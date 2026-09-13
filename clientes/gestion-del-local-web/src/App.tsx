@@ -1,31 +1,49 @@
 import { useEffect, useState } from "react";
-import { VERSION_CALCULO_DE_PRECIOS } from "@ferre/calculo-de-precios";
 import { urlApi } from "./api";
+import { ProveedorDeSesion, useSesion } from "./sesion";
+import { Login } from "./pantallas/Login";
+import { Vincular } from "./pantallas/Vincular";
+import { Administracion } from "./pantallas/Administracion";
+import "./estilos.css";
 
-type Salud = { ok: boolean; db: string; calculoDePrecios: string };
-
-// Pantalla mínima del esqueleto: muestra que el cliente, la API y la base se hablan.
-// Las pantallas reales (buscar, vender, cargar lista) llegan con los issues #12 a #15.
 export function App() {
-  const [salud, setSalud] = useState<Salud | "cargando" | "sin-conexion">("cargando");
+  return (
+    <ProveedorDeSesion>
+      <Rutas />
+    </ProveedorDeSesion>
+  );
+}
 
-  useEffect(() => {
-    fetch(urlApi("/health"))
-      .then((r) => r.json() as Promise<Salud>)
-      .then(setSalud)
-      .catch(() => setSalud("sin-conexion"));
-  }, []);
+// Dos rutas por ahora; un enrutador de verdad llega con las pantallas de venta.
+function Rutas() {
+  const { sesion, salir } = useSesion();
+  const codigoVinculacion = new URLSearchParams(location.search).get("codigo");
+  const ruta = location.pathname.replace(import.meta.env.BASE_URL, "/");
+
+  if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
+  if (ruta === "/vincular" && codigoVinculacion) return <Vincular codigo={codigoVinculacion} />;
+  if (sesion.estado === "sin-sesion") return <Login />;
 
   return (
-    <main style={{ fontFamily: "system-ui", padding: "2rem", maxWidth: 480 }}>
-      <h1>ferre</h1>
-      <p data-testid="estado">
-        {salud === "cargando" && "Consultando el servidor…"}
-        {salud === "sin-conexion" && "Sin conexión con el servidor."}
-        {typeof salud === "object" &&
-          `Servidor ${salud.ok ? "ok" : "con problemas"} · base ${salud.db} · cálculo de precios v${salud.calculoDePrecios}`}
-      </p>
-      <small>cliente web v{VERSION_CALCULO_DE_PRECIOS}</small>
+    <main>
+      <header className="barra">
+        <strong>ferre</strong>
+        <span data-testid="usuario">{sesion.usuario.nombre} · {sesion.usuario.rol}{sesion.sinConexion ? " · sin conexión" : ""}</span>
+        <button onClick={salir}>Salir</button>
+      </header>
+      <EstadoDelServidor />
+      {sesion.usuario.rol === "dueño" && <Administracion />}
     </main>
   );
+}
+
+function EstadoDelServidor() {
+  const [texto, setTexto] = useState("Consultando el servidor…");
+  useEffect(() => {
+    fetch(urlApi("/health"))
+      .then((r) => r.json() as Promise<{ ok: boolean; db: string }>)
+      .then((s) => setTexto(`Servidor ${s.ok ? "ok" : "con problemas"} · base ${s.db}`))
+      .catch(() => setTexto("Sin conexión con el servidor."));
+  }, []);
+  return <p data-testid="estado">{texto}</p>;
 }

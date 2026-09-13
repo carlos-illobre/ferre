@@ -93,6 +93,7 @@ jobs:
       - run: pnpm --filter gestion-del-local-web... build
         env:
           VITE_API_URL: ${{ vars.API_URL }}
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VITE_BASE: /${{ github.event.repository.name }}/
       - uses: actions/upload-pages-artifact@v3
         with: { path: clientes/gestion-del-local-web/dist }

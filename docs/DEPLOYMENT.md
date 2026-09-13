@@ -35,6 +35,15 @@ cliente (`http://localhost:4173` para `vite preview`; `http://localhost:5173` pa
 
 El script de despliegue, el preflight y la guía paso a paso se generan en el issue #19.
 
+## Primer usuario
+
+El login es con Google ([docs/google-cloud.md](google-cloud.md)). El primer dueño se
+crea desde el contenedor; los siguientes usuarios, desde la app:
+
+```bash
+docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre" dueño
+```
+
 ## Respaldo y recuperación
 
 - Volcado horario de la base a Oracle Object Storage, retención 30 días.

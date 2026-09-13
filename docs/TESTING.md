@@ -17,6 +17,7 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 | Escenario | Archivo | Estado |
 |---|---|---|
 | La app abre y el servidor responde | `00-arranque.spec.ts` | Hecho |
+| Sin sesión se pide entrar; con sesión el dueño ve la administración | `01-login.spec.ts` | Hecho |
 | Cargar una lista de precios y aplicarla | pendiente | Issue #12 |
 | Buscar un producto y registrar una venta | pendiente | Issue #15 |
 | Ingresar mercadería de un proveedor | pendiente | Issue #30 |
@@ -32,6 +33,7 @@ Cada issue de esa lista agrega su escenario antes de cerrarse.
 | `paridad_env.sh` | Todos los `.env*` declaran las mismas variables; el compose no interpola ninguna sin declarar | Es la que atrapa el error más caro y corre en segundos |
 | `health.sh` | Cada servicio responde 200 en `/health` con el stack arriba | Primera verificación después de cualquier despliegue |
 | `migraciones.sh` | Todas las migraciones aplicadas y las tablas del modelo existen | Verifica el arranque real de la API contra la base |
+| `autenticacion.sh` | 401 sin sesión, 403 por rol, alta de usuario, auditoría, login por QR de punta a punta, cierre de sesión | Es la puerta de todo; se prueba sin Google sembrando sesiones |
 
 ## Unitarias
 

@@ -45,7 +45,10 @@ erDiagram
 | `consulta` | Preguntaron y no compraron | Hoy pasa muy seguido y no se anota |
 | `compra` / `item_compra` | Ingreso de mercadería (#30) | `sin_comprobante` para los dos proveedores sin factura |
 | `movimiento_stock` | Cada entrada o salida | Cantidad con signo; los conteos (#31) generan ajustes |
-| `evento` | Registro de eventos de dominio (ADR-003) | Sincronización hoy; otros servicios mañana |
+| `evento` | Registro de eventos de dominio (ADR-003) y auditoría | Lleva `usuario_id`: quién hizo qué |
+| `usuario` | Quién puede entrar | Gmail autorizado y rol dueño/mostrador; sin contraseñas ([ADR-011](adr/ADR-011-autenticacion-sin-contrasenas.md)) |
+| `sesion` | Sesiones abiertas | Token hasheado, dispositivo, vencimiento renovable, revocación |
+| `vinculacion` | Login de la laptop por QR | Código de un solo uso aprobado desde el celular |
 | `migracion` | Qué archivos SQL ya corrieron | La crea el corredor |
 
 ## Migraciones

@@ -15,3 +15,4 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [008](ADR-008-pnpm-y-uv.md) | pnpm para TypeScript y uv para Python | Aceptado | 2026-09-13 |
 | [009](ADR-009-compose-unico-y-env.md) | Un solo docker-compose.yml con el .env como única fuente | Aceptado | 2026-09-13 |
 | [010](ADR-010-servicios-clientes-y-librerias.md) | Servicios, clientes y librerías separados; nombres por negocio; cliente web en GitHub Pages | Aceptado | 2026-09-13 |
+| [011](ADR-011-autenticacion-sin-contrasenas.md) | Entrar con Google, sesiones opacas revocables, login por QR, auditoría por usuario | Aceptado | 2026-09-13 |

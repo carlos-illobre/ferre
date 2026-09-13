@@ -33,6 +33,7 @@ services:
       DATABASE_URL: ${DATABASE_URL:?falta DATABASE_URL en el .env}
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
       ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
       # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
       PORT: "8080"
