@@ -1,14 +1,6 @@
-# Con SITIO=http://localhost sirve HTTP plano (desarrollo). Con un dominio, Caddy emite y
-# renueva el certificado de Let's Encrypt solo. Ver docs/adr/ADR-006-caddy.md.
-#
-# Un solo Caddy (el del proyecto de producción) atiende los dos ambientes por nombre de
-# dominio y llega al de pruebas por la red compartida ferre-borde (ADR-012).
+# Caddy de DESARROLLO (perfil gateway): sirve la API en http://localhost. En la máquina de
+# Oracle no se usa: ahí el gateway compartido es deployment/oracle-single/caddy-gateway.
 {$SITIO} {
     encode gzip
-    reverse_proxy gestion-del-local-{$AMBIENTE}:8080
-}
-
-{$SITIO_PRUEBAS} {
-    encode gzip
-    reverse_proxy gestion-del-local-pruebas:8080
+    reverse_proxy gestion-del-local:8080
 }

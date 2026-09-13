@@ -4,7 +4,7 @@
 
 ```bash
 cp .env.example .env
-docker network create ferre-borde
+docker network create caddy-gateway
 docker compose up -d --build --wait
 ```
 
@@ -27,11 +27,12 @@ cliente (`http://localhost:4173` para `vite preview`; `http://localhost:5173` pa
 Guía completa en [deployment/oracle-single/ORACLE.md](../deployment/oracle-single/ORACLE.md).
 
 - `master` es pruebas, `produccion` es producción ([ADR-012](adr/ADR-012-ambientes-de-prueba-y-produccion.md)).
-  Cada push a una de las dos ramas despliega su ambiente desde CI. Pasar a producción:
-  `git push origin master:produccion`.
+  En cada push CI construye, publica y avisa; la máquina despliega sola su ambiente
+  ([ADR-013](adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
+  producción: `git push origin master:produccion`.
 - Máquina Always Free (Ampere, arm64), sin estado: dos proyectos de compose, uno por
-  ambiente, con `gestion-del-local` y `listas-de-proveedores`; Caddy solo en producción,
-  atendiendo los dos dominios.
+  ambiente, con `gestion-del-local` y `listas-de-proveedores`, detrás del Caddy
+  compartido `~/caddy-gateway`, que sirve a todos los proyectos de la máquina.
 - Base de datos en Supabase ([ADR-002](adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md)).
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
   ([ADR-007](adr/ADR-007-imagenes-en-ci-y-ghcr.md)).
@@ -41,6 +42,8 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../deployment/oracle-sing
 - **Cliente web en GitHub Pages:** un sitio, dos carpetas: la raíz es `produccion` y
   `/pruebas/` es `master`. CI lo construye con las variables de repositorio `API_URL`,
   `API_URL_PRUEBAS` y `GOOGLE_CLIENT_ID`. Es lo único que vive fuera del `.env`.
+- **Sin acceso entrante:** GitHub no entra a la máquina. El job `avisar` publica en el
+  canal `NTFY_AVISOS` y el servicio `ferre-despliegue` de la máquina hace el resto.
 - TLS: Caddy emite y renueva solo ([ADR-006](adr/ADR-006-caddy.md)). Puertos 80 y 443
   abiertos en la Security List de la VCN, que es el firewall efectivo.
 
@@ -65,8 +68,11 @@ docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.co
 
 ## Reversión
 
-Desde tu computadora, con `deployment/oracle-single/.env` completado:
+En la máquina:
 
 ```bash
-bash deployment/oracle-single/deploy.sh produccion <sha-anterior>
+~/ferre/bin/desplegar.sh produccion <sha-anterior>
 ```
+
+O moviendo la rama `produccion` al commit anterior, que además deja el repositorio
+contando la verdad.

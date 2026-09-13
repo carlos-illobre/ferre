@@ -17,3 +17,4 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [010](ADR-010-servicios-clientes-y-librerias.md) | Servicios, clientes y librerías separados; nombres por negocio; cliente web en GitHub Pages | Aceptado | 2026-09-13 |
 | [011](ADR-011-autenticacion-sin-contrasenas.md) | Entrar con Google, sesiones opacas revocables, login por QR, auditoría por usuario | Aceptado | 2026-09-13 |
 | [012](ADR-012-ambientes-de-prueba-y-produccion.md) | Dos ambientes en la misma máquina, promoción por rama, despliegue desde CI | Aceptado | 2026-09-13 |
+| [013](ADR-013-despliegue-por-aviso-y-gateway-compartido.md) | La máquina se despliega sola al recibir un aviso; Caddy compartido como puerta de entrada | Aceptado | 2026-09-13 |

@@ -1,0 +1,29 @@
+# El Caddy compartido de la máquina (ADR-013): la única puerta de entrada, para ferre y
+# para cualquier proyecto futuro. Vive en ~/caddy-gateway, aparte de los proyectos.
+#
+# Para sumar un proyecto: su compose se conecta a la red externa `caddy-gateway`, se
+# deja un archivo en sitios/<proyecto>.caddy con su dominio y el nombre de su contenedor,
+# y se recarga:  docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./sitios:/etc/caddy/sitios:ro
+      # Certificados y estado de ACME. Sin este volumen, cada reinicio vuelve a emitir
+      # y agota el cupo de Let's Encrypt.
+      - caddy-data:/data
+    networks:
+      - caddy-gateway
+
+volumes:
+  caddy-data:
+
+networks:
+  caddy-gateway:
+    name: caddy-gateway
+    external: true

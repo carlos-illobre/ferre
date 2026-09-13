@@ -1,8 +1,8 @@
 name: CI
 
 # master = ambiente de pruebas; produccion = ambiente de producción (ADR-012).
-# Cada push a una de las dos ramas: pruebas, imágenes, cliente web en Pages y despliegue
-# del ambiente que corresponde en la máquina de Oracle.
+# Cada push a una de las dos ramas: pruebas, imágenes, cliente web en Pages y un aviso a
+# la máquina de Oracle, que despliega sola el ambiente que corresponde (ADR-013).
 on:
   push:
     branches: [master, produccion]
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: cp .env.example .env
-      - run: docker network create ferre-borde
+      - run: docker network create caddy-gateway
       - run: docker compose up -d --build --wait
       - run: tests/itest.sh
       - run: pnpm install --frozen-lockfile
@@ -79,41 +79,25 @@ jobs:
       - run: docker compose build gestion-del-local listas-de-proveedores
       - run: docker compose push gestion-del-local listas-de-proveedores
 
-  desplegar:
-    # master → pruebas, produccion → produccion, en la misma máquina de Oracle. Los datos
-    # de acceso son secretos del repositorio (ORACLE_HOST, ORACLE_USUARIO, ORACLE_SSH_KEY).
+  avisar:
+    # GitHub no entra a la máquina (ADR-013): publica un aviso en ntfy y la máquina, que
+    # escucha ese canal, verifica contra GitHub y GHCR y despliega sola. El aviso no lleva
+    # información; el nombre del canal es una variable del repositorio (NTFY_AVISOS).
     if: github.event_name == 'push'
     needs: [imagenes]
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'produccion' && 'produccion' || 'pruebas' }}
     steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      # Hasta que existan los secretos de la máquina (ORACLE.md, paso 8) el job avisa y
-      # termina bien, para que CI no quede en rojo por algo que todavía no se configuró.
-      - id: acceso
-        name: ¿Hay acceso a la máquina?
-        env: { HOST: "${{ secrets.ORACLE_HOST }}" }
-        run: |
-          if [ -z "$HOST" ]; then
-            echo "::warning::Sin secretos ORACLE_* configurados: no se despliega (ver deployment/oracle-single/ORACLE.md, paso 8)"
-            echo "listo=no" >> "$GITHUB_OUTPUT"
-          else
-            echo "listo=si" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Clave SSH
-        if: steps.acceso.outputs.listo == 'si'
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.ORACLE_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.ORACLE_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
-      - name: Desplegar
-        if: steps.acceso.outputs.listo == 'si'
+      - name: Avisar a la máquina
         env:
-          SSH: ${{ secrets.ORACLE_USUARIO }}@${{ secrets.ORACLE_HOST }}
-          RUTA_REMOTA: ferre
-        run: bash deployment/oracle-single/deploy.sh "${{ github.ref_name == 'produccion' && 'produccion' || 'pruebas' }}" "$GITHUB_SHA"
+          NTFY_URL: ${{ vars.NTFY_URL || 'https://ntfy.sh' }}
+          NTFY_AVISOS: ${{ vars.NTFY_AVISOS }}
+        run: |
+          if [ -z "$NTFY_AVISOS" ]; then
+            echo "::warning::Sin la variable NTFY_AVISOS no se avisa a la máquina (ver deployment/oracle-single/ORACLE.md, paso 7)"
+            exit 0
+          fi
+          curl -sf -o /dev/null -H "Title: ferre ${GITHUB_REF_NAME}" -d "${GITHUB_SHA::7} publicado" "$NTFY_URL/$NTFY_AVISOS"
+          echo "aviso publicado en $NTFY_AVISOS para ${GITHUB_REF_NAME} ${GITHUB_SHA::7}"
 
   cliente-web:
     # Un solo sitio de Pages con dos carpetas: la raíz es la rama produccion y /pruebas/

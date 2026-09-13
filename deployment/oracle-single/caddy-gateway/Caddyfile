@@ -1,0 +1,6 @@
+# Un archivo por proyecto en sitios/. Este Caddyfile no se toca al agregar proyectos.
+{
+    email <correo-para-avisos-de-lets-encrypt>
+}
+
+import sitios/*.caddy

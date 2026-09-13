@@ -78,3 +78,15 @@ Un solo `docker-compose.yml`; el `.env` sigue siendo la única diferencia entre 
 ## Referencias
 
 ADR-002, ADR-006, ADR-007, ADR-010. `deployment/oracle-single/ORACLE.md`. Issue #53.
+
+---
+
+## Enmienda (ADR-013)
+
+El despliegue ya no lo hace CI por SSH: la máquina se despliega sola al recibir un aviso
+por ntfy, verificando contra GitHub y GHCR. La red compartida pasa a llamarse
+`caddy-gateway`, y el Caddy que atiende los dominios es el proyecto compartido
+`~/caddy-gateway`, no el del compose de ferre. Siguen vigentes las ramas, los dos
+proyectos de compose, las dos bases y las dos carpetas de Pages.
+
+→ [ADR-013](ADR-013-despliegue-por-aviso-y-gateway-compartido.md)
