@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph navegador["Laptop / celular (navegador)"]
+        pwa["PWA<br/>IndexedDB: catálogo, ventas, cola"]
+    end
+
+    subgraph oracle["Máquina Oracle Cloud (sin estado)"]
+        caddy["Caddy<br/>:80 :443 TLS automático"]
+        mostrador["mostrador<br/>Hono + PWA estática :8080"]
+        importador["importador<br/>FastAPI :8000"]
+        caddy --> mostrador
+        mostrador -- "token de servicio" --> importador
+    end
+
+    supabase[("Supabase<br/>PostgreSQL")]
+    objeto[("Oracle Object Storage<br/>volcados horarios")]
+    ghcr["GHCR<br/>imágenes por SHA"]
+
+    pwa -- HTTPS --> caddy
+    mostrador --> supabase
+    oracle -. "pg_dump cada hora" .-> objeto
+    ghcr -. "docker compose pull" .-> oracle

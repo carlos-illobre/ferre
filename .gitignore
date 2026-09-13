@@ -17,3 +17,16 @@ Thumbs.db
 .idea/
 node_modules/
 __pycache__/
+
+# Dependencias y artefactos de build
+**/node_modules/
+**/dist/
+microservices/mostrador/api/public/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/playwright-report/
+**/test-results/
+
+# Configuración real de cada ambiente (las plantillas .env.example y .env.oracle sí se versionan)
+deployment/*/.env

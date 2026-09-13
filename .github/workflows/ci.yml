@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  REGISTRO: ghcr.io/${{ github.repository }}
+
+jobs:
+  mostrador:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: microservices/mostrador } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm, cache-dependency-path: microservices/mostrador/pnpm-lock.yaml }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm test
+
+  importador:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: microservices/importador } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run pytest -q
+
+  configuracion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Paridad de .env y compose resuelto sin variables sin definir
+        run: |
+          cp .env.example .env
+          tests/itest.sh --rapido
+          docker compose --profile local config --quiet
+
+  e2e:
+    needs: [mostrador, importador, configuracion]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: cp .env.example .env
+      - run: docker compose --profile local up -d --build --wait
+      - run: tests/itest.sh
+      - run: pnpm install --frozen-lockfile
+        working-directory: tests/e2e
+      - run: pnpm exec playwright install --with-deps chromium
+        working-directory: tests/e2e
+      - run: pnpm exec playwright test
+        working-directory: tests/e2e
+      - if: failure()
+        run: docker compose --profile local logs --no-color | tail -200
+
+  imagenes:
+    # Solo en master: publica las imágenes etiquetadas por SHA corto, que es lo que
+    # despliega deployment/oracle-single (ADR-007).
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: [e2e]
+    runs-on: ubuntu-latest
+    permissions: { contents: read, packages: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - run: echo "IMAGEN_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+      - run: docker compose build mostrador importador
+      - run: docker compose push mostrador importador

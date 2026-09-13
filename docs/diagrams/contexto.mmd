@@ -1,0 +1,17 @@
+C4Context
+    title Contexto del sistema ferre
+
+    Person(empleado, "Empleado", "Vende, compra y cuenta stock desde la laptop o el celular")
+    Person(dueno, "Dueño", "Administra a distancia desde el celular")
+
+    System(ferre, "ferre", "Mostrador: catálogo, precios, stock, ventas y compras")
+
+    System_Ext(proveedores, "Proveedores", "Mandan listas de precios por mail, web o PDF")
+    System_Ext(supabase, "Supabase", "PostgreSQL administrado")
+    System_Ext(futuro, "Ventas online (futuro)", "Consume catálogo y stock por API; publica pedidos como eventos")
+
+    Rel(empleado, ferre, "Usa", "HTTPS / PWA offline")
+    Rel(dueno, ferre, "Consulta", "HTTPS")
+    Rel(proveedores, ferre, "Listas de precios", "Excel, PDF")
+    Rel(ferre, supabase, "Lee y escribe", "PostgreSQL")
+    Rel(futuro, ferre, "API y eventos", "HTTPS / JSON")

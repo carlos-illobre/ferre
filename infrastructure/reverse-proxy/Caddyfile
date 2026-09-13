@@ -1,0 +1,6 @@
+# Con SITIO=http://localhost sirve HTTP plano (desarrollo). Con un dominio, Caddy emite y
+# renueva el certificado de Let's Encrypt solo. Ver docs/adr/ADR-006-caddy.md.
+{$SITIO} {
+    encode gzip
+    reverse_proxy mostrador:8080
+}

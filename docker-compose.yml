@@ -1,0 +1,78 @@
+# Único compose del proyecto. Lo que cambia entre ambientes sale del .env; lo que no
+# cambia va literal acá. Sin valores por omisión: una variable ausente corta el arranque.
+# Ver docs/adr/ADR-009-compose-unico-y-env.md.
+
+services:
+  reverse-proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # "http://localhost" en desarrollo; el dominio real en producción. Con un dominio,
+      # Caddy emite y renueva el certificado solo (ADR-006).
+      SITIO: ${SITIO:?falta SITIO en el .env}
+    volumes:
+      - ./infrastructure/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificados y estado de ACME. Sin este volumen, cada reinicio vuelve a emitir
+      # y agota el cupo de Let's Encrypt.
+      - caddy-data:/data
+    depends_on:
+      mostrador:
+        condition: service_healthy
+
+  mostrador:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/mostrador:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build: ./microservices/mostrador
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?falta DATABASE_URL en el .env}
+      TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
+      # No cambia entre ambientes: el importador siempre vive en la misma red del compose.
+      IMPORTADOR_URL: http://importador:8000
+      PORT: "8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  importador:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/importador:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build: ./microservices/importador
+    restart: unless-stopped
+    environment:
+      TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
+      PORT: "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  # Solo en desarrollo y CI. En producción la base es Supabase (ADR-002) y este servicio
+  # no se levanta: `docker compose --profile local up`.
+  db:
+    image: postgres:17-alpine
+    profiles: ["local"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ferre
+      POSTGRES_PASSWORD: ferre
+      POSTGRES_DB: ferre
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ferre -d ferre"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  caddy-data:
+  db-data:
