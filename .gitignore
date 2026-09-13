@@ -3,6 +3,8 @@ privado/
 *.xlsx
 *.xls
 *.pdf
+# Muestras anonimizadas para las pruebas: sí se versionan
+!microservices/listas-de-proveedores/tests/muestras/*.xlsx
 *.html:Zone.Identifier
 *:Zone.Identifier
 *.db
