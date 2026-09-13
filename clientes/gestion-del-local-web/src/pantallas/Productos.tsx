@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { buscar, indexar, margenReal, MARGENES, precioDeVenta, type Margen } from "@ferre/calculo-de-precios";
-import { api, ErrorApi } from "../api";
+import { margenReal, MARGENES, precioDeVenta, type Margen } from "@ferre/calculo-de-precios";
+import { useCatalogo } from "../catalogo";
 import { Explicacion } from "../componentes/Explicacion";
 import { fecha, pesos } from "../formato";
 
@@ -15,30 +15,19 @@ export type Producto = {
 // entero y se busca en memoria: respuesta al instante y base del modo sin conexión (#18).
 // Teclado: escribir busca; flechas eligen; 1 a 5 fijan el margen del elegido; Esc limpia.
 export function Productos() {
-  const [catalogo, setCatalogo] = useState<Producto[] | null>(null);
+  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [error, setError] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
   const caja = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    api<Producto[]>("/productos")
-      .then(setCatalogo)
-      .catch((e) => setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor: el catálogo no se pudo bajar."));
-  }, []);
   useEffect(() => { caja.current?.focus(); }, [catalogo]);
-
-  const indice = useMemo(() => (catalogo ? indexar(catalogo.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }))) : null), [catalogo]);
-  const resultados = useMemo(() => (indice ? buscar(indice, consulta, 50) : []), [indice, consulta]);
+  const resultados = useMemo(() => buscarProductos(consulta, 50), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
 
   const actualizar = useCallback((id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "precio_manual">>) => {
-    setCatalogo((c) => c && c.map((p) => (p.id === id ? { ...p, ...cambios } : p)));
-    const cuerpo: Record<string, number | null> = {};
-    if ("margen_elegido" in cambios) cuerpo.margen_elegido = cambios.margen_elegido ?? null;
-    if ("precio_manual" in cambios) cuerpo.precio_manual = cambios.precio_manual === null || cambios.precio_manual === undefined ? null : Number(cambios.precio_manual);
-    api(`/productos/${id}`, { method: "PATCH", body: JSON.stringify(cuerpo) }).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`));
-  }, []);
+    actualizarProducto(id, cambios).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`));
+  }, [actualizarProducto]);
 
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
@@ -49,7 +38,7 @@ export function Productos() {
       // solo escribe). Se mira e.code porque con Shift la tecla "3" reporta "#".
       e.preventDefault();
       const p = resultados[elegido];
-      if (p) actualizar(p.id, { margen_elegido: MARGENES[Number(e.key) - 1]!, precio_manual: null });
+      if (p) actualizar(p.id, { margen_elegido: MARGENES[Number(e.key === "#" ? 3 : e.code.slice(5)) - 1]!, precio_manual: null });
     }
   }
 
@@ -71,7 +60,7 @@ export function Productos() {
         {catalogo ? `${catalogo.length.toLocaleString("es-AR")} productos. ` : ""}
         Flechas para elegir · Shift+1 a Shift+5 para el margen (300, 200, 100, 50, 25 %) · Esc para limpiar
       </p>
-      {error && <p className="error" role="alert">{error}</p>}
+      {(error ?? errorCatalogo) && <p className="error" role="alert">{error ?? errorCatalogo}</p>}
       {catalogo && catalogo.length === 0 && <p>Todavía no hay productos: cargá una lista de precios primero.</p>}
       {consulta.trim() && resultados.length === 0 && catalogo && catalogo.length > 0 && <p data-testid="sin-resultados">Nada con "{consulta}". Probá con menos palabras.</p>}
       <div className="tabla-scroll">

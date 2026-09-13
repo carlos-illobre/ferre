@@ -60,3 +60,23 @@ td.precio .explicacion { display: inline-block; }
 .manual { color: #7a5c00; font-size: 0.85rem; }
 .precio-manual { width: 7rem; font: inherit; margin-left: 0.4rem; }
 button.enlace.chico { font-size: 0.85rem; padding: 0.2rem 0.4rem; }
+
+/* Vender: la búsqueda con sugerencias, la venta en curso, el cobro abajo. */
+.buscador { position: relative; }
+.sugerencias { position: absolute; left: 0; right: 0; z-index: 5; margin: 0; padding: 0; list-style: none; background: #fff; border: 1px solid #bbb; border-radius: 0 0 8px 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+.sugerencias li { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 1rem; padding: 0.5rem 0.9rem; cursor: pointer; border-top: 1px solid #eee; }
+.sugerencias li small { grid-column: 1; color: #555; }
+.sugerencias li strong { grid-row: 1 / span 2; align-self: center; font-size: 1.1rem; }
+.sugerencias li.elegido { background: #eef4ff; }
+.exito { color: #0a7a2f; background: #eefaf0; padding: 0.5rem 0.8rem; border-radius: 6px; }
+table.venta td { font-size: 1.05rem; }
+tr.sin-precio-fila td { background: #fff3f3; }
+input.cantidad { width: 4.5rem; font: inherit; font-size: 1.1rem; text-align: right; }
+input.libre { font: inherit; width: 100%; }
+.cobro { position: sticky; bottom: 0; background: #fff; border-top: 2px solid #ddd; padding: 0.75rem 0; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+.total { font-size: 1.4rem; }
+.total strong { font-size: 2rem; margin-left: 0.5rem; }
+.medios { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+button.medio { font: inherit; padding: 0.6rem 0.9rem; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; }
+button.medio.activo { background: #0b57d0; color: #fff; border-color: #0b57d0; }
+tr.anulada td { color: #888; text-decoration: line-through; }

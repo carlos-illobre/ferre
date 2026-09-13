@@ -25,7 +25,11 @@ test.beforeAll(() => {
   // textos: el SQL pasa por un shell con comillas dobles y $2 se expandiría. Las comillas
   // dobles del JSON van sin escapar: psql() las escapa una sola vez.
   psql(`DELETE FROM precio_proveedor WHERE proveedor_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}')`);
-  psql(`DELETE FROM producto WHERE descripcion LIKE '%(E2E)%'`);
+  // Solo los productos de este escenario: otros escenarios tienen los suyos, con ventas colgando.
+  psql(`DELETE FROM movimiento_stock WHERE producto_id IN ('00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e3')`);
+  psql(`DELETE FROM item_venta WHERE producto_id IN ('00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e3')`);
+  psql(`DELETE FROM consulta WHERE producto_id IN ('00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e3')`);
+  psql(`DELETE FROM producto WHERE id IN ('00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e3')`);
   psql(`DELETE FROM proveedor WHERE nombre = '${PROVEEDOR}'`);
   psql(`INSERT INTO proveedor (id, nombre) VALUES ('00000000-0000-0000-0000-00000000e2e1', '${PROVEEDOR}')`);
   psql(`INSERT INTO producto (id, descripcion, marca, codigo_barras) VALUES ('00000000-0000-0000-0000-00000000e2e2', 'MECHA PARA MADERA DE 6 MM (E2E)', 'MARCA E2E', '7790000000099'), ('00000000-0000-0000-0000-00000000e2e3', 'TALADRO PERCUTOR 750 W (E2E)', 'MARCA E2E', NULL)`);
@@ -34,7 +38,7 @@ test.beforeAll(() => {
 
 test("buscar un producto, elegir el margen y fijar un precio a mano", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/");
+  await page.goto("/#/productos");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
   await expect(busqueda).toBeFocused();

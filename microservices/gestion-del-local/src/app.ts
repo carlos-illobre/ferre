@@ -9,6 +9,9 @@ import { auditoria } from "./rutas/auditoria.js";
 import { proveedores } from "./rutas/proveedores.js";
 import { listas } from "./rutas/listas.js";
 import { productos } from "./rutas/productos.js";
+import { ventas } from "./rutas/ventas.js";
+import { clientes } from "./rutas/clientes.js";
+import { consultas } from "./rutas/consultas.js";
 
 export const app = new Hono();
 
@@ -29,6 +32,9 @@ app.route("/auditoria", auditoria);
 app.route("/proveedores", proveedores);
 app.route("/listas", listas);
 app.route("/productos", productos);
+app.route("/ventas", ventas);
+app.route("/clientes", clientes);
+app.route("/consultas", consultas);
 
 app.onError((error, c) => {
   console.error(error);

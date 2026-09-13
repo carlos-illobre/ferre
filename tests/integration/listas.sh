@@ -30,6 +30,9 @@ fallos=0
 verificar() { if [[ "$2" == "$3" ]]; then echo "  ok   $1"; else echo "  FALLÓ $1: esperado $2, respondió $3"; fallos=$((fallos+1)); fi; }
 alta() { curl -s -H "$AUTH" -H 'Content-Type: application/json' -d "$1" $API/proveedores | json '["id"]'; }
 
+# Otras corridas (los E2E) pueden haber dejado otro proveedor con el lector comodo; la
+# detección tiene que caer en el de esta prueba.
+psql "UPDATE proveedor SET lector = NULL WHERE lector = 'comodo'" >/dev/null
 COMODO=$(alta '{"nombre":"Comodo (prueba)","descuento_contado":0.05,"lector":"comodo"}')
 TRESGE=$(alta '{"nombre":"3GE (prueba)","lector":"tresge"}')
 alta '{"nombre":"ERPA (prueba)","lector":"erpa"}' >/dev/null

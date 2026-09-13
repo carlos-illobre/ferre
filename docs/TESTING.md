@@ -20,7 +20,7 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 | Sin sesión se pide entrar; con sesión el dueño ve la administración | `01-login.spec.ts` | Hecho |
 | Cargar una lista de precios y aplicarla | `02-listas.spec.ts` | Hecho |
 | Buscar un producto, elegir su margen y fijar un precio a mano | `03-productos.spec.ts` | Hecho |
-| Buscar un producto y registrar una venta | pendiente | Issue #15 |
+| Buscar un producto y registrar una venta; ventas del día; anular; "no llevó" | `04-vender.spec.ts` | Hecho |
 | Ingresar mercadería de un proveedor | pendiente | Issue #30 |
 | Contar un sector y ajustar stock | pendiente | Issue #31 |
 | Ver el stock valorizado | pendiente | Issue #33 |
