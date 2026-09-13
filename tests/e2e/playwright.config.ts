@@ -4,6 +4,8 @@ import { defineConfig } from "@playwright/test";
 // Caddy), como lo usaría el empleado. BASE_URL permite apuntar a otro ambiente.
 export default defineConfig({
   testDir: "./escenarios",
+  // Los escenarios comparten la base del compose: de a uno, para que no se pisen.
+  workers: 1,
   reporter: [["list"]],
   use: { baseURL: process.env.BASE_URL ?? "http://localhost:4173", trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { browserName: "chromium" } }],

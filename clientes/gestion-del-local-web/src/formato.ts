@@ -1,9 +1,10 @@
-// Números como los lee el empleado: $1.649,14 y 12,5 %.
-const pesosAr = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// Números como los lee el empleado: $1.649,14 y 12,5 %. El formato de pesos es el de la
+// librería compartida, así se ve igual en la explicación y en la pantalla.
+import { pesos as pesosLib } from "@ferre/calculo-de-precios";
 
 export function pesos(valor: string | number | null | undefined): string {
   if (valor === null || valor === undefined || valor === "") return "—";
-  return pesosAr.format(Number(valor));
+  return pesosLib(Number(valor));
 }
 
 export function porcentaje(valor: number): string {

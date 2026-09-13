@@ -6,6 +6,7 @@ import { Login } from "./pantallas/Login";
 import { Vincular } from "./pantallas/Vincular";
 import { Administracion } from "./pantallas/Administracion";
 import { Listas } from "./pantallas/Listas";
+import { Productos } from "./pantallas/Productos";
 import "./estilos.css";
 
 export function App() {
@@ -17,6 +18,7 @@ export function App() {
 }
 
 const MENU: { ruta: string; nombre: string; soloDueno?: boolean }[] = [
+  { ruta: "productos", nombre: "Productos" },
   { ruta: "listas", nombre: "Listas de precios" },
   { ruta: "administracion", nombre: "Administración", soloDueno: true },
 ];
@@ -31,7 +33,7 @@ function Pantallas() {
   if (sesion.estado === "sin-sesion") return <Login />;
 
   const esDueno = sesion.usuario.rol === "dueño";
-  const actual = ruta.nombre === "inicio" ? "listas" : ruta.nombre;
+  const actual = ruta.nombre === "inicio" ? "productos" : ruta.nombre;
 
   return (
     <main>
@@ -50,8 +52,10 @@ function Pantallas() {
           <EstadoDelServidor />
           <Administracion />
         </>
-      ) : (
+      ) : actual === "listas" ? (
         <Listas />
+      ) : (
+        <Productos />
       )}
     </main>
   );

@@ -19,6 +19,7 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 | La app abre y el servidor responde | `00-arranque.spec.ts` | Hecho |
 | Sin sesión se pide entrar; con sesión el dueño ve la administración | `01-login.spec.ts` | Hecho |
 | Cargar una lista de precios y aplicarla | `02-listas.spec.ts` | Hecho |
+| Buscar un producto, elegir su margen y fijar un precio a mano | `03-productos.spec.ts` | Hecho |
 | Buscar un producto y registrar una venta | pendiente | Issue #15 |
 | Ingresar mercadería de un proveedor | pendiente | Issue #30 |
 | Contar un sector y ajustar stock | pendiente | Issue #31 |
@@ -39,7 +40,9 @@ Cada issue de esa lista agrega su escenario antes de cerrarse.
 ## Unitarias
 
 Se escriben donde probar a mano sería más lento: el cálculo de precios y su explicación
-(`calculo-de-precios`), los lectores de listas (`listas-de-proveedores`). Hoy: los cuatro
-lectores contra muestras anonimizadas (y contra las listas reales de `privado/` cuando
-existen), el cálculo de costo neto, la API del servicio de listas, y el orden de archivos
-del corredor de migraciones.
+(`calculo-de-precios`), los lectores de listas (`listas-de-proveedores`). Hoy: el precio de
+venta con su redondeo y explicación, el margen real de un precio manual, la búsqueda (orden
+de palabras, acentos, códigos, velocidad con 50.000 productos), los cuatro lectores contra
+muestras anonimizadas (y contra las listas reales de `privado/` cuando existen), el cálculo
+de costo neto, la API del servicio de listas, y el orden de archivos del corredor de
+migraciones.

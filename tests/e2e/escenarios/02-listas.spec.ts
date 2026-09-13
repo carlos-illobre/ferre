@@ -37,6 +37,7 @@ test.beforeAll(() => {
 test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");
+  await page.getByRole("button", { name: "Listas de precios" }).click();
   await expect(page.getByRole("heading", { name: "Listas de precios" })).toBeVisible();
 
   // Alta del proveedor con su configuración de costo (descuento por contado 5 %).
@@ -58,7 +59,7 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
 
   // La vista previa muestra el costo con descuento de línea y contado, y su explicación.
   const fila = page.getByRole("row", { name: /MP001/ });
-  await expect(fila).toContainText("712,50");
+  await expect(fila).toContainText("$712,50");
   await fila.locator("summary").click();
   await expect(fila).toContainText("− 25 % (linea)");
   await expect(fila).toContainText("− 5 % (contado)");

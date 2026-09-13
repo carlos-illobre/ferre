@@ -1,5 +1,5 @@
-// Paquete compartido entre la API y la PWA. Acá va a vivir el cálculo de costo neto,
-// margen y precio de venta, que devuelve siempre el resultado junto con su explicación
-// (issue #47). Se comparte para que el precio calculado sin conexión sea idéntico al del
-// servidor (ADR-001). Todavía sin lógica de negocio: la define el issue #11 y el #13.
-export const VERSION_CALCULO_DE_PRECIOS = "0.1.0";
+// Librería compartida entre la API y los clientes (ADR-001, ADR-010): cálculo de precios
+// con su explicación (issue #13, #47) y búsqueda sobre el catálogo (issue #14).
+export const VERSION_CALCULO_DE_PRECIOS = "0.2.0";
+export * from "./precio.js";
+export * from "./busqueda.js";

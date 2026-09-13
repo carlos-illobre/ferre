@@ -42,3 +42,21 @@ td.baja { color: #0a7a2f; font-weight: 600; }
 .explicacion summary small { color: #0b57d0; }
 .explicacion ol { margin: 0.4rem 0 0; padding-left: 1.2rem; font-size: 0.9rem; color: #333; white-space: normal; }
 label { display: inline-flex; gap: 0.3rem; align-items: center; }
+
+/* Productos: búsqueda grande con foco, resultados en filas, selector de margen (docs/ux.md). */
+.busqueda { width: 100%; font-size: 1.25rem; padding: 0.8rem 1rem; border: 2px solid #bbb; border-radius: 8px; margin-top: 1rem; }
+.busqueda:focus { outline: none; border-color: #0b57d0; }
+.ayuda { color: #555; font-size: 0.9rem; margin: 0.4rem 0 0.8rem; }
+.resultados tr { cursor: pointer; }
+.resultados tr.elegido td { background: #eef4ff; }
+.resultados td { vertical-align: middle; }
+.margenes { display: flex; gap: 0.25rem; }
+button.margen { font: inherit; padding: 0.35rem 0.5rem; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; }
+button.margen.activo { background: #0b57d0; color: #fff; border-color: #0b57d0; }
+button.margen:disabled { opacity: 0.4; cursor: default; }
+td.precio { white-space: nowrap; font-size: 1.15rem; }
+td.precio .explicacion { display: inline-block; }
+.sin-precio { color: #b00020; font-size: 1rem; }
+.manual { color: #7a5c00; font-size: 0.85rem; }
+.precio-manual { width: 7rem; font: inherit; margin-left: 0.4rem; }
+button.enlace.chico { font-size: 0.85rem; padding: 0.2rem 0.4rem; }
