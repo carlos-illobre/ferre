@@ -80,3 +80,8 @@ input.libre { font: inherit; width: 100%; }
 button.medio { font: inherit; padding: 0.6rem 0.9rem; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; }
 button.medio.activo { background: #0b57d0; color: #fff; border-color: #0b57d0; }
 tr.anulada td { color: #888; text-decoration: line-through; }
+
+/* Compras */
+.cabecera-compra { margin: 0.5rem 0; align-items: end; }
+.cabecera-compra label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.9rem; color: #555; }
+.cabecera-compra select, .cabecera-compra input { font-size: 1rem; }

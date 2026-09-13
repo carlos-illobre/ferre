@@ -12,6 +12,7 @@ import { productos } from "./rutas/productos.js";
 import { ventas } from "./rutas/ventas.js";
 import { clientes } from "./rutas/clientes.js";
 import { consultas } from "./rutas/consultas.js";
+import { compras } from "./rutas/compras.js";
 
 export const app = new Hono();
 
@@ -35,6 +36,7 @@ app.route("/productos", productos);
 app.route("/ventas", ventas);
 app.route("/clientes", clientes);
 app.route("/consultas", consultas);
+app.route("/compras", compras);
 
 app.onError((error, c) => {
   console.error(error);
