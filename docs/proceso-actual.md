@@ -3,7 +3,7 @@
 Cómo se trabaja hoy, sin sistema, paso por paso. Es la vara contra la que se mide cada
 pantalla: si el sistema es más lento que esto, está mal (ver `docs/ux.md`).
 
-Fuente: relato del dueño, 2026-09-13. Pendiente de confirmar observando en el mostrador.
+Fuente: relato del dueño, 2026-09-13. Conviene confirmarlo observando en el mostrador durante el piloto (issue #21).
 
 ## Venta
 
@@ -54,30 +54,70 @@ cargar uno solo.
 
 ## Consulta de precio sin venta
 
-Pendiente: ¿pasa seguido que alguien pregunta el precio y no compra? ¿Se anota en algún
-lado? Vale para saber si conviene registrar "consultas" (issue #45 presupuestos).
+Pasa **muy seguido** y no se anota. Es demanda que hoy se pierde: no se sabe qué piden y
+no se compra, ni si fue por precio o porque no había.
+
+**Consecuencia:** cuando una venta se descarta, la pantalla puede guardar la consulta con
+una tecla (producto, precio ofrecido, motivo si se quiere). Costo casi nulo; sirve para
+decidir qué comprar y qué remarcar. Se agrega como opcional en el issue #15.
 
 ## Compra a proveedor
 
-Pendiente de relevar:
+1. Se detecta que falta algo (góndola, pedido de un cliente).
+2. **No todos los proveedores venden todo:** se identifica qué proveedores tienen el
+   producto y, entre ellos, se elige **el más barato**. Hoy eso es memoria más consulta
+   de varios Excel.
+3. Se pide por **teléfono, WhatsApp, o al vendedor que pasa por el local**. En urgencias
+   el empleado va en persona al proveedor, pero se evita: su tiempo es para el mostrador.
+4. Llega la mercadería con **remito y factura** en la gran mayoría de los casos. **Dos
+   proveedores no emiten factura**: la mercadería se verifica cuando la entregan en
+   persona, contra lo pedido, y no queda papel.
+5. El empleado controla lo que llega.
+6. Lo único que se anota es **un papel a mano con los gastos de la semana**, que el
+   empleado le muestra al dueño y después se tira.
 
-- ¿Cómo se decide qué pedir? (se mira la góndola, se anota lo que falta, lo pide el
-  dueño o el empleado)
-- ¿Por qué canal se pide? (WhatsApp, mail, vendedor que pasa, web del proveedor)
-- ¿Qué llega con la mercadería? (factura, remito) ¿Se controla contra el pedido?
-- ¿Se anota en algún lado lo que ingresó?
-- ¿Cuándo se paga y quién?
+### Lo que hoy no queda registrado
+
+- Qué ingresó, cuándo y a qué costo real (la factura queda, pero no se carga en ningún
+  lado).
+- El detalle de gastos: el papel semanal se tira después de mostrarlo.
+- Qué proveedor tenía el mejor precio en cada compra.
+
+### Consecuencia para el diseño
+
+- El ingreso de mercadería (issue #30) reemplaza el papel semanal: si cada compra queda
+  cargada, el "gasto de la semana" es un informe automático para el dueño.
+- Saber qué proveedores venden el mismo producto y cuál es el más barato (issue #29) es
+  parte del trabajo diario de comprar, no una mejora tardía.
+- Para los dos proveedores sin factura el ingreso se carga igual, con "sin factura" como
+  comprobante.
 
 ## Clientes importantes
 
-Pendiente de relevar:
+- Compran **fiado**. Cada compra se anota en **un cuaderno de deudas**; cuando el cliente
+  paga, se tacha el renglón.
+- A veces tienen **precio distinto**, según la cantidad que compran y la velocidad con
+  que pagan. Lo decide el empleado o el dueño en el momento.
 
-- ¿Compran fiado / cuenta corriente? ¿Dónde se anota lo que deben?
-- ¿Tienen precio distinto al de mostrador?
+### Consecuencia para el diseño
+
+- "Fiado" tiene que ser un medio de pago desde el MVP, con el nombre del cliente. Sin
+  eso, las ventas a los clientes grandes seguirían en un cuaderno aparte.
+- La cuenta corriente completa (saldo, pagos parciales, resumen) es el issue #43; el
+  tachado del renglón se traduce a "marcar como pagada".
+- El precio especial se cubre con el precio manual por línea del issue #13; no hace
+  falta una lista de precios por cliente en el MVP.
 
 ## Listas de precios
 
-Pendiente de relevar:
+- No hay listas impresas: se usan **los mismos Excel que mandan los proveedores**, en la
+  laptop.
+- Las descarga **el propio empleado** del mail del negocio.
 
-- ¿El empleado abre el Excel en la laptop, o tiene listas impresas?
-- Cuando llega una lista nueva por mail, ¿quién la descarga y qué hace con la vieja?
+### Consecuencia para el diseño
+
+- La carga de una lista (issue #12) la hace el empleado, así que tiene que ser arrastrar
+  el archivo y confirmar. La ingesta automática desde el mail (issue #25) le saca ese
+  paso.
+- Mientras el sistema no tenga un proveedor, el empleado va a seguir abriendo su Excel:
+  cargar los 50 proveedores (issue #28) es lo que hace que deje de hacerlo.
