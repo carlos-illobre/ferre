@@ -7,6 +7,8 @@ on:
   push:
     branches: [master, produccion]
   pull_request:
+  # A mano, para republicar el cliente web cuando cambia una variable del repositorio.
+  workflow_dispatch:
 
 env:
   REGISTRO: ghcr.io/${{ github.repository }}
