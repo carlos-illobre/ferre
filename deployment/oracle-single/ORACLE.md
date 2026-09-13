@@ -3,34 +3,37 @@
 Una sola máquina (Ampere ARM, 2 núcleos, 12 GB) corre los dos ambientes, **pruebas** y
 **producción**, cada uno con su base en Supabase. El cliente web vive en GitHub Pages.
 Nadie entra a la máquina para desplegar: GitHub publica un aviso y la máquina, que lo
-escucha, verifica contra el repositorio y se actualiza sola (ADR-013). Después de esta
-guía, cada push a `master` actualiza pruebas y cada push a `produccion` actualiza
-producción.
+escucha, verifica contra el repositorio y se actualiza sola (ADR-013). Todo lo de ferre
+corre como **un usuario sin privilegios con Docker rootless**: sin root, sin sudo, sin
+grupo `docker`.
 
-Los pasos en la máquina los puede hacer el Claude que corre ahí; cada uno dice qué
-tiene que verse si salió bien. Ningún paso abre puertos nuevos ni instala nada fuera de
-Docker, que ya está.
+El reverse proxy de la máquina **no es parte de este proyecto**: lo administra la
+máquina para todas sus aplicaciones. Ferre solo cumple un contrato con él (ver "El
+reverse proxy").
 
-## Antes de empezar: lo que ya no hace falta
+Los pasos en la máquina los puede hacer el Claude que corre ahí; cada uno dice qué tiene
+que verse si salió bien.
 
-- **No instalar Docker:** ya está (paquete `docker.io` de Ubuntu, con compose v2). El
-  script oficial lo pisaría.
-- **No abrir el puerto 22 a internet ni cargar claves SSH en GitHub:** el despliegue no
-  entra a la máquina.
-- **Sí hay que apagar lo que use los puertos 80 y 443** antes de levantar el gateway.
-  Hoy los usa el nginx de citypass; cuando se desinstale, quedan libres.
+## Antes de empezar
 
-## 1. Clonar el repositorio en la máquina
+- Un usuario sin privilegios (el que va a correr ferre) con **Docker rootless** instalado
+  y `docker context use rootless`, y **linger** habilitado por un administrador, para que
+  sus servicios sigan corriendo sin sesión abierta:
+  `sudo loginctl enable-linger <usuario>`. Es lo único que necesita root, una vez.
+- No hace falta abrir puertos ni cargar claves en GitHub: ferre no publica puertos y el
+  despliegue no entra a la máquina.
 
-Como `ubuntu`:
+## 1. Clonar el repositorio
+
+Como el usuario de ferre:
 
 ```bash
 git clone https://github.com/carlos-illobre/ferre.git ~/ferre-repo
 ```
 
-Es solo para tener los scripts de instalación; el despliegue no usa esta copia.
+Es solo para los scripts de instalación; el despliegue no usa esta copia.
 
-## 2. Verificar la máquina sin tocar nada
+## 2. Verificar sin tocar nada
 
 ```bash
 bash ~/ferre-repo/deployment/oracle-single/preflight.sh
@@ -38,17 +41,16 @@ bash ~/ferre-repo/deployment/oracle-single/preflight.sh
 
 Dice qué falta y cómo resolverlo. Repetilo después de cada paso hasta que quede en verde.
 
-## 3. Instalar el gateway y el servicio de despliegue
+## 3. Instalar el servicio de despliegue
 
 ```bash
 bash ~/ferre-repo/deployment/oracle-single/maquina/instalar.sh
 ```
 
-Crea `~/caddy-gateway/` (el Caddy compartido de la máquina, ver abajo), `~/ferre/bin/`
-con los scripts, las carpetas `~/ferre/produccion` y `~/ferre/pruebas` con sus `.env` a
-partir de las plantillas, `~/ferre/despliegue.env`, la red de Docker `caddy-gateway`, y
-el servicio `ferre-despliegue` en systemd (instalado pero todavía apagado). Se puede
-volver a correr: no pisa lo que ya está completado.
+Sin sudo. Crea `~/ferre/bin/` con los scripts, `~/ferre/produccion` y `~/ferre/pruebas`
+con sus `.env` a partir de las plantillas, `~/ferre/despliegue.env`, y el servicio de
+usuario `ferre-despliegue` en systemd (registrado, todavía apagado). Se puede volver a
+correr: no pisa lo que ya está completado.
 
 ## 4. El dominio
 
@@ -59,16 +61,13 @@ Dos nombres que apunten a la IP pública de la máquina, con registros A:
 | `api.<tu-dominio>` | API de producción |
 | `api-pruebas.<tu-dominio>` | API de pruebas |
 
-Sin dominio propio, un dominio dinámico gratuito (DuckDNS) sirve igual. Comprobar antes
-de seguir, desde cualquier máquina:
+Sin dominio propio, un dominio dinámico gratuito (DuckDNS) sirve igual. Comprobar:
 
 ```bash
 dig +short api.<tu-dominio>
 ```
 
-**Bien:** devuelve la IP de la máquina. Hasta que resuelva, Caddy no puede emitir el
-certificado, y cada intento fallido consume uno de los pocos que Let's Encrypt permite
-por hora.
+**Bien:** devuelve la IP de la máquina.
 
 ## 5. Las dos bases en Supabase
 
@@ -78,73 +77,68 @@ por hora.
    reemplazar `[YOUR-PASSWORD]`. **No usar la conexión directa:** es solo IPv6 y la
    máquina sale por IPv4.
 
-## 6. Completar la configuración en la máquina
+## 6. Completar la configuración
 
-Cuatro archivos, reemplazando todos los marcadores `<...>`:
+Tres archivos, reemplazando todos los marcadores `<...>`:
 
 | Archivo | Qué va |
 |---|---|
 | `~/ferre/produccion/.env` | dominio de producción, ID de Google ([docs/google-cloud.md](../../docs/google-cloud.md)), cadena de Supabase de producción, un token de servicio |
 | `~/ferre/pruebas/.env` | lo mismo para pruebas, con su dominio, su base y **otro** token |
 | `~/ferre/despliegue.env` | el canal de avisos (paso 7) |
-| `~/caddy-gateway/Caddyfile` | un correo, para los avisos de Let's Encrypt |
 
-Token de servicio, uno por ambiente:
-
-```bash
-openssl rand -hex 32
-```
-
-`IMAGEN_TAG` se deja como está: lo escribe el despliegue.
+Token de servicio, uno por ambiente: `openssl rand -hex 32`. `IMAGEN_TAG` se deja como
+está: lo escribe el despliegue.
 
 **Bien:** el preflight ya no avisa de marcadores sin reemplazar.
 
 ## 7. El canal de avisos
 
-Un nombre de canal de ntfy, aleatorio, que solo sirve para que GitHub le diga a la
-máquina "fijate". No es un secreto: un aviso falso solo provoca una verificación contra
-GitHub que no hace nada. Generar uno:
+Un nombre de canal de ntfy que solo sirve para que GitHub le diga a la máquina "fijate".
+No es un secreto: un aviso falso solo provoca una verificación contra GitHub que no hace
+nada. El nombre ya está cargado en GitHub como variable `NTFY_AVISOS`; el mismo va en
+`NTFY_AVISOS=` de `~/ferre/despliegue.env`. Si el ntfy fuera propio, también `NTFY_URL`.
 
-```bash
-echo "ferre-despliegues-$(openssl rand -hex 6)"
-```
+Además, en GitHub, **Settings → Secrets and variables → Actions → Variables**: `API_URL`
+(`https://api.<tu-dominio>`), `API_URL_PRUEBAS` (`https://api-pruebas.<tu-dominio>`) y
+`GOOGLE_CLIENT_ID`.
 
-Ese mismo nombre va en dos lugares:
+## 8. El reverse proxy: el contrato
 
-- En la máquina: `NTFY_AVISOS=` de `~/ferre/despliegue.env`.
-- En GitHub: **Settings → Secrets and variables → Actions → Variables** →
-  `NTFY_AVISOS`. Si el ntfy fuera propio, también `NTFY_URL`.
+El reverse proxy de la máquina lo administra quien administra la máquina, para todas
+las aplicaciones. Ferre necesita de él exactamente esto:
 
-Además, en las mismas Variables de GitHub: `API_URL` (`https://api.<tu-dominio>`),
-`API_URL_PRUEBAS` (`https://api-pruebas.<tu-dominio>`) y `GOOGLE_CLIENT_ID`.
+1. Que corra **en el mismo Docker rootless del usuario de ferre**, porque una red de
+   Docker solo se comparte dentro de un mismo demonio.
+2. Una **red externa de Docker llamada `caddy-gateway`** (si se llama distinto, poner el
+   nombre en `RED_GATEWAY=` de `~/ferre/despliegue.env`). Ferre se conecta a ella; nunca
+   publica puertos.
+3. Que enrute por nombre de dominio hacia los contenedores de ferre, que en esa red se
+   llaman `gestion-del-local-produccion` y `gestion-del-local-pruebas`, puerto 8080:
 
-## 8. Levantar el gateway
+| Dominio | Destino en la red |
+|---|---|
+| `api.<tu-dominio>` | `http://gestion-del-local-produccion:8080` |
+| `api-pruebas.<tu-dominio>` | `http://gestion-del-local-pruebas:8080` |
 
-Con el 80 y el 443 libres:
-
-```bash
-cd ~/caddy-gateway && docker compose up -d
-```
-
-**Bien:** `docker compose ps` lo muestra `Up`. Todavía no sirve ningún sitio: el
-archivo de ferre lo escribe el primer despliegue.
+4. HTTPS con certificado válido: el cliente web está en otro origen y el navegador no
+   acepta una API sin TLS.
 
 ## 9. Arrancar el servicio de despliegue
 
 ```bash
-sudo systemctl start ferre-despliegue
-journalctl -u ferre-despliegue -f
+systemctl --user start ferre-despliegue
+journalctl --user -u ferre-despliegue -f
 ```
 
-Al arrancar hace una verificación: consulta las ramas, baja las imágenes de pruebas y
-de producción, levanta cada ambiente, comprueba que quede sano, escribe los dos sitios
-en `~/caddy-gateway/sitios/ferre.caddy` y recarga Caddy. Después queda escuchando.
+Al arrancar hace una verificación: consulta las ramas, baja las imágenes de pruebas y de
+producción, levanta cada ambiente y comprueba que quede sano. Después queda escuchando.
 
-**Bien:** el journal termina en `pruebas corriendo <sha>`, `produccion corriendo <sha>`,
-`caddy-gateway recargado` y `escuchando ...`. Desde afuera,
-`curl https://api-pruebas.<tu-dominio>/health` devuelve `{"ok":true,...}` con el
-candado en verde. Si un ambiente no queda sano, el journal muestra sus logs y vuelve a
-la versión anterior si la había.
+**Bien:** el journal termina en `pruebas corriendo <sha>`, `produccion corriendo <sha>` y
+`escuchando ...`. Con el reverse proxy configurado,
+`curl https://api-pruebas.<tu-dominio>/health` devuelve `{"ok":true,...}`. Si un
+ambiente no queda sano, el journal muestra sus logs y vuelve a la versión anterior si
+la había.
 
 ## 10. El primer usuario
 
@@ -162,8 +156,6 @@ Después se entra con Google y se da de alta al empleado desde la app:
 
 ## 11. Pasar algo a producción
 
-Cuando lo que está en pruebas convence:
-
 ```bash
 git push origin master:produccion
 ```
@@ -173,16 +165,15 @@ CI construye, publica y avisa; la máquina despliega producción sola. La rama
 
 ## 12. Volver atrás
 
-Producción se vuelve al commit anterior con el mismo script, en la máquina, con el SHA
-que el journal mostró como "antes":
+En la máquina, con el SHA que el journal mostró como "antes":
 
 ```bash
 ~/ferre/bin/desplegar.sh produccion <sha-anterior>
 ```
 
 O moviendo la rama al commit anterior (`git push --force origin <sha>:produccion`), que
-además deja el repositorio contando la verdad. Lo que la reversión **no** revierte: los
-datos. Si una versión migró el esquema, volver la imagen no vuelve la base.
+además deja el repositorio contando la verdad. La reversión **no** revierte los datos: si
+una versión migró el esquema, volver la imagen no vuelve la base.
 
 ## 13. Operación de todos los días
 
@@ -191,8 +182,8 @@ datos. Si una versión migró el esquema, volver la imagen no vuelve la base.
 cd ~/ferre/produccion && docker compose ps && grep IMAGEN_TAG .env
 
 # el servicio de despliegue y su historial
-systemctl status ferre-despliegue
-journalctl -u ferre-despliegue --since today
+systemctl --user status ferre-despliegue
+journalctl --user -u ferre-despliegue --since today
 
 # forzar una verificación sin esperar un aviso
 ~/ferre/bin/desplegar.sh
@@ -208,24 +199,10 @@ df -h / && docker system df
 cd ~/ferre/pruebas && docker compose down
 ```
 
-## caddy-gateway: cómo sumar otro proyecto
-
-`~/caddy-gateway` es la única puerta de entrada de la máquina, para ferre y para lo que
-venga. El `Caddyfile` no se toca: importa todo lo que haya en `sitios/`.
-
-1. El compose del proyecto nuevo se conecta a la red externa `caddy-gateway`
-   (`networks: { caddy-gateway: { external: true } }` y el servicio en esa red).
-2. Copiar `sitios/ejemplo-de-otro-proyecto.caddy.ejemplo` a `sitios/<proyecto>.caddy`,
-   poner el dominio y el nombre del contenedor.
-3. Recargar: `cd ~/caddy-gateway && docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile`.
-
-Caddy emite el certificado solo para el dominio nuevo. Ferre no se entera.
-
 ## Qué se pierde si se pierde cada volumen
 
 | Volumen | Qué guarda | Si se pierde |
 |---|---|---|
-| `caddy-gateway_caddy-data` | certificados y estado de Let's Encrypt de todos los proyectos | Caddy vuelve a emitir; solo duele si se agota el cupo de intentos |
 | `ferre-<ambiente>_listas-data` | los Excel originales de cada lista cargada | no se pueden reprocesar listas viejas; los precios aplicados están en la base |
 
 La base de datos no está en la máquina: está en Supabase, con el respaldo del ADR-002.

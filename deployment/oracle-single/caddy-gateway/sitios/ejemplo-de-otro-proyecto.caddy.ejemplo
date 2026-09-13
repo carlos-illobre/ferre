@@ -1,6 +1,0 @@
-# Plantilla para un proyecto futuro. Copiar a sitios/<proyecto>.caddy, completar y recargar Caddy.
-# El contenedor tiene que estar conectado a la red externa `caddy-gateway`.
-app.otro-dominio.ejemplo.com {
-    encode gzip
-    reverse_proxy nombre-del-contenedor:8080
-}

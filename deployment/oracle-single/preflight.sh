@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 #
-# Verificación previa de la máquina de Oracle. NO MODIFICA NADA: solo informa.
+# Verificación previa de la máquina de Oracle. NO MODIFICA NADA: solo informa. Se corre
+# como el usuario sin privilegios que va a correr ferre (Docker rootless), en la máquina:
 #
-#   en la máquina      bash deployment/oracle-single/preflight.sh
-#   desde tu máquina   ssh ubuntu@<ip> 'bash -s' < deployment/oracle-single/preflight.sh
-#
-# La segunda forma no copia nada: sirve antes de clonar. En esa forma `sudo` no puede
-# pedir contraseña (stdin lo ocupa el script); en las imágenes Ubuntu de Oracle el usuario
-# `ubuntu` tiene sudo sin contraseña. Correrlo ANTES del primer `docker compose up`: con el
-# stack arriba, la comprobación de puertos los marca ocupados.
+#   bash deployment/oracle-single/preflight.sh
 set -uo pipefail
 
-PUERTOS=(80 443)              # los que publica caddy-gateway; nada más escucha en el host
-MEMORIA_NECESARIA_MB=3072     # dos ambientes: 2 APIs Node + 2 lectores Python + Caddy, con margen
+# ferre no publica ningún puerto en la máquina: lo sirve el reverse proxy por la red compartida.
+MEMORIA_NECESARIA_MB=2048     # dos ambientes: 2 APIs Node + 2 lectores Python, con margen
 
 VERDE='\033[0;32m'; ROJO='\033[0;31m'; AMARILLO='\033[0;33m'; NC='\033[0m'
 fallos=0
@@ -40,39 +35,23 @@ fi
 libre_gb=$(( $(df -k / | awk 'NR==2 {print $4}') / 1024 / 1024 ))
 if [ "$libre_gb" -ge 10 ]; then ok "espacio libre en /: ${libre_gb} GB"; else mal "espacio libre en /: ${libre_gb} GB" "liberá con: docker image prune -af --filter until=24h"; fi
 
-titulo "Docker"
+titulo "El usuario y Docker rootless"
+[ "$(id -u)" -ne 0 ] && ok "corriendo como $(id -un), no root" || mal "corriendo como root" "usar el usuario sin privilegios dueño del Docker rootless"
+id -nG | grep -qw sudo && aviso "$(id -un) tiene sudo: ferre no lo necesita" || ok "$(id -un) no tiene sudo"
+id -nG | grep -qw docker && aviso "$(id -un) está en el grupo docker (equivale a root): con rootless no hace falta" || ok "$(id -un) no está en el grupo docker"
 if command -v docker >/dev/null 2>&1; then
     ok "instalado: $(docker --version)"
-    docker info >/dev/null 2>&1 && ok "el demonio responde y el usuario puede hablarle" \
-        || mal "el usuario no puede hablar con el demonio" "sudo usermod -aG docker \$USER  y volvé a entrar por SSH"
-    docker compose version >/dev/null 2>&1 && ok "el plugin compose está" || mal "falta el plugin compose" "instalá docker-compose-plugin"
-    docker network inspect caddy-gateway >/dev/null 2>&1 && ok "la red caddy-gateway existe" || aviso "la red caddy-gateway no existe todavía (instalar.sh la crea)"
-else
-    mal "Docker no está instalado" "ver ORACLE.md, paso 4"
-fi
-
-titulo "Los puertos que publica el stack"
-for puerto in "${PUERTOS[@]}"; do
-    if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE "[:.]${puerto}\$"; then
-        if docker ps --format '{{.Names}} {{.Ports}}' 2>/dev/null | grep -q "caddy-gateway.*:$puerto->"; then ok "el $puerto lo usa caddy-gateway"; else mal "el $puerto lo usa otro proceso" "caddy-gateway necesita 80 y 443: apagá lo que los ocupe (por ejemplo, el nginx de otro proyecto)"; fi
+    if docker info >/dev/null 2>&1; then
+        docker info --format '{{.SecurityOptions}}' | grep -q rootless && ok "el demonio es rootless y responde" || aviso "el demonio responde pero NO es rootless"
     else
-        ok "el $puerto está libre (caddy-gateway todavía no corre)"
+        mal "Docker no responde para este usuario" "instalar rootless: dockerd-rootless-setuptool.sh install, y 'docker context use rootless'"
     fi
-done
-
-titulo "El firewall del host"
-# Los puertos publicados por Docker no pasan por INPUT (DNAT → FORWARD → DOCKER). Se mira
-# igual porque las imágenes Ubuntu de Oracle traen reglas que descartan tráfico entrante.
-if sudo -n iptables -L INPUT -n 2>/dev/null | grep -qE '^(REJECT|DROP)'; then
-    aviso "hay reglas REJECT/DROP en INPUT"
-    nota "no afectan a los puertos publicados por Docker, pero sí al SSH y a lo que escuche en el host"
-    nota "lista completa: sudo iptables -L INPUT -n --line-numbers"
+    docker compose version >/dev/null 2>&1 && ok "el plugin compose está" || mal "falta el plugin compose" "instalar docker-compose-plugin para este usuario"
+    docker network inspect "${RED_GATEWAY:-caddy-gateway}" >/dev/null 2>&1 && ok "la red ${RED_GATEWAY:-caddy-gateway} existe (el reverse proxy ya está)" || aviso "la red ${RED_GATEWAY:-caddy-gateway} no existe: la crea el reverse proxy de la máquina (ORACLE.md)"
 else
-    ok "sin reglas de descarte en INPUT, o no se pudo consultar"
+    mal "Docker no está instalado para este usuario" "ver ORACLE.md, 'Antes de empezar'"
 fi
-command -v ufw >/dev/null 2>&1 && sudo -n ufw status 2>/dev/null | grep -q "Status: active" \
-    && { aviso "ufw está activo"; nota "sus reglas van a INPUT y no filtran los puertos de Docker: el firewall efectivo es la Security List de la VCN"; }
-nota "lo que decide qué está abierto desde internet es la Security List de la VCN"
+[ "$(loginctl show-user "$(id -un)" -p Linger --value 2>/dev/null)" = yes ] && ok "linger activo: los servicios de usuario siguen sin sesión" || aviso "sin linger: un administrador debe correr  sudo loginctl enable-linger $(id -un)"
 
 titulo "Las carpetas de los ambientes y el servicio de despliegue"
 for a in produccion pruebas; do
@@ -83,8 +62,7 @@ for a in produccion pruebas; do
     fi
 done
 [ -f "$HOME/ferre/despliegue.env" ] && ! grep -q '<' "$HOME/ferre/despliegue.env" && ok "~/ferre/despliegue.env completo" || aviso "falta completar ~/ferre/despliegue.env (canal de avisos)"
-[ -f "$HOME/caddy-gateway/Caddyfile" ] && ! grep -q '<' "$HOME/caddy-gateway/Caddyfile" && ok "~/caddy-gateway/Caddyfile completo" || aviso "falta completar el correo en ~/caddy-gateway/Caddyfile"
-systemctl is-enabled ferre-despliegue >/dev/null 2>&1 && ok "servicio ferre-despliegue instalado ($(systemctl is-active ferre-despliegue))" || aviso "el servicio ferre-despliegue no está instalado (instalar.sh)"
+systemctl --user is-enabled ferre-despliegue >/dev/null 2>&1 && ok "servicio de usuario ferre-despliegue instalado ($(systemctl --user is-active ferre-despliegue))" || aviso "el servicio ferre-despliegue no está instalado (instalar.sh)"
 
 printf '\n\033[1m═══════════════════════════════════════\033[0m\n'
 if [ "$fallos" -eq 0 ]; then printf "${VERDE}✓ la máquina está lista${NC}\n"; else printf "${ROJO}✗ %s comprobación(es) fallaron${NC}\n" "$fallos"; fi

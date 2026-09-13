@@ -4,9 +4,9 @@
 
 # Dos ambientes en la misma máquina (ADR-012/013): cada uno es un proyecto de compose
 # aparte (COMPOSE_PROJECT_NAME en su .env) con sus propios volúmenes y red. Ambos se
-# conectan a la red externa `caddy-gateway`, donde el Caddy compartido de la máquina
-# (deployment/oracle-single/caddy-gateway) los encuentra por nombre. Perfiles, desde el .env:
-#   gateway → Caddy local, solo para desarrollo (en Oracle lo pone caddy-gateway)
+# conectan a la red externa `caddy-gateway`, donde el reverse proxy de la máquina (que
+# no es parte de este repo) los encuentra por nombre. Perfiles, desde el .env:
+#   gateway → Caddy local, solo para desarrollo (en Oracle lo pone la máquina)
 #   local   → PostgreSQL propio (solo desarrollo y CI; en la nube la base es Supabase)
 
 services:
@@ -47,7 +47,7 @@ services:
     networks:
       default:
       caddy-gateway:
-        # Nombre estable por ambiente en la red compartida: es a lo que apunta el Caddy de la máquina.
+        # Nombre estable por ambiente en la red compartida: es a lo que apunta el reverse proxy de la máquina.
         aliases:
           - gestion-del-local-${AMBIENTE:?falta AMBIENTE en el .env}
     volumes:

@@ -1,22 +1,20 @@
-# systemd: escucha los avisos de despliegue de ferre. Instalar con instalar.sh.
+# systemd de USUARIO (~/.config/systemd/user/): escucha los avisos de despliegue de ferre.
+# Sin root: corre como el usuario sin privilegios dueño del Docker rootless. instalar.sh
+# completa DOCKER_HOST y las rutas con los del usuario que lo corre.
 [Unit]
 Description=ferre: escucha los avisos de despliegue (ntfy) y despliega verificando contra GitHub
 After=network-online.target docker.service
 Wants=network-online.target
-Requires=docker.service
 
 [Service]
 Type=simple
-User=ubuntu
-Environment=HOME=/home/ubuntu
-ExecStart=/home/ubuntu/ferre/bin/escuchar.sh
+Environment=DOCKER_HOST=unix://__XDG_RUNTIME_DIR__/docker.sock
+Environment=PATH=__HOME__/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=__HOME__/ferre/bin/escuchar.sh
 Restart=always
 RestartSec=10
-# Solo lo que necesita: el home de ubuntu (para los .env y el compose) y el socket de Docker.
 NoNewPrivileges=true
 PrivateTmp=true
-ProtectSystem=strict
-ReadWritePaths=/home/ubuntu/ferre /home/ubuntu/caddy-gateway
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

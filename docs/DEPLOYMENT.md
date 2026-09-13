@@ -31,8 +31,9 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../deployment/oracle-sing
   ([ADR-013](adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
   producción: `git push origin master:produccion`.
 - Máquina Always Free (Ampere, arm64), sin estado: dos proyectos de compose, uno por
-  ambiente, con `gestion-del-local` y `listas-de-proveedores`, detrás del Caddy
-  compartido `~/caddy-gateway`, que sirve a todos los proyectos de la máquina.
+  ambiente, con `gestion-del-local` y `listas-de-proveedores`, corriendo como un usuario
+  sin privilegios con Docker rootless, detrás del reverse proxy de la máquina, que no es
+  parte de este proyecto (contrato en la guía).
 - Base de datos en Supabase ([ADR-002](adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md)).
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
   ([ADR-007](adr/ADR-007-imagenes-en-ci-y-ghcr.md)).

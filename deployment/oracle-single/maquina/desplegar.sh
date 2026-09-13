@@ -10,11 +10,12 @@
 #
 # Fuente de la verdad: la rama master (→ pruebas) y la rama produccion (→ produccion) del
 # repositorio, y las imágenes por SHA en GHCR. Un aviso falso solo provoca esta consulta.
+# Corre como un usuario sin privilegios con Docker rootless; no usa sudo.
 set -euo pipefail
 
 REPO=carlos-illobre/ferre
 BASE="${FERRE_BASE:-$HOME/ferre}"
-GATEWAY="${CADDY_GATEWAY:-$HOME/caddy-gateway}"
+RED_GATEWAY="${RED_GATEWAY:-caddy-gateway}"   # red externa que administra el reverse proxy de la máquina
 SERVICIOS=(gestion-del-local listas-de-proveedores)
 
 ok()    { printf '  \033[0;32m✓\033[0m %s\n' "$1"; }
@@ -48,22 +49,6 @@ sano() { # ambiente
 
 fijar_tag() { sed -i '/^IMAGEN_TAG=/d' "$BASE/$1/.env" && printf 'IMAGEN_TAG=%s\n' "$2" >> "$BASE/$1/.env"; }
 
-sitios_de_caddy() {
-    # El archivo de sitios de ferre sale de los SITIO de cada ambiente; Caddy se recarga en caliente.
-    local archivo="$GATEWAY/sitios/ferre.caddy" nuevo
-    nuevo=$(for amb in produccion pruebas; do
-        [ -f "$BASE/$amb/.env" ] || continue
-        sitio=$(grep -m1 '^SITIO=' "$BASE/$amb/.env" | cut -d= -f2-)
-        [ -n "$sitio" ] && [ "${sitio#<}" = "$sitio" ] || continue
-        printf '%s {\n    encode gzip\n    reverse_proxy gestion-del-local-%s:8080\n}\n\n' "$sitio" "$amb"
-    done)
-    if [ "$nuevo" != "$(cat "$archivo" 2>/dev/null || true)" ]; then
-        printf '%s\n' "$nuevo" > "$archivo"
-        (cd "$GATEWAY" && docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile) \
-            && ok "caddy-gateway recargado con los sitios de ferre" || fallo "no se pudo recargar caddy-gateway"
-    fi
-}
-
 desplegar() { # ambiente [sha]
     local amb=$1 rama dir sha actual
     rama=$(rama_de "$amb") || { fallo "ambiente desconocido: $amb"; return 1; }
@@ -88,7 +73,8 @@ desplegar() { # ambiente [sha]
     curl -sf "https://raw.githubusercontent.com/$REPO/$sha/docker-compose.yml" -o "$dir/docker-compose.yml.nuevo" \
         || { fallo "no pude bajar el compose del commit $sha"; return 1; }
     mv "$dir/docker-compose.yml.nuevo" "$dir/docker-compose.yml"
-    docker network inspect caddy-gateway >/dev/null 2>&1 || docker network create caddy-gateway >/dev/null
+    docker network inspect "$RED_GATEWAY" >/dev/null 2>&1 \
+        || { fallo "no existe la red $RED_GATEWAY: la crea el reverse proxy de la máquina (ver ORACLE.md)"; return 1; }
 
     fijar_tag "$amb" "$sha"
     (cd "$dir" && docker compose pull --quiet && docker compose up -d --remove-orphans) \
@@ -117,8 +103,6 @@ if [ $# -gt 0 ]; then
 else
     for amb in pruebas produccion; do desplegar "$amb" || resultado=1; done
 fi
-sitios_de_caddy
-
 paso "Liberando disco"
 # -a es lo que hace el trabajo: las imágenes etiquetadas por SHA nunca están "colgadas".
 info "$(docker image prune -af --filter until=24h | tail -1)"

@@ -3,7 +3,7 @@
 # Escucha el canal de avisos de ntfy con una sola conexión saliente y, por cada aviso,
 # corre desplegar.sh (ADR-013). El aviso no trae información: la máquina verifica sola
 # contra GitHub y GHCR. Al arrancar hace una verificación, por si se perdió un aviso.
-# Lo corre systemd como el usuario ubuntu (ferre-despliegue.service).
+# Lo corre systemd como servicio de usuario (ferre-despliegue.service), sin root.
 set -uo pipefail
 
 CONFIG="${FERRE_BASE:-$HOME/ferre}/despliegue.env"

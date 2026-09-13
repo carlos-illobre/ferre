@@ -1,5 +1,5 @@
 # Caddy de DESARROLLO (perfil gateway): sirve la API en http://localhost. En la máquina de
-# Oracle no se usa: ahí el gateway compartido es deployment/oracle-single/caddy-gateway.
+# Oracle no se usa: ahí el reverse proxy lo administra la máquina para todas sus apps.
 {$SITIO} {
     encode gzip
     reverse_proxy gestion-del-local:8080

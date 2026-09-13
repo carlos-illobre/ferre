@@ -81,3 +81,16 @@ Pages con dos carpetas (ADR-012).
 ## Referencias
 
 ADR-006, ADR-012. `deployment/oracle-single/ORACLE.md`.
+
+---
+
+## Enmienda (2026-09-13, misma fecha)
+
+El reverse proxy compartido **sale de este repositorio**: lo administra la máquina para
+todas sus aplicaciones, por decisión del dueño. Ferre solo cumple un contrato: se conecta
+a la red externa de Docker del proxy (`caddy-gateway`, configurable con `RED_GATEWAY`)
+con los alias `gestion-del-local-produccion` y `gestion-del-local-pruebas`, puerto 8080,
+y no publica puertos. Además, todo lo de ferre corre como un usuario sin privilegios con
+Docker rootless: el servicio de despliegue es una unidad de usuario de systemd y ningún
+paso usa sudo. El contrato está en `deployment/oracle-single/ORACLE.md`, "El reverse
+proxy". Lo demás del ADR sigue vigente.
