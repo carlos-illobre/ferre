@@ -54,17 +54,18 @@ correr: no pisa lo que ya está completado.
 
 ## 4. El dominio
 
-Dos nombres que apunten a la IP pública de la máquina, con registros A:
+Dos nombres de DuckDNS, creados en la misma cuenta, apuntando a la IP pública de la
+máquina:
 
 | Nombre | Para |
 |---|---|
-| `api.<tu-dominio>` | API de producción |
-| `api-pruebas.<tu-dominio>` | API de pruebas |
+| `ferre-api.duckdns.org` | API de producción |
+| `ferre-api-pruebas.duckdns.org` | API de pruebas |
 
-Sin dominio propio, un dominio dinámico gratuito (DuckDNS) sirve igual. Comprobar:
+Comprobar:
 
 ```bash
-dig +short api.<tu-dominio>
+dig +short ferre-api.duckdns.org
 ```
 
 **Bien:** devuelve la IP de la máquina.
@@ -83,8 +84,8 @@ Tres archivos, reemplazando todos los marcadores `<...>`:
 
 | Archivo | Qué va |
 |---|---|
-| `~/ferre/produccion/.env` | dominio de producción, ID de Google ([docs/google-cloud.md](../../docs/google-cloud.md)), cadena de Supabase de producción, un token de servicio |
-| `~/ferre/pruebas/.env` | lo mismo para pruebas, con su dominio, su base y **otro** token |
+| `~/ferre/produccion/.env` | ID de Google ([docs/google-cloud.md](../../docs/google-cloud.md)), cadena de Supabase de producción, un token de servicio |
+| `~/ferre/pruebas/.env` | lo mismo para pruebas, con su base y **otro** token |
 | `~/ferre/despliegue.env` | el canal de avisos (paso 7) |
 
 Token de servicio, uno por ambiente: `openssl rand -hex 32`. `IMAGEN_TAG` se deja como
@@ -99,9 +100,8 @@ No es un secreto: un aviso falso solo provoca una verificación contra GitHub qu
 nada. El nombre ya está cargado en GitHub como variable `NTFY_AVISOS`; el mismo va en
 `NTFY_AVISOS=` de `~/ferre/despliegue.env`. Si el ntfy fuera propio, también `NTFY_URL`.
 
-Además, en GitHub, **Settings → Secrets and variables → Actions → Variables**: `API_URL`
-(`https://api.<tu-dominio>`), `API_URL_PRUEBAS` (`https://api-pruebas.<tu-dominio>`) y
-`GOOGLE_CLIENT_ID`.
+En GitHub ya están cargadas las variables `API_URL` (`https://ferre-api.duckdns.org`) y
+`API_URL_PRUEBAS` (`https://ferre-api-pruebas.duckdns.org`). Falta `GOOGLE_CLIENT_ID`.
 
 ## 8. El reverse proxy: el contrato
 
@@ -118,8 +118,8 @@ las aplicaciones. Ferre necesita de él exactamente esto:
 
 | Dominio | Destino en la red |
 |---|---|
-| `api.<tu-dominio>` | `http://gestion-del-local-produccion:8080` |
-| `api-pruebas.<tu-dominio>` | `http://gestion-del-local-pruebas:8080` |
+| `ferre-api.duckdns.org` | `http://gestion-del-local-produccion:8080` |
+| `ferre-api-pruebas.duckdns.org` | `http://gestion-del-local-pruebas:8080` |
 
 4. HTTPS con certificado válido: el cliente web está en otro origen y el navegador no
    acepta una API sin TLS.
@@ -136,7 +136,7 @@ producción, levanta cada ambiente y comprueba que quede sano. Después queda es
 
 **Bien:** el journal termina en `pruebas corriendo <sha>`, `produccion corriendo <sha>` y
 `escuchando ...`. Con el reverse proxy configurado,
-`curl https://api-pruebas.<tu-dominio>/health` devuelve `{"ok":true,...}`. Si un
+`curl https://ferre-api-pruebas.duckdns.org/health` devuelve `{"ok":true,...}`. Si un
 ambiente no queda sano, el journal muestra sus logs y vuelve a la versión anterior si
 la había.
 
