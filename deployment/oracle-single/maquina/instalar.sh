@@ -35,7 +35,6 @@ cat <<'FIN'
 
 Listo. Falta, en este orden:
   1. Completar ~/ferre/produccion/.env, ~/ferre/pruebas/.env y ~/ferre/despliegue.env.
-  2. Que el reverse proxy de la máquina exista, con la red externa de Docker `caddy-gateway`
-     en este mismo Docker rootless (ver ORACLE.md, "El reverse proxy").
+  2. Que el reverse proxy de la máquina apunte a 127.0.0.1:8081 y 127.0.0.1:8082 (ver ORACLE.md, "El reverse proxy").
   3. Arrancar el servicio:  systemctl --user start ferre-despliegue && journalctl --user -u ferre-despliegue -f
 FIN

@@ -17,7 +17,6 @@ Requisitos: Docker con Compose, Node 22 con pnpm 10, y uv.
 ```bash
 cp .env.example .env
 pnpm install
-docker network create caddy-gateway
 docker compose up -d --build --wait
 ```
 

@@ -4,7 +4,6 @@
 
 ```bash
 cp .env.example .env
-docker network create caddy-gateway
 docker compose up -d --build --wait
 ```
 
@@ -31,9 +30,9 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../deployment/oracle-sing
   ([ADR-013](adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
   producción: `git push origin master:produccion`.
 - Máquina Always Free (Ampere, arm64), sin estado: dos proyectos de compose, uno por
-  ambiente, con `gestion-del-local` y `listas-de-proveedores`, corriendo como un usuario
-  sin privilegios con Docker rootless, detrás del reverse proxy de la máquina, que no es
-  parte de este proyecto (contrato en la guía).
+  ambiente, con `gestion-del-local` y `listas-de-proveedores`, corriendo como el usuario
+  `ferre` con Docker rootless, publicados solo en `127.0.0.1` (8081 y 8082), detrás del
+  reverse proxy de la máquina, que no es parte de este proyecto (contrato en la guía).
 - Base de datos en Supabase ([ADR-002](adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md)).
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
   ([ADR-007](adr/ADR-007-imagenes-en-ci-y-ghcr.md)).

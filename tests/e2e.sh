@@ -5,7 +5,6 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-docker network inspect caddy-gateway >/dev/null 2>&1 || docker network create caddy-gateway >/dev/null
 docker compose up -d --wait
 
 # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.

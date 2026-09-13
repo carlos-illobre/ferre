@@ -6,7 +6,8 @@
 #   bash deployment/oracle-single/preflight.sh
 set -uo pipefail
 
-# ferre no publica ningún puerto en la máquina: lo sirve el reverse proxy por la red compartida.
+# La API de cada ambiente se publica solo en 127.0.0.1 (8081 producción, 8082 pruebas);
+# el reverse proxy de la máquina la alcanza ahí.
 MEMORIA_NECESARIA_MB=2048     # dos ambientes: 2 APIs Node + 2 lectores Python, con margen
 
 VERDE='\033[0;32m'; ROJO='\033[0;31m'; AMARILLO='\033[0;33m'; NC='\033[0m'
@@ -47,11 +48,21 @@ if command -v docker >/dev/null 2>&1; then
         mal "Docker no responde para este usuario" "instalar rootless: dockerd-rootless-setuptool.sh install, y 'docker context use rootless'"
     fi
     docker compose version >/dev/null 2>&1 && ok "el plugin compose está" || mal "falta el plugin compose" "instalar docker-compose-plugin para este usuario"
-    docker network inspect "${RED_GATEWAY:-caddy-gateway}" >/dev/null 2>&1 && ok "la red ${RED_GATEWAY:-caddy-gateway} existe (el reverse proxy ya está)" || aviso "la red ${RED_GATEWAY:-caddy-gateway} no existe: la crea el reverse proxy de la máquina (ORACLE.md)"
 else
     mal "Docker no está instalado para este usuario" "ver ORACLE.md, 'Antes de empezar'"
 fi
 [ "$(loginctl show-user "$(id -un)" -p Linger --value 2>/dev/null)" = yes ] && ok "linger activo: los servicios de usuario siguen sin sesión" || aviso "sin linger: un administrador debe correr  sudo loginctl enable-linger $(id -un)"
+
+titulo "Los puertos locales de la API"
+for puerto in 8081 8082; do
+    if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE "^127\.0\.0\.1:${puerto}$"; then
+        ok "127.0.0.1:$puerto en uso (si ferre ya corre, es esperable)"
+    elif ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE "[:.]${puerto}$"; then
+        mal "el $puerto lo usa otro proceso" "elegir otro PUERTO_API en el .env del ambiente y avisar al reverse proxy"
+    else
+        ok "el $puerto está libre"
+    fi
+done
 
 titulo "Las carpetas de los ambientes y el servicio de despliegue"
 for a in produccion pruebas; do

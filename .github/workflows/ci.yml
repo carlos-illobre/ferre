@@ -52,7 +52,6 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: cp .env.example .env
-      - run: docker network create caddy-gateway
       - run: docker compose up -d --build --wait
       - run: tests/itest.sh
       - run: pnpm install --frozen-lockfile

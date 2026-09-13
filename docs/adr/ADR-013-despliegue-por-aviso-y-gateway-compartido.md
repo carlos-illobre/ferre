@@ -94,3 +94,14 @@ y no publica puertos. Además, todo lo de ferre corre como un usuario sin privil
 Docker rootless: el servicio de despliegue es una unidad de usuario de systemd y ningún
 paso usa sudo. El contrato está en `deployment/oracle-single/ORACLE.md`, "El reverse
 proxy". Lo demás del ADR sigue vigente.
+
+---
+
+## Enmienda 2 (2026-09-13, misma fecha): puertos locales en vez de red compartida
+
+Cada aplicación de la máquina va a tener su propio usuario y su propio Docker rootless,
+y una red de Docker no se comparte entre demonios distintos. Por eso el contrato con el
+reverse proxy deja de ser una red externa y pasa a ser **puertos de la interfaz local**:
+cada API se publica en `127.0.0.1:PUERTO_API` (8081 producción, 8082 pruebas) y el proxy,
+que es un servicio de la máquina fuera de Docker, apunta ahí. Ferre no necesita red
+`caddy-gateway` ni alias por ambiente; desaparecen `AMBIENTE` y `RED_GATEWAY`.

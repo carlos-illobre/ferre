@@ -20,8 +20,8 @@ que verse si salió bien.
   `docker context use rootless`, y **linger** habilitado por un administrador, para que
   sus servicios sigan corriendo sin sesión abierta: `sudo loginctl enable-linger ferre`.
   Es lo único que necesita root, una vez.
-- No hace falta abrir puertos ni cargar claves en GitHub: ferre no publica puertos y el
-  despliegue no entra a la máquina.
+- No hace falta abrir puertos ni cargar claves en GitHub: ferre solo escucha en la
+  interfaz local y el despliegue no entra a la máquina.
 
 ## 1. Clonar el repositorio
 
@@ -108,21 +108,19 @@ En GitHub ya están cargadas las variables `API_URL` (`https://ferre-api.duckdns
 El reverse proxy de la máquina lo administra quien administra la máquina, para todas
 las aplicaciones. Ferre necesita de él exactamente esto:
 
-1. Que corra **en el mismo Docker rootless del usuario `ferre`**, porque una red de
-   Docker solo se comparte dentro de un mismo demonio.
-2. Una **red externa de Docker llamada `caddy-gateway`** (si se llama distinto, poner el
-   nombre en `RED_GATEWAY=` de `~/ferre/despliegue.env`). Ferre se conecta a ella; nunca
-   publica puertos.
-3. Que enrute por nombre de dominio hacia los contenedores de ferre, que en esa red se
-   llaman `gestion-del-local-produccion` y `gestion-del-local-pruebas`, puerto 8080:
+1. Ferre publica cada API **solo en la interfaz local** de la máquina, nunca hacia
+   internet: producción en `127.0.0.1:8081` y pruebas en `127.0.0.1:8082` (`PUERTO_API`
+   en el `.env` de cada ambiente; si hay que cambiarlos, avisar al proxy).
+2. El proxy enruta por nombre de dominio hacia esos puertos, con HTTPS y certificado
+   válido, porque el cliente web está en otro origen y el navegador no acepta una API
+   sin TLS:
 
-| Dominio | Destino en la red |
+| Dominio | Destino |
 |---|---|
-| `ferre-api.duckdns.org` | `http://gestion-del-local-produccion:8080` |
-| `ferre-api-pruebas.duckdns.org` | `http://gestion-del-local-pruebas:8080` |
+| `ferre-api.duckdns.org` | `http://127.0.0.1:8081` |
+| `ferre-api-pruebas.duckdns.org` | `http://127.0.0.1:8082` |
 
-4. HTTPS con certificado válido: el cliente web está en otro origen y el navegador no
-   acepta una API sin TLS.
+No hace falta que el proxy y ferre compartan usuario, Docker ni red.
 
 ## 9. Arrancar el servicio de despliegue
 

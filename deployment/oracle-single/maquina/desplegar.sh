@@ -15,7 +15,6 @@ set -euo pipefail
 
 REPO=carlos-illobre/ferre
 BASE="${FERRE_BASE:-$HOME/ferre}"
-RED_GATEWAY="${RED_GATEWAY:-caddy-gateway}"   # red externa que administra el reverse proxy de la máquina
 SERVICIOS=(gestion-del-local listas-de-proveedores)
 
 ok()    { printf '  \033[0;32m✓\033[0m %s\n' "$1"; }
@@ -73,8 +72,6 @@ desplegar() { # ambiente [sha]
     curl -sf "https://raw.githubusercontent.com/$REPO/$sha/docker-compose.yml" -o "$dir/docker-compose.yml.nuevo" \
         || { fallo "no pude bajar el compose del commit $sha"; return 1; }
     mv "$dir/docker-compose.yml.nuevo" "$dir/docker-compose.yml"
-    docker network inspect "$RED_GATEWAY" >/dev/null 2>&1 \
-        || { fallo "no existe la red $RED_GATEWAY: la crea el reverse proxy de la máquina (ver ORACLE.md)"; return 1; }
 
     fijar_tag "$amb" "$sha"
     (cd "$dir" && docker compose pull --quiet && docker compose up -d --remove-orphans) \
