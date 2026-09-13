@@ -31,9 +31,10 @@ Cada issue de esa lista agrega su escenario antes de cerrarse.
 |---|---|---|
 | `paridad_env.sh` | Todos los `.env*` declaran las mismas variables; el compose no interpola ninguna sin declarar | Es la que atrapa el error más caro y corre en segundos |
 | `health.sh` | Cada servicio responde 200 en `/health` con el stack arriba | Primera verificación después de cualquier despliegue |
+| `migraciones.sh` | Todas las migraciones aplicadas y las tablas del modelo existen | Verifica el arranque real de la API contra la base |
 
 ## Unitarias
 
 Se escriben donde probar a mano sería más lento: el cálculo de precios y su explicación
-(`precios`), los parsers de listas (`importador`). Hoy: una prueba del `/health` del
-importador.
+(`precios`), los parsers de listas (`importador`). Hoy: el `/health` del importador y el
+orden de archivos del corredor de migraciones.

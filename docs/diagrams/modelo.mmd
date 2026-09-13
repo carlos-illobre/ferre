@@ -1,0 +1,68 @@
+erDiagram
+    proveedor ||--o{ lista_importada : "manda"
+    proveedor ||--o{ precio_proveedor : "cotiza"
+    lista_importada ||--o{ precio_proveedor : "origina"
+    producto ||--o{ precio_proveedor : "tiene precios de"
+    proveedor o|--o{ producto : "preferido"
+    cliente o|--o{ venta : "compra"
+    venta ||--|{ item_venta : "renglones"
+    producto o|--o{ item_venta : ""
+    precio_proveedor o|--o{ item_venta : "costo usado"
+    producto o|--o{ consulta : ""
+    proveedor ||--o{ compra : ""
+    compra ||--|{ item_compra : "renglones"
+    producto ||--o{ item_compra : ""
+    producto ||--o{ movimiento_stock : "stock = suma"
+
+    proveedor {
+        uuid id PK
+        text nombre
+        boolean precios_incluyen_iva
+        numeric descuento_general
+        numeric descuento_contado
+    }
+    producto {
+        uuid id PK
+        text descripcion
+        text marca
+        text codigo_barras
+        int margen_elegido "300|200|100|50|25"
+        numeric precio_manual
+    }
+    precio_proveedor {
+        uuid id PK
+        text codigo_proveedor
+        numeric precio_lista
+        jsonb descuentos
+        numeric costo_neto
+        numeric iva
+        date fecha_lista
+    }
+    venta {
+        uuid id PK
+        timestamptz fecha
+        text medio_pago "efectivo|mercado_pago|tarjeta|cuenta_corriente"
+        numeric total
+        text estado
+        timestamptz pagada_en
+    }
+    item_venta {
+        uuid id PK
+        numeric cantidad
+        numeric costo_neto
+        int margen_aplicado
+        numeric precio_unitario
+        jsonb explicacion
+    }
+    movimiento_stock {
+        uuid id PK
+        text tipo "venta|compra|ajuste"
+        numeric cantidad "con signo"
+        uuid referencia_id
+    }
+    evento {
+        uuid id PK
+        text tipo
+        int version
+        jsonb contenido
+    }

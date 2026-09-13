@@ -64,6 +64,10 @@ flowchart LR
 Fuente: [diagrams/despliegue.mmd](diagrams/despliegue.mmd). Detalle en
 [DEPLOYMENT.md](DEPLOYMENT.md).
 
+## Modelo de datos
+
+En [MODELO.md](MODELO.md): tablas, reglas comunes y cómo se migra el esquema.
+
 ## Decisiones
 
 Todas en [adr/README.md](adr/README.md). Las que más condicionan el diseño: el stack

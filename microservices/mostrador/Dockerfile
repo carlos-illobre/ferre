@@ -23,6 +23,7 @@ WORKDIR /app
 COPY --from=build --chown=app:app /out ./
 COPY --from=build --chown=app:app /app/api/dist ./dist
 COPY --from=build --chown=app:app /app/api/public ./public
+COPY --from=build --chown=app:app /app/api/migrations ./migrations
 USER app
 EXPOSE 8080
 CMD ["node", "dist/index.js"]
