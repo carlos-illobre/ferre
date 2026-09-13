@@ -10,6 +10,79 @@ planillas y de sus sitios. Se amplía con el issue #28.
 | **ERPA** (ERPA S.A., Suprabond, Villa Madero) | Excel por mail, exportado de su sistema (lista "comercio") | **No para precios mayoristas.** suprabond.com tiene catálogos PDF sin precios; tienda.suprabond.com es Shopify **minorista**, con precios de venta al público, no los de la lista comercio | **Solo por mail** | Ingesta automática del adjunto (issue #25). Los precios minoristas de la tienda sirven como referencia de precio de venta, no de costo |
 | **Comodo** | Excel por mail, vía el vendedor (Matias Banegas), con un Drive de ofertas e imágenes | **No identificado.** No se encontró sitio ni razón social; la lista solo referencia una carpeta de Google Drive | **Solo por mail** | Ingesta automática del adjunto (issue #25). Preguntarle al vendedor si tienen portal |
 
+## Cómo se automatiza la actualización de precios
+
+Los tres canales terminan en el mismo lugar: una **lista pendiente de aplicar** con su
+vista previa (nuevos, cambiados, dados de baja) que alguien confirma con un clic
+(issue #12). Lo que cambia es cómo llega el archivo. Nunca se aplica una lista sin
+confirmación humana: un archivo mal leído puede cambiar miles de precios.
+
+```mermaid
+flowchart LR
+    web["A · Portal del proveedor\n(tarea programada)"] --> normalizar
+    mail["B · Casilla de Gmail\n(cada 15 min)"] --> normalizar
+    manual["C · Subida manual\n(arrastrar el Excel)"] --> normalizar
+    normalizar["Servicio de listas de proveedores\nreconoce formato, calcula costo neto"] --> pendiente["Lista pendiente\ncon vista previa"]
+    pendiente -- "confirmar" --> precios[("Histórico de precios")]
+    pendiente -- "avisar" --> dueno["Dueño / empleado\n(notificación)"]
+```
+
+### A · Descarga desde el portal del proveedor
+
+Para los que tienen web con precios mayoristas: **Ixnova** hoy, **3GE** si su sección de
+descargas entrega un archivo.
+
+1. El negocio tiene usuario en el portal. Las credenciales van al `.env` del servicio,
+   nunca al código.
+2. Una tarea programada (semanal, o diaria si el proveedor cambia seguido) entra al
+   portal, descarga la lista y la guarda con fecha.
+3. Si el archivo es igual al último (mismo hash), no hace nada. Si cambió, lo normaliza
+   y crea la lista pendiente.
+4. Si el portal cambió y la descarga falla, avisa al dueño con el error en castellano;
+   no reintenta a ciegas.
+
+**Ixnova:** no ofrece exportación visible; la tienda muestra precios por producto una
+vez logueado. Antes de recorrer el catálogo página por página, **pedirles la
+exportación** (ya mandan el Excel por mail: probablemente puedan dejarlo en un enlace
+fijo). Si no, el conector recorre la tienda con el usuario del negocio, respetando
+pausas, y arma el mismo formato que su Excel. Es el conector del issue #26.
+
+**3GE:** entrar con código de cliente y CUIT a `/descargas/` y bajar la lista. Si es el
+mismo Excel que mandan por mail, el importador ya lo entiende. Confirmar con ellos.
+
+### B · Vinculación con la casilla de correo
+
+Para todos los que mandan la lista por mail: **ERPA, Comodo**, y en la práctica también
+Ixnova y 3GE, que llegan por el vendedor. Es el canal que más proveedores cubre de una
+vez (issue #25).
+
+1. El dueño autoriza al sistema a **leer** la casilla del negocio con la API de Gmail,
+   permiso de solo lectura, con la misma cuenta de Google que usa para entrar al sistema.
+2. Cada 15 minutos el servicio busca correos nuevos con adjuntos Excel o PDF.
+3. Reconoce el proveedor por **el archivo, no por el remitente**: nombre del archivo
+   (`Lista ERPA`, `lista_precios_ixnova_*`, `LISTA GENERAL`) y huella del formato
+   (encabezados y posición). Varios proveedores llegan desde la casilla personal del
+   mismo vendedor.
+4. Adjunto reconocido: normaliza y crea la lista pendiente. Adjunto no reconocido: queda
+   en una bandeja "¿de qué proveedor es?" donde se asigna una vez y el sistema aprende.
+5. El correo original queda enlazado a la lista para poder verlo.
+
+### C · Subida manual
+
+Siempre disponible, y el único canal hasta que existan A y B (issue #12): arrastrar el
+Excel a la pantalla, el sistema detecta el proveedor, muestra la vista previa, confirmar.
+Sirve también para el proveedor nuevo que todavía no está configurado y para el PDF que
+el reconocimiento automático no entendió.
+
+### Por proveedor
+
+| Proveedor | Canal principal | Respaldo | Frecuencia de cambio | Qué hay que conseguir |
+|---|---|---|---|---|
+| Ixnova | A (portal) | B (mail) | Semanal | Usuario del negocio en ixnova.com.ar; pedir exportación |
+| 3GE | A (descargas con login) | B (mail) | Semanal o quincenal | Código de cliente y CUIT; confirmar que la descarga es el Excel |
+| ERPA | B (mail) | C (manual) | Mensual aproximado | Nada: ya llega por mail |
+| Comodo | B (mail) | C (manual) | Semanal | Preguntarle al vendedor si existe portal; nombre de la empresa |
+
 ## Observaciones
 
 - **Un mismo vendedor manda varias listas** (Comodo, 3GE, Ixnova llegan desde la misma
