@@ -41,8 +41,9 @@ es más lenta que eso, está mal, aunque sea más completa.
   producto o escaneá el código").
 - Respuesta visible en menos de 100 ms para búsqueda y para cambiar margen. Si algo va a
   tardar más (cargar una lista), barra de progreso con lo que está haciendo.
-- Nombres de las cosas como las dice el empleado: "fiado", no "cuenta corriente";
-  "lista", no "importación"; "costo", no "precio de compra neto".
+- Nombres autodocumentados y fáciles de entender: "cuenta corriente" (no "fiado"),
+  "lista", no "importación"; "costo", no "precio de compra neto". Se abrevia "cc." solo
+  donde el espacio no alcanza, por ejemplo en una columna angosta.
 - Un solo estilo de botón principal por pantalla; el resto, secundarios.
 - Funciona en Chrome y Firefox de la laptop antigua y en el navegador del celular. Se
   prueba en la laptop real antes del piloto.
