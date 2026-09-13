@@ -2,5 +2,5 @@
 # renueva el certificado de Let's Encrypt solo. Ver docs/adr/ADR-006-caddy.md.
 {$SITIO} {
     encode gzip
-    reverse_proxy mostrador:8080
+    reverse_proxy gestion-del-local:8080
 }

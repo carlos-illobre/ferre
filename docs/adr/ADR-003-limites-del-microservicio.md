@@ -65,3 +65,14 @@ Un solo docker-compose levanta todo; el empleado ve una sola aplicación.
 ## Referencias
 
 ADR-001. Skill `microservicios-base`.
+
+---
+
+## Enmienda (ADR-010)
+
+`mostrador` pasó a llamarse `gestion-del-local` e `importador`,
+`listas-de-proveedores`. Los límites, la API como única puerta y la tabla de eventos
+siguen igual. Se agrega una regla de nombres: los servicios se nombran por la parte del
+negocio que resuelven.
+
+→ [ADR-010](ADR-010-servicios-clientes-y-librerias.md)

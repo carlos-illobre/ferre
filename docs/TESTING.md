@@ -8,8 +8,8 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 
 | Corredor | Qué corre | Necesita |
 |---|---|---|
-| `tests/e2e.sh` | Escenarios Playwright de `tests/e2e/escenarios/` contra el stack. `--solo <nombre>` repite uno. | Docker |
-| `tests/utest.sh` | Unitarias de `mostrador` (vitest) e `importador` (pytest) | Nada |
+| `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API, corre los escenarios Playwright de `tests/e2e/escenarios/`. `--solo <nombre>` repite uno. | Docker, pnpm |
+| `tests/utest.sh` | Unitarias del workspace TypeScript (vitest) y de `listas-de-proveedores` (pytest) | Nada |
 | `tests/itest.sh` | Scripts de `tests/integration/`. `--rapido` saltea los que necesitan el stack. | Docker (salvo `--rapido`) |
 
 ## Caminos principales cubiertos por E2E
@@ -36,5 +36,5 @@ Cada issue de esa lista agrega su escenario antes de cerrarse.
 ## Unitarias
 
 Se escriben donde probar a mano sería más lento: el cálculo de precios y su explicación
-(`precios`), los parsers de listas (`importador`). Hoy: el `/health` del importador y el
+(`calculo-de-precios`), los lectores de listas (`listas-de-proveedores`). Hoy: el `/health` de `listas-de-proveedores` y el
 orden de archivos del corredor de migraciones.

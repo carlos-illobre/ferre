@@ -48,3 +48,12 @@ En desarrollo se construye localmente con `docker compose build`, con el mismo c
 ## Referencias
 
 ADR-009. Skill `desplegar-en-oracle-cloud`.
+
+---
+
+## Enmienda (ADR-010)
+
+Las imágenes publicadas son `gestion-del-local` y `listas-de-proveedores`. El cliente
+web no tiene imagen: se publica en GitHub Pages.
+
+→ [ADR-010](ADR-010-servicios-clientes-y-librerias.md)

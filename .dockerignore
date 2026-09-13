@@ -1,0 +1,14 @@
+# Contexto de build = raíz del repo (por el workspace). Fuera todo lo que no es código.
+**/node_modules
+**/dist
+**/.venv
+**/__pycache__
+**/public
+.env*
+deployment/*/.env
+privado
+docs
+tests
+clientes
+microservices/listas-de-proveedores
+.git

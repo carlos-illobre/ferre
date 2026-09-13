@@ -19,18 +19,22 @@ services:
       # y agota el cupo de Let's Encrypt.
       - caddy-data:/data
     depends_on:
-      mostrador:
+      gestion-del-local:
         condition: service_healthy
 
-  mostrador:
-    image: ${REGISTRO:?falta REGISTRO en el .env}/mostrador:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
-    build: ./microservices/mostrador
+  gestion-del-local:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/gestion-del-local:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build:
+      # Contexto en la raíz por el workspace compartido (ADR-010).
+      context: .
+      dockerfile: microservices/gestion-del-local/Dockerfile
     restart: unless-stopped
     environment:
       DATABASE_URL: ${DATABASE_URL:?falta DATABASE_URL en el .env}
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
-      # No cambia entre ambientes: el importador siempre vive en la misma red del compose.
-      IMPORTADOR_URL: http://importador:8000
+      ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
+      # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
+      LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
       PORT: "8080"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
@@ -39,9 +43,9 @@ services:
       retries: 6
       start_period: 15s
 
-  importador:
-    image: ${REGISTRO:?falta REGISTRO en el .env}/importador:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
-    build: ./microservices/importador
+  listas-de-proveedores:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/listas-de-proveedores:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build: ./microservices/listas-de-proveedores
     restart: unless-stopped
     environment:
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}

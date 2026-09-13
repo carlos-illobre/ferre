@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Esquema en `microservices/mostrador/api/migrations/`, aplicado por el corredor propio al
+Esquema en `microservices/gestion-del-local/migrations/`, aplicado por el corredor propio al
 arrancar la API (issue #6). Diagrama completo en
 [diagrams/modelo.mmd](diagrams/modelo.mmd).
 
@@ -35,7 +35,7 @@ erDiagram
 
 | Tabla | Qué es | Detalle que importa |
 |---|---|---|
-| `proveedor` | Quién vende | Si sus precios incluyen IVA y sus descuentos general y por contado: lo que el importador necesita para el costo neto (#11) |
+| `proveedor` | Quién vende | Si sus precios incluyen IVA y sus descuentos general y por contado: lo que `listas-de-proveedores` necesita para el costo neto (#11) |
 | `lista_importada` | Cada archivo cargado | Estado pendiente/aplicada/descartada y resumen de cambios; el archivo se guarda para reprocesar (#12) |
 | `producto` | Lo que se vende | `margen_elegido` (300/200/100/50/25 o ninguno) y `precio_manual` (#13). Un producto por renglón de lista hasta que #29 los una |
 | `precio_proveedor` | Histórico de costos | Precio de lista, descuentos aplicados en orden (JSON), costo neto, IVA, bulto, fecha de la lista |

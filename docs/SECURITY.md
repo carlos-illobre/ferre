@@ -12,7 +12,8 @@ Datos de ventas, compras, costos y márgenes del negocio; listas de precios de p
 | Datos sensibles en el repo público | `privado/` y todo `.xlsx`/`.pdf`/`.env` en `.gitignore`; plantillas con marcadores | Hecho (#1) |
 | Secretos en imágenes o código | Toda configuración sale del `.env`; los Dockerfiles ignoran `.env*` | Hecho |
 | Variable de seguridad olvidada que deja algo abierto | Sin valores por omisión: el arranque falla ([ADR-009](adr/ADR-009-compose-unico-y-env.md)); prueba de paridad | Hecho |
-| Servicios internos expuestos a internet | Solo Caddy publica puertos; `importador` solo es alcanzable en la red del compose | Hecho |
+| Servicios internos expuestos a internet | Solo Caddy publica puertos; `listas-de-proveedores` solo es alcanzable en la red del compose | Hecho |
+| Cualquier sitio llamando a la API desde un navegador | CORS restringido a `ORIGEN_WEB` | Hecho |
 | Llamadas entre servicios sin autenticar | `TOKEN_SERVICIO` compartido, verificado en cada llamada interna | Pendiente (#6) |
 | Acceso al mostrador sin usuario | Usuarios y roles dueño/mostrador, auditoría | Pendiente (#41) |
 | Tráfico en claro | HTTPS obligatorio vía Caddy; la PWA no funciona sin él | Hecho |

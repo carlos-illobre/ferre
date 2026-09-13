@@ -12,15 +12,22 @@ Objetivos, en orden:
 
 ## Levantarlo
 
-Requisitos: Docker con Compose. Para desarrollar además Node 22 con pnpm y uv.
+Requisitos: Docker con Compose, Node 22 con pnpm 10, y uv.
 
 ```bash
 cp .env.example .env
+pnpm install
 docker compose --profile local up -d --build --wait
 ```
 
-Abrir http://localhost. El perfil `local` levanta un PostgreSQL propio; en producción la
-base es Supabase.
+Eso levanta la API en http://localhost (vía Caddy) y un PostgreSQL local. El cliente web
+se sirve aparte, como en producción:
+
+```bash
+VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web dev
+```
+
+En producción la base es Supabase y el cliente está en GitHub Pages.
 
 ## Pruebas
 
@@ -37,17 +44,22 @@ tests/e2e.sh              # caminos principales, levanta el stack
 - Antes de codear un issue se propone la solución y se espera la aprobación del dueño.
 - Las decisiones técnicas están en [docs/adr](docs/adr/README.md). Arquitectura en
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), despliegue en
-  [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), pruebas en [docs/TESTING.md](docs/TESTING.md).
+  [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), pruebas en [docs/TESTING.md](docs/TESTING.md),
+  configuración de Google para el login en [docs/google-cloud.md](docs/google-cloud.md).
 - La carpeta `privado/` contiene listas de precios reales y otros datos de terceros.
   Está ignorada por git y **no debe subirse nunca**.
 
 ## Estructura
 
+Los nombres dicen qué parte del negocio resuelve cada pieza (ADR-010).
+
 ```
-microservices/mostrador    API Hono + PWA React + paquete precios (pnpm workspace)
-microservices/importador   FastAPI: lectura de listas de proveedores (uv)
-infrastructure/            Caddy
-deployment/oracle-single/  Plantilla de configuración y despliegue en Oracle Cloud
-tests/                     Corredores E2E, unitarias e integración
-docs/                      Arquitectura, ADR, despliegue, seguridad, pruebas
+microservices/gestion-del-local        Lo que pasa dentro del local: catálogo, precios, ventas, cuenta corriente, compras, stock (Hono, TypeScript)
+microservices/listas-de-proveedores    Recibe listas de proveedores y las convierte en precios (FastAPI, Python)
+clientes/gestion-del-local-web         Pantalla del empleado y del dueño (React, PWA, GitHub Pages)
+libraries/calculo-de-precios           Costo, margen y precio con su explicación (compartida)
+infrastructure/                        Caddy
+deployment/oracle-single/              Plantilla de configuración y despliegue en Oracle Cloud
+tests/                                 Corredores E2E, unitarias e integración
+docs/                                  Arquitectura, modelo, ADR, despliegue, seguridad, pruebas
 ```

@@ -5,7 +5,7 @@ set -uo pipefail
 [[ "${RAPIDO:-0}" == "1" ]] && exit 3
 cd "$(dirname "$0")/../.."
 
-esperadas=$(ls microservices/mostrador/api/migrations/*.sql | wc -l)
+esperadas=$(ls microservices/gestion-del-local/migrations/*.sql | wc -l)
 aplicadas=$(docker compose --profile local exec -T db psql -U ferre -d ferre -tAc "SELECT count(*) FROM migracion" 2>/dev/null | tr -d '[:space:]')
 if [[ "$aplicadas" != "$esperadas" ]]; then
   echo "migraciones aplicadas: ${aplicadas:-ninguna}, archivos: $esperadas"

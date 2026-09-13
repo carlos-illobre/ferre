@@ -1,21 +1,23 @@
 flowchart LR
+    pages["GitHub Pages<br/>clientes/gestion-del-local-web"]
     subgraph navegador["Laptop / celular (navegador)"]
-        pwa["PWA<br/>IndexedDB: catálogo, ventas, cola"]
+        pwa["Cliente web<br/>IndexedDB: catálogo, ventas, cola"]
     end
+    pages -. "abre (HTTPS)" .-> pwa
 
     subgraph oracle["Máquina Oracle Cloud (sin estado)"]
         caddy["Caddy<br/>:80 :443 TLS automático"]
-        mostrador["mostrador<br/>Hono + PWA estática :8080"]
-        importador["importador<br/>FastAPI :8000"]
-        caddy --> mostrador
-        mostrador -- "token de servicio" --> importador
+        gdl["gestion-del-local<br/>Hono :8080"]
+        ldp["listas-de-proveedores<br/>FastAPI :8000"]
+        caddy --> gdl
+        gdl -- "token de servicio" --> ldp
     end
 
     supabase[("Supabase<br/>PostgreSQL")]
     objeto[("Oracle Object Storage<br/>volcados horarios")]
     ghcr["GHCR<br/>imágenes por SHA"]
 
-    pwa -- HTTPS --> caddy
-    mostrador --> supabase
+    pwa -- "HTTPS + CORS" --> caddy
+    gdl --> supabase
     oracle -. "pg_dump cada hora" .-> objeto
     ghcr -. "docker compose pull" .-> oracle

@@ -1,0 +1,7 @@
+# Un solo workspace para compartir libraries/ entre servicios y clientes en TypeScript.
+# Cada servicio se empaqueta solo con lo suyo (pnpm deploy), ver ADR-010.
+packages:
+  - microservices/gestion-del-local
+  - clientes/gestion-del-local-web
+  - libraries/calculo-de-precios
+  - tests/e2e

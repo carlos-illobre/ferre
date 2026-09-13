@@ -29,19 +29,21 @@ Fuente: [diagrams/contexto.mmd](diagrams/contexto.mmd).
 
 | Componente | Qué hace | Tecnología | ADR |
 |---|---|---|---|
-| `microservices/mostrador` | API del mostrador (catálogo, precios, stock, ventas, compras) y sirve la PWA compilada | Node 22, Hono, TypeScript | [001](adr/ADR-001-stack-tecnologico.md) |
-| `mostrador/pwa` | Interfaz del empleado y del dueño; funciona sin internet con IndexedDB | React, Vite | [001](adr/ADR-001-stack-tecnologico.md), [005](adr/ADR-005-indexeddb-directo.md) |
-| `mostrador/precios` | Cálculo de costo neto, margen y precio con su explicación; compartido entre API y PWA | TypeScript | [001](adr/ADR-001-stack-tecnologico.md) |
-| `microservices/importador` | Lee listas de proveedores (Excel, PDF) y devuelve filas normalizadas | Python 3.12, FastAPI, openpyxl | [001](adr/ADR-001-stack-tecnologico.md) |
+| `microservices/gestion-del-local` | Lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base | Node 22, Hono, TypeScript | [001](adr/ADR-001-stack-tecnologico.md), [010](adr/ADR-010-servicios-clientes-y-librerias.md) |
+| `clientes/gestion-del-local-web` | Pantalla del empleado y del dueño; funciona sin internet con IndexedDB; publicada en GitHub Pages | React, Vite, PWA | [005](adr/ADR-005-indexeddb-directo.md), [010](adr/ADR-010-servicios-clientes-y-librerias.md) |
+| `libraries/calculo-de-precios` | Costo neto, margen y precio con su explicación; compartida entre servicio y cliente | TypeScript | [001](adr/ADR-001-stack-tecnologico.md) |
+| `microservices/listas-de-proveedores` | Recibe listas de proveedores (Excel, PDF, mail, portal) y las convierte en precios | Python 3.12, FastAPI, openpyxl | [001](adr/ADR-001-stack-tecnologico.md) |
 | `infrastructure/reverse-proxy` | TLS automático y única puerta de entrada | Caddy | [006](adr/ADR-006-caddy.md) |
 | Base de datos | PostgreSQL administrado, usado por cadena de conexión | Supabase | [002](adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md) |
 
 ## Límites y comunicación
 
-- `mostrador` es el único dueño de la base de datos. Ningún otro servicio la toca
-  ([ADR-003](adr/ADR-003-limites-del-microservicio.md)).
-- `mostrador` llama a `importador` por HTTP con un token de servicio compartido
-  (`TOKEN_SERVICIO`). `importador` no tiene estado ni base.
+- `gestion-del-local` es el único dueño de la base de datos. Ningún otro servicio la
+  toca ([ADR-003](adr/ADR-003-limites-del-microservicio.md)).
+- `gestion-del-local` llama a `listas-de-proveedores` por HTTP con un token de servicio
+  compartido (`TOKEN_SERVICIO`). `listas-de-proveedores` no tiene estado ni base.
+- El cliente web vive en otro origen (GitHub Pages) y habla con la API con CORS y un
+  token de sesión en cabecera ([ADR-010](adr/ADR-010-servicios-clientes-y-librerias.md)).
 - Los eventos de dominio se guardan en una tabla de eventos en JSON versionado. Hoy los
   consume la propia app; un futuro servicio de ventas online los lee desde ahí.
 - La PWA guarda catálogo, ventas del día y cola de cambios en IndexedDB, y sincroniza
@@ -51,12 +53,13 @@ Fuente: [diagrams/contexto.mmd](diagrams/contexto.mmd).
 
 ```mermaid
 flowchart LR
-    pwa["PWA en el navegador"] -- HTTPS --> caddy["Caddy"]
+    pages["GitHub Pages<br/>gestion-del-local-web"] -. "abre" .-> pwa["Cliente web en el navegador<br/>IndexedDB"]
+    pwa -- "HTTPS + CORS" --> caddy["Caddy"]
     subgraph oracle["Máquina Oracle Cloud (sin estado)"]
-        caddy --> mostrador["mostrador :8080"]
-        mostrador -- token --> importador["importador :8000"]
+        caddy --> gdl["gestion-del-local :8080"]
+        gdl -- token --> ldp["listas-de-proveedores :8000"]
     end
-    mostrador --> supabase[("Supabase PostgreSQL")]
+    gdl --> supabase[("Supabase PostgreSQL")]
     oracle -. "pg_dump cada hora" .-> objeto[("Object Storage")]
     ghcr["GHCR"] -. pull .-> oracle
 ```

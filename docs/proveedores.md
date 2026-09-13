@@ -6,7 +6,7 @@ planillas y de sus sitios. Se amplía con el issue #28.
 | Proveedor | Cómo llega hoy | Web con precios | Automatizable | Cómo |
 |---|---|---|---|---|
 | **Ixnova** (HNZ SRL, Castelar) | Excel por mail, 3 hojas, con fecha en el título | **Sí.** Tienda online propia en ixnova.com.ar; precios mayoristas visibles con usuario registrado por CUIT, aprobación inmediata | **Sí, alta** | Conector con usuario del negocio que recorra el catálogo o, mejor, pedirles exportación. Es el candidato del issue #26 |
-| **3GE** (Distribuidora 3GE SRL, 3M y otras) | Excel por mail, vía el vendedor | **Parcial.** tresge.com.ar tiene sección de descargas y acceso para clientes con código de cliente y CUIT; la lista de precios parece estar detrás de ese login | **Sí, media** | Con las credenciales del negocio, descargar el archivo de la sección de descargas y pasarlo por el importador. Confirmar con ellos si el archivo es el mismo Excel |
+| **3GE** (Distribuidora 3GE SRL, 3M y otras) | Excel por mail, vía el vendedor | **Parcial.** tresge.com.ar tiene sección de descargas y acceso para clientes con código de cliente y CUIT; la lista de precios parece estar detrás de ese login | **Sí, media** | Con las credenciales del negocio, descargar el archivo de la sección de descargas y pasarlo por el servicio de listas. Confirmar con ellos si el archivo es el mismo Excel |
 | **ERPA** (ERPA S.A., Suprabond, Villa Madero) | Excel por mail, exportado de su sistema (lista "comercio") | **No para precios mayoristas.** suprabond.com tiene catálogos PDF sin precios; tienda.suprabond.com es Shopify **minorista**, con precios de venta al público, no los de la lista comercio | **Solo por mail** | Ingesta automática del adjunto (issue #25). Los precios minoristas de la tienda sirven como referencia de precio de venta, no de costo |
 | **Comodo** | Excel por mail, vía el vendedor (Matias Banegas), con un Drive de ofertas e imágenes | **No identificado.** No se encontró sitio ni razón social; la lista solo referencia una carpeta de Google Drive | **Solo por mail** | Ingesta automática del adjunto (issue #25). Preguntarle al vendedor si tienen portal |
 
@@ -48,7 +48,7 @@ fijo). Si no, el conector recorre la tienda con el usuario del negocio, respetan
 pausas, y arma el mismo formato que su Excel. Es el conector del issue #26.
 
 **3GE:** entrar con código de cliente y CUIT a `/descargas/` y bajar la lista. Si es el
-mismo Excel que mandan por mail, el importador ya lo entiende. Confirmar con ellos.
+mismo Excel que mandan por mail, el servicio de listas ya lo entiende. Confirmar con ellos.
 
 ### B · Vinculación con la casilla de correo
 

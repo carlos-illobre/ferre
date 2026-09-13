@@ -9,23 +9,23 @@ env:
   REGISTRO: ghcr.io/${{ github.repository }}
 
 jobs:
-  mostrador:
+  typescript:
+    # gestion-del-local, el cliente web y calculo-de-precios comparten el workspace.
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: microservices/mostrador } }
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with: { version: 10 }
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: pnpm, cache-dependency-path: microservices/mostrador/pnpm-lock.yaml }
+        with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
-      - run: pnpm build
+      - run: VITE_API_URL=http://localhost pnpm build
       - run: pnpm test
 
-  importador:
+  listas-de-proveedores:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: microservices/importador } }
+    defaults: { run: { working-directory: microservices/listas-de-proveedores } }
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -43,23 +43,20 @@ jobs:
           docker compose --profile local config --quiet
 
   e2e:
-    needs: [mostrador, importador, configuracion]
+    needs: [typescript, listas-de-proveedores, configuracion]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with: { version: 10 }
       - uses: actions/setup-node@v4
-        with: { node-version: 22 }
+        with: { node-version: 22, cache: pnpm }
       - run: cp .env.example .env
       - run: docker compose --profile local up -d --build --wait
       - run: tests/itest.sh
       - run: pnpm install --frozen-lockfile
-        working-directory: tests/e2e
-      - run: pnpm exec playwright install --with-deps chromium
-        working-directory: tests/e2e
-      - run: pnpm exec playwright test
-        working-directory: tests/e2e
+      - run: pnpm --filter e2e exec playwright install --with-deps chromium
+      - run: tests/e2e.sh
       - if: failure()
         run: docker compose --profile local logs --no-color | tail -200
 
@@ -78,5 +75,29 @@ jobs:
       # alcanza porque ninguna entra en la imagen. IMAGEN_TAG del entorno pisa a la del .env.
       - run: cp .env.example .env
       - run: echo "IMAGEN_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-      - run: docker compose build mostrador importador
-      - run: docker compose push mostrador importador
+      - run: docker compose build gestion-del-local listas-de-proveedores
+      - run: docker compose push gestion-del-local listas-de-proveedores
+
+  cliente-web:
+    # Solo en master: publica el cliente web en GitHub Pages (ADR-010). API_URL es una
+    # variable del repositorio (Settings → Secrets and variables → Actions → Variables).
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: [e2e]
+    runs-on: ubuntu-latest
+    permissions: { contents: read, pages: write, id-token: write }
+    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter gestion-del-local-web... build
+        env:
+          VITE_API_URL: ${{ vars.API_URL }}
+          VITE_BASE: /${{ github.event.repository.name }}/
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: clientes/gestion-del-local-web/dist }
+      - id: deploy
+        uses: actions/deploy-pages@v4
