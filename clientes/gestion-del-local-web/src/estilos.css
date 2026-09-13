@@ -1,93 +1,198 @@
-/* Mínimo del esqueleto; la guía de interfaz (docs/ux.md) manda cuando lleguen las pantallas reales. */
-:root { font-family: system-ui, sans-serif; font-size: 16px; color: #1a1a1a; background: #fafafa; }
-body { margin: 0; }
-main { padding: 1rem; max-width: 960px; margin: 0 auto; }
-.pantalla-centrada { max-width: 420px; text-align: center; padding-top: 3rem; }
-.barra { display: flex; gap: 1rem; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #ddd; }
-.barra span { flex: 1; }
-.en-linea { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
-table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
-th, td { text-align: left; padding: 0.4rem; border-bottom: 1px solid #eee; font-size: 0.95rem; }
-button, input, select { font: inherit; padding: 0.4rem 0.7rem; }
-.error { color: #b00020; }
-.aviso { color: #7a5c00; }
-article { margin-top: 1.5rem; }
+/* Sistema visual de ferre, a partir de los mockups (mockups/*.png): barra azul marino con
+   el ítem activo subrayado en amarillo, fondo gris claro, tarjetas blancas, búsqueda con
+   borde ámbar, acción principal en amarillo, fila elegida en azul marino, "sin precio" en
+   rojo. Reglas de docs/ux.md: letra 16 px, alto contraste, una acción principal. */
+:root {
+  --azul: #1b3f77;
+  --azul-oscuro: #12305e;
+  --azul-claro: #e8eef8;
+  --amarillo: #f5b800;
+  --amarillo-oscuro: #d9a200;
+  --ambar: #e6a400;
+  --rojo: #d8322f;
+  --rojo-claro: #fdeeee;
+  --verde: #2e9e44;
+  --verde-claro: #edf8ef;
+  --fondo: #eef0f4;
+  --tarjeta: #ffffff;
+  --borde: #d5d9e2;
+  --texto: #1c2430;
+  --texto-suave: #5b6675;
+  --gris-boton: #4b5563;
+  --sombra: 0 2px 6px rgba(18, 48, 94, 0.10);
+  --radio: 8px;
+  font-family: "Segoe UI", "Nunito", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  color: var(--texto);
+  background: var(--fondo);
+}
+body { margin: 0; background: var(--fondo); }
+main { padding: 0 0 2rem; }
+main > section, main > p, main > details { max-width: 1180px; margin-left: auto; margin-right: auto; padding: 0 1.25rem; box-sizing: border-box; }
+h1 { font-size: 1.5rem; color: var(--azul); margin: 1rem 0 0.5rem; }
+h2 { font-size: 1.15rem; color: var(--azul); margin: 1.25rem 0 0.5rem; border-bottom: 2px solid var(--borde); padding-bottom: 0.25rem; }
+h3 { font-size: 1rem; color: var(--azul); margin: 1rem 0 0.4rem; }
+a { color: var(--azul); }
+small { color: var(--texto-suave); }
+code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.9em; }
 
-/* Guía de interfaz (docs/ux.md): letra 16 px, una acción principal por pantalla, errores en el lugar. */
-nav { display: flex; gap: 0.25rem; }
-button.enlace { background: none; border: none; padding: 0.4rem 0.6rem; cursor: pointer; color: #0b57d0; text-decoration: underline; }
-button.enlace.activo { color: #1a1a1a; text-decoration: none; font-weight: 600; }
-button.grande { font-size: 1.1rem; padding: 0.9rem 1.4rem; background: #0b57d0; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-button.grande:disabled { opacity: 0.6; cursor: wait; }
-button.secundario { background: #fff; border: 1px solid #bbb; border-radius: 6px; cursor: pointer; }
-.zona-de-carga { margin: 1rem 0; padding: 2rem; border: 2px dashed #bbb; border-radius: 10px; text-align: center; background: #fff; }
-.zona-de-carga.arrastrando { border-color: #0b57d0; background: #eef4ff; }
-.zona-de-carga .en-linea { justify-content: center; align-items: center; }
-.leyendo { font-size: 1.1rem; }
-.tarjeta { background: #fff; border: 1px solid #e3e3e3; border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
-.numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
-.numeros div { background: #f4f6fa; border-radius: 8px; padding: 0.6rem 0.8rem; }
-.numeros dt { font-size: 0.85rem; color: #555; }
-.numeros dd { margin: 0; font-size: 1.6rem; font-weight: 600; }
-.numeros dd small { font-size: 0.85rem; font-weight: 400; color: #555; }
+/* Barra superior */
+.barra { display: flex; gap: 1.5rem; align-items: center; padding: 0 1.5rem; height: 60px; width: 100%; box-sizing: border-box; background: linear-gradient(180deg, var(--azul) 0%, var(--azul-oscuro) 100%); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25); position: sticky; top: 0; z-index: 10; }
+.barra > strong { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+.barra nav { display: flex; gap: 0.25rem; flex: 1; justify-content: center; height: 100%; }
+.barra nav button.enlace { color: #fff; text-decoration: none; font-weight: 600; font-size: 1.05rem; padding: 0 0.9rem; border-bottom: 3px solid transparent; border-radius: 0; height: 100%; white-space: nowrap; }
+.barra nav button.enlace:hover { background: rgba(255,255,255,0.08); }
+.barra nav button.enlace.activo { color: var(--amarillo); border-bottom-color: var(--amarillo); font-weight: 700; }
+.barra > span { color: #d9e2f2; font-size: 0.95rem; white-space: nowrap; }
+.barra > button.secundario { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); }
+
+/* Botones */
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.55; }
+button.grande { font-size: 1.15rem; font-weight: 700; padding: 0.85rem 1.6rem; background: var(--amarillo); color: var(--azul-oscuro); border: none; border-radius: var(--radio); box-shadow: var(--sombra); }
+button.grande:hover:not(:disabled) { background: var(--amarillo-oscuro); }
+button.secundario { background: var(--gris-boton); color: #fff; border: none; border-radius: var(--radio); padding: 0.6rem 1.1rem; font-weight: 600; }
+button.secundario:hover:not(:disabled) { background: #374151; }
+button.enlace { background: none; border: none; padding: 0.4rem 0.6rem; color: var(--azul); text-decoration: underline; }
+button.enlace.chico { font-size: 0.85rem; padding: 0.2rem 0.4rem; }
+button.enlace.activo { color: var(--texto); text-decoration: none; font-weight: 600; }
+input, select { padding: 0.45rem 0.6rem; border: 1px solid var(--borde); border-radius: 6px; background: #fff; color: var(--texto); }
+input:focus, select:focus { outline: none; border-color: var(--azul); box-shadow: 0 0 0 3px rgba(27, 63, 119, 0.15); }
+label { display: inline-flex; gap: 0.3rem; align-items: center; }
+.en-linea { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; align-items: center; }
 .acciones { display: flex; gap: 0.75rem; align-items: center; margin: 1rem 0; }
+
+/* Tarjetas y tablas */
+.tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 1rem 1.25rem; margin: 1rem 0; box-shadow: var(--sombra); }
+article { margin-top: 1.5rem; }
+table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; background: var(--tarjeta); border-radius: var(--radio); overflow: hidden; box-shadow: var(--sombra); }
+th { text-align: left; padding: 0.55rem 0.7rem; background: var(--azul-claro); color: var(--azul); font-size: 0.9rem; font-weight: 700; }
+td { text-align: left; padding: 0.55rem 0.7rem; border-top: 1px solid #eceff4; font-size: 0.98rem; vertical-align: middle; }
 .tabla-scroll { overflow-x: auto; }
-tr.nuevo td { background: #f1fbf1; }
-tr.cambia td { background: #fff8e6; }
-tr.vieja td { color: #b00020; }
-td.sube { color: #b00020; font-weight: 600; }
-td.baja { color: #0a7a2f; font-weight: 600; }
+tr.nuevo td { background: var(--verde-claro); }
+tr.cambia td { background: #fff8e1; }
+tr.vieja td { color: var(--rojo); font-weight: 600; }
+tr.anulada td { color: #888; text-decoration: line-through; }
+td.sube, .sube { color: var(--rojo); font-weight: 700; }
+td.baja, .baja { color: var(--verde); font-weight: 700; }
+
+/* Mensajes */
+.error { color: var(--rojo); background: var(--rojo-claro); border-left: 4px solid var(--rojo); padding: 0.5rem 0.8rem; border-radius: 4px; }
+.aviso { color: #7a5c00; background: #fff8e1; border-left: 4px solid var(--amarillo); padding: 0.5rem 0.8rem; border-radius: 4px; }
+.exito { color: #1f6b30; background: var(--verde-claro); border-left: 4px solid var(--verde); padding: 0.5rem 0.8rem; border-radius: 4px; }
+.ayuda { color: var(--texto-suave); font-size: 0.9rem; margin: 0.4rem 0 0.8rem; }
+
+/* Pantallas centradas (entrar, vincular) */
+.pantalla-centrada { max-width: 480px; margin: 0 auto; text-align: center; padding: 3rem 1.25rem; }
+.pantalla-centrada h1 { font-size: 3.2rem; font-weight: 800; color: var(--azul); letter-spacing: -0.03em; margin: 0 0 0.5rem; }
+.pantalla-centrada p { font-size: 1.15rem; }
+.pantalla-centrada h2 { border: none; font-size: 1.1rem; color: var(--texto-suave); display: flex; align-items: center; gap: 0.75rem; }
+.pantalla-centrada h2::before, .pantalla-centrada h2::after { content: ""; flex: 1; border-top: 1px solid var(--borde); }
+.pantalla-centrada hr { border: none; margin: 1.5rem 0 0.5rem; }
+.pantalla-centrada img { border: 3px solid var(--amarillo); border-radius: 10px; padding: 6px; background: #fff; }
+.pantalla-centrada button.grande, .pantalla-centrada > button { font-size: 1.05rem; }
+.pantalla-centrada > div { display: flex; justify-content: center; }
+
+/* Búsqueda */
+.busqueda { width: 100%; box-sizing: border-box; font-size: 1.2rem; padding: 0.75rem 1rem 0.75rem 2.8rem; border: 2px solid var(--ambar); border-radius: var(--radio); margin-top: 1rem; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231b3f77' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cline x1='15.5' y1='15.5' x2='21' y2='21'/%3E%3C/svg%3E") no-repeat 0.9rem center / 1.3rem; box-shadow: var(--sombra); }
+.busqueda:focus { outline: none; border-color: var(--amarillo-oscuro); box-shadow: 0 0 0 3px rgba(245, 184, 0, 0.25); }
+.buscador { position: relative; }
+.sugerencias { position: absolute; left: 0; right: 0; z-index: 5; margin: 0; padding: 0; list-style: none; background: #fff; border: 1px solid var(--borde); border-radius: 0 0 var(--radio) var(--radio); box-shadow: 0 8px 20px rgba(18, 48, 94, 0.18); }
+.sugerencias li { display: grid; grid-template-columns: 1fr auto; gap: 0.1rem 1rem; padding: 0.55rem 1rem; cursor: pointer; border-top: 1px solid #eceff4; }
+.sugerencias li span { grid-column: 1; grid-row: 1; font-weight: 600; }
+.sugerencias li small { grid-column: 1; grid-row: 2; }
+.sugerencias li strong { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 1.15rem; color: var(--azul); }
+.sugerencias li.elegido { background: var(--azul); color: #fff; }
+.sugerencias li.elegido small, .sugerencias li.elegido strong { color: #fff; }
+
+/* Resultados de productos: cada fila como tarjeta; la elegida en azul marino */
+table.resultados { border-collapse: separate; border-spacing: 0 8px; background: transparent; box-shadow: none; overflow: visible; }
+table.resultados thead th { background: transparent; padding-bottom: 0; }
+table.resultados td:first-child { min-width: 240px; }
+table.resultados td:nth-child(2) { min-width: 120px; }
+table.resultados td.precio { white-space: normal; min-width: 190px; }
+table.resultados td.precio .explicacion summary { white-space: nowrap; }
+table.resultados tbody tr { cursor: pointer; }
+table.resultados tbody td { background: var(--tarjeta); border: none; box-shadow: var(--sombra); }
+table.resultados tbody td:first-child { border-radius: var(--radio) 0 0 var(--radio); }
+table.resultados tbody td:last-child { border-radius: 0 var(--radio) var(--radio) 0; }
+table.resultados tr.elegido td { background: var(--azul); color: #fff; }
+table.resultados tr.elegido td small, table.resultados tr.elegido td em, table.resultados tr.elegido .explicacion summary small { color: #fff; }
+table.resultados tr.elegido button.margen { background: #fff; color: var(--azul); }
+table.resultados tr.elegido button.margen.activo { background: var(--amarillo); color: var(--azul-oscuro); border-color: var(--amarillo); }
+table.resultados tr.elegido button.enlace { color: #fff; }
+
+/* Selector de margen */
+.margenes { display: flex; gap: 0.2rem; }
+button.margen { padding: 0.3rem 0.42rem; border: 1px solid var(--borde); border-radius: 6px; background: #f3f5f9; color: var(--texto); font-weight: 600; white-space: nowrap; font-size: 0.88rem; }
+button.margen.activo { background: var(--azul); color: #fff; border-color: var(--azul); }
+button.margen:disabled { opacity: 0.4; }
+td.precio { white-space: nowrap; font-size: 1.2rem; font-weight: 700; color: var(--azul); }
+td.precio .explicacion { display: inline-block; }
+td.precio input, td.precio button.enlace { font-weight: 400; }
+.sin-precio { color: var(--rojo); font-size: 0.95rem; font-weight: 600; font-style: normal; }
+tr.sin-precio-fila td { background: var(--rojo-claro); }
+.manual { color: #7a5c00; font-size: 0.85rem; }
+.precio-manual { width: 6rem; margin-left: 0.4rem; }
+
+/* Explicación de un número calculado (#47) */
 .explicacion summary { list-style: none; cursor: pointer; white-space: nowrap; }
 .explicacion summary::-webkit-details-marker { display: none; }
-.explicacion summary small { color: #0b57d0; }
-.explicacion ol { margin: 0.4rem 0 0; padding-left: 1.2rem; font-size: 0.9rem; color: #333; white-space: normal; }
-label { display: inline-flex; gap: 0.3rem; align-items: center; }
+.explicacion summary small { display: inline-flex; width: 1.1rem; height: 1.1rem; align-items: center; justify-content: center; border-radius: 50%; background: var(--amarillo); color: var(--azul-oscuro); font-size: 0.75rem; font-weight: 800; vertical-align: 0.1em; }
+.explicacion ol { margin: 0.4rem 0 0; padding: 0.5rem 1.4rem; font-size: 0.9rem; font-weight: 400; color: var(--texto); background: #fff8e1; border-radius: 6px; white-space: normal; }
 
-/* Productos: búsqueda grande con foco, resultados en filas, selector de margen (docs/ux.md). */
-.busqueda { width: 100%; font-size: 1.25rem; padding: 0.8rem 1rem; border: 2px solid #bbb; border-radius: 8px; margin-top: 1rem; }
-.busqueda:focus { outline: none; border-color: #0b57d0; }
-.ayuda { color: #555; font-size: 0.9rem; margin: 0.4rem 0 0.8rem; }
-.resultados tr { cursor: pointer; }
-.resultados tr.elegido td { background: #eef4ff; }
-.resultados td { vertical-align: middle; }
-.margenes { display: flex; gap: 0.25rem; }
-button.margen { font: inherit; padding: 0.35rem 0.5rem; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; }
-button.margen.activo { background: #0b57d0; color: #fff; border-color: #0b57d0; }
-button.margen:disabled { opacity: 0.4; cursor: default; }
-td.precio { white-space: nowrap; font-size: 1.15rem; }
-td.precio .explicacion { display: inline-block; }
-.sin-precio { color: #b00020; font-size: 1rem; }
-.manual { color: #7a5c00; font-size: 0.85rem; }
-.precio-manual { width: 7rem; font: inherit; margin-left: 0.4rem; }
-button.enlace.chico { font-size: 0.85rem; padding: 0.2rem 0.4rem; }
-
-/* Vender: la búsqueda con sugerencias, la venta en curso, el cobro abajo. */
-.buscador { position: relative; }
-.sugerencias { position: absolute; left: 0; right: 0; z-index: 5; margin: 0; padding: 0; list-style: none; background: #fff; border: 1px solid #bbb; border-radius: 0 0 8px 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-.sugerencias li { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 1rem; padding: 0.5rem 0.9rem; cursor: pointer; border-top: 1px solid #eee; }
-.sugerencias li small { grid-column: 1; color: #555; }
-.sugerencias li strong { grid-row: 1 / span 2; align-self: center; font-size: 1.1rem; }
-.sugerencias li.elegido { background: #eef4ff; }
-.exito { color: #0a7a2f; background: #eefaf0; padding: 0.5rem 0.8rem; border-radius: 6px; }
+/* Vender */
 table.venta td { font-size: 1.05rem; }
-tr.sin-precio-fila td { background: #fff3f3; }
-input.cantidad { width: 4.5rem; font: inherit; font-size: 1.1rem; text-align: right; }
-input.libre { font: inherit; width: 100%; }
-.cobro { position: sticky; bottom: 0; background: #fff; border-top: 2px solid #ddd; padding: 0.75rem 0; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
-.total { font-size: 1.4rem; }
-.total strong { font-size: 2rem; margin-left: 0.5rem; }
+table.venta td:first-child { min-width: 220px; }
+table.venta td:first-child small { display: block; }
+input.cantidad { width: 4rem; font-size: 1.1rem; text-align: right; }
+input.libre { width: 100%; }
+.cobro { position: sticky; bottom: 0; margin: 1rem -1.25rem 0; padding: 0.9rem 1.25rem; background: linear-gradient(180deg, var(--azul) 0%, var(--azul-oscuro) 100%); color: #fff; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; box-shadow: 0 -4px 12px rgba(0,0,0,0.2); }
+.cobro .total { font-size: 1.3rem; color: #fff; }
+.cobro .total strong { font-size: 2.1rem; margin-left: 0.5rem; color: var(--amarillo); }
+.cobro .total small { color: #d9e2f2; }
+.cobro .acciones { margin: 0; }
+.cobro button.secundario { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.5); }
 .medios { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
-button.medio { font: inherit; padding: 0.6rem 0.9rem; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; }
-button.medio.activo { background: #0b57d0; color: #fff; border-color: #0b57d0; }
-tr.anulada td { color: #888; text-decoration: line-through; }
+button.medio { padding: 0.6rem 0.9rem; border: 1px solid var(--borde); border-radius: 6px; background: #f3f5f9; color: var(--texto); font-weight: 600; }
+button.medio.activo { background: var(--amarillo); color: var(--azul-oscuro); border-color: var(--amarillo); }
+.medios select { padding: 0.55rem 0.6rem; }
 
-/* Compras */
-.cabecera-compra { margin: 0.5rem 0; align-items: end; }
-.cabecera-compra label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.9rem; color: #555; }
-.cabecera-compra select, .cabecera-compra input { font-size: 1rem; }
-
-/* Stock */
-.numeros div small { display: block; color: #555; font-size: 0.8rem; }
-tr.detalle-stock td { background: #f7f9fc; }
-table.movimientos { width: auto; }
+/* Listas de precios */
+.zona-de-carga { margin: 1rem 0; padding: 2rem; border: 2px dashed var(--amarillo); border-radius: 10px; text-align: center; background: var(--tarjeta); }
+.zona-de-carga.arrastrando { border-style: solid; background: #fff8e1; }
+.zona-de-carga .en-linea { justify-content: center; }
+.zona-de-carga > button.grande { display: block; margin: 0 auto; }
+.zona-de-carga .leyenda { font-size: 1.15rem; margin: 0 0 1rem; color: var(--texto); }
+.leyendo { font-size: 1.1rem; }
+.numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.numeros div { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 0.6rem 0.8rem; box-shadow: var(--sombra); }
+.numeros div.destacado-verde { background: var(--verde); color: #fff; border-color: var(--verde); }
+.numeros div.destacado-amarillo { background: var(--amarillo); color: var(--azul-oscuro); border-color: var(--amarillo); }
+.numeros div.destacado-rojo dd { color: var(--rojo); }
+.numeros dt { font-size: 0.85rem; opacity: 0.85; }
+.numeros dd { margin: 0; font-size: 1.7rem; font-weight: 700; }
+.numeros dd small { font-size: 0.85rem; font-weight: 400; }
+.numeros div.destacado-verde dt, .numeros div.destacado-verde small, .numeros div.destacado-amarillo dt, .numeros div.destacado-amarillo small { color: inherit; }
+.resultado-final { text-align: center; padding: 2rem 1rem; }
+.resultado-final .tilde { width: 96px; height: 96px; margin: 1rem auto; border-radius: 50%; background: var(--amarillo); color: #fff; font-size: 3.5rem; line-height: 96px; font-weight: 800; box-shadow: var(--sombra); }
+.resultado-final h2 { border: none; font-size: 1.6rem; justify-content: center; }
+.detalle-stock td, tr.detalle-stock td { background: #f7f9fc; }
+table.movimientos { width: auto; box-shadow: none; }
 table.movimientos td { padding: 0.15rem 0.6rem; border: none; font-size: 0.9rem; }
+
+/* Compras y stock */
+.cabecera-compra { margin: 0.5rem 0; align-items: end; }
+.cabecera-compra label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.9rem; color: var(--texto-suave); }
+.cabecera-compra select, .cabecera-compra input { font-size: 1rem; }
+.numeros div small { display: block; font-size: 0.8rem; }
+
+@media (max-width: 720px) {
+  .barra { gap: 0.6rem; height: auto; padding: 0.5rem 0.8rem; flex-wrap: wrap; }
+  .barra nav { order: 3; width: 100%; justify-content: flex-start; overflow-x: auto; }
+  .barra nav button.enlace { padding: 0.5rem 0.7rem; }
+  :root { font-size: 18px; }
+  .cobro { margin: 1rem -0.8rem 0; padding: 0.8rem; }
+  main > section, main > p { padding: 0 0.8rem; }
+}

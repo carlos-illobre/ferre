@@ -127,6 +127,7 @@ export function Compras() {
       {(error ?? errorCatalogo) && <p className="error" role="alert">{error ?? errorCatalogo}</p>}
       {mensaje && <p className="exito" role="status" data-testid="mensaje">{mensaje}</p>}
 
+      <div className="tabla-scroll">
       <table className="venta" data-testid="renglones">
         <thead>{renglones.length > 0 && <tr><th>Producto</th><th>Cant.</th><th>Costo unitario (sin IVA)</th><th>Según lista</th><th>Subtotal</th><th /></tr>}</thead>
         <tbody>
@@ -145,6 +146,7 @@ export function Compras() {
           })}
         </tbody>
       </table>
+      </div>
 
       {renglones.length > 0 && (
         <div className="cobro">

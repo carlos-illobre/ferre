@@ -107,9 +107,10 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
   return (
     <div className={`zona-de-carga ${arrastrando ? "arrastrando" : ""}`} onDragOver={(e) => { e.preventDefault(); setArrastrando(true); }} onDragLeave={() => setArrastrando(false)} onDrop={soltar}>
       {estado === "esperando" && (
-        <button className="grande" onClick={() => entrada.current?.click()}>
-          Arrastrá acá la lista del proveedor, o tocá para elegirla
-        </button>
+        <>
+          <p className="leyenda">Arrastrá acá la lista del proveedor, o tocá para elegirla</p>
+          <button className="grande" onClick={() => entrada.current?.click()}>Elegir archivo</button>
+        </>
       )}
       {estado === "leyendo" && <p className="leyendo">Leyendo {archivo?.name}…</p>}
       {estado === "falta-proveedor" && archivo && (
@@ -168,7 +169,8 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
 
   if (resultado) {
     return (
-      <div className="tarjeta">
+      <div className="tarjeta resultado-final">
+        <div className="tilde" aria-hidden="true">✓</div>
         <p role="status" data-testid="resultado">{resultado}</p>
         <button className="grande" onClick={alTerminar}>Cargar otra lista</button>
       </div>
@@ -181,11 +183,11 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
       {cargada.avisos.map((a, i) => <p key={i} className="aviso">{a}</p>)}
       <dl className="numeros" data-testid="resumen">
         <div><dt>Productos leídos</dt><dd>{r.leidas}</dd></div>
-        <div><dt>Nuevos</dt><dd>{r.nuevos}</dd></div>
-        <div><dt>Cambian de precio</dt><dd>{r.modificados}{r.modificados > 0 && <small> ({porcentaje(r.variacion_promedio)} en promedio)</small>}</dd></div>
+        <div className={r.nuevos > 0 ? "destacado-verde" : ""}><dt>Nuevos</dt><dd>{r.nuevos}</dd></div>
+        <div className={r.modificados > 0 ? "destacado-amarillo" : ""}><dt>Cambian de precio</dt><dd>{r.modificados}{r.modificados > 0 && <small> ({porcentaje(r.variacion_promedio)} en promedio)</small>}</dd></div>
         <div><dt>Sin cambio</dt><dd>{r.sin_cambio}</dd></div>
-        <div><dt>Ya no aparecen</dt><dd>{r.dados_de_baja}</dd></div>
-        <div><dt>Filas salteadas</dt><dd>{r.salteadas}</dd></div>
+        <div className={r.dados_de_baja > 0 ? "destacado-rojo" : ""}><dt>Ya no aparecen</dt><dd>{r.dados_de_baja}</dd></div>
+        <div className={r.salteadas > 0 ? "destacado-rojo" : ""}><dt>Filas salteadas</dt><dd>{r.salteadas}</dd></div>
       </dl>
       {cargada.salteadas.length > 0 && (
         <details>

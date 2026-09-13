@@ -196,6 +196,7 @@ export function Vender() {
       {(error ?? errorCatalogo) && <p className="error" role="alert">{error ?? errorCatalogo}</p>}
       {mensaje && <p className="exito" role="status" data-testid="mensaje">{mensaje}</p>}
 
+      <div className="tabla-scroll">
       <table className="venta" data-testid="venta">
         <thead>{items.length > 0 && <tr><th>Producto</th><th>Costo</th><th>Margen</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th /></tr>}</thead>
         <tbody>
@@ -234,6 +235,7 @@ export function Vender() {
           })}
         </tbody>
       </table>
+      </div>
 
       {items.length > 0 && (
         <div className="cobro">
