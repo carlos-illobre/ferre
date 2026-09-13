@@ -8,7 +8,7 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 
 | Corredor | Qué corre | Necesita |
 |---|---|---|
-| `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API, corre los escenarios Playwright de `tests/e2e/escenarios/`. `--solo <nombre>` repite uno. | Docker, pnpm |
+| `tests/e2e.sh` | Crea la red `ferre-borde` si falta, levanta el stack, construye y sirve el cliente web contra esa API, corre los escenarios Playwright de `tests/e2e/escenarios/`. `--solo <nombre>` repite uno. | Docker, pnpm |
 | `tests/utest.sh` | Unitarias del workspace TypeScript (vitest) y de `listas-de-proveedores` (pytest) | Nada |
 | `tests/itest.sh` | Scripts de `tests/integration/`. `--rapido` saltea los que necesitan el stack. | Docker (salvo `--rapido`) |
 

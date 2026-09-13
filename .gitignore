@@ -32,3 +32,4 @@ microservices/mostrador/api/public/
 
 # Configuración real de cada ambiente (las plantillas .env.example y .env.oracle sí se versionan)
 deployment/*/.env
+deployment/*/*/.env

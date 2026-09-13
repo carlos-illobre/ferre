@@ -6,13 +6,13 @@ set -uo pipefail
 cd "$(dirname "$0")/../.."
 
 esperadas=$(ls microservices/gestion-del-local/migrations/*.sql | wc -l)
-aplicadas=$(docker compose --profile local exec -T db psql -U ferre -d ferre -tAc "SELECT count(*) FROM migracion" 2>/dev/null | tr -d '[:space:]')
+aplicadas=$(docker compose exec -T db psql -U ferre -d ferre -tAc "SELECT count(*) FROM migracion" 2>/dev/null | tr -d '[:space:]')
 if [[ "$aplicadas" != "$esperadas" ]]; then
   echo "migraciones aplicadas: ${aplicadas:-ninguna}, archivos: $esperadas"
   exit 1
 fi
 
 for tabla in proveedor lista_importada producto precio_proveedor cliente venta item_venta consulta compra item_compra movimiento_stock evento; do
-  docker compose --profile local exec -T db psql -U ferre -d ferre -tAc "SELECT 1 FROM $tabla LIMIT 0" >/dev/null 2>&1 \
+  docker compose exec -T db psql -U ferre -d ferre -tAc "SELECT 1 FROM $tabla LIMIT 0" >/dev/null 2>&1 \
     || { echo "falta la tabla $tabla"; exit 1; }
 done

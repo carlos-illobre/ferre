@@ -1,8 +1,11 @@
 name: CI
 
+# master = ambiente de pruebas; produccion = ambiente de producción (ADR-012).
+# Cada push a una de las dos ramas: pruebas, imágenes, cliente web en Pages y despliegue
+# del ambiente que corresponde en la máquina de Oracle.
 on:
   push:
-    branches: [master]
+    branches: [master, produccion]
   pull_request:
 
 env:
@@ -10,7 +13,6 @@ env:
 
 jobs:
   typescript:
-    # gestion-del-local, el cliente web y calculo-de-precios comparten el workspace.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +41,7 @@ jobs:
         run: |
           cp .env.example .env
           tests/itest.sh --rapido
-          docker compose --profile local config --quiet
+          docker compose config --quiet
 
   e2e:
     needs: [typescript, listas-de-proveedores, configuracion]
@@ -50,20 +52,21 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: cp .env.example .env
-      - run: docker compose --profile local up -d --build --wait
+      - run: docker network create ferre-borde
+      - run: docker compose up -d --build --wait
       - run: tests/itest.sh
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter e2e exec playwright install --with-deps chromium
       - run: tests/e2e.sh
       - if: failure()
-        run: docker compose --profile local logs --no-color | tail -200
+        run: docker compose logs --no-color | tail -200
 
   imagenes:
-    # Solo en master: publica las imágenes etiquetadas por SHA corto, que es lo que
-    # despliega deployment/oracle-single (ADR-007).
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    # La máquina de Oracle es Ampere (arm64): se construye en un runner ARM nativo, que
+    # es varias veces más rápido que emular arm64 sobre x86 (ADR-007, ADR-012).
+    if: github.event_name == 'push'
     needs: [e2e]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     permissions: { contents: read, packages: write }
     steps:
       - uses: actions/checkout@v4
@@ -76,26 +79,84 @@ jobs:
       - run: docker compose build gestion-del-local listas-de-proveedores
       - run: docker compose push gestion-del-local listas-de-proveedores
 
+  desplegar:
+    # master → pruebas, produccion → produccion, en la misma máquina de Oracle. Los datos
+    # de acceso son secretos del repositorio (ORACLE_HOST, ORACLE_USUARIO, ORACLE_SSH_KEY).
+    if: github.event_name == 'push'
+    needs: [imagenes]
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'produccion' && 'produccion' || 'pruebas' }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      # Hasta que existan los secretos de la máquina (ORACLE.md, paso 8) el job avisa y
+      # termina bien, para que CI no quede en rojo por algo que todavía no se configuró.
+      - id: acceso
+        name: ¿Hay acceso a la máquina?
+        env: { HOST: "${{ secrets.ORACLE_HOST }}" }
+        run: |
+          if [ -z "$HOST" ]; then
+            echo "::warning::Sin secretos ORACLE_* configurados: no se despliega (ver deployment/oracle-single/ORACLE.md, paso 8)"
+            echo "listo=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "listo=si" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Clave SSH
+        if: steps.acceso.outputs.listo == 'si'
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.ORACLE_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.ORACLE_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+      - name: Desplegar
+        if: steps.acceso.outputs.listo == 'si'
+        env:
+          SSH: ${{ secrets.ORACLE_USUARIO }}@${{ secrets.ORACLE_HOST }}
+          RUTA_REMOTA: ferre
+        run: bash deployment/oracle-single/deploy.sh "${{ github.ref_name == 'produccion' && 'produccion' || 'pruebas' }}" "$GITHUB_SHA"
+
   cliente-web:
-    # Solo en master: publica el cliente web en GitHub Pages (ADR-010). API_URL es una
-    # variable del repositorio (Settings → Secrets and variables → Actions → Variables).
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    # Un solo sitio de Pages con dos carpetas: la raíz es la rama produccion y /pruebas/
+    # es master (ADR-012). Cualquier push a una de las dos ramas regenera las dos.
+    if: github.event_name == 'push'
     needs: [e2e]
     runs-on: ubuntu-latest
     permissions: { contents: read, pages: write, id-token: write }
     environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
     steps:
       - uses: actions/checkout@v4
+        with: { ref: produccion, path: produccion }
+      - uses: actions/checkout@v4
+        with: { ref: master, path: pruebas }
       - uses: pnpm/action-setup@v4
+        with: { package_json_file: produccion/package.json }
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter gestion-del-local-web... build
+        with: { node-version: 22 }
+      - name: Construir producción (raíz del sitio)
+        working-directory: produccion
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter gestion-del-local-web... build
         env:
           VITE_API_URL: ${{ vars.API_URL }}
           VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VITE_BASE: /${{ github.event.repository.name }}/
+      - name: Construir pruebas (/pruebas/)
+        working-directory: pruebas
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter gestion-del-local-web... build
+        env:
+          VITE_API_URL: ${{ vars.API_URL_PRUEBAS }}
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          VITE_BASE: /${{ github.event.repository.name }}/pruebas/
+      - name: Armar el sitio
+        run: |
+          mkdir -p sitio
+          cp -r produccion/clientes/gestion-del-local-web/dist/. sitio/
+          mkdir -p sitio/pruebas
+          cp -r pruebas/clientes/gestion-del-local-web/dist/. sitio/pruebas/
       - uses: actions/upload-pages-artifact@v3
-        with: { path: clientes/gestion-del-local-web/dist }
+        with: { path: sitio }
       - id: deploy
         uses: actions/deploy-pages@v4

@@ -8,7 +8,7 @@ cd "$(dirname "$0")/../.."
 
 API=http://localhost
 MUESTRAS=microservices/listas-de-proveedores/tests/muestras
-psql() { docker compose --profile local exec -T db psql -U ferre -d ferre -tAc "$1"; }
+psql() { docker compose exec -T db psql -U ferre -d ferre -tAc "$1"; }
 json() { python3 -c "import json,sys; d=json.load(sys.stdin); print(eval('d$1'))"; }
 
 # Dueño de prueba con sesión sembrada (como en autenticacion.sh).

@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-archivos=(.env.example deployment/oracle-single/.env.oracle)
+archivos=(.env.example deployment/oracle-single/produccion/.env.oracle deployment/oracle-single/pruebas/.env.oracle)
 [[ -f .env ]] && archivos+=(.env)
 
 declarar() { grep -oE '^[A-Z_][A-Z0-9_]*=' "$1" | tr -d '=' | sort -u; }

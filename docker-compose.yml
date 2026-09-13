@@ -2,9 +2,17 @@
 # cambia va literal acá. Sin valores por omisión: una variable ausente corta el arranque.
 # Ver docs/adr/ADR-009-compose-unico-y-env.md.
 
+# Dos ambientes en la misma máquina (ADR-012): cada uno es un proyecto de compose aparte
+# (COMPOSE_PROJECT_NAME en su .env) con sus propios volúmenes y red. Comparten una sola
+# red externa `ferre-borde` por la que el Caddy del proyecto de producción llega a la API
+# del de pruebas. Los perfiles se activan desde el .env (COMPOSE_PROFILES):
+#   borde  → Caddy (solo producción y desarrollo; pruebas no publica puertos)
+#   local  → PostgreSQL propio (solo desarrollo y CI; en la nube la base es Supabase)
+
 services:
   reverse-proxy:
     image: caddy:2-alpine
+    profiles: ["borde"]
     restart: unless-stopped
     ports:
       - "80:80"
@@ -13,6 +21,11 @@ services:
       # "http://localhost" en desarrollo; el dominio real en producción. Con un dominio,
       # Caddy emite y renueva el certificado solo (ADR-006).
       SITIO: ${SITIO:?falta SITIO en el .env}
+      SITIO_PRUEBAS: ${SITIO_PRUEBAS:?falta SITIO_PRUEBAS en el .env}
+      AMBIENTE: ${AMBIENTE:?falta AMBIENTE en el .env}
+    networks:
+      - default
+      - borde
     volumes:
       - ./infrastructure/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile:ro
       # Certificados y estado de ACME. Sin este volumen, cada reinicio vuelve a emitir
@@ -38,6 +51,12 @@ services:
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
       CARPETA_LISTAS: /app/datos/listas
       PORT: "8080"
+    networks:
+      default:
+      borde:
+        # Nombre estable por ambiente en la red compartida: es a lo que apunta Caddy.
+        aliases:
+          - gestion-del-local-${AMBIENTE:?falta AMBIENTE en el .env}
     volumes:
       # Archivos originales de las listas cargadas, para reprocesar (issue #12).
       - listas-data:/app/datos/listas
@@ -86,3 +105,8 @@ volumes:
   caddy-data:
   db-data:
   listas-data:
+
+networks:
+  borde:
+    name: ferre-borde
+    external: true

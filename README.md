@@ -17,7 +17,8 @@ Requisitos: Docker con Compose, Node 22 con pnpm 10, y uv.
 ```bash
 cp .env.example .env
 pnpm install
-docker compose --profile local up -d --build --wait
+docker network create ferre-borde
+docker compose up -d --build --wait
 ```
 
 Eso levanta la API en http://localhost (vía Caddy) y un PostgreSQL local. El cliente web
@@ -42,6 +43,8 @@ tests/e2e.sh              # caminos principales, levanta el stack
 - El backlog vive en [GitHub Issues](https://github.com/carlos-illobre/ferre/issues),
   agrupado por etapa en [milestones](https://github.com/carlos-illobre/ferre/milestones).
 - Antes de codear un issue se propone la solución y se espera la aprobación del dueño.
+- `master` es el ambiente de pruebas y `produccion` el de producción; cada push despliega
+  su ambiente solo. Pasar a producción: `git push origin master:produccion` (ADR-012).
 - Las decisiones técnicas están en [docs/adr](docs/adr/README.md). Arquitectura en
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), despliegue en
   [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), pruebas en [docs/TESTING.md](docs/TESTING.md),

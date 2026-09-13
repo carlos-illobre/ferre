@@ -5,7 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-docker compose --profile local up -d --wait
+docker network inspect ferre-borde >/dev/null 2>&1 || docker network create ferre-borde >/dev/null
+docker compose up -d --wait
 
 # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.
 VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web build >/dev/null

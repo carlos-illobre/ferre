@@ -9,7 +9,7 @@ const TOKEN = "token-e2e-dueno";
 const EMAIL = "e2e-dueno@ferre.test";
 
 function psql(sql: string): string {
-  return execSync(`docker compose --profile local exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
+  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
 }
 
 test.beforeAll(() => {

@@ -7,7 +7,7 @@ set -uo pipefail
 cd "$(dirname "$0")/../.."
 
 API=http://localhost
-psql() { docker compose --profile local exec -T db psql -U ferre -d ferre -tAc "$1"; }
+psql() { docker compose exec -T db psql -U ferre -d ferre -tAc "$1"; }
 codigo() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 
 # Limpieza de corridas anteriores (en orden de dependencias).
