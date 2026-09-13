@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Instala en la máquina el servicio de despliegue por aviso. Sin root: se corre como el
-# usuario sin privilegios que tiene Docker rootless, desde una copia del repositorio
+# usuario `ferre`, que tiene Docker rootless, desde una copia del repositorio
 # (git clone https://github.com/carlos-illobre/ferre.git). Idempotente.
 set -euo pipefail
 cd "$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"

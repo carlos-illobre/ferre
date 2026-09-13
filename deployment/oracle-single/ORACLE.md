@@ -4,8 +4,8 @@ Una sola máquina (Ampere ARM, 2 núcleos, 12 GB) corre los dos ambientes, **pru
 **producción**, cada uno con su base en Supabase. El cliente web vive en GitHub Pages.
 Nadie entra a la máquina para desplegar: GitHub publica un aviso y la máquina, que lo
 escucha, verifica contra el repositorio y se actualiza sola (ADR-013). Todo lo de ferre
-corre como **un usuario sin privilegios con Docker rootless**: sin root, sin sudo, sin
-grupo `docker`.
+corre como el usuario **`ferre`**, sin privilegios y con Docker rootless: sin root, sin
+sudo, sin grupo `docker`.
 
 El reverse proxy de la máquina **no es parte de este proyecto**: lo administra la
 máquina para todas sus aplicaciones. Ferre solo cumple un contrato con él (ver "El
@@ -16,16 +16,16 @@ que verse si salió bien.
 
 ## Antes de empezar
 
-- Un usuario sin privilegios (el que va a correr ferre) con **Docker rootless** instalado
-  y `docker context use rootless`, y **linger** habilitado por un administrador, para que
-  sus servicios sigan corriendo sin sesión abierta:
-  `sudo loginctl enable-linger <usuario>`. Es lo único que necesita root, una vez.
+- El usuario `ferre`, sin sudo, con **Docker rootless** instalado y
+  `docker context use rootless`, y **linger** habilitado por un administrador, para que
+  sus servicios sigan corriendo sin sesión abierta: `sudo loginctl enable-linger ferre`.
+  Es lo único que necesita root, una vez.
 - No hace falta abrir puertos ni cargar claves en GitHub: ferre no publica puertos y el
   despliegue no entra a la máquina.
 
 ## 1. Clonar el repositorio
 
-Como el usuario de ferre:
+Como `ferre`:
 
 ```bash
 git clone https://github.com/carlos-illobre/ferre.git ~/ferre-repo
@@ -108,7 +108,7 @@ Además, en GitHub, **Settings → Secrets and variables → Actions → Variabl
 El reverse proxy de la máquina lo administra quien administra la máquina, para todas
 las aplicaciones. Ferre necesita de él exactamente esto:
 
-1. Que corra **en el mismo Docker rootless del usuario de ferre**, porque una red de
+1. Que corra **en el mismo Docker rootless del usuario `ferre`**, porque una red de
    Docker solo se comparte dentro de un mismo demonio.
 2. Una **red externa de Docker llamada `caddy-gateway`** (si se llama distinto, poner el
    nombre en `RED_GATEWAY=` de `~/ferre/despliegue.env`). Ferre se conecta a ella; nunca
