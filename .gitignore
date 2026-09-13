@@ -1,0 +1,19 @@
+# Datos sensibles: listas de precios reales, correos, bases de datos. Nunca al repo.
+privado/
+*.xlsx
+*.xls
+*.pdf
+*.html:Zone.Identifier
+*:Zone.Identifier
+*.db
+*.sqlite*
+.env
+.env.*
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/
+__pycache__/
