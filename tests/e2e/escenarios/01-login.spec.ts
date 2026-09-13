@@ -31,6 +31,7 @@ test("con sesión el dueño entra y ve la administración", async ({ page }) => 
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
+  await page.getByRole("button", { name: "Administración" }).click();
   await expect(page.getByRole("heading", { name: "Usuarios autorizados" })).toBeVisible();
   await expect(page.getByRole("cell", { name: EMAIL })).toBeVisible();
 });

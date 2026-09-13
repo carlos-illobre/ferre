@@ -61,7 +61,8 @@ function LoginPorQr() {
       method: "POST",
       body: JSON.stringify({ dispositivo: describirDispositivo() }),
     });
-    const enlace = `${location.origin}${import.meta.env.BASE_URL}vincular?codigo=${encodeURIComponent(codigo)}`;
+    // Ruta por hash: en GitHub Pages una ruta real daría 404 al abrirla.
+    const enlace = `${location.origin}${import.meta.env.BASE_URL}#/vincular?codigo=${encodeURIComponent(codigo)}`;
     setQr(await QRCode.toDataURL(enlace, { width: 220, margin: 1 }));
     setEstado("esperando");
     const fin = Date.now() + expiraEnSegundos * 1000;

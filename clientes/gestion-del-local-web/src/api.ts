@@ -17,7 +17,8 @@ export class ErrorApi extends Error {
 // sesión ya no vale: se borra y la app vuelve al login.
 export async function api<T>(ruta: string, opciones: RequestInit = {}): Promise<T> {
   const cabeceras = new Headers(opciones.headers);
-  cabeceras.set("Content-Type", "application/json");
+  // Un FormData (subida de archivos) fija su propio Content-Type con el separador.
+  if (!(opciones.body instanceof FormData)) cabeceras.set("Content-Type", "application/json");
   const token = leerToken();
   if (token) cabeceras.set("Authorization", `Bearer ${token}`);
   const respuesta = await fetch(urlApi(ruta), { ...opciones, headers: cabeceras });

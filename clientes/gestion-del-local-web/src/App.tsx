@@ -1,38 +1,58 @@
 import { useEffect, useState } from "react";
 import { urlApi } from "./api";
 import { ProveedorDeSesion, useSesion } from "./sesion";
+import { irA, useRuta } from "./rutas";
 import { Login } from "./pantallas/Login";
 import { Vincular } from "./pantallas/Vincular";
 import { Administracion } from "./pantallas/Administracion";
+import { Listas } from "./pantallas/Listas";
 import "./estilos.css";
 
 export function App() {
   return (
     <ProveedorDeSesion>
-      <Rutas />
+      <Pantallas />
     </ProveedorDeSesion>
   );
 }
 
-// Dos rutas por ahora; un enrutador de verdad llega con las pantallas de venta.
-function Rutas() {
+const MENU: { ruta: string; nombre: string; soloDueno?: boolean }[] = [
+  { ruta: "listas", nombre: "Listas de precios" },
+  { ruta: "administracion", nombre: "Administración", soloDueno: true },
+];
+
+function Pantallas() {
   const { sesion, salir } = useSesion();
-  const codigoVinculacion = new URLSearchParams(location.search).get("codigo");
-  const ruta = location.pathname.replace(import.meta.env.BASE_URL, "/");
+  const ruta = useRuta();
+  const codigoVinculacion = ruta.parametros.get("codigo");
 
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
-  if (ruta === "/vincular" && codigoVinculacion) return <Vincular codigo={codigoVinculacion} />;
+  if (ruta.nombre === "vincular" && codigoVinculacion) return <Vincular codigo={codigoVinculacion} />;
   if (sesion.estado === "sin-sesion") return <Login />;
+
+  const esDueno = sesion.usuario.rol === "dueño";
+  const actual = ruta.nombre === "inicio" ? "listas" : ruta.nombre;
 
   return (
     <main>
       <header className="barra">
         <strong>ferre</strong>
+        <nav>
+          {MENU.filter((m) => !m.soloDueno || esDueno).map((m) => (
+            <button key={m.ruta} className={`enlace ${actual === m.ruta ? "activo" : ""}`} onClick={() => irA(m.ruta)}>{m.nombre}</button>
+          ))}
+        </nav>
         <span data-testid="usuario">{sesion.usuario.nombre} · {sesion.usuario.rol}{sesion.sinConexion ? " · sin conexión" : ""}</span>
-        <button onClick={salir}>Salir</button>
+        <button className="secundario" onClick={salir}>Salir</button>
       </header>
-      <EstadoDelServidor />
-      {sesion.usuario.rol === "dueño" && <Administracion />}
+      {actual === "administracion" && esDueno ? (
+        <>
+          <EstadoDelServidor />
+          <Administracion />
+        </>
+      ) : (
+        <Listas />
+      )}
     </main>
   );
 }

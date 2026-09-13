@@ -72,13 +72,30 @@ listas.post("/", async (c) => {
   return c.json({ id, proveedor: proveedor.nombre, fecha_lista: fechaLista, resumen: { ...lectura.resumen, ...resumen }, avisos: lectura.avisos, salteadas: lectura.salteadas.slice(0, 50) }, 201);
 });
 
-// Vista previa: primeras filas con costo y explicación, para revisar antes de aplicar.
+// Qué lectores existen en el servicio de listas (para elegir uno al dar de alta un proveedor).
+listas.get("/lectores", async (c) => {
+  const r = await fetch(`${config.listasDeProveedoresUrl}/health`).catch(() => null);
+  if (!r?.ok) return c.json({ error: "El servicio de listas no responde" }, 502);
+  const { lectores } = (await r.json()) as { lectores: string[] };
+  return c.json(lectores);
+});
+
+// Vista previa: filas con costo, explicación y el costo vigente hasta ahora, para revisar
+// antes de aplicar. Las que cambian de precio van primero.
 listas.get("/:id/filas", async (c) => {
   const lista = await buscarLista(c.req.param("id"));
   if (!lista) return c.json({ error: "No existe esa lista" }, 404);
   const lectura = await releer(lista);
+  const { rows } = await pool.query<{ codigo_proveedor: string; costo_neto: string }>(
+    `SELECT DISTINCT ON (codigo_proveedor) codigo_proveedor, costo_neto FROM precio_proveedor WHERE proveedor_id = $1 ORDER BY codigo_proveedor, fecha_lista DESC, creado_en DESC`,
+    [lista.proveedor_id],
+  );
+  const vigentes = new Map(rows.map((r) => [r.codigo_proveedor, r.costo_neto]));
+  const filas = lectura.filas.map((f) => ({ ...f, costo_anterior: vigentes.get(f.codigo_proveedor) ?? null }));
+  const orden = (f: (typeof filas)[number]) => (f.costo_anterior === null ? 1 : Number(f.costo_anterior) !== Number(f.costo_neto) ? 0 : 2);
+  filas.sort((x, y) => orden(x) - orden(y));
   const desde = Number(c.req.query("desde") ?? 0);
-  return c.json({ total: lectura.filas.length, filas: lectura.filas.slice(desde, desde + 200) });
+  return c.json({ total: filas.length, filas: filas.slice(desde, desde + 200) });
 });
 
 listas.post("/:id/aplicar", async (c) => {

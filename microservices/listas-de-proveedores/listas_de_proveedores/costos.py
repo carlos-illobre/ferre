@@ -17,6 +17,11 @@ def redondear(valor: Decimal) -> Decimal:
     return valor.quantize(CUATRO_DECIMALES, rounding=ROUND_HALF_UP)
 
 
+def por_ciento(valor: Decimal) -> str:
+    """5.0000 → '5', 12.5000 → '12.5', 47.5 → '47.5'. Decimal conserva ceros que el lector no quiere ver."""
+    return f"{valor.normalize():f}"
+
+
 def pesos(valor: Decimal) -> str:
     return f"${valor.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
@@ -41,21 +46,21 @@ def costo_neto(
 
     if config.precios_incluyen_iva:
         valor = valor / (1 + iva)
-        pasos.append(f"sin IVA ({iva * 100:.1f} %) = {pesos(valor)}")
+        pasos.append(f"sin IVA ({por_ciento(iva * 100)} %) = {pesos(valor)}")
 
     for d in descuentos_de_la_fila or []:
         if d.porcentaje:
             valor = valor * (1 - d.porcentaje / 100)
             aplicados.append(d)
-            pasos.append(f"− {d.porcentaje:g} % ({d.tipo}) = {pesos(valor)}")
+            pasos.append(f"− {por_ciento(d.porcentaje)} % ({d.tipo}) = {pesos(valor)}")
 
     for tipo, fraccion in (("general", config.descuento_general), ("contado", config.descuento_contado)):
         if fraccion:
             porcentaje = fraccion * 100
             valor = valor * (1 - fraccion)
             aplicados.append(Descuento(tipo, porcentaje))
-            pasos.append(f"− {porcentaje:g} % ({tipo}) = {pesos(valor)}")
+            pasos.append(f"− {por_ciento(porcentaje)} % ({tipo}) = {pesos(valor)}")
 
     valor = redondear(valor)
-    pasos.append(f"Costo neto {pesos(valor)} (+ IVA {iva * 100:.1f} % = {pesos(valor * (1 + iva))})")
+    pasos.append(f"Costo neto {pesos(valor)} (+ IVA {por_ciento(iva * 100)} % = {pesos(valor * (1 + iva))})")
     return valor, aplicados, pasos

@@ -12,3 +12,33 @@ button, input, select { font: inherit; padding: 0.4rem 0.7rem; }
 .error { color: #b00020; }
 .aviso { color: #7a5c00; }
 article { margin-top: 1.5rem; }
+
+/* Guía de interfaz (docs/ux.md): letra 16 px, una acción principal por pantalla, errores en el lugar. */
+nav { display: flex; gap: 0.25rem; }
+button.enlace { background: none; border: none; padding: 0.4rem 0.6rem; cursor: pointer; color: #0b57d0; text-decoration: underline; }
+button.enlace.activo { color: #1a1a1a; text-decoration: none; font-weight: 600; }
+button.grande { font-size: 1.1rem; padding: 0.9rem 1.4rem; background: #0b57d0; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+button.grande:disabled { opacity: 0.6; cursor: wait; }
+button.secundario { background: #fff; border: 1px solid #bbb; border-radius: 6px; cursor: pointer; }
+.zona-de-carga { margin: 1rem 0; padding: 2rem; border: 2px dashed #bbb; border-radius: 10px; text-align: center; background: #fff; }
+.zona-de-carga.arrastrando { border-color: #0b57d0; background: #eef4ff; }
+.zona-de-carga .en-linea { justify-content: center; align-items: center; }
+.leyendo { font-size: 1.1rem; }
+.tarjeta { background: #fff; border: 1px solid #e3e3e3; border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
+.numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.numeros div { background: #f4f6fa; border-radius: 8px; padding: 0.6rem 0.8rem; }
+.numeros dt { font-size: 0.85rem; color: #555; }
+.numeros dd { margin: 0; font-size: 1.6rem; font-weight: 600; }
+.numeros dd small { font-size: 0.85rem; font-weight: 400; color: #555; }
+.acciones { display: flex; gap: 0.75rem; align-items: center; margin: 1rem 0; }
+.tabla-scroll { overflow-x: auto; }
+tr.nuevo td { background: #f1fbf1; }
+tr.cambia td { background: #fff8e6; }
+tr.vieja td { color: #b00020; }
+td.sube { color: #b00020; font-weight: 600; }
+td.baja { color: #0a7a2f; font-weight: 600; }
+.explicacion summary { list-style: none; cursor: pointer; white-space: nowrap; }
+.explicacion summary::-webkit-details-marker { display: none; }
+.explicacion summary small { color: #0b57d0; }
+.explicacion ol { margin: 0.4rem 0 0; padding-left: 1.2rem; font-size: 0.9rem; color: #333; white-space: normal; }
+label { display: inline-flex; gap: 0.3rem; align-items: center; }

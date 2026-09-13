@@ -18,7 +18,7 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 |---|---|---|
 | La app abre y el servidor responde | `00-arranque.spec.ts` | Hecho |
 | Sin sesión se pide entrar; con sesión el dueño ve la administración | `01-login.spec.ts` | Hecho |
-| Cargar una lista de precios y aplicarla | pendiente | Issue #12 |
+| Cargar una lista de precios y aplicarla | `02-listas.spec.ts` | Hecho |
 | Buscar un producto y registrar una venta | pendiente | Issue #15 |
 | Ingresar mercadería de un proveedor | pendiente | Issue #30 |
 | Contar un sector y ajustar stock | pendiente | Issue #31 |
