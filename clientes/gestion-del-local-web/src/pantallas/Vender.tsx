@@ -49,6 +49,10 @@ export function Vender() {
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pendientes, setPendientes] = useState(leerPendientes().length);
+  const [stockPorId, setStockPorId] = useState<Map<string, number>>(new Map());
+  useEffect(() => {
+    api<{ productos: { id: string; stock: string }[] }>("/stock").then((d) => setStockPorId(new Map(d.productos.map((s) => [s.id, Number(s.stock)])))).catch(() => undefined);
+  }, [mensaje]);
   const [ocupado, setOcupado] = useState(false);
   const caja = useRef<HTMLInputElement>(null);
 
@@ -179,7 +183,7 @@ export function Vender() {
               const precio = p.precio_manual !== null ? Number(p.precio_manual) : p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null;
               return (
                 <li key={p.id} role="option" aria-selected={i === elegido} className={i === elegido ? "elegido" : ""} onMouseDown={() => agregar(p)}>
-                  <span>{p.descripcion}</span> <small>{[p.marca, p.proveedor].filter(Boolean).join(" · ")}</small>
+                  <span>{p.descripcion}</span> <small>{[p.marca, p.proveedor].filter(Boolean).join(" · ")}{stockPorId.has(p.id) ? ` · stock ${stockPorId.get(p.id)!.toLocaleString("es-AR")}` : ""}</small>
                   <strong>{precio === null ? "sin precio" : pesos(precio)}</strong>
                 </li>
               );
@@ -201,7 +205,7 @@ export function Vender() {
               <tr key={it.clave} data-testid="item" className={p.unitario === null ? "sin-precio-fila" : ""}>
                 <td>
                   {it.producto ? <strong>{it.descripcion}</strong> : <input className="libre" value={it.descripcion} placeholder="Descripción" onChange={(e) => cambiarItem(it.clave, { descripcion: e.target.value })} />}
-                  {it.producto && <><br /><small>{[it.producto.marca, it.producto.proveedor].filter(Boolean).join(" · ")}</small></>}
+                  {it.producto && <><br /><small>{[it.producto.marca, it.producto.proveedor].filter(Boolean).join(" · ")}{stockPorId.has(it.producto.id) ? <> · stock {stockPorId.get(it.producto.id)!.toLocaleString("es-AR")}{stockPorId.get(it.producto.id)! - it.cantidad < 0 && <span className="sube" title="La venta deja el stock negativo: seguramente falta cargar una compra o contar"> (queda negativo)</span>}</> : ""}</small></>}
                 </td>
                 <td>{p.costo === null ? <em>—</em> : <Explicacion valor={pesos(p.costo)} pasos={it.producto?.explicacion_costo?.length ? it.producto.explicacion_costo : [`Costo ${pesos(p.costo)} según la lista`]} />}</td>
                 <td>

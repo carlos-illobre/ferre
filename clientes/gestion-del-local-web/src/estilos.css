@@ -85,3 +85,9 @@ tr.anulada td { color: #888; text-decoration: line-through; }
 .cabecera-compra { margin: 0.5rem 0; align-items: end; }
 .cabecera-compra label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.9rem; color: #555; }
 .cabecera-compra select, .cabecera-compra input { font-size: 1rem; }
+
+/* Stock */
+.numeros div small { display: block; color: #555; font-size: 0.8rem; }
+tr.detalle-stock td { background: #f7f9fc; }
+table.movimientos { width: auto; }
+table.movimientos td { padding: 0.15rem 0.6rem; border: none; font-size: 0.9rem; }
