@@ -7,8 +7,8 @@ privado/
 *:Zone.Identifier
 *.db
 *.sqlite*
+# El .env real de cada ambiente; las plantillas .env.example y .env.oracle sí se versionan
 .env
-.env.*
 
 # Sistema / editores
 .DS_Store
