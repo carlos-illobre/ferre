@@ -8,7 +8,8 @@ cd "$(dirname "$0")/.."
 docker compose up -d --wait
 
 # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.
-VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web build >/dev/null
+# "..." construye también las librerías de las que depende (en CI no hay dist previo).
+VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web... build >/dev/null
 pnpm --filter gestion-del-local-web preview >/dev/null 2>&1 &
 PREVIEW=$!
 trap 'kill $PREVIEW 2>/dev/null || true' EXIT
