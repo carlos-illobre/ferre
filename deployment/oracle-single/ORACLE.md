@@ -154,8 +154,9 @@ En el repositorio, **Settings → Secrets and variables → Actions**:
 | `API_URL_PRUEBAS` | `https://api-pruebas.<tu-dominio>` |
 | `GOOGLE_CLIENT_ID` | el ID de cliente de Google |
 
-Y en **Settings → Environments**, crear `produccion` y `pruebas` (vacíos alcanza; en
-`produccion` podés exigir tu aprobación antes de cada despliegue si querés).
+Los ambientes `pruebas`, `produccion` y `github-pages` ya existen en **Settings →
+Environments**; en `github-pages` las dos ramas están autorizadas a publicar. En
+`produccion` podés exigir tu aprobación antes de cada despliegue si querés.
 
 ## 9. El primer despliegue
 
