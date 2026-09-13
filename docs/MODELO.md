@@ -35,8 +35,8 @@ erDiagram
 
 | Tabla | Qué es | Detalle que importa |
 |---|---|---|
-| `proveedor` | Quién vende | Si sus precios incluyen IVA y sus descuentos general y por contado: lo que `listas-de-proveedores` necesita para el costo neto (#11) |
-| `lista_importada` | Cada archivo cargado | Estado pendiente/aplicada/descartada y resumen de cambios; el archivo se guarda para reprocesar (#12) |
+| `proveedor` | Quién vende | Si sus precios incluyen IVA, sus descuentos general y por contado (#11), y qué `lector` entiende su planilla |
+| `lista_importada` | Cada archivo cargado | Estado pendiente/aplicada/descartada, resumen de cambios, avisos, quién la cargó y quién la aplicó; el archivo se guarda en un volumen para reprocesar (#12) |
 | `producto` | Lo que se vende | `margen_elegido` (300/200/100/50/25 o ninguno) y `precio_manual` (#13). Un producto por renglón de lista hasta que #29 los una |
 | `precio_proveedor` | Histórico de costos | Precio de lista, descuentos aplicados en orden (JSON), costo neto, IVA, bulto, fecha de la lista |
 | `cliente` | Solo los importantes | Si se le permite cuenta corriente |

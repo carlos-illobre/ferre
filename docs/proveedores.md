@@ -83,6 +83,16 @@ el reconocimiento automático no entendió.
 | ERPA | B (mail) | C (manual) | Mensual aproximado | Nada: ya llega por mail |
 | Comodo | B (mail) | C (manual) | Semanal | Preguntarle al vendedor si existe portal; nombre de la empresa |
 
+## Estado de los lectores
+
+Los cuatro lectores del MVP están hechos (issues #7 a #10) en
+`microservices/listas-de-proveedores/listas_de_proveedores/lectores/`. Cada uno
+reconoce su planilla por el nombre del archivo o las hojas, y devuelve el mismo formato:
+código, descripción, marca, grupo, precio de lista, descuentos aplicados, costo neto sin
+IVA con su explicación paso a paso, IVA, bulto, código de barras y precio sugerido cuando
+la planilla los trae. Contra las listas reales: Comodo 7.096 filas, Ixnova 4.109 (más 54
+ofertas), 3GE 2.167, ERPA 729, ninguna salteada.
+
 ## Observaciones
 
 - **Un mismo vendedor manda varias listas** (Comodo, 3GE, Ixnova llegan desde la misma

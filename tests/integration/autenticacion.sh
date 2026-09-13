@@ -10,9 +10,11 @@ API=http://localhost
 psql() { docker compose --profile local exec -T db psql -U ferre -d ferre -tAc "$1"; }
 codigo() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 
-# Limpieza de corridas anteriores.
+# Limpieza de corridas anteriores (en orden de dependencias).
+psql "DELETE FROM vinculacion WHERE aprobada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test'))" >/dev/null
 psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
 psql "DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
+psql "UPDATE lista_importada SET cargada_por = NULL, aplicada_por = NULL WHERE cargada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR aplicada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
 psql "DELETE FROM usuario WHERE email LIKE 'prueba-%@ferre.test'" >/dev/null
 
 docker compose exec -T gestion-del-local node dist/crear-usuario.js prueba-dueno@ferre.test "Dueño de prueba" dueño >/dev/null || { echo "no se pudo crear el dueño"; exit 1; }

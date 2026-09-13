@@ -36,7 +36,11 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
       # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
+      CARPETA_LISTAS: /app/datos/listas
       PORT: "8080"
+    volumes:
+      # Archivos originales de las listas cargadas, para reprocesar (issue #12).
+      - listas-data:/app/datos/listas
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 10s
@@ -81,3 +85,4 @@ services:
 volumes:
   caddy-data:
   db-data:
+  listas-data:

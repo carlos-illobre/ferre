@@ -19,4 +19,6 @@ export const config = {
   origenWeb: obligatoria("ORIGEN_WEB"),
   // ID de cliente OAuth de Google (docs/google-cloud.md). No es secreto; identifica la app.
   googleClientId: obligatoria("GOOGLE_CLIENT_ID"),
+  // Dónde se guardan los archivos originales de las listas cargadas (volumen del compose).
+  carpetaListas: obligatoria("CARPETA_LISTAS"),
 };

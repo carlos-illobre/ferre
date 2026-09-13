@@ -24,6 +24,7 @@ WORKDIR /app
 COPY --from=build --chown=app:app /out ./
 COPY --from=build --chown=app:app /app/microservices/gestion-del-local/dist ./dist
 COPY --from=build --chown=app:app /app/microservices/gestion-del-local/migrations ./migrations
+RUN mkdir -p /app/datos/listas && chown app:app /app/datos/listas
 USER app
 EXPOSE 8080
 CMD ["node", "dist/index.js"]
