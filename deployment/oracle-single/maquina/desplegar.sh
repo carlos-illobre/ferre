@@ -48,6 +48,16 @@ sano() { # ambiente
 
 fijar_tag() { sed -i '/^IMAGEN_TAG=/d' "$BASE/$1/.env" && printf 'IMAGEN_TAG=%s\n' "$2" >> "$BASE/$1/.env"; }
 
+# Lo que corre DE VERDAD: la etiqueta de la imagen del contenedor sano, no lo que diga el
+# .env. Si el .env quedó con un SHA que nunca levantó, acá se ve vacío y se vuelve a
+# intentar en vez de creer que "ya está corriendo".
+version_corriendo() { # ambiente
+    local fila
+    fila=$(cd "$BASE/$1" && docker compose ps --format '{{.Image}} {{.Health}}' gestion-del-local 2>/dev/null | head -1)
+    [ "${fila##* }" = healthy ] || return 0
+    fila=${fila%% *}; echo "${fila##*:}"
+}
+
 desplegar() { # ambiente [sha]
     local amb=$1 rama dir sha actual
     rama=$(rama_de "$amb") || { fallo "ambiente desconocido: $amb"; return 1; }
@@ -62,8 +72,9 @@ desplegar() { # ambiente [sha]
         [ -n "$sha" ] || { fallo "no pude consultar la rama $rama en GitHub"; return 1; }
         info "último de $rama en GitHub: $sha"
     fi
-    actual=$(grep -m1 '^IMAGEN_TAG=' "$dir/.env" | cut -d= -f2-)
+    actual=$(version_corriendo "$amb")
     if [ "$actual" = "$sha" ]; then ok "ya está corriendo $sha, nada que hacer"; return 0; fi
+    [ -n "$actual" ] && info "corriendo ahora: $actual" || info "no hay ningún contenedor sano corriendo"
 
     # La imagen de ese SHA tiene que existir: si CI todavía no la publicó, el próximo aviso lo resuelve.
     if ! docker manifest inspect "ghcr.io/$REPO/gestion-del-local:$sha" >/dev/null 2>&1; then
@@ -81,13 +92,15 @@ desplegar() { # ambiente [sha]
         avisar "$amb desplegado" "$sha sano (antes: ${actual:-ninguno})"
     else
         fallo "$amb con $sha no quedó sano"
-        if [ -n "$actual" ] && [ "${actual#<}" = "$actual" ]; then
+        if [ -n "$actual" ]; then
             info "volviendo a $actual"
             fijar_tag "$amb" "$actual"
             (cd "$dir" && docker compose up -d --remove-orphans) || true
             sano "$amb" && ok "$amb de vuelta en $actual" || fallo "$amb tampoco quedó sano en $actual"
             avisar "$amb FALLÓ" "$sha no quedó sano; volví a $actual"
         else
+            # Sin versión anterior no queda nada arriba; el .env no debe fingir que sí.
+            fijar_tag "$amb" "<sha>"
             avisar "$amb FALLÓ" "$sha no quedó sano y no había versión anterior"
         fi
         return 1

@@ -173,7 +173,17 @@ O moviendo la rama al commit anterior (`git push --force origin <sha>:produccion
 además deja el repositorio contando la verdad. La reversión **no** revierte los datos: si
 una versión migró el esquema, volver la imagen no vuelve la base.
 
-## 13. Operación de todos los días
+## 13. Actualizar los scripts de la máquina
+
+Los scripts de `~/ferre/bin` y la unidad de systemd se copian al instalar; el despliegue
+por aviso no los actualiza. Cuando cambien en el repositorio:
+
+```bash
+cd ~/ferre-repo && git pull && bash deployment/oracle-single/maquina/instalar.sh
+systemctl --user restart ferre-despliegue
+```
+
+## 14. Operación de todos los días
 
 ```bash
 # qué corre y con qué versión (IMAGEN_TAG es el SHA)

@@ -14,7 +14,9 @@ ExecStart=__HOME__/ferre/bin/escuchar.sh
 Restart=always
 RestartSec=10
 NoNewPrivileges=true
-PrivateTmp=true
+# Sin PrivateTmp: en un servicio de usuario systemd lo implementa con un user namespace
+# sin privilegios, y el perfil AppArmor de Ubuntu 24.04 le niega el socket de Docker
+# rootless ("DENIED ... docker.sock" en el journal del kernel).
 
 [Install]
 WantedBy=default.target
