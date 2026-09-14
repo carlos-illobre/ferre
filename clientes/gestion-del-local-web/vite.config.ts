@@ -19,8 +19,11 @@ export default defineConfig(({ command }) => {
         registerType: "autoUpdate",
         includeAssets: ["icono.svg"],
         manifest: {
-          name: "ferre",
+          id: "ferre",
+          name: "ferre · gestión del local",
           short_name: "ferre",
+          categories: ["business", "productivity"],
+          orientation: "any",
           description: "Gestión del local: ventas, compras, stock y precios",
           lang: "es",
           start_url: "./",

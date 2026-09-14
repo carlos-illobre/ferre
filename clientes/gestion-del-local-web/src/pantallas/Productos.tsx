@@ -76,7 +76,7 @@ export function Productos() {
         data-testid="busqueda"
         autoComplete="off"
       />
-      <p className="ayuda">
+      <p className="ayuda solo-escritorio">
         {catalogo ? `${catalogo.length.toLocaleString("es-AR")} productos. ` : ""}
         Flechas para elegir · Shift+1 a Shift+5 para el margen (300, 200, 100, 50, 25 %) · Esc para limpiar
       </p>

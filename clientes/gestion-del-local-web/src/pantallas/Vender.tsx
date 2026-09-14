@@ -270,7 +270,7 @@ export function Vender() {
           <button className="enlace chico" onClick={() => setCodigoDesconocido(null)}>Ignorar</button>
         </p>
       )}
-      <p className="ayuda">Enter agrega · Esc descarta · F5 efectivo · F6 Mercado Pago · F7 tarjeta · F8 cuenta corriente · F2 cobrar{pendientes > 0 ? ` · ${pendientes} cambio(s) guardados sin enviar` : ""}</p>
+      <p className="ayuda solo-escritorio">Enter agrega · Esc descarta · F5 efectivo · F6 Mercado Pago · F7 tarjeta · F8 cuenta corriente · F2 cobrar{pendientes > 0 ? ` · ${pendientes} cambio(s) guardados sin enviar` : ""}</p>
       {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} ultimo={ultimoEscaneo} />}
       {(error ?? errorCatalogo) && <p className="error" role="alert">{error ?? errorCatalogo}</p>}
       {mensaje && <p className="exito" role="status" data-testid="mensaje">{mensaje}</p>}

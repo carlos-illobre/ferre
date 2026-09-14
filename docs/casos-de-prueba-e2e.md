@@ -241,3 +241,17 @@ del barato.
 | Autorizar un mostrador nuevo | Aparece en la tabla; el selector de alta no ofrece el rol "dueño" |
 | Mirar la fila del dueño | Su selector de rol está deshabilitado y dice "solo el dueño" |
 | Intentar por la API crear un dueño, desactivar al dueño o ascender a dueño | Las tres respuestas son 403; el dueño sigue activo y no existe el dueño nuevo |
+
+
+## Celular (se prueba a mano)
+
+Las capturas se hacen con Playwright en un viewport de Pixel 7 (no forman parte de la
+suite: los escenarios corren en escritorio). Qué mirar:
+
+| Paso | Resultado esperado |
+|---|---|
+| Abrir la app en el celular | Barra de arriba con "ferre" y el nombre de la pantalla; menú abajo con íconos (Vender, Productos, Compras, Stock, Contar, Más) |
+| "Más" | Sube una hoja con Listas de precios (y Duplicados y Administración para el dueño) y Salir |
+| Vender con dos productos | Cada renglón es una tarjeta; la barra de cobro queda pegada arriba del menú |
+| Productos | Cada producto es una tarjeta; la elegida se pinta de azul |
+| Chrome en Android: menú del navegador | Ofrece "Instalar app" (manifest con ícono, nombre y modo standalone) |

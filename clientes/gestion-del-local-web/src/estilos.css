@@ -208,13 +208,57 @@ table.movimientos td { padding: 0.15rem 0.6rem; border: none; font-size: 0.9rem;
 .cabecera-compra select, .cabecera-compra input { font-size: 1rem; }
 .numeros div small { display: block; font-size: 0.8rem; }
 
+/* Celular: se ve y se usa como una app de Android. Barra de arriba compacta con el nombre
+   de la pantalla, menú abajo con íconos, botones altos para el dedo, tablas como tarjetas. */
+.solo-celular { display: none !important; }
 @media (max-width: 720px) {
-  .barra { gap: 0.6rem; height: auto; padding: 0.5rem 0.8rem; flex-wrap: wrap; }
-  .barra nav { order: 3; width: 100%; justify-content: flex-start; overflow-x: auto; }
-  .barra nav button.enlace { padding: 0.5rem 0.7rem; }
-  :root { font-size: 18px; }
-  .cobro { margin: 1rem -0.8rem 0; padding: 0.8rem; }
+  .solo-escritorio { display: none !important; }
+  .solo-celular { display: initial !important; }
+  :root { font-size: 17px; }
+  html { overscroll-behavior-y: none; }
+  .barra { gap: 0.6rem; height: 56px; padding: 0 0.9rem; padding-top: env(safe-area-inset-top); }
+  .barra > strong { font-size: 1.3rem; }
+  .barra .pantalla-actual { flex: 1; font-size: 1.1rem; font-weight: 700; color: #fff; }
+  main { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   main > section, main > p { padding: 0 0.8rem; }
+  h1 { font-size: 1.3rem; margin-top: 0.7rem; }
+  .cobro { margin: 1rem -0.8rem 0; padding: 0.8rem; bottom: calc(60px + env(safe-area-inset-bottom)); }
+  .version { bottom: calc(66px + env(safe-area-inset-bottom)); }
+  button, select, input[type="submit"] { min-height: 44px; }
+  input, select { font-size: 1rem; }
+  button.enlace.chico { min-height: 36px; }
+  button.margen, button.medio { min-height: 40px; }
+  .acciones { flex-wrap: wrap; }
+  .acciones button.grande { flex: 1 1 100%; }
+
+  .barra-inferior { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex !important; background: var(--tarjeta); border-top: 1px solid var(--borde); box-shadow: 0 -2px 10px rgba(18, 48, 94, 0.12); padding-bottom: env(safe-area-inset-bottom); }
+  .barra-inferior button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; border: none; background: none; color: var(--texto-suave); font-size: 0.7rem; font-weight: 600; min-height: 60px; }
+  .barra-inferior button .icono { width: 24px; height: 24px; padding: 3px 14px; border-radius: 999px; transition: background 0.15s ease; box-sizing: content-box; }
+  .barra-inferior button.activo { color: var(--azul); }
+  .barra-inferior button.activo .icono { background: var(--azul-claro); }
+  .hoja-fondo { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,0.4); display: flex !important; align-items: flex-end; }
+  .hoja { width: 100%; background: var(--tarjeta); border-radius: 16px 16px 0 0; padding: 0.8rem 0.8rem calc(0.8rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 0.2rem; animation: subir 0.2s ease-out; }
+  .hoja small { padding: 0.2rem 0.6rem 0.5rem; }
+  .opcion-hoja { display: flex; align-items: center; gap: 0.8rem; width: 100%; text-align: left; padding: 0.8rem 0.6rem; border: none; background: none; border-radius: var(--radio); font-size: 1.05rem; font-weight: 600; color: var(--texto); }
+  .opcion-hoja.activo { background: var(--azul-claro); color: var(--azul); }
+  .opcion-hoja .icono { width: 24px; height: 24px; color: var(--azul); }
+  @keyframes subir { from { transform: translateY(100%); } to { transform: none; } }
+
+  /* Tablas de productos, venta y compra: cada fila es una tarjeta */
+  table.resultados, table.venta { display: block; }
+  table.resultados thead, table.venta thead { display: none; }
+  table.resultados tbody, table.venta tbody { display: block; }
+  table.resultados tr, table.venta tr { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.6rem; align-items: center; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 0.6rem 0.7rem; margin-bottom: 0.6rem; box-shadow: var(--sombra); }
+  table.resultados td, table.venta td { display: block; border: none; padding: 0.1rem 0; min-width: 0 !important; }
+  table.resultados td:first-child, table.venta td:first-child { grid-row: 1 / span 2; }
+  table.resultados td:nth-child(2), table.venta td:nth-child(2) { grid-column: 2; }
+  table.resultados td:nth-child(n + 3), table.venta td:nth-child(n + 3) { grid-column: 1 / -1; }
+  table.resultados tr.elegido { background: var(--azul); border-color: var(--azul); }
+  table.venta .margenes { width: 100%; grid-template-columns: repeat(5, 1fr); }
+  table.venta td.celda-cantidad { display: flex; align-items: center; gap: 0.4rem; }
+  table.venta td.celda-cantidad::before { content: "Cantidad"; color: var(--texto-suave); font-size: 0.9rem; }
+  table.venta td.precio:last-of-type::before { content: "Subtotal "; color: var(--texto-suave); font-size: 0.9rem; }
+  .celda-foto { width: 44px; }
 }
 
 /* Contar (celular, una mano) */
