@@ -258,3 +258,6 @@ button.boton.primario { background: var(--azul); }
 button.boton.primario:hover { background: var(--azul-oscuro); }
 button.boton.peligro { background: var(--rojo); }
 button.boton.peligro:hover { background: #b3241f; }
+
+.progreso.indeterminado .progreso-relleno { background-image: repeating-linear-gradient(45deg, var(--amarillo) 0 12px, var(--amarillo-oscuro) 12px 24px); background-size: 34px 100%; animation: avanzar 1s linear infinite; }
+@keyframes avanzar { from { background-position: 0 0; } to { background-position: 34px 0; } }

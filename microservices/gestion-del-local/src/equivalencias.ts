@@ -4,28 +4,41 @@ import type pg from "pg";
 // Sugerencias de "es el mismo artículo" (issue #29): mismo código de barras, o misma
 // descripción normalizada (sin acentos, símbolos ni espacios) entre productos de
 // proveedores distintos. Se guardan como pendientes; nunca se unen solas.
+//
+// Dos cruces por igualdad (uno por código, otro por descripción) para que la base use
+// un hash join: un solo cruce con OR se volvía cuadrático y tardaba minutos con miles de
+// productos nuevos.
 const NORMALIZAR = "regexp_replace(lower(translate(descripcion, 'áéíóúñÁÉÍÓÚÑ', 'aeiounaeioun')), '[^a-z0-9]+', '', 'g')";
 
 export async function sugerirEquivalencias(db: pg.Pool | pg.PoolClient, productoIds: string[] | null): Promise<number> {
-  const filtro = productoIds ? "AND (a.id = ANY($1::uuid[]) OR b.id = ANY($1::uuid[]))" : "";
+  const soloNuevos = productoIds ? "AND (a.id = ANY($1::uuid[]) OR b.id = ANY($1::uuid[]))" : "";
   const params = productoIds ? [productoIds] : [];
   const { rows } = await db.query<{ a: string; b: string; motivo: string }>(
     `WITH activos AS (
        SELECT id, codigo_barras, ${NORMALIZAR} AS clave, proveedor_preferido_id FROM producto WHERE activo AND reemplazado_por IS NULL
+     ),
+     por_codigo AS (
+       SELECT LEAST(a.id, b.id) AS a, GREATEST(a.id, b.id) AS b, 'codigo_barras' AS motivo
+         FROM activos a JOIN activos b ON a.codigo_barras = b.codigo_barras AND a.id < b.id
+        WHERE a.codigo_barras IS NOT NULL AND a.proveedor_preferido_id IS DISTINCT FROM b.proveedor_preferido_id ${soloNuevos}
+     ),
+     por_descripcion AS (
+       SELECT LEAST(a.id, b.id) AS a, GREATEST(a.id, b.id) AS b, 'descripcion' AS motivo
+         FROM activos a JOIN activos b ON a.clave = b.clave AND a.id < b.id
+        WHERE length(a.clave) >= 8 AND a.proveedor_preferido_id IS DISTINCT FROM b.proveedor_preferido_id ${soloNuevos}
      )
-     SELECT LEAST(a.id, b.id) AS a, GREATEST(a.id, b.id) AS b,
-            CASE WHEN a.codigo_barras IS NOT NULL AND a.codigo_barras = b.codigo_barras THEN 'codigo_barras' ELSE 'descripcion' END AS motivo
-       FROM activos a JOIN activos b ON a.id < b.id
-      WHERE (a.proveedor_preferido_id IS DISTINCT FROM b.proveedor_preferido_id)
-        AND ((a.codigo_barras IS NOT NULL AND a.codigo_barras = b.codigo_barras) OR (length(a.clave) >= 8 AND a.clave = b.clave))
-        ${filtro}`,
+     SELECT DISTINCT ON (a, b) a, b, motivo FROM (SELECT * FROM por_codigo UNION ALL SELECT * FROM por_descripcion) x ORDER BY a, b, motivo`,
     params,
   );
+  if (rows.length === 0) return 0;
+  // Un solo INSERT de muchas filas; las que ya existían no cuentan.
   let nuevas = 0;
-  for (const r of rows) {
+  for (let i = 0; i < rows.length; i += 500) {
+    const lote = rows.slice(i, i + 500);
+    const valores = lote.map((_, j) => `($${j * 4 + 1}, $${j * 4 + 2}, $${j * 4 + 3}, $${j * 4 + 4})`).join(", ");
     const { rowCount } = await db.query(
-      `INSERT INTO equivalencia_sugerida (id, producto_a, producto_b, motivo) VALUES ($1, $2, $3, $4) ON CONFLICT (producto_a, producto_b) DO NOTHING`,
-      [randomUUID(), r.a, r.b, r.motivo],
+      `INSERT INTO equivalencia_sugerida (id, producto_a, producto_b, motivo) VALUES ${valores} ON CONFLICT (producto_a, producto_b) DO NOTHING`,
+      lote.flatMap((r) => [randomUUID(), r.a, r.b, r.motivo]),
     );
     nuevas += rowCount ?? 0;
   }

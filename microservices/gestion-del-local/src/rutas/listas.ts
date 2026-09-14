@@ -133,8 +133,10 @@ const LOTE = 500;
 async function aplicarEnSegundoPlano(lista: ListaGuardada, usuarioId: string): Promise<void> {
   const lectura = await releer(lista);
   const total = lectura.filas.length;
-  const progreso = async (procesadas: number) =>
-    pool.query(`UPDATE lista_importada SET resumen = resumen || $2::jsonb WHERE id = $1`, [lista.id, JSON.stringify({ progreso: { procesadas, total } })]);
+  // El progreso dice qué etapa va: "precios" (n de total) y después "duplicados". La
+  // pantalla no muestra 100 % hasta que el estado sea 'aplicada'.
+  const progreso = async (procesadas: number, etapa: "precios" | "duplicados" = "precios") =>
+    pool.query(`UPDATE lista_importada SET resumen = resumen || $2::jsonb WHERE id = $1`, [lista.id, JSON.stringify({ progreso: { procesadas, total, etapa } })]);
   await progreso(0);
 
   const { rows: vigentes } = await pool.query<{ producto_id: string; codigo_proveedor: string; costo_neto: string; precio_lista: string }>(
@@ -191,7 +193,10 @@ async function aplicarEnSegundoPlano(lista: ListaGuardada, usuarioId: string): P
   }
 
   // Los productos nuevos pueden ser el mismo artículo que ya vende otro proveedor (#29).
-  if (nuevosIds.length) resultado.posibles_duplicados = await sugerirEquivalencias(pool, nuevosIds);
+  if (nuevosIds.length) {
+    await progreso(total, "duplicados");
+    resultado.posibles_duplicados = await sugerirEquivalencias(pool, nuevosIds);
+  }
   await pool.query(
     `UPDATE lista_importada SET estado = 'aplicada', importada_en = now(), aplicada_por = $2, resumen = (resumen - 'progreso' - 'error') || $3::jsonb WHERE id = $1`,
     [lista.id, usuarioId, JSON.stringify(resultado)],

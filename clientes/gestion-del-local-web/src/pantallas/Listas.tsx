@@ -151,7 +151,7 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
     api<{ total: number; filas: Fila[] }>(`/listas/${cargada.id}/filas`).then((x) => { setFilas(x.filas); setTotal(x.total); }).catch((e: Error) => setError(e.message));
   }, [cargada.id]);
 
-  const [progreso, setProgreso] = useState<{ procesadas: number; total: number | null } | null>(null);
+  const [progreso, setProgreso] = useState<{ procesadas: number; total: number | null; etapa?: string } | null>(null);
 
   // Aplicar corre en el servidor en segundo plano; acá se consulta el avance cada segundo.
   async function aplicar() {
@@ -161,14 +161,14 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
       setProgreso({ procesadas: 0, total: cargada.resumen.leidas });
       for (;;) {
         await new Promise((r) => setTimeout(r, 800));
-        const l = await api<{ estado: string; resumen: Resumen & { progreso?: { procesadas: number; total: number | null }; error?: string } }>(`/listas/${cargada.id}`);
+        const l = await api<{ estado: string; resumen: Resumen & { progreso?: { procesadas: number; total: number | null; etapa?: string }; error?: string } }>(`/listas/${cargada.id}`);
         if (l.estado === "aplicada") {
           const x = l.resumen;
           setResultado(`Listo: ${x.nuevos + x.modificados} precios actualizados (${x.nuevos} productos nuevos, ${x.modificados} con precio nuevo, ${x.sin_cambio} sin cambio).`);
           break;
         }
         if (l.estado !== "aplicando") { setError(l.resumen.error ?? "La aplicación se interrumpió. Volvé a intentar."); break; }
-        if (l.resumen.progreso) setProgreso({ procesadas: l.resumen.progreso.procesadas, total: l.resumen.progreso.total ?? cargada.resumen.leidas });
+        if (l.resumen.progreso) setProgreso({ procesadas: l.resumen.progreso.procesadas, total: l.resumen.progreso.total ?? cargada.resumen.leidas, etapa: l.resumen.progreso.etapa });
       }
     } catch (e) {
       setError((e as Error).message);
@@ -211,9 +211,12 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
         </details>
       )}
       {progreso ? (
-        <div className="progreso" data-testid="progreso" role="progressbar" aria-valuemin={0} aria-valuemax={progreso.total ?? 100} aria-valuenow={progreso.procesadas}>
-          <div className="progreso-barra"><div className="progreso-relleno" style={{ width: `${progreso.total ? Math.round((progreso.procesadas / progreso.total) * 100) : 5}%` }} /></div>
-          <span>Aplicando… {progreso.procesadas.toLocaleString("es-AR")} de {(progreso.total ?? r.leidas).toLocaleString("es-AR")} precios</span>
+        // Los precios llenan hasta el 90 %; la búsqueda de duplicados va del 90 al 99 con
+        // animación; el 100 % solo aparece cuando la lista está aplicada.
+        <div className={`progreso ${progreso.etapa === "duplicados" ? "indeterminado" : ""}`} data-testid="progreso" role="progressbar" aria-valuemin={0} aria-valuemax={100}
+          aria-valuenow={progreso.etapa === "duplicados" ? 95 : Math.round(((progreso.total ? progreso.procesadas / progreso.total : 0) * 90))}>
+          <div className="progreso-barra"><div className="progreso-relleno" style={{ width: `${progreso.etapa === "duplicados" ? 95 : Math.round((progreso.total ? progreso.procesadas / progreso.total : 0.05) * 90)}%` }} /></div>
+          <span>{progreso.etapa === "duplicados" ? "Precios guardados. Buscando duplicados con otros proveedores…" : `Guardando precios… ${progreso.procesadas.toLocaleString("es-AR")} de ${(progreso.total ?? r.leidas).toLocaleString("es-AR")}`}</span>
         </div>
       ) : (
         <div className="acciones">
