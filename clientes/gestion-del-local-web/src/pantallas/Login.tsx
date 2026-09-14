@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { api } from "../api";
 import { useSesion, type Usuario } from "../sesion";
 import { entrarConHuella, hayHuella } from "../credenciales";
+import { marcarEntradaConGoogle } from "../componentes/OfrecerHuella";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -30,6 +31,7 @@ export function BotonGoogle() {
               method: "POST",
               body: JSON.stringify({ credencial: credential, dispositivo: describirDispositivo() }),
             });
+            marcarEntradaConGoogle();
             entrar(r.token, r.usuario);
           } catch (e) {
             setError((e as Error).message);

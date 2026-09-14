@@ -46,8 +46,21 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   });
   psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
 
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  // Recién entrado con Google (Google no se automatiza: se siembra la sesión y la marca),
+  // la app ofrece usar la huella, como en el banco. Aceptar vincula el celular.
+  await page.addInitScript((token) => { localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1"); }, TOKEN);
   await page.goto("/#/administracion");
+  await expect(page.getByTestId("ofrecer-huella")).toContainText("¿Entrar con la huella?");
+  await page.getByTestId("aceptar-huella").click();
+  await expect(page.getByTestId("ofrecer-huella")).toContainText("Listo");
+  await page.getByRole("button", { name: "Entendido" }).click();
+  await expect(page.getByTestId("celular")).toHaveCount(1);
+  // No vuelve a ofrecerlo; y desde Administración se puede quitar y vincular a mano.
+  await page.reload();
+  await expect(page.getByTestId("ofrecer-huella")).toHaveCount(0);
+  page.once("dialog", (d) => d.accept());
+  await page.getByTestId("celular").getByRole("button", { name: "Quitar" }).click();
+  await expect(page.getByTestId("celular")).toHaveCount(0);
   page.once("dialog", (d) => d.accept("Celular E2E"));
   await page.getByTestId("vincular-celular").click();
   await expect(page.getByTestId("mensaje-celular")).toContainText('"Celular E2E" entra con la huella');

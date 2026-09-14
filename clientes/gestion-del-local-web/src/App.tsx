@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { esAmbienteDePrueba } from "./ambiente";
 import { observarTablas } from "./tablas";
+import { OfrecerHuella } from "./componentes/OfrecerHuella";
 import { urlApi } from "./api";
 import { ProveedorDeSesion, administra, useSesion } from "./sesion";
 import { irA, useRuta } from "./rutas";
@@ -86,6 +87,7 @@ function Pantallas() {
         <button className="secundario solo-escritorio" onClick={salir}>Salir</button>
       </header>
       <BarraInferior opciones={visibles} actual={actual} usuario={`${sesion.usuario.nombre} · ${sesion.usuario.rol}`} salir={salir} />
+      <OfrecerHuella />
       <small className="version" title="Versión de la app (commit)">{import.meta.env.VITE_VERSION ?? "local"}</small>
       {actual === "administracion" && esDueno ? (
         <>

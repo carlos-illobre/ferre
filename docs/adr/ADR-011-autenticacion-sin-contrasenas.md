@@ -100,6 +100,9 @@ Gmail. Se usan **passkeys (WebAuthn)** con `@simplewebauthn`:
   auditado con medio `huella`.
 - **Atado al dominio del cliente web** (`ORIGEN_WEB`): cambiar de dominio obliga a
   volver a vincular los celulares. Exige HTTPS (o `localhost`).
+- **Oferta al primer login:** la primera vez que alguien entra con Google desde un
+  dispositivo con huella, la app ofrece vincularlo ("¿Entrar con la huella?"), como las
+  apps de los bancos. Se ofrece una sola vez por dispositivo, acepte o no.
 - Google sigue siendo la puerta de entrada del primer login y de la laptop sin huella.
 
 ## Enmienda (2026-09-14): rol admin
