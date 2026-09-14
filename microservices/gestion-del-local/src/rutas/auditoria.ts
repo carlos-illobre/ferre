@@ -8,16 +8,23 @@ export const auditoria = new Hono();
 auditoria.use("/*", exigirSesion, exigirAdministrador);
 
 auditoria.get("/", async (c) => {
-  const { usuario, tipo, desde, hasta } = c.req.query();
-  const { rows } = await pool.query(
-    `SELECT e.id, e.tipo, e.fecha, e.dispositivo_id, e.contenido, u.email, u.nombre
-       FROM evento e LEFT JOIN usuario u ON u.id = e.usuario_id
-      WHERE ($1::uuid IS NULL OR e.usuario_id = $1)
+  const { usuario, tipo, desde, hasta, pagina } = c.req.query();
+  // De a 50 por página: "quién hizo qué" crece todos los días y no se lee entero.
+  const porPagina = 50;
+  const nroPagina = Math.max(1, Number(pagina) || 1);
+  const filtro = `WHERE ($1::uuid IS NULL OR e.usuario_id = $1)
         AND ($2::text IS NULL OR e.tipo LIKE $2 || '%')
         AND ($3::timestamptz IS NULL OR e.fecha >= $3)
-        AND ($4::timestamptz IS NULL OR e.fecha < $4)
-      ORDER BY e.fecha DESC LIMIT 100`,
-    [usuario || null, tipo || null, desde || null, hasta || null],
-  );
-  return c.json(rows);
+        AND ($4::timestamptz IS NULL OR e.fecha < $4)`;
+  const params = [usuario || null, tipo || null, desde || null, hasta || null];
+  const [{ rows }, total] = await Promise.all([
+    pool.query(
+      `SELECT e.id, e.tipo, e.fecha, e.dispositivo_id, e.contenido, u.email, u.nombre
+         FROM evento e LEFT JOIN usuario u ON u.id = e.usuario_id ${filtro}
+        ORDER BY e.fecha DESC LIMIT ${porPagina} OFFSET ${(nroPagina - 1) * porPagina}`,
+      params,
+    ),
+    pool.query<{ total: string }>(`SELECT count(*) AS total FROM evento e ${filtro}`, params),
+  ]);
+  return c.json({ eventos: rows, total: Number(total.rows[0]?.total ?? 0), pagina: nroPagina, por_pagina: porPagina });
 });

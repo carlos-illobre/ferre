@@ -42,6 +42,9 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 .barra nav { display: flex; gap: 0.25rem; flex: 1; justify-content: center; height: 100%; }
 .barra nav button.enlace { color: #fff; text-decoration: none; font-weight: 600; font-size: 1.05rem; padding: 0 0.9rem; border-bottom: 3px solid transparent; border-radius: 0; height: 100%; white-space: nowrap; }
 .barra nav button.enlace:hover { background: rgba(255,255,255,0.08); }
+/* Cada opción del menú se distingue de la siguiente: un separador entre ellas */
+.barra nav button.enlace + button.enlace { border-left: 1px solid rgba(255,255,255,0.28); }
+.paginado { display: flex; gap: 0.8rem; align-items: center; margin-top: 0.6rem; }
 .barra nav button.enlace.activo { color: var(--amarillo); border-bottom-color: var(--amarillo); font-weight: 700; }
 .barra > span { color: #d9e2f2; font-size: 0.95rem; white-space: nowrap; }
 .barra > button.secundario { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); }

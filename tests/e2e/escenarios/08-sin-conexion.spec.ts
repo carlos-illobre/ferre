@@ -50,7 +50,7 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
   await expect(page.getByTestId("sugerencias")).toContainText("$2.000,00"); // 500 × 2 × 1,21 = 1210 → 2000
   await busqueda.press("Enter");
   await page.getByTestId("item").getByTestId("cantidad").fill("2");
-  await page.getByRole("button", { name: "Efectivo" }).click();
+  await page.locator(".medios").getByRole("button", { name: "Efectivo" }).click();
   await page.getByTestId("cobrar").click();
   await expect(page.getByTestId("mensaje")).toContainText("Sin conexión: se envía sola");
   await expect(page.getByTestId("conexion")).toContainText("1 por enviar");

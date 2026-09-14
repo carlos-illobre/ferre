@@ -95,7 +95,7 @@ mecha (costo $1.500, sin margen) y un taladro (costo $120.000, sin margen).
 | "Cobrar" sin medio de pago | Aviso "Elegí cómo paga"; al tocar un medio de pago el aviso desaparece solo |
 | "Efectivo", "Cobrar" | "Venta registrada: $10.500,00 en efectivo"; la venta queda vacía |
 | Verificación en la base | Una venta confirmada; stock de la mecha −3; el ítem del tornillo con margen 300 y el tornillo con unidad kg; la explicación "+ 100 % de margen" guardada en el de la mecha |
-| Abrir "Ventas de hoy" | Aparece la venta con "Efectivo"; como tiene dos productos, cada uno va en su fila (3 × mecha, 1.5 × tornillo) debajo de la fila de la venta |
+| "Ventas de hoy" (ya desplegado) | Aparece la venta con "Efectivo"; como tiene dos productos, cada uno va en su fila (3 × mecha, 1.5 × tornillo) debajo de la fila de la venta |
 | Tocar la fila de la venta; tocarla de nuevo | Se pliega a una sola fila ("2 productos: ..."); vuelve a desplegarse |
 | "Anular", confirmar con motivo | La fila queda "anulada"; el stock de la mecha vuelve a 0 |
 | Agregar la mecha y tocar "No llevó" | "Anotado como consulta"; queda una consulta en la base |
@@ -117,7 +117,7 @@ lista $1.000.
 | "Registrar ingreso" | "Compra registrada: $16.000,00", "2 costo(s) actualizado(s)", "1 producto(s) nuevo(s)" |
 | Verificación en la base | Stock de la cinta 10; su costo vigente $1.200 con explicación "según factura 0001-00000777"; el pincel existe como producto del proveedor |
 | "Gastos de la semana" | Aparece el proveedor |
-| "Compras recientes", tocar la fila de la compra | Se despliega y muestra sus renglones: 10 × cinta y 5 × pincel, con costo unitario y subtotal |
+| "Compras recientes" (ya desplegado), tocar la fila de la compra | Se despliega y muestra sus renglones: 10 × cinta y 5 × pincel, con costo unitario y subtotal |
 | "Anular", confirmar | La compra queda "anulada"; el stock de la cinta vuelve a 0 |
 
 ---
@@ -212,6 +212,8 @@ del barato.
 | "Es el mismo" | "Unidos"; en la base el absorbido queda inactivo apuntando al conservado, su venta ahora apunta al conservado, el preferido es el proveedor barato y hay 2 proveedores con precio |
 | "Productos", buscar `e2e silicona duplicada` | Un solo producto; lista "★ Proveedor barato (e2e) $2.400,00" y "Proveedor caro (e2e) $3.000,00"; precio $6.000,00 |
 | "usar" en el proveedor caro | El precio pasa a $8.000,00 |
+| Volver a "Duplicados"; en "Unidos", "Separar" la silicona, confirmar | "Separados"; la unión desaparece de la lista |
+| Verificación en la base | El absorbido vuelve a estar activo, la venta apunta otra vez a él y cada producto tiene un solo proveedor |
 
 ---
 

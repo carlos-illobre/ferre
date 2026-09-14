@@ -70,4 +70,18 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   // Elegir el caro a mano: el precio sigue a ese costo.
   await fila.getByTestId("otros-proveedores").getByRole("button", { name: "usar" }).click();
   await expect(fila.locator("td.precio")).toContainText("$8.000,00", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
+
+  // Separar: el absorbido vuelve a existir con sus precios y su venta.
+  await page.goto("/#/duplicados");
+  const union = page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" });
+  await expect(union).toBeVisible();
+  await expect(union).toContainText("Proveedor barato (e2e), Proveedor caro (e2e)");
+  page.once("dialog", (d) => d.accept());
+  await union.getByRole("button", { name: "Separar" }).click();
+  await expect(page.getByTestId("mensaje-separar")).toContainText("Separados");
+  await expect(union).toHaveCount(0);
+  expect(psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe("true");
+  expect(psql(`SELECT producto_id FROM item_venta WHERE venta_id = '00000000-0000-0000-0000-00000000e2f9'`)).toBe(ID_B);
+  expect(psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("1");
+  expect(psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_B}'`)).toBe("1");
 });

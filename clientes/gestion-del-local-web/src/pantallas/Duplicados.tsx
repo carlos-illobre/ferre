@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import { useCatalogo } from "../catalogo";
 import { fecha, pesos } from "../formato";
+import { Desplegable } from "../componentes/Desplegable";
 
 // Un mismo artículo en varios proveedores (issue #29): el dueño ve las sugerencias lado a
 // lado y decide "es el mismo" o "son distintos". También puede unir dos a mano.
@@ -61,6 +62,7 @@ export function Duplicados() {
         </ul>
       )}
       <UnionManual alUnir={cargar} />
+      <Unidos version={mensaje} />
     </section>
   );
 }
@@ -78,8 +80,7 @@ function UnionManual({ alUnir }: { alUnir: () => Promise<void> }) {
     catch (e) { setMensaje((e as Error).message); }
   }
   return (
-    <details className="tarjeta">
-      <summary>Unir dos productos a mano</summary>
+    <Desplegable titulo="Unir dos productos a mano" testId="union-manual">
       <div className="lado-a-lado">
         {[{ q: q1, setQ: setQ1, r: r1, id: id1, setId: setId1, titulo: "Conservar" }, { q: q2, setQ: setQ2, r: r2, id: id2, setId: setId2, titulo: "Absorber (queda dentro del otro)" }].map((c) => (
           <div key={c.titulo} className="candidato">
@@ -94,6 +95,39 @@ function UnionManual({ alUnir }: { alUnir: () => Promise<void> }) {
         ))}
       </div>
       <div className="acciones"><button className="grande" disabled={!id1 || !id2 || id1 === id2} onClick={unir}>Unir</button>{mensaje && <span className="ayuda">{mensaje}</span>}</div>
-    </details>
+    </Desplegable>
+  );
+}
+
+// Lo ya unido, para poder separarlo si fue un error. El absorbido no aparece en las
+// búsquedas (quedó dentro del otro), así que este es el único lugar donde se lo ve.
+type Union = { absorbido_id: string; absorbido: string; conservado_id: string; conservado: string; unido_en: string; proveedores: string | null };
+function Unidos({ version }: { version: string | null }) {
+  const [uniones, setUniones] = useState<Union[]>([]);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const cargar = useCallback(() => api<Union[]>("/equivalencias/unidos").then(setUniones).catch(() => setUniones([])), []);
+  useEffect(() => { void cargar(); }, [cargar, version]);
+  async function separar(u: Union) {
+    if (!window.confirm(`¿Separar "${u.absorbido}" de "${u.conservado}"? Cada uno vuelve a tener sus precios, ventas y stock.`)) return;
+    try { await api("/equivalencias/separar", { method: "POST", body: JSON.stringify({ absorbido_id: u.absorbido_id }) }); setMensaje(`Separados: "${u.absorbido}" vuelve a ser un producto aparte.`); await cargar(); }
+    catch (e) { setMensaje((e as Error).message); }
+  }
+  return (
+    <Desplegable titulo={`Unidos (${uniones.length}): se pueden separar`} testId="unidos">
+      {mensaje && <p className="exito" role="status" data-testid="mensaje-separar">{mensaje}</p>}
+      {uniones.length === 0 ? <p className="ayuda">Todavía no se unió ningún producto.</p> : (
+        <table>
+          <thead><tr><th>Producto que quedó</th><th>Absorbió a</th><th>Proveedores</th><th>Cuándo</th><th /></tr></thead>
+          <tbody>
+            {uniones.map((u) => (
+              <tr key={u.absorbido_id} data-testid="union">
+                <td><strong>{u.conservado}</strong></td><td>{u.absorbido}</td><td>{u.proveedores ?? ""}</td><td>{fecha(u.unido_en.slice(0, 10))}</td>
+                <td><button className="boton peligro" onClick={() => separar(u)}>Separar</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </Desplegable>
   );
 }

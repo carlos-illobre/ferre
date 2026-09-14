@@ -115,24 +115,34 @@ function Sesiones() {
 }
 
 function Auditoria() {
-  const [filas, setFilas] = useState<EventoFila[]>([]);
-  useEffect(() => { api<EventoFila[]>("/auditoria").then(setFilas).catch(() => undefined); }, []);
+  const [datos, setDatos] = useState<{ eventos: EventoFila[]; total: number; pagina: number; por_pagina: number } | null>(null);
+  const [pagina, setPagina] = useState(1);
+  useEffect(() => { api<{ eventos: EventoFila[]; total: number; pagina: number; por_pagina: number }>(`/auditoria?pagina=${pagina}`).then(setDatos).catch(() => undefined); }, [pagina]);
+  const paginas = datos ? Math.max(1, Math.ceil(datos.total / datos.por_pagina)) : 1;
+  const resumen = (contenido: Record<string, unknown>) => { const t = JSON.stringify(contenido); return t.length > 120 ? `${t.slice(0, 120)}…` : t; };
   return (
-    <article>
+    <article data-testid="auditoria">
       <h2>Quién hizo qué</h2>
       <table>
         <thead><tr><th>Cuándo</th><th>Quién</th><th>Qué</th><th>Detalle</th></tr></thead>
         <tbody>
-          {filas.map((e) => (
+          {(datos?.eventos ?? []).map((e) => (
             <tr key={e.id}>
               <td>{new Date(e.fecha).toLocaleString("es-AR")}</td>
               <td>{e.nombre ?? "sistema"}</td>
               <td>{e.tipo}</td>
-              <td><code>{JSON.stringify(e.contenido)}</code></td>
+              <td><code title={JSON.stringify(e.contenido)}>{resumen(e.contenido)}</code></td>
             </tr>
           ))}
         </tbody>
       </table>
+      {datos && (
+        <div className="paginado" data-testid="paginado">
+          <button className="boton primario" disabled={pagina <= 1} onClick={() => setPagina((p) => p - 1)}>← Anteriores</button>
+          <span>Página {datos.pagina} de {paginas} · {datos.total} acciones</span>
+          <button className="boton primario" disabled={pagina >= paginas} onClick={() => setPagina((p) => p + 1)}>Siguientes →</button>
+        </div>
+      )}
     </article>
   );
 }

@@ -77,7 +77,6 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
 
   // Anular devuelve el stock; el costo según factura se mantiene.
   const recientes = page.getByTestId("compras-recientes");
-  await recientes.locator("summary").click();
   // La compra se despliega y muestra sus dos renglones.
   const compra = recientes.getByTestId("compra-reciente").filter({ hasText: PROVEEDOR }).first();
   await expect(compra.getByRole("row")).toHaveCount(1);

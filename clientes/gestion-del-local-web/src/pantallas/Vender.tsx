@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { margenReal, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { FotoProducto } from "../componentes/Foto";
+import { Desplegable } from "../componentes/Desplegable";
 import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../unidades";
 import { api, ErrorApi } from "../api";
 import { guardar, borrarAnterioresA } from "../almacen";
@@ -374,8 +375,7 @@ function VentasDeHoy({ clave }: { clave: string | null }) {
   }
 
   return (
-    <details className="tarjeta" data-testid="ventas-de-hoy">
-      <summary>Ventas de hoy: <strong>{pesos(datos.total)}</strong> {Object.entries(datos.totales).map(([m, t]) => `· ${nombre(m)} ${pesos(t)}`).join(" ")} ({datos.ventas.filter((v) => v.estado === "confirmada").length})</summary>
+    <Desplegable testId="ventas-de-hoy" titulo={<>Ventas de hoy: <strong>{pesos(datos.total)}</strong> {Object.entries(datos.totales).map(([m, t]) => `· ${nombre(m)} ${pesos(t)}`).join(" ")} ({datos.ventas.filter((v) => v.estado === "confirmada").length})</>}>
       <table>
         <thead><tr><th>Hora</th><th>Productos</th><th>Pago</th><th>Total</th><th /></tr></thead>
         {datos.ventas.map((v) => {
@@ -404,6 +404,6 @@ function VentasDeHoy({ clave }: { clave: string | null }) {
         })}
       </table>
       <small>{fecha(new Date().toISOString().slice(0, 10))}</small>
-    </details>
+    </Desplegable>
   );
 }

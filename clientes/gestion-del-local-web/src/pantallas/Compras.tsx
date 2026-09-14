@@ -4,6 +4,7 @@ import { useCatalogo } from "../catalogo";
 import { fecha, pesos, porcentaje } from "../formato";
 import type { Producto } from "./Productos";
 import { cantidadValida, enteras, unidadDe } from "../unidades";
+import { Desplegable } from "../componentes/Desplegable";
 
 // Ingreso de mercadería (issue #30): proveedor y comprobante → renglones con la búsqueda
 // de siempre → confirmar. Suma stock y, si la factura trae otro costo, ese pasa a ser el
@@ -179,13 +180,12 @@ function GastosDeLaSemana({ version }: { version: number }) {
   useEffect(() => { api<typeof datos>("/compras/semana").then(setDatos).catch(() => setDatos(null)); }, [version]);
   if (!datos || datos.por_proveedor.length === 0) return null;
   return (
-    <details className="tarjeta" open data-testid="gastos-semana">
-      <summary>Gastos de la semana (desde el {fecha(datos.desde)}): <strong>{pesos(datos.total)}</strong></summary>
+    <Desplegable testId="gastos-semana" titulo={<>Gastos de la semana (desde el {fecha(datos.desde)}): <strong>{pesos(datos.total)}</strong></>}>
       <table>
         <thead><tr><th>Proveedor</th><th>Compras</th><th>Total</th></tr></thead>
         <tbody>{datos.por_proveedor.map((p) => <tr key={p.proveedor}><td>{p.proveedor}</td><td>{p.compras}</td><td>{pesos(p.total)}</td></tr>)}</tbody>
       </table>
-    </details>
+    </Desplegable>
   );
 }
 
@@ -204,8 +204,7 @@ function ComprasRecientes({ version, alCambiar }: { version: number; alCambiar: 
     alCambiar();
   }
   return (
-    <details className="tarjeta" data-testid="compras-recientes">
-      <summary>Compras recientes ({filas.length})</summary>
+    <Desplegable testId="compras-recientes" titulo={`Compras recientes (${filas.length})`}>
       <table>
         <thead><tr><th>Fecha</th><th>Proveedor</th><th>Comprobante</th><th>Renglones</th><th>Total</th><th /></tr></thead>
         {filas.map((c) => {
@@ -228,6 +227,6 @@ function ComprasRecientes({ version, alCambiar }: { version: number; alCambiar: 
           );
         })}
       </table>
-    </details>
+    </Desplegable>
   );
 }

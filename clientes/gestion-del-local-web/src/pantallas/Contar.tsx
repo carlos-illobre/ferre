@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { api, ErrorApi } from "../api";
+import { Desplegable } from "../componentes/Desplegable";
 import { enviarOEncolar } from "../cola";
 import { useCatalogo } from "../catalogo";
 import { fecha } from "../formato";
@@ -199,10 +200,9 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
         </table>
       )}
       {conteo.sin_contar.length > 0 && (
-        <details>
-          <summary>Del sector, sin contar todavía ({conteo.sin_contar.length})</summary>
+        <Desplegable titulo={`Del sector, sin contar todavía (${conteo.sin_contar.length})`}>
           <ul>{conteo.sin_contar.map((p) => <li key={p.producto_id}>{p.descripcion} <small>(teórico {Number(p.stock_teorico)})</small></li>)}</ul>
-        </details>
+        </Desplegable>
       )}
 
       {conteo.renglones.length > 0 && !cerrando && (

@@ -79,7 +79,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   // Cobrar sin medio de pago avisa; con efectivo, registra.
   await page.getByTestId("cobrar").click();
   await expect(page.getByRole("alert")).toContainText("Elegí cómo paga");
-  await page.getByRole("button", { name: "Efectivo" }).click();
+  await page.locator(".medios").getByRole("button", { name: "Efectivo" }).click();
   await expect(page.getByRole("alert")).toHaveCount(0); // el aviso se va solo al corregirlo
   await page.getByTestId("cobrar").click();
   await expect(page.getByTestId("mensaje")).toContainText("Venta registrada: $10.500,00 en efectivo");
@@ -95,7 +95,6 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   // Ventas de hoy la muestra; anular la marca y devuelve el stock.
   const hoy = page.getByTestId("ventas-de-hoy");
   await expect(hoy).toContainText("Efectivo");
-  await hoy.locator("summary").click();
   // Dos productos: cada uno en su fila, y la venta se pliega desde la primera.
   const venta = hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
   await expect(venta.getByRole("row")).toHaveCount(3);

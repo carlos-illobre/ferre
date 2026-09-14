@@ -203,10 +203,9 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
         <div className={r.salteadas > 0 ? "destacado-rojo" : ""}><dt>Filas salteadas</dt><dd>{r.salteadas}</dd></div>
       </dl>
       {cargada.salteadas.length > 0 && (
-        <details>
-          <summary>Ver las filas salteadas</summary>
+        <Desplegable titulo="Filas salteadas" abiertoAlInicio={false}>
           <ul>{cargada.salteadas.map((s) => <li key={s.fila}>Fila {s.fila}: {s.motivo}{s.contenido.length ? ` (${s.contenido.join(" | ")})` : ""}</li>)}</ul>
-        </details>
+        </Desplegable>
       )}
       {progreso ? (
         // Los precios llenan hasta el 90 %; la búsqueda de duplicados va del 90 al 99 con
