@@ -82,18 +82,19 @@ ventas.post("/", async (c) => {
 
 // Ventas de un día (hoy por defecto) con sus ítems y el total por medio de pago.
 ventas.get("/", async (c) => {
-  const dia = c.req.query("dia") ?? new Date().toISOString().slice(0, 10);
+  // "Hoy" es el día del local (Buenos Aires), no el día UTC del servidor: a la noche difieren.
+  const dia = c.req.query("dia") || null;
   const { rows } = await pool.query(
     `SELECT v.id, v.fecha, v.medio_pago, v.total, v.estado, v.pagada_en, cl.nombre AS cliente,
             COALESCE(json_agg(json_build_object('descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'explicacion', i.explicacion) ORDER BY i.orden) FILTER (WHERE i.id IS NOT NULL), '[]') AS items
        FROM venta v LEFT JOIN cliente cl ON cl.id = v.cliente_id LEFT JOIN item_venta i ON i.venta_id = v.id
-      WHERE (v.fecha AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = $1::date
+      WHERE (v.fecha AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = COALESCE($1::date, (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date)
       GROUP BY v.id, cl.nombre ORDER BY v.fecha DESC`,
     [dia],
   );
   const totales: Record<string, number> = {};
   for (const v of rows) if (v.estado === "confirmada") totales[v.medio_pago] = (totales[v.medio_pago] ?? 0) + Number(v.total);
-  return c.json({ dia, ventas: rows, totales, total: Object.values(totales).reduce((a, b) => a + b, 0) });
+  return c.json({ dia: dia ?? new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 10), ventas: rows, totales, total: Object.values(totales).reduce((a, b) => a + b, 0) });
 });
 
 // Anular: la venta queda marcada (no se borra) y el stock vuelve con un ajuste.

@@ -22,7 +22,7 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 | Buscar un producto, elegir su margen y fijar un precio a mano | `03-productos.spec.ts` | Hecho |
 | Buscar un producto y registrar una venta; ventas del día; anular; "no llevó" | `04-vender.spec.ts` | Hecho |
 | Ingresar mercadería de un proveedor; costo según factura; gasto semanal; anular | `05-compras.spec.ts` | Hecho |
-| Contar un sector y ajustar stock | pendiente | Issue #31 |
+| Contar un sector desde el celular y cerrarlo con ajustes | `07-contar.spec.ts` | Hecho |
 | Ver el stock valorizado, sus movimientos y corregirlo | `06-stock.spec.ts` | Hecho |
 
 Cada issue de esa lista agrega su escenario antes de cerrarse.

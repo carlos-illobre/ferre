@@ -44,7 +44,9 @@ erDiagram
 | `item_venta` | Un renglón del cuaderno | Guarda costo, margen, precio y explicación **de ese momento**; `producto_id` nulo = ítem libre (#17) |
 | `consulta` | Preguntaron y no compraron | Hoy pasa muy seguido y no se anota |
 | `compra` / `item_compra` | Ingreso de mercadería (#30) | `sin_comprobante` para los dos proveedores sin factura |
-| `movimiento_stock` | Cada entrada o salida | Cantidad con signo; los conteos (#31) generan ajustes |
+| `movimiento_stock` | Cada entrada o salida | Cantidad con signo; los conteos (#31) generan ajustes con referencia al conteo |
+| `sector` | Dónde vive cada producto en el local | Se asigna al contar; el conteo cíclico va por sector (#31) |
+| `conteo` / `renglon_conteo` | Un conteo abierto por sector con lo contado | Al cerrar, cada diferencia contra el teórico es un ajuste explicado |
 | `evento` | Registro de eventos de dominio (ADR-003) y auditoría | Lleva `usuario_id`: quién hizo qué |
 | `usuario` | Quién puede entrar | Gmail autorizado y rol dueño/mostrador; sin contraseñas ([ADR-011](adr/ADR-011-autenticacion-sin-contrasenas.md)) |
 | `sesion` | Sesiones abiertas | Token hasheado, dispositivo, vencimiento renovable, revocación |

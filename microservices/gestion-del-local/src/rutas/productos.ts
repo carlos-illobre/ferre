@@ -21,7 +21,7 @@ export type ProductoCatalogo = {
 
 productos.get("/", async (c) => {
   const { rows } = await pool.query(
-    `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.precio_manual, p.modificado_en,
+    `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.precio_manual, p.modificado_en, p.sector_id,
             pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text,
             COALESCE(pp.descuentos->'explicacion', '[]'::jsonb) AS explicacion_costo
        FROM producto p

@@ -9,6 +9,7 @@ export type Producto = {
   margen_elegido: Margen | null; precio_manual: string | null;
   proveedor: string | null; codigo_proveedor: string | null;
   costo_neto: string | null; iva: string | null; fecha_lista: string | null; explicacion_costo: string[];
+  sector_id?: string | null;
 };
 
 // Búsqueda instantánea y selector de margen (issues #13 y #14). El catálogo se baja
