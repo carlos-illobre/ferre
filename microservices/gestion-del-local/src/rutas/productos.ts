@@ -1,5 +1,9 @@
+import { randomUUID } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { Hono } from "hono";
 import { pool } from "../db.js";
+import { config } from "../config.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirSesion } from "../autenticacion.js";
 
@@ -71,7 +75,7 @@ productos.patch("/:id", async (c) => {
   }
   if ("foto_url" in cuerpo) {
     const f = cuerpo.foto_url === null ? null : String(cuerpo.foto_url).trim();
-    if (f !== null && !/^https?:\/\/.{4,500}$/.test(f)) return c.json({ error: "La foto tiene que ser una dirección https" }, 400);
+    if (f !== null && !/^(https?:\/\/|\/fotos\/).{4,500}$/.test(f)) return c.json({ error: "La foto tiene que ser una dirección https o una foto subida" }, 400);
     valores.push(f); cambios.push(`foto_url = $${valores.length}`);
   }
   if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido, unidad, codigo_barras, proveedor_preferido_id o foto_url" }, 400);
@@ -79,4 +83,38 @@ productos.patch("/:id", async (c) => {
   if (!rowCount) return c.json({ error: "No existe ese producto" }, 404);
   await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id"), ...cuerpo } });
   return c.body(null, 204);
+});
+
+// Foto sacada con el celular: se guarda en el volumen de datos (junto a los Excel) con un
+// nombre al azar y queda como foto del producto. Tipos: jpeg, png, webp; hasta 10 MB (el
+// cliente ya la achica a 800 px antes de mandarla).
+const TIPOS_DE_FOTO: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
+export const carpetaFotos = () => path.join(config.carpetaListas, "fotos");
+productos.post("/:id/foto", async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const archivo = cuerpo["foto"];
+  if (!(archivo instanceof File)) return c.json({ error: "Falta la foto" }, 400);
+  const extension = TIPOS_DE_FOTO[archivo.type];
+  if (!extension) return c.json({ error: "La foto tiene que ser jpeg, png o webp" }, 400);
+  if (archivo.size > 10 * 1024 * 1024) return c.json({ error: "La foto pesa más de 10 MB" }, 413);
+  const nombre = `${randomUUID()}${extension}`;
+  await mkdir(carpetaFotos(), { recursive: true });
+  await writeFile(path.join(carpetaFotos(), nombre), Buffer.from(await archivo.arrayBuffer()));
+  const url = `/fotos/${nombre}`;
+  const { rowCount } = await pool.query("UPDATE producto SET foto_url = $2 WHERE id = $1 AND activo", [c.req.param("id"), url]);
+  if (!rowCount) return c.json({ error: "No existe ese producto" }, 404);
+  await registrarEvento(pool, { tipo: "producto.foto", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id"), foto_url: url } });
+  return c.json({ foto_url: url });
+});
+
+// Las fotos se sirven sin sesión: una etiqueta <img> no puede mandar el token, y el
+// nombre al azar hace que no se puedan adivinar. Son fotos de tornillos, no datos.
+export const fotos = new Hono();
+fotos.get("/:nombre", async (c) => {
+  const nombre = c.req.param("nombre");
+  if (!/^[0-9a-f-]{36}\.(jpg|png|webp)$/.test(nombre)) return c.json({ error: "No existe esa foto" }, 404);
+  const contenido = await readFile(path.join(carpetaFotos(), nombre)).catch(() => null);
+  if (!contenido) return c.json({ error: "No existe esa foto" }, 404);
+  const tipo = nombre.endsWith(".png") ? "image/png" : nombre.endsWith(".webp") ? "image/webp" : "image/jpeg";
+  return c.body(contenido, 200, { "Content-Type": tipo, "Cache-Control": "public, max-age=31536000, immutable" });
 });

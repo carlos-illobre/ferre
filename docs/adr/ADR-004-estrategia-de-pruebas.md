@@ -59,3 +59,21 @@ más caro.
 ## Referencias
 
 Skill `microservicios-base`, `referencias/pruebas.md`.
+
+## Enmienda (2026-09-14): unitarias en cada push, E2E a mano
+
+Los E2E tardaban más de lo que el dueño quiere esperar por cada push, y cada push
+despliega a pruebas. Se cambia:
+
+- **En CI, en cada push, corren las unitarias** de la librería de precios, de la API (las
+  rutas contra una base simulada) y del cliente web (las pantallas sobre jsdom con
+  IndexedDB simulada). Cubren lo que el dueño pidió en la prueba manual y lo que más
+  cuesta descubrir a mano: redondeo y márgenes, cantidades, cola de cambios write-ahead,
+  memoria del margen, permisos por rol, validaciones de ventas, unir y separar
+  productos, paginado de la auditoría, fotos, desplegables.
+- **Los E2E quedan en un workflow aparte (`e2e.yml`) que se lanza a mano** desde Actions
+  y corre solo una vez por semana. Se corren antes de promover a producción y después
+  de un cambio grande. `tests/e2e.sh` sigue igual para correrlos en la máquina de
+  desarrollo.
+- Regla nueva: **cada pedido del dueño que cambie un comportamiento trae su unitaria**
+  (en la pantalla o en la ruta), además de actualizar el caso E2E si lo toca.

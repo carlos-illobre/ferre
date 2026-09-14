@@ -1,14 +1,16 @@
 # Pruebas
 
-Estrategia en [ADR-004](adr/ADR-004-estrategia-de-pruebas.md): E2E de los caminos
-principales como red de seguridad; unitarias solo donde aceleran; integración solo sobre
-lo estable. Sin compuerta de cobertura ni mutation testing.
+Estrategia en [ADR-004](adr/ADR-004-estrategia-de-pruebas.md) y su enmienda del
+2026-09-14: **las unitarias corren en cada push** y son la red de seguridad del CI; los
+E2E de los caminos principales se lanzan a mano (workflow "E2E" en Actions, o
+`tests/e2e.sh` en la máquina) antes de promover a producción y tras un cambio grande;
+integración solo sobre lo estable. Sin compuerta de cobertura ni mutation testing.
 
 ## Corredores
 
 | Corredor | Qué corre | Necesita |
 |---|---|---|
-| `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API, corre los escenarios Playwright de `tests/e2e/escenarios/`. `--solo <nombre>` repite uno. | Docker, pnpm |
+| `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API, corre los escenarios Playwright de `tests/e2e/escenarios/`. `--solo <nombre>` repite uno. En GitHub: workflow "E2E", a mano o los lunes. | Docker, pnpm |
 | `tests/utest.sh` | Unitarias del workspace TypeScript (vitest) y de `listas-de-proveedores` (pytest) | Nada |
 | `tests/itest.sh` | Scripts de `tests/integration/`. `--rapido` saltea los que necesitan el stack. | Docker (salvo `--rapido`) |
 
@@ -48,10 +50,12 @@ Cada issue de esa lista agrega su escenario antes de cerrarse.
 
 ## Unitarias
 
-Se escriben donde probar a mano sería más lento: el cálculo de precios y su explicación
-(`calculo-de-precios`), los lectores de listas (`listas-de-proveedores`). Hoy: el precio de
-venta con su redondeo para arriba a $1.000 y su explicación, el margen real de un precio tipeado en un renglón libre, la búsqueda (orden
-de palabras, acentos, códigos, velocidad con 50.000 productos), los cuatro lectores contra
-muestras anonimizadas (y contra las listas reales de `privado/` cuando existen), el cálculo
-de costo neto, la API del servicio de listas, y el orden de archivos del corredor de
-migraciones.
+Corren en cada push (`pnpm test` en el job `typescript`, `tests/utest.sh` en la máquina).
+Cada pedido del dueño que cambia un comportamiento trae la suya.
+
+| Dónde | Qué cubre |
+|---|---|
+| `libraries/calculo-de-precios` | Redondeo para arriba a $1.000, precio de venta con margen de botón o tipeado, explicación paso a paso, margen real de un precio a mano, búsqueda (orden de palabras, acentos, códigos, velocidad con 50.000 productos) |
+| `microservices/gestion-del-local` (`src/**/*.test.ts`, base simulada en `src/pruebas/base-falsa.ts`) | Validaciones y permisos de las rutas: margen entero, unidad, foto (subida, servida sin sesión, nombres raros), Excel original de una lista, auditoría paginada, roles (admin no toca dueños), ventas (validación, reenvío sin duplicar, ítems con precio/margen/explicación, stock), unir y separar productos, orden de migraciones |
+| `clientes/gestion-del-local-web` (`src/**/*.test.tsx`, jsdom + IndexedDB simulada) | Cantidades enteras o a granel; cola write-ahead (orden, fusión por producto, reintentos, rechazos); debounce; atajos sin foco; Desplegable, Explicación "?", foto ampliada y sacar foto; Productos (precio, memoria del margen, otro margen en %, carga de a 30, bajar lista, varios proveedores); Vender (precio, cantidades, unidad guardada, a mano por renglón, avisos que se van solos, cobro, Ventas de hoy plegables, No llevó); Compras (cantidades, compras recientes desplegables, registrar); Administración (auditoría paginada, admin sin tocar dueños, sesiones) |
+| `microservices/listas-de-proveedores` (pytest) | Los lectores contra muestras anonimizadas (y contra las listas reales de `privado/` cuando existen), el cálculo de costo neto, la API del servicio |

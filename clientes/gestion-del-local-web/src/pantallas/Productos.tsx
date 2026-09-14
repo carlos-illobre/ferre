@@ -6,7 +6,7 @@ import { useTeclasGlobales } from "../teclas";
 import { FotoProducto } from "../componentes/Foto";
 import { Explicacion } from "../componentes/Explicacion";
 import { fecha, pesos } from "../formato";
-import { descargar } from "../api";
+import { descargar, subirFoto } from "../api";
 
 export type Producto = {
   id: string; descripcion: string; marca: string | null; codigo_barras: string | null; unidad: string;
@@ -44,7 +44,7 @@ export function Productos() {
     return () => obs.disconnect();
   }, [hayMas, resultados.length]);
 
-  const actualizar = useCallback((id: string, cambios: Partial<Pick<Producto, "margen_elegido">>) => {
+  const actualizar = useCallback((id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "foto_url">>) => {
     actualizarProducto(id, cambios).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`));
   }, [actualizarProducto]);
 
@@ -100,7 +100,7 @@ export function Productos() {
   );
 }
 
-function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto: Producto; elegido: boolean; alElegir: () => void; alCambiar: (c: Partial<Pick<Producto, "margen_elegido">>) => void }) {
+function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto: Producto; elegido: boolean; alElegir: () => void; alCambiar: (c: Partial<Pick<Producto, "margen_elegido" | "foto_url">>) => void }) {
   const costo = p.costo_neto === null ? null : Number(p.costo_neto);
   const iva = p.iva === null ? 0.21 : Number(p.iva);
   // Margen a mano: cualquier porcentaje que no sea uno de los botones.
@@ -110,7 +110,7 @@ function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto:
 
   return (
     <tr className={elegido ? "elegido" : ""} onClick={alElegir} data-testid="producto" aria-selected={elegido}>
-      <td className="celda-foto"><FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} /></td>
+      <td className="celda-foto"><FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} alSubir={async (archivo) => alCambiar({ foto_url: await subirFoto(p.id, archivo) })} /></td>
       <td>
         <strong>{p.descripcion}</strong>
         <br /><small>{[p.marca, p.codigo_proveedor, p.codigo_barras].filter(Boolean).join(" · ")}</small>

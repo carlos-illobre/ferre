@@ -1,5 +1,9 @@
 # Casos de prueba de punta a punta
 
+> Desde el 2026-09-14 estos escenarios no corren en cada push: se lanzan a mano desde el
+> workflow "E2E" de GitHub Actions (o con `tests/e2e.sh`) y los lunes solos. En cada push
+> corren las unitarias (ver [TESTING.md](TESTING.md)).
+
 Un caso por escenario de `tests/e2e/escenarios/`. Cada uno arranca sembrando en la base
 lo que necesita (usuario, sesión, productos) y termina verificando en pantalla y en la
 base. Corren de a uno, con `tests/e2e.sh`, contra el compose local y el cliente servido

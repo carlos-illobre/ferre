@@ -34,7 +34,7 @@ En producción la base es Supabase y el cliente está en GitHub Pages.
 ```bash
 tests/utest.sh            # unitarias, sin nada levantado
 tests/itest.sh --rapido   # paridad de configuración
-tests/e2e.sh              # caminos principales, levanta el stack
+tests/e2e.sh              # caminos principales, levanta el stack (a mano; en CI corren las unitarias)
 ```
 
 ## Cómo se organiza el trabajo

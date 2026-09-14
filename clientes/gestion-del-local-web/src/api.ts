@@ -69,3 +69,33 @@ export async function descargar(ruta: string, nombre: string): Promise<void> {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
+
+// Una foto subida se guarda como "/fotos/..." (relativa a la API); una externa, completa.
+export function urlDeFoto(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url.startsWith("/") ? urlApi(url) : url;
+}
+
+// La foto del celular se achica a 800 px de lado antes de subir: pesa 20 veces menos y
+// en pantalla se ve igual. Si el navegador no puede (raro), va la original.
+export async function reducirImagen(archivo: File, lado = 800): Promise<Blob> {
+  try {
+    const imagen = await createImageBitmap(archivo);
+    const escala = Math.min(1, lado / Math.max(imagen.width, imagen.height));
+    if (escala === 1 && archivo.type === "image/jpeg") return archivo;
+    const lienzo = document.createElement("canvas");
+    lienzo.width = Math.round(imagen.width * escala);
+    lienzo.height = Math.round(imagen.height * escala);
+    lienzo.getContext("2d")!.drawImage(imagen, 0, 0, lienzo.width, lienzo.height);
+    return await new Promise<Blob>((r, j) => lienzo.toBlob((b) => (b ? r(b) : j(new Error("No se pudo achicar la foto"))), "image/jpeg", 0.85));
+  } catch {
+    return archivo;
+  }
+}
+
+export async function subirFoto(productoId: string, archivo: File): Promise<string> {
+  const datos = new FormData();
+  datos.append("foto", await reducirImagen(archivo), "foto.jpg");
+  const r = await api<{ foto_url: string }>(`/productos/${productoId}/foto`, { method: "POST", body: datos });
+  return r.foto_url;
+}

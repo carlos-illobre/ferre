@@ -39,3 +39,12 @@ describe("margenReal", () => {
     expect(margenReal({ costoNeto: 0, iva: 0.21, precio: 100 }).valor).toBe(0);
   });
 });
+
+describe("esMargenBoton", () => {
+  it("distingue los cinco botones de un margen tipeado a mano", async () => {
+    const { esMargenBoton } = await import("./precio.js");
+    expect([300, 200, 100, 50, 25].every(esMargenBoton)).toBe(true);
+    expect(esMargenBoton(20)).toBe(false);
+    expect(esMargenBoton(150)).toBe(false);
+  });
+});

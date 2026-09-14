@@ -19,13 +19,18 @@ export async function pendientes(): Promise<Cambio[]> {
   return lista.sort((a, b) => a.orden - b.orden);
 }
 
+// El orden es creciente aunque dos cambios entren en el mismo milisegundo (una prueba
+// unitaria encontró que un azar los podía invertir).
+let ultimoOrden = 0;
+const siguienteOrden = () => (ultimoOrden = Math.max(Date.now() * 1000, ultimoOrden + 1));
+
 // Un cambio de producto reemplaza al anterior del mismo producto que siga en la cola
 // (se funden los cuerpos): así nunca se reenvía un margen viejo después de uno nuevo.
 async function encolar(cambio: Omit<Cambio, "orden" | "creado_en">): Promise<number> {
   const db = await abrirBase();
   const tx = db.transaction("cola", "readwrite");
   const almacen = tx.objectStore("cola");
-  const orden = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+  const orden = siguienteOrden();
   let cuerpo = cambio.cuerpo;
   if (cambio.tipo === "producto.cambio") {
     const todos = await new Promise<Cambio[]>((r, j) => { const q = almacen.getAll(); q.onsuccess = () => r(q.result as Cambio[]); q.onerror = () => j(q.error); });

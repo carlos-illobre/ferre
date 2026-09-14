@@ -3,7 +3,7 @@ import { margenReal, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { FotoProducto } from "../componentes/Foto";
 import { Desplegable } from "../componentes/Desplegable";
 import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../unidades";
-import { api, ErrorApi } from "../api";
+import { api, ErrorApi, subirFoto } from "../api";
 import { guardar, borrarAnterioresA } from "../almacen";
 import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendientesEnCola } from "../cola";
 import { useCatalogo } from "../catalogo";
@@ -283,7 +283,7 @@ export function Vender() {
             const p = precioDe(it);
             return (
               <tr key={it.clave} data-testid="item" className={p.unitario === null ? "sin-precio-fila" : ""}>
-                <td className="celda-foto">{it.producto && <FotoProducto id={it.producto.id} url={it.producto.foto_url ?? null} descripcion={it.descripcion} />}</td>
+                <td className="celda-foto">{it.producto && <FotoProducto id={it.producto.id} url={it.producto.foto_url ?? null} descripcion={it.descripcion} alSubir={async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); }} />}</td>
                 <td>
                   {it.producto ? <strong>{it.descripcion}</strong> : <input className="libre" value={it.descripcion} placeholder="Descripción" onChange={(e) => cambiarItem(it.clave, { descripcion: e.target.value })} />}
                   {it.producto && <><br /><small>{[it.producto.marca, it.producto.proveedor].filter(Boolean).join(" · ")}{stockPorId.has(it.producto.id) ? <> · stock {stockPorId.get(it.producto.id)!.toLocaleString("es-AR")}{stockPorId.get(it.producto.id)! - it.cantidad < 0 && <span className="sube" title="La venta deja el stock negativo: seguramente falta cargar una compra o contar"> (queda negativo)</span>}</> : ""}</small></>}

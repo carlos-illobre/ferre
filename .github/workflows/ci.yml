@@ -1,8 +1,10 @@
 name: CI
 
 # master = ambiente de pruebas; produccion = ambiente de producción (ADR-012).
-# Cada push a una de las dos ramas: pruebas, imágenes, cliente web en Pages y un aviso a
-# la máquina de Oracle, que despliega sola el ambiente que corresponde (ADR-013).
+# Cada push a una de las dos ramas: unitarias y verificaciones rápidas, imágenes, cliente
+# web en Pages y un aviso a la máquina de Oracle, que despliega sola (ADR-013). Los E2E
+# tardan demasiado para cada push: corren a mano desde el workflow "E2E" (ADR-004,
+# enmienda 2026-09-14).
 on:
   push:
     branches: [master, produccion]
@@ -24,6 +26,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: VITE_API_URL=http://localhost pnpm build
+      # Unitarias de la librería de precios, la API (rutas contra una base simulada) y el
+      # cliente web (pantallas sobre jsdom): la red de seguridad de cada push.
       - run: pnpm test
 
   listas-de-proveedores:
@@ -45,81 +49,11 @@ jobs:
           tests/itest.sh --rapido
           docker compose config --quiet
 
-  e2e:
-    needs: [typescript, listas-de-proveedores, configuracion]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: pnpm }
-      - run: cp .env.example .env
-      - run: docker compose up -d --build --wait
-      - run: tests/itest.sh
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter e2e exec playwright install --with-deps chromium
-      - name: Preparar stack y cliente web
-        run: tests/e2e.sh --preparar
-      # Un paso por escenario, para ver el avance en el job. `always()` para que un fallo
-      # no oculte cómo les fue a los demás.
-      - name: "00 · La app abre y el servidor responde"
-        run: PLAYWRIGHT_JSON=/tmp/e2e-00.json tests/e2e.sh --escenario 00-arranque.spec.ts
-      - name: "01 · Entrar"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-01.json tests/e2e.sh --escenario 01-login.spec.ts
-      - name: "02 · Cargar una lista de precios"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-02.json tests/e2e.sh --escenario 02-listas.spec.ts
-      - name: "03 · Buscar productos y elegir margen"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-03.json tests/e2e.sh --escenario 03-productos.spec.ts
-      - name: "04 · Vender"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-04.json tests/e2e.sh --escenario 04-vender.spec.ts
-      - name: "05 · Ingresar mercadería"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-05.json tests/e2e.sh --escenario 05-compras.spec.ts
-      - name: "06 · Stock"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-06.json tests/e2e.sh --escenario 06-stock.spec.ts
-      - name: "07 · Contar un sector"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-07.json tests/e2e.sh --escenario 07-contar.spec.ts
-      - name: "08 · Sin conexión"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-08.json tests/e2e.sh --escenario 08-sin-conexion.spec.ts
-      - name: "10 · Escanear con el celular"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-10.json tests/e2e.sh --escenario 10-escaner.spec.ts
-      - name: "11 · Duplicados entre proveedores"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-11.json tests/e2e.sh --escenario 11-duplicados.spec.ts
-      - name: "12 · Cerrar sesiones"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-12.json tests/e2e.sh --escenario 12-cerrar-sesion.spec.ts
-      - name: "13 · Rol admin"
-        if: always()
-        run: PLAYWRIGHT_JSON=/tmp/e2e-13.json tests/e2e.sh --escenario 13-admin.spec.ts
-      - name: Resumen
-        if: always()
-        run: |
-          {
-            echo "## Escenarios E2E"
-            echo "| Escenario | Resultado | Tiempo |"
-            echo "|---|---|---|"
-            for f in /tmp/e2e-*.json; do
-              [ -f "$f" ] || continue
-              jq -r '[.. | objects | select(has("specs")) | .specs[]] | .[] | (.tests[0].results[-1] // {}) as $r | "| \(.title) | \(if $r.status == "passed" then "✅" elif $r.status == "skipped" then "⏭️" elif $r.status == null then "⏭️ no corrió" else "❌ " + $r.status end) | \((($r.duration // 0) / 1000) | floor)s |"' "$f" 2>/dev/null || true
-            done
-          } >> "$GITHUB_STEP_SUMMARY"
-      - if: failure()
-        run: docker compose logs --no-color | tail -200
-
   imagenes:
     # La máquina de Oracle es Ampere (arm64): se construye en un runner ARM nativo, que
     # es varias veces más rápido que emular arm64 sobre x86 (ADR-007, ADR-012).
     if: github.event_name == 'push'
-    needs: [e2e]
+    needs: [typescript, listas-de-proveedores, configuracion]
     runs-on: ubuntu-24.04-arm
     permissions: { contents: read, packages: write }
     steps:
@@ -157,7 +91,7 @@ jobs:
     # Un solo sitio de Pages con dos carpetas: la raíz es la rama produccion y /pruebas/
     # es master (ADR-012). Cualquier push a una de las dos ramas regenera las dos.
     if: github.event_name == 'push'
-    needs: [e2e]
+    needs: [typescript, listas-de-proveedores, configuracion]
     runs-on: ubuntu-latest
     # Un push a cada rama dispara este job dos veces casi a la vez; Pages acepta una
     # publicación por vez, así que se encolan en vez de pisarse.

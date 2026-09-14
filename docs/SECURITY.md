@@ -24,6 +24,10 @@ Datos de ventas, compras, costos y márgenes del negocio; listas de precios de p
 
 ## Qué queda abierto
 
+- Las fotos de productos (`/fotos/<uuid>.jpg`) se sirven sin sesión: una etiqueta `<img>`
+  no puede mandar el token. El nombre al azar impide adivinarlas y son fotos de
+  mercadería, no datos.
+
 - Quien tenga acceso físico al navegador desbloqueado de la laptop opera como el usuario
   logueado. Mitigación: cerrar sesión al terminar el día o revocarla desde el celular.
 - El plan gratuito de Supabase no tiene garantía de servicio ni respaldos propios: el

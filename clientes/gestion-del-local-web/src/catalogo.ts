@@ -19,7 +19,7 @@ export function useCatalogo() {
   const [desdeDispositivo, setDesdeDispositivo] = useState(false);
   // Cambios hechos acá mientras la bajada estaba en vuelo: se vuelven a aplicar sobre lo
   // que llega y se conservan hasta que esa bajada termina.
-  const pendientes = useRef(new Map<string, Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad"> & { proveedor_preferido_id?: string }>>());
+  const pendientes = useRef(new Map<string, Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad" | "foto_url"> & { proveedor_preferido_id?: string }>>());
 
   useEffect(() => {
     let vigente = true;
@@ -66,7 +66,7 @@ export function useCatalogo() {
   const indice = useMemo(() => (catalogo ? indexar(catalogo.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }))) : null), [catalogo]);
   const buscarProductos = useCallback((consulta: string, maximo = 50) => (indice ? buscar(indice, consulta, maximo) : []), [indice]);
 
-  const actualizarProducto = useCallback(async (id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad"> & { proveedor_preferido_id?: string }>) => {
+  const actualizarProducto = useCallback(async (id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad" | "foto_url"> & { proveedor_preferido_id?: string }>) => {
     pendientes.current.set(id, { ...pendientes.current.get(id), ...cambios });
     setCatalogo((c) => {
       const nuevo = c && c.map((p) => (p.id === id ? { ...p, ...cambios } : p));
@@ -77,6 +77,7 @@ export function useCatalogo() {
     if ("margen_elegido" in cambios) cuerpo.margen_elegido = cambios.margen_elegido ?? null;
     if ("codigo_barras" in cambios) cuerpo.codigo_barras = cambios.codigo_barras ?? null;
     if ("unidad" in cambios) cuerpo.unidad = cambios.unidad ?? "unidad";
+    if ("foto_url" in cambios) cuerpo.foto_url = cambios.foto_url ?? null;
     if ("proveedor_preferido_id" in cambios) cuerpo.proveedor_preferido_id = cambios.proveedor_preferido_id ?? null;
     const r = enviarOEncolar("producto.cambio", "PATCH", `/productos/${id}`, cuerpo);
     // Cambiar el proveedor preferido cambia el costo vigente: se vuelve a bajar el catálogo.
