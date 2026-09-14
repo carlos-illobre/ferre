@@ -8,10 +8,15 @@ export const hayHuella = () => browserSupportsWebAuthn();
 
 export type Credencial = { id: string; dispositivo: string | null; creada_en: string; ultimo_uso_en: string | null };
 
+// Quien muestre la lista de celulares se entera de un alta hecha en otro lado (la oferta
+// al primer login, por ejemplo).
+export const EVENTO_CREDENCIALES = "ferre.credenciales";
 export async function vincularEsteDispositivo(dispositivo: string): Promise<Credencial> {
   const { desafioId, opciones } = await api<{ desafioId: string; opciones: PublicKeyCredentialCreationOptionsJSON }>("/credenciales/registro/opciones", { method: "POST", body: "{}" });
   const respuesta = await startRegistration({ optionsJSON: opciones });
-  return api<Credencial>("/credenciales/registro", { method: "POST", body: JSON.stringify({ desafioId, respuesta, dispositivo }) });
+  const c = await api<Credencial>("/credenciales/registro", { method: "POST", body: JSON.stringify({ desafioId, respuesta, dispositivo }) });
+  window.dispatchEvent(new Event(EVENTO_CREDENCIALES));
+  return c;
 }
 
 export async function entrarConHuella(dispositivo: string): Promise<{ token: string; usuario: Usuario }> {

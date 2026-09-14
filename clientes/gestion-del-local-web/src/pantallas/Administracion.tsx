@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../api";
 import { useSesion } from "../sesion";
-import { hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../credenciales";
+import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../credenciales";
 import { describirDispositivo } from "./Login";
 import { fecha } from "../formato";
 
@@ -90,7 +90,7 @@ function Celulares() {
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const cargar = () => listarCredenciales().then(setFilas).catch(() => undefined);
-  useEffect(() => { void cargar(); }, []);
+  useEffect(() => { void cargar(); window.addEventListener(EVENTO_CREDENCIALES, cargar); return () => window.removeEventListener(EVENTO_CREDENCIALES, cargar); }, []);
   async function vincular() {
     setError(null); setMensaje(null);
     const nombre = window.prompt("¿Cómo llamamos a este celular?", describirDispositivo().slice(0, 40));
