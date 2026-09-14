@@ -54,12 +54,12 @@ test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) =>
   // Corregir: "hay 15", con motivo. Queda un ajuste de −2 explicado.
   await fila.getByRole("button", { name: "Corregir" }).click();
   await page.getByTestId("cantidad-real").fill("15");
-  await page.getByPlaceholder(/Motivo/).fill("conté la góndola");
+  await page.getByPlaceholder(/Motivo/).fill("conté la estantería");
   await page.getByTestId("guardar-ajuste").click();
   await expect(fila.getByTestId("stock")).toContainText("15");
   await expect(fila).toContainText("$37.500,00");
   await expect(movimientos).toContainText("Conteo");
-  await expect(movimientos).toContainText("había 17, hay 15: conté la góndola");
+  await expect(movimientos).toContainText("había 17, hay 15: conté la estantería");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("15.000");
 
   // En la venta se ve el stock del producto.

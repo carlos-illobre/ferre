@@ -133,7 +133,7 @@ compra de 20 y una venta de 3.
 | Abrir "Stock" | Se ve "Valor del inventario" |
 | Buscar `e2e candado stock` | Stock 17 y valor $42.500,00 |
 | Tocar el número del stock | Se listan los movimientos: Compra +20, Venta −3, y "Stock 17 = suma de estos movimientos" |
-| "Corregir", 15, motivo "conté la góndola", "Guardar" | Stock 15, valor $37.500,00; aparece un movimiento "Conteo" con "había 17, hay 15: conté la góndola" |
+| "Corregir", 15, motivo "conté la estantería", "Guardar" | Stock 15, valor $37.500,00; aparece un movimiento "Conteo" con "había 17, hay 15: conté la estantería" |
 | Ir a "Vender" y buscar el candado | La sugerencia dice "stock 15" |
 
 ---
@@ -146,11 +146,11 @@ stock 5.
 
 | Paso | Resultado esperado |
 |---|---|
-| Abrir "Contar", escribir `Góndola E2E`, "Agregar sector" | Se abre el conteo del sector |
+| Abrir "Contar", escribir `Estantería E2E`, "Agregar sector" | Se abre el conteo del sector |
 | Buscar `e2e lija contar`, Enter, cantidad 8, "Siguiente" | La tabla de contados muestra la lija con diferencia −2 |
 | Buscar `e2e pincel contar`, Enter, cantidad 5, Enter | El pincel aparece con "=" |
-| "Cerrar Góndola E2E", confirmar | "2 productos contados, 1 con diferencia ajustada" |
-| Verificación en la base | Stock de la lija 8 y del pincel 5; el ajuste tiene la nota "conteo de Góndola E2E del …: había 10, hay 8"; los dos productos quedaron en el sector |
+| "Cerrar Estantería E2E", confirmar | "2 productos contados, 1 con diferencia ajustada" |
+| Verificación en la base | Stock de la lija 8 y del pincel 5; el ajuste tiene la nota "conteo de Estantería E2E del …: había 10, hay 8"; los dos productos quedaron en el sector |
 | "Contar otro sector" | El sector dice "contado hace 0 días" |
 
 ---

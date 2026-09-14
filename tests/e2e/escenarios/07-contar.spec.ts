@@ -9,7 +9,7 @@ test.use({ viewport: { width: 390, height: 844 } });
 
 const TOKEN = "token-e2e-contar";
 const EMAIL = "e2e-contar@ferre.test";
-const SECTOR = "Góndola E2E";
+const SECTOR = "Estantería E2E";
 const ID_PROV = "00000000-0000-0000-0000-00000000e2ec";
 const ID_A = "00000000-0000-0000-0000-00000000e2ed";
 const ID_B = "00000000-0000-0000-0000-00000000e2ee";
@@ -29,6 +29,7 @@ test.beforeAll(() => {
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   // Sector y productos limpios.
   psql(`DELETE FROM renglon_conteo WHERE conteo_id IN (SELECT id FROM conteo WHERE sector_id IN (SELECT id FROM sector WHERE nombre = '${SECTOR}'))`);
+  psql(`DELETE FROM renglon_conteo WHERE producto_id IN ('${ID_A}', '${ID_B}')`); // también de conteos de otros sectores
   psql(`DELETE FROM movimiento_stock WHERE producto_id IN ('${ID_A}', '${ID_B}')`);
   psql(`DELETE FROM conteo WHERE sector_id IN (SELECT id FROM sector WHERE nombre = '${SECTOR}')`);
   psql(`UPDATE producto SET sector_id = NULL WHERE sector_id IN (SELECT id FROM sector WHERE nombre = '${SECTOR}')`);

@@ -61,7 +61,7 @@ export function Contar() {
         })}
       </ul>
       <form onSubmit={crearSector} className="en-linea">
-        <input name="nombre" placeholder="Sector nuevo (Góndola 1, Pared herramientas…)" required style={{ flex: 1, minWidth: "14rem" }} />
+        <input name="nombre" placeholder="Sector nuevo (Estantería 1, Pared herramientas…)" required style={{ flex: 1, minWidth: "14rem" }} />
         <button type="submit" className="secundario">Agregar sector</button>
       </form>
     </section>
@@ -143,7 +143,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     <section className="contar">
       <div className="en-linea" style={{ justifyContent: "space-between" }}>
         <h1 style={{ margin: 0 }}>{conteo.sector}</h1>
-        <button className="enlace" onClick={alSalir}>Salir (queda abierto)</button>
+        <button className="secundario" onClick={alSalir} title="El sector queda abierto para seguir después">← Volver</button>
       </div>
       {error && <p className="error" role="alert">{error}</p>}
 
@@ -180,7 +180,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
       )}
 
       <h2>Contados ({conteo.renglones.length})</h2>
-      {conteo.renglones.length === 0 ? <p className="ayuda">Todavía nada. Buscá el primer producto de la góndola.</p> : (
+      {conteo.renglones.length === 0 ? <p className="ayuda">Todavía nada. Buscá el primer producto de la estantería.</p> : (
         <table data-testid="contados">
           <thead><tr><th>Producto</th><th>Contado</th><th>Teórico</th><th>Dif.</th></tr></thead>
           <tbody>
