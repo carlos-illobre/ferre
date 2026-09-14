@@ -245,7 +245,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
     <main className="contenido vender-ancho">
       <div className="encabezado">
         <div className="fila-titulo">
-          <span className="solo-celular"><EstadoDeConexion /></span>
+          <span className="solo-celular"><EstadoDeConexion testId="conexion-celular" /></span>
           <span className="solo-escritorio"><small>{pendientes > 0 ? `${pendientes} cambio(s) guardados sin enviar · ` : ""}Enter agrega · Esc descarta · F5 a F8 medio de pago · F2 cobrar</small></span>
           {esDueno && hoy && <button type="button" className="chip" onClick={() => setHoja("hoy")} data-testid="hoy"><span className="suave">Hoy</span>{pesosCortos(hoy.total)}</button>}
         </div>

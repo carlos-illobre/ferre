@@ -37,7 +37,7 @@ export function Negocio() {
           <div className="avatar">{usuario.nombre.charAt(0).toUpperCase()}</div>
           <div className="textos">
             <strong data-testid="usuario-negocio">{usuario.nombre}</strong>
-            <small>{usuario.rol} · <EstadoDeConexion /></small>
+            <small>{usuario.rol} · <EstadoDeConexion testId="conexion-negocio" /></small>
           </div>
           <button type="button" className="boton chico solo-celular" style={{ height: 34, fontSize: 13, borderRadius: 10 }} onClick={salir}>Salir</button>
         </div>

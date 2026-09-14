@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
 // agregan con sus issues; la lista vive en docs/TESTING.md.
 test("la app abre y el servidor responde", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "ferre" })).toBeVisible();
+  await expect(page.getByTestId("entrar")).toBeVisible();
   // Sin sesión no hay estado del servidor a la vista: alcanza con que la API responda.
   const salud = await page.request.get("http://localhost/health");
   expect(salud.ok()).toBeTruthy();

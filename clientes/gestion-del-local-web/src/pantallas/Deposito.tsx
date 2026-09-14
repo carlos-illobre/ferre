@@ -278,7 +278,7 @@ function Ingreso() {
               <Contador valor={r.cantidad} entera={enteras(unidad)} alCambiar={(v) => cambiar(r.clave, { cantidad: enteras(unidad) ? Math.floor(v) : cantidadValida(String(v), unidad) })}>{!enteras(unidad) && <span className="unidad" style={{ padding: "0 10px 0 4px", fontSize: 14, color: "var(--gris)" }}>{unidad}</span>}</Contador>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
                 <label className={`campo importe-campo ${r.costo === null ? "falta" : ""}`}><span>costo $</span><input inputMode="decimal" placeholder="0" value={r.costoTexto} onChange={(e) => { const t = e.target.value.replace(/[^\d,.]/g, ""); const v = Number(t.replace(",", ".")); cambiar(r.clave, { costoTexto: t, costo: t === "" || !Number.isFinite(v) ? null : v }); }} data-testid="costo" /></label>
-                <small style={{ fontWeight: 600, color: dif !== null && dif > 0.05 ? "var(--coral-texto)" : undefined }}>{r.costoLista === null ? "sin lista previa" : dif === null ? `según lista ${pesos(r.costoLista)}` : Math.abs(dif) < 0.05 ? "igual que la lista" : `${porcentaje(dif)} vs. lista ${pesos(r.costoLista)}`}</small>
+                <small style={{ fontWeight: 600, color: dif !== null && dif > 0.05 ? "var(--coral-texto)" : undefined }}>{r.costoLista === null ? "sin lista previa" : dif === null ? `según lista ${pesos(r.costoLista)}` : Math.abs(dif) < 0.05 ? `igual que la lista (${pesos(r.costoLista)})` : `${porcentaje(dif)} vs. lista ${pesos(r.costoLista)}`}</small>
               </div>
             </div>
           </div>

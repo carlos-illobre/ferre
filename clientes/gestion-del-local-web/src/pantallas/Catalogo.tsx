@@ -107,7 +107,7 @@ function FilaProducto({ producto: p, elegida, alAbrir }: { producto: Producto; e
       <span className="nombre">{p.descripcion}</span>
       <span className="derecha">
         <strong className="importe">{precio === null ? "—" : pesosCortos(precio)}</strong>
-        <small style={{ color: p.margen_elegido === null ? "var(--coral-texto)" : undefined, fontWeight: 600 }}>{costo === null ? "sin costo" : p.margen_elegido === null ? "sin margen" : `${p.margen_elegido} %${esMargenBoton(p.margen_elegido) ? "" : " a mano"}`}</small>
+        <small style={{ color: p.margen_elegido === null ? "var(--coral-texto)" : undefined, fontWeight: 600 }}>{p.margen_elegido === null ? (costo === null ? "sin costo" : "sin margen") : `${p.margen_elegido} %${esMargenBoton(p.margen_elegido) ? "" : " a mano"}${costo === null ? " · sin costo" : ""}`}</small>
       </span>
       <span className="detalle">{detalleDe(p)}{costo !== null ? ` · costo ${pesos(costo)}` : ""}</span>
     </button>
