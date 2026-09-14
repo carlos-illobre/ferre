@@ -91,11 +91,12 @@ function FilaStock({ producto: p, cantidad, fila, abierto, alAbrir, alAjustar }:
       {(abierto || ajustando) && (
         <tr className="detalle-stock">
           <td colSpan={7}>
+           <div className="detalle-animado"><div>
             {ajustando && (
               <form className="en-linea" onSubmit={(e) => { e.preventDefault(); const d = new FormData(e.currentTarget); ajustar(Number(d.get("real")), String(d.get("motivo") ?? "")); }}>
                 <label>Hay <input name="real" type="number" min="0" step="1" defaultValue={cantidad} autoFocus data-testid="cantidad-real" style={{ width: "6rem" }} /></label>
                 <input name="motivo" placeholder="Motivo (opcional): conté la góndola, rotura…" style={{ minWidth: "18rem" }} />
-                <button type="submit" data-testid="guardar-ajuste">Guardar</button>
+                <button type="submit" className="boton primario" data-testid="guardar-ajuste">Guardar</button>
                 <button type="button" className="secundario" onClick={() => setAjustando(false)}>Cancelar</button>
                 {error && <span className="error">{error}</span>}
               </form>
@@ -114,6 +115,7 @@ function FilaStock({ producto: p, cantidad, fila, abierto, alAbrir, alAjustar }:
                 )}
               </>
             )}
+           </div></div>
           </td>
         </tr>
       )}

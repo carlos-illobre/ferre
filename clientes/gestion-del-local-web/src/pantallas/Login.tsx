@@ -97,14 +97,14 @@ function LoginPorQr() {
   return (
     <section>
       <h2>O entrá con el celular</h2>
-      {estado === "inactivo" && <button onClick={generar}>Mostrar código para leer con el celular</button>}
+      {estado === "inactivo" && <button className="boton primario" onClick={generar}>Mostrar código para leer con el celular</button>}
       {estado === "esperando" && qr && (
         <>
           <img src={qr} alt="Código para vincular" width={220} height={220} />
           <p>Abrí la cámara del celular, apuntá al código y tocá el enlace. Tiene que ser un celular donde ya entraste a ferre.</p>
         </>
       )}
-      {estado === "vencido" && <button onClick={generar}>El código venció. Generar otro</button>}
+      {estado === "vencido" && <button className="boton primario" onClick={generar}>El código venció. Generar otro</button>}
     </section>
   );
 }

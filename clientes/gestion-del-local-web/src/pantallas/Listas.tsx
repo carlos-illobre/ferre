@@ -129,7 +129,7 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
             <option value="" disabled>Elegir proveedor</option>
             {proveedores.filter((p) => p.activo).map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
-          <button onClick={() => proveedorElegido.current?.value && enviar(archivo, { proveedor_id: proveedorElegido.current.value })}>Leer</button>
+          <button className="boton primario" onClick={() => proveedorElegido.current?.value && enviar(archivo, { proveedor_id: proveedorElegido.current.value })}>Leer</button>
           <button className="secundario" onClick={() => { setArchivo(null); setEstado("esperando"); }}>Cancelar</button>
         </div>
       )}
@@ -137,7 +137,7 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
         <div className="en-linea">
           <span>La planilla no dice su fecha. ¿De qué fecha es la lista?</span>
           <input ref={fechaElegida} type="date" defaultValue={new Date().toISOString().slice(0, 10)} />
-          <button onClick={() => fechaElegida.current?.value && enviar(archivo, { fecha_lista: fechaElegida.current.value, ...(proveedorElegido.current?.value ? { proveedor_id: proveedorElegido.current.value } : {}) })}>Leer</button>
+          <button className="boton primario" onClick={() => fechaElegida.current?.value && enviar(archivo, { fecha_lista: fechaElegida.current.value, ...(proveedorElegido.current?.value ? { proveedor_id: proveedorElegido.current.value } : {}) })}>Leer</button>
           <button className="secundario" onClick={() => { setArchivo(null); setEstado("esperando"); }}>Cancelar</button>
         </div>
       )}
@@ -322,7 +322,7 @@ function AltaDeProveedor({ proveedores, alCambiar }: { proveedores: Proveedor[];
         <label><input type="checkbox" name="iva" /> precios con IVA</label>
         <label>dto. general <input name="general" type="number" min="0" max="100" step="0.5" defaultValue="0" style={{ width: "4.5rem" }} /> %</label>
         <label>dto. contado <input name="contado" type="number" min="0" max="100" step="0.5" defaultValue="0" style={{ width: "4.5rem" }} /> %</label>
-        <button type="submit">Agregar</button>
+        <button type="submit" className="boton primario">Agregar</button>
       </form>
       {error && <p className="error" role="alert">{error}</p>}
     </Desplegable>

@@ -37,7 +37,7 @@ export function Vincular({ codigo }: { codigo: string }) {
       {resultado ? <p role="status">{resultado}</p> : (
         <>
           <p>Vas a dejar entrar a la computadora como <strong>{nombre}</strong>.</p>
-          <button onClick={aprobar}>Sí, dejar entrar</button>
+          <button className="boton primario" onClick={aprobar}>Sí, dejar entrar</button>
         </>
       )}
     </main>

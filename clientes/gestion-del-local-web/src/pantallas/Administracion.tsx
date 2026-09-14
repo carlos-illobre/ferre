@@ -72,7 +72,7 @@ function Usuarios() {
         <input name="nombre" placeholder="Nombre" required />
         <input name="email" type="email" placeholder="correo@gmail.com" required />
         <select name="rol" defaultValue="mostrador"><option value="mostrador">mostrador</option><option value="admin">admin</option>{!esAdmin && <option value="dueño">dueño</option>}</select>
-        <button type="submit">Autorizar</button>
+        <button type="submit" className="boton primario">Autorizar</button>
       </form>
       {error && <p className="error" role="alert">{error}</p>}
     </article>
