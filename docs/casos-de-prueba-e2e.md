@@ -259,4 +259,5 @@ suite: los escenarios corren en escritorio). Qué mirar:
 | Vender con dos productos | Cada renglón es una tarjeta; la barra de cobro queda pegada arriba del menú |
 | Productos | Cada producto es una tarjeta; la elegida se pinta de azul |
 | Abrir la app de pruebas (`/ferre/pruebas/`) y la de producción (`/ferre/`) | En pruebas la barra titila de azul a rojo y dice "Ambiente de prueba"; en producción es azul fija, sin leyenda |
+| Stock, Ventas de hoy, Compras recientes, Listas, Duplicados, Administración | Ninguna pantalla se desplaza para el costado: cada fila de tabla es una tarjeta con el nombre de cada columna delante del valor |
 | Chrome en Android: menú del navegador | Ofrece "Instalar app" (manifest con ícono, nombre y modo standalone) |

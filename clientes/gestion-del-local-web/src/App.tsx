@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { esAmbienteDePrueba } from "./ambiente";
+import { observarTablas } from "./tablas";
 import { urlApi } from "./api";
 import { ProveedorDeSesion, administra, useSesion } from "./sesion";
 import { irA, useRuta } from "./rutas";
@@ -18,6 +19,7 @@ import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import "./estilos.css";
 
 export function App() {
+  useEffect(() => observarTablas(), []);
   return (
     <ProveedorDeSesion>
       <Pantallas />

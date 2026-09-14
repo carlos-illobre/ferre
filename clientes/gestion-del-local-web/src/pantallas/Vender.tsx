@@ -393,9 +393,9 @@ function VentasDeHoy({ clave }: { clave: string | null }) {
               {varios && !plegada && v.items.map((i, n) => (
                 <tr key={n} className="renglon">
                   <td />
-                  <td>{Number(i.cantidad)} × {i.descripcion}</td>
-                  <td><small>{pesos(Number(i.precio_unitario))} c/u</small></td>
-                  <td>{pesos(Number(i.cantidad) * Number(i.precio_unitario))}</td>
+                  <td data-etiqueta="">{Number(i.cantidad)} × {i.descripcion}</td>
+                  <td data-etiqueta="Precio"><small>{pesos(Number(i.precio_unitario))} c/u</small></td>
+                  <td data-etiqueta="Subtotal">{pesos(Number(i.cantidad) * Number(i.precio_unitario))}</td>
                   <td />
                 </tr>
               ))}

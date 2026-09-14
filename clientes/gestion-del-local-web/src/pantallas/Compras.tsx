@@ -218,9 +218,9 @@ function ComprasRecientes({ version, alCambiar }: { version: number; alCambiar: 
               </tr>
               {abierta && c.items.map((i, n) => (
                 <tr key={n} className="renglon">
-                  <td /><td colSpan={2}>{Number(i.cantidad)} × {i.descripcion}</td>
-                  <td><small>{pesos(Number(i.costo_unitario))} c/u</small></td>
-                  <td>{pesos(Number(i.cantidad) * Number(i.costo_unitario))}</td><td />
+                  <td /><td colSpan={2} data-etiqueta="">{Number(i.cantidad)} × {i.descripcion}</td>
+                  <td data-etiqueta="Costo"><small>{pesos(Number(i.costo_unitario))} c/u</small></td>
+                  <td data-etiqueta="Subtotal">{pesos(Number(i.cantidad) * Number(i.costo_unitario))}</td><td />
                 </tr>
               ))}
             </tbody>

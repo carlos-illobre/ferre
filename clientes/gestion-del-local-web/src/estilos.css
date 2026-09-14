@@ -266,6 +266,33 @@ table.movimientos td { padding: 0.15rem 0.6rem; border: none; font-size: 0.9rem;
   table.venta td.celda-cantidad::before { content: "Cantidad"; color: var(--texto-suave); font-size: 0.9rem; }
   table.venta td.precio:last-of-type::before { content: "Subtotal "; color: var(--texto-suave); font-size: 0.9rem; }
   .celda-foto { width: 44px; }
+
+  /* Las demás tablas: cada fila es una tarjeta y cada celda lleva el nombre de su columna
+     (data-etiqueta, que pone tablas.ts). Nada se va para el costado. */
+  table:not(.resultados):not(.venta) { display: block; background: transparent; box-shadow: none; overflow: visible; }
+  table:not(.resultados):not(.venta) thead { display: none; }
+  table:not(.resultados):not(.venta) tbody { display: block; }
+  table:not(.resultados):not(.venta) tr { display: block; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 0.5rem 0.7rem; margin-bottom: 0.5rem; box-shadow: var(--sombra); }
+  table:not(.resultados):not(.venta) td { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; border: none; padding: 0.2rem 0; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+  table:not(.resultados):not(.venta) td::before { content: attr(data-etiqueta); color: var(--texto-suave); font-size: 0.85rem; font-weight: 600; text-align: left; flex-shrink: 0; }
+  table:not(.resultados):not(.venta) td[data-etiqueta=""]::before { content: none; }
+  table:not(.resultados):not(.venta) td[data-etiqueta=""] { justify-content: flex-start; text-align: left; }
+  table:not(.resultados):not(.venta) td:empty { display: none; }
+  table:not(.resultados):not(.venta) tr.renglon { margin: 0 0 0 1rem; padding: 0.3rem 0.7rem; background: #f7f9fc; }
+  tbody.venta-dia + tbody tr:first-child td { border-top: none; }
+  .tabla-scroll { overflow-x: visible; }
+  .paginado { flex-wrap: wrap; }
+
+  /* Barra de arriba: nada se sale; el indicador de conexión queda como un punto */
+  .barra { overflow: hidden; }
+  .barra > * { min-width: 0; }
+  .barra .pantalla-actual { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .barra .ambiente { font-size: 0.72rem; padding: 0.15rem 0.45rem; white-space: nowrap; }
+  .barra .conexion { width: 14px; height: 14px; padding: 0; border-radius: 50%; font-size: 0; flex-shrink: 0; background: #4cd37a; }
+  .barra .conexion::before { content: none; }
+  .barra .conexion.pendiente { background: #9ec5ff; }
+  .barra .conexion.atrasado { background: var(--amarillo); }
+  .barra .conexion.sin-conexion { background: var(--rojo); }
 }
 
 /* Contar (celular, una mano) */
