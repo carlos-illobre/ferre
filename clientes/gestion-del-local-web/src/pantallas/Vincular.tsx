@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api";
 import { useSesion } from "../sesion";
+import { BotonGoogle } from "./Login";
 
 // Se abre en el celular al leer el QR de la laptop. Si acá ya hay sesión, aprueba y la
 // laptop entra sola. Si no, primero hay que entrar con Google en este celular.

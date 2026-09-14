@@ -7,16 +7,18 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 // Dos formas de entrar, sin contraseñas (ADR-011): con la cuenta de Google, o leyendo
 // con el celular (ya autenticado) el QR que muestra esta pantalla.
-export function Login() {
+// El botón oficial de Google. Al entrar, el servidor acepta solo los correos que el
+// dueño autorizó en Administración; si no, devuelve "no está autorizado".
+export function BotonGoogle() {
   const { entrar } = useSesion();
   const [error, setError] = useState<string | null>(null);
-  const botonGoogle = useRef<HTMLDivElement>(null);
+  const boton = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !botonGoogle.current) return;
+    if (!GOOGLE_CLIENT_ID || !boton.current) return;
     const intervalo = setInterval(() => {
       const google = window.google;
-      if (!google || !botonGoogle.current) return;
+      if (!google || !boton.current) return;
       clearInterval(intervalo);
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
@@ -33,17 +35,27 @@ export function Login() {
           }
         },
       });
-      google.accounts.id.renderButton(botonGoogle.current, { theme: "outline", size: "large", text: "signin_with", locale: "es" });
+      google.accounts.id.renderButton(boton.current, { theme: "outline", size: "large", text: "signin_with", locale: "es" });
     }, 200);
     return () => clearInterval(intervalo);
   }, [entrar]);
 
   return (
+    <>
+      {GOOGLE_CLIENT_ID ? <div ref={boton} /> : <p className="aviso">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</p>}
+      {error && <p className="error" role="alert" data-testid="error-google">{error}</p>}
+    </>
+  );
+}
+
+// Dos formas de entrar, sin contraseñas (ADR-011): con la cuenta de Google, o leyendo
+// con el celular (ya autenticado) el QR que muestra esta pantalla.
+export function Login() {
+  return (
     <main className="pantalla-centrada">
       <h1>ferre</h1>
       <p>Entrá con tu cuenta de Google.</p>
-      {GOOGLE_CLIENT_ID ? <div ref={botonGoogle} /> : <p className="aviso">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</p>}
-      {error && <p className="error" role="alert">{error}</p>}
+      <BotonGoogle />
       <hr />
       <LoginPorQr />
     </main>
