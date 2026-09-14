@@ -6,7 +6,11 @@ export default defineConfig({
   testDir: "./escenarios",
   // Los escenarios comparten la base del compose: de a uno, para que no se pisen.
   workers: 1,
-  reporter: [["list"]],
+  // En CI, además de la lista: anotaciones de GitHub en las fallas y un JSON por escenario
+  // con el que el workflow arma el resumen del job.
+  reporter: process.env.CI
+    ? [["list"], ["github"], ["json", { outputFile: process.env.PLAYWRIGHT_JSON ?? "resultados.json" }]]
+    : [["list"]],
   use: { baseURL: process.env.BASE_URL ?? "http://localhost:4173", trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { browserName: "chromium" } }],
 });

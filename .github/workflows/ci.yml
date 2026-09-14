@@ -58,7 +58,54 @@ jobs:
       - run: tests/itest.sh
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter e2e exec playwright install --with-deps chromium
-      - run: tests/e2e.sh
+      - name: Preparar stack y cliente web
+        run: tests/e2e.sh --preparar
+      # Un paso por escenario, para ver el avance en el job. `always()` para que un fallo
+      # no oculte cómo les fue a los demás.
+      - name: "00 · La app abre y el servidor responde"
+        run: PLAYWRIGHT_JSON=/tmp/e2e-00.json tests/e2e.sh --escenario 00-arranque.spec.ts
+      - name: "01 · Entrar"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-01.json tests/e2e.sh --escenario 01-login.spec.ts
+      - name: "02 · Cargar una lista de precios"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-02.json tests/e2e.sh --escenario 02-listas.spec.ts
+      - name: "03 · Buscar productos y elegir margen"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-03.json tests/e2e.sh --escenario 03-productos.spec.ts
+      - name: "04 · Vender"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-04.json tests/e2e.sh --escenario 04-vender.spec.ts
+      - name: "05 · Ingresar mercadería"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-05.json tests/e2e.sh --escenario 05-compras.spec.ts
+      - name: "06 · Stock"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-06.json tests/e2e.sh --escenario 06-stock.spec.ts
+      - name: "07 · Contar un sector"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-07.json tests/e2e.sh --escenario 07-contar.spec.ts
+      - name: "08 · Sin conexión"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-08.json tests/e2e.sh --escenario 08-sin-conexion.spec.ts
+      - name: "10 · Escanear con el celular"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-10.json tests/e2e.sh --escenario 10-escaner.spec.ts
+      - name: "11 · Duplicados entre proveedores"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-11.json tests/e2e.sh --escenario 11-duplicados.spec.ts
+      - name: Resumen
+        if: always()
+        run: |
+          {
+            echo "## Escenarios E2E"
+            echo "| Escenario | Resultado | Tiempo |"
+            echo "|---|---|---|"
+            for f in /tmp/e2e-*.json; do
+              [ -f "$f" ] || continue
+              jq -r '[.. | objects | select(has("specs")) | .specs[]] | .[] | (.tests[0].results[-1] // {}) as $r | "| \(.title) | \(if $r.status == "passed" then "✅" elif $r.status == "skipped" then "⏭️" elif $r.status == null then "⏭️ no corrió" else "❌ " + $r.status end) | \((($r.duration // 0) / 1000) | floor)s |"' "$f" 2>/dev/null || true
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
       - if: failure()
         run: docker compose logs --no-color | tail -200
 
