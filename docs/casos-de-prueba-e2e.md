@@ -36,6 +36,7 @@ en cada corrida.
 |---|---|---|
 | Sin sesión se pide entrar | Abrir la app sin token guardado | Se ve "Entrá con tu cuenta de Google" y el botón "Mostrar código para leer con el celular" |
 | Con sesión el dueño entra | Abrir la app con el token en el dispositivo; tocar "Administración" | Arriba dice "Dueño E2E · dueño"; se ve "Usuarios autorizados" con el correo del dueño en la tabla |
+| Vincular el celular con la huella y volver a entrar con ella (autenticador virtual de Chromium) | En Administración, "Vincular este celular con mi huella", nombre "Celular E2E"; Salir; "Entrar con la huella"; volver a Administración, "Quitar"; Salir; "Entrar con la huella" | Aparece "Celular E2E" en "Mis celulares con huella" y en la base hay una credencial; entra sin Google y la sesión queda auditada con medio "huella"; tras quitarlo, la huella dice "no está vinculado" |
 
 ---
 

@@ -83,6 +83,25 @@ ADR-002, ADR-003, ADR-010. Issue #41. `docs/google-cloud.md`.
 
 ---
 
+## Enmienda (2026-09-14): entrar con la huella del celular (passkeys)
+
+El QR sirve para meter la laptop desde un celular ya entrado, pero el celular mismo
+solo podía entrar con Google. El dueño pidió que el celular entre con la huella, sin
+Gmail. Se usan **passkeys (WebAuthn)** con `@simplewebauthn`:
+
+- **Vincular:** en Administración, ya entrado, "Vincular este celular con mi huella". El
+  teléfono crea un par de claves (clave descubrible, verificación del usuario
+  obligatoria); la API guarda solo la pública en `credencial`, con el nombre del
+  dispositivo. Se listan y se quitan desde ahí; el dueño o el admin pueden quitar el de
+  cualquiera (celular perdido).
+- **Entrar:** "Entrar con la huella" en el login. La API emite un desafío de un solo
+  uso (5 minutos, en memoria del proceso), el teléfono lo firma con la huella, la API
+  verifica firma, origen y contador, y abre la sesión de 90 días de siempre. Queda
+  auditado con medio `huella`.
+- **Atado al dominio del cliente web** (`ORIGEN_WEB`): cambiar de dominio obliga a
+  volver a vincular los celulares. Exige HTTPS (o `localhost`).
+- Google sigue siendo la puerta de entrada del primer login y de la laptop sin huella.
+
 ## Enmienda (2026-09-14): rol admin
 
 Se agrega el rol `admin`, con los permisos del dueño (usuarios, sesiones, auditoría,

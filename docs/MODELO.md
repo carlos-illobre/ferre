@@ -37,6 +37,7 @@ erDiagram
 |---|---|---|
 | `proveedor` | Quién vende | Si sus precios incluyen IVA, sus descuentos general y por contado (#11), y qué `lector` entiende su planilla |
 | `lista_importada` | Cada archivo cargado | Estado pendiente/aplicada/descartada, resumen de cambios, avisos, quién la cargó y quién la aplicó; el archivo se guarda en un volumen para reprocesar (#12) |
+| `credencial` | Celulares vinculados por huella (passkeys) | Clave pública por usuario y dispositivo, contador, `revocada_en` (ADR-011, enmienda) |
 | `producto` | Lo que se vende | `margen_elegido`: uno de los botones (300/200/100/50/25), cualquier porcentaje entero tipeado a mano, o ninguno (#13). El precio de venta siempre sale del costo y se redondea para arriba a múltiplos de $1.000. `unidad`: `unidad` (se vende por enteros) o `kg`/`m`/`l` (a granel, con un decimal). Puede tener foto (`foto_url`: sacada con el celular y guardada en el volumen de datos como `/fotos/<uuid>.jpg`, o una dirección externa). Puede tener precios de varios proveedores; `proveedor_preferido_id` decide el costo vigente (por defecto el más barato con lista reciente). Un producto absorbido queda inactivo con `reemplazado_por` (#29) |
 | `equivalencia_sugerida` | Posibles duplicados entre proveedores | Por código de barras o descripción normalizada; el dueño une o rechaza (#29) |
 | `precio_proveedor` | Histórico de costos | Precio de lista, descuentos aplicados en orden (JSON), costo neto, IVA, bulto, fecha de la lista |

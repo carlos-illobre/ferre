@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { api } from "../api";
 import { useSesion, type Usuario } from "../sesion";
+import { entrarConHuella, hayHuella } from "../credenciales";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -54,11 +55,34 @@ export function Login() {
   return (
     <main className="pantalla-centrada">
       <h1>ferre</h1>
+      <BotonHuella />
       <p>Entrá con tu cuenta de Google.</p>
       <BotonGoogle />
       <hr />
       <LoginPorQr />
     </main>
+  );
+}
+
+// Entrar con la huella: solo en dispositivos que la tienen; el celular tiene que estar
+// vinculado antes desde Administración (entrando con Google una vez).
+export function BotonHuella() {
+  const { entrar } = useSesion();
+  const [error, setError] = useState<string | null>(null);
+  const [ocupado, setOcupado] = useState(false);
+  if (!hayHuella()) return null;
+  async function conHuella() {
+    setOcupado(true); setError(null);
+    try { const r = await entrarConHuella(describirDispositivo()); entrar(r.token, r.usuario); }
+    catch (e) { setError((e as Error).name === "NotAllowedError" ? "No se leyó la huella. Probá de nuevo." : (e as Error).message); }
+    finally { setOcupado(false); }
+  }
+  return (
+    <section className="entrar-huella">
+      <button className="grande" onClick={conHuella} disabled={ocupado} data-testid="entrar-huella">👆 Entrar con la huella</button>
+      <p className="ayuda">Si este celular ya está vinculado a tu cuenta.</p>
+      {error && <p className="error" role="alert" data-testid="error-huella">{error}</p>}
+    </section>
   );
 }
 

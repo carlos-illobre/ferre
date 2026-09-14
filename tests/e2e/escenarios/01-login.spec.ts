@@ -35,3 +35,38 @@ test("con sesión el dueño entra y ve la administración", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Usuarios autorizados" })).toBeVisible();
   await expect(page.getByRole("cell", { name: EMAIL })).toBeVisible();
 });
+
+// Passkeys con un autenticador virtual de Chromium (huella simulada): vincular el
+// dispositivo desde Administración, salir, y volver a entrar con la huella sin Google.
+test("vincular el celular con la huella y volver a entrar con ella", async ({ page }) => {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("WebAuthn.enable");
+  await cdp.send("WebAuthn.addVirtualAuthenticator", {
+    options: { protocol: "ctap2", transport: "internal", hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true },
+  });
+  psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.goto("/#/administracion");
+  page.once("dialog", (d) => d.accept("Celular E2E"));
+  await page.getByTestId("vincular-celular").click();
+  await expect(page.getByTestId("mensaje-celular")).toContainText('"Celular E2E" entra con la huella');
+  await expect(page.getByTestId("celular")).toContainText("Celular E2E");
+  expect(psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
+
+  // Salir y entrar con la huella: sin Google.
+  await page.getByRole("button", { name: "Salir" }).click();
+  await expect(page.getByTestId("entrar-huella")).toBeVisible();
+  await page.getByTestId("entrar-huella").click();
+  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
+  expect(psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
+
+  // Quitar el celular: ya no entra con la huella.
+  await page.goto("/#/administracion");
+  page.once("dialog", (d) => d.accept());
+  await page.getByTestId("celular").getByRole("button", { name: "Quitar" }).click();
+  await expect(page.getByTestId("celular")).toHaveCount(0);
+  await page.getByRole("button", { name: "Salir" }).click();
+  await page.getByTestId("entrar-huella").click();
+  await expect(page.getByTestId("error-huella")).toContainText("no está vinculado");
+});

@@ -24,6 +24,10 @@ Datos de ventas, compras, costos y márgenes del negocio; listas de precios de p
 
 ## Qué queda abierto
 
+- Passkeys: la clave privada nunca sale del teléfono; la API guarda la pública y un
+  contador que detecta clonado. Quien tenga el teléfono desbloqueado y el dedo del
+  dueño entra; mitigación: quitar el celular desde Administración desde otro dispositivo.
+
 - Las fotos de productos (`/fotos/<uuid>.jpg`) se sirven sin sesión: una etiqueta `<img>`
   no puede mandar el token. El nombre al azar impide adivinarlas y son fotos de
   mercadería, no datos.

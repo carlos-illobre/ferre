@@ -1,6 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../api";
 import { useSesion } from "../sesion";
+import { hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../credenciales";
+import { describirDispositivo } from "./Login";
+import { fecha } from "../formato";
 
 type UsuarioFila = { id: string; email: string; nombre: string; rol: string; activo: boolean };
 type SesionFila = { id: string; dispositivo: string; ultimo_uso_en: string; email: string; nombre: string };
@@ -11,6 +14,7 @@ export function Administracion() {
   return (
     <section>
       <Usuarios />
+      <Celulares />
       <Sesiones />
       <Auditoria />
     </section>
@@ -75,6 +79,51 @@ function Usuarios() {
         <button type="submit" className="boton primario">Autorizar</button>
       </form>
       {error && <p className="error" role="alert">{error}</p>}
+    </article>
+  );
+}
+
+// Mis celulares vinculados: desde acá se vincula este dispositivo con la huella, y se
+// quita uno perdido. Cada usuario ve los suyos.
+function Celulares() {
+  const [filas, setFilas] = useState<Credencial[]>([]);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const cargar = () => listarCredenciales().then(setFilas).catch(() => undefined);
+  useEffect(() => { void cargar(); }, []);
+  async function vincular() {
+    setError(null); setMensaje(null);
+    const nombre = window.prompt("¿Cómo llamamos a este celular?", describirDispositivo().slice(0, 40));
+    if (nombre === null) return;
+    try { const c = await vincularEsteDispositivo(nombre); setMensaje(`Listo: "${c.dispositivo}" entra con la huella desde ahora.`); await cargar(); }
+    catch (e) { setError((e as Error).name === "NotAllowedError" ? "No se pudo leer la huella. Probá de nuevo." : (e as Error).message); }
+  }
+  async function quitar(c: Credencial) {
+    if (!window.confirm(`¿Quitar "${c.dispositivo ?? "este celular"}"? Ya no va a poder entrar con la huella.`)) return;
+    try { await quitarCredencial(c.id); await cargar(); } catch (e) { setError((e as Error).message); }
+  }
+  return (
+    <article data-testid="celulares">
+      <h2>Mis celulares con huella</h2>
+      <p className="ayuda">Vinculá el celular una vez y desde entonces entra con la huella, sin Google. Si lo perdés, quitalo de acá.</p>
+      {error && <p className="error" role="alert">{error}</p>}
+      {mensaje && <p className="exito" role="status" data-testid="mensaje-celular">{mensaje}</p>}
+      {filas.length > 0 && (
+        <table>
+          <thead><tr><th>Celular</th><th>Vinculado el</th><th>Último uso</th><th /></tr></thead>
+          <tbody>
+            {filas.map((c) => (
+              <tr key={c.id} data-testid="celular">
+                <td>{c.dispositivo ?? "celular"}</td><td>{fecha(c.creada_en.slice(0, 10))}</td><td>{c.ultimo_uso_en ? fecha(c.ultimo_uso_en.slice(0, 10)) : "todavía no"}</td>
+                <td><button className="boton peligro" onClick={() => quitar(c)}>Quitar</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {hayHuella() ? (
+        <button className="boton primario" onClick={vincular} data-testid="vincular-celular">👆 Vincular este celular con mi huella</button>
+      ) : <p className="ayuda">Este dispositivo no tiene lector de huella o desbloqueo compatible: vinculá desde el celular.</p>}
     </article>
   );
 }
