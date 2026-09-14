@@ -73,7 +73,13 @@ td { text-align: left; padding: 0.55rem 0.7rem; border-top: 1px solid #eceff4; f
 tr.nuevo td { background: var(--verde-claro); }
 tr.cambia td { background: #fff8e1; }
 tr.vieja td { color: var(--rojo); font-weight: 600; }
-tr.anulada td { color: #888; text-decoration: line-through; }
+tr.anulada td, tbody.anulada td { color: #888; text-decoration: line-through; }
+/* Ventas de hoy: una venta con varios productos es un grupo de filas que se pliega */
+tbody.venta-dia tr.plegable { cursor: pointer; }
+tbody.venta-dia tr.plegable:hover td { background: #f3f6fb; }
+tbody.venta-dia .pliegue { font-weight: 600; color: var(--azul); }
+tbody.venta-dia tr.renglon td { padding-top: 0.15rem; padding-bottom: 0.15rem; font-size: 0.95rem; color: #444; border-top: none; }
+tbody.venta-dia + tbody tr:first-child td { border-top: 2px solid var(--borde); }
 td.sube, .sube { color: var(--rojo); font-weight: 700; }
 td.baja, .baja { color: var(--verde); font-weight: 700; }
 

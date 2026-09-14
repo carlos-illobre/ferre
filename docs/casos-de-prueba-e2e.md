@@ -95,7 +95,8 @@ mecha (costo $1.500, sin margen) y un taladro (costo $120.000, sin margen).
 | "Cobrar" sin medio de pago | Aviso "Elegí cómo paga" |
 | "Efectivo", "Cobrar" | "Venta registrada: $10.500,00 en efectivo"; la venta queda vacía |
 | Verificación en la base | Una venta confirmada; stock de la mecha −3; el ítem del tornillo con margen 300 y el tornillo con unidad kg; la explicación "+ 100 % de margen" guardada en el de la mecha |
-| Abrir "Ventas de hoy" | Aparece la venta con "Efectivo" |
+| Abrir "Ventas de hoy" | Aparece la venta con "Efectivo"; como tiene dos productos, cada uno va en su fila (3 × mecha, 1.5 × tornillo) debajo de la fila de la venta |
+| Tocar la fila de la venta; tocarla de nuevo | Se pliega a una sola fila ("2 productos: ..."); vuelve a desplegarse |
 | "Anular", confirmar con motivo | La fila queda "anulada"; el stock de la mecha vuelve a 0 |
 | Agregar la mecha y tocar "No llevó" | "Anotado como consulta"; queda una consulta en la base |
 

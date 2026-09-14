@@ -368,6 +368,9 @@ type VentaDia = { id: string; fecha: string; medio_pago: string; total: string; 
 
 function VentasDeHoy({ clave }: { clave: string | null }) {
   const [datos, setDatos] = useState<{ ventas: VentaDia[]; totales: Record<string, number>; total: number } | null>(null);
+  // Ventas con más de un producto: cada producto en su fila, y la venta se puede plegar.
+  const [plegadas, setPlegadas] = useState<Set<string>>(new Set());
+  const plegar = (id: string) => setPlegadas((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const cargar = useCallback(() => api<{ ventas: VentaDia[]; totales: Record<string, number>; total: number }>("/ventas").then(setDatos).catch(() => setDatos(null)), []);
   useEffect(() => { void cargar(); }, [cargar, clave]);
   if (!datos) return null;
@@ -385,17 +388,30 @@ function VentasDeHoy({ clave }: { clave: string | null }) {
       <summary>Ventas de hoy: <strong>{pesos(datos.total)}</strong> {Object.entries(datos.totales).map(([m, t]) => `· ${nombre(m)} ${pesos(t)}`).join(" ")} ({datos.ventas.filter((v) => v.estado === "confirmada").length})</summary>
       <table>
         <thead><tr><th>Hora</th><th>Productos</th><th>Pago</th><th>Total</th><th /></tr></thead>
-        <tbody>
-          {datos.ventas.map((v) => (
-            <tr key={v.id} className={v.estado === "anulada" ? "anulada" : ""}>
-              <td>{new Date(v.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</td>
-              <td>{v.items.map((i) => `${Number(i.cantidad)} × ${i.descripcion}`).join(", ")}</td>
-              <td>{nombre(v.medio_pago)}{v.cliente ? ` · ${v.cliente}` : ""}</td>
-              <td>{pesos(v.total)}</td>
-              <td>{v.estado === "anulada" ? <em>anulada</em> : <button className="enlace chico" onClick={() => anular(v)}>Anular</button>}</td>
-            </tr>
-          ))}
-        </tbody>
+        {datos.ventas.map((v) => {
+          const varios = v.items.length > 1;
+          const plegada = plegadas.has(v.id);
+          return (
+            <tbody key={v.id} className={`venta-dia ${v.estado === "anulada" ? "anulada" : ""}`} data-testid="venta-dia">
+              <tr className={varios ? "plegable" : ""} onClick={varios ? () => plegar(v.id) : undefined} title={varios ? (plegada ? "Ver los productos" : "Plegar") : undefined}>
+                <td>{new Date(v.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</td>
+                <td>{varios ? <span className="pliegue">{plegada ? "▸" : "▾"} {v.items.length} productos{plegada ? `: ${v.items.map((i) => i.descripcion).join(", ")}` : ""}</span> : `${Number(v.items[0]?.cantidad ?? 0)} × ${v.items[0]?.descripcion ?? ""}`}</td>
+                <td>{nombre(v.medio_pago)}{v.cliente ? ` · ${v.cliente}` : ""}</td>
+                <td>{pesos(v.total)}</td>
+                <td>{v.estado === "anulada" ? <em>anulada</em> : <button className="enlace chico" onClick={(e) => { e.stopPropagation(); anular(v); }}>Anular</button>}</td>
+              </tr>
+              {varios && !plegada && v.items.map((i, n) => (
+                <tr key={n} className="renglon">
+                  <td />
+                  <td>{Number(i.cantidad)} × {i.descripcion}</td>
+                  <td><small>{pesos(Number(i.precio_unitario))} c/u</small></td>
+                  <td>{pesos(Number(i.cantidad) * Number(i.precio_unitario))}</td>
+                  <td />
+                </tr>
+              ))}
+            </tbody>
+          );
+        })}
       </table>
       <small>{fecha(new Date().toISOString().slice(0, 10))}</small>
     </details>

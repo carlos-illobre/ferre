@@ -95,9 +95,19 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   const hoy = page.getByTestId("ventas-de-hoy");
   await expect(hoy).toContainText("Efectivo");
   await hoy.locator("summary").click();
+  // Dos productos: cada uno en su fila, y la venta se pliega desde la primera.
+  const venta = hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
+  await expect(venta.getByRole("row")).toHaveCount(3);
+  await expect(venta.getByRole("row").nth(1)).toContainText("3 × MECHA VENDER");
+  await expect(venta.getByRole("row").nth(2)).toContainText("1.5 × TORNILLO VENDER");
+  await venta.getByRole("row").first().click();
+  await expect(venta.getByRole("row")).toHaveCount(1);
+  await expect(venta).toContainText("2 productos: MECHA VENDER");
+  await venta.getByRole("row").first().click();
+  await expect(venta.getByRole("row")).toHaveCount(3);
   page.once("dialog", (d) => d.accept("se arrepintió"));
-  await hoy.getByRole("row", { name: /MECHA VENDER/ }).getByRole("button", { name: "Anular" }).click();
-  await expect(hoy.getByRole("row", { name: /MECHA VENDER/ })).toContainText("anulada");
+  await venta.getByRole("button", { name: "Anular" }).click();
+  await expect(venta).toContainText("anulada");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("0.000");
 
   // "No llevó": la consulta queda registrada.
