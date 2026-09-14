@@ -4,6 +4,7 @@ import { ProveedorDeSesion, useSesion } from "./sesion";
 import { irA, useRuta } from "./rutas";
 import { Login } from "./pantallas/Login";
 import { Vincular } from "./pantallas/Vincular";
+import { VincularCelular } from "./pantallas/VincularCelular";
 import { Administracion } from "./pantallas/Administracion";
 import { Listas } from "./pantallas/Listas";
 import { Productos } from "./pantallas/Productos";
@@ -39,6 +40,7 @@ function Pantallas() {
 
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
   if (ruta.nombre === "vincular" && codigoVinculacion) return <Vincular codigo={codigoVinculacion} />;
+  if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
   if (sesion.estado === "sin-sesion") return <Login />;
 
   const esDueno = sesion.usuario.rol === "dueño";

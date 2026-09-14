@@ -7,6 +7,9 @@ import { useCatalogo } from "../catalogo";
 import { Explicacion } from "../componentes/Explicacion";
 import { fecha, pesos } from "../formato";
 import { describirDispositivo } from "./Login";
+import { Escaner, hayCamara } from "../componentes/Escaner";
+import { VincularCelular } from "../componentes/VincularCelular";
+import { enviarCodigoAlPuesto, escucharPuesto, puestoRemoto } from "../puesto";
 import type { Producto } from "./Productos";
 
 // La venta (issue #15): el orden es el del mostrador (docs/proceso-actual.md). Buscar →
@@ -48,6 +51,10 @@ export function Vender() {
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pendientes, setPendientes] = useState(0);
+  const [escaneando, setEscaneando] = useState(false);
+  const [ultimoEscaneo, setUltimoEscaneo] = useState<string | null>(null);
+  const [puestoVinculado, setPuestoVinculado] = useState(false);
+  const [codigoDesconocido, setCodigoDesconocido] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const caja = useRef<HTMLInputElement>(null);
 
@@ -81,6 +88,39 @@ export function Vender() {
     setMensaje(null);
   }, []);
 
+  // Un código de barras, venga de la cámara del celular o del lector USB (que tipea y
+  // manda Enter): si es de un producto, se agrega; si no, se ofrece asociarlo.
+  const agregarPorCodigo = useCallback((codigo: string): boolean => {
+    const c = codigo.trim();
+    const exacto = (catalogo ?? []).find((p) => p.codigo_barras === c || p.codigo_proveedor === c);
+    if (exacto) { agregar(exacto); setCodigoDesconocido(null); return true; }
+    setCodigoDesconocido(c);
+    setConsulta("");
+    return false;
+  }, [catalogo, agregar]);
+
+  // El oyente del flujo de eventos se crea una sola vez: siempre tiene que ver la versión
+  // más nueva de agregarPorCodigo (con el catálogo actualizado, por ejemplo tras asociar
+  // un código), por eso pasa por una referencia.
+  const manejarCodigo = useRef(agregarPorCodigo);
+  useEffect(() => { manejarCodigo.current = agregarPorCodigo; }, [agregarPorCodigo]);
+
+  // Códigos que llegan del celular vinculado.
+  const alVincular = useCallback((puestoId: string) => {
+    setPuestoVinculado(true);
+    const parar = escucharPuesto(puestoId, (codigo) => manejarCodigo.current(codigo), (conectado) => { if (!conectado) setPuestoVinculado(Boolean(localStorage.getItem("ferre.puesto"))); });
+    (window as unknown as { __pararPuesto?: () => void }).__pararPuesto?.();
+    (window as unknown as { __pararPuesto?: () => void }).__pararPuesto = parar;
+  }, []);
+  useEffect(() => () => (window as unknown as { __pararPuesto?: () => void }).__pararPuesto?.(), []);
+
+  // En el celular: lo escaneado se agrega acá y, si hay laptop vinculada, se le manda.
+  const alDetectar = useCallback((codigo: string) => {
+    const conocido = manejarCodigo.current(codigo);
+    setUltimoEscaneo(conocido ? `${codigo}: agregado` : `${codigo}: no está en el catálogo`);
+    if (puestoRemoto()) enviarCodigoAlPuesto(codigo).then((ok) => { if (ok) setUltimoEscaneo((u) => `${u ?? codigo} · enviado a la computadora ✓`); });
+  }, []);
+
   function cambiarItem(clave: string, cambios: Partial<Item>) {
     setItems((lista) => lista.map((it) => (it.clave === clave ? { ...it, ...cambios } : it)));
   }
@@ -100,7 +140,14 @@ export function Vender() {
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter") {
       e.preventDefault();
-      if (resultados[elegido]) agregar(resultados[elegido]);
+      const p = resultados[elegido];
+      if (codigoDesconocido && p) {
+        // Asociar el código escaneado al producto elegido: la próxima vez se encuentra directo.
+        actualizarProducto(p.id, { codigo_barras: codigoDesconocido } as never).catch(() => undefined);
+        setCodigoDesconocido(null);
+        agregar({ ...p, codigo_barras: codigoDesconocido });
+      } else if (p) agregar(p);
+      else if (consulta.trim() && /^[0-9A-Za-z\-]{6,32}$/.test(consulta.trim()) && !resultados.length) agregarPorCodigo(consulta.trim()); // lector USB
       else if (consulta.trim()) agregar(null, consulta.trim()); // ítem libre (#17)
     }
     else if (e.key === "Escape") { if (consulta) setConsulta(""); else noLlevo(); }
@@ -192,7 +239,19 @@ export function Vender() {
         )}
         {consulta.trim() && resultados.length === 0 && catalogo && <p className="ayuda">Nada con "{consulta}". Enter lo agrega como ítem libre y le ponés el precio.</p>}
       </div>
+      <div className="en-linea herramientas">
+        {hayCamara() && <button className="secundario" onClick={() => setEscaneando(true)} data-testid="escanear">📷 Escanear</button>}
+        {!hayCamara() || window.innerWidth > 900 ? <VincularCelular vinculado={puestoVinculado} alVincular={alVincular} /> : null}
+        {puestoRemoto() && <small data-testid="celular-vinculado-remoto">📱 Vinculado a la computadora</small>}
+      </div>
+      {codigoDesconocido && (
+        <p className="aviso" data-testid="codigo-desconocido">
+          El código <code>{codigoDesconocido}</code> no está en el catálogo. Buscá el producto y dale Enter para asociarlo.
+          <button className="enlace chico" onClick={() => setCodigoDesconocido(null)}>Ignorar</button>
+        </p>
+      )}
       <p className="ayuda">Enter agrega · Esc descarta · F5 efectivo · F6 Mercado Pago · F7 tarjeta · F8 cuenta corriente · F2 cobrar{pendientes > 0 ? ` · ${pendientes} cambio(s) guardados sin enviar` : ""}</p>
+      {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} ultimo={ultimoEscaneo} />}
       {(error ?? errorCatalogo) && <p className="error" role="alert">{error ?? errorCatalogo}</p>}
       {mensaje && <p className="exito" role="status" data-testid="mensaje">{mensaje}</p>}
 

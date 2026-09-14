@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@ferre/calculo-de-precios": "workspace:*",
+    "@zxing/browser": "^0.2.1",
+    "@zxing/library": "^0.23.0",
     "qrcode": "^1.5.4",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",

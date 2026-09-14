@@ -41,7 +41,7 @@ productos.get("/", async (c) => {
 // Elegir margen (300/200/100/50/25 o ninguno) o fijar un precio a mano. Lo hace el
 // empleado en el mostrador; queda auditado con quién y cuándo.
 productos.patch("/:id", async (c) => {
-  const cuerpo = await c.req.json<{ margen_elegido?: number | null; precio_manual?: number | null }>().catch(() => ({}) as Record<string, never>);
+  const cuerpo = await c.req.json<{ margen_elegido?: number | null; precio_manual?: number | null; codigo_barras?: string | null }>().catch(() => ({}) as Record<string, never>);
   const cambios: string[] = [];
   const valores: unknown[] = [c.req.param("id")];
   if ("margen_elegido" in cuerpo) {
@@ -54,7 +54,12 @@ productos.patch("/:id", async (c) => {
     if (p !== null && (typeof p !== "number" || !Number.isFinite(p) || p < 0)) return c.json({ error: "El precio tiene que ser un número mayor o igual a cero" }, 400);
     valores.push(p); cambios.push(`precio_manual = $${valores.length}`);
   }
-  if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido o precio_manual" }, 400);
+  if ("codigo_barras" in cuerpo) {
+    const cb = cuerpo.codigo_barras === null ? null : String(cuerpo.codigo_barras).trim();
+    if (cb !== null && !/^[0-9A-Za-z\-]{4,32}$/.test(cb)) return c.json({ error: "El código de barras tiene que tener entre 4 y 32 letras o números" }, 400);
+    valores.push(cb); cambios.push(`codigo_barras = $${valores.length}`);
+  }
+  if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido, precio_manual o codigo_barras" }, 400);
   const { rowCount } = await pool.query(`UPDATE producto SET ${cambios.join(", ")} WHERE id = $1 AND activo`, valores);
   if (!rowCount) return c.json({ error: "No existe ese producto" }, 404);
   await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id"), ...cuerpo } });

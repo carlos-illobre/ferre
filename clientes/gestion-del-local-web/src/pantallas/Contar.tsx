@@ -4,6 +4,7 @@ import { enviarOEncolar } from "../cola";
 import { useCatalogo } from "../catalogo";
 import { fecha } from "../formato";
 import type { Producto } from "./Productos";
+import { Escaner, hayCamara } from "../componentes/Escaner";
 
 // Conteo cíclico con el celular (issue #31), con una mano: elegir sector → buscar o
 // escanear → cuántas hay → siguiente. El sector queda abierto hasta cerrarlo; al cerrar,
@@ -74,6 +75,12 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   const [producto, setProducto] = useState<Producto | null>(null);
   const [cantidad, setCantidad] = useState("");
   const [cerrando, setCerrando] = useState(false);
+  const [escaneando, setEscaneando] = useState(false);
+  const alDetectar = useCallback((codigo: string) => {
+    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
+    if (p) { setEscaneando(false); elegirProducto(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalogo]);
   const [resultado, setResultado] = useState<{ ajustados: number; puestos_en_cero: number; contados: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const caja = useRef<HTMLInputElement>(null);
@@ -157,6 +164,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
         <div className="buscador">
           <input ref={caja} className="busqueda" type="search" value={consulta} onChange={(e) => setConsulta(e.target.value)} onKeyDown={teclasBusqueda} disabled={!catalogo}
             placeholder={catalogo ? "Buscá o escaneá el producto" : "Bajando el catálogo…"} data-testid="busqueda" autoComplete="off" />
+          {hayCamara() && <button className="secundario" style={{ marginTop: "0.5rem" }} onClick={() => setEscaneando(true)}>📷 Escanear</button>}
+          {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
           {resultados.length > 0 && (
             <ul className="sugerencias" role="listbox" data-testid="sugerencias">
               {resultados.map((p, i) => (

@@ -19,7 +19,7 @@ export function useCatalogo() {
   const [desdeDispositivo, setDesdeDispositivo] = useState(false);
   // Cambios hechos acá mientras la bajada estaba en vuelo: se vuelven a aplicar sobre lo
   // que llega y se conservan hasta que esa bajada termina.
-  const pendientes = useRef(new Map<string, Partial<Pick<Producto, "margen_elegido" | "precio_manual">>>());
+  const pendientes = useRef(new Map<string, Partial<Pick<Producto, "margen_elegido" | "precio_manual" | "codigo_barras">>>());
 
   useEffect(() => {
     let vigente = true;
@@ -59,17 +59,18 @@ export function useCatalogo() {
   const indice = useMemo(() => (catalogo ? indexar(catalogo.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }))) : null), [catalogo]);
   const buscarProductos = useCallback((consulta: string, maximo = 50) => (indice ? buscar(indice, consulta, maximo) : []), [indice]);
 
-  const actualizarProducto = useCallback(async (id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "precio_manual">>) => {
+  const actualizarProducto = useCallback(async (id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "precio_manual" | "codigo_barras">>) => {
     pendientes.current.set(id, { ...pendientes.current.get(id), ...cambios });
     setCatalogo((c) => {
       const nuevo = c && c.map((p) => (p.id === id ? { ...p, ...cambios } : p));
       if (nuevo) reemplazarTodo("catalogo", nuevo).catch(() => undefined);
       return nuevo;
     });
-    const cuerpo: Record<string, number | null> = {};
+    const cuerpo: Record<string, number | string | null> = {};
     if ("margen_elegido" in cambios) cuerpo.margen_elegido = cambios.margen_elegido ?? null;
     if ("precio_manual" in cambios) cuerpo.precio_manual = cambios.precio_manual === null || cambios.precio_manual === undefined ? null : Number(cambios.precio_manual);
-    return enviarOEncolar("producto.precio", "PATCH", `/productos/${id}`, cuerpo);
+    if ("codigo_barras" in cambios) cuerpo.codigo_barras = cambios.codigo_barras ?? null;
+    return enviarOEncolar("producto.cambio", "PATCH", `/productos/${id}`, cuerpo);
   }, []);
 
   // Stock que ve el mostrador después de un movimiento local (venta sin conexión).
