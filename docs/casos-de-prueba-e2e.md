@@ -47,8 +47,8 @@ precio).
 | Menú "Listas de precios": el panel "Proveedores: agregar o revisar" está arriba y abierto; cargar `Comodo (e2e)` con lector `comodo` y contado 5 %, "Agregar" | El proveedor aparece en la tabla |
 | Soltar la planilla en la zona de carga | Se detecta el proveedor; el resumen dice 4 leídos, 4 nuevos, 1 salteada; el título dice "Comodo (e2e) · lista del 11/08/2026" |
 | En la vista previa, abrir la explicación del costo de `MP001` | Costo $712,50 con los pasos "− 25 % (linea)" y "− 5 % (contado)" |
-| "Aplicar" | Aparece la barra de progreso mientras se aplica en segundo plano; al terminar, "4 precios actualizados", "4 productos nuevos" |
-| "Cargar otra lista" | En "Proveedores", `Comodo (e2e)` muestra su última lista aplicada ("hace N días") |
+| "Aplicar" | Aparece la barra de progreso mientras se aplica en segundo plano; al terminar vuelve a la pantalla de listas con una tarjeta: "4 precios actualizados", "4 productos nuevos" |
+| "Entendido" | La tarjeta se cierra; en "Proveedores", `Comodo (e2e)` muestra su última lista aplicada ("hace N días") |
 
 ---
 

@@ -261,3 +261,7 @@ button.boton.peligro:hover { background: #b3241f; }
 
 .progreso.indeterminado .progreso-relleno { background-image: repeating-linear-gradient(45deg, var(--amarillo) 0 12px, var(--amarillo-oscuro) 12px 24px); background-size: 34px 100%; animation: avanzar 1s linear infinite; }
 @keyframes avanzar { from { background-position: 0 0; } to { background-position: 34px 0; } }
+
+.resultado-lista { display: flex; align-items: center; gap: 0.8rem; background: var(--verde-claro); border-color: var(--verde); }
+.resultado-lista > span:nth-child(2) { flex: 1; font-weight: 600; color: #1f6b30; }
+.tilde-chico { width: 34px; height: 34px; border-radius: 50%; background: var(--amarillo); color: #fff; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }

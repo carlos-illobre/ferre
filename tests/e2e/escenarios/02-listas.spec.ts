@@ -68,10 +68,12 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
 
   await page.getByTestId("aplicar").click();
   // Se aplica en segundo plano con barra de progreso; con 4 filas termina enseguida.
+  // Al terminar vuelve a la pantalla de listas con el resultado en una tarjeta que se cierra.
   await expect(page.getByTestId("resultado")).toContainText("4 precios actualizados", { timeout: 15000 });
   await expect(page.getByTestId("resultado")).toContainText("4 productos nuevos");
+  await page.getByRole("button", { name: "Entendido" }).click();
+  await expect(page.getByTestId("resultado")).toHaveCount(0);
 
-  // Vuelta a la pantalla inicial: el proveedor ya tiene su última lista aplicada.
-  await page.getByRole("button", { name: "Cargar otra lista" }).click();
+  // El proveedor ya tiene su última lista aplicada.
   await expect(page.getByTestId("estado-proveedores").getByRole("row", { name: PROVEEDOR_RE })).toContainText("hace");
 });

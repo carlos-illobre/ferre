@@ -21,6 +21,7 @@ export function Listas() {
   const [historial, setHistorial] = useState<ListaFila[]>([]);
   const [cargada, setCargada] = useState<Cargada | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [resultado, setResultado] = useState<string | null>(null);
 
   const recargar = useCallback(async () => {
     try {
@@ -42,9 +43,16 @@ export function Listas() {
       {error && <p className="error" role="alert">{error}</p>}
 
       {cargada ? (
-        <Revision cargada={cargada} alTerminar={() => { setCargada(null); void recargar(); }} />
+        <Revision cargada={cargada} alTerminar={(mensaje) => { setCargada(null); setResultado(mensaje ?? null); void recargar(); }} />
       ) : (
         <>
+          {resultado && (
+            <div className="tarjeta resultado-lista" role="status" data-testid="resultado">
+              <span className="tilde-chico" aria-hidden="true">✓</span>
+              <span>{resultado}</span>
+              <button className="boton primario" onClick={() => setResultado(null)}>Entendido</button>
+            </div>
+          )}
           {pendientes.length > 0 && (
             <p className="aviso">
               Hay {pendientes.length === 1 ? "una lista pendiente" : `${pendientes.length} listas pendientes`} de revisar:{" "}
@@ -139,10 +147,9 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
   );
 }
 
-function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () => void }) {
+function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mensaje?: string) => void }) {
   const [filas, setFilas] = useState<Fila[]>([]);
   const [total, setTotal] = useState(0);
-  const [resultado, setResultado] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const r = cargada.resumen;
@@ -164,8 +171,9 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
         const l = await api<{ estado: string; resumen: Resumen & { progreso?: { procesadas: number; total: number | null; etapa?: string }; error?: string } }>(`/listas/${cargada.id}`);
         if (l.estado === "aplicada") {
           const x = l.resumen;
-          setResultado(`Listo: ${x.nuevos + x.modificados} precios actualizados (${x.nuevos} productos nuevos, ${x.modificados} con precio nuevo, ${x.sin_cambio} sin cambio).`);
-          break;
+          // Vuelve a la pantalla de listas con el resultado como una tarjeta que se cierra.
+          alTerminar(`Lista de ${cargada.proveedor} del ${fecha(cargada.fecha_lista)} aplicada: ${x.nuevos + x.modificados} precios actualizados (${x.nuevos} productos nuevos, ${x.modificados} con precio nuevo, ${x.sin_cambio} sin cambio).`);
+          return;
         }
         if (l.estado !== "aplicando") { setError(l.resumen.error ?? "La aplicación se interrumpió. Volvé a intentar."); break; }
         if (l.resumen.progreso) setProgreso({ procesadas: l.resumen.progreso.procesadas, total: l.resumen.progreso.total ?? cargada.resumen.leidas, etapa: l.resumen.progreso.etapa });
@@ -180,16 +188,6 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
     setOcupado(true);
     try { await api(`/listas/${cargada.id}/descartar`, { method: "POST" }); alTerminar(); }
     catch (e) { setError((e as Error).message); setOcupado(false); }
-  }
-
-  if (resultado) {
-    return (
-      <div className="tarjeta resultado-final">
-        <div className="tilde" aria-hidden="true">✓</div>
-        <p role="status" data-testid="resultado">{resultado}</p>
-        <button className="grande" onClick={alTerminar}>Cargar otra lista</button>
-      </div>
-    );
   }
 
   return (
