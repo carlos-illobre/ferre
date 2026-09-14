@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { margenReal, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { FotoProducto } from "../componentes/Foto";
+import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../unidades";
 import { api, ErrorApi } from "../api";
 import { guardar, borrarAnterioresA } from "../almacen";
 import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendientesEnCola } from "../cola";
@@ -22,20 +23,7 @@ type Item = {
   unidad: Unidad; // por unidades enteras o por kilo/metro/litro (con un decimal)
   precioManual: number | null; // precio tipeado en esta venta, pisa al margen
 };
-// Cómo se vende: por unidad (cantidades enteras) o a granel (hasta un decimal). Queda
-// guardado en el producto, como el margen.
-export const UNIDADES = [
-  { valor: "unidad", nombre: "un." }, { valor: "kg", nombre: "kg" }, { valor: "m", nombre: "m" }, { valor: "l", nombre: "l" },
-] as const;
-export type Unidad = (typeof UNIDADES)[number]["valor"];
-const unidadDe = (p: Producto | null): Unidad => (UNIDADES.some((u) => u.valor === p?.unidad) ? (p!.unidad as Unidad) : "unidad");
-const enteras = (u: Unidad) => u === "unidad";
-// La cantidad tipeada, ajustada a la unidad: enteros para "un.", un decimal para el resto.
-function cantidadValida(texto: string, unidad: Unidad): number {
-  const n = Number(texto.replace(",", "."));
-  if (!Number.isFinite(n) || n <= 0) return 0;
-  return enteras(unidad) ? Math.floor(n) : Math.round(n * 10) / 10;
-}
+
 const MEDIOS: { valor: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; nombre: string; tecla: string }[] = [
   { valor: "efectivo", nombre: "Efectivo", tecla: "F5" },
   { valor: "mercado_pago", nombre: "Mercado Pago", tecla: "F6" },

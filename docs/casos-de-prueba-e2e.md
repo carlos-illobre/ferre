@@ -117,7 +117,8 @@ lista $1.000.
 | "Registrar ingreso" | "Compra registrada: $16.000,00", "2 costo(s) actualizado(s)", "1 producto(s) nuevo(s)" |
 | Verificación en la base | Stock de la cinta 10; su costo vigente $1.200 con explicación "según factura 0001-00000777"; el pincel existe como producto del proveedor |
 | "Gastos de la semana" | Aparece el proveedor |
-| "Compras recientes", "Anular", confirmar | La compra queda "anulada"; el stock de la cinta vuelve a 0 |
+| "Compras recientes", tocar la fila de la compra | Se despliega y muestra sus renglones: 10 × cinta y 5 × pincel, con costo unitario y subtotal |
+| "Anular", confirmar | La compra queda "anulada"; el stock de la cinta vuelve a 0 |
 
 ---
 

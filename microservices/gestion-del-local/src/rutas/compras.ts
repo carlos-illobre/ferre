@@ -107,7 +107,9 @@ compras.post("/", async (c) => {
 compras.get("/", async (c) => {
   const { rows } = await pool.query(
     `SELECT co.id, co.fecha::text, co.comprobante_tipo, co.comprobante_numero, co.total, co.estado, co.nota, co.creado_en, pr.nombre AS proveedor,
-            (SELECT count(*) FROM item_compra i WHERE i.compra_id = co.id) AS renglones
+            (SELECT count(*) FROM item_compra i WHERE i.compra_id = co.id) AS renglones,
+            COALESCE((SELECT json_agg(json_build_object('descripcion', p.descripcion, 'cantidad', i.cantidad, 'costo_unitario', i.costo_unitario) ORDER BY i.orden)
+                        FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = co.id), '[]'::json) AS items
        FROM compra co JOIN proveedor pr ON pr.id = co.proveedor_id
       ORDER BY co.fecha DESC, co.creado_en DESC LIMIT 50`,
   );

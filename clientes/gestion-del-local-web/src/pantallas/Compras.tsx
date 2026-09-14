@@ -3,13 +3,14 @@ import { api, ErrorApi } from "../api";
 import { useCatalogo } from "../catalogo";
 import { fecha, pesos, porcentaje } from "../formato";
 import type { Producto } from "./Productos";
+import { cantidadValida, enteras, unidadDe } from "../unidades";
 
 // Ingreso de mercadería (issue #30): proveedor y comprobante → renglones con la búsqueda
 // de siempre → confirmar. Suma stock y, si la factura trae otro costo, ese pasa a ser el
 // vigente. Reemplaza el papel semanal de gastos.
 type Proveedor = { id: string; nombre: string; activo: boolean };
 type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoLista: number | null };
-type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; total: string; estado: string; proveedor: string; renglones: string };
+type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; total: string; estado: string; proveedor: string; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[] };
 const COMPROBANTES = [{ valor: "factura", nombre: "Factura" }, { valor: "remito", nombre: "Remito" }, { valor: "sin_comprobante", nombre: "Sin comprobante" }] as const;
 
 export function Compras() {
@@ -136,7 +137,16 @@ export function Compras() {
             return (
               <tr key={r.clave} data-testid="renglon" className={r.costo === null ? "sin-precio-fila" : ""}>
                 <td>{r.producto ? <><strong>{r.descripcion}</strong><br /><small>{[r.producto.marca, r.producto.proveedor].filter(Boolean).join(" · ")}</small></> : <input className="libre" value={r.descripcion} placeholder="Descripción del producto nuevo" onChange={(e) => cambiar(r.clave, { descripcion: e.target.value })} />}</td>
-                <td><input type="number" min="0.001" step="1" className="cantidad" value={r.cantidad} onChange={(e) => cambiar(r.clave, { cantidad: Number(e.target.value) })} data-testid="cantidad" /></td>
+                <td className="celda-cantidad">
+                  <input
+                    type="number" min={enteras(unidadDe(r.producto)) ? "1" : "0.1"} step={enteras(unidadDe(r.producto)) ? "1" : "0.1"} inputMode="decimal" className="cantidad"
+                    value={r.cantidad === 0 ? "" : r.cantidad}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => cambiar(r.clave, { cantidad: cantidadValida(e.target.value, unidadDe(r.producto)) })}
+                    onBlur={() => { if (r.cantidad === 0) cambiar(r.clave, { cantidad: 1 }); }}
+                    data-testid="cantidad"
+                  />{!enteras(unidadDe(r.producto)) && <small> {unidadDe(r.producto)}</small>}
+                </td>
                 <td><input type="number" min="0" step="0.01" className="precio-manual" value={r.costo ?? ""} placeholder="costo" onChange={(e) => cambiar(r.clave, { costo: e.target.value === "" ? null : Number(e.target.value) })} data-testid="costo" /></td>
                 <td>{r.costoLista === null ? <em>sin lista</em> : <>{pesos(r.costoLista)}{dif !== null && Math.abs(dif) >= 0.05 && <small className={dif > 0 ? "sube" : "baja"}> {porcentaje(dif)}</small>}</>}</td>
                 <td className="precio">{r.costo === null ? "" : pesos(r.costo * r.cantidad)}</td>
@@ -181,6 +191,9 @@ function GastosDeLaSemana({ version }: { version: number }) {
 
 function ComprasRecientes({ version, alCambiar }: { version: number; alCambiar: () => void }) {
   const [filas, setFilas] = useState<CompraFila[]>([]);
+  // Cada compra se despliega para ver todos sus renglones.
+  const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
+  const abrir = (id: string) => setAbiertas((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   useEffect(() => { api<CompraFila[]>("/compras").then(setFilas).catch(() => setFilas([])); }, [version]);
   if (filas.length === 0) return null;
   const nombreComprobante = (c: CompraFila) => c.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${c.comprobante_tipo} ${c.comprobante_numero ?? "s/n"}`;
@@ -195,14 +208,25 @@ function ComprasRecientes({ version, alCambiar }: { version: number; alCambiar: 
       <summary>Compras recientes ({filas.length})</summary>
       <table>
         <thead><tr><th>Fecha</th><th>Proveedor</th><th>Comprobante</th><th>Renglones</th><th>Total</th><th /></tr></thead>
-        <tbody>
-          {filas.map((c) => (
-            <tr key={c.id} className={c.estado === "anulada" ? "anulada" : ""}>
-              <td>{fecha(c.fecha)}</td><td>{c.proveedor}</td><td>{nombreComprobante(c)}</td><td>{c.renglones}</td><td>{pesos(c.total)}</td>
-              <td>{c.estado === "anulada" ? <em>anulada</em> : <button className="enlace chico" onClick={() => anular(c)}>Anular</button>}</td>
-            </tr>
-          ))}
-        </tbody>
+        {filas.map((c) => {
+          const abierta = abiertas.has(c.id);
+          return (
+            <tbody key={c.id} className={`venta-dia ${c.estado === "anulada" ? "anulada" : ""}`} data-testid="compra-reciente">
+              <tr className="plegable" onClick={() => abrir(c.id)} title={abierta ? "Plegar" : "Ver los renglones"}>
+                <td>{fecha(c.fecha)}</td><td>{c.proveedor}</td><td>{nombreComprobante(c)}</td>
+                <td><span className="pliegue">{abierta ? "▾" : "▸"} {c.renglones}</span></td><td>{pesos(c.total)}</td>
+                <td>{c.estado === "anulada" ? <em>anulada</em> : <button className="enlace chico" onClick={(e) => { e.stopPropagation(); anular(c); }}>Anular</button>}</td>
+              </tr>
+              {abierta && c.items.map((i, n) => (
+                <tr key={n} className="renglon">
+                  <td /><td colSpan={2}>{Number(i.cantidad)} × {i.descripcion}</td>
+                  <td><small>{pesos(Number(i.costo_unitario))} c/u</small></td>
+                  <td>{pesos(Number(i.cantidad) * Number(i.costo_unitario))}</td><td />
+                </tr>
+              ))}
+            </tbody>
+          );
+        })}
       </table>
     </details>
   );

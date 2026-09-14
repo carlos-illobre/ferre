@@ -78,8 +78,15 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   // Anular devuelve el stock; el costo según factura se mantiene.
   const recientes = page.getByTestId("compras-recientes");
   await recientes.locator("summary").click();
+  // La compra se despliega y muestra sus dos renglones.
+  const compra = recientes.getByTestId("compra-reciente").filter({ hasText: PROVEEDOR }).first();
+  await expect(compra.getByRole("row")).toHaveCount(1);
+  await compra.getByRole("row").first().click();
+  await expect(compra.getByRole("row")).toHaveCount(3);
+  await expect(compra.getByRole("row").nth(1)).toContainText("10 × CINTA AISLADORA");
+  await expect(compra.getByRole("row").nth(2)).toContainText("5 × PINCEL NUEVO");
   page.once("dialog", (d) => d.accept("error de carga"));
-  await recientes.getByRole("row", { name: new RegExp(PROVEEDOR.replace(/[()]/g, "\\$&")) }).first().getByRole("button", { name: "Anular" }).click();
-  await expect(recientes.getByRole("row", { name: new RegExp(PROVEEDOR.replace(/[()]/g, "\\$&")) }).first()).toContainText("anulada");
+  await compra.getByRole("button", { name: "Anular" }).click();
+  await expect(compra).toContainText("anulada");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("0.000");
 });
