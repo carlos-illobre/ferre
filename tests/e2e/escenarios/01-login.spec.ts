@@ -41,7 +41,7 @@ test("con sesión el dueño entra y ve la administración", async ({ page }) => 
 test("vincular el celular con la huella y volver a entrar con ella", async ({ page }) => {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("WebAuthn.enable");
-  await cdp.send("WebAuthn.addVirtualAuthenticator", {
+  const { authenticatorId } = await cdp.send("WebAuthn.addVirtualAuthenticator", {
     options: { protocol: "ctap2", transport: "internal", hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true },
   });
   psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -61,6 +61,9 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   page.once("dialog", (d) => d.accept());
   await page.getByTestId("celular").getByRole("button", { name: "Quitar" }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
+  // El autenticador virtual elige solo la primera clave que tiene (un celular real muestra
+  // para elegir): se borra la quitada para que la prueba use la nueva.
+  await cdp.send("WebAuthn.clearCredentials", { authenticatorId });
   page.once("dialog", (d) => d.accept("Celular E2E"));
   await page.getByTestId("vincular-celular").click();
   await expect(page.getByTestId("mensaje-celular")).toContainText('"Celular E2E" entra con la huella');
