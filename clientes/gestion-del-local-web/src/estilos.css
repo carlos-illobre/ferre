@@ -251,3 +251,10 @@ button.sector:hover { border-color: var(--azul); }
 .progreso-barra { height: 14px; background: #e3e8f0; border-radius: 7px; overflow: hidden; }
 .progreso-relleno { height: 100%; background: linear-gradient(90deg, var(--amarillo) 0%, var(--amarillo-oscuro) 100%); transition: width 0.4s ease; }
 .progreso span { font-weight: 600; color: var(--azul); }
+
+/* Botones chicos de acción en tablas: azul por defecto, rojo para lo que afecta a uno mismo */
+button.boton { padding: 0.35rem 0.8rem; border: none; border-radius: 6px; font-weight: 600; color: #fff; cursor: pointer; }
+button.boton.primario { background: var(--azul); }
+button.boton.primario:hover { background: var(--azul-oscuro); }
+button.boton.peligro { background: var(--rojo); }
+button.boton.peligro:hover { background: #b3241f; }

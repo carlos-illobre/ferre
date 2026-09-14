@@ -214,6 +214,6 @@ del barato.
 
 | Caso | Pasos | Resultado esperado |
 |---|---|---|
-| Cerrar otra sesión | "Administración", "Cerrar" en la fila "otro celular" | La fila desaparece; la propia sigue; en la base esa sesión queda revocada |
-| Cerrar la propia | "Administración", el botón de la fila "esta sesión" | Vuelve al login; el token ya no está en el dispositivo; recargar no vuelve a entrar |
+| Cerrar otra sesión | "Administración", botón azul "Cerrar" en la fila "otro celular" | La fila desaparece; la propia sigue; en la base esa sesión queda revocada |
+| Cerrar la propia | "Administración", botón rojo "Cerrar" de la fila "esta sesión" | Vuelve al login; el token ya no está en el dispositivo; recargar no vuelve a entrar |
 | Salir | "Salir" en la barra | Vuelve al login; en la base la sesión queda revocada |

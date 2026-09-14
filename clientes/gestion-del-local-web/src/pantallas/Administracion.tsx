@@ -95,7 +95,7 @@ function Sesiones() {
           {filas.map((s) => (
             <tr key={s.id} className={s.id === propiaId ? "propia" : ""}>
               <td>{s.nombre}{s.id === propiaId ? <small> · esta sesión</small> : null}</td><td>{s.dispositivo}</td><td>{new Date(s.ultimo_uso_en).toLocaleString("es-AR")}</td>
-              <td><button className="enlace chico" onClick={() => cerrar(s)}>{s.id === propiaId ? "Salir" : "Cerrar"}</button></td>
+              <td><button className={`boton ${s.id === propiaId ? "peligro" : "primario"}`} onClick={() => cerrar(s)} title={s.id === propiaId ? "Cierra esta sesión: volvés al login" : "Cierra la sesión en ese dispositivo"}>Cerrar</button></td>
             </tr>
           ))}
         </tbody>
