@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from "react";
 import { api, ErrorApi } from "../api";
 import { Explicacion } from "../componentes/Explicacion";
+import { Desplegable } from "../componentes/Desplegable";
 import { fecha, pesos, porcentaje } from "../formato";
 import { useSesion } from "../sesion";
 
@@ -54,9 +55,9 @@ export function Listas() {
               ))}
             </p>
           )}
+          {esDueno && <AltaDeProveedor proveedores={proveedores} alCambiar={recargar} />}
           <ZonaDeCarga proveedores={proveedores} alCargar={setCargada} />
           <EstadoDeProveedores proveedores={proveedores} historial={historial} />
-          {esDueno && <AltaDeProveedor proveedores={proveedores} alCambiar={recargar} />}
           <Historial historial={historial} />
         </>
       )}
@@ -150,15 +151,29 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
     api<{ total: number; filas: Fila[] }>(`/listas/${cargada.id}/filas`).then((x) => { setFilas(x.filas); setTotal(x.total); }).catch((e: Error) => setError(e.message));
   }, [cargada.id]);
 
+  const [progreso, setProgreso] = useState<{ procesadas: number; total: number | null } | null>(null);
+
+  // Aplicar corre en el servidor en segundo plano; acá se consulta el avance cada segundo.
   async function aplicar() {
-    setOcupado(true);
+    setOcupado(true); setError(null);
     try {
-      const x = await api<{ nuevos: number; modificados: number; sin_cambio: number }>(`/listas/${cargada.id}/aplicar`, { method: "POST" });
-      setResultado(`Listo: ${x.nuevos + x.modificados} precios actualizados (${x.nuevos} productos nuevos, ${x.modificados} con precio nuevo, ${x.sin_cambio} sin cambio).`);
+      await api(`/listas/${cargada.id}/aplicar`, { method: "POST" });
+      setProgreso({ procesadas: 0, total: cargada.resumen.leidas });
+      for (;;) {
+        await new Promise((r) => setTimeout(r, 800));
+        const l = await api<{ estado: string; resumen: Resumen & { progreso?: { procesadas: number; total: number | null }; error?: string } }>(`/listas/${cargada.id}`);
+        if (l.estado === "aplicada") {
+          const x = l.resumen;
+          setResultado(`Listo: ${x.nuevos + x.modificados} precios actualizados (${x.nuevos} productos nuevos, ${x.modificados} con precio nuevo, ${x.sin_cambio} sin cambio).`);
+          break;
+        }
+        if (l.estado !== "aplicando") { setError(l.resumen.error ?? "La aplicación se interrumpió. Volvé a intentar."); break; }
+        if (l.resumen.progreso) setProgreso({ procesadas: l.resumen.progreso.procesadas, total: l.resumen.progreso.total ?? cargada.resumen.leidas });
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setOcupado(false);
+      setOcupado(false); setProgreso(null);
     }
   }
   async function descartar() {
@@ -195,10 +210,17 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: () =>
           <ul>{cargada.salteadas.map((s) => <li key={s.fila}>Fila {s.fila}: {s.motivo}{s.contenido.length ? ` (${s.contenido.join(" | ")})` : ""}</li>)}</ul>
         </details>
       )}
-      <div className="acciones">
-        <button className="grande" onClick={aplicar} disabled={ocupado} data-testid="aplicar">Aplicar {r.leidas} precios</button>
-        <button className="secundario" onClick={descartar} disabled={ocupado}>Descartar</button>
-      </div>
+      {progreso ? (
+        <div className="progreso" data-testid="progreso" role="progressbar" aria-valuemin={0} aria-valuemax={progreso.total ?? 100} aria-valuenow={progreso.procesadas}>
+          <div className="progreso-barra"><div className="progreso-relleno" style={{ width: `${progreso.total ? Math.round((progreso.procesadas / progreso.total) * 100) : 5}%` }} /></div>
+          <span>Aplicando… {progreso.procesadas.toLocaleString("es-AR")} de {(progreso.total ?? r.leidas).toLocaleString("es-AR")} precios</span>
+        </div>
+      ) : (
+        <div className="acciones">
+          <button className="grande" onClick={aplicar} disabled={ocupado} data-testid="aplicar">Aplicar {r.leidas} precios</button>
+          <button className="secundario" onClick={descartar} disabled={ocupado}>Descartar</button>
+        </div>
+      )}
       {error && <p className="error" role="alert">{error}</p>}
       <h3>Vista previa {total > filas.length ? `(primeras ${filas.length} de ${total}; los cambios de precio van primero)` : ""}</h3>
       <div className="tabla-scroll">
@@ -281,8 +303,7 @@ function AltaDeProveedor({ proveedores, alCambiar }: { proveedores: Proveedor[];
   }
 
   return (
-    <details className="tarjeta">
-      <summary>Agregar o revisar proveedores (solo dueño)</summary>
+    <Desplegable titulo="Proveedores: agregar o revisar (solo dueño)" testId="panel-proveedores">
       <table>
         <thead><tr><th>Proveedor</th><th>Lector</th><th>Precios con IVA</th><th>Dto. general</th><th>Dto. contado</th></tr></thead>
         <tbody>
@@ -303,7 +324,7 @@ function AltaDeProveedor({ proveedores, alCambiar }: { proveedores: Proveedor[];
         <button type="submit">Agregar</button>
       </form>
       {error && <p className="error" role="alert">{error}</p>}
-    </details>
+    </Desplegable>
   );
 }
 
@@ -321,7 +342,7 @@ function Historial({ historial }: { historial: ListaFila[] }) {
               <td>{l.proveedor}</td>
               <td>{fecha(l.fecha_lista)}</td>
               <td>{l.archivo_nombre}</td>
-              <td>{l.estado}</td>
+              <td>{l.estado === "aplicando" ? "aplicándose…" : l.estado}</td>
               <td>{l.estado === "aplicada" ? `${l.resumen.nuevos} nuevos, ${l.resumen.modificados} cambiados` : `${l.resumen.leidas} leídos`}</td>
             </tr>
           ))}

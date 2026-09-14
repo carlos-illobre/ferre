@@ -49,8 +49,20 @@ verificar "resumen: 4 leídas, 1 salteada, 4 nuevas" "4 1 4" "$(echo "$R" | json
 verificar "vista previa trae filas con explicación" sí "$(curl -s -H "$AUTH" $API/listas/$LISTA/filas | json '["filas"][0]["explicacion"][0][:15]' | grep -q "Precio de lista" && echo sí || echo no)"
 verificar "todavía no hay precios" 0 "$(psql "SELECT count(*) FROM precio_proveedor WHERE proveedor_id = '$COMODO'")"
 
-A=$(curl -s -X POST -H "$AUTH" $API/listas/$LISTA/aplicar)
-verificar "aplicar crea 4 productos y precios" "aplicada 4 0" "$(echo "$A" | json '["estado"], d["nuevos"], d["modificados"]' | tr -d "(),'")"
+# Aplicar corre en segundo plano: se consulta la lista hasta que termina.
+aplicar_y_esperar() { # id
+  curl -s -o /dev/null -X POST -H "$AUTH" "$API/listas/$1/aplicar"
+  for _ in $(seq 1 60); do
+    estado=$(curl -s -H "$AUTH" "$API/listas/$1" | json '["estado"]')
+    [[ "$estado" != "aplicando" ]] && break
+    sleep 0.5
+  done
+  curl -s -H "$AUTH" "$API/listas/$1"
+}
+verificar "aplicar responde 202 y queda aplicándose" 202 "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H "$AUTH" $API/listas/$LISTA/aplicar)"
+for _ in $(seq 1 60); do [[ "$(curl -s -H "$AUTH" $API/listas/$LISTA | json '["estado"]')" != "aplicando" ]] && break; sleep 0.5; done
+A=$(curl -s -H "$AUTH" $API/listas/$LISTA)
+verificar "aplicar crea 4 productos y precios" "aplicada 4 0" "$(echo "$A" | json '["estado"], d["resumen"]["nuevos"], d["resumen"]["modificados"]' | tr -d "(),'")"
 verificar "precios guardados" 4 "$(psql "SELECT count(*) FROM precio_proveedor WHERE proveedor_id = '$COMODO'")"
 verificar "costo neto con descuento de línea y contado" 712.5000 "$(psql "SELECT costo_neto FROM precio_proveedor WHERE proveedor_id = '$COMODO' AND codigo_proveedor = 'MP001'")"
 verificar "aplicar dos veces da 409" 409 "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H "$AUTH" $API/listas/$LISTA/aplicar)"
@@ -58,7 +70,7 @@ verificar "aplicar dos veces da 409" 409 "$(curl -s -o /dev/null -w '%{http_code
 # La misma lista otra vez: nada nuevo, nada modificado, ningún precio duplicado.
 R2=$(curl -s -H "$AUTH" -F "archivo=@$MUESTRAS/LISTA GENERAL PRUEBA 11-8.xlsx" -F "proveedor_id=$COMODO" $API/listas)
 verificar "recargar: 0 nuevos, 4 sin cambio" "0 4" "$(echo "$R2" | json '["resumen"]["nuevos"], d["resumen"]["sin_cambio"]' | tr -d "(),")"
-curl -s -X POST -H "$AUTH" $API/listas/$(echo "$R2" | json '["id"]')/aplicar >/dev/null
+aplicar_y_esperar "$(echo "$R2" | json '["id"]')" >/dev/null
 verificar "reaplicar no duplica precios" 4 "$(psql "SELECT count(*) FROM precio_proveedor WHERE proveedor_id = '$COMODO'")"
 verificar "un solo producto por código" 4 "$(psql "SELECT count(DISTINCT producto_id) FROM precio_proveedor WHERE proveedor_id = '$COMODO'")"
 
@@ -75,8 +87,10 @@ verificar "archivo irreconocible da 422" 422 "$(curl -s -o /dev/null -w '%{http_
 if [[ -f "privado/lista_precios_ixnova_14-8-2026.xlsx" ]]; then
   R4=$(curl -s -H "$AUTH" -F "archivo=@privado/lista_precios_ixnova_14-8-2026.xlsx" $API/listas)
   verificar "Ixnova real: 4109 filas leídas" 4109 "$(echo "$R4" | json '["resumen"]["leidas"]')"
-  A4=$(curl -s -X POST -H "$AUTH" $API/listas/$(echo "$R4" | json '["id"]')/aplicar)
-  verificar "Ixnova real aplicada: 4109 productos nuevos" 4109 "$(echo "$A4" | json '["nuevos"]')"
+  inicio=$(date +%s)
+  A4=$(aplicar_y_esperar "$(echo "$R4" | json '["id"]')")
+  verificar "Ixnova real aplicada: 4109 productos nuevos" 4109 "$(echo "$A4" | json '["resumen"]["nuevos"]')"
+  echo "  (Ixnova completa aplicada en $(( $(date +%s) - inicio )) s)"
 fi
 
 verificar "la auditoría registró la aplicación" sí "$([[ $(psql "SELECT count(*) FROM evento WHERE tipo = 'lista.aplicada'") -ge 1 ]] && echo sí || echo no)"

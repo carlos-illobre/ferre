@@ -41,12 +41,13 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.getByRole("button", { name: "Listas de precios" }).click();
   await expect(page.getByRole("heading", { name: "Listas de precios" })).toBeVisible();
 
-  // Alta del proveedor con su configuración de costo (descuento por contado 5 %).
-  await page.getByText("Agregar o revisar proveedores").click();
+  // Alta del proveedor con su configuración de costo (descuento por contado 5 %). El panel
+  // está arriba de la zona de carga y abierto.
+  await expect(page.getByTestId("panel-proveedores")).toHaveClass(/abierto/);
   await page.getByPlaceholder("Nombre del proveedor").fill(PROVEEDOR);
   await page.locator('select[name="lector"]').selectOption("comodo");
   await page.locator('input[name="contado"]').fill("5");
-  await page.getByRole("button", { name: "Agregar" }).click();
+  await page.getByRole("button", { name: "Agregar", exact: true }).click();
   await expect(page.getByRole("cell", { name: PROVEEDOR }).first()).toBeVisible();
 
   // Soltar la planilla: se detecta el proveedor y aparece el resumen.
@@ -66,7 +67,8 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await expect(fila).toContainText("− 5 % (contado)");
 
   await page.getByTestId("aplicar").click();
-  await expect(page.getByTestId("resultado")).toContainText("4 precios actualizados");
+  // Se aplica en segundo plano con barra de progreso; con 4 filas termina enseguida.
+  await expect(page.getByTestId("resultado")).toContainText("4 precios actualizados", { timeout: 15000 });
   await expect(page.getByTestId("resultado")).toContainText("4 productos nuevos");
 
   // Vuelta a la pantalla inicial: el proveedor ya tiene su última lista aplicada.

@@ -99,33 +99,66 @@ listas.get("/:id/filas", async (c) => {
   return c.json({ total: filas.length, filas: filas.slice(desde, desde + 200) });
 });
 
+// Aplicar corre en segundo plano: miles de filas contra una base remota tardan, y la
+// pantalla muestra el progreso consultando la lista. Las filas se insertan en lotes.
 listas.post("/:id/aplicar", async (c) => {
   const lista = await buscarLista(c.req.param("id"));
   if (!lista) return c.json({ error: "No existe esa lista" }, 404);
-  if (lista.estado !== "pendiente") return c.json({ error: `La lista ya está ${lista.estado}` }, 409);
-  const lectura = await releer(lista);
   const usuarioId = c.get("sesion").usuario.id;
+  // Solo una aplicación a la vez: el que cambia el estado es el que la corre.
+  const { rowCount } = await pool.query(
+    `UPDATE lista_importada SET estado = 'aplicando', resumen = resumen || '{"progreso": {"procesadas": 0, "total": null}}'::jsonb WHERE id = $1 AND estado = 'pendiente'`,
+    [lista.id],
+  );
+  if (!rowCount) return c.json({ error: `La lista ya está ${lista.estado === "aplicando" ? "aplicándose" : lista.estado}` }, 409);
+  aplicarEnSegundoPlano(lista, usuarioId).catch(async (e) => {
+    console.error("aplicar lista", lista.id, e);
+    await pool.query(`UPDATE lista_importada SET estado = 'pendiente', resumen = resumen || $2::jsonb WHERE id = $1`, [lista.id, JSON.stringify({ error: `No se pudo aplicar: ${(e as Error).message}` })]).catch(() => undefined);
+  });
+  return c.json({ id: lista.id, estado: "aplicando" }, 202);
+});
 
-  const cliente = await pool.connect();
+// Estado y progreso de una lista (la pantalla lo consulta mientras se aplica).
+listas.get("/:id", async (c) => {
+  const { rows } = await pool.query(
+    `SELECT l.id, l.estado, l.resumen, l.avisos, l.fecha_lista::text, l.archivo_nombre, p.nombre AS proveedor FROM lista_importada l JOIN proveedor p ON p.id = l.proveedor_id WHERE l.id = $1`,
+    [c.req.param("id")],
+  );
+  if (!rows[0]) return c.json({ error: "No existe esa lista" }, 404);
+  return c.json(rows[0]);
+});
+
+const LOTE = 500;
+
+async function aplicarEnSegundoPlano(lista: ListaGuardada, usuarioId: string): Promise<void> {
+  const lectura = await releer(lista);
+  const total = lectura.filas.length;
+  const progreso = async (procesadas: number) =>
+    pool.query(`UPDATE lista_importada SET resumen = resumen || $2::jsonb WHERE id = $1`, [lista.id, JSON.stringify({ progreso: { procesadas, total } })]);
+  await progreso(0);
+
+  const { rows: vigentes } = await pool.query<{ producto_id: string; codigo_proveedor: string; costo_neto: string; precio_lista: string }>(
+    `SELECT DISTINCT ON (codigo_proveedor) producto_id, codigo_proveedor, costo_neto, precio_lista
+       FROM precio_proveedor WHERE proveedor_id = $1 ORDER BY codigo_proveedor, fecha_lista DESC, creado_en DESC`,
+    [lista.proveedor_id],
+  );
+  const porCodigo = new Map(vigentes.map((v) => [v.codigo_proveedor, v]));
   const resultado = { nuevos: 0, modificados: 0, sin_cambio: 0, posibles_duplicados: 0 };
   const nuevosIds: string[] = [];
-  try {
-    await cliente.query("BEGIN");
-    const { rows: vigentes } = await cliente.query<{ producto_id: string; codigo_proveedor: string; costo_neto: string; precio_lista: string }>(
-      `SELECT DISTINCT ON (codigo_proveedor) producto_id, codigo_proveedor, costo_neto, precio_lista
-         FROM precio_proveedor WHERE proveedor_id = $1 ORDER BY codigo_proveedor, fecha_lista DESC, creado_en DESC`,
-      [lista.proveedor_id],
-    );
-    const porCodigo = new Map(vigentes.map((v) => [v.codigo_proveedor, v]));
-    for (const fila of lectura.filas) {
+
+  // Un lote = una transacción con dos INSERT de muchas filas: cientos de veces menos idas
+  // y vueltas que una fila por vez.
+  for (let desde = 0; desde < total; desde += LOTE) {
+    const filas = lectura.filas.slice(desde, desde + LOTE);
+    const productos: unknown[][] = [];
+    const precios: unknown[][] = [];
+    for (const fila of filas) {
       const vigente = porCodigo.get(fila.codigo_proveedor);
       let productoId = vigente?.producto_id;
       if (!productoId) {
         productoId = randomUUID();
-        await cliente.query(
-          `INSERT INTO producto (id, descripcion, marca, codigo_barras, proveedor_preferido_id) VALUES ($1, $2, $3, $4, $5)`,
-          [productoId, fila.descripcion, fila.marca, fila.codigo_barras, lista.proveedor_id],
-        );
+        productos.push([productoId, fila.descripcion, fila.marca, fila.codigo_barras, lista.proveedor_id]);
+        porCodigo.set(fila.codigo_proveedor, { producto_id: productoId, codigo_proveedor: fila.codigo_proveedor, costo_neto: fila.costo_neto, precio_lista: fila.precio_lista });
         resultado.nuevos++;
         nuevosIds.push(productoId);
       } else if (Number(vigente!.costo_neto) === Number(fila.costo_neto) && Number(vigente!.precio_lista) === Number(fila.precio_lista)) {
@@ -134,29 +167,42 @@ listas.post("/:id/aplicar", async (c) => {
       } else {
         resultado.modificados++;
       }
-      await cliente.query(
-        `INSERT INTO precio_proveedor (id, producto_id, proveedor_id, lista_importada_id, codigo_proveedor, descripcion_proveedor, precio_lista, descuentos, costo_neto, iva, cantidad_bulto, precio_bulto, fecha_lista)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-        [randomUUID(), productoId, lista.proveedor_id, lista.id, fila.codigo_proveedor, fila.descripcion, fila.precio_lista,
-          JSON.stringify({ pasos: fila.descuentos, explicacion: fila.explicacion }), fila.costo_neto, fila.iva, fila.cantidad_bulto, fila.precio_bulto, lista.fecha_lista],
-      );
+      precios.push([randomUUID(), productoId, lista.proveedor_id, lista.id, fila.codigo_proveedor, fila.descripcion, fila.precio_lista,
+        JSON.stringify({ pasos: fila.descuentos, explicacion: fila.explicacion }), fila.costo_neto, fila.iva, fila.cantidad_bulto, fila.precio_bulto, lista.fecha_lista]);
     }
-    // Los productos nuevos pueden ser el mismo artículo que ya vende otro proveedor (#29).
-    if (nuevosIds.length) resultado.posibles_duplicados = await sugerirEquivalencias(cliente, nuevosIds);
-    await cliente.query(
-      `UPDATE lista_importada SET estado = 'aplicada', importada_en = now(), aplicada_por = $2, resumen = resumen || $3::jsonb WHERE id = $1`,
-      [lista.id, usuarioId, JSON.stringify(resultado)],
-    );
-    await registrarEvento(cliente, { tipo: "lista.aplicada", usuarioId, contenido: { id: lista.id, proveedorId: lista.proveedor_id, fechaLista: lista.fecha_lista, ...resultado } });
-    await cliente.query("COMMIT");
-  } catch (e) {
-    await cliente.query("ROLLBACK");
-    throw e;
-  } finally {
-    cliente.release();
+    const cliente = await pool.connect();
+    try {
+      await cliente.query("BEGIN");
+      if (productos.length) await cliente.query(insertMultiple("producto", ["id", "descripcion", "marca", "codigo_barras", "proveedor_preferido_id"], productos), productos.flat());
+      if (precios.length) {
+        await cliente.query(
+          insertMultiple("precio_proveedor", ["id", "producto_id", "proveedor_id", "lista_importada_id", "codigo_proveedor", "descripcion_proveedor", "precio_lista", "descuentos", "costo_neto", "iva", "cantidad_bulto", "precio_bulto", "fecha_lista"], precios),
+          precios.flat(),
+        );
+      }
+      await cliente.query("COMMIT");
+    } catch (e) {
+      await cliente.query("ROLLBACK");
+      throw e;
+    } finally {
+      cliente.release();
+    }
+    await progreso(Math.min(desde + LOTE, total));
   }
-  return c.json({ id: lista.id, estado: "aplicada", ...resultado });
-});
+
+  // Los productos nuevos pueden ser el mismo artículo que ya vende otro proveedor (#29).
+  if (nuevosIds.length) resultado.posibles_duplicados = await sugerirEquivalencias(pool, nuevosIds);
+  await pool.query(
+    `UPDATE lista_importada SET estado = 'aplicada', importada_en = now(), aplicada_por = $2, resumen = (resumen - 'progreso' - 'error') || $3::jsonb WHERE id = $1`,
+    [lista.id, usuarioId, JSON.stringify(resultado)],
+  );
+  await registrarEvento(pool, { tipo: "lista.aplicada", usuarioId, contenido: { id: lista.id, proveedorId: lista.proveedor_id, fechaLista: lista.fecha_lista, ...resultado } });
+}
+
+function insertMultiple(tabla: string, columnas: string[], filas: unknown[][]): string {
+  const valores = filas.map((_, i) => `(${columnas.map((__, j) => `$${i * columnas.length + j + 1}`).join(", ")})`).join(", ");
+  return `INSERT INTO ${tabla} (${columnas.join(", ")}) VALUES ${valores}`;
+}
 
 listas.post("/:id/descartar", async (c) => {
   const { rowCount } = await pool.query(`UPDATE lista_importada SET estado = 'descartada' WHERE id = $1 AND estado = 'pendiente'`, [c.req.param("id")]);

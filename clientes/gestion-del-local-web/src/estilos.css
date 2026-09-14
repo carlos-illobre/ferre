@@ -234,3 +234,20 @@ button.sector:hover { border-color: var(--azul); }
 @media (max-width: 720px) { .lado-a-lado { grid-template-columns: 1fr; } }
 
 .version { position: fixed; right: 0.5rem; bottom: 0.3rem; font-size: 0.7rem; color: #9aa4b2; z-index: 1; }
+
+/* Panel plegable con animación */
+.desplegable { padding: 0; overflow: hidden; }
+.desplegable-titulo { width: 100%; display: flex; gap: 0.6rem; align-items: center; background: var(--azul-claro); color: var(--azul); border: none; padding: 0.7rem 1rem; font-size: 1.05rem; font-weight: 700; text-align: left; cursor: pointer; }
+.desplegable-titulo:hover { background: #dde6f5; }
+.desplegable .flecha { display: inline-block; font-size: 0.8rem; transition: transform 0.25s ease; }
+.desplegable.abierto .flecha { transform: rotate(90deg); }
+.desplegable-cuerpo { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; }
+.desplegable.abierto .desplegable-cuerpo { grid-template-rows: 1fr; }
+.desplegable-interior { overflow: hidden; padding: 0 1.25rem; }
+.desplegable.abierto .desplegable-interior { padding: 0.75rem 1.25rem 1rem; }
+
+/* Barra de progreso al aplicar una lista */
+.progreso { display: flex; flex-direction: column; gap: 0.4rem; margin: 1rem 0; }
+.progreso-barra { height: 14px; background: #e3e8f0; border-radius: 7px; overflow: hidden; }
+.progreso-relleno { height: 100%; background: linear-gradient(90deg, var(--amarillo) 0%, var(--amarillo-oscuro) 100%); transition: width 0.4s ease; }
+.progreso span { font-weight: 600; color: var(--azul); }
