@@ -7,6 +7,7 @@ import { registrarEvento } from "../eventos.js";
 import { exigirSesion } from "../autenticacion.js";
 import { config } from "../config.js";
 import { detectarProveedor, ErrorDeLectura, leerPlanilla, type FilaLeida, type Lectura } from "../listas-de-proveedores.js";
+import { sugerirEquivalencias } from "../equivalencias.js";
 
 // Carga y aplicación de listas de precios (issues #7 a #12). Nada se aplica sin
 // confirmación: cargar crea una lista "pendiente" con su resumen; aplicar recién toca
@@ -106,7 +107,8 @@ listas.post("/:id/aplicar", async (c) => {
   const usuarioId = c.get("sesion").usuario.id;
 
   const cliente = await pool.connect();
-  const resultado = { nuevos: 0, modificados: 0, sin_cambio: 0 };
+  const resultado = { nuevos: 0, modificados: 0, sin_cambio: 0, posibles_duplicados: 0 };
+  const nuevosIds: string[] = [];
   try {
     await cliente.query("BEGIN");
     const { rows: vigentes } = await cliente.query<{ producto_id: string; codigo_proveedor: string; costo_neto: string; precio_lista: string }>(
@@ -125,6 +127,7 @@ listas.post("/:id/aplicar", async (c) => {
           [productoId, fila.descripcion, fila.marca, fila.codigo_barras, lista.proveedor_id],
         );
         resultado.nuevos++;
+        nuevosIds.push(productoId);
       } else if (Number(vigente!.costo_neto) === Number(fila.costo_neto) && Number(vigente!.precio_lista) === Number(fila.precio_lista)) {
         resultado.sin_cambio++;
         continue; // mismo precio: no se agrega una fila igual (reimportar no duplica)
@@ -138,6 +141,8 @@ listas.post("/:id/aplicar", async (c) => {
           JSON.stringify({ pasos: fila.descuentos, explicacion: fila.explicacion }), fila.costo_neto, fila.iva, fila.cantidad_bulto, fila.precio_bulto, lista.fecha_lista],
       );
     }
+    // Los productos nuevos pueden ser el mismo artículo que ya vende otro proveedor (#29).
+    if (nuevosIds.length) resultado.posibles_duplicados = await sugerirEquivalencias(cliente, nuevosIds);
     await cliente.query(
       `UPDATE lista_importada SET estado = 'aplicada', importada_en = now(), aplicada_por = $2, resumen = resumen || $3::jsonb WHERE id = $1`,
       [lista.id, usuarioId, JSON.stringify(resultado)],

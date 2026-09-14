@@ -23,7 +23,8 @@ productos.get("/", async (c) => {
   const { rows } = await pool.query(
     `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.precio_manual, p.modificado_en, p.sector_id,
             pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text,
-            COALESCE(pp.descuentos->'explicacion', '[]'::jsonb) AS explicacion_costo
+            COALESCE(pp.descuentos->'explicacion', '[]'::jsonb) AS explicacion_costo,
+            COALESCE(prov.lista, '[]'::json) AS proveedores
        FROM producto p
        LEFT JOIN LATERAL (
          SELECT * FROM precio_proveedor x
@@ -32,7 +33,15 @@ productos.get("/", async (c) => {
           ORDER BY x.fecha_lista DESC, x.creado_en DESC LIMIT 1
        ) pp ON true
        LEFT JOIN proveedor pr ON pr.id = pp.proveedor_id
-      WHERE p.activo
+       LEFT JOIN LATERAL (
+         SELECT json_agg(json_build_object('proveedor_id', v.proveedor_id, 'proveedor', v.nombre, 'costo_neto', v.costo_neto, 'fecha_lista', v.fecha_lista, 'codigo_proveedor', v.codigo_proveedor) ORDER BY v.costo_neto) AS lista
+           FROM (
+             SELECT DISTINCT ON (x.proveedor_id) x.proveedor_id, pv.nombre, x.costo_neto, x.fecha_lista::text, x.codigo_proveedor
+               FROM precio_proveedor x JOIN proveedor pv ON pv.id = x.proveedor_id
+              WHERE x.producto_id = p.id ORDER BY x.proveedor_id, x.fecha_lista DESC, x.creado_en DESC
+           ) v
+       ) prov ON true
+      WHERE p.activo AND p.reemplazado_por IS NULL
       ORDER BY p.descripcion`,
   );
   return c.json(rows);
@@ -41,7 +50,7 @@ productos.get("/", async (c) => {
 // Elegir margen (300/200/100/50/25 o ninguno) o fijar un precio a mano. Lo hace el
 // empleado en el mostrador; queda auditado con quién y cuándo.
 productos.patch("/:id", async (c) => {
-  const cuerpo = await c.req.json<{ margen_elegido?: number | null; precio_manual?: number | null; codigo_barras?: string | null }>().catch(() => ({}) as Record<string, never>);
+  const cuerpo = await c.req.json<{ margen_elegido?: number | null; precio_manual?: number | null; codigo_barras?: string | null; proveedor_preferido_id?: string | null }>().catch(() => ({}) as Record<string, never>);
   const cambios: string[] = [];
   const valores: unknown[] = [c.req.param("id")];
   if ("margen_elegido" in cuerpo) {
@@ -59,7 +68,10 @@ productos.patch("/:id", async (c) => {
     if (cb !== null && !/^[0-9A-Za-z\-]{4,32}$/.test(cb)) return c.json({ error: "El código de barras tiene que tener entre 4 y 32 letras o números" }, 400);
     valores.push(cb); cambios.push(`codigo_barras = $${valores.length}`);
   }
-  if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido, precio_manual o codigo_barras" }, 400);
+  if ("proveedor_preferido_id" in cuerpo) {
+    valores.push(cuerpo.proveedor_preferido_id ?? null); cambios.push(`proveedor_preferido_id = $${valores.length}`);
+  }
+  if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido, precio_manual, codigo_barras o proveedor_preferido_id" }, 400);
   const { rowCount } = await pool.query(`UPDATE producto SET ${cambios.join(", ")} WHERE id = $1 AND activo`, valores);
   if (!rowCount) return c.json({ error: "No existe ese producto" }, 404);
   await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id"), ...cuerpo } });

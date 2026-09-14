@@ -10,6 +10,7 @@ export type Producto = {
   proveedor: string | null; codigo_proveedor: string | null;
   costo_neto: string | null; iva: string | null; fecha_lista: string | null; explicacion_costo: string[];
   sector_id?: string | null;
+  proveedores?: { proveedor_id: string; proveedor: string; costo_neto: string; fecha_lista: string; codigo_proveedor: string }[];
 };
 
 // Búsqueda instantánea y selector de margen (issues #13 y #14). El catálogo se baja
@@ -94,7 +95,18 @@ function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto:
         <strong>{p.descripcion}</strong>
         <br /><small>{[p.marca, p.codigo_proveedor, p.codigo_barras].filter(Boolean).join(" · ")}</small>
       </td>
-      <td>{p.proveedor ?? <em>sin proveedor</em>}<br /><small>{p.fecha_lista ? `lista del ${fecha(p.fecha_lista)}` : ""}</small></td>
+      <td>
+        {p.proveedor ?? <em>sin proveedor</em>}<br /><small>{p.fecha_lista ? `lista del ${fecha(p.fecha_lista)}` : ""}</small>
+        {(p.proveedores?.length ?? 0) > 1 && (
+          <ul className="otros-proveedores" data-testid="otros-proveedores">
+            {p.proveedores!.map((v, i) => (
+              <li key={v.proveedor_id} className={v.proveedor === p.proveedor ? "actual" : ""}>
+                {i === 0 ? "★ " : ""}{v.proveedor} {pesos(v.costo_neto)}{v.proveedor !== p.proveedor && <button className="enlace chico" onClick={(e) => { e.stopPropagation(); alCambiar({ proveedor_preferido_id: v.proveedor_id } as never); }}>usar</button>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </td>
       <td>{costo === null ? <em>sin costo</em> : <Explicacion valor={pesos(costo)} pasos={p.explicacion_costo.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`]} />}</td>
       <td>
         <div className="margenes" role="radiogroup" aria-label="margen">

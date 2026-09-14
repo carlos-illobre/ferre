@@ -26,6 +26,7 @@ test.beforeAll(() => {
   const hash = createHash("sha256").update(TOKEN).digest("hex");
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   // Proveedor de prueba limpio: sin listas ni precios de corridas anteriores.
+  psql(`DELETE FROM equivalencia_sugerida WHERE producto_a IN (SELECT id FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}')) OR producto_b IN (SELECT id FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}'))`);
   psql(`DELETE FROM precio_proveedor WHERE proveedor_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}')`);
   psql(`DELETE FROM lista_importada WHERE proveedor_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}')`);
   psql(`DELETE FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}') AND id NOT IN (SELECT producto_id FROM precio_proveedor)`);

@@ -20,6 +20,7 @@ AUTH="Authorization: Bearer $TOKEN"
 
 # Limpieza de corridas anteriores (los proveedores de prueba y todo lo que cuelga de ellos).
 for p in "Comodo (prueba)" "3GE (prueba)" "ERPA (prueba)" "Ixnova (prueba)"; do
+  psql "DELETE FROM equivalencia_sugerida WHERE producto_a IN (SELECT id FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '$p')) OR producto_b IN (SELECT id FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '$p'))" >/dev/null
   psql "DELETE FROM precio_proveedor WHERE proveedor_id IN (SELECT id FROM proveedor WHERE nombre = '$p')" >/dev/null
   psql "DELETE FROM lista_importada WHERE proveedor_id IN (SELECT id FROM proveedor WHERE nombre = '$p')" >/dev/null
   psql "DELETE FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '$p') AND id NOT IN (SELECT producto_id FROM precio_proveedor)" >/dev/null

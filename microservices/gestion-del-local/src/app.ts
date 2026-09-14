@@ -16,6 +16,7 @@ import { compras } from "./rutas/compras.js";
 import { stock } from "./rutas/stock.js";
 import { conteos, sectores } from "./rutas/conteos.js";
 import { puestos } from "./rutas/puestos.js";
+import { equivalencias } from "./rutas/equivalencias.js";
 
 export const app = new Hono();
 
@@ -44,6 +45,7 @@ app.route("/stock", stock);
 app.route("/sectores", sectores);
 app.route("/conteos", conteos);
 app.route("/puestos", puestos);
+app.route("/equivalencias", equivalencias);
 
 app.onError((error, c) => {
   console.error(error);

@@ -37,7 +37,8 @@ erDiagram
 |---|---|---|
 | `proveedor` | Quién vende | Si sus precios incluyen IVA, sus descuentos general y por contado (#11), y qué `lector` entiende su planilla |
 | `lista_importada` | Cada archivo cargado | Estado pendiente/aplicada/descartada, resumen de cambios, avisos, quién la cargó y quién la aplicó; el archivo se guarda en un volumen para reprocesar (#12) |
-| `producto` | Lo que se vende | `margen_elegido` (300/200/100/50/25 o ninguno) y `precio_manual` (#13). Un producto por renglón de lista hasta que #29 los una |
+| `producto` | Lo que se vende | `margen_elegido` (300/200/100/50/25 o ninguno) y `precio_manual` (#13). Puede tener precios de varios proveedores; `proveedor_preferido_id` decide el costo vigente (por defecto el más barato con lista reciente). Un producto absorbido queda inactivo con `reemplazado_por` (#29) |
+| `equivalencia_sugerida` | Posibles duplicados entre proveedores | Por código de barras o descripción normalizada; el dueño une o rechaza (#29) |
 | `precio_proveedor` | Histórico de costos | Precio de lista, descuentos aplicados en orden (JSON), costo neto, IVA, bulto, fecha de la lista |
 | `cliente` | Solo los importantes | Si se le permite cuenta corriente |
 | `venta` | Un ticket | Medio de pago incluye `cuenta_corriente` (exige cliente); `pagada_en` es el "tachar el renglón" |

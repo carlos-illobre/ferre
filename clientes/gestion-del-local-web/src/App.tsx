@@ -12,6 +12,7 @@ import { Vender } from "./pantallas/Vender";
 import { Compras } from "./pantallas/Compras";
 import { Stock } from "./pantallas/Stock";
 import { Contar } from "./pantallas/Contar";
+import { Duplicados } from "./pantallas/Duplicados";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import "./estilos.css";
 
@@ -30,6 +31,7 @@ const MENU: { ruta: string; nombre: string; soloDueno?: boolean }[] = [
   { ruta: "stock", nombre: "Stock" },
   { ruta: "contar", nombre: "Contar" },
   { ruta: "listas", nombre: "Listas de precios" },
+  { ruta: "duplicados", nombre: "Duplicados", soloDueno: true },
   { ruta: "administracion", nombre: "Administración", soloDueno: true },
 ];
 
@@ -74,6 +76,8 @@ function Pantallas() {
         <Stock />
       ) : actual === "contar" ? (
         <Contar />
+      ) : actual === "duplicados" && esDueno ? (
+        <Duplicados />
       ) : (
         <Vender />
       )}
