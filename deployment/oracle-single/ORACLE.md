@@ -147,7 +147,7 @@ cd ~/ferre/produccion && docker compose exec gestion-del-local node dist/crear-u
 cd ~/ferre/pruebas && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre" dueño
 ```
 
-Después se entra con Google y se da de alta al empleado desde la app:
+Después se entra con Google y se da de alta al empleado desde la app (roles: `dueño`, `admin`, `mostrador`):
 
 - Producción: `https://carlos-illobre.github.io/ferre/`
 - Pruebas: `https://carlos-illobre.github.io/ferre/pruebas/`

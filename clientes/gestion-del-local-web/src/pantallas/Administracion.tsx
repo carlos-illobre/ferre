@@ -18,6 +18,9 @@ export function Administracion() {
 }
 
 function Usuarios() {
+  const { sesion } = useSesion();
+  const rolActor = sesion.estado === "con-sesion" ? sesion.usuario.rol : "mostrador";
+  const esAdmin = rolActor === "admin"; // no toca dueños ni da ese rol
   const [filas, setFilas] = useState<UsuarioFila[]>([]);
   const [error, setError] = useState<string | null>(null);
   const cargar = () => api<UsuarioFila[]>("/usuarios").then(setFilas).catch((e: Error) => setError(e.message));
@@ -45,15 +48,22 @@ function Usuarios() {
   return (
     <article>
       <h2>Usuarios autorizados</h2>
+      <p className="ayuda">mostrador: vende, compra, cuenta y carga listas · admin: además administra usuarios, proveedores, duplicados y sesiones, pero no toca dueños · dueño: todo</p>
       <table>
         <thead><tr><th>Nombre</th><th>Correo de Google</th><th>Rol</th><th>Estado</th><th /></tr></thead>
         <tbody>
           {filas.map((u) => (
             <tr key={u.id}>
               <td>{u.nombre}</td><td>{u.email}</td>
-              <td><select value={u.rol} onChange={(e) => cambiar(u.id, { rol: e.target.value })}><option value="mostrador">mostrador</option><option value="dueño">dueño</option></select></td>
+              <td>
+                <select value={u.rol} disabled={esAdmin && u.rol === "dueño"} onChange={(e) => cambiar(u.id, { rol: e.target.value })}>
+                  <option value="mostrador">mostrador</option>
+                  <option value="admin">admin</option>
+                  {(!esAdmin || u.rol === "dueño") && <option value="dueño">dueño</option>}
+                </select>
+              </td>
               <td>{u.activo ? "activo" : "desactivado"}</td>
-              <td><button onClick={() => cambiar(u.id, { activo: !u.activo })}>{u.activo ? "Desactivar" : "Reactivar"}</button></td>
+              <td>{esAdmin && u.rol === "dueño" ? <small>solo el dueño</small> : <button className={`boton ${u.activo ? "peligro" : "primario"}`} onClick={() => cambiar(u.id, { activo: !u.activo })}>{u.activo ? "Desactivar" : "Reactivar"}</button>}</td>
             </tr>
           ))}
         </tbody>
@@ -61,7 +71,7 @@ function Usuarios() {
       <form onSubmit={alta} className="en-linea">
         <input name="nombre" placeholder="Nombre" required />
         <input name="email" type="email" placeholder="correo@gmail.com" required />
-        <select name="rol" defaultValue="mostrador"><option value="mostrador">mostrador</option><option value="dueño">dueño</option></select>
+        <select name="rol" defaultValue="mostrador"><option value="mostrador">mostrador</option><option value="admin">admin</option>{!esAdmin && <option value="dueño">dueño</option>}</select>
         <button type="submit">Autorizar</button>
       </form>
       {error && <p className="error" role="alert">{error}</p>}

@@ -25,12 +25,15 @@ export const exigirSesion: MiddlewareHandler = async (c, next) => {
   await next();
 };
 
-export function exigirRol(rol: Usuario["rol"]): MiddlewareHandler {
+export function exigirRol(...roles: Usuario["rol"][]): MiddlewareHandler {
   return async (c, next) => {
-    if (c.get("sesion").usuario.rol !== rol) return c.json({ error: `Solo puede hacerlo el ${rol}` }, 403);
+    if (!roles.includes(c.get("sesion").usuario.rol)) return c.json({ error: `Solo puede hacerlo ${roles.length > 1 ? "un " + roles.join(" o un ") : "el " + roles[0]}` }, 403);
     await next();
   };
 }
+
+// El dueño y el admin administran; la única diferencia es que el admin no toca dueños.
+export const exigirAdministrador = exigirRol("dueño", "admin");
 
 // Verifica el token que devuelve el botón de Google contra las claves públicas de
 // Google. Sin contraseñas: la identidad la afirma Google, nosotros solo decidimos si ese

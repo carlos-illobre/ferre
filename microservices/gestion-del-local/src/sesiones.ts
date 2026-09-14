@@ -7,7 +7,7 @@ import type pg from "pg";
 export const DURACION_SESION_DIAS = 90;
 const RENOVAR_CADA_MS = 60 * 60 * 1000; // se extiende con el uso, como mucho una vez por hora
 
-export type Usuario = { id: string; email: string; nombre: string; rol: "dueño" | "mostrador" };
+export type Usuario = { id: string; email: string; nombre: string; rol: "dueño" | "admin" | "mostrador" };
 export type SesionActiva = { id: string; usuario: Usuario };
 
 export function hashear(token: string): string {

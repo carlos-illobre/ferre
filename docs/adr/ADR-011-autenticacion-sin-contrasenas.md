@@ -80,3 +80,12 @@ El token de servicio entre `gestion-del-local` y `listas-de-proveedores` sigue a
 ## Referencias
 
 ADR-002, ADR-003, ADR-010. Issue #41. `docs/google-cloud.md`.
+
+---
+
+## Enmienda (2026-09-14): rol admin
+
+Se agrega el rol `admin`, con los permisos del dueño (usuarios, sesiones, auditoría,
+proveedores, duplicados) salvo sobre los dueños: no puede crearlos, cambiarles el rol,
+desactivarlos ni dar el rol de dueño. Sirve para delegar la administración diaria sin
+ceder el control de quién manda.

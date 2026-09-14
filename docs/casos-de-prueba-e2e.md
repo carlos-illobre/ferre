@@ -217,3 +217,17 @@ del barato.
 | Cerrar otra sesión | "Administración", botón azul "Cerrar" en la fila "otro celular" | La fila desaparece; la propia sigue; en la base esa sesión queda revocada |
 | Cerrar la propia | "Administración", botón rojo "Cerrar" de la fila "esta sesión" | Vuelve al login; el token ya no está en el dispositivo; recargar no vuelve a entrar |
 | Salir | "Salir" en la barra | Vuelve al login; en la base la sesión queda revocada |
+
+---
+
+## 13 · Rol admin
+`13-admin.spec.ts`
+
+**Precondiciones:** un usuario `admin` con sesión y un usuario `dueño`.
+
+| Paso | Resultado esperado |
+|---|---|
+| Abrir "Administración" como admin | Arriba dice "Admin E2E · admin"; se ven "Usuarios autorizados" y el menú "Duplicados" |
+| Autorizar un mostrador nuevo | Aparece en la tabla; el selector de alta no ofrece el rol "dueño" |
+| Mirar la fila del dueño | Su selector de rol está deshabilitado y dice "solo el dueño" |
+| Intentar por la API crear un dueño, desactivar al dueño o ascender a dueño | Las tres respuestas son 403; el dueño sigue activo y no existe el dueño nuevo |

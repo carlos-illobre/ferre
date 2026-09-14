@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirRol, exigirSesion } from "../autenticacion.js";
+import { exigirAdministrador, exigirSesion } from "../autenticacion.js";
 
 // Proveedores con su configuración de costo (issue #11): si sus precios incluyen IVA,
 // descuento general, descuento por contado, y qué lector entiende su planilla.
@@ -27,7 +27,7 @@ function validar(cuerpo: Cuerpo, completo: boolean): string | null {
   return null;
 }
 
-proveedores.post("/", exigirRol("dueño"), async (c) => {
+proveedores.post("/", exigirAdministrador, async (c) => {
   const cuerpo = await c.req.json<Cuerpo>().catch(() => ({}) as Cuerpo);
   const error = validar(cuerpo, true);
   if (error) return c.json({ error }, 400);
@@ -46,7 +46,7 @@ proveedores.post("/", exigirRol("dueño"), async (c) => {
   return c.json({ id }, 201);
 });
 
-proveedores.patch("/:id", exigirRol("dueño"), async (c) => {
+proveedores.patch("/:id", exigirAdministrador, async (c) => {
   const cuerpo = await c.req.json<Cuerpo & { activo?: boolean }>().catch(() => ({}) as Cuerpo & { activo?: boolean });
   const error = validar(cuerpo, false);
   if (error) return c.json({ error }, 400);

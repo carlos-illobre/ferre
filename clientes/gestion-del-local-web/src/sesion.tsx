@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, borrarToken, guardarToken, leerToken } from "./api";
 
-export type Usuario = { id: string; email: string; nombre: string; rol: "dueño" | "mostrador" };
+export type Usuario = { id: string; email: string; nombre: string; rol: "dueño" | "admin" | "mostrador" };
+export const administra = (u: Usuario | null | undefined) => u?.rol === "dueño" || u?.rol === "admin";
 type Estado = { estado: "cargando" } | { estado: "sin-sesion" } | { estado: "con-sesion"; usuario: Usuario; sinConexion: boolean; sesionId: string | null };
 
 const Contexto = createContext<{ sesion: Estado; entrar: (token: string, usuario: Usuario) => void; salir: () => Promise<void> } | null>(null);

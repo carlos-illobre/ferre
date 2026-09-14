@@ -3,7 +3,7 @@ import { api, ErrorApi } from "../api";
 import { Explicacion } from "../componentes/Explicacion";
 import { Desplegable } from "../componentes/Desplegable";
 import { fecha, pesos, porcentaje } from "../formato";
-import { useSesion } from "../sesion";
+import { administra, useSesion } from "../sesion";
 
 type Proveedor = { id: string; nombre: string; precios_incluyen_iva: boolean; descuento_general: string; descuento_contado: string; lector: string | null; activo: boolean };
 type ListaFila = { id: string; archivo_nombre: string; fecha_lista: string; estado: string; resumen: Resumen; avisos: string[]; importada_en: string | null; creado_en: string; proveedor_id: string; proveedor: string };
@@ -16,7 +16,7 @@ type Fila = { codigo_proveedor: string; descripcion: string; marca: string | nul
 // en menos de un minuto.
 export function Listas() {
   const { sesion } = useSesion();
-  const esDueno = sesion.estado === "con-sesion" && sesion.usuario.rol === "dueño";
+  const esDueno = sesion.estado === "con-sesion" && administra(sesion.usuario);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [historial, setHistorial] = useState<ListaFila[]>([]);
   const [cargada, setCargada] = useState<Cargada | null>(null);
@@ -303,7 +303,7 @@ function AltaDeProveedor({ proveedores, alCambiar }: { proveedores: Proveedor[];
   }
 
   return (
-    <Desplegable titulo="Proveedores: agregar o revisar (solo dueño)" testId="panel-proveedores">
+    <Desplegable titulo="Proveedores: agregar o revisar" testId="panel-proveedores">
       <table>
         <thead><tr><th>Proveedor</th><th>Lector</th><th>Precios con IVA</th><th>Dto. general</th><th>Dto. contado</th></tr></thead>
         <tbody>

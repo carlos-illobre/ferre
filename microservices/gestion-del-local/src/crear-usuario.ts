@@ -6,8 +6,8 @@ import { registrarEvento } from "./eventos.js";
 //   docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre" dueño
 // Los siguientes usuarios se cargan desde la app.
 const [email, nombre, rol = "dueño"] = process.argv.slice(2);
-if (!email || !nombre || (rol !== "dueño" && rol !== "mostrador")) {
-  console.error("Uso: crear-usuario <email> <nombre> [dueño|mostrador]");
+if (!email || !nombre || (rol !== "dueño" && rol !== "admin" && rol !== "mostrador")) {
+  console.error("Uso: crear-usuario <email> <nombre> [dueño|admin|mostrador]");
   process.exit(1);
 }
 const id = randomUUID();

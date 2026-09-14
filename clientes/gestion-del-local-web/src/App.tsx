@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { urlApi } from "./api";
-import { ProveedorDeSesion, useSesion } from "./sesion";
+import { ProveedorDeSesion, administra, useSesion } from "./sesion";
 import { irA, useRuta } from "./rutas";
 import { Login } from "./pantallas/Login";
 import { Vincular } from "./pantallas/Vincular";
@@ -45,7 +45,7 @@ function Pantallas() {
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
   if (sesion.estado === "sin-sesion") return <Login />;
 
-  const esDueno = sesion.usuario.rol === "dueño";
+  const esDueno = administra(sesion.usuario);
   const actual = ruta.nombre === "inicio" ? "vender" : ruta.nombre;
 
   return (

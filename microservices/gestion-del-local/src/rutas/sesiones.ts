@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { emailVerificadoPorGoogle, exigirRol, exigirSesion, limitarIntentos } from "../autenticacion.js";
+import { emailVerificadoPorGoogle, exigirAdministrador, exigirSesion, limitarIntentos } from "../autenticacion.js";
 import { crearSesion, generarToken, hashear, revocarSesion } from "../sesiones.js";
 
 export const sesiones = new Hono();
@@ -110,7 +110,7 @@ sesiones.get("/vinculaciones/:codigo", async (c) => {
 });
 
 // El dueño ve y revoca cualquier sesión abierta.
-sesiones.get("/", exigirSesion, exigirRol("dueño"), async (c) => {
+sesiones.get("/", exigirSesion, exigirAdministrador, async (c) => {
   const { rows } = await pool.query(
     `SELECT s.id, s.dispositivo, s.creada_en, s.ultimo_uso_en, s.expira_en, u.email, u.nombre
        FROM sesion s JOIN usuario u ON u.id = s.usuario_id
@@ -120,7 +120,7 @@ sesiones.get("/", exigirSesion, exigirRol("dueño"), async (c) => {
   return c.json(rows);
 });
 
-sesiones.delete("/:id", exigirSesion, exigirRol("dueño"), async (c) => {
+sesiones.delete("/:id", exigirSesion, exigirAdministrador, async (c) => {
   await revocarSesion(pool, c.req.param("id"));
   await registrarEvento(pool, { tipo: "sesion.revocada", usuarioId: c.get("sesion").usuario.id, contenido: { sesionId: c.req.param("id") } });
   return c.body(null, 204);

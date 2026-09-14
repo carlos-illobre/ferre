@@ -31,6 +31,7 @@ El detalle de cada caso (precondiciones, pasos y resultado esperado) está en
 | Vincular el celular por QR y que lo escaneado aparezca en la laptop; asociar un código desconocido | `10-escaner.spec.ts` | Hecho (el escaneo con cámara real se prueba a mano) |
 | Sugerir un duplicado entre proveedores, unirlo y ver el más barato como preferido | `11-duplicados.spec.ts` | Hecho |
 | Cerrar la sesión de otro dispositivo, cerrar la propia (vuelve al login) y Salir | `12-cerrar-sesion.spec.ts` | Hecho |
+| El admin administra pero no puede crear, cambiar ni desactivar dueños | `13-admin.spec.ts` | Hecho |
 | Ver el stock valorizado, sus movimientos y corregirlo | `06-stock.spec.ts` | Hecho |
 
 Cada issue de esa lista agrega su escenario antes de cerrarse.
