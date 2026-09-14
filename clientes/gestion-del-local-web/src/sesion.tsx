@@ -16,7 +16,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
     const token = leerToken();
     if (!token) return setSesion({ estado: "sin-sesion" });
     api<{ usuario: Usuario }>("/sesiones/actual")
-      .then((r) => setSesion({ estado: "con-sesion", usuario: r.usuario, sinConexion: false }))
+      .then((r) => { guardarUsuario(r.usuario); setSesion({ estado: "con-sesion", usuario: r.usuario, sinConexion: false }); })
       .catch((e: { estado?: number }) => {
         if (e.estado === 401) return setSesion({ estado: "sin-sesion" });
         const guardado = leerUsuarioGuardado();

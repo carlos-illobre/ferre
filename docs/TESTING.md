@@ -23,6 +23,8 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 | Buscar un producto y registrar una venta; ventas del día; anular; "no llevó" | `04-vender.spec.ts` | Hecho |
 | Ingresar mercadería de un proveedor; costo según factura; gasto semanal; anular | `05-compras.spec.ts` | Hecho |
 | Contar un sector desde el celular y cerrarlo con ajustes | `07-contar.spec.ts` | Hecho |
+| Vender y cambiar un margen sin red, y que llegue todo al volver; la app abre sin red | `08-sin-conexion.spec.ts` | Hecho |
+| Carga del navegador: 50.000 productos y 10.000 ventas (solo con `CARGA=1`) | `09-carga.spec.ts` | Hecho |
 | Ver el stock valorizado, sus movimientos y corregirlo | `06-stock.spec.ts` | Hecho |
 
 Cada issue de esa lista agrega su escenario antes de cerrarse.

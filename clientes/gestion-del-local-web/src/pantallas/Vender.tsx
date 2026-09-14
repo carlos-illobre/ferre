@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { margenReal, MARGENES, precioDeVenta, type Margen } from "@ferre/calculo-de-precios";
 import { api, ErrorApi } from "../api";
+import { guardar, borrarAnterioresA } from "../almacen";
+import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendientesEnCola } from "../cola";
 import { useCatalogo } from "../catalogo";
 import { Explicacion } from "../componentes/Explicacion";
 import { fecha, pesos } from "../formato";
-import { encolar, enviarPendientes, leerPendientes } from "../ventas-pendientes";
 import { describirDispositivo } from "./Login";
 import type { Producto } from "./Productos";
 
@@ -21,7 +22,6 @@ const MEDIOS: { valor: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corrien
   { valor: "tarjeta", nombre: "Tarjeta", tecla: "F7" },
   { valor: "cuenta_corriente", nombre: "Cuenta corriente", tecla: "F8" },
 ];
-type Cliente = { id: string; nombre: string; deuda: string };
 
 function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: Margen | null; costo: number | null; iva: number } {
   const p = item.producto;
@@ -39,32 +39,30 @@ function precioDe(item: Item): { unitario: number | null; pasos: string[]; marge
 }
 
 export function Vender() {
-  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
   const [medio, setMedio] = useState<(typeof MEDIOS)[number]["valor"] | null>(null);
   const [clienteId, setClienteId] = useState<string>("");
-  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [pendientes, setPendientes] = useState(leerPendientes().length);
-  const [stockPorId, setStockPorId] = useState<Map<string, number>>(new Map());
-  useEffect(() => {
-    api<{ productos: { id: string; stock: string }[] }>("/stock").then((d) => setStockPorId(new Map(d.productos.map((s) => [s.id, Number(s.stock)])))).catch(() => undefined);
-  }, [mensaje]);
+  const [pendientes, setPendientes] = useState(0);
   const [ocupado, setOcupado] = useState(false);
   const caja = useRef<HTMLInputElement>(null);
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
   useEffect(() => { caja.current?.focus(); }, [catalogo]);
-  useEffect(() => { api<Cliente[]>("/clientes").then(setClientes).catch(() => undefined); }, []);
   useEffect(() => {
+    const contar = () => pendientesEnCola().then((l) => setPendientes(l.length)).catch(() => undefined);
+    void contar();
+    const quitar = alCambiarLaCola(contar);
     const reintentar = () => { enviarPendientes().then(setPendientes).catch(() => undefined); };
-    reintentar();
     window.addEventListener("online", reintentar);
-    return () => window.removeEventListener("online", reintentar);
+    // Las ventas confirmadas se conservan 7 días en el dispositivo (ADR-002).
+    borrarAnterioresA("ventas", "fecha", new Date(Date.now() - 7 * 86400000).toISOString()).catch(() => undefined);
+    return () => { quitar(); window.removeEventListener("online", reintentar); };
   }, []);
 
   const total = items.reduce((s, it) => s + (precioDe(it).unitario ?? 0) * it.cantidad, 0);
@@ -140,14 +138,16 @@ export function Vender() {
       }),
     };
     try {
-      await api("/ventas", { method: "POST", body: JSON.stringify(cuerpo) });
-      setMensaje(`Venta registrada: ${pesos(total)} en ${MEDIOS.find((m) => m.valor === medio)!.nombre.toLowerCase()}.`);
+      const { encolado } = await enviarOEncolar("venta", "POST", "/ventas", cuerpo);
+      // Copia local de la venta (7 días) y stock visto por el mostrador.
+      guardar("ventas", { id, fecha: cuerpo.fecha, total, medio_pago: medio, items: cuerpo.items, enviada: !encolado }).catch(() => undefined);
+      for (const it of items) if (it.producto) ajustarStockLocal(it.producto.id, -it.cantidad);
+      setMensaje(encolado
+        ? `Venta guardada en este dispositivo (${pesos(total)}). Sin conexión: se envía sola cuando vuelva.`
+        : `Venta registrada: ${pesos(total)} en ${MEDIOS.find((m) => m.valor === medio)!.nombre.toLowerCase()}.`);
     } catch (e) {
       if (e instanceof ErrorApi) { setError(e.message); setOcupado(false); return; }
-      // Sin conexión: la venta queda guardada acá y se envía sola al reconectar.
-      encolar({ id, fecha: cuerpo.fecha, cuerpo, total });
-      setPendientes(leerPendientes().length);
-      setMensaje(`Venta guardada en este dispositivo (${pesos(total)}). Sin conexión: se envía sola cuando vuelva.`);
+      throw e;
     }
     setItems([]); setMedio(null); setClienteId(""); setOcupado(false);
     caja.current?.focus();
@@ -156,7 +156,7 @@ export function Vender() {
   async function noLlevo() {
     if (items.length === 0) return;
     const consultaItems = items.map((it) => ({ producto_id: it.producto?.id ?? null, descripcion: it.descripcion, precio_ofrecido: precioDe(it).unitario }));
-    api("/consultas", { method: "POST", body: JSON.stringify({ items: consultaItems, dispositivo_id: describirDispositivo() }) }).catch(() => undefined);
+    enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: describirDispositivo() }).catch(() => undefined);
     setItems([]); setMedio(null); setClienteId("");
     setMensaje("Anotado como consulta: qué pidió y a cuánto se ofreció.");
     caja.current?.focus();
@@ -192,7 +192,7 @@ export function Vender() {
         )}
         {consulta.trim() && resultados.length === 0 && catalogo && <p className="ayuda">Nada con "{consulta}". Enter lo agrega como ítem libre y le ponés el precio.</p>}
       </div>
-      <p className="ayuda">Enter agrega · Esc descarta · F5 efectivo · F6 Mercado Pago · F7 tarjeta · F8 cuenta corriente · F2 cobrar{pendientes > 0 ? ` · ${pendientes} venta(s) guardadas sin enviar` : ""}</p>
+      <p className="ayuda">Enter agrega · Esc descarta · F5 efectivo · F6 Mercado Pago · F7 tarjeta · F8 cuenta corriente · F2 cobrar{pendientes > 0 ? ` · ${pendientes} cambio(s) guardados sin enviar` : ""}</p>
       {(error ?? errorCatalogo) && <p className="error" role="alert">{error ?? errorCatalogo}</p>}
       {mensaje && <p className="exito" role="status" data-testid="mensaje">{mensaje}</p>}
 

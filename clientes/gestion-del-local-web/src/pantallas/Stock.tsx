@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, ErrorApi } from "../api";
+import { enviarOEncolar } from "../cola";
 import { useCatalogo } from "../catalogo";
 import { fecha, pesos } from "../formato";
 import type { Producto } from "./Productos";
@@ -68,7 +69,7 @@ function FilaStock({ producto: p, cantidad, fila, abierto, alAbrir, alAjustar }:
 
   async function ajustar(real: number, motivo: string) {
     try {
-      await api(`/stock/${p.id}/ajustes`, { method: "POST", body: JSON.stringify({ cantidad_real: real, motivo }) });
+      await enviarOEncolar("stock.ajuste", "POST", `/stock/${p.id}/ajustes`, { cantidad_real: real, motivo });
       setAjustando(false); setMovimientos(null); setError(null);
       await alAjustar();
       if (abierto) api<Movimiento[]>(`/stock/${p.id}/movimientos`).then(setMovimientos).catch(() => undefined);

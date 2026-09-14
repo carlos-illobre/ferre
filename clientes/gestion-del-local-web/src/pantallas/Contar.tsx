@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { api, ErrorApi } from "../api";
+import { enviarOEncolar } from "../cola";
 import { useCatalogo } from "../catalogo";
 import { fecha } from "../formato";
 import type { Producto } from "./Productos";
@@ -102,9 +103,14 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     const n = Number(cantidad);
     if (cantidad === "" || !Number.isFinite(n) || n < 0) { setError("Escribí cuántas hay."); return; }
     try {
-      await api(`/conteos/${conteo.id}/renglones/${producto.id}`, { method: "PUT", body: JSON.stringify({ cantidad: n }) });
+      const { encolado } = await enviarOEncolar("conteo.renglon", "PUT", `/conteos/${conteo.id}/renglones/${producto.id}`, { cantidad: n });
       setError(null); setProducto(null); setCantidad("");
-      await recargar();
+      if (encolado) {
+        // Sin conexión: se muestra lo contado igual; el servidor lo recibe al reconectar.
+        alActualizar({ ...conteo, renglones: [{ producto_id: producto.id, cantidad_contada: String(n), contado_en: new Date().toISOString(), descripcion: producto.descripcion, marca: producto.marca, stock_teorico: String(contadoPorId.get(producto.id)?.stock_teorico ?? "0") }, ...conteo.renglones.filter((r) => r.producto_id !== producto.id)] });
+      } else {
+        await recargar();
+      }
     } catch (e) { setError((e as Error).message); }
   }
   async function cerrar(faltantesEnCero: boolean) {

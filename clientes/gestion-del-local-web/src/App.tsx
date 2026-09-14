@@ -11,6 +11,7 @@ import { Vender } from "./pantallas/Vender";
 import { Compras } from "./pantallas/Compras";
 import { Stock } from "./pantallas/Stock";
 import { Contar } from "./pantallas/Contar";
+import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import "./estilos.css";
 
 export function App() {
@@ -52,7 +53,8 @@ function Pantallas() {
             <button key={m.ruta} className={`enlace ${actual === m.ruta ? "activo" : ""}`} onClick={() => irA(m.ruta)}>{m.nombre}</button>
           ))}
         </nav>
-        <span data-testid="usuario">{sesion.usuario.nombre} · {sesion.usuario.rol}{sesion.sinConexion ? " · sin conexión" : ""}</span>
+        <EstadoDeConexion />
+        <span data-testid="usuario">{sesion.usuario.nombre} · {sesion.usuario.rol}</span>
         <button className="secundario" onClick={salir}>Salir</button>
       </header>
       {actual === "administracion" && esDueno ? (

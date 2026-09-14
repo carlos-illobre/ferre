@@ -2,6 +2,7 @@
 # E2E de los caminos principales: la red de seguridad (ADR-004). Levanta el stack si no
 # está, construye y sirve el cliente web contra esa API, corre los escenarios de
 # tests/e2e/ con Playwright, y sale con 1 nombrando cuál falló. --solo <nombre> repite uno.
+# CARGA=1 activa además la prueba de carga del navegador (lenta; para la laptop del local).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

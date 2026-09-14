@@ -206,3 +206,10 @@ button.sector:hover { border-color: var(--azul); }
 .contando .cuantas { display: flex; flex-direction: column; gap: 0.3rem; font-size: 1.1rem; margin-top: 0.5rem; }
 .contando .cuantas input { font-size: 2rem; text-align: center; padding: 0.6rem; width: 100%; box-sizing: border-box; }
 .contando .acciones button.grande { flex: 1; }
+
+/* Indicador de conexión (#18) */
+.conexion { font-size: 0.85rem; padding: 0.25rem 0.6rem; border-radius: 999px; white-space: nowrap; background: rgba(255,255,255,0.12); color: #d9e2f2; }
+.conexion.ok::before { content: "● "; color: #4cd37a; }
+.conexion.pendiente::before { content: "● "; color: #9ec5ff; }
+.conexion.atrasado { background: var(--amarillo); color: var(--azul-oscuro); }
+.conexion.sin-conexion { background: var(--rojo); color: #fff; }

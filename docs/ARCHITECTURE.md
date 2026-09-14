@@ -46,8 +46,11 @@ Fuente: [diagrams/contexto.mmd](diagrams/contexto.mmd).
   token de sesión en cabecera ([ADR-010](adr/ADR-010-servicios-clientes-y-librerias.md)).
 - Los eventos de dominio se guardan en una tabla de eventos en JSON versionado. Hoy los
   consume la propia app; un futuro servicio de ventas online los lee desde ahí.
-- La PWA guarda catálogo, ventas del día y cola de cambios en IndexedDB, y sincroniza
-  cuando hay conexión.
+- El cliente web es una PWA: un service worker precachea la app entera, así abre sin
+  conexión y se actualiza sola. Catálogo, stock, clientes, ventas de 7 días y la cola
+  única de cambios pendientes viven en IndexedDB (`almacen.ts`, `cola.ts`). Todo cambio
+  del mostrador se intenta enviar y, sin red, se encola y sale en orden al reconectar;
+  la API y Google nunca pasan por el caché.
 
 ## Despliegue
 
