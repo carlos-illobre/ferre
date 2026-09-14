@@ -53,49 +53,57 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   const fila = page.getByTestId("producto").filter({ hasText: "MECHA PARA MADERA DE 6 MM (E2E)" });
   await expect(fila).toBeVisible();
   await expect(page.getByTestId("producto")).toHaveCount(1);
-  await expect(fila).toContainText("sin precio");
+  await expect(fila).toContainText("sin margen");
 
-  // Costo con explicación, margen 100 % con el teclado, precio calculado con explicación.
-  await fila.locator("summary").first().click();
-  await expect(fila).toContainText("− 25 % (linea)");
-  await busqueda.press("Shift+3");
-  await expect(fila.getByRole("button", { name: "100 %" })).toHaveClass(/activo/);
-  await expect(fila.locator("td.precio")).toContainText("$4.000,00"); // 1500 × 2 × 1,21 = 3630 → para arriba a 4000
-  await fila.locator("td.precio summary").click();
-  await expect(fila).toContainText("+ 100 % de margen");
+  // La ficha se abre con Enter. Ahí, costo con explicación, margen 100 %, precio calculado.
+  await busqueda.press("Enter");
+  const ficha = page.getByTestId("ficha-producto");
+  await expect(ficha).toContainText("MECHA PARA MADERA DE 6 MM (E2E)");
+  await ficha.getByRole("button", { name: /Cómo se calcula el costo/ }).click();
+  await expect(page.getByTestId("hoja-explicacion")).toContainText("− 25 % (linea)");
+  await page.keyboard.press("Escape");
+  await ficha.getByRole("button", { name: "100 %" }).click();
+  await expect(ficha.getByRole("button", { name: "100 %" })).toHaveClass(/activo/);
+  await expect(ficha).toContainText("$4.000"); // 1500 × 2 × 1,21 = 3630 → para arriba a 4000
+  await ficha.getByRole("button", { name: "De dónde sale $4.000" }).click();
+  await expect(page.getByTestId("hoja-explicacion")).toContainText("+ 100 % de margen");
+  await page.keyboard.press("Escape");
 
   // Queda guardado aunque se recargue con el pedido en vuelo: el cambio se anota en el
   // dispositivo antes de mandarse y se reenvía al arrancar. Acá el servidor "tarda" 5 s.
   await page.route("**/productos/*", async (ruta) => { await new Promise((r) => setTimeout(r, 5000)); await ruta.continue().catch(() => undefined); });
-  await fila.getByRole("button", { name: "50 %" }).click();
-  await expect(fila.getByRole("button", { name: "50 %" })).toHaveClass(/activo/);
+  await ficha.getByRole("button", { name: "50 %" }).click();
+  await expect(ficha.getByRole("button", { name: "50 %" })).toHaveClass(/activo/);
   await page.waitForTimeout(300); // que llegue a anotarse en el dispositivo
   await page.unroute("**/productos/*");
   await page.reload();
   await page.getByTestId("busqueda").fill("me6");
-  await expect(page.getByTestId("producto").first().getByRole("button", { name: "50 %" })).toHaveClass(/activo/);
-  await page.getByTestId("producto").first().getByRole("button", { name: "100 %" }).click();
-  await expect(page.getByTestId("producto").first().locator("td.precio")).toContainText("$4.000,00");
+  await expect(page.getByTestId("producto").first()).toContainText("50 %");
+  await page.getByTestId("producto").first().click();
+  await page.getByTestId("ficha-producto").getByRole("button", { name: "100 %" }).click();
+  await expect(page.getByTestId("ficha-producto")).toContainText("$4.000");
   await page.waitForTimeout(300); // que llegue a anotarse en el dispositivo
   await page.reload();
   await page.getByTestId("busqueda").fill("me6");
-  await expect(page.getByTestId("producto").first().getByRole("button", { name: "100 %" })).toHaveClass(/activo/);
+  await expect(page.getByTestId("producto").first()).toContainText("100 %");
 
   // Otro margen a mano, en porcentaje: 20 % → 1500 × 1,2 × 1,21 = 2178 → $3.000.
-  const fila2 = page.getByTestId("producto").first();
-  await fila2.getByRole("button", { name: "otro margen" }).click();
-  await fila2.locator("input.precio-manual").fill("20");
-  await fila2.locator("input.precio-manual").press("Enter");
-  await expect(fila2.locator("td.precio")).toContainText("$3.000,00");
-  await expect(fila2.locator("td.precio")).toContainText("margen a mano · 20 %");
-  await expect(fila2.getByRole("button", { name: "100 %" })).not.toHaveClass(/activo/);
+  await page.getByTestId("producto").first().click();
+  const ficha2 = page.getByTestId("ficha-producto");
+  await ficha2.getByTestId("otro-margen").fill("20");
+  await ficha2.getByTestId("otro-margen").press("Enter");
+  await expect(ficha2).toContainText("$3.000");
+  await expect(ficha2).toContainText("20 % a mano");
+  await expect(ficha2.getByRole("button", { name: "100 %" })).not.toHaveClass(/activo/);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("producto").first()).toContainText("20 % a mano");
 
-  // El taladro con 25 %: 181.500 → para arriba a $182.000.
+  // El taladro con 25 %: 181.500 → para arriba a $182.000. Con Shift+5 desde la lista.
   await page.getByTestId("busqueda").fill("e2e taladro");
   const taladro = page.getByTestId("producto").filter({ hasText: "TALADRO PERCUTOR" });
   await expect(taladro).toBeVisible();
-  await taladro.getByRole("button", { name: "25 %" }).click();
-  await expect(taladro.locator("td.precio")).toContainText("$182.000,00");
+  await page.keyboard.press("Shift+Digit5");
+  await expect(taladro).toContainText("$182.000");
 
   // Nada con palabras que no existen.
   await page.getByTestId("busqueda").fill("zzzz");
@@ -104,20 +112,21 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   // Las flechas y Shift+número funcionan aunque la búsqueda no tenga el foco.
   await page.getByTestId("busqueda").fill("e2e tuerca scroll");
   await expect(page.getByTestId("producto")).toHaveCount(30);
-  await page.locator("h1, .ayuda").first().click(); // el foco sale de la caja
+  await page.locator("h1").first().click(); // el foco sale de la caja
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("producto").nth(2)).toHaveAttribute("aria-selected", "true");
   await page.keyboard.press("Shift+Digit2");
-  await expect(page.getByTestId("producto").nth(2).getByRole("button", { name: "200 %" })).toHaveClass(/activo/);
+  await expect(page.getByTestId("producto").nth(2)).toContainText("200 %");
 
   // Carga progresiva: 30 primero, el resto al llegar al final.
   await page.getByTestId("cargar-mas").scrollIntoViewIfNeeded();
   await expect(page.getByTestId("producto")).toHaveCount(40);
   await expect(page.getByTestId("cargar-mas")).toHaveCount(0);
 
-  // Foto: sin foto muestra el ícono; al tocar se amplía con la descripción y Escape cierra.
-  await page.getByTestId("producto").first().getByTestId("foto-chica").click();
+  // Foto: en la ficha, sin foto muestra el ícono; al tocar se amplía con la descripción y Escape cierra.
+  await page.getByTestId("producto").first().click();
+  await page.getByTestId("ficha-producto").getByTestId("foto-chica").click();
   const grande = page.getByTestId("foto-grande");
   await expect(grande).toBeVisible();
   await expect(grande).toContainText("TUERCA SCROLL");

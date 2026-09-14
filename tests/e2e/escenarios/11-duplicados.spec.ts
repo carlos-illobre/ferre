@@ -42,7 +42,6 @@ test.beforeAll(() => {
 test("sugerir, unir y ver el proveedor más barato como preferido", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/duplicados");
-  await expect(page.getByRole("heading", { name: "Duplicados entre proveedores" })).toBeVisible();
   await page.getByTestId("buscar-duplicados").click();
   const sugerencia = page.getByTestId("sugerencia").filter({ hasText: "SILICONA DUPLICADA" });
   await expect(sugerencia).toBeVisible();
@@ -58,18 +57,22 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   expect(psql(`SELECT proveedor_preferido_id FROM producto WHERE id = '${ID_A}'`)).toBe(ID_PROV_B);
   expect(psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("2");
 
-  // En Productos: un solo producto, dos proveedores, el barato con estrella y el precio sobre su costo.
+  // En Productos: un solo producto; en su ficha, dos proveedores, el barato con estrella y el precio sobre su costo.
   await page.goto("/#/productos");
   await page.getByTestId("busqueda").fill("e2e silicona duplicada");
   await expect(page.getByTestId("producto")).toHaveCount(1);
-  const fila = page.getByTestId("producto").first();
-  await expect(fila.getByTestId("otros-proveedores")).toContainText("★ Proveedor barato (e2e) $2.400,00");
-  await expect(fila.getByTestId("otros-proveedores")).toContainText("Proveedor caro (e2e) $3.000,00");
-  await expect(fila.locator("td.precio")).toContainText("$6.000,00"); // 2400 × 2 × 1,21 = 5808 → 6000
+  await page.getByTestId("producto").first().click();
+  const ficha = page.getByTestId("ficha-producto");
+  await expect(ficha.getByTestId("otros-proveedores")).toContainText("★ Proveedor barato (e2e)");
+  await expect(ficha.getByTestId("otros-proveedores")).toContainText("$2.400,00");
+  await expect(ficha.getByTestId("otros-proveedores")).toContainText("Proveedor caro (e2e)");
+  await expect(ficha.getByTestId("otros-proveedores")).toContainText("$3.000,00");
+  await expect(ficha).toContainText("$6.000"); // 2400 × 2 × 1,21 = 5808 → 6000
 
   // Elegir el caro a mano: el precio sigue a ese costo.
-  await fila.getByTestId("otros-proveedores").getByRole("button", { name: "usar" }).click();
-  await expect(fila.locator("td.precio")).toContainText("$8.000,00", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
+  await ficha.getByTestId("proveedor-de-producto").filter({ hasText: "Proveedor caro" }).click();
+  await expect(ficha).toContainText("$8.000", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
+  await page.keyboard.press("Escape");
 
   // Separar: el absorbido vuelve a existir con sus precios y su venta.
   await page.goto("/#/duplicados");

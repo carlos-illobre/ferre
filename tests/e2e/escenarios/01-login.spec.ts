@@ -24,16 +24,16 @@ test.beforeAll(() => {
 test("sin sesión se pide entrar", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
-  await expect(page.getByRole("button", { name: /leer con el celular/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /código QR con el celular/ })).toBeVisible();
 });
 
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
-  await page.getByRole("button", { name: "Administración" }).click();
-  await expect(page.getByRole("heading", { name: "Usuarios autorizados" })).toBeVisible();
-  await expect(page.getByRole("cell", { name: EMAIL })).toBeVisible();
+  await page.getByRole("button", { name: "Negocio" }).click();
+  await expect(page.getByText("Quién puede entrar")).toBeVisible();
+  await expect(page.getByTestId("usuarios")).toContainText(EMAIL);
 });
 
 // Passkeys con un autenticador virtual de Chromium (huella simulada): vincular el

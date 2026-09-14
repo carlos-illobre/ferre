@@ -38,17 +38,18 @@ test.beforeAll(() => {
 test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");
-  await page.getByRole("button", { name: "Listas de precios" }).click();
-  await expect(page.getByRole("heading", { name: "Listas de precios" })).toBeVisible();
+  await page.getByRole("button", { name: "Catálogo" }).click();
+  await page.getByRole("tab", { name: "Listas" }).click();
 
   // Alta del proveedor con su configuración de costo (descuento por contado 5 %). El panel
   // está arriba de la zona de carga y abierto.
-  await expect(page.getByTestId("panel-proveedores")).toHaveClass(/abierto/);
+  await page.getByTestId("agregar-proveedor").click();
+  await expect(page.getByTestId("panel-proveedores")).toBeVisible();
   await page.getByPlaceholder("Nombre del proveedor").fill(PROVEEDOR);
   await page.locator('select[name="lector"]').selectOption("comodo");
   await page.locator('input[name="contado"]').fill("5");
   await page.getByRole("button", { name: "Agregar", exact: true }).click();
-  await expect(page.getByRole("cell", { name: PROVEEDOR }).first()).toBeVisible();
+  await expect(page.getByTestId("estado-proveedores")).toContainText(PROVEEDOR);
 
   // Soltar la planilla: se detecta el proveedor y aparece el resumen.
   await page.getByTestId("archivo").setInputFiles(MUESTRA);
@@ -62,16 +63,17 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   // La vista previa muestra el costo con descuento de línea y contado, y su explicación.
   const fila = page.getByRole("row", { name: /MP001/ });
   await expect(fila).toContainText("$712,50");
-  await fila.locator("summary").click();
-  await expect(fila).toContainText("− 25 % (linea)");
-  await expect(fila).toContainText("− 5 % (contado)");
+  await fila.getByRole("button").first().click();
+  await expect(page.getByTestId("hoja-explicacion")).toContainText("− 25 % (linea)");
+  await expect(page.getByTestId("hoja-explicacion")).toContainText("− 5 % (contado)");
+  await page.keyboard.press("Escape");
 
   await page.getByTestId("aplicar").click();
   // Se aplica en segundo plano con barra de progreso; con 4 filas termina enseguida.
   // Al terminar vuelve a la pantalla de listas con el resultado en una tarjeta que se cierra.
   await expect(page.getByTestId("resultado")).toContainText("4 precios actualizados", { timeout: 15000 });
   await expect(page.getByTestId("resultado")).toContainText("4 productos nuevos");
-  await page.getByRole("button", { name: "Entendido" }).click();
+  await page.getByTestId("resultado").getByRole("button", { name: "Cerrar aviso" }).click();
   await expect(page.getByTestId("resultado")).toHaveCount(0);
 
   // El proveedor ya tiene su última lista aplicada.

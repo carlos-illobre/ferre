@@ -38,8 +38,9 @@ test.beforeAll(() => {
 test("ingresar mercadería: stock, costo según factura, gasto de la semana y anulación", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/compras");
-  await expect(page.getByRole("heading", { name: "Ingreso de mercadería" })).toBeVisible();
-  await page.getByTestId("proveedor").selectOption({ label: PROVEEDOR });
+  await page.getByTestId("proveedor").click();
+  await page.getByTestId("opcion-proveedor").filter({ hasText: PROVEEDOR }).click();
+  await expect(page.getByTestId("proveedor")).toContainText(PROVEEDOR);
   await page.getByTestId("numero").fill("0001-00000777");
 
   // Producto conocido: el costo viene de la lista ($1.000); la factura dice $1.200.
@@ -58,34 +59,37 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   await busqueda.press("Enter");
   // El renglón libre muestra la descripción en un input (no es texto): es el segundo renglón.
   const pincel = page.getByTestId("renglon").nth(1);
-  await expect(pincel.locator("input.libre")).toHaveValue("PINCEL NUEVO COMPRAS (E2E)");
+  await expect(pincel.getByTestId("descripcion-nueva")).toHaveValue("PINCEL NUEVO COMPRAS (E2E)");
   await pincel.getByTestId("cantidad").fill("5");
   await pincel.getByTestId("costo").fill("800");
-  await expect(page.getByTestId("total")).toContainText("$16.000,00"); // 10 × 1200 + 5 × 800
+  await expect(page.getByTestId("total")).toContainText("$16.000"); // 10 × 1200 + 5 × 800
 
-  await page.getByTestId("confirmar").click();
-  await expect(page.getByTestId("mensaje")).toContainText("Compra registrada: $16.000,00");
-  await expect(page.getByTestId("mensaje")).toContainText("2 costo(s) actualizado(s)");
-  await expect(page.getByTestId("mensaje")).toContainText("1 producto(s) nuevo(s)");
+  await page.getByTestId("registrar").click();
+  await expect(page.getByTestId("exito")).toContainText("Ingreso registrado");
+  await expect(page.getByTestId("exito")).toContainText("$16.000");
+  await expect(page.getByTestId("exito")).toContainText("2 costos actualizados");
+  await expect(page.getByTestId("exito")).toContainText("1 producto nuevo");
+  await page.getByTestId("cerrar-exito").click();
 
   // Stock, costo vigente con explicación, gasto de la semana.
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("10.000");
   expect(psql(`SELECT costo_neto FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toBe("1200.0000");
   expect(psql(`SELECT descuentos->'explicacion'->>0 FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toContain("según factura 0001-00000777");
   expect(psql(`SELECT count(*) FROM producto WHERE descripcion = 'PINCEL NUEVO COMPRAS (E2E)' AND proveedor_preferido_id = '${ID_PROV}'`)).toBe("1");
-  await expect(page.getByTestId("gastos-semana")).toContainText(PROVEEDOR);
+  await expect(page.getByTestId("gastos-semana")).toContainText("$16.000");
 
   // Anular devuelve el stock; el costo según factura se mantiene.
   const recientes = page.getByTestId("compras-recientes");
+  await expect(recientes).toContainText(PROVEEDOR);
   // La compra se despliega y muestra sus dos renglones.
   const compra = recientes.getByTestId("compra-reciente").filter({ hasText: PROVEEDOR }).first();
-  await expect(compra.getByRole("row")).toHaveCount(1);
-  await compra.getByRole("row").first().click();
-  await expect(compra.getByRole("row")).toHaveCount(3);
-  await expect(compra.getByRole("row").nth(1)).toContainText("10 × CINTA AISLADORA");
-  await expect(compra.getByRole("row").nth(2)).toContainText("5 × PINCEL NUEVO");
+  await compra.getByRole("button").first().click();
+  await expect(compra).toContainText("10 ×");
+  await expect(compra).toContainText("CINTA AISLADORA");
+  await expect(compra).toContainText("5 ×");
+  await expect(compra).toContainText("PINCEL NUEVO");
   page.once("dialog", (d) => d.accept("error de carga"));
-  await compra.getByRole("button", { name: "Anular" }).click();
+  await compra.getByRole("button", { name: "Anular esta compra" }).click();
   await expect(compra).toContainText("anulada");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("0.000");
 });

@@ -28,7 +28,7 @@ test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page 
   await page.goto("/#/administracion");
   const otra = page.getByRole("row", { name: /otro celular/ });
   await expect(otra).toBeVisible();
-  await expect(otra.getByRole("button", { name: "Cerrar" })).toHaveClass(/primario/);
+  await expect(otra.getByRole("button", { name: "Cerrar" })).not.toHaveClass(/coral/);
   await otra.getByRole("button", { name: "Cerrar" }).click();
   await expect(page.getByRole("row", { name: /otro celular/ })).toHaveCount(0);
   await expect(page.getByRole("row", { name: /esta computadora/ })).toBeVisible();
@@ -41,7 +41,7 @@ test("cerrar la sesión propia desde Administración vuelve al login", async ({ 
   const propia = page.getByRole("row", { name: /esta computadora/ });
   await expect(propia).toBeVisible();
   await expect(propia).toContainText("esta sesión");
-  await expect(propia.getByRole("button", { name: "Cerrar" })).toHaveClass(/peligro/);
+  await expect(propia.getByRole("button", { name: "Cerrar" })).toHaveClass(/coral/);
   await propia.getByRole("button", { name: "Cerrar" }).click();
   await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("ferre.sesion"))).toBeNull();

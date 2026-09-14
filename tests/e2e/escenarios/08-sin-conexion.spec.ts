@@ -47,19 +47,21 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
 
   // Venta sin red: queda guardada y el mostrador sigue.
   await busqueda.fill("e2e destornillador offline");
-  await expect(page.getByTestId("sugerencias")).toContainText("$2.000,00"); // 500 × 2 × 1,21 = 1210 → 2000
+  await expect(page.getByTestId("sugerencias")).toContainText("$2.000"); // 500 × 2 × 1,21 = 1210 → 2000
   await busqueda.press("Enter");
   await page.getByTestId("item").getByTestId("cantidad").fill("2");
   await page.locator(".medios").getByRole("button", { name: "Efectivo" }).click();
   await page.getByTestId("cobrar").click();
-  await expect(page.getByTestId("mensaje")).toContainText("Sin conexión: se envía sola");
+  await expect(page.getByTestId("exito")).toContainText("Sin conexión: se envía sola");
+  await page.getByTestId("cerrar-exito").click();
   await expect(page.getByTestId("conexion")).toContainText("1 por enviar");
 
   // Cambio de margen sin red, desde la venta siguiente.
   await busqueda.fill("e2e destornillador offline");
   await busqueda.press("Enter");
-  await page.getByTestId("item").getByRole("button", { name: "50 %" }).click();
-  await expect(page.getByTestId("item")).toContainText("$1.000,00"); // 500 × 1,5 × 1,21 = 907,5 → 1000
+  await page.getByTestId("item").getByTestId("margen").click();
+  await page.getByTestId("item").getByRole("button", { name: "50 %", exact: true }).click();
+  await expect(page.getByTestId("item")).toContainText("$1.000"); // 500 × 1,5 × 1,21 = 907,5 → 1000
   await page.getByRole("button", { name: "No llevó" }).click();
   await expect(page.getByTestId("conexion")).toContainText("3 por enviar");
   expect(psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");

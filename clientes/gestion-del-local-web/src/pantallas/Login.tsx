@@ -4,13 +4,12 @@ import { api } from "../api";
 import { useSesion, type Usuario } from "../sesion";
 import { entrarConHuella, hayHuella } from "../credenciales";
 import { marcarEntradaConGoogle } from "../componentes/OfrecerHuella";
+import { AvisoError, Icono } from "../componentes/base";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-// Dos formas de entrar, sin contraseñas (ADR-011): con la cuenta de Google, o leyendo
-// con el celular (ya autenticado) el QR que muestra esta pantalla.
-// El botón oficial de Google. Al entrar, el servidor acepta solo los correos que el
-// dueño autorizó en Administración; si no, devuelve "no está autorizado".
+// Tres formas de entrar, sin contraseñas (ADR-011): la huella del celular vinculado, la
+// cuenta de Google, o leyendo con el celular el QR que muestra la computadora.
 export function BotonGoogle() {
   const { entrar } = useSesion();
   const [error, setError] = useState<string | null>(null);
@@ -38,36 +37,39 @@ export function BotonGoogle() {
           }
         },
       });
-      google.accounts.id.renderButton(boton.current, { theme: "outline", size: "large", text: "signin_with", locale: "es" });
+      google.accounts.id.renderButton(boton.current, { theme: "filled_black", size: "large", text: "continue_with", locale: "es", width: 320 });
     }, 200);
     return () => clearInterval(intervalo);
   }, [entrar]);
 
   return (
     <>
-      {GOOGLE_CLIENT_ID ? <div ref={boton} /> : <p className="aviso">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</p>}
-      {error && <p className="error" role="alert" data-testid="error-google">{error}</p>}
+      {GOOGLE_CLIENT_ID ? <div className="boton-google" ref={boton} /> : <p className="ayuda-clara">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</p>}
+      {error && <div data-testid="error-google"><AvisoError texto={error} /></div>}
     </>
   );
 }
 
-// Dos formas de entrar, sin contraseñas (ADR-011): con la cuenta de Google, o leyendo
-// con el celular (ya autenticado) el QR que muestra esta pantalla.
 export function Login() {
   return (
-    <main className="pantalla-centrada">
-      <h1>ferre</h1>
-      <BotonHuella />
-      <p>Entrá con tu cuenta de Google.</p>
-      <BotonGoogle />
-      <hr />
-      <LoginPorQr />
+    <main className="entrar" data-testid="entrar">
+      <div className="arriba">
+        <div className="logo">fe</div>
+        <h1>El cuaderno,<br />sin cuaderno.</h1>
+        <p className="lema">Vendé, comprá y contá desde el celular o la computadora. Sin contraseñas: entrás con tu cuenta de Google autorizada, o con la huella del celular.</p>
+      </div>
+      <div className="abajo">
+        <BotonHuella />
+        <p className="ayuda-clara">Entrá con tu cuenta de Google.</p>
+        <BotonGoogle />
+        <LoginPorQr />
+      </div>
     </main>
   );
 }
 
 // Entrar con la huella: solo en dispositivos que la tienen; el celular tiene que estar
-// vinculado antes desde Administración (entrando con Google una vez).
+// vinculado antes desde Negocio (entrando con Google una vez).
 export function BotonHuella() {
   const { entrar } = useSesion();
   const [error, setError] = useState<string | null>(null);
@@ -80,15 +82,14 @@ export function BotonHuella() {
     finally { setOcupado(false); }
   }
   return (
-    <section className="entrar-huella">
-      <button className="grande" onClick={conHuella} disabled={ocupado} data-testid="entrar-huella">👆 Entrar con la huella</button>
-      <p className="ayuda">Si este celular ya está vinculado a tu cuenta.</p>
-      {error && <p className="error" role="alert" data-testid="error-huella">{error}</p>}
-    </section>
+    <>
+      <button type="button" className="boton blanco" onClick={conHuella} disabled={ocupado} data-testid="entrar-huella"><Icono nombre="huella" tam={22} />Entrar con la huella</button>
+      {error && <div data-testid="error-huella"><AvisoError texto={error} /></div>}
+    </>
   );
 }
 
-// La laptop muestra el QR; el celular lo lee con la cámara y abre /vincular?codigo=…
+// La computadora muestra el QR; el celular lo lee con la cámara y abre /vincular?codigo=…
 function LoginPorQr() {
   const { entrar } = useSesion();
   const [qr, setQr] = useState<string | null>(null);
@@ -121,23 +122,22 @@ function LoginPorQr() {
   }
 
   return (
-    <section>
-      <h2>O entrá con el celular</h2>
-      {estado === "inactivo" && <button className="boton primario" onClick={generar}>Mostrar código para leer con el celular</button>}
+    <>
+      {estado === "inactivo" && <button type="button" className="boton oscuro" onClick={generar}>Leer el código QR con el celular</button>}
       {estado === "esperando" && qr && (
-        <>
+        <div className="qr">
           <img src={qr} alt="Código para vincular" width={220} height={220} />
           <p>Abrí la cámara del celular, apuntá al código y tocá el enlace. Tiene que ser un celular donde ya entraste a ferre.</p>
-        </>
+        </div>
       )}
-      {estado === "vencido" && <button className="boton primario" onClick={generar}>El código venció. Generar otro</button>}
-    </section>
+      {estado === "vencido" && <button type="button" className="boton oscuro" onClick={generar}>El código venció. Generar otro</button>}
+    </>
   );
 }
 
 export function describirDispositivo(): string {
   const ua = navigator.userAgent;
   const tipo = /Android|iPhone|iPad/.test(ua) ? "celular" : "computadora";
-  const navegador = /Firefox/.test(ua) ? "Firefox" : /Chrome/.test(ua) ? "Chrome" : /Safari/.test(ua) ? "Safari" : "navegador";
+  const navegador = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Firefox\//.test(ua) ? "Firefox" : /Safari\//.test(ua) ? "Safari" : "navegador";
   return `${tipo} · ${navegador}`;
 }

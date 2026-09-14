@@ -35,7 +35,6 @@ test.beforeAll(() => {
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/stock");
-  await expect(page.getByRole("heading", { name: "Stock" })).toBeVisible();
   await expect(page.getByTestId("valorizacion")).toContainText("Valor del inventario");
 
   await page.getByTestId("busqueda").fill("e2e candado stock");

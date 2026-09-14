@@ -1,16 +1,19 @@
-// Todo número calculado explica de dónde sale (issue #47): el valor se ve, y al lado un
-// botón que despliega los pasos en castellano. Mismo componente en todas las pantallas.
-export function Explicacion({ valor, pasos, etiqueta }: { valor: string; pasos: string[]; etiqueta?: string }) {
+import { useState } from "react";
+import { Hoja, Pasos } from "./base";
+
+// Todo número calculado explica de dónde sale (issue #47): el valor se ve subrayado con
+// puntos y, al tocarlo, sube una hoja con los pasos en castellano, numerados.
+export function Explicacion({ valor, pasos, etiqueta, className }: { valor: string; pasos: string[]; etiqueta?: string; className?: string }) {
+  const [abierta, setAbierta] = useState(false);
   return (
-    <details className="explicacion">
-      <summary title="Ver de dónde sale">
-        <span>{valor}</span> <small aria-label={etiqueta ?? "de dónde sale este número"} title="¿De dónde sale este número?">?</small>
-      </summary>
-      <ol>
-        {pasos.map((p, i) => (
-          <li key={i}>{p}</li>
-        ))}
-      </ol>
-    </details>
+    <>
+      <button type="button" className={`explicacion ${className ?? ""}`} title="¿De dónde sale este número?" aria-label={etiqueta ?? `De dónde sale ${valor}`} onClick={(e) => { e.stopPropagation(); setAbierta(true); }}>{valor}</button>
+      {abierta && (
+        <Hoja titulo={`De dónde sale ${valor}`} alCerrar={() => setAbierta(false)} testId="hoja-explicacion">
+          <Pasos pasos={pasos} />
+          <button type="button" className="boton tinta" onClick={() => setAbierta(false)}>Listo</button>
+        </Hoja>
+      )}
+    </>
   );
 }

@@ -43,38 +43,38 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
 
   // Producto con margen guardado: Enter lo agrega ya con precio (1000 × 2 × 1,21 = 2420 → $3.000).
   await busqueda.fill("e2e mecha vender");
-  await expect(page.getByTestId("sugerencias")).toContainText("$3.000,00");
+  await expect(page.getByTestId("sugerencias")).toContainText("$3.000");
   await busqueda.press("Enter");
   const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
   await expect(mecha).toBeVisible();
   await expect(busqueda).toHaveValue("");
   await expect(busqueda).toBeFocused();
-  await expect(page.getByTestId("total")).toContainText("$3.000,00");
+  await expect(page.getByTestId("total")).toContainText("$3.000");
 
   // Cantidad 3; la flechita suma de a 1 (enteras, sin decimales); 2,7 por unidad es 2.
   await mecha.getByTestId("cantidad").fill("3");
-  await expect(page.getByTestId("total")).toContainText("$9.000,00");
-  await mecha.getByTestId("cantidad").press("ArrowUp");
+  await expect(page.getByTestId("total")).toContainText("$9.000");
+  await mecha.getByRole("button", { name: "Más" }).click();
   await expect(mecha.getByTestId("cantidad")).toHaveValue("4");
   await mecha.getByTestId("cantidad").fill("2.7");
   await expect(mecha.getByTestId("cantidad")).toHaveValue("2");
   await mecha.getByTestId("cantidad").fill("3");
-  await expect(page.getByTestId("total")).toContainText("$9.000,00");
+  await expect(page.getByTestId("total")).toContainText("$9.000");
 
   // Producto sin margen: queda en rojo hasta elegirlo en la fila; cualquier margen sobre $10 redondea a $1.000.
   await busqueda.fill("e2e tornillo vender");
   await busqueda.press("Enter");
   const tornillo = page.getByTestId("item").filter({ hasText: "TORNILLO VENDER" });
-  await expect(tornillo).toContainText("elegí margen o precio");
+  await expect(tornillo).toContainText("elegí margen");
   await page.getByTestId("cobrar").click();
   await expect(page.getByRole("alert")).toContainText("sin precio");
-  await tornillo.getByRole("button", { name: "300 %" }).click(); // 10 × 4 × 1,21 = 48,4 → $1.000
-  await expect(tornillo).toContainText("$1.000,00");
-  await expect(page.getByTestId("total")).toContainText("$10.000,00");
+  await tornillo.getByRole("button", { name: "300 %", exact: true }).click(); // 10 × 4 × 1,21 = 48,4 → $1.000
+  await expect(tornillo).toContainText("$1.000");
+  await expect(page.getByTestId("total")).toContainText("$10.000");
   // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto.
   await tornillo.getByTestId("unidad").selectOption("kg");
   await tornillo.getByTestId("cantidad").fill("1.5");
-  await expect(page.getByTestId("total")).toContainText("$10.500,00");
+  await expect(page.getByTestId("total")).toContainText("$10.500");
 
   // Cobrar sin medio de pago avisa; con efectivo, registra.
   await page.getByTestId("cobrar").click();
@@ -82,7 +82,12 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.locator(".medios").getByRole("button", { name: "Efectivo" }).click();
   await expect(page.getByRole("alert")).toHaveCount(0); // el aviso se va solo al corregirlo
   await page.getByTestId("cobrar").click();
-  await expect(page.getByTestId("mensaje")).toContainText("Venta registrada: $10.500,00 en efectivo");
+  // Pantalla de éxito con el importe grande; "Nueva venta" vuelve a la búsqueda vacía.
+  await expect(page.getByTestId("exito")).toContainText("Venta registrada");
+  await expect(page.getByTestId("exito")).toContainText("$10.500");
+  await expect(page.getByTestId("exito")).toContainText("Efectivo");
+  await page.getByTestId("cerrar-exito").click();
+  await expect(page.getByTestId("exito")).toHaveCount(0);
   await expect(page.getByTestId("item")).toHaveCount(0);
 
   // Quedó en la base con el stock descontado y el precio explicado.
@@ -92,23 +97,19 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   expect(psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   expect(psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
-  // Ventas de hoy la muestra; anular la marca y devuelve el stock.
+  // Negocio muestra las ventas de hoy, con cada producto en su renglón; anular la marca y devuelve el stock.
+  await page.getByRole("button", { name: "Negocio" }).click();
   const hoy = page.getByTestId("ventas-de-hoy");
-  await expect(hoy).toContainText("Efectivo");
-  // Dos productos: cada uno en su fila, y la venta se pliega desde la primera.
   const venta = hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
-  await expect(venta.getByRole("row")).toHaveCount(3);
-  await expect(venta.getByRole("row").nth(1)).toContainText("3 × MECHA VENDER");
-  await expect(venta.getByRole("row").nth(2)).toContainText("1.5 × TORNILLO VENDER");
-  await venta.getByRole("row").first().click();
-  await expect(venta.getByRole("row")).toHaveCount(1);
-  await expect(venta).toContainText("2 productos: MECHA VENDER");
-  await venta.getByRole("row").first().click();
-  await expect(venta.getByRole("row")).toHaveCount(3);
+  await expect(venta).toContainText("3 × MECHA VENDER");
+  await expect(venta).toContainText("1.5 × TORNILLO VENDER");
+  await expect(venta).toContainText("Efectivo");
+  await expect(venta).toContainText("$10.500,00");
   page.once("dialog", (d) => d.accept("se arrepintió"));
   await venta.getByRole("button", { name: "Anular" }).click();
   await expect(venta).toContainText("anulada");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("0.000");
+  await page.getByRole("button", { name: "Vender" }).click();
 
   // "No llevó": la consulta queda registrada.
   await busqueda.fill("e2e mecha vender");

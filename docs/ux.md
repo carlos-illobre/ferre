@@ -29,14 +29,39 @@ es más lenta que eso, está mal, aunque sea más completa.
 10. **Máximo tres pantallas en el MVP:** vender, buscar (que es la misma), cargar lista.
     Ingreso de mercadería y conteo se suman con su mismo estilo.
 
+## Sistema visual (rediseño 2026-09-14)
+
+El diseño de referencia es `mockups/Ferre iOS.html` (Claude Design). Reglas que salen de ahí
+y valen igual en el celular y en la computadora:
+
+- **Cuatro pestañas, todo el negocio:** Vender · Catálogo (productos, listas, duplicados) ·
+  Depósito (stock, ingreso, contar) · Negocio (hoy, gastos, usuarios, sesiones, quién hizo
+  qué). En el celular van abajo; en la computadora arriba.
+- **Un solo color de acción (coral).** Todo lo demás es tinta (`#0e1220`) y niebla
+  (`#f3f4f7`). Lo que falta (sin margen, sin cliente) se marca con coral tenue.
+- **Los importes van en tipografía condensada (Archivo Narrow)**, más grandes que el resto:
+  se leen de lejos. En pantalla van sin centavos (`$3.000`); en explicaciones y detalles, con
+  centavos.
+- **Tarjetas blancas redondeadas sobre fondo niebla**; nada de tablas anchas. Cada fila de una
+  lista es nombre + detalle a la izquierda e importe a la derecha.
+- **Hojas que suben desde abajo** (ventana centrada en la computadora) para lo que se abre
+  sobre lo que se está haciendo: explicación de un número, ficha del producto, elegir
+  cliente o proveedor, revisar una lista. Escape o tocar afuera cierra.
+- **Pantalla de éxito a pantalla completa** al cobrar o registrar un ingreso: el importe
+  grande, cómo pagó y un solo botón para seguir.
+- **Avisos en el lugar:** un toast oscuro para lo que salió bien, un aviso coral para lo que
+  falta; se van solos al corregir la causa.
+- La cámara está a un toque al lado de cada buscador, en el celular.
+
 ## Concreto
 
 - Letra mínima 16 px en laptop, 18 px en celular. Alto contraste. Los precios, más
   grandes que el resto.
 - La pantalla de venta entra entera en la laptop sin desplazarse: búsqueda arriba, líneas
   en el medio, total y cobro abajo.
-- Cada línea de venta muestra en una sola fila: producto, costo, selector de margen,
-  precio unitario, cantidad, subtotal. Editable en la fila.
+- Cada renglón de venta es una tarjeta: producto y subtotal arriba, cantidad (− +),
+  unidad y margen abajo; el margen se despliega en el mismo renglón con los cinco botones
+  y el precio a mano. En la computadora, la venta y el panel de cobro van lado a lado.
 - Estado vacío de cada pantalla con una frase que dice qué hacer ("Escribí el nombre del
   producto o escaneá el código").
 - Respuesta visible en menos de 100 ms para búsqueda y para cambiar margen. Si algo va a

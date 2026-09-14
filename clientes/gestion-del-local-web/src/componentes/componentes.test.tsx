@@ -1,34 +1,72 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { Desplegable } from "./Desplegable";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { Contador, Exito, Hoja, Segmentos, Toast } from "./base";
 import { Explicacion } from "./Explicacion";
 import { FotoProducto } from "./Foto";
 
-describe("Desplegable", () => {
-  it("arranca abierto y se pliega al tocar el título", () => {
-    render(<Desplegable titulo="Ventas de hoy"><p>contenido</p></Desplegable>);
-    const titulo = screen.getByRole("button", { name: /Ventas de hoy/ });
-    expect(titulo.getAttribute("aria-expanded")).toBe("true");
-    fireEvent.click(titulo);
-    expect(titulo.getAttribute("aria-expanded")).toBe("false");
-  });
-  it("puede arrancar cerrado", () => {
-    render(<Desplegable titulo="Filas salteadas" abiertoAlInicio={false}><p>x</p></Desplegable>);
-    expect(screen.getByRole("button", { name: /Filas salteadas/ }).getAttribute("aria-expanded")).toBe("false");
+describe("Hoja", () => {
+  it("se cierra con Escape y tocando el fondo, no tocando adentro", () => {
+    const alCerrar = vi.fn();
+    render(<Hoja titulo="Elegí" alCerrar={alCerrar}><p>contenido</p></Hoja>);
+    fireEvent.click(screen.getByText("contenido"));
+    expect(alCerrar).not.toHaveBeenCalled();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(alCerrar).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("presentation"));
+    expect(alCerrar).toHaveBeenCalledTimes(2);
   });
 });
 
 describe("Explicacion", () => {
-  it("muestra el valor, un ícono '?' redondo y los pasos", () => {
-    render(<Explicacion valor="$4.000,00" pasos={["Costo $1.500,00", "+ 100 % de margen = $3.000,00"]} />);
-    expect(screen.getByText("$4.000,00")).toBeTruthy();
-    expect(screen.getByTitle("¿De dónde sale este número?").textContent).toBe("?");
-    expect(screen.getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Costo $1.500,00", "+ 100 % de margen = $3.000,00"]);
+  it("muestra el valor y, al tocarlo, una hoja con los pasos numerados", () => {
+    render(<Explicacion valor="$4.000" pasos={["Costo $1.500,00", "+ 100 % de margen = $3.000,00"]} />);
+    expect(screen.queryByTestId("hoja-explicacion")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "De dónde sale $4.000" }));
+    const pasos = within(screen.getByTestId("hoja-explicacion")).getAllByRole("listitem").map((li) => li.textContent);
+    expect(pasos).toEqual(["1Costo $1.500,00", "2+ 100 % de margen = $3.000,00"]);
+    fireEvent.click(screen.getByRole("button", { name: "Listo" }));
+    expect(screen.queryByTestId("hoja-explicacion")).toBeNull();
+  });
+});
+
+describe("Contador", () => {
+  it("por unidad suma de a 1 y no baja de 1; a granel de a 0,5 con un decimal", () => {
+    const alCambiar = vi.fn();
+    const { rerender } = render(<Contador valor={1} entera alCambiar={alCambiar} />);
+    fireEvent.click(screen.getByRole("button", { name: "Menos" }));
+    expect(alCambiar).toHaveBeenLastCalledWith(1);
+    fireEvent.click(screen.getByRole("button", { name: "Más" }));
+    expect(alCambiar).toHaveBeenLastCalledWith(2);
+    rerender(<Contador valor={1.5} entera={false} alCambiar={alCambiar} />);
+    expect((screen.getByTestId("cantidad") as HTMLInputElement).value).toBe("1,5");
+    fireEvent.click(screen.getByRole("button", { name: "Más" }));
+    expect(alCambiar).toHaveBeenLastCalledWith(2);
+    fireEvent.change(screen.getByTestId("cantidad"), { target: { value: "2,75" } });
+    expect(alCambiar).toHaveBeenLastCalledWith(2.8);
+  });
+});
+
+describe("Segmentos, Toast y Exito", () => {
+  it("el segmento activo se marca y elegir otro avisa", () => {
+    const alElegir = vi.fn();
+    render(<Segmentos opciones={[{ valor: "a", nombre: "Stock" }, { valor: "b", nombre: "Contar" }]} actual="a" alElegir={alElegir} />);
+    expect(screen.getByRole("tab", { name: "Stock" }).getAttribute("aria-selected")).toBe("true");
+    fireEvent.click(screen.getByRole("tab", { name: "Contar" }));
+    expect(alElegir).toHaveBeenCalledWith("b");
+  });
+  it("el toast se cierra y el éxito muestra el importe grande", () => {
+    const cerrar = vi.fn();
+    render(<><Toast texto="Listo" alCerrar={cerrar} /><Exito que="Venta registrada" importe="$10.500" medio="Efectivo" detalle="2 productos" boton="Nueva venta" alCerrar={cerrar} /></>);
+    fireEvent.click(screen.getByRole("button", { name: "Cerrar aviso" }));
+    expect(cerrar).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("exito").textContent).toContain("$10.500");
+    fireEvent.click(screen.getByTestId("cerrar-exito"));
+    expect(cerrar).toHaveBeenCalledTimes(2);
   });
 });
 
 describe("FotoProducto", () => {
-  it("sin foto muestra el ícono, se amplía con la descripción y Escape cierra", () => {
+  it("sin foto muestra el lugar, se amplía con la descripción y Escape cierra", () => {
     render(<FotoProducto id="p1" url={null} descripcion="TALADRO 750 W" />);
     expect(screen.queryByTestId("foto-grande")).toBeNull();
     fireEvent.click(screen.getByTestId("foto-chica"));
@@ -49,13 +87,9 @@ describe("FotoProducto", () => {
     fireEvent.change(entrada, { target: { files: [archivo] } });
     await waitFor(() => expect(alSubir).toHaveBeenCalledWith(archivo));
   });
-  it("una foto subida ('/fotos/...') se muestra desde la API", () => {
+  it("una foto subida ('/fotos/...') se muestra desde la API, chica y grande", () => {
     render(<FotoProducto id="p1" url="/fotos/abc.jpg" descripcion="TALADRO" />);
     expect(screen.getByTestId("foto-chica").querySelector("img")?.getAttribute("src")).toBe("http://api.prueba/fotos/abc.jpg");
-  });
-  it("con foto muestra la imagen chica y la grande", () => {
-    render(<FotoProducto id="p1" url="https://fotos/taladro.jpg" descripcion="TALADRO" />);
-    expect(screen.getByTestId("foto-chica").querySelector("img")?.getAttribute("src")).toBe("https://fotos/taladro.jpg");
     fireEvent.click(screen.getByTestId("foto-chica"));
     expect(screen.getByRole("img", { name: "TALADRO" })).toBeTruthy();
   });

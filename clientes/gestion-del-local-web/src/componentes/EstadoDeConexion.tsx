@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { leerMeta } from "../almacen";
 import { alCambiarLaCola, enviarPendientes, pendientes } from "../cola";
 
-// Indicador discreto (issue #18): sin conexión y cuántos cambios esperan; sincronizado
-// hace cuánto; amarillo si hay cambios esperando desde hace más de una hora.
+// Indicador discreto (issue #18): un punto y dos palabras. Sin conexión y cuántos cambios
+// esperan; sincronizado hace cuánto; coral si hay cambios esperando desde hace más de una hora.
 export function EstadoDeConexion() {
   const [enLinea, setEnLinea] = useState(navigator.onLine);
   const [cantidad, setCantidad] = useState(0);
@@ -36,7 +36,7 @@ export function EstadoDeConexion() {
     : cantidad > 0
       ? `${cantidad} por enviar${viejo ? " desde hace más de una hora" : ""}`
       : ultimoEnvio ? `Sincronizado ${haceCuanto(ultimoEnvio)}` : "Conectado";
-  return <span className={`conexion ${clase}`} data-testid="conexion" title={texto}>{texto}</span>;
+  return <span className={`estado-chico ${clase}`} data-testid="conexion" title={texto}><i aria-hidden="true" />{texto}</span>;
 }
 
 function haceCuanto(iso: string): string {

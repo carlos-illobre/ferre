@@ -45,9 +45,8 @@ test.beforeAll(() => {
 test("contar un sector desde el celular y cerrarlo con ajustes", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/contar");
-  await expect(page.getByRole("heading", { name: "Contar" })).toBeVisible();
-
   // Sector nuevo: se crea y se abre.
+  await page.getByTestId("sector-nuevo").click();
   await page.getByPlaceholder(/Sector nuevo/).fill(SECTOR);
   await page.getByRole("button", { name: "Agregar sector" }).click();
   await expect(page.getByRole("heading", { name: SECTOR })).toBeVisible();
@@ -82,5 +81,5 @@ test("contar un sector desde el celular y cerrarlo con ajustes", async ({ page }
 
   // El sector muestra que se contó hoy.
   await page.getByRole("button", { name: "Contar otro sector" }).click();
-  await expect(page.getByTestId("sectores").getByRole("button", { name: new RegExp(SECTOR) })).toContainText("contado hace 0 días");
+  await expect(page.getByTestId("sectores").getByRole("button", { name: new RegExp(SECTOR) })).toContainText("contado hoy");
 });

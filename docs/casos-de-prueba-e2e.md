@@ -1,5 +1,11 @@
 # Casos de prueba de punta a punta
 
+> Rediseño del 2026-09-14 (`mockups/Ferre iOS.html`): cuatro pestañas (Vender, Catálogo,
+> Depósito, Negocio); las rutas viejas (`#/productos`, `#/compras`, `#/administracion`…)
+> siguen abriendo lo mismo. Donde abajo dice "tabla" o "fila", hoy es una lista de tarjetas;
+> donde dice "panel" o "desplegable", hoy es una hoja que sube desde abajo. Los importes en
+> pantalla van sin centavos (`$3.000`); las explicaciones, con centavos.
+
 > Desde el 2026-09-14 estos escenarios no corren en cada push: se lanzan a mano desde el
 > workflow "E2E" de GitHub Actions (o con `tests/e2e.sh`) y los lunes solos. En cada push
 > corren las unitarias (ver [TESTING.md](TESTING.md)).

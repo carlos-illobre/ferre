@@ -2,9 +2,10 @@ import { useState } from "react";
 import { api } from "../api";
 import { useSesion } from "../sesion";
 import { BotonGoogle } from "./Login";
+import { AvisoError } from "../componentes/base";
 
-// Se abre en el celular al leer el QR de la laptop. Si acá ya hay sesión, aprueba y la
-// laptop entra sola. Si no, primero hay que entrar con Google en este celular.
+// Se abre en el celular al leer el QR de la computadora. Si acá ya hay sesión, aprueba y
+// la computadora entra sola. Si no, primero hay que entrar con Google en este celular.
 export function Vincular({ codigo }: { codigo: string }) {
   const { sesion } = useSesion();
   const [resultado, setResultado] = useState<string | null>(null);
@@ -12,11 +13,13 @@ export function Vincular({ codigo }: { codigo: string }) {
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
   if (sesion.estado !== "con-sesion") {
     return (
-      <main className="pantalla-centrada">
-        <h1>ferre</h1>
-        <h2>Dejar entrar a la computadora</h2>
-        <p>Entrá con tu cuenta de Google para confirmar. La computadora va a entrar como vos.</p>
-        <BotonGoogle />
+      <main className="entrar">
+        <div className="arriba">
+          <div className="logo">fe</div>
+          <h1>Dejar entrar a la computadora</h1>
+          <p className="lema">Entrá con tu cuenta de Google para confirmar. La computadora va a entrar como vos.</p>
+        </div>
+        <div className="abajo"><BotonGoogle /></div>
       </main>
     );
   }
@@ -37,9 +40,10 @@ export function Vincular({ codigo }: { codigo: string }) {
       {resultado ? <p role="status">{resultado}</p> : (
         <>
           <p>Vas a dejar entrar a la computadora como <strong>{nombre}</strong>.</p>
-          <button className="boton primario" onClick={aprobar}>Sí, dejar entrar</button>
+          <button type="button" className="boton tinta" onClick={aprobar}>Sí, dejar entrar</button>
         </>
       )}
+      <AvisoError texto={null} />
     </main>
   );
 }

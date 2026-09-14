@@ -28,19 +28,20 @@ test("el admin administra pero no toca dueños", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/administracion");
   await expect(page.getByTestId("usuario")).toContainText("Admin E2E · admin");
-  await expect(page.getByRole("heading", { name: "Usuarios autorizados" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Duplicados" })).toBeVisible();
+  await expect(page.getByText("Quién puede entrar")).toBeVisible();
+  await expect(page.getByText("Sesiones abiertas")).toBeVisible();
 
   // Autorizar un mostrador: sí. El selector de alta no ofrece "dueño".
-  const alta = page.locator("form.en-linea").first();
+  await page.getByTestId("autorizar").click();
+  const alta = page.getByTestId("alta-usuario");
   await expect(alta.locator('select[name="rol"] option', { hasText: "dueño" })).toHaveCount(0);
   await alta.getByPlaceholder("Nombre").fill("Nuevo mostrador");
   await alta.getByPlaceholder("correo@gmail.com").fill(EMAIL_NUEVO);
   await alta.getByRole("button", { name: "Autorizar" }).click();
-  await expect(page.getByRole("cell", { name: EMAIL_NUEVO })).toBeVisible();
+  await expect(page.getByTestId("usuarios")).toContainText(EMAIL_NUEVO);
 
   // La fila del dueño no se puede tocar desde acá.
-  const filaDueno = page.getByRole("row", { name: /Dueño protegido E2E/ });
+  const filaDueno = page.getByTestId("usuario-fila").filter({ hasText: "Dueño protegido E2E" });
   await expect(filaDueno.locator("select")).toBeDisabled();
   await expect(filaDueno).toContainText("solo el dueño");
 
