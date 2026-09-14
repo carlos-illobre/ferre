@@ -73,5 +73,5 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
 
   // Vuelta a la pantalla inicial: el proveedor ya tiene su última lista aplicada.
   await page.getByRole("button", { name: "Cargar otra lista" }).click();
-  await expect(page.getByRole("row", { name: PROVEEDOR_RE }).first()).toContainText("hace");
+  await expect(page.getByTestId("estado-proveedores").getByRole("row", { name: PROVEEDOR_RE })).toContainText("hace");
 });

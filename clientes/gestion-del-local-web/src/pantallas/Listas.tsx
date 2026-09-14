@@ -254,7 +254,7 @@ function EstadoDeProveedores({ proveedores, historial }: { proveedores: Proveedo
   return (
     <article>
       <h2>Proveedores</h2>
-      <table>
+      <table data-testid="estado-proveedores">
         <thead><tr><th>Proveedor</th><th>Última lista aplicada</th><th>Productos</th></tr></thead>
         <tbody>
           {proveedores.filter((p) => p.activo).map((p) => {
