@@ -49,8 +49,9 @@ Fuente: [diagrams/contexto.mmd](diagrams/contexto.mmd).
 - El cliente web es una PWA: un service worker precachea la app entera, así abre sin
   conexión y se actualiza sola. Catálogo, stock, clientes, ventas de 7 días y la cola
   única de cambios pendientes viven en IndexedDB (`almacen.ts`, `cola.ts`). Todo cambio
-  del mostrador se intenta enviar y, sin red, se encola y sale en orden al reconectar;
-  la API y Google nunca pasan por el caché.
+  del mostrador se anota primero en la cola y recién después se manda, en orden: una
+  recarga con el pedido en vuelo no lo pierde, sin red queda esperando y sale al
+  reconectar. La API y Google nunca pasan por el caché.
 
 ## Despliegue
 

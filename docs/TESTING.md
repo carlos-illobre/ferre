@@ -22,7 +22,7 @@ El detalle de cada caso (precondiciones, pasos y resultado esperado) está en
 | La app abre y el servidor responde | `00-arranque.spec.ts` | Hecho |
 | Sin sesión se pide entrar; con sesión el dueño ve la administración | `01-login.spec.ts` | Hecho |
 | Cargar una lista de precios y aplicarla | `02-listas.spec.ts` | Hecho |
-| Buscar un producto, elegir su margen y fijar un precio a mano | `03-productos.spec.ts` | Hecho |
+| Buscar un producto, elegir su margen o tipear otro margen a mano | `03-productos.spec.ts` | Hecho |
 | Buscar un producto y registrar una venta; ventas del día; anular; "no llevó" | `04-vender.spec.ts` | Hecho |
 | Ingresar mercadería de un proveedor; costo según factura; gasto semanal; anular | `05-compras.spec.ts` | Hecho |
 | Contar un sector desde el celular y cerrarlo con ajustes | `07-contar.spec.ts` | Hecho |
@@ -50,7 +50,7 @@ Cada issue de esa lista agrega su escenario antes de cerrarse.
 
 Se escriben donde probar a mano sería más lento: el cálculo de precios y su explicación
 (`calculo-de-precios`), los lectores de listas (`listas-de-proveedores`). Hoy: el precio de
-venta con su redondeo y explicación, el margen real de un precio manual, la búsqueda (orden
+venta con su redondeo para arriba a $1.000 y su explicación, el margen real de un precio tipeado en un renglón libre, la búsqueda (orden
 de palabras, acentos, códigos, velocidad con 50.000 productos), los cuatro lectores contra
 muestras anonimizadas (y contra las listas reales de `privado/` cuando existen), el cálculo
 de costo neto, la API del servicio de listas, y el orden de archivos del corredor de

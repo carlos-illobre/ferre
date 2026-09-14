@@ -41,43 +41,54 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(busqueda).toBeEnabled();
   await expect(busqueda).toBeFocused();
 
-  // Producto con margen guardado: Enter lo agrega ya con precio (1000 × 2 × 1,21 = 2420).
+  // Producto con margen guardado: Enter lo agrega ya con precio (1000 × 2 × 1,21 = 2420 → $3.000).
   await busqueda.fill("e2e mecha vender");
-  await expect(page.getByTestId("sugerencias")).toContainText("$2.420,00");
+  await expect(page.getByTestId("sugerencias")).toContainText("$3.000,00");
   await busqueda.press("Enter");
   const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
   await expect(mecha).toBeVisible();
   await expect(busqueda).toHaveValue("");
   await expect(busqueda).toBeFocused();
-  await expect(page.getByTestId("total")).toContainText("$2.420,00");
+  await expect(page.getByTestId("total")).toContainText("$3.000,00");
 
-  // Cantidad 3.
+  // Cantidad 3; la flechita suma de a 1 (enteras, sin decimales); 2,7 por unidad es 2.
   await mecha.getByTestId("cantidad").fill("3");
-  await expect(page.getByTestId("total")).toContainText("$7.260,00");
+  await expect(page.getByTestId("total")).toContainText("$9.000,00");
+  await mecha.getByTestId("cantidad").press("ArrowUp");
+  await expect(mecha.getByTestId("cantidad")).toHaveValue("4");
+  await mecha.getByTestId("cantidad").fill("2.7");
+  await expect(mecha.getByTestId("cantidad")).toHaveValue("2");
+  await mecha.getByTestId("cantidad").fill("3");
+  await expect(page.getByTestId("total")).toContainText("$9.000,00");
 
-  // Producto sin margen: queda en rojo hasta elegirlo en la fila; 25 % → 10 × 1,25 × 1,21 = 15,1 → $20.
+  // Producto sin margen: queda en rojo hasta elegirlo en la fila; cualquier margen sobre $10 redondea a $1.000.
   await busqueda.fill("e2e tornillo vender");
   await busqueda.press("Enter");
   const tornillo = page.getByTestId("item").filter({ hasText: "TORNILLO VENDER" });
   await expect(tornillo).toContainText("elegí margen o precio");
   await page.getByTestId("cobrar").click();
   await expect(page.getByRole("alert")).toContainText("sin precio");
-  await tornillo.getByRole("button", { name: "300 %" }).click(); // 10 × 4 × 1,21 = 48,4 → $50
-  await expect(tornillo).toContainText("$50,00");
-  await expect(page.getByTestId("total")).toContainText("$7.310,00");
+  await tornillo.getByRole("button", { name: "300 %" }).click(); // 10 × 4 × 1,21 = 48,4 → $1.000
+  await expect(tornillo).toContainText("$1.000,00");
+  await expect(page.getByTestId("total")).toContainText("$10.000,00");
+  // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto.
+  await tornillo.getByTestId("unidad").selectOption("kg");
+  await tornillo.getByTestId("cantidad").fill("1.5");
+  await expect(page.getByTestId("total")).toContainText("$10.500,00");
 
   // Cobrar sin medio de pago avisa; con efectivo, registra.
   await page.getByTestId("cobrar").click();
   await expect(page.getByRole("alert")).toContainText("Elegí cómo paga");
   await page.getByRole("button", { name: "Efectivo" }).click();
   await page.getByTestId("cobrar").click();
-  await expect(page.getByTestId("mensaje")).toContainText("Venta registrada: $7.310,00 en efectivo");
+  await expect(page.getByTestId("mensaje")).toContainText("Venta registrada: $10.500,00 en efectivo");
   await expect(page.getByTestId("item")).toHaveCount(0);
 
   // Quedó en la base con el stock descontado y el precio explicado.
   expect(psql(`SELECT count(*) FROM venta v JOIN item_venta i ON i.venta_id = v.id WHERE i.producto_id = '${ID_MECHA}' AND v.estado = 'confirmada'`)).toBe("1");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("-3.000");
   expect(psql(`SELECT margen_aplicado FROM item_venta WHERE producto_id = '${ID_TORNILLO}' ORDER BY creado_en DESC LIMIT 1`)).toBe("300");
+  expect(psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   expect(psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
   // Ventas de hoy la muestra; anular la marca y devuelve el stock.

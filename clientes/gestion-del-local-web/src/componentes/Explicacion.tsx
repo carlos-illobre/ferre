@@ -4,7 +4,7 @@ export function Explicacion({ valor, pasos, etiqueta }: { valor: string; pasos: 
   return (
     <details className="explicacion">
       <summary title="Ver de dónde sale">
-        <span>{valor}</span> <small aria-label={etiqueta ?? "de dónde sale"}>ⓘ</small>
+        <span>{valor}</span> <small aria-label={etiqueta ?? "de dónde sale este número"} title="¿De dónde sale este número?">?</small>
       </summary>
       <ol>
         {pasos.map((p, i) => (

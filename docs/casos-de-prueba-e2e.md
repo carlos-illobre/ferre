@@ -52,7 +52,7 @@ precio).
 
 ---
 
-## 03 · Buscar productos, elegir margen y fijar un precio a mano
+## 03 · Buscar productos, elegir margen y tipear otro margen a mano
 `03-productos.spec.ts`
 
 **Precondiciones:** usuario mostrador con sesión; un proveedor con dos productos: una
@@ -63,11 +63,15 @@ mecha (costo $1.500, sin margen) y un taladro (costo $120.000, sin margen).
 | Abrir "Productos" | La caja de búsqueda tiene el foco |
 | Escribir `e2e madera mecha` | Un solo resultado, la mecha, con "sin precio" |
 | Abrir la explicación del costo | Muestra "− 25 % (linea)" |
-| Shift+3 | El botón "100 %" queda activo y el precio es $3.630,00 (1500 × 2 × 1,21); su explicación dice "+ 100 % de margen" |
-| Recargar y buscar `me6` (código del proveedor) | El margen 100 % sigue elegido |
-| "a mano", escribir 4235, Enter | Precio $4.235,00 y "a mano · 133.3 %" |
-| Buscar `e2e taladro`, tocar "25 %" | Precio $181.500,00 (redondeo a $100) |
+| Shift+3 | El botón "100 %" queda activo y el precio es $4.000,00 (1500 × 2 × 1,21 = 3630, para arriba al múltiplo de $1.000); su explicación dice "+ 100 % de margen" |
+| Tocar "50 %" y recargar enseguida; buscar `me6` (código del proveedor) | "50 %" sigue elegido: el cambio se guarda en el dispositivo antes de mandarse y una recarga no lo pierde |
+| Tocar "100 %", recargar, buscar `me6` | El margen 100 % sigue elegido |
+| "otro margen", escribir 20, Enter | Precio $3.000,00 (1500 × 1,2 × 1,21 = 2178 → 3000) y "margen a mano · 20 %"; ningún botón queda activo |
+| Buscar `e2e taladro`, tocar "25 %" | Precio $182.000,00 (181.500 para arriba) |
 | Buscar `zzzz` | "Nada con "zzzz"" |
+| Buscar `e2e tuerca scroll` (40 productos sembrados); sacar el foco de la búsqueda; flecha abajo dos veces; Shift+2 | Queda marcado el tercer resultado y su margen 200 % activo: los atajos funcionan sin foco en la caja |
+| Llegar al final de la lista | Aparecen 30 primero; después se cargan los 40 y desaparece "Cargando más" |
+| Tocar la foto chica de un producto sin foto | Se amplía con la descripción y "todavía no tiene foto"; Escape la cierra |
 
 ---
 
@@ -80,15 +84,17 @@ mecha (costo $1.500, sin margen) y un taladro (costo $120.000, sin margen).
 | Paso | Resultado esperado |
 |---|---|
 | Abrir "Vender" | La búsqueda tiene el foco |
-| Escribir `e2e mecha vender` | La sugerencia muestra $2.420,00 |
-| Enter | La mecha está en la venta; la búsqueda queda vacía y con foco; total $2.420,00 |
-| Cantidad 3 | Total $7.260,00 |
+| Escribir `e2e mecha vender` | La sugerencia muestra $3.000,00 (1000 × 2 × 1,21 = 2420 → 3000) |
+| Enter | La mecha está en la venta; la búsqueda queda vacía y con foco; total $3.000,00 |
+| Cantidad 3 | Total $9.000,00 |
+| Flechita arriba en la cantidad; escribir 2,7; volver a 3 | Queda 4 (de a 1, sin decimales); 2,7 por unidad se toma como 2; total $9.000,00 |
 | Agregar `e2e tornillo vender` | La fila dice "elegí margen o precio" |
 | "Cobrar" | Aviso "Hay productos sin precio" |
-| "300 %" en la fila del tornillo | Precio $50,00; total $7.310,00 |
+| "300 %" en la fila del tornillo | Precio $1.000,00 (10 × 4 × 1,21 = 48,4 → 1000); total $10.000,00 |
+| Unidad "kg" en el tornillo, cantidad 1,5 | Total $10.500,00: a granel admite un decimal |
 | "Cobrar" sin medio de pago | Aviso "Elegí cómo paga" |
-| "Efectivo", "Cobrar" | "Venta registrada: $7.310,00 en efectivo"; la venta queda vacía |
-| Verificación en la base | Una venta confirmada; stock de la mecha −3; el ítem del tornillo con margen 300 y la explicación "+ 100 % de margen" guardada en el de la mecha |
+| "Efectivo", "Cobrar" | "Venta registrada: $10.500,00 en efectivo"; la venta queda vacía |
+| Verificación en la base | Una venta confirmada; stock de la mecha −3; el ítem del tornillo con margen 300 y el tornillo con unidad kg; la explicación "+ 100 % de margen" guardada en el de la mecha |
 | Abrir "Ventas de hoy" | Aparece la venta con "Efectivo" |
 | "Anular", confirmar con motivo | La fila queda "anulada"; el stock de la mecha vuelve a 0 |
 | Agregar la mecha y tocar "No llevó" | "Anotado como consulta"; queda una consulta en la base |
@@ -157,7 +163,7 @@ margen 100 %.
 |---|---|---|
 | Vender y cambiar margen sin red | Abrir "Vender" y esperar a que el catálogo quede guardado en el dispositivo; cortar la red | El indicador dice "Sin conexión" |
 | | Agregar el destornillador, cantidad 2, "Efectivo", "Cobrar" | "Sin conexión: se envía sola"; el indicador dice "1 por enviar"; en la base todavía no hay venta |
-| | Agregar el destornillador de nuevo, elegir "50 %", "No llevó" | Precio $910,00; el indicador dice "3 por enviar" |
+| | Agregar el destornillador de nuevo, elegir "50 %", "No llevó" | Precio $1.000,00; el indicador dice "3 por enviar" |
 | | Volver la red | El indicador pasa a "Sincronizado"; en la base: 1 ítem vendido, stock −2, margen 50 y 1 consulta |
 | La app abre sin red | Con la app abierta y el service worker activo, cortar la red y recargar | La app abre, la búsqueda funciona y encuentra el destornillador |
 
@@ -202,8 +208,8 @@ del barato.
 |---|---|
 | Abrir "Duplicados", "Buscar duplicados en todo el catálogo" | Aparece la sugerencia "Mismo código de barras" con los dos proveedores |
 | "Es el mismo" | "Unidos"; en la base el absorbido queda inactivo apuntando al conservado, su venta ahora apunta al conservado, el preferido es el proveedor barato y hay 2 proveedores con precio |
-| "Productos", buscar `e2e silicona duplicada` | Un solo producto; lista "★ Proveedor barato (e2e) $2.400,00" y "Proveedor caro (e2e) $3.000,00"; precio $5.810,00 |
-| "usar" en el proveedor caro | El precio pasa a $7.260,00 |
+| "Productos", buscar `e2e silicona duplicada` | Un solo producto; lista "★ Proveedor barato (e2e) $2.400,00" y "Proveedor caro (e2e) $3.000,00"; precio $6.000,00 |
+| "usar" en el proveedor caro | El precio pasa a $8.000,00 |
 
 ---
 

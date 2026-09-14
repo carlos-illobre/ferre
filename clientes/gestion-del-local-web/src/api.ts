@@ -48,3 +48,24 @@ export function guardarToken(token: string): void {
 export function borrarToken(): void {
   localStorage.removeItem(CLAVE);
 }
+
+// Bajar un archivo de la API con la sesión puesta. Un enlace común no sirve: el token va
+// en la cabecera, no en una cookie. Se pide, se arma un blob y se dispara la descarga.
+export async function descargar(ruta: string, nombre: string): Promise<void> {
+  const cabeceras = new Headers();
+  const token = leerToken();
+  if (token) cabeceras.set("Authorization", `Bearer ${token}`);
+  const respuesta = await fetch(urlApi(ruta), { headers: cabeceras });
+  if (!respuesta.ok) {
+    const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string };
+    throw new ErrorApi(respuesta.status, cuerpo.error ?? `Error ${respuesta.status}`);
+  }
+  const url = URL.createObjectURL(await respuesta.blob());
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nombre;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}

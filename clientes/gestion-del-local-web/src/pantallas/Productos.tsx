@@ -1,15 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { margenReal, MARGENES, precioDeVenta, type Margen } from "@ferre/calculo-de-precios";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { useCatalogo } from "../catalogo";
+import { useDebounce } from "../debounce";
+import { useTeclasGlobales } from "../teclas";
+import { FotoProducto } from "../componentes/Foto";
 import { Explicacion } from "../componentes/Explicacion";
 import { fecha, pesos } from "../formato";
+import { descargar } from "../api";
 
 export type Producto = {
   id: string; descripcion: string; marca: string | null; codigo_barras: string | null; unidad: string;
-  margen_elegido: Margen | null; precio_manual: string | null;
+  margen_elegido: number | null;
   proveedor: string | null; codigo_proveedor: string | null;
-  costo_neto: string | null; iva: string | null; fecha_lista: string | null; explicacion_costo: string[];
+  costo_neto: string | null; iva: string | null; fecha_lista: string | null; lista_importada_id?: string | null; explicacion_costo: string[];
   sector_id?: string | null;
+  foto_url?: string | null;
   proveedores?: { proveedor_id: string; proveedor: string; costo_neto: string; fecha_lista: string; codigo_proveedor: string }[];
 };
 
@@ -20,29 +25,43 @@ export function Productos() {
   const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [error, setError] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
+  const consultaEstable = useDebounce(consulta, 150);
   const [elegido, setElegido] = useState(0);
+  // Carga progresiva: de a 30 resultados, y más a medida que se llega al final de la lista.
+  const [limite, setLimite] = useState(30);
   const caja = useRef<HTMLInputElement>(null);
+  const centinela = useRef<HTMLDivElement>(null);
 
   useEffect(() => { caja.current?.focus(); }, [catalogo]);
-  const resultados = useMemo(() => buscarProductos(consulta, 50), [buscarProductos, consulta]);
-  useEffect(() => { setElegido(0); }, [consulta]);
+  const resultados = useMemo(() => buscarProductos(consultaEstable, limite), [buscarProductos, consultaEstable, limite]);
+  const hayMas = resultados.length === limite;
+  useEffect(() => { setElegido(0); setLimite(30); }, [consultaEstable]);
+  useEffect(() => {
+    const el = centinela.current;
+    if (!el || !hayMas) return;
+    const obs = new IntersectionObserver((entradas) => { if (entradas.some((e) => e.isIntersecting)) setLimite((l) => l + 30); }, { rootMargin: "200px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [hayMas, resultados.length]);
 
-  const actualizar = useCallback((id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "precio_manual">>) => {
+  const actualizar = useCallback((id: string, cambios: Partial<Pick<Producto, "margen_elegido">>) => {
     actualizarProducto(id, cambios).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`));
   }, [actualizarProducto]);
 
-  function teclas(e: KeyboardEvent<HTMLInputElement>) {
+  // Los atajos valen con o sin foco en la búsqueda (salvo dentro de otro campo).
+  const teclas = useCallback((e: globalThis.KeyboardEvent) => {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
-    else if (e.key === "Escape") { setConsulta(""); }
+    else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
     else if (e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
       // Shift+1..5 elige el margen del resultado marcado sin ensuciar la búsqueda (el 1..5
       // solo escribe). Se mira e.code porque con Shift la tecla "3" reporta "#".
       e.preventDefault();
       const p = resultados[elegido];
-      if (p) actualizar(p.id, { margen_elegido: MARGENES[Number(e.key === "#" ? 3 : e.code.slice(5)) - 1]!, precio_manual: null });
+      if (p) actualizar(p.id, { margen_elegido: MARGENES[Number(e.code.slice(5)) - 1]! });
     }
-  }
+  }, [resultados, elegido, actualizar]);
+  useTeclasGlobales(teclas, caja.current);
 
   return (
     <section className="productos">
@@ -53,7 +72,6 @@ export function Productos() {
         placeholder={catalogo ? "Escribí el nombre del producto, el código o escaneá el código de barras" : "Bajando el catálogo…"}
         value={consulta}
         onChange={(e) => setConsulta(e.target.value)}
-        onKeyDown={teclas}
         disabled={!catalogo}
         data-testid="busqueda"
         autoComplete="off"
@@ -64,11 +82,11 @@ export function Productos() {
       </p>
       {(error ?? errorCatalogo) && <p className="error" role="alert">{error ?? errorCatalogo}</p>}
       {catalogo && catalogo.length === 0 && <p>Todavía no hay productos: cargá una lista de precios primero.</p>}
-      {consulta.trim() && resultados.length === 0 && catalogo && catalogo.length > 0 && <p data-testid="sin-resultados">Nada con "{consulta}". Probá con menos palabras.</p>}
+      {consultaEstable.trim() && resultados.length === 0 && catalogo && catalogo.length > 0 && <p data-testid="sin-resultados">Nada con "{consultaEstable}". Probá con menos palabras.</p>}
       <div className="tabla-scroll">
         <table className="resultados" data-testid="resultados">
           {resultados.length > 0 && (
-            <thead><tr><th>Producto</th><th>Proveedor</th><th>Costo</th><th>Margen</th><th>Precio de venta</th></tr></thead>
+            <thead><tr><th /><th>Producto</th><th>Proveedor</th><th>Costo</th><th>Margen</th><th>Precio de venta</th></tr></thead>
           )}
           <tbody>
             {resultados.map((p, i) => (
@@ -76,27 +94,35 @@ export function Productos() {
             ))}
           </tbody>
         </table>
+        {hayMas && <div ref={centinela} className="centinela" data-testid="cargar-mas">Cargando más…</div>}
       </div>
     </section>
   );
 }
 
-function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto: Producto; elegido: boolean; alElegir: () => void; alCambiar: (c: Partial<Pick<Producto, "margen_elegido" | "precio_manual">>) => void }) {
+function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto: Producto; elegido: boolean; alElegir: () => void; alCambiar: (c: Partial<Pick<Producto, "margen_elegido">>) => void }) {
   const costo = p.costo_neto === null ? null : Number(p.costo_neto);
   const iva = p.iva === null ? 0.21 : Number(p.iva);
-  const manual = p.precio_manual === null ? null : Number(p.precio_manual);
+  // Margen a mano: cualquier porcentaje que no sea uno de los botones.
+  const manual = p.margen_elegido !== null && !esMargenBoton(p.margen_elegido) ? p.margen_elegido : null;
   const calculado = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva }) : null;
-  const real = costo !== null && manual !== null ? margenReal({ costoNeto: costo, iva, precio: manual }) : null;
   const [editandoManual, setEditandoManual] = useState(false);
 
   return (
     <tr className={elegido ? "elegido" : ""} onClick={alElegir} data-testid="producto" aria-selected={elegido}>
+      <td className="celda-foto"><FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} /></td>
       <td>
         <strong>{p.descripcion}</strong>
         <br /><small>{[p.marca, p.codigo_proveedor, p.codigo_barras].filter(Boolean).join(" · ")}</small>
       </td>
       <td>
-        {p.proveedor ?? <em>sin proveedor</em>}<br /><small>{p.fecha_lista ? `lista del ${fecha(p.fecha_lista)}` : ""}</small>
+        {p.proveedor ?? <em>sin proveedor</em>}<br />
+        {p.fecha_lista && (p.lista_importada_id ? (
+          <button className="enlace chico" title="Bajar el Excel original del proveedor" data-testid="bajar-lista"
+            onClick={(e) => { e.stopPropagation(); descargar(`/listas/${p.lista_importada_id}/archivo`, `lista ${p.proveedor ?? ""} ${p.fecha_lista}.xlsx`).catch((err: Error) => alert(`No se pudo bajar la lista: ${err.message}`)); }}>
+            lista del {fecha(p.fecha_lista)} ⤓
+          </button>
+        ) : <small>lista del {fecha(p.fecha_lista)}</small>)}
         {(p.proveedores?.length ?? 0) > 1 && (
           <ul className="otros-proveedores" data-testid="otros-proveedores">
             {p.proveedores!.map((v, i) => (
@@ -113,9 +139,9 @@ function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto:
           {MARGENES.map((m, i) => (
             <button
               key={m}
-              className={`margen ${p.margen_elegido === m && manual === null ? "activo" : ""}`}
+              className={`margen ${p.margen_elegido === m ? "activo" : ""}`}
               title={`Shift+${i + 1}`}
-              onClick={(e) => { e.stopPropagation(); alElegir(); alCambiar({ margen_elegido: m, precio_manual: null }); }}
+              onClick={(e) => { e.stopPropagation(); alElegir(); alCambiar({ margen_elegido: m }); }}
               disabled={costo === null}
             >
               {m} %
@@ -124,36 +150,37 @@ function FilaProducto({ producto: p, elegido, alElegir, alCambiar }: { producto:
         </div>
       </td>
       <td className="precio">
-        {manual !== null && real ? (
+        {calculado ? (
           <>
-            <Explicacion valor={pesos(manual)} pasos={real.pasos} /> <small className="manual">a mano · {real.valor} %</small>
+            <Explicacion valor={pesos(calculado.valor)} pasos={calculado.pasos} />
+            {manual !== null && <> <small className="manual">margen a mano · {manual} %</small></>}
           </>
-        ) : calculado ? (
-          <Explicacion valor={pesos(calculado.valor)} pasos={calculado.pasos} />
         ) : (
           <em className="sin-precio">sin precio: elegí un margen</em>
         )}
         {editandoManual ? (
-          <input
-            type="number"
-            min="0"
-            step="10"
-            autoFocus
-            className="precio-manual"
-            defaultValue={manual ?? calculado?.valor ?? ""}
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") { const v = Number((e.target as HTMLInputElement).value); if (v > 0) alCambiar({ precio_manual: String(v) }); setEditandoManual(false); }
-              if (e.key === "Escape") setEditandoManual(false);
-            }}
-            onBlur={() => setEditandoManual(false)}
-          />
+          <span className="margen-a-mano" onClick={(e) => e.stopPropagation()}>
+            <input
+              type="number"
+              min="1"
+              max="10000"
+              step="1"
+              autoFocus
+              className="precio-manual"
+              placeholder="20"
+              defaultValue={manual ?? ""}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { const v = Math.round(Number((e.target as HTMLInputElement).value)); if (v > 0) alCambiar({ margen_elegido: v }); setEditandoManual(false); }
+                if (e.key === "Escape") setEditandoManual(false);
+              }}
+              onBlur={() => setEditandoManual(false)}
+            /> % de margen
+          </span>
         ) : (
-          <button className="enlace chico" onClick={(e) => { e.stopPropagation(); alElegir(); setEditandoManual(true); }} disabled={costo === null}>
-            {manual !== null ? "cambiar" : "a mano"}
+          <button className="enlace chico" onClick={(e) => { e.stopPropagation(); alElegir(); setEditandoManual(true); }} disabled={costo === null} title="Un porcentaje de margen distinto de los botones">
+            {manual !== null ? "cambiar" : "otro margen"}
           </button>
         )}
-        {manual !== null && <button className="enlace chico" onClick={(e) => { e.stopPropagation(); alCambiar({ precio_manual: null }); }}>volver al margen</button>}
       </td>
     </tr>
   );

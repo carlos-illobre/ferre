@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { MARGENES, type Margen } from "@ferre/calculo-de-precios";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirSesion } from "../autenticacion.js";
@@ -13,16 +12,16 @@ productos.use("/*", exigirSesion);
 
 export type ProductoCatalogo = {
   id: string; descripcion: string; marca: string | null; codigo_barras: string | null; unidad: string;
-  margen_elegido: Margen | null; precio_manual: string | null;
+  margen_elegido: number | null;
   proveedor_id: string | null; proveedor: string | null; codigo_proveedor: string | null;
-  costo_neto: string | null; iva: string | null; fecha_lista: string | null; explicacion_costo: string[];
+  costo_neto: string | null; iva: string | null; fecha_lista: string | null; lista_importada_id: string | null; explicacion_costo: string[];
   modificado_en: string;
 };
 
 productos.get("/", async (c) => {
   const { rows } = await pool.query(
-    `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.precio_manual, p.modificado_en, p.sector_id,
-            pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text,
+    `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.modificado_en, p.sector_id, p.foto_url,
+            pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text, pp.lista_importada_id,
             COALESCE(pp.descuentos->'explicacion', '[]'::jsonb) AS explicacion_costo,
             COALESCE(prov.lista, '[]'::json) AS proveedores
        FROM producto p
@@ -47,21 +46,20 @@ productos.get("/", async (c) => {
   return c.json(rows);
 });
 
-// Elegir margen (300/200/100/50/25 o ninguno) o fijar un precio a mano. Lo hace el
-// empleado en el mostrador; queda auditado con quién y cuándo.
+// Elegir margen: uno de los botones (300/200/100/50/25), cualquier porcentaje entero
+// tipeado a mano, o ninguno. Lo hace el empleado en el mostrador; queda auditado.
 productos.patch("/:id", async (c) => {
-  const cuerpo = await c.req.json<{ margen_elegido?: number | null; precio_manual?: number | null; codigo_barras?: string | null; proveedor_preferido_id?: string | null }>().catch(() => ({}) as Record<string, never>);
+  const cuerpo = await c.req.json<{ margen_elegido?: number | null; unidad?: string; codigo_barras?: string | null; proveedor_preferido_id?: string | null; foto_url?: string | null }>().catch(() => ({}) as Record<string, never>);
   const cambios: string[] = [];
   const valores: unknown[] = [c.req.param("id")];
   if ("margen_elegido" in cuerpo) {
     const m = cuerpo.margen_elegido;
-    if (m !== null && !MARGENES.includes(m as Margen)) return c.json({ error: `El margen es uno de ${MARGENES.join(", ")} o ninguno` }, 400);
+    if (m !== null && (typeof m !== "number" || !Number.isInteger(m) || m <= 0 || m > 10000)) return c.json({ error: "El margen es un porcentaje entero mayor que cero (por ejemplo 20) o ninguno" }, 400);
     valores.push(m); cambios.push(`margen_elegido = $${valores.length}`);
   }
-  if ("precio_manual" in cuerpo) {
-    const p = cuerpo.precio_manual;
-    if (p !== null && (typeof p !== "number" || !Number.isFinite(p) || p < 0)) return c.json({ error: "El precio tiene que ser un número mayor o igual a cero" }, 400);
-    valores.push(p); cambios.push(`precio_manual = $${valores.length}`);
+  if ("unidad" in cuerpo) {
+    if (!["unidad", "kg", "m", "l"].includes(cuerpo.unidad as string)) return c.json({ error: "La unidad es unidad, kg, m o l" }, 400);
+    valores.push(cuerpo.unidad); cambios.push(`unidad = $${valores.length}`);
   }
   if ("codigo_barras" in cuerpo) {
     const cb = cuerpo.codigo_barras === null ? null : String(cuerpo.codigo_barras).trim();
@@ -71,7 +69,12 @@ productos.patch("/:id", async (c) => {
   if ("proveedor_preferido_id" in cuerpo) {
     valores.push(cuerpo.proveedor_preferido_id ?? null); cambios.push(`proveedor_preferido_id = $${valores.length}`);
   }
-  if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido, precio_manual, codigo_barras o proveedor_preferido_id" }, 400);
+  if ("foto_url" in cuerpo) {
+    const f = cuerpo.foto_url === null ? null : String(cuerpo.foto_url).trim();
+    if (f !== null && !/^https?:\/\/.{4,500}$/.test(f)) return c.json({ error: "La foto tiene que ser una dirección https" }, 400);
+    valores.push(f); cambios.push(`foto_url = $${valores.length}`);
+  }
+  if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido, unidad, codigo_barras, proveedor_preferido_id o foto_url" }, 400);
   const { rowCount } = await pool.query(`UPDATE producto SET ${cambios.join(", ")} WHERE id = $1 AND activo`, valores);
   if (!rowCount) return c.json({ error: "No existe ese producto" }, 404);
   await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id"), ...cuerpo } });

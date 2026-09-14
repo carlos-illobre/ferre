@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { buscar, indexar } from "@ferre/calculo-de-precios";
 import { api } from "./api";
 import { guardarMeta, leerTodo, reemplazarTodo } from "./almacen";
-import { enviarOEncolar } from "./cola";
+import { cambiosDeProductosPendientes, enviarOEncolar, enviarPendientes } from "./cola";
 import type { Producto } from "./pantallas/Productos";
 
 // Los datos del mostrador (catálogo, stock, clientes) en memoria y en IndexedDB (#18):
@@ -19,7 +19,7 @@ export function useCatalogo() {
   const [desdeDispositivo, setDesdeDispositivo] = useState(false);
   // Cambios hechos acá mientras la bajada estaba en vuelo: se vuelven a aplicar sobre lo
   // que llega y se conservan hasta que esa bajada termina.
-  const pendientes = useRef(new Map<string, Partial<Pick<Producto, "margen_elegido" | "precio_manual" | "codigo_barras"> & { proveedor_preferido_id?: string }>>());
+  const pendientes = useRef(new Map<string, Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad"> & { proveedor_preferido_id?: string }>>());
 
   useEffect(() => {
     let vigente = true;
@@ -40,8 +40,15 @@ export function useCatalogo() {
           api<Cliente[]>("/clientes").catch(() => null),
         ]);
         if (!vigente) return;
-        const c = bajado.map((p) => (pendientes.current.has(p.id) ? { ...p, ...pendientes.current.get(p.id) } : p));
+        // Lo que quedó en la cola (sin red, o una recarga con el pedido en vuelo) va
+        // sobre lo bajado, y se reintenta mandar.
+        const enCola = await cambiosDeProductosPendientes();
+        const c = bajado.map((p) => {
+          const local = { ...enCola.get(p.id), ...pendientes.current.get(p.id) } as Partial<Producto>;
+          return Object.keys(local).length ? { ...p, ...local } : p;
+        });
         pendientes.current.clear();
+        if (enCola.size) enviarPendientes().catch(() => undefined);
         setCatalogo(c); setDesdeDispositivo(false); setError(null);
         if (st) setStock(new Map(st.map((x) => [x.id, Number(x.stock)])));
         if (cl) setClientes(cl);
@@ -59,7 +66,7 @@ export function useCatalogo() {
   const indice = useMemo(() => (catalogo ? indexar(catalogo.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }))) : null), [catalogo]);
   const buscarProductos = useCallback((consulta: string, maximo = 50) => (indice ? buscar(indice, consulta, maximo) : []), [indice]);
 
-  const actualizarProducto = useCallback(async (id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "precio_manual" | "codigo_barras"> & { proveedor_preferido_id?: string }>) => {
+  const actualizarProducto = useCallback(async (id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad"> & { proveedor_preferido_id?: string }>) => {
     pendientes.current.set(id, { ...pendientes.current.get(id), ...cambios });
     setCatalogo((c) => {
       const nuevo = c && c.map((p) => (p.id === id ? { ...p, ...cambios } : p));
@@ -68,8 +75,8 @@ export function useCatalogo() {
     });
     const cuerpo: Record<string, number | string | null> = {};
     if ("margen_elegido" in cambios) cuerpo.margen_elegido = cambios.margen_elegido ?? null;
-    if ("precio_manual" in cambios) cuerpo.precio_manual = cambios.precio_manual === null || cambios.precio_manual === undefined ? null : Number(cambios.precio_manual);
     if ("codigo_barras" in cambios) cuerpo.codigo_barras = cambios.codigo_barras ?? null;
+    if ("unidad" in cambios) cuerpo.unidad = cambios.unidad ?? "unidad";
     if ("proveedor_preferido_id" in cambios) cuerpo.proveedor_preferido_id = cambios.proveedor_preferido_id ?? null;
     const r = enviarOEncolar("producto.cambio", "PATCH", `/productos/${id}`, cuerpo);
     // Cambiar el proveedor preferido cambia el costo vigente: se vuelve a bajar el catálogo.

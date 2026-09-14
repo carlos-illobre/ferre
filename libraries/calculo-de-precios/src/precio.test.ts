@@ -2,27 +2,30 @@ import { describe, expect, it } from "vitest";
 import { margenReal, precioDeVenta, redondear } from "./precio.js";
 
 describe("redondear", () => {
-  it("a $10 por debajo de $10.000 y a $100 desde ahí", () => {
-    expect(redondear(1994.57)).toBe(1990);
-    expect(redondear(1995)).toBe(2000);
-    expect(redondear(9995)).toBe(10000);
-    expect(redondear(12_349)).toBe(12_300);
-    expect(redondear(12_350)).toBe(12_400);
+  it("para arriba, al múltiplo de $1.000 siguiente", () => {
+    expect(redondear(1994.57)).toBe(2000);
+    expect(redondear(1000.01)).toBe(2000);
+    expect(redondear(1000)).toBe(1000);
+    expect(redondear(15.1)).toBe(1000);
+    expect(redondear(181_500)).toBe(182_000);
   });
 });
 
 describe("precioDeVenta", () => {
   it("costo × (1 + margen) × (1 + IVA), redondeado, con los pasos", () => {
     const r = precioDeVenta({ costoNeto: 1649.14, margen: 100, iva: 0.21 });
-    expect(r.valor).toBe(3990); // 1649,14 × 2 × 1,21 = 3990,92 → 3990
-    expect(r.pasos).toEqual(["Costo $1.649,14", "+ 100 % de margen = $3.298,28", "+ IVA 21 % = $3.990,92", "Redondeado a $3.990,00"]);
+    expect(r.valor).toBe(4000); // 1649,14 × 2 × 1,21 = 3990,92 → 4000
+    expect(r.pasos).toEqual(["Costo $1.649,14", "+ 100 % de margen = $3.298,28", "+ IVA 21 % = $3.990,92", "Redondeado para arriba a $4.000,00 (múltiplo de $1.000,00)"]);
   });
   it("un clavo con 300 % y un taladro con 25 %", () => {
-    expect(precioDeVenta({ costoNeto: 12.5, margen: 300, iva: 0.21 }).valor).toBe(60);
-    expect(precioDeVenta({ costoNeto: 120_000, margen: 25, iva: 0.21 }).valor).toBe(181_500);
+    expect(precioDeVenta({ costoNeto: 12.5, margen: 300, iva: 0.21 }).valor).toBe(1000);
+    expect(precioDeVenta({ costoNeto: 120_000, margen: 25, iva: 0.21 }).valor).toBe(182_000);
+  });
+  it("acepta un margen tipeado a mano, no solo los de los botones", () => {
+    expect(precioDeVenta({ costoNeto: 1500, margen: 20, iva: 0.21 }).valor).toBe(3000); // 2178 → 3000
   });
   it("respeta el IVA reducido de la fila", () => {
-    expect(precioDeVenta({ costoNeto: 1000, margen: 50, iva: 0.105 }).valor).toBe(1660); // 1657,5 → 1660
+    expect(precioDeVenta({ costoNeto: 1000, margen: 50, iva: 0.105 }).valor).toBe(2000); // 1657,5 → 2000
   });
 });
 

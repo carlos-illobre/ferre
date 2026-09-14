@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { margenReal, MARGENES, precioDeVenta, type Margen } from "@ferre/calculo-de-precios";
+import { margenReal, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
+import { FotoProducto } from "../componentes/Foto";
 import { api, ErrorApi } from "../api";
 import { guardar, borrarAnterioresA } from "../almacen";
 import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendientesEnCola } from "../cola";
 import { useCatalogo } from "../catalogo";
+import { useTeclasGlobales } from "../teclas";
 import { Explicacion } from "../componentes/Explicacion";
 import { fecha, pesos } from "../formato";
 import { describirDispositivo } from "./Login";
@@ -17,8 +19,23 @@ import type { Producto } from "./Productos";
 // F2 cobra. Nada obligatorio que el cuaderno no tenga.
 type Item = {
   clave: string; producto: Producto | null; descripcion: string; cantidad: number;
-  precioManual: number | null; // precio tipeado en esta venta (o del producto), pisa al margen
+  unidad: Unidad; // por unidades enteras o por kilo/metro/litro (con un decimal)
+  precioManual: number | null; // precio tipeado en esta venta, pisa al margen
 };
+// Cómo se vende: por unidad (cantidades enteras) o a granel (hasta un decimal). Queda
+// guardado en el producto, como el margen.
+export const UNIDADES = [
+  { valor: "unidad", nombre: "un." }, { valor: "kg", nombre: "kg" }, { valor: "m", nombre: "m" }, { valor: "l", nombre: "l" },
+] as const;
+export type Unidad = (typeof UNIDADES)[number]["valor"];
+const unidadDe = (p: Producto | null): Unidad => (UNIDADES.some((u) => u.valor === p?.unidad) ? (p!.unidad as Unidad) : "unidad");
+const enteras = (u: Unidad) => u === "unidad";
+// La cantidad tipeada, ajustada a la unidad: enteros para "un.", un decimal para el resto.
+function cantidadValida(texto: string, unidad: Unidad): number {
+  const n = Number(texto.replace(",", "."));
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return enteras(unidad) ? Math.floor(n) : Math.round(n * 10) / 10;
+}
 const MEDIOS: { valor: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; nombre: string; tecla: string }[] = [
   { valor: "efectivo", nombre: "Efectivo", tecla: "F5" },
   { valor: "mercado_pago", nombre: "Mercado Pago", tecla: "F6" },
@@ -26,7 +43,7 @@ const MEDIOS: { valor: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corrien
   { valor: "cuenta_corriente", nombre: "Cuenta corriente", tecla: "F8" },
 ];
 
-function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: Margen | null; costo: number | null; iva: number } {
+function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: number | null; costo: number | null; iva: number } {
   const p = item.producto;
   const costo = p?.costo_neto != null ? Number(p.costo_neto) : null;
   const iva = p?.iva != null ? Number(p.iva) : 0.21;
@@ -80,9 +97,9 @@ export function Vender() {
       if (p) {
         const ya = lista.find((it) => it.producto?.id === p.id);
         if (ya) return lista.map((it) => (it === ya ? { ...it, cantidad: it.cantidad + 1 } : it));
-        return [...lista, { clave: crypto.randomUUID(), producto: p, descripcion: p.descripcion, cantidad: 1, precioManual: p.precio_manual !== null ? Number(p.precio_manual) : null }];
+        return [...lista, { clave: crypto.randomUUID(), producto: p, descripcion: p.descripcion, cantidad: 1, unidad: unidadDe(p), precioManual: null }];
       }
-      return [...lista, { clave: crypto.randomUUID(), producto: null, descripcion: descripcionLibre ?? "", cantidad: 1, precioManual: null }];
+      return [...lista, { clave: crypto.randomUUID(), producto: null, descripcion: descripcionLibre ?? "", cantidad: 1, unidad: unidadDe(p), precioManual: null }];
     });
     setConsulta("");
     setMensaje(null);
@@ -124,15 +141,20 @@ export function Vender() {
   function cambiarItem(clave: string, cambios: Partial<Item>) {
     setItems((lista) => lista.map((it) => (it.clave === clave ? { ...it, ...cambios } : it)));
   }
+  function cambiarUnidad(item: Item, unidad: Unidad) {
+    cambiarItem(item.clave, { unidad, cantidad: cantidadValida(String(item.cantidad), unidad) || 1 });
+    // Queda guardado en el producto: la próxima vez ya se vende así.
+    if (item.producto) actualizarProducto(item.producto.id, { unidad } as never).catch(() => undefined);
+  }
   function quitar(clave: string) {
     setItems((lista) => lista.filter((it) => it.clave !== clave));
     caja.current?.focus();
   }
-  function elegirMargen(item: Item, margen: Margen) {
+  function elegirMargen(item: Item, margen: number) {
     if (!item.producto) return;
     // Queda guardado en el producto: la próxima vez ya viene con ese margen (#13).
-    actualizarProducto(item.producto.id, { margen_elegido: margen, precio_manual: null }).catch(() => undefined);
-    cambiarItem(item.clave, { precioManual: null, producto: { ...item.producto, margen_elegido: margen, precio_manual: null } });
+    actualizarProducto(item.producto.id, { margen_elegido: margen }).catch(() => undefined);
+    cambiarItem(item.clave, { precioManual: null, producto: { ...item.producto, margen_elegido: margen } });
   }
 
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {
@@ -161,6 +183,13 @@ export function Vender() {
     window.addEventListener("keydown", global);
     return () => window.removeEventListener("keydown", global);
   });
+  // Flechas y Esc también sin foco en la búsqueda (salvo dentro de otro campo).
+  useTeclasGlobales(useCallback((e: globalThis.KeyboardEvent) => {
+    if (document.activeElement === caja.current) return; // ya lo maneja la caja
+    if (e.key === "ArrowDown" && resultados.length) { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
+    else if (e.key === "ArrowUp" && resultados.length) { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
+    else if (e.key === "Escape") { caja.current?.focus(); }
+  }, [resultados.length]), caja.current);
 
   async function cobrar() {
     if (items.length === 0 || ocupado) return;
@@ -227,7 +256,7 @@ export function Vender() {
         {resultados.length > 0 && (
           <ul className="sugerencias" role="listbox" data-testid="sugerencias">
             {resultados.map((p, i) => {
-              const precio = p.precio_manual !== null ? Number(p.precio_manual) : p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null;
+              const precio = p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null;
               return (
                 <li key={p.id} role="option" aria-selected={i === elegido} className={i === elegido ? "elegido" : ""} onMouseDown={() => agregar(p)}>
                   <span>{p.descripcion}</span> <small>{[p.marca, p.proveedor].filter(Boolean).join(" · ")}{stockPorId.has(p.id) ? ` · stock ${stockPorId.get(p.id)!.toLocaleString("es-AR")}` : ""}</small>
@@ -257,12 +286,13 @@ export function Vender() {
 
       <div className="tabla-scroll">
       <table className="venta" data-testid="venta">
-        <thead>{items.length > 0 && <tr><th>Producto</th><th>Costo</th><th>Margen</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th /></tr>}</thead>
+        <thead>{items.length > 0 && <tr><th /><th>Producto</th><th>Costo</th><th>Margen</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th /></tr>}</thead>
         <tbody>
           {items.map((it) => {
             const p = precioDe(it);
             return (
               <tr key={it.clave} data-testid="item" className={p.unitario === null ? "sin-precio-fila" : ""}>
+                <td className="celda-foto">{it.producto && <FotoProducto id={it.producto.id} url={it.producto.foto_url ?? null} descripcion={it.descripcion} />}</td>
                 <td>
                   {it.producto ? <strong>{it.descripcion}</strong> : <input className="libre" value={it.descripcion} placeholder="Descripción" onChange={(e) => cambiarItem(it.clave, { descripcion: e.target.value })} />}
                   {it.producto && <><br /><small>{[it.producto.marca, it.producto.proveedor].filter(Boolean).join(" · ")}{stockPorId.has(it.producto.id) ? <> · stock {stockPorId.get(it.producto.id)!.toLocaleString("es-AR")}{stockPorId.get(it.producto.id)! - it.cantidad < 0 && <span className="sube" title="La venta deja el stock negativo: seguramente falta cargar una compra o contar"> (queda negativo)</span>}</> : ""}</small></>}
@@ -280,13 +310,25 @@ export function Vender() {
                 <td className="precio">
                   {p.unitario === null ? <em className="sin-precio">elegí margen o precio</em> : <Explicacion valor={pesos(p.unitario)} pasos={p.pasos} />}
                   <input
-                    type="number" min="0" step="10" className="precio-manual" placeholder="a mano"
+                    type="number" min="0" step="1" className="precio-manual" placeholder="a mano" title="Un precio distinto solo para esta venta"
                     value={it.precioManual ?? ""}
                     onChange={(e) => cambiarItem(it.clave, { precioManual: e.target.value === "" ? null : Number(e.target.value) })}
                     data-testid="precio-manual"
                   />
                 </td>
-                <td><input type="number" min="0.001" step="1" className="cantidad" value={it.cantidad} onChange={(e) => cambiarItem(it.clave, { cantidad: Number(e.target.value) })} data-testid="cantidad" /></td>
+                <td className="celda-cantidad">
+                  <input
+                    type="number" min={enteras(it.unidad) ? "1" : "0.1"} step={enteras(it.unidad) ? "1" : "0.1"} inputMode="decimal" className="cantidad"
+                    value={it.cantidad === 0 ? "" : it.cantidad}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => cambiarItem(it.clave, { cantidad: cantidadValida(e.target.value, it.unidad) })}
+                    onBlur={() => { if (it.cantidad === 0) cambiarItem(it.clave, { cantidad: 1 }); }}
+                    data-testid="cantidad"
+                  />
+                  <select className="unidad" value={it.unidad} onChange={(e) => cambiarUnidad(it, e.target.value as Unidad)} title="Por unidad (enteras) o por kilo, metro o litro (con un decimal)" data-testid="unidad">
+                    {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
+                  </select>
+                </td>
                 <td className="precio">{p.unitario === null ? "" : pesos(p.unitario * it.cantidad)}</td>
                 <td><button className="enlace chico" onClick={() => quitar(it.clave)} title="Quitar">✕</button></td>
               </tr>

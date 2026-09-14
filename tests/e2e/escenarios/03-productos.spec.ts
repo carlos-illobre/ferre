@@ -30,13 +30,17 @@ test.beforeAll(() => {
   psql(`DELETE FROM item_venta WHERE producto_id IN ('00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e3')`);
   psql(`DELETE FROM consulta WHERE producto_id IN ('00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e3')`);
   psql(`DELETE FROM producto WHERE id IN ('00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e3')`);
+  // Las tuercas del escenario apuntan al proveedor: van antes que él.
+  psql(`DELETE FROM precio_proveedor WHERE producto_id IN (SELECT id FROM producto WHERE descripcion LIKE 'TUERCA SCROLL % (E2E)')`);
+  psql(`DELETE FROM producto WHERE descripcion LIKE 'TUERCA SCROLL % (E2E)'`);
   psql(`DELETE FROM proveedor WHERE nombre = '${PROVEEDOR}'`);
   psql(`INSERT INTO proveedor (id, nombre) VALUES ('00000000-0000-0000-0000-00000000e2e1', '${PROVEEDOR}')`);
   psql(`INSERT INTO producto (id, descripcion, marca, codigo_barras) VALUES ('00000000-0000-0000-0000-00000000e2e2', 'MECHA PARA MADERA DE 6 MM (E2E)', 'MARCA E2E', '7790000000099'), ('00000000-0000-0000-0000-00000000e2e3', 'TALADRO PERCUTOR 750 W (E2E)', 'MARCA E2E', NULL)`);
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e1', 'ME6', 2000, '{"explicacion": ["Precio de lista 2000", "− 25 % (linea) = 1500", "Costo neto 1500"]}', 1500, 0.21, '2026-08-11'), (gen_random_uuid(), '00000000-0000-0000-0000-00000000e2e3', '00000000-0000-0000-0000-00000000e2e1', 'TP750', 120000, '[]', 120000, 0.21, '2026-08-11')`);
+  psql(`INSERT INTO producto (id, descripcion, marca, proveedor_preferido_id) SELECT gen_random_uuid(), 'TUERCA SCROLL ' || n || ' (E2E)', 'MARCA E2E', '00000000-0000-0000-0000-00000000e2e1' FROM generate_series(1, 40) n`);
 });
 
-test("buscar un producto, elegir el margen y fijar un precio a mano", async ({ page }) => {
+test("buscar un producto, elegir el margen y tipear otro margen a mano", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/productos");
   const busqueda = page.getByTestId("busqueda");
@@ -56,30 +60,68 @@ test("buscar un producto, elegir el margen y fijar un precio a mano", async ({ p
   await expect(fila).toContainText("− 25 % (linea)");
   await busqueda.press("Shift+3");
   await expect(fila.getByRole("button", { name: "100 %" })).toHaveClass(/activo/);
-  await expect(fila.locator("td.precio")).toContainText("$3.630,00"); // 1500 × 2 × 1,21 = 3630
+  await expect(fila.locator("td.precio")).toContainText("$4.000,00"); // 1500 × 2 × 1,21 = 3630 → para arriba a 4000
   await fila.locator("td.precio summary").click();
   await expect(fila).toContainText("+ 100 % de margen");
 
-  // Queda guardado: al recargar, el margen sigue.
+  // Queda guardado aunque se recargue con el pedido en vuelo: el cambio se anota en el
+  // dispositivo antes de mandarse y se reenvía al arrancar. Acá el servidor "tarda" 5 s.
+  await page.route("**/productos/*", async (ruta) => { await new Promise((r) => setTimeout(r, 5000)); await ruta.continue().catch(() => undefined); });
+  await fila.getByRole("button", { name: "50 %" }).click();
+  await expect(fila.getByRole("button", { name: "50 %" })).toHaveClass(/activo/);
+  await page.waitForTimeout(300); // que llegue a anotarse en el dispositivo
+  await page.unroute("**/productos/*");
+  await page.reload();
+  await page.getByTestId("busqueda").fill("me6");
+  await expect(page.getByTestId("producto").first().getByRole("button", { name: "50 %" })).toHaveClass(/activo/);
+  await page.getByTestId("producto").first().getByRole("button", { name: "100 %" }).click();
+  await expect(page.getByTestId("producto").first().locator("td.precio")).toContainText("$4.000,00");
+  await page.waitForTimeout(300); // que llegue a anotarse en el dispositivo
   await page.reload();
   await page.getByTestId("busqueda").fill("me6");
   await expect(page.getByTestId("producto").first().getByRole("button", { name: "100 %" })).toHaveClass(/activo/);
 
-  // Precio a mano: muestra el margen real que deja.
+  // Otro margen a mano, en porcentaje: 20 % → 1500 × 1,2 × 1,21 = 2178 → $3.000.
   const fila2 = page.getByTestId("producto").first();
-  await fila2.getByRole("button", { name: "a mano" }).click();
-  await fila2.locator("input.precio-manual").fill("4235");
+  await fila2.getByRole("button", { name: "otro margen" }).click();
+  await fila2.locator("input.precio-manual").fill("20");
   await fila2.locator("input.precio-manual").press("Enter");
-  await expect(fila2.locator("td.precio")).toContainText("$4.235,00");
-  await expect(fila2.locator("td.precio")).toContainText("a mano · 133.3 %"); // 4235 / 1,21 = 3500 → 133,3 % sobre 1500
+  await expect(fila2.locator("td.precio")).toContainText("$3.000,00");
+  await expect(fila2.locator("td.precio")).toContainText("margen a mano · 20 %");
+  await expect(fila2.getByRole("button", { name: "100 %" })).not.toHaveClass(/activo/);
 
-  // El taladro caro con 25 % redondea a $100.
+  // El taladro con 25 %: 181.500 → para arriba a $182.000.
   await page.getByTestId("busqueda").fill("e2e taladro");
-  const taladro = page.getByTestId("producto").first();
+  const taladro = page.getByTestId("producto").filter({ hasText: "TALADRO PERCUTOR" });
+  await expect(taladro).toBeVisible();
   await taladro.getByRole("button", { name: "25 %" }).click();
-  await expect(taladro.locator("td.precio")).toContainText("$181.500,00");
+  await expect(taladro.locator("td.precio")).toContainText("$182.000,00");
 
   // Nada con palabras que no existen.
   await page.getByTestId("busqueda").fill("zzzz");
   await expect(page.getByTestId("sin-resultados")).toBeVisible();
+
+  // Las flechas y Shift+número funcionan aunque la búsqueda no tenga el foco.
+  await page.getByTestId("busqueda").fill("e2e tuerca scroll");
+  await expect(page.getByTestId("producto")).toHaveCount(30);
+  await page.locator("h1, .ayuda").first().click(); // el foco sale de la caja
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("producto").nth(2)).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Shift+Digit2");
+  await expect(page.getByTestId("producto").nth(2).getByRole("button", { name: "200 %" })).toHaveClass(/activo/);
+
+  // Carga progresiva: 30 primero, el resto al llegar al final.
+  await page.getByTestId("cargar-mas").scrollIntoViewIfNeeded();
+  await expect(page.getByTestId("producto")).toHaveCount(40);
+  await expect(page.getByTestId("cargar-mas")).toHaveCount(0);
+
+  // Foto: sin foto muestra el ícono; al tocar se amplía con la descripción y Escape cierra.
+  await page.getByTestId("producto").first().getByTestId("foto-chica").click();
+  const grande = page.getByTestId("foto-grande");
+  await expect(grande).toBeVisible();
+  await expect(grande).toContainText("TUERCA SCROLL");
+  await expect(grande).toContainText("todavía no tiene foto");
+  await page.keyboard.press("Escape");
+  await expect(grande).toHaveCount(0);
 });

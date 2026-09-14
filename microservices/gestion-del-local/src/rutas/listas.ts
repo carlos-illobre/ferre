@@ -118,6 +118,24 @@ listas.post("/:id/aplicar", async (c) => {
   return c.json({ id: lista.id, estado: "aplicando" }, 202);
 });
 
+// El Excel original, tal como lo mandó el proveedor. Desde Productos, "lista del ..." lo baja.
+listas.get("/:id/archivo", async (c) => {
+  const { rows } = await pool.query<{ archivo_nombre: string; archivo_ruta: string | null }>(
+    "SELECT archivo_nombre, archivo_ruta FROM lista_importada WHERE id = $1",
+    [c.req.param("id")],
+  );
+  const lista = rows[0];
+  if (!lista) return c.json({ error: "No existe esa lista" }, 404);
+  if (!lista.archivo_ruta) return c.json({ error: "Esa lista se cargó sin guardar el archivo" }, 404);
+  const contenido = await readFile(lista.archivo_ruta).catch(() => null);
+  if (!contenido) return c.json({ error: "El archivo de esa lista ya no está en el disco" }, 404);
+  const nombre = lista.archivo_nombre.replace(/[^\w. -]+/g, "_");
+  return c.body(contenido, 200, {
+    "Content-Type": "application/octet-stream",
+    "Content-Disposition": `attachment; filename="${nombre}"; filename*=UTF-8''${encodeURIComponent(lista.archivo_nombre)}`,
+  });
+});
+
 // Estado y progreso de una lista (la pantalla lo consulta mientras se aplica).
 listas.get("/:id", async (c) => {
   const { rows } = await pool.query(

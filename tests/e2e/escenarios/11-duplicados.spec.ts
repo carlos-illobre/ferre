@@ -65,9 +65,9 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   const fila = page.getByTestId("producto").first();
   await expect(fila.getByTestId("otros-proveedores")).toContainText("★ Proveedor barato (e2e) $2.400,00");
   await expect(fila.getByTestId("otros-proveedores")).toContainText("Proveedor caro (e2e) $3.000,00");
-  await expect(fila.locator("td.precio")).toContainText("$5.810,00"); // 2400 × 2 × 1,21 = 5808 → 5810
+  await expect(fila.locator("td.precio")).toContainText("$6.000,00"); // 2400 × 2 × 1,21 = 5808 → 6000
 
   // Elegir el caro a mano: el precio sigue a ese costo.
   await fila.getByTestId("otros-proveedores").getByRole("button", { name: "usar" }).click();
-  await expect(fila.locator("td.precio")).toContainText("$7.260,00", { timeout: 10000 }); // 3000 × 2 × 1,21
+  await expect(fila.locator("td.precio")).toContainText("$8.000,00", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
 });

@@ -2,8 +2,10 @@
 // su explicación paso a paso (issue #47). Se comparte entre la API y el cliente para que
 // el precio calculado sin conexión sea idéntico al del servidor (ADR-001).
 
+// Los cinco botones de margen. Cualquier otro porcentaje entero se puede tipear a mano.
 export const MARGENES = [300, 200, 100, 50, 25] as const;
 export type Margen = (typeof MARGENES)[number];
+export const esMargenBoton = (m: number): m is Margen => (MARGENES as readonly number[]).includes(m);
 
 export type Explicado = { valor: number; pasos: string[] };
 
@@ -16,14 +18,14 @@ export function pesos(v: number): string {
 }
 const porCiento = (v: number): string => `${String(Number(v.toFixed(2))).replace(".", ",")} %`;
 
-// Redondeo del precio de venta: al múltiplo de $10 más cercano; de $10.000 en adelante,
-// al de $100. Lo que se cobra en un mostrador no lleva centavos.
+// Redondeo del precio de venta: para arriba, al múltiplo de $1.000 siguiente. Lo pidió el
+// dueño: en el mostrador se cobra en miles y el redondeo nunca come el margen.
+export const PASO_DE_REDONDEO = 1000;
 export function redondear(precio: number): number {
-  const paso = precio >= 10_000 ? 100 : 10;
-  return Math.round(precio / paso) * paso;
+  return Math.ceil(precio / PASO_DE_REDONDEO - 1e-9) * PASO_DE_REDONDEO;
 }
 
-export function precioDeVenta(entrada: { costoNeto: number; margen: Margen; iva: number }): Explicado {
+export function precioDeVenta(entrada: { costoNeto: number; margen: number; iva: number }): Explicado {
   const { costoNeto, margen, iva } = entrada;
   const conMargen = costoNeto * (1 + margen / 100);
   const conIva = conMargen * (1 + iva);
@@ -34,7 +36,7 @@ export function precioDeVenta(entrada: { costoNeto: number; margen: Margen; iva:
       `Costo ${pesos(costoNeto)}`,
       `+ ${margen} % de margen = ${pesos(conMargen)}`,
       `+ IVA ${porCiento(iva * 100)} = ${pesos(conIva)}`,
-      `Redondeado a ${pesos(precio)}`,
+      `Redondeado para arriba a ${pesos(precio)} (múltiplo de ${pesos(PASO_DE_REDONDEO)})`,
     ],
   };
 }
