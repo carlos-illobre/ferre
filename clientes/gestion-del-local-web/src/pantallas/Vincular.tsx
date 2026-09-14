@@ -9,8 +9,16 @@ export function Vincular({ codigo }: { codigo: string }) {
   const { sesion } = useSesion();
   const [resultado, setResultado] = useState<string | null>(null);
 
+  if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
   if (sesion.estado !== "con-sesion") {
-    return <main className="pantalla-centrada"><p>Primero entrá con Google en este celular y volvé a leer el código.</p></main>;
+    return (
+      <main className="pantalla-centrada">
+        <h1>ferre</h1>
+        <h2>Dejar entrar a la computadora</h2>
+        <p>Entrá con tu cuenta de Google para confirmar. La computadora va a entrar como vos.</p>
+        <BotonGoogle />
+      </main>
+    );
   }
   const nombre = sesion.usuario.nombre;
 

@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { api, borrarToken, guardarToken, leerToken } from "./api";
 
 export type Usuario = { id: string; email: string; nombre: string; rol: "dueño" | "mostrador" };
-type Estado = { estado: "cargando" } | { estado: "sin-sesion" } | { estado: "con-sesion"; usuario: Usuario; sinConexion: boolean };
+type Estado = { estado: "cargando" } | { estado: "sin-sesion" } | { estado: "con-sesion"; usuario: Usuario; sinConexion: boolean; sesionId: string | null };
 
 const Contexto = createContext<{ sesion: Estado; entrar: (token: string, usuario: Usuario) => void; salir: () => Promise<void> } | null>(null);
 
@@ -15,12 +15,12 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = leerToken();
     if (!token) return setSesion({ estado: "sin-sesion" });
-    api<{ usuario: Usuario }>("/sesiones/actual")
-      .then((r) => { guardarUsuario(r.usuario); setSesion({ estado: "con-sesion", usuario: r.usuario, sinConexion: false }); })
+    api<{ id: string; usuario: Usuario }>("/sesiones/actual")
+      .then((r) => { guardarUsuario(r.usuario); setSesion({ estado: "con-sesion", usuario: r.usuario, sinConexion: false, sesionId: r.id }); })
       .catch((e: { estado?: number }) => {
         if (e.estado === 401) return setSesion({ estado: "sin-sesion" });
         const guardado = leerUsuarioGuardado();
-        setSesion(guardado ? { estado: "con-sesion", usuario: guardado, sinConexion: true } : { estado: "sin-sesion" });
+        setSesion(guardado ? { estado: "con-sesion", usuario: guardado, sinConexion: true, sesionId: null } : { estado: "sin-sesion" });
       });
     const alCerrar = () => setSesion({ estado: "sin-sesion" });
     window.addEventListener("sesion-cerrada", alCerrar);
@@ -30,7 +30,8 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
   const entrar = useCallback((token: string, usuario: Usuario) => {
     guardarToken(token);
     guardarUsuario(usuario);
-    setSesion({ estado: "con-sesion", usuario, sinConexion: false });
+    setSesion({ estado: "con-sesion", usuario, sinConexion: false, sesionId: null });
+    api<{ id: string }>("/sesiones/actual").then((r) => setSesion((s) => (s.estado === "con-sesion" ? { ...s, sesionId: r.id } : s))).catch(() => undefined);
   }, []);
 
   const salir = useCallback(async () => {

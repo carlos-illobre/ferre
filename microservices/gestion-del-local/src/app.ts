@@ -26,7 +26,7 @@ app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders:
 app.get("/health", async (c) => {
   const db = await baseResponde();
   return c.json(
-    { ok: db, db: db ? "ok" : "sin-respuesta", calculoDePrecios: VERSION_CALCULO_DE_PRECIOS },
+    { ok: db, db: db ? "ok" : "sin-respuesta", version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_CALCULO_DE_PRECIOS },
     db ? 200 : 503,
   );
 });

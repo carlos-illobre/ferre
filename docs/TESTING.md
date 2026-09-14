@@ -14,6 +14,9 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 
 ## Caminos principales cubiertos por E2E
 
+El detalle de cada caso (precondiciones, pasos y resultado esperado) está en
+[casos-de-prueba-e2e.md](casos-de-prueba-e2e.md).
+
 | Escenario | Archivo | Estado |
 |---|---|---|
 | La app abre y el servidor responde | `00-arranque.spec.ts` | Hecho |
@@ -27,6 +30,7 @@ lo estable. Sin compuerta de cobertura ni mutation testing.
 | Carga del navegador: 50.000 productos y 10.000 ventas (solo con `CARGA=1`) | `09-carga.spec.ts` | Hecho |
 | Vincular el celular por QR y que lo escaneado aparezca en la laptop; asociar un código desconocido | `10-escaner.spec.ts` | Hecho (el escaneo con cámara real se prueba a mano) |
 | Sugerir un duplicado entre proveedores, unirlo y ver el más barato como preferido | `11-duplicados.spec.ts` | Hecho |
+| Cerrar la sesión de otro dispositivo, cerrar la propia (vuelve al login) y Salir | `12-cerrar-sesion.spec.ts` | Hecho |
 | Ver el stock valorizado, sus movimientos y corregirlo | `06-stock.spec.ts` | Hecho |
 
 Cada issue de esa lista agrega su escenario antes de cerrarse.

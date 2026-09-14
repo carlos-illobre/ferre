@@ -232,3 +232,5 @@ button.sector:hover { border-color: var(--azul); }
 .otros-proveedores { list-style: none; padding: 0; margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--texto-suave); }
 .otros-proveedores li.actual { color: var(--texto); font-weight: 600; }
 @media (max-width: 720px) { .lado-a-lado { grid-template-columns: 1fr; } }
+
+.version { position: fixed; right: 0.5rem; bottom: 0.3rem; font-size: 0.7rem; color: #9aa4b2; z-index: 1; }

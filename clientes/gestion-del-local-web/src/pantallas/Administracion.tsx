@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../api";
+import { useSesion } from "../sesion";
 
 type UsuarioFila = { id: string; email: string; nombre: string; rol: string; activo: boolean };
 type SesionFila = { id: string; dispositivo: string; ultimo_uso_en: string; email: string; nombre: string };
@@ -69,19 +70,32 @@ function Usuarios() {
 }
 
 function Sesiones() {
+  const { sesion, salir } = useSesion();
+  const propiaId = sesion.estado === "con-sesion" ? sesion.sesionId : null;
   const [filas, setFilas] = useState<SesionFila[]>([]);
-  const cargar = () => api<SesionFila[]>("/sesiones").then(setFilas).catch(() => undefined);
+  const [error, setError] = useState<string | null>(null);
+  const cargar = () => api<SesionFila[]>("/sesiones").then((f) => { setFilas(f); setError(null); }).catch((e: Error) => setError(e.message));
   useEffect(() => { void cargar(); }, []);
+
+  async function cerrar(s: SesionFila) {
+    // La propia es "Salir": se sale de forma explícita, sin esperar a que otra llamada falle.
+    if (s.id === propiaId) { await salir(); return; }
+    try { await api(`/sesiones/${s.id}`, { method: "DELETE" }); }
+    catch (e) { setError(`No se pudo cerrar: ${(e as Error).message}`); }
+    await cargar();
+  }
+
   return (
     <article>
       <h2>Sesiones abiertas</h2>
-      <table>
+      {error && <p className="error" role="alert">{error}</p>}
+      <table data-testid="sesiones">
         <thead><tr><th>Quién</th><th>Dispositivo</th><th>Último uso</th><th /></tr></thead>
         <tbody>
           {filas.map((s) => (
-            <tr key={s.id}>
-              <td>{s.nombre}</td><td>{s.dispositivo}</td><td>{new Date(s.ultimo_uso_en).toLocaleString("es-AR")}</td>
-              <td><button onClick={() => api(`/sesiones/${s.id}`, { method: "DELETE" }).then(cargar)}>Cerrar</button></td>
+            <tr key={s.id} className={s.id === propiaId ? "propia" : ""}>
+              <td>{s.nombre}{s.id === propiaId ? <small> · esta sesión</small> : null}</td><td>{s.dispositivo}</td><td>{new Date(s.ultimo_uso_en).toLocaleString("es-AR")}</td>
+              <td><button className="enlace chico" onClick={() => cerrar(s)}>{s.id === propiaId ? "Salir" : "Cerrar"}</button></td>
             </tr>
           ))}
         </tbody>

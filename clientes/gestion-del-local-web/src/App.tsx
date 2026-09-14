@@ -61,6 +61,7 @@ function Pantallas() {
         <span data-testid="usuario">{sesion.usuario.nombre} · {sesion.usuario.rol}</span>
         <button className="secundario" onClick={salir}>Salir</button>
       </header>
+      <small className="version" title="Versión de la app (commit)">{import.meta.env.VITE_VERSION ?? "local"}</small>
       {actual === "administracion" && esDueno ? (
         <>
           <EstadoDelServidor />

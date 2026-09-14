@@ -94,6 +94,9 @@ jobs:
       - name: "11 · Duplicados entre proveedores"
         if: always()
         run: PLAYWRIGHT_JSON=/tmp/e2e-11.json tests/e2e.sh --escenario 11-duplicados.spec.ts
+      - name: "12 · Cerrar sesiones"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-12.json tests/e2e.sh --escenario 12-cerrar-sesion.spec.ts
       - name: Resumen
         if: always()
         run: |
@@ -176,6 +179,7 @@ jobs:
           VITE_API_URL: ${{ vars.API_URL }}
           VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VITE_BASE: /${{ github.event.repository.name }}/
+          VITE_VERSION: produccion ${{ github.sha }}
       - name: Construir pruebas (/pruebas/)
         working-directory: pruebas
         run: |
@@ -185,6 +189,7 @@ jobs:
           VITE_API_URL: ${{ vars.API_URL_PRUEBAS }}
           VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VITE_BASE: /${{ github.event.repository.name }}/pruebas/
+          VITE_VERSION: pruebas ${{ github.sha }}
       - name: Armar el sitio
         run: |
           mkdir -p sitio

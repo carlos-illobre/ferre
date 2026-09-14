@@ -43,6 +43,8 @@ services:
       # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
       CARPETA_LISTAS: /app/datos/listas
+      # Solo informativa: /health la devuelve para saber qué corre. No cambia el comportamiento.
+      VERSION: ${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
       PORT: "8080"
     ports:
       # Solo en la interfaz local: desde internet no se llega sin pasar por el reverse proxy.
