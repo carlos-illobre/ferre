@@ -77,6 +77,8 @@ export function Vender() {
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
+  // Un aviso ("elegí el cliente", "elegí cómo paga") se va solo apenas se corrige la causa.
+  useEffect(() => { setError(null); }, [items, medio, clienteId]);
   useEffect(() => { caja.current?.focus(); }, [catalogo]);
   useEffect(() => {
     const contar = () => pendientesEnCola().then((l) => setPendientes(l.length)).catch(() => undefined);

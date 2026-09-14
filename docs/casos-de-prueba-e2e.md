@@ -92,7 +92,7 @@ mecha (costo $1.500, sin margen) y un taladro (costo $120.000, sin margen).
 | "Cobrar" | Aviso "Hay productos sin precio" |
 | "300 %" en la fila del tornillo | Precio $1.000,00 (10 × 4 × 1,21 = 48,4 → 1000); total $10.000,00 |
 | Unidad "kg" en el tornillo, cantidad 1,5 | Total $10.500,00: a granel admite un decimal |
-| "Cobrar" sin medio de pago | Aviso "Elegí cómo paga" |
+| "Cobrar" sin medio de pago | Aviso "Elegí cómo paga"; al tocar un medio de pago el aviso desaparece solo |
 | "Efectivo", "Cobrar" | "Venta registrada: $10.500,00 en efectivo"; la venta queda vacía |
 | Verificación en la base | Una venta confirmada; stock de la mecha −3; el ítem del tornillo con margen 300 y el tornillo con unidad kg; la explicación "+ 100 % de margen" guardada en el de la mecha |
 | Abrir "Ventas de hoy" | Aparece la venta con "Efectivo"; como tiene dos productos, cada uno va en su fila (3 × mecha, 1.5 × tornillo) debajo de la fila de la venta |

@@ -80,6 +80,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.getByTestId("cobrar").click();
   await expect(page.getByRole("alert")).toContainText("Elegí cómo paga");
   await page.getByRole("button", { name: "Efectivo" }).click();
+  await expect(page.getByRole("alert")).toHaveCount(0); // el aviso se va solo al corregirlo
   await page.getByTestId("cobrar").click();
   await expect(page.getByTestId("mensaje")).toContainText("Venta registrada: $10.500,00 en efectivo");
   await expect(page.getByTestId("item")).toHaveCount(0);
