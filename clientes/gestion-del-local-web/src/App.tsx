@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { esAmbienteDePrueba } from "./ambiente";
 import { urlApi } from "./api";
 import { ProveedorDeSesion, administra, useSesion } from "./sesion";
 import { irA, useRuta } from "./rutas";
@@ -69,8 +70,9 @@ function Pantallas() {
 
   return (
     <main>
-      <header className="barra">
+      <header className={`barra ${esAmbienteDePrueba() ? "de-prueba" : ""}`}>
         <strong>ferre</strong>
+        {esAmbienteDePrueba() && <span className="ambiente" data-testid="ambiente">Ambiente de prueba</span>}
         <span className="pantalla-actual solo-celular">{pantalla}</span>
         <nav className="solo-escritorio">
           {visibles.map((m) => (

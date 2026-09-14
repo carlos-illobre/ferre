@@ -258,4 +258,5 @@ suite: los escenarios corren en escritorio). Qué mirar:
 | "Más" | Sube una hoja con Listas de precios (y Duplicados y Administración para el dueño) y Salir |
 | Vender con dos productos | Cada renglón es una tarjeta; la barra de cobro queda pegada arriba del menú |
 | Productos | Cada producto es una tarjeta; la elegida se pinta de azul |
+| Abrir la app de pruebas (`/ferre/pruebas/`) y la de producción (`/ferre/`) | En pruebas la barra titila de azul a rojo y dice "Ambiente de prueba"; en producción es azul fija, sin leyenda |
 | Chrome en Android: menú del navegador | Ofrece "Instalar app" (manifest con ícono, nombre y modo standalone) |

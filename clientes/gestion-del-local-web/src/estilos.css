@@ -47,6 +47,10 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 .paginado { display: flex; gap: 0.8rem; align-items: center; margin-top: 0.6rem; }
 .barra nav button.enlace.activo { color: var(--amarillo); border-bottom-color: var(--amarillo); font-weight: 700; }
 .barra > span { color: #d9e2f2; font-size: 0.95rem; white-space: nowrap; }
+/* Ambiente de prueba: la barra titila de azul a rojo y lo dice, para no confundirla con producción */
+.barra.de-prueba { animation: titilar 1.6s ease-in-out infinite; }
+.barra .ambiente { background: var(--amarillo); color: var(--azul-oscuro); font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.9rem; letter-spacing: 0.02em; }
+@keyframes titilar { 0%, 100% { background: linear-gradient(180deg, var(--azul) 0%, var(--azul-oscuro) 100%); } 50% { background: linear-gradient(180deg, #c62828 0%, #8e1b1b 100%); } }
 .barra > button.secundario { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); }
 
 /* Botones */
