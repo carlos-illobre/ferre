@@ -10,7 +10,7 @@ vi.mock("../credenciales", () => ({ hayHuella: () => false, listarCredenciales: 
 import { Negocio } from "./Negocio";
 
 function eventos(pagina: number) {
-  return { pagina, por_pagina: 50, total: 120, eventos: Array.from({ length: pagina === 3 ? 20 : 50 }, (_, i) => ({ id: `e${pagina}-${i}`, tipo: "venta.registrada", fecha: "2026-09-14T12:00:00Z", email: null, nombre: "Ana", contenido: { detalle: "x".repeat(200) } })) };
+  return { pagina, por_pagina: 10, total: 24, eventos: Array.from({ length: pagina === 3 ? 4 : 10 }, (_, i) => ({ id: `e${pagina}-${i}`, tipo: "venta.registrada", fecha: "2026-09-14T12:00:00Z", email: null, nombre: "Ana", contenido: { detalle: "x".repeat(200) } })) };
 }
 
 describe("Negocio", () => {
@@ -37,11 +37,11 @@ describe("Negocio", () => {
     expect(screen.getByText("Proveedor uno").parentElement!.textContent).toContain("2 compras");
   });
 
-  it("'Quién hizo qué' va de a 50 por página, acorta el detalle y pagina hacia adelante y atrás", async () => {
+  it("'Quién hizo qué' va de a 10 por página, acorta el detalle y pagina hacia adelante y atrás", async () => {
     render(<Negocio />);
     const paginado = await screen.findByTestId("paginado");
-    expect(paginado.textContent).toContain("Página 1 de 3 · 120 acciones");
-    expect(screen.getAllByText("venta.registrada", { exact: false })).toHaveLength(50);
+    expect(paginado.textContent).toContain("Página 1 de 3 · 24 acciones");
+    expect(screen.getAllByText("venta.registrada", { exact: false })).toHaveLength(10);
     const detalles = Array.from(document.querySelectorAll("code")).map((c) => c.textContent ?? "");
     expect(detalles.every((d) => d.length === 121 && d.endsWith("…"))).toBe(true);
     expect(screen.getByRole("button", { name: "← Anteriores" })).toHaveProperty("disabled", true);

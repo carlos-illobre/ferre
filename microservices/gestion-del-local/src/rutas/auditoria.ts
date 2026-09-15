@@ -9,8 +9,8 @@ auditoria.use("/*", exigirSesion, exigirAdministrador);
 
 auditoria.get("/", async (c) => {
   const { usuario, tipo, desde, hasta, pagina } = c.req.query();
-  // De a 50 por página: "quién hizo qué" crece todos los días y no se lee entero.
-  const porPagina = 50;
+  // De a 10 por página (pedido del dueño): "quién hizo qué" crece todos los días y no se lee entero.
+  const porPagina = 10;
   const nroPagina = Math.max(1, Number(pagina) || 1);
   const filtro = `WHERE ($1::uuid IS NULL OR e.usuario_id = $1)
         AND ($2::text IS NULL OR e.tipo LIKE $2 || '%')
