@@ -47,8 +47,12 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
 
   // Recién entrado con Google (Google no se automatiza: se siembra la sesión y la marca),
-  // la app ofrece usar la huella, como en el banco. Aceptar vincula el celular.
-  await page.addInitScript((token) => { localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1"); }, TOKEN);
+  // la app ofrece usar la huella, como en el banco, solo en un celular: se simula el
+  // user agent de Android. Aceptar vincula el celular.
+  await page.addInitScript((token) => {
+    localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1");
+    Object.defineProperty(navigator, "userAgent", { get: () => "Mozilla/5.0 (Linux; Android 14; Pixel 7) Chrome/128.0 Mobile Safari/537.36" });
+  }, TOKEN);
   await page.goto("/#/administracion");
   await expect(page.getByTestId("ofrecer-huella")).toContainText("¿Entrar con la huella?");
   await page.getByTestId("aceptar-huella").click();

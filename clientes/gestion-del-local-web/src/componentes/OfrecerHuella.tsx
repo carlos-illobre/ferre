@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { hayHuella, vincularEsteDispositivo } from "../credenciales";
-import { describirDispositivo } from "../pantallas/Login";
+import { describirDispositivo, esCelular } from "../pantallas/Login";
 
 // Como en las apps del banco: la primera vez que alguien entra con Google desde un
 // celular con huella, se le ofrece vincularlo para entrar con la huella la próxima vez.
 // Se ofrece una sola vez por dispositivo (acepte o no); si ya estaba vinculado, no molesta.
+// En la computadora no se ofrece: la huella se vincula desde el celular (Negocio).
 const CLAVE_OFRECIDA = "ferre.huella-ofrecida";
 const CLAVE_RECIEN_GOOGLE = "ferre.recien-google";
 
 export const marcarEntradaConGoogle = () => { try { sessionStorage.setItem(CLAVE_RECIEN_GOOGLE, "1"); } catch { /* sin almacenamiento */ } };
 function corresponde(): boolean {
   try {
-    return hayHuella() && sessionStorage.getItem(CLAVE_RECIEN_GOOGLE) === "1" && localStorage.getItem(CLAVE_OFRECIDA) === null;
+    return esCelular() && hayHuella() && sessionStorage.getItem(CLAVE_RECIEN_GOOGLE) === "1" && localStorage.getItem(CLAVE_OFRECIDA) === null;
   } catch { return false; }
 }
 function yaOfrecida() {

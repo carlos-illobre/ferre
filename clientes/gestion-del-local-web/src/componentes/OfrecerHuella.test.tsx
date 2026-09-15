@@ -4,13 +4,21 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const cred = vi.hoisted(() => ({ hay: true, vincular: vi.fn<(...a: any[]) => Promise<any>>() }));
 vi.mock("../credenciales", () => ({ hayHuella: () => cred.hay, vincularEsteDispositivo: (...a: unknown[]) => cred.vincular(...a) }));
-vi.mock("../pantallas/Login", () => ({ describirDispositivo: () => "Celular" }));
+const dispositivo = vi.hoisted(() => ({ celular: true }));
+vi.mock("../pantallas/Login", () => ({ describirDispositivo: () => "Celular", esCelular: () => dispositivo.celular }));
 import { marcarEntradaConGoogle, OfrecerHuella } from "./OfrecerHuella";
 
 // Como en el banco: la primera vez que se entra con Google desde un celular con huella se
 // ofrece vincularlo; una sola vez por dispositivo.
 describe("OfrecerHuella", () => {
-  beforeEach(() => { cred.hay = true; cred.vincular.mockReset(); sessionStorage.clear(); localStorage.clear(); });
+  beforeEach(() => { cred.hay = true; dispositivo.celular = true; cred.vincular.mockReset(); sessionStorage.clear(); localStorage.clear(); });
+
+  it("en la computadora no se ofrece aunque tenga huella y acabe de entrar con Google", () => {
+    marcarEntradaConGoogle(); dispositivo.celular = false;
+    render(<OfrecerHuella />);
+    expect(screen.queryByTestId("ofrecer-huella")).toBeNull();
+    expect(localStorage.getItem("ferre.huella-ofrecida")).toBeNull();
+  });
 
   it("no aparece si no se acaba de entrar con Google, ni sin huella, ni si ya se ofreció", () => {
     render(<OfrecerHuella />);

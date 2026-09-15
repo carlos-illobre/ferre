@@ -42,7 +42,7 @@ en cada corrida.
 |---|---|---|
 | Sin sesión se pide entrar | Abrir la app sin token guardado | Se ve "Entrá con tu cuenta de Google" y el botón "Mostrar código para leer con el celular" |
 | Con sesión el dueño entra | Abrir la app con el token en el dispositivo; tocar "Administración" | Arriba dice "Dueño E2E · dueño"; se ve "Usuarios autorizados" con el correo del dueño en la tabla |
-| Vincular el celular con la huella y volver a entrar con ella (autenticador virtual de Chromium) | Entrar recién con Google (sesión y marca sembradas): aparece "¿Entrar con la huella?", "Sí, usar la huella", "Entendido"; recargar; "Quitar"; "Vincular este celular con mi huella", nombre "Celular E2E"; Salir; "Entrar con la huella"; volver a Administración, "Quitar"; Salir; "Entrar con la huella" | La oferta vincula el celular (aparece en "Mis celulares con huella") y no se repite al recargar; vincular a mano deja "Celular E2E" y una credencial en la base; entra sin Google y la sesión queda auditada con medio "huella"; tras quitarlo, la huella dice "no está vinculado" |
+| Vincular el celular con la huella y volver a entrar con ella (autenticador virtual de Chromium) | Entrar recién con Google (sesión y marca sembradas, user agent de Android): aparece "¿Entrar con la huella?", "Sí, usar la huella", "Entendido"; recargar; "Quitar"; "Vincular este celular con mi huella", nombre "Celular E2E"; Salir; "Entrar con la huella"; volver a Administración, "Quitar"; Salir; "Entrar con la huella" | La oferta vincula el celular (aparece en "Mis celulares con huella") y no se repite al recargar; vincular a mano deja "Celular E2E" y una credencial en la base; entra sin Google y la sesión queda auditada con medio "huella"; tras quitarlo, la huella dice "no está vinculado" |
 
 ---
 

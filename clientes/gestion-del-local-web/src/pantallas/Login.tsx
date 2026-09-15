@@ -135,9 +135,11 @@ function LoginPorQr() {
   );
 }
 
+// Celular = Android o iPhone/iPad. La oferta de huella al primer login es solo para ellos.
+export const esCelular = () => /Android|iPhone|iPad/.test(navigator.userAgent);
 export function describirDispositivo(): string {
   const ua = navigator.userAgent;
-  const tipo = /Android|iPhone|iPad/.test(ua) ? "celular" : "computadora";
+  const tipo = esCelular() ? "celular" : "computadora";
   const navegador = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Firefox\//.test(ua) ? "Firefox" : /Safari\//.test(ua) ? "Safari" : "navegador";
   return `${tipo} · ${navegador}`;
 }
