@@ -32,6 +32,8 @@ export function Negocio() {
   return (
     <main className="contenido">
       <div className="encabezado"><h1 className="titulo">Negocio</h1></div>
+      <div className="dos-columnas">
+      <div className="columna">
       {usuario && (
         <div className="tarjeta usuario-actual">
           <div className="avatar">{usuario.nombre.charAt(0).toUpperCase()}</div>
@@ -72,10 +74,14 @@ export function Negocio() {
         </>
       )}
 
+      </div>
+      <div className="columna">
       {esDueno && <Usuarios />}
       <Celulares />
       {esDueno && <Sesiones />}
       {esDueno && <Auditoria />}
+      </div>
+      </div>
     </main>
   );
 }

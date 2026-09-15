@@ -60,6 +60,8 @@ function Stock() {
     <>
       <AvisoError texto={error} alCerrar={() => setError(null)} />
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
+      <div className="lateral">
+      <div className="columna al-costado">
       {datos && (
         <div className="tarjeta oscura" data-testid="valorizacion">
           <small>Valor del inventario · al costo, sin IVA</small>
@@ -71,12 +73,16 @@ function Stock() {
           </div>
         </div>
       )}
+      </div>
+      <div className="columna">
       <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" />
       <p className="subtitulo">El stock es la suma de compras, ventas y ajustes desde que se usa el sistema. Hasta el conteo, lo que no se cargó no está.</p>
       <div className="lista" data-testid="tabla-stock">
         {filas.map((p) => <FilaStock key={p.id} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={async (texto) => { setMensaje(texto); await cargar(); }} />)}
       </div>
       {consulta.trim() && filas.length === 0 && catalogo && <div className="aviso-suave">Nada con "{consulta}".</div>}
+      </div>
+      </div>
     </>
   );
 }
@@ -238,6 +244,8 @@ function Ingreso() {
   return (
     <>
       <AvisoError texto={error ?? errorCatalogo} alCerrar={() => setError(null)} />
+      <div className="lateral">
+      <div className="columna al-costado">
       <div className="formulario">
         <button type="button" className="renglon" onClick={() => setHoja("proveedores")} data-testid="proveedor">
           <span>Proveedor</span><span className={`valor ${proveedor ? "" : "falta"}`}>{proveedor ? proveedor.nombre : "Elegir"}<Icono nombre="derecha" tam={14} grosor={2.5} /></span>
@@ -246,6 +254,8 @@ function Ingreso() {
         {comprobante !== "sin_comprobante" && <label className="renglon"><span>Número</span><input value={numero} onChange={(e) => setNumero(e.target.value)} placeholder="0001-00012345" inputMode="numeric" data-testid="numero" /></label>}
         <label className="renglon"><span>Fecha</span><input type="date" value={fechaCompra} onChange={(e) => setFechaCompra(e.target.value)} /></label>
       </div>
+      </div>
+      <div className="columna">
       <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Producto que llegó" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclas} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
       {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
       {consulta.trim() && (
@@ -289,6 +299,8 @@ function Ingreso() {
           <span>Registrar ingreso</span><span className="importe" data-testid="total">{pesosCortos(total)}</span>
         </button>
       )}
+      </div>
+      </div>
       <ComprasRecientes version={version} />
       {hoja === "proveedores" && (
         <Hoja titulo="¿De qué proveedor llegó?" alCerrar={() => setHoja(null)} testId="hoja-proveedores">
@@ -495,6 +507,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     <>
       {cabecera}
       <AvisoError texto={error} alCerrar={() => setError(null)} />
+      <div className="lateral">
+      <div className="columna al-costado">
       {producto ? (
         <div className="contando" data-testid="contando">
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}><span style={{ fontSize: 18, fontWeight: 600 }}>{producto.descripcion}</span><small>{[producto.marca, producto.codigo_proveedor].filter(Boolean).join(" · ")}{contadoPorId.get(producto.id) ? ` · teórico ${Number(contadoPorId.get(producto.id)!.stock_teorico)}` : ""}</small></div>
@@ -524,6 +538,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           )}
         </>
       )}
+      </div>
+      <div className="columna">
       <div className="seccion"><span>Contados · {conteo.renglones.length}</span><span className="suave">{conteo.sin_contar.length} sin contar</span></div>
       {conteo.renglones.length === 0 ? <div className="aviso-suave">Todavía nada. Buscá el primer producto de la estantería.</div> : (
         <div className="lista" data-testid="contados">
@@ -554,6 +570,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           <button type="button" className="boton texto gris" onClick={() => setCerrando(false)}>Volver</button>
         </div>
       )}
+      </div>
+      </div>
     </>
   );
 }

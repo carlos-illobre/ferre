@@ -44,6 +44,8 @@ export function Listas() {
     <>
       <AvisoError texto={error} alCerrar={() => setError(null)} />
       <Toast texto={resultado} alCerrar={() => setResultado(null)} testId="resultado" />
+      <div className="dos-columnas">
+      <div className="columna">
       {pendientes.map((l) => (
         <button key={l.id} type="button" className="tarjeta oscura" style={{ textAlign: "left", gap: 8 }} onClick={() => abrirPendiente(l)} data-testid="lista-pendiente">
           <span className="seccion" style={{ padding: 0, color: "var(--coral-claro)" }}>Lista pendiente de revisar</span>
@@ -70,6 +72,8 @@ export function Listas() {
           })}
         </div>
       )}
+      </div>
+      <div className="columna">
       {historial.length > 0 && (
         <>
           <div className="seccion">Últimas cargas</div>
@@ -84,6 +88,8 @@ export function Listas() {
           </div>
         </>
       )}
+      </div>
+      </div>
       {cargada && <Revision cargada={cargada} alTerminar={(mensaje) => { setCargada(null); setResultado(mensaje ?? null); void recargar(); }} />}
       {altaAbierta && <AltaDeProveedor alCerrar={() => setAltaAbierta(false)} alCambiar={async () => { await recargar(); setAltaAbierta(false); }} />}
     </>

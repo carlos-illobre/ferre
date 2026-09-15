@@ -38,6 +38,7 @@ export function Duplicados() {
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
       <AvisoError texto={error} alCerrar={() => setError(null)} />
       {sugerencias.length === 0 && <div className="aviso-suave">No hay sugerencias pendientes.</div>}
+      {sugerencias.length > 0 && <div className="tarjetas">
       {sugerencias.map((s) => (
         <div key={s.id} className="tarjeta" data-testid="sugerencia">
           <span className="seccion" style={{ padding: 0 }}>{s.motivo === "codigo_barras" ? "Mismo código de barras" : "Misma descripción"}</span>
@@ -56,6 +57,7 @@ export function Duplicados() {
           </div>
         </div>
       ))}
+      </div>}
       <button type="button" className="boton blanco" onClick={buscar} data-testid="buscar-duplicados">Buscar duplicados en todo el catálogo</button>
       <button type="button" className="boton texto" onClick={() => setAMano(true)} data-testid="unir-a-mano">Unir dos productos a mano</button>
       {aMano && <UnionManual alCerrar={() => setAMano(false)} alUnir={async (m) => { setMensaje(m); setAMano(false); await cargar(); }} />}

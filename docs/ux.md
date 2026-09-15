@@ -52,6 +52,12 @@ y valen igual en el celular y en la computadora:
 - **Avisos en el lugar:** un toast oscuro para lo que salió bien, un aviso coral para lo que
   falta; se van solos al corregir la causa.
 - La cámara está a un toque al lado de cada buscador, en el celular.
+- **En la computadora se usa toda la pantalla** (sin ancho máximo, 32 px de margen): las
+  pantallas se reparten en dos columnas (Negocio, Listas) o en panel lateral fijo + contenido
+  (Stock con la valorización, Ingreso con el comprobante, Contar con la búsqueda); las
+  sugerencias de duplicados y los sectores van en cuadrícula. Cuando una lista mide más de
+  640 px, cada fila va en una sola línea (nombre · detalle · importe) para que entren más
+  filas; en columnas angostas y en las hojas siguen apiladas. El celular no cambia.
 
 ## Concreto
 

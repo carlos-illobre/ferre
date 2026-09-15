@@ -73,6 +73,8 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 .barra .salir { height: 32px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; font-size: 13px; font-weight: 600; }
 .contenido { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 8px 20px 40px; display: flex; flex-direction: column; gap: 10px; }
 .contenido.ancho { max-width: 1080px; }
+/* Agrupadores de pantalla: en el celular son una columna; en la computadora se reparten (ver abajo) */
+.columna, .dos-columnas, .lateral, .tarjetas { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .version { position: fixed; right: 8px; bottom: 4px; font-size: 11px; color: var(--gris-claro); z-index: 1; }
 
 /* Encabezado de pantalla: título grande y, opcional, segmentos */
@@ -367,16 +369,35 @@ tr.cambia td { background: #fff8e8; }
 
 /* ---------- Computadora ---------- */
 @media (min-width: 900px) {
-  .contenido.vender-ancho { max-width: 1100px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto 1fr; column-gap: 20px; align-items: start; }
+  /* Toda la pantalla: sin ancho máximo, margen de 32px a los costados */
+  .contenido { max-width: none; padding: 8px 32px 40px; }
+  .contenido.vender-ancho { display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: auto 1fr; column-gap: 24px; align-items: start; }
   .contenido.vender-ancho > .encabezado { grid-column: 1 / -1; }
-  .contenido.vender-ancho > .columna { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .contenido.vender-ancho > .cobro { position: sticky; top: calc(var(--alto-barra) + 12px); bottom: auto; margin-top: 0; }
+  /* Agrupadores: dos columnas iguales; panel lateral fijo + contenido; tarjetas en cuadrícula */
+  .dos-columnas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; align-items: start; }
+  .lateral { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 10px 24px; align-items: start; }
+  .lateral > .al-costado { position: sticky; top: calc(var(--alto-barra) + 12px); }
+  .tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 12px; align-items: start; }
+  .sectores { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  /* Filas en una sola línea cuando la lista es ancha (más de 640px): nombre, detalle e importe
+     uno al lado del otro, más filas por pantalla. En columnas angostas y en las hojas siguen apiladas. */
+  .lista, .sugerencias { container-type: inline-size; }
+  @container (min-width: 640px) {
+    .fila { grid-template-columns: minmax(0, 36%) minmax(0, 1fr) auto; gap: 0 18px; min-height: 48px; padding: 7px 16px; }
+    .fila.con-foto { grid-template-columns: 36px minmax(0, 36%) minmax(0, 1fr) auto; }
+    .fila > * { grid-row: 1; }
+    .fila .miniatura { grid-row: 1; width: 36px; height: 36px; border-radius: 8px; }
+    .fila > .nombre { font-size: 15px; }
+    .fila > .detalle { grid-row: 1; grid-column: -3; }
+    .fila .derecha { grid-row: 1; grid-column: -2; flex-direction: row; align-items: baseline; gap: 10px; white-space: nowrap; }
+    .fila > .derecha .importe { font-size: 20px; }
+  }
   .hoja-fondo { align-items: center; justify-content: center; padding: 24px; }
-  .hoja { width: 100%; max-width: 560px; border-radius: 24px; max-height: 88vh; padding-bottom: 24px; }
+  .hoja { width: 100%; max-width: 640px; border-radius: 24px; max-height: 88vh; padding-bottom: 24px; }
   .exito .boton { position: static; margin-top: 20px; width: 100%; }
   .entrar { align-items: center; justify-content: center; padding: 40px; }
   .entrar .arriba { position: static; margin-bottom: 40px; }
-  .sectores { grid-template-columns: repeat(3, 1fr); }
   .sugerencias .fila:hover, button.fila:hover, .fila.tocable:hover { background: var(--niebla); }
   .boton:hover:not(:disabled) { filter: brightness(0.97); }
 }
