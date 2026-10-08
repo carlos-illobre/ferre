@@ -95,7 +95,7 @@ riesgos:
     probabilidad: 5
     impacto: 1
     respuesta: mitigar
-    plan: La app vende sin conexión y sincroniza al reconectar (#18, #37)
+    plan: "La app vende sin conexión y sincroniza al reconectar (#18, #37)"
     contingencia: Ninguna adicional; verificar el indicador de cambios pendientes al cerrar el día
     disparador: Indicador "sin conexión" en la pantalla
     responsable: Empleado
