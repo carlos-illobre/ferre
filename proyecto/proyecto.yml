@@ -1,0 +1,87 @@
+# Ficha del proyecto. La lee el portafolio (github.com/carlos-illobre/portafolio) y es la
+# fuente de verdad de objetivos, interesados, supuestos, restricciones y cronograma.
+# Los requerimientos están en el markdown de `requerimientos`; las tareas, en los issues;
+# los riesgos, en riesgos.yml.
+nombre: Ferretería
+tipo: software
+estado: en curso
+resumen: >-
+  Sistema de gestión para una ferretería de barrio: reemplaza el cuaderno de ventas y las
+  listas de precios en Excel, y lleva stock, compras y ganancias sin sumarle trabajo al
+  empleado.
+
+objetivos:
+  corto:
+    - Registrar ventas y stock en el sistema en vez de en papel
+    - Saber cuánta plata hay invertida en stock y cuánto se gana
+    - Que sea fácil de usar en la notebook y en el celular
+    - Alta disponibilidad y respaldos de toda la información
+  mediano:
+    - Precios actualizados sin cargarlos a mano, con las listas de todos los proveedores
+    - Calcular costos y precios con datos en vez de a ojo
+  largo:
+    - Aumentar las ventas
+    - Venta online, con devoluciones
+
+criterios_de_exito:
+  - Al terminar el piloto, el empleado prefiere el sistema al cuaderno
+  - Una venta de 3 productos se registra en menos de 20 segundos
+  - No se pierde ninguna venta, con o sin internet
+  - El dueño ve ventas, ganancia y capital en stock desde cualquier lado
+
+interesados:
+  - nombre: Carlos
+    rol: Dueño y patrocinador
+    interes: Administrar a distancia; decide precios, márgenes y prioridades
+  - nombre: Empleado
+    rol: Usuario principal
+    interes: Que vender no le lleve más tiempo que con el cuaderno
+  - nombre: Madre del dueño
+    rol: Usuaria
+    interes: Consultar y operar igual que el dueño
+  - nombre: Proveedores (~50)
+    rol: Externos
+    interes: Mandan listas de precios; no usan el sistema
+  - nombre: Clientes importantes (~20)
+    rol: Externos
+    interes: Cuenta corriente y presupuestos
+
+supuestos:
+  - El empleado está dispuesto a usar el sistema en el mostrador
+  - Los proveedores siguen mandando sus listas en Excel o PDF
+  - Se empieza con pocos proveedores y se agregan de a poco
+
+restricciones:
+  - Costo de infraestructura cero hasta que el sistema muestre resultados
+  - "Equipo del local: una notebook vieja, internet intermitente y un celular Android"
+  - El único lector de códigos de barras es la cámara del celular
+  - Un solo empleado, que no puede desatender el mostrador
+
+requerimientos: docs/REQUERIMIENTOS.md
+
+# Cada etapa es un milestone de GitHub con el mismo nombre. Las fechas marcadas como
+# tentativas son una primera estimación, a confirmar por el dueño.
+cronograma:
+  - etapa: Etapa 0 · Base del proyecto
+    inicio: 2026-09-13
+    fin: 2026-09-15
+  - etapa: Etapa 1 · MVP
+    inicio: 2026-09-13
+    fin: 2026-11-08
+    tentativo: true
+  - etapa: Etapa 2 · Precios automáticos
+    inicio: 2026-11-09
+    fin: 2026-12-20
+    tentativo: true
+  - etapa: Etapa 3 · Stock y compras
+    inicio: 2027-01-04
+    fin: 2027-02-14
+    tentativo: true
+  - etapa: Etapa 4 · Administración remota
+    inicio: 2027-02-15
+    fin: 2027-03-14
+    tentativo: true
+  - etapa: Etapa 5 · Clientes y rentabilidad
+    inicio: 2027-03-15
+    fin: 2027-04-30
+    tentativo: true

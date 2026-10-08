@@ -1,0 +1,102 @@
+# Registro de riesgos. Probabilidad e impacto van de 1 (bajo) a 5 (alto); la severidad es
+# el producto. `respuesta` es la estrategia: evitar, mitigar, transferir o aceptar.
+# `plan` es lo que se hace antes para que no pase; `contingencia`, lo que se hace si pasa.
+riesgos:
+  - id: R-01
+    riesgo: El empleado no adopta el sistema porque le resulta más lento que el cuaderno
+    probabilidad: 3
+    impacto: 5
+    respuesta: mitigar
+    plan: Reglas de docs/ux.md en cada pantalla; piloto de 2 semanas con medición de tiempos (#21)
+    contingencia: Seguir una semana más con cuaderno y sistema en paralelo y convertir cada queja en un issue ux
+    disparador: Al final de la primera semana del piloto una venta tarda más que con el cuaderno
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-02
+    riesgo: Se pierden datos porque los respaldos todavía no están implementados
+    probabilidad: 2
+    impacto: 5
+    respuesta: mitigar
+    plan: Volcado horario, copia semanal externa y prueba mensual de restauración (#19, ADR-002)
+    contingencia: Reconstruir desde las ventas de los últimos 7 días que guarda cada dispositivo
+    disparador: La base de Supabase no responde o falta información
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-03
+    riesgo: La interfaz de escritorio no conforma y demora la puesta en marcha en el local
+    probabilidad: 4
+    impacto: 3
+    respuesta: mitigar
+    plan: Rediseñar el escritorio partiendo de la versión anterior que sí gustaba, sin tocar el celular
+    contingencia: Arrancar el piloto usando solo el celular en el mostrador
+    disparador: Llega la fecha del piloto sin una versión de escritorio aprobada
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-04
+    riesgo: Un proveedor cambia el formato de su lista y se cargan precios equivocados
+    probabilidad: 3
+    impacto: 4
+    respuesta: mitigar
+    plan: Vista previa y confirmación humana antes de aplicar; importador tolerante a cambios (#22)
+    contingencia: Descartar la lista; el histórico de precios permite volver al costo anterior
+    disparador: La vista previa muestra muchas bajas o saltos de precio fuera de lo normal
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-05
+    riesgo: Con más de 100.000 artículos la búsqueda deja de ser instantánea en la notebook vieja
+    probabilidad: 3
+    impacto: 4
+    respuesta: mitigar
+    plan: Prueba de carga con el catálogo completo antes de sumar proveedores (RNF-08)
+    contingencia: Guardar en el dispositivo solo lo que se vende y buscar el resto en el servidor
+    disparador: La búsqueda tarda más de 100 ms o el navegador se queda sin espacio
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-06
+    riesgo: El plan gratuito de Supabase pausa la base, cambia sus condiciones o llega al tope de 500 MB
+    probabilidad: 2
+    impacto: 4
+    respuesta: mitigar
+    plan: Monitor externo que consulta la base a diario y alerta a los 350 MB (#19)
+    contingencia: Restaurar el último volcado en otro PostgreSQL; el mostrador sigue vendiendo sin servidor
+    disparador: Aviso del monitor o de Supabase
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-07
+    riesgo: Oracle apaga o reclama la máquina gratuita
+    probabilidad: 2
+    impacto: 3
+    respuesta: aceptar
+    plan: La máquina no guarda datos (ADR-002)
+    contingencia: Levantar el mismo compose en otra máquina; mientras tanto el mostrador vende sin servidor
+    disparador: La API deja de responder
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-08
+    riesgo: Un conector que entra al portal de un proveedor se rompe o viola sus condiciones de uso
+    probabilidad: 3
+    impacto: 2
+    respuesta: evitar
+    plan: Pedir al proveedor una exportación oficial o su autorización antes de automatizar (#26)
+    contingencia: Volver a la carga de la lista por mail o a mano
+    disparador: La descarga automática falla o el proveedor reclama
+    responsable: Carlos
+    estado: abierto
+
+  - id: R-09
+    riesgo: El internet del local se corta en medio de la atención
+    probabilidad: 5
+    impacto: 1
+    respuesta: mitigar
+    plan: La app vende sin conexión y sincroniza al reconectar (#18, #37)
+    contingencia: Ninguna adicional; verificar el indicador de cambios pendientes al cerrar el día
+    disparador: Indicador "sin conexión" en la pantalla
+    responsable: Empleado
+    estado: abierto
