@@ -40,6 +40,19 @@ describe("POST /ventas", () => {
     expect(base.actual.sqlDe(/^COMMIT/)).toHaveLength(1);
   });
 
+  it("cada renglón se redondea para arriba a $1.000: toda venta es múltiplo de $1.000 (RF-19)", async () => {
+    const items = [
+      { ...venta.items[0], cantidad: 0.5, precio_unitario: 3000 }, // $1.500 → $2.000
+      { ...venta.items[0], producto_id: null, descripcion: "A MANO", cantidad: 1, precio_unitario: 1500 }, // $1.500 → $2.000
+      { ...venta.items[0], producto_id: null, descripcion: "JUSTO", cantidad: 0.3, precio_unitario: 10000 }, // $3.000 justo: no sube
+    ];
+    const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: { ...venta, items } });
+    expect(await r.json()).toMatchObject({ total: 7000 });
+    expect(base.actual.sqlDe(/INSERT INTO venta \(/)[0]!.params[4]).toBe("7000.00");
+    // El precio por unidad y la cantidad se guardan tal cual: el redondeo es del renglón.
+    expect(base.actual.sqlDe(/INSERT INTO item_venta/)[0]!.params).toEqual(expect.arrayContaining([0.5, "3000.00"]));
+  });
+
   it("una venta reenviada (sin conexión, reintento) no se duplica", async () => {
     base.actual.programar(/SELECT id, total, estado FROM venta WHERE id = \$1/, { rows: [{ id: venta.id, total: "9000.00", estado: "confirmada" }] });
     const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });

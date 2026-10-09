@@ -24,7 +24,8 @@ test.beforeAll(() => {
 test("sin sesión se pide entrar", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
-  await expect(page.getByRole("button", { name: /código QR con el celular/ })).toBeVisible();
+  // Entrar leyendo un QR se quitó (2026-10-09): se entra con Google o con la huella.
+  await expect(page.getByRole("button", { name: /código QR/ })).toHaveCount(0);
 });
 
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {

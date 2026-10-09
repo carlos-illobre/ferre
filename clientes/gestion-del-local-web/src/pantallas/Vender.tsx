@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { esMargenBoton, margenReal, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
+import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { FotoProducto } from "../componentes/Foto";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "../componentes/base";
 import { Explicacion } from "../componentes/Explicacion";
@@ -87,7 +87,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
     return () => { quitar(); window.removeEventListener("online", reintentar); };
   }, []);
 
-  const total = items.reduce((s, it) => s + (precioDe(it).unitario ?? 0) * it.cantidad, 0);
+  const total = items.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: precioDe(it).unitario ?? 0, cantidad: it.cantidad }).valor, 0);
   const sinPrecio = items.some((it) => precioDe(it).unitario === null);
 
   const agregar = useCallback((p: Producto | null, descripcionLibre?: string) => {
@@ -360,7 +360,8 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
 }) {
   const p = precioDe(it);
   const producto = it.producto;
-  const subtotal = p.unitario === null ? null : p.unitario * it.cantidad;
+  const renglon = p.unitario === null ? null : subtotalDeRenglon({ precioUnitario: p.unitario, cantidad: it.cantidad, unidad: it.unidad });
+  const subtotal = renglon?.valor ?? null;
   const margenTexto = it.precioManual !== null ? "a mano" : p.margen === null ? "elegí margen" : `${p.margen} %${esMargenBoton(p.margen) ? "" : " a mano"}`;
   return (
     <div className="item" data-testid="item">
@@ -369,7 +370,7 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
         {producto ? <span className="nombre" style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.25 }}>{it.descripcion}</span>
           : <input className="linea-editable" value={it.descripcion} placeholder="¿Qué se lleva?" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
         {subtotal !== null ? (
-          <Explicacion className="subtotal" valor={pesosCortos(subtotal)} pasos={[...p.pasos, ...(it.cantidad !== 1 ? [`× ${num(it.cantidad)} ${it.unidad === "unidad" ? "unidades" : it.unidad} = ${pesos(subtotal)}`] : [])]} />
+          <Explicacion className="subtotal" valor={pesosCortos(subtotal)} pasos={[...p.pasos, ...(renglon?.pasos ?? [])]} />
         ) : (
           <label className="campo falta importe-campo"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus={!producto} value={it.precioManual ?? ""} onChange={(e) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) })} data-testid="precio-manual" /></label>
         )}

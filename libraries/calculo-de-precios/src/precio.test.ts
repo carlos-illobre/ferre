@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { margenReal, precioDeVenta, redondear } from "./precio.js";
+import { margenReal, precioDeVenta, redondear, subtotalDeRenglon } from "./precio.js";
 
 describe("redondear", () => {
   it("para arriba, al múltiplo de $1.000 siguiente", () => {
@@ -46,5 +46,26 @@ describe("esMargenBoton", () => {
     expect([300, 200, 100, 50, 25].every(esMargenBoton)).toBe(true);
     expect(esMargenBoton(20)).toBe(false);
     expect(esMargenBoton(150)).toBe(false);
+  });
+});
+
+describe("subtotalDeRenglon", () => {
+  it("una unidad de un precio ya redondeado queda igual y no agrega pasos", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 6000, cantidad: 1 })).toEqual({ valor: 6000, pasos: [] });
+  });
+  it("varias unidades multiplican sin redondear de más", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 3000, cantidad: 3 })).toEqual({ valor: 9000, pasos: ["× 3 = $9.000,00"] });
+  });
+  it("lo fraccionado se redondea para arriba a $1.000 para no dar vuelto, y lo explica", () => {
+    const r = subtotalDeRenglon({ precioUnitario: 3000, cantidad: 0.5, unidad: "kg" });
+    expect(r.valor).toBe(2000);
+    expect(r.pasos).toEqual(["× 0,5 kg = $1.500,00", "Redondeado para arriba a $2.000,00 (múltiplo de $1.000,00) para no dar vuelto"]);
+  });
+  it("no sube mil pesos por un error de coma flotante", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 10000, cantidad: 0.3, unidad: "m" }).valor).toBe(3000);
+    expect(subtotalDeRenglon({ precioUnitario: 7000, cantidad: 1.1, unidad: "l" }).valor).toBe(8000);
+  });
+  it("un precio tipeado a mano que no es múltiplo de $1.000 también se redondea", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 1500, cantidad: 1 }).valor).toBe(2000);
   });
 });

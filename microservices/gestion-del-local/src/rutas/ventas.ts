@@ -1,3 +1,4 @@
+import { subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
@@ -40,7 +41,8 @@ ventas.post("/", async (c) => {
   if (error) return c.json({ error }, 400);
   const id = v.id ?? randomUUID();
   const usuarioId = c.get("sesion").usuario.id;
-  const total = v.items.reduce((s, it) => s + it.cantidad * it.precio_unitario, 0);
+  // Cada renglón se redondea para arriba a $1.000 (RF-19): toda venta es múltiplo de $1.000.
+  const total = v.items.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: it.precio_unitario, cantidad: it.cantidad }).valor, 0);
 
   const cliente = await pool.connect();
   try {

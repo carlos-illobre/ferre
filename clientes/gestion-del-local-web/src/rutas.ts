@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-// Enrutamiento por hash (#/catalogo/listas, #/vincular?codigo=…). Por hash y no por ruta
+// Enrutamiento por hash (#/catalogo/listas, #/vincular-celular?codigo=…). Por hash y no por ruta
 // real porque el cliente vive en GitHub Pages, que no reescribe rutas: una URL real daría
 // 404 al recargar. Cuatro pestañas y, dentro de dos de ellas, sub-pantallas.
 export type Ruta = { nombre: string; sub: string | null; parametros: URLSearchParams };

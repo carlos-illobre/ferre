@@ -65,7 +65,8 @@ describe("Vender", () => {
     const cantidad = within(item("MECHA")).getByTestId("cantidad") as HTMLInputElement;
     fireEvent.change(cantidad, { target: { value: "1.55" } });
     expect(cantidad.value).toBe("1,6");
-    expect(screen.getByTestId("total").textContent).toBe("$4.800");
+    // 1,6 kg × $3.000 = $4.800: el renglón se redondea para arriba a $1.000 para no dar vuelto (RF-19)
+    expect(screen.getByTestId("total").textContent).toBe("$5.000");
     fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Más" }));
     expect(cantidad.value).toBe("2,1");
   });
@@ -95,7 +96,8 @@ describe("Vender", () => {
     agregar("mecha vender");
     fireEvent.click(within(item("MECHA")).getByTestId("margen"));
     fireEvent.change(within(item("MECHA")).getByTestId("precio-manual"), { target: { value: "2500" } });
-    expect(screen.getByTestId("total").textContent).toBe("$2.500");
+    // Un precio a mano que no es múltiplo de $1.000 también se redondea para arriba
+    expect(screen.getByTestId("total").textContent).toBe("$3.000");
     expect(within(item("MECHA")).getByTestId("margen").textContent).toContain("a mano");
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
   });
@@ -178,6 +180,6 @@ describe("Vender", () => {
     const libre = screen.getByTestId("item");
     expect(within(libre).getByTestId("descripcion-libre")).toHaveProperty("value", "bolsa de arena");
     fireEvent.change(within(libre).getByTestId("precio-manual"), { target: { value: "1500" } });
-    expect(screen.getByTestId("total").textContent).toBe("$1.500");
+    expect(screen.getByTestId("total").textContent).toBe("$2.000");
   });
 });

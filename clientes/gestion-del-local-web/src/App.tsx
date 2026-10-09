@@ -5,7 +5,6 @@ import { Icono } from "./componentes/base";
 import { ProveedorDeSesion, administra, useSesion } from "./sesion";
 import { irA, useRuta } from "./rutas";
 import { Login } from "./pantallas/Login";
-import { Vincular } from "./pantallas/Vincular";
 import { VincularCelular } from "./pantallas/VincularCelular";
 import { Vender } from "./pantallas/Vender";
 import { Catalogo } from "./pantallas/Catalogo";
@@ -38,7 +37,6 @@ function Pantallas() {
   useEffect(() => { window.scrollTo(0, 0); }, [ruta.nombre, ruta.sub]);
 
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
-  if (ruta.nombre === "vincular" && codigoVinculacion) return <Vincular codigo={codigoVinculacion} />;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
   if (sesion.estado === "sin-sesion") return <Login />;
 

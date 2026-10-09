@@ -45,15 +45,8 @@ verificar "la auditoría registra el alta"            1   "$(psql "SELECT count(
 verificar "login con Google sin credencial da 400"   400 "$(codigo -H 'Content-Type: application/json' -d '{}' $API/sesiones/google)"
 verificar "credencial de Google inválida da 401"     401 "$(codigo -H 'Content-Type: application/json' -d '{"credencial":"basura"}' $API/sesiones/google)"
 
-# Login por QR: la laptop crea la vinculación, el celular (empleado) aprueba, la laptop retira el token.
-CODIGO=$(curl -s -H 'Content-Type: application/json' -d '{"dispositivo":"laptop de prueba"}' $API/sesiones/vinculaciones | python3 -c 'import json,sys; print(json.load(sys.stdin)["codigo"])')
-verificar "QR pendiente antes de aprobar"            pendiente "$(curl -s $API/sesiones/vinculaciones/$CODIGO | python3 -c 'import json,sys; print(json.load(sys.stdin)["estado"])')"
-verificar "el celular aprueba el QR"                 200 "$(codigo -X POST -H "Authorization: Bearer $TOKEN_EMPLEADO" $API/sesiones/vinculaciones/$CODIGO/aprobar)"
-TOKEN_LAPTOP=$(curl -s $API/sesiones/vinculaciones/$CODIGO | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("token",""))')
-verificar "la laptop recibe un token"                sí  "$([[ -n "$TOKEN_LAPTOP" ]] && echo sí || echo no)"
-verificar "el token de la laptop sirve"              200 "$(codigo -H "Authorization: Bearer $TOKEN_LAPTOP" $API/sesiones/actual)"
-verificar "el mismo QR no entrega el token dos veces" retirada "$(curl -s $API/sesiones/vinculaciones/$CODIGO | python3 -c 'import json,sys; print(json.load(sys.stdin)["estado"])')"
-verificar "cerrar sesión da 204"                     204 "$(codigo -X DELETE -H "Authorization: Bearer $TOKEN_LAPTOP" $API/sesiones/actual)"
-verificar "sesión cerrada ya no sirve"               401 "$(codigo -H "Authorization: Bearer $TOKEN_LAPTOP" $API/sesiones/actual)"
+# Cerrar la sesión propia la deja sin efecto.
+verificar "cerrar sesión da 204"                     204 "$(codigo -X DELETE -H "Authorization: Bearer $TOKEN_EMPLEADO" $API/sesiones/actual)"
+verificar "sesión cerrada ya no sirve"               401 "$(codigo -H "Authorization: Bearer $TOKEN_EMPLEADO" $API/sesiones/actual)"
 
 exit $(( fallos > 0 ))

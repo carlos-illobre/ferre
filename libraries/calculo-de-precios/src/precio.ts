@@ -41,6 +41,21 @@ export function precioDeVenta(entrada: { costoNeto: number; margen: number; iva:
   };
 }
 
+// Subtotal de un renglón de venta: precio × cantidad, redondeado para arriba al múltiplo de
+// $1.000 siguiente. Lo pidió el dueño (2026-10-09): no hay billetes chicos para dar vuelto,
+// así que toda venta tiene que ser múltiplo de $1.000, también cuando se vende medio kilo o
+// se tipea un precio a mano. La API suma estos subtotales: cliente y servidor dan lo mismo.
+export function subtotalDeRenglon(entrada: { precioUnitario: number; cantidad: number; unidad?: string }): Explicado {
+  const { precioUnitario, cantidad } = entrada;
+  const bruto = Math.round(precioUnitario * cantidad * 100) / 100;
+  const valor = redondear(bruto);
+  const cuanto = `${String(cantidad).replace(".", ",")}${entrada.unidad ? ` ${entrada.unidad === "unidad" ? "unidades" : entrada.unidad}` : ""}`;
+  const pasos: string[] = [];
+  if (cantidad !== 1) pasos.push(`× ${cuanto} = ${pesos(bruto)}`);
+  if (valor !== bruto) pasos.push(`Redondeado para arriba a ${pesos(valor)} (múltiplo de ${pesos(PASO_DE_REDONDEO)}) para no dar vuelto`);
+  return { valor, pasos };
+}
+
 // Para un precio tipeado a mano: qué margen real deja sobre el costo, para que se vea.
 export function margenReal(entrada: { costoNeto: number; iva: number; precio: number }): Explicado {
   const { costoNeto, iva, precio } = entrada;

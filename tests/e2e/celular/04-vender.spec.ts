@@ -71,10 +71,11 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await tornillo.getByRole("button", { name: "300 %", exact: true }).click(); // 10 × 4 × 1,21 = 48,4 → $1.000
   await expect(tornillo).toContainText("$1.000");
   await expect(page.getByTestId("total")).toContainText("$10.000");
-  // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto.
+  // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto. 1,5 kg × $1.000 =
+  // $1.500: el renglón se redondea para arriba a $2.000 para no dar vuelto (RF-19).
   await tornillo.getByTestId("unidad").selectOption("kg");
   await tornillo.getByTestId("cantidad").fill("1.5");
-  await expect(page.getByTestId("total")).toContainText("$10.500");
+  await expect(page.getByTestId("total")).toContainText("$11.000");
 
   // Cobrar sin medio de pago avisa; con efectivo, registra.
   await page.getByTestId("cobrar").click();
@@ -84,7 +85,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.getByTestId("cobrar").click();
   // Pantalla de éxito con el importe grande; "Nueva venta" vuelve a la búsqueda vacía.
   await expect(page.getByTestId("exito")).toContainText("Venta registrada");
-  await expect(page.getByTestId("exito")).toContainText("$10.500");
+  await expect(page.getByTestId("exito")).toContainText("$11.000");
   await expect(page.getByTestId("exito")).toContainText("Efectivo");
   await page.getByTestId("cerrar-exito").click();
   await expect(page.getByTestId("exito")).toHaveCount(0);
@@ -104,7 +105,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(venta).toContainText("3 × MECHA VENDER");
   await expect(venta).toContainText("1.5 × TORNILLO VENDER");
   await expect(venta).toContainText("Efectivo");
-  await expect(venta).toContainText("$10.500,00");
+  await expect(venta).toContainText("$11.000,00");
   page.once("dialog", (d) => d.accept("se arrepintió"));
   await venta.getByRole("button", { name: "Anular" }).click();
   await expect(venta).toContainText("anulada");
