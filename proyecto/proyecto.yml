@@ -39,6 +39,9 @@ interesados:
   - nombre: Madre del dueño
     rol: Usuaria
     interes: Consultar y operar igual que el dueño
+  - nombre: Padre del dueño
+    rol: Titular del CUIT de la ferretería
+    interes: La ferretería factura a su nombre
   - nombre: Proveedores (~50)
     rol: Externos
     interes: Mandan listas de precios; no usan el sistema

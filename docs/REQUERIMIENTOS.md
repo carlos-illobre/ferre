@@ -31,6 +31,7 @@ Prioridad de corto plazo, en este orden:
 | Empleado | El único empleado del local | Vende, carga compras, cuenta stock, carga listas de precios |
 | Dueño | Carlos | Administra a distancia, decide precios y márgenes, revisa resultados |
 | Familiar | La madre del dueño | Consulta y opera igual que el dueño |
+| Titular | El padre del dueño | Titular del CUIT con el que factura la ferretería; no usa el sistema |
 | Proveedor | ~50, externos | Manda listas de precios (Excel, PDF, web); no usa el sistema |
 | Cliente importante | ~20, externos | Compra a cuenta corriente, pide presupuestos; no usa el sistema |
 
@@ -79,7 +80,8 @@ existen; los permisos finos por rol no son prioridad.
 | RF-27 | Presupuestos: se arman como una venta, no tocan stock, se convierten en venta | Pendiente (#45) |
 | RF-28 | Mandar el comprobante de la venta por WhatsApp | Pendiente (#46) |
 | RF-29 | Cargar las últimas dos semanas del cuaderno como ventas históricas | Pendiente (#20) |
-| RF-30 | Factura electrónica de ARCA (hoy: talonario en papel, responsable inscripto) | Nuevo, fuera de esta etapa |
+| RF-30 | Factura electrónica de ARCA (hoy: talonario en papel; la ferretería factura como responsable inscripto con el CUIT del padre del dueño) | Nuevo, fuera de esta etapa |
+| RF-31 | Venta online de los productos de la ferretería, con devoluciones (RF-24b) | Nuevo, fuera de esta etapa |
 
 ### 3.3 Clientes
 
@@ -271,7 +273,8 @@ existen; los permisos finos por rol no son prioridad.
 - Devoluciones con reintegro o saldo a favor (RF-24b).
 - Buscar un producto por foto (RF-09b): segunda versión.
 - Permisos finos por rol (RF-72).
-- Venta online: la arquitectura deja la puerta abierta (ADR-003), pero no se construye acá.
+- Venta online (RF-31): la arquitectura deja la puerta abierta (ADR-003), pero no se construye acá.
+  Es un negocio aparte del proyecto Tienda online.
 
 ## 7. Decisiones del dueño (2026-10-08)
 
