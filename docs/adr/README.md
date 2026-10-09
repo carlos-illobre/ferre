@@ -15,6 +15,7 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [008](ADR-008-pnpm-y-uv.md) | pnpm para TypeScript y uv para Python | Aceptado | 2026-09-13 |
 | [009](ADR-009-compose-unico-y-env.md) | Un solo docker-compose.yml con el .env como única fuente | Aceptado | 2026-09-13 |
 | [010](ADR-010-servicios-clientes-y-librerias.md) | Servicios, clientes y librerías separados; nombres por negocio; cliente web en GitHub Pages | Aceptado | 2026-09-13 |
-| [011](ADR-011-autenticacion-sin-contrasenas.md) | Entrar con Google, sesiones opacas revocables, login por QR, auditoría por usuario | Aceptado | 2026-09-13 |
+| [011](ADR-011-autenticacion-sin-contrasenas.md) | Entrar con Google o con la huella, sesiones opacas revocables, auditoría por usuario (el login por QR se quitó el 2026-10-09) | Aceptado | 2026-09-13 |
 | [012](ADR-012-ambientes-de-prueba-y-produccion.md) | Dos ambientes en la misma máquina, promoción por rama, despliegue desde CI | Aceptado | 2026-09-13 |
 | [013](ADR-013-despliegue-por-aviso-y-gateway-compartido.md) | La máquina se despliega sola al recibir un aviso; Caddy compartido como puerta de entrada | Aceptado | 2026-09-13 |
+| [014](ADR-014-dos-interfaces-celular-y-escritorio.md) | Dos interfaces sobre la misma app: tarjetas para el celular, tablas y teclado para la computadora; se elige por el ancho | Aceptado | 2026-10-09 |

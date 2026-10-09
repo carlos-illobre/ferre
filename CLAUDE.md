@@ -57,8 +57,14 @@ trabajo, o se le pregunta a Carlos si cambia el requerimiento.
 - **`master` es el ambiente de pruebas y cada push lo despliega solo.** `produccion` es
   producción: se promueve con `git push origin master:produccion` y solo cuando Carlos lo
   pide.
-- **La interfaz de celular está bien como está.** Un cambio para la computadora no puede
-  alterar el celular: se verifica con capturas de las dos, antes y después.
+- **Hay dos interfaces (ADR-014).** La de celular (`src/App.tsx`, `src/pantallas/`) está bien
+  como está; la de computadora vive en `src/escritorio/`. Se elige por el ancho de la pantalla
+  y no comparten estilos. Una función nueva con pantalla se hace en las dos, con su prueba.
+  Un cambio para la computadora no puede alterar el celular: se verifica con capturas de las
+  dos, antes y después.
+- **Roles, no actores.** En pantallas, casos de uso y diagramas se nombra el rol
+  (Administrador, Vendedor, Comprador); los actores (Dueño, Empleado, Cliente, Proveedor)
+  solo donde el rol no alcanza. Ver `docs/REQUERIMIENTOS.md`, sección 2.
 - **La vara es el cuaderno y la calculadora** (`docs/ux.md`): si una pantalla es más lenta
   que eso, está mal aunque sea más completa.
 - **`privado/` y las listas de precios reales nunca se suben.** El repositorio es público.
@@ -66,7 +72,7 @@ trabajo, o se le pregunta a Carlos si cambia el requerimiento.
 
 ## Prioridad actual
 
-1. La interfaz de escritorio (RNF-05): que use toda la pantalla y se vea prolija. Hubo una
-   versión de escritorio anterior al rediseño del 2026-09-14 que a Carlos le gustaba; sirve
-   de referencia.
+1. La interfaz de escritorio (RNF-05): desde el 2026-10-09 volvió el layout de tablas
+   anterior al rediseño, a toda la pantalla y con la paleta nueva. Falta que Carlos la valide
+   en la notebook; lo que pida ajustar va primero.
 2. Los respaldos (RNF-21 a RNF-23, issue #19): todavía no están implementados.

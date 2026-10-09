@@ -10,7 +10,15 @@
 > workflow "E2E" de GitHub Actions (o con `tests/e2e.sh`) y los lunes solos. En cada push
 > corren las unitarias (ver [TESTING.md](TESTING.md)).
 
-Un caso por escenario de `tests/e2e/escenarios/`. Cada uno arranca sembrando en la base
+> Desde el 2026-10-09 la app tiene dos interfaces (ADR-014) y cada escenario existe dos veces:
+> en `tests/e2e/escritorio/` (ventana de 1366 px: tablas, menú completo, filas editables) y en
+> `tests/e2e/celular/` (ventana de 412 px: cuatro pestañas, tarjetas, hojas). Los pasos de abajo
+> describen el recorrido; los nombres de pantalla cambian según la interfaz (en la computadora,
+> «Productos», «Compras», «Administración»; en el celular, «Catálogo», «Depósito», «Negocio»).
+> En el workflow corren en paralelo. La huella solo se ofrece sola en el celular. El redondeo
+> de RF-19 alcanza a cada renglón: 1,5 kg a $1.000 se cobra $2.000.
+
+Un caso por escenario de `tests/e2e/escritorio/` y `tests/e2e/celular/`. Cada uno arranca sembrando en la base
 lo que necesita (usuario, sesión, productos) y termina verificando en pantalla y en la
 base. Corren de a uno, con `tests/e2e.sh`, contra el compose local y el cliente servido
 aparte, como en producción. En CI cada caso es un paso del job `e2e`.
@@ -40,9 +48,9 @@ en cada corrida.
 
 | Caso | Pasos | Resultado esperado |
 |---|---|---|
-| Sin sesión se pide entrar | Abrir la app sin token guardado | Se ve "Entrá con tu cuenta de Google" y el botón "Mostrar código para leer con el celular" |
+| Sin sesión se pide entrar | Abrir la app sin token guardado | Se ve "Entrá con tu cuenta de Google" y no hay ningún botón de código QR (se quitó el 2026-10-09) |
 | Con sesión el dueño entra | Abrir la app con el token en el dispositivo; tocar "Administración" | Arriba dice "Dueño E2E · dueño"; se ve "Usuarios autorizados" con el correo del dueño en la tabla |
-| Vincular el celular con la huella y volver a entrar con ella (autenticador virtual de Chromium) | Entrar recién con Google (sesión y marca sembradas, user agent de Android): aparece "¿Entrar con la huella?", "Sí, usar la huella", "Entendido"; recargar; "Quitar"; "Vincular este celular con mi huella", nombre "Celular E2E"; Salir; "Entrar con la huella"; volver a Administración, "Quitar"; Salir; "Entrar con la huella" | La oferta vincula el celular (aparece en "Mis celulares con huella") y no se repite al recargar; vincular a mano deja "Celular E2E" y una credencial en la base; entra sin Google y la sesión queda auditada con medio "huella"; tras quitarlo, la huella dice "no está vinculado" |
+| Vincular el celular con la huella y volver a entrar con ella (autenticador virtual de Chromium) | En el celular: entrar recién con Google (sesión y marca sembradas, user agent de Android): aparece "¿Entrar con la huella?" (en la computadora no aparece y se vincula a mano), "Sí, usar la huella", "Entendido"; recargar; "Quitar"; "Vincular este celular con mi huella", nombre "Celular E2E"; Salir; "Entrar con la huella"; volver a Administración, "Quitar"; Salir; "Entrar con la huella" | La oferta vincula el celular (aparece en "Mis celulares con huella") y no se repite al recargar; vincular a mano deja "Celular E2E" y una credencial en la base; entra sin Google y la sesión queda auditada con medio "huella"; tras quitarlo, la huella dice "no está vinculado" |
 
 ---
 

@@ -30,7 +30,7 @@ Fuente: [diagrams/contexto.mmd](diagrams/contexto.mmd).
 | Componente | Qué hace | Tecnología | ADR |
 |---|---|---|---|
 | `microservices/gestion-del-local` | Lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base | Node 22, Hono, TypeScript | [001](adr/ADR-001-stack-tecnologico.md), [010](adr/ADR-010-servicios-clientes-y-librerias.md) |
-| `clientes/gestion-del-local-web` | Pantalla del empleado y del dueño; funciona sin internet con IndexedDB; publicada en GitHub Pages | React, Vite, PWA | [005](adr/ADR-005-indexeddb-directo.md), [010](adr/ADR-010-servicios-clientes-y-librerias.md) |
+| `clientes/gestion-del-local-web` | Las pantallas, en dos interfaces que comparten todo lo demás: tarjetas para el celular y tablas con teclado para la computadora ([014](adr/ADR-014-dos-interfaces-celular-y-escritorio.md)); funciona sin internet con IndexedDB; publicada en GitHub Pages | React, Vite, PWA | [005](adr/ADR-005-indexeddb-directo.md), [010](adr/ADR-010-servicios-clientes-y-librerias.md) |
 | `libraries/calculo-de-precios` | Costo neto, margen y precio con su explicación; compartida entre servicio y cliente | TypeScript | [001](adr/ADR-001-stack-tecnologico.md) |
 | `microservices/listas-de-proveedores` | Recibe listas de proveedores (Excel, PDF, mail, portal) y las convierte en precios | Python 3.12, FastAPI, openpyxl | [001](adr/ADR-001-stack-tecnologico.md) |
 | `infrastructure/reverse-proxy` | TLS automático y única puerta de entrada | Caddy | [006](adr/ADR-006-caddy.md) |

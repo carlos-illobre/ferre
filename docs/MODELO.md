@@ -52,7 +52,7 @@ erDiagram
 | `evento` | Registro de eventos de dominio (ADR-003) y auditoría | Lleva `usuario_id`: quién hizo qué |
 | `usuario` | Quién puede entrar | Gmail autorizado y rol dueño/mostrador; sin contraseñas ([ADR-011](adr/ADR-011-autenticacion-sin-contrasenas.md)) |
 | `sesion` | Sesiones abiertas | Token hasheado, dispositivo, vencimiento renovable, revocación |
-| `vinculacion` | Login de la laptop por QR | Código de un solo uso aprobado desde el celular |
+| `vinculacion` | En desuso desde el 2026-10-09: era el login de la laptop por QR, que se quitó (ADR-011). La tabla queda, sin filas nuevas | Código de un solo uso aprobado desde el celular |
 | `puesto` / `codigo_escaneado` | Laptop vinculada a un celular por QR, y los códigos que el celular le manda | 12 horas de vínculo; lo no entregado se entrega al reconectar (#52) |
 | `migracion` | Qué archivos SQL ya corrieron | La crea el corredor |
 

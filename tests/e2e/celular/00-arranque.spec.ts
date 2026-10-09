@@ -10,3 +10,12 @@ test("la app abre y el servidor responde", async ({ page }) => {
   const salud = await page.request.get("http://localhost/health");
   expect(salud.ok()).toBeTruthy();
 });
+
+// La app tiene dos interfaces (ADR-014) y cada una carga solo sus estilos: si se mezclan,
+// las clases de una pisan las de la otra. Se ve en el build, no en desarrollo.
+test("la interfaz de celular carga una sola hoja de estilos propia", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#root > *").first()).toBeVisible();
+  const hojas = await page.evaluate(() => [...document.styleSheets].map((h) => h.href ?? "").filter((h) => /\/assets\/.*\.css$/.test(h)));
+  expect(hojas).toHaveLength(1);
+});

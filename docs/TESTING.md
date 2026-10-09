@@ -10,7 +10,7 @@ integración solo sobre lo estable. Sin compuerta de cobertura ni mutation testi
 
 | Corredor | Qué corre | Necesita |
 |---|---|---|
-| `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API, corre los escenarios Playwright de `tests/e2e/escenarios/`. `--solo <nombre>` repite uno. En GitHub: workflow "E2E", a mano o los lunes. | Docker, pnpm |
+| `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API, corre los escenarios Playwright de `tests/e2e/escritorio/` y `tests/e2e/celular/` (la app tiene dos interfaces, ADR-014; cada una con su tamaño de ventana). `--solo <nombre>` repite uno. En GitHub: workflow "E2E", a mano o los lunes. | Docker, pnpm |
 | `tests/utest.sh` | Unitarias del workspace TypeScript (vitest) y de `listas-de-proveedores` (pytest) | Nada |
 | `tests/itest.sh` | Scripts de `tests/integration/`. `--rapido` saltea los que necesitan el stack. | Docker (salvo `--rapido`) |
 
@@ -46,7 +46,7 @@ Cada issue de esa lista agrega su escenario antes de cerrarse.
 | `health.sh` | Cada servicio responde 200 en `/health` con el stack arriba | Primera verificación después de cualquier despliegue |
 | `migraciones.sh` | Todas las migraciones aplicadas y las tablas del modelo existen | Verifica el arranque real de la API contra la base |
 | `listas.sh` | Alta de proveedores, carga con detección automática, vista previa, aplicación, reaplicar no duplica, descartar, archivo irreconocible; la lista real de Ixnova si está en `privado/` | Es el circuito completo de precios (#7 a #12) contra los dos servicios |
-| `autenticacion.sh` | 401 sin sesión, 403 por rol, alta de usuario, auditoría, login por QR de punta a punta, cierre de sesión | Es la puerta de todo; se prueba sin Google sembrando sesiones |
+| `autenticacion.sh` | 401 sin sesión, 403 por rol, alta de usuario, auditoría, cierre de sesión | Es la puerta de todo; se prueba sin Google sembrando sesiones |
 
 ## Unitarias
 

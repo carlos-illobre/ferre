@@ -31,20 +31,31 @@ es más lenta que eso, está mal, aunque sea más completa.
 
 ## Sistema visual (rediseño 2026-09-14)
 
-El diseño de referencia es `mockups/Ferre iOS.html` (Claude Design). Reglas que salen de ahí
-y valen igual en el celular y en la computadora:
+Hay **dos interfaces** sobre la misma app (ADR-014), con la misma paleta y la misma marca:
+
+- **Celular** (pantallas de menos de 900 px): el diseño de `mockups/Ferre iOS.html` (Claude
+  Design). El dueño la aprobó tal como está: no se toca por un cambio de la computadora.
+- **Computadora** (900 px o más): tablas a todo el ancho de la pantalla, menú completo arriba
+  (Vender, Productos, Compras, Stock, Contar, Listas de precios, Duplicados, Administración),
+  edición en la fila y atajos de teclado. Vive en `src/escritorio/`.
+
+Lo que comparten: un solo color de acción (coral), tinta y niebla, importes en Archivo
+Narrow, el logo «fe», las palabras del mostrador y que todo número se explica. Toda función
+nueva con pantalla se hace en las dos.
+
+Reglas del celular, que salen del diseño de referencia:
 
 - **Cuatro pestañas, todo el negocio:** Vender · Catálogo (productos, listas, duplicados) ·
   Depósito (stock, ingreso, contar) · Negocio (hoy, gastos, usuarios, sesiones, quién hizo
-  qué). En el celular van abajo; en la computadora arriba.
+  qué), abajo. La computadora tiene su menú completo arriba.
 - **Un solo color de acción (coral).** Todo lo demás es tinta (`#0e1220`) y niebla
   (`#f3f4f7`). Lo que falta (sin margen, sin cliente) se marca con coral tenue.
 - **Los importes van en tipografía condensada (Archivo Narrow)**, más grandes que el resto:
   se leen de lejos. En pantalla van sin centavos (`$3.000`); en explicaciones y detalles, con
   centavos.
-- **Tarjetas blancas redondeadas sobre fondo niebla**; nada de tablas anchas. Cada fila de una
+- **Tarjetas blancas redondeadas sobre fondo niebla**; nada de tablas anchas en el celular. Cada fila de una
   lista es nombre + detalle a la izquierda e importe a la derecha.
-- **Hojas que suben desde abajo** (ventana centrada en la computadora) para lo que se abre
+- **Hojas que suben desde abajo** para lo que se abre
   sobre lo que se está haciendo: explicación de un número, ficha del producto, elegir
   cliente o proveedor, revisar una lista. Escape o tocar afuera cierra.
 - **Pantalla de éxito a pantalla completa** al cobrar o registrar un ingreso: el importe
@@ -52,12 +63,9 @@ y valen igual en el celular y en la computadora:
 - **Avisos en el lugar:** un toast oscuro para lo que salió bien, un aviso coral para lo que
   falta; se van solos al corregir la causa.
 - La cámara está a un toque al lado de cada buscador, en el celular.
-- **En la computadora se usa toda la pantalla** (sin ancho máximo, 32 px de margen): las
-  pantallas se reparten en dos columnas (Negocio, Listas) o en panel lateral fijo + contenido
-  (Stock con la valorización, Ingreso con el comprobante, Contar con la búsqueda); las
-  sugerencias de duplicados y los sectores van en cuadrícula. Cuando una lista mide más de
-  640 px, cada fila va en una sola línea (nombre · detalle · importe) para que entren más
-  filas; en columnas angostas y en las hojas siguen apiladas. El celular no cambia.
+- **En la computadora nada de esto aplica al layout:** ahí mandan las tablas. La barra de
+  arriba entra entera en la notebook (la leyenda de pruebas se acorta a «Prueba» y el estado
+  de conexión es un punto verde mientras todo está sincronizado; sin conexión se lee completo).
 
 ## Concreto
 
@@ -67,7 +75,8 @@ y valen igual en el celular y en la computadora:
   en el medio, total y cobro abajo.
 - Cada renglón de venta es una tarjeta: producto y subtotal arriba, cantidad (− +),
   unidad y margen abajo; el margen se despliega en el mismo renglón con los cinco botones
-  y el precio a mano. En la computadora, la venta y el panel de cobro van lado a lado.
+  y el precio a mano. En la computadora, cada renglón es una fila de la tabla y el cobro queda
+  fijo abajo.
 - Estado vacío de cada pantalla con una frase que dice qué hacer ("Escribí el nombre del
   producto o escaneá el código").
 - Respuesta visible en menos de 100 ms para búsqueda y para cambiar margen. Si algo va a

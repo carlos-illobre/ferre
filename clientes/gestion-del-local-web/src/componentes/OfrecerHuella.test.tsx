@@ -52,12 +52,12 @@ describe("OfrecerHuella", () => {
     expect(cred.vincular).not.toHaveBeenCalled();
   });
 
-  it("si la huella no se leyó, lo dice y deja la puerta a Administración", async () => {
+  it("si la huella no se leyó, lo dice y deja la puerta a Negocio", async () => {
     marcarEntradaConGoogle();
     cred.vincular.mockRejectedValue(Object.assign(new Error("x"), { name: "NotAllowedError" }));
     render(<OfrecerHuella />);
     fireEvent.click(screen.getByTestId("aceptar-huella"));
-    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("desde Administración"));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("desde Negocio"));
     expect(localStorage.getItem("ferre.huella-ofrecida")).toBeNull();
   });
 });

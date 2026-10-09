@@ -111,3 +111,20 @@ Se agrega el rol `admin`, con los permisos del dueño (usuarios, sesiones, audit
 proveedores, duplicados) salvo sobre los dueños: no puede crearlos, cambiarles el rol,
 desactivarlos ni dar el rol de dueño. Sirve para delegar la administración diaria sin
 ceder el control de quién manda.
+
+## Enmienda (2026-10-09): se quita el login por QR
+
+El dueño lo descartó: una vez que el celular entra con la huella, mostrar un QR en la
+computadora para que el celular la deje entrar no agrega nada, y la computadora entra con
+Google. Se quitaron el botón de la pantalla de entrada, la página que aprobaba el código y
+las rutas `/sesiones/vinculaciones` de la API. Quedan dos formas de entrar: Google y huella.
+
+- La tabla `vinculacion` queda en la base sin uso (nada se borra, `docs/MODELO.md`).
+- El QR que vincula el celular **como lector de códigos de barras** de la computadora
+  (`puesto`, issue #52) es otra cosa y sigue igual.
+
+## Enmienda (2026-10-09): roles Administrador, Vendedor y Comprador
+
+El dueño definió que los permisos se dan con tres roles combinables por usuario
+(`docs/REQUERIMIENTOS.md`, sección 2 y RF-72). Reemplazan a dueño, admin y mostrador cuando
+se implemente el issue #59; hasta entonces rige lo de arriba.
