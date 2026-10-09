@@ -2,10 +2,10 @@ import { test, expect } from "@playwright/test";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 
-// Happy path "contar un sector y ajustar stock" (issue #31), en pantalla de celular: crear
+// Happy path "contar un sector y ajustar stock" (issue #31), desde la computadora: crear
 // el sector, contar dos productos (uno coincide, otro no), cerrar, y verificar que la
 // diferencia quedó como ajuste explicado y que el sector muestra su último conteo.
-test.use({ viewport: { width: 390, height: 844 } });
+// El mismo recorrido en pantalla de celular está en tests/e2e/celular/07-contar.spec.ts.
 
 const TOKEN = "token-e2e-contar";
 const EMAIL = "e2e-contar@ferre.test";
@@ -42,7 +42,7 @@ test.beforeAll(() => {
   psql(`INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, fecha) VALUES (gen_random_uuid(), '${ID_A}', 'compra', 10, 'compra', '2026-09-01'), (gen_random_uuid(), '${ID_B}', 'compra', 5, 'compra', '2026-09-01')`);
 });
 
-test("contar un sector desde el celular y cerrarlo con ajustes", async ({ page }) => {
+test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/contar");
   await expect(page.getByRole("heading", { name: "Contar" })).toBeVisible();
