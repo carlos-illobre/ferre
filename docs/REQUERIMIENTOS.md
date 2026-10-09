@@ -82,6 +82,7 @@ existen; los permisos finos por rol no son prioridad.
 | RF-29 | Cargar las últimas dos semanas del cuaderno como ventas históricas | Pendiente (#20) |
 | RF-30 | Factura electrónica de ARCA (hoy: talonario en papel; la ferretería factura como responsable inscripto con el CUIT del padre del dueño) | Nuevo, fuera de esta etapa |
 | RF-31 | Venta online de los productos de la ferretería, con devoluciones (RF-24b) | Nuevo, fuera de esta etapa |
+| RF-32 | Ofrecer el sistema a otras ferreterías con licencia de uso: varios negocios en la misma instalación, con sus datos separados (proyecto Consultoría) | Nuevo, fuera de esta etapa |
 
 ### 3.3 Clientes
 
