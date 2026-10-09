@@ -3,7 +3,8 @@
 Qué tiene que hacer el sistema y con qué calidad. Fuente: relato del dueño del 2026-10-08,
 más lo que ya estaba escrito en `docs/proceso-actual.md`, `docs/ux.md`, los ADR y el
 backlog de GitHub Issues. Las respuestas del dueño a las preguntas abiertas están
-incorporadas (sección 7).
+incorporadas (sección 7). El 2026-10-09 se revisó contra todo lo que el dueño pidió durante
+el desarrollo (sección 8); lo que quedó en duda está en la sección 9.
 
 La columna **Estado** dice dónde está cada requerimiento:
 
@@ -44,23 +45,24 @@ existen; los permisos finos por rol no son prioridad.
 
 | ID | Requerimiento | Estado |
 |---|---|---|
-| RF-01 | Cargar la lista de precios de un proveedor subiendo el archivo Excel; el sistema reconoce el proveedor, muestra qué cambia (nuevos, cambiados, dados de baja) y actualiza todo al confirmar | Hecho (#12, 4 proveedores) |
+| RF-01 | Cargar la lista de precios de un proveedor subiendo el archivo Excel; el sistema reconoce el proveedor, muestra qué cambia (nuevos, cambiados, dados de baja) y actualiza todo al confirmar. Nada se guarda hasta confirmar y se puede descartar | Hecho (#12, 4 proveedores) |
+| RF-01b | Desde la ficha de un producto, bajar el Excel original de la lista de la que salió su costo | Hecho |
 | RF-02 | Cargar listas en PDF | Pendiente (#27) |
 | RF-03 | Cargar la lista de cualquier proveedor nuevo sin programar un lector a medida | Pendiente (#22, #28) |
 | RF-04 | Recibir las listas solas desde el correo del negocio o la web del proveedor | Pendiente (#25, #26) |
 | RF-05 | Cada artículo guarda el código de cada proveedor que lo vende. Se empieza con pocos proveedores y se suman de a poco; entre todos pueden superar los 100.000 artículos | Hecho (#6); el volumen grande está sin probar (RNF-08) |
-| RF-06 | Un mismo artículo vendido por varios proveedores se une en uno solo; se ve quién lo vende y quién es más barato | Hecho (#29) |
+| RF-06 | Un mismo artículo vendido por varios proveedores se une en uno solo; se ve quién lo vende y quién es más barato. El sistema sugiere los duplicados, también se unen a mano, y dos productos unidos se pueden volver a separar | Hecho (#29) |
 | RF-07 | Buscar un producto por nombre, código o código de barras, sin saber el proveedor, con respuesta instantánea | Hecho (#14) |
-| RF-08 | Leer el código de barras con la cámara del celular, también para cargarlo en la laptop | Hecho (#52) |
-| RF-09 | Sacarle una foto al producto desde el celular y guardarla en su ficha | Hecho (#54) |
+| RF-08 | Leer el código de barras con la cámara del celular, también para cargarlo en la laptop: el celular se vincula a la laptop leyendo un QR y lo que escanea aparece en la pantalla de la laptop | Hecho (#52) |
+| RF-09 | Sacarle una foto al producto desde el celular y guardarla en su ficha. La foto chica se amplía al tocarla y desde ahí se puede sacar otra para reemplazarla | Hecho (#54) |
 | RF-09b | Encontrar un producto sin código de barras sacándole una foto | Nuevo, segunda versión |
-| RF-10 | Precio de venta = costo + margen. El margen se elige con un toque (300 / 200 / 100 / 50 / 25 %) o a mano, y queda guardado por producto | Hecho (#13) |
+| RF-10 | Precio de venta = costo + margen. El margen se elige con un toque (300 / 200 / 100 / 50 / 25 %) o a mano, y queda guardado por producto. En el catálogo, «a mano» es un porcentaje, no un precio | Hecho (#13) |
 | RF-11 | Costo comparable entre proveedores: descuentos e IVA aplicados igual para todos | Pendiente (#11) |
-| RF-12 | Productos fraccionados (clavos por kilo, cable por metro, líquidos por litro) | Hecho (unidad kg / m / l) |
+| RF-12 | Productos fraccionados (clavos por kilo, cable por metro, líquidos por litro). Lo que se vende por unidad lleva cantidades enteras; lo fraccionado, hasta un decimal | Hecho (unidad kg / m / l) |
 | RF-13 | Todo número calculado explica de dónde sale | Hecho (#47) |
 | RF-14 | Historial de precios por producto y proveedor | Pendiente (#23) |
 | RF-15 | Después de cargar una lista, avisar qué productos hay que remarcar | Pendiente (#24) |
-| RF-16 | Ayudar a decidir el margen con datos (costos fijos, rotación) en vez de a ojo | Pendiente (#48) |
+| RF-16 | Ayudar a decidir el margen con datos (costeo por absorción: costos fijos, rotación) en vez de a ojo | Pendiente (#48) |
 | RF-17 | Descuentos puntuales de un proveedor que se trasladan al precio de venta mientras duran | Nuevo |
 | RF-18 | Buscar proveedores y ver su ficha: datos de contacto, listas cargadas, qué venden | Nuevo |
 | RF-19 | El precio de venta siempre se redondea para arriba a múltiplos de $1.000, también en lo que se vende suelto, para no dar vuelto | Hecho |
@@ -70,9 +72,10 @@ existen; los permisos finos por rol no son prioridad.
 | ID | Requerimiento | Estado |
 |---|---|---|
 | RF-20 | Registrar una venta en el orden del mostrador: buscar, ver precio, cantidad, cobrar | Hecho (#15) |
+| RF-20b | En la venta, el margen de un producto se elige o cambia ahí mismo, y el precio de un renglón se puede poner a mano (un importe) solo para esa venta | Hecho (#15) |
 | RF-21 | Medios de pago: efectivo, Mercado Pago, tarjeta, cuenta corriente | Hecho (#15) |
 | RF-22 | Vender un producto que no está en ninguna lista (ítem libre) y darlo de alta ahí mismo | Hecho (#17) |
-| RF-23 | Ver las ventas del día, corregirlas y anularlas | Hecho (#16) |
+| RF-23 | Ver las ventas del día, corregirlas y anularlas. Cada venta muestra sus productos, uno por renglón | Hecho (#16) |
 | RF-24 | Cambio por otro producto: vuelve al stock lo devuelto, sale lo nuevo y se cobra la diferencia | Nuevo |
 | RF-24b | Devoluciones con reintegro de plata o saldo a favor, a elección del cliente; plazo a definir | Nuevo, fuera de esta etapa (llega con la venta online) |
 | RF-25 | Anotar lo que un cliente pidió y no se vendió, con el motivo (no había, precio) | Hecho en parte (tabla `consulta`); falta la vista |
@@ -91,15 +94,16 @@ existen; los permisos finos por rol no son prioridad.
 | RF-40 | Vender a cuenta corriente a un cliente importante y marcar la venta como pagada | Hecho (#15) |
 | RF-41 | Cuenta corriente completa: saldo, pagos parciales, antigüedad de la deuda, resumen para mandar | Pendiente (#43) |
 | RF-42 | Buscar clientes importantes y ver su ficha con lo que compraron y lo que deben | Pendiente (#43) |
+| RF-43 | Precio distinto para un cliente importante según la cantidad que compra y lo rápido que paga | Pendiente (#43) |
 
 ### 3.4 Compras y stock
 
 | ID | Requerimiento | Estado |
 |---|---|---|
-| RF-50 | Registrar cada compra a proveedor con su costo real; suma stock | Hecho (#30) |
+| RF-50 | Registrar cada compra a proveedor con su costo real; suma stock. Con factura, con remito o sin comprobante (hay proveedores que no facturan). Las compras recientes se abren para ver sus renglones y se pueden anular | Hecho (#30) |
 | RF-51 | Cargar la factura de compra con una foto, sin tipear los renglones | Pendiente (#55) |
-| RF-52 | El stock arranca en cero; el empleado carga lo que ya hay de a poco, por sector, con el celular | Hecho (#31) |
-| RF-53 | Stock actual y cuánta plata hay invertida | Hecho (#33) |
+| RF-52 | El stock arranca en cero; el empleado carga lo que ya hay de a poco, por sector, con el celular. Un conteo interrumpido queda abierto y se retoma | Hecho (#31) |
+| RF-53 | Stock actual y cuánta plata hay invertida. El stock de cada producto muestra los movimientos que lo explican y se puede corregir a mano, con el motivo | Hecho (#33) |
 | RF-54 | Aviso de stock bajo y sugerencia de qué pedir | Pendiente (#35) |
 | RF-55 | Armar el pedido a un proveedor | Pendiente (#36) |
 | RF-56 | Lo que se les debe a los proveedores y cuándo vence: se paga por adelantado cuando hay descuento, y si no a 30 o 60 días | Nuevo |
@@ -121,9 +125,12 @@ existen; los permisos finos por rol no son prioridad.
 
 | ID | Requerimiento | Estado |
 |---|---|---|
-| RF-70 | Solo entran usuarios autorizados, con su cuenta de Google o la huella del celular; sin contraseñas | Hecho (#41) |
-| RF-71 | Quién hizo qué: cada acción queda con su usuario y se puede consultar | Hecho (#41) |
+| RF-70 | Solo entran usuarios autorizados, con su cuenta de Google o la huella del celular; sin contraseñas. Se autoriza a alguien cargando su correo de Google desde la app; quien no está autorizado ve «no autorizado» | Hecho (#41) |
+| RF-70b | Vincular el celular a la cuenta para entrar con la huella, sin Google. La app lo ofrece sola la primera vez que se entra con Google desde un celular (como las apps de los bancos) y nunca en la computadora; también se vincula y se quita desde Negocio | Hecho (ADR-011) |
+| RF-71 | Quién hizo qué: cada acción queda con su usuario y se puede consultar, de a 10 por página | Hecho (#41) |
 | RF-72 | Permisos distintos por rol (por ejemplo, ocultar costos al mostrador) | Fuera de esta etapa |
+| RF-73 | Rol admin: puede lo mismo que el dueño, salvo crear, modificar o desactivar usuarios dueño | Hecho (#41) |
+| RF-74 | Ver las sesiones abiertas en cada dispositivo y cerrarlas a distancia; cerrar la propia vuelve a la pantalla de entrada | Hecho (#41) |
 
 ## 4. Requerimientos no funcionales
 
@@ -134,10 +141,11 @@ existen; los permisos finos por rol no son prioridad.
 | RNF-01 | Curva de aprendizaje cero: el empleado vende el primer día sin manual | A validar en el piloto (#21) |
 | RNF-02 | Nunca más lento que el cuaderno y la calculadora: una venta de 3 productos en menos de 20 segundos | A validar (#21) |
 | RNF-03 | Mínimo esfuerzo manual: no se tipea nada que se pueda sacar de una lista, un código de barras o una foto | Parcial (falta #55, #25) |
-| RNF-04 | Celular: la interfaz actual se conserva tal como está | Hecho |
+| RNF-04 | Celular: la interfaz actual se conserva tal como está. Sigue el diseño de `mockups/Ferre iOS.html` (reglas en `docs/ux.md`), se parece a una app nativa y ninguna pantalla se desplaza hacia el costado | Hecho |
 | RNF-05 | Computadora: usa todo el ancho de la pantalla, se ve prolija y se maneja con teclado, sin cambiar nada del celular | **Pendiente, prioridad 1.** El intento del 2026-09-15 (commit `6333c1f`) no conformó |
-| RNF-06 | Todo en castellano, con las palabras del mostrador; los errores dicen qué hacer | Hecho (`docs/ux.md`) |
+| RNF-06 | Todo en castellano, con las palabras del mostrador; los errores dicen qué hacer. Nombres que se entienden solos: «cuenta corriente» y no «fiado» («cc.» solo donde no entra), «estantería» y no «góndola» | Hecho (`docs/ux.md`) |
 | RNF-07 | Búsqueda y cambio de margen responden en menos de 100 ms | Hecho (#14) |
+| RNF-09 | Lo que tarda muestra su avance (barra de progreso al aplicar una lista); los avisos desaparecen solos al corregir la causa; lo que se puede tocar parece un botón; los paneles plegables arrancan abiertos y se abren y cierran con animación | Hecho (`docs/ux.md`) |
 | RNF-08 | La búsqueda sigue siendo instantánea y funciona sin internet con más de 100.000 artículos, en la notebook vieja | Nuevo, sin probar |
 
 ### 4.2 Disponibilidad
@@ -153,7 +161,7 @@ existen; los permisos finos por rol no son prioridad.
 
 | ID | Requerimiento | Estado |
 |---|---|---|
-| RNF-20 | No se pierde ninguna venta: cada una vive en el dispositivo hasta que el servidor la confirma | Hecho (#18) |
+| RNF-20 | No se pierde ninguna venta ni ningún cambio (margen, ajuste de stock, conteo): cada uno vive en el dispositivo hasta que el servidor lo confirma, aunque se recargue la página o se corte internet. Las ventas confirmadas quedan además 7 días en el dispositivo | Hecho (#18, ADR-002) |
 | RNF-21 | Copia de la base cada hora, guardada 30 días | **Pendiente** (#19) |
 | RNF-22 | Copia semanal cifrada fuera de Oracle y de Supabase | **Pendiente** (#19) |
 | RNF-23 | Prueba mensual automática de que la copia se puede restaurar | **Pendiente** (#19) |
@@ -169,10 +177,23 @@ existen; los permisos finos por rol no son prioridad.
 
 | ID | Requerimiento | Estado |
 |---|---|---|
-| RNF-40 | Funciona en la notebook vieja del local (Chrome o Firefox) y en un celular Android, sin instalar nada | Hecho; falta probar en la notebook real |
+| RNF-40 | Funciona en la notebook vieja del local (Chrome o Firefox) y en un celular Android, sin instalar nada. En el celular se puede agregar a la pantalla de inicio como una app, sin pasar por la tienda | Hecho (#42); falta probar en la notebook real |
 | RNF-41 | El único lector de códigos es la cámara del celular | Hecho (#52) |
 | RNF-42 | Costo de infraestructura cero hasta que el sistema muestre resultados | Hecho (Oracle Always Free, Supabase gratis, GitHub Pages) |
-| RNF-43 | HTTPS siempre; sesiones revocables; ningún dato de proveedores en el repositorio | Hecho (`docs/SECURITY.md`) |
+| RNF-43 | HTTPS siempre; sesiones revocables; ningún dato de proveedores ni secreto en el repositorio, que es público: lo sensible vive en `privado/`, que no se sube | Hecho (`docs/SECURITY.md`) |
+| RNF-44 | En el servidor la app corre con un usuario propio sin privilegios de administrador y no publica puertos a internet: sale por el proxy compartido de la máquina | Hecho (ADR-013) |
+
+### 4.6 Arquitectura y forma de trabajo
+
+| ID | Requerimiento | Estado |
+|---|---|---|
+| RNF-50 | El servidor está separado de la pantalla: la misma API la consume la web y la podrá consumir una app Android. El sistema es un microservicio que se integrará con otros (venta online, RF-31). Los servicios se llaman por lo que resuelven del negocio | Hecho (ADR-003, ADR-010) |
+| RNF-51 | Cada problema con la tecnología que mejor lo resuelve; en caso de duda o empate, TypeScript | Hecho (ADR-001) |
+| RNF-52 | Importa la disponibilidad, no la escala: tres usuarios y unas 200 ventas por día | Hecho (ADR-002) |
+| RNF-53 | Dos ambientes: pruebas, que se actualiza solo con cada cambio, y producción, que se actualiza cuando el dueño lo pide | Hecho (ADR-012, ADR-013) |
+| RNF-54 | El ambiente de pruebas se distingue a simple vista: la barra titila y dice «Ambiente de prueba»; producción no muestra nada de eso | Hecho |
+| RNF-55 | Pruebas automáticas: las unitarias corren en cada cambio y todo cambio de comportamiento trae la suya; las de punta a punta cubren los caminos principales y se corren a mano. Sin mutation testing ni meta de cobertura | Hecho (ADR-004) |
+| RNF-56 | Cada decisión técnica queda escrita con su porqué (un ADR) y la documentación se mantiene al día con el código | Hecho (`docs/adr/`) |
 
 ## 5. Casos de uso
 
@@ -276,6 +297,7 @@ existen; los permisos finos por rol no son prioridad.
 - Permisos finos por rol (RF-72).
 - Venta online (RF-31): la arquitectura deja la puerta abierta (ADR-003), pero no se construye acá.
   Es un negocio aparte del proyecto Tienda online.
+- Licenciar el sistema a otras ferreterías (RF-32).
 
 ## 7. Decisiones del dueño (2026-10-08)
 
@@ -290,3 +312,48 @@ existen; los permisos finos por rol no son prioridad.
 5. **Redondeo.** Siempre para arriba a múltiplos de $1.000, para no lidiar con vueltos (RF-19).
 6. **Tamaño del catálogo.** Entre todos los proveedores puede superar los 100.000 artículos.
    Se empieza con pocos proveedores y se agregan de a poco (RF-05, RNF-08).
+
+## 8. Revisión del 2026-10-09
+
+Se comparó este documento con todo lo que el dueño pidió durante el desarrollo (2026-09-13
+al 2026-09-15). Lo que faltaba se agregó:
+
+- **Requerimientos nuevos en el documento, ya construidos:** RF-01b, RF-20b, RF-70b, RF-73,
+  RF-74, RNF-09, RNF-44 y la sección 4.6 (RNF-50 a RNF-56).
+- **Requerimiento que faltaba y sigue pendiente:** RF-43, precio distinto para clientes
+  importantes según cantidad y velocidad de pago (relato del 2026-09-13; está en el alcance
+  de #43).
+- **Detalle sumado a requerimientos que ya estaban:** RF-01, RF-06, RF-08, RF-09, RF-10,
+  RF-12, RF-16, RF-23, RF-50, RF-52, RF-53, RF-70, RF-71, RNF-04, RNF-06, RNF-20, RNF-40,
+  RNF-43.
+- **Sección 6:** se sumó RF-32, que estaba marcado fuera de esta etapa pero no figuraba.
+
+No se cambió ningún estado ni se quitó nada.
+
+## 9. Contradicciones y preguntas abiertas (2026-10-09)
+
+Esperan la respuesta del dueño. Hasta entonces, el agente que toque uno de estos puntos
+pregunta antes de avanzar.
+
+1. **RF-19, redondeo en lo fraccionado.** Se redondea el precio por unidad, pero el renglón
+   es precio × cantidad: medio kilo de algo a $3.000 da $1.500 y hay que dar vuelto. El
+   estado dice «Hecho». ¿El total del renglón también se redondea para arriba a $1.000?
+2. **RF-23, corregir una venta.** El estado dice «Hecho (#16)», pero hoy solo se puede
+   anular y cargar de nuevo. Editar la cantidad o el precio y ver las ventas de días
+   anteriores estaban en el alcance de #16 y no se construyeron.
+3. **RF-40, marcar como pagada.** El servidor lo permite, pero ninguna pantalla lo ofrece.
+4. **CU-13, filtros de quién hizo qué.** El caso de uso dice que se filtra por usuario,
+   fecha o tipo; la pantalla solo pagina. El servidor ya filtra.
+5. **Sección 2, «todos ven todo».** No es así: usuarios, sesiones, quién hizo qué, alta de
+   proveedores y duplicados son solo de dueño y admin (RF-73). ¿Se corrige el texto, o se
+   quiere de verdad que el mostrador vea todo?
+6. **RNF-05, referencia para el escritorio.** `CLAUDE.md` dice que la referencia es la
+   versión de escritorio anterior al rediseño; `docs/ux.md` dice que el sistema visual del
+   rediseño vale igual para celular y computadora y que no hay tablas anchas. ¿Cuál manda?
+7. **Entrar leyendo un QR.** La pantalla de entrada de la computadora todavía lo ofrece. El
+   dueño dijo el 2026-09-14 que así no tiene utilidad y se reemplazó por la huella (RF-70b).
+   ¿Se quita?
+8. **RF-32, licenciar a otras ferreterías.** El modelo de datos no separa negocios y RNF-52
+   dice que la escala no importa. No es urgente, pero cada tabla nueva lo encarece. ¿Se
+   empieza a guardar a qué negocio pertenece cada dato, o se deja para cuando llegue?
+9. **Rol de la madre del dueño.** «Opera igual que el dueño»: ¿entra como dueño o como admin?
