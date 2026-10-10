@@ -193,7 +193,8 @@ orden, y saber por qué ese precio.
 
 **Necesita a la vista:** en cada renglón, el precio que se le cobra a ese cliente,
 distinguible del precio de mostrador; al tocarlo, la explicación con el precio de mostrador
-y la condición del cliente; el total, siempre múltiplo de $1.000.
+y la condición del cliente; el total, con el aviso de RF-19 si un precio puesto a mano lo
+deja sin ser múltiplo de $1.000.
 
 **Computadora:** ver la explicación del precio se hace con teclado, como cualquier otro
 número calculado.

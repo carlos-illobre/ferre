@@ -211,8 +211,9 @@ que sale.
 - **Una venta anulada después del cierre de caja:** el cierre guardado no se modifica
   (constitución, principio V). Cómo se refleja la anulación en la diferencia depende de la
   aclaración de RF-62 sobre lo que pasa después del cierre.
-- **Importes de venta:** toda venta es múltiplo de $1.000 (RF-19), así que el efectivo
-  esperado también lo es. El efectivo contado se acepta tal como se tipea.
+- **Importes de venta:** una venta es múltiplo de $1.000 salvo que lleve un precio puesto a
+  mano que no lo sea (RF-19), así que el efectivo esperado puede no ser múltiplo de $1.000.
+  El efectivo contado se acepta tal como se tipea.
 - **Varios dispositivos:** el efectivo esperado y los números del tablero salen de todas
   las ventas del día, sin importar desde qué dispositivo se cargaron.
 - **El resumen no se pudo enviar:** las novedades del día se ven igual en la app, que no
@@ -387,9 +388,13 @@ que sale.
   (RF-26) y las listas de precios (RF-01, RF-04) se especifican en su capacidad; el tablero
   los muestra con las reglas de cada una.
 - Qué rol puede cada cosa lo fija RF-72. Esta especificación asigna el tablero, lo más
-  vendido, las novedades y el resultado al Administrador, el cierre de caja al Vendedor y
-  el gasto semanal al Comprador y al Administrador, como lo dicen la decisión 8 del
-  2026-10-09 y los casos de uso «Ver cómo va el negocio» y «Cerrar la caja».
+  vendido, las novedades y el resultado al Administrador, como lo dice la decisión 8 del
+  2026-10-09. El cierre de caja al Vendedor y el gasto semanal al Comprador salen de los
+  casos de uso «Cerrar la caja» y «Registrar una compra», donde el rol se puso al pasar de
+  actores a roles: Carlos no los confirmó. [NEEDS CLARIFICATION: ¿cerrar la caja es del
+  Vendedor, y el Comprador ve el gasto de la semana donde registra las compras? Ver las
+  ventas del día quedó para el Administrador (decisión 15), y el efectivo esperado sale de
+  esas ventas. Es la pregunta P3 de la capacidad de usuarios y acceso.]
 - El gasto semanal cuenta lo comprado en la semana, esté pago o no. Lo que se les debe a
   los proveedores y cuándo vence es RF-56.
 - La ganancia de esta capacidad es bruta: lo vendido menos el costo de lo vendido. El costo
@@ -427,6 +432,10 @@ que sale.
 
 ### Session 2026-10-10
 
+- Q: ¿Un precio puesto a mano que no es múltiplo de $1.000 se redondea? → A: No: se
+  respeta y la venta lo avisa (decisión 16, RF-19). Para el cierre de caja: el efectivo
+  esperado ya no es siempre múltiplo de $1.000; reemplaza lo dicho el 2026-10-09.
+- Q: ¿Quién ve las ventas del día? → A: Por ahora, el Administrador (decisión 15, RF-72).
 - Q: ¿La especificación describe lo que el código hace o lo que el negocio necesita? → A:
   Lo que el negocio necesita: es independiente del código y tiene que alcanzar para
   rehacer la aplicación (constitución, principio I).

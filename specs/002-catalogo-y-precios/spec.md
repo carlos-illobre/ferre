@@ -19,6 +19,14 @@ Decisiones de Carlos que tocan esta capacidad.
 - Q: ¿Qué se tiene que poder saber de un número calculado? → A: De dónde viene. Vale para costos, precios, totales, stock y valorización (RF-13).
 - Q: ¿El mismo artículo en dos o tres listas es un producto o varios? → A: Uno solo. Comprar es elegir, entre los proveedores que lo tienen, el más barato (RF-06).
 
+### Session 2026-09-14
+
+- Q: ¿Cómo se redondea el precio de venta? → A: Para arriba, a múltiplos de $1.000 (RF-19). Se volvió a confirmar el 2026-10-08.
+- Q: En el catálogo, ¿«a mano» es un precio o un margen? → A: Un porcentaje de margen. El precio de venta siempre sale del costo y del margen. En la venta, en cambio, «a mano» es un precio y vale solo para esa venta (RF-10, RF-20b).
+- Q: ¿Cómo se cargan las cantidades? → A: Enteras para lo que se vende por unidad; con un decimal para lo que se vende por kilo, metro o litro. La unidad queda guardada en el producto (RF-12).
+- Q: ¿Se puede deshacer una unión de productos? → A: Sí: dos productos unidos se pueden volver a separar (RF-06).
+- Q: Desde un producto, ¿se puede llegar a la planilla de la que salió su costo? → A: Sí, se baja el Excel original (RF-01b).
+
 ### Session 2026-10-08
 
 - Q: ¿Se necesita encontrar un producto sin código de barras sacándole una foto? → A: En la primera versión alcanza con escanear el código de barras y fotografiar facturas; buscar por foto va en la segunda (RF-09b).
@@ -29,15 +37,19 @@ Decisiones de Carlos que tocan esta capacidad.
 
 - Q: ¿Alcanza con redondear el precio? → A: No. No hay billetes chicos: toda venta tiene que ser múltiplo de $1.000, así que además del precio se redondea para arriba cada renglón de la venta (RF-19).
 - Q: ¿Con qué nombres se dan los permisos? → A: Por rol: Administrador, Vendedor y Comprador, combinables. Los actores (Dueño, Empleado, Cliente, Proveedor) se usan solo donde el rol no alcanza (RF-72).
-- Q: En el catálogo, ¿«a mano» es un precio o un margen? → A: Un porcentaje de margen. El precio de venta siempre sale del costo y del margen (RF-10).
-- Q: ¿Con qué se leen los códigos de barras? → A: Solo con la cámara del celular; no hay otro lector en el local. Para usarlo en la computadora, el celular se vincula leyendo un QR (RF-08, RNF-41).
+- Q: ¿Con qué se leen los códigos de barras? → A: Solo con la cámara del celular; no hay otro lector en el local. Para usarlo en la computadora, el celular se vincula leyendo un QR. Lo pidió Carlos el 2026-09-13 (RF-08, RNF-41).
+
+### Session 2026-10-10
+
+- Q: Un precio puesto a mano en una venta que no es múltiplo de $1.000, ¿se redondea? → A: No. Se respeta tal cual y la venta muestra un aviso que dice que no es múltiplo de $1.000. Lo calculado y lo que se vende suelto se sigue redondeando para arriba (decisión 16; RF-19).
+- Q: ¿Qué rol carga listas, elige márgenes, une duplicados y ve costos? → A: Por ahora, el Administrador. Más adelante se reparte mejor, con más roles (decisión 15; RF-72).
 
 ## User Scenarios & Testing *(mandatory)*
 
 Toda historia con interfaz vale para las dos, computadora y celular (ADR-014), y cada
-escenario se comprueba en cada una. Los roles son los de RF-72; donde la decisión de qué rol
-puede qué sigue abierta, la historia nombra el rol propuesto y el requerimiento lleva la
-pregunta.
+escenario se comprueba en cada una. Los roles son los de RF-72. Por la decisión 15 del
+2026-10-10, cargar listas, elegir márgenes, unir duplicados y ver costos son del
+Administrador; lo que esa decisión deja sin resolver está en «Assumptions».
 
 ### User Story 1 - Buscar un producto sin saber el proveedor (Priority: P1)
 
@@ -69,7 +81,7 @@ productos, escribir y ver el resultado, con conexión y sin ella.
 
 ### User Story 2 - Elegir el margen y ver el precio de venta explicado (Priority: P1)
 
-El Vendedor ve el costo del producto, elige el margen con un toque (300 / 200 / 100 / 50 /
+El Administrador ve el costo del producto, elige el margen con un toque (300 / 200 / 100 / 50 /
 25 %) o tipea otro porcentaje, y el sistema calcula el precio de venta redondeado para arriba
 a $1.000. Cada número calculado dice de dónde sale.
 
@@ -81,7 +93,7 @@ comparar el precio y su explicación con la cuenta a mano.
 
 **Acceptance Scenarios**:
 
-1. **Given** una mecha con costo $1.500, IVA 21 % y sin margen, **When** el Vendedor elige 100 % con un toque o con un solo atajo de teclado, **Then** esa opción queda marcada como la elegida y el precio es $4.000 (1.500 × 2 × 1,21 = 3.630, para arriba al múltiplo de $1.000).
+1. **Given** una mecha con costo $1.500, IVA 21 % y sin margen, **When** el Administrador elige 100 % con un toque o con un solo atajo de teclado, **Then** esa opción queda marcada como la elegida y el precio es $4.000 (1.500 × 2 × 1,21 = 3.630, para arriba al múltiplo de $1.000).
 2. **Given** un producto sin margen elegido, **When** se lo ve en cualquier lado, **Then** dice «sin precio» en vez de un precio, con las opciones de margen a la vista.
 3. **Given** la mecha de costo $1.500, **When** elige otro margen y tipea 20, **Then** el precio es $3.000 (1.500 × 1,2 × 1,21 = 2.178 → 3.000), se ve que el margen es 20 % puesto a mano y ninguna de las cinco opciones queda marcada: lo tipeado es un porcentaje, no un precio.
 4. **Given** un taladro de costo $120.000, **When** elige 25 %, **Then** el precio es $182.000 (181.500 para arriba).
@@ -90,18 +102,19 @@ comparar el precio y su explicación con la cuenta a mano.
 7. **Given** un margen recién elegido y el dispositivo sin conexión, **When** se cierra y se vuelve a abrir la aplicación, **Then** el margen sigue elegido, y se manda solo al servidor cuando vuelve la conexión (RNF-20).
 8. **Given** un producto, **When** se indica como margen un porcentaje entero entre 1 y 10.000, o ninguno, **Then** se guarda y queda registrado con el usuario que lo hizo; un decimal, cero, un negativo, más de 10.000 o un texto se rechazan con un mensaje en el lugar.
 9. **Given** un producto sin costo (ningún proveedor le puso precio), **When** se lo ve, **Then** dice «sin costo» y no se le puede elegir margen.
-10. **Given** el costo de un producto que salió de una lista con descuentos, **When** el Vendedor pide la explicación del costo, **Then** ve los pasos con sus números de origen y la fecha de la lista: precio de lista, IVA quitado si lo incluía, cada descuento en orden y el costo que queda.
+10. **Given** el costo de un producto que salió de una lista con descuentos, **When** el Administrador pide la explicación del costo, **Then** ve los pasos con sus números de origen y la fecha de la lista: precio de lista, IVA quitado si lo incluía, cada descuento en orden y el costo que queda.
 11. **Given** un costo de $1.649,14, margen 100 % e IVA 21 %, **When** pide la explicación del precio, **Then** ve «Costo $1.649,14», «+ 100 % de margen = $3.298,28», «+ IVA 21 % = $3.990,92» y «Redondeado para arriba a $4.000,00 (múltiplo de $1.000,00)»; un producto con IVA 10,5 % usa ese IVA.
 12. **Given** un precio que ya es múltiplo de $1.000, **When** se redondea, **Then** queda igual; $1.000,01 pasa a $2.000 y $15,10 a $1.000.
 13. **Given** un renglón de venta de 0,5 kg de un producto a $3.000 el kilo, **When** se calcula el renglón, **Then** es $2.000 y la explicación lo dice: «× 0,5 kg = $1.500,00», «Redondeado para arriba a $2.000,00 (múltiplo de $1.000,00) para no dar vuelto».
-14. **Given** un renglón de venta con un precio puesto a mano de $1.500 (RF-20b), **When** se calcula el renglón, **Then** se cobra $2.000 y la explicación muestra el redondeo.
-15. **Given** un cambio de margen en un catálogo de 100.000 productos, **When** el Vendedor lo elige, **Then** el precio nuevo se ve en menos de 100 ms (RNF-07).
+14. **Given** un renglón de venta con un precio puesto a mano de $1.500 (RF-20b), **When** se calcula el renglón, **Then** se cobra $1.500, sin redondear, y el renglón muestra un aviso que dice que no es múltiplo de $1.000; el aviso no impide cobrar.
+15. **Given** un cambio de margen en un catálogo de 100.000 productos, **When** el Administrador lo elige, **Then** el precio nuevo se ve en menos de 100 ms (RNF-07).
+16. **Given** un usuario que no es Administrador, **When** mira un producto del catálogo, **Then** ve su precio de venta y no se le ofrece elegir ni cambiar el margen; si se lo pide directo al servidor, el servidor lo rechaza.
 
 ---
 
 ### User Story 3 - Actualizar precios con la lista de un proveedor (Priority: P1)
 
-El Comprador sube el Excel de un proveedor. El sistema reconoce de quién es, muestra qué
+El Administrador sube el Excel de un proveedor. El sistema reconoce de quién es, muestra qué
 cambia y recién al confirmar actualiza los costos; con el margen de cada producto cambian los
 precios de venta. Si algo se ve mal, se descarta y no cambia nada.
 
@@ -114,25 +127,25 @@ nada.
 
 **Acceptance Scenarios**:
 
-1. **Given** un proveedor configurado, con descuento por contado de 5 %, **When** el Comprador sube su planilla sin decir de quién es, **Then** el sistema reconoce el proveedor por el nombre del archivo o por el formato de la planilla y muestra su nombre, la fecha de la lista y el resumen de qué cambia.
+1. **Given** un proveedor configurado, con descuento por contado de 5 %, **When** el Administrador sube su planilla sin decir de quién es, **Then** el sistema reconoce el proveedor por el nombre del archivo o por el formato de la planilla y muestra su nombre, la fecha de la lista y el resumen de qué cambia.
 2. **Given** una planilla de muestra con cuatro productos válidos y una fila sin precio, cargada por primera vez, **When** se la sube, **Then** el resumen dice 4 productos leídos, 4 nuevos y 1 fila salteada con su motivo.
 3. **Given** una lista que cambia el costo de productos que ya existen, **When** se la sube, **Then** el resumen dice cuántos son nuevos, cuántos cambian de precio y con qué variación promedio, cuántos quedan sin cambio y cuántos ya no aparecen.
-4. **Given** el resumen de una lista subida, **When** el Comprador revisa la vista previa, **Then** ve cada producto con el costo que tenía y el costo nuevo, los que cambian primero, y puede pedir la explicación de cada costo (por ejemplo $712,50 con «− 25 %» de la línea y «− 5 %» de contado).
+4. **Given** el resumen de una lista subida, **When** el Administrador revisa la vista previa, **Then** ve cada producto con el costo que tenía y el costo nuevo, los que cambian primero, y puede pedir la explicación de cada costo (por ejemplo $712,50 con «− 25 %» de la línea y «− 5 %» de contado).
 5. **Given** una lista subida y sin aplicar, **When** se consultan los costos del proveedor, **Then** son los de antes: nada se guarda hasta aplicar.
-6. **Given** una lista sin aplicar, **When** el Comprador la aplica, **Then** se crean los productos nuevos, se agregan los costos que cambiaron, se ve el avance mientras dura y al terminar se ve el resultado (cuántos precios se actualizaron y cuántos productos son nuevos); el proveedor muestra la fecha de su última lista aplicada.
+6. **Given** una lista sin aplicar, **When** el Administrador la aplica, **Then** se crean los productos nuevos, se agregan los costos que cambiaron, se ve el avance mientras dura y al terminar se ve el resultado (cuántos precios se actualizaron y cuántos productos son nuevos); el proveedor muestra la fecha de su última lista aplicada.
 7. **Given** una lista aplicada que trae productos que ya no aparecen, **When** termina de aplicarse, **Then** esos productos quedan dados de baja para ese proveedor [NEEDS CLARIFICATION: ¿qué es exactamente «dar de baja» un producto que ya no aparece en la lista nueva de su proveedor? ¿Deja de verse en la búsqueda y de poder venderse, o solo deja de tener costo de ese proveedor? ¿Qué pasa si tiene stock, o si lo vende otro proveedor? ¿Vuelve solo si reaparece en una lista posterior?].
 8. **Given** una lista ya aplicada, **When** alguien quiere aplicarla otra vez, **Then** el sistema no lo permite y lo dice.
 9. **Given** una lista ya aplicada, **When** se sube y se aplica el mismo archivo otra vez, **Then** el resumen dice 0 nuevos y todos sin cambio, y no se duplica ningún costo ni ningún producto.
-10. **Given** una lista sin aplicar, **When** el Comprador la descarta, **Then** queda descartada, no se guarda ningún costo y no vuelve a ofrecerse para aplicar.
+10. **Given** una lista sin aplicar, **When** el Administrador la descarta, **Then** queda descartada, no se guarda ningún costo y no vuelve a ofrecerse para aplicar.
 11. **Given** un archivo que no es la planilla de ningún proveedor conocido, **When** se lo sube, **Then** un mensaje claro en castellano dice que no se reconoció y pide elegir el proveedor; el archivo no se pierde: queda guardado para revisarlo.
-12. **Given** que el sistema no reconoció el proveedor, o lo reconoció mal, **When** el Comprador elige el proveedor correcto, **Then** la planilla se lee como una lista de ese proveedor.
+12. **Given** que el sistema no reconoció el proveedor, o lo reconoció mal, **When** el Administrador elige el proveedor correcto, **Then** la planilla se lee como una lista de ese proveedor.
 13. **Given** una planilla que no dice su fecha, **When** se la sube, **Then** el sistema pregunta de qué fecha es la lista antes de leerla.
 14. **Given** la planilla de un proveedor, **When** se la lee, **Then** cada fila sale con los mismos datos, sea cual sea el proveedor: código, descripción, marca, grupo, precio de lista, descuentos, costo sin IVA con su explicación, IVA, bulto, código de barras y precio sugerido cuando la planilla los trae; las filas sin código o sin precio se saltean con su motivo.
 15. **Given** un descuento por contado configurado que no coincide con el que dice la planilla, **When** se lee la lista, **Then** la vista previa trae un aviso de que no coincide.
 16. **Given** una lista aplicada, **When** se revisa el registro de acciones, **Then** figuran quién la cargó y quién la aplicó (RF-71).
 17. **Given** una lista que trae productos nuevos, **When** termina de aplicarse, **Then** el sistema busca si esos productos son duplicados de los de otros proveedores y deja las sugerencias para revisar (RF-06).
 18. **Given** dos personas que aplican la misma lista a la vez, **When** llegan los dos pedidos, **Then** solo el primero la aplica; el otro ve que la lista ya se está aplicando.
-19. **Given** cualquiera de las listas reales de los proveedores cargados, **When** el Comprador la sube, la revisa y la aplica, **Then** todo el recorrido le lleva menos de un minuto y no necesita manual.
+19. **Given** cualquiera de las listas reales de los proveedores cargados, **When** el Administrador la sube, la revisa y la aplica, **Then** todo el recorrido le lleva menos de un minuto y no necesita manual.
 
 ---
 
@@ -298,8 +311,8 @@ son pocos productos.
 
 ### User Story 11 - Sumar un proveedor nuevo sin programar nada (Priority: P2)
 
-El Comprador sube la lista de un proveedor que el sistema nunca vio. El sistema encuentra
-solo el encabezado y las columnas; si no puede, el Comprador le dice qué columna es qué, una
+El Administrador sube la lista de un proveedor que el sistema nunca vio. El sistema encuentra
+solo el encabezado y las columnas; si no puede, el Administrador le dice qué columna es qué, una
 sola vez, y la próxima lista de ese proveedor entra sin preguntar.
 
 **Why this priority**: los proveedores pasan de unos pocos a unos cincuenta, y sus formatos
@@ -321,7 +334,7 @@ aplicar, y subir otra planilla del mismo proveedor con el mismo formato.
 
 ### User Story 12 - Cargar una lista que llega en PDF (Priority: P2)
 
-El Comprador sube el PDF de un proveedor y el sistema saca de ahí la tabla de precios, igual
+El Administrador sube el PDF de un proveedor y el sistema saca de ahí la tabla de precios, igual
 que de un Excel.
 
 **Why this priority**: algunos proveedores solo mandan PDF, y tipear esos precios es el
@@ -331,7 +344,7 @@ trabajo que el sistema viene a quitar.
 
 **Acceptance Scenarios**:
 
-1. **Given** el PDF de un proveedor, con el texto seleccionable, **When** el Comprador lo sube, **Then** el sistema extrae la tabla y la trata como cualquier otra lista: reconoce o pide las columnas (RF-03), muestra el resumen y la vista previa, y no guarda nada hasta aplicar.
+1. **Given** el PDF de un proveedor, con el texto seleccionable, **When** el Administrador lo sube, **Then** el sistema extrae la tabla y la trata como cualquier otra lista: reconoce o pide las columnas (RF-03), muestra el resumen y la vista previa, y no guarda nada hasta aplicar.
 2. **Given** un PDF escaneado, que es una imagen sin texto, **When** se lo sube, **Then** [NEEDS CLARIFICATION: cuando un proveedor manda un PDF escaneado (una imagen, sin texto), ¿el sistema tiene que leerlo igual reconociendo los caracteres, o alcanza con que avise que no puede y que hay que pedirle el Excel al proveedor?].
 3. **Given** un PDF del que no se pudo sacar ninguna tabla, **When** se lo sube, **Then** un mensaje dice que no se pudo leer y qué hacer, y el archivo queda guardado.
 
@@ -340,7 +353,7 @@ trabajo que el sistema viene a quitar.
 ### User Story 13 - Recibir las listas solas (Priority: P2)
 
 Las listas llegan al sistema sin que nadie baje ni suba un archivo: desde el correo del
-negocio o desde el portal del proveedor. El Comprador solo revisa el resumen y aplica.
+negocio o desde el portal del proveedor. El Administrador solo revisa el resumen y aplica.
 
 **Why this priority**: quita el paso manual de cada semana, pero subir el archivo a mano
 sigue estando siempre disponible.
@@ -358,7 +371,7 @@ negocio y ver la lista lista para revisar, sin haber tocado nada.
 6. **Given** una lista bajada de un portal que es idéntica a la última, **When** se la compara, **Then** no se crea nada.
 7. **Given** un portal que cambió y cuya descarga falla, **When** corre la descarga programada, **Then** el Administrador recibe un aviso con el error en castellano, queda el registro de la ejecución y no se reintenta a ciegas.
 8. **Given** una lista que llegó sola, por cualquier canal, **When** nadie la aplicó, **Then** no cambia ningún costo: nunca se aplica una lista sin que una persona la confirme.
-9. **Given** una lista que llegó sola, **When** queda lista para revisar, **Then** se avisa a quien tiene que revisarla [NEEDS CLARIFICATION: cuando una lista llega sola, ¿a quién se le avisa (Administrador, Comprador o los dos) y por dónde (dentro de la aplicación, por WhatsApp, por correo)?].
+9. **Given** una lista que llegó sola, **When** queda lista para revisar, **Then** se avisa a quien tiene que revisarla [NEEDS CLARIFICATION: cuando una lista llega sola, ¿por dónde se le avisa al Administrador (dentro de la aplicación, por WhatsApp, por correo)?].
 10. **Given** un proveedor con portal, **When** se quiere automatizar su descarga, **Then** [NEEDS CLARIFICATION: ¿qué proveedores autorizaron el acceso automático a su portal, o entregan una exportación oficial? Sin esa autorización no se automatiza la descarga de ninguno].
 
 ---
@@ -389,7 +402,7 @@ puntos en el historial del producto.
 Después de aplicar una lista, el Vendedor ve qué productos necesitan atención: los que
 cambiaron de precio de venta, los nuevos que todavía no tienen margen y las subas grandes.
 
-**Why this priority**: sin el aviso, la góndola queda con precios viejos y los productos
+**Why this priority**: sin el aviso, la estantería queda con precios viejos y los productos
 nuevos quedan sin precio.
 
 **Independent Test**: aplicar una lista que sube algunos costos y trae productos nuevos, y
@@ -398,10 +411,10 @@ comparar el aviso con los productos afectados.
 **Acceptance Scenarios**:
 
 1. **Given** una lista recién aplicada, **When** el Vendedor abre el aviso de esa lista, **Then** ve exactamente los productos afectados y ninguno más.
-2. **Given** una lista que trajo productos nuevos, **When** se mira el aviso, **Then** figuran los productos nuevos sin margen elegido, y desde ahí se les puede elegir.
+2. **Given** una lista que trajo productos nuevos, **When** se mira el aviso, **Then** figuran los productos nuevos sin margen elegido, y desde ahí el Administrador se lo elige.
 3. **Given** una lista con costos que subieron más que un umbral, **When** se mira el aviso, **Then** esas subas figuran aparte para revisarlas [NEEDS CLARIFICATION: ¿a partir de qué porcentaje de suba del costo hay que avisar para revisar el producto (por ejemplo 15 %), y quién puede cambiar ese porcentaje?].
-4. **Given** una lista que cambió el costo de productos con margen elegido, **When** el precio de venta redondeado de un producto cambió, **Then** figura para remarcar con el precio anterior y el nuevo; si el costo cambió y el precio redondeado quedó igual, no figura [NEEDS CLARIFICATION: ¿«remarcar» es cambiar el precio escrito en la góndola de todo producto cuyo precio de venta cambió? La regla original hablaba además de productos con precio fijado a mano, que en el catálogo ya no existen; ¿hay algún otro caso que tenga que aparecer en el aviso?].
-5. **Given** el aviso de una lista, **When** existan las etiquetas de góndola (RF-57), **Then** se pueden imprimir solo las de los productos que cambiaron.
+4. **Given** una lista que cambió el costo de productos con margen elegido, **When** el precio de venta redondeado de un producto cambió, **Then** figura para remarcar con el precio anterior y el nuevo; si el costo cambió y el precio redondeado quedó igual, no figura [NEEDS CLARIFICATION: ¿«remarcar» es cambiar el precio escrito en la estantería de todo producto cuyo precio de venta cambió? La regla original hablaba además de productos con precio fijado a mano, que en el catálogo ya no existen; ¿hay algún otro caso que tenga que aparecer en el aviso?].
+5. **Given** el aviso de una lista, **When** existan las etiquetas de estantería (RF-57), **Then** se pueden imprimir solo las de los productos que cambiaron.
 
 ---
 
@@ -503,27 +516,27 @@ catálogo y ver si aparece entre los primeros resultados.
 
 ### Functional Requirements
 
-- **RF-01**: El sistema DEBE cargar la lista de precios de un proveedor subiendo el archivo Excel: reconoce el proveedor por el archivo y permite corregirlo, muestra qué cambia (productos leídos, nuevos, los que cambian de precio con su variación promedio, sin cambio, los que ya no aparecen y las filas salteadas con su motivo) y recién al confirmar crea los productos nuevos, agrega los costos y da de baja lo que ya no aparece. Nada se guarda hasta confirmar y la lista se puede descartar. El archivo original se guarda siempre, con su fecha, también cuando no se reconoce. Cargar una lista lleva menos de un minuto. [NEEDS CLARIFICATION: ¿qué es exactamente «dar de baja» un producto que ya no aparece en la lista nueva de su proveedor? ¿Deja de verse en la búsqueda y de poder venderse, o solo deja de tener costo de ese proveedor? ¿Qué pasa si tiene stock, o si lo vende otro proveedor? ¿Vuelve solo si reaparece en una lista posterior?] [NEEDS CLARIFICATION: ¿qué rol puede cargar, aplicar y descartar listas de precios? La propuesta sin confirmar es el Comprador.]
+- **RF-01**: El sistema DEBE cargar la lista de precios de un proveedor subiendo el archivo Excel: reconoce el proveedor por el archivo y permite corregirlo, muestra qué cambia (productos leídos, nuevos, los que cambian de precio con su variación promedio, sin cambio, los que ya no aparecen y las filas salteadas con su motivo) y recién al confirmar crea los productos nuevos, agrega los costos y da de baja lo que ya no aparece. Nada se guarda hasta confirmar y la lista se puede descartar. El archivo original se guarda siempre, con su fecha, también cuando no se reconoce. Cargar una lista lleva menos de un minuto. [NEEDS CLARIFICATION: ¿qué es exactamente «dar de baja» un producto que ya no aparece en la lista nueva de su proveedor? ¿Deja de verse en la búsqueda y de poder venderse, o solo deja de tener costo de ese proveedor? ¿Qué pasa si tiene stock, o si lo vende otro proveedor? ¿Vuelve solo si reaparece en una lista posterior?] Cargar, aplicar y descartar listas es del Administrador (decisión 15).
 - **RF-01b**: Desde un producto se DEBE poder bajar el archivo original de la lista de la que salió su costo, sin modificar y con su nombre.
 - **RF-02**: El sistema DEBE cargar listas que llegan en PDF con texto, extrayendo su tabla y tratándola como cualquier otra lista (RF-01, RF-03). [NEEDS CLARIFICATION: cuando un proveedor manda un PDF escaneado (una imagen, sin texto), ¿el sistema tiene que leerlo igual reconociendo los caracteres, o alcanza con que avise que no puede y que hay que pedirle el Excel al proveedor?]
 - **RF-03**: El sistema DEBE cargar la lista de cualquier proveedor nuevo sin programar un lector a medida: detecta el encabezado y las columnas por sus nombres habituales, guarda por proveedor qué columna es qué y, cuando no puede reconocerlas o el formato cambió, lo pregunta en vez de fallar y guarda la respuesta. De cada proveedor se registran formato, IVA, descuentos, frecuencia de cambio y canal por el que llega la lista.
-- **RF-04**: El sistema DEBE recibir las listas solas, desde el correo del negocio (leído con permiso de solo lectura) y desde el portal web del proveedor (con el usuario del negocio, en forma programada). Toda lista que llega sola queda para revisar y nunca se aplica sin que una persona la confirme. El proveedor se reconoce por el archivo, no por el remitente; lo que no se reconoce queda en una bandeja para asignarle proveedor una vez. Las descargas programadas dejan registro de cada ejecución y de sus errores. Subir el archivo a mano está siempre disponible. [NEEDS CLARIFICATION: ¿cuánto puede tardar en aparecer una lista desde que llega el correo? Una fuente dice menos de 10 minutos y otra que el correo se revisa cada 15 minutos.] [NEEDS CLARIFICATION: cuando una lista llega sola, ¿a quién se le avisa (Administrador, Comprador o los dos) y por dónde (dentro de la aplicación, por WhatsApp, por correo)?] [NEEDS CLARIFICATION: ¿qué proveedores autorizaron el acceso automático a su portal, o entregan una exportación oficial? Sin esa autorización no se automatiza la descarga de ninguno.]
+- **RF-04**: El sistema DEBE recibir las listas solas, desde el correo del negocio (leído con permiso de solo lectura) y desde el portal web del proveedor (con el usuario del negocio, en forma programada). Toda lista que llega sola queda para revisar y nunca se aplica sin que una persona la confirme. El proveedor se reconoce por el archivo, no por el remitente; lo que no se reconoce queda en una bandeja para asignarle proveedor una vez. Las descargas programadas dejan registro de cada ejecución y de sus errores. Subir el archivo a mano está siempre disponible. [NEEDS CLARIFICATION: ¿cuánto puede tardar en aparecer una lista desde que llega el correo? Una fuente dice menos de 10 minutos y otra que el correo se revisa cada 15 minutos.] [NEEDS CLARIFICATION: cuando una lista llega sola, ¿por dónde se le avisa al Administrador (dentro de la aplicación, por WhatsApp, por correo)?] [NEEDS CLARIFICATION: ¿qué proveedores autorizaron el acceso automático a su portal, o entregan una exportación oficial? Sin esa autorización no se automatiza la descarga de ninguno.]
 - **RF-05**: Cada artículo DEBE guardar el código de cada proveedor que lo vende, y se lo encuentra y se lo reconoce en la lista siguiente por ese código. Se empieza con pocos proveedores y se suman de a poco; el catálogo DEBE funcionar igual con más de 100.000 artículos (RNF-08).
-- **RF-06**: Un mismo artículo vendido por varios proveedores DEBE poder unirse en uno solo: se ve quién lo vende, a qué costo y quién es el más barato, y se elige de cuál sale el costo sobre el que se calcula el precio de venta. El sistema sugiere los duplicados (mismo código de barras o descripción similar), al aplicar una lista y a pedido, y una persona confirma; también se unen a mano, una sugerencia se puede rechazar y dos productos unidos se pueden volver a separar dejando todo como estaba. [NEEDS CLARIFICATION: ¿qué rol puede unir, rechazar y separar duplicados? El contrato del servidor lo reserva al Administrador.] [NEEDS CLARIFICATION: ¿a partir de cuántos días sin lista nueva deja de valer el costo de un proveedor para elegirlo como el más barato, y a partir de cuántos días se avisa que la lista de un proveedor está vieja?] [NEEDS CLARIFICATION: cuando una lista nueva deja más barato a un proveedor que no era el que estaba en uso, ¿el costo pasa solo al más barato, o se mantiene el que estaba en uso hasta que alguien lo cambie? Si alguien había elegido el proveedor a mano, ¿se respeta esa elección?] [NEEDS CLARIFICATION: al unir dos productos, sus costos, ventas, compras y movimientos de stock históricos pasan a nombre del producto que se conserva, y vuelven a su lugar si se separan. ¿Se acepta eso como excepción a «los históricos no se modifican», o al unir no se debe tocar ningún registro histórico?]
+- **RF-06**: Un mismo artículo vendido por varios proveedores DEBE poder unirse en uno solo: se ve quién lo vende, a qué costo y quién es el más barato, y se elige de cuál sale el costo sobre el que se calcula el precio de venta. El sistema sugiere los duplicados (mismo código de barras o descripción similar), al aplicar una lista y a pedido, y una persona confirma; también se unen a mano, una sugerencia se puede rechazar y dos productos unidos se pueden volver a separar dejando todo como estaba. Unir, rechazar y separar duplicados es del Administrador (decisión 15). [NEEDS CLARIFICATION: ¿a partir de cuántos días sin lista nueva deja de valer el costo de un proveedor para elegirlo como el más barato, y a partir de cuántos días se avisa que la lista de un proveedor está vieja?] [NEEDS CLARIFICATION: cuando una lista nueva deja más barato a un proveedor que no era el que estaba en uso, ¿el costo pasa solo al más barato, o se mantiene el que estaba en uso hasta que alguien lo cambie? Si alguien había elegido el proveedor a mano, ¿se respeta esa elección?] [NEEDS CLARIFICATION: al unir dos productos, sus costos, ventas, compras y movimientos de stock históricos pasan a nombre del producto que se conserva, y vuelven a su lugar si se separan. ¿Se acepta eso como excepción a «los históricos no se modifican», o al unir no se debe tocar ningún registro histórico?]
 - **RF-07**: Se DEBE poder buscar un producto por nombre, marca, código del proveedor o código de barras, sin saber el proveedor, con varias palabras en cualquier orden, sin acentos ni mayúsculas, tolerando un error de tipeo, con el resultado mientras se escribe. La búsqueda funciona sin conexión, sobre el catálogo guardado en el dispositivo, y responde en menos de 100 ms. Cada resultado muestra descripción, marca, proveedor, precio de venta y precio por bulto si existe.
 - **RF-08**: El código de barras se DEBE leer con la cámara del celular, que es el único lector del local, también sin conexión. Para usarlo en la computadora, el celular se vincula leyendo un QR y lo que escanea aparece en la computadora. Un código que no está en el catálogo se asocia al producto que se elija. Si la cámara no lee, el código se puede tipear.
 - **RF-09**: Desde el celular se DEBE poder sacarle una foto al producto y guardarla en su ficha. La foto chica se amplía al tocarla y desde ahí se saca otra que la reemplaza. La foto se ve en la búsqueda, en la venta y en el conteo; un producto sin foto muestra un ícono, nunca una imagen rota.
 - **RF-09b**: Se DEBE poder encontrar un producto sin código de barras sacándole una foto. Es de una etapa posterior (segunda versión). [NEEDS CLARIFICATION: para buscar por foto, ¿contra qué se compara la foto que saca el Vendedor: contra las fotos que el local ya sacó de cada producto (RF-09), contra las del catálogo del proveedor, o reconociendo lo que dice el envase?]
-- **RF-10**: El precio de venta DEBE ser costo + margen + IVA del producto, redondeado según RF-19. El margen se elige con un toque o un atajo de teclado entre 300, 200, 100, 50 y 25 %, o a mano, y queda guardado por producto. En el catálogo, «a mano» es un porcentaje entero de margen, no un precio. Un producto sin margen elegido se muestra «sin precio». Cuando cambia el costo, el precio se recalcula con el margen guardado. [NEEDS CLARIFICATION: ¿qué rol puede elegir y cambiar el margen de un producto: solo el Administrador, o también el Vendedor y el Comprador?]
+- **RF-10**: El precio de venta DEBE ser costo + margen + IVA del producto, redondeado según RF-19. El margen se elige con un toque o un atajo de teclado entre 300, 200, 100, 50 y 25 %, o a mano, y queda guardado por producto. En el catálogo, «a mano» es un porcentaje entero de margen, no un precio. Un producto sin margen elegido se muestra «sin precio». Cuando cambia el costo, el precio se recalcula con el margen guardado. Elegir y cambiar el margen de un producto es del Administrador (decisión 15); qué hace quien es solo Vendedor ante un producto sin precio está preguntado en la capacidad de usuarios y acceso (P10).
 - **RF-11**: El costo DEBE ser comparable entre proveedores: lo que realmente se paga, sin IVA, calculado igual para todos. Costo = precio de lista (sin IVA si lo incluía) − descuento general − descuento por pago contado − ofertas vigentes, aplicados en cascada. Cada proveedor tiene su configuración (precios con o sin IVA, descuento general, descuento por contado), que carga el Administrador. Se guardan todos los números intermedios y el IVA aparte. El costo de diez productos elegidos a mano coincide con la factura. [NEEDS CLARIFICATION: la regla del costo del 2026-09-13 (lista − descuento general − descuento por contado − ofertas vigentes, sin IVA) figura como no cerrada por Carlos. ¿Queda aprobada tal cual? En particular: ¿las ofertas que trae la planilla de un proveedor bajan el costo del producto mientras duran?]
 - **RF-12**: Un producto se DEBE poder vender por unidad, con cantidades enteras, o fraccionado por kilo, metro o litro, con hasta un decimal. La unidad queda guardada en el producto.
-- **RF-13**: Todo número calculado DEBE explicar de dónde sale, paso a paso, en castellano simple y con los números de origen: el costo, con la fecha de la lista, el precio de lista, el IVA si lo incluía y cada descuento en orden; el precio de venta, con costo, margen, IVA y redondeo. La explicación se ve igual en todos los lugares donde aparece el número, y ningún número se calcula sin su explicación. [NEEDS CLARIFICATION: ¿qué roles pueden ver el costo de un producto y su explicación? ¿El Vendedor lo ve en el mostrador, o solo el Administrador y el Comprador?]
+- **RF-13**: Todo número calculado DEBE explicar de dónde sale, paso a paso, en castellano simple y con los números de origen: el costo, con la fecha de la lista, el precio de lista, el IVA si lo incluía y cada descuento en orden; el precio de venta, con costo, margen, IVA y redondeo. La explicación se ve igual en todos los lugares donde aparece el número, y ningún número se calcula sin su explicación. El costo de un producto y su explicación los ve el Administrador (decisión 15); si el Comprador los ve al registrar una compra y el Vendedor al vender está preguntado en la capacidad de usuarios y acceso (P10).
 - **RF-14**: Se DEBE poder ver el historial de precios de un producto: la evolución del costo, por proveedor y con la fecha de cada lista, y la del precio de venta. Cada lista aplicada que cambia un costo suma un punto; nunca se pisa un precio.
-- **RF-15**: Después de aplicar una lista, el sistema DEBE avisar qué productos hay que remarcar: los que cambiaron de precio de venta, los nuevos sin margen elegido y las subas de costo mayores a un umbral configurable; y permitir imprimir las etiquetas solo de los que cambiaron (RF-57). El aviso trae exactamente los productos afectados. [NEEDS CLARIFICATION: ¿a partir de qué porcentaje de suba del costo hay que avisar para revisar el producto (por ejemplo 15 %), y quién puede cambiar ese porcentaje?] [NEEDS CLARIFICATION: ¿«remarcar» es cambiar el precio escrito en la góndola de todo producto cuyo precio de venta cambió? La regla original hablaba además de productos con precio fijado a mano, que en el catálogo ya no existen; ¿hay algún otro caso que tenga que aparecer en el aviso?]
+- **RF-15**: Después de aplicar una lista, el sistema DEBE avisar qué productos hay que remarcar: los que cambiaron de precio de venta, los nuevos sin margen elegido y las subas de costo mayores a un umbral configurable; y permitir imprimir las etiquetas solo de los que cambiaron (RF-57). El aviso trae exactamente los productos afectados. [NEEDS CLARIFICATION: ¿a partir de qué porcentaje de suba del costo hay que avisar para revisar el producto (por ejemplo 15 %), y quién puede cambiar ese porcentaje?] [NEEDS CLARIFICATION: ¿«remarcar» es cambiar el precio escrito en la estantería de todo producto cuyo precio de venta cambió? La regla original hablaba además de productos con precio fijado a mano, que en el catálogo ya no existen; ¿hay algún otro caso que tenga que aparecer en el aviso?]
 - **RF-16**: El sistema DEBE ayudar a decidir el margen con datos en vez de a ojo, por costeo por absorción: reparte los gastos fijos del negocio entre los productos, calcula el costo total de cada uno, compara el precio vigente con el que sale de ese costo y sugiere el margen, con su explicación (RF-13). Es de una etapa posterior: necesita los gastos fijos (RF-64). [NEEDS CLARIFICATION: ¿con qué criterio se reparten los gastos fijos (alquiler, sueldo, servicios, impuestos) entre los productos: por unidad vendida, por valor vendido, por rotación o por familia de productos?]
 - **RF-17**: Los descuentos puntuales de un proveedor se DEBEN trasladar al precio de venta mientras duran: entran en el costo como un paso más y dejan de valer solos al terminar. [NEEDS CLARIFICATION: ¿cómo se entera el sistema de un descuento puntual: lo trae la lista del proveedor como oferta, lo carga alguien a mano, o las dos cosas? ¿Quién lo carga, hasta cuándo vale cuando el proveedor no dice la fecha de fin, y el precio de venta tiene que bajar siempre o solo si alguien lo aprueba?]
 - **RF-18**: Se DEBE poder buscar proveedores y ver su ficha: datos de contacto, listas cargadas y qué venden. [NEEDS CLARIFICATION: ¿qué datos de contacto de un proveedor hay que guardar (nombre del vendedor, teléfono, WhatsApp, correo, dirección, CUIT, usuario de su portal) y quién puede verlos y cambiarlos?]
-- **RF-19**: Toda venta DEBE ser múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto y el precio puesto a mano. El redondeo figura en la explicación. [NEEDS CLARIFICATION: cuando en una venta se pone un precio a mano que no es múltiplo de $1.000 (por ejemplo $1.500), ¿se cobra redondeado para arriba ($2.000), como dice la regla, o el precio a mano se respeta tal cual?]
+- **RF-19**: Toda venta DEBE ser múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta que calcula el sistema se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto; el redondeo figura en la explicación. La única excepción es el precio puesto a mano en una venta (RF-20b), incluido el del ítem libre: se respeta tal cual, su renglón no se redondea (vale precio × cantidad) y, si el importe del renglón no es múltiplo de $1.000, la venta muestra un aviso que lo dice. El aviso no impide cobrar y desaparece solo si el importe pasa a ser múltiplo de $1.000 (decisión 16 del 2026-10-10).
 
 ### Key Entities *(include if feature involves data)*
 
@@ -548,7 +561,7 @@ El detalle está en [data-model.md](data-model.md) y el contrato del servidor en
 - **SC-004**: Cargar una lista (subir, revisar y aplicar) lleva menos de un minuto y no requiere manual.
 - **SC-005**: Volver a cargar una lista ya aplicada no agrega ningún costo ni ningún producto.
 - **SC-006**: El costo de diez productos elegidos a mano coincide con lo que se pagó en la factura.
-- **SC-007**: Todo precio de venta y todo renglón de venta es múltiplo de $1.000 y nunca queda por debajo del precio calculado.
+- **SC-007**: Todo precio de venta calculado y todo renglón de venta sin precio a mano es múltiplo de $1.000 y nunca queda por debajo del precio calculado; un renglón con precio a mano que no es múltiplo de $1.000 siempre muestra su aviso.
 - **SC-008**: Elegir un margen y ver el precio lleva un solo toque o una sola acción de teclado, y el precio se ve en menos de 100 ms.
 - **SC-009**: El Vendedor o el Administrador explican cualquier precio que se ve sin abrir un Excel.
 - **SC-010**: Unir dos productos y volver a separarlos deja cada venta, costo y movimiento de stock en el producto donde estaba.
@@ -559,11 +572,11 @@ El detalle está en [data-model.md](data-model.md) y el contrato del servidor en
 
 ## Assumptions
 
-- **Roles.** Las historias nombran los roles de RF-72 (Administrador, Vendedor, Comprador). Está decidido que administrar es del Administrador, vender del Vendedor y recibir mercadería del Comprador; quién carga listas, elige márgenes, une duplicados y ve costos está preguntado en RF-01, RF-10, RF-06 y RF-13. Hasta que se responda, las historias usan la propuesta: listas en el Comprador, márgenes en el Vendedor, duplicados y proveedores en el Administrador.
+- **Roles.** Administrar es del Administrador, vender del Vendedor y recibir mercadería del Comprador (decisión 8). Por la decisión 15 del 2026-10-10, cargar listas, elegir márgenes, unir duplicados y ver costos son, por ahora, del Administrador. Las historias 5, 6, 10, 14, 15 y 17 nombran al Vendedor o al Comprador porque así estaban en los casos de uso; mientras «ver costos» sea solo del Administrador, lo que en ellas muestra un costo lo ve quien tenga ese rol. Qué ven el Vendedor y el Comprador en esas historias depende de la pregunta P10 de la capacidad de usuarios y acceso.
 - **Las dos interfaces.** Todo lo que tiene interfaz se especifica para computadora y celular (ADR-014); lo que exige cada una está en [ux.md](ux.md).
 - **Sin conexión.** Buscar, ver precios, elegir márgenes y escanear en el celular funcionan sin conexión (ADR-005); cargar y aplicar listas, unir duplicados, subir fotos y vincular el celular con la computadora necesitan conexión.
 - **Las listas reales de los proveedores no son públicas** (RNF-43): la lectura completa de las listas reales se comprueba donde estén disponibles; para las pruebas automáticas se usan muestras anonimizadas.
 - **La cámara real no se puede automatizar:** la lectura del código con la cámara se valida en el celular del local; las pruebas automáticas mandan el código por el mismo camino que usa el escáner.
-- **Precio a mano en una venta** (RF-20b) y el registro de la venta pertenecen a la capacidad de ventas; acá solo está la regla de redondeo que se les aplica (RF-19).
+- **Precio a mano en una venta** (RF-20b) y el registro de la venta pertenecen a la capacidad de ventas; acá solo está la regla que se les aplica: no se redondea y avisa (RF-19).
 - **El stock en los resultados de búsqueda** pertenece a la capacidad de compras y stock.
 - Depende de la capacidad de usuarios y acceso para saber quién hace cada cosa (RF-70 a RF-74) y de los gastos fijos (RF-64) para RF-16.

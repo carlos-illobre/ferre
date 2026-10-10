@@ -25,13 +25,14 @@ sistema visual del proyecto.
 - **Lo que tarda muestra su avance** con números (cuánto va de cuánto), no un indicador sin
   fin.
 - **Todo número calculado se puede tocar** (o alcanzar con teclado) y muestra su explicación
-  paso a paso (RF-13). La explicación tiene la misma forma en todos lados.
+  paso a paso (RF-13). La explicación tiene la misma forma en todos lados, y se nota a
+  simple vista qué números la tienen (ver los requerimientos de interfaz generales).
 - **Cada recorrido se explica solo:** el estado vacío dice qué hacer para empezar.
 - **Palabras del mostrador** (son regla): «lista» y no «importación»; «costo» y no «precio de
   compra»; «margen»; «precio» para el de venta; «sin precio» para el producto sin margen
   elegido; «sin costo» para el que ningún proveedor cotizó; «es el mismo» y «son distintos»
   para los duplicados; «unir» y «separar»; «suelto» o por kilo, metro, litro; «aplicar» y
-  «descartar» para una lista. Se nombra el rol, nunca a la persona.
+  «descartar» para una lista; «estantería», nunca «góndola». Se nombra el rol, nunca a la persona.
 - **Plata:** siempre con signo $, punto de miles y, donde hay centavos, coma. Los
   porcentajes, con el signo %.
 
@@ -67,7 +68,8 @@ tocar un resultado abre su ficha.
 
 ## Elegir el margen y ver el precio (historia 2 · RF-10, RF-13, RF-19)
 
-**Rol:** Vendedor.
+**Rol:** Administrador. Quien no lo es ve el precio y no las opciones de margen ni el costo
+(decisión 15 del 2026-10-10).
 
 **Tiene que poder:** elegir una de las cinco opciones (300 / 200 / 100 / 50 / 25 %) con un
 solo toque o una sola acción de teclado; tipear otro porcentaje; quitar el margen; ver al
@@ -104,7 +106,7 @@ porcentaje a mano abre el teclado numérico.
 
 ## Cargar la lista de un proveedor (historias 3, 11 y 12 · RF-01, RF-02, RF-03)
 
-**Rol:** Comprador.
+**Rol:** Administrador (decisión 15 del 2026-10-10).
 
 **Tiene que poder, en este orden:** entregar el archivo (elegirlo o, en la computadora,
 arrastrarlo); corregir el proveedor si el sistema no lo reconoció o lo reconoció mal; indicar
@@ -275,12 +277,12 @@ unidad.
 
 ## Listas que llegan solas (historia 13 · RF-04)
 
-**Rol:** Comprador para revisar; Administrador para autorizar la casilla y los portales.
+**Rol:** Administrador, para revisar y para autorizar la casilla y los portales.
 
 **Tiene que poder:** ver las listas que llegaron solas junto con las que esperan revisión,
 con de dónde vino cada una (correo o portal) y cuándo; abrir el correo original; asignar
 proveedor a los adjuntos que no se reconocieron; revisar y aplicar igual que una lista subida
-a mano. El Administrador, además: autorizar y quitar el acceso a la casilla, cargar el
+a mano. Además: autorizar y quitar el acceso a la casilla, cargar el
 usuario de un portal, ver las ejecuciones programadas con su resultado y su error.
 
 **Estados:** nada nuevo (lo dice, con cuándo se revisó por última vez); adjuntos sin
@@ -307,7 +309,7 @@ después; ver por separado los que cambiaron de precio (precio anterior y nuevo)
 sin margen y las subas grandes; elegir el margen de los nuevos ahí mismo; imprimir etiquetas de los
 que cambiaron.
 
-**Celular:** es el recorrido que se hace caminando la góndola: una mano, un producto por vez,
+**Celular:** es el recorrido que se hace caminando las estanterías: una mano, un producto por vez,
 foto y precio nuevo bien visibles.
 
 **Estados:** nada para remarcar (lo dice).

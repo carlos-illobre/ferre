@@ -31,7 +31,7 @@ Un ticket: agrupa los renglones del cuaderno de un mismo cliente.
 | `fecha` | timestamptz, obligatorio | Cuándo se vendió (la hora del dispositivo; si no viene, la del servidor) |
 | `cliente_id` | uuid → `cliente` | Solo si es a un cliente importante |
 | `medio_pago` | texto, obligatorio | `efectivo`, `mercado_pago`, `tarjeta` o `cuenta_corriente` |
-| `total` | numeric(12,2), ≥ 0 | Suma de los renglones, cada uno redondeado para arriba a $1.000 (RF-19) |
+| `total` | numeric(12,2), ≥ 0 | Suma de los renglones. Cada renglón calculado se redondea para arriba a $1.000; el que lleva un precio puesto a mano (sin margen aplicado) vale precio × cantidad, sin redondear (RF-19, decisión del 2026-10-10) |
 | `estado` | texto | `confirmada` (por omisión) o `anulada` |
 | `pagada_en` | timestamptz | Solo cuenta corriente: cuándo pagó el cliente (RF-40, capacidad de Clientes) |
 | `dispositivo_id` | texto | Desde qué dispositivo se creó |

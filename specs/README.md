@@ -30,7 +30,7 @@ Los roles, los actores y qué puede cada uno están en
 | Dónde | Qué tiene |
 |---|---|
 | [La constitución](../.specify/memory/constitution.md) | Lo que no se negocia y el flujo de trabajo |
-| [001-base-del-sistema](001-base-del-sistema/) | Lo que vale para todo: los requerimientos no funcionales (`spec.md`), la arquitectura decidida (`plan.md`), el modelo de datos completo (`data-model.md`) y cómo se levanta y se prueba (`quickstart.md`) |
+| [001-base-del-sistema](001-base-del-sistema/) | Lo que vale para todo: los requerimientos no funcionales (`spec.md`), los requerimientos de interfaz generales y todo lo que Carlos pidió sobre las pantallas (`ux.md`), la arquitectura decidida (`plan.md`), el modelo de datos completo (`data-model.md`) y cómo se levanta y se prueba (`quickstart.md`) |
 | `002` a `007` | Una por capacidad, con todos sus requerimientos: `spec.md` (historias, escenarios de aceptación y requerimientos), `ux.md` (requerimientos de interfaz, sin atarse a un diseño), `data-model.md` y `contracts/api.md` (el contrato del servidor) y, donde hubo relevamiento, `research.md` |
 | `008` en adelante | Una por funcionalidad nueva, con el flujo de la constitución |
 | [preguntas-abiertas.md](preguntas-abiertas.md) | Lo que todavía no está decidido. Cada pregunta está marcada en su `spec.md` como `[NEEDS CLARIFICATION]` |
@@ -67,7 +67,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
 | RF-16 | Ayudar a decidir el margen con datos (costeo por absorción: costos fijos, rotación) en vez de a ojo | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
 | RF-17 | Descuentos puntuales de un proveedor que se trasladan al precio de venta mientras duran | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
 | RF-18 | Buscar proveedores y ver su ficha: datos de contacto, listas cargadas, qué venden | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
-| RF-19 | Toda venta es múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto y el precio a mano | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
+| RF-19 | Toda venta es múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto. Un precio puesto a mano se respeta tal cual y, si no es múltiplo de $1.000, la venta lo avisa | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
 
 ### Ventas
 
@@ -145,7 +145,7 @@ Los que son reglas generales están además en la constitución.
 | RNF-01 | Curva de aprendizaje cero: un Vendedor nuevo vende el primer día sin manual | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-02 | Nunca más lento que el cuaderno y la calculadora: una venta de 3 productos en menos de 20 segundos | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-03 | Mínimo esfuerzo manual: no se tipea nada que se pueda sacar de una lista, un código de barras o una foto | [001-base-del-sistema](001-base-del-sistema/spec.md) |
-| RNF-04 | Celular: la interfaz actual se conserva tal como está, en pantallas de menos de 900 px. Se parece a una app nativa y ninguna pantalla se desplaza hacia el costado | [001-base-del-sistema](001-base-del-sistema/spec.md) |
+| RNF-04 | Celular: se usa con una mano, se parece a una app nativa y ninguna pantalla se desplaza hacia el costado. Es la interfaz de las pantallas de menos de 900 px | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-05 | Computadora: usa todo el ancho de la pantalla, se ve prolija y se maneja con teclado, sin cambiar nada del celular. Es una interfaz propia: tablas, menú completo y atajos de teclado, con la misma paleta y la misma marca que el celular (ADR-014) | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-06 | Todo en castellano, con las palabras del mostrador; los errores dicen qué hacer | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-07 | Búsqueda y cambio de margen responden en menos de 100 ms | [001-base-del-sistema](001-base-del-sistema/spec.md) |
@@ -219,6 +219,6 @@ están en el historial de git.
 | Modelo de datos | `001-base-del-sistema/data-model.md` y el `data-model.md` de cada capacidad |
 | Seguridad | Constitución (principio VII) y `001-base-del-sistema/plan.md` |
 | Pruebas | Constitución (principio VI) y `001-base-del-sistema/quickstart.md` |
-| Guía de interfaz | Constitución (principio II), `docs/sistema-visual.md` y el `ux.md` de cada capacidad |
+| Guía de interfaz | Constitución (principio II), `001-base-del-sistema/ux.md`, `docs/sistema-visual.md` y el `ux.md` de cada capacidad |
 | Despliegue y configuración de Google | `docs/operacion/` |
 | Reglas para agentes | Constitución; `CLAUDE.md` quedó como guía corta |

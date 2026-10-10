@@ -2,7 +2,9 @@
 
 Reglas de negocio que ninguna fuente define. Salieron el 2026-10-10 al escribir las
 especificaciones completas: en vez de inventar una regla, cada vacío quedó como pregunta.
-Son 146. Cada una está marcada en su `spec.md` con `[NEEDS CLARIFICATION]`.
+Ese mismo día Carlos respondió las del precio a mano, los actores y el reparto provisorio
+de permisos (decisiones 13 a 17), y la revisión contra el historial sumó cuatro.
+Son 142. Cada una está marcada en su `spec.md` con `[NEEDS CLARIFICATION]`.
 
 Solo Carlos las puede contestar. Cada respuesta se anota con su fecha en
 [docs/decisiones-de-negocio.md](../docs/decisiones-de-negocio.md) y en la sección
@@ -14,106 +16,102 @@ historia de las demás capacidades.
 
 ### Generales
 
-1. **La interfaz de celular.** El 2026-10-09 se decidió que «la interfaz de celular queda como está». Después Carlos dijo que quiere rehacer el frontend porque está mal. ¿La regla de conservar el celular sigue valiendo, o el celular también se rediseña?
+1. **El rediseño de la interfaz.** Carlos decidió el 2026-10-10 rehacer toda la interfaz. De lo que hoy está escrito sobre ella, ¿qué es regla para el rediseño y qué es solo cómo está hecha hoy? En particular: que sean dos interfaces separadas elegidas por el ancho de la pantalla, con el corte en 900 px (ADR-014; constitución, principio III); en el celular, cuatro pestañas abajo, tarjetas y hojas que suben; en la computadora, tablas a todo el ancho, menú completo y edición en la fila.
 2. **El sistema visual.** ¿Se conservan la paleta (tinta, niebla, coral), la tipografía de los importes y la marca «fe», o el rediseño puede cambiarlos?
-3. **Lector de códigos.** Un issue viejo hablaba de «lector USB o cámara del celular»; la regla actual dice que el único lector es la cámara del celular, y el código conserva un camino para lector USB. ¿Se quita, o se deja por si algún día se compra un lector?
-4. **El conteo abierto.** La regla dice que nada se borra, pero en un conteo sin cerrar lo contado se puede corregir o quitar. ¿Vale tratar el conteo abierto como un borrador y que el histórico empiece al cerrarlo?
+3. **La maqueta del celular.** La maqueta «Ferre iOS» no está en el repositorio: la carpeta de maquetas está excluida del control de versiones y solo quedaron adentro las siete imágenes de la primera. ¿Se sube como antecedente para quien rediseñe?
+4. **Ramas.** La constitución dice «una funcionalidad, una rama». El 2026-09-13 Carlos había pedido lo contrario: sin ramas ni pull requests, directo a la rama de pruebas. ¿Vale la regla nueva para toda funcionalidad, y quién une la rama al cerrar?
+5. **Lector de códigos.** Un issue viejo hablaba de «lector USB o cámara del celular»; la regla actual dice que el único lector es la cámara del celular, y el código conserva un camino para lector USB. ¿Se quita, o se deja por si algún día se compra un lector?
+6. **El conteo abierto.** La regla dice que nada se borra, pero en un conteo sin cerrar lo contado se puede corregir o quitar. ¿Vale tratar el conteo abierto como un borrador y que el histórico empiece al cerrarlo?
 
 ### Usuarios y acceso (007)
 
 Los tres roles (Administrador, Vendedor, Comprador) reemplazan a los anteriores; eso ya está decidido. Lo que falta:
 
 1. **RF-72.** ¿El rol Administrador, por sí solo, deja también vender y registrar compras, o solo administrar? Es decir: ¿quien es solo Administrador puede cobrar una venta, o necesita además el rol Vendedor?
-2. **RF-72.** ¿Qué rol o roles pueden hacer cada una de estas operaciones? Anular una venta · ver las ventas del día · contar stock · corregir stock · cargar listas de precios · elegir márgenes · unir duplicados · ver costos · dar de alta o modificar proveedores. La propuesta sin confirmar es listas, conteo y pedidos para el Comprador.
-3. **RF-72.** «Ver cómo va el negocio» es del Administrador: ¿es solo de él? ¿El Comprador ve los gastos de la semana cuando registra un ingreso, y el Vendedor ve el total vendido en el día?
+2. **RF-72.** La decisión 15 dejó en el Administrador siete operaciones. Queda una sin nombrar: ¿qué rol corrige el stock a mano? Y como regla general: ¿todo lo que no sea vender ni recibir mercadería es, por ahora, del Administrador? Eso alcanzaría a corregir una venta, cargar y modificar clientes, marcar pagada una cuenta corriente, cerrar la caja, armar pedidos, la deuda con proveedores, las etiquetas y el plan de conteo.
+3. **RF-72.** «Ver cómo va el negocio» y «ver las ventas del día» son del Administrador. ¿El Comprador ve los gastos de la semana cuando registra un ingreso? ¿Y quién cierra la caja, si el efectivo esperado sale de las ventas del día?
 4. **RF-72.** ¿Un Administrador puede desactivar o quitarle el rol a cualquier otro Administrador, incluido el Dueño? Antes el dueño estaba protegido de los demás administradores; con tres roles sin niveles esa protección desaparece, salvo que se decida conservarla.
 5. **RF-72.** ¿Un Administrador puede darse o quitarse a sí mismo los roles Vendedor y Comprador?
-6. **Actores.** Se habló de cinco actores y se nombraron cuatro (Dueño, Empleado, Cliente, Proveedor). ¿Cuál es el quinto, o son cuatro?
-7. **RF-70b.** En una computadora con lector de huella, ¿se puede vincular a mano y entrar con la huella, o la huella es solo del celular?
-8. **RF-72.** Una venta cobrada sin conexión por alguien a quien, antes de reconectar, se le quitó el rol Vendedor o se lo desactivó: ¿se registra igual al reconectar, o se rechaza?
-9. **RF-74.** Sin internet, ¿«Salir» lleva igual a la pantalla de entrada y la sesión se cierra en el servidor al reconectar, o no se puede salir sin conexión?
+6. **RF-70b.** En una computadora con lector de huella, ¿se puede vincular a mano y entrar con la huella, o la huella es solo del celular?
+7. **RF-72.** Una venta cobrada sin conexión por alguien a quien, antes de reconectar, se le quitó el rol Vendedor o se lo desactivó: ¿se registra igual al reconectar, o se rechaza?
+8. **RF-74.** Sin internet, ¿«Salir» lleva igual a la pantalla de entrada y la sesión se cierra en el servidor al reconectar, o no se puede salir sin conexión?
+9. **RF-72, RF-20, RF-50.** «Ver costos» y «elegir márgenes» quedaron para el Administrador, pero dos casos de uso dependen de ellos. La venta: el relevamiento dice que quien vende ve costo, margen y precio y elige el margen ahí mismo; ¿quien es solo Vendedor ve nada más que el precio? Ante un producto sin precio, ¿le pone el precio a mano o no lo puede vender? La compra: registrar un ingreso es cargar el costo de cada renglón; ¿quien es solo Comprador ve y carga esos costos? (P10 en la especificación.)
 
 ### Ventas (003)
 
 **Vender y cobrar**
-1. **RF-19, RF-20b.** Un precio puesto a mano que no es múltiplo de $1.000 ($1.500), ¿se respeta tal cual o se redondea para arriba ($2.000) como todo lo demás?
-2. **RF-21.** Si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión o «sin especificar») o se le exige elegir uno? El relevamiento dice que no tiene que frenar; el backend actual lo exige.
-3. **RF-20b.** ¿El Vendedor puede ver el costo y elegir o cambiar el margen en la venta, o eso es solo del Administrador?
+1. **RF-21.** Si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión o «sin especificar») o se le exige elegir uno? El relevamiento dice que no tiene que frenar; el backend actual lo exige.
 
 **Ítem libre (RF-22)**
-4. Cuando un ítem libre se guarda como producto nuevo, ¿qué precio tiene la próxima vez: el importe tipeado en esa venta, o queda sin precio hasta cargarle costo y margen?
-5. ¿Qué puede hacer el Administrador con la lista de ítems libres vendidos: convertir uno en producto, asociarlo a uno existente, marcarlo revisado?
+2. Cuando un ítem libre se guarda como producto nuevo, ¿qué precio tiene la próxima vez: el importe tipeado en esa venta, o queda sin precio hasta cargarle costo y margen?
+3. ¿Qué puede hacer el Administrador con la lista de ítems libres vendidos: convertir uno en producto, asociarlo a uno existente, marcarlo revisado?
 
 **Ventas del día (RF-23)**
-6. ¿Qué rol puede ver las ventas del día y de días anteriores, y cuál puede anular o corregir una venta?
-7. Al anular una venta, ¿se pide confirmación? ¿Se pide el motivo, obligatorio u opcional?
-8. ¿Hasta cuándo se puede corregir o anular una venta: solo las del día, las de los últimos N días, o cualquiera?
-9. Al corregir una venta, ¿solo se cambian cantidad y precio de sus renglones, o también agregar o quitar un renglón, cambiar el medio de pago o el cliente?
+4. ¿Qué rol puede corregir una venta? Ver y anular quedaron para el Administrador; corregir no se nombró.
+5. Al anular una venta, ¿se pide confirmación? ¿Se pide el motivo, obligatorio u opcional?
+6. ¿Hasta cuándo se puede corregir o anular una venta: solo las del día, las de los últimos N días, o cualquiera?
+7. Al corregir una venta, ¿solo se cambian cantidad y precio de sus renglones, o también agregar o quitar un renglón, cambiar el medio de pago o el cliente?
 
 **Lo que pidieron y no se vendió (RF-25)**
-10. Los motivos, ¿son una lista cerrada (¿cuáles, además de «no había» y «precio»?) o texto libre?
-11. ¿Quién consulta lo anotado y cómo lo necesita ver: lista por fecha, o agrupado por producto con cuántas veces se pidió y por qué?
-12. Cuando el cliente no lleva, ¿descartar la venta anota siempre la consulta, o hay dos acciones: descartar sin anotar y «No llevó», que anota?
+8. Los motivos, ¿son una lista cerrada (¿cuáles, además de «no había» y «precio»?) o texto libre?
+9. ¿Quién consulta lo anotado y cómo lo necesita ver: lista por fecha, o agrupado por producto con cuántas veces se pidió y por qué?
+10. Cuando el cliente no lleva, ¿descartar la venta anota siempre la consulta, o hay dos acciones: descartar sin anotar y «No llevó», que anota?
 
 **Cambios (RF-24)**
-13. Si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que no se devuelve plata?
-14. Para registrar un cambio, ¿hay que encontrar la venta original (y lo devuelto se toma al precio pagado) o alcanza con decir qué producto vuelve, al precio del día? ¿Hay plazo?
+11. Si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que no se devuelve plata?
+12. Para registrar un cambio, ¿hay que encontrar la venta original (y lo devuelto se toma al precio pagado) o alcanza con decir qué producto vuelve, al precio del día? ¿Hay plazo?
 
 **Pedidos de clientes sin stock (RF-26)**
-15. Cuando llega la mercadería, ¿qué hace el sistema: avisarle al Vendedor para que llame, armarle un WhatsApp para mandar, o mandarlo solo?
-16. ¿Cómo se cierra un pedido: se marca entregado a mano, se cierra solo al venderle ese producto? ¿Se puede cancelar si el cliente no vuelve?
+13. Cuando llega la mercadería, ¿qué hace el sistema: avisarle al Vendedor para que llame, armarle un WhatsApp para mandar, o mandarlo solo?
+14. ¿Cómo se cierra un pedido: se marca entregado a mano, se cierra solo al venderle ese producto? ¿Se puede cancelar si el cliente no vuelve?
 
 **Presupuestos (RF-27)**
-17. ¿Cuántos días vale un presupuesto, quién configura ese plazo y qué pasa cuando venció?
-18. Al convertir un presupuesto vigente en venta, ¿se respetan sus precios o se recalculan con los del día?
-19. ¿Un presupuesto tiene que llevar cliente, o se puede armar sin cliente?
+15. ¿Cuántos días vale un presupuesto, quién configura ese plazo y qué pasa cuando venció?
+16. Al convertir un presupuesto vigente en venta, ¿se respetan sus precios o se recalculan con los del día?
+17. ¿Un presupuesto tiene que llevar cliente, o se puede armar sin cliente?
 
 **Comprobante por WhatsApp (RF-28)**
-20. ¿Qué datos del negocio lleva (nombre, dirección, teléfono, CUIT, logo)? ¿Tiene que decir que no es una factura?
-21. ¿El Vendedor tipea el teléfono en cada venta, lo elige de sus contactos, o solo se usa el de los clientes importantes?
+18. ¿Qué datos del negocio lleva (nombre, dirección, teléfono, CUIT, logo)? ¿Tiene que decir que no es una factura?
+19. ¿El Vendedor tipea el teléfono en cada venta, lo elige de sus contactos, o solo se usa el de los clientes importantes?
 
 **Ventas históricas del cuaderno (RF-29)**
-22. ¿Qué diferencia entre el precio del cuaderno y el calculado cuenta como «grande» para el informe?
-23. Las ventas cargadas del cuaderno, ¿descuentan stock y cuentan en los totales, o son solo para comparar precios?
-24. El cuaderno no anota el medio de pago y sus precios no son múltiplos de $1.000: ¿se guardan con el precio tal cual, y con qué medio de pago?
+20. ¿Qué diferencia entre el precio del cuaderno y el calculado cuenta como «grande» para el informe?
+21. Las ventas cargadas del cuaderno, ¿descuentan stock y cuentan en los totales, o son solo para comparar precios?
+22. El cuaderno no anota el medio de pago y sus precios no son múltiplos de $1.000: ¿se guardan con el precio tal cual, y con qué medio de pago?
 
 **Etapas posteriores**
-25. **RF-24b.** ¿Cuál es el plazo para aceptar una devolución?
-26. **RF-30.** Factura electrónica: ¿se factura cada venta o solo cuando el cliente la pide? ¿Qué tipos de comprobante y con qué CUIT y punto de venta?
-27. **RF-31.** Venta online: ¿qué productos se publican, a qué precio y cómo paga y recibe el cliente?
-28. **RF-32.** ¿Qué controla la licencia en la instalación de otra ferretería: tiene vencimiento, qué pasa cuando vence y quién la renueva?
+23. **RF-24b.** ¿Cuál es el plazo para aceptar una devolución?
+24. **RF-30.** Factura electrónica: ¿se factura cada venta o solo cuando el cliente la pide? ¿Qué tipos de comprobante y con qué CUIT y punto de venta?
+25. **RF-31.** Venta online: ¿qué productos se publican, a qué precio y cómo paga y recibe el cliente?
+26. **RF-32.** ¿Qué controla la licencia en la instalación de otra ferretería: tiene vencimiento, qué pasa cuando vence y quién la renueva?
 
 ### Catálogo y precios (002)
 
 **Listas de precios**
 1. **RF-01.** ¿Qué es exactamente «dar de baja» un producto que ya no aparece en la lista nueva de su proveedor? ¿Deja de verse en la búsqueda y de poder venderse, o solo deja de tener costo de ese proveedor? ¿Qué pasa si tiene stock, o si lo vende otro proveedor? ¿Vuelve solo si reaparece en una lista posterior?
-2. **RF-01.** ¿Qué rol puede cargar, aplicar y descartar listas de precios? La propuesta sin confirmar es el Comprador.
-3. **RF-02.** Cuando un proveedor manda un PDF escaneado (una imagen, sin texto), ¿el sistema tiene que leerlo igual, o alcanza con que avise que no puede y que hay que pedirle el Excel?
-4. **RF-04.** ¿Cuánto puede tardar en aparecer una lista desde que llega el correo? Una fuente dice menos de 10 minutos y otra que el correo se revisa cada 15.
-5. **RF-04.** Cuando una lista llega sola, ¿a quién se le avisa y por dónde (dentro de la aplicación, WhatsApp, correo)?
-6. **RF-04.** ¿Qué proveedores autorizaron el acceso automático a su portal, o entregan una exportación oficial? Sin esa autorización no se automatiza ninguno.
+2. **RF-02.** Cuando un proveedor manda un PDF escaneado (una imagen, sin texto), ¿el sistema tiene que leerlo igual, o alcanza con que avise que no puede y que hay que pedirle el Excel?
+3. **RF-04.** ¿Cuánto puede tardar en aparecer una lista desde que llega el correo? Una fuente dice menos de 10 minutos y otra que el correo se revisa cada 15.
+4. **RF-04.** Cuando una lista llega sola, ¿por dónde se le avisa al Administrador (dentro de la aplicación, WhatsApp, correo)?
+5. **RF-04.** ¿Qué proveedores autorizaron el acceso automático a su portal, o entregan una exportación oficial? Sin esa autorización no se automatiza ninguno.
 
 **Productos de varios proveedores (RF-06)**
-7. ¿Qué rol puede unir, rechazar y separar duplicados?
-8. ¿A partir de cuántos días sin lista nueva deja de valer el costo de un proveedor para elegirlo como el más barato, y a partir de cuántos días se avisa que su lista está vieja? El código usa 120 y 45 días; nadie lo decidió.
-9. Cuando una lista nueva deja más barato a un proveedor que no era el que estaba en uso, ¿el costo pasa solo al más barato, o se mantiene el que estaba hasta que alguien lo cambie? Si alguien había elegido el proveedor a mano, ¿se respeta?
-10. Al unir dos productos, sus costos, ventas, compras y movimientos de stock históricos pasan a nombre del que se conserva, y vuelven si se separan. ¿Se acepta eso como excepción a «los históricos no se modifican»?
+6. ¿A partir de cuántos días sin lista nueva deja de valer el costo de un proveedor para elegirlo como el más barato, y a partir de cuántos días se avisa que su lista está vieja? El código usa 120 y 45 días; nadie lo decidió.
+7. Cuando una lista nueva deja más barato a un proveedor que no era el que estaba en uso, ¿el costo pasa solo al más barato, o se mantiene el que estaba hasta que alguien lo cambie? Si alguien había elegido el proveedor a mano, ¿se respeta?
+8. Al unir dos productos, sus costos, ventas, compras y movimientos de stock históricos pasan a nombre del que se conserva, y vuelven si se separan. ¿Se acepta eso como excepción a «los históricos no se modifican»?
 
 **Códigos y fotos**
-11. **RF-08.** Si un código de barras desconocido se quiere asociar a un producto, pero ese código ya lo tiene otro, ¿se rechaza, se pasa al producto nuevo, o se sugiere que los dos son el mismo artículo?
-12. **RF-09b.** Para buscar por foto, ¿contra qué se compara la foto: contra las que el local ya sacó de cada producto, contra las del catálogo del proveedor, o reconociendo lo que dice el envase?
+9. **RF-08.** Si un código de barras desconocido se quiere asociar a un producto, pero ese código ya lo tiene otro, ¿se rechaza, se pasa al producto nuevo, o se sugiere que los dos son el mismo artículo?
+10. **RF-09b.** Para buscar por foto, ¿contra qué se compara la foto: contra las que el local ya sacó de cada producto, contra las del catálogo del proveedor, o reconociendo lo que dice el envase?
 
 **Costos, márgenes y precios**
-13. **RF-10.** ¿Qué rol puede elegir y cambiar el margen de un producto?
-14. **RF-11.** La regla del costo del 2026-09-13 (lista − descuento general − descuento por contado − ofertas vigentes, sin IVA) figura como no cerrada. ¿Queda aprobada tal cual? ¿Las ofertas que trae la planilla bajan el costo mientras duran?
-15. **RF-13.** ¿Qué roles pueden ver el costo de un producto y su explicación? ¿El Vendedor lo ve en el mostrador?
-16. **RF-15.** ¿A partir de qué porcentaje de suba del costo hay que avisar para revisar el producto, y quién puede cambiar ese porcentaje?
-17. **RF-15.** ¿«Remarcar» es cambiar el precio escrito en la estantería de todo producto cuyo precio de venta cambió? ¿Hay algún otro caso que tenga que aparecer en el aviso?
-18. **RF-16.** ¿Con qué criterio se reparten los gastos fijos entre los productos: por unidad vendida, por valor vendido, por rotación o por familia?
-19. **RF-17.** ¿Cómo se entera el sistema de un descuento puntual: lo trae la lista como oferta, lo carga alguien a mano, o las dos cosas? ¿Hasta cuándo vale cuando el proveedor no dice la fecha de fin? ¿El precio de venta baja siempre, o solo si alguien lo aprueba?
+11. **RF-11.** La regla del costo del 2026-09-13 (lista − descuento general − descuento por contado − ofertas vigentes, sin IVA) figura como no cerrada. ¿Queda aprobada tal cual? ¿Las ofertas que trae la planilla bajan el costo mientras duran?
+12. **RF-15.** ¿A partir de qué porcentaje de suba del costo hay que avisar para revisar el producto, y quién puede cambiar ese porcentaje?
+13. **RF-15.** ¿«Remarcar» es cambiar el precio escrito en la estantería de todo producto cuyo precio de venta cambió? ¿Hay algún otro caso que tenga que aparecer en el aviso?
+14. **RF-16.** ¿Con qué criterio se reparten los gastos fijos entre los productos: por unidad vendida, por valor vendido, por rotación o por familia?
+15. **RF-17.** ¿Cómo se entera el sistema de un descuento puntual: lo trae la lista como oferta, lo carga alguien a mano, o las dos cosas? ¿Hasta cuándo vale cuando el proveedor no dice la fecha de fin? ¿El precio de venta baja siempre, o solo si alguien lo aprueba?
 
 **Proveedores**
-20. **RF-18.** ¿Qué datos de contacto de un proveedor hay que guardar (vendedor, teléfono, WhatsApp, correo, dirección, CUIT, usuario de su portal) y quién puede verlos y cambiarlos?
+16. **RF-18.** ¿Qué datos de contacto de un proveedor hay que guardar (vendedor, teléfono, WhatsApp, correo, dirección, CUIT, usuario de su portal) y quién puede verlos y cambiarlos?
 
 ### Compras y stock (005)
 
@@ -159,7 +157,7 @@ Los tres roles (Administrador, Vendedor, Comprador) reemplazan a los anteriores;
 25. «Qué toca contar», ¿lista productos sueltos o estanterías?
 
 **Roles en esta capacidad (RF-72)**
-26. ¿Qué rol puede: anular una compra; ver el stock; ver costos y plata invertida; corregir el stock a mano; contar y cerrar un conteo; armar y mandar un pedido; ver la deuda con proveedores y marcar una compra pagada; imprimir etiquetas; ver el plan de conteo?
+26. ¿Qué rol puede: anular una compra; ver el stock; corregir el stock a mano; armar y mandar un pedido; ver la deuda con proveedores y marcar una compra pagada; imprimir etiquetas; ver el plan de conteo? Contar y ver costos quedaron para el Administrador.
 
 ### Clientes (004)
 
@@ -245,7 +243,7 @@ Los tres roles (Administrador, Vendedor, Comprador) reemplazan a los anteriores;
 **Facilidad de uso, medible**
 13. **RNF-01.** ¿Cuántas veces puede pedir ayuda un Vendedor nuevo en su primer día para dar el requerimiento por cumplido?
 14. **RNF-02.** ¿Desde qué momento hasta cuál se cuentan los 20 segundos de una venta de 3 productos, y vale para la notebook, el celular o los dos?
-15. **RNF-04.** La maqueta del celular («Ferre iOS») no está en el repositorio. Si el celular se conserva, ¿alcanzan las reglas escritas del sistema visual, o hay que guardar la maqueta o capturas como referencia obligatoria?
+15. **RNF-04.** Ver «Generales», preguntas 1 y 3: qué reglas de interfaz valen para el rediseño y si se sube la maqueta.
 16. **RNF-04.** El sistema visual pide letra mínima de 18 px en el celular y la interfaz actual usa textos más chicos. ¿Cuál vale?
 17. **RNF-05, RNF-04.** «Alto contraste» no dice cuánto. ¿Se toma el mínimo habitual de accesibilidad (4,5 a 1 entre texto y fondo)?
 18. **RNF-08.** ¿Hasta cuántos artículos hay que garantizar la búsqueda instantánea (100.000, 150.000, 200.000), y también en el celular o solo en la notebook?

@@ -204,13 +204,16 @@ RF-18:
     - "Sin construir: no hay búsqueda ni ficha de proveedores, ni se guardan datos de contacto"
 
 RF-19:
-  estado: "Hecho"
+  estado: "Hecho en parte (#60): el precio a mano se redondea en vez de respetarse y avisar"
   pruebas:
     - libraries/calculo-de-precios/src/precio.test.ts
     - microservices/gestion-del-local/src/rutas/ventas.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-  defectos: []
+  defectos:
+    - "Un precio puesto a mano que no es múltiplo de $1.000 se redondea para arriba, en las dos interfaces y en el servidor; la regla del 2026-10-10 pide respetarlo tal cual y mostrar un aviso (#60)"
+    - "El precio tipeado de un ítem libre también se redondea; la regla lo trata como un precio a mano (#60)"
+    - "Las pruebas de hoy comprueban el redondeo del precio a mano: hay que cambiarlas junto con el código (#60)"
 
 RF-20:
   estado: "Hecho en parte (#15): se aparta de la regla en 5 puntos"
@@ -235,7 +238,7 @@ RF-20:
     - "Los 20 segundos de una venta de 3 productos no están medidos en el mostrador (RNF-02)"
 
 RF-20b:
-  estado: "Hecho en parte (#15): se aparta de la regla en 1 punto"
+  estado: "Hecho en parte (#15): se aparta de la regla en 3 puntos"
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
@@ -247,6 +250,8 @@ RF-20b:
   defectos:
     - "Sin prueba que mida que el cambio de margen responde en menos de 100 ms (RNF-07)"
     - "La explicación del subtotal paso por paso solo tiene prueba en el celular"
+    - "El precio a mano de un renglón se redondea para arriba a $1.000; la regla pide respetarlo y avisar (#60)"
+    - "El costo y los márgenes se muestran a cualquier usuario con sesión; la regla del 2026-10-10 los deja para el Administrador (#59)"
 
 RF-21:
   estado: "Hecho en parte (#15): se aparta de la regla en 1 punto"

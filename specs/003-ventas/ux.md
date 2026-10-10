@@ -83,6 +83,10 @@ el total quedan al alcance del pulgar.
 lo tiene; poner un precio a mano para esta venta; pedir la explicación del costo, del
 precio y del subtotal.
 
+**Quién ve qué:** el costo y los márgenes son, por ahora, del Administrador (decisión 15
+del 2026-10-10); qué ve quien es solo Vendedor está preguntado en la especificación
+(RF-20b).
+
 **Información a la vista:** el costo; los cinco márgenes (300, 200, 100, 50 y 25 %) con el
 vigente marcado; el precio que resulta; dónde poner el precio a mano, con un texto que diga
 que vale solo para esta venta.
@@ -97,14 +101,24 @@ que vale solo para esta venta.
 - Intentar cobrar con un renglón sin precio muestra «Hay productos sin precio», al lado de
   la acción de cobrar, y marca cuál es.
 
-## Historia 3: cada renglón es múltiplo de $1.000 (Vendedor)
+## Historia 3: cada renglón es múltiplo de $1.000, salvo el precio a mano (Vendedor)
 
-**Tiene que poder:** entender por qué un renglón se cobra más que precio × cantidad.
+**Tiene que poder:** entender por qué un renglón se cobra más que precio × cantidad; y, si
+puso un precio a mano que no es múltiplo de $1.000, enterarse antes de cobrar.
 
-**Reglas:** el subtotal que se muestra es el que se cobra, ya redondeado. Cuando hubo
-redondeo, la explicación del subtotal lo dice con las palabras de la regla: «Redondeado para
-arriba a $2.000,00 (múltiplo de $1.000,00) para no dar vuelto». Vale igual para lo que se
-vende suelto y para el precio a mano.
+**Reglas:**
+
+- El subtotal que se muestra es el que se cobra. Cuando hubo redondeo, la explicación del
+  subtotal lo dice con las palabras de la regla: «Redondeado para arriba a $2.000,00
+  (múltiplo de $1.000,00) para no dar vuelto». Vale para lo calculado y para lo que se vende
+  suelto.
+- Un renglón con precio a mano no se redondea: se cobra precio × cantidad.
+- Si el importe de ese renglón no es múltiplo de $1.000, el renglón muestra un aviso que lo
+  dice, con el importe. El aviso es una alerta, no un error: se ve sin tocar nada, no pide
+  cerrarlo, no impide cobrar y desaparece solo cuando el importe pasa a ser múltiplo de
+  $1.000. Se distingue a la vista de un aviso que sí frena («Hay productos sin precio»).
+- El total de la venta deja ver que no es múltiplo de $1.000 mientras haya un renglón con
+  el aviso.
 
 ## Historia 4: cobrar con cada medio de pago (Vendedor)
 
@@ -133,8 +147,9 @@ de RF-21.
 
 ## Historia 5: vender sin conexión (Vendedor)
 
-**Tiene que poder:** hacer todo lo de las historias 1 a 4, anotar un «No llevó» y ver las
-ventas del día, sin conexión y sin hacer nada distinto.
+**Tiene que poder:** hacer todo lo de las historias 1 a 4 y anotar un «No llevó», sin
+conexión y sin hacer nada distinto. Quien puede ver las ventas del día las ve también sin
+conexión.
 
 **Información a la vista:** el indicador de conexión, siempre: sin conexión, cuántos
 cambios están por enviar («1 por enviar») y, al reconectar, «Sincronizado».
@@ -169,7 +184,7 @@ descripción, precio, fecha y quién lo vendió.
 - *Computadora:* Enter sobre una búsqueda sin resultados agrega el ítem libre.
 - *Vacío (lista del Administrador):* dice que no hay ítems libres para revisar.
 
-## Historia 7: ventas del día y de días anteriores (Vendedor)
+## Historia 7: ventas del día y de días anteriores (Administrador)
 
 **Tiene que poder:** abrir las ventas del día sin perder la venta que está armando; ver
 cada venta con sus productos; ver los totales; elegir otra fecha.
@@ -195,7 +210,7 @@ cada venta con sus productos; ver los totales; elegir otra fecha.
   no estar todas.
 - *Computadora:* se llega y se recorre con el teclado.
 
-## Historia 8: anular una venta (Vendedor)
+## Historia 8: anular una venta (Administrador)
 
 **Tiene que poder:** anular una venta confirmada desde las ventas del día.
 
@@ -210,7 +225,7 @@ cada venta con sus productos; ver los totales; elegir otra fecha.
   van en el lugar y se resuelven con el teclado en la computadora y con una mano en el
   celular.
 
-## Historia 9: corregir una venta (Vendedor)
+## Historia 9: corregir una venta (rol sin decidir)
 
 **Tiene que poder:** cambiar la cantidad o el precio de un renglón de una venta reciente,
 desde las ventas del día o de un día anterior.

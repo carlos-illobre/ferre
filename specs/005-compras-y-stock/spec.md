@@ -22,11 +22,16 @@
 - Q: ¿Quién registra la mercadería que llega? → A: Los permisos se dan por rol (Administrador, Vendedor, Comprador, combinables en un mismo usuario); recibir la mercadería y registrarla es del Comprador (RF-72). Quién puede contar stock y quién puede ver costos sigue sin decidir: está preguntado en RF-72, más abajo.
 - Q: ¿En qué interfaces tiene que estar esta capacidad? → A: En las dos, celular y computadora, que son interfaces distintas sobre la misma API, con la misma paleta y la misma marca (ADR-014). Todo lo de compras y stock se puede hacer en cualquiera de las dos.
 
+### Session 2026-10-10
+
+- Q: ¿Quién cuenta el stock y quién ve los costos? → A: Por ahora, el Administrador. Más adelante se reparte mejor, con más roles (decisión 15; RF-72). Recibir la mercadería y registrarla sigue siendo del Comprador.
+
 ## User Scenarios & Testing *(mandatory)*
 
-Las historias nombran al **Comprador** donde las decisiones de Carlos o la propuesta de
-casos de uso lo ponen (recibir mercadería, contar, pedir). Qué rol puede cada operación de
-esta capacidad es una pregunta abierta: ver RF-72 en «Functional Requirements».
+Recibir la mercadería y registrarla es del **Comprador** (decisión 8). Contar el stock y
+ver los costos y la plata invertida son, por ahora, del **Administrador** (decisión 15 del
+2026-10-10). Las demás historias nombran al Comprador porque así estaba en la propuesta de
+casos de uso; qué rol puede cada una sigue abierto: ver RF-72 en «Functional Requirements».
 
 ### User Story 1 - Registrar la mercadería que llega (Priority: P1)
 
@@ -120,7 +125,7 @@ motivo y ver el ajuste explicado.
 
 ### User Story 4 - Cargar el stock que ya hay, contando de a un sector (Priority: P2)
 
-El stock arranca en cero. El Comprador elige un sector (una estantería, una pared), busca o
+El stock arranca en cero. El Administrador elige un sector (una estantería, una pared), busca o
 escanea cada producto y pone cuántos hay. Si lo interrumpe un cliente, el conteo queda
 abierto y lo sigue después. Al cerrar el sector, cada diferencia contra lo que decía el
 sistema queda como un ajuste explicado.
@@ -365,7 +370,7 @@ ver qué toca contar en el día según la fecha del último conteo de cada uno.
 - **RF-56**: El sistema muestra lo que se les debe a los proveedores y cuándo vence. Cada compra registra cómo se paga: por adelantado cuando hay descuento, y si no a 30 o 60 días. La deuda se ve en total, por proveedor y por compra, ordenada por vencimiento, con lo vencido distinguido. Una compra se marca como pagada y deja de figurar; una compra anulada tampoco figura.
 - **RF-57**: El sistema genera un código interno para los productos que no traen código de barras de fábrica e imprime etiquetas con la descripción, el código de barras y el precio de venta, en impresora de etiquetas o en hoja A4 con plantilla. Se imprime de a una o en lote: por familia, por proveedor o solo los que cambiaron de precio desde su última impresión. Una etiqueta impresa se escanea con la cámara del celular en la venta, en el ingreso y en el conteo, y elige ese producto.
 - **RF-58**: El sistema arma un plan de conteo que dice qué contar primero: clasifica los productos en A, B y C por su valor, de modo que los A cubran entre el 70 y el 80 % del total, y propone un calendario (A cada mes, B cada tres meses, C cada seis). Qué toca contar en el día se ve en el tablero (RF-60) y lleva al conteo (RF-52).
-- **RF-72** (de la capacidad de usuarios y acceso, aplicado acá): cada operación de esta capacidad exige el rol que corresponde. Registrar la mercadería que llega es del Comprador. [NEEDS CLARIFICATION: ¿qué rol (Administrador, Vendedor, Comprador) puede hacer cada una de estas cosas?: anular una compra; ver el stock; ver los costos y la plata invertida; corregir el stock a mano; contar stock y cerrar un conteo; ver «qué pedir» y armar y mandar un pedido; ver lo que se les debe a los proveedores y marcar una compra como pagada; generar códigos e imprimir etiquetas; ver el plan de conteo.]
+- **RF-72** (de la capacidad de usuarios y acceso, aplicado acá): cada operación de esta capacidad exige el rol que corresponde. Registrar la mercadería que llega es del Comprador (decisión 8). Contar stock y cerrar un conteo, y ver los costos y la plata invertida, son por ahora del Administrador (decisión 15 del 2026-10-10). [NEEDS CLARIFICATION: registrar una compra es cargar el costo de cada renglón, con el costo de la lista a la vista (RF-50). Si ver costos es solo del Administrador, ¿qué ve el Comprador al registrar un ingreso? Es la pregunta P10 de la capacidad de usuarios y acceso.] [NEEDS CLARIFICATION: ¿qué rol (Administrador, Vendedor, Comprador) puede hacer cada una de estas cosas?: anular una compra; ver el stock; corregir el stock a mano; ver «qué pedir» y armar y mandar un pedido; ver lo que se les debe a los proveedores y marcar una compra como pagada; generar códigos e imprimir etiquetas; ver el plan de conteo.]
 
 ### Key Entities *(include if feature involves data)*
 

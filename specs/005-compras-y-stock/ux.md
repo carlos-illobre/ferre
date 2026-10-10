@@ -185,7 +185,7 @@ bajado y una corrección queda «guardada, se manda al volver internet», visibl
 hasta que el servidor la confirma); corrección rechazada por el servidor al reconectar: se
 avisa cuál y por qué; éxito: el stock y el valor nuevos a la vista.
 
-## Historia 4: contar de a un sector (Comprador)
+## Historia 4: contar de a un sector (Administrador)
 
 **Tiene que poder:** ver los sectores; crear uno; empezar o retomar el conteo de un sector;
 buscar o escanear un producto; poner cuántas hay; corregir o quitar lo contado; ver lo que
@@ -215,7 +215,9 @@ sector.
   tienen diferencia y cuántos del sector no se contaron. Si hay no contados, las dos
   opciones se leen completas: «Cerrar y poner en cero los no contados» y «Cerrar y dejar los
   no contados como están».
-- Salir de un conteo sin cerrarlo no pregunta nada: queda en curso.
+- Salir de un conteo sin cerrarlo no pregunta nada: queda en curso. La acción de salir se
+  llama «Volver»; no lleva una aclaración del tipo «queda abierto» (pedido de Carlos del
+  2026-09-14).
 
 **Estados:**
 

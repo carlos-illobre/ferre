@@ -31,6 +31,11 @@
 - Q: ¿Se entra en la computadora leyendo un código QR con el celular? → A: No, se quita: se entra con Google o con la huella (decisión 10; RF-70).
 - Q: ¿«Quién hizo qué» incluye filtrar? → A: Sí. Recorrer el registro de a 10 no alcanza: filtrar por usuario, fecha y tipo de acción es parte de RF-71 (decisión 12).
 
+### Session 2026-10-10
+
+- Q: ¿Cuántos actores hay? → A: Cuatro: Dueño, Empleado, Cliente y Proveedor (decisión 14).
+- Q: ¿Qué rol puede cargar listas de precios, elegir márgenes, contar stock, unir duplicados, ver costos, ver las ventas del día y anular ventas? → A: Por ahora, el Administrador. Más adelante se reparten mejor, con más roles; por ahora no importa (decisión 15; RF-72).
+
 ## User Scenarios & Testing *(mandatory)*
 
 En las historias se nombra el rol (Administrador, Vendedor, Comprador), no la persona.
@@ -109,12 +114,12 @@ al servidor, y comparar con la matriz.
 
 **Acceptance Scenarios**:
 
-1. **Given** un usuario con solo el rol Vendedor, **When** usa la app, **Then** puede vender y registrar ventas, y no se le ofrece registrar compras ni administrar usuarios, sesiones o «quién hizo qué».
+1. **Given** un usuario con solo el rol Vendedor, **When** usa la app, **Then** puede vender y registrar ventas, y no se le ofrece registrar compras, anular ventas, ver las ventas del día, contar stock, cargar listas, elegir márgenes, unir duplicados ni administrar usuarios, sesiones o «quién hizo qué».
 2. **Given** un usuario con solo el rol Vendedor, **When** le pide directo al servidor registrar una compra, autorizar un usuario o ver «quién hizo qué», **Then** el servidor rechaza las tres y nada cambia.
-3. **Given** un usuario con solo el rol Comprador, **When** usa la app, **Then** puede recibir mercadería y registrarla, y no se le ofrece vender ni administrar.
+3. **Given** un usuario con solo el rol Comprador, **When** usa la app, **Then** puede recibir mercadería y registrarla, y no se le ofrece vender, contar stock, cargar listas ni administrar.
 4. **Given** un usuario con solo el rol Comprador, **When** le pide directo al servidor registrar una venta o autorizar un usuario, **Then** el servidor rechaza las dos y nada cambia.
 5. **Given** un usuario con los roles Vendedor y Comprador, **When** usa la app, **Then** puede vender y registrar compras, y no administrar.
-6. **Given** un usuario con el rol Administrador, **When** usa la app, **Then** puede crear usuarios, asignar roles, cerrar sesiones, ver quién hizo qué y ver cómo va el negocio.
+6. **Given** un usuario con el rol Administrador, **When** usa la app, **Then** puede crear usuarios, asignar roles, cerrar sesiones, ver quién hizo qué y ver cómo va el negocio, y además cargar listas de precios, elegir márgenes, unir duplicados, contar stock, ver costos, ver las ventas del día y anular ventas.
 7. **Given** una operación rechazada por no tener el rol, **When** el usuario la ve rechazada, **Then** el mensaje dice qué rol se necesita, y el rechazo no le cierra la sesión.
 8. **Given** cualquier usuario, **When** mira la app, **Then** ve su nombre y los roles que tiene.
 
@@ -216,6 +221,7 @@ hizo qué», ver 3 páginas, filtrar por un usuario y un día y ver solo las suy
 - **Cambio de roles con la sesión abierta.** Un cambio de roles vale desde la próxima operación del usuario, sin cerrarle la sesión.
 - **Operación en cola de alguien que perdió el permiso.** [NEEDS CLARIFICATION: P8, ver «Preguntas abiertas»]
 - **Computadora con lector de huella.** [NEEDS CLARIFICATION: P7, ver «Preguntas abiertas»]
+- **Vendedor sin el rol Administrador ante un producto sin precio.** [NEEDS CLARIFICATION: P10, ver «Preguntas abiertas»]
 - **Salir sin conexión.** [NEEDS CLARIFICATION: P9, ver «Preguntas abiertas»]
 - **El celular como lector de códigos de la computadora** (RF-08) usa un código QR, pero no es una forma de entrar: los dos dispositivos ya tienen sesión. Pertenece a la capacidad de catálogo.
 
@@ -242,7 +248,8 @@ un rol.
 | Empleado | Atiende el local | Sí, con los roles que se le asignen; el Empleado de la ferretería tiene los tres |
 | Cliente | Quien compra; unos 20 son importantes, con cuenta corriente | No, no tiene rol |
 | Proveedor | Unos 50; mandan listas de precios | No, no tiene rol |
-| [NEEDS CLARIFICATION: P6] | | |
+
+Son cuatro (decisión 14 del 2026-10-10).
 
 ### Matriz de permisos
 
@@ -253,21 +260,26 @@ los celulares propios lo puede cualquier usuario, sin importar el rol.
 | Operación | Administrador | Vendedor | Comprador |
 |---|---|---|---|
 | Vender y registrar ventas | [NEEDS CLARIFICATION: P1] | Sí | No |
-| Anular una venta | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
-| Ver las ventas del día | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
+| Anular una venta | Sí | No | No |
+| Ver las ventas del día | Sí | No | No |
 | Registrar compras (recibir mercadería) | [NEEDS CLARIFICATION: P1] | No | Sí |
-| Contar stock | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
+| Contar stock | Sí | No | No |
 | Corregir stock | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
-| Cargar listas de precios | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
-| Elegir márgenes | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
-| Unir duplicados | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
-| Ver costos | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
-| Dar de alta y modificar proveedores | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
+| Cargar listas de precios | Sí | No | No |
+| Elegir márgenes | Sí | No [NEEDS CLARIFICATION: P10] | No |
+| Unir duplicados | Sí | No | No |
+| Ver costos | Sí | No [NEEDS CLARIFICATION: P10] | No [NEEDS CLARIFICATION: P10] |
+| Dar de alta y modificar proveedores | Sí | No | No |
 | Administrar usuarios y roles | Sí | No | No |
 | Ver las sesiones abiertas y cerrar las de otros | Sí | No | No |
 | Quitar el celular vinculado de otro usuario | Sí | No | No |
 | Ver quién hizo qué | Sí | No | No |
 | Ver cómo va el negocio | Sí | [NEEDS CLARIFICATION: P3] | [NEEDS CLARIFICATION: P3] |
+
+Anular ventas, ver las ventas del día, contar stock, cargar listas, elegir márgenes, unir
+duplicados y ver costos son del Administrador por la decisión 15 del 2026-10-10: es un
+reparto provisorio, hasta que se separen mejor en más roles. Dar de alta y modificar
+proveedores es del Administrador por la historia 4 de la capacidad de catálogo.
 
 Las operaciones de requerimientos que no figuran acá (presupuestos, pedidos, cierre de caja,
 cuentas corrientes) fijan su rol en la especificación de su capacidad y se agregan a esta
@@ -276,21 +288,21 @@ matriz.
 ### Preguntas abiertas
 
 - **P1** (RF-72) [NEEDS CLARIFICATION: ¿el rol Administrador, por sí solo, deja también vender y registrar compras, o solo administrar? Dicho de otro modo: ¿un usuario que es solo Administrador puede cobrar una venta, o para eso necesita además el rol Vendedor?]
-- **P2** (RF-72) [NEEDS CLARIFICATION: ¿qué rol o roles pueden hacer cada una de estas operaciones?: anular una venta, ver las ventas del día, contar stock, corregir stock, cargar listas de precios, elegir márgenes, unir duplicados, ver costos, y dar de alta o modificar proveedores. Propuesta sin confirmar: listas, conteo y pedidos para el Comprador.]
-- **P3** (RF-72) [NEEDS CLARIFICATION: «ver cómo va el negocio» es del Administrador. ¿Es solo de él? En particular: ¿el Comprador ve los gastos de la semana cuando registra un ingreso (RF-65), y el Vendedor ve el total vendido en el día?]
+- **P2** (RF-72) [NEEDS CLARIFICATION: la decisión 15 dejó en el Administrador siete operaciones. De las que se habían preguntado queda una sin nombrar: ¿qué rol corrige el stock a mano? Y como regla general: ¿todo lo que no sea vender (Vendedor) ni recibir mercadería (Comprador) es, por ahora, del Administrador? Eso alcanzaría a corregir una venta, cargar y modificar clientes, marcar pagada una cuenta corriente, cerrar la caja, armar pedidos, la deuda con proveedores, las etiquetas y el plan de conteo, que hoy tienen su propia pregunta en cada capacidad.]
+- **P3** (RF-72) [NEEDS CLARIFICATION: «ver cómo va el negocio» y «ver las ventas del día» son del Administrador. ¿El Comprador ve los gastos de la semana cuando registra un ingreso (RF-65)? ¿Y quién cierra la caja (RF-62), si el efectivo esperado sale de las ventas del día?]
 - **P4** (RF-72, RF-73) [NEEDS CLARIFICATION: ¿un Administrador puede desactivar o quitarle el rol a cualquier otro Administrador, incluido el Dueño? RF-73 protegía al dueño de los demás administradores «para delegar la administración diaria sin ceder el control de quién manda»; con tres roles sin niveles esa protección desaparece, salvo que se decida conservarla.]
 - **P5** (RF-72, RF-73) [NEEDS CLARIFICATION: ¿un Administrador puede darse o quitarse a sí mismo los roles Vendedor y Comprador? Está escrito que nadie se desactiva ni se quita el rol Administrador a sí mismo; RF-73 decía además que nadie se cambia el rol a sí mismo, cuando el rol era uno solo.]
-- **P6** (actores) [NEEDS CLARIFICATION: se habló de cinco actores y se nombraron cuatro (Dueño, Empleado, Cliente, Proveedor). ¿Cuál es el quinto, o son cuatro?]
 - **P7** (RF-70b) [NEEDS CLARIFICATION: en una computadora que tiene lector de huella, ¿se puede vincular a mano y entrar con la huella, o la huella es solo para el celular y la computadora entra siempre con Google? Lo decidido es que en la computadora nunca se ofrece sola.]
 - **P8** (RF-72) [NEEDS CLARIFICATION: una venta cobrada sin conexión por alguien a quien, antes de que el dispositivo reconecte, se le quitó el rol Vendedor o se lo desactivó: ¿se registra igual al reconectar, porque nada del mostrador se pierde, o se rechaza?]
 - **P9** (RF-74) [NEEDS CLARIFICATION: si el dispositivo no tiene internet, ¿«Salir» lo lleva igual a la entrada y la sesión se cierra en el servidor cuando reconecte, o no se puede salir sin conexión?]
+- **P10** (RF-72, RF-20, RF-50) [NEEDS CLARIFICATION: «ver costos» y «elegir márgenes» quedaron para el Administrador, pero dos casos de uso dependen de ellos. (a) La venta: el relevamiento del mostrador dice que quien vende ve costo, margen y precio y elige el margen ahí mismo. ¿Un usuario que es solo Vendedor ve nada más que el precio? Ante un producto sin precio, ¿le pone el precio a mano, o no lo puede vender hasta que un Administrador le elija el margen? (b) La compra: registrar un ingreso es cargar el costo de cada renglón, con el costo de la lista a la vista. ¿Un usuario que es solo Comprador ve y carga esos costos? Mientras el único Empleado tenga los tres roles, esto no se nota en el mostrador.]
 
 ### Functional Requirements
 
 - **RF-70**: Solo entran usuarios autorizados y activos, con su cuenta de Google o con la huella del celular. No hay contraseñas ni entrada por código QR. Se autoriza a alguien cargando su nombre y su correo de Google desde la app; quien no está autorizado ve que no lo está y a quién pedirle el alta. Todo pedido al servidor exige una sesión vigente. La sesión queda en el dispositivo, dura 90 días que se renuevan con el uso, y sigue sirviendo sin conexión hasta que el servidor diga lo contrario. Los intentos de entrada tienen un límite por minuto y por origen (ADR-011).
 - **RF-70b**: Un usuario vincula su celular a su cuenta para entrar con la huella, sin Google. La app lo ofrece sola la primera vez que se entra con Google desde un celular con lector de huella, una sola vez por dispositivo, y nunca en la computadora. Cada usuario ve sus celulares vinculados, vincula uno a mano y lo quita; un Administrador quita el de cualquiera. Del celular se guarda solo lo necesario para verificarlo: la huella nunca sale del aparato (ADR-011, enmiendas del 2026-09-14 y del 2026-09-15).
 - **RF-71**: Quién hizo qué. Cada acción queda registrada con el usuario que la hizo, cuándo, el tipo de acción y su detalle, y el registro solo recibe acciones nuevas. El Administrador lo consulta de la acción más reciente a la más vieja, de a 10 por página y con el total, y lo filtra por usuario, por fecha y por tipo de acción, combinando los filtros.
-- **RF-72**: Los permisos se dan por rol, con tres roles: Administrador, Vendedor y Comprador, combinables. Cada usuario tiene uno o más. Cada pantalla y cada operación exige el rol que le corresponde según la matriz de permisos, tanto en la app como en el servidor. Los roles se asignan y se quitan desde la administración de usuarios y cada cambio queda en «quién hizo qué». El sistema nunca queda sin un Administrador activo. Nadie se desactiva ni se quita el rol Administrador a sí mismo. Desactivar a un usuario le cierra todas las sesiones.
+- **RF-72**: Los permisos se dan por rol, con tres roles: Administrador, Vendedor y Comprador, combinables. Cada usuario tiene uno o más. Cada pantalla y cada operación exige el rol que le corresponde según la matriz de permisos, tanto en la app como en el servidor. Los roles se asignan y se quitan desde la administración de usuarios y cada cambio queda en «quién hizo qué». El sistema nunca queda sin un Administrador activo. Nadie se desactiva ni se quita el rol Administrador a sí mismo. Desactivar a un usuario le cierra todas las sesiones. Por ahora, todo lo que la matriz no le da al Vendedor ni al Comprador lo hace el Administrador; el reparto se va a afinar con más roles más adelante (decisión 15 del 2026-10-10).
 - **RF-73**: Reemplazado por RF-72 (decisión 8 del 2026-10-09; ADR-011, enmienda del 2026-10-09). Los roles dueño, admin y mostrador, de a uno por usuario, dejan de ser una regla. Equivalencia para pasar de unos a otros: dueño y admin reciben Administrador, Vendedor y Comprador; mostrador recibe Vendedor y Comprador. De RF-73 siguen valiendo, dentro de RF-72, las reglas que no dependen de esos nombres: nadie se desactiva a sí mismo y desactivar a un usuario le cierra las sesiones. Si se conserva la protección del dueño frente a otros administradores es la pregunta P4.
 - **RF-74**: El Administrador ve las sesiones abiertas, con el usuario, el dispositivo y el último uso, y cierra cualquiera a distancia; la sesión cerrada deja de servir en el próximo pedido de ese dispositivo. Cualquier usuario sale de la suya. Cerrar la propia, por la lista o saliendo, vuelve a la entrada.
 

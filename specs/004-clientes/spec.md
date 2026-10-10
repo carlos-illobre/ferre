@@ -21,6 +21,11 @@
 - Q: ¿Cómo se redondea? → A: Siempre para arriba a múltiplos de $1.000, para no lidiar con vueltos (decisión 5; RF-19). Vale también para el precio que se le cobra a un cliente importante.
 - Q: ¿Un cliente puede quedar con saldo a favor? → A: El saldo a favor llega con las devoluciones de la venta online y queda fuera de esta etapa (decisión 2; RF-24b).
 
+### Session 2026-10-10
+
+- Q: ¿Un precio puesto a mano que no es múltiplo de $1.000 se redondea? → A: No. Se respeta tal cual y la venta avisa que no es múltiplo de $1.000 (decisión 16; RF-19). Vale para el precio que se le pone a mano a un cliente importante.
+- Q: ¿Cuántos actores hay? → A: Cuatro: Dueño, Empleado, Cliente y Proveedor (decisión 14).
+
 ### Session 2026-10-09
 
 - Q: ¿El Cliente usa el sistema? → A: No. Cliente es un actor, no un rol: no entra al sistema. Los permisos se dan por rol (Administrador, Vendedor, Comprador), combinables (decisión 8; RF-72).
@@ -167,7 +172,7 @@ qué ese precio.
 
 **Acceptance Scenarios**:
 
-1. **Given** una venta a un cliente importante con precio distinto, **When** el Vendedor la arma, **Then** cada renglón se cobra al precio de ese cliente y el total sigue siendo múltiplo de $1.000, redondeando cada renglón para arriba (RF-19).
+1. **Given** una venta a un cliente importante con precio distinto, **When** el Vendedor la arma, **Then** cada renglón se cobra al precio de ese cliente, con la regla de RF-19: lo que calcula el sistema se redondea para arriba a $1.000 y lo que se pone a mano se respeta y avisa si no es múltiplo de $1.000.
 2. **Given** un renglón cobrado al precio de un cliente, **When** el Vendedor toca el precio, **Then** el sistema explica de dónde sale, con el precio de mostrador y la condición del cliente (RF-13).
 3. **Given** una venta cobrada al precio de un cliente, **When** se la consulta después, **Then** conserva el costo, el margen y el precio de ese momento, aunque la condición del cliente haya cambiado (RNF-31).
 4. **Given** un cliente importante con precio distinto, **When** el Vendedor le vende, **Then** [NEEDS CLARIFICATION: ¿el precio distinto lo decide la persona en el momento, poniendo el precio a mano en cada renglón, o lo calcula el sistema a partir de una condición guardada en la ficha del cliente (un descuento o una lista de precios propia)? El relato dice lo primero; el alcance de la ficha de cliente dice lo segundo.]
@@ -186,7 +191,7 @@ qué ese precio.
 - Un cliente desactivado no se ofrece al cobrar a cuenta corriente.
 - Una venta a cuenta corriente registrada sin conexión cuenta en lo que debe el cliente en ese dispositivo desde el momento en que se cobra, sin esperar al servidor.
 - Dos dispositivos marcan como pagada la misma venta, uno de ellos sin conexión: la venta queda pagada una sola vez, con la fecha del primer aviso que llega al servidor, y el segundo no produce un error que frene el mostrador.
-- Un precio puesto a mano que no es múltiplo de $1.000 se redondea para arriba como todo lo demás (RF-19); si el precio a mano tiene que respetarse tal cual es una pregunta abierta de las decisiones de negocio.
+- Un precio puesto a mano se respeta tal cual; si no es múltiplo de $1.000, la venta lo avisa y se puede cobrar igual (RF-19, decisión 16 del 2026-10-10). Es lo que hoy permite cobrarle a un cliente importante un precio distinto.
 
 ## Requirements *(mandatory)*
 
@@ -214,7 +219,7 @@ qué ese precio.
   - Alta, modificación y desactivación quedan en «quién hizo qué» con su usuario (RF-71).
 - **RF-43**: Precio distinto para un cliente importante según la cantidad que compra y lo rápido que paga.
   - El precio que se le cobra a un cliente importante puede ser distinto al de mostrador.
-  - Ese precio respeta el redondeo para arriba a $1.000 por renglón (RF-19), se explica con sus números de origen (RF-13) y queda guardado en la venta con el costo y el margen de ese momento (RNF-31).
+  - Ese precio sigue la regla de RF-19 (redondeo para arriba de lo calculado; el precio a mano se respeta y avisa), se explica con sus números de origen (RF-13) y queda guardado en la venta con el costo y el margen de ese momento (RNF-31).
   - [NEEDS CLARIFICATION: ¿el precio distinto lo decide la persona en el momento, con el precio a mano del renglón, o lo calcula el sistema a partir de una condición guardada en la ficha del cliente (descuento o lista de precios propia)?]
 
 ### Key Entities *(include if feature involves data)*

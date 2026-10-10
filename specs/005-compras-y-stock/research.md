@@ -6,7 +6,7 @@ dueño, 2026-09-13; conviene confirmarlo observando en el mostrador durante el p
 
 ## Compra a proveedor
 
-1. Se detecta que falta algo (góndola, pedido de un cliente).
+1. Se detecta que falta algo (estantería, pedido de un cliente).
 2. **No todos los proveedores venden todo:** se identifica qué proveedores tienen el
    producto y, entre ellos, se elige **el más barato**. Hoy eso es memoria más consulta
    de varios Excel.

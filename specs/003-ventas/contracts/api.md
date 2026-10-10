@@ -38,9 +38,10 @@ Cuerpo:
 }
 ```
 
-- El total lo calcula el servidor: suma de `precio_unitario × cantidad` de cada renglón,
-  cada uno redondeado para arriba a $1.000 (RF-19), con el mismo cálculo que hace el
-  dispositivo.
+- El total lo calcula el servidor, con el mismo cálculo que hace el dispositivo: suma de
+  `precio_unitario × cantidad` de cada renglón. Cada renglón calculado se redondea para
+  arriba a $1.000; el que lleva un precio puesto a mano (`margen_aplicado` nulo) no se
+  redondea (RF-19, decisión del 2026-10-10).
 - En una sola transacción guarda la venta, sus renglones, un movimiento de stock negativo
   por cada renglón con producto y el evento `venta.registrada` con el usuario.
 - **201** `{ id, total, estado: "confirmada" }`.

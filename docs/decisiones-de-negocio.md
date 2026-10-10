@@ -49,3 +49,20 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     venta y ver las de días anteriores (RF-23), marcar como pagada una venta a cuenta
     corriente desde la aplicación (RF-40) y filtrar quién hizo qué por usuario, fecha y
     tipo de acción (RF-71).
+
+### Decisiones del 2026-10-10
+
+13. **Toda la interfaz se rehace.** Carlos va a rediseñar la interfaz completa, celular y
+    computadora, más adelante. Hasta entonces el código de las pantallas queda como está.
+    Reemplaza la parte de la decisión 9 que decía que la interfaz de celular «queda como
+    está». Qué reglas de la interfaz de hoy valen para el rediseño es una pregunta abierta.
+14. **Actores.** Son cuatro: Dueño, Empleado, Cliente y Proveedor.
+15. **Permisos, por ahora.** Cargar listas de precios, elegir márgenes, contar stock, unir
+    duplicados, ver costos, ver las ventas del día y anular ventas son del Administrador.
+    Más adelante se reparten mejor, con más roles; por ahora no importa (RF-72).
+16. **Precio a mano.** Un precio puesto a mano en una venta se respeta tal cual, aunque no
+    sea múltiplo de $1.000, y la venta muestra un aviso que lo dice. Reemplaza la parte de
+    la decisión 7 que redondeaba también el precio a mano (RF-19, RF-20b).
+17. **Etapa de los pendientes nuevos.** Corregir ventas (#56) y marcar pagada una cuenta
+    corriente (#57) van en el MVP; filtrar quién hizo qué (#58) y los roles nuevos (#59),
+    en Administración remota.
