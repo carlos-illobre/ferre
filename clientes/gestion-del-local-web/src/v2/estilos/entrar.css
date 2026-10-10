@@ -1,0 +1,70 @@
+/* La entrada: la primera impresión de la marca. Azul marino con la cinta métrica arriba;
+   sobre blanco, las formas de entrar. En el celular la puerta queda abajo, al alcance del
+   pulgar; en la computadora, a la derecha. La usan también «Abriendo Ferrebress…», la
+   página que vincula el celular con la computadora y la oferta de la huella. */
+
+.entrar-cargando { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--e4); padding: var(--e6); background: var(--marino); color: var(--sobre-marino); text-align: center; }
+.entrar-cargando .marca { font-size: 1.75rem; }
+.entrar-cargando p { color: var(--sobre-marino-2); animation: latir 1s ease-in-out infinite alternate; }
+
+.entrar { position: relative; min-height: 100dvh; display: flex; flex-direction: column; background: var(--marino); color: var(--sobre-marino); }
+.entrar-cinta { display: block; flex: none; }
+
+.entrar-marca { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--e4); padding: calc(var(--e6) + env(safe-area-inset-top)) var(--e5) var(--e6); }
+.entrar-marca .marca { font-size: 1.75rem; margin-bottom: var(--e2); }
+.entrar-marca h1 { font-size: 1.75rem; font-weight: 750; line-height: 1.15; max-width: 18ch; }
+.entrar-bajada { color: var(--sobre-marino-2); max-width: 48ch; }
+.entrar-puntos { display: flex; flex-direction: column; gap: var(--e3); margin-top: var(--e2); }
+.entrar-puntos li { display: flex; align-items: center; gap: var(--e3); font-size: var(--t-chico); font-weight: 550; }
+.entrar-puntos li > span { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--marino-2); border: 1px solid var(--marino-3); color: var(--ambar); }
+
+.entrar-puerta { display: flex; flex-direction: column; gap: var(--e4); padding: var(--e6) var(--e5) calc(var(--e6) + env(safe-area-inset-bottom)); background: var(--superficie); color: var(--texto); border-radius: var(--r-hoja) var(--r-hoja) 0 0; box-shadow: var(--sombra-3); }
+.entrar-puerta h2 { font-size: var(--t-titulo); font-weight: 750; }
+.entrar-como { color: var(--texto-2); margin-top: calc(var(--e2) * -1); }
+.entrar-error-titulo { display: block; }
+.entrar-huella, .entrar-google { display: flex; flex-direction: column; gap: var(--e3); }
+.entrar-huella .boton { min-height: 56px; }
+.entrar-o { display: flex; align-items: center; gap: var(--e3); color: var(--texto-3); font-size: var(--t-chico); font-weight: 600; }
+.entrar-o::before, .entrar-o::after { content: ""; flex: 1; height: 1px; background: var(--borde); }
+
+/* El lugar del botón de Google: centrado y con su alto reservado, para que nada salte
+   cuando Google termina de dibujarlo. */
+.entrar-google-lugar { display: flex; justify-content: center; align-items: center; min-height: 44px; width: 100%; max-width: 400px; margin-inline: auto; border-radius: var(--r-control); transition: opacity var(--rapido) ease-out; }
+.entrar-google-lugar.esperando { background: var(--borde); animation: latir 1s ease-in-out infinite alternate; }
+.entrar-google-lugar.ocupado { opacity: 0.45; pointer-events: none; }
+
+.entrar-nota { display: flex; align-items: flex-start; gap: var(--e2); padding-top: var(--e4); border-top: 1px solid var(--borde); color: var(--texto-2); font-size: var(--t-chico); }
+.entrar-nota svg { flex: none; margin-top: 1px; color: var(--azul); }
+
+/* Pantallas bajas (celular acostado o chico): la explicación larga deja lugar a la puerta. */
+@media (max-width: 899px) and (max-height: 920px) { .entrar-puntos { display: none; } }
+@media (max-width: 899px) and (max-height: 620px) { .entrar-bajada { display: none; } .entrar-marca { padding-block: var(--e4); } }
+
+@media (min-width: 900px) {
+  .entrar { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; column-gap: var(--e8); }
+  .entrar-cinta { grid-column: 1 / -1; }
+  .entrar-marca { padding: var(--e12) var(--e6) var(--e12) clamp(var(--e8), 8vw, 120px); gap: var(--e5); }
+  .entrar-marca .marca { font-size: 2rem; margin-bottom: var(--e4); }
+  .entrar-marca h1 { font-size: 2.75rem; max-width: 16ch; }
+  .entrar-bajada { font-size: var(--t-medio); }
+  .entrar-puntos { margin-top: var(--e4); gap: var(--e4); }
+  .entrar-puntos li { font-size: var(--t-base); }
+  .entrar-puntos li > span { width: 40px; height: 40px; }
+  .entrar-puerta { align-self: center; width: clamp(420px, 36vw, 500px); margin: var(--e8) clamp(var(--e6), 6vw, 96px) var(--e8) 0; padding: var(--e10); border-radius: var(--r-hoja); gap: var(--e5); }
+  .entrar-como { margin-top: calc(var(--e3) * -1); }
+}
+
+/* ---------- La página que abre el celular al leer el código de la computadora ---------- */
+.vincular-resultado { display: flex; flex-direction: column; align-items: center; gap: var(--e3); text-align: center; padding-block: var(--e2); }
+.vincular-resultado .vincular-tilde { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--verde-suave); color: var(--verde); animation: tilde 260ms ease-out; }
+.vincular-resultado p { max-width: 40ch; color: var(--texto-2); }
+.vincular-resultado p strong { color: var(--tinta); }
+
+/* ---------- La oferta de la huella ---------- */
+.ofrecer-huella { display: flex; flex-direction: column; align-items: center; gap: var(--e3); text-align: center; }
+.ofrecer-huella-icono { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--ambar-suave); color: var(--ambar-texto); }
+.ofrecer-huella-icono.listo { background: var(--verde-suave); color: var(--verde); animation: tilde 260ms ease-out; }
+.ofrecer-huella p { max-width: 40ch; color: var(--texto-2); }
+.ofrecer-huella .aviso { text-align: left; align-self: stretch; }
+.ofrecer-huella-botones { display: flex; flex-direction: column; gap: var(--e2); align-self: stretch; margin-top: var(--e2); }
+@media (min-width: 900px) { .ofrecer-huella-botones { flex-direction: row-reverse; justify-content: center; } }

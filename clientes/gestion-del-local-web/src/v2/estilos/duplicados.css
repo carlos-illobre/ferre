@@ -1,0 +1,61 @@
+/* Duplicados: lo propio de la pantalla. Piezas y colores salen de base.css y tokens.css. */
+
+.duplicados-seccion { display: flex; flex-direction: column; gap: var(--e3); min-width: 0; }
+.duplicados-seccion-cabeza { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2) var(--e3); }
+.duplicados-esqueleto { height: 220px; border-radius: var(--r-tarjeta); }
+.duplicados-nada { padding: 0 var(--e4) var(--e4); color: var(--texto-2); }
+/* La flecha del plegable abierto: en base.css la regla espera el botón como hijo directo y hay un h2 en el medio. */
+.plegable.abierto .plegable-titulo .flecha { transform: rotate(90deg); }
+
+/* Lo último que se hizo, con «Deshacer»: queda a la vista aunque se siga bajando por la lista. */
+.duplicados-hecho { position: sticky; top: var(--e3); z-index: var(--z-pegado); animation: subir var(--normal) ease-out; }
+.duplicados-hecho .aviso { align-items: center; box-shadow: var(--sombra-2); }
+.duplicados-hecho .aviso > svg { margin-top: 0; }
+.duplicados-hecho-botones { display: flex; gap: var(--e2); flex: none; }
+
+.duplicados-sugerencias { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: var(--e4); }
+.duplicados-sugerencia { display: flex; flex-direction: column; gap: var(--e3); padding: var(--e4); min-width: 0; animation: aparecer var(--normal) ease-out; }
+.duplicados-motivo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e2); }
+.duplicados-par { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e3); flex: 1; }
+
+/* Cada producto del par se toca entero para elegir qué nombre queda. */
+.duplicados-candidato { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: var(--e3); padding: var(--e3); border: 1px solid var(--borde-fuerte); border-radius: var(--r-control); background: var(--superficie); text-align: left; transition: background-color var(--rapido) ease-out; }
+.duplicados-candidato:hover:not(:disabled) { background: var(--superficie-2); }
+.duplicados-candidato[aria-checked="true"] { border-color: var(--azul); background: var(--azul-suave); box-shadow: inset 0 0 0 1px var(--azul); }
+.duplicados-candidato[aria-checked="true"]:focus-visible { box-shadow: var(--foco); }
+.duplicados-candidato-marca { display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; border: 2px solid var(--borde-fuerte); background: var(--superficie); color: var(--superficie); }
+.duplicados-candidato[aria-checked="true"] .duplicados-candidato-marca { border-color: var(--azul); background: var(--azul); }
+.duplicados-candidato-datos { display: flex; flex-direction: column; gap: var(--e1); min-width: 0; }
+.duplicados-candidato-datos strong { overflow-wrap: anywhere; line-height: 1.25; }
+.duplicados-candidato-datos .detalle { overflow-wrap: anywhere; }
+.duplicados-candidato-costo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); margin-top: var(--e1); }
+.duplicados-candidato-queda { margin-top: var(--e1); font-size: var(--t-chico); font-weight: 650; color: var(--texto-3); }
+.duplicados-candidato[aria-checked="true"] .duplicados-candidato-queda { color: var(--azul); }
+
+.duplicados-decidir { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e3); }
+
+/* Unir a mano: dos buscadores lado a lado. */
+.duplicados-manual { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e5); align-items: start; margin-bottom: var(--e3); }
+.duplicados-elegir { display: flex; flex-direction: column; gap: var(--e2); min-width: 0; }
+.duplicados-elegir h3 { font-size: var(--t-base); font-weight: 700; }
+.duplicados-elegido { display: flex; align-items: center; gap: var(--e3); min-height: 52px; padding: var(--e2) var(--e3) var(--e2) var(--e4); border: 1px solid var(--azul); border-radius: var(--r-tarjeta); background: var(--azul-suave); }
+.duplicados-elegido-datos { display: flex; flex-direction: column; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.duplicados-manual-pie { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); margin-top: var(--e3); }
+
+.duplicados-tabla th { position: static; border-top: 1px solid var(--borde); }
+.duplicados-uniones { display: flex; flex-direction: column; border-top: 1px solid var(--borde); }
+.duplicados-uniones li { border-bottom: 1px solid var(--borde); }
+.duplicados-uniones li:last-child { border-bottom: 0; }
+
+@media (max-width: 899px) {
+  .duplicados-buscar { width: 100%; white-space: normal; }
+  .duplicados-hecho { top: calc(60px + env(safe-area-inset-top)); }
+  .duplicados-hecho .aviso { flex-wrap: wrap; }
+  .duplicados-hecho .aviso > div { flex-basis: calc(100% - 44px); }
+  .duplicados-hecho-botones { margin-left: auto; }
+  .duplicados-par { gap: var(--e2); }
+  .duplicados-candidato { grid-template-columns: minmax(0, 1fr); gap: var(--e2); padding: var(--e3) var(--e2) var(--e3) var(--e3); }
+  .duplicados-decidir .boton { min-height: var(--toque); white-space: normal; }
+  .duplicados-manual { grid-template-columns: minmax(0, 1fr); }
+  .duplicados-manual-pie .boton { width: 100%; }
+}

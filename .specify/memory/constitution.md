@@ -116,7 +116,7 @@ en un estado que rompa las pruebas. Los comandos de Spec Kit no crean rama.
 | Paso | Rol | Cómo | Produce | Aprueba Carlos |
 |---|---|---|---|---|
 | 1 | Analista de negocio | `/speckit-specify` y `/speckit-clarify` | `spec.md` | Sí |
-| 2 | Diseñador UI/UX | `/ux` | `ux.md` | Sí, si hay pantallas |
+| 2 | Diseñador UI/UX | `/ux` | Maquetas estáticas con variantes y capturas, y `ux.md` | Sí, sobre la maqueta, si hay pantallas |
 | 3 | Arquitecto | `/speckit-plan` | `plan.md`, `data-model.md`, `contracts/` | No |
 | 4 | Planificador | `/speckit-tasks` y `/speckit-analyze` | `tasks.md` | No |
 | 5 | QA | subagente `qa` | Una prueba que falla por escenario | No |
