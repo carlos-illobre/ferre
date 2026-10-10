@@ -19,6 +19,10 @@
   a { display: flex; align-items: center; min-height: 48px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--borde); color: var(--tinta); text-decoration: none; font-weight: 600; }
   a:hover { background: var(--fondo); }
   a:focus-visible { outline: 3px solid #1463ff; outline-offset: 2px; }
+  h3 { margin: 28px 0 10px; font-size: 1.125rem; }
+  .lado { display: grid; gap: 12px; }
+  .lado a { display: block; padding: 0; min-height: 0; border: 1px solid var(--borde); overflow: hidden; }
+  .lado img { display: block; width: 100%; height: auto; }
   footer { margin-top: 28px; color: var(--gris); font-size: 0.9375rem; }
 </style>
 </head>
@@ -52,6 +56,20 @@
       </ul>
     </section>
   </div>
+  <h2 style="margin-top:40px">Las tres, lado a lado</h2>
+  <p>Tocá una imagen para verla grande.</p>
+  <h3>Vender</h3>
+  <div class="lado"><a href="comparar/vender-celu.png"><img src="comparar/vender-celu.png" alt="Vender en el celular: opciones A, B y C" loading="lazy"></a><a href="comparar/vender-compu.png"><img src="comparar/vender-compu.png" alt="Vender en la computadora: opciones A, B y C" loading="lazy"></a></div>
+  <h3>Buscar un producto</h3>
+  <div class="lado"><a href="comparar/productos-celu.png"><img src="comparar/productos-celu.png" alt="Buscar un producto en el celular: opciones A, B y C" loading="lazy"></a><a href="comparar/productos-compu.png"><img src="comparar/productos-compu.png" alt="Buscar un producto en la computadora: opciones A, B y C" loading="lazy"></a></div>
+  <h3>Entrar</h3>
+  <div class="lado"><a href="comparar/entrar-celu.png"><img src="comparar/entrar-celu.png" alt="Entrar en el celular: opciones A, B y C" loading="lazy"></a><a href="comparar/entrar-compu.png"><img src="comparar/entrar-compu.png" alt="Entrar en la computadora: opciones A, B y C" loading="lazy"></a></div>
+  <h3>Subir una lista de precios</h3>
+  <div class="lado"><a href="comparar/listas-celu.png"><img src="comparar/listas-celu.png" alt="Subir una lista de precios en el celular: opciones A, B y C" loading="lazy"></a><a href="comparar/listas-compu.png"><img src="comparar/listas-compu.png" alt="Subir una lista de precios en la computadora: opciones A, B y C" loading="lazy"></a></div>
+  <h3>Recibir mercadería</h3>
+  <div class="lado"><a href="comparar/mercaderia-celu.png"><img src="comparar/mercaderia-celu.png" alt="Recibir mercadería en el celular: opciones A, B y C" loading="lazy"></a><a href="comparar/mercaderia-compu.png"><img src="comparar/mercaderia-compu.png" alt="Recibir mercadería en la computadora: opciones A, B y C" loading="lazy"></a></div>
+  <h3>Quién hizo qué</h3>
+  <div class="lado"><a href="comparar/actividad-celu.png"><img src="comparar/actividad-celu.png" alt="Quién hizo qué en el celular: opciones A, B y C" loading="lazy"></a><a href="comparar/actividad-compu.png"><img src="comparar/actividad-compu.png" alt="Quién hizo qué en la computadora: opciones A, B y C" loading="lazy"></a></div>
   <footer>La versión anterior sigue en <a style="display:inline;border:0;padding:0;min-height:0;text-decoration:underline;font-weight:400" href="../v2/">/v2/</a> y la actual, en la raíz.</footer>
 </main>
 </body>
