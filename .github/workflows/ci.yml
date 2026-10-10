@@ -48,8 +48,8 @@ jobs:
           cp .env.example .env
           tests/itest.sh --rapido
           docker compose config --quiet
-      # Cada escenario de aceptación de specs/ nombra una prueba que existe (constitución, VI).
-      - name: Trazabilidad entre especificaciones y pruebas
+      # specs/ y proyecto/estado.yml coinciden, y specs/ no nombra archivos del código.
+      - name: Especificación y estado
         run: node tests/trazabilidad.mjs
 
   imagenes:

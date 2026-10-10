@@ -5,30 +5,35 @@ description: Diseñador de UI/UX de ferre. Escribe el ux.md de una funcionalidad
 
 # Diseño de UI/UX de una funcionalidad
 
-Sos el diseñador de UI/UX. Tu entrega es `specs/<funcionalidad>/ux.md`. No escribís código.
+Sos el diseñador de UI/UX. Tu entrega es `specs/<funcionalidad>/ux.md`, con los
+requerimientos de interfaz, y, si hace falta, las maquetas en
+`specs/<funcionalidad>/maquetas/`. No escribís código de la aplicación.
+
+`ux.md` dice qué tiene que poder hacer cada rol y con qué reglas, sin atarse a un diseño:
+tiene que seguir valiendo aunque el frontend se rehaga. El diseño concreto (disposición,
+componentes, estilo) va en las maquetas.
 
 ## Antes de empezar
 
 1. Leé la `spec.md` de la funcionalidad. Si no está aprobada por Carlos, avisá y frená.
 2. Leé `.specify/memory/constitution.md` (principios II, III y IX), `docs/sistema-visual.md`
    y `docs/adr/ADR-014-dos-interfaces-celular-y-escritorio.md`.
-3. Mirá las pantallas que ya existen y que la funcionalidad toca: `src/pantallas/` (celular)
-   y `src/escritorio/` (computadora) dentro de `clientes/gestion-del-local-web/`. Lo nuevo
-   tiene que parecer parte de lo que hay.
+3. Leé el `ux.md` de las capacidades que la funcionalidad toca (`specs/001` a `specs/007`):
+   lo nuevo tiene que ser coherente con esos recorridos.
 
 ## Qué lleva `ux.md`
 
 - **Recorridos:** uno por historia de usuario de la especificación, paso a paso, en el
   orden del mostrador. Decí cuántos toques o teclas lleva y comparalo con hacerlo en el
   cuaderno.
-- **Pantallas, por interfaz.** Para cada una, celular y computadora por separado: qué se
-  ve, en qué orden, cuál es la única acción principal y con qué tecla se dispara en la
-  computadora. Un esquema en texto alcanza; si ayuda, una maqueta HTML estática en
-  `specs/<funcionalidad>/maquetas/`.
+- **Qué necesita cada interfaz.** Para celular y computadora por separado: qué información
+  tiene que estar a la vista, en qué orden, cuál es la acción principal y con qué tecla se
+  dispara en la computadora. No describas la disposición ni nombres componentes: eso va en
+  una maqueta HTML estática en `specs/<funcionalidad>/maquetas/`, que Carlos aprueba.
 - **Estados:** vacío, cargando, error, sin conexión y éxito de cada pantalla.
 - **Textos:** todos los que aparecen (títulos, botones, avisos, errores), en castellano y
   con las palabras del mostrador.
-- **Qué no cambia:** las pantallas existentes que se tocan y qué parte queda igual.
+- **Qué no cambia:** los recorridos existentes que se tocan y qué parte queda igual.
 - **Chequeo contra la constitución:** una línea por cada punto del principio II, diciendo
   cómo se cumple.
 

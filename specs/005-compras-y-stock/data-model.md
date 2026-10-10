@@ -1,7 +1,7 @@
 # Modelo de datos: compras y stock
 
-Sale de `docs/MODELO.md` y de las migraciones `0001_modelo_inicial.sql` y
-`0004_sectores_y_conteos.sql` de `microservices/gestion-del-local/migrations/`.
+Las tablas del servicio `gestion-del-local` que usa esta capacidad. El modelo completo está
+en [001-base-del-sistema/data-model.md](../001-base-del-sistema/data-model.md).
 
 Reglas que valen acá: ids UUID (el de la compra lo genera el cliente, así un reintento no
 la duplica); nada se borra (`estado` en documentos, `activo` en catálogos);
@@ -20,15 +20,15 @@ erDiagram
     producto ||--o{ renglon_conteo : ""
 ```
 
-## compra (0001)
+## compra
 
-Un ingreso de mercadería (#30).
+Un ingreso de mercadería.
 
 | Columna | Tipo | Detalle |
 |---|---|---|
 | `id` | uuid, PK | |
 | `proveedor_id` | uuid, obligatorio | → `proveedor` |
-| `fecha` | date, obligatorio | Fecha del comprobante; por omisión, hoy |
+| `fecha` | date, obligatorio | Fecha del comprobante; por omisión, la del día |
 | `comprobante_tipo` | text, obligatorio | `factura`, `remito` o `sin_comprobante` |
 | `comprobante_numero` | text | Vacío si no hay comprobante |
 | `total` | numeric(12,2), ≥ 0 | Suma de cantidad × costo unitario, sin IVA |
@@ -39,7 +39,7 @@ Un ingreso de mercadería (#30).
 Índice por `fecha DESC`. Quién la registró o anuló no está en la tabla: queda en `evento`
 (`compra.registrada`, `compra.anulada`; el motivo de la anulación va en el evento).
 
-## item_compra (0001)
+## item_compra
 
 Un renglón de la compra.
 
@@ -53,7 +53,7 @@ Un renglón de la compra.
 | `costo_unitario` | numeric(14,4), ≥ 0 | Sin IVA |
 | `creado_en` | timestamptz | |
 
-## movimiento_stock (0001)
+## movimiento_stock
 
 Cada entrada o salida. El stock de un producto no se guarda: es la suma de `cantidad`.
 
@@ -81,7 +81,7 @@ Cada entrada o salida. El stock de un producto no se guarda: es la suma de `cant
 
 Los movimientos de tipo `venta` los escribe la capacidad de ventas.
 
-## sector (0004)
+## sector
 
 Dónde vive cada producto en el local.
 
@@ -93,10 +93,10 @@ Dónde vive cada producto en el local.
 | `activo` | boolean | |
 | `creado_en`, `modificado_en` | timestamptz | |
 
-La misma migración agrega `producto.sector_id` (→ `sector`, con índice): se asigna al
-contar el producto en un sector.
+`producto.sector_id` (→ `sector`, con índice) dice en qué sector vive cada producto: se
+asigna al contar el producto en un sector.
 
-## conteo (0004)
+## conteo
 
 El recuento de un sector.
 
@@ -111,7 +111,7 @@ El recuento de un sector.
 
 Índice único parcial: un solo conteo `abierto` por sector.
 
-## renglon_conteo (0004)
+## renglon_conteo
 
 Lo contado de un producto en un conteo.
 
@@ -128,12 +128,12 @@ está abierto).
 
 ## Tablas de otras capacidades que esta usa
 
-- **`proveedor`** (0001; `lector` en 0003): se lee para elegir el proveedor de la compra.
-- **`producto`** (0001): la compra crea productos nuevos (`descripcion`, `marca`,
+- **`proveedor`**: se lee para elegir el proveedor de la compra.
+- **`producto`**: la compra crea productos nuevos (`descripcion`, `marca`,
   `proveedor_preferido_id`); el conteo le asigna `sector_id`.
-- **`precio_proveedor`** (0001): cuando el costo del comprobante difiere del vigente, la
+- **`precio_proveedor`**: cuando el costo del comprobante difiere del vigente, la
   compra agrega una fila con `precio_lista` y `costo_neto` iguales al costo unitario,
   `fecha_lista` igual a la fecha de la compra, sin `lista_importada_id`, y en `descuentos`
   la explicación `{"pasos": [], "explicacion": ["Costo … según factura … de … del …"]}`.
-- **`evento`** (0001): `compra.registrada`, `compra.anulada`, `stock.ajustado`,
+- **`evento`**: `compra.registrada`, `compra.anulada`, `stock.ajustado`,
   `sector.creado`, `conteo.abierto`, `conteo.cerrado`, con el usuario que lo hizo.

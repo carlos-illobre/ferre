@@ -1,8 +1,8 @@
 # Contrato de la API: Usuarios y acceso
 
-Servicio `gestion-del-local`. Fuente: `microservices/gestion-del-local/src/app.ts`,
-`autenticacion.ts`, `sesiones.ts` y `rutas/` (`sesiones.ts`, `usuarios.ts`,
-`credenciales.ts`, `auditoria.ts`, `puestos.ts`).
+> El contrato de roles cambia con RF-72: donde dice «dueño o admin» pasa a exigir el rol que fije la matriz de permisos de [spec.md](../spec.md), y `rol` pasa a ser una lista de roles.
+
+Servicio `gestion-del-local`.
 
 ## Reglas comunes
 
@@ -23,13 +23,13 @@ En la columna «Exige», «sesión» quiere decir cualquier rol.
 | Método | Ruta | Exige | Para qué sirve |
 |---|---|---|---|
 | POST | `/sesiones/google` | Nada; 10 intentos por minuto | Entrar con Google. Cuerpo: `credencial` (el token del botón de Google) y `dispositivo` opcional. `201` con `token` y `usuario` (`id`, `email`, `nombre`, `rol`). `400` sin credencial; `401` si Google no verifica la cuenta; `403` «<correo> no está autorizado. Pedile al dueño que te dé de alta.» si el correo no está cargado o está desactivado. Registra `sesion.iniciada` con medio `google` |
-| GET | `/sesiones/actual` | Sesión | Quién soy: `id` de la sesión y `usuario`. La app lo llama al abrir |
+| GET | `/sesiones/actual` | Sesión | Quién soy: `id` de la sesión y `usuario` |
 | DELETE | `/sesiones/actual` | Sesión | Salir: revoca la sesión propia. `204`. Registra `sesion.cerrada` |
 | GET | `/sesiones` | Dueño o admin | Sesiones abiertas de todos los usuarios (sin revocar ni vencidas), la más usada recientemente primero: `id`, `dispositivo`, `creada_en`, `ultimo_uso_en`, `expira_en`, `email`, `nombre` |
 | DELETE | `/sesiones/:id` | Dueño o admin | Cerrar a distancia la sesión de cualquiera. `204` (también si el id no existe). Registra `sesion.revocada` |
 
-`/sesiones/vinculaciones` y `/sesiones/vinculaciones/:codigo/aprobar` (login por QR) se
-quitaron el 2026-10-09: responden `404`.
+`/sesiones/vinculaciones` y `/sesiones/vinculaciones/:codigo/aprobar` (entrada por QR) no
+existen: responden `404` (RF-70).
 
 ## Usuarios (`/usuarios`)
 
@@ -60,12 +60,13 @@ Los desafíos valen 5 minutos y un solo uso, y viven en la memoria del proceso.
 |---|---|---|---|
 | GET | `/auditoria` | Dueño o admin | El registro de acciones, de la más reciente a la más vieja, de a 10. Parámetro `pagina` (desde 1; un valor inválido es 1). Devuelve `eventos` (`id`, `tipo`, `fecha`, `dispositivo_id`, `contenido`, `email`, `nombre`), `total`, `pagina` y `por_pagina` (10) |
 
-La ruta también acepta `usuario` (id), `tipo` (prefijo), `desde` y `hasta` (fechas). Ninguna
-pantalla los usa y no tienen prueba: los filtros de RF-71 son el issue #58.
+Filtros opcionales y combinables (RF-71): `usuario` (id del usuario), `tipo` (prefijo del
+tipo de evento), `desde` (fecha y hora, inclusive) y `hasta` (fecha y hora, exclusive).
+`total` cuenta las acciones que cumplen los filtros.
 
 ## Celular como lector de la computadora (`/puestos`)
 
-Pertenecen a RF-08 (issue #52, capacidad de catálogo). Figuran acá porque todas exigen
+Pertenecen a RF-08 (capacidad de catálogo). Figuran acá porque todas exigen
 sesión y atan una sesión de computadora con una de celular; no son una forma de entrar.
 
 | Método | Ruta | Exige | Para qué sirve |

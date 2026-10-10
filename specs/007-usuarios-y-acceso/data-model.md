@@ -1,9 +1,9 @@
 # Modelo de datos: Usuarios y acceso
 
-Fuentes: `docs/MODELO.md` y las migraciones de `microservices/gestion-del-local/migrations/`
-(`0001_modelo_inicial.sql`, `0002_usuarios_y_sesiones.sql`, `0008_rol_admin.sql`,
-`0011_credenciales_passkey.sql`). Valen las reglas generales del modelo: nada se borra
-físicamente y `evento` solo recibe filas nuevas.
+> El contrato de roles cambia con RF-72: `usuario.rol`, con un solo valor entre `dueño`, `admin` y `mostrador`, pasa a uno o más roles entre Administrador, Vendedor y Comprador.
+
+Contrato de datos del servicio `gestion-del-local` para esta capacidad. Valen las reglas
+generales del modelo: nada se borra físicamente y `evento` solo recibe filas nuevas.
 
 ```mermaid
 erDiagram
@@ -16,21 +16,20 @@ erDiagram
 
 ## usuario
 
-Quién puede entrar. Migraciones 0002 y 0008.
+Quién puede entrar.
 
 | Columna | Tipo | Detalle |
 |---|---|---|
 | `id` | uuid, clave primaria | Lo genera la API |
 | `email` | text, único, obligatorio | El correo de Google; se guarda y se compara en minúsculas |
 | `nombre` | text, obligatorio | |
-| `rol` | text, obligatorio | `dueño`, `admin` o `mostrador` (restricción `usuario_rol_check`; `admin` se agregó en 0008). Uno solo por usuario |
+| `rol` | text, obligatorio | `dueño`, `admin` o `mostrador` (restricción `usuario_rol_check`). Uno solo por usuario |
 | `activo` | boolean, por omisión `true` | Desactivar es la baja; no se borra |
 | `creado_en`, `modificado_en` | timestamptz | `modificado_en` lo mantiene el trigger `usuario_modificado` |
 
-Reglas que aplica la API (`rutas/usuarios.ts`): nadie se desactiva ni se cambia el rol a sí
-mismo; el admin no crea dueños, no modifica a un dueño ni da ese rol; desactivar a un
-usuario revoca sus sesiones abiertas. El primer dueño se crea con el comando
-`crear-usuario` (`src/crear-usuario.ts`).
+Reglas que aplica la API: nadie se desactiva ni se cambia el rol a sí mismo; el admin no
+crea dueños, no modifica a un dueño ni da ese rol; desactivar a un usuario revoca sus
+sesiones abiertas. El primer dueño se crea con el comando `crear-usuario` del servicio.
 
 Otras tablas guardan quién hizo algo apuntando a `usuario`: `lista_importada.cargada_por`
 y `aplicada_por`, `conteo.abierto_por` y `cerrado_por`, `renglon_conteo.contado_por`,
@@ -38,7 +37,7 @@ y `aplicada_por`, `conteo.abierto_por` y `cerrado_por`, `renglon_conteo.contado_
 
 ## sesion
 
-Un dispositivo en el que un usuario está adentro. Migración 0002.
+Un dispositivo en el que un usuario está adentro.
 
 | Columna | Tipo | Detalle |
 |---|---|---|
@@ -52,14 +51,13 @@ Un dispositivo en el que un usuario está adentro. Migración 0002.
 | `revocada_en` | timestamptz | Cierre: por «Salir», por un Administrador o por desactivar al usuario |
 
 Índice `sesion_por_usuario (usuario_id) WHERE revocada_en IS NULL`. Una sesión vale si no
-está revocada, no venció y su usuario está activo (`src/sesiones.ts`).
+está revocada, no venció y su usuario está activo.
 
-`puesto.sesion_id` y `puesto.celular_sesion_id` (migración 0005, capacidad de catálogo,
-RF-08) apuntan a `sesion`: la computadora que muestra el QR y el celular que escanea.
+`puesto.sesion_id` y `puesto.celular_sesion_id` (capacidad de catálogo, RF-08) apuntan a `sesion`: la computadora que muestra el QR y el celular que escanea.
 
 ## credencial
 
-Un celular vinculado para entrar con la huella (passkey). Migración 0011.
+Un celular vinculado para entrar con la huella (passkey).
 
 | Columna | Tipo | Detalle |
 |---|---|---|
@@ -78,8 +76,8 @@ vinculación o entrada no se guarda en la base: vive 5 minutos en la memoria del
 
 ## evento
 
-Registro de eventos de dominio (ADR-003) y, a la vez, «quién hizo qué». Migraciones 0001
-y 0002 (que le agregó `usuario_id`). Solo recibe filas nuevas.
+Registro de eventos de dominio (ADR-003) y, a la vez, «quién hizo qué». Solo recibe filas
+nuevas.
 
 | Columna | Tipo | Detalle |
 |---|---|---|
@@ -110,11 +108,11 @@ Tipos que escribe esta capacidad:
 Las demás capacidades escriben los suyos (`venta.registrada`, `lista.aplicada`,
 `conteo.cerrado`…) con el mismo `usuario_id`.
 
-## vinculacion (en desuso)
+## vinculacion
 
-Era el código de un solo uso para entrar en la computadora leyendo un QR con el celular.
-Se quitó el 2026-10-09 (ADR-011, enmienda): la tabla queda, sin filas nuevas y sin código
-que la lea.
+Código de un solo uso para entrar en la computadora leyendo un QR con el celular. Esa forma
+de entrar se quitó (RF-70; ADR-011, enmienda del 2026-10-09): la tabla se conserva porque
+nada se borra, no recibe filas nuevas y ninguna ruta la lee.
 
 | Columna | Tipo |
 |---|---|

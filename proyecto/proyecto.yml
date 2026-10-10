@@ -61,6 +61,8 @@ restricciones:
   - Un solo empleado, que no puede desatender el mostrador
 
 requerimientos: specs/README.md
+# El estado de cada requerimiento va aparte: las especificaciones no dicen si algo está hecho.
+estado_de_requerimientos: proyecto/estado.yml
 
 # Cada etapa es un milestone de GitHub con el mismo nombre. Las fechas marcadas como
 # tentativas son una primera estimación, a confirmar por el dueño.

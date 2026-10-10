@@ -6,7 +6,13 @@ Carlos. El porqué de cada regla técnica está en los ADR ([docs/adr](../../doc
 
 ## Core Principles
 
-### I. La especificación manda
+### I. La especificación manda y no depende del código
+
+Lo fijo son las reglas de negocio; el código puede rehacerse en cualquier momento. Las
+especificaciones tienen que alcanzar para que alguien que nunca vio este código construya
+de nuevo una aplicación que cumpla todos los requerimientos, funcionales y no funcionales.
+Por eso describen qué tiene que pasar y nunca cómo está hecho hoy: no nombran archivos,
+componentes ni pantallas del código, y no dicen si algo está construido o no.
 
 No se escribe código de una funcionalidad sin su `spec.md` aprobada por Carlos. Si el
 trabajo no coincide con la especificación, se corrige el trabajo o se le pregunta a Carlos
@@ -51,8 +57,10 @@ números de origen. Cada acción queda con el usuario que la hizo.
 
 Cada escenario de aceptación de una especificación tiene una prueba que se escribe antes
 del código y falla hasta que el código existe. Un requerimiento figura como hecho solo
-cuando todos sus escenarios tienen una prueba que pasa; lo que solo se puede comprobar en
-el mostrador figura «a validar» hasta que Carlos o el Vendedor lo confirman. Las unitarias
+cuando sus escenarios tienen pruebas que pasan; lo que solo se puede comprobar en el
+mostrador figura «a validar» hasta que Carlos o el Vendedor lo confirman. Ese estado no se
+escribe en la especificación: vive en `proyecto/estado.yml`, con las pruebas que lo
+respaldan, y es lo único que hay que reiniciar si el código se rehace. Las unitarias
 corren en cada push; las de punta a punta cubren los caminos principales, una vez por
 interfaz. Sin meta de cobertura ni mutation testing (ADR-004).
 
@@ -119,16 +127,21 @@ Una funcionalidad, una carpeta en `specs/` y una rama con el mismo nombre.
   inglés, para no apartarse del estándar; el contenido se escribe en castellano.
 - **Identificadores.** Los requerimientos conservan sus IDs (`RF-19`, `RNF-21`) en lugar de
   `FR-001`. Los nuevos siguen la numeración de su capacidad.
-- **Línea de base.** Las carpetas `001` a `007` describen lo construido antes de adoptar el
-  método, una por capacidad. Son la especificación vigente de cada capacidad.
+- **Una carpeta por capacidad.** Las carpetas `001` a `007` especifican cada capacidad
+  completa: todos sus requerimientos, estén construidos o no. Son la especificación vigente.
 - **Qué vale hoy.** Al cerrar una funcionalidad, lo que cambia de una capacidad se
   incorpora a la `spec.md` de esa capacidad, con una nota de qué carpeta lo cambió y cuándo.
   La carpeta de la funcionalidad conserva la historia; la de la capacidad, lo vigente.
-- **Dos documentos más por funcionalidad:** `ux.md` y `verificacion.md`.
-- **Cada escenario nombra su prueba** (`Prueba: ruta del archivo`). `tests/trazabilidad`
-  lo controla en el CI.
-- **Índice.** [specs/README.md](../../specs/README.md) lista cada requerimiento con su
-  estado y su carpeta. Es la entrada para quien llega al proyecto y lo que lee el tablero.
+- **Regla y estado, separados.** `specs/` dice qué tiene que hacer el sistema.
+  `proyecto/estado.yml` dice, por requerimiento, si está hecho, qué pruebas lo respaldan y
+  en qué se aparta hoy el código de la regla. `tests/trazabilidad.mjs` controla en el CI que
+  los dos coincidan.
+- **`ux.md` son requerimientos de interfaz:** qué tiene que poder hacer cada rol en cada
+  recorrido y con qué reglas, sin atarse a un diseño. En una funcionalidad nueva, el
+  diseño concreto va en `specs/NNN/maquetas/`.
+- **Un documento más por funcionalidad nueva:** `verificacion.md`.
+- **Índice.** [specs/README.md](../../specs/README.md) lista cada requerimiento y su
+  carpeta. Es la entrada para quien llega al proyecto.
 - **Fuera de Spec Kit:** los ADR (`docs/adr/`), las decisiones de negocio
   (`docs/decisiones-de-negocio.md`), los manuales de operación (`docs/operacion/`), el
   sistema visual (`docs/sistema-visual.md`) y la gestión del portafolio (`proyecto/`).
@@ -140,4 +153,4 @@ la aprobación de Carlos, anotando qué cambió y por qué, y subiendo la versi�
 verificador comprueba cada funcionalidad contra ella antes de dar su veredicto; lo que la
 incumple no se cierra.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10
+**Version**: 1.1.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10

@@ -8,11 +8,17 @@ especificación aprobada.
 
 1. [.specify/memory/constitution.md](.specify/memory/constitution.md): lo que no se
    negocia y el flujo de trabajo. **Leela antes de tocar nada.**
-2. [specs/README.md](specs/README.md): de qué se trata el proyecto, cada requerimiento con
-   su estado y en qué carpeta está especificado.
-3. La carpeta de `specs/` de la capacidad que vayas a tocar (`001` a `007` son lo ya
-   construido).
-4. [docs/adr/](docs/adr/README.md): el porqué de cada decisión técnica.
+2. [specs/README.md](specs/README.md): de qué se trata el proyecto, cada requerimiento y en
+   qué carpeta está especificado.
+3. La carpeta de `specs/` de la capacidad que vayas a tocar (`001` a `007`, una por
+   capacidad, con todos sus requerimientos).
+4. [proyecto/estado.yml](proyecto/estado.yml): qué está hecho hoy, con qué pruebas, y dónde
+   el código se aparta de la regla.
+5. [docs/adr/](docs/adr/README.md): el porqué de cada decisión técnica.
+
+**La especificación no depende del código.** Lo fijo son las reglas de negocio; el código
+puede rehacerse. `specs/` nunca nombra archivos del código ni dice si algo está hecho: eso
+vive en `proyecto/estado.yml`.
 
 ## Cómo se trabaja
 
@@ -47,11 +53,11 @@ especificación aprobada.
 ## Lo que lee el tablero del portafolio
 
 El tablero (<https://gratis-vnic.tail994934.ts.net:8444/>) lee `specs/README.md`,
-`proyecto/proyecto.yml`, `proyecto/riesgos.yml` y los issues.
+`proyecto/estado.yml`, `proyecto/proyecto.yml`, `proyecto/riesgos.yml` y los issues.
 
-- En `specs/README.md`, el estado de cada requerimiento empieza con `Hecho`,
-  `Hecho en parte` (o `Parcial`), `A validar`, `Pendiente` o `Nuevo`. Si dice
-  `fuera de esta etapa` o `segunda versión`, no cuenta para el avance.
+- En `proyecto/estado.yml`, el `estado` de cada requerimiento empieza con `Hecho`,
+  `Hecho en parte`, `A validar`, `Pendiente` o `Nuevo`. Si dice `fuera de esta etapa` o
+  `segunda versión`, no cuenta para el avance. Los `#N` se enlazan a esos issues.
 - En un issue, `## Depende de` seguido de `#13, #15` lo deja bloqueado hasta que se cierren.
 - En los YAML de `proyecto/`, un texto con ` #` o `: ` adentro va entre comillas.
 
@@ -59,7 +65,7 @@ El tablero (<https://gratis-vnic.tail994934.ts.net:8444/>) lee `specs/README.md`
 
 ```bash
 tests/utest.sh               # unitarias, sin nada levantado
-node tests/trazabilidad.mjs  # cada escenario de specs/ nombra una prueba que existe
+node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
 tests/e2e.sh                 # caminos principales, en las dos interfaces (levanta el stack)
 ```

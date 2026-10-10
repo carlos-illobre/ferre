@@ -1,17 +1,14 @@
 # Contrato de la API: Ventas
 
-Servicio `gestion-del-local`. Código: `microservices/gestion-del-local/src/rutas/ventas.ts`
-y `microservices/gestion-del-local/src/rutas/consultas.ts`, montadas en `/ventas` y
-`/consultas` (`src/app.ts`).
+Servicio `gestion-del-local`, rutas `/ventas` y `/consultas`.
 
-**Rol que exigen:** todas las rutas pasan por `exigirSesion` y ninguna por `exigirRol`.
-Alcanza con una sesión válida de cualquier rol (dueño, admin o mostrador); sin sesión
-responden 401 «Hay que iniciar sesión».
+**Rol que exigen:** una sesión válida de cualquier rol; sin sesión responden 401 «Hay que
+iniciar sesión».
 
 | Método | Ruta | Rol que exige | Para qué sirve |
 |---|---|---|---|
 | POST | `/ventas` | Cualquier usuario con sesión | Registrar una venta con sus renglones |
-| GET | `/ventas` | Cualquier usuario con sesión | Las ventas de un día (hoy por omisión) con sus renglones y los totales |
+| GET | `/ventas` | Cualquier usuario con sesión | Las ventas de un día (por omisión, el día en curso) con sus renglones y los totales |
 | POST | `/ventas/:id/anular` | Cualquier usuario con sesión | Anular una venta y devolver el stock |
 | POST | `/ventas/:id/pagar` | Cualquier usuario con sesión | Marcar pagada una venta a cuenta corriente (RF-40, capacidad de Clientes) |
 | POST | `/consultas` | Cualquier usuario con sesión | Anotar lo que pidieron y no llevaron |
@@ -42,8 +39,8 @@ Cuerpo:
 ```
 
 - El total lo calcula el servidor: suma de `precio_unitario × cantidad` de cada renglón,
-  cada uno redondeado para arriba a $1.000 (RF-19) con la misma función que usa la pantalla
-  (`subtotalDeRenglon`, librería `calculo-de-precios`).
+  cada uno redondeado para arriba a $1.000 (RF-19), con el mismo cálculo que hace el
+  dispositivo.
 - En una sola transacción guarda la venta, sus renglones, un movimiento de stock negativo
   por cada renglón con producto y el evento `venta.registrada` con el usuario.
 - **201** `{ id, total, estado: "confirmada" }`.
@@ -55,8 +52,8 @@ Cuerpo:
 
 ## GET /ventas
 
-- Parámetro opcional `dia` (`AAAA-MM-DD`). Sin él, hoy. El día es el del local
-  (America/Argentina/Buenos_Aires), no el del servidor. Ninguna pantalla manda `dia` todavía.
+- Parámetro opcional `dia` (`AAAA-MM-DD`). Sin él, el día en curso. El día es el del local
+  (America/Argentina/Buenos_Aires), no el del servidor.
 - **200** `{ dia, ventas, totales, total }`. Cada venta: `id`, `fecha`, `medio_pago`,
   `total`, `estado`, `pagada_en`, `cliente` (nombre o null) e `items` en orden
   (`descripcion`, `cantidad`, `precio_unitario`, `margen_aplicado`, `explicacion`). Las más
@@ -77,7 +74,6 @@ Cuerpo:
 - Pone `pagada_en` a una venta a cuenta corriente, confirmada y todavía sin pagar; registra
   el evento `venta.pagada`.
 - **204** sin cuerpo. **409** «La venta no es a cuenta corriente, está anulada o ya se pagó».
-- Ninguna pantalla la usa todavía (#57).
 
 ## POST /consultas
 
@@ -94,13 +90,11 @@ Cuerpo:
 - Guarda una consulta por renglón; los renglones sin descripción se saltean. La fecha la
   pone el servidor. No registra evento.
 - **204** sin cuerpo. **400** «No hay nada que registrar» si no hay renglones.
-- Las pantallas de hoy no mandan `motivo`.
 
 ## GET /consultas
 
 - **200** lista de hasta 200 consultas, las más nuevas primero: `id`, `fecha`,
   `descripcion`, `precio_ofrecido`, `motivo`.
-- Ninguna pantalla la usa todavía.
 
 ## Rutas de otras capacidades que usa la venta
 
@@ -110,11 +104,3 @@ Cuerpo:
 | PATCH | `/productos/:id` | Guardar el margen o la unidad elegidos en el renglón |
 | GET | `/stock` | El stock que se muestra al lado de cada producto |
 | GET | `/clientes` | Los clientes para la cuenta corriente, con lo que debe cada uno |
-
-## Pruebas
-
-- `microservices/gestion-del-local/src/rutas/ventas.test.ts` cubre `POST /ventas`
-  (validaciones, registro, redondeo por renglón, reenvío).
-- `GET /ventas`, `POST /ventas/:id/anular` y `POST /consultas` no tienen prueba unitaria; los
-  recorre `tests/e2e/*/04-vender.spec.ts`.
-- `POST /ventas/:id/pagar` y `GET /consultas` no tienen ninguna prueba.

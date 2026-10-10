@@ -1,7 +1,8 @@
 # Quickstart: Base del sistema
 
-Cómo se levanta y cómo se prueba. Viene de `README.md`, `docs/TESTING.md` y
-`docs/casos-de-prueba-e2e.md`, contrastados con los scripts y los workflows el 2026-10-10.
+Cómo se levanta y cómo se prueba el repositorio. Es una guía de uso: nombra comandos y
+carpetas. Qué pruebas respaldan cada requerimiento se anota en `proyecto/`, fuera de
+`specs/`.
 
 ## Levantarlo
 
@@ -15,7 +16,7 @@ docker compose up -d --build --wait
 
 Eso levanta la API en http://localhost (vía el Caddy de desarrollo) y un PostgreSQL local.
 Los perfiles del compose (`local`: base propia; `gateway`: Caddy) vienen de
-`COMPOSE_PROFILES` en el `.env`; no hace falta pasarlos por línea de comandos. Las
+`COMPOSE_PROFILES` en el `.env`; no hay que pasarlos por línea de comandos. Las
 migraciones se aplican solas al arrancar la API.
 
 El cliente web se sirve aparte, como en producción:
@@ -50,7 +51,7 @@ estable. Sin compuerta de cobertura ni mutation testing.
 
 ```bash
 tests/utest.sh               # unitarias, sin nada levantado
-node tests/trazabilidad.mjs  # cada escenario de specs/ nombra una prueba que existe
+node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
 tests/itest.sh               # integración completa (necesita el stack levantado)
 tests/e2e.sh                 # caminos principales, en las dos interfaces (levanta el stack)
@@ -63,7 +64,7 @@ tests/e2e.sh                 # caminos principales, en las dos interfaces (levan
 | `tests/utest.sh` | Unitarias del workspace TypeScript (vitest, `pnpm -r test`) y de `listas-de-proveedores` (pytest) | Nada levantado |
 | `tests/itest.sh` | Los scripts de `tests/integration/`. `--rapido` saltea los que necesitan el stack | Docker (salvo `--rapido`) |
 | `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API (`vite preview` en el puerto 4173) y corre los escenarios Playwright de `tests/e2e/escritorio/` (ventana de 1366×768) y `tests/e2e/celular/` (412×915), en Chromium y de a uno. `--solo <nombre>` repite uno. `CARGA=1` activa además la prueba de carga | Docker, pnpm |
-| `node tests/trazabilidad.mjs` | Que cada escenario de aceptación de `specs/*/spec.md` tenga su línea «Prueba:» y que los archivos que nombra existan | Nada |
+| `node tests/trazabilidad.mjs` | Que la especificación (`specs/`) y el estado del proyecto (`proyecto/`) coincidan, que las pruebas que el estado nombra existan y que `specs/` no nombre código | Nada |
 
 ### Qué corre en cada push
 
@@ -87,37 +88,37 @@ despliegue) y `cliente-web` (publica en Pages producción en la raíz y pruebas 
   desarrollo. En el workflow las dos interfaces corren en paralelo, cada una con su stack, y
   cada escenario es un paso del job. Antes de los escenarios corre `tests/itest.sh` completo.
 - **La integración completa** (`tests/itest.sh` sin `--rapido`), que necesita el stack.
-- **La prueba de carga** (`CARGA=1 tests/e2e.sh --solo carga`): no está en el workflow. Está
-  pensada para correrse en la notebook del local antes del piloto.
+- **La prueba de carga** (`CARGA=1 tests/e2e.sh --solo carga`): se corre en la notebook del
+  local antes del piloto (RNF-07, RNF-08).
 - **Lo que no se automatiza:** el escaneo con la cámara real, la instalación como app en el
   celular, la leyenda del ambiente de pruebas y que ninguna pantalla del celular se desplace
   hacia el costado.
 
 ## Caminos principales cubiertos por E2E
 
-Cada escenario existe dos veces, con el mismo nombre de archivo: en `tests/e2e/escritorio/`
-y en `tests/e2e/celular/`. El detalle de cada caso (precondiciones, pasos y resultado
-esperado) está en `docs/casos-de-prueba-e2e.md`.
+Cada escenario va dos veces, con el mismo nombre de archivo: en `tests/e2e/escritorio/`
+y en `tests/e2e/celular/`. Qué tiene que pasar en cada uno está en los escenarios de
+aceptación de la `spec.md` de su capacidad.
 
-| Escenario | Archivo | Estado |
-|---|---|---|
-| La app abre y el servidor responde; cada interfaz carga solo su hoja de estilos | `00-arranque.spec.ts` | Hecho |
-| Sin sesión se pide entrar; con sesión el dueño ve la administración; vincular el celular con la huella y entrar con ella | `01-login.spec.ts` | Hecho |
-| Cargar una lista de precios y aplicarla | `02-listas.spec.ts` | Hecho |
-| Buscar un producto, elegir su margen o tipear otro margen a mano | `03-productos.spec.ts` | Hecho |
-| Buscar un producto y registrar una venta; ventas del día; anular; «no llevó» | `04-vender.spec.ts` | Hecho |
-| Ingresar mercadería de un proveedor; costo según factura; gasto semanal; anular | `05-compras.spec.ts` | Hecho |
-| Ver el stock valorizado, sus movimientos y corregirlo | `06-stock.spec.ts` | Hecho |
-| Contar un sector y cerrarlo con ajustes | `07-contar.spec.ts` | Hecho |
-| Vender y cambiar un margen sin red, y que llegue todo al volver; la app abre sin red | `08-sin-conexion.spec.ts` | Hecho |
-| Carga del navegador: 50.000 productos y 10.000 ventas (solo con `CARGA=1`) | `09-carga.spec.ts` | Hecho; se corre a mano |
-| Vincular el celular por QR y que lo escaneado aparezca en la laptop; asociar un código desconocido | `10-escaner.spec.ts` | Hecho (el escaneo con cámara real se prueba a mano) |
-| Sugerir un duplicado entre proveedores, unirlo y ver el más barato como preferido; separar | `11-duplicados.spec.ts` | Hecho |
-| Cerrar la sesión de otro dispositivo, cerrar la propia (vuelve al login) y Salir | `12-cerrar-sesion.spec.ts` | Hecho |
-| El admin administra pero no puede crear, cambiar ni desactivar dueños | `13-admin.spec.ts` | Hecho |
+| Escenario | Archivo |
+|---|---|
+| La app abre y el servidor responde; cada interfaz carga solo su hoja de estilos | `00-arranque.spec.ts` |
+| Sin sesión se pide entrar; con sesión el dueño ve la administración; vincular el celular con la huella y entrar con ella | `01-login.spec.ts` |
+| Cargar una lista de precios y aplicarla | `02-listas.spec.ts` |
+| Buscar un producto, elegir su margen o tipear otro margen a mano | `03-productos.spec.ts` |
+| Buscar un producto y registrar una venta; ventas del día; anular; «no llevó» | `04-vender.spec.ts` |
+| Ingresar mercadería de un proveedor; costo según factura; gasto semanal; anular | `05-compras.spec.ts` |
+| Ver el stock valorizado, sus movimientos y corregirlo | `06-stock.spec.ts` |
+| Contar un sector y cerrarlo con ajustes | `07-contar.spec.ts` |
+| Vender y cambiar un margen sin red, y que llegue todo al volver; la app abre sin red | `08-sin-conexion.spec.ts` |
+| Carga del navegador: 50.000 productos y 10.000 ventas (solo con `CARGA=1`) | `09-carga.spec.ts` |
+| Vincular el celular por QR y que lo escaneado aparezca en la laptop; asociar un código desconocido | `10-escaner.spec.ts` |
+| Sugerir un duplicado entre proveedores, unirlo y ver el más barato como preferido; separar | `11-duplicados.spec.ts` |
+| Cerrar la sesión de otro dispositivo, cerrar la propia (vuelve al login) y Salir | `12-cerrar-sesion.spec.ts` |
+| El admin administra pero no puede crear, cambiar ni desactivar dueños | `13-admin.spec.ts` |
 
-«Hecho» quiere decir que el escenario está escrito; al armar esta línea de base no se
-corrieron.
+El escaneo con la cámara real (`10-escaner`) se prueba a mano; la carga (`09-carga`) corre
+solo con `CARGA=1`.
 
 ## Verificaciones guardadas como integración
 
@@ -125,8 +126,8 @@ corrieron.
 |---|---|---|
 | `paridad_env.sh` | Todos los `.env*` declaran las mismas variables; el compose no interpola ninguna sin declarar | Es la que atrapa el error más caro y corre en segundos |
 | `health.sh` | Cada servicio responde 200 en `/health` con el stack arriba | Primera verificación después de cualquier despliegue |
-| `migraciones.sh` | Todas las migraciones aplicadas y existen las doce tablas del modelo inicial | Verifica el arranque real de la API contra la base |
-| `listas.sh` | Alta de proveedores, carga con detección automática, vista previa, aplicación, reaplicar no duplica, descartar, archivo irreconocible; la lista real de Ixnova si está en `privado/` | Es el circuito completo de precios (#7 a #12) contra los dos servicios |
+| `migraciones.sh` | Todas las migraciones aplicadas y existen las doce tablas de la primera migración | Verifica el arranque real de la API contra la base |
+| `listas.sh` | Alta de proveedores, carga con detección automática, vista previa, aplicación, reaplicar no duplica, descartar, archivo irreconocible; la lista real de Ixnova si está en `privado/` | Es el circuito completo de precios contra los dos servicios |
 | `autenticacion.sh` | 401 sin sesión, 403 por rol, alta de usuario, auditoría, cierre de sesión | Es la puerta de todo; se prueba sin Google sembrando sesiones |
 
 ## Unitarias
@@ -160,18 +161,3 @@ un token conocido, guardado hasheado como lo hace la API.
 - Las planillas de muestra están anonimizadas y versionadas en
   `microservices/listas-de-proveedores/tests/muestras/`; las listas reales viven en
   `privado/`, que no se sube.
-
-## Diferencias encontradas con los documentos de origen
-
-- `docs/casos-de-prueba-e2e.md`, caso 00: dice que `/health` responde `ok: true` y `db: ok`;
-  el escenario solo comprueba que la respuesta sea exitosa.
-- `docs/casos-de-prueba-e2e.md`, sección «Celular (se prueba a mano)»: describe la interfaz
-  anterior (menú «Más», barra que titila «de azul a rojo») y dice que los escenarios corren
-  solo en escritorio; desde ADR-014 hay una suite de celular.
-- `docs/TESTING.md`: `migraciones.sh` «verifica que las tablas del modelo existen»; comprueba
-  solo las doce de la primera migración.
-- `09-carga.spec.ts` mide una base IndexedDB propia (`ferre-carga`) y una búsqueda escrita en
-  la prueba, no la base ni la búsqueda de la app; la búsqueda de la app se mide en
-  `libraries/calculo-de-precios/src/busqueda.test.ts`.
-- `README.md` no avisa que hay que cambiar `ORIGEN_WEB` para usar el cliente en modo `dev`
-  (lo dice `docs/DEPLOYMENT.md`).

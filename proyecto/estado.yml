@@ -1,0 +1,912 @@
+# Cómo está hoy cada requerimiento. Las reglas están en specs/ y no dependen de esto: si el
+# código se rehace, este archivo se reinicia y las especificaciones quedan como están.
+#
+#   estado    Empieza con Hecho, Hecho en parte, A validar, Pendiente o Nuevo. Si dice
+#             «fuera de esta etapa» o «segunda versión», no cuenta para el avance. Los #N son issues.
+#   pruebas   Los archivos de prueba que respaldan el requerimiento.
+#   defectos  Dónde el código de hoy se aparta de la regla, o qué le falta.
+#
+# Lo leen el tablero del portafolio y tests/trazabilidad.mjs. Todo texto va entre comillas.
+
+RF-01:
+  estado: "Hecho en parte (#12, 4 proveedores): los productos que ya no aparecen en la lista solo se cuentan; al confirmar no se dan de baja"
+  pruebas:
+    - tests/e2e/escritorio/02-listas.spec.ts
+    - tests/e2e/celular/02-listas.spec.ts
+    - tests/integration/listas.sh
+    - microservices/listas-de-proveedores/tests/test_lectores.py
+    - microservices/listas-de-proveedores/tests/test_api.py
+  defectos:
+    - "Los productos que dejan de aparecer en una lista no se dan de baja al confirmarla; solo se cuentan en el resumen"
+    - "Un archivo cuyo proveedor no se reconoce se rechaza sin guardarlo; la regla pide que quede guardado para revisarlo"
+    - "Cualquier usuario con sesión carga, aplica y descarta listas; no se exige ningún rol"
+    - "Sin prueba: descartar una lista desde la interfaz, elegir el proveedor a mano cuando no se reconoce, indicar la fecha cuando la planilla no la trae, el avance mientras se aplica y la búsqueda de duplicados al terminar"
+    - "Sin medición de que cargar una lista lleve menos de un minuto"
+    - "Las pruebas que respaldan la carga de listas no corren en cada push"
+
+RF-01b:
+  estado: "Hecho"
+  pruebas:
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
+    - microservices/gestion-del-local/src/rutas/listas.test.ts
+  defectos: []
+
+RF-02:
+  estado: "Pendiente (#27)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no se leen listas en PDF"
+
+RF-03:
+  estado: "Pendiente (#22, #28)"
+  pruebas: []
+  defectos:
+    - "Sin construir: cada proveedor necesita un lector programado a medida (hay cuatro) y no existe el mapeo de columnas guardado por proveedor"
+
+RF-04:
+  estado: "Pendiente (#25, #26)"
+  pruebas: []
+  defectos:
+    - "Sin construir: las listas solo entran subiendo el archivo a mano; no hay lectura del correo ni descarga desde portales"
+
+RF-05:
+  estado: "Hecho en parte (#6): se aparta de la regla en 1 punto"
+  pruebas:
+    - libraries/calculo-de-precios/src/busqueda.test.ts
+    - tests/e2e/escritorio/03-productos.spec.ts
+    - tests/e2e/celular/03-productos.spec.ts
+    - tests/integration/listas.sh
+  defectos:
+    - "El catálogo de más de 100.000 artículos no está probado; la búsqueda está probada con 50.000"
+
+RF-06:
+  estado: "Hecho en parte (#29): se aparta de la regla en 6 puntos"
+  pruebas:
+    - tests/e2e/escritorio/11-duplicados.spec.ts
+    - tests/e2e/celular/11-duplicados.spec.ts
+    - microservices/gestion-del-local/src/equivalencias.test.ts
+    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
+  defectos:
+    - "Solo se sugieren duplicados con la misma descripción (sin acentos, símbolos ni espacios, de 8 caracteres o más); no por descripción similar"
+    - "En el celular, el recorrido de duplicados se le muestra a cualquier usuario aunque el servidor se lo niega a quien no administra"
+    - "Unir productos modifica filas de los históricos de precios, ventas, compras y stock, y borra renglones de conteo repetidos (roza RNF-30)"
+    - "Cambiar el proveedor del que sale el costo necesita conexión para verse reflejado; no queda guardado en el dispositivo"
+    - "Separar una unión pide una confirmación, que la regla general de la interfaz no admite para lo que se puede deshacer"
+    - "El más barato se elige entre los proveedores con lista de los últimos 120 días, y solo al unir o separar; no al aplicar una lista nueva. Ninguna de las dos cosas está decidida por Carlos"
+    - "Sin prueba: rechazar una sugerencia («son distintos»), unir dos productos a mano y la sugerencia por descripción"
+
+RF-07:
+  estado: "Hecho en parte (#14): se aparta de la regla en 4 puntos"
+  pruebas:
+    - libraries/calculo-de-precios/src/busqueda.test.ts
+    - tests/e2e/escritorio/03-productos.spec.ts
+    - tests/e2e/celular/03-productos.spec.ts
+    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
+    - clientes/gestion-del-local-web/src/teclas.test.tsx
+  defectos:
+    - "La búsqueda no tolera errores de tipeo"
+    - "Los resultados no muestran el precio por bulto"
+    - "El tiempo de respuesta está probado con 50.000 productos, no con 100.000, y no en la notebook del local"
+    - "Sin la prueba de las 20 búsquedas reales del cuaderno (19 de 20 entre los tres primeros resultados)"
+
+RF-08:
+  estado: "Hecho en parte (#52): se aparta de la regla en 3 puntos"
+  pruebas:
+    - tests/e2e/escritorio/10-escaner.spec.ts
+    - tests/e2e/celular/10-escaner.spec.ts
+  defectos:
+    - "La búsqueda del catálogo no tiene escáner: en el celular solo se abre desde la venta, el ingreso de mercadería y el conteo"
+    - "La lectura con la cámara real no tiene prueba automática y no hay medición de los 3 segundos"
+    - "La prueba del escáner es el mismo archivo copiado para las dos interfaces; no hay una variante por interfaz"
+    - "Sin prueba: vencimiento del QR a los 5 minutos, del vínculo a las 12 horas y entrega de los códigos al reconectar"
+
+RF-09:
+  estado: "Hecho en parte (#54): se aparta de la regla en 2 puntos"
+  pruebas:
+    - tests/e2e/escritorio/03-productos.spec.ts
+    - tests/e2e/celular/03-productos.spec.ts
+    - clientes/gestion-del-local-web/src/componentes/componentes.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/componentes/componentes.test.tsx
+    - microservices/gestion-del-local/src/rutas/productos.test.ts
+  defectos:
+    - "La foto no se muestra en el conteo de stock"
+    - "Sin prueba: reemplazar la foto de un producto que ya tiene una"
+    - "Las fotos y los archivos de las listas se guardan en el disco del servidor, sin copia (contradice ADR-002)"
+
+RF-09b:
+  estado: "Nuevo, segunda versión"
+  pruebas: []
+  defectos:
+    - "Sin construir: no se puede buscar un producto por foto (segunda versión)"
+
+RF-10:
+  estado: "Hecho en parte (#13): se aparta de la regla en 3 puntos"
+  pruebas:
+    - tests/e2e/escritorio/03-productos.spec.ts
+    - tests/e2e/celular/03-productos.spec.ts
+    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
+    - clientes/gestion-del-local-web/src/teclas.test.tsx
+    - clientes/gestion-del-local-web/src/cola.test.ts
+    - microservices/gestion-del-local/src/rutas/productos.test.ts
+    - libraries/calculo-de-precios/src/precio.test.ts
+  defectos:
+    - "En el celular el producto sin margen dice «sin margen»; la regla dice «sin precio»"
+    - "Cualquier usuario con sesión cambia el margen; no se exige ningún rol"
+    - "Un cambio guardado en el dispositivo que el servidor rechaza al reconectar se descarta sin avisar"
+    - "Sin prueba del tiempo del cambio de margen (menos de 100 ms)"
+
+RF-11:
+  estado: "Pendiente (#11): el cálculo ya está construido y en uso; falta que Carlos cierre la regla"
+  pruebas:
+    - microservices/listas-de-proveedores/tests/test_lectores.py
+    - tests/e2e/escritorio/02-listas.spec.ts
+    - tests/e2e/celular/02-listas.spec.ts
+    - tests/integration/listas.sh
+  defectos:
+    - "Las ofertas que trae la planilla se leen y se cuentan, pero no entran en el costo"
+    - "Sin la comprobación de diez productos contra la factura"
+    - "La regla figura sin cerrar por Carlos"
+
+RF-12:
+  estado: "Hecho"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/productos.test.ts
+    - clientes/gestion-del-local-web/src/unidades.test.ts
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+  defectos: []
+
+RF-13:
+  estado: "Hecho (#47)"
+  pruebas:
+    - libraries/calculo-de-precios/src/precio.test.ts
+    - clientes/gestion-del-local-web/src/componentes/componentes.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/componentes/componentes.test.tsx
+    - tests/e2e/escritorio/03-productos.spec.ts
+    - tests/e2e/celular/03-productos.spec.ts
+    - tests/e2e/escritorio/02-listas.spec.ts
+    - tests/e2e/celular/02-listas.spec.ts
+    - microservices/listas-de-proveedores/tests/test_lectores.py
+  defectos: []
+
+RF-14:
+  estado: "Pendiente (#23)"
+  pruebas: []
+  defectos:
+    - "Sin construir: el histórico de costos se guarda, pero no hay forma de verlo ni se guarda la evolución del precio de venta"
+
+RF-15:
+  estado: "Pendiente (#24)"
+  pruebas: []
+  defectos:
+    - "Sin construir: después de aplicar una lista no se avisa qué remarcar"
+
+RF-16:
+  estado: "Pendiente (#48)"
+  pruebas: []
+  defectos:
+    - "Sin construir: el margen se elige a ojo, sin sugerencia por costeo"
+
+RF-17:
+  estado: "Nuevo"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay descuentos puntuales con vigencia"
+
+RF-18:
+  estado: "Nuevo"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay búsqueda ni ficha de proveedores, ni se guardan datos de contacto"
+
+RF-19:
+  estado: "Hecho"
+  pruebas:
+    - libraries/calculo-de-precios/src/precio.test.ts
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+    - tests/e2e/escritorio/03-productos.spec.ts
+    - tests/e2e/celular/03-productos.spec.ts
+  defectos: []
+
+RF-20:
+  estado: "Hecho en parte (#15): se aparta de la regla en 5 puntos"
+  pruebas:
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
+    - tests/e2e/escritorio/08-sin-conexion.spec.ts
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/unidades.test.ts
+    - clientes/gestion-del-local-web/src/cola.test.ts
+    - libraries/calculo-de-precios/src/precio.test.ts
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+  defectos:
+    - "En la computadora la venta se cobra con F2; el Enter final no la cierra, como pide la regla"
+    - "El servidor no exige el rol Vendedor para registrar una venta: alcanza con cualquier sesión (RF-72)"
+    - "Un cambio guardado sin conexión que el servidor rechaza al reconectar se descarta sin avisar si la venta ya no está abierta"
+    - "La venta de la computadora acepta un código tipeado por un lector USB, y la regla dice que el único lector es la cámara del celular (RNF-41)"
+    - "Sin prueba: quitar un renglón, sumar al mismo renglón al agregar dos veces un producto, el aviso de stock negativo y el rechazo del servidor con la venta armada"
+    - "Sin prueba de los atajos de teclado para cobrar y descartar"
+    - "Los 20 segundos de una venta de 3 productos no están medidos en el mostrador (RNF-02)"
+
+RF-20b:
+  estado: "Hecho en parte (#15): se aparta de la regla en 1 punto"
+  pruebas:
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
+    - tests/e2e/escritorio/08-sin-conexion.spec.ts
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - libraries/calculo-de-precios/src/precio.test.ts
+  defectos:
+    - "Sin prueba que mida que el cambio de margen responde en menos de 100 ms (RNF-07)"
+    - "La explicación del subtotal paso por paso solo tiene prueba en el celular"
+
+RF-21:
+  estado: "Hecho en parte (#15): se aparta de la regla en 1 punto"
+  pruebas:
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+  defectos:
+    - "Cobrar sin elegir el medio de pago frena la venta con el aviso «Elegí cómo paga»; el relevamiento y el pedido original dicen que saltearlo no debe frenar (regla a confirmar por Carlos)"
+    - "Sin prueba que elija Mercado Pago ni tarjeta"
+    - "Sin prueba del camino completo de cuenta corriente: elegir el cliente y cobrar"
+    - "Sin prueba de las teclas de Mercado Pago, tarjeta y cuenta corriente"
+
+RF-22:
+  estado: "Hecho en parte (#17): se vende como ítem libre. Falta darlo de alta ahí mismo"
+  pruebas:
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+  defectos:
+    - "El ítem libre no se puede dar de alta como producto desde la venta"
+    - "No existe la lista de ítems libres para que el Administrador los revise"
+    - "El ítem libre no tiene prueba en la computadora, solo en el celular"
+    - "Sin prueba de que un ítem libre no mueve stock"
+
+RF-23:
+  estado: "Hecho en parte (#16): ver y anular. Falta corregir una venta y ver días anteriores (#56)"
+  pruebas:
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+  defectos:
+    - "No se puede corregir una venta: solo anularla y cargarla de nuevo"
+    - "No se pueden ver las ventas de días anteriores: el servidor acepta la fecha, pero ninguna interfaz la pide"
+    - "El servidor no exige rol para ver ni para anular ventas: alcanza con cualquier sesión (RF-72)"
+    - "Anular pide el motivo en un cuadro del navegador, que es una ventana de confirmación"
+    - "Anular sin conexión no se guarda en el dispositivo y falla sin avisar"
+    - "Las ventas del día no se ven sin conexión: se piden siempre al servidor"
+    - "En el celular, las ventas del día dentro de la venta solo las ve quien administra; el resto las ve en otra sección"
+    - "Sin prueba: anular una venta que no existe o ya está anulada, que los totales cuenten solo las confirmadas, que el día sea el del local y que figure el nombre del cliente de cuenta corriente"
+
+RF-24:
+  estado: "Nuevo"
+  pruebas: []
+  defectos:
+    - "No existe: no hay forma de registrar un cambio por otro producto"
+
+RF-24b:
+  estado: "Nuevo, fuera de esta etapa (llega con la venta online)"
+  pruebas: []
+  defectos:
+    - "No existe: no hay devoluciones con reintegro ni saldo a favor"
+
+RF-25:
+  estado: "Hecho en parte: «No llevó» guarda el producto y el precio ofrecido. Falta cargar el motivo y la vista para consultarlo"
+  pruebas:
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
+    - tests/e2e/escritorio/08-sin-conexion.spec.ts
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+  defectos:
+    - "El motivo no se puede cargar desde ninguna interfaz, aunque el servidor lo acepta"
+    - "No existe la vista para consultar lo anotado, aunque el servidor lo devuelve"
+    - "La consulta anotada no guarda qué usuario la anotó ni queda en quién hizo qué"
+    - "Sin prueba del rechazo cuando no hay nada que anotar"
+
+RF-26:
+  estado: "Nuevo"
+  pruebas: []
+  defectos:
+    - "No existe: no se pueden anotar ni ver pedidos de clientes"
+
+RF-27:
+  estado: "Pendiente (#45)"
+  pruebas: []
+  defectos:
+    - "No existe: no se pueden armar presupuestos"
+
+RF-28:
+  estado: "Pendiente (#46)"
+  pruebas: []
+  defectos:
+    - "No existe: no se puede mandar ni generar el comprobante de una venta"
+
+RF-29:
+  estado: "Pendiente (#20)"
+  pruebas: []
+  defectos:
+    - "No existe: no se pueden cargar las ventas del cuaderno ni comparar sus precios"
+
+RF-30:
+  estado: "Nuevo, fuera de esta etapa"
+  pruebas: []
+  defectos:
+    - "No existe: no se emite la factura electrónica de ARCA"
+
+RF-31:
+  estado: "Nuevo, fuera de esta etapa"
+  pruebas: []
+  defectos:
+    - "No existe: no hay venta online"
+
+RF-32:
+  estado: "Nuevo, fuera de esta etapa"
+  pruebas: []
+  defectos:
+    - "No existe: no hay licencias ni instalación para otras ferreterías"
+
+RF-40:
+  estado: "Hecho en parte (#15): se vende a cuenta corriente, sin prueba del camino completo. Falta la pantalla para marcarla pagada (#57)"
+  pruebas:
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+  defectos:
+    - "No hay forma de cargar un cliente desde la aplicación: la ruta para crearlo existe, pero ninguna interfaz la usa"
+    - "No se puede marcar una venta como pagada desde la aplicación, en ninguna de las dos interfaces: la ruta existe y ninguna interfaz la usa (#57)"
+    - "No hay vista de las ventas a cuenta corriente sin pagar por cliente, ni ruta de la API que devuelva las ventas de un cliente"
+    - "El camino completo de vender a cuenta corriente (elegir el cliente, cobrar, que la venta quede a su nombre y suba su deuda) no tiene ninguna prueba; solo se prueba que sin cliente no se cobra"
+    - "Crear un cliente y marcar una venta como pagada no tienen prueba en la API"
+    - "Lo que debe cada cliente no se recalcula en el dispositivo después de cobrar: hasta que responde el servidor muestra la deuda vieja, y sin conexión no incluye las ventas recién cobradas"
+    - "Marcar como pagada sin conexión no existe: no hay cola en el dispositivo para ese cambio"
+    - "El permiso de cuenta corriente del cliente no se controla al vender, y la base y la API no coinciden en su valor por omisión (la base lo deja en falso, la API lo crea en verdadero)"
+    - "Sin clientes cargados, el celular avisa que no hay clientes pero no dice cómo cargar uno; la computadora muestra la lista vacía sin ningún aviso"
+    - "Las rutas de clientes y de marcar como pagada no exigen ningún rol: alcanza con tener sesión"
+
+RF-41:
+  estado: "Pendiente (#43)"
+  pruebas: []
+  defectos:
+    - "No hay nada construido: no se registran pagos parciales ni se calcula el saldo con pagos"
+    - "No se muestra la antigüedad de la deuda"
+    - "No se genera el resumen de cuenta para mandar por WhatsApp"
+    - "No hay forma de cargar lo que cada cliente ya debía en el cuaderno de deudas"
+
+RF-42:
+  estado: "Pendiente (#43)"
+  pruebas: []
+  defectos:
+    - "No hay búsqueda de clientes ni ficha de cliente en ninguna de las dos interfaces"
+    - "La API no tiene rutas para modificar ni desactivar un cliente, ni para ver lo que compró"
+    - "El cliente no guarda condición de precio ni otros datos además de nombre, teléfono y si se le permite la cuenta corriente"
+
+RF-43:
+  estado: "Pendiente (#43)"
+  pruebas: []
+  defectos:
+    - "No hay nada propio de clientes para el precio distinto: se resuelve poniendo el precio a mano en el renglón de la venta, sin que quede ligado al cliente ni se explique por su condición"
+
+RF-50:
+  estado: "Hecho en parte (#30): se aparta de la regla en 11 puntos"
+  pruebas:
+    - tests/e2e/escritorio/05-compras.spec.ts
+    - tests/e2e/celular/05-compras.spec.ts
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Compras.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
+  defectos:
+    - "Registrar y anular una compra solo piden sesión: no se exige el rol Comprador (RF-72)"
+    - "El ingreso de mercadería de la computadora no recibe códigos escaneados con el celular vinculado; solo se escanea en el celular"
+    - "No se puede guardar la foto del comprobante con la compra"
+    - "El ingreso no se precarga desde un pedido (RF-55) ni desde la foto de la factura (RF-51)"
+    - "En el celular los gastos de la semana muestran solo el total, sin el detalle por proveedor"
+    - "Sin conexión el ingreso no se registra y solo se avisa; qué exige la regla está preguntado en la spec (historia 1, escenario 13)"
+    - "Anular una compra deja el costo que puso el comprobante; qué exige la regla está preguntado en la spec (historia 2, escenario 4)"
+    - "Anular pide el motivo, opcional, en una ventana del navegador y no dentro de la aplicación"
+    - "No se controla que el mismo proveedor y número de comprobante se cargue dos veces; está preguntado en la spec (historia 1, escenario 14)"
+    - "Sin prueba: ingreso con remito o sin comprobante, validaciones del ingreso, escanear en el ingreso, registrar sin conexión, reintento del mismo ingreso y anular una compra ya anulada"
+    - "Las rutas de compras del servidor no tienen pruebas unitarias; solo las cubren las de punta a punta, que no corren en cada push"
+    - "No está medido que una factura de 20 renglones se cargue en menos de 5 minutos"
+
+RF-51:
+  estado: "Pendiente (#55)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no se puede cargar una factura desde una foto"
+
+RF-52:
+  estado: "Hecho en parte (#31): se aparta de la regla en 9 puntos"
+  pruebas:
+    - tests/e2e/escritorio/07-contar.spec.ts
+    - tests/e2e/celular/07-contar.spec.ts
+    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
+  defectos:
+    - "Contar, crear sectores y cerrar un conteo solo piden sesión: no se exige ningún rol (RF-72)"
+    - "En el celular la cantidad contada solo acepta enteros, aunque el producto se venda a granel (RF-12)"
+    - "Crear un sector, empezar un conteo y cerrarlo exigen conexión; solo contar un producto funciona sin internet. Qué exige la regla está preguntado en la spec (historia 4, escenario 13)"
+    - "Al cerrar, la diferencia se calcula contra el stock del momento del cierre, no del momento en que se contó; está preguntado en la spec (historia 4, escenario 14)"
+    - "La interfaz no deja quitar un producto contado por error, aunque la API tiene la ruta"
+    - "Un producto contado sin conexión que el servidor rechaza al reconectar se descarta sin avisar si la vista ya no está abierta"
+    - "El sector contado en el día dice «contado hoy» en el celular y «contado hace 0 días» en la computadora: los textos no coinciden"
+    - "Sin prueba: retomar un conteo interrumpido, cerrar un conteo con productos no contados, escanear en el conteo y contar sin conexión"
+    - "Las rutas de sectores y conteos del servidor no tienen pruebas unitarias"
+    - "No está medido que un sector de 100 productos se cuente en menos de 30 minutos"
+
+RF-53:
+  estado: "Hecho en parte (#33): se aparta de la regla en 7 puntos"
+  pruebas:
+    - tests/e2e/escritorio/06-stock.spec.ts
+    - tests/e2e/celular/06-stock.spec.ts
+    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
+  defectos:
+    - "El motivo al corregir el stock a mano es opcional y la regla lo pide"
+    - "Ver el stock, los costos y la plata invertida y corregir el stock solo piden sesión: no se exige ningún rol (RF-72)"
+    - "No existe el valor del inventario por familia; el catálogo no tiene familias"
+    - "El stock y su valorización no se pueden exportar a Excel"
+    - "Los movimientos de un producto se cortan en los 200 más nuevos: con más, la lista ya no suma el stock que explica"
+    - "El valor se calcula con el costo del proveedor preferido del producto; qué costo vale cuando lo venden varios proveedores está preguntado en la spec"
+    - "Sin prueba: el motivo obligatorio, corregir a la misma cantidad, cantidad inválida, corregir sin conexión y el aviso de stock negativo al vender"
+    - "Las rutas de stock del servidor no tienen pruebas unitarias"
+
+RF-54:
+  estado: "Pendiente (#35)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay stock mínimo, aviso de stock bajo ni lista de qué pedir"
+
+RF-55:
+  estado: "Pendiente (#36)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay pedidos a proveedores"
+
+RF-56:
+  estado: "Nuevo"
+  pruebas: []
+  defectos:
+    - "Sin construir: la compra no guarda cómo se paga, cuándo vence ni si está pagada, y no hay vista de la deuda con proveedores"
+
+RF-57:
+  estado: "Pendiente (#34)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no se generan códigos internos ni se imprimen etiquetas"
+
+RF-58:
+  estado: "Pendiente (#32)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay clasificación A, B y C ni plan de conteo"
+
+RF-60:
+  estado: "Pendiente (#39)"
+  pruebas:
+    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+    - tests/e2e/celular/04-vender.spec.ts
+  defectos:
+    - "Del tablero solo existe, en el celular, lo vendido en el día con la cantidad de ventas y el total por medio de pago; no hay semana ni mes"
+    - "No se calcula ni se muestra la ganancia, en ningún período"
+    - "No hay ticket promedio"
+    - "No hay comparación con el período anterior"
+    - "En la computadora no hay ninguna vista de cómo va el negocio para el Administrador"
+    - "El tablero no reúne la plata invertida en stock, el stock bajo, los pedidos de clientes, las listas de precios sin aplicar, lo más vendido ni las novedades del día"
+    - "Lo vendido en el día no se puede tocar para ver la cuenta que lo explica; solo se ve la lista de ventas debajo"
+    - "Lo vendido en el día lo ve cualquier usuario con sesión y no solo el Administrador; la API no exige rol"
+    - "Que cargue en menos de 2 segundos en el celular no tiene prueba"
+
+RF-61:
+  estado: "Pendiente (#39)"
+  pruebas: []
+  defectos:
+    - "No hay nada construido: ni lo más vendido ni lo que no rota, en ninguna interfaz ni en la API"
+
+RF-62:
+  estado: "Pendiente (#40)"
+  pruebas: []
+  defectos:
+    - "No hay nada construido: no se puede cerrar la caja, no se guarda el efectivo contado ni se calcula la diferencia contra las ventas en efectivo"
+
+RF-63:
+  estado: "Pendiente (#40); la vista en la app es nueva"
+  pruebas: []
+  defectos:
+    - "No hay nada construido: no se arma el resumen del día, no se envía a los Administradores ni se ve en la app"
+
+RF-64:
+  estado: "Pendiente (#44)"
+  pruebas: []
+  defectos:
+    - "No hay nada construido: no se cargan gastos ni se calcula el resultado mensual, los últimos 12 meses ni el punto de equilibrio"
+
+RF-65:
+  estado: "Hecho en parte (#30): se aparta de la regla en 11 puntos"
+  pruebas:
+    - tests/e2e/celular/05-compras.spec.ts
+    - tests/e2e/escritorio/05-compras.spec.ts
+    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Compras.test.tsx
+    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+  defectos:
+    - "Que una compra anulada no sume al gasto no tiene prueba"
+    - "Que una compra con fecha fuera de la semana no sume no tiene prueba, y la consulta de la API no tiene ninguna prueba propia"
+    - "Sin compras en la semana el gasto desaparece (en la vista de negocio del celular y en la computadora) en lugar de mostrar $0 con su texto de estado vacío"
+    - "En el celular, donde se registran las compras, se ve solo el total, sin el detalle por proveedor"
+    - "El importe de un proveedor no se abre para ver las compras que lo forman, en ninguna interfaz"
+    - "No dice hasta qué día cuenta, y en el celular donde se registran las compras tampoco desde qué día"
+    - "Lo puede pedir cualquier usuario con sesión: la API no exige el rol Comprador o Administrador"
+    - "En la computadora el Administrador solo lo ve donde se registran las compras, porque no hay vista de negocio"
+    - "Sin conexión o con error del servidor no avisa nada: el bloque queda sin número o no aparece"
+    - "El primer día de la semana que informa la API se calcula con la hora UTC y no con la del local, y puede no coincidir con el que usa la suma"
+    - "La semana es una ventana fija de siete días que termina en el día en curso; la definición de semana es una aclaración abierta de RF-65"
+
+RF-70:
+  estado: "Hecho en parte (#41): se aparta de la regla en 5 puntos"
+  pruebas:
+    - tests/e2e/celular/01-login.spec.ts
+    - tests/e2e/escritorio/01-login.spec.ts
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+    - tests/e2e/escritorio/08-sin-conexion.spec.ts
+    - tests/e2e/celular/13-admin.spec.ts
+    - tests/e2e/escritorio/13-admin.spec.ts
+    - tests/integration/autenticacion.sh
+    - microservices/gestion-del-local/src/rutas/sesiones.test.ts
+    - microservices/gestion-del-local/src/rutas/usuarios.test.ts
+    - microservices/gestion-del-local/src/rutas/credenciales.test.ts
+  defectos:
+    - "Entrar bien con Google y el aviso de correo no autorizado no tienen prueba automática (el botón de Google no se puede automatizar)"
+    - "El aviso de correo no autorizado dice «Pedile al dueño que te dé de alta»; la regla es nombrar el rol, Administrador"
+    - "Reactivar un usuario desactivado no tiene prueba"
+    - "El límite de intentos de entrada (10 por minuto con Google, 20 con la huella) no tiene prueba"
+    - "Que el dispositivo vuelva solo a la entrada cuando el servidor rechaza la sesión no tiene prueba"
+
+RF-70b:
+  estado: "Hecho en parte: se aparta de la regla en 4 puntos"
+  pruebas:
+    - tests/e2e/celular/01-login.spec.ts
+    - tests/e2e/escritorio/01-login.spec.ts
+    - clientes/gestion-del-local-web/src/componentes/OfrecerHuella.test.tsx
+    - microservices/gestion-del-local/src/rutas/credenciales.test.ts
+  defectos:
+    - "En la computadora, la lista de celulares vinculados está dentro de la administración: quien no administra no tiene desde dónde ver ni quitar los suyos"
+    - "Quitar un celular vinculado pide confirmación y vincularlo a mano pide el nombre con ventanas del navegador, no dentro de la app"
+    - "Un administrador puede quitar por la API el celular de otro usuario, pero la API no lista los celulares de otros y ninguna pantalla lo ofrece"
+    - "La computadora ofrece «Entrar con la huella» y vincular a mano si tiene lector; si eso vale es una pregunta abierta de la especificación (P7)"
+
+RF-71:
+  estado: "Hecho en parte (#41): consulta paginada. Faltan los filtros en pantalla (#58)"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/auditoria.test.ts
+    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Administracion.test.tsx
+    - tests/integration/autenticacion.sh
+    - microservices/gestion-del-local/src/rutas/credenciales.test.ts
+    - tests/e2e/celular/01-login.spec.ts
+  defectos:
+    - "Los filtros por usuario, fecha y tipo existen en la API pero ninguna pantalla los ofrece (#58)"
+    - "Los filtros de la API no tienen prueba"
+
+RF-72:
+  estado: "Pendiente (#59)"
+  pruebas: []
+  defectos:
+    - "Los roles Administrador, Vendedor y Comprador no existen: el código usa dueño, admin y mostrador (#59)"
+    - "Cada usuario tiene un solo rol; no se pueden combinar"
+    - "Vender, anular ventas, registrar y anular compras, contar y corregir stock, cargar listas y elegir márgenes solo exigen sesión, sin ningún rol"
+    - "No hay control de último Administrador: un dueño puede desactivar o bajar de rol a otro dueño hasta dejar el sistema sin ninguno activo"
+    - "Las ventas del día y los gastos de la semana se muestran a cualquier usuario; «ver cómo va el negocio» es del Administrador"
+    - "Nadie puede cambiarse el rol a sí mismo, ni siquiera para sumarse otro; la regla escrita solo impide desactivarse y quitarse el rol Administrador (pregunta abierta P5)"
+
+RF-73:
+  estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/usuarios.test.ts
+    - tests/e2e/celular/13-admin.spec.ts
+    - tests/e2e/escritorio/13-admin.spec.ts
+    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Administracion.test.tsx
+    - tests/integration/autenticacion.sh
+  defectos:
+    - "RF-72 reemplaza estos roles (ADR-011, enmienda del 2026-10-09) y el código sigue rigiéndose por dueño, admin y mostrador"
+
+RF-74:
+  estado: "Hecho en parte (#41): se aparta de la regla en 3 puntos"
+  pruebas:
+    - tests/e2e/celular/12-cerrar-sesion.spec.ts
+    - tests/e2e/escritorio/12-cerrar-sesion.spec.ts
+    - tests/integration/autenticacion.sh
+    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Administracion.test.tsx
+    - microservices/gestion-del-local/src/rutas/usuarios.test.ts
+  defectos:
+    - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
+    - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
+    - "Que un dispositivo con la sesión cerrada a distancia vuelva solo a la entrada no tiene prueba"
+
+RNF-01:
+  estado: "A validar en el piloto (#21)"
+  pruebas: []
+  defectos:
+    - "Sin validar: solo se comprueba en el mostrador, durante el piloto"
+
+RNF-02:
+  estado: "A validar (#21)"
+  pruebas: []
+  defectos:
+    - "Sin validar: el tiempo de una venta de 3 productos solo se mide en el mostrador, durante el piloto"
+
+RNF-03:
+  estado: "Hecho en parte: listas en Excel, escáner y foto de producto. Falta #55 y #25"
+  pruebas: []
+  defectos:
+    - "Sin construir: los renglones de una factura de compra se tipean; no se cargan con una foto (RF-51)"
+    - "Sin construir: las listas no se reciben solas desde el correo ni desde la web del proveedor (RF-04); alguien sube el Excel"
+    - "Sin construir: no se leen listas en PDF (RF-02)"
+
+RNF-04:
+  estado: "Hecho en parte: se aparta de la regla en 2 puntos"
+  pruebas:
+    - clientes/gestion-del-local-web/src/vista.test.ts
+    - tests/e2e/celular/00-arranque.spec.ts
+  defectos:
+    - "La letra mínima de 18 px del sistema visual no se cumple en el celular: la base es de 16 px y hay textos de 11 a 15 px"
+    - "El diseño de referencia del celular (mockups/Ferre iOS.html) no está en el repositorio"
+    - "Sin prueba: que ninguna pantalla del celular se desplace hacia el costado"
+    - "Sin prueba: que la interfaz cambie al cruzar los 900 px con la app abierta"
+
+RNF-05:
+  estado: "A validar por Carlos en la notebook"
+  pruebas:
+    - clientes/gestion-del-local-web/src/vista.test.ts
+    - tests/e2e/escritorio/00-arranque.spec.ts
+  defectos:
+    - "Sin validar: el dueño no la revisó en la notebook del local"
+    - "Sin prueba: que la pantalla de venta y la barra de arriba entren enteras en la notebook, y que una venta completa se pueda registrar solo con el teclado"
+    - "Sin prueba: capturas de antes y después que demuestren que un cambio en una interfaz no altera la otra"
+
+RNF-06:
+  estado: "Hecho"
+  pruebas: []
+  defectos:
+    - "Sin prueba: ninguna comprueba que todos los textos estén en castellano ni que cada error diga qué hacer"
+
+RNF-07:
+  estado: "Hecho en parte (#14): se aparta de la regla en 3 puntos"
+  pruebas:
+    - libraries/calculo-de-precios/src/busqueda.test.ts
+    - tests/e2e/escritorio/09-carga.spec.ts
+    - tests/e2e/celular/09-carga.spec.ts
+  defectos:
+    - "El tiempo del cambio de margen no se mide en ninguna prueba"
+    - "La prueba de carga mide una base del navegador y una búsqueda escritas en la propia prueba, no las de la app"
+    - "La prueba de carga no corre en el CI ni se corrió en la notebook del local"
+
+RNF-08:
+  estado: "Nuevo, sin probar"
+  pruebas: []
+  defectos:
+    - "Sin prueba con más de 100.000 artículos: la búsqueda se mide con 50.000"
+
+RNF-09:
+  estado: "Hecho"
+  pruebas:
+    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/escritorio/componentes/componentes.test.tsx
+    - tests/e2e/escritorio/04-vender.spec.ts
+  defectos:
+    - "Sin prueba: la barra de progreso mientras se aplica una lista"
+    - "Sin prueba: que todo lo que se puede tocar tenga forma de botón"
+
+RNF-10:
+  estado: "Hecho (#18, #37)"
+  pruebas:
+    - tests/e2e/escritorio/08-sin-conexion.spec.ts
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+    - clientes/gestion-del-local-web/src/cola.test.ts
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+  defectos:
+    - "Sin prueba: corregir stock y cargar un renglón de conteo sin conexión"
+    - "Sin prueba: una hora sin conexión con 30 ventas"
+    - "Sin prueba: el aviso de que una operación que no es del mostrador necesita conexión"
+
+RNF-11:
+  estado: "Hecho"
+  pruebas:
+    - clientes/gestion-del-local-web/src/cola.test.ts
+  defectos:
+    - "Sin prueba: que una venta quede en espera y se reintente cuando el servidor responde con un error propio"
+    - "Sin prueba: abrir la app y vender con el servidor apagado"
+
+RNF-12:
+  estado: "Pendiente (#19)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay monitor externo ni aviso a los Administradores cuando la API o la base dejan de responder (contra ADR-002)"
+    - "Sin la consulta diaria del monitor, la base gratuita se pausa a los 7 días sin consultas"
+    - "Sin construir: no hay alerta cuando la base supera los 350 MB (contra ADR-002)"
+
+RNF-13:
+  estado: "Hecho en parte: se aparta de la regla en 1 punto"
+  pruebas:
+    - tests/integration/health.sh
+    - tests/integration/migraciones.sh
+    - microservices/gestion-del-local/src/migraciones.test.ts
+    - microservices/listas-de-proveedores/tests/test_health.py
+  defectos:
+    - "Sin prueba: la vuelta atrás automática cuando la versión nueva no queda sana"
+    - "Sin prueba: que el cliente tome solo la versión nueva y conserve lo guardado en el dispositivo"
+    - "Sin prueba: la respuesta de salud con la base sin responder"
+    - "tests/integration/migraciones.sh comprueba solo las doce tablas de la primera migración, no las diez que agregaron las siguientes"
+
+RNF-20:
+  estado: "Hecho en parte (#18): se aparta de la regla en 3 puntos"
+  pruebas:
+    - tests/e2e/escritorio/08-sin-conexion.spec.ts
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+    - tests/e2e/escritorio/03-productos.spec.ts
+    - tests/e2e/celular/03-productos.spec.ts
+    - clientes/gestion-del-local-web/src/cola.test.ts
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+  defectos:
+    - "Un cambio encolado que el servidor rechaza al reconectar se descarta sin avisar, si la pantalla que lo pidió ya no está abierta"
+    - "En un navegador sin IndexedDB el cambio se manda directo, sin cola: sin conexión se pierde"
+    - "Sin construir: reenviar al servidor las ventas de los últimos 7 días guardadas en el dispositivo después de restaurar una copia vieja"
+    - "Sin prueba: que las ventas confirmadas se quiten del dispositivo a los 7 días y no antes"
+    - "Sin prueba: el aviso de cambios en espera desde hace más de una hora"
+
+RNF-21:
+  estado: "Pendiente (#19)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay copia de la base cada hora ni ningún script o tarea de respaldo (contra ADR-002)"
+    - "Los Excel originales de las listas y las fotos de productos viven en un volumen de la máquina, uno por ambiente, sin copia (contra ADR-002: la máquina no guarda datos)"
+    - "docs/operacion/DEPLOYMENT.md describe el volcado horario como si estuviera en marcha"
+
+RNF-22:
+  estado: "Pendiente (#19)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay copia semanal cifrada fuera de Oracle y de Supabase (contra ADR-002)"
+
+RNF-23:
+  estado: "Pendiente (#19)"
+  pruebas: []
+  defectos:
+    - "Sin construir: no hay prueba mensual de restauración (contra ADR-002)"
+
+RNF-30:
+  estado: "Hecho en parte: anular y corregir suman filas. Al unir productos duplicados sí se modifican filas del histórico, y los renglones de un conteo se borran"
+  pruebas:
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
+    - tests/e2e/escritorio/06-stock.spec.ts
+    - tests/e2e/celular/06-stock.spec.ts
+  defectos:
+    - "Unir dos productos duplicados cambia el producto al que apuntan filas ya escritas de precio_proveedor, movimiento_stock, item_venta, item_compra, consulta y renglon_conteo; queda registrado y se puede deshacer"
+    - "Los renglones de un conteo abierto se borran al quitarlos y al unir dos productos que estaban en el mismo conteo"
+    - "Nada en la base impide modificar o borrar filas de los históricos: la regla la sostiene solo el código"
+    - "Sin construir: no se archivan los eventos de más de un año (ADR-002)"
+
+RNF-31:
+  estado: "Hecho (#47)"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
+  defectos:
+    - "Sin prueba: que un cambio posterior del costo o del margen no modifique lo guardado en la venta"
+
+RNF-40:
+  estado: "Hecho en parte (#42): se aparta de la regla en 3 puntos"
+  pruebas:
+    - tests/e2e/escritorio/00-arranque.spec.ts
+    - tests/e2e/celular/00-arranque.spec.ts
+  defectos:
+    - "Sin validar: no se probó en la notebook real del local"
+    - "Las pruebas de punta a punta corren solo en Chromium: Firefox está sin probar"
+    - "El color de la app instalada en el celular es el azul del diseño anterior, no la paleta de la marca"
+    - "Sin prueba: instalar la app en el celular y abrirla a pantalla completa"
+
+RNF-41:
+  estado: "Hecho (#52)"
+  pruebas: []
+  defectos: []
+
+RNF-42:
+  estado: "Hecho"
+  pruebas: []
+  defectos: []
+
+RNF-43:
+  estado: "Hecho en parte: se aparta de la regla en 1 punto"
+  pruebas:
+    - tests/integration/autenticacion.sh
+    - tests/e2e/escritorio/12-cerrar-sesion.spec.ts
+    - tests/e2e/celular/12-cerrar-sesion.spec.ts
+    - microservices/listas-de-proveedores/tests/test_api.py
+  defectos:
+    - "Sin prueba: que el control de versiones ignore planillas, PDF, archivos de configuración reales y la carpeta privado"
+    - "Sin prueba: que el arranque se corte al faltar una variable de configuración"
+    - "Sin prueba: que la API solo responda por HTTPS y solo admita el origen del cliente"
+    - "El HTTPS de la API lo pone el proxy de la máquina, fuera del repositorio: desde acá no se puede comprobar"
+
+RNF-44:
+  estado: "Hecho"
+  pruebas: []
+  defectos:
+    - "Sin prueba: que los contenedores corran sin privilegios y que ningún puerto responda desde internet"
+
+RNF-50:
+  estado: "Hecho en parte: se aparta de la regla en 2 puntos"
+  pruebas: []
+  defectos:
+    - "No hay ningún documento OpenAPI de la API (contra ADR-001 y ADR-003)"
+    - "microservices/gestion-del-local/public conserva un cliente compilado anterior a ADR-010 que nada sirve"
+    - "Sin prueba: que el precio calculado en el dispositivo sea idéntico al del servidor"
+
+RNF-51:
+  estado: "Hecho"
+  pruebas: []
+  defectos: []
+
+RNF-52:
+  estado: "Hecho"
+  pruebas: []
+  defectos: []
+
+RNF-53:
+  estado: "Hecho en parte: se aparta de la regla en 1 punto"
+  pruebas:
+    - tests/integration/paridad_env.sh
+  defectos:
+    - "Pruebas y producción se publican en el mismo origen y el cliente usa la misma base IndexedDB (ferre) y las mismas claves de localStorage en los dos: en un dispositivo que abre ambos, la sesión, el catálogo guardado y la cola de cambios se comparten (visto en el código, sin reproducir)"
+    - "Sin prueba: el despliegue automático de pruebas y la promoción a producción"
+
+RNF-54:
+  estado: "Hecho"
+  pruebas:
+    - clientes/gestion-del-local-web/src/ambiente.test.ts
+  defectos:
+    - "Sin prueba: que la barra titile y muestre la leyenda en pruebas, y que no la muestre en producción"
+
+RNF-55:
+  estado: "Hecho en parte: se aparta de la regla en 2 puntos"
+  pruebas: []
+  defectos:
+    - "El servidor de compras, stock y conteos no tiene pruebas unitarias; solo lo cubren las de punta a punta, que no corren en cada push"
+    - "La prueba del escáner es el mismo archivo copiado en las dos carpetas: no hay una variante por interfaz"
+
+RNF-56:
+  estado: "Hecho en parte: los 14 ADR existen; varios documentos estaban atrasados respecto del código"
+  pruebas: []
+  defectos:
+    - "ADR-010 dice que el token de sesión vive en IndexedDB; vive en localStorage, como dice ADR-011"
+    - "ADR-007 dice que las imágenes se construyen después de las pruebas de punta a punta; se construyen después de las unitarias (ADR-004, enmienda) y ADR-007 no tiene esa enmienda"
+    - "ADR-003 dice que los eventos alimentan la sincronización del cliente; la sincronización es la cola del cliente, que reenvía pedidos a la API, y los eventos se usan solo para la auditoría"
+    - "ADR-005 se decidió para tres almacenes, unos 15.000 productos y las ventas del día; el cliente tiene seis almacenes, ventas de 7 días y el catálogo puede superar los 100.000 artículos: pasó su propio umbral de revisión (más de cinco almacenes)"
+    - "ADR-006 y ADR-012 conservan en su decisión el Caddy del compose y la red compartida, que ADR-013 reemplazó; ADR-006 no tiene enmienda que lo diga"
+    - "docs/operacion/DEPLOYMENT.md dice que el script de despliegue, el preflight y la guía se generan en el issue 19; ya están en deployment/oracle-single"
+    - "README.md no avisa que hay que cambiar ORIGEN_WEB para usar el cliente en modo dev"
+
+general:
+  estado: ""
+  pruebas: []
+  defectos:
+    - "usuario.rol admite un solo rol entre dueño, admin y mostrador; la regla pide Administrador, Vendedor y Comprador, combinables (decisión 8 del 2026-10-09, RF-72)"
+    - "La tabla vinculacion quedó en la base sin uso desde que se quitó la entrada por QR (ADR-011, enmienda del 2026-10-09)"
+    - "producto.unidad es texto libre en la base: los valores unidad, kg, m y l los valida solo la API"
+    - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"

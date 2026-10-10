@@ -11,12 +11,14 @@ decir si la funcionalidad cumple su especificación, con evidencia.
 2. Corré las pruebas: `tests/utest.sh` y los escenarios de punta a punta de la
    funcionalidad en las dos interfaces. Copiá el resultado tal cual salió.
 3. Por cada escenario de aceptación:
-   - ¿Tiene su línea `Prueba:` y ese archivo existe?
+   - ¿Hay una prueba que lo cubra entre las que `proyecto/estado.yml` lista para sus
+     requerimientos?
    - ¿La prueba comprueba de verdad el «Then» del escenario, o comprueba otra cosa?
    - ¿Pasa?
 4. Por cada requerimiento de la especificación: ¿hay algo en el código que lo cumpla, o
    quedó sin hacer?
-5. Buscá lo que sobra: comportamiento nuevo que la especificación no pide.
+5. Buscá lo que sobra: comportamiento nuevo que la especificación no pide. Y lo que se
+   coló: nombres de archivos del código o palabras de estado dentro de `spec.md` o `ux.md`.
 6. Revisá las secciones `## Seguridad` y `## UI/UX` de `verificacion.md`.
 7. Comprobá la funcionalidad contra cada principio de la constitución.
 

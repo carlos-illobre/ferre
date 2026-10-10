@@ -1,8 +1,8 @@
 # Modelo de datos: catálogo y precios
 
-Entidades de esta capacidad, tal como quedaron después de las migraciones `0001` a `0011` de
-`microservices/gestion-del-local/migrations/`. Fuente: `docs/MODELO.md` y los archivos SQL.
-`gestion-del-local` es el único dueño de la base (ADR-003).
+Entidades de esta capacidad en la base de datos. El servicio `gestion-del-local` es el
+único dueño de la base (ADR-003). El esquema cambia con una migración nueva; nunca se edita
+una aplicada.
 
 ```mermaid
 erDiagram
@@ -30,8 +30,6 @@ erDiagram
 
 ## proveedor
 
-Migraciones `0001` y `0003`.
-
 | Campo | Tipo | Qué es |
 |---|---|---|
 | `id` | uuid, PK | |
@@ -44,14 +42,14 @@ Migraciones `0001` y `0003`.
 
 ## lista_importada
 
-Cada archivo cargado. Migraciones `0001`, `0003` y `0007`.
+Cada archivo cargado.
 
 | Campo | Tipo | Qué es |
 |---|---|---|
 | `id` | uuid, PK | |
 | `proveedor_id` | uuid → proveedor | |
 | `archivo_nombre` | text | Nombre con que se subió |
-| `archivo_ruta` | text, opcional | Dónde quedó el original, en el volumen de datos (`CARPETA_LISTAS`); se vuelve a leer para la vista previa y al aplicar |
+| `archivo_ruta` | text, opcional | Dónde quedó guardado el original; se vuelve a leer para la vista previa y al aplicar |
 | `fecha_lista` | date | La que dice la planilla o la que indica quien la carga |
 | `estado` | text | `pendiente`, `aplicando`, `aplicada` o `descartada` |
 | `resumen` | jsonb | Leídas, salteadas (con el detalle de hasta 50), ofertas, nuevos, modificados, sin cambio, dados de baja, variación promedio; mientras se aplica, el progreso; si falló, el error |
@@ -63,7 +61,7 @@ Las filas de la planilla no se guardan hasta aplicar.
 
 ## producto
 
-Lo que se vende. Migraciones `0001`, `0004`, `0006`, `0009` y `0010`.
+Lo que se vende.
 
 | Campo | Tipo | Qué es |
 |---|---|---|
@@ -74,17 +72,16 @@ Lo que se vende. Migraciones `0001`, `0004`, `0006`, `0009` y `0010`.
 | `unidad` | text, por omisión `unidad` | `unidad` (cantidades enteras) o `kg`, `m`, `l` (a granel, un decimal) |
 | `margen_elegido` | integer, opcional | Porcentaje entero mayor que 0 y hasta 10.000: uno de los botones (300, 200, 100, 50, 25), otro tipeado a mano, o ninguno |
 | `proveedor_preferido_id` | uuid → proveedor, opcional | De qué proveedor sale el costo vigente. Al crear el producto es el de la lista; al unir o separar pasa al más barato con lista de los últimos 120 días; se puede fijar a mano |
-| `foto_url` | text, opcional | `/fotos/<uuid>.jpg` (subida y guardada en el volumen de datos) o una dirección externa |
+| `foto_url` | text, opcional | `/fotos/<uuid>.jpg` (subida y guardada por el servidor) o una dirección externa |
 | `reemplazado_por` | uuid → producto, opcional | Si fue absorbido por otro al unir duplicados; queda inactivo |
 | `sector_id` | uuid → sector, opcional | Dónde vive en el local; lo asigna el conteo (capacidad de compras y stock) |
 | `activo` | boolean | |
 
-La columna `precio_manual` del modelo inicial se quitó en la migración `0010`: lo que se fija
-a mano es el margen, no el precio.
+El producto no guarda un precio fijado a mano: lo que se fija a mano es el margen (RF-10).
 
 ## precio_proveedor
 
-Histórico de costos por producto y proveedor. Migración `0001`. Guarda el código de cada
+Histórico de costos por producto y proveedor. Guarda el código de cada
 proveedor para ese artículo (RF-05).
 
 | Campo | Tipo | Qué es |
@@ -104,7 +101,7 @@ proveedor para ese artículo (RF-05).
 
 ## equivalencia_sugerida
 
-Posibles duplicados entre proveedores. Migración `0006`.
+Posibles duplicados entre proveedores.
 
 | Campo | Tipo | Qué es |
 |---|---|---|
@@ -121,7 +118,6 @@ stock, las consultas y los renglones de conteo del absorbido. Qué se movió que
 ## puesto y codigo_escaneado
 
 La computadora vinculada a un celular por QR, y los códigos que el celular le manda.
-Migración `0005`.
 
 | Tabla | Campo | Qué es |
 |---|---|---|

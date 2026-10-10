@@ -1,49 +1,270 @@
-# Pantallas: Usuarios y acceso
+# Requerimientos de interfaz: Usuarios y acceso
 
-Las dos interfaces (ADR-014) usan la misma API. La de celular vive en
-`clientes/gestion-del-local-web/src/` (`App.tsx`, `pantallas/`, `componentes/`) y la de
-computadora en `clientes/gestion-del-local-web/src/escritorio/`. Se elige por el ancho de
-la pantalla al abrir (900 px, `src/vista.ts`). La sesión, el token y las llamadas de huella
-son comunes: `src/sesion.tsx`, `src/api.ts`, `src/credenciales.ts`.
+Qué tiene que poder hacer cada rol en cada recorrido de [spec.md](spec.md) y con qué
+reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitución
+(principios II, III y IX) vale.
 
-## Celular
+## Reglas para todos los recorridos
 
-| Pantalla | Archivo | Qué muestra |
-|---|---|---|
-| Entrar | `pantallas/Login.tsx` | Logo «fe», «El cuaderno, sin cuaderno.» y el lema. Abajo: «Entrar con la huella» (solo si el dispositivo tiene huella), «Entrá con tu cuenta de Google.» y el botón de Google. Los errores de cada botón salen debajo del suyo |
-| Oferta de huella | `componentes/OfrecerHuella.tsx` | Hoja que sube desde abajo la primera vez que se entra con Google en un celular con huella: «¿Entrar con la huella?», «Sí, usar la huella» y «Ahora no»; al vincular dice «Listo» y «Entendido». Tocar afuera vale como «Ahora no». Una sola vez por dispositivo |
-| Negocio | `pantallas/Negocio.tsx` | Tarjeta con el nombre, el rol, el estado de conexión y «Salir». Para todos: ventas de hoy, gastos de la semana (de otras capacidades) y «Mis celulares con huella» (lista con «Quitar» y «Vincular este celular con mi huella»). Solo para quien administra: «Quién puede entrar» (lista con selector de rol, «Desactivar» o «Reactivar», y «+ Autorizar otro correo de Google», que abre una hoja con nombre, correo y rol), «Sesiones abiertas» (cada una con «Cerrar»; la propia dice «esta sesión» y su botón es coral) y «Quién hizo qué» (de a 10, con «← Anteriores», «Página N de M · T acciones» y «Siguientes →») |
-| Vincular celular como lector | `pantallas/VincularCelular.tsx` | Se abre al leer el QR de la computadora (RF-08, capacidad de catálogo). Sin sesión pide entrar con Google ahí mismo, sin botón de huella; con sesión avisa que el celular quedó vinculado 12 horas y ofrece «Ir a vender» |
+- **Dos interfaces.** Todo lo de este documento existe en el celular y en la computadora
+  (ADR-014), salvo donde dice lo contrario. Lo único que cambia por regla entre una y otra
+  es la huella: se ofrece sola en el celular y nunca en la computadora.
+- **Teclado.** En la computadora, cada recorrido se completa entero con el teclado.
+- **Sin confirmaciones.** Nada de esta capacidad pide confirmar antes de actuar: desactivar
+  un usuario, quitar un rol, quitar un celular y cerrar una sesión se pueden deshacer o
+  repetir (reactivar, volver a dar el rol, volver a vincular, volver a entrar).
+- **Errores en el lugar.** Cada error aparece junto a lo que lo causó, en castellano, y
+  dice qué hacer. Nunca un código ni un texto técnico.
+- **Rol, no persona.** Los textos dicen Administrador, Vendedor y Comprador; nunca «dueño»
+  ni «empleado».
+- **Lo que no se puede, no se ofrece.** Una operación que el usuario no puede hacer por sus
+  roles no figura en su interfaz; no se muestra deshabilitada ni con candado.
+- **Identidad siempre a la vista.** Con sesión abierta, desde cualquier parte de la app se
+  ve el nombre del usuario y sus roles, y se llega a «Salir» en un paso.
+- **Lo que tarda muestra su avance.** Entrar, vincular y cada guardado indican que están en
+  curso y no dejan repetir la acción mientras tanto.
+- **Sin conexión.** Entrar, vincular la huella, administrar usuarios, ver sesiones y ver
+  «quién hizo qué» necesitan conexión. Sin ella, la app lo dice en ese lugar, conserva lo
+  que el usuario haya escrito y permite reintentar; no muestra datos viejos como si fueran
+  actuales.
 
-La ruta vieja `#/administracion` abre Negocio.
+## Textos que son regla
 
-## Computadora
+| Dónde | Texto |
+|---|---|
+| Entrada, acción de la huella | «Entrar con la huella» |
+| Oferta de huella | «¿Entrar con la huella?» |
+| Vincular a mano | «Vincular este celular con mi huella» |
+| Correo sin autorizar | Nombra el correo con el que se intentó, dice que no está autorizado y que hay que pedirle el alta a un Administrador |
+| Demasiados intentos | «Demasiados intentos; esperá un minuto» |
+| Sesión que dejó de valer | «Hay que iniciar sesión» |
+| Registro de acciones | «Quién hizo qué» |
+| Salir de la sesión | «Salir» |
+| Roles | «Administrador», «Vendedor», «Comprador», siempre con esos nombres |
 
-| Pantalla | Archivo | Qué muestra |
-|---|---|---|
-| Entrar | `escritorio/pantallas/Login.tsx` | La marca «ferre», «Entrar con la huella» con su aclaración (solo si el dispositivo tiene huella), «Entrá con tu cuenta de Google.» y el botón de Google |
-| Barra de arriba | `escritorio/App.tsx` | Nombre y rol del usuario («Dueño E2E · dueño») y «Salir». Las entradas «Duplicados» y «Administración» solo aparecen para quien administra |
-| Administración | `escritorio/pantallas/Administracion.tsx` | Solo para quien administra. Cuatro bloques con tablas: «Usuarios autorizados» (nombre, correo, selector de rol, estado, «Desactivar» o «Reactivar», y debajo el alta en una línea: nombre, correo, rol, «Autorizar»), «Mis celulares con huella» (celular, vinculado el, último uso, «Quitar», y «Vincular este celular con mi huella»), «Sesiones abiertas» (quién, dispositivo, último uso, «Cerrar»: rojo el de la propia, azul los demás) y «Quién hizo qué» (cuándo, quién, qué, detalle; de a 10 con el mismo paginado) |
-| Vincular celular como lector | `escritorio/pantallas/VincularCelular.tsx` | La misma página que en el celular, con los estilos de la computadora |
+## Historia 1: entrar
 
-El QR que la computadora muestra para vincular el celular como lector está en
-`componentes/VincularCelular.tsx`, dentro de Vender (RF-08, capacidad de catálogo).
+**Quién:** cualquier persona que abre la app sin sesión.
 
-## Diferencias entre las dos
+**Qué tiene que poder hacer:** entrar con Google; en un dispositivo que puede, entrar con
+la huella. Nada más: sin sesión no se ve ningún dato del negocio.
 
-- La oferta de huella solo existe en el celular; en la computadora se vincula a mano.
-- En el celular todo usuario ve «Mis celulares con huella»; en la computadora está dentro
-  de Administración, que un usuario «mostrador» no ve.
-- En el celular, autorizar a alguien es una hoja; en la computadora, un formulario en línea.
-- Quitar un celular vinculado pide confirmación y vincularlo a mano pide el nombre, las dos
-  con ventanas del navegador (`confirm` y `prompt`).
-- En las dos, un Administrador con rol «admin» ve la fila de un dueño con el selector
-  deshabilitado y el texto «solo el dueño».
+**Qué necesita a la vista, en este orden:**
 
-## Mockup
+1. Qué app es (la marca).
+2. La forma más rápida de entrar que ese dispositivo tenga: «Entrar con la huella» primero,
+   si el dispositivo tiene lector de huella.
+3. Entrar con Google.
 
-`mockups/Entrar.png` es la pantalla de entrada de la computadora de antes del 2026-10-09:
-«Entrá con tu cuenta de Google», el botón y, debajo, «O entrá con el celular» con un código
-QR. **Quedó vieja:** entrar leyendo un QR se quitó (decisión 10 del dueño) y lo construido
-no tiene ese bloque; en su lugar está «Entrar con la huella». No hay mockup de Negocio ni
-de Administración.
+**Reglas:**
+
+- No hay campo de usuario ni de contraseña, ni entrada por código QR.
+- «Entrar con la huella» solo aparece donde el dispositivo puede leerla. En el celular
+  siempre que tenga lector; en la computadora depende de la pregunta P7 de la spec.
+- El resultado de cada forma de entrar se muestra junto a esa forma.
+- Al entrar bien no hay pantalla intermedia ni mensaje de bienvenida: se llega directo a
+  trabajar.
+- Con una sesión vigente guardada, la entrada no se muestra.
+
+**Estados:**
+
+| Estado | Qué se ve |
+|---|---|
+| Inicial | Las formas de entrar disponibles en ese dispositivo |
+| Cargando | Que se está entrando; no se puede lanzar otro intento |
+| Correo sin autorizar o usuario desactivado | El texto de la regla, con el correo; se puede intentar con otra cuenta |
+| Celular que no está vinculado | Que ese celular no está vinculado y que entre con Google |
+| La huella no se leyó o se canceló | Que no se pudo leer y que pruebe de nuevo o entre con Google |
+| Demasiados intentos | El texto de la regla |
+| Sin conexión | Que para entrar se necesita internet, y reintento |
+| Google no responde | Que Google no responde; la huella sigue disponible donde esté vinculada |
+| Sesión cerrada a distancia o vencida | Se vuelve solo a la entrada, con «Hay que iniciar sesión» |
+
+## Historia 2: administrar usuarios y roles
+
+**Quién:** Administrador.
+
+**Qué tiene que poder hacer:** ver quién puede entrar; autorizar un correo con sus roles;
+agregar y quitar roles; desactivar y reactivar.
+
+**Qué necesita a la vista:**
+
+- Por cada usuario: nombre, correo, los tres roles con cuáles tiene, y si está activo. Los
+  desactivados se distinguen de los activos sin leer la letra chica.
+- Cuál de los usuarios es él mismo.
+- Para autorizar, en este orden: nombre, correo de Google, roles. Ningún otro dato.
+
+**Reglas:**
+
+- Los tres roles se marcan por separado: se puede elegir cualquier combinación de
+  uno, dos o tres. No es una elección de uno entre tres.
+- Un alta no se puede confirmar sin al menos un rol.
+- Agregar o quitar un rol se guarda al tocarlo, sin paso de «guardar» aparte, y se ve el
+  resultado en la misma fila.
+- Lo que la regla impide se explica en el lugar: quitar el último rol de un usuario
+  («desactivalo si no tiene que entrar»), desactivarse o quitarse el rol Administrador a
+  uno mismo («lo tiene que hacer otro Administrador»), y dejar el sistema sin ningún
+  Administrador activo.
+- Desactivar avisa, después de hacerlo, que a ese usuario se le cerraron las sesiones.
+- Un correo repetido se avisa en el campo del correo, y lo escrito no se pierde.
+- Si se conserva alguna protección entre Administradores (pregunta P4 de la spec), lo que
+  no se puede tocar se explica en la fila.
+
+**Estados:**
+
+| Estado | Qué se ve |
+|---|---|
+| Vacío | No existe: siempre figura al menos el propio Administrador. La invitación a autorizar a alguien está siempre a la vista |
+| Cargando | Que la lista se está trayendo |
+| Éxito al autorizar | El usuario nuevo en la lista, y el alta lista para cargar otro |
+| Éxito al cambiar roles o estado | La fila con el valor nuevo |
+| Error de datos | Junto al campo: nombre vacío, correo mal escrito, correo que ya existe, ningún rol |
+| Error de regla | Junto a la fila, con el motivo |
+| Error del servidor | Que no se pudo guardar, con la fila como estaba y reintento |
+| Sin conexión | Que administrar usuarios necesita internet |
+
+## Historia 3: cada rol ve lo suyo
+
+**Quién:** cualquier usuario.
+
+**Qué tiene que poder hacer:** llegar a todas las operaciones que sus roles permiten, y solo
+a esas, según la matriz de permisos de la spec.
+
+**Reglas:**
+
+- El menú y los accesos se arman con la unión de los roles del usuario. Quien tiene los
+  tres ve todo; quien tiene uno ve lo de ese rol.
+- La app abre en la primera operación que el usuario puede hacer; nunca en una que no puede.
+- Un atajo de teclado o un enlace a una operación que el usuario no puede hacer no hace
+  nada dañino: lo lleva a algo que sí puede, con el motivo.
+- Si el servidor rechaza algo por rol (porque el rol cambió con la app abierta), el mensaje
+  dice qué rol se necesita, la sesión sigue abierta y la interfaz se actualiza a los roles
+  nuevos sin que el usuario tenga que salir.
+- Sin conexión, la interfaz usa los roles que conocía la última vez que tuvo servidor.
+
+**Estados:**
+
+| Estado | Qué se ve |
+|---|---|
+| Roles cambiados con la app abierta | La interfaz con las operaciones nuevas, o sin las que perdió, y un aviso de qué cambió |
+| Operación rechazada por rol | Qué rol se necesita |
+
+## Historia 4: la huella
+
+**Quién:** cualquier usuario.
+
+**Qué tiene que poder hacer:** aceptar o dejar pasar la oferta; ver sus celulares
+vinculados; vincular el que tiene en la mano; quitar uno. El Administrador, además, quitar
+el de otro usuario.
+
+**La oferta (solo en el celular):**
+
+- Aparece sola, una vez por dispositivo, justo después de la primera entrada con Google en
+  un celular con lector de huella. Nunca en la computadora.
+- Pregunta «¿Entrar con la huella?» y da dos salidas de igual facilidad: aceptar y dejarlo
+  para después. Ignorarla o cerrarla vale como dejarlo para después.
+- No tapa ni demora el trabajo más de lo que tarda en contestarse: quien la deja pasar
+  queda donde iba a quedar.
+- Al aceptar, el celular pide la huella; al leerla, la app confirma en una frase que desde
+  ahora se entra con la huella.
+- Si la huella no se lee, dice que se puede vincular después y dónde, y la oferta vuelve a
+  aparecer en la próxima entrada con Google.
+
+**Mis celulares vinculados (las dos interfaces, cualquier rol):**
+
+- Por cada uno: el nombre que le puso, cuándo se vinculó y cuándo se usó por última vez.
+- Cuál es el dispositivo que tiene en la mano, si está en la lista.
+- «Vincular este celular con mi huella» aparece solo en un dispositivo que puede leer la
+  huella y que no está ya vinculado. Pide un nombre, con uno propuesto que se puede dejar
+  como está; el nombre se pide dentro de la app.
+- Quitar uno es un paso, y dice después que ese celular ya no entra con la huella.
+- Todo usuario llega a su lista desde las dos interfaces, tenga el rol que tenga.
+
+**Celulares de otros (Administrador):** junto a cada usuario, sus celulares vinculados con
+la misma información y la posibilidad de quitarlos. Es la respuesta a un celular perdido,
+junto con cerrar sus sesiones.
+
+**Estados:**
+
+| Estado | Qué se ve |
+|---|---|
+| Vacío | Que no hay ningún celular vinculado y, si el dispositivo puede, la acción para vincular este |
+| Dispositivo sin lector de huella | La lista, sin la acción de vincular, y por qué no está |
+| Cargando | Que se está vinculando; el pedido de huella lo muestra el propio celular |
+| Éxito al vincular | El celular en la lista, con su nombre, y la frase de confirmación |
+| La huella no se leyó o se canceló | Que no se vinculó y que se puede probar de nuevo |
+| Pedido vencido | Que tardó demasiado y que empiece de nuevo |
+| Sin conexión | Que vincular y quitar necesitan internet |
+
+## Historia 5: sesiones
+
+**Quién:** Administrador para ver y cerrar las de todos; cualquier usuario para salir de la
+suya.
+
+**Qué necesita a la vista el Administrador:**
+
+- Por cada sesión abierta: de quién es, en qué dispositivo y cuándo se usó por última vez.
+  Ordenadas de la usada más recientemente a la más vieja.
+- Cuál es la suya en ese dispositivo, señalada con texto y no solo con color.
+
+**Reglas:**
+
+- Cerrar la propia se distingue a la vista de cerrar las demás, porque lo saca de la app.
+  La diferencia no depende solo del color.
+- Cerrar una sesión de otro la quita de la lista en el momento y deja al Administrador
+  donde estaba.
+- Cerrar la propia, o «Salir», lleva a la entrada.
+- «Salir» está al alcance de cualquier usuario desde cualquier parte, en un paso.
+- El dispositivo al que le cerraron la sesión vuelve solo a la entrada en su próxima
+  operación, con «Hay que iniciar sesión».
+- «Salir» sin conexión: [NEEDS CLARIFICATION: P9 de la spec: si el dispositivo no tiene internet, ¿«Salir» lo lleva igual a la entrada y la sesión se cierra en el servidor cuando reconecte, o no se puede salir sin conexión?]
+
+**Estados:**
+
+| Estado | Qué se ve |
+|---|---|
+| Vacío | No existe: siempre figura al menos la propia |
+| Cargando | Que la lista se está trayendo |
+| Éxito | La lista sin la sesión cerrada |
+| Error | Que no se pudo cerrar, con la sesión en la lista y reintento |
+| Sin conexión | Que ver y cerrar sesiones necesita internet |
+
+## Historia 6: quién hizo qué
+
+**Quién:** Administrador.
+
+**Qué tiene que poder hacer:** recorrer el registro de a 10; filtrarlo por usuario, por
+fecha o rango de fechas y por tipo de acción, solos o combinados; quitar los filtros.
+
+**Qué necesita a la vista, en este orden:**
+
+1. Los filtros: usuario, fecha, tipo de acción, y cuáles están puestos.
+2. Cuántas acciones hay con esos filtros y en qué página está, de cuántas.
+3. Las acciones de la página, de la más reciente a la más vieja. Por cada una: cuándo
+   (día y hora), quién, qué, y el detalle.
+4. Avanzar y retroceder.
+
+**Reglas:**
+
+- Nunca más de 10 acciones por página.
+- El filtro de usuario ofrece a todos los usuarios, también los desactivados, y «el
+  sistema» para las acciones sin usuario.
+- El filtro de tipo ofrece los tipos con palabras del mostrador («Venta anulada», «Cambio
+  de margen»), no con nombres técnicos; lo mismo vale para la columna «qué».
+- La fecha se elige con un día o con un desde y un hasta.
+- Cambiar un filtro lleva a la página 1 y actualiza el total.
+- El detalle se lee en palabras: qué se cambió, de cuánto a cuánto, sobre qué producto,
+  venta o usuario. Si es largo se resume, y el detalle completo se abre desde la acción.
+- En la primera página no se puede retroceder ni en la última avanzar, y se nota.
+- El registro es de solo lectura: no hay nada que editar ni que borrar.
+- Los filtros puestos se conservan al avanzar y retroceder.
+
+**Estados:**
+
+| Estado | Qué se ve |
+|---|---|
+| Vacío sin filtros | Que no hay acciones registradas |
+| Vacío con filtros | Que no hay acciones con esos filtros, y cómo quitarlos de un paso |
+| Cargando | Que se está trayendo la página; los filtros y la página anterior no desaparecen |
+| Error | Que no se pudo traer, con reintento |
+| Sin conexión | Que el registro necesita internet |

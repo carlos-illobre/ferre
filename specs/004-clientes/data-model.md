@@ -1,8 +1,5 @@
 # Modelo de datos: Clientes
 
-Fuente: `docs/MODELO.md` y `microservices/gestion-del-local/migrations/0001_modelo_inicial.sql`.
-Ninguna migración posterior (0002 a 0011) toca estas tablas.
-
 ## `cliente`
 
 Solo los clientes importantes; el cliente de barrio no se carga.
@@ -46,9 +43,3 @@ Un cliente tiene cero o muchas ventas; una venta tiene cero o un cliente.
 | `venta.pagada` | Al marcar pagada una venta a cuenta corriente | `id` de la venta |
 
 Los dos llevan el usuario que hizo la acción.
-
-## En el dispositivo
-
-El cliente web guarda la lista de clientes (con su deuda, tal como la devolvió la API) en el
-almacén `clientes` de IndexedDB (`clientes/gestion-del-local-web/src/almacen.ts`,
-`catalogo.ts`) y la reemplaza entera cada vez que el servidor responde.

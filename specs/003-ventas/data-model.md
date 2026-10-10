@@ -1,7 +1,7 @@
 # Data Model: Ventas
 
-Fuente: `docs/MODELO.md` y `microservices/gestion-del-local/migrations/0001_modelo_inicial.sql`
-(las tres tablas de esta capacidad nacen ahí y ninguna migración posterior las cambió).
+El contrato de datos de la capacidad: las tres tablas que son suyas y las de otras
+capacidades que la venta toca. El modelo completo está en la capacidad 001.
 
 ```mermaid
 erDiagram
@@ -53,7 +53,7 @@ Un renglón del cuaderno.
 | `descripcion` | texto, obligatorio | La del producto, o lo tipeado en un ítem libre |
 | `cantidad` | numeric(12,3), > 0 | Entera por unidad; con un decimal a granel |
 | `costo_neto` | numeric(14,4) | Costo de ese momento |
-| `precio_proveedor_id` | uuid → `precio_proveedor` | De qué fila de costo salió (la API lo acepta; las pantallas de hoy no lo mandan) |
+| `precio_proveedor_id` | uuid → `precio_proveedor` | De qué fila de costo salió; opcional |
 | `margen_aplicado` | entero | Margen de ese momento; nulo si el precio se puso a mano o es un ítem libre |
 | `precio_unitario` | numeric(12,2), ≥ 0 | Precio por unidad, tal cual; el redondeo del renglón no se guarda acá, va al `total` de la venta |
 | `explicacion` | jsonb | Los pasos del precio y los del costo, de ese momento |
@@ -72,7 +72,7 @@ Lo que preguntaron y no llevaron. Una fila por producto del «No llevó».
 | `producto_id` | uuid → `producto` | Nulo si era un ítem libre |
 | `descripcion` | texto, obligatorio | |
 | `precio_ofrecido` | numeric(12,2) | Nulo si el renglón no tenía precio |
-| `motivo` | texto | Existe en la tabla y en la API; ninguna pantalla lo carga todavía |
+| `motivo` | texto | Por qué no se vendió (RF-25); opcional |
 | `dispositivo_id` | texto | |
 | `creado_en` | timestamptz | |
 
