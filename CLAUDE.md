@@ -73,7 +73,9 @@ tests/e2e.sh                 # caminos principales, en las dos interfaces (levan
 Cómo levantarlo: [specs/001-base-del-sistema/quickstart.md](specs/001-base-del-sistema/quickstart.md).
 Operación del servidor: [docs/operacion/](docs/operacion/).
 
-## Prioridad actual
+## Qué sigue
 
-1. Que Carlos valide en la notebook la interfaz de computadora (RNF-05).
-2. Los respaldos (RNF-21 a RNF-23, issue #19): todavía no están implementados.
+Este archivo no dice qué está hecho ni qué va primero. El avance está en
+[proyecto/estado.yml](proyecto/estado.yml) y en el tablero; las tareas y su orden, en los
+issues y sus etapas; lo que falta decidir, en
+[specs/preguntas-abiertas.md](specs/preguntas-abiertas.md).
