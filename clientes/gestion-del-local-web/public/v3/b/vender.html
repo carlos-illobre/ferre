@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · Ferrebress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#00A86B; --verde-osc:#007A4D; --verde-claro:#DDF5EA;
+  --tinta:#0C2B26; --tinta-2:#48625C; --linea:#D5E1DC;
+  --sup:#F1F6F4; --blanco:#fff; --limon:#FFD43B; --limon-claro:#FFF6CC;
+  --rojo:#B3261E; --rojo-claro:#FBE9E7;
+  --titulos:"Sora",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --texto:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--blanco);color:var(--tinta);font:400 17px/1.45 var(--texto);
+  font-variant-numeric:tabular-nums;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+h1,h2,p{margin:0}
+svg{flex:none}
+.ancho{width:100%;max-width:800px;margin:0 auto;padding:0 16px}
+:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}
+
+/* botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;
+  border:1.5px solid var(--linea);border-radius:12px;background:var(--blanco);color:var(--tinta);
+  font:600 16px/1 var(--texto);cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--tinta-2)}
+.btn-principal{width:100%;min-height:60px;border:0;border-radius:14px;background:var(--verde);color:var(--tinta);
+  font:700 20px/1 var(--titulos)}
+.btn-principal:hover{background:#00B874}
+
+/* barra de arriba */
+.barra{border-bottom:1px solid var(--linea);background:var(--blanco)}
+.barra .ancho{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding-top:10px;padding-bottom:10px}
+.barra .tarea{font:700 22px/1.2 var(--titulos);text-align:center}
+.barra .inicio{justify-self:end}
+.barra .volver{justify-self:start}
+
+/* pasos */
+.pasos{display:flex;align-items:center;justify-content:center;gap:12px;list-style:none;margin:0;padding:16px 0 0;
+  font:500 15px/1 var(--texto);color:var(--tinta-2)}
+.pasos li{display:flex;align-items:center;gap:8px}
+.pasos li+li::before{content:"";width:36px;height:2px;background:var(--linea);margin-right:4px}
+.pasos .n{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--linea);
+  font:600 14px/1 var(--titulos);color:var(--tinta-2);background:var(--blanco)}
+.pasos .hecho .n{background:var(--verde-claro);border-color:var(--verde-claro);color:var(--verde-osc)}
+.pasos .actual{color:var(--tinta);font-weight:700}
+.pasos .actual .n{background:var(--tinta);border-color:var(--tinta);color:var(--blanco)}
+.paso-celu{display:none}
+
+main{flex:1;padding:20px 0 20px}
+body.con-pie{height:100vh;height:100dvh;overflow:hidden}
+body.con-pie main{overflow-y:auto;min-height:0}
+.pregunta{font:700 34px/1.15 var(--titulos);letter-spacing:-.02em;text-align:center;margin-bottom:6px}
+.bajada{text-align:center;color:var(--tinta-2);margin-bottom:24px}
+.pregunta + .bloque, .pregunta + .buscar{margin-top:22px}
+.rotulo{font:600 15px/1.2 var(--texto);color:var(--tinta-2);margin:22px 0 10px}
+
+/* barra de abajo */
+.pie{position:sticky;bottom:0;background:var(--blanco);border-top:1px solid var(--linea);padding:12px 0 14px}
+.pie .total{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.pie .total span{font:500 17px/1 var(--texto);color:var(--tinta-2)}
+.pie .total strong{font:700 36px/1 var(--titulos);letter-spacing:-.02em}
+.pie .dos{display:flex;gap:12px}
+.pie .dos .btn:not(.btn-principal){min-height:60px;padding:0 22px;font-size:17px;border-radius:14px}
+.pie .nota{text-align:center;color:var(--tinta-2);font-size:15px;margin-bottom:10px}
+
+/* buscar */
+.buscar{display:flex;gap:10px}
+.campo{flex:1;display:flex;align-items:center;gap:10px;min-height:60px;padding:0 16px;border:2px solid var(--tinta);
+  border-radius:14px;background:var(--blanco);min-width:0}
+.campo input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--tinta);font:500 19px/1 var(--texto)}
+.campo input::placeholder{color:var(--tinta-2);opacity:1}
+.campo.suave{border:1.5px solid var(--linea);background:var(--sup)}
+.buscar .btn-principal{width:auto;padding:0 28px}
+
+/* listas de renglones */
+.lista{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.fila{display:flex;align-items:center;gap:16px;min-height:62px;padding:7px 18px;border-radius:14px;background:var(--sup)}
+a.fila:hover{background:#E6EFEB}
+.fila .nombre{flex:1;min-width:0;font:600 17px/1.3 var(--texto)}
+.fila .nombre small{display:block;font:400 15px/1.3 var(--texto);color:var(--tinta-2);margin-top:2px}
+.fila .importe{font:700 20px/1 var(--titulos);white-space:nowrap}
+.aviso{display:inline-flex;align-items:center;min-height:30px;padding:0 12px;border-radius:8px;background:var(--limon);
+  color:var(--tinta);font:600 15px/1 var(--texto);white-space:nowrap}
+.fila.atencion{background:var(--limon-claro)}
+.flecha{color:var(--tinta-2)}
+.costo{color:var(--tinta-2);font-size:16px;white-space:nowrap;min-width:190px;text-align:right}
+.nb{white-space:nowrap}
+
+/* cantidad */
+.cant{display:flex;align-items:center;border:1.5px solid var(--linea);border-radius:12px;background:var(--blanco)}
+.cant button{width:48px;height:48px;border:0;background:none;color:var(--tinta);font:600 24px/1 var(--titulos);cursor:pointer;border-radius:12px}
+.cant button:hover{background:var(--sup)}
+.cant output{min-width:64px;text-align:center;font:600 17px/1 var(--texto);white-space:nowrap}
+
+/* medios de pago */
+.medios{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.medio{display:flex;align-items:center;gap:10px;min-height:64px;padding:14px;
+  border:1.5px solid var(--linea);border-radius:14px;background:var(--blanco);font:600 17px/1.2 var(--texto);
+  color:var(--tinta);cursor:pointer;text-align:left}
+.medio .radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--tinta-2)}
+.medio[aria-checked=true]{border:2px solid var(--tinta);background:var(--verde-claro);padding:13.5px}
+.medio[aria-checked=true] .radio{border:7px solid var(--tinta);background:var(--blanco)}
+.acciones{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.acciones .crece{flex:1}
+
+/* listas de precios */
+.ficha{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:var(--sup)}
+.ficha .txt{flex:1;min-width:0}
+.ficha strong{display:block;font:700 19px/1.25 var(--titulos)}
+.ficha small{display:block;font-size:15px;color:var(--tinta-2);overflow-wrap:anywhere}
+.tres{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.dato{padding:12px 18px;border-radius:14px;border:1.5px solid var(--linea)}
+.dato b{display:block;font:700 30px/1.1 var(--titulos);letter-spacing:-.02em}
+.dato span{display:block;font:600 16px/1.3 var(--texto);margin-top:2px}
+.dato small{display:block;font-size:15px;color:var(--tinta-2)}
+.dato.fuerte{border-color:var(--tinta);border-width:2px;padding:11.5px 17.5px}
+.cambio .antes{color:var(--tinta-2);font-size:15px;white-space:nowrap}
+.cambio .ahora{font:700 18px/1 var(--titulos);white-space:nowrap}
+.pct{display:inline-block;min-width:74px;text-align:right;font:600 16px/1 var(--texto);white-space:nowrap}
+.sube{color:var(--rojo)} .baja{color:var(--verde-osc)}
+
+/* actividad */
+.filtro{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.filtro .btn{border-radius:999px;padding:0 20px}
+.filtro .btn[aria-pressed=true]{background:var(--tinta);border-color:var(--tinta);color:var(--blanco)}
+.quien{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--blanco);
+  border:1.5px solid var(--linea);font:700 17px/1 var(--titulos);flex:none}
+.hecho-txt{flex:1;min-width:0;font-size:17px;line-height:1.35}
+.hecho-txt b{font-weight:700}
+.hora{color:var(--tinta-2);font:500 15px/1 var(--texto);white-space:nowrap}
+.fila.anulada{background:var(--rojo-claro)}
+.fila.anulada .verbo{color:var(--rojo);font-weight:700}
+
+/* inicio */
+.tarjetas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+.tarjeta{display:flex;align-items:center;gap:16px;min-height:104px;padding:20px;border-radius:18px;background:var(--sup)}
+.tarjeta:hover{background:#E6EFEB}
+.tarjeta .ico{display:grid;place-items:center;width:56px;height:56px;border-radius:14px;background:var(--blanco);flex:none}
+.tarjeta strong{display:block;font:700 22px/1.2 var(--titulos)}
+.tarjeta span span{display:block;color:var(--tinta-2);font-size:16px;margin-top:2px}
+.tarjeta.primera{grid-column:1/-1;background:var(--verde);min-height:120px}
+.tarjeta.primera:hover{background:#00B874}
+.tarjeta.primera strong{font-size:28px}
+.tarjeta.primera span span{color:var(--tinta)}
+.barra .cabeza{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;padding-bottom:14px}
+.marca{display:flex;align-items:center;gap:10px;font:700 20px/1 var(--titulos)}
+
+/* entrar */
+.entrar{flex:1;display:grid;place-items:center;padding:32px 16px;background:var(--sup)}
+.entrar .caja{width:100%;max-width:440px;background:var(--blanco);border-radius:24px;padding:44px 36px 36px;text-align:center}
+.entrar h1{font:700 36px/1.1 var(--titulos);letter-spacing:-.02em;margin:18px 0 8px}
+.entrar p{color:var(--tinta-2);font-size:18px;margin-bottom:30px}
+.entrar .btn{width:100%;min-height:60px;font-size:18px;border-radius:14px;margin-top:12px}
+.entrar .btn-principal{margin-top:0;font:700 19px/1 var(--titulos)}
+.solo-celu{display:none}
+
+@media (max-width:640px){
+  .solo-celu{display:inline-flex}
+  .barra .ancho{grid-template-columns:1fr 1fr;row-gap:12px;padding-bottom:12px}
+  .barra .tarea{grid-row:2;grid-column:1;text-align:left;font-size:22px;white-space:nowrap}
+  .barra .inicio{grid-row:1;grid-column:2}
+  .paso-celu{display:block;grid-row:2;grid-column:2;justify-self:end;font:600 15px/1 var(--texto);color:var(--tinta-2);white-space:nowrap}
+  .barra{border-bottom:0}
+  .pasos{justify-content:stretch;gap:6px;padding-top:0}
+  .pasos li{flex:1;height:5px;border-radius:3px;background:var(--linea)}
+  .pasos li .n,.pasos li span{display:none}
+  .pasos li+li::before{display:none}
+  .pasos .hecho,.pasos .actual{background:var(--tinta)}
+  main{padding:20px 0 24px}
+  .ficha strong{font-size:17px}
+  .pregunta{font-size:27px;text-align:left}
+  .bajada{text-align:left}
+  .buscar .btn-principal{padding:0 18px;font-size:17px}
+  .campo{padding:0 12px}
+  .medios{grid-template-columns:1fr 1fr}
+  .medio{font-size:16px;padding:12px;min-height:56px}
+  .pregunta{margin-bottom:0}
+  .rotulo{margin-top:18px}
+  .medio[aria-checked=true]{padding:11.5px}
+  .fila{padding:10px 14px;gap:12px}
+  .fila.renglon{flex-wrap:wrap;row-gap:10px}
+  .fila.renglon .nombre{flex-basis:100%}
+  .fila.renglon .importe,.fila.renglon .costo{margin-left:auto;min-width:0}
+  .fila.cambio{flex-wrap:wrap;row-gap:4px}
+  .fila.cambio .nombre{flex-basis:100%}
+  .fila.cambio .ahora{margin-left:auto}
+  .pct{min-width:66px}
+  .tres{grid-template-columns:1fr}
+  .dato{display:grid;grid-template-columns:104px 1fr;align-items:center;column-gap:8px;padding:12px 16px}
+  .dato.fuerte{padding:11.5px 15.5px}
+  .dato b{font-size:28px;grid-row:1/3}
+  .dato span{margin:0}
+  .dato:not(:has(small)) b{grid-row:1}
+  .filtro{justify-content:flex-start}
+  .filtro{gap:6px}
+  .filtro .btn{padding:0 13px}
+  .cant output{min-width:52px}
+  .costo{font-size:15px}
+  .tarjetas{grid-template-columns:1fr}
+  .tarjeta{min-height:88px;padding:16px}
+  .tarjeta.primera{min-height:104px}
+  .entrar{padding:16px;background:var(--blanco)}
+  .entrar .caja{padding:24px 8px}
+  .pie .total strong{font-size:32px}
+}
+</style>
+</head>
+<body class="con-pie">
+<header>
+<div class="barra"><div class="ancho">
+  <a class="btn volver" href="vender.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Volver</a>
+  <span class="tarea">Vender</span>
+  <a class="btn inicio" href="inicio.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Inicio</a>
+  <span class="paso-celu">Paso 2 de 2: cobro</span>
+</div></div>
+<div class="ancho"><ol class="pasos" aria-label="Pasos"><li class="hecho"><span class="n">1</span><span>Productos</span></li><li class="actual" aria-current="step"><span class="n">2</span><span>Cobro</span></li></ol></div>
+</header>
+<main><div class="ancho">
+  <h1 class="pregunta">¿Cómo paga?</h1>
+  <div class="medios bloque" role="radiogroup" aria-label="Medio de pago"><button type="button" class="medio" role="radio" aria-checked="true"><span class="radio"></span>Efectivo</button><button type="button" class="medio" role="radio" aria-checked="false"><span class="radio"></span>Mercado Pago</button><button type="button" class="medio" role="radio" aria-checked="false"><span class="radio"></span>Tarjeta</button><button type="button" class="medio" role="radio" aria-checked="false"><span class="radio"></span>Cuenta corriente</button></div>
+  <h2 class="rotulo">Se lleva 3 productos</h2>
+  <ul class="lista"><li class="fila renglon"><span class="nombre">Mecha 6 mm madera</span><div class="cant"><button type="button" aria-label="Uno menos de Mecha 6 mm madera">−</button><output>2</output><button type="button" aria-label="Uno más de Mecha 6 mm madera">+</button></div><span class="importe">$8.000</span></li><li class="fila renglon"><span class="nombre">Clavo punta París 2 pulgadas</span><div class="cant"><button type="button" aria-label="Uno menos de Clavo punta París 2 pulgadas">−</button><output>2,5 kg</output><button type="button" aria-label="Uno más de Clavo punta París 2 pulgadas">+</button></div><span class="importe">$25.000</span></li><li class="fila renglon"><span class="nombre">Taladro inalámbrico 18 V con dos baterías</span><div class="cant"><button type="button" aria-label="Uno menos de Taladro inalámbrico 18 V con dos baterías">−</button><output>1</output><button type="button" aria-label="Uno más de Taladro inalámbrico 18 V con dos baterías">+</button></div><span class="importe">$223.000</span></li></ul>
+  <div class="acciones">
+    <a class="btn crece" href="vender.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Agregar otro producto</a>
+    <a class="btn" href="inicio.html">No llevó</a>
+  </div>
+</div></main>
+<footer class="pie"><div class="ancho">
+  <p class="total"><span>Total en efectivo</span><strong>$256.000</strong></p>
+  <button class="btn btn-principal" type="button">Cobrar</button>
+</div></footer>
+</body>
+</html>

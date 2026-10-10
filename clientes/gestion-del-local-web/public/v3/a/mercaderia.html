@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mercadería · Ferrebress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --violeta:#5B3DF5; --violeta-osc:#4426D6; --lila:#ECE8FF; --lila-borde:#CFC7FB;
+  --tinta:#16132D; --tinta2:#5A5676; --fondo:#F6F5FF; --sup:#FFFFFF;
+  --linea:#E6E3F5; --borde:#8F86C9;
+  --menta:#12B886; --verde:#0A7A57; --verde-fondo:#E3F8F0;
+  --rojo:#C12B2B; --rojo-fondo:#FDECEC;
+  --radio:18px; --col:680px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fondo);color:var(--tinta);
+  font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;line-height:1.4;font-weight:500;-webkit-font-smoothing:antialiased}
+h1,h2,p{margin:0}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.num{font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
+:focus-visible{outline:3px solid var(--violeta);outline-offset:3px}
+
+/* Barra de arriba */
+.barra{background:var(--sup);border-bottom:1px solid var(--linea);position:sticky;top:0;z-index:5}
+.barra-in{height:64px;display:flex;align-items:center;gap:24px;padding:0 24px}
+.marca{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+.marca svg{width:34px;height:34px;flex:none}
+.destinos{display:flex;gap:4px;margin:0 auto;height:100%}
+.destinos a{display:flex;align-items:center;padding:0 16px;font-weight:700;color:var(--tinta2);
+  border-bottom:3px solid transparent;border-top:3px solid transparent}
+.destinos a:hover{color:var(--tinta)}
+.destinos a[aria-current]{color:var(--violeta);border-bottom-color:var(--violeta)}
+.destinos svg{display:none}
+.yo{display:flex;align-items:center;gap:10px;font-weight:700}
+.inicial{width:36px;height:36px;border-radius:50%;background:var(--lila);color:var(--violeta-osc);
+  display:grid;place-items:center;font-weight:800;font-size:15px;flex:none}
+
+/* Columna */
+.col{max-width:var(--col);margin:0 auto;padding:28px 16px 40px}
+.col.con-accion{padding-bottom:132px}
+.titulo{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.bajada{color:var(--tinta2);margin-top:4px}
+
+/* Búsqueda: siempre igual */
+.buscar{display:flex;align-items:center;gap:14px;height:76px;padding:0 10px 0 22px;background:var(--sup);
+  border:2px solid var(--borde);border-radius:22px}
+.buscar.activa{border-color:var(--violeta);box-shadow:0 0 0 5px rgba(91,61,245,.16)}
+.buscar>svg{width:28px;height:28px;flex:none;color:var(--violeta)}
+.buscar input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:24px;font-weight:700;
+  color:var(--tinta);height:100%}
+.buscar input::placeholder{color:var(--tinta2);font-weight:500;opacity:1}
+.borrar{width:52px;height:52px;border-radius:50%;border:0;background:var(--lila);display:grid;place-items:center;flex:none}
+.borrar svg{width:20px;height:20px;color:var(--violeta-osc)}
+
+.cuenta{color:var(--tinta2);margin:20px 4px 10px}
+
+/* Tarjeta con renglones */
+.tarjeta{background:var(--sup);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden}
+.tarjeta>*+*{border-top:1px solid var(--linea)}
+.mt{margin-top:20px}
+
+/* Productos */
+.prod{display:flex;align-items:center;gap:16px;padding:16px 16px 16px 20px;min-height:76px}
+.prod:hover{background:#FBFAFF}
+.prod .n{flex:1;min-width:0}
+.nombre{font-weight:700;font-size:18px;line-height:1.3}
+.chica{color:var(--tinta2);font-size:15px}
+.prod .num{font-size:24px}
+.prod .sin{color:var(--tinta2);font-size:16px;font-weight:500;white-space:nowrap}
+.prod>svg{width:20px;height:20px;color:var(--borde);flex:none}
+
+/* Renglones de venta y de mercadería */
+.reng{display:grid;grid-template-columns:1fr auto 132px;align-items:center;gap:16px;padding:12px 20px}
+.reng .tot{text-align:right}
+.reng .tot .num{font-size:22px;display:block}
+.cant{display:inline-flex;align-items:center;background:var(--fondo);border-radius:999px;padding:0}
+.cant button{width:48px;height:48px;border-radius:50%;border:2px solid var(--lila-borde);background:var(--sup);
+  display:grid;place-items:center;color:var(--violeta-osc)}
+.cant button svg{width:18px;height:18px}
+.cant output{min-width:76px;text-align:center;font-weight:800;font-size:19px;font-variant-numeric:tabular-nums;padding:0 6px}
+
+/* Medios de pago */
+.fila-pago{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 10px 4px}
+.pregunta{font-weight:800;font-size:20px}
+.medios{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.medio{height:60px;border-radius:16px;border:2px solid var(--borde);background:var(--sup);font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:8px;padding:0 8px;line-height:1.15}
+.medio[aria-pressed=true]{border-color:var(--violeta);background:var(--lila);color:var(--violeta-osc);border-width:3px}
+.medio svg{width:20px;height:20px;flex:none}
+.secundario{height:52px;padding:0 22px;border-radius:16px;border:2px solid var(--borde);background:var(--sup);font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center}
+.nollevo{height:48px;padding:0 18px;border-radius:14px;color:var(--tinta2);border-color:var(--lila-borde);background:transparent;font-size:16px}
+
+/* Acción fija abajo de la columna */
+.accion{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:min(var(--col) - 32px,100% - 32px);
+  background:var(--sup);border:1px solid var(--linea);border-radius:24px;padding:12px 12px 12px 24px;
+  display:flex;align-items:center;gap:12px;box-shadow:0 12px 32px rgba(22,19,45,.14);z-index:6}
+.accion.dos{padding-left:12px}
+.accion .total{flex:1;min-width:0;line-height:1.1}
+.accion .total small{display:block;font-size:15px;color:var(--tinta2);font-weight:500;margin-bottom:2px}
+.accion .total .num{font-size:38px;letter-spacing:-.02em}
+.principal{height:64px;padding:0 36px;border-radius:18px;border:0;background:var(--violeta);color:#fff;font-weight:800;
+  font-size:20px;display:inline-flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap}
+.principal:hover{background:var(--violeta-osc)}
+.accion.dos .secundario{height:64px;flex:1;font-size:18px}
+.accion.dos .principal{flex:2}
+
+/* Listas */
+.archivo{display:flex;align-items:center;gap:14px;margin-top:20px;padding:16px 20px}
+.archivo svg{width:28px;height:28px;color:var(--violeta);flex:none}
+.tres{display:grid;grid-template-columns:repeat(3,1fr)}
+.tres>div{padding:18px 20px}
+.tres>div+div{border-left:1px solid var(--linea)}
+.tres .num{font-size:34px;display:block;line-height:1.1}
+.tres span:not(.num){color:var(--tinta2);font-size:16px;display:block;margin-top:4px;line-height:1.3}
+.sub{font-weight:700;font-size:18px;margin:22px 4px 10px}
+.cambio{display:flex;align-items:center;gap:16px;padding:14px 20px}
+.cambio .n{flex:1;min-width:0}
+.cambio .precios{color:var(--tinta2);font-variant-numeric:tabular-nums;font-size:16px}
+.cambio .precios b{color:var(--tinta);font-weight:800}
+.sube,.baja{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:6px}
+.sube{color:var(--rojo)} .baja{color:var(--verde)}
+.sube svg,.baja svg{width:14px;height:14px}
+.aviso{color:var(--tinta2);text-align:center;margin-top:18px}
+
+/* Mercadería */
+.prov{display:flex;align-items:center;gap:16px;padding:14px 16px 14px 20px}
+.prov .n{flex:1;min-width:0}
+.prov .nombre{font-size:20px;font-weight:800}
+
+/* Actividad */
+.filtro{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.filtro button{height:48px;padding:0 20px;border-radius:999px;border:2px solid var(--borde);background:var(--sup);font-weight:700}
+.filtro button[aria-pressed=true]{border-color:var(--violeta);background:var(--lila);color:var(--violeta-osc);border-width:3px;padding:0 19px}
+.dia{font-weight:800;margin:26px 4px 12px;font-size:18px}
+.hecho{display:flex;gap:12px;margin-top:14px;align-items:flex-start}
+.hecho .inicial{width:44px;height:44px;font-size:17px;margin-top:22px}
+.hecho .quien{font-size:15px;color:var(--tinta2);margin:0 0 4px 4px}
+.hecho .quien b{color:var(--tinta);font-weight:700}
+.globo{background:var(--sup);border:1px solid var(--linea);border-radius:6px 18px 18px 18px;padding:12px 18px;display:inline-block;font-size:18px}
+.globo b{font-weight:800;font-variant-numeric:tabular-nums}
+.globo.anulo{background:var(--rojo-fondo);border-color:#F3C6C6}
+.globo.anulo .v{color:var(--rojo);font-weight:800}
+
+/* Entrar */
+.entrar{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 16px}
+.entrar main{width:100%;max-width:420px;text-align:center}
+.entrar .logo{width:88px;height:88px}
+.entrar h1{font-size:40px;font-weight:800;letter-spacing:-.03em;margin-top:18px;line-height:1.1}
+.entrar p{color:var(--tinta2);font-size:19px;margin-top:10px}
+.entrar .botones{display:grid;gap:12px;margin-top:40px}
+.entrar .principal,.entrar .secundario{height:64px;width:100%;font-size:19px;font-weight:800;gap:12px;border-radius:18px}
+.entrar .principal svg,.entrar .secundario svg{width:26px;height:26px;flex:none}
+.g{width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+.g svg{width:18px!important;height:18px!important}
+.solo-celu{display:none!important}
+
+/* Celular */
+@media (max-width:720px){
+  body{font-size:17px}
+  .barra-in{height:54px;padding:0 16px}
+  .marca{font-size:18px}.marca svg{width:30px;height:30px}
+  .yo{margin-left:auto}.yo span.nom{display:none}
+  .destinos{position:fixed;left:0;right:0;bottom:0;height:calc(66px + env(safe-area-inset-bottom));margin:0;gap:0;
+    padding-bottom:env(safe-area-inset-bottom);background:var(--sup);border-top:1px solid var(--linea);z-index:7}
+  .destinos a{flex:1;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:0;font-size:12px;font-weight:700;
+    border-bottom:0;border-top:3px solid transparent}
+  .destinos a[aria-current]{border-top-color:var(--violeta)}
+  .destinos svg{display:block;width:24px;height:24px}
+  .col{padding:16px 16px 96px}
+  .col.con-accion{padding-bottom:176px}
+  .titulo{font-size:26px}
+  .buscar{height:64px;padding:0 8px 0 16px;gap:10px;border-radius:20px}
+  .buscar input{font-size:20px}
+  .buscar>svg{width:24px;height:24px}
+  .borrar{width:48px;height:48px}
+  .prod{padding:14px 12px 14px 16px;gap:10px}
+  .prod .num{font-size:21px}
+  .reng{grid-template-columns:1fr auto;gap:10px 12px;padding:14px 16px}
+  .reng .nombre{grid-column:1/-1}
+  .reng .tot{align-self:center}
+  .reng .cant{justify-self:start}
+  .reng{padding:12px 16px}
+  .fila-pago{margin-top:14px}
+  .medios{grid-template-columns:1fr 1fr}
+  .medio{height:56px}
+  .accion{left:0;right:0;transform:none;width:auto;bottom:calc(66px + env(safe-area-inset-bottom));border-radius:0;
+    border:0;border-top:1px solid var(--linea);padding:10px 16px;box-shadow:0 -8px 24px rgba(22,19,45,.08)}
+  .accion.dos{padding:10px 16px}
+  .accion .total .num{font-size:30px}
+  .accion .total small{font-size:14px}
+  .principal{height:58px;padding:0 26px;font-size:19px}
+  .accion.dos .secundario{height:58px}
+  .tres>div{padding:16px 12px}
+  .tres .num{font-size:26px}
+  .tres span{font-size:15px}
+  .archivo{padding:14px 16px}
+  .cambio{padding:14px 16px;gap:10px}
+  .prov{padding:12px 12px 12px 16px}
+  .filtro{gap:6px;flex-wrap:nowrap}
+  .filtro button,.filtro button[aria-pressed=true]{padding:0;flex:1;min-width:0;font-size:16px}
+  .hecho .inicial{width:40px;height:40px}
+  .globo{padding:12px 16px;font-size:17px}
+  .solo-celu{display:inline-flex!important}
+  .solo-compu{display:none!important}
+  .entrar h1{font-size:36px}
+}
+</style>
+</head>
+<body>
+<header class="barra"><div class="barra-in">
+  <a class="marca" href="vender.html"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="12" fill="#5B3DF5"/><path d="M20 8.5l9.96 5.75v11.5L20 31.5l-9.96-5.75v-11.5z" fill="#fff"/><circle cx="20" cy="20" r="4.6" fill="#5B3DF5"/></svg><span>Ferrebress</span></a>
+  <nav class="destinos" aria-label="Secciones"><a href="vender.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg><span>Vender</span></a><a href="productos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>Productos</span></a><a href="listas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg><span>Listas</span></a><a href="mercaderia.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9"/></svg><span>Mercadería</span></a><a href="actividad.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Actividad</span></a></nav>
+  <div class="yo"><span class="nom">Carlos</span><span class="inicial" aria-hidden="true">C</span></div>
+</div></header>
+<main class="col con-accion">
+  <h1 class="oculto">Recibir mercadería</h1>
+  <div class="buscar" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" stroke-width="2.4"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+  <input type="search" aria-label="Buscá lo que llegó" placeholder="Buscá lo que llegó" value="" autocomplete="off"></div>
+  <div class="tarjeta mt">
+    <div class="prov"><div class="n"><div class="nombre">Llegó de Comodo</div><div class="chica">Factura 0003-00019001</div></div>
+      <button type="button" class="secundario">Cambiar</button></div>
+    <div class="reng"><div class="nombre">Mecha 6 mm madera</div><div class="cant" role="group" aria-label="Cantidad de Mecha 6 mm madera"><button type="button" aria-label="Menos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" stroke-width="2.8"><path d="M5 12h14"/></svg></button><output>20</output><button type="button" aria-label="Más"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="tot"><span class="num">$1.649,14</span><span class="chica">cada una</span></div></div><div class="reng"><div class="nombre">Clavo punta París 2 pulgadas</div><div class="cant" role="group" aria-label="Cantidad de Clavo punta París 2 pulgadas"><button type="button" aria-label="Menos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" stroke-width="2.8"><path d="M5 12h14"/></svg></button><output>2,5 kg</output><button type="button" aria-label="Más"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="tot"><span class="num">$3.890,00</span><span class="chica">el kilo</span></div></div><div class="reng"><div class="nombre">Cinta aisladora negra 20 m</div><div class="cant" role="group" aria-label="Cantidad de Cinta aisladora negra 20 m"><button type="button" aria-label="Menos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" stroke-width="2.8"><path d="M5 12h14"/></svg></button><output>30</output><button type="button" aria-label="Más"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg></button></div><div class="tot"><span class="num">$438,50</span><span class="chica">cada una</span></div></div>
+  </div>
+</main>
+<div class="accion">
+  <div class="total"><small>Total de la factura</small><span class="num">$55.863</span></div>
+  <button type="button" class="principal">Registrar ingreso</button>
+</div>
+</body>
+</html>

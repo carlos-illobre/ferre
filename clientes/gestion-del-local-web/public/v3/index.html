@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ferrebress v3: tres opciones de diseño</title>
+<style>
+  :root { --tinta: #14161f; --gris: #5a6072; --borde: #dfe2ea; --fondo: #f5f6f9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.75rem; line-height: 1.2; margin: 0 0 8px; text-wrap: balance; }
+  p { margin: 0; color: var(--gris); max-width: 68ch; text-wrap: pretty; }
+  .opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 28px; }
+  section { background: #fff; border: 1px solid var(--borde); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  h2 { font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 10px; }
+  h2 i { width: 18px; height: 18px; border-radius: 50%; flex: none; }
+  ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+  a { display: flex; align-items: center; min-height: 48px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--borde); color: var(--tinta); text-decoration: none; font-weight: 600; }
+  a:hover { background: var(--fondo); }
+  a:focus-visible { outline: 3px solid #1463ff; outline-offset: 2px; }
+  footer { margin-top: 28px; color: var(--gris); font-size: 0.9375rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ferrebress v3: tres opciones de diseño</h1>
+  <p>Son maquetas: muestran cómo se vería cada pantalla, con datos de ejemplo, y no guardan nada. Abrilas en la computadora y en el celular, y decime cuál te gusta más. Se puede mezclar: la disposición de una con los colores de otra.</p>
+  <div class="opciones">
+    <section>
+      <h2><i style="background:#5b3df5"></i>A. Una columna</h2>
+      <p>Todo en una columna angosta, con la búsqueda bien grande arriba. Violeta.</p>
+      <ul>
+        <li><a href="a/entrar.html">Entrar</a></li><li><a href="a/productos.html">Buscar un producto</a></li><li><a href="a/vender.html">Vender</a></li>
+        <li><a href="a/listas.html">Subir una lista de precios</a></li><li><a href="a/mercaderia.html">Recibir mercadería</a></li><li><a href="a/actividad.html">Quién hizo qué</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2><i style="background:#00a86b"></i>B. Paso a paso</h2>
+      <p>Sin menú a la vista: cada tarea se hace en pasos, con una pregunta por pantalla. Verde.</p>
+      <ul>
+        <li><a href="b/entrar.html">Entrar</a></li><li><a href="b/productos.html">Buscar un producto</a></li><li><a href="b/vender.html">Vender</a></li>
+        <li><a href="b/listas.html">Subir una lista de precios</a></li><li><a href="b/mercaderia.html">Recibir mercadería</a></li><li><a href="b/actividad.html">Quién hizo qué</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2><i style="background:#1463ff"></i>C. Dos paneles</h2>
+      <p>A la izquierda se busca y se elige; a la derecha queda el ticket con el total y el botón. Azul.</p>
+      <ul>
+        <li><a href="c/entrar.html">Entrar</a></li><li><a href="c/productos.html">Buscar un producto</a></li><li><a href="c/vender.html">Vender</a></li>
+        <li><a href="c/listas.html">Subir una lista de precios</a></li><li><a href="c/mercaderia.html">Recibir mercadería</a></li><li><a href="c/actividad.html">Quién hizo qué</a></li>
+      </ul>
+    </section>
+  </div>
+  <footer>La versión anterior sigue en <a style="display:inline;border:0;padding:0;min-height:0;text-decoration:underline;font-weight:400" href="../v2/">/v2/</a> y la actual, en la raíz.</footer>
+</main>
+</body>
+</html>
