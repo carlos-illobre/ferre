@@ -3,7 +3,7 @@
    tipografía condensada que se lee de lejos; tarjetas blancas redondeadas sobre fondo
    niebla; hojas que suben desde abajo para explicar, elegir y revisar. Mismo sistema en
    el celular y en la computadora: en el celular las pestañas van abajo, en la
-   computadora arriba, y el contenido se ensancha. Reglas de docs/ux.md. */
+   computadora arriba, y el contenido se ensancha. Reglas de docs/sistema-visual.md. */
 @font-face { font-family: "Archivo Narrow"; font-weight: 600; font-display: swap; src: url("./fuentes/archivo-narrow-600.woff2") format("woff2"); }
 @font-face { font-family: "Archivo Narrow"; font-weight: 700; font-display: swap; src: url("./fuentes/archivo-narrow-700.woff2") format("woff2"); }
 

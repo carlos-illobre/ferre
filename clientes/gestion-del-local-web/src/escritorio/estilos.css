@@ -1,5 +1,5 @@
 /* Interfaz de escritorio (RNF-05): el layout de tablas, menú completo y teclado anterior al
-   rediseño, con la paleta y la marca del sistema visual actual (docs/ux.md): tinta y niebla,
+   rediseño, con la paleta y la marca del sistema visual actual (docs/sistema-visual.md): tinta y niebla,
    coral como único color de acción, importes en Archivo Narrow. Los nombres de las variables
    (--azul, --amarillo) son los de entonces: --azul es la tinta y --amarillo es el coral.
    El celular no usa este archivo: carga src/estilos.css (ver src/main.tsx). */

@@ -1,3 +1,5 @@
+> Relevamiento mudado tal cual de `docs/proveedores.md` (2026-09-13) al adoptar Spec Kit, el 2026-10-10. Los issues que nombra (#22, #25, #26, #27, #28) siguen abiertos; los de los lectores (#7 a #10) y la carga manual (#12) están cerrados.
+
 # Proveedores: cómo llegan los precios y qué se puede automatizar
 
 Relevamiento del 2026-09-13 sobre los cuatro proveedores del MVP, a partir de sus

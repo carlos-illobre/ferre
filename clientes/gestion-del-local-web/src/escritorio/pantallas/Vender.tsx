@@ -16,7 +16,7 @@ import { VincularCelular } from "../../componentes/VincularCelular";
 import { enviarCodigoAlPuesto, escucharPuesto, puestoRemoto } from "../../puesto";
 import type { Producto } from "./Productos";
 
-// La venta (issue #15): el orden es el del mostrador (docs/proceso-actual.md). Buscar →
+// La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
 // costo, margen y precio → cantidad → cobro. Enter agrega; Esc descarta ("no llevó");
 // F2 cobra. Nada obligatorio que el cuaderno no tenga.
 type Item = {

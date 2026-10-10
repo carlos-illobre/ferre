@@ -79,7 +79,7 @@ El token de servicio entre `gestion-del-local` y `listas-de-proveedores` sigue a
 
 ## Referencias
 
-ADR-002, ADR-003, ADR-010. Issue #41. `docs/google-cloud.md`.
+ADR-002, ADR-003, ADR-010. Issue #41. `docs/operacion/google-cloud.md`.
 
 ---
 
@@ -119,12 +119,12 @@ computadora para que el celular la deje entrar no agrega nada, y la computadora 
 Google. Se quitaron el botón de la pantalla de entrada, la página que aprobaba el código y
 las rutas `/sesiones/vinculaciones` de la API. Quedan dos formas de entrar: Google y huella.
 
-- La tabla `vinculacion` queda en la base sin uso (nada se borra, `docs/MODELO.md`).
+- La tabla `vinculacion` queda en la base sin uso (nada se borra, `specs/001-base-del-sistema/data-model.md`).
 - El QR que vincula el celular **como lector de códigos de barras** de la computadora
   (`puesto`, issue #52) es otra cosa y sigue igual.
 
 ## Enmienda (2026-10-09): roles Administrador, Vendedor y Comprador
 
 El dueño definió que los permisos se dan con tres roles combinables por usuario
-(`docs/REQUERIMIENTOS.md`, sección 2 y RF-72). Reemplazan a dueño, admin y mostrador cuando
+(`specs/README.md`, sección 2 y RF-72). Reemplazan a dueño, admin y mostrador cuando
 se implemente el issue #59; hasta entonces rige lo de arriba.

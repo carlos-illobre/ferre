@@ -84,7 +84,7 @@ Tres archivos, reemplazando todos los marcadores `<...>`:
 
 | Archivo | Qué va |
 |---|---|
-| `~/ferre/produccion/.env` | ID de Google ([docs/google-cloud.md](../../docs/google-cloud.md)), cadena de Supabase de producción, un token de servicio |
+| `~/ferre/produccion/.env` | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), cadena de Supabase de producción, un token de servicio |
 | `~/ferre/pruebas/.env` | lo mismo para pruebas, con su base y **otro** token |
 | `~/ferre/despliegue.env` | el canal de avisos (paso 7) |
 

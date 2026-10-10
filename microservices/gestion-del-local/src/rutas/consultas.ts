@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { pool } from "../db.js";
 import { exigirSesion } from "../autenticacion.js";
 
-// Lo que preguntaron y no compraron: demanda que hoy se pierde (docs/proceso-actual.md).
+// Lo que preguntaron y no compraron: demanda que hoy se pierde (specs/003-ventas/research.md).
 export const consultas = new Hono();
 consultas.use("/*", exigirSesion);
 

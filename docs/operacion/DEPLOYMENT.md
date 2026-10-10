@@ -23,19 +23,19 @@ cliente (`http://localhost:4173` para `vite preview`; `http://localhost:5173` pa
 
 ## Pruebas y producción: una máquina en Oracle Cloud
 
-Guía completa en [deployment/oracle-single/ORACLE.md](../deployment/oracle-single/ORACLE.md).
+Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-single/ORACLE.md).
 
-- `master` es pruebas, `produccion` es producción ([ADR-012](adr/ADR-012-ambientes-de-prueba-y-produccion.md)).
+- `master` es pruebas, `produccion` es producción ([ADR-012](../adr/ADR-012-ambientes-de-prueba-y-produccion.md)).
   En cada push CI construye, publica y avisa; la máquina despliega sola su ambiente
-  ([ADR-013](adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
+  ([ADR-013](../adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
   producción: `git push origin master:produccion`.
 - Máquina Always Free (Ampere, arm64), sin estado: dos proyectos de compose, uno por
   ambiente, con `gestion-del-local` y `listas-de-proveedores`, corriendo como el usuario
   `ferre` con Docker rootless, publicados solo en `127.0.0.1` (8081 y 8082), detrás del
   reverse proxy de la máquina, que no es parte de este proyecto (contrato en la guía).
-- Base de datos en Supabase ([ADR-002](adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md)).
+- Base de datos en Supabase ([ADR-002](../adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md)).
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
-  ([ADR-007](adr/ADR-007-imagenes-en-ci-y-ghcr.md)).
+  ([ADR-007](../adr/ADR-007-imagenes-en-ci-y-ghcr.md)).
 - Configuración de la aplicación en la máquina: `~/ferre/produccion/.env` y
   `~/ferre/pruebas/.env`, a partir de las plantillas `deployment/oracle-single/<ambiente>/.env.oracle`.
   Nunca se versionan.
@@ -44,14 +44,14 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../deployment/oracle-sing
   `API_URL_PRUEBAS` y `GOOGLE_CLIENT_ID`. Es lo único que vive fuera del `.env`.
 - **Sin acceso entrante:** GitHub no entra a la máquina. El job `avisar` publica en el
   canal `NTFY_AVISOS` y el servicio `ferre-despliegue` de la máquina hace el resto.
-- TLS: Caddy emite y renueva solo ([ADR-006](adr/ADR-006-caddy.md)). Puertos 80 y 443
+- TLS: Caddy emite y renueva solo ([ADR-006](../adr/ADR-006-caddy.md)). Puertos 80 y 443
   abiertos en la Security List de la VCN, que es el firewall efectivo.
 
 El script de despliegue, el preflight y la guía paso a paso se generan en el issue #19.
 
 ## Primer usuario
 
-El login es con Google ([docs/google-cloud.md](google-cloud.md)). El primer dueño se
+El login es con Google ([docs/operacion/google-cloud.md](google-cloud.md)). El primer dueño se
 crea desde el contenedor; los siguientes usuarios, desde la app:
 
 ```bash

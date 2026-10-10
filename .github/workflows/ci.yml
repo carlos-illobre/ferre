@@ -48,6 +48,9 @@ jobs:
           cp .env.example .env
           tests/itest.sh --rapido
           docker compose config --quiet
+      # Cada escenario de aceptación de specs/ nombra una prueba que existe (constitución, VI).
+      - name: Trazabilidad entre especificaciones y pruebas
+        run: node tests/trazabilidad.mjs
 
   imagenes:
     # La máquina de Oracle es Ampere (arm64): se construye en un runner ARM nativo, que

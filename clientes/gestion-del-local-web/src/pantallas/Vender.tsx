@@ -18,7 +18,7 @@ import { enviarCodigoAlPuesto, escucharPuesto, puestoRemoto } from "../puesto";
 import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./VentasDeHoy";
 import type { Producto } from "./Productos";
 
-// La venta (issue #15): el orden es el del mostrador (docs/proceso-actual.md). Buscar →
+// La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
 // precio → cantidad → cobro. Enter agrega; Esc descarta ("no llevó"); F2 cobra. Cada
 // renglón es una tarjeta; el margen se cambia ahí mismo y queda guardado en el producto.
 type Item = {

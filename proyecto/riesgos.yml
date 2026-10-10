@@ -7,7 +7,7 @@ riesgos:
     probabilidad: 3
     impacto: 5
     respuesta: mitigar
-    plan: Reglas de docs/ux.md en cada pantalla; piloto de 2 semanas con medición de tiempos (#21)
+    plan: Reglas de docs/sistema-visual.md en cada pantalla; piloto de 2 semanas con medición de tiempos (#21)
     contingencia: Seguir una semana más con cuaderno y sistema en paralelo y convertir cada queja en un issue ux
     disparador: Al final de la primera semana del piloto una venta tarda más que con el cuaderno
     responsable: Carlos

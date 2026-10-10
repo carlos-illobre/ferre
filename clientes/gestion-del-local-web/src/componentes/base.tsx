@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
-// Piezas del sistema visual (docs/ux.md, rediseño de mockups/Ferre iOS.html): íconos de
+// Piezas del sistema visual (docs/sistema-visual.md, rediseño de mockups/Ferre iOS.html): íconos de
 // trazo, hoja que sube desde abajo, avisos, segmentos, buscador, contador de cantidad,
 // pantalla de éxito. Mismas piezas en el celular y en la computadora.
 

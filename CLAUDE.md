@@ -1,78 +1,73 @@
 # ferre (Ferrebress)
 
-Contexto que no se deduce leyendo el código. Lo demás está en el [README](README.md), en
-[docs/](docs/) y en los [ADR](docs/adr/README.md): antes de cambiar algo que tenga un ADR,
-leerlo.
+Sistema de gestión de una ferretería de barrio. Se desarrolla con **spec driven
+development sobre GitHub Spec Kit**: no se escribe código de una funcionalidad sin su
+especificación aprobada.
 
-## La fuente de verdad
+## Por dónde empezar
 
-Este repositorio es la fuente de verdad del proyecto. El tablero del portafolio
-(<https://gratis-vnic.tail994934.ts.net:8444/>) lo lee y lo muestra; no guarda nada propio.
+1. [.specify/memory/constitution.md](.specify/memory/constitution.md): lo que no se
+   negocia y el flujo de trabajo. **Leela antes de tocar nada.**
+2. [specs/README.md](specs/README.md): de qué se trata el proyecto, cada requerimiento con
+   su estado y en qué carpeta está especificado.
+3. La carpeta de `specs/` de la capacidad que vayas a tocar (`001` a `007` son lo ya
+   construido).
+4. [docs/adr/](docs/adr/README.md): el porqué de cada decisión técnica.
 
-| Qué | Dónde |
+## Cómo se trabaja
+
+| Querés | Usá |
 |---|---|
-| Requerimientos funcionales y no funcionales, y casos de uso | `docs/REQUERIMIENTOS.md` |
-| Objetivos, interesados, supuestos, restricciones y cronograma | `proyecto/proyecto.yml` |
-| Riesgos, con su plan y su contingencia | `proyecto/riesgos.yml` |
-| Tareas | Issues de GitHub; cada etapa es un milestone |
+| Especificar una funcionalidad nueva | `/speckit-specify`, y `/speckit-clarify` para cerrar dudas con Carlos |
+| Diseñar sus pantallas | `/ux` |
+| Planificarla | `/speckit-plan`, `/speckit-tasks`, `/speckit-analyze` |
+| Escribir sus pruebas antes del código | subagente `qa` |
+| Implementarla | `/speckit-implement` |
+| Revisarla | subagentes `seguridad`, `revision-ux` y `verificador` |
+| Cerrarla | `/cerrar` |
 
-Si lo que se hace no coincide con lo que dice `docs/REQUERIMIENTOS.md`, manda el documento: o se corrige el
-trabajo, o se le pregunta a Carlos si cambia el requerimiento.
-
-## Cómo se toma una tarea
-
-1. **Solo tareas listas para empezar:** abiertas y con todo lo que figura en su «Depende de»
-   ya cerrado. El tablero las marca; en el VPS también se pueden pedir con
-   `curl -s http://127.0.0.1:8083/api/portafolio` (campo `lista` de cada tarea).
-2. **Leer antes de tocar:** el requerimiento de `docs/REQUERIMIENTOS.md` que la tarea implementa, `docs/ux.md` si toca una pantalla, `docs/proceso-actual.md` si toca el mostrador, y los ADR relacionados.
-3. **Proponer y esperar.** Antes de codear un issue se propone la solución y se espera la aprobación de Carlos (regla del README).
-4. **Al terminar:** pruebas en verde (`tests/utest.sh`; si toca un camino principal, su escenario E2E en `tests/e2e.sh`), cambiar el estado del requerimiento en `docs/REQUERIMIENTOS.md` de `Pendiente (#N)` a `Hecho (#N)`, actualizar la documentación que haya quedado vieja y cerrar el issue.
-5. **Trabajo nuevo que aparece:** un issue nuevo, con su etapa (milestone) y, si
-   corresponde, su sección `## Depende de` con los `#N`. No se hace de paso.
+- **Una funcionalidad, una rama** con el nombre de su carpeta. `master` es el ambiente de
+  pruebas y cada push lo despliega; `produccion` se promueve con
+  `git push origin master:produccion` solo cuando Carlos lo pide.
+- **Carlos aprueba tres veces:** la especificación, el diseño de pantallas y el resultado
+  verificado. Nada avanza sin la aprobación que le toca.
+- **Lo que falta hacer son los issues abiertos de GitHub.** Se toma uno solo si todo lo que
+  figura en su `## Depende de` está cerrado. Al tomarlo se le crea su carpeta en `specs/`.
+- **Un arreglo que no cambia lo que el usuario ve o puede hacer** no necesita
+  especificación: va directo, con su prueba.
+- **Trabajo nuevo que aparece:** un issue nuevo con su etapa (milestone). No se hace de paso.
 
 ## Qué no decide el agente
 
-- **El alcance.** Un requerimiento nuevo, o uno que cambia, se le pregunta a Carlos. Recién con su
-  respuesta se edita el documento, y se anota en la sección de decisiones con la fecha.
-- **Las fechas del cronograma** y las prioridades entre etapas.
-- **Lo que cruza proyectos:** el encuadre impositivo del CUIT, las marcas y la prioridad
-  entre proyectos se tratan en la sesión del portafolio, no acá. Este agente no toca
-  otros repositorios.
+- **El alcance.** Un requerimiento nuevo, o uno que cambia, se le pregunta a Carlos.
+- **Las fechas y las prioridades.**
+- **Lo que cruza proyectos** (impuestos, marcas, prioridad entre proyectos): se trata en la
+  sesión del portafolio. Este agente no toca otros repositorios.
 
-## Formato que el tablero entiende
+## Lo que lee el tablero del portafolio
 
-- **Estado de un requerimiento:** tiene que empezar con `Hecho`, `Hecho en parte`, `A validar`,
-  `Pendiente` o `Nuevo`. Si contiene `fuera de esta etapa` no cuenta para el avance. Los
-  `#N` del estado se enlazan a esos issues.
-- **Issue:** `## Depende de` seguido de `#13, #15` lo deja bloqueado hasta que se cierren.
-  `Inicio: 2026-10-01` y `Fin: 2026-10-15`, cada una en su línea, le dan barra propia en
-  el Gantt.
-- **YAML:** un texto que tenga ` #` o `: ` adentro va entre comillas; si no, se corta o
-  rompe el archivo.
-- **Riesgos:** probabilidad e impacto de 1 a 5. Un riesgo nuevo, o uno que cambió, se
-  actualiza en `proyecto/riesgos.yml`; uno que ya no aplica pasa a `estado: cerrado`.
+El tablero (<https://gratis-vnic.tail994934.ts.net:8444/>) lee `specs/README.md`,
+`proyecto/proyecto.yml`, `proyecto/riesgos.yml` y los issues.
 
-## Reglas de este repositorio
+- En `specs/README.md`, el estado de cada requerimiento empieza con `Hecho`,
+  `Hecho en parte` (o `Parcial`), `A validar`, `Pendiente` o `Nuevo`. Si dice
+  `fuera de esta etapa` o `segunda versión`, no cuenta para el avance.
+- En un issue, `## Depende de` seguido de `#13, #15` lo deja bloqueado hasta que se cierren.
+- En los YAML de `proyecto/`, un texto con ` #` o `: ` adentro va entre comillas.
 
-- **`master` es el ambiente de pruebas y cada push lo despliega solo.** `produccion` es
-  producción: se promueve con `git push origin master:produccion` y solo cuando Carlos lo
-  pide.
-- **Hay dos interfaces (ADR-014).** La de celular (`src/App.tsx`, `src/pantallas/`) está bien
-  como está; la de computadora vive en `src/escritorio/`. Se elige por el ancho de la pantalla
-  y no comparten estilos. Una función nueva con pantalla se hace en las dos, con su prueba.
-  Un cambio para la computadora no puede alterar el celular: se verifica con capturas de las
-  dos, antes y después.
-- **Roles, no actores.** En pantallas, casos de uso y diagramas se nombra el rol
-  (Administrador, Vendedor, Comprador); los actores (Dueño, Empleado, Cliente, Proveedor)
-  solo donde el rol no alcanza. Ver `docs/REQUERIMIENTOS.md`, sección 2.
-- **La vara es el cuaderno y la calculadora** (`docs/ux.md`): si una pantalla es más lenta
-  que eso, está mal aunque sea más completa.
-- **`privado/` y las listas de precios reales nunca se suben.** El repositorio es público.
-- Todo en español: código, comentarios, commits y textos de la app.
+## Comandos
+
+```bash
+tests/utest.sh               # unitarias, sin nada levantado
+node tests/trazabilidad.mjs  # cada escenario de specs/ nombra una prueba que existe
+tests/itest.sh --rapido      # paridad de configuración
+tests/e2e.sh                 # caminos principales, en las dos interfaces (levanta el stack)
+```
+
+Cómo levantarlo: [specs/001-base-del-sistema/quickstart.md](specs/001-base-del-sistema/quickstart.md).
+Operación del servidor: [docs/operacion/](docs/operacion/).
 
 ## Prioridad actual
 
-1. La interfaz de escritorio (RNF-05): desde el 2026-10-09 volvió el layout de tablas
-   anterior al rediseño, a toda la pantalla y con la paleta nueva. Falta que Carlos la valide
-   en la notebook; lo que pida ajustar va primero.
+1. Que Carlos valide en la notebook la interfaz de computadora (RNF-05).
 2. Los respaldos (RNF-21 a RNF-23, issue #19): todavía no están implementados.

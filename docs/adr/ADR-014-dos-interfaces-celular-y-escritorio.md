@@ -51,7 +51,7 @@ El cliente web tiene dos interfaces que comparten todo lo que no es pantalla:
 - **Lo compartido no se duplica:** API, cola de cambios, catálogo local, sesión, huella,
   escáner, unidades, formato y la librería de precios. Una regla de negocio se escribe una vez.
 - **Misma paleta y misma marca:** tinta, niebla y coral, importes en Archivo Narrow, logo
-  «fe». Las reglas están en `docs/ux.md`.
+  «fe». Las reglas están en `docs/sistema-visual.md`.
 - **Las pruebas siguen a las interfaces:** unitarias al lado de cada pantalla; los E2E en
   `tests/e2e/escritorio/` y `tests/e2e/celular/`, cada uno con su tamaño de ventana.
 

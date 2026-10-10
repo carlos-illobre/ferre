@@ -39,16 +39,22 @@ tests/e2e.sh              # caminos principales, levanta el stack (a mano; en CI
 
 ## Cómo se organiza el trabajo
 
-- El backlog vive en [GitHub Issues](https://github.com/carlos-illobre/ferre/issues),
-  agrupado por etapa en [milestones](https://github.com/carlos-illobre/ferre/milestones).
-- Antes de codear un issue se propone la solución y se espera la aprobación del dueño.
+Con spec driven development sobre [GitHub Spec Kit](https://github.com/github/spec-kit): no
+se escribe código de una funcionalidad sin su especificación aprobada.
+
+- **Qué hace el sistema, qué está hecho y qué falta:** [specs/README.md](specs/README.md).
+- **Las reglas y el flujo de trabajo:** [la constitución](.specify/memory/constitution.md).
+- **Lo que falta hacer** son los [issues](https://github.com/carlos-illobre/ferre/issues),
+  agrupados por etapa en [milestones](https://github.com/carlos-illobre/ferre/milestones).
+- **Las decisiones técnicas** están en [docs/adr](docs/adr/README.md) y las de negocio en
+  [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md).
 - `master` es el ambiente de pruebas y `produccion` el de producción; en cada push la
   máquina se despliega sola (ADR-012, ADR-013). Pasar a producción:
   `git push origin master:produccion`.
-- Las decisiones técnicas están en [docs/adr](docs/adr/README.md). Arquitectura en
-  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), despliegue en
-  [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), pruebas en [docs/TESTING.md](docs/TESTING.md),
-  configuración de Google para el login en [docs/google-cloud.md](docs/google-cloud.md).
+- Arquitectura en [specs/001-base-del-sistema/plan.md](specs/001-base-del-sistema/plan.md),
+  cómo se prueba en [specs/001-base-del-sistema/quickstart.md](specs/001-base-del-sistema/quickstart.md),
+  despliegue en [docs/operacion/DEPLOYMENT.md](docs/operacion/DEPLOYMENT.md) y configuración
+  de Google para el login en [docs/operacion/google-cloud.md](docs/operacion/google-cloud.md).
 - La carpeta `privado/` contiene listas de precios reales y otros datos de terceros.
   Está ignorada por git y **no debe subirse nunca**.
 
@@ -64,5 +70,7 @@ libraries/calculo-de-precios           Costo, margen y precio con su explicació
 infrastructure/                        Caddy
 deployment/oracle-single/              Plantilla de configuración y despliegue en Oracle Cloud
 tests/                                 Corredores E2E, unitarias e integración
-docs/                                  Arquitectura, modelo, ADR, despliegue, seguridad, pruebas
+specs/                                 Especificaciones: lo construido (001 a 007) y cada funcionalidad nueva
+.specify/                              Spec Kit: constitución, plantillas y scripts
+docs/                                  ADR, decisiones de negocio, sistema visual y manuales de operación
 ```

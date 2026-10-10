@@ -60,7 +60,7 @@ restricciones:
   - El único lector de códigos de barras es la cámara del celular
   - Un solo empleado, que no puede desatender el mostrador
 
-requerimientos: docs/REQUERIMIENTOS.md
+requerimientos: specs/README.md
 
 # Cada etapa es un milestone de GitHub con el mismo nombre. Las fechas marcadas como
 # tentativas son una primera estimación, a confirmar por el dueño.

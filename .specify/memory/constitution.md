@@ -82,7 +82,8 @@ Comprador), no la persona.
 
 Una decisión técnica que afecta a más de una funcionalidad es un ADR, con las opciones
 consideradas y el porqué. Un ADR viejo no se reescribe: se le agrega una enmienda. Las
-decisiones de negocio de Carlos se anotan con su fecha en la especificación que tocan.
+decisiones de negocio de Carlos se anotan con su fecha en la especificación que tocan y en
+[docs/decisiones-de-negocio.md](../../docs/decisiones-de-negocio.md).
 
 ## Restricciones técnicas
 
@@ -128,8 +129,9 @@ Una funcionalidad, una carpeta en `specs/` y una rama con el mismo nombre.
   lo controla en el CI.
 - **Índice.** [specs/README.md](../../specs/README.md) lista cada requerimiento con su
   estado y su carpeta. Es la entrada para quien llega al proyecto y lo que lee el tablero.
-- **Fuera de Spec Kit:** los ADR (`docs/adr/`), los manuales de operación
-  (`docs/operacion/`) y la gestión del portafolio (`proyecto/`).
+- **Fuera de Spec Kit:** los ADR (`docs/adr/`), las decisiones de negocio
+  (`docs/decisiones-de-negocio.md`), los manuales de operación (`docs/operacion/`), el
+  sistema visual (`docs/sistema-visual.md`) y la gestión del portafolio (`proyecto/`).
 
 ## Governance
 
