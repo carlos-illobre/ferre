@@ -22,25 +22,28 @@ vive en `proyecto/estado.yml`.
 
 ## Cómo se trabaja
 
-| Querés | Usá |
-|---|---|
-| Especificar una funcionalidad nueva | `/speckit-specify`, y `/speckit-clarify` para cerrar dudas con Carlos |
-| Diseñar sus pantallas | `/ux` |
-| Planificarla | `/speckit-plan`, `/speckit-tasks`, `/speckit-analyze` |
-| Escribir sus pruebas antes del código | subagente `qa` |
-| Implementarla | `/speckit-implement` |
-| Revisarla | subagentes `seguridad`, `revision-ux` y `verificador` |
-| Cerrarla | `/cerrar` |
+Cuatro roles, y ninguno más (el detalle está en la constitución):
 
+| Paso | Rol | Usá | Aprueba Carlos |
+|---|---|---|---|
+| 1 | Analista de negocio | `/speckit-specify`, y `/speckit-clarify` para preguntarle a Carlos | Sí |
+| 2 | Diseñador, si hay pantallas nuevas | `/ux`: maquetas para que elija | Sí |
+| 3 | Planificador | `/speckit-plan` y `/speckit-tasks` | No |
+| 4 | Desarrollador | `/speckit-implement` | Lo prueba en el ambiente de pruebas |
+
+- **Un arreglo** que no cambia ninguna regla va solo con el desarrollador, con su prueba.
+- **Un cambio de regla** dentro de una capacidad va con analista y desarrollador: la regla
+  se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia.
+- **Toda lista de tareas termina con tres:** una prueba por escenario, comparar con la
+  maqueta aprobada si hay pantallas, y dejar al día `proyecto/estado.yml`, la `spec.md` de
+  la capacidad y el issue.
 - **Sin ramas ni pull requests:** todo se sube directo a `master`. `master` es el ambiente de
   pruebas y cada push lo despliega; `produccion` se promueve con
   `git push origin master:produccion` solo cuando Carlos lo pide.
-- **Carlos aprueba tres veces:** la especificación, el diseño de pantallas y el resultado
-  verificado. Nada avanza sin la aprobación que le toca.
+- **Nada avanza sin la aprobación que le toca:** la especificación y, si hay pantallas, la
+  maqueta.
 - **Lo que falta hacer son los issues abiertos de GitHub.** Se toma uno solo si todo lo que
   figura en su `## Depende de` está cerrado. Al tomarlo se le crea su carpeta en `specs/`.
-- **Un arreglo que no cambia lo que el usuario ve o puede hacer** no necesita
-  especificación: va directo, con su prueba.
 - **Trabajo nuevo que aparece:** un issue nuevo con su etapa (milestone). No se hace de paso.
 
 ## Qué no decide el agente

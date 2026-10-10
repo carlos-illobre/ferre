@@ -74,9 +74,9 @@ estilo, con sus estados: vacío, cargando, error, sin conexión y éxito.
 ## 6. Entregar a quien implementa
 
 La implementación sigue la maqueta aprobada y el sistema visual, pantalla por pantalla,
-empezando por la que se diseñó primero. Quien implementa compara su resultado con la
-maqueta mediante capturas y le muestra a Carlos las diferencias. La revisión final la hace
-el subagente `revision-ux`.
+empezando por la que se diseñó primero. El desarrollador compara su resultado con la
+maqueta mediante capturas de computadora y de celular y le muestra a Carlos las diferencias:
+es una de las tareas fijas del final de toda lista de tareas.
 
 ## Reglas
 

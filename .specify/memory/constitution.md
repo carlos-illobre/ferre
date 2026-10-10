@@ -74,8 +74,8 @@ otro, y la configuración que no depende del ambiente va en un archivo aparte. L
 configuración sale del `.env` sin valores por
 omisión. Solo entran usuarios autorizados, sin contraseñas (ADR-011); las sesiones se
 pueden cerrar a distancia. Siempre HTTPS. En el servidor la app corre sin privilegios y no
-publica puertos a internet (ADR-013). Toda funcionalidad pasa una revisión de seguridad
-antes de cerrarse.
+publica puertos a internet (ADR-013). Quien implementa una funcionalidad que toca
+el acceso, los permisos o datos que salen al navegador revisa esos puntos antes de terminar.
 
 ### VIII. Disponibilidad antes que escala, y costo cero
 
@@ -115,23 +115,40 @@ Una funcionalidad, una carpeta en `specs/`. **No hay ramas ni pull requests:** t
 sube directo a `master`, que es el ambiente de pruebas; lo que no está terminado no se sube
 en un estado que rompa las pruebas. Los comandos de Spec Kit no crean rama.
 
+Cuatro roles, y ninguno más:
+
 | Paso | Rol | Cómo | Produce | Aprueba Carlos |
 |---|---|---|---|---|
-| 1 | Analista de negocio | `/speckit-specify` y `/speckit-clarify` | `spec.md` | Sí |
-| 2 | Diseñador UI/UX | `/ux` | Maquetas estáticas con variantes y capturas, y `ux.md` | Sí, sobre la maqueta, si hay pantallas |
-| 3 | Arquitecto | `/speckit-plan` | `plan.md`, `data-model.md`, `contracts/` | No |
-| 4 | Planificador | `/speckit-tasks` y `/speckit-analyze` | `tasks.md` | No |
-| 5 | QA | subagente `qa` | Una prueba que falla por escenario | No |
-| 6 | Desarrollador | `/speckit-implement` | Código | No |
-| 7 | Seguridad | subagente `seguridad` | Su sección de `verificacion.md` | No |
-| 8 | Revisión de UI/UX | subagente `revision-ux` | Capturas contra `ux.md` | No |
-| 9 | Verificador | subagente `verificador` | Veredicto en `verificacion.md` | Sí |
-| 10 | Cierre | `/cerrar` | Capacidad e índice al día, ADR, todo subido a `master`, issue cerrado | |
+| 1 | Analista de negocio | `/speckit-specify` y `/speckit-clarify`: le pregunta a Carlos hasta poder escribir la regla | `spec.md` | Sí |
+| 2 | Diseñador | `/ux`: dos o tres maquetas de la pantalla principal para que Carlos elija | Maquetas y `ux.md` | Sí, elige la maqueta |
+| 3 | Planificador | `/speckit-plan` y `/speckit-tasks` | `plan.md` corto y `tasks.md` | No |
+| 4 | Desarrollador | `/speckit-implement` | Código, pruebas y el estado al día | Lo prueba en el ambiente de pruebas |
+
+El paso 2 se saltea cuando la funcionalidad no tiene pantallas nuevas. No se usan los
+comandos opcionales del kit (análisis de coherencia, listas de control).
+
+No todo cambio pasa por los cuatro:
+
+| Tamaño | Ejemplo | Quién interviene |
+|---|---|---|
+| Arreglo | Un error o un texto; no cambia ninguna regla | Solo el desarrollador, con su prueba. Sin documentos |
+| Cambio de regla | Un requerimiento nuevo o modificado dentro de una capacidad | Analista y desarrollador. La regla se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia |
+| Funcionalidad nueva | Varias historias o pantallas nuevas | Los cuatro, con carpeta propia: `spec.md`, maquetas y `tasks.md` |
+
+Como nadie revisa después al desarrollador, toda lista de tareas termina con estas tres, y
+la funcionalidad no está terminada sin ellas:
+
+1. Una prueba por cada escenario de aceptación, anotada en `proyecto/estado.yml`.
+2. Si hay pantallas, comparar el resultado con la maqueta aprobada mediante capturas de
+   computadora y de celular, y mostrarle a Carlos las diferencias.
+3. Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de la capacidad,
+   escribir el ADR si hubo una decisión técnica y cerrar el issue.
 
 ## Convenciones propias sobre Spec Kit
 
-- **Plantillas sin tocar.** Los títulos de las plantillas quedan como los trae el kit, en
-  inglés, para no apartarse del estándar; el contenido se escribe en castellano.
+- **Plantillas casi sin tocar.** Los títulos de las plantillas quedan como los trae el kit,
+  en inglés, para no apartarse del estándar; el contenido se escribe en castellano. El único
+  cambio propio es la fase final de `tasks-template.md`, con las tres tareas de cierre.
 - **Identificadores.** Los requerimientos conservan sus IDs (`RF-19`, `RNF-21`) en lugar de
   `FR-001`. Los nuevos siguen la numeración de su capacidad.
 - **Una carpeta por capacidad.** Las carpetas `001` a `007` especifican cada capacidad
@@ -146,7 +163,6 @@ en un estado que rompa las pruebas. Los comandos de Spec Kit no crean rama.
 - **`ux.md` son requerimientos de interfaz:** qué tiene que poder hacer cada rol en cada
   recorrido y con qué reglas, sin atarse a un diseño. En una funcionalidad nueva, el
   diseño concreto va en `specs/NNN/maquetas/`.
-- **Un documento más por funcionalidad nueva:** `verificacion.md`.
 - **Índice.** [specs/README.md](../../specs/README.md) lista cada requerimiento y su
   carpeta. Es la entrada para quien llega al proyecto.
 - **Fuera de Spec Kit:** los ADR (`docs/adr/`), las decisiones de negocio
@@ -156,9 +172,8 @@ en un estado que rompa las pruebas. Los comandos de Spec Kit no crean rama.
 ## Governance
 
 Esta constitución prevalece sobre cualquier otra práctica del repositorio. Se enmienda con
-la aprobación de Carlos, anotando qué cambió y por qué, y subiendo la versión. El
-verificador comprueba cada funcionalidad contra ella antes de dar su veredicto; lo que la
-incumple no se cierra.
+la aprobación de Carlos, anotando qué cambió y por qué, y subiendo la versión. Cada
+rol comprueba su trabajo contra ella antes de entregarlo; lo que la incumple no se cierra.
 
 **Enmienda 1.2.0 (2026-10-10), por decisión de Carlos:** no hay ramas, todo va directo a
 `master` (flujo de trabajo); el principio III deja de exigir dos interfaces separadas y pasa
@@ -168,4 +183,4 @@ versión todos los usuarios son Administrador (principio IX).
 **Enmienda 1.2.1 (2026-10-10), por decisión de Carlos:** el `.env` lleva solo variables de
 entorno; la configuración que no depende del ambiente va aparte (principio VII).
 
-**Version**: 1.2.1 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10
+**Version**: 1.3.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10

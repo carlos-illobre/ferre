@@ -147,16 +147,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ---
 
-## Phase N: Polish & Cross-Cutting Concerns
+## Phase N: Cierre
 
-**Purpose**: Improvements that affect multiple user stories
+**Purpose**: Las tres tareas con las que termina toda funcionalidad (constitución, «Flujo de
+trabajo»). Nadie revisa después al desarrollador: sin estas tres, no está terminada.
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+- [ ] TXXX Una prueba por cada escenario de aceptación de spec.md, anotada en proyecto/estado.yml
+- [ ] TXXX Si hay pantallas: capturas de computadora y de celular comparadas con la maqueta aprobada, y las diferencias mostradas a Carlos
+- [ ] TXXX Estado al día en proyecto/estado.yml, lo nuevo incorporado a la spec.md de la capacidad, ADR si hubo una decisión técnica, e issue cerrado
 
 ---
 
@@ -169,7 +167,7 @@ Examples of foundational tasks (adjust based on your project):
 - **User Stories (Phase 3+)**: All depend on Foundational phase completion
   - User stories can then proceed in parallel (if staffed)
   - Or sequentially in priority order (P1 → P2 → P3)
-- **Polish (Final Phase)**: Depends on all desired user stories being complete
+- **Cierre (Final Phase)**: Depends on all desired user stories being complete
 
 ### User Story Dependencies
 
