@@ -184,10 +184,10 @@ Los que son reglas generales están además en la constitución.
 
 | ID | Requerimiento | Especificación |
 |---|---|---|
-| RNF-40 | Funciona en la notebook vieja del local (Chrome o Firefox) y en un celular Android, sin instalar nada. En el celular se puede agregar a la pantalla de inicio como una app | [001-base-del-sistema](001-base-del-sistema/spec.md) |
+| RNF-40 | Funciona en la notebook vieja del local (Windows 11, con Chrome o Firefox) y en un celular Android, sin instalar nada. En el celular se puede agregar a la pantalla de inicio como una app | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-41 | El único lector de códigos es la cámara del celular | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-42 | Costo de infraestructura cero hasta que el sistema muestre resultados | [001-base-del-sistema](001-base-del-sistema/spec.md) |
-| RNF-43 | HTTPS siempre; sesiones revocables; ningún dato de proveedores ni secreto en el repositorio, que es público | [001-base-del-sistema](001-base-del-sistema/spec.md) |
+| RNF-43 | HTTPS siempre; sesiones revocables; ningún dato de proveedores ni secreto en el repositorio, que es público; el archivo de variables de entorno lleva solo lo que cambia entre ambientes | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-44 | En el servidor la app corre con un usuario propio sin privilegios de administrador y no publica puertos a internet | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 
 ### Arquitectura y forma de trabajo

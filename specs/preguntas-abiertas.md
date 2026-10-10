@@ -232,4 +232,4 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 16. **RNF-05, RNF-04.** «Alto contraste» no dice cuánto. ¿Se toma el mínimo habitual de accesibilidad (4,5 a 1 entre texto y fondo)?
 17. **RNF-08.** ¿Hasta cuántos artículos hay que garantizar la búsqueda instantánea (100.000, 150.000, 200.000), y también en el celular o solo en la notebook?
 18. **RNF-09.** ¿A partir de cuánto tiempo una operación tiene que mostrar su avance? ¿Vale 1 segundo?
-19. **RNF-40.** ¿Cuál es la notebook del local (marca, modelo, memoria, sistema operativo, resolución) y qué celular Android se usa? Sin eso se toma una pantalla de 1366×768.
+19. **RNF-40.** La notebook del local tiene Windows 11; ¿cuáles son su marca, su modelo, su memoria y su resolución, y qué celular Android se usa? Sin eso se toma una pantalla de 1366×768.

@@ -69,7 +69,9 @@ celular y otra en la computadora. Sin meta de cobertura ni mutation testing (ADR
 ### VII. Seguro por defecto
 
 El repositorio es público: ni datos de proveedores ni secretos entran en él; lo sensible
-vive en `privado/`, que no se sube. La configuración sale del `.env` y sin valores por
+vive en `privado/`, que no se sube. El `.env` lleva solo variables de entorno, las que cambian de un ambiente a
+otro, y la configuración que no depende del ambiente va en un archivo aparte. La
+configuración sale del `.env` sin valores por
 omisión. Solo entran usuarios autorizados, sin contraseñas (ADR-011); las sesiones se
 pueden cerrar a distancia. Siempre HTTPS. En el servidor la app corre sin privilegios y no
 publica puertos a internet (ADR-013). Toda funcionalidad pasa una revisión de seguridad
@@ -163,4 +165,7 @@ incumple no se cierra.
 a exigir que todo se use en el celular y en la computadora, sin atar el diseño; y en esta
 versión todos los usuarios son Administrador (principio IX).
 
-**Version**: 1.2.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10
+**Enmienda 1.2.1 (2026-10-10), por decisión de Carlos:** el `.env` lleva solo variables de
+entorno; la configuración que no depende del ambiente va aparte (principio VII).
+
+**Version**: 1.2.1 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10

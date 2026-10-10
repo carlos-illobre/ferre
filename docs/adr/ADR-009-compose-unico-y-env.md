@@ -54,3 +54,11 @@ Nada: es la base del proyecto.
 ## Referencias
 
 Skill `microservicios-base`, `referencias/invariantes.md`.
+
+## Enmienda (2026-10-10): el `.env` lleva solo variables de entorno
+
+Carlos precisó la regla (decisión 24): el `.env` contiene únicamente lo que cambia de un
+ambiente a otro. Cualquier otra configuración, que vale igual en todos los ambientes, no va
+en el `.env`: va en un archivo de configuración aparte, versionado. Es coherente con lo
+decidido arriba («lo que no cambia va literal en el compose») y lo extiende a la
+configuración de cada servicio.

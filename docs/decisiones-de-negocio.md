@@ -80,3 +80,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     requests. Confirma lo pedido el 2026-09-13 y corrige la constitución.
 21. **La maqueta del celular se sube al repositorio,** como antecedente para el rediseño.
 22. **Prioridad.** Ahora la prioridad es la interfaz: el rediseño de UI y UX.
+23. **La notebook del local tiene Windows 11** (RNF-40).
+24. **El `.env` lleva solo variables de entorno.** Lo que cambia de un ambiente a otro va
+    en el `.env`; cualquier otra configuración, que no depende del ambiente, va en un
+    archivo aparte (RNF-43, ADR-009).

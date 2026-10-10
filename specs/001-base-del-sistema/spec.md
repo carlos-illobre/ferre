@@ -49,6 +49,9 @@ levanta y se prueba en [quickstart.md](quickstart.md).
 
 ### Session 2026-10-10
 
+- Q: ¿Qué sistema operativo tiene la notebook del local? → A: Windows 11 (decisión 23, RNF-40).
+- Q: ¿Qué va en el archivo de variables de entorno? → A: Solo variables de entorno, las que cambian de un ambiente a otro. Cualquier otra configuración va en un archivo aparte (decisión 24; RNF-43, ADR-009).
+
 - Q: ¿La especificación describe el código que hay? → A: No. El código se puede rehacer en cualquier momento; la especificación tiene que alcanzar para construir de nuevo la aplicación sin haberlo visto. Cuánto del sistema existe y con qué pruebas se anota aparte, fuera de la especificación (constitución, principios I y VI).
 - Q: Si el código se rehace, ¿qué se conserva? → A: El servidor y su modelo de datos, que son contrato ([data-model.md](data-model.md)). Las pantallas se rehacen.
 - Q: ¿La interfaz de celular «queda como está»? → A: No. Carlos va a rehacer toda la interfaz, celular y computadora; es la prioridad (decisión 13, que reemplaza esa parte de la decisión 9). Lo que Carlos pidió sobre las pantallas a lo largo del proyecto está reunido en [ux.md](ux.md), para quien las rediseñe.
@@ -436,10 +439,10 @@ notebook del local» es el equipo de RNF-40.
 
 #### Equipo, costo y seguridad
 
-- **RNF-40**: Funciona en la notebook vieja del local, con Chrome o Firefox actualizados, y en un celular Android, sin instalar nada. En el celular se puede agregar a la pantalla de inicio como una app, sin pasar por la tienda: abre a pantalla completa, con su ícono, su nombre y los colores de la marca. [NEEDS CLARIFICATION: ¿cuál es la notebook del local (marca y modelo, memoria, sistema operativo y resolución de pantalla) y qué celular Android se usa? Se necesita para poder comprobar los tiempos y que las pantallas entren, sin estar en el local; si no, se toma una pantalla de 1366×768.]
+- **RNF-40**: Funciona en la notebook del local, que es vieja y tiene Windows 11, con Chrome o Firefox actualizados, y en un celular Android, sin instalar nada. En el celular se puede agregar a la pantalla de inicio como una app, sin pasar por la tienda: abre a pantalla completa, con su ícono, su nombre y los colores de la marca. [NEEDS CLARIFICATION: la notebook del local tiene Windows 11; ¿cuáles son su marca y modelo, su memoria y su resolución de pantalla, y qué celular Android se usa? Se necesita para poder comprobar los tiempos y que las pantallas entren, sin estar en el local; si no, se toma una pantalla de 1366×768.]
 - **RNF-41**: El único lector de códigos es la cámara del celular: ninguna función exige otro lector, y todo código que haya que leer, también trabajando en la notebook, se lee con ella (RF-08). Ver constitución, Restricciones técnicas (Equipo del local).
 - **RNF-42**: La infraestructura cuesta $0 por mes hasta que el dueño decida destinarle presupuesto, cuando el sistema muestre resultados sobre las ventas. Ver constitución, principio VIII, y ADR-002.
-- **RNF-43**: HTTPS siempre, en las pantallas y en el servidor. Toda sesión se puede cerrar a distancia y deja de servir en el momento. Ningún dato de proveedores ni secreto entra en el repositorio, que es público, ni en lo que se publica desde él. La configuración sale de un archivo por ambiente, sin valores por omisión. Ver constitución, principio VII, y ADR-009, ADR-011.
+- **RNF-43**: HTTPS siempre, en las pantallas y en el servidor. Toda sesión se puede cerrar a distancia y deja de servir en el momento. Ningún dato de proveedores ni secreto entra en el repositorio, que es público, ni en lo que se publica desde él. La configuración que cambia de un ambiente a otro sale de un archivo de variables de entorno por ambiente, sin valores por omisión. Ese archivo lleva solo variables de entorno: toda configuración que no depende del ambiente va en otro archivo, aparte. Ver constitución, principio VII, y ADR-009, ADR-011.
 - **RNF-44**: En el servidor la app corre con un usuario propio sin privilegios de administrador y no publica puertos a internet: escucha solo en la interfaz local y sale por el proxy compartido de la máquina. Nada externo ejecuta comandos en la máquina. Ver constitución, principio VII, y ADR-013.
 
 #### Arquitectura y forma de trabajo
