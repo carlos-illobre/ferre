@@ -7,7 +7,8 @@ especificación (RF-60 a RF-65); lo que acá depende de una aclaración lo dice.
 
 ## Reglas para toda la capacidad
 
-- **Dos interfaces** (ADR-014). Todo se puede usar en el celular y en la computadora, con
+- **En el celular y en la computadora.** Si son dos interfaces o una que se adapta lo
+  decide el diseño. En esta versión todos los usuarios son Administrador y ven todo. Todo se puede usar en el celular y en la computadora, con
   la misma información y las mismas palabras. En el celular nada se desplaza hacia el
   costado; en la computadora todo se opera con teclado y se aprovecha el ancho.
 - **El Administrador mira a distancia, desde el celular.** Lo del Administrador se piensa

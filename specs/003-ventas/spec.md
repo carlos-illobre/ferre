@@ -201,15 +201,13 @@ las ventas del día y se comprueba cada venta, el total y el total por medio de 
 6. **Given** ventas registradas en días anteriores, **When** el Administrador elige una fecha, **Then** ve las ventas de ese día con sus renglones, su total y su total por medio de pago.
 7. **Given** una venta a cuenta corriente, **When** se la mira en las ventas del día, **Then** figura el nombre del cliente.
 
-Ver las ventas del día y las de días anteriores es, por ahora, del Administrador (decisión 15 del 2026-10-10). Un usuario que es solo Vendedor no las ve, ni en la interfaz ni pidiéndoselas al servidor.
 
 ---
 
 ### User Story 8 - Anular una venta (Priority: P2)
 
 El Administrador anula la venta que estuvo mal: queda marcada, no se borra, y el stock
-vuelve a donde estaba (RF-23, CU-02). Anular es, por ahora, del Administrador (decisión 15
-del 2026-10-10).
+vuelve a donde estaba (RF-23, CU-02).
 
 **Why this priority**: el cuaderno permite tachar; el sistema también, con rastro.
 
@@ -224,7 +222,6 @@ de cada uno vuelve al valor anterior.
 4. **Given** una venta anulada, **When** el Administrador consulta quién hizo qué (RF-71), **Then** la anulación figura con el usuario que la hizo, la fecha y, si se cargó, el motivo.
 5. **Given** una venta a cuenta corriente anulada, **When** se mira lo que debe el cliente, **Then** esa venta ya no cuenta en su deuda (RF-40).
 6. **Given** una venta con un ítem libre, **When** se la anula, **Then** el ítem libre no mueve stock de ningún producto.
-7. **Given** un usuario que es solo Vendedor, **When** quiere anular una venta, **Then** la interfaz no se lo ofrece y el servidor lo rechaza.
 
 [NEEDS CLARIFICATION: al anular una venta, ¿se pide confirmación y se pide el motivo (obligatorio u opcional)? La constitución solo admite una ventana de confirmación para lo que no se puede recuperar, y una anulación no se puede deshacer.]
 
@@ -250,8 +247,6 @@ comprueba el total de la venta, el total del día y el stock.
 4. **Given** una venta corregida, **When** se consulta lo guardado, **Then** los valores anteriores siguen existiendo: la corrección agrega registros y no pisa los históricos (RNF-30).
 5. **Given** una venta anulada, **When** se intenta corregirla, **Then** no se puede.
 6. **Given** una venta a cuenta corriente sin pagar, **When** se corrige, **Then** lo que debe el cliente refleja el total nuevo (RF-40).
-
-[NEEDS CLARIFICATION: ¿qué rol puede corregir una venta? Ver y anular quedaron para el Administrador (decisión 15); corregir no se nombró.]
 
 [NEEDS CLARIFICATION: ¿hasta cuándo se puede corregir o anular una venta: solo las del día, las de los últimos N días, o cualquiera? El pedido dice «una venta reciente» sin decir cuánto.]
 
@@ -523,10 +518,10 @@ comprueba que en la otra no existe ningún dato de la primera.
 ### Functional Requirements
 
 - **RF-20**: El sistema DEBE permitir registrar una venta en el orden del mostrador: buscar (escribiendo o escaneando), ver costo, margen y precio, poner la cantidad (1 por omisión) y cobrar. El total está siempre a la vista. La venta guarda sus renglones, descuenta el stock de cada producto, lleva la fecha y hora del dispositivo y queda con el usuario que la registró. Cada renglón guarda el costo, el margen, el precio y la explicación de ese momento (RNF-31). Nada es obligatorio que el cuaderno no tenga: fecha, producto, cantidad y precio; el cliente es opcional. La venta nunca se impide por stock insuficiente. En la computadora se hace entera con el teclado; una venta de 3 productos lleva menos de 20 segundos (RNF-02). Un identificador generado en el dispositivo evita que una venta reenviada se duplique.
-- **RF-20b**: En la venta, el margen de un producto DEBE poder elegirse o cambiarse ahí mismo, con un toque entre 300, 200, 100, 50 y 25 % (RF-10), y queda guardado en el producto. El precio de un renglón DEBE poder ponerse a mano, como un importe, y vale solo para esa venta: no cambia el margen guardado, no se redondea y, si el importe del renglón no es múltiplo de $1.000, la venta lo avisa sin impedir cobrar (RF-19). Una venta con un renglón sin precio no se puede cobrar. Elegir márgenes y ver costos son, por ahora, del Administrador (decisión 15 del 2026-10-10). [NEEDS CLARIFICATION: el caso de uso de la venta dice que quien vende ve costo, margen y precio y elige el margen ahí mismo. Con esa decisión, ¿qué ve y qué puede hacer en la venta un usuario que es solo Vendedor: ve solo el precio? Ante un producto sin precio, ¿le pone el precio a mano, o no puede venderlo hasta que un Administrador le elija el margen? Es la pregunta P10 de la capacidad de usuarios y acceso.]
+- **RF-20b**: En la venta, el margen de un producto DEBE poder elegirse o cambiarse ahí mismo, con un toque entre 300, 200, 100, 50 y 25 % (RF-10), y queda guardado en el producto. El precio de un renglón DEBE poder ponerse a mano, como un importe, y vale solo para esa venta: no cambia el margen guardado, no se redondea y, si el importe del renglón no es múltiplo de $1.000, la venta lo avisa sin impedir cobrar (RF-19). Una venta con un renglón sin precio no se puede cobrar.
 - **RF-21**: Los medios de pago son cuatro: efectivo, Mercado Pago, tarjeta y cuenta corriente. Se eligen con un toque o una tecla. La cuenta corriente exige elegir el cliente, por nombre, y la venta queda a su nombre y sin pagar (RF-40). El sistema registra con qué se pagó; no cobra ni se conecta con Mercado Pago ni con la tarjeta. [NEEDS CLARIFICATION: si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión, o «sin especificar») o se le exige elegir uno antes de cobrar?]
 - **RF-22**: El sistema DEBE permitir vender un producto que no está en ninguna lista como ítem libre, con descripción y precio tipeados, sin agregar más de 2 pasos a una venta normal; el ítem libre no mueve stock. En el mismo paso DEBE poder guardarse como producto nuevo, con familia y costo opcionales. Los ítems libres vendidos quedan listados para que el Administrador los revise después. [NEEDS CLARIFICATION: precio del producto nuevo en la venta siguiente, y qué puede hacer el Administrador con la lista de ítems libres; ver historia 6, escenarios 6 y 8.]
-- **RF-23**: El sistema DEBE mostrar las ventas del día, con el total del día, la cantidad de ventas y el total por medio de pago, y las de un día anterior eligiendo la fecha; cada venta muestra sus productos, uno por renglón. El día es el del local (hora de Buenos Aires). Una venta se DEBE poder anular: queda marcada, no se borra, su stock vuelve y deja de contar en los totales. Una venta reciente se DEBE poder corregir en cantidad o precio: ajusta el stock y el total del día, no pisa lo anterior (RNF-30) y queda en quién hizo qué (RF-71) con el usuario y qué cambió. Ver las ventas y anularlas es, por ahora, del Administrador (decisión 15 del 2026-10-10). [NEEDS CLARIFICATION: qué rol puede corregir; si anular pide confirmación y motivo; hasta cuándo una venta es «reciente»; y qué más se puede corregir además de cantidad y precio; ver historias 7, 8 y 9.]
+- **RF-23**: El sistema DEBE mostrar las ventas del día, con el total del día, la cantidad de ventas y el total por medio de pago, y las de un día anterior eligiendo la fecha; cada venta muestra sus productos, uno por renglón. El día es el del local (hora de Buenos Aires). Una venta se DEBE poder anular: queda marcada, no se borra, su stock vuelve y deja de contar en los totales. Una venta reciente se DEBE poder corregir en cantidad o precio: ajusta el stock y el total del día, no pisa lo anterior (RNF-30) y queda en quién hizo qué (RF-71) con el usuario y qué cambió. [NEEDS CLARIFICATION: si anular pide confirmación y motivo; hasta cuándo una venta es «reciente»; y qué más se puede corregir además de cantidad y precio; ver historias 7, 8 y 9.]
 - **RF-24**: El sistema DEBE permitir registrar el cambio de un producto por otro: lo devuelto vuelve al stock, lo nuevo sale y se cobra la diferencia. No hay devolución de plata. [NEEDS CLARIFICATION: qué pasa si lo nuevo vale menos; si hay que encontrar la venta original, a qué precio se toma lo devuelto y si hay plazo; ver historia 11.]
 - **RF-24b**: El sistema DEBE permitir registrar una devolución con reintegro de plata o saldo a favor, a elección del cliente. Es de una etapa posterior: llega con la venta online (RF-31). [NEEDS CLARIFICATION: ¿cuál es el plazo para aceptar una devolución?]
 - **RF-25**: El sistema DEBE permitir anotar con un toque lo que un cliente pidió y no se vendió: producto o descripción, precio ofrecido y, de forma opcional, el motivo (no había, precio). Lo anotado DEBE poder consultarse después. [NEEDS CLARIFICATION: si los motivos son una lista cerrada o texto libre; quién consulta lo anotado y cómo; y si descartar una venta anota siempre la consulta; ver historia 10.]
@@ -587,7 +582,7 @@ comprueba que en la otra no existe ningún dato de la primera.
 ### Session 2026-10-10
 
 - Q: ¿Un precio puesto a mano que no es múltiplo de $1.000 se respeta tal cual? → A: Sí. Se respeta tal cual y aparece un aviso que dice que no es múltiplo de $1.000 (decisión 16; RF-19, RF-20b). Se interpretó así: el renglón con precio a mano no se redondea (vale precio × cantidad), el aviso se muestra cuando el importe del renglón no es múltiplo de $1.000, no impide cobrar, y vale también para el precio del ítem libre y para un precio corregido.
-- Q: ¿Quién ve las ventas del día y quién anula una venta? → A: Por ahora, el Administrador; lo mismo elegir márgenes y ver costos. Más adelante se reparte mejor, con más roles (decisión 15; RF-72).
+- Q: ¿Quién ve las ventas del día, anula una venta, ve los costos y elige márgenes? → A: En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo; qué podrá cada rol se define más adelante (decisión 18; RF-72).
 
 ## Assumptions
 
@@ -596,7 +591,7 @@ comprueba que en la otra no existe ningún dato de la primera.
 - Guardar en el dispositivo y enviar al reconectar es de RNF-10 y RNF-20; acá solo se describe cómo se comporta la venta.
 - Marcar pagada una venta a cuenta corriente, los saldos y los pagos parciales pertenecen a la capacidad 004 (RF-40, RF-41).
 - La lista de lo que hay que comprar y el pedido al proveedor pertenecen a la capacidad 005 (RF-54, RF-55); los pedidos de clientes (RF-26) la alimentan.
-- Los permisos por rol son de RF-72 (capacidad 007). Las historias 1 y 2 describen a quien vende viendo costo y margen, como en el caso de uso original; desde la decisión 15 eso lo ve y lo elige quien además es Administrador, y qué le queda a quien es solo Vendedor es la pregunta P10 de esa capacidad.
+- Los permisos por rol son de RF-72 (capacidad 007): en esta primera versión todos los usuarios son Administrador y pueden hacer todo. Las historias nombran al Vendedor o al Administrador para decir quién hace ese trabajo en el local, no para restringirlo.
 - El sistema registra el medio de pago; no procesa el cobro con Mercado Pago ni con tarjeta.
 - En la carga del cuaderno (RF-29), transcribir a la planilla se hace fuera del sistema; se supone que la carga y el informe los maneja el Administrador, porque el informe se revisa con el dueño.
 - Los textos entre comillas angulares («No llevó», «Venta registrada», «anulada», «Hay productos sin precio») son las palabras del mostrador y valen en las dos interfaces.

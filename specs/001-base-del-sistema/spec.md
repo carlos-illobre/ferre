@@ -51,7 +51,10 @@ levanta y se prueba en [quickstart.md](quickstart.md).
 
 - Q: ¿La especificación describe el código que hay? → A: No. El código se puede rehacer en cualquier momento; la especificación tiene que alcanzar para construir de nuevo la aplicación sin haberlo visto. Cuánto del sistema existe y con qué pruebas se anota aparte, fuera de la especificación (constitución, principios I y VI).
 - Q: Si el código se rehace, ¿qué se conserva? → A: El servidor y su modelo de datos, que son contrato ([data-model.md](data-model.md)). Las pantallas se rehacen.
-- Q: ¿La interfaz de celular «queda como está»? → A: No. Carlos va a rehacer toda la interfaz, celular y computadora, más adelante; hasta entonces las pantallas no se tocan (decisión 13, que reemplaza esa parte de la decisión 9). Lo que Carlos pidió sobre las pantallas a lo largo del proyecto está reunido en [ux.md](ux.md), para quien las rediseñe. Qué reglas de la interfaz de hoy valen para el rediseño es una pregunta abierta de RNF-04.
+- Q: ¿La interfaz de celular «queda como está»? → A: No. Carlos va a rehacer toda la interfaz, celular y computadora; es la prioridad (decisión 13, que reemplaza esa parte de la decisión 9). Lo que Carlos pidió sobre las pantallas a lo largo del proyecto está reunido en [ux.md](ux.md), para quien las rediseñe.
+- Q: ¿Qué de lo escrito sobre la interfaz ata al rediseño? → A: Nada de cómo está hecha hoy: que sean dos interfaces separadas con el corte en 900 px, las cuatro pestañas, las tarjetas, las tablas, el menú, la paleta, la tipografía y la marca son cómo está hecho hoy y no una regla (decisión 19). Lo que ata son los requerimientos: qué tiene que poder hacer quien usa el sistema en el celular y en la computadora, y con qué reglas (RNF-04, RNF-05).
+- Q: ¿Se trabaja con una rama por funcionalidad? → A: No. No hay ramas ni pull requests: todo se sube directo a la rama de pruebas, como se pidió el 2026-09-13 (decisión 20; constitución, flujo de trabajo).
+- Q: ¿Qué puede hacer cada rol? → A: En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo. Van a existir otros roles, pero no se usan todavía y sus permisos se definen más adelante (decisión 18, RF-72).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -190,29 +193,28 @@ que entrar a mirar.
 
 ---
 
-### User Story 7 - Cada dispositivo abre su interfaz (Priority: P2)
+### User Story 7 - Usarlo completo en el celular y en la computadora (Priority: P2)
 
-El celular abre la interfaz de tarjetas y pestañas; la computadora, la de tablas, menú
-completo y teclado. Es la misma dirección y la misma app; se elige sola por el ancho de la
-pantalla.
+Todo lo que el sistema hace se usa en el celular y en la computadora, en la misma dirección
+y con la misma app: en el celular, con una mano; en la computadora, con el teclado y
+aprovechando la pantalla. Cómo se resuelve (una interfaz que se adapta o dos distintas, con
+qué disposición y con qué estilo) lo decide el diseño.
 
-**Why this priority**: el Vendedor usa la notebook para vender y el celular para escanear y contar; una sola interfaz no sirve en las dos (ADR-014).
+**Why this priority**: quien vende usa la notebook para buscar y cobrar y el celular para escanear y contar; lo que funciona bien en uno no sirve tal cual en el otro.
 
-**Independent Test**: abrir la misma dirección en una ventana de 412 px de ancho y en una de 1366 px y ver que cada una carga su interfaz.
+**Independent Test**: abrir la misma dirección en una ventana de 412 px de ancho y en una de 1366 px, y recorrer la venta completa en las dos.
 
 **Acceptance Scenarios**:
 
-1. **Given** una pantalla de menos de 900 px de ancho, **When** se abre la app, **Then** carga la interfaz de celular; con 900 px o más carga la de computadora.
-2. **Given** la app abierta, **When** la ventana cruza los 900 px (se gira una tablet o se achica la ventana), **Then** la app pasa a la otra interfaz.
-3. **Given** la app abierta en cualquiera de las dos interfaces, **When** termina de cargar, **Then** trae solo los estilos de esa interfaz: ningún estilo de una se aplica en la otra.
-4. **Given** la interfaz de celular, **When** se recorre cualquier pantalla, **Then** ninguna se desplaza hacia el costado.
-5. **Given** la interfaz de celular, **When** se navega, **Then** hay cuatro pestañas abajo, las listas son tarjetas y lo que se abre sobre lo que se está haciendo sube desde abajo.
-6. **Given** la interfaz de computadora, **When** se abre cualquier pantalla con una lista, **Then** la lista es una tabla que ocupa todo el ancho de la ventana, con el menú completo arriba.
-7. **Given** la interfaz de computadora y ningún mouse, **When** el Vendedor busca un producto, lo agrega, elige el medio de pago y cobra, **Then** completa la venta solo con el teclado.
-8. **Given** la interfaz de computadora en la notebook del local, **When** se abre la pantalla de venta, **Then** entra entera sin desplazarse: búsqueda arriba, renglones en el medio, total y cobro abajo.
-9. **Given** las dos interfaces, **When** se comparan, **Then** usan la misma paleta, la misma tipografía para los importes, el mismo logo y las mismas palabras.
-10. **Given** un cambio en la interfaz de computadora, **When** se comparan capturas de todas las pantallas del celular de antes y de después, **Then** son iguales; y lo mismo al revés.
-11. **Given** una funcionalidad con pantalla, **When** se la busca en cada interfaz, **Then** está en las dos.
+1. **Given** un celular, **When** se recorre cualquier pantalla, **Then** ninguna se desplaza hacia el costado y cada elemento de una lista entra entero en el ancho de la pantalla.
+2. **Given** un celular en una mano, **When** se busca un producto, se lo agrega, se pone la cantidad y se cobra, **Then** todo se alcanza con el pulgar de esa mano.
+3. **Given** una computadora, **When** se abre cualquier pantalla con una lista, **Then** la lista usa todo el ancho de la ventana, sin espacio desaprovechado a los costados, y muestra varios productos a la vez con sus datos en la misma fila.
+4. **Given** una computadora y ningún mouse, **When** se busca un producto, se lo agrega, se elige el medio de pago y se cobra, **Then** la venta se completa solo con el teclado.
+5. **Given** la notebook del local, **When** se abre la pantalla de venta, **Then** entra entera sin desplazarse: la búsqueda, los renglones, el total y el cobro están a la vista.
+6. **Given** el celular y la computadora, **When** se comparan, **Then** usan las mismas palabras, la misma marca y los mismos colores.
+7. **Given** una funcionalidad con pantalla, **When** se la busca en el celular y en la computadora, **Then** está completa en los dos; ninguno es una versión recortada del otro.
+8. **Given** un cambio pensado para la computadora, **When** se comparan capturas de todas las pantallas del celular de antes y de después, **Then** son iguales; y lo mismo al revés.
+9. **Given** una ventana de la computadora que se achica, o una tablet que se gira, **When** cambia el ancho, **Then** la app se sigue pudiendo usar completa en el ancho nuevo.
 
 ---
 
@@ -381,7 +383,6 @@ qué cada cosa es como es.
 - **Google caído:** no se puede entrar en un dispositivo nuevo; los que ya tienen sesión siguen (ADR-011).
 - **El servidor se reinicia en medio de un ingreso con huella:** el desafío de ese ingreso deja de valer y la app pide otro (ADR-011).
 - **Un aviso de despliegue que se pierde:** la máquina se pone al día en su próximo arranque o con un comando a mano (ADR-013).
-- **Una tablet o una ventana angosta en la computadora** ven la interfaz de celular; es lo esperado (ADR-014).
 - **El servicio de base gratuito pausa la base tras 7 días sin consultas** (ADR-002): la consulta diaria del monitor lo evita (RNF-12).
 - **Unir dos productos duplicados (RF-06)** y **quitar un renglón de un conteo abierto (RF-52)** tocan filas ya escritas; ver la pregunta en RNF-30.
 - **Los dos ambientes abiertos en el mismo dispositivo:** ver la pregunta en RNF-53.
@@ -399,12 +400,10 @@ notebook del local» es el equipo de RNF-40.
 - **RNF-01**: Curva de aprendizaje cero: un Vendedor que nunca usó el sistema registra una venta el primer día, sin manual. Se comprueba en el mostrador, durante el piloto, contando las veces que tuvo que pedir ayuda. [NEEDS CLARIFICATION: ¿cuántas veces puede pedir ayuda un Vendedor nuevo en su primer día para que el requerimiento se dé por cumplido: ninguna, o hasta cuántas?] Ver constitución, principio II.
 - **RNF-02**: Nunca más lento que el cuaderno y la calculadora: una venta de 3 productos se registra en menos de 20 segundos. [NEEDS CLARIFICATION: ¿desde qué momento hasta cuál se cuentan los 20 segundos (por ejemplo, desde que se empieza a escribir el primer producto hasta que aparece la pantalla de venta cobrada), y vale para la notebook, para el celular o para los dos?] Ver constitución, principio II.
 - **RNF-03**: Mínimo esfuerzo manual: no se tipea nada que se pueda sacar de una lista, un código de barras o una foto. Los productos, sus códigos y sus costos entran por las listas de los proveedores (RF-01 a RF-04); el código de barras se lee con la cámara (RF-08); la foto del producto se saca con el celular (RF-09); los renglones de una factura de compra salen de su foto (RF-51). La pantalla no pide ningún dato obligatorio que el cuaderno no tenga: fecha, producto, cantidad y precio.
-- **RNF-04**: Interfaz de celular. Es la que se carga en pantallas de menos de 900 px de ancho. Ninguna pantalla se desplaza hacia el costado. Se navega con cuatro pestañas abajo; las listas son tarjetas, nunca tablas anchas; lo que se abre sobre lo que se está haciendo sube desde abajo y se cierra tocando afuera; la cámara está a un toque al lado de cada buscador; instalada, abre a pantalla completa (RNF-40). Las reglas visuales son las del sistema visual del proyecto. Ver constitución, principio III, y ADR-014.
-  - [NEEDS CLARIFICATION: toda la interfaz se va a rehacer (decisión 13 del 2026-10-10). De lo que este requerimiento y RNF-05 dicen sobre la interfaz, ¿qué es regla para el rediseño y qué es solo cómo está hecha hoy? En particular: que sean dos interfaces separadas elegidas por el ancho de la pantalla, con el corte en 900 px (ADR-014; constitución, principio III); en el celular, las cuatro pestañas abajo, las tarjetas y lo que sube desde abajo; en la computadora, las tablas a todo el ancho, el menú completo arriba y la edición en la fila; y la paleta, la tipografía de los importes y la marca «fe».]
-  - [NEEDS CLARIFICATION: la maqueta del celular («Ferre iOS») no está en el repositorio: la carpeta de maquetas está excluida del control de versiones y solo quedaron adentro las siete imágenes de la primera maqueta. ¿Se sube como antecedente para quien rediseñe, o no hace falta?]
-  - [NEEDS CLARIFICATION: el sistema visual pide letra de 18 px como mínimo en el celular, y la interfaz de celular que aprobaste usa textos más chicos. ¿Cuál vale: el mínimo de 18 px, o un mínimo menor (¿cuál?)?]
-- **RNF-05**: Interfaz de computadora. Es la que se carga en pantallas de 900 px o más. Usa todo el ancho de la ventana: las listas son tablas a todo el ancho, se edita en la fila y el menú completo está arriba. Todo se opera con teclado; el mouse nunca es la única forma. La pantalla de venta y la barra de arriba entran enteras en la notebook del local sin desplazarse. Letra de 16 px como mínimo. Hay un solo botón principal por pantalla. Usa la misma paleta, la misma tipografía de importes y la misma marca que el celular, y ningún cambio en ella altera el celular. Ver constitución, principios II y III, y ADR-014.
-  - [NEEDS CLARIFICATION: el sistema visual pide «alto contraste» en las dos interfaces sin decir cuánto. ¿Se toma el mínimo del estándar de accesibilidad WCAG nivel AA (4,5 a 1 entre el texto y su fondo), u otro?]
+- **RNF-04**: En el celular todo se usa con una mano y se alcanza con el pulgar. Ninguna pantalla se desplaza hacia el costado: cada elemento de una lista entra entero en el ancho. Se parece lo más posible a una app nativa de Android. La cámara está a un toque al lado de cada buscador. Instalada, abre a pantalla completa (RNF-40). La disposición, los componentes y el estilo los decide el diseño: nada de cómo está hecha hoy la interfaz es regla (decisión 19 del 2026-10-10). Ver constitución, principio III, y [ux.md](ux.md).
+  - [NEEDS CLARIFICATION: se había pedido letra de 18 px como mínimo en el celular, y la interfaz de celular que se aprobó en su momento usaba textos más chicos. ¿Cuál vale para el rediseño: el mínimo de 18 px, o un mínimo menor (¿cuál?)?]
+- **RNF-05**: En la computadora la interfaz usa todo el ancho de la ventana, sin espacio desaprovechado a los costados, y lo aprovecha para mostrar muchos productos a la vez, con sus datos en la misma fila. Todo se opera con teclado; el mouse nunca es la única forma. Buscar y recorrer una grilla es tan directo como escribir y mover las flechas. La pantalla de venta entra entera en la notebook del local sin desplazarse. Letra de 16 px como mínimo. Hay un solo botón principal por pantalla. Usa las mismas palabras, la misma marca y los mismos colores que el celular, y ningún cambio en ella rompe el celular. La disposición, los componentes y el estilo los decide el diseño (decisión 19 del 2026-10-10). Ver constitución, principios II y III, y [ux.md](ux.md).
+  - [NEEDS CLARIFICATION: se pidió «alto contraste» sin decir cuánto. ¿Se toma el mínimo del estándar de accesibilidad WCAG nivel AA (4,5 a 1 entre el texto y su fondo), u otro?]
 - **RNF-06**: Todo en castellano, con las palabras del mostrador: «cuenta corriente» y no «fiado», «lista» y no «importación», «costo» y no «precio de compra neto». Los errores aparecen en el lugar y dicen qué hacer. Ver constitución, principios II y IX.
 - **RNF-07**: La búsqueda y el cambio de margen muestran su resultado en menos de 100 ms, medidos en la notebook del local con 50.000 productos y 10.000 ventas guardados en el dispositivo. Con esos mismos datos, guardar una venta en el dispositivo tarda menos de 50 ms. Ver constitución, principio II.
 - **RNF-08**: La búsqueda cumple RNF-07 y funciona sin internet con más de 100.000 artículos, en la notebook del local. [NEEDS CLARIFICATION: ¿hasta cuántos artículos hay que garantizar la búsqueda instantánea (100.000, 150.000, 200.000), y tiene que cumplirse también en el celular o solo en la notebook?]

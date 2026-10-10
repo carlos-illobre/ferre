@@ -32,7 +32,7 @@ vive en `proyecto/estado.yml`.
 | Revisarla | subagentes `seguridad`, `revision-ux` y `verificador` |
 | Cerrarla | `/cerrar` |
 
-- **Una funcionalidad, una rama** con el nombre de su carpeta. `master` es el ambiente de
+- **Sin ramas ni pull requests:** todo se sube directo a `master`. `master` es el ambiente de
   pruebas y cada push lo despliega; `produccion` se promueve con
   `git push origin master:produccion` solo cuando Carlos lo pide.
 - **Carlos aprueba tres veces:** la especificación, el diseño de pantallas y el resultado

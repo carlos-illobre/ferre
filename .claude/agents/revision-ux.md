@@ -10,8 +10,8 @@ Sos el revisor de UI/UX de ferre. No modificás código: informás.
 2. Levantá la app y sacá capturas con Playwright de cada pantalla y cada estado que nombra
    `ux.md`, en las dos interfaces: computadora (1366 px de ancho) y celular (412 px).
    Guardalas en `specs/<funcionalidad>/capturas/`.
-3. Sacá también capturas de las pantallas vecinas que la funcionalidad no debía cambiar, en
-   `master` y en la rama, y comparalas.
+3. Sacá también capturas de las pantallas vecinas que la funcionalidad no debía cambiar,
+   antes y después de sus commits (no hay ramas: todo está en `master`), y comparalas.
 4. Compará cada captura con lo que pide `ux.md`: orden, acción principal, textos, estados.
    Recorré cada historia contando toques o teclas.
 5. Escribí en `verificacion.md` la sección `## UI/UX`: qué coincide, cada diferencia con su

@@ -6,8 +6,9 @@ reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitu
 
 ## Reglas para todos los recorridos
 
-- **Dos interfaces.** Todo lo de este documento existe en el celular y en la computadora
-  (ADR-014), salvo donde dice lo contrario. Lo único que cambia por regla entre una y otra
+- **En el celular y en la computadora.** Todo lo de este documento se hace completo en los
+  dos, salvo donde dice lo contrario; si son dos interfaces o una que se adapta lo decide el
+  diseño (constitución, principio III). Lo único que cambia por regla entre una y otra
   es la huella: se ofrece sola en el celular y nunca en la computadora.
 - **Teclado.** En la computadora, cada recorrido se completa entero con el teclado.
 - **Sin confirmaciones.** Nada de esta capacidad pide confirmar antes de actuar: desactivar
@@ -17,10 +18,11 @@ reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitu
   dice qué hacer. Nunca un código ni un texto técnico.
 - **Rol, no persona.** Los textos dicen Administrador, Vendedor y Comprador; nunca «dueño»
   ni «empleado».
-- **Lo que no se puede, no se ofrece.** Una operación que el usuario no puede hacer por sus
-  roles no figura en su interfaz; no se muestra deshabilitada ni con candado.
+- **Roles.** En esta versión todos los usuarios son Administrador y pueden hacer todo. Cuando
+  haya permisos por rol, lo que un usuario no pueda hacer no se le va a ofrecer: no se
+  muestra deshabilitado ni con candado.
 - **Identidad siempre a la vista.** Con sesión abierta, desde cualquier parte de la app se
-  ve el nombre del usuario y sus roles, y se llega a «Salir» en un paso.
+  ve el nombre del usuario, y se llega a «Salir» en un paso.
 - **Lo que tarda muestra su avance.** Entrar, vincular y cada guardado indican que están en
   curso y no dejan repetir la acción mientras tanto.
 - **Sin conexión.** Entrar, vincular la huella, administrar usuarios, ver sesiones y ver
@@ -80,31 +82,27 @@ la huella. Nada más: sin sesión no se ve ningún dato del negocio.
 | Google no responde | Que Google no responde; la huella sigue disponible donde esté vinculada |
 | Sesión cerrada a distancia o vencida | Se vuelve solo a la entrada, con «Hay que iniciar sesión» |
 
-## Historia 2: administrar usuarios y roles
+## Historia 2: administrar usuarios
 
-**Quién:** Administrador.
+**Quién:** Administrador (en esta versión, todo usuario).
 
-**Qué tiene que poder hacer:** ver quién puede entrar; autorizar un correo con sus roles;
-agregar y quitar roles; desactivar y reactivar.
+**Qué tiene que poder hacer:** ver quién puede entrar; autorizar un correo; desactivar y
+reactivar.
 
 **Qué necesita a la vista:**
 
-- Por cada usuario: nombre, correo, los tres roles con cuáles tiene, y si está activo. Los
-  desactivados se distinguen de los activos sin leer la letra chica.
+- Por cada usuario: nombre, correo y si está activo. Los desactivados se distinguen de los
+  activos sin leer la letra chica.
 - Cuál de los usuarios es él mismo.
-- Para autorizar, en este orden: nombre, correo de Google, roles. Ningún otro dato.
+- Para autorizar, en este orden: nombre y correo de Google. Ningún otro dato.
 
 **Reglas:**
 
-- Los tres roles se marcan por separado: se puede elegir cualquier combinación de
-  uno, dos o tres. No es una elección de uno entre tres.
-- Un alta no se puede confirmar sin al menos un rol.
-- Agregar o quitar un rol se guarda al tocarlo, sin paso de «guardar» aparte, y se ve el
-  resultado en la misma fila.
-- Lo que la regla impide se explica en el lugar: quitar el último rol de un usuario
-  («desactivalo si no tiene que entrar»), desactivarse o quitarse el rol Administrador a
-  uno mismo («lo tiene que hacer otro Administrador»), y dejar el sistema sin ningún
-  Administrador activo.
+- En esta versión no se elige rol: toda persona autorizada entra como Administrador y puede
+  hacer todo. Elegir, agregar y quitar roles llega cuando se definan los permisos de cada
+  rol; el diseño no tiene que reservarle lugar.
+- Lo que la regla impide se explica en el lugar: desactivarse a uno mismo («lo tiene que
+  hacer otro Administrador») y dejar el sistema sin ningún Administrador activo.
 - Desactivar avisa, después de hacerlo, que a ese usuario se le cerraron las sesiones.
 - Un correo repetido se avisa en el campo del correo, y lo escrito no se pierde.
 - Si se conserva alguna protección entre Administradores (pregunta P4 de la spec), lo que
@@ -117,37 +115,20 @@ agregar y quitar roles; desactivar y reactivar.
 | Vacío | No existe: siempre figura al menos el propio Administrador. La invitación a autorizar a alguien está siempre a la vista |
 | Cargando | Que la lista se está trayendo |
 | Éxito al autorizar | El usuario nuevo en la lista, y el alta lista para cargar otro |
-| Éxito al cambiar roles o estado | La fila con el valor nuevo |
-| Error de datos | Junto al campo: nombre vacío, correo mal escrito, correo que ya existe, ningún rol |
+| Éxito al desactivar o reactivar | La fila con el valor nuevo |
+| Error de datos | Junto al campo: nombre vacío, correo mal escrito, correo que ya existe |
 | Error de regla | Junto a la fila, con el motivo |
 | Error del servidor | Que no se pudo guardar, con la fila como estaba y reintento |
 | Sin conexión | Que administrar usuarios necesita internet |
 
-## Historia 3: cada rol ve lo suyo
+## Historia 3: todos pueden todo
 
 **Quién:** cualquier usuario.
 
-**Qué tiene que poder hacer:** llegar a todas las operaciones que sus roles permiten, y solo
-a esas, según la matriz de permisos de la spec.
-
-**Reglas:**
-
-- El menú y los accesos se arman con la unión de los roles del usuario. Quien tiene los
-  tres ve todo; quien tiene uno ve lo de ese rol.
-- La app abre en la primera operación que el usuario puede hacer; nunca en una que no puede.
-- Un atajo de teclado o un enlace a una operación que el usuario no puede hacer no hace
-  nada dañino: lo lleva a algo que sí puede, con el motivo.
-- Si el servidor rechaza algo por rol (porque el rol cambió con la app abierta), el mensaje
-  dice qué rol se necesita, la sesión sigue abierta y la interfaz se actualiza a los roles
-  nuevos sin que el usuario tenga que salir.
-- Sin conexión, la interfaz usa los roles que conocía la última vez que tuvo servidor.
-
-**Estados:**
-
-| Estado | Qué se ve |
-|---|---|
-| Roles cambiados con la app abierta | La interfaz con las operaciones nuevas, o sin las que perdió, y un aviso de qué cambió |
-| Operación rechazada por rol | Qué rol se necesita |
+**Regla:** en esta versión todos los usuarios son Administrador y a todos se les ofrecen
+todas las operaciones. La interfaz no oculta, no deshabilita ni restringe nada por rol, y
+no hace falta mostrar el rol junto al nombre. Qué ve cada rol se escribe acá cuando se
+definan los permisos (etapa posterior).
 
 ## Historia 4: la huella
 
@@ -170,7 +151,7 @@ el de otro usuario.
 - Si la huella no se lee, dice que se puede vincular después y dónde, y la oferta vuelve a
   aparecer en la próxima entrada con Google.
 
-**Mis celulares vinculados (las dos interfaces, cualquier rol):**
+**Mis celulares vinculados (celular y computadora):**
 
 - Por cada uno: el nombre que le puso, cuándo se vinculó y cuándo se usó por última vez.
 - Cuál es el dispositivo que tiene en la mano, si está en la lista.
@@ -178,7 +159,7 @@ el de otro usuario.
   huella y que no está ya vinculado. Pide un nombre, con uno propuesto que se puede dejar
   como está; el nombre se pide dentro de la app.
 - Quitar uno es un paso, y dice después que ese celular ya no entra con la huella.
-- Todo usuario llega a su lista desde las dos interfaces, tenga el rol que tenga.
+- Todo usuario llega a su lista desde el celular y desde la computadora.
 
 **Celulares de otros (Administrador):** junto a cada usuario, sus celulares vinculados con
 la misma información y la posibilidad de quitarlos. Es la respuesta a un celular perdido,

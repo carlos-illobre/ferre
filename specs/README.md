@@ -22,8 +22,11 @@ Lo que más importa, en este orden:
 3. Respaldos: que no se pierda ningún dato.
 4. Información: guardarla toda y poder verla.
 
-Los roles, los actores y qué puede cada uno están en
-[007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md).
+Los roles y los actores están en [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md).
+**En esta primera versión todos los usuarios son Administrador y el Administrador puede
+hacer todo.** Donde una historia nombra al Vendedor o al Comprador, dice quién hace ese
+trabajo en el local; hoy lo hace un usuario Administrador. Los escenarios que hablan de un
+usuario sin el rol Administrador quedan para cuando se definan los permisos de cada rol.
 
 ## Cómo está organizado
 
@@ -130,7 +133,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
 | RF-70 | Solo entran usuarios autorizados, con su cuenta de Google o la huella del celular; sin contraseñas ni QR. Se autoriza a alguien cargando su correo desde la app; quien no está autorizado ve «no autorizado» | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-70b | Vincular el celular a la cuenta para entrar con la huella. La app lo ofrece sola la primera vez que se entra con Google desde un celular, y nunca en la computadora; también se vincula y se quita a mano | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-71 | Quién hizo qué: cada acción queda con su usuario y se puede consultar, de a 10 por página, filtrando por usuario, fecha y tipo de acción | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
-| RF-72 | Permisos por rol, con los tres roles Administrador, Vendedor y Comprador, combinables; cada pantalla y cada operación exige el rol que corresponde; nunca queda el sistema sin un Administrador | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
+| RF-72 | Los permisos se dan por rol. En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo; van a existir otros roles (Vendedor, Comprador), que todavía no se usan y cuyos permisos se definen más adelante. Nunca queda el sistema sin un Administrador | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-73 | Reemplazado por RF-72. Eran los roles anteriores: dueño, admin y mostrador, uno solo por usuario | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-74 | Ver las sesiones abiertas en cada dispositivo y cerrarlas a distancia; cerrar la propia vuelve a la pantalla de entrada | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 
@@ -145,8 +148,8 @@ Los que son reglas generales están además en la constitución.
 | RNF-01 | Curva de aprendizaje cero: un Vendedor nuevo vende el primer día sin manual | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-02 | Nunca más lento que el cuaderno y la calculadora: una venta de 3 productos en menos de 20 segundos | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-03 | Mínimo esfuerzo manual: no se tipea nada que se pueda sacar de una lista, un código de barras o una foto | [001-base-del-sistema](001-base-del-sistema/spec.md) |
-| RNF-04 | Celular: se usa con una mano, se parece a una app nativa y ninguna pantalla se desplaza hacia el costado. Es la interfaz de las pantallas de menos de 900 px | [001-base-del-sistema](001-base-del-sistema/spec.md) |
-| RNF-05 | Computadora: usa todo el ancho de la pantalla, se ve prolija y se maneja con teclado, sin cambiar nada del celular. Es una interfaz propia: tablas, menú completo y atajos de teclado, con la misma paleta y la misma marca que el celular (ADR-014) | [001-base-del-sistema](001-base-del-sistema/spec.md) |
+| RNF-04 | Celular: todo se usa con una mano, se parece a una app nativa y ninguna pantalla se desplaza hacia el costado. El diseño no está atado a cómo está hecha hoy la interfaz | [001-base-del-sistema](001-base-del-sistema/spec.md) |
+| RNF-05 | Computadora: usa todo el ancho de la pantalla, muestra muchos productos a la vez y se maneja entera con teclado, sin romper el celular. El diseño no está atado a cómo está hecha hoy la interfaz | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-06 | Todo en castellano, con las palabras del mostrador; los errores dicen qué hacer | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-07 | Búsqueda y cambio de margen responden en menos de 100 ms | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-08 | La búsqueda sigue siendo instantánea y funciona sin internet con más de 100.000 artículos, en la notebook vieja | [001-base-del-sistema](001-base-del-sistema/spec.md) |

@@ -128,3 +128,11 @@ las rutas `/sesiones/vinculaciones` de la API. Quedan dos formas de entrar: Goog
 El dueño definió que los permisos se dan con tres roles combinables por usuario
 (`specs/README.md`, sección 2 y RF-72). Reemplazan a dueño, admin y mostrador cuando
 se implemente el issue #59; hasta entonces rige lo de arriba.
+
+## Enmienda (2026-10-10): en la primera versión todos son Administrador
+
+Carlos decidió que, por ahora, todos los usuarios son Administrador y el Administrador
+puede hacer todo (decisión 18). Los roles Vendedor y Comprador de la enmienda anterior
+quedan como idea de partida: no se usan todavía, y cuáles son y qué puede cada uno se
+define cuando se analicen los roles en profundidad. Hasta entonces el servidor no restringe
+ninguna operación por rol: exige una sesión vigente de un usuario activo.

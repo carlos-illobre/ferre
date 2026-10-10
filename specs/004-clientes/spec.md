@@ -25,6 +25,7 @@
 
 - Q: ¿Un precio puesto a mano que no es múltiplo de $1.000 se redondea? → A: No. Se respeta tal cual y la venta avisa que no es múltiplo de $1.000 (decisión 16; RF-19). Vale para el precio que se le pone a mano a un cliente importante.
 - Q: ¿Cuántos actores hay? → A: Cuatro: Dueño, Empleado, Cliente y Proveedor (decisión 14).
+- Q: ¿Qué rol carga clientes, marca una venta como pagada o fija el precio de un cliente? → A: En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo; qué podrá cada rol se define más adelante (decisión 18; RF-72).
 
 ### Session 2026-10-09
 
@@ -104,7 +105,7 @@ corriente. Sin clientes cargados no se puede cobrar a cuenta corriente.
 3. **Given** el alta de un cliente, **When** se carga además el teléfono, **Then** queda guardado; el teléfono es opcional.
 4. **Given** un cliente recién cargado, **When** se consulta «quién hizo qué» (RF-71), **Then** figura el alta con el usuario que la cargó.
 5. **Given** el alta de un cliente, **When** no se indica su condición, **Then** [NEEDS CLARIFICATION: ¿un cliente nuevo queda por omisión habilitado para comprar a cuenta corriente, o hay que habilitarlo aparte? El contrato tiene las dos versiones: la base lo deja sin cuenta corriente y la API lo crea con cuenta corriente.]
-6. **Given** un usuario del local, **When** quiere cargar, modificar o desactivar un cliente, **Then** [NEEDS CLARIFICATION: ¿qué rol puede cargar, modificar y desactivar clientes importantes: solo el Administrador, o también el Vendedor? ¿El Vendedor tiene que poder cargarlo en medio de una venta, cuando el cliente está en el mostrador?]
+6. **Given** un usuario del local en medio de una venta, **When** el cliente todavía no está cargado, **Then** [NEEDS CLARIFICATION: ¿el cliente se tiene que poder cargar sin salir de la venta, cuando está en el mostrador?]
 7. **Given** un cliente cargado con un nombre, **When** se carga otro con el mismo nombre, **Then** [NEEDS CLARIFICATION: ¿puede haber dos clientes con el mismo nombre? Si no, ¿el sistema lo impide o solo avisa?]
 8. **Given** el alta de un cliente, **When** el usuario completa sus datos, **Then** [NEEDS CLARIFICATION: ¿qué datos lleva un cliente importante además del nombre y el teléfono (CUIT, dirección, nombre del negocio, notas)? ¿Alguno más es obligatorio?]
 
@@ -177,8 +178,7 @@ qué ese precio.
 3. **Given** una venta cobrada al precio de un cliente, **When** se la consulta después, **Then** conserva el costo, el margen y el precio de ese momento, aunque la condición del cliente haya cambiado (RNF-31).
 4. **Given** un cliente importante con precio distinto, **When** el Vendedor le vende, **Then** [NEEDS CLARIFICATION: ¿el precio distinto lo decide la persona en el momento, poniendo el precio a mano en cada renglón, o lo calcula el sistema a partir de una condición guardada en la ficha del cliente (un descuento o una lista de precios propia)? El relato dice lo primero; el alcance de la ficha de cliente dice lo segundo.]
 5. **Given** un cliente que compra mucho y paga rápido, **When** se define su precio, **Then** [NEEDS CLARIFICATION: si lo calcula el sistema, ¿cómo se traducen «la cantidad que compra» y «lo rápido que paga» en un precio: qué cantidades o montos, en qué período, qué plazos de pago y qué descuento da cada uno? ¿O el Administrador fija el descuento de cada cliente a ojo y el sistema solo lo aplica?]
-6. **Given** un cliente con precio distinto, **When** alguien quiere cambiar su condición de precio, **Then** [NEEDS CLARIFICATION: ¿qué rol puede fijar o cambiar el precio de un cliente: solo el Administrador, o también el Vendedor en el momento de la venta?]
-7. **Given** un cliente con precio distinto, **When** compra y paga de contado, **Then** [NEEDS CLARIFICATION: ¿el precio distinto vale solo cuando compra a cuenta corriente, o también cuando paga en el momento?]
+6. **Given** un cliente con precio distinto, **When** compra y paga de contado, **Then** [NEEDS CLARIFICATION: ¿el precio distinto vale solo cuando compra a cuenta corriente, o también cuando paga en el momento?]
 
 ---
 
@@ -202,9 +202,8 @@ qué ese precio.
   - La venta queda a nombre del cliente y sin pagar. Lo que debe un cliente es la suma de sus ventas a cuenta corriente confirmadas y sin pagar; se calcula, no se guarda.
   - Al elegir el cliente, el Vendedor ve lo que debe cada uno.
   - Las ventas sin pagar se ven agrupadas por cliente y cada una se puede marcar como pagada con una sola acción. Marcarla guarda la fecha y la hora del pago y el usuario que lo anotó.
-  - Para poder vender a cuenta corriente, los clientes importantes se dan de alta desde la aplicación, con el nombre como único dato obligatorio. [NEEDS CLARIFICATION: ¿qué rol puede cargar, modificar y desactivar clientes importantes: solo el Administrador, o también el Vendedor?]
+  - Para poder vender a cuenta corriente, los clientes importantes se dan de alta desde la aplicación, con el nombre como único dato obligatorio.
   - Todo funciona en las dos interfaces (ADR-014) y sin conexión: elegir el cliente, cobrar y marcar como pagada (RNF-10, RNF-20).
-  - [NEEDS CLARIFICATION: ¿qué rol puede marcar una venta como pagada y ver lo que debe cada cliente: el Vendedor, el Administrador o los dos? El caso de uso nombra al Vendedor; los permisos por rol (RF-72) no lo definen.]
 - **RF-41**: Cuenta corriente completa: saldo, pagos parciales, antigüedad de la deuda y resumen para mandar.
   - Se registran pagos del cliente por un monto menor a lo que debe. Cada pago lleva fecha, monto y el usuario que lo registró, y no se borra ni se pisa.
   - El saldo de cada cliente se calcula a partir de sus ventas a cuenta corriente y sus pagos, y se explica con los números de origen (RF-13).
@@ -250,7 +249,7 @@ qué ese precio.
 
 - Los clientes importantes son unos 20; el sistema no se diseña para miles de clientes.
 - El Cliente no entra al sistema: todo lo que le toca (su deuda, su resumen) lo opera un usuario del local.
-- Qué rol puede cada operación de esta capacidad depende de los permisos por rol (RF-72); mientras eso no esté decidido, las historias nombran al rol que el caso de uso menciona y la pregunta queda marcada.
+- En esta primera versión todos los usuarios son Administrador y pueden hacer todo (decisión 18 del 2026-10-10; RF-72). Las historias nombran al Vendedor o al Administrador para decir quién hace ese trabajo en el local, no para restringirlo.
 - El saldo a favor de un cliente (por una devolución) queda fuera de esta capacidad: llega con las devoluciones (RF-24b).
 - Mientras RF-43 no esté definido, el precio distinto de un cliente importante se resuelve con el precio a mano del renglón de la venta, que pertenece a la capacidad de ventas.
 - Las ventas del día, anular y corregir una venta pertenecen a la capacidad de ventas (RF-23); acá solo se dice cómo afectan a la deuda del cliente.

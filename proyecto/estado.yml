@@ -19,7 +19,6 @@ RF-01:
   defectos:
     - "Los productos que dejan de aparecer en una lista no se dan de baja al confirmarla; solo se cuentan en el resumen"
     - "Un archivo cuyo proveedor no se reconoce se rechaza sin guardarlo; la regla pide que quede guardado para revisarlo"
-    - "Cualquier usuario con sesión carga, aplica y descarta listas; no se exige ningún rol"
     - "Sin prueba: descartar una lista desde la interfaz, elegir el proveedor a mano cuando no se reconoce, indicar la fecha cuando la planilla no la trae, el avance mientras se aplica y la búsqueda de duplicados al terminar"
     - "Sin medición de que cargar una lista lleve menos de un minuto"
     - "Las pruebas que respaldan la carga de listas no corren en cada push"
@@ -61,7 +60,7 @@ RF-05:
     - "El catálogo de más de 100.000 artículos no está probado; la búsqueda está probada con 50.000"
 
 RF-06:
-  estado: "Hecho en parte (#29): se aparta de la regla en 6 puntos"
+  estado: "Hecho en parte (#29): se aparta de la regla en 5 puntos"
   pruebas:
     - tests/e2e/escritorio/11-duplicados.spec.ts
     - tests/e2e/celular/11-duplicados.spec.ts
@@ -70,7 +69,6 @@ RF-06:
     - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
   defectos:
     - "Solo se sugieren duplicados con la misma descripción (sin acentos, símbolos ni espacios, de 8 caracteres o más); no por descripción similar"
-    - "En el celular, el recorrido de duplicados se le muestra a cualquier usuario aunque el servidor se lo niega a quien no administra"
     - "Unir productos modifica filas de los históricos de precios, ventas, compras y stock, y borra renglones de conteo repetidos (roza RNF-30)"
     - "Cambiar el proveedor del que sale el costo necesita conexión para verse reflejado; no queda guardado en el dispositivo"
     - "Separar una unión pide una confirmación, que la regla general de la interfaz no admite para lo que se puede deshacer"
@@ -123,7 +121,7 @@ RF-09b:
     - "Sin construir: no se puede buscar un producto por foto (segunda versión)"
 
 RF-10:
-  estado: "Hecho en parte (#13): se aparta de la regla en 3 puntos"
+  estado: "Hecho en parte (#13): se aparta de la regla en 2 puntos"
   pruebas:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
@@ -135,7 +133,6 @@ RF-10:
     - libraries/calculo-de-precios/src/precio.test.ts
   defectos:
     - "En el celular el producto sin margen dice «sin margen»; la regla dice «sin precio»"
-    - "Cualquier usuario con sesión cambia el margen; no se exige ningún rol"
     - "Un cambio guardado en el dispositivo que el servidor rechaza al reconectar se descarta sin avisar"
     - "Sin prueba del tiempo del cambio de margen (menos de 100 ms)"
 
@@ -216,7 +213,7 @@ RF-19:
     - "Las pruebas de hoy comprueban el redondeo del precio a mano: hay que cambiarlas junto con el código (#60)"
 
 RF-20:
-  estado: "Hecho en parte (#15): se aparta de la regla en 5 puntos"
+  estado: "Hecho en parte (#15): se aparta de la regla en 4 puntos"
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
@@ -230,7 +227,6 @@ RF-20:
     - microservices/gestion-del-local/src/rutas/ventas.test.ts
   defectos:
     - "En la computadora la venta se cobra con F2; el Enter final no la cierra, como pide la regla"
-    - "El servidor no exige el rol Vendedor para registrar una venta: alcanza con cualquier sesión (RF-72)"
     - "Un cambio guardado sin conexión que el servidor rechaza al reconectar se descarta sin avisar si la venta ya no está abierta"
     - "La venta de la computadora acepta un código tipeado por un lector USB, y la regla dice que el único lector es la cámara del celular (RNF-41)"
     - "Sin prueba: quitar un renglón, sumar al mismo renglón al agregar dos veces un producto, el aviso de stock negativo y el rechazo del servidor con la venta armada"
@@ -238,7 +234,7 @@ RF-20:
     - "Los 20 segundos de una venta de 3 productos no están medidos en el mostrador (RNF-02)"
 
 RF-20b:
-  estado: "Hecho en parte (#15): se aparta de la regla en 3 puntos"
+  estado: "Hecho en parte (#15): se aparta de la regla en 2 puntos"
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
@@ -251,7 +247,6 @@ RF-20b:
     - "Sin prueba que mida que el cambio de margen responde en menos de 100 ms (RNF-07)"
     - "La explicación del subtotal paso por paso solo tiene prueba en el celular"
     - "El precio a mano de un renglón se redondea para arriba a $1.000; la regla pide respetarlo y avisar (#60)"
-    - "El costo y los márgenes se muestran a cualquier usuario con sesión; la regla del 2026-10-10 los deja para el Administrador (#59)"
 
 RF-21:
   estado: "Hecho en parte (#15): se aparta de la regla en 1 punto"
@@ -289,7 +284,6 @@ RF-23:
   defectos:
     - "No se puede corregir una venta: solo anularla y cargarla de nuevo"
     - "No se pueden ver las ventas de días anteriores: el servidor acepta la fecha, pero ninguna interfaz la pide"
-    - "El servidor no exige rol para ver ni para anular ventas: alcanza con cualquier sesión (RF-72)"
     - "Anular pide el motivo en un cuadro del navegador, que es una ventana de confirmación"
     - "Anular sin conexión no se guarda en el dispositivo y falla sin avisar"
     - "Las ventas del día no se ven sin conexión: se piden siempre al servidor"
@@ -381,7 +375,6 @@ RF-40:
     - "Marcar como pagada sin conexión no existe: no hay cola en el dispositivo para ese cambio"
     - "El permiso de cuenta corriente del cliente no se controla al vender, y la base y la API no coinciden en su valor por omisión (la base lo deja en falso, la API lo crea en verdadero)"
     - "Sin clientes cargados, el celular avisa que no hay clientes pero no dice cómo cargar uno; la computadora muestra la lista vacía sin ningún aviso"
-    - "Las rutas de clientes y de marcar como pagada no exigen ningún rol: alcanza con tener sesión"
 
 RF-41:
   estado: "Pendiente (#43)"
@@ -407,14 +400,13 @@ RF-43:
     - "No hay nada propio de clientes para el precio distinto: se resuelve poniendo el precio a mano en el renglón de la venta, sin que quede ligado al cliente ni se explique por su condición"
 
 RF-50:
-  estado: "Hecho en parte (#30): se aparta de la regla en 11 puntos"
+  estado: "Hecho en parte (#30): se aparta de la regla en 10 puntos"
   pruebas:
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts
     - clientes/gestion-del-local-web/src/escritorio/pantallas/Compras.test.tsx
     - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
   defectos:
-    - "Registrar y anular una compra solo piden sesión: no se exige el rol Comprador (RF-72)"
     - "El ingreso de mercadería de la computadora no recibe códigos escaneados con el celular vinculado; solo se escanea en el celular"
     - "No se puede guardar la foto del comprobante con la compra"
     - "El ingreso no se precarga desde un pedido (RF-55) ni desde la foto de la factura (RF-51)"
@@ -434,13 +426,12 @@ RF-51:
     - "Sin construir: no se puede cargar una factura desde una foto"
 
 RF-52:
-  estado: "Hecho en parte (#31): se aparta de la regla en 9 puntos"
+  estado: "Hecho en parte (#31): se aparta de la regla en 8 puntos"
   pruebas:
     - tests/e2e/escritorio/07-contar.spec.ts
     - tests/e2e/celular/07-contar.spec.ts
     - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
   defectos:
-    - "Contar, crear sectores y cerrar un conteo solo piden sesión: no se exige ningún rol (RF-72)"
     - "En el celular la cantidad contada solo acepta enteros, aunque el producto se venda a granel (RF-12)"
     - "Crear un sector, empezar un conteo y cerrarlo exigen conexión; solo contar un producto funciona sin internet. Qué exige la regla está preguntado en la spec (historia 4, escenario 13)"
     - "Al cerrar, la diferencia se calcula contra el stock del momento del cierre, no del momento en que se contó; está preguntado en la spec (historia 4, escenario 14)"
@@ -452,14 +443,13 @@ RF-52:
     - "No está medido que un sector de 100 productos se cuente en menos de 30 minutos"
 
 RF-53:
-  estado: "Hecho en parte (#33): se aparta de la regla en 7 puntos"
+  estado: "Hecho en parte (#33): se aparta de la regla en 6 puntos"
   pruebas:
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
     - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
   defectos:
     - "El motivo al corregir el stock a mano es opcional y la regla lo pide"
-    - "Ver el stock, los costos y la plata invertida y corregir el stock solo piden sesión: no se exige ningún rol (RF-72)"
     - "No existe el valor del inventario por familia; el catálogo no tiene familias"
     - "El stock y su valorización no se pueden exportar a Excel"
     - "Los movimientos de un producto se cortan en los 200 más nuevos: con más, la lista ya no suma el stock que explica"
@@ -510,7 +500,6 @@ RF-60:
     - "En la computadora no hay ninguna vista de cómo va el negocio para el Administrador"
     - "El tablero no reúne la plata invertida en stock, el stock bajo, los pedidos de clientes, las listas de precios sin aplicar, lo más vendido ni las novedades del día"
     - "Lo vendido en el día no se puede tocar para ver la cuenta que lo explica; solo se ve la lista de ventas debajo"
-    - "Lo vendido en el día lo ve cualquier usuario con sesión y no solo el Administrador; la API no exige rol"
     - "Que cargue en menos de 2 segundos en el celular no tiene prueba"
 
 RF-61:
@@ -538,7 +527,7 @@ RF-64:
     - "No hay nada construido: no se cargan gastos ni se calcula el resultado mensual, los últimos 12 meses ni el punto de equilibrio"
 
 RF-65:
-  estado: "Hecho en parte (#30): se aparta de la regla en 11 puntos"
+  estado: "Hecho en parte (#30): se aparta de la regla en 10 puntos"
   pruebas:
     - tests/e2e/celular/05-compras.spec.ts
     - tests/e2e/escritorio/05-compras.spec.ts
@@ -552,7 +541,6 @@ RF-65:
     - "En el celular, donde se registran las compras, se ve solo el total, sin el detalle por proveedor"
     - "El importe de un proveedor no se abre para ver las compras que lo forman, en ninguna interfaz"
     - "No dice hasta qué día cuenta, y en el celular donde se registran las compras tampoco desde qué día"
-    - "Lo puede pedir cualquier usuario con sesión: la API no exige el rol Comprador o Administrador"
     - "En la computadora el Administrador solo lo ve donde se registran las compras, porque no hay vista de negocio"
     - "Sin conexión o con error del servidor no avisa nada: el bloque queda sin número o no aparece"
     - "El primer día de la semana que informa la API se calcula con la hora UTC y no con la del local, y puede no coincidir con el que usa la suma"
@@ -605,15 +593,16 @@ RF-71:
     - "Los filtros de la API no tienen prueba"
 
 RF-72:
-  estado: "Pendiente (#59)"
-  pruebas: []
+  estado: "Hecho en parte (#59): todos los usuarios tienen que ser Administrador y poder todo; hoy hay tres roles con permisos distintos"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/usuarios.test.ts
+    - tests/integration/autenticacion.sh
   defectos:
-    - "Los roles Administrador, Vendedor y Comprador no existen: el código usa dueño, admin y mostrador (#59)"
-    - "Cada usuario tiene un solo rol; no se pueden combinar"
-    - "Vender, anular ventas, registrar y anular compras, contar y corregir stock, cargar listas y elegir márgenes solo exigen sesión, sin ningún rol"
+    - "El código usa tres roles (dueño, admin y mostrador) con permisos distintos; la regla de esta versión es un solo rol, Administrador, que puede todo (decisión 18 del 2026-10-10, #59)"
+    - "Un usuario con rol mostrador no puede administrar usuarios, sesiones, proveedores ni duplicados, ni ver quién hizo qué"
+    - "Un admin no puede crear ni modificar a un dueño: la regla de esta versión no distingue entre Administradores (pregunta abierta P4)"
+    - "Al autorizar a alguien se elige uno de los tres roles; la regla dice que toda persona autorizada entra como Administrador"
     - "No hay control de último Administrador: un dueño puede desactivar o bajar de rol a otro dueño hasta dejar el sistema sin ninguno activo"
-    - "Las ventas del día y los gastos de la semana se muestran a cualquier usuario; «ver cómo va el negocio» es del Administrador"
-    - "Nadie puede cambiarse el rol a sí mismo, ni siquiera para sumarse otro; la regla escrita solo impide desactivarse y quitarse el rol Administrador (pregunta abierta P5)"
 
 RF-73:
   estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
@@ -668,7 +657,6 @@ RNF-04:
     - tests/e2e/celular/00-arranque.spec.ts
   defectos:
     - "La letra mínima de 18 px del sistema visual no se cumple en el celular: la base es de 16 px y hay textos de 11 a 15 px"
-    - "El diseño de referencia del celular (mockups/Ferre iOS.html) no está en el repositorio"
     - "Sin prueba: que ninguna pantalla del celular se desplace hacia el costado"
     - "Sin prueba: que la interfaz cambie al cruzar los 900 px con la app abierta"
 
@@ -911,7 +899,7 @@ general:
   estado: ""
   pruebas: []
   defectos:
-    - "usuario.rol admite un solo rol entre dueño, admin y mostrador; la regla pide Administrador, Vendedor y Comprador, combinables (decisión 8 del 2026-10-09, RF-72)"
+    - "usuario.rol admite dueño, admin y mostrador, con permisos distintos; la regla de esta versión es un solo rol, Administrador, que puede todo (decisión 18 del 2026-10-10, RF-72)"
     - "La tabla vinculacion quedó en la base sin uso desde que se quitó la entrada por QR (ADR-011, enmienda del 2026-10-09)"
     - "producto.unidad es texto libre en la base: los valores unidad, kg, m y l los valida solo la API"
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"

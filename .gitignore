@@ -34,5 +34,3 @@ microservices/mostrador/api/public/
 deployment/*/.env
 deployment/*/*/.env
 
-# Mockups de referencia (imágenes pesadas, no se versionan)
-mockups/

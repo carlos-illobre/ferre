@@ -34,12 +34,23 @@
 ### Session 2026-10-10
 
 - Q: ¿Cuántos actores hay? → A: Cuatro: Dueño, Empleado, Cliente y Proveedor (decisión 14).
-- Q: ¿Qué rol puede cargar listas de precios, elegir márgenes, contar stock, unir duplicados, ver costos, ver las ventas del día y anular ventas? → A: Por ahora, el Administrador. Más adelante se reparten mejor, con más roles; por ahora no importa (decisión 15; RF-72).
+- Q: ¿Qué rol puede cargar listas de precios, elegir márgenes, contar stock, unir duplicados, ver costos, ver las ventas del día y anular ventas? → A: Por ahora, el Administrador (decisión 15). Ese mismo día Carlos lo amplió: ver la respuesta siguiente.
+- Q: ¿Qué puede hacer cada rol? → A: En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo. Está decidido que van a existir distintos roles, pero los otros (Vendedor, Comprador) no se usan por ahora y qué puede cada uno se define más adelante, cuando se analicen los roles en profundidad (decisión 18, que reemplaza el reparto de la decisión 15; RF-72).
 
 ## User Scenarios & Testing *(mandatory)*
 
 En las historias se nombra el rol (Administrador, Vendedor, Comprador), no la persona.
-«Cualquier usuario» quiere decir alguien autorizado y activo, con el rol que sea.
+«Cualquier usuario» quiere decir alguien autorizado y activo.
+
+**En esta primera versión todos los usuarios son Administrador y el Administrador puede
+hacer todo** (decisión 18 del 2026-10-10). Los roles Vendedor y Comprador van a existir,
+pero no se usan todavía y sus permisos no están definidos. Por eso:
+
+- Donde una historia de cualquier capacidad nombra al Vendedor o al Comprador, dice quién
+  hace ese trabajo en el local; en esta versión lo hace un usuario Administrador.
+- Los escenarios que hablan de un usuario «sin el rol Administrador», o con solo otro rol,
+  no se pueden dar en esta versión: quedan para cuando se definan los permisos. En esta
+  especificación están marcados «(etapa posterior)».
 
 ### User Story 1 - Entrar solo si estás autorizado (Priority: P1)
 
@@ -51,13 +62,13 @@ sesión y no vuelve a pedir nada.
 extraño vea costos, márgenes y ventas.
 
 **Independent Test**: abrir la app en un dispositivo sin sesión y ver que solo ofrece
-entrar; entrar con un correo autorizado y ver el nombre y los roles; intentar con un correo
+entrar; entrar con un correo autorizado y ver el nombre; intentar con un correo
 sin autorizar y ver que no entra.
 
 **Acceptance Scenarios**:
 
 1. **Given** un dispositivo sin sesión guardada, **When** se abre la app, **Then** lo único que se puede hacer es entrar, con Google o con la huella; no hay campo de contraseña ni forma de entrar leyendo un código QR.
-2. **Given** un correo de Google autorizado y activo, **When** el usuario entra con Google y Google confirma la cuenta, **Then** se abre una sesión en ese dispositivo, la app muestra su nombre y sus roles, y queda registrado el inicio de sesión con el medio «Google».
+2. **Given** un correo de Google autorizado y activo, **When** el usuario entra con Google y Google confirma la cuenta, **Then** se abre una sesión en ese dispositivo, la app muestra su nombre, y queda registrado el inicio de sesión con el medio «Google».
 3. **Given** un correo de Google que nadie autorizó, **When** entra con Google, **Then** no se abre sesión y la app muestra el correo, dice que no está autorizado y que tiene que pedirle el alta a un Administrador.
 4. **Given** un usuario desactivado, **When** entra con Google, **Then** pasa lo mismo que con un correo sin autorizar.
 5. **Given** un pedido de entrada sin la confirmación de Google, o con una que Google no reconoce, **When** llega al servidor, **Then** se rechaza y no se abre sesión.
@@ -69,59 +80,56 @@ sin autorizar y ver que no entra.
 
 ---
 
-### User Story 2 - Autorizar a alguien y administrar usuarios y roles (Priority: P1)
+### User Story 2 - Autorizar a alguien y administrar usuarios (Priority: P1)
 
 El Administrador ve quién puede entrar, autoriza a alguien cargando su nombre y su correo
-de Google con uno o más roles, le agrega o le quita roles, y lo desactiva o lo reactiva.
-El sistema nunca queda sin un Administrador activo.
+de Google, y lo desactiva o lo reactiva. En esta versión toda persona autorizada entra como
+Administrador; asignar y quitar otros roles es de una etapa posterior. El sistema nunca
+queda sin un Administrador activo.
 
 **Why this priority**: autorizar un correo es la única forma de que alguien más entre,
-darle roles es lo que decide qué puede hacer, y desactivarlo es la baja de un empleado.
+y desactivarlo es la baja de un empleado.
 
-**Independent Test**: como Administrador, autorizar un correo con el rol Vendedor,
-agregarle Comprador, quitárselo, desactivarlo y reactivarlo; comprobar que cada paso queda
+**Independent Test**: como Administrador, autorizar un correo, entrar con él,
+desactivarlo y reactivarlo; comprobar que cada paso queda
 en «quién hizo qué» y que el único Administrador no se puede dar de baja.
 
 **Acceptance Scenarios**:
 
-1. **Given** un Administrador con sesión, **When** abre la administración de usuarios, **Then** ve a todos los usuarios, activos y desactivados, cada uno con su nombre, su correo, sus roles y si está activo.
-2. **Given** un Administrador, **When** carga un nombre, un correo de Google y al menos un rol y lo autoriza, **Then** el usuario aparece en la lista, puede entrar con ese correo y queda registrado quién lo autorizó.
-3. **Given** un alta sin nombre, con un correo mal escrito o sin ningún rol, **When** el Administrador la confirma, **Then** no se crea nada y el error dice qué corregir.
+1. **Given** un Administrador con sesión, **When** abre la administración de usuarios, **Then** ve a todos los usuarios, activos y desactivados, cada uno con su nombre, su correo y si está activo.
+2. **Given** un Administrador, **When** carga un nombre y un correo de Google y lo autoriza, **Then** el usuario aparece en la lista como Administrador, puede entrar con ese correo y hacer todo, y queda registrado quién lo autorizó.
+3. **Given** un alta sin nombre o con un correo mal escrito, **When** el Administrador la confirma, **Then** no se crea nada y el error dice qué corregir.
 4. **Given** un correo que ya está cargado, **When** se lo intenta autorizar de nuevo, **Then** no se duplica y el Administrador ve que ese correo ya existe. Mayúsculas y minúsculas no distinguen un correo de otro.
-5. **Given** un usuario con el rol Vendedor, **When** el Administrador le agrega Comprador, **Then** el usuario tiene los dos roles, puede hacer lo de ambos y el cambio queda registrado con quién lo hizo.
-6. **Given** un usuario con los roles Vendedor y Comprador, **When** el Administrador le quita Comprador, **Then** conserva Vendedor y deja de poder hacer lo que era solo del Comprador desde su próxima operación, sin tener que volver a entrar.
-7. **Given** un usuario con un solo rol, **When** el Administrador intenta quitárselo, **Then** no se guarda: un usuario activo tiene al menos un rol; para que no pueda hacer nada se lo desactiva.
+5. (etapa posterior) **Given** un usuario con el rol Vendedor, **When** el Administrador le agrega Comprador, **Then** el usuario tiene los dos roles, puede hacer lo de ambos y el cambio queda registrado con quién lo hizo.
+6. (etapa posterior) **Given** un usuario con los roles Vendedor y Comprador, **When** el Administrador le quita Comprador, **Then** conserva Vendedor y deja de poder hacer lo que era solo del Comprador desde su próxima operación, sin tener que volver a entrar.
+7. (etapa posterior) **Given** un usuario con un solo rol, **When** el Administrador intenta quitárselo, **Then** no se guarda: un usuario activo tiene al menos un rol; para que no pueda hacer nada se lo desactiva.
 8. **Given** un usuario con sesiones abiertas, **When** el Administrador lo desactiva, **Then** se le cierran todas las sesiones, no puede volver a entrar ni con Google ni con la huella, y sigue en la lista como desactivado.
-9. **Given** un usuario desactivado, **When** el Administrador lo reactiva, **Then** vuelve a poder entrar con los roles que tenía.
+9. **Given** un usuario desactivado, **When** el Administrador lo reactiva, **Then** vuelve a poder entrar.
 10. **Given** un Administrador, **When** intenta desactivarse o quitarse el rol Administrador a sí mismo, **Then** no se guarda y la app le dice que eso lo tiene que hacer otro Administrador.
 11. **Given** un único Administrador activo en el sistema, **When** alguien intenta desactivarlo o quitarle el rol Administrador por cualquier camino, **Then** no se guarda: el sistema nunca queda sin un Administrador activo.
-12. **Given** un usuario sin el rol Administrador, **When** intenta ver la lista de usuarios, autorizar a alguien o cambiar roles, desde la app o pidiéndoselo directo al servidor, **Then** la app no se lo ofrece y el servidor lo rechaza sin cambiar nada.
+12. (etapa posterior) **Given** un usuario sin el rol Administrador, **When** intenta ver la lista de usuarios, autorizar a alguien o cambiar roles, desde la app o pidiéndoselo directo al servidor, **Then** la app no se lo ofrece y el servidor lo rechaza sin cambiar nada.
 
 ---
 
-### User Story 3 - Cada rol puede lo suyo y nada más (Priority: P1)
+### User Story 3 - Todos son Administrador y pueden todo (Priority: P1)
 
-Cada operación del sistema exige un rol. Lo que el usuario no puede hacer no se le ofrece,
-y el servidor lo rechaza aunque se lo pidan sin pasar por la app. Quien tiene varios roles
-puede lo de todos ellos. Qué rol exige cada operación está en la «Matriz de permisos».
+En esta primera versión hay un solo rol en uso: Administrador. Todo usuario autorizado lo
+tiene y puede hacer todo lo que el sistema ofrece. Lo único que el servidor exige es una
+sesión vigente de un usuario activo. Los permisos por rol llegan en una etapa posterior.
 
-**Why this priority**: es la regla que permite sumar a una persona nueva dándole solo los
-permisos mínimos y necesarios.
+**Why this priority**: son pocos usuarios, todos de confianza; repartir permisos antes de
+analizar los roles en profundidad complicaría el mostrador sin proteger nada.
 
-**Independent Test**: con un usuario solo Vendedor, uno solo Comprador y uno con los tres
-roles, recorrer cada operación de la matriz desde las dos interfaces y pidiéndosela directo
-al servidor, y comparar con la matriz.
+**Independent Test**: autorizar un usuario nuevo, entrar con él y recorrer todas las
+operaciones del sistema, en el celular y en la computadora.
 
 **Acceptance Scenarios**:
 
-1. **Given** un usuario con solo el rol Vendedor, **When** usa la app, **Then** puede vender y registrar ventas, y no se le ofrece registrar compras, anular ventas, ver las ventas del día, contar stock, cargar listas, elegir márgenes, unir duplicados ni administrar usuarios, sesiones o «quién hizo qué».
-2. **Given** un usuario con solo el rol Vendedor, **When** le pide directo al servidor registrar una compra, autorizar un usuario o ver «quién hizo qué», **Then** el servidor rechaza las tres y nada cambia.
-3. **Given** un usuario con solo el rol Comprador, **When** usa la app, **Then** puede recibir mercadería y registrarla, y no se le ofrece vender, contar stock, cargar listas ni administrar.
-4. **Given** un usuario con solo el rol Comprador, **When** le pide directo al servidor registrar una venta o autorizar un usuario, **Then** el servidor rechaza las dos y nada cambia.
-5. **Given** un usuario con los roles Vendedor y Comprador, **When** usa la app, **Then** puede vender y registrar compras, y no administrar.
-6. **Given** un usuario con el rol Administrador, **When** usa la app, **Then** puede crear usuarios, asignar roles, cerrar sesiones, ver quién hizo qué y ver cómo va el negocio, y además cargar listas de precios, elegir márgenes, unir duplicados, contar stock, ver costos, ver las ventas del día y anular ventas.
-7. **Given** una operación rechazada por no tener el rol, **When** el usuario la ve rechazada, **Then** el mensaje dice qué rol se necesita, y el rechazo no le cierra la sesión.
-8. **Given** cualquier usuario, **When** mira la app, **Then** ve su nombre y los roles que tiene.
+1. **Given** un usuario autorizado y activo, **When** usa la app, **Then** es Administrador y se le ofrecen todas las operaciones: vender, ver y anular ventas, registrar compras, contar y corregir stock, cargar listas, elegir márgenes, unir duplicados, ver costos, ver cómo va el negocio y administrar usuarios, sesiones y «quién hizo qué».
+2. **Given** un usuario autorizado y activo, **When** le pide cualquier operación directo al servidor, **Then** el servidor la acepta: no la rechaza por rol.
+3. **Given** cualquier usuario, **When** mira la app, **Then** ve su nombre.
+4. **Given** alguien sin sesión, o un usuario desactivado, **When** le pide cualquier operación al servidor, **Then** el servidor la rechaza (historia 1).
+5. (etapa posterior) **Given** roles con permisos distintos ya definidos, **When** un usuario usa la app, **Then** se le ofrece solo lo que sus roles permiten y el servidor rechaza lo demás, diciendo qué rol se necesita y sin cerrarle la sesión.
 
 ---
 
@@ -176,7 +184,7 @@ ver la entrada.
 4. **Given** un dispositivo cuya sesión se cerró a distancia, **When** hace su próximo pedido al servidor, **Then** el servidor lo rechaza, el dispositivo descarta la sesión guardada y vuelve solo a la entrada.
 5. **Given** un Administrador en la lista de sesiones, **When** cierra la suya, **Then** vuelve a la entrada y abrir la app de nuevo no entra sin autenticarse.
 6. **Given** cualquier usuario con sesión, **When** elige «Salir», **Then** vuelve a la entrada, esa sesión deja de valer en el servidor y queda registrado el cierre.
-7. **Given** un usuario sin el rol Administrador, **When** intenta ver las sesiones abiertas o cerrar la de otro, desde la app o pidiéndoselo directo al servidor, **Then** la app no se lo ofrece y el servidor lo rechaza.
+7. (etapa posterior) **Given** un usuario sin el rol Administrador, **When** intenta ver las sesiones abiertas o cerrar la de otro, desde la app o pidiéndoselo directo al servidor, **Then** la app no se lo ofrece y el servidor lo rechaza.
 8. **Given** una sesión abierta, **When** pasan 90 días sin que se use, **Then** vence y hay que volver a entrar; cada uso la extiende otros 90 días.
 
 ---
@@ -204,7 +212,7 @@ hizo qué», ver 3 páginas, filtrar por un usuario y un día y ver solo las suy
 8. **Given** un usuario, un día y un tipo elegidos a la vez, **When** el Administrador mira el resultado, **Then** ve solo las acciones que cumplen los tres, de a 10 por página, y al cambiar un filtro vuelve a la página 1.
 9. **Given** filtros que no coinciden con ninguna acción, **When** el Administrador mira el resultado, **Then** lee que no hay acciones con esos filtros y puede quitarlos de un paso.
 10. **Given** una acción que no hizo ningún usuario (el alta del primer Administrador), **When** figura en el registro, **Then** dice que la hizo el sistema.
-11. **Given** un usuario sin el rol Administrador, **When** intenta ver el registro, desde la app o pidiéndoselo directo al servidor, **Then** la app no se lo ofrece y el servidor lo rechaza.
+11. (etapa posterior) **Given** un usuario sin el rol Administrador, **When** intenta ver el registro, desde la app o pidiéndoselo directo al servidor, **Then** la app no se lo ofrece y el servidor lo rechaza.
 12. **Given** una acción ya registrada, **When** pasa el tiempo o se desactiva al usuario que la hizo, **Then** sigue en el registro tal como se anotó: el registro solo recibe acciones nuevas.
 
 ---
@@ -218,10 +226,8 @@ hizo qué», ver 3 páginas, filtrar por un usuario y un día y ver solo las suy
 - **Pedido de huella interrumpido.** Un pedido de vinculación o de entrada con la huella vale 5 minutos y un solo uso; si se interrumpe, el usuario empieza de nuevo y no queda nada a medias.
 - **Cambio de dirección de la app.** La vinculación de la huella queda atada a la dirección web de la app: si cambia, cada celular se vincula de nuevo (ADR-011).
 - **Sin conexión.** La sesión guardada se da por válida mientras no haya servidor que diga lo contrario. Los cambios de usuarios, roles y sesiones necesitan conexión: sin ella no se ofrecen, y la app lo dice.
-- **Cambio de roles con la sesión abierta.** Un cambio de roles vale desde la próxima operación del usuario, sin cerrarle la sesión.
-- **Operación en cola de alguien que perdió el permiso.** [NEEDS CLARIFICATION: P8, ver «Preguntas abiertas»]
+- **Operación en cola de alguien a quien desactivaron.** [NEEDS CLARIFICATION: P8, ver «Preguntas abiertas»]
 - **Computadora con lector de huella.** [NEEDS CLARIFICATION: P7, ver «Preguntas abiertas»]
-- **Vendedor sin el rol Administrador ante un producto sin precio.** [NEEDS CLARIFICATION: P10, ver «Preguntas abiertas»]
 - **Salir sin conexión.** [NEEDS CLARIFICATION: P9, ver «Preguntas abiertas»]
 - **El celular como lector de códigos de la computadora** (RF-08) usa un código QR, pero no es una forma de entrar: los dos dispositivos ya tienen sesión. Pertenece a la capacidad de catálogo.
 
@@ -233,83 +239,54 @@ Roles y actores son cosas distintas. El **rol** es lo que da permisos dentro del
 El **actor** es la persona real, y se lo nombra solo donde el rol no alcanza para describir
 el proceso.
 
-| Rol | Qué puede hacer |
-|---|---|
-| Administrador | Todo lo de administrar: crear usuarios, asignar roles, cerrar sesiones, ver quién hizo qué, ver cómo va el negocio |
-| Vendedor | Vender y registrar las ventas |
-| Comprador | Recibir la mercadería y registrarla |
+| Rol | En esta versión | Qué puede hacer |
+|---|---|---|
+| Administrador | El único en uso: lo tiene todo usuario | Todo |
+| Vendedor | No se usa todavía | Se define más adelante. La idea de partida: vender y registrar las ventas |
+| Comprador | No se usa todavía | Se define más adelante. La idea de partida: recibir la mercadería y registrarla |
 
-Son tres, se combinan y un usuario tiene uno o más. No hay otros roles ni niveles dentro de
-un rol.
+Está decidido que el sistema va a tener distintos roles y que los permisos se van a dar por
+rol. Cuáles van a ser, si se combinan en un mismo usuario y qué puede cada uno se define
+más adelante, cuando se analicen en profundidad (decisión 18 del 2026-10-10).
 
 | Actor | Quién es | Usa el sistema |
 |---|---|---|
-| Dueño | Administra la ferretería a distancia y decide precios, márgenes y prioridades | Sí, con el rol Administrador |
-| Empleado | Atiende el local | Sí, con los roles que se le asignen; el Empleado de la ferretería tiene los tres |
+| Dueño | Administra la ferretería a distancia y decide precios, márgenes y prioridades | Sí, como Administrador |
+| Empleado | Atiende el local | Sí, como Administrador |
 | Cliente | Quien compra; unos 20 son importantes, con cuenta corriente | No, no tiene rol |
 | Proveedor | Unos 50; mandan listas de precios | No, no tiene rol |
 
 Son cuatro (decisión 14 del 2026-10-10).
 
-### Matriz de permisos
+### Permisos
 
-«Sí» y «No» dicen lo que el rol permite **por sí solo**; un usuario con varios roles puede
-lo que permite cualquiera de ellos. Entrar, salir de la propia sesión y vincular o quitar
-los celulares propios lo puede cualquier usuario, sin importar el rol.
+En esta versión no hay matriz de permisos: el Administrador puede hacer todo y todos los
+usuarios son Administrador. Entrar, salir de la propia sesión y vincular o quitar los
+celulares propios lo puede cualquier usuario.
 
-| Operación | Administrador | Vendedor | Comprador |
-|---|---|---|---|
-| Vender y registrar ventas | [NEEDS CLARIFICATION: P1] | Sí | No |
-| Anular una venta | Sí | No | No |
-| Ver las ventas del día | Sí | No | No |
-| Registrar compras (recibir mercadería) | [NEEDS CLARIFICATION: P1] | No | Sí |
-| Contar stock | Sí | No | No |
-| Corregir stock | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] | [NEEDS CLARIFICATION: P2] |
-| Cargar listas de precios | Sí | No | No |
-| Elegir márgenes | Sí | No [NEEDS CLARIFICATION: P10] | No |
-| Unir duplicados | Sí | No | No |
-| Ver costos | Sí | No [NEEDS CLARIFICATION: P10] | No [NEEDS CLARIFICATION: P10] |
-| Dar de alta y modificar proveedores | Sí | No | No |
-| Administrar usuarios y roles | Sí | No | No |
-| Ver las sesiones abiertas y cerrar las de otros | Sí | No | No |
-| Quitar el celular vinculado de otro usuario | Sí | No | No |
-| Ver quién hizo qué | Sí | No | No |
-| Ver cómo va el negocio | Sí | [NEEDS CLARIFICATION: P3] | [NEEDS CLARIFICATION: P3] |
-
-Anular ventas, ver las ventas del día, contar stock, cargar listas, elegir márgenes, unir
-duplicados y ver costos son del Administrador por la decisión 15 del 2026-10-10: es un
-reparto provisorio, hasta que se separen mejor en más roles. Dar de alta y modificar
-proveedores es del Administrador por la historia 4 de la capacidad de catálogo.
-
-Las operaciones de requerimientos que no figuran acá (presupuestos, pedidos, cierre de caja,
-cuentas corrientes) fijan su rol en la especificación de su capacidad y se agregan a esta
-matriz.
+La matriz (qué rol exige cada operación) se escribe acá cuando se definan los roles. Hasta
+entonces, ninguna especificación de capacidad restringe una operación por rol.
 
 ### Preguntas abiertas
 
-- **P1** (RF-72) [NEEDS CLARIFICATION: ¿el rol Administrador, por sí solo, deja también vender y registrar compras, o solo administrar? Dicho de otro modo: ¿un usuario que es solo Administrador puede cobrar una venta, o para eso necesita además el rol Vendedor?]
-- **P2** (RF-72) [NEEDS CLARIFICATION: la decisión 15 dejó en el Administrador siete operaciones. De las que se habían preguntado queda una sin nombrar: ¿qué rol corrige el stock a mano? Y como regla general: ¿todo lo que no sea vender (Vendedor) ni recibir mercadería (Comprador) es, por ahora, del Administrador? Eso alcanzaría a corregir una venta, cargar y modificar clientes, marcar pagada una cuenta corriente, cerrar la caja, armar pedidos, la deuda con proveedores, las etiquetas y el plan de conteo, que hoy tienen su propia pregunta en cada capacidad.]
-- **P3** (RF-72) [NEEDS CLARIFICATION: «ver cómo va el negocio» y «ver las ventas del día» son del Administrador. ¿El Comprador ve los gastos de la semana cuando registra un ingreso (RF-65)? ¿Y quién cierra la caja (RF-62), si el efectivo esperado sale de las ventas del día?]
-- **P4** (RF-72, RF-73) [NEEDS CLARIFICATION: ¿un Administrador puede desactivar o quitarle el rol a cualquier otro Administrador, incluido el Dueño? RF-73 protegía al dueño de los demás administradores «para delegar la administración diaria sin ceder el control de quién manda»; con tres roles sin niveles esa protección desaparece, salvo que se decida conservarla.]
-- **P5** (RF-72, RF-73) [NEEDS CLARIFICATION: ¿un Administrador puede darse o quitarse a sí mismo los roles Vendedor y Comprador? Está escrito que nadie se desactiva ni se quita el rol Administrador a sí mismo; RF-73 decía además que nadie se cambia el rol a sí mismo, cuando el rol era uno solo.]
+- **P4** (RF-72, RF-73) [NEEDS CLARIFICATION: si todos son Administrador, cualquiera puede desactivar a cualquier otro, incluido el Dueño (lo único que el sistema impide es desactivarse a uno mismo y dejar el sistema sin ningún Administrador activo). Antes el dueño estaba protegido de los demás administradores. ¿Se acepta así para esta versión, o el Dueño tiene que quedar protegido?]
 - **P7** (RF-70b) [NEEDS CLARIFICATION: en una computadora que tiene lector de huella, ¿se puede vincular a mano y entrar con la huella, o la huella es solo para el celular y la computadora entra siempre con Google? Lo decidido es que en la computadora nunca se ofrece sola.]
-- **P8** (RF-72) [NEEDS CLARIFICATION: una venta cobrada sin conexión por alguien a quien, antes de que el dispositivo reconecte, se le quitó el rol Vendedor o se lo desactivó: ¿se registra igual al reconectar, porque nada del mostrador se pierde, o se rechaza?]
+- **P8** (RF-72) [NEEDS CLARIFICATION: una venta cobrada sin conexión por alguien a quien se desactivó antes de que el dispositivo reconecte: ¿se registra igual al reconectar, porque nada del mostrador se pierde, o se rechaza?]
 - **P9** (RF-74) [NEEDS CLARIFICATION: si el dispositivo no tiene internet, ¿«Salir» lo lleva igual a la entrada y la sesión se cierra en el servidor cuando reconecte, o no se puede salir sin conexión?]
-- **P10** (RF-72, RF-20, RF-50) [NEEDS CLARIFICATION: «ver costos» y «elegir márgenes» quedaron para el Administrador, pero dos casos de uso dependen de ellos. (a) La venta: el relevamiento del mostrador dice que quien vende ve costo, margen y precio y elige el margen ahí mismo. ¿Un usuario que es solo Vendedor ve nada más que el precio? Ante un producto sin precio, ¿le pone el precio a mano, o no lo puede vender hasta que un Administrador le elija el margen? (b) La compra: registrar un ingreso es cargar el costo de cada renglón, con el costo de la lista a la vista. ¿Un usuario que es solo Comprador ve y carga esos costos? Mientras el único Empleado tenga los tres roles, esto no se nota en el mostrador.]
 
 ### Functional Requirements
 
 - **RF-70**: Solo entran usuarios autorizados y activos, con su cuenta de Google o con la huella del celular. No hay contraseñas ni entrada por código QR. Se autoriza a alguien cargando su nombre y su correo de Google desde la app; quien no está autorizado ve que no lo está y a quién pedirle el alta. Todo pedido al servidor exige una sesión vigente. La sesión queda en el dispositivo, dura 90 días que se renuevan con el uso, y sigue sirviendo sin conexión hasta que el servidor diga lo contrario. Los intentos de entrada tienen un límite por minuto y por origen (ADR-011).
 - **RF-70b**: Un usuario vincula su celular a su cuenta para entrar con la huella, sin Google. La app lo ofrece sola la primera vez que se entra con Google desde un celular con lector de huella, una sola vez por dispositivo, y nunca en la computadora. Cada usuario ve sus celulares vinculados, vincula uno a mano y lo quita; un Administrador quita el de cualquiera. Del celular se guarda solo lo necesario para verificarlo: la huella nunca sale del aparato (ADR-011, enmiendas del 2026-09-14 y del 2026-09-15).
 - **RF-71**: Quién hizo qué. Cada acción queda registrada con el usuario que la hizo, cuándo, el tipo de acción y su detalle, y el registro solo recibe acciones nuevas. El Administrador lo consulta de la acción más reciente a la más vieja, de a 10 por página y con el total, y lo filtra por usuario, por fecha y por tipo de acción, combinando los filtros.
-- **RF-72**: Los permisos se dan por rol, con tres roles: Administrador, Vendedor y Comprador, combinables. Cada usuario tiene uno o más. Cada pantalla y cada operación exige el rol que le corresponde según la matriz de permisos, tanto en la app como en el servidor. Los roles se asignan y se quitan desde la administración de usuarios y cada cambio queda en «quién hizo qué». El sistema nunca queda sin un Administrador activo. Nadie se desactiva ni se quita el rol Administrador a sí mismo. Desactivar a un usuario le cierra todas las sesiones. Por ahora, todo lo que la matriz no le da al Vendedor ni al Comprador lo hace el Administrador; el reparto se va a afinar con más roles más adelante (decisión 15 del 2026-10-10).
-- **RF-73**: Reemplazado por RF-72 (decisión 8 del 2026-10-09; ADR-011, enmienda del 2026-10-09). Los roles dueño, admin y mostrador, de a uno por usuario, dejan de ser una regla. Equivalencia para pasar de unos a otros: dueño y admin reciben Administrador, Vendedor y Comprador; mostrador recibe Vendedor y Comprador. De RF-73 siguen valiendo, dentro de RF-72, las reglas que no dependen de esos nombres: nadie se desactiva a sí mismo y desactivar a un usuario le cierra las sesiones. Si se conserva la protección del dueño frente a otros administradores es la pregunta P4.
+- **RF-72**: Los permisos se dan por rol. En esta primera versión hay un solo rol en uso, Administrador: lo tiene todo usuario autorizado y puede hacer todo; el servidor solo exige una sesión vigente de un usuario activo. Van a existir otros roles (la idea de partida es Vendedor y Comprador), que todavía no se usan; cuáles son, si se combinan y qué puede cada uno se define más adelante, y recién entonces cada pantalla y cada operación exige su rol. El sistema nunca queda sin un Administrador activo. Nadie se desactiva a sí mismo. Desactivar a un usuario le cierra todas las sesiones (decisión 18 del 2026-10-10).
+- **RF-73**: Reemplazado por RF-72 (decisión 8 del 2026-10-09; ADR-011, enmienda del 2026-10-09). Los roles dueño, admin y mostrador dejan de ser una regla. Equivalencia para esta versión: los tres pasan a Administrador. De RF-73 siguen valiendo, dentro de RF-72, las reglas que no dependen de esos nombres: nadie se desactiva a sí mismo y desactivar a un usuario le cierra las sesiones. Si se conserva la protección del dueño frente a otros administradores es la pregunta P4.
 - **RF-74**: El Administrador ve las sesiones abiertas, con el usuario, el dispositivo y el último uso, y cierra cualquiera a distancia; la sesión cerrada deja de servir en el próximo pedido de ese dispositivo. Cualquier usuario sale de la suya. Cerrar la propia, por la lista o saliendo, vuelve a la entrada.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Usuario**: quién puede entrar. Correo de Google (único), nombre, uno o más roles y si está activo. No se borra: se desactiva.
-- **Rol**: Administrador, Vendedor o Comprador. Un usuario tiene uno o más; una operación exige uno o más.
+- **Usuario**: quién puede entrar. Correo de Google (único), nombre, rol y si está activo. No se borra: se desactiva.
+- **Rol**: en esta versión, solo Administrador. Los demás se definen más adelante.
 - **Sesión**: un dispositivo en el que un usuario está adentro. Tiene el dispositivo, el último uso, cuándo vence y si se cerró. Lo que el servidor guarda de ella no alcanza para entrar: una copia de los datos no sirve para hacerse pasar por nadie.
 - **Celular vinculado**: un celular que entra con la huella. Pertenece a un usuario; tiene el nombre que le puso, cuándo se vinculó, el último uso y si se quitó. No se borra: se quita.
 - **Acción registrada**: qué pasó, cuándo, quién lo hizo, desde qué dispositivo y el detalle. Solo se agregan.
@@ -325,7 +302,7 @@ El detalle del contrato del servidor está en [data-model.md](data-model.md) y
 - **SC-002**: Ningún usuario tiene que recordar una contraseña: las únicas formas de entrar son Google y la huella.
 - **SC-003**: En un celular vinculado se entra con un toque más la huella, sin elegir cuenta ni escribir nada.
 - **SC-004**: Una sesión cerrada a distancia deja de servir en el pedido siguiente de ese dispositivo.
-- **SC-005**: Para cada operación de la matriz de permisos y cada combinación de roles, lo que el servidor acepta o rechaza coincide con la matriz, y la app no ofrece nada que el servidor vaya a rechazar por rol.
+- **SC-005**: Todo usuario autorizado y activo puede hacer todas las operaciones del sistema; nada se rechaza por rol.
 - **SC-006**: En ningún momento el sistema tiene cero Administradores activos.
 - **SC-007**: El Administrador responde «qué hizo tal usuario tal día» eligiendo un usuario y una fecha, sin recorrer páginas.
 - **SC-008**: El registro de acciones nunca muestra más de 10 por página y siempre dice cuántas hay en total con los filtros puestos.
@@ -335,7 +312,7 @@ El detalle del contrato del servidor está en [data-model.md](data-model.md) y
 
 - Dueño y Empleado tienen cuenta de Google. Google tiene que estar disponible para la primera entrada de cada dispositivo; los que ya entraron y los celulares vinculados no dependen de él.
 - La sesión vive en el dispositivo: quien tenga el dispositivo desbloqueado opera como ese usuario. La respuesta es cerrar la sesión a distancia (RF-74).
-- Los permisos se controlan en cada operación, por eso un cambio de roles o una desactivación vale de inmediato.
+- La sesión se controla en cada operación, por eso una desactivación vale de inmediato.
 - Son tres usuarios (RNF-52): las listas de usuarios, sesiones y celulares vinculados entran enteras a la vista y no necesitan paginado ni búsqueda. El registro de acciones crece todos los días y por eso se pagina.
-- Cuentan como «computadora» y «celular» las dos interfaces de ADR-014.
-- Permisos más finos que los tres roles quedan fuera de esta etapa (docs/decisiones-de-negocio.md).
+- «Computadora» y «celular» son los dos lugares donde se usa el sistema (RNF-04, RNF-05); si son dos interfaces o una que se adapta lo decide el diseño.
+- Los permisos por rol quedan fuera de esta etapa: se definen cuando se analicen los roles en profundidad (decisión 18).

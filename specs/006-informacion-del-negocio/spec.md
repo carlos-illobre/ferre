@@ -301,8 +301,6 @@ que sale.
   - [NEEDS CLARIFICATION: ¿qué alertas trae el resumen? Por ejemplo: diferencia de caja,
     ventas anuladas, productos que quedaron con stock bajo, ventas con precio puesto a mano,
     pedidos de clientes prometidos para el día.]
-  - [NEEDS CLARIFICATION: en la app, ¿las novedades del día las ven solo los Administradores,
-    o también el Vendedor y el Comprador?]
 - **RF-64**: El sistema guarda los gastos del negocio y calcula el resultado de cada mes.
   - Un gasto tiene concepto, importe y mes al que corresponde; queda con el usuario que lo
     cargó, y corregirlo o darlo de baja no borra el valor anterior.
@@ -313,7 +311,7 @@ que sale.
   - Se ve el resultado de cada uno de los últimos 12 meses.
   - Se ve el punto de equilibrio: cuánto hay que vender por día para cubrir los gastos.
   - Los gastos fijos son además el dato de entrada para decidir márgenes con datos (RF-16).
-  - [NEEDS CLARIFICATION: ¿quién carga los gastos: solo el Administrador? Y un gasto fijo
+  - [NEEDS CLARIFICATION: un gasto fijo
     (alquiler, sueldo), ¿se carga una vez y se repite solo todos los meses hasta que se
     cambia, o se carga mes a mes?]
   - [NEEDS CLARIFICATION: además de los fijos, ¿qué gastos variables hay que poder cargar?
@@ -387,14 +385,10 @@ que sale.
 - La plata invertida en stock (RF-53), el stock bajo (RF-54), los pedidos de clientes
   (RF-26) y las listas de precios (RF-01, RF-04) se especifican en su capacidad; el tablero
   los muestra con las reglas de cada una.
-- Qué rol puede cada cosa lo fija RF-72. Esta especificación asigna el tablero, lo más
-  vendido, las novedades y el resultado al Administrador, como lo dice la decisión 8 del
-  2026-10-09. El cierre de caja al Vendedor y el gasto semanal al Comprador salen de los
-  casos de uso «Cerrar la caja» y «Registrar una compra», donde el rol se puso al pasar de
-  actores a roles: Carlos no los confirmó. [NEEDS CLARIFICATION: ¿cerrar la caja es del
-  Vendedor, y el Comprador ve el gasto de la semana donde registra las compras? Ver las
-  ventas del día quedó para el Administrador (decisión 15), y el efectivo esperado sale de
-  esas ventas. Es la pregunta P3 de la capacidad de usuarios y acceso.]
+- Qué rol puede cada cosa lo fija RF-72: en esta primera versión todos los usuarios son
+  Administrador y pueden hacer todo (decisión 18 del 2026-10-10). Las historias nombran al
+  Administrador, al Vendedor o al Comprador para decir quién hace ese trabajo en el local;
+  los escenarios de «un usuario sin el rol…» quedan para cuando se definan los permisos.
 - El gasto semanal cuenta lo comprado en la semana, esté pago o no. Lo que se les debe a
   los proveedores y cuándo vence es RF-56.
 - La ganancia de esta capacidad es bruta: lo vendido menos el costo de lo vendido. El costo
@@ -435,7 +429,9 @@ que sale.
 - Q: ¿Un precio puesto a mano que no es múltiplo de $1.000 se redondea? → A: No: se
   respeta y la venta lo avisa (decisión 16, RF-19). Para el cierre de caja: el efectivo
   esperado ya no es siempre múltiplo de $1.000; reemplaza lo dicho el 2026-10-09.
-- Q: ¿Quién ve las ventas del día? → A: Por ahora, el Administrador (decisión 15, RF-72).
+- Q: ¿Quién ve cada cosa de esta capacidad? → A: En esta primera versión todos los
+  usuarios son Administrador y el Administrador puede hacer todo; qué podrá cada rol se
+  define más adelante (decisión 18, RF-72).
 - Q: ¿La especificación describe lo que el código hace o lo que el negocio necesita? → A:
   Lo que el negocio necesita: es independiente del código y tiene que alcanzar para
   rehacer la aplicación (constitución, principio I).

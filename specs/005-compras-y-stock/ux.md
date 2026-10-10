@@ -3,11 +3,14 @@
 Qué tiene que poder hacer cada rol en cada recorrido de [spec.md](spec.md) y con qué
 reglas. No describe un diseño: no fija disposición, componentes ni estilos. El aspecto sale
 del sistema visual del proyecto; las reglas generales, de la constitución (principios II,
-III, IV y IX) y de ADR-014.
+III, IV y IX).
 
 ## Reglas que valen para todos los recorridos
 
-**Las dos interfaces.** Todo recorrido de esta capacidad existe en el celular y en la
+**Roles.** En esta versión todos los usuarios son Administrador y pueden hacer todo; el rol
+que nombra cada historia dice quién hace ese trabajo en el local.
+
+**En el celular y en la computadora.** Todo recorrido de esta capacidad existe en el celular y en la
 computadora, con las mismas reglas de negocio y los mismos textos. Ninguna de las dos es una
 versión recortada de la otra.
 

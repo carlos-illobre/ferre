@@ -34,12 +34,14 @@ Una pantalla más lenta que anotar en el cuaderno está mal, aunque sea más com
 El detalle visual (colores, tipografía, componentes) está en
 [docs/sistema-visual.md](../../docs/sistema-visual.md).
 
-### III. Dos interfaces, una app (ADR-014)
+### III. En el celular y en la computadora
 
-Celular y computadora son interfaces distintas sobre la misma API, con la misma paleta y
-la misma marca, y no comparten estilos. Toda funcionalidad con pantalla se hace en las dos,
-con su prueba en cada una. Un cambio en una no puede alterar la otra: se verifica con
-capturas de las dos, antes y después.
+Toda funcionalidad con pantalla se usa completa en el celular y en la computadora, con su
+prueba en cada uno: en el celular, con una mano y sin desplazarse hacia el costado; en la
+computadora, con el teclado y aprovechando todo el ancho. Cómo se logra lo decide el
+diseño: que hoy sean dos interfaces separadas (ADR-014), su disposición, sus componentes,
+su paleta y su marca son cómo está hecho hoy, no una regla. Un cambio pensado para uno no
+puede romper el otro: se verifica con capturas de los dos, antes y después.
 
 ### IV. Sin internet no se nota y no se pierde nada
 
@@ -61,8 +63,8 @@ cuando sus escenarios tienen pruebas que pasan; lo que solo se puede comprobar e
 mostrador figura «a validar» hasta que Carlos o el Vendedor lo confirman. Ese estado no se
 escribe en la especificación: vive en `proyecto/estado.yml`, con las pruebas que lo
 respaldan, y es lo único que hay que reiniciar si el código se rehace. Las unitarias
-corren en cada push; las de punta a punta cubren los caminos principales, una vez por
-interfaz. Sin meta de cobertura ni mutation testing (ADR-004).
+corren en cada push; las de punta a punta cubren los caminos principales, una vez en el
+celular y otra en la computadora. Sin meta de cobertura ni mutation testing (ADR-004).
 
 ### VII. Seguro por defecto
 
@@ -84,7 +86,8 @@ construye nada «para después».
 Código, comentarios, commits, documentación y textos de la app van en español. Se dice
 «cuenta corriente» y no «fiado», «lista» y no «importación», «costo» y no «precio de compra
 neto». En pantallas, historias y diagramas se nombra el rol (Administrador, Vendedor,
-Comprador), no la persona.
+Comprador), no la persona. En esta primera versión todos los usuarios son Administrador
+y el Administrador puede hacer todo; qué podrá cada rol se define más adelante.
 
 ### X. Toda decisión queda escrita
 
@@ -106,7 +109,9 @@ decisiones de negocio de Carlos se anotan con su fecha en la especificación que
 
 ## Flujo de trabajo
 
-Una funcionalidad, una carpeta en `specs/` y una rama con el mismo nombre.
+Una funcionalidad, una carpeta en `specs/`. **No hay ramas ni pull requests:** todo se
+sube directo a `master`, que es el ambiente de pruebas; lo que no está terminado no se sube
+en un estado que rompa las pruebas. Los comandos de Spec Kit no crean rama.
 
 | Paso | Rol | Cómo | Produce | Aprueba Carlos |
 |---|---|---|---|---|
@@ -119,7 +124,7 @@ Una funcionalidad, una carpeta en `specs/` y una rama con el mismo nombre.
 | 7 | Seguridad | subagente `seguridad` | Su sección de `verificacion.md` | No |
 | 8 | Revisión de UI/UX | subagente `revision-ux` | Capturas contra `ux.md` | No |
 | 9 | Verificador | subagente `verificador` | Veredicto en `verificacion.md` | Sí |
-| 10 | Cierre | `/cerrar` | Capacidad e índice al día, ADR, rama unida, issue cerrado | |
+| 10 | Cierre | `/cerrar` | Capacidad e índice al día, ADR, todo subido a `master`, issue cerrado | |
 
 ## Convenciones propias sobre Spec Kit
 
@@ -153,4 +158,9 @@ la aprobación de Carlos, anotando qué cambió y por qué, y subiendo la versi�
 verificador comprueba cada funcionalidad contra ella antes de dar su veredicto; lo que la
 incumple no se cierra.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10
+**Enmienda 1.2.0 (2026-10-10), por decisión de Carlos:** no hay ramas, todo va directo a
+`master` (flujo de trabajo); el principio III deja de exigir dos interfaces separadas y pasa
+a exigir que todo se use en el celular y en la computadora, sin atar el diseño; y en esta
+versión todos los usuarios son Administrador (principio IX).
+
+**Version**: 1.2.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-10

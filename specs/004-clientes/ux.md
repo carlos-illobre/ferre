@@ -5,8 +5,11 @@ regla en cada interfaz. No fija un diseño: cualquier diseño que cumpla esto va
 
 ## Reglas que valen para todos los recorridos
 
-- **Dos interfaces.** Cada recorrido existe en la computadora y en el celular, con la misma
-  marca y la misma paleta, cada una con su forma propia (ADR-014).
+- **En el celular y en la computadora.** Cada recorrido se hace completo en los dos, con la
+  misma marca y las mismas palabras; si son dos interfaces o una que se adapta lo decide el
+  diseño (constitución, principio III).
+- **Roles.** En esta versión todos los usuarios son Administrador y pueden hacer todo; el
+  rol que nombra cada historia dice quién hace ese trabajo en el local.
 - **Computadora:** todo se opera con teclado, de punta a punta; el mouse nunca es la única
   forma. El foco siempre se ve y, al terminar una acción, vuelve al lugar desde donde se
   sigue trabajando.
@@ -100,8 +103,6 @@ Si marcar como pagada pide confirmación o se puede deshacer depende de una preg
 de la historia 2 de la especificación.
 
 ## Historia 3: dar de alta un cliente importante
-
-El rol que puede hacerlo es una pregunta abierta de la especificación.
 
 **Tiene que poder:** cargar un cliente escribiendo solo el nombre, agregar el teléfono si
 quiere, y guardarlo.

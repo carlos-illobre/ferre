@@ -66,3 +66,17 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
 17. **Etapa de los pendientes nuevos.** Corregir ventas (#56) y marcar pagada una cuenta
     corriente (#57) van en el MVP; filtrar quién hizo qué (#58) y los roles nuevos (#59),
     en Administración remota.
+18. **Roles, en la primera versión.** Todos los usuarios son Administrador y el
+    Administrador puede hacer todo. Está decidido que van a existir distintos roles, pero
+    los otros no se usan por ahora; cuáles son y qué puede cada uno se define más adelante,
+    cuando se analicen en profundidad. Reemplaza el reparto de la decisión 15 y deja en
+    suspenso lo que la decisión 8 decía de Vendedor y Comprador (RF-72).
+19. **El rediseño no está atado a la interfaz de hoy.** Que sean dos interfaces separadas
+    que se eligen a los 900 px, las cuatro pestañas, las tarjetas, las tablas, el menú, la
+    paleta, la tipografía y la marca son cómo está hecho hoy, no una regla. Lo que ata son
+    los requerimientos de uso (RNF-01 a RNF-09) y los requerimientos de interfaz de cada
+    capacidad. Reemplaza lo que quedaba de la decisión 9.
+20. **Sin ramas.** Todo se sube directo a la rama de pruebas; no hay ramas ni pull
+    requests. Confirma lo pedido el 2026-09-13 y corrige la constitución.
+21. **La maqueta del celular se sube al repositorio,** como antecedente para el rediseño.
+22. **Prioridad.** Ahora la prioridad es la interfaz: el rediseño de UI y UX.

@@ -16,8 +16,11 @@ componentes, estilo) va en las maquetas.
 ## Antes de empezar
 
 1. Leé la `spec.md` de la funcionalidad. Si no está aprobada por Carlos, avisá y frená.
-2. Leé `.specify/memory/constitution.md` (principios II, III y IX), `docs/sistema-visual.md`
-   y `docs/adr/ADR-014-dos-interfaces-celular-y-escritorio.md`.
+2. Leé `.specify/memory/constitution.md` (principios II, III y IX) y
+   `specs/001-base-del-sistema/ux.md`, que reúne las reglas generales de interfaz y todo lo
+   que Carlos pidió sobre las pantallas. `docs/sistema-visual.md` y
+   `docs/adr/ADR-014-dos-interfaces-celular-y-escritorio.md` describen la interfaz de hoy:
+   sirven de antecedente y no atan el diseño.
 3. Leé el `ux.md` de las capacidades que la funcionalidad toca (`specs/001` a `specs/007`):
    lo nuevo tiene que ser coherente con esos recorridos.
 

@@ -76,3 +76,17 @@ El cliente web tiene dos interfaces que comparten todo lo que no es pantalla:
   administración pueden quedar solo en una interfaz.
 - Si aparece la app Android nativa (RNF-50): la interfaz de celular de la web pasa a ser
   la de respaldo.
+
+## Enmienda (2026-10-10): describe el código de hoy y no ata al rediseño
+
+Carlos decidió rehacer toda la interfaz (decisiones 13 y 19 de
+`docs/decisiones-de-negocio.md`). Que sean dos árboles de pantallas elegidos a los 900 px
+deja de ser una regla del proyecto: es cómo está construido el cliente web hoy. La
+constitución (principio III) ya no exige dos interfaces: exige que todo se use completo en
+el celular y en la computadora, y deja la forma al diseño. Si el rediseño resuelve los dos
+con una sola interfaz que se adapta, este ADR se reemplaza por el que documente esa
+decisión.
+
+Lo que este ADR dejó aprendido sigue valiendo como antecedente: una tarjeta pensada para el
+pulgar no se convierte en una fila pensada para el teclado solo cambiando estilos, y los
+`import()` de cada interfaz van en sentencias separadas para que no compartan estilos.

@@ -7,8 +7,11 @@ sistema visual del proyecto.
 
 ## Reglas que valen para todos los recorridos
 
-- **Dos interfaces (ADR-014).** Cada recorrido existe en la computadora y en el celular, con
-  la misma marca y las mismas palabras. Lo que cambia es cómo se opera.
+- **En el celular y en la computadora.** Cada recorrido se hace completo en los dos, con la
+  misma marca y las mismas palabras. Lo que cambia es cómo se opera. Si son dos interfaces
+  o una que se adapta lo decide el diseño (constitución, principio III).
+- **Roles.** En esta versión todos los usuarios son Administrador y pueden hacer todo; el
+  rol que nombra cada recorrido dice quién hace ese trabajo en el local.
 - **Computadora:** todo se hace con teclado; el mouse nunca es la única forma. El foco se ve
   siempre, sigue el orden del recorrido y vuelve a la búsqueda al terminar una acción. Lo
   que se abre encima se cierra con Escape. Aprovecha el ancho: se comparan muchos productos
@@ -68,8 +71,7 @@ tocar un resultado abre su ficha.
 
 ## Elegir el margen y ver el precio (historia 2 · RF-10, RF-13, RF-19)
 
-**Rol:** Administrador. Quien no lo es ve el precio y no las opciones de margen ni el costo
-(decisión 15 del 2026-10-10).
+**Rol:** Administrador; es también lo que hace quien vende, en el mostrador.
 
 **Tiene que poder:** elegir una de las cinco opciones (300 / 200 / 100 / 50 / 25 %) con un
 solo toque o una sola acción de teclado; tipear otro porcentaje; quitar el margen; ver al
@@ -106,7 +108,7 @@ porcentaje a mano abre el teclado numérico.
 
 ## Cargar la lista de un proveedor (historias 3, 11 y 12 · RF-01, RF-02, RF-03)
 
-**Rol:** Administrador (decisión 15 del 2026-10-10).
+**Rol:** Administrador.
 
 **Tiene que poder, en este orden:** entregar el archivo (elegirlo o, en la computadora,
 arrastrarlo); corregir el proveedor si el sistema no lo reconoció o lo reconoció mal; indicar

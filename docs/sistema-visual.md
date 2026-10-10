@@ -5,22 +5,21 @@ Viene de `docs/ux.md` (secciones «Sistema visual» y «Concreto»), pasado a es
 Rediseño del 2026-09-14. La decisión de tener dos interfaces está en
 [ADR-014](adr/ADR-014-dos-interfaces-celular-y-escritorio.md).
 
-> **Este documento describe la interfaz que hay hoy.** El 2026-10-10 Carlos decidió rehacer
-> toda la interfaz, celular y computadora (decisión 13 de
-> [decisiones-de-negocio.md](decisiones-de-negocio.md)). Hasta entonces las pantallas no se
-> tocan. Para rediseñar, la entrada es
-> [specs/001-base-del-sistema/ux.md](../specs/001-base-del-sistema/ux.md): reúne las reglas
-> que valen sea cual sea el diseño y todo lo que Carlos pidió sobre las pantallas. Si la
-> paleta, la tipografía y la marca de acá se conservan es una pregunta abierta.
+> **Este documento describe la interfaz que hay hoy, y no ata al rediseño.** El 2026-10-10
+> Carlos decidió rehacer toda la interfaz, celular y computadora, y que nada de cómo está
+> hecha hoy sea regla: ni las dos interfaces separadas, ni la disposición, ni los
+> componentes, ni la paleta, la tipografía o la marca (decisiones 13 y 19 de
+> [decisiones-de-negocio.md](decisiones-de-negocio.md)). Queda como antecedente. Para
+> rediseñar, la entrada es
+> [specs/001-base-del-sistema/ux.md](../specs/001-base-del-sistema/ux.md).
 
 ## Dos interfaces
 
 Hay dos interfaces sobre la misma app, con la misma paleta y la misma marca:
 
 - **Celular** (pantallas de menos de 900 px): el diseño de `mockups/Ferre iOS.html` (Claude
-  Design), una maqueta que no está en el repositorio porque la carpeta `mockups/` está
-  excluida del control de versiones. El 2026-10-09 el dueño la había aprobado tal como
-  está; el 2026-10-10 decidió rehacerla junto con la de computadora.
+  Design). El 2026-10-09 el dueño la había aprobado tal como está; el 2026-10-10 decidió
+  rehacerla junto con la de computadora.
   Vive en `src/App.tsx`, `src/pantallas/`, `src/componentes/` y `src/estilos.css` del
   cliente web.
 - **Computadora** (900 px o más): tablas a todo el ancho de la pantalla, menú completo arriba

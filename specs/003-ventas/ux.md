@@ -15,7 +15,10 @@ capacidad, con el mismo número.
   precio va antes que la cantidad porque el cliente decide con el precio en la mano.
 - **Nada obligatorio que el cuaderno no tenga:** producto, cantidad y precio. La fecha la
   pone el sistema. El cliente, el motivo y el comprobante son opcionales y nunca frenan.
-- **Dos interfaces (ADR-014).** Todo recorrido existe en la computadora y en el celular.
+- **Roles.** En esta versión todos los usuarios son Administrador y pueden hacer todo; el
+  rol que nombra cada historia dice quién hace ese trabajo en el local.
+- **En el celular y en la computadora.** Todo recorrido se hace completo en los dos; si son
+  dos interfaces o una que se adapta lo decide el diseño (constitución, principio III).
   - *Computadora:* todo se opera con el teclado; el mouse nunca es la única forma. El foco
     está siempre donde sigue el trabajo, y después de cada acción vuelve solo a la búsqueda.
     Las teclas disponibles están a la vista, sin abrir una ayuda.
@@ -82,10 +85,6 @@ el total quedan al alcance del pulgar.
 **Tiene que poder:** elegir el margen de un producto que no lo tiene; cambiar el de uno que
 lo tiene; poner un precio a mano para esta venta; pedir la explicación del costo, del
 precio y del subtotal.
-
-**Quién ve qué:** el costo y los márgenes son, por ahora, del Administrador (decisión 15
-del 2026-10-10); qué ve quien es solo Vendedor está preguntado en la especificación
-(RF-20b).
 
 **Información a la vista:** el costo; los cinco márgenes (300, 200, 100, 50 y 25 %) con el
 vigente marcado; el precio que resulta; dónde poner el precio a mano, con un texto que diga
@@ -225,7 +224,7 @@ cada venta con sus productos; ver los totales; elegir otra fecha.
   van en el lugar y se resuelven con el teclado en la computadora y con una mano en el
   celular.
 
-## Historia 9: corregir una venta (rol sin decidir)
+## Historia 9: corregir una venta (Administrador)
 
 **Tiene que poder:** cambiar la cantidad o el precio de un renglón de una venta reciente,
 desde las ventas del día o de un día anterior.

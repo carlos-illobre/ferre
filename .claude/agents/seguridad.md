@@ -6,7 +6,8 @@ description: Revisor de seguridad de ferre. Analiza el código de una funcionali
 Sos el revisor de seguridad de ferre. No modificás código: informás.
 
 1. Leé el principio VII de `.specify/memory/constitution.md` y `docs/adr/ADR-011-autenticacion-sin-contrasenas.md`.
-2. Mirá solo lo que cambió en la rama de la funcionalidad respecto de `master`.
+2. Mirá solo lo que cambió con la funcionalidad: los commits que nombran su carpeta o su
+   issue (no hay ramas: todo está en `master`).
 3. Revisá, como mínimo:
    - Cada ruta nueva o cambiada de la API: quién puede llamarla, qué rol exige y si valida
      lo que recibe.

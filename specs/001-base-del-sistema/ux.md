@@ -10,20 +10,30 @@ qué le gustó y qué no le gustó al dueño de cada versión que vio.
 
 ## En qué está la interfaz
 
-Carlos va a rehacer toda la interfaz, celular y computadora (decisión 13 del 2026-10-10).
-Hasta entonces las pantallas no se tocan. Qué de lo que hoy está escrito sobre la interfaz
-es regla para el rediseño y qué es solo cómo está hecha hoy está preguntado en RNF-04
-([spec.md](spec.md)) y en [preguntas-abiertas.md](../preguntas-abiertas.md).
+Carlos va a rehacer toda la interfaz, celular y computadora, y es la prioridad (decisión 13
+del 2026-10-10).
 
-Lo que sí es regla, se rediseñe como se rediseñe:
+**Nada de cómo está hecha hoy ata al diseño** (decisión 19): que sean dos interfaces
+separadas que se eligen a los 900 px de ancho, las cuatro pestañas del celular, las
+tarjetas, las hojas que suben desde abajo, las tablas y el menú de la computadora, la
+paleta, la tipografía y la marca son cómo está hecho hoy. Sirven de antecedente: están
+descriptos en `docs/sistema-visual.md` y en la maqueta del celular,
+`mockups/Ferre iOS.html`.
 
-- La constitución, principios II (la vara es el cuaderno y la calculadora), IV (sin
-  internet no se nota), V (todo número se explica) y IX (en castellano y con las palabras
-  del mostrador).
+Lo que sí es regla, se diseñe como se diseñe:
+
+- La constitución, principios II (la vara es el cuaderno y la calculadora), III (todo se
+  usa completo en el celular y en la computadora), IV (sin internet no se nota), V (todo
+  número se explica) y IX (en castellano y con las palabras del mostrador).
 - Los requerimientos de uso RNF-01 a RNF-09 y RNF-54 de [spec.md](spec.md).
-- Los requerimientos de interfaz de cada capacidad: qué tiene que poder hacer cada rol, qué
-  necesita ver, en qué orden y qué pasa en cada estado.
+- Los requerimientos de interfaz de cada capacidad: qué tiene que poder hacer quien usa el
+  sistema, qué necesita ver, en qué orden y qué pasa en cada estado.
 - Lo que sigue en este documento.
+
+**Roles.** En esta primera versión todos los usuarios son Administrador y pueden hacer
+todo (decisión 18). El diseño no tiene que ocultar ni restringir nada por rol. Donde un
+recorrido nombra al Vendedor o al Comprador, dice quién hace ese trabajo en el local: sirve
+para saber en qué situación se usa esa pantalla (en el mostrador, recibiendo mercadería).
 
 ## Dónde se usa
 
@@ -197,7 +207,10 @@ Prueba manual de punta a punta, pantalla por pantalla.
 
 ### 2026-10-10
 
-- **Toda la interfaz se rehace** (decisión 13).
+- **Toda la interfaz se rehace** (decisión 13) y es la prioridad. Nada de cómo está hecha
+  hoy ata al diseño (decisión 19).
+- **Roles.** Por ahora todos los usuarios son Administrador y el Administrador puede todo
+  (decisión 18).
 - **Precio a mano.** Se respeta tal cual; si no es múltiplo de $1.000 aparece un mensaje
   de alerta que lo dice (RF-19, RF-20b).
 
@@ -225,15 +238,12 @@ por vez, entera en el ancho de la pantalla y al alcance del pulgar.
 | Error | En el lugar, en castellano, con qué hacer; lo cargado no se pierde |
 | Sin conexión | Lo del mostrador funciona igual; un indicador siempre a la vista dice que no hay conexión y cuántos cambios están por enviar. Lo que necesita conexión lo dice antes de intentarlo |
 | Éxito | Se ve sin leer letra chica y deja listo el paso siguiente |
-| Sin permiso | Lo que el usuario no puede hacer por sus roles no se le ofrece; no se muestra deshabilitado (capacidad de usuarios y acceso) |
 
 ## Lo que no está decidido
 
 Está en [preguntas-abiertas.md](../preguntas-abiertas.md). Lo que más pesa para un rediseño:
 
-- Qué reglas de la interfaz de hoy valen para el rediseño (RNF-04).
-- Qué ve cada rol: costos, márgenes, ventas del día (pregunta P10 de la capacidad de
-  usuarios y acceso).
 - La letra mínima y cuánto es «alto contraste» (RNF-04, RNF-05).
 - La notebook y el celular del local, para saber en qué pantalla tiene que entrar todo
   (RNF-40).
+- A partir de cuánto tiempo una operación muestra su avance (RNF-09).
