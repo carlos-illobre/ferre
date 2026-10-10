@@ -38,8 +38,6 @@ export default defineConfig(({ command }) => {
         },
         workbox: {
           navigateFallback: "index.html",
-          // La interfaz nueva en revisión vive en /v2/ con su propio index.html.
-          navigateFallbackDenylist: [/\/v2\//],
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
           // Nada de la API ni de Google se cachea: siempre red.
           runtimeCaching: [],
@@ -47,7 +45,6 @@ export default defineConfig(({ command }) => {
       }),
     ],
     base: process.env.VITE_BASE ?? "/",
-    // Dos entradas: la interfaz actual en la raíz y la nueva, en revisión, en /v2/.
-    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { principal: "index.html", v2: "v2/index.html" } } },
+    build: { outDir: "dist", emptyOutDir: true },
   };
 });
