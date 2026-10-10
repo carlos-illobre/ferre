@@ -1,0 +1,15 @@
+/* Ventas del día. */
+.ventas-dia .entrada { width: auto; }
+.ventas-esqueleto { height: 96px; }
+.ventas-tarjeta { display: flex; flex-direction: column; gap: var(--e2); padding: var(--e3) var(--e4); }
+.ventas-tarjeta .boton { align-self: flex-start; }
+.ventas-renglones { display: flex; flex-direction: column; gap: var(--e1); }
+.ventas-renglones li { display: flex; justify-content: space-between; gap: var(--e3); font-weight: 600; }
+.ventas-renglones li .detalle { flex: none; font-weight: 400; }
+.ventas-tarjeta.anulada { color: var(--texto-3); }
+.ventas-tarjeta.anulada .tachable, .tabla .atenuada .tachable { text-decoration: line-through; }
+.ventas-pliegue { display: flex; align-items: center; gap: var(--e2); max-width: 100%; min-height: 32px; padding: 0 var(--e2) 0 0; border: 0; background: none; border-radius: var(--r-control); text-align: left; color: inherit; }
+.ventas-pliegue:hover { background: var(--azul-suave); }
+.ventas-pliegue .flecha { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--azul-suave); color: var(--azul); transition: transform var(--normal) ease-out; }
+.ventas-pliegue .flecha.abierta { transform: rotate(90deg); }
+.ventas-pliegue .nombre { flex: none; }
