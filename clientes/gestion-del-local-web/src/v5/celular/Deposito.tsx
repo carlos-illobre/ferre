@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { api, ErrorApi } from "../../api";
 import { enviarOEncolar } from "../../cola";
 import { useCatalogo } from "../../catalogo";
@@ -141,7 +142,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { product
 // ---------- Ingreso de mercadería ----------
 type Proveedor = { id: string; nombre: string; activo: boolean };
 type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoTexto: string; costoLista: number | null };
-type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; total: string; estado: string; proveedor: string; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[] };
+type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; foto: string | null; total: string; estado: string; proveedor: string; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[] };
 const COMPROBANTES = [{ valor: "factura", nombre: "Factura" }, { valor: "remito", nombre: "Remito" }, { valor: "sin_comprobante", nombre: "Sin" }] as const;
 
 // Ingreso de mercadería (issue #30): proveedor y comprobante → renglones con la búsqueda
@@ -152,7 +153,7 @@ function Ingreso() {
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [proveedorId, setProveedorId] = useState("");
   const [comprobante, setComprobante] = useState<(typeof COMPROBANTES)[number]["valor"]>("factura");
-  const [numero, setNumero] = useState("");
+  const [foto, setFoto] = useState<string | null>(null);
   const [fechaCompra, setFechaCompra] = useState(new Date().toISOString().slice(0, 10));
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
@@ -215,13 +216,13 @@ function Ingreso() {
       const r = await api<{ total: number; productos_nuevos: number; costos_actualizados: number }>("/compras", {
         method: "POST",
         body: JSON.stringify({
-          id: crypto.randomUUID(), proveedor_id: proveedorId, fecha: fechaCompra, comprobante_tipo: comprobante, comprobante_numero: numero || null,
+          id: crypto.randomUUID(), proveedor_id: proveedorId, fecha: fechaCompra, comprobante_tipo: comprobante, foto: comprobante === "sin_comprobante" ? null : foto,
           items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion, cantidad: x.cantidad, costo_unitario: x.costo })),
         }),
       });
       const n = renglones.length;
       setExito({ total: r.total, proveedor: proveedor?.nombre ?? "", detalle: `${n} ${n === 1 ? "renglón sumado" : "renglones sumados"} al stock · ${r.costos_actualizados} costo${r.costos_actualizados === 1 ? "" : "s"} actualizado${r.costos_actualizados === 1 ? "" : "s"} según el comprobante${r.productos_nuevos ? ` · ${r.productos_nuevos} producto${r.productos_nuevos === 1 ? "" : "s"} nuevo${r.productos_nuevos === 1 ? "" : "s"}` : ""}.` });
-      setRenglones([]); setNumero(""); setVersion((v) => v + 1);
+      setRenglones([]); setFoto(null); setVersion((v) => v + 1);
     } catch (e) {
       setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor. Registrar una compra necesita internet.");
     } finally {
@@ -239,7 +240,7 @@ function Ingreso() {
           <span>Proveedor</span><span className={`valor ${proveedor ? "" : "falta"}`}>{proveedor ? proveedor.nombre : "Elegir"}<Icono nombre="derecha" tam={14} grosor={2.5} /></span>
         </button>
         <div className="renglon"><span>Comprobante</span><div style={{ width: 220 }}><Segmentos chico opciones={COMPROBANTES.map((c) => ({ valor: c.valor, nombre: c.nombre }))} actual={comprobante} alElegir={setComprobante} /></div></div>
-        {comprobante !== "sin_comprobante" && <label className="renglon"><span>Número</span><input value={numero} onChange={(e) => setNumero(e.target.value)} placeholder="0001-00012345" inputMode="numeric" data-testid="numero" /></label>}
+        {comprobante !== "sin_comprobante" && <div style={{ padding: "10px 16px" }}><FotoDeFactura foto={foto} alCambiar={setFoto} nombre={comprobante === "remito" ? "remito" : "factura"} /></div>}
         <label className="renglon"><span>Fecha</span><input type="date" value={fechaCompra} onChange={(e) => setFechaCompra(e.target.value)} /></label>
       </div>
       </div>
@@ -312,7 +313,7 @@ function ComprasRecientes({ version }: { version: number }) {
   const cargar = () => Promise.all([api<CompraFila[]>("/compras").then(setFilas).catch(() => setFilas([])), api<{ total: number; desde: string }>("/compras/semana").then(setGastos).catch(() => undefined)]);
   useEffect(() => { void cargar(); }, [version]);
   if (filas.length === 0) return null;
-  const nombreComprobante = (c: CompraFila) => c.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${c.comprobante_tipo} ${c.comprobante_numero ?? "s/n"}`;
+  const nombreComprobante = (c: CompraFila) => c.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${c.comprobante_tipo}${c.comprobante_numero ? ` ${c.comprobante_numero}` : c.foto ? " con foto" : " sin foto"}`;
   async function anular(c: CompraFila) {
     const motivo = window.prompt(`¿Anular la compra de ${pesos(c.total)} a ${c.proveedor}? Motivo (opcional):`);
     if (motivo === null) return;
@@ -336,6 +337,7 @@ function ComprasRecientes({ version }: { version: number }) {
               </button>
               {abierta && (
                 <div style={{ padding: "0 16px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+                  {c.foto && <div style={{ display: "flex", alignItems: "center", gap: 12 }}><VerComprobante ruta={c.foto} /><small>Tocá la foto para leer el número o cualquier otro dato del comprobante.</small></div>}
                   <div className="movimientos">
                     {c.items.map((i, n) => <div key={n}><span>{Number(i.cantidad)} ×</span><span>{i.descripcion}</span><strong className="importe" style={{ fontSize: 16 }}>{pesos(Number(i.cantidad) * Number(i.costo_unitario))}</strong></div>)}
                   </div>

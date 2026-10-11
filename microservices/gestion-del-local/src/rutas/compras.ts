@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { Hono } from "hono";
+import { config } from "../config.js";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirSesion } from "../autenticacion.js";
@@ -13,13 +16,18 @@ compras.use("/*", exigirSesion);
 
 const COMPROBANTES = ["factura", "remito", "sin_comprobante"] as const;
 type ItemEntrada = { producto_id?: string | null; descripcion: string; marca?: string | null; cantidad: number; costo_unitario: number };
-type CompraEntrada = { id?: string; proveedor_id: string; fecha?: string; comprobante_tipo: (typeof COMPROBANTES)[number]; comprobante_numero?: string | null; nota?: string | null; items: ItemEntrada[] };
+type CompraEntrada = { id?: string; proveedor_id: string; fecha?: string; comprobante_tipo: (typeof COMPROBANTES)[number]; comprobante_numero?: string | null; foto?: string | null; nota?: string | null; items: ItemEntrada[] };
+const TIPOS_DE_FOTO: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
+const ARCHIVO_DE_FOTO = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
+const MAXIMO_DE_FOTO = 10 * 1024 * 1024;
+export const carpetaComprobantes = () => path.join(config.carpetaListas, "comprobantes");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function validar(v: CompraEntrada): string | null {
   if (v.id && !UUID.test(v.id)) return "El id de la compra tiene que ser un UUID";
   if (!v.proveedor_id || !UUID.test(v.proveedor_id)) return "Elegí el proveedor";
   if (!COMPROBANTES.includes(v.comprobante_tipo)) return `El comprobante es uno de ${COMPROBANTES.join(", ")}`;
+  if (v.foto && !ARCHIVO_DE_FOTO.test(v.foto)) return "La foto del comprobante no es válida";
   if (v.fecha && !/^\d{4}-\d{2}-\d{2}$/.test(v.fecha)) return "La fecha tiene que ser AAAA-MM-DD";
   if (!Array.isArray(v.items) || v.items.length === 0) return "La compra no tiene productos";
   for (const [i, it] of v.items.entries()) {
@@ -34,6 +42,43 @@ function fechaLegible(iso: string): string {
   const [a, m, d] = iso.split("-");
   return `${d}/${m}/${a}`;
 }
+
+// La foto del comprobante se sube sola, antes de registrar la compra. Queda suelta, a nombre
+// de quien la subió, hasta que una compra la toma.
+compras.post("/fotos", async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const f = cuerpo.foto;
+  if (!(f instanceof File)) return c.json({ error: "Falta la foto" }, 400);
+  if (!TIPOS_DE_FOTO[f.type]) return c.json({ error: "La foto tiene que ser jpeg, png o webp" }, 400);
+  if (f.size > MAXIMO_DE_FOTO) return c.json({ error: "La foto pesa más de 10 MB" }, 400);
+  const archivo = `${randomUUID()}${TIPOS_DE_FOTO[f.type]}`;
+  await mkdir(carpetaComprobantes(), { recursive: true });
+  await writeFile(path.join(carpetaComprobantes(), archivo), Buffer.from(await f.arrayBuffer()));
+  await pool.query("INSERT INTO foto_comprobante (archivo, usuario_id) VALUES ($1, $2)", [archivo, c.get("sesion").usuario.id]);
+  return c.json({ foto: archivo }, 201);
+});
+
+// La computadora espera la foto que el mismo usuario saca con su celular: la última foto
+// suelta que subió después del momento que se pide.
+compras.get("/fotos/sueltas", async (c) => {
+  const desde = new Date(c.req.query("desde") ?? "");
+  if (Number.isNaN(desde.getTime())) return c.json({ error: "Falta desde cuándo" }, 400);
+  const { rows } = await pool.query<{ archivo: string }>(
+    "SELECT archivo FROM foto_comprobante WHERE usuario_id = $1 AND compra_id IS NULL AND creado_en > $2 ORDER BY creado_en DESC LIMIT 1",
+    [c.get("sesion").usuario.id, desde.toISOString()],
+  );
+  return c.json({ foto: rows[0]?.archivo ?? null });
+});
+
+// Con sesión: un comprobante muestra a quién se le compra y a cuánto.
+compras.get("/fotos/:archivo", async (c) => {
+  const archivo = c.req.param("archivo");
+  if (!ARCHIVO_DE_FOTO.test(archivo)) return c.json({ error: "No existe esa foto" }, 404);
+  const contenido = await readFile(path.join(carpetaComprobantes(), archivo)).catch(() => null);
+  if (!contenido) return c.json({ error: "No existe esa foto" }, 404);
+  const tipo = Object.entries(TIPOS_DE_FOTO).find(([, ext]) => archivo.endsWith(ext))![0];
+  return c.body(new Uint8Array(contenido), 200, { "Content-Type": tipo, "Cache-Control": "private, max-age=86400" });
+});
 
 compras.post("/", async (c) => {
   const v = await c.req.json<CompraEntrada>().catch(() => ({}) as CompraEntrada);
@@ -52,12 +97,14 @@ compras.post("/", async (c) => {
     if (previa[0]) { await cliente.query("ROLLBACK"); return c.json({ id, total: Number(previa[0].total), repetida: true }); }
     const { rows: prov } = await cliente.query<{ nombre: string }>("SELECT nombre FROM proveedor WHERE id = $1 AND activo", [v.proveedor_id]);
     if (!prov[0]) { await cliente.query("ROLLBACK"); return c.json({ error: "No existe ese proveedor" }, 404); }
-    const comprobante = v.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${v.comprobante_tipo} ${v.comprobante_numero?.trim() || "s/n"}`;
+    // El número ya no se pide: está en la foto. Si llega (versiones anteriores), se usa.
+    const comprobante = v.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : [v.comprobante_tipo, v.comprobante_numero?.trim()].filter(Boolean).join(" ");
 
     await cliente.query(
       `INSERT INTO compra (id, proveedor_id, fecha, comprobante_tipo, comprobante_numero, total, nota) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [id, v.proveedor_id, fecha, v.comprobante_tipo, v.comprobante_numero?.trim() || null, total.toFixed(2), v.nota?.trim() || null],
     );
+    if (v.foto && v.comprobante_tipo !== "sin_comprobante") await cliente.query("UPDATE foto_comprobante SET compra_id = $1 WHERE archivo = $2 AND compra_id IS NULL", [id, v.foto]);
     for (const [orden, it] of v.items.entries()) {
       let productoId = it.producto_id ?? null;
       let codigo: string | null = null;
@@ -93,7 +140,7 @@ compras.post("/", async (c) => {
         resultado.costos_actualizados++;
       }
     }
-    await registrarEvento(cliente, { tipo: "compra.registrada", usuarioId, contenido: { id, proveedor: prov[0].nombre, fecha, comprobante, total, items: v.items.length, ...resultado } });
+    await registrarEvento(cliente, { tipo: "compra.registrada", usuarioId, contenido: { id, proveedor: prov[0].nombre, fecha, comprobante, foto: v.foto ?? null, total, items: v.items.length, ...resultado } });
     await cliente.query("COMMIT");
   } catch (e) {
     await cliente.query("ROLLBACK");
@@ -107,6 +154,7 @@ compras.post("/", async (c) => {
 compras.get("/", async (c) => {
   const { rows } = await pool.query(
     `SELECT co.id, co.fecha::text, co.comprobante_tipo, co.comprobante_numero, co.total, co.estado, co.nota, co.creado_en, pr.nombre AS proveedor,
+            (SELECT '/compras/fotos/' || f.archivo FROM foto_comprobante f WHERE f.compra_id = co.id ORDER BY f.creado_en LIMIT 1) AS foto,
             (SELECT count(*) FROM item_compra i WHERE i.compra_id = co.id) AS renglones,
             COALESCE((SELECT json_agg(json_build_object('descripcion', p.descripcion, 'cantidad', i.cantidad, 'costo_unitario', i.costo_unitario) ORDER BY i.orden)
                         FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = co.id), '[]'::json) AS items

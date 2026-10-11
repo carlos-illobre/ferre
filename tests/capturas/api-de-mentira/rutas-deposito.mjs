@@ -29,8 +29,8 @@ const proveedores = [
 ];
 const item = (i, cantidad, costo) => ({ producto_id: productos[i].id, descripcion: productos[i].descripcion, cantidad: String(cantidad), costo_unitario: String(costo ?? productos[i].costo_neto) });
 const compras = [
-  { id: "co-1", fecha: fecha(1), comprobante_tipo: "factura", comprobante_numero: "0003-00018954", estado: "confirmada", proveedor: "Comodo", items: [item(0, 20), item(4, 30, 438.5), item(8, 500), item(12, 12)] },
-  { id: "co-2", fecha: fecha(2), comprobante_tipo: "remito", comprobante_numero: "0001-00004410", estado: "confirmada", proveedor: "Tresge", items: [item(5, 2), item(9, 4, 28150)] },
+  { id: "co-1", fecha: fecha(1), comprobante_tipo: "factura", comprobante_numero: null, foto: "/compras/fotos/5d1f0a52-93a1-4f0e-8c1b-7a2e6d4c9b10.jpg", estado: "confirmada", proveedor: "Comodo", items: [item(0, 20), item(4, 30, 438.5), item(8, 500), item(12, 12)] },
+  { id: "co-2", fecha: fecha(2), comprobante_tipo: "remito", comprobante_numero: null, estado: "confirmada", proveedor: "Tresge", items: [item(5, 2), item(9, 4, 28150)] },
   { id: "co-3", fecha: fecha(4), comprobante_tipo: "sin_comprobante", comprobante_numero: null, estado: "confirmada", proveedor: "Erpa", items: [item(6, 25), item(10, 6), item(14, 24)] },
   { id: "co-4", fecha: fecha(6), comprobante_tipo: "factura", comprobante_numero: "0002-00090117", estado: "anulada", proveedor: "Ixnova", items: [item(3, 10), item(7, 100)] },
   { id: "co-5", fecha: fecha(11), comprobante_tipo: "factura", comprobante_numero: "0003-00018822", estado: "confirmada", proveedor: "Comodo", items: [item(0, 14), item(4, 40), item(16, 3.5)] },

@@ -400,13 +400,19 @@ RF-43:
     - "No hay nada propio de clientes para el precio distinto: se resuelve poniendo el precio a mano en el renglón de la venta, sin que quede ligado al cliente ni se explique por su condición"
 
 RF-50:
-  estado: "Hecho en parte (#30): se aparta de la regla en 10 puntos"
+  estado: "Hecho en parte (#30): se aparta de la regla en 13 puntos"
   pruebas:
+    - microservices/gestion-del-local/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts
     - clientes/gestion-del-local-web/src/escritorio/pantallas/Compras.test.tsx
     - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
   defectos:
+    - "La foto del comprobante está en la versión 5; las versiones 1, 2 y 4 siguen pidiendo el número"
+    - "La foto no es obligatoria: una factura o un remito se puede registrar sin foto y figura «sin foto»"
+    - "Sin conexión la foto no se puede subir (el ingreso tampoco se registra sin conexión)"
+    - "Una foto subida que no llega a usarse en ninguna compra queda guardada en el servidor; no se limpia"
+    - "Sin prueba de la pantalla ni del paso de la foto del celular a la computadora: las pruebas de interfaz están en pausa (decisión 25)"
     - "El ingreso de mercadería de la computadora no recibe códigos escaneados con el celular vinculado; solo se escanea en el celular"
     - "No se puede guardar la foto del comprobante con la compra"
     - "El ingreso no se precarga desde un pedido (RF-55) ni desde la foto de la factura (RF-51)"
@@ -414,9 +420,9 @@ RF-50:
     - "Sin conexión el ingreso no se registra y solo se avisa; qué exige la regla está preguntado en la spec (historia 1, escenario 13)"
     - "Anular una compra deja el costo que puso el comprobante; qué exige la regla está preguntado en la spec (historia 2, escenario 4)"
     - "Anular pide el motivo, opcional, en una ventana del navegador y no dentro de la aplicación"
-    - "No se controla que el mismo proveedor y número de comprobante se cargue dos veces; está preguntado en la spec (historia 1, escenario 14)"
+    - "No se controla que la misma factura se cargue dos veces; sin número tipeado ya no se puede comparar por número: está preguntado en la spec (historia 1, escenario 14)"
     - "Sin prueba: ingreso con remito o sin comprobante, validaciones del ingreso, escanear en el ingreso, registrar sin conexión, reintento del mismo ingreso y anular una compra ya anulada"
-    - "Las rutas de compras del servidor no tienen pruebas unitarias; solo las cubren las de punta a punta, que no corren en cada push"
+    - "De las rutas de compras del servidor solo la foto del comprobante tiene pruebas unitarias; el resto lo cubren las de punta a punta, que no corren en cada push"
     - "No está medido que una factura de 20 renglones se cargue en menos de 5 minutos"
 
 RF-51:

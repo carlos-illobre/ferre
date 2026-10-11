@@ -136,3 +136,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     «Inventario» y solo muestra cantidades. La va a manejar un comprador, que no tiene que
     ver sumas de dinero: el total invertido y lo invertido por proveedor se ven en «Cómo va
     el negocio». En toda la aplicación y la documentación se dice «dinero», no «plata».
+32. **El número de factura no se tipea** (2026-10-11): al ingresar mercadería se sube la
+    foto de la factura o del remito, y el número, o cualquier otro dato, se lee tocando la
+    foto. En la computadora un botón deja que la foto la saque el celular del mismo usuario
+    y aparezca sola. Que el sistema lea la foto y precargue el ingreso (RF-51) queda para
+    más adelante, hasta decidir con qué se lee sin romper el costo de $0.

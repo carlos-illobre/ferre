@@ -11,7 +11,7 @@ import { Listas } from "../../v2/pantallas/Listas";
 import { Duplicados } from "../../v2/pantallas/Duplicados";
 import { Inventario } from "./Inventario";
 import { DineroInvertido } from "../DineroInvertido";
-import { Compras } from "../../v2/pantallas/Compras";
+import { Ingreso } from "./Ingreso";
 import { Contar } from "../../v2/pantallas/Contar";
 import { Resumen } from "../../v2/pantallas/Resumen";
 import { Usuarios } from "../../v2/pantallas/Usuarios";
@@ -120,7 +120,7 @@ function Pantallas() {
         {parte === "mas" && actual !== "mas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
         {actual === "ventas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("vender")}>Volver a Vender</Boton></div>}
         {actual === "mas" ? <Mas atajoDe={atajoDe} />
-          : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Compras />
+          : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <><Resumen /><DineroInvertido /></> : actual === "usuarios" ? <Usuarios />
           : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : <Vender />}

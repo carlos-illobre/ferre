@@ -105,7 +105,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
 
 | ID | Requerimiento | Especificación |
 |---|---|---|
-| RF-50 | Registrar cada compra a proveedor con su costo real; suma stock. Con factura, con remito o sin comprobante. Las compras recientes se abren para ver sus renglones y se pueden anular | [005-compras-y-stock](005-compras-y-stock/spec.md) |
+| RF-50 | Registrar cada compra a proveedor con su costo real; suma stock. Con factura, con remito o sin comprobante; el número no se tipea, se lee de la foto del comprobante. Las compras recientes se abren para ver sus renglones y se pueden anular | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-51 | Cargar la factura de compra con una foto, sin tipear los renglones | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-52 | El stock arranca en cero; lo que ya hay se carga de a poco, por sector. Un conteo interrumpido queda abierto y se retoma | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-53 | Inventario: el stock actual de cada producto, sin sumas de dinero; el dinero invertido se ve en «Cómo va el negocio». El stock de cada producto muestra los movimientos que lo explican y se puede corregir a mano, con el motivo | [005-compras-y-stock](005-compras-y-stock/spec.md) |

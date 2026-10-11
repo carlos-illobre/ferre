@@ -1,0 +1,29 @@
+/* Foto del comprobante de una compra. Igual en celular y computadora: trae sus colores. */
+.ff { display: flex; align-items: center; gap: 14px; padding: 12px; border: 1.500px solid #7c9085; border-radius: 12px; background: #fff; color: #18201e; font-size: 1rem; line-height: 1.4; box-sizing: border-box; min-width: 0; }
+.ff.vacia { border-style: dashed; background: #fbfcfa; }
+.ff-texto { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+.ff-texto > span { color: #4a5451; font-size: 0.9375rem; }
+.ff-botones { display: flex; flex-wrap: wrap; gap: 8px; }
+.ff-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1.500px solid #7c9085; background: #fff; color: #18201e; font: inherit; font-weight: 650; cursor: pointer; }
+.ff-boton:hover:not(:disabled) { background: #f1f4f1; }
+.ff-boton:disabled { color: #555f5c; background: #e4e8e5; border-color: #e4e8e5; cursor: not-allowed; }
+.ff-boton.fuerte { background: #17312b; border-color: #17312b; color: #fff; }
+.ff-boton.fuerte:hover:not(:disabled) { background: #25443d; }
+.ff-boton:focus-visible, .ff-ver:focus-visible { outline: 3px solid #0f6b52; outline-offset: 2px; }
+.ff-ver { flex: none; padding: 0; border: 0; border-radius: 10px; background: none; cursor: zoom-in; }
+.ff-ver img, .ff-cargando { display: block; width: 72px; height: 96px; border-radius: 10px; border: 1px solid #dfe5e1; object-fit: cover; background: #f1f4f1; }
+.ff-texto .ff-error { color: #c2370b; font-weight: 650; }
+
+dialog.ff-grande { width: min(96vw, 1100px); max-height: 94dvh; padding: 12px; border: 0; border-radius: 14px; background: #fff; color: #18201e; }
+dialog.ff-grande[open] { display: flex; flex-direction: column; gap: 12px; }
+dialog.ff-grande::backdrop { background: rgb(15 30 25 / 0.78); }
+dialog.ff-grande .ff-botones { justify-content: flex-end; }
+.ff-lienzo { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; background: #f1f4f1; text-align: center; }
+.ff-lienzo img { max-width: 100%; max-height: 76dvh; object-fit: contain; cursor: zoom-in; }
+.ff-lienzo.zoom img { max-width: none; max-height: none; width: 220%; cursor: zoom-out; }
+@media (max-width: 899px) { .ff.vacia .ff-boton { flex: 1 1 100%; min-height: 48px; } }
+.ff-lienzo img { display: block; margin: 0 auto; width: 100%; height: 76dvh; }
+.ff-lienzo.zoom img { height: auto; }
+/* En la computadora la foto ocupa su propio renglón del encabezado del ingreso. */
+.compras-foto { grid-column: 1 / -1; flex-basis: 100%; order: 9; }
+@media (min-width: 900px) { .ff.vacia .ff-texto { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; } }
