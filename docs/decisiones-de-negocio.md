@@ -193,3 +193,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     hay que inventariarla). En «Más» hay una pantalla nueva, «Anomalías», que es un registro
     con fecha, producto y usuario de cada inconsistencia entre el sistema y la realidad; la
     venta sin stock anota una. Las alertas sobre anomalías quedan para más adelante (RF-59).
+45. **La entrada dice lo mismo en el celular y en la computadora** (2026-10-11): mismo
+    título, misma explicación, los mismos tres puntos, «Entrar», la misma aclaración de que
+    no hay contraseñas y la misma nota sobre quién puede entrar. Cambia solo la disposición.
+    Es una sola aplicación y se tiene que notar desde la primera pantalla.

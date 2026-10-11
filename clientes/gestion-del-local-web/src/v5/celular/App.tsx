@@ -5,7 +5,7 @@ import { OfrecerHuella } from "../../componentes/OfrecerHuella";
 import { Icono } from "../../componentes/base";
 import { ProveedorDeSesion, administra, useSesion } from "../../sesion";
 import { irA, useRuta } from "../../rutas";
-import { Login } from "../../pantallas/Login";
+import { Entrar } from "./Entrar";
 import { VincularCelular } from "../../pantallas/VincularCelular";
 import { Catalogo } from "./Catalogo";
 import { Icono as IconoDeMas, type NombreDeIcono } from "../../v2/ui";
@@ -54,7 +54,7 @@ function Pantallas() {
 
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
-  if (sesion.estado === "sin-sesion") return <Login />;
+  if (sesion.estado === "sin-sesion") return <Entrar />;
   // El celular llega acá al leer el código QR de la computadora: con la sesión ya iniciada, saca la foto que
   // pidió la computadora.
   if (ruta.nombre === "foto" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;

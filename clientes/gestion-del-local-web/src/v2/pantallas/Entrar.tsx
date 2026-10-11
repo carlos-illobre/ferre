@@ -132,7 +132,19 @@ export function BotonHuella() {
   );
 }
 
-const QUE_HACE: { icono: NombreDeIcono; texto: string }[] = [
+// Los textos de la entrada, los mismos en el celular y en la computadora: es una sola
+// aplicación y se tiene que notar desde la primera pantalla.
+export const TEXTOS_DE_ENTRADA = {
+  titulo: "Precios al día, ventas y stock de la ferretería.",
+  bajada: "Ferrebress es el sistema del mostrador: se usa desde el celular y desde la computadora, con los mismos datos.",
+  entrar: "Entrar",
+  comoConHuella: "Acá no hay contraseñas. Entrás con la huella, si ya vinculaste este dispositivo, o con tu cuenta de Google.",
+  comoSinHuella: "Acá no hay contraseñas. Entrás con tu cuenta de Google.",
+  nota: "Solo entran las personas que un Administrador del negocio autorizó. Si es tu primera vez, pedile que agregue tu correo de Google.",
+  sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
+};
+
+export const QUE_HACE: { icono: NombreDeIcono; texto: string }[] = [
   { icono: "vender", texto: "Buscás el producto, decís el precio y cobrás." },
   { icono: "listas", texto: "Los precios se actualizan con las listas de los proveedores." },
   { icono: "stock", texto: "Lo que se vende baja del stock; lo que se compra, sube." },
@@ -182,22 +194,18 @@ export function Entrar() {
   const conHuella = hayHuella();
   return (
     <MarcoDeEntrada testId="entrar" conPuntos
-      titulo="Precios al día, ventas y stock de la ferretería."
-      bajada="Ferrebress es el sistema del mostrador: se usa desde el celular y desde la computadora, con los mismos datos.">
-      <h2>Entrar</h2>
-      <p className="entrar-como">
-        {conHuella
-          ? "Acá no hay contraseñas. Entrás con la huella, si ya vinculaste este dispositivo, o con tu cuenta de Google."
-          : "Acá no hay contraseñas. Entrás con tu cuenta de Google."}
-      </p>
+      titulo={TEXTOS_DE_ENTRADA.titulo}
+      bajada={TEXTOS_DE_ENTRADA.bajada}>
+      <h2>{TEXTOS_DE_ENTRADA.entrar}</h2>
+      <p className="entrar-como">{conHuella ? TEXTOS_DE_ENTRADA.comoConHuella : TEXTOS_DE_ENTRADA.comoSinHuella}</p>
       {cerrada && <Aviso tipo="alerta" testId="sesion-cerrada"><strong className="entrar-error-titulo">Hay que iniciar sesión</strong>La sesión de este dispositivo se cerró o venció. Entrá de nuevo para seguir.</Aviso>}
-      {!enLinea && <Aviso tipo="alerta" testId="entrar-sin-conexion">Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.</Aviso>}
+      {!enLinea && <Aviso tipo="alerta" testId="entrar-sin-conexion">{TEXTOS_DE_ENTRADA.sinConexion}</Aviso>}
       <BotonHuella />
       {conHuella && <div className="entrar-o" aria-hidden="true"><span>o</span></div>}
       <BotonGoogle />
       <p className="entrar-nota">
         <Icono nombre="info" tam={18} />
-        <span>Solo entran las personas que un Administrador del negocio autorizó. Si es tu primera vez, pedile que agregue tu correo de Google.</span>
+        <span>{TEXTOS_DE_ENTRADA.nota}</span>
       </p>
     </MarcoDeEntrada>
   );
