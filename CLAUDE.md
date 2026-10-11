@@ -76,6 +76,24 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
   [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md) y, si es una regla, en la
   `spec.md` de la capacidad.
 
+## Cada pedido es una tarea
+
+Todo lo que Carlos pide queda anotado como un issue, para que se vea en el tablero del
+portafolio mientras se hace y después de hecho. Vale también para un arreglo chico.
+
+1. **Antes de empezar,** buscar si el pedido ya tiene issue (`gh issue list --search`). Si
+   no tiene, crearlo con un título que diga qué se pidió, en palabras de Carlos, y con su
+   etapa (milestone). Ponerle la etiqueta `en curso`:
+   `gh issue edit N --add-label "en curso"`.
+2. **Cada commit nombra su issue** al final del título, entre paréntesis: `(#N)`. Un commit
+   sin `#N` aparece en el tablero como trabajo sin tarea.
+3. **Al terminar,** cerrar el issue y sacarle la etiqueta:
+   `gh issue close N` y `gh issue edit N --remove-label "en curso"`. Si queda a medias,
+   se deja abierto con un comentario que diga qué falta.
+
+Un pedido que cambia de tema a mitad de la sesión es otro issue. Las preguntas y las
+consultas que no cambian nada en el repositorio no llevan issue.
+
 ## Qué no decide el agente
 
 - **El alcance.** Un requerimiento nuevo, o uno que cambia, se le pregunta a Carlos.
