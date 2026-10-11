@@ -35,7 +35,8 @@
 
 - Q: ¿Cuántos actores hay? → A: Cuatro: Dueño, Empleado, Cliente y Proveedor (decisión 14).
 - Q: ¿Qué rol puede cargar listas de precios, elegir márgenes, contar stock, unir duplicados, ver costos, ver las ventas del día y anular ventas? → A: Por ahora, el Administrador (decisión 15). Ese mismo día Carlos lo amplió: ver la respuesta siguiente.
-- Q: ¿Qué puede hacer cada rol? → A: En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo. Está decidido que van a existir distintos roles, pero los otros (Vendedor, Comprador) no se usan por ahora y qué puede cada uno se define más adelante, cuando se analicen los roles en profundidad (decisión 18, que reemplaza el reparto de la decisión 15; RF-72).
+- Q: ¿Cómo quedan los roles? → A: Lo fijo son los permisos; los roles son grupos de permisos que se arman desde una pantalla, con un nombre, y se asignan a los usuarios, que pueden tener varios. El sistema arranca con Vendedor, Comprador, Recepción, Administrador y Gerente. Reemplaza lo anterior (decisión 50, 2026-10-11).
+- Q: (reemplazada por la anterior) ¿Qué puede hacer cada rol? → A: En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo. Está decidido que van a existir distintos roles, pero los otros (Vendedor, Comprador) no se usan por ahora y qué puede cada uno se define más adelante, cuando se analicen los roles en profundidad (decisión 18, que reemplaza el reparto de la decisión 15; RF-72).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -111,25 +112,55 @@ en «quién hizo qué» y que el único Administrador no se puede dar de baja.
 
 ---
 
-### User Story 3 - Todos son Administrador y pueden todo (Priority: P1)
+### User Story 3 - Cada usuario puede lo que le permiten sus roles (Priority: P1)
 
-En esta primera versión hay un solo rol en uso: Administrador. Todo usuario autorizado lo
-tiene y puede hacer todo lo que el sistema ofrece. Lo único que el servidor exige es una
-sesión vigente de un usuario activo. Los permisos por rol llegan en una etapa posterior.
+Lo que se puede hacer en el sistema está dividido en **permisos**, que son fijos. Un **rol**
+es un grupo de permisos con un nombre. Cada usuario tiene uno o más roles y puede hacer lo que
+permita cualquiera de ellos. La aplicación le muestra solo lo que puede usar, y el servidor
+rechaza lo demás.
 
-**Why this priority**: son pocos usuarios, todos de confianza; repartir permisos antes de
-analizar los roles en profundidad complicaría el mostrador sin proteger nada.
+**Why this priority**: quien vende no tiene que ver los números del negocio, y quien recibe
+mercadería no tiene que administrar usuarios; hasta ahora todos podían todo.
 
-**Independent Test**: autorizar un usuario nuevo, entrar con él y recorrer todas las
-operaciones del sistema, en el celular y en la computadora.
+**Independent Test**: con un usuario que solo tiene el rol Vendedor, comprobar que ve Catálogo
+y Vender, que no ve Depósito ni los números, y que el servidor le rechaza un ingreso de
+mercadería.
 
 **Acceptance Scenarios**:
 
-1. **Given** un usuario autorizado y activo, **When** usa la app, **Then** es Administrador y se le ofrecen todas las operaciones: vender, ver y anular ventas, registrar compras, contar y corregir stock, cargar listas, elegir márgenes, unir duplicados, ver costos, ver cómo va el negocio y administrar usuarios, sesiones y «quién hizo qué».
-2. **Given** un usuario autorizado y activo, **When** le pide cualquier operación directo al servidor, **Then** el servidor la acepta: no la rechaza por rol.
-3. **Given** cualquier usuario, **When** mira la app, **Then** ve su nombre.
-4. **Given** alguien sin sesión, o un usuario desactivado, **When** le pide cualquier operación al servidor, **Then** el servidor la rechaza (historia 1).
-5. (etapa posterior) **Given** roles con permisos distintos ya definidos, **When** un usuario usa la app, **Then** se le ofrece solo lo que sus roles permiten y el servidor rechaza lo demás, diciendo qué rol se necesita y sin cerrarle la sesión.
+1. **Given** un usuario con el rol Vendedor, **When** usa la app, **Then** se le ofrece vender, ver las ventas del día y anularlas, y no se le ofrecen las listas, el ingreso de mercadería, los números del negocio ni los usuarios.
+2. **Given** un usuario con dos roles, **When** usa la app, **Then** puede todo lo que permite uno u otro.
+3. **Given** un usuario sin el permiso de una operación, **When** se la pide directo al servidor, **Then** el servidor la rechaza diciendo qué permiso hace falta, y no le cierra la sesión.
+4. **Given** un usuario sin el permiso de una pantalla, **When** entra a su dirección, **Then** ve que no tiene permiso y qué permiso hace falta, y el menú no se la ofrece.
+5. **Given** cualquier usuario con sesión, **When** usa la app, **Then** puede buscar en el catálogo, ver el stock de un producto, sacarle la foto, cargarle el código de barras, avisar de un error o una mejora, cerrar su sesión y vincular su celular: eso no pide ningún permiso.
+6. **Given** un usuario que vende pero no tiene «Fijar márgenes», **When** elige un margen dentro de una venta, **Then** vale para esa venta y no queda guardado en el producto.
+7. **Given** un usuario sin «Ver los números del negocio», **When** mira el inventario, **Then** no recibe ninguna suma de dinero, ni en la pantalla ni del servidor.
+8. **Given** un cambio hecho sin conexión por alguien a quien después le sacaron el permiso, **When** el dispositivo reconecta, **Then** el servidor lo rechaza y el dispositivo lo descarta avisando.
+9. **Given** alguien sin sesión, o un usuario desactivado, **When** le pide cualquier operación al servidor, **Then** el servidor la rechaza (historia 1).
+
+---
+
+### User Story 3b - Armar los roles (Priority: P1)
+
+Quien administra arma los roles del negocio: les pone un nombre y elige qué permisos tienen.
+Después se los asigna a las personas. El sistema arranca con cinco roles ya armados, que se
+pueden cambiar.
+
+**Independent Test**: crear un rol «Encargado» con permisos de vender y de registrar ingresos,
+asignárselo a un usuario y comprobar que gana ese acceso; intentar dejar el sistema sin nadie
+que administre y comprobar que no se puede.
+
+**Acceptance Scenarios**:
+
+1. **Given** el sistema recién instalado, **When** se miran los roles, **Then** existen Vendedor, Comprador, Recepción, Administrador y Gerente, cada uno con sus permisos (tabla de abajo).
+2. **Given** alguien con «Administrar roles», **When** crea un rol con un nombre y tilda sus permisos, **Then** el rol queda disponible para asignar. Cada permiso se muestra con su nombre y una explicación de qué deja hacer, agrupado por parte de la aplicación.
+3. **Given** un rol existente, **When** se le cambian los permisos, **Then** el cambio vale enseguida para todos los que lo tienen.
+4. **Given** un nombre de rol que ya existe, o un rol sin nombre o sin ningún permiso, **When** se lo quiere guardar, **Then** no se guarda y se dice por qué.
+5. **Given** un rol que alguien tiene asignado, **When** se lo quiere borrar, **Then** no se borra: primero hay que sacárselo a esas personas.
+6. **Given** alguien con «Administrar usuarios», **When** autoriza a una persona o la edita, **Then** le tilda uno o más roles. Un usuario activo tiene al menos un rol; para que no pueda nada se lo desactiva.
+7. **Given** una sola persona activa que puede administrar usuarios y roles, **When** alguien intenta por cualquier camino dejarla sin esos permisos (quitárselos al rol, borrar el rol, sacarle el rol o desactivarla), **Then** no se guarda: el sistema nunca queda sin quien lo administre.
+8. **Given** quien administra, **When** intenta quitarse a sí mismo esos permisos o desactivarse, **Then** no se guarda: lo tiene que hacer otra persona.
+9. **Given** un cambio en los roles o en su asignación, **When** se guarda, **Then** queda en «Quién hizo qué» con quién lo hizo.
 
 ---
 
@@ -239,15 +270,37 @@ Roles y actores son cosas distintas. El **rol** es lo que da permisos dentro del
 El **actor** es la persona real, y se lo nombra solo donde el rol no alcanza para describir
 el proceso.
 
-| Rol | En esta versión | Qué puede hacer |
-|---|---|---|
-| Administrador | El único en uso: lo tiene todo usuario | Todo |
-| Vendedor | No se usa todavía | Se define más adelante. La idea de partida: vender y registrar las ventas |
-| Comprador | No se usa todavía | Se define más adelante. La idea de partida: recibir la mercadería y registrarla |
+Los **permisos** son fijos y los define el sistema:
 
-Está decidido que el sistema va a tener distintos roles y que los permisos se van a dar por
-rol. Cuáles van a ser, si se combinan en un mismo usuario y qué puede cada uno se define
-más adelante, cuando se analicen en profundidad (decisión 18 del 2026-10-10).
+| Parte | Permiso | Qué deja hacer |
+|---|---|---|
+| Vender | Vender | Armar una venta, cobrar, anotar «No llevó», elegir el cliente y cambiar el margen dentro de esa venta |
+| Vender | Ver las ventas del día | Abrir «Ventas de hoy» |
+| Vender | Anular ventas | Anular una venta registrada |
+| Catálogo | Fijar márgenes | Elegir el margen de un producto en el catálogo, que queda guardado |
+| Catálogo | Cargar listas de precios | Cargar y aplicar la lista de un proveedor; dar de alta proveedores |
+| Catálogo | Unir duplicados | Unir y separar productos repetidos |
+| Depósito | Registrar ingresos | Registrar la mercadería que llega y anular un ingreso |
+| Depósito | Ver las compras | Ver las compras recientes y sus comprobantes |
+| Depósito | Contar y corregir stock | Contar estanterías y corregir el stock a mano |
+| Negocio | Ver los números del negocio | Cómo va el negocio: ventas, gastos y dinero invertido en inventario |
+| Negocio | Ver las anomalías | Abrir «Anomalías» |
+| Negocio | Ver quién hizo qué | Abrir el registro de acciones |
+| Administración | Administrar usuarios | Autorizar personas, asignarles roles, desactivarlas |
+| Administración | Administrar roles | Crear roles, cambiarles el nombre y los permisos, borrarlos |
+| Administración | Administrar sesiones | Ver y cerrar las sesiones de todos y quitar celulares de otros |
+
+Los **roles** los arma el negocio. El sistema arranca con estos cinco, que se pueden cambiar:
+
+| Rol | Permisos |
+|---|---|
+| Vendedor | Vender · Ver las ventas del día · Anular ventas |
+| Comprador | Cargar listas de precios · Unir duplicados · Ver las compras |
+| Recepción | Registrar ingresos · Ver las compras · Contar y corregir stock · Ver las anomalías |
+| Administrador | Administrar usuarios · Administrar roles · Administrar sesiones · Ver quién hizo qué |
+| Gerente | Ver los números del negocio · Fijar márgenes · Ver las ventas del día · Anular ventas · Ver las compras · Ver las anomalías · Ver quién hizo qué |
+
+Decisión 50 del 2026-10-11, que reemplaza a las decisiones 8, 15 y 18 en lo que toca a roles.
 
 | Actor | Quién es | Usa el sistema |
 |---|---|---|
@@ -269,7 +322,7 @@ entonces, ninguna especificación de capacidad restringe una operación por rol.
 
 ### Preguntas abiertas
 
-- **P4** (RF-72, RF-73) [NEEDS CLARIFICATION: si todos son Administrador, cualquiera puede desactivar a cualquier otro, incluido el Dueño (lo único que el sistema impide es desactivarse a uno mismo y dejar el sistema sin ningún Administrador activo). Antes el dueño estaba protegido de los demás administradores. ¿Se acepta así para esta versión, o el Dueño tiene que quedar protegido?]
+- **P4** (RF-72, RF-73) Respondida el 2026-10-11 (decisión 50): no hay un dueño protegido; lo que el sistema impide es quedarse sin nadie que pueda administrar usuarios y roles, y que alguien se quite a sí mismo esos permisos.
 - **P7** (RF-70b) [NEEDS CLARIFICATION: en una computadora que tiene lector de huella, ¿se puede vincular a mano y entrar con la huella, o la huella es solo para el celular y la computadora entra siempre con Google? Lo decidido es que en la computadora nunca se ofrece sola.]
 - **P8** (RF-72) [NEEDS CLARIFICATION: una venta cobrada sin conexión por alguien a quien se desactivó antes de que el dispositivo reconecte: ¿se registra igual al reconectar, porque nada del mostrador se pierde, o se rechaza?]
 - **P9** (RF-74) [NEEDS CLARIFICATION: si el dispositivo no tiene internet, ¿«Salir» lo lleva igual a la entrada y la sesión se cierra en el servidor cuando reconecte, o no se puede salir sin conexión?]
@@ -279,7 +332,8 @@ entonces, ninguna especificación de capacidad restringe una operación por rol.
 - **RF-70**: Solo entran usuarios autorizados y activos, con su cuenta de Google o con la huella del celular. No hay contraseñas ni entrada por código QR. Se autoriza a alguien cargando su nombre y su correo de Google desde la app; quien no está autorizado ve que no lo está y a quién pedirle el alta. Todo pedido al servidor exige una sesión vigente. La sesión queda en el dispositivo, dura 90 días que se renuevan con el uso, y sigue sirviendo sin conexión hasta que el servidor diga lo contrario. Los intentos de entrada tienen un límite por minuto y por origen (ADR-011).
 - **RF-70b**: Un usuario vincula su celular a su cuenta para entrar con la huella, sin Google. La app lo ofrece sola la primera vez que se entra con Google desde un celular con lector de huella, una sola vez por dispositivo, y nunca en la computadora. Cada usuario ve sus celulares vinculados, vincula uno a mano y lo quita; un Administrador quita el de cualquiera. Del celular se guarda solo lo necesario para verificarlo: la huella nunca sale del aparato (ADR-011, enmiendas del 2026-09-14 y del 2026-09-15).
 - **RF-71**: Quién hizo qué. Cada acción queda registrada con el usuario que la hizo, cuándo, el tipo de acción y su detalle, y el registro solo recibe acciones nuevas. El Administrador lo consulta de la acción más reciente a la más vieja, de a 10 por página y con el total, y lo filtra por usuario, por fecha y por tipo de acción, combinando los filtros.
-- **RF-72**: Los permisos se dan por rol. En esta primera versión hay un solo rol en uso, Administrador: lo tiene todo usuario autorizado y puede hacer todo; el servidor solo exige una sesión vigente de un usuario activo. Van a existir otros roles (la idea de partida es Vendedor y Comprador), que todavía no se usan; cuáles son, si se combinan y qué puede cada uno se define más adelante, y recién entonces cada pantalla y cada operación exige su rol. El sistema nunca queda sin un Administrador activo. Nadie se desactiva a sí mismo. Desactivar a un usuario le cierra todas las sesiones (decisión 18 del 2026-10-10).
+- **RF-72**: Lo que se puede hacer en el sistema se divide en permisos, que son fijos (tabla «Actores y roles»). Cada usuario tiene uno o más roles y puede lo que permita cualquiera de ellos; la aplicación le ofrece solo eso y el servidor rechaza lo demás diciendo qué permiso hace falta. Buscar en el catálogo, ver el stock de un producto, sacarle la foto, cargarle el código de barras, avisar de un error o una mejora y manejar la propia sesión no piden permiso. Las reglas son las mismas en el celular y en la computadora.
+- **RF-75**: Los roles se arman desde la aplicación: un nombre y los permisos que agrupa. El sistema arranca con cinco roles (Vendedor, Comprador, Recepción, Administrador y Gerente) que se pueden cambiar. Un rol no se borra si alguien lo tiene asignado, dos roles no se llaman igual, y un usuario activo tiene al menos un rol. El sistema nunca queda sin una persona activa que pueda administrar usuarios y roles, y nadie se quita a sí mismo esos permisos. Todo cambio de roles queda en el registro de acciones (RF-71).
 - **RF-73**: Reemplazado por RF-72 (decisión 8 del 2026-10-09; ADR-011, enmienda del 2026-10-09). Los roles dueño, admin y mostrador dejan de ser una regla. Equivalencia para esta versión: los tres pasan a Administrador. De RF-73 siguen valiendo, dentro de RF-72, las reglas que no dependen de esos nombres: nadie se desactiva a sí mismo y desactivar a un usuario le cierra las sesiones. Si se conserva la protección del dueño frente a otros administradores es la pregunta P4.
 - **RF-74**: El Administrador ve las sesiones abiertas, con el usuario, el dispositivo y el último uso, y cierra cualquiera a distancia; la sesión cerrada deja de servir en el próximo pedido de ese dispositivo. Cualquier usuario sale de la suya. Cerrar la propia, por la lista o saliendo, vuelve a la entrada.
 

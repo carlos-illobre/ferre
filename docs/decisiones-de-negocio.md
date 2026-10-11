@@ -234,3 +234,21 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     muestran con el mismo nombre en las dos: Administrador principal, Administrador y
     Vendedor y comprador (el celular mostraba dueño, admin y mostrador, que son los nombres
     internos). Esos tres nombres de rol todavía no los confirmó Carlos.
+50. **Permisos fijos y roles armados por el negocio** (2026-10-11). Reemplaza lo que las
+    decisiones 8, 15 y 18 decían sobre roles.
+    - Carlos describió cinco funciones: quien vende, quien encarga las compras, quien recibe
+      la mercadería, quien administra usuarios y roles, y quien ve los números del negocio y
+      toma las decisiones. Un usuario puede tener más de una.
+    - Lo fijo son los **permisos** (quince, agrupados por parte de la aplicación). Un **rol**
+      es un grupo de permisos con un nombre, y **se arma desde una pantalla**. Después se
+      asigna a los usuarios.
+    - El sistema arranca con cinco roles: **Vendedor, Comprador, Recepción, Administrador y
+      Gerente**. La lista de permisos y qué trae cada rol está en la especificación de
+      usuarios y acceso (RF-72 y RF-75).
+    - El catálogo y los precios: cargar listas y unir duplicados es del Comprador; fijar el
+      margen de un producto es del Gerente; quien vende puede cambiar el margen solo dentro
+      de una venta. Contar estanterías y corregir el stock es de Recepción.
+    - El día del cambio todos los usuarios que ya existen reciben los cinco roles.
+    - Nunca queda el sistema sin una persona que pueda administrar usuarios y roles.
+    - La pantalla de pedidos a proveedores, que es el trabajo propio del Comprador, se hace
+      a continuación (RF-55).

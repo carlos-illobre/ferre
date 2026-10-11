@@ -600,16 +600,16 @@ RF-71:
     - "Los filtros de la API no tienen prueba"
 
 RF-72:
-  estado: "Hecho en parte (#59): todos los usuarios tienen que ser Administrador y poder todo; hoy hay tres roles con permisos distintos"
-  pruebas:
-    - microservices/gestion-del-local/src/rutas/usuarios.test.ts
-    - tests/integration/autenticacion.sh
+  estado: "Pendiente: en construcción (decisión 50)"
+  pruebas: []
   defectos:
-    - "El código usa tres roles (dueño, admin y mostrador) con permisos distintos; la regla de esta versión es un solo rol, Administrador, que puede todo (decisión 18 del 2026-10-10, #59)"
-    - "Un usuario con rol mostrador no puede administrar usuarios, sesiones, proveedores ni duplicados, ni ver quién hizo qué"
-    - "Un admin no puede crear ni modificar a un dueño: la regla de esta versión no distingue entre Administradores (pregunta abierta P4)"
-    - "Al autorizar a alguien se elige uno de los tres roles; la regla dice que toda persona autorizada entra como Administrador"
-    - "No hay control de último Administrador: un dueño puede desactivar o bajar de rol a otro dueño hasta dejar el sistema sin ninguno activo"
+    - "En construcción: el servidor todavía usa los tres roles viejos"
+
+RF-75:
+  estado: "Pendiente: en construcción (decisión 50)"
+  pruebas: []
+  defectos:
+    - "En construcción: los roles todavía no se arman desde la aplicación"
 
 RF-73:
   estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
