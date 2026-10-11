@@ -84,3 +84,15 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
 24. **El `.env` lleva solo variables de entorno.** Lo que cambia de un ambiente a otro va
     en el `.env`; cualquier otra configuración, que no depende del ambiente, va en un
     archivo aparte (RNF-43, ADR-009).
+
+### Decisiones del 2026-10-11
+
+25. **Las pruebas de la interfaz quedan en pausa** hasta que Carlos elija cuál de las
+    versiones publicadas (v1, v2 o v4) es la definitiva: no tiene sentido mantenerlas al
+    día para una versión que puede descartarse. No corren las pruebas de las pantallas ni
+    las de punta a punta; los archivos se conservan. Siguen corriendo las del servidor, las
+    de la librería de precios, las de las listas de proveedores y las de la lógica del
+    cliente que no es pantalla. Al elegir la versión, se reactivan las suyas y se portan
+    las de punta a punta.
+26. **Cada versión de la interfaz en su carpeta.** La original pasa a `/v1/`; la raíz lista
+    las versiones publicadas.

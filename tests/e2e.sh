@@ -10,6 +10,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# EN PAUSA (decisión 25, 2026-10-11): hasta que Carlos elija la versión definitiva de la
+# interfaz, estos escenarios no se corren (están escritos para la versión 1, en /v1/).
+# Para correrlos igual: E2E_EN_PAUSA=no tests/e2e.sh
+if [ "${E2E_EN_PAUSA:-si}" != "no" ]; then
+  echo "E2E en pausa hasta elegir la versión definitiva de la interfaz. Para correrlos igual: E2E_EN_PAUSA=no tests/e2e.sh"
+  exit 0
+fi
+
 preparar() {
   docker compose up -d --wait
   # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.

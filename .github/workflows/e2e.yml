@@ -4,10 +4,13 @@ name: E2E
 # varios minutos, por eso no corren en cada push: se lanzan a mano desde la pestaña
 # Actions ("Run workflow") antes de promover a producción o después de un cambio grande.
 # También corren solos una vez por semana para que no se pudran.
+# EN PAUSA (decisión 25, 2026-10-11): no corren solos hasta que Carlos elija cuál de las
+# versiones de la interfaz queda como definitiva; los escenarios están escritos para la
+# versión 1. Para reactivar la corrida semanal, descomentá las dos líneas de `schedule`.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 9 * * 1"
+  # schedule:
+  #   - cron: "0 9 * * 1"
 
 jobs:
   e2e:

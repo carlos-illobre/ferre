@@ -83,6 +83,10 @@ despliegue) y `cliente-web` (publica en Pages producción en la raíz y pruebas 
 
 ### Qué corre a mano
 
+> **En pausa desde el 2026-10-11** (decisión 25 de `docs/decisiones-de-negocio.md`): las
+> pruebas de las pantallas y las de punta a punta no corren hasta que se elija la versión
+> definitiva de la interfaz. Lo que sigue describe cómo funcionan cuando están activas.
+
 - **Los E2E:** workflow `E2E` (`.github/workflows/e2e.yml`), que se lanza desde la pestaña
   Actions y corre solo los lunes a las 09:00 UTC; o `tests/e2e.sh` en la máquina de
   desarrollo. En el workflow las dos interfaces corren en paralelo, cada una con su stack, y
