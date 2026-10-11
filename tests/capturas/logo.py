@@ -21,7 +21,7 @@ MARCOS = {
     # Arriba es horizontal, a la izquierda va paralelo al tronco y la diagonal pasa por la punta del
     # brazo y la punta del tornillo. Se dibuja en las mismas coordenadas que la F y el borde grueso,
     # de puntas redondas, es el que da la distancia pareja (la mitad de su grosor).
-    "envolvente": ('<path d="M22 16H81.300L22 114.200Z" transform="translate(10 -0.700) scale(0.78) translate(6 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="20" stroke-linejoin="round"/>', "translate(10 -0.700) scale(0.78)"),
+    "envolvente": ('<path d="M22 16H81.300L22 114.200Z" transform="translate(11.400 1.300) scale(0.75) translate(6 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="26" stroke-linejoin="round"/>', "translate(11.400 1.300) scale(0.75)"),
     "hexagono": ('<path d="M50 6 88.100 28V72L50 94 11.900 72V28Z" fill="{f}" stroke="{f}" stroke-width="8" stroke-linejoin="round"/>', "translate(13.500 13) scale(0.68)"),
 }
 MARCO = "envolvente"
