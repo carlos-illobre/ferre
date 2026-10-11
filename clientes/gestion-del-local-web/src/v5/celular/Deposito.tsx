@@ -15,7 +15,7 @@ import type { Producto } from "../../pantallas/Productos";
 // Depósito: inventario (cantidades, sin dinero), ingreso de mercadería y conteo por sector. Tres
 // sub-pantallas con un segmento arriba (rediseño en mockups/Ferre iOS.html).
 // Primero lo que más se hace: recibir mercadería; después mirar el stock y, cada tanto, contar.
-const SUB = [{ valor: "ingreso", nombre: "Ingreso" }, { valor: "stock", nombre: "Inventario" }, { valor: "contar", nombre: "Contar" }] as const;
+const SUB = [{ valor: "ingreso", nombre: "Ingreso" }, { valor: "stock", nombre: "Inventario" }, { valor: "contar", nombre: "Estanterías" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");

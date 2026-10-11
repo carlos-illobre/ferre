@@ -40,7 +40,7 @@ type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono };
 const MENU: { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] }[] = [
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas" }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados" }] },
   { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender" }] },
-  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", icono: "compras", nombre: "Ingreso" }, { ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "contar", icono: "contar", nombre: "Contar" }] },
+  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", icono: "compras", nombre: "Ingreso" }, { ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "contar", icono: "contar", nombre: "Estanterías" }] },
   { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre, icono: d.icono })) },
 ];
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.

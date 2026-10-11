@@ -168,3 +168,5 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     y se toca por error; en la computadora sigue. El panel de cobro tiene dos renglones: los
     medios de pago con ícono y nombre chico debajo (como el menú de abajo), y debajo «No
     llevó», el total y «Cobrar».
+39. **La pestaña «Contar» se llama «Estanterías»** (2026-10-11), en el celular y en la
+    computadora. Depósito queda con Ingreso, Inventario y Estanterías.
