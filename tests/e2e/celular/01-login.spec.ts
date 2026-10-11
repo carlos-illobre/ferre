@@ -25,7 +25,7 @@ test.beforeAll(() => {
 
 test("sin sesión se pide entrar", async ({ page }) => {
   await page.goto("/v5/");
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByTestId("entrar")).toBeVisible();
   // Entrar leyendo un QR se quitó (2026-10-09): se entra con Google o con la huella.
   await expect(page.getByRole("button", { name: /código QR/ })).toHaveCount(0);
 });

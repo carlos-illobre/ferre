@@ -43,11 +43,11 @@ test("cerrar la sesión propia desde Administración vuelve al login", async ({ 
   await expect(propia).toContainText("esta sesión");
   await expect(propia.getByRole("button", { name: "Cerrar" })).toHaveClass(/coral/);
   await propia.getByRole("button", { name: "Cerrar" }).click();
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByTestId("entrar")).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("ferre.sesion"))).toBeNull();
   // Recargar no vuelve a entrar.
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByTestId("entrar")).toBeVisible();
 });
 
 test("Salir vuelve al login", async ({ page }) => {
@@ -55,6 +55,6 @@ test("Salir vuelve al login", async ({ page }) => {
   // En el celular, Salir está en la tarjeta del usuario, en Negocio.
   await page.goto("/v5/#/mas/negocio");
   await page.getByRole("button", { name: "Salir" }).click();
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByTestId("entrar")).toBeVisible();
   expect(psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NOT NULL`)).toBe("1");
 });
