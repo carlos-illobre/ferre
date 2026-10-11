@@ -1,0 +1,109 @@
+/* Compras: el ingreso de mercadería (datos del comprobante, renglones, total fijo), las
+   compras recientes y los gastos de la semana. */
+.compras-ingreso { display: flex; flex-direction: column; gap: var(--e3); min-width: 0; }
+.compras-datos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--e3); }
+.compras-datos > .campo:nth-child(1), .compras-datos > .campo:nth-child(2) { grid-column: 1 / -1; }
+.compras-datos .campo > label { font-size: var(--t-chico); font-weight: 600; color: var(--texto-2); }
+.compras-datos .segmentos { display: flex; }
+.compras-datos .segmentos button { flex: 1; padding: 0 var(--e2); }
+.compras-elegir { display: flex; align-items: center; justify-content: space-between; gap: var(--e2); text-align: left; font-weight: 650; box-shadow: var(--sombra-1); }
+.compras-elegir.sin-elegir { font-weight: 500; color: var(--texto-2); }
+.compras-elegir[aria-invalid="true"], .compras-datos select[aria-invalid="true"] { border-color: var(--rojo); background: var(--rojo-suave); }
+.compras-falta { color: var(--rojo); font-weight: 600; font-size: var(--t-chico); }
+
+/* Renglones. */
+.compras-cantidad { display: inline-flex; align-items: center; gap: var(--e2); }
+.compras-costo { width: 100%; }
+.compras-bajo-nombre { display: block; }
+.compras-nuevo { display: flex; flex-direction: column; align-items: flex-start; gap: var(--e1); }
+.compras-nuevo .entrada[aria-invalid="true"] { border-color: var(--ambar-fuerte); background: var(--ambar-suave); }
+.compras-segun-lista { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--e1) var(--e3); }
+.compras-segun-lista .explicado { margin-block: 0; }
+
+.compras-tarjetas { display: flex; flex-direction: column; gap: var(--e3); }
+.compras-tarjeta { display: flex; flex-direction: column; gap: var(--e3); padding: var(--e3) var(--e4) var(--e4); scroll-margin-bottom: 180px; }
+.compras-tarjeta.incompleto { border-color: var(--ambar-fuerte); box-shadow: inset 4px 0 0 var(--ambar); }
+.compras-tarjeta-cabeza { display: flex; align-items: flex-start; gap: var(--e3); }
+.compras-tarjeta-cabeza .nombre { display: block; font-weight: 650; overflow-wrap: anywhere; }
+.compras-tarjeta-cabeza .boton { flex: none; margin: calc(-1 * var(--e1)) calc(-1 * var(--e2)) 0 0; box-shadow: none; border-color: transparent; color: var(--texto-2); }
+.compras-tarjeta-campos { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--e3); align-items: end; }
+.compras-tarjeta-pie { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); min-height: 28px; }
+
+.compras-tabla td { padding-block: var(--e2); }
+.compras-tabla tr.incompleto td:first-child { box-shadow: inset 4px 0 0 var(--ambar); }
+.compras-tabla .compras-costo { width: 150px; }
+.compras-tabla .compras-nuevo .entrada { min-width: 260px; }
+
+/* El total y registrar, siempre a la vista. */
+.compras-total { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.compras-total .rotulo { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.compras-total .importe { font-size: var(--t-total); }
+.compras-pie-aviso { flex: 1; min-width: 0; text-align: right; }
+.compras-pie .boton.grande { flex: none; }
+
+/* Compras recientes y gastos de la semana. */
+.compras-historia { display: flex; flex-direction: column; gap: var(--e4); min-width: 0; }
+.compras-recientes { display: flex; flex-direction: column; }
+.compras-recientes > .aviso { margin: 0 var(--e4) var(--e4); }
+.compras-sin-compras { padding: 0 var(--e4) var(--e4); }
+.compras-cargando { display: flex; flex-direction: column; gap: var(--e2); padding: 0 var(--e4) var(--e4); }
+.compras-cargando .esqueleto { height: 36px; }
+.plegable-relleno > .compras-cargando { padding: 0; }
+.compras-flecha { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: var(--azul-suave); color: var(--azul); transition: transform var(--normal) ease-out; flex: none; }
+.compras-flecha.abierta { transform: rotate(90deg); }
+.compras-tabla-recientes { border-top: 1px solid var(--borde); }
+.compras-tabla-recientes tbody + tbody tr:first-child td { border-top: 1px solid var(--borde); }
+.compras-tabla-recientes tbody tr:last-child td { border-bottom: 0; }
+.compras-tabla-recientes tr.hija td { border-bottom: 0; }
+.compras-tabla-recientes tr.hija { animation: aparecer var(--normal) ease-out; }
+.compras-tabla-recientes td.num { white-space: nowrap; }
+.compras-tabla-recientes .atenuada .tachable { text-decoration: line-through; }
+.compras-ayuda-teclas { padding: var(--e2) var(--e4) var(--e3); border-top: 1px solid var(--borde); }
+
+.compras-lista { border-top: 1px solid var(--borde); }
+.compras-lista > li { border-bottom: 1px solid var(--borde); }
+.compras-lista > li:last-child { border-bottom: 0; }
+.compras-lista .anulada .renglon { color: var(--texto-3); }
+.compras-lista .anulada .tachable { text-decoration: line-through; }
+.compras-linea { display: flex; align-items: flex-start; gap: var(--e2); }
+.compras-sin-corte { white-space: nowrap; }
+.compras-ingreso .vacio { padding-block: var(--e6); }
+.compras-linea .compras-flecha { width: 22px; height: 22px; }
+.compras-abierta { display: flex; flex-direction: column; align-items: flex-start; gap: var(--e3); padding: 0 var(--e4) var(--e4); animation: aparecer var(--normal) ease-out; }
+.compras-items { align-self: stretch; border-radius: var(--r-control); background: var(--superficie-2); border: 1px solid var(--borde); }
+.compras-items li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--e3); padding: var(--e2) var(--e3); border-bottom: 1px solid var(--borde); }
+.compras-items li:last-child { border-bottom: 0; }
+.compras-items strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.compras-anular-que { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--e1) var(--e3); padding: var(--e3) var(--e4); border-radius: var(--r-tarjeta); background: var(--superficie-2); border: 1px solid var(--borde); }
+.compras-anular-que strong { font-size: var(--t-medio); }
+.compras-anular-que .detalle { grid-column: 1 / -1; }
+
+.compras-gastos { display: flex; flex-direction: column; gap: var(--e4); }
+.compras-gastos-total { display: flex; flex-direction: column; gap: var(--e1); }
+.compras-gastos-lista { display: flex; flex-direction: column; gap: var(--e3); }
+.compras-gastos-lista li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--e1) var(--e3); }
+.compras-gastos-lista .nombre { font-weight: 650; }
+.compras-gastos-lista .detalle, .compras-riel { grid-column: 1 / -1; }
+.compras-riel { height: 8px; border-radius: var(--r-pastilla); background: var(--superficie-2); border: 1px solid var(--borde); overflow: hidden; }
+.compras-riel i { display: block; height: 100%; background: var(--azul); transform-origin: left; }
+
+@media (max-width: 899px) {
+  .compras-pie .compras-pie-aviso:empty { display: none; }
+  .compras-pie { flex-wrap: wrap; }
+  .compras-pie .compras-total { flex: 1; }
+  .compras-pie .compras-pie-aviso { order: -1; flex-basis: 100%; text-align: left; }
+  .compras-total .importe { font-size: var(--t-titulo); }
+}
+@media (min-width: 900px) {
+  .compras-ingreso { padding: var(--e4); background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); }
+  .compras-datos { grid-template-columns: minmax(220px, 1.4fr) auto minmax(150px, 1fr) 170px; align-items: start; }
+  .compras-datos > .campo:nth-child(1), .compras-datos > .campo:nth-child(2) { grid-column: auto; }
+  .compras-datos .segmentos { display: inline-flex; }
+  .compras-datos .segmentos button { flex: none; padding: 0 var(--e3); }
+  .compras-gastos-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--e4) var(--e6); }
+}
+@media (min-width: 1500px) {
+  .compras-historia { display: grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); align-items: start; gap: var(--e5); }
+  .compras-gastos-lista { display: flex; }
+}

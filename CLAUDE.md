@@ -66,9 +66,10 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
   explican; resumidos en el celular). Un cambio de regla o de texto se hace en lo compartido
   o en los dos lados, nunca en uno solo (decisión 47).
 - **Las versiones 1 a 4 son históricas** (`historico/`): se conservan para ver su maquetado.
-  No se usan, no se prueban y **no reciben ninguna funcionalidad nueva**. Ojo: la principal
-  todavía importa archivos de `src/pantallas`, `src/componentes` y `src/v2`; un cambio ahí
-  también cambia la versión histórica, así que lo nuevo va en `src/principal/`.
+  No se usan, no se prueban y **no reciben ninguna funcionalidad nueva**. Su código
+  (`src/pantallas`, `src/componentes`, `src/escritorio`, `src/v2`, `src/v4`) está congelado:
+  la aplicación no importa nada de ahí. Lo único que comparten es lo común de `src/`
+  (la llamada a la API, el catálogo, el envío sin conexión, la sesión).
 - **Solo la aplicación principal tiene pruebas.** Un cambio en una pantalla va con su prueba
   en `src/principal/` y, si toca un camino principal, en `tests/e2e/`.
 - **Cada cosa que Carlos decide** se anota con su número en

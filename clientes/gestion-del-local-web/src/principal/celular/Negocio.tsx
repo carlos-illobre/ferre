@@ -4,10 +4,10 @@ import { api, urlApi } from "../../api";
 import { fecha, pesos } from "../../formato";
 import { administra, useSesion } from "../../sesion";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../credenciales";
-import { AvisoError, Hoja, Icono, Toast } from "../../componentes/base";
-import { EstadoDeConexion } from "../../componentes/EstadoDeConexion";
-import { describirDispositivo } from "../../pantallas/Login";
-import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "../../pantallas/VentasDeHoy";
+import { AvisoError, Hoja, Icono, Toast } from "./componentes/base";
+import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
+import { describirDispositivo } from "./pantallas/Login";
+import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
 import { esAmbienteDePrueba } from "../../ambiente";
 
 type UsuarioFila = { id: string; email: string; nombre: string; rol: string; activo: boolean };

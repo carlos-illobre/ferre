@@ -1,0 +1,75 @@
+/* Contar: la lista de sectores y el conteo de uno (puesto de trabajo, contados, sin contar). */
+.contar-en-curso { display: flex; align-items: center; gap: var(--e2); color: var(--ambar-texto); font-weight: 600; }
+.contar-sectores { display: flex; flex-direction: column; gap: var(--e3); }
+.contar-sector { display: flex; flex-direction: column; gap: var(--e2); padding: var(--e4); }
+.contar-sector.en-curso { border-color: var(--ambar-fuerte); box-shadow: inset 4px 0 0 var(--ambar), var(--sombra-1); }
+.contar-sector-cabeza { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); }
+.contar-sector-cabeza h2 { font-size: var(--t-medio); font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.contar-sector .boton { margin-top: var(--e2); }
+.contar-celda-accion .boton { min-width: 150px; }
+.contar-falta { color: var(--rojo); font-weight: 600; font-size: var(--t-chico); }
+
+/* El nombre del sector queda siempre a la vista mientras se cuenta. */
+.contar-conteo .pagina-cabeza { position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: var(--z-pegado); margin: calc(-1 * var(--e2)) calc(-1 * var(--e4)); padding: var(--e2) var(--e4); background: var(--fondo); }
+.contar-avance { display: flex; flex-wrap: wrap; gap: var(--e2); }
+
+.contar-cuerpo { display: flex; flex-direction: column; gap: var(--e5); min-width: 0; }
+.contar-puesto, .contar-listas { display: flex; flex-direction: column; gap: var(--e3); min-width: 0; }
+.contar-listas { gap: var(--e5); }
+
+.contar-contando { display: flex; flex-direction: column; gap: var(--e3); padding: var(--e4); border-color: var(--azul-borde); box-shadow: var(--sombra-2); animation: subir var(--normal) ease-out; }
+.contar-contando h2 { font-size: var(--t-medio); font-weight: 700; }
+.contar-previo { display: flex; align-items: flex-start; gap: var(--e2); padding: var(--e2) var(--e3); border-radius: var(--r-control); background: var(--azul-suave); font-size: var(--t-chico); }
+.contar-previo svg { flex: none; margin-top: 2px; color: var(--azul); }
+.contar-cuantas { font-size: var(--t-medio); font-weight: 700; }
+.contar-cuantas .detalle { font-weight: 500; }
+.contar-numero { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; height: 72px; border: 2px solid var(--borde-fuerte); border-radius: var(--r-tarjeta); background: var(--superficie); overflow: hidden; }
+.contar-numero:focus-within { border-color: var(--azul); box-shadow: 0 0 0 3px var(--azul-suave); }
+.contar-numero:has([aria-invalid="true"]) { border-color: var(--rojo); }
+.contar-numero button { display: grid; place-items: center; border: 0; background: var(--superficie-2); color: var(--tinta); }
+.contar-numero button:hover { background: var(--azul-suave); }
+.contar-numero input { min-width: 0; width: 100%; border: 0; border-inline: 1px solid var(--borde); background: none; text-align: center; font-stretch: 78%; font-variation-settings: "wdth" var(--ancho-importe); font-size: var(--t-total); font-weight: 700; font-variant-numeric: tabular-nums; }
+.contar-numero input::placeholder { color: var(--borde-fuerte); }
+.contar-numero :focus-visible { box-shadow: inset 0 0 0 2px var(--azul); border-radius: 0; }
+.contar-contando-botones { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--e3); }
+.contar-contando-botones .boton { min-height: 52px; }
+
+.seccion-titulo .detalle { font-weight: 500; }
+.contar-contado { display: inline-flex; align-items: baseline; gap: var(--e2); }
+.contar-contado .deposito-dif { min-width: 2.2em; text-align: right; }
+.contar-tabla .explicado { justify-content: flex-end; margin-right: 0; }
+.contar-sin-contar { border-top: 1px solid var(--borde); }
+.contar-sin-contar > li { border-bottom: 1px solid var(--borde); }
+.contar-sin-contar > li:last-child { border-bottom: 0; }
+.contar-sin-contar > li:last-child .renglon { border-radius: 0 0 var(--r-tarjeta) var(--r-tarjeta); }
+.contar-tocar { display: inline-flex; align-items: center; gap: 2px; min-height: 32px; padding: 0 var(--e2) 0 var(--e3); border-radius: var(--r-control); border: 1px solid var(--borde-fuerte); background: var(--superficie); box-shadow: var(--sombra-1); font-weight: 650; font-size: var(--t-chico); }
+
+.contar-pie { padding-block: var(--e2); }
+
+/* Confirmación del cierre. */
+.contar-cierre-numeros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e2); margin: 0; }
+.contar-cierre-numeros > div { display: flex; flex-direction: column; gap: var(--e1); padding: var(--e3); border-radius: var(--r-tarjeta); background: var(--superficie-2); border: 1px solid var(--borde); }
+.contar-cierre-numeros dt { font-size: var(--t-chico); font-weight: 600; color: var(--texto-2); }
+.contar-cierre-numeros dd { margin: 0; }
+.contar-cierre-botones { display: flex; flex-direction: column; gap: var(--e2); }
+.contar-cierre-botones .boton { white-space: normal; min-height: var(--toque); padding-block: var(--e2); text-align: center; }
+
+/* Conteo cerrado. */
+.contar-resultado { display: flex; flex-direction: column; align-items: center; gap: var(--e3); padding: var(--e8) var(--e4); text-align: center; animation: aparecer var(--normal) ease-out; }
+.contar-resultado h2 { font-size: var(--t-titulo); font-weight: 750; }
+.contar-resultado p { color: var(--texto-2); font-size: var(--t-medio); max-width: 46ch; }
+.contar-tilde { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--verde-suave); color: var(--verde); animation: tilde 260ms ease-out; }
+.contar-resultado-botones { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--e3); margin-top: var(--e3); }
+.contar-ajustes { display: flex; flex-direction: column; gap: var(--e3); }
+
+@media (max-width: 899px) {
+  .contar-conteo .pagina-cabeza h1 { font-size: var(--t-medio); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+  .contar-resultado-botones { flex-direction: column; align-self: stretch; align-items: stretch; }
+}
+@media (min-width: 900px) {
+  .contar-conteo .pagina-cabeza { top: 0; margin: calc(-1 * var(--e5)) calc(-1 * var(--e6)) 0; padding: var(--e4) var(--e6) var(--e3); }
+  .contar-cuerpo { display: grid; grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); align-items: start; gap: var(--e6); }
+  .contar-puesto { position: sticky; top: 132px; }
+  .contar-resultado { padding: var(--e10) var(--e6); }
+  .contar-ajustes { max-width: 720px; }
+}

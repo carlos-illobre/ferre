@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
-import { AvisoError, Buscador, Hoja, Toast } from "../../componentes/base";
+import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
-import { Explicacion } from "../../componentes/Explicacion";
-import { FotoProducto } from "../../componentes/Foto";
+import { Explicacion } from "./componentes/Explicacion";
+import { FotoProducto } from "./componentes/Foto";
 import { useCatalogo } from "../../catalogo";
 import { useDebounce } from "../../debounce";
 import { useTeclasGlobales } from "../../teclas";
 import { descargar, subirFoto } from "../../api";
 import { fecha, pesos } from "../../formato";
 import { irA } from "../../rutas";
-import { Listas } from "../../pantallas/Listas";
-import { Duplicados } from "../../pantallas/Duplicados";
-import { pesosCortos } from "../../pantallas/VentasDeHoy";
-import type { Producto } from "../../pantallas/Productos";
+import { Listas } from "./pantallas/Listas";
+import { Duplicados } from "./pantallas/Duplicados";
+import { pesosCortos } from "./pantallas/VentasDeHoy";
+import type { Producto } from "./pantallas/Productos";
 
 // Catálogo: productos con margen y proveedores, listas de precios, duplicados. Tres
 // sub-pantallas con un segmento arriba (rediseño en mockups/Ferre iOS.html).

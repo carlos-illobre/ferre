@@ -1,5 +1,5 @@
-import { BotonGoogle, BotonHuella } from "../../pantallas/Login";
-import { TEXTOS_DE_ENTRADA } from "../../v2/pantallas/Entrar";
+import { BotonGoogle, BotonHuella } from "./pantallas/Login";
+import { TEXTOS_DE_ENTRADA } from "../compu/base/pantallas/Entrar";
 
 // La entrada del celular es mínima (decisión 47): la marca, una línea que dice qué hace la
 // aplicación y los botones para entrar. La línea es la misma que titula la entrada de la

@@ -7,7 +7,7 @@ vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalog
 const descargar = vi.hoisted(() => vi.fn(async () => undefined));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar }));
 
-import { Productos } from "../../v2/pantallas/Productos";
+import { Productos } from "./base/pantallas/Productos";
 
 function armar() {
   const falso = catalogoFalso([

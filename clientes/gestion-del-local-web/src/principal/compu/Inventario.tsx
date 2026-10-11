@@ -7,11 +7,11 @@ import { enviarOEncolar } from "../../cola";
 import { useCatalogo, type StockFila } from "../../catalogo";
 import { fecha, pesos } from "../../formato";
 import { cantidadValida, enteras, unidadDe } from "../../unidades";
-import { irA } from "../../v2/rutas";
-import { Aviso, Boton, Buscador, Explicado, Hoja, Icono, Indicador, Pagina, Pastilla, Progreso, Segmentos, Toast, Vacio, numero } from "../../v2/ui";
-import { useEsCelular } from "../../v2/vista";
-import { conSigno, detalleDe, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "../../v2/pantallas/deposito-comun";
-import "../../v2/estilos/stock.css";
+import { irA } from "./base/rutas";
+import { Aviso, Boton, Buscador, Explicado, Hoja, Icono, Indicador, Pagina, Pastilla, Progreso, Segmentos, Toast, Vacio, numero } from "./base/ui";
+import { useEsCelular } from "./base/vista";
+import { conSigno, detalleDe, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
+import "./base/estilos/stock.css";
 
 // Inventario: cuánto hay de cada producto, sin sumas de dinero (el dinero invertido está en
 // Cómo va el negocio; decisión 31). Cada número se explica: el stock, con sus movimientos; el

@@ -1,20 +1,20 @@
 import { useEffect } from "react";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
-import { OfrecerHuella } from "../../componentes/OfrecerHuella";
-import { Icono } from "../../componentes/base";
+import { OfrecerHuella } from "./componentes/OfrecerHuella";
+import { Icono } from "./componentes/base";
 import { ProveedorDeSesion, administra, useSesion } from "../../sesion";
 import { irA, useRuta } from "../../rutas";
 import { Entrar } from "./Entrar";
-import { VincularCelular } from "../../pantallas/VincularCelular";
+import { VincularCelular } from "./pantallas/VincularCelular";
 import { Catalogo } from "./Catalogo";
-import { Icono as IconoDeMas, type NombreDeIcono } from "../../v2/ui";
+import { Icono as IconoDeMas, type NombreDeIcono } from "../compu/base/ui";
 import { Deposito } from "./Deposito";
 import { Negocio, type Parte } from "./Negocio";
 import { Tickets } from "../Tickets";
 import { Anomalias } from "../Anomalias";
 import { Vender } from "./Vender";
-import "../../estilos.css";
+import "./estilos.css";
 import "./tema.css";
 
 // La interfaz de celular de la versión 1, que es la que resultó más fácil de usar, con la

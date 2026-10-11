@@ -1,5 +1,5 @@
-import { Icono, Pagina, type NombreDeIcono } from "../../v2/ui";
-import { irA } from "../../v2/rutas";
+import { Icono, Pagina, type NombreDeIcono } from "./base/ui";
+import { irA } from "./base/rutas";
 
 // «Más» guarda las pantallas que se usan poco, para que el menú tenga solo lo de todos los días.
 export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: NombreDeIcono }[] = [

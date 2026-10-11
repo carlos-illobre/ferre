@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { subirFoto } from "../../api";
-import { FotoProducto } from "../../componentes/Foto";
+import { FotoProducto } from "./componentes/Foto";
 
 // La foto de un producto, donde sea que aparezca en una lista (ingreso, inventario): se toca
 // para verla en grande o para sacarla. `alCambiar` avisa la foto nueva para guardarla en el

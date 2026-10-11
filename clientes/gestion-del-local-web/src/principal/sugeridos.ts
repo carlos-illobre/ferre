@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { precioDeVenta } from "@ferre/calculo-de-precios";
 import { api } from "../api";
 import { leerTodo } from "../almacen";
-import type { Producto } from "../pantallas/Productos";
+import type { Producto } from "./celular/pantallas/Productos";
 
 // Para que la venta nueva no arranque vacía: lo último que se vendió y lo que más se vende,
 // a un toque. Sale de las ventas guardadas en este dispositivo (los últimos 7 días) y de

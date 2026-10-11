@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { PedirFotoAlCelular, hayQueUsarElCelular } from "../principal/PedirFoto";
 import { leerMeta } from "../almacen";
 import { alCambiarLaCola, enviarPendientes, pendientes } from "../cola";
 import { urlDeFoto } from "../api";
@@ -376,15 +375,11 @@ function FotoGrande({ url, nombre, descripcion, alSubir, alCerrar }: { url: stri
   const archivo = useRef<HTMLInputElement>(null);
   const [subiendo, setSubiendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pidiendo, setPidiendo] = useState(false);
   async function elegida(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     e.target.value = "";
-    await recibir(f);
-  }
-  async function recibir(f: File | undefined) {
     if (!f || !alSubir) return;
-    setPidiendo(false); setSubiendo(true); setError(null);
+    setSubiendo(true); setError(null);
     try { await alSubir(f); } catch (err) { setError(`No se pudo subir la foto: ${(err as Error).message}. Probá de nuevo.`); }
     finally { setSubiendo(false); }
   }
@@ -395,14 +390,11 @@ function FotoGrande({ url, nombre, descripcion, alSubir, alCerrar }: { url: stri
         <figcaption>
           <span>{descripcion}{!url && <><br /><small>Este producto todavía no tiene foto.</small></>}</span>
           <Aviso tipo="error">{error}</Aviso>
-          {pidiendo && <PedirFotoAlCelular para={`la foto de ${descripcion}`} alCancelar={() => setPidiendo(false)} alRecibir={recibir} />}
           <div className="hoja-pie">
-            {alSubir && !pidiendo && (
+            {alSubir && (
               <>
                 <input ref={archivo} type="file" accept="image/*" capture="environment" hidden onChange={elegida} data-testid="archivo-foto" />
-                {/* La computadora no tiene cámara: la foto la saca el celular, con un código QR. */}
-                {hayQueUsarElCelular() && <Boton variante="principal" icono="celular" disabled={subiendo} onClick={() => { setError(null); setPidiendo(true); }} data-testid="foto-con-celular">{subiendo ? "Subiendo la foto…" : "Sacar la foto con el celular"}</Boton>}
-                <Boton variante={hayQueUsarElCelular() ? undefined : "principal"} icono="camara" disabled={subiendo} onClick={() => archivo.current?.click()} data-testid="sacar-foto">{hayQueUsarElCelular() ? "Elegir un archivo" : subiendo ? "Subiendo la foto…" : url ? "Sacar otra foto" : "Sacar foto"}</Boton>
+                <Boton variante="principal" icono="camara" disabled={subiendo} onClick={() => archivo.current?.click()} data-testid="sacar-foto">{subiendo ? "Subiendo la foto…" : url ? "Sacar otra foto" : "Sacar foto"}</Boton>
               </>
             )}
             <Boton onClick={alCerrar}>Cerrar</Boton>

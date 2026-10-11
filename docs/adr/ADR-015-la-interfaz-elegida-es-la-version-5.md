@@ -22,6 +22,13 @@ versión 4 (decisión 27). El 2026-10-11 eligió la versión 5, que junta esas t
 > `src/principal/textos.ts` (textos y listas; forma larga para la computadora y corta para
 > el celular), `src/principal/paleta.css` (todos los colores) y las reglas, que tienen que
 > ser idénticas en las dos.
+>
+> **La aplicación ya no depende de las versiones históricas.** Las pantallas, los componentes
+> y los estilos de las versiones 1 y 2 que usaba se copiaron adentro de `src/principal/`
+> (`celular/pantallas`, `celular/componentes`, `celular/estilos.css` y `compu/base/`). Lo que
+> más abajo dice sobre importar pantallas de las versiones 1 y 2, y sobre no poder borrarlas,
+> ya no vale: el código de las históricas quedó congelado y un cambio en la aplicación no las
+> toca. Siguen compartiendo solo lo común de `src/` (API, catálogo, envío sin conexión, sesión).
 
 ## Decisión
 

@@ -1,4 +1,4 @@
-import { Icono, type NombreDeIcono } from "../../v2/ui";
+import { Icono, type NombreDeIcono } from "../compu/base/ui";
 
 // Las pestañas de adentro de una parte (Catálogo, Depósito), cada una con su ícono para
 // reconocerla sin leer. Usa los estilos de los segmentos de la versión 1.

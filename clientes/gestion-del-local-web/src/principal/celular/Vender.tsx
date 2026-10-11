@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent }
 import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
 import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
-import { FotoProducto } from "../../componentes/Foto";
-import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "../../componentes/base";
-import { Explicacion } from "../../componentes/Explicacion";
+import { FotoProducto } from "./componentes/Foto";
+import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "./componentes/base";
+import { Explicacion } from "./componentes/Explicacion";
 import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto } from "../../api";
 import { guardar, borrarAnterioresA } from "../../almacen";
@@ -12,13 +12,13 @@ import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendie
 import { useCatalogo } from "../../catalogo";
 import { useTeclasGlobales } from "../../teclas";
 import { pesos } from "../../formato";
-import { describirDispositivo } from "../../pantallas/Login";
-import { Escaner, hayCamara } from "../../componentes/Escaner";
-import { VincularCelular } from "../../componentes/VincularCelular";
-import { EstadoDeConexion } from "../../componentes/EstadoDeConexion";
+import { describirDispositivo } from "./pantallas/Login";
+import { Escaner, hayCamara } from "./componentes/Escaner";
+import { VincularCelular } from "./componentes/VincularCelular";
+import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { enviarCodigoAlPuesto, escucharPuesto, puestoRemoto } from "../../puesto";
-import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "../../pantallas/VentasDeHoy";
-import type { Producto } from "../../pantallas/Productos";
+import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
+import type { Producto } from "./pantallas/Productos";
 
 // La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
 // precio → cantidad → cobro. Enter agrega; Esc descarta ("no llevó"); F2 cobra. Cada

@@ -9,15 +9,15 @@ import { enviarOEncolar, enviarPendientes } from "../../cola";
 import { useCatalogo, type Cliente } from "../../catalogo";
 import { useTeclasGlobales } from "../../teclas";
 import { pesos } from "../../formato";
-import { Escaner, hayCamara } from "../../componentes/Escaner";
+import { Escaner, hayCamara } from "../celular/componentes/Escaner";
 import { enviarCodigoAlPuesto, escucharPuesto, guardarPuestoLocal, puestoLocal, puestoRemoto } from "../../puesto";
-import type { Producto } from "../../pantallas/Productos";
-import { describirDispositivo } from "../../v2/dispositivo";
-import { NOMBRE_MEDIO, useVentasDelDia } from "../../v2/pantallas/VentasDeHoy";
-import { useEsCelular } from "../../v2/vista";
-import { irA } from "../../v2/rutas";
-import { Aviso, Boton, Buscador, Contador, Exito, Explicado, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Progreso, Toast, Vacio, hora, numero, pesosCortos } from "../../v2/ui";
-import "../../v2/estilos/vender.css";
+import type { Producto } from "../celular/pantallas/Productos";
+import { describirDispositivo } from "./base/dispositivo";
+import { NOMBRE_MEDIO, useVentasDelDia } from "./base/pantallas/VentasDeHoy";
+import { useEsCelular } from "./base/vista";
+import { irA } from "./base/rutas";
+import { Aviso, Boton, Buscador, Contador, Exito, Explicado, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Progreso, Toast, Vacio, hora, numero, pesosCortos } from "./base/ui";
+import "./base/estilos/vender.css";
 import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 
 // La venta, en el orden del mostrador: buscar → costo, margen y precio → cantidad → cobro.

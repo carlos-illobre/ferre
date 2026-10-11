@@ -5,11 +5,11 @@ import { api } from "../../api";
 import { useCatalogo } from "../../catalogo";
 import { fecha, pesos, porcentaje } from "../../formato";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
-import { Escaner, hayCamara } from "../../componentes/Escaner";
-import { Aviso, Boton, Contador, Exito, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Segmentos, Toast, Vacio, numero as cifra, pesosCortos } from "../../v2/ui";
-import { useEsCelular } from "../../v2/vista";
-import { BuscadorDeProducto, detalleDe, mensajeDe, plural, useEnLinea, type Producto } from "../../v2/pantallas/deposito-comun";
-import "../../v2/estilos/compras.css";
+import { Escaner, hayCamara } from "../celular/componentes/Escaner";
+import { Aviso, Boton, Contador, Exito, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Segmentos, Toast, Vacio, numero as cifra, pesosCortos } from "./base/ui";
+import { useEsCelular } from "./base/vista";
+import { BuscadorDeProducto, detalleDe, mensajeDe, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
+import "./base/estilos/compras.css";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 
 // Ingreso de mercadería: proveedor y comprobante, renglones con la búsqueda de siempre, y
