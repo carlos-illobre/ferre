@@ -1,0 +1,37 @@
+/* La paleta de la aplicación, una sola para el celular y la computadora (decisión 47). Cada
+   color dice una cosa: verde oscuro = dónde estoy y títulos; naranja = la acción principal;
+   amarillo = avisos y el cobro; blanco con borde = botones comunes y campos. Las hojas de
+   estilo de cada interfaz y las de las pantallas compartidas toman los colores de acá: para
+   cambiar un color se cambia en este archivo y en ningún otro. El magenta del marco del
+   ambiente de prueba queda afuera a propósito: no es de la aplicación. */
+:root {
+  --p-verde: #17312b;
+  --p-verde-2: #25443d;
+  --p-verde-3: #33574e;
+  --p-verde-texto: #0f6b52;
+  --p-verde-suave: #e3f3ea;
+  --p-ok: #0f8a5f;
+  --p-naranja: #d83f0e;
+  --p-naranja-fuerte: #b9350a;
+  --p-naranja-sombra: #8f2a08;
+  --p-naranja-texto: #c2370b;
+  --p-naranja-texto-fuerte: #a52e08;
+  --p-naranja-suave: #fff0ea;
+  --p-naranja-borde: #f0b9a3;
+  --p-amarillo: #f7c445;
+  --p-amarillo-suave: #fff7d6;
+  --p-amarillo-borde: #f0c64a;
+  --p-fondo: #e6ece6;
+  --p-fondo-2: #eef3ee;
+  --p-superficie: #ffffff;
+  --p-borde: #c3cfc6;
+  --p-borde-suave: #dbe3dc;
+  --p-borde-fuerte: #7c9085;
+  --p-tinta: #18201e;
+  --p-texto-medio: #33403b;
+  --p-texto-2: #4a5451;
+  --p-relleno: #dfe5e0;
+  --p-relleno-fuerte: #d3ddd5;
+  --p-naranja-apretado: #ffd9cb;
+  --p-amarillo-texto: #6b4a00;
+}

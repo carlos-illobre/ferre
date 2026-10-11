@@ -1,24 +1,24 @@
 /* Foto del comprobante de una compra. Igual en celular y computadora: trae sus colores. */
-.ff { display: flex; align-items: center; gap: 14px; padding: 12px; border: 1.500px solid #7c9085; border-radius: 12px; background: #fff; color: #18201e; font-size: 1rem; line-height: 1.4; box-sizing: border-box; min-width: 0; }
-.ff.vacia { border-style: dashed; background: #fbfcfa; }
+.ff { display: flex; align-items: center; gap: 14px; padding: 12px; border: 1.500px solid var(--p-borde-fuerte); border-radius: 12px; background: #fff; color: var(--p-tinta); font-size: 1rem; line-height: 1.4; box-sizing: border-box; min-width: 0; }
+.ff.vacia { border-style: dashed; background: var(--p-fondo-2); }
 .ff-texto { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
-.ff-texto > span { color: #4a5451; font-size: 0.9375rem; }
+.ff-texto > span { color: var(--p-texto-2); font-size: 0.9375rem; }
 .ff-botones { display: flex; flex-wrap: wrap; gap: 8px; }
-.ff-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1.500px solid #7c9085; background: #fff; color: #18201e; font: inherit; font-weight: 650; cursor: pointer; }
-.ff-boton:hover:not(:disabled) { background: #f1f4f1; }
-.ff-boton:disabled { color: #555f5c; background: #e4e8e5; border-color: #e4e8e5; cursor: not-allowed; }
-.ff-boton.fuerte { background: #17312b; border-color: #17312b; color: #fff; }
-.ff-boton.fuerte:hover:not(:disabled) { background: #25443d; }
-.ff-boton:focus-visible, .ff-ver:focus-visible { outline: 3px solid #0f6b52; outline-offset: 2px; }
+.ff-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1.500px solid var(--p-borde-fuerte); background: #fff; color: var(--p-tinta); font: inherit; font-weight: 650; cursor: pointer; }
+.ff-boton:hover:not(:disabled) { background: var(--p-fondo-2); }
+.ff-boton:disabled { color: var(--p-texto-2); background: var(--p-relleno); border-color: var(--p-relleno); cursor: not-allowed; }
+.ff-boton.fuerte { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+.ff-boton.fuerte:hover:not(:disabled) { background: var(--p-verde-2); }
+.ff-boton:focus-visible, .ff-ver:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
 .ff-ver { flex: none; padding: 0; border: 0; border-radius: 10px; background: none; cursor: zoom-in; }
-.ff-ver img, .ff-cargando { display: block; width: 72px; height: 96px; border-radius: 10px; border: 1px solid #dfe5e1; object-fit: cover; background: #f1f4f1; }
-.ff-texto .ff-error { color: #c2370b; font-weight: 650; }
+.ff-ver img, .ff-cargando { display: block; width: 72px; height: 96px; border-radius: 10px; border: 1px solid var(--p-borde); object-fit: cover; background: var(--p-fondo-2); }
+.ff-texto .ff-error { color: var(--p-naranja-texto); font-weight: 650; }
 
-dialog.ff-grande { width: min(96vw, 1100px); max-height: 94dvh; padding: 12px; border: 0; border-radius: 14px; background: #fff; color: #18201e; }
+dialog.ff-grande { width: min(96vw, 1100px); max-height: 94dvh; padding: 12px; border: 0; border-radius: 14px; background: #fff; color: var(--p-tinta); }
 dialog.ff-grande[open] { display: flex; flex-direction: column; gap: 12px; }
 dialog.ff-grande::backdrop { background: rgb(15 30 25 / 0.78); }
 dialog.ff-grande .ff-botones { justify-content: flex-end; }
-.ff-lienzo { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; background: #f1f4f1; text-align: center; }
+.ff-lienzo { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; background: var(--p-fondo-2); text-align: center; }
 .ff-lienzo img { max-width: 100%; max-height: 76dvh; object-fit: contain; cursor: zoom-in; }
 .ff-lienzo.zoom img { max-width: none; max-height: none; width: 220%; cursor: zoom-out; }
 @media (max-width: 899px) { .ff.vacia .ff-boton { flex: 1 1 100%; min-height: 48px; } }
@@ -30,19 +30,19 @@ dialog.ff-grande .ff-botones { justify-content: flex-end; }
 
 /* El pedido de foto en la computadora: el código QR y los pasos. */
 .ff-pedido { display: flex; align-items: center; gap: 18px; width: 100%; }
-.ff-pedido img { flex: none; border-radius: 10px; border: 1px solid #dfe5e1; background: #fff; }
+.ff-pedido img { flex: none; border-radius: 10px; border: 1px solid var(--p-borde); background: #fff; }
 .ff-pedido .ff-texto { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
-.ff-pedido ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; color: #33403b; }
+.ff-pedido ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; color: var(--p-texto-medio); }
 
 /* La pantalla del celular que saca la foto para la computadora. */
-.ff-celular { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 56px 24px 32px; background: #e6ece6; color: #18201e; font-size: 18px; line-height: 1.45; box-sizing: border-box; }
-.ff-celular h1 { margin: 0; font-size: 30px; line-height: 1.1; color: #17312b; }
+.ff-celular { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 56px 24px 32px; background: var(--p-fondo); color: var(--p-tinta); font-size: 18px; line-height: 1.45; box-sizing: border-box; }
+.ff-celular h1 { margin: 0; font-size: 30px; line-height: 1.1; color: var(--p-verde); }
 .ff-celular p { margin: 0; }
 .ff-grande-boton { width: 100%; min-height: 60px; font-size: 19px; text-decoration: none; }
-.ff-celular .ff-error { color: #c2370b; font-weight: 700; }
-.ff-listo { padding: 14px 16px; border-radius: 12px; background: #e3f3ea; color: #0f6b52; font-weight: 700; }
+.ff-celular .ff-error { color: var(--p-naranja-texto); font-weight: 700; }
+.ff-listo { padding: 14px 16px; border-radius: 12px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-weight: 700; }
 .ff-pedido ol { list-style: decimal; }
 .ff-pedido ol li { list-style: decimal; }
-.ff-qr-vacio { flex: none; width: 150px; height: 150px; border-radius: 10px; background: #e4e8e5; }
-.ff-pedido { text-align: left; color: #18201e; font-size: 1rem; }
-.ff-pedido .ff-error { color: #c2370b; font-weight: 650; }
+.ff-qr-vacio { flex: none; width: 150px; height: 150px; border-radius: 10px; background: var(--p-relleno); }
+.ff-pedido { text-align: left; color: var(--p-tinta); font-size: 1rem; }
+.ff-pedido .ff-error { color: var(--p-naranja-texto); font-weight: 650; }

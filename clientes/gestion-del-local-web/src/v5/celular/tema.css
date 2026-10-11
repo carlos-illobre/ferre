@@ -1,25 +1,26 @@
 /* Paleta de la v5 sobre la interfaz de celular de la versión 1: verde oscuro para lo que
    ordena, naranja como único color de acción y amarillo para destacar. Son los colores ya
    medidos en la v4 (texto blanco sobre el naranja: 4,5 a 1). */
+@import "../paleta.css";
 @import "@fontsource-variable/manrope/wght.css";
 @import "@fontsource-variable/space-grotesk/wght.css";
 
 :root {
-  --tinta: #17312b;
-  --niebla: #f5f6f2;
-  --relleno: #e4e8e5;
-  --gris: #4a5451;
-  --gris-claro: #66706d;
+  --tinta: var(--p-verde);
+  --niebla: var(--p-fondo-2);
+  --relleno: var(--p-relleno);
+  --gris: var(--p-texto-2);
+  --gris-claro: var(--p-texto-2);
   --linea: rgba(23, 49, 43, 0.1);
-  --coral: #d83f0e;
+  --coral: var(--p-naranja);
   --coral-claro: #e2531f;
-  --coral-tinte: #fff0ea;
-  --coral-texto: #c2370b;
-  --verde: #0f8a5f;
+  --coral-tinte: var(--p-naranja-suave);
+  --coral-texto: var(--p-naranja-texto);
+  --verde: var(--p-ok);
   --importes: "Space Grotesk Variable", "Segoe UI", system-ui, sans-serif;
   font-family: "Manrope Variable", -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
 }
-.pill-prueba { background: #f7c445 !important; color: #17312b !important; }
+.pill-prueba { background: var(--p-amarillo) !important; color: var(--p-verde) !important; }
 
 /* Lo último que se vendió y lo que más se vende, para que la venta nueva no arranque vacía. */
 .sugeridos { display: flex; flex-direction: column; gap: 8px; }
@@ -50,15 +51,15 @@
 
 /* Un producto sin foto muestra una cámara en el lugar de la foto, para que se note que ahí
    se toca para sacarla. */
-button.foto-chica:empty { background: #fff0ea; border: 2px dashed #d83f0e; cursor: pointer; }
-button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; background: #c2370b;
+button.foto-chica:empty { background: var(--p-naranja-suave); border: 2px dashed var(--p-naranja); cursor: pointer; }
+button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; background: var(--p-naranja-texto);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3v11H4Z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3Cpath d='M19 2v4M17 4h4'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3v11H4Z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3Cpath d='M19 2v4M17 4h4'/%3E%3C/svg%3E") center / contain no-repeat; }
 
 /* Un botón blanco sobre fondo claro no parecía botón: lleva borde. Y el de buscar duplicados,
    que es la acción de esa pantalla, va lleno y a todo el ancho. */
-.boton.blanco { border: 1.500px solid #7c9085; box-shadow: none; }
-.boton[data-testid="buscar-duplicados"] { width: 100%; height: 52px; border: 0; border-radius: 14px; background: #17312b; color: #fff; font-size: 16px; white-space: normal; }
+.boton.blanco { border: 1.500px solid var(--p-borde-fuerte); box-shadow: none; }
+.boton[data-testid="buscar-duplicados"] { width: 100%; height: 52px; border: 0; border-radius: 14px; background: var(--p-verde); color: #fff; font-size: 16px; white-space: normal; }
 .boton[data-testid="buscar-duplicados"]::before { content: ""; flex: none; width: 20px; height: 20px; background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.800-3.800'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.800-3.800'/%3E%3C/svg%3E") center / contain no-repeat; }
@@ -67,121 +68,121 @@ button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; backgroun
    búsqueda; lo que ya está en la venta va aparte, con título verde y franja naranja, para
    que no se confunda una cosa con la otra. */
 .atajos { display: flex; flex-direction: column; gap: 6px; }
-.atajos h2 { margin: 0 4px; font-size: 14px; font-weight: 700; color: #6b4a00; }
+.atajos h2 { margin: 0 4px; font-size: 14px; font-weight: 700; color: var(--p-amarillo-texto); }
 .atajos-grilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.atajo { display: flex; flex-direction: column; gap: 6px; padding: 6px; min-width: 0; border: 1.500px solid #f0c64a; border-radius: 14px; background: #fff7d6; color: #17312b; text-align: center; }
+.atajo { display: flex; flex-direction: column; gap: 6px; padding: 6px; min-width: 0; border: 1.500px solid var(--p-amarillo-borde); border-radius: 14px; background: var(--p-amarillo-suave); color: var(--p-verde); text-align: center; }
 .atajo:active { transform: scale(0.97); background: #ffeeb0; }
 .atajo-foto { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 10px; background: #fff; color: #b98a00; overflow: hidden; }
 .atajo-foto img { width: 100%; height: 100%; object-fit: cover; }
 .atajo-nombre { font-size: 12.500px; font-weight: 650; line-height: 1.2; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; min-height: 2.4em; }
-.en-venta { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 0; padding: 8px 14px; border-radius: 12px; background: #17312b; color: #fff; font-size: 16px; font-weight: 700; }
-.en-venta span { font-size: 13px; font-weight: 600; color: #f7c445; }
-.item { border-left: 6px solid #d83f0e; }
+.en-venta { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 0; padding: 8px 14px; border-radius: 12px; background: var(--p-verde); color: #fff; font-size: 16px; font-weight: 700; }
+.en-venta span { font-size: 13px; font-weight: 600; color: var(--p-amarillo); }
+.item { border-left: 6px solid var(--p-naranja); }
 
 /* ───────── Colores del celular: que se distingan los botones y las secciones ─────────
    Antes todo era blanco sobre gris muy claro. Ahora: el fondo es un verde grisáceo más
    marcado, así lo blanco resalta; todo lo que se toca lleva borde o color; y cada color
    dice una cosa: verde oscuro = dónde estoy y títulos, naranja = la acción principal,
    amarillo = atajos y avisos, blanco con borde = botones comunes y campos. */
-body, .hoja { background: #e6ece6; }
-.titulo { color: #17312b; }
+body, .hoja { background: var(--p-fondo); }
+.titulo { color: var(--p-verde); }
 
 /* Tarjetas y listas: borde fino, para que se despeguen del fondo. */
-.tarjeta:not(.oscura), .lista, .aviso-suave, .chip, .vacio .icono { border: 1px solid #c3cfc6; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
-.hoja .lista, .hoja .tarjeta:not(.oscura) { border: 1px solid #c3cfc6; }
-.lista > * { border-bottom-color: #dbe3dc; }
+.tarjeta:not(.oscura), .lista, .aviso-suave, .chip, .vacio .icono { border: 1px solid var(--p-borde); box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
+.hoja .lista, .hoja .tarjeta:not(.oscura) { border: 1px solid var(--p-borde); }
+.lista > * { border-bottom-color: var(--p-borde-suave); }
 
 /* Títulos de sección: verde oscuro, con una marca amarilla. */
-.seccion { color: #17312b; font-weight: 750; padding: 10px 4px 0 12px; position: relative; }
-.seccion::before { content: ""; position: absolute; left: 0; bottom: 1px; width: 5px; height: 16px; border-radius: 3px; background: #f7c445; }
+.seccion { color: var(--p-verde); font-weight: 750; padding: 10px 4px 0 12px; position: relative; }
+.seccion::before { content: ""; position: absolute; left: 0; bottom: 1px; width: 5px; height: 16px; border-radius: 3px; background: var(--p-amarillo); }
 .tarjeta .seccion { padding-left: 12px; }
 
 /* Botones: el común es blanco con borde; el oscuro y el naranja siguen llenos. */
-.boton { background: #fff; border: 1.500px solid #7c9085; }
+.boton { background: #fff; border: 1.500px solid var(--p-borde-fuerte); }
 .boton.tinta, .boton.coral, .boton.principal, .cuadricula-5 .boton.activo { border-color: transparent; }
-.boton.tinta { background: #17312b; color: #fff; }
-.boton.coral { background: #d83f0e; color: #fff; box-shadow: 0 2px 0 #8f2a08; }
-.boton.texto { background: #fff0ea; border-color: #f0b9a3; color: #a52e08; }
-.boton.texto.gris { background: #fff; border-color: #7c9085; color: #33403b; }
-.boton:disabled { background: #dfe5e0; border-color: #dfe5e0; color: #5c6763; box-shadow: none; }
-.cuadricula-5 .boton { border-color: #7c9085; }
-.cuadricula-5 .boton.activo { background: #17312b; }
+.boton.tinta { background: var(--p-verde); color: #fff; }
+.boton.coral { background: var(--p-naranja); color: #fff; box-shadow: 0 2px 0 var(--p-naranja-sombra); }
+.boton.texto { background: var(--p-naranja-suave); border-color: var(--p-naranja-borde); color: var(--p-naranja-texto-fuerte); }
+.boton.texto.gris { background: #fff; border-color: var(--p-borde-fuerte); color: var(--p-texto-medio); }
+.boton:disabled { background: var(--p-relleno); border-color: var(--p-relleno); color: var(--p-texto-2); box-shadow: none; }
+.cuadricula-5 .boton { border-color: var(--p-borde-fuerte); }
+.cuadricula-5 .boton.activo { background: var(--p-verde); }
 
 /* Pestañas y opciones: la elegida va en verde oscuro, no en blanco. */
-.segmentos { background: #d3ddd5; }
-.segmentos button { color: #33403b; }
-.segmentos button.activo { background: #17312b; color: #fff; box-shadow: none; }
+.segmentos { background: var(--p-relleno-fuerte); }
+.segmentos button { color: var(--p-texto-medio); }
+.segmentos button.activo { background: var(--p-verde); color: #fff; box-shadow: none; }
 
 /* Campos y búsqueda: blancos con borde, para que se note dónde se escribe. */
-.buscador .caja { border: 1.500px solid #7c9085; box-shadow: none; }
-.buscador .caja:focus-within { border-color: #17312b; box-shadow: 0 0 0 2px #17312b; }
-.campo, .contador, .chip-margen { background: #fff; border: 1.500px solid #a9b8ae; }
-.campo.falta, .chip-margen.falta { background: #fff0ea; border-color: #d83f0e; }
-.contador button { color: #17312b; }
-.contador button:active { background: #d3ddd5; }
+.buscador .caja { border: 1.500px solid var(--p-borde-fuerte); box-shadow: none; }
+.buscador .caja:focus-within { border-color: var(--p-verde); box-shadow: 0 0 0 2px var(--p-verde); }
+.campo, .contador, .chip-margen { background: #fff; border: 1.500px solid var(--p-borde-fuerte); }
+.campo.falta, .chip-margen.falta { background: var(--p-naranja-suave); border-color: var(--p-naranja); }
+.contador button { color: var(--p-verde); }
+.contador button:active { background: var(--p-relleno-fuerte); }
 
 /* Filas que se tocan: la elegida y la apretada se notan. */
-.fila:active { background: #eef3ee; }
-.fila.elegida { background: #fff7d6; box-shadow: inset 5px 0 0 #d83f0e; }
-.fila .miniatura { background: repeating-linear-gradient(135deg, #dfe7e0 0 5px, #eef3ee 5px 10px); }
+.fila:active { background: var(--p-fondo-2); }
+.fila.elegida { background: var(--p-amarillo-suave); box-shadow: inset 5px 0 0 var(--p-naranja); }
+.fila .miniatura { background: repeating-linear-gradient(135deg, var(--p-relleno) 0 5px, var(--p-fondo-2) 5px 10px); }
 
 /* Avisos suaves: amarillos, para que no parezcan una tarjeta más. */
-.aviso-suave { background: #fff7d6; border-color: #f0c64a; color: #4d3a00; }
-.aviso-suave button { color: #a52e08; text-decoration: underline; }
+.aviso-suave { background: var(--p-amarillo-suave); border-color: var(--p-amarillo-borde); color: var(--p-amarillo-texto); }
+.aviso-suave button { color: var(--p-naranja-texto-fuerte); text-decoration: underline; }
 
 /* Menú de abajo: blanco, con la parte actual en naranja y una marca arriba. */
-.nav-inferior.solo-celular { background: #fff; border-top: 1.500px solid #c3cfc6; backdrop-filter: none; -webkit-backdrop-filter: none; }
-.nav-inferior button { color: #4a5451; position: relative; }
-.nav-inferior button.activo { color: #c2370b; font-weight: 750; }
-.nav-inferior button.activo::before { content: ""; position: absolute; top: -7px; left: 22%; right: 22%; height: 4px; border-radius: 0 0 4px 4px; background: #d83f0e; }
+.nav-inferior.solo-celular { background: #fff; border-top: 1.500px solid var(--p-borde); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.nav-inferior button { color: var(--p-texto-2); position: relative; }
+.nav-inferior button.activo { color: var(--p-naranja-texto); font-weight: 750; }
+.nav-inferior button.activo::before { content: ""; position: absolute; top: -7px; left: 22%; right: 22%; height: 4px; border-radius: 0 0 4px 4px; background: var(--p-naranja); }
 
 /* La barra de cobro, amarilla como en la computadora: es lo más importante de Vender. */
-.cobro { background: #f7c445; color: #17312b; border: 2px solid #17312b; }
-.cobro .medios button, .cobro .cliente, .cobro .no-llevo { background: #fffdf4; border: 1.500px solid #17312b; color: #17312b; }
-.cobro .medios button.activo { background: #17312b; color: #fff; }
-.cobro .cliente.falta { color: #6b4a00; border-style: dashed; }
+.cobro { background: var(--p-amarillo); color: var(--p-verde); border: 2px solid var(--p-verde); }
+.cobro .medios button, .cobro .cliente, .cobro .no-llevo { background: var(--p-superficie); border: 1.500px solid var(--p-verde); color: var(--p-verde); }
+.cobro .medios button.activo { background: var(--p-verde); color: #fff; }
+.cobro .cliente.falta { color: var(--p-amarillo-texto); border-style: dashed; }
 .cobro .no-llevo:active { background: #fff; }
 .chip-margen { white-space: nowrap; padding: 0 8px; gap: 4px; }
-.fila .miniatura.mas-icono { background: #fff0ea; }
+.fila .miniatura.mas-icono { background: var(--p-naranja-suave); }
 /* Lo oculto queda oculto aunque su clase le dé otra disposición (en Usuarios y en Quién hizo
    qué se colaba arriba el resumen del negocio). */
 [hidden] { display: none !important; }
 /* Sobre una tarjeta oscura el título de sección va claro y sin la marca. */
-.tarjeta.oscura .seccion { color: #f7c445; padding-left: 0; }
+.tarjeta.oscura .seccion { color: var(--p-amarillo); padding-left: 0; }
 .tarjeta.oscura .seccion::before { display: none; }
 
 /* Vender con la misma paleta que el resto: los dos títulos son títulos de sección (verde, en
    mayúsculas, con la marca amarilla), y los productos de la venta y los resultados de la
    búsqueda llevan el mismo borde que las demás tarjetas. */
 .atajos h2, .en-venta { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0; padding: 10px 4px 0 12px; border-radius: 0; background: none;
-  color: #17312b; font-size: 13px; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
-.atajos h2::before, .en-venta::before { content: ""; position: absolute; left: 0; bottom: 1px; width: 5px; height: 16px; border-radius: 3px; background: #f7c445; }
-.en-venta span { color: #4a5451; font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; }
-.item { border: 1px solid #c3cfc6; border-left: 6px solid #d83f0e; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
-.item > * + * { border-top-color: #dbe3dc; }
+  color: var(--p-verde); font-size: 13px; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
+.atajos h2::before, .en-venta::before { content: ""; position: absolute; left: 0; bottom: 1px; width: 5px; height: 16px; border-radius: 3px; background: var(--p-amarillo); }
+.en-venta span { color: var(--p-texto-2); font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.item { border: 1px solid var(--p-borde); border-left: 6px solid var(--p-naranja); box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
+.item > * + * { border-top-color: var(--p-borde-suave); }
 /* La búsqueda no empuja al botón de escanear fuera de la pantalla cuando aparece la «×». */
 .buscador .caja { min-width: 0; }
 .buscador .caja input { min-width: 0; }
 
 /* Vender sin colores propios: los atajos y los productos de la venta son tarjetas blancas con
    el borde de siempre, como en las demás pantallas. Se distinguen por su título de sección. */
-.atajo { background: #fff; border: 1px solid #c3cfc6; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
-.atajo:active { background: #eef3ee; }
-.atajo-foto { background: repeating-linear-gradient(135deg, #dfe7e0 0 5px, #eef3ee 5px 10px); color: #4a5451; }
-.item { border: 1px solid #c3cfc6; }
+.atajo { background: #fff; border: 1px solid var(--p-borde); box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
+.atajo:active { background: var(--p-fondo-2); }
+.atajo-foto { background: repeating-linear-gradient(135deg, var(--p-relleno) 0 5px, var(--p-fondo-2) 5px 10px); color: var(--p-texto-2); }
+.item { border: 1px solid var(--p-borde); }
 
 /* Quitar un producto de la venta: un botón con tacho, no una «×» suelta. */
-.item .pie .quitar { width: 46px; height: 40px; flex: none; border-radius: 12px; background: #fff0ea; border: 1.500px solid #f0b9a3; color: #a52e08; }
-.item .pie .quitar:active { background: #ffd9cb; }
-.quitar.tacho { display: grid; place-items: center; width: 44px; height: 40px; flex: none; border-radius: 12px; background: #fff0ea; border: 1.500px solid #f0b9a3; color: #a52e08; }
-.quitar.tacho:active { background: #ffd9cb; }
+.item .pie .quitar { width: 46px; height: 40px; flex: none; border-radius: 12px; background: var(--p-naranja-suave); border: 1.500px solid var(--p-naranja-borde); color: var(--p-naranja-texto-fuerte); }
+.item .pie .quitar:active { background: var(--p-naranja-apretado); }
+.quitar.tacho { display: grid; place-items: center; width: 44px; height: 40px; flex: none; border-radius: 12px; background: var(--p-naranja-suave); border: 1.500px solid var(--p-naranja-borde); color: var(--p-naranja-texto-fuerte); }
+.quitar.tacho:active { background: var(--p-naranja-apretado); }
 
 /* Panel de cobro, igual que en la computadora: el total grande y afuera del botón, los medios
    de pago en fila con el elegido en verde oscuro, y «Cobrar» como un botón que solo dice
    «Cobrar». */
 .cobro { gap: 10px; }
-.cobro-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 2px; font-size: 17px; font-weight: 700; color: #17312b; }
-.cobro-total .importe { font-size: 36px; line-height: 1; color: #17312b; }
+.cobro-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 2px; font-size: 17px; font-weight: 700; color: var(--p-verde); }
+.cobro-total .importe { font-size: 36px; line-height: 1; color: var(--p-verde); }
 .cobro .medios button { height: 48px; }
 .cobro .acciones { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
 .cobro .boton.principal { height: 54px; font-size: 19px; font-weight: 750; }
@@ -221,17 +222,17 @@ body, .hoja { background: #e6ece6; }
    stock» es un botón lleno, con lápiz. */
 .lista[data-testid="tabla-stock"] { background: none; border: 0; box-shadow: none; overflow: visible; gap: 8px; }
 .lista[data-testid="tabla-stock"] > * { border-bottom: 0; }
-.fila-stock { background: #fff; border: 1px solid #c3cfc6; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
-.fila-stock.abierta { border: 2px solid #17312b; }
-.fila-stock.abierta > .fila { background: #eef3ee; }
-.detalle-stock { padding: 12px 16px 14px; border-top: 1px solid #c3cfc6; background: #f7f9f6; }
-.boton.corregir-stock { width: 100%; height: 48px; background: #17312b; border-color: #17312b; color: #fff; font-size: 16px; font-weight: 700; }
-.boton.corregir-stock:active { background: #25443d; }
+.fila-stock { background: #fff; border: 1px solid var(--p-borde); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
+.fila-stock.abierta { border: 2px solid var(--p-verde); }
+.fila-stock.abierta > .fila { background: var(--p-fondo-2); }
+.detalle-stock { padding: 12px 16px 14px; border-top: 1px solid var(--p-borde); background: var(--p-fondo-2); }
+.boton.corregir-stock { width: 100%; height: 48px; background: var(--p-verde); border-color: var(--p-verde); color: #fff; font-size: 16px; font-weight: 700; }
+.boton.corregir-stock:active { background: var(--p-verde-2); }
 
 /* La foto del producto al lado de su renglón, en Inventario y en Ingreso. */
 .con-foto-de-producto { display: flex; align-items: center; gap: 4px; padding-left: 12px; }
 .con-foto-de-producto > .fila { flex: 1; min-width: 0; padding-left: 8px; }
-.fila-stock.abierta > .con-foto-de-producto { background: #eef3ee; }
+.fila-stock.abierta > .con-foto-de-producto { background: var(--p-fondo-2); }
 
 /* La entrada del celular dice lo mismo que la de la computadora; acá solo se acomoda. */
 .entrar { gap: 22px; padding: 44px 24px 28px; }
@@ -239,7 +240,7 @@ body, .hoja { background: #e6ece6; }
 .entrar .lema { font-size: 15px; line-height: 1.4; }
 .entrar-puntos-celular { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14.500px; line-height: 1.35; color: rgb(255 255 255 / 0.88); }
 .entrar-puntos-celular li { display: flex; align-items: flex-start; gap: 10px; }
-.entrar-puntos-celular svg { flex: none; margin-top: 1px; color: #f7c445; }
+.entrar-puntos-celular svg { flex: none; margin-top: 1px; color: var(--p-amarillo); }
 .entrar-titulo-celular { margin: 0; font-size: 20px; font-weight: 750; color: #fff; }
 .entrar .abajo { gap: 12px; }
 .entrar .ayuda-clara { font-size: 14.500px; line-height: 1.4; }

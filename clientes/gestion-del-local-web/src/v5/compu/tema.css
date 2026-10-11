@@ -1,32 +1,33 @@
 /* Paleta de la v5 sobre la interfaz de computadora de la versión 2: verde oscuro para lo
    que ordena, naranja como único color de acción y amarillo para destacar. Son los colores
    ya medidos en la v4 (texto blanco sobre el naranja: 4,5 a 1). */
+@import "../paleta.css";
 @import "@fontsource-variable/manrope/wght.css";
 @import "@fontsource-variable/space-grotesk/wght.css";
 
 :root {
-  --marino: #17312b;
-  --marino-2: #25443d;
-  --marino-3: #33574e;
-  --tinta: #18201e;
-  --azul: #0f6b52;
-  --azul-suave: #e3f3ea;
+  --marino: var(--p-verde);
+  --marino-2: var(--p-verde-2);
+  --marino-3: var(--p-verde-3);
+  --tinta: var(--p-tinta);
+  --azul: var(--p-verde-texto);
+  --azul-suave: var(--p-verde-suave);
   --azul-borde: #8fc7b0;
-  --ambar: #d83f0e;
-  --ambar-fuerte: #b9350a;
-  --ambar-suave: #fff0ea;
-  --ambar-texto: #9c2c08;
-  --ambar-borde: #f3b9a3;
-  --fondo: #f5f6f2;
-  --superficie-2: #f1f4f1;
-  --borde: #dfe5e1;
-  --borde-fuerte: #7c9085;
-  --texto-2: #4a5451;
-  --texto-3: #66706d;
+  --ambar: var(--p-naranja);
+  --ambar-fuerte: var(--p-naranja-fuerte);
+  --ambar-suave: var(--p-naranja-suave);
+  --ambar-texto: var(--p-naranja-texto-fuerte);
+  --ambar-borde: var(--p-naranja-borde);
+  --fondo: var(--p-fondo);
+  --superficie-2: var(--p-fondo-2);
+  --borde: var(--p-borde);
+  --borde-fuerte: var(--p-borde-fuerte);
+  --texto-2: var(--p-texto-2);
+  --texto-3: var(--p-texto-2);
   --sobre-marino-2: #b8c7c3;
-  --riel: #e4e8e5;
-  --gris-pastilla: #e4e8e5;
-  --destacado: #f7c445;
+  --riel: var(--p-relleno);
+  --gris-pastilla: var(--p-relleno);
+  --destacado: var(--p-amarillo);
   --fuente: "Manrope Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --lateral: 200px;
 }
@@ -91,17 +92,17 @@
 
 /* La barra de cobro es lo más importante de Vender: va en amarillo, que no se usa en ningún
    otro fondo, para que no se confunda con el menú ni pase desapercibida. */
-.vender-cobro { background: var(--destacado, #f7c445); color: #17312b; border-top: 3px solid #17312b; box-shadow: 0 -10px 28px rgb(23 49 43 / 0.28); padding-block: 14px; }
+.vender-cobro { background: var(--destacado, var(--p-amarillo)); color: var(--p-verde); border-top: 3px solid var(--p-verde); box-shadow: 0 -10px 28px rgb(23 49 43 / 0.28); padding-block: 14px; }
 .vender-cobro .vender-total { font-size: 1.125rem; font-weight: 700; }
-.vender-cobro .vender-total .importe { color: #17312b; }
-.vender-cobro .boton.sobre-marino { background: #fffdf4; border: 1.500px solid #17312b; color: #17312b; font-weight: 650; }
-.vender-cobro .boton.sobre-marino:hover:not(:disabled) { background: #fff; box-shadow: 0 2px 0 #17312b; }
-.vender-cobro .boton.sobre-marino[aria-checked="true"], .vender-cobro .boton.sobre-marino[aria-checked="true"]:hover { background: #17312b; border-color: #17312b; color: #fff; box-shadow: none; }
+.vender-cobro .vender-total .importe { color: var(--p-verde); }
+.vender-cobro .boton.sobre-marino { background: var(--p-superficie); border: 1.500px solid var(--p-verde); color: var(--p-verde); font-weight: 650; }
+.vender-cobro .boton.sobre-marino:hover:not(:disabled) { background: #fff; box-shadow: 0 2px 0 var(--p-verde); }
+.vender-cobro .boton.sobre-marino[aria-checked="true"], .vender-cobro .boton.sobre-marino[aria-checked="true"]:hover { background: var(--p-verde); border-color: var(--p-verde); color: #fff; box-shadow: none; }
 .vender-cobro .boton.sobre-marino .tecla { border-color: currentColor; color: inherit; background: none; }
-.vender-cobro .vender-cliente.falta { background: #fff; border-style: dashed; color: #17312b; }
-.vender-cobro .boton.principal { min-width: 150px; min-height: 56px; font-size: 1.1875rem; box-shadow: 0 3px 0 #8f2a08; }
-.vender-cobro .boton.principal:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #8f2a08; }
-.vender-cobro :focus-visible { box-shadow: 0 0 0 2px #f7c445, 0 0 0 5px #17312b; }
+.vender-cobro .vender-cliente.falta { background: #fff; border-style: dashed; color: var(--p-verde); }
+.vender-cobro .boton.principal { min-width: 150px; min-height: 56px; font-size: 1.1875rem; box-shadow: 0 3px 0 var(--p-naranja-sombra); }
+.vender-cobro .boton.principal:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--p-naranja-sombra); }
+.vender-cobro :focus-visible { box-shadow: 0 0 0 2px var(--p-amarillo), 0 0 0 5px var(--p-verde); }
 /* El número de versión es largo: se corta en vez de estirar el menú. */
 .lateral-pie .version { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lateral { overflow-x: hidden; }
@@ -126,7 +127,7 @@
 .lateral nav button[aria-current="page"] .atajo { opacity: 0.9; }
 .lateral nav button .atajo { width: auto; padding: 0 6px; white-space: nowrap; }
 /* El foco en el menú se tiene que ver bien: se llega con la flecha izquierda. */
-.lateral nav button:focus-visible { outline: 3px solid #f7c445; outline-offset: 1px; }
+.lateral nav button:focus-visible { outline: 3px solid var(--p-amarillo); outline-offset: 1px; }
 /* La foto del producto al lado de su nombre, en Inventario y en Ingreso. */
 .con-foto-de-producto { display: flex; align-items: center; gap: var(--e3); min-width: 0; }
 .con-foto-de-producto > span { display: flex; flex-direction: column; min-width: 0; }
