@@ -406,7 +406,9 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
             {margenTexto}<Icono nombre={it.abierto ? "arriba" : "abajo"} tam={14} grosor={2.5} />
           </button>
         )}
-        <button type="button" className="quitar" onClick={alQuitar} aria-label="Quitar"><Icono nombre="cerrar" tam={18} grosor={2.2} /></button>
+        <button type="button" className="quitar" onClick={alQuitar} aria-label={`Quitar ${it.descripcion} de la venta`} title="Quitar de la venta" data-testid="quitar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+        </button>
       </div>
       {it.abierto && producto && p.costo !== null && (
         <div className="abierto">

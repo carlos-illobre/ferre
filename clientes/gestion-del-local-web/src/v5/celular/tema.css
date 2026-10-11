@@ -169,3 +169,7 @@ body, .hoja { background: #e6ece6; }
 .atajo:active { background: #eef3ee; }
 .atajo-foto { background: repeating-linear-gradient(135deg, #dfe7e0 0 5px, #eef3ee 5px 10px); color: #4a5451; }
 .item { border: 1px solid #c3cfc6; }
+
+/* Quitar un producto de la venta: un botón con tacho, no una «×» suelta. */
+.item .pie .quitar { width: 46px; height: 40px; flex: none; border-radius: 12px; background: #fff0ea; border: 1.500px solid #f0b9a3; color: #a52e08; }
+.item .pie .quitar:active { background: #ffd9cb; }
