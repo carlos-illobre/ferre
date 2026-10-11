@@ -51,10 +51,6 @@
   color: var(--amarillo);
 }
 
-.listas__zona .boton:disabled {
-  opacity: 0.55;
-}
-
 .listas__zona + .aviso,
 .pagina__contenido > .aviso + .listas__zona {
   margin-top: var(--e-4);

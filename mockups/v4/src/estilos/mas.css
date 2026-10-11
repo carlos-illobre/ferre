@@ -12,7 +12,7 @@
   gap: var(--e-4);
   min-height: 88px;
   padding: var(--e-4);
-  border: var(--grosor-borde) solid var(--borde);
+  border: var(--grosor-borde) solid var(--borde-fuerte);
   border-radius: var(--radio-tarjeta);
   background: var(--superficie);
   text-decoration: none;

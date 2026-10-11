@@ -100,7 +100,7 @@ export default function Recibir() {
   const compras = useAlmacen((a) => a.compras);
 
   const [proveedorId, setProveedorId] = useState<string | null>(null);
-  const [comprobante, setComprobante] = useState<Comprobante>("sin");
+  const [comprobante, setComprobante] = useState<Comprobante>("factura");
   const [numeroDeComprobante, setNumeroDeComprobante] = useState("");
   const [fecha, setFecha] = useState(hoyParaElCampo);
   const [lineas, setLineas] = useState<Linea[]>([]);
@@ -125,7 +125,7 @@ export default function Recibir() {
     setCodigoSuelto(null);
     setConsulta("");
     if (estado === "vacio") {
-      setLineas([]); setProveedorId(null); setComprobante("sin"); setNumeroDeComprobante("");
+      setLineas([]); setProveedorId(null); setComprobante("factura"); setNumeroDeComprobante("");
     } else {
       setLineas(estado === "error" ? LINEAS_DE_EJEMPLO.map((l) => (l.costo === "" ? { ...l, costo: "1.150,00" } : l)) : LINEAS_DE_EJEMPLO);
       setProveedorId("comodo"); setComprobante("factura"); setNumeroDeComprobante("0003-00012851");
@@ -233,7 +233,7 @@ export default function Recibir() {
     comprobanteDe.set(compra.id, comprobante === "sin" ? "Sin comprobante" : `${comprobante === "factura" ? "Factura" : "Remito"} ${numeroDeComprobante.trim()}`.trim());
     if (!enLinea) cambiarAlmacen((a) => ({ ...a, porEnviar: a.porEnviar + 1 }));
     setHecha({ total: totalDeCompra(compra), proveedor: proveedor.nombre, productos: renglones.length, actualizados, nuevos: nuevos.length, sinConexion: !enLinea });
-    setLineas([]); setProveedorId(null); setComprobante("sin"); setNumeroDeComprobante(""); setFecha(hoyParaElCampo());
+    setLineas([]); setProveedorId(null); setComprobante("factura"); setNumeroDeComprobante(""); setFecha(hoyParaElCampo());
     if (estado === "error") { saltear.current = true; cambiarParametro("estado", null); }
     window.scrollTo(0, 0);
   }

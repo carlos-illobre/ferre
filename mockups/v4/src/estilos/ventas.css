@@ -135,7 +135,7 @@
 
 .ventas__venta {
   display: grid;
-  grid-template-columns: 62px minmax(0, 1fr) auto 104px;
+  grid-template-columns: 62px minmax(0, 1fr) auto 176px; /* la última columna aloja «Anulada · por enviar» */
   align-items: center;
   gap: var(--e-2) var(--e-4);
   padding: var(--e-3) var(--e-4) var(--e-3) var(--e-5);

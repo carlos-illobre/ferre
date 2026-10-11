@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { cambiarProducto, proveedorActual, useAlmacen } from "../almacen";
 import { buscarProductos, IVA, MARGENES, pesos, pesosConCentavos, porUnidad, precioDe, proveedorDe, type CostoDeProveedor, type Producto } from "../datos";
 import {
-  Aviso, avisar, Boton, Buscador, Campo, Cargando, clases, ErrorDeCarga, Explicado, Hoja, Icono, Margenes, Pagina, Pastilla, Vacio,
+  Aviso, avisar, Boton, Buscador, Campo, Cargando, clases, ErrorDeCarga, Explicado, FotoDeProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Vacio,
   useEstadoDeMaqueta, type EstadoDeMaqueta,
 } from "../piezas";
 import { cambiarParametro, ir, useEsCelular, useParametro } from "../ruta";
@@ -25,7 +25,6 @@ function listaDe(proveedorId: string): { diasAtras: number; conIva: boolean; des
   return { diasAtras: proveedor?.diasDeLaLista ?? 1, conIva: proveedor?.conIva ?? false, descuento: proveedor?.descuento ?? 0 };
 }
 
-const CON_FOTO_AL_EMPEZAR = ["mecha-6-madera", "taladro-18v", "llave-francesa-10"];
 
 /** "25/09/2026". */
 function fechaDeLista(proveedorId: string): string {
@@ -57,7 +56,6 @@ export default function Productos() {
 
   const [consulta, setConsulta] = useState("");
   const [marcado, setMarcado] = useState(0);
-  const [conFoto, setConFoto] = useState<string[]>(CON_FOTO_AL_EMPEZAR);
   const buscador = useRef<HTMLInputElement>(null);
   const idLista = useId();
 
@@ -136,6 +134,7 @@ export default function Productos() {
                       className={clases("productos__renglon", !precio && "productos__renglon--sin-precio", !esCelular && i === elMarcado && "productos__renglon--marcado")}
                       onClick={() => { setMarcado(i); abrir(p); }}
                     >
+                      <FotoDeProducto producto={p} />
                       <span className="productos__nombre"><strong>{p.nombre}</strong><span>{p.marca}</span></span>
                       {precio ? (
                         <span className="productos__precio"><strong className="cifra">{pesos(precio.valor)}</strong>{p.unidad !== "unidad" && <span>{porUnidad(p.unidad)}</span>}</span>
@@ -156,8 +155,8 @@ export default function Productos() {
 
       <Ficha
         producto={abierto}
-        tieneFoto={abierto !== null && conFoto.includes(abierto.id)}
-        alSacarFoto={() => { if (abierto) setConFoto((antes) => [...new Set([...antes, abierto.id])]); }}
+        tieneFoto={Boolean(abierto?.foto)}
+        alSacarFoto={() => { if (abierto && !abierto.foto) cambiarProducto(abierto.id, { foto: "caja" }); }}
         alCerrar={() => { cambiarParametro("producto", null); if (!esCelular) buscador.current?.focus(); }}
       />
     </Pagina>
@@ -215,11 +214,7 @@ function Ficha({ producto: p, tieneFoto, alSacarFoto, alCerrar }: PropsDeFicha) 
     avisar("Foto guardada", { detalle: "Maqueta: en la app se abre la cámara del celular." });
   }
 
-  const foto = (
-    <span className={clases("productos__foto", `figura--${p.tono}`, !tieneFoto && "productos__foto--sin")}>
-      <Icono nombre={tieneFoto ? "productos" : "camara"} tam={tieneFoto ? 40 : 30} />
-    </span>
-  );
+  const foto = <FotoDeProducto producto={p} tam="mediana" />;
 
   return (
     <Hoja abierta alCerrar={alCerrar} titulo={p.nombre} pie={<Boton onClick={alCerrar}>Listo</Boton>}>
@@ -320,7 +315,7 @@ function Ficha({ producto: p, tieneFoto, alSacarFoto, alCerrar }: PropsDeFicha) 
         <Boton icono="camara" onClick={() => { setFotoGrande(false); sacarFoto(); }}>Sacar otra foto</Boton>
         <Boton onClick={() => setFotoGrande(false)}>Cerrar</Boton>
       </>}>
-        <span className={clases("productos__foto productos__foto--grande", `figura--${p.tono}`)}><Icono nombre="productos" tam={120} grosor={1.2} /></span>
+        <FotoDeProducto producto={p} tam="grande" />
         <p className="detalle">Maqueta: acá va la foto de verdad.</p>
       </Hoja>
     </Hoja>

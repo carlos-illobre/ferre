@@ -23,7 +23,7 @@
   gap: var(--e-3);
   width: 100%;
   min-height: 68px;
-  padding: var(--e-2) var(--e-3) var(--e-2) var(--e-5);
+  padding: var(--e-2) var(--e-3) var(--e-2) var(--e-4);
   border: 0;
   border-bottom: var(--grosor-borde) solid var(--borde);
   background: transparent;
@@ -301,21 +301,6 @@
   min-width: 0;
 }
 
-.productos__foto {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 96px;
-  height: 96px;
-  border-radius: var(--radio-tarjeta);
-}
-
-.productos__foto--sin {
-  border: 2px dashed var(--borde-fuerte);
-  background: var(--superficie-2);
-  color: var(--texto-apagado);
-}
-
 .productos__foto-boton {
   flex: none;
   padding: 0;
@@ -324,17 +309,21 @@
   background: transparent;
 }
 
-.productos__foto--grande {
-  width: 100%;
-  height: min(320px, 44dvh);
-}
-
 /* ---- Celular ---- */
 
 @media (max-width: 700px) {
   .productos__renglon {
     min-height: 72px;
-    padding-left: var(--e-4);
+    padding-left: var(--e-3);
+    padding-right: var(--e-2);
+  }
+
+  /* El nombre entra en hasta dos renglones; el precio queda a la derecha. */
+  .productos__nombre strong {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 
   .productos__precio strong {
@@ -351,8 +340,15 @@
     order: 2;
   }
 
-  .productos__renglon--sin-precio .pastilla {
+  .productos__renglon--sin-precio .productos__nombre {
+    flex-basis: 60%;
+  }
+
+  .productos__renglon--sin-precio .productos__precio {
     order: 3;
+    flex-basis: 100%;
+    align-items: flex-start;
+    padding-left: calc(48px + var(--e-3));
   }
 
   .productos__grande .explicado {

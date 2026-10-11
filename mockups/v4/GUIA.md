@@ -35,6 +35,7 @@ toques < 44 px y errores de consola. Tiene que decir «bien». No uses `pkill -f
 - `Lista` + `Renglon({ titulo, detalle?, inicio?, fin?, alTocar?, apagado? })` — `<Lista><Renglon titulo="Marta" detalle="marta@gmail.com" fin={<Boton tam="chico">Desactivar</Boton>} /></Lista>`; con `alTocar` todo el renglón es botón con flecha.
 - `TituloDeSeccion({ titulo, detalle?, children })` — `<TituloDeSeccion titulo="Proveedores">4 listas</TituloDeSeccion>`
 - `Pastilla({ tipo?: "bien"|"alerta"|"error"|"info"|"neutro", icono? })` — `<Pastilla tipo="error">Anulada</Pastilla>`
+- `FotoDeProducto({ producto, tam?: "chica"|"mediana"|"grande" })` — la foto (en la maqueta, un dibujo según `producto.foto`); sin foto, marcador con cámara.
 - `Iniciales({ nombre, tono?, forma?: "redonda"|"cuadrada", tam? })` · `Figura({ icono, tono?, tam? })` — tonos: naranja azul amarillo negro verde violeta (+ `marca`, `avatar` en Iniciales).
 - `Campo({ etiqueta, error?, ayuda?, prefijo?, sufijo?, …input })` — `<Campo etiqueta="Costo" prefijo="$" inputMode="decimal" value={v} onChange={…} error={e} />`; `leerPesos("4.000")` → 4000.
 - `Buscador({ valor, alCambiar, etiqueta, placeholder?, alEscanear?, alTeclear?, autoFocus?, ref? })`
@@ -71,12 +72,31 @@ dentro de la franja «Ambiente de prueba» en el celular); no lo muevas ni lo co
 - Una venta cobrada en Vender ya aparece en `ventas`, descuenta `productos[].stock` y suma un `movimiento`.
 
 ## Variables CSS (tokens.css)
-- Color: `--verde --verde-2 --verde-3 --sobre-verde --sobre-verde-2 · --naranja --naranja-fuerte --naranja-texto --naranja-suave --naranja-borde · --amarillo --amarillo-suave --amarillo-borde --amarillo-texto · --fondo --superficie --superficie-2 --borde --borde-fuerte --texto --texto-2 --texto-apagado · --bien|alerta|peligro|info` con `-texto -suave -borde` · `--tono-<tono>` y `--tono-<tono>-fondo`.
+- Color: `--verde --verde-2 --verde-3 --sobre-verde --sobre-verde-2 · --naranja --naranja-fuerte --naranja-texto --naranja-suave --naranja-borde · --amarillo --amarillo-suave --amarillo-borde --amarillo-texto · --fondo --superficie --superficie-2 --borde --borde-fuerte --texto --texto-2 --texto-apagado --apagado-fondo --apagado-texto · --bien|alerta|peligro|info` con `-texto -suave -borde` · `--tono-<tono>` y `--tono-<tono>-fondo`.
 - Letra: `--letra-detalle` (14, el mínimo) `--letra-chica` (15) `--letra` (16; 17 en celular) `--letra-grande` (18) `--titulo-3` (18) `--titulo-2` (22) `--titulo-1` (26) `--cifra` (32) `--cifra-grande` (52) · `--fuente --fuente-titulos` · `--peso-normal|medio|fuerte|boton`.
 - Espacio: `--e-1` 4 · `--e-2` 8 · `--e-3` 12 · `--e-4` 16 · `--e-5` 20 · `--e-6` 24 · `--e-8` 32 · `--e-10` 40 · `--e-12` 48 · `--margen-pagina`.
 - Radio: `--radio-chico` 8 · `--radio` 10 · `--radio-tarjeta` 12 · `--radio-grande` 14 · `--radio-redondo`.
 - Tamaño: `--toque` 44 · `--alto-boton` 48 · `--alto-boton-grande` 56 · `--alto-campo` · `--alto-encabezado` · `--alto-pestanas` (0 en computadora) · `--grosor-borde`.
 - Capas: `--capa-encabezado` 5 · `--capa-barra-fija` 10 · `--capa-pestanas` 30 · `--capa-flotante` 50. Movimiento: `--rapido --suave`.
+
+## Contraste (WCAG)
+`python contraste.py [pantalla]` recorre lo que se dibuja y avisa lo que no llega (4,5:1 texto; 3:1 texto grande, íconos y bordes de controles). Tiene que decir «Todo cumple». Los colores se cambian solo en tokens.css.
+
+| Par | Colores | Razón |
+|---|---|---|
+| Texto / texto de detalle sobre blanco | `--texto` #18201e · `--texto-2` #4a5451 | 16,6 · 7,8 |
+| Texto de detalle sobre el fondo y sobre `--superficie-2` | `--texto-2` sobre #f5f6f2 · #f2f5f0 | 7,2 · 7,1 |
+| Botón principal (blanco sobre naranja) / al pasar el cursor | `--naranja` #d83f0e · `--naranja-fuerte` #b9350a | 4,5 · 5,9 |
+| Naranja como texto: sobre blanco / fondo / opción elegida | `--naranja-texto` #c2370b | 5,5 · 5,0 · 4,9 |
+| Botón rojo de `Confirmar` / pastilla «Anulada» | `--peligro` #d63c29 · `--peligro-texto` sobre `--peligro-suave` | 4,6 · 5,2 |
+| Pastilla de alerta y «Ambiente de prueba» / aviso de alerta | `--amarillo-texto` #6b5000 sobre sus fondos suaves | 6,9 · 7,2 |
+| Pastillas «bien» / información | `--bien-texto` · `--info-texto` sobre sus fondos suaves | 5,5 · 5,8 |
+| Sobre el verde: texto / secundario / secundario en cajas | `--sobre-verde` · `--sobre-verde-2` sobre `--verde` · `--verde-2` | 13,9 · 7,9 · 6,1 |
+| Placeholder / botón deshabilitado | `--texto-apagado` #66706d · `--apagado-texto` sobre `--apagado-fondo` | 5,1 · 5,3 |
+| Borde de campos y botones: sobre blanco / sobre el fondo | `--borde-fuerte` #7c9085 | 3,4 · 3,1 |
+| Foco de teclado: sobre blanco / fondo / verde | `--foco` #1463d6 · `--foco-sobre-verde` #ffd65c | 5,5 · 5,1 · 9,9 |
+
+Lo que se toca lleva `--borde-fuerte` (no `--borde`, que es para tarjetas y separadores). Lo deshabilitado va con `--apagado-fondo` y `--apagado-texto`, nunca con `opacity`.
 
 ## Reglas de estilo
 1. Clases con el prefijo de tu pantalla: `.stock__cifras`, `.stock__renglon--negativo`. No redefinas clases de base.css de forma global; si hace falta ajustar una pieza, que sea dentro de una clase tuya (`.stock__cifras .tarjeta`).

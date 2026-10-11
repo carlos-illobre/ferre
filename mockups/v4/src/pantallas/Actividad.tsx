@@ -131,6 +131,22 @@ function accionDeVenta(v: Venta): Accion {
   };
 }
 
+/** Una venta anulada mientras se recorre la maqueta: es una acción propia, con quién y a qué hora, como las de ejemplo. */
+function accionDeAnulacion(v: Venta): Accion {
+  const medio = MEDIOS_DE_PAGO.find((m) => m.clave === v.medio);
+  const como = v.medio === "efectivo" ? "en efectivo" : v.medio === "cuenta-corriente" ? "en cuenta corriente" : `con ${medio?.nombre === "Tarjeta" ? "tarjeta" : medio?.nombre}`;
+  return {
+    id: `${v.id}-anulada`, cuando: v.anuladaCuando ?? v.cuando, quien: v.anuladaPor ?? v.usuarioId, tipo: "anulaciones", titulo: "Venta anulada", frase: `anuló una venta de ${pesos(v.total)}`,
+    datos: [
+      { que: "Venta", valor: `La de las ${hora(v.cuando)}, ${como}, de ${USUARIOS.find((u) => u.id === v.usuarioId)?.nombre ?? "alguien"}` },
+      { que: "Tenía", valor: v.renglones.map((r) => `${cantidad(r.cantidad, r.unidad)} de ${r.nombre}`) },
+      ...(v.motivo ? [{ que: "Motivo", valor: v.motivo }] : []),
+      { que: "Stock", valor: "La mercadería volvió al stock" },
+      ...(v.anulacionPorEnviar ? [{ que: "Envío", valor: "Se anuló sin conexión: se envía sola cuando vuelva internet" }] : []),
+    ],
+  };
+}
+
 /** Una compra del almacén (las de ejemplo y las que se registren en Recibir), con el mismo total que muestra Recibir. */
 function accionDeCompra(c: Compra): Accion {
   const proveedor = proveedorDe(c.proveedorId)?.nombre ?? "un proveedor";
@@ -212,7 +228,7 @@ export default function Actividad() {
     window.scrollTo(0, 0);
   }
 
-  const todas = [...ventas.filter((v) => v.id.startsWith("v-n")).map(accionDeVenta), ...compras.map(accionDeCompra), ...ACCIONES]
+  const todas = [...ventas.filter((v) => v.id.startsWith("v-n")).map(accionDeVenta), ...ventas.filter((v) => v.anulada && v.anuladaCuando).map(accionDeAnulacion), ...compras.map(accionDeCompra), ...ACCIONES]
     .sort((x, y) => y.cuando.getTime() - x.cuando.getTime());
   const encontradas = todas.filter((x) => {
     const suDia = claveDeDia(x.cuando);

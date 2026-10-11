@@ -8,9 +8,9 @@
   --verde-3: #203d36;          /* cajas dentro del verde */
   --sobre-verde: #ffffff;
   --sobre-verde-2: #b8c7c3;    /* texto secundario sobre verde */
-  --naranja: #ff5a2a;          /* único color de acción (fondos) */
-  --naranja-fuerte: #e9481d;   /* al pasar el mouse o apretar */
-  --naranja-texto: #c93a10;    /* naranja para texto sobre blanco (contraste AA) */
+  --naranja: #d83f0e;          /* único color de acción (fondos): 4,5:1 con el texto blanco */
+  --naranja-fuerte: #b9350a;   /* al pasar el mouse o apretar */
+  --naranja-texto: #c2370b;    /* naranja para texto sobre blanco, el fondo y los fondos suaves (AA) */
   --naranja-suave: #fff0ea;    /* fondo de lo elegido */
   --naranja-borde: #ffc4af;
   --sobre-naranja: #ffffff;
@@ -24,10 +24,12 @@
   --superficie: #ffffff;
   --superficie-2: #f2f5f0;     /* relleno tenue: botón de huella, pastilla neutra */
   --borde: #e0e5e2;
-  --borde-fuerte: #cfd6d2;     /* borde de lo que se toca */
+  --borde-fuerte: #7c9085;     /* borde de lo que se toca: 3:1 contra blanco y contra el fondo */
   --texto: #18201e;
-  --texto-2: #56615d;          /* texto de detalle (AA sobre blanco y sobre el fondo) */
-  --texto-apagado: #6f7a76;    /* texto de ejemplo dentro de los campos */
+  --texto-2: #4a5451;          /* texto de detalle: 7:1 sobre blanco, el fondo y los fondos suaves */
+  --texto-apagado: #66706d;    /* texto de ejemplo dentro de los campos (4,5:1) */
+  --apagado-fondo: #e4e8e5;    /* relleno de un botón deshabilitado */
+  --apagado-texto: #555f5c;    /* su texto: se sigue leyendo (4,5:1 o más sobre ese relleno) */
 
   /* ---- Color: estados ---- */
   --bien: #38a878;
@@ -38,7 +40,7 @@
   --alerta-texto: #6b5000;
   --alerta-suave: #fff9e6;
   --alerta-borde: #efd57b;
-  --peligro: #d84431;
+  --peligro: #d63c29;
   --peligro-fuerte: #bd3524;
   --peligro-texto: #b93523;
   --peligro-suave: #fdeeeb;
@@ -49,7 +51,7 @@
   --info-borde: #bcd7f5;
 
   /* ---- Color: tonos para íconos de producto e iniciales ---- */
-  --tono-naranja-fondo: #fff0ea;  --tono-naranja: #d84821;
+  --tono-naranja-fondo: #fff0ea;  --tono-naranja: #c2370b;
   --tono-azul-fondo: #e7f1ff;     --tono-azul: #2c6cab;
   --tono-amarillo-fondo: #fff5cc; --tono-amarillo: #8a6500;
   --tono-negro-fondo: #e8eae9;    --tono-negro: #202624;

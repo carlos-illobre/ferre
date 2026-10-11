@@ -87,9 +87,10 @@ export default function VentasDelDia() {
 
   function anular() {
     if (!porAnular) return;
-    if (esHoy) anularVenta(porAnular.id, motivo.trim());
+    if (esHoy) anularVenta(porAnular.id, motivo.trim(), { sinConexion: !enLinea });
     else setAnuladasDeAntes((antes) => ({ ...antes, [porAnular.id]: motivo.trim() }));
-    avisar(`Venta de ${pesos(porAnular.total)} anulada`, { detalle: "La mercadería volvió al stock." });
+    if (enLinea) avisar(`Venta de ${pesos(porAnular.total)} anulada`, { detalle: "La mercadería volvió al stock." });
+    else avisar(`Venta de ${pesos(porAnular.total)} anulada en este dispositivo`, { tipo: "alerta", detalle: "Se envía sola cuando vuelva internet." });
     setPorAnular(null);
   }
 
@@ -109,7 +110,7 @@ export default function VentasDelDia() {
 
       {!enLinea && (
         <Aviso tipo="alerta">
-          Se ven las ventas guardadas en este dispositivo. Para anular una venta hace falta internet.
+          Se ven las ventas guardadas en este dispositivo. Si anulás una, queda anulada acá y se envía sola cuando vuelva internet.
         </Aviso>
       )}
 
@@ -150,7 +151,7 @@ export default function VentasDelDia() {
 
           {ventas.length > 0 && (
             <ul className="ventas__lista">
-              {ventas.map((v) => <UnaVenta key={v.id} venta={v} sePuedeAnular={enLinea} alAnular={() => { setMotivo(""); setPorAnular(v); }} />)}
+              {ventas.map((v) => <UnaVenta key={v.id} venta={v} sePuedeAnular={esHoy || enLinea} alAnular={() => { setMotivo(""); setPorAnular(v); }} />)}
             </ul>
           )}
         </>
@@ -204,7 +205,7 @@ function UnaVenta({ venta: v, sePuedeAnular, alAnular }: { venta: Venta; sePuede
       <strong className="ventas__importe cifra">{pesos(v.total)}</strong>
       <div className="ventas__accion">
         {v.anulada
-          ? <Pastilla tipo="error">Anulada</Pastilla>
+          ? <Pastilla tipo="error" icono={v.anulacionPorEnviar ? "sin-conexion" : undefined}>{v.anulacionPorEnviar ? "Anulada · por enviar" : "Anulada"}</Pastilla>
           : <Boton tam="chico" disabled={!sePuedeAnular} aria-label={`Anular la venta de las ${hora(v.cuando)}, de ${pesos(v.total)}`} onClick={alAnular}>Anular</Boton>}
       </div>
     </li>

@@ -253,15 +253,19 @@ export function deshacerNoLlevo(anterior: VentaEnCurso): void {
 
 // ---------------------------------------------------------------- Acciones: lo demás
 
-/** Anula una venta del día (no se puede deshacer) y devuelve la mercadería al stock por nombre. */
-export function anularVenta(id: string, motivo: string): void {
+/**
+ * Anula una venta del día (no se puede deshacer) y devuelve la mercadería al stock por nombre.
+ * También funciona sin conexión: queda anulada en el dispositivo y suma un cambio por enviar.
+ */
+export function anularVenta(id: string, motivo: string, opciones: { sinConexion?: boolean } = {}): void {
   cambiarAlmacen((a) => {
     const venta = a.ventas.find((v) => v.id === id);
     if (!venta || venta.anulada) return a;
     const devuelto = new Map(venta.renglones.map((r) => [r.nombre, r.cantidad]));
     return {
       ...a,
-      ventas: a.ventas.map((v) => (v.id === id ? { ...v, anulada: true, motivo } : v)),
+      ventas: a.ventas.map((v) => (v.id === id ? { ...v, anulada: true, motivo, anuladaPor: YO.usuarioId, anuladaCuando: new Date(), anulacionPorEnviar: Boolean(opciones.sinConexion) } : v)),
+      porEnviar: a.porEnviar + (opciones.sinConexion ? 1 : 0),
       productos: a.productos.map((p) => (devuelto.has(p.nombre) ? { ...p, stock: p.stock + (devuelto.get(p.nombre) ?? 0) } : p)),
       clientes: venta.medio === "cuenta-corriente" ? a.clientes.map((c) => (c.id === venta.clienteId ? { ...c, debe: c.debe - venta.total } : c)) : a.clientes,
     };

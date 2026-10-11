@@ -149,7 +149,12 @@ export type Producto = {
   stock: number;
   sectorId: string;
   tono: Tono;
+  /** Qué se ve en la foto (en la maqueta es un dibujo); `null` o nada si todavía no tiene foto. */
+  foto?: DibujoDeFoto | null;
 };
+
+/** Los dibujos que hacen de foto en la maqueta. `caja` es el genérico (una foto recién sacada). */
+export type DibujoDeFoto = "mecha" | "clavos" | "taladro" | "cinta" | "llave" | "cable" | "caja";
 
 export type Cliente = { id: string; nombre: string; debe: number };
 
@@ -192,6 +197,11 @@ export type Venta = {
   motivo: string;
   /** `true` si se cobró sin conexión y todavía no se envió. */
   porEnviar: boolean;
+  /** Quién la anuló y cuándo (solo en las que se anulan mientras se recorre la maqueta). */
+  anuladaPor?: string;
+  anuladaCuando?: Date;
+  /** `true` si se anuló sin conexión: quedó anulada en el dispositivo y todavía no se envió. */
+  anulacionPorEnviar?: boolean;
 };
 
 export type RenglonComprado = { productoId: string; cantidad: number; costo: number };
@@ -294,12 +304,12 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "mecha-6-madera", nombre: "Mecha 6 mm madera", marca: "Bosch", unidad: "unidad", costo: 1649.14, margen: 100,
     proveedores: [{ proveedorId: "comodo", codigo: "BO-2608", costo: 1649.14 }, { proveedorId: "tresge", codigo: "TG-M6M", costo: 1764.5 }],
-    codigoDeBarras: "7790001000015", stock: 18, sectorId: "estanteria-1", tono: "naranja",
+    codigoDeBarras: "7790001000015", stock: 18, sectorId: "estanteria-1", tono: "naranja", foto: "mecha",
   },
   {
     id: "mecha-8-widia", nombre: "Mecha 8 mm widia", marca: "Bosch", unidad: "unidad", costo: 4850, margen: 100,
     proveedores: [{ proveedorId: "comodo", codigo: "BO-2609", costo: 4850 }],
-    codigoDeBarras: "7790001000022", stock: 9, sectorId: "estanteria-1", tono: "azul",
+    codigoDeBarras: "7790001000022", stock: 9, sectorId: "estanteria-1", tono: "azul", foto: "mecha",
   },
   {
     id: "mecha-6-hormigon", nombre: "Mecha 6 mm para hormigón", marca: "Irwin", unidad: "unidad", costo: 3100, margen: null,
@@ -309,27 +319,27 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "clavo-paris-2", nombre: "Clavo punta París 2 pulgadas", marca: "Acindar", unidad: "kilo", costo: 5200, margen: 50,
     proveedores: [{ proveedorId: "comodo", codigo: "CL-PP2", costo: 5200 }],
-    codigoDeBarras: null, stock: 24.5, sectorId: "mostrador", tono: "azul",
+    codigoDeBarras: null, stock: 24.5, sectorId: "mostrador", tono: "azul", foto: "clavos",
   },
   {
     id: "taladro-18v", nombre: "Taladro inalámbrico 18 V con dos baterías", marca: "Bosch", unidad: "unidad", costo: 122500, margen: 50,
     proveedores: [{ proveedorId: "erpa", codigo: "ER-GSR18", costo: 122500 }],
-    codigoDeBarras: "7790001000053", stock: 3, sectorId: "estanteria-2", tono: "amarillo",
+    codigoDeBarras: "7790001000053", stock: 3, sectorId: "estanteria-2", tono: "amarillo", foto: "taladro",
   },
   {
     id: "cinta-aisladora", nombre: "Cinta aisladora negra 20 m", marca: "Tacsa", unidad: "unidad", costo: 780.5, margen: 100,
     proveedores: [{ proveedorId: "ixnova", codigo: "IX-CA20N", costo: 780.5 }, { proveedorId: "comodo", codigo: "CO-CIN20", costo: 812 }],
-    codigoDeBarras: "7790001000060", stock: 42, sectorId: "mostrador", tono: "negro",
+    codigoDeBarras: "7790001000060", stock: 42, sectorId: "mostrador", tono: "negro", foto: "cinta",
   },
   {
     id: "llave-francesa-10", nombre: "Llave francesa 10 pulgadas", marca: "Bahco", unidad: "unidad", costo: 16800, margen: 100,
     proveedores: [{ proveedorId: "tresge", codigo: "TG-LF10", costo: 16800 }],
-    codigoDeBarras: "7790001000077", stock: 7, sectorId: "estanteria-2", tono: "verde",
+    codigoDeBarras: "7790001000077", stock: 7, sectorId: "estanteria-2", tono: "verde", foto: "llave",
   },
   {
     id: "cable-2-5", nombre: "Cable unipolar 2,5 mm", marca: "Kalop", unidad: "metro", costo: 520, margen: 50,
     proveedores: [{ proveedorId: "ixnova", codigo: "IX-CU25", costo: 520 }],
-    codigoDeBarras: null, stock: 180, sectorId: "estanteria-2", tono: "naranja",
+    codigoDeBarras: null, stock: 180, sectorId: "estanteria-2", tono: "naranja", foto: "cable",
   },
   {
     id: "thinner", nombre: "Thinner sello de oro", marca: "Venier", unidad: "litro", costo: 2380, margen: 100,
