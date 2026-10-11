@@ -28,6 +28,13 @@ type Item = {
   precioManual: number | null; // precio tipeado en esta venta, pisa al margen
   abierto: boolean; // el detalle del margen desplegado
 };
+// Un dibujo por medio de pago, para reconocerlo sin leer: billete, celular, tarjeta y libreta.
+const DIBUJO_DE_MEDIO: Record<string, string> = {
+  efectivo: "M3 7h18v10H3ZM12 14.500a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5ZM6 10v4M18 10v4",
+  mercado_pago: "M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM11 18h2",
+  tarjeta: "M3 6h18v12H3ZM3 10h18M7 15h4",
+  cuenta_corriente: "M6 3h12v18H6ZM9 8h6M9 12h6M9 16h3",
+};
 const MEDIOS: { valor: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; nombre: string; corto: string; tecla: string }[] = [
   { valor: "efectivo", nombre: "Efectivo", corto: "Efectivo", tecla: "F5" },
   { valor: "mercado_pago", nombre: "Mercado Pago", corto: "Mercado Pago", tecla: "F6" },
@@ -329,9 +336,13 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
 
       {items.length > 0 && (
         <div className="cobro" data-testid="cobro">
-          <div className="medios" role="radiogroup" aria-label="medio de pago">
+          <strong className="cobro-pregunta" id="cobro-pregunta">¿Cómo paga? <span>Tocá una opción</span></strong>
+          <div className="medios" role="radiogroup" aria-labelledby="cobro-pregunta">
             {MEDIOS.map((m) => (
-              <button key={m.valor} type="button" className={medio === m.valor ? "activo" : ""} onClick={() => elegirMedio(m.valor)} title={m.tecla}>{m.corto}</button>
+              <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} className={medio === m.valor ? "activo" : ""} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DIBUJO_DE_MEDIO[m.valor]} /></svg>
+                <span>{m.corto}</span>
+              </button>
             ))}
           </div>
           {medio === "cuenta_corriente" && (
@@ -340,9 +351,11 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
             </button>
           )}
           <div className="acciones auto-1fr">
-            <button type="button" className="no-llevo" onClick={noLlevo}>No llevó</button>
+            <button type="button" className="no-llevo" onClick={noLlevo} data-testid="no-llevo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM5.700 5.700l12.600 12.600" /></svg>No llevó
+            </button>
             <button type="button" className="boton coral principal" onClick={cobrar} disabled={ocupado} data-testid="cobrar">
-              <span>Cobrar</span><span className="importe" data-testid="total">{pesosCortos(total)}</span>
+              <span className="cobrar-texto"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m5 12.500 4.500 4.500L19 7.500" /></svg>Cobrar</span><span className="importe" data-testid="total">{pesosCortos(total)}</span>
             </button>
           </div>
         </div>

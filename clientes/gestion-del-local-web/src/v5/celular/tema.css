@@ -175,3 +175,33 @@ body, .hoja { background: #e6ece6; }
 .item .pie .quitar:active { background: #ffd9cb; }
 .quitar.tacho { display: grid; place-items: center; width: 44px; height: 40px; flex: none; border-radius: 12px; background: #fff0ea; border: 1.500px solid #f0b9a3; color: #a52e08; }
 .quitar.tacho:active { background: #ffd9cb; }
+
+/* Panel de cobro: que cada cosa se vea como un botón que se aprieta. Los medios de pago son
+   botones con su dibujo, en relieve; el elegido se hunde, se pinta de verde y lleva un tilde.
+   Arriba, la pregunta que contestan. */
+.cobro { gap: 10px; }
+.cobro-pregunta { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 16px; font-weight: 750; color: #17312b; padding: 0 2px; }
+.cobro-pregunta span { font-size: 13px; font-weight: 600; color: #5c4300; }
+.cobro .medios { gap: 8px; }
+.cobro .medios button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 66px; padding: 4px 2px; border-radius: 14px;
+  background: #fff; border: 2px solid #17312b; color: #17312b; font-size: 12.500px; font-weight: 700; line-height: 1.1; box-shadow: 0 4px 0 #17312b; transition: transform 0.08s, box-shadow 0.08s; }
+.cobro .medios button:active { transform: translateY(3px); box-shadow: 0 1px 0 #17312b; }
+.cobro .medios button.activo { background: #17312b; color: #fff; transform: translateY(3px); box-shadow: 0 1px 0 #0b1a17; }
+.cobro .medios button.activo::after { content: "✓"; position: absolute; top: -9px; right: -7px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #0f8a5f; border: 2px solid #f7c445; color: #fff; font-size: 14px; font-weight: 800; }
+.cobro .cliente { background: #fff; border: 2px solid #17312b; box-shadow: 0 3px 0 #17312b; font-weight: 700; }
+.cobro .no-llevo { display: flex; align-items: center; gap: 6px; height: 56px; background: #fff; border: 2px solid #17312b; color: #17312b; box-shadow: 0 4px 0 #17312b; font-weight: 700; }
+.cobro .no-llevo:active { transform: translateY(3px); box-shadow: 0 1px 0 #17312b; background: #fff; }
+.cobro .boton.principal { height: 56px; border: 2px solid #8f2a08; box-shadow: 0 4px 0 #8f2a08; }
+.cobro .boton.principal:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #8f2a08; }
+.cobro .cobrar-texto { display: inline-flex; align-items: center; gap: 6px; font-weight: 750; }
+.cobro .acciones { padding-bottom: 4px; }
+@media (prefers-reduced-motion: reduce) { .cobro .medios button, .cobro .no-llevo { transition: none; } }
+.cobro .acciones { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; }
+.cobro .no-llevo { padding: 0 12px; font-size: 15px; }
+.cobro .boton.principal { min-width: 0; width: auto; padding: 0 12px; gap: 8px; }
+.cobro .boton.principal .importe { font-size: 22px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cobro .cobrar-texto { font-size: 17px; flex: none; }
+/* El total nunca se corta: el tilde de Cobrar cede el lugar. */
+.cobro .cobrar-texto svg { display: none; }
+.cobro .boton.principal .importe { overflow: visible; text-overflow: clip; white-space: nowrap; font-size: 21px; }
+.cobro .no-llevo { padding: 0 10px; }
