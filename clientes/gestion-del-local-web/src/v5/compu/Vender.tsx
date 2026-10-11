@@ -61,7 +61,7 @@ export function Vender() {
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
-  const [medio, setMedio] = useState<Medio | null>(null);
+  const [medio, setMedio] = useState<Medio | null>("efectivo"); // Efectivo viene elegido: es lo más común y muestra que los medios se tocan
   const [clienteId, setClienteId] = useState("");
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -243,14 +243,14 @@ export function Vender() {
       if (e instanceof ErrorApi) { setError(`${e.message}. La venta sigue armada: corregila y cobrá de nuevo.`); return; }
       throw e;
     }
-    setItems([]); setMedio(null); setClienteId(""); setOcupado(false);
+    setItems([]); setMedio("efectivo"); setClienteId(""); setOcupado(false);
   }
 
   function noLlevo() {
     if (items.length === 0) return;
     const consultaItems = items.map((it) => ({ producto_id: it.producto?.id ?? null, descripcion: it.descripcion, precio_ofrecido: precioDe(it).unitario }));
     enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: describirDispositivo() }).catch(() => undefined);
-    setItems([]); setMedio(null); setClienteId("");
+    setItems([]); setMedio("efectivo"); setClienteId("");
     setMensaje("Anotado como «No llevó»: qué pidió y a cuánto se le ofreció.");
     caja.current?.focus();
   }

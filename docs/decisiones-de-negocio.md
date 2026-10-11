@@ -159,3 +159,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     cosa: verde oscuro para dónde se está (pestaña elegida) y los títulos, naranja para la
     acción principal y la parte actual del menú, amarillo para atajos, avisos y la barra de
     cobro, y blanco con borde para los botones comunes y los campos.
+37. **Cobro: Efectivo viene elegido y el total va fuera del botón** (2026-10-11): en Vender,
+    en el celular y en la computadora, el medio de pago arranca en Efectivo (así se nota que
+    los medios se tocan) y vuelve a Efectivo después de cada venta. El total se muestra
+    grande, fuera del botón «Cobrar», que solo dice «Cobrar».

@@ -31,7 +31,7 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 ### Ventas (003)
 
 **Vender y cobrar**
-1. **RF-21.** Si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión o «sin especificar») o se le exige elegir uno? El relevamiento dice que no tiene que frenar; el backend actual lo exige.
+1. **RF-21.** ~~Si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión o «sin especificar») o se le exige elegir uno? El relevamiento dice que no tiene que frenar; el backend actual lo exige.~~ Respondida (2026-10-11): Efectivo viene elegido de entrada y la venta se registra en efectivo.
 
 **Ítem libre (RF-22)**
 2. Cuando un ítem libre se guarda como producto nuevo, ¿qué precio tiene la próxima vez: el importe tipeado en esa venta, o queda sin precio hasta cargarle costo y margen?

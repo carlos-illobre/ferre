@@ -125,7 +125,7 @@ guardada con el suyo; la de cuenta corriente, con su cliente.
 4. **Given** una venta con cuenta corriente elegida, **When** el Vendedor elige el cliente, **Then** lo busca por nombre y ve de cada uno cuánto debe o que está al día.
 5. **Given** una venta con cuenta corriente y un cliente elegido, **When** cobra, **Then** la venta se registra a nombre de ese cliente y sin pagar, y en las ventas del día figura su nombre al lado del medio de pago.
 6. **Given** una venta que llega al servidor con un medio de pago que no es efectivo, Mercado Pago, tarjeta ni cuenta corriente, **When** se intenta registrar, **Then** el servidor la rechaza y dice cuáles son los medios de pago.
-7. **Given** una venta armada sin medio de pago elegido, **When** el Vendedor cobra, **Then** la venta no se frena: elegir el medio de pago es un toque y saltearlo no impide registrar. [NEEDS CLARIFICATION: si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión, o «sin especificar») o se le exige elegir uno antes de cobrar? El relevamiento y el pedido original dicen que no debe frenar; el contrato del servidor exige uno de los cuatro medios.]
+7. **Given** una venta recién empezada, **When** el Vendedor todavía no tocó ningún medio de pago, **Then** ya está elegido Efectivo, que es lo más común: si cobra así, la venta se registra en efectivo, y después de cada venta el medio vuelve a Efectivo (respondido por Carlos el 2026-10-11).
 
 ---
 
