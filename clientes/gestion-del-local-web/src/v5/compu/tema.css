@@ -121,3 +121,6 @@
 .sugeridos-tarjeta { height: 100%; min-height: 116px; }
 .sugeridos-tarjeta .nombre { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .sugeridos-tarjeta .detalle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+/* Los numeritos del menú, como en la versión 2. */
+.lateral nav button .atajo { width: 22px; height: 22px; border-radius: 6px; font-size: 0.75rem; opacity: 0.7; }
+.lateral nav button[aria-current="page"] .atajo { opacity: 0.9; }

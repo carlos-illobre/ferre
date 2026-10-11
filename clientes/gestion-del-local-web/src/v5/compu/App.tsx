@@ -92,6 +92,8 @@ function Pantallas() {
             return (
               <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`}>
                 <Icono nombre={m.icono} tam={19} grosor={parte === m.clave ? 2.3 : 1.9} />{m.nombre}
+                {/* El número que, con Alt, abre la primera pantalla de esta parte. */}
+                {atajoDe(m.pestanas[0]!.ruta) && <span className="atajo" aria-hidden="true">{atajoDe(m.pestanas[0]!.ruta)}</span>}
               </button>
             );
           })}
