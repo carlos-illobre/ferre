@@ -183,3 +183,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     41. En todos los lugares de la computadora donde se pide una foto (la factura de un
     ingreso, la foto de un producto, la captura de un ticket) hay un botón «Sacar la foto
     con el celular» que usa el mismo código QR. Elegir un archivo sigue estando.
+43. **Vuelven las pruebas, solo para la versión elegida** (2026-10-11): termina la pausa de
+    la decisión 25. Se prueba únicamente la versión 5, que es la que abre la raíz. Las otras
+    versiones siguen publicadas en su carpeta, pero no tienen pruebas. Cómo está armada la
+    versión 5 y dónde vive cada cosa está en el ADR-015.

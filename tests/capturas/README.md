@@ -6,7 +6,7 @@ diseñar y para revisar; no reemplaza a las pruebas.
 
 ```bash
 tests/capturas/levantar.sh                      # API de mentira (:8799) y cliente (:5199)
-python tests/capturas/capturar.py vender        # captura #/vender de la v4, en las dos medidas
+python tests/capturas/capturar.py vender        # captura #/vender de la versión 5, en las dos medidas
 python tests/capturas/capturar.py stock --celu --py "page.get_by_test_id('stock').first.click()"
 BASE=http://localhost:5199/v1/ python tests/capturas/capturar.py productos   # otra versión
 tests/capturas/levantar.sh --apagar
@@ -34,3 +34,17 @@ volviendo a levantar.
 
 La forma de cada respuesta tiene que ser la del servidor real (`specs/00N-*/contracts/api.md`).
 Si el servidor cambia, esta API se actualiza en el mismo cambio.
+
+## Direcciones de la versión 5
+
+La computadora y el celular no usan las mismas direcciones:
+
+| Pantalla | Computadora | Celular |
+|---|---|---|
+| Catálogo | `productos`, `listas`, `duplicados` | `catalogo`, `catalogo/listas`, `catalogo/duplicados` |
+| Vender | `vender` | `vender` |
+| Depósito | `compras` (Ingreso), `stock` (Inventario), `contar` (Estanterías) | `deposito`, `deposito/stock`, `deposito/contar` |
+| Más | `mas`, `resumen`, `usuarios`, `actividad`, `tickets` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/actividad`, `mas/tickets` |
+
+`--entera` (página completa) se cuelga en la computadora: ahí conviene bajar con
+`--py "page.locator('...').scroll_into_view_if_needed()"`.

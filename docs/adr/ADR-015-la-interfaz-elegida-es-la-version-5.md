@@ -1,0 +1,70 @@
+# ADR-015: La interfaz elegida es la versión 5, armada sobre las pantallas de la 1 y la 2
+
+**Estado:** Aceptado
+**Fecha:** 2026-10-11
+**Amplía a:** [ADR-014](ADR-014-dos-interfaces-celular-y-escritorio.md) (dos interfaces que se eligen por el ancho)
+
+---
+
+## Contexto
+
+El 2026-10-10 Carlos decidió rehacer toda la interfaz (decisión 13). Se probaron una versión
+nueva para las dos pantallas (la 2), tres maquetas (la 3) y una versión hecha a partir de un
+diseño de Figma (la 4). Ninguna lo conformó entera: le gustó el celular de la versión 1, la
+computadora de la versión 2 (menú lateral, tablas, teclado) y la idea de un menú «Más» de la
+versión 4 (decisión 27). El 2026-10-11 eligió la versión 5, que junta esas tres cosas
+(decisión 28), y pidió que las otras versiones sigan publicadas pero sin pruebas (decisión 43).
+
+## Decisión
+
+**La versión 5 es la interfaz del sistema y es la que abre la raíz.** Se arma así:
+
+- **Dos árboles que se eligen por el ancho (900 px), como en ADR-014.** El del celular usa
+  las pantallas de la versión 1; el de la computadora, las de la versión 2. Si la ventana
+  cruza el límite, se recarga.
+- **No se copia lo que no cambia.** La versión 5 importa las pantallas de las versiones 1 y 2
+  tal cual. Solo cuando una pantalla tiene que comportarse distinto se hace una copia propia
+  en la carpeta de la versión 5 y se cambia ahí (Vender, Depósito, Catálogo y Negocio del
+  celular; Vender, Ingreso e Inventario de la computadora). Las versiones anteriores no se
+  tocan, salvo los componentes compartidos que la versión 5 usa y que mejoran para todas (el
+  contador de cantidad, el diálogo de la foto del producto, el nombre de las unidades).
+- **Lo nuevo se escribe una sola vez y lo usan los dos árboles:** Mejoras y errores, la foto
+  de la factura, el pedido de foto con código QR, el dinero invertido, el marco del ambiente
+  de prueba. Cada una trae sus propios estilos para verse igual sobre cualquiera de los dos.
+- **El aspecto se ajusta con una hoja de estilos por árbol,** que pisa los colores y las
+  piezas de la versión de la que sale, en vez de tocar las hojas de esa versión.
+- **Un solo menú en los dos árboles:** Catálogo (Productos, Listas, Duplicados), Vender,
+  Depósito (Ingreso, Inventario, Estanterías) y Más (Cómo va el negocio, Usuarios y sesiones,
+  Quién hizo qué, Mejoras y errores).
+
+Dónde está cada cosa en el código:
+
+| Qué | Dónde |
+|---|---|
+| Entrada de la versión 5 y elección del árbol | `clientes/gestion-del-local-web/src/v5/main.tsx` |
+| Árbol del celular: menú, copias de pantallas y estilos | `src/v5/celular/` (`App.tsx`, `tema.css`) |
+| Árbol de la computadora: menú, atajos, copias y estilos | `src/v5/compu/` (`App.tsx`, `tema.css`) |
+| Lo compartido por los dos árboles | `src/v5/*.tsx` y `src/v5/*.css` |
+| Pantallas de la versión 1 que usa el celular | `src/pantallas/`, `src/componentes/` |
+| Pantallas de la versión 2 que usa la computadora | `src/v2/` |
+| La raíz, que redirige a la versión 5 | `clientes/gestion-del-local-web/index.html` |
+| Las otras versiones, publicadas en su carpeta | `/v1/`, `/v2/`, `/v3/`, `/v4/`, `/v4-maqueta/` |
+
+**Pruebas.** Solo se prueba la versión 5. Las unitarias están en `src/v5/` (las de las
+pantallas del celular y de la computadora, más las de lo nuevo) y corren en cada push. Los
+archivos de prueba de las otras versiones quedaron en su lugar y están excluidos en
+`vitest.config.ts`. Los escenarios de punta a punta (`tests/e2e/`) apuntan a la versión 5.
+
+**Para mirar una pantalla sin Docker:** `tests/capturas/` (API de mentira y capturas).
+
+## Consecuencias
+
+- El celular y la computadora siguen siendo dos interfaces con su propio marcado; una regla
+  que cambia se toca en los dos árboles, salvo que viva en lo compartido.
+- La versión 5 depende de archivos de las versiones 1 y 2. **No se puede borrar una versión
+  anterior sin antes mover a la carpeta de la versión 5 lo que ella usa.** Cuando Carlos pida
+  borrarlas, ese es el primer paso.
+- Una mejora hecha en un archivo de la versión 1 o 2 que la versión 5 importa también cambia
+  esa versión vieja. Se acepta: las versiones viejas están para comparar, no para usarse.
+- Los estilos de cada árbol pisan a los de la versión de origen; al mover las pantallas a la
+  carpeta de la versión 5 conviene fundirlos.

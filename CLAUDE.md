@@ -52,6 +52,21 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
   figura en su `## Depende de` está cerrado. Al tomarlo se le crea su carpeta en `specs/`.
 - **Trabajo nuevo que aparece:** un issue nuevo con su etapa (milestone). No se hace de paso.
 
+## La interfaz
+
+- **La interfaz del sistema es la «versión 5»** y es la que abre la raíz. Cómo está armada y
+  dónde vive cada cosa: [ADR-015](docs/adr/ADR-015-la-interfaz-elegida-es-la-version-5.md).
+  Lo que Carlos pidió de ella, que es regla para cualquier cambio:
+  [specs/001-base-del-sistema/ux.md](specs/001-base-del-sistema/ux.md), sección «2026-10-11».
+- **Las otras versiones** (`/v1/`, `/v2/`, `/v3/`, `/v4/`) siguen publicadas para comparar.
+  No se cambian ni se prueban, y no se borran hasta que Carlos lo pida: la versión 5 usa
+  archivos de la 1 y de la 2.
+- **Solo la versión 5 tiene pruebas.** Un cambio en una pantalla va con su prueba en
+  `clientes/gestion-del-local-web/src/v5/`.
+- **Cada cosa que Carlos decide** se anota con su número en
+  [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md) y, si es una regla, en la
+  `spec.md` de la capacidad.
+
 ## Qué no decide el agente
 
 - **El alcance.** Un requerimiento nuevo, o uno que cambia, se le pregunta a Carlos.
@@ -76,9 +91,9 @@ El tablero (<https://gratis-vnic.tail994934.ts.net:8444/>) lee `specs/README.md`
 tests/utest.sh               # unitarias, sin nada levantado
 node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
-tests/e2e.sh                 # caminos principales, en las dos interfaces (levanta el stack)
+tests/e2e.sh                 # caminos principales de la versión 5, en celular y computadora (levanta el stack)
 tests/capturas/levantar.sh   # API de mentira y cliente, para mirar pantallas sin Docker
-python tests/capturas/capturar.py vender   # captura una pantalla en computadora y celular
+python tests/capturas/capturar.py vender   # captura una pantalla de la versión 5 en computadora y celular
 ```
 
 Para mirar o comparar una pantalla, usá `tests/capturas/` ([cómo](tests/capturas/README.md))

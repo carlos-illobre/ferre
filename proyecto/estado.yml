@@ -26,8 +26,7 @@ RF-01:
 RF-01b:
   estado: "Hecho"
   pruebas:
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Catalogo.test.tsx
     - microservices/gestion-del-local/src/rutas/listas.test.ts
   defectos: []
 
@@ -65,8 +64,7 @@ RF-06:
     - tests/e2e/escritorio/11-duplicados.spec.ts
     - tests/e2e/celular/11-duplicados.spec.ts
     - microservices/gestion-del-local/src/equivalencias.test.ts
-    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Catalogo.test.tsx
   defectos:
     - "Solo se sugieren duplicados con la misma descripción (sin acentos, símbolos ni espacios, de 8 caracteres o más); no por descripción similar"
     - "Unir productos modifica filas de los históricos de precios, ventas, compras y stock, y borra renglones de conteo repetidos (roza RNF-30)"
@@ -81,8 +79,7 @@ RF-07:
     - libraries/calculo-de-precios/src/busqueda.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Catalogo.test.tsx
     - clientes/gestion-del-local-web/src/teclas.test.tsx
   defectos:
     - "La búsqueda no tolera errores de tipeo"
@@ -106,8 +103,6 @@ RF-09:
   pruebas:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-    - clientes/gestion-del-local-web/src/componentes/componentes.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/componentes/componentes.test.tsx
     - microservices/gestion-del-local/src/rutas/productos.test.ts
   defectos:
     - "La foto no se muestra en el conteo de stock"
@@ -125,8 +120,7 @@ RF-10:
   pruebas:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-    - clientes/gestion-del-local-web/src/pantallas/Catalogo.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Productos.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Catalogo.test.tsx
     - clientes/gestion-del-local-web/src/teclas.test.tsx
     - clientes/gestion-del-local-web/src/cola.test.ts
     - microservices/gestion-del-local/src/rutas/productos.test.ts
@@ -153,16 +147,13 @@ RF-12:
   pruebas:
     - microservices/gestion-del-local/src/rutas/productos.test.ts
     - clientes/gestion-del-local-web/src/unidades.test.ts
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
   defectos: []
 
 RF-13:
   estado: "Hecho (#47)"
   pruebas:
     - libraries/calculo-de-precios/src/precio.test.ts
-    - clientes/gestion-del-local-web/src/componentes/componentes.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/componentes/componentes.test.tsx
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - tests/e2e/escritorio/02-listas.spec.ts
@@ -219,8 +210,7 @@ RF-20:
     - tests/e2e/celular/04-vender.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
     - clientes/gestion-del-local-web/src/unidades.test.ts
     - clientes/gestion-del-local-web/src/cola.test.ts
     - libraries/calculo-de-precios/src/precio.test.ts
@@ -240,8 +230,7 @@ RF-20b:
     - tests/e2e/celular/04-vender.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
     - libraries/calculo-de-precios/src/precio.test.ts
   defectos:
     - "Sin prueba que mida que el cambio de margen responde en menos de 100 ms (RNF-07)"
@@ -253,8 +242,7 @@ RF-21:
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
     - microservices/gestion-del-local/src/rutas/ventas.test.ts
   defectos:
     - "Cobrar sin elegir el medio de pago frena la venta con el aviso «Elegí cómo paga»; el relevamiento y el pedido original dicen que saltearlo no debe frenar (regla a confirmar por Carlos)"
@@ -265,7 +253,7 @@ RF-21:
 RF-22:
   estado: "Hecho en parte (#17): se vende como ítem libre. Falta darlo de alta ahí mismo"
   pruebas:
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
     - microservices/gestion-del-local/src/rutas/ventas.test.ts
   defectos:
     - "El ítem libre no se puede dar de alta como producto desde la venta"
@@ -278,9 +266,8 @@ RF-23:
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Negocio.test.tsx
   defectos:
     - "No se puede corregir una venta: solo anularla y cargarla de nuevo"
     - "No se pueden ver las ventas de días anteriores: el servidor acepta la fecha, pero ninguna interfaz la pide"
@@ -309,8 +296,7 @@ RF-25:
     - tests/e2e/celular/04-vender.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
   defectos:
     - "El motivo no se puede cargar desde ninguna interfaz, aunque el servidor lo acepta"
     - "No existe la vista para consultar lo anotado, aunque el servidor lo devuelve"
@@ -362,8 +348,7 @@ RF-32:
 RF-40:
   estado: "Hecho en parte (#15): se vende a cuenta corriente, sin prueba del camino completo. Falta la pantalla para marcarla pagada (#57)"
   pruebas:
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
     - microservices/gestion-del-local/src/rutas/ventas.test.ts
   defectos:
     - "No hay forma de cargar un cliente desde la aplicación: la ruta para crearlo existe, pero ninguna interfaz la usa"
@@ -402,19 +387,19 @@ RF-43:
 RF-50:
   estado: "Hecho en parte (#30): se aparta de la regla en 14 puntos"
   pruebas:
+    - clientes/gestion-del-local-web/src/v5/FotoDeFactura.test.tsx
     - microservices/gestion-del-local/src/rutas/pedidos-de-foto.test.ts
     - microservices/gestion-del-local/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Compras.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Deposito.test.tsx
   defectos:
     - "Los pedidos de foto (el código QR) viven en la memoria del servidor: si el servidor se reinicia mientras se espera una foto, hay que pedir el código de nuevo"
     - "La foto del comprobante está en la versión 5; las versiones 1, 2 y 4 siguen pidiendo el número"
     - "La foto no es obligatoria: una factura o un remito se puede registrar sin foto y figura «sin foto»"
     - "Sin conexión la foto no se puede subir (el ingreso tampoco se registra sin conexión)"
     - "Una foto subida que no llega a usarse en ninguna compra queda guardada en el servidor; no se limpia"
-    - "Sin prueba de la pantalla ni del paso de la foto del celular a la computadora: las pruebas de interfaz están en pausa (decisión 25)"
+    - "El paso de la foto del celular a la computadora está probado con el servidor simulado, no con un celular real"
     - "El ingreso de mercadería de la computadora no recibe códigos escaneados con el celular vinculado; solo se escanea en el celular"
     - "No se puede guardar la foto del comprobante con la compra"
     - "El ingreso no se precarga desde un pedido (RF-55) ni desde la foto de la factura (RF-51)"
@@ -438,7 +423,7 @@ RF-52:
   pruebas:
     - tests/e2e/escritorio/07-contar.spec.ts
     - tests/e2e/celular/07-contar.spec.ts
-    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Deposito.test.tsx
   defectos:
     - "En el celular la cantidad contada solo acepta enteros, aunque el producto se venda a granel (RF-12)"
     - "Crear un sector, empezar un conteo y cerrarlo exigen conexión; solo contar un producto funciona sin internet. Qué exige la regla está preguntado en la spec (historia 4, escenario 13)"
@@ -455,7 +440,7 @@ RF-53:
   pruebas:
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
-    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Deposito.test.tsx
   defectos:
     - "El servidor sigue entregando el valor del stock a quien pide el inventario: se oculta en la pantalla, y se cierra en el servidor cuando exista el rol Comprador (RF-72)"
     - "En Inventario tampoco se muestra el costo de cada producto; no está dicho si el Comprador debe verlo ahí"
@@ -501,7 +486,7 @@ RF-58:
 RF-60:
   estado: "Pendiente (#39)"
   pruebas:
-    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Negocio.test.tsx
     - tests/e2e/celular/04-vender.spec.ts
   defectos:
     - "Del tablero solo existe, en el celular, lo vendido en el día con la cantidad de ventas y el total por medio de pago; no hay semana ni mes"
@@ -542,9 +527,8 @@ RF-65:
   pruebas:
     - tests/e2e/celular/05-compras.spec.ts
     - tests/e2e/escritorio/05-compras.spec.ts
-    - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Compras.test.tsx
-    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Deposito.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Negocio.test.tsx
   defectos:
     - "Que una compra anulada no sume al gasto no tiene prueba"
     - "Que una compra con fecha fuera de la semana no sume no tiene prueba, y la consulta de la API no tiene ninguna prueba propia"
@@ -582,7 +566,6 @@ RF-70b:
   pruebas:
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
-    - clientes/gestion-del-local-web/src/componentes/OfrecerHuella.test.tsx
     - microservices/gestion-del-local/src/rutas/credenciales.test.ts
   defectos:
     - "En la computadora, la lista de celulares vinculados está dentro de la administración: quien no administra no tiene desde dónde ver ni quitar los suyos"
@@ -594,8 +577,7 @@ RF-71:
   estado: "Hecho en parte (#41): consulta paginada. Faltan los filtros en pantalla (#58)"
   pruebas:
     - microservices/gestion-del-local/src/rutas/auditoria.test.ts
-    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Administracion.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Negocio.test.tsx
     - tests/integration/autenticacion.sh
     - microservices/gestion-del-local/src/rutas/credenciales.test.ts
     - tests/e2e/celular/01-login.spec.ts
@@ -621,8 +603,7 @@ RF-73:
     - microservices/gestion-del-local/src/rutas/usuarios.test.ts
     - tests/e2e/celular/13-admin.spec.ts
     - tests/e2e/escritorio/13-admin.spec.ts
-    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Administracion.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Negocio.test.tsx
     - tests/integration/autenticacion.sh
   defectos:
     - "RF-72 reemplaza estos roles (ADR-011, enmienda del 2026-10-09) y el código sigue rigiéndose por dueño, admin y mostrador"
@@ -633,8 +614,7 @@ RF-74:
     - tests/e2e/celular/12-cerrar-sesion.spec.ts
     - tests/e2e/escritorio/12-cerrar-sesion.spec.ts
     - tests/integration/autenticacion.sh
-    - clientes/gestion-del-local-web/src/pantallas/Negocio.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Administracion.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Negocio.test.tsx
     - microservices/gestion-del-local/src/rutas/usuarios.test.ts
   defectos:
     - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
@@ -644,17 +624,17 @@ RF-74:
 RF-80:
   estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
   pruebas:
+    - clientes/gestion-del-local-web/src/v5/Tickets.test.tsx
     - microservices/gestion-del-local/src/rutas/tickets.test.ts
   defectos:
-    - "Sin prueba de la pantalla ni del envío sin conexión: las pruebas de interfaz están en pausa (decisión 25); se probó a mano con tests/capturas"
     - "La foto de un ticket por enviar se guarda en el dispositivo sin tope de espacio"
 
 RF-81:
   estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
   pruebas:
+    - clientes/gestion-del-local-web/src/v5/Tickets.test.tsx
     - microservices/gestion-del-local/src/rutas/tickets.test.ts
   defectos:
-    - "Sin prueba de la pantalla: las pruebas de interfaz están en pausa (decisión 25)"
     - "Cualquier usuario puede marcar resuelto o reabrir: hoy todos son Administrador (RF-72)"
 
 RNF-01:
@@ -723,9 +703,7 @@ RNF-08:
 RNF-09:
   estado: "Hecho"
   pruebas:
-    - clientes/gestion-del-local-web/src/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/pantallas/Vender.test.tsx
-    - clientes/gestion-del-local-web/src/escritorio/componentes/componentes.test.tsx
+    - clientes/gestion-del-local-web/src/v5/celular/Vender.test.tsx
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos:
     - "Sin prueba: la barra de progreso mientras se aplica una lista"

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-"""Captura una pantalla de la app real v4 (http://localhost:5199/v4/) y avisa de lo que se puede medir.
+"""Captura una pantalla de la app real, versión 5 (http://localhost:5199/v5/) y avisa de lo que se puede medir.
 
-  python captura-v4.py vender                        # las dos medidas (1366×768 y 390×844)
-  python captura-v4.py stock --celu                  # solo celular; --compu: solo computadora
-  python captura-v4.py vender --nombre buscando --py 'page.get_by_test_id("busqueda").fill("mecha")'
-  python captura-v4.py entrar --sin-sesion           # sin sembrar la sesión (pantalla de entrada)
-  python captura-v4.py vender --sin-conexion         # corta la red después de cargar
-  python captura-v4.py productos --entera            # la página entera, no solo lo que se ve
-  python captura-v4.py 'vincular-celular?codigo=ABC123' --nombre vincular
+  python capturar.py vender                        # las dos medidas (1366×768 y 390×844)
+  python capturar.py stock --celu                  # solo celular; --compu: solo computadora
+  python capturar.py vender --nombre buscando --py 'page.get_by_test_id("busqueda").fill("mecha")'
+  python capturar.py entrar --sin-sesion           # sin sembrar la sesión (pantalla de entrada)
+  python capturar.py vender --sin-conexion         # corta la red después de cargar
+  python capturar.py productos --entera            # la página entera, no solo lo que se ve
+  python capturar.py 'vincular-celular?codigo=ABC123' --nombre vincular
 
 --py recibe código Python que usa `page` (Playwright, API sincrónica); también tiene `contexto`,
 `medida` ("compu" o "celu") y `google(credencial)`, que simula que Google devolvió una
@@ -26,7 +26,7 @@ from playwright.sync_api import sync_playwright
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 CAPTURAS = os.environ.get("CAPTURAS", os.path.join(AQUI, "salida"))
-BASE = os.environ.get("BASE", "http://localhost:5199/v4/")
+BASE = os.environ.get("BASE", "http://localhost:5199/v5/")
 MEDIDAS = {
     "compu": dict(viewport={"width": 1366, "height": 768}),
     "celu": dict(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, device_scale_factor=2,

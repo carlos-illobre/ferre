@@ -10,15 +10,14 @@ qué le gustó y qué no le gustó al dueño de cada versión que vio.
 
 ## En qué está la interfaz
 
-Carlos va a rehacer toda la interfaz, celular y computadora, y es la prioridad (decisión 13
-del 2026-10-10).
+**Carlos eligió la interfaz el 2026-10-11** (decisión 28): es la que llamó «versión 5» y es
+la que abre la raíz. Junta lo que le gustó de cada intento: en el celular, una cosa por vez
+con tarjetas y hojas; en la computadora, menú a la izquierda, tablas y todo con el teclado;
+y un menú «Más» para lo que se usa poco. Las versiones anteriores siguen publicadas para
+comparar, pero no se mantienen ni se prueban (decisión 43).
 
-**Nada de cómo está hecha hoy ata al diseño** (decisión 19): que sean dos interfaces
-separadas que se eligen a los 900 px de ancho, las cuatro pestañas del celular, las
-tarjetas, las hojas que suben desde abajo, las tablas y el menú de la computadora, la
-paleta, la tipografía y la marca son cómo está hecho hoy. Sirven de antecedente: están
-descriptos en `docs/sistema-visual.md` y en la maqueta del celular,
-`mockups/Ferre iOS.html`.
+Lo que quedó decidido de la interfaz elegida está más abajo, en «2026-10-11», y es regla
+para cualquier cambio. Lo que esa lista no dice sigue abierto al diseño.
 
 Lo que sí es regla, se diseñe como se diseñe:
 
@@ -214,6 +213,63 @@ Prueba manual de punta a punta, pantalla por pantalla.
 - **Precio a mano.** Se respeta tal cual; si no es múltiplo de $1.000 aparece un mensaje
   de alerta que lo dice (RF-19, RF-20b).
 
+### 2026-10-11
+
+Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su decisión en
+`docs/decisiones-de-negocio.md`.
+
+**En las dos pantallas**
+
+- **Un solo menú, en el mismo orden:** Catálogo (Productos, Listas, Duplicados), Vender,
+  Depósito (Ingreso, Inventario, Estanterías) y Más (Cómo va el negocio, Usuarios y sesiones,
+  Quién hizo qué, Mejoras y errores). La aplicación abre en lo primero del menú (decisiones
+  28 y 39).
+- **Las palabras:** «estantería» y no «góndola»; «Inventario» y no «Stock» para la pantalla;
+  «Estanterías» y no «Contar» para la pestaña; «dinero» y no «plata»; el litro se escribe
+  «L» (decisiones 28, 31 y 39).
+- **El ambiente de prueba no se puede confundir con producción:** un marco de un color que
+  no se usa en ningún otro lado, que aparece y desaparece, y un cartel fijo. Producción no
+  lleva nada (decisión 33).
+- **Lo que está elegido se sigue leyendo** al pasarle el mouse o al tocarlo.
+- **Quitar algo es un botón con un tacho,** nunca una «×» suelta. La «×» queda solo para
+  borrar lo escrito en una búsqueda.
+- **Lo que se toca tiene que parecer un botón:** borde o color; un texto de color solo no
+  alcanza.
+- **Las pestañas de adentro de una pantalla llevan ícono.**
+- **Cobro:** Efectivo viene elegido; el total se ve grande y fuera del botón «Cobrar», que
+  solo dice «Cobrar»; el panel de cobro es lo que más resalta de Vender (decisión 37).
+- **Fotos:** un producto sin foto muestra una cámara donde se toca para sacarla. La foto de
+  un producto se ve y se saca desde cualquier lista donde aparezca el producto (Catálogo,
+  Vender, Ingreso, Inventario).
+- **Inventario no muestra dinero** y los gastos de la semana se ven solo en «Cómo va el
+  negocio» (decisiones 31 y 34).
+
+**En el celular**
+
+- **Ninguna búsqueda toma el foco sola:** abriría el teclado y taparía el menú.
+- **Colores** (decisión 36): fondo marcado para que lo blanco resalte; verde oscuro para
+  dónde se está y los títulos; naranja para la acción principal y la parte actual del menú;
+  amarillo para avisos y el panel de cobro; blanco con borde para botones comunes y campos.
+  Ninguna pantalla usa colores propios.
+- **Vender** (decisión 38): sin «lo último que se vendió» (ocupa lugar y se toca por error).
+  El panel de cobro ocupa dos renglones: los medios de pago con ícono y nombre chico debajo,
+  como el menú de abajo (Mercado Pago con su isotipo), y debajo «No llevó», el total y
+  «Cobrar».
+- **Inventario:** cada producto en su tarjeta, separada de la siguiente.
+
+**En la computadora**
+
+- **Todo con el teclado:** Alt+número abre cada pantalla y el atajo se lee como «Alt+1» en
+  el menú y en las pestañas; flecha izquierda pasa al menú, arriba y abajo lo recorren,
+  derecha o Enter vuelven a la pantalla (decisión 40); las cantidades suben y bajan con las
+  flechas.
+- **Vender:** «lo último que se vendió» son cuatro tarjetas del mismo tamaño, con foto, que
+  siguen a la vista con la venta empezada.
+- **La computadora no tiene cámara:** donde haga falta una foto hay un botón que muestra un
+  código QR para sacarla con el celular; elegir un archivo siempre queda (decisiones 41 y 42).
+- **La primera vez en un dispositivo** el catálogo no se espera entero: se ve una primera
+  tanda y el resto baja atrás.
+
 ## Qué dijo Carlos de cada versión
 
 Para no repetir lo que no funcionó.
@@ -224,6 +280,10 @@ Para no repetir lo que no funcionó.
 | Rediseño del 2026-09-14 | Una sola interfaz hecha a partir de una maqueta de celular: cuatro pestañas, tarjetas, hojas que suben desde abajo, un solo color de acción | En el celular, «perfecto». En la computadora perdió usabilidad: mucho espacio desaprovechado, y grillas y búsquedas más difíciles de usar |
 | Ensanche del 2026-09-15 | La misma del rediseño, estirada a todo el ancho en la computadora, con columnas y filas de una línea | No conformó |
 | Dos interfaces, del 2026-10-09 | El celular del rediseño y, en la computadora, la primera versión con la paleta y la marca del rediseño | No la validó. El 2026-10-10 decidió rehacer toda la interfaz |
+| Versión 2, del 2026-10-10 | Rediseño nuevo de las dos pantallas: menú lateral, tablas y teclado en la computadora | «Muy complicado» en general; de la computadora le gustó la usabilidad |
+| Versión 3, del 2026-10-10 | Tres maquetas más simples, con otras paletas | Ninguna quedó |
+| Versión 4, del 2026-10-11 | Hecha a partir de un diseño de Figma que le había gustado | Le gustó el menú «Más»; no la eligió |
+| **Versión 5, del 2026-10-11** | El celular de la primera, la computadora de la versión 2 y el menú «Más» de la 4 | **La eligió.** La paleta del celular la pidió con más contraste y quedó; no quiere colores propios por pantalla |
 
 Lo que se repite en lo que funcionó: en la computadora, tablas densas que muestran muchos
 productos a la vez, edición en la misma fila y todo con el teclado; en el celular, una cosa
