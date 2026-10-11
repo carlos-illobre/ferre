@@ -85,6 +85,13 @@ portafolio mientras se hace y después de hecho. Vale también para un arreglo c
    no tiene, crearlo con un título que diga qué se pidió, en palabras de Carlos, y con su
    etapa (milestone). Ponerle la etiqueta `en curso`:
    `gh issue edit N --add-label "en curso"`.
+   Al crearlo, decir también con etiquetas:
+   - **Quién la ejecuta:** `carlos` si la tiene que hacer él (llamar, comprar, firmar,
+     decidir, probar en el lugar) o `agente` si la puede hacer un agente.
+   - **Si hay algo por decidir antes:** `definir`. El tablero se la muestra a Carlos como
+     decisión pendiente y no la propone para ejecutar.
+   - **La prioridad**, solo si Carlos la dijo: `prioridad alta` o `prioridad baja`.
+   - **La duración**, en una línea del cuerpo: `Estimación: 3h` o `Estimación: 2d`.
 2. **Cada commit nombra su issue** al final del título, entre paréntesis: `(#N)`. Un commit
    sin `#N` aparece en el tablero como trabajo sin tarea.
 3. **Al terminar,** cerrar el issue y sacarle la etiqueta:
