@@ -101,7 +101,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { product
   const unidad = p.unidad === "unidad" ? "u." : p.unidad === "l" ? "L" : p.unidad;
 
   return (
-    <div data-testid="fila-stock">
+    <div className={`fila-stock ${abierto ? "abierta" : ""}`} data-testid="fila-stock">
       <button type="button" className="fila" onClick={alAbrir} data-testid="stock" aria-expanded={abierto}>
         <span className="nombre">{p.descripcion}</span>
         <span className="derecha">
@@ -110,7 +110,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { product
         <span className="detalle">{detalleDe(p)}{fila?.ultimo_movimiento ? ` · último ${fecha(fila.ultimo_movimiento.slice(0, 10))}` : ""}</span>
       </button>
       {abierto && (
-        <div style={{ padding: "0 16px 14px", display: "flex", flexDirection: "column", gap: 10, animation: "aparecer .2s" }} data-testid="detalle-stock">
+        <div className="detalle-stock" style={{ display: "flex", flexDirection: "column", gap: 10, animation: "aparecer .2s" }} data-testid="detalle-stock">
           <small>Stock {num(cantidad)} = suma de estos movimientos</small>
           {movimientos === null ? <small>Cargando…</small> : movimientos.length === 0 ? <small>Sin movimientos.</small> : (
             <div className="movimientos" data-testid="movimientos">
@@ -132,7 +132,9 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { product
                 <button type="button" className="boton" onClick={() => setCorrigiendo(false)}>Cancelar</button>
               </div>
             </>
-          ) : <button type="button" className="boton" onClick={() => { setCorrigiendo(true); setReal(String(cantidad)); setMotivo(""); }} data-testid="corregir">Corregir el stock</button>}
+          ) : <button type="button" className="boton corregir-stock" onClick={() => { setCorrigiendo(true); setReal(String(cantidad)); setMotivo(""); }} data-testid="corregir">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4ZM13.500 6.500l4 4" /></svg>Corregir el stock
+          </button>}
         </div>
       )}
     </div>
