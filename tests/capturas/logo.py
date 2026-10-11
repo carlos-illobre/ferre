@@ -17,9 +17,14 @@ MARCOS = {
     # El cateto de arriba es más corto que el vertical, en la proporción de la F (más alta que ancha),
     # y todo el marco está inclinado igual que la F.
     "escuadra": ('<path d="M18 11H86L18 92Z" transform="translate(5.500 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(10.500 7.500) scale(0.7)"),
+    # El marco que pidió Carlos: sigue el contorno de la F a la misma distancia en los tres lados.
+    # Arriba es horizontal, a la izquierda va paralelo al tronco y la diagonal pasa por la punta del
+    # brazo y la punta del tornillo. Se dibuja en las mismas coordenadas que la F y el borde grueso,
+    # de puntas redondas, es el que da la distancia pareja (la mitad de su grosor).
+    "envolvente": ('<path d="M22 16H81.300L22 114.200Z" transform="translate(10 -0.700) scale(0.78) translate(6 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="20" stroke-linejoin="round"/>', "translate(10 -0.700) scale(0.78)"),
     "hexagono": ('<path d="M50 6 88.100 28V72L50 94 11.900 72V28Z" fill="{f}" stroke="{f}" stroke-width="8" stroke-linejoin="round"/>', "translate(13.500 13) scale(0.68)"),
 }
-MARCO = "escuadra"
+MARCO = "envolvente"
 
 def efe(tronco, brazo, ADENTRO):
     borde = lambda c: f'stroke="{c}" stroke-width="2.500" stroke-linejoin="round"'
@@ -67,10 +72,10 @@ fila = lambda fondo, color, c: (f'<div style="display:flex;flex-wrap:wrap;align-
     + "".join(svg(c, n) for n in (150, 64, 32, 16)) + f'<span style="display:inline-flex;align-items:center;gap:12px;font-weight:700;font-size:2.2rem">{svg(c, 60)}Ferrebress</span>{svg(EN_NARANJA, 110)}</div>')
 hoja = (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ferrebress: el logo</title></head>'
         f'<body style="margin:0;background:{CLARO};color:#18201e;font:17px/1.5 system-ui,sans-serif"><main style="max-width:980px;margin:0 auto;padding:28px 16px 56px">'
-        f'<h1 style="font-size:1.6rem;margin:0 0 4px">Ferrebress: el logo</h1><p style="margin:0 0 12px;color:#4a5451">La F que es un tornillo, dentro de una escuadra (un triángulo rectángulo con la punta hacia abajo). Sobre claro, sobre oscuro, con el nombre, en naranja y en tamaño chico.</p>'
+        f'<h1 style="font-size:1.6rem;margin:0 0 4px">Ferrebress: el logo</h1><p style="margin:0 0 12px;color:#4a5451">La F que es un tornillo, dentro de un triángulo que sigue su contorno. Sobre claro, sobre oscuro, con el nombre, en naranja y en tamaño chico.</p>'
         + fila("#fff", "#18201e", SOBRE_CLARO) + fila(VERDE, "#fff", SOBRE_OSCURO)
-        + '<h2 style="font-size:1.2rem;margin:32px 0 0">Para comparar: el triángulo parejo</h2>'
-        + fila("#fff", "#18201e", logo(VERDE, "#fff", NARANJA, marco="triangulo"))
+        + '<h2 style="font-size:1.2rem;margin:32px 0 0">Para comparar: la escuadra anterior</h2>'
+        + fila("#fff", "#18201e", logo(VERDE, "#fff", NARANJA, marco="escuadra"))
         + "</main></body></html>")
 escribir("public/logo.html", hoja)
 
