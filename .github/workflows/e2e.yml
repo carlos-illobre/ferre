@@ -7,8 +7,10 @@ name: E2E
 # Corren contra la versión 5 de la interfaz, la que abre la raíz (decisión 43).
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 9 * * 1"
+  # La corrida semanal vuelve cuando los escenarios estén adaptados a la versión 5 (ver el
+  # issue «Adaptar los escenarios de punta a punta a la versión 5»): hoy fallarían todos los lunes.
+  # schedule:
+  #   - cron: "0 9 * * 1"
 
 jobs:
   e2e:
