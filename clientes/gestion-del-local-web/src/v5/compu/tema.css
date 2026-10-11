@@ -125,3 +125,5 @@
 .lateral nav button .atajo { width: 22px; height: 22px; border-radius: 6px; font-size: 0.75rem; opacity: 0.7; }
 .lateral nav button[aria-current="page"] .atajo { opacity: 0.9; }
 .lateral nav button .atajo { width: auto; padding: 0 6px; white-space: nowrap; }
+/* El foco en el menú se tiene que ver bien: se llega con la flecha izquierda. */
+.lateral nav button:focus-visible { outline: 3px solid #f7c445; outline-offset: 1px; }

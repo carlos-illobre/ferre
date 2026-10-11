@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { irA, useRuta } from "../../v2/rutas";
@@ -70,6 +70,50 @@ function Pantallas() {
     window.addEventListener("keydown", tecla);
     return () => window.removeEventListener("keydown", tecla);
   }, [conSesion]);
+  // Flechas entre el menú y la pantalla: ← lleva el foco al menú, ↑ ↓ lo recorren, y → (o
+  // Enter) abre lo elegido y devuelve el foco a la pantalla, donde ↑ ↓ vuelven a elegir sus
+  // renglones. Mientras se escribe, ← sigue moviendo el cursor: solo salta al menú con la
+  // caja vacía o con el cursor al principio. En una lista desplegable las opciones se
+  // cambian con ↑ ↓, así que ← también lleva al menú.
+  useEffect(() => {
+    if (!conSesion) return;
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowLeft" || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (document.querySelector("dialog[open], [role='dialog'], [aria-modal='true']")) return;
+      const foco = document.activeElement as HTMLElement | null;
+      if (foco?.closest(".lateral")) return;
+      if (foco instanceof HTMLInputElement || foco instanceof HTMLTextAreaElement) {
+        const deTexto = foco instanceof HTMLTextAreaElement || ["text", "search", "", "tel", "url", "email", "password"].includes(foco.type);
+        if (!deTexto || (foco.value !== "" && !(foco.selectionStart === 0 && foco.selectionEnd === 0))) return;
+      } else if (foco && (foco.isContentEditable || ["radio", "tab", "slider", "option", "menuitem"].includes(foco.getAttribute("role") ?? ""))) return;
+      const botones = [...document.querySelectorAll<HTMLButtonElement>(".lateral nav button")];
+      const destino = botones.find((b) => b.getAttribute("aria-current") === "page") ?? botones[0];
+      if (destino) { e.preventDefault(); destino.focus(); }
+    };
+    window.addEventListener("keydown", tecla);
+    return () => window.removeEventListener("keydown", tecla);
+  }, [conSesion]);
+  function teclasDelMenu(e: ReactKeyboardEvent<HTMLElement>) {
+    const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
+    const i = botones.indexOf(document.activeElement as HTMLButtonElement);
+    if (i < 0) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      botones[(i + (e.key === "ArrowDown" ? 1 : botones.length - 1)) % botones.length]!.focus();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      // Si es otra parte, se abre; cada pantalla pone el foco en su búsqueda. Si es la misma, se vuelve a ella.
+      if (botones[i]!.getAttribute("aria-current") !== "page") botones[i]!.click();
+      requestAnimationFrame(() => {
+        const cuerpo = document.querySelector<HTMLElement>(".cuerpo");
+        if (!cuerpo || cuerpo.contains(document.activeElement)) return;
+        // Primero la búsqueda (u otro campo); si la pantalla no tiene, su primer botón.
+        const deLaPantalla = (selector: string) => [...cuerpo.querySelectorAll<HTMLElement>(selector)].find((x) => !x.closest(".pestanas, .mas-volver"));
+        const primero = deLaPantalla("input:not([type='hidden']):not([type='file']):not([disabled]), select:not([disabled])") ?? deLaPantalla("button:not([disabled])");
+        (primero ?? document.getElementById("contenido"))?.focus();
+      });
+    }
+  }
 
   if (sesion.estado === "cargando") return <main className="entrar-cargando" aria-busy="true"><Marca tam={44} /><p>Abriendo Ferrebress…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
@@ -86,7 +130,7 @@ function Pantallas() {
         <div className="lateral-marca">
           <Marca />
         </div>
-        <nav aria-label="Menú">
+        <nav aria-label="Menú" onKeyDown={teclasDelMenu}>
           {MENU.map((m) => {
             const destino = m.clave === "mas" ? "mas" : m.pestanas[0]!.ruta;
             return (
@@ -98,7 +142,7 @@ function Pantallas() {
             );
           })}
         </nav>
-        <p className="lateral-ayuda">Alt + número abre cada pantalla</p>
+        <p className="lateral-ayuda">Alt + número abre cada pantalla. Con ← se pasa al menú y con → se vuelve.</p>
         <div className="lateral-pie">
           <EstadoDeConexion />
           <div className="quien">

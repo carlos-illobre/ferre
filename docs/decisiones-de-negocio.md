@@ -170,3 +170,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     llevó», el total y «Cobrar».
 39. **La pestaña «Contar» se llama «Estanterías»** (2026-10-11), en el celular y en la
     computadora. Depósito queda con Ingreso, Inventario y Estanterías.
+40. **Flechas entre el menú y la pantalla, en la computadora** (2026-10-11): la flecha
+    izquierda lleva el foco al menú lateral; arriba y abajo lo recorren; la flecha derecha
+    (o Enter) abre lo elegido y vuelve a la pantalla, donde arriba y abajo siguen eligiendo
+    sus renglones. Mientras se escribe, la izquierda mueve el cursor y solo salta al menú
+    con la caja vacía o con el cursor al principio.
