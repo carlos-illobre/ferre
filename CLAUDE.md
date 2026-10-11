@@ -10,7 +10,7 @@ especificación aprobada.
    negocia y el flujo de trabajo. **Leela antes de tocar nada.**
 2. [specs/README.md](specs/README.md): de qué se trata el proyecto, cada requerimiento y en
    qué carpeta está especificado.
-3. La carpeta de `specs/` de la capacidad que vayas a tocar (`001` a `007`, una por
+3. La carpeta de `specs/` de la capacidad que vayas a tocar (`001` a `008`, una por
    capacidad, con todos sus requerimientos).
 4. [proyecto/estado.yml](proyecto/estado.yml): qué está hecho hoy, con qué pruebas, y dónde
    el código se aparta de la regla.

@@ -29,5 +29,7 @@ http.createServer(async (req, res) => {
   let out = await r.fn({ params, query: url.searchParams, body });
   let estado = 200; if (Array.isArray(out) && typeof out[0] === "number" && out.length === 2) [estado, out] = out;
   if (out === undefined) { res.writeHead(204, cab); return res.end(); }
+  // Una ruta puede devolver un archivo: { tipo: "image/svg+xml", cuerpo: "..." }.
+  if (out && typeof out === "object" && typeof out.tipo === "string" && "cuerpo" in out) { res.writeHead(estado, { ...cab, "Content-Type": out.tipo }); return res.end(out.cuerpo); }
   res.writeHead(estado, { ...cab, "Content-Type": "application/json" }); res.end(JSON.stringify(out));
 }).listen(Number(process.argv[2] ?? 8799), () => console.log("mock listo"));

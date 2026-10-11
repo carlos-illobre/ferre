@@ -1,0 +1,74 @@
+/* Mejoras y errores. La misma pantalla en el celular y en la computadora: trae sus propios
+   colores (los de la v5) para verse igual sobre los estilos de cualquiera de las dos. */
+.tk { --tk-verde: #17312b; --tk-naranja: #d83f0e; --tk-naranja-fuerte: #b9350a; --tk-naranja-suave: #fff0ea; --tk-naranja-texto: #c2370b; --tk-tinta: #18201e; --tk-detalle: #4a5451;
+  --tk-borde: #dfe5e1; --tk-borde-fuerte: #7c9085; --tk-fondo-2: #f1f4f1; --tk-verde-suave: #e3f3ea; --tk-verde-texto: #0f6b52; --tk-amarillo-suave: #fff5cc; --tk-amarillo-texto: #6b4a00;
+  flex: 1; display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 860px; margin: 0 auto; padding: 20px 16px 110px; color: var(--tk-tinta); font-size: 17px; line-height: 1.45; box-sizing: border-box; }
+.tk *, .tk *::before, .tk *::after { box-sizing: border-box; }
+.tk h1 { margin: 0; font-size: 1.75rem; line-height: 1.2; font-weight: 750; }
+.tk h2 { margin: 0; font-size: 1.2rem; font-weight: 700; }
+.tk p { margin: 0; }
+.tk ul { margin: 0; padding: 0; list-style: none; }
+.tk section { display: flex; flex-direction: column; gap: 12px; }
+.tk-bajada, .tk-detalle { color: var(--tk-detalle); }
+.tk-detalle { font-size: 0.9375rem; }
+.tk-tarjeta { padding: 16px; background: #fff; border: 1px solid var(--tk-borde); border-radius: 14px; }
+.tk :focus-visible { outline: 3px solid var(--tk-verde-texto); outline-offset: 2px; }
+
+.tk-tipos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tk-tipos button { display: flex; flex-direction: column; gap: 2px; min-height: 64px; padding: 10px 14px; border: 1.500px solid var(--tk-borde-fuerte); border-radius: 12px; background: #fff; color: var(--tk-tinta); text-align: left; font: inherit; cursor: pointer; }
+.tk-tipos button span { color: var(--tk-detalle); font-size: 0.875rem; }
+.tk-tipos button[aria-checked="true"] { border-color: var(--tk-naranja); background: var(--tk-naranja-suave); box-shadow: inset 0 0 0 1px var(--tk-naranja); }
+
+.tk-campo { display: flex; flex-direction: column; gap: 6px; }
+.tk-campo > span { font-weight: 650; }
+.tk-campo textarea, .tk-campo input { width: 100%; padding: 12px 14px; border: 1.500px solid var(--tk-borde-fuerte); border-radius: 12px; background: #fff; color: var(--tk-tinta); font: inherit; }
+.tk-campo textarea { min-height: 120px; resize: vertical; }
+.tk-campo input { min-height: 48px; }
+.tk-campo [aria-invalid="true"] { border-color: var(--tk-naranja); }
+.tk-campo ::placeholder { color: #66706d; }
+
+.tk-fotos { display: flex; flex-wrap: wrap; gap: 10px; }
+.tk-fotos li { position: relative; }
+.tk-fotos img, .tk-cargando-foto { display: block; width: 84px; height: 84px; border-radius: 10px; border: 1px solid var(--tk-borde); object-fit: cover; background: var(--tk-fondo-2); }
+.tk-ver { padding: 0; border: 0; background: none; border-radius: 10px; cursor: zoom-in; }
+.tk-quitar { position: absolute; top: -8px; right: -8px; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; background: var(--tk-verde); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+
+.tk-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.tk-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1.500px solid var(--tk-borde-fuerte); background: #fff; color: var(--tk-tinta); font: inherit; font-weight: 650; cursor: pointer; }
+.tk-boton:hover:not(:disabled) { background: var(--tk-fondo-2); }
+.tk-boton:disabled { background: #e4e8e5; color: #555f5c; border-color: #e4e8e5; cursor: not-allowed; }
+.tk-boton.principal { margin-left: auto; min-width: 150px; border-color: var(--tk-naranja); background: var(--tk-naranja); color: #fff; font-weight: 750; }
+.tk-boton.principal:hover:not(:disabled) { background: var(--tk-naranja-fuerte); border-color: var(--tk-naranja-fuerte); }
+.tk-boton.oscuro { border-color: var(--tk-verde); background: var(--tk-verde); color: #fff; }
+.tk-boton.oscuro:hover { background: #25443d; }
+.tk-boton.chico { min-height: 44px; padding: 0 14px; align-self: flex-start; }
+.tk-falta { color: var(--tk-naranja-texto); font-weight: 650; }
+.tk-aviso { padding: 12px 16px; border-radius: 12px; background: var(--tk-verde-suave); color: var(--tk-verde-texto); font-weight: 650; }
+
+.tk-cabeza { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.tk-filtro { display: inline-flex; padding: 3px; gap: 2px; border-radius: 12px; background: #e4e8e5; }
+.tk-filtro button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: var(--tk-detalle); font: inherit; font-weight: 650; cursor: pointer; }
+.tk-filtro button[aria-pressed="true"] { background: #fff; color: var(--tk-tinta); box-shadow: 0 1px 2px rgb(23 49 43 / 0.15); }
+.tk-vacio { padding: 28px 16px; border: 1px dashed var(--tk-borde-fuerte); border-radius: 14px; color: var(--tk-detalle); text-align: center; }
+
+.tk-lista { display: flex; flex-direction: column; gap: 12px; }
+.tk-ticket { display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #fff; border: 1px solid var(--tk-borde); border-radius: 14px; }
+.tk-ticket header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tk-ticket.resuelto { background: var(--tk-fondo-2); }
+.tk-texto { white-space: pre-wrap; overflow-wrap: anywhere; }
+.tk-pastilla { padding: 2px 10px; border-radius: 999px; font-size: 0.875rem; font-weight: 700; }
+.tk-pastilla.error { background: var(--tk-naranja-suave); color: var(--tk-naranja-texto); }
+.tk-pastilla.mejora { background: var(--tk-verde-suave); color: var(--tk-verde-texto); }
+.tk-pastilla.pendiente { background: var(--tk-amarillo-suave); color: var(--tk-amarillo-texto); }
+.tk-resuelto { color: var(--tk-verde-texto); font-weight: 650; }
+.tk-resolver { display: flex; flex-direction: column; gap: 10px; }
+
+dialog.tk-grande { max-width: min(96vw, 1100px); max-height: 94dvh; padding: 12px; border: 0; border-radius: 14px; background: #fff; }
+dialog.tk-grande[open] { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+dialog.tk-grande::backdrop { background: rgb(15 30 25 / 0.75); }
+dialog.tk-grande img { max-width: 100%; max-height: 78dvh; object-fit: contain; border-radius: 8px; }
+
+.tk-solo-compu { display: none; }
+@media (min-width: 900px) { .tk { padding: 24px 24px 40px; } .tk-solo-compu { display: block; } }
+@media (max-width: 899px) { .tk { padding-top: calc(40px + env(safe-area-inset-top)); } }
+@media (max-width: 480px) { .tk-tipos { grid-template-columns: 1fr; } .tk-boton.principal { flex: 1; } .tk-acciones .tk-boton { flex: 1 1 100%; } }

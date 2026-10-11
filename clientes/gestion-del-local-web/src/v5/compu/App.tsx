@@ -17,6 +17,7 @@ import { Usuarios } from "../../v2/pantallas/Usuarios";
 import { Actividad } from "../../v2/pantallas/Actividad";
 import { Vender } from "./Vender";
 import { DE_MAS, Mas } from "./Mas";
+import { Tickets } from "../Tickets";
 import "../../v2/estilos/base.css";
 import "../../v2/estilos/entrar.css";
 import "./tema.css";
@@ -121,7 +122,7 @@ function Pantallas() {
           : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Compras />
           : actual === "stock" ? <Stock /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <Resumen /> : actual === "usuarios" ? <Usuarios />
-          : actual === "actividad" ? <Actividad /> : <Vender />}
+          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : <Vender />}
       </div>
     </div>
   );

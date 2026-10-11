@@ -127,3 +127,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     propuestas por ser la que menos se parece a otra marca; falta buscarla en el registro de
     marcas (INPI) antes de darla por definitiva. Los archivos están en la carpeta `public`
     del cliente web (`logo-ferrebress.svg`, `icono-v5.svg` y los íconos de la app instalada).
+30. **Mejoras y errores** (2026-10-11): dentro de Más hay una pantalla para avisar de un
+    error o proponer una mejora, con texto y fotos o capturas. Los tickets quedan en la
+    misma aplicación (no en un servicio de afuera), todos los usuarios ven todos, tienen dos
+    estados (abierto y resuelto, con una nota opcional, y se pueden reabrir), y sin conexión
+    se guardan en el dispositivo y se envían solos al volver (RF-80 y RF-81).

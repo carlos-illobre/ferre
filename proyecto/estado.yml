@@ -630,6 +630,22 @@ RF-74:
     - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
     - "Que un dispositivo con la sesión cerrada a distancia vuelva solo a la entrada no tiene prueba"
 
+RF-80:
+  estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/tickets.test.ts
+  defectos:
+    - "Sin prueba de la pantalla ni del envío sin conexión: las pruebas de interfaz están en pausa (decisión 25); se probó a mano con tests/capturas"
+    - "La foto de un ticket por enviar se guarda en el dispositivo sin tope de espacio"
+
+RF-81:
+  estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/tickets.test.ts
+  defectos:
+    - "Sin prueba de la pantalla: las pruebas de interfaz están en pausa (decisión 25)"
+    - "Cualquier usuario puede marcar resuelto o reabrir: hoy todos son Administrador (RF-72)"
+
 RNF-01:
   estado: "A validar en el piloto (#21)"
   pruebas: []

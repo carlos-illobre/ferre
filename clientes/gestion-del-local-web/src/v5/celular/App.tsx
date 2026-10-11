@@ -10,6 +10,7 @@ import { Catalogo } from "./Catalogo";
 import { Icono as IconoDeMas, type NombreDeIcono } from "../../v2/ui";
 import { Deposito } from "./Deposito";
 import { Negocio, type Parte } from "./Negocio";
+import { Tickets } from "../Tickets";
 import { Vender } from "./Vender";
 import "../../estilos.css";
 import "./tema.css";
@@ -32,10 +33,11 @@ const PESTANAS = [
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ] as const;
-const DE_MAS: { parte: Parte; nombre: string; detalle: string; icono: NombreDeIcono }[] = [
+const DE_MAS: { parte: Parte | "tickets"; nombre: string; detalle: string; icono: NombreDeIcono }[] = [
   { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen" },
   { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
   { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad" },
+  { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
 ];
 const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
@@ -62,7 +64,8 @@ function Pantallas() {
     <div className="app">
       {esAmbienteDePrueba() && <span className="pill-prueba solo-celular" data-testid="ambiente">Ambiente de prueba</span>}
 
-      {pestana === "mas" && parte ? <Negocio parte={parte} />
+      {pestana === "mas" && parte === "tickets" ? <Tickets />
+        : pestana === "mas" && parte && parte !== "tickets" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>

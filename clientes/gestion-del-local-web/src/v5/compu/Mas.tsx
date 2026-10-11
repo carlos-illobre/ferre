@@ -6,6 +6,7 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
   { ruta: "resumen", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen" },
   { ruta: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
   { ruta: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad" },
+  { ruta: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
 ];
 
 export function Mas({ atajoDe }: { atajoDe: (ruta: string) => string | null }) {
