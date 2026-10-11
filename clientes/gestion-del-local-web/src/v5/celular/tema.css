@@ -62,3 +62,18 @@ button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; backgroun
 .boton[data-testid="buscar-duplicados"]::before { content: ""; flex: none; width: 20px; height: 20px; background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.800-3.800'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.800-3.800'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+/* Vender: los atajos (lo último que se vendió) son cuatro cuadrados amarillos pegados a la
+   búsqueda; lo que ya está en la venta va aparte, con título verde y franja naranja, para
+   que no se confunda una cosa con la otra. */
+.atajos { display: flex; flex-direction: column; gap: 6px; }
+.atajos h2 { margin: 0 4px; font-size: 14px; font-weight: 700; color: #6b4a00; }
+.atajos-grilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.atajo { display: flex; flex-direction: column; gap: 6px; padding: 6px; min-width: 0; border: 1.500px solid #f0c64a; border-radius: 14px; background: #fff7d6; color: #17312b; text-align: center; }
+.atajo:active { transform: scale(0.97); background: #ffeeb0; }
+.atajo-foto { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 10px; background: #fff; color: #b98a00; overflow: hidden; }
+.atajo-foto img { width: 100%; height: 100%; object-fit: cover; }
+.atajo-nombre { font-size: 12.500px; font-weight: 650; line-height: 1.2; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; min-height: 2.4em; }
+.en-venta { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 0; padding: 8px 14px; border-radius: 12px; background: #17312b; color: #fff; font-size: 16px; font-weight: 700; }
+.en-venta span { font-size: 13px; font-weight: 600; color: #f7c445; }
+.item { border-left: 6px solid #d83f0e; }

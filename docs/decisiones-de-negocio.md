@@ -147,3 +147,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     Es para que nadie registre una venta real en pruebas. Producción no lleva nada de eso.
 34. **Los gastos de la semana se ven solo en «Cómo va el negocio»** (2026-10-11): se
     sacaron del ingreso de mercadería, donde alcanza con las compras recientes.
+35. **Vender en el celular: atajos y venta bien separados** (2026-10-11): lo último que se
+    vendió son atajos de búsqueda, así que va pegado debajo de la búsqueda como cuatro
+    cuadrados con la foto y un nombre corto, sin precio, en amarillo. Lo que ya está en la
+    venta va aparte, bajo un título verde «En esta venta» y con una franja naranja, para
+    que no se confunda con los atajos. En la computadora siguen siendo cuatro tarjetas.

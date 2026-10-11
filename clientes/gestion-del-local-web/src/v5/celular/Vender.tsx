@@ -295,6 +295,22 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
           </div>
         )}
 
+        {/* Atajos de búsqueda: lo último que se vendió, en cuatro cuadrados pegados a la búsqueda.
+            Siguen a la vista con la venta empezada, para sumar otro producto de un toque. */}
+        {sugeridos.hay && !consulta.trim() && !codigoDesconocido && (
+          <section className="atajos" aria-label="Lo último que se vendió" data-testid="sugeridos-ultimos">
+            <h2>Lo último que se vendió</h2>
+            <div className="atajos-grilla">
+              {sugeridos.ultimos.slice(0, 4).map((p) => (
+                <button key={p.id} type="button" className="atajo" onClick={() => agregar(p)} aria-label={`Agregar ${p.descripcion} a la venta`}>
+                  <span className="atajo-foto">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : <Icono nombre="vender" tam={26} grosor={1.6} />}</span>
+                  <span className="atajo-nombre">{p.descripcion}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         {vacio && !sugeridos.hay && (
           <div className="vacio">
             <div className="icono"><Icono nombre="vender" tam={30} grosor={1.8} /></div>
@@ -303,29 +319,11 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
           </div>
         )}
 
-        {/* Siguen a la vista con la venta empezada (debajo de lo ya cargado), para sumar otro producto de un toque. */}
+        {items.length > 0 && <h2 className="en-venta" data-testid="titulo-venta">En esta venta<span>{items.length} {items.length === 1 ? "producto" : "productos"}</span></h2>}
         {items.map((it) => (
           <ItemDeVenta key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined}
             alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it.clave)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
             alSubirFoto={it.producto ? async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); } : undefined} />
-        ))}
-        {sugeridos.hay && !consulta.trim() && !codigoDesconocido && [["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", items.length ? [] : sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
-          <section key={clave} className="sugeridos" data-testid={`sugeridos-${clave}`}>
-            <h2>{titulo}</h2>
-            <div className="lista">
-              {lista.slice(0, 5).map((p) => {
-                const precio = precioSugerido(p);
-                return (
-                  <button key={p.id} type="button" className="fila con-foto" onClick={() => agregar(p)}>
-                    <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : null}</span>
-                    <span className="nombre">{p.descripcion}</span>
-                    <strong className="derecha importe">{precio === null ? <small>sin precio</small> : pesosCortos(precio)}</strong>
-                    <span className="detalle">{detalleDe(p) || "Tocá para agregarlo a la venta"}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
         ))}
       </div>
 
