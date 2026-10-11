@@ -9,7 +9,7 @@ import "../estilos/deposito-comun.css";
 export type { Producto };
 
 export const detalleDe = (p: Pick<Producto, "marca" | "proveedor">) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
-export const nombreUnidad = (u: string) => (u === "unidad" ? "u." : u);
+export const nombreUnidad = (u: string) => (u === "unidad" ? "u." : u === "l" ? "L" : u);
 // Diferencia con su signo; «=» cuando coincide.
 export const conSigno = (n: number) => (n === 0 ? "=" : `${n > 0 ? "+" : "−"}${numero(Math.abs(n))}`);
 // Un error del servidor ya viene en castellano; cualquier otro es que no hubo conexión.

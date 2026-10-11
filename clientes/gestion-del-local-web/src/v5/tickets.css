@@ -31,7 +31,7 @@
 .tk-fotos li { position: relative; }
 .tk-fotos img, .tk-cargando-foto { display: block; width: 84px; height: 84px; border-radius: 10px; border: 1px solid var(--tk-borde); object-fit: cover; background: var(--tk-fondo-2); }
 .tk-ver { padding: 0; border: 0; background: none; border-radius: 10px; cursor: zoom-in; }
-.tk-quitar { position: absolute; top: -8px; right: -8px; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; background: var(--tk-verde); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+.tk-quitar { position: absolute; top: -8px; right: -8px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; background: #c2370b; color: #fff; cursor: pointer; }
 
 .tk-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
 .tk-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1.500px solid var(--tk-borde-fuerte); background: #fff; color: var(--tk-tinta); font: inherit; font-weight: 650; cursor: pointer; }

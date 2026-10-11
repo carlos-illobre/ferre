@@ -184,7 +184,7 @@ export function Ingreso() {
         {enteras(unidad)
           ? <Contador valor={r.cantidad} entera sinBotones={!esCelular} alCambiar={(v) => cambiar(r.clave, { cantidad: Math.floor(v) })} etiqueta={`Cantidad de ${r.descripcion || "producto nuevo"}`} />
           : <CantidadAGranel valor={r.cantidad} unidad={unidad} conBotones={esCelular} alCambiar={(v) => cambiar(r.clave, { cantidad: v })} etiqueta={`Cantidad de ${r.descripcion}, en ${unidad}`} />}
-        {!enteras(unidad) && <span className="detalle">{unidad}</span>}
+        {!enteras(unidad) && <span className="detalle">{unidad === "l" ? "L" : unidad}</span>}
       </span>
     );
   };
@@ -218,7 +218,7 @@ export function Ingreso() {
         <input className="entrada" value={r.descripcion} placeholder="Descripción del producto nuevo" aria-label="Descripción del producto nuevo" aria-invalid={!r.descripcion.trim()} onChange={(e) => cambiar(r.clave, { descripcion: e.target.value })} data-testid="descripcion-nueva" />
       </span>
     );
-  const botonQuitar = (r: Renglon) => <Boton tam={esCelular ? undefined : "chico"} icono="cerrar" aria-label={`Quitar ${r.descripcion || "el producto nuevo"}`} onClick={() => quitar(r.clave)} data-testid="quitar" />;
+  const botonQuitar = (r: Renglon) => <Boton tam={esCelular ? undefined : "chico"} icono="basura" variante="peligro" title="Quitar del ingreso" aria-label={`Quitar ${r.descripcion || "el producto nuevo"}`} onClick={() => quitar(r.clave)} data-testid="quitar" />;
 
   return (
     <Pagina titulo="Compras" testId="pantalla-compras" className={renglones.length ? "deposito-con-pie" : ""} bajada="Acá se carga la mercadería que llega. Suma stock y, si el comprobante trae otro costo, ese pasa a ser el vigente.">

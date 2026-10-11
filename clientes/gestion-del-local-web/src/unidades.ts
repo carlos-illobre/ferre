@@ -3,9 +3,11 @@ import type { Producto } from "./pantallas/Productos";
 // Cómo se vende (y se compra) un producto: por unidad, con cantidades enteras, o a
 // granel por kilo, metro o litro, con hasta un decimal. Queda guardado en el producto.
 export const UNIDADES = [
-  { valor: "unidad", nombre: "un." }, { valor: "kg", nombre: "kg" }, { valor: "m", nombre: "m" }, { valor: "l", nombre: "l" },
+  { valor: "unidad", nombre: "un." }, { valor: "kg", nombre: "kg" }, { valor: "m", nombre: "m" }, { valor: "l", nombre: "L" },
 ] as const;
 export type Unidad = (typeof UNIDADES)[number]["valor"];
+// Cómo se escribe una unidad en pantalla: el litro siempre va con mayúscula (L).
+export const escribirUnidad = (u: string): string => (u === "l" ? "L" : u);
 export const unidadDe = (p: Producto | null | undefined): Unidad => (UNIDADES.some((u) => u.valor === p?.unidad) ? (p!.unidad as Unidad) : "unidad");
 export const enteras = (u: Unidad) => u === "unidad";
 

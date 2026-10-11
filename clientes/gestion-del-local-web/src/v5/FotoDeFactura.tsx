@@ -53,7 +53,7 @@ export function FotoDeFactura({ foto, alCambiar, conCelular = false, nombre }: {
         <span>Tocá la foto para leer el número o cualquier otro dato.</span>
         <div className="ff-botones">
           <button type="button" className="ff-boton" disabled={subiendo} onClick={() => archivo.current?.click()}>{subiendo ? "Subiendo…" : "Cambiar"}</button>
-          <button type="button" className="ff-boton" onClick={() => alCambiar(null)} data-testid="quitar-comprobante">Quitar</button>
+          <button type="button" className="ff-boton" onClick={() => alCambiar(null)} data-testid="quitar-comprobante"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>Quitar</button>
         </div>
         {error && <span className="ff-error" role="alert">{error}</span>}
       </div>

@@ -77,7 +77,7 @@ export function Tickets() {
             {fotos.map((f, i) => (
               <li key={`${f.name}-${f.size}-${i}`}>
                 <Miniatura origen={f} />
-                <button type="button" className="tk-quitar" aria-label={`Quitar la foto ${i + 1}`} onClick={() => { setFotos(fotos.filter((_, n) => n !== i)); setFalta(null); }}>×</button>
+                <button type="button" className="tk-quitar" aria-label={`Quitar la foto ${i + 1}`} onClick={() => { setFotos(fotos.filter((_, n) => n !== i)); setFalta(null); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg></button>
               </li>
             ))}
           </ul>

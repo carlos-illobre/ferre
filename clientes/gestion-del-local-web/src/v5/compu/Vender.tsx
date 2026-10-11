@@ -440,7 +440,7 @@ function FilaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegirMar
       </td>
       <td><Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} etiqueta={`Cantidad de ${it.descripcion}`} sinBotones /></td>
       <td className="num" data-testid="subtotal">{renglon && (renglon.pasos.length ? <Explicado className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : <span className="importe">{pesosCortos(renglon.valor)}</span>)}</td>
-      <td className="angosta"><Boton icono="cerrar" tam="chico" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} /></td>
+      <td className="angosta"><Boton icono="basura" variante="peligro" tam="chico" title="Quitar de la venta" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} /></td>
     </tr>
   );
 }

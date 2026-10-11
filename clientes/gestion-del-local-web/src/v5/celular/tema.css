@@ -173,3 +173,5 @@ body, .hoja { background: #e6ece6; }
 /* Quitar un producto de la venta: un botón con tacho, no una «×» suelta. */
 .item .pie .quitar { width: 46px; height: 40px; flex: none; border-radius: 12px; background: #fff0ea; border: 1.500px solid #f0b9a3; color: #a52e08; }
 .item .pie .quitar:active { background: #ffd9cb; }
+.quitar.tacho { display: grid; place-items: center; width: 44px; height: 40px; flex: none; border-radius: 12px; background: #fff0ea; border: 1.500px solid #f0b9a3; color: #a52e08; }
+.quitar.tacho:active { background: #ffd9cb; }
