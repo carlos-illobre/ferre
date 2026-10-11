@@ -390,7 +390,7 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
         ) : (
           <label className="campo falta importe-campo"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus={!producto} value={it.precioManual ?? ""} onChange={(e) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) })} data-testid="precio-manual" /></label>
         )}
-        <small className="detalle">{producto ? `${detalleDe(producto)}${stock !== undefined ? ` · stock ${num(stock)}${stock - it.cantidad < 0 ? " (queda negativo)" : ""}` : ""}` : "Ítem libre"}</small>
+        <small className="detalle">{producto ? `${detalleDe(producto)}${stock !== undefined ? ` · stock ${num(stock)}${stock - it.cantidad < 0 ? " (no alcanza: se vende igual y queda anotado)" : ""}` : ""}` : "Ítem libre"}</small>
       </div>
       <div className="pie">
         <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })}>

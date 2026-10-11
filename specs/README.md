@@ -109,6 +109,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
 | RF-51 | Cargar la factura de compra con una foto, sin tipear los renglones | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-52 | El stock arranca en cero; lo que ya hay se carga de a poco, por sector. Un conteo interrumpido queda abierto y se retoma | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-53 | Inventario: el stock actual de cada producto, sin sumas de dinero; el dinero invertido se ve en «Cómo va el negocio». El stock de cada producto muestra los movimientos que lo explican y se puede corregir a mano, con el motivo | [005-compras-y-stock](005-compras-y-stock/spec.md) |
+| RF-59 | Una venta nunca deja el stock por debajo de cero: se vende igual, el stock queda en cero y lo que faltaba se anota como anomalía. Las anomalías (diferencias entre el sistema y la realidad) se ven en «Más» | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-54 | Aviso de stock bajo y sugerencia de qué pedir | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-55 | Armar el pedido a un proveedor | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-56 | Lo que se les debe a los proveedores y cuándo vence: se paga por adelantado cuando hay descuento, y si no a 30 o 60 días | [005-compras-y-stock](005-compras-y-stock/spec.md) |

@@ -9,6 +9,8 @@ import { exigirSesion } from "../autenticacion.js";
 // precio y explicación DE ESE MOMENTO, así el precio se puede explicar para siempre aunque
 // el costo cambie (#47). Cada ítem con producto descuenta stock (#33). El id lo genera el
 // cliente: una venta hecha sin conexión se reenvía y no se duplica (#18).
+// Los números del detalle de una anomalía, con coma decimal.
+const coma = (n: number) => String(n).replace(".", ",");
 export const ventas = new Hono();
 ventas.use("/*", exigirSesion);
 
@@ -57,6 +59,7 @@ ventas.post("/", async (c) => {
       `INSERT INTO venta (id, fecha, cliente_id, medio_pago, total, dispositivo_id) VALUES ($1, $2, $3, $4, $5, $6)`,
       [id, v.fecha ?? new Date().toISOString(), v.cliente_id ?? null, v.medio_pago, total.toFixed(2), v.dispositivo_id ?? null],
     );
+    let anomalias = 0;
     for (const [orden, it] of v.items.entries()) {
       await cliente.query(
         `INSERT INTO item_venta (id, venta_id, orden, producto_id, descripcion, cantidad, costo_neto, precio_proveedor_id, margen_aplicado, precio_unitario, explicacion)
@@ -65,13 +68,28 @@ ventas.post("/", async (c) => {
           it.margen_aplicado ?? null, it.precio_unitario.toFixed(2), JSON.stringify(it.explicacion ?? {})],
       );
       if (it.producto_id) {
-        await cliente.query(
-          `INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, referencia_id, fecha) VALUES ($1, $2, 'venta', $3, 'venta', $4, $5)`,
-          [randomUUID(), it.producto_id, -it.cantidad, id, v.fecha ?? new Date().toISOString()],
-        );
+        // Una venta nunca deja el stock por debajo de cero (RF-59): se descuenta lo que hay y
+        // lo que faltaba queda anotado como anomalía. Lo vendido ya no hay que inventariarlo.
+        const { rows: hay } = await cliente.query<{ stock: string }>("SELECT COALESCE(SUM(cantidad), 0) AS stock FROM movimiento_stock WHERE producto_id = $1", [it.producto_id]);
+        const enStock = Math.max(0, Number(hay[0]?.stock ?? 0));
+        const descuenta = Math.min(it.cantidad, enStock);
+        if (descuenta > 0) {
+          await cliente.query(
+            `INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, referencia_id, fecha) VALUES ($1, $2, 'venta', $3, 'venta', $4, $5)`,
+            [randomUUID(), it.producto_id, -descuenta, id, v.fecha ?? new Date().toISOString()],
+          );
+        }
+        const falta = Math.round((it.cantidad - descuenta) * 1000) / 1000;
+        if (falta > 0) {
+          await cliente.query(
+            `INSERT INTO anomalia (id, tipo, producto_id, usuario_id, venta_id, cantidad, detalle) VALUES ($1, 'venta_sin_stock', $2, $3, $4, $5, $6)`,
+            [randomUUID(), it.producto_id, usuarioId, id, falta, `${it.cantidad === 1 ? "Se vendió 1" : `Se vendieron ${coma(it.cantidad)}`} y el sistema tenía ${coma(enStock)} en stock: ${falta === 1 ? "faltaba 1" : `faltaban ${coma(falta)}`}`],
+          );
+          anomalias++;
+        }
       }
     }
-    await registrarEvento(cliente, { tipo: "venta.registrada", usuarioId, dispositivoId: v.dispositivo_id ?? null, contenido: { id, total, medio_pago: v.medio_pago, cliente_id: v.cliente_id ?? null, items: v.items.length } });
+    await registrarEvento(cliente, { tipo: "venta.registrada", usuarioId, dispositivoId: v.dispositivo_id ?? null, contenido: { id, total, medio_pago: v.medio_pago, cliente_id: v.cliente_id ?? null, items: v.items.length, ...(anomalias ? { anomalias } : {}) } });
     await cliente.query("COMMIT");
   } catch (e) {
     await cliente.query("ROLLBACK");
@@ -99,7 +117,8 @@ ventas.get("/", async (c) => {
   return c.json({ dia: dia ?? new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 10), ventas: rows, totales, total: Object.values(totales).reduce((a, b) => a + b, 0) });
 });
 
-// Anular: la venta queda marcada (no se borra) y el stock vuelve con un ajuste.
+// Anular: la venta queda marcada (no se borra) y vuelve al stock lo que la venta descontó de
+// verdad, que puede ser menos de lo vendido si no había stock (RF-59).
 ventas.post("/:id/anular", async (c) => {
   const { motivo } = await c.req.json<{ motivo?: string }>().catch(() => ({}) as { motivo?: string });
   const id = c.req.param("id");
@@ -111,8 +130,8 @@ ventas.post("/:id/anular", async (c) => {
     if (!rowCount) { await cliente.query("ROLLBACK"); return c.json({ error: "La venta no existe o ya está anulada" }, 409); }
     await cliente.query(
       `INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, referencia_id, fecha, nota)
-       SELECT gen_random_uuid(), producto_id, 'ajuste', cantidad, 'venta', $1, now(), 'anulación de venta'
-         FROM item_venta WHERE venta_id = $1 AND producto_id IS NOT NULL`,
+       SELECT gen_random_uuid(), producto_id, 'ajuste', -cantidad, 'venta', $1, now(), 'anulación de venta'
+         FROM movimiento_stock WHERE referencia_tipo = 'venta' AND referencia_id = $1 AND tipo = 'venta'`,
       [id],
     );
     await registrarEvento(cliente, { tipo: "venta.anulada", usuarioId, contenido: { id, motivo: motivo?.trim() || null } });

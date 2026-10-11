@@ -12,6 +12,7 @@ import { Icono as IconoDeMas, type NombreDeIcono } from "../../v2/ui";
 import { Deposito } from "./Deposito";
 import { Negocio, type Parte } from "./Negocio";
 import { Tickets } from "../Tickets";
+import { Anomalias } from "../Anomalias";
 import { Vender } from "./Vender";
 import "../../estilos.css";
 import "./tema.css";
@@ -34,10 +35,11 @@ const PESTANAS = [
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ] as const;
-const DE_MAS: { parte: Parte | "tickets"; nombre: string; detalle: string; icono: NombreDeIcono }[] = [
+const DE_MAS: { parte: Parte | "tickets" | "anomalias"; nombre: string; detalle: string; icono: NombreDeIcono }[] = [
   { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen" },
   { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
   { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad" },
+  { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta" },
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
 ];
 const IconoMas = ({ grosor }: { grosor: number }) => (
@@ -68,7 +70,8 @@ function Pantallas() {
     <div className="app">
 
       {pestana === "mas" && parte === "tickets" ? <Tickets />
-        : pestana === "mas" && parte && parte !== "tickets" ? <Negocio parte={parte} />
+        : pestana === "mas" && parte === "anomalias" ? <Anomalias />
+        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>

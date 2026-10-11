@@ -187,3 +187,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     la decisión 25. Se prueba únicamente la versión 5, que es la que abre la raíz. Las otras
     versiones siguen publicadas en su carpeta, pero no tienen pruebas. Cómo está armada la
     versión 5 y dónde vive cada cosa está en el ADR-015.
+44. **Vender sin stock no deja el stock negativo, y queda una anomalía** (2026-10-11): si el
+    stock está en cero la venta se registra igual y el stock sigue en cero (esa unidad ya no
+    hay que inventariarla). En «Más» hay una pantalla nueva, «Anomalías», que es un registro
+    con fecha, producto y usuario de cada inconsistencia entre el sistema y la realidad; la
+    venta sin stock anota una. Las alertas sobre anomalías quedan para más adelante (RF-59).

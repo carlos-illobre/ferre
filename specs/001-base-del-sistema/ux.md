@@ -222,8 +222,8 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 
 - **Un solo menú, en el mismo orden:** Catálogo (Productos, Listas, Duplicados), Vender,
   Depósito (Ingreso, Inventario, Estanterías) y Más (Cómo va el negocio, Usuarios y sesiones,
-  Quién hizo qué, Mejoras y errores). La aplicación abre en lo primero del menú (decisiones
-  28 y 39).
+  Quién hizo qué, Anomalías, Mejoras y errores). La aplicación abre en lo primero del menú
+  (decisiones 28, 39 y 44).
 - **Las palabras:** «estantería» y no «góndola»; «Inventario» y no «Stock» para la pantalla;
   «Estanterías» y no «Contar» para la pestaña; «dinero» y no «plata»; el litro se escribe
   «L» (decisiones 28, 31 y 39).

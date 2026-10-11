@@ -28,14 +28,14 @@ versión 4 (decisión 27). El 2026-10-11 eligió la versión 5, que junta esas t
   celular; Vender, Ingreso e Inventario de la computadora). Las versiones anteriores no se
   tocan, salvo los componentes compartidos que la versión 5 usa y que mejoran para todas (el
   contador de cantidad, el diálogo de la foto del producto, el nombre de las unidades).
-- **Lo nuevo se escribe una sola vez y lo usan los dos árboles:** Mejoras y errores, la foto
+- **Lo nuevo se escribe una sola vez y lo usan los dos árboles:** Mejoras y errores, Anomalías, la foto
   de la factura, el pedido de foto con código QR, el dinero invertido, el marco del ambiente
   de prueba. Cada una trae sus propios estilos para verse igual sobre cualquiera de los dos.
 - **El aspecto se ajusta con una hoja de estilos por árbol,** que pisa los colores y las
   piezas de la versión de la que sale, en vez de tocar las hojas de esa versión.
 - **Un solo menú en los dos árboles:** Catálogo (Productos, Listas, Duplicados), Vender,
   Depósito (Ingreso, Inventario, Estanterías) y Más (Cómo va el negocio, Usuarios y sesiones,
-  Quién hizo qué, Mejoras y errores).
+  Quién hizo qué, Anomalías, Mejoras y errores).
 
 Dónde está cada cosa en el código:
 

@@ -28,6 +28,7 @@ describe("POST /ventas", () => {
   });
 
   it("registra la venta con su total, guarda cada ítem con precio, margen y explicación, y descuenta stock", async () => {
+    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "10" }] });
     const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
     expect(r.status).toBe(201);
     const ventaSql = base.actual.sqlDe(/INSERT INTO venta \(/)[0]!;
@@ -37,7 +38,39 @@ describe("POST /ventas", () => {
     expect(item.params).toEqual(expect.arrayContaining(["MECHA", 3, 100, "3000.00", JSON.stringify({ pasos: ["+ 100 % de margen"] })]));
     const movimiento = base.actual.sqlDe(/INSERT INTO movimiento_stock/)[0]!;
     expect(movimiento.params).toContain(-3);
+    expect(base.actual.sqlDe(/INSERT INTO anomalia/)).toHaveLength(0);
     expect(base.actual.sqlDe(/^COMMIT/)).toHaveLength(1);
+  });
+
+  // RF-59: una venta nunca deja el stock por debajo de cero; lo que faltaba es una anomalía.
+  it("con stock en cero la venta se registra igual, el stock no baja y queda anotada la anomalía", async () => {
+    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "0" }] });
+    const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
+    expect(r.status).toBe(201);
+    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)).toHaveLength(0);
+    const anomalia = base.actual.sqlDe(/INSERT INTO anomalia/)[0]!;
+    expect(anomalia.params.slice(1, 5)).toEqual(["p1", "u-mostrador", venta.id, 3]);
+    expect(String(anomalia.params[5])).toContain("faltaban 3");
+    expect(JSON.stringify(base.actual.sqlDe(/INSERT INTO evento/)[0]?.params ?? "")).toContain("anomalias");
+  });
+
+  it("si alcanza solo en parte, descuenta lo que hay y anota lo que faltó; un stock ya negativo no baja más", async () => {
+    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "2" }] });
+    await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
+    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)[0]!.params).toContain(-2);
+    expect(base.actual.sqlDe(/INSERT INTO anomalia/)[0]!.params[4]).toBe(1);
+    base.actual = baseFalsa();
+    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "-4" }] });
+    await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
+    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/INSERT INTO anomalia/)[0]!.params[4]).toBe(3);
+  });
+
+  it("anular devuelve al stock lo que la venta descontó, no lo que se vendió", async () => {
+    base.actual.programar(/UPDATE venta SET estado = 'anulada'/, { rowCount: 1 });
+    const r = await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "admin", cuerpo: {} });
+    expect(r.status).toBeLessThan(300);
+    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)[0]!.sql).toMatch(/-cantidad[\s\S]*FROM movimiento_stock WHERE referencia_tipo = 'venta'/);
   });
 
   it("cada renglón se redondea para arriba a $1.000: toda venta es múltiplo de $1.000 (RF-19)", async () => {

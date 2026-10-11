@@ -453,6 +453,17 @@ RF-53:
     - "Sin prueba: el motivo obligatorio, corregir a la misma cantidad, cantidad inválida, corregir sin conexión y el aviso de stock negativo al vender"
     - "Las rutas de stock del servidor no tienen pruebas unitarias"
 
+RF-59:
+  estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/ventas.test.ts
+    - microservices/gestion-del-local/src/rutas/anomalias.test.ts
+    - clientes/gestion-del-local-web/src/v5/Anomalias.test.tsx
+  defectos:
+    - "En la computadora el renglón de la venta no avisa que el stock no alcanza; en el celular sí"
+    - "Los stocks que ya estaban en negativo antes de esta regla siguen negativos hasta que se cuenten o corrijan"
+    - "No hay avisos de anomalías: está dicho que son para más adelante"
+
 RF-54:
   estado: "Pendiente (#35)"
   pruebas: []

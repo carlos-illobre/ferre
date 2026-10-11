@@ -105,7 +105,8 @@ export function useCatalogo() {
 
   // Stock que ve el mostrador después de un movimiento local (venta sin conexión).
   const ajustarStockLocal = useCallback((id: string, delta: number) => {
-    setStock((m) => { const n = new Map(m); n.set(id, (n.get(id) ?? 0) + delta); return n; });
+    // Una venta nunca deja el stock por debajo de cero (RF-59): baja hasta cero y no más.
+    setStock((m) => { const n = new Map(m); const hay = n.get(id) ?? 0; n.set(id, delta < 0 ? Math.min(hay, Math.max(0, hay + delta)) : hay + delta); return n; });
   }, []);
 
   return { catalogo, stock, clientes, error, desdeDispositivo, buscarProductos, actualizarProducto, ajustarStockLocal };

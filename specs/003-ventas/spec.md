@@ -49,7 +49,7 @@ elige efectivo y se cobra; la venta queda confirmada y el stock baja.
 12. **Given** una venta cobrada de 3 mechas, **When** se consulta lo guardado, **Then** existe una venta confirmada, con el usuario que la registró y la fecha y hora del dispositivo; el stock de la mecha bajó 3; y el renglón guardó su cantidad, su precio por unidad, su costo, su margen y la explicación del precio de ese momento (RNF-31).
 13. **Given** un Vendedor en la computadora, **When** arma y cobra una venta de 3 productos, **Then** lo hace de punta a punta solo con el teclado: Enter agrega el producto, y con la venta armada el Enter final la cierra y deja todo listo para la siguiente.
 14. **Given** una venta armada sin cliente elegido y con un medio de pago que no es cuenta corriente, **When** cobra, **Then** se registra: el cliente es opcional y nada es obligatorio que el cuaderno no tenga (fecha, producto, cantidad, precio).
-15. **Given** un producto con stock 2, **When** el Vendedor pone cantidad 5, **Then** la venta no se impide: el renglón avisa que el stock queda negativo y se puede cobrar igual (el stock arranca en cero y se carga de a poco, RF-52).
+15. **Given** un producto con stock 2, **When** el Vendedor pone cantidad 5, **Then** la venta no se impide: el renglón avisa que no alcanza, se puede cobrar igual, el stock queda en 0 y no baja más, y por las 3 que faltaban queda anotada una anomalía (RF-59 de compras y stock).
 16. **Given** una venta que llega al servidor sin renglones, con una cantidad que no es mayor que cero, con un precio negativo o con un renglón sin descripción, **When** se intenta registrar, **Then** el servidor la rechaza y dice qué está mal; el aviso aparece en el lugar y la venta queda armada para corregirla.
 17. **Given** una venta ya guardada, **When** el dispositivo la reenvía con el mismo identificador (reintento o vuelta de la conexión), **Then** el servidor responde con la venta guardada y no la duplica.
 
@@ -504,7 +504,7 @@ comprueba que en la otra no existe ningún dato de la primera.
 
 - **Precio a mano que no es múltiplo de $1.000:** se respeta tal cual ($1.500 tipeado se cobra $1.500) y el renglón muestra un aviso que lo dice; el aviso no impide cobrar (decisión 16 del 2026-10-10).
 - **Mismo producto agregado dos veces:** no se abre otro renglón; se suma 1 a la cantidad del que ya está.
-- **Vender más de lo que hay:** no se impide. El renglón avisa que el stock queda negativo.
+- **Vender más de lo que hay:** no se impide. El renglón avisa que no alcanza; el stock queda en cero y lo que faltaba se anota como anomalía (RF-59).
 - **El servidor no acepta la venta** (un dato inválido): el aviso aparece en el lugar, en castellano, dice qué hacer, y la venta queda armada para corregirla.
 - **Ítem libre sin descripción:** el servidor rechaza la venta.
 - **Venta anulada a cuenta corriente:** deja de contar en lo que debe el cliente (la deuda suma solo ventas confirmadas; RF-40).

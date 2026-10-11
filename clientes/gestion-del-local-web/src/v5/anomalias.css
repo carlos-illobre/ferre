@@ -1,0 +1,20 @@
+/* Anomalías. La misma pantalla en el celular y en la computadora: trae sus colores. */
+.an { flex: 1; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 980px; margin: 0 auto; padding: 20px 16px 110px; color: #18201e; font-size: 17px; line-height: 1.45; box-sizing: border-box; }
+.an *, .an *::before { box-sizing: border-box; }
+.an h1 { margin: 0; font-size: 1.75rem; line-height: 1.2; font-weight: 750; color: #17312b; }
+.an p { margin: 0; }
+.an-bajada { color: #4a5451; }
+.an-vacio { padding: 28px 16px; border: 1px dashed #7c9085; border-radius: 14px; background: #fff; color: #4a5451; text-align: center; }
+.an-error { color: #c2370b; font-weight: 650; }
+.an-lista { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.an-lista li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 16px; background: #fff; border: 1px solid #c3cfc6; border-left: 5px solid #f7c445; border-radius: 12px; }
+.an-fecha { grid-column: 1; color: #4a5451; font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+.an-usuario { grid-column: 2; grid-row: 1; color: #4a5451; font-size: 0.9375rem; text-align: right; }
+.an-producto { grid-column: 1 / -1; font-size: 1.0625rem; overflow-wrap: anywhere; }
+.an-que { grid-column: 1 / -1; color: #33403b; font-size: 0.9375rem; }
+.an-paginas { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #4a5451; }
+.an-boton { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1.500px solid #7c9085; background: #fff; color: #18201e; font: inherit; font-weight: 650; cursor: pointer; }
+.an-boton:disabled { color: #5c6763; background: #dfe5e0; border-color: #dfe5e0; cursor: not-allowed; }
+.an :focus-visible { outline: 3px solid #0f6b52; outline-offset: 2px; }
+@media (max-width: 899px) { .an { padding-top: calc(40px + env(safe-area-inset-top)); } }
+@media (min-width: 900px) { .an { padding: 24px 24px 40px; } .an-lista li { grid-template-columns: 150px minmax(0, 1.2fr) minmax(0, 2fr) 120px; align-items: baseline; gap: 12px; } .an-fecha, .an-usuario, .an-producto, .an-que { grid-column: auto; grid-row: auto; } .an-usuario { order: 4; } }
