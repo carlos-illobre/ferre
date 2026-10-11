@@ -212,3 +212,18 @@
     align-self: center;
   }
 }
+
+/* ---- Lo que el servidor no dejó hacer, en el lugar ---- */
+
+.usuarios__rechazo {
+  grid-column: 1 / -1;
+  margin-bottom: var(--e-3);
+}
+
+.usuarios__persona .usuarios__rechazo {
+  margin: var(--e-2) 0 0;
+}
+
+.usuarios .cargando {
+  padding-block: var(--e-5);
+}

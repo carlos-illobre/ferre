@@ -180,3 +180,9 @@
     min-height: var(--alto-boton);
   }
 }
+
+/* ---- Lo que sumó la app real ---- */
+
+.stock__tope {
+  margin-top: var(--e-3);
+}

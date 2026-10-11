@@ -233,3 +233,11 @@
     min-width: 0;
   }
 }
+
+/* ---- Lo que sumó la app real ---- */
+
+.duplicados__buscar-todo {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--e-5);
+}

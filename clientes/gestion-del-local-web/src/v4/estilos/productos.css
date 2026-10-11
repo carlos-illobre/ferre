@@ -372,3 +372,10 @@
     min-width: 0;
   }
 }
+
+/* ---- Lo que sumó la app real ---- */
+
+/* «Para cambiar de proveedor hace falta internet», debajo de la lista de proveedores. */
+.productos__nota {
+  margin-top: var(--e-2);
+}

@@ -256,3 +256,20 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Los días de una página, con el mismo aire que el resto de la columna. */
+.actividad__dias {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+@media (max-width: 700px) {
+  .actividad__dias {
+    gap: var(--e-3);
+  }
+}
+
+.actividad__detalle-marca {
+  margin-top: var(--e-2);
+}

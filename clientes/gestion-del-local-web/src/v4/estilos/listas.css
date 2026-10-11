@@ -493,3 +493,15 @@
     white-space: nowrap;
   }
 }
+
+/* ---- Lo que sumó la app real ---- */
+
+/* Avisos de la lectura (filas salteadas, productos que ya no aparecen, un rechazo al aplicar). */
+.listas__revisar > .aviso {
+  margin: var(--e-3) 0;
+}
+
+/* El costo nuevo de cada ejemplo se puede tocar para ver de dónde sale. */
+.listas__ejemplo-costo .explicado {
+  margin-right: calc(-1 * var(--e-1));
+}
