@@ -88,15 +88,18 @@ RF-07:
     - "Sin la prueba de las 20 búsquedas reales del cuaderno (19 de 20 entre los tres primeros resultados)"
 
 RF-08:
-  estado: "Hecho en parte (#52): se aparta de la regla en 3 puntos"
+  estado: "Hecho en parte (#52, #62): se aparta de la regla en 5 puntos"
   pruebas:
     - tests/e2e/escritorio/10-escaner.spec.ts
     - tests/e2e/celular/10-escaner.spec.ts
+    - clientes/gestion-del-local-web/src/principal/CodigoDeBarras.test.tsx
+    - clientes/gestion-del-local-web/src/principal/celular/Catalogo.test.tsx
   defectos:
-    - "La búsqueda del catálogo no tiene escáner: en el celular solo se abre desde la venta, el ingreso de mercadería y el conteo"
     - "La lectura con la cámara real no tiene prueba automática y no hay medición de los 3 segundos"
     - "La prueba del escáner es el mismo archivo copiado para las dos interfaces; no hay una variante por interfaz"
     - "Sin prueba: vencimiento del QR a los 5 minutos, del vínculo a las 12 horas y entrega de los códigos al reconectar"
+    - "El código de un producto no se puede quitar desde la ficha, solo reemplazar por otro"
+    - "En la computadora, buscar escaneando con el celular vinculado en la pantalla de productos y en el inventario no tiene prueba; el inventario de la computadora no escucha al celular"
 
 RF-09:
   estado: "Hecho en parte (#54): se aparta de la regla en 2 puntos"

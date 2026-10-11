@@ -57,6 +57,7 @@ function Stock() {
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
   const [abierto, setAbierto] = useState<string | null>(null);
+  const [escaneando, setEscaneando] = useState(false);
 
   const cargar = useCallback(() => api<Datos>("/stock").then((d) => { setDatos(d); setError(null); }).catch((e) => setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor.")), []);
   useEffect(() => { void cargar(); }, [cargar]);
@@ -75,7 +76,8 @@ function Stock() {
       <div className="columna al-costado">
       </div>
       <div className="columna">
-      <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" />
+      <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
+      {escaneando && <Escaner alDetectar={(codigo) => { setEscaneando(false); setConsulta(codigo); setAbierto(null); }} alCerrar={() => setEscaneando(false)} />}
       <p className="subtitulo">El stock es la suma de compras, ventas y ajustes desde que se usa el sistema. Hasta el conteo, lo que no se cargó no está.</p>
       <div className="lista" data-testid="tabla-stock">
         {filas.map((p) => <FilaStock key={p.id} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={async (texto) => { setMensaje(texto); await cargar(); }} />)}

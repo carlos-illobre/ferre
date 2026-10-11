@@ -228,8 +228,8 @@ dice al hacerlas.
 
 **Rol:** Vendedor.
 
-**En el celular tiene que poder:** abrir el escáner desde la búsqueda, la venta, el ingreso
-de mercadería y el conteo; apuntar y que el código se lea solo; tipear el código si la cámara
+**En el celular tiene que poder:** abrir el escáner desde la búsqueda del catálogo, la del
+inventario, la venta, el ingreso de mercadería y el conteo; apuntar y que el código se lea solo; tipear el código si la cámara
 no lee; cerrar el escáner con una acción. Necesita ver dónde apuntar y el último código
 leído, con una señal clara de que se leyó.
 
@@ -239,6 +239,17 @@ Lo que el celular escanea aparece donde se está trabajando, sin tocar nada.
 
 **Código desconocido:** se avisa que no está en el catálogo y se ofrece buscar el producto
 para asociarlo; al elegirlo, el código queda guardado en ese producto y se dice.
+
+**En la ficha de cada producto** (pedido de Carlos del 2026-10-11, decisión 51): se ve su
+código de barras, o que todavía no tiene, y un botón con nombre para cargárselo. En el
+celular el botón abre la cámara; en la computadora deja tipearlo y, si hay un celular
+vinculado, toma lo que el celular escanee. Al guardar, la ficha muestra el código y dice
+que ya se puede buscar escaneándolo. Si otro producto tiene el mismo código, lo nombra y
+manda a Duplicados. La regla y las palabras son las mismas en las dos interfaces.
+
+**Buscar escaneando:** la búsqueda del catálogo y la del inventario, en el celular, tienen
+el escáner al lado. Un código conocido lleva directo al producto; uno que nadie tiene lo
+dice y explica cómo cargárselo.
 
 **Estados:**
 

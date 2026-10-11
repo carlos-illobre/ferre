@@ -11,6 +11,10 @@ const descargar = vi.fn<(...a: any[]) => Promise<void>>(async () => undefined);
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar: (...a: unknown[]) => descargar(...a), api: (...a: unknown[]) => apiFalsa(...a) }));
 
+vi.mock("./componentes/Escaner", () => ({
+  hayCamara: () => true,
+  Escaner: ({ alDetectar }: { alDetectar: (c: string) => void }) => <div data-testid="escaner">{["7791234567890", "111"].map((c) => <button key={c} type="button" onClick={() => alDetectar(c)}>leer {c}</button>)}</div>,
+}));
 import { Catalogo } from "./Catalogo";
 
 // Todo lo que pidió el dueño para Productos, sobre el rediseño: la lista busca con debounce y
@@ -163,5 +167,18 @@ describe("Catálogo · Productos", () => {
     conPermisos("catalogo.margenes");
     armar(undefined, "listas");
     expect(screen.getByTestId("sin-permiso").textContent).toContain("Cargar listas de precios");
+  });
+
+  // RF-08: buscar escaneando. La cámara se simula.
+  it("escanear el código de un producto abre su ficha; uno que nadie tiene lo dice y queda en la búsqueda", () => {
+    armar([producto({ id: "mecha", descripcion: "MECHA PARA MADERA 6 MM", codigo_barras: "7791234567890" }), producto({ id: "taladro", descripcion: "TALADRO PERCUTOR 750 W" })]);
+    fireEvent.click(screen.getByTestId("escanear"));
+    fireEvent.click(screen.getByRole("button", { name: "leer 7791234567890" }));
+    expect(within(ficha()).getByText("MECHA PARA MADERA 6 MM")).toBeTruthy();
+    expect(within(ficha()).getByTestId("codigo-actual").textContent).toBe("7791234567890");
+    fireEvent.click(screen.getByTestId("escanear"));
+    fireEvent.click(screen.getByRole("button", { name: "leer 111" }));
+    expect((screen.getByTestId("busqueda") as HTMLInputElement).value).toBe("111");
+    expect(document.body.textContent).toContain("Ningún producto tiene el código 111");
   });
 });

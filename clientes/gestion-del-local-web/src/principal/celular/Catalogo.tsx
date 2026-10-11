@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CodigoDeBarras } from "../CodigoDeBarras";
+import { Escaner, hayCamara } from "./componentes/Escaner";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
@@ -54,6 +56,15 @@ export function Productos() {
   const [elegido, setElegido] = useState(0);
   const [limite, setLimite] = useState(30);
   const [abiertoId, setAbiertoId] = useState<string | null>(null);
+  // Buscar escaneando (RF-08): el código de un producto abre su ficha; uno que nadie tiene, lo dice.
+  const [escaneando, setEscaneando] = useState(false);
+  const alEscanear = useCallback((codigo: string) => {
+    setEscaneando(false);
+    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
+    if (p) { setConsulta(""); setAbiertoId(p.id); return; }
+    setConsulta(codigo);
+    setError(`Ningún producto tiene el código ${codigo}. Buscá el producto, abrilo y tocá «Escanear el código» para cargárselo.`);
+  }, [catalogo]);
   const caja = useRef<HTMLInputElement>(null);
   const centinela = useRef<HTMLDivElement>(null);
 
@@ -69,7 +80,7 @@ export function Productos() {
     return () => obs.disconnect();
   }, [hayMas, resultados.length]);
 
-  const actualizar = useCallback((id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "foto_url">> & { proveedor_preferido_id?: string }) => {
+  const actualizar = useCallback((id: string, cambios: Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string }) => {
     actualizarProducto(id, cambios as never).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`));
   }, [actualizarProducto]);
 
@@ -91,7 +102,8 @@ export function Productos() {
 
   return (
     <>
-      <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? `Buscar en ${catalogo.length.toLocaleString("es-AR")} productos` : "Bajando el catálogo…"} disabled={!catalogo} cajaRef={caja} />
+      <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? `Buscar en ${catalogo.length.toLocaleString("es-AR")} productos` : "Bajando el catálogo…"} disabled={!catalogo} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
+      {escaneando && <Escaner alDetectar={alEscanear} alCerrar={() => setEscaneando(false)} />}
       <small className="solo-escritorio">Flechas para elegir · Enter abre{fijaMargen ? " · Shift+1 a Shift+5 fijan el margen (300, 200, 100, 50, 25 %)" : ""} · Esc limpia</small>
       <AvisoError texto={error ?? errorCatalogo} alCerrar={() => setError(null)} />
       {catalogo && catalogo.length === 0 && <div className="aviso-suave">Todavía no hay productos: cargá una lista de precios primero.</div>}
@@ -102,7 +114,7 @@ export function Productos() {
         </div>
       )}
       {hayMas && <div ref={centinela} className="aviso-suave" data-testid="cargar-mas">Cargando más…</div>}
-      {abierto && <FichaProducto producto={abierto} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
+      {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== abierto.id && x.codigo_barras === codigo)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
     </>
   );
 }
@@ -125,7 +137,7 @@ function FilaProducto({ producto: p, elegida, alAbrir }: { producto: Producto; e
 
 // Ficha del producto: precio con explicación, margen (botones u otro), proveedores con el
 // más barato, foto, y la lista de origen para bajar el Excel.
-export function FichaProducto({ producto: p, alCerrar, alCambiar }: { producto: Producto; alCerrar: () => void; alCambiar: (c: Partial<Pick<Producto, "margen_elegido" | "foto_url">> & { proveedor_preferido_id?: string }) => void }) {
+export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; alCerrar: () => void; quienLoTiene: (codigo: string) => Producto | undefined; alCambiar: (c: Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string }) => void }) {
   const fijaMargen = usePuede()("catalogo.margenes");
   const costo = p.costo_neto === null ? null : Number(p.costo_neto);
   const iva = p.iva === null ? 0.21 : Number(p.iva);
@@ -142,10 +154,11 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar }: { producto: 
         <FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} alSubir={async (archivo) => alCambiar({ foto_url: await subirFoto(p.id, archivo) })} />
         <div className="textos">
           <strong>{p.descripcion}</strong>
-          <small>{[p.marca, p.codigo_proveedor ? `código ${p.codigo_proveedor}` : null, p.codigo_barras].filter(Boolean).join(" · ")}</small>
+          <small>{[p.marca, p.codigo_proveedor ? `código ${p.codigo_proveedor}` : null].filter(Boolean).join(" · ")}</small>
         </div>
       </div>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-ficha" />
+      <CodigoDeBarras producto={p} celular alGuardar={(codigo) => alCambiar({ codigo_barras: codigo })} quienLoTiene={quienLoTiene} />
       <div className="tarjeta">
         <div className="fila-precio">
           <small>Precio de venta</small>

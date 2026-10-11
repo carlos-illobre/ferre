@@ -252,3 +252,15 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Nunca queda el sistema sin una persona que pueda administrar usuarios y roles.
     - La pantalla de pedidos a proveedores, que es el trabajo propio del Comprador, se hace
       a continuación (RF-55).
+
+51. **El código de barras se carga desde la ficha del producto** (2026-10-11). Carlos notó
+    que no había dónde escanear el código de un producto en particular: solo se asociaba
+    de rebote, al escanear en una venta un código desconocido. Pidió un botón para hacerlo
+    y poder después buscar el producto escaneando.
+    - En la ficha de cada producto se ve su código y un botón para escanearlo; en la
+      computadora se tipea o se escanea con el celular vinculado.
+    - Se puede buscar escaneando también en el catálogo y en el inventario del celular, y en
+      los productos de la computadora con el celular vinculado.
+    - Dos productos pueden tener el mismo código (el mismo artículo de dos proveedores): se
+      guarda y se avisa, para unirlos como duplicados.
+    - Lo puede hacer cualquier usuario con sesión (RF-08).

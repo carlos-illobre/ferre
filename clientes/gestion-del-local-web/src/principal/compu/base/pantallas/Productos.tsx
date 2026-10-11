@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CodigoDeBarras } from "../../../CodigoDeBarras";
+import { escucharPuesto, puestoLocal } from "../../../../puesto";
 import { usePuede } from "../../../permisos";
 import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { useCatalogo } from "../../../../catalogo";
@@ -16,7 +18,7 @@ import "../estilos/productos.css";
 // de cada uno. En la computadora todo se cambia en la fila; en el celular, cada producto
 // abre su ficha. Teclado: flechas eligen, Mayúsculas + 1 a 5 fijan el margen, Enter abre la
 // ficha, Esc borra la búsqueda.
-type Cambios = Partial<Pick<Producto, "margen_elegido" | "foto_url">> & { proveedor_preferido_id?: string };
+type Cambios = Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string };
 const PASO = 30;
 
 function calcular(p: Producto) {
@@ -42,6 +44,21 @@ export function Productos() {
   const centinela = useRef<HTMLDivElement>(null);
 
   useEffect(() => { caja.current?.focus(); }, [catalogo]);
+  // Buscar escaneando (RF-08): lo que lee el celular vinculado abre la ficha de ese producto o,
+  // si nadie tiene ese código, queda escrito en la búsqueda. Con una ficha abierta no escucha:
+  // ahí el código es para ese producto.
+  const alEscanear = useRef<(codigo: string) => void>(() => undefined);
+  useEffect(() => {
+    alEscanear.current = (codigo) => {
+      const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
+      if (p) { setConsulta(""); setAbiertoId(p.id); } else setConsulta(codigo);
+    };
+  }, [catalogo]);
+  useEffect(() => {
+    const puesto = puestoLocal();
+    if (!puesto || abiertoId) return;
+    return escucharPuesto(puesto.id, (codigo) => alEscanear.current(codigo));
+  }, [abiertoId]);
   const resultados = useMemo(() => (consultaEstable.trim() ? buscarProductos(consultaEstable, limite) : (catalogo ?? []).slice(0, limite)), [buscarProductos, consultaEstable, limite, catalogo]);
   const hayMas = resultados.length === limite;
   useEffect(() => { setElegido(0); setLimite(PASO); }, [consultaEstable]);
@@ -136,7 +153,7 @@ export function Productos() {
       ))}
       {hayMas && <div ref={centinela} className="detalle productos-mas" data-testid="cargar-mas">Trayendo más productos…</div>}
 
-      {abierto && <FichaProducto producto={abierto} stock={stock.get(abierto.id)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
+      {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== abierto.id && x.codigo_barras === codigo)} stock={stock.get(abierto.id)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
     </Pagina>
   );
 }
@@ -217,7 +234,7 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
 
 // Ficha del producto: precio con su explicación, margen, proveedores con el más barato,
 // foto y la lista de la que salió el costo.
-function FichaProducto({ producto: p, stock, alCerrar, alCambiar }: { producto: Producto; stock: number | undefined; alCerrar: () => void; alCambiar: (c: Cambios) => void }) {
+function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; stock: number | undefined; quienLoTiene: (codigo: string) => Producto | undefined; alCerrar: () => void; alCambiar: (c: Cambios) => void }) {
   const fijaMargen = usePuede()("catalogo.margenes");
   const { costo, precio, manual, pasosCosto } = calcular(p);
   const [error, setError] = useState<string | null>(null);
@@ -232,6 +249,7 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar }: { producto: 
         </div>
       </div>
       <Aviso tipo="error">{error}</Aviso>
+      <CodigoDeBarras producto={p} alGuardar={(codigo) => alCambiar({ codigo_barras: codigo })} quienLoTiene={quienLoTiene} />
 
       <section className="tarjeta relleno pila" aria-label="Precio y margen">
         <div className="fila">

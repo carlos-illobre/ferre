@@ -86,3 +86,27 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   await expect(laptop.getByTestId("item").filter({ hasText: "GUANTES ESCANER" }).getByTestId("cantidad")).toHaveValue("2", { timeout: 10000 });
   expect(psql(`SELECT count(*) FROM codigo_escaneado WHERE entregado_en IS NOT NULL AND puesto_id = '${puestoRemoto!.id}'`)).toBe("3");
 });
+
+// El código de barras se le carga a un producto desde su ficha (RF-08) y después sirve para
+// buscarlo. En el navegador de prueba la cámara no abre: se tipea, que es la alternativa de la regla.
+test("cargarle el código de barras a un producto desde su ficha y encontrarlo por ese código", async ({ page }) => {
+  await page.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
+  await page.goto("/#/catalogo");
+  await page.getByTestId("busqueda").fill("GUANTES ESCANER");
+  await page.getByTestId("producto").filter({ hasText: "GUANTES ESCANER" }).click();
+  const ficha = page.getByTestId("ficha-producto");
+  await ficha.getByTestId("escanear-codigo").click();
+  // Se abre el escáner; como la cámara del navegador de prueba no existe, se tipea ahí mismo.
+  const escaner = page.getByTestId("escaner");
+  await escaner.getByTestId("codigo-manual").fill("7790009998881");
+  await escaner.getByRole("button", { name: "Enviar" }).click();
+  await expect(escaner).toHaveCount(0);
+  await expect(ficha.getByTestId("codigo-actual")).toHaveText("7790009998881");
+  await expect(ficha.getByTestId("codigo-guardado")).toContainText("Ya se puede buscar");
+  await expect.poll(() => psql(`SELECT codigo_barras FROM producto WHERE id = '${ID_PROD2}'`)).toBe("7790009998881");
+
+  await ficha.getByRole("button", { name: "Listo" }).click();
+  await page.getByTestId("busqueda").fill("7790009998881");
+  await expect(page.getByTestId("producto")).toHaveCount(1);
+  await expect(page.getByTestId("producto")).toContainText("GUANTES ESCANER");
+});
