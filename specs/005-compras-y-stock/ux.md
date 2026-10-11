@@ -62,7 +62,7 @@ enteras para lo que se vende por unidad y con un decimal para lo que se vende a 
 
 | Se dice | No se dice |
 |---|---|
-| estantería, sector | góndola, ubicación, depósito lógico |
+| estantería, sector | ubicación, depósito lógico, o cualquier otro nombre para el mueble |
 | costo | precio de compra, precio neto |
 | lista | importación |
 | ingreso de mercadería, compra | recepción, orden de entrada |

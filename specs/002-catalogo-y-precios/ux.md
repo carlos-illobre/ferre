@@ -35,7 +35,7 @@ sistema visual del proyecto.
   compra»; «margen»; «precio» para el de venta; «sin precio» para el producto sin margen
   elegido; «sin costo» para el que ningún proveedor cotizó; «es el mismo» y «son distintos»
   para los duplicados; «unir» y «separar»; «suelto» o por kilo, metro, litro; «aplicar» y
-  «descartar» para una lista; «estantería», nunca «góndola». Se nombra el rol, nunca a la persona.
+  «descartar» para una lista; «estantería» para el mueble donde va la mercadería. Se nombra el rol, nunca a la persona.
 - **Plata:** siempre con signo $, punto de miles y, donde hay centavos, coma. Los
   porcentajes, con el signo %.
 

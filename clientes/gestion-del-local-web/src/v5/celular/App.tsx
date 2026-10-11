@@ -7,15 +7,15 @@ import { irA, useRuta } from "../../rutas";
 import { Login } from "../../pantallas/Login";
 import { VincularCelular } from "../../pantallas/VincularCelular";
 import { Catalogo } from "../../pantallas/Catalogo";
-import { Deposito } from "../../pantallas/Deposito";
-import { Negocio } from "../../pantallas/Negocio";
+import { Deposito } from "./Deposito";
+import { Negocio, type Parte } from "./Negocio";
 import { Vender } from "./Vender";
 import "../../estilos.css";
 import "./tema.css";
 
 // La interfaz de celular de la versión 1, que es la que resultó más fácil de usar, con la
-// paleta de la v5, la venta con sugeridos y sin que la búsqueda tome el foco sola. La cuarta
-// pestaña es «Más»: guarda lo que se usa poco.
+// paleta de la v5, la venta con sugeridos y sin que la búsqueda tome el foco sola. El menú es
+// el mismo que en la computadora: Catálogo, Vender, Depósito y Más, con sus pestañas adentro.
 export function App() {
   return (
     <ProveedorDeSesion>
@@ -24,16 +24,17 @@ export function App() {
   );
 }
 
+// El mismo menú que en la computadora, en el mismo orden: primero lo que más se hace.
 const PESTANAS = [
+  { ruta: "catalogo", nombre: "Catálogo" },
   { ruta: "vender", nombre: "Vender" },
-  { ruta: "catalogo", nombre: "Productos" },
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ] as const;
-const DE_MAS = [
-  { camino: "catalogo/listas", nombre: "Listas de precios", detalle: "Cargar la planilla de un proveedor y actualizar los costos" },
-  { camino: "catalogo/duplicados", nombre: "Duplicados", detalle: "Unir el mismo producto cuando llega de dos proveedores" },
-  { camino: "negocio", nombre: "Cómo va el negocio", detalle: "Ventas de hoy, gastos, usuarios, sesiones y quién hizo qué" },
+const DE_MAS: { parte: Parte; nombre: string; detalle: string }[] = [
+  { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana" },
+  { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos" },
+  { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó" },
 ];
 const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
@@ -50,19 +51,23 @@ function Pantallas() {
   if (sesion.estado === "sin-sesion") return <Login />;
 
   const usuario = sesion.usuario;
-  const deMas = ruta.nombre === "mas" || ruta.nombre === "negocio" || (ruta.nombre === "catalogo" && ruta.sub !== null);
-  const pestana = deMas ? "mas" : PESTANAS.some((p) => p.ruta === ruta.nombre) ? ruta.nombre : "vender";
+  // Sin dirección, la app abre en lo primero del menú. Las direcciones viejas de Negocio siguen andando.
+  const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
+  const nombre = sinDireccion ? "catalogo" : ruta.nombre === "negocio" ? "mas" : ruta.nombre;
+  const parte = DE_MAS.find((d) => d.parte === (ruta.nombre === "negocio" ? "negocio" : ruta.sub))?.parte ?? null;
+  const pestana = PESTANAS.some((p) => p.ruta === nombre) ? nombre : "vender";
 
   return (
     <div className="app">
       {esAmbienteDePrueba() && <span className="pill-prueba solo-celular" data-testid="ambiente">Ambiente de prueba</span>}
 
-      {ruta.nombre === "mas" ? (
+      {pestana === "mas" && parte ? <Negocio parte={parte} />
+        : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
           <div className="lista">
             {DE_MAS.map((d) => (
-              <button key={d.camino} type="button" className="fila" onClick={() => irA(d.camino)}>
+              <button key={d.parte} type="button" className="fila" onClick={() => irA(`mas/${d.parte}`)}>
                 <span className="nombre">{d.nombre}</span>
                 <Icono nombre="derecha" tam={18} grosor={2.4} />
                 <span className="detalle">{d.detalle}</span>
@@ -77,9 +82,8 @@ function Pantallas() {
             </button>
           </div>
         </main>
-      ) : ruta.nombre === "catalogo" ? <Catalogo sub={ruta.sub} />
-        : ruta.nombre === "deposito" ? <Deposito sub={ruta.sub} />
-        : ruta.nombre === "negocio" ? <Negocio />
+      ) : pestana === "catalogo" ? <Catalogo sub={sinDireccion ? null : ruta.sub} />
+        : pestana === "deposito" ? <Deposito sub={ruta.sub} />
         : <Vender esDueno={administra(usuario)} />}
 
       <nav className="nav-inferior solo-celular" aria-label="Menú">

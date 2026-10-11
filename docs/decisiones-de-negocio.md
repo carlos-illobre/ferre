@@ -105,3 +105,16 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     porque abre el teclado; en la computadora sí. La paleta la eligió el agente (verde
     oscuro, naranja de acción y amarillo para destacar). La versión 5 está en `/v5/` y es
     la que abre la raíz.
+28. **La versión 5 es la elegida** (2026-10-11). Ajustes pedidos al elegirla:
+    - **Un solo menú, igual en el celular y en la computadora:** Catálogo, Vender, Depósito
+      y Más, en ese orden, porque se busca más de lo que se vende y se vende más de lo que
+      se compra. Catálogo tiene las pestañas Productos, Listas y Duplicados; Depósito tiene
+      Ingreso, Stock y Contar, en ese orden; Más guarda Cómo va el negocio, Usuarios y
+      sesiones, y Quién hizo qué. La app abre en lo primero del menú.
+    - Lo que está elegido se tiene que seguir leyendo con el mouse encima.
+    - La primera vez en un dispositivo el catálogo no se espera entero: se ve una primera
+      tanda enseguida y el resto baja atrás.
+    - En la entrada del celular los botones van en el centro de la pantalla, y el de Google
+      tiene la misma forma que los demás.
+    - El mueble donde va la mercadería se llama «estantería» en toda la aplicación y en toda
+      la documentación.

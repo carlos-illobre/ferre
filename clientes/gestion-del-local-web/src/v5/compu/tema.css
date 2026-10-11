@@ -28,7 +28,7 @@
   --gris-pastilla: #e4e8e5;
   --destacado: #f7c445;
   --fuente: "Manrope Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --lateral: 244px;
+  --lateral: 200px;
 }
 .importe, .marca { font-family: "Space Grotesk Variable", "Segoe UI", system-ui, sans-serif; font-stretch: normal; font-variation-settings: normal; }
 .marca { font-weight: 700; }
@@ -61,3 +61,24 @@
 .sugeridos-tarjeta .nombre { font-weight: 650; }
 .sugeridos-tarjeta .detalle { grid-column: 1; }
 .sugeridos-tarjeta .importe, .sugeridos-tarjeta .falta-texto { grid-column: 2; grid-row: 1 / span 2; }
+
+/* Lo elegido se sigue leyendo con el mouse encima: no cambia a un fondo claro con letra blanca. */
+.margenes button[aria-checked="true"]:hover:not(:disabled) { background: var(--marino-2); border-color: var(--marino-2); color: #fff; }
+.boton.sobre-marino[aria-checked="true"]:hover:not(:disabled), .boton.sobre-marino[aria-pressed="true"]:hover:not(:disabled) { background: var(--superficie); border-color: var(--superficie); color: var(--tinta); }
+.productos-otro.activo:hover { background: var(--marino); }
+
+/* Pestañas dentro de Catálogo y Depósito, como en el celular. Hacen de título de la pantalla. */
+.pestanas { display: flex; gap: var(--e2); padding: var(--e4) var(--e5) 0; }
+.pestanas button { display: inline-flex; align-items: center; gap: var(--e2); min-height: 44px; padding: 0 var(--e5); border-radius: var(--r-pastilla); border: 1px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto-2); font-weight: 650; font-size: var(--t-medio); }
+.pestanas button:hover { border-color: var(--marino); color: var(--tinta); }
+.pestanas button[aria-current="page"] { background: var(--marino); border-color: var(--marino); color: #fff; }
+.pestanas .tecla { font-size: 0.6875rem; }
+.con-pestanas .pagina { padding-top: var(--e4); }
+.con-pestanas .pagina-cabeza h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Con Manrope las columnas de Productos son algo más anchas: se ajustan para que el precio entre a 1366 px. */
+.productos-tabla td, .productos-tabla th { padding-inline: 6px; }
+.productos-tabla td:last-child, .productos-tabla th:last-child { padding-right: 14px; }
+.productos-tabla td:nth-child(2) { min-width: 150px; }
+.productos-tabla .margenes.compacto button { min-width: 40px; }
+.productos-otro { width: 70px; }

@@ -32,25 +32,28 @@ export function App() {
   );
 }
 
-const MENU: { ruta: string; nombre: string; icono: NombreDeIcono }[] = [
-  { ruta: "vender", nombre: "Vender", icono: "vender" },
-  { ruta: "ventas", nombre: "Ventas de hoy", icono: "ventas" },
-  { ruta: "productos", nombre: "Productos", icono: "productos" },
-  { ruta: "compras", nombre: "Recibir mercadería", icono: "compras" },
-  { ruta: "stock", nombre: "Stock", icono: "stock" },
-  { ruta: "mas", nombre: "Más", icono: "mas" },
+// El mismo menú que en el celular, en el mismo orden (primero lo que más se hace), y cada
+// parte con sus pestañas adentro. «Más» es una pantalla con lo que se usa poco.
+type Pestana = { ruta: string; nombre: string };
+const MENU: { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] }[] = [
+  { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", nombre: "Productos" }, { ruta: "listas", nombre: "Listas" }, { ruta: "duplicados", nombre: "Duplicados" }] },
+  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", nombre: "Vender" }] },
+  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", nombre: "Ingreso" }, { ruta: "stock", nombre: "Stock" }, { ruta: "contar", nombre: "Contar" }] },
+  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre })) },
 ];
-// Alt + 1 a 6 son las del menú; 7, 8, 9 y 0, las primeras cuatro de «Más».
+// Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
 const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-const CON_ATAJO = [...MENU.map((m) => m.ruta), ...DE_MAS.map((d) => d.ruta)].slice(0, TECLAS.length);
-const atajoDe = (ruta: string) => { const i = CON_ATAJO.indexOf(ruta); return i < 0 ? null : TECLAS[i]!; };
-const NOMBRES = new Map([...MENU, ...DE_MAS].map((p) => [p.ruta, p.nombre]));
+const CON_ATAJO = MENU.flatMap((m) => m.pestanas.map((p) => p.ruta));
+const atajoDe = (ruta: string) => { const i = CON_ATAJO.indexOf(ruta); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
+const NOMBRES = new Map<string, string>([...MENU.flatMap((m) => m.pestanas.map((p) => [p.ruta, p.nombre] as [string, string])), ["mas", "Más"], ["ventas", "Ventas de hoy"]]);
 
 function Pantallas() {
   const { sesion, salir } = useSesion();
   const ruta = useRuta();
   const codigoVinculacion = ruta.parametros.get("codigo");
-  const actual = NOMBRES.has(ruta.nombre) ? ruta.nombre : "vender";
+  // Sin dirección, la app abre en lo primero del menú.
+  const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
+  const actual = sinDireccion ? "productos" : NOMBRES.has(ruta.nombre) ? ruta.nombre : "vender";
   const conSesion = sesion.estado === "con-sesion";
 
   useEffect(() => { window.scrollTo(0, 0); }, [actual]);
@@ -70,7 +73,8 @@ function Pantallas() {
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
   if (sesion.estado === "sin-sesion") return <Entrar />;
 
-  const enMas = DE_MAS.some((d) => d.ruta === actual);
+  const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === actual))?.clave ?? (actual === "ventas" ? "vender" : "mas");
+  const pestanas = parte === "catalogo" || parte === "deposito" ? MENU.find((m) => m.clave === parte)!.pestanas : null;
   const prueba = esAmbienteDePrueba();
 
   return (
@@ -83,11 +87,10 @@ function Pantallas() {
         </div>
         <nav aria-label="Menú">
           {MENU.map((m) => {
-            const activo = actual === m.ruta || (m.ruta === "mas" && enMas);
+            const destino = m.clave === "mas" ? "mas" : m.pestanas[0]!.ruta;
             return (
-              <button key={m.ruta} type="button" aria-current={activo ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(m.ruta)}`} onClick={() => irA(m.ruta)} data-testid={`menu-${m.ruta}`}>
-                <Icono nombre={m.icono} tam={19} grosor={activo ? 2.3 : 1.9} />{m.nombre}
-                <span className="atajo" aria-hidden="true">{atajoDe(m.ruta)}</span>
+              <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`}>
+                <Icono nombre={m.icono} tam={19} grosor={parte === m.clave ? 2.3 : 1.9} />{m.nombre}
               </button>
             );
           })}
@@ -102,8 +105,18 @@ function Pantallas() {
           <small className="version" title="Versión de la app">{import.meta.env.VITE_VERSION ?? "local"}</small>
         </div>
       </aside>
-      <div className="cuerpo">
-        {enMas && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
+      <div className={`cuerpo ${pestanas ? "con-pestanas" : ""}`}>
+        {pestanas && (
+          <nav className="pestanas" aria-label={NOMBRES.get(actual)}>
+            {pestanas.map((p) => (
+              <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(p.ruta)}`} onClick={() => irA(p.ruta)} data-testid={`pestana-${p.ruta}`}>
+                {p.nombre}<span className="tecla" aria-hidden="true">Alt {atajoDe(p.ruta)}</span>
+              </button>
+            ))}
+          </nav>
+        )}
+        {parte === "mas" && actual !== "mas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
+        {actual === "ventas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("vender")}>Volver a Vender</Boton></div>}
         {actual === "mas" ? <Mas atajoDe={atajoDe} />
           : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Compras />
           : actual === "stock" ? <Stock /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />

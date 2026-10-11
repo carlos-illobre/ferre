@@ -7,6 +7,23 @@ const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof im
 vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));
 const { app } = await import("../app.js");
 
+describe("GET /productos", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+
+  it("sin `limite` pide el catálogo entero; con `limite` y `desde`, solo esa tanda y en orden estable", async () => {
+    await pedir(app, "GET", "/productos");
+    await pedir(app, "GET", "/productos?limite=60&desde=120");
+    const [entero, tanda] = base.actual.consultas.filter((q) => /FROM producto p/.test(q.sql));
+    expect(entero!.sql).not.toMatch(/OFFSET/);
+    expect(tanda!.sql).toMatch(/ORDER BY p\.descripcion, p\.id LIMIT 60 OFFSET 120/);
+  });
+
+  it("un `limite` que no es un número se ignora", async () => {
+    await pedir(app, "GET", "/productos?limite=abc");
+    expect(base.actual.consultas.find((q) => /FROM producto p/.test(q.sql))!.sql).not.toMatch(/OFFSET/);
+  });
+});
+
 describe("PATCH /productos/:id", () => {
   beforeEach(() => { base.actual = baseFalsa(); base.actual.programar(/UPDATE producto SET/, { rowCount: 1 }); });
 

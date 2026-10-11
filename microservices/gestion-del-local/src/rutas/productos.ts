@@ -23,6 +23,11 @@ export type ProductoCatalogo = {
 };
 
 productos.get("/", async (c) => {
+  // De a tandas (`limite` y `desde`) para que la primera vez el dispositivo muestre algo
+  // enseguida y baje el resto atrás; sin `limite` va el catálogo entero, como siempre.
+  const limite = Math.floor(Number(c.req.query("limite")));
+  const desde = Math.max(0, Math.floor(Number(c.req.query("desde")) || 0));
+  const tanda = Number.isFinite(limite) && limite > 0 ? `, p.id LIMIT ${Math.min(limite, 20000)} OFFSET ${desde}` : "";
   const { rows } = await pool.query(
     `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.modificado_en, p.sector_id, p.foto_url,
             pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text, pp.lista_importada_id,
@@ -45,7 +50,7 @@ productos.get("/", async (c) => {
            ) v
        ) prov ON true
       WHERE p.activo AND p.reemplazado_por IS NULL
-      ORDER BY p.descripcion`,
+      ORDER BY p.descripcion${tanda}`,
   );
   return c.json(rows);
 });

@@ -101,8 +101,8 @@ Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec
 **Palabras**
 
 - Todo en castellano, con las palabras del mostrador (RNF-06). Se dice «cuenta corriente»,
-  nunca «fiado»; se abrevia «cc.» solo donde el espacio no alcanza. Se dice «estantería»,
-  nunca «góndola». Los nombres se tienen que entender solos, sin explicación.
+  nunca «fiado»; se abrevia «cc.» solo donde el espacio no alcanza. El mueble donde va la
+  mercadería se llama «estantería», y no de otra forma. Los nombres se tienen que entender solos, sin explicación.
 - En pantallas y textos se nombra el rol (Administrador, Vendedor, Comprador), no la
   persona (constitución, principio IX).
 
@@ -174,7 +174,7 @@ Prueba manual de punta a punta, pantalla por pantalla.
   compras recientes se despliegan para ver sus renglones (RF-50).
 - **Stock.** El detalle de un producto se abre con animación. Toda acción de guardar tiene
   forma de botón (RNF-09).
-- **Contar.** «Estantería» en lugar de «góndola». Para salir de un conteo, «Volver», sin la
+- **Contar.** El mueble donde va la mercadería se llama «estantería». Para salir de un conteo, «Volver», sin la
   aclaración de que queda abierto (RF-52).
 - **Duplicados.** Una unión se tiene que poder deshacer desde la misma pantalla. Los
   paneles, desplegados y con animación (RF-06, RNF-09).

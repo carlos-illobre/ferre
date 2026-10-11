@@ -34,8 +34,26 @@ export function useCatalogo() {
       } catch { /* sin IndexedDB: se sigue solo con el servidor */ }
       // 2. El servidor, si responde.
       try {
+        // La primera vez en un dispositivo (nada guardado todavía) el catálogo entero tarda:
+        // se muestra enseguida una primera tanda y el resto se va sumando atrás, de a
+        // tandas grandes. Con el catálogo ya guardado alcanza un solo pedido, que nadie espera.
+        const primeraVez = !(await leerTodo<Producto>("catalogo").catch(() => [])).length;
+        const bajarCatalogo = async (): Promise<Producto[]> => {
+          if (!primeraVez) return api<Producto[]>("/productos");
+          const PRIMERA = 60, TANDA = 5000;
+          let todo = await api<Producto[]>(`/productos?limite=${PRIMERA}`);
+          // Un servidor que todavía no reparte de a tandas contesta todo junto: listo.
+          if (todo.length !== PRIMERA) return todo;
+          if (vigente) setCatalogo(todo);
+          for (;;) {
+            const tanda = await api<Producto[]>(`/productos?limite=${TANDA}&desde=${todo.length}`);
+            todo = todo.concat(tanda);
+            if (tanda.length < TANDA) return todo;
+            if (vigente) setCatalogo(todo);
+          }
+        };
         const [bajado, st, cl] = await Promise.all([
-          api<Producto[]>("/productos"),
+          bajarCatalogo(),
           api<{ productos: StockFila[] }>("/stock").then((d) => d.productos).catch(() => null),
           api<Cliente[]>("/clientes").catch(() => null),
         ]);

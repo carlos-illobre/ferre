@@ -27,7 +27,7 @@ sectores.get("/", async (c) => {
 sectores.post("/", async (c) => {
   const cuerpo = await c.req.json<{ nombre?: string }>().catch(() => ({}) as { nombre?: string });
   const nombre = cuerpo.nombre?.trim();
-  if (!nombre) return c.json({ error: "Hace falta el nombre del sector (por ejemplo: Góndola 1)" }, 400);
+  if (!nombre) return c.json({ error: "Hace falta el nombre del sector (por ejemplo: Estantería 1)" }, 400);
   const id = randomUUID();
   try {
     await pool.query("INSERT INTO sector (id, nombre, orden) VALUES ($1, $2, (SELECT COALESCE(max(orden), 0) + 1 FROM sector))", [id, nombre]);
