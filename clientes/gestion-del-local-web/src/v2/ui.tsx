@@ -250,6 +250,12 @@ export function Contador({ valor, entera, alCambiar, min = entera ? 1 : 0.1, uni
           setTexto(entera ? (ajustado === 0 ? "" : String(ajustado)) : limpio);
           alCambiar(ajustado);
         }}
+        // Flecha arriba y abajo suman y restan, como los botones.
+        onKeyDown={(e) => {
+          if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+          e.preventDefault(); e.stopPropagation(); setTexto(null);
+          alCambiar(e.key === "ArrowUp" ? redondear(valor + paso) : Math.max(min, redondear(valor - paso)));
+        }}
         onBlur={() => { setTexto(null); if (valor === 0) alCambiar(min); }} data-testid={testId} />
       {!sinBotones && <button type="button" aria-label="Uno más" onClick={() => { setTexto(null); alCambiar(redondear(valor + paso)); }}><Icono nombre="mas" tam={18} grosor={2.4} /></button>}
       {unidad && alCambiarUnidad && (

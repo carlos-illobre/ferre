@@ -106,3 +106,9 @@
 .lateral-pie .version { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lateral { overflow-x: hidden; }
 @media (max-width: 1499px) { .vender-cobro { gap: 10px 12px; } .vender-cobro .vender-acciones { gap: 8px; } .vender-cobro .vender-total > span { display: none; } }
+/* La tarjeta de un sugerido lleva la foto del producto a la izquierda. */
+.sugeridos-tarjeta { grid-template-columns: auto 1fr auto; }
+.sugeridos-tarjeta .miniatura { grid-column: 1; grid-row: 1 / span 2; }
+.sugeridos-tarjeta .nombre, .sugeridos-tarjeta .detalle { grid-column: 2; }
+.sugeridos-tarjeta .importe, .sugeridos-tarjeta .falta-texto { grid-column: 3; }
+.sugeridos-grilla { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }

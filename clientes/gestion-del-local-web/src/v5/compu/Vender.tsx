@@ -323,9 +323,10 @@ export function Vender() {
         </Vacio>
       )}
 
-      {vacio && sugeridos.hay && (
+      {/* Siguen a la vista con la venta empezada, para sumar otro producto de un clic. */}
+      {sugeridos.hay && !consulta.trim() && !codigoDesconocido && (
         <div className="sugeridos">
-          {[["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
+          {[["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", items.length ? [] : sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
             <section key={clave} aria-label={titulo} data-testid={`sugeridos-${clave}`}>
               <h2 className="seccion-titulo">{titulo}</h2>
               <ul className="sugeridos-grilla">
@@ -334,6 +335,7 @@ export function Vender() {
                   return (
                     <li key={p.id}>
                       <button type="button" className="tarjeta sugeridos-tarjeta" onClick={() => agregar(p)}>
+                        <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
                         <span className="nombre">{p.descripcion}</span>
                         <span className="detalle">{detalleDe(p) || "Agregar a la venta"}</span>
                         <span className={precio === null ? "falta-texto" : "importe chico"}>{precio === null ? "sin precio" : pesosCortos(precio)}</span>
@@ -344,7 +346,7 @@ export function Vender() {
               </ul>
             </section>
           ))}
-          <p className="detalle">Un clic agrega el producto a la venta. También podés escribir en la búsqueda o escanear con el celular vinculado.</p>
+          {vacio && <p className="detalle">Un clic agrega el producto a la venta. También podés escribir en la búsqueda o escanear con el celular vinculado.</p>}
         </div>
       )}
 

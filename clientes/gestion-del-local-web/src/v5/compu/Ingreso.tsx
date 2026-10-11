@@ -349,6 +349,11 @@ function CantidadAGranel({ valor, unidad, alCambiar, conBotones, etiqueta }: { v
       {conBotones && <button type="button" aria-label="Medio menos" onClick={() => alCambiar(Math.max(0.1, redondo(valor - 0.5)))}><Icono nombre="menos" tam={18} grosor={2.4} /></button>}
       <input inputMode="decimal" aria-label={etiqueta} value={texto} onFocus={(e) => e.target.select()}
         onChange={(e) => { const t = e.target.value.replace(/[^\d,.]/g, ""); setTexto(t); alCambiar(cantidadValida(t, unidad)); }}
+        onKeyDown={(e) => {
+          if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+          e.preventDefault(); e.stopPropagation();
+          alCambiar(e.key === "ArrowUp" ? redondo(valor + 0.5) : Math.max(0.1, redondo(valor - 0.5)));
+        }}
         onBlur={() => { if (valor === 0) alCambiar(1); else setTexto(escrito(valor)); }} data-testid="cantidad" />
       {conBotones && <button type="button" aria-label="Medio más" onClick={() => alCambiar(redondo(valor + 0.5))}><Icono nombre="mas" tam={18} grosor={2.4} /></button>}
     </div>

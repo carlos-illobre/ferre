@@ -302,14 +302,22 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
             <p>Tocá la búsqueda y escribí el producto, o escaneá el código de barras.</p>
           </div>
         )}
-        {vacio && sugeridos.hay && [["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
+
+        {/* Siguen a la vista con la venta empezada (debajo de lo ya cargado), para sumar otro producto de un toque. */}
+        {items.map((it) => (
+          <ItemDeVenta key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined}
+            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it.clave)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
+            alSubirFoto={it.producto ? async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); } : undefined} />
+        ))}
+        {sugeridos.hay && !consulta.trim() && !codigoDesconocido && [["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", items.length ? [] : sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
           <section key={clave} className="sugeridos" data-testid={`sugeridos-${clave}`}>
             <h2>{titulo}</h2>
             <div className="lista">
-              {lista.slice(0, 4).map((p) => {
+              {lista.slice(0, 5).map((p) => {
                 const precio = precioSugerido(p);
                 return (
-                  <button key={p.id} type="button" className="fila" onClick={() => agregar(p)}>
+                  <button key={p.id} type="button" className="fila con-foto" onClick={() => agregar(p)}>
+                    <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : null}</span>
                     <span className="nombre">{p.descripcion}</span>
                     <strong className="derecha importe">{precio === null ? <small>sin precio</small> : pesosCortos(precio)}</strong>
                     <span className="detalle">{detalleDe(p) || "Tocá para agregarlo a la venta"}</span>
@@ -318,12 +326,6 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
               })}
             </div>
           </section>
-        ))}
-
-        {items.map((it) => (
-          <ItemDeVenta key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined}
-            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it.clave)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
-            alSubirFoto={it.producto ? async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); } : undefined} />
         ))}
       </div>
 
