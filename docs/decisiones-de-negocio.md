@@ -118,3 +118,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       tiene la misma forma que los demás.
     - El mueble donde va la mercadería se llama «estantería» en toda la aplicación y en toda
       la documentación.
+29. **El logo es la F-tornillo** (2026-10-11): una F cuyo tronco termina en la rosca y la
+    punta de un tornillo, con el brazo corto en naranja. Carlos la eligió entre varias
+    propuestas por ser la que menos se parece a otra marca; falta buscarla en el registro de
+    marcas (INPI) antes de darla por definitiva. Los archivos están en la carpeta `public`
+    del cliente web (`logo-ferrebress.svg`, `icono-v5.svg` y los íconos de la app instalada).

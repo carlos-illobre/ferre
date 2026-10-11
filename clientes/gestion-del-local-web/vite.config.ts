@@ -20,8 +20,8 @@ export default defineConfig(({ command }) => {
         includeAssets: ["icono.svg"],
         manifest: {
           id: "ferre",
-          name: "ferre · gestión del local",
-          short_name: "ferre",
+          name: "Ferrebress",
+          short_name: "Ferrebress",
           categories: ["business", "productivity"],
           orientation: "any",
           description: "Gestión del local: ventas, compras, stock y precios",
@@ -30,8 +30,8 @@ export default defineConfig(({ command }) => {
           start_url: "./",
           scope: "./",
           display: "standalone",
-          background_color: "#eef0f4",
-          theme_color: "#1b3f77",
+          background_color: "#f5f6f2",
+          theme_color: "#17312b",
           icons: [
             { src: "icono-192.png", sizes: "192x192", type: "image/png" },
             { src: "icono-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
