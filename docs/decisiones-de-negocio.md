@@ -197,3 +197,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     título, misma explicación, los mismos tres puntos, «Entrar», la misma aclaración de que
     no hay contraseñas y la misma nota sobre quién puede entrar. Cambia solo la disposición.
     Es una sola aplicación y se tiene que notar desde la primera pantalla.
+46. **La versión 5 es «la principal»; las versiones 1 a 4 son históricas** (2026-10-11): la
+    que se llamó «versión 5» pasa a nombrarse la principal, o la raíz, y cuando Carlos no
+    aclara de qué versión habla, habla de esa. Las versiones 1 a 4 se conservan solo para
+    poder ver su maquetado: no van a producción, no se usan y no reciben ninguna
+    funcionalidad nueva. La principal sigue teniendo dos juegos de pantallas, celular y
+    computadora, en archivos separados: Carlos acepta ese costo porque unificarlas arriesga
+    la usabilidad de alguna de las dos. Lo que sí se unifica es lo que no cambia la
+    disposición (textos, reglas, cálculos), para que no haya diferencias entre una y otra.
