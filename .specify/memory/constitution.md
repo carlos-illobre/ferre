@@ -132,8 +132,13 @@ agente.** Un rol es un paso del trabajo, no un agente aparte: no se lanzan subag
 abre una sesión por rol, porque cada uno arrancaría vacío y volvería a leer lo mismo. Para
 gastar poco:
 
-- Se lee la constitución, la carpeta de `specs/` de la capacidad que se toca y el código
-  que hace falta. No las demás capacidades, ni los ADR que no vienen al caso.
+- Se lee la constitución, el `resumen.md` de la capacidad que se toca y el código que hace
+  falta. La `spec.md` y el `ux.md` completos se abren solo en la parte del requerimiento
+  que se va a cambiar, o ante una duda que el resumen no resuelve. No se leen las demás
+  capacidades, ni los ADR que no vienen al caso.
+- Para mirar una pantalla no se levanta el stack ni se arma nada nuevo: se usan las
+  herramientas de `tests/capturas/` (una API de mentira y un script de capturas). Lo que les
+  falte se agrega ahí, no en una carpeta temporal, para que la sesión siguiente lo encuentre.
 - Lo que ya se leyó en la sesión no se vuelve a leer.
 - Las preguntas del analista van todas juntas, y las maquetas también.
 - Solo si la sesión se cortó se retoma en otra: `spec.md`, la maqueta aprobada y `tasks.md`
@@ -144,6 +149,7 @@ No todo cambio pasa por los cuatro:
 | Tamaño | Ejemplo | Quién interviene |
 |---|---|---|
 | Arreglo | Un error o un texto; no cambia ninguna regla | Solo el desarrollador, con su prueba. Sin documentos |
+| Cambio de interfaz | Cambia cómo se ve o cómo se usa una pantalla, sin cambiar ninguna regla de negocio | Diseñador y desarrollador: maqueta aprobada por Carlos y código. Sin `spec.md`, `plan.md` ni `tasks.md`; el `ux.md` se toca solo si cambia un requerimiento de interfaz |
 | Cambio de regla | Un requerimiento nuevo o modificado dentro de una capacidad | Analista y desarrollador. La regla se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia |
 | Funcionalidad nueva | Varias historias o pantallas nuevas | Los cuatro, con carpeta propia: `spec.md`, maquetas y `tasks.md` |
 
@@ -172,6 +178,13 @@ la funcionalidad no está terminada sin ellas:
   `proyecto/estado.yml` dice, por requerimiento, si está hecho, qué pruebas lo respaldan y
   en qué se aparta hoy el código de la regla. `tests/trazabilidad.mjs` controla en el CI que
   los dos coincidan.
+- **Un resumen por capacidad.** Cada carpeta `001` a `007` tiene un `resumen.md` de 80
+  líneas como mucho: cada requerimiento con su ID en una línea, las reglas que más pesan,
+  las decisiones de Carlos que la tocan y las preguntas abiertas que frenan. Es lo primero
+  que se lee, y lo único si alcanza. Sigue las reglas de `specs/`: no nombra código ni dice
+  qué está hecho. Si una capacidad todavía no lo tiene, lo escribe quien la lee completa por
+  primera vez, antes de terminar su sesión. Quien cambia una regla actualiza el resumen en
+  el mismo cambio; ante una diferencia, manda la `spec.md`.
 - **`ux.md` son requerimientos de interfaz:** qué tiene que poder hacer cada rol en cada
   recorrido y con qué reglas, sin atarse a un diseño. En una funcionalidad nueva, el
   diseño concreto va en `specs/NNN/maquetas/`.
@@ -195,4 +208,9 @@ versión todos los usuarios son Administrador (principio IX).
 **Enmienda 1.2.1 (2026-10-10), por decisión de Carlos:** el `.env` lleva solo variables de
 entorno; la configuración que no depende del ambiente va aparte (principio VII).
 
-**Version**: 1.4.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-11
+**Enmienda 1.5.0 (2026-10-11), por decisión de Carlos, para gastar menos en cada sesión:**
+cada capacidad tiene un `resumen.md` que se lee antes que la especificación completa; un
+cambio que es solo de interfaz va con maqueta y código, sin los demás documentos; y las
+herramientas para mirar pantallas viven en `tests/capturas/`.
+
+**Version**: 1.5.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-11

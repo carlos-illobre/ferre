@@ -32,8 +32,12 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
 | 4 | Desarrollador | `/speckit-implement` | Lo prueba en el ambiente de pruebas |
 
 - **Todo en una sola sesión y sin subagentes:** el mismo agente hace los cuatro pasos en
-  orden. Se lee solo la constitución y la carpeta de la capacidad que se toca.
+  orden. Se lee la constitución y el `resumen.md` de la capacidad que se toca; la `spec.md`
+  y el `ux.md` completos, solo en la parte que se va a cambiar. Si la capacidad no tiene
+  resumen, lo escribe quien la lee completa por primera vez.
 - **Un arreglo** que no cambia ninguna regla va solo con el desarrollador, con su prueba.
+- **Un cambio de interfaz** que no toca ninguna regla va con diseñador y desarrollador:
+  maqueta aprobada y código, sin `spec.md`, `plan.md` ni `tasks.md`.
 - **Un cambio de regla** dentro de una capacidad va con analista y desarrollador: la regla
   se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia.
 - **Toda lista de tareas termina con tres:** una prueba por escenario, comparar con la
@@ -73,7 +77,12 @@ tests/utest.sh               # unitarias, sin nada levantado
 node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
 tests/e2e.sh                 # caminos principales, en las dos interfaces (levanta el stack)
+tests/capturas/levantar.sh   # API de mentira y cliente, para mirar pantallas sin Docker
+python tests/capturas/capturar.py vender   # captura una pantalla en computadora y celular
 ```
+
+Para mirar o comparar una pantalla, usá `tests/capturas/` ([cómo](tests/capturas/README.md))
+en vez de armar algo nuevo; lo que le falte, agregalo ahí.
 
 Cómo levantarlo: [specs/001-base-del-sistema/quickstart.md](specs/001-base-del-sistema/quickstart.md).
 Operación del servidor: [docs/operacion/](docs/operacion/).

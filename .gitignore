@@ -34,3 +34,4 @@ microservices/mostrador/api/public/
 deployment/*/.env
 deployment/*/*/.env
 
+tests/capturas/salida/

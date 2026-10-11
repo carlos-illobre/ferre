@@ -18,7 +18,8 @@ Entregás tres cosas en la carpeta de la funcionalidad (`specs/<funcionalidad>/`
 ## 1. Antes de dibujar
 
 1. Leé la `spec.md` de la funcionalidad. Si no está aprobada por Carlos, avisá y frená.
-2. Leé la constitución del proyecto (principios de interfaz), su sistema visual
+2. Leé el `resumen.md` de la capacidad si existe (y el `ux.md` solo en la parte que
+   vas a cambiar). Leé la constitución del proyecto (principios de interfaz), su sistema visual
    (`docs/sistema-visual.md` o el archivo que el proyecto use) y el `ux.md` de las
    capacidades que la funcionalidad toca: lo nuevo tiene que ser coherente con eso.
 3. **Pedí referencias.** Si Carlos no pasó ninguna, pedile dos o tres capturas de algo que

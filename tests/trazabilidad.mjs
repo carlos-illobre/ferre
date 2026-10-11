@@ -80,7 +80,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const leer = (ruta) => readFileSync(join(RAIZ, ruta), 'utf8');
   const carpetas = readdirSync(join(RAIZ, 'specs')).filter((c) => /^\d{3}-/.test(c)).sort();
   const specs = carpetas.flatMap((c) =>
-    ['spec.md', 'ux.md'].filter((a) => existsSync(join(RAIZ, 'specs', c, a))).map((a) => ({ archivo: `specs/${c}/${a}`, texto: leer(`specs/${c}/${a}`) })),
+    ['spec.md', 'ux.md', 'resumen.md'].filter((a) => existsSync(join(RAIZ, 'specs', c, a))).map((a) => ({ archivo: `specs/${c}/${a}`, texto: leer(`specs/${c}/${a}`) })),
   );
   const r = revisar({
     indice: leer('specs/README.md'),

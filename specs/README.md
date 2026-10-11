@@ -34,7 +34,7 @@ usuario sin el rol Administrador quedan para cuando se definan los permisos de c
 |---|---|
 | [La constitución](../.specify/memory/constitution.md) | Lo que no se negocia y el flujo de trabajo |
 | [001-base-del-sistema](001-base-del-sistema/) | Lo que vale para todo: los requerimientos no funcionales (`spec.md`), los requerimientos de interfaz generales y todo lo que Carlos pidió sobre las pantallas (`ux.md`), la arquitectura decidida (`plan.md`), el modelo de datos completo (`data-model.md`) y cómo se levanta y se prueba (`quickstart.md`) |
-| `002` a `007` | Una por capacidad, con todos sus requerimientos: `spec.md` (historias, escenarios de aceptación y requerimientos), `ux.md` (requerimientos de interfaz, sin atarse a un diseño), `data-model.md` y `contracts/api.md` (el contrato del servidor) y, donde hubo relevamiento, `research.md` |
+| `002` a `007` | Una por capacidad, con todos sus requerimientos: `resumen.md` (lo primero que se lee: cada requerimiento en una línea, las reglas que más pesan y lo que falta decidir; se escribe la primera vez que alguien lee la capacidad completa), `spec.md` (historias, escenarios de aceptación y requerimientos), `ux.md` (requerimientos de interfaz, sin atarse a un diseño), `data-model.md` y `contracts/api.md` (el contrato del servidor) y, donde hubo relevamiento, `research.md` |
 | `008` en adelante | Una por funcionalidad nueva, con el flujo de la constitución |
 | [preguntas-abiertas.md](preguntas-abiertas.md) | Lo que todavía no está decidido. Cada pregunta está marcada en su `spec.md` como `[NEEDS CLARIFICATION]` |
 
