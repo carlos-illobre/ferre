@@ -120,7 +120,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       la documentación.
 29. **El logo es la F-tornillo** (2026-10-11): una F de cortes en diagonal, con las puntas
     apenas suavizadas y un poco inclinada, cuyo tronco termina en la rosca y la punta de un
-    tornillo, con el brazo corto en naranja. Va dentro de un hexágono, que es su tuerca. Carlos la eligió entre varias
+    tornillo, con el brazo corto en naranja. Va dentro de un triángulo con la punta hacia
+    abajo, como una plomada (se probó antes un hexágono y no convenció). Carlos la eligió entre varias
     propuestas por ser la que menos se parece a otra marca; falta buscarla en el registro de
     marcas (INPI) antes de darla por definitiva. Los archivos están en la carpeta `public`
     del cliente web (`logo-ferrebress.svg`, `icono-v5.svg` y los íconos de la app instalada).
