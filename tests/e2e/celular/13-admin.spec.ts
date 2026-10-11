@@ -30,13 +30,13 @@ test.beforeAll(() => {
 test("el admin administra pero no toca dueños", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/mas/usuarios");
-  await expect(page.getByText("Quién puede entrar")).toBeVisible();
+  await expect(page.getByText("Usuarios autorizados")).toBeVisible();
   await expect(page.getByText("Sesiones abiertas")).toBeVisible();
 
-  // Autorizar un mostrador: sí. El selector de alta no ofrece "dueño".
+  // Autorizar a alguien: sí. El selector de alta no ofrece «Administrador principal».
   await page.getByTestId("autorizar").click();
   const alta = page.getByTestId("alta-usuario");
-  await expect(alta.locator('select[name="rol"] option', { hasText: "dueño" })).toHaveCount(0);
+  await expect(alta.locator('select[name="rol"] option', { hasText: "Administrador principal" })).toHaveCount(0);
   await alta.getByPlaceholder("Nombre").fill("Nuevo mostrador");
   await alta.getByPlaceholder("correo@gmail.com").fill(EMAIL_NUEVO);
   await alta.getByRole("button", { name: "Autorizar" }).click();
@@ -45,7 +45,7 @@ test("el admin administra pero no toca dueños", async ({ page }) => {
   // La fila del dueño no se puede tocar desde acá.
   const filaDueno = page.getByTestId("usuario-fila").filter({ hasText: "Dueño protegido E2E" });
   await expect(filaDueno.locator("select")).toBeDisabled();
-  await expect(filaDueno).toContainText("solo el dueño");
+  await expect(filaDueno).toContainText("solo el Administrador principal");
 
   // Y la API lo rechaza aunque se intente directo.
   const respuestas = await page.evaluate(async ([token, email, API]) => {

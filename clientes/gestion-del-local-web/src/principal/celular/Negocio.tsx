@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { NOMBRES, TEXTOS, nombreDeRol } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { api, urlApi } from "../../api";
 import { fecha, pesos } from "../../formato";
@@ -19,7 +20,7 @@ type Gastos = { desde: string; por_proveedor: { proveedor: string; compras: stri
 // celulares con huella, sesiones y quién hizo qué.
 // La misma pantalla de la versión 1, partida en las tres opciones de «Más».
 export type Parte = "negocio" | "usuarios" | "actividad";
-const TITULOS: Record<Parte, string> = { negocio: "Cómo va el negocio", usuarios: "Usuarios y sesiones", actividad: "Quién hizo qué" };
+const TITULOS: Record<Parte, string> = { negocio: NOMBRES.comoVaElNegocio, usuarios: NOMBRES.usuariosYSesiones, actividad: NOMBRES.quienHizoQue };
 
 export function Negocio({ parte }: { parte: Parte }) {
   const { sesion, salir } = useSesion();
@@ -44,7 +45,7 @@ export function Negocio({ parte }: { parte: Parte }) {
           <div className="avatar">{usuario.nombre.charAt(0).toUpperCase()}</div>
           <div className="textos">
             <strong data-testid="usuario-negocio">{usuario.nombre}</strong>
-            <small>{usuario.rol} · <EstadoDeConexion testId="conexion-negocio" /></small>
+            <small>{nombreDeRol(usuario.rol)} · <EstadoDeConexion testId="conexion-negocio" /></small>
           </div>
           <button type="button" className="boton chico solo-celular" style={{ height: 34, fontSize: 13, borderRadius: 10 }} onClick={salir}>Salir</button>
         </div>
@@ -120,8 +121,8 @@ function Usuarios() {
 
   return (
     <>
-      <div className="seccion">Quién puede entrar</div>
-      <small style={{ padding: "0 4px" }}>mostrador: vende, compra, cuenta y carga listas · admin: además administra usuarios, proveedores, duplicados y sesiones, pero no toca dueños · dueño: todo</small>
+      <div className="seccion">{NOMBRES.usuariosAutorizados}</div>
+      <small style={{ padding: "0 4px" }}>{TEXTOS.usuarios.queHaceCadaRol.corto}</small>
       <AvisoError texto={error} alCerrar={() => setError(null)} />
       <div className="lista" data-testid="usuarios">
         {filas.map((u) => {
@@ -131,11 +132,11 @@ function Usuarios() {
               <span className="nombre">{u.nombre}</span>
               <span className="derecha" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <select className="boton chico" style={{ appearance: "none", WebkitAppearance: "none" }} value={u.rol} disabled={protegido} onChange={(e) => cambiar(u.id, { rol: e.target.value })} aria-label={`Rol de ${u.nombre}`}>
-                  <option value="mostrador">mostrador</option>
-                  <option value="admin">admin</option>
-                  {(!esAdmin || u.rol === "dueño") && <option value="dueño">dueño</option>}
+                  <option value="mostrador">{nombreDeRol("mostrador")}</option>
+                  <option value="admin">{nombreDeRol("admin")}</option>
+                  {(!esAdmin || u.rol === "dueño") && <option value="dueño">{nombreDeRol("dueño")}</option>}
                 </select>
-                {protegido ? <small>solo el dueño</small> : <button type="button" className="boton chico texto" style={{ color: u.activo ? "var(--coral-texto)" : "var(--tinta)" }} onClick={() => cambiar(u.id, { activo: !u.activo })}>{u.activo ? "Desactivar" : "Reactivar"}</button>}
+                {protegido ? <small>solo el Administrador principal</small> : <button type="button" className="boton chico texto" style={{ color: u.activo ? "var(--coral-texto)" : "var(--tinta)" }} onClick={() => cambiar(u.id, { activo: !u.activo })}>{u.activo ? "Desactivar" : "Reactivar"}</button>}
               </span>
               <span className="detalle">{u.email}{u.activo ? "" : " · desactivado"}</span>
             </div>
@@ -148,7 +149,7 @@ function Usuarios() {
           <form onSubmit={autorizar} className="formulario" data-testid="alta-usuario">
             <label className="renglon"><span>Nombre</span><input name="nombre" placeholder="Nombre" required /></label>
             <label className="renglon"><span>Correo de Google</span><input name="email" type="email" placeholder="correo@gmail.com" required /></label>
-            <label className="renglon"><span>Rol</span><select name="rol" defaultValue="mostrador"><option value="mostrador">mostrador</option><option value="admin">admin</option>{!esAdmin && <option value="dueño">dueño</option>}</select></label>
+            <label className="renglon"><span>Rol</span><select name="rol" defaultValue="mostrador"><option value="mostrador">{nombreDeRol("mostrador")}</option><option value="admin">{nombreDeRol("admin")}</option>{!esAdmin && <option value="dueño">{nombreDeRol("dueño")}</option>}</select></label>
             <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton tinta">Autorizar</button></div>
           </form>
         </Hoja>

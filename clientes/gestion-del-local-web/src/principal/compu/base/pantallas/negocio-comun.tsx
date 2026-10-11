@@ -62,12 +62,7 @@ export function diaYHora(iso: string): string {
 export const fechaCompleta = (iso: string) => new Date(iso).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 
 // Los roles de la API con los nombres que se usan en el negocio.
-export const ROLES: { valor: string; nombre: string }[] = [
-  { valor: "admin", nombre: "Administrador" },
-  { valor: "dueño", nombre: "Administrador principal" },
-  { valor: "mostrador", nombre: "Vendedor y comprador" },
-];
-export const nombreDeRol = (rol: string) => ROLES.find((r) => r.valor === rol)?.nombre ?? rol;
+export { ROLES, nombreDeRol } from "../../../textos";
 
 // Ícono que falta en lo compartido: una computadora, para distinguirla del celular.
 export function IconoCompu({ tam = 20 }: { tam?: number }) {

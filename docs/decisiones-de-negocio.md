@@ -228,3 +228,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     la F y pegada a su diagonal. Se usa donde antes iban el isotipo y el nombre al lado: el
     menú de la computadora y las dos entradas. El ícono de la app y la pestaña del navegador
     siguen siendo el isotipo solo. Todo sale de `tests/capturas/logo.py`.
+49. **Mismos nombres en las dos interfaces** (2026-10-11), en aplicación de la 47: la
+    pantalla se llama «Cómo va el negocio» también en la computadora (decía «Resumen»); la
+    lista de quienes pueden entrar se llama «Usuarios autorizados» en las dos; y los roles se
+    muestran con el mismo nombre en las dos: Administrador principal, Administrador y
+    Vendedor y comprador (el celular mostraba dueño, admin y mostrador, que son los nombres
+    internos). Esos tres nombres de rol todavía no los confirmó Carlos.

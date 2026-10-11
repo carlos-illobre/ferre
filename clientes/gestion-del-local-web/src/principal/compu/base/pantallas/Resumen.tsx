@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { NOMBRES } from "../../../textos";
 import { urlApi } from "../../../../api";
 import { esAmbienteDePrueba } from "../../../../ambiente";
 import { fecha, pesos } from "../../../../formato";
@@ -38,7 +39,7 @@ export function Resumen() {
   function actualizar() { hoy.recargar(); gastos.recargar(); consultas.recargar(); }
 
   return (
-    <Pagina titulo="Resumen" testId="resumen" bajada={`Cómo va el negocio hoy, ${hoyTexto}.`}
+    <Pagina titulo={NOMBRES.comoVaElNegocio} testId="resumen" bajada={`Cómo va el negocio hoy, ${hoyTexto}.`}
       acciones={<Boton icono="repetir" onClick={actualizar} disabled={!enLinea || hoy.cargando || gastos.cargando || consultas.cargando}>Actualizar</Boton>}>
       {!enLinea && <Aviso tipo="alerta" testId="resumen-sin-conexion">Sin conexión: los números se ven cuando vuelva internet. Se actualizan solos.</Aviso>}
 

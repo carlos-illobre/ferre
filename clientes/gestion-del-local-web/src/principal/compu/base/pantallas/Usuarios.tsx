@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { TEXTOS } from "../../../textos";
 import { api, ErrorApi } from "../../../../api";
 import { fecha } from "../../../../formato";
 import { useSesion } from "../../../../sesion";
@@ -19,7 +20,7 @@ function enPalabras(e: unknown, queNoSePudo: string): string {
   if (esFallaDeRed(e)) return textoDeError(e, queNoSePudo);
   const texto = (e as Error).message;
   if (/a vos mismo/.test(texto)) return "No podés desactivarte ni cambiarte el rol: lo tiene que hacer otro Administrador.";
-  if (/admin no puede/.test(texto)) return "Eso lo tiene que hacer un Administrador principal.";
+  if (/admin no puede/.test(texto)) return TEXTOS.usuarios.soloElPrincipal.largo;
   if (/dueño o un admin/.test(texto)) return "Solo puede hacerlo un Administrador.";
   return `${queNoSePudo}: ${texto}`;
 }

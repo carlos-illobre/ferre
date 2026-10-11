@@ -39,7 +39,7 @@ test("con sesión el dueño entra y ve la administración", async ({ page }) => 
   await expect(page.getByTestId("usuario-negocio")).toContainText("Dueño E2E");
   await page.getByRole("button", { name: "Más" }).click();
   await page.getByRole("button", { name: /Usuarios y sesiones/ }).click();
-  await expect(page.getByText("Quién puede entrar")).toBeVisible();
+  await expect(page.getByText("Usuarios autorizados")).toBeVisible();
   await expect(page.getByTestId("usuarios")).toContainText(EMAIL);
 });
 

@@ -62,14 +62,14 @@ describe("Negocio", () => {
     const filas = await screen.findAllByTestId("usuario-fila");
     const filaDueno = filas.find((f) => f.textContent?.includes("d@b"))!;
     expect(filaDueno.querySelector("select")).toHaveProperty("disabled", true);
-    expect(filaDueno.textContent).toContain("solo el dueño");
+    expect(filaDueno.textContent).toContain("solo el Administrador principal");
     const filaMostrador = filas.find((f) => f.textContent?.includes("m@b"))!;
     const opciones = Array.from(filaMostrador.querySelectorAll("select option")).map((o) => o.textContent);
-    expect(opciones).toContain("admin");
-    expect(opciones).not.toContain("dueño");
+    expect(opciones).toContain("Administrador");
+    expect(opciones).not.toContain("Administrador principal");
     fireEvent.click(screen.getByTestId("autorizar"));
     const alta = screen.getByTestId("alta-usuario");
-    expect(Array.from(alta.querySelectorAll("option")).map((o) => o.textContent)).not.toContain("dueño");
+    expect(Array.from(alta.querySelectorAll("option")).map((o) => o.textContent)).not.toContain("Administrador principal");
   });
 
   it("Sesiones: todos los botones dicen Cerrar; el de la propia es coral", async () => {
