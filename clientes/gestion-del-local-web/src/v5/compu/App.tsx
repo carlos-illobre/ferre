@@ -103,15 +103,17 @@ function Pantallas() {
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
       // Si es otra parte, se abre; cada pantalla pone el foco en su búsqueda. Si es la misma, se vuelve a ella.
-      if (botones[i]!.getAttribute("aria-current") !== "page") botones[i]!.click();
-      requestAnimationFrame(() => {
+      const cambia = botones[i]!.getAttribute("aria-current") !== "page";
+      if (cambia) botones[i]!.click();
+      // Al cambiar de parte hay que esperar a que la pantalla nueva esté dibujada.
+      setTimeout(() => {
         const cuerpo = document.querySelector<HTMLElement>(".cuerpo");
         if (!cuerpo || cuerpo.contains(document.activeElement)) return;
         // Primero la búsqueda (u otro campo); si la pantalla no tiene, su primer botón.
         const deLaPantalla = (selector: string) => [...cuerpo.querySelectorAll<HTMLElement>(selector)].find((x) => !x.closest(".pestanas, .mas-volver"));
         const primero = deLaPantalla("input:not([type='hidden']):not([type='file']):not([disabled]), select:not([disabled])") ?? deLaPantalla("button:not([disabled])");
         (primero ?? document.getElementById("contenido"))?.focus();
-      });
+      }, cambia ? 150 : 0);
     }
   }
 
