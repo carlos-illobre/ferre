@@ -124,3 +124,4 @@
 /* Los numeritos del menú, como en la versión 2. */
 .lateral nav button .atajo { width: 22px; height: 22px; border-radius: 6px; font-size: 0.75rem; opacity: 0.7; }
 .lateral nav button[aria-current="page"] .atajo { opacity: 0.9; }
+.lateral nav button .atajo { width: auto; padding: 0 6px; white-space: nowrap; }

@@ -6,3 +6,5 @@
 /* Sin animaciones, el marco queda fijo. */
 @media (prefers-reduced-motion: reduce) { .marco-de-prueba-borde { animation: none; } }
 @media (max-width: 899px) { .marco-de-prueba-borde { border-width: 5px; } .marco-de-prueba-cartel span { display: none; } }
+/* En la computadora el contenido baja un poco para que el cartel no tape las pestañas. */
+@media (min-width: 900px) { body:has(.marco-de-prueba) .cuerpo { padding-top: 22px; } }

@@ -19,7 +19,7 @@ export function Mas({ atajoDe }: { atajoDe: (ruta: string) => string | null }) {
               <span className="mas-icono"><Icono nombre={d.icono} tam={24} /></span>
               <span className="nombre">{d.nombre}</span>
               <span className="detalle">{d.detalle}</span>
-              {atajoDe(d.ruta) && <span className="tecla" aria-hidden="true">Alt {atajoDe(d.ruta)}</span>}
+              {atajoDe(d.ruta) && <span className="tecla" aria-hidden="true">Alt+{atajoDe(d.ruta)}</span>}
             </button>
           </li>
         ))}

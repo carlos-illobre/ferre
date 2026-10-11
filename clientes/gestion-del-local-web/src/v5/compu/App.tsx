@@ -93,7 +93,7 @@ function Pantallas() {
               <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`}>
                 <Icono nombre={m.icono} tam={19} grosor={parte === m.clave ? 2.3 : 1.9} />{m.nombre}
                 {/* El número que, con Alt, abre la primera pantalla de esta parte. */}
-                {atajoDe(m.pestanas[0]!.ruta) && <span className="atajo" aria-hidden="true">{atajoDe(m.pestanas[0]!.ruta)}</span>}
+                {atajoDe(m.pestanas[0]!.ruta) && <span className="atajo" aria-hidden="true">Alt+{atajoDe(m.pestanas[0]!.ruta)}</span>}
               </button>
             );
           })}
@@ -113,7 +113,7 @@ function Pantallas() {
           <nav className="pestanas" aria-label={NOMBRES.get(actual)}>
             {pestanas.map((p) => (
               <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(p.ruta)}`} onClick={() => irA(p.ruta)} data-testid={`pestana-${p.ruta}`}>
-                <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}<span className="tecla" aria-hidden="true">Alt {atajoDe(p.ruta)}</span>
+                <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}<span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>
               </button>
             ))}
           </nav>
