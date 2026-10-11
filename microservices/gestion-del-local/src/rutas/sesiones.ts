@@ -39,7 +39,7 @@ sesiones.delete("/actual", exigirSesion, async (c) => {
 });
 
 // El dueño ve y revoca cualquier sesión abierta.
-sesiones.get("/", exigirPermiso("admin.sesiones"), exigirSesion, async (c) => {
+sesiones.get("/", exigirSesion, exigirPermiso("admin.sesiones"), async (c) => {
   const { rows } = await pool.query(
     `SELECT s.id, s.dispositivo, s.creada_en, s.ultimo_uso_en, s.expira_en, u.email, u.nombre
        FROM sesion s JOIN usuario u ON u.id = s.usuario_id
@@ -49,7 +49,7 @@ sesiones.get("/", exigirPermiso("admin.sesiones"), exigirSesion, async (c) => {
   return c.json(rows);
 });
 
-sesiones.delete("/:id", exigirPermiso("admin.sesiones"), exigirSesion, async (c) => {
+sesiones.delete("/:id", exigirSesion, exigirPermiso("admin.sesiones"), async (c) => {
   await revocarSesion(pool, c.req.param("id"));
   await registrarEvento(pool, { tipo: "sesion.revocada", usuarioId: c.get("sesion").usuario.id, contenido: { sesionId: c.req.param("id") } });
   return c.body(null, 204);
