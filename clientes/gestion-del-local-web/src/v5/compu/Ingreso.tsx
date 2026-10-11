@@ -12,7 +12,8 @@ import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 
 // Ingreso de mercadería: proveedor y comprobante, renglones con la búsqueda de siempre, y
 // registrar. Suma stock y, si el comprobante trae otro costo, ese pasa a ser el vigente.
-// Abajo, las compras recientes (se despliegan y se anulan) y los gastos de la semana.
+// Abajo, las compras recientes (se despliegan y se anulan). Los gastos de la semana están
+// en Cómo va el negocio (decisión 34).
 type Proveedor = { id: string; nombre: string; activo: boolean };
 type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoTexto: string; costoLista: number | null };
 type Comprobante = "factura" | "remito" | "sin_comprobante";
@@ -324,9 +325,8 @@ export function Ingreso() {
         </div>
       )}
 
-      <div className="compras-historia">
+      <div className="compras-historia sola">
         <ComprasRecientes version={version} enLinea={enLinea} esCelular={esCelular} alAnular={(texto) => { setMensaje(texto); setVersion((v) => v + 1); }} />
-        <GastosDeLaSemana version={version} />
       </div>
 
       {eligiendoProveedor && (
@@ -510,7 +510,7 @@ function AnularCompra({ compra: c, enLinea, alCerrar, alAnular }: { compra: Comp
         <strong>{c.proveedor}</strong><span className="importe">{pesosCortos(c.total)}</span>
         <span className="detalle">{fecha(c.fecha)} · {nombreComprobante(c)} · {plural(Number(c.renglones), "renglón", "renglones")}</span>
       </div>
-      <p>El stock que sumó esta compra se descuenta, con un ajuste por cada renglón, y deja de contar en los gastos de la semana. El costo que dejó el comprobante no cambia. <strong>No se puede deshacer.</strong></p>
+      <p>El stock que sumó esta compra se descuenta, con un ajuste por cada renglón, y deja de contar en los gastos de la semana de Cómo va el negocio. El costo que dejó el comprobante no cambia. <strong>No se puede deshacer.</strong></p>
       <label className="campo"><span>Motivo (opcional)</span><input className="entrada" value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Se cargó dos veces…" maxLength={200} autoFocus data-testid="motivo-anular" /></label>
       <Aviso tipo="alerta">{!enLinea ? "Sin conexión: anular una compra necesita internet." : null}</Aviso>
       <Aviso tipo="error">{error}</Aviso>
@@ -518,37 +518,3 @@ function AnularCompra({ compra: c, enLinea, alCerrar, alAnular }: { compra: Comp
   );
 }
 
-function GastosDeLaSemana({ version }: { version: number }) {
-  const [datos, setDatos] = useState<Semana | null>(null);
-  const [falla, setFalla] = useState(false);
-  useEffect(() => { api<Semana>("/compras/semana").then((d) => { setDatos(d); setFalla(false); }).catch(() => setFalla(true)); }, [version]);
-  const mayor = Math.max(1, ...(datos?.por_proveedor ?? []).map((p) => Number(p.total)));
-  return (
-    <Plegable titulo="Gastos de la semana" testId="gastos-semana">
-      {datos === null && !falla && <div className="compras-cargando" aria-busy="true"><span className="solo-lectores">Trayendo los gastos…</span><div className="esqueleto" /><div className="esqueleto" /></div>}
-      {datos === null && falla && <p className="detalle">Sin conexión: los gastos de la semana se ven cuando vuelve internet.</p>}
-      {datos && (
-        <div className="compras-gastos">
-          <div className="compras-gastos-total">
-            <span className="importe total">
-              {datos.por_proveedor.length ? <Explicado valor={pesosCortos(datos.total)} titulo="De dónde salen los gastos de la semana" pasos={[`Compras registradas desde el ${fecha(datos.desde)}, sin las anuladas.`, ...datos.por_proveedor.map((p) => `${p.proveedor}: ${pesos(p.total)} en ${plural(Number(p.compras), "compra", "compras")}`), `Total: ${pesos(datos.total)}`]} /> : pesosCortos(0)}
-            </span>
-            <span className="detalle">Desde el {fecha(datos.desde)}, al costo sin IVA</span>
-          </div>
-          {datos.por_proveedor.length === 0 ? <p className="detalle">Esta semana no se registró ninguna compra.</p> : (
-            <ul className="compras-gastos-lista">
-              {datos.por_proveedor.map((p) => (
-                <li key={p.proveedor}>
-                  <span className="nombre">{p.proveedor}</span>
-                  <span className="importe chico">{pesosCortos(p.total)}</span>
-                  <span className="compras-riel" aria-hidden="true"><i style={{ transform: `scaleX(${Math.max(0.01, Number(p.total) / mayor)})` }} /></span>
-                  <span className="detalle">{plural(Number(p.compras), "compra", "compras")}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-    </Plegable>
-  );
-}

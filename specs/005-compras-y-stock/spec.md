@@ -87,7 +87,7 @@ sigue en la lista, marcada como anulada.
 
 **Acceptance Scenarios**:
 
-1. **Given** una compra recién registrada por $16.000, **When** mira los gastos de la semana, **Then** ve el total gastado y el detalle por proveedor, en el celular y en la computadora (RF-65).
+1. **Given** una compra recién registrada por $16.000, **When** mira los gastos de la semana en «Cómo va el negocio» (no en el ingreso, donde solo están las compras recientes), **Then** ve el total gastado y el detalle por proveedor, en el celular y en la computadora (RF-65).
 2. **Given** la compra en las compras recientes, **When** la abre, **Then** ve sus renglones: 10 × cinta y 5 × pincel, cada uno con su costo unitario y su subtotal, y el proveedor, la fecha, el comprobante y el total de la compra.
 3. **Given** la compra de 10 cintas, **When** la anula, **Then** la compra queda marcada «anulada», el stock de la cinta baja en 10 con un movimiento que dice que es la anulación de esa compra, y la compra deja de sumar a los gastos de la semana. [NEEDS CLARIFICATION: al anular una compra, ¿el motivo es obligatorio, como al corregir el stock, u opcional?]
 4. **Given** una compra que al registrarse cambió el costo vigente de la cinta de $1.000 a $1.200, **When** se la anula, **Then** [NEEDS CLARIFICATION: al anular una compra que había cambiado el costo de un producto, ¿el costo vuelve al anterior ($1.000) o queda el de la factura anulada ($1.200)?]

@@ -112,3 +112,6 @@
 .sugeridos-tarjeta .nombre, .sugeridos-tarjeta .detalle { grid-column: 2; }
 .sugeridos-tarjeta .importe, .sugeridos-tarjeta .falta-texto { grid-column: 3; }
 .sugeridos-grilla { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+
+/* Ingreso: las compras recientes ocupan todo el ancho (los gastos de la semana están en Cómo va el negocio). */
+.compras-historia.sola { display: block; }

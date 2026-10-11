@@ -303,14 +303,13 @@ function Ingreso() {
   );
 }
 
-// Compras recientes y gastos de la semana: el papel que ya no se tira. Cada compra se
+// Compras recientes: el papel que ya no se tira (los gastos de la semana están en Cómo va el negocio). Cada compra se
 // abre para ver sus renglones y se puede anular.
 function ComprasRecientes({ version }: { version: number }) {
   const [filas, setFilas] = useState<CompraFila[]>([]);
-  const [gastos, setGastos] = useState<{ total: number; desde: string } | null>(null);
   const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
   const [mensaje, setMensaje] = useState<string | null>(null);
-  const cargar = () => Promise.all([api<CompraFila[]>("/compras").then(setFilas).catch(() => setFilas([])), api<{ total: number; desde: string }>("/compras/semana").then(setGastos).catch(() => undefined)]);
+  const cargar = () => api<CompraFila[]>("/compras").then(setFilas).catch(() => setFilas([]));
   useEffect(() => { void cargar(); }, [version]);
   if (filas.length === 0) return null;
   const nombreComprobante = (c: CompraFila) => c.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${c.comprobante_tipo}${c.comprobante_numero ? ` ${c.comprobante_numero}` : c.foto ? " con foto" : " sin foto"}`;
@@ -322,7 +321,7 @@ function ComprasRecientes({ version }: { version: number }) {
   }
   return (
     <>
-      <div className="seccion" data-testid="gastos-semana"><span>Gastos de la semana</span>{gastos && <span className="importe" style={{ fontSize: 16 }}>{pesosCortos(gastos.total)}</span>}</div>
+      <div className="seccion"><span>Compras recientes</span></div>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
       <div className="lista" data-testid="compras-recientes">
         {filas.map((c) => {

@@ -145,3 +145,5 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     pantalla lleva un marco magenta que aparece y desaparece y un cartel fijo arriba que
     dice «Ambiente de prueba · nada de esto es real», también en la pantalla de entrada.
     Es para que nadie registre una venta real en pruebas. Producción no lleva nada de eso.
+34. **Los gastos de la semana se ven solo en «Cómo va el negocio»** (2026-10-11): se
+    sacaron del ingreso de mercadería, donde alcanza con las compras recientes.
