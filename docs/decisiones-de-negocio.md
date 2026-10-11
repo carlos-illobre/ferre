@@ -95,4 +95,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     cliente que no es pantalla. Al elegir la versión, se reactivan las suyas y se portan
     las de punta a punta.
 26. **Cada versión de la interfaz en su carpeta.** La original pasa a `/v1/`. La raíz abre
-    la versión 2, que sigue también en `/v2/`; la lista de todas está en `versiones.html`.
+    la versión elegida en cada momento (desde la decisión 27, la 5); la lista de todas está
+    en `versiones.html`.
+27. **Qué gustó de cada versión, y la versión 5 que lo junta.** En el celular, la facilidad
+    de uso de la versión 1; en la computadora, la de la versión 2, sobre todo el teclado y
+    Alt + número para abrir cada pantalla; de la versión 4, el menú «Más» para lo que se usa
+    poco; del diseño de Figma, que la venta nueva muestre lo último que se vendió y lo que
+    más se vende en vez de quedar vacía. En el celular la búsqueda no toma el foco sola,
+    porque abre el teclado; en la computadora sí. La paleta la eligió el agente (verde
+    oscuro, naranja de acción y amarillo para destacar). La versión 5 está en `/v5/` y es
+    la que abre la raíz.

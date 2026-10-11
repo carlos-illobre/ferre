@@ -1,0 +1,26 @@
+/* Paleta de la v5 sobre la interfaz de celular de la versión 1: verde oscuro para lo que
+   ordena, naranja como único color de acción y amarillo para destacar. Son los colores ya
+   medidos en la v4 (texto blanco sobre el naranja: 4,5 a 1). */
+@import "@fontsource-variable/manrope/wght.css";
+@import "@fontsource-variable/space-grotesk/wght.css";
+
+:root {
+  --tinta: #17312b;
+  --niebla: #f5f6f2;
+  --relleno: #e4e8e5;
+  --gris: #4a5451;
+  --gris-claro: #66706d;
+  --linea: rgba(23, 49, 43, 0.1);
+  --coral: #d83f0e;
+  --coral-claro: #e2531f;
+  --coral-tinte: #fff0ea;
+  --coral-texto: #c2370b;
+  --verde: #0f8a5f;
+  --importes: "Space Grotesk Variable", "Segoe UI", system-ui, sans-serif;
+  font-family: "Manrope Variable", -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+}
+.pill-prueba { background: #f7c445 !important; color: #17312b !important; }
+
+/* Lo último que se vendió y lo que más se vende, para que la venta nueva no arranque vacía. */
+.sugeridos { display: flex; flex-direction: column; gap: 8px; }
+.sugeridos h2 { margin: 6px 4px 0; font-size: 15px; font-weight: 700; color: var(--gris); }

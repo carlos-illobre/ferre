@@ -43,8 +43,8 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   `/pruebas/` es `master`. CI lo construye con las variables de repositorio `API_URL`,
   `API_URL_PRUEBAS` y `GOOGLE_CLIENT_ID`. Es lo único que vive fuera del `.env`.
   Dentro de cada una conviven las versiones de la interfaz, cada una en su carpeta: `/v1/`
-  (la original), `/v2/`, `/v4/` (Ferrebress) y las maquetas `/v3/` y `/v4-maqueta/`. La
-  raíz de cada carpeta abre la versión 2 y `versiones.html` las lista todas. Todas usan la misma API y la misma sesión.
+  (la original), `/v2/`, `/v4/`, `/v5/` y las maquetas `/v3/` y `/v4-maqueta/`. La raíz de
+  cada carpeta abre la versión 5 y `versiones.html` las lista todas. Todas usan la misma API y la misma sesión.
 - **Sin acceso entrante:** GitHub no entra a la máquina. El job `avisar` publica en el
   canal `NTFY_AVISOS` y el servicio `ferre-despliegue` de la máquina hace el resto.
 - TLS: Caddy emite y renueva solo ([ADR-006](../adr/ADR-006-caddy.md)). Puertos 80 y 443

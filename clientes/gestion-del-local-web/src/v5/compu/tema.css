@@ -1,0 +1,63 @@
+/* Paleta de la v5 sobre la interfaz de computadora de la versión 2: verde oscuro para lo
+   que ordena, naranja como único color de acción y amarillo para destacar. Son los colores
+   ya medidos en la v4 (texto blanco sobre el naranja: 4,5 a 1). */
+@import "@fontsource-variable/manrope/wght.css";
+@import "@fontsource-variable/space-grotesk/wght.css";
+
+:root {
+  --marino: #17312b;
+  --marino-2: #25443d;
+  --marino-3: #33574e;
+  --tinta: #18201e;
+  --azul: #0f6b52;
+  --azul-suave: #e3f3ea;
+  --azul-borde: #8fc7b0;
+  --ambar: #d83f0e;
+  --ambar-fuerte: #b9350a;
+  --ambar-suave: #fff0ea;
+  --ambar-texto: #9c2c08;
+  --ambar-borde: #f3b9a3;
+  --fondo: #f5f6f2;
+  --superficie-2: #f1f4f1;
+  --borde: #dfe5e1;
+  --borde-fuerte: #7c9085;
+  --texto-2: #4a5451;
+  --texto-3: #66706d;
+  --sobre-marino-2: #b8c7c3;
+  --riel: #e4e8e5;
+  --gris-pastilla: #e4e8e5;
+  --destacado: #f7c445;
+  --fuente: "Manrope Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --lateral: 244px;
+}
+.importe, .marca { font-family: "Space Grotesk Variable", "Segoe UI", system-ui, sans-serif; font-stretch: normal; font-variation-settings: normal; }
+.marca { font-weight: 700; }
+.marca svg path:first-child { fill: var(--destacado); }
+
+/* Donde la versión 2 ponía texto oscuro sobre el ámbar, ahora va blanco sobre el naranja. */
+.boton.principal, .lateral nav button[aria-current="page"], .pasos li:last-child::before, .exito .tilde { color: #fff; }
+.vender-total .importe, .exito .importe { color: var(--destacado); }
+.prueba { background: var(--destacado); }
+.lateral nav { padding-top: var(--e3); }
+.lateral nav button { min-height: 44px; font-size: 1rem; }
+.lateral button:focus-visible, .lateral a:focus-visible { box-shadow: 0 0 0 2px var(--marino), 0 0 0 4px var(--destacado); }
+
+/* «Más» y sus pantallas. */
+.mas-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--e4); }
+.mas-tarjeta { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 2px var(--e4); align-items: center; width: 100%; min-height: 96px; padding: var(--e4); text-align: left; border-color: var(--borde-fuerte); }
+.mas-tarjeta:hover { background: var(--superficie-2); border-color: var(--marino); }
+.mas-icono { grid-row: 1 / span 2; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 12px; background: var(--ambar-suave); color: var(--ambar-texto); }
+.mas-tarjeta .nombre { font-weight: 700; font-size: var(--t-medio); }
+.mas-tarjeta .tecla { position: absolute; top: var(--e3); right: var(--e3); }
+.mas-volver { padding: var(--e4) var(--e5) 0; }
+.mas-volver + .pagina { padding-top: var(--e3); }
+
+/* Lo último que se vendió y lo que más se vende, para que la venta nueva no arranque vacía. */
+.sugeridos { display: flex; flex-direction: column; gap: var(--e5); }
+.sugeridos section { display: flex; flex-direction: column; gap: var(--e3); }
+.sugeridos-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--e3); }
+.sugeridos-tarjeta { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--e3); align-items: center; width: 100%; min-height: 72px; padding: var(--e3) var(--e4); text-align: left; border-color: var(--borde-fuerte); }
+.sugeridos-tarjeta:hover { background: var(--azul-suave); border-color: var(--azul); }
+.sugeridos-tarjeta .nombre { font-weight: 650; }
+.sugeridos-tarjeta .detalle { grid-column: 1; }
+.sugeridos-tarjeta .importe, .sugeridos-tarjeta .falta-texto { grid-column: 2; grid-row: 1 / span 2; }
