@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
 import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
@@ -50,6 +51,7 @@ const pasosDeCosto = (p: Producto, costo: number) => (p.explicacion_costo?.lengt
 const soloDigitos = (v: string) => (v === "" ? null : Number(v.replace(/[^\d]/g, "")) || null);
 
 export function Vender() {
+  const puedeEsto = usePuede();
   const { catalogo, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
   const esCelular = useEsCelular();
   const [consulta, setConsulta] = useState("");
@@ -144,7 +146,8 @@ export function Vender() {
   }
   function elegirMargen(item: Item, margen: number) {
     if (!item.producto) return;
-    actualizarProducto(item.producto.id, { margen_elegido: margen }).catch(() => undefined);
+    // Queda guardado en el producto solo si la persona puede fijar márgenes; si no, vale para esta venta.
+    if (puedeEsto("catalogo.margenes")) actualizarProducto(item.producto.id, { margen_elegido: margen }).catch(() => undefined);
     cambiarItem(item.clave, { precioManual: null, producto: { ...item.producto, margen_elegido: margen } });
   }
   async function subirFotoDe(item: Item, archivo: File) {
@@ -262,7 +265,7 @@ export function Vender() {
         <div className="fila envuelve">
           {!esCelular && <VincularParaEscanear vinculado={puestoVinculado} alVincular={alVincular} />}
           {puestoRemoto() && <span data-testid="celular-vinculado-remoto"><Pastilla tipo="ok">Vinculado a la computadora</Pastilla></span>}
-          {hoy && <Boton icono="ventas" onClick={() => irA("ventas")} data-testid="hoy">Hoy <span className="importe chico">{pesosCortos(hoy.total)}</span></Boton>}
+          {hoy && puedeEsto("ventas.ver") && <Boton icono="ventas" onClick={() => irA("ventas")} data-testid="hoy">Hoy <span className="importe chico">{pesosCortos(hoy.total)}</span></Boton>}
         </div>
       }>
       <div className="vender-busqueda">

@@ -1,4 +1,4 @@
-import { useEffect, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo } from "react";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
@@ -19,6 +19,9 @@ import { Usuarios } from "./base/pantallas/Usuarios";
 import { Actividad } from "./base/pantallas/Actividad";
 import { Vender } from "./Vender";
 import { DE_MAS, Mas } from "./Mas";
+import { puede, type Permiso } from "../permisos";
+import { SinPermiso } from "../SinPermiso";
+import { Roles } from "../Roles";
 import { Tickets } from "../Tickets";
 import { Anomalias } from "../Anomalias";
 import "./base/estilos/base.css";
@@ -38,18 +41,21 @@ export function App() {
 
 // El mismo menú que en el celular, en el mismo orden (primero lo que más se hace), y cada
 // parte con sus pestañas adentro. «Más» es una pantalla con lo que se usa poco.
-type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono };
-const MENU: { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] }[] = [
-  { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas" }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados" }] },
-  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender" }] },
-  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", icono: "compras", nombre: "Ingreso" }, { ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "contar", icono: "contar", nombre: "Estanterías" }] },
-  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre, icono: d.icono })) },
+// Cada pantalla dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
+type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono; pide?: Permiso[] };
+type Parte = { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] };
+const MENU: Parte[] = [
+  { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
+  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }] },
+  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos", "deposito.compras"] }, { ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }] },
+  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide })) },
 ];
+// Pantallas que no están en el menú pero tienen dirección.
+const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "ventas", nombre: "Ventas de hoy", icono: "ventas", pide: ["ventas.ver"] }];
+const TODAS = [...MENU.flatMap((m) => m.pestanas), ...FUERA_DEL_MENU];
+const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
 const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-const CON_ATAJO = MENU.flatMap((m) => m.pestanas.map((p) => p.ruta));
-const atajoDe = (ruta: string) => { const i = CON_ATAJO.indexOf(ruta); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
-const NOMBRES = new Map<string, string>([...MENU.flatMap((m) => m.pestanas.map((p) => [p.ruta, p.nombre] as [string, string])), ["mas", "Más"], ["ventas", "Ventas de hoy"]]);
 
 function Pantallas() {
   const { sesion, salir } = useSesion();
@@ -57,8 +63,15 @@ function Pantallas() {
   const codigoVinculacion = ruta.parametros.get("codigo");
   // Sin dirección, la app abre en lo primero del menú.
   const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
-  const actual = sinDireccion ? "productos" : NOMBRES.has(ruta.nombre) ? ruta.nombre : "vender";
   const conSesion = sesion.estado === "con-sesion";
+  // El menú de esta persona: solo las partes y pantallas que sus roles le permiten. Los atajos
+  // se numeran sobre lo que ve.
+  const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
+  const menu = useMemo(() => MENU.map((m) => ({ ...m, pestanas: m.pestanas.filter((p) => puede(usuario, ...(p.pide ?? []))) })).filter((m) => m.pestanas.length > 0), [usuario]);
+  const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)), [menu]);
+  const atajoDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
+  const actual = sinDireccion || !NOMBRES.has(ruta.nombre) ? "productos" : ruta.nombre;
+  const falta = usuario && !puede(usuario, ...(TODAS.find((p) => p.ruta === actual)?.pide ?? [])) ? TODAS.find((p) => p.ruta === actual)!.pide! : null;
 
   useEffect(() => { window.scrollTo(0, 0); }, [actual]);
   useEffect(() => { document.title = conSesion ? `${NOMBRES.get(actual)} · Ferrebress` : "Ferrebress"; }, [actual, conSesion]);
@@ -66,12 +79,12 @@ function Pantallas() {
     if (!conSesion) return;
     const tecla = (e: KeyboardEvent) => {
       if (!e.altKey || e.ctrlKey || e.metaKey || !/^Digit[0-9]$/.test(e.code)) return;
-      const destino = CON_ATAJO[TECLAS.indexOf(e.code.slice(5))];
+      const destino = conAtajo[TECLAS.indexOf(e.code.slice(5))];
       if (destino) { e.preventDefault(); irA(destino); }
     };
     window.addEventListener("keydown", tecla);
     return () => window.removeEventListener("keydown", tecla);
-  }, [conSesion]);
+  }, [conSesion, conAtajo]);
   // Flechas entre el menú y la pantalla: ← lleva el foco al menú, ↑ ↓ lo recorren, y → (o
   // Enter) abre lo elegido y devuelve el foco a la pantalla, donde ↑ ↓ vuelven a elegir sus
   // renglones. Mientras se escribe, ← sigue moviendo el cursor: solo salta al menú con la
@@ -127,7 +140,8 @@ function Pantallas() {
   if (ruta.nombre === "foto" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;
 
   const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === actual))?.clave ?? (actual === "ventas" ? "vender" : "mas");
-  const pestanas = parte === "catalogo" || parte === "deposito" ? MENU.find((m) => m.clave === parte)!.pestanas : null;
+  const pestanas = parte === "catalogo" || parte === "deposito" ? (menu.find((m) => m.clave === parte)?.pestanas ?? null) : null;
+  const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? [])));
   const prueba = esAmbienteDePrueba();
 
   return (
@@ -138,7 +152,7 @@ function Pantallas() {
           <Marca />
         </div>
         <nav aria-label="Menú" onKeyDown={teclasDelMenu}>
-          {MENU.map((m) => {
+          {menu.map((m) => {
             const destino = m.clave === "mas" ? "mas" : m.pestanas[0]!.ruta;
             return (
               <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`}>
@@ -171,7 +185,9 @@ function Pantallas() {
         )}
         {parte === "mas" && actual !== "mas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
         {actual === "ventas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("vender")}>Volver a Vender</Boton></div>}
-        {actual === "mas" ? <Mas atajoDe={atajoDe} />
+        {falta ? <SinPermiso falta={falta} />
+          : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />
+          : actual === "roles" ? <Roles />
           : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <><Resumen /><DineroInvertido /></> : actual === "usuarios" ? <Usuarios />

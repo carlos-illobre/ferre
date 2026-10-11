@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { conPermisos } from "../../pruebas/sesion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
@@ -124,5 +125,35 @@ describe("Depósito · Contar", () => {
     expect(sector.textContent).toContain("nunca contado");
     fireEvent.click(screen.getByTestId("sector-nuevo"));
     expect(screen.getByPlaceholderText(/Sector nuevo/)).toBeTruthy();
+  });
+});
+
+// RF-72: lo que no se puede usar no se muestra.
+describe("Depósito · según los permisos", () => {
+  beforeEach(() => { apiFalsa.mockReset(); });
+
+  it("quien solo ve las compras no tiene el formulario de ingreso ni puede anular", async () => {
+    conPermisos("deposito.compras");
+    armar(null);
+    expect(await screen.findByText(/Proveedor uno/)).toBeTruthy();
+    expect(screen.queryByTestId("busqueda")).toBeNull();
+    expect(screen.queryByRole("tab", { name: "Estanterías" })).toBeNull();
+    fireEvent.click(screen.getByText(/Proveedor uno/));
+    expect(screen.queryByRole("button", { name: "Anular esta compra" })).toBeNull();
+  });
+
+  it("sin permisos de depósito abre en Inventario, que se puede mirar pero no corregir", async () => {
+    conPermisos("ventas.registrar");
+    armar(null);
+    expect(screen.queryByRole("tab", { name: "Ingreso" })).toBeNull();
+    fireEvent.click(await screen.findByTestId("stock"));
+    expect(await screen.findByTestId("detalle-stock")).toBeTruthy();
+    expect(screen.queryByTestId("corregir")).toBeNull();
+  });
+
+  it("entrar por la dirección a Estanterías sin permiso dice qué permiso falta", () => {
+    conPermisos("deposito.ingresos");
+    armar("contar");
+    expect(screen.getByTestId("sin-permiso").textContent).toContain("Contar y corregir stock");
   });
 });

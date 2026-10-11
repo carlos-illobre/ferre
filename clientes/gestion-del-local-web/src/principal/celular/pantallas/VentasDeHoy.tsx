@@ -24,7 +24,7 @@ export function useVentasDeHoy(clave: unknown) {
 const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
 // Cada venta con sus productos (uno por renglón), el medio de pago y "Anular".
-export function ListaDeVentas({ ventas, alAnular }: { ventas: VentaDia[]; alAnular: (v: VentaDia) => void }) {
+export function ListaDeVentas({ ventas, alAnular }: { ventas: VentaDia[]; alAnular: ((v: VentaDia) => void) | null }) {
   if (ventas.length === 0) return <div className="aviso-suave">Todavía no hay ventas hoy.</div>;
   return (
     <div className="lista" data-testid="ventas-de-hoy">
@@ -37,7 +37,7 @@ export function ListaDeVentas({ ventas, alAnular }: { ventas: VentaDia[]; alAnul
             </span>
             <span className="derecha">
               <strong className="importe" style={{ textDecoration: anulada ? "line-through" : undefined }}>{pesos(v.total)}</strong>
-              {anulada ? <small>anulada</small> : <button type="button" className="enlace" onClick={() => alAnular(v)}>Anular</button>}
+              {anulada ? <small>anulada</small> : alAnular && <button type="button" className="enlace" onClick={() => alAnular(v)}>Anular</button>}
             </span>
             <span className="detalle">{hora(v.fecha)} · {NOMBRE_MEDIO[v.medio_pago] ?? v.medio_pago}{v.cliente ? ` · ${v.cliente}` : ""}</span>
           </div>

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { usePuede, type Permiso } from "../permisos";
+import { SinPermiso } from "../SinPermiso";
 import { COMPROBANTES, MOTIVOS_DE_AJUSTE, TEXTOS, type Comprobante } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
@@ -19,18 +21,24 @@ import type { Producto } from "./pantallas/Productos";
 // Primero lo que más se hace: recibir mercadería; después mirar el stock y, cada tanto, contar.
 const SUB = [{ valor: "ingreso", nombre: "Ingreso" }, { valor: "stock", nombre: "Inventario" }, { valor: "contar", nombre: "Estanterías" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
+// Lo que pide cada pestaña (RF-72). El inventario lo ve cualquiera con sesión.
+const PIDE: Partial<Record<Sub, Permiso[]>> = { ingreso: ["deposito.ingresos", "deposito.compras"], contar: ["deposito.stock"] };
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
 
 export function Deposito({ sub }: { sub: string | null }) {
-  const actual: Sub = sub === "stock" || sub === "contar" ? sub : "ingreso";
+  const puedeEsto = usePuede();
+  const permitida = (s: Sub) => puedeEsto(...(PIDE[s] ?? []));
+  // Sin dirección abre en la primera pestaña que la persona puede usar.
+  const actual: Sub = sub === "stock" || sub === "contar" ? sub : sub === "ingreso" || permitida("ingreso") ? "ingreso" : "stock";
+  if (!permitida(actual)) return <SinPermiso falta={PIDE[actual]!} />;
   return (
     <main className="contenido">
       <div className="encabezado">
         <h1 className="titulo">Depósito</h1>
-        <Pestanas opciones={SUB.map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor }))} actual={actual} alElegir={(v) => irA(v === "ingreso" ? "deposito" : `deposito/${v}`)} />
+        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor }))} actual={actual} alElegir={(v) => irA(v === "ingreso" ? "deposito" : `deposito/${v}`)} />
       </div>
-      {actual === "stock" ? <Stock /> : actual === "ingreso" ? <Ingreso /> : <Contar />}
+      {actual === "stock" ? <Stock /> : actual === "ingreso" ? (puedeEsto("deposito.ingresos") ? <Ingreso /> : <ComprasRecientes version={0} soloVer />) : <Contar />}
     </main>
   );
 }
@@ -80,6 +88,7 @@ function Stock() {
 }
 
 function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: { alFoto: (foto_url: string) => void; producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => Promise<void> }) {
+  const corrige = usePuede()("deposito.stock");
   const cantidad = fila ? Number(fila.stock) : 0;
   const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null);
   const [corrigiendo, setCorrigiendo] = useState(false);
@@ -142,7 +151,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: {
                 <button type="button" className="boton" onClick={() => setCorrigiendo(false)}>Cancelar</button>
               </div>
             </>
-          ) : <button type="button" className="boton corregir-stock" onClick={() => { setCorrigiendo(true); setReal(String(cantidad)); setMotivo(""); }} data-testid="corregir">
+          ) : corrige && <button type="button" className="boton corregir-stock" onClick={() => { setCorrigiendo(true); setReal(String(cantidad)); setMotivo(""); }} data-testid="corregir">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4ZM13.500 6.500l4 4" /></svg>Corregir el stock
           </button>}
         </div>
@@ -317,13 +326,14 @@ function Ingreso() {
 
 // Compras recientes: el papel que ya no se tira (los gastos de la semana están en Cómo va el negocio). Cada compra se
 // abre para ver sus renglones y se puede anular.
-function ComprasRecientes({ version }: { version: number }) {
+function ComprasRecientes({ version, soloVer = false }: { version: number; soloVer?: boolean }) {
+  const anula = usePuede()("deposito.ingresos");
   const [filas, setFilas] = useState<CompraFila[]>([]);
   const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
   const [mensaje, setMensaje] = useState<string | null>(null);
   const cargar = () => api<CompraFila[]>("/compras").then(setFilas).catch(() => setFilas([]));
   useEffect(() => { void cargar(); }, [version]);
-  if (filas.length === 0) return null;
+  if (filas.length === 0) return soloVer ? <div className="aviso-suave">Todavía no hay compras registradas.</div> : null;
   const nombreComprobante = (c: CompraFila) => c.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${c.comprobante_tipo}${c.comprobante_numero ? ` ${c.comprobante_numero}` : c.foto ? " con foto" : " sin foto"}`;
   async function anular(c: CompraFila) {
     const motivo = window.prompt(`¿Anular la compra de ${pesos(c.total)} a ${c.proveedor}? Motivo (opcional):`);
@@ -352,7 +362,7 @@ function ComprasRecientes({ version }: { version: number }) {
                   <div className="movimientos">
                     {c.items.map((i, n) => <div key={n}><span>{Number(i.cantidad)} ×</span><span>{i.descripcion}</span><strong className="importe" style={{ fontSize: 16 }}>{pesos(Number(i.cantidad) * Number(i.costo_unitario))}</strong></div>)}
                   </div>
-                  {!anulada && <button type="button" className="boton texto" onClick={() => anular(c)}>Anular esta compra</button>}
+                  {!anulada && anula && <button type="button" className="boton texto" onClick={() => anular(c)}>Anular esta compra</button>}
                 </div>
               )}
             </div>

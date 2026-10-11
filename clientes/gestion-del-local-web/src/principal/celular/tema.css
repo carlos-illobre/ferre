@@ -252,3 +252,6 @@ body, .hoja { background: var(--p-fondo); }
 .motivos-de-ajuste { display: flex; flex-wrap: wrap; gap: 6px; }
 .motivos-de-ajuste .boton.chico { height: 36px; font-size: 13px; padding: 0 10px; border-radius: 10px; }
 .entrar-marca-celular { font-size: 38px; padding-bottom: 14px; }
+
+/* El menú de abajo reparte el ancho entre las partes que la persona puede usar (RF-72). */
+.nav-inferior.solo-celular { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 1fr; }

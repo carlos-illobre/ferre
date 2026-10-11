@@ -58,7 +58,7 @@ El login es con Google ([docs/operacion/google-cloud.md](google-cloud.md)). El p
 crea desde el contenedor; los siguientes usuarios, desde la app:
 
 ```bash
-docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre" dueño
+docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre"
 ```
 
 ## Respaldo y recuperación

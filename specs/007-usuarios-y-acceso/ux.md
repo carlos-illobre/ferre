@@ -16,11 +16,11 @@ reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitu
   repetir (reactivar, volver a dar el rol, volver a vincular, volver a entrar).
 - **Errores en el lugar.** Cada error aparece junto a lo que lo causó, en castellano, y
   dice qué hacer. Nunca un código ni un texto técnico.
-- **Rol, no persona.** Los textos dicen Administrador, Vendedor y Comprador; nunca «dueño»
-  ni «empleado».
-- **Roles.** En esta versión todos los usuarios son Administrador y pueden hacer todo. Cuando
-  haya permisos por rol, lo que un usuario no pueda hacer no se le va a ofrecer: no se
-  muestra deshabilitado ni con candado.
+- **Rol, no persona.** Los textos nombran roles y permisos; nunca «dueño» ni «empleado».
+- **Lo que no se puede usar no se ofrece.** Cada parte del menú, pestaña y botón aparece solo
+  si alguno de los roles de la persona lo permite: no se muestra deshabilitado ni con candado.
+  Los atajos de teclado se numeran sobre lo que se ve. Vale igual en el celular y en la
+  computadora.
 - **Identidad siempre a la vista.** Con sesión abierta, desde cualquier parte de la app se
   ve el nombre del usuario, y se llega a «Salir» en un paso.
 - **Lo que tarda muestra su avance.** Entrar, vincular y cada guardado indican que están en
@@ -42,7 +42,7 @@ reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitu
 | Sesión que dejó de valer | «Hay que iniciar sesión» |
 | Registro de acciones | «Quién hizo qué» |
 | Salir de la sesión | «Salir» |
-| Roles | «Administrador», «Vendedor», «Comprador», siempre con esos nombres |
+| Roles | Con el nombre que les puso el negocio. Los de arranque: «Vendedor», «Comprador», «Recepción», «Administrador» y «Gerente» |
 
 ## Historia 1: entrar
 
@@ -84,35 +84,36 @@ la huella. Nada más: sin sesión no se ve ningún dato del negocio.
 
 ## Historia 2: administrar usuarios
 
-**Quién:** Administrador (en esta versión, todo usuario).
+**Quién:** quien tiene el permiso «Administrar usuarios».
 
-**Qué tiene que poder hacer:** ver quién puede entrar; autorizar un correo; desactivar y
-reactivar.
+**Qué tiene que poder hacer:** ver quién puede entrar; autorizar un correo; darle y quitarle
+roles a cada persona; desactivar y reactivar.
 
 **Qué necesita a la vista:**
 
-- Por cada usuario: nombre, correo y si está activo. Los desactivados se distinguen de los
+- Por cada usuario: nombre, correo, sus roles y si está activo. Los desactivados se distinguen de los
   activos sin leer la letra chica.
 - Cuál de los usuarios es él mismo.
-- Para autorizar, en este orden: nombre y correo de Google. Ningún otro dato.
+- Para autorizar, en este orden: nombre, correo de Google y los roles, una casilla por rol.
+  Se pueden tildar varias. Ningún otro dato.
 
 **Reglas:**
 
-- En esta versión no se elige rol: toda persona autorizada entra como Administrador y puede
-  hacer todo. Elegir, agregar y quitar roles llega cuando se definan los permisos de cada
-  rol; el diseño no tiene que reservarle lugar.
-- Lo que la regla impide se explica en el lugar: desactivarse a uno mismo («lo tiene que
-  hacer otro Administrador») y dejar el sistema sin ningún Administrador activo.
+- Los roles de una persona se cambian en su fila: se ven los que tiene y, al pedir
+  cambiarlos, una casilla por cada rol que existe. Guardar reemplaza la lista.
+- Un usuario activo tiene al menos un rol. Guardar sin ninguno no se puede, y el aviso dice
+  qué hacer: para que no pueda nada, se lo desactiva.
+- Lo que la regla impide se explica en el lugar: desactivarse a uno mismo, quitarse a uno
+  mismo los permisos de administrar, y dejar el sistema sin nadie activo que pueda
+  administrar usuarios y roles.
 - Desactivar avisa, después de hacerlo, que a ese usuario se le cerraron las sesiones.
 - Un correo repetido se avisa en el campo del correo, y lo escrito no se pierde.
-- Si se conserva alguna protección entre Administradores (pregunta P4 de la spec), lo que
-  no se puede tocar se explica en la fila.
 
 **Estados:**
 
 | Estado | Qué se ve |
 |---|---|
-| Vacío | No existe: siempre figura al menos el propio Administrador. La invitación a autorizar a alguien está siempre a la vista |
+| Vacío | No existe: siempre figura al menos quien administra. La invitación a autorizar a alguien está siempre a la vista |
 | Cargando | Que la lista se está trayendo |
 | Éxito al autorizar | El usuario nuevo en la lista, y el alta lista para cargar otro |
 | Éxito al desactivar o reactivar | La fila con el valor nuevo |
@@ -121,14 +122,58 @@ reactivar.
 | Error del servidor | Que no se pudo guardar, con la fila como estaba y reintento |
 | Sin conexión | Que administrar usuarios necesita internet |
 
-## Historia 3: todos pueden todo
+## Historia 3: cada uno ve lo que puede
 
 **Quién:** cualquier usuario.
 
-**Regla:** en esta versión todos los usuarios son Administrador y a todos se les ofrecen
-todas las operaciones. La interfaz no oculta, no deshabilita ni restringe nada por rol, y
-no hace falta mostrar el rol junto al nombre. Qué ve cada rol se escribe acá cuando se
-definan los permisos (etapa posterior).
+**Qué necesita a la vista:** solo lo que sus roles le permiten usar.
+
+**Reglas:**
+
+- El menú muestra las partes en las que la persona puede hacer algo. Dentro de cada parte,
+  las pestañas y los botones siguen la misma regla: quien no puede fijar márgenes ve el
+  margen pero no los botones para cambiarlo; quien solo ve las compras ve la lista sin el
+  formulario de ingreso; quien no corrige stock ve el inventario sin «Corregir».
+- Lo que puede cualquiera con sesión está siempre: buscar en el catálogo, ver el inventario,
+  sacarle la foto a un producto, sus propios celulares, Mejoras y errores y Salir.
+- Quien llega por una dirección a una pantalla que no le corresponde ve «No tenés permiso
+  para esta pantalla» y **el nombre del permiso que hace falta**, para saber qué pedir.
+- La aplicación abre en la primera pantalla que la persona puede usar.
+- En Vender, el margen que se elige en un renglón queda guardado en el producto solo si la
+  persona puede fijar márgenes; si no, vale para esa venta, sin aviso.
+- Si el servidor rechaza una acción por permiso (porque cambiaron los roles mientras la
+  pantalla estaba abierta), el aviso dice qué permiso hace falta.
+
+## Historia 3b: armar los roles
+
+**Quién:** quien tiene el permiso «Administrar roles». Se llega desde Más → Roles.
+
+**Qué tiene que poder hacer:** ver los roles; crear uno; cambiarle el nombre y los permisos;
+borrar el que nadie tiene.
+
+**Qué necesita a la vista:**
+
+- Por cada rol: su nombre, los permisos que tiene (por nombre) y cuántas personas lo tienen.
+- Al crear o cambiar: el nombre y **todos los permisos del sistema como casillas, agrupados
+  por parte de la aplicación** (Vender, Catálogo, Depósito, Negocio, Administración), cada
+  uno con una línea que explica qué deja hacer.
+
+**Reglas:**
+
+- Un rol necesita nombre y al menos un permiso; lo que falta se avisa en el formulario.
+- «Borrar» aparece solo en el rol que nadie tiene; en los demás, una línea dice que primero
+  hay que sacárselo a quien lo tiene.
+- Después de guardar, un aviso dice que el cambio ya vale para quienes tienen el rol.
+- Lo que la regla impide (nombre repetido, dejar el sistema sin quien administre, quitarse
+  a uno mismo los permisos de administrar) se explica en el formulario, con lo cargado intacto.
+- La pantalla es la misma en el celular y en la computadora.
+
+| Estado | Qué se ve |
+|---|---|
+| Cargando | Que los roles se están trayendo |
+| Éxito al guardar o borrar | La lista con el cambio y un aviso que nombra el rol |
+| Error de datos o de regla | En el formulario, con el motivo |
+| Sin conexión | Que armar roles necesita internet |
 
 ## Historia 4: la huella
 
@@ -179,7 +224,7 @@ junto con cerrar sus sesiones.
 
 ## Historia 5: sesiones
 
-**Quién:** Administrador para ver y cerrar las de todos; cualquier usuario para salir de la
+**Quién:** quien tiene «Administrar sesiones» para ver y cerrar las de todos; cualquier usuario para salir de la
 suya.
 
 **Qué necesita a la vista el Administrador:**
@@ -212,7 +257,7 @@ suya.
 
 ## Historia 6: quién hizo qué
 
-**Quién:** Administrador.
+**Quién:** quien tiene el permiso «Ver quién hizo qué».
 
 **Qué tiene que poder hacer:** recorrer el registro de a 10; filtrarlo por usuario, por
 fecha o rango de fechas y por tipo de acción, solos o combinados; quitar los filtros.

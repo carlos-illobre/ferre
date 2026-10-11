@@ -1,8 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, borrarToken, guardarToken, leerToken } from "./api";
 
-export type Usuario = { id: string; email: string; nombre: string; rol: "dueño" | "admin" | "mostrador" };
-export const administra = (u: Usuario | null | undefined) => u?.rol === "dueño" || u?.rol === "admin";
+// `roles` son los nombres de sus roles y `permisos` lo que esos roles le dejan hacer (RF-72).
+// `rol` es el dato viejo de un solo rol: ya no viene del servidor; lo leen las versiones históricas.
+export type Usuario = { id: string; email: string; nombre: string; roles?: string[]; permisos?: string[]; rol?: "dueño" | "admin" | "mostrador" };
+export const administra = (u: Usuario | null | undefined) => u?.rol === "dueño" || u?.rol === "admin" || Boolean(u?.permisos?.includes("admin.usuarios"));
 type Estado = { estado: "cargando" } | { estado: "sin-sesion" } | { estado: "con-sesion"; usuario: Usuario; sinConexion: boolean; sesionId: string | null };
 
 const Contexto = createContext<{ sesion: Estado; entrar: (token: string, usuario: Usuario) => void; salir: () => Promise<void> } | null>(null);

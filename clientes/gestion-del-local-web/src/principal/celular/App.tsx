@@ -3,7 +3,10 @@ import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "./componentes/OfrecerHuella";
 import { Icono } from "./componentes/base";
-import { ProveedorDeSesion, administra, useSesion } from "../../sesion";
+import { ProveedorDeSesion, useSesion } from "../../sesion";
+import { puede, type Permiso } from "../permisos";
+import { SinPermiso } from "../SinPermiso";
+import { Roles } from "../Roles";
 import { irA, useRuta } from "../../rutas";
 import { Entrar } from "./Entrar";
 import { VincularCelular } from "./pantallas/VincularCelular";
@@ -29,17 +32,19 @@ export function App() {
 }
 
 // El mismo menú que en la computadora, en el mismo orden: primero lo que más se hace.
-const PESTANAS = [
+// Cada parte dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
+const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: string; pide?: Permiso[] }[] = [
   { ruta: "catalogo", nombre: "Catálogo" },
-  { ruta: "vender", nombre: "Vender" },
+  { ruta: "vender", nombre: "Vender", pide: ["ventas.registrar"] },
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
-] as const;
-const DE_MAS: { parte: Parte | "tickets" | "anomalias"; nombre: string; detalle: string; icono: NombreDeIcono }[] = [
-  { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen" },
+];
+const DE_MAS: { parte: Parte | "tickets" | "anomalias" | "roles"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
+  { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen", pide: ["negocio.numeros"] },
   { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
-  { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad" },
-  { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta" },
+  { parte: "roles", nombre: "Roles", detalle: "Qué puede hacer cada rol", icono: "usuarios", pide: ["admin.roles"] },
+  { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad", pide: ["negocio.actividad"] },
+  { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: ["negocio.anomalias"] },
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
 ];
 const IconoMas = ({ grosor }: { grosor: number }) => (
@@ -60,24 +65,33 @@ function Pantallas() {
   if (ruta.nombre === "foto" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;
 
   const usuario = sesion.usuario;
+  const permitido = (pide?: Permiso[]) => puede(usuario, ...(pide ?? []));
+  const pestanas = PESTANAS.filter((p) => permitido(p.pide));
+  const deMas = DE_MAS.filter((d) => permitido(d.pide));
   // Sin dirección, la app abre en lo primero del menú. Las direcciones viejas de Negocio siguen andando.
   const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
   const nombre = sinDireccion ? "catalogo" : ruta.nombre === "negocio" ? "mas" : ruta.nombre;
-  const parte = DE_MAS.find((d) => d.parte === (ruta.nombre === "negocio" ? "negocio" : ruta.sub))?.parte ?? null;
-  const pestana = PESTANAS.some((p) => p.ruta === nombre) ? nombre : "vender";
+  const elegida = DE_MAS.find((d) => d.parte === (ruta.nombre === "negocio" ? "negocio" : ruta.sub)) ?? null;
+  const parte = elegida?.parte ?? null;
+  const pestana = PESTANAS.find((p) => p.ruta === nombre)?.ruta ?? "catalogo";
+  // Lo que pide la pantalla a la que se llegó; si no se tiene, se dice en vez de mostrarla.
+  const falta = !permitido(PESTANAS.find((p) => p.ruta === pestana)?.pide) ? PESTANAS.find((p) => p.ruta === pestana)!.pide!
+    : pestana === "mas" && elegida && !permitido(elegida.pide) ? elegida.pide! : null;
 
   return (
     <div className="app">
 
-      {pestana === "mas" && parte === "tickets" ? <Tickets />
+      {falta ? <SinPermiso falta={falta} />
+        : pestana === "mas" && parte === "tickets" ? <Tickets />
+        : pestana === "mas" && parte === "roles" ? <Roles />
         : pestana === "mas" && parte === "anomalias" ? <Anomalias />
-        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" ? <Negocio parte={parte} />
+        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "roles" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
           <div className="lista">
-            {DE_MAS.map((d) => (
-              <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte}`)}>
+            {deMas.map((d) => (
+              <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte}`)} data-testid={`mas-${d.parte}`}>
                 <span className="miniatura mas-icono"><IconoDeMas nombre={d.icono} tam={22} /></span>
                 <span className="nombre">{d.nombre}</span>
                 <Icono nombre="derecha" tam={18} grosor={2.4} />
@@ -95,11 +109,11 @@ function Pantallas() {
         </main>
       ) : pestana === "catalogo" ? <Catalogo sub={sinDireccion ? null : ruta.sub} />
         : pestana === "deposito" ? <Deposito sub={ruta.sub} />
-        : <Vender esDueno={administra(usuario)} />}
+        : <Vender esDueno={puede(usuario, "ventas.ver")} />}
 
       <nav className="nav-inferior solo-celular" aria-label="Menú">
-        {PESTANAS.map((p) => (
-          <button key={p.ruta} type="button" className={pestana === p.ruta ? "activo" : ""} onClick={() => irA(p.ruta)} aria-current={pestana === p.ruta ? "page" : undefined}>
+        {pestanas.map((p) => (
+          <button key={p.ruta} type="button" data-testid={`menu-${p.ruta}`} className={pestana === p.ruta ? "activo" : ""} onClick={() => irA(p.ruta)} aria-current={pestana === p.ruta ? "page" : undefined}>
             {p.ruta === "mas" ? <IconoMas grosor={pestana === "mas" ? 2.2 : 1.8} /> : <Icono nombre={p.ruta} tam={26} grosor={pestana === p.ruta ? 2.2 : 1.8} />}
             <span>{p.nombre}</span>
           </button>

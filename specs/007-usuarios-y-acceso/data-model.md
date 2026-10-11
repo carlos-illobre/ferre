@@ -1,6 +1,6 @@
 # Modelo de datos: Usuarios y acceso
 
-> El contrato de roles cambia con RF-72: `usuario.rol`, con un solo valor entre `dueño`, `admin` y `mostrador`, pasa a uno o más roles entre Administrador, Vendedor y Comprador.
+> Vigente desde el 2026-10-11 (RF-72 y RF-75, decisión 50): un usuario tiene uno o más roles, y cada rol es un grupo de permisos.
 
 Contrato de datos del servicio `gestion-del-local` para esta capacidad. Valen las reglas
 generales del modelo: nada se borra físicamente y `evento` solo recibe filas nuevas.
@@ -23,13 +23,32 @@ Quién puede entrar.
 | `id` | uuid, clave primaria | Lo genera la API |
 | `email` | text, único, obligatorio | El correo de Google; se guarda y se compara en minúsculas |
 | `nombre` | text, obligatorio | |
-| `rol` | text, obligatorio | `dueño`, `admin` o `mostrador` (restricción `usuario_rol_check`). Uno solo por usuario |
+| `rol` | text, opcional | Dato viejo, de cuando había un solo rol fijo por usuario. Ya no se usa ni se exige; los roles están en `usuario_rol` |
 | `activo` | boolean, por omisión `true` | Desactivar es la baja; no se borra |
 | `creado_en`, `modificado_en` | timestamptz | `modificado_en` lo mantiene el trigger `usuario_modificado` |
 
-Reglas que aplica la API: nadie se desactiva ni se cambia el rol a sí mismo; el admin no
-crea dueños, no modifica a un dueño ni da ese rol; desactivar a un usuario revoca sus
-sesiones abiertas. El primer dueño se crea con el comando `crear-usuario` del servicio.
+Reglas que aplica la API: un usuario activo tiene al menos un rol; nadie se desactiva ni se
+quita a sí mismo los permisos de administrar; siempre queda al menos un usuario activo que
+puede administrar usuarios y roles; desactivar a un usuario revoca sus sesiones abiertas. El
+primer usuario se crea con el comando `crear-usuario` del servicio, que le da todos los roles.
+
+## rol, rol_permiso y usuario_rol
+
+Los roles que arma el negocio (RF-75) y a quién se le asignan (RF-72).
+
+| Tabla | Columna | Tipo | Detalle |
+|---|---|---|---|
+| `rol` | `id` | uuid, clave primaria | Los cinco roles de arranque tienen id fijo |
+| `rol` | `nombre` | text, obligatorio | Único sin distinguir mayúsculas (índice `rol_nombre_unico`) |
+| `rol` | `descripcion` | text, opcional | |
+| `rol` | `creado_en` | timestamptz | |
+| `rol_permiso` | `rol_id` | uuid → `rol`, se borra con el rol | |
+| `rol_permiso` | `permiso` | text | La clave del permiso. La lista válida es del sistema, no de la base: sumar un permiso no pide migración |
+| `usuario_rol` | `usuario_id` | uuid → `usuario`, se borra con el usuario | |
+| `usuario_rol` | `rol_id` | uuid → `rol` | Sin borrado en cascada: un rol asignado no se puede borrar |
+
+La migración siembra Vendedor, Comprador, Recepción, Administrador y Gerente con los permisos
+de la tabla de [spec.md](spec.md), y les da los cinco a los usuarios que ya existían.
 
 Otras tablas guardan quién hizo algo apuntando a `usuario`: `lista_importada.cargada_por`
 y `aplicada_por`, `conteo.abierto_por` y `cerrado_por`, `renglon_conteo.contado_por`,
@@ -97,8 +116,9 @@ Tipos que escribe esta capacidad:
 
 | Tipo | Cuándo | Contenido |
 |---|---|---|
-| `usuario.creado` | Alta desde la app o por comando | `id`, `email`, `rol` (y `medio: "comando"`) |
-| `usuario.modificado` | Cambio de rol, nombre o activo | `id`, `cambios` |
+| `usuario.creado` | Alta desde la app o por comando | `id`, `email`, `roles` (y `medio: "comando"`) |
+| `usuario.modificado` | Cambio de roles, nombre o activo | `id`, `cambios` |
+| `rol.creado`, `rol.modificado`, `rol.borrado` | Un rol se crea, cambia de nombre o de permisos, o se borra | `id`, `nombre`, `permisos` o `cambios` |
 | `sesion.iniciada` | Entrada con Google o con la huella | `sesionId`, `dispositivo`, `medio` (`google` o `huella`), `credencial` si fue con huella |
 | `sesion.cerrada` | «Salir» o cerrar la propia | `sesionId` |
 | `sesion.revocada` | Un Administrador cierra una sesión | `sesionId` |

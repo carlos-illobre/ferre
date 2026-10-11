@@ -143,8 +143,8 @@ la había.
 Una vez por ambiente:
 
 ```bash
-cd ~/ferre/produccion && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre" dueño
-cd ~/ferre/pruebas && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre" dueño
+cd ~/ferre/produccion && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"
+cd ~/ferre/pruebas && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"
 ```
 
 Después se entra con Google y se da de alta al empleado desde la app (roles: `dueño`, `admin`, `mostrador`):

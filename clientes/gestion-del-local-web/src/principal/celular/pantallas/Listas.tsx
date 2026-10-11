@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from "react";
+import { usePuede } from "../../permisos";
 import { api, ErrorApi } from "../../../api";
 import { Explicacion } from "../componentes/Explicacion";
 import { AvisoError, Hoja, Icono, Toast } from "../componentes/base";
 import { fecha, pesos, porcentaje } from "../../../formato";
-import { administra, useSesion } from "../../../sesion";
 
 type Proveedor = { id: string; nombre: string; precios_incluyen_iva: boolean; descuento_general: string; descuento_contado: string; lector: string | null; activo: boolean };
 type ListaFila = { id: string; archivo_nombre: string; fecha_lista: string; estado: string; resumen: Resumen; avisos: string[]; importada_en: string | null; creado_en: string; proveedor_id: string; proveedor: string };
@@ -14,8 +14,7 @@ type Fila = { codigo_proveedor: string; descripcion: string; marca: string | nul
 // Cargar una lista de precios (issue #12): elegir el archivo → revisar el resumen y la
 // vista previa en una hoja → aplicar o descartar. Nada se guarda hasta "Aplicar".
 export function Listas() {
-  const { sesion } = useSesion();
-  const esDueno = sesion.estado === "con-sesion" && administra(sesion.usuario);
+  const esDueno = usePuede()("catalogo.listas");
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [historial, setHistorial] = useState<ListaFila[]>([]);
   const [cargada, setCargada] = useState<Cargada | null>(null);

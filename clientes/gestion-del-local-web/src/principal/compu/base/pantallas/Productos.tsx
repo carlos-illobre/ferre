@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePuede } from "../../../permisos";
 import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { useCatalogo } from "../../../../catalogo";
 import { useDebounce } from "../../../../debounce";
@@ -28,6 +29,7 @@ function calcular(p: Producto) {
 const codigosDe = (p: Producto) => [p.marca, p.codigo_proveedor, p.codigo_barras].filter(Boolean).join(" · ");
 
 export function Productos() {
+  const fijaMargen = usePuede()("catalogo.margenes");
   const { catalogo, stock, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const esCelular = useEsCelular();
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export function Productos() {
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter" && resultados[elegido] && (e.target as HTMLElement).tagName !== "BUTTON") { e.preventDefault(); setAbiertoId(resultados[elegido]!.id); }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
-    else if (e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
+    else if (fijaMargen && e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
       // Se mira e.code porque con Mayúsculas la tecla «3» reporta «#».
       e.preventDefault();
       const p = resultados[elegido];
@@ -90,7 +92,7 @@ export function Productos() {
       {!esCelular && (
         <p className="vender-teclas detalle">
           <span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen</span>
-          <span><kbd className="tecla">Mayús</kbd> + <kbd className="tecla">1</kbd> a <kbd className="tecla">5</kbd> fijan el margen del elegido (300, 200, 100, 50, 25 %)</span>
+          {fijaMargen && <span><kbd className="tecla">Mayús</kbd> + <kbd className="tecla">1</kbd> a <kbd className="tecla">5</kbd> fijan el margen del elegido (300, 200, 100, 50, 25 %)</span>}
           <span><kbd className="tecla">Enter</kbd> abre la ficha</span><span><kbd className="tecla">Esc</kbd> borra la búsqueda</span>
         </p>
       )}
@@ -167,6 +169,7 @@ function BajarLista({ producto: p, alError }: { producto: Producto; alError: (m:
 }
 
 function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alError }: { producto: Producto; stock: number | undefined; elegido: boolean; alElegir: () => void; alCambiar: (c: Cambios) => void; alError: (m: string) => void }) {
+  const fijaMargen = usePuede()("catalogo.margenes");
   const { costo, precio, manual, pasosCosto } = calcular(p);
   const varios = (p.proveedores?.length ?? 0) > 1;
   return (
@@ -199,10 +202,10 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
       <td className="num">{stock === undefined ? <span className="detalle">sin contar</span> : <span className={stock <= 0 ? "sube" : ""}>{numero(stock)}</span>}</td>
       <td className="num">{costo === null ? <span className="detalle">sin costo</span> : <Explicado valor={pesos(costo)} pasos={pasosCosto} etiqueta={`Costo ${pesos(costo)}`} />}</td>
       <td>
-        <div className="productos-margen">
+        {!fijaMargen ? <span className="detalle" data-testid="margen-fijo">{p.margen_elegido === null ? "sin margen" : `${p.margen_elegido} %`}</span> : <div className="productos-margen">
           <Margenes compacto elegido={p.margen_elegido} disabled={costo === null} atajos={elegido} etiqueta={`Margen de ${p.descripcion}`} alElegir={(m) => { alElegir(); alCambiar({ margen_elegido: m }); }} />
           <OtroMargen producto={p} manual={manual} alCambiar={alCambiar} />
-        </div>
+        </div>}
       </td>
       <td className="num">
         {precio ? <Explicado className="importe" valor={pesosCortos(precio.valor)} pasos={precio.pasos} etiqueta={`Precio de venta ${pesosCortos(precio.valor)}`} />
@@ -215,6 +218,7 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
 // Ficha del producto: precio con su explicación, margen, proveedores con el más barato,
 // foto y la lista de la que salió el costo.
 function FichaProducto({ producto: p, stock, alCerrar, alCambiar }: { producto: Producto; stock: number | undefined; alCerrar: () => void; alCambiar: (c: Cambios) => void }) {
+  const fijaMargen = usePuede()("catalogo.margenes");
   const { costo, precio, manual, pasosCosto } = calcular(p);
   const [error, setError] = useState<string | null>(null);
   const masBarato = p.proveedores?.[0]?.proveedor_id;
@@ -235,11 +239,11 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar }: { producto: 
           {precio ? <Explicado className="importe productos-precio" valor={pesosCortos(precio.valor)} pasos={precio.pasos} etiqueta={`Precio de venta ${pesosCortos(precio.valor)}`} />
             : <span className="falta-texto" data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
         </div>
-        <Margenes elegido={p.margen_elegido} disabled={costo === null} etiqueta="Margen" alElegir={(m) => alCambiar({ margen_elegido: m })} />
+        {fijaMargen && <><Margenes elegido={p.margen_elegido} disabled={costo === null} etiqueta="Margen" alElegir={(m) => alCambiar({ margen_elegido: m })} />
         <div className="fila">
           <label className="crece detalle" htmlFor="ficha-otro-margen">Otro margen{manual !== null ? `: hoy ${manual} % a mano` : ""}</label>
           <OtroMargen producto={p} manual={manual} alCambiar={alCambiar} id="ficha-otro-margen" />
-        </div>
+        </div></>}
         {costo !== null && <div className="fila"><span className="rotulo crece">Costo</span><Explicado valor={pesos(costo)} pasos={pasosCosto} etiqueta={`Costo ${pesos(costo)}`} /></div>}
       </section>
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { usePuede } from "../../../permisos";
 import { subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { api } from "../../../../api";
 import { fecha as fechaLarga } from "../../../../formato";
@@ -26,6 +27,7 @@ export function useVentasDelDia(dia: string | null, clave?: unknown) {
 }
 
 export function VentasDeHoy() {
+  const anula = usePuede()("ventas.anular");
   const [dia, setDia] = useState(hoyLocal);
   const esHoy = dia === hoyLocal();
   const { datos, error, cargar } = useVentasDelDia(esHoy ? null : dia);
@@ -81,7 +83,7 @@ export function VentasDeHoy() {
                 <ul className="ventas-renglones">
                   {v.items.map((i, n) => <li key={n} className="tachable"><span>{numero(Number(i.cantidad))} × {i.descripcion}</span><span className="detalle">{pesosCortos(i.precio_unitario)} c/u</span></li>)}
                 </ul>
-                {!anulada && <Boton tam="chico" variante="peligro" onClick={() => setPorAnular(v)}>Anular</Boton>}
+                {!anulada && anula && <Boton tam="chico" variante="peligro" onClick={() => setPorAnular(v)}>Anular</Boton>}
               </li>
             );
           })}
@@ -111,7 +113,7 @@ export function VentasDeHoy() {
                     <td className="num">{varios ? "" : pesosCortos(uno?.precio_unitario)}</td>
                     <td>{NOMBRE_MEDIO[v.medio_pago] ?? v.medio_pago}{v.cliente ? ` · ${v.cliente}` : ""}</td>
                     <td className="num"><span className="importe chico tachable">{pesosCortos(v.total)}</span></td>
-                    <td className="angosta">{anulada ? <Pastilla tipo="mal">anulada</Pastilla> : <Boton tam="chico" variante="peligro" onClick={() => setPorAnular(v)}>Anular</Boton>}</td>
+                    <td className="angosta">{anulada ? <Pastilla tipo="mal">anulada</Pastilla> : anula && <Boton tam="chico" variante="peligro" onClick={() => setPorAnular(v)}>Anular</Boton>}</td>
                   </tr>
                   {varios && !plegada && v.items.map((i, n) => (
                     <tr key={n} className={`hija ${anulada ? "atenuada" : ""}`}>

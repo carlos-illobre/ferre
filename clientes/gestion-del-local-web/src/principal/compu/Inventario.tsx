@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { usePuede } from "../permisos";
 import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { api, ErrorApi } from "../../api";
@@ -39,6 +40,7 @@ function armar(filas: StockFila[]): Datos {
 }
 
 export function Inventario() {
+  const corrige = usePuede()("deposito.stock");
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
@@ -212,7 +214,7 @@ export function Inventario() {
                           {porEnviar.has(p.id) && <div><Pastilla tipo="alerta">Se manda al volver internet</Pastilla></div>}
                         </td>
                         <td>{fila?.ultimo_movimiento ? fecha(fila.ultimo_movimiento) : <span className="detalle">sin movimientos</span>}</td>
-                        <td className="angosta"><Boton tam="chico" icono="editar" onClick={() => setAbierto({ id: p.id, corregir: true })} aria-label={`Corregir el stock de ${p.descripcion}`}>Corregir</Boton></td>
+                        <td className="angosta">{corrige && <Boton tam="chico" icono="editar" onClick={() => setAbierto({ id: p.id, corregir: true })} aria-label={`Corregir el stock de ${p.descripcion}`}>Corregir</Boton>}</td>
                       </tr>
                     );
                   })}
@@ -239,9 +241,10 @@ const nombreTipo = (m: Movimiento) => (m.tipo === "venta" ? "Venta" : m.tipo ===
 function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnviar, alCerrar, alCorregir }: {
   producto: Producto; fila: StockFila | null; cantidad: number; corregirDeEntrada: boolean; porEnviar: boolean; alCerrar: () => void; alCorregir: (habia: number, hay: number, encolado: boolean) => void;
 }) {
+  const corrige = usePuede()("deposito.stock");
   const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null);
   const [errorMovimientos, setErrorMovimientos] = useState<string | null>(null);
-  const [corrigiendo, setCorrigiendo] = useState(corregirDeEntrada);
+  const [corrigiendo, setCorrigiendo] = useState(corregirDeEntrada && corrige);
   const [real, setReal] = useState(String(cantidad).replace(".", ","));
   const [motivo, setMotivo] = useState("");
   const [falta, setFalta] = useState<{ real?: string; motivo?: string }>({});
@@ -321,7 +324,7 @@ function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnv
             <Boton type="submit" variante="principal" disabled={guardando} data-testid="guardar-ajuste">{guardando ? "Guardando…" : "Guardar la corrección"}</Boton>
           </div>
         </form>
-      ) : (
+      ) : corrige && (
         <div><Boton icono="editar" onClick={() => setCorrigiendo(true)} data-testid="corregir">Corregir el stock</Boton></div>
       )}
 

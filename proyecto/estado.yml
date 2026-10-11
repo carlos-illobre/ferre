@@ -443,7 +443,6 @@ RF-53:
     - tests/e2e/celular/06-stock.spec.ts
     - clientes/gestion-del-local-web/src/principal/celular/Deposito.test.tsx
   defectos:
-    - "El servidor sigue entregando el valor del stock a quien pide el inventario: se oculta en la pantalla, y se cierra en el servidor cuando exista el rol Comprador (RF-72)"
     - "En Inventario tampoco se muestra el costo de cada producto; no está dicho si el Comprador debe verlo ahí"
     - "El cambio a Inventario sin dinero está hecho en la versión 5; las versiones 1, 2 y 4 siguen como antes"
     - "El motivo al corregir el stock a mano es opcional y la regla lo pide"
@@ -562,15 +561,12 @@ RF-70:
     - tests/e2e/escritorio/01-login.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
-    - tests/e2e/celular/13-admin.spec.ts
-    - tests/e2e/escritorio/13-admin.spec.ts
     - tests/integration/autenticacion.sh
     - microservices/gestion-del-local/src/rutas/sesiones.test.ts
     - microservices/gestion-del-local/src/rutas/usuarios.test.ts
     - microservices/gestion-del-local/src/rutas/credenciales.test.ts
   defectos:
     - "Entrar bien con Google y el aviso de correo no autorizado no tienen prueba automática (el botón de Google no se puede automatizar)"
-    - "El aviso de correo no autorizado dice «Pedile al dueño que te dé de alta»; la regla es nombrar el rol, Administrador"
     - "Reactivar un usuario desactivado no tiene prueba"
     - "El límite de intentos de entrada (10 por minuto con Google, 20 con la huella) no tiene prueba"
     - "Que el dispositivo vuelva solo a la entrada cuando el servidor rechaza la sesión no tiene prueba"
@@ -600,27 +596,40 @@ RF-71:
     - "Los filtros de la API no tienen prueba"
 
 RF-72:
-  estado: "Pendiente: en construcción (decisión 50)"
-  pruebas: []
+  estado: "Hecho (#59): permisos fijos, varios roles por usuario, y la aplicación muestra solo lo que cada uno puede usar"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/roles.test.ts
+    - microservices/gestion-del-local/src/rutas/usuarios.test.ts
+    - clientes/gestion-del-local-web/src/principal/celular/Negocio.test.tsx
+    - clientes/gestion-del-local-web/src/principal/celular/Catalogo.test.tsx
+    - clientes/gestion-del-local-web/src/principal/celular/Deposito.test.tsx
+    - clientes/gestion-del-local-web/src/principal/celular/Vender.test.tsx
+    - tests/e2e/celular/13-roles.spec.ts
+    - tests/e2e/escritorio/13-roles.spec.ts
   defectos:
-    - "En construcción: el servidor todavía usa los tres roles viejos"
+    - "Lo que se muestra según los permisos tiene pruebas unitarias en las pantallas del celular; en la computadora lo cubre solo la prueba de punta a punta"
+    - "Un cambio hecho sin conexión que el servidor rechaza por permiso se descarta sin avisarle a la persona"
+    - "Vender muestra el costo de cada producto a cualquiera que venda: falta decidir si hace falta un permiso «Ver costos»"
+    - "El último que administra no se puede quitar: tiene prueba en el servidor, no de punta a punta"
 
 RF-75:
-  estado: "Pendiente: en construcción (decisión 50)"
-  pruebas: []
+  estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/roles.test.ts
+    - clientes/gestion-del-local-web/src/principal/Roles.test.tsx
+    - tests/e2e/celular/13-roles.spec.ts
+    - tests/e2e/escritorio/13-roles.spec.ts
   defectos:
-    - "En construcción: los roles todavía no se arman desde la aplicación"
+    - "La descripción de un rol existe en los datos pero la pantalla no la deja cargar"
 
 RF-73:
   estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
   pruebas:
     - microservices/gestion-del-local/src/rutas/usuarios.test.ts
-    - tests/e2e/celular/13-admin.spec.ts
-    - tests/e2e/escritorio/13-admin.spec.ts
     - clientes/gestion-del-local-web/src/principal/celular/Negocio.test.tsx
     - tests/integration/autenticacion.sh
   defectos:
-    - "RF-72 reemplaza estos roles (ADR-011, enmienda del 2026-10-09) y el código sigue rigiéndose por dueño, admin y mostrador"
+    - "Reemplazado: los roles dueño, admin y mostrador ya no existen (RF-72, decisión 50)"
 
 RF-74:
   estado: "Hecho en parte (#41): se aparta de la regla en 3 puntos"
@@ -653,7 +662,7 @@ RF-81:
     - clientes/gestion-del-local-web/src/principal/Tickets.test.tsx
     - microservices/gestion-del-local/src/rutas/tickets.test.ts
   defectos:
-    - "Cualquier usuario puede marcar resuelto o reabrir: hoy todos son Administrador (RF-72)"
+    - "Cualquier usuario puede marcar resuelto o reabrir: no hay un permiso para eso"
 
 RNF-01:
   estado: "A validar en el piloto (#21)"
@@ -922,7 +931,7 @@ general:
   estado: ""
   pruebas: []
   defectos:
-    - "usuario.rol admite dueño, admin y mostrador, con permisos distintos; la regla de esta versión es un solo rol, Administrador, que puede todo (decisión 18 del 2026-10-10, RF-72)"
+    - "La columna usuario.rol quedó en la base sin uso desde que los roles se arman con permisos (RF-72, decisión 50)"
     - "La tabla vinculacion quedó en la base sin uso desde que se quitó la entrada por QR (ADR-011, enmienda del 2026-10-09)"
     - "producto.unidad es texto libre en la base: los valores unidad, kg, m y l los valida solo la API"
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"

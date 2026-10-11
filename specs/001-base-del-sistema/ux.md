@@ -279,6 +279,14 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **La primera vez en un dispositivo** el catálogo no se espera entero: se ve una primera
   tanda y el resto baja atrás.
 
+**Lo que se ve depende de los permisos (decisión 50, RF-72).** El menú, las pestañas, los
+botones y los atajos de teclado muestran solo lo que los roles de la persona le permiten
+usar; nada se muestra deshabilitado. Una dirección que no le corresponde muestra qué permiso
+hace falta. Toda pantalla o botón nuevo dice qué permiso pide, igual en el celular y en la
+computadora. El detalle está en
+[los requerimientos de interfaz de Usuarios y acceso](../007-usuarios-y-acceso/ux.md),
+historias 3 y 3b.
+
 ## Qué dijo Carlos de cada versión
 
 Para no repetir lo que no funcionó.

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
 import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
@@ -55,6 +56,8 @@ const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join("
 const num = (n: number) => n.toLocaleString("es-AR");
 
 export function Vender({ esDueno }: { esDueno: boolean }) {
+  const puedeEsto = usePuede();
+  const fijaMargen = puedeEsto("catalogo.margenes");
   const { catalogo, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
@@ -145,7 +148,8 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
   function elegirMargen(item: Item, margen: number) {
     if (!item.producto) return;
     // Queda guardado en el producto: la próxima vez ya viene con ese margen (#13).
-    actualizarProducto(item.producto.id, { margen_elegido: margen }).catch(() => undefined);
+    // Queda guardado en el producto solo si la persona puede fijar márgenes; si no, vale para esta venta.
+    if (fijaMargen) actualizarProducto(item.producto.id, { margen_elegido: margen }).catch(() => undefined);
     cambiarItem(item.clave, { precioManual: null, producto: { ...item.producto, margen_elegido: margen } });
   }
   function cambiarUnidad(item: Item, unidad: Unidad) {
@@ -355,7 +359,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
       )}
       {hoja === "hoy" && hoy && (
         <Hoja titulo="Ventas de hoy" extra={<span className="importe" style={{ fontSize: 26 }}>{pesosCortos(hoy.total)}</span>} alCerrar={() => setHoja(null)} testId="hoja-hoy">
-          <ListaDeVentas ventas={hoy.ventas} alAnular={anular} />
+          <ListaDeVentas ventas={hoy.ventas} alAnular={puedeEsto("ventas.anular") ? anular : null} />
         </Hoja>
       )}
       {exito && (

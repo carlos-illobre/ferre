@@ -1,0 +1,5 @@
+/* Pantalla de «no tenés permiso». Igual en celular y computadora. */
+.sin-permiso { flex: 1; display: flex; flex-direction: column; gap: 12px; max-width: 620px; margin: 0 auto; padding: 56px 24px 120px; color: var(--p-tinta); font-size: 17px; line-height: 1.5; }
+.sin-permiso h1 { margin: 0; font-size: 1.6rem; line-height: 1.2; color: var(--p-verde); }
+.sin-permiso p { margin: 0; color: var(--p-texto-2); }
+.sin-permiso strong { color: var(--p-tinta); }

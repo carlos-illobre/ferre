@@ -4,9 +4,9 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../../sesion", () => ({ useSesion: () => ({ sesion: { estado: "con-sesion", usuario: { id: "u1", email: "a@b", nombre: "Ana", rol: "admin" }, sesionId: "s1" }, salir: vi.fn() }), administra: () => true }));
 vi.mock("../../credenciales", () => ({ hayHuella: () => false, listarCredenciales: async () => [], quitarCredencial: vi.fn(), vincularEsteDispositivo: vi.fn(), EVENTO_CREDENCIALES: "x" }));
 
+import { conPermisos } from "../../pruebas/sesion";
 import { Negocio } from "./Negocio";
 
 function eventos(pagina: number) {
@@ -19,7 +19,8 @@ describe("Negocio", () => {
     globalThis.fetch = vi.fn(async () => ({ json: async () => ({ ok: true, db: "ok" }) })) as never;
     apiFalsa.mockImplementation(async (ruta: string) => {
       if (ruta.startsWith("/auditoria")) return eventos(Number(new URL(`http://x${ruta}`).searchParams.get("pagina")));
-      if (ruta === "/usuarios") return [{ id: "d1", email: "d@b", nombre: "Dueño", rol: "dueño", activo: true }, { id: "m1", email: "m@b", nombre: "Mostrador", rol: "mostrador", activo: true }];
+      if (ruta === "/usuarios") return [{ id: "d1", email: "d@b", nombre: "Dueño", activo: true, roles: [{ id: "r3", nombre: "Administrador" }] }, { id: "m1", email: "m@b", nombre: "Marta", activo: true, roles: [{ id: "r1", nombre: "Vendedor" }] }];
+      if (ruta === "/roles") return [{ id: "r1", nombre: "Vendedor" }, { id: "r2", nombre: "Recepción" }, { id: "r3", nombre: "Administrador" }];
       if (ruta === "/sesiones") return [{ id: "s1", dispositivo: "laptop", ultimo_uso_en: "2026-09-14T12:00:00Z", email: "a@b", nombre: "Ana" }, { id: "s2", dispositivo: "celular", ultimo_uso_en: "2026-09-14T11:00:00Z", email: "m@b", nombre: "Mostrador" }];
       if (ruta === "/ventas") return { total: 10500, totales: { efectivo: 10500 }, ventas: [{ id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [{ descripcion: "MECHA", cantidad: "3", precio_unitario: "3000" }] }] };
       if (ruta === "/compras/semana") return { desde: "2026-09-08", por_proveedor: [{ proveedor: "Proveedor uno", compras: "2", total: "40000" }], total: 40000 };
@@ -57,19 +58,39 @@ describe("Negocio", () => {
     await waitFor(() => expect(screen.getByTestId("paginado").textContent).toContain("Página 2 de 3"));
   });
 
-  it("el admin no puede tocar al dueño ni darle ese rol a nadie; autoriza desde una hoja", async () => {
+  it("cada persona muestra sus roles y se le pueden tildar varios; autorizar a alguien pide al menos uno", async () => {
     render(<Negocio parte="usuarios" />);
     const filas = await screen.findAllByTestId("usuario-fila");
-    const filaDueno = filas.find((f) => f.textContent?.includes("d@b"))!;
-    expect(filaDueno.querySelector("select")).toHaveProperty("disabled", true);
-    expect(filaDueno.textContent).toContain("solo el Administrador principal");
-    const filaMostrador = filas.find((f) => f.textContent?.includes("m@b"))!;
-    const opciones = Array.from(filaMostrador.querySelectorAll("select option")).map((o) => o.textContent);
-    expect(opciones).toContain("Administrador");
-    expect(opciones).not.toContain("Administrador principal");
+    const marta = filas.find((f) => f.textContent?.includes("m@b"))!;
+    expect(within(marta).getByTestId("roles-de-usuario").textContent).toContain("Vendedor");
+    fireEvent.click(within(marta).getByTestId("cambiar-roles"));
+    fireEvent.click(await within(marta).findByTestId("rol-Recepción"));
+    fireEvent.click(within(marta).getByTestId("guardar-roles"));
+    await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/usuarios/m1", { method: "PATCH", body: JSON.stringify({ roles: ["r1", "r2"] }) }));
+    // Sin ningún rol no se guarda: para que no pueda nada, se la desactiva.
+    fireEvent.click(await within(marta).findByTestId("cambiar-roles"));
+    fireEvent.click(within(marta).getByTestId("rol-Vendedor"));
+    fireEvent.click(within(marta).getByTestId("guardar-roles"));
+    expect(within(marta).getByRole("alert").textContent).toContain("al menos un rol");
+
     fireEvent.click(screen.getByTestId("autorizar"));
     const alta = screen.getByTestId("alta-usuario");
-    expect(Array.from(alta.querySelectorAll("option")).map((o) => o.textContent)).not.toContain("Administrador principal");
+    fireEvent.change(alta.querySelector("[name=nombre]")!, { target: { value: "Pedro" } });
+    fireEvent.change(alta.querySelector("[name=email]")!, { target: { value: "p@b.com" } });
+    fireEvent.submit(alta);
+    expect((await within(alta).findByRole("alert")).textContent).toContain("al menos un rol");
+    fireEvent.click(within(alta).getByTestId("rol-Recepción"));
+    fireEvent.submit(alta);
+    await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/usuarios", { method: "POST", body: JSON.stringify({ email: "p@b.com", nombre: "Pedro", roles: ["r2"] }) }));
+  });
+
+  it("sin permisos de administración no se ven los usuarios ni las sesiones de los demás, y sin los números tampoco el resumen", async () => {
+    conPermisos("ventas.registrar");
+    render(<Negocio parte="usuarios" />);
+    expect(await screen.findByTestId("celulares")).toBeTruthy();
+    expect(screen.queryByTestId("usuarios")).toBeNull();
+    expect(screen.queryByTestId("sesiones")).toBeNull();
+    expect(apiFalsa).not.toHaveBeenCalledWith("/usuarios");
   });
 
   it("Sesiones: todos los botones dicen Cerrar; el de la propia es coral", async () => {

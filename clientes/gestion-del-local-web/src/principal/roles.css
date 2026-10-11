@@ -1,0 +1,51 @@
+/* Roles. La misma pantalla en el celular y en la computadora: toma los colores de la paleta. */
+.rl { flex: 1; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 860px; margin: 0 auto; padding: 20px 16px 110px; color: var(--p-tinta); font-size: 17px; line-height: 1.45; box-sizing: border-box; }
+.rl *, .rl *::before { box-sizing: border-box; }
+.rl h1 { margin: 0; font-size: 1.75rem; line-height: 1.2; font-weight: 750; color: var(--p-verde); }
+.rl h2 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+.rl p { margin: 0; }
+.rl ul { margin: 0; padding: 0; list-style: none; }
+.rl-bajada { color: var(--p-texto-2); font-size: 0.9375rem; }
+.rl-error { color: var(--p-naranja-texto); font-weight: 650; }
+.rl-aviso { padding: 12px 16px; border-radius: 12px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-weight: 650; }
+.rl-tarjeta { display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 14px; }
+.rl-tarjeta header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.rl-cuantos { color: var(--p-texto-2); font-size: 0.9375rem; }
+.rl-lista { display: flex; flex-direction: column; gap: 12px; }
+.rl-permisos-del-rol { display: flex; flex-wrap: wrap; gap: 6px; }
+.rl-permisos-del-rol li { padding: 3px 10px; border-radius: 999px; background: var(--p-fondo-2); border: 1px solid var(--p-borde); font-size: 0.875rem; font-weight: 600; }
+.rl-campo { display: flex; flex-direction: column; gap: 6px; }
+.rl-campo > span, .rl-parte legend { font-weight: 700; }
+.rl-campo input { width: 100%; min-height: 48px; padding: 0 14px; border: 1.500px solid var(--p-borde-fuerte); border-radius: 12px; background: var(--p-superficie); color: var(--p-tinta); font: inherit; }
+.rl-parte { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 4px; }
+.rl-parte legend { padding: 0 0 4px; color: var(--p-verde); }
+.rl-permiso { display: flex; align-items: flex-start; gap: 12px; min-height: 48px; padding: 8px 10px; border-radius: 10px; cursor: pointer; }
+.rl-permiso:hover { background: var(--p-fondo-2); }
+.rl-permiso input { flex: none; width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--p-verde); }
+.rl-permiso span { display: flex; flex-direction: column; }
+.rl-permiso small { color: var(--p-texto-2); font-size: 0.875rem; }
+.rl-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.rl-boton { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 16px; border-radius: 12px; border: 1.500px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font: inherit; font-weight: 650; cursor: pointer; }
+.rl-boton:hover:not(:disabled) { background: var(--p-fondo-2); }
+.rl-boton:disabled { background: var(--p-relleno); border-color: var(--p-relleno); color: var(--p-texto-2); cursor: not-allowed; }
+.rl-boton.fuerte { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+.rl-boton.fuerte:hover:not(:disabled) { background: var(--p-verde-2); }
+.rl-boton.peligro { background: var(--p-naranja-suave); border-color: var(--p-naranja-borde); color: var(--p-naranja-texto-fuerte); }
+.rl-nuevo { align-self: flex-start; }
+.rl :focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
+@media (max-width: 899px) { .rl { padding-top: calc(40px + env(safe-area-inset-top)); } .rl-nuevo { align-self: stretch; } }
+@media (min-width: 900px) { .rl { padding: 24px 24px 40px; } }
+
+/* Los roles de una persona, en la lista de usuarios y al autorizar a alguien. */
+.ru { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.ru .rl-permisos-del-rol { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.ru .rl-permisos-del-rol li { padding: 3px 10px; border-radius: 999px; background: var(--p-fondo-2); border: 1px solid var(--p-borde); font-size: 0.875rem; font-weight: 600; color: var(--p-tinta); }
+.ru .ru-sin { color: var(--p-naranja-texto); border-color: var(--p-naranja-borde); background: var(--p-naranja-suave); }
+.ru-cambiar { min-height: 40px; padding: 0 12px; font-size: 0.9375rem; }
+.ru-panel { flex-basis: 100%; display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--p-borde); border-radius: 12px; background: var(--p-fondo-2); }
+.ru-casillas { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; }
+.ru-casillas legend { padding: 0 0 4px; font-weight: 700; color: var(--p-verde); }
+.ru-casillas .rl-permiso { display: flex; align-items: flex-start; gap: 12px; min-height: 44px; padding: 6px 8px; border-radius: 10px; cursor: pointer; color: var(--p-tinta); }
+.ru-casillas .rl-permiso input { flex: none; width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--p-verde); }
+.ru-casillas .rl-permiso span { display: flex; flex-direction: column; }
+.ru-casillas .rl-permiso small { color: var(--p-texto-2); font-size: 0.875rem; }

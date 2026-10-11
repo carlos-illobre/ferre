@@ -4,7 +4,7 @@ import { fecha } from "../../../../formato";
 import { NOMBRE_MEDIO } from "./VentasDeHoy";
 import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Progreso, Vacio, numero, pesosCortos } from "../ui";
-import { diaYHora, fechaCompleta, nombreDeRol, textoDeError, useEnLinea } from "./negocio-comun";
+import { diaYHora, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
 import "../estilos/negocio.css";
 
 type Contenido = Record<string, unknown>;
@@ -87,10 +87,10 @@ function detalleDe(e: Evento, usuarios: UsuarioFila[]): string {
     case "lista.cargada": return juntar(texto(c.proveedor), texto(c.archivo), c.fechaLista ? `lista del ${fecha(texto(c.fechaLista))}` : "");
     case "lista.aplicada": return juntar(c.fechaLista ? `Lista del ${fecha(texto(c.fechaLista))}` : "", cuantos(c.actualizados, "precio actualizado", "precios actualizados"), cuantos(c.nuevos, "producto nuevo", "productos nuevos"));
     case "conteo.cerrado": return juntar(texto(c.sector), cuantos(c.contados, "producto contado", "productos contados"), cuantos(c.ajustados, "ajustado", "ajustados"));
-    case "usuario.creado": return juntar(texto(c.email), c.rol ? `como ${nombreDeRol(String(c.rol))}` : "");
+    case "usuario.creado": return juntar(texto(c.email), Array.isArray(c.roles) ? `con ${c.roles.length} ${c.roles.length === 1 ? "rol" : "roles"}` : "");
     case "usuario.modificado": {
       const cambios = (c.cambios ?? {}) as Contenido;
-      return juntar(cambios.activo === false && `Desactivó a ${persona(c.id)}`, cambios.activo === true && `Reactivó a ${persona(c.id)}`, typeof cambios.rol === "string" && `${persona(c.id)} pasó a ser ${nombreDeRol(cambios.rol)}`, typeof cambios.nombre === "string" && `Ahora se llama ${cambios.nombre}`);
+      return juntar(cambios.activo === false && `Desactivó a ${persona(c.id)}`, cambios.activo === true && `Reactivó a ${persona(c.id)}`, Array.isArray(cambios.roles) && `Cambió los roles de ${persona(c.id)}`, typeof cambios.nombre === "string" && `Ahora se llama ${cambios.nombre}`);
     }
     case "sesion.iniciada": return juntar(c.medio === "huella" ? "Con la huella" : "Con Google", texto(c.dispositivo));
     case "credencial.vinculada": return texto(c.dispositivo);

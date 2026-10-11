@@ -14,6 +14,7 @@ json() { python3 -c "import json,sys; d=json.load(sys.stdin); print(eval('d$1'))
 # Dueño de prueba con sesión sembrada (como en autenticacion.sh).
 psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = 'prueba-listas@ferre.test')" >/dev/null
 psql "INSERT INTO usuario (id, email, nombre, rol) SELECT gen_random_uuid(), 'prueba-listas@ferre.test', 'Dueño listas', 'dueño' WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE email = 'prueba-listas@ferre.test')" >/dev/null
+psql "INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE u.email = 'prueba-listas@ferre.test' ON CONFLICT DO NOTHING" >/dev/null
 TOKEN=token-de-prueba-listas
 psql "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$(printf '%s' "$TOKEN" | sha256sum | cut -d' ' -f1)', 'prueba', now() + interval '1 day' FROM usuario WHERE email = 'prueba-listas@ferre.test'" >/dev/null
 AUTH="Authorization: Bearer $TOKEN"

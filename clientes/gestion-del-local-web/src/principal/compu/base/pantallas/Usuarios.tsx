@@ -7,21 +7,20 @@ import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, v
 import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";
-import { IconoCompu, ROLES, esFallaDeRed, fechaCompleta, nombreDeRol, textoDeError, useCarga, useEnLinea } from "./negocio-comun";
+import { IconoCompu, esFallaDeRed, fechaCompleta, textoDeError, useCarga, useEnLinea } from "./negocio-comun";
+import { usePuede } from "../../../permisos";
+import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
 import "../estilos/negocio.css";
 
-type UsuarioFila = { id: string; email: string; nombre: string; rol: string; activo: boolean };
+type UsuarioFila = { id: string; email: string; nombre: string; activo: boolean; roles: RolAsignable[] };
 type SesionFila = { id: string; dispositivo: string; ultimo_uso_en: string; email: string; nombre: string };
 type Mensaje = { texto: string; testId?: string };
 type Avisar = (m: Mensaje) => void;
 
-// La API habla de «dueño» y «admin»; en pantalla los roles llevan su nombre del negocio.
+// Los avisos del servidor ya vienen en castellano y dicen qué hacer: se muestran tal cual.
 function enPalabras(e: unknown, queNoSePudo: string): string {
   if (esFallaDeRed(e)) return textoDeError(e, queNoSePudo);
   const texto = (e as Error).message;
-  if (/a vos mismo/.test(texto)) return "No podés desactivarte ni cambiarte el rol: lo tiene que hacer otro Administrador.";
-  if (/admin no puede/.test(texto)) return TEXTOS.usuarios.soloElPrincipal.largo;
-  if (/dueño o un admin/.test(texto)) return "Solo puede hacerlo un Administrador.";
   return `${queNoSePudo}: ${texto}`;
 }
 
@@ -30,12 +29,13 @@ export function Usuarios() {
   const enLinea = useEnLinea();
   const [mensaje, setMensaje] = useState<Mensaje | null>(null);
   const [vueltaDeSesiones, setVueltaDeSesiones] = useState(0);
+  const puedeEsto = usePuede();
   return (
     <Pagina titulo="Usuarios y sesiones" testId="usuarios-y-sesiones" className="usuarios" bajada="Quién puede entrar a Ferrebress, desde qué dispositivos está abierto ahora y qué celulares entran con la huella.">
       {!enLinea && <Aviso tipo="alerta" testId="usuarios-sin-conexion">Sin conexión: administrar usuarios, sesiones y celulares necesita internet. Lo que ves puede no estar al día.</Aviso>}
-      <Autorizados enLinea={enLinea} avisar={setMensaje} alCerrarSesiones={() => setVueltaDeSesiones((v) => v + 1)} />
+      {puedeEsto("admin.usuarios") && <Autorizados enLinea={enLinea} avisar={setMensaje} alCerrarSesiones={() => setVueltaDeSesiones((v) => v + 1)} />}
       <div className="usuarios-columnas">
-        <Sesiones enLinea={enLinea} avisar={setMensaje} vuelta={vueltaDeSesiones} />
+        {puedeEsto("admin.sesiones") && <Sesiones enLinea={enLinea} avisar={setMensaje} vuelta={vueltaDeSesiones} />}
         <Celulares enLinea={enLinea} avisar={setMensaje} />
       </div>
       <Toast texto={mensaje?.texto ?? null} alCerrar={() => setMensaje(null)} testId={mensaje?.testId ?? "mensaje"} />
@@ -54,32 +54,32 @@ function Autorizados({ enLinea, avisar, alCerrarSesiones }: { enLinea: boolean; 
   const filas = lista.datos ?? [];
   const activos = filas.filter((u) => u.activo).length;
 
-  async function cambiar(u: UsuarioFila, cambios: { rol?: string; activo?: boolean }) {
+  async function cambiar(u: UsuarioFila, cambios: { roles?: string[]; activo?: boolean }): Promise<string | null> {
     setOcupada(u.id); setErrorDeFila(null);
     try {
       await api(`/usuarios/${u.id}`, { method: "PATCH", body: JSON.stringify(cambios) });
       lista.recargar();
       if (cambios.activo === false) { avisar({ texto: `${u.nombre} ya no puede entrar: se le cerraron las sesiones abiertas.` }); alCerrarSesiones(); }
       else if (cambios.activo) avisar({ texto: `${u.nombre} puede entrar de nuevo.` });
-      else if (cambios.rol) avisar({ texto: `${u.nombre} ahora es ${nombreDeRol(cambios.rol)}.` });
+      else if (cambios.roles) avisar({ texto: `Roles de ${u.nombre} guardados.` });
+      return null;
     } catch (e) {
-      setErrorDeFila({ id: u.id, texto: enPalabras(e, "No se pudo guardar el cambio") });
+      const texto = enPalabras(e, "No se pudo guardar el cambio");
+      if (cambios.roles) return texto;
+      setErrorDeFila({ id: u.id, texto }); return texto;
     } finally { setOcupada(null); }
   }
 
-  const rolDe = (u: UsuarioFila) => u.id === yo ? <span>{nombreDeRol(u.rol)}</span> : (
-    <select className="selector usuarios-rol" value={u.rol} disabled={ocupada === u.id} onChange={(e) => cambiar(u, { rol: e.target.value })} aria-label={`Rol de ${u.nombre}`}>
-      {ROLES.map((r) => <option key={r.valor} value={r.valor}>{r.nombre}</option>)}
-    </select>
-  );
-  const accionDe = (u: UsuarioFila) => u.id === yo ? <span className="detalle">A vos te cambia otro Administrador</span> : (
+  const disponibles = useRolesAsignables();
+  const rolDe = (u: UsuarioFila) => <RolesDeUsuario disponibles={disponibles} actuales={u.roles ?? []} nombre={u.nombre} bloqueado={ocupada === u.id || !enLinea} alGuardar={(ids) => cambiar(u, { roles: ids })} />;
+  const accionDe = (u: UsuarioFila) => u.id === yo ? <span className="detalle">A vos te desactiva otra persona</span> : (
     <Boton tam={esCelular ? undefined : "chico"} variante={u.activo ? "peligro" : undefined} disabled={ocupada === u.id || !enLinea} onClick={() => cambiar(u, { activo: !u.activo })} aria-label={`${u.activo ? "Desactivar" : "Reactivar"} a ${u.nombre}`}>
       {ocupada === u.id ? "Guardando…" : u.activo ? "Desactivar" : "Reactivar"}
     </Boton>
   );
   const estadoDe = (u: UsuarioFila) => <Pastilla tipo={u.activo ? "ok" : undefined}>{u.activo ? "Activo" : "Desactivado"}</Pastilla>;
   const errorDe = (u: UsuarioFila) => errorDeFila?.id === u.id ? <Aviso tipo="error">{errorDeFila.texto}</Aviso> : null;
-  const formulario = <AltaDeUsuario enLinea={enLinea} alAutorizar={(u) => { lista.recargar(); setAlta(false); avisar({ texto: `${u.nombre} ya puede entrar con su cuenta de Google.` }); }} />;
+  const formulario = <AltaDeUsuario disponibles={disponibles} enLinea={enLinea} alAutorizar={(u) => { lista.recargar(); setAlta(false); avisar({ texto: `${u.nombre} ya puede entrar con su cuenta de Google.` }); }} />;
 
   return (
     <section className="negocio-seccion" aria-labelledby="usuarios-autorizados">
@@ -111,7 +111,7 @@ function Autorizados({ enLinea, avisar, alCerrarSesiones }: { enLinea: boolean; 
       ) : (
         <div className="tabla-marco">
           <table className="tabla" data-testid="usuarios">
-            <thead><tr><th scope="col">Nombre</th><th scope="col">Correo de Google</th><th scope="col">Rol</th><th scope="col">Estado</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
+            <thead><tr><th scope="col">Nombre</th><th scope="col">Correo de Google</th><th scope="col">Roles</th><th scope="col">Estado</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
             <tbody>
               {filas.map((u) => (
                 <FilaConError key={u.id} error={errorDe(u)} columnas={5}>
@@ -138,11 +138,11 @@ function FilaConError({ children, error, columnas }: { children: React.ReactNode
 }
 
 // Autorizar es agregar el correo de Google de la persona: no hay contraseña que crear.
-function AltaDeUsuario({ enLinea, alAutorizar }: { enLinea: boolean; alAutorizar: (u: { nombre: string }) => void }) {
+function AltaDeUsuario({ disponibles, enLinea, alAutorizar }: { disponibles: RolAsignable[]; enLinea: boolean; alAutorizar: (u: { nombre: string }) => void }) {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
-  const [rol, setRol] = useState("admin");
-  const [errores, setErrores] = useState<{ nombre?: string; email?: string; general?: string }>({});
+  const [roles, setRoles] = useState<string[]>([]);
+  const [errores, setErrores] = useState<{ nombre?: string; email?: string; roles?: string; general?: string }>({});
   const [guardando, setGuardando] = useState(false);
   const cajaNombre = useRef<HTMLInputElement>(null);
   const id = useId();
@@ -152,15 +152,17 @@ function AltaDeUsuario({ enLinea, alAutorizar }: { enLinea: boolean; alAutorizar
     const faltas: typeof errores = {};
     if (!nombre.trim()) faltas.nombre = "Escribí el nombre de la persona.";
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) faltas.email = email.trim() ? "Ese correo está mal escrito: revisá que tenga la arroba y el dominio." : "Escribí su correo de Google.";
+    if (roles.length === 0) faltas.roles = TEXTOS.usuarios.faltaUnRol.largo;
     setErrores(faltas);
     if (faltas.nombre) { cajaNombre.current?.focus(); return; }
     if (faltas.email) { document.getElementById(`${id}-email`)?.focus(); return; }
+    if (faltas.roles) return;
     setGuardando(true);
     try {
-      await api("/usuarios", { method: "POST", body: JSON.stringify({ email: email.trim().toLowerCase(), nombre: nombre.trim(), rol }) });
+      await api("/usuarios", { method: "POST", body: JSON.stringify({ email: email.trim().toLowerCase(), nombre: nombre.trim(), roles }) });
       const autorizado = nombre.trim();
       // El alta queda lista para cargar a otra persona.
-      setNombre(""); setEmail(""); setRol("admin"); setErrores({});
+      setNombre(""); setEmail(""); setRoles([]); setErrores({});
       cajaNombre.current?.focus();
       alAutorizar({ nombre: autorizado });
     } catch (err) {
@@ -188,12 +190,10 @@ function AltaDeUsuario({ enLinea, alAutorizar }: { enLinea: boolean; alAutorizar
           aria-invalid={Boolean(errores.email)} aria-describedby={errores.email ? `${id}-error-email` : undefined} />
         {errores.email && <small className="usuarios-error" id={`${id}-error-email`} role="alert">{errores.email}</small>}
       </label>
-      <label className="campo">
-        <span>Rol</span>
-        <select className="selector" name="rol" value={rol} onChange={(e) => setRol(e.target.value)}>
-          {ROLES.map((r) => <option key={r.valor} value={r.valor}>{r.nombre}</option>)}
-        </select>
-      </label>
+      <div className="campo usuarios-roles-del-alta">
+        <ElegirRoles disponibles={disponibles} elegidos={roles} alCambiar={(ids) => { setRoles(ids); setErrores((x) => ({ ...x, roles: undefined })); }} />
+        {errores.roles && <small className="usuarios-error" role="alert">{errores.roles}</small>}
+      </div>
       <Boton type="submit" variante="principal" icono="mas" disabled={guardando || !enLinea} className="usuarios-autorizar">{guardando ? "Autorizando…" : "Autorizar"}</Boton>
       <Aviso tipo="error">{errores.general}</Aviso>
     </form>

@@ -22,14 +22,6 @@ export const COMPROBANTES: { valor: Comprobante; nombre: string; corto: string }
 // Por qué se corrige un stock. El motivo es obligatorio en las dos interfaces (RF-53).
 export const MOTIVOS_DE_AJUSTE = ["Conté la estantería", "Rotura", "Se usó en el local", "Estaba mal cargado"];
 
-// Los roles, con el nombre que llevan en pantalla (la API los llama dueño, admin y mostrador).
-export const ROLES: { valor: string; nombre: string }[] = [
-  { valor: "admin", nombre: "Administrador" },
-  { valor: "dueño", nombre: "Administrador principal" },
-  { valor: "mostrador", nombre: "Vendedor y comprador" },
-];
-export const nombreDeRol = (rol: string) => ROLES.find((r) => r.valor === rol)?.nombre ?? rol;
-
 // Cómo se llama cada pantalla y cada parte, igual en el menú, en el título y en las dos interfaces.
 export const NOMBRES = {
   comoVaElNegocio: "Cómo va el negocio",
@@ -37,6 +29,7 @@ export const NOMBRES = {
   quienHizoQue: "Quién hizo qué",
   anomalias: "Anomalías",
   mejorasYErrores: "Mejoras y errores",
+  roles: "Roles",
   usuariosAutorizados: "Usuarios autorizados",
   sesionesAbiertas: "Sesiones abiertas",
   celularesConHuella: "Mis celulares con huella",
@@ -58,10 +51,10 @@ export const TEXTOS = {
     faltaElMotivo: { largo: "Elegí un motivo o escribilo: sin motivo no se guarda.", corto: "Falta el motivo: sin motivo no se guarda." },
   },
   usuarios: {
-    queHaceCadaRol: {
-      largo: "Vendedor y comprador: vende, compra, cuenta y carga listas. Administrador: además administra usuarios, proveedores, duplicados y sesiones, pero no cambia a un Administrador principal. Administrador principal: todo.",
-      corto: "Vendedor y comprador: vende, compra, cuenta y carga listas · Administrador: además administra usuarios y sesiones · Administrador principal: todo",
+    queSonLosRoles: {
+      largo: "Cada persona puede lo que le permiten sus roles, y puede tener más de uno. Qué permite cada rol se arma en «Roles».",
+      corto: "Cada persona puede lo que le permiten sus roles; puede tener más de uno.",
     },
-    soloElPrincipal: igual("Eso lo tiene que hacer un Administrador principal."),
+    faltaUnRol: igual("Elegí al menos un rol. Para que no pueda nada, desactivá al usuario."),
   },
 } satisfies Record<string, Record<string, Texto>>;

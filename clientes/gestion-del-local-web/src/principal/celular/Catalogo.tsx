@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePuede, type Permiso } from "../permisos";
+import { SinPermiso } from "../SinPermiso";
 import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
@@ -19,14 +21,19 @@ import type { Producto } from "./pantallas/Productos";
 // sub-pantallas con un segmento arriba (rediseño en mockups/Ferre iOS.html).
 const SUB = [{ valor: "productos", nombre: "Productos" }, { valor: "listas", nombre: "Listas" }, { valor: "duplicados", nombre: "Duplicados" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
+// Lo que pide cada pestaña (RF-72). Buscar productos lo puede cualquiera con sesión.
+const PIDE: Partial<Record<Sub, Permiso>> = { listas: "catalogo.listas", duplicados: "catalogo.duplicados" };
 
 export function Catalogo({ sub }: { sub: string | null }) {
   const actual: Sub = sub === "listas" || sub === "duplicados" ? sub : "productos";
+  const puedeEsto = usePuede();
+  const permitida = (s: Sub) => !PIDE[s] || puedeEsto(PIDE[s]!);
+  if (!permitida(actual)) return <SinPermiso falta={[PIDE[actual]!]} />;
   return (
     <main className="contenido">
       <div className="encabezado">
         <h1 className="titulo">Catálogo</h1>
-        <Pestanas opciones={SUB.map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor }))} actual={actual} alElegir={(v) => irA(v === "productos" ? "catalogo" : `catalogo/${v}`)} />
+        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor }))} actual={actual} alElegir={(v) => irA(v === "productos" ? "catalogo" : `catalogo/${v}`)} />
       </div>
       {actual === "productos" ? <Productos /> : actual === "listas" ? <Listas /> : <Duplicados />}
     </main>
@@ -39,6 +46,7 @@ const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join("
 // está el margen (botones o tipeado), los proveedores, la foto y la lista de origen.
 // Teclado: flechas eligen, Enter abre, Shift+1..5 fijan el margen del elegido, Esc limpia.
 export function Productos() {
+  const fijaMargen = usePuede()("catalogo.margenes");
   const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [error, setError] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
@@ -71,12 +79,12 @@ export function Productos() {
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter" && resultados[elegido]) { e.preventDefault(); setAbiertoId(resultados[elegido]!.id); }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
-    else if (e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
+    else if (fijaMargen && e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
       e.preventDefault();
       const p = resultados[elegido];
       if (p) actualizar(p.id, { margen_elegido: MARGENES[Number(e.code.slice(5)) - 1]! });
     }
-  }, [resultados, elegido, actualizar, abiertoId]);
+  }, [resultados, elegido, actualizar, abiertoId, fijaMargen]);
   useTeclasGlobales(teclas, caja.current);
 
   const abierto = abiertoId ? (catalogo ?? []).find((p) => p.id === abiertoId) ?? null : null;
@@ -84,7 +92,7 @@ export function Productos() {
   return (
     <>
       <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? `Buscar en ${catalogo.length.toLocaleString("es-AR")} productos` : "Bajando el catálogo…"} disabled={!catalogo} cajaRef={caja} />
-      <small className="solo-escritorio">Flechas para elegir · Enter abre · Shift+1 a Shift+5 fijan el margen (300, 200, 100, 50, 25 %) · Esc limpia</small>
+      <small className="solo-escritorio">Flechas para elegir · Enter abre{fijaMargen ? " · Shift+1 a Shift+5 fijan el margen (300, 200, 100, 50, 25 %)" : ""} · Esc limpia</small>
       <AvisoError texto={error ?? errorCatalogo} alCerrar={() => setError(null)} />
       {catalogo && catalogo.length === 0 && <div className="aviso-suave">Todavía no hay productos: cargá una lista de precios primero.</div>}
       {consultaEstable.trim() && resultados.length === 0 && catalogo && catalogo.length > 0 && <div className="aviso-suave" data-testid="sin-resultados">Nada con "{consultaEstable}". Probá con menos palabras.</div>}
@@ -118,6 +126,7 @@ function FilaProducto({ producto: p, elegida, alAbrir }: { producto: Producto; e
 // Ficha del producto: precio con explicación, margen (botones u otro), proveedores con el
 // más barato, foto, y la lista de origen para bajar el Excel.
 export function FichaProducto({ producto: p, alCerrar, alCambiar }: { producto: Producto; alCerrar: () => void; alCambiar: (c: Partial<Pick<Producto, "margen_elegido" | "foto_url">> & { proveedor_preferido_id?: string }) => void }) {
+  const fijaMargen = usePuede()("catalogo.margenes");
   const costo = p.costo_neto === null ? null : Number(p.costo_neto);
   const iva = p.iva === null ? 0.21 : Number(p.iva);
   const calculado = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva }) : null;
@@ -142,6 +151,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar }: { producto: 
           <small>Precio de venta</small>
           {calculado ? <Explicacion valor={pesosCortos(calculado.valor)} pasos={calculado.pasos} /> : <span className="importe" style={{ fontSize: 22, color: "var(--coral-texto)" }} data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
         </div>
+        {fijaMargen && <>
         <div className="cuadricula-5" role="radiogroup" aria-label="margen">
           {MARGENES.map((m, i) => (
             <button key={m} type="button" className={`boton ${p.margen_elegido === m ? "activo" : ""}`} title={`Shift+${i + 1}`} disabled={costo === null} onClick={() => alCambiar({ margen_elegido: m })}>{m} %</button>
@@ -154,6 +164,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar }: { producto: 
             onKeyDown={(e) => { if (e.key === "Enter") { const v = Number(otro); if (v > 0) alCambiar({ margen_elegido: v }); } }}
             onBlur={() => { const v = Number(otro); if (v > 0 && v !== p.margen_elegido) alCambiar({ margen_elegido: v }); }} /><span>%</span></label>
         </div>
+        </>}
       </div>
       {(p.proveedores?.length ?? 0) > 0 && (
         <>

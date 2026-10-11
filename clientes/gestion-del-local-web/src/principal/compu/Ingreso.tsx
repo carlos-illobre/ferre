@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { usePuede } from "../permisos";
 import { COMPROBANTES, type Comprobante } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { api } from "../../api";
@@ -38,7 +39,16 @@ function leerBorrador(): Borrador | null {
 const diferencia = (r: Renglon) => (r.costo !== null && r.costoLista !== null && r.costoLista > 0 ? ((r.costo - r.costoLista) / r.costoLista) * 100 : null);
 const incompleto = (r: Renglon) => r.costo === null || !r.descripcion.trim() || r.cantidad <= 0;
 
+// Quien solo puede ver las compras (RF-72) no tiene el formulario: ve las compras recientes.
 export function Ingreso() {
+  const registra = usePuede()("deposito.ingresos");
+  const esCelular = useEsCelular();
+  const enLinea = useEnLinea();
+  if (registra) return <RegistrarIngreso />;
+  return <Pagina titulo="Compras recientes"><ComprasRecientes version={0} enLinea={enLinea} esCelular={esCelular} alAnular={() => undefined} /></Pagina>;
+}
+
+function RegistrarIngreso() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
@@ -389,6 +399,7 @@ const nombreComprobante = (c: CompraFila) => (c.comprobante_tipo === "sin_compro
 // Las últimas compras. Cada una se despliega para ver sus renglones y se puede anular; anular
 // no se deshace, por eso pide confirmación con el motivo ahí mismo.
 function ComprasRecientes({ version, enLinea, esCelular, alAnular }: { version: number; enLinea: boolean; esCelular: boolean; alAnular: (mensaje: string) => void }) {
+  const anula = usePuede()("deposito.ingresos");
   const [filas, setFilas] = useState<CompraFila[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
@@ -436,7 +447,7 @@ function ComprasRecientes({ version, enLinea, esCelular, alAnular }: { version: 
                           <li key={n}><span>{cifra(Number(i.cantidad))} × {i.descripcion}<span className="detalle"> · {pesos(i.costo_unitario)} c/u</span></span><strong>{pesosCortos(Number(i.cantidad) * Number(i.costo_unitario))}</strong></li>
                         ))}
                       </ul>
-                      {!anulada && <Boton variante="peligro" icono="basura" onClick={() => setAnulando(c)} data-testid="anular">Anular esta compra</Boton>}
+                      {!anulada && anula && <Boton variante="peligro" icono="basura" onClick={() => setAnulando(c)} data-testid="anular">Anular esta compra</Boton>}
                     </div>
                   )}
                 </li>
@@ -464,7 +475,7 @@ function ComprasRecientes({ version, enLinea, esCelular, alAnular }: { version: 
                       <td className="compras-sin-corte">{nombreComprobante(c)}{c.foto ? <> <VerComprobante ruta={c.foto} texto="Ver foto" /></> : c.comprobante_tipo !== "sin_comprobante" && !c.comprobante_numero ? <span className="detalle"> · sin foto</span> : null}</td>
                       <td className="num">{c.renglones}</td>
                       <td className="num"><span className="importe chico tachable">{pesosCortos(c.total)}</span></td>
-                      <td className="angosta">{anulada ? <Pastilla tipo="mal">Anulada</Pastilla> : <Boton tam="chico" variante="peligro" onClick={(e) => { e.stopPropagation(); setAnulando(c); }} data-testid="anular">Anular</Boton>}</td>
+                      <td className="angosta">{anulada ? <Pastilla tipo="mal">Anulada</Pastilla> : anula && <Boton tam="chico" variante="peligro" onClick={(e) => { e.stopPropagation(); setAnulando(c); }} data-testid="anular">Anular</Boton>}</td>
                     </tr>
                     {abierta && c.items.map((i, n) => (
                       <tr key={n} className="hija">

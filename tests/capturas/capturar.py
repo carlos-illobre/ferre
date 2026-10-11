@@ -73,6 +73,7 @@ def main() -> int:
     a.add_argument("--compu", action="store_true")
     a.add_argument("--nombre", help="nombre del archivo (por defecto, la ruta)")
     a.add_argument("--sin-sesion", action="store_true", help="no siembra la sesión")
+    a.add_argument("--permisos", help="los permisos de la sesión, separados por coma (por defecto, todos): para ver lo que ve cada rol")
     a.add_argument("--sin-conexion", action="store_true", help="corta la red después de cargar (antes de --py)")
     a.add_argument("--py", action="append", default=[], help="código Python con `page` para dejar la pantalla como hace falta (repetible)")
     a.add_argument("--entera", action="store_true", help="captura la página entera")
@@ -82,6 +83,14 @@ def main() -> int:
     os.makedirs(CAPTURAS, exist_ok=True)
     base = o.nombre or re.sub(r"[^a-z0-9-]+", "-", o.ruta.lower()).strip("-")
     problemas = 0
+
+    # La API de mentira guarda con qué permisos responde la sesión: se le dice en cada corrida.
+    try:
+        import json, urllib.request
+        permisos = [p.strip() for p in (o.permisos or "").split(",") if p.strip()]
+        urllib.request.urlopen(urllib.request.Request(os.environ.get("API", "http://localhost:8799") + "/mentira/permisos", data=json.dumps({"permisos": permisos}).encode(), method="PUT", headers={"Content-Type": "application/json"}), timeout=5)
+    except Exception as e:  # otra API (la real, por ejemplo) no tiene esa ruta
+        if o.permisos: print(f"no se pudieron fijar los permisos: {e}")
 
     with sync_playwright() as pw:
         navegador = pw.chromium.launch()

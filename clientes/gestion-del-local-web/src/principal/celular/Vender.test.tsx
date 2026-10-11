@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { conPermisos } from "../../pruebas/sesion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
@@ -196,5 +197,23 @@ describe("Vender", () => {
     expect(within(libre).getByTestId("descripcion-libre")).toHaveProperty("value", "bolsa de arena");
     fireEvent.change(within(libre).getByTestId("precio-manual"), { target: { value: "1500" } });
     expect(screen.getByTestId("total").textContent).toBe("$2.000");
+  });
+
+  // RF-72: el margen elegido en la venta queda en el producto solo con «Fijar márgenes».
+  it("sin el permiso de fijar márgenes, el margen vale para esta venta y no cambia el producto", () => {
+    conPermisos("ventas.registrar");
+    const { agregar, item, falso } = armar();
+    agregar("tornillo vender");
+    fireEvent.click(within(item("TORNILLO")).getByRole("button", { name: "300 %" }));
+    expect(item("TORNILLO").textContent).toContain("$1.000");
+    expect(falso.actualizarProducto).not.toHaveBeenCalled();
+  });
+
+  it("sin el permiso de anular, las ventas de hoy se ven sin el botón Anular", async () => {
+    conPermisos("ventas.registrar", "ventas.ver");
+    armar({ total: 10500, totales: { efectivo: 10500 }, ventas: [{ id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }] }] }, true);
+    fireEvent.click(await screen.findByTestId("hoy"));
+    expect(screen.getByTestId("ventas-de-hoy").textContent).toContain("MECHA");
+    expect(screen.queryByRole("button", { name: "Anular" })).toBeNull();
   });
 });

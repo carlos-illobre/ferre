@@ -1,9 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { NOMBRES, TEXTOS, nombreDeRol } from "../textos";
+import { NOMBRES, TEXTOS } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { api, urlApi } from "../../api";
 import { fecha, pesos } from "../../formato";
-import { administra, useSesion } from "../../sesion";
+import { useSesion } from "../../sesion";
+import { usePuede } from "../permisos";
+import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../RolesDeUsuario";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../credenciales";
 import { AvisoError, Hoja, Icono, Toast } from "./componentes/base";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
@@ -11,7 +13,7 @@ import { describirDispositivo } from "./pantallas/Login";
 import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
 import { esAmbienteDePrueba } from "../../ambiente";
 
-type UsuarioFila = { id: string; email: string; nombre: string; rol: string; activo: boolean };
+type UsuarioFila = { id: string; email: string; nombre: string; activo: boolean; roles: RolAsignable[] };
 type SesionFila = { id: string; dispositivo: string; ultimo_uso_en: string; email: string; nombre: string };
 type EventoFila = { id: string; tipo: string; fecha: string; email: string | null; nombre: string | null; contenido: Record<string, unknown> };
 type Gastos = { desde: string; por_proveedor: { proveedor: string; compras: string; total: string }[]; total: number };
@@ -25,7 +27,7 @@ const TITULOS: Record<Parte, string> = { negocio: NOMBRES.comoVaElNegocio, usuar
 export function Negocio({ parte }: { parte: Parte }) {
   const { sesion, salir } = useSesion();
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
-  const esDueno = administra(usuario);
+  const puedeEsto = usePuede();
   const { datos: hoy, anular } = useVentasDeHoy(null);
   const [gastos, setGastos] = useState<Gastos | null>(null);
   const [servidor, setServidor] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export function Negocio({ parte }: { parte: Parte }) {
           <div className="avatar">{usuario.nombre.charAt(0).toUpperCase()}</div>
           <div className="textos">
             <strong data-testid="usuario-negocio">{usuario.nombre}</strong>
-            <small>{nombreDeRol(usuario.rol)} · <EstadoDeConexion testId="conexion-negocio" /></small>
+            <small>{(usuario.roles ?? []).join(", ") || "sin roles"} · <EstadoDeConexion testId="conexion-negocio" /></small>
           </div>
           <button type="button" className="boton chico solo-celular" style={{ height: 34, fontSize: 13, borderRadius: 10 }} onClick={salir}>Salir</button>
         </div>
@@ -84,10 +86,10 @@ export function Negocio({ parte }: { parte: Parte }) {
 
       </div>
       <div className="columna">
-      {parte === "usuarios" && esDueno && <Usuarios />}
+      {parte === "usuarios" && puedeEsto("admin.usuarios") && <Usuarios />}
       {parte === "usuarios" && <Celulares />}
-      {parte === "usuarios" && esDueno && <Sesiones />}
-      {parte === "actividad" && esDueno && <Auditoria />}
+      {parte === "usuarios" && puedeEsto("admin.sesiones") && <Sesiones />}
+      {parte === "actividad" && puedeEsto("negocio.actividad") && <Auditoria />}
       </div>
       </div>
     </main>
@@ -95,53 +97,45 @@ export function Negocio({ parte }: { parte: Parte }) {
 }
 
 function Usuarios() {
-  const { sesion } = useSesion();
-  const rolActor = sesion.estado === "con-sesion" ? sesion.usuario.rol : "mostrador";
-  const esAdmin = rolActor === "admin"; // no toca dueños ni da ese rol
+  const disponibles = useRolesAsignables();
   const [filas, setFilas] = useState<UsuarioFila[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [alta, setAlta] = useState(false);
+  const [rolesDelNuevo, setRolesDelNuevo] = useState<string[]>([]);
   const cargar = () => api<UsuarioFila[]>("/usuarios").then(setFilas).catch((e: Error) => setError(e.message));
   useEffect(() => { void cargar(); }, []);
 
   async function autorizar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formulario = e.currentTarget;
-    const datos = new FormData(formulario);
+    const datos = new FormData(e.currentTarget);
+    if (rolesDelNuevo.length === 0) { setError("Elegí al menos un rol para la persona."); return; }
     try {
-      await api("/usuarios", { method: "POST", body: JSON.stringify({ email: datos.get("email"), nombre: datos.get("nombre"), rol: datos.get("rol") }) });
-      setError(null); setAlta(false);
+      await api("/usuarios", { method: "POST", body: JSON.stringify({ email: datos.get("email"), nombre: datos.get("nombre"), roles: rolesDelNuevo }) });
+      setError(null); setAlta(false); setRolesDelNuevo([]);
       await cargar();
     } catch (err) { setError((err as Error).message); }
   }
-  async function cambiar(id: string, cambios: Partial<UsuarioFila>) {
-    try { await api(`/usuarios/${id}`, { method: "PATCH", body: JSON.stringify(cambios) }); setError(null); await cargar(); }
-    catch (err) { setError((err as Error).message); }
+  async function cambiar(id: string, cambios: { activo?: boolean; roles?: string[] }): Promise<string | null> {
+    try { await api(`/usuarios/${id}`, { method: "PATCH", body: JSON.stringify(cambios) }); setError(null); await cargar(); return null; }
+    catch (err) { return (err as Error).message; }
   }
 
   return (
     <>
       <div className="seccion">{NOMBRES.usuariosAutorizados}</div>
-      <small style={{ padding: "0 4px" }}>{TEXTOS.usuarios.queHaceCadaRol.corto}</small>
+      <small style={{ padding: "0 4px" }}>{TEXTOS.usuarios.queSonLosRoles.corto}</small>
       <AvisoError texto={error} alCerrar={() => setError(null)} />
       <div className="lista" data-testid="usuarios">
-        {filas.map((u) => {
-          const protegido = esAdmin && u.rol === "dueño";
-          return (
-            <div key={u.id} className={`fila ${u.activo ? "" : "apagada"}`} data-testid="usuario-fila">
+        {filas.map((u) => (
+          <div key={u.id} className={`usuario-con-roles ${u.activo ? "" : "apagada"}`} data-testid="usuario-fila">
+            <div className="fila">
               <span className="nombre">{u.nombre}</span>
-              <span className="derecha" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <select className="boton chico" style={{ appearance: "none", WebkitAppearance: "none" }} value={u.rol} disabled={protegido} onChange={(e) => cambiar(u.id, { rol: e.target.value })} aria-label={`Rol de ${u.nombre}`}>
-                  <option value="mostrador">{nombreDeRol("mostrador")}</option>
-                  <option value="admin">{nombreDeRol("admin")}</option>
-                  {(!esAdmin || u.rol === "dueño") && <option value="dueño">{nombreDeRol("dueño")}</option>}
-                </select>
-                {protegido ? <small>solo el Administrador principal</small> : <button type="button" className="boton chico texto" style={{ color: u.activo ? "var(--coral-texto)" : "var(--tinta)" }} onClick={() => cambiar(u.id, { activo: !u.activo })}>{u.activo ? "Desactivar" : "Reactivar"}</button>}
-              </span>
+              <span className="derecha"><button type="button" className="boton chico texto" onClick={async () => { const falla = await cambiar(u.id, { activo: !u.activo }); if (falla) setError(falla); }}>{u.activo ? "Desactivar" : "Reactivar"}</button></span>
               <span className="detalle">{u.email}{u.activo ? "" : " · desactivado"}</span>
             </div>
-          );
-        })}
+            <RolesDeUsuario disponibles={disponibles} actuales={u.roles ?? []} nombre={u.nombre} alGuardar={(ids) => cambiar(u.id, { roles: ids })} />
+          </div>
+        ))}
         <button type="button" className="fila" onClick={() => setAlta(true)} data-testid="autorizar"><span className="nombre" style={{ color: "var(--coral-texto)" }}>+ Autorizar otro correo de Google</span></button>
       </div>
       {alta && (
@@ -149,7 +143,8 @@ function Usuarios() {
           <form onSubmit={autorizar} className="formulario" data-testid="alta-usuario">
             <label className="renglon"><span>Nombre</span><input name="nombre" placeholder="Nombre" required /></label>
             <label className="renglon"><span>Correo de Google</span><input name="email" type="email" placeholder="correo@gmail.com" required /></label>
-            <label className="renglon"><span>Rol</span><select name="rol" defaultValue="mostrador"><option value="mostrador">{nombreDeRol("mostrador")}</option><option value="admin">{nombreDeRol("admin")}</option>{!esAdmin && <option value="dueño">{nombreDeRol("dueño")}</option>}</select></label>
+            <div style={{ padding: "10px 16px" }}><ElegirRoles disponibles={disponibles} elegidos={rolesDelNuevo} alCambiar={setRolesDelNuevo} /></div>
+            <AvisoError texto={error} />
             <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton tinta">Autorizar</button></div>
           </form>
         </Hoja>

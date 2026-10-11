@@ -18,10 +18,12 @@ tests/capturas/levantar.sh --apagar
   (1366×768) y `<nombre>-celu.png` (390×844).
 - **Qué avisa:** desplazamiento hacia el costado, texto de menos de 14 px, objetivos táctiles
   de menos de 44 px en el celular y errores de consola. Si no avisa nada, dice «bien».
-- **Opciones:** `--celu`, `--compu`, `--nombre`, `--sin-sesion`, `--sin-conexion`, `--entera`
+- **Opciones:** `--celu`, `--compu`, `--nombre`, `--sin-sesion`, `--permisos`, `--sin-conexion`, `--entera`
   y `--py "código"` (repetible) para dejar la pantalla en el estado que hace falta;
   `python tests/capturas/capturar.py -h` las explica.
-- **La sesión** se simula: no pasa por Google.
+- **La sesión** se simula: no pasa por Google. Por defecto puede todo; con `--permisos` queda solo con los
+  que se le pasan, para ver lo que ve cada rol:
+  `python tests/capturas/capturar.py vender --permisos ventas.registrar`.
 
 ## La API de mentira
 
@@ -44,7 +46,7 @@ La computadora y el celular no usan las mismas direcciones:
 | Catálogo | `productos`, `listas`, `duplicados` | `catalogo`, `catalogo/listas`, `catalogo/duplicados` |
 | Vender | `vender` | `vender` |
 | Depósito | `compras` (Ingreso), `stock` (Inventario), `contar` (Estanterías) | `deposito`, `deposito/stock`, `deposito/contar` |
-| Más | `mas`, `resumen`, `usuarios`, `actividad`, `tickets` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/actividad`, `mas/tickets` |
+| Más | `mas`, `resumen`, `usuarios`, `roles`, `actividad`, `anomalias`, `tickets` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/roles`, `mas/actividad`, `mas/anomalias`, `mas/tickets` |
 
 `--entera` (página completa) se cuelga en la computadora: ahí conviene bajar con
 `--py "page.locator('...').scroll_into_view_if_needed()"`.

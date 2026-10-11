@@ -34,7 +34,7 @@ El ingreso con Google no funciona en local con el `GOOGLE_CLIENT_ID` de la plant
 resto sí. El primer usuario se crea desde el contenedor:
 
 ```bash
-docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre" dueño
+docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre"
 ```
 
 En pruebas y producción la base es Supabase y el cliente está en GitHub Pages. `master` es

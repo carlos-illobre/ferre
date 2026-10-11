@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { conPermisos } from "../../pruebas/sesion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
@@ -9,7 +10,6 @@ vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalog
 const descargar = vi.fn<(...a: any[]) => Promise<void>>(async () => undefined);
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar: (...a: unknown[]) => descargar(...a), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../../sesion", () => ({ useSesion: () => ({ sesion: { estado: "con-sesion", usuario: { id: "u1", email: "a@b", nombre: "Ana", rol: "dueño" } } }), administra: () => true }));
 
 import { Catalogo } from "./Catalogo";
 
@@ -144,5 +144,24 @@ describe("Catálogo · Productos", () => {
     armar(undefined, "duplicados");
     expect(screen.getByRole("tab", { name: "Duplicados" }).getAttribute("aria-selected")).toBe("true");
     expect(screen.getByTestId("buscar-duplicados")).toBeTruthy();
+  });
+
+  // RF-72: lo que no se puede usar no se muestra.
+  it("sin el permiso de fijar márgenes, la ficha no tiene los botones y los atajos no cambian nada", () => {
+    conPermisos("ventas.registrar");
+    const { falso } = armar();
+    expect(screen.queryByRole("tab", { name: "Listas" })).toBeNull();
+    expect(screen.queryByRole("tab", { name: "Duplicados" })).toBeNull();
+    fireEvent.keyDown(document.body, { code: "Digit1", key: "!", shiftKey: true });
+    fireEvent.click(fila("MECHA"));
+    expect(within(ficha()).queryByRole("radiogroup")).toBeNull();
+    expect(screen.queryByTestId("otro-margen")).toBeNull();
+    expect(falso.actualizarProducto).not.toHaveBeenCalled();
+  });
+
+  it("entrar por la dirección a una pestaña sin permiso dice qué permiso falta", () => {
+    conPermisos("catalogo.margenes");
+    armar(undefined, "listas");
+    expect(screen.getByTestId("sin-permiso").textContent).toContain("Cargar listas de precios");
   });
 });
