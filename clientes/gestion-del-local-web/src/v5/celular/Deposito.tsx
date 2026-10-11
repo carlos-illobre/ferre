@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { api, ErrorApi } from "../../api";
 import { enviarOEncolar } from "../../cola";
@@ -41,7 +42,7 @@ type Movimiento = { id: string; tipo: string; cantidad: string; referencia_tipo:
 // Inventario: cuánto hay de cada producto, explicado con sus movimientos. Sin sumas de
 // dinero: el dinero invertido está en Cómo va el negocio (decisión 31).
 function Stock() {
-  const { catalogo, buscarProductos } = useCatalogo();
+  const { catalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [datos, setDatos] = useState<Datos | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -68,7 +69,7 @@ function Stock() {
       <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" />
       <p className="subtitulo">El stock es la suma de compras, ventas y ajustes desde que se usa el sistema. Hasta el conteo, lo que no se cargó no está.</p>
       <div className="lista" data-testid="tabla-stock">
-        {filas.map((p) => <FilaStock key={p.id} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={async (texto) => { setMensaje(texto); await cargar(); }} />)}
+        {filas.map((p) => <FilaStock key={p.id} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={async (texto) => { setMensaje(texto); await cargar(); }} />)}
       </div>
       {consulta.trim() && filas.length === 0 && catalogo && <div className="aviso-suave">Nada con "{consulta}".</div>}
       </div>
@@ -77,7 +78,7 @@ function Stock() {
   );
 }
 
-function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => Promise<void> }) {
+function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: { alFoto: (foto_url: string) => void; producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => Promise<void> }) {
   const cantidad = fila ? Number(fila.stock) : 0;
   const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null);
   const [corrigiendo, setCorrigiendo] = useState(false);
@@ -102,6 +103,8 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { product
 
   return (
     <div className={`fila-stock ${abierto ? "abierta" : ""}`} data-testid="fila-stock">
+      <div className="con-foto-de-producto">
+      <FotoDeProducto producto={p} alCambiar={alFoto} />
       <button type="button" className="fila" onClick={alAbrir} data-testid="stock" aria-expanded={abierto}>
         <span className="nombre">{p.descripcion}</span>
         <span className="derecha">
@@ -109,6 +112,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { product
         </span>
         <span className="detalle">{detalleDe(p)}{fila?.ultimo_movimiento ? ` · último ${fecha(fila.ultimo_movimiento.slice(0, 10))}` : ""}</span>
       </button>
+      </div>
       {abierto && (
         <div className="detalle-stock" style={{ display: "flex", flexDirection: "column", gap: 10, animation: "aparecer .2s" }} data-testid="detalle-stock">
           <small>Stock {num(cantidad)} = suma de estos movimientos</small>
@@ -151,7 +155,7 @@ const COMPROBANTES = [{ valor: "factura", nombre: "Factura" }, { valor: "remito"
 // de siempre → registrar. Suma stock y, si la factura trae otro costo, ese pasa a ser el
 // vigente. Reemplaza el papel semanal de gastos.
 function Ingreso() {
-  const { catalogo, error: errorCatalogo, buscarProductos } = useCatalogo();
+  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [proveedorId, setProveedorId] = useState("");
   const [comprobante, setComprobante] = useState<(typeof COMPROBANTES)[number]["valor"]>("factura");
@@ -271,6 +275,7 @@ function Ingreso() {
         return (
           <div key={r.clave} className="tarjeta" data-testid="renglon">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
+              {r.producto && <FotoDeProducto producto={r.producto} alCambiar={(f) => { cambiar(r.clave, { producto: { ...r.producto!, foto_url: f } }); actualizarProducto(r.producto!.id, { foto_url: f }).catch(() => undefined); }} />}
               {r.producto ? <span style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}><span style={{ fontWeight: 600, lineHeight: 1.25 }}>{r.descripcion}</span><small>{detalleDe(r.producto)}</small></span>
                 : <input className="linea-editable" value={r.descripcion} placeholder="Descripción del producto nuevo" onChange={(e) => cambiar(r.clave, { descripcion: e.target.value })} data-testid="descripcion-nueva" />}
               <button type="button" className="quitar tacho" onClick={() => quitar(r.clave)} aria-label={`Quitar ${r.descripcion || "el producto"} del ingreso`} title="Quitar del ingreso" data-testid="quitar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg></button>

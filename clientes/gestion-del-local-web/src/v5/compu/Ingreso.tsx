@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { FotoDeProducto } from "./FotoDeProducto";
 import { api } from "../../api";
 import { useCatalogo } from "../../catalogo";
 import { fecha, pesos, porcentaje } from "../../formato";
@@ -41,7 +42,7 @@ const incompleto = (r: Renglon) => r.costo === null || !r.descripcion.trim() || 
 export function Ingreso() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const { catalogo, error: errorCatalogo, buscarProductos } = useCatalogo();
+  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [borrador] = useState(leerBorrador);
   const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
   const [proveedorId, setProveedorId] = useState(borrador?.proveedorId ?? "");
@@ -211,7 +212,7 @@ export function Ingreso() {
     );
   };
   const nombreDe = (r: Renglon) => r.producto
-    ? <><span className="nombre">{r.descripcion}</span><span className="detalle compras-bajo-nombre">{detalleDe(r.producto) || "Sin marca ni proveedor"}</span></>
+    ? <span className="con-foto-de-producto"><FotoDeProducto producto={r.producto} alCambiar={(f) => { cambiar(r.clave, { producto: { ...r.producto!, foto_url: f } }); actualizarProducto(r.producto!.id, { foto_url: f }).catch(() => undefined); }} /><span><span className="nombre">{r.descripcion}</span><span className="detalle compras-bajo-nombre">{detalleDe(r.producto) || "Sin marca ni proveedor"}</span></span></span>
     : (
       <span className="compras-nuevo">
         <Pastilla tipo="azul" sinPunto>Producto nuevo</Pastilla>

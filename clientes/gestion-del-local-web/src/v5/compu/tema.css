@@ -127,3 +127,6 @@
 .lateral nav button .atajo { width: auto; padding: 0 6px; white-space: nowrap; }
 /* El foco en el menú se tiene que ver bien: se llega con la flecha izquierda. */
 .lateral nav button:focus-visible { outline: 3px solid #f7c445; outline-offset: 1px; }
+/* La foto del producto al lado de su nombre, en Inventario y en Ingreso. */
+.con-foto-de-producto { display: flex; align-items: center; gap: var(--e3); min-width: 0; }
+.con-foto-de-producto > span { display: flex; flex-direction: column; min-width: 0; }

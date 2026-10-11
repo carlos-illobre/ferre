@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { FotoDeProducto } from "./FotoDeProducto";
 import { api, ErrorApi } from "../../api";
 import { leerTodo } from "../../almacen";
 import { enviarOEncolar } from "../../cola";
@@ -40,7 +41,7 @@ function armar(filas: StockFila[]): Datos {
 export function Inventario() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const { catalogo, error: errorCatalogo, buscarProductos } = useCatalogo();
+  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [datos, setDatos] = useState<Datos | null>(null);
   const [delDispositivo, setDelDispositivo] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -191,7 +192,7 @@ export function Inventario() {
               <table className="tabla stock-tabla" data-testid="tabla-stock">
                 <thead>
                   <tr>
-                    {cabeza("producto", "Producto")}<th>Proveedor</th>{cabeza("stock", "Stock", true)}{cabeza("ultimo", "Último movimiento")}<th><span className="solo-lectores">Corregir</span></th>
+                    <th><span className="solo-lectores">Foto</span></th>{cabeza("producto", "Producto")}<th>Proveedor</th>{cabeza("stock", "Stock", true)}{cabeza("ultimo", "Último movimiento")}<th><span className="solo-lectores">Corregir</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -201,6 +202,7 @@ export function Inventario() {
                     const unidad = nombreUnidad(p.unidad);
                     return (
                       <tr key={p.id} data-testid="fila-stock" aria-selected={i === marcada && consulta.trim() !== ""}>
+                        <td className="angosta"><FotoDeProducto producto={p} alCambiar={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} /></td>
                         <td><span className="nombre">{p.descripcion}</span><span className="detalle stock-bajo-nombre">{[p.marca, p.codigo_proveedor].filter(Boolean).join(" · ")}</span></td>
                         <td>{fila?.proveedor ?? p.proveedor ?? "—"}</td>
                         <td className="num">
