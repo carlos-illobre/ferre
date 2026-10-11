@@ -1,0 +1,258 @@
+/* Quién hizo qué: una lista que se lee como una conversación, agrupada por día.
+   Los filtros van a la vista en la computadora y detrás de «Filtrar» en el celular.
+   Prefijo: actividad */
+
+.actividad {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+/* ---- Filtros ---- */
+
+.actividad__filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) 170px 170px auto;
+  align-items: end;
+  gap: var(--e-3);
+  padding: var(--e-4);
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+}
+
+.actividad__filtros--hoja {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--e-4) var(--e-3);
+  padding: 0;
+  border: 0;
+}
+
+.actividad__filtros--hoja .actividad__elegir {
+  grid-column: 1 / -1;
+}
+
+.actividad__filtros .campo {
+  min-width: 0;
+}
+
+.actividad__elegir .campo__caja {
+  position: relative;
+}
+
+.actividad__select {
+  width: 100%;
+  height: 100%;
+  padding: 0 var(--e-10) 0 var(--e-4);
+  border: 0;
+  border-radius: var(--radio);
+  outline: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.actividad__select-flecha {
+  position: absolute;
+  right: var(--e-3);
+  color: var(--texto-2);
+  pointer-events: none;
+}
+
+.actividad__fecha .campo__entrada {
+  min-width: 0;
+  padding: 0 var(--e-3);
+}
+
+.actividad__quitar-todos {
+  min-height: var(--alto-campo);
+}
+
+/* ---- Celular: «Filtrar» y las pastillas de lo que está puesto ---- */
+
+.actividad__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+}
+
+.actividad__cuenta {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.actividad__puestos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+  padding: 0;
+  list-style: none;
+}
+
+.actividad__puesto {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  max-width: 100%;
+  min-height: var(--toque);
+  padding: 0 var(--e-3) 0 var(--e-4);
+  border: var(--grosor-borde) solid var(--naranja-borde);
+  border-radius: var(--radio-redondo);
+  background: var(--naranja-suave);
+  color: var(--naranja-texto);
+  font-size: var(--letra-chica);
+  font-weight: var(--peso-fuerte);
+}
+
+.actividad__puesto svg {
+  flex: none;
+}
+
+/* ---- La lista, por día ---- */
+
+.actividad__dia h2 {
+  margin-bottom: var(--e-2);
+  font-size: var(--titulo-3);
+}
+
+/* La frase se lee de corrido: solo el nombre va en negrita. */
+.actividad__lista .renglon__titulo {
+  font-weight: var(--peso-normal);
+  line-height: 1.4;
+}
+
+.actividad__lista .renglon__titulo strong {
+  font-weight: var(--peso-boton);
+}
+
+.actividad__lista .renglon__inicio {
+  align-self: flex-start;
+}
+
+.actividad__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-1) var(--e-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Las anulaciones se distinguen por la pastilla (texto) y, además, por la franja y el fondo. */
+.actividad__accion--anulacion {
+  background: var(--peligro-suave);
+  box-shadow: inset 4px 0 0 var(--peligro);
+}
+
+.actividad__accion--anulacion .renglon__caja--boton:hover {
+  background: transparent;
+}
+
+.actividad__accion--anulacion .pastilla {
+  background: var(--superficie);
+}
+
+/* ---- Páginas ---- */
+
+.actividad__paginas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  margin-top: var(--e-2);
+}
+
+.actividad__paginas p {
+  font-size: var(--letra-chica);
+  color: var(--texto-2);
+  text-align: center;
+}
+
+.actividad__paginas .boton {
+  min-width: 150px;
+}
+
+/* ---- Detalle de una acción ---- */
+
+.actividad__detalle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+.actividad__detalle-cabeza {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-3);
+}
+
+.actividad__detalle-frase {
+  font-size: var(--letra-grande);
+  line-height: 1.35;
+  color: var(--texto);
+}
+
+.actividad__detalle-frase strong {
+  font-weight: var(--peso-boton);
+}
+
+.actividad__datos {
+  margin: 0;
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+}
+
+.actividad__datos div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: var(--e-1) var(--e-4);
+  padding: var(--e-3) var(--e-4);
+}
+
+.actividad__datos div + div {
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.actividad__datos dt {
+  font-size: var(--letra-chica);
+  color: var(--texto-2);
+}
+
+.actividad__datos dd {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-1);
+  margin: 0;
+  font-weight: var(--peso-medio);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .actividad {
+    gap: var(--e-3);
+  }
+
+  .actividad__paginas .boton {
+    min-width: 0;
+    padding-inline: var(--e-3);
+  }
+
+  .actividad__paginas p {
+    white-space: nowrap;
+  }
+
+  /* En el celular alcanza con «1 de 3»: la palabra queda para los lectores de pantalla. */
+  .actividad__palabra-pagina {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .actividad__datos div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

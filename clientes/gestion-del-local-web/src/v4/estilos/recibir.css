@@ -1,0 +1,485 @@
+/* Recibir mercadería: lo que llegó a la izquierda y las compras recientes a la derecha.
+   En el celular va todo en una columna y el total con «Registrar ingreso» queda pegado abajo. Prefijo: recibir */
+
+.recibir {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: var(--e-5);
+}
+
+/* ---- El ingreso ---- */
+
+.recibir__formulario {
+  min-width: 0;
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+}
+
+.recibir__parte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  padding: var(--e-5);
+}
+
+.recibir__parte + .recibir__parte {
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.recibir__parte h2,
+.recibir__recientes h2 {
+  font-size: var(--titulo-3);
+}
+
+.recibir__proveedores {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--e-2);
+}
+
+.recibir__proveedor {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: 60px;
+  padding: var(--e-2);
+  border: var(--grosor-borde) solid var(--borde-fuerte);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  text-align: left;
+  transition: background var(--rapido), border-color var(--rapido);
+}
+
+.recibir__proveedor:hover {
+  border-color: var(--naranja);
+}
+
+.recibir__proveedor strong {
+  flex: 1;
+  min-width: 0;
+}
+
+.recibir__proveedor svg {
+  flex: none;
+}
+
+.recibir__proveedor--elegido {
+  border-color: var(--naranja);
+  background: var(--naranja-suave);
+  box-shadow: inset 0 0 0 1px var(--naranja);
+  color: var(--naranja-texto);
+}
+
+/* El comprobante no frena: una sola fila; el número y la fecha aparecen si hay comprobante. */
+.recibir__comprobante {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: var(--e-3);
+}
+
+.recibir__comprobante--con-datos {
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr) 160px;
+}
+
+.recibir__comprobante .segmentos__opcion {
+  min-height: var(--alto-campo);
+}
+
+.recibir__comprobante .segmentos__opcion:last-child {
+  flex: 1.5;
+}
+
+.recibir__comprobante:not(.recibir__comprobante--con-datos) .segmentos {
+  max-width: 460px;
+}
+
+/* ---- Buscar lo que llegó ---- */
+
+.recibir__resultados {
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+  overflow: hidden;
+}
+
+.recibir__resultado {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--e-2) var(--e-3) var(--e-2) var(--e-4);
+  border: 0;
+  border-bottom: var(--grosor-borde) solid var(--borde);
+  background: transparent;
+  text-align: left;
+}
+
+.recibir__resultado:last-child {
+  border-bottom: 0;
+}
+
+.recibir__resultado--marcado {
+  background: var(--naranja-suave);
+}
+
+.recibir__resultado:focus-visible {
+  outline-offset: -3px;
+}
+
+.recibir__resultado-texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.recibir__resultado-texto span,
+.recibir__resultado-costo span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.recibir__resultado-costo {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+.recibir__sumar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--toque);
+  height: var(--toque);
+  border-radius: var(--radio);
+  background: var(--naranja-suave);
+  color: var(--naranja-texto);
+}
+
+.recibir__resultado--marcado .recibir__sumar {
+  background: var(--superficie);
+}
+
+.recibir__sin-resultados {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--e-3);
+  padding: var(--e-4);
+}
+
+.recibir__nuevo {
+  align-self: flex-start;
+  margin: calc(-1 * var(--e-1)) 0 0 calc(-1 * var(--e-3));
+  text-align: left;
+}
+
+.recibir__parte .vacio {
+  padding-block: var(--e-6);
+}
+
+/* ---- Los renglones ---- */
+
+.recibir__lineas {
+  padding: 0;
+  list-style: none;
+}
+
+.recibir__linea {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 150px 96px auto;
+  align-items: end;
+  gap: var(--e-2) var(--e-3);
+  padding: var(--e-3) 0;
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.recibir__linea--recien {
+  animation: recibir-recien 1.2s ease-out;
+}
+
+@keyframes recibir-recien {
+  from { background: var(--naranja-suave); }
+}
+
+.recibir__linea--falta {
+  margin: var(--e-2) calc(-1 * var(--e-3));
+  padding: var(--e-3);
+  border: var(--grosor-borde) solid var(--alerta-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--alerta-suave);
+}
+
+.recibir__linea--falta + .recibir__linea {
+  border-top: 0;
+}
+
+.recibir__nombre {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: var(--e-1);
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.recibir__notas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-1) var(--e-2);
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.recibir__cuanto {
+  display: flex;
+  flex-direction: column;
+}
+
+.recibir__rotulo,
+.recibir__costo .campo__etiqueta {
+  margin-bottom: var(--e-1);
+  font-size: var(--letra-detalle);
+  font-weight: var(--peso-medio);
+  color: var(--texto-2);
+}
+
+.recibir__cuanto .cantidad {
+  height: var(--alto-campo);
+}
+
+.recibir__subtotal {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: var(--alto-campo);
+  font-size: var(--letra-grande);
+}
+
+.recibir__quitar {
+  height: var(--alto-campo);
+  margin-right: calc(-1 * var(--e-2));
+  color: var(--texto-2);
+}
+
+.recibir__quitar:hover:not(:disabled) {
+  background: var(--peligro-suave);
+  color: var(--peligro-texto);
+}
+
+/* ---- Total y «Registrar ingreso» ---- */
+
+.recibir__registrar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--e-3) var(--e-5);
+  padding: var(--e-4) var(--e-5);
+  border-radius: 0 0 var(--radio-tarjeta) var(--radio-tarjeta);
+}
+
+.recibir__registrar .aviso,
+.recibir__sin-conexion {
+  grid-column: 1 / -1;
+}
+
+.recibir__sin-conexion {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  font-size: var(--letra-detalle);
+  color: var(--alerta-texto);
+}
+
+.recibir__sin-conexion svg {
+  flex: none;
+}
+
+.recibir__total {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.recibir__total span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.recibir__total strong {
+  font-size: var(--cifra);
+}
+
+/* ---- Compras de la semana y recientes ---- */
+
+.recibir__recientes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  min-width: 0;
+}
+
+.recibir__semana {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--e-2);
+  padding: var(--e-4) var(--e-5);
+}
+
+.recibir__semana p,
+.recibir__semana span {
+  font-size: var(--letra-chica);
+  color: var(--sobre-verde-2);
+}
+
+.recibir__semana strong {
+  font-size: var(--cifra);
+  line-height: 1.2;
+}
+
+/* ---- Hojas ---- */
+
+.recibir__datos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--e-1);
+  font-size: var(--letra-chica);
+}
+
+.recibir__comprado {
+  padding: 0;
+  list-style: none;
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.recibir__comprado li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  padding: var(--e-3) 0;
+  border-bottom: var(--grosor-borde) solid var(--borde);
+}
+
+.recibir__comprado li > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.recibir__comprado li > span span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.recibir__total-comprado {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-weight: var(--peso-fuerte);
+  color: var(--texto);
+}
+
+.hoja__cuerpo > .recibir__total-comprado {
+  color: var(--texto);
+}
+
+.recibir__total-comprado strong {
+  font-size: var(--titulo-1);
+}
+
+.recibir__nuevo-producto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+.recibir__pregunta {
+  margin-bottom: var(--e-2);
+  font-size: var(--letra-chica);
+  font-weight: var(--peso-fuerte);
+}
+
+/* ---- Pantalla angosta de computadora ---- */
+
+@media (max-width: 1100px) {
+  .recibir {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- Celular ---- */
+
+@media (max-width: 700px) {
+  .recibir {
+    gap: var(--e-5);
+  }
+
+  /* El ingreso ocupa todo el ancho, como «Esta venta». */
+  .recibir__formulario {
+    margin: calc(-1 * var(--e-4)) calc(-1 * var(--margen-pagina)) 0;
+    border-width: 0 0 var(--grosor-borde);
+    border-radius: 0;
+  }
+
+  .recibir__parte {
+    padding: var(--e-4) var(--margen-pagina);
+  }
+
+  .recibir__proveedores {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .recibir__comprobante--con-datos {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .recibir__comprobante .segmentos {
+    grid-column: 1 / -1;
+  }
+
+  .recibir__linea {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .recibir__linea--falta {
+    margin-inline: calc(-1 * var(--e-2));
+    padding-inline: var(--e-2);
+  }
+
+  .recibir__nombre { grid-column: 1 / 3; grid-row: 1; }
+  .recibir__quitar { grid-column: 3; grid-row: 1; align-self: start; height: var(--toque); }
+  .recibir__cuanto { grid-column: 1; grid-row: 2; }
+  .recibir__costo { grid-column: 2 / 4; grid-row: 2; }
+  .recibir__subtotal { display: none; }
+
+  .recibir__registrar {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--e-2) var(--e-4);
+    padding: var(--e-3) var(--margen-pagina);
+    border-radius: 0;
+  }
+
+  .recibir__total strong {
+    font-size: var(--titulo-1);
+  }
+
+  .recibir__registrar .boton {
+    padding-inline: var(--e-3);
+    white-space: nowrap;
+  }
+
+  .recibir__registrar .boton svg {
+    display: none;
+  }
+}

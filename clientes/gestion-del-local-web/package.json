@@ -14,6 +14,8 @@
   "dependencies": {
     "@ferre/calculo-de-precios": "workspace:*",
     "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
     "@simplewebauthn/browser": "^13.3.0",
     "@zxing/browser": "^0.2.1",
     "@zxing/library": "^0.23.0",

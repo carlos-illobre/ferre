@@ -1,0 +1,495 @@
+/* Listas de precios: la portada (zona para la planilla, proveedores, últimas cargas) y el
+   recorrido de una lista: leer, revisar, aplicar. Prefijo: listas */
+
+/* ---- Zona para la planilla: el bloque verde de Figma, con borde de «soltá acá» ---- */
+
+.listas__zona {
+  display: flex;
+  align-items: center;
+  gap: var(--e-5);
+  padding: var(--e-8) var(--e-6);
+  border: 2px dashed color-mix(in srgb, var(--sobre-verde-2) 55%, transparent);
+  border-radius: var(--radio-grande);
+  background: var(--verde);
+  color: var(--sobre-verde);
+  transition: background var(--rapido), border-color var(--rapido);
+}
+
+.listas__zona--arrastrando {
+  border-color: var(--amarillo);
+  background: var(--verde-2);
+}
+
+.listas__zona :focus-visible {
+  outline: var(--foco-sobre-verde);
+}
+
+.listas__zona-texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.listas__zona h2 {
+  margin-bottom: var(--e-1);
+  font-size: var(--titulo-2);
+}
+
+.listas__zona p {
+  max-width: 52ch;
+  font-size: var(--letra-chica);
+  color: var(--sobre-verde-2);
+}
+
+.listas__icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--verde-2);
+  color: var(--amarillo);
+}
+
+.listas__zona + .aviso,
+.pagina__contenido > .aviso + .listas__zona {
+  margin-top: var(--e-4);
+}
+
+/* ---- Proveedores ---- */
+
+.listas__proveedores {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--e-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listas__proveedor {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e-3);
+  padding: var(--e-4);
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+}
+
+.listas__proveedor-texto {
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.listas__proveedor h3 {
+  font-size: var(--titulo-3);
+}
+
+.listas__proveedor p {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.listas__proveedor > .pastilla,
+.listas__hace {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.listas__hace {
+  padding: 3px 0;
+  font-size: var(--letra-detalle);
+  line-height: 1.4;
+  color: var(--texto-2);
+}
+
+/* ---- Sin proveedores ---- */
+
+/* ---- Un paso con el archivo en la mano: leyendo, una pregunta, un error ---- */
+
+.listas__paso {
+  padding: var(--e-6);
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-grande);
+  background: var(--superficie);
+}
+
+.listas__pregunta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+
+.listas__pregunta h2 {
+  font-size: var(--titulo-2);
+}
+
+.listas__pregunta > p {
+  color: var(--texto-2);
+}
+
+.listas__pregunta > p strong {
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+
+.listas__pregunta > .boton--principal,
+.listas__pregunta > .campo {
+  margin-top: var(--e-2);
+}
+
+.listas__pregunta > .boton--texto {
+  align-self: flex-start;
+  margin-left: calc(-1 * var(--e-3));
+}
+
+.listas__signo {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--amarillo-suave);
+  color: var(--alerta-texto);
+}
+
+.listas__signo--error {
+  background: var(--peligro-suave);
+  color: var(--peligro-texto);
+}
+
+.listas__opciones {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--e-2);
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  overflow: hidden;
+}
+
+.listas__opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: 64px;
+  padding: var(--e-2) var(--e-4);
+  border: 0;
+  border-bottom: var(--grosor-borde) solid var(--borde);
+  background: transparent;
+  text-align: left;
+  transition: background var(--rapido);
+}
+
+.listas__opcion:last-child {
+  border-bottom: 0;
+}
+
+.listas__opcion:hover {
+  background: var(--naranja-suave);
+}
+
+.listas__opcion:focus-visible {
+  outline-offset: -3px;
+}
+
+.listas__opcion strong {
+  flex: 1;
+}
+
+.listas__opcion svg {
+  color: var(--texto-apagado);
+}
+
+.listas__fecha .campo__entrada {
+  min-width: 0;
+}
+
+/* ---- Revisar ---- */
+
+.listas__cabeza {
+  margin-bottom: var(--e-5);
+}
+
+.listas__cabeza h2 {
+  font-size: var(--titulo-1);
+}
+
+.listas__cabeza p {
+  margin-top: var(--e-1);
+  color: var(--texto-2);
+}
+
+.listas__numeros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--e-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listas__numeros li {
+  display: flex;
+  flex-direction: column;
+  padding: var(--e-4) var(--e-5);
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+}
+
+.listas__numeros strong {
+  font-size: var(--cifra);
+  line-height: 1.15;
+}
+
+.listas__numeros span {
+  color: var(--texto-2);
+}
+
+.listas__numeros em {
+  display: flex;
+  align-items: center;
+  gap: var(--e-1);
+  margin-top: var(--e-1);
+  font-size: var(--letra-detalle);
+  font-style: normal;
+  font-weight: var(--peso-fuerte);
+  color: var(--peligro-texto);
+}
+
+.listas__numeros .listas__numero--cambian {
+  border-color: var(--naranja-borde);
+  background: var(--naranja-suave);
+}
+
+.listas__subtitulo {
+  margin: var(--e-6) 0 var(--e-3);
+  font-size: var(--titulo-3);
+}
+
+.listas__ejemplos {
+  margin: 0 0 var(--e-6);
+  padding: 0;
+  list-style: none;
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+  overflow: hidden;
+}
+
+.listas__ejemplos li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 128px;
+  align-items: center;
+  gap: var(--e-2) var(--e-5);
+  min-height: 64px;
+  padding: var(--e-3) var(--e-4) var(--e-3) var(--e-5);
+}
+
+.listas__ejemplos li + li {
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.listas__ejemplo-nombre {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.listas__ejemplo-nombre span,
+.listas__ejemplo-costo span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.listas__ejemplo-costo {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: var(--e-2);
+}
+
+.listas__ejemplo-costo strong {
+  font-size: var(--letra-grande);
+}
+
+.listas__ejemplos .pastilla {
+  justify-self: start;
+}
+
+.listas__aplicar {
+  margin: 0 calc(-1 * var(--margen-pagina)) calc(-1 * var(--e-10));
+  justify-content: flex-end;
+}
+
+.listas__nada {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--e-2);
+  min-width: 0;
+  font-weight: var(--peso-fuerte);
+}
+
+.listas__nada svg {
+  flex: none;
+  color: var(--info-texto);
+}
+
+/* ---- Agregar proveedor ---- */
+
+.listas__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+.listas__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+}
+
+.listas__grupo p {
+  font-size: var(--letra-chica);
+  font-weight: var(--peso-fuerte);
+}
+
+.listas__ejemplo-de-costo {
+  padding: var(--e-3) var(--e-4);
+  border-radius: var(--radio);
+  background: var(--superficie-2);
+  font-size: var(--letra-chica);
+  color: var(--texto-2);
+}
+
+.listas__ejemplo-de-costo strong {
+  color: var(--texto);
+}
+
+/* ---- Celular ---- */
+
+@media (max-width: 700px) {
+  .listas__zona {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--e-4);
+    padding: var(--e-5) var(--e-4);
+  }
+
+  .listas__icono {
+    width: 56px;
+    height: 56px;
+  }
+
+  .listas__proveedores {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    border: var(--grosor-borde) solid var(--borde);
+    border-radius: var(--radio-tarjeta);
+    background: var(--superficie);
+    overflow: hidden;
+  }
+
+  .listas__proveedor {
+    gap: var(--e-2) var(--e-3);
+    padding: var(--e-3) var(--e-4);
+    border: 0;
+    border-radius: 0;
+  }
+
+  .listas__proveedor + .listas__proveedor {
+    border-top: var(--grosor-borde) solid var(--borde);
+  }
+
+  /* En el celular, «hace cuánto» y la marca de «vieja» van debajo del nombre, alineados con él. */
+  .listas__proveedor > .pastilla,
+  .listas__hace {
+    grid-column: 2;
+  }
+
+  .listas__hace {
+    margin-top: calc(-1 * var(--e-2));
+    padding: 0;
+  }
+
+  .listas__carga .renglon__caja {
+    flex-wrap: wrap;
+  }
+
+  .listas__carga .renglon__texto {
+    flex-basis: 100%;
+  }
+
+  .listas__paso {
+    padding: var(--e-5) var(--e-4);
+  }
+
+  .listas__cabeza h2 {
+    font-size: var(--titulo-2);
+  }
+
+  /* Los tres números, uno debajo del otro: la cifra a la izquierda y qué es al lado. */
+  .listas__numeros {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--e-2);
+  }
+
+  .listas__numeros li {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    align-items: center;
+    gap: 0 var(--e-3);
+    padding: var(--e-3) var(--e-4);
+  }
+
+  .listas__numeros strong {
+    grid-row: span 2;
+    font-size: var(--titulo-1);
+  }
+
+  .listas__numeros li:not(.listas__numero--cambian) strong {
+    grid-row: auto;
+  }
+
+  .listas__numeros em {
+    grid-column: 2;
+    margin-top: 0;
+  }
+
+  .listas__ejemplos li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: var(--e-3) var(--e-4);
+  }
+
+  .listas__ejemplo-nombre {
+    grid-column: 1 / -1;
+  }
+
+  .listas__ejemplo-costo {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0 var(--e-2);
+  }
+
+  .listas__aplicar {
+    flex-wrap: wrap;
+    gap: var(--e-2);
+    margin-bottom: 0;
+  }
+
+  .listas__nada {
+    flex-basis: 100%;
+    font-size: var(--letra-chica);
+  }
+
+  .listas__aplicar .boton--principal {
+    flex: 1;
+    padding-inline: var(--e-3);
+    font-size: var(--letra);
+    white-space: nowrap;
+  }
+}

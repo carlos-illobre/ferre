@@ -38,10 +38,10 @@ export default defineConfig(({ command }) => {
         },
         workbox: {
           navigateFallback: "index.html",
-          // La interfaz en revisión vive en /v2/ con su propio index.html; /v3/ y /v4/ son
-          // maquetas, que no se guardan en el dispositivo.
-          navigateFallbackDenylist: [/\/v2\//, /\/v3\//, /\/v4\//],
-          globIgnores: ["v3/**", "v4/**"],
+          // /v2/ (la interfaz anterior, en revisión) y /v4/ (Ferrebress) tienen su propio
+          // index.html y se guardan en el dispositivo; /v3/ y /v4-maqueta/ son maquetas, que no.
+          navigateFallbackDenylist: [/\/v2\//, /\/v3\//, /\/v4\//, /\/v4-maqueta\//],
+          globIgnores: ["v3/**", "v4-maqueta/**"],
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
           // Nada de la API ni de Google se cachea: siempre red.
           runtimeCaching: [],
@@ -49,7 +49,7 @@ export default defineConfig(({ command }) => {
       }),
     ],
     base: process.env.VITE_BASE ?? "/",
-    // Dos entradas: la interfaz actual en la raíz y la nueva, en revisión, en /v2/.
-    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { principal: "index.html", v2: "v2/index.html" } } },
+    // Tres entradas: la interfaz actual en la raíz, la v2 en /v2/ y Ferrebress v4 en /v4/.
+    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { principal: "index.html", v2: "v2/index.html", v4: "v4/index.html" } } },
   };
 });

@@ -1,0 +1,61 @@
+/* Más: tarjetas grandes hacia las otras pantallas, como en Figma. Prefijo: mas */
+
+.mas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--e-3);
+}
+
+.mas__tarjeta {
+  display: flex;
+  align-items: center;
+  gap: var(--e-4);
+  min-height: 88px;
+  padding: var(--e-4);
+  border: var(--grosor-borde) solid var(--borde-fuerte);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+  text-decoration: none;
+  transition: border-color var(--rapido);
+}
+
+.mas__tarjeta:hover {
+  border-color: var(--naranja);
+}
+
+.mas__texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mas__texto strong {
+  font-family: var(--fuente-titulos);
+  font-size: var(--titulo-3);
+  line-height: var(--renglon-titulo);
+}
+
+.mas__texto span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+  line-height: 1.35;
+}
+
+.mas__flecha {
+  flex: none;
+  color: var(--texto-2);
+}
+
+@media (max-width: 700px) {
+  .mas {
+    grid-template-columns: 1fr;
+    gap: var(--e-2);
+  }
+
+  .mas__tarjeta {
+    min-height: 80px;
+    padding: var(--e-3) var(--e-4);
+  }
+}
