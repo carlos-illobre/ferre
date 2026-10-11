@@ -244,6 +244,15 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **Inventario no muestra dinero** y los gastos de la semana se ven solo en «Cómo va el
   negocio» (decisiones 31 y 34).
 
+- **Celular y computadora son la misma aplicación** (decisión 47): las reglas son idénticas;
+  la paleta es una sola; los textos dicen lo mismo, más largos en la computadora (explican,
+  casi como una ayuda) y resumidos en el celular si no entran. Las ventanas de confirmación
+  pueden ser distintas, porque en el celular una ventana emergente molesta más.
+- **La entrada:** en el celular, mínima (nombre, logo, una línea que dice qué hace la
+  aplicación y los botones); en la computadora puede explicar más. La línea es la misma.
+- **Corregir un stock pide siempre el motivo,** en las dos interfaces; hay motivos
+  frecuentes para elegir de un toque.
+
 **En el celular**
 
 - **Ninguna búsqueda toma el foco sola:** abriría el teclado y taparía el menú.

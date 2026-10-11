@@ -24,7 +24,7 @@ test.beforeAll(() => {
 });
 
 test("sin sesión se pide entrar", async ({ page }) => {
-  await page.goto("/v5/");
+  await page.goto("/");
   await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
   await expect(page.getByText(/Acá no hay contraseñas/)).toBeVisible();
   // Entrar leyendo un QR se quitó (2026-10-09): se entra con Google o con la huella.
@@ -33,7 +33,7 @@ test("sin sesión se pide entrar", async ({ page }) => {
 
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/");
+  await page.goto("/");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   // Lo que se usa poco está en «Más» (decisión 28).
   await page.getByTestId("menu-mas").click();
@@ -54,7 +54,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   // En la computadora la app no ofrece la huella aunque se acabe de entrar con Google
   // (eso es del celular): se vincula a mano desde Administración.
   await page.addInitScript((token) => { localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1"); }, TOKEN);
-  await page.goto("/v5/#/usuarios");
+  await page.goto("/#/usuarios");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   await expect(page.getByTestId("ofrecer-huella")).toHaveCount(0);
   await expect(page.getByTestId("celular")).toHaveCount(0);
@@ -73,7 +73,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   expect(psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
   // Quitar el celular: ya no entra con la huella.
-  await page.goto("/v5/#/usuarios");
+  await page.goto("/#/usuarios");
   await page.getByTestId("celular").getByRole("button", { name: /Quitar/ }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
   await page.getByRole("button", { name: "Salir" }).click();

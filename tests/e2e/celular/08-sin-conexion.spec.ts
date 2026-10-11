@@ -36,7 +36,7 @@ test.beforeAll(() => {
 
 test("vender y cambiar un margen sin red; al volver la red llega todo una sola vez", async ({ page, context }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/vender");
+  await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
   await expect(page.getByTestId("conexion-celular")).not.toContainText("Sin conexión");
@@ -82,7 +82,7 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
 
 test("la app abre sin red gracias al service worker", async ({ page, context }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/vender");
+  await page.goto("/#/vender");
   await expect(page.getByTestId("busqueda")).toBeEnabled();
   // Esperar a que el service worker controle la página y haya precacheado la app.
   await page.evaluate(() => navigator.serviceWorker.ready);

@@ -16,5 +16,5 @@ apagar
 mkdir -p tests/capturas/salida
 (cd tests/capturas/api-de-mentira && nohup node servidor.mjs 8799 > ../salida/api.log 2>&1 &)
 (cd clientes/gestion-del-local-web && VITE_API_URL=http://localhost:8799 VITE_GOOGLE_CLIENT_ID=captura nohup corepack pnpm exec vite --port 5199 --strictPort > ../../tests/capturas/salida/vite.log 2>&1 &)
-until curl -sf http://localhost:8799/health >/dev/null && curl -sf http://localhost:5199/v4/ >/dev/null; do sleep 0.5; done
+until curl -sf http://localhost:8799/health >/dev/null && curl -sf http://localhost:5199/ >/dev/null; do sleep 0.5; done
 echo "listo: API de mentira en :8799 y cliente en http://localhost:5199/ (v1/, v2/, v4/)"

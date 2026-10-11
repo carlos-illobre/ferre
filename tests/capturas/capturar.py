@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Captura una pantalla de la app real, versión 5 (http://localhost:5199/v5/) y avisa de lo que se puede medir.
+"""Captura una pantalla de la app real, aplicación principal (http://localhost:5199/) y avisa de lo que se puede medir.
 
   python capturar.py vender                        # las dos medidas (1366×768 y 390×844)
   python capturar.py stock --celu                  # solo celular; --compu: solo computadora
@@ -15,7 +15,7 @@ credencial (el mock rechaza la credencial "no" con 403). Se puede repetir.
 Guarda en $CAPTURAS (por defecto tests/capturas/salida/, que no se sube) como <nombre>-compu.png y <nombre>-celu.png
 (nombre = --nombre o la ruta). Avisa: desplazamiento hacia el costado, textos de menos de 14 px,
 objetivos táctiles de menos de 44 px (solo en el celular) y errores de consola. Tiene que decir «bien».
-Hacen falta la API de mentira (8799) y el Vite del cliente (5199); ver tests/capturas/README.md; con BASE=http://localhost:5199/v1/ (o v2) captura otra versión.
+Hacen falta la API de mentira (8799) y el Vite del cliente (5199); ver tests/capturas/README.md; con BASE=http://localhost:5199/historico/v1/ (o v2) captura otra versión.
 """
 import argparse
 import os
@@ -26,7 +26,7 @@ from playwright.sync_api import sync_playwright
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 CAPTURAS = os.environ.get("CAPTURAS", os.path.join(AQUI, "salida"))
-BASE = os.environ.get("BASE", "http://localhost:5199/v5/")
+BASE = os.environ.get("BASE", "http://localhost:5199/")
 MEDIDAS = {
     "compu": dict(viewport={"width": 1366, "height": 768}),
     "celu": dict(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, device_scale_factor=2,

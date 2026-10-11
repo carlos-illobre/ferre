@@ -73,8 +73,8 @@ def en_estilos(ruta, patron, regla):
 escribir("public/logo-ferrebress.svg", "<!-- Ferrebress: la F que es un tornillo, dentro de su tuerca. Para fondo claro. Lo genera tests/capturas/logo.py -->\n" + svg(SOBRE_CLARO) + "\n")
 escribir("public/icono-v5.svg", "<!-- Ferrebress: el ícono de la pestaña del navegador. Lo genera tests/capturas/logo.py -->\n" + svg(SOBRE_CLARO) + "\n")
 dato = "data:image/svg+xml," + urllib.parse.quote(svg(SOBRE_OSCURO).replace('"', "'"), safe="/:=' ()")
-en_estilos("src/v5/compu/tema.css", r"\.marca::before \{[^}]*\}", f'.marca::before {{ content: ""; flex: none; width: 1.9em; height: 1.9em; background: url("{dato}") center / contain no-repeat; }}')
-en_estilos("src/v5/celular/tema.css", r"\.entrar \.logo \{[^}]*\}", f'.entrar .logo {{ font-size: 0; width: 76px; height: 76px; border-radius: 0; background: url("{dato}") center / contain no-repeat; }}')
+en_estilos("src/principal/compu/tema.css", r"\.marca::before \{[^}]*\}", f'.marca::before {{ content: ""; flex: none; width: 1.9em; height: 1.9em; background: url("{dato}") center / contain no-repeat; }}')
+en_estilos("src/principal/celular/tema.css", r"\.entrar \.logo \{[^}]*\}", f'.entrar .logo {{ font-size: 0; width: 76px; height: 76px; border-radius: 0; background: url("{dato}") center / contain no-repeat; }}')
 
 fila = lambda fondo, color, c: (f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:22px;padding:20px;border-radius:14px;background:{fondo};color:{color};margin-top:10px">'
     + "".join(svg(c, n) for n in (150, 64, 32, 16)) + f'<span style="display:inline-flex;align-items:center;gap:12px;font-weight:700;font-size:2.2rem">{svg(c, 60)}Ferrebress</span>{svg(EN_NARANJA, 110)}</div>')

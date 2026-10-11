@@ -40,7 +40,7 @@ test.beforeAll(() => {
 
 test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/vender");
+  await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
   await expect(busqueda).toBeFocused();

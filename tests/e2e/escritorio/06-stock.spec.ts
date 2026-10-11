@@ -34,7 +34,7 @@ test.beforeAll(() => {
 
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/stock");
+  await page.goto("/#/stock");
   // La pantalla se llama Inventario y muestra cantidades, sin ninguna suma de dinero (decisión 31).
   await expect(page.getByRole("button", { name: /^Inventario/ })).toBeVisible();
   await expect(page.getByTestId("plata-invertida")).toHaveCount(0);
@@ -62,7 +62,7 @@ test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) =>
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("15.000");
 
   // En la venta se ve el stock del producto.
-  await page.goto("/v5/#/vender");
+  await page.goto("/#/vender");
   await page.getByTestId("busqueda").fill("e2e candado stock");
   await expect(page.getByTestId("sugerencias")).toContainText("stock 15");
 });

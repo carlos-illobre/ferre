@@ -29,7 +29,7 @@ test.beforeAll(() => {
 
 test("el admin administra pero no toca dueños", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/mas/usuarios");
+  await page.goto("/#/mas/usuarios");
   await expect(page.getByText("Quién puede entrar")).toBeVisible();
   await expect(page.getByText("Sesiones abiertas")).toBeVisible();
 

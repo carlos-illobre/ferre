@@ -54,15 +54,23 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
 
 ## La interfaz
 
-- **La interfaz del sistema es la «versión 5»** y es la que abre la raíz. Cómo está armada y
-  dónde vive cada cosa: [ADR-015](docs/adr/ADR-015-la-interfaz-elegida-es-la-version-5.md).
-  Lo que Carlos pidió de ella, que es regla para cualquier cambio:
+- **La aplicación es una sola y abre en la raíz.** Su código está en
+  `clientes/gestion-del-local-web/src/principal/` (se llamó «versión 5» hasta el 2026-10-11).
+  Cómo está armada y dónde vive cada cosa:
+  [ADR-015](docs/adr/ADR-015-la-interfaz-elegida-es-la-version-5.md). Lo que Carlos pidió de
+  ella, que es regla para cualquier cambio:
   [specs/001-base-del-sistema/ux.md](specs/001-base-del-sistema/ux.md), sección «2026-10-11».
-- **Las otras versiones** (`/v1/`, `/v2/`, `/v3/`, `/v4/`) siguen publicadas para comparar.
-  No se cambian ni se prueban, y no se borran hasta que Carlos lo pida: la versión 5 usa
-  archivos de la 1 y de la 2.
-- **Solo la versión 5 tiene pruebas.** Un cambio en una pantalla va con su prueba en
-  `clientes/gestion-del-local-web/src/v5/`.
+- **Tiene dos juegos de pantallas, celular y computadora, en archivos separados, a
+  propósito** (decisión 46). Entre los dos: **las reglas son idénticas, la paleta es una sola
+  (`paleta.css`) y los textos dicen lo mismo** (`textos.ts`: largos en la computadora, que
+  explican; resumidos en el celular). Un cambio de regla o de texto se hace en lo compartido
+  o en los dos lados, nunca en uno solo (decisión 47).
+- **Las versiones 1 a 4 son históricas** (`historico/`): se conservan para ver su maquetado.
+  No se usan, no se prueban y **no reciben ninguna funcionalidad nueva**. Ojo: la principal
+  todavía importa archivos de `src/pantallas`, `src/componentes` y `src/v2`; un cambio ahí
+  también cambia la versión histórica, así que lo nuevo va en `src/principal/`.
+- **Solo la aplicación principal tiene pruebas.** Un cambio en una pantalla va con su prueba
+  en `src/principal/` y, si toca un camino principal, en `tests/e2e/`.
 - **Cada cosa que Carlos decide** se anota con su número en
   [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md) y, si es una regla, en la
   `spec.md` de la capacidad.
@@ -91,9 +99,9 @@ El tablero (<https://gratis-vnic.tail994934.ts.net:8444/>) lee `specs/README.md`
 tests/utest.sh               # unitarias, sin nada levantado
 node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
-tests/e2e.sh                 # caminos principales de la versión 5, en celular y computadora (levanta el stack)
+tests/e2e.sh                 # caminos principales de la aplicación, en celular y computadora (levanta el stack)
 tests/capturas/levantar.sh   # API de mentira y cliente, para mirar pantallas sin Docker
-python tests/capturas/capturar.py vender   # captura una pantalla de la versión 5 en computadora y celular
+python tests/capturas/capturar.py vender   # captura una pantalla de la aplicación en computadora y celular
 ```
 
 Para mirar o comparar una pantalla, usá `tests/capturas/` ([cómo](tests/capturas/README.md))

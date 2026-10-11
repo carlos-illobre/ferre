@@ -42,7 +42,7 @@ test.beforeAll(() => {
 
 test("ingresar mercadería: stock, costo según factura, gasto de la semana y anulación", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/compras");
+  await page.goto("/#/compras");
   await page.getByTestId("proveedor").selectOption({ label: PROVEEDOR });
   // El número de la factura no se tipea (RF-50): se sube su foto. En la computadora se puede
   // pedir al celular con un código QR o elegir un archivo.

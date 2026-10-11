@@ -27,7 +27,7 @@ test.beforeAll(() => {
 
 test("avisar de un error con una captura, verlo en la lista, marcarlo resuelto y reabrirlo", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/tickets");
+  await page.goto("/#/tickets");
   const pantalla = page.getByTestId("tickets");
   await expect(pantalla.getByRole("heading", { name: "Mejoras y errores" })).toBeVisible();
 

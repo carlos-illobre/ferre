@@ -37,7 +37,7 @@ test.beforeAll(() => {
 
 test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/");
+  await page.goto("/");
   await page.getByTestId("menu-catalogo").click();
   await page.getByRole("button", { name: /^Listas/ }).click();
 

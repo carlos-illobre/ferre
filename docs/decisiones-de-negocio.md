@@ -205,3 +205,20 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     computadora, en archivos separados: Carlos acepta ese costo porque unificarlas arriesga
     la usabilidad de alguna de las dos. Lo que sí se unifica es lo que no cambia la
     disposición (textos, reglas, cálculos), para que no haya diferencias entre una y otra.
+47. **Celular y computadora: mismas reglas, mismos colores, textos que dicen lo mismo**
+    (2026-10-11). Sobre la aplicación principal:
+    - **Las reglas son idénticas** en las dos interfaces. Lo que una exige, lo exige la otra
+      (por ejemplo, el motivo al corregir un stock es obligatorio en las dos, y lo exige
+      también el servidor).
+    - **Los textos dicen lo mismo.** En la computadora explican, casi como documentación de
+      uso; en el celular pueden ir resumidos si no entran. Lo que no puede pasar es que digan
+      cosas distintas (como pasaba en la entrada, que en una hablaba del cuaderno y en la
+      otra de precios).
+    - **Las ventanas de confirmación pueden ser distintas:** en el celular una ventana
+      emergente molesta más que en la computadora.
+    - **La paleta de colores es una sola.**
+    - **La entrada del celular es mínima:** nombre, logo, una línea que dice qué hace la
+      aplicación y los botones para entrar. La de la computadora puede explicar más.
+    - **La aplicación abre en la raíz** y deja de llamarse «versión 5». Las versiones 1 a 4
+      se publican bajo `historico/`, con un cartel que dice que no se usan. Las direcciones
+      viejas (`/v5/`, `/v1/`, …) llevan solas a las nuevas.

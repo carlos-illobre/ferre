@@ -44,7 +44,7 @@ test.beforeAll(() => {
 
 test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/contar");
+  await page.goto("/#/contar");
   // La pestaña se llama Estanterías (decisión 39).
   await expect(page.getByRole("button", { name: /^Estanterías/ })).toBeVisible();
 

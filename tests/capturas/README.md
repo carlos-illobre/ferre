@@ -6,9 +6,9 @@ diseñar y para revisar; no reemplaza a las pruebas.
 
 ```bash
 tests/capturas/levantar.sh                      # API de mentira (:8799) y cliente (:5199)
-python tests/capturas/capturar.py vender        # captura #/vender de la versión 5, en las dos medidas
+python tests/capturas/capturar.py vender        # captura #/vender de la aplicación principal, en las dos medidas
 python tests/capturas/capturar.py stock --celu --py "page.get_by_test_id('stock').first.click()"
-BASE=http://localhost:5199/v1/ python tests/capturas/capturar.py productos   # otra versión
+BASE=http://localhost:5199/historico/v1/ python tests/capturas/capturar.py productos   # otra versión
 tests/capturas/levantar.sh --apagar
 ```
 
@@ -35,7 +35,7 @@ volviendo a levantar.
 La forma de cada respuesta tiene que ser la del servidor real (`specs/00N-*/contracts/api.md`).
 Si el servidor cambia, esta API se actualiza en el mismo cambio.
 
-## Direcciones de la versión 5
+## Direcciones de la aplicación
 
 La computadora y el celular no usan las mismas direcciones:
 

@@ -15,6 +15,14 @@ computadora de la versión 2 (menú lateral, tablas, teclado) y la idea de un me
 versión 4 (decisión 27). El 2026-10-11 eligió la versión 5, que junta esas tres cosas
 (decisión 28), y pidió que las otras versiones sigan publicadas pero sin pruebas (decisión 43).
 
+> **Actualización del 2026-10-11 (decisiones 46 y 47).** La «versión 5» pasó a llamarse
+> **la principal**: su código está en `src/principal/` y se publica en la raíz. Las versiones
+> 1 a 4 son históricas y se publican bajo `historico/`. Donde este documento dice «versión 5»
+> hay que leer «la principal». Se sumaron tres archivos que comparten las dos interfaces:
+> `src/principal/textos.ts` (textos y listas; forma larga para la computadora y corta para
+> el celular), `src/principal/paleta.css` (todos los colores) y las reglas, que tienen que
+> ser idénticas en las dos.
+
 ## Decisión
 
 **La versión 5 es la interfaz del sistema y es la que abre la raíz.** Se arma así:
@@ -41,16 +49,17 @@ Dónde está cada cosa en el código:
 
 | Qué | Dónde |
 |---|---|
-| Entrada de la versión 5 y elección del árbol | `clientes/gestion-del-local-web/src/v5/main.tsx` |
-| Árbol del celular: menú, copias de pantallas y estilos | `src/v5/celular/` (`App.tsx`, `tema.css`) |
-| Árbol de la computadora: menú, atajos, copias y estilos | `src/v5/compu/` (`App.tsx`, `tema.css`) |
-| Lo compartido por los dos árboles | `src/v5/*.tsx` y `src/v5/*.css` |
+| Entrada de la aplicación y elección del árbol | `clientes/gestion-del-local-web/src/principal/main.tsx` (la carga `index.html`, en la raíz) |
+| Árbol del celular: menú, copias de pantallas y estilos | `src/principal/celular/` (`App.tsx`, `tema.css`) |
+| Árbol de la computadora: menú, atajos, copias y estilos | `src/principal/compu/` (`App.tsx`, `tema.css`) |
+| Lo compartido por los dos árboles | `src/principal/*.tsx` y `src/principal/*.css` |
 | Pantallas de la versión 1 que usa el celular | `src/pantallas/`, `src/componentes/` |
 | Pantallas de la versión 2 que usa la computadora | `src/v2/` |
-| La raíz, que redirige a la versión 5 | `clientes/gestion-del-local-web/index.html` |
-| Las otras versiones, publicadas en su carpeta | `/v1/`, `/v2/`, `/v3/`, `/v4/`, `/v4-maqueta/` |
+| Textos y listas comunes, y la paleta | `src/principal/textos.ts`, `src/principal/paleta.css` |
+| Las versiones históricas | `historico/v1/`, `historico/v2/`, `historico/v4/` (entradas), `public/historico/` (maquetas 3 y 4 y la lista) |
+| Redirecciones desde las direcciones viejas | `public/v1/` … `public/v5/`, `public/versiones.html` |
 
-**Pruebas.** Solo se prueba la versión 5. Las unitarias están en `src/v5/` (las de las
+**Pruebas.** Solo se prueba la versión 5. Las unitarias están en `src/principal/` (las de las
 pantallas del celular y de la computadora, más las de lo nuevo) y corren en cada push. Los
 archivos de prueba de las otras versiones quedaron en su lugar y están excluidos en
 `vitest.config.ts`. Los escenarios de punta a punta (`tests/e2e/`, una carpeta por árbol) corren contra la versión 5,

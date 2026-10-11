@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { PedirFotoAlCelular, hayQueUsarElCelular } from "../v5/PedirFoto";
+import { PedirFotoAlCelular, hayQueUsarElCelular } from "../principal/PedirFoto";
 import { leerMeta } from "../almacen";
 import { alCambiarLaCola, enviarPendientes, pendientes } from "../cola";
 import { urlDeFoto } from "../api";
