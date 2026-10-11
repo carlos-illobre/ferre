@@ -2,6 +2,9 @@ import { test, expect } from "@playwright/test";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 
+// La API del stack contra el que corren los escenarios (API_URL permite otro puerto).
+const API = process.env.API_URL ?? "http://localhost";
+
 // Celular que escanea, laptop que muestra (issue #52): la laptop muestra el QR, el celular
 // lo abre y queda vinculado, y cada código que "escanea" (acá, tipeado en el escáner)
 // aparece en la venta de la laptop. Un código desconocido se asocia a un producto y la
@@ -61,10 +64,10 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   // Se manda el código por la misma API que usa el escáner del celular.
   const puestoRemoto = await celular.evaluate(() => JSON.parse(localStorage.getItem("ferre.puesto-remoto") ?? "null") as { id: string } | null);
   expect(puestoRemoto).not.toBeNull();
-  const mandar = (codigo: string) => celular.evaluate(async ([id, codigo, token]) => {
-    const r = await fetch(`http://localhost/puestos/${id}/codigos`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ codigo }) });
+  const mandar = (codigo: string) => celular.evaluate(async ([id, codigo, token, API]) => {
+    const r = await fetch(`${API}/puestos/${id}/codigos`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ codigo }) });
     return r.status;
-  }, [puestoRemoto!.id, codigo, TOKEN_CELULAR] as const);
+  }, [puestoRemoto!.id, codigo, TOKEN_CELULAR, API] as const);
   expect(await mandar("7790001112223")).toBe(201);
   await expect(laptop.getByTestId("item").filter({ hasText: "CINTA ESCANER" })).toBeVisible({ timeout: 10000 });
 

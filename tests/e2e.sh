@@ -16,7 +16,7 @@ preparar() {
   docker compose up -d --wait
   # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.
   # "..." construye también las librerías de las que depende (en CI no hay dist previo).
-  VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web... build >/dev/null
+  VITE_API_URL="${API_URL:-http://localhost}" pnpm --filter gestion-del-local-web... build >/dev/null
   if ! curl -sf http://localhost:4173 >/dev/null; then
     nohup pnpm --filter gestion-del-local-web preview >/tmp/ferre-preview.log 2>&1 &
     echo $! > /tmp/ferre-preview.pid

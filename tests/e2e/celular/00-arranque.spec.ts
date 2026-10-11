@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+// La API del stack contra el que corren los escenarios (API_URL permite otro puerto).
+const API = process.env.API_URL ?? "http://localhost";
+
 // Escenario del esqueleto: la PWA abre y le habla a la API y a la base. Los happy paths
 // reales (cargar lista, buscar y vender, ingresar mercadería, contar, ver stock) se
 // agregan con sus issues; la lista vive en specs/001-base-del-sistema/quickstart.md.
@@ -7,15 +10,21 @@ test("la app abre y el servidor responde", async ({ page }) => {
   await page.goto("/v5/");
   await expect(page.getByTestId("entrar")).toBeVisible();
   // Sin sesión no hay estado del servidor a la vista: alcanza con que la API responda.
-  const salud = await page.request.get("http://localhost/health");
+  const salud = await page.request.get(`${API}/health`);
   expect(salud.ok()).toBeTruthy();
 });
 
-// La app tiene dos interfaces (ADR-014) y cada una carga solo sus estilos: si se mezclan,
-// las clases de una pisan las de la otra. Se ve en el build, no en desarrollo.
-test("la interfaz de celular carga una sola hoja de estilos propia", async ({ page }) => {
+// La app tiene dos interfaces (ADR-014 y ADR-015) que se eligen por el ancho: en una pantalla
+// de celular se arma la del celular (menú abajo) y no la de la computadora (menú al costado).
+test("en un celular se carga la interfaz de celular y no la de computadora", async ({ page }) => {
   await page.goto("/v5/");
   await expect(page.locator("#root > *").first()).toBeVisible();
-  const hojas = await page.evaluate(() => [...document.styleSheets].map((h) => h.href ?? "").filter((h) => /\/assets\/.*\.css$/.test(h)));
-  expect(hojas).toHaveLength(1);
+  await expect(page.locator(".lateral")).toHaveCount(0);
+  // El ambiente de prueba se anuncia con su marco y su cartel (decisión 33).
+  await expect(page.getByTestId("ambiente")).toContainText("Ambiente de prueba");
+});
+
+test("la raíz lleva a la versión elegida", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/v5\//);
 });

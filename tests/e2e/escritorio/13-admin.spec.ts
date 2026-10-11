@@ -2,6 +2,9 @@ import { test, expect } from "@playwright/test";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 
+// La API del stack contra el que corren los escenarios (API_URL permite otro puerto).
+const API = process.env.API_URL ?? "http://localhost";
+
 // Rol admin: administra como el dueño (usuarios, sesiones, auditoría, proveedores,
 // duplicados) pero no puede crear dueños, cambiarlos ni desactivarlos, ni dar ese rol.
 const TOKEN = "token-e2e-admin";
@@ -45,15 +48,15 @@ test("el admin administra pero no toca dueños", async ({ page }) => {
   await expect(filaDueno).toContainText("solo el dueño");
 
   // Y la API lo rechaza aunque se intente directo.
-  const respuestas = await page.evaluate(async ([token, email]) => {
+  const respuestas = await page.evaluate(async ([token, email, API]) => {
     const cabeceras = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-    const crear = await fetch("http://localhost/usuarios", { method: "POST", headers: cabeceras, body: JSON.stringify({ email: "e2e-otro-dueno@ferre.test", nombre: "X", rol: "dueño" }) });
-    const lista = (await (await fetch("http://localhost/usuarios", { headers: cabeceras })).json()) as { id: string; email: string }[];
+    const crear = await fetch(`${API}/usuarios`, { method: "POST", headers: cabeceras, body: JSON.stringify({ email: "e2e-otro-dueno@ferre.test", nombre: "X", rol: "dueño" }) });
+    const lista = (await (await fetch(`${API}/usuarios`, { headers: cabeceras })).json()) as { id: string; email: string }[];
     const dueno = lista.find((u) => u.email === email)!;
-    const desactivar = await fetch(`http://localhost/usuarios/${dueno.id}`, { method: "PATCH", headers: cabeceras, body: JSON.stringify({ activo: false }) });
-    const ascender = await fetch(`http://localhost/usuarios/${lista.find((u) => u.email === "e2e-admin-nuevo@ferre.test")!.id}`, { method: "PATCH", headers: cabeceras, body: JSON.stringify({ rol: "dueño" }) });
+    const desactivar = await fetch(`${API}/usuarios/${dueno.id}`, { method: "PATCH", headers: cabeceras, body: JSON.stringify({ activo: false }) });
+    const ascender = await fetch(`${API}/usuarios/${lista.find((u) => u.email === "e2e-admin-nuevo@ferre.test")!.id}`, { method: "PATCH", headers: cabeceras, body: JSON.stringify({ rol: "dueño" }) });
     return [crear.status, desactivar.status, ascender.status];
-  }, [TOKEN, EMAIL_DUENO] as const);
+  }, [TOKEN, EMAIL_DUENO, API] as const);
   expect(respuestas).toEqual([403, 403, 403]);
   expect(psql(`SELECT activo::text FROM usuario WHERE email = '${EMAIL_DUENO}'`)).toBe("true");
   expect(psql(`SELECT count(*) FROM usuario WHERE email = 'e2e-otro-dueno@ferre.test'`)).toBe("0");

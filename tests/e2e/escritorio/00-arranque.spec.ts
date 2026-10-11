@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+// La API del stack contra el que corren los escenarios (API_URL permite otro puerto).
+const API = process.env.API_URL ?? "http://localhost";
+
 // Escenario del esqueleto: la PWA abre y le habla a la API y a la base. Los happy paths
 // reales (cargar lista, buscar y vender, ingresar mercadería, contar, ver stock) se
 // agregan con sus issues; la lista vive en specs/001-base-del-sistema/quickstart.md.
@@ -7,7 +10,7 @@ test("la app abre y el servidor responde", async ({ page }) => {
   await page.goto("/v5/");
   await expect(page.getByRole("heading", { name: "ferre" })).toBeVisible();
   // Sin sesión no hay estado del servidor a la vista: alcanza con que la API responda.
-  const salud = await page.request.get("http://localhost/health");
+  const salud = await page.request.get(`${API}/health`);
   expect(salud.ok()).toBeTruthy();
 });
 

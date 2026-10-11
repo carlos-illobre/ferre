@@ -42,10 +42,11 @@ test.beforeAll(() => {
 
 test("buscar un producto, elegir el margen y tipear otro margen a mano", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/productos");
+  await page.goto("/v5/#/catalogo");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
-  await expect(busqueda).toBeFocused();
+  // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía el menú.
+  await expect(busqueda).not.toBeFocused();
 
   // Dos palabras en cualquier orden, sin importar mayúsculas. "e2e" acota a los productos
   // sembrados: la base del compose puede tener listas reales cargadas por otras pruebas.

@@ -13,6 +13,8 @@ function psql(sql: string): string {
 }
 
 test.beforeAll(() => {
+  // Si una corrida anterior se cortó puede haber quedado una huella vinculada.
+  psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
@@ -31,8 +33,12 @@ test("sin sesión se pide entrar", async ({ page }) => {
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/v5/");
-  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
-  await page.getByRole("button", { name: "Negocio" }).click();
+  // Todo lo que se usa poco está en «Más» (decisión 28).
+  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: /Cómo va el negocio/ }).click();
+  await expect(page.getByTestId("usuario-negocio")).toContainText("Dueño E2E");
+  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: /Usuarios y sesiones/ }).click();
   await expect(page.getByText("Quién puede entrar")).toBeVisible();
   await expect(page.getByTestId("usuarios")).toContainText(EMAIL);
 });
@@ -54,7 +60,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
     localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1");
     Object.defineProperty(navigator, "userAgent", { get: () => "Mozilla/5.0 (Linux; Android 14; Pixel 7) Chrome/128.0 Mobile Safari/537.36" });
   }, TOKEN);
-  await page.goto("/v5/#/administracion");
+  await page.goto("/v5/#/mas/usuarios");
   await expect(page.getByTestId("ofrecer-huella")).toContainText("¿Entrar con la huella?");
   await page.getByTestId("aceptar-huella").click();
   await expect(page.getByTestId("ofrecer-huella")).toContainText("Listo");
@@ -76,18 +82,20 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   expect(psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
 
   // Salir y entrar con la huella: sin Google.
-  await page.getByRole("button", { name: "Salir" }).click();
+  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: /^Salir/ }).click();
   await expect(page.getByTestId("entrar-huella")).toBeVisible();
   await page.getByTestId("entrar-huella").click();
-  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
+  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   expect(psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
   // Quitar el celular: ya no entra con la huella.
-  await page.goto("/v5/#/administracion");
+  await page.goto("/v5/#/mas/usuarios");
   page.once("dialog", (d) => d.accept());
   await page.getByTestId("celular").getByRole("button", { name: "Quitar" }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
-  await page.getByRole("button", { name: "Salir" }).click();
+  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: /^Salir/ }).click();
   await page.getByTestId("entrar-huella").click();
   await expect(page.getByTestId("error-huella")).toContainText("no está vinculado");
 });

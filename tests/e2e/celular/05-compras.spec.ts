@@ -12,11 +12,15 @@ const PROVEEDOR = "Proveedor compras (e2e)";
 const ID_PROV = "00000000-0000-0000-0000-00000000e2e8";
 const ID_CINTA = "00000000-0000-0000-0000-00000000e2e9";
 
+// Una imagen mínima (PNG de 1 × 1) que hace de foto de la factura.
+const FOTO = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+
 function psql(sql: string): string {
   return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
 }
 
 test.beforeAll(() => {
+  psql(`DELETE FROM foto_comprobante WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
@@ -25,6 +29,7 @@ test.beforeAll(() => {
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   // Limpieza en orden de dependencias: compras del proveedor y sus renglones, movimientos, precios, productos.
   psql(`DELETE FROM movimiento_stock WHERE referencia_id IN (SELECT id FROM compra WHERE proveedor_id = '${ID_PROV}') OR producto_id = '${ID_CINTA}'`);
+  psql(`DELETE FROM foto_comprobante WHERE compra_id IN (SELECT id FROM compra WHERE proveedor_id = '${ID_PROV}') OR usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM item_compra WHERE compra_id IN (SELECT id FROM compra WHERE proveedor_id = '${ID_PROV}')`);
   psql(`DELETE FROM compra WHERE proveedor_id = '${ID_PROV}'`);
   psql(`DELETE FROM precio_proveedor WHERE proveedor_id = '${ID_PROV}'`);
@@ -37,11 +42,14 @@ test.beforeAll(() => {
 
 test("ingresar mercadería: stock, costo según factura, gasto de la semana y anulación", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/compras");
+  await page.goto("/v5/#/deposito");
   await page.getByTestId("proveedor").click();
   await page.getByTestId("opcion-proveedor").filter({ hasText: PROVEEDOR }).click();
   await expect(page.getByTestId("proveedor")).toContainText(PROVEEDOR);
-  await page.getByTestId("numero").fill("0001-00000777");
+  // El número de la factura no se tipea (RF-50): se le saca una foto y se lee de ahí.
+  await expect(page.getByTestId("numero")).toHaveCount(0);
+  await page.getByTestId("archivo-comprobante").setInputFiles({ name: "factura.png", mimeType: "image/png", buffer: FOTO });
+  await expect(page.getByTestId("foto-comprobante")).toContainText("Foto de la factura cargada");
 
   // Producto conocido: el costo viene de la lista ($1.000); la factura dice $1.200.
   const busqueda = page.getByTestId("busqueda");
@@ -74,9 +82,11 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   // Stock, costo vigente con explicación, gasto de la semana.
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("10.000");
   expect(psql(`SELECT costo_neto FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toBe("1200.0000");
-  expect(psql(`SELECT descuentos->'explicacion'->>0 FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toContain("según factura 0001-00000777");
+  expect(psql(`SELECT descuentos->'explicacion'->>0 FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toContain("según factura de");
+  expect(psql(`SELECT count(*) FROM foto_comprobante f JOIN compra c ON c.id = f.compra_id WHERE c.proveedor_id = '${ID_PROV}'`)).toBe("1");
   expect(psql(`SELECT count(*) FROM producto WHERE descripcion = 'PINCEL NUEVO COMPRAS (E2E)' AND proveedor_preferido_id = '${ID_PROV}'`)).toBe("1");
-  await expect(page.getByTestId("gastos-semana")).toContainText("$16.000");
+  // Los gastos de la semana ya no están en el ingreso: se ven en Cómo va el negocio (decisión 34).
+  await expect(page.getByTestId("gastos-semana")).toHaveCount(0);
 
   // Anular devuelve el stock; el costo según factura se mantiene.
   const recientes = page.getByTestId("compras-recientes");
@@ -88,6 +98,10 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   await expect(compra).toContainText("CINTA AISLADORA");
   await expect(compra).toContainText("5 ×");
   await expect(compra).toContainText("PINCEL NUEVO");
+  // La foto de la factura queda con la compra y se abre en grande para leerla.
+  await compra.getByTestId("ver-comprobante").click();
+  await expect(page.getByRole("dialog", { name: "Foto del comprobante" })).toBeVisible();
+  await page.getByRole("button", { name: "Cerrar" }).click();
   page.once("dialog", (d) => d.accept("error de carga"));
   await compra.getByRole("button", { name: "Anular esta compra" }).click();
   await expect(compra).toContainText("anulada");
