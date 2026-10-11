@@ -281,6 +281,7 @@ Los **permisos** son fijos y los define el sistema:
 | Catálogo | Cargar listas de precios | Cargar y aplicar la lista de un proveedor; dar de alta proveedores |
 | Catálogo | Unir duplicados | Unir y separar productos repetidos |
 | Depósito | Registrar ingresos | Registrar la mercadería que llega y anular un ingreso |
+| Depósito | Encargar compras | Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos (RF-55) |
 | Depósito | Ver las compras | Ver las compras recientes y sus comprobantes |
 | Depósito | Contar y corregir stock | Contar estanterías y corregir el stock a mano |
 | Negocio | Ver los números del negocio | Cómo va el negocio: ventas, gastos y dinero invertido en inventario |
@@ -295,7 +296,7 @@ Los **roles** los arma el negocio. El sistema arranca con estos cinco, que se pu
 | Rol | Permisos |
 |---|---|
 | Vendedor | Vender · Ver las ventas del día · Anular ventas |
-| Comprador | Cargar listas de precios · Unir duplicados · Ver las compras |
+| Comprador | Encargar compras · Cargar listas de precios · Unir duplicados · Ver las compras |
 | Recepción | Registrar ingresos · Ver las compras · Contar y corregir stock · Ver las anomalías |
 | Administrador | Administrar usuarios · Administrar roles · Administrar sesiones · Ver quién hizo qué |
 | Gerente | Ver los números del negocio · Fijar márgenes · Ver las ventas del día · Anular ventas · Ver las compras · Ver las anomalías · Ver quién hizo qué |

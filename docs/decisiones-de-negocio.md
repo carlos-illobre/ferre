@@ -264,3 +264,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Dos productos pueden tener el mismo código (el mismo artículo de dos proveedores): se
       guarda y se avisa, para unirlos como duplicados.
     - Lo puede hacer cualquier usuario con sesión (RF-08).
+
+52. **Cómo son los pedidos a proveedores** (2026-10-11). Carlos pidió la pantalla de pedidos
+    apenas terminados los roles, y contestó lo que la especificación tenía sin decidir:
+    - **No hay aprobación:** quien puede encargar compras arma el pedido y lo manda.
+    - **El proveedor recibe código, descripción y cantidad, sin costos.** El costo estimado
+      se ve en la pantalla y no viaja en el mensaje.
+    - **Un pedido enviado se puede cancelar, y uno que llegó incompleto se puede cerrar.**
+    - **Primera tanda:** se manda como texto, por WhatsApp o copiándolo, y se arma desde
+      cero. Correo, PDF y armarlo desde la sugerencia de «qué pedir» quedan para después.
+    - Permiso nuevo, **«Encargar compras»**, que de arranque trae el rol Comprador.
