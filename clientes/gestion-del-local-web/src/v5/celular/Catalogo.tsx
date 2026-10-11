@@ -49,7 +49,7 @@ export function Productos() {
   const caja = useRef<HTMLInputElement>(null);
   const centinela = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { caja.current?.focus(); }, [catalogo]);
+  // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía el menú.
   const resultados = useMemo(() => (consultaEstable.trim() ? buscarProductos(consultaEstable, limite) : (catalogo ?? []).slice(0, limite)), [buscarProductos, consultaEstable, limite, catalogo]);
   const hayMas = resultados.length === limite;
   useEffect(() => { setElegido(0); setLimite(30); }, [consultaEstable]);

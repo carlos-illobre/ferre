@@ -190,7 +190,7 @@ function Ingreso() {
     setConsulta("");
   }, []);
   const cambiar = (clave: string, c: Partial<Renglon>) => setRenglones((l) => l.map((r) => (r.clave === clave ? { ...r, ...c } : r)));
-  const quitar = (clave: string) => { setRenglones((l) => l.filter((r) => r.clave !== clave)); caja.current?.focus(); };
+  const quitar = (clave: string) => { setRenglones((l) => l.filter((r) => r.clave !== clave)); };
   const alDetectar = useCallback((codigo: string) => {
     const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
     if (p) { setEscaneando(false); agregar(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
@@ -298,7 +298,7 @@ function Ingreso() {
           </div>
         </Hoja>
       )}
-      {exito && <Exito que="Ingreso registrado" importe={pesosCortos(exito.total)} medio={exito.proveedor} detalle={exito.detalle} boton="Listo" alCerrar={() => { setExito(null); caja.current?.focus(); }} />}
+      {exito && <Exito que="Ingreso registrado" importe={pesosCortos(exito.total)} medio={exito.proveedor} detalle={exito.detalle} boton="Listo" alCerrar={() => setExito(null)} />}
     </>
   );
 }
@@ -428,7 +428,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 6) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
-  useEffect(() => { if (producto) cajaCantidad.current?.focus(); else caja.current?.focus(); }, [producto, catalogo]);
+  // La búsqueda no toma el foco sola (abriría el teclado y taparía el menú); la cantidad sí, porque se acaba de elegir el producto.
+  useEffect(() => { if (producto) cajaCantidad.current?.focus(); }, [producto]);
 
   const recargar = useCallback(() => api<Conteo>(`/conteos/${conteo.id}`).then(alActualizar).catch(() => undefined), [conteo.id, alActualizar]);
   const contadoPorId = new Map(conteo.renglones.map((r) => [r.producto_id, r]));
