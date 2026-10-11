@@ -44,7 +44,7 @@ test.beforeAll(() => {
 
 test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/contar");
+  await page.goto("/v1/#/contar");
   await expect(page.getByRole("heading", { name: "Contar" })).toBeVisible();
 
   // Sector nuevo: se crea y se abre.

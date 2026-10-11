@@ -25,7 +25,7 @@ test.beforeEach(() => {
 
 test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/administracion");
+  await page.goto("/v1/#/administracion");
   const otra = page.getByRole("row", { name: /otro celular/ });
   await expect(otra).toBeVisible();
   await expect(otra.getByRole("button", { name: "Cerrar" })).toHaveClass(/primario/);
@@ -37,7 +37,7 @@ test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page 
 
 test("cerrar la sesión propia desde Administración vuelve al login", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/administracion");
+  await page.goto("/v1/#/administracion");
   const propia = page.getByRole("row", { name: /esta computadora/ });
   await expect(propia).toBeVisible();
   await expect(propia).toContainText("esta sesión");
@@ -52,7 +52,7 @@ test("cerrar la sesión propia desde Administración vuelve al login", async ({ 
 
 test("Salir vuelve al login", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/vender");
+  await page.goto("/v1/#/vender");
   await page.getByRole("button", { name: "Salir" }).click();
   await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
   expect(psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NOT NULL`)).toBe("1");

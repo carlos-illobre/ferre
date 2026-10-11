@@ -41,7 +41,7 @@ test.beforeAll(() => {
 
 test("sugerir, unir y ver el proveedor más barato como preferido", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/duplicados");
+  await page.goto("/v1/#/duplicados");
   await expect(page.getByRole("heading", { name: "Duplicados entre proveedores" })).toBeVisible();
   await page.getByTestId("buscar-duplicados").click();
   const sugerencia = page.getByTestId("sugerencia").filter({ hasText: "SILICONA DUPLICADA" });
@@ -59,7 +59,7 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   expect(psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("2");
 
   // En Productos: un solo producto, dos proveedores, el barato con estrella y el precio sobre su costo.
-  await page.goto("/#/productos");
+  await page.goto("/v1/#/productos");
   await page.getByTestId("busqueda").fill("e2e silicona duplicada");
   await expect(page.getByTestId("producto")).toHaveCount(1);
   const fila = page.getByTestId("producto").first();
@@ -72,7 +72,7 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await expect(fila.locator("td.precio")).toContainText("$8.000,00", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
 
   // Separar: el absorbido vuelve a existir con sus precios y su venta.
-  await page.goto("/#/duplicados");
+  await page.goto("/v1/#/duplicados");
   const union = page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" });
   await expect(union).toBeVisible();
   await expect(union).toContainText("Proveedor barato (e2e), Proveedor caro (e2e)");

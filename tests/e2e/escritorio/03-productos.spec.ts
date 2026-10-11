@@ -42,7 +42,7 @@ test.beforeAll(() => {
 
 test("buscar un producto, elegir el margen y tipear otro margen a mano", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/productos");
+  await page.goto("/v1/#/productos");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
   await expect(busqueda).toBeFocused();

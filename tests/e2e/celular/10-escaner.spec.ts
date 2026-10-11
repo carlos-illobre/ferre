@@ -41,7 +41,7 @@ test.beforeAll(() => {
 test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ browser }) => {
   const laptop = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
   await laptop.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
-  await laptop.goto("/#/vender");
+  await laptop.goto("/v1/#/vender");
   await expect(laptop.getByTestId("busqueda")).toBeEnabled();
   await laptop.getByTestId("vincular-celular").click();
   await expect(laptop.getByTestId("qr-vincular")).toBeVisible();

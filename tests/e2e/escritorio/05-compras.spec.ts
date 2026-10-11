@@ -37,7 +37,7 @@ test.beforeAll(() => {
 
 test("ingresar mercadería: stock, costo según factura, gasto de la semana y anulación", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/compras");
+  await page.goto("/v1/#/compras");
   await expect(page.getByRole("heading", { name: "Ingreso de mercadería" })).toBeVisible();
   await page.getByTestId("proveedor").selectOption({ label: PROVEEDOR });
   await page.getByTestId("numero").fill("0001-00000777");

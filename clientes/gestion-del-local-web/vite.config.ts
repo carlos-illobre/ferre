@@ -26,7 +26,8 @@ export default defineConfig(({ command }) => {
           orientation: "any",
           description: "Gestión del local: ventas, compras, stock y precios",
           lang: "es",
-          start_url: "./",
+          // La app instalada en el celular sigue abriendo la interfaz original.
+          start_url: "./v1/",
           scope: "./",
           display: "standalone",
           background_color: "#eef0f4",
@@ -38,9 +39,9 @@ export default defineConfig(({ command }) => {
         },
         workbox: {
           navigateFallback: "index.html",
-          // /v2/ (la interfaz anterior, en revisión) y /v4/ (Ferrebress) tienen su propio
-          // index.html y se guardan en el dispositivo; /v3/ y /v4-maqueta/ son maquetas, que no.
-          navigateFallbackDenylist: [/\/v2\//, /\/v3\//, /\/v4\//, /\/v4-maqueta\//],
+          // Cada versión (/v1/ la original, /v2/, /v4/ Ferrebress) tiene su propio index.html
+          // y se guarda en el dispositivo; /v3/ y /v4-maqueta/ son maquetas, que no.
+          navigateFallbackDenylist: [/\/v1\//, /\/v2\//, /\/v3\//, /\/v4\//, /\/v4-maqueta\//],
           globIgnores: ["v3/**", "v4-maqueta/**"],
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
           // Nada de la API ni de Google se cachea: siempre red.
@@ -49,7 +50,8 @@ export default defineConfig(({ command }) => {
       }),
     ],
     base: process.env.VITE_BASE ?? "/",
-    // Tres entradas: la interfaz actual en la raíz, la v2 en /v2/ y Ferrebress v4 en /v4/.
-    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { principal: "index.html", v2: "v2/index.html", v4: "v4/index.html" } } },
+    // La raíz es la página que lista las versiones; la interfaz original está en /v1/, la
+    // v2 en /v2/ y Ferrebress v4 en /v4/.
+    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { versiones: "index.html", v1: "v1/index.html", v2: "v2/index.html", v4: "v4/index.html" } } },
   };
 });

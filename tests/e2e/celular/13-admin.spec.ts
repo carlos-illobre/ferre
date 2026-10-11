@@ -26,7 +26,7 @@ test.beforeAll(() => {
 
 test("el admin administra pero no toca dueños", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/administracion");
+  await page.goto("/v1/#/administracion");
   await expect(page.getByTestId("usuario")).toContainText("Admin E2E · admin");
   await expect(page.getByText("Quién puede entrar")).toBeVisible();
   await expect(page.getByText("Sesiones abiertas")).toBeVisible();

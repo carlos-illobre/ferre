@@ -13,7 +13,8 @@ export function VincularCelular({ vinculado, alVincular }: { vinculado: boolean;
   async function generar() {
     try {
       const { id, codigo, expiraEnSegundos } = await api<{ id: string; codigo: string; expiraEnSegundos: number }>("/puestos", { method: "POST", body: JSON.stringify({ nombre: "computadora del mostrador" }) });
-      const enlace = `${location.origin}${import.meta.env.BASE_URL}#/vincular-celular?codigo=${encodeURIComponent(codigo)}`;
+      // La dirección de esta misma interfaz (vive en /v1/): el celular tiene que abrir la misma.
+      const enlace = `${location.origin}${location.pathname}#/vincular-celular?codigo=${encodeURIComponent(codigo)}`;
       setQr(await QRCode.toDataURL(enlace, { width: 220, margin: 1 }));
       setPuestoId(id);
       setError(null);
