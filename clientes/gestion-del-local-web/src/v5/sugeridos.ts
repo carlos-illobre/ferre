@@ -10,7 +10,7 @@ import type { Producto } from "../pantallas/Productos";
 type VentaLocal = { fecha: string; items: { producto_id: string | null; descripcion: string }[] };
 type VentaDelDia = { fecha: string; estado: string; items: { descripcion: string }[] };
 export type Sugeridos = { ultimos: Producto[]; masVendidos: Producto[]; hay: boolean };
-const CUANTOS = 5;
+const CUANTOS = 4;
 
 export const precioDe = (p: Producto): number | null =>
   p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null;
