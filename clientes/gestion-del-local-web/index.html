@@ -3,38 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#17312b" />
-    <link rel="icon" href="icono-v4.svg" type="image/svg+xml" />
-    <title>Ferrebress: versiones</title>
-    <!-- Página de entrada mientras conviven varias versiones de la interfaz. Cada versión
-         vive en su carpeta y usa la misma API, la misma sesión y los mismos datos. -->
-    <style>
-      :root { --tinta: #18201e; --detalle: #4a5451; --borde: #7c9085; --fondo: #f5f6f2; --verde: #17312b; --naranja: #d83f0e; }
-      * { box-sizing: border-box; }
-      body { margin: 0; background: var(--fondo); color: var(--tinta); font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-      main { max-width: 640px; margin: 0 auto; padding: 40px 20px 64px; }
-      h1 { margin: 0 0 8px; font-size: 1.75rem; line-height: 1.2; }
-      p { margin: 0; color: var(--detalle); }
-      ul { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 12px; }
-      a { display: block; padding: 16px 20px; border: 1px solid var(--borde); border-radius: 12px; background: #fff; color: var(--tinta); text-decoration: none; }
-      a:hover { border-color: var(--verde); }
-      a:focus-visible { outline: 3px solid var(--naranja); outline-offset: 2px; }
-      a strong { display: block; font-size: 1.125rem; }
-      a span { color: var(--detalle); }
-      a.actual { border: 2px solid var(--verde); }
-    </style>
+    <meta name="theme-color" content="#14294b" />
+    <title>Ferrebress</title>
+    <!-- La raíz abre la versión 2, que también sigue en /v2/. Cada versión vive en su
+         carpeta (decisión 26); la lista completa está en versiones.html. Para que la raíz
+         abra otra versión alcanza con cambiar "v2/" acá abajo, en los tres lugares. -->
+    <meta http-equiv="refresh" content="0; url=v2/" />
+    <script>location.replace("v2/" + location.search + location.hash);</script>
   </head>
   <body>
-    <main>
-      <h1>Ferrebress</h1>
-      <p>Hay varias versiones de la interfaz publicadas a la vez. Todas usan los mismos datos.</p>
-      <ul>
-        <li><a class="actual" href="v4/"><strong>Versión 4</strong><span>La interfaz nueva, aprobada.</span></a></li>
-        <li><a href="v1/"><strong>Versión 1</strong><span>La interfaz original.</span></a></li>
-        <li><a href="v2/"><strong>Versión 2</strong><span>Rediseño anterior, descartado.</span></a></li>
-        <li><a href="v3/"><strong>Versión 3</strong><span>Maquetas de tres opciones de diseño.</span></a></li>
-        <li><a href="v4-maqueta/"><strong>Maqueta de la versión 4</strong><span>Con datos de ejemplo; no guarda nada.</span></a></li>
-      </ul>
-    </main>
+    <p><a href="v2/">Abrir Ferrebress</a></p>
   </body>
 </html>

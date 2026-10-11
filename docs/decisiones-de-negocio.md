@@ -94,5 +94,5 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     de la librería de precios, las de las listas de proveedores y las de la lógica del
     cliente que no es pantalla. Al elegir la versión, se reactivan las suyas y se portan
     las de punta a punta.
-26. **Cada versión de la interfaz en su carpeta.** La original pasa a `/v1/`; la raíz lista
-    las versiones publicadas.
+26. **Cada versión de la interfaz en su carpeta.** La original pasa a `/v1/`. La raíz abre
+    la versión 2, que sigue también en `/v2/`; la lista de todas está en `versiones.html`.

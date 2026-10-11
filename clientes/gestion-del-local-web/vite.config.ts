@@ -26,8 +26,8 @@ export default defineConfig(({ command }) => {
           orientation: "any",
           description: "Gestión del local: ventas, compras, stock y precios",
           lang: "es",
-          // La app instalada en el celular sigue abriendo la interfaz original.
-          start_url: "./v1/",
+          // La raíz lleva a la versión que esté elegida (hoy la 2); la app instalada abre esa.
+          start_url: "./",
           scope: "./",
           display: "standalone",
           background_color: "#eef0f4",
@@ -50,8 +50,8 @@ export default defineConfig(({ command }) => {
       }),
     ],
     base: process.env.VITE_BASE ?? "/",
-    // La raíz es la página que lista las versiones; la interfaz original está en /v1/, la
-    // v2 en /v2/ y Ferrebress v4 en /v4/.
-    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { versiones: "index.html", v1: "v1/index.html", v2: "v2/index.html", v4: "v4/index.html" } } },
+    // La raíz lleva a la versión 2 (que sigue también en /v2/); la interfaz original está
+    // en /v1/ y Ferrebress v4 en /v4/. versiones.html las lista todas.
+    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { raiz: "index.html", v1: "v1/index.html", v2: "v2/index.html", v4: "v4/index.html" } } },
   };
 });
