@@ -9,7 +9,7 @@ RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 WEB = os.path.join(RAIZ, "clientes", "gestion-del-local-web")
 VERDE, NARANJA, AMARILLO, CLARO = "#17312b", "#d83f0e", "#f7c445", "#f5f6f2"
 # Cuánto ocupa la F dentro del hexágono, y dónde queda centrada.
-ADENTRO = "translate(12 11) scale(0.72)"
+ADENTRO = "translate(13.500 13) scale(0.68)"
 
 def efe(tronco, brazo):
     borde = lambda c: f'stroke="{c}" stroke-width="2.500" stroke-linejoin="round"'
