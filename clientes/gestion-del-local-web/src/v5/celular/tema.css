@@ -77,3 +77,75 @@ button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; backgroun
 .en-venta { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 0; padding: 8px 14px; border-radius: 12px; background: #17312b; color: #fff; font-size: 16px; font-weight: 700; }
 .en-venta span { font-size: 13px; font-weight: 600; color: #f7c445; }
 .item { border-left: 6px solid #d83f0e; }
+
+/* ───────── Colores del celular: que se distingan los botones y las secciones ─────────
+   Antes todo era blanco sobre gris muy claro. Ahora: el fondo es un verde grisáceo más
+   marcado, así lo blanco resalta; todo lo que se toca lleva borde o color; y cada color
+   dice una cosa: verde oscuro = dónde estoy y títulos, naranja = la acción principal,
+   amarillo = atajos y avisos, blanco con borde = botones comunes y campos. */
+body, .hoja { background: #e6ece6; }
+.titulo { color: #17312b; }
+
+/* Tarjetas y listas: borde fino, para que se despeguen del fondo. */
+.tarjeta:not(.oscura), .lista, .aviso-suave, .chip, .vacio .icono { border: 1px solid #c3cfc6; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
+.hoja .lista, .hoja .tarjeta:not(.oscura) { border: 1px solid #c3cfc6; }
+.lista > * { border-bottom-color: #dbe3dc; }
+
+/* Títulos de sección: verde oscuro, con una marca amarilla. */
+.seccion { color: #17312b; font-weight: 750; padding: 10px 4px 0 12px; position: relative; }
+.seccion::before { content: ""; position: absolute; left: 0; bottom: 1px; width: 5px; height: 16px; border-radius: 3px; background: #f7c445; }
+.tarjeta .seccion { padding-left: 12px; }
+
+/* Botones: el común es blanco con borde; el oscuro y el naranja siguen llenos. */
+.boton { background: #fff; border: 1.500px solid #7c9085; }
+.boton.tinta, .boton.coral, .boton.principal, .cuadricula-5 .boton.activo { border-color: transparent; }
+.boton.tinta { background: #17312b; color: #fff; }
+.boton.coral { background: #d83f0e; color: #fff; box-shadow: 0 2px 0 #8f2a08; }
+.boton.texto { background: #fff0ea; border-color: #f0b9a3; color: #a52e08; }
+.boton.texto.gris { background: #fff; border-color: #7c9085; color: #33403b; }
+.boton:disabled { background: #dfe5e0; border-color: #dfe5e0; color: #5c6763; box-shadow: none; }
+.cuadricula-5 .boton { border-color: #7c9085; }
+.cuadricula-5 .boton.activo { background: #17312b; }
+
+/* Pestañas y opciones: la elegida va en verde oscuro, no en blanco. */
+.segmentos { background: #d3ddd5; }
+.segmentos button { color: #33403b; }
+.segmentos button.activo { background: #17312b; color: #fff; box-shadow: none; }
+
+/* Campos y búsqueda: blancos con borde, para que se note dónde se escribe. */
+.buscador .caja { border: 1.500px solid #7c9085; box-shadow: none; }
+.buscador .caja:focus-within { border-color: #17312b; box-shadow: 0 0 0 2px #17312b; }
+.campo, .contador, .chip-margen { background: #fff; border: 1.500px solid #a9b8ae; }
+.campo.falta, .chip-margen.falta { background: #fff0ea; border-color: #d83f0e; }
+.contador button { color: #17312b; }
+.contador button:active { background: #d3ddd5; }
+
+/* Filas que se tocan: la elegida y la apretada se notan. */
+.fila:active { background: #eef3ee; }
+.fila.elegida { background: #fff7d6; box-shadow: inset 5px 0 0 #d83f0e; }
+.fila .miniatura { background: repeating-linear-gradient(135deg, #dfe7e0 0 5px, #eef3ee 5px 10px); }
+
+/* Avisos suaves: amarillos, para que no parezcan una tarjeta más. */
+.aviso-suave { background: #fff7d6; border-color: #f0c64a; color: #4d3a00; }
+.aviso-suave button { color: #a52e08; text-decoration: underline; }
+
+/* Menú de abajo: blanco, con la parte actual en naranja y una marca arriba. */
+.nav-inferior.solo-celular { background: #fff; border-top: 1.500px solid #c3cfc6; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.nav-inferior button { color: #4a5451; position: relative; }
+.nav-inferior button.activo { color: #c2370b; font-weight: 750; }
+.nav-inferior button.activo::before { content: ""; position: absolute; top: -7px; left: 22%; right: 22%; height: 4px; border-radius: 0 0 4px 4px; background: #d83f0e; }
+
+/* La barra de cobro, amarilla como en la computadora: es lo más importante de Vender. */
+.cobro { background: #f7c445; color: #17312b; border: 2px solid #17312b; }
+.cobro .medios button, .cobro .cliente, .cobro .no-llevo { background: #fffdf4; border: 1.500px solid #17312b; color: #17312b; }
+.cobro .medios button.activo { background: #17312b; color: #fff; }
+.cobro .cliente.falta { color: #6b4a00; border-style: dashed; }
+.cobro .no-llevo:active { background: #fff; }
+.chip-margen { white-space: nowrap; padding: 0 8px; gap: 4px; }
+.fila .miniatura.mas-icono { background: #fff0ea; }
+/* Lo oculto queda oculto aunque su clase le dé otra disposición (en Usuarios y en Quién hizo
+   qué se colaba arriba el resumen del negocio). */
+[hidden] { display: none !important; }
+/* Sobre una tarjeta oscura el título de sección va claro y sin la marca. */
+.tarjeta.oscura .seccion { color: #f7c445; padding-left: 0; }
+.tarjeta.oscura .seccion::before { display: none; }

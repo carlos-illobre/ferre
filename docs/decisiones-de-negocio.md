@@ -152,3 +152,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     cuadrados con la foto y un nombre corto, sin precio, en amarillo. Lo que ya está en la
     venta va aparte, bajo un título verde «En esta venta» y con una franja naranja, para
     que no se confunda con los atajos. En la computadora siguen siendo cuatro tarjetas.
+36. **Colores del celular** (2026-10-11): las pantallas del celular eran blanco sobre gris
+    muy claro y no se distinguían los botones ni las secciones. Ahora el fondo es un verde
+    grisáceo más marcado; todo lo que se toca lleva borde o color; y cada color dice una
+    cosa: verde oscuro para dónde se está (pestaña elegida) y los títulos, naranja para la
+    acción principal y la parte actual del menú, amarillo para atajos, avisos y la barra de
+    cobro, y blanco con borde para los botones comunes y los campos.
