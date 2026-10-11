@@ -212,3 +212,6 @@ body, .hoja { background: #e6ece6; }
 .cobro-total { flex: none; align-items: flex-end; text-align: right; font-size: 12px; line-height: 1.1; }
 .cobro-total .importe { font-size: 23px; }
 .cobro .boton.principal { height: 50px; }
+/* El isotipo de Mercado Pago va en su celeste; sobre el botón elegido, en blanco. */
+.cobro .medios .isotipo-mp { color: #0091c4; margin: -4px 0; }
+.cobro .medios button.activo .isotipo-mp { color: #fff; }

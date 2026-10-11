@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
 import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { FotoProducto } from "../../componentes/Foto";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "../../componentes/base";
@@ -28,10 +29,9 @@ type Item = {
   abierto: boolean; // el detalle del margen desplegado
 };
 // Un dibujo por medio de pago, con su nombre chico debajo como en el menú de abajo: billete,
-// celular, tarjeta y libreta.
+// tarjeta y libreta. Mercado Pago lleva su propio isotipo.
 const DIBUJO_DE_MEDIO: Record<string, string> = {
   efectivo: "M3 7h18v10H3ZM12 14.500a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5ZM6 10v4M18 10v4",
-  mercado_pago: "M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM11 18h2",
   tarjeta: "M3 6h18v12H3ZM3 10h18M7 15h4",
   cuenta_corriente: "M6 3h12v18H6ZM9 8h6M9 12h6M9 16h3",
 };
@@ -322,7 +322,9 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
           <div className="medios" role="radiogroup" aria-label="Cómo paga">
             {MEDIOS.map((m) => (
               <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} className={medio === m.valor ? "activo" : ""} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DIBUJO_DE_MEDIO[m.valor]} /></svg>
+                {m.valor === "mercado_pago"
+                  ? <svg className="isotipo-mp" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={ISOTIPO_DE_MERCADO_PAGO} /></svg>
+                  : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DIBUJO_DE_MEDIO[m.valor]} /></svg>}
                 <span>{m.corto}</span>
               </button>
             ))}
