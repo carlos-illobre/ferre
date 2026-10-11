@@ -27,6 +27,8 @@ const CUANTOS_EJEMPLOS = 6;
 const IVA = 21;
 /** Cada cuánto se le pregunta al servidor cómo va la aplicación. */
 export const ESPERA_DEL_AVANCE = 800;
+/** La opción «Ninguna de estas / no sé» del alta de proveedor: se guarda sin lector. */
+const SIN_LECTOR = "ninguno";
 const SIN_INTERNET = "Revisá la conexión y probá de nuevo.";
 
 const soloDia = (texto: string) => texto.slice(0, 10);
@@ -536,16 +538,30 @@ function AgregarProveedor({ abierta, enLinea, alCerrar, alAgregar }: PropsDeAgre
   const [nombre, setNombre] = useState("");
   const [iva, setIva] = useState<"sin" | "con">("sin");
   const [descuento, setDescuento] = useState("");
+  const [contado, setContado] = useState("");
+  /** Los lectores que el servicio de listas sabe usar; cada uno lleva el nombre del proveedor cuya planilla entiende. */
+  const [lectores, setLectores] = useState<string[]>([]);
+  const [lector, setLector] = useState(SIN_LECTOR);
   const [errorDelNombre, setErrorDelNombre] = useState<string | null>(null);
   const [rechazo, setRechazo] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
-    if (abierta) { setNombre(""); setIva("sin"); setDescuento(""); setErrorDelNombre(null); setRechazo(null); setGuardando(false); }
+    if (!abierta) return;
+    setNombre(""); setIva("sin"); setDescuento(""); setContado(""); setLector(SIN_LECTOR); setErrorDelNombre(null); setRechazo(null); setGuardando(false);
+    let vigente = true;
+    // Si el servicio de listas no responde, queda solo «Ninguna de estas / no sé».
+    api<string[]>("/listas/lectores").then((l) => { if (vigente) setLectores(l); }).catch(() => undefined);
+    return () => { vigente = false; };
   }, [abierta]);
 
   const porcentaje = Math.min(99, Number(descuento) || 0);
-  const costoDeEjemplo = (1000 / (iva === "con" ? 1 + IVA / 100 : 1)) * (1 - porcentaje / 100);
+  const porContado = Math.min(99, Number(contado) || 0);
+  // La misma cuenta que hace el servicio de listas: sin IVA si la lista lo trae, después el
+  // descuento general y sobre eso el de contado (en cascada). El IVA de cada producto sale
+  // de la planilla; el ejemplo usa el de 21 % y lo dice.
+  const costoDeEjemplo = (1000 / (iva === "con" ? 1 + IVA / 100 : 1)) * (1 - porcentaje / 100) * (1 - porContado / 100);
+  const soloNumero = (texto: string) => texto.replace(/\D/g, "").replace(/^0+(?=\d)/, "").slice(0, 2);
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
@@ -557,7 +573,7 @@ function AgregarProveedor({ abierta, enLinea, alCerrar, alAgregar }: PropsDeAgre
     try {
       const creado = await api<{ id?: string } | undefined>("/proveedores", {
         method: "POST",
-        body: JSON.stringify({ nombre: limpio, lector: null, precios_incluyen_iva: iva === "con", descuento_general: porcentaje / 100, descuento_contado: 0 }),
+        body: JSON.stringify({ nombre: limpio, lector: lector === SIN_LECTOR ? null : lector, precios_incluyen_iva: iva === "con", descuento_general: porcentaje / 100, descuento_contado: porContado / 100 }),
       });
       // Si la respuesta no trae el proveedor, se busca por el nombre recién puesto.
       const id = creado?.id ?? (await api<Proveedor[]>("/proveedores")).find((p) => p.nombre.toLowerCase() === limpio.toLowerCase())?.id ?? "";
@@ -578,18 +594,30 @@ function AgregarProveedor({ abierta, enLinea, alCerrar, alAgregar }: PropsDeAgre
           <p>Sus precios de lista vienen</p>
           <Segmentos etiqueta="Sus precios de lista vienen" opciones={[{ clave: "sin", nombre: "Sin IVA" }, { clave: "con", nombre: "Con IVA incluido" }]} elegido={iva} alElegir={setIva} testId="iva" />
         </div>
-        <Campo
-          etiqueta="Descuento que te hace"
-          sufijo="%"
-          inputMode="numeric"
-          value={descuento}
-          onChange={(e) => setDescuento(e.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "").slice(0, 2))}
-          ayuda="Si no te hace descuento, dejalo vacío."
-          data-testid="descuento-del-proveedor"
-        />
+        <div className="listas__descuentos">
+          <Campo etiqueta="Descuento que te hace" sufijo="%" inputMode="numeric" value={descuento} onChange={(e) => setDescuento(soloNumero(e.target.value))} data-testid="descuento-del-proveedor" />
+          <Campo etiqueta="Descuento por pagar de contado" sufijo="%" inputMode="numeric" value={contado} onChange={(e) => setContado(soloNumero(e.target.value))} data-testid="descuento-de-contado" />
+          <p className="campo__ayuda">El que no te haga, dejalo vacío.</p>
+        </div>
         <p className="listas__ejemplo-de-costo" data-testid="ejemplo-de-costo">
-          Con esto, si su lista dice <strong>$1.000,00</strong> el costo queda en <strong>{pesosConCentavos(costoDeEjemplo)}</strong>.
+          Con esto, si su lista dice <strong>$1.000,00</strong>{iva === "con" && ` (con IVA de ${IVA} %)`} el costo queda en <strong>{pesosConCentavos(costoDeEjemplo)}</strong>.
         </p>
+        <div className="listas__grupo">
+          <p>¿Su planilla se parece a la de…?</p>
+          <Segmentos
+            forma="grilla"
+            etiqueta="A la planilla de qué proveedor se parece la suya"
+            opciones={[...lectores.map((l) => ({ clave: l, nombre: conMayuscula(l) })), { clave: SIN_LECTOR, nombre: "Ninguna de estas / no sé" }]}
+            elegido={lector}
+            alElegir={setLector}
+            testId="lector"
+          />
+          <p className="campo__ayuda" data-testid="ayuda-del-lector">
+            {lector === SIN_LECTOR
+              ? "Entonces la app te va a preguntar de quién es cada vez que cargues su planilla."
+              : `Su planilla se va a leer como la de ${conMayuscula(lector)}, y se va a reconocer sola al cargarla.`}
+          </p>
+        </div>
         {rechazo && <Aviso tipo="error" titulo="No se pudo agregar" testId="error-proveedor">{rechazo}</Aviso>}
         {!enLinea && <Aviso tipo="alerta">Agregar un proveedor necesita internet.</Aviso>}
         <Boton type="submit" variante="principal" tam="grande" ancho disabled={guardando || !enLinea} data-testid="guardar-proveedor">{guardando ? "Agregando…" : "Agregar proveedor"}</Boton>

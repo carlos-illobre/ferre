@@ -14,7 +14,7 @@ const dia = (atras: number) => { const d = new Date(Date.now() - atras * 8640000
 const enPalabras = (clave: string) => `${clave.slice(8)}/${clave.slice(5, 7)}/${clave.slice(0, 4)}`;
 const resumen = (extra: object = {}) => ({ leidas: 7096, salteadas: 0, nuevos: 12, modificados: 1340, sin_cambio: 5744, dados_de_baja: 0, variacion_promedio: 8.2, ...extra });
 
-type Estado = { proveedores: any[]; listas: any[]; subidas: FormData[]; alSubir: (cuerpo: FormData) => any; estadoDeLista: () => any; filas: any[] };
+type Estado = { lectores: string[] | null; proveedores: any[]; listas: any[]; subidas: FormData[]; alSubir: (cuerpo: FormData) => any; estadoDeLista: () => any; filas: any[] };
 let servidor: Estado;
 
 function reiniciar() {
@@ -30,6 +30,7 @@ function reiniciar() {
   });
   const leida = { id: "l-nueva", proveedor: "Comodo", fecha_lista: dia(1), resumen: resumen({ salteadas: 2, dados_de_baja: 3 }), avisos: ["La planilla trae 38 ofertas con vencimiento."], salteadas: [{ fila: 14, motivo: "no tiene precio", contenido: [] }, { fila: 20, motivo: "no tiene código", contenido: [] }] };
   servidor = {
+    lectores: ["comodo", "erpa", "tresge"],
     proveedores,
     listas: [lista("l-pend", proveedores[1]!, 2, "pendiente", resumen({ nuevos: 3, modificados: 96, sin_cambio: 1120 })), lista("l-1", proveedores[0]!, 10, "aplicada"), lista("l-2", proveedores[1]!, 60, "aplicada"), lista("l-3", proveedores[0]!, 90, "descartada")],
     subidas: [],
@@ -50,6 +51,7 @@ function reiniciar() {
       servidor.proveedores.push({ id: "pv-nuevo", activo: true, ...cuerpo });
       return { ok: true };
     }
+    if (ruta === "/listas/lectores") { if (!servidor.lectores) throw new ErrorApi(502, "El servicio de listas no responde"); return servidor.lectores; }
     if (ruta === "/listas" && metodo === "GET") return servidor.listas;
     if (ruta === "/listas" && metodo === "POST") { servidor.subidas.push(opciones.body as FormData); return servidor.alSubir(opciones.body as FormData); }
     if (/\/filas$/.test(ruta)) return { total: 7096, filas: servidor.filas };
@@ -288,8 +290,50 @@ describe("Listas de precios (v4)", () => {
     fireEvent.change(screen.getByTestId("nombre-del-proveedor"), { target: { value: "Ferretera del Sur" } });
     fireEvent.click(screen.getByTestId("guardar-proveedor"));
     await waitFor(() => expect(screen.getByTestId("mensaje").textContent).toContain("Proveedor Ferretera del Sur agregado"));
+    // Sin tocar la pregunta del lector queda «no sé»: va sin lector y sin descuento de contado.
     expect(JSON.parse(String(llamadas("/proveedores").at(-1)![1].body))).toEqual({ nombre: "Ferretera del Sur", lector: null, precios_incluyen_iva: true, descuento_general: 0.15, descuento_contado: 0 });
     await waitFor(() => expect(screen.getAllByTestId("proveedor")).toHaveLength(4));
+  });
+
+  it("el alta pregunta a qué planilla se parece la suya y el descuento de contado, y los manda", async () => {
+    await abrir();
+    fireEvent.click(screen.getByTestId("agregar-proveedor"));
+    await waitFor(() => expect(screen.getByTestId("lector-erpa").textContent).toBe("Erpa"));
+    expect(screen.getByTestId("lector-ninguno").getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByTestId("ayuda-del-lector").textContent).toContain("te va a preguntar de quién es cada vez");
+    fireEvent.click(screen.getByTestId("lector-erpa"));
+    expect(screen.getByTestId("ayuda-del-lector").textContent).toContain("se va a leer como la de Erpa");
+    fireEvent.change(screen.getByTestId("nombre-del-proveedor"), { target: { value: "Bulonera Norte" } });
+    fireEvent.change(screen.getByTestId("descuento-del-proveedor"), { target: { value: "25" } });
+    fireEvent.change(screen.getByTestId("descuento-de-contado"), { target: { value: "5" } });
+    expect(screen.getByTestId("ejemplo-de-costo").textContent).toContain("$712,50"); // en cascada: 1000 × 0,75 × 0,95
+    fireEvent.click(screen.getByTestId("iva-con"));
+    expect(screen.getByTestId("ejemplo-de-costo").textContent).toContain("(con IVA de 21 %)");
+    expect(screen.getByTestId("ejemplo-de-costo").textContent).toContain("$588,84"); // 1000 / 1,21 × 0,75 × 0,95
+    fireEvent.click(screen.getByTestId("guardar-proveedor"));
+    await waitFor(() => expect(screen.getByTestId("mensaje").textContent).toContain("Proveedor Bulonera Norte agregado"));
+    expect(JSON.parse(String(llamadas("/proveedores").at(-1)![1].body))).toEqual({ nombre: "Bulonera Norte", lector: "erpa", precios_incluyen_iva: true, descuento_general: 0.25, descuento_contado: 0.05 });
+  });
+
+  it("en el alta, «no sé» después de haber elegido un lector manda el proveedor sin lector", async () => {
+    await abrir();
+    fireEvent.click(screen.getByTestId("agregar-proveedor"));
+    await waitFor(() => expect(screen.getByTestId("lector-comodo")).toBeTruthy());
+    fireEvent.click(screen.getByTestId("lector-comodo"));
+    fireEvent.click(screen.getByTestId("lector-ninguno"));
+    fireEvent.change(screen.getByTestId("nombre-del-proveedor"), { target: { value: "Pinturería Sol" } });
+    fireEvent.click(screen.getByTestId("guardar-proveedor"));
+    await waitFor(() => expect(screen.getByTestId("mensaje").textContent).toContain("Proveedor Pinturería Sol agregado"));
+    expect(JSON.parse(String(llamadas("/proveedores").at(-1)![1].body))).toEqual({ nombre: "Pinturería Sol", lector: null, precios_incluyen_iva: false, descuento_general: 0, descuento_contado: 0 });
+  });
+
+  it("si el servicio de listas no dice qué lectores hay, el alta queda solo con «no sé»", async () => {
+    servidor.lectores = null;
+    await abrir();
+    fireEvent.click(screen.getByTestId("agregar-proveedor"));
+    await waitFor(() => expect(llamadas("/listas/lectores", "GET")).toHaveLength(1));
+    expect(screen.getByTestId("lector-ninguno").getAttribute("aria-pressed")).toBe("true");
+    expect(screen.queryByTestId("lector-comodo")).toBeNull();
   });
 
   it("sin proveedores, el primer paso es agregar uno", async () => {

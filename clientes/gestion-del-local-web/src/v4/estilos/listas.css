@@ -505,3 +505,27 @@
 .listas__ejemplo-costo .explicado {
   margin-right: calc(-1 * var(--e-1));
 }
+
+/* Alta de proveedor: los dos descuentos, uno al lado del otro, con una sola línea de ayuda. */
+.listas__descuentos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--e-1) var(--e-3);
+}
+
+.listas__descuentos .campo__ayuda {
+  grid-column: 1 / -1;
+}
+
+/* La última opción («Ninguna de estas / no sé») ocupa el renglón entero cuando queda sola. */
+.listas__grupo .segmentos--grilla .segmentos__opcion:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* La línea que explica lo elegido no es un título de grupo. */
+.listas__grupo .campo__ayuda {
+  margin-top: 0;
+  font-size: var(--letra-detalle);
+  font-weight: var(--peso-normal);
+}
