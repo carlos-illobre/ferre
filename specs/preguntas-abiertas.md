@@ -120,7 +120,7 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 8. Si un conteo queda abierto varios días y hubo ventas o compras de un producto ya contado, ¿la diferencia se calcula contra el stock del momento en que se contó o del momento del cierre?
 
 **Factura por foto (RF-51)**
-9. La computadora no tiene cámara: ¿la foto se carga eligiendo un archivo, se saca con el celular vinculado, o las dos?
+9. ~~La computadora no tiene cámara: ¿cómo se carga la foto?~~ Respondida (2026-10-11): con el celular enlazado al usuario; la foto se sube sola a la computadora. Queda abierta otra: ¿con qué se lee la foto, si un servicio pago choca con el costo de $0?
 10. ¿Hay que poder cargar facturas de varias hojas y facturas en PDF, o alcanza con una foto por compra?
 
 **Stock bajo y pedidos (RF-54, RF-55)**

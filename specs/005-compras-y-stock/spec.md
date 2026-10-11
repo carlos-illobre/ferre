@@ -14,6 +14,9 @@
 
 - Q: ¿Cómo se les paga a los proveedores? → A: Por adelantado cuando hay descuento; si no, a 30 o 60 días (RF-56).
 - Q: ¿Dónde se ve el dinero invertido en mercadería? → A: En «Cómo va el negocio», no en el inventario. El inventario (antes «Stock») lo maneja el Comprador y solo muestra cantidades; el Comprador no tiene que ver sumas de dinero. Se dice «dinero», no «plata» (2026-10-11).
+- Q: La computadora no tiene cámara: ¿cómo se carga ahí la foto de la factura? → A: Con un botón que usa el celular enlazado al usuario: la foto se saca con el celular y se sube sola a la computadora (2026-10-11).
+- Q: ¿Qué sale de la foto en la primera entrega? → A: Todo el ingreso: proveedor, tipo y número, fecha y renglones. Mientras no exista, tipear el número de factura es el camino provisorio y va contra RNF-03 (2026-10-11).
+- Q: ¿Con qué se lee la foto? → A: Queda para más adelante; la lectura con un servicio pago choca con el costo de $0 (2026-10-11).
 - Q: ¿Se necesita buscar un producto por foto en la primera versión? → A: No. Alcanza con escanear el código de barras y fotografiar facturas (RF-51). Encontrar un producto por su foto es de la segunda versión (RF-09b).
 - Q: ¿Qué se hace cuando un cliente pide algo que no hay? → A: No se toma seña: se le dice qué día va a estar y se lo espera (RF-26). Esos pedidos de clientes son parte de lo que hay que comprar (RF-54).
 - Q: ¿De qué tamaño es el catálogo? → A: Entre todos los proveedores puede superar los 100.000 artículos; se empieza con pocos proveedores y se suman de a poco (RF-05). Toda búsqueda de esta capacidad (ingreso, stock, conteo, pedido) tiene que seguir siendo instantánea con ese volumen (RNF-08).
@@ -183,7 +186,7 @@ los renglones; corregir uno, registrar y comprobar el stock.
 5. **Given** una factura precargada y revisada, **When** registra el ingreso, **Then** pasa lo mismo que en un ingreso cargado a mano (historia 1) y la foto queda guardada con la compra, visible desde las compras recientes.
 6. **Given** una foto que no se puede leer (borrosa, cortada, o que no es una factura), **When** la carga, **Then** se le avisa con claridad que no se pudo leer y puede sacar otra o cargar el ingreso a mano; lo que ya tenía cargado no se pierde.
 7. **Given** la lectura de la foto en curso, **When** tarda, **Then** se muestra su avance y el Comprador puede seguir cargando a mano o cancelarla.
-8. **Given** el ingreso de mercadería en la computadora, **When** quiere cargar la factura por foto, **Then** [NEEDS CLARIFICATION: la computadora no tiene cámara: ¿la foto de la factura se carga eligiendo un archivo de imagen, se saca con el celular vinculado a la computadora (como el escáner), o las dos?]
+8. **Given** el ingreso de mercadería en la computadora, **When** aprieta el botón para cargar la factura por foto, **Then** la foto se saca con el celular enlazado al usuario que está usando la computadora y aparece sola en la computadora, con el ingreso precargado, sin pasar archivos a mano.
 9. **Given** una factura de más de una hoja, o una factura que el proveedor mandó en PDF, **When** quiere cargarla, **Then** [NEEDS CLARIFICATION: ¿hay que poder cargar facturas de varias hojas (varias fotos para una misma compra) y facturas que llegan en PDF, o alcanza con una sola foto por compra?]
 
 ---
