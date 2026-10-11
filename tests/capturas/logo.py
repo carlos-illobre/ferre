@@ -16,7 +16,7 @@ MARCOS = {
     # Triángulo rectángulo, como una escuadra: el ángulo recto arriba a la izquierda, donde arranca la F.
     # El cateto de arriba es más corto que el vertical, en la proporción de la F (más alta que ancha),
     # y todo el marco está inclinado igual que la F.
-    "escuadra": ('<path d="M18 11H86L18 92Z" transform="translate(5.500 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(9.500 8) scale(0.7)"),
+    "escuadra": ('<path d="M18 11H86L18 92Z" transform="translate(5.500 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(10.500 7.500) scale(0.7)"),
     "hexagono": ('<path d="M50 6 88.100 28V72L50 94 11.900 72V28Z" fill="{f}" stroke="{f}" stroke-width="8" stroke-linejoin="round"/>', "translate(13.500 13) scale(0.68)"),
 }
 MARCO = "escuadra"
@@ -27,7 +27,7 @@ def efe(tronco, brazo, ADENTRO):
             f'<path d="M42 38H68L58 50H42Z" fill="{brazo}" {borde(brazo)}/>'
             f'<path d="M26 16H78L66 30H40V62H26Z" fill="{tronco}" {borde(tronco)}/>'
             f'<path d="M28.500 60H37.500V86H28.500Z" fill="{tronco}" {borde(tronco)}/>'
-            f'<path d="M19 68.500 47 63V67.500L19 73ZM21 78 45 73.500V78L21 82.500ZM24 87 42 83.500V88L24 91.500Z" fill="{tronco}" {borde(tronco)}/>'
+            f'<path d="M22 68 44.500 63.500V68L22 72.500ZM23.500 77.500 43 73.500V78L23.500 82ZM26 86.500 40.500 83.500V88L26 91Z" fill="{tronco}" {borde(tronco)}/>'
             f'<path d="M29.500 92 36.500 90.500 33 96Z" fill="{tronco}" {borde(tronco)}/></g>')
 
 # Lo que acompaña a la F abajo a la derecha, para que ese rincón no quede vacío.
