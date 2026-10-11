@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { COMPROBANTES, type Comprobante } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { api } from "../../api";
 import { useCatalogo } from "../../catalogo";
@@ -17,12 +18,10 @@ import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 // en Cómo va el negocio (decisión 34).
 type Proveedor = { id: string; nombre: string; activo: boolean };
 type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoTexto: string; costoLista: number | null };
-type Comprobante = "factura" | "remito" | "sin_comprobante";
 type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; foto: string | null; total: string; estado: string; proveedor: string; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[] };
 type Semana = { desde: string; por_proveedor: { proveedor: string; total: string; compras: string }[]; total: number };
 type Borrador = { proveedorId: string; comprobante: Comprobante; foto: string | null; fechaCompra: string; renglones: Renglon[] };
 
-const COMPROBANTES: { valor: Comprobante; nombre: string }[] = [{ valor: "factura", nombre: "Factura" }, { valor: "remito", nombre: "Remito" }, { valor: "sin_comprobante", nombre: "Sin comprobante" }];
 const CLAVE_BORRADOR = "ferre.v2.ingreso";
 // La fecha del día según el reloj del local, no la de Greenwich (a la noche ya es mañana).
 const hoy = () => new Date().toLocaleDateString("sv-SE");

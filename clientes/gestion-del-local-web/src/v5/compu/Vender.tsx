@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
 import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
@@ -28,13 +29,6 @@ type Item = {
   precioManual: number | null; // precio tipeado para esta venta; no se guarda en el producto
   abierto: boolean; // celular: el margen y el precio a mano desplegados
 };
-type Medio = "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente";
-const MEDIOS: { valor: Medio; nombre: string; corto: string; tecla: string }[] = [
-  { valor: "efectivo", nombre: "Efectivo", corto: "Efectivo", tecla: "F5" },
-  { valor: "mercado_pago", nombre: "Mercado Pago", corto: "M. Pago", tecla: "F6" },
-  { valor: "tarjeta", nombre: "Tarjeta", corto: "Tarjeta", tecla: "F7" },
-  { valor: "cuenta_corriente", nombre: "Cuenta corriente", corto: "Cta. cte.", tecla: "F8" },
-];
 
 function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: number | null; costo: number | null } {
   const p = item.producto;
@@ -207,9 +201,9 @@ export function Vender() {
 
   async function cobrar() {
     if (items.length === 0 || ocupado) return;
-    if (sinPrecio) { setError("Hay productos sin precio: elegí un margen o poné el precio a mano en el renglón marcado."); return; }
-    if (!medio) { setError("Elegí cómo paga: efectivo, Mercado Pago, tarjeta o cuenta corriente."); return; }
-    if (medio === "cuenta_corriente" && !clienteId) { setError("Cuenta corriente: elegí el cliente."); setEligiendoCliente(true); return; }
+    if (sinPrecio) { setError(TEXTOS.vender.sinPrecio.largo); return; }
+    if (!medio) { setError(TEXTOS.vender.elegiComoPaga.largo); return; }
+    if (medio === "cuenta_corriente" && !clienteId) { setError(TEXTOS.vender.faltaElCliente.largo); setEligiendoCliente(true); return; }
     setOcupado(true);
     setError(null);
     const id = crypto.randomUUID();
@@ -251,7 +245,7 @@ export function Vender() {
     const consultaItems = items.map((it) => ({ producto_id: it.producto?.id ?? null, descripcion: it.descripcion, precio_ofrecido: precioDe(it).unitario }));
     enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: describirDispositivo() }).catch(() => undefined);
     setItems([]); setMedio("efectivo"); setClienteId("");
-    setMensaje("Anotado como «No llevó»: qué pidió y a cuánto se le ofreció.");
+    setMensaje(TEXTOS.vender.noLlevo.largo);
     caja.current?.focus();
   }
 
@@ -405,7 +399,7 @@ function useRenglon(it: Item) {
   return { p, renglon, margenTexto };
 }
 const StockDeRenglon = ({ stock, cantidad }: { stock: number | undefined; cantidad: number }) => (stock === undefined ? null : (
-  <>stock {numero(stock)}{stock - cantidad < 0 && <> <Pastilla tipo="alerta" sinPunto>queda en {numero(stock - cantidad)}</Pastilla></>}</>
+  <>stock {numero(stock)}{stock - cantidad < 0 && <> <Pastilla tipo="alerta" sinPunto>{TEXTOS.vender.stockNoAlcanza.largo}</Pastilla></>}</>
 ));
 function PrecioAMano({ item, alCambiar, falta, id }: { item: Item; alCambiar: (c: Partial<Item>) => void; falta?: boolean; id?: string }) {
   return (
@@ -496,7 +490,7 @@ function ElegirCliente({ clientes, elegido, alElegir, alCerrar }: { clientes: Cl
   const visibles = clientes.filter((c) => c.cuenta_corriente !== false && (!f || c.nombre.toLowerCase().includes(f)));
   useEffect(() => { setMarcado(0); }, [filtro]);
   return (
-    <Hoja titulo="¿Quién lleva a cuenta corriente?" alCerrar={alCerrar} testId="hoja-clientes">
+    <Hoja titulo={TEXTOS.vender.quienLleva.largo} alCerrar={alCerrar} testId="hoja-clientes">
       {clientes.length === 0 ? (
         <Vacio icono="usuarios" titulo="Todavía no hay clientes con cuenta corriente">Mientras tanto, cobrá con otro medio de pago. Los clientes con cuenta corriente se cargan desde Clientes, que todavía no está en esta versión.</Vacio>
       ) : (

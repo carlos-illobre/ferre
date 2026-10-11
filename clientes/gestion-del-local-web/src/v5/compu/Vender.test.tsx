@@ -97,6 +97,15 @@ describe("Vender (v2)", () => {
     expect(screen.queryByTestId("sugeridos-mas-vendidos")).toBeNull();
   });
 
+  it("dicen lo mismo que el celular: los medios de pago y los avisos salen de los textos compartidos", async () => {
+    const { MEDIOS, TEXTOS } = await import("../textos");
+    const { agregar } = armar();
+    agregar("mecha vender");
+    for (const m of MEDIOS) expect(screen.getByTestId(`medio-${m.valor}`).textContent).toContain(m.nombre);
+    fireEvent.click(screen.getByTestId("no-llevo"));
+    expect((await screen.findByTestId("mensaje")).textContent).toBe(TEXTOS.vender.noLlevo.largo);
+  });
+
   it("la cantidad sube y baja con las flechas del teclado", () => {
     const { agregar, item } = armar();
     agregar("mecha vender");

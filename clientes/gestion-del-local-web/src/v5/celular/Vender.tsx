@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
 import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { FotoProducto } from "../../componentes/Foto";
@@ -35,12 +36,6 @@ const DIBUJO_DE_MEDIO: Record<string, string> = {
   tarjeta: "M3 6h18v12H3ZM3 10h18M7 15h4",
   cuenta_corriente: "M6 3h12v18H6ZM9 8h6M9 12h6M9 16h3",
 };
-const MEDIOS: { valor: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; nombre: string; corto: string; tecla: string }[] = [
-  { valor: "efectivo", nombre: "Efectivo", corto: "Efectivo", tecla: "F5" },
-  { valor: "mercado_pago", nombre: "Mercado Pago", corto: "M. Pago", tecla: "F6" },
-  { valor: "tarjeta", nombre: "Tarjeta", corto: "Tarjeta", tecla: "F7" },
-  { valor: "cuenta_corriente", nombre: "Cuenta corriente", corto: "Cta. cte.", tecla: "F8" },
-];
 
 function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: number | null; costo: number | null; iva: number } {
   const p = item.producto;
@@ -198,9 +193,9 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
 
   async function cobrar() {
     if (items.length === 0 || ocupado) return;
-    if (sinPrecio) { setError("Hay productos sin precio: elegí un margen o tipeá el precio."); return; }
-    if (!medio) { setError("Elegí cómo paga: efectivo, Mercado Pago, tarjeta o cuenta corriente."); return; }
-    if (medio === "cuenta_corriente" && !clienteId) { setError("Cuenta corriente: elegí el cliente."); setHoja("clientes"); return; }
+    if (sinPrecio) { setError(TEXTOS.vender.sinPrecio.corto); return; }
+    if (!medio) { setError(TEXTOS.vender.elegiComoPaga.corto); return; }
+    if (medio === "cuenta_corriente" && !clienteId) { setError(TEXTOS.vender.faltaElCliente.corto); setHoja("clientes"); return; }
     setOcupado(true);
     setError(null);
     const id = crypto.randomUUID();
@@ -242,7 +237,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
     const consultaItems = items.map((it) => ({ producto_id: it.producto?.id ?? null, descripcion: it.descripcion, precio_ofrecido: precioDe(it).unitario }));
     enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: describirDispositivo() }).catch(() => undefined);
     setItems([]); setMedio("efectivo"); setClienteId("");
-    setMensaje("Anotado como consulta: qué pidió y a cuánto se ofreció.");
+    setMensaje(TEXTOS.vender.noLlevo.corto);
     
   }
 
@@ -346,7 +341,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
       )}
 
       {hoja === "clientes" && (
-        <Hoja titulo="¿Quién lleva a cuenta?" alCerrar={() => setHoja(null)} testId="hoja-clientes">
+        <Hoja titulo={TEXTOS.vender.quienLleva.corto} alCerrar={() => setHoja(null)} testId="hoja-clientes">
           <div className="lista">
             {clientes.length === 0 && <div className="fila"><span className="nombre">Todavía no hay clientes con cuenta corriente.</span></div>}
             {clientes.map((c) => (
@@ -390,7 +385,7 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
         ) : (
           <label className="campo falta importe-campo"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus={!producto} value={it.precioManual ?? ""} onChange={(e) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) })} data-testid="precio-manual" /></label>
         )}
-        <small className="detalle">{producto ? `${detalleDe(producto)}${stock !== undefined ? ` · stock ${num(stock)}${stock - it.cantidad < 0 ? " (no alcanza: se vende igual y queda anotado)" : ""}` : ""}` : "Ítem libre"}</small>
+        <small className="detalle">{producto ? `${detalleDe(producto)}${stock !== undefined ? ` · stock ${num(stock)}${stock - it.cantidad < 0 ? ` (${TEXTOS.vender.stockNoAlcanza.corto})` : ""}` : ""}` : "Ítem libre"}</small>
       </div>
       <div className="pie">
         <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })}>

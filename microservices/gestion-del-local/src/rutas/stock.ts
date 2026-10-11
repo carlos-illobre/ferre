@@ -53,6 +53,8 @@ stock.get("/:productoId/movimientos", async (c) => {
 stock.post("/:productoId/ajustes", async (c) => {
   const cuerpo = await c.req.json<{ cantidad_real?: number; motivo?: string }>().catch(() => ({}) as Record<string, never>);
   if (typeof cuerpo.cantidad_real !== "number" || !Number.isFinite(cuerpo.cantidad_real) || cuerpo.cantidad_real < 0) return c.json({ error: "Decí cuántas hay (un número mayor o igual a cero)" }, 400);
+  // El motivo es obligatorio (RF-53), venga de la interfaz que venga.
+  if (!cuerpo.motivo?.trim()) return c.json({ error: "Falta el motivo: sin motivo no se guarda" }, 400);
   const productoId = c.req.param("productoId");
   const { rows } = await pool.query<{ stock: string }>("SELECT COALESCE(SUM(cantidad), 0) AS stock FROM movimiento_stock WHERE producto_id = $1", [productoId]);
   const actual = Number(rows[0]!.stock);

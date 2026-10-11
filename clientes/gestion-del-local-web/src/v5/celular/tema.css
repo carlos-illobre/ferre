@@ -247,3 +247,7 @@ body, .hoja { background: #e6ece6; }
 .entrar-marca-celular { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 26px; font-weight: 750; }
 .entrar-marca-celular .logo { width: 56px; height: 56px; }
 .entrar .boton-google::before { background-position: 20px center; padding-left: 30px; }
+
+/* Motivos frecuentes al corregir un stock: se tocan en vez de escribirlos. */
+.motivos-de-ajuste { display: flex; flex-wrap: wrap; gap: 6px; }
+.motivos-de-ajuste .boton.chico { height: 36px; font-size: 13px; padding: 0 10px; border-radius: 10px; }

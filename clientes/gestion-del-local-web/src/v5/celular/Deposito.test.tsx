@@ -106,8 +106,13 @@ describe("Depósito · Stock", () => {
     expect(screen.getByTestId("movimientos").textContent).toContain("+20");
     fireEvent.click(within(fila).getByTestId("corregir"));
     fireEvent.change(within(fila).getByTestId("cantidad-real"), { target: { value: "15" } });
+    // El motivo es obligatorio, igual que en la computadora: sin motivo no se guarda.
     fireEvent.click(within(fila).getByTestId("guardar-ajuste"));
-    await waitFor(() => expect(enviarOEncolar).toHaveBeenCalledWith("stock.ajuste", "POST", "/stock/cinta/ajustes", { cantidad_real: 15, motivo: "" }));
+    expect(within(fila).getByRole("alert").textContent).toContain("Falta el motivo");
+    expect(enviarOEncolar).not.toHaveBeenCalled();
+    fireEvent.click(within(fila).getByRole("button", { name: "Rotura" })); // un motivo frecuente, de un toque
+    fireEvent.click(within(fila).getByTestId("guardar-ajuste"));
+    await waitFor(() => expect(enviarOEncolar).toHaveBeenCalledWith("stock.ajuste", "POST", "/stock/cinta/ajustes", { cantidad_real: 15, motivo: "Rotura" }));
   });
 });
 

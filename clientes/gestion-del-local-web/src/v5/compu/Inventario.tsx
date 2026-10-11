@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { api, ErrorApi } from "../../api";
 import { leerTodo } from "../../almacen";
@@ -25,7 +26,6 @@ type Orden = { columna: Columna; sube: boolean };
 type Abierto = { id: string; corregir: boolean };
 
 const FILTROS: { valor: Filtro; nombre: string }[] = [{ valor: "todos", nombre: "Todos" }, { valor: "con", nombre: "Con stock" }, { valor: "sin", nombre: "En cero o negativo" }];
-const MOTIVOS = ["Conté la estantería", "Rotura", "Se usó en el local", "Estaba mal cargado"];
 const TOPE = 100;
 
 // Lo guardado en el dispositivo trae las filas pero no los totales: se rearman acá.
@@ -266,7 +266,7 @@ function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnv
   async function guardar(e: FormEvent) {
     e.preventDefault();
     if (guardando) return;
-    const faltas = { real: valida ? undefined : "Escribí cuántas hay: un número, cero o más.", motivo: motivo.trim() ? undefined : "Elegí un motivo o escribilo: sin motivo no se guarda." };
+    const faltas = { real: valida ? undefined : TEXTOS.inventario.faltaCuantasHay.largo, motivo: motivo.trim() ? undefined : TEXTOS.inventario.faltaElMotivo.largo };
     setFalta(faltas);
     if (faltas.real || faltas.motivo) return;
     setGuardando(true); setError(null);
@@ -308,7 +308,7 @@ function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnv
           <div className="campo">
             <span id={`${id}-motivos`}>Motivo</span>
             <div className="stock-motivos" role="group" aria-labelledby={`${id}-motivos`}>
-              {MOTIVOS.map((m) => <Boton key={m} tam="chico" aria-pressed={motivo === m} className={motivo === m ? "stock-motivo-elegido" : undefined} onClick={() => { setMotivo(m); setFalta((f) => ({ ...f, motivo: undefined })); }}>{m}</Boton>)}
+              {MOTIVOS_DE_AJUSTE.map((m) => <Boton key={m} tam="chico" aria-pressed={motivo === m} className={motivo === m ? "stock-motivo-elegido" : undefined} onClick={() => { setMotivo(m); setFalta((f) => ({ ...f, motivo: undefined })); }}>{m}</Boton>)}
             </div>
             <input className="entrada" value={motivo} onChange={(e) => { setMotivo(e.target.value); setFalta((f) => ({ ...f, motivo: undefined })); }} placeholder="O escribí otro motivo" aria-label="Motivo de la corrección" maxLength={200}
               aria-invalid={Boolean(falta.motivo)} aria-describedby={falta.motivo ? `${id}-falta-motivo` : undefined} data-testid="motivo" />

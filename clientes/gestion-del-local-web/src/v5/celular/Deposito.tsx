@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { COMPROBANTES, MOTIVOS_DE_AJUSTE, TEXTOS, type Comprobante } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { api, ErrorApi } from "../../api";
@@ -89,9 +90,11 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: {
 
   async function guardar() {
     const n = Number(real.replace(",", "."));
-    if (real === "" || !Number.isFinite(n) || n < 0) { setError("Escribí cuántas hay."); return; }
+    if (real === "" || !Number.isFinite(n) || n < 0) { setError(TEXTOS.inventario.faltaCuantasHay.corto); return; }
+    // El motivo es obligatorio, igual que en la computadora (RF-53).
+    if (!motivo.trim()) { setError(TEXTOS.inventario.faltaElMotivo.corto); return; }
     try {
-      await enviarOEncolar("stock.ajuste", "POST", `/stock/${p.id}/ajustes`, { cantidad_real: n, motivo });
+      await enviarOEncolar("stock.ajuste", "POST", `/stock/${p.id}/ajustes`, { cantidad_real: n, motivo: motivo.trim() });
       setCorrigiendo(false); setError(null);
       const dif = n - cantidad;
       await alAjustar(dif === 0 ? "Sin diferencia: el stock ya decía eso." : `Stock corregido a ${num(n)} (${dif > 0 ? "+" : ""}${num(dif)}).`);
@@ -129,7 +132,10 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: {
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontWeight: 600 }}>Hay</span>
                 <input className="campo importe-campo" style={{ width: 90, height: 44, textAlign: "center" }} inputMode="decimal" autoFocus value={real} onChange={(e) => setReal(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void guardar(); }} data-testid="cantidad-real" />
-                <input className="campo" style={{ flex: 1, height: 44 }} placeholder="Motivo (opcional)" value={motivo} onChange={(e) => setMotivo(e.target.value)} />
+                <input className="campo" style={{ flex: 1, height: 44, minWidth: 0 }} placeholder="Motivo" value={motivo} onChange={(e) => setMotivo(e.target.value)} data-testid="motivo" />
+              </div>
+              <div className="motivos-de-ajuste" role="group" aria-label="Motivos frecuentes">
+                {MOTIVOS_DE_AJUSTE.map((m) => <button key={m} type="button" className={`boton chico ${motivo === m ? "tinta" : ""}`} aria-pressed={motivo === m} onClick={() => setMotivo(m)}>{m}</button>)}
               </div>
               <div className="cuadricula-2">
                 <button type="button" className="boton tinta" onClick={guardar} data-testid="guardar-ajuste">Guardar</button>
@@ -149,7 +155,6 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: {
 type Proveedor = { id: string; nombre: string; activo: boolean };
 type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoTexto: string; costoLista: number | null };
 type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; foto: string | null; total: string; estado: string; proveedor: string; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[] };
-const COMPROBANTES = [{ valor: "factura", nombre: "Factura" }, { valor: "remito", nombre: "Remito" }, { valor: "sin_comprobante", nombre: "Sin" }] as const;
 
 // Ingreso de mercadería (issue #30): proveedor y comprobante → renglones con la búsqueda
 // de siempre → registrar. Suma stock y, si la factura trae otro costo, ese pasa a ser el
@@ -158,7 +163,7 @@ function Ingreso() {
   const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [proveedorId, setProveedorId] = useState("");
-  const [comprobante, setComprobante] = useState<(typeof COMPROBANTES)[number]["valor"]>("factura");
+  const [comprobante, setComprobante] = useState<Comprobante>("factura");
   const [foto, setFoto] = useState<string | null>(null);
   const [fechaCompra, setFechaCompra] = useState(new Date().toISOString().slice(0, 10));
   const [consulta, setConsulta] = useState("");
@@ -245,7 +250,7 @@ function Ingreso() {
         <button type="button" className="renglon" onClick={() => setHoja("proveedores")} data-testid="proveedor">
           <span>Proveedor</span><span className={`valor ${proveedor ? "" : "falta"}`}>{proveedor ? proveedor.nombre : "Elegir"}<Icono nombre="derecha" tam={14} grosor={2.5} /></span>
         </button>
-        <div className="renglon"><span>Comprobante</span><div style={{ width: 220 }}><Segmentos chico opciones={COMPROBANTES.map((c) => ({ valor: c.valor, nombre: c.nombre }))} actual={comprobante} alElegir={setComprobante} /></div></div>
+        <div className="renglon"><span>Comprobante</span><div style={{ width: 220 }}><Segmentos chico opciones={COMPROBANTES.map((c) => ({ valor: c.valor, nombre: c.corto }))} actual={comprobante} alElegir={setComprobante} /></div></div>
         {comprobante !== "sin_comprobante" && <div style={{ padding: "10px 16px" }}><FotoDeFactura foto={foto} alCambiar={setFoto} nombre={comprobante === "remito" ? "remito" : "factura"} /></div>}
         <label className="renglon"><span>Fecha</span><input type="date" value={fechaCompra} onChange={(e) => setFechaCompra(e.target.value)} /></label>
       </div>

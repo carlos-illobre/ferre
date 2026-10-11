@@ -127,6 +127,6 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await busqueda.fill("e2e mecha vender");
   await busqueda.press("Enter");
   await page.getByRole("button", { name: "No llevó" }).click();
-  await expect(page.getByTestId("mensaje")).toContainText("Anotado como consulta");
+  await expect(page.getByTestId("mensaje")).toContainText("Anotado como «No llevó»");
   await expect.poll(() => psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_MECHA}'`)).toBe("1");
 });
