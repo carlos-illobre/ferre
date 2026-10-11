@@ -1,0 +1,549 @@
+/* Vender: buscar a la izquierda y «Esta venta» a la derecha (computadora), como en Figma.
+   En el celular va todo en una columna y el total con «Cobrar» queda pegado abajo. Prefijo: vender */
+
+.vender {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 430px;
+  min-height: calc(100dvh - var(--alto-encabezado));
+}
+
+/* ---- Columna de buscar ---- */
+
+.vender__buscar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+  min-width: 0;
+  padding: var(--e-6) var(--margen-pagina);
+}
+
+.vender__resultados {
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+  overflow: hidden;
+}
+
+.vender__resultado {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--e-2) var(--e-3) var(--e-2) var(--e-4);
+  border: 0;
+  border-bottom: var(--grosor-borde) solid var(--borde);
+  background: transparent;
+  text-align: left;
+}
+
+.vender__resultado:last-child {
+  border-bottom: 0;
+}
+
+.vender__resultado--marcado {
+  background: var(--naranja-suave);
+}
+
+.vender__resultado:focus-visible {
+  outline-offset: -3px;
+}
+
+.vender__resultado-texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.vender__resultado-texto span,
+.vender__resultado-precio span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.vender__resultado-precio {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+.vender__resultado-precio strong {
+  font-size: var(--letra-grande);
+}
+
+.vender__sumar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--toque);
+  height: var(--toque);
+  border-radius: var(--radio);
+  background: var(--naranja-suave);
+  color: var(--naranja-texto);
+}
+
+.vender__resultado--marcado .vender__sumar {
+  background: var(--superficie);
+}
+
+.vender__sin-resultados {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--e-3);
+  padding: var(--e-4);
+}
+
+.vender__teclas {
+  padding: var(--e-2) var(--e-4);
+  border-top: var(--grosor-borde) solid var(--borde);
+  background: var(--superficie-2);
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.vender__atajos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+.vender__mas-vendidos h2 {
+  margin: var(--e-2) 0 var(--e-3);
+  font-family: var(--fuente);
+  font-size: var(--letra);
+  letter-spacing: 0;
+}
+
+.vender__tarjetas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--e-3);
+}
+
+.vender__tarjeta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e-1) var(--e-3);
+  min-height: 92px;
+  padding: var(--e-3);
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+  text-align: left;
+  transition: border-color var(--rapido), transform var(--rapido);
+}
+
+.vender__tarjeta:hover {
+  border-color: var(--naranja);
+  transform: translateY(-1px);
+}
+
+.vender__tarjeta .figura {
+  grid-row: span 2;
+}
+
+.vender__tarjeta-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.vender__tarjeta-texto strong {
+  font-size: var(--letra-chica);
+}
+
+.vender__tarjeta-texto span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.vender__tarjeta-precio {
+  justify-self: end;
+  font-size: var(--letra-grande);
+}
+
+.vender__otros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+}
+
+.vender__otros .boton--texto {
+  margin-left: calc(-1 * var(--e-3));
+}
+
+.vender__vinculado {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+/* ---- Columna de la venta ---- */
+
+.vender__venta {
+  position: sticky;
+  top: var(--alto-encabezado);
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--alto-encabezado));
+  border-left: var(--grosor-borde) solid var(--borde);
+  background: var(--superficie);
+}
+
+.vender__cabeza {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: 60px;
+  padding: var(--e-2) var(--e-5);
+  border-bottom: var(--grosor-borde) solid var(--borde);
+}
+
+.vender__cabeza h2 {
+  font-size: var(--titulo-3);
+}
+
+.vender__no-llevo {
+  margin-left: auto;
+}
+
+.vender__venta .vacio {
+  margin: auto 0;
+}
+
+.vender__renglones {
+  flex: 1;
+  margin: 0;
+  padding: 0 var(--e-5);
+  list-style: none;
+  overflow-y: auto;
+}
+
+.vender__renglon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+  padding: var(--e-3) 0;
+  border-bottom: var(--grosor-borde) solid var(--borde);
+}
+
+.vender__renglon:last-child {
+  border-bottom: 0;
+}
+
+.vender__renglon--recien {
+  animation: vender-recien 1.2s ease-out;
+}
+
+@keyframes vender-recien {
+  from { background: var(--naranja-suave); }
+}
+
+.vender__renglon--sin-precio {
+  margin: var(--e-2) calc(-1 * var(--e-3));
+  padding: var(--e-2) var(--e-3) var(--e-3);
+  border: var(--grosor-borde) solid var(--alerta-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--alerta-suave);
+}
+
+.vender__renglon-nombre {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.vender__renglon-nombre > span:not(.pastilla) {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.vender__quitar {
+  margin-right: calc(-1 * var(--e-2));
+  color: var(--texto-2);
+}
+
+.vender__quitar:hover:not(:disabled) {
+  background: var(--peligro-suave);
+  color: var(--peligro-texto);
+}
+
+.vender__renglon-cuenta {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+.vender__unidad {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.vender__subtotal,
+.pastilla + .vender__quitar,
+.cantidad + .vender__quitar,
+.vender__unidad + .vender__quitar {
+  margin-left: auto;
+}
+
+.vender__subtotal {
+  font-size: var(--letra-grande);
+}
+
+.vender__precio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+  padding-top: var(--e-2);
+}
+
+.vender__precio > p {
+  font-size: var(--letra-chica);
+  font-weight: var(--peso-fuerte);
+}
+
+/* El precio a mano va en un renglón: la etiqueta a la izquierda y el importe a la derecha. */
+.vender__a-mano {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  align-items: center;
+  gap: var(--e-3);
+}
+
+.vender__a-mano .campo__etiqueta {
+  margin: 0;
+  font-size: var(--letra-detalle);
+  font-weight: var(--peso-medio);
+  line-height: 1.3;
+}
+
+.vender__a-mano .campo__caja {
+  height: var(--alto-boton);
+}
+
+.vender__renglon--sin-precio .vender__renglon-nombre {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-1) var(--e-3);
+}
+
+/* ---- Cómo paga, total y Cobrar ---- */
+
+.vender__pago {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--e-2);
+  padding: var(--e-3) var(--e-5) 0;
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.vender__cliente {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  padding: var(--e-2) var(--e-2) var(--e-2) var(--e-3);
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio);
+}
+
+.vender__cliente > span:nth-child(2) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.vender__cliente span span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.vender__cobro {
+  position: static;
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  border-top: 0;
+  flex-direction: column;
+  gap: var(--e-2);
+  padding: var(--e-3) var(--e-5) var(--e-5);
+  background: var(--superficie);
+}
+
+.vender__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-weight: var(--peso-fuerte);
+}
+
+.vender__total strong {
+  font-size: var(--cifra);
+  line-height: 1.1;
+}
+
+/* ---- Hojas ---- */
+
+.vender__libre {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+.vender__vincular {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e-5);
+}
+
+.vender__vincular ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  padding: 0;
+  list-style: none;
+  counter-reset: paso;
+}
+
+.vender__vincular li {
+  display: flex;
+  gap: var(--e-3);
+  counter-increment: paso;
+  font-size: var(--letra-chica);
+  line-height: 1.35;
+}
+
+.vender__vincular li::before {
+  content: counter(paso);
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radio-redondo);
+  background: var(--naranja-suave);
+  color: var(--naranja-texto);
+  font-size: var(--letra-detalle);
+  font-weight: var(--peso-boton);
+}
+
+/* ---- Pantalla angosta de computadora ---- */
+
+@media (max-width: 1100px) {
+  .vender {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+
+  .vender__tarjetas {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Celular: una columna; lo primero son los renglones; total y Cobrar pegados abajo ---- */
+
+@media (max-width: 700px) {
+  .vender {
+    display: block;
+    min-height: 0;
+  }
+
+  .vender__buscar {
+    gap: var(--e-2);
+    padding: var(--e-3) var(--margen-pagina) var(--e-2);
+  }
+
+  /* En el celular la grilla de atajos compite con la venta: no va. */
+  .vender__mas-vendidos {
+    display: none;
+  }
+
+  .vender__venta {
+    position: static;
+    height: auto;
+    border-left: 0;
+    border-top: var(--grosor-borde) solid var(--borde);
+  }
+
+  .vender__cabeza {
+    min-height: 56px;
+    padding-inline: var(--margen-pagina);
+  }
+
+  .vender__venta .vacio {
+    margin: 0;
+    padding-block: var(--e-8) var(--e-12);
+  }
+
+  .vender__renglones {
+    flex: none;
+    padding-inline: var(--margen-pagina);
+    overflow: visible;
+  }
+
+  .vender__renglon--sin-precio {
+    margin-inline: calc(-1 * var(--e-2));
+  }
+
+  .vender__pago {
+    padding: var(--e-4) var(--margen-pagina);
+  }
+
+  .vender__otros .boton {
+    text-align: left;
+  }
+
+  /* Pegado arriba de la barra de pestañas mientras se desplaza; al final ocupa su lugar. */
+  .vender__cobro {
+    position: sticky;
+    bottom: calc(var(--alto-pestanas) + var(--seguro-abajo));
+    z-index: var(--capa-barra-fija);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--e-2) var(--e-4);
+    padding: var(--e-3) var(--margen-pagina);
+    border-top: var(--grosor-borde) solid var(--borde);
+  }
+
+  .vender__cobro .aviso {
+    grid-column: 1 / -1;
+  }
+
+  .vender__total {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: var(--letra-detalle);
+    line-height: 1.2;
+  }
+
+  .vender__total strong {
+    font-size: var(--titulo-1);
+  }
+
+  .vender__cobrar-importe {
+    display: none;
+  }
+
+  .vender__vincular {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}

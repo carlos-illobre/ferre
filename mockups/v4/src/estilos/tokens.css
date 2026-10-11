@@ -1,0 +1,152 @@
+/* Valores del diseño de Figma pasados a variables. Todo estilo de la maqueta sale de acá:
+   no se escriben colores, tamaños de letra, radios ni espacios sueltos en las otras hojas. */
+
+:root {
+  /* ---- Color: marca ---- */
+  --verde: #17312b;            /* menú lateral y bloques fuertes */
+  --verde-2: #25443d;          /* destino marcado, relieve sobre verde */
+  --verde-3: #203d36;          /* cajas dentro del verde */
+  --sobre-verde: #ffffff;
+  --sobre-verde-2: #b8c7c3;    /* texto secundario sobre verde */
+  --naranja: #ff5a2a;          /* único color de acción (fondos) */
+  --naranja-fuerte: #e9481d;   /* al pasar el mouse o apretar */
+  --naranja-texto: #c93a10;    /* naranja para texto sobre blanco (contraste AA) */
+  --naranja-suave: #fff0ea;    /* fondo de lo elegido */
+  --naranja-borde: #ffc4af;
+  --sobre-naranja: #ffffff;
+  --amarillo: #f7c445;         /* avatar y avisos */
+  --amarillo-suave: #fff4c9;
+  --amarillo-borde: #efd57b;
+  --amarillo-texto: #6b5000;
+
+  /* ---- Color: superficies y texto ---- */
+  --fondo: #f5f6f2;
+  --superficie: #ffffff;
+  --superficie-2: #f2f5f0;     /* relleno tenue: botón de huella, pastilla neutra */
+  --borde: #e0e5e2;
+  --borde-fuerte: #cfd6d2;     /* borde de lo que se toca */
+  --texto: #18201e;
+  --texto-2: #56615d;          /* texto de detalle (AA sobre blanco y sobre el fondo) */
+  --texto-apagado: #6f7a76;    /* texto de ejemplo dentro de los campos */
+
+  /* ---- Color: estados ---- */
+  --bien: #38a878;
+  --bien-texto: #1d6f52;
+  --bien-suave: #eaf7f1;
+  --bien-borde: #bee6d3;
+  --alerta: #f1b631;
+  --alerta-texto: #6b5000;
+  --alerta-suave: #fff9e6;
+  --alerta-borde: #efd57b;
+  --peligro: #d84431;
+  --peligro-fuerte: #bd3524;
+  --peligro-texto: #b93523;
+  --peligro-suave: #fdeeeb;
+  --peligro-borde: #f3c5bd;
+  --info: #357cc0;
+  --info-texto: #245f99;
+  --info-suave: #e7f1ff;
+  --info-borde: #bcd7f5;
+
+  /* ---- Color: tonos para íconos de producto e iniciales ---- */
+  --tono-naranja-fondo: #fff0ea;  --tono-naranja: #d84821;
+  --tono-azul-fondo: #e7f1ff;     --tono-azul: #2c6cab;
+  --tono-amarillo-fondo: #fff5cc; --tono-amarillo: #8a6500;
+  --tono-negro-fondo: #e8eae9;    --tono-negro: #202624;
+  --tono-verde-fondo: #e3f3ea;    --tono-verde: #1d6f52;
+  --tono-violeta-fondo: #e5ddff;  --tono-violeta: #5a34c4;
+
+  /* ---- Color: andamiaje de la maqueta (a propósito, ajeno a la paleta de la app) ---- */
+  --maqueta: #7a2bd1;
+  --maqueta-suave: #f6eeff;
+
+  /* ---- Sombra: solo para lo que flota (hojas, avisos flotantes, menús) ---- */
+  --sombra-flotante: 0 12px 35px #152f2a33;
+  --velo: #0f211dcc;           /* fondo oscurecido detrás de una hoja */
+
+  /* ---- Tipografía ---- */
+  --fuente: "Manrope Variable", "Manrope", system-ui, sans-serif;
+  --fuente-titulos: "Space Grotesk Variable", "Space Grotesk", var(--fuente);
+  --letra-detalle: 14px;       /* mínimo absoluto */
+  --letra-chica: 15px;
+  --letra: 16px;               /* texto común (17 px en el celular, ver abajo) */
+  --letra-grande: 18px;
+  --titulo-3: 18px;            /* título de tarjeta o sección */
+  --titulo-2: 22px;            /* título dentro de la pantalla */
+  --titulo-1: 26px;            /* título de la pantalla */
+  --cifra: 32px;               /* total, cifras destacadas */
+  --cifra-grande: 52px;        /* importe de la pantalla de éxito, conteo */
+  --peso-normal: 500;
+  --peso-medio: 600;
+  --peso-fuerte: 700;
+  --peso-boton: 800;
+  --renglon: 1.45;             /* alto de línea del texto */
+  --renglon-titulo: 1.15;
+
+  /* ---- Espacios ---- */
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 20px;
+  --e-6: 24px;
+  --e-8: 32px;
+  --e-10: 40px;
+  --e-12: 48px;
+  --margen-pagina: 30px;       /* aire a los costados del contenido */
+
+  /* ---- Radios ---- */
+  --radio-chico: 8px;
+  --radio: 10px;
+  --radio-tarjeta: 12px;
+  --radio-grande: 14px;
+  --radio-redondo: 999px;
+
+  /* ---- Tamaños ---- */
+  --toque: 44px;               /* alto mínimo de todo lo que se toca */
+  --alto-boton: 48px;
+  --alto-boton-grande: 56px;
+  --alto-campo: 50px;
+  --alto-encabezado: 76px;
+  --alto-pestanas: 0px;        /* la barra de pestañas solo existe en el celular */
+  --ancho-menu: 244px;
+  --ancho-contenido: 1200px;
+  --ancho-angosto: 640px;
+  --ancho-hoja: 520px;
+  --grosor-borde: 1px;
+  --foco: 3px solid #1463d6;   /* anillo de foco del teclado */
+  --foco-sobre-verde: 3px solid #ffd65c;
+
+  /* ---- Capas ---- */
+  --capa-encabezado: 5;
+  --capa-barra-fija: 10;
+  --capa-pestanas: 30;
+  --capa-flotante: 50;
+  --capa-maqueta: 60;
+
+  /* ---- Movimiento ---- */
+  --rapido: 120ms;
+  --suave: 220ms;
+}
+
+/* Celular: letra un punto más grande y menos aire a los costados. */
+@media (max-width: 700px) {
+  :root {
+    --letra-detalle: 14.5px;
+    --letra-chica: 15.5px;
+    --letra: 17px;
+    --letra-grande: 19px;
+    --titulo-1: 22px;
+    --titulo-2: 21px;
+    --cifra: 30px;
+    --cifra-grande: 46px;
+    --margen-pagina: 16px;
+    --alto-encabezado: 64px;
+    --alto-pestanas: 68px;
+    --alto-campo: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --rapido: 0ms; --suave: 0ms; }
+}

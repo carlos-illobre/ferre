@@ -38,10 +38,10 @@ export default defineConfig(({ command }) => {
         },
         workbox: {
           navigateFallback: "index.html",
-          // La interfaz en revisión vive en /v2/ con su propio index.html; /v3/ son maquetas
-          // estáticas, que no se guardan en el dispositivo.
-          navigateFallbackDenylist: [/\/v2\//, /\/v3\//],
-          globIgnores: ["v3/**"],
+          // La interfaz en revisión vive en /v2/ con su propio index.html; /v3/ y /v4/ son
+          // maquetas, que no se guardan en el dispositivo.
+          navigateFallbackDenylist: [/\/v2\//, /\/v3\//, /\/v4\//],
+          globIgnores: ["v3/**", "v4/**"],
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
           // Nada de la API ni de Google se cachea: siempre red.
           runtimeCaching: [],

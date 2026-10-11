@@ -1,0 +1,304 @@
+/* Entrar: portada de Figma (panel verde con la marca + opciones a la derecha). Prefijo: entrar */
+
+.entrar {
+  display: grid;
+  grid-template-columns: 52% 48%;
+  min-height: 100dvh;
+  background: var(--superficie);
+}
+
+/* ---- Panel de marca ---- */
+
+.entrar__marca {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--e-12) 9%;
+  background: var(--verde);
+  color: var(--sobre-verde);
+  overflow: hidden;
+}
+
+.entrar__sello {
+  position: absolute;
+  top: var(--e-10);
+  left: 9%;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--naranja);
+  border-radius: var(--radio-grande);
+  transform: rotate(-7deg);
+}
+
+.entrar__sello span {
+  font-family: var(--fuente-titulos);
+  font-size: var(--titulo-1);
+  font-weight: var(--peso-fuerte);
+  color: var(--naranja);
+  transform: rotate(7deg);
+}
+
+.entrar__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: clamp(48px, 6vw, 82px);
+  font-weight: var(--peso-fuerte);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+
+.entrar__nombre span {
+  color: var(--naranja);
+}
+
+.entrar__que-es {
+  margin-top: var(--e-3);
+  font-size: var(--titulo-2);
+  color: var(--sobre-verde-2);
+}
+
+.entrar__que-es--celular {
+  display: none;
+}
+
+.entrar__arte {
+  position: absolute;
+  right: -65px;
+  bottom: -52px;
+  width: 260px;
+  height: 260px;
+}
+
+.entrar__arte div {
+  position: absolute;
+  width: 180px;
+  height: 70px;
+  border: 16px solid var(--naranja);
+  border-radius: 50px;
+  transform: rotate(-35deg);
+}
+
+.entrar__arte div:nth-child(2) {
+  top: 70px;
+  left: 42px;
+  border-color: var(--amarillo);
+}
+
+.entrar__arte div:nth-child(3) {
+  top: 140px;
+  left: 84px;
+  border-color: var(--sobre-verde);
+}
+
+/* ---- Opciones para entrar ---- */
+
+.entrar__lado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--e-8);
+}
+
+.entrar__caja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  width: min(430px, 100%);
+}
+
+.entrar__logo {
+  display: none;
+}
+
+.entrar__caja h1 {
+  margin-bottom: var(--e-5);
+  font-size: 38px;
+  letter-spacing: -0.04em;
+}
+
+.entrar__opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--e-4);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--e-2) var(--e-5);
+  border: var(--grosor-borde) solid var(--borde-fuerte);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+  text-align: left;
+  transition: border-color var(--rapido);
+}
+
+.entrar__opcion:hover:not(:disabled) {
+  border-color: var(--naranja);
+}
+
+.entrar__opcion:disabled {
+  opacity: 0.5;
+}
+
+.entrar__opcion > span {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.entrar__opcion strong {
+  font-size: var(--letra-grande);
+}
+
+.entrar__opcion span span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.entrar__opcion--huella {
+  border-color: var(--superficie-2);
+  background: var(--superficie-2);
+}
+
+.entrar__huella {
+  color: var(--naranja-texto);
+}
+
+.entrar__ayuda {
+  margin-top: var(--e-3);
+  font-size: var(--letra-chica);
+  color: var(--texto-2);
+  text-align: center;
+}
+
+.entrar__ambiente {
+  align-self: center;
+  margin-top: var(--e-2);
+  padding: var(--e-1) var(--e-3);
+  border: var(--grosor-borde) solid var(--amarillo-borde);
+  border-radius: var(--radio-chico);
+}
+
+/* ---- Estados: oferta de huella y «no autorizado» (tarjeta blanca sobre verde) ---- */
+
+.entrar--estado {
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  padding: var(--e-5);
+  background: var(--verde);
+}
+
+.entrar__tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e-3);
+  width: min(440px, 100%);
+  padding: var(--e-10) var(--e-8) var(--e-6);
+  border-radius: var(--radio-grande);
+  background: var(--superficie);
+  text-align: center;
+}
+
+.entrar__tarjeta h1 {
+  font-size: var(--titulo-1);
+}
+
+.entrar__tarjeta p {
+  margin-bottom: var(--e-4);
+  color: var(--texto-2);
+  overflow-wrap: anywhere;
+}
+
+.entrar__tarjeta p strong {
+  color: var(--texto);
+}
+
+.entrar__circulo {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: var(--e-2);
+  border-radius: var(--radio-redondo);
+  background: var(--naranja-suave);
+  color: var(--naranja-texto);
+}
+
+.entrar__circulo--alerta {
+  background: var(--amarillo-suave);
+  color: var(--amarillo-texto);
+}
+
+/* ---- Celular ---- */
+
+@media (max-width: 700px) {
+  .entrar {
+    display: block;
+  }
+
+  .entrar__marca {
+    height: 26dvh;
+    min-height: 170px;
+    padding: 0;
+  }
+
+  .entrar__sello,
+  .entrar__marca > div:not(.entrar__arte) {
+    display: none;
+  }
+
+  .entrar__arte {
+    right: -60px;
+    bottom: -60px;
+    transform: scale(0.7);
+  }
+
+  .entrar__lado {
+    align-items: flex-start;
+    padding: var(--e-6) var(--e-5) var(--e-12);
+  }
+
+  .entrar__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--e-3);
+    margin-bottom: var(--e-4);
+    font-family: var(--fuente-titulos);
+    font-size: var(--titulo-2);
+  }
+
+  .entrar__logo span {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radio);
+    background: var(--naranja);
+    color: var(--sobre-naranja);
+    font-weight: var(--peso-fuerte);
+  }
+
+  .entrar__caja h1 {
+    margin-bottom: 0;
+    font-size: 30px;
+  }
+
+  .entrar__que-es--celular {
+    display: block;
+    margin: 0 0 var(--e-4);
+    font-size: var(--letra);
+    color: var(--texto-2);
+  }
+
+  .entrar__tarjeta {
+    padding: var(--e-8) var(--e-5) var(--e-5);
+  }
+
+  .entrar--estado {
+    padding-bottom: var(--e-12);
+  }
+}

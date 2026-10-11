@@ -1,0 +1,289 @@
+/* Ventas del día: el bloque verde de Figma con el total y los medios de pago, y la lista de
+   ventas con un producto por renglón. Prefijo: ventas */
+
+/* ---- Qué día se mira ---- */
+
+.ventas__dia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-2) var(--e-4);
+  margin-bottom: var(--e-4);
+}
+
+.ventas__dia h2 {
+  font-size: var(--titulo-3);
+}
+
+.ventas__dia-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+/* El selector de día es el `<input type="date">` nativo, vestido como un botón. */
+.ventas__fecha {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: var(--toque);
+  padding: 0 var(--e-2) 0 var(--e-3);
+  border: var(--grosor-borde) solid var(--borde-fuerte);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  font-size: var(--letra-chica);
+  font-weight: var(--peso-fuerte);
+}
+
+.ventas__fecha:focus-within {
+  border-color: var(--naranja);
+  outline: 2px solid var(--naranja);
+}
+
+.ventas__fecha input {
+  min-height: var(--toque);
+  padding: 0 var(--e-1);
+  border: 0;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  font-weight: var(--peso-medio);
+}
+
+.ventas__fecha input:focus-visible {
+  outline: 0;
+}
+
+.ventas__dia + .aviso {
+  margin-bottom: var(--e-4);
+}
+
+/* ---- Total del día ---- */
+
+.ventas__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-8);
+  padding: var(--e-5) var(--e-6);
+}
+
+.ventas__vendido p,
+.ventas__vendido span {
+  font-size: var(--letra-chica);
+  color: var(--sobre-verde-2);
+}
+
+.ventas__vendido strong {
+  display: block;
+  font-size: var(--cifra-grande);
+  line-height: 1.1;
+}
+
+.ventas__medios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(190px, auto));
+  gap: var(--e-2);
+  margin: 0;
+}
+
+.ventas__medio {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--e-2);
+  padding: var(--e-2) var(--e-3);
+  border-radius: var(--radio);
+  background: var(--verde-3);
+}
+
+.ventas__medio::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radio-redondo);
+  background: var(--naranja);
+}
+
+.ventas__medio--mercado-pago::before { background: var(--info); }
+.ventas__medio--tarjeta::before { background: var(--amarillo); }
+.ventas__medio--cuenta-corriente::before { background: var(--tono-violeta-fondo); }
+
+.ventas__medio dt {
+  font-size: var(--letra-chica);
+  color: var(--sobre-verde-2);
+}
+
+.ventas__medio dd {
+  margin: 0 0 0 var(--e-4);
+  font-size: var(--letra-grande);
+}
+
+/* ---- Lista de ventas ---- */
+
+.ventas__lista {
+  margin: var(--e-4) 0 0;
+  padding: 0;
+  list-style: none;
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+  overflow: hidden;
+}
+
+.ventas__venta {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) auto 104px;
+  align-items: center;
+  gap: var(--e-2) var(--e-4);
+  padding: var(--e-3) var(--e-4) var(--e-3) var(--e-5);
+}
+
+.ventas__venta + .ventas__venta {
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.ventas__hora {
+  font-size: var(--letra-grande);
+}
+
+.ventas__que {
+  min-width: 0;
+}
+
+.ventas__productos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: var(--peso-fuerte);
+  line-height: 1.35;
+}
+
+.ventas__pago {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-1) var(--e-2);
+  margin-top: 2px;
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.ventas__importe {
+  font-size: var(--titulo-2);
+  text-align: right;
+}
+
+.ventas__accion {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ventas__venta--anulada {
+  background: var(--superficie-2);
+}
+
+.ventas__venta--anulada .ventas__productos,
+.ventas__venta--anulada .ventas__importe,
+.ventas__venta--anulada .ventas__hora {
+  color: var(--texto-2);
+}
+
+.ventas__venta--anulada .ventas__productos,
+.ventas__venta--anulada .ventas__importe {
+  text-decoration: line-through;
+}
+
+/* ---- Sin ventas: el vacío con su botón para ir a vender ---- */
+
+/* ---- En la hoja de anular ---- */
+
+.ventas__productos--en-hoja {
+  padding: var(--e-3) var(--e-4);
+  border-radius: var(--radio);
+  background: var(--superficie-2);
+}
+
+/* ---- Celular ---- */
+
+@media (max-width: 700px) {
+  .ventas__dia h2 {
+    flex-basis: 100%;
+  }
+
+  .ventas__dia-acciones {
+    flex: 1;
+  }
+
+  .ventas__fecha {
+    flex: 1;
+  }
+
+  .ventas__fecha input {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+  }
+
+  .ventas__total {
+    display: block;
+    padding: var(--e-5) var(--e-4) var(--e-4);
+  }
+
+  .ventas__vendido strong {
+    font-size: var(--cifra-grande);
+  }
+
+  .ventas__medios {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: var(--e-4);
+  }
+
+  /* En el celular el nombre va arriba y el importe abajo: entran los cuatro sin apretarse. */
+  .ventas__medio {
+    grid-template-columns: 10px minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    gap: 0 var(--e-2);
+  }
+
+  .ventas__medio::before {
+    margin-top: 6px;
+  }
+
+  .ventas__medio dt {
+    font-size: var(--letra-detalle);
+    line-height: 1.3;
+  }
+
+  .ventas__medio dd {
+    grid-column: 2;
+    margin: 0;
+  }
+
+  .ventas__venta {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "hora importe"
+      "que que"
+      "accion accion";
+    gap: var(--e-1) var(--e-3);
+    padding: var(--e-3) var(--e-4);
+  }
+
+  .ventas__hora { grid-area: hora; }
+  .ventas__importe { grid-area: importe; }
+  .ventas__que { grid-area: que; }
+
+  .ventas__accion {
+    grid-area: accion;
+    justify-content: flex-start;
+    margin-top: var(--e-1);
+  }
+
+  .ventas__hora {
+    color: var(--texto-2);
+  }
+}

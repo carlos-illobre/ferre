@@ -1,0 +1,235 @@
+/* Duplicados. Prefijo: duplicados */
+
+.duplicados__entrada {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3) var(--e-6);
+}
+
+.duplicados__entrada p {
+  max-width: 68ch;
+  color: var(--texto-2);
+}
+
+.duplicados__entrada .boton {
+  flex: none;
+}
+
+.duplicados__cola {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+.duplicados__sugerencia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+
+.duplicados__por-que {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-1) var(--e-3);
+}
+
+.duplicados__comparar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--e-3);
+}
+
+/* Cada producto es un botón: se toca el nombre que tiene que quedar. */
+.duplicados__ficha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--e-1);
+  min-width: 0;
+  padding: var(--e-4);
+  border: var(--grosor-borde) solid var(--borde-fuerte);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  text-align: left;
+  transition: background var(--rapido), border-color var(--rapido);
+}
+
+.duplicados__ficha:hover {
+  border-color: var(--naranja);
+}
+
+.duplicados__ficha--queda {
+  border-color: var(--naranja);
+  background: var(--naranja-suave);
+  box-shadow: inset 0 0 0 1px var(--naranja);
+}
+
+.duplicados__proveedor {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  margin-bottom: var(--e-2);
+  font-size: var(--letra-chica);
+  font-weight: var(--peso-fuerte);
+}
+
+.duplicados__nombre {
+  font-size: var(--letra-grande);
+  line-height: 1.3;
+}
+
+.duplicados__datos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-1);
+  font-size: var(--letra-chica);
+  color: var(--texto-2);
+}
+
+.duplicados__datos strong {
+  color: var(--texto);
+}
+
+.duplicados__eleccion {
+  display: flex;
+  align-items: center;
+  gap: var(--e-1);
+  margin-top: var(--e-2);
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.duplicados__ficha--queda .duplicados__eleccion {
+  font-weight: var(--peso-boton);
+  color: var(--naranja-texto);
+}
+
+.duplicados__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--e-2);
+}
+
+.duplicados__acciones .boton {
+  min-width: 170px;
+}
+
+/* ---- Hoja: unir dos a mano ---- */
+
+.duplicados__elegir {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+}
+
+.duplicados__elegir h3 {
+  font-family: var(--fuente);
+  font-size: var(--letra-chica);
+  letter-spacing: 0;
+}
+
+.duplicados__elegido {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  padding: var(--e-2) var(--e-2) var(--e-2) var(--e-4);
+  border: var(--grosor-borde) solid var(--naranja);
+  border-radius: var(--radio);
+  background: var(--naranja-suave);
+}
+
+.duplicados__elegido > span {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.duplicados__elegido > span span,
+.duplicados__resultado span {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.duplicados__resultados {
+  border: var(--grosor-borde) solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.duplicados__resultados p {
+  padding: var(--e-3) var(--e-4);
+  color: var(--texto-2);
+}
+
+.duplicados__resultado {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  padding: var(--e-2) var(--e-4);
+  border: 0;
+  border-bottom: var(--grosor-borde) solid var(--borde);
+  background: transparent;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.duplicados__resultado:last-child {
+  border-bottom: 0;
+}
+
+.duplicados__resultado:hover {
+  background: var(--naranja-suave);
+}
+
+.duplicados__resultado:focus-visible {
+  outline-offset: -3px;
+}
+
+@media (max-width: 700px) {
+  .duplicados__entrada {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .duplicados__sugerencia {
+    padding: var(--e-4);
+  }
+
+  .duplicados__comparar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--e-2);
+  }
+
+  .duplicados__ficha {
+    padding: var(--e-3);
+  }
+
+  .duplicados__proveedor {
+    margin-bottom: var(--e-1);
+  }
+
+  .duplicados__datos {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 var(--e-4);
+  }
+
+  .duplicados__eleccion {
+    margin-top: var(--e-1);
+  }
+
+  .duplicados__ficha:not(.duplicados__ficha--queda) .duplicados__eleccion {
+    display: none;
+  }
+
+  .duplicados__acciones .boton {
+    flex: 1;
+    min-width: 0;
+  }
+}

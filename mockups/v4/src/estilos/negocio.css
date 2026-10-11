@@ -1,0 +1,293 @@
+/* Cómo va el negocio: tres bloques que se leen de un vistazo. Lo vendido hoy es el bloque
+   fuerte (verde, a la izquierda); las compras y lo que no llevaron, a la derecha.
+   En el celular va todo en una columna. Prefijo: negocio */
+
+.negocio {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--e-4);
+}
+
+.negocio__aviso {
+  margin-bottom: var(--e-4);
+}
+
+/* ---- Lo común a los tres bloques ---- */
+
+.negocio__hoy,
+.negocio__bloque {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.negocio__hoy {
+  grid-row: span 2;
+  align-self: stretch;
+  padding: var(--e-6);
+}
+
+.negocio__cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-2) var(--e-4);
+}
+
+.negocio__cabeza h2 {
+  font-size: var(--titulo-3);
+}
+
+.negocio__cabeza p {
+  margin-top: var(--e-1);
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.negocio__cabeza p::first-letter {
+  text-transform: uppercase;
+}
+
+.negocio__hoy .negocio__cabeza p,
+.negocio__cuantas {
+  color: var(--sobre-verde-2);
+}
+
+.negocio__total {
+  margin-top: var(--e-4);
+  font-size: var(--cifra-grande);
+  line-height: 1.1;
+}
+
+.negocio__total--chico {
+  margin-top: 0;
+  font-size: var(--cifra);
+}
+
+.negocio__cuantas {
+  margin-top: var(--e-1);
+  font-size: var(--letra-chica);
+}
+
+.negocio__nada {
+  margin-top: var(--e-2);
+  color: var(--texto-2);
+}
+
+.negocio__hoy .negocio__nada {
+  color: var(--sobre-verde-2);
+}
+
+/* ---- Lo vendido por medio de pago ---- */
+
+.negocio__medios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--e-2);
+  margin: var(--e-6) 0 var(--e-5);
+}
+
+.negocio__medios div {
+  padding: var(--e-3) var(--e-4);
+  border-radius: var(--radio);
+  background: var(--verde-2);
+}
+
+.negocio__medios dt {
+  font-size: var(--letra-detalle);
+  color: var(--sobre-verde-2);
+}
+
+.negocio__medios dd {
+  margin: 0;
+  font-size: var(--titulo-2);
+  line-height: 1.25;
+}
+
+.negocio__medio--en-cero dd {
+  color: var(--sobre-verde-2);
+}
+
+.negocio__ver {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* ---- Listas de los bloques blancos ---- */
+
+.negocio__lista {
+  margin-top: var(--e-3);
+  padding: 0;
+  list-style: none;
+}
+
+.negocio__lista li {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: 58px;
+  padding: var(--e-2) 0;
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+.negocio__lista li:last-child {
+  padding-bottom: 0;
+}
+
+.negocio__renglon-texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.negocio__renglon-texto span,
+.negocio__mas {
+  font-size: var(--letra-detalle);
+  color: var(--texto-2);
+}
+
+.negocio__importe {
+  flex: none;
+  font-size: var(--letra-grande);
+}
+
+.negocio__veces {
+  flex: none;
+  padding: var(--e-1) var(--e-3);
+  border-radius: var(--radio-redondo);
+  background: var(--amarillo-suave);
+  color: var(--amarillo-texto);
+  font-size: var(--letra-detalle);
+  font-weight: var(--peso-fuerte);
+  white-space: nowrap;
+}
+
+.negocio__mas {
+  padding-top: var(--e-3);
+  border-top: var(--grosor-borde) solid var(--borde);
+}
+
+/* ---- Cargando: el lugar de los números, sin mostrar $0 ---- */
+
+.negocio__cargando {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  margin-top: var(--e-5);
+}
+
+.negocio__hueso {
+  width: 100%;
+  height: 18px;
+  border-radius: var(--radio-chico);
+  background: var(--borde);
+  animation: negocio-late 1.2s ease-in-out infinite alternate;
+}
+
+.negocio__hueso--cifra {
+  width: 55%;
+  height: 40px;
+}
+
+.negocio__hueso--corto {
+  width: 70%;
+}
+
+.negocio__cargando--verde .negocio__hueso {
+  background: var(--verde-2);
+}
+
+.negocio__cargando--verde .negocio__hueso--cifra {
+  height: 56px;
+}
+
+@keyframes negocio-late {
+  from { opacity: 1; }
+  to { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .negocio__hueso {
+    animation: none;
+  }
+}
+
+/* ---- Error de un bloque, en el lugar ---- */
+
+.negocio__falla {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3);
+  margin-top: var(--e-4);
+  padding: var(--e-3) var(--e-4);
+  border: var(--grosor-borde) solid var(--peligro-borde);
+  border-radius: var(--radio);
+  background: var(--peligro-suave);
+}
+
+.negocio__falla-icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radio-redondo);
+  background: var(--superficie);
+  color: var(--peligro-texto);
+}
+
+.negocio__falla p {
+  display: flex;
+  flex: 1 1 180px;
+  flex-direction: column;
+  min-width: 0;
+  font-size: var(--letra-chica);
+  line-height: 1.35;
+}
+
+.negocio__falla--verde {
+  border-color: var(--verde-2);
+  background: var(--verde-2);
+}
+
+.negocio__falla--verde p span {
+  color: var(--sobre-verde-2);
+}
+
+.negocio__falla--verde .negocio__falla-icono {
+  background: var(--amarillo);
+  color: var(--verde);
+}
+
+@media (max-width: 700px) {
+  .negocio {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--e-3);
+  }
+
+  .negocio__hoy {
+    grid-row: auto;
+    padding: var(--e-5);
+  }
+
+  .negocio__medios {
+    margin-top: var(--e-5);
+  }
+
+  .negocio__medios div {
+    padding: var(--e-3);
+  }
+
+  .negocio__medios dd {
+    font-size: var(--letra-grande);
+  }
+
+  .negocio__ver {
+    align-self: stretch;
+  }
+}
