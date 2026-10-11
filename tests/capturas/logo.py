@@ -14,7 +14,8 @@ MARCOS = {
     # Un triángulo con la punta hacia abajo, como una plomada: acompaña la forma de la F, ancha arriba y en punta abajo.
     "triangulo": ('<path d="M10 12H90L50 92Z" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(18.500 6) scale(0.7)"),
     # Triángulo rectángulo, como una escuadra: el ángulo recto arriba a la izquierda, donde arranca la F.
-    "escuadra": ('<path d="M12 11H91L12 92Z" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(3.500 8) scale(0.7)"),
+    # El cateto de arriba es más corto que el vertical, en la proporción de la F (más alta que ancha).
+    "escuadra": ('<path d="M18 11H86L18 92Z" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(9.500 8) scale(0.7)"),
     "hexagono": ('<path d="M50 6 88.100 28V72L50 94 11.900 72V28Z" fill="{f}" stroke="{f}" stroke-width="8" stroke-linejoin="round"/>', "translate(13.500 13) scale(0.68)"),
 }
 MARCO = "escuadra"
