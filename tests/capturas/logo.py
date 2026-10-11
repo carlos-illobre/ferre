@@ -1,6 +1,6 @@
 """Genera los archivos del logo de Ferrebress (la F-tornillo dentro de su tuerca) a partir de
 una sola definición: los SVG y los íconos de la app en clientes/gestion-del-local-web/public/,
-la marca dentro de los estilos de la v5 y una hoja de prueba en tests/capturas/salida/.
+el isotipo y el logotipo que dibuja la aplicación (src/principal) y una hoja de prueba en tests/capturas/salida/.
 Uso: python tests/capturas/logo.py   (necesita Playwright)"""
 import os, re, urllib.parse
 from playwright.sync_api import sync_playwright
@@ -62,6 +62,9 @@ def svg(contenido, lado=None):
 
 SOBRE_CLARO, SOBRE_OSCURO, EN_NARANJA = logo(VERDE, "#fff", NARANJA), logo(CLARO, VERDE, NARANJA), logo(NARANJA, "#fff", AMARILLO)
 
+import base64
+FUENTE = "data:font/woff2;base64," + base64.b64encode(open(os.path.join(WEB, "node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2"), "rb").read()).decode()
+
 def escribir(ruta, texto):
     with open(os.path.join(WEB, ruta), "w") as f: f.write(texto)
 
@@ -72,13 +75,24 @@ def en_estilos(ruta, patron, regla):
 
 escribir("public/logo-ferrebress.svg", "<!-- Ferrebress: la F que es un tornillo, dentro de su tuerca. Para fondo claro. Lo genera tests/capturas/logo.py -->\n" + svg(SOBRE_CLARO) + "\n")
 escribir("public/icono-v5.svg", "<!-- Ferrebress: el ícono de la pestaña del navegador. Lo genera tests/capturas/logo.py -->\n" + svg(SOBRE_CLARO) + "\n")
-dato = "data:image/svg+xml," + urllib.parse.quote(svg(SOBRE_OSCURO).replace('"', "'"), safe="/:=' ()")
-en_estilos("src/principal/compu/tema.css", r"\.marca::before \{[^}]*\}", f'.marca::before {{ content: ""; flex: none; width: 1.9em; height: 1.9em; background: url("{dato}") center / contain no-repeat; }}')
-en_estilos("src/principal/celular/tema.css", r"\.entrar \.logo \{[^}]*\}", f'.entrar .logo {{ font-size: 0; width: 76px; height: 76px; border-radius: 0; background: url("{dato}") center / contain no-repeat; }}')
+# El isotipo para dibujarlo dentro de la aplicación (sobre fondo claro y sobre fondo oscuro).
+escribir("src/principal/isotipo.ts", "// El isotipo de Ferrebress: la F que es un tornillo, dentro de su marco. Lo genera\n// tests/capturas/logo.py a partir de una sola definición: no se edita a mano.\n"
+         f"export const ISOTIPO_SOBRE_CLARO = `{svg(SOBRE_CLARO)}`;\nexport const ISOTIPO_SOBRE_OSCURO = `{svg(SOBRE_OSCURO)}`;\n")
+
+# El logotipo: el isotipo hace de F en la palabra Ferrebress (decisión 48). El isotipo no cambia;
+# el resto de la palabra va en la tipografía de la marca, inclinada igual que la F y pegada a su
+# diagonal. Estas medidas son las mismas que usa la aplicación (src/principal/logotipo.css).
+LOGOTIPO_CSS = (".logotipo{display:inline-flex;align-items:baseline;font-family:'Space Grotesk Variable','Segoe UI',system-ui,sans-serif;font-weight:700;line-height:1;letter-spacing:-.01em;white-space:nowrap}"
+                ".logotipo-isotipo,.logotipo>svg{flex:none;display:inline-block;width:1.5em;height:1.5em;transform:translateY(.36em);margin-right:-.2em}.logotipo-isotipo svg{display:block;width:100%;height:100%}"
+                ".logotipo>span:last-child{display:inline-block;transform:skewX(-6deg)}"
+                "")
+logotipo = lambda isotipo: f'<span class="logotipo" role="img" aria-label="Ferrebress">{isotipo}<span aria-hidden="true">errebress</span></span>'
+escribir("src/principal/logotipo.css", "/* El logotipo de Ferrebress: el isotipo hace de F en la palabra. Lo genera tests/capturas/logo.py. */\n" + LOGOTIPO_CSS.replace("}", "}\n"))
 
 fila = lambda fondo, color, c: (f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:22px;padding:20px;border-radius:14px;background:{fondo};color:{color};margin-top:10px">'
-    + "".join(svg(c, n) for n in (150, 64, 32, 16)) + f'<span style="display:inline-flex;align-items:center;gap:12px;font-weight:700;font-size:2.2rem">{svg(c, 60)}Ferrebress</span>{svg(EN_NARANJA, 110)}</div>')
+    + "".join(svg(c, n) for n in (150, 64, 32, 16)) + f'<span style="font-size:2.6rem">{logotipo(svg(c))}</span>{svg(EN_NARANJA, 110)}</div>')
 hoja = (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ferrebress: el logo</title></head>'
+        f'<style>@font-face{{font-family:"Space Grotesk Variable";src:url("{FUENTE}");font-weight:300 700}}{LOGOTIPO_CSS}</style>'
         f'<body style="margin:0;background:{CLARO};color:#18201e;font:17px/1.5 system-ui,sans-serif"><main style="max-width:980px;margin:0 auto;padding:28px 16px 56px">'
         f'<h1 style="font-size:1.6rem;margin:0 0 4px">Ferrebress: el logo</h1><p style="margin:0 0 12px;color:#4a5451">La F que es un tornillo, dentro de un triángulo que sigue su contorno. Sobre claro, sobre oscuro, con el nombre, en naranja y en tamaño chico.</p>'
         + fila("#fff", "#18201e", SOBRE_CLARO) + fila(VERDE, "#fff", SOBRE_OSCURO)
@@ -94,5 +108,9 @@ with sync_playwright() as pw:
     b = pw.chromium.launch()
     for lado in (192, 512):
         p = b.new_page(viewport={"width": lado, "height": lado}); p.set_content(f'<body style="margin:0">{svg(cuadro, lado)}</body>'); p.screenshot(path=os.path.join(WEB, "public", f"icono-{lado}.png")); p.close()
+    for nombre, isotipo, color in (("logotipo-ferrebress", SOBRE_CLARO, VERDE), ("logotipo-ferrebress-sobre-oscuro", SOBRE_OSCURO, "#ffffff")):
+        p = b.new_page(viewport={"width": 1400, "height": 400}, device_scale_factor=2)
+        p.set_content(f'<style>@font-face{{font-family:"Space Grotesk Variable";src:url("{FUENTE}");font-weight:300 700}}{LOGOTIPO_CSS}body{{margin:0;background:transparent}}#l{{display:inline-block;padding:10px 24px 70px 24px;font-size:160px;color:{color}}}</style><div id="l">{logotipo(svg(isotipo))}</div>')
+        p.wait_for_timeout(300); p.locator("#l").screenshot(path=os.path.join(WEB, "public", f"{nombre}.png"), omit_background=True); p.close()
     p = b.new_page(viewport={"width": 1000, "height": 520}); p.set_content(hoja); p.wait_for_timeout(200); p.screenshot(path=os.path.join(RAIZ, "tests", "capturas", "salida", "logo.png"), full_page=True); b.close()
 print("logo generado")

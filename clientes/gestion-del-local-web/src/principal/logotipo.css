@@ -1,0 +1,5 @@
+/* El logotipo de Ferrebress: el isotipo hace de F en la palabra. Lo genera tests/capturas/logo.py. */
+.logotipo{display:inline-flex;align-items:baseline;font-family:'Space Grotesk Variable','Segoe UI',system-ui,sans-serif;font-weight:700;line-height:1;letter-spacing:-.01em;white-space:nowrap}
+.logotipo-isotipo,.logotipo>svg{flex:none;display:inline-block;width:1.5em;height:1.5em;transform:translateY(.36em);margin-right:-.2em}
+.logotipo-isotipo svg{display:block;width:100%;height:100%}
+.logotipo>span:last-child{display:inline-block;transform:skewX(-6deg)}

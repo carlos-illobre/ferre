@@ -1,3 +1,4 @@
+import { Logotipo } from "../Logotipo";
 import { BotonGoogle, BotonHuella } from "./pantallas/Login";
 import { TEXTOS_DE_ENTRADA } from "../compu/base/pantallas/Entrar";
 
@@ -8,7 +9,7 @@ export function Entrar() {
   return (
     <main className="entrar" data-testid="entrar">
       <div className="arriba">
-        <div className="entrar-marca-celular"><div className="logo" aria-hidden="true" /><strong>Ferrebress</strong></div>
+        <div className="entrar-marca-celular"><Logotipo /></div>
         <h1>{TEXTOS_DE_ENTRADA.titulo}</h1>
       </div>
       <div className="abajo">

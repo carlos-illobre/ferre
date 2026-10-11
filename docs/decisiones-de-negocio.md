@@ -222,3 +222,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - **La aplicación abre en la raíz** y deja de llamarse «versión 5». Las versiones 1 a 4
       se publican bajo `historico/`, con un cartel que dice que no se usan. Las direcciones
       viejas (`/v5/`, `/v1/`, …) llevan solas a las nuevas.
+48. **El logotipo: el isotipo hace de «F» en la palabra Ferrebress** (2026-10-11). El
+    isotipo (la F-tornillo en su marco, decisión 29) no se toca. El logotipo lo pone como
+    primera letra y sigue con «errebress» en la tipografía de la marca, inclinada igual que
+    la F y pegada a su diagonal. Se usa donde antes iban el isotipo y el nombre al lado: el
+    menú de la computadora y las dos entradas. El ícono de la app y la pestaña del navegador
+    siguen siendo el isotipo solo. Todo sale de `tests/capturas/logo.py`.

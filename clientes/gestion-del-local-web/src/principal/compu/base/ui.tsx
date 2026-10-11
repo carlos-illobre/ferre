@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { Isotipo, Logotipo } from "../../Logotipo";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
 import { leerMeta } from "../../../almacen";
 import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../cola";
@@ -70,15 +71,8 @@ export function Icono({ nombre, tam = 20, grosor = 2 }: { nombre: NombreDeIcono;
 
 // La marca: una tuerca ámbar con la F calada, y el nombre en Archivo ancha.
 export function Marca({ tam = 30, soloSimbolo }: { tam?: number; soloSimbolo?: boolean }) {
-  return (
-    <span className="marca">
-      <svg width={tam} height={tam} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-        <path d="M24 2 43.050 13v22L24 46 4.950 35V13Z" fill="var(--ambar)" />
-        <path d="M17.500 13h15.500v5.500h-9.500v4.500h8v5.500h-8V35h-6Z" fill="var(--marino)" />
-      </svg>
-      {!soloSimbolo && <span>Ferrebress</span>}
-    </span>
-  );
+  // La marca es el logotipo: el isotipo hace de F en la palabra (decisión 48). Siempre va sobre el verde oscuro.
+  return <span className="marca" style={{ fontSize: Math.round(tam * 0.85) }}>{soloSimbolo ? <Isotipo lado={tam} /> : <Logotipo />}</span>;
 }
 
 type VarianteBoton = "principal" | "marino" | "peligro" | "sobre-marino";
