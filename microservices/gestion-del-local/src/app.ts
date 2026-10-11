@@ -21,6 +21,7 @@ import { credenciales } from "./rutas/credenciales.js";
 import { tickets } from "./rutas/tickets.js";
 import { pedidosDeFoto } from "./rutas/pedidos-de-foto.js";
 import { anomalias } from "./rutas/anomalias.js";
+import { permisos, roles } from "./rutas/roles.js";
 
 export const app = new Hono();
 
@@ -55,6 +56,8 @@ app.route("/credenciales", credenciales);
 app.route("/tickets", tickets);
 app.route("/pedidos-de-foto", pedidosDeFoto);
 app.route("/anomalias", anomalias);
+app.route("/roles", roles);
+app.route("/permisos", permisos);
 
 app.onError((error, c) => {
   console.error(error);

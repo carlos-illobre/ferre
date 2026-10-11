@@ -53,11 +53,13 @@ describe("passkeys", () => {
     expect(opciones.rpId).toBe("web.prueba");
     base.actual.programar(/FROM credencial cr JOIN usuario u/, (p) => ({ rows: p[0] === "cred-1" ? [{ id: "cred-1", usuario_id: "u-mostrador", clave_publica: clave, contador: "3", transportes: ["internal"], dispositivo: "Celular de Carlos", email: "mostrador@ferre.test", nombre: "Mostrador", rol: "mostrador", activo: true }] : [] }));
     verificar.login.mockResolvedValue({ verified: true, authenticationInfo: { newCounter: 4 } });
+    // Al entrar, el usuario llega con sus roles y permisos.
+    base.actual.programar(/FROM usuario u WHERE u\.id = \$1 AND u\.activo/, { rows: [{ id: "u-mostrador", email: "mostrador@ferre.test", nombre: "Mostrador", roles: ["Vendedor"], permisos: ["ventas.registrar"] }] });
     const r = await pedir(app, "POST", "/credenciales/login", { rol: null, cuerpo: { desafioId, respuesta: { id: "cred-1" } } });
     expect(r.status).toBe(201);
-    const cuerpo = (await r.json()) as { token: string; usuario: { id: string; rol: string } };
+    const cuerpo = (await r.json()) as { token: string; usuario: { id: string; roles: string[]; permisos: string[] } };
     expect(cuerpo.token.length).toBeGreaterThan(20);
-    expect(cuerpo.usuario).toMatchObject({ id: "u-mostrador", rol: "mostrador" });
+    expect(cuerpo.usuario).toMatchObject({ id: "u-mostrador", roles: ["Vendedor"], permisos: ["ventas.registrar"] });
     expect(verificar.login.mock.calls[0]![0]).toMatchObject({ credential: { id: "cred-1", counter: 3 }, requireUserVerification: true });
     expect(base.actual.sqlDe(/UPDATE credencial SET contador/)[0]!.params).toEqual(["cred-1", 4]);
     expect(base.actual.sqlDe(/INSERT INTO sesion/)).toHaveLength(1);

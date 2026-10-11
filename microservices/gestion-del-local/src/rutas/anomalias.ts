@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import { pool } from "../db.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 
 // Anomalías (RF-59): el registro de cada vez que el sistema y la realidad no coincidieron.
 // Se anotan solas (hoy, al vender algo que según el sistema no tenía stock) y no se editan
 // ni se borran: son una auditoría. Más adelante van a disparar avisos.
 export const anomalias = new Hono();
-anomalias.use("/*", exigirSesion);
+anomalias.use("/*", exigirSesion, exigirPermiso("negocio.anomalias"));
 
 const POR_PAGINA = 50;
 anomalias.get("/", async (c) => {

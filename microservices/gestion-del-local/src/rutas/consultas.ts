@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 
 // Lo que preguntaron y no compraron: demanda que hoy se pierde (specs/003-ventas/research.md).
 export const consultas = new Hono();
 consultas.use("/*", exigirSesion);
 
-consultas.post("/", async (c) => {
+consultas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
   const cuerpo = await c.req.json<{ items?: { producto_id?: string | null; descripcion: string; precio_ofrecido?: number | null }[]; motivo?: string; dispositivo_id?: string | null }>().catch(() => ({}) as Record<string, never>);
   if (!cuerpo.items?.length) return c.json({ error: "No hay nada que registrar" }, 400);
   for (const it of cuerpo.items) {
@@ -20,7 +20,7 @@ consultas.post("/", async (c) => {
   return c.body(null, 204);
 });
 
-consultas.get("/", async (c) => {
+consultas.get("/", exigirPermiso("negocio.numeros"), async (c) => {
   const { rows } = await pool.query("SELECT id, fecha, descripcion, precio_ofrecido, motivo FROM consulta ORDER BY fecha DESC LIMIT 200");
   return c.json(rows);
 });

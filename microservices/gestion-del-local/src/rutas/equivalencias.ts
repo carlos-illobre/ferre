@@ -1,12 +1,12 @@
 import { Hono, type Context } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirAdministrador, exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import { separarProductos, sugerirEquivalencias, unirProductos, type Movidos } from "../equivalencias.js";
 
 // Duplicados entre proveedores (issue #29): el dueño ve las sugerencias, une o rechaza.
 export const equivalencias = new Hono();
-equivalencias.use("/*", exigirSesion, exigirAdministrador);
+equivalencias.use("/*", exigirSesion, exigirPermiso("catalogo.duplicados"));
 
 const RESUMEN = `
   SELECT p.id, p.descripcion, p.marca, p.codigo_barras, pr.nombre AS proveedor, pp.costo_neto, pp.fecha_lista::text

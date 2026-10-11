@@ -3,8 +3,9 @@ import { OAuth2Client } from "google-auth-library";
 import { config } from "./config.js";
 import { pool } from "./db.js";
 import { buscarSesion, type SesionActiva, type Usuario } from "./sesiones.js";
+import { nombreDePermiso, type Permiso } from "./permisos.js";
 
-// Quién es el que llama. Sin sesión válida, 401; con rol insuficiente, 403.
+// Quién es el que llama. Sin sesión válida, 401; sin el permiso que pide la operación, 403.
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -25,15 +26,15 @@ export const exigirSesion: MiddlewareHandler = async (c, next) => {
   await next();
 };
 
-export function exigirRol(...roles: Usuario["rol"][]): MiddlewareHandler {
+// Pasa quien tenga alguno de los permisos pedidos (ADR-017). Si no, 403 diciendo cuál falta:
+// no es un problema de sesión, así que no se le cierra.
+export function exigirPermiso(...claves: Permiso[]): MiddlewareHandler {
   return async (c, next) => {
-    if (!roles.includes(c.get("sesion").usuario.rol)) return c.json({ error: `Solo puede hacerlo ${roles.length > 1 ? "un " + roles.join(" o un ") : "el " + roles[0]}` }, 403);
+    if (!puede(c.get("sesion").usuario, ...claves)) return c.json({ error: `No tenés permiso para esto. Hace falta: ${claves.map(nombreDePermiso).join(" o ")}`, permiso: claves[0] }, 403);
     await next();
   };
 }
-
-// El dueño y el admin administran; la única diferencia es que el admin no toca dueños.
-export const exigirAdministrador = exigirRol("dueño", "admin");
+export const puede = (usuario: Usuario, ...claves: Permiso[]) => claves.some((p) => usuario.permisos.includes(p));
 
 // Verifica el token que devuelve el botón de Google contra las claves públicas de
 // Google. Sin contraseñas: la identidad la afirma Google, nosotros solo decidimos si ese

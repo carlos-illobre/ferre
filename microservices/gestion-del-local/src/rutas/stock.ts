@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion, puede } from "../autenticacion.js";
 
 // Stock actual y valorización (issue #33). El stock no es un número guardado: es la suma
 // de los movimientos (compras +, ventas −, ajustes ±), así siempre se puede explicar de
@@ -37,6 +37,11 @@ stock.get("/", async (c) => {
     entrada.productos += 1;
     total += Number(r.valor);
   }
+  // El dinero invertido es de quien ve los números del negocio (RF-53, RF-72): a los demás
+  // les llegan las cantidades, sin costos ni valores.
+  if (!puede(c.get("sesion").usuario, "negocio.numeros")) {
+    return c.json({ productos: rows.map((r) => ({ id: r.id, stock: r.stock, proveedor: r.proveedor, ultimo_movimiento: r.ultimo_movimiento, costo_neto: null, valor: "0" })), valor_total: 0, por_proveedor: {} });
+  }
   return c.json({ productos: rows, valor_total: Math.round(total * 100) / 100, por_proveedor: porProveedor });
 });
 
@@ -50,7 +55,7 @@ stock.get("/:productoId/movimientos", async (c) => {
 });
 
 // Ajuste rápido: "hay tantas". Se registra la diferencia contra el stock actual, con motivo.
-stock.post("/:productoId/ajustes", async (c) => {
+stock.post("/:productoId/ajustes", exigirPermiso("deposito.stock"), async (c) => {
   const cuerpo = await c.req.json<{ cantidad_real?: number; motivo?: string }>().catch(() => ({}) as Record<string, never>);
   if (typeof cuerpo.cantidad_real !== "number" || !Number.isFinite(cuerpo.cantidad_real) || cuerpo.cantidad_real < 0) return c.json({ error: "Decí cuántas hay (un número mayor o igual a cero)" }, 400);
   // El motivo es obligatorio (RF-53), venga de la interfaz que venga.

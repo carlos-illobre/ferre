@@ -7,8 +7,8 @@ import {
 import { pool } from "../db.js";
 import { config } from "../config.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion, limitarIntentos } from "../autenticacion.js";
-import { crearSesion } from "../sesiones.js";
+import { exigirSesion, limitarIntentos, puede } from "../autenticacion.js";
+import { crearSesion, usuarioConPermisos } from "../sesiones.js";
 
 // Passkeys (WebAuthn, ADR-011 enmienda): el usuario, ya entrado con Google, vincula su
 // celular; desde entonces ese celular entra con la huella, sin Gmail. La clave privada
@@ -83,7 +83,7 @@ credenciales.get("/", exigirSesion, async (c) => {
 // Quitar un celular: el propio, o cualquiera si administra.
 credenciales.delete("/:id", exigirSesion, async (c) => {
   const { usuario } = c.get("sesion");
-  const administra = usuario.rol === "dueño" || usuario.rol === "admin";
+  const administra = puede(usuario, "admin.sesiones");
   const { rowCount } = await pool.query(
     "UPDATE credencial SET revocada_en = now() WHERE id = $1 AND revocada_en IS NULL AND ($3 OR usuario_id = $2)",
     [c.req.param("id"), usuario.id, administra],
@@ -124,5 +124,5 @@ credenciales.post("/login", limitarIntentos(20), async (c) => {
   const dispositivo = (cuerpo.dispositivo?.trim() || cred.dispositivo || "celular").slice(0, 120);
   const sesion = await crearSesion(pool, cred.usuario_id, dispositivo);
   await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: cred.usuario_id, contenido: { sesionId: sesion.id, dispositivo, medio: "huella", credencial: cred.id } });
-  return c.json({ token: sesion.token, usuario: { id: cred.usuario_id, email: cred.email, nombre: cred.nombre, rol: cred.rol } }, 201);
+  return c.json({ token: sesion.token, usuario: await usuarioConPermisos(pool, cred.usuario_id) }, 201);
 });

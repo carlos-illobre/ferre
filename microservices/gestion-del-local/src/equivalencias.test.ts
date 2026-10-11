@@ -56,8 +56,8 @@ describe("unir y separar productos", () => {
 describe("POST /equivalencias/separar", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
-  it("solo el dueño o el admin; 409 si el producto no está unido o no hay registro de la unión", async () => {
-    expect((await pedir(app, "POST", "/equivalencias/separar", { rol: "mostrador", cuerpo: { absorbido_id: "B" } })).status).toBe(403);
+  it("pide el permiso de unir duplicados; 409 si el producto no está unido o no hay registro de la unión", async () => {
+    expect((await pedir(app, "POST", "/equivalencias/separar", { rol: "soloVende", cuerpo: { absorbido_id: "B" } })).status).toBe(403);
     expect((await pedir(app, "POST", "/equivalencias/separar", { rol: "admin", cuerpo: {} })).status).toBe(400);
     expect((await pedir(app, "POST", "/equivalencias/separar", { rol: "admin", cuerpo: { absorbido_id: "B" } })).status).toBe(409);
     base.actual.programar(/SELECT reemplazado_por FROM producto WHERE id = \$1 FOR UPDATE/, { rows: [{ reemplazado_por: "A" }] });

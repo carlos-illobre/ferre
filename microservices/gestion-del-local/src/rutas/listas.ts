@@ -4,7 +4,7 @@ import path from "node:path";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import { config } from "../config.js";
 import { detectarProveedor, ErrorDeLectura, leerPlanilla, type FilaLeida, type Lectura } from "../listas-de-proveedores.js";
 import { sugerirEquivalencias } from "../equivalencias.js";
@@ -15,7 +15,7 @@ import { sugerirEquivalencias } from "../equivalencias.js";
 export const listas = new Hono();
 listas.use("/*", exigirSesion);
 
-listas.get("/", async (c) => {
+listas.get("/", exigirPermiso("catalogo.listas"), async (c) => {
   const { rows } = await pool.query(
     `SELECT l.id, l.archivo_nombre, l.fecha_lista, l.estado, l.resumen, l.avisos, l.importada_en, l.creado_en, p.id AS proveedor_id, p.nombre AS proveedor
        FROM lista_importada l JOIN proveedor p ON p.id = l.proveedor_id
@@ -25,7 +25,7 @@ listas.get("/", async (c) => {
 });
 
 // multipart: archivo, proveedor_id (opcional: si falta, se detecta), fecha_lista (opcional)
-listas.post("/", async (c) => {
+listas.post("/", exigirPermiso("catalogo.listas"), async (c) => {
   const cuerpo = await c.req.parseBody();
   const archivo = cuerpo["archivo"];
   if (!(archivo instanceof File)) return c.json({ error: "Falta el archivo" }, 400);
@@ -74,7 +74,7 @@ listas.post("/", async (c) => {
 });
 
 // Qué lectores existen en el servicio de listas (para elegir uno al dar de alta un proveedor).
-listas.get("/lectores", async (c) => {
+listas.get("/lectores", exigirPermiso("catalogo.listas"), async (c) => {
   const r = await fetch(`${config.listasDeProveedoresUrl}/health`).catch(() => null);
   if (!r?.ok) return c.json({ error: "El servicio de listas no responde" }, 502);
   const { lectores } = (await r.json()) as { lectores: string[] };
@@ -83,7 +83,7 @@ listas.get("/lectores", async (c) => {
 
 // Vista previa: filas con costo, explicación y el costo vigente hasta ahora, para revisar
 // antes de aplicar. Las que cambian de precio van primero.
-listas.get("/:id/filas", async (c) => {
+listas.get("/:id/filas", exigirPermiso("catalogo.listas"), async (c) => {
   const lista = await buscarLista(c.req.param("id"));
   if (!lista) return c.json({ error: "No existe esa lista" }, 404);
   const lectura = await releer(lista);
@@ -101,7 +101,7 @@ listas.get("/:id/filas", async (c) => {
 
 // Aplicar corre en segundo plano: miles de filas contra una base remota tardan, y la
 // pantalla muestra el progreso consultando la lista. Las filas se insertan en lotes.
-listas.post("/:id/aplicar", async (c) => {
+listas.post("/:id/aplicar", exigirPermiso("catalogo.listas"), async (c) => {
   const lista = await buscarLista(c.req.param("id"));
   if (!lista) return c.json({ error: "No existe esa lista" }, 404);
   const usuarioId = c.get("sesion").usuario.id;
@@ -137,7 +137,7 @@ listas.get("/:id/archivo", async (c) => {
 });
 
 // Estado y progreso de una lista (la pantalla lo consulta mientras se aplica).
-listas.get("/:id", async (c) => {
+listas.get("/:id", exigirPermiso("catalogo.listas"), async (c) => {
   const { rows } = await pool.query(
     `SELECT l.id, l.estado, l.resumen, l.avisos, l.fecha_lista::text, l.archivo_nombre, p.nombre AS proveedor FROM lista_importada l JOIN proveedor p ON p.id = l.proveedor_id WHERE l.id = $1`,
     [c.req.param("id")],
@@ -227,7 +227,7 @@ function insertMultiple(tabla: string, columnas: string[], filas: unknown[][]): 
   return `INSERT INTO ${tabla} (${columnas.join(", ")}) VALUES ${valores}`;
 }
 
-listas.post("/:id/descartar", async (c) => {
+listas.post("/:id/descartar", exigirPermiso("catalogo.listas"), async (c) => {
   const { rowCount } = await pool.query(`UPDATE lista_importada SET estado = 'descartada' WHERE id = $1 AND estado = 'pendiente'`, [c.req.param("id")]);
   if (!rowCount) return c.json({ error: "La lista no existe o ya no está pendiente" }, 409);
   await registrarEvento(pool, { tipo: "lista.descartada", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id") } });

@@ -1,58 +1,91 @@
 import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
+import type pg from "pg";
 import { pool } from "../db.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirAdministrador, exigirSesion } from "../autenticacion.js";
+import { quedaQuienAdministre } from "./roles.js";
 
-// El dueño y el admin dan de alta, cambian de rol o desactivan usuarios; el admin no
-// puede tocar dueños ni dar ese rol. No hay contraseñas: autorizar es agregar el Gmail.
+// Usuarios autorizados (RF-70, RF-72, RF-75). Se autoriza a una persona con su correo de
+// Google y uno o más roles; sus permisos son la unión de los de sus roles. Para que no pueda
+// nada se la desactiva. Nunca queda el sistema sin quien administre usuarios y roles.
 export const usuarios = new Hono();
-usuarios.use("/*", exigirSesion, exigirAdministrador);
+usuarios.use("/*", exigirSesion, exigirPermiso("admin.usuarios"));
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SIN_QUIEN_ADMINISTRE = "No se guardó: el sistema se quedaría sin nadie que pueda administrar usuarios y roles";
+
+// Los ids de rol pedidos, si son válidos y existen. Un usuario activo tiene al menos un rol.
+async function rolesValidos(db: Pick<pg.Pool, "query">, roles: unknown): Promise<string[] | string> {
+  if (!Array.isArray(roles) || roles.length === 0) return "Elegí al menos un rol. Para que no pueda nada, desactivá al usuario";
+  const ids = [...new Set(roles.map(String))];
+  if (ids.some((id) => !UUID.test(id))) return "Hay un rol que no existe";
+  const { rows } = await db.query<{ id: string }>("SELECT id FROM rol WHERE id = ANY($1::uuid[])", [ids]);
+  return rows.length === ids.length ? ids : "Hay un rol que no existe";
+}
 
 usuarios.get("/", async (c) => {
-  const { rows } = await pool.query("SELECT id, email, nombre, rol, activo, creado_en FROM usuario ORDER BY creado_en");
+  const { rows } = await pool.query(
+    `SELECT u.id, u.email, u.nombre, u.activo, u.creado_en,
+            COALESCE((SELECT json_agg(json_build_object('id', r.id, 'nombre', r.nombre) ORDER BY r.nombre) FROM usuario_rol ur JOIN rol r ON r.id = ur.rol_id WHERE ur.usuario_id = u.id), '[]'::json) AS roles
+       FROM usuario u ORDER BY u.creado_en`,
+  );
   return c.json(rows);
 });
 
 usuarios.post("/", async (c) => {
-  const cuerpo = await c.req.json<{ email?: string; nombre?: string; rol?: string }>().catch(() => ({}) as Record<string, string>);
+  const cuerpo = await c.req.json<{ email?: string; nombre?: string; roles?: unknown }>().catch(() => ({}) as Record<string, never>);
   const email = cuerpo.email?.trim().toLowerCase();
   if (!email || !email.includes("@")) return c.json({ error: "Hace falta un correo válido" }, 400);
   if (!cuerpo.nombre?.trim()) return c.json({ error: "Hace falta el nombre" }, 400);
-  if (cuerpo.rol !== "dueño" && cuerpo.rol !== "admin" && cuerpo.rol !== "mostrador") return c.json({ error: "El rol es dueño, admin o mostrador" }, 400);
-  if (c.get("sesion").usuario.rol === "admin" && cuerpo.rol === "dueño") return c.json({ error: "Un admin no puede crear dueños" }, 403);
+  const roles = await rolesValidos(pool, cuerpo.roles);
+  if (typeof roles === "string") return c.json({ error: roles }, 400);
   const id = randomUUID();
+  const cliente = await pool.connect();
   try {
-    await pool.query("INSERT INTO usuario (id, email, nombre, rol) VALUES ($1, $2, $3, $4)", [id, email, cuerpo.nombre.trim(), cuerpo.rol]);
+    await cliente.query("BEGIN");
+    await cliente.query("INSERT INTO usuario (id, email, nombre) VALUES ($1, $2, $3)", [id, email, cuerpo.nombre.trim()]);
+    await cliente.query("INSERT INTO usuario_rol (usuario_id, rol_id) SELECT $1, unnest($2::uuid[])", [id, roles]);
+    await registrarEvento(cliente, { tipo: "usuario.creado", usuarioId: c.get("sesion").usuario.id, contenido: { id, email, roles } });
+    await cliente.query("COMMIT");
   } catch (error) {
+    await cliente.query("ROLLBACK");
     if ((error as { code?: string }).code === "23505") return c.json({ error: `${email} ya existe` }, 409);
     throw error;
+  } finally {
+    cliente.release();
   }
-  await registrarEvento(pool, { tipo: "usuario.creado", usuarioId: c.get("sesion").usuario.id, contenido: { id, email, rol: cuerpo.rol } });
-  return c.json({ id, email, nombre: cuerpo.nombre.trim(), rol: cuerpo.rol, activo: true }, 201);
+  return c.json({ id, email, nombre: cuerpo.nombre.trim(), activo: true }, 201);
 });
 
 usuarios.patch("/:id", async (c) => {
-  const cuerpo = await c.req.json<{ rol?: string; activo?: boolean; nombre?: string }>().catch(() => ({}) as Record<string, never>);
+  const cuerpo = await c.req.json<{ roles?: unknown; activo?: boolean; nombre?: string }>().catch(() => ({}) as Record<string, never>);
   const id = c.req.param("id");
   const actor = c.get("sesion").usuario;
-  const propio = actor.id === id;
-  if (propio && (cuerpo.activo === false || (cuerpo.rol && cuerpo.rol !== actor.rol))) {
-    return c.json({ error: "No podés desactivarte ni cambiarte el rol a vos mismo" }, 400);
+  if (actor.id === id && cuerpo.activo === false) return c.json({ error: "No podés desactivarte a vos mismo: lo tiene que hacer otra persona" }, 400);
+  const cliente = await pool.connect();
+  try {
+    await cliente.query("BEGIN");
+    const { rowCount } = await cliente.query("UPDATE usuario SET activo = COALESCE($2, activo), nombre = COALESCE($3, nombre) WHERE id = $1", [id, cuerpo.activo ?? null, cuerpo.nombre?.trim() || null]);
+    if (!rowCount) { await cliente.query("ROLLBACK"); return c.json({ error: "No existe ese usuario" }, 404); }
+    if (cuerpo.roles !== undefined) {
+      const roles = await rolesValidos(cliente, cuerpo.roles);
+      if (typeof roles === "string") { await cliente.query("ROLLBACK"); return c.json({ error: roles }, 400); }
+      await cliente.query("DELETE FROM usuario_rol WHERE usuario_id = $1", [id]);
+      await cliente.query("INSERT INTO usuario_rol (usuario_id, rol_id) SELECT $1, unnest($2::uuid[])", [id, roles]);
+    }
+    // Las dos reglas se miran con el cambio ya aplicado, antes de confirmarlo.
+    const quien = await quedaQuienAdministre(cliente);
+    if (!quien.alguien) { await cliente.query("ROLLBACK"); return c.json({ error: SIN_QUIEN_ADMINISTRE }, 409); }
+    if (actor.id === id && !quien.usuarios.includes(id)) { await cliente.query("ROLLBACK"); return c.json({ error: "No podés quitarte a vos mismo los permisos de administrar: lo tiene que hacer otra persona" }, 400); }
+    if (cuerpo.activo === false) await cliente.query("UPDATE sesion SET revocada_en = now() WHERE usuario_id = $1 AND revocada_en IS NULL", [id]);
+    await registrarEvento(cliente, { tipo: "usuario.modificado", usuarioId: actor.id, contenido: { id, cambios: cuerpo } });
+    await cliente.query("COMMIT");
+  } catch (e) {
+    await cliente.query("ROLLBACK");
+    throw e;
+  } finally {
+    cliente.release();
   }
-  if (cuerpo.rol !== undefined && !["dueño", "admin", "mostrador"].includes(cuerpo.rol)) return c.json({ error: "El rol es dueño, admin o mostrador" }, 400);
-  if (actor.rol === "admin") {
-    // El admin no toca dueños ni da ese rol.
-    const { rows } = await pool.query<{ rol: string }>("SELECT rol FROM usuario WHERE id = $1", [id]);
-    if (rows[0]?.rol === "dueño") return c.json({ error: "Un admin no puede cambiar a un dueño" }, 403);
-    if (cuerpo.rol === "dueño") return c.json({ error: "Un admin no puede dar el rol de dueño" }, 403);
-  }
-  const { rowCount } = await pool.query(
-    `UPDATE usuario SET rol = COALESCE($2, rol), activo = COALESCE($3, activo), nombre = COALESCE($4, nombre) WHERE id = $1`,
-    [id, cuerpo.rol ?? null, cuerpo.activo ?? null, cuerpo.nombre?.trim() || null],
-  );
-  if (!rowCount) return c.json({ error: "No existe ese usuario" }, 404);
-  if (cuerpo.activo === false) await pool.query("UPDATE sesion SET revocada_en = now() WHERE usuario_id = $1 AND revocada_en IS NULL", [id]);
-  await registrarEvento(pool, { tipo: "usuario.modificado", usuarioId: c.get("sesion").usuario.id, contenido: { id, cambios: cuerpo } });
   return c.body(null, 204);
 });

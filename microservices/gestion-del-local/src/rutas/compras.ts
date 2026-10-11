@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { config } from "../config.js";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 
 // Ingreso de mercadería (issue #30): reemplaza el papel semanal de gastos y es la mitad
 // del stock (lo que entra). Cada renglón suma stock; si el costo de la factura difiere
@@ -45,7 +45,7 @@ function fechaLegible(iso: string): string {
 
 // La foto del comprobante se sube sola, antes de registrar la compra. Queda suelta, a nombre
 // de quien la subió, hasta que una compra la toma.
-compras.post("/fotos", async (c) => {
+compras.post("/fotos", exigirPermiso("deposito.ingresos"), async (c) => {
   const cuerpo = await c.req.parseBody();
   const f = cuerpo.foto;
   if (!(f instanceof File)) return c.json({ error: "Falta la foto" }, 400);
@@ -59,7 +59,7 @@ compras.post("/fotos", async (c) => {
 });
 
 // Con sesión: un comprobante muestra a quién se le compra y a cuánto.
-compras.get("/fotos/:archivo", async (c) => {
+compras.get("/fotos/:archivo", exigirPermiso("deposito.compras", "deposito.ingresos"), async (c) => {
   const archivo = c.req.param("archivo");
   if (!ARCHIVO_DE_FOTO.test(archivo)) return c.json({ error: "No existe esa foto" }, 404);
   const contenido = await readFile(path.join(carpetaComprobantes(), archivo)).catch(() => null);
@@ -68,7 +68,7 @@ compras.get("/fotos/:archivo", async (c) => {
   return c.body(new Uint8Array(contenido), 200, { "Content-Type": tipo, "Cache-Control": "private, max-age=86400" });
 });
 
-compras.post("/", async (c) => {
+compras.post("/", exigirPermiso("deposito.ingresos"), async (c) => {
   const v = await c.req.json<CompraEntrada>().catch(() => ({}) as CompraEntrada);
   const error = validar(v);
   if (error) return c.json({ error }, 400);
@@ -139,7 +139,7 @@ compras.post("/", async (c) => {
   return c.json({ id, total, ...resultado }, 201);
 });
 
-compras.get("/", async (c) => {
+compras.get("/", exigirPermiso("deposito.compras", "deposito.ingresos"), async (c) => {
   const { rows } = await pool.query(
     `SELECT co.id, co.fecha::text, co.comprobante_tipo, co.comprobante_numero, co.total, co.estado, co.nota, co.creado_en, pr.nombre AS proveedor,
             (SELECT '/compras/fotos/' || f.archivo FROM foto_comprobante f WHERE f.compra_id = co.id ORDER BY f.creado_en LIMIT 1) AS foto,
@@ -153,7 +153,7 @@ compras.get("/", async (c) => {
 });
 
 // El papel de gastos de la semana, que ya no se tira: total por proveedor, últimos 7 días.
-compras.get("/semana", async (c) => {
+compras.get("/semana", exigirPermiso("negocio.numeros"), async (c) => {
   const { rows } = await pool.query(
     `SELECT pr.nombre AS proveedor, SUM(co.total) AS total, count(*) AS compras
        FROM compra co JOIN proveedor pr ON pr.id = co.proveedor_id
@@ -163,7 +163,7 @@ compras.get("/semana", async (c) => {
   return c.json({ desde: new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10), por_proveedor: rows, total: rows.reduce((s, r) => s + Number(r.total), 0) });
 });
 
-compras.get("/:id", async (c) => {
+compras.get("/:id", exigirPermiso("deposito.compras", "deposito.ingresos"), async (c) => {
   const { rows } = await pool.query(
     `SELECT i.orden, i.cantidad, i.costo_unitario, p.descripcion, p.marca FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = $1 ORDER BY i.orden`,
     [c.req.param("id")],
@@ -173,7 +173,7 @@ compras.get("/:id", async (c) => {
 
 // Anular: la compra queda marcada y el stock vuelve con un ajuste. El costo que se
 // registró por la factura no se toca: fue real aunque la compra se haya anulado.
-compras.post("/:id/anular", async (c) => {
+compras.post("/:id/anular", exigirPermiso("deposito.ingresos"), async (c) => {
   const { motivo } = await c.req.json<{ motivo?: string }>().catch(() => ({}) as { motivo?: string });
   const id = c.req.param("id");
   const cliente = await pool.connect();

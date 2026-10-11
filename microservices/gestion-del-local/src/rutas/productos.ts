@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { pool } from "../db.js";
 import { config } from "../config.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirSesion, puede } from "../autenticacion.js";
 
 // El catálogo para el mostrador (issues #13 y #14): cada producto con su costo vigente
 // (la fila más reciente de precio_proveedor) y el margen o precio manual elegidos. El
@@ -62,6 +62,9 @@ productos.patch("/:id", async (c) => {
   const cambios: string[] = [];
   const valores: unknown[] = [c.req.param("id")];
   if ("margen_elegido" in cuerpo) {
+    // Fijar el margen de un producto es de quien tiene ese permiso; en una venta el margen
+    // vale solo para esa venta y no llega acá (RF-72).
+    if (!puede(c.get("sesion").usuario, "catalogo.margenes")) return c.json({ error: "No tenés permiso para esto. Hace falta: Fijar márgenes", permiso: "catalogo.margenes" }, 403);
     const m = cuerpo.margen_elegido;
     if (m !== null && (typeof m !== "number" || !Number.isInteger(m) || m <= 0 || m > 10000)) return c.json({ error: "El margen es un porcentaje entero mayor que cero (por ejemplo 20) o ninguno" }, 400);
     valores.push(m); cambios.push(`margen_elegido = $${valores.length}`);

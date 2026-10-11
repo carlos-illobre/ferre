@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 import { pool } from "../db.js";
-import { exigirAdministrador, exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 
 // Quién hizo qué. Es la tabla de eventos leída por el dueño, filtrable por usuario,
 // tipo y fecha. Página de 100.
 export const auditoria = new Hono();
-auditoria.use("/*", exigirSesion, exigirAdministrador);
+auditoria.use("/*", exigirSesion, exigirPermiso("negocio.actividad"));
 
 auditoria.get("/", async (c) => {
   const { usuario, tipo, desde, hasta, pagina } = c.req.query();

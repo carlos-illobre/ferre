@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 
 // Sectores y conteos (issue #31). Se cuenta de a un sector; el conteo queda abierto hasta
 // que se cierra; al cerrar, cada diferencia contra el stock teórico es un ajuste con la
@@ -10,8 +10,8 @@ import { exigirSesion } from "../autenticacion.js";
 // pueden poner en cero de una vez o dejar como están.
 export const sectores = new Hono();
 export const conteos = new Hono();
-sectores.use("/*", exigirSesion);
-conteos.use("/*", exigirSesion);
+sectores.use("/*", exigirSesion, exigirPermiso("deposito.stock"));
+conteos.use("/*", exigirSesion, exigirPermiso("deposito.stock"));
 
 sectores.get("/", async (c) => {
   const { rows } = await pool.query(

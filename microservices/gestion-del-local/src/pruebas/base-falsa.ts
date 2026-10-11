@@ -1,6 +1,7 @@
 import type { Hono } from "hono";
 import { vi } from "vitest";
 import type { Usuario } from "../sesiones.js";
+import { PERMISOS } from "../permisos.js";
 
 // Base de datos simulada para probar las rutas sin Postgres: cada consulta se anota y se
 // contesta con lo que la prueba programó (por expresión regular sobre el SQL). Lo que no
@@ -8,10 +9,15 @@ import type { Usuario } from "../sesiones.js";
 export type Consulta = { sql: string; params: unknown[] };
 export type Respuesta = { rows?: Record<string, unknown>[]; rowCount?: number } | ((params: unknown[]) => { rows?: Record<string, unknown>[]; rowCount?: number });
 
-export const usuarios: Record<string, Usuario> = {
-  dueño: { id: "u-dueño", email: "dueno@ferre.test", nombre: "Dueño", rol: "dueño" },
-  admin: { id: "u-admin", email: "admin@ferre.test", nombre: "Admin", rol: "admin" },
-  mostrador: { id: "u-mostrador", email: "mostrador@ferre.test", nombre: "Mostrador", rol: "mostrador" },
+// Usuarios de prueba. «dueño» y «admin» pueden todo; «mostrador» todo menos administrar; y
+// «soloVende» nada más que vender, para probar que una ruta rechaza a quien no tiene su permiso.
+const TODOS = PERMISOS.map((p) => p.clave as string);
+const SIN_ADMINISTRAR = TODOS.filter((p) => !p.startsWith("admin.") && p !== "negocio.actividad");
+export const usuarios: Record<string, Usuario & { rol: string }> = {
+  dueño: { id: "u-dueño", email: "dueno@ferre.test", nombre: "Dueño", rol: "dueño", roles: ["Todos"], permisos: TODOS },
+  admin: { id: "u-admin", email: "admin@ferre.test", nombre: "Admin", rol: "admin", roles: ["Todos"], permisos: TODOS },
+  mostrador: { id: "u-mostrador", email: "mostrador@ferre.test", nombre: "Mostrador", rol: "mostrador", roles: ["Operación"], permisos: SIN_ADMINISTRAR },
+  soloVende: { id: "u-solo-vende", email: "vende@ferre.test", nombre: "Solo vende", rol: "soloVende", roles: ["Vendedor"], permisos: ["ventas.registrar"] },
 };
 
 export function baseFalsa() {
@@ -23,7 +29,7 @@ export function baseFalsa() {
       const token = String(params[0]);
       const rol = Object.keys(usuarios).find((r) => token === hashDe(`token-${r}`));
       const u = rol ? usuarios[rol]! : null;
-      return { rows: u ? [{ id: `sesion-${u.rol}`, ultimo_uso_en: new Date(), usuario_id: u.id, email: u.email, nombre: u.nombre, rol: u.rol }] : [], rowCount: u ? 1 : 0 };
+      return { rows: u ? [{ id: `sesion-${u.rol}`, ultimo_uso_en: new Date(), usuario_id: u.id, email: u.email, nombre: u.nombre, roles: u.roles, permisos: u.permisos }] : [], rowCount: u ? 1 : 0 };
     }
     for (const p of programadas) {
       if (p.patron.test(sql)) {

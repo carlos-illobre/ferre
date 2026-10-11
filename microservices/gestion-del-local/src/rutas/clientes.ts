@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 
 // Solo los clientes importantes, los que compran a cuenta corriente. El de barrio no se carga.
 export const clientes = new Hono();
@@ -18,7 +18,7 @@ clientes.get("/", async (c) => {
   return c.json(rows);
 });
 
-clientes.post("/", async (c) => {
+clientes.post("/", exigirPermiso("ventas.registrar"), async (c) => {
   const cuerpo = await c.req.json<{ nombre?: string; telefono?: string; cuenta_corriente?: boolean }>().catch(() => ({}) as Record<string, never>);
   if (!cuerpo.nombre?.trim()) return c.json({ error: "Hace falta el nombre del cliente" }, 400);
   const id = randomUUID();

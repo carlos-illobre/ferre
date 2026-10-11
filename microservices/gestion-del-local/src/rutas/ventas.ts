@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 
 // La venta (issue #15): reemplaza el renglón del cuaderno. Cada ítem guarda costo, margen,
 // precio y explicación DE ESE MOMENTO, así el precio se puede explicar para siempre aunque
@@ -37,7 +37,7 @@ function validar(v: VentaEntrada): string | null {
   return null;
 }
 
-ventas.post("/", async (c) => {
+ventas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
   const v = await c.req.json<VentaEntrada>().catch(() => ({}) as VentaEntrada);
   const error = validar(v);
   if (error) return c.json({ error }, 400);
@@ -101,7 +101,7 @@ ventas.post("/", async (c) => {
 });
 
 // Ventas de un día (hoy por defecto) con sus ítems y el total por medio de pago.
-ventas.get("/", async (c) => {
+ventas.get("/", exigirPermiso("ventas.ver", "negocio.numeros"), async (c) => {
   // "Hoy" es el día del local (Buenos Aires), no el día UTC del servidor: a la noche difieren.
   const dia = c.req.query("dia") || null;
   const { rows } = await pool.query(
@@ -119,7 +119,7 @@ ventas.get("/", async (c) => {
 
 // Anular: la venta queda marcada (no se borra) y vuelve al stock lo que la venta descontó de
 // verdad, que puede ser menos de lo vendido si no había stock (RF-59).
-ventas.post("/:id/anular", async (c) => {
+ventas.post("/:id/anular", exigirPermiso("ventas.anular"), async (c) => {
   const { motivo } = await c.req.json<{ motivo?: string }>().catch(() => ({}) as { motivo?: string });
   const id = c.req.param("id");
   const usuarioId = c.get("sesion").usuario.id;
@@ -146,7 +146,7 @@ ventas.post("/:id/anular", async (c) => {
 });
 
 // Cuenta corriente: marcar una venta como pagada ("tachar el renglón").
-ventas.post("/:id/pagar", async (c) => {
+ventas.post("/:id/pagar", exigirPermiso("ventas.registrar"), async (c) => {
   const { rowCount } = await pool.query("UPDATE venta SET pagada_en = now() WHERE id = $1 AND medio_pago = 'cuenta_corriente' AND estado = 'confirmada' AND pagada_en IS NULL", [c.req.param("id")]);
   if (!rowCount) return c.json({ error: "La venta no es a cuenta corriente, está anulada o ya se pagó" }, 409);
   await registrarEvento(pool, { tipo: "venta.pagada", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id") } });
