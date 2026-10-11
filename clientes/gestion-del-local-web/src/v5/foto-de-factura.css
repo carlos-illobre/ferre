@@ -43,3 +43,6 @@ dialog.ff-grande .ff-botones { justify-content: flex-end; }
 .ff-listo { padding: 14px 16px; border-radius: 12px; background: #e3f3ea; color: #0f6b52; font-weight: 700; }
 .ff-pedido ol { list-style: decimal; }
 .ff-pedido ol li { list-style: decimal; }
+.ff-qr-vacio { flex: none; width: 150px; height: 150px; border-radius: 10px; background: #e4e8e5; }
+.ff-pedido { text-align: left; color: #18201e; font-size: 1rem; }
+.ff-pedido .ff-error { color: #c2370b; font-weight: 650; }

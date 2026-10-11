@@ -179,3 +179,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     la 32. En el ingreso de la computadora, «Sacar la foto con el celular» muestra un código
     QR; el celular lo escanea, se abre la cámara, saca la foto y la foto aparece sola en la
     computadora. Es el mismo mecanismo que se usa para vincular el celular.
+42. **El código QR sirve para cualquier foto desde la computadora** (2026-10-11): amplía la
+    41. En todos los lugares de la computadora donde se pide una foto (la factura de un
+    ingreso, la foto de un producto, la captura de un ticket) hay un botón «Sacar la foto
+    con el celular» que usa el mismo código QR. Elegir un archivo sigue estando.

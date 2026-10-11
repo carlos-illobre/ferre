@@ -402,6 +402,7 @@ RF-43:
 RF-50:
   estado: "Hecho en parte (#30): se aparta de la regla en 14 puntos"
   pruebas:
+    - microservices/gestion-del-local/src/rutas/pedidos-de-foto.test.ts
     - microservices/gestion-del-local/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { MAXIMO_DE_FOTOS, crearTicket, useFoto, useTickets, type Pendiente, type Ticket } from "./tickets";
+import { PedirFotoAlCelular, hayQueUsarElCelular } from "./PedirFoto";
 import "./tickets.css";
 
 // Mejoras y errores (RF-80): quien usa la app cuenta lo que encontró o lo que se le ocurrió,
@@ -25,6 +26,7 @@ export function Tickets() {
   const [enviando, setEnviando] = useState(false);
   const [viendo, setViendo] = useState<"abierto" | "resuelto">("abierto");
   const archivo = useRef<HTMLInputElement>(null);
+  const [pidiendo, setPidiendo] = useState(false);
 
   function agregarFotos(nuevas: File[]) {
     const imagenes = nuevas.filter((f) => f.type.startsWith("image/"));
@@ -82,12 +84,14 @@ export function Tickets() {
             ))}
           </ul>
         )}
+        {pidiendo && <PedirFotoAlCelular para="una foto para el ticket" alCancelar={() => setPidiendo(false)} alRecibir={(f) => { setPidiendo(false); agregarFotos([f]); }} />}
         {falta && <p className="tk-falta" id="tk-falta" role="alert">{falta}</p>}
         <div className="tk-acciones">
           <input ref={archivo} type="file" accept="image/*" multiple hidden onChange={(e) => { agregarFotos(Array.from(e.target.files ?? [])); e.target.value = ""; }} data-testid="archivo-foto" />
           <button type="button" className="tk-boton" disabled={fotos.length >= MAXIMO_DE_FOTOS} onClick={() => archivo.current?.click()} data-testid="agregar-foto">
             <Clip />{fotos.length ? `Agregar otra foto (${fotos.length} de ${MAXIMO_DE_FOTOS})` : "Agregar foto o captura"}
           </button>
+          {hayQueUsarElCelular() && <button type="button" className="tk-boton" disabled={pidiendo || fotos.length >= MAXIMO_DE_FOTOS} onClick={() => setPidiendo(true)} data-testid="foto-con-celular">Sacar una foto con el celular</button>}
           <button type="button" className="tk-boton principal" disabled={enviando} onClick={() => void enviar()} data-testid="enviar">{enviando ? "Enviando…" : "Enviar"}</button>
         </div>
         <p className="tk-detalle tk-solo-compu">En la computadora también podés pegar una captura con Ctrl + V.</p>
