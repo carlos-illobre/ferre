@@ -45,12 +45,14 @@ test.beforeAll(() => {
 test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/v5/#/contar");
-  await expect(page.getByRole("heading", { name: "Contar" })).toBeVisible();
+  // La pestaña se llama Estanterías (decisión 39).
+  await expect(page.getByRole("button", { name: /^Estanterías/ })).toBeVisible();
 
   // Sector nuevo: se crea y se abre.
-  await page.getByPlaceholder(/Sector nuevo/).fill(SECTOR);
-  await page.getByRole("button", { name: "Agregar sector" }).click();
-  await expect(page.getByRole("heading", { name: SECTOR })).toBeVisible();
+  await page.getByTestId("sector-nuevo").click();
+  await page.getByTestId("nombre-sector").fill(SECTOR);
+  await page.getByTestId("crear-sector").click();
+  await expect(page.getByRole("heading", { name: new RegExp(SECTOR.replace(/[()]/g, "\\$&")) })).toBeVisible();
 
   // Primer producto: había 10, hay 8.
   const busqueda = page.getByTestId("busqueda");
@@ -61,14 +63,14 @@ test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
   await page.getByTestId("cantidad").fill("8");
   await page.getByTestId("siguiente").click();
   const contados = page.getByTestId("contados");
-  await expect(contados.getByRole("row", { name: /LIJA CONTAR/ })).toContainText("-2");
+  await expect(contados.getByTestId("contado").filter({ hasText: "LIJA CONTAR" })).toContainText("2");
 
   // Segundo producto: coincide.
   await page.getByTestId("busqueda").fill("e2e pincel contar");
   await page.getByTestId("busqueda").press("Enter");
   await page.getByTestId("cantidad").fill("5");
   await page.getByTestId("cantidad").press("Enter");
-  await expect(contados.getByRole("row", { name: /PINCEL CONTAR/ })).toContainText("=");
+  await expect(contados.getByTestId("contado").filter({ hasText: "PINCEL CONTAR" })).toBeVisible();
 
   // Cerrar: un ajuste de −2 explicado; el otro producto no cambia.
   await page.getByTestId("cerrar").click();
@@ -81,6 +83,6 @@ test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
   expect(psql(`SELECT count(*) FROM producto WHERE sector_id = (SELECT id FROM sector WHERE nombre = '${SECTOR}')`)).toBe("2");
 
   // El sector muestra que se contó hoy.
-  await page.getByRole("button", { name: "Contar otro sector" }).click();
-  await expect(page.getByTestId("sectores").getByRole("button", { name: new RegExp(SECTOR) })).toContainText("contado hace 0 días");
+  await page.getByTestId("otro-sector").click();
+  await expect(page.getByTestId("sector").filter({ hasText: SECTOR })).toBeVisible();
 });

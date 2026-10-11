@@ -81,7 +81,8 @@ tickets.post("/:id/resolver", async (c) => {
 tickets.post("/:id/reabrir", async (c) => {
   const usuarioId = c.get("sesion").usuario.id;
   const { rowCount } = await pool.query(
-    "UPDATE ticket SET estado = 'abierto', resuelto_en = NULL, resuelto_por = NULL WHERE id = $1 AND estado = 'resuelto'",
+    // Al reabrir se borra también la nota de la resolución (RF-81).
+    "UPDATE ticket SET estado = 'abierto', resuelto_en = NULL, resuelto_por = NULL, nota = NULL WHERE id = $1 AND estado = 'resuelto'",
     [c.req.param("id")],
   );
   if (!rowCount) return c.json({ error: "Ese ticket no existe o ya está abierto" }, 409);

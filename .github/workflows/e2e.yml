@@ -7,10 +7,8 @@ name: E2E
 # Corren contra la versión 5 de la interfaz, la que abre la raíz (decisión 43).
 on:
   workflow_dispatch:
-  # La corrida semanal vuelve cuando los escenarios estén adaptados a la versión 5 (ver el
-  # issue «Adaptar los escenarios de punta a punta a la versión 5»): hoy fallarían todos los lunes.
-  # schedule:
-  #   - cron: "0 9 * * 1"
+  schedule:
+    - cron: "0 9 * * 1"
 
 jobs:
   e2e:
@@ -74,6 +72,12 @@ jobs:
       - name: "13 · Rol admin"
         if: always()
         run: PLAYWRIGHT_JSON=/tmp/e2e-13.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 13-admin.spec.ts
+      - name: "14 · Mejoras y errores"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-14.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 14-tickets.spec.ts
+      - name: "15 · Foto de la factura con código QR"
+        if: always() && matrix.interfaz == 'escritorio'
+        run: PLAYWRIGHT_JSON=/tmp/e2e-15.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 15-foto-con-celular.spec.ts
       - name: Resumen
         if: always()
         run: |

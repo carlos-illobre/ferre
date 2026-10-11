@@ -12,6 +12,12 @@ cd "$(dirname "$0")/.."
 
 # Corren contra la versión elegida, la 5, que es la que abre la raíz (decisión 43). Las
 # otras versiones siguen publicadas pero no tienen escenarios.
+#
+# Para correrlos en una máquina donde los puertos 80 y 5432 están ocupados o Docker pide
+# sudo (por ejemplo el servidor): un .env con COMPOSE_PROJECT_NAME=ferre-e2e,
+# COMPOSE_PROFILES=local y PUERTO_API=18080, un `docker` en el PATH que llame a
+# `sudo docker`, y API_URL=http://localhost:18080 tests/e2e.sh. Al terminar,
+# `docker compose down -v` para no dejar el stack levantado.
 preparar() {
   docker compose up -d --wait
   # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.

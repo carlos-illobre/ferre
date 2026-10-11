@@ -42,16 +42,15 @@ test.beforeAll(() => {
 test("sugerir, unir y ver el proveedor más barato como preferido", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/v5/#/duplicados");
-  await expect(page.getByRole("heading", { name: "Duplicados entre proveedores" })).toBeVisible();
   await page.getByTestId("buscar-duplicados").click();
   const sugerencia = page.getByTestId("sugerencia").filter({ hasText: "SILICONA DUPLICADA" });
   await expect(sugerencia).toBeVisible();
-  await expect(sugerencia).toContainText("Mismo código de barras");
+  await expect(sugerencia).toContainText(/mismo código de barras/i);
   await expect(sugerencia).toContainText("Proveedor caro (e2e)");
   await expect(sugerencia).toContainText("Proveedor barato (e2e)");
 
   await sugerencia.getByTestId("unir").click();
-  await expect(page.getByTestId("mensaje")).toContainText("Unidos");
+  await expect(page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" })).toBeVisible();
   // El absorbido queda inactivo y su venta ahora apunta al conservado; el preferido es el barato.
   expect(psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe(`false ${ID_A}`);
   expect(psql(`SELECT producto_id FROM item_venta WHERE venta_id = '00000000-0000-0000-0000-00000000e2f9'`)).toBe(ID_A);
@@ -63,22 +62,21 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await page.getByTestId("busqueda").fill("e2e silicona duplicada");
   await expect(page.getByTestId("producto")).toHaveCount(1);
   const fila = page.getByTestId("producto").first();
-  await expect(fila.getByTestId("otros-proveedores")).toContainText("★ Proveedor barato (e2e) $2.400,00");
-  await expect(fila.getByTestId("otros-proveedores")).toContainText("Proveedor caro (e2e) $3.000,00");
-  await expect(fila.locator("td.precio")).toContainText("$6.000,00"); // 2400 × 2 × 1,21 = 5808 → 6000
+  const otros = fila.getByTestId("otros-proveedores");
+  await expect(otros.getByRole("listitem").filter({ hasText: "Proveedor barato (e2e)" })).toContainText("$2.400,00");
+  await expect(otros.getByRole("listitem").filter({ hasText: "Proveedor barato (e2e)" })).toContainText("el más barato");
+  await expect(otros.getByRole("listitem").filter({ hasText: "Proveedor caro (e2e)" })).toContainText("$3.000,00");
+  await expect(fila.getByTestId("explicacion").last()).toContainText("$6.000"); // 2400 × 2 × 1,21 = 5808 → 6000
 
   // Elegir el caro a mano: el precio sigue a ese costo.
-  await fila.getByTestId("otros-proveedores").getByRole("button", { name: "usar" }).click();
-  await expect(fila.locator("td.precio")).toContainText("$8.000,00", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
+  await otros.getByRole("button", { name: "Usar el costo de Proveedor caro (e2e)" }).click();
+  await expect(fila.getByTestId("explicacion").last()).toContainText("$8.000", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
 
   // Separar: el absorbido vuelve a existir con sus precios y su venta.
   await page.goto("/v5/#/duplicados");
   const union = page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" });
   await expect(union).toBeVisible();
-  await expect(union).toContainText("Proveedor barato (e2e), Proveedor caro (e2e)");
-  page.once("dialog", (d) => d.accept());
-  await union.getByRole("button", { name: "Separar" }).click();
-  await expect(page.getByTestId("mensaje-separar")).toContainText("Separados");
+  await union.getByTestId("separar").click();
   await expect(union).toHaveCount(0);
   expect(psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe("true");
   expect(psql(`SELECT producto_id FROM item_venta WHERE venta_id = '00000000-0000-0000-0000-00000000e2f9'`)).toBe(ID_B);

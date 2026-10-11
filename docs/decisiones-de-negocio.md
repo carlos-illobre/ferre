@@ -186,7 +186,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
 43. **Vuelven las pruebas, solo para la versión elegida** (2026-10-11): termina la pausa de
     la decisión 25. Se prueba únicamente la versión 5, que es la que abre la raíz. Las otras
     versiones siguen publicadas en su carpeta, pero no tienen pruebas. Cómo está armada la
-    versión 5 y dónde vive cada cosa está en el ADR-015.
+    versión 5 y dónde vive cada cosa está en el ADR-015. Las de punta a punta también
+    quedaron adaptadas a la versión 5 y corren una vez por semana y a pedido.
 44. **Vender sin stock no deja el stock negativo, y queda una anomalía** (2026-10-11): si el
     stock está en cero la venta se registra igual y el stock sigue en cero (esa unidad ya no
     hay que inventariarla). En «Más» hay una pantalla nueva, «Anomalías», que es un registro

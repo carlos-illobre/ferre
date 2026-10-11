@@ -25,7 +25,8 @@ test.beforeAll(() => {
 
 test("sin sesión se pide entrar", async ({ page }) => {
   await page.goto("/v5/");
-  await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByText(/Acá no hay contraseñas/)).toBeVisible();
   // Entrar leyendo un QR se quitó (2026-10-09): se entra con Google o con la huella.
   await expect(page.getByRole("button", { name: /leer con el celular|código QR/ })).toHaveCount(0);
 });
@@ -33,10 +34,11 @@ test("sin sesión se pide entrar", async ({ page }) => {
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/v5/");
-  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
-  await page.getByRole("button", { name: "Administración" }).click();
-  await expect(page.getByRole("heading", { name: "Usuarios autorizados" })).toBeVisible();
-  await expect(page.getByRole("cell", { name: EMAIL })).toBeVisible();
+  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
+  // Lo que se usa poco está en «Más» (decisión 28).
+  await page.getByTestId("menu-mas").click();
+  await page.getByTestId("mas-usuarios").click();
+  await expect(page.getByTestId("usuarios")).toContainText(EMAIL);
 });
 
 // Passkeys con un autenticador virtual de Chromium (huella simulada): vincular el
@@ -52,13 +54,14 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   // En la computadora la app no ofrece la huella aunque se acabe de entrar con Google
   // (eso es del celular): se vincula a mano desde Administración.
   await page.addInitScript((token) => { localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1"); }, TOKEN);
-  await page.goto("/v5/#/administracion");
-  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
+  await page.goto("/v5/#/usuarios");
+  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   await expect(page.getByTestId("ofrecer-huella")).toHaveCount(0);
   await expect(page.getByTestId("celular")).toHaveCount(0);
-  page.once("dialog", (d) => d.accept("Celular E2E"));
   await page.getByTestId("vincular-celular").click();
-  await expect(page.getByTestId("mensaje-celular")).toContainText('"Celular E2E" entra con la huella');
+  await page.getByTestId("nombre-celular").fill("Celular E2E");
+  await page.getByTestId("confirmar-vincular").click();
+  await expect(page.getByTestId("mensaje-celular")).toContainText("«Celular E2E» entra con la huella");
   await expect(page.getByTestId("celular")).toContainText("Celular E2E");
   expect(psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
 
@@ -66,13 +69,12 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await page.getByRole("button", { name: "Salir" }).click();
   await expect(page.getByTestId("entrar-huella")).toBeVisible();
   await page.getByTestId("entrar-huella").click();
-  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E · dueño");
+  await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   expect(psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
   // Quitar el celular: ya no entra con la huella.
-  await page.goto("/v5/#/administracion");
-  page.once("dialog", (d) => d.accept());
-  await page.getByTestId("celular").getByRole("button", { name: "Quitar" }).click();
+  await page.goto("/v5/#/usuarios");
+  await page.getByTestId("celular").getByRole("button", { name: /Quitar/ }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
   await page.getByRole("button", { name: "Salir" }).click();
   await page.getByTestId("entrar-huella").click();

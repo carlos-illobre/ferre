@@ -53,7 +53,8 @@ Dónde está cada cosa en el código:
 **Pruebas.** Solo se prueba la versión 5. Las unitarias están en `src/v5/` (las de las
 pantallas del celular y de la computadora, más las de lo nuevo) y corren en cada push. Los
 archivos de prueba de las otras versiones quedaron en su lugar y están excluidos en
-`vitest.config.ts`. Los escenarios de punta a punta (`tests/e2e/`) apuntan a la versión 5.
+`vitest.config.ts`. Los escenarios de punta a punta (`tests/e2e/`, una carpeta por árbol) corren contra la versión 5,
+una vez por semana y a pedido; `tests/e2e.sh` explica cómo correrlos en el servidor.
 
 **Para mirar una pantalla sin Docker:** `tests/capturas/` (API de mentira y capturas).
 

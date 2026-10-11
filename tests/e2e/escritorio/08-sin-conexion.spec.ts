@@ -22,6 +22,7 @@ test.beforeAll(() => {
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador sin conexión E2E', 'mostrador')`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psql(`DELETE FROM anomalia WHERE producto_id = '${ID_PROD}'`);
   psql(`DELETE FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`);
   psql(`DELETE FROM item_venta WHERE producto_id = '${ID_PROD}'`);
   psql(`DELETE FROM consulta WHERE producto_id = '${ID_PROD}'`);
@@ -48,21 +49,22 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
 
   // Venta sin red: queda guardada y el mostrador sigue.
   await busqueda.fill("e2e destornillador offline");
-  await expect(page.getByTestId("sugerencias")).toContainText("$2.000,00"); // 500 × 2 × 1,21 = 1210 → 2000
+  await expect(page.getByTestId("sugerencias")).toContainText("$2.000"); // 500 × 2 × 1,21 = 1210 → 2000
   await busqueda.press("Enter");
   await page.getByTestId("item").getByTestId("cantidad").fill("2");
-  await page.locator(".medios").getByRole("button", { name: "Efectivo" }).click();
+  await expect(page.getByTestId("medio-efectivo")).toHaveAttribute("aria-checked", "true"); // viene elegido
   await page.getByTestId("cobrar").click();
-  await expect(page.getByTestId("mensaje")).toContainText("Sin conexión: se envía sola");
-  await expect(page.getByTestId("conexion")).toContainText("1 por enviar");
+  await expect(page.getByTestId("exito")).toContainText(/sin conexión/i);
+  await page.getByTestId("cerrar-exito").click();
+  await expect(page.getByTestId("conexion")).toContainText("1 cambio por enviar");
 
   // Cambio de margen sin red, desde la venta siguiente.
   await busqueda.fill("e2e destornillador offline");
   await busqueda.press("Enter");
-  await page.getByTestId("item").getByRole("button", { name: "50 %" }).click();
-  await expect(page.getByTestId("item")).toContainText("$1.000,00"); // 500 × 1,5 × 1,21 = 907,5 → 1000
-  await page.getByRole("button", { name: "No llevó" }).click();
-  await expect(page.getByTestId("conexion")).toContainText("3 por enviar");
+  await page.getByTestId("item").getByTestId("margen-50").click();
+  await expect(page.getByTestId("item")).toContainText("$1.000"); // 500 × 1,5 × 1,21 = 907,5 → 1000
+  await page.getByTestId("no-llevo").click();
+  await expect(page.getByTestId("conexion")).toContainText("3 cambios por enviar");
   expect(psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");
 
   // Vuelve la red: se envía todo, en orden, una sola vez.
@@ -70,7 +72,9 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(page.getByTestId("conexion")).toContainText("Sincronizado", { timeout: 15000 });
   expect(psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("1");
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("-2.000");
+  // El producto no tenía stock cargado: se vendió igual, el stock no bajó de cero y quedó la anomalía (RF-59).
+  expect(psql(`SELECT count(*) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("0");
+  expect(psql(`SELECT count(*) FROM anomalia WHERE producto_id = '${ID_PROD}'`)).toBe("1");
   expect(psql(`SELECT margen_elegido FROM producto WHERE id = '${ID_PROD}'`)).toBe("50");
   expect(psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_PROD}'`)).toBe("1");
 });

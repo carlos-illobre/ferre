@@ -387,6 +387,7 @@ RF-43:
 RF-50:
   estado: "Hecho en parte (#30): se aparta de la regla en 14 puntos"
   pruebas:
+    - tests/e2e/escritorio/15-foto-con-celular.spec.ts
     - clientes/gestion-del-local-web/src/v5/FotoDeFactura.test.tsx
     - microservices/gestion-del-local/src/rutas/pedidos-de-foto.test.ts
     - microservices/gestion-del-local/src/rutas/compras.test.ts
@@ -399,7 +400,7 @@ RF-50:
     - "La foto no es obligatoria: una factura o un remito se puede registrar sin foto y figura «sin foto»"
     - "Sin conexión la foto no se puede subir (el ingreso tampoco se registra sin conexión)"
     - "Una foto subida que no llega a usarse en ninguna compra queda guardada en el servidor; no se limpia"
-    - "El paso de la foto del celular a la computadora está probado con el servidor simulado, no con un celular real"
+    - "El paso de la foto del celular a la computadora está probado de punta a punta con dos navegadores, no con la cámara de un celular real"
     - "El ingreso de mercadería de la computadora no recibe códigos escaneados con el celular vinculado; solo se escanea en el celular"
     - "No se puede guardar la foto del comprobante con la compra"
     - "El ingreso no se precarga desde un pedido (RF-55) ni desde la foto de la factura (RF-51)"
@@ -456,6 +457,8 @@ RF-53:
 RF-59:
   estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
   pruebas:
+    - tests/e2e/escritorio/04-vender.spec.ts
+    - tests/e2e/celular/04-vender.spec.ts
     - microservices/gestion-del-local/src/rutas/ventas.test.ts
     - microservices/gestion-del-local/src/rutas/anomalias.test.ts
     - clientes/gestion-del-local-web/src/v5/Anomalias.test.tsx
@@ -635,6 +638,8 @@ RF-74:
 RF-80:
   estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
   pruebas:
+    - tests/e2e/escritorio/14-tickets.spec.ts
+    - tests/e2e/celular/14-tickets.spec.ts
     - clientes/gestion-del-local-web/src/v5/Tickets.test.tsx
     - microservices/gestion-del-local/src/rutas/tickets.test.ts
   defectos:
@@ -643,6 +648,8 @@ RF-80:
 RF-81:
   estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
   pruebas:
+    - tests/e2e/escritorio/14-tickets.spec.ts
+    - tests/e2e/celular/14-tickets.spec.ts
     - clientes/gestion-del-local-web/src/v5/Tickets.test.tsx
     - microservices/gestion-del-local/src/rutas/tickets.test.ts
   defectos:

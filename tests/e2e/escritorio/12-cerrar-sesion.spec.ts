@@ -25,35 +25,35 @@ test.beforeEach(() => {
 
 test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/administracion");
-  const otra = page.getByRole("row", { name: /otro celular/ });
+  await page.goto("/v5/#/usuarios");
+  const otra = page.getByTestId("sesion").filter({ hasText: "otro celular" });
   await expect(otra).toBeVisible();
-  await expect(otra.getByRole("button", { name: "Cerrar" })).toHaveClass(/primario/);
-  await otra.getByRole("button", { name: "Cerrar" }).click();
-  await expect(page.getByRole("row", { name: /otro celular/ })).toHaveCount(0);
-  await expect(page.getByRole("row", { name: /esta computadora/ })).toBeVisible();
+  await expect(otra.getByRole("button", { name: /Cerrar/ })).not.toHaveClass(/peligro/);
+  await otra.getByRole("button", { name: /Cerrar/ }).click();
+  await expect(page.getByTestId("sesion").filter({ hasText: "otro celular" })).toHaveCount(0);
+  await expect(page.getByTestId("sesion").filter({ hasText: "esta computadora" })).toBeVisible();
   expect(psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'otro celular' AND revocada_en IS NOT NULL`)).toBe("1");
 });
 
 test("cerrar la sesión propia desde Administración vuelve al login", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/v5/#/administracion");
-  const propia = page.getByRole("row", { name: /esta computadora/ });
+  await page.goto("/v5/#/usuarios");
+  const propia = page.getByTestId("sesion").filter({ hasText: "esta computadora" });
   await expect(propia).toBeVisible();
-  await expect(propia).toContainText("esta sesión");
-  await expect(propia.getByRole("button", { name: "Cerrar" })).toHaveClass(/peligro/);
-  await propia.getByRole("button", { name: "Cerrar" }).click();
-  await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
+  await expect(propia).toContainText("Esta sesión");
+  await expect(propia.getByRole("button", { name: /Cerrar/ })).toHaveClass(/peligro/);
+  await propia.getByRole("button", { name: /Cerrar/ }).click();
+  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("ferre.sesion"))).toBeNull();
   // Recargar no vuelve a entrar.
   await page.reload();
-  await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
 });
 
 test("Salir vuelve al login", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/v5/#/vender");
-  await page.getByRole("button", { name: "Salir" }).click();
-  await expect(page.getByText("Entrá con tu cuenta de Google.")).toBeVisible();
+  await page.getByTestId("salir").click();
+  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
   expect(psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NOT NULL`)).toBe("1");
 });

@@ -38,17 +38,16 @@ test.beforeAll(() => {
 test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/v5/");
-  await page.getByRole("button", { name: "Listas de precios" }).click();
-  await expect(page.getByRole("heading", { name: "Listas de precios" })).toBeVisible();
+  await page.getByTestId("menu-catalogo").click();
+  await page.getByRole("button", { name: /^Listas/ }).click();
 
-  // Alta del proveedor con su configuración de costo (descuento por contado 5 %). El panel
-  // está arriba de la zona de carga y abierto.
-  await expect(page.getByTestId("panel-proveedores")).toHaveClass(/abierto/);
-  await page.getByPlaceholder("Nombre del proveedor").fill(PROVEEDOR);
+  // Alta del proveedor con su configuración de costo (descuento por contado 5 %).
+  await page.getByTestId("agregar-proveedor").click();
+  await page.locator('input[name="nombre"]').fill(PROVEEDOR);
   await page.locator('select[name="lector"]').selectOption("comodo");
   await page.locator('input[name="contado"]').fill("5");
-  await page.getByRole("button", { name: "Agregar", exact: true }).click();
-  await expect(page.getByRole("cell", { name: PROVEEDOR }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Agregar proveedor", exact: true }).last().click();
+  await expect(page.getByTestId("estado-proveedores")).toContainText(PROVEEDOR);
 
   // Soltar la planilla: se detecta el proveedor y aparece el resumen.
   await page.getByTestId("archivo").setInputFiles(MUESTRA);
@@ -62,9 +61,11 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   // La vista previa muestra el costo con descuento de línea y contado, y su explicación.
   const fila = page.getByRole("row", { name: /MP001/ });
   await expect(fila).toContainText("$712,50");
-  await fila.locator("summary").click();
-  await expect(fila).toContainText("− 25 % (linea)");
-  await expect(fila).toContainText("− 5 % (contado)");
+  await fila.getByTestId("explicacion").click();
+  const explicacion = page.getByTestId("hoja-explicacion");
+  await expect(explicacion).toContainText("− 25 % (linea)");
+  await expect(explicacion).toContainText("− 5 % (contado)");
+  await explicacion.getByRole("button", { name: "Entendido" }).click();
 
   await page.getByTestId("aplicar").click();
   // Se aplica en segundo plano con barra de progreso; con 4 filas termina enseguida.

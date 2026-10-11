@@ -65,6 +65,7 @@ describe("tickets", () => {
     expect(base.actual.sqlDe(/UPDATE ticket SET estado = 'resuelto'/)[0]!.params).toEqual([ID, "u-admin", "Corregido en la versión de hoy"]);
     base.actual.programar(/UPDATE ticket SET estado = 'abierto'/, { rowCount: 1 });
     expect((await pedir(app, "POST", `/tickets/${ID}/reabrir`)).status).toBe(204);
+    expect(base.actual.sqlDe(/UPDATE ticket SET estado = 'abierto'/)[0]!.sql).toContain("nota = NULL"); // la nota se va con la resolución
     base.actual.limpiar();
     expect((await pedir(app, "POST", `/tickets/${ID}/resolver`, { cuerpo: {} })).status).toBe(409);
     expect((await pedir(app, "POST", `/tickets/${ID}/reabrir`)).status).toBe(409);

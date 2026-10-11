@@ -35,31 +35,30 @@ test.beforeAll(() => {
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/v5/#/stock");
-  await expect(page.getByRole("heading", { name: "Stock" })).toBeVisible();
-  await expect(page.getByTestId("valorizacion")).toContainText("Valor del inventario");
+  // La pantalla se llama Inventario y muestra cantidades, sin ninguna suma de dinero (decisión 31).
+  await expect(page.getByRole("button", { name: /^Inventario/ })).toBeVisible();
+  await expect(page.getByTestId("plata-invertida")).toHaveCount(0);
+  await expect(page.getByTestId("por-proveedor")).toHaveCount(0);
 
   await page.getByTestId("busqueda").fill("e2e candado stock");
   const fila = page.getByTestId("fila-stock").filter({ hasText: "CANDADO STOCK 40 MM" });
   await expect(fila.getByTestId("stock")).toContainText("17");
-  await expect(fila).toContainText("$42.500,00"); // 17 × 2500
+  await expect(fila).not.toContainText("$");
 
   // La explicación del número: sus movimientos.
   await fila.getByTestId("stock").click();
-  const movimientos = page.getByTestId("movimientos");
+  const detalle = page.getByTestId("detalle-stock");
+  const movimientos = detalle.getByTestId("movimientos");
   await expect(movimientos).toContainText("Compra");
-  await expect(movimientos).toContainText("+20");
-  await expect(movimientos).toContainText("-3");
-  await expect(page.getByText("Stock 17 = suma de estos movimientos")).toBeVisible();
+  await expect(movimientos).toContainText("20");
+  await expect(movimientos).toContainText("3");
+  await expect(detalle).not.toContainText("$");
 
   // Corregir: "hay 15", con motivo. Queda un ajuste de −2 explicado.
-  await fila.getByRole("button", { name: "Corregir" }).click();
-  await page.getByTestId("cantidad-real").fill("15");
-  await page.getByPlaceholder(/Motivo/).fill("conté la estantería");
-  await page.getByTestId("guardar-ajuste").click();
-  await expect(fila.getByTestId("stock")).toContainText("15");
-  await expect(fila).toContainText("$37.500,00");
-  await expect(movimientos).toContainText("Conteo");
-  await expect(movimientos).toContainText("había 17, hay 15: conté la estantería");
+  await detalle.getByTestId("corregir").click();
+  await detalle.getByTestId("cantidad-real").fill("15");
+  await detalle.getByTestId("motivo").fill("conté la estantería");
+  await detalle.getByTestId("guardar-ajuste").click();
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("15.000");
 
   // En la venta se ve el stock del producto.

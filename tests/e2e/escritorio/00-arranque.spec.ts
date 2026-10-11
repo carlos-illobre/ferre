@@ -14,11 +14,17 @@ test("la app abre y el servidor responde", async ({ page }) => {
   expect(salud.ok()).toBeTruthy();
 });
 
-// La app tiene dos interfaces (ADR-014) y cada una carga solo sus estilos: si se mezclan,
-// las clases de una pisan las de la otra. Se ve en el build, no en desarrollo.
-test("la interfaz de escritorio carga una sola hoja de estilos propia", async ({ page }) => {
+// La app tiene dos interfaces (ADR-014 y ADR-015) que se eligen por el ancho: en una pantalla
+// de computadora se arma la de la computadora (menú al costado) y no la del celular.
+test("en una computadora se carga la interfaz de computadora y no la de celular", async ({ page }) => {
   await page.goto("/v5/");
   await expect(page.locator("#root > *").first()).toBeVisible();
-  const hojas = await page.evaluate(() => [...document.styleSheets].map((h) => h.href ?? "").filter((h) => /\/assets\/.*\.css$/.test(h)));
-  expect(hojas).toHaveLength(1);
+  await expect(page.locator(".nav-inferior")).toHaveCount(0);
+  // El ambiente de prueba se anuncia con su marco y su cartel (decisión 33).
+  await expect(page.getByTestId("ambiente")).toContainText("nada de esto es real");
+});
+
+test("la raíz lleva a la versión elegida", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/v5\//);
 });
