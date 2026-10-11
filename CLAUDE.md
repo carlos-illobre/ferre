@@ -31,6 +31,8 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
 | 3 | Planificador | `/speckit-plan` y `/speckit-tasks` | No |
 | 4 | Desarrollador | `/speckit-implement` | Lo prueba en el ambiente de pruebas |
 
+- **Todo en una sola sesión y sin subagentes:** el mismo agente hace los cuatro pasos en
+  orden. Se lee solo la constitución y la carpeta de la capacidad que se toca.
 - **Un arreglo** que no cambia ninguna regla va solo con el desarrollador, con su prueba.
 - **Un cambio de regla** dentro de una capacidad va con analista y desarrollador: la regla
   se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia.
