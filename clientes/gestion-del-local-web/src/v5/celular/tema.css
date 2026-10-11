@@ -47,3 +47,10 @@
 .segmentos.con-icono button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .segmentos.con-icono svg { flex: none; }
 .miniatura.mas-icono { display: grid; place-items: center; background: var(--coral-tinte); color: var(--coral-texto); }
+
+/* Un producto sin foto muestra una cámara en el lugar de la foto, para que se note que ahí
+   se toca para sacarla. */
+button.foto-chica:empty { background: #fff0ea; border: 2px dashed #d83f0e; cursor: pointer; }
+button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; background: #c2370b;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3v11H4Z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3Cpath d='M19 2v4M17 4h4'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3v11H4Z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3Cpath d='M19 2v4M17 4h4'/%3E%3C/svg%3E") center / contain no-repeat; }
