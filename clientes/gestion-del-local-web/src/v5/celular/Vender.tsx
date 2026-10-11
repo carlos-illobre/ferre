@@ -17,7 +17,6 @@ import { EstadoDeConexion } from "../../componentes/EstadoDeConexion";
 import { enviarCodigoAlPuesto, escucharPuesto, puestoRemoto } from "../../puesto";
 import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "../../pantallas/VentasDeHoy";
 import type { Producto } from "../../pantallas/Productos";
-import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 
 // La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
 // precio → cantidad → cobro. Enter agrega; Esc descarta ("no llevó"); F2 cobra. Cada
@@ -28,8 +27,8 @@ type Item = {
   precioManual: number | null; // precio tipeado en esta venta, pisa al margen
   abierto: boolean; // el detalle del margen desplegado
 };
-// Un dibujo por medio de pago, para que el panel de cobro ocupe poco: billete, celular,
-// tarjeta y libreta. El nombre del elegido se lee al lado del total.
+// Un dibujo por medio de pago, con su nombre chico debajo como en el menú de abajo: billete,
+// celular, tarjeta y libreta.
 const DIBUJO_DE_MEDIO: Record<string, string> = {
   efectivo: "M3 7h18v10H3ZM12 14.500a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5ZM6 10v4M18 10v4",
   mercado_pago: "M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM11 18h2",
@@ -38,7 +37,7 @@ const DIBUJO_DE_MEDIO: Record<string, string> = {
 };
 const MEDIOS: { valor: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; nombre: string; corto: string; tecla: string }[] = [
   { valor: "efectivo", nombre: "Efectivo", corto: "Efectivo", tecla: "F5" },
-  { valor: "mercado_pago", nombre: "Mercado Pago", corto: "Mercado Pago", tecla: "F6" },
+  { valor: "mercado_pago", nombre: "Mercado Pago", corto: "M. Pago", tecla: "F6" },
   { valor: "tarjeta", nombre: "Tarjeta", corto: "Tarjeta", tecla: "F7" },
   { valor: "cuenta_corriente", nombre: "Cuenta corriente", corto: "Cta. cte.", tecla: "F8" },
 ];
@@ -79,7 +78,6 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
   const [exito, setExito] = useState<{ total: number; medio: string; detalle: string } | null>(null);
   const caja = useRef<HTMLInputElement>(null);
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía media pantalla.
-  const sugeridos = useSugeridos(catalogo, exito);
   const { datos: hoy, anular } = useVentasDeHoy(mensaje ?? exito);
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
@@ -303,23 +301,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
           </div>
         )}
 
-        {/* Atajos de búsqueda: lo último que se vendió, en cuatro cuadrados pegados a la búsqueda.
-            Siguen a la vista con la venta empezada, para sumar otro producto de un toque. */}
-        {sugeridos.hay && !consulta.trim() && !codigoDesconocido && (
-          <section className="atajos" aria-label="Lo último que se vendió" data-testid="sugeridos-ultimos">
-            <h2>Lo último que se vendió</h2>
-            <div className="atajos-grilla">
-              {sugeridos.ultimos.slice(0, 4).map((p) => (
-                <button key={p.id} type="button" className="atajo" onClick={() => agregar(p)} aria-label={`Agregar ${p.descripcion} a la venta`}>
-                  <span className="atajo-foto">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : <Icono nombre="vender" tam={26} grosor={1.6} />}</span>
-                  <span className="atajo-nombre">{p.descripcion}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {vacio && !sugeridos.hay && (
+        {vacio && (
           <div className="vacio">
             <div className="icono"><Icono nombre="vender" tam={30} grosor={1.8} /></div>
             <strong>Venta nueva</strong>
@@ -337,25 +319,25 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
 
       {items.length > 0 && (
         <div className="cobro" data-testid="cobro">
-          <div className="cobro-arriba">
-            <div className="cobro-total"><span>Total{medio ? ` · ${MEDIOS.find((m) => m.valor === medio)!.corto}` : ""}</span><strong className="importe" data-testid="total">{pesosCortos(total)}</strong></div>
-            <div className="medios" role="radiogroup" aria-label="Cómo paga">
-              {MEDIOS.map((m) => (
-                <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} aria-label={m.nombre} title={m.nombre} className={medio === m.valor ? "activo" : ""} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DIBUJO_DE_MEDIO[m.valor]} /></svg>
-                </button>
-              ))}
-            </div>
+          <div className="medios" role="radiogroup" aria-label="Cómo paga">
+            {MEDIOS.map((m) => (
+              <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} className={medio === m.valor ? "activo" : ""} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DIBUJO_DE_MEDIO[m.valor]} /></svg>
+                <span>{m.corto}</span>
+              </button>
+            ))}
           </div>
           {medio === "cuenta_corriente" && (
             <button type="button" className={`cliente ${cliente ? "" : "falta"}`} onClick={() => setHoja("clientes")} data-testid="cliente">
               <span>{cliente ? cliente.nombre : "Elegí el cliente"}</span><Icono nombre="derecha" tam={16} grosor={2.5} />
             </button>
           )}
-          <div className="acciones auto-1fr">
-            <button type="button" className="no-llevo" onClick={noLlevo} aria-label="No llevó" title="No llevó" data-testid="no-llevo">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM5.700 5.700l12.600 12.600" /></svg>
+          <div className="acciones">
+            <button type="button" className="no-llevo" onClick={noLlevo} data-testid="no-llevo">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM5.700 5.700l12.600 12.600" /></svg>
+              <span>No llevó</span>
             </button>
+            <div className="cobro-total"><span>Total</span><strong className="importe" data-testid="total">{pesosCortos(total)}</strong></div>
             <button type="button" className="boton coral principal centrado" onClick={cobrar} disabled={ocupado} data-testid="cobrar">{ocupado ? "Cobrando…" : "Cobrar"}</button>
           </div>
         </div>

@@ -202,3 +202,13 @@ body, .hoja { background: #e6ece6; }
 .cobro-total .importe { font-size: 24px; }
 .cobro .medios { gap: 5px; }
 .cobro .medios button { width: 38px; }
+
+/* Panel de cobro: dos renglones. Arriba los medios de pago, cada uno con su ícono y su nombre
+   chico debajo (como el menú de abajo); abajo «No llevó», el total y «Cobrar». */
+.cobro .medios { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.cobro .medios button, .cobro .no-llevo { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: auto; height: 50px; padding: 2px; border-radius: 12px; font-size: 11.500px; font-weight: 700; line-height: 1.1; white-space: nowrap; }
+.cobro .acciones { display: grid; grid-template-columns: 62px minmax(0, auto) minmax(96px, 1fr); align-items: center; gap: 8px; }
+.cobro .no-llevo { width: 62px; }
+.cobro-total { flex: none; align-items: flex-end; text-align: right; font-size: 12px; line-height: 1.1; }
+.cobro-total .importe { font-size: 23px; }
+.cobro .boton.principal { height: 50px; }

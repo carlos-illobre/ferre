@@ -163,3 +163,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     en el celular y en la computadora, el medio de pago arranca en Efectivo (así se nota que
     los medios se tocan) y vuelve a Efectivo después de cada venta. El total se muestra
     grande, fuera del botón «Cobrar», que solo dice «Cobrar».
+38. **Vender en el celular, sin atajos y con el cobro compacto** (2026-10-11): reemplaza a la
+    35 en el celular. «Lo último que se vendió» se sacó del celular porque ocupa mucho lugar
+    y se toca por error; en la computadora sigue. El panel de cobro tiene dos renglones: los
+    medios de pago con ícono y nombre chico debajo (como el menú de abajo), y debajo «No
+    llevó», el total y «Cobrar».
