@@ -1,0 +1,14 @@
+/* Dinero invertido en inventario, dentro de Cómo va el negocio. Igual en celular y computadora. */
+.di { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid #dfe5e1; border-radius: 14px; background: #fff; color: #18201e; box-sizing: border-box; }
+.di h2 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.di p { margin: 0; }
+.di-total { font-size: 2rem; line-height: 1.1; font-weight: 750; font-variant-numeric: tabular-nums; }
+.di-detalle { color: #4a5451; font-size: 0.9375rem; }
+.di-lista { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.di-lista li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; }
+.di-nombre { font-weight: 650; overflow-wrap: anywhere; }
+.di-importe { font-weight: 700; font-variant-numeric: tabular-nums; }
+.di-riel { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: #e4e8e5; overflow: hidden; }
+.di-riel i { display: block; height: 100%; border-radius: 3px; background: #17312b; }
+.di-lista .di-detalle { grid-column: 1 / -1; }
+@media (min-width: 900px) { .cuerpo > .di { margin: 0 24px 32px; max-width: 720px; } }

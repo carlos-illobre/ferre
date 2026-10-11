@@ -284,7 +284,7 @@ consulta guardada con el producto y el precio ofrecido, y aparece en la vista de
 
 Un cliente vuelve con algo que compró y se lleva otra cosa. El Vendedor registra el cambio:
 lo devuelto vuelve al stock, lo nuevo sale y se cobra la diferencia (RF-24, CU-02). No hay
-devoluciones de plata (RF-24b).
+devoluciones de dinero (RF-24b).
 
 **Why this priority**: es la única forma de deshacer una venta frente al cliente en esta
 etapa, y sin registrarla el stock queda mal.
@@ -298,7 +298,7 @@ stock de la primera sube 1, el de la segunda baja 1 y se cobran $2.000.
 2. **Given** un cambio registrado, **When** se miran las ventas del día, **Then** el cambio figura con lo devuelto, lo que salió y la diferencia cobrada, y la diferencia cuenta en el total del día y en el de su medio de pago.
 3. **Given** un cambio registrado, **When** el Administrador consulta quién hizo qué, **Then** figura con el usuario que lo hizo; la venta original no se borra ni se pisa (RNF-30).
 4. **Given** un cambio en el que lo nuevo vale lo mismo que lo devuelto, **When** se registra, **Then** el stock se mueve igual y no se cobra nada.
-5. **Given** un cambio en el que lo nuevo vale menos que lo devuelto, **When** el Vendedor lo registra, **Then** [NEEDS CLARIFICATION: si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que en esta etapa no se devuelve plata: se pierde, queda como saldo a favor, o el cambio solo se admite por algo de igual o mayor valor?]
+5. **Given** un cambio en el que lo nuevo vale menos que lo devuelto, **When** el Vendedor lo registra, **Then** [NEEDS CLARIFICATION: si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que en esta etapa no se devuelve dinero: se pierde, queda como saldo a favor, o el cambio solo se admite por algo de igual o mayor valor?]
 
 [NEEDS CLARIFICATION: para registrar un cambio, ¿hay que encontrar la venta original (y entonces lo devuelto se toma al precio que se pagó) o alcanza con decir qué producto vuelve (y se toma al precio del día)? ¿Hay un plazo para aceptar cambios?]
 
@@ -412,7 +412,7 @@ difiere.
 
 ### User Story 16 - Devolver un producto con reintegro o saldo a favor (Priority: P3)
 
-Un cliente devuelve lo que compró y elige entre que le devuelvan la plata o que le quede un
+Un cliente devuelve lo que compró y elige entre que le devuelvan el dinero o que le quede un
 saldo a favor (RF-24b). Es de una etapa posterior: llega con la venta online (RF-31); hasta
 entonces solo hay cambios por otro producto (RF-24).
 
@@ -425,7 +425,7 @@ favor y se comprueba el stock y el saldo del cliente.
 **Acceptance Scenarios**:
 
 1. **Given** una venta registrada y un cliente que devuelve uno de sus productos, **When** se registra la devolución, **Then** el producto vuelve al stock y la venta original no se borra ni se pisa (RNF-30).
-2. **Given** una devolución, **When** el cliente elige reintegro, **Then** se registra la plata devuelta, con su medio de pago, y cuenta en la caja del día.
+2. **Given** una devolución, **When** el cliente elige reintegro, **Then** se registra el dinero devuelto, con su medio de pago, y cuenta en la caja del día.
 3. **Given** una devolución, **When** el cliente elige saldo a favor, **Then** queda un saldo a su nombre que se descuenta en una compra posterior.
 4. **Given** una devolución pedida fuera de plazo, **When** se la quiere registrar, **Then** no se admite. [NEEDS CLARIFICATION: ¿cuál es el plazo para aceptar una devolución? La decisión del 2026-10-08 lo dejó para cuando se haga la venta online.]
 
@@ -522,8 +522,8 @@ comprueba que en la otra no existe ningún dato de la primera.
 - **RF-21**: Los medios de pago son cuatro: efectivo, Mercado Pago, tarjeta y cuenta corriente. Se eligen con un toque o una tecla. La cuenta corriente exige elegir el cliente, por nombre, y la venta queda a su nombre y sin pagar (RF-40). El sistema registra con qué se pagó; no cobra ni se conecta con Mercado Pago ni con la tarjeta. [NEEDS CLARIFICATION: si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión, o «sin especificar») o se le exige elegir uno antes de cobrar?]
 - **RF-22**: El sistema DEBE permitir vender un producto que no está en ninguna lista como ítem libre, con descripción y precio tipeados, sin agregar más de 2 pasos a una venta normal; el ítem libre no mueve stock. En el mismo paso DEBE poder guardarse como producto nuevo, con familia y costo opcionales. Los ítems libres vendidos quedan listados para que el Administrador los revise después. [NEEDS CLARIFICATION: precio del producto nuevo en la venta siguiente, y qué puede hacer el Administrador con la lista de ítems libres; ver historia 6, escenarios 6 y 8.]
 - **RF-23**: El sistema DEBE mostrar las ventas del día, con el total del día, la cantidad de ventas y el total por medio de pago, y las de un día anterior eligiendo la fecha; cada venta muestra sus productos, uno por renglón. El día es el del local (hora de Buenos Aires). Una venta se DEBE poder anular: queda marcada, no se borra, su stock vuelve y deja de contar en los totales. Una venta reciente se DEBE poder corregir en cantidad o precio: ajusta el stock y el total del día, no pisa lo anterior (RNF-30) y queda en quién hizo qué (RF-71) con el usuario y qué cambió. [NEEDS CLARIFICATION: si anular pide confirmación y motivo; hasta cuándo una venta es «reciente»; y qué más se puede corregir además de cantidad y precio; ver historias 7, 8 y 9.]
-- **RF-24**: El sistema DEBE permitir registrar el cambio de un producto por otro: lo devuelto vuelve al stock, lo nuevo sale y se cobra la diferencia. No hay devolución de plata. [NEEDS CLARIFICATION: qué pasa si lo nuevo vale menos; si hay que encontrar la venta original, a qué precio se toma lo devuelto y si hay plazo; ver historia 11.]
-- **RF-24b**: El sistema DEBE permitir registrar una devolución con reintegro de plata o saldo a favor, a elección del cliente. Es de una etapa posterior: llega con la venta online (RF-31). [NEEDS CLARIFICATION: ¿cuál es el plazo para aceptar una devolución?]
+- **RF-24**: El sistema DEBE permitir registrar el cambio de un producto por otro: lo devuelto vuelve al stock, lo nuevo sale y se cobra la diferencia. No hay devolución de dinero. [NEEDS CLARIFICATION: qué pasa si lo nuevo vale menos; si hay que encontrar la venta original, a qué precio se toma lo devuelto y si hay plazo; ver historia 11.]
+- **RF-24b**: El sistema DEBE permitir registrar una devolución con reintegro de dinero o saldo a favor, a elección del cliente. Es de una etapa posterior: llega con la venta online (RF-31). [NEEDS CLARIFICATION: ¿cuál es el plazo para aceptar una devolución?]
 - **RF-25**: El sistema DEBE permitir anotar con un toque lo que un cliente pidió y no se vendió: producto o descripción, precio ofrecido y, de forma opcional, el motivo (no había, precio). Lo anotado DEBE poder consultarse después. [NEEDS CLARIFICATION: si los motivos son una lista cerrada o texto libre; quién consulta lo anotado y cómo; y si descartar una venta anota siempre la consulta; ver historia 10.]
 - **RF-26**: El sistema DEBE llevar los pedidos de clientes de lo que no hay en stock: qué hay que conseguir, para quién (nombre y teléfono) y qué día se le prometió. No se toma seña. Los pedidos aparecen en la lista de lo que hay que comprar (RF-54, RF-55). El sistema DEBE mejorar el procedimiento de decirle al cliente un día y esperarlo, por ejemplo avisándole cuando llega la mercadería. [NEEDS CLARIFICATION: cómo se avisa cuando llega la mercadería y cómo se cierra o se cancela un pedido; ver historia 12.]
 - **RF-27**: El sistema DEBE permitir armar un presupuesto igual que una venta, sin tocar el stock; mandarlo por WhatsApp o en PDF; y convertirlo en venta con un toque. El presupuesto tiene un vencimiento configurable. Un presupuesto de 10 productos se arma y se envía en menos de 3 minutos. [NEEDS CLARIFICATION: plazo de vencimiento por omisión y qué pasa al vencer; si al convertirlo valen los precios del presupuesto o los del día; y si lleva cliente obligatorio; ver historia 13.]

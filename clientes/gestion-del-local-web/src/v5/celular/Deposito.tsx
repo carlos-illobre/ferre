@@ -11,10 +11,10 @@ import { Escaner, hayCamara } from "../../componentes/Escaner";
 import { pesosCortos } from "../../pantallas/VentasDeHoy";
 import type { Producto } from "../../pantallas/Productos";
 
-// Depósito: stock valorizado, ingreso de mercadería y conteo por sector. Tres
+// Depósito: inventario (cantidades, sin dinero), ingreso de mercadería y conteo por sector. Tres
 // sub-pantallas con un segmento arriba (rediseño en mockups/Ferre iOS.html).
 // Primero lo que más se hace: recibir mercadería; después mirar el stock y, cada tanto, contar.
-const SUB = [{ valor: "ingreso", nombre: "Ingreso" }, { valor: "stock", nombre: "Stock" }, { valor: "contar", nombre: "Contar" }] as const;
+const SUB = [{ valor: "ingreso", nombre: "Ingreso" }, { valor: "stock", nombre: "Inventario" }, { valor: "contar", nombre: "Contar" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
@@ -37,8 +37,8 @@ type StockFila = { id: string; stock: string; costo_neto: string | null; proveed
 type Datos = { productos: StockFila[]; valor_total: number; por_proveedor: Record<string, { unidades: number; valor: number; productos: number }> };
 type Movimiento = { id: string; tipo: string; cantidad: string; referencia_tipo: string | null; fecha: string; nota: string | null };
 
-// Stock actual y valorización (issue #33). Cada número se explica: el stock, con sus
-// movimientos; el valor, como stock × costo vigente.
+// Inventario: cuánto hay de cada producto, explicado con sus movimientos. Sin sumas de
+// dinero: el dinero invertido está en Cómo va el negocio (decisión 31).
 function Stock() {
   const { catalogo, buscarProductos } = useCatalogo();
   const [datos, setDatos] = useState<Datos | null>(null);
@@ -53,10 +53,8 @@ function Stock() {
   const porId = useMemo(() => new Map((datos?.productos ?? []).map((s) => [s.id, s])), [datos]);
   const filas = useMemo(() => {
     if (!catalogo) return [];
-    return consulta.trim() ? buscarProductos(consulta, 100) : catalogo.filter((p) => porId.has(p.id)).sort((a, b) => Number(porId.get(b.id)!.valor) - Number(porId.get(a.id)!.valor)).slice(0, 100);
+    return consulta.trim() ? buscarProductos(consulta, 100) : catalogo.filter((p) => porId.has(p.id)).sort((a, b) => a.descripcion.localeCompare(b.descripcion, "es")).slice(0, 100);
   }, [catalogo, consulta, buscarProductos, porId]);
-  const porProveedor = datos ? Object.entries(datos.por_proveedor).sort((a, b) => b[1].valor - a[1].valor).slice(0, 3) : [];
-  const mayor = porProveedor[0]?.[1].valor ?? 1;
 
   return (
     <>
@@ -64,17 +62,6 @@ function Stock() {
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
       <div className="lateral">
       <div className="columna al-costado">
-      {datos && (
-        <div className="tarjeta oscura" data-testid="valorizacion">
-          <small>Valor del inventario · al costo, sin IVA</small>
-          <span className="importe" style={{ fontSize: 40, lineHeight: 1 }}>{pesosCortos(datos.valor_total)}</span>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
-            {porProveedor.map(([nombre, v]) => (
-              <div key={nombre} className="barra-valor"><span>{nombre}</span><span className="importe" style={{ fontSize: 17, fontWeight: 600 }}>{pesosCortos(v.valor)}</span><div className="pista"><div style={{ width: `${Math.round((v.valor / mayor) * 100)}%` }} /></div></div>
-            ))}
-          </div>
-        </div>
-      )}
       </div>
       <div className="columna">
       <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" />
@@ -118,13 +105,12 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar }: { product
         <span className="nombre">{p.descripcion}</span>
         <span className="derecha">
           <strong className="importe" style={{ fontSize: 24, color: cantidad < 0 ? "var(--coral-texto)" : undefined }}>{num(cantidad)} {unidad}</strong>
-          <small>{fila ? pesosCortos(fila.valor) : "—"}</small>
         </span>
-        <span className="detalle">{detalleDe(p)}{fila?.costo_neto ? ` · ${pesos(fila.costo_neto)} c/u` : ""}{fila?.ultimo_movimiento ? ` · último ${fecha(fila.ultimo_movimiento.slice(0, 10))}` : ""}</span>
+        <span className="detalle">{detalleDe(p)}{fila?.ultimo_movimiento ? ` · último ${fecha(fila.ultimo_movimiento.slice(0, 10))}` : ""}</span>
       </button>
       {abierto && (
         <div style={{ padding: "0 16px 14px", display: "flex", flexDirection: "column", gap: 10, animation: "aparecer .2s" }} data-testid="detalle-stock">
-          <small>Stock {num(cantidad)} = suma de estos movimientos{fila?.costo_neto ? ` · Valor ${pesos(fila.valor)} = ${num(cantidad)} × ${pesos(fila.costo_neto)}` : ""}</small>
+          <small>Stock {num(cantidad)} = suma de estos movimientos</small>
           {movimientos === null ? <small>Cargando…</small> : movimientos.length === 0 ? <small>Sin movimientos.</small> : (
             <div className="movimientos" data-testid="movimientos">
               {movimientos.map((m) => (

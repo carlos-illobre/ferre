@@ -48,7 +48,7 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 9. Cuando el cliente no lleva, ¿descartar la venta anota siempre la consulta, o hay dos acciones: descartar sin anotar y «No llevó», que anota?
 
 **Cambios (RF-24)**
-10. Si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que no se devuelve plata?
+10. Si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que no se devuelve dinero?
 11. Para registrar un cambio, ¿hay que encontrar la venta original (y lo devuelto se toma al precio pagado) o alcanza con decir qué producto vuelve, al precio del día? ¿Hay plazo?
 
 **Pedidos de clientes sin stock (RF-26)**
@@ -153,9 +153,9 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 **RF-40: vender a cuenta corriente, marcar pagada y alta de clientes**
 1. ¿Existen clientes importantes con condición «contado», a los que no se les vende a cuenta corriente? Si existen, ¿el sistema impide cobrarles a cuenta corriente, solo avisa, o no los ofrece al elegir el cliente?
 2. ¿Una venta en efectivo, Mercado Pago o tarjeta puede llevar el nombre de un cliente importante, para que figure en su ficha? ¿O el cliente solo se anota en las ventas a cuenta corriente?
-3. Cuando el cliente paga una venta a cuenta corriente, ¿se anota con qué pagó? ¿Esa plata cuenta en la caja del día en que pagó (RF-62)?
+3. Cuando el cliente paga una venta a cuenta corriente, ¿se anota con qué pagó? ¿Ese dinero cuenta en la caja del día en que pagó (RF-62)?
 4. Si una venta se marca como pagada por error, ¿se puede deshacer? ¿Quién puede y hasta cuándo?
-5. ¿Se puede anular una venta a cuenta corriente que el cliente ya pagó? Si se puede, ¿qué pasa con la plata?
+5. ¿Se puede anular una venta a cuenta corriente que el cliente ya pagó? Si se puede, ¿qué pasa con el dinero?
 6. ¿Un cliente nuevo queda habilitado para cuenta corriente por omisión, o hay que habilitarlo aparte?
 7. ¿Puede haber dos clientes con el mismo nombre? Si no, ¿el sistema lo impide o solo avisa?
 8. ¿Qué datos lleva un cliente además de nombre y teléfono (CUIT, dirección, nombre del negocio, notas)? ¿Alguno más es obligatorio?
@@ -185,7 +185,7 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 4. Una venta a cuenta corriente, ¿cuenta en lo vendido y en la ganancia el día en que se vendió, o recién cuando el cliente paga?
 
 **RF-61: lo más vendido y lo que no rota**
-5. ¿«Lo más vendido» se ordena por unidades, por plata vendida o por ganancia? ¿De qué período? ¿Cuántos productos se muestran?
+5. ¿«Lo más vendido» se ordena por unidades, por dinero vendido o por ganancia? ¿De qué período? ¿Cuántos productos se muestran?
 6. ¿«Lo que no rota» incluye solo productos con stock? Un producto que entró hace menos de 90 días y nunca se vendió, ¿figura como sin rotación?
 
 **RF-62: cierre de caja**

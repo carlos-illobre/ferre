@@ -9,7 +9,8 @@ import { VentasDeHoy } from "../../v2/pantallas/VentasDeHoy";
 import { Productos } from "../../v2/pantallas/Productos";
 import { Listas } from "../../v2/pantallas/Listas";
 import { Duplicados } from "../../v2/pantallas/Duplicados";
-import { Stock } from "../../v2/pantallas/Stock";
+import { Inventario } from "./Inventario";
+import { DineroInvertido } from "../DineroInvertido";
 import { Compras } from "../../v2/pantallas/Compras";
 import { Contar } from "../../v2/pantallas/Contar";
 import { Resumen } from "../../v2/pantallas/Resumen";
@@ -39,7 +40,7 @@ type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono };
 const MENU: { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] }[] = [
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas" }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados" }] },
   { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender" }] },
-  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", icono: "compras", nombre: "Ingreso" }, { ruta: "stock", icono: "stock", nombre: "Stock" }, { ruta: "contar", icono: "contar", nombre: "Contar" }] },
+  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", icono: "compras", nombre: "Ingreso" }, { ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "contar", icono: "contar", nombre: "Contar" }] },
   { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre, icono: d.icono })) },
 ];
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
@@ -120,8 +121,8 @@ function Pantallas() {
         {actual === "ventas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("vender")}>Volver a Vender</Boton></div>}
         {actual === "mas" ? <Mas atajoDe={atajoDe} />
           : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Compras />
-          : actual === "stock" ? <Stock /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
-          : actual === "contar" ? <Contar /> : actual === "resumen" ? <Resumen /> : actual === "usuarios" ? <Usuarios />
+          : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
+          : actual === "contar" ? <Contar /> : actual === "resumen" ? <><Resumen /><DineroInvertido /></> : actual === "usuarios" ? <Usuarios />
           : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : <Vender />}
       </div>
     </div>

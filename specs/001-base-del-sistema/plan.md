@@ -87,7 +87,7 @@ docs/                                  ADR, operación, sistema visual, decision
 
 **Structure Decision**: servicios, clientes y librerías en carpetas propias, nombradas por
 la parte del negocio que resuelven y nunca por su rol técnico («backend», «api», «web»,
-«app»). Un cliente se llama por el servicio que muestra más la plataforma
+«app»). Un cliente se llama por el servicio que muestra más el dineroforma
 (`gestion-del-local-android`). Un workspace de pnpm en la raíz enlaza la librería
 compartida; cada servicio se empaqueta solo con lo suyo (ADR-010).
 

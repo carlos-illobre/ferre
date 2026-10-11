@@ -13,7 +13,7 @@ resumen: >-
 objetivos:
   corto:
     - Registrar ventas y stock en el sistema en vez de en papel
-    - Saber cuánta plata hay invertida en stock y cuánto se gana
+    - Saber cuánto dinero hay invertido en stock y cuánto se gana
     - Que sea fácil de usar en la notebook y en el celular
     - Alta disponibilidad y respaldos de toda la información
   mediano:

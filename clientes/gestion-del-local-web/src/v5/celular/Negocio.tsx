@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { DineroInvertido } from "../DineroInvertido";
 import { api, urlApi } from "../../api";
 import { fecha, pesos } from "../../formato";
 import { administra, useSesion } from "../../sesion";
@@ -62,6 +63,8 @@ export function Negocio({ parte }: { parte: Parte }) {
       )}
       <div className="seccion">Detalle de hoy</div>
       {hoy ? <ListaDeVentas ventas={hoy.ventas} alAnular={anular} /> : <div className="aviso-suave">Sin conexión: las ventas de hoy se ven cuando vuelva internet.</div>}
+
+      <DineroInvertido />
 
       {gastos && gastos.por_proveedor.length > 0 && (
         <>

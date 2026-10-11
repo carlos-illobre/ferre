@@ -86,7 +86,7 @@ especificación (RF-60 a RF-65); lo que acá depende de una aclaración lo dice.
 5. Novedades del día (historia 4).
 6. Gasto de la semana en compras (historia 1).
 7. Lo más vendido y lo que no rota (historia 5).
-8. Plata invertida en stock, stock bajo, pedidos de clientes sin entregar y listas de
+8. Dinero invertido en stock, stock bajo, pedidos de clientes sin entregar y listas de
    precios sin aplicar: cada uno con su número y la forma de llegar a su detalle, con las
    reglas de su capacidad (RF-53, RF-54, RF-26, RF-01).
 
@@ -203,7 +203,7 @@ especificación (RF-60 a RF-65); lo que acá depende de una aclaración lo dice.
 **Reglas**
 
 - Las dos listas se distinguen sin ambigüedad: una es lo que conviene tener, la otra es
-  plata parada.
+  dinero parado.
 - Las cantidades van en la unidad del producto; lo fraccionado, con hasta un decimal.
 - Una lista larga no obliga a desplazar para llegar a la otra: se ven primero los
   principales de cada una y el resto se pide.

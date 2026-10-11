@@ -83,9 +83,9 @@ como deuda. Es el renglón tachado del cuaderno.
 5. **Given** una venta que no es a cuenta corriente, está anulada o ya se pagó, **When** se la quiere marcar como pagada, **Then** el servidor responde «La venta no es a cuenta corriente, está anulada o ya se pagó» y no cambia nada.
 6. **Given** un dispositivo sin conexión, **When** el Vendedor marca una venta como pagada, **Then** el cambio queda guardado en el dispositivo, la venta ya no figura como deuda en ese dispositivo y el cambio se manda solo al reconectar (RNF-10, RNF-20).
 7. **Given** ningún cliente con ventas sin pagar, **When** el Vendedor abre la cuenta corriente, **Then** el sistema dice que nadie debe nada.
-8. **Given** un cliente que paga una venta a cuenta corriente, **When** el Vendedor la marca como pagada, **Then** [NEEDS CLARIFICATION: ¿se anota con qué pagó el cliente (efectivo, Mercado Pago o tarjeta)? ¿Esa plata cuenta en la caja del día en que pagó (RF-62)?]
+8. **Given** un cliente que paga una venta a cuenta corriente, **When** el Vendedor la marca como pagada, **Then** [NEEDS CLARIFICATION: ¿se anota con qué pagó el cliente (efectivo, Mercado Pago o tarjeta)? ¿Ese dinero cuenta en la caja del día en que pagó (RF-62)?]
 9. **Given** una venta marcada como pagada por error, **When** el Vendedor se da cuenta, **Then** [NEEDS CLARIFICATION: ¿se puede deshacer y que la venta vuelva a figurar como deuda? ¿Quién puede y hasta cuándo? Si no se puede deshacer, marcarla pide confirmación, porque sería algo que no se recupera.]
-10. **Given** una venta a cuenta corriente ya pagada, **When** se la anula (RF-23), **Then** [NEEDS CLARIFICATION: ¿se puede anular una venta a cuenta corriente que el cliente ya pagó? Si se puede, ¿qué pasa con la plata que pagó?]
+10. **Given** una venta a cuenta corriente ya pagada, **When** se la anula (RF-23), **Then** [NEEDS CLARIFICATION: ¿se puede anular una venta a cuenta corriente que el cliente ya pagó? Si se puede, ¿qué pasa con el dinero que pagó?]
 
 ---
 
@@ -141,7 +141,7 @@ El Vendedor registra lo que el cliente va pagando, aunque no cubra una venta ent
 sistema lleva el saldo y la antigüedad de la deuda de cada cliente. El Administrador ve
 quién debe, cuánto y desde cuándo, y le manda al cliente el resumen de su cuenta.
 
-**Why this priority**: saber cuánto debe cada cliente grande y desde cuándo es plata del negocio que no se conoce con el cuaderno; viene después de poder vender y tachar.
+**Why this priority**: saber cuánto debe cada cliente grande y desde cuándo es dinero del negocio que no se conoce con el cuaderno; viene después de poder vender y tachar.
 
 **Independent Test**: con un cliente que debe dos ventas, registrar un pago menor al total, ver que el saldo baja por ese monto, ver la antigüedad de lo que sigue debiendo y generar el resumen para mandarle.
 
@@ -226,7 +226,7 @@ qué ese precio.
 - **Cliente**: solo los clientes importantes, unos 20; el cliente de barrio no se carga. Tiene nombre, teléfono opcional, condición (contado o cuenta corriente) y si está activo. No se borra: se desactiva. No es un usuario del sistema.
 - **Venta a cuenta corriente**: una venta cuyo medio de pago es cuenta corriente; siempre tiene cliente. Lleva la fecha en que se pagó, vacía mientras se debe.
 - **Deuda del cliente**: no se guarda; es la suma de sus ventas a cuenta corriente confirmadas y sin pagar.
-- **Pago de cuenta corriente** (RF-41): plata que el cliente entrega a cuenta de lo que debe, con fecha, monto y el usuario que lo registró.
+- **Pago de cuenta corriente** (RF-41): dinero que el cliente entrega a cuenta de lo que debe, con fecha, monto y el usuario que lo registró.
 - **Saldo del cliente** (RF-41): lo que debe el cliente una vez descontados sus pagos; se calcula y se explica.
 - **Resumen de cuenta** (RF-41): lo que se le manda al cliente para que sepa cuánto debe.
 - **Condición de precio del cliente** (RF-43): lo que hace que a ese cliente se le cobre un precio distinto al de mostrador.

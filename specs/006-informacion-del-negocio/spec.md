@@ -62,7 +62,7 @@ semana muestra ese importe con el proveedor en el detalle.
 El Administrador abre Negocio, desde el celular o la computadora y desde cualquier lado, y
 ve cuánto se vendió y cuánto se ganó en el día, en la semana y en el mes, comparado con el
 período anterior. En el mismo lugar ve lo demás que necesita para saber cómo va el negocio:
-la plata invertida en stock, el stock bajo, los pedidos de clientes sin entregar, las
+el dinero invertido en stock, el stock bajo, los pedidos de clientes sin entregar, las
 listas de precios sin aplicar, el gasto de la semana, lo más vendido y las novedades del día.
 
 **Why this priority**: es lo que el Administrador mira todos los días para administrar a
@@ -83,7 +83,7 @@ tocar la ganancia ve las ventas y los costos de los que sale.
 7. **Given** un período con $60.000 vendidos y el período anterior con $50.000, **When** el Administrador mira el tablero, **Then** junto a lo vendido ve lo del período anterior y la diferencia: $10.000 más, 20 % más. La ganancia, la cantidad de ventas y el ticket promedio se comparan igual.
 8. **Given** un período anterior sin ventas, **When** el Administrador mira la comparación, **Then** ve que en el período anterior no hubo ventas, sin un porcentaje.
 9. **Given** un día sin ventas confirmadas, **When** el Administrador abre Negocio, **Then** ve vendido $0, 0 ventas y un texto que dice que en el día todavía no se registraron ventas; el ticket promedio no muestra un número.
-10. **Given** un Administrador, **When** abre Negocio, **Then** además de ventas y ganancia tiene a la vista la plata invertida en stock (RF-53), los productos con stock bajo (RF-54), los pedidos de clientes sin entregar (RF-26), las listas de precios recibidas y sin aplicar (RF-01, RF-04), el gasto de la semana en compras (RF-65), lo más vendido y lo que no rota (RF-61) y las novedades del día (RF-63).
+10. **Given** un Administrador, **When** abre Negocio, **Then** además de ventas y ganancia tiene a la vista el dinero invertido en stock (RF-53), los productos con stock bajo (RF-54), los pedidos de clientes sin entregar (RF-26), las listas de precios recibidas y sin aplicar (RF-01, RF-04), el gasto de la semana en compras (RF-65), lo más vendido y lo que no rota (RF-61) y las novedades del día (RF-63).
 11. **Given** un Administrador en el celular con conexión de datos móviles, **When** abre Negocio, **Then** los números del día están a la vista en menos de 2 segundos.
 12. **Given** un Administrador en la computadora, **When** abre Negocio, **Then** tiene la misma información que en el celular.
 13. **Given** un usuario sin el rol Administrador, **When** entra a la app o le pide los números del tablero al servidor, **Then** no ve el tablero y el servidor rechaza el pedido.
@@ -98,7 +98,7 @@ le muestra la diferencia contra las ventas en efectivo registradas. Es un contro
 simple: lo registrado contra lo que hay en la caja. El resultado les llega a los
 Administradores con las novedades del día.
 
-**Why this priority**: es el control diario de la plata del mostrador y el dato que
+**Why this priority**: es el control diario del dinero del mostrador y el dato que
 alimenta las novedades del día.
 
 **Independent Test**: con ventas en efectivo del día por $50.000, el Vendedor tipea $48.000
@@ -152,7 +152,7 @@ Administrador recibe el resumen y, al abrir la app, ve las mismas novedades.
 ### User Story 5 - Saber qué se vende y qué no rota (Priority: P5)
 
 El Administrador ve qué productos son los que más se venden y cuáles tienen stock y no se
-venden desde hace 90 días, para decidir qué reponer y dónde hay plata parada.
+venden desde hace 90 días, para decidir qué reponer y dónde hay dinero parado.
 
 **Why this priority**: orienta las compras y los márgenes, pero necesita varias semanas de
 ventas y de stock cargados para decir algo útil.
@@ -237,7 +237,7 @@ que sale.
   - La comparación muestra, para cada número, el valor del período anterior y la diferencia
     en pesos y en porcentaje.
   - El tablero reúne además lo que el Administrador necesita para ver cómo va el negocio:
-    plata invertida en stock (RF-53), stock bajo (RF-54), pedidos de clientes sin entregar
+    dinero invertido en stock (RF-53), stock bajo (RF-54), pedidos de clientes sin entregar
     (RF-26), listas de precios sin aplicar (RF-01, RF-04), gasto de la semana (RF-65), lo
     más vendido y lo que no rota (RF-61) y las novedades del día (RF-63).
   - Se ve en el celular y en la computadora, desde cualquier lado, y en el celular carga en
@@ -259,7 +259,7 @@ que sale.
     se vendió de cada uno.
   - Lo que no rota: los productos sin ninguna venta confirmada en los últimos 90 días, con
     la fecha de su última venta y su stock.
-  - [NEEDS CLARIFICATION: ¿«lo más vendido» se ordena por unidades vendidas, por plata
+  - [NEEDS CLARIFICATION: ¿«lo más vendido» se ordena por unidades vendidas, por dinero
     vendida o por ganancia? ¿De qué período (el día, la semana, el mes, o el mismo que se
     elige en el tablero)? ¿Cuántos productos se muestran?]
   - [NEEDS CLARIFICATION: ¿«lo que no rota» incluye solo productos con stock, o también los
@@ -275,7 +275,7 @@ que sale.
     cuánto se contó.
   - El resultado del cierre forma parte de las novedades del día (RF-63).
   - [NEEDS CLARIFICATION: ¿la caja arranca el día con un fondo de cambio? ¿Y en el día entra
-    o sale efectivo que no es una venta: pagos a proveedores con plata de la caja, retiros
+    o sale efectivo que no es una venta: pagos a proveedores con dinero de la caja, retiros
     del Administrador, gastos chicos, cobros en efectivo de una cuenta corriente? Si pasa,
     ¿el Vendedor tiene que anotarlos para que la diferencia los tenga en cuenta?]
   - [NEEDS CLARIFICATION: antes de tipear lo contado, ¿el Vendedor puede ver cuánto efectivo
@@ -382,7 +382,7 @@ que sale.
   especifica la suma semanal que sale de ellas.
 - La lista de las ventas del día, con su detalle, su corrección y su anulación, es RF-23,
   de la capacidad de ventas; acá se especifican los totales y la ganancia.
-- La plata invertida en stock (RF-53), el stock bajo (RF-54), los pedidos de clientes
+- El dinero invertido en stock (RF-53), el stock bajo (RF-54), los pedidos de clientes
   (RF-26) y las listas de precios (RF-01, RF-04) se especifican en su capacidad; el tablero
   los muestra con las reglas de cada una.
 - Qué rol puede cada cosa lo fija RF-72: en esta primera versión todos los usuarios son
@@ -393,14 +393,14 @@ que sale.
   los proveedores y cuándo vence es RF-56.
 - La ganancia de esta capacidad es bruta: lo vendido menos el costo de lo vendido. El costo
   es el que rige para las ventas, con la regla de RF-11.
-- En esta etapa no hay devoluciones de plata (RF-24b) ni señas por pedidos (RF-26), así que
+- En esta etapa no hay devoluciones de dinero (RF-24b) ni señas por pedidos (RF-26), así que
   por esos motivos no entra ni sale efectivo de la caja.
 
 ## Clarifications
 
 ### Session 2026-10-08
 
-- Q: ¿Hay devoluciones de plata? → A: En esta versión no; solo cambios por otro producto
+- Q: ¿Hay devoluciones de dinero? → A: En esta versión no; solo cambios por otro producto
   (decisión 2, RF-24). Para el cierre de caja: no sale efectivo por devoluciones.
 - Q: ¿Se toma seña por los pedidos de clientes sin stock? → A: No, se le dice al cliente
   qué día va a estar y se lo espera (decisión 3, RF-26). Para el cierre de caja: no entra

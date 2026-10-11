@@ -132,3 +132,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     misma aplicación (no en un servicio de afuera), todos los usuarios ven todos, tienen dos
     estados (abierto y resuelto, con una nota opcional, y se pueden reabrir), y sin conexión
     se guardan en el dispositivo y se envían solos al volver (RF-80 y RF-81).
+31. **Inventario sin dinero** (2026-10-11): la pantalla «Stock» pasa a llamarse
+    «Inventario» y solo muestra cantidades. La va a manejar un comprador, que no tiene que
+    ver sumas de dinero: el total invertido y lo invertido por proveedor se ven en «Cómo va
+    el negocio». En toda la aplicación y la documentación se dice «dinero», no «plata».

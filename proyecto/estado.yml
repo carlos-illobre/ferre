@@ -443,12 +443,15 @@ RF-52:
     - "No está medido que un sector de 100 productos se cuente en menos de 30 minutos"
 
 RF-53:
-  estado: "Hecho en parte (#33): se aparta de la regla en 6 puntos"
+  estado: "Hecho en parte (#33): se aparta de la regla en 9 puntos"
   pruebas:
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
     - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
   defectos:
+    - "El servidor sigue entregando el valor del stock a quien pide el inventario: se oculta en la pantalla, y se cierra en el servidor cuando exista el rol Comprador (RF-72)"
+    - "En Inventario tampoco se muestra el costo de cada producto; no está dicho si el Comprador debe verlo ahí"
+    - "El cambio a Inventario sin dinero está hecho en la versión 5; las versiones 1, 2 y 4 siguen como antes"
     - "El motivo al corregir el stock a mano es opcional y la regla lo pide"
     - "No existe el valor del inventario por familia; el catálogo no tiene familias"
     - "El stock y su valorización no se pueden exportar a Excel"
@@ -498,7 +501,7 @@ RF-60:
     - "No hay ticket promedio"
     - "No hay comparación con el período anterior"
     - "En la computadora no hay ninguna vista de cómo va el negocio para el Administrador"
-    - "El tablero no reúne la plata invertida en stock, el stock bajo, los pedidos de clientes, las listas de precios sin aplicar, lo más vendido ni las novedades del día"
+    - "El tablero no reúne el dinero invertido en stock, el stock bajo, los pedidos de clientes, las listas de precios sin aplicar, lo más vendido ni las novedades del día"
     - "Lo vendido en el día no se puede tocar para ver la cuenta que lo explica; solo se ve la lista de ventas debajo"
     - "Que cargue en menos de 2 segundos en el celular no tiene prueba"
 

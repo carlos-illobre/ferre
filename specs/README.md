@@ -11,7 +11,7 @@ donde el código se aparta de la regla.
 ## De qué se trata
 
 Aumentar las ventas de una ferretería de barrio. El primer paso es saber qué se vende, qué
-hay en stock, cuánta plata hay invertida y cuánto se gana, reemplazando el cuaderno de
+hay en stock, cuánto dinero hay invertido y cuánto se gana, reemplazando el cuaderno de
 ventas y las listas de precios en Excel por un sistema que no le sume trabajo a quien
 atiende el mostrador.
 
@@ -82,7 +82,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
 | RF-22 | Vender un producto que no está en ninguna lista (ítem libre) y darlo de alta ahí mismo | [003-ventas](003-ventas/spec.md) |
 | RF-23 | Ver las ventas del día, corregirlas y anularlas. Cada venta muestra sus productos, uno por renglón | [003-ventas](003-ventas/spec.md) |
 | RF-24 | Cambio por otro producto: vuelve al stock lo devuelto, sale lo nuevo y se cobra la diferencia | [003-ventas](003-ventas/spec.md) |
-| RF-24b | Devoluciones con reintegro de plata o saldo a favor, a elección del cliente; plazo a definir | [003-ventas](003-ventas/spec.md) |
+| RF-24b | Devoluciones con reintegro de dinero o saldo a favor, a elección del cliente; plazo a definir | [003-ventas](003-ventas/spec.md) |
 | RF-25 | Anotar lo que un cliente pidió y no se vendió, con el motivo (no había, precio) | [003-ventas](003-ventas/spec.md) |
 | RF-26 | Pedidos de clientes sin stock: lista de lo que hay que conseguir, para quién y qué día se le prometió | [003-ventas](003-ventas/spec.md) |
 | RF-27 | Presupuestos: se arman como una venta, no tocan stock, se convierten en venta | [003-ventas](003-ventas/spec.md) |
@@ -108,7 +108,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
 | RF-50 | Registrar cada compra a proveedor con su costo real; suma stock. Con factura, con remito o sin comprobante. Las compras recientes se abren para ver sus renglones y se pueden anular | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-51 | Cargar la factura de compra con una foto, sin tipear los renglones | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-52 | El stock arranca en cero; lo que ya hay se carga de a poco, por sector. Un conteo interrumpido queda abierto y se retoma | [005-compras-y-stock](005-compras-y-stock/spec.md) |
-| RF-53 | Stock actual y cuánta plata hay invertida. El stock de cada producto muestra los movimientos que lo explican y se puede corregir a mano, con el motivo | [005-compras-y-stock](005-compras-y-stock/spec.md) |
+| RF-53 | Inventario: el stock actual de cada producto, sin sumas de dinero; el dinero invertido se ve en «Cómo va el negocio». El stock de cada producto muestra los movimientos que lo explican y se puede corregir a mano, con el motivo | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-54 | Aviso de stock bajo y sugerencia de qué pedir | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-55 | Armar el pedido a un proveedor | [005-compras-y-stock](005-compras-y-stock/spec.md) |
 | RF-56 | Lo que se les debe a los proveedores y cuándo vence: se paga por adelantado cuando hay descuento, y si no a 30 o 60 días | [005-compras-y-stock](005-compras-y-stock/spec.md) |

@@ -36,7 +36,7 @@ sistema visual del proyecto.
   elegido; «sin costo» para el que ningún proveedor cotizó; «es el mismo» y «son distintos»
   para los duplicados; «unir» y «separar»; «suelto» o por kilo, metro, litro; «aplicar» y
   «descartar» para una lista; «estantería» para el mueble donde va la mercadería. Se nombra el rol, nunca a la persona.
-- **Plata:** siempre con signo $, punto de miles y, donde hay centavos, coma. Los
+- **Dinero:** siempre con signo $, punto de miles y, donde hay centavos, coma. Los
   porcentajes, con el signo %.
 
 ## Buscar un producto (historia 1 · RF-07, RF-05)

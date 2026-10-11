@@ -9,7 +9,7 @@
 **Input**: Especificación completa de lo no funcional
 
 El sistema existe para aumentar las ventas de la ferretería. El primer paso es saber qué se
-vende, qué hay en stock, cuánta plata hay invertida y cuánto se gana, reemplazando el
+vende, qué hay en stock, cuánto dinero hay invertido y cuánto se gana, reemplazando el
 cuaderno de ventas y las listas de precios en Excel por un sistema que no le sume trabajo a
 quien atiende el mostrador. Las prioridades de corto plazo, en orden: facilidad de uso (que
 se use sin manual, en la notebook y en el celular), alta disponibilidad (que el mostrador

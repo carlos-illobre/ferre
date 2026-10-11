@@ -13,6 +13,7 @@
 ### Session 2026-10-08
 
 - Q: ¿Cómo se les paga a los proveedores? → A: Por adelantado cuando hay descuento; si no, a 30 o 60 días (RF-56).
+- Q: ¿Dónde se ve el dinero invertido en mercadería? → A: En «Cómo va el negocio», no en el inventario. El inventario (antes «Stock») lo maneja el Comprador y solo muestra cantidades; el Comprador no tiene que ver sumas de dinero. Se dice «dinero», no «plata» (2026-10-11).
 - Q: ¿Se necesita buscar un producto por foto en la primera versión? → A: No. Alcanza con escanear el código de barras y fotografiar facturas (RF-51). Encontrar un producto por su foto es de la segunda versión (RF-09b).
 - Q: ¿Qué se hace cuando un cliente pide algo que no hay? → A: No se toma seña: se le dice qué día va a estar y se lo espera (RF-26). Esos pedidos de clientes son parte de lo que hay que comprar (RF-54).
 - Q: ¿De qué tamaño es el catálogo? → A: Entre todos los proveedores puede superar los 100.000 artículos; se empieza con pocos proveedores y se suman de a poco (RF-05). Toda búsqueda de esta capacidad (ingreso, stock, conteo, pedido) tiene que seguir siendo instantánea con ese volumen (RNF-08).
@@ -90,14 +91,16 @@ sigue en la lista, marcada como anulada.
 
 ---
 
-### User Story 3 - Ver el stock y la plata invertida, y corregirlo a mano (Priority: P1)
+### User Story 3 - Ver el stock y el dinero invertido, y corregirlo a mano (Priority: P1)
 
-El Administrador o el Comprador abre el stock y ve cuánta plata hay invertida en mercadería.
-Busca un producto, ve cuántos hay y cuánto valen, toca el número para ver los movimientos
+El Comprador abre el inventario, que muestra cantidades y ninguna suma de dinero. Busca un
+producto, ve cuántos hay, toca el número para ver los movimientos
 que lo explican y, si en la estantería hay otra cantidad, lo corrige diciendo cuántas hay y
-por qué. El Vendedor ve el stock de cada producto al buscarlo para vender.
+por qué. El Vendedor ve el stock de cada producto al buscarlo para vender. Cuánto dinero
+hay invertido en mercadería lo ve el Administrador en «Cómo va el negocio», no en el
+inventario: quien compra no tiene que tener ese dato.
 
-**Why this priority**: Saber qué hay y cuánta plata hay invertida es el primer objetivo del
+**Why this priority**: Saber qué hay y cuánto dinero hay invertido es el primer objetivo del
 sistema.
 
 **Independent Test**: Con un candado a costo $2.500, una compra de 20 y una venta de 3,
@@ -256,7 +259,7 @@ registra cómo se paga: por adelantado cuando el proveedor da descuento, o a 30 
 pagar, la compra se marca como pagada y deja de figurar en la deuda.
 
 **Why this priority**: Saber qué vence evita atrasarse con un proveedor y es parte de saber
-cuánta plata hay comprometida. Depende de que las compras estén cargadas.
+cuánto dinero hay comprometido. Depende de que las compras estén cargadas.
 
 **Independent Test**: Registrar una compra a 30 días y otra pagada por adelantado, comprobar
 que solo la primera figura en la deuda con su vencimiento, marcarla pagada y comprobar que
@@ -363,7 +366,7 @@ ver qué toca contar en el día según la fecha del último conteo de cada uno.
 - **RF-50**: El sistema registra cada compra a proveedor con su costo real y suma stock por cada renglón. El comprobante es factura, remito o «sin comprobante» (hay proveedores que no facturan); lleva número, salvo «sin comprobante», y fecha. Los renglones se cargan buscando el producto o escaneando su código, con el costo de la lista de ese proveedor ya puesto y la diferencia contra la lista a la vista. Si el costo del comprobante difiere del vigente, pasa a ser el costo vigente de ese producto para ese proveedor, con la explicación «según <comprobante y número> de <proveedor> del <fecha>». Un producto que no estaba en ninguna lista nace en la compra, como producto de ese proveedor. La foto del comprobante se puede guardar con la compra. Las cantidades siguen RF-12 y los costos van sin IVA. Registrar dos veces el mismo ingreso no lo duplica. Las compras recientes se abren para ver sus renglones y se pueden anular: la compra queda marcada «anulada», no se borra, y el stock vuelve con un ajuste por renglón. Los gastos de la semana se muestran en total y por proveedor (RF-65). Cada registro y cada anulación quedan con el usuario que los hizo. El ingreso se puede precargar desde un pedido (RF-55) o desde la foto de la factura (RF-51).
 - **RF-51**: El sistema carga la factura de compra desde una foto, sin tipear los renglones: lee el proveedor, el tipo y el número de comprobante, la fecha y cada renglón (producto, cantidad, costo), une cada renglón con el producto del catálogo por el código del proveedor o por la descripción, y deja el ingreso precargado para revisar. Lo que no se reconoce queda marcado para corregir a mano. Nada se guarda hasta que el Comprador registra el ingreso. Si la foto no se lee, se avisa y queda la carga a mano. La foto se guarda con la compra.
 - **RF-52**: El stock arranca en cero: es la suma de los movimientos de cada producto. Lo que ya hay se carga de a poco, por sector, desde el celular o la computadora: se crea el sector, se busca o escanea cada producto y se pone cuántos hay. La lista de sectores muestra cuántos productos tiene cada uno, la fecha de su último conteo o que nunca se contó, y si tiene un conteo sin cerrar. Un conteo interrumpido queda abierto (uno por sector) y se retoma con lo ya contado. Un producto contado en un sector pasa a ser de ese sector. Al cerrar, cada diferencia contra el stock del sistema es un ajuste con su nota («conteo de <sector> del <fecha>: había N, hay M»), y los productos del sector que no se contaron se ponen en cero o se dejan como están, a elección de quien cierra. Contar funciona sin internet y pensado para el celular con una mano. Queda anotado quién abrió y cerró cada conteo y quién contó cada producto.
-- **RF-53**: El sistema muestra el stock actual de cada producto y cuánta plata hay invertida (stock × costo vigente, sin IVA): en total, por proveedor y por familia. El stock de cada producto muestra los movimientos que lo explican (compras, ventas, ajustes y conteos), y el stock es siempre la suma de todos ellos. Se puede corregir a mano diciendo cuántas hay, con el motivo, que es obligatorio y queda en la nota del ajuste («había N, hay M: motivo») junto con el usuario. El stock se ve al buscar un producto y al venderlo; vender más de lo que hay avisa y no bloquea. El stock y su valorización se exportan a Excel.
+- **RF-53**: El sistema muestra el stock actual de cada producto en la pantalla «Inventario», que es de quien compra y no muestra ninguna suma de dinero: ni el total invertido, ni lo invertido por proveedor, ni cuánto vale el stock de un producto. Cuánto dinero hay invertido (stock × costo vigente, sin IVA), en total, por proveedor y por familia, se muestra en «Cómo va el negocio» (capacidad 006), que es del Administrador. Siempre se dice «dinero», no «plata». El stock de cada producto muestra los movimientos que lo explican (compras, ventas, ajustes y conteos), y el stock es siempre la suma de todos ellos. Se puede corregir a mano diciendo cuántas hay, con el motivo, que es obligatorio y queda en la nota del ajuste («había N, hay M: motivo») junto con el usuario. El stock se ve al buscar un producto y al venderlo; vender más de lo que hay avisa y no bloquea. El stock y su valorización se exportan a Excel.
 - **RF-54**: El sistema avisa qué productos tienen stock bajo y sugiere qué pedir. Cada producto tiene un stock mínimo, que el sistema sugiere según las ventas de los últimos 90 días y que se puede cambiar a mano. La lista «qué pedir» reúne los productos por debajo de su mínimo y los pedidos de clientes sin stock (RF-26), agrupados por proveedor, eligiendo para cada producto el proveedor más barato entre los que lo venden (RF-06), con la cantidad sugerida y el costo estimado. Cada número sugerido explica de dónde sale. [NEEDS CLARIFICATION: ¿cómo se calculan el stock mínimo y la cantidad a pedir a partir de las ventas de los últimos 90 días? Por ejemplo: mínimo = lo que se vende en cuántos días; cantidad a pedir = lo necesario para cubrir cuántos días. ¿Cambia según el proveedor (lo que tarda en entregar, si vende por caja cerrada)?]
 - **RF-55**: El sistema arma el pedido a un proveedor: se genera desde la sugerencia (RF-54) o desde cero, se edita, y se manda por WhatsApp o por correo, como texto o como PDF. El pedido tiene estado: enviado, recibido parcial, recibido. El ingreso de mercadería (RF-50) se precarga desde el pedido, y al registrarlo el pedido pasa a recibido o a recibido parcial según lo que llegó. El Administrador puede aprobar pedidos desde el celular.
 - **RF-56**: El sistema muestra lo que se les debe a los proveedores y cuándo vence. Cada compra registra cómo se paga: por adelantado cuando hay descuento, y si no a 30 o 60 días. La deuda se ve en total, por proveedor y por compra, ordenada por vencimiento, con lo vencido distinguido. Una compra se marca como pagada y deja de figurar; una compra anulada tampoco figura.

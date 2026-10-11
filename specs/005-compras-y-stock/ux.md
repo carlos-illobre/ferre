@@ -70,7 +70,7 @@ enteras para lo que se vende por unidad y con un decimal para lo que se vende a 
 | ¿cuántas hay? | cantidad real, stock físico |
 | había N, hay M | stock teórico, diferencia de inventario |
 | nunca contado | sin inventariar |
-| plata invertida, valor del inventario | valorización, capital inmovilizado |
+| dinero invertido, valor del inventario | valorización, capital inmovilizado |
 | qué pedir | reposición, reabastecimiento |
 | lo que se les debe a los proveedores | cuentas a pagar, pasivo |
 | anular, anulada | eliminar, borrar, cancelar (para una compra) |
@@ -150,7 +150,7 @@ ver sus renglones y la foto del comprobante si la tiene; anularla.
 cargando; sin conexión (se muestra lo último que se bajó, diciendo de cuándo es, y anular
 avisa que necesita conexión); error al anular, en la compra misma.
 
-## Historia 3: stock y plata invertida, y corregir (Administrador, Comprador; el Vendedor lo ve al vender)
+## Historia 3: stock y dinero invertido, y corregir (Administrador, Comprador; el Vendedor lo ve al vender)
 
 **Tiene que poder:** ver el valor del inventario; ver su desglose; buscar un producto; ver
 su stock y su valor; ver los movimientos que explican el stock; corregir el stock diciendo
