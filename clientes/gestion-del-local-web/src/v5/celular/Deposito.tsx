@@ -6,6 +6,7 @@ import { fecha, pesos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
 import { cantidadValida, enteras, unidadDe } from "../../unidades";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast } from "../../componentes/base";
+import { Pestanas } from "./Pestanas";
 import { Escaner, hayCamara } from "../../componentes/Escaner";
 import { pesosCortos } from "../../pantallas/VentasDeHoy";
 import type { Producto } from "../../pantallas/Productos";
@@ -24,7 +25,7 @@ export function Deposito({ sub }: { sub: string | null }) {
     <main className="contenido">
       <div className="encabezado">
         <h1 className="titulo">Depósito</h1>
-        <Segmentos opciones={SUB.map((s) => ({ valor: s.valor, nombre: s.nombre }))} actual={actual} alElegir={(v) => irA(v === "ingreso" ? "deposito" : `deposito/${v}`)} />
+        <Pestanas opciones={SUB.map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor }))} actual={actual} alElegir={(v) => irA(v === "ingreso" ? "deposito" : `deposito/${v}`)} />
       </div>
       {actual === "stock" ? <Stock /> : actual === "ingreso" ? <Ingreso /> : <Contar />}
     </main>

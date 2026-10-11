@@ -34,12 +34,12 @@ export function App() {
 
 // El mismo menú que en el celular, en el mismo orden (primero lo que más se hace), y cada
 // parte con sus pestañas adentro. «Más» es una pantalla con lo que se usa poco.
-type Pestana = { ruta: string; nombre: string };
+type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono };
 const MENU: { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] }[] = [
-  { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", nombre: "Productos" }, { ruta: "listas", nombre: "Listas" }, { ruta: "duplicados", nombre: "Duplicados" }] },
-  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", nombre: "Vender" }] },
-  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", nombre: "Ingreso" }, { ruta: "stock", nombre: "Stock" }, { ruta: "contar", nombre: "Contar" }] },
-  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre })) },
+  { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas" }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados" }] },
+  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender" }] },
+  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "compras", icono: "compras", nombre: "Ingreso" }, { ruta: "stock", icono: "stock", nombre: "Stock" }, { ruta: "contar", icono: "contar", nombre: "Contar" }] },
+  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre, icono: d.icono })) },
 ];
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
 const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
@@ -110,7 +110,7 @@ function Pantallas() {
           <nav className="pestanas" aria-label={NOMBRES.get(actual)}>
             {pestanas.map((p) => (
               <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(p.ruta)}`} onClick={() => irA(p.ruta)} data-testid={`pestana-${p.ruta}`}>
-                {p.nombre}<span className="tecla" aria-hidden="true">Alt {atajoDe(p.ruta)}</span>
+                <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}<span className="tecla" aria-hidden="true">Alt {atajoDe(p.ruta)}</span>
               </button>
             ))}
           </nav>

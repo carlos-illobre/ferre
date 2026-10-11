@@ -6,7 +6,8 @@ import { ProveedorDeSesion, administra, useSesion } from "../../sesion";
 import { irA, useRuta } from "../../rutas";
 import { Login } from "../../pantallas/Login";
 import { VincularCelular } from "../../pantallas/VincularCelular";
-import { Catalogo } from "../../pantallas/Catalogo";
+import { Catalogo } from "./Catalogo";
+import { Icono as IconoDeMas, type NombreDeIcono } from "../../v2/ui";
 import { Deposito } from "./Deposito";
 import { Negocio, type Parte } from "./Negocio";
 import { Vender } from "./Vender";
@@ -31,10 +32,10 @@ const PESTANAS = [
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ] as const;
-const DE_MAS: { parte: Parte; nombre: string; detalle: string }[] = [
-  { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana" },
-  { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos" },
-  { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó" },
+const DE_MAS: { parte: Parte; nombre: string; detalle: string; icono: NombreDeIcono }[] = [
+  { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen" },
+  { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
+  { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad" },
 ];
 const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
@@ -67,7 +68,8 @@ function Pantallas() {
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
           <div className="lista">
             {DE_MAS.map((d) => (
-              <button key={d.parte} type="button" className="fila" onClick={() => irA(`mas/${d.parte}`)}>
+              <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte}`)}>
+                <span className="miniatura mas-icono"><IconoDeMas nombre={d.icono} tam={22} /></span>
                 <span className="nombre">{d.nombre}</span>
                 <Icono nombre="derecha" tam={18} grosor={2.4} />
                 <span className="detalle">{d.detalle}</span>

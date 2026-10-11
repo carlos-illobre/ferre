@@ -80,7 +80,10 @@
 .productos-tabla td:last-child, .productos-tabla th:last-child { padding-right: 14px; }
 .productos-tabla td:nth-child(2) { min-width: 150px; }
 .productos-tabla .margenes.compacto button { min-width: 40px; }
-.productos-otro { width: 70px; }
+.productos-otro { width: 88px; padding-right: 6px; }
+.productos-otro input { padding: 0 2px 0 4px; }
+.productos-tabla td:nth-child(4) { white-space: nowrap; }
+.productos-proveedor .boton { padding: 0 6px; }
 
 /* La marca: la F que es un tornillo, en lugar de la tuerca de la versión 2. */
 .marca svg { display: none; }
