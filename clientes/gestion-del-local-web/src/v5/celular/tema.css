@@ -162,3 +162,10 @@ body, .hoja { background: #e6ece6; }
 /* La búsqueda no empuja al botón de escanear fuera de la pantalla cuando aparece la «×». */
 .buscador .caja { min-width: 0; }
 .buscador .caja input { min-width: 0; }
+
+/* Vender sin colores propios: los atajos y los productos de la venta son tarjetas blancas con
+   el borde de siempre, como en las demás pantallas. Se distinguen por su título de sección. */
+.atajo { background: #fff; border: 1px solid #c3cfc6; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
+.atajo:active { background: #eef3ee; }
+.atajo-foto { background: repeating-linear-gradient(135deg, #dfe7e0 0 5px, #eef3ee 5px 10px); color: #4a5451; }
+.item { border: 1px solid #c3cfc6; }

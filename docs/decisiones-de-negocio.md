@@ -149,9 +149,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     sacaron del ingreso de mercadería, donde alcanza con las compras recientes.
 35. **Vender en el celular: atajos y venta bien separados** (2026-10-11): lo último que se
     vendió son atajos de búsqueda, así que va pegado debajo de la búsqueda como cuatro
-    cuadrados con la foto y un nombre corto, sin precio, en amarillo. Lo que ya está en la
-    venta va aparte, bajo un título verde «En esta venta» y con una franja naranja, para
-    que no se confunda con los atajos. En la computadora siguen siendo cuatro tarjetas.
+    cuadrados con la foto y un nombre corto, sin precio. Lo que ya está en la venta va
+    aparte, bajo el título «En esta venta». Las dos partes usan las mismas tarjetas blancas
+    y los mismos títulos de sección que el resto de la app (se probó con amarillo y una
+    franja naranja, y desentonaba). En la computadora siguen siendo cuatro tarjetas.
 36. **Colores del celular** (2026-10-11): las pantallas del celular eran blanco sobre gris
     muy claro y no se distinguían los botones ni las secciones. Ahora el fondo es un verde
     grisáceo más marcado; todo lo que se toca lleva borde o color; y cada color dice una
