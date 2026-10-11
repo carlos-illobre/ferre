@@ -19,9 +19,17 @@ MARCOS = {
     "escuadra": ('<path d="M18 11H86L18 92Z" transform="translate(5.500 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(10.500 7.500) scale(0.7)"),
     # El marco que pidió Carlos: sigue el contorno de la F a la misma distancia en los tres lados.
     # Arriba es horizontal, a la izquierda va paralelo al tronco y la diagonal pasa por la punta del
-    # brazo y la punta del tornillo. Se dibuja en las mismas coordenadas que la F y el borde grueso,
-    # de puntas redondas, es el que da la distancia pareja (la mitad de su grosor).
-    "envolvente": ('<path d="M22 16H81.300L22 114.200Z" transform="translate(11.400 1.300) scale(0.75) translate(6 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="26" stroke-linejoin="round"/>', "translate(11.400 1.300) scale(0.75)"),
+    # brazo y la punta del tornillo, todo a 13 de distancia de la F (en sus coordenadas). La esquina
+    # de abajo se redondea con más radio (20) para que debajo de la punta quede el mismo aire.
+    "envolvente": ('<path d="M22 3H81.300A13 13 0 0 1 92.400 22.700L46.200 99.400A20 20 0 0 1 9 89V16A13 13 0 0 1 22 3Z" transform="translate(5.600 1.900) scale(0.86) translate(6 0) skewX(-6)" fill="{f}"/>', "translate(5.600 1.900) scale(0.86)"),
+    # Triángulo rectángulo, como una escuadra: el ángulo recto arriba a la izquierda, donde arranca la F.
+    # El cateto de arriba es más corto que el vertical, en la proporción de la F (más alta que ancha),
+    # y todo el marco está inclinado igual que la F.
+    "escuadra": ('<path d="M18 11H86L18 92Z" transform="translate(5.500 0) skewX(-6)" fill="{f}" stroke="{f}" stroke-width="12" stroke-linejoin="round"/>', "translate(10.500 7.500) scale(0.7)"),
+    # El marco que pidió Carlos: sigue el contorno de la F a la misma distancia en los tres lados.
+    # Arriba es horizontal, a la izquierda va paralelo al tronco y la diagonal pasa por la punta del
+    # brazo y la punta del tornillo, todo a 13 de distancia de la F (en sus coordenadas). La esquina
+    # de abajo se redondea con más radio (20) para que debajo de la punta quede el mismo aire.
     "hexagono": ('<path d="M50 6 88.100 28V72L50 94 11.900 72V28Z" fill="{f}" stroke="{f}" stroke-width="8" stroke-linejoin="round"/>', "translate(13.500 13) scale(0.68)"),
 }
 MARCO = "envolvente"
