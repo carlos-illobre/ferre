@@ -400,7 +400,7 @@ RF-43:
     - "No hay nada propio de clientes para el precio distinto: se resuelve poniendo el precio a mano en el renglón de la venta, sin que quede ligado al cliente ni se explique por su condición"
 
 RF-50:
-  estado: "Hecho en parte (#30): se aparta de la regla en 13 puntos"
+  estado: "Hecho en parte (#30): se aparta de la regla en 14 puntos"
   pruebas:
     - microservices/gestion-del-local/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
@@ -408,6 +408,7 @@ RF-50:
     - clientes/gestion-del-local-web/src/escritorio/pantallas/Compras.test.tsx
     - clientes/gestion-del-local-web/src/pantallas/Deposito.test.tsx
   defectos:
+    - "Los pedidos de foto (el código QR) viven en la memoria del servidor: si el servidor se reinicia mientras se espera una foto, hay que pedir el código de nuevo"
     - "La foto del comprobante está en la versión 5; las versiones 1, 2 y 4 siguen pidiendo el número"
     - "La foto no es obligatoria: una factura o un remito se puede registrar sin foto y figura «sin foto»"
     - "Sin conexión la foto no se puede subir (el ingreso tampoco se registra sin conexión)"

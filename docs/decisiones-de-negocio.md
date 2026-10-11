@@ -175,3 +175,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     (o Enter) abre lo elegido y vuelve a la pantalla, donde arriba y abajo siguen eligiendo
     sus renglones. Mientras se escribe, la izquierda mueve el cursor y solo salta al menú
     con la caja vacía o con el cursor al principio.
+41. **La foto de la factura llega a la computadora con un código QR** (2026-10-11): corrige
+    la 32. En el ingreso de la computadora, «Sacar la foto con el celular» muestra un código
+    QR; el celular lo escanea, se abre la cámara, saca la foto y la foto aparece sola en la
+    computadora. Es el mismo mecanismo que se usa para vincular el celular.

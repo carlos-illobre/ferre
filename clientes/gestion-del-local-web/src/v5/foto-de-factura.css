@@ -27,3 +27,19 @@ dialog.ff-grande .ff-botones { justify-content: flex-end; }
 /* En la computadora la foto ocupa su propio renglón del encabezado del ingreso. */
 .compras-foto { grid-column: 1 / -1; flex-basis: 100%; order: 9; }
 @media (min-width: 900px) { .ff.vacia .ff-texto { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; } }
+
+/* El pedido de foto en la computadora: el código QR y los pasos. */
+.ff-pedido { display: flex; align-items: center; gap: 18px; width: 100%; }
+.ff-pedido img { flex: none; border-radius: 10px; border: 1px solid #dfe5e1; background: #fff; }
+.ff-pedido .ff-texto { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+.ff-pedido ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; color: #33403b; }
+
+/* La pantalla del celular que saca la foto para la computadora. */
+.ff-celular { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 56px 24px 32px; background: #e6ece6; color: #18201e; font-size: 18px; line-height: 1.45; box-sizing: border-box; }
+.ff-celular h1 { margin: 0; font-size: 30px; line-height: 1.1; color: #17312b; }
+.ff-celular p { margin: 0; }
+.ff-grande-boton { width: 100%; min-height: 60px; font-size: 19px; text-decoration: none; }
+.ff-celular .ff-error { color: #c2370b; font-weight: 700; }
+.ff-listo { padding: 14px 16px; border-radius: 12px; background: #e3f3ea; color: #0f6b52; font-weight: 700; }
+.ff-pedido ol { list-style: decimal; }
+.ff-pedido ol li { list-style: decimal; }

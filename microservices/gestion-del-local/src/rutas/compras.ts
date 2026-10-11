@@ -43,11 +43,41 @@ function fechaLegible(iso: string): string {
   return `${d}/${m}/${a}`;
 }
 
+// Pedido de foto: la computadora no tiene cámara, así que pide la foto y muestra un código
+// QR; el celular lo lee, saca la foto y la sube con ese código, y la computadora la recibe.
+// Un solo proceso (ADR-001): los pedidos viven en memoria y duran diez minutos.
+const MINUTOS_DE_PEDIDO = 10;
+type PedidoDeFoto = { vence: number; foto: string | null };
+const pedidosDeFoto = new Map<string, PedidoDeFoto>();
+function pedidoVigente(codigo: string | undefined): PedidoDeFoto | null {
+  const ahora = Date.now();
+  for (const [c, p] of pedidosDeFoto) if (p.vence < ahora) pedidosDeFoto.delete(c);
+  return (codigo && pedidosDeFoto.get(codigo)) || null;
+}
+
+compras.post("/fotos/pedidos", (c) => {
+  pedidoVigente(undefined);
+  const codigo = randomUUID();
+  pedidosDeFoto.set(codigo, { vence: Date.now() + MINUTOS_DE_PEDIDO * 60_000, foto: null });
+  return c.json({ codigo, expiraEnSegundos: MINUTOS_DE_PEDIDO * 60 }, 201);
+});
+
+// La computadora pregunta si ya llegó la foto; el celular, si el código sigue valiendo.
+compras.get("/fotos/pedidos/:codigo", (c) => {
+  const pedido = pedidoVigente(c.req.param("codigo"));
+  if (!pedido) return c.json({ error: "El código venció. Pedí otro en la computadora." }, 404);
+  return c.json({ foto: pedido.foto });
+});
+
 // La foto del comprobante se sube sola, antes de registrar la compra. Queda suelta, a nombre
-// de quien la subió, hasta que una compra la toma.
+// de quien la subió, hasta que una compra la toma. Si viene con el código de un pedido, es
+// la que la computadora está esperando.
 compras.post("/fotos", async (c) => {
   const cuerpo = await c.req.parseBody();
   const f = cuerpo.foto;
+  const codigo = typeof cuerpo.pedido === "string" && cuerpo.pedido ? cuerpo.pedido : null;
+  const pedido = codigo ? pedidoVigente(codigo) : null;
+  if (codigo && !pedido) return c.json({ error: "El código venció. Pedí otro en la computadora." }, 404);
   if (!(f instanceof File)) return c.json({ error: "Falta la foto" }, 400);
   if (!TIPOS_DE_FOTO[f.type]) return c.json({ error: "La foto tiene que ser jpeg, png o webp" }, 400);
   if (f.size > MAXIMO_DE_FOTO) return c.json({ error: "La foto pesa más de 10 MB" }, 400);
@@ -55,19 +85,8 @@ compras.post("/fotos", async (c) => {
   await mkdir(carpetaComprobantes(), { recursive: true });
   await writeFile(path.join(carpetaComprobantes(), archivo), Buffer.from(await f.arrayBuffer()));
   await pool.query("INSERT INTO foto_comprobante (archivo, usuario_id) VALUES ($1, $2)", [archivo, c.get("sesion").usuario.id]);
+  if (pedido) pedido.foto = archivo;
   return c.json({ foto: archivo }, 201);
-});
-
-// La computadora espera la foto que el mismo usuario saca con su celular: la última foto
-// suelta que subió después del momento que se pide.
-compras.get("/fotos/sueltas", async (c) => {
-  const desde = new Date(c.req.query("desde") ?? "");
-  if (Number.isNaN(desde.getTime())) return c.json({ error: "Falta desde cuándo" }, 400);
-  const { rows } = await pool.query<{ archivo: string }>(
-    "SELECT archivo FROM foto_comprobante WHERE usuario_id = $1 AND compra_id IS NULL AND creado_en > $2 ORDER BY creado_en DESC LIMIT 1",
-    [c.get("sesion").usuario.id, desde.toISOString()],
-  );
-  return c.json({ foto: rows[0]?.archivo ?? null });
 });
 
 // Con sesión: un comprobante muestra a quién se le compra y a cuánto.

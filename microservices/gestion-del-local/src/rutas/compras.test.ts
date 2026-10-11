@@ -41,12 +41,24 @@ describe("foto del comprobante de una compra", () => {
     expect(escritos).toHaveLength(0);
   });
 
-  it("la computadora recibe la foto suelta que el mismo usuario subió después de pedirla", async () => {
-    base.actual.programar(/FROM foto_comprobante WHERE usuario_id/, { rows: [{ archivo: FOTO }] });
-    const r = await pedir(app, "GET", "/compras/fotos/sueltas?desde=2026-10-11T12:00:00.000Z", { rol: "admin" });
-    expect(await r.json()).toEqual({ foto: FOTO });
-    expect(base.actual.sqlDe(/FROM foto_comprobante WHERE usuario_id/)[0]!.params).toEqual(["u-admin", "2026-10-11T12:00:00.000Z"]);
-    expect((await pedir(app, "GET", "/compras/fotos/sueltas")).status).toBe(400);
+  it("la computadora pide la foto, el celular la sube con el código y la computadora la recibe", async () => {
+    const pedido = await pedir(app, "POST", "/compras/fotos/pedidos", { rol: "admin" });
+    expect(pedido.status).toBe(201);
+    const { codigo } = (await pedido.json()) as { codigo: string };
+    expect(await (await pedir(app, "GET", `/compras/fotos/pedidos/${codigo}`, { rol: "admin" })).json()).toEqual({ foto: null });
+    const f = conFoto(); f.append("pedido", codigo);
+    const subida = await pedir(app, "POST", "/compras/fotos", { rol: "mostrador", formulario: f });
+    expect(subida.status).toBe(201);
+    const { foto } = (await subida.json()) as { foto: string };
+    expect(await (await pedir(app, "GET", `/compras/fotos/pedidos/${codigo}`, { rol: "admin" })).json()).toEqual({ foto });
+  });
+
+  it("un código que no existe o venció no sirve, y sin sesión tampoco", async () => {
+    expect((await pedir(app, "GET", "/compras/fotos/pedidos/no-existe")).status).toBe(404);
+    const f = conFoto(); f.append("pedido", "no-existe");
+    expect((await pedir(app, "POST", "/compras/fotos", { formulario: f })).status).toBe(404);
+    expect(escritos).toHaveLength(0);
+    expect((await pedir(app, "POST", "/compras/fotos/pedidos", { rol: null })).status).toBe(401);
   });
 
   it("la foto se entrega con sesión; una que no existe o con nombre raro, 404", async () => {

@@ -1,4 +1,5 @@
 import { useEffect, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { irA, useRuta } from "../../v2/rutas";
@@ -120,6 +121,9 @@ function Pantallas() {
   if (sesion.estado === "cargando") return <main className="entrar-cargando" aria-busy="true"><Marca tam={44} /><p>Abriendo Ferrebress…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
   if (sesion.estado === "sin-sesion") return <Entrar />;
+  // El celular llega acá al leer el código QR del ingreso: con la sesión ya iniciada, saca la foto de la
+  // factura para la computadora.
+  if (ruta.nombre === "foto-factura" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;
 
   const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === actual))?.clave ?? (actual === "ventas" ? "vender" : "mas");
   const pestanas = parte === "catalogo" || parte === "deposito" ? MENU.find((m) => m.clave === parte)!.pestanas : null;

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "../../componentes/OfrecerHuella";
 import { Icono } from "../../componentes/base";
@@ -52,6 +53,9 @@ function Pantallas() {
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
   if (sesion.estado === "sin-sesion") return <Login />;
+  // El celular llega acá al leer el código QR del ingreso: con la sesión ya iniciada, saca la foto de la
+  // factura para la computadora.
+  if (ruta.nombre === "foto-factura" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;
 
   const usuario = sesion.usuario;
   // Sin dirección, la app abre en lo primero del menú. Las direcciones viejas de Negocio siguen andando.
