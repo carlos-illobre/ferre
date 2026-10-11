@@ -85,7 +85,6 @@ function Pantallas() {
       <aside className="lateral">
         <div className="lateral-marca">
           <Marca />
-          {prueba && <span className="prueba" data-testid="ambiente">Ambiente de prueba</span>}
         </div>
         <nav aria-label="Menú">
           {MENU.map((m) => {

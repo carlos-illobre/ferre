@@ -141,3 +141,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     foto. En la computadora un botón deja que la foto la saque el celular del mismo usuario
     y aparezca sola. Que el sistema lea la foto y precargue el ingreso (RF-51) queda para
     más adelante, hasta decidir con qué se lee sin romper el costo de $0.
+33. **El ambiente de prueba no se puede confundir con producción** (2026-10-11): toda la
+    pantalla lleva un marco magenta que aparece y desaparece y un cartel fijo arriba que
+    dice «Ambiente de prueba · nada de esto es real», también en la pantalla de entrada.
+    Es para que nadie registre una venta real en pruebas. Producción no lleva nada de eso.

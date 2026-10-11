@@ -62,7 +62,6 @@ function Pantallas() {
 
   return (
     <div className="app">
-      {esAmbienteDePrueba() && <span className="pill-prueba solo-celular" data-testid="ambiente">Ambiente de prueba</span>}
 
       {pestana === "mas" && parte === "tickets" ? <Tickets />
         : pestana === "mas" && parte && parte !== "tickets" ? <Negocio parte={parte} />

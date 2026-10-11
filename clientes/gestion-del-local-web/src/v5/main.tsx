@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
+import { esAmbienteDePrueba } from "../ambiente";
+import { MarcoDePrueba } from "./MarcoDePrueba";
 
 // Ferrebress v5 junta lo que mejor funcionó de cada versión: en el celular, las pantallas de
 // la versión 1 (una cosa por vez, tarjetas, hojas); en la computadora, las de la versión 2
@@ -23,6 +25,7 @@ void cargarInterfaz().then((App) => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <App />
+      {esAmbienteDePrueba() && <MarcoDePrueba />}
     </StrictMode>,
   );
 });

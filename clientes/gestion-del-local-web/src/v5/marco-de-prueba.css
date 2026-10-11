@@ -1,0 +1,8 @@
+/* Marco del ambiente de prueba. El magenta no se usa en ningún otro lugar de la app. */
+.marco-de-prueba { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; }
+.marco-de-prueba-borde { position: absolute; inset: 0; border: 7px solid #d6007a; box-shadow: inset 0 0 22px rgb(214 0 122 / 0.55); animation: marco-de-prueba 2.4s ease-in-out infinite; }
+.marco-de-prueba-cartel { position: absolute; top: 0; left: 50%; transform: translateX(-50%); padding: calc(4px + env(safe-area-inset-top)) 16px 5px; border-radius: 0 0 12px 12px; background: #d6007a; color: #fff; font-size: 0.875rem; font-weight: 750; line-height: 1.2; white-space: nowrap; box-shadow: 0 2px 8px rgb(0 0 0 / 0.25); }
+@keyframes marco-de-prueba { 0%, 100% { opacity: 1; } 50% { opacity: 0.12; } }
+/* Sin animaciones, el marco queda fijo. */
+@media (prefers-reduced-motion: reduce) { .marco-de-prueba-borde { animation: none; } }
+@media (max-width: 899px) { .marco-de-prueba-borde { border-width: 5px; } .marco-de-prueba-cartel span { display: none; } }
