@@ -115,3 +115,9 @@
 
 /* Ingreso: las compras recientes ocupan todo el ancho (los gastos de la semana están en Cómo va el negocio). */
 .compras-historia.sola { display: block; }
+/* Todas las tarjetas de sugeridos miden lo mismo, tengan el nombre que tengan. */
+.sugeridos-grilla { grid-auto-rows: 1fr; }
+.sugeridos-grilla li { display: flex; }
+.sugeridos-tarjeta { height: 100%; min-height: 116px; }
+.sugeridos-tarjeta .nombre { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.sugeridos-tarjeta .detalle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
