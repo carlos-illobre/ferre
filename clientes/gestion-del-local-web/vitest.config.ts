@@ -10,11 +10,10 @@ export default defineConfig({
     setupFiles: ["src/pruebas/preparar.ts"],
     env: { VITE_API_URL: "http://api.prueba" },
     include: ["src/**/*.test.{ts,tsx}"],
-    // EN PAUSA (decisión 25, 2026-10-11): las pruebas de las pantallas no corren hasta que
-    // Carlos elija cuál de las versiones de la interfaz (v1, v2 o v4) queda como definitiva.
-    // Los archivos siguen en su lugar. Para reactivarlas, dejá acá solo las carpetas de las
-    // versiones que se descarten (o borrá esta lista si quedan todas). Las pruebas de lo que
-    // no es pantalla (cola de cambios, unidades, formato) siguen corriendo.
+    // Solo se prueba la versión elegida, la 5, que es la que abre la raíz (decisión 43). Las
+    // otras versiones siguen publicadas pero sin pruebas: sus archivos de prueba quedaron en
+    // su lugar y no corren. Las pruebas de la v5 están en src/v5/ (incluidas las de las
+    // pantallas de la versión 2 que la v5 usa tal cual en la computadora).
     exclude: [
       "node_modules/**",
       "src/pantallas/**", "src/componentes/**", "src/escritorio/**", // versión 1

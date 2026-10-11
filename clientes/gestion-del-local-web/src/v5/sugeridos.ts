@@ -22,7 +22,7 @@ export function useSugeridos(catalogo: Producto[] | null, clave?: unknown): Suge
     let vigente = true;
     (async () => {
       const locales = await leerTodo<VentaLocal>("ventas").catch(() => [] as VentaLocal[]);
-      const deHoy = await api<{ ventas: VentaDelDia[] }>("/ventas").then((d) => d.ventas.filter((v) => v.estado !== "anulada")).catch(() => [] as VentaDelDia[]);
+      const deHoy = await (async () => (await api<{ ventas: VentaDelDia[] }>("/ventas")).ventas.filter((v) => v.estado !== "anulada"))().catch(() => [] as VentaDelDia[]);
       if (!vigente) return;
       setRenglones([
         ...locales.flatMap((v) => (v.items ?? []).map((i) => ({ fecha: v.fecha, id: i.producto_id, descripcion: i.descripcion }))),
