@@ -608,7 +608,7 @@ RF-71:
     - "Los filtros de la API no tienen prueba"
 
 RF-72:
-  estado: "Hecho (#59): permisos fijos, varios roles por usuario, y la aplicación muestra solo lo que cada uno puede usar"
+  estado: "Hecho (#59, #64): permisos fijos, varios roles por usuario, y la aplicación muestra solo lo que cada uno puede usar"
   pruebas:
     - microservices/gestion-del-local/src/rutas/roles.test.ts
     - microservices/gestion-del-local/src/rutas/usuarios.test.ts
@@ -621,7 +621,9 @@ RF-72:
   defectos:
     - "Lo que se muestra según los permisos tiene pruebas unitarias en las pantallas del celular; en la computadora lo cubre solo la prueba de punta a punta"
     - "Un cambio hecho sin conexión que el servidor rechaza por permiso se descarta sin avisarle a la persona"
-    - "Vender muestra el costo de cada producto a cualquiera que venda: falta decidir si hace falta un permiso «Ver costos»"
+    - "«Ver costos» esconde los costos en las pantallas, pero el servidor los sigue entregando con el catálogo: el precio se calcula en el dispositivo, también sin conexión"
+    - "Con el margen y el precio a la vista, quien no ve costos puede deducirlos"
+    - "Que no se pueda anular una venta de otro día sin el permiso tiene prueba en el servidor, no en pantalla ni de punta a punta"
     - "El último que administra no se puede quitar: tiene prueba en el servidor, no de punta a punta"
 
 RF-75:

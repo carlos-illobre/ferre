@@ -5,7 +5,9 @@
 export const PERMISOS = [
   { clave: "ventas.registrar", parte: "Vender", nombre: "Vender", detalle: "Armar una venta, cobrar, anotar «No llevó», elegir el cliente y cambiar el margen dentro de esa venta" },
   { clave: "ventas.ver", parte: "Vender", nombre: "Ver las ventas del día", detalle: "Abrir «Ventas de hoy»" },
-  { clave: "ventas.anular", parte: "Vender", nombre: "Anular ventas", detalle: "Anular una venta registrada" },
+  { clave: "ventas.anular", parte: "Vender", nombre: "Anular ventas del día", detalle: "Anular una venta registrada hoy" },
+  { clave: "ventas.anular_cualquiera", parte: "Vender", nombre: "Anular ventas de cualquier día", detalle: "Anular una venta de hoy o de un día anterior" },
+  { clave: "catalogo.costos", parte: "Catálogo", nombre: "Ver costos", detalle: "Ver lo que cobra cada proveedor por un producto y de dónde sale cada precio" },
   { clave: "catalogo.margenes", parte: "Catálogo", nombre: "Fijar márgenes", detalle: "Elegir el margen de un producto en el catálogo, que queda guardado" },
   { clave: "catalogo.listas", parte: "Catálogo", nombre: "Cargar listas de precios", detalle: "Cargar y aplicar la lista de un proveedor; dar de alta proveedores" },
   { clave: "catalogo.duplicados", parte: "Catálogo", nombre: "Unir duplicados", detalle: "Unir y separar productos repetidos" },

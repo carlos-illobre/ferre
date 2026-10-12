@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SiVeCostos, useVeCostos } from "../Costos";
 import { CodigoDeBarras } from "../CodigoDeBarras";
 import { Escaner, hayCamara } from "./componentes/Escaner";
 import { usePuede, type Permiso } from "../permisos";
@@ -130,7 +131,7 @@ function FilaProducto({ producto: p, elegida, alAbrir }: { producto: Producto; e
         <strong className="importe">{precio === null ? "—" : pesosCortos(precio)}</strong>
         <small style={{ color: p.margen_elegido === null ? "var(--coral-texto)" : undefined, fontWeight: 600 }}>{p.margen_elegido === null ? (costo === null ? "sin costo" : "sin margen") : `${p.margen_elegido} %${esMargenBoton(p.margen_elegido) ? "" : " a mano"}${costo === null ? " · sin costo" : ""}`}</small>
       </span>
-      <span className="detalle">{detalleDe(p)}{costo !== null ? ` · costo ${pesos(costo)}` : ""}</span>
+      <span className="detalle">{detalleDe(p)}{costo !== null && <SiVeCostos>{` · costo ${pesos(costo)}`}</SiVeCostos>}</span>
     </button>
   );
 }
@@ -143,6 +144,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
   const iva = p.iva === null ? 0.21 : Number(p.iva);
   const calculado = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva }) : null;
   const manual = p.margen_elegido !== null && !esMargenBoton(p.margen_elegido) ? p.margen_elegido : null;
+  const veCostos = useVeCostos();
   const [otro, setOtro] = useState(manual === null ? "" : String(manual));
   const [mensaje, setMensaje] = useState<string | null>(null);
   useEffect(() => { setOtro(manual === null ? "" : String(manual)); }, [manual]);
@@ -162,7 +164,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
       <div className="tarjeta">
         <div className="fila-precio">
           <small>Precio de venta</small>
-          {calculado ? <Explicacion valor={pesosCortos(calculado.valor)} pasos={calculado.pasos} /> : <span className="importe" style={{ fontSize: 22, color: "var(--coral-texto)" }} data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
+          {calculado ? <Explicacion conCosto valor={pesosCortos(calculado.valor)} pasos={calculado.pasos} /> : <span className="importe" style={{ fontSize: 22, color: "var(--coral-texto)" }} data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
         </div>
         {fijaMargen && <>
         <div className="cuadricula-5" role="radiogroup" aria-label="margen">
@@ -179,7 +181,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
         </div>
         </>}
       </div>
-      {(p.proveedores?.length ?? 0) > 0 && (
+      {veCostos && (p.proveedores?.length ?? 0) > 0 && (
         <>
           <div className="seccion">Proveedores · el costo sale del elegido</div>
           <div className="lista" data-testid="otros-proveedores">
@@ -199,7 +201,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
           </div>
         </>
       )}
-      {costo !== null && (
+      {veCostos && costo !== null && (
         <div className="acciones" style={{ flexWrap: "wrap" }}>
           <Explicacion className="boton texto" valor={`¿Cómo se calcula el costo ${pesos(costo)}?`} pasos={p.explicacion_costo.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`]} />
           {p.fecha_lista && p.lista_importada_id && (

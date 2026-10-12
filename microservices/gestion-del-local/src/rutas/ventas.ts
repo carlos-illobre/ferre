@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirPermiso, exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion, puede } from "../autenticacion.js";
 
 // La venta (issue #15): reemplaza el renglón del cuaderno. Cada ítem guarda costo, margen,
 // precio y explicación DE ESE MOMENTO, así el precio se puede explicar para siempre aunque
@@ -119,13 +119,20 @@ ventas.get("/", exigirPermiso("ventas.ver", "negocio.numeros"), async (c) => {
 
 // Anular: la venta queda marcada (no se borra) y vuelve al stock lo que la venta descontó de
 // verdad, que puede ser menos de lo vendido si no había stock (RF-59).
-ventas.post("/:id/anular", exigirPermiso("ventas.anular"), async (c) => {
+// Las de hoy (el día del local) las anula quien tiene «Anular ventas del día»; las de un día
+// anterior, solo quien tiene «Anular ventas de cualquier día» (decisión 53).
+ventas.post("/:id/anular", exigirPermiso("ventas.anular", "ventas.anular_cualquiera"), async (c) => {
   const { motivo } = await c.req.json<{ motivo?: string }>().catch(() => ({}) as { motivo?: string });
   const id = c.req.param("id");
   const usuarioId = c.get("sesion").usuario.id;
   const cliente = await pool.connect();
   try {
     await cliente.query("BEGIN");
+    if (!puede(c.get("sesion").usuario, "ventas.anular_cualquiera")) {
+      const { rows: cuando } = await cliente.query<{ de_hoy: boolean }>(
+        "SELECT (fecha AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date AS de_hoy FROM venta WHERE id = $1", [id]);
+      if (cuando[0] && !cuando[0].de_hoy) { await cliente.query("ROLLBACK"); return c.json({ error: "Esa venta no es de hoy. Hace falta: Anular ventas de cualquier día", permiso: "ventas.anular_cualquiera" }, 403); }
+    }
     const { rowCount } = await cliente.query("UPDATE venta SET estado = 'anulada' WHERE id = $1 AND estado = 'confirmada'", [id]);
     if (!rowCount) { await cliente.query("ROLLBACK"); return c.json({ error: "La venta no existe o ya está anulada" }, 409); }
     await cliente.query(

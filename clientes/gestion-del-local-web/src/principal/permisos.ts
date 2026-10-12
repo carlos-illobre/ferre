@@ -6,7 +6,9 @@ import { useSesion, type Usuario } from "../sesion";
 export const PERMISOS = {
   "ventas.registrar": "Vender",
   "ventas.ver": "Ver las ventas del día",
-  "ventas.anular": "Anular ventas",
+  "ventas.anular": "Anular ventas del día",
+  "ventas.anular_cualquiera": "Anular ventas de cualquier día",
+  "catalogo.costos": "Ver costos",
   "catalogo.margenes": "Fijar márgenes",
   "catalogo.listas": "Cargar listas de precios",
   "catalogo.duplicados": "Unir duplicados",

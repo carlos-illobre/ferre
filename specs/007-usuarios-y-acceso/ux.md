@@ -134,6 +134,12 @@ roles a cada persona; desactivar y reactivar.
   las pestañas y los botones siguen la misma regla: quien no puede fijar márgenes ve el
   margen pero no los botones para cambiarlo; quien solo ve las compras ve la lista sin el
   formulario de ingreso; quien no corrige stock ve el inventario sin «Corregir».
+- **Costos:** lo que cobra cada proveedor, la columna o el renglón «Costo», los proveedores
+  de un producto con sus importes, la lista del proveedor para bajar y la explicación de
+  cómo se llega a un precio se muestran solo con «Ver costos». Sin ese permiso se ven el
+  precio de venta y el margen, sin explicación.
+- **Anular ventas:** «Anular» aparece en las ventas de hoy con «Anular ventas del día», y en
+  las de un día anterior solo con «Anular ventas de cualquier día».
 - Lo que puede cualquiera con sesión está siempre: buscar en el catálogo, ver el inventario,
   sacarle la foto a un producto, sus propios celulares, Mejoras y errores y Salir.
 - Quien llega por una dirección a una pantalla que no le corresponde ve «No tenés permiso

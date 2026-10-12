@@ -277,3 +277,15 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       los permisos pasan a ser dieciséis.
     - De las dos maquetas, Carlos eligió la **B**: la pantalla es solo el pedido y «Revisar y
       mandar» abre el mensaje para el proveedor.
+
+53. **Tres permisos más: ver costos y anular ventas por día** (2026-10-11). Carlos contestó
+    las dos preguntas que habían quedado abiertas al hacer los roles (decisión 50):
+    - **«Ver costos»** es un permiso aparte. Sin él se ven los precios de venta y los
+      márgenes, pero no lo que cobra cada proveedor ni cómo se llega al precio. De arranque
+      lo traen Gerente, Comprador y Recepción (que carga costos al ingresar mercadería); el
+      Vendedor no. Qué roles lo traen lo elegí yo: se cambia desde la pantalla Roles.
+    - **Anular ventas son dos permisos:** «Anular ventas del día» (las de hoy) y «Anular
+      ventas de cualquier día». El permiso que ya existía pasa a ser el del día, así que
+      quien lo tenía sigue anulando las de hoy. El de cualquier día lo trae el Gerente.
+    - Con esto los permisos son dieciocho.
+

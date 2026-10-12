@@ -276,11 +276,13 @@ Los **permisos** son fijos y los define el sistema:
 |---|---|---|
 | Vender | Vender | Armar una venta, cobrar, anotar «No llevó», elegir el cliente y cambiar el margen dentro de esa venta |
 | Vender | Ver las ventas del día | Abrir «Ventas de hoy» |
-| Vender | Anular ventas | Anular una venta registrada |
+| Vender | Anular ventas del día | Anular una venta registrada hoy |
+| Vender | Anular ventas de cualquier día | Anular una venta de hoy o de un día anterior |
 | Catálogo | Fijar márgenes | Elegir el margen de un producto en el catálogo, que queda guardado |
 | Catálogo | Cargar listas de precios | Cargar y aplicar la lista de un proveedor; dar de alta proveedores |
 | Catálogo | Unir duplicados | Unir y separar productos repetidos |
 | Depósito | Registrar ingresos | Registrar la mercadería que llega y anular un ingreso |
+| Catálogo | Ver costos | Ver lo que cobra cada proveedor por un producto y de dónde sale cada precio. Sin él se ven los precios de venta y los márgenes, no los costos |
 | Depósito | Encargar compras | Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos (RF-55) |
 | Depósito | Ver las compras | Ver las compras recientes y sus comprobantes |
 | Depósito | Contar y corregir stock | Contar estanterías y corregir el stock a mano |
@@ -295,11 +297,11 @@ Los **roles** los arma el negocio. El sistema arranca con estos cinco, que se pu
 
 | Rol | Permisos |
 |---|---|
-| Vendedor | Vender · Ver las ventas del día · Anular ventas |
-| Comprador | Encargar compras · Cargar listas de precios · Unir duplicados · Ver las compras |
-| Recepción | Registrar ingresos · Ver las compras · Contar y corregir stock · Ver las anomalías |
+| Vendedor | Vender · Ver las ventas del día · Anular ventas del día |
+| Comprador | Encargar compras · Cargar listas de precios · Unir duplicados · Ver las compras · Ver costos |
+| Recepción | Registrar ingresos · Ver las compras · Contar y corregir stock · Ver las anomalías · Ver costos |
 | Administrador | Administrar usuarios · Administrar roles · Administrar sesiones · Ver quién hizo qué |
-| Gerente | Ver los números del negocio · Fijar márgenes · Ver las ventas del día · Anular ventas · Ver las compras · Ver las anomalías · Ver quién hizo qué |
+| Gerente | Ver los números del negocio · Fijar márgenes · Ver las ventas del día · Anular ventas del día · Anular ventas de cualquier día · Ver costos · Ver las compras · Ver las anomalías · Ver quién hizo qué |
 
 Decisión 50 del 2026-10-11, que reemplaza a las decisiones 8, 15 y 18 en lo que toca a roles.
 

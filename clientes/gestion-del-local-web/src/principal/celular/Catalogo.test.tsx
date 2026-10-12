@@ -181,4 +181,20 @@ describe("Catálogo · Productos", () => {
     expect((screen.getByTestId("busqueda") as HTMLInputElement).value).toBe("111");
     expect(document.body.textContent).toContain("Ningún producto tiene el código 111");
   });
+
+  // Decisión 53: los costos se ven solo con «Ver costos».
+  it("sin el permiso de ver costos no aparece el costo, ni los proveedores con lo que cobran, ni la explicación del precio", () => {
+    conPermisos("catalogo.margenes");
+    armar([producto({ id: "mecha", descripcion: "MECHA PARA MADERA 6 MM", costo_neto: "1500", margen_elegido: 100, explicacion_costo: ["Precio de lista 2000"],
+      proveedores: [{ proveedor_id: "p1", proveedor: "Proveedor uno", costo_neto: "1500", fecha_lista: "2026-08-11", codigo_proveedor: "ME6" }] })]);
+    expect(fila("MECHA").textContent).not.toContain("costo");
+    expect(fila("MECHA").textContent).not.toContain("1.500");
+    fireEvent.click(fila("MECHA"));
+    expect(ficha().textContent).toContain("$4.000"); // el precio sí: 1500 × 2 × 1,21 = 3630 → 4000
+    expect(within(ficha()).getByTestId("sin-explicacion").textContent).toBe("$4.000");
+    expect(ficha().textContent).not.toContain("1.500");
+    expect(within(ficha()).queryByTestId("otros-proveedores")).toBeNull();
+    expect(within(ficha()).queryByTestId("bajar-lista")).toBeNull();
+    expect(within(ficha()).getByRole("radiogroup")).toBeTruthy(); // fijar el margen es otro permiso
+  });
 });

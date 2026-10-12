@@ -13,10 +13,10 @@ const administran = (...ids: string[]) => base.actual.programar(/FROM usuario u\
 describe("roles", () => {
   beforeEach(() => { base.actual = baseFalsa(); administran("u-admin"); base.actual.programar(/UPDATE rol SET nombre/, { rowCount: 1 }); });
 
-  it("la lista de permisos sale del servidor: dieciséis, cada uno con su parte, nombre y explicación", async () => {
+  it("la lista de permisos sale del servidor: dieciocho, cada uno con su parte, nombre y explicación", async () => {
     const r = await pedir(app, "GET", "/permisos", { rol: "admin" });
     const lista = (await r.json()) as { clave: string; parte: string; nombre: string; detalle: string }[];
-    expect(lista).toHaveLength(16);
+    expect(lista).toHaveLength(18);
     expect(lista.every((p) => p.clave && p.parte && p.nombre && p.detalle)).toBe(true);
     expect(new Set(lista.map((p) => p.parte))).toEqual(new Set(["Vender", "Catálogo", "Depósito", "Negocio", "Administración"]));
     expect((await pedir(app, "GET", "/permisos", { rol: "mostrador" })).status).toBe(403);
@@ -84,7 +84,7 @@ describe("roles", () => {
 describe("permisos por operación", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
   const PROHIBIDO_AL_QUE_SOLO_VENDE: [string, string, string][] = [
-    ["GET", "/ventas", "Ver las ventas del día"], ["POST", "/ventas/x/anular", "Anular ventas"],
+    ["GET", "/ventas", "Ver las ventas del día"], ["POST", "/ventas/x/anular", "Anular ventas del día"],
     ["GET", "/listas", "Cargar listas de precios"], ["POST", "/proveedores", "Cargar listas de precios"],
     ["GET", "/equivalencias", "Unir duplicados"],
     ["PUT", "/pedidos/x", "Encargar compras"], ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los números del negocio"],
@@ -115,7 +115,9 @@ describe("permisos por operación", () => {
     expect(con.valor_total).toBe(17000);
   });
   it("todos los permisos de la lista se usan en alguna ruta de esta prueba o de las de roles", () => {
-    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender"]);
+    // «Anular ventas de cualquier día» se prueba con las ventas; «Ver costos» no lo exige ninguna
+    // ruta: decide qué muestran las pantallas.
+    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender", "Anular ventas de cualquier día", "Ver costos"]);
     expect(PERMISOS.filter((p) => !usados.has(p.nombre)).map((p) => p.nombre)).toEqual([]);
   });
 });

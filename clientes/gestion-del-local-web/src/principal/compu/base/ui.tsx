@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useVeCostos } from "../../Costos";
 import { Isotipo, Logotipo } from "../../Logotipo";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
 import { leerMeta } from "../../../almacen";
@@ -263,10 +264,12 @@ export function Contador({ valor, entera, alCambiar, min = entera ? 1 : 0.1, uni
 }
 
 // Todo número calculado se toca y dice de dónde sale. La señal es el «?» en un círculo.
-export function Explicado({ valor, pasos, etiqueta, className, titulo }: { valor: ReactNode; pasos: string[]; etiqueta?: string; className?: string; titulo?: string }) {
+// `conCosto`: los pasos dejan ver el costo; quien no tiene «Ver costos» ve el número sin explicación.
+export function Explicado({ valor, pasos, etiqueta, className, titulo, conCosto }: { valor: ReactNode; pasos: string[]; etiqueta?: string; className?: string; titulo?: string; conCosto?: boolean }) {
   const [abierta, setAbierta] = useState(false);
+  const veCostos = useVeCostos();
   const texto = typeof valor === "string" ? valor : (etiqueta ?? "este número");
-  if (!pasos.length) return <span className={className}>{valor}</span>;
+  if (!pasos.length || (conCosto && !veCostos)) return <span className={className}>{valor}</span>;
   return (
     <>
       <button type="button" className={`explicado ${className ?? ""}`} aria-label={`${etiqueta ?? texto}. Ver de dónde sale`} aria-haspopup="dialog"

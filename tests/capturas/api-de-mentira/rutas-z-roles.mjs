@@ -5,7 +5,9 @@
 const PERMISOS = [
   ["ventas.registrar", "Vender", "Vender", "Armar una venta, cobrar, anotar «No llevó», elegir el cliente y cambiar el margen dentro de esa venta"],
   ["ventas.ver", "Vender", "Ver las ventas del día", "Abrir «Ventas de hoy»"],
-  ["ventas.anular", "Vender", "Anular ventas", "Anular una venta registrada"],
+  ["ventas.anular", "Vender", "Anular ventas del día", "Anular una venta registrada hoy"],
+  ["ventas.anular_cualquiera", "Vender", "Anular ventas de cualquier día", "Anular una venta de hoy o de un día anterior"],
+  ["catalogo.costos", "Catálogo", "Ver costos", "Ver lo que cobra cada proveedor por un producto y de dónde sale cada precio"],
   ["catalogo.margenes", "Catálogo", "Fijar márgenes", "Elegir el margen de un producto en el catálogo: queda guardado"],
   ["catalogo.listas", "Catálogo", "Cargar listas de precios", "Cargar y aplicar la lista de un proveedor; dar de alta proveedores"],
   ["catalogo.duplicados", "Catálogo", "Unir duplicados", "Unir y separar productos repetidos"],

@@ -73,6 +73,24 @@ describe("POST /ventas", () => {
     expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)[0]!.sql).toMatch(/-cantidad[\s\S]*FROM movimiento_stock WHERE referencia_tipo = 'venta'/);
   });
 
+  it("quien anula ventas del día no anula las de un día anterior; con «de cualquier día», sí (decisión 53)", async () => {
+    base.actual.programar(/UPDATE venta SET estado = 'anulada'/, { rowCount: 1 });
+    base.actual.programar(/AS de_hoy FROM venta/, { rows: [{ de_hoy: false }] });
+    const r = await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "cajero", cuerpo: {} });
+    expect(r.status).toBe(403);
+    expect(((await r.json()) as { error: string }).error).toContain("Anular ventas de cualquier día");
+    expect(base.actual.sqlDe(/UPDATE venta SET estado = 'anulada'/)).toHaveLength(0);
+    // La de hoy sí.
+    base.actual.programar(/AS de_hoy FROM venta/, { rows: [{ de_hoy: true }] });
+    expect((await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "cajero", cuerpo: {} })).status).toBeLessThan(300);
+    // Con el permiso de cualquier día no se mira la fecha.
+    base.actual = baseFalsa();
+    base.actual.programar(/UPDATE venta SET estado = 'anulada'/, { rowCount: 1 });
+    expect((await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "admin", cuerpo: {} })).status).toBeLessThan(300);
+    expect(base.actual.sqlDe(/AS de_hoy FROM venta/)).toHaveLength(0);
+    expect((await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "soloVende", cuerpo: {} })).status).toBe(403);
+  });
+
   it("cada renglón se redondea para arriba a $1.000: toda venta es múltiplo de $1.000 (RF-19)", async () => {
     const items = [
       { ...venta.items[0], cantidad: 0.5, precio_unitario: 3000 }, // $1.500 → $2.000

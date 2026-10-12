@@ -18,6 +18,7 @@ export const usuarios: Record<string, Usuario & { rol: string }> = {
   admin: { id: "u-admin", email: "admin@ferre.test", nombre: "Admin", rol: "admin", roles: ["Todos"], permisos: TODOS },
   mostrador: { id: "u-mostrador", email: "mostrador@ferre.test", nombre: "Mostrador", rol: "mostrador", roles: ["Operación"], permisos: SIN_ADMINISTRAR },
   recepcion: { id: "u-recepcion", email: "recepcion@ferre.test", nombre: "Recepción", rol: "recepcion", roles: ["Recepción"], permisos: ["deposito.ingresos", "deposito.compras", "deposito.stock"] },
+  cajero: { id: "u-cajero", email: "cajero@ferre.test", nombre: "Cajero", rol: "cajero", roles: ["Vendedor"], permisos: ["ventas.registrar", "ventas.ver", "ventas.anular"] },
   soloVende: { id: "u-solo-vende", email: "vende@ferre.test", nombre: "Solo vende", rol: "soloVende", roles: ["Vendedor"], permisos: ["ventas.registrar"] },
 };
 

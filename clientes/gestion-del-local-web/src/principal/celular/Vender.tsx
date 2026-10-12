@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
@@ -359,7 +360,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
       )}
       {hoja === "hoy" && hoy && (
         <Hoja titulo="Ventas de hoy" extra={<span className="importe" style={{ fontSize: 26 }}>{pesosCortos(hoy.total)}</span>} alCerrar={() => setHoja(null)} testId="hoja-hoy">
-          <ListaDeVentas ventas={hoy.ventas} alAnular={puedeEsto("ventas.anular") ? anular : null} />
+          <ListaDeVentas ventas={hoy.ventas} alAnular={puedeEsto("ventas.anular", "ventas.anular_cualquiera") ? anular : null} />
         </Hoja>
       )}
       {exito && (
@@ -385,7 +386,7 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
         {producto ? <span className="nombre" style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.25 }}>{it.descripcion}</span>
           : <input className="linea-editable" value={it.descripcion} placeholder="¿Qué se lleva?" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
         {subtotal !== null ? (
-          <Explicacion className="subtotal" valor={pesosCortos(subtotal)} pasos={[...p.pasos, ...(renglon?.pasos ?? [])]} />
+          <Explicacion conCosto className="subtotal" valor={pesosCortos(subtotal)} pasos={[...p.pasos, ...(renglon?.pasos ?? [])]} />
         ) : (
           <label className="campo falta importe-campo"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus={!producto} value={it.precioManual ?? ""} onChange={(e) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) })} data-testid="precio-manual" /></label>
         )}
@@ -409,7 +410,7 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
       {it.abierto && producto && p.costo !== null && (
         <div className="abierto">
           <div className="cabecera">
-            <Explicacion className="enlace punteado" valor={`Costo ${pesos(p.costo)} · ${producto.proveedor ?? "sin proveedor"}`} pasos={producto.explicacion_costo?.length ? producto.explicacion_costo : [`Costo ${pesos(p.costo)} según la lista`]} />
+            <SiVeCostos><Explicacion className="enlace punteado" valor={`Costo ${pesos(p.costo)} · ${producto.proveedor ?? "sin proveedor"}`} pasos={producto.explicacion_costo?.length ? producto.explicacion_costo : [`Costo ${pesos(p.costo)} según la lista`]} /></SiVeCostos>
             {p.unitario !== null && <span>{pesos(p.unitario)} c/u</span>}
           </div>
           <div className="cuadricula-5">

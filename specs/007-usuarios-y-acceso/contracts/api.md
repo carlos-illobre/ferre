@@ -56,7 +56,7 @@ Los permisos son fijos: los define el sistema. Los roles los arma el negocio.
 | PATCH | `/roles/:id` | `admin.roles` | Cambiar `nombre` o `permisos` (los que vengan; `permisos` reemplaza la lista). Vale enseguida para quienes lo tienen. `404` si no existe; `409` si el nombre ya está usado, o si el cambio deja al sistema sin nadie que administre o le quita a quien lo pide sus permisos de administrar. Registra `rol.modificado` |
 | DELETE | `/roles/:id` | `admin.roles` | Borrar un rol que nadie tiene. `204`; `404` si no existe; `409` si alguien lo tiene asignado. Registra `rol.borrado` |
 
-Las claves de permiso: `ventas.registrar`, `ventas.ver`, `ventas.anular`, `catalogo.margenes`,
+Las claves de permiso: `ventas.registrar`, `ventas.ver`, `ventas.anular` (del día), `ventas.anular_cualquiera`, `catalogo.costos`, `catalogo.margenes`,
 `catalogo.listas`, `catalogo.duplicados`, `deposito.pedidos`, `deposito.ingresos`, `deposito.compras`,
 `deposito.stock`, `negocio.numeros`, `negocio.anomalias`, `negocio.actividad`,
 `admin.usuarios`, `admin.roles`, `admin.sesiones`. Qué deja hacer cada una está en la tabla
@@ -108,7 +108,7 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 | `PATCH /productos/:id` cuando trae el margen | `catalogo.margenes` |
 | `POST /ventas`, `POST /ventas/:id/pagar`, `POST /consultas`, `POST /clientes` | `ventas.registrar` |
 | `GET /ventas` | `ventas.ver` o `negocio.numeros` |
-| `POST /ventas/:id/anular` | `ventas.anular` |
+| `POST /ventas/:id/anular` | `ventas.anular` si la venta es de hoy (el día del local); `ventas.anular_cualquiera` para cualquier día. Con solo la primera, una venta de otro día da `403` |
 | `/listas` (salvo bajar el archivo), `POST /proveedores`, `PATCH /proveedores/:id` | `catalogo.listas` |
 | `/equivalencias/*` | `catalogo.duplicados` |
 | `PUT`, `DELETE` y `POST` de `/pedidos` | `deposito.pedidos` |
@@ -121,3 +121,7 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 
 `GET /stock` no trae el valor en dinero (ni el de cada producto ni el total) a quien no tiene
 `negocio.numeros`.
+
+`catalogo.costos` («Ver costos») no lo exige ninguna ruta: decide qué muestran las pantallas.
+`GET /productos` trae el costo a cualquiera con sesión, porque el precio de venta se calcula
+en el dispositivo (también sin conexión) a partir del costo y el margen.

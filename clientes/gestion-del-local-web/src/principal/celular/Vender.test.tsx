@@ -216,4 +216,14 @@ describe("Vender", () => {
     expect(screen.getByTestId("ventas-de-hoy").textContent).toContain("MECHA");
     expect(screen.queryByRole("button", { name: "Anular" })).toBeNull();
   });
+
+  it("sin el permiso de ver costos, el renglón no muestra el costo ni explica el precio", () => {
+    conPermisos("ventas.registrar");
+    const { agregar, item } = armar();
+    agregar("tornillo vender");
+    fireEvent.click(within(item("TORNILLO")).getByRole("button", { name: "300 %" }));
+    expect(item("TORNILLO").textContent).toContain("$1.000");
+    expect(item("TORNILLO").textContent).not.toContain("Costo");
+    expect(within(item("TORNILLO")).getByTestId("sin-explicacion")).toBeTruthy();
+  });
 });

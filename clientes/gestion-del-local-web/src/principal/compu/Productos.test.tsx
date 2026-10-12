@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { conPermisos } from "../../pruebas/sesion";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
@@ -71,5 +72,14 @@ describe("Productos (v2)", () => {
     armar();
     fireEvent.keyDown(window, { key: "Enter" });
     expect(screen.getByTestId("ficha-producto").textContent).toContain("MECHA PRODUCTO 8 MM");
+  });
+
+  // Decisión 53: los costos se ven solo con «Ver costos».
+  it("sin el permiso de ver costos la tabla no tiene la columna Costo ni explica el precio", () => {
+    conPermisos("catalogo.margenes");
+    armar();
+    expect(screen.queryByRole("columnheader", { name: "Costo" })).toBeNull();
+    expect(screen.getByRole("columnheader", { name: "Precio de venta" })).toBeTruthy();
+    expect(document.querySelector("[data-testid=explicacion]")).toBeNull();
   });
 });

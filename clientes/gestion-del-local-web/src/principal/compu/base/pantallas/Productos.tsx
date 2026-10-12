@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SiVeCostos, useVeCostos } from "../../../Costos";
 import { CodigoDeBarras } from "../../../CodigoDeBarras";
 import { escucharPuesto, puestoLocal } from "../../../../puesto";
 import { usePuede } from "../../../permisos";
@@ -144,7 +145,7 @@ export function Productos() {
       ) : (
         <div className="tabla-marco">
           <table className="tabla productos-tabla" data-testid="resultados">
-            <thead><tr><th className="angosta"><span className="solo-lectores">Foto</span></th><th>Producto</th><th>Proveedor</th><th className="num">Stock</th><th className="num">Costo</th><th>Margen</th><th className="num">Precio de venta</th></tr></thead>
+            <thead><tr><th className="angosta"><span className="solo-lectores">Foto</span></th><th>Producto</th><th>Proveedor</th><th className="num">Stock</th><SiVeCostos><th className="num">Costo</th></SiVeCostos><th>Margen</th><th className="num">Precio de venta</th></tr></thead>
             <tbody>
               {resultados.map((p, i) => <FilaProducto key={p.id} producto={p} stock={stock.get(p.id)} elegido={i === elegido} alElegir={() => setElegido(i)} alCambiar={(c) => actualizar(p.id, c)} alError={setError} />)}
             </tbody>
@@ -188,6 +189,7 @@ function BajarLista({ producto: p, alError }: { producto: Producto; alError: (m:
 function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alError }: { producto: Producto; stock: number | undefined; elegido: boolean; alElegir: () => void; alCambiar: (c: Cambios) => void; alError: (m: string) => void }) {
   const fijaMargen = usePuede()("catalogo.margenes");
   const { costo, precio, manual, pasosCosto } = calcular(p);
+  const veCostos = useVeCostos();
   const varios = (p.proveedores?.length ?? 0) > 1;
   return (
     <tr className="elegible" aria-selected={elegido} onClick={alElegir} data-testid="producto">
@@ -199,9 +201,9 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
       <td>
         <div className="productos-proveedor">
           <span>{p.proveedor ?? <span className="detalle">sin proveedor</span>}</span>
-          <BajarLista producto={p} alError={alError} />
+          <SiVeCostos><BajarLista producto={p} alError={alError} /></SiVeCostos>
         </div>
-        {varios && (
+        {veCostos && varios && (
           <ul className="productos-otros" data-testid="otros-proveedores">
             {p.proveedores!.map((v, i) => {
               const actual = v.proveedor === p.proveedor;
@@ -217,7 +219,7 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
         )}
       </td>
       <td className="num">{stock === undefined ? <span className="detalle">sin contar</span> : <span className={stock <= 0 ? "sube" : ""}>{numero(stock)}</span>}</td>
-      <td className="num">{costo === null ? <span className="detalle">sin costo</span> : <Explicado valor={pesos(costo)} pasos={pasosCosto} etiqueta={`Costo ${pesos(costo)}`} />}</td>
+      <SiVeCostos><td className="num">{costo === null ? <span className="detalle">sin costo</span> : <Explicado valor={pesos(costo)} pasos={pasosCosto} etiqueta={`Costo ${pesos(costo)}`} />}</td></SiVeCostos>
       <td>
         {!fijaMargen ? <span className="detalle" data-testid="margen-fijo">{p.margen_elegido === null ? "sin margen" : `${p.margen_elegido} %`}</span> : <div className="productos-margen">
           <Margenes compacto elegido={p.margen_elegido} disabled={costo === null} atajos={elegido} etiqueta={`Margen de ${p.descripcion}`} alElegir={(m) => { alElegir(); alCambiar({ margen_elegido: m }); }} />
@@ -225,7 +227,7 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
         </div>}
       </td>
       <td className="num">
-        {precio ? <Explicado className="importe" valor={pesosCortos(precio.valor)} pasos={precio.pasos} etiqueta={`Precio de venta ${pesosCortos(precio.valor)}`} />
+        {precio ? <Explicado conCosto className="importe" valor={pesosCortos(precio.valor)} pasos={precio.pasos} etiqueta={`Precio de venta ${pesosCortos(precio.valor)}`} />
           : <span className="falta-texto" data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
       </td>
     </tr>
@@ -237,6 +239,7 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
 function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; stock: number | undefined; quienLoTiene: (codigo: string) => Producto | undefined; alCerrar: () => void; alCambiar: (c: Cambios) => void }) {
   const fijaMargen = usePuede()("catalogo.margenes");
   const { costo, precio, manual, pasosCosto } = calcular(p);
+  const veCostos = useVeCostos();
   const [error, setError] = useState<string | null>(null);
   const masBarato = p.proveedores?.[0]?.proveedor_id;
   return (
@@ -254,7 +257,7 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }
       <section className="tarjeta relleno pila" aria-label="Precio y margen">
         <div className="fila">
           <span className="rotulo crece">Precio de venta</span>
-          {precio ? <Explicado className="importe productos-precio" valor={pesosCortos(precio.valor)} pasos={precio.pasos} etiqueta={`Precio de venta ${pesosCortos(precio.valor)}`} />
+          {precio ? <Explicado conCosto className="importe productos-precio" valor={pesosCortos(precio.valor)} pasos={precio.pasos} etiqueta={`Precio de venta ${pesosCortos(precio.valor)}`} />
             : <span className="falta-texto" data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
         </div>
         {fijaMargen && <><Margenes elegido={p.margen_elegido} disabled={costo === null} etiqueta="Margen" alElegir={(m) => alCambiar({ margen_elegido: m })} />
@@ -262,10 +265,10 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }
           <label className="crece detalle" htmlFor="ficha-otro-margen">Otro margen{manual !== null ? `: hoy ${manual} % a mano` : ""}</label>
           <OtroMargen producto={p} manual={manual} alCambiar={alCambiar} id="ficha-otro-margen" />
         </div></>}
-        {costo !== null && <div className="fila"><span className="rotulo crece">Costo</span><Explicado valor={pesos(costo)} pasos={pasosCosto} etiqueta={`Costo ${pesos(costo)}`} /></div>}
+        {veCostos && costo !== null && <div className="fila"><span className="rotulo crece">Costo</span><Explicado valor={pesos(costo)} pasos={pasosCosto} etiqueta={`Costo ${pesos(costo)}`} /></div>}
       </section>
 
-      {(p.proveedores?.length ?? 0) > 0 && (
+      {veCostos && (p.proveedores?.length ?? 0) > 0 && (
         <section className="pila" aria-labelledby="ficha-proveedores">
           <h3 id="ficha-proveedores" className="seccion-titulo">Quién lo vende</h3>
           <ul className="lista" data-testid="otros-proveedores">
@@ -285,7 +288,7 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }
         </section>
       )}
       {p.proveedor && (p.proveedores?.length ?? 0) === 0 && <p className="detalle">Proveedor: {p.proveedor}</p>}
-      <div className="fila envuelve"><BajarLista producto={p} alError={setError} /></div>
+      <SiVeCostos><div className="fila envuelve"><BajarLista producto={p} alError={setError} /></div></SiVeCostos>
     </Hoja>
   );
 }

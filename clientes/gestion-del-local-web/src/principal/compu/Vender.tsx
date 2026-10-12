@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
@@ -352,7 +353,7 @@ export function Vender() {
       ) : (
         <div className="tabla-marco">
           <table className="tabla vender-tabla" data-testid="venta">
-            <thead><tr><th className="angosta"><span className="solo-lectores">Foto</span></th><th>Producto</th><th className="num">Costo</th><th>Margen</th><th className="num">Precio por unidad</th><th>Cantidad</th><th className="num">Subtotal</th><th className="angosta"><span className="solo-lectores">Quitar</span></th></tr></thead>
+            <thead><tr><th className="angosta"><span className="solo-lectores">Foto</span></th><th>Producto</th><SiVeCostos><th className="num">Costo</th></SiVeCostos><th>Margen</th><th className="num">Precio por unidad</th><th>Cantidad</th><th className="num">Subtotal</th><th className="angosta"><span className="solo-lectores">Quitar</span></th></tr></thead>
             <tbody>{filas.map((f) => <FilaDeVenta key={f.item.clave} {...f} />)}</tbody>
           </table>
         </div>
@@ -427,16 +428,16 @@ function FilaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegirMar
           : <input className="entrada" value={it.descripcion} placeholder="¿Qué se lleva?" aria-label="Descripción del ítem libre" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
         <div className="detalle">{producto ? <>{detalleDe(producto)}{detalleDe(producto) && stock !== undefined ? " · " : ""}<StockDeRenglon stock={stock} cantidad={it.cantidad} /></> : "Ítem libre: no está en ninguna lista"}</div>
       </td>
-      <td className="num">{p.costo === null || !producto ? <span className="detalle">sin costo</span> : <Explicado valor={pesos(p.costo)} pasos={pasosDeCosto(producto, p.costo)} etiqueta={`Costo ${pesos(p.costo)}`} />}</td>
+      <SiVeCostos><td className="num">{p.costo === null || !producto ? <span className="detalle">sin costo</span> : <Explicado valor={pesos(p.costo)} pasos={pasosDeCosto(producto, p.costo)} etiqueta={`Costo ${pesos(p.costo)}`} />}</td></SiVeCostos>
       <td>{producto && p.costo !== null ? <Margenes compacto elegido={it.precioManual === null ? p.margen : null} alElegir={alElegirMargen} etiqueta={`Margen de ${it.descripcion}`} /> : <span className="detalle">a mano</span>}</td>
       <td className="num">
         <div className="vender-precio">
-          {sinPrecio ? <span className="falta-texto" data-testid="sin-precio">elegí margen o precio</span> : <Explicado className="importe chico" valor={pesosCortos(p.unitario)} pasos={p.pasos} etiqueta={`Precio ${pesosCortos(p.unitario)}`} />}
+          {sinPrecio ? <span className="falta-texto" data-testid="sin-precio">elegí margen o precio</span> : <Explicado conCosto className="importe chico" valor={pesosCortos(p.unitario)} pasos={p.pasos} etiqueta={`Precio ${pesosCortos(p.unitario)}`} />}
           <PrecioAMano item={it} alCambiar={alCambiar} falta={sinPrecio} />
         </div>
       </td>
       <td><Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} etiqueta={`Cantidad de ${it.descripcion}`} sinBotones /></td>
-      <td className="num" data-testid="subtotal">{renglon && (renglon.pasos.length ? <Explicado className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : <span className="importe">{pesosCortos(renglon.valor)}</span>)}</td>
+      <td className="num" data-testid="subtotal">{renglon && (renglon.pasos.length ? <Explicado conCosto className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : <span className="importe">{pesosCortos(renglon.valor)}</span>)}</td>
       <td className="angosta"><Boton icono="basura" variante="peligro" tam="chico" title="Quitar de la venta" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} /></td>
     </tr>
   );
@@ -457,7 +458,7 @@ function TarjetaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
             : <input className="entrada" value={it.descripcion} placeholder="¿Qué se lleva?" aria-label="Descripción del ítem libre" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
           <span className="detalle">{producto ? <>{detalleDe(producto)}{detalleDe(producto) && stock !== undefined ? " · " : ""}<StockDeRenglon stock={stock} cantidad={it.cantidad} /></> : "Ítem libre"}</span>
         </div>
-        <span data-testid="subtotal">{renglon ? <Explicado className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : !producto ? <PrecioAMano item={it} alCambiar={alCambiar} falta /> : <span className="falta-texto" data-testid="sin-precio">sin precio</span>}</span>
+        <span data-testid="subtotal">{renglon ? <Explicado conCosto className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : !producto ? <PrecioAMano item={it} alCambiar={alCambiar} falta /> : <span className="falta-texto" data-testid="sin-precio">sin precio</span>}</span>
       </div>
       <div className="vender-item-pie">
         <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} />
@@ -470,7 +471,7 @@ function TarjetaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
       {abierto && producto && p.costo !== null && (
         <div className="vender-item-margen">
           <div className="fila">
-            <span className="crece"><Explicado valor={`Costo ${pesos(p.costo)}`} pasos={pasosDeCosto(producto, p.costo)} /></span>
+            <SiVeCostos><span className="crece"><Explicado valor={`Costo ${pesos(p.costo)}`} pasos={pasosDeCosto(producto, p.costo)} /></span></SiVeCostos>
             {p.unitario !== null && <span className="detalle">{pesosCortos(p.unitario)} c/u</span>}
           </div>
           {sinPrecio && <p className="falta-texto">Elegí el margen o poné el precio a mano.</p>}

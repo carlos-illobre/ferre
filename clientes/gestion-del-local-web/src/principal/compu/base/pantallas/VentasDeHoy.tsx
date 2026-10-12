@@ -27,9 +27,11 @@ export function useVentasDelDia(dia: string | null, clave?: unknown) {
 }
 
 export function VentasDeHoy() {
-  const anula = usePuede()("ventas.anular");
+  const puedeEsto = usePuede();
   const [dia, setDia] = useState(hoyLocal);
   const esHoy = dia === hoyLocal();
+  // Las de hoy, con «Anular ventas del día»; las de otro día, solo con «de cualquier día».
+  const anula = esHoy ? puedeEsto("ventas.anular", "ventas.anular_cualquiera") : puedeEsto("ventas.anular_cualquiera");
   const { datos, error, cargar } = useVentasDelDia(esHoy ? null : dia);
   const [porAnular, setPorAnular] = useState<VentaDia | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
