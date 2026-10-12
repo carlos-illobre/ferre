@@ -31,8 +31,16 @@ En la columna «Exige», «sesión» quiere decir cualquier persona con sesión,
 | GET | `/sesiones` | `admin.sesiones` | Sesiones abiertas de todos los usuarios (sin revocar ni vencidas), la más usada recientemente primero: `id`, `dispositivo`, `creada_en`, `ultimo_uso_en`, `expira_en`, `email`, `nombre` |
 | DELETE | `/sesiones/:id` | `admin.sesiones` | Cerrar a distancia la sesión de cualquiera. `204` (también si el id no existe). Registra `sesion.revocada` |
 
-`/sesiones/vinculaciones` y `/sesiones/vinculaciones/:codigo/aprobar` (entrada por QR) no
-existen: responden `404` (RF-70).
+### Entrar a la computadora con el celular (RF-76)
+
+| Método | Ruta | Exige | Para qué sirve |
+|---|---|---|---|
+| POST | `/sesiones/vinculaciones` | Nada; 30 por minuto | La computadora pide un código. Cuerpo opcional: `dispositivo`. `201` con `id`, `codigo` (va en el QR), `clave` (no sale de la computadora) y `expiraEnSegundos` (300). Se guardan hasheados |
+| POST | `/sesiones/vinculaciones/aprobar` | Sesión | El celular aprueba el código que leyó. Cuerpo: `codigo`. `200` con `dispositivo`; `400` sin código; `410` si venció o ya se aprobó |
+| POST | `/sesiones/vinculaciones/:id/estado` | Nada; 240 por minuto | La computadora pregunta por su código. Cuerpo: `clave`. Responde `estado`: `pendiente`, `vencida` o `aprobada`; con `aprobada` trae `token` y `usuario`, una sola vez, y abre la sesión de la computadora a nombre de quien aprobó. Registra `sesion.iniciada` con `medio: "celular"` |
+
+Los límites de intentos de estas dos rutas se cuentan aparte de los de entrar con Google o con
+la huella: la computadora que espera en la entrada consulta cada dos segundos.
 
 ## Usuarios (`/usuarios`)
 

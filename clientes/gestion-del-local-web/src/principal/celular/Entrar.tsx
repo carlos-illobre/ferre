@@ -26,7 +26,11 @@ function useEnLinea() {
   return enLinea;
 }
 
-export function Entrar() {
+const COMPUTADORA = <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></svg>;
+
+// `paraLaCompu`: se llegó leyendo el código de una computadora (RF-76). La entrada es la misma;
+// avisa que al entrar acá esa computadora entra también, y el botón de la huella lo dice.
+export function Entrar({ paraLaCompu = false }: { paraLaCompu?: boolean } = {}) {
   const enLinea = useEnLinea();
   const conHuella = hayHuella();
   return (
@@ -40,9 +44,10 @@ export function Entrar() {
       </header>
       <section className="en-formas" aria-label={TEXTOS_DE_ENTRADA.entrar}>
         {!enLinea && <p className="en-ayuda">{TEXTOS_DE_ENTRADA.sinConexion}</p>}
-        <BotonGoogle />
+        {paraLaCompu && <p className="en-compu" role="status" data-testid="entrar-para-la-compu">{COMPUTADORA}<span>Leíste el código de una computadora. Al entrar acá, esa computadora entra también.</span></p>}
+        {paraLaCompu ? <BotonHuella titulo="Entrar acá y en la computadora" detalle="Con la huella" /> : <BotonGoogle />}
         {conHuella && <div className="en-o" aria-hidden="true"><span>o</span></div>}
-        <BotonHuella detalle="Rápido y seguro" />
+        {paraLaCompu ? <BotonGoogle /> : <BotonHuella detalle="Rápido y seguro" />}
         <p className="en-sin-claves">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4M12 15v2" /></svg>
           <span><strong>Sin contraseñas.</strong> Entrá de forma simple y segura.</span>

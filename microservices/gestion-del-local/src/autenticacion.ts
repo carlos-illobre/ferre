@@ -52,11 +52,13 @@ export async function emailVerificadoPorGoogle(credencial: string): Promise<stri
   }
 }
 
-// Límite de intentos por IP para los puntos de entrada sin sesión.
+// Límite de intentos por IP para los puntos de entrada sin sesión. Cada `grupo` lleva su
+// cuenta: la computadora que espera en la entrada consulta su código cada dos segundos, y eso
+// no puede gastar los intentos de entrar con Google o con la huella.
 const intentos = new Map<string, { cuenta: number; desde: number }>();
-export function limitarIntentos(maximoPorMinuto: number): MiddlewareHandler {
+export function limitarIntentos(maximoPorMinuto: number, grupo = "entrada"): MiddlewareHandler {
   return async (c, next) => {
-    const ip = c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida";
+    const ip = `${grupo}|${c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida"}`;
     const ahora = Date.now();
     const registro = intentos.get(ip);
     if (!registro || ahora - registro.desde > 60_000) {

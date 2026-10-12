@@ -68,7 +68,7 @@ export function Login() {
 
 // Entrar con la huella: solo en dispositivos que la tienen; el celular tiene que estar
 // vinculado antes desde Negocio (entrando con Google una vez).
-export function BotonHuella({ detalle }: { detalle?: string } = {}) {
+export function BotonHuella({ detalle, titulo = "Entrar con la huella" }: { detalle?: string; titulo?: string } = {}) {
   const { entrar } = useSesion();
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -81,7 +81,7 @@ export function BotonHuella({ detalle }: { detalle?: string } = {}) {
   }
   return (
     <>
-      <button type="button" className={detalle ? "entrar-huella" : "boton blanco"} onClick={conHuella} disabled={ocupado} data-testid="entrar-huella"><Icono nombre="huella" tam={22} />{detalle ? <span><strong>Entrar con la huella</strong><small>{detalle}</small></span> : "Entrar con la huella"}</button>
+      <button type="button" className={detalle ? "entrar-huella" : "boton blanco"} onClick={conHuella} disabled={ocupado} data-testid="entrar-huella"><Icono nombre="huella" tam={22} />{detalle ? <span><strong>{titulo}</strong><small>{detalle}</small></span> : titulo}</button>
       {error && <div data-testid="error-huella"><AvisoError texto={error} /></div>}
     </>
   );

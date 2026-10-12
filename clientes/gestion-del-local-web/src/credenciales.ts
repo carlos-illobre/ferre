@@ -16,13 +16,23 @@ export async function vincularEsteDispositivo(dispositivo: string): Promise<Cred
   const respuesta = await startRegistration({ optionsJSON: opciones });
   const c = await api<Credencial>("/credenciales/registro", { method: "POST", body: JSON.stringify({ desafioId, respuesta, dispositivo }) });
   window.dispatchEvent(new Event(EVENTO_CREDENCIALES));
+  anotarHuellaAca();
   return c;
 }
+
+// Si este dispositivo ya vinculó o usó su huella con Ferrebress. La computadora ofrece «Entrar
+// con la huella» solo en ese caso (RF-76): si no, el sistema operativo abre su propio diálogo
+// para usar un teléfono, que es largo y confunde.
+const CLAVE_HUELLA_ACA = "ferre.huella-en-este-dispositivo";
+function anotarHuellaAca() { try { localStorage.setItem(CLAVE_HUELLA_ACA, "1"); } catch { /* sin almacenamiento */ } }
+export function huellaVinculadaAca(): boolean { try { return localStorage.getItem(CLAVE_HUELLA_ACA) === "1"; } catch { return false; } }
 
 export async function entrarConHuella(dispositivo: string): Promise<{ token: string; usuario: Usuario }> {
   const { desafioId, opciones } = await api<{ desafioId: string; opciones: PublicKeyCredentialRequestOptionsJSON }>("/credenciales/login/opciones", { method: "POST", body: "{}" });
   const respuesta = await startAuthentication({ optionsJSON: opciones });
-  return api<{ token: string; usuario: Usuario }>("/credenciales/login", { method: "POST", body: JSON.stringify({ desafioId, respuesta, dispositivo }) });
+  const r = await api<{ token: string; usuario: Usuario }>("/credenciales/login", { method: "POST", body: JSON.stringify({ desafioId, respuesta, dispositivo }) });
+  anotarHuellaAca();
+  return r;
 }
 
 export const listarCredenciales = () => api<Credencial[]>("/credenciales");

@@ -39,6 +39,7 @@ let usuarios = [
   { id: "u-4", email: "lucia.fernandez.deposito@ferre.test", nombre: "Lucía Fernández", activo: false, creado_en: "2026-09-02T12:00:00Z", roles: ["r-3", "r-2"] },
 ];
 let permisosDeLaSesion = TODOS;
+let codigoAprobado = false;
 const sesion = () => ({ id: "u-1", email: "carlos@ferre.test", nombre: "Carlos", roles: permisosDeLaSesion.length === TODOS.length ? roles.slice(0, 5).map((r) => r.nombre) : ["Rol de la captura"], permisos: permisosDeLaSesion });
 const conRoles = (u) => ({ ...u, roles: u.roles.map((id) => roles.find((r) => r.id === id)).filter(Boolean).map((r) => ({ id: r.id, nombre: r.nombre })) });
 const conUsuarios = (r) => ({ ...r, usuarios: usuarios.filter((u) => u.roles.includes(r.id)).length });
@@ -49,6 +50,12 @@ export default {
   "POST /sesiones/google": ({ body }) => body?.credencial === "no"
     ? [403, { error: "juan.perez@ferre.test no está autorizado. Pedile a quien administra los usuarios que te dé de alta." }]
     : [201, { token: "token-de-mentira", usuario: sesion() }],
+  // Entrar a la computadora con el celular (RF-76): el código nunca se aprueba solo; con
+  // `PUT /mentira/aprobar-codigo` la próxima consulta de la computadora la deja entrar.
+  "POST /sesiones/vinculaciones": () => [201, { id: "v-1", codigo: "codigo-de-mentira", clave: "clave-de-mentira", expiraEnSegundos: 300 }],
+  "PUT /mentira/aprobar-codigo": () => { codigoAprobado = true; return {}; },
+  "POST /sesiones/vinculaciones/aprobar": ({ body }) => (body?.codigo === "vencido" ? [410, { error: "Ese código venció o ya se usó. Leé el que la computadora muestra ahora." }] : { dispositivo: "computadora · Chrome" }),
+  "POST /sesiones/vinculaciones/:id/estado": () => { if (!codigoAprobado) return { estado: "pendiente" }; codigoAprobado = false; return { estado: "aprobada", token: "token-de-mentira", usuario: sesion() }; },
   "GET /permisos": () => PERMISOS,
   "GET /roles": () => roles.map(conUsuarios),
   "POST /roles": ({ body }) => {

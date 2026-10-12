@@ -45,17 +45,17 @@ test("cerrar la sesión propia desde Administración vuelve al login", async ({ 
   await expect(propia).toContainText("Esta sesión");
   await expect(propia.getByRole("button", { name: /Cerrar/ })).toHaveClass(/peligro/);
   await propia.getByRole("button", { name: /Cerrar/ }).click();
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("ferre.sesion"))).toBeNull();
   // Recargar no vuelve a entrar.
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
 });
 
 test("Salir vuelve al login", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/vender");
   await page.getByTestId("salir").click();
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
   expect(psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NOT NULL`)).toBe("1");
 });

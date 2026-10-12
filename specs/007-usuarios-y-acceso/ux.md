@@ -87,6 +87,28 @@ la huella. Nada más: sin sesión no se ve ningún dato del negocio.
 | Google no responde | Que Google no responde; la huella sigue disponible donde esté vinculada |
 | Sesión cerrada a distancia o vencida | Se vuelve solo a la entrada, con «Hay que iniciar sesión» |
 
+## Historia 1b: entrar a la computadora con el celular (RF-76)
+
+**Maquetas aprobadas por Carlos el 2026-10-12** (`maquetas/`), con el logotipo de siempre y
+el botón de Google de verdad.
+
+**Quién:** cualquier usuario autorizado, sin sesión en la computadora.
+
+**Qué necesita a la vista en la computadora:** el código, sin pedirlo; los dos pasos, al lado;
+que se renueva solo; «Continuar con Google» debajo, como alternativa. «Entrar con la huella»
+solo si esa computadora fue vinculada.
+
+**Qué necesita a la vista en el celular:**
+
+- Sin sesión: la entrada de siempre, con un aviso de que al entrar ahí la computadora entra
+  también, y el botón de la huella primero, que lo dice: «Entrar acá y en la computadora».
+- Con la sesión ya abierta: un solo botón, «Entrar en la computadora», y «Ahora no».
+- Después: que la computadora ya entró, con qué usuario, y cómo seguir en el celular.
+
+**Reglas:** no hay pantalla de confirmación aparte; un código vencido o ya usado dice que hay
+que leer el que la computadora muestra ahora; sin conexión, la computadora no muestra código
+y dice que entrar necesita internet.
+
 ## Historia 2: administrar usuarios
 
 **Quién:** quien tiene el permiso «Administrar usuarios».

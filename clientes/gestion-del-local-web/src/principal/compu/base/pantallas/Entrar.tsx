@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api, ErrorApi } from "../../../../api";
 import { useSesion, type Usuario } from "../../../../sesion";
-import { entrarConHuella, hayHuella } from "../../../../credenciales";
+import QRCode from "qrcode";
+import { entrarConHuella, hayHuella, huellaVinculadaAca } from "../../../../credenciales";
 import { describirDispositivo, esCelular } from "../dispositivo";
 import { marcarEntradaConGoogle } from "./OfrecerHuella";
 import { useEnLinea } from "./negocio-comun";
@@ -139,6 +140,10 @@ export const TEXTOS_DE_ENTRADA = {
   lema: "Tu ferretería, en orden", // la versión corta, para la entrada del celular
   bajada: "Ferrebress es el sistema del mostrador: se usa desde el celular y desde la computadora, con los mismos datos.",
   entrar: "Entrar",
+  conElCelular: "Entrá con tu celular",
+  pasoLeer: "Apuntá la cámara del celular a este código y tocá el enlace.",
+  pasoHuella: "Poné la huella en el celular. Esta pantalla entra sola.",
+  codigoSeRenueva: "El código se renueva solo cada 5 minutos. No hay contraseñas.",
   comoConHuella: "Acá no hay contraseñas. Entrás con la huella, si ya vinculaste este dispositivo, o con tu cuenta de Google.",
   comoSinHuella: "Acá no hay contraseñas. Entrás con tu cuenta de Google.",
   nota: "Solo entran las personas que un Administrador del negocio autorizó. Si es tu primera vez, pedile que agregue tu correo de Google.",
@@ -189,20 +194,81 @@ function CintaMetrica() {
 
 // Dos formas de entrar, sin contraseñas (ADR-011): la huella del celular vinculado o la
 // cuenta de Google. Primero la más rápida que el dispositivo tenga.
+// El código para entrar con el celular (RF-76): se pide solo, se muestra como QR, y cada dos
+// segundos se pregunta si ya lo aprobaron. Al vencer se pide otro. La clave que retira la
+// sesión no sale de acá: el QR solo lleva el código.
+const CADA_MS = 2000;
+function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: string | null } {
+  const { entrar } = useSesion();
+  const [qr, setQr] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!activo) { setQr(null); return; }
+    let vigente = true;
+    let espera: ReturnType<typeof setTimeout> | null = null;
+    const esperar = (ms: number, que: () => void) => { espera = setTimeout(que, ms); };
+    async function pedir() {
+      try {
+        const { id, codigo, clave, expiraEnSegundos } = await api<{ id: string; codigo: string; clave: string; expiraEnSegundos: number }>("/sesiones/vinculaciones", { method: "POST", body: JSON.stringify({ dispositivo: describirDispositivo() }) });
+        if (!vigente) return;
+        const enlace = `${location.origin}${location.pathname}#/entrar-compu?codigo=${encodeURIComponent(codigo)}`;
+        // Para las pruebas automáticas: el enlace que el celular abriría.
+        (window as unknown as { __enlaceParaEntrar?: string }).__enlaceParaEntrar = enlace;
+        setQr(await QRCode.toDataURL(enlace, { width: 440, margin: 0, color: { dark: "#17312b", light: "#ffffff" } }));
+        setError(null);
+        const vence = Date.now() + expiraEnSegundos * 1000;
+        const preguntar = async () => {
+          if (!vigente) return;
+          if (Date.now() > vence) return void pedir();
+          // Con la ventana tapada no se pregunta: nadie está por entrar.
+          if (document.visibilityState === "hidden") return esperar(CADA_MS, () => void preguntar());
+          const r = await api<{ estado: "pendiente" | "vencida" | "aprobada"; token?: string; usuario?: Usuario }>(`/sesiones/vinculaciones/${id}/estado`, { method: "POST", body: JSON.stringify({ clave }) }).catch(() => null);
+          if (!vigente) return;
+          if (r?.estado === "aprobada" && r.token && r.usuario) return entrar(r.token, r.usuario);
+          if (r?.estado === "vencida") return void pedir();
+          esperar(CADA_MS, () => void preguntar());
+        };
+        esperar(CADA_MS, () => void preguntar());
+      } catch (e) {
+        if (!vigente) return;
+        setQr(null);
+        setError(e instanceof ErrorApi ? e.message : "No se pudo pedir el código. Reintentando…");
+        esperar(5000, () => void pedir());
+      }
+    }
+    void pedir();
+    return () => { vigente = false; if (espera) clearTimeout(espera); };
+  }, [activo, entrar]);
+  return { qr, error };
+}
+
 export function Entrar() {
   const enLinea = useEnLinea();
   const [cerrada] = useState(() => sesionCerradaPorElServidor);
-  const conHuella = hayHuella();
+  const conHuella = hayHuella() && huellaVinculadaAca();
+  const { qr, error: errorDeCodigo } = useCodigoParaEntrar(enLinea);
   return (
     <MarcoDeEntrada testId="entrar" conPuntos
       titulo={TEXTOS_DE_ENTRADA.titulo}
       bajada={TEXTOS_DE_ENTRADA.bajada}>
-      <h2>{TEXTOS_DE_ENTRADA.entrar}</h2>
-      <p className="entrar-como">{conHuella ? TEXTOS_DE_ENTRADA.comoConHuella : TEXTOS_DE_ENTRADA.comoSinHuella}</p>
+      <h2>{TEXTOS_DE_ENTRADA.conElCelular}</h2>
       {cerrada && <Aviso tipo="alerta" testId="sesion-cerrada"><strong className="entrar-error-titulo">Hay que iniciar sesión</strong>La sesión de este dispositivo se cerró o venció. Entrá de nuevo para seguir.</Aviso>}
       {!enLinea && <Aviso tipo="alerta" testId="entrar-sin-conexion">{TEXTOS_DE_ENTRADA.sinConexion}</Aviso>}
-      <BotonHuella />
-      {conHuella && <div className="entrar-o" aria-hidden="true"><span>o</span></div>}
+      {enLinea && (
+        <div className="entrar-codigo">
+          <div className="entrar-qr" data-testid="qr-entrar">
+            {qr ? <img src={qr} alt="Código para entrar con el celular" width={220} height={220} /> : <div className="esqueleto" aria-label="Generando el código" />}
+          </div>
+          <ol className="entrar-pasos">
+            <li><span>{TEXTOS_DE_ENTRADA.pasoLeer}</span></li>
+            <li><span>{TEXTOS_DE_ENTRADA.pasoHuella}</span></li>
+          </ol>
+        </div>
+      )}
+      {enLinea && <p className="entrar-como">{TEXTOS_DE_ENTRADA.codigoSeRenueva}</p>}
+      <Aviso tipo="error">{errorDeCodigo}</Aviso>
+      <div className="entrar-o" aria-hidden="true"><span>o</span></div>
+      {conHuella && <BotonHuella />}
       <BotonGoogle />
       <p className="entrar-nota">
         <Icono nombre="info" tam={18} />

@@ -627,10 +627,17 @@ RF-72:
     - "El último que administra no se puede quitar: tiene prueba en el servidor, no de punta a punta"
 
 RF-76:
-  estado: "Pendiente (#72): especificado, con la maqueta a aprobar"
-  pruebas: []
+  estado: "Hecho (#72): la computadora entra leyendo su código con el celular, sin paso de confirmar"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/sesiones.test.ts
+    - clientes/gestion-del-local-web/src/principal/celular/EntrarEnLaCompu.test.tsx
+    - tests/e2e/celular/01-login.spec.ts
+    - tests/e2e/escritorio/01-login.spec.ts
   defectos:
-    - "Sin construir: la computadora todavía no muestra el código para entrar con el celular"
+    - "El recorrido completo con la huella (celular sin sesión que entra y deja entrar a la computadora) no tiene prueba de punta a punta: la huella y Google no se pueden automatizar; está probado por partes"
+    - "No está probado con un celular y una computadora de verdad"
+    - "La computadora que ya tenía una huella vinculada antes de este cambio deja de ofrecer «Entrar con la huella» hasta que se vincule o entre con ella de nuevo"
+    - "Abrir el enlace del código en una computadora, en vez de en un celular, no muestra el paso para dejar entrar"
 
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"

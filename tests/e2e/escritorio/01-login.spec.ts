@@ -15,6 +15,7 @@ function psql(sql: string): string {
 test.beforeAll(() => {
   // Si una corrida anterior se cortó puede haber quedado una huella vinculada.
   psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psql(`DELETE FROM vinculacion`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
@@ -27,10 +28,10 @@ test.beforeAll(() => {
 
 test("sin sesión se pide entrar", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
-  await expect(page.getByText(/Acá no hay contraseñas/)).toBeVisible();
-  // Entrar leyendo un QR se quitó (2026-10-09): se entra con Google o con la huella.
-  await expect(page.getByRole("button", { name: /leer con el celular|código QR/ })).toHaveCount(0);
+  // En la computadora se entra con el celular (RF-76): el código está sin pedirlo.
+  await expect(page.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
+  await expect(page.getByTestId("qr-entrar")).toBeVisible();
+  await expect(page.getByText(/No hay contraseñas/)).toBeVisible();
 });
 
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
@@ -81,4 +82,43 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await page.getByRole("button", { name: "Salir" }).click();
   await page.getByTestId("entrar-huella").click();
   await expect(page.getByTestId("error-huella")).toContainText("no está vinculado");
+});
+
+// Entrar a la computadora con el celular (RF-76, decisión 57): la entrada de la computadora
+// muestra sola un código; el celular lo lee y la computadora entra, sin paso de confirmar.
+test("entrar a la computadora leyendo su código con el celular", async ({ browser }) => {
+  // Una sesión propia para el celular: las otras pruebas de este archivo cierran la suya.
+  const TOKEN_CELULAR = "token-e2e-login-celular";
+  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}', 'e2e celular', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  const compu = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
+  await compu.goto("/");
+  await expect(compu.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
+  await expect(compu.getByTestId("qr-entrar").locator("img")).toBeVisible();
+  // Sin una huella vinculada en esta computadora, no se ofrece entrar con la huella.
+  await expect(compu.getByTestId("entrar-huella")).toHaveCount(0);
+  const enlace = await compu.evaluate(() => (window as unknown as { __enlaceParaEntrar: string }).__enlaceParaEntrar);
+  expect(enlace).toContain("#/entrar-compu?codigo=");
+  const ruta = enlace.replace(/^https?:\/\/[^/]+/, "");
+
+  // Un celular sin sesión ve la entrada de siempre, que avisa que la computadora entra también.
+  const sinSesion = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await sinSesion.goto(ruta);
+  await expect(sinSesion.getByTestId("entrar-para-la-compu")).toContainText("esa computadora entra también");
+  await expect(compu.getByTestId("qr-entrar")).toBeVisible(); // nadie entró todavía
+
+  // Un celular que ya tenía la sesión: un toque, y la computadora entra sola con ese usuario.
+  const celular = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await celular.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
+  await celular.goto(ruta);
+  await celular.getByTestId("dejar-entrar").click();
+  await expect(celular.getByTestId("compu-entro")).toBeVisible();
+  await expect(compu.getByTestId("usuario")).toContainText("Dueño E2E", { timeout: 10000 });
+  expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'sesion.iniciada' AND contenido->>'medio' = 'celular' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
+
+  // El código sirve una sola vez.
+  const otro = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await otro.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
+  await otro.goto(ruta);
+  await otro.getByTestId("dejar-entrar").click();
+  await expect(otro.getByTestId("compu-no-entro")).toContainText("Leé el que la computadora muestra ahora");
 });

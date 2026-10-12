@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { emailVerificadoPorGoogle, exigirPermiso, exigirSesion, limitarIntentos } from "../autenticacion.js";
-import { crearSesion, revocarSesion, usuarioConPermisos } from "../sesiones.js";
+import { randomUUID } from "node:crypto";
+import { crearSesion, generarToken, hashear, revocarSesion, usuarioConPermisos } from "../sesiones.js";
 
 export const sesiones = new Hono();
 
@@ -24,6 +25,60 @@ sesiones.post("/google", limitarIntentos(10), async (c) => {
   const sesion = await crearSesion(pool, usuario.id, dispositivo);
   await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo, medio: "google" } });
   return c.json({ token: sesion.token, usuario }, 201);
+});
+
+// ---------- Entrar a la computadora con el celular (RF-76, decisión 57) ----------
+// La computadora pide un código y lo muestra como QR. Quien lo lee con el celular y tiene (o
+// abre ahí) una sesión, lo aprueba; la computadora, que consulta cada pocos segundos, retira
+// entonces su propia sesión, con ese mismo usuario. El código vence a los 5 minutos y sirve
+// una sola vez. No hay paso de confirmar: leerlo y entrar con la huella es la confirmación.
+const VIGENCIA_DEL_CODIGO_S = 300;
+const SIN_CODIGO = "Ese código venció o ya se usó. Leé el que la computadora muestra ahora.";
+
+sesiones.post("/vinculaciones", limitarIntentos(30, "codigo-nuevo"), async (c) => {
+  const cuerpo = await c.req.json<{ dispositivo?: string }>().catch(() => ({}) as { dispositivo?: string });
+  const id = randomUUID();
+  const codigo = generarToken(); // va en el QR
+  const clave = generarToken();  // queda en la computadora: con ella retira la sesión
+  await pool.query(
+    "INSERT INTO vinculacion (id, codigo_hash, clave_hash, dispositivo, expira_en) VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval)",
+    [id, hashear(codigo), hashear(clave), dispositivoDe(c.req.header("user-agent"), cuerpo.dispositivo), String(VIGENCIA_DEL_CODIGO_S)],
+  );
+  return c.json({ id, codigo, clave, expiraEnSegundos: VIGENCIA_DEL_CODIGO_S }, 201);
+});
+
+// El celular, con sesión, aprueba el código que leyó.
+sesiones.post("/vinculaciones/aprobar", exigirSesion, async (c) => {
+  const { codigo } = await c.req.json<{ codigo?: string }>().catch(() => ({}) as { codigo?: string });
+  if (!codigo) return c.json({ error: "Falta el código" }, 400);
+  const { rows } = await pool.query<{ id: string; dispositivo: string | null }>(
+    "UPDATE vinculacion SET aprobada_en = now(), aprobada_por = $1 WHERE codigo_hash = $2 AND aprobada_en IS NULL AND expira_en > now() RETURNING id, dispositivo",
+    [c.get("sesion").usuario.id, hashear(codigo)],
+  );
+  if (!rows[0]) return c.json({ error: SIN_CODIGO }, 410);
+  return c.json({ dispositivo: rows[0].dispositivo });
+});
+
+// La computadora pregunta cómo va su código. Cuando fue aprobado, retira la sesión: una sola vez.
+sesiones.post("/vinculaciones/:id/estado", limitarIntentos(240, "codigo-estado"), async (c) => {
+  const { clave } = await c.req.json<{ clave?: string }>().catch(() => ({}) as { clave?: string });
+  if (!clave) return c.json({ error: "Falta la clave" }, 400);
+  const id = c.req.param("id");
+  const { rows: lista } = await pool.query<{ aprobada_por: string; dispositivo: string | null }>(
+    "UPDATE vinculacion SET retirada_en = now() WHERE id = $1 AND clave_hash = $2 AND aprobada_en IS NOT NULL AND retirada_en IS NULL RETURNING aprobada_por, dispositivo",
+    [id, hashear(clave)],
+  ).catch(() => ({ rows: [] as { aprobada_por: string; dispositivo: string | null }[] }));
+  if (lista[0]) {
+    const usuario = await usuarioConPermisos(pool, lista[0].aprobada_por);
+    if (!usuario) return c.json({ estado: "vencida" });
+    const sesion = await crearSesion(pool, usuario.id, lista[0].dispositivo);
+    await pool.query("UPDATE vinculacion SET sesion_id = $1 WHERE id = $2", [sesion.id, id]);
+    await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo: lista[0].dispositivo, medio: "celular" } });
+    return c.json({ estado: "aprobada", token: sesion.token, usuario });
+  }
+  const { rows } = await pool.query<{ vigente: boolean }>("SELECT expira_en > now() AND retirada_en IS NULL AS vigente FROM vinculacion WHERE id = $1 AND clave_hash = $2", [id, hashear(clave)])
+    .catch(() => ({ rows: [] as { vigente: boolean }[] }));
+  return c.json({ estado: rows[0]?.vigente ? "pendiente" : "vencida" });
 });
 
 sesiones.get("/actual", exigirSesion, (c) => {

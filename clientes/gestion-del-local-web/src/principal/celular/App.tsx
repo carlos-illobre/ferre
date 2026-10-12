@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "./componentes/OfrecerHuella";
@@ -60,15 +61,21 @@ function Pantallas() {
   // que se había salido (decisión 56). Salvo que se haya llegado leyendo un código QR, que
   // sigue con lo que vino a hacer.
   const estadoAnterior = useRef(sesion.estado);
+  const [recienEntro, setRecienEntro] = useState(false);
   useEffect(() => {
     const venia = estadoAnterior.current;
     estadoAnterior.current = sesion.estado;
-    if (venia === "sin-sesion" && sesion.estado === "con-sesion" && !codigoVinculacion) irA("catalogo");
-  }, [sesion.estado, codigoVinculacion]);
+    if (venia !== "sin-sesion" || sesion.estado !== "con-sesion") return;
+    // Si se llegó leyendo el código de una computadora, entrar fue la confirmación (RF-76).
+    if (ruta.nombre === "entrar-compu") setRecienEntro(true);
+    else if (!codigoVinculacion) irA("catalogo");
+  }, [sesion.estado, codigoVinculacion, ruta.nombre]);
 
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
-  if (sesion.estado === "sin-sesion") return <Entrar />;
+  const paraLaCompu = ruta.nombre === "entrar-compu" && Boolean(codigoVinculacion);
+  if (sesion.estado === "sin-sesion") return <Entrar paraLaCompu={paraLaCompu} />;
+  if (paraLaCompu) return <EntrarEnLaCompu codigo={codigoVinculacion!} automatico={recienEntro || estadoAnterior.current === "sin-sesion"} nombre={sesion.usuario.nombre} />;
   // El celular llega acá al leer el código QR de la computadora: con la sesión ya iniciada, saca la foto que
   // pidió la computadora.
   if (ruta.nombre === "foto" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;

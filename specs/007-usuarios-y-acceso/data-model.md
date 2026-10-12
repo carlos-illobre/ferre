@@ -119,7 +119,7 @@ Tipos que escribe esta capacidad:
 | `usuario.creado` | Alta desde la app o por comando | `id`, `email`, `roles` (y `medio: "comando"`) |
 | `usuario.modificado` | Cambio de roles, nombre o activo | `id`, `cambios` |
 | `rol.creado`, `rol.modificado`, `rol.borrado` | Un rol se crea, cambia de nombre o de permisos, o se borra | `id`, `nombre`, `permisos` o `cambios` |
-| `sesion.iniciada` | Entrada con Google o con la huella | `sesionId`, `dispositivo`, `medio` (`google` o `huella`), `credencial` si fue con huella |
+| `sesion.iniciada` | Entrada con Google, con la huella, o de la computadora aprobada desde el celular | `sesionId`, `dispositivo`, `medio` (`google`, `huella` o `celular`), `credencial` si fue con huella |
 | `sesion.cerrada` | «Salir» o cerrar la propia | `sesionId` |
 | `sesion.revocada` | Un Administrador cierra una sesión | `sesionId` |
 | `credencial.vinculada` | Se vincula un celular | `id`, `dispositivo`, `tipo` |
@@ -130,17 +130,16 @@ Las demás capacidades escriben los suyos (`venta.registrada`, `lista.aplicada`,
 
 ## vinculacion
 
-Código de un solo uso para entrar en la computadora leyendo un QR con el celular. Esa forma
-de entrar se quitó (RF-70; ADR-011, enmienda del 2026-10-09): la tabla se conserva porque
-nada se borra, no recibe filas nuevas y ninguna ruta la lee.
+El código de un solo uso con el que se entra a la computadora leyéndolo con el celular
+(RF-76). La forma se había quitado el 2026-10-09 y volvió el 2026-10-12 (decisión 57).
 
-| Columna | Tipo |
-|---|---|
-| `id` | uuid, clave primaria |
-| `codigo_hash` | text, único, obligatorio |
-| `dispositivo` | text |
-| `creada_en`, `expira_en` | timestamptz |
-| `aprobada_en` | timestamptz |
-| `aprobada_por` | uuid → `usuario` |
-| `sesion_id` | uuid → `sesion` |
-| `retirada_en` | timestamptz |
+| Columna | Tipo | Detalle |
+|---|---|---|
+| `id` | uuid, clave primaria | |
+| `codigo_hash` | text, único | El hash del código que va en el QR |
+| `clave_hash` | text | El hash de la clave con la que la computadora retira su sesión. El código, que está a la vista, no alcanza para retirarla |
+| `dispositivo` | text | Cómo se describe la computadora que lo pidió |
+| `creada_en`, `expira_en` | timestamptz | Vence a los 5 minutos |
+| `aprobada_en`, `aprobada_por` | timestamptz, uuid → `usuario` | Cuándo y quién lo aprobó desde el celular |
+| `retirada_en` | timestamptz | Cuándo la computadora retiró la sesión: se retira una sola vez |
+| `sesion_id` | uuid → `sesion` | La sesión que se le abrió a la computadora |
