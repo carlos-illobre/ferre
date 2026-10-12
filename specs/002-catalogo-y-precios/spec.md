@@ -260,13 +260,16 @@ mandar un código conocido y uno desconocido, y ver el resultado en la computado
 7. **Given** ese código ya asociado, **When** el celular lo escanea otra vez, **Then** el producto pasa a cantidad 2.
 8. **Given** el escáner del celular sin computadora vinculada, **When** escanea un código que no está en el catálogo, **Then** ofrece asociarlo al producto que el Vendedor elija.
 9. **Given** un QR que se mostró y no se leyó en 5 minutos, o que ya se usó una vez, **When** un celular lo lee, **Then** no se vincula y dice que hay que pedir otro.
-10. **Given** un vínculo de más de 12 horas, **When** el celular manda un código, **Then** no se acepta y hay que vincular de nuevo.
+10. **Given** un emparejamiento de más de 30 días, o uno que alguno de los dos soltó o cuya sesión se cerró, **When** el celular manda un código, **Then** no se acepta y hay que emparejar de nuevo. Antes eran 12 horas (decisión 58).
 11. **Given** el celular vinculado y la computadora que perdió la conexión un momento, **When** la computadora vuelve, **Then** recibe los códigos que no le habían llegado, en orden y sin repetir.
 12. **Given** la ficha de un producto en el celular, **When** el usuario toca «Escanear el código» y apunta al código de barras del artículo, **Then** el código queda guardado en ese producto, la ficha lo muestra y dice que ya se puede buscar escaneándolo. Si el producto ya tenía un código, el nuevo lo reemplaza.
 13. **Given** la ficha de un producto en la computadora, **When** el usuario pide cargarle el código, **Then** puede tipearlo, o escanearlo con el celular vinculado: mientras la ficha lo está pidiendo, lo que el celular escanea queda guardado en ese producto.
 14. **Given** un código que ya tiene otro producto, **When** se lo carga a este, **Then** se guarda igual y se avisa cuál otro producto lo tiene, para unirlos como duplicados si son el mismo artículo (RF-06).
 15. **Given** la búsqueda del catálogo o del inventario en el celular, **When** el usuario escanea el código de un producto cargado, **Then** llega a ese producto sin tipear; si ningún producto tiene ese código, se le dice, y cómo cargárselo.
 16. **Given** la pantalla de productos de la computadora con el celular vinculado y ninguna ficha abierta, **When** el celular escanea un código, **Then** se abre la ficha de ese producto; si ninguno lo tiene, el código queda escrito en la búsqueda.
+17. **Given** un celular que dejó entrar a una computadora (RF-76), **When** la computadora entra, **Then** los dos quedan emparejados sin leer otro código: lo que el celular escanea le llega a la computadora, y la computadora lo dice.
+18. **Given** un celular emparejado que se usa para vender por su cuenta, **When** apaga «Lo que escaneo va también a la computadora», **Then** lo que escanea queda solo en el celular hasta que lo vuelva a encender.
+19. **Given** la computadora esperando el código de un producto en su ficha, o con la búsqueda de productos abierta, **When** llega un código que el celular había escaneado antes de eso, **Then** no se toma: solo cuenta lo que se escanea desde que empezó a esperar.
 12. **Given** un celular con sesión de otro usuario o sin sesión, **When** lee el QR, **Then** el sistema le pide entrar y solo vincula a quien tiene sesión; cada código llega solo a la computadora vinculada.
 13. **Given** un código de barras de menos de 4 o más de 32 caracteres, **When** se lo quiere asociar a un producto, **Then** no se guarda.
 

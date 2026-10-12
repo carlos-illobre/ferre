@@ -6,15 +6,15 @@ import { irA } from "../../../rutas";
 import { BotonGoogle } from "./Login";
 import { AvisoError } from "../componentes/base";
 
-// Se abre en el celular al leer el QR de la computadora: lo vincula 12 horas y vuelve a vender.
+// Se abre en el celular al leer el QR que la computadora muestra en Vender: los empareja y vuelve a vender.
 export function VincularCelular({ codigo }: { codigo: string }) {
   const { sesion } = useSesion();
   const [resultado, setResultado] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     if (sesion.estado !== "con-sesion") return;
-    api<{ id: string; nombre: string | null; horas: number }>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST" })
-      .then((r) => { guardarPuestoRemoto({ id: r.id, nombre: r.nombre, expira_en: new Date(Date.now() + r.horas * 3600_000).toISOString() }); setResultado(`Listo: este celular quedó vinculado a ${r.nombre ?? "la computadora"} por ${r.horas} horas. Lo que escanees acá aparece allá.`); })
+    api<{ id: string; nombre: string | null; expira_en: string; dias: number }>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST" })
+      .then((r) => { guardarPuestoRemoto({ id: r.id, nombre: r.nombre, expira_en: r.expira_en }); setResultado(`Listo: este celular quedó vinculado a ${r.nombre ?? "la computadora"}. Lo que escanees le llega, y si te pide una foto te aparece acá.`); })
       .catch((e: Error) => setError(e.message));
   }, [codigo, sesion.estado]);
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;

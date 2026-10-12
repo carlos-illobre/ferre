@@ -93,7 +93,7 @@ Filtros opcionales y combinables (RF-71): `usuario` (id del usuario), `tipo` (pr
 tipo de evento), `desde` (fecha y hora, inclusive) y `hasta` (fecha y hora, exclusive).
 `total` cuenta las acciones que cumplen los filtros.
 
-## Celular como lector de la computadora (`/puestos`)
+## Emparejamiento celular–computadora (`/puestos`)
 
 Pertenecen a RF-08 (capacidad de catálogo). Figuran acá porque todas exigen
 sesión y atan una sesión de computadora con una de celular; no son una forma de entrar.
@@ -101,11 +101,21 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 | Método | Ruta | Exige | Para qué sirve |
 |---|---|---|---|
 | POST | `/puestos` | Sesión | La computadora pide un puesto: devuelve `id`, el `codigo` para el QR y `expiraEnSegundos` (5 minutos) |
-| POST | `/puestos/:codigo/vincular` | Sesión | El celular leyó el QR: queda vinculado 12 horas. `404` si el código venció o ya se usó. Registra `puesto.vinculado` |
+| POST | `/puestos/:codigo/vincular` | Sesión | El celular leyó el QR de Vender: quedan emparejados 30 días, y se suelta el emparejamiento anterior de cualquiera de los dos. Devuelve `id`, `nombre`, `expira_en`, `dias`. `404` si el código venció o ya se usó. Registra `puesto.vinculado` |
+| GET | `/puestos/mio` | Sesión | Con quién está emparejada esta sesión: `comoComputadora` y `comoCelular` (cada uno `id`, `nombre`, `expira_en`, o nulo). Solo cuenta si la otra sesión sigue abierta |
+| DELETE | `/puestos/:id` | Sesión de cualquiera de los dos | Soltar el emparejamiento. `204`. Registra `puesto.desvinculado` |
 | POST | `/puestos/:id/codigos` | Sesión del celular vinculado a ese puesto (si no, `403`) | El celular manda un código escaneado |
 | POST | `/puestos/:id/codigos/:codigoId/recibido` | Sesión de la computadora dueña del puesto | La computadora confirma que lo recibió. `204` |
 | GET | `/puestos/:id` | Sesión de la computadora o del celular de ese puesto (si no, `404`) | Estado del puesto: si ya se vinculó y si sigue vigente |
-| GET | `/puestos/:id/eventos` | Sesión de la computadora dueña del puesto (si no, `404`) | Flujo de eventos (SSE) con los códigos pendientes y los que vayan llegando |
+| GET | `/puestos/:id/eventos` | Sesión de la computadora dueña del puesto (si no, `404`) | Flujo de eventos (SSE) con los códigos que vayan llegando y los que quedaron sin entregar en los últimos 2 minutos. Con `?nuevos=1`, solo los que lleguen de ahí en más (lo atrasado se da por entregado) |
+
+El emparejamiento también nace solo: cuando la computadora retira la sesión que le dejó un
+celular (`POST /sesiones/vinculaciones/:id/estado`), la respuesta trae `puesto` (`id`,
+`expira_en`) y ese celular queda emparejado con ella.
+
+`GET /pedidos-de-foto/para-mi` (sesión): los pedidos de foto que esperan las computadoras
+emparejadas con este celular, cada uno con `codigo` y `para`. Con eso el celular manda la foto
+sin leer el código.
 
 ## Qué exigen las rutas de las otras capacidades
 

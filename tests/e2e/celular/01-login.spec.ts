@@ -16,6 +16,10 @@ test.beforeAll(() => {
   // Si una corrida anterior se cortó puede haber quedado una huella vinculada.
   psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM vinculacion`);
+  // El emparejamiento que deja la entrada con el celular, y la foto que se manda con él.
+  psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')))`);
+  psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
+  psql(`DELETE FROM foto_comprobante WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
@@ -136,6 +140,21 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   await expect(celular.getByTestId("compu-entro")).toBeVisible();
   await expect(compu.getByTestId("usuario")).toContainText("Dueño E2E", { timeout: 10000 });
   expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'sesion.iniciada' AND contenido->>'medio' = 'celular' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
+
+  // Quedan emparejados (decisión 58): sin leer más códigos, la computadora ya tiene su celular…
+  await expect(celular.getByTestId("quedo-emparejado")).toBeVisible({ timeout: 15000 });
+  expect(psql(`SELECT count(*) FROM puesto WHERE vinculado_en IS NOT NULL AND expira_en > now() + interval '29 days' AND celular_sesion_id = (SELECT id FROM sesion WHERE token_hash = '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}')`)).toBe("1");
+  await compu.goto("/#/vender");
+  await expect(compu.getByTestId("celular-vinculado")).toBeVisible();
+  // …y la foto de una factura se la pide sin código: al celular le aparece el aviso.
+  await compu.goto("/#/compras");
+  await compu.getByTestId("foto-con-celular").click();
+  await expect(compu.getByTestId("pedida-al-celular")).toBeVisible();
+  await celular.getByTestId("seguir-en-el-celular").click();
+  await expect(celular.getByTestId("pedido-de-la-compu")).toContainText("La computadora pide una foto");
+  await celular.getByTestId("sacar-foto-para-la-compu").click();
+  await celular.getByTestId("archivo-para-la-compu").setInputFiles({ name: "factura.png", mimeType: "image/png", buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64") });
+  await expect(compu.getByTestId("foto-comprobante")).toContainText("cargada", { timeout: 15000 });
 
   // El código sirve una sola vez.
   const otro = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();

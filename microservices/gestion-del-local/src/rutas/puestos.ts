@@ -5,15 +5,18 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirSesion } from "../autenticacion.js";
 import { generarToken, hashear } from "../sesiones.js";
+import { DIAS_EMPAREJADO, soltarAnteriores } from "../emparejamiento.js";
 
-// Vinculación laptop–celular (issue #52). La laptop crea el puesto y muestra el QR; el
-// celular, ya autenticado, lo lee y queda vinculado 12 horas; cada código que escanea se
+// Emparejamiento computadora–celular (issue #52, decisión 58). Nace solo cuando el celular
+// deja entrar a la computadora (RF-76, ver sesiones.ts) o, con las dos sesiones ya abiertas,
+// cuando la computadora muestra un QR y el celular lo lee. Dura 30 días o hasta que alguno
+// de los dos lo suelte o cierre su sesión. Cada código que el celular escanea se
 // guarda y se empuja a la laptop por un flujo de eventos (SSE) que se reconecta solo. Lo
 // que la laptop no alcanzó a recibir se le entrega al reconectar.
 export const puestos = new Hono();
 puestos.use("/*", exigirSesion);
 
-const HORAS_VINCULO = 12;
+const SEGUNDOS_PENDIENTE = 120; // un código que la computadora no recibió a tiempo ya no sirve
 const MINUTOS_QR = 5;
 
 // Un solo proceso (ADR-001): los oyentes viven en memoria.
@@ -39,14 +42,39 @@ puestos.post("/", async (c) => {
 // El celular lee el QR y se vincula. Desde acá el puesto dura 12 horas.
 puestos.post("/:codigo/vincular", async (c) => {
   const { id: sesionId, usuario } = c.get("sesion");
-  const { rows } = await pool.query<{ id: string; nombre: string | null }>(
-    `UPDATE puesto SET vinculado_en = now(), celular_sesion_id = $2, expira_en = now() + ($3 || ' hours')::interval
-      WHERE codigo_hash = $1 AND vinculado_en IS NULL AND expira_en > now() RETURNING id, nombre`,
-    [hashear(c.req.param("codigo")), sesionId, String(HORAS_VINCULO)],
+  const { rows } = await pool.query<{ id: string; nombre: string | null; sesion_id: string; expira_en: string }>(
+    `UPDATE puesto SET vinculado_en = now(), celular_sesion_id = $2, expira_en = now() + ($3 || ' days')::interval
+      WHERE codigo_hash = $1 AND vinculado_en IS NULL AND expira_en > now() RETURNING id, nombre, sesion_id, expira_en`,
+    [hashear(c.req.param("codigo")), sesionId, String(DIAS_EMPAREJADO)],
   );
   if (!rows[0]) return c.json({ error: "El código venció o ya se usó. Generá otro en la computadora." }, 404);
-  await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: rows[0].id } });
-  return c.json({ id: rows[0].id, nombre: rows[0].nombre, horas: HORAS_VINCULO });
+  await soltarAnteriores(pool, rows[0].sesion_id, sesionId, rows[0].id);
+  await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: rows[0].id, medio: "codigo" } });
+  return c.json({ id: rows[0].id, nombre: rows[0].nombre, expira_en: rows[0].expira_en, dias: DIAS_EMPAREJADO });
+});
+
+// Con quién está emparejada esta sesión, mirada desde los dos lados: como computadora (quién
+// le manda códigos) y como celular (a quién se los manda). Solo cuenta si la otra sesión sigue abierta.
+puestos.get("/mio", async (c) => {
+  const { id: sesionId } = c.get("sesion");
+  const { rows } = await pool.query<{ id: string; nombre: string | null; expira_en: string; sesion_id: string }>(
+    `SELECT p.id, p.nombre, p.expira_en, p.sesion_id FROM puesto p
+       JOIN sesion a ON a.id = p.sesion_id AND a.revocada_en IS NULL AND a.expira_en > now()
+       JOIN sesion b ON b.id = p.celular_sesion_id AND b.revocada_en IS NULL AND b.expira_en > now()
+      WHERE p.vinculado_en IS NOT NULL AND p.expira_en > now() AND (p.sesion_id = $1 OR p.celular_sesion_id = $1)
+      ORDER BY p.vinculado_en DESC`,
+    [sesionId],
+  );
+  const de = (compu: boolean) => { const p = rows.find((r) => (r.sesion_id === sesionId) === compu); return p ? { id: p.id, nombre: p.nombre, expira_en: p.expira_en } : null; };
+  return c.json({ comoComputadora: de(true), comoCelular: de(false) });
+});
+
+// Soltar el emparejamiento, desde cualquiera de los dos.
+puestos.delete("/:id", async (c) => {
+  const { id: sesionId, usuario } = c.get("sesion");
+  const { rowCount } = await pool.query("UPDATE puesto SET expira_en = now() WHERE id = $1 AND (sesion_id = $2 OR celular_sesion_id = $2) AND expira_en > now()", [c.req.param("id"), sesionId]);
+  if (rowCount) await registrarEvento(pool, { tipo: "puesto.desvinculado", usuarioId: usuario.id, contenido: { puestoId: c.req.param("id") } });
+  return c.body(null, 204);
 });
 
 // El celular manda un código escaneado.
@@ -89,10 +117,16 @@ puestos.get("/:id/eventos", async (c) => {
   const puestoId = c.req.param("id");
   const { rows } = await pool.query("SELECT id FROM puesto WHERE id = $1 AND sesion_id = $2 AND expira_en > now()", [puestoId, sesionId]);
   if (!rows[0]) return c.json({ error: "No existe ese puesto o venció" }, 404);
+  // `nuevos=1`: quien escucha quiere solo lo que se escanee de acá en más (la ficha que espera
+  // el código de un producto, la búsqueda). Lo que había quedado sin entregar se da por
+  // entregado: si no, un código de hace un rato terminaría guardado en el producto que no es.
+  const soloNuevos = c.req.query("nuevos") === "1";
+  if (soloNuevos) await pool.query("UPDATE codigo_escaneado SET entregado_en = now() WHERE puesto_id = $1 AND entregado_en IS NULL", [puestoId]);
   return streamSSE(c, async (flujo) => {
-    const { rows: pendientes } = await pool.query<{ id: string; codigo: string; creado_en: string }>(
-      "SELECT id, codigo, creado_en FROM codigo_escaneado WHERE puesto_id = $1 AND entregado_en IS NULL ORDER BY creado_en",
-      [puestoId],
+    const { rows: pendientes } = soloNuevos ? { rows: [] } : await pool.query<{ id: string; codigo: string; creado_en: string }>(
+      // Lo que no llegó «hace un momento» ya no se entrega: aparecería en una venta que no es.
+      "SELECT id, codigo, creado_en FROM codigo_escaneado WHERE puesto_id = $1 AND entregado_en IS NULL AND creado_en > now() - ($2 || ' seconds')::interval ORDER BY creado_en",
+      [puestoId, String(SEGUNDOS_PENDIENTE)],
     );
     for (const p of pendientes) await flujo.writeSSE({ event: "codigo", data: JSON.stringify(p), id: p.id });
     let abierto = true;

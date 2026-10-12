@@ -8,7 +8,7 @@ const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFal
 vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso() }));
 vi.mock("./componentes/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
 vi.mock("./componentes/VincularCelular", () => ({ VincularCelular: () => null }));
-vi.mock("../../puesto", () => ({ enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), puestoRemoto: () => null }));
+vi.mock("../../puesto", async (original) => ({ ...(await original<typeof import("../../puesto")>()), enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));

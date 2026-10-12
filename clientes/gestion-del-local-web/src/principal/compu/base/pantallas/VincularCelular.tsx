@@ -8,7 +8,7 @@ import { esFallaDeRed } from "./negocio-comun";
 import { Aviso, Boton, Icono, Progreso } from "../ui";
 import "../estilos/entrar.css";
 
-type Vinculado = { id: string; nombre: string | null; horas: number };
+type Vinculado = { id: string; nombre: string | null; expira_en: string; dias: number };
 
 // El código de la computadora vale una sola vez: si la pantalla se monta dos veces, el
 // segundo pedido lo encontraría usado. Se guarda el pedido en curso de cada código.
@@ -23,7 +23,7 @@ function vincular(codigo: string): Promise<Vinculado> {
   return pedido;
 }
 
-// Se abre en el celular al leer el código QR de la computadora: lo vincula 12 horas, y
+// Se abre en el celular al leer el código QR de la computadora: los empareja, y
 // desde entonces lo que el celular escanea aparece en la venta de la computadora.
 export function VincularCelular({ codigo }: { codigo: string }) {
   const { sesion } = useSesion();
@@ -38,7 +38,7 @@ export function VincularCelular({ codigo }: { codigo: string }) {
     setError(null);
     vincular(codigo)
       .then((r) => {
-        guardarPuestoRemoto({ id: r.id, nombre: r.nombre, expira_en: new Date(Date.now() + r.horas * 3600_000).toISOString() });
+        guardarPuestoRemoto({ id: r.id, nombre: r.nombre, expira_en: r.expira_en });
         if (vigente) setResultado(r);
       })
       .catch((e: Error) => {
@@ -71,7 +71,7 @@ export function VincularCelular({ codigo }: { codigo: string }) {
       {resultado && (
         <div className="vincular-resultado">
           <span className="vincular-tilde"><Icono nombre="tilde" tam={36} grosor={3} /></span>
-          <p role="status" data-testid="vinculacion-ok">Listo: este celular quedó vinculado a <strong>{resultado.nombre ?? "la computadora"}</strong> por {resultado.horas} horas. Lo que escanees acá aparece allá.</p>
+          <p role="status" data-testid="vinculacion-ok">Listo: este celular quedó vinculado a <strong>{resultado.nombre ?? "la computadora"}</strong>. Lo que escanees acá aparece allá, y si te pide una foto te aparece acá.</p>
         </div>
       )}
       <Aviso tipo="error" accion={error?.reintentable ? <Boton tam="chico" onClick={() => setIntento((n) => n + 1)}>Probar de nuevo</Boton> : undefined}>{error?.texto}</Aviso>

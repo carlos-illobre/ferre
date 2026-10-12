@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
+import { pool } from "../db.js";
+import { computadorasDe } from "../emparejamiento.js";
 
 // Pedido de foto: la computadora no tiene cámara. Donde haga falta una foto (la factura de un
 // ingreso, un producto, un ticket) pide una y muestra un código QR; el celular lo lee, saca
@@ -14,7 +16,7 @@ const MINUTOS = 10;
 const MAXIMO_DE_PEDIDOS = 50;
 const MAXIMO_DE_FOTO = 10 * 1024 * 1024;
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
-type Pedido = { para: string; vence: number; foto: { tipo: string; contenido: ArrayBuffer } | null };
+type Pedido = { para: string; de: string; vence: number; foto: { tipo: string; contenido: ArrayBuffer } | null };
 const pedidos = new Map<string, Pedido>();
 const VENCIDO = { error: "El código venció. Pedí otro en la computadora." };
 
@@ -30,8 +32,17 @@ pedidosDeFoto.post("/", async (c) => {
   vigente("");
   if (pedidos.size >= MAXIMO_DE_PEDIDOS) pedidos.delete(pedidos.keys().next().value!);
   const codigo = randomUUID();
-  pedidos.set(codigo, { para: String(cuerpo.para ?? "").trim().slice(0, 120) || "la computadora", vence: Date.now() + MINUTOS * 60_000, foto: null });
+  pedidos.set(codigo, { para: String(cuerpo.para ?? "").trim().slice(0, 120) || "la computadora", de: c.get("sesion").id, vence: Date.now() + MINUTOS * 60_000, foto: null });
   return c.json({ codigo, expiraEnSegundos: MINUTOS * 60 }, 201);
+});
+
+// El celular emparejado (decisión 58) pregunta si su computadora está esperando alguna foto:
+// así no hace falta leer el código. Va antes de «/:codigo» para que no la tape.
+pedidosDeFoto.get("/para-mi", async (c) => {
+  vigente("");
+  const computadoras = new Set(await computadorasDe(pool, c.get("sesion").id));
+  const esperando = [...pedidos].filter(([, p]) => p.foto === null && computadoras.has(p.de)).map(([codigo, p]) => ({ codigo, para: p.para }));
+  return c.json(esperando);
 });
 
 // La computadora pregunta si ya llegó; el celular, si el código vale y para qué es la foto.

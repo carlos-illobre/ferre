@@ -18,7 +18,7 @@ import { describirDispositivo } from "./pantallas/Login";
 import { Escaner, hayCamara } from "./componentes/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
-import { enviarCodigoAlPuesto, escucharPuesto, puestoRemoto } from "../../puesto";
+import { enviarCodigoAlPuesto, escucharPuesto, EVENTO_EMPAREJAMIENTO, fijarMandaLoQueEscanea, mandaLoQueEscanea, puestoRemoto } from "../../puesto";
 import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
 import type { Producto } from "./pantallas/Productos";
 
@@ -71,6 +71,14 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
   const [escaneando, setEscaneando] = useState(false);
   const [ultimoEscaneo, setUltimoEscaneo] = useState<string | null>(null);
   const [puestoVinculado, setPuestoVinculado] = useState(false);
+  // El celular emparejado con una computadora (decisión 58), y si le manda lo que escanea.
+  const [emparejado, setEmparejado] = useState(() => Boolean(puestoRemoto()));
+  const [manda, setManda] = useState(mandaLoQueEscanea);
+  useEffect(() => {
+    const mirar = () => { setEmparejado(Boolean(puestoRemoto())); setManda(mandaLoQueEscanea()); };
+    window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar);
+    return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar);
+  }, []);
   const [codigoDesconocido, setCodigoDesconocido] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [hoja, setHoja] = useState<"clientes" | "hoy" | null>(null);
@@ -261,7 +269,11 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
         <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Buscar producto o código" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja}
           alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
         {(!hayCamara() || window.innerWidth > 900) && <div className="solo-escritorio"><VincularCelular vinculado={puestoVinculado} alVincular={alVincular} /></div>}
-        {puestoRemoto() && <small data-testid="celular-vinculado-remoto">📱 Vinculado a la computadora</small>}
+        {emparejado && (
+          <button type="button" className={`chip emparejado ${manda ? "activo" : ""}`} aria-pressed={manda} onClick={() => fijarMandaLoQueEscanea(!manda)} data-testid="celular-vinculado-remoto">
+            {manda ? "Lo que escaneo va también a la computadora" : "Lo que escaneo queda solo en el celular"}
+          </button>
+        )}
       </div>
 
       <div className="columna">

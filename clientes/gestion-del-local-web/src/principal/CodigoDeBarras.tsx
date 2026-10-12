@@ -41,7 +41,7 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
   // El escáner reinicia la cámara si le cambia la función: se le da siempre la misma.
   const alDetectar = useCallback((codigo: string) => void alLlegar.current(codigo), []);
   const puestoId = abierto && puesto ? puesto.id : null;
-  useEffect(() => { if (puestoId) return escucharPuesto(puestoId, (codigo) => void alLlegar.current(codigo)); }, [puestoId]);
+  useEffect(() => { if (puestoId) return escucharPuesto(puestoId, (codigo) => void alLlegar.current(codigo), undefined, true); }, [puestoId]);
 
   return (
     <section className="cb" aria-label="Código de barras" data-testid="codigo-de-barras">

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
+import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
+import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "./componentes/OfrecerHuella";
@@ -60,6 +62,8 @@ function Pantallas() {
   // Al entrar (con Google o con la huella) se abre siempre el Catálogo, no la pantalla desde la
   // que se había salido (decisión 56). Salvo que se haya llegado leyendo un código QR, que
   // sigue con lo que vino a hacer.
+  // Con la sesión abierta, el emparejamiento con la computadora se pone al día con el servidor (decisión 58).
+  useEffect(() => { if (sesion.estado === "con-sesion") void sincronizarEmparejamiento(); }, [sesion.estado]);
   const estadoAnterior = useRef(sesion.estado);
   const [recienEntro, setRecienEntro] = useState(false);
   useEffect(() => {
@@ -135,6 +139,7 @@ function Pantallas() {
           </button>
         ))}
       </nav>
+      <PedidosDeLaCompu alSacar={(codigo) => irA(`foto?codigo=${encodeURIComponent(codigo)}`)} />
       <OfrecerHuella />
     </div>
   );

@@ -47,4 +47,16 @@ describe("pedidos de foto", () => {
       expect((await pedir(app, "GET", `/pedidos-de-foto/${codigo}`)).status).toBe(404);
     } finally { vi.useRealTimers(); }
   });
+
+  // Decisión 58: el celular emparejado se entera solo de que su computadora espera una foto.
+  it("el celular emparejado ve el pedido de su computadora sin leer el código; uno que no lo está, no", async () => {
+    const codigo = await pedirUna(); // lo pide la sesión «sesion-admin»
+    expect(await (await pedir(app, "GET", "/pedidos-de-foto/para-mi", { rol: "mostrador" })).json()).toEqual([]);
+    base.actual.programar(/SELECT sesion_id FROM puesto WHERE celular_sesion_id/, (params) => ({ rows: params[0] === "sesion-mostrador" ? [{ sesion_id: "sesion-admin" }] : [] }));
+    expect(await (await pedir(app, "GET", "/pedidos-de-foto/para-mi", { rol: "mostrador" })).json()).toEqual([{ codigo, para: "la factura del ingreso" }]);
+    expect(await (await pedir(app, "GET", "/pedidos-de-foto/para-mi", { rol: "soloVende" })).json()).toEqual([]);
+    // Una vez mandada la foto, deja de figurar.
+    await pedir(app, "POST", `/pedidos-de-foto/${codigo}/foto`, { rol: "mostrador", formulario: conFoto() });
+    expect(await (await pedir(app, "GET", "/pedidos-de-foto/para-mi", { rol: "mostrador" })).json()).toEqual([]);
+  });
 });

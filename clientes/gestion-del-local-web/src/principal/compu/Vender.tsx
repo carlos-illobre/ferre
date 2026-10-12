@@ -12,7 +12,7 @@ import { useCatalogo, type Cliente } from "../../catalogo";
 import { useTeclasGlobales } from "../../teclas";
 import { pesos } from "../../formato";
 import { Escaner, hayCamara } from "../celular/componentes/Escaner";
-import { enviarCodigoAlPuesto, escucharPuesto, guardarPuestoLocal, puestoLocal, puestoRemoto } from "../../puesto";
+import { enviarCodigoAlPuesto, escucharPuesto, EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
 import type { Producto } from "../celular/pantallas/Productos";
 import { describirDispositivo } from "./base/dispositivo";
 import { NOMBRE_MEDIO, useVentasDelDia } from "./base/pantallas/VentasDeHoy";
@@ -125,7 +125,13 @@ export function Vender() {
     pararPuesto.current?.();
     pararPuesto.current = escucharPuesto(puestoId, (codigo) => manejarCodigo.current(codigo), (conectado) => { if (!conectado) setPuestoVinculado(Boolean(puestoLocal())); });
   }, []);
-  useEffect(() => { const p = puestoLocal(); if (p) alVincular(p.id); return () => pararPuesto.current?.(); }, [alVincular]);
+  useEffect(() => {
+    // El emparejamiento puede llegar después de abrir la pantalla (se pone al día con el servidor) o soltarse.
+    const mirar = () => { const p = puestoLocal(); if (p) alVincular(p.id); else { pararPuesto.current?.(); pararPuesto.current = null; setPuestoVinculado(false); } };
+    mirar();
+    window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar);
+    return () => { window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); pararPuesto.current?.(); };
+  }, [alVincular]);
 
   const alDetectar = useCallback((codigo: string) => {
     const conocido = manejarCodigo.current(codigo);
@@ -555,7 +561,7 @@ function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; a
     return (
       <span className="fila" data-testid="celular-vinculado">
         <Pastilla tipo="ok">Celular vinculado</Pastilla>
-        <Boton tam="chico" onClick={() => { guardarPuestoLocal(null); location.reload(); }}>Desvincular</Boton>
+        <Boton tam="chico" onClick={() => void soltarEmparejamiento()} data-testid="desvincular">Desvincular</Boton>
       </span>
     );
   }
@@ -571,7 +577,7 @@ function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; a
             <ol className="pasos">
               <li><span>Abrí la cámara del celular y apuntá al código.</span></li>
               <li><span>Tocá el enlace que aparece y entrá con tu cuenta.</span></li>
-              <li><span>Listo: lo que escanees con el celular aparece en esta venta durante 12 horas.</span></li>
+              <li><span>Listo: lo que escanees con el celular aparece en esta venta, y las fotos que le pidas te llegan sin leer más códigos.</span></li>
             </ol>
           </div>
           <Aviso tipo="error">{error}</Aviso>

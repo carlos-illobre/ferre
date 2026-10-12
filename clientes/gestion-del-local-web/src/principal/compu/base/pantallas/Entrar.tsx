@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api, ErrorApi } from "../../../../api";
 import { useSesion, type Usuario } from "../../../../sesion";
 import QRCode from "qrcode";
+import { guardarPuestoLocal } from "../../../../puesto";
 import { entrarConHuella, hayHuella, huellaVinculadaAca } from "../../../../credenciales";
 import { describirDispositivo, esCelular } from "../dispositivo";
 import { marcarEntradaConGoogle } from "./OfrecerHuella";
@@ -222,9 +223,13 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
           if (Date.now() > vence) return void pedir();
           // Con la ventana tapada no se pregunta: nadie está por entrar.
           if (document.visibilityState === "hidden") return esperar(CADA_MS, () => void preguntar());
-          const r = await api<{ estado: "pendiente" | "vencida" | "aprobada"; token?: string; usuario?: Usuario }>(`/sesiones/vinculaciones/${id}/estado`, { method: "POST", body: JSON.stringify({ clave }) }).catch(() => null);
+          const r = await api<{ estado: "pendiente" | "vencida" | "aprobada"; token?: string; usuario?: Usuario; puesto?: { id: string; expira_en: string } | null }>(`/sesiones/vinculaciones/${id}/estado`, { method: "POST", body: JSON.stringify({ clave }) }).catch(() => null);
           if (!vigente) return;
-          if (r?.estado === "aprobada" && r.token && r.usuario) return entrar(r.token, r.usuario);
+          if (r?.estado === "aprobada" && r.token && r.usuario) {
+            // El celular que la dejó entrar queda emparejado: escanea y manda fotos sin leer más códigos.
+            if (r.puesto) guardarPuestoLocal(r.puesto);
+            return entrar(r.token, r.usuario);
+          }
           if (r?.estado === "vencida") return void pedir();
           esperar(CADA_MS, () => void preguntar());
         };

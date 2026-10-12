@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SiVeCostos, useVeCostos } from "../../../Costos";
 import { CodigoDeBarras } from "../../../CodigoDeBarras";
-import { escucharPuesto, puestoLocal } from "../../../../puesto";
+import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
 import { usePuede } from "../../../permisos";
 import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { useCatalogo } from "../../../../catalogo";
@@ -55,11 +55,12 @@ export function Productos() {
       if (p) { setConsulta(""); setAbiertoId(p.id); } else setConsulta(codigo);
     };
   }, [catalogo]);
+  const [emparejado, setEmparejado] = useState(() => puestoLocal()?.id ?? null);
+  useEffect(() => { const mirar = () => setEmparejado(puestoLocal()?.id ?? null); window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar); return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); }, []);
   useEffect(() => {
-    const puesto = puestoLocal();
-    if (!puesto || abiertoId) return;
-    return escucharPuesto(puesto.id, (codigo) => alEscanear.current(codigo));
-  }, [abiertoId]);
+    if (!emparejado || abiertoId) return;
+    return escucharPuesto(emparejado, (codigo) => alEscanear.current(codigo), undefined, true);
+  }, [abiertoId, emparejado]);
   const resultados = useMemo(() => (consultaEstable.trim() ? buscarProductos(consultaEstable, limite) : (catalogo ?? []).slice(0, limite)), [buscarProductos, consultaEstable, limite, catalogo]);
   const hayMas = resultados.length === limite;
   useEffect(() => { setElegido(0); setLimite(PASO); }, [consultaEstable]);

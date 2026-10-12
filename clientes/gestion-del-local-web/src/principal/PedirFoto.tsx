@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { api, leerToken, urlApi } from "../api";
+import { puestoLocal } from "../puesto";
 import "./foto-de-factura.css";
 
 // La computadora no tiene cámara: donde haga falta una foto muestra un código QR, el celular
@@ -14,6 +15,8 @@ export function PedirFotoAlCelular({ para, alRecibir, alCancelar }: { para: stri
   const [pedido, setPedido] = useState<{ codigo: string; qr: string; vence: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [recibiendo, setRecibiendo] = useState(false);
+  // Con un celular emparejado (decisión 58) no hace falta leer el código: el pedido le aparece solo.
+  const [emparejado] = useState(() => Boolean(puestoLocal()));
 
   useEffect(() => {
     let vigente = true;
@@ -57,12 +60,20 @@ export function PedirFotoAlCelular({ para, alRecibir, alCancelar }: { para: stri
     <div className="ff-pedido" role="status" data-testid="pedido-de-foto">
       {pedido ? <img src={pedido.qr} alt="Código para sacar la foto con el celular" width={150} height={150} /> : <span className="ff-qr-vacio" aria-hidden="true" />}
       <div className="ff-texto">
-        <strong>{recibiendo ? "Llegó la foto, un momento…" : "Sacá la foto con el celular"}</strong>
-        <ol>
-          <li>Abrí la cámara del celular y apuntá a este código.</li>
-          <li>Tocá el enlace que aparece y sacá la foto.</li>
-          <li>La foto aparece sola acá.</li>
-        </ol>
+        <strong>{recibiendo ? "Llegó la foto, un momento…" : emparejado ? "Pedida a tu celular" : "Sacá la foto con el celular"}</strong>
+        {emparejado ? (
+          <ol data-testid="pedida-al-celular">
+            <li>Abrí Ferrebress en el celular: te aparece «La computadora pide una foto».</li>
+            <li>Tocá «Sacar la foto». La foto aparece sola acá.</li>
+            <li>Si no te aparece, apuntá la cámara del celular a este código.</li>
+          </ol>
+        ) : (
+          <ol>
+            <li>Abrí la cámara del celular y apuntá a este código.</li>
+            <li>Tocá el enlace que aparece y sacá la foto.</li>
+            <li>La foto aparece sola acá.</li>
+          </ol>
+        )}
         {error && <span className="ff-error" role="alert">{error}</span>}
         <div className="ff-botones"><button type="button" className="ff-boton" onClick={alCancelar}>Cancelar</button></div>
       </div>

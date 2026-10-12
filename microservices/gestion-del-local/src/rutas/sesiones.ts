@@ -3,6 +3,7 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { emailVerificadoPorGoogle, exigirPermiso, exigirSesion, limitarIntentos } from "../autenticacion.js";
 import { randomUUID } from "node:crypto";
+import { emparejar } from "../emparejamiento.js";
 import { crearSesion, generarToken, hashear, revocarSesion, usuarioConPermisos } from "../sesiones.js";
 
 export const sesiones = new Hono();
@@ -52,8 +53,8 @@ sesiones.post("/vinculaciones/aprobar", exigirSesion, async (c) => {
   const { codigo } = await c.req.json<{ codigo?: string }>().catch(() => ({}) as { codigo?: string });
   if (!codigo) return c.json({ error: "Falta el código" }, 400);
   const { rows } = await pool.query<{ id: string; dispositivo: string | null }>(
-    "UPDATE vinculacion SET aprobada_en = now(), aprobada_por = $1 WHERE codigo_hash = $2 AND aprobada_en IS NULL AND expira_en > now() RETURNING id, dispositivo",
-    [c.get("sesion").usuario.id, hashear(codigo)],
+    "UPDATE vinculacion SET aprobada_en = now(), aprobada_por = $1, celular_sesion_id = $3 WHERE codigo_hash = $2 AND aprobada_en IS NULL AND expira_en > now() RETURNING id, dispositivo",
+    [c.get("sesion").usuario.id, hashear(codigo), c.get("sesion").id],
   );
   if (!rows[0]) return c.json({ error: SIN_CODIGO }, 410);
   return c.json({ dispositivo: rows[0].dispositivo });
@@ -64,17 +65,21 @@ sesiones.post("/vinculaciones/:id/estado", limitarIntentos(240, "codigo-estado")
   const { clave } = await c.req.json<{ clave?: string }>().catch(() => ({}) as { clave?: string });
   if (!clave) return c.json({ error: "Falta la clave" }, 400);
   const id = c.req.param("id");
-  const { rows: lista } = await pool.query<{ aprobada_por: string; dispositivo: string | null }>(
-    "UPDATE vinculacion SET retirada_en = now() WHERE id = $1 AND clave_hash = $2 AND aprobada_en IS NOT NULL AND retirada_en IS NULL RETURNING aprobada_por, dispositivo",
+  type Aprobada = { aprobada_por: string; dispositivo: string | null; celular_sesion_id: string | null };
+  const { rows: lista } = await pool.query<Aprobada>(
+    "UPDATE vinculacion SET retirada_en = now() WHERE id = $1 AND clave_hash = $2 AND aprobada_en IS NOT NULL AND retirada_en IS NULL RETURNING aprobada_por, dispositivo, celular_sesion_id",
     [id, hashear(clave)],
-  ).catch(() => ({ rows: [] as { aprobada_por: string; dispositivo: string | null }[] }));
+  ).catch(() => ({ rows: [] as Aprobada[] }));
   if (lista[0]) {
     const usuario = await usuarioConPermisos(pool, lista[0].aprobada_por);
     if (!usuario) return c.json({ estado: "vencida" });
     const sesion = await crearSesion(pool, usuario.id, lista[0].dispositivo);
     await pool.query("UPDATE vinculacion SET sesion_id = $1 WHERE id = $2", [sesion.id, id]);
     await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo: lista[0].dispositivo, medio: "celular" } });
-    return c.json({ estado: "aprobada", token: sesion.token, usuario });
+    // El celular que la dejó entrar queda emparejado con esta computadora (decisión 58).
+    const puesto = lista[0].celular_sesion_id ? await emparejar(pool, sesion.id, lista[0].celular_sesion_id, lista[0].dispositivo).catch(() => null) : null;
+    if (puesto) await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: puesto.id, medio: "entrada" } });
+    return c.json({ estado: "aprobada", token: sesion.token, usuario, puesto });
   }
   const { rows } = await pool.query<{ vigente: boolean }>("SELECT expira_en > now() AND retirada_en IS NULL AS vigente FROM vinculacion WHERE id = $1 AND clave_hash = $2", [id, hashear(clave)])
     .catch(() => ({ rows: [] as { vigente: boolean }[] }));

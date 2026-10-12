@@ -336,3 +336,21 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Es el primer paso de un rediseño mayor: que un solo emparejamiento celular–computadora
       sirva también para escanear y para mandar fotos. Eso se especifica aparte.
 
+58. **Un solo emparejamiento entre el celular y la computadora, que nace al entrar**
+    (2026-10-12). Segundo paso del rediseño que pidió Carlos: que no haya que leer un código
+    para cada cosa.
+    - El celular que deja entrar a una computadora (decisión 57) queda emparejado con ella.
+      Con las dos sesiones ya abiertas, se emparejan leyendo el código de Vender, como antes.
+    - El emparejamiento sirve para todo: lo que el celular escanea le llega a la computadora,
+      y cuando la computadora pide una foto (una factura, un producto, la captura de un
+      ticket) al celular le aparece un aviso con «Sacar la foto». El código QR de la foto
+      sigue en pantalla, por si el celular no está a mano.
+    - **Dura 30 días** (eran 12 horas), o hasta que alguno de los dos lo suelte o cierre su
+      sesión. La duración la elegí yo: Carlos no la fijó.
+    - Una computadora tiene un celular emparejado a la vez, y un celular una computadora: el
+      emparejamiento nuevo reemplaza al anterior.
+    - En el celular, un interruptor en Vender apaga el envío de lo escaneado, para vender
+      desde el celular sin que los productos aparezcan también en la venta de la computadora.
+    - Un código que la computadora no recibió en 2 minutos ya no se le entrega, y la ficha de
+      un producto solo toma lo que se escanea desde que empezó a esperar.
+

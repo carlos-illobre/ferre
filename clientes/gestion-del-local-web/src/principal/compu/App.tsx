@@ -1,5 +1,6 @@
 import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo } from "react";
 import { Pedidos } from "../Pedidos";
+import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
@@ -65,6 +66,8 @@ function Pantallas() {
   // Sin dirección, la app abre en lo primero del menú.
   const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
   const conSesion = sesion.estado === "con-sesion";
+  // Con la sesión abierta, el emparejamiento con el celular se pone al día con el servidor (decisión 58).
+  useEffect(() => { if (conSesion) void sincronizarEmparejamiento(); }, [conSesion]);
   // El menú de esta persona: solo las partes y pantallas que sus roles le permiten. Los atajos
   // se numeran sobre lo que ve.
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;

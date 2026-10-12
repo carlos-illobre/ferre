@@ -1,0 +1,8 @@
+/* El aviso de que la computadora emparejada pide una foto: arriba del menú del celular. */
+.pdc { position: fixed; z-index: 2147481000; left: 12px; right: 12px; bottom: calc(92px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 16px; background: var(--p-verde, #17312b); color: #fff; font: 600 1rem/1.3 "Manrope Variable", system-ui, sans-serif; box-shadow: 0 8px 24px rgb(23 49 43 / 0.35); }
+.pdc strong, .pdc small { display: block; } .pdc small { font-size: 0.9375rem; font-weight: 500; opacity: 0.9; }
+.pdc-botones { display: flex; gap: 10px; }
+.pdc button { flex: 1; min-height: 46px; padding: 0 14px; border-radius: 12px; border: 1.5px solid rgb(255 255 255 / 0.6); background: transparent; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.pdc button.pdc-sacar { flex: 2; border-color: var(--p-naranja, #d83f0e); background: var(--p-naranja, #d83f0e); }
+.pdc button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+@media (min-width: 900px) { .pdc { left: auto; right: 24px; bottom: 24px; max-width: 420px; } }

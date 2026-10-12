@@ -32,7 +32,7 @@ describe("entrar a la computadora con el celular", () => {
     // Solo se aprueba el que no fue aprobado y no venció.
     const sql = base.actual.sqlDe(/UPDATE vinculacion SET aprobada_en/)[0]!;
     expect(sql.sql).toMatch(/aprobada_en IS NULL AND expira_en > now\(\)/);
-    expect(sql.params).toEqual(["u-solo-vende", hashear("viejo")]);
+    expect(sql.params).toEqual(["u-solo-vende", hashear("viejo"), "sesion-soloVende"]); // y desde qué sesión de celular
     base.actual.programar(/UPDATE vinculacion SET aprobada_en/, { rows: [{ id: "v1", dispositivo: "computadora · Chrome" }] });
     expect((await pedir(app, "POST", "/sesiones/vinculaciones/aprobar", { rol: "soloVende", cuerpo: { codigo: "bueno" } })).status).toBe(200);
   });
@@ -59,6 +59,21 @@ describe("entrar a la computadora con el celular", () => {
     const evento = base.actual.sqlDe(/INSERT INTO evento/).at(-1)!.params;
     expect(JSON.stringify(evento)).toContain("sesion.iniciada");
     expect(JSON.stringify(evento)).toContain("celular");
+  });
+
+  it("el celular que la dejó entrar queda emparejado con la computadora, y el anterior de cualquiera de los dos se suelta (decisión 58)", async () => {
+    base.actual.programar(/UPDATE vinculacion SET retirada_en/, { rows: [{ aprobada_por: "u-cajero", dispositivo: "computadora · Chrome", celular_sesion_id: "sesion-del-celular" }] });
+    base.actual.programar(/FROM usuario u WHERE u\.id = \$1 AND u\.activo/, { rows: [{ ...usuarios.cajero }] });
+    base.actual.programar(/INSERT INTO puesto/, { rows: [{ expira_en: "2026-11-11T00:00:00Z" }] });
+    const r = await pedir(app, "POST", "/sesiones/vinculaciones/v1/estado", { rol: null, cuerpo: { clave: "la-clave" } });
+    const { puesto } = (await r.json()) as { puesto: { id: string; expira_en: string } };
+    expect(puesto.expira_en).toBe("2026-11-11T00:00:00Z");
+    const sesionDeLaCompu = base.actual.sqlDe(/INSERT INTO sesion/).at(-1)!.params[0];
+    const alta = base.actual.sqlDe(/INSERT INTO puesto/)[0]!;
+    expect(alta.params[0]).toBe(puesto.id);
+    expect(alta.params[1]).toBe(sesionDeLaCompu);
+    expect(alta.params.slice(3)).toEqual(["computadora · Chrome", "sesion-del-celular", "30"]);
+    expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL/)[0]!.params.slice(0, 2)).toEqual([sesionDeLaCompu, "sesion-del-celular"]);
   });
 
   it("si quien aprobó fue desactivado antes de que la computadora retire, no entra", async () => {

@@ -237,6 +237,13 @@ leído, con una señal clara de que se leyó.
 y saber que vence a los pocos minutos; ver si hay un celular vinculado; pedir otro QR.
 Lo que el celular escanea aparece donde se está trabajando, sin tocar nada.
 
+**Emparejamiento (decisión 58):** el celular y la computadora se emparejan una vez (al dejar
+entrar a la computadora con el celular, o leyendo el código de Vender) y sirve para todo: lo
+que el celular escanea le llega a la computadora, y las fotos que la computadora pide le
+aparecen al celular como un aviso con el botón «Sacar la foto». La computadora dice que tiene
+un celular emparejado y deja soltarlo. En el celular, en Vender, un interruptor dice si lo que
+escanea va también a la computadora.
+
 **Volver:** con la cámara abierta, el botón de volver del celular cierra la cámara y deja la
 pantalla como estaba; no sale de la aplicación (pedido de Carlos del 2026-10-12).
 

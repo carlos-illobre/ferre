@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../api";
 import { irA } from "../../rutas";
+import { sincronizarEmparejamiento } from "../../puesto";
 import { Logotipo } from "../Logotipo";
 import "./entrar.css";
 
@@ -13,11 +14,17 @@ export function EntrarEnLaCompu({ codigo, automatico, nombre }: { codigo: string
   const [estado, setEstado] = useState<Estado>(automatico ? "entrando" : "preguntar");
   const [error, setError] = useState<string | null>(null);
   const pedido = useRef(false);
+  const [emparejado, setEmparejado] = useState(false);
   const dejarEntrar = useCallback(async () => {
     if (pedido.current) return;
     pedido.current = true;
     setEstado("entrando");
-    try { await api("/sesiones/vinculaciones/aprobar", { method: "POST", body: JSON.stringify({ codigo }) }); setEstado("listo"); }
+    try {
+      await api("/sesiones/vinculaciones/aprobar", { method: "POST", body: JSON.stringify({ codigo }) });
+      setEstado("listo");
+      // El emparejamiento nace cuando la computadora retira su sesión, un par de segundos después.
+      for (let i = 0; i < 6; i++) { await new Promise((r) => setTimeout(r, 1500)); if ((await sincronizarEmparejamiento())?.comoCelular) { setEmparejado(true); break; } }
+    }
     catch (e) { pedido.current = false; setError((e as { estado?: number }).estado ? (e as Error).message : "Sin conexión: para dejar entrar a la computadora hace falta internet."); setEstado("error"); }
   }, [codigo]);
   useEffect(() => { if (automatico) void dejarEntrar(); }, [automatico, dejarEntrar]);
@@ -41,6 +48,7 @@ export function EntrarEnLaCompu({ codigo, automatico, nombre }: { codigo: string
             <span className="en-tilde" aria-hidden="true">✓</span>
             <h2 data-testid="compu-entro">Listo: la computadora ya entró</h2>
             <p>Entraste como <strong>{nombre}</strong> en los dos. Ya podés seguir en la computadora.</p>
+            {emparejado && <p data-testid="quedo-emparejado">Este celular quedó emparejado con ella: lo que escanees le llega, y si te pide una foto te aparece acá.</p>}
             <button type="button" className="en-boton verde" onClick={seguir} data-testid="seguir-en-el-celular">Seguir en el celular</button>
           </>
         )}
