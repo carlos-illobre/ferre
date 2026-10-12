@@ -659,7 +659,7 @@ RF-77:
     - "No está probado con un celular y una computadora de verdad, ni con conexión lenta"
     - "El estado del espejo vive en la memoria del servidor: si el servidor se reinicia, cada lado sigue con lo suyo hasta el próximo cambio"
     - "Si los dos cambian el mismo trabajo en el mismo instante, queda el del último que avisó"
-    - "La misma sesión abierta en dos ventanas a la vez (dos pestañas de la computadora, por ejemplo) no está contemplada: en las pruebas, ventanas viejas con la misma sesión movieron a la computadora de parte alguna vez"
+    - "La misma sesión abierta en dos ventanas a la vez (dos pestañas de la computadora) no está probada"
     - "El canal del espejo (reconexión, pausa, no rebotar) no tiene pruebas unitarias en el cliente: lo cubre la de punta a punta"
     - "No se espejan el conteo de estanterías, la carga de listas ni las pantallas de Más: en esas van a la misma parte pero cada uno trabaja lo suyo"
     - "En la computadora, un ingreso a medio cargar guardado de antes no se le manda al celular hasta que se le cambia algo"
@@ -752,11 +752,12 @@ RNF-05:
     - clientes/gestion-del-local-web/src/vista.test.ts
     - tests/e2e/escritorio/00-arranque.spec.ts
     - clientes/gestion-del-local-web/src/teclas.test.tsx
+    - tests/e2e/escritorio/04-vender.spec.ts
   defectos:
-    - "Las flechas que recorren cada pantalla (decisión 61, #77) se probaron a mano en un navegador en cinco operaciones completas (venta, rol, ticket, ingreso, ficha); no tienen prueba automática salvo la del menú y las pestañas"
+    - "Las flechas que recorren cada pantalla (decisión 61, #77) tienen prueba de punta a punta en el menú, las pestañas y una venta completa; crear un rol, mandar un ticket, cargar un ingreso y la ficha de un producto se probaron a mano en un navegador"
     - "No se recorrieron con el teclado todas las pantallas una por una hasta el final: puede quedar algún control al que no se llegue"
     - "Sin validar: el dueño no la revisó en la notebook del local"
-    - "Sin prueba: que la pantalla de venta y la barra de arriba entren enteras en la notebook, y que una venta completa se pueda registrar solo con el teclado"
+    - "Sin prueba: que la pantalla de venta y la barra de arriba entren enteras en la notebook"
     - "Sin prueba: capturas de antes y después que demuestren que un cambio en una interfaz no altera la otra"
 
 RNF-06:
