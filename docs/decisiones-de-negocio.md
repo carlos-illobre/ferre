@@ -307,8 +307,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       «Rápido y seguro». Debajo, «Sin contraseñas. Entrá de forma simple y segura.»
     - Tres cosas que hace la aplicación, con su ícono: vendé más rápido, controlá tu stock,
       hacé crecer tu negocio.
-    - Un pie con la onda de la marca, la frase «Las mismas herramientas de siempre. Ahora,
-      más simple.» y «Hecho en Argentina».
+    - Un pie con la onda de la marca, sin texto: al verla, Carlos pidió quitar la frase,
+      «Hecho en Argentina» y la bandera.
+    - En el logotipo, la F queda más pegada a «errebress» (vale para toda la aplicación).
     - El aviso de sin conexión va arriba a la derecha, solo cuando no hay conexión.
     - La entrada de la computadora no cambia.
 

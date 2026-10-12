@@ -8,7 +8,7 @@ import "./entrar.css";
 
 // La entrada del celular (decisión 55, sobre una referencia que pasó Carlos el 2026-10-12):
 // la marca arriba y al centro, las dos formas de entrar como tarjetas, una línea que dice que
-// no hay contraseñas, tres cosas que hace la aplicación y un pie con la onda de la marca.
+// no hay contraseñas, tres cosas que hace la aplicación y un pie con la onda de la marca, sin texto.
 // Los colores son los de la paleta y el logotipo es el de siempre.
 const PARA_QUE: { icono: NombreDeIcono; titulo: string; detalle: string }[] = [
   { icono: "vender", titulo: "Vendé", detalle: "más rápido" },
@@ -53,15 +53,11 @@ export function Entrar() {
           <li key={q.titulo}><span className="en-icono"><Icono nombre={q.icono} tam={26} /></span><strong>{q.titulo}</strong><span>{q.detalle}</span></li>
         ))}
       </ul>
-      <footer className="en-pie">
+      <footer className="en-pie" aria-hidden="true">
         <svg className="en-onda" viewBox="0 0 390 150" preserveAspectRatio="none" aria-hidden="true">
           <path d="M0 4 C 110 46, 250 84, 390 92 L 390 150 L 0 150 Z" fill="var(--p-naranja)" />
           <path d="M0 26 C 110 62, 250 90, 390 96 L 390 150 L 0 150 Z" fill="var(--p-verde)" />
         </svg>
-        <p className="en-frase">Las mismas herramientas de siempre. <span>Ahora, más simple.</span></p>
-        <p className="en-hecho">Hecho en Argentina
-          <svg width="26" height="17" viewBox="0 0 26 17" role="img" aria-label="Bandera argentina"><rect width="26" height="17" rx="2" fill="#74acdf" /><rect y="5.67" width="26" height="5.67" fill="#fff" /><circle cx="13" cy="8.5" r="1.7" fill="#f6b40e" /></svg>
-        </p>
       </footer>
     </main>
   );

@@ -83,7 +83,7 @@ escribir("src/principal/isotipo.ts", "// El isotipo de Ferrebress: la F que es u
 # el resto de la palabra va en la tipografía de la marca, inclinada igual que la F y pegada a su
 # diagonal. Estas medidas son las mismas que usa la aplicación (src/principal/logotipo.css).
 LOGOTIPO_CSS = (".logotipo{display:inline-flex;align-items:baseline;font-family:'Space Grotesk Variable','Segoe UI',system-ui,sans-serif;font-weight:700;line-height:1;letter-spacing:-.01em;white-space:nowrap}"
-                ".logotipo-isotipo,.logotipo>svg{flex:none;display:inline-block;width:1.5em;height:1.5em;transform:translateY(.36em);margin-right:-.2em}.logotipo-isotipo svg{display:block;width:100%;height:100%}"
+                ".logotipo-isotipo,.logotipo>svg{flex:none;display:inline-block;width:1.5em;height:1.5em;transform:translateY(.36em);margin-right:-.33em}.logotipo-isotipo svg{display:block;width:100%;height:100%}"
                 ".logotipo>span:last-child{display:inline-block;transform:skewX(-6deg)}"
                 "")
 logotipo = lambda isotipo: f'<span class="logotipo" role="img" aria-label="Ferrebress">{isotipo}<span aria-hidden="true">errebress</span></span>'
