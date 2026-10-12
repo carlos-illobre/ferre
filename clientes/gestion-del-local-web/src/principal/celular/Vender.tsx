@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { irA } from "../../rutas";
-import { useEspejar } from "../../espejo";
+import { contarAlEspejo, useEspejar } from "../../espejo";
 import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "../venta-en-espejo";
 import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
@@ -239,6 +239,7 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
       guardar("ventas", { id, fecha: cuerpo.fecha, total, medio_pago: medio, items: cuerpo.items, enviada: !encolado }).catch(() => undefined);
       for (const it of items) if (it.producto) ajustarStockLocal(it.producto.id, -it.cantidad);
       const n = items.length;
+      contarAlEspejo(`Venta de ${pesosCortos(total)} cobrada en el celular`);
       setExito({
         total,
         medio: (NOMBRE_MEDIO[medio] ?? medio) + (nombreCliente ? ` · ${nombreCliente}` : ""),

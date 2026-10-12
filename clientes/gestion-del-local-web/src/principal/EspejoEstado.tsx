@@ -1,4 +1,5 @@
-import { pausarEspejo, useEspejo } from "../espejo";
+import { useEffect, useState } from "react";
+import { alAvisoDelEspejo, pausarEspejo, useEspejo } from "../espejo";
 import { soltarEmparejamiento } from "../puesto";
 import "./espejo-estado.css";
 
@@ -7,6 +8,10 @@ import "./espejo-estado.css";
 // separa un rato sin desemparejarlos) y «Desvincular» (el corte definitivo).
 export function EspejoEstado() {
   const e = useEspejo();
+  // Lo que terminó en el otro dispositivo («venta cobrada») se dice acá un momento.
+  const [aviso, setAviso] = useState<string | null>(null);
+  useEffect(() => alAvisoDelEspejo(setAviso), []);
+  useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 7000); return () => clearTimeout(t); }, [aviso]);
   if (!e.emparejado) return null;
   const otro = e.lado === "computadora" ? "el celular" : "la computadora";
   const texto = !e.conectado ? `Conectando con ${otro}…`
@@ -16,6 +21,7 @@ export function EspejoEstado() {
   return (
     <div className={`espejo ${e.enEspejo ? "activo" : ""}`} role="status" data-testid="espejo">
       <span className="espejo-texto" data-testid="espejo-estado"><span className="espejo-punto" aria-hidden="true" />{texto}</span>
+      {aviso && <span className="espejo-aviso" data-testid="espejo-aviso">{aviso}</span>}
       <span className="espejo-botones">
         {e.conectado && e.otroPresente && <button type="button" onClick={() => pausarEspejo(!e.pausado)} data-testid="pausar-espejo">{e.pausado ? "Reanudar" : "Pausar"}</button>}
         <button type="button" onClick={() => void soltarEmparejamiento()} data-testid="desvincular-espejo">Desvincular</button>

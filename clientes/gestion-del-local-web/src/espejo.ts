@@ -16,23 +16,26 @@ import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoL
 //  - Lo que llega del otro lado no se vuelve a avisar (si no, rebotaría para siempre).
 export type Lado = "computadora" | "celular";
 export type EstadoDelEspejo = { emparejado: boolean; lado: Lado | null; conectado: boolean; otroPresente: boolean; pausado: boolean };
-type Tipo = "ir" | "venta";
+// Lo que se espeja: la parte en la que están y cada trabajo en curso.
+type Tipo = "ir" | "venta" | "ingreso" | "pedido" | "pedido-renglones";
+const DOCUMENTOS: Tipo[] = ["venta", "ingreso", "pedido", "pedido-renglones"];
 
 let estado: EstadoDelEspejo = { emparejado: false, lado: null, conectado: false, otroPresente: false, pausado: false };
 const oyentesDeEstado = new Set<() => void>();
 function poner(cambios: Partial<EstadoDelEspejo>) { estado = { ...estado, ...cambios }; oyentesDeEstado.forEach((o) => o()); }
 
-const suscriptos: Record<Tipo, Set<(datos: unknown) => void>> = { ir: new Set(), venta: new Set() };
+const suscriptos: Record<Tipo, Set<(datos: unknown) => void>> = { ir: new Set(), venta: new Set(), ingreso: new Set(), pedido: new Set(), "pedido-renglones": new Set() };
+// Los avisos de algo que terminó del otro lado («venta cobrada»): pasan y no se guardan.
+const oyentesDeAvisos = new Set<(texto: string) => void>();
 const alReanudar = new Set<() => void>();
-const ultimo: Partial<Record<Tipo, unknown>> = {}; // lo último que llegó, para la pantalla que se abre después
-const acordado: Partial<Record<Tipo, unknown>> = {}; // lo último avisado o recibido: en qué quedaron los dos
+const acordado: Partial<Record<Tipo, unknown>> = {}; // lo último avisado o recibido de cada cosa: en qué quedaron los dos
 let puestoId: string | null = null;
 let cortar: (() => void) | null = null;
 
 const enEspejo = () => estado.conectado && estado.otroPresente && !estado.pausado;
 function entregar(tipo: Tipo, datos: unknown) {
   if (datos === null || datos === undefined) return;
-  ultimo[tipo] = datos; acordado[tipo] = datos;
+  acordado[tipo] = datos;
   if (!estado.pausado) suscriptos[tipo].forEach((s) => s(datos));
 }
 
@@ -41,7 +44,7 @@ function conectar() {
   const id = puestoLocal()?.id ?? puestoRemoto()?.id ?? null;
   if (id === puestoId && (id === null || cortar)) return;
   cortar?.(); cortar = null; puestoId = id;
-  delete ultimo.ir; delete ultimo.venta; delete acordado.ir; delete acordado.venta;
+  for (const t of ["ir", ...DOCUMENTOS] as Tipo[]) delete acordado[t];
   if (!id || !lado) { poner({ emparejado: false, lado: null, conectado: false, otroPresente: false, pausado: false }); return; }
   poner({ emparejado: true, lado, conectado: false, otroPresente: false });
   let activo = true;
@@ -70,14 +73,15 @@ function conectar() {
             if (!evento || evento === "latido") continue;
             const datos = crudo ? (JSON.parse(crudo) as unknown) : null;
             if (evento === "estado") {
-              const e = datos as { parte: string | null; venta: unknown; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
+              const e = datos as { parte: string | null; docs: Record<string, unknown>; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
+              const hayAlgo = e.parte !== null || DOCUMENTOS.some((d) => (e.docs?.[d] ?? null) !== null);
               poner({ conectado: true, pausado: e.pausado });
               presencia(e.presentes);
               // El que llega con el otro ya trabajando se suma a lo que el otro tiene. Si el otro no
               // está (o no hay nada todavía), este lado sigue con lo suyo y lo cuenta: lo guardado
               // puede ser de hace horas, y no tiene que mover a quien acaba de abrir la aplicación.
               const elOtroEsta = lado === "computadora" ? e.presentes.celular : e.presentes.computadora;
-              if (elOtroEsta && (e.parte !== null || e.venta !== null)) { entregar("ir", e.parte); entregar("venta", e.venta); }
+              if (elOtroEsta && hayAlgo) { entregar("ir", e.parte); for (const d of DOCUMENTOS) entregar(d, e.docs?.[d]); }
               // Con los dos recién llegados y nada acordado todavía, cuenta lo suyo solo la
               // computadora, que es la principal: si contaran los dos, se cruzarían.
               else if (!elOtroEsta || lado === "computadora") alReanudar.forEach((f) => f());
@@ -88,7 +92,8 @@ function conectar() {
               poner({ pausado });
               if (reanuda && lado === "computadora") alReanudar.forEach((f) => f());
             } else if (evento === "desvinculado") { guardarPuestoLocal(null); guardarPuestoRemoto(null); return; }
-            else if (evento === "ir" || evento === "venta") entregar(evento, datos);
+            else if (evento === "aviso") { if (!estado.pausado) oyentesDeAvisos.forEach((o) => o(String(datos ?? ""))); }
+            else if (evento === "ir" || DOCUMENTOS.includes(evento as Tipo)) entregar(evento as Tipo, datos);
           }
         }
       } catch { /* se reconecta abajo */ }
@@ -112,6 +117,12 @@ export function avisarAlEspejo(tipo: Tipo, datos: unknown): void {
   acordado[tipo] = datos;
   api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo, datos }) }).catch(() => undefined);
 }
+// Contarle al otro lado algo que terminó acá: se le muestra un momento y no se guarda.
+export function contarAlEspejo(texto: string): void {
+  if (!puestoId || !enEspejo()) return;
+  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "aviso", datos: texto }) }).catch(() => undefined);
+}
+export function alAvisoDelEspejo(oyente: (texto: string) => void): () => void { oyentesDeAvisos.add(oyente); return () => { oyentesDeAvisos.delete(oyente); }; }
 export function pausarEspejo(pausar: boolean): void {
   if (!puestoId) return;
   poner({ pausado: pausar });
@@ -145,8 +156,9 @@ export function useEspejar<T>(tipo: Tipo, valor: T, aplicar: (v: T) => void, lis
       visto.current = texto;
       aplicarRef.current(datos as T);
     };
-    // La pantalla que se abre toma lo último que llegó mientras no estaba.
-    if (ultimo[tipo] !== undefined && enEspejo()) recibir(ultimo[tipo]);
+    // La pantalla que se abre retoma el trabajo donde habían quedado los dos: así una venta o
+    // un ingreso a medio cargar no se pierde por ir a mirar otra parte.
+    if (acordado[tipo] !== undefined && enEspejo()) recibir(acordado[tipo]);
     const contar = () => { visto.current = JSON.stringify(valorRef.current); avisarAlEspejo(tipo, valorRef.current); };
     suscriptos[tipo].add(recibir); alReanudar.add(contar);
     return () => { suscriptos[tipo].delete(recibir); alReanudar.delete(contar); };

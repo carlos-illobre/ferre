@@ -117,8 +117,8 @@ El espejo (RF-77). El estado vive en memoria del servidor, por emparejamiento:
 
 | Método | Ruta | Exige | Para qué sirve |
 |---|---|---|---|
-| POST | `/puestos/:id/espejo` | Sesión de cualquiera de los dos (si no, `404`) | Avisar un cambio. Cuerpo: `tipo` (`ir`, `venta` o `pausa`) y `datos` (la parte, la venta en curso, o si se pausa). `204`; `400` con otro tipo; `413` si la venta pasa de 200.000 caracteres. `ir` y `venta` le llegan al otro; `pausa`, a los dos |
-| GET | `/puestos/:id/espejo` | Sesión de cualquiera de los dos (si no, `404`) | Flujo de eventos (SSE). Al conectar: `estado` (`lado`, `parte`, `venta`, `pausado`, `presentes`). Después: `ir`, `venta`, `pausa`, `presencia` (quién está conectado) y `desvinculado` |
+| POST | `/puestos/:id/espejo` | Sesión de cualquiera de los dos (si no, `404`) | Avisar un cambio. Cuerpo: `tipo` y `datos`. Tipos: `ir` (la parte), un trabajo en curso (`venta`, `ingreso`, `pedido`, `pedido-renglones`), `pausa` (si se pausa) o `aviso` (un texto de algo que terminó; no se guarda). `204`; `400` con otro tipo; `413` si un trabajo pasa de 200.000 caracteres o un aviso de 300. `pausa` les llega a los dos; lo demás, al otro |
+| GET | `/puestos/:id/espejo` | Sesión de cualquiera de los dos (si no, `404`) | Flujo de eventos (SSE). Al conectar: `estado` (`lado`, `parte`, `docs` con cada trabajo en curso, `pausado`, `presentes`). Después: `ir`, cada trabajo, `aviso`, `pausa`, `presencia` (quién está conectado) y `desvinculado` |
 
 `POST /puestos/:codigo/vincular` responde `403` si la computadora tiene la sesión de otro usuario.
 

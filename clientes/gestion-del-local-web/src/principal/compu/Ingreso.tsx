@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { contarAlEspejo, useEspejar } from "../../espejo";
+import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo, type IngresoEnEspejo } from "../ingreso-en-espejo";
 import { AvisoDePedido, renglonesDelPedido, usePedidoAIngresar } from "../Pedidos";
 import { irA } from "./base/rutas";
 import { usePuede } from "../permisos";
@@ -53,7 +55,7 @@ export function Ingreso() {
 function RegistrarIngreso() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, catalogoCompleto, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [borrador] = useState(leerBorrador);
   const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
   const [proveedorId, setProveedorId] = useState(borrador?.proveedorId ?? "");
@@ -62,6 +64,11 @@ function RegistrarIngreso() {
   const [fechaCompra, setFechaCompra] = useState(borrador?.fechaCompra ?? hoy());
   const [consulta, setConsulta] = useState("");
   const [renglones, setRenglones] = useState<Renglon[]>(borrador?.renglones ?? []);
+  // En espejo (decisión 60): el ingreso es uno solo, lo cargue quien lo cargue.
+  useEspejar<IngresoEnEspejo>("ingreso", useMemo(() => ingresoParaElEspejo(proveedorId, comprobante, foto, fechaCompra, renglones), [proveedorId, comprobante, foto, fechaCompra, renglones]), (v) => {
+    setProveedorId(v.proveedorId); setComprobante(v.comprobante as Comprobante); setFoto(v.foto); setFechaCompra(v.fecha);
+    setRenglones((previos) => renglonesDeIngresoDelEspejo(v, catalogo ?? [], previos, (c) => String(c).replace(".", ",")));
+  }, catalogo !== null && catalogoCompleto !== false);
   // Si se viene de un pedido (RF-55), el ingreso arranca con su proveedor y con lo que falta llegar.
   const { pedido, error: errorPedido } = usePedidoAIngresar();
   const hayCatalogo = catalogo !== null;
@@ -184,6 +191,7 @@ function RegistrarIngreso() {
         detalle: `${plural(n, "renglón sumado", "renglones sumados")} al stock · ${plural(r.costos_actualizados, "costo actualizado", "costos actualizados")} según el comprobante${r.productos_nuevos ? ` · ${plural(r.productos_nuevos, "producto nuevo", "productos nuevos")}` : ""}.`,
       });
       setRenglones([]); setFoto(null); setIntento(false); setDescartado(null); setVersion((v) => v + 1);
+      contarAlEspejo(`Ingreso de ${proveedor?.nombre ?? "mercadería"} registrado en la computadora`);
       if (pedido) irA("compras");
     } catch (e) {
       setError(mensajeDe(e, "No se registró: se cortó la conexión y registrar un ingreso necesita internet. Lo cargado sigue acá; probá de nuevo cuando vuelva."));

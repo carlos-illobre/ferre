@@ -372,7 +372,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       curso (renglones, cantidad, unidad, margen, precio a mano, medio de pago, cliente) y la
       navegación, en las dos direcciones. Carlos había pedido espejo de todo; al ver los
       problemas (el celular dejaría de servir de cámara, la búsqueda letra por letra) eligió
-      esto. El ingreso y el pedido se suman en una tanda posterior.
+      esto. El ingreso de mercadería y el pedido a proveedor se sumaron en la segunda tanda,
+      el mismo día.
     - **«Pausar» además de «Desvincular».** Pausar los separa un rato; al reanudar manda la
       computadora.
     - **Solo se emparejan dos sesiones del mismo usuario.**
@@ -382,5 +383,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       servidor: si solo estaba abierto el celular y después se abre la computadora, la
       computadora se suma a lo del celular. La computadora manda cuando hay que desempatar
       (al reanudar, o si los dos arrancan a la vez).
-    - Al cobrar, la venta se registra una vez, desde donde se cobró, y se vacía en los dos.
+    - Al cobrar, registrar un ingreso o mandar un pedido, se hace una vez, desde donde se
+      tocó, el trabajo se vacía en los dos y el otro lo dice un momento.
+    - Una venta o un ingreso a medio cargar no se pierde por ir a otra parte: al volver, los
+      dos lo retoman como lo habían dejado.
 

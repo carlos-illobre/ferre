@@ -22,6 +22,8 @@ test.beforeAll(() => {
   const deEstos = `(SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email IN ('${EMAIL}', '${EMAIL_OTRA}')))`;
   psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN ${deEstos} OR celular_sesion_id IN ${deEstos})`);
   psql(`DELETE FROM puesto WHERE sesion_id IN ${deEstos} OR celular_sesion_id IN ${deEstos}`);
+  // El pedido borrador que deja la prueba apunta al usuario: se borra antes que él.
+  psql(`DELETE FROM pedido WHERE proveedor_id = '${ID_PROV}'`);
   for (const e of [EMAIL, EMAIL_OTRA]) {
     psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
     psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
@@ -42,6 +44,7 @@ test.beforeAll(() => {
   psql(`DELETE FROM proveedor WHERE id = '${ID_PROV}'`);
   psql(`INSERT INTO proveedor (id, nombre) VALUES ('${ID_PROV}', 'Proveedor espejo (e2e)')`);
   psql(`INSERT INTO producto (id, descripcion, marca, margen_elegido) VALUES ('${ID_MECHA}', 'MECHA ESPEJO 8 MM (E2E)', 'MARCA E2E', 100)`);
+  psql(`INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, fecha, nota) VALUES (gen_random_uuid(), '${ID_MECHA}', 'ajuste', 20, 'conteo', now(), 'stock inicial e2e')`);
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '${ID_MECHA}', '${ID_PROV}', 'ME8', 1000, '[]', 1000, 0.21, '2026-08-01')`);
 });
 
@@ -78,6 +81,13 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await celular.getByRole("radio", { name: /Tarjeta/ }).click();
   await expect(compu.getByRole("radio", { name: /Tarjeta/ })).toHaveAttribute("aria-checked", "true");
 
+  // Se cobra en la computadora: la venta se vacía en los dos, y el celular se entera.
+  await compu.getByTestId("cobrar").click();
+  await expect(compu.getByTestId("exito")).toContainText("Venta registrada");
+  await expect(celular.getByTestId("espejo-aviso")).toContainText("cobrada en la computadora");
+  await expect(celular.getByTestId("item")).toHaveCount(0);
+  await compu.getByTestId("cerrar-exito").click();
+
   // La navegación va junta, en las dos direcciones.
   await celular.getByTestId("menu-deposito").click();
   await expect(compu.getByTestId("pestana-pedidos")).toHaveAttribute("aria-current", "page");
@@ -86,6 +96,34 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   // La otra persona sigue donde estaba.
   await expect(otra.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await expect(otra.getByTestId("espejo")).toHaveCount(0);
+
+  // El ingreso de mercadería también es uno solo: el proveedor que se elige en la computadora…
+  await compu.getByTestId("pestana-compras").click();
+  await expect(celular.getByRole("tab", { name: "Ingreso" })).toHaveAttribute("aria-selected", "true");
+  await compu.getByTestId("proveedor").selectOption({ label: "Proveedor espejo (e2e)" });
+  await expect(celular.getByTestId("proveedor")).toContainText("Proveedor espejo (e2e)");
+  // …el renglón que se agrega en el celular, y la cantidad que se corrige en la computadora.
+  await celular.getByTestId("busqueda").fill("e2e mecha espejo");
+  await celular.getByTestId("busqueda").press("Enter");
+  const llego = compu.getByTestId("renglon").filter({ hasText: "MECHA ESPEJO" });
+  await expect(llego).toBeVisible();
+  await llego.getByTestId("cantidad").fill("5");
+  await llego.getByTestId("cantidad").blur();
+  await expect(celular.getByTestId("renglon").filter({ hasText: "MECHA ESPEJO" }).getByTestId("cantidad")).toHaveValue("5");
+
+  // Y el pedido a un proveedor: el que se abre en el celular se abre en la computadora, con sus renglones.
+  await celular.getByRole("tab", { name: "Pedidos" }).click();
+  await expect(compu.getByTestId("pestana-pedidos")).toHaveAttribute("aria-current", "page");
+  await celular.getByTestId("pedido-nuevo").click();
+  await celular.getByTestId("proveedor-opcion").filter({ hasText: "Proveedor espejo (e2e)" }).click();
+  await expect(compu.getByTestId("armar-pedido")).toContainText("Pedido a Proveedor espejo (e2e)");
+  await compu.getByTestId("buscar-para-pedir").fill("e2e mecha espejo");
+  await compu.getByTestId("resultado-para-pedir").first().click();
+  await expect(celular.getByTestId("renglon-pedido").filter({ hasText: "MECHA ESPEJO" })).toBeVisible();
+  await celular.getByTestId("volver-a-pedidos").click();
+  await expect(compu.getByTestId("armar-pedido")).toHaveCount(0);
+  await compu.getByTestId("pestana-stock").click();
+  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
 
   // Pausar los separa: el celular se mueve y la computadora no. Al reanudar manda la computadora.
   await celular.getByTestId("pausar-espejo").click();
@@ -106,4 +144,6 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await celular.getByTestId("menu-vender").click();
   await compu.waitForTimeout(800);
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
+  // Se cierran las tres ventanas: abiertas, seguirían vivas con estas sesiones en la prueba que sigue.
+  for (const pagina of [compu, celular, otra]) await pagina.context().close();
 });

@@ -106,12 +106,15 @@ puestos.delete("/avisos/lector", async (c) => {
 // llega después lo tome. Cada emparejamiento tiene su propio espejo: lo de una persona no toca
 // el de otra. Vive en memoria (un solo proceso, ADR-001): se pierde si el servidor se reinicia.
 type Lado = "computadora" | "celular";
-type Espejo = { parte: string | null; venta: unknown; pausado: boolean; oyentes: Record<Lado, Set<(evento: string, datos: unknown) => void>> };
+// Los trabajos en curso que se comparten: la venta, el ingreso de mercadería, qué pedido a
+// proveedor está abierto y sus renglones. El servidor no los entiende: los guarda y los pasa.
+const DOCUMENTOS = ["venta", "ingreso", "pedido", "pedido-renglones"];
+type Espejo = { parte: string | null; docs: Record<string, unknown>; pausado: boolean; oyentes: Record<Lado, Set<(evento: string, datos: unknown) => void>> };
 const espejos = new Map<string, Espejo>();
-const MAXIMO_DE_VENTA = 200_000; // caracteres de la venta en curso serializada
+const MAXIMO_DE_DOCUMENTO = 200_000; // caracteres de un trabajo en curso serializado
 function espejoDe(puestoId: string): Espejo {
   let e = espejos.get(puestoId);
-  if (!e) { e = { parte: null, venta: null, pausado: false, oyentes: { computadora: new Set(), celular: new Set() } }; espejos.set(puestoId, e); }
+  if (!e) { e = { parte: null, docs: {}, pausado: false, oyentes: { computadora: new Set(), celular: new Set() } }; espejos.set(puestoId, e); }
   return e;
 }
 const presentes = (e: Espejo) => ({ computadora: e.oyentes.computadora.size > 0, celular: e.oyentes.celular.size > 0 });
@@ -128,9 +131,11 @@ puestos.post("/:id/espejo", async (c) => {
   if (!lado) return c.json({ error: "Este dispositivo no está emparejado" }, 404);
   const { tipo, datos } = await c.req.json<{ tipo?: string; datos?: unknown }>().catch(() => ({}) as { tipo?: string; datos?: unknown });
   const e = espejoDe(c.req.param("id"));
-  if (tipo === "ir") e.parte = String(datos ?? "").slice(0, 80) || null;
-  else if (tipo === "venta") { if (JSON.stringify(datos ?? null).length > MAXIMO_DE_VENTA) return c.json({ error: "La venta es demasiado grande para compartirla" }, 413); e.venta = datos ?? null; }
+  if (tipo === "ir") e.parte = String(datos ?? "").slice(0, 120) || null;
+  else if (tipo && DOCUMENTOS.includes(tipo)) { if (JSON.stringify(datos ?? null).length > MAXIMO_DE_DOCUMENTO) return c.json({ error: "Es demasiado grande para compartirlo" }, 413); e.docs[tipo] = datos ?? null; }
   else if (tipo === "pausa") e.pausado = Boolean(datos);
+  // Un aviso de algo que terminó («venta cobrada»): se le pasa al otro y no se guarda.
+  else if (tipo === "aviso") { if (String(datos ?? "").length > 300) return c.json({ error: "El aviso es demasiado largo" }, 413); }
   else return c.json({ error: "No se entiende el cambio" }, 400);
   // La pausa les llega a los dos; lo demás, al otro.
   for (const l of tipo === "pausa" ? (["computadora", "celular"] as Lado[]) : [otro(lado)]) e.oyentes[l].forEach((o) => o(tipo, tipo === "pausa" ? e.pausado : datos));
@@ -148,7 +153,7 @@ puestos.get("/:id/espejo", async (c) => {
     const oyente = (evento: string, datos: unknown) => { flujo.writeSSE({ event: evento, data: JSON.stringify(datos ?? null) }).catch(() => undefined); };
     const avisarPresencia = () => { const p = presentes(e); for (const l of ["computadora", "celular"] as Lado[]) e.oyentes[l].forEach((o) => o("presencia", p)); };
     e.oyentes[lado].add(oyente);
-    await flujo.writeSSE({ event: "estado", data: JSON.stringify({ lado, parte: e.parte, venta: e.venta, pausado: e.pausado, presentes: presentes(e) }) });
+    await flujo.writeSSE({ event: "estado", data: JSON.stringify({ lado, parte: e.parte, docs: e.docs, pausado: e.pausado, presentes: presentes(e) }) });
     avisarPresencia();
     flujo.onAbort(() => { abierto = false; e.oyentes[lado].delete(oyente); avisarPresencia(); });
     while (abierto) {

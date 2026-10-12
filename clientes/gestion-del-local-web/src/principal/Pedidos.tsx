@@ -4,6 +4,7 @@ import { useCatalogo } from "../catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
 import { Escaner, hayCamara } from "./celular/componentes/Escaner";
 import { usePuede } from "./permisos";
+import { contarAlEspejo, useEspejar } from "../espejo";
 import { useVolverCierra } from "./celular/componentes/volver";
 import "./pedidos.css";
 
@@ -67,6 +68,11 @@ export function Pedidos({ celular = false, alIngresar }: { celular?: boolean; al
   useEffect(() => { if (encarga) api<Proveedor[]>("/proveedores").then((l) => setProveedores(l.filter((p) => p.activo))).catch(() => undefined); }, [encarga]);
   useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 7000); return () => clearTimeout(t); }, [aviso]);
 
+  // En espejo (decisión 60): los dos tienen abierto el mismo pedido, o la lista.
+  useEspejar<{ id: string | null; proveedorId: string | null }>("pedido", useMemo(() => (nuevo ? { id: nuevo.id, proveedorId: nuevo.proveedorId } : { id: abiertoId, proveedorId: null }), [nuevo, abiertoId]), (v) => {
+    if (v.id && v.proveedorId) { setAbiertoId(null); setNuevo((n) => (n?.id === v.id ? n : { id: v.id!, proveedorId: v.proveedorId!, renglones: [] })); }
+    else { setNuevo(null); setAbiertoId(v.id); void cargar(); } // el otro abrió uno ya guardado, o volvió a la lista: puede haber cambiado
+  });
   const abierto = abiertoId ? (pedidos ?? []).find((p) => p.id === abiertoId) ?? null : null;
   const volver = (mensaje?: string) => { setAbiertoId(null); setNuevo(null); if (mensaje) setAviso(mensaje); void cargar(); };
 
@@ -148,6 +154,8 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
   const caja = useRef<HTMLInputElement>(null);
   const existe = useRef(inicial.renglones.length > 0);
 
+  // En espejo (decisión 60): los renglones del pedido son los mismos en los dos.
+  useEspejar<{ id: string; renglones: Renglon[] }>("pedido-renglones", useMemo(() => ({ id: inicial.id, renglones }), [inicial.id, renglones]), (v) => { if (v.id === inicial.id) setRenglones(v.renglones); });
   const guardar = useCallback(async (lista: Renglon[]) => {
     setGuardado("guardando");
     try {
@@ -242,7 +250,7 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
               <span>Total estimado <strong className="pd-importe pd-total" data-testid="total-estimado">{pesos(total)}</strong></span></div>
           </div>
         )}
-      {mandando && <MandarPedido id={inicial.id} proveedor={proveedor} renglones={renglones} total={total} alCerrar={() => setMandando(false)} alMandar={() => alVolver(`Pedido enviado a ${proveedor.nombre}.`)} />}
+      {mandando && <MandarPedido id={inicial.id} proveedor={proveedor} renglones={renglones} total={total} alCerrar={() => setMandando(false)} alMandar={() => { contarAlEspejo(`Pedido enviado a ${proveedor.nombre}`); alVolver(`Pedido enviado a ${proveedor.nombre}.`); }} />}
     </section>
   );
 }

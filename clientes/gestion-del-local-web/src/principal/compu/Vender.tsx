@@ -3,7 +3,7 @@ import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
-import { useEspejar } from "../../espejo";
+import { contarAlEspejo, useEspejar } from "../../espejo";
 import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "../venta-en-espejo";
 import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
@@ -244,6 +244,7 @@ export function Vender() {
       guardar("ventas", { id, fecha: cuerpo.fecha, total, medio_pago: medio, items: cuerpo.items, enviada: !encolado }).catch(() => undefined);
       for (const it of items) if (it.producto) ajustarStockLocal(it.producto.id, -it.cantidad);
       const n = items.length;
+      contarAlEspejo(`Venta de ${pesosCortos(total)} cobrada en la computadora`);
       setExito({
         total, encolado,
         medio: NOMBRE_MEDIO[medio]! + (cliente ? ` · ${cliente.nombre}` : ""),

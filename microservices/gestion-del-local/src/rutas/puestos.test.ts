@@ -74,20 +74,26 @@ describe("emparejamiento", () => {
     // La computadora avisa a dónde fue y cómo está la venta, antes de que el celular llegue.
     expect((await avisar("admin", "ir", "vender")).status).toBe(204);
     expect((await avisar("admin", "venta", { items: [{ productoId: "p1", cantidad: 2 }], medio: "efectivo", clienteId: "" })).status).toBe(204);
+    expect((await avisar("admin", "ingreso", { proveedorId: "prov1", renglones: [] })).status).toBe(204);
+    expect((await avisar("admin", "aviso", "x".repeat(400))).status).toBe(413);
     // El celular se conecta: recibe cómo está todo y quién está.
     const flujo = await pedir(app, "GET", "/puestos/espejo-1/espejo", { rol: "mostrador" });
     const lector = flujo.body!.getReader();
     const leer = async () => new TextDecoder().decode((await lector.read()).value);
     const primero = await leer();
     expect(primero).toContain("event: estado");
-    const estado = JSON.parse(primero.split("data: ")[1]!.split("\n")[0]!) as { lado: string; parte: string; venta: { items: unknown[] }; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
+    const estado = JSON.parse(primero.split("data: ")[1]!.split("\n")[0]!) as { lado: string; parte: string; docs: { venta: { items: unknown[] }; ingreso: { proveedorId: string } }; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
     expect(estado).toMatchObject({ lado: "celular", parte: "vender", pausado: false, presentes: { computadora: false, celular: true } });
-    expect(estado.venta.items).toHaveLength(1);
+    expect(estado.docs.venta.items).toHaveLength(1);
+    expect(estado.docs.ingreso.proveedorId).toBe("prov1"); // cada trabajo en curso se guarda aparte
     // Lo que la computadora cambia después le llega; la pausa les llega a los dos.
     let recibido = "";
     const hasta = async (texto: string) => { for (let i = 0; i < 6 && !recibido.includes(texto); i++) recibido += await leer(); return recibido; };
     await avisar("admin", "ir", "deposito/ingreso");
     expect(await hasta("deposito/ingreso")).toContain("event: ir");
+    // Un aviso de algo que terminó le llega al otro y no queda guardado.
+    await avisar("admin", "aviso", "Venta de $3.000 cobrada");
+    expect(await hasta("event: aviso")).toContain("Venta de $3.000 cobrada");
     await avisar("mostrador", "pausa", true);
     expect(await hasta("event: pausa")).toContain("data: true");
     await lector.cancel();

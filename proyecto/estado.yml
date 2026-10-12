@@ -648,19 +648,21 @@ RF-76:
     - "Abrir el enlace del código en una computadora, en vez de en un celular, no muestra el paso para dejar entrar"
 
 RF-77:
-  estado: "Hecho en parte (#75): navegación y venta en espejo, con presencia y pausa; faltan el ingreso y el pedido"
+  estado: "Hecho (#75): navegación, venta, ingreso y pedido en espejo, con presencia, pausa y avisos"
   pruebas:
     - microservices/gestion-del-local/src/rutas/puestos.test.ts
     - clientes/gestion-del-local-web/src/principal/venta-en-espejo.test.ts
+    - clientes/gestion-del-local-web/src/principal/ingreso-en-espejo.test.ts
     - tests/e2e/celular/17-espejo.spec.ts
     - tests/e2e/escritorio/17-espejo.spec.ts
   defectos:
-    - "El ingreso de mercadería y el pedido a proveedor todavía no se espejan: cada dispositivo tiene el suyo"
     - "No está probado con un celular y una computadora de verdad, ni con conexión lenta"
     - "El estado del espejo vive en la memoria del servidor: si el servidor se reinicia, cada lado sigue con lo suyo hasta el próximo cambio"
-    - "Si los dos cambian la misma venta en el mismo instante, queda la del último que avisó"
+    - "Si los dos cambian el mismo trabajo en el mismo instante, queda el del último que avisó"
+    - "La misma sesión abierta en dos ventanas a la vez (dos pestañas de la computadora, por ejemplo) no está contemplada: en las pruebas, ventanas viejas con la misma sesión movieron a la computadora de parte alguna vez"
     - "El canal del espejo (reconexión, pausa, no rebotar) no tiene pruebas unitarias en el cliente: lo cubre la de punta a punta"
-    - "En la venta en espejo, quien no cobró no ve la pantalla de «venta registrada»: solo se le vacía la venta"
+    - "No se espejan el conteo de estanterías, la carga de listas ni las pantallas de Más: en esas van a la misma parte pero cada uno trabaja lo suyo"
+    - "En la computadora, un ingreso a medio cargar guardado de antes no se le manda al celular hasta que se le cambia algo"
 
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"

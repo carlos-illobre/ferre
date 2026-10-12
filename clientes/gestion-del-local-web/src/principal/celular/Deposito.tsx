@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { contarAlEspejo, useEspejar } from "../../espejo";
+import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo, type IngresoEnEspejo } from "../ingreso-en-espejo";
 import { AvisoDePedido, Pedidos, renglonesDelPedido, usePedidoAIngresar } from "../Pedidos";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
@@ -173,7 +175,7 @@ type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprob
 // de siempre → registrar. Suma stock y, si la factura trae otro costo, ese pasa a ser el
 // vigente. Reemplaza el papel semanal de gastos.
 function Ingreso() {
-  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, catalogoCompleto, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [proveedorId, setProveedorId] = useState("");
   const [comprobante, setComprobante] = useState<Comprobante>("factura");
@@ -186,6 +188,11 @@ function Ingreso() {
   const [ocupado, setOcupado] = useState(false);
   const [version, setVersion] = useState(0);
   const [hoja, setHoja] = useState<"proveedores" | null>(null);
+  // En espejo (decisión 60): el ingreso es uno solo, lo cargue quien lo cargue.
+  useEspejar<IngresoEnEspejo>("ingreso", useMemo(() => ingresoParaElEspejo(proveedorId, comprobante, foto, fechaCompra, renglones), [proveedorId, comprobante, foto, fechaCompra, renglones]), (v) => {
+    setProveedorId(v.proveedorId); setComprobante(v.comprobante as Comprobante); setFoto(v.foto); setFechaCompra(v.fecha);
+    setRenglones((previos) => renglonesDeIngresoDelEspejo(v, catalogo ?? [], previos, (c) => String(c)));
+  }, catalogo !== null && catalogoCompleto !== false);
   // Si se viene de un pedido (RF-55), el ingreso arranca con su proveedor y con lo que falta llegar.
   const { pedido, error: errorPedido } = usePedidoAIngresar();
   const hayCatalogo = catalogo !== null;
@@ -257,6 +264,7 @@ function Ingreso() {
       const n = renglones.length;
       setExito({ total: r.total, proveedor: proveedor?.nombre ?? "", detalle: `${n} ${n === 1 ? "renglón sumado" : "renglones sumados"} al stock · ${r.costos_actualizados} costo${r.costos_actualizados === 1 ? "" : "s"} actualizado${r.costos_actualizados === 1 ? "" : "s"} según el comprobante${r.productos_nuevos ? ` · ${r.productos_nuevos} producto${r.productos_nuevos === 1 ? "" : "s"} nuevo${r.productos_nuevos === 1 ? "" : "s"}` : ""}.` });
       setRenglones([]); setFoto(null); setVersion((v) => v + 1);
+      contarAlEspejo(`Ingreso de ${proveedor?.nombre ?? "mercadería"} registrado en el celular`);
       if (pedido) irA("deposito/ingreso");
     } catch (e) {
       setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor. Registrar una compra necesita internet.");

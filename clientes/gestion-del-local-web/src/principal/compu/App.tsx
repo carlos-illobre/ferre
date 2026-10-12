@@ -89,11 +89,16 @@ function Pantallas() {
   const falta = usuario && !puede(usuario, ...(TODAS.find((p) => p.ruta === actual)?.pide ?? [])) ? TODAS.find((p) => p.ruta === actual)!.pide! : null;
   // En espejo con el celular (decisión 60): los dos están en la misma parte. Las direcciones
   // del celular y las de la computadora no son las mismas: viajan con un nombre común.
-  const parteEnEspejo = conSesion && [...ruta.parametros].length === 0 ? (A_PARTE_COMUN[actual] ?? null) : null;
+  // El ingreso que se abre desde un pedido («llegó la mercadería») también viaja, con su pedido.
+  const pedidoDeLaRuta = ruta.parametros.get("pedido");
+  const soloElPedido = [...ruta.parametros.keys()].every((k) => k === "pedido");
+  const parteEnEspejo = conSesion && soloElPedido && A_PARTE_COMUN[actual] ? `${A_PARTE_COMUN[actual]}${pedidoDeLaRuta ? `?pedido=${pedidoDeLaRuta}` : ""}` : null;
   useEspejar<string | null>("ir", parteEnEspejo, (parte) => {
     if (!parte || !conSesion) return;
-    const destino = parte === "deposito" ? (menu.find((m) => m.clave === "deposito")?.pestanas[0]?.ruta ?? "stock") : DE_PARTE_COMUN[parte];
-    if (destino && destino !== actual && !(destino === "vender" && actual === "ventas")) irA(destino);
+    const [base = "", consulta] = parte.split("?");
+    const destino = base === "deposito" ? (menu.find((m) => m.clave === "deposito")?.pestanas[0]?.ruta ?? "stock") : DE_PARTE_COMUN[base];
+    if (!destino || (destino === "vender" && actual === "ventas")) return;
+    if (destino !== actual || (consulta ?? "") !== (pedidoDeLaRuta ? `pedido=${pedidoDeLaRuta}` : "")) irA(consulta ? `${destino}?${consulta}` : destino);
   }, parteEnEspejo !== null);
 
   useEffect(() => { window.scrollTo(0, 0); }, [actual]);

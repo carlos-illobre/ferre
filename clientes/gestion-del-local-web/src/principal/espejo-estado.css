@@ -17,3 +17,4 @@
   .lateral .espejo-botones { justify-content: flex-start; }
   .lateral .espejo button { min-height: 32px; font-size: 0.8125rem; }
 }
+.espejo-aviso { flex: 1 1 100%; padding: 6px 10px; border-radius: 10px; background: var(--p-amarillo-suave, #fff7d6); color: var(--p-amarillo-texto, #6b4a00); font-weight: 700; }

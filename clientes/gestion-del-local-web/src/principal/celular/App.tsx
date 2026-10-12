@@ -71,8 +71,11 @@ function Pantallas() {
   // que son solo de este dispositivo (la cámara, un enlace con código) no viajan.
   const sinHash = location.hash.replace(/^#\/?/, "") === "";
   const nombreDeParte = sinHash ? "catalogo" : ruta.nombre === "negocio" ? "mas" : ruta.nombre;
-  const parteEnEspejo = sesion.estado === "con-sesion" && [...ruta.parametros].length === 0 && ["catalogo", "vender", "deposito", "mas"].includes(nombreDeParte)
-    ? `${nombreDeParte}${ruta.nombre === "negocio" ? "/negocio" : ruta.sub ? `/${ruta.sub}` : ""}` : null;
+  // El ingreso que se abre desde un pedido («llegó la mercadería») también viaja, con su pedido.
+  const pedidoDeLaRuta = ruta.parametros.get("pedido");
+  const soloElPedido = [...ruta.parametros.keys()].every((k) => k === "pedido");
+  const parteEnEspejo = sesion.estado === "con-sesion" && soloElPedido && ["catalogo", "vender", "deposito", "mas"].includes(nombreDeParte)
+    ? `${nombreDeParte}${ruta.nombre === "negocio" ? "/negocio" : ruta.sub ? `/${ruta.sub}` : ""}${pedidoDeLaRuta ? `?pedido=${pedidoDeLaRuta}` : ""}` : null;
   useEspejar<string | null>("ir", parteEnEspejo, (parte) => { if (parte && sesion.estado === "con-sesion") irA(parte); }, parteEnEspejo !== null);
   const estadoAnterior = useRef(sesion.estado);
   const [recienEntro, setRecienEntro] = useState(false);
