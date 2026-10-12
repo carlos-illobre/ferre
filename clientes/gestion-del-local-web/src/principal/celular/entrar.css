@@ -1,0 +1,41 @@
+/* La entrada del celular (decisión 55). Fondo claro, la marca al centro, las formas de entrar
+   como tarjetas y un pie con la onda de la marca. Todo con la paleta. */
+.en { position: relative; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: calc(14px + env(safe-area-inset-top)) 22px 0; background: linear-gradient(180deg, var(--p-superficie) 0%, var(--p-fondo-2) 55%, var(--p-fondo) 100%); color: var(--p-tinta); overflow: hidden; }
+.en > * { width: 100%; max-width: 440px; }
+:where(.en) p, :where(.en) h1, :where(.en) ul { margin: 0; padding: 0; }
+.en-estado { min-height: 36px; display: flex; justify-content: flex-end; }
+.en-sin-conexion { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 12px; background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); box-shadow: inset 0 0 0 1px var(--p-amarillo-borde); font-size: 15px; font-weight: 700; }
+.en-marca { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; padding-top: 8px; }
+.en-marca h1 { font-size: 46px; line-height: 1; color: var(--p-verde); padding-bottom: 12px; }
+.en-marca p { font-size: 19px; color: var(--p-texto-2); }
+.en-formas { display: flex; flex-direction: column; gap: 14px; }
+.en-ayuda { font-size: 15px; line-height: 1.4; color: var(--p-amarillo-texto); text-align: center; }
+
+/* El botón de Google lo dibuja Google y no deja cambiarle la forma: queda invisible encima de
+   una tarjeta como las demás, y el toque le llega igual. */
+.en .boton-google { position: relative; width: 100%; height: 64px; border-radius: 16px; background: var(--p-superficie); box-shadow: 0 0 0 1px var(--p-borde-suave), 0 6px 18px rgb(23 49 43 / 0.10); overflow: hidden; }
+.en .boton-google::before { content: "Continuar con Google"; position: absolute; inset: 0; display: flex; align-items: center; padding-left: 78px; color: var(--p-verde); font-weight: 700; font-size: 19px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E") no-repeat 28px center / 30px 30px; }
+.en .boton-google > div { position: absolute; inset: 0; opacity: 0; transform: scale(1.4, 1.5); transform-origin: top left; }
+.en-o { display: flex; align-items: center; gap: 14px; color: var(--p-texto-2); font-size: 15px; }
+.en-o::before, .en-o::after { content: ""; flex: 1; height: 1px; background: var(--p-borde); }
+.en .entrar-huella { display: flex; flex-direction: row; align-items: center; gap: 20px; width: 100%; min-height: 72px; padding: 10px 20px 10px 26px; border: 0; border-radius: 16px; background: var(--p-superficie); box-shadow: 0 0 0 1px var(--p-borde-suave), 0 6px 18px rgb(23 49 43 / 0.10); color: var(--p-verde); font: inherit; text-align: left; cursor: pointer; }
+.en .entrar-huella svg { flex: none; width: 34px; height: 34px; color: var(--p-verde-texto); }
+.en .entrar-huella strong { display: block; font-size: 19px; font-weight: 700; }
+.en .entrar-huella small { display: block; font-size: 15px; color: var(--p-texto-2); }
+.en .entrar-huella:disabled { opacity: 0.6; }
+.en .entrar-huella:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
+.en-sin-claves { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-radius: 16px; background: var(--p-relleno); color: var(--p-texto-medio); font-size: 15.5px; line-height: 1.4; }
+.en-sin-claves svg { flex: none; color: var(--p-verde); }
+.en-sin-claves strong { display: block; color: var(--p-verde); }
+.en-para-que { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.en-para-que li { display: flex; flex-direction: column; align-items: center; font-size: 14.5px; line-height: 1.3; color: var(--p-texto-2); }
+.en-para-que strong { color: var(--p-verde); font-size: 15.5px; }
+.en-icono { display: grid; place-items: center; width: 54px; height: 54px; margin-bottom: 8px; border-radius: 50%; background: var(--p-relleno); color: var(--p-verde); }
+.en-pie { position: relative; flex: 1; min-height: 196px; max-width: none; width: calc(100% + 44px); margin: 0 -22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 0 24px calc(22px + env(safe-area-inset-bottom)); color: #fff; }
+.en-onda { position: absolute; inset: 0; width: 100%; height: 100%; }
+.en-frase, .en-hecho { position: relative; }
+.en-frase { max-width: 200px; font-size: 16px; font-style: italic; font-weight: 600; line-height: 1.35; }
+.en-frase span { display: inline-block; padding-bottom: 3px; border-bottom: 3px solid var(--p-naranja); }
+.en-hecho { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: rgb(255 255 255 / 0.85); white-space: nowrap; }
+@media (max-height: 760px) { .en { gap: 16px; } .en-marca h1 { font-size: 40px; } .en-marca { gap: 16px; } .en-pie { min-height: 140px; } }

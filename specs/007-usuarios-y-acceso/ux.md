@@ -46,6 +46,11 @@ reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitu
 
 ## Historia 1: entrar
 
+**Entrada del celular (decisión 55, 2026-10-12):** sigue la disposición de la referencia que
+pasó Carlos: marca al centro, las formas de entrar como tarjetas (Google primero, después la
+huella), la línea de «sin contraseñas», tres cosas que hace la aplicación y un pie con la
+onda de la marca. Colores de la paleta y el logotipo de siempre.
+
 **Quién:** cualquier persona que abre la app sin sesión.
 
 **Qué tiene que poder hacer:** entrar con Google; en un dispositivo que puede, entrar con

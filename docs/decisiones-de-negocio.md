@@ -299,3 +299,16 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       «Hay una versión nueva» con un botón «Actualizar ahora»** y no se recarga sola, para
       no perder una venta a medio armar.
 
+55. **La entrada del celular sigue la disposición de una referencia de Carlos** (2026-10-12).
+    Pasó una imagen y dijo que le interesaban la disposición y la posición de los elementos,
+    con el logotipo y la paleta de siempre. Reemplaza la entrada mínima de la decisión 47.
+    - Fondo claro. Arriba y al centro, el logotipo y la línea «Tu ferretería, en orden».
+    - Las dos formas de entrar como tarjetas: primero Google, una «o», y la huella con
+      «Rápido y seguro». Debajo, «Sin contraseñas. Entrá de forma simple y segura.»
+    - Tres cosas que hace la aplicación, con su ícono: vendé más rápido, controlá tu stock,
+      hacé crecer tu negocio.
+    - Un pie con la onda de la marca, la frase «Las mismas herramientas de siempre. Ahora,
+      más simple.» y «Hecho en Argentina».
+    - El aviso de sin conexión va arriba a la derecha, solo cuando no hay conexión.
+    - La entrada de la computadora no cambia.
+
