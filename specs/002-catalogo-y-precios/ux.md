@@ -237,6 +237,9 @@ leído, con una señal clara de que se leyó.
 y saber que vence a los pocos minutos; ver si hay un celular vinculado; pedir otro QR.
 Lo que el celular escanea aparece donde se está trabajando, sin tocar nada.
 
+**Volver:** con la cámara abierta, el botón de volver del celular cierra la cámara y deja la
+pantalla como estaba; no sale de la aplicación (pedido de Carlos del 2026-10-12).
+
 **Código desconocido:** se avisa que no está en el catálogo y se ofrece buscar el producto
 para asociarlo; al elegirlo, el código queda guardado en ese producto y se dice.
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useVolverCierra } from "./volver";
 
 // Escaneo con la cámara del celular (issue #52). Detección nativa del navegador donde
 // existe (Chrome en Android); si no, una librería de decodificación cargada recién ahí.
@@ -13,6 +14,8 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
   const [error, setError] = useState<string | null>(null);
   const [manual, setManual] = useState("");
   const [activa, setActiva] = useState(false);
+  // El botón de volver del celular cierra la cámara y deja la pantalla como estaba.
+  useVolverCierra(alCerrar);
 
   useEffect(() => {
     let vivo = true;
