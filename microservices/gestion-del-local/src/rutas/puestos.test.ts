@@ -54,4 +54,42 @@ describe("emparejamiento", () => {
     expect((await pedir(app, "DELETE", "/puestos/avisos/lector", { rol: "mostrador" })).status).toBe(204);
     expect(((await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()) as { lector: boolean }).lector).toBe(false);
   });
+
+  // Decisión 60: el espejo.
+  it("solo se emparejan dos sesiones del mismo usuario", async () => {
+    base.actual.programar(/SELECT s\.usuario_id FROM puesto p JOIN sesion s/, { rows: [{ usuario_id: "u-admin" }] });
+    const r = await pedir(app, "POST", "/puestos/codigo-del-qr/vincular", { rol: "mostrador" });
+    expect(r.status).toBe(403);
+    expect(((await r.json()) as { error: string }).error).toContain("donde entraste vos");
+    expect(base.actual.sqlDe(/UPDATE puesto SET vinculado_en = now\(\)/)).toHaveLength(0);
+  });
+
+  it("cada lado avisa sus cambios y el otro los recibe; el que llega después toma lo último; quien no es del emparejamiento, nada", async () => {
+    const delPuesto = (compu: string, celular: string) => base.actual.programar(/SELECT sesion_id, celular_sesion_id FROM puesto WHERE id = \$1/, (params) => ({ rows: params[1] === compu || params[1] === celular ? [{ sesion_id: compu, celular_sesion_id: celular }] : [] }));
+    delPuesto("sesion-admin", "sesion-mostrador");
+    const avisar = (rol: "admin" | "mostrador" | "soloVende", tipo: string, datos: unknown) => pedir(app, "POST", "/puestos/espejo-1/espejo", { rol, cuerpo: { tipo, datos } });
+    expect((await avisar("soloVende", "ir", "vender")).status).toBe(404);
+    expect((await pedir(app, "GET", "/puestos/espejo-1/espejo", { rol: "soloVende" })).status).toBe(404);
+    expect((await avisar("admin", "cualquiera", 1)).status).toBe(400);
+    // La computadora avisa a dónde fue y cómo está la venta, antes de que el celular llegue.
+    expect((await avisar("admin", "ir", "vender")).status).toBe(204);
+    expect((await avisar("admin", "venta", { items: [{ productoId: "p1", cantidad: 2 }], medio: "efectivo", clienteId: "" })).status).toBe(204);
+    // El celular se conecta: recibe cómo está todo y quién está.
+    const flujo = await pedir(app, "GET", "/puestos/espejo-1/espejo", { rol: "mostrador" });
+    const lector = flujo.body!.getReader();
+    const leer = async () => new TextDecoder().decode((await lector.read()).value);
+    const primero = await leer();
+    expect(primero).toContain("event: estado");
+    const estado = JSON.parse(primero.split("data: ")[1]!.split("\n")[0]!) as { lado: string; parte: string; venta: { items: unknown[] }; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
+    expect(estado).toMatchObject({ lado: "celular", parte: "vender", pausado: false, presentes: { computadora: false, celular: true } });
+    expect(estado.venta.items).toHaveLength(1);
+    // Lo que la computadora cambia después le llega; la pausa les llega a los dos.
+    let recibido = "";
+    const hasta = async (texto: string) => { for (let i = 0; i < 6 && !recibido.includes(texto); i++) recibido += await leer(); return recibido; };
+    await avisar("admin", "ir", "deposito/ingreso");
+    expect(await hasta("deposito/ingreso")).toContain("event: ir");
+    await avisar("mostrador", "pausa", true);
+    expect(await hasta("event: pausa")).toContain("data: true");
+    await lector.cancel();
+  });
 });

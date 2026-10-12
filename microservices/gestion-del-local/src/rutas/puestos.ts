@@ -43,6 +43,10 @@ puestos.post("/", async (c) => {
 // El celular lee el QR y se vincula. Desde acá el puesto dura 12 horas.
 puestos.post("/:codigo/vincular", async (c) => {
   const { id: sesionId, usuario } = c.get("sesion");
+  // Solo se emparejan dos sesiones del mismo usuario (decisión 60): en espejo los dos hacen lo mismo.
+  const { rows: duenio } = await pool.query<{ usuario_id: string }>(
+    "SELECT s.usuario_id FROM puesto p JOIN sesion s ON s.id = p.sesion_id WHERE p.codigo_hash = $1 AND p.vinculado_en IS NULL AND p.expira_en > now()", [hashear(c.req.param("codigo"))]);
+  if (duenio[0] && duenio[0].usuario_id !== usuario.id) return c.json({ error: "Esa computadora tiene la sesión de otra persona. El celular se empareja solo con una computadora donde entraste vos." }, 403);
   const { rows } = await pool.query<{ id: string; nombre: string | null; sesion_id: string; expira_en: string }>(
     `UPDATE puesto SET vinculado_en = now(), celular_sesion_id = $2, expira_en = now() + ($3 || ' days')::interval
       WHERE codigo_hash = $1 AND vinculado_en IS NULL AND expira_en > now() RETURNING id, nombre, sesion_id, expira_en`,
@@ -95,11 +99,75 @@ puestos.delete("/avisos/lector", async (c) => {
   return c.body(null, 204);
 });
 
+// ---------- El espejo (decisión 60) ----------
+// Emparejados y con la aplicación abierta en los dos, el celular y la computadora trabajan en
+// espejo: están en la misma parte y comparten el trabajo en curso (la venta). Cada lado avisa
+// lo que cambia y el servidor se lo pasa al otro; guarda además lo último, para que el que
+// llega después lo tome. Cada emparejamiento tiene su propio espejo: lo de una persona no toca
+// el de otra. Vive en memoria (un solo proceso, ADR-001): se pierde si el servidor se reinicia.
+type Lado = "computadora" | "celular";
+type Espejo = { parte: string | null; venta: unknown; pausado: boolean; oyentes: Record<Lado, Set<(evento: string, datos: unknown) => void>> };
+const espejos = new Map<string, Espejo>();
+const MAXIMO_DE_VENTA = 200_000; // caracteres de la venta en curso serializada
+function espejoDe(puestoId: string): Espejo {
+  let e = espejos.get(puestoId);
+  if (!e) { e = { parte: null, venta: null, pausado: false, oyentes: { computadora: new Set(), celular: new Set() } }; espejos.set(puestoId, e); }
+  return e;
+}
+const presentes = (e: Espejo) => ({ computadora: e.oyentes.computadora.size > 0, celular: e.oyentes.celular.size > 0 });
+const otro = (lado: Lado): Lado => (lado === "computadora" ? "celular" : "computadora");
+async function ladoDe(puestoId: string, sesionId: string): Promise<Lado | null> {
+  const { rows } = await pool.query<{ sesion_id: string; celular_sesion_id: string | null }>(
+    "SELECT sesion_id, celular_sesion_id FROM puesto WHERE id = $1 AND vinculado_en IS NOT NULL AND expira_en > now() AND (sesion_id = $2 OR celular_sesion_id = $2)", [puestoId, sesionId]);
+  return !rows[0] ? null : rows[0].sesion_id === sesionId ? "computadora" : "celular";
+}
+
+// Un lado avisa un cambio: a qué parte fue, cómo quedó la venta, o que pausó o reanudó.
+puestos.post("/:id/espejo", async (c) => {
+  const lado = await ladoDe(c.req.param("id"), c.get("sesion").id);
+  if (!lado) return c.json({ error: "Este dispositivo no está emparejado" }, 404);
+  const { tipo, datos } = await c.req.json<{ tipo?: string; datos?: unknown }>().catch(() => ({}) as { tipo?: string; datos?: unknown });
+  const e = espejoDe(c.req.param("id"));
+  if (tipo === "ir") e.parte = String(datos ?? "").slice(0, 80) || null;
+  else if (tipo === "venta") { if (JSON.stringify(datos ?? null).length > MAXIMO_DE_VENTA) return c.json({ error: "La venta es demasiado grande para compartirla" }, 413); e.venta = datos ?? null; }
+  else if (tipo === "pausa") e.pausado = Boolean(datos);
+  else return c.json({ error: "No se entiende el cambio" }, 400);
+  // La pausa les llega a los dos; lo demás, al otro.
+  for (const l of tipo === "pausa" ? (["computadora", "celular"] as Lado[]) : [otro(lado)]) e.oyentes[l].forEach((o) => o(tipo, tipo === "pausa" ? e.pausado : datos));
+  return c.body(null, 204);
+});
+
+// Cada lado escucha al otro. Al conectarse recibe cómo está todo, y los dos se enteran de quién está.
+puestos.get("/:id/espejo", async (c) => {
+  const puestoId = c.req.param("id");
+  const lado = await ladoDe(puestoId, c.get("sesion").id);
+  if (!lado) return c.json({ error: "Este dispositivo no está emparejado" }, 404);
+  return streamSSE(c, async (flujo) => {
+    const e = espejoDe(puestoId);
+    let abierto = true;
+    const oyente = (evento: string, datos: unknown) => { flujo.writeSSE({ event: evento, data: JSON.stringify(datos ?? null) }).catch(() => undefined); };
+    const avisarPresencia = () => { const p = presentes(e); for (const l of ["computadora", "celular"] as Lado[]) e.oyentes[l].forEach((o) => o("presencia", p)); };
+    e.oyentes[lado].add(oyente);
+    await flujo.writeSSE({ event: "estado", data: JSON.stringify({ lado, parte: e.parte, venta: e.venta, pausado: e.pausado, presentes: presentes(e) }) });
+    avisarPresencia();
+    flujo.onAbort(() => { abierto = false; e.oyentes[lado].delete(oyente); avisarPresencia(); });
+    while (abierto) {
+      await flujo.writeSSE({ event: "latido", data: String(Date.now()) }).catch(() => { abierto = false; });
+      await flujo.sleep(25_000);
+    }
+  });
+});
+
 // Soltar el emparejamiento, desde cualquiera de los dos.
 puestos.delete("/:id", async (c) => {
   const { id: sesionId, usuario } = c.get("sesion");
   const { rowCount } = await pool.query("UPDATE puesto SET expira_en = now() WHERE id = $1 AND (sesion_id = $2 OR celular_sesion_id = $2) AND expira_en > now()", [c.req.param("id"), sesionId]);
-  if (rowCount) await registrarEvento(pool, { tipo: "puesto.desvinculado", usuarioId: usuario.id, contenido: { puestoId: c.req.param("id") } });
+  if (rowCount) {
+    await registrarEvento(pool, { tipo: "puesto.desvinculado", usuarioId: usuario.id, contenido: { puestoId: c.req.param("id") } });
+    // A los dos se les avisa, para que dejen el espejo en el momento.
+    const e = espejos.get(c.req.param("id"));
+    if (e) { for (const l of ["computadora", "celular"] as Lado[]) e.oyentes[l].forEach((o) => o("desvinculado", null)); espejos.delete(c.req.param("id")); }
+  }
   return c.body(null, 204);
 });
 
