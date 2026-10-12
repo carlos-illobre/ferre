@@ -41,4 +41,17 @@ describe("emparejamiento", () => {
     expect(base.actual.sqlDe(/UPDATE codigo_escaneado SET entregado_en = now\(\) WHERE puesto_id = \$1 AND entregado_en IS NULL/)[0]!.params).toEqual(["p1"]);
     expect(base.actual.sqlDe(/FROM codigo_escaneado WHERE puesto_id = \$1 AND entregado_en IS NULL AND creado_en/)).toHaveLength(0);
   });
+
+  // Decisión 59: la computadora le pide a su celular que haga de lector.
+  it("la computadora pide el lector y su celular emparejado se entera; al abrirlo, el pedido queda atendido", async () => {
+    expect((await pedir(app, "POST", "/puestos/p1/lector", { rol: "admin" })).status).toBe(404); // sin celular emparejado
+    base.actual.programar(/SELECT id FROM puesto WHERE id = \$1 AND sesion_id = \$2 AND vinculado_en IS NOT NULL/, { rows: [{ id: "p1" }] });
+    base.actual.programar(/SELECT sesion_id FROM puesto WHERE celular_sesion_id/, (params) => ({ rows: params[0] === "sesion-mostrador" ? [{ sesion_id: "sesion-admin" }] : [] }));
+    expect(await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()).toEqual({ lector: false, fotos: [] });
+    expect((await pedir(app, "POST", "/puestos/p1/lector", { rol: "admin" })).status).toBe(204);
+    expect(await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()).toEqual({ lector: true, fotos: [] });
+    expect(((await (await pedir(app, "GET", "/puestos/avisos", { rol: "soloVende" })).json()) as { lector: boolean }).lector).toBe(false);
+    expect((await pedir(app, "DELETE", "/puestos/avisos/lector", { rol: "mostrador" })).status).toBe(204);
+    expect(((await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()) as { lector: boolean }).lector).toBe(false);
+  });
 });

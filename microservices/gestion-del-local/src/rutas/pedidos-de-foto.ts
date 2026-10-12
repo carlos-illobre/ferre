@@ -36,13 +36,17 @@ pedidosDeFoto.post("/", async (c) => {
   return c.json({ codigo, expiraEnSegundos: MINUTOS * 60 }, 201);
 });
 
+// Los pedidos de foto que esperan esas computadoras (las emparejadas con un celular).
+export function fotosQueEsperan(computadoras: string[]): { codigo: string; para: string }[] {
+  vigente("");
+  const de = new Set(computadoras);
+  return [...pedidos].filter(([, p]) => p.foto === null && de.has(p.de)).map(([codigo, p]) => ({ codigo, para: p.para }));
+}
+
 // El celular emparejado (decisión 58) pregunta si su computadora está esperando alguna foto:
 // así no hace falta leer el código. Va antes de «/:codigo» para que no la tape.
 pedidosDeFoto.get("/para-mi", async (c) => {
-  vigente("");
-  const computadoras = new Set(await computadorasDe(pool, c.get("sesion").id));
-  const esperando = [...pedidos].filter(([, p]) => p.foto === null && computadoras.has(p.de)).map(([codigo, p]) => ({ codigo, para: p.para }));
-  return c.json(esperando);
+  return c.json(fotosQueEsperan(await computadorasDe(pool, c.get("sesion").id)));
 });
 
 // La computadora pregunta si ya llegó; el celular, si el código vale y para qué es la foto.

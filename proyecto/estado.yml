@@ -104,7 +104,7 @@ RF-08:
     - "Sin prueba: vencimiento del QR a los 5 minutos, del vínculo a las 12 horas y entrega de los códigos al reconectar"
     - "El código de un producto no se puede quitar desde la ficha, solo reemplazar por otro"
     - "El emparejamiento que nace al entrar (#73) no está probado con un celular y una computadora de verdad"
-    - "El interruptor del celular para no mandar lo que escanea no tiene prueba"
+    - "El lector del celular (decisión 59) está probado sin cámara: en la prueba el código se tipea"
     - "El celular pregunta cada 3 segundos si la computadora pide una foto: no hay avisos con la aplicación cerrada"
     - "Un celular no puede estar emparejado con dos computadoras a la vez"
     - "En la computadora, buscar escaneando con el celular vinculado en la pantalla de productos y en el inventario no tiene prueba; el inventario de la computadora no escucha al celular"

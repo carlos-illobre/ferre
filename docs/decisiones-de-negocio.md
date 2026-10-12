@@ -354,3 +354,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Un código que la computadora no recibió en 2 minutos ya no se le entrega, y la ficha de
       un producto solo toma lo que se escanea desde que empezó a esperar.
 
+59. **El celular emparejado hace de lector cuando la computadora se lo pide** (2026-10-12).
+    Carlos probó el emparejamiento y no encontró cómo buscar un producto en la computadora
+    leyéndolo con el celular: había que saber que se hacía desde Vender del celular.
+    - En Vender de la computadora, con el celular emparejado, «Escanear con el celular» se lo
+      pide. Al celular le aparece «La computadora quiere escanear» con «Abrir el lector».
+    - El lector es un modo aparte: la cámara queda abierta, lo que lee va solo a la
+      computadora y no a una venta del celular.
+    - Vender del celular vuelve a ser solo la venta del celular: lo que se escanea ahí ya no
+      viaja a la computadora. Reemplaza el interruptor de la decisión 58.
+

@@ -49,6 +49,7 @@ export function EntrarEnLaCompu({ codigo, automatico, nombre }: { codigo: string
             <h2 data-testid="compu-entro">Listo: la computadora ya entró</h2>
             <p>Entraste como <strong>{nombre}</strong> en los dos. Ya podés seguir en la computadora.</p>
             {emparejado && <p data-testid="quedo-emparejado">Este celular quedó emparejado con ella: lo que escanees le llega, y si te pide una foto te aparece acá.</p>}
+            {emparejado && <button type="button" className="en-boton naranja" onClick={() => irA("lector")} data-testid="usar-como-lector">Usar este celular como lector</button>}
             <button type="button" className="en-boton verde" onClick={seguir} data-testid="seguir-en-el-celular">Seguir en el celular</button>
           </>
         )}

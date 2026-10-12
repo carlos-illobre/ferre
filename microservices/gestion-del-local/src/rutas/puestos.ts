@@ -5,7 +5,8 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirSesion } from "../autenticacion.js";
 import { generarToken, hashear } from "../sesiones.js";
-import { DIAS_EMPAREJADO, soltarAnteriores } from "../emparejamiento.js";
+import { computadorasDe, DIAS_EMPAREJADO, soltarAnteriores } from "../emparejamiento.js";
+import { fotosQueEsperan } from "./pedidos-de-foto.js";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). Nace solo cuando el celular
 // deja entrar a la computadora (RF-76, ver sesiones.ts) o, con las dos sesiones ya abiertas,
@@ -67,6 +68,31 @@ puestos.get("/mio", async (c) => {
   );
   const de = (compu: boolean) => { const p = rows.find((r) => (r.sesion_id === sesionId) === compu); return p ? { id: p.id, nombre: p.nombre, expira_en: p.expira_en } : null; };
   return c.json({ comoComputadora: de(true), comoCelular: de(false) });
+});
+
+// La computadora le pide a su celular que haga de lector (decisión 59): el celular lo ve como
+// un aviso y abre el lector. El pedido vive en memoria dos minutos (un solo proceso, ADR-001).
+const SEGUNDOS_PEDIDO_DE_LECTOR = 120;
+const lectoresPedidos = new Map<string, number>(); // sesión de la computadora → hasta cuándo vale
+puestos.post("/:id/lector", async (c) => {
+  const { id: sesionId } = c.get("sesion");
+  const { rows } = await pool.query("SELECT id FROM puesto WHERE id = $1 AND sesion_id = $2 AND vinculado_en IS NOT NULL AND expira_en > now()", [c.req.param("id"), sesionId]);
+  if (!rows[0]) return c.json({ error: "Esta computadora no tiene un celular emparejado" }, 404);
+  lectoresPedidos.set(sesionId, Date.now() + SEGUNDOS_PEDIDO_DE_LECTOR * 1000);
+  return c.body(null, 204);
+});
+
+// Lo que la computadora emparejada espera de este celular: que haga de lector, o alguna foto.
+// El celular lo pregunta cada pocos segundos, con la aplicación a la vista.
+puestos.get("/avisos", async (c) => {
+  const computadoras = await computadorasDe(pool, c.get("sesion").id);
+  const ahora = Date.now();
+  return c.json({ lector: computadoras.some((s) => (lectoresPedidos.get(s) ?? 0) > ahora), fotos: fotosQueEsperan(computadoras) });
+});
+// El celular abrió el lector (o dijo «ahora no»): el pedido ya está atendido.
+puestos.delete("/avisos/lector", async (c) => {
+  for (const s of await computadorasDe(pool, c.get("sesion").id)) lectoresPedidos.delete(s);
+  return c.body(null, 204);
 });
 
 // Soltar el emparejamiento, desde cualquiera de los dos.

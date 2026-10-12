@@ -113,9 +113,14 @@ El emparejamiento también nace solo: cuando la computadora retira la sesión qu
 celular (`POST /sesiones/vinculaciones/:id/estado`), la respuesta trae `puesto` (`id`,
 `expira_en`) y ese celular queda emparejado con ella.
 
-`GET /pedidos-de-foto/para-mi` (sesión): los pedidos de foto que esperan las computadoras
-emparejadas con este celular, cada uno con `codigo` y `para`. Con eso el celular manda la foto
-sin leer el código.
+Lo que la computadora le pide a su celular emparejado:
+
+| Método | Ruta | Exige | Para qué sirve |
+|---|---|---|---|
+| POST | `/puestos/:id/lector` | Sesión de la computadora de ese emparejamiento (si no, `404`) | Pedirle al celular que haga de lector. Vale 2 minutos. `204` |
+| GET | `/puestos/avisos` | Sesión | Lo que las computadoras emparejadas con este celular esperan de él: `lector` (si pidieron el lector) y `fotos` (cada pedido de foto, con `codigo` y `para`). El celular lo consulta cada 3 segundos |
+| DELETE | `/puestos/avisos/lector` | Sesión | El celular abrió el lector o lo dejó para después: el pedido queda atendido. `204` |
+| GET | `/pedidos-de-foto/para-mi` | Sesión | Solo los pedidos de foto, con la misma forma que `fotos` |
 
 ## Qué exigen las rutas de las otras capacidades
 

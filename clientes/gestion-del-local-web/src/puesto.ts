@@ -43,17 +43,19 @@ export async function soltarEmparejamiento(): Promise<void> {
   guardarPuestoLocal(null); guardarPuestoRemoto(null);
 }
 
-// El celular emparejado manda a la computadora lo que escanea, salvo que se lo apague (para
-// vender desde el celular sin que los productos aparezcan también en la venta de la computadora).
-const CLAVE_MANDA = "ferre.puesto-remoto-manda";
-export const mandaLoQueEscanea = () => { try { return localStorage.getItem(CLAVE_MANDA) !== "no"; } catch { return true; } };
-export function fijarMandaLoQueEscanea(manda: boolean) { try { localStorage.setItem(CLAVE_MANDA, manda ? "si" : "no"); } catch { /* sin almacenamiento */ } window.dispatchEvent(new Event(EVENTO_EMPAREJAMIENTO)); }
+// La computadora le pide a su celular emparejado que haga de lector (decisión 59).
+export async function pedirLector(): Promise<boolean> {
+  const p = puestoLocal();
+  if (!p) return false;
+  try { await api(`/puestos/${p.id}/lector`, { method: "POST" }); return true; }
+  catch (e) { if ((e as { estado?: number }).estado === 404) guardarPuestoLocal(null); return false; }
+}
 
 // El celular manda un código a la laptop vinculada (si hay). Sin red, no se encola: el
 // celular ya muestra el producto en su pantalla y el código pierde sentido después.
 export async function enviarCodigoAlPuesto(codigo: string): Promise<boolean> {
   const p = puestoRemoto();
-  if (!p || !mandaLoQueEscanea()) return false;
+  if (!p) return false;
   try {
     await api(`/puestos/${p.id}/codigos`, { method: "POST", body: JSON.stringify({ codigo }) });
     return true;

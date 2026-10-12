@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
+import { Lector } from "./Lector";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
@@ -83,6 +84,7 @@ function Pantallas() {
   // El celular llega acá al leer el código QR de la computadora: con la sesión ya iniciada, saca la foto que
   // pidió la computadora.
   if (ruta.nombre === "foto" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;
+  if (ruta.nombre === "lector") return <Lector />;
 
   const usuario = sesion.usuario;
   const permitido = (pide?: Permiso[]) => puede(usuario, ...(pide ?? []));
@@ -139,7 +141,7 @@ function Pantallas() {
           </button>
         ))}
       </nav>
-      <PedidosDeLaCompu alSacar={(codigo) => irA(`foto?codigo=${encodeURIComponent(codigo)}`)} />
+      <PedidosDeLaCompu alSacar={(codigo) => irA(`foto?codigo=${encodeURIComponent(codigo)}`)} alLeer={() => irA("lector")} />
       <OfrecerHuella />
     </div>
   );

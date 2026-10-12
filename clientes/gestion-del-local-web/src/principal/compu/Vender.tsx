@@ -12,7 +12,7 @@ import { useCatalogo, type Cliente } from "../../catalogo";
 import { useTeclasGlobales } from "../../teclas";
 import { pesos } from "../../formato";
 import { Escaner, hayCamara } from "../celular/componentes/Escaner";
-import { enviarCodigoAlPuesto, escucharPuesto, EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
+import { enviarCodigoAlPuesto, escucharPuesto, EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, pedirLector, puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
 import type { Producto } from "../celular/pantallas/Productos";
 import { describirDispositivo } from "./base/dispositivo";
 import { NOMBRE_MEDIO, useVentasDelDia } from "./base/pantallas/VentasDeHoy";
@@ -556,11 +556,17 @@ function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; a
     } catch (e) { const err = e as { estado?: number; message: string }; setError(err.estado ? err.message : "Sin conexión: para vincular el celular hace falta internet."); }
   }
   function cerrar() { parar(); setAbierta(false); }
+  // Con el celular emparejado no hay código que leer: se le pide que abra el lector (decisión 59).
+  const [pedido, setPedido] = useState<"si" | "no" | null>(null);
+  async function pedir() { setPedido((await pedirLector()) ? "si" : "no"); }
+  useEffect(() => { if (!pedido) return; const t = setTimeout(() => setPedido(null), 20000); return () => clearTimeout(t); }, [pedido]);
 
   if (vinculado) {
     return (
       <span className="fila" data-testid="celular-vinculado">
-        <Pastilla tipo="ok">Celular vinculado</Pastilla>
+        <Boton icono="celular" onClick={() => void pedir()} data-testid="pedir-lector">Escanear con el celular</Boton>
+        {pedido === "si" && <Pastilla tipo="ok"><span data-testid="lector-pedido">Abrí Ferrebress en el celular y tocá «Abrir el lector»</span></Pastilla>}
+        {pedido === "no" && <Pastilla tipo="alerta">No se pudo avisar al celular</Pastilla>}
         <Boton tam="chico" onClick={() => void soltarEmparejamiento()} data-testid="desvincular">Desvincular</Boton>
       </span>
     );

@@ -241,8 +241,13 @@ Lo que el celular escanea aparece donde se está trabajando, sin tocar nada.
 entrar a la computadora con el celular, o leyendo el código de Vender) y sirve para todo: lo
 que el celular escanea le llega a la computadora, y las fotos que la computadora pide le
 aparecen al celular como un aviso con el botón «Sacar la foto». La computadora dice que tiene
-un celular emparejado y deja soltarlo. En el celular, en Vender, un interruptor dice si lo que
-escanea va también a la computadora.
+un celular emparejado y deja soltarlo.
+
+**El celular como lector (decisión 59):** en la computadora, con un celular emparejado, el
+botón «Escanear con el celular» de Vender se lo pide: al celular le aparece un aviso con
+«Abrir el lector». El lector es un modo aparte de Vender: la cámara queda abierta, cada código
+va solo a la computadora y el celular dice que ya llegó. También se entra desde el celular,
+en Vender («Usar este celular como lector de la computadora») y apenas se empareja.
 
 **Volver:** con la cámara abierta, el botón de volver del celular cierra la cámara y deja la
 pantalla como estaba; no sale de la aplicación (pedido de Carlos del 2026-10-12).

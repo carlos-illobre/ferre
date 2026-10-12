@@ -146,11 +146,21 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   expect(psql(`SELECT count(*) FROM puesto WHERE vinculado_en IS NOT NULL AND expira_en > now() + interval '29 days' AND celular_sesion_id = (SELECT id FROM sesion WHERE token_hash = '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}')`)).toBe("1");
   await compu.goto("/#/vender");
   await expect(compu.getByTestId("celular-vinculado")).toBeVisible();
+  // La computadora le pide que haga de lector (decisión 59): al celular le aparece el aviso,
+  // abre el lector y lo que lee llega a la venta de la computadora. (Sin cámara en la prueba: se tipea.)
+  await compu.getByTestId("pedir-lector").click();
+  await expect(compu.getByTestId("lector-pedido")).toBeVisible();
+  await celular.getByTestId("seguir-en-el-celular").click();
+  await celular.getByTestId("abrir-el-lector").click();
+  await celular.getByTestId("codigo-manual").fill("7790000000011");
+  await celular.getByRole("button", { name: "Enviar" }).click();
+  await expect(celular.getByTestId("escaner-ultimo")).toContainText("ya está en la computadora");
+  await expect(compu.getByTestId("codigo-desconocido")).toContainText("7790000000011", { timeout: 10000 });
+  await celular.getByRole("button", { name: "Cerrar" }).click();
   // …y la foto de una factura se la pide sin código: al celular le aparece el aviso.
   await compu.goto("/#/compras");
   await compu.getByTestId("foto-con-celular").click();
   await expect(compu.getByTestId("pedida-al-celular")).toBeVisible();
-  await celular.getByTestId("seguir-en-el-celular").click();
   await expect(celular.getByTestId("pedido-de-la-compu")).toContainText("La computadora pide una foto");
   await celular.getByTestId("sacar-foto-para-la-compu").click();
   await celular.getByTestId("archivo-para-la-compu").setInputFiles({ name: "factura.png", mimeType: "image/png", buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64") });

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { irA } from "../../rutas";
 import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
@@ -18,7 +19,7 @@ import { describirDispositivo } from "./pantallas/Login";
 import { Escaner, hayCamara } from "./componentes/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
-import { enviarCodigoAlPuesto, escucharPuesto, EVENTO_EMPAREJAMIENTO, fijarMandaLoQueEscanea, mandaLoQueEscanea, puestoRemoto } from "../../puesto";
+import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../../puesto";
 import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
 import type { Producto } from "./pantallas/Productos";
 
@@ -71,11 +72,11 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
   const [escaneando, setEscaneando] = useState(false);
   const [ultimoEscaneo, setUltimoEscaneo] = useState<string | null>(null);
   const [puestoVinculado, setPuestoVinculado] = useState(false);
-  // El celular emparejado con una computadora (decisión 58), y si le manda lo que escanea.
+  // El celular emparejado con una computadora (decisión 58): Vender es su propia venta; para
+  // leerle códigos a la computadora está el lector, que es un modo aparte (decisión 59).
   const [emparejado, setEmparejado] = useState(() => Boolean(puestoRemoto()));
-  const [manda, setManda] = useState(mandaLoQueEscanea);
   useEffect(() => {
-    const mirar = () => { setEmparejado(Boolean(puestoRemoto())); setManda(mandaLoQueEscanea()); };
+    const mirar = () => setEmparejado(Boolean(puestoRemoto()));
     window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar);
     return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar);
   }, []);
@@ -144,7 +145,6 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
   const alDetectar = useCallback((codigo: string) => {
     const conocido = manejarCodigo.current(codigo);
     setUltimoEscaneo(conocido ? `${codigo}: agregado` : `${codigo}: no está en el catálogo`);
-    if (puestoRemoto()) enviarCodigoAlPuesto(codigo).then((ok) => { if (ok) setUltimoEscaneo((u) => `${u ?? codigo} · enviado a la computadora ✓`); });
   }, []);
 
   function cambiarItem(clave: string, cambios: Partial<Item>) {
@@ -270,8 +270,8 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
           alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
         {(!hayCamara() || window.innerWidth > 900) && <div className="solo-escritorio"><VincularCelular vinculado={puestoVinculado} alVincular={alVincular} /></div>}
         {emparejado && (
-          <button type="button" className={`chip emparejado ${manda ? "activo" : ""}`} aria-pressed={manda} onClick={() => fijarMandaLoQueEscanea(!manda)} data-testid="celular-vinculado-remoto">
-            {manda ? "Lo que escaneo va también a la computadora" : "Lo que escaneo queda solo en el celular"}
+          <button type="button" className="chip emparejado" onClick={() => irA("lector")} data-testid="celular-vinculado-remoto">
+            Usar este celular como lector de la computadora
           </button>
         )}
       </div>
