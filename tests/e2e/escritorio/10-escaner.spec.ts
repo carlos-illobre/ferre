@@ -49,7 +49,8 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   await laptop.goto("/#/vender");
   await expect(laptop.getByTestId("busqueda")).toBeEnabled();
   await laptop.getByTestId("vincular-celular").click();
-  await expect(laptop.getByTestId("qr-vincular")).toBeVisible();
+  // El código tarda un instante en llegar: se espera la imagen, no el recuadro vacío.
+  await expect(laptop.getByTestId("qr-vincular").locator("img")).toBeVisible();
   const enlace = await laptop.evaluate(() => (window as unknown as { __enlaceVinculacion: string }).__enlaceVinculacion);
   expect(enlace).toContain("#/vincular-celular?codigo=");
 
@@ -90,6 +91,7 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
 // El código de barras se le carga a un producto desde su ficha (RF-08) y después sirve para
 // buscarlo. En el navegador de prueba no hay cámara: se tipea, que es la alternativa de la regla.
 test("cargarle el código de barras a un producto desde su ficha y encontrarlo por ese código", async ({ page }) => {
+  psql(`UPDATE producto SET codigo_barras = NULL WHERE codigo_barras = '7790009998881'`);
   await page.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
   await page.goto("/#/productos");
   await page.getByTestId("busqueda").fill("GUANTES ESCANER");
@@ -101,7 +103,8 @@ test("cargarle el código de barras a un producto desde su ficha y encontrarlo p
   await ficha.getByTestId("guardar-codigo").click();
   await expect(ficha.getByTestId("codigo-actual")).toHaveText("7790009998881");
   await expect(ficha.getByTestId("codigo-guardado")).toContainText("Ya se puede buscar");
-  await expect.poll(() => psql(`SELECT codigo_barras FROM producto WHERE id = '${ID_PROD2}'`)).toBe("7790009998881");
+  // Por nombre y no por id: la corrida del otro tamaño de pantalla deja un producto que se llama igual.
+  await expect.poll(() => psql(`SELECT count(*) FROM producto WHERE codigo_barras = '7790009998881' AND descripcion LIKE 'GUANTES ESCANER%'`)).toBe("1");
 
   await ficha.getByRole("button", { name: "Listo" }).click();
   await page.getByTestId("busqueda").fill("7790009998881");

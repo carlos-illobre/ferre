@@ -131,10 +131,12 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   await celular.getByTestId("seguir-en-el-celular").click();
   await celular.getByTestId("abrir-el-lector").click();
   await celular.getByTestId("codigo-manual").fill("7790000000011");
-  await celular.getByRole("button", { name: "Enviar" }).click();
-  await expect(celular.getByTestId("escaner-ultimo")).toContainText("ya está en la computadora");
+  await celular.getByTestId("codigo-manual").press("Enter");
+  // Leído el código, la cámara se cierra sola y el celular dice que llegó.
+  await expect(celular.getByTestId("escaner")).toHaveCount(0);
+  await expect(celular.getByTestId("lector-resultado")).toContainText("Ya está en la computadora");
   await expect(compu.getByTestId("codigo-desconocido")).toContainText("7790000000011", { timeout: 10000 });
-  await celular.getByRole("button", { name: "Cerrar" }).click();
+  await celular.getByRole("button", { name: "Listo" }).click();
   // …y la foto de una factura se la pide sin código: al celular le aparece el aviso.
   await compu.goto("/#/compras");
   await compu.getByTestId("foto-con-celular").click();

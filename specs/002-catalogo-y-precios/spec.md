@@ -253,7 +253,7 @@ mandar un código conocido y uno desconocido, y ver el resultado en la computado
 
 1. **Given** un celular con cámara y el catálogo bajado, **When** el Vendedor abre el escáner junto a la búsqueda y apunta a un código de barras de un producto cargado, **Then** ve el producto en menos de 3 segundos desde que tocó escanear, con o sin conexión.
 2. **Given** el escáner abierto, **When** la cámara no logra leer el código, **Then** el Vendedor puede tipearlo ahí mismo.
-3. **Given** el escáner apuntando al mismo código de forma continua, **When** pasa el tiempo, **Then** el código se toma una sola vez; para sumar otra unidad hay que volver a escanearlo.
+3. **Given** el escáner abierto, **When** lee un código (o se tipea uno y se manda con Enter), **Then** el escáner se cierra solo y se vuelve a la pantalla de abajo con el resultado; para leer otro se lo vuelve a abrir. No hay botón «Enviar» (pedido de Carlos del 2026-10-12; antes quedaba abierto para leer varios seguidos).
 4. **Given** una venta abierta en la computadora, **When** el Vendedor pide vincular el celular, **Then** la computadora muestra un QR; al leerlo con el celular, el celular dice que quedó vinculado y la computadora también.
 5. **Given** el celular vinculado, **When** escanea el código de un producto conocido, **Then** el producto aparece en la venta de la computadora.
 6. **Given** el celular vinculado, **When** escanea un código que no está en el catálogo, **Then** la computadora avisa que no lo conoce; al buscar el producto y elegirlo, se agrega a la venta y el código queda guardado en ese producto.

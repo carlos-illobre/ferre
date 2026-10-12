@@ -3,7 +3,8 @@ import { useVolverCierra } from "./volver";
 
 // Escaneo con la cámara del celular (issue #52). Detección nativa del navegador donde
 // existe (Chrome en Android); si no, una librería de decodificación cargada recién ahí.
-// También se puede tipear el código: sirve cuando la cámara no lee o no hay.
+// También se puede tipear el código (y mandarlo con Enter): sirve cuando la cámara no lee o no hay.
+// Apenas se lee o se manda un código, el escáner se cierra.
 type Detector = { detect(fuente: HTMLVideoElement): Promise<{ rawValue: string }[]> };
 declare global { interface Window { BarcodeDetector?: new (opciones?: { formats?: string[] }) => Detector } }
 
@@ -14,6 +15,8 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
   const [error, setError] = useState<string | null>(null);
   const [manual, setManual] = useState("");
   const [activa, setActiva] = useState(false);
+  const alCerrarRef = useRef(alCerrar);
+  useEffect(() => { alCerrarRef.current = alCerrar; }, [alCerrar]);
   // El botón de volver del celular cierra la cámara y deja la pantalla como estaba.
   useVolverCierra(alCerrar);
 
@@ -36,6 +39,9 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
           ultimoCodigo = codigo; ultimoMomento = ahora;
           navigator.vibrate?.(60);
           alDetectar(codigo);
+          // Leído un código, la cámara se cierra sola (pedido de Carlos del 2026-10-12): para
+          // leer otro se la vuelve a abrir.
+          alCerrarRef.current();
         };
         if (window.BarcodeDetector) {
           const detector = new window.BarcodeDetector({ formats: ["ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e", "qr_code"] });
@@ -64,9 +70,8 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
       <div className="escaner-abajo">
         {error && <p className="error">{error}</p>}
         {ultimo && <p className="escaner-leido" role="status" data-testid="escaner-ultimo">{ultimo}</p>}
-        <form className="en-linea" onSubmit={(e) => { e.preventDefault(); if (manual.trim()) { alDetectar(manual.trim()); setManual(""); } }}>
-          <input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="O tipeá el código" inputMode="numeric" data-testid="codigo-manual" style={{ flex: 1 }} />
-          <button type="submit" className="secundario">Enviar</button>
+        <form className="en-linea" onSubmit={(e) => { e.preventDefault(); if (manual.trim()) { alDetectar(manual.trim()); setManual(""); alCerrar(); } }}>
+          <input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="O tipeá el código y Enter" inputMode="numeric" enterKeyHint="send" aria-label="Tipear el código de barras" data-testid="codigo-manual" style={{ flex: 1 }} />
           <button type="button" className="grande" onClick={alCerrar}>Cerrar</button>
         </form>
       </div>
