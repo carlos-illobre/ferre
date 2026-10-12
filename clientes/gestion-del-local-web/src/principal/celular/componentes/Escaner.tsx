@@ -63,7 +63,7 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
       {activa && <div className="guia" aria-hidden="true" />}
       <div className="escaner-abajo">
         {error && <p className="error">{error}</p>}
-        {ultimo && <p className="exito" data-testid="escaner-ultimo">{ultimo}</p>}
+        {ultimo && <p className="escaner-leido" role="status" data-testid="escaner-ultimo">{ultimo}</p>}
         <form className="en-linea" onSubmit={(e) => { e.preventDefault(); if (manual.trim()) { alDetectar(manual.trim()); setManual(""); } }}>
           <input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="O tipeá el código" inputMode="numeric" data-testid="codigo-manual" style={{ flex: 1 }} />
           <button type="submit" className="secundario">Enviar</button>

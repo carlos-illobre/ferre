@@ -332,6 +332,9 @@ button.fila:active, .fila.tocable:active { background: var(--niebla); }
 .escaner .guia::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: var(--coral-claro); box-shadow: 0 0 12px var(--coral-claro); }
 .escaner-abajo { background: var(--niebla); padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; border-radius: 24px 24px 0 0; }
 .escaner-abajo form { display: flex; gap: 8px; }
+/* Lo último que se leyó: un renglón sobre los botones. No lleva la clase «exito», que es la pantalla entera de «venta registrada». */
+.escaner-leido { margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--p-verde-suave, #e3f3ea); color: var(--p-verde-texto, #0f6b52); font-weight: 700; font-size: 16px; }
+.escaner-abajo .error { margin: 0; color: var(--p-naranja-texto, #c2370b); font-weight: 600; }
 .escaner-abajo .campo { flex: 1; }
 .escaner-abajo .campo input { text-align: left; width: 100%; }
 .qr-vincular { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; background: #fff; border-radius: 18px; padding: 10px; box-shadow: var(--sombra); }
@@ -418,3 +421,7 @@ tr.cambia td { background: #fff8e8; }
   .pill-prueba { position: fixed; top: calc(6px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 25; background: var(--tinta); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; animation: titilar 1.6s ease-in-out infinite; }
   .escaner-abajo form { flex-wrap: wrap; }
 }
+/* El pie del escáner: el campo para tipear el código y sus dos botones, que se vean como tales. */
+.escaner-abajo form input { flex: 1; min-width: 0; height: 48px; padding: 0 14px; border: 1.5px solid var(--p-borde-fuerte, #7c9085); border-radius: 12px; background: #fff; color: var(--p-tinta, #18201e); font: inherit; font-size: 17px; }
+.escaner-abajo form button { flex: none; height: 48px; padding: 0 16px; border-radius: 12px; border: 1.5px solid var(--p-borde-fuerte, #7c9085); background: #fff; color: var(--p-tinta, #18201e); font: inherit; font-weight: 700; font-size: 16px; }
+.escaner-abajo form button.grande { background: var(--p-verde, #17312b); border-color: var(--p-verde, #17312b); color: #fff; }
