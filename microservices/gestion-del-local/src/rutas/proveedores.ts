@@ -11,7 +11,7 @@ proveedores.use("/*", exigirSesion);
 
 proveedores.get("/", async (c) => {
   const { rows } = await pool.query(
-    "SELECT id, nombre, precios_incluyen_iva, descuento_general, descuento_contado, lector, activo FROM proveedor ORDER BY nombre",
+    "SELECT id, nombre, precios_incluyen_iva, descuento_general, descuento_contado, lector, activo, whatsapp FROM proveedor ORDER BY nombre",
   );
   return c.json(rows);
 });

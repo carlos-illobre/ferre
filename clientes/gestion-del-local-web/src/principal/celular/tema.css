@@ -255,3 +255,6 @@ body, .hoja { background: var(--p-fondo); }
 
 /* El menú de abajo reparte el ancho entre las partes que la persona puede usar (RF-72). */
 .nav-inferior.solo-celular { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 1fr; }
+
+/* Con cuatro pestañas (Depósito) el ícono va arriba del nombre, para que entren sin apretarse. */
+.segmentos.con-icono:has(> :nth-child(4)) button { flex-direction: column; gap: 2px; height: auto; min-height: 52px; padding: 6px 2px; font-size: 14px; letter-spacing: -0.01em; }

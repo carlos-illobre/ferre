@@ -273,4 +273,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - **Un pedido enviado se puede cancelar, y uno que llegó incompleto se puede cerrar.**
     - **Primera tanda:** se manda como texto, por WhatsApp o copiándolo, y se arma desde
       cero. Correo, PDF y armarlo desde la sugerencia de «qué pedir» quedan para después.
-    - Permiso nuevo, **«Encargar compras»**, que de arranque trae el rol Comprador.
+    - Permiso nuevo, **«Encargar compras»**, que de arranque trae el rol Comprador. Con él
+      los permisos pasan a ser dieciséis.
+    - De las dos maquetas, Carlos eligió la **B**: la pantalla es solo el pedido y «Revisar y
+      mandar» abre el mensaje para el proveedor.

@@ -17,6 +17,25 @@ operación está en [spec.md](../spec.md).
 | GET | `/compras/:id` | Cualquiera con sesión | Los renglones de una compra |
 | POST | `/compras/:id/anular` | Cualquiera con sesión | Anular una compra. Cuerpo: `motivo` (opcional). La marca `anulada` y devuelve el stock con un ajuste por renglón; el costo que dejó el comprobante no se toca. 204; 409 si no existe o ya está anulada |
 
+## Pedidos a proveedores
+
+RF-55. «Encargar» es el permiso `deposito.pedidos`; «ingresar», `deposito.ingresos`.
+
+| Método | Ruta | Exige | Para qué sirve |
+|---|---|---|---|
+| GET | `/pedidos` | Encargar o ingresar | Los pedidos, del más nuevo al más viejo (hasta 100). Quien solo ingresa recibe solo los que esperan mercadería (`enviado`, `recibido_parcial`). Cada uno: `id`, `estado`, `proveedor_id`, `proveedor`, `whatsapp` (del proveedor), `creado_en`, `enviado_en`, `enviado_por`, `cerrado_en`, `cerrado_por` e `items[]` (`producto_id`, `descripcion`, `marca`, `unidad`, `codigo_proveedor`, `cantidad`, `costo_estimado`, `recibido`) |
+| GET | `/pedidos/:id` | Encargar o ingresar | Un pedido, con la misma forma. `404` si no existe, o si quien solo ingresa pide uno que no espera mercadería |
+| PUT | `/pedidos/:id` | Encargar | Guardar el borrador: lo crea o lo reemplaza entero. Cuerpo: `proveedor_id` e `items[]` (`producto_id`, `cantidad`). El servidor le pone a cada renglón, como `costo_estimado`, el costo de la última lista de ese proveedor (nulo si no lo vende). `400` sin proveedor, con cantidad inválida o con un producto repetido; `404` si el proveedor no existe; `409` si el pedido ya se mandó |
+| DELETE | `/pedidos/:id` | Encargar | Borrar un borrador. `204`; `409` si ya se mandó o no existe |
+| POST | `/pedidos/:id/enviar` | Encargar | Anotar que el pedido se mandó: queda `enviado`, con quién y cuándo. El servidor no manda nada: el texto sale del dispositivo. Cuerpo opcional: `whatsapp`, que queda guardado en el proveedor (solo números, de 8 a 15). `204`; `400` sin renglones o con un número inválido; `404`; `409` si ya se había mandado. Registra `pedido.enviado` |
+| POST | `/pedidos/:id/cancelar` | Encargar | Un pedido `enviado` pasa a `cancelado`. `204`; `409` si no está en ese estado. Registra `pedido.cancelado` |
+| POST | `/pedidos/:id/cerrar` | Encargar | Un pedido `recibido_parcial` pasa a `cerrado_incompleto`. `204`; `409` si no está en ese estado. Registra `pedido.cerrado` |
+
+`POST /compras` acepta `pedido_id`: el pedido tiene que ser de ese proveedor y estar esperando
+mercadería (`404` si no existe, `409` si no). Cada renglón del ingreso suma a lo recibido del
+renglón del pedido con ese producto; el pedido queda `recibido` si a ningún renglón le falta, o
+`recibido_parcial`. Registra `pedido.recibido`. `GET /proveedores` trae también `whatsapp`.
+
 ## Stock
 
 | Método | Ruta | Exige | Para qué sirve |

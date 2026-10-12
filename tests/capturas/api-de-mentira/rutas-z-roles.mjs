@@ -9,6 +9,7 @@ const PERMISOS = [
   ["catalogo.margenes", "Catálogo", "Fijar márgenes", "Elegir el margen de un producto en el catálogo: queda guardado"],
   ["catalogo.listas", "Catálogo", "Cargar listas de precios", "Cargar y aplicar la lista de un proveedor; dar de alta proveedores"],
   ["catalogo.duplicados", "Catálogo", "Unir duplicados", "Unir y separar productos repetidos"],
+  ["deposito.pedidos", "Depósito", "Encargar compras", "Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos"],
   ["deposito.ingresos", "Depósito", "Registrar ingresos", "Registrar la mercadería que llega y anular un ingreso"],
   ["deposito.compras", "Depósito", "Ver las compras", "Ver las compras recientes y sus comprobantes"],
   ["deposito.stock", "Depósito", "Contar y corregir stock", "Contar estanterías y corregir el stock a mano"],
@@ -23,7 +24,7 @@ const TODOS = PERMISOS.map((p) => p.clave);
 
 let roles = [
   { id: "r-1", nombre: "Vendedor", permisos: ["ventas.registrar", "ventas.ver", "ventas.anular"] },
-  { id: "r-2", nombre: "Comprador", permisos: ["catalogo.listas", "catalogo.duplicados", "deposito.compras"] },
+  { id: "r-2", nombre: "Comprador", permisos: ["deposito.pedidos", "catalogo.listas", "catalogo.duplicados", "deposito.compras"] },
   { id: "r-3", nombre: "Recepción", permisos: ["deposito.ingresos", "deposito.compras", "deposito.stock", "negocio.anomalias"] },
   { id: "r-4", nombre: "Administrador", permisos: ["admin.usuarios", "admin.roles", "admin.sesiones", "negocio.actividad"] },
   { id: "r-5", nombre: "Gerente", permisos: ["negocio.numeros", "catalogo.margenes", "ventas.ver", "ventas.anular", "deposito.compras", "negocio.anomalias", "negocio.actividad"] },

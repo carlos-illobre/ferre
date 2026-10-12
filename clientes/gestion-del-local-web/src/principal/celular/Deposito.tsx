@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { AvisoDePedido, Pedidos, renglonesDelPedido, usePedidoAIngresar } from "../Pedidos";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { COMPROBANTES, MOTIVOS_DE_AJUSTE, TEXTOS, type Comprobante } from "../textos";
@@ -19,10 +20,10 @@ import type { Producto } from "./pantallas/Productos";
 // Depósito: inventario (cantidades, sin dinero), ingreso de mercadería y conteo por sector. Tres
 // sub-pantallas con un segmento arriba (rediseño en mockups/Ferre iOS.html).
 // Primero lo que más se hace: recibir mercadería; después mirar el stock y, cada tanto, contar.
-const SUB = [{ valor: "ingreso", nombre: "Ingreso" }, { valor: "stock", nombre: "Inventario" }, { valor: "contar", nombre: "Estanterías" }] as const;
+const SUB = [{ valor: "pedidos", nombre: "Pedidos" }, { valor: "ingreso", nombre: "Ingreso" }, { valor: "stock", nombre: "Inventario" }, { valor: "contar", nombre: "Estanterías" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
 // Lo que pide cada pestaña (RF-72). El inventario lo ve cualquiera con sesión.
-const PIDE: Partial<Record<Sub, Permiso[]>> = { ingreso: ["deposito.ingresos", "deposito.compras"], contar: ["deposito.stock"] };
+const PIDE: Partial<Record<Sub, Permiso[]>> = { pedidos: ["deposito.pedidos", "deposito.ingresos"], ingreso: ["deposito.ingresos", "deposito.compras"], contar: ["deposito.stock"] };
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
 
@@ -30,15 +31,15 @@ export function Deposito({ sub }: { sub: string | null }) {
   const puedeEsto = usePuede();
   const permitida = (s: Sub) => puedeEsto(...(PIDE[s] ?? []));
   // Sin dirección abre en la primera pestaña que la persona puede usar.
-  const actual: Sub = sub === "stock" || sub === "contar" ? sub : sub === "ingreso" || permitida("ingreso") ? "ingreso" : "stock";
+  const actual: Sub = sub === "stock" || sub === "contar" || sub === "pedidos" ? sub : sub === "ingreso" || permitida("ingreso") ? "ingreso" : "stock";
   if (!permitida(actual)) return <SinPermiso falta={PIDE[actual]!} />;
   return (
     <main className="contenido">
       <div className="encabezado">
         <h1 className="titulo">Depósito</h1>
-        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor }))} actual={actual} alElegir={(v) => irA(v === "ingreso" ? "deposito" : `deposito/${v}`)} />
+        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor === "pedidos" ? "listas" : s.valor }))} actual={actual} alElegir={(v) => irA(v === "ingreso" ? "deposito" : `deposito/${v}`)} />
       </div>
-      {actual === "stock" ? <Stock /> : actual === "ingreso" ? (puedeEsto("deposito.ingresos") ? <Ingreso /> : <ComprasRecientes version={0} soloVer />) : <Contar />}
+      {actual === "pedidos" ? <Pedidos celular alIngresar={(id) => irA(`deposito/ingreso?pedido=${id}`)} /> : actual === "stock" ? <Stock /> : actual === "ingreso" ? (puedeEsto("deposito.ingresos") ? <Ingreso /> : <ComprasRecientes version={0} soloVer />) : <Contar />}
     </main>
   );
 }
@@ -184,6 +185,15 @@ function Ingreso() {
   const [ocupado, setOcupado] = useState(false);
   const [version, setVersion] = useState(0);
   const [hoja, setHoja] = useState<"proveedores" | null>(null);
+  // Si se viene de un pedido (RF-55), el ingreso arranca con su proveedor y con lo que falta llegar.
+  const { pedido, error: errorPedido } = usePedidoAIngresar();
+  const hayCatalogo = catalogo !== null;
+  useEffect(() => {
+    if (!pedido || !catalogo) return;
+    setProveedorId(pedido.proveedor_id);
+    setRenglones(renglonesDelPedido(pedido, catalogo));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pedido, hayCatalogo]);
   const [escaneando, setEscaneando] = useState(false);
   const [exito, setExito] = useState<{ total: number; proveedor: string; detalle: string } | null>(null);
   const caja = useRef<HTMLInputElement>(null);
@@ -239,12 +249,14 @@ function Ingreso() {
         method: "POST",
         body: JSON.stringify({
           id: crypto.randomUUID(), proveedor_id: proveedorId, fecha: fechaCompra, comprobante_tipo: comprobante, foto: comprobante === "sin_comprobante" ? null : foto,
+          pedido_id: pedido?.id ?? null,
           items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion, cantidad: x.cantidad, costo_unitario: x.costo })),
         }),
       });
       const n = renglones.length;
       setExito({ total: r.total, proveedor: proveedor?.nombre ?? "", detalle: `${n} ${n === 1 ? "renglón sumado" : "renglones sumados"} al stock · ${r.costos_actualizados} costo${r.costos_actualizados === 1 ? "" : "s"} actualizado${r.costos_actualizados === 1 ? "" : "s"} según el comprobante${r.productos_nuevos ? ` · ${r.productos_nuevos} producto${r.productos_nuevos === 1 ? "" : "s"} nuevo${r.productos_nuevos === 1 ? "" : "s"}` : ""}.` });
       setRenglones([]); setFoto(null); setVersion((v) => v + 1);
+      if (pedido) irA("deposito/ingreso");
     } catch (e) {
       setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor. Registrar una compra necesita internet.");
     } finally {
@@ -255,6 +267,7 @@ function Ingreso() {
   return (
     <>
       <AvisoError texto={error ?? errorCatalogo} alCerrar={() => setError(null)} />
+      <AvisoDePedido pedido={pedido} error={errorPedido} />
       <div className="lateral">
       <div className="columna al-costado">
       <div className="formulario">

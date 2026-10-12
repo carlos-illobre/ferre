@@ -10,6 +10,7 @@ export const PERMISOS = {
   "catalogo.margenes": "Fijar márgenes",
   "catalogo.listas": "Cargar listas de precios",
   "catalogo.duplicados": "Unir duplicados",
+  "deposito.pedidos": "Encargar compras",
   "deposito.ingresos": "Registrar ingresos",
   "deposito.compras": "Ver las compras",
   "deposito.stock": "Contar y corregir stock",

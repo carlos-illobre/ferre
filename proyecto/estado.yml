@@ -406,7 +406,7 @@ RF-50:
     - "El paso de la foto del celular a la computadora está probado de punta a punta con dos navegadores, no con la cámara de un celular real"
     - "El ingreso de mercadería de la computadora no recibe códigos escaneados con el celular vinculado; solo se escanea en el celular"
     - "No se puede guardar la foto del comprobante con la compra"
-    - "El ingreso no se precarga desde un pedido (RF-55) ni desde la foto de la factura (RF-51)"
+    - "El ingreso no se precarga desde la foto de la factura (RF-51)"
     - "En el celular los gastos de la semana muestran solo el total, sin el detalle por proveedor"
     - "Sin conexión el ingreso no se registra y solo se avisa; qué exige la regla está preguntado en la spec (historia 1, escenario 13)"
     - "Anular una compra deja el costo que puso el comprobante; qué exige la regla está preguntado en la spec (historia 2, escenario 4)"
@@ -476,10 +476,19 @@ RF-54:
     - "Sin construir: no hay stock mínimo, aviso de stock bajo ni lista de qué pedir"
 
 RF-55:
-  estado: "Pendiente (#36)"
-  pruebas: []
+  estado: "Hecho en parte (#36): se arma desde cero y se manda como texto; faltan la sugerencia, el correo y el PDF"
+  pruebas:
+    - microservices/gestion-del-local/src/rutas/pedidos.test.ts
+    - clientes/gestion-del-local-web/src/principal/Pedidos.test.tsx
+    - tests/e2e/celular/16-pedidos.spec.ts
+    - tests/e2e/escritorio/16-pedidos.spec.ts
   defectos:
-    - "Sin construir: no hay pedidos a proveedores"
+    - "El pedido no se arma desde la sugerencia de «qué pedir»: espera a RF-54 (#35)"
+    - "No se manda por correo ni como PDF: quedó para una tanda posterior (decisión 52)"
+    - "Anular un ingreso hecho desde un pedido no descuenta lo recibido ni devuelve el pedido a su estado anterior"
+    - "Un borrador que no se pudo guardar por falta de conexión no queda en el dispositivo: se pierde si se sale de la pantalla"
+    - "El pedido no admite productos que no están en el catálogo"
+    - "El nombre del negocio en el mensaje es fijo («Ferrebress»)"
 
 RF-56:
   estado: "Nuevo"

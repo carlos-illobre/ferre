@@ -20,6 +20,7 @@ import { equivalencias } from "./rutas/equivalencias.js";
 import { credenciales } from "./rutas/credenciales.js";
 import { tickets } from "./rutas/tickets.js";
 import { pedidosDeFoto } from "./rutas/pedidos-de-foto.js";
+import { pedidos } from "./rutas/pedidos.js";
 import { anomalias } from "./rutas/anomalias.js";
 import { permisos, roles } from "./rutas/roles.js";
 
@@ -55,6 +56,7 @@ app.route("/equivalencias", equivalencias);
 app.route("/credenciales", credenciales);
 app.route("/tickets", tickets);
 app.route("/pedidos-de-foto", pedidosDeFoto);
+app.route("/pedidos", pedidos);
 app.route("/anomalias", anomalias);
 app.route("/roles", roles);
 app.route("/permisos", permisos);

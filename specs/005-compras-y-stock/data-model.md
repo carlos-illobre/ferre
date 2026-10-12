@@ -53,6 +53,28 @@ Un renglón de la compra.
 | `costo_unitario` | numeric(14,4), ≥ 0 | Sin IVA |
 | `creado_en` | timestamptz | |
 
+## pedido e item_pedido
+
+Lo que se le encargó a un proveedor y qué llegó (RF-55).
+
+| Tabla | Columna | Tipo | Detalle |
+|---|---|---|---|
+| `pedido` | `id` | uuid, clave primaria | Lo genera el dispositivo al empezar el borrador |
+| `pedido` | `proveedor_id` | uuid → `proveedor` | |
+| `pedido` | `estado` | text | `borrador`, `enviado`, `recibido_parcial`, `recibido`, `cancelado` o `cerrado_incompleto` |
+| `pedido` | `creado_por`, `enviado_por`, `cerrado_por` | uuid → `usuario` | Quién lo armó, quién lo mandó y quién lo canceló o cerró |
+| `pedido` | `enviado_en`, `cerrado_en`, `creado_en`, `modificado_en` | timestamptz | |
+| `item_pedido` | `pedido_id` | uuid → `pedido`, se borra con él | |
+| `item_pedido` | `orden` | integer | |
+| `item_pedido` | `producto_id` | uuid → `producto` | Un producto figura una sola vez por pedido |
+| `item_pedido` | `cantidad` | numeric(12,3), mayor que cero | Lo pedido |
+| `item_pedido` | `costo_estimado` | numeric(14,4), opcional | El costo de la última lista de ese proveedor al guardar el borrador |
+| `item_pedido` | `recibido` | numeric(12,3), por omisión 0 | Lo que fue llegando en los ingresos hechos desde el pedido |
+
+`compra.pedido_id` (uuid → `pedido`, opcional) dice de qué pedido es un ingreso, y
+`proveedor.whatsapp` (text, opcional) guarda el número al que se le mandan los pedidos.
+Anular un ingreso no descuenta lo recibido del pedido.
+
 ## movimiento_stock
 
 Cada entrada o salida. El stock de un producto no se guarda: es la suma de `cantidad`.

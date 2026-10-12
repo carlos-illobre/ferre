@@ -16,7 +16,7 @@ compras.use("/*", exigirSesion);
 
 const COMPROBANTES = ["factura", "remito", "sin_comprobante"] as const;
 type ItemEntrada = { producto_id?: string | null; descripcion: string; marca?: string | null; cantidad: number; costo_unitario: number };
-type CompraEntrada = { id?: string; proveedor_id: string; fecha?: string; comprobante_tipo: (typeof COMPROBANTES)[number]; comprobante_numero?: string | null; foto?: string | null; nota?: string | null; items: ItemEntrada[] };
+type CompraEntrada = { id?: string; proveedor_id: string; fecha?: string; comprobante_tipo: (typeof COMPROBANTES)[number]; comprobante_numero?: string | null; foto?: string | null; nota?: string | null; pedido_id?: string | null; items: ItemEntrada[] };
 const TIPOS_DE_FOTO: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
 const ARCHIVO_DE_FOTO = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
 const MAXIMO_DE_FOTO = 10 * 1024 * 1024;
@@ -26,6 +26,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function validar(v: CompraEntrada): string | null {
   if (v.id && !UUID.test(v.id)) return "El id de la compra tiene que ser un UUID";
   if (!v.proveedor_id || !UUID.test(v.proveedor_id)) return "Elegí el proveedor";
+  if (v.pedido_id && !UUID.test(v.pedido_id)) return "El pedido no es válido";
   if (!COMPROBANTES.includes(v.comprobante_tipo)) return `El comprobante es uno de ${COMPROBANTES.join(", ")}`;
   if (v.foto && !ARCHIVO_DE_FOTO.test(v.foto)) return "La foto del comprobante no es válida";
   if (v.fecha && !/^\d{4}-\d{2}-\d{2}$/.test(v.fecha)) return "La fecha tiene que ser AAAA-MM-DD";
@@ -85,12 +86,19 @@ compras.post("/", exigirPermiso("deposito.ingresos"), async (c) => {
     if (previa[0]) { await cliente.query("ROLLBACK"); return c.json({ id, total: Number(previa[0].total), repetida: true }); }
     const { rows: prov } = await cliente.query<{ nombre: string }>("SELECT nombre FROM proveedor WHERE id = $1 AND activo", [v.proveedor_id]);
     if (!prov[0]) { await cliente.query("ROLLBACK"); return c.json({ error: "No existe ese proveedor" }, 404); }
+    // Si la mercadería es de un pedido (RF-55), el pedido tiene que estar esperándola y ser de este proveedor.
+    if (v.pedido_id) {
+      const { rows: ped } = await cliente.query<{ estado: string; proveedor_id: string }>("SELECT estado, proveedor_id FROM pedido WHERE id = $1 FOR UPDATE", [v.pedido_id]);
+      if (!ped[0]) { await cliente.query("ROLLBACK"); return c.json({ error: "No existe ese pedido" }, 404); }
+      if (ped[0].proveedor_id !== v.proveedor_id) { await cliente.query("ROLLBACK"); return c.json({ error: "Ese pedido es de otro proveedor" }, 409); }
+      if (ped[0].estado !== "enviado" && ped[0].estado !== "recibido_parcial") { await cliente.query("ROLLBACK"); return c.json({ error: "Ese pedido ya no espera mercadería" }, 409); }
+    }
     // El número ya no se pide: está en la foto. Si llega (versiones anteriores), se usa.
     const comprobante = v.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : [v.comprobante_tipo, v.comprobante_numero?.trim()].filter(Boolean).join(" ");
 
     await cliente.query(
-      `INSERT INTO compra (id, proveedor_id, fecha, comprobante_tipo, comprobante_numero, total, nota) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [id, v.proveedor_id, fecha, v.comprobante_tipo, v.comprobante_numero?.trim() || null, total.toFixed(2), v.nota?.trim() || null],
+      `INSERT INTO compra (id, proveedor_id, fecha, comprobante_tipo, comprobante_numero, total, nota, pedido_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [id, v.proveedor_id, fecha, v.comprobante_tipo, v.comprobante_numero?.trim() || null, total.toFixed(2), v.nota?.trim() || null, v.pedido_id ?? null],
     );
     if (v.foto && v.comprobante_tipo !== "sin_comprobante") await cliente.query("UPDATE foto_comprobante SET compra_id = $1 WHERE archivo = $2 AND compra_id IS NULL", [id, v.foto]);
     for (const [orden, it] of v.items.entries()) {
@@ -128,7 +136,18 @@ compras.post("/", exigirPermiso("deposito.ingresos"), async (c) => {
         resultado.costos_actualizados++;
       }
     }
-    await registrarEvento(cliente, { tipo: "compra.registrada", usuarioId, contenido: { id, proveedor: prov[0].nombre, fecha, comprobante, foto: v.foto ?? null, total, items: v.items.length, ...resultado } });
+    // Lo que llegó se anota en el pedido: queda «recibido» si llegó todo, o «recibido parcial».
+    let pedido: string | null = null;
+    if (v.pedido_id) {
+      for (const it of v.items) {
+        if (it.producto_id) await cliente.query("UPDATE item_pedido SET recibido = recibido + $1 WHERE pedido_id = $2 AND producto_id = $3", [it.cantidad, v.pedido_id, it.producto_id]);
+      }
+      const { rows: falta } = await cliente.query<{ faltan: string }>("SELECT count(*) AS faltan FROM item_pedido WHERE pedido_id = $1 AND recibido < cantidad", [v.pedido_id]);
+      pedido = Number(falta[0]?.faltan ?? 0) > 0 ? "recibido_parcial" : "recibido";
+      await cliente.query("UPDATE pedido SET estado = $1 WHERE id = $2", [pedido, v.pedido_id]);
+      await registrarEvento(cliente, { tipo: "pedido.recibido", usuarioId, contenido: { id: v.pedido_id, compra: id, proveedor: prov[0].nombre, estado: pedido } });
+    }
+    await registrarEvento(cliente, { tipo: "compra.registrada", usuarioId, contenido: { id, proveedor: prov[0].nombre, fecha, comprobante, foto: v.foto ?? null, total, items: v.items.length, ...resultado, ...(v.pedido_id ? { pedido: v.pedido_id } : {}) } });
     await cliente.query("COMMIT");
   } catch (e) {
     await cliente.query("ROLLBACK");
@@ -136,7 +155,7 @@ compras.post("/", exigirPermiso("deposito.ingresos"), async (c) => {
   } finally {
     cliente.release();
   }
-  return c.json({ id, total, ...resultado }, 201);
+  return c.json({ id, total, ...resultado, ...(v.pedido_id ? { pedido: v.pedido_id } : {}) }, 201);
 });
 
 compras.get("/", exigirPermiso("deposito.compras", "deposito.ingresos"), async (c) => {

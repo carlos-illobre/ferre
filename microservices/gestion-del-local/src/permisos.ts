@@ -9,6 +9,7 @@ export const PERMISOS = [
   { clave: "catalogo.margenes", parte: "Catálogo", nombre: "Fijar márgenes", detalle: "Elegir el margen de un producto en el catálogo, que queda guardado" },
   { clave: "catalogo.listas", parte: "Catálogo", nombre: "Cargar listas de precios", detalle: "Cargar y aplicar la lista de un proveedor; dar de alta proveedores" },
   { clave: "catalogo.duplicados", parte: "Catálogo", nombre: "Unir duplicados", detalle: "Unir y separar productos repetidos" },
+  { clave: "deposito.pedidos", parte: "Depósito", nombre: "Encargar compras", detalle: "Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos" },
   { clave: "deposito.ingresos", parte: "Depósito", nombre: "Registrar ingresos", detalle: "Registrar la mercadería que llega y anular un ingreso" },
   { clave: "deposito.compras", parte: "Depósito", nombre: "Ver las compras", detalle: "Ver las compras recientes y sus comprobantes" },
   { clave: "deposito.stock", parte: "Depósito", nombre: "Contar y corregir stock", detalle: "Contar estanterías y corregir el stock a mano" },

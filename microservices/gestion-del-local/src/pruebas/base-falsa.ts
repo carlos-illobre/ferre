@@ -10,13 +10,14 @@ export type Consulta = { sql: string; params: unknown[] };
 export type Respuesta = { rows?: Record<string, unknown>[]; rowCount?: number } | ((params: unknown[]) => { rows?: Record<string, unknown>[]; rowCount?: number });
 
 // Usuarios de prueba. «dueño» y «admin» pueden todo; «mostrador» todo menos administrar; y
-// «soloVende» nada más que vender, para probar que una ruta rechaza a quien no tiene su permiso.
+// «recepcion» lo de quien recibe mercadería; y «soloVende» nada más que vender, para probar que una ruta rechaza a quien no tiene su permiso.
 const TODOS = PERMISOS.map((p) => p.clave as string);
 const SIN_ADMINISTRAR = TODOS.filter((p) => !p.startsWith("admin.") && p !== "negocio.actividad");
 export const usuarios: Record<string, Usuario & { rol: string }> = {
   dueño: { id: "u-dueño", email: "dueno@ferre.test", nombre: "Dueño", rol: "dueño", roles: ["Todos"], permisos: TODOS },
   admin: { id: "u-admin", email: "admin@ferre.test", nombre: "Admin", rol: "admin", roles: ["Todos"], permisos: TODOS },
   mostrador: { id: "u-mostrador", email: "mostrador@ferre.test", nombre: "Mostrador", rol: "mostrador", roles: ["Operación"], permisos: SIN_ADMINISTRAR },
+  recepcion: { id: "u-recepcion", email: "recepcion@ferre.test", nombre: "Recepción", rol: "recepcion", roles: ["Recepción"], permisos: ["deposito.ingresos", "deposito.compras", "deposito.stock"] },
   soloVende: { id: "u-solo-vende", email: "vende@ferre.test", nombre: "Solo vende", rol: "soloVende", roles: ["Vendedor"], permisos: ["ventas.registrar"] },
 };
 

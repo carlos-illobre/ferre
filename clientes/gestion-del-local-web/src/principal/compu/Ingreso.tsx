@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { AvisoDePedido, renglonesDelPedido, usePedidoAIngresar } from "../Pedidos";
+import { irA } from "./base/rutas";
 import { usePuede } from "../permisos";
 import { COMPROBANTES, type Comprobante } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
@@ -60,6 +62,15 @@ function RegistrarIngreso() {
   const [fechaCompra, setFechaCompra] = useState(borrador?.fechaCompra ?? hoy());
   const [consulta, setConsulta] = useState("");
   const [renglones, setRenglones] = useState<Renglon[]>(borrador?.renglones ?? []);
+  // Si se viene de un pedido (RF-55), el ingreso arranca con su proveedor y con lo que falta llegar.
+  const { pedido, error: errorPedido } = usePedidoAIngresar();
+  const hayCatalogo = catalogo !== null;
+  useEffect(() => {
+    if (!pedido || !catalogo) return;
+    setProveedorId(pedido.proveedor_id);
+    setRenglones(renglonesDelPedido(pedido, catalogo));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pedido, hayCatalogo]);
   const [intento, setIntento] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errorCodigo, setErrorCodigo] = useState<string | null>(null);
@@ -163,6 +174,7 @@ function RegistrarIngreso() {
         method: "POST",
         body: JSON.stringify({
           id: crypto.randomUUID(), proveedor_id: proveedorId, fecha: fechaCompra, comprobante_tipo: comprobante, foto: comprobante === "sin_comprobante" ? null : foto,
+          pedido_id: pedido?.id ?? null,
           items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion.trim(), cantidad: x.cantidad, costo_unitario: x.costo })),
         }),
       });
@@ -172,6 +184,7 @@ function RegistrarIngreso() {
         detalle: `${plural(n, "renglón sumado", "renglones sumados")} al stock · ${plural(r.costos_actualizados, "costo actualizado", "costos actualizados")} según el comprobante${r.productos_nuevos ? ` · ${plural(r.productos_nuevos, "producto nuevo", "productos nuevos")}` : ""}.`,
       });
       setRenglones([]); setFoto(null); setIntento(false); setDescartado(null); setVersion((v) => v + 1);
+      if (pedido) irA("compras");
     } catch (e) {
       setError(mensajeDe(e, "No se registró: se cortó la conexión y registrar un ingreso necesita internet. Lo cargado sigue acá; probá de nuevo cuando vuelva."));
     } finally {
@@ -234,6 +247,7 @@ function RegistrarIngreso() {
     <Pagina titulo="Compras" testId="pantalla-compras" className={renglones.length ? "deposito-con-pie" : ""} bajada="Acá se carga la mercadería que llega. Suma stock y, si el comprobante trae otro costo, ese pasa a ser el vigente.">
       <Aviso tipo="alerta" testId="sin-conexion">{!enLinea ? "Sin conexión: registrar un ingreso necesita internet. Podés seguir cargando; lo cargado queda guardado en este dispositivo hasta que vuelva." : null}</Aviso>
       <Aviso tipo="error">{errorCatalogo}</Aviso>
+      <AvisoDePedido pedido={pedido} error={errorPedido} />
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
 
       <section className="compras-ingreso" aria-labelledby={`${id}-titulo`}>

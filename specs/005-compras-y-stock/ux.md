@@ -292,7 +292,12 @@ el stock mínimo de un producto; armar el pedido de un proveedor.
 **Estados:** vacío («No hay nada para pedir»); cargando; sin conexión (se ve la última lista
 bajada, diciendo de cuándo es); éxito al armar el pedido (lleva al pedido, historia 7).
 
-## Historia 7: pedido a un proveedor (Comprador; Administrador si aprueba)
+## Historia 7: pedido a un proveedor (quien puede encargar compras)
+
+**Maqueta aprobada por Carlos el 2026-10-11:** la variante B de `maquetas/` (la pantalla es
+solo el pedido; «Revisar y mandar» abre una hoja con el mensaje tal como lo recibe el
+proveedor). La lista de pedidos es `maquetas/pedidos-lista.html`. En la primera tanda se
+manda como texto, por WhatsApp o copiándolo; el correo y el PDF no están (decisión 52).
 
 **Tiene que poder:** armar un pedido desde la sugerencia o desde cero; agregar, quitar y
 cambiar renglones; ver el total estimado; mandarlo por WhatsApp o por correo, como texto o
@@ -304,12 +309,19 @@ desde un pedido; ver qué queda sin llegar.
 - Pedido: proveedor, fecha, estado, renglones (código del proveedor, descripción, cantidad,
   costo estimado), total estimado. En un recibido parcial: por renglón, pedido, recibido y lo
   que resta.
-- Lista de pedidos: proveedor, fecha, total estimado y estado con sus palabras exactas:
-  «enviado», «recibido parcial», «recibido».
+- Lista de pedidos, en tres grupos: por llegar, sin mandar y cerrados. De cada uno:
+  proveedor, fecha, total estimado y estado con sus palabras exactas: «borrador», «enviado»,
+  «recibido parcial», «recibido», «cancelado», «cerrado incompleto».
 
 **Reglas de interfaz:**
 
-- Antes de mandar se ve el pedido tal como lo va a recibir el proveedor.
+- Antes de mandar se ve el pedido tal como lo va a recibir el proveedor: sin costos.
+- El total estimado lo ve solo quien puede encargar compras; quien solo ingresa mercadería ve
+  los pedidos por llegar, sin importes y sin poder cambiarlos.
+- Copiar el texto no da el pedido por enviado: después hay que marcarlo. Mandarlo por
+  WhatsApp sí.
+- El WhatsApp del proveedor se pide la primera vez y queda guardado.
+- Cancelar y cerrar incompleto se ofrecen solo en el estado en que valen, y no piden confirmar.
 - Si el proveedor no tiene WhatsApp ni correo cargados, se dice y se ofrece llevarse el
   texto o el PDF.
 - Desde un pedido enviado o recibido parcial, «llegó la mercadería» lleva al ingreso

@@ -13,10 +13,10 @@ const administran = (...ids: string[]) => base.actual.programar(/FROM usuario u\
 describe("roles", () => {
   beforeEach(() => { base.actual = baseFalsa(); administran("u-admin"); base.actual.programar(/UPDATE rol SET nombre/, { rowCount: 1 }); });
 
-  it("la lista de permisos sale del servidor: quince, cada uno con su parte, nombre y explicación", async () => {
+  it("la lista de permisos sale del servidor: dieciséis, cada uno con su parte, nombre y explicación", async () => {
     const r = await pedir(app, "GET", "/permisos", { rol: "admin" });
     const lista = (await r.json()) as { clave: string; parte: string; nombre: string; detalle: string }[];
-    expect(lista).toHaveLength(15);
+    expect(lista).toHaveLength(16);
     expect(lista.every((p) => p.clave && p.parte && p.nombre && p.detalle)).toBe(true);
     expect(new Set(lista.map((p) => p.parte))).toEqual(new Set(["Vender", "Catálogo", "Depósito", "Negocio", "Administración"]));
     expect((await pedir(app, "GET", "/permisos", { rol: "mostrador" })).status).toBe(403);
@@ -87,7 +87,7 @@ describe("permisos por operación", () => {
     ["GET", "/ventas", "Ver las ventas del día"], ["POST", "/ventas/x/anular", "Anular ventas"],
     ["GET", "/listas", "Cargar listas de precios"], ["POST", "/proveedores", "Cargar listas de precios"],
     ["GET", "/equivalencias", "Unir duplicados"],
-    ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los números del negocio"],
+    ["PUT", "/pedidos/x", "Encargar compras"], ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los números del negocio"],
     ["POST", "/stock/p1/ajustes", "Contar y corregir stock"], ["GET", "/sectores", "Contar y corregir stock"],
     ["GET", "/auditoria", "Ver quién hizo qué"], ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver los números del negocio"],
     ["GET", "/usuarios", "Administrar usuarios"], ["GET", "/sesiones", "Administrar sesiones"], ["GET", "/roles", "Administrar roles"],

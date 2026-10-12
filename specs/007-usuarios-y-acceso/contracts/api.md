@@ -57,7 +57,7 @@ Los permisos son fijos: los define el sistema. Los roles los arma el negocio.
 | DELETE | `/roles/:id` | `admin.roles` | Borrar un rol que nadie tiene. `204`; `404` si no existe; `409` si alguien lo tiene asignado. Registra `rol.borrado` |
 
 Las claves de permiso: `ventas.registrar`, `ventas.ver`, `ventas.anular`, `catalogo.margenes`,
-`catalogo.listas`, `catalogo.duplicados`, `deposito.ingresos`, `deposito.compras`,
+`catalogo.listas`, `catalogo.duplicados`, `deposito.pedidos`, `deposito.ingresos`, `deposito.compras`,
 `deposito.stock`, `negocio.numeros`, `negocio.anomalias`, `negocio.actividad`,
 `admin.usuarios`, `admin.roles`, `admin.sesiones`. Qué deja hacer cada una está en la tabla
 de permisos de [spec.md](../spec.md).
@@ -111,6 +111,8 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 | `POST /ventas/:id/anular` | `ventas.anular` |
 | `/listas` (salvo bajar el archivo), `POST /proveedores`, `PATCH /proveedores/:id` | `catalogo.listas` |
 | `/equivalencias/*` | `catalogo.duplicados` |
+| `PUT`, `DELETE` y `POST` de `/pedidos` | `deposito.pedidos` |
+| `GET /pedidos` | `deposito.pedidos` o `deposito.ingresos` |
 | `POST /compras`, `POST /compras/fotos`, `POST /compras/:id/anular` | `deposito.ingresos` |
 | `GET /compras`, `GET /compras/:id` | `deposito.compras` o `deposito.ingresos` |
 | `POST /stock/ajustes`, `/sectores`, `/conteos` | `deposito.stock` |

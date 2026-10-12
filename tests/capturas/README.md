@@ -45,7 +45,7 @@ La computadora y el celular no usan las mismas direcciones:
 |---|---|---|
 | Catálogo | `productos`, `listas`, `duplicados` | `catalogo`, `catalogo/listas`, `catalogo/duplicados` |
 | Vender | `vender` | `vender` |
-| Depósito | `compras` (Ingreso), `stock` (Inventario), `contar` (Estanterías) | `deposito`, `deposito/stock`, `deposito/contar` |
+| Depósito | `pedidos`, `compras` (Ingreso), `stock` (Inventario), `contar` (Estanterías) | `deposito/pedidos`, `deposito`, `deposito/stock`, `deposito/contar` |
 | Más | `mas`, `resumen`, `usuarios`, `roles`, `actividad`, `anomalias`, `tickets` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/roles`, `mas/actividad`, `mas/anomalias`, `mas/tickets` |
 
 `--entera` (página completa) se cuelga en la computadora: ahí conviene bajar con
