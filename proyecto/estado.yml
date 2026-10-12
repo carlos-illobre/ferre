@@ -626,6 +626,12 @@ RF-72:
     - "Que no se pueda anular una venta de otro día sin el permiso tiene prueba en el servidor, no en pantalla ni de punta a punta"
     - "El último que administra no se puede quitar: tiene prueba en el servidor, no de punta a punta"
 
+RF-76:
+  estado: "Pendiente (#72): especificado, con la maqueta a aprobar"
+  pruebas: []
+  defectos:
+    - "Sin construir: la computadora todavía no muestra el código para entrar con el celular"
+
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
   pruebas:

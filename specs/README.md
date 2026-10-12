@@ -131,8 +131,9 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
 
 | ID | Requerimiento | Especificación |
 |---|---|---|
-| RF-70 | Solo entran usuarios autorizados, con su cuenta de Google o la huella del celular; sin contraseñas ni QR. Se autoriza a alguien cargando su correo desde la app; quien no está autorizado ve «no autorizado» | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
+| RF-70 | Solo entran usuarios autorizados, con su cuenta de Google o la huella del celular; sin contraseñas. A la computadora también se entra leyendo su código con el celular (RF-76). Se autoriza a alguien cargando su correo desde la app; quien no está autorizado ve «no autorizado» | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-70b | Vincular el celular a la cuenta para entrar con la huella. La app lo ofrece sola la primera vez que se entra con Google desde un celular, y nunca en la computadora; también se vincula y se quita a mano | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
+| RF-76 | Entrar a la computadora con el celular: se lee el código QR de la entrada y se pone la huella; sin tipear y sin paso de confirmar | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-71 | Quién hizo qué: cada acción queda con su usuario y se puede consultar, de a 10 por página, filtrando por usuario, fecha y tipo de acción | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-72 | Lo que se puede hacer se divide en permisos fijos; cada usuario tiene uno o más roles y puede lo que permita cualquiera de ellos. La aplicación ofrece solo eso y el servidor rechaza lo demás | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-75 | Los roles se arman desde la aplicación: un nombre y los permisos que agrupa. Arranca con Vendedor, Comprador, Recepción, Administrador y Gerente. Nunca queda el sistema sin quien administre usuarios y roles | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |

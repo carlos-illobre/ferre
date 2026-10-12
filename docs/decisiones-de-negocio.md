@@ -322,3 +322,17 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Catálogo abre en Productos y Depósito en Pedidos; si la persona no puede usar la
       primera pestaña, en la primera que sí puede. Las demás pestañas se eligen arriba.
 
+57. **A la computadora se entra con el celular, leyendo un código** (2026-10-12). Carlos pidió
+    rediseñar la comunicación entre el celular y la computadora con la menor cantidad de
+    pasos, empezando por la entrada: hoy «Entrar con la huella» en la computadora abre un
+    diálogo de Windows que pide Bluetooth y cuatro pasos.
+    - La entrada de la computadora muestra sola un código QR. Se lo lee con el celular, se
+      pone la huella, y la computadora entra. Dos gestos, sin tipear.
+    - **Sin paso de confirmar:** lo eligió Carlos. La huella después de leer el código es la
+      confirmación. El código vence a los 5 minutos y sirve una sola vez.
+    - Revierte la decisión del 2026-10-09 que había quitado la entrada por código: entonces
+      era un botón más; ahora es la forma principal de entrar en la computadora.
+    - La computadora ofrece «Entrar con la huella» solo si esa computadora fue vinculada.
+    - Es el primer paso de un rediseño mayor: que un solo emparejamiento celular–computadora
+      sirva también para escanear y para mandar fotos. Eso se especifica aparte.
+

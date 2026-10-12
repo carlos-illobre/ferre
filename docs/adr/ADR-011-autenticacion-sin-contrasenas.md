@@ -136,3 +136,20 @@ puede hacer todo (decisión 18). Los roles Vendedor y Comprador de la enmienda a
 quedan como idea de partida: no se usan todavía, y cuáles son y qué puede cada uno se
 define cuando se analicen los roles en profundidad. Hasta entonces el servidor no restringe
 ninguna operación por rol: exige una sesión vigente de un usuario activo.
+
+## Enmienda (2026-10-12): vuelve la entrada por código, como forma principal en la computadora
+
+Decisión 57 y RF-76. La computadora no tiene lector de huellas, y pedirle la huella abre el
+diálogo del sistema operativo para usar un teléfono (QR propio, Bluetooth, cuatro pasos), que
+no se puede acortar desde la aplicación. Vuelve entonces el código QR nuestro, que se había
+quitado el 2026-10-09, con dos diferencias: se muestra solo en la entrada, sin pedirlo, y no
+hay pantalla de confirmación (la huella después de leerlo es la confirmación).
+
+- El código es al azar, se guarda hasheado, vence a los 5 minutos y sirve una sola vez. La
+  computadora consulta si ya fue aprobado y recibe su propia sesión; el celular nunca ve el
+  token de la computadora.
+- Riesgo aceptado: que alguien muestre el código de su computadora a una persona autorizada
+  para entrar con su usuario. Lo acotan el vencimiento corto, el uso único, y que la sesión
+  queda en la lista de sesiones abiertas y en el registro, donde se puede cerrar.
+- La tabla `vinculacion`, que había quedado sin uso, se vuelve a usar para esto.
+
