@@ -30,8 +30,9 @@ const num = (n: number) => n.toLocaleString("es-AR");
 export function Deposito({ sub }: { sub: string | null }) {
   const puedeEsto = usePuede();
   const permitida = (s: Sub) => puedeEsto(...(PIDE[s] ?? []));
-  // Sin dirección abre en la primera pestaña que la persona puede usar.
-  const actual: Sub = sub === "stock" || sub === "contar" || sub === "pedidos" ? sub : sub === "ingreso" || permitida("ingreso") ? "ingreso" : "stock";
+  // Al entrar a Depósito desde el menú se abre siempre la primera pestaña que la persona puede
+  // usar (decisión 56); las demás se eligen arriba.
+  const actual: Sub = SUB.find((s) => s.valor === sub)?.valor ?? SUB.find((s) => permitida(s.valor))?.valor ?? "stock";
   if (!permitida(actual)) return <SinPermiso falta={PIDE[actual]!} />;
   return (
     <main className="contenido">

@@ -314,3 +314,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - El aviso de sin conexión va arriba a la derecha, solo cuando no hay conexión.
     - La entrada de la computadora no cambia.
 
+56. **En el celular, cada parte del menú abre siempre en su primera pestaña, y al entrar se
+    abre el Catálogo** (2026-10-12). A Carlos le molestaba volver a la pantalla desde la que
+    había salido.
+    - Al entrar, con Google o con la huella, se abre el Catálogo. La excepción es llegar
+      leyendo un código QR (vincular el celular, mandar una foto), que sigue con eso.
+    - Catálogo abre en Productos y Depósito en Pedidos; si la persona no puede usar la
+      primera pestaña, en la primera que sí puede. Las demás pestañas se eligen arriba.
+

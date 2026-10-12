@@ -8,7 +8,7 @@ export type Ruta = { nombre: string; sub: string | null; parametros: URLSearchPa
 // Rutas viejas (una pantalla por opción del menú) que siguen abriendo lo que abrían.
 const ALIAS: Record<string, string> = {
   inicio: "vender", productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados",
-  stock: "deposito", compras: "deposito/ingreso", contar: "deposito/contar", administracion: "negocio",
+  stock: "deposito/stock", compras: "deposito/ingreso", contar: "deposito/contar", administracion: "negocio",
 };
 
 function leer(): Ruta {

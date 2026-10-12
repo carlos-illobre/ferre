@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "./componentes/OfrecerHuella";
@@ -56,6 +56,15 @@ function Pantallas() {
   const ruta = useRuta();
   const codigoVinculacion = ruta.parametros.get("codigo");
   useEffect(() => { window.scrollTo(0, 0); }, [ruta.nombre, ruta.sub]);
+  // Al entrar (con Google o con la huella) se abre siempre el Catálogo, no la pantalla desde la
+  // que se había salido (decisión 56). Salvo que se haya llegado leyendo un código QR, que
+  // sigue con lo que vino a hacer.
+  const estadoAnterior = useRef(sesion.estado);
+  useEffect(() => {
+    const venia = estadoAnterior.current;
+    estadoAnterior.current = sesion.estado;
+    if (venia === "sin-sesion" && sesion.estado === "con-sesion" && !codigoVinculacion) irA("catalogo");
+  }, [sesion.estado, codigoVinculacion]);
 
   if (sesion.estado === "cargando") return <main className="pantalla-centrada"><p>Cargando…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;

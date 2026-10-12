@@ -151,6 +151,12 @@ describe("Depósito · según los permisos", () => {
     expect(screen.queryByTestId("corregir")).toBeNull();
   });
 
+  it("desde el menú, Depósito abre siempre en la primera pestaña: Pedidos (decisión 56)", async () => {
+    armar(null);
+    expect(screen.getByRole("tab", { name: "Pedidos" }).getAttribute("aria-selected")).toBe("true");
+    expect(await screen.findByTestId("pedidos")).toBeTruthy();
+  });
+
   it("entrar por la dirección a Estanterías sin permiso dice qué permiso falta", () => {
     conPermisos("deposito.ingresos");
     armar("contar");

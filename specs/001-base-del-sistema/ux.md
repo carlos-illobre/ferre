@@ -284,6 +284,10 @@ abrirse, al volver a primer plano y cada media hora. Recién abierta, se actuali
 preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
 tapa lo que se está haciendo, y nunca se recarga sola.
 
+**Por dónde se entra en el celular (decisión 56).** Al entrar se abre siempre el Catálogo, y
+cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en Productos,
+Depósito en Pedidos): la aplicación no recuerda en qué pestaña se estaba.
+
 **El botón de volver del celular (pedido de Carlos del 2026-10-12).** Con algo abierto encima
 de la pantalla (la ficha de un producto, cualquier hoja que sube desde abajo, la cámara del
 escáner), volver lo cierra y deja la pantalla de abajo como estaba: no cambia de pantalla ni
