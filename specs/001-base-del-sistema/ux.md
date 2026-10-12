@@ -284,6 +284,11 @@ abrirse, al volver a primer plano y cada media hora. Recién abierta, se actuali
 preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
 tapa lo que se está haciendo, y nunca se recarga sola.
 
+**El botón de volver del celular (pedido de Carlos del 2026-10-12).** Con algo abierto encima
+de la pantalla (la ficha de un producto, cualquier hoja que sube desde abajo, la cámara del
+escáner), volver lo cierra y deja la pantalla de abajo como estaba: no cambia de pantalla ni
+sale de la aplicación. Con varias cosas apiladas, cada «volver» cierra la de arriba.
+
 **Lo que se ve depende de los permisos (decisión 50, RF-72).** El menú, las pestañas, los
 botones y los atajos de teclado muestran solo lo que los roles de la persona le permiten
 usar; nada se muestra deshabilitado. Una dirección que no le corresponde muestra qué permiso

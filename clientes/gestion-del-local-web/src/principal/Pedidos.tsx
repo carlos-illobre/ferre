@@ -4,6 +4,7 @@ import { useCatalogo } from "../catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
 import { Escaner, hayCamara } from "./celular/componentes/Escaner";
 import { usePuede } from "./permisos";
+import { useVolverCierra } from "./celular/componentes/volver";
 import "./pedidos.css";
 
 // Pedidos a proveedores (RF-55, decisión 52). La misma pantalla en el celular y en la
@@ -123,6 +124,7 @@ export function Pedidos({ celular = false, alIngresar }: { celular?: boolean; al
 }
 
 function Hoja({ titulo, alCerrar, testId, children }: { titulo: string; alCerrar: () => void; testId: string; children: React.ReactNode }) {
+  useVolverCierra(alCerrar);
   useEffect(() => { const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") alCerrar(); }; window.addEventListener("keydown", tecla); return () => window.removeEventListener("keydown", tecla); }, [alCerrar]);
   return (
     <div className="pd-velo" onMouseDown={(e) => { if (e.target === e.currentTarget) alCerrar(); }}>

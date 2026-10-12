@@ -38,6 +38,19 @@ describe("volver cierra lo que está encima", () => {
     atras.mockRestore();
   });
 
+  it("con dos cosas apiladas, cada «volver» cierra la de arriba", async () => {
+    const ficha = vi.fn(); const camara = vi.fn();
+    render(<Encima alCerrar={ficha} />);
+    await unInstante();
+    render(<Encima alCerrar={camara} />);
+    await unInstante();
+    volver();
+    expect(camara).toHaveBeenCalledTimes(1);
+    expect(ficha).not.toHaveBeenCalled();
+    volver();
+    expect(ficha).toHaveBeenCalledTimes(1);
+  });
+
   it("si se desmonta antes de anotar el paso, no toca el historial", () => {
     const atras = vi.spyOn(history, "back").mockImplementation(() => undefined);
     const antes = history.length;

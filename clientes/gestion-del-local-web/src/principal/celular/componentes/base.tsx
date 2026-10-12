@@ -1,3 +1,4 @@
+import { useVolverCierra } from "./volver";
 import { useEffect, useRef, type ReactNode } from "react";
 
 // Piezas del sistema visual (docs/sistema-visual.md, rediseño de mockups/Ferre iOS.html): íconos de
@@ -34,6 +35,8 @@ export function Icono({ nombre, tam = 20, grosor = 2, className }: { nombre: key
 // tocando el fondo, con Escape o con el botón que le pase el contenido.
 const hojasAbiertas: (() => void)[] = [];
 export function Hoja({ titulo, extra, alCerrar, children, testId }: { titulo?: ReactNode; extra?: ReactNode; alCerrar: () => void; children: ReactNode; testId?: string }) {
+  // El botón de volver del celular cierra la hoja y deja la pantalla de abajo como estaba.
+  useVolverCierra(alCerrar);
   useEffect(() => {
     // Con varias hojas apiladas (la ficha y, encima, una explicación), Escape cierra la de arriba.
     hojasAbiertas.push(alCerrar);
