@@ -19,10 +19,11 @@
 .en .boton-google > div { position: absolute; inset: 0; opacity: 0; transform: scale(1.4, 1.5); transform-origin: top left; }
 .en-o { display: flex; align-items: center; gap: 14px; color: var(--p-texto-2); font-size: 15px; }
 .en-o::before, .en-o::after { content: ""; flex: 1; height: 1px; background: var(--p-borde); }
-.en .entrar-huella { display: flex; flex-direction: row; align-items: center; gap: 20px; width: 100%; min-height: 72px; padding: 10px 20px 10px 26px; border: 0; border-radius: 16px; background: var(--p-superficie); box-shadow: 0 0 0 1px var(--p-borde-suave), 0 6px 18px rgb(23 49 43 / 0.10); color: var(--p-verde); font: inherit; text-align: left; cursor: pointer; }
-.en .entrar-huella svg { flex: none; width: 34px; height: 34px; color: var(--p-verde-texto); }
+.en .entrar-huella { display: flex; flex-direction: row; align-items: center; gap: 20px; width: 100%; min-height: 72px; padding: 10px 20px 10px 26px; border: 0; border-radius: 16px; background: var(--p-naranja); box-shadow: 0 6px 18px rgb(143 42 8 / 0.28); color: #fff; font: inherit; text-align: left; cursor: pointer; }
+.en .entrar-huella:active { background: var(--p-naranja-fuerte); }
+.en .entrar-huella svg { flex: none; width: 34px; height: 34px; color: #fff; }
 .en .entrar-huella strong { display: block; font-size: 19px; font-weight: 700; }
-.en .entrar-huella small { display: block; font-size: 15px; color: var(--p-texto-2); }
+.en .entrar-huella small { display: block; font-size: 15px; color: #fff; }
 .en .entrar-huella:disabled { opacity: 0.6; }
 .en .entrar-huella:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
 .en-sin-claves { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-radius: 16px; background: var(--p-relleno); color: var(--p-texto-medio); font-size: 15.5px; line-height: 1.4; }

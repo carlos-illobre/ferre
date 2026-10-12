@@ -309,6 +309,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       hacé crecer tu negocio.
     - Un pie con la onda de la marca, sin texto: al verla, Carlos pidió quitar la frase,
       «Hecho en Argentina» y la bandera.
+    - El botón de la huella va naranja, como en la computadora.
     - En el logotipo, la F queda más pegada a «errebress» (vale para toda la aplicación).
     - El aviso de sin conexión va arriba a la derecha, solo cuando no hay conexión.
     - La entrada de la computadora no cambia.
