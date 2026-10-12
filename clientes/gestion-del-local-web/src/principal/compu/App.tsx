@@ -3,6 +3,7 @@ import { Pedidos } from "../Pedidos";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { useEspejar, useEspejo } from "../../espejo";
 import { EspejoEstado } from "../EspejoEstado";
+import { useFlechas } from "./flechas";
 import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
@@ -77,6 +78,8 @@ function Pantallas() {
   const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
   const conSesion = sesion.estado === "con-sesion";
   const { emparejado } = useEspejo();
+  // Todo con el teclado: las flechas recorren lo que hay en pantalla (ver flechas.ts).
+  useFlechas(true);
   // Con la sesión abierta, el emparejamiento con el celular se pone al día con el servidor (decisión 58).
   useEffect(() => { if (conSesion) void sincronizarEmparejamiento(); }, [conSesion]);
   // El menú de esta persona: solo las partes y pantallas que sus roles le permiten. Los atajos
@@ -124,7 +127,7 @@ function Pantallas() {
       if (e.key !== "ArrowLeft" || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       if (document.querySelector("dialog[open], [role='dialog'], [aria-modal='true']")) return;
       const foco = document.activeElement as HTMLElement | null;
-      if (foco?.closest(".lateral")) return;
+      if (foco?.closest(".lateral, .pestanas")) return;
       if (foco instanceof HTMLInputElement || foco instanceof HTMLTextAreaElement) {
         const deTexto = foco instanceof HTMLTextAreaElement || ["text", "search", "", "tel", "url", "email", "password"].includes(foco.type);
         if (!deTexto || (foco.value !== "" && !(foco.selectionStart === 0 && foco.selectionEnd === 0))) return;
@@ -136,8 +139,19 @@ function Pantallas() {
     window.addEventListener("keydown", tecla);
     return () => window.removeEventListener("keydown", tecla);
   }, [conSesion]);
+  // Poner el foco en la pantalla: primero la búsqueda (u otro campo); si no tiene, su primer botón.
+  function focoALaPantalla() {
+    const cuerpo = document.querySelector<HTMLElement>(".cuerpo");
+    if (!cuerpo) return;
+    const deLaPantalla = (selector: string) => [...cuerpo.querySelectorAll<HTMLElement>(selector)].find((x) => !x.closest(".pestanas, .mas-volver"));
+    const primero = deLaPantalla("input:not([type='hidden']):not([type='file']):not([disabled]), select:not([disabled])") ?? deLaPantalla("button:not([disabled])");
+    (primero ?? document.getElementById("contenido"))?.focus();
+  }
+  const pestanaActual = () => document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button");
+  // En el menú lateral: ↑ ↓ recorren todo lo que tiene (las partes y, debajo, los botones del
+  // espejo y Salir). → abre la parte y pasa a sus pestañas, si tiene; si no, a la pantalla.
   function teclasDelMenu(e: ReactKeyboardEvent<HTMLElement>) {
-    const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
+    const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button:not([disabled])")];
     const i = botones.indexOf(document.activeElement as HTMLButtonElement);
     if (i < 0) return;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
@@ -145,18 +159,33 @@ function Pantallas() {
       botones[(i + (e.key === "ArrowDown" ? 1 : botones.length - 1)) % botones.length]!.focus();
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      // Si es otra parte, se abre; cada pantalla pone el foco en su búsqueda. Si es la misma, se vuelve a ella.
-      const cambia = botones[i]!.getAttribute("aria-current") !== "page";
+      // Solo las partes se abren con →; desde Desvincular o Salir, → vuelve a la pantalla sin tocarlos.
+      const esParte = Boolean(botones[i]!.closest("nav"));
+      const cambia = esParte && botones[i]!.getAttribute("aria-current") !== "page";
       if (cambia) botones[i]!.click();
       // Al cambiar de parte hay que esperar a que la pantalla nueva esté dibujada.
-      setTimeout(() => {
-        const cuerpo = document.querySelector<HTMLElement>(".cuerpo");
-        if (!cuerpo || cuerpo.contains(document.activeElement)) return;
-        // Primero la búsqueda (u otro campo); si la pantalla no tiene, su primer botón.
-        const deLaPantalla = (selector: string) => [...cuerpo.querySelectorAll<HTMLElement>(selector)].find((x) => !x.closest(".pestanas, .mas-volver"));
-        const primero = deLaPantalla("input:not([type='hidden']):not([type='file']):not([disabled]), select:not([disabled])") ?? deLaPantalla("button:not([disabled])");
-        (primero ?? document.getElementById("contenido"))?.focus();
-      }, cambia ? 150 : 0);
+      setTimeout(() => { const pestana = esParte ? pestanaActual() : null; if (pestana) pestana.focus(); else focoALaPantalla(); }, cambia ? 150 : 0);
+    }
+  }
+  // En las pestañas de una parte (Productos, Listas, Duplicados): ← → pasan de una a otra y la
+  // abren; ← desde la primera vuelve al menú; ↓ (o Enter) entra a la pantalla.
+  function teclasDeLasPestanas(e: ReactKeyboardEvent<HTMLElement>) {
+    const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
+    const i = botones.indexOf(document.activeElement as HTMLButtonElement);
+    if (i < 0 || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault(); e.stopPropagation();
+      const destino = botones[i + (e.key === "ArrowRight" ? 1 : -1)];
+      if (!destino) {
+        if (e.key === "ArrowLeft") (document.querySelector<HTMLButtonElement>(".lateral nav button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".lateral nav button"))?.focus();
+        return;
+      }
+      destino.click();
+      // La pantalla nueva pone el foco en su búsqueda: se lo devuelve a la pestaña, para seguir pasando.
+      setTimeout(() => pestanaActual()?.focus(), 150);
+    } else if (e.key === "ArrowDown" || e.key === "Enter") {
+      e.preventDefault(); e.stopPropagation();
+      focoALaPantalla();
     }
   }
 
@@ -175,11 +204,11 @@ function Pantallas() {
   return (
     <div className="app">
       <a className="saltar" href="#contenido" onClick={(e) => { e.preventDefault(); document.getElementById("contenido")?.focus(); }}>Ir al contenido</a>
-      <aside className="lateral">
+      <aside className="lateral" onKeyDown={teclasDelMenu}>
         <div className="lateral-marca">
           <Marca />
         </div>
-        <nav aria-label="Menú" onKeyDown={teclasDelMenu}>
+        <nav aria-label="Menú">
           {menu.map((m) => {
             const destino = m.clave === "mas" ? "mas" : m.pestanas[0]!.ruta;
             return (
@@ -191,7 +220,7 @@ function Pantallas() {
             );
           })}
         </nav>
-        <p className="lateral-ayuda">Alt + número abre cada pantalla. Con ← se pasa al menú y con → se vuelve.</p>
+        <p className="lateral-ayuda">Todo se hace con el teclado: ↑ ↓ recorren, Enter acciona, ← va al menú, → a las pestañas y Esc cierra. Alt + número abre cada pantalla.</p>
         <EspejoEstado />
         {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
         <div className="lateral-pie">
@@ -205,7 +234,7 @@ function Pantallas() {
       </aside>
       <div className={`cuerpo ${pestanas ? "con-pestanas" : ""}`}>
         {pestanas && (
-          <nav className="pestanas" aria-label={NOMBRES.get(actual)}>
+          <nav className="pestanas" aria-label={NOMBRES.get(actual)} onKeyDown={teclasDeLasPestanas}>
             {pestanas.map((p) => (
               <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(p.ruta)}`} onClick={() => irA(p.ruta)} data-testid={`pestana-${p.ruta}`}>
                 <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}<span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>

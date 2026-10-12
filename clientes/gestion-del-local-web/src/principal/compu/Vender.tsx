@@ -184,8 +184,9 @@ export function Vender() {
   }
 
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
+    // Sin resultados a la vista, ↑ ↓ no son para elegir uno: recorren la pantalla (flechas.ts).
+    if (e.key === "ArrowDown" && resultados.length) { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
+    else if (e.key === "ArrowUp" && resultados.length) { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter") {
       e.preventDefault();
       const p = resultados[elegido];

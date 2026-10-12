@@ -284,6 +284,32 @@ abrirse, al volver a primer plano y cada media hora. Recién abierta, se actuali
 preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
 tapa lo que se está haciendo, y nunca se recarga sola.
 
+**Todo con el teclado en la computadora (decisión 61, RNF-05).** Toda operación se tiene que
+poder hacer con las flechas y Enter; el mouse es un complemento. Las teclas significan lo
+mismo en todas las pantallas:
+
+| Tecla | Qué hace |
+|---|---|
+| ↓ ↑ | Van al control siguiente o al anterior de la pantalla: un campo, un botón, una casilla, un renglón |
+| Enter | Acciona el botón que tiene el foco; tilda o destilda una casilla; en un selector o una fecha, da el valor por elegido y pasa al siguiente |
+| ← | Lleva al menú (desde un campo de texto, solo con el cursor al principio) |
+| → | Desde el menú, entra a las pestañas de esa parte, o a la pantalla si no tiene. En la pantalla, va al control siguiente (desde un campo de texto, solo con el cursor al final) |
+| ← → en las pestañas | Pasan de una pestaña a otra y la abren; ← desde la primera vuelve al menú; ↓ entra a la pantalla |
+| ↑ ↓ en el menú | Recorren las partes y, debajo, los botones del espejo (Pausar, Desvincular o Vincular el celular) y Salir |
+| Esc | Cierra lo que esté abierto |
+| Alt + número | Abre cada pantalla |
+
+Donde las flechas ya tienen otro uso, ese uso gana y se sigue con la tecla de al lado:
+- En una búsqueda con resultados a la vista, ↑ ↓ eligen un resultado y Enter lo toma. Sin
+  resultados, ↑ ↓ recorren la pantalla.
+- En una cantidad, ↑ ↓ suman y restan: se sigue con →.
+- En un selector o una fecha, ↑ ↓ cambian el valor: se sigue con Enter o con →.
+- En un área de texto, las flechas mueven el cursor: se sale por abajo desde el final.
+
+Con el foco en el menú o en las pestañas, las flechas no mueven nada de la pantalla. Con una
+ventana abierta, las flechas recorren solo esa ventana. Toda pantalla o control nuevo tiene
+que poder alcanzarse y accionarse así: nada puede depender de un clic.
+
 **Por dónde se entra en el celular (decisión 56).** Al entrar se abre siempre el Catálogo, y
 cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en Productos,
 Depósito en Pedidos): la aplicación no recuerda en qué pestaña se estaba.

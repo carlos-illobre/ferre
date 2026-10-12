@@ -751,7 +751,10 @@ RNF-05:
   pruebas:
     - clientes/gestion-del-local-web/src/vista.test.ts
     - tests/e2e/escritorio/00-arranque.spec.ts
+    - clientes/gestion-del-local-web/src/teclas.test.tsx
   defectos:
+    - "Las flechas que recorren cada pantalla (decisión 61, #77) se probaron a mano en un navegador en cinco operaciones completas (venta, rol, ticket, ingreso, ficha); no tienen prueba automática salvo la del menú y las pestañas"
+    - "No se recorrieron con el teclado todas las pantallas una por una hasta el final: puede quedar algún control al que no se llegue"
     - "Sin validar: el dueño no la revisó en la notebook del local"
     - "Sin prueba: que la pantalla de venta y la barra de arriba entren enteras en la notebook, y que una venta completa se pueda registrar solo con el teclado"
     - "Sin prueba: capturas de antes y después que demuestren que un cambio en una interfaz no altera la otra"

@@ -126,3 +126,56 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(page.getByTestId("mensaje")).toContainText("Anotado como «No llevó»");
   await expect.poll(() => psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_MECHA}'`)).toBe("1");
 });
+
+// Todo con el teclado (decisión 61, RNF-05): el menú, las pestañas y una venta completa, sin mouse.
+test("sin mouse: recorrer el menú y las pestañas con las flechas y cobrar una venta", async ({ page }) => {
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.goto("/#/productos");
+  const busqueda = page.getByTestId("busqueda");
+  await expect(busqueda).toBeFocused();
+  const fila = () => page.evaluate(() => [...document.querySelectorAll("[data-testid=producto]")].findIndex((f) => f.getAttribute("aria-selected") === "true"));
+  const elegida = await fila();
+
+  // ← lleva al menú; ahí ↑ ↓ lo recorren sin mover la lista de productos, hasta Vincular y Salir.
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+  for (const destino of ["menu-vender", "menu-deposito", "menu-mas", "emparejar-celular", "salir", "menu-catalogo"]) {
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByTestId(destino)).toBeFocused();
+  }
+  expect(await fila()).toBe(elegida);
+
+  // → entra a las pestañas; ← → pasan de una a otra y la abren; ← desde la primera vuelve al menú.
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("pestana-productos")).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("pestana-listas")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("pestana-listas")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("pestana-productos")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+
+  // Vender no tiene pestañas: → va derecho a su búsqueda. La venta entera, con el teclado.
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("pestana-productos")).toHaveCount(0);
+  await expect(page.getByTestId("busqueda")).toBeFocused();
+  await page.keyboard.type("e2e mecha vender");
+  await expect(page.getByTestId("sugerencias")).toContainText("MECHA VENDER");
+  await page.keyboard.press("Enter");
+  const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
+  await expect(mecha).toBeVisible();
+  const conElFoco = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
+  // ↓ recorre los controles del renglón hasta la cantidad; ahí ↑ suma, y → sigue hasta Cobrar.
+  for (let i = 0; i < 40 && (await conElFoco()) !== "cantidad"; i++) await page.keyboard.press("ArrowDown");
+  await expect(mecha.getByTestId("cantidad")).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(mecha.getByTestId("cantidad")).toHaveValue("2");
+  for (let i = 0; i < 20 && (await conElFoco()) !== "cobrar"; i++) await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("cobrar")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("exito")).toContainText("Venta registrada");
+  await expect(page.getByTestId("exito")).toContainText("$6.000"); // 2 × $3.000
+});

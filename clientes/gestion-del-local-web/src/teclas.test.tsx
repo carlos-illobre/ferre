@@ -22,4 +22,14 @@ describe("useTeclasGlobales", () => {
     fireEvent.keyDown(getByTestId("otro"), { key: "ArrowDown" });
     expect(manejar).toHaveBeenCalledTimes(3);
   });
+
+  it("con el foco en el menú lateral o en las pestañas, las flechas no llegan a la pantalla", () => {
+    const manejar = vi.fn();
+    const { getByText } = render(<><aside className="lateral"><button>Catálogo</button></aside><nav className="pestanas"><button>Listas</button></nav><Prueba manejar={manejar} exceptoBusqueda={true} /></>);
+    fireEvent.keyDown(getByText("Catálogo"), { key: "ArrowDown" });
+    fireEvent.keyDown(getByText("Listas"), { key: "ArrowDown" });
+    expect(manejar).not.toHaveBeenCalled();
+    fireEvent.keyDown(getByText("b"), { key: "ArrowDown" });
+    expect(manejar).toHaveBeenCalledTimes(1);
+  });
 });

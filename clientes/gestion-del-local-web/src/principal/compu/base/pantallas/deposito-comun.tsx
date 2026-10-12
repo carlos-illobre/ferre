@@ -44,8 +44,9 @@ export function BuscadorDeProducto({ consulta, alCambiar, resultados, alElegir, 
   const total = resultados.length + (ofreceCrear ? 1 : 0);
 
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "ArrowDown") { e.preventDefault(); setMarcado((i) => Math.min(i + 1, total - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setMarcado((i) => Math.max(i - 1, 0)); }
+    // Sin resultados a la vista, ↑ ↓ recorren la pantalla (flechas.ts).
+    if (e.key === "ArrowDown" && total > 0) { e.preventDefault(); setMarcado((i) => Math.min(i + 1, total - 1)); }
+    else if (e.key === "ArrowUp" && total > 0) { e.preventDefault(); setMarcado((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter") {
       e.preventDefault();
       const p = resultados[marcado];

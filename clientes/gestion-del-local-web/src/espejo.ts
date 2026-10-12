@@ -187,6 +187,10 @@ export function useEspejar<T>(tipo: Tipo, valor: T, aplicar: (v: T) => void, lis
       return;
     }
     visto.current = texto;
+    // Solo se avisa lo que cambia con el espejo ya conectado. Lo que cambia antes (la pantalla
+    // con la que abre la aplicación, mientras todavía se está conectando) no es una decisión
+    // de la persona: si se avisara, arrastraría al otro. Al conectar se decide quién sigue a quién.
+    if (!estado.conectado || estado.pausado) return;
     const t = setTimeout(() => avisarAlEspejo(tipo, JSON.parse(texto)), 150);
     return () => clearTimeout(t);
   }, [texto, tipo]);

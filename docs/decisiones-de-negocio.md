@@ -388,3 +388,15 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Una venta o un ingreso a medio cargar no se pierde por ir a otra parte: al volver, los
       dos lo retoman como lo habían dejado.
 
+61. **En la computadora todo se hace con el teclado; el mouse es un complemento**
+    (2026-10-12). Carlos, probando el menú con las flechas, encontró tres fallas y pidió la
+    regla general: que con las flechas y Enter se puedan ejecutar todas las operaciones.
+    - Las tres fallas: con el foco en el menú, ↑ ↓ movían también la lista de productos;
+      bajando desde Más no se llegaba a Desvincular ni a Salir; y con → no se entraba a las
+      pestañas (Productos, Listas, Duplicados).
+    - La regla: ↑ ↓ recorren los controles de la pantalla, Enter acciona, ← va al menú, →
+      entra a las pestañas o sigue, Esc cierra. Las teclas significan lo mismo en todas las
+      pantallas (la tabla está en los requerimientos de interfaz de la base del sistema).
+    - Donde las flechas ya tenían otro uso (elegir un resultado, sumar a una cantidad, cambiar
+      un selector), ese uso se mantiene y se sigue con la tecla de al lado.
+
