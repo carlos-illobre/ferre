@@ -279,6 +279,11 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **La primera vez en un dispositivo** el catálogo no se espera entero: se ve una primera
   tanda y el resto baja atrás.
 
+**Versión nueva (decisión 54).** La app instalada busca sola si hay una versión nueva: al
+abrirse, al volver a primer plano y cada media hora. Recién abierta, se actualiza sin
+preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
+tapa lo que se está haciendo, y nunca se recarga sola.
+
 **Lo que se ve depende de los permisos (decisión 50, RF-72).** El menú, las pestañas, los
 botones y los atajos de teclado muestran solo lo que los roles de la persona le permiten
 usar; nada se muestra deshabilitado. Una dirección que no le corresponde muestra qué permiso

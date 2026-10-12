@@ -289,3 +289,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       quien lo tenía sigue anulando las de hoy. El de cualquier día lo trae el Gerente.
     - Con esto los permisos son dieciocho.
 
+54. **La app instalada se actualiza sin que haya que hacer nada** (2026-10-12). Carlos tenía
+    la app instalada en el celular y seguía viendo la versión anterior después de cada
+    cambio: el celular la deja abierta en segundo plano y solo buscaba versión nueva al
+    cargarse.
+    - Busca una versión nueva al abrirse, **cada vez que vuelve a primer plano** y cada
+      media hora.
+    - Si la encuentra recién abierta, se actualiza sola. Si ya se estaba usando, **avisa
+      «Hay una versión nueva» con un botón «Actualizar ahora»** y no se recarga sola, para
+      no perder una venta a medio armar.
+

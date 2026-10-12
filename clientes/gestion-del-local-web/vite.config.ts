@@ -13,10 +13,12 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [
       react(),
-      // Service worker (issue #18): precachea la app entera para que abra sin conexión y
-      // se actualice sola. La API y Google nunca pasan por el caché.
+      // Service worker (issue #18): precachea la app entera para que abra sin conexión. La API
+      // y Google nunca pasan por el caché. Es «prompt» y no «autoUpdate» porque cuándo se
+      // aplica una versión nueva lo decide la app (src/principal/actualizacion.ts): sola al
+      // abrir, con un aviso si ya se estaba usando, para no perder una venta a medio armar.
       VitePWA({
-        registerType: "autoUpdate",
+        registerType: "prompt",
         includeAssets: ["icono.svg"],
         manifest: {
           id: "ferre",
@@ -38,6 +40,9 @@ export default defineConfig(({ command }) => {
           ],
         },
         workbox: {
+          // La primera vez toma la página enseguida, para que ya abra sin conexión; una versión
+          // nueva, en cambio, espera a que la app la aplique (no hay skipWaiting).
+          clientsClaim: true,
           navigateFallback: "index.html",
           // La raíz es la aplicación. Las versiones históricas (historico/) y las páginas que
           // redirigen desde las direcciones viejas no son parte de la app instalada.
