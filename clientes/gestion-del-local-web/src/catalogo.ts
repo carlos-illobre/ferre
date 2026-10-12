@@ -20,13 +20,14 @@ import type { Producto } from "./pantallas/Productos";
 export type StockFila = { id: string; stock: string; costo_neto: string | null; proveedor: string | null; valor: string; ultimo_movimiento: string | null };
 export type Cliente = { id: string; nombre: string; telefono: string | null; cuenta_corriente: boolean; deuda: string };
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad" | "foto_url"> & { proveedor_preferido_id?: string }>;
-type Estado = { catalogo: Producto[] | null; stock: Map<string, number>; clientes: Cliente[]; error: string | null; desdeDispositivo: boolean };
+// `completo`: el catálogo ya está entero (no solo los primeros, ni una tanda de la primera bajada).
+type Estado = { catalogo: Producto[] | null; completo: boolean; stock: Map<string, number>; clientes: Cliente[]; error: string | null; desdeDispositivo: boolean };
 
 const PRIMEROS = 60;            // los que se guardan aparte para mostrar al instante
 const TANDA = 5000;             // la primera vez, el servidor se baja de a tandas
 const REFRESCO_MS = 60_000;     // al abrir una pantalla se vuelve a consultar al servidor si pasó este tiempo
 
-let estado: Estado = { catalogo: null, stock: new Map(), clientes: [], error: null, desdeDispositivo: false };
+let estado: Estado = { catalogo: null, completo: false, stock: new Map(), clientes: [], error: null, desdeDispositivo: false };
 const oyentes = new Set<() => void>();
 function poner(cambios: Partial<Estado>) { estado = { ...estado, ...cambios }; oyentes.forEach((o) => o()); }
 const suscribir = (oyente: () => void) => { oyentes.add(oyente); return () => { oyentes.delete(oyente); }; };
@@ -73,7 +74,7 @@ function cargarDelDispositivo(): Promise<void> {
       const [c, s, cl] = await Promise.all([leerTodo<Producto>("catalogo"), leerTodo<StockFila>("stock"), leerTodo<Cliente>("clientes")]);
       const cambios: Partial<Estado> = {};
       // Si el servidor ya contestó mientras tanto, lo del dispositivo llega tarde: no se usa.
-      if (c.length && (!estado.catalogo || estado.desdeDispositivo)) { cambios.catalogo = ordenar(c); cambios.desdeDispositivo = true; }
+      if (c.length && (!estado.catalogo || estado.desdeDispositivo)) { cambios.catalogo = ordenar(c); cambios.desdeDispositivo = true; cambios.completo = true; }
       if (s.length && estado.stock.size === 0) cambios.stock = new Map(s.map((x) => [x.id, Number(x.stock)]));
       if (cl.length && estado.clientes.length === 0) cambios.clientes = cl;
       if (Object.keys(cambios).length) poner(cambios);
@@ -127,7 +128,7 @@ function refrescarDelServidor(): Promise<void> {
       });
       pendientes.clear();
       if (enCola.size) enviarPendientes().catch(() => undefined);
-      const cambios: Partial<Estado> = { desdeDispositivo: false, error: null };
+      const cambios: Partial<Estado> = { desdeDispositivo: false, error: null, completo: true };
       if (cambio || !anterior) cambios.catalogo = c;
       if (st) cambios.stock = new Map(st.map((x) => [x.id, Number(x.stock)]));
       if (cl) cambios.clientes = cl;
@@ -211,5 +212,5 @@ export function useCatalogo() {
   const e = useSyncExternalStore(suscribir, () => estado);
   useEffect(() => { asegurar(); }, []);
   const buscarProductos = useCallback((consulta: string, maximo = 50) => buscarEn(e.catalogo, consulta, maximo), [e.catalogo]);
-  return { catalogo: e.catalogo, stock: e.stock, clientes: e.clientes, error: e.error, desdeDispositivo: e.desdeDispositivo, buscarProductos, actualizarProducto, ajustarStockLocal };
+  return { catalogo: e.catalogo, catalogoCompleto: e.completo, stock: e.stock, clientes: e.clientes, error: e.error, desdeDispositivo: e.desdeDispositivo, buscarProductos, actualizarProducto, ajustarStockLocal };
 }

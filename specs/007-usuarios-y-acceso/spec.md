@@ -33,6 +33,10 @@
 
 ### Session 2026-10-12
 
+- Q: Emparejados el celular y la computadora, ¿qué se sincroniza? → A: El trabajo en curso (la venta, y más adelante el ingreso y el pedido) y la parte en la que están; no lo que hay abierto encima ni la búsqueda. Carlos había pedido espejo de todo y eligió esto al ver los problemas del espejo literal.
+- Q: ¿Cómo se separan sin desemparejarse? → A: Con «Pausar», además de «Desvincular».
+- Q: ¿Quiénes se pueden emparejar? → A: Solo dos sesiones del mismo usuario.
+
 - Q: Sin sesión en la computadora ni en el celular, ¿cómo se entra a la computadora usando el celular con la menor cantidad de pasos? → A: La entrada de la computadora muestra sola un código QR; se lo lee con el celular y se pone la huella. Reemplaza la decisión del 2026-10-09 que había quitado la entrada por código.
 - Q: ¿Hace falta una pantalla que pida confirmar antes de dejar entrar a la computadora? → A: No. Carlos eligió que no haya paso de confirmar: la huella (o Google) después de leer el código es la confirmación. El código vence a los 5 minutos y sirve una sola vez.
 
@@ -228,6 +232,38 @@ aplicación con ese usuario, sin haber tocado nada en ella.
 
 ---
 
+### User Story 4c - El celular y la computadora en espejo (Priority: P2)
+
+La computadora es la herramienta principal del mostrador; el celular la acompaña con lo que
+ella no tiene: la cámara y que se lleva en la mano. Emparejados y con la aplicación abierta en
+los dos, trabajan en espejo: están en la misma parte y comparten el trabajo en curso.
+
+**Why this priority**: una persona usa los dos dispositivos a la vez para un mismo trabajo
+(arma la venta en la computadora y escanea con el celular). Sin espejo, cada uno tiene su
+propia venta y hay que avisarle al otro qué hacer.
+
+**Independent Test**: con un celular y una computadora emparejados y abiertos, agregar un
+producto a la venta en la computadora y verlo en el celular; cambiarle la cantidad en el
+celular y verla en la computadora; ir a Depósito en el celular y ver que la computadora va
+también; pausar y comprobar que cada uno se mueve por su lado.
+
+**Acceptance Scenarios**:
+
+1. **Given** solo la computadora abierta y sin celular emparejado, **When** se la usa, **Then** todo se registra desde ella y el menú ofrece siempre «Vincular el celular».
+2. **Given** solo el celular abierto, **When** se lo usa, **Then** todo se registra desde el celular, como si no hubiera computadora.
+3. **Given** el celular y la computadora emparejados y abiertos los dos, **When** uno cambia de parte (Vender, Catálogo y sus pestañas, Depósito y sus pestañas, Más y sus pantallas), **Then** el otro va a la misma parte. Vale en las dos direcciones.
+4. **Given** los dos en espejo en Vender, **When** en uno se agrega o se quita un producto, o se cambia la cantidad, la unidad, el margen, el precio a mano, el medio de pago o el cliente, **Then** el otro muestra la misma venta. Es una sola venta, la arme quien la arme.
+5. **Given** los dos en espejo, **When** en uno se abre algo encima de la pantalla (la ficha de un producto, una hoja, la cámara) o se escribe en la búsqueda, **Then** el otro no cambia: se espeja el trabajo y la parte en la que están, no lo que hay abierto encima.
+6. **Given** el celular en una pantalla que es solo suya (sacando una foto para la computadora, leyendo un código), **When** la computadora cambia de parte, **Then** el celular no se interrumpe; al terminar vuelve a donde está la computadora, y no la arrastra.
+7. **Given** los dos en espejo, **When** en cualquiera se toca «Pausar», **Then** los dos lo dicen y cada uno se mueve por su lado sin desemparejarse. Al tocar «Reanudar», el celular vuelve a donde está la computadora, con la venta de la computadora.
+8. **Given** los dos emparejados, **When** uno cierra la aplicación o pierde la conexión, **Then** el otro dice que trabaja solo y sigue; al volver el primero, se suma a lo que el otro tiene.
+9. **Given** los dos emparejados, **When** en cualquiera se toca «Desvincular», **Then** quedan sueltos los dos en el momento, y la computadora vuelve a ofrecer «Vincular el celular».
+10. **Given** dos personas, cada una con su celular y su computadora emparejados, **When** una cambia de parte o arma una venta, **Then** solo se mueve su otro dispositivo: el espejo de la otra persona no se entera.
+11. **Given** una computadora con la sesión de una persona, **When** otra persona lee su código de «Vincular el celular» con su propio celular, **Then** no se emparejan: solo se emparejan dos sesiones del mismo usuario.
+12. **Given** los dos en espejo, **When** se mira cualquiera, **Then** se ve con quién está en espejo, o que el otro no está abierto, o que está en pausa.
+
+---
+
 ### User Story 5 - Ver las sesiones abiertas y cerrarlas (Priority: P2)
 
 El Administrador ve en qué dispositivos hay sesiones abiertas y cierra cualquiera a
@@ -368,6 +404,7 @@ entonces, ninguna especificación de capacidad restringe una operación por rol.
 - **RF-70**: Solo entran usuarios autorizados y activos, con su cuenta de Google o con la huella del celular. No hay contraseñas. A la computadora también se entra leyendo su código con el celular (RF-76). Se autoriza a alguien cargando su nombre y su correo de Google desde la app; quien no está autorizado ve que no lo está y a quién pedirle el alta. Todo pedido al servidor exige una sesión vigente. La sesión queda en el dispositivo, dura 90 días que se renuevan con el uso, y sigue sirviendo sin conexión hasta que el servidor diga lo contrario. Los intentos de entrada tienen un límite por minuto y por origen (ADR-011).
 - **RF-70b**: Un usuario vincula su celular a su cuenta para entrar con la huella, sin Google. La app lo ofrece sola la primera vez que se entra con Google desde un celular con lector de huella, una sola vez por dispositivo, y nunca en la computadora. Cada usuario ve sus celulares vinculados, vincula uno a mano y lo quita; un Administrador quita el de cualquiera. Del celular se guarda solo lo necesario para verificarlo: la huella nunca sale del aparato (ADR-011, enmiendas del 2026-09-14 y del 2026-09-15).
 - **RF-76**: Se DEBE poder entrar a la computadora con el celular. La entrada de la computadora muestra sola un código QR que vence a los 5 minutos, sirve una sola vez y se renueva solo. Quien lo lee con el celular y entra ahí con la huella o con Google deja entrar a la computadora con su mismo usuario, sin tipear nada y sin una pantalla de confirmación; si el celular ya tenía la sesión iniciada, alcanza con un toque. La sesión de la computadora queda registrada como abierta desde el celular. La computadora ofrece «Entrar con la huella» solo si esa computadora fue vinculada.
+- **RF-77**: El celular y la computadora emparejados, con la aplicación abierta en los dos, DEBEN trabajar en espejo: están en la misma parte y comparten la venta en curso (renglones, cantidades, unidad, margen, precio a mano, medio de pago y cliente), en las dos direcciones. No se espeja lo que hay abierto encima de la pantalla ni lo escrito en la búsqueda, y las pantallas que son solo de un dispositivo (la cámara) no arrastran al otro. «Pausar» los separa sin desemparejarlos y al reanudar manda la computadora; «Desvincular» los suelta. Solo se emparejan dos sesiones del mismo usuario, y cada emparejamiento tiene su propio espejo. El estado del espejo está siempre a la vista en los dos.
 - **RF-71**: Quién hizo qué. Cada acción queda registrada con el usuario que la hizo, cuándo, el tipo de acción y su detalle, y el registro solo recibe acciones nuevas. El Administrador lo consulta de la acción más reciente a la más vieja, de a 10 por página y con el total, y lo filtra por usuario, por fecha y por tipo de acción, combinando los filtros.
 - **RF-72**: Lo que se puede hacer en el sistema se divide en permisos, que son fijos (tabla «Actores y roles»). Cada usuario tiene uno o más roles y puede lo que permita cualquiera de ellos; la aplicación le ofrece solo eso y el servidor rechaza lo demás diciendo qué permiso hace falta. Buscar en el catálogo, ver el stock de un producto, sacarle la foto, cargarle el código de barras, avisar de un error o una mejora y manejar la propia sesión no piden permiso. Las reglas son las mismas en el celular y en la computadora.
 - **RF-75**: Los roles se arman desde la aplicación: un nombre y los permisos que agrupa. El sistema arranca con cinco roles (Vendedor, Comprador, Recepción, Administrador y Gerente) que se pueden cambiar. Un rol no se borra si alguien lo tiene asignado, dos roles no se llaman igual, y un usuario activo tiene al menos un rol. El sistema nunca queda sin una persona activa que pueda administrar usuarios y roles, y nadie se quita a sí mismo esos permisos. Todo cambio de roles queda en el registro de acciones (RF-71).

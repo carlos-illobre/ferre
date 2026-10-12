@@ -48,7 +48,7 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   await laptop.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
   await laptop.goto("/#/vender");
   await expect(laptop.getByTestId("busqueda")).toBeEnabled();
-  await laptop.getByTestId("vincular-celular").click();
+  await laptop.getByTestId("emparejar-celular").click();
   // El código tarda un instante en llegar: se espera la imagen, no el recuadro vacío.
   await expect(laptop.getByTestId("qr-vincular").locator("img")).toBeVisible();
   const enlace = await laptop.evaluate(() => (window as unknown as { __enlaceVinculacion: string }).__enlaceVinculacion);
@@ -86,6 +86,10 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   expect(await mandar("7790009998887")).toBe(201);
   await expect(laptop.getByTestId("item").filter({ hasText: "GUANTES ESCANER" }).getByTestId("cantidad")).toHaveValue("2", { timeout: 10000 });
   expect(psql(`SELECT count(*) FROM codigo_escaneado WHERE entregado_en IS NOT NULL AND puesto_id = '${puestoRemoto!.id}'`)).toBe("3");
+  // Se cierran los dos: si quedaran abiertos y emparejados, la prueba que sigue (con la misma
+  // sesión de computadora) entraría en espejo con este celular y se iría a su pantalla.
+  await laptop.context().close();
+  await celular.context().close();
 });
 
 // El código de barras se le carga a un producto desde su ficha (RF-08) y después sirve para

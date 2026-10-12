@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { irA } from "../../rutas";
+import { useEspejar } from "../../espejo";
+import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "../venta-en-espejo";
 import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
@@ -60,7 +62,7 @@ const num = (n: number) => n.toLocaleString("es-AR");
 export function Vender({ esDueno }: { esDueno: boolean }) {
   const puedeEsto = usePuede();
   const fijaMargen = puedeEsto("catalogo.margenes");
-  const { catalogo, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
+  const { catalogo, catalogoCompleto, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
@@ -88,6 +90,11 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía media pantalla.
   const { datos: hoy, anular } = useVentasDeHoy(mensaje ?? exito);
 
+  // En espejo con la computadora (decisión 60): la venta es una sola, la arme quien la arme.
+  useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
+    setItems((previos) => renglonesDelEspejo(v, catalogo ?? [], previos));
+    setMedio(v.medio as typeof medio); setClienteId(v.clienteId);
+  }, catalogo !== null && catalogoCompleto !== false); // con el catálogo a medio cargar no se reconocerían los productos
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
   // Un aviso ("elegí el cliente", "elegí cómo paga") se va solo apenas se corrige la causa.

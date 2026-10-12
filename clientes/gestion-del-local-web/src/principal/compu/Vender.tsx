@@ -3,6 +3,8 @@ import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
+import { useEspejar } from "../../espejo";
+import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "../venta-en-espejo";
 import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
@@ -53,7 +55,7 @@ const soloDigitos = (v: string) => (v === "" ? null : Number(v.replace(/[^\d]/g,
 
 export function Vender() {
   const puedeEsto = usePuede();
-  const { catalogo, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
+  const { catalogo, catalogoCompleto, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
   const esCelular = useEsCelular();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
@@ -73,6 +75,11 @@ export function Vender() {
   const sugeridos = useSugeridos(catalogo, exito);
   const { datos: hoy } = useVentasDelDia(null, exito);
 
+  // En espejo con la computadora (decisión 60): la venta es una sola, la arme quien la arme.
+  useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
+    setItems((previos) => renglonesDelEspejo(v, catalogo ?? [], previos));
+    setMedio(v.medio as typeof medio); setClienteId(v.clienteId);
+  }, catalogo !== null && catalogoCompleto !== false); // con el catálogo a medio cargar no se reconocerían los productos
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
   // Un aviso se va solo apenas se corrige su causa.
@@ -270,7 +277,8 @@ export function Vender() {
     <Pagina titulo="Vender" testId="vender" className={`vender ${items.length ? "con-cobro" : ""}`}
       acciones={
         <div className="fila envuelve">
-          {!esCelular && <VincularParaEscanear vinculado={puestoVinculado} alVincular={alVincular} />}
+          {/* Sin celular emparejado, «Vincular el celular» está en el menú lateral, siempre a la vista. */}
+          {!esCelular && puestoVinculado && <VincularParaEscanear vinculado={puestoVinculado} alVincular={alVincular} />}
           {puestoRemoto() && <span data-testid="celular-vinculado-remoto"><Pastilla tipo="ok">Vinculado a la computadora</Pastilla></span>}
           {hoy && puedeEsto("ventas.ver") && <Boton icono="ventas" onClick={() => irA("ventas")} data-testid="hoy">Hoy <span className="importe chico">{pesosCortos(hoy.total)}</span></Boton>}
         </div>
@@ -530,7 +538,7 @@ function ElegirCliente({ clientes, elegido, alElegir, alCerrar }: { clientes: Cl
 
 // En la computadora: un QR que el celular lee con su cámara. Queda vinculado 12 horas y lo
 // que escanea aparece en esta venta.
-function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; alVincular: (puestoId: string) => void }) {
+export function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; alVincular: (puestoId: string) => void }) {
   const [abierta, setAbierta] = useState(false);
   const [qr, setQr] = useState<string | null>(null);
   const [vencido, setVencido] = useState(false);
@@ -573,9 +581,9 @@ function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; a
   }
   return (
     <>
-      <Boton icono="celular" onClick={() => void generar()} data-testid="vincular-celular">Escanear con el celular</Boton>
+      <Boton icono="celular" onClick={() => void generar()} data-testid="emparejar-celular">Vincular el celular</Boton>
       {abierta && (
-        <Hoja titulo="Usar el celular para escanear" alCerrar={cerrar} testId="hoja-vincular">
+        <Hoja titulo="Vincular el celular con esta computadora" alCerrar={cerrar} testId="hoja-vincular">
           <div className="vender-vincular">
             <div className="vender-qr" data-testid="qr-vincular">
               {qr ? <img src={qr} alt="Código para vincular el celular" width={220} height={220} /> : vencido || error ? <Icono nombre="celular" tam={56} grosor={1.4} /> : <div className="esqueleto" aria-label="Generando el código" />}
@@ -583,7 +591,7 @@ function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; a
             <ol className="pasos">
               <li><span>Abrí la cámara del celular y apuntá al código.</span></li>
               <li><span>Tocá el enlace que aparece y entrá con tu cuenta.</span></li>
-              <li><span>Listo: lo que escanees con el celular aparece en esta venta, y las fotos que le pidas te llegan sin leer más códigos.</span></li>
+              <li><span>Listo: el celular y esta computadora trabajan en espejo. Lo que hagas en uno se ve en el otro, y el celular pone la cámara.</span></li>
             </ol>
           </div>
           <Aviso tipo="error">{error}</Aviso>

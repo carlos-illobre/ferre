@@ -1,6 +1,9 @@
 import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo } from "react";
 import { Pedidos } from "../Pedidos";
 import { sincronizarEmparejamiento } from "../../puesto";
+import { useEspejar, useEspejo } from "../../espejo";
+import { EspejoEstado } from "../EspejoEstado";
+import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
@@ -56,6 +59,13 @@ const MENU: Parte[] = [
 const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "ventas", nombre: "Ventas de hoy", icono: "ventas", pide: ["ventas.ver"] }];
 const TODAS = [...MENU.flatMap((m) => m.pestanas), ...FUERA_DEL_MENU];
 const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
+// Las partes con el nombre que comparten el celular y la computadora en espejo (decisión 60).
+const A_PARTE_COMUN: Record<string, string> = {
+  productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", ventas: "vender",
+  pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
+  mas: "mas", resumen: "mas/negocio", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", tickets: "mas/tickets",
+};
+const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).filter(([ruta]) => ruta !== "ventas").map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
 const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
@@ -66,6 +76,7 @@ function Pantallas() {
   // Sin dirección, la app abre en lo primero del menú.
   const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
   const conSesion = sesion.estado === "con-sesion";
+  const { emparejado } = useEspejo();
   // Con la sesión abierta, el emparejamiento con el celular se pone al día con el servidor (decisión 58).
   useEffect(() => { if (conSesion) void sincronizarEmparejamiento(); }, [conSesion]);
   // El menú de esta persona: solo las partes y pantallas que sus roles le permiten. Los atajos
@@ -76,6 +87,14 @@ function Pantallas() {
   const atajoDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
   const actual = sinDireccion || !NOMBRES.has(ruta.nombre) ? "productos" : ruta.nombre;
   const falta = usuario && !puede(usuario, ...(TODAS.find((p) => p.ruta === actual)?.pide ?? [])) ? TODAS.find((p) => p.ruta === actual)!.pide! : null;
+  // En espejo con el celular (decisión 60): los dos están en la misma parte. Las direcciones
+  // del celular y las de la computadora no son las mismas: viajan con un nombre común.
+  const parteEnEspejo = conSesion && [...ruta.parametros].length === 0 ? (A_PARTE_COMUN[actual] ?? null) : null;
+  useEspejar<string | null>("ir", parteEnEspejo, (parte) => {
+    if (!parte || !conSesion) return;
+    const destino = parte === "deposito" ? (menu.find((m) => m.clave === "deposito")?.pestanas[0]?.ruta ?? "stock") : DE_PARTE_COMUN[parte];
+    if (destino && destino !== actual && !(destino === "vender" && actual === "ventas")) irA(destino);
+  }, parteEnEspejo !== null);
 
   useEffect(() => { window.scrollTo(0, 0); }, [actual]);
   useEffect(() => { document.title = conSesion ? `${NOMBRES.get(actual)} · Ferrebress` : "Ferrebress"; }, [actual, conSesion]);
@@ -168,6 +187,8 @@ function Pantallas() {
           })}
         </nav>
         <p className="lateral-ayuda">Alt + número abre cada pantalla. Con ← se pasa al menú y con → se vuelve.</p>
+        <EspejoEstado />
+        {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
         <div className="lateral-pie">
           <EstadoDeConexion />
           <div className="quien">

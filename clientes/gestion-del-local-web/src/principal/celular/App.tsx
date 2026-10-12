@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
+import { EspejoEstado } from "../EspejoEstado";
+import { useEspejar } from "../../espejo";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
@@ -65,6 +67,13 @@ function Pantallas() {
   // sigue con lo que vino a hacer.
   // Con la sesión abierta, el emparejamiento con la computadora se pone al día con el servidor (decisión 58).
   useEffect(() => { if (sesion.estado === "con-sesion") void sincronizarEmparejamiento(); }, [sesion.estado]);
+  // En espejo con la computadora (decisión 60): los dos están en la misma parte. Las pantallas
+  // que son solo de este dispositivo (la cámara, un enlace con código) no viajan.
+  const sinHash = location.hash.replace(/^#\/?/, "") === "";
+  const nombreDeParte = sinHash ? "catalogo" : ruta.nombre === "negocio" ? "mas" : ruta.nombre;
+  const parteEnEspejo = sesion.estado === "con-sesion" && [...ruta.parametros].length === 0 && ["catalogo", "vender", "deposito", "mas"].includes(nombreDeParte)
+    ? `${nombreDeParte}${ruta.nombre === "negocio" ? "/negocio" : ruta.sub ? `/${ruta.sub}` : ""}` : null;
+  useEspejar<string | null>("ir", parteEnEspejo, (parte) => { if (parte && sesion.estado === "con-sesion") irA(parte); }, parteEnEspejo !== null);
   const estadoAnterior = useRef(sesion.estado);
   const [recienEntro, setRecienEntro] = useState(false);
   useEffect(() => {
@@ -102,6 +111,7 @@ function Pantallas() {
 
   return (
     <div className="app">
+      <EspejoEstado />
 
       {falta ? <SinPermiso falta={falta} />
         : pestana === "mas" && parte === "tickets" ? <Tickets />

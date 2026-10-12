@@ -364,3 +364,23 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Vender del celular vuelve a ser solo la venta del celular: lo que se escanea ahí ya no
       viaja a la computadora. Reemplaza el interruptor de la decisión 58.
 
+60. **El celular y la computadora emparejados trabajan en espejo** (2026-10-12). Carlos: la
+    computadora es la herramienta oficial y el celular un apoyo, por la portabilidad y la
+    cámara. Con uno solo abierto, se trabaja desde ese. Con los dos abiertos y emparejados,
+    van juntos.
+    - **Se espeja el trabajo y la parte en la que están**, no la pantalla entera: la venta en
+      curso (renglones, cantidad, unidad, margen, precio a mano, medio de pago, cliente) y la
+      navegación, en las dos direcciones. Carlos había pedido espejo de todo; al ver los
+      problemas (el celular dejaría de servir de cámara, la búsqueda letra por letra) eligió
+      esto. El ingreso y el pedido se suman en una tanda posterior.
+    - **«Pausar» además de «Desvincular».** Pausar los separa un rato; al reanudar manda la
+      computadora.
+    - **Solo se emparejan dos sesiones del mismo usuario.**
+    - **Cada emparejamiento tiene su espejo:** lo que hace una persona con su celular impacta
+      solo en su computadora, no en la de otra.
+    - La «fuente de verdad» no es la computadora sino el trabajo en curso que guarda el
+      servidor: si solo estaba abierto el celular y después se abre la computadora, la
+      computadora se suma a lo del celular. La computadora manda cuando hay que desempatar
+      (al reanudar, o si los dos arrancan a la vez).
+    - Al cobrar, la venta se registra una vez, desde donde se cobró, y se vacía en los dos.
+

@@ -113,6 +113,15 @@ El emparejamiento también nace solo: cuando la computadora retira la sesión qu
 celular (`POST /sesiones/vinculaciones/:id/estado`), la respuesta trae `puesto` (`id`,
 `expira_en`) y ese celular queda emparejado con ella.
 
+El espejo (RF-77). El estado vive en memoria del servidor, por emparejamiento:
+
+| Método | Ruta | Exige | Para qué sirve |
+|---|---|---|---|
+| POST | `/puestos/:id/espejo` | Sesión de cualquiera de los dos (si no, `404`) | Avisar un cambio. Cuerpo: `tipo` (`ir`, `venta` o `pausa`) y `datos` (la parte, la venta en curso, o si se pausa). `204`; `400` con otro tipo; `413` si la venta pasa de 200.000 caracteres. `ir` y `venta` le llegan al otro; `pausa`, a los dos |
+| GET | `/puestos/:id/espejo` | Sesión de cualquiera de los dos (si no, `404`) | Flujo de eventos (SSE). Al conectar: `estado` (`lado`, `parte`, `venta`, `pausado`, `presentes`). Después: `ir`, `venta`, `pausa`, `presencia` (quién está conectado) y `desvinculado` |
+
+`POST /puestos/:codigo/vincular` responde `403` si la computadora tiene la sesión de otro usuario.
+
 Lo que la computadora le pide a su celular emparejado:
 
 | Método | Ruta | Exige | Para qué sirve |

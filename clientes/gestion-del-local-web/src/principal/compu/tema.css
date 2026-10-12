@@ -129,3 +129,7 @@
 /* La foto del producto al lado de su nombre, en Inventario y en Ingreso. */
 .con-foto-de-producto { display: flex; align-items: center; gap: var(--e3); min-width: 0; }
 .con-foto-de-producto > span { display: flex; flex-direction: column; min-width: 0; }
+
+/* El botón para vincular el celular, siempre a la vista en el menú cuando no hay uno emparejado (decisión 60). */
+.lateral-vincular { padding: 0 var(--e3) var(--e3); }
+.lateral-vincular .boton { width: 100%; }

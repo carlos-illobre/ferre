@@ -109,6 +109,25 @@ solo si esa computadora fue vinculada.
 que leer el que la computadora muestra ahora; sin conexión, la computadora no muestra código
 y dice que entrar necesita internet.
 
+## Historia 1c: el celular y la computadora en espejo (RF-77)
+
+**Quién:** cualquier usuario con su celular y su computadora emparejados.
+
+**Qué necesita a la vista, en los dos:** con quién está en espejo; si el otro no está abierto
+(«trabajás solo acá»); si está en pausa; y dos botones, «Pausar» (o «Reanudar») y
+«Desvincular». En la computadora va en el menú lateral; en el celular, en una franja arriba.
+Sin celular emparejado, la computadora muestra en el menú «Vincular el celular», siempre.
+
+**Reglas:**
+
+- Se espeja la parte en la que están y la venta en curso. No lo que hay abierto encima (una
+  ficha, una hoja, la cámara) ni lo escrito en la búsqueda.
+- Nada pide confirmar: pausar, reanudar y desvincular se hacen con un toque.
+- Una pantalla que es solo del celular (la cámara para una foto o un código) no se interrumpe
+  porque la computadora cambie de parte, y al salir de ella el celular vuelve a donde está
+  la computadora.
+- No hay aviso por cada cambio que llega del otro lado: la pantalla simplemente lo muestra.
+
 ## Historia 2: administrar usuarios
 
 **Quién:** quien tiene el permiso «Administrar usuarios».

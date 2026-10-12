@@ -23,7 +23,7 @@ export function catalogoFalso(productos: Producto[]) {
     return { encolado: false };
   });
   const valor = {
-    catalogo: productos, stock: new Map<string, number>(), clientes: [], error: null, desdeDispositivo: false,
+    catalogo: productos, catalogoCompleto: true, stock: new Map<string, number>(), clientes: [], error: null, desdeDispositivo: false,
     buscarProductos: (consulta: string, maximo = 50) => buscar(indice, consulta, maximo),
     actualizarProducto, ajustarStockLocal: vi.fn(),
   };
