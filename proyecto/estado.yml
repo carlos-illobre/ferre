@@ -737,8 +737,10 @@ RNF-07:
 
 RNF-08:
   estado: "Nuevo, sin probar"
-  pruebas: []
+  pruebas:
+    - clientes/gestion-del-local-web/src/catalogo.test.tsx
   defectos:
+    - "La carga del catálogo (primeros al instante, el resto de fondo, una sola vez para toda la app) no está medida en un celular con el catálogo real de once mil productos"
     - "Sin prueba con más de 100.000 artículos: la búsqueda se mide con 50.000"
 
 RNF-09:

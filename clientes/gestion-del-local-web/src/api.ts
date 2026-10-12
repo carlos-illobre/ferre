@@ -30,8 +30,12 @@ export async function api<T>(ruta: string, opciones: RequestInit = {}): Promise<
     const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string };
     throw new ErrorApi(respuesta.status, cuerpo.error ?? `Error ${respuesta.status}`);
   }
+  // Lo que se guardó en el servidor puede cambiar lo que el dispositivo tiene en memoria (el
+  // catálogo, el stock): quien lo tenga se entera y lo vuelve a pedir cuando haga falta.
+  if (opciones.method && opciones.method !== "GET") window.dispatchEvent(new CustomEvent(EVENTO_CAMBIO, { detail: ruta }));
   return respuesta.status === 204 ? (undefined as T) : ((await respuesta.json()) as T);
 }
+export const EVENTO_CAMBIO = "ferre:cambio-guardado";
 
 // El token de sesión vive en este dispositivo (ADR-011). Sin conexión, sigue valiendo.
 const CLAVE = "ferre.sesion";

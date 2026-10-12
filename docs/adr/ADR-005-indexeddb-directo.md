@@ -46,3 +46,23 @@ Nada: es la primera decisión sobre esta capa.
 ## Referencias
 
 ADR-001. Issue #18.
+
+## Enmienda del 2026-10-12: el catálogo se carga una vez y de a partes
+
+Con el catálogo de pruebas en once mil productos, abrir cualquier pantalla con productos en
+el celular tardaba segundos: cada pantalla leía el catálogo entero del dispositivo, armaba el
+índice de búsqueda y lo volvía a bajar del servidor. Carlos pidió que se vieran enseguida los
+primeros y el resto se cargara de fondo.
+
+- El catálogo, el stock y los clientes viven en un solo lugar en memoria, compartido por
+  todas las pantallas. Se cargan una vez por sesión de la aplicación.
+- Al abrir: primero los 60 primeros productos, que se guardan aparte para leerlos de una;
+  después el catálogo entero del dispositivo; después el del servidor. Las dos últimas no
+  frenan la pantalla.
+- Si el servidor trae lo mismo, la pantalla no se vuelve a dibujar; si trae cambios, en el
+  dispositivo se guarda solo lo que cambió.
+- El índice de búsqueda se arma la primera vez que se busca, no al cargar.
+- El catálogo se vuelve a pedir al abrir una pantalla si pasó un minuto, o enseguida si algo
+  lo cambió en el servidor (unir duplicados, aplicar una lista, un ingreso). El stock y los
+  clientes, que son livianos, se piden en cada pantalla.
+- Mientras solo están los primeros (un instante), una búsqueda mira solo esos.
