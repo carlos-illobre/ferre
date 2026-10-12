@@ -48,7 +48,7 @@ describe("pedidos a proveedores", () => {
   });
 
   it("no acepta un pedido sin proveedor, con cantidad inválida o con un producto repetido, ni cambiar uno que ya se mandó", async () => {
-    const guardar = (cuerpo: unknown) => pedir(app, "PUT", `/pedidos/${PEDIDO}`, { cuerpo }).then((r) => r.status);
+    const guardar = async (cuerpo: unknown) => (await pedir(app, "PUT", `/pedidos/${PEDIDO}`, { cuerpo })).status;
     expect(await guardar({ items: [] })).toBe(400);
     expect(await guardar(borrador({ items: [{ producto_id: MECHA, cantidad: 0 }] }))).toBe(400);
     expect(await guardar(borrador({ items: [{ producto_id: MECHA, cantidad: 1 }, { producto_id: MECHA, cantidad: 2 }] }))).toBe(400);
@@ -67,7 +67,7 @@ describe("pedidos a proveedores", () => {
   });
 
   it("no se manda vacío, ni dos veces, ni con un número que no es un teléfono", async () => {
-    const enviar = (cuerpo: unknown = {}) => pedir(app, "POST", `/pedidos/${PEDIDO}/enviar`, { cuerpo }).then((r) => r.status);
+    const enviar = async (cuerpo: unknown = {}) => (await pedir(app, "POST", `/pedidos/${PEDIDO}/enviar`, { cuerpo })).status;
     expect(await enviar()).toBe(404);
     expect(await enviar({ whatsapp: "123" })).toBe(400);
     base.actual.programar(/SELECT pe\.estado, pe\.proveedor_id/, { rows: [{ estado: "borrador", proveedor_id: PROVEEDOR, proveedor: "Tresge", renglones: "0" }] });
@@ -112,7 +112,7 @@ describe("ingresar la mercadería de un pedido", () => {
   });
 
   it("no recibe mercadería un pedido que no existe, que es de otro proveedor o que ya no la espera", async () => {
-    const ingresar = () => pedir(app, "POST", "/compras", { cuerpo: compra() }).then((r) => r.status);
+    const ingresar = async () => (await pedir(app, "POST", "/compras", { cuerpo: compra() })).status;
     expect(await ingresar()).toBe(404);
     esperando("enviado", MECHA);
     expect(await ingresar()).toBe(409);
