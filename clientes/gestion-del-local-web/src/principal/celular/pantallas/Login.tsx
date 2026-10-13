@@ -68,10 +68,18 @@ export function Login() {
 
 // Entrar con la huella: solo en dispositivos que la tienen; el celular tiene que estar
 // vinculado antes desde Negocio (entrando con Google una vez).
-export function BotonHuella({ detalle, titulo = "Entrar con la huella" }: { detalle?: string; titulo?: string } = {}) {
+// `enseguida`: pide la huella apenas aparece, sin esperar el toque (se viene de escanear el
+// código de la computadora, decisión 65). Si no se lee, el botón queda para probar de nuevo.
+export function BotonHuella({ detalle, titulo = "Entrar con la huella", enseguida = false }: { detalle?: string; titulo?: string; enseguida?: boolean } = {}) {
   const { entrar } = useSesion();
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const pedida = useRef(false);
+  useEffect(() => {
+    if (!enseguida || pedida.current || !hayHuella()) return;
+    pedida.current = true;
+    void conHuella();
+  });
   if (!hayHuella()) return null;
   async function conHuella() {
     setOcupado(true); setError(null);

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Escaner, hayCamara } from "./componentes/Escaner";
-import { hayHuella } from "../../credenciales";
+import { hayHuella, huellaVinculadaAca } from "../../credenciales";
 import { Logotipo } from "../Logotipo";
 import { BotonGoogle, BotonHuella } from "./pantallas/Login";
 import { TEXTOS_DE_ENTRADA } from "../compu/base/pantallas/Entrar";
@@ -46,9 +46,12 @@ export function Entrar({ paraLaCompu = false }: { paraLaCompu?: boolean } = {}) 
   // foto): es lo mismo que leerlo con la cámara del celular, sin salir de la aplicación.
   const [escaneando, setEscaneando] = useState(false);
   const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
+  const [pedirHuella, setPedirHuella] = useState(false);
   const alLeerCodigo = useCallback((leido: string) => {
     const destino = destinoDelCodigo(leido);
-    if (destino) location.hash = destino; else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora en su pantalla de entrada.");
+    // Leído el código de la computadora, se pide la huella enseguida: con ella entra el
+    // celular, entra la computadora y quedan vinculados (decisión 65).
+    if (destino) { setPedirHuella(destino.startsWith("#/entrar-compu") && huellaVinculadaAca()); location.hash = destino; } else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora en su pantalla de entrada.");
   }, []);
   return (
     <main className="en" data-testid="entrar">
@@ -62,7 +65,7 @@ export function Entrar({ paraLaCompu = false }: { paraLaCompu?: boolean } = {}) 
       <section className="en-formas" aria-label={TEXTOS_DE_ENTRADA.entrar}>
         {!enLinea && <p className="en-ayuda">{TEXTOS_DE_ENTRADA.sinConexion}</p>}
         {paraLaCompu && <p className="en-compu" role="status" data-testid="entrar-para-la-compu">{COMPUTADORA}<span>Leíste el código de una computadora. Al entrar acá, esa computadora entra también.</span></p>}
-        {paraLaCompu ? <BotonHuella titulo="Entrar acá y en la computadora" detalle="Con la huella" /> : <BotonGoogle />}
+        {paraLaCompu ? <BotonHuella titulo="Entrar acá y en la computadora" detalle="Con la huella" enseguida={pedirHuella} /> : <BotonGoogle />}
         {conHuella && <div className="en-o" aria-hidden="true"><span>o</span></div>}
         {paraLaCompu ? <BotonGoogle /> : <BotonHuella detalle="Rápido y seguro" />}
         {!paraLaCompu && hayCamara() && (

@@ -427,3 +427,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     volver al menú de Más. Va arriba a la izquierda, en todas las pantallas de Más, también
     en la que avisa que falta un permiso. En la computadora no hace falta: el menú está
     siempre a la vista.
+
+65. **Escanear el código de la computadora desde la entrada pide la huella enseguida** (2026-10-13).
+    Carlos pidió que el botón de escanear de la entrada del celular no deje la entrada a
+    medio camino: leído el código, pide la huella; si es correcta, el celular entra, la
+    computadora entra y quedan vinculados, sin otro toque.
+    - Vale cuando ese celular ya tiene la huella vinculada. Si no, queda la entrada de
+      siempre, con el aviso de que la computadora entra también, para entrar con Google.
+    - Si la huella no se lee, lo dice y queda el botón para probar de nuevo.

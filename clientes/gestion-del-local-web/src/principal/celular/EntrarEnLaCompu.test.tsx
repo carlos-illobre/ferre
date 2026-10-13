@@ -8,7 +8,13 @@ import { ErrorApi } from "../../api";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 
-vi.mock("../../credenciales", () => ({ hayHuella: () => true, entrarConHuella: vi.fn(), huellaVinculadaAca: () => true }));
+const huella = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
+vi.mock("../../credenciales", () => ({ hayHuella: () => true, entrarConHuella: huella, huellaVinculadaAca: () => true }));
+// La cámara de mentira: un botón que «lee» el código que muestra la computadora.
+vi.mock("./componentes/Escaner", () => ({
+  hayCamara: () => true,
+  Escaner: ({ alDetectar }: { alDetectar: (c: string) => void }) => <button type="button" data-testid="camara" onClick={() => alDetectar("https://ejemplo.test/#/entrar-compu?codigo=abc")}>leer</button>,
+}));
 
 // Entrar a la computadora con el celular (RF-76, decisión 57): sin paso de confirmar.
 describe("el celular deja entrar a la computadora", () => {
@@ -43,6 +49,24 @@ describe("el celular deja entrar a la computadora", () => {
     render(<Entrar paraLaCompu />);
     expect(screen.getByTestId("entrar-para-la-compu").textContent).toContain("esa computadora entra también");
     expect(screen.getByTestId("entrar-huella").textContent).toContain("Entrar acá y en la computadora");
+  });
+
+  it("escaneado el código desde la entrada, pide la huella enseguida; llegando por un enlace, espera el toque", async () => {
+    huella.mockReset(); huella.mockRejectedValue(Object.assign(new Error("x"), { name: "NotAllowedError" }));
+    const { rerender, unmount } = render(<Entrar />);
+    fireEvent.click(screen.getByTestId("escanear-codigo-de-la-compu"));
+    fireEvent.click(screen.getByTestId("camara"));
+    expect(location.hash).toBe("#/entrar-compu?codigo=abc");
+    rerender(<Entrar paraLaCompu />);
+    await waitFor(() => expect(huella).toHaveBeenCalledTimes(1));
+    // No se leyó la huella: lo dice y el botón queda para probar de nuevo, sin insistir solo.
+    expect((await screen.findByTestId("error-huella")).textContent).toContain("Probá de nuevo");
+    expect(huella).toHaveBeenCalledTimes(1);
+    unmount();
+
+    huella.mockClear();
+    render(<Entrar paraLaCompu />);
+    expect(huella).not.toHaveBeenCalled();
   });
 
   it("el código leído desde la entrada lleva solo a lo que Ferrebress muestra para el celular", () => {
