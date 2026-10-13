@@ -1,6 +1,8 @@
 import { Icono, Pagina, type NombreDeIcono } from "./base/ui";
 import type { Permiso } from "../permisos";
 import { irA } from "./base/rutas";
+import { useEspejo } from "../../espejo";
+import { soltarEmparejamiento } from "../../puesto";
 
 // «Más» guarda las pantallas que se usan poco, para que el menú tenga solo lo de todos los días.
 // Cada una dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
@@ -14,6 +16,7 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
 ];
 
 export function Mas({ atajoDe, opciones }: { atajoDe: (ruta: string) => string | null; opciones: typeof DE_MAS }) {
+  const { emparejado } = useEspejo();
   return (
     <Pagina titulo="Más" testId="mas" bajada="Lo que se usa de vez en cuando.">
       <ul className="mas-grilla">
@@ -27,6 +30,17 @@ export function Mas({ atajoDe, opciones }: { atajoDe: (ruta: string) => string |
             </button>
           </li>
         ))}
+        {/* Desvincular el celular está solo acá (decisión 73): es el corte definitivo, y pregunta antes. */}
+        {emparejado && (
+          <li>
+            <button type="button" className="tarjeta mas-tarjeta" data-testid="desvincular-en-mas"
+              onClick={() => { if (window.confirm("¿Desvincular el celular de esta computadora? Para volver a trabajar juntos vas a tener que escanear el código.")) void soltarEmparejamiento(); }}>
+              <span className="mas-icono"><Icono nombre="celular" tam={24} /></span>
+              <span className="nombre">Desvincular el celular</span>
+              <span className="detalle">Dejan de trabajar juntos hasta que vuelvas a escanear el código</span>
+            </button>
+          </li>
+        )}
       </ul>
     </Pagina>
   );

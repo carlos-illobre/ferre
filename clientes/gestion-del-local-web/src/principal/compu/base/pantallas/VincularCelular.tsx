@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../../api";
-import { guardarPuestoRemoto } from "../../../../puesto";
+import { dispositivoId, guardarPuestoRemoto } from "../../../../puesto";
 import { useSesion } from "../../../../sesion";
 import { irA } from "../rutas";
 import { BotonGoogle, BotonHuella, MarcoDeEntrada } from "./Entrar";
@@ -16,7 +16,7 @@ const pedidos = new Map<string, Promise<Vinculado>>();
 function vincular(codigo: string): Promise<Vinculado> {
   let pedido = pedidos.get(codigo);
   if (!pedido) {
-    pedido = api<Vinculado>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST" });
+    pedido = api<Vinculado>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST", body: JSON.stringify({ dispositivo_id: dispositivoId() }) });
     pedidos.set(codigo, pedido);
     pedido.catch(() => pedidos.delete(codigo));
   }

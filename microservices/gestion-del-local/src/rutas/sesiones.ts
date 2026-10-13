@@ -3,7 +3,7 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { emailVerificadoPorGoogle, exigirPermiso, exigirSesion, limitarIntentos } from "../autenticacion.js";
 import { randomUUID } from "node:crypto";
-import { emparejar } from "../emparejamiento.js";
+import { anotarDispositivo, cortarVinculosDe, emparejar } from "../emparejamiento.js";
 import { crearSesion, generarToken, hashear, revocarSesion, usuarioConPermisos } from "../sesiones.js";
 
 export const sesiones = new Hono();
@@ -50,8 +50,9 @@ sesiones.post("/vinculaciones", limitarIntentos(30, "codigo-nuevo"), async (c) =
 
 // El celular, con sesión, aprueba el código que leyó.
 sesiones.post("/vinculaciones/aprobar", exigirSesion, async (c) => {
-  const { codigo } = await c.req.json<{ codigo?: string }>().catch(() => ({}) as { codigo?: string });
+  const { codigo, dispositivo_id } = await c.req.json<{ codigo?: string; dispositivo_id?: string }>().catch(() => ({}) as { codigo?: string; dispositivo_id?: string });
   if (!codigo) return c.json({ error: "Falta el código" }, 400);
+  await anotarDispositivo(pool, c.get("sesion").id, dispositivo_id);
   const { rows } = await pool.query<{ id: string; dispositivo: string | null }>(
     "UPDATE vinculacion SET aprobada_en = now(), aprobada_por = $1, celular_sesion_id = $3 WHERE codigo_hash = $2 AND aprobada_en IS NULL AND expira_en > now() RETURNING id, dispositivo",
     [c.get("sesion").usuario.id, hashear(codigo), c.get("sesion").id],
@@ -62,7 +63,7 @@ sesiones.post("/vinculaciones/aprobar", exigirSesion, async (c) => {
 
 // La computadora pregunta cómo va su código. Cuando fue aprobado, retira la sesión: una sola vez.
 sesiones.post("/vinculaciones/:id/estado", limitarIntentos(240, "codigo-estado"), async (c) => {
-  const { clave } = await c.req.json<{ clave?: string }>().catch(() => ({}) as { clave?: string });
+  const { clave, dispositivo_id } = await c.req.json<{ clave?: string; dispositivo_id?: string }>().catch(() => ({}) as { clave?: string; dispositivo_id?: string });
   if (!clave) return c.json({ error: "Falta la clave" }, 400);
   const id = c.req.param("id");
   type Aprobada = { aprobada_por: string; dispositivo: string | null; celular_sesion_id: string | null };
@@ -75,6 +76,7 @@ sesiones.post("/vinculaciones/:id/estado", limitarIntentos(240, "codigo-estado")
     if (!usuario) return c.json({ estado: "vencida" });
     const sesion = await crearSesion(pool, usuario.id, lista[0].dispositivo);
     await pool.query("UPDATE vinculacion SET sesion_id = $1 WHERE id = $2", [sesion.id, id]);
+    await anotarDispositivo(pool, sesion.id, dispositivo_id);
     await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo: lista[0].dispositivo, medio: "celular" } });
     // El celular que la dejó entrar queda emparejado con esta computadora (decisión 58).
     const puesto = lista[0].celular_sesion_id ? await emparejar(pool, sesion.id, lista[0].celular_sesion_id, lista[0].dispositivo).catch(() => null) : null;
@@ -111,6 +113,8 @@ sesiones.get("/", exigirSesion, exigirPermiso("admin.sesiones"), async (c) => {
 
 sesiones.delete("/:id", exigirSesion, exigirPermiso("admin.sesiones"), async (c) => {
   await revocarSesion(pool, c.req.param("id"));
+  // Cerrar a distancia la sesión de un dispositivo corta también su vínculo (decisión 73).
+  await cortarVinculosDe(pool, c.req.param("id"));
   await registrarEvento(pool, { tipo: "sesion.revocada", usuarioId: c.get("sesion").usuario.id, contenido: { sesionId: c.req.param("id") } });
   return c.body(null, 204);
 });

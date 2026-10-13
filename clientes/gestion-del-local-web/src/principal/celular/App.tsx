@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
-import { EspejoEstado } from "../EspejoEstado";
-import { useEspejar, useEspejo } from "../../espejo";
+import { EspejoEstado, TEXTOS_DEL_VINCULO } from "../EspejoEstado";
+import { pausarEspejo, useEspejar, useEspejo } from "../../espejo";
 import { Escaner, hayCamara } from "./componentes/Escaner";
 import { sincronizarEmparejamiento, soltarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
@@ -81,7 +81,7 @@ function Pantallas() {
   useEspejar<string | null>("ir", parteEnEspejo, (parte) => { if (parte && sesion.estado === "con-sesion") irA(parte); }, parteEnEspejo !== null);
   // Vincular con la computadora sin salir de la aplicación: la cámara se abre acá adentro y lee
   // el código que la computadora muestra en «Vincular el celular» (o en su entrada).
-  const { emparejado } = useEspejo();
+  const { emparejado, pausado } = useEspejo();
   const [escaneando, setEscaneando] = useState(false);
   const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
   const alLeerCodigo = useCallback((leido: string) => {
@@ -125,23 +125,29 @@ function Pantallas() {
 
   return (
     <div className="app">
-      <EspejoEstado sinDesvincular />
+      <EspejoEstado sinBoton />
 
-      {/* Vincular o desvincular, a la derecha del encabezado de cualquier pantalla (decisión 70):
-          un botón chico y cuadrado. Vinculado, se pone verde y sirve para desvincular. */}
+      {/* Un solo botón a la derecha del encabezado de cualquier pantalla (decisiones 70 y 73):
+          sin vínculo, «Vincular»; con vínculo, «Separar» o «Juntar». Desvincular está en Más. */}
       {(emparejado || hayCamara()) && (
         <div className="vincular-lugar">
-          {emparejado ? (
-            <button type="button" className="vincular-boton vinculado" data-testid="desvincular-arriba" aria-label="Desvincular de la computadora" title="Desvincular de la computadora"
-              onClick={() => { if (window.confirm("¿Desvincular este celular de la computadora?")) void soltarEmparejamiento(); }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M9 10l2 2 4-4" /></svg>
-              <span>Desvincular</span>
-            </button>
-          ) : (
+          {!emparejado ? (
             <button type="button" className="vincular-boton" data-testid="vincular-arriba" aria-label="Vincular con la computadora" title="Vincular con la computadora"
               onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M12 7v6M9 10h6" /></svg>
-              <span>Vincular</span>
+              <span>{TEXTOS_DEL_VINCULO.vincular}</span>
+            </button>
+          ) : pausado ? (
+            <button type="button" className="vincular-boton" data-testid="juntar-arriba" aria-label="Juntar con la computadora: volver a trabajar en espejo" title="Volver a trabajar junto con la computadora"
+              onClick={() => pausarEspejo(false)}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12h6M21 12h-6M7 8l4 4-4 4M17 8l-4 4 4 4" /></svg>
+              <span>{TEXTOS_DEL_VINCULO.juntar}</span>
+            </button>
+          ) : (
+            <button type="button" className="vincular-boton vinculado" data-testid="separar-arriba" aria-label="Separar de la computadora: cada uno por su lado un rato" title="Trabajar por separado un rato"
+              onClick={() => pausarEspejo(true)}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 12H3M14 12h7M7 8l-4 4 4 4M17 8l4 4-4 4" /></svg>
+              <span>{TEXTOS_DEL_VINCULO.separar}</span>
             </button>
           )}
         </div>
@@ -168,6 +174,17 @@ function Pantallas() {
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
+          {emparejado && (
+            <div className="lista">
+              <button type="button" className="fila con-foto" data-testid="desvincular-en-mas"
+                onClick={() => { if (window.confirm("¿Desvincular este celular de la computadora? Para volver a trabajar juntos vas a tener que escanear su código.")) void soltarEmparejamiento(); }}>
+                <span className="miniatura mas-icono"><Icono nombre="escanear" tam={22} /></span>
+                <span className="nombre">Desvincular de la computadora</span>
+                <Icono nombre="derecha" tam={18} grosor={2.4} />
+                <span className="detalle">Dejan de trabajar juntos hasta que vuelvas a escanear su código</span>
+              </button>
+            </div>
+          )}
           {!emparejado && hayCamara() && (
             <div className="lista">
               <button type="button" className="fila con-foto" onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }} data-testid="vincular-con-la-compu">

@@ -36,4 +36,7 @@ export default {
   "POST /consultas": () => [201, { ok: true }],
   "POST /puestos": () => ({ id: "pu-1", codigo: "ABC123", expiraEnSegundos: 300 }),
   "GET /puestos/:id": () => ({ vinculado_en: null, expira_en: new Date(Date.now() + 3e5).toISOString() }),
+  // Van después de «/puestos/:id»: la última definición gana.
+  "GET /puestos/configuracion": () => ({ dias: 30 }),
+  "PUT /puestos/configuracion": ({ body }) => ({ dias: Number(body?.dias ?? 30) }),
 };

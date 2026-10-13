@@ -143,3 +143,29 @@ El código de un solo uso con el que se entra a la computadora leyéndolo con el
 | `aprobada_en`, `aprobada_por` | timestamptz, uuid → `usuario` | Cuándo y quién lo aprobó desde el celular |
 | `retirada_en` | timestamptz | Cuándo la computadora retiró la sesión: se retira una sola vez |
 | `sesion_id` | uuid → `sesion` | La sesión que se le abrió a la computadora |
+
+## puesto (el vínculo entre un celular y una computadora)
+
+Un vínculo es de un usuario y de dos dispositivos, no de dos sesiones (decisión 73).
+
+| Dato | Qué es |
+|---|---|
+| `id` | Identificador |
+| `sesion_id` | La sesión de la computadora que hoy lo usa. Cambia sola cuando el usuario vuelve a entrar en esa computadora |
+| `celular_sesion_id` | La sesión del celular que hoy lo usa. Cambia igual |
+| `usuario_id` | De quién es el vínculo. Solo ese usuario lo reactiva |
+| `compu_dispositivo`, `celular_dispositivo` | El identificador que cada dispositivo guarda para sí y no borra al salir |
+| `nombre` | Cómo se llama la computadora, para mostrarla en el celular |
+| `vinculado_en`, `expira_en` | Cuándo se vinculó y cuándo vence: los días configurados, contados desde que se vinculó |
+| `codigo_hash` | El código de un solo uso del QR, mientras el vínculo todavía no se completó |
+
+Reglas: uno a uno (un vínculo nuevo de cualquiera de los dos dispositivos da por vencido el
+anterior); vigente mientras `expira_en` no pasó; se da por vencido al desvincular o cuando se
+cierra a distancia la sesión de uno de los dos.
+
+`sesion` suma `dispositivo_id`: el identificador del dispositivo desde el que se abrió.
+
+## configuracion
+
+Lo que el negocio configura desde la aplicación: `clave`, `valor`, `actualizado_en`. Hoy tiene
+una sola clave, `vinculo.dias` (30 de arranque; entero de 1 a 365).

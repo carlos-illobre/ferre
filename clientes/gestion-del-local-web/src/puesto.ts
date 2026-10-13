@@ -13,6 +13,16 @@ const CLAVE_REMOTO = "ferre.puesto-remoto";
 function leer<T>(clave: string): T | null {
   try { const v = localStorage.getItem(clave); if (!v) return null; const p = JSON.parse(v) as T & { expira_en: string }; return new Date(p.expira_en).getTime() > Date.now() ? p : null; } catch { return null; }
 }
+// El identificador de este dispositivo: lo guarda el navegador y no se borra al salir. Con él
+// el servidor reconoce un dispositivo ya vinculado cuando el mismo usuario vuelve a entrar (decisión 73).
+const CLAVE_DISPOSITIVO = "ferre.dispositivo";
+export function dispositivoId(): string {
+  try {
+    let id = localStorage.getItem(CLAVE_DISPOSITIVO);
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem(CLAVE_DISPOSITIVO, id); }
+    return id;
+  } catch { return ""; }
+}
 export const puestoLocal = () => leer<PuestoLocal>(CLAVE_LOCAL);
 export const puestoRemoto = () => leer<PuestoRemoto>(CLAVE_REMOTO);
 // Quien muestre el emparejamiento (Vender, Productos, el aviso de fotos) se entera cuando cambia.
@@ -31,7 +41,7 @@ export const guardarPuestoRemoto = (p: PuestoRemoto | null) => guardarLado(CLAVE
 export async function sincronizarEmparejamiento(): Promise<{ comoComputadora: PuestoLocal | null; comoCelular: PuestoRemoto | null } | null> {
   try {
     const alPedir = cambios;
-    const r = await api<{ comoComputadora: PuestoLocal | null; comoCelular: PuestoRemoto | null }>("/puestos/mio");
+    const r = await api<{ comoComputadora: PuestoLocal | null; comoCelular: PuestoRemoto | null }>(`/puestos/mio?dispositivo=${encodeURIComponent(dispositivoId())}`);
     // Si mientras tanto se vinculó o desvinculó acá, esta respuesta es vieja: no pisa lo nuevo.
     if (alPedir !== cambios) return r;
     guardarPuestoLocal(r.comoComputadora ? { id: r.comoComputadora.id, expira_en: r.comoComputadora.expira_en } : null);

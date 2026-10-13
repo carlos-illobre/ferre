@@ -648,7 +648,7 @@ RF-76:
     - "Abrir el enlace del código en una computadora, en vez de en un celular, no muestra el paso para dejar entrar"
 
 RF-77:
-  estado: "Hecho (#75): navegación, venta, ingreso y pedido en espejo, con presencia, pausa y avisos"
+  estado: "Hecho (#75, #101): navegación, venta, ingreso y pedido en espejo, con presencia, separar y juntar, y avisos; el vínculo es de los dispositivos y sobrevive al cierre de sesión"
   pruebas:
     - microservices/gestion-del-local/src/rutas/puestos.test.ts
     - clientes/gestion-del-local-web/src/principal/venta-en-espejo.test.ts
@@ -657,6 +657,8 @@ RF-77:
     - tests/e2e/escritorio/17-espejo.spec.ts
   defectos:
     - "No está probado con un celular y una computadora de verdad, ni con conexión lenta"
+    - "Sin prueba de punta a punta: cambiar desde la pantalla los días que dura el vínculo, y que entrar a la computadora con el celular renueve el plazo"
+    - "Si se borran los datos del navegador, ese dispositivo pierde su identificador y hay que vincular de nuevo"
     - "El estado del espejo vive en la memoria del servidor: si el servidor se reinicia, cada lado sigue con lo suyo hasta el próximo cambio"
     - "Si los dos cambian el mismo trabajo en el mismo instante, queda el del último que avisó"
     - "La misma sesión abierta en dos ventanas a la vez (dos pestañas de la computadora) no está probada"

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { NOMBRES, TEXTOS } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
+import { DiasDeVinculo } from "../DiasDeVinculo";
 import { api, urlApi } from "../../api";
 import { fecha, pesos } from "../../formato";
 import { useSesion } from "../../sesion";
@@ -90,6 +91,7 @@ export function Negocio({ parte }: { parte: Parte }) {
       <div className="columna">
       {parte === "usuarios" && puedeEsto("admin.usuarios") && <Usuarios />}
       {parte === "usuarios" && <Celulares />}
+      {parte === "usuarios" && <DiasDeVinculo />}
       {parte === "usuarios" && puedeEsto("admin.sesiones") && <Sesiones />}
       {parte === "actividad" && puedeEsto("negocio.actividad") && <Auditoria />}
       </div>

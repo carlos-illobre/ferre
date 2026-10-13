@@ -1,0 +1,11 @@
+/* Los días que dura el vínculo entre celular y computadora: un bloque chico en Usuarios y sesiones. */
+.dias-de-vinculo { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 16px; background: var(--p-superficie, #fff); box-shadow: 0 0 0 1px var(--p-borde-suave, #cfd8d2); color: var(--p-tinta, #18201e); }
+.dias-de-vinculo h2 { margin: 0; font-size: 1.125rem; font-weight: 700; }
+.dias-de-vinculo p { margin: 0; color: var(--p-texto-2, #56635e); font-size: 0.9375rem; line-height: 1.4; max-width: 60ch; }
+.dias-de-vinculo-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 1rem; }
+.dias-de-vinculo-fila input { width: 88px; min-height: 44px; padding: 0 10px; border: 1.5px solid var(--p-borde, #7c9085); border-radius: 10px; background: #fff; color: inherit; font: inherit; font-weight: 700; text-align: right; }
+.dias-de-vinculo-fila button { min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--p-verde, #17312b); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.dias-de-vinculo-fila button:disabled { opacity: 0.45; cursor: default; }
+.dias-de-vinculo-fila input:focus-visible, .dias-de-vinculo-fila button:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 2px; }
+.dias-de-vinculo p.dias-de-vinculo-mal { color: var(--p-rojo-texto, #a3261a); font-weight: 600; }
+.dias-de-vinculo p.dias-de-vinculo-bien { color: var(--p-verde-texto, #0f6b52); font-weight: 600; }

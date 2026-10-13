@@ -499,3 +499,26 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       pantalla suelta «Ventas de hoy» de la computadora pasan a ser estas pestañas.
     - Las pestañas tienen el mismo aspecto que las de Catálogo y Depósito. Cada persona ve
       solo las que puede usar; con una sola, no se dibujan. Vale para celular y computadora.
+
+73. **El vínculo entre el celular y la computadora es de los dispositivos, no de la sesión** (2026-10-13).
+    Carlos notó que «Pausar» y «Desvincular» se pisaban, y pidió que el vínculo no se pierda
+    al cerrar sesión. Reemplaza de la decisión 58 que el vínculo terminaba al cerrarse una
+    sesión, y de las 60 y 70 dónde están los botones.
+    - **De quién es:** de ese celular, esa computadora y ese usuario. Al salir de uno o de los
+      dos queda dormido; cuando el mismo usuario vuelve a entrar en ese dispositivo, se
+      reactiva solo, sin escanear. Si en ese dispositivo entra otra persona, no se le aplica.
+    - **Cómo se corta:** con «Desvincular», que está solo en Más (en el celular y en la
+      computadora), o cuando un administrador cierra a distancia la sesión de uno de los dos
+      dispositivos. Sigue siendo uno a uno: vincular otro reemplaza al anterior.
+    - **Cuánto dura:** los días que se configuran en Más → Usuarios y sesiones (30 de
+      arranque; lo cambia quien tiene «Administrar sesiones»). El plazo se cuenta desde que
+      se vinculó, y se renueva cada vez que se entra a la computadora escaneando su código
+      con el celular o se vuelve a vincular. El cambio de días vale para los vínculos nuevos
+      y los que se renueven.
+    - **Un solo botón en las pantallas:** sin vínculo dice «Vincular»; con vínculo, «Separar»
+      para que cada uno trabaje por su lado un rato, y «Juntar» para volver a trabajar en
+      espejo. En el celular va a la derecha del encabezado; en la computadora, en el bloque
+      del menú. La franja de arriba del celular queda solo con el estado.
+    - **Los nombres:** «Separar» y «Juntar» reemplazan a «Pausar» y «Reanudar» (propuesta del
+      agente, a confirmar por Carlos). El estado dice «Trabajando juntos» o «Separados: cada
+      uno por su lado».

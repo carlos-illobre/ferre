@@ -26,7 +26,7 @@ describe("el celular deja entrar a la computadora", () => {
     expect(screen.queryByTestId("dejar-entrar")).toBeNull();
     expect((await screen.findByTestId("compu-entro")).textContent).toContain("la computadora ya entró");
     expect(aprobaciones()).toHaveLength(1);
-    expect(JSON.parse(aprobaciones()[0]![1].body)).toEqual({ codigo: "abc" });
+    expect(JSON.parse(aprobaciones()[0]![1].body)).toMatchObject({ codigo: "abc" });
     expect(screen.getByText(/Entraste como/).textContent).toContain("Carlos");
   });
 

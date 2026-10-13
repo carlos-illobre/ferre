@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { DiasDeVinculo } from "../../../DiasDeVinculo";
 import { TEXTOS } from "../../../textos";
 import { api, ErrorApi } from "../../../../api";
 import { fecha } from "../../../../formato";
@@ -35,6 +36,7 @@ export function Usuarios() {
       {!enLinea && <Aviso tipo="alerta" testId="usuarios-sin-conexion">Sin conexión: administrar usuarios, sesiones y celulares necesita internet. Lo que ves puede no estar al día.</Aviso>}
       {puedeEsto("admin.usuarios") && <Autorizados enLinea={enLinea} avisar={setMensaje} alCerrarSesiones={() => setVueltaDeSesiones((v) => v + 1)} />}
       <div className="usuarios-columnas">
+        <DiasDeVinculo />
         {puedeEsto("admin.sesiones") && <Sesiones enLinea={enLinea} avisar={setMensaje} vuelta={vueltaDeSesiones} />}
         <Celulares enLinea={enLinea} avisar={setMensaje} />
       </div>

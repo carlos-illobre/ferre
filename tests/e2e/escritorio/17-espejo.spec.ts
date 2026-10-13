@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 
 // El espejo entre el celular y la computadora emparejados (decisión 60): están en la misma
-// parte y comparten la venta en curso; «Pausar» los separa un rato; cada emparejamiento es de
+// parte y comparten la venta en curso; «Separar» los separa un rato; cada emparejamiento es de
 // una persona y lo de otra no lo toca.
 const TOKEN_COMPU = "token-e2e-espejo-compu";
 const TOKEN_CELULAR = "token-e2e-espejo-celular";
@@ -55,18 +55,18 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
     await pagina.goto(ruta);
     return pagina;
   };
-  const compu = await abrir(1366, 768, TOKEN_COMPU, "/#/vender");
+  let compu = await abrir(1366, 768, TOKEN_COMPU, "/#/vender");
   await expect(compu.getByTestId("espejo-estado")).toContainText("El celular no está abierto");
   const celular = await abrir(390, 844, TOKEN_CELULAR, "/#/catalogo");
   // Otra persona, con su propia computadora y sin emparejar: lo de este espejo no la toca.
   const otra = await abrir(1366, 768, TOKEN_OTRA, "/#/productos");
 
   // Al abrirse el celular, los dos lo dicen, y el celular va a donde está la computadora.
-  await expect(compu.getByTestId("espejo-estado")).toContainText("En espejo con el celular");
-  await expect(celular.getByTestId("espejo-estado")).toContainText("En espejo con la computadora");
+  await expect(compu.getByTestId("espejo-estado")).toContainText("Trabajando juntos con el celular");
+  await expect(celular.getByTestId("espejo-estado")).toContainText("Trabajando juntos con la computadora");
   await expect(celular.getByTestId("menu-vender")).toHaveAttribute("aria-current", "page");
-  // Vinculado, el botón del encabezado del celular es el de desvincular; el de vincular no está.
-  await expect(celular.getByTestId("desvincular-arriba")).toBeVisible();
+  // Vinculado, el único botón del encabezado del celular es «Separar»; el de vincular no está (decisión 73).
+  await expect(celular.getByTestId("separar-arriba")).toBeVisible();
   await expect(celular.getByTestId("vincular-arriba")).toHaveCount(0);
 
   // La venta es una sola: lo que se agrega en la computadora aparece en el celular…
@@ -131,31 +131,61 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   // Dónde se está parado lo decide la computadora (decisión 71): si se la abre de nuevo en otra
   // pantalla con el celular ya abierto, el celular va a ella y no al revés.
   await compu.goto("/?de-nuevo=1#/productos");
-  await expect(compu.getByTestId("espejo-estado")).toContainText("En espejo con el celular");
+  await expect(compu.getByTestId("espejo-estado")).toContainText("Trabajando juntos con el celular");
   await expect(celular.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await compu.getByTestId("menu-deposito").click();
   await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
 
-  // Pausar los separa: el celular se mueve y la computadora no. Al reanudar manda la computadora.
-  await celular.getByTestId("pausar-espejo").click();
-  await expect(compu.getByTestId("espejo-estado")).toContainText("en pausa");
+  // «Separar» hace que cada uno vaya por su lado: el celular se mueve y la computadora no. Al «Juntar» manda la computadora.
+  await celular.getByTestId("separar-arriba").click();
+  await expect(compu.getByTestId("espejo-estado")).toContainText("Separados");
   await celular.getByTestId("menu-catalogo").click();
   await expect(celular.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
   await compu.waitForTimeout(800);
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
-  await celular.getByTestId("pausar-espejo").click();
+  await celular.getByTestId("juntar-arriba").click();
   await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
-  await expect(compu.getByTestId("espejo-estado")).toContainText("En espejo con el celular");
+  await expect(compu.getByTestId("espejo-estado")).toContainText("Trabajando juntos con el celular");
 
-  // Desvincular es el corte definitivo: los dos quedan sueltos y la computadora ofrece vincular.
-  await compu.getByTestId("desvincular-espejo").click();
+  // El vínculo es de los dispositivos y del usuario (decisión 73): si la persona sale de la
+  // computadora y vuelve a entrar ahí, sigue vinculada sin escanear nada.
+  const dispositivo = await compu.evaluate(() => localStorage.getItem("ferre.dispositivo"));
+  expect(dispositivo).toBeTruthy();
+  await expect.poll(() => psql(`SELECT dispositivo_id FROM sesion WHERE token_hash = '${hash(TOKEN_COMPU)}'`)).toBe(dispositivo);
+  psql(`UPDATE puesto SET usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}'), compu_dispositivo = '${dispositivo}' WHERE codigo_hash = 'e2e-espejo'`);
+  await compu.context().close();
+  psql(`UPDATE sesion SET revocada_en = now() WHERE token_hash = '${hash(TOKEN_COMPU)}'`);
+  await expect(celular.getByTestId("espejo-estado")).toContainText("La computadora no está abierta");
+  const TOKEN_COMPU_2 = `${TOKEN_COMPU}-de-nuevo`;
+  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(TOKEN_COMPU_2)}', 'e2e compu de nuevo', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  const enEsteDispositivo = async (token: string) => {
+    const contexto = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+    await contexto.addInitScript(([t, d]) => { localStorage.setItem("ferre.sesion", t!); localStorage.setItem("ferre.dispositivo", d!); }, [token, dispositivo!]);
+    const pagina = await contexto.newPage();
+    await pagina.goto("/#/stock");
+    return pagina;
+  };
+  // Otra persona que entra en esa misma computadora no queda vinculada con ese celular.
+  const intrusa = await enEsteDispositivo(TOKEN_OTRA);
+  await expect(intrusa.getByTestId("emparejar-celular")).toBeVisible();
+  await expect(intrusa.getByTestId("espejo")).toHaveCount(0);
+  await intrusa.context().close();
+  compu = await enEsteDispositivo(TOKEN_COMPU_2);
+  await expect(compu.getByTestId("espejo-estado")).toContainText("Trabajando juntos con el celular");
+  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+
+  // Desvincular es el corte definitivo y está solo en Más: los dos quedan sueltos y la computadora ofrece vincular.
+  await expect(compu.getByTestId("desvincular-espejo")).toHaveCount(0);
+  await compu.getByTestId("menu-mas").click();
+  compu.once("dialog", (d) => void d.accept());
+  await compu.getByTestId("desvincular-en-mas").click();
   await expect(compu.getByTestId("espejo")).toHaveCount(0);
   await expect(compu.getByTestId("emparejar-celular")).toBeVisible();
   await expect(celular.getByTestId("espejo")).toHaveCount(0);
   await celular.getByTestId("menu-vender").click();
   await compu.waitForTimeout(800);
-  await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
+  await expect(compu.getByTestId("mas")).toBeVisible();
   // Se cierran las tres ventanas: abiertas, seguirían vivas con estas sesiones en la prueba que sigue.
   for (const pagina of [compu, celular, otra]) await pagina.context().close();
 });

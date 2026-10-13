@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../api";
-import { guardarPuestoRemoto } from "../../../puesto";
+import { dispositivoId, guardarPuestoRemoto } from "../../../puesto";
 import { useSesion } from "../../../sesion";
 import { irA } from "../../../rutas";
 import { BotonGoogle } from "./Login";
@@ -13,7 +13,7 @@ export function VincularCelular({ codigo }: { codigo: string }) {
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     if (sesion.estado !== "con-sesion") return;
-    api<{ id: string; nombre: string | null; expira_en: string; dias: number }>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST" })
+    api<{ id: string; nombre: string | null; expira_en: string; dias: number }>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST", body: JSON.stringify({ dispositivo_id: dispositivoId() }) })
       .then((r) => { guardarPuestoRemoto({ id: r.id, nombre: r.nombre, expira_en: r.expira_en }); setResultado(`Listo: este celular quedó vinculado a ${r.nombre ?? "la computadora"}. Lo que escanees le llega, y si te pide una foto te aparece acá.`); })
       .catch((e: Error) => setError(e.message));
   }, [codigo, sesion.estado]);

@@ -126,22 +126,26 @@ y dice que entrar necesita internet.
 
 **Quién:** cualquier usuario con su celular y su computadora emparejados.
 
-**Qué necesita a la vista, en los dos:** con quién está en espejo; si el otro no está abierto
-(«trabajás solo acá»); si está en pausa; y dos botones, «Pausar» (o «Reanudar») y
-«Desvincular». En la computadora va todo en el menú lateral, y Vender no repite «Desvincular».
-En el celular, el estado y «Pausar» van en una franja arriba; vincular y desvincular van en un
-botón chico a la derecha del encabezado de cada pantalla, con el ícono y la leyenda debajo, como
-los botones del menú de abajo (decisión 70): sin vincular dice «Vincular» y abre la cámara
-dentro de la aplicación para leer el código de la computadora (decisión 63); vinculado dice
-«Desvincular», en verde. Más tiene además el renglón «Vincular con la computadora».
+**Qué necesita a la vista, en los dos:** con quién trabaja («Trabajando juntos con…»); si el otro
+no está abierto («trabajás solo acá»); si están separados («Separados: cada uno por su lado»); y
+un solo botón (decisión 73): «Vincular» si no hay vínculo, «Separar» si trabajan juntos y
+«Juntar» si están separados. «Desvincular» está solo en Más, en los dos, y pregunta antes.
+En la computadora el estado y el botón van en el menú lateral.
+En el celular, el estado va en una franja arriba, sin botones; el botón va a la derecha del
+encabezado de cada pantalla, chico, con el ícono y la leyenda debajo, como los del menú de abajo
+(decisión 70): «Vincular» abre la cámara dentro de la aplicación para leer el código de la
+computadora (decisión 63). En Más, el primer renglón es «Vincular con la computadora» o, ya
+vinculado, «Desvincular de la computadora».
+
+**Cuánto dura el vínculo:** en Más → Usuarios y sesiones, quien tiene «Administrar sesiones» ve
+«El vínculo entre celular y computadora dura N días» y lo cambia ahí.
 Sin celular emparejado, la computadora muestra en el menú «Vincular el celular», siempre.
 
 **Reglas:**
 
 - Se espeja la parte en la que están y la venta en curso. No lo que hay abierto encima (una
   ficha, una hoja, la cámara) ni lo escrito en la búsqueda.
-- Pausar y reanudar se hacen con un toque. Desvincular también en la computadora; en el
-  celular, donde el botón es chico y está en todas las pantallas, pregunta antes.
+- Separar y juntar se hacen con un toque. Desvincular pregunta antes, en los dos.
 - Al conectarse los dos (se abre o se recarga cualquiera, o se acaban de vincular), la pantalla
   en la que quedan es la de la computadora: el celular va a ella, nunca al revés. Después, cada
   cambio de pantalla hecho en cualquiera de los dos mueve al otro (decisión 71).

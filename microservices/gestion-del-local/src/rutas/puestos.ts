@@ -3,15 +3,16 @@ import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
-import { exigirSesion } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import { generarToken, hashear } from "../sesiones.js";
-import { computadorasDe, DIAS_EMPAREJADO, soltarAnteriores } from "../emparejamiento.js";
+import { adoptarVinculos, anotarDispositivo, computadorasDe, diasDeVinculo, sellarVinculo, soltarAnteriores } from "../emparejamiento.js";
 import { fotosQueEsperan } from "./pedidos-de-foto.js";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). Nace solo cuando el celular
 // deja entrar a la computadora (RF-76, ver sesiones.ts) o, con las dos sesiones ya abiertas,
-// cuando la computadora muestra un QR y el celular lo lee. Dura 30 días o hasta que alguno
-// de los dos lo suelte o cierre su sesión. Cada código que el celular escanea se
+// cuando la computadora muestra un QR y el celular lo lee. Es de los dos dispositivos y del
+// usuario (decisión 73): dura los días configurados, sobrevive al cierre de sesión y se corta
+// al desvincular. Cada código que el celular escanea se
 // guarda y se empuja a la laptop por un flujo de eventos (SSE) que se reconecta solo. Lo
 // que la laptop no alcanzó a recibir se le entrega al reconectar.
 export const puestos = new Hono();
@@ -47,31 +48,49 @@ puestos.post("/:codigo/vincular", async (c) => {
   const { rows: duenio } = await pool.query<{ usuario_id: string }>(
     "SELECT s.usuario_id FROM puesto p JOIN sesion s ON s.id = p.sesion_id WHERE p.codigo_hash = $1 AND p.vinculado_en IS NULL AND p.expira_en > now()", [hashear(c.req.param("codigo"))]);
   if (duenio[0] && duenio[0].usuario_id !== usuario.id) return c.json({ error: "Esa computadora tiene la sesión de otra persona. El celular se empareja solo con una computadora donde entraste vos." }, 403);
+  const cuerpo = await c.req.json<{ dispositivo_id?: string }>().catch(() => ({}) as { dispositivo_id?: string });
+  await anotarDispositivo(pool, sesionId, cuerpo.dispositivo_id);
+  const dias = await diasDeVinculo(pool);
   const { rows } = await pool.query<{ id: string; nombre: string | null; sesion_id: string; expira_en: string }>(
     `UPDATE puesto SET vinculado_en = now(), celular_sesion_id = $2, expira_en = now() + ($3 || ' days')::interval
       WHERE codigo_hash = $1 AND vinculado_en IS NULL AND expira_en > now() RETURNING id, nombre, sesion_id, expira_en`,
-    [hashear(c.req.param("codigo")), sesionId, String(DIAS_EMPAREJADO)],
+    [hashear(c.req.param("codigo")), sesionId, String(dias)],
   );
   if (!rows[0]) return c.json({ error: "El código venció o ya se usó. Generá otro en la computadora." }, 404);
   await soltarAnteriores(pool, rows[0].sesion_id, sesionId, rows[0].id);
+  await sellarVinculo(pool, rows[0].id);
   await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: rows[0].id, medio: "codigo" } });
-  return c.json({ id: rows[0].id, nombre: rows[0].nombre, expira_en: rows[0].expira_en, dias: DIAS_EMPAREJADO });
+  return c.json({ id: rows[0].id, nombre: rows[0].nombre, expira_en: rows[0].expira_en, dias });
 });
 
-// Con quién está emparejada esta sesión, mirada desde los dos lados: como computadora (quién
-// le manda códigos) y como celular (a quién se los manda). Solo cuenta si la otra sesión sigue abierta.
+// Con quién está vinculada esta sesión, mirada desde los dos lados: como computadora (quién
+// le manda códigos) y como celular (a quién se los manda). El dispositivo dice quién es: si
+// tenía un vínculo dormido de este usuario, se reactiva acá. Cuenta aunque el otro no tenga la
+// sesión abierta: está vinculado, solo que el otro no está.
 puestos.get("/mio", async (c) => {
-  const { id: sesionId } = c.get("sesion");
+  const { id: sesionId, usuario } = c.get("sesion");
+  const dispositivo = c.req.query("dispositivo");
+  await anotarDispositivo(pool, sesionId, dispositivo);
+  await adoptarVinculos(pool, sesionId, usuario.id, dispositivo);
   const { rows } = await pool.query<{ id: string; nombre: string | null; expira_en: string; sesion_id: string }>(
     `SELECT p.id, p.nombre, p.expira_en, p.sesion_id FROM puesto p
-       JOIN sesion a ON a.id = p.sesion_id AND a.revocada_en IS NULL AND a.expira_en > now()
-       JOIN sesion b ON b.id = p.celular_sesion_id AND b.revocada_en IS NULL AND b.expira_en > now()
       WHERE p.vinculado_en IS NOT NULL AND p.expira_en > now() AND (p.sesion_id = $1 OR p.celular_sesion_id = $1)
       ORDER BY p.vinculado_en DESC`,
     [sesionId],
   );
   const de = (compu: boolean) => { const p = rows.find((r) => (r.sesion_id === sesionId) === compu); return p ? { id: p.id, nombre: p.nombre, expira_en: p.expira_en } : null; };
   return c.json({ comoComputadora: de(true), comoCelular: de(false) });
+});
+
+// Cuántos días dura el vínculo: lo ve cualquiera con sesión y lo cambia quien administra sesiones.
+puestos.get("/configuracion", async (c) => c.json({ dias: await diasDeVinculo(pool) }));
+puestos.put("/configuracion", exigirPermiso("admin.sesiones"), async (c) => {
+  const { dias } = await c.req.json<{ dias?: number }>().catch(() => ({}) as { dias?: number });
+  if (!Number.isInteger(dias) || dias! < 1 || dias! > 365) return c.json({ error: "Los días tienen que ser un número entero entre 1 y 365" }, 400);
+  await pool.query(
+    "INSERT INTO configuracion (clave, valor) VALUES ('vinculo.dias', $1) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor, actualizado_en = now()", [String(dias)]);
+  await registrarEvento(pool, { tipo: "vinculo.dias_cambiados", usuarioId: c.get("sesion").usuario.id, contenido: { dias } });
+  return c.json({ dias });
 });
 
 // La computadora le pide a su celular que haga de lector (decisión 59): el celular lo ve como

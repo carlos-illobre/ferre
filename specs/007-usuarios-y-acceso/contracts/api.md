@@ -101,9 +101,11 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 | Método | Ruta | Exige | Para qué sirve |
 |---|---|---|---|
 | POST | `/puestos` | Sesión | La computadora pide un puesto: devuelve `id`, el `codigo` para el QR y `expiraEnSegundos` (5 minutos) |
-| POST | `/puestos/:codigo/vincular` | Sesión | El celular leyó el QR de Vender: quedan emparejados 30 días, y se suelta el emparejamiento anterior de cualquiera de los dos. Devuelve `id`, `nombre`, `expira_en`, `dias`. `404` si el código venció o ya se usó. Registra `puesto.vinculado` |
-| GET | `/puestos/mio` | Sesión | Con quién está emparejada esta sesión: `comoComputadora` y `comoCelular` (cada uno `id`, `nombre`, `expira_en`, o nulo). Solo cuenta si la otra sesión sigue abierta |
-| DELETE | `/puestos/:id` | Sesión de cualquiera de los dos | Soltar el emparejamiento. `204`. Registra `puesto.desvinculado` |
+| POST | `/puestos/:codigo/vincular` | Sesión | El celular leyó el QR de «Vincular el celular». Cuerpo opcional: `dispositivo_id` (el identificador que ese celular guarda para sí). Quedan vinculados los días configurados (`dias` en la respuesta) y se suelta el vínculo anterior de cualquiera de los dos. Guarda de qué usuario y de qué dos dispositivos es el vínculo. Registra `puesto.vinculado` |
+| GET | `/puestos/mio?dispositivo=…` | Sesión | Con quién está vinculada esta sesión: `comoComputadora` y `comoCelular` (cada uno `id`, `nombre`, `expira_en`, o `null`). `dispositivo` es el identificador de este dispositivo (8 a 64 letras, números, guiones): se anota en la sesión y, si este usuario tenía en ese dispositivo un vínculo vigente de una sesión anterior, el vínculo pasa a esta sesión. Cuenta aunque la sesión del otro lado esté cerrada |
+| GET | `/puestos/configuracion` | Sesión | `dias`: cuántos días dura un vínculo (30 de arranque) |
+| PUT | `/puestos/configuracion` | «Administrar sesiones» (si no, `403`) | Cuerpo: `dias`, entero de 1 a 365 (si no, `400`). Vale para los vínculos nuevos y los que se renueven. Registra `vinculo.dias_cambiados` |
+| DELETE | `/puestos/:id` | Sesión de cualquiera de los dos | Desvincular. `204`. Registra `puesto.desvinculado`. Es la única forma de cortarlo desde la aplicación, junto con el cierre a distancia de la sesión de uno de los dos (`DELETE /sesiones/:id`); salir (`DELETE /sesiones/actual`) no lo corta |
 | POST | `/puestos/:id/codigos` | Sesión del celular vinculado a ese puesto (si no, `403`) | El celular manda un código escaneado |
 | POST | `/puestos/:id/codigos/:codigoId/recibido` | Sesión de la computadora dueña del puesto | La computadora confirma que lo recibió. `204` |
 | GET | `/puestos/:id` | Sesión de la computadora o del celular de ese puesto (si no, `404`) | Estado del puesto: si ya se vinculó y si sigue vigente |
@@ -111,7 +113,10 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 
 El emparejamiento también nace solo: cuando la computadora retira la sesión que le dejó un
 celular (`POST /sesiones/vinculaciones/:id/estado`), la respuesta trae `puesto` (`id`,
-`expira_en`) y ese celular queda emparejado con ella.
+`expira_en`) y ese celular queda emparejado con ella. Como se crea un vínculo nuevo, el plazo
+empieza otra vez: así se renueva. `POST /sesiones/vinculaciones/aprobar` y
+`POST /sesiones/vinculaciones/:id/estado` aceptan `dispositivo_id` en el cuerpo, para anotar de
+qué dispositivos es el vínculo.
 
 El espejo (RF-77). El estado vive en memoria del servidor, por emparejamiento:
 
