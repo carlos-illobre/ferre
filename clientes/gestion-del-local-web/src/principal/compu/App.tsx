@@ -223,7 +223,7 @@ function Pantallas() {
             );
           })}
         </nav>
-        <p className="lateral-ayuda">Todo se hace con el teclado: ↑ ↓ recorren, Enter acciona, ← va al menú, → a las pestañas y Esc cierra. Alt + número abre cada pantalla.</p>
+        <p className="lateral-ayuda">Con el teclado: ↑ ↓ recorren el menú y las listas, ← → las pestañas, Tab pasa de un campo a otro, Enter acciona y Esc cierra. Alt + número abre cada pantalla.</p>
         <EspejoEstado />
         {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
         <div className="lateral-pie">

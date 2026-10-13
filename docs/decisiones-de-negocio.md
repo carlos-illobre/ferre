@@ -548,3 +548,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Entre esa línea y el título de la pantalla no queda espacio de más.
     - El botón lleva el ícono a la izquierda y la leyenda a la derecha, no debajo: el lugar
       alcanza. Corrige eso de la decisión 70.
+
+77. **En la computadora, las flechas son solo para el menú, las pestañas y las listas** (2026-10-13).
+    Carlos cambió de idea sobre la decisión 61, que hacía recorrer con las flechas todos los
+    controles de la pantalla. Reemplaza esa parte de la 61.
+    - Con las flechas se recorre el menú de la izquierda, las pestañas de cada pantalla y los
+      ítems de las listas. Nada más.
+    - A un campo de texto o a un botón se va con Tab.
+    - Todos los botones tienen que tener un atajo de teclado. Qué tecla le toca a cada uno
+      está por definir con Carlos; siguen los que ya había (F2 cobra, F5 a F8 el medio de pago).

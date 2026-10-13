@@ -9,3 +9,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 
 ## Tareas
 
+- [x] T001 [ajuste] En la computadora, con las flechas solo se recorre el menú, las pestañas y los ítems de las listas; a los campos y botones se va con Tab

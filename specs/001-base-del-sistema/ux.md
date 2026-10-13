@@ -285,31 +285,31 @@ abrirse, al volver a primer plano y cada media hora. Recién abierta, se actuali
 preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
 tapa lo que se está haciendo, y nunca se recarga sola.
 
-**Todo con el teclado en la computadora (decisión 61, RNF-05).** Toda operación se tiene que
-poder hacer con las flechas y Enter; el mouse es un complemento. Las teclas significan lo
-mismo en todas las pantallas:
+**El teclado en la computadora (decisión 77, que reemplaza a la 61; RNF-05).** Las flechas
+sirven para tres cosas y nada más: recorrer el menú de la izquierda, las pestañas de la pantalla
+y los ítems de una lista. A un campo de texto o a un botón no se llega con las flechas: se va
+con Tab (y Mayús + Tab para volver), como en cualquier programa. Los botones tienen además su
+atajo. Las teclas significan lo mismo en todas las pantallas:
 
 | Tecla | Qué hace |
 |---|---|
-| ↓ ↑ | Van al control siguiente o al anterior de la pantalla: un campo, un botón, una casilla, un renglón |
-| Enter | Acciona el botón que tiene el foco; tilda o destilda una casilla; en un selector o una fecha, da el valor por elegido y pasa al siguiente |
-| ← | Lleva al menú (desde un campo de texto, solo con el cursor al principio) |
-| → | Desde el menú, entra a las pestañas de esa parte, o a la pantalla si no tiene. En la pantalla, va al control siguiente (desde un campo de texto, solo con el cursor al final) |
-| ← → en las pestañas | Pasan de una pestaña a otra y la abren; ← desde la primera vuelve al menú; ↓ entra a la pantalla |
 | ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Desconectar o Reconectar) y Salir. El foco se marca con el mismo borde amarillo en todos |
+| → en el menú | Entra a las pestañas de esa parte, o a la pantalla si no tiene |
+| ← → en las pestañas | Pasan de una pestaña a otra y la abren; ← desde la primera vuelve al menú; ↓ entra a la pantalla |
+| ↑ ↓ en una lista | Van al ítem anterior o al siguiente (un renglón de una tabla, una tarjeta de una lista); ↑ desde el primero vuelve a las pestañas |
+| ← en una lista | Vuelve al menú |
+| Enter | Acciona el botón o el ítem que tiene el foco |
+| Tab, Mayús + Tab | Van al campo o botón siguiente o anterior |
 | Esc | Cierra lo que esté abierto |
 | Alt + número | Abre cada pantalla |
 
-Donde las flechas ya tienen otro uso, ese uso gana y se sigue con la tecla de al lado:
-- En una búsqueda con resultados a la vista, ↑ ↓ eligen un resultado y Enter lo toma. Sin
-  resultados, ↑ ↓ recorren la pantalla.
-- En una cantidad, ↑ ↓ suman y restan: se sigue con →.
-- En un selector o una fecha, ↑ ↓ cambian el valor: se sigue con Enter o con →.
-- En un área de texto, las flechas mueven el cursor: se sale por abajo desde el final.
+Dentro de un campo, las flechas hacen lo que hacen siempre: mueven el cursor en un texto, cambian
+el valor en una cantidad, un selector o una fecha. En una búsqueda con resultados a la vista,
+↑ ↓ eligen un resultado y Enter lo toma.
 
-Con el foco en el menú o en las pestañas, las flechas no mueven nada de la pantalla. Con una
-ventana abierta, las flechas recorren solo esa ventana. Toda pantalla o control nuevo tiene
-que poder alcanzarse y accionarse así: nada puede depender de un clic.
+**Atajos de los botones.** Los que ya existen: en Vender, F5 a F8 eligen el medio de pago y F2
+cobra. Carlos pidió que todos los botones tengan atajo (2026-10-13); el esquema está por
+definir con él y, hasta entonces, los demás botones se alcanzan con Tab.
 
 **Por dónde se entra en el celular (decisión 56).** Al entrar se abre siempre el Catálogo, y
 cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en Productos,

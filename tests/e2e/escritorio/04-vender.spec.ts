@@ -132,7 +132,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
 });
 
 // Todo con el teclado (decisión 61, RNF-05): el menú, las pestañas y una venta completa, sin mouse.
-test("sin mouse: recorrer el menú y las pestañas con las flechas y cobrar una venta", async ({ page }) => {
+test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una venta con Tab y los atajos", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/productos");
   const busqueda = page.getByTestId("busqueda");
@@ -172,15 +172,16 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas y cobrar una 
   await page.keyboard.press("Enter");
   const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
   await expect(mecha).toBeVisible();
+  // Las flechas no recorren los controles de la pantalla (decisión 77): la búsqueda sigue con el foco.
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("busqueda")).toBeFocused();
+  // A la cantidad se llega con Tab; ahí ↑ suma, como en cualquier campo de cantidad. F2 cobra.
   const conElFoco = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
-  // ↓ recorre los controles del renglón hasta la cantidad; ahí ↑ suma, y → sigue hasta Cobrar.
-  for (let i = 0; i < 40 && (await conElFoco()) !== "cantidad"; i++) await page.keyboard.press("ArrowDown");
+  for (let i = 0; i < 40 && (await conElFoco()) !== "cantidad"; i++) await page.keyboard.press("Tab");
   await expect(mecha.getByTestId("cantidad")).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(mecha.getByTestId("cantidad")).toHaveValue("2");
-  for (let i = 0; i < 20 && (await conElFoco()) !== "cobrar"; i++) await page.keyboard.press("ArrowRight");
-  await expect(page.getByTestId("cobrar")).toBeFocused();
-  await page.keyboard.press("Enter");
+  await page.keyboard.press("F2");
   await expect(page.getByTestId("exito")).toContainText("Venta registrada");
   await expect(page.getByTestId("exito")).toContainText("$6.000"); // 2 × $3.000
 });
