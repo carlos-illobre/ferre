@@ -5,6 +5,7 @@ import { VersionNueva } from "./VersionNueva";
 import { esAmbienteDePrueba } from "../ambiente";
 import { MarcoDePrueba } from "./MarcoDePrueba";
 import "../preferencias"; // aplica al abrir lo que la persona eligió en Configuración (RF-80)
+import { respetarElGuardado } from "../almacen";
 
 // Ferrebress v5 junta lo que mejor funcionó de cada versión: en el celular, las pantallas de
 // la versión 1 (una cosa por vez, tarjetas, hojas); en la computadora, las de la versión 2
@@ -13,6 +14,7 @@ import "../preferencias"; // aplica al abrir lo que la persona eligió en Config
 // cruza el límite se recarga. Cada import() va en su propia sentencia a propósito: en un
 // mismo ternario Vite les asigna a los dos la precarga de uno solo.
 mantenerActualizada();
+void respetarElGuardado();
 const ANCHO_DE_COMPUTADORA = 900;
 
 async function cargarInterfaz() {

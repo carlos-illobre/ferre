@@ -7,4 +7,5 @@ es personal: de esa persona en ese dispositivo.
 ## Tareas
 
 - [x] T001 Pantalla Configuración en Más, con la opción de habilitar o deshabilitar las animaciones
-- [ ] T002 En el celular, guardar datos para trabajar sin conexión solo si la persona lo habilita en Configuración (deshabilitado de arranque) (depende de T001)
+- [x] T002 En el celular, guardar datos para trabajar sin conexión solo si la persona lo habilita en Configuración (deshabilitado de arranque) (depende de T001)
+- [ ] T003 En el celular, con el guardado deshabilitado, elegir entre bajar el catálogo al abrir o buscar en el servidor (depende de T002)

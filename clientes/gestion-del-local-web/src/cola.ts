@@ -1,5 +1,6 @@
 import { api, ErrorApi } from "./api";
 import { abrirBase, guardarMeta, leerTodo } from "./almacen";
+import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "./guardado";
 
 // Cola única de cambios hechos sin conexión (issue #18): ventas, "no llevó", márgenes y
 // precios, ajustes de stock, renglones de conteo. Cada cambio es un pedido HTTP
@@ -15,7 +16,8 @@ export function alCambiarLaCola(oyente: () => void): () => void {
 const avisar = () => oyentes.forEach((o) => o());
 
 export async function pendientes(): Promise<Cambio[]> {
-  const lista = await leerTodo<Cambio>("cola");
+  // Sin base en el dispositivo (guardado deshabilitado) no hay nada esperando.
+  const lista = await leerTodo<Cambio>("cola").catch(() => [] as Cambio[]);
   return lista.sort((a, b) => a.orden - b.orden);
 }
 
@@ -65,8 +67,11 @@ function esErrorDeRed(e: unknown): boolean {
 export async function enviarOEncolar(tipo: string, metodo: Cambio["metodo"], ruta: string, cuerpo: unknown): Promise<{ encolado: boolean }> {
   const orden = await encolar({ tipo, metodo, ruta, cuerpo }).catch(() => null);
   if (orden === null) {
-    // Sin IndexedDB (navegador raro): se manda directo, como antes.
-    await api(ruta, { method: metodo, body: JSON.stringify(cuerpo), keepalive: true });
+    // Sin base en el dispositivo (un navegador sin IndexedDB, o un celular con el guardado
+    // deshabilitado, RF-81): se manda directo. Si además no hay conexión, no se registra ni se
+    // guarda, y se dice cómo habilitar el trabajo sin conexión.
+    try { await api(ruta, { method: metodo, body: JSON.stringify(cuerpo), keepalive: true }); }
+    catch (e) { if (esErrorDeRed(e) && !guardaEnElDispositivo()) throw new ErrorApi(503, SIN_CONEXION_Y_SIN_GUARDADO); throw e; }
     return { encolado: false };
   }
   await enviarPendientes();

@@ -584,3 +584,16 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     Carlos eligió este esquema entre dos que propuso el agente. Con Alt apretado, cada botón
     a la vista muestra una letra, y esa letra lo acciona. La letra sale del nombre del botón.
     No se usan la D, la E ni la F, que el navegador tiene para sí. Completa la decisión 77.
+
+81. **El celular no guarda datos del negocio, salvo que la persona lo habilite** (2026-10-13).
+    El celular es del empleado y tiene poco lugar; en el local hay buena conexión.
+    - De arranque, el celular guarda solo lo mínimo para mantener la sesión y el vínculo
+      (menos de 150 KB, sin contar los archivos de la aplicación). Nada de productos,
+      ventas ni listas.
+    - Así, si se corta internet no se puede registrar ni guardar nada: la aplicación lo
+      dice y explica que hay que habilitar «Trabajar sin conexión» en Configuración.
+    - Es una preferencia personal, como todo lo de Configuración. La computadora no cambia.
+    - Deshabilitarla borra lo guardado. Si había ventas sin enviar se pierden: Carlos lo
+      acepta por ser un caso extremo; la aplicación avisa cuántas y pregunta antes.
+    - Con el guardado deshabilitado, la persona elige cómo buscar productos: bajando el
+      catálogo a la memoria al abrir, o consultando al servidor en cada búsqueda.

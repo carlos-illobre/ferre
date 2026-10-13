@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, leerToken, reducirImagen, urlApi } from "../api";
+import { api, ErrorApi, leerToken, reducirImagen, urlApi } from "../api";
+import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "../guardado";
 import { guardarMeta, leerMeta } from "../almacen";
 
 // Tickets (RF-80): errores y mejoras que reporta quien usa la app. Un ticket se guarda
@@ -21,9 +22,23 @@ export async function crearTicket(datos: Omit<Pendiente, "id" | "creado_en" | "f
   // Las capturas se achican antes de guardarlas: pesan mucho menos y se leen igual.
   const achicadas = await Promise.all(fotos.slice(0, MAXIMO_DE_FOTOS).map((f) => reducirImagen(f, 1600)));
   const pendiente: Pendiente = { ...datos, id: crypto.randomUUID(), creado_en: new Date().toISOString(), fotos: achicadas };
+  // Un celular con el guardado deshabilitado (RF-81) no deja el ticket esperando: lo manda en el momento.
+  if (!guardaEnElDispositivo()) {
+    try { await api("/tickets", { method: "POST", body: formularioDe(pendiente) }); }
+    catch (e) { if (!(e as { estado?: number }).estado) throw new ErrorApi(503, SIN_CONEXION_Y_SIN_GUARDADO); throw e; }
+    avisar();
+    return;
+  }
   await guardarMeta(CLAVE, [...(await leerPendientes()), pendiente]);
   avisar();
   await enviarPendientes();
+}
+
+function formularioDe(p: Pendiente): FormData {
+  const formulario = new FormData();
+  for (const clave of ["id", "tipo", "descripcion", "dispositivo", "version"] as const) formulario.append(clave, p[clave]);
+  p.fotos.forEach((f, i) => formulario.append("fotos", f, `foto-${i}.${f.type === "image/png" ? "png" : f.type === "image/webp" ? "webp" : "jpg"}`));
+  return formulario;
 }
 
 let enviando: Promise<void> | null = null;
@@ -34,10 +49,7 @@ export function enviarPendientes(): Promise<void> {
   enviando = (async () => {
     try {
       for (const p of await leerPendientes()) {
-        const formulario = new FormData();
-        for (const clave of ["id", "tipo", "descripcion", "dispositivo", "version"] as const) formulario.append(clave, p[clave]);
-        p.fotos.forEach((f, i) => formulario.append("fotos", f, `foto-${i}.${f.type === "image/png" ? "png" : f.type === "image/webp" ? "webp" : "jpg"}`));
-        try { await api("/tickets", { method: "POST", body: formulario }); }
+        try { await api("/tickets", { method: "POST", body: formularioDe(p) }); }
         catch (e) { const estado = (e as { estado?: number }).estado; if (!estado || estado >= 500 || estado === 401 || estado === 429) return; }
         await guardarMeta(CLAVE, (await leerPendientes()).filter((x) => x.id !== p.id));
         avisar();

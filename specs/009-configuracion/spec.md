@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-13
 
-**Status**: Aprobada la historia 1; la historia 2 espera la aprobación de Carlos
+**Status**: Aprobada
 
 **Maquetas**: Aprobadas
 
@@ -16,6 +16,10 @@
 
 - Q: ¿De quién es la preferencia de las animaciones? → A: De cada persona en su dispositivo: la elige ahí y no cambia nada de los demás.
 - Q: ¿Cómo arranca? → A: Habilitada.
+- Q: Con el guardado deshabilitado, ¿cómo se busca en el catálogo? → A: Lo elige cada persona en Configuración entre bajarlo a la memoria al abrir o buscar en el servidor; cada opción explica su ventaja y su desventaja.
+- Q: ¿Qué pasa con las ventas sin enviar al deshabilitar el guardado? → A: Se pierden. Es un caso extremo y Carlos lo acepta.
+- Q: ¿Qué es «no guardar nada»? → A: Guardar lo mínimo para mantener la sesión y el vínculo: menos de 150 KB, sin contar los archivos de la aplicación. Nada de productos, ventas ni listas.
+- Todo lo que hay en Configuración es personal: de esa persona en ese dispositivo.
 - Q: ¿La pantalla está también en la computadora? → A: Carlos lo dejó a criterio del agente, por lo más simple y consistente: está en los dos, como todas las opciones de Más (decisión 47), y la opción de las animaciones vale en los dos. En la computadora no hay deslizamiento entre pantallas, pero sí el movimiento de las ventanas y los avisos, que también se apaga.
 - La maqueta del celular se le mostró a Carlos el 2026-10-13 junto con estas preguntas; las contestó sin pedir cambios.
 
@@ -68,20 +72,32 @@ Los archivos de la aplicación (lo que se instala) no cuentan.
 - **E08** **Given** la opción deshabilitada, **When** se usa la aplicación con conexión, **Then** todo funciona igual, y en el celular no queda guardado ningún dato del negocio: lo guardado no pasa de 150 KB.
 - **E09** **Given** la opción deshabilitada y el celular sin conexión, **When** se intenta registrar una venta, un ingreso, un pedido, un conteo o un ticket, **Then** no se registra ni se guarda, y la aplicación dice que no hay conexión y que para trabajar así hay que habilitarlo en Configuración.
 - **E10** **Given** la opción deshabilitada, **When** se la habilita, **Then** el celular baja y guarda los datos, y desde ese momento trabaja sin conexión como antes de este cambio.
-- **E11** **Given** la opción habilitada y sin nada por enviar, **When** se la deshabilita, **Then** se borra del celular todo lo guardado, salvo lo mínimo.
-- **E12** **Given** la opción habilitada y con ventas u otros cambios todavía sin enviar, **When** se la quiere deshabilitar, **Then** no deja, y dice cuántos cambios faltan enviar y que se deshabilita cuando se manden.
+- **E11** **Given** la opción habilitada, **When** se la deshabilita, **Then** se borra del celular todo lo guardado, salvo lo mínimo.
+- **E12** **Given** la opción habilitada y con ventas u otros cambios todavía sin enviar, **When** se la quiere deshabilitar, **Then** la aplicación avisa cuántos cambios se van a perder y pregunta; si la persona sigue, se pierden. Carlos lo aceptó: es un caso extremo (sin conexión y, a la vez, decidir dejar de guardar).
 - **E13** **Given** la aplicación abierta en la computadora, **When** se mira Configuración, **Then** la opción no aparece y la computadora sigue guardando como siempre.
-- **E14** **Given** un celular que venía usando la aplicación antes de este cambio, con datos guardados, **When** se actualiza, **Then** queda deshabilitada y lo guardado se borra, salvo que haya cambios sin enviar: en ese caso queda habilitada hasta que se manden, y lo dice.
+- **E14** **Given** un celular que venía usando la aplicación antes de este cambio, con datos guardados, **When** se actualiza, **Then** queda deshabilitada y lo guardado se borra, también lo que hubiera sin enviar.
 
-[NEEDS CLARIFICATION: con la opción deshabilitada, el catálogo ya no puede quedar guardado. Hay dos formas de buscar: (a) bajar el catálogo entero a la memoria cada vez que se abre la aplicación (la búsqueda sigue siendo instantánea, pero abrir tarda unos segundos más y gasta datos: se estima medio mega por apertura, sin medir todavía); o (b) buscar en el servidor en cada consulta (no baja nada, pero cada búsqueda espera a la red y hay que construir esa búsqueda en el servidor). Propuesta: (a).]
+**Cómo se buscan los productos sin guardar el catálogo.** Con «Trabajar sin conexión»
+deshabilitada, la persona elige en Configuración una de dos formas, y cada una dice sus
+ventajas y desventajas:
 
-[NEEDS CLARIFICATION: E12 y E14 son propuestas del agente, para no perder ventas que todavía no llegaron al servidor. ¿Están bien?]
+| Opción | Ventaja | Desventaja |
+|---|---|---|
+| **Bajar el catálogo al abrir** (de arranque) | La búsqueda es instantánea y escanear responde en el acto | Abrir la aplicación tarda unos segundos más y gasta datos cada vez |
+| **Buscar en el servidor** | No baja el catálogo: abre enseguida y casi no gasta datos | Cada búsqueda y cada código escaneado espera a la red |
+
+- **E15** **Given** «Trabajar sin conexión» deshabilitada, **When** se mira Configuración, **Then** aparece «Cómo buscar productos» con las dos opciones, cada una con su ventaja y su desventaja, y elegida «Bajar el catálogo al abrir».
+- **E16** **Given** «Trabajar sin conexión» habilitada, **When** se mira Configuración, **Then** «Cómo buscar productos» no aparece: el catálogo está guardado en el celular.
+- **E17** **Given** elegida «Buscar en el servidor», **When** se busca un producto o se escanea un código en Catálogo, Vender, Ingreso, Pedidos o Estanterías, **Then** aparece el mismo resultado que con el catálogo bajado, después de consultar al servidor.
+- **E18** **Given** elegida «Buscar en el servidor» y una búsqueda en curso, **When** la red tarda, **Then** la pantalla dice que está buscando; si no hay conexión, lo dice.
 
 ## Requirements
 
 ### Functional Requirements
 
 - **RF-80**: Más tiene la opción «Configuración», que abre una pantalla con las preferencias de la aplicación. La ve cualquier usuario con sesión. Cada preferencia dice en una línea qué cambia. La primera es «Animaciones»: habilitar o deshabilitar el movimiento al navegar (decisión 78). Se guarda en el dispositivo, vale en el momento y arranca habilitada.
+
+- **RF-82**: Con el guardado deshabilitado (RF-81), la persona elige en Configuración cómo se buscan los productos: bajando el catálogo a la memoria cada vez que abre la aplicación (de arranque), o consultando al servidor en cada búsqueda y en cada código escaneado. Cada opción dice su ventaja y su desventaja. El resultado de buscar es el mismo en las dos.
 
 - **RF-81**: En el celular, guardar datos del negocio en el dispositivo para trabajar sin conexión es una preferencia de cada persona (RF-80), que arranca deshabilitada. Deshabilitada, el celular guarda solo lo mínimo para mantener la sesión y el vínculo (menos de 150 KB, sin contar los archivos de la aplicación), y sin conexión no registra ni guarda nada. Habilitada, guarda y trabaja sin conexión como la computadora. No aplica a la computadora.
 

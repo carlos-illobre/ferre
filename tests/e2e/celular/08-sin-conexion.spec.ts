@@ -36,8 +36,46 @@ test.beforeAll(() => {
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '${ID_PROD}', '${ID_PROV}', 'DO2', 500, '[]', 500, 0.21, '2026-08-11')`);
 });
 
-test("vender y cambiar un margen sin red; al volver la red llega todo una sola vez", async ({ page, context }) => {
+// En el celular, trabajar sin conexión es una preferencia que arranca deshabilitada (RF-81):
+// así queda como si la persona la hubiera habilitado en Configuración.
+const HABILITADO = JSON.stringify({ animaciones: true, sinConexion: true, buscar: "memoria" });
+
+test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y sin red no se puede vender", async ({ page, context }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.goto("/#/vender");
+  const busqueda = page.getByTestId("busqueda");
+  await expect(busqueda).toBeEnabled();
+  // Con conexión se trabaja igual: el catálogo está en memoria y se encuentra el producto (E08).
+  await busqueda.fill("e2e destornillador offline");
+  await busqueda.press("Enter");
+  await expect(page.getByTestId("item").filter({ hasText: "DESTORNILLADOR OFFLINE" })).toBeVisible();
+  // En el celular no quedó ninguna base con datos del negocio, y lo guardado no llega a 150 KB.
+  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
+  expect(await page.evaluate(() => Object.keys(localStorage).reduce((n, k) => n + k.length + (localStorage.getItem(k) ?? "").length, 0))).toBeLessThan(150_000);
+
+  // Sin red (E09): no se registra ni se guarda, y dice cómo habilitarlo.
+  await context.setOffline(true);
+  await page.evaluate(() => window.dispatchEvent(new Event("offline")));
+  await expect(page.getByTestId("conexion-celular")).toContainText("no se puede registrar nada");
+  await page.getByTestId("cobrar").click();
+  await expect(page.getByText(/habilitalo en Más → Configuración/)).toBeVisible();
+  await expect(page.getByTestId("exito")).toHaveCount(0);
+  await expect(page.getByTestId("item")).toHaveCount(1);
+  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
+  await context.setOffline(false);
+  expect(psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");
+
+  // La llave está en Configuración, deshabilitada de arranque (E07); habilitarla hace que el celular guarde (E10).
+  await page.goto("/#/mas/configuracion");
+  await expect(page.getByTestId("cfg-sin-conexion")).toHaveAttribute("aria-checked", "false");
+  await page.getByTestId("cfg-sin-conexion").click();
+  await expect(page.getByTestId("cfg-sin-conexion")).toHaveAttribute("aria-checked", "true");
+  await page.goto("/#/vender");
+  await expect.poll(async () => page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).toContain("ferre");
+});
+
+test("vender y cambiar un margen sin red; al volver la red llega todo una sola vez", async ({ page, context }) => {
+  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
@@ -82,8 +120,8 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
   expect(psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_PROD}'`)).toBe("1");
 });
 
-test("la app abre sin red gracias al service worker", async ({ page, context }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+test("con el trabajo sin conexión habilitado, la app abre sin red gracias al service worker", async ({ page, context }) => {
+  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
   await page.goto("/#/vender");
   await expect(page.getByTestId("busqueda")).toBeEnabled();
   // Esperar a que el service worker controle la página y haya precacheado la app.

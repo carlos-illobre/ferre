@@ -678,7 +678,17 @@ RF-80:
     - "Falta la revisión independiente de la carpeta: se hace al terminar su última tarea"
 
 RF-81:
-  estado: "Nuevo: especificado, a la espera de la aprobación de Carlos (009-T002)"
+  estado: "Hecho (009-T002): en el celular el guardado para trabajar sin conexión arranca deshabilitado y se habilita en Configuración"
+  pruebas:
+    - clientes/gestion-del-local-web/src/guardado.test.tsx
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+  defectos:
+    - "No está medido en un teléfono cuánto tarda en abrir ni cuántos datos gasta bajar el catálogo a la memoria con los 11.000 productos reales"
+    - "Las fotos y los archivos que el navegador guarda por su cuenta (su caché) no se controlan desde la aplicación"
+    - "Sin prueba: que un ticket de Mejoras y errores sin conexión y sin guardado avise en vez de quedar esperando"
+
+RF-82:
+  estado: "Nuevo: especificado y aprobado (009-T003)"
   pruebas: []
   defectos: []
 RF-75:

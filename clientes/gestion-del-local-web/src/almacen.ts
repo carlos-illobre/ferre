@@ -1,3 +1,4 @@
+import { guardaEnElDispositivo } from "./guardado";
 // IndexedDB con un envoltorio propio (ADR-005): promesas, almacenes tipados y ninguna
 // dependencia. Lo que el mostrador necesita sin conexión vive acá: catálogo, stock,
 // clientes, ventas de los últimos 7 días y la cola de cambios pendientes.
@@ -12,6 +13,9 @@ export type Almacen = "catalogo" | "stock" | "clientes" | "ventas" | "cola" | "m
 let baseAbierta: Promise<IDBDatabase> | null = null;
 
 export function abrirBase(): Promise<IDBDatabase> {
+  // Con el guardado deshabilitado en un celular (RF-81) la base no se abre: cada parte de la
+  // aplicación ya sabe seguir sin ella, como en un navegador sin IndexedDB.
+  if (!guardaEnElDispositivo()) return Promise.reject(new Error("El guardado en este celular está deshabilitado"));
   if (baseAbierta) return baseAbierta;
   baseAbierta = new Promise((resolver, rechazar) => {
     if (typeof indexedDB === "undefined") return rechazar(new Error("Este navegador no tiene IndexedDB"));
@@ -31,6 +35,24 @@ export function abrirBase(): Promise<IDBDatabase> {
   });
   baseAbierta.catch(() => { baseAbierta = null; });
   return baseAbierta;
+}
+
+// Borra del dispositivo todos los datos del negocio (al deshabilitar el guardado, RF-81).
+export async function borrarLoGuardado(): Promise<void> {
+  const abierta = baseAbierta;
+  baseAbierta = null;
+  if (abierta) await abierta.then((db) => db.close()).catch(() => undefined);
+  if (typeof indexedDB === "undefined") return;
+  await new Promise<void>((listo) => {
+    const pedido = indexedDB.deleteDatabase(NOMBRE);
+    pedido.onsuccess = pedido.onerror = pedido.onblocked = () => listo();
+  });
+}
+
+// Al abrir la aplicación: un celular con el guardado deshabilitado no conserva datos del
+// negocio, tampoco los que hubiera guardado una versión anterior (RF-81).
+export async function respetarElGuardado(): Promise<void> {
+  if (!guardaEnElDispositivo()) await borrarLoGuardado();
 }
 
 function esperar<T>(pedido: IDBRequest<T>): Promise<T> {

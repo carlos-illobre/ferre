@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { leerMeta } from "../../../almacen";
+import { guardaEnElDispositivo } from "../../../guardado";
 import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../cola";
 
 // Indicador discreto (issue #18): un punto y dos palabras. Sin conexión y cuántos cambios
@@ -32,7 +33,7 @@ export function EstadoDeConexion({ testId = "conexion" }: { testId?: string } = 
   const viejo = masViejo !== null && Date.now() - new Date(masViejo).getTime() > 3600_000;
   const clase = !enLinea ? "sin-conexion" : cantidad > 0 ? (viejo ? "atrasado" : "pendiente") : "ok";
   const texto = !enLinea
-    ? `Sin conexión${cantidad ? ` · ${cantidad} por enviar` : ""}`
+    ? (guardaEnElDispositivo() ? `Sin conexión${cantidad ? ` · ${cantidad} por enviar` : ""}` : "Sin conexión · no se puede registrar nada")
     : cantidad > 0
       ? `${cantidad} por enviar${viejo ? " desde hace más de una hora" : ""}`
       : ultimoEnvio ? `Sincronizado ${haceCuanto(ultimoEnvio)}` : "Conectado";
