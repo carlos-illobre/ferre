@@ -49,7 +49,18 @@ reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitu
 **Entrada del celular (decisión 55, 2026-10-12):** sigue la disposición de la referencia que
 pasó Carlos: marca al centro, las formas de entrar como tarjetas (Google primero, después la
 huella), la línea de «sin contraseñas», tres cosas que hace la aplicación y un pie con la
-onda de la marca. Colores de la paleta y el logotipo de siempre.
+onda de la marca, sin texto. Colores de la paleta y el logotipo de siempre. El botón de la
+huella es naranja, como en la computadora.
+
+**El botón de Google (decisión 69):** es el original que dibuja Google, azul y con las puntas
+redondeadas, en el celular y en la computadora. No lleva estilos propios ni nada encima: que el
+azul no sea de la paleta marca que es de un servicio externo.
+
+**Escanear desde la entrada (decisiones 62 y 65):** debajo de las formas de entrar, el celular
+tiene «Escanear el código de la computadora», que abre la cámara dentro de la aplicación. Leído
+el código, si ese celular ya tiene la huella vinculada, la huella se pide enseguida: con ella
+entra el celular, entra la computadora y quedan vinculados. Si la huella no se lee, lo dice y
+queda el botón para probar de nuevo. Si el código no es de Ferrebress, lo dice.
 
 **Quién:** cualquier persona que abre la app sin sesión.
 
@@ -117,14 +128,25 @@ y dice que entrar necesita internet.
 
 **Qué necesita a la vista, en los dos:** con quién está en espejo; si el otro no está abierto
 («trabajás solo acá»); si está en pausa; y dos botones, «Pausar» (o «Reanudar») y
-«Desvincular». En la computadora va en el menú lateral; en el celular, en una franja arriba.
+«Desvincular». En la computadora va todo en el menú lateral, y Vender no repite «Desvincular».
+En el celular, el estado y «Pausar» van en una franja arriba; vincular y desvincular van en un
+botón chico a la derecha del encabezado de cada pantalla, con el ícono y la leyenda debajo, como
+los botones del menú de abajo (decisión 70): sin vincular dice «Vincular» y abre la cámara
+dentro de la aplicación para leer el código de la computadora (decisión 63); vinculado dice
+«Desvincular», en verde. Más tiene además el renglón «Vincular con la computadora».
 Sin celular emparejado, la computadora muestra en el menú «Vincular el celular», siempre.
 
 **Reglas:**
 
 - Se espeja la parte en la que están y la venta en curso. No lo que hay abierto encima (una
   ficha, una hoja, la cámara) ni lo escrito en la búsqueda.
-- Nada pide confirmar: pausar, reanudar y desvincular se hacen con un toque.
+- Pausar y reanudar se hacen con un toque. Desvincular también en la computadora; en el
+  celular, donde el botón es chico y está en todas las pantallas, pregunta antes.
+- Al conectarse los dos (se abre o se recarga cualquiera, o se acaban de vincular), la pantalla
+  en la que quedan es la de la computadora: el celular va a ella, nunca al revés. Después, cada
+  cambio de pantalla hecho en cualquiera de los dos mueve al otro (decisión 71).
+- El trabajo a medio hacer (una venta, un ingreso, un pedido) lo retoma el que llega, del que
+  ya lo tenía.
 - Una pantalla que es solo del celular (la cámara para una foto o un código) no se interrumpe
   porque la computadora cambie de parte, y al salir de ella el celular vuelve a donde está
   la computadora.
@@ -186,8 +208,9 @@ roles a cada persona; desactivar y reactivar.
   de un producto con sus importes, la lista del proveedor para bajar y la explicación de
   cómo se llega a un precio se muestran solo con «Ver costos». Sin ese permiso se ven el
   precio de venta y el margen, sin explicación.
-- **Anular ventas:** «Anular» aparece en las ventas de hoy con «Anular ventas del día», y en
-  las de un día anterior solo con «Anular ventas de cualquier día».
+- **Anular ventas:** se anula solo desde la pestaña «Anular» de Vender (decisión 72): las
+  ventas de hoy con «Anular ventas del día», y las de un día anterior solo con «Anular ventas
+  de cualquier día», que es quien ve el selector de día.
 - Lo que puede cualquiera con sesión está siempre: buscar en el catálogo, ver el inventario,
   sacarle la foto a un producto, sus propios celulares, Mejoras y errores y Salir.
 - Quien llega por una dirección a una pantalla que no le corresponde ve «No tenés permiso

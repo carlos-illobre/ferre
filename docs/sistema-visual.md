@@ -58,6 +58,12 @@ nueva con pantalla se hace en las dos.
 - **Botones:** un solo estilo de botón principal por pantalla; el resto, secundarios.
 - **Barra de progreso** con lo que está haciendo, para lo que va a tardar (cargar una lista).
 
+## Lo que no es nuestro
+
+- **El botón de Google** es el original, azul y con puntas redondeadas, tal como lo dibuja
+  Google: sin estilos propios, sin nada encima y sin copiarlo con un botón nuestro
+  (decisión 69). Es el único elemento fuera de la paleta, a propósito.
+
 ## Reglas del celular
 
 Salen del diseño de referencia.

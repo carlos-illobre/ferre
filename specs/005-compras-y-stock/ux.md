@@ -124,6 +124,11 @@ agregar la foto del comprobante; registrar el ingreso; descartarlo entero.
 
 ## Historia 2: compras recientes, gastos de la semana y anular (Comprador)
 
+**Dónde (decisión 67):** en «Cómo va el negocio», no en el ingreso de mercadería, que queda
+solo para recibir. Las compras recientes las ve quien tiene «Ver las compras»; si no tiene
+además «Ver los números del negocio», la pantalla le muestra solo las compras. Anular pide
+«Registrar ingresos».
+
 **Tiene que poder:** ver el gasto de la semana; ver las compras recientes; abrir una para
 ver sus renglones y la foto del comprobante si la tiene; anularla.
 

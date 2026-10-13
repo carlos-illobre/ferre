@@ -38,6 +38,21 @@ especificación (RF-60 a RF-65); lo que acá depende de una aclaración lo dice.
 | Sin conexión | Dice que los números se ven cuando vuelva internet. Si se muestran los últimos números recibidos, dicen de qué momento son y no se confunden con los actuales. Al volver la conexión se actualizan solos |
 | Éxito | El número aparece o cambia sin recargar; un aviso que no interrumpe confirma lo que se guardó |
 
+## Qué tiene hoy la pantalla «Cómo va el negocio»
+
+Es la pantalla del proceso «analizar el negocio» (decisión 67). Está en Más y pide «Ver los
+números del negocio» o «Ver las compras».
+
+- **Con «Ver los números del negocio»:** lo vendido hoy (total, cantidad de ventas y total por
+  medio de pago), los gastos de la semana por proveedor, lo que preguntaron y no llevaron (en
+  la computadora) y el dinero invertido en inventario, en total y por proveedor.
+- **Con «Ver las compras»:** las compras recientes, que se abren para ver sus renglones y la
+  foto del comprobante; quien tiene «Registrar ingresos» las anula desde ahí. Con este permiso
+  solo, la pantalla muestra nada más que las compras.
+- **No tiene** el detalle de cada venta ni forma de anular ventas: eso está en las pestañas
+  «Hoy» y «Anular» de Vender (decisión 72). En la computadora, «Ver las ventas de hoy» lleva
+  a la pestaña «Hoy».
+
 ## Historia 1: gasto de la semana (Comprador; RF-65)
 
 **Qué tiene que poder hacer el Comprador**

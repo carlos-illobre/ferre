@@ -170,7 +170,8 @@ Prueba manual de punta a punta, pantalla por pantalla.
   irse al elegir el cliente (RNF-09).
 - **Compras.** La factura se tiene que poder cargar con una foto, que precargue todo
   (RF-51). Las cantidades, sin cero a la izquierda y con la misma regla de decimales. Las
-  compras recientes se despliegan para ver sus renglones (RF-50).
+  compras recientes se despliegan para ver sus renglones (RF-50); desde el 2026-10-13 están en
+  «Cómo va el negocio» y no en el ingreso (decisión 67).
 - **Stock.** El detalle de un producto se abre con animación. Toda acción de guardar tiene
   forma de botón (RNF-09).
 - **Contar.** El mueble donde va la mercadería se llama «estantería». Para salir de un conteo, «Volver», sin la
@@ -295,7 +296,7 @@ mismo en todas las pantallas:
 | ← | Lleva al menú (desde un campo de texto, solo con el cursor al principio) |
 | → | Desde el menú, entra a las pestañas de esa parte, o a la pantalla si no tiene. En la pantalla, va al control siguiente (desde un campo de texto, solo con el cursor al final) |
 | ← → en las pestañas | Pasan de una pestaña a otra y la abren; ← desde la primera vuelve al menú; ↓ entra a la pantalla |
-| ↑ ↓ en el menú | Recorren las partes y, debajo, los botones del espejo (Pausar, Desvincular o Vincular el celular) y Salir |
+| ↑ ↓ en el menú | Recorren las partes y, debajo, los botones del espejo (Pausar, Desvincular o Vincular el celular) y Salir. El foco se marca con el mismo borde amarillo en todos |
 | Esc | Cierra lo que esté abierto |
 | Alt + número | Abre cada pantalla |
 
@@ -315,13 +316,17 @@ cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en 
 Depósito en Inventario; el orden de Depósito es Inventario, Ingreso, Estanterías, Pedidos, decisión 68): la aplicación no recuerda en qué pestaña se estaba.
 
 **Vincular, siempre a mano (decisión 66).** En el celular, mientras no esté vinculado con una
-computadora, todas las pantallas llevan arriba a la derecha «Vincular». Vinculado, arriba queda
-la franja del espejo con «Desvincular».
+computadora, todas las pantallas llevan «Vincular» a la derecha de su encabezado: un botón chico,
+con el ícono y la leyenda debajo. Vinculado, ese botón dice «Desvincular» y arriba queda la
+franja del espejo con «Pausar» (decisión 70).
 
 **Las partes y sus pestañas (decisiones 68 y 72).** Catálogo: Productos, Listas, Duplicados.
 Vender: Vender, Hoy, Anular. Depósito: Inventario, Ingreso, Estanterías, Pedidos. Más no tiene
 pestañas: es una lista de opciones. Las pestañas se ven igual en las tres partes, cada persona
 ve solo las que puede usar y, si le queda una sola, no se dibujan.
+
+**Más, en el celular.** Todas las opciones se ven igual: ícono a la izquierda, nombre, una línea
+que explica y la flecha a la derecha. «Salir» también, en su propio bloque al final.
 
 **Volver a Más (decisión 64).** En el celular, cada pantalla de Más lleva arriba a la
 izquierda «Volver a Más», que regresa al menú de Más.
