@@ -1,6 +1,6 @@
 import { useMemo, useReducer } from "react";
 import { vi } from "vitest";
-import type { Producto } from "../pantallas/Productos";
+import type { Producto } from "../producto";
 import { buscar, indexar } from "@ferre/calculo-de-precios";
 
 // Un catálogo en memoria con la misma búsqueda que la app, y `actualizarProducto` espiado.

@@ -23,11 +23,3 @@ test("en una computadora se carga la interfaz de computadora y no la de celular"
   // El ambiente de prueba se anuncia con su marco y su cartel (decisión 33).
   await expect(page.getByTestId("ambiente")).toContainText("nada de esto es real");
 });
-
-test("las direcciones viejas siguen andando: /v5/ lleva a la raíz y /v1/ a su versión histórica", async ({ page }) => {
-  await page.goto("/v5/#/vender");
-  await expect(page).toHaveURL(/:\d+\/#\/vender$/);
-  await page.goto("/v1/");
-  await expect(page).toHaveURL(/\/historico\/v1\//);
-  await expect(page.getByText("Versión histórica: no se usa.")).toBeVisible();
-});

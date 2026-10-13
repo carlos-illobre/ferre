@@ -15,7 +15,7 @@ credencial (el mock rechaza la credencial "no" con 403). Se puede repetir.
 Guarda en $CAPTURAS (por defecto tests/capturas/salida/, que no se sube) como <nombre>-compu.png y <nombre>-celu.png
 (nombre = --nombre o la ruta). Avisa: desplazamiento hacia el costado, textos de menos de 14 px,
 objetivos táctiles de menos de 44 px (solo en el celular) y errores de consola. Tiene que decir «bien».
-Hacen falta la API de mentira (8799) y el Vite del cliente (5199); ver tests/capturas/README.md; con BASE=http://localhost:5199/historico/v1/ (o v2) captura otra versión.
+Hacen falta la API de mentira (8799) y el Vite del cliente (5199); ver tests/capturas/README.md.
 """
 import argparse
 import os

@@ -19,3 +19,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T008 [arreglo] En el celular las animaciones al navegar no aparecen y cambiar de pantalla tarda casi tres segundos
 - [x] T009 [ajuste] Teclado de la computadora: Enter en el menú deja la marca en la primera pestaña; un clic en una pestaña deja la marca en ella; solo se marcan filas que hacen algo con Enter; en Catálogo ↑ desde la primera fila vuelve a las pestañas; en Más se ve el borde del foco
 - [x] T010 [arreglo] En el celular, el botón de volver de Android no cierra la foto de un producto abierta en grande
+- [x] T011 [ajuste] Borrar las versiones viejas de la interfaz (1 a 4), sus mockups y toda referencia a ellas: la interfaz actual es la definitiva

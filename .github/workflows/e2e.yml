@@ -4,7 +4,7 @@ name: E2E
 # varios minutos, por eso no corren en cada push: se lanzan a mano desde la pestaña
 # Actions ("Run workflow") antes de promover a producción o después de un cambio grande.
 # También corren solos una vez por semana para que no se pudran.
-# Corren contra la versión 5 de la interfaz, la que abre la raíz (decisión 43).
+# Corren contra la aplicación, que abre en la raíz.
 on:
   workflow_dispatch:
   schedule:

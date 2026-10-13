@@ -37,7 +37,7 @@ import "./base/estilos/base.css";
 import "./base/estilos/entrar.css";
 import "./tema.css";
 
-// La interfaz de computadora de la versión 2 (menú lateral, tablas, todo con teclado), con
+// La interfaz de computadora (menú lateral, tablas, todo con teclado), con
 // la paleta de la v5, la venta con sugeridos y el menú reducido a lo de todos los días: lo
 // que se usa poco va en «Más». Alt + número abre cada pantalla.
 export function App() {

@@ -31,7 +31,7 @@ import { ParteVender } from "./Vender";
 import "./estilos.css";
 import "./tema.css";
 
-// La interfaz de celular de la versión 1, que es la que resultó más fácil de usar, con la
+// La interfaz de celular (una cosa por vez, tarjetas y hojas), con la
 // paleta de la v5, la venta con sugeridos y sin que la búsqueda tome el foco sola. El menú es
 // el mismo que en la computadora: Catálogo, Vender, Depósito y Más, con sus pestañas adentro.
 export function App() {

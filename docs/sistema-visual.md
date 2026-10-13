@@ -1,34 +1,20 @@
-Viene de `docs/ux.md` (secciones «Sistema visual» y «Concreto»), pasado a este documento el 2026-10-10 al adoptar Spec Kit. Los principios de la interfaz y cómo se verifican están resumidos en la constitución (`.specify/memory/constitution.md`, principio II).
-
 # Sistema visual
 
-Rediseño del 2026-09-14. La decisión de tener dos interfaces está en
-[ADR-014](adr/ADR-014-dos-interfaces-celular-y-escritorio.md).
-
-> **Este documento describe la interfaz que hay hoy, y no ata al rediseño.** El 2026-10-10
-> Carlos decidió rehacer toda la interfaz, celular y computadora, y que nada de cómo está
-> hecha hoy sea regla: ni las dos interfaces separadas, ni la disposición, ni los
-> componentes, ni la paleta, la tipografía o la marca (decisiones 13 y 19 de
-> [decisiones-de-negocio.md](decisiones-de-negocio.md)). Queda como antecedente. Para
-> rediseñar, la entrada es
-> [specs/001-base-del-sistema/ux.md](../specs/001-base-del-sistema/ux.md).
+Cómo se ve Ferrebress. La decisión de tener dos interfaces está en
+[ADR-014](adr/ADR-014-dos-interfaces-celular-y-escritorio.md); lo que Carlos pidió de cada
+pantalla, en [specs/001-base-del-sistema/ux.md](../specs/001-base-del-sistema/ux.md).
 
 ## Dos interfaces
 
-Hay dos interfaces sobre la misma app, con la misma paleta y la misma marca:
+Hay dos juegos de pantallas sobre la misma aplicación, con la misma paleta y la misma marca:
 
-- **Celular** (pantallas de menos de 900 px): el diseño de `mockups/Ferre iOS.html` (Claude
-  Design). El 2026-10-09 el dueño la había aprobado tal como está; el 2026-10-10 decidió
-  rehacerla junto con la de computadora.
-  Vive en `src/App.tsx`, `src/pantallas/`, `src/componentes/` y `src/estilos.css` del
-  cliente web.
-- **Computadora** (900 px o más): tablas a todo el ancho de la pantalla, menú completo arriba
-  (Vender, Productos, Compras, Stock, Contar, Listas de precios, Duplicados, Administración),
-  edición en la fila y atajos de teclado. Vive en `src/escritorio/`.
+- **Celular** (ventanas de menos de 900 px): una cosa por vez, con tarjetas y hojas que suben
+  desde abajo; el menú, abajo, con cuatro partes.
+- **Computadora** (900 px o más): menú a la izquierda, pestañas arriba, tablas a todo el
+  ancho y todo con el teclado.
 
-Lo que comparten: un solo color de acción (coral), tinta y niebla, importes en Archivo
-Narrow, el logo «fe», las palabras del mostrador y que todo número se explica. Toda función
-nueva con pantalla se hace en las dos.
+Lo que comparten: la paleta, la marca, las palabras del mostrador y que todo número se explica.
+Toda función nueva con pantalla se hace en las dos.
 
 ## Paleta
 

@@ -9,7 +9,7 @@ import "./foto-de-factura.css";
 // para la factura de un ingreso, la foto de un producto o la captura de un ticket.
 const ESPERA_MS = 2000;
 // Solo en la aplicación: las versiones históricas no reciben funcionalidad nueva (decisión 46).
-export const hayQueUsarElCelular = () => window.innerWidth >= 900 && !/\/historico\//.test(location.pathname);
+export const hayQueUsarElCelular = () => window.innerWidth >= 900;
 
 export function PedirFotoAlCelular({ para, alRecibir, alCancelar }: { para: string; alRecibir: (foto: File) => void | Promise<void>; alCancelar: () => void }) {
   const [pedido, setPedido] = useState<{ codigo: string; qr: string; vence: number } | null>(null);

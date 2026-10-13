@@ -63,7 +63,7 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 ## La interfaz
 
 - **La aplicación es una sola y abre en la raíz.** Su código está en
-  `clientes/gestion-del-local-web/src/principal/` (se llamó «versión 5» hasta el 2026-10-11).
+  `clientes/gestion-del-local-web/src/principal/`.
   Cómo está armada y dónde vive cada cosa:
   [ADR-015](docs/adr/ADR-015-la-interfaz-elegida-es-la-version-5.md). Lo que Carlos pidió de
   ella, que es regla para cualquier cambio:
@@ -73,11 +73,9 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
   (`paleta.css`) y los textos dicen lo mismo** (`textos.ts`: largos en la computadora, que
   explican; resumidos en el celular). Un cambio de regla o de texto se hace en lo compartido
   o en los dos lados, nunca en uno solo (decisión 47).
-- **Las versiones 1 a 4 son históricas** (`historico/`): se conservan para ver su maquetado.
-  No se usan, no se prueban y **no reciben ninguna funcionalidad nueva**. Su código
-  (`src/pantallas`, `src/componentes`, `src/escritorio`, `src/v2`, `src/v4`) está congelado:
-  la aplicación no importa nada de ahí. Lo único que comparten es lo común de `src/`
-  (la llamada a la API, el catálogo, el envío sin conexión, la sesión).
+- **Es la interfaz definitiva** (decisión 83). Las versiones anteriores y sus mockups se
+  borraron el 2026-10-13: no hay otra interfaz en el repositorio. Lo común a las dos (la
+  llamada a la API, el catálogo, el envío sin conexión, la sesión) está en `src/`.
 - **Solo la aplicación principal tiene pruebas.** Un cambio en una pantalla va con su prueba
   en `src/principal/` y, si toca un camino principal, en `tests/e2e/`.
 - **Cada cosa que Carlos decide** se anota con su número en

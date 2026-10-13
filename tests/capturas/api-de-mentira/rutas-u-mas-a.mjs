@@ -1,4 +1,4 @@
-// Rutas del desarrollador A (ventas del día, productos, listas) para las capturas de la v4.
+// Datos de mentira de las ventas del día, los productos y las listas, para las capturas.
 import { ventas as deHoy, productos as base } from "./rutas-00-base.mjs";
 
 // ---- Productos: con estado (margen, proveedor preferido, foto), una foto de ejemplo y uno sin costo.

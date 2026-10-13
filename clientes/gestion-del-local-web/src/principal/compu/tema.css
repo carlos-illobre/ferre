@@ -1,4 +1,4 @@
-/* Paleta de la v5 sobre la interfaz de computadora de la versión 2: verde oscuro para lo
+/* La paleta sobre la interfaz de computadora: verde oscuro para lo
    que ordena, naranja como único color de acción y amarillo para destacar. Son los colores
    ya medidos en la v4 (texto blanco sobre el naranja: 4,5 a 1). */
 @import "../paleta.css";
@@ -34,7 +34,7 @@
 .importe, .marca { font-family: "Space Grotesk Variable", "Segoe UI", system-ui, sans-serif; font-stretch: normal; font-variation-settings: normal; }
 .marca { font-weight: 700; }
 
-/* Donde la versión 2 ponía texto oscuro sobre el ámbar, ahora va blanco sobre el naranja. */
+/* Sobre el naranja, el texto va blanco. */
 .boton.principal, .lateral nav button[aria-current="page"], .pasos li:last-child::before, .exito .tilde { color: #fff; }
 .vender-total .importe, .exito .importe { color: var(--destacado); }
 .prueba { background: var(--destacado); }
@@ -88,7 +88,7 @@
 .productos-tabla td:nth-child(4) { white-space: nowrap; }
 .productos-proveedor .boton { padding: 0 6px; }
 
-/* La marca: la F que es un tornillo, en lugar de la tuerca de la versión 2. */
+/* La marca: la F que es un tornillo. */
 
 /* La barra de cobro es lo más importante de Vender: va en amarillo, que no se usa en ningún
    otro fondo, para que no se confunda con el menú ni pase desapercibida. */
@@ -122,7 +122,7 @@
 .sugeridos-tarjeta { height: 100%; min-height: 116px; }
 .sugeridos-tarjeta .nombre { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .sugeridos-tarjeta .detalle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-/* Los numeritos del menú, como en la versión 2. */
+/* Los numeritos del menú. */
 .lateral nav button .atajo { width: 22px; height: 22px; border-radius: 6px; font-size: 0.75rem; opacity: 0.7; }
 .lateral nav button[aria-current="page"] .atajo { opacity: 0.9; }
 .lateral nav button .atajo { width: auto; padding: 0 6px; white-space: nowrap; }

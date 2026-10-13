@@ -21,7 +21,7 @@ import { pesosCortos } from "./pantallas/VentasDeHoy";
 import type { Producto } from "./pantallas/Productos";
 
 // Catálogo: productos con margen y proveedores, listas de precios, duplicados. Tres
-// sub-pantallas con un segmento arriba (rediseño en mockups/Ferre iOS.html).
+// sub-pantallas con un segmento arriba.
 const SUB = [{ valor: "productos", nombre: "Productos" }, { valor: "listas", nombre: "Listas" }, { valor: "duplicados", nombre: "Duplicados" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
 // Lo que pide cada pestaña (RF-72). Buscar productos lo puede cualquiera con sesión.

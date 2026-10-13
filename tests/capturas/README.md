@@ -8,7 +8,6 @@ diseñar y para revisar; no reemplaza a las pruebas.
 tests/capturas/levantar.sh                      # API de mentira (:8799) y cliente (:5199)
 python tests/capturas/capturar.py vender        # captura #/vender de la aplicación principal, en las dos medidas
 python tests/capturas/capturar.py stock --celu --py "page.get_by_test_id('stock').first.click()"
-BASE=http://localhost:5199/historico/v1/ python tests/capturas/capturar.py productos   # otra versión
 tests/capturas/levantar.sh --apagar
 ```
 

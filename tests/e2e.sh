@@ -10,8 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# Corren contra la versión elegida, la 5, que es la que abre la raíz (decisión 43). Las
-# otras versiones siguen publicadas pero no tienen escenarios.
+# Corren contra la aplicación, que abre en la raíz.
 #
 # Para correrlos en una máquina donde los puertos 80 y 5432 están ocupados o Docker pide
 # sudo (por ejemplo el servidor): un .env con COMPOSE_PROJECT_NAME=ferre-e2e,

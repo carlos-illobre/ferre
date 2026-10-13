@@ -4,7 +4,7 @@ import { buscaEnElServidor } from "./guardado";
 import { api, EVENTO_CAMBIO } from "./api";
 import { borrar, guardar, guardarMeta, leerMeta, leerTodo, reemplazarTodo } from "./almacen";
 import { cambiosDeProductosPendientes, enviarOEncolar, enviarPendientes } from "./cola";
-import type { Producto } from "./pantallas/Productos";
+import type { Producto } from "./producto";
 
 // Los datos del mostrador (catálogo, stock, clientes) en memoria y en IndexedDB (#18):
 // arrancan desde el dispositivo, se refrescan del servidor cuando hay conexión, y los

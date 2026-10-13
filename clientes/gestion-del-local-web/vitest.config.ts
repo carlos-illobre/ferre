@@ -10,15 +10,6 @@ export default defineConfig({
     setupFiles: ["src/pruebas/preparar.ts"],
     env: { VITE_API_URL: "http://api.prueba" },
     include: ["src/**/*.test.{ts,tsx}"],
-    // Solo se prueba la aplicación principal, la que abre la raíz (decisión 43). Las
-    // otras versiones siguen publicadas pero sin pruebas: sus archivos de prueba quedaron en
-    // su lugar y no corren. Las pruebas de la v5 están en src/principal/ (incluidas las de las
-    // pantallas de la versión 2 que la v5 usa tal cual en la computadora).
-    exclude: [
-      "node_modules/**",
-      "src/pantallas/**", "src/componentes/**", "src/escritorio/**", // versión 1
-      "src/v2/**",
-      "src/v4/**",
-    ],
+    exclude: ["node_modules/**"],
   },
 });

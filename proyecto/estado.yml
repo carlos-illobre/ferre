@@ -407,7 +407,7 @@ RF-50:
     - clientes/gestion-del-local-web/src/principal/celular/Deposito.test.tsx
   defectos:
     - "Los pedidos de foto (el código QR) viven en la memoria del servidor: si el servidor se reinicia mientras se espera una foto, hay que pedir el código de nuevo"
-    - "La foto del comprobante está en la versión 5; las versiones 1, 2 y 4 siguen pidiendo el número"
+    - "La foto del comprobante reemplaza al número tipeado"
     - "La foto no es obligatoria: una factura o un remito se puede registrar sin foto y figura «sin foto»"
     - "Sin conexión la foto no se puede subir (el ingreso tampoco se registra sin conexión)"
     - "Una foto subida que no llega a usarse en ninguna compra queda guardada en el servidor; no se limpia"
@@ -455,7 +455,6 @@ RF-53:
     - clientes/gestion-del-local-web/src/principal/celular/Deposito.test.tsx
   defectos:
     - "En Inventario tampoco se muestra el costo de cada producto; no está dicho si el Comprador debe verlo ahí"
-    - "El cambio a Inventario sin dinero está hecho en la versión 5; las versiones 1, 2 y 4 siguen como antes"
     - "El motivo al corregir el stock a mano es opcional y la regla lo pide"
     - "No existe el valor del inventario por familia; el catálogo no tiene familias"
     - "El stock y su valorización no se pueden exportar a Excel"
@@ -465,7 +464,7 @@ RF-53:
     - "Las rutas de stock del servidor no tienen pruebas unitarias"
 
 RF-59:
-  estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
+  estado: "Hecho (pedido directo de Carlos)"
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
@@ -738,7 +737,7 @@ RF-74:
     - "Que un dispositivo con la sesión cerrada a distancia vuelva solo a la entrada no tiene prueba"
 
 RF-80:
-  estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
+  estado: "Hecho (pedido directo de Carlos)"
   pruebas:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts
@@ -748,7 +747,7 @@ RF-80:
     - "La foto de un ticket por enviar se guarda en el dispositivo sin tope de espacio"
 
 RF-81:
-  estado: "Hecho: en la versión 5, sin issue (pedido directo de Carlos)"
+  estado: "Hecho (pedido directo de Carlos)"
   pruebas:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts

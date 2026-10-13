@@ -1,4 +1,4 @@
-// Datos de mentira para la entrada y la parte Negocio de /v2/.
+// Datos de mentira para la entrada y la parte Negocio.
 const ahora = Date.now();
 const hace = (min) => new Date(ahora - min * 60000).toISOString();
 const dia = (d) => new Date(ahora - d * 86400000).toISOString().slice(0, 10);

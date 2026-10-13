@@ -1,6 +1,6 @@
-// Datos de mentira para las pantallas de (C) en la v4: Cómo va el negocio, Usuarios y sesiones,
+// Datos de mentira para las pantallas de Más: Cómo va el negocio, Usuarios y sesiones,
 // Quién hizo qué. Mismas formas que el servidor real (microservices/gestion-del-local/src/rutas).
-import deA from "./rutas-v4-a.mjs";
+import deA from "./rutas-u-mas-a.mjs";
 
 const ahora = Date.now();
 const hace = (min) => new Date(ahora - min * 60000).toISOString();

@@ -1,5 +1,4 @@
-// El producto tal como lo devuelve la API (/productos) y lo guarda el catálogo local.
-// La pantalla de productos vive en Catalogo.tsx.
+// El producto tal como lo devuelve la API (/productos) y lo guarda el catálogo.
 export type Producto = {
   id: string; descripcion: string; marca: string | null; codigo_barras: string | null; unidad: string;
   margen_elegido: number | null;

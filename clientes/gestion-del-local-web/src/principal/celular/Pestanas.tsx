@@ -1,7 +1,7 @@
 import { Icono, type NombreDeIcono } from "../compu/base/ui";
 
 // Las pestañas de adentro de una parte (Catálogo, Depósito), cada una con su ícono para
-// reconocerla sin leer. Usa los estilos de los segmentos de la versión 1.
+// reconocerla sin leer. Usa los estilos de los segmentos.
 export function Pestanas<T extends string>({ opciones, actual, alElegir }: { opciones: { valor: T; nombre: string; icono: NombreDeIcono }[]; actual: T; alElegir: (v: T) => void }) {
   return (
     <div className="segmentos con-icono" role="tablist">

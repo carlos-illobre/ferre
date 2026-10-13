@@ -44,10 +44,6 @@ export default defineConfig(({ command }) => {
           // nueva, en cambio, espera a que la app la aplique (no hay skipWaiting).
           clientsClaim: true,
           navigateFallback: "index.html",
-          // La raíz es la aplicación. Las versiones históricas (historico/) y las páginas que
-          // redirigen desde las direcciones viejas no son parte de la app instalada.
-          navigateFallbackDenylist: [/\/historico\//, /\/v[1-5]\//, /\/v4-maqueta\//],
-          globIgnores: ["historico/**", "v1/**", "v2/**", "v3/**", "v4/**", "v5/**", "v4-maqueta/**", "versiones.html"],
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
           // Nada de la API ni de Google se cachea: siempre red.
           runtimeCaching: [],
@@ -55,8 +51,7 @@ export default defineConfig(({ command }) => {
       }),
     ],
     base: process.env.VITE_BASE ?? "/",
-    // La raíz es la aplicación (src/principal). Las versiones 1, 2 y 4 son históricas
-    // (decisión 46): se publican bajo historico/ solo para ver su maquetado.
-    build: { outDir: "dist", emptyOutDir: true, rollupOptions: { input: { principal: "index.html", v1: "historico/v1/index.html", v2: "historico/v2/index.html", v4: "historico/v4/index.html" } } },
+    // La raíz es la aplicación (src/principal): es la única que hay (decisión 83).
+    build: { outDir: "dist", emptyOutDir: true },
   };
 });

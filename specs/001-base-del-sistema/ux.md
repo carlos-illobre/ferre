@@ -10,11 +10,9 @@ qué le gustó y qué no le gustó al dueño de cada versión que vio.
 
 ## En qué está la interfaz
 
-**Carlos eligió la interfaz el 2026-10-11** (decisión 28): es la que llamó «versión 5» y es
-la que abre la raíz. Junta lo que le gustó de cada intento: en el celular, una cosa por vez
-con tarjetas y hojas; en la computadora, menú a la izquierda, tablas y todo con el teclado;
-y un menú «Más» para lo que se usa poco. Las versiones anteriores siguen publicadas para
-comparar, pero no se mantienen ni se prueban (decisión 43).
+**La interfaz es una sola y es la definitiva** (decisiones 28 y 83). En el celular, una cosa por
+vez con tarjetas y hojas; en la computadora, menú a la izquierda, tablas y teclado; y un menú
+«Más» para lo que se usa poco. Las versiones anteriores y sus mockups se borraron el 2026-10-13.
 
 Lo que quedó decidido de la interfaz elegida está más abajo, en «2026-10-11», y es regla
 para cualquier cambio. Lo que esa lista no dice sigue abierto al diseño.
@@ -378,22 +376,9 @@ computadora. El detalle está en
 [los requerimientos de interfaz de Usuarios y acceso](../007-usuarios-y-acceso/ux.md),
 historias 3 y 3b.
 
-## Qué dijo Carlos de cada versión
+## Lo que funcionó
 
-Para no repetir lo que no funcionó.
-
-| Versión | Qué era | Qué dijo |
-|---|---|---|
-| Primera, del 2026-09-13 y 14 | Una sola interfaz: barra arriba con el menú completo, tablas, el margen y el precio editables en la fila, atajos de teclado. Colores a partir de las maquetas de `mockups/` (imágenes) | Los estilos le gustaron. En la computadora, «perfecta a nivel de usabilidad». En el celular, inusable: había que desplazarse hacia el costado |
-| Rediseño del 2026-09-14 | Una sola interfaz hecha a partir de una maqueta de celular: cuatro pestañas, tarjetas, hojas que suben desde abajo, un solo color de acción | En el celular, «perfecto». En la computadora perdió usabilidad: mucho espacio desaprovechado, y grillas y búsquedas más difíciles de usar |
-| Ensanche del 2026-09-15 | La misma del rediseño, estirada a todo el ancho en la computadora, con columnas y filas de una línea | No conformó |
-| Dos interfaces, del 2026-10-09 | El celular del rediseño y, en la computadora, la primera versión con la paleta y la marca del rediseño | No la validó. El 2026-10-10 decidió rehacer toda la interfaz |
-| Versión 2, del 2026-10-10 | Rediseño nuevo de las dos pantallas: menú lateral, tablas y teclado en la computadora | «Muy complicado» en general; de la computadora le gustó la usabilidad |
-| Versión 3, del 2026-10-10 | Tres maquetas más simples, con otras paletas | Ninguna quedó |
-| Versión 4, del 2026-10-11 | Hecha a partir de un diseño de Figma que le había gustado | Le gustó el menú «Más»; no la eligió |
-| **Versión 5, del 2026-10-11** | El celular de la primera, la computadora de la versión 2 y el menú «Más» de la 4 | **La eligió.** La paleta del celular la pidió con más contraste y quedó; no quiere colores propios por pantalla |
-
-Lo que se repite en lo que funcionó: en la computadora, tablas densas que muestran muchos
+En la computadora, tablas densas que muestran muchos
 productos a la vez, edición en la misma fila y todo con el teclado; en el celular, una cosa
 por vez, entera en el ancho de la pantalla y al alcance del pulgar.
 

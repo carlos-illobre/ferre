@@ -85,3 +85,9 @@ una vez por semana y a pedido; `tests/e2e.sh` explica cómo correrlos en el serv
   esa versión vieja. Se acepta: las versiones viejas están para comparar, no para usarse.
 - Los estilos de cada árbol pisan a los de la versión de origen; al mover las pantallas a la
   carpeta de la versión 5 conviene fundirlos.
+
+## Enmienda del 2026-10-13
+
+Las versiones 1 a 4, sus páginas publicadas y los mockups se borraron del repositorio
+(decisión 83): la interfaz elegida es la única y es la definitiva. Lo que este ADR dice de
+dónde vivía cada versión vale como historia; hoy todo está en `src/principal/` y lo común en `src/`.

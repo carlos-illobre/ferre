@@ -605,3 +605,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - La marca solo recorre el menú, las pestañas y las filas enteras de la lista.
     - Con la lista vacía, la marca no baja: se queda en las pestañas.
     - Funciona igual en todas las pantallas.
+
+83. **La interfaz actual es la definitiva: se borran las versiones viejas y los mockups** (2026-10-13).
+    Carlos: las versiones 1 a 4 ya no sirven y la interfaz actual es lo bastante buena para
+    quedar. Se borran del repositorio su código, las páginas que las publicaban, los mockups
+    y las referencias a ellas en la documentación de trabajo. Reemplaza la decisión 43, que
+    las mantenía publicadas para comparar. Las maquetas aprobadas de cada capacidad
+    (`specs/…/maquetas/`) se conservan: son parte de la especificación, no versiones viejas.
+    Los ADR y las decisiones anteriores no se reescriben: cuentan por qué se llegó acá.

@@ -22,7 +22,7 @@ type Gastos = { desde: string; por_proveedor: { proveedor: string; compras: stri
 
 // Negocio: quién soy, ventas de hoy, gastos de la semana y, para quien administra, usuarios,
 // celulares con huella, sesiones y quién hizo qué.
-// La misma pantalla de la versión 1, partida en las tres opciones de «Más».
+// Una misma pantalla, partida en las tres opciones de «Más».
 export type Parte = "negocio" | "usuarios" | "actividad";
 const TITULOS: Record<Parte, string> = { negocio: NOMBRES.comoVaElNegocio, usuarios: NOMBRES.usuariosYSesiones, actividad: NOMBRES.quienHizoQue };
 
