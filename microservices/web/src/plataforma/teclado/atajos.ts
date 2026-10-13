@@ -22,6 +22,10 @@ export function repartirLetras(nombres: string[]): (string | null)[] {
 const visible = (e: HTMLElement) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(e).visibility !== "hidden"; };
 const nombreDe = (b: HTMLElement) => (b.getAttribute("aria-label") || b.textContent || b.getAttribute("title") || "").trim();
 
+// Dónde están los botones que reciben letra al final (un menú que ya tiene sus propias teclas):
+// lo dice cada aplicación. Si las letras no alcanzan, esos son los que se quedan sin la suya.
+let alFinal: string | null = null;
+
 // Los botones que reciben letra: los de la ventana abierta, si hay una; si no, los de la pantalla.
 function botonesALaVista(): HTMLElement[] {
   const ventanas = [...document.querySelectorAll<HTMLElement>("dialog[open], [role='dialog'], [aria-modal='true']")].filter(visible);
@@ -29,11 +33,12 @@ function botonesALaVista(): HTMLElement[] {
   // Los que ya tienen su tecla (Alt + número, F2, F5 a F8) no llevan letra: así alcanzan para los demás.
   const todos = [...donde.querySelectorAll<HTMLElement>("button:not([disabled]), a[href], [role='button']:not([aria-disabled='true'])")]
     .filter((b) => visible(b) && !b.closest(".atajos-capa") && !b.hasAttribute("aria-keyshortcuts") && nombreDe(b) !== "");
-  // Primero los de la pantalla, después los del menú de la izquierda: si no alcanzan las letras, se queda sin la suya el menú.
-  return [...todos.filter((b) => !b.closest(".lateral")), ...todos.filter((b) => b.closest(".lateral"))];
+  // Primero los de la pantalla; después los que la aplicación deja para el final.
+  return alFinal ? [...todos.filter((b) => !b.closest(alFinal!)), ...todos.filter((b) => b.closest(alFinal!))] : todos;
 }
 
-export function useAtajos(activos: boolean): void {
+export function useAtajos(activos: boolean, opciones?: { alFinal?: string }): void {
+  if (opciones) alFinal = opciones.alFinal ?? null;
   useEffect(() => {
     if (!activos) return;
     let capa: HTMLDivElement | null = null;

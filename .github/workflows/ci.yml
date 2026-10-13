@@ -135,13 +135,10 @@ jobs:
           VITE_VERSION: pruebas ${{ github.sha }}
       - name: Armar el sitio
         run: |
-          # Cada rama puede tener el front en su carpeta nueva (microservices/web) o, hasta que
-          # se promueva el reordenamiento a producción, en la vieja (clientes/gestion-del-local-web).
-          front() { if [ -d "$1/microservices/web/dist" ]; then echo "$1/microservices/web/dist"; else echo "$1/clientes/gestion-del-local-web/dist"; fi; }
           mkdir -p sitio
-          cp -r "$(front produccion)/." sitio/
+          cp -r produccion/microservices/web/dist/. sitio/
           mkdir -p sitio/pruebas
-          cp -r "$(front pruebas)/." sitio/pruebas/
+          cp -r pruebas/microservices/web/dist/. sitio/pruebas/
       - uses: actions/upload-pages-artifact@v3
         with: { path: sitio }
       - id: deploy

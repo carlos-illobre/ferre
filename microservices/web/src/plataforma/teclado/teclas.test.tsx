@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render } from "@testing-library/react";
-import { useTeclasGlobales } from "./teclas";
+import { useTeclasGlobales, zonasConTeclasPropias } from "./teclas";
 
 function Prueba({ manejar, exceptoBusqueda }: { manejar: (e: KeyboardEvent) => void; exceptoBusqueda: boolean }) {
   const [caja, setCaja] = useState<HTMLInputElement | null>(null);
@@ -23,7 +23,8 @@ describe("useTeclasGlobales", () => {
     expect(manejar).toHaveBeenCalledTimes(3);
   });
 
-  it("con el foco en el menú lateral o en las pestañas, las flechas no llegan a la pantalla", () => {
+  it("con el foco en una zona que la aplicación recorre por su cuenta (su menú, sus pestañas), las flechas no llegan a la pantalla", () => {
+    zonasConTeclasPropias(".lateral, .pestanas");
     const manejar = vi.fn();
     const { getByText } = render(<><aside className="lateral"><button>Catálogo</button></aside><nav className="pestanas"><button>Listas</button></nav><Prueba manejar={manejar} exceptoBusqueda={true} /></>);
     fireEvent.keyDown(getByText("Catálogo"), { key: "ArrowDown" });

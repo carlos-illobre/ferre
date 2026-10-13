@@ -8,6 +8,11 @@ import { useEffect } from "react";
 // Todas las pantallas comparten un solo oyente, para que el orden sea siempre el mismo:
 // primero lo propio de la pantalla y, si la pantalla no usó la tecla, lo general de la
 // aplicación (`usarTeclasPorDefecto`: moverse con las flechas por lo que hay en pantalla).
+// Zonas que recorren las flechas por su cuenta (un menú, unas pestañas): con el foco ahí, las
+// teclas no llegan a la pantalla. Las dice cada aplicación.
+let zonasPropias: string | null = null;
+export function zonasConTeclasPropias(selector: string | null): void { zonasPropias = selector; }
+
 type Manejador = { manejar: (e: KeyboardEvent) => void; excepto: HTMLElement | null };
 const deLasPantallas = new Set<Manejador>();
 let porDefecto: ((e: KeyboardEvent) => void) | null = null;
@@ -17,7 +22,7 @@ function alTeclear(e: KeyboardEvent) {
   const objetivo = e.target as HTMLElement | null;
   // Con el foco en el menú o en las pestañas, las flechas son para recorrerlos: no mueven
   // también la lista de la pantalla.
-  if (e.defaultPrevented || objetivo?.closest?.(".lateral, .pestanas")) return;
+  if (e.defaultPrevented || (zonasPropias && objetivo?.closest?.(zonasPropias))) return;
   const enCampo = Boolean(objetivo && (objetivo.tagName === "INPUT" || objetivo.tagName === "SELECT" || objetivo.tagName === "TEXTAREA" || objetivo.isContentEditable));
   for (const m of [...deLasPantallas]) { if (!enCampo || objetivo === m.excepto) m.manejar(e); }
   if (!e.defaultPrevented) porDefecto?.(e);

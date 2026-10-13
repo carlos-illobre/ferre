@@ -3,8 +3,18 @@ import { Pedidos } from "../Pedidos";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { useEspejar, useEspejo } from "../../espejo";
 import { EspejoEstado } from "../EspejoEstado";
-import { irAlPrimerItem, useFlechas } from "../../plataforma/teclado/flechas";
+import { irAlPrimerItem, useFlechas, type DisposicionParaFlechas } from "../../plataforma/teclado/flechas";
 import { useAtajos } from "../../plataforma/teclado/atajos";
+import { zonasConTeclasPropias } from "../../plataforma/teclado/teclas";
+
+zonasConTeclasPropias(".lateral, .pestanas");
+const DISPOSICION: DisposicionParaFlechas = {
+  pantalla: ".cuerpo",
+  noSonListas: ".lateral, .pestanas, .mas-grilla",
+  noSonCajas: ".pestanas, .mas-volver",
+  sinCaja: () => document.getElementById("contenido"),
+  arribaDeLaLista: () => document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']"),
+};
 import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
@@ -82,8 +92,10 @@ function Pantallas() {
   const conSesion = sesion.estado === "con-sesion";
   const { emparejado } = useEspejo();
   // Todo con el teclado: las flechas recorren lo que hay en pantalla (ver flechas.ts).
-  useFlechas(true);
-  useAtajos(true);
+  // La disposición de esta interfaz, para la tecnología de teclado (que no la conoce): el menú
+  // de la izquierda, las pestañas y las opciones de Más se recorren por su cuenta.
+  useFlechas(true, DISPOSICION);
+  useAtajos(true, { alFinal: ".lateral" });
   // Con la sesión abierta, el emparejamiento con el celular se pone al día con el servidor (decisión 58).
   useEffect(() => { if (conSesion) void sincronizarEmparejamiento(); }, [conSesion]);
   // El menú de esta persona: solo las partes y pantallas que sus roles le permiten. Los atajos
