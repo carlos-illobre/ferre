@@ -53,6 +53,16 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await expect(page.getByTestId("mas-tickets")).toBeVisible();
   for (const oculto of [RUTAS.enMas, "mas-roles", "mas-actividad", "mas-anomalias"]) await expect(page.getByTestId(oculto)).toHaveCount(0);
 
+  // Configuración la ve cualquiera, sin permisos (RF-80, E06). Deshabilitar las animaciones vale
+  // en el momento (E02) y queda en el dispositivo aunque se recargue (E03).
+  await page.getByTestId("mas-configuracion").click();
+  await expect(page.getByTestId("cfg-animaciones")).toHaveAttribute("aria-checked", "true");
+  await page.getByTestId("cfg-animaciones").click();
+  await expect(page.locator("html")).toHaveAttribute("data-animaciones", "no");
+  await page.reload();
+  await expect(page.getByTestId("cfg-animaciones")).toHaveAttribute("aria-checked", "false");
+  await expect(page.locator("html")).toHaveAttribute("data-animaciones", "no");
+
   // Por la dirección tampoco: dice qué permiso hace falta.
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.numeros);
   await expect(page.getByTestId("sin-permiso")).toContainText("Ver los números del negocio");

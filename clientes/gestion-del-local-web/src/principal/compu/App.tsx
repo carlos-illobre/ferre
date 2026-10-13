@@ -19,6 +19,7 @@ import { Duplicados } from "./base/pantallas/Duplicados";
 import { Inventario } from "./Inventario";
 import { DineroInvertido } from "../DineroInvertido";
 import { Ingreso } from "./Ingreso";
+import { Configuracion } from "../Configuracion";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { Contar } from "./base/pantallas/Contar";
 import { Resumen } from "./base/pantallas/Resumen";
@@ -65,7 +66,7 @@ const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 const A_PARTE_COMUN: Record<string, string> = {
   productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy", anular: "vender/anular",
   pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
-  mas: "mas", resumen: "mas/negocio", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", tickets: "mas/tickets",
+  mas: "mas", resumen: "mas/negocio", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", tickets: "mas/tickets", configuracion: "mas/configuracion",
 };
 const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
@@ -254,7 +255,7 @@ function Pantallas() {
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? (puede(usuario, "negocio.numeros") ? <><Resumen /><DineroInvertido />{puede(usuario, "deposito.compras") && <ComprasRecientes />}</>
             : <Pagina titulo="Cómo va el negocio"><ComprasRecientes /></Pagina>) : actual === "usuarios" ? <Usuarios />
-          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "anomalias" ? <Anomalias /> : <Vender />}
+          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion /> : actual === "anomalias" ? <Anomalias /> : <Vender />}
       </div>
     </div>
   );

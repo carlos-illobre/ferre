@@ -35,3 +35,7 @@
   --p-naranja-apretado: #ffd9cb;
   --p-amarillo-texto: #6b4a00;
 }
+
+/* Animaciones deshabilitadas en Configuración (RF-80): nada se mueve, en ninguna de las dos interfaces. */
+:root[data-animaciones="no"] *, :root[data-animaciones="no"] *::before, :root[data-animaciones="no"] *::after { animation-duration: 0.001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+:root[data-animaciones="no"]::view-transition-group(*), :root[data-animaciones="no"]::view-transition-old(*), :root[data-animaciones="no"]::view-transition-new(*) { animation: none !important; }

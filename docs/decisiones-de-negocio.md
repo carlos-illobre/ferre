@@ -571,3 +571,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       teléfono tiene pedido «reducir movimiento».
     - Decisión del agente: se hacen con lo que trae el navegador (transiciones de vista), sin
       sumar ninguna librería. En un navegador que no las tenga, la pantalla cambia sin animar.
+
+79. **Más tiene «Configuración», y la primera opción son las animaciones** (2026-10-13).
+    Carlos pidió la pantalla para ir sumándole cosas.
+    - La ve cualquiera con sesión, en el celular y en la computadora.
+    - «Animaciones» se habilita o deshabilita con una llave. Es de cada persona en su
+      dispositivo, arranca habilitada y vale en el momento.
+    - Que la pantalla esté en los dos y que la opción valga también en la computadora lo
+      decidió el agente, a pedido de Carlos, por lo más simple y consistente.

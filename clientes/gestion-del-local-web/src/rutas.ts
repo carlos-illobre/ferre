@@ -50,7 +50,9 @@ export function irA(camino: string): void {
   const destino = `#/${camino}`;
   const doc = document as ConTransicion;
   const sinMovimiento = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!animada || !doc.startViewTransition || sinMovimiento || location.hash === destino) { location.hash = destino; return; }
+  // Deshabilitadas en Configuración (RF-80): la raíz de la página lleva la marca.
+  const deshabilitadas = document.documentElement.dataset.animaciones === "no";
+  if (!animada || deshabilitadas || !doc.startViewTransition || sinMovimiento || location.hash === destino) { location.hash = destino; return; }
   document.documentElement.dataset.nav = movimientoDe(location.hash, destino);
   // La pantalla nueva se dibuja cuando llega el aviso del cambio de dirección: se espera eso y un cuadro más.
   const transicion = doc.startViewTransition(() => new Promise<void>((listo) => {

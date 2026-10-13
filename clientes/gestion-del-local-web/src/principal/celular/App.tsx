@@ -3,6 +3,7 @@ import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
 import { TEXTOS_DEL_VINCULO } from "../EspejoEstado";
+import { Configuracion } from "../Configuracion";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { alAvisoDelEspejo, pausarEspejo, useEspejar, useEspejo } from "../../espejo";
 import { Escaner, hayCamara } from "./componentes/Escaner";
@@ -48,13 +49,14 @@ const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: stri
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ];
-const DE_MAS: { parte: Parte | "tickets" | "anomalias" | "roles"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
+const DE_MAS: { parte: Parte | "tickets" | "anomalias" | "roles" | "configuracion"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
   { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy, los gastos y las compras", icono: "resumen", pide: ["negocio.numeros", "deposito.compras"] },
   { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
   { parte: "roles", nombre: "Roles", detalle: "Qué puede hacer cada rol", icono: "usuarios", pide: ["admin.roles"] },
   { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad", pide: ["negocio.actividad"] },
   { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: ["negocio.anomalias"] },
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
+  { parte: "configuracion", nombre: "Configuración", detalle: "Cómo se comporta la aplicación en este celular", icono: "ajustes" },
 ];
 const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
@@ -177,13 +179,14 @@ function Pantallas() {
       )}
       {falta ? <SinPermiso falta={falta} />
         : pestana === "mas" && parte === "tickets" ? <Tickets />
+        : pestana === "mas" && parte === "configuracion" ? <Configuracion celular />
         : pestana === "mas" && parte === "roles" ? <Roles />
         : pestana === "mas" && parte === "anomalias" ? <Anomalias />
         : pestana === "mas" && parte === "negocio" && !permitido(["negocio.numeros"]) ? (
           // Quien ve las compras pero no los números del negocio: de esta pantalla le toca solo esa parte.
           <main className="contenido"><div className="encabezado"><h1 className="titulo">Cómo va el negocio</h1></div><ComprasRecientes soloVer /></main>
         )
-        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "roles" ? <Negocio parte={parte} />
+        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "roles" && parte !== "configuracion" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>

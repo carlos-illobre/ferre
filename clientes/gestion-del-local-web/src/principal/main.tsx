@@ -4,6 +4,7 @@ import { mantenerActualizada } from "./actualizacion";
 import { VersionNueva } from "./VersionNueva";
 import { esAmbienteDePrueba } from "../ambiente";
 import { MarcoDePrueba } from "./MarcoDePrueba";
+import "../preferencias"; // aplica al abrir lo que la persona eligió en Configuración (RF-80)
 
 // Ferrebress v5 junta lo que mejor funcionó de cada versión: en el celular, las pantallas de
 // la versión 1 (una cosa por vez, tarjetas, hojas); en la computadora, las de la versión 2
