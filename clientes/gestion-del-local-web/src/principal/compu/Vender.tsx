@@ -3,6 +3,7 @@ import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
+import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "../venta-en-espejo";
 import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
@@ -584,7 +585,9 @@ export function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boo
   return (
     <>
       <Boton icono="celular" onClick={() => void generar()} data-testid="emparejar-celular">Vincular el celular</Boton>
-      {abierta && (
+      {/* La ventana se dibuja en el cuerpo de la aplicación y no donde está el botón: dentro del
+          menú lateral heredaba sus estilos (el título y el botón de cerrar salían deformados). */}
+      {abierta && createPortal(
         <Hoja titulo="Vincular el celular con esta computadora" alCerrar={cerrar} testId="hoja-vincular">
           <div className="vender-vincular">
             <div className="vender-qr" data-testid="qr-vincular">
@@ -599,7 +602,8 @@ export function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boo
           <Aviso tipo="error">{error}</Aviso>
           {vencido && <Aviso tipo="alerta" accion={<Boton tam="chico" onClick={() => void generar()}>Generar otro</Boton>}>El código venció a los 5 minutos.</Aviso>}
           {qr && <p className="detalle">El código vence en 5 minutos. No hace falta instalar nada en el celular.</p>}
-        </Hoja>
+        </Hoja>,
+        document.querySelector(".cuerpo") ?? document.body,
       )}
     </>
   );
