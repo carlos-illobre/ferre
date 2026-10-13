@@ -11,7 +11,7 @@ import { destinoDelCodigo, Entrar } from "./Entrar";
 const huella = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../credenciales", () => ({ hayHuella: () => true, entrarConHuella: huella, huellaVinculadaAca: () => true }));
 // La cámara de mentira: un botón que «lee» el código que muestra la computadora.
-vi.mock("./componentes/Escaner", () => ({
+vi.mock("../../plataforma/camara/Escaner", () => ({
   hayCamara: () => true,
   Escaner: ({ alDetectar }: { alDetectar: (c: string) => void }) => <button type="button" data-testid="camara" onClick={() => alDetectar("https://ejemplo.test/#/entrar-compu?codigo=abc")}>leer</button>,
 }));

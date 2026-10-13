@@ -6,7 +6,7 @@ import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
 vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: (c: string) => catalogo.actual.traerPorCodigo(c), traerPorIds: async () => undefined }));
-vi.mock("./componentes/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
+vi.mock("../../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
 vi.mock("./componentes/VincularCelular", () => ({ VincularCelular: () => null }));
 vi.mock("../../puesto", async (original) => ({ ...(await original<typeof import("../../puesto")>()), enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());

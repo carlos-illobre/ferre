@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
 import { traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
-import { Escaner, hayCamara } from "./celular/componentes/Escaner";
+import { Escaner, hayCamara } from "../plataforma/camara/Escaner";
 import { usePuede } from "./permisos";
 import { contarAlEspejo, useEspejar } from "../espejo";
-import { useVolverCierra } from "./celular/componentes/volver";
+import { useVolverCierra } from "../plataforma/navegacion/volver";
 import "./pedidos.css";
 
 // Pedidos a proveedores (RF-55, decisión 52). La misma pantalla en el celular y en la

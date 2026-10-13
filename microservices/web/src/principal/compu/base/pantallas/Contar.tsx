@@ -4,7 +4,7 @@ import { enviarOEncolar } from "../../../../cola";
 import { useCatalogo } from "../../../../catalogo";
 import { fecha } from "../../../../formato";
 import { enteras, unidadDe } from "../../../../unidades";
-import { Escaner, hayCamara } from "../../../celular/componentes/Escaner";
+import { Escaner, hayCamara } from "../../../../plataforma/camara/Escaner";
 import { irA } from "../rutas";
 import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Toast, Vacio, numero } from "../ui";
 import { useEsCelular } from "../vista";

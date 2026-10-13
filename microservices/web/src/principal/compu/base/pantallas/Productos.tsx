@@ -5,8 +5,8 @@ import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../
 import { usePuede } from "../../../permisos";
 import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
 import { useCatalogo } from "../../../../catalogo";
-import { useDebounce } from "../../../../debounce";
-import { useTeclasGlobales } from "../../../../teclas";
+import { useDebounce } from "../../../../plataforma/tiempo/debounce";
+import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { descargar, subirFoto, urlDeFoto } from "../../../../api";
 import { fecha, pesos } from "../../../../formato";
 import type { Producto } from "../../../celular/pantallas/Productos";

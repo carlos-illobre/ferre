@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useVolverCierra } from "./volver";
+import { useVolverCierra } from "../navegacion/volver";
 
 // Escaneo con la cámara del celular (issue #52). Detección nativa del navegador donde
 // existe (Chrome en Android); si no, una librería de decodificación cargada recién ahí.

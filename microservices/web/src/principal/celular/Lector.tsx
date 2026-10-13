@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api";
 import { enviarCodigoAlPuesto, puestoRemoto } from "../../puesto";
 import { irA } from "../../rutas";
-import { Escaner } from "./componentes/Escaner";
+import { Escaner } from "../../plataforma/camara/Escaner";
 import "./entrar.css";
 
 // El celular como lector de códigos de barras de la computadora emparejada (decisión 59). Es

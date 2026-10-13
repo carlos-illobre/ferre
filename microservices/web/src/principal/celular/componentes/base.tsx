@@ -1,4 +1,4 @@
-import { useVolverCierra } from "./volver";
+import { useVolverCierra } from "../../../plataforma/navegacion/volver";
 import { useEffect, useRef, type ReactNode } from "react";
 
 // Piezas del sistema visual (docs/sistema-visual.md, rediseño de mockups/Ferre iOS.html): íconos de

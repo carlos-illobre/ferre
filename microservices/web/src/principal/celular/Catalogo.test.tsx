@@ -11,7 +11,7 @@ const descargar = vi.fn<(...a: any[]) => Promise<void>>(async () => undefined);
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar: (...a: unknown[]) => descargar(...a), api: (...a: unknown[]) => apiFalsa(...a) }));
 
-vi.mock("./componentes/Escaner", () => ({
+vi.mock("../../plataforma/camara/Escaner", () => ({
   hayCamara: () => true,
   Escaner: ({ alDetectar }: { alDetectar: (c: string) => void }) => <div data-testid="escaner">{["7791234567890", "111"].map((c) => <button key={c} type="button" onClick={() => alDetectar(c)}>leer {c}</button>)}</div>,
 }));

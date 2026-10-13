@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { urlDeFoto } from "../../../api";
 import { Icono } from "./base";
-import { useVolverCierra } from "./volver";
+import { useVolverCierra } from "../../../plataforma/navegacion/volver";
 
 // Con la foto abierta en grande, el botón de volver del celular la cierra (como cualquier otra
 // cosa abierta encima de la pantalla) en vez de cambiar de pantalla.

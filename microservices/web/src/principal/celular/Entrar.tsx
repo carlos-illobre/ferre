@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Escaner, hayCamara } from "./componentes/Escaner";
+import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { hayHuella, huellaVinculadaAca } from "../../credenciales";
 import { Logotipo } from "../Logotipo";
 import { BotonGoogle, BotonHuella } from "./pantallas/Login";

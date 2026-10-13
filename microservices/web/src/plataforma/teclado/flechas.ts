@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { usarTeclasPorDefecto } from "../../teclas";
+import { usarTeclasPorDefecto } from "./teclas";
 import "./flechas.css";
 
 // El teclado en la computadora (decisiones 77 y 82). Hay dos focos distintos:

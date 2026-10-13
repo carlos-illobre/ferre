@@ -7,7 +7,7 @@ import { useCatalogo } from "../../catalogo";
 import { Configuracion } from "../Configuracion";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { alAvisoDelEspejo, pausarEspejo, useEspejar, useEspejo } from "../../espejo";
-import { Escaner, hayCamara } from "./componentes/Escaner";
+import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";

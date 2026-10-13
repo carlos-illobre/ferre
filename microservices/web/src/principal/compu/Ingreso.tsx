@@ -10,7 +10,7 @@ import { api } from "../../api";
 import { useCatalogo } from "../../catalogo";
 import { fecha, pesos, porcentaje } from "../../formato";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
-import { Escaner, hayCamara } from "../celular/componentes/Escaner";
+import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { Aviso, Boton, Contador, Exito, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Segmentos, Toast, Vacio, numero as cifra, pesosCortos } from "./base/ui";
 import { useEsCelular } from "./base/vista";
 import { BuscadorDeProducto, detalleDe, mensajeDe, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Producto } from "./celular/pantallas/Productos";
 import { escucharPuesto, puestoLocal } from "../puesto";
-import { Escaner, hayCamara } from "./celular/componentes/Escaner";
+import { Escaner, hayCamara } from "../plataforma/camara/Escaner";
 import "./codigo-de-barras.css";
 
 // El código de barras de un producto, en su ficha (RF-08): se ve el que tiene y se le carga

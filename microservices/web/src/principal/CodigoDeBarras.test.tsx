@@ -4,7 +4,7 @@ import { catalogoFalso, producto } from "../pruebas/catalogo-falso";
 
 // La cámara se simula: el escáner de mentira entrega el código al tocar un botón.
 const camara = vi.hoisted(() => ({ hay: true }));
-vi.mock("./celular/componentes/Escaner", () => ({
+vi.mock("../plataforma/camara/Escaner", () => ({
   hayCamara: () => camara.hay,
   Escaner: ({ alDetectar, alCerrar }: { alDetectar: (c: string) => void; alCerrar: () => void }) => (
     <div data-testid="escaner"><button type="button" onClick={() => alDetectar("7791234567890")}>leer</button><button type="button" onClick={alCerrar}>cerrar</button></div>
