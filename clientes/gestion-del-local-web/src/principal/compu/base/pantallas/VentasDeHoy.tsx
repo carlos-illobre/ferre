@@ -26,12 +26,15 @@ export function useVentasDelDia(dia: string | null, clave?: unknown) {
   return { datos, error, cargar };
 }
 
-export function VentasDeHoy() {
+// Dos procesos, dos pestañas de Vender (decisión 72): «Hoy» muestra lo vendido en el día, sin
+// nada para tocar; «Anular» es para buscar una venta y anularla, de hoy o, con el permiso, de otro día.
+export function VentasDeHoy({ modo }: { modo: "hoy" | "anular" }) {
   const puedeEsto = usePuede();
   const [dia, setDia] = useState(hoyLocal);
+  const otroDia = modo === "anular" && puedeEsto("ventas.anular_cualquiera");
   const esHoy = dia === hoyLocal();
   // Las de hoy, con «Anular ventas del día»; las de otro día, solo con «de cualquier día».
-  const anula = esHoy ? puedeEsto("ventas.anular", "ventas.anular_cualquiera") : puedeEsto("ventas.anular_cualquiera");
+  const anula = modo === "anular" && (esHoy ? puedeEsto("ventas.anular", "ventas.anular_cualquiera") : puedeEsto("ventas.anular_cualquiera"));
   const { datos, error, cargar } = useVentasDelDia(esHoy ? null : dia);
   const [porAnular, setPorAnular] = useState<VentaDia | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -40,11 +43,12 @@ export function VentasDeHoy() {
   const plegar = (id: string) => setPlegadas((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   const confirmadas = datos?.ventas.filter((v) => v.estado === "confirmada") ?? [];
-  const titulo = esHoy ? "Ventas de hoy" : `Ventas del ${fechaLarga(dia)}`;
+  const titulo = modo === "anular" ? (esHoy ? "Anular una venta de hoy" : `Anular una venta del ${fechaLarga(dia)}`) : "Ventas de hoy";
 
   return (
-    <Pagina titulo={titulo} testId="ventas-de-hoy"
-      acciones={
+    <Pagina titulo={titulo} testId={modo === "anular" ? "anular-ventas" : "ventas-de-hoy"}
+      bajada={modo === "anular" ? "La venta anulada queda marcada y sus productos vuelven al stock. No se puede deshacer." : undefined}
+      acciones={otroDia &&
         <div className="fila envuelve">
           <label className="ventas-dia"><span className="solo-lectores">Día que se muestra</span>
             <input type="date" className="entrada" value={dia} max={hoyLocal()} onChange={(e) => e.target.value && setDia(e.target.value)} data-testid="dia" />
@@ -54,7 +58,7 @@ export function VentasDeHoy() {
       }>
       <Aviso tipo="error" accion={<Boton tam="chico" onClick={() => void cargar()}>Reintentar</Boton>}>{error}</Aviso>
 
-      {datos && (
+      {datos && modo === "hoy" && (
         <div className="indicadores">
           <Indicador rotulo={esHoy ? "Vendido hoy" : "Vendido ese día"} valor={pesosCortos(datos.total)} detalle={`${confirmadas.length} ${confirmadas.length === 1 ? "venta" : "ventas"}`} icono="ganancia" color="ambar" testId="total-del-dia" />
           {Object.keys(NOMBRE_MEDIO).map((m) => (

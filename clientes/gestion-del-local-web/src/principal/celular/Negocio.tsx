@@ -11,7 +11,7 @@ import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, v
 import { AvisoError, Hoja, Icono, Toast } from "./componentes/base";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { describirDispositivo } from "./pantallas/Login";
-import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
+import { NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
 import { esAmbienteDePrueba } from "../../ambiente";
 
 type UsuarioFila = { id: string; email: string; nombre: string; activo: boolean; roles: RolAsignable[] };
@@ -29,7 +29,7 @@ export function Negocio({ parte }: { parte: Parte }) {
   const { sesion, salir } = useSesion();
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const puedeEsto = usePuede();
-  const { datos: hoy, anular } = useVentasDeHoy(null);
+  const { datos: hoy } = useVentasDeHoy(null);
   const [gastos, setGastos] = useState<Gastos | null>(null);
   const [servidor, setServidor] = useState<string | null>(null);
   useEffect(() => {
@@ -65,8 +65,7 @@ export function Negocio({ parte }: { parte: Parte }) {
           </div>
         </div>
       )}
-      <div className="seccion">Detalle de hoy</div>
-      {hoy ? <ListaDeVentas ventas={hoy.ventas} alAnular={anular} /> : <div className="aviso-suave">Sin conexión: las ventas de hoy se ven cuando vuelva internet.</div>}
+      {!hoy && <div className="aviso-suave">Sin conexión: las ventas de hoy se ven cuando vuelva internet.</div>}
 
       <DineroInvertido />
 

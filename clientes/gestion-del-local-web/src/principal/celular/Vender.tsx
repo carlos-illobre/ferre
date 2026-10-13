@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { irA } from "../../rutas";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "../venta-en-espejo";
 import { SiVeCostos } from "../Costos";
-import { usePuede } from "../permisos";
+import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
 import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
@@ -22,7 +22,9 @@ import { Escaner, hayCamara } from "./componentes/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../../puesto";
-import { ListaDeVentas, NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
+import { AnularVentas, NOMBRE_MEDIO, pesosCortos, VentasDeHoy } from "./pantallas/VentasDeHoy";
+import { Pestanas } from "./Pestanas";
+import { SinPermiso } from "../SinPermiso";
 import type { Producto } from "./pantallas/Productos";
 
 // La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
@@ -59,7 +61,28 @@ function precioDe(item: Item): { unitario: number | null; pasos: string[]; marge
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
 
-export function Vender({ esDueno }: { esDueno: boolean }) {
+// Vender tiene tres pestañas (decisión 72): vender, ver lo vendido hoy y anular una venta.
+const SUB = [{ valor: "vender", nombre: "Vender", icono: "vender" }, { valor: "hoy", nombre: "Hoy", icono: "ventas" }, { valor: "anular", nombre: "Anular", icono: "deshacer" }] as const;
+type Sub = (typeof SUB)[number]["valor"];
+const PIDE: Record<Sub, Permiso[]> = { vender: ["ventas.registrar"], hoy: ["ventas.ver"], anular: ["ventas.anular", "ventas.anular_cualquiera"] };
+
+export function ParteVender({ sub }: { sub: string | null }) {
+  const puedeEsto = usePuede();
+  const permitidas = SUB.filter((s) => puedeEsto(...PIDE[s.valor]));
+  const actual: Sub = SUB.find((s) => s.valor === sub)?.valor ?? permitidas[0]?.valor ?? "vender";
+  // Con una sola pestaña a la vista no se dibujan.
+  const pestanas = permitidas.length > 1 ? <Pestanas opciones={permitidas.map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.icono }))} actual={actual} alElegir={(v) => irA(v === "vender" ? "vender" : `vender/${v}`)} /> : null;
+  if (!puedeEsto(...PIDE[actual])) return <SinPermiso falta={PIDE[actual]} />;
+  if (actual === "vender") return <Vender pestanas={pestanas} />;
+  return (
+    <main className="contenido">
+      <div className="encabezado"><h1 className="titulo">Vender</h1>{pestanas}</div>
+      {actual === "hoy" ? <VentasDeHoy /> : <AnularVentas cualquierDia={puedeEsto("ventas.anular_cualquiera")} />}
+    </main>
+  );
+}
+
+export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   const puedeEsto = usePuede();
   const fijaMargen = puedeEsto("catalogo.margenes");
   const { catalogo, catalogoCompleto, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
@@ -84,11 +107,10 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
   }, []);
   const [codigoDesconocido, setCodigoDesconocido] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const [hoja, setHoja] = useState<"clientes" | "hoy" | null>(null);
+  const [hoja, setHoja] = useState<"clientes" | null>(null);
   const [exito, setExito] = useState<{ total: number; medio: string; detalle: string } | null>(null);
   const caja = useRef<HTMLInputElement>(null);
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía media pantalla.
-  const { datos: hoy, anular } = useVentasDeHoy(mensaje ?? exito);
 
   // En espejo con la computadora (decisión 60): la venta es una sola, la arme quien la arme.
   useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
@@ -271,9 +293,9 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
         <div className="fila-titulo">
           <span className="solo-celular"><EstadoDeConexion testId="conexion-celular" /></span>
           <span className="solo-escritorio"><small>{pendientes > 0 ? `${pendientes} cambio(s) guardados sin enviar · ` : ""}Enter agrega · Esc descarta · F5 a F8 medio de pago · F2 cobrar</small></span>
-          {esDueno && hoy && <button type="button" className="chip" onClick={() => setHoja("hoy")} data-testid="hoy"><span className="suave">Hoy</span>{pesosCortos(hoy.total)}</button>}
         </div>
         <h1 className="titulo">Vender</h1>
+        {pestanas}
         <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Buscar producto o código" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja}
           alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
         {(!hayCamara() || window.innerWidth > 900) && <div className="solo-escritorio"><VincularCelular vinculado={puestoVinculado} alVincular={alVincular} /></div>}
@@ -376,11 +398,6 @@ export function Vender({ esDueno }: { esDueno: boolean }) {
               </button>
             ))}
           </div>
-        </Hoja>
-      )}
-      {hoja === "hoy" && hoy && (
-        <Hoja titulo="Ventas de hoy" extra={<span className="importe" style={{ fontSize: 26 }}>{pesosCortos(hoy.total)}</span>} alCerrar={() => setHoja(null)} testId="hoja-hoy">
-          <ListaDeVentas ventas={hoy.ventas} alAnular={puedeEsto("ventas.anular", "ventas.anular_cualquiera") ? anular : null} />
         </Hoja>
       )}
       {exito && (

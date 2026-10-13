@@ -106,15 +106,17 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   expect(psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   expect(psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
-  // Negocio muestra las ventas de hoy, con cada producto en su renglón; anular la marca y devuelve el stock.
-  await page.getByRole("button", { name: "Más", exact: true }).click();
-  await page.getByRole("button", { name: /Cómo va el negocio/ }).click();
-  const hoy = page.getByTestId("ventas-de-hoy");
-  const venta = hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
-  await expect(venta).toContainText("3 × MECHA VENDER");
-  await expect(venta).toContainText("1.5 × TORNILLO VENDER");
-  await expect(venta).toContainText("Efectivo");
-  await expect(venta).toContainText("$11.000,00");
+  // La pestaña Hoy de Vender muestra las ventas del día, con cada producto en su renglón y sin anular (decisión 72).
+  await page.getByRole("tab", { name: "Hoy" }).click();
+  const deHoy = page.getByTestId("ventas-de-hoy").getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
+  await expect(deHoy).toContainText("3 × MECHA VENDER");
+  await expect(deHoy).toContainText("1.5 × TORNILLO VENDER");
+  await expect(deHoy).toContainText("Efectivo");
+  await expect(deHoy).toContainText("$11.000,00");
+  await expect(page.getByRole("button", { name: "Anular" })).toHaveCount(0);
+  // La pestaña Anular es para eso: anular la marca y devuelve el stock.
+  await page.getByRole("tab", { name: "Anular" }).click();
+  const venta = page.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
   page.once("dialog", (d) => d.accept("se arrepintió"));
   await venta.getByRole("button", { name: "Anular" }).click();
   await expect(venta).toContainText("anulada");

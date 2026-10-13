@@ -85,7 +85,7 @@ export function Resumen() {
           )}
           <footer className="negocio-bloque-pie">
             <span className="detalle">{hoy.datos ? `${plural(confirmadas, "venta", "ventas")} en el día` : ""}</span>
-            <Boton icono="ventas" onClick={() => irA("ventas")} data-testid="ver-ventas">Ver las ventas de hoy</Boton>
+            <Boton icono="ventas" onClick={() => irA("hoy")} data-testid="ver-ventas">Ver las ventas de hoy</Boton>
           </footer>
         </section>
 

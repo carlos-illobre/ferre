@@ -101,11 +101,15 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   expect(psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   expect(psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
-  // Ventas de hoy la muestra; anular la marca y devuelve el stock.
-  await page.getByTestId("hoy").click();
+  // La pestaña Hoy de Vender la muestra, sin anular (decisión 72).
+  await page.getByTestId("pestana-hoy").click();
   const hoy = page.getByTestId("ventas-de-hoy");
   await expect(hoy).toContainText("Efectivo");
-  const venta = hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
+  await expect(hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" })).toContainText("TORNILLO VENDER");
+  await expect(hoy.getByRole("button", { name: "Anular" })).toHaveCount(0);
+  // La pestaña Anular es para eso: anular la marca y devuelve el stock.
+  await page.getByTestId("pestana-anular").click();
+  const venta = page.getByTestId("anular-ventas").getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
   await expect(venta).toContainText("TORNILLO VENDER");
   await venta.getByRole("button", { name: "Anular" }).click();
   await page.getByTestId("motivo-anular").fill("se arrepintió");
@@ -157,10 +161,11 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas y cobrar una 
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
 
-  // Vender no tiene pestañas: → va derecho a su búsqueda. La venta entera, con el teclado.
+  // Vender también tiene pestañas (decisión 72): → entra a ellas y ↓ baja a la búsqueda. La venta entera, con el teclado.
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByTestId("pestana-productos")).toHaveCount(0);
+  await expect(page.getByTestId("pestana-vender")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("busqueda")).toBeFocused();
   await page.keyboard.type("e2e mecha vender");
   await expect(page.getByTestId("sugerencias")).toContainText("MECHA VENDER");

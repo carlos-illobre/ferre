@@ -19,6 +19,8 @@
   .lateral .espejo-texto { align-items: flex-start; line-height: 1.3; }
   .lateral .espejo-punto { margin-top: 4px; }
   .lateral .espejo-botones { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* Sobre el menú oscuro, el foco se marca en amarillo, como en el resto del menú. */
+  .lateral .espejo button:focus-visible { outline: 3px solid var(--p-amarillo, #f5c542); outline-offset: 2px; }
   .lateral .espejo button { flex: 1 1 auto; min-height: 32px; padding: 0 10px; font-size: 0.8125rem; white-space: nowrap; }
 }
 .espejo-aviso { flex: 1 1 100%; padding: 6px 10px; border-radius: 10px; background: var(--p-amarillo-suave, #fff7d6); color: var(--p-amarillo-texto, #6b4a00); font-weight: 700; }

@@ -53,21 +53,21 @@ type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono; pide?: Perm
 type Parte = { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] };
 const MENU: Parte[] = [
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
-  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }] },
+  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }, { ruta: "hoy", icono: "ventas", nombre: "Hoy", pide: ["ventas.ver"] }, { ruta: "anular", icono: "deshacer", nombre: "Anular", pide: ["ventas.anular", "ventas.anular_cualquiera"] }] },
   { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos"] }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }, { ruta: "pedidos", icono: "listas", nombre: "Pedidos", pide: ["deposito.pedidos", "deposito.ingresos"] }] },
   { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide })) },
 ];
 // Pantallas que no están en el menú pero tienen dirección.
-const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "ventas", nombre: "Ventas de hoy", icono: "ventas", pide: ["ventas.ver"] }];
+const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }];
 const TODAS = [...MENU.flatMap((m) => m.pestanas), ...FUERA_DEL_MENU];
 const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 // Las partes con el nombre que comparten el celular y la computadora en espejo (decisión 60).
 const A_PARTE_COMUN: Record<string, string> = {
-  productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", ventas: "vender",
+  productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy", anular: "vender/anular",
   pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
   mas: "mas", resumen: "mas/negocio", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", tickets: "mas/tickets",
 };
-const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).filter(([ruta]) => ruta !== "ventas").map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos" };
+const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
 const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
@@ -101,7 +101,7 @@ function Pantallas() {
     if (!parte || !conSesion) return;
     const [base = "", consulta] = parte.split("?");
     const destino = base === "deposito" ? (menu.find((m) => m.clave === "deposito")?.pestanas[0]?.ruta ?? "stock") : DE_PARTE_COMUN[base];
-    if (!destino || (destino === "vender" && actual === "ventas")) return;
+    if (!destino) return;
     if (destino !== actual || (consulta ?? "") !== (pedidoDeLaRuta ? `pedido=${pedidoDeLaRuta}` : "")) irA(consulta ? `${destino}?${consulta}` : destino);
   }, parteEnEspejo !== null);
 
@@ -197,8 +197,10 @@ function Pantallas() {
   // pidió la computadora.
   if (ruta.nombre === "foto" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;
 
-  const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === actual))?.clave ?? (actual === "ventas" ? "vender" : "mas");
-  const pestanas = parte === "catalogo" || parte === "deposito" ? (menu.find((m) => m.clave === parte)?.pestanas ?? null) : null;
+  const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === actual))?.clave ?? "mas";
+  // Vender, Catálogo y Depósito tienen pestañas; con una sola a la vista no se dibujan.
+  const deLaParte = parte === "mas" ? null : (menu.find((m) => m.clave === parte)?.pestanas ?? null);
+  const pestanas = deLaParte && deLaParte.length > 1 ? deLaParte : null;
   const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? [])));
   const prueba = esAmbienteDePrueba();
 
@@ -244,12 +246,11 @@ function Pantallas() {
           </nav>
         )}
         {parte === "mas" && actual !== "mas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
-        {actual === "ventas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("vender")}>Volver a Vender</Boton></div>}
         {falta ? <SinPermiso falta={falta} />
           : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />
           : actual === "roles" ? <Roles />
           : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`compras?pedido=${id}`)} /></main>
-          : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
+          : actual === "hoy" ? <VentasDeHoy modo="hoy" /> : actual === "anular" ? <VentasDeHoy modo="anular" /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? (puede(usuario, "negocio.numeros") ? <><Resumen /><DineroInvertido />{puede(usuario, "deposito.compras") && <ComprasRecientes />}</>
             : <Pagina titulo="Cómo va el negocio"><ComprasRecientes /></Pagina>) : actual === "usuarios" ? <Usuarios />

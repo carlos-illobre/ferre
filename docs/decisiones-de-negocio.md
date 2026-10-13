@@ -486,3 +486,16 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       del que ya lo tenía.
     - Se corrigió además que, al vincular, una consulta vieja al servidor podía borrar el
       vínculo recién creado.
+
+72. **Vender tiene tres pestañas: Vender, Hoy y Anular** (2026-10-13).
+    Carlos, siguiendo el criterio de una pantalla por proceso (decisión 67):
+    - **Vender:** armar la venta y cobrar. Ya no muestra las ventas del día.
+    - **Hoy:** lo vendido en el día: total, total por medio de pago y cada venta con sus
+      productos. No se puede tocar nada. La ve quien tiene «Ver las ventas del día».
+    - **Anular:** buscar una venta y anularla. Las de hoy, con «Anular ventas del día»; las
+      de otro día, solo con «Anular ventas de cualquier día», que es quien puede elegir el día.
+    - Todo lo que anulaba ventas desde otra pantalla se va: «Cómo va el negocio» del celular
+      queda con el total del día y sin el detalle de cada venta; el botón «Hoy» de Vender y la
+      pantalla suelta «Ventas de hoy» de la computadora pasan a ser estas pestañas.
+    - Las pestañas tienen el mismo aspecto que las de Catálogo y Depósito. Cada persona ve
+      solo las que puede usar; con una sola, no se dibujan. Vale para celular y computadora.

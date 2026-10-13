@@ -318,6 +318,11 @@ Depósito en Inventario; el orden de Depósito es Inventario, Ingreso, Estanter�
 computadora, todas las pantallas llevan arriba a la derecha «Vincular». Vinculado, arriba queda
 la franja del espejo con «Desvincular».
 
+**Las partes y sus pestañas (decisiones 68 y 72).** Catálogo: Productos, Listas, Duplicados.
+Vender: Vender, Hoy, Anular. Depósito: Inventario, Ingreso, Estanterías, Pedidos. Más no tiene
+pestañas: es una lista de opciones. Las pestañas se ven igual en las tres partes, cada persona
+ve solo las que puede usar y, si le queda una sola, no se dibujan.
+
 **Volver a Más (decisión 64).** En el celular, cada pantalla de Más lleva arriba a la
 izquierda «Volver a Más», que regresa al menú de Más.
 

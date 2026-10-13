@@ -24,7 +24,7 @@ import { ComprasRecientes } from "./ComprasRecientes";
 import { Negocio, type Parte } from "./Negocio";
 import { Tickets } from "../Tickets";
 import { Anomalias } from "../Anomalias";
-import { Vender } from "./Vender";
+import { ParteVender } from "./Vender";
 import "./estilos.css";
 import "./tema.css";
 
@@ -43,7 +43,7 @@ export function App() {
 // Cada parte dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
 const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: string; pide?: Permiso[] }[] = [
   { ruta: "catalogo", nombre: "Catálogo" },
-  { ruta: "vender", nombre: "Vender", pide: ["ventas.registrar"] },
+  { ruta: "vender", nombre: "Vender", pide: ["ventas.registrar", "ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] },
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ];
@@ -200,7 +200,7 @@ function Pantallas() {
         </main>
       ) : pestana === "catalogo" ? <Catalogo sub={sinDireccion ? null : ruta.sub} />
         : pestana === "deposito" ? <Deposito sub={ruta.sub} />
-        : <Vender esDueno={puede(usuario, "ventas.ver")} />}
+        : <ParteVender sub={ruta.sub} />}
 
       <nav className="nav-inferior solo-celular" aria-label="Menú">
         {pestanas.map((p) => (

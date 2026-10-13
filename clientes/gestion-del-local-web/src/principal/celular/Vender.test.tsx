@@ -14,21 +14,21 @@ const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolad
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: vi.fn(async () => 0), pendientes: vi.fn(async () => []), alCambiarLaCola: () => () => undefined }));
 
-import { Vender } from "./Vender";
+import { ParteVender } from "./Vender";
 
 const ventasVacias = { ventas: [], totales: {}, total: 0 };
-function armar(ventas: unknown = ventasVacias, esDueno = false) {
+function armar(ventas: unknown = ventasVacias, sub: string | null = null) {
   const falso = catalogoFalso([
     producto({ id: "mecha", descripcion: "MECHA VENDER 8 MM", costo_neto: "1000", margen_elegido: 100 }),
     producto({ id: "tornillo", descripcion: "TORNILLO VENDER", costo_neto: "10" }),
   ]);
   catalogo.actual = falso;
   apiFalsa.mockImplementation(async (ruta: string) => (ruta.startsWith("/ventas") ? ventas : []));
-  render(<Vender esDueno={esDueno} />);
-  const busqueda = screen.getByTestId("busqueda");
+  const { unmount } = render(<ParteVender sub={sub} />);
+  const busqueda = screen.queryByTestId("busqueda")!;
   const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
   const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.includes(texto))!;
-  return { falso, busqueda, agregar, item };
+  return { falso, busqueda, agregar, item, unmount };
 }
 
 // Todo lo que pidió el dueño para Vender, sobre el rediseño: renglones como tarjetas,
@@ -161,21 +161,42 @@ describe("Vender", () => {
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
   });
 
-  it("el dueño ve el total de hoy en un chip que abre la hoja con las ventas y permite anular", async () => {
+  it("Vender tiene tres pestañas, cada una con su dirección; Vender ya no muestra las ventas del día", async () => {
+    armar();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Hoy", "Anular"]);
+    expect(screen.queryByTestId("hoy")).toBeNull();
+    fireEvent.click(screen.getByRole("tab", { name: "Hoy" }));
+    expect(location.hash).toBe("#/vender/hoy");
+    fireEvent.click(screen.getByRole("tab", { name: "Anular" }));
+    expect(location.hash).toBe("#/vender/anular");
+  });
+
+  it("Hoy muestra el total y cada venta del día, sin nada para anular", async () => {
     armar({ total: 10500, totales: { efectivo: 10500 }, ventas: [
       { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [
         { descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }, { descripcion: "TORNILLO VENDER", cantidad: "1.5", precio_unitario: "1000" }] },
       { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "anulada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "1", precio_unitario: "3000" }] },
-    ] }, true);
-    const chip = await screen.findByTestId("hoy");
-    expect(chip.textContent).toContain("$10.500");
-    fireEvent.click(chip);
-    const ventas = within(screen.getByTestId("hoja-hoy")).getAllByTestId("venta-dia");
+    ] }, "hoy");
+    expect((await screen.findByTestId("total-de-hoy")).textContent).toBe("$10.500");
+    const ventas = screen.getAllByTestId("venta-dia");
     expect(ventas).toHaveLength(2);
     expect(ventas[0]!.textContent).toContain("3 × MECHA VENDER 8 MM");
     expect(ventas[0]!.textContent).toContain("1.5 × TORNILLO VENDER");
     expect(ventas[0]!.textContent).toContain("Efectivo");
     expect(ventas[1]!.textContent).toContain("anulada");
+    expect(screen.queryByRole("button", { name: "Anular" })).toBeNull();
+  });
+
+  it("Anular lista las ventas y anula la elegida; el día se elige solo con el permiso de cualquier día", async () => {
+    conPermisos("ventas.registrar", "ventas.ver", "ventas.anular");
+    armar({ total: 10500, totales: { efectivo: 10500 }, ventas: [
+      { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [
+        { descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }, { descripcion: "TORNILLO VENDER", cantidad: "1.5", precio_unitario: "1000" }] },
+      { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "anulada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "1", precio_unitario: "3000" }] },
+    ] }, "anular");
+    const ventas = await screen.findAllByTestId("venta-dia");
+    expect(screen.queryByTestId("dia")).toBeNull();
+    expect(screen.queryByTestId("resumen-hoy")).toBeNull();
     expect(within(ventas[1]!).queryByRole("button", { name: "Anular" })).toBeNull();
     window.prompt = () => "se arrepintió";
     fireEvent.click(within(ventas[0]!).getByRole("button", { name: "Anular" }));
@@ -209,12 +230,14 @@ describe("Vender", () => {
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
   });
 
-  it("sin el permiso de anular, las ventas de hoy se ven sin el botón Anular", async () => {
+  it("sin el permiso de anular no hay pestaña Anular; con solo vender, no hay pestañas", async () => {
     conPermisos("ventas.registrar", "ventas.ver");
-    armar({ total: 10500, totales: { efectivo: 10500 }, ventas: [{ id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }] }] }, true);
-    fireEvent.click(await screen.findByTestId("hoy"));
-    expect(screen.getByTestId("ventas-de-hoy").textContent).toContain("MECHA");
-    expect(screen.queryByRole("button", { name: "Anular" })).toBeNull();
+    const uno = armar();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Hoy"]);
+    uno.unmount();
+    conPermisos("ventas.registrar");
+    armar();
+    expect(screen.queryAllByRole("tab")).toHaveLength(0);
   });
 
   it("sin el permiso de ver costos, el renglón no muestra el costo ni explica el precio", () => {

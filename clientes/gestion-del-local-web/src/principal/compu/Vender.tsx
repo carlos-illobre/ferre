@@ -74,7 +74,6 @@ export function Vender() {
   const [exito, setExito] = useState<{ total: number; medio: string; detalle: string; encolado: boolean } | null>(null);
   const caja = useRef<HTMLInputElement>(null);
   const sugeridos = useSugeridos(catalogo, exito);
-  const { datos: hoy } = useVentasDelDia(null, exito);
 
   // En espejo con la computadora (decisión 60): la venta es una sola, la arme quien la arme.
   useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
@@ -283,7 +282,6 @@ export function Vender() {
           {/* Sin celular emparejado, «Vincular el celular» está en el menú lateral, siempre a la vista. */}
           {!esCelular && puestoVinculado && <VincularParaEscanear vinculado={puestoVinculado} alVincular={alVincular} />}
           {puestoRemoto() && <span data-testid="celular-vinculado-remoto"><Pastilla tipo="ok">Vinculado a la computadora</Pastilla></span>}
-          {hoy && puedeEsto("ventas.ver") && <Boton icono="ventas" onClick={() => irA("ventas")} data-testid="hoy">Hoy <span className="importe chico">{pesosCortos(hoy.total)}</span></Boton>}
         </div>
       }>
       <div className="vender-busqueda">

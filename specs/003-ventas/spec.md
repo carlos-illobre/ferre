@@ -181,6 +181,14 @@ libre, se tipea el precio y se cobra; después se lo encuentra en la lista de í
 
 ### User Story 7 - Ver las ventas del día y las de días anteriores (Priority: P2)
 
+**Dónde se hace (decisión 72):** la parte Vender tiene tres pestañas, una por proceso.
+«Vender» arma la venta y cobra, y no muestra las ventas del día. «Hoy» muestra lo vendido en el
+día (total, total por medio de pago y cada venta con sus productos) sin dejar tocar nada; pide
+el permiso «Ver las ventas del día». «Anular» lista las ventas para anular una (historia 8):
+las de hoy con «Anular ventas del día» y las de otro día solo con «Anular ventas de cualquier
+día», que es quien puede elegir el día. Ninguna otra pantalla anula ventas. Cada persona ve
+solo las pestañas que puede usar.
+
 El Administrador abre las ventas del día y ve cada una con sus productos, uno por renglón,
 como en el cuaderno, con el total del día y el total por medio de pago. Eligiendo una fecha ve
 las de un día anterior (RF-23, CU-02).

@@ -28,12 +28,13 @@ describe("Negocio", () => {
     });
   });
 
-  it("muestra quién soy, las ventas de hoy con su detalle y los gastos de la semana", async () => {
+  it("muestra quién soy, el total vendido hoy y los gastos de la semana", async () => {
     render(<Negocio parte="negocio" />);
     expect(await screen.findByTestId("usuario-negocio")).toHaveProperty("textContent", "Ana");
     await waitFor(() => expect(screen.getByTestId("resumen-hoy").textContent).toContain("$10.500"));
     expect(screen.getByTestId("resumen-hoy").textContent).toContain("1 ventas");
-    expect(screen.getByTestId("ventas-de-hoy").textContent).toContain("3 × MECHA");
+    // El detalle de cada venta y anular están en Vender, en sus pestañas (decisión 72).
+    expect(screen.queryByTestId("ventas-de-hoy")).toBeNull();
     expect(screen.getByTestId("gastos-semana").textContent).toContain("$40.000");
     expect(screen.getByText("Proveedor uno").parentElement!.textContent).toContain("2 compras");
     // El dinero invertido en inventario se ve acá y no en Inventario (decisión 31).
