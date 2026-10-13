@@ -119,6 +119,10 @@ revisar el resumen y la vista previa; aplicar o descartar; ver el resultado.
 bien visibles; los proveedores con la fecha de su última lista aplicada y un aviso en los que
 tienen la lista vieja; las últimas cargas con su situación.
 
+**El orden de la pantalla Listas** (pedido de Carlos del 2026-10-13), en el celular y en la
+computadora: primero «Cargar una lista», que es para lo que se entra; después las últimas tres
+cargas; y al final los proveedores, con «Agregar proveedor».
+
 **Necesita ver al revisar:** proveedor y fecha de la lista; los avisos; el resumen en números
 (leídos, nuevos, cambian de precio con su variación promedio, sin cambio, ya no aparecen,
 filas salteadas); las filas salteadas con su motivo; la vista previa con los que cambian

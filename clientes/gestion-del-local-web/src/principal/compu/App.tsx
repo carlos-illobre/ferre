@@ -158,6 +158,11 @@ function Pantallas() {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       botones[(i + (e.key === "ArrowDown" ? 1 : botones.length - 1)) % botones.length]!.focus();
+    } else if (e.key === "Enter" && botones[i]!.closest("nav")) {
+      // Enter abre la parte y deja la marca de las flechas en su primera pestaña (en Más, en su primera opción).
+      e.preventDefault();
+      botones[i]!.click();
+      setTimeout(() => (pestanaActual() ?? document.querySelector<HTMLButtonElement>(".cuerpo .mas-grilla button"))?.focus(), 150);
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
       // Solo las partes se abren con →; desde Desvincular o Salir, → vuelve a la pantalla sin tocarlos.
@@ -242,7 +247,9 @@ function Pantallas() {
         {pestanas && (
           <nav className="pestanas" aria-label={NOMBRES.get(actual)} onKeyDown={teclasDeLasPestanas}>
             {pestanas.map((p) => (
-              <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(p.ruta)}`} onClick={() => irA(p.ruta)} data-testid={`pestana-${p.ruta}`}>
+              <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(p.ruta)}`} data-testid={`pestana-${p.ruta}`}
+                // Al abrirla (con un clic o con Enter), la marca de las flechas queda en esta pestaña: la pantalla nueva no se la lleva.
+                onClick={() => { irA(p.ruta); setTimeout(() => document.querySelector<HTMLButtonElement>(`[data-testid="pestana-${p.ruta}"]`)?.focus(), 150); }}>
                 <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}<span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>
               </button>
             ))}

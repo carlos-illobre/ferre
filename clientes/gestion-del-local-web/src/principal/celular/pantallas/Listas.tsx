@@ -54,6 +54,23 @@ export function Listas() {
         </button>
       ))}
       <ZonaDeCarga proveedores={proveedores} alCargar={setCargada} />
+      {/* El orden lo pidió Carlos: primero cargar, después las últimas tres cargas y al final los proveedores. */}
+      {historial.length > 0 && (
+        <>
+          <div className="seccion">Últimas cargas</div>
+          <div className="lista" data-testid="historial">
+            {historial.slice(0, 3).map((l) => (
+              <div key={l.id} className="fila">
+                <span className="nombre">{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
+                <small className="derecha">{l.estado === "aplicando" ? "aplicándose…" : l.estado}</small>
+                <span className="detalle">{new Date(l.creado_en).toLocaleString("es-AR")} · {l.archivo_nombre} · {l.estado === "aplicada" ? `${l.resumen.nuevos} nuevos, ${l.resumen.modificados} cambiados` : `${l.resumen.leidas} leídos`}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      </div>
+      <div className="columna">
       <div className="seccion"><span>Proveedores</span>{esDueno && <button type="button" className="enlace" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">+ Agregar</button>}</div>
       {proveedores.length === 0 ? <div className="aviso-suave">Todavía no hay proveedores cargados.</div> : (
         <div className="lista" data-testid="estado-proveedores">
@@ -70,22 +87,6 @@ export function Listas() {
             );
           })}
         </div>
-      )}
-      </div>
-      <div className="columna">
-      {historial.length > 0 && (
-        <>
-          <div className="seccion">Últimas cargas</div>
-          <div className="lista" data-testid="historial">
-            {historial.slice(0, 20).map((l) => (
-              <div key={l.id} className="fila">
-                <span className="nombre">{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
-                <small className="derecha">{l.estado === "aplicando" ? "aplicándose…" : l.estado}</small>
-                <span className="detalle">{new Date(l.creado_en).toLocaleString("es-AR")} · {l.archivo_nombre} · {l.estado === "aplicada" ? `${l.resumen.nuevos} nuevos, ${l.resumen.modificados} cambiados` : `${l.resumen.leidas} leídos`}</span>
-              </div>
-            ))}
-          </div>
-        </>
       )}
       </div>
       </div>

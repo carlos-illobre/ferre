@@ -298,7 +298,9 @@ Vale igual en todas las pantallas:
 | Tecla | Qué hace |
 |---|---|
 | ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Desconectar o Reconectar) y Salir. No abren nada: se abre con Enter |
+| Enter en el menú | Abre esa parte y deja la marca en su primera pestaña (en Más, en su primera opción) |
 | → en el menú | Pasa la marca a las pestañas de esa parte; en Más, a su primera opción |
+| Clic en una pestaña | La abre y deja la marca de las flechas en esa pestaña |
 | ← → en las pestañas | Pasan la marca de una pestaña a otra sin abrirla; Enter abre la marcada; ← desde la primera vuelve al menú |
 | ← → ↑ ↓ en Más | Las opciones de Más se recorren como pestañas: → y ↓ a la siguiente, ← y ↑ a la anterior, Enter abre, ← desde la primera vuelve al menú |
 | ↓ desde las pestañas | Marca la primera fila de la lista de la pantalla, y el cursor de escritura queda en la búsqueda. **Si la lista está vacía, la marca se queda en las pestañas** |
@@ -310,7 +312,10 @@ Vale igual en todas las pantallas:
 | Esc | Cierra lo que esté abierto |
 | Alt + número | Abre cada pantalla |
 
-Los títulos de una tabla (los de ordenar) no son filas: se alcanzan con Tab. Una búsqueda que
+Solo se marcan las filas que hacen algo al apretar Enter (abren una ficha, tienen un botón). Una
+lista que solo muestra datos no se recorre: ahí la marca se queda en las pestañas. Los títulos
+de una tabla (los de ordenar) no son filas: se alcanzan con Tab. El foco se ve siempre: borde
+amarillo en el menú, en las pestañas, en las opciones de Más y en la fila marcada. Una búsqueda que
 despliega sus propios resultados (la de Vender) los recorre con ↑ ↓ y Enter toma el marcado.
 Con una ventana abierta, las flechas valen dentro de ella.
 

@@ -83,7 +83,12 @@ export function Productos() {
   const teclas = useCallback((e: globalThis.KeyboardEvent) => {
     if (abiertoId || document.querySelector("dialog[open]")) return;
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
+    else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      // Arriba de la primera fila están las pestañas: la marca de las flechas vuelve a ellas (decisión 82).
+      if (elegido === 0) document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']")?.focus();
+      else setElegido((i) => Math.max(i - 1, 0));
+    }
     else if (e.key === "Enter" && resultados[elegido] && (e.target as HTMLElement).tagName !== "BUTTON") { e.preventDefault(); setAbiertoId(resultados[elegido]!.id); }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
     else if (fijaMargen && e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
@@ -128,7 +133,7 @@ export function Productos() {
       )}
 
       {resultados.length > 0 && (esCelular ? (
-        <ul className="lista" data-testid="resultados">
+        <ul className="lista" data-flechas-propias data-testid="resultados">
           {resultados.map((p, i) => {
             const { costo, precio } = calcular(p);
             return (
@@ -145,7 +150,7 @@ export function Productos() {
         </ul>
       ) : (
         <div className="tabla-marco">
-          <table className="tabla productos-tabla" data-testid="resultados">
+          <table className="tabla productos-tabla" data-flechas-propias data-testid="resultados">
             <thead><tr><th className="angosta"><span className="solo-lectores">Foto</span></th><th>Producto</th><th>Proveedor</th><th className="num">Stock</th><SiVeCostos><th className="num">Costo</th></SiVeCostos><th>Margen</th><th className="num">Precio de venta</th></tr></thead>
             <tbody>
               {resultados.map((p, i) => <FilaProducto key={p.id} producto={p} stock={stock.get(p.id)} elegido={i === elegido} alElegir={() => setElegido(i)} alCambiar={(c) => actualizar(p.id, c)} alError={setError} />)}

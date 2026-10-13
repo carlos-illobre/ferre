@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { act, render } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { FotoProducto } from "./Foto";
 import { useVolverCierra } from "./volver";
 
 function Encima({ alCerrar }: { alCerrar: () => void }) { useVolverCierra(alCerrar); return <p>cámara</p>; }
@@ -58,5 +59,17 @@ describe("volver cierra lo que está encima", () => {
     expect(history.length).toBe(antes);
     expect(atras).not.toHaveBeenCalled();
     atras.mockRestore();
+  });
+
+  it("la foto de un producto abierta en grande se cierra con «volver», y la pantalla de atrás sigue ahí", async () => {
+    render(<><p data-testid="pantalla">Depósito</p><FotoProducto id="p1" url={null} descripcion="MECHA 8 MM" /></>);
+    fireEvent.click(screen.getByTestId("foto-chica"));
+    await unInstante();
+    expect(screen.getByTestId("foto-grande")).toBeTruthy();
+    expect((history.state as { encima?: boolean }).encima).toBe(true);
+    volver();
+    await unInstante();
+    expect(screen.queryByTestId("foto-grande")).toBeNull();
+    expect(screen.getByTestId("pantalla")).toBeTruthy();
   });
 });

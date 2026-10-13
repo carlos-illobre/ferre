@@ -46,6 +46,8 @@
 .mas-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--e4); }
 .mas-tarjeta { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 2px var(--e4); align-items: center; width: 100%; min-height: 96px; padding: var(--e4); text-align: left; border-color: var(--borde-fuerte); }
 .mas-tarjeta:hover { background: var(--superficie-2); border-color: var(--marino); }
+/* La opción que tiene la marca de las flechas se ve con el mismo borde amarillo que el resto. */
+.mas-tarjeta:focus, .mas-tarjeta:focus-visible { outline: 3px solid var(--p-amarillo, #f5c542); outline-offset: 2px; border-color: var(--marino); }
 .mas-icono { grid-row: 1 / span 2; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 12px; background: var(--ambar-suave); color: var(--ambar-texto); }
 .mas-tarjeta .nombre { font-weight: 700; font-size: var(--t-medio); }
 .mas-tarjeta .tecla { position: absolute; top: var(--e3); right: var(--e3); }

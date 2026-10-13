@@ -123,6 +123,48 @@ export function Listas() {
         </section>
       )}
 
+      {/* El orden lo pidió Carlos: primero cargar, después las últimas tres cargas y al final los proveedores. */}
+      <section className="listas-seccion" aria-labelledby="listas-cargar">
+        <h2 id="listas-cargar" className="seccion-titulo">Cargar una lista</h2>
+        <ZonaDeCarga proveedores={activos} enLinea={enLinea} alCargar={(c) => { setResultado(null); setCargada(c); }} />
+      </section>
+
+      <section className="listas-seccion" aria-labelledby="listas-historial">
+        <h2 id="listas-historial" className="seccion-titulo">Últimas cargas</h2>
+        {historial.length === 0 ? (
+          proveedores !== null && <p className="listas-nada">Todavía no se cargó ninguna lista. Cuando cargues la primera, acá queda anotado qué cambió.</p>
+        ) : esCelular ? (
+          <ul className="lista" data-testid="historial">
+            {historial.slice(0, 3).map((l) => (
+              <li key={l.id} className="renglon">
+                <span className="nombre">{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
+                <EstadoDeCarga estado={l.estado} />
+                <span className="detalle">{cuando(l.creado_en)} · {queCambio(l)}</span>
+                <span className="detalle listas-archivo">{l.archivo_nombre}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="tabla-marco">
+            <table className="tabla" data-testid="historial">
+              <thead><tr><th scope="col">Cuándo</th><th scope="col">Proveedor</th><th scope="col">Lista del</th><th scope="col">Archivo</th><th scope="col">Resultado</th><th scope="col">Estado</th></tr></thead>
+              <tbody>
+                {historial.slice(0, 3).map((l) => (
+                  <tr key={l.id}>
+                    <td className="angosta">{cuando(l.creado_en)}</td>
+                    <td className="nombre">{l.proveedor}</td>
+                    <td>{fecha(l.fecha_lista)}</td>
+                    <td className="detalle listas-archivo">{l.archivo_nombre}</td>
+                    <td>{queCambio(l)}</td>
+                    <td className="angosta"><EstadoDeCarga estado={l.estado} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       <section className="listas-seccion" aria-labelledby="listas-proveedores">
         <div className="listas-seccion-cabeza">
           <h2 id="listas-proveedores" className="seccion-titulo">Proveedores</h2>
@@ -169,47 +211,6 @@ export function Listas() {
                     </tr>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="listas-seccion" aria-labelledby="listas-cargar">
-        <h2 id="listas-cargar" className="seccion-titulo">Cargar una lista</h2>
-        <ZonaDeCarga proveedores={activos} enLinea={enLinea} alCargar={(c) => { setResultado(null); setCargada(c); }} />
-      </section>
-
-      <section className="listas-seccion" aria-labelledby="listas-historial">
-        <h2 id="listas-historial" className="seccion-titulo">Últimas cargas</h2>
-        {historial.length === 0 ? (
-          proveedores !== null && <p className="listas-nada">Todavía no se cargó ninguna lista. Cuando cargues la primera, acá queda anotado qué cambió.</p>
-        ) : esCelular ? (
-          <ul className="lista" data-testid="historial">
-            {historial.slice(0, 20).map((l) => (
-              <li key={l.id} className="renglon">
-                <span className="nombre">{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
-                <EstadoDeCarga estado={l.estado} />
-                <span className="detalle">{cuando(l.creado_en)} · {queCambio(l)}</span>
-                <span className="detalle listas-archivo">{l.archivo_nombre}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="tabla-marco">
-            <table className="tabla" data-testid="historial">
-              <thead><tr><th scope="col">Cuándo</th><th scope="col">Proveedor</th><th scope="col">Lista del</th><th scope="col">Archivo</th><th scope="col">Resultado</th><th scope="col">Estado</th></tr></thead>
-              <tbody>
-                {historial.slice(0, 20).map((l) => (
-                  <tr key={l.id}>
-                    <td className="angosta">{cuando(l.creado_en)}</td>
-                    <td className="nombre">{l.proveedor}</td>
-                    <td>{fecha(l.fecha_lista)}</td>
-                    <td className="detalle listas-archivo">{l.archivo_nombre}</td>
-                    <td>{queCambio(l)}</td>
-                    <td className="angosta"><EstadoDeCarga estado={l.estado} /></td>
-                  </tr>
-                ))}
               </tbody>
             </table>
           </div>

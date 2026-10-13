@@ -42,6 +42,9 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.goto("/");
   await page.getByTestId("menu-catalogo").click();
   await page.getByRole("button", { name: /^Listas/ }).click();
+  // El orden de la pantalla: primero cargar, después las últimas cargas (hasta tres) y al final los proveedores.
+  await expect.poll(() => page.locator("h2.seccion-titulo").allInnerTexts().then((t) => t.filter((x) => ["Cargar una lista", "Últimas cargas", "Proveedores"].includes(x)))).toEqual(["Cargar una lista", "Últimas cargas", "Proveedores"]);
+  expect(await page.locator('[aria-labelledby="listas-historial"] tbody tr').count()).toBeLessThanOrEqual(3);
 
   // Alta del proveedor con su configuración de costo (descuento por contado 5 %).
   await page.getByTestId("agregar-proveedor").click();

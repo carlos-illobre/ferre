@@ -176,6 +176,10 @@ roles a cada persona; desactivar y reactivar.
   activos sin leer la letra chica.
 - Cuál de los usuarios es él mismo.
 - Para autorizar, en este orden: nombre, correo de Google y los roles, una casilla por rol.
+  En la computadora el formulario usa todo el ancho (pedido de Carlos del 2026-10-13): nombre,
+  correo y el botón «Autorizar» en una misma línea, y debajo los roles repartidos en columnas,
+  uno al lado del otro, cada uno con su explicación. No queda una columna angosta de roles con
+  la mitad de la pantalla vacía.
   Se pueden tildar varias. Ningún otro dato.
 
 **Reglas:**

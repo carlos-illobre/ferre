@@ -84,7 +84,12 @@
 }
 @media (min-width: 900px) {
   .usuarios-rol { width: auto; max-width: 240px; }
-  .usuarios-formulario { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 220px) auto; align-items: start; }
+  /* «Autorizar a alguien» usa todo el ancho: nombre, correo y el botón en una línea; debajo, los
+     roles repartidos en columnas, uno al lado del otro. */
+  .usuarios-formulario { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto; align-items: start; }
+  .usuarios-formulario > .usuarios-autorizar { grid-row: 2; grid-column: 3; }
+  .usuarios-formulario > .usuarios-roles-del-alta { grid-column: 1 / -1; }
+  .usuarios-roles-del-alta .ru-casillas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--e1) var(--e4); }
   .usuarios-formulario-titulo { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--e1) var(--e3); }
   /* El botón se alinea con las cajas, que tienen su rótulo arriba. */
   .usuarios-autorizar { margin-top: calc(var(--t-chico) * 1.4 + var(--e1)); }

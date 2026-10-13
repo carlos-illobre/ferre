@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { urlDeFoto } from "../../../api";
 import { Icono } from "./base";
+import { useVolverCierra } from "./volver";
+
+// Con la foto abierta en grande, el botón de volver del celular la cierra (como cualquier otra
+// cosa abierta encima de la pantalla) en vez de cambiar de pantalla.
+function CierraAlVolver({ alCerrar }: { alCerrar: () => void }) { useVolverCierra(alCerrar); return null; }
 
 // Foto chica del producto; al tocarla se amplía con la descripción, con la animación de
 // View Transitions donde el navegador la tiene (Chrome), y sin animación donde no. En la
@@ -38,6 +43,7 @@ export function FotoProducto({ id, url: urlCruda, descripcion, alSubir }: { id: 
       <button type="button" className="foto-chica miniatura" onClick={(e) => { e.stopPropagation(); cambiar(true); }} title={url ? "Ver la foto grande" : "Sin foto todavía"} data-testid="foto-chica">
         {url ? <img src={url} alt="" style={abierta ? undefined : { viewTransitionName: nombre }} /> : null}
       </button>
+      {abierta && <CierraAlVolver alCerrar={() => cambiar(false)} />}
       {abierta && (
         <div className="foto-grande-fondo" onClick={() => cambiar(false)} role="dialog" aria-label={descripcion} data-testid="foto-grande">
           <figure className="foto-grande" onClick={(e) => e.stopPropagation()}>

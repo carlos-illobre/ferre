@@ -142,6 +142,45 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   const fila = () => page.evaluate(() => [...document.querySelectorAll("[data-testid=producto]")].findIndex((f) => f.getAttribute("aria-selected") === "true"));
   const elegida = await fila();
 
+  // En Catálogo, ↑ desde la primera fila devuelve la marca de las flechas a la pestaña.
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("pestana-productos")).toBeFocused();
+  // Una lista que solo muestra datos no se recorre: en Listas, ↓ deja la marca en la pestaña.
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("pestana-listas")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("pestana-listas")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.locator("[data-flecha]")).toHaveCount(0);
+  await expect(page.getByTestId("pestana-listas")).toBeFocused();
+  // Un clic en una pestaña la abre y deja la marca en ella, aunque la pantalla nueva tenga una búsqueda.
+  await page.getByTestId("pestana-productos").click();
+  await expect(page.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("pestana-productos")).toBeFocused();
+  // Enter en el menú abre la parte y deja la marca en su primera pestaña.
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("menu-deposito")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("pestana-stock")).toBeFocused();
+  // En Más, Enter deja la marca en la primera opción, y se ve su borde.
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("menu-mas")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("mas-resumen")).toBeFocused();
+  expect(await page.getByTestId("mas-resumen").evaluate((b) => getComputedStyle(b).outlineStyle)).toBe("solid");
+  // Y de vuelta a Catálogo, para seguir desde donde estaba.
+  await page.keyboard.press("ArrowLeft");
+  for (const _ of [1, 2, 3]) await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("pestana-productos")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+
   // ← lleva al menú; ahí ↑ ↓ lo recorren sin mover la lista de productos, hasta Vincular y Salir.
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
@@ -174,7 +213,6 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   for (const _ of [1, 2, 3]) await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("menu-mas")).toBeFocused();
   await page.keyboard.press("Enter");
-  await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("mas-resumen")).toBeFocused();
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("mas-usuarios")).toBeFocused();

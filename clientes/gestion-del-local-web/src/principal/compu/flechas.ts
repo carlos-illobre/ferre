@@ -18,7 +18,8 @@ import "./flechas.css";
 // pantalla marca con `data-sin-flechas`. Los títulos de una tabla no son filas.
 const ENFOCABLES = "a[href], button:not([disabled]), input:not([disabled]):not([type='hidden']):not([type='file']), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 const LISTAS = "ul, ol, table, [role='list'], .lista";
-const NO_SON = ".lateral, .pestanas, .mas-grilla, [role='listbox'], [data-sin-flechas], thead";
+const NO_SON = ".lateral, .pestanas, .mas-grilla, [role='listbox'], [data-sin-flechas], [data-flechas-propias], thead";
+const ACCIONABLE = "button:not([disabled]), a[href], [role='button'], [data-principal], .elegible";
 const visible = (e: HTMLElement) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== "hidden";
 
 // Dónde valen las flechas: la ventana abierta, si hay una; si no, la pantalla.
@@ -36,7 +37,8 @@ function filasDeLaPantalla(): HTMLElement[] {
     const filas = lista.tagName === "TABLE"
       ? [...lista.querySelectorAll<HTMLElement>("tbody > tr")].filter((f) => f.closest("table") === lista && !f.classList.contains("hija"))
       : ([...lista.children] as HTMLElement[]);
-    const visibles = filas.filter(visible);
+    // Solo cuentan las filas que hacen algo con Enter: una lista que nada más muestra datos no se recorre.
+    const visibles = filas.filter((f) => visible(f) && (f.matches(ACCIONABLE) || f.querySelector(ACCIONABLE) !== null));
     if (visibles.length) return visibles;
   }
   return [];
@@ -60,12 +62,14 @@ export const quitarLaMarca = (): void => marcar(null);
 // cursor de escritura en la caja de texto de la pantalla. Sin filas no hace nada: devuelve falso
 // y la marca se queda donde estaba.
 export function irAlPrimerItem(): boolean {
-  const filas = filasDeLaPantalla();
-  if (filas.length === 0) return false;
   const donde = alcance();
+  // Una pantalla que ya lleva su propia marca por la lista (Catálogo, desde la búsqueda): alcanza con dejar el cursor en su búsqueda.
+  const propia = donde?.querySelector<HTMLElement>("[data-flechas-propias]");
+  const filas = filasDeLaPantalla();
+  if (filas.length === 0 && !(propia && propia.children.length > 0)) return false;
   const caja = donde ? [...donde.querySelectorAll<HTMLElement>("input[type='search'], input[type='text'], input:not([type])")].find((c) => visible(c) && !(c as HTMLInputElement).disabled && !c.closest(".pestanas, .mas-volver")) : undefined;
   (caja ?? document.getElementById("contenido"))?.focus();
-  marcar(filas[0]!);
+  if (filas.length) marcar(filas[0]!);
   return true;
 }
 
@@ -73,7 +77,7 @@ export function irAlPrimerItem(): boolean {
 // se puede accionar; si no, lo primero accionable que tenga.
 function abrir(fila: HTMLElement): void {
   const destino = [...fila.querySelectorAll<HTMLElement>("[data-principal]")].find(visible)
-    ?? (fila.matches("button, a[href], [role='button']") ? fila : [...fila.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]")].find(visible) ?? fila);
+    ?? (fila.matches("button, a[href], [role='button'], [data-principal], .elegible") ? fila : [...fila.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]")].find(visible) ?? fila);
   destino.click();
 }
 
