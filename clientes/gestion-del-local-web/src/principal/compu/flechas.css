@@ -1,0 +1,4 @@
+/* La marca de las flechas sobre una fila entera de la lista (decisión 82): toda la fila resaltada,
+   distinta del cursor de escritura, que sigue en la caja de texto. */
+[data-flecha] { outline: 3px solid var(--p-amarillo, #f5c542); outline-offset: -3px; background: var(--p-amarillo-suave, #fff7d6) !important; }
+tr[data-flecha] > td { background: var(--p-amarillo-suave, #fff7d6); }

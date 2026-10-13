@@ -97,7 +97,7 @@ export function Inventario() {
 
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
     // ↓ no recorre nada desde acá: saltea la búsqueda y va al primer producto de la lista (decisión 77).
-    if (e.key === "Enter" && filas[marcada]) { e.preventDefault(); setAbierto({ id: filas[marcada]!.id, corregir: false }); }
+    if (e.key === "Enter" && filas[marcada] && !document.querySelector("[data-flecha]")) { e.preventDefault(); setAbierto({ id: filas[marcada]!.id, corregir: false }); }
     else if (e.key === "Escape" && consulta) { e.preventDefault(); setConsulta(""); }
   }
   useEffect(() => { document.querySelector(".stock-tabla tr[aria-selected='true']")?.scrollIntoView({ block: "nearest" }); }, [marcada]);

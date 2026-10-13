@@ -186,14 +186,27 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await expect(page.getByTestId("mas")).toBeVisible();
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-mas")).toBeFocused();
-  // Depósito abre en Inventario: desde la pestaña, ↓ saltea la caja de búsqueda y va al primer producto de la lista.
+  // Dos focos (decisión 82): en Inventario, ↓ desde la pestaña marca la primera fila entera y el
+  // cursor de escritura queda en la búsqueda; ↑ ↓ mueven la marca; ↑ desde la primera vuelve a la pestaña.
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("pestana-stock")).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await expect(page.locator('[data-testid="fila-stock"] [data-principal]').first()).toBeFocused();
+  const filasDeStock = page.getByTestId("fila-stock");
+  await expect(filasDeStock.nth(0)).toHaveAttribute("data-flecha", "");
+  await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
+  // La marca es una sola y es la fila entera. Si hay más filas, ↓ pasa a la siguiente y ↑ vuelve.
+  await expect(page.locator("[data-flecha]")).toHaveCount(1);
+  if ((await filasDeStock.count()) > 1) {
+    await page.keyboard.press("ArrowDown");
+    await expect(filasDeStock.nth(1)).toHaveAttribute("data-flecha", "");
+    await expect(page.locator("[data-flecha]")).toHaveCount(1);
+    await page.keyboard.press("ArrowUp");
+    await expect(filasDeStock.nth(0)).toHaveAttribute("data-flecha", "");
+  }
   await page.keyboard.press("ArrowUp");
+  await expect(page.locator("[data-flecha]")).toHaveCount(0);
   await expect(page.getByTestId("pestana-stock")).toBeFocused();
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
@@ -207,6 +220,10 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("pestana-vender")).toBeFocused();
+  // Con la venta vacía no hay filas: ↓ no pierde la marca, que se queda en la pestaña.
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("pestana-vender")).toBeFocused();
+  await expect(page.locator("[data-flecha]")).toHaveCount(0);
   const enfocado = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
   for (let i = 0; i < 12 && (await enfocado()) !== "busqueda"; i++) await page.keyboard.press("Tab");
   await expect(page.getByTestId("busqueda")).toBeFocused();
@@ -215,9 +232,10 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("Enter");
   const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
   await expect(mecha).toBeVisible();
-  // Desde la búsqueda, ↓ saltea los campos y va a los ítems de la lista (decisión 77).
+  // Desde la búsqueda, ↓ marca la fila del producto, entera, y el cursor sigue en la búsqueda (decisión 82).
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByTestId("busqueda")).not.toBeFocused();
+  await expect(page.locator('[data-testid="venta"] [data-flecha]')).toHaveCount(1);
+  await expect(page.getByTestId("busqueda")).toBeFocused();
   // A la cantidad se llega con Tab; ahí ↑ suma, como en cualquier campo de cantidad. F2 cobra.
   const conElFoco = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
   for (let i = 0; i < 40 && (await conElFoco()) !== "cantidad"; i++) await page.keyboard.press("Tab");

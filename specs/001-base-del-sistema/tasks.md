@@ -15,3 +15,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T004 [regla] En la computadora, todos los botones tienen atajo: con Alt apretado cada uno muestra una letra, y esa letra lo acciona
 - [x] T005 [ajuste] En la computadora, la flecha para abajo saltea la caja de búsqueda y va directo a los ítems de la lista
 - [x] T006 [ajuste] En la computadora, en Más las flechas recorren las opciones como si fueran pestañas
+- [x] T007 [regla] En la computadora, las flechas tienen su propia marca (menú, pestañas y filas enteras) y el cursor de escritura queda en la caja de texto; con la lista vacía la marca se queda en las pestañas; igual en todas las pantallas

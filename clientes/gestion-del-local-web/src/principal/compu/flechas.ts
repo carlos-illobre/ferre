@@ -1,44 +1,80 @@
 import { useEffect } from "react";
 import { usarTeclasPorDefecto } from "../../teclas";
+import "./flechas.css";
 
-// El teclado en la computadora (decisión 77, pedido de Carlos del 2026-10-13). Las flechas
-// recorren el menú y las pestañas (eso lo resuelve la aplicación) y, acá, los ítems de una lista:
-//   ↓ ↑   van al ítem siguiente o al anterior: un renglón de una tabla, una tarjeta de una lista.
-//         ↑ desde el primero vuelve a las pestañas de la parte.
-// Nada más: a un campo o a un botón se va con Tab, y dentro de un campo las flechas hacen lo de
-// siempre. Enter acciona lo que tiene el foco (en una casilla, hace lo mismo que Espacio).
+// El teclado en la computadora (decisiones 77 y 82). Hay dos focos distintos:
+//   - el cursor de escritura, que queda en la caja de texto de la pantalla y no se mueve con
+//     las flechas (a los campos y botones se va con Tab);
+//   - la marca de las flechas, que solo puede estar en el menú, en las pestañas (eso lo
+//     resuelve la aplicación, con el foco de verdad) o en una fila entera de la lista de la
+//     pantalla. De la marca de las filas se ocupa este archivo:
+//       ↓      desde las pestañas o desde la búsqueda marca la primera fila; si la lista está
+//              vacía, la marca no baja.
+//       ↓ ↑    con una fila marcada, marcan la siguiente o la anterior, entera; ↑ desde la
+//              primera vuelve a las pestañas.
+//       Enter  abre la fila marcada: su acción principal.
+// Vale igual en todas las pantallas. No cuentan como lista: el menú, las pestañas, las opciones
+// de Más, los resultados que despliega una búsqueda (los recorre esa búsqueda) ni lo que una
+// pantalla marca con `data-sin-flechas`. Los títulos de una tabla no son filas.
 const ENFOCABLES = "a[href], button:not([disabled]), input:not([disabled]):not([type='hidden']):not([type='file']), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
-const LISTAS = "ul, ol, table, [role='listbox'], [role='list'], .lista";
-const ITEMS = "li, tr, tbody, [role='option'], [role='listitem'], [role='row']";
+const LISTAS = "ul, ol, table, [role='list'], .lista";
+const NO_SON = ".lateral, .pestanas, .mas-grilla, [role='listbox'], [data-sin-flechas], thead";
 const visible = (e: HTMLElement) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== "hidden";
 
-// Los ítems de la lista en la que está el foco: de cada uno, lo primero que se puede enfocar.
-function itemsDeLaLista(foco: HTMLElement): HTMLElement[] {
-  const lista = foco.closest<HTMLElement>(LISTAS);
-  if (!lista || lista.closest(".lateral, .pestanas")) return [];
-  // El encabezado de una tabla (sus títulos para ordenar) no es un ítem: se alcanza con Tab.
-  const propios = [...lista.querySelectorAll<HTMLElement>(ITEMS)].filter((i) => i.closest(LISTAS) === lista && !i.closest("thead") && !(i.tagName === "TBODY" && i.querySelector("tr")) && visible(i));
-  // En una lista sin ítems marcados (botones sueltos, uno debajo del otro), cada hijo es un ítem.
-  const filas = propios.length ? propios : ([...lista.children] as HTMLElement[]).filter(visible);
-  const vistos = new Set<HTMLElement>();
-  // De cada ítem, su acción principal si la marca; si no, lo primero que se puede enfocar.
-  return filas.map((f) => (f.matches(ENFOCABLES) ? f : [...f.querySelectorAll<HTMLElement>("[data-principal]")].find(visible) ?? [...f.querySelectorAll<HTMLElement>(ENFOCABLES)].find(visible)))
-    .filter((c): c is HTMLElement => Boolean(c) && !vistos.has(c!) && Boolean(vistos.add(c!)));
+// Dónde valen las flechas: la ventana abierta, si hay una; si no, la pantalla.
+function alcance(): HTMLElement | null {
+  const ventanas = [...document.querySelectorAll<HTMLElement>("dialog[open], [role='dialog'], [aria-modal='true']")].filter(visible);
+  return ventanas.at(-1) ?? document.querySelector<HTMLElement>(".cuerpo");
 }
 
-// El primer ítem de la primera lista de la pantalla (o de la ventana abierta). Así ↓ saltea los
-// campos: desde las pestañas o desde una caja de búsqueda se va directo a los ítems.
-export function irAlPrimerItem(): boolean {
-  const ventanas = [...document.querySelectorAll<HTMLElement>("dialog[open], [role='dialog'], [aria-modal='true']")].filter(visible);
-  const donde = ventanas.at(-1) ?? document.querySelector<HTMLElement>(".cuerpo");
-  if (!donde) return false;
+// Las filas de la lista de la pantalla: las de la primera lista que tenga alguna.
+function filasDeLaPantalla(): HTMLElement[] {
+  const donde = alcance();
+  if (!donde) return [];
   for (const lista of donde.querySelectorAll<HTMLElement>(LISTAS)) {
-    if (!visible(lista) || lista.closest(".lateral, .pestanas")) continue;
-    const dentro = [...lista.querySelectorAll<HTMLElement>(ENFOCABLES)].find((c) => visible(c) && !c.closest("thead"));
-    const primero = dentro ? itemsDeLaLista(dentro)[0] : undefined;
-    if (primero) { primero.focus(); primero.scrollIntoView?.({ block: "nearest" }); return true; }
+    if (!visible(lista) || lista.closest(NO_SON)) continue;
+    const filas = lista.tagName === "TABLE"
+      ? [...lista.querySelectorAll<HTMLElement>("tbody > tr")].filter((f) => f.closest("table") === lista && !f.classList.contains("hija"))
+      : ([...lista.children] as HTMLElement[]);
+    const visibles = filas.filter(visible);
+    if (visibles.length) return visibles;
   }
-  return false;
+  return [];
+}
+
+let marcada: HTMLElement | null = null;
+function marcar(fila: HTMLElement | null): void {
+  if (marcada === fila) return;
+  marcada?.removeAttribute("data-flecha");
+  marcada = fila;
+  if (fila) { fila.setAttribute("data-flecha", ""); fila.scrollIntoView?.({ block: "nearest" }); }
+}
+// La fila que tiene la marca, si sigue en pantalla.
+function filaMarcada(): HTMLElement | null {
+  if (marcada && (!marcada.isConnected || !visible(marcada))) marcar(null);
+  return marcada;
+}
+export const quitarLaMarca = (): void => marcar(null);
+
+// Desde las pestañas (o al entrar a una pantalla con el teclado): marca la primera fila y deja el
+// cursor de escritura en la caja de texto de la pantalla. Sin filas no hace nada: devuelve falso
+// y la marca se queda donde estaba.
+export function irAlPrimerItem(): boolean {
+  const filas = filasDeLaPantalla();
+  if (filas.length === 0) return false;
+  const donde = alcance();
+  const caja = donde ? [...donde.querySelectorAll<HTMLElement>("input[type='search'], input[type='text'], input:not([type])")].find((c) => visible(c) && !(c as HTMLInputElement).disabled && !c.closest(".pestanas, .mas-volver")) : undefined;
+  (caja ?? document.getElementById("contenido"))?.focus();
+  marcar(filas[0]!);
+  return true;
+}
+
+// La acción principal de una fila: la que marca con `data-principal`; si no, la fila misma si
+// se puede accionar; si no, lo primero accionable que tenga.
+function abrir(fila: HTMLElement): void {
+  const destino = [...fila.querySelectorAll<HTMLElement>("[data-principal]")].find(visible)
+    ?? (fila.matches("button, a[href], [role='button']") ? fila : [...fila.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]")].find(visible) ?? fila);
+  destino.click();
 }
 
 function manejar(e: KeyboardEvent): void {
@@ -47,21 +83,33 @@ function manejar(e: KeyboardEvent): void {
   if (!foco) return;
   const tipo = foco instanceof HTMLInputElement ? foco.type : "";
   if (e.key === "Enter" && tipo === "checkbox") { e.preventDefault(); (foco as HTMLInputElement).click(); return; }
-  if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-  // Desde una caja de texto de una sola línea, ↓ saltea los campos y va al primer ítem de la lista.
-  if (e.key === "ArrowDown" && foco.tagName === "INPUT" && ["text", "search", ""].includes(tipo)) { if (irAlPrimerItem()) e.preventDefault(); return; }
-  // Dentro de un campo, las flechas son del campo.
-  if (foco.isContentEditable || ["SELECT", "TEXTAREA"].includes(foco.tagName) || (foco.tagName === "INPUT" && !["checkbox", "button", "submit"].includes(tipo))) return;
-  const items = itemsDeLaLista(foco);
-  const fila = foco.closest<HTMLElement>(ITEMS);
-  const i = items.findIndex((c) => c === foco || (fila !== null && fila.contains(c)));
-  if (i < 0) return;
-  const destino = items[i + (e.key === "ArrowDown" ? 1 : -1)];
-  if (destino) { e.preventDefault(); destino.focus(); destino.scrollIntoView?.({ block: "nearest" }); return; }
-  // Arriba del primero están las pestañas de la parte, si tiene.
-  if (e.key === "ArrowUp" && !foco.closest("dialog[open], [role='dialog'], [aria-modal='true']")) {
-    const pestana = document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']");
-    if (pestana) { e.preventDefault(); pestana.focus(); }
+  if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") return;
+  // En un campo donde las flechas cambian el valor (una cantidad, un selector, una fecha, un
+  // área de texto), son del campo. En una caja de texto de una línea no tienen otro uso: mueven la marca.
+  const deUnaLinea = foco.tagName === "INPUT" && ["text", "search", ""].includes(tipo);
+  if (!deUnaLinea && (foco.isContentEditable || ["SELECT", "TEXTAREA", "INPUT"].includes(foco.tagName))) return;
+  const actual = filaMarcada();
+  if (e.key === "Enter") {
+    // Enter sobre un botón enfocado es de ese botón; con una fila marcada y el cursor en la búsqueda (o en ningún lado), abre la fila.
+    if (!actual || (!deUnaLinea && foco.matches("button, a[href], [role='button']"))) return;
+    e.preventDefault();
+    abrir(actual);
+    return;
+  }
+  const filas = filasDeLaPantalla();
+  if (filas.length === 0) return;
+  const i = actual ? filas.indexOf(actual) : -1;
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    marcar(filas[Math.min(i + 1, filas.length - 1)]!);
+  } else if (i > 0) {
+    e.preventDefault();
+    marcar(filas[i - 1]!);
+  } else if (i === 0) {
+    // Arriba de la primera fila están las pestañas de la parte, si tiene.
+    e.preventDefault();
+    marcar(null);
+    if (!foco.closest("dialog[open], [role='dialog'], [aria-modal='true']")) document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']")?.focus();
   }
 }
 
@@ -69,6 +117,10 @@ export function useFlechas(activas: boolean): void {
   useEffect(() => {
     if (!activas) return;
     usarTeclasPorDefecto(manejar);
-    return () => usarTeclasPorDefecto(null);
+    // Al cambiar de pantalla o al usar el mouse, la marca de las flechas se va.
+    const quitar = () => marcar(null);
+    window.addEventListener("hashchange", quitar);
+    window.addEventListener("mousedown", quitar);
+    return () => { usarTeclasPorDefecto(null); window.removeEventListener("hashchange", quitar); window.removeEventListener("mousedown", quitar); quitar(); };
   }, [activas]);
 }

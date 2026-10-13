@@ -144,15 +144,10 @@ function Pantallas() {
     return () => window.removeEventListener("keydown", tecla);
   }, [conSesion]);
   // Poner el foco en la pantalla: primero la búsqueda (u otro campo); si no tiene, su primer botón.
-  function focoALaPantalla() {
-    // Con las flechas no se va a los campos: si la pantalla tiene una lista, directo a su primer ítem.
-    if (irAlPrimerItem()) return;
-    const cuerpo = document.querySelector<HTMLElement>(".cuerpo");
-    if (!cuerpo) return;
-    const deLaPantalla = (selector: string) => [...cuerpo.querySelectorAll<HTMLElement>(selector)].find((x) => !x.closest(".pestanas, .mas-volver"));
-    const primero = deLaPantalla("input:not([type='hidden']):not([type='file']):not([disabled]), select:not([disabled])") ?? deLaPantalla("button:not([disabled])");
-    (primero ?? document.getElementById("contenido"))?.focus();
-  }
+  // Entrar a la pantalla con el teclado: la marca de las flechas va a la primera fila de su
+  // lista y el cursor de escritura queda en su caja de texto. Con la lista vacía no hace nada,
+  // y la marca se queda en las pestañas o en el menú (decisión 82).
+  const focoALaPantalla = () => irAlPrimerItem();
   const pestanaActual = () => document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button");
   // En el menú lateral: ↑ ↓ recorren todo lo que tiene (las partes y, debajo, los botones del
   // espejo y Salir). → abre la parte y pasa a sus pestañas, si tiene; si no, a la pantalla.
@@ -170,7 +165,7 @@ function Pantallas() {
       const cambia = esParte && botones[i]!.getAttribute("aria-current") !== "page";
       if (cambia) botones[i]!.click();
       // Al cambiar de parte hay que esperar a que la pantalla nueva esté dibujada.
-      setTimeout(() => { const pestana = esParte ? pestanaActual() : null; if (pestana) pestana.focus(); else focoALaPantalla(); }, cambia ? 150 : 0);
+      setTimeout(() => { const pestana = esParte ? pestanaActual() : null; if (pestana) pestana.focus(); else (document.querySelector<HTMLButtonElement>(".cuerpo .mas-grilla button") ?? null)?.focus(); }, cambia ? 150 : 0);
     }
   }
   // En las pestañas de una parte (Productos, Listas, Duplicados): ← → pasan el foco de una a

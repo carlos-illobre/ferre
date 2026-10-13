@@ -322,7 +322,7 @@ export function Vender() {
         </Aviso>
       )}
       {consulta.trim() && resultados.length === 0 && catalogo && (
-        <div className="lista">
+        <div className="lista" data-sin-flechas>
           <button type="button" className="renglon" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
             <span className="nombre">Agregar «{consulta.trim()}» como ítem libre</span><Icono nombre="mas" />
             <span className="detalle">No está en ninguna lista. Le ponés el precio a mano.{!esCelular && " Enter lo agrega."}</span>
@@ -342,7 +342,7 @@ export function Vender() {
           {[["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", items.length ? [] : sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
             <section key={clave} aria-label={titulo} data-testid={`sugeridos-${clave}`}>
               <h2 className="seccion-titulo">{titulo}</h2>
-              <ul className="sugeridos-grilla">
+              <ul className="sugeridos-grilla" data-sin-flechas>
                 {lista.map((p) => {
                   const precio = precioSugerido(p);
                   return (

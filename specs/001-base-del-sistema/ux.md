@@ -285,29 +285,34 @@ abrirse, al volver a primer plano y cada media hora. Recién abierta, se actuali
 preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
 tapa lo que se está haciendo, y nunca se recarga sola.
 
-**El teclado en la computadora (decisión 77, que reemplaza a la 61; RNF-05).** Las flechas
-sirven para tres cosas y nada más: recorrer el menú de la izquierda, las pestañas de la pantalla
-y los ítems de una lista. A un campo de texto o a un botón no se llega con las flechas: se va
-con Tab (y Mayús + Tab para volver), como en cualquier programa. Los botones tienen además su
-atajo. Las teclas significan lo mismo en todas las pantallas:
+**El teclado en la computadora (decisiones 77 y 82; RNF-05).** Hay dos focos distintos:
+
+- **El cursor de escritura** está en la caja de texto de la pantalla (la búsqueda) y no se mueve
+  con las flechas: de un campo a otro, y a los botones, se va con Tab (y Mayús + Tab).
+- **La marca de las flechas** es propia de las flechas. Solo puede estar en tres lugares: una
+  opción del menú de la izquierda, una pestaña, o una fila entera de la lista de la pantalla.
+  La fila marcada se ve entera resaltada, no una parte de ella.
+
+Vale igual en todas las pantallas:
 
 | Tecla | Qué hace |
 |---|---|
-| ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Desconectar o Reconectar) y Salir. El foco se marca con el mismo borde amarillo en todos |
-| → en el menú | Entra a las pestañas de esa parte, o a la pantalla si no tiene |
-| ← → en las pestañas | Pasan el foco de una pestaña a otra sin abrirla, igual que ↑ ↓ en el menú; Enter abre la que tiene el foco; ← desde la primera vuelve al menú |
-| ← → ↑ ↓ en Más | Las opciones de Más se recorren como pestañas: → y ↓ pasan a la siguiente, ← y ↑ a la anterior, Enter abre la que tiene el foco y ← desde la primera vuelve al menú. Desde el menú, → entra a la primera opción |
-| ↓ desde las pestañas o desde una caja de búsqueda | Va directo al primer ítem de la lista de la pantalla, salteando los campos. Si la búsqueda tiene sus propios resultados desplegados, ↓ los recorre a ellos |
-| ↑ ↓ en una lista | Van al ítem anterior o al siguiente (un renglón de una tabla, una tarjeta de una lista); ↑ desde el primero vuelve a las pestañas. En cada ítem el foco queda en su acción principal, y Enter la abre |
-| ← en una lista | Vuelve al menú |
-| Enter | Acciona el botón o el ítem que tiene el foco |
+| ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Desconectar o Reconectar) y Salir. No abren nada: se abre con Enter |
+| → en el menú | Pasa la marca a las pestañas de esa parte; en Más, a su primera opción |
+| ← → en las pestañas | Pasan la marca de una pestaña a otra sin abrirla; Enter abre la marcada; ← desde la primera vuelve al menú |
+| ← → ↑ ↓ en Más | Las opciones de Más se recorren como pestañas: → y ↓ a la siguiente, ← y ↑ a la anterior, Enter abre, ← desde la primera vuelve al menú |
+| ↓ desde las pestañas | Marca la primera fila de la lista de la pantalla, y el cursor de escritura queda en la búsqueda. **Si la lista está vacía, la marca se queda en las pestañas** |
+| ↑ ↓ con una fila marcada | Marcan la fila anterior o la siguiente, entera; el cursor de escritura no se mueve. ↑ desde la primera vuelve a las pestañas |
+| ↓ desde la búsqueda | Marca la primera fila de la lista, si hay; el cursor sigue en la búsqueda |
+| Enter con una fila marcada | Abre esa fila (su acción principal) |
+| ← con una fila marcada | Vuelve al menú, si la búsqueda está vacía o el cursor está al principio |
 | Tab, Mayús + Tab | Van al campo o botón siguiente o anterior |
 | Esc | Cierra lo que esté abierto |
 | Alt + número | Abre cada pantalla |
 
-Dentro de un campo, las flechas hacen lo que hacen siempre: mueven el cursor en un texto, cambian
-el valor en una cantidad, un selector o una fecha. En una búsqueda con resultados a la vista,
-↑ ↓ eligen un resultado y Enter lo toma.
+Los títulos de una tabla (los de ordenar) no son filas: se alcanzan con Tab. Una búsqueda que
+despliega sus propios resultados (la de Vender) los recorre con ↑ ↓ y Enter toma el marcado.
+Con una ventana abierta, las flechas valen dentro de ella.
 
 **Atajos de los botones (decisión 80).** En la computadora todos los botones tienen atajo:
 

@@ -597,3 +597,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       acepta por ser un caso extremo; la aplicación avisa cuántas y pregunta antes.
     - Con el guardado deshabilitado, la persona elige cómo buscar productos: bajando el
       catálogo a la memoria al abrir, o consultando al servidor en cada búsqueda.
+
+82. **En la computadora hay dos focos: el de escribir y el de las flechas** (2026-10-13).
+    Carlos lo fijó al ver que en Depósito la flecha marcaba solo la cantidad y que en Vender,
+    sin productos, la marca se perdía. Completa la decisión 77.
+    - El cursor de escritura queda en la caja de texto. Las flechas tienen su propia marca.
+    - La marca solo recorre el menú, las pestañas y las filas enteras de la lista.
+    - Con la lista vacía, la marca no baja: se queda en las pestañas.
+    - Funciona igual en todas las pantallas.
