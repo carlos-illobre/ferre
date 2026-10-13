@@ -15,3 +15,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T004 [ajuste] El botón Desconectar/Reconectar lleva borde, para que resalte, y el ícono va a la izquierda con la leyenda a la derecha
 - [x] T005 [ajuste] En la computadora, el botón Desconectar/Reconectar lleva su ícono, como en el celular
 - [x] T006 [ajuste] En la computadora, «Autorizar a alguien» aprovecha el ancho: nombre, correo y el botón en una línea, y los roles debajo, repartidos en columnas
+- [x] T007 [arreglo] Vinculados, ir a Depósito y enseguida a Más desde el celular hace que el celular vuelva solo a Depósito un segundo después

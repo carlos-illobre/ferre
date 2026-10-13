@@ -97,7 +97,10 @@ function Pantallas() {
   const pedidoDeLaRuta = ruta.parametros.get("pedido");
   const soloElPedido = [...ruta.parametros.keys()].every((k) => k === "pedido");
   const parteEnEspejo = sesion.estado === "con-sesion" && soloElPedido && ["catalogo", "vender", "deposito", "mas"].includes(nombreDeParte)
-    ? `${nombreDeParte}${ruta.nombre === "negocio" ? "/negocio" : ruta.sub ? `/${ruta.sub}` : ""}${pedidoDeLaRuta ? `?pedido=${pedidoDeLaRuta}` : ""}` : null;
+    // Depósito sin pestaña elegida es Inventario, y se lo nombra así: es como lo nombra la
+    // computadora. Si cada uno nombrara distinto la misma pantalla, la computadora le devolvería
+    // al celular su propio nombre y lo traería de vuelta a Depósito aunque ya se hubiera ido a otra parte.
+    ? `${nombreDeParte}${ruta.nombre === "negocio" ? "/negocio" : ruta.sub ? `/${ruta.sub}` : nombreDeParte === "deposito" ? "/stock" : ""}${pedidoDeLaRuta ? `?pedido=${pedidoDeLaRuta}` : ""}` : null;
   useEspejar<string | null>("ir", parteEnEspejo, (parte) => { if (parte && sesion.estado === "con-sesion") irA(parte); }, parteEnEspejo !== null);
   // Vincular con la computadora sin salir de la aplicación: la cámara se abre acá adentro y lee
   // el código que la computadora muestra en «Vincular el celular» (o en su entrada).

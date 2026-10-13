@@ -98,6 +98,22 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
   await compu.getByTestId("pestana-pedidos").click();
   await expect(celular.getByRole("tab", { name: "Pedidos" })).toHaveAttribute("aria-selected", "true");
+  // Ir a Depósito y enseguida a Más desde el celular: los dos quedan en Más, y el celular no vuelve solo a Depósito.
+  // Con la red de la computadora lenta, como en el local: lo que ella contesta al primer toque llega
+  // cuando el celular ya está en Más.
+  const lenta = async (ruta: import("@playwright/test").Route) => { if (ruta.request().method() === "POST") await new Promise((r) => setTimeout(r, 700)); await ruta.continue(); };
+  await compu.route("**/puestos/*/espejo", lenta);
+  await celular.getByTestId("menu-deposito").click();
+  await celular.waitForTimeout(450);
+  await celular.getByTestId("menu-mas").click();
+  await celular.waitForTimeout(2000);
+  await compu.unroute("**/puestos/*/espejo", lenta);
+  await expect(celular.getByTestId("menu-mas")).toHaveAttribute("aria-current", "page");
+  await expect(compu.getByTestId("mas")).toBeVisible();
+  await celular.getByTestId("menu-deposito").click();
+  await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
+  await compu.getByTestId("pestana-pedidos").click();
+  await expect(celular.getByRole("tab", { name: "Pedidos" })).toHaveAttribute("aria-selected", "true");
   // La otra persona sigue donde estaba.
   await expect(otra.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await expect(otra.getByTestId("espejo")).toHaveCount(0);
