@@ -400,3 +400,14 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Donde las flechas ya tenían otro uso (elegir un resultado, sumar a una cantidad, cambiar
       un selector), ese uso se mantiene y se sigue con la tecla de al lado.
 
+62. **Desde la entrada del celular se escanea el código de la computadora** (2026-10-12).
+    Carlos pidió un botón en la entrada del celular para leer el código que muestra la
+    entrada de la computadora, sin tener que salir a la cámara del teléfono.
+    - El botón «Escanear el código de la computadora» abre la cámara dentro de Ferrebress.
+      Al leer el código queda la misma entrada de siempre, que avisa que la computadora
+      entra también.
+    - Reconoce solo los códigos que Ferrebress muestra para el celular (entrar a la
+      computadora, vincularla, mandarle una foto); cualquier otro lo dice.
+    - En la computadora, el botón de Google pasa a tener borde, sombra y el tamaño de los
+      demás botones: casi no se notaba que era un botón.
+

@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { Escaner, hayCamara } from "./componentes/Escaner";
 import { hayHuella } from "../../credenciales";
 import { Logotipo } from "../Logotipo";
 import { BotonGoogle, BotonHuella } from "./pantallas/Login";
@@ -15,6 +17,13 @@ const PARA_QUE: { icono: NombreDeIcono; titulo: string; detalle: string }[] = [
   { icono: "stock", titulo: "Controlá", detalle: "tu stock" },
   { icono: "resumen", titulo: "Hacé crecer", detalle: "tu negocio" },
 ];
+
+// A dónde lleva un código de Ferrebress leído con la cámara: solo los que la aplicación
+// muestra para el celular (entrar a la computadora, vincularla, mandarle una foto).
+export function destinoDelCodigo(leido: string): string | null {
+  const m = /#\/(entrar-compu|vincular-celular|foto)\?codigo=[\w.~%-]+$/.exec(leido.trim());
+  return m ? m[0] : null;
+}
 
 function useEnLinea() {
   const [enLinea, setEnLinea] = useState(() => navigator.onLine);
@@ -33,6 +42,14 @@ const COMPUTADORA = <svg width="30" height="30" viewBox="0 0 24 24" fill="none" 
 export function Entrar({ paraLaCompu = false }: { paraLaCompu?: boolean } = {}) {
   const enLinea = useEnLinea();
   const conHuella = hayHuella();
+  // Leer desde acá el código que muestra la computadora en su entrada (o el de vincular o de una
+  // foto): es lo mismo que leerlo con la cámara del celular, sin salir de la aplicación.
+  const [escaneando, setEscaneando] = useState(false);
+  const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
+  const alLeerCodigo = useCallback((leido: string) => {
+    const destino = destinoDelCodigo(leido);
+    if (destino) location.hash = destino; else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora en su pantalla de entrada.");
+  }, []);
   return (
     <main className="en" data-testid="entrar">
       <div className="en-estado" aria-live="polite">
@@ -48,6 +65,14 @@ export function Entrar({ paraLaCompu = false }: { paraLaCompu?: boolean } = {}) 
         {paraLaCompu ? <BotonHuella titulo="Entrar acá y en la computadora" detalle="Con la huella" /> : <BotonGoogle />}
         {conHuella && <div className="en-o" aria-hidden="true"><span>o</span></div>}
         {paraLaCompu ? <BotonGoogle /> : <BotonHuella detalle="Rápido y seguro" />}
+        {!paraLaCompu && hayCamara() && (
+          <button type="button" className="en-escanear" onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }} data-testid="escanear-codigo-de-la-compu">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3" /><rect x="7" y="7" width="4" height="4" /><rect x="13" y="7" width="4" height="4" /><rect x="7" y="13" width="4" height="4" /><path d="M13 13h4v4h-4z" /></svg>
+            <span><strong>Escanear el código de la computadora</strong><small>Para entrar en los dos de una vez</small></span>
+          </button>
+        )}
+        {errorDeCodigo && <p className="en-ayuda" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}
+        {escaneando && createPortal(<Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />, document.body)}
         <p className="en-sin-claves">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4M12 15v2" /></svg>
           <span><strong>Sin contraseñas.</strong> Entrá de forma simple y segura.</span>

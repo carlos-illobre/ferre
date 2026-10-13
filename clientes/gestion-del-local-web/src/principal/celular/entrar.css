@@ -49,3 +49,10 @@
 .en-boton.verde { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
 .en-boton:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
 .en-tilde { display: grid; place-items: center; width: 84px; height: 84px; margin: 0 auto; border-radius: 50%; background: var(--p-verde); color: #fff; font-size: 40px; }
+
+/* Leer desde la entrada el código que muestra la computadora (decisión 62). */
+.en-escanear { display: flex; flex-direction: row; align-items: center; gap: 18px; width: 100%; min-height: 68px; padding: 10px 20px 10px 24px; border: 0; border-radius: 16px; background: var(--p-superficie); box-shadow: 0 0 0 1.5px var(--p-verde), 0 6px 18px rgb(23 49 43 / 0.10); color: var(--p-verde); font: inherit; text-align: left; cursor: pointer; }
+.en-escanear svg { flex: none; }
+.en-escanear strong { display: block; font-size: 17px; font-weight: 700; line-height: 1.25; }
+.en-escanear small { display: block; font-size: 14.5px; color: var(--p-texto-2); }
+.en-escanear:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }

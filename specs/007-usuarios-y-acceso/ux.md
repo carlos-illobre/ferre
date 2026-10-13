@@ -100,6 +100,8 @@ solo si esa computadora fue vinculada.
 
 **Qué necesita a la vista en el celular:**
 
+- En la entrada del celular, un botón «Escanear el código de la computadora» que abre la cámara
+  sin salir de la aplicación (decisión 62). Leerlo con la cámara del teléfono sigue valiendo.
 - Sin sesión: la entrada de siempre, con un aviso de que al entrar ahí la computadora entra
   también, y el botón de la huella primero, que lo dice: «Entrar acá y en la computadora».
 - Con la sesión ya abierta: un solo botón, «Entrar en la computadora», y «Ahora no».
