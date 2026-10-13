@@ -578,7 +578,6 @@ export function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boo
         <Boton icono="celular" onClick={() => void pedir()} data-testid="pedir-lector">Escanear con el celular</Boton>
         {pedido === "si" && <Pastilla tipo="ok"><span data-testid="lector-pedido">Abrí Ferrebress en el celular y tocá «Abrir el lector»</span></Pastilla>}
         {pedido === "no" && <Pastilla tipo="alerta">No se pudo avisar al celular</Pastilla>}
-        <Boton tam="chico" onClick={() => void soltarEmparejamiento()} data-testid="desvincular">Desvincular</Boton>
       </span>
     );
   }

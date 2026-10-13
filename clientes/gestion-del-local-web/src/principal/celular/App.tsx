@@ -5,7 +5,7 @@ import { Lector } from "./Lector";
 import { EspejoEstado } from "../EspejoEstado";
 import { useEspejar, useEspejo } from "../../espejo";
 import { Escaner, hayCamara } from "./componentes/Escaner";
-import { sincronizarEmparejamiento } from "../../puesto";
+import { sincronizarEmparejamiento, soltarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "./componentes/OfrecerHuella";
@@ -125,15 +125,26 @@ function Pantallas() {
 
   return (
     <div className="app">
-      <EspejoEstado />
+      <EspejoEstado sinDesvincular />
 
-      {/* Sin vincular, el botón para vincular está arriba a la derecha en todas las pantallas
-          (decisión 66); vinculado, ese lugar lo ocupa la franja del espejo, con «Desvincular». */}
-      {!emparejado && hayCamara() && (
-        <button type="button" className="vincular-arriba" onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }} data-testid="vincular-arriba" aria-label="Vincular con la computadora">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></svg>
-          <span>Vincular</span>
-        </button>
+      {/* Vincular o desvincular, a la derecha del encabezado de cualquier pantalla (decisión 70):
+          un botón chico y cuadrado. Vinculado, se pone verde y sirve para desvincular. */}
+      {(emparejado || hayCamara()) && (
+        <div className="vincular-lugar">
+          {emparejado ? (
+            <button type="button" className="vincular-boton vinculado" data-testid="desvincular-arriba" aria-label="Desvincular de la computadora" title="Desvincular de la computadora"
+              onClick={() => { if (window.confirm("¿Desvincular este celular de la computadora?")) void soltarEmparejamiento(); }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M9 10l2 2 4-4" /></svg>
+              <span>Desvincular</span>
+            </button>
+          ) : (
+            <button type="button" className="vincular-boton" data-testid="vincular-arriba" aria-label="Vincular con la computadora" title="Vincular con la computadora"
+              onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M12 7v6M9 10h6" /></svg>
+              <span>Vincular</span>
+            </button>
+          )}
+        </div>
       )}
       {escaneando && <Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />}
       {errorDeCodigo && pestana !== "mas" && <p className="aviso-suave vincular-error" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}

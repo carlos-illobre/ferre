@@ -6,7 +6,8 @@ import "./espejo-estado.css";
 // El estado del espejo (decisión 60), siempre a la vista en los dos: con quién se está en
 // espejo, si el otro no está abierto o si está en pausa; y los dos botones, «Pausar» (los
 // separa un rato sin desemparejarlos) y «Desvincular» (el corte definitivo).
-export function EspejoEstado() {
+// `sinDesvincular`: en el celular ese botón va en el encabezado de la pantalla (decisión 70).
+export function EspejoEstado({ sinDesvincular = false }: { sinDesvincular?: boolean } = {}) {
   const e = useEspejo();
   // Lo que terminó en el otro dispositivo («venta cobrada») se dice acá un momento.
   const [aviso, setAviso] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export function EspejoEstado() {
       {aviso && <span className="espejo-aviso" data-testid="espejo-aviso">{aviso}</span>}
       <span className="espejo-botones">
         {e.conectado && e.otroPresente && <button type="button" onClick={() => pausarEspejo(!e.pausado)} data-testid="pausar-espejo">{e.pausado ? "Reanudar" : "Pausar"}</button>}
-        <button type="button" onClick={() => void soltarEmparejamiento()} data-testid="desvincular-espejo">Desvincular</button>
+        {!sinDesvincular && <button type="button" onClick={() => void soltarEmparejamiento()} data-testid="desvincular-espejo">Desvincular</button>}
       </span>
     </div>
   );

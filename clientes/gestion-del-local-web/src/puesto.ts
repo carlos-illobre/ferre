@@ -17,10 +17,11 @@ export const puestoLocal = () => leer<PuestoLocal>(CLAVE_LOCAL);
 export const puestoRemoto = () => leer<PuestoRemoto>(CLAVE_REMOTO);
 // Quien muestre el emparejamiento (Vender, Productos, el aviso de fotos) se entera cuando cambia.
 export const EVENTO_EMPAREJAMIENTO = "ferre:emparejamiento";
+let cambios = 0; // cada vez que cambia lo guardado: para no pisarlo con una respuesta que salió antes
 function guardarLado(clave: string, p: object | null) {
   const antes = localStorage.getItem(clave);
   if (p) localStorage.setItem(clave, JSON.stringify(p)); else localStorage.removeItem(clave);
-  if (antes !== localStorage.getItem(clave)) window.dispatchEvent(new Event(EVENTO_EMPAREJAMIENTO));
+  if (antes !== localStorage.getItem(clave)) { cambios += 1; window.dispatchEvent(new Event(EVENTO_EMPAREJAMIENTO)); }
 }
 export const guardarPuestoLocal = (p: PuestoLocal | null) => guardarLado(CLAVE_LOCAL, p);
 export const guardarPuestoRemoto = (p: PuestoRemoto | null) => guardarLado(CLAVE_REMOTO, p);
@@ -29,7 +30,10 @@ export const guardarPuestoRemoto = (p: PuestoRemoto | null) => guardarLado(CLAVE
 // o cerraron la sesión, acá deja de figurar. Sin conexión, queda lo guardado.
 export async function sincronizarEmparejamiento(): Promise<{ comoComputadora: PuestoLocal | null; comoCelular: PuestoRemoto | null } | null> {
   try {
+    const alPedir = cambios;
     const r = await api<{ comoComputadora: PuestoLocal | null; comoCelular: PuestoRemoto | null }>("/puestos/mio");
+    // Si mientras tanto se vinculó o desvinculó acá, esta respuesta es vieja: no pisa lo nuevo.
+    if (alPedir !== cambios) return r;
     guardarPuestoLocal(r.comoComputadora ? { id: r.comoComputadora.id, expira_en: r.comoComputadora.expira_en } : null);
     guardarPuestoRemoto(r.comoCelular);
     return r;

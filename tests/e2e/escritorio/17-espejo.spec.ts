@@ -65,6 +65,9 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(compu.getByTestId("espejo-estado")).toContainText("En espejo con el celular");
   await expect(celular.getByTestId("espejo-estado")).toContainText("En espejo con la computadora");
   await expect(celular.getByTestId("menu-vender")).toHaveAttribute("aria-current", "page");
+  // Vinculado, el botón del encabezado del celular es el de desvincular; el de vincular no está.
+  await expect(celular.getByTestId("desvincular-arriba")).toBeVisible();
+  await expect(celular.getByTestId("vincular-arriba")).toHaveCount(0);
 
   // La venta es una sola: lo que se agrega en la computadora aparece en el celular…
   const busqueda = compu.getByTestId("busqueda");
@@ -123,6 +126,15 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await celular.getByTestId("volver-a-pedidos").click();
   await expect(compu.getByTestId("armar-pedido")).toHaveCount(0);
   await compu.getByTestId("pestana-stock").click();
+  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+
+  // Dónde se está parado lo decide la computadora (decisión 71): si se la abre de nuevo en otra
+  // pantalla con el celular ya abierto, el celular va a ella y no al revés.
+  await compu.goto("/?de-nuevo=1#/productos");
+  await expect(compu.getByTestId("espejo-estado")).toContainText("En espejo con el celular");
+  await expect(celular.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
+  await expect(compu.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
+  await compu.getByTestId("menu-deposito").click();
   await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
 
   // Pausar los separa: el celular se mueve y la computadora no. Al reanudar manda la computadora.

@@ -466,3 +466,23 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Se va el botón propio con el de Google invisible encima, y la base con sombra de la
       computadora: el botón queda tal como lo dibuja Google, sin estilos nuestros.
     - Reemplaza lo que decían del botón de Google las decisiones 55 y 62.
+
+70. **Vincular y desvincular en el celular: en el encabezado, con su leyenda** (2026-10-13).
+    Carlos pidió que el botón no esté arriba de la pantalla sino a la derecha del encabezado
+    (por ejemplo, a la derecha de «Catálogo»), más chico y con la leyenda debajo del ícono,
+    como los botones del menú de abajo.
+    - Sin vincular dice «Vincular» y abre la cámara. Vinculado dice «Desvincular», en verde,
+      y pregunta antes de desvincular. La franja del espejo del celular queda con «Pausar».
+    - En la computadora, Vender ya no tiene «Desvincular» junto a «Escanear con el celular»:
+      alcanza con el del menú de la izquierda.
+
+71. **Vinculados, dónde se está parado lo decide la computadora** (2026-10-13).
+    Carlos: si en la computadora estoy en Vender, el celular tiene que ir a Vender.
+    - Al conectarse los dos (se abre o se recarga cualquiera, o se acaban de vincular), el
+      celular va a la pantalla de la computadora, nunca al revés. Antes, la computadora que
+      se abría con el celular ya abierto se iba a la pantalla del celular.
+    - Después, cada cambio de pantalla hecho en cualquiera de los dos mueve al otro, como
+      siempre. El trabajo a medio hacer (una venta, un ingreso, un pedido) se sigue retomando
+      del que ya lo tenía.
+    - Se corrigió además que, al vincular, una consulta vieja al servidor podía borrar el
+      vínculo recién creado.
