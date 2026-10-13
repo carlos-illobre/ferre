@@ -32,7 +32,7 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
   });
   afterEach(() => { aparato(COMPUTADORA); });
 
-  it("E15: con el guardado deshabilitado aparecen las dos formas, cada una con su ventaja y su desventaja, y elegida la de bajar el catálogo", () => {
+  it("009-E15: con el guardado deshabilitado aparecen las dos formas, cada una con su ventaja y su desventaja, y elegida la de bajar el catálogo", () => {
     render(<Configuracion celular alCambiarElGuardado={() => undefined} />);
     expect(screen.getByTestId("cfg-buscar-memoria").getAttribute("aria-checked")).toBe("true");
     expect(screen.getByTestId("cfg-buscar-servidor").getAttribute("aria-checked")).toBe("false");
@@ -48,7 +48,7 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
     expect(buscaEnElServidor()).toBe(true);
   });
 
-  it("E16: con el guardado habilitado, o en la computadora, la elección no aparece", () => {
+  it("009-E16: con el guardado habilitado, o en la computadora, la elección no aparece", () => {
     cambiarPreferencia("sinConexion", true);
     const celular = render(<Configuracion celular alCambiarElGuardado={() => undefined} />);
     expect(screen.queryByTestId("cfg-buscar-memoria")).toBeNull();
@@ -59,7 +59,7 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
     expect(screen.queryByTestId("cfg-buscar-memoria")).toBeNull();
   });
 
-  it("E17 y E18: buscando en el servidor no se baja el catálogo; buscar y escanear le preguntan al servidor, lo dicen mientras tanto y dan el mismo producto", async () => {
+  it("009-E17 y 009-E18: buscando en el servidor no se baja el catálogo; buscar y escanear le preguntan al servidor, lo dicen mientras tanto y dan el mismo producto", async () => {
     cambiarPreferencia("buscar", "servidor");
     const { result } = renderHook(() => useCatalogo());
     await waitFor(() => expect(result.current.catalogo?.map((p) => p.id)).toEqual(["a"]));

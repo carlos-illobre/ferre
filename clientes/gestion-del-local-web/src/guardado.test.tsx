@@ -24,14 +24,14 @@ describe("Trabajar sin conexión en el celular", () => {
   beforeEach(async () => { aparato(TELEFONO); localStorage.clear(); recargarPreferencias(); apiFalsa.mockReset(); await respetarElGuardado(); });
   afterEach(() => { aparato(COMPUTADORA); });
 
-  it("E07: en un celular sin nada elegido, figura deshabilitada", () => {
+  it("009-E07: en un celular sin nada elegido, figura deshabilitada", () => {
     render(<Configuracion celular alCambiarElGuardado={() => undefined} />);
     expect(screen.getByTestId("cfg-sin-conexion").getAttribute("aria-checked")).toBe("false");
     expect(screen.getByTestId("configuracion").textContent).toContain("no guarda datos del negocio");
     expect(guardaEnElDispositivo()).toBe(false);
   });
 
-  it("E08: deshabilitada, con conexión todo se manda y en el celular no queda ningún dato del negocio", async () => {
+  it("009-E08: deshabilitada, con conexión todo se manda y en el celular no queda ningún dato del negocio", async () => {
     apiFalsa.mockResolvedValue({});
     expect(await enviarOEncolar("venta", "POST", "/ventas", venta)).toEqual({ encolado: false });
     expect(apiFalsa).toHaveBeenCalledWith("/ventas", expect.objectContaining({ method: "POST" }));
@@ -44,7 +44,7 @@ describe("Trabajar sin conexión en el celular", () => {
     expect(guardado).toBeLessThan(150_000);
   });
 
-  it("E09: deshabilitada y sin conexión, no se registra ni se guarda, y dice cómo habilitarlo", async () => {
+  it("009-E09: deshabilitada y sin conexión, no se registra ni se guarda, y dice cómo habilitarlo", async () => {
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     const fallo = await enviarOEncolar("venta", "POST", "/ventas", venta).catch((e: unknown) => e);
     expect(fallo).toBeInstanceOf(ErrorApi);
@@ -54,7 +54,7 @@ describe("Trabajar sin conexión en el celular", () => {
     expect(await hayBase()).toBe(false);
   });
 
-  it("E10: al habilitarla, el celular vuelve a guardar y a trabajar sin conexión como antes", async () => {
+  it("009-E10: al habilitarla, el celular vuelve a guardar y a trabajar sin conexión como antes", async () => {
     const alCambiar = vi.fn();
     render(<Configuracion celular alCambiarElGuardado={alCambiar} />);
     fireEvent.click(screen.getByTestId("cfg-sin-conexion"));
@@ -67,7 +67,7 @@ describe("Trabajar sin conexión en el celular", () => {
     expect(await pendientes()).toHaveLength(1);
   });
 
-  it("E11: al deshabilitarla se borra del celular todo lo guardado", async () => {
+  it("009-E11: al deshabilitarla se borra del celular todo lo guardado", async () => {
     cambiarPreferencia("sinConexion", true);
     await guardar("ventas", venta);
     expect(await leerTodo("ventas")).toHaveLength(1);
@@ -82,7 +82,7 @@ describe("Trabajar sin conexión en el celular", () => {
     preguntar.mockRestore();
   });
 
-  it("E12: con cambios sin enviar avisa cuántos se pierden y pregunta; si la persona no sigue, no pasa nada", async () => {
+  it("009-E12: con cambios sin enviar avisa cuántos se pierden y pregunta; si la persona no sigue, no pasa nada", async () => {
     cambiarPreferencia("sinConexion", true);
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     await enviarOEncolar("venta", "POST", "/ventas", venta);
@@ -113,7 +113,7 @@ describe("Trabajar sin conexión en el celular", () => {
     (window as any).innerWidth = 1024;
   });
 
-  it("E13: en la computadora la opción no aparece, y la computadora guarda siempre", async () => {
+  it("009-E13: en la computadora la opción no aparece, y la computadora guarda siempre", async () => {
     aparato(COMPUTADORA);
     render(<Configuracion />);
     expect(screen.queryByTestId("cfg-sin-conexion")).toBeNull();
@@ -122,7 +122,7 @@ describe("Trabajar sin conexión en el celular", () => {
     expect(await leerTodo("ventas")).toHaveLength(1);
   });
 
-  it("E14: un celular que ya tenía datos guardados de antes queda deshabilitado y sin esos datos", async () => {
+  it("009-E14: un celular que ya tenía datos guardados de antes queda deshabilitado y sin esos datos", async () => {
     // Como lo dejaba la versión anterior: datos guardados y ninguna preferencia elegida.
     cambiarPreferencia("sinConexion", true);
     await guardar("ventas", venta);

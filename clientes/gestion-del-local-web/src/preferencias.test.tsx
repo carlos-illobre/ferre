@@ -10,14 +10,14 @@ import { animarNavegacion, irA } from "./rutas";
 describe("Configuración · animaciones", () => {
   beforeEach(() => { localStorage.clear(); recargarPreferencias(); });
 
-  it("E01: en un dispositivo sin nada guardado, las animaciones figuran habilitadas", () => {
+  it("009-E01: en un dispositivo sin nada guardado, las animaciones figuran habilitadas", () => {
     render(<Configuracion celular />);
     expect(screen.getByTestId("cfg-animaciones").getAttribute("aria-checked")).toBe("true");
     expect(document.documentElement.dataset.animaciones).toBeUndefined();
     expect(screen.getByTestId("configuracion").textContent).toContain("como en una aplicación de iPhone");
   });
 
-  it("E02: al deshabilitarlas vale en el momento: la página queda marcada y la navegación no arma ninguna transición", () => {
+  it("009-E02: al deshabilitarlas vale en el momento: la página queda marcada y la navegación no arma ninguna transición", () => {
     const transicion = vi.fn(() => ({ finished: Promise.resolve() }));
     (document as unknown as { startViewTransition: unknown }).startViewTransition = transicion;
     animarNavegacion(true);
@@ -35,7 +35,7 @@ describe("Configuración · animaciones", () => {
     delete (document as unknown as { startViewTransition?: unknown }).startViewTransition;
   });
 
-  it("E03: lo elegido queda en el dispositivo: sigue al volver a abrir la aplicación o al salir y volver a entrar", () => {
+  it("009-E03: lo elegido queda en el dispositivo: sigue al volver a abrir la aplicación o al salir y volver a entrar", () => {
     cambiarPreferencia("animaciones", false);
     // Salir de la sesión no borra la preferencia: es otra clave del dispositivo.
     localStorage.removeItem("ferre.sesion");
@@ -46,7 +46,7 @@ describe("Configuración · animaciones", () => {
     expect(screen.getByTestId("cfg-animaciones").getAttribute("aria-checked")).toBe("false");
   });
 
-  it("E04: con «reducir movimiento» pedido en el dispositivo, la pantalla lo dice", () => {
+  it("009-E04: con «reducir movimiento» pedido en el dispositivo, la pantalla lo dice", () => {
     const original = window.matchMedia;
     window.matchMedia = ((consulta: string) => ({ matches: consulta.includes("reduce"), addEventListener: () => undefined, removeEventListener: () => undefined })) as unknown as typeof window.matchMedia;
     render(<Configuracion celular />);
@@ -54,7 +54,7 @@ describe("Configuración · animaciones", () => {
     window.matchMedia = original;
   });
 
-  it("E05: si el navegador no deja guardar, el cambio vale mientras la aplicación está abierta y no da error", () => {
+  it("009-E05: si el navegador no deja guardar, el cambio vale mientras la aplicación está abierta y no da error", () => {
     const guardar = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("sin lugar"); });
     render(<Configuracion celular />);
     expect(() => fireEvent.click(screen.getByTestId("cfg-animaciones"))).not.toThrow();
@@ -66,7 +66,7 @@ describe("Configuración · animaciones", () => {
     expect(preferencias().animaciones).toBe(true);
   });
 
-  it("E06: no pide ningún permiso: la usa también quien no tiene ninguno", () => {
+  it("009-E06: no pide ningún permiso: la usa también quien no tiene ninguno", () => {
     conPermisos();
     render(<Configuracion />);
     fireEvent.click(screen.getByTestId("cfg-animaciones"));
