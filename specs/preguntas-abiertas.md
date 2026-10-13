@@ -96,7 +96,7 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 **Costos, márgenes y precios**
 11. **RF-11.** La regla del costo del 2026-09-13 (lista − descuento general − descuento por contado − ofertas vigentes, sin IVA) figura como no cerrada. ¿Queda aprobada tal cual? ¿Las ofertas que trae la planilla bajan el costo mientras duran?
 12. **RF-15.** ¿A partir de qué porcentaje de suba del costo hay que avisar para revisar el producto, y quién puede cambiar ese porcentaje?
-13. **RF-15.** ¿«Remarcar» es cambiar el precio escrito en la estantería de todo producto cuyo precio de venta cambió? ¿Hay algún otro caso que tenga que aparecer en el aviso?
+13. **RF-15.** ¿«Remarcar» es cambiar el precio escrito en la estantería de todo producto cuyo precio de venta cambió? ¿Hay algún otro caso que tenga que aparecer en el aviso? El pedido original (tarea T024) decía: listar los productos con precio manual cuyo margen real quedó por debajo de 25 %. La especificación dice que en el catálogo no hay precio a mano, solo margen (RF-10), así que ese listado no tiene de dónde salir: ¿se descarta, o se reemplaza por otro?
 14. **RF-16.** ¿Con qué criterio se reparten los gastos fijos entre los productos: por unidad vendida, por valor vendido, por rotación o por familia?
 15. **RF-17.** ¿Cómo se entera el sistema de un descuento puntual: lo trae la lista como oferta, lo carga alguien a mano, o las dos cosas? ¿Hasta cuándo vale cuando el proveedor no dice la fecha de fin? ¿El precio de venta baja siempre, o solo si alguien lo aprueba?
 

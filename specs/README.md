@@ -41,8 +41,8 @@ usuario sin el rol Administrador quedan para cuando se definan los permisos de c
 Fuera de `specs/`: las decisiones técnicas en [docs/adr](../docs/adr/README.md), las
 decisiones de negocio de Carlos en [docs/decisiones-de-negocio.md](../docs/decisiones-de-negocio.md),
 el sistema visual en [docs/sistema-visual.md](../docs/sistema-visual.md), los manuales del
-servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en los
-[issues](https://github.com/carlos-illobre/ferre/issues).
+servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
+[proyecto/tasks.md](../proyecto/tasks.md).
 
 ## Requerimientos funcionales
 
