@@ -90,6 +90,10 @@ Se parece a una aplicación de iPhone (decisión 78). Una sola curva para todo l
 | Cambiar de parte (menú de abajo) o de pestaña dentro de una parte | Fundido | 180 ms |
 | Abrir una hoja | Sube desde abajo, con la misma curva | 350 ms |
 
+**Solo animaciones de CSS, y solo de posición y opacidad** (`transform` y `opacity`), que el
+navegador mueve fuera del hilo principal: ninguna animación se calcula cuadro a cuadro con
+código. El código solo avisa que empieza el cambio de pantalla. Pedido de Carlos del 2026-10-13.
+
 El menú de abajo no se mueve mientras cambia la pantalla. Con «reducir movimiento» pedido en el
 teléfono no hay animaciones. Se hacen con las transiciones de vista del navegador, sin
 librerías; donde no existen, la pantalla cambia sin animar. La computadora no anima la navegación.
