@@ -73,6 +73,11 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 .barra .salir { height: 32px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; font-size: 13px; font-weight: 600; }
 .contenido { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 8px 20px 40px; display: flex; flex-direction: column; gap: 10px; }
 .contenido.ancho { max-width: 1080px; }
+/* Dentro de una pantalla de Más: arriba, el botón que vuelve al menú de Más */
+.volver-a-mas { width: 100%; max-width: 760px; margin: 0 auto; padding: 10px 12px 0; }
+.volver-a-mas button { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 12px 0 6px; border-radius: 999px; color: var(--coral-texto); font-size: 16px; font-weight: 600; }
+.volver-a-mas + main { padding-top: 0; }
+.volver-a-mas + main > :first-child { padding-top: 0; margin-top: 0; }
 /* Agrupadores de pantalla: en el celular son una columna; en la computadora se reparten (ver abajo) */
 .columna, .dos-columnas, .lateral, .tarjetas { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .version { position: fixed; right: 8px; bottom: 4px; font-size: 11px; color: var(--gris-claro); z-index: 1; }

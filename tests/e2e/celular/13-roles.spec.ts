@@ -52,6 +52,12 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.mas);
   await expect(page.getByTestId("mas-tickets")).toBeVisible();
   for (const oculto of [RUTAS.enMas, "mas-roles", "mas-actividad", "mas-anomalias"]) await expect(page.getByTestId(oculto)).toHaveCount(0);
+  // En el celular, de cada pantalla de Más se vuelve al menú de Más con su botón.
+  if (CELULAR) {
+    await page.getByTestId("mas-tickets").click();
+    await page.getByTestId("volver-a-mas").click();
+    await expect(page.getByTestId("mas-tickets")).toBeVisible();
+  }
 
   // Por la dirección tampoco: dice qué permiso hace falta.
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.numeros);

@@ -314,6 +314,9 @@ que poder alcanzarse y accionarse así: nada puede depender de un clic.
 cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en Productos,
 Depósito en Pedidos): la aplicación no recuerda en qué pestaña se estaba.
 
+**Volver a Más (decisión 64).** En el celular, cada pantalla de Más lleva arriba a la
+izquierda «Volver a Más», que regresa al menú de Más.
+
 **El botón de volver del celular (pedido de Carlos del 2026-10-12).** Con algo abierto encima
 de la pantalla (la ficha de un producto, cualquier hoja que sube desde abajo, la cámara del
 escáner), volver lo cierra y deja la pantalla de abajo como estaba: no cambia de pantalla ni

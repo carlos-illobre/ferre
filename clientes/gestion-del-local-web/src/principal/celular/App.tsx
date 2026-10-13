@@ -126,6 +126,14 @@ function Pantallas() {
     <div className="app">
       <EspejoEstado />
 
+      {pestana === "mas" && parte && (
+        <div className="volver-a-mas">
+          <button type="button" onClick={() => irA("mas")} data-testid="volver-a-mas">
+            <Icono nombre="izquierda" tam={18} grosor={2.4} />
+            <span>Volver a Más</span>
+          </button>
+        </div>
+      )}
       {falta ? <SinPermiso falta={falta} />
         : pestana === "mas" && parte === "tickets" ? <Tickets />
         : pestana === "mas" && parte === "roles" ? <Roles />

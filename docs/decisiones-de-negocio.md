@@ -419,3 +419,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       abre la cámara dentro de Ferrebress y lee el código que muestra la computadora.
     - Las instrucciones de la computadora nombran primero ese camino; la cámara del
       teléfono sigue sirviendo.
+
+64. **En el celular, cada pantalla de Más tiene su «Volver a Más»** (2026-10-12).
+    Carlos pidió que, al entrar a una opción de Más (por ejemplo Roles), haya un botón para
+    volver al menú de Más. Va arriba a la izquierda, en todas las pantallas de Más, también
+    en la que avisa que falta un permiso. En la computadora no hace falta: el menú está
+    siempre a la vista.
