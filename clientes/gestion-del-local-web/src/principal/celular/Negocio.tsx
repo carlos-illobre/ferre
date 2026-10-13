@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { NOMBRES, TEXTOS } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
+import { ComprasRecientes } from "./ComprasRecientes";
 import { api, urlApi } from "../../api";
 import { fecha, pesos } from "../../formato";
 import { useSesion } from "../../sesion";
@@ -83,6 +84,8 @@ export function Negocio({ parte }: { parte: Parte }) {
           </div>
         </>
       )}
+
+      {puedeEsto("deposito.compras") && <ComprasRecientes />}
 
       </div>
       <div className="columna">

@@ -357,7 +357,7 @@ Los **permisos** son fijos y los define el sistema:
 | Depósito | Registrar ingresos | Registrar la mercadería que llega y anular un ingreso |
 | Catálogo | Ver costos | Ver lo que cobra cada proveedor por un producto y de dónde sale cada precio. Sin él se ven los precios de venta y los márgenes, no los costos |
 | Depósito | Encargar compras | Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos (RF-55) |
-| Depósito | Ver las compras | Ver las compras recientes y sus comprobantes |
+| Depósito | Ver las compras | Ver las compras recientes y sus comprobantes, en «Cómo va el negocio» |
 | Depósito | Contar y corregir stock | Contar estanterías y corregir el stock a mano |
 | Negocio | Ver los números del negocio | Cómo va el negocio: ventas, gastos y dinero invertido en inventario |
 | Negocio | Ver las anomalías | Abrir «Anomalías» |

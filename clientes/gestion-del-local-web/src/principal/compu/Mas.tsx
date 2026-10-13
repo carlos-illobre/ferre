@@ -5,7 +5,7 @@ import { irA } from "./base/rutas";
 // «Más» guarda las pantallas que se usan poco, para que el menú tenga solo lo de todos los días.
 // Cada una dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
 export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
-  { ruta: "resumen", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen", pide: ["negocio.numeros"] },
+  { ruta: "resumen", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy, los gastos y las compras", icono: "resumen", pide: ["negocio.numeros", "deposito.compras"] },
   { ruta: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
   { ruta: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad", pide: ["negocio.actividad"] },
   { ruta: "roles", nombre: "Roles", detalle: "Qué puede hacer cada rol", icono: "usuarios", pide: ["admin.roles"] },

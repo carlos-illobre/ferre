@@ -20,6 +20,7 @@ import { VincularCelular } from "./pantallas/VincularCelular";
 import { Catalogo } from "./Catalogo";
 import { Icono as IconoDeMas, type NombreDeIcono } from "../compu/base/ui";
 import { Deposito } from "./Deposito";
+import { ComprasRecientes } from "./ComprasRecientes";
 import { Negocio, type Parte } from "./Negocio";
 import { Tickets } from "../Tickets";
 import { Anomalias } from "../Anomalias";
@@ -47,7 +48,7 @@ const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: stri
   { ruta: "mas", nombre: "Más" },
 ];
 const DE_MAS: { parte: Parte | "tickets" | "anomalias" | "roles"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
-  { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy y los gastos de la semana", icono: "resumen", pide: ["negocio.numeros"] },
+  { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy, los gastos y las compras", icono: "resumen", pide: ["negocio.numeros", "deposito.compras"] },
   { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
   { parte: "roles", nombre: "Roles", detalle: "Qué puede hacer cada rol", icono: "usuarios", pide: ["admin.roles"] },
   { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad", pide: ["negocio.actividad"] },
@@ -148,6 +149,10 @@ function Pantallas() {
         : pestana === "mas" && parte === "tickets" ? <Tickets />
         : pestana === "mas" && parte === "roles" ? <Roles />
         : pestana === "mas" && parte === "anomalias" ? <Anomalias />
+        : pestana === "mas" && parte === "negocio" && !permitido(["negocio.numeros"]) ? (
+          // Quien ve las compras pero no los números del negocio: de esta pantalla le toca solo esa parte.
+          <main className="contenido"><div className="encabezado"><h1 className="titulo">Cómo va el negocio</h1></div><ComprasRecientes soloVer /></main>
+        )
         : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "roles" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
@@ -174,9 +179,10 @@ function Pantallas() {
             ))}
           </div>
           <div className="lista">
-            <button type="button" className="fila" onClick={salir} data-testid="salir">
+            <button type="button" className="fila con-foto" onClick={salir} data-testid="salir">
+              <span className="miniatura mas-icono"><Icono nombre="salir" tam={22} /></span>
               <span className="nombre">Salir</span>
-              <Icono nombre="salir" tam={18} grosor={2.2} />
+              <Icono nombre="derecha" tam={18} grosor={2.4} />
               <span className="detalle" data-testid="usuario">Entraste como {usuario.nombre}</span>
             </button>
           </div>

@@ -41,10 +41,10 @@ test("con sesión el dueño entra y ve la administración", async ({ page }) => 
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");
   // Todo lo que se usa poco está en «Más» (decisión 28).
-  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: "Más", exact: true }).click();
   await page.getByRole("button", { name: /Cómo va el negocio/ }).click();
   await expect(page.getByTestId("usuario-negocio")).toContainText("Dueño E2E");
-  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: "Más", exact: true }).click();
   await page.getByRole("button", { name: /Usuarios y sesiones/ }).click();
   await expect(page.getByText("Usuarios autorizados")).toBeVisible();
   await expect(page.getByTestId("usuarios")).toContainText(EMAIL);
@@ -89,13 +89,13 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   expect(psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
 
   // Salir y entrar con la huella: sin Google.
-  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: "Más", exact: true }).click();
   await page.getByRole("button", { name: /^Salir/ }).click();
   await expect(page.getByTestId("entrar-huella")).toBeVisible();
   await page.getByTestId("entrar-huella").click();
   // Al entrar se abre siempre el Catálogo, no la pantalla desde la que se salió (decisión 56).
   await expect(page.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
-  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: "Más", exact: true }).click();
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   expect(psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
@@ -104,7 +104,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   page.once("dialog", (d) => d.accept());
   await page.getByTestId("celular").getByRole("button", { name: "Quitar" }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
-  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: "Más", exact: true }).click();
   await page.getByRole("button", { name: /^Salir/ }).click();
   await page.getByTestId("entrar-huella").click();
   await expect(page.getByTestId("error-huella")).toContainText("no está vinculado");

@@ -61,7 +61,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   // Cantidad 3; la flechita suma de a 1 (enteras, sin decimales); 2,7 por unidad es 2.
   await mecha.getByTestId("cantidad").fill("3");
   await expect(page.getByTestId("total")).toContainText("$9.000");
-  await mecha.getByRole("button", { name: "Más" }).click();
+  await mecha.getByRole("button", { name: "Más", exact: true }).click();
   await expect(mecha.getByTestId("cantidad")).toHaveValue("4");
   await mecha.getByTestId("cantidad").fill("2.7");
   await expect(mecha.getByTestId("cantidad")).toHaveValue("2");
@@ -107,7 +107,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   expect(psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
   // Negocio muestra las ventas de hoy, con cada producto en su renglón; anular la marca y devuelve el stock.
-  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: "Más", exact: true }).click();
   await page.getByRole("button", { name: /Cómo va el negocio/ }).click();
   const hoy = page.getByTestId("ventas-de-hoy");
   const venta = hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
@@ -120,7 +120,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(venta).toContainText("anulada");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
   // La anomalía se ve en Más > Anomalías.
-  await page.getByRole("button", { name: "Más" }).click();
+  await page.getByRole("button", { name: "Más", exact: true }).click();
   await page.getByRole("button", { name: /Anomalías/ }).click();
   await expect(page.getByTestId("anomalia").filter({ hasText: "TORNILLO VENDER" })).toContainText("Venta sin stock");
   await page.getByRole("button", { name: "Vender" }).click();

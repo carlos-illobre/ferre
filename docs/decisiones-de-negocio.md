@@ -441,3 +441,20 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Sin vincular: el botón «Vincular», que abre la cámara dentro de Ferrebress.
     - Vinculado: ese botón no aparece; arriba queda la franja del espejo, con «Desvincular»
       (y «Pausar»), que ya estaba en todas las pantallas.
+
+67. **Una pantalla por proceso: las compras recientes salen del ingreso** (2026-10-13).
+    Carlos fijó el criterio: cada pantalla tiene solo lo que hace falta para un proceso
+    (vender, recibir mercadería, armar un pedido, buscar un producto para decir un precio,
+    dar de alta un usuario, armar roles, analizar el negocio), y cada proceso tiene su
+    pantalla.
+    - Las compras recientes no ayudan a recibir mercadería: pasan a «Cómo va el negocio».
+      El ingreso queda solo con el proveedor, el comprobante y los renglones.
+    - Interpretación del agente, a confirmar con Carlos: quien tiene «Ver las compras» pero
+      no «Ver los números del negocio» abre «Cómo va el negocio» y ve solo las compras; y
+      una compra se sigue anulando desde esa lista, con «Registrar ingresos».
+    - El resto de las pantallas se revisó con ese criterio y lo encontrado se le pasó a
+      Carlos para decidir; no se cambió nada más.
+
+68. **El orden de Depósito: Inventario, Ingreso, Estanterías, Pedidos** (2026-10-13).
+    Lo pidió Carlos. Como cada parte abre en su primera pestaña (decisión 56), Depósito
+    abre ahora en Inventario. Vale para el celular y la computadora.

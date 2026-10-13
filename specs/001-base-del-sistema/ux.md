@@ -312,7 +312,7 @@ que poder alcanzarse y accionarse así: nada puede depender de un clic.
 
 **Por dónde se entra en el celular (decisión 56).** Al entrar se abre siempre el Catálogo, y
 cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en Productos,
-Depósito en Pedidos): la aplicación no recuerda en qué pestaña se estaba.
+Depósito en Inventario; el orden de Depósito es Inventario, Ingreso, Estanterías, Pedidos, decisión 68): la aplicación no recuerda en qué pestaña se estaba.
 
 **Vincular, siempre a mano (decisión 66).** En el celular, mientras no esté vinculado con una
 computadora, todas las pantallas llevan arriba a la derecha «Vincular». Vinculado, arriba queda

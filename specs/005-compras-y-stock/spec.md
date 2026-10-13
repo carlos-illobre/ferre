@@ -97,7 +97,7 @@ sigue en la lista, marcada como anulada.
 
 **Acceptance Scenarios**:
 
-1. **Given** una compra recién registrada por $16.000, **When** mira los gastos de la semana en «Cómo va el negocio» (no en el ingreso, donde solo están las compras recientes), **Then** ve el total gastado y el detalle por proveedor, en el celular y en la computadora (RF-65).
+1. **Given** una compra recién registrada por $16.000, **When** mira los gastos de la semana en «Cómo va el negocio», **Then** ve el total gastado y el detalle por proveedor, en el celular y en la computadora (RF-65).
 2. **Given** la compra en las compras recientes, **When** la abre, **Then** ve sus renglones: 10 × cinta y 5 × pincel, cada uno con su costo unitario y su subtotal, y el proveedor, la fecha, el comprobante y el total de la compra.
 3. **Given** la compra de 10 cintas, **When** la anula, **Then** la compra queda marcada «anulada», el stock de la cinta baja en 10 con un movimiento que dice que es la anulación de esa compra, y la compra deja de sumar a los gastos de la semana. [NEEDS CLARIFICATION: al anular una compra, ¿el motivo es obligatorio, como al corregir el stock, u opcional?]
 4. **Given** una compra que al registrarse cambió el costo vigente de la cinta de $1.000 a $1.200, **When** se la anula, **Then** [NEEDS CLARIFICATION: al anular una compra que había cambiado el costo de un producto, ¿el costo vuelve al anterior ($1.000) o queda el de la factura anulada ($1.200)?]
@@ -429,7 +429,7 @@ ver qué toca contar en el día según la fecha del último conteo de cada uno.
 ## Assumptions
 
 - **Costos sin IVA:** el costo unitario de la compra y el valor del inventario van sin IVA, y el costo de una compra es comparable con el de las listas (RF-11).
-- **Compras recientes:** son las últimas 50 compras, de la más nueva a la más vieja, incluidas las anuladas.
+- **Compras recientes:** son las últimas 50 compras, de la más nueva a la más vieja, incluidas las anuladas. Se ven en «Cómo va el negocio», no en el ingreso de mercadería, que es solo para recibir (decisión 67). Las ve quien tiene «Ver las compras», aunque no tenga «Ver los números del negocio»: en ese caso la pantalla le muestra solo las compras. Desde ahí las anula quien tiene «Registrar ingresos».
 - **Semana de gastos:** la definición del período es de RF-65 (capacidad de información del negocio); esta capacidad solo aporta las compras.
 - **Stock negativo:** una venta nunca deja el stock por debajo de cero (RF-59). Un stock negativo solo puede venir de antes de esa regla o de anular una compra cuya mercadería ya se vendió; se muestra tal cual y se explica con sus movimientos.
 - **Ficha del proveedor:** el número de WhatsApp y el correo a los que se manda un pedido son de RF-18.

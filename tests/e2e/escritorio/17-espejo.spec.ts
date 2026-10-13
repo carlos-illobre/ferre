@@ -90,9 +90,9 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
 
   // La navegación va junta, en las dos direcciones.
   await celular.getByTestId("menu-deposito").click();
-  await expect(compu.getByTestId("pestana-pedidos")).toHaveAttribute("aria-current", "page");
-  await compu.getByTestId("pestana-stock").click();
-  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+  await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
+  await compu.getByTestId("pestana-pedidos").click();
+  await expect(celular.getByRole("tab", { name: "Pedidos" })).toHaveAttribute("aria-selected", "true");
   // La otra persona sigue donde estaba.
   await expect(otra.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await expect(otra.getByTestId("espejo")).toHaveCount(0);

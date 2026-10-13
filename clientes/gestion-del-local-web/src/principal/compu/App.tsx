@@ -9,7 +9,7 @@ import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { irA, useRuta } from "./base/rutas";
-import { Boton, EstadoDeConexion, Icono, Marca, type NombreDeIcono } from "./base/ui";
+import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } from "./base/ui";
 import { Entrar } from "./base/pantallas/Entrar";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
 import { VentasDeHoy } from "./base/pantallas/VentasDeHoy";
@@ -19,6 +19,7 @@ import { Duplicados } from "./base/pantallas/Duplicados";
 import { Inventario } from "./Inventario";
 import { DineroInvertido } from "../DineroInvertido";
 import { Ingreso } from "./Ingreso";
+import { ComprasRecientes } from "./ComprasRecientes";
 import { Contar } from "./base/pantallas/Contar";
 import { Resumen } from "./base/pantallas/Resumen";
 import { Usuarios } from "./base/pantallas/Usuarios";
@@ -53,7 +54,7 @@ type Parte = { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pe
 const MENU: Parte[] = [
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
   { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }] },
-  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "pedidos", icono: "listas", nombre: "Pedidos", pide: ["deposito.pedidos", "deposito.ingresos"] }, { ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos", "deposito.compras"] }, { ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }] },
+  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos"] }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }, { ruta: "pedidos", icono: "listas", nombre: "Pedidos", pide: ["deposito.pedidos", "deposito.ingresos"] }] },
   { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.map((d) => ({ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide })) },
 ];
 // Pantallas que no están en el menú pero tienen dirección.
@@ -250,7 +251,8 @@ function Pantallas() {
           : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`compras?pedido=${id}`)} /></main>
           : actual === "ventas" ? <VentasDeHoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
-          : actual === "contar" ? <Contar /> : actual === "resumen" ? <><Resumen /><DineroInvertido /></> : actual === "usuarios" ? <Usuarios />
+          : actual === "contar" ? <Contar /> : actual === "resumen" ? (puede(usuario, "negocio.numeros") ? <><Resumen /><DineroInvertido />{puede(usuario, "deposito.compras") && <ComprasRecientes />}</>
+            : <Pagina titulo="Cómo va el negocio"><ComprasRecientes /></Pagina>) : actual === "usuarios" ? <Usuarios />
           : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "anomalias" ? <Anomalias /> : <Vender />}
       </div>
     </div>

@@ -13,6 +13,7 @@ vi.mock("../../api", async (original) => ({ ...(await original<typeof import("..
 vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a) }));
 
 import { Deposito } from "./Deposito";
+import { ComprasRecientes } from "./ComprasRecientes";
 
 const compras = [{ id: "c1", fecha: "2026-09-14", comprobante_tipo: "factura", comprobante_numero: "0001-00000777", total: "16000", estado: "confirmada", proveedor: "Proveedor uno", renglones: "2",
   items: [{ descripcion: "CINTA AISLADORA", cantidad: "10", costo_unitario: "1200" }, { descripcion: "PINCEL NUEVO", cantidad: "5", costo_unitario: "800" }] }];
@@ -59,8 +60,7 @@ describe("Depósito · Ingreso", () => {
 
   it("el proveedor se elige en una hoja; la foto de la factura reemplaza al número; registrar manda todo y muestra el éxito", async () => {
     armar("ingreso");
-    await screen.findByTestId("compras-recientes");
-    fireEvent.click(screen.getByTestId("proveedor"));
+    fireEvent.click(await screen.findByTestId("proveedor"));
     fireEvent.click(screen.getByTestId("opcion-proveedor"));
     expect(screen.getByTestId("proveedor").textContent).toContain("Proveedor uno");
     // El número no se tipea (RF-50): se sube la foto del comprobante.
@@ -77,10 +77,18 @@ describe("Depósito · Ingreso", () => {
     expect(JSON.parse((llamada[1] as { body: string }).body)).toMatchObject({ proveedor_id: "prov1", comprobante_tipo: "factura", foto: "5d1f0a52-93a1-4f0e-8c1b-7a2e6d4c9b10.jpg", items: [{ producto_id: "cinta", cantidad: 1, costo_unitario: 1200 }] });
   });
 
-  it("compras recientes: cada compra se abre y muestra sus renglones; los gastos de la semana ya no están acá", async () => {
+  it("Ingreso es solo para recibir mercadería: las compras recientes no están acá (decisión 67)", async () => {
     armar("ingreso");
+    await screen.findByTestId("proveedor");
+    await waitFor(() => expect(apiFalsa.mock.calls.some((c) => c[0] === "/proveedores")).toBe(true));
+    expect(screen.queryByTestId("compras-recientes")).toBeNull();
+    expect(apiFalsa.mock.calls.some((c) => c[0] === "/compras" && !(c[1] as RequestInit | undefined)?.method)).toBe(false);
+  });
+
+  it("compras recientes (en Cómo va el negocio): cada compra se abre y muestra sus renglones", async () => {
+    apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/compras" ? compras : []));
+    render(<ComprasRecientes />);
     const compra = await screen.findByTestId("compra-reciente");
-    expect(screen.queryByTestId("gastos-semana")).toBeNull(); // están en Cómo va el negocio (decisión 34)
     expect(compra.textContent).not.toContain("CINTA AISLADORA");
     fireEvent.click(within(compra).getAllByRole("button")[0]!);
     expect(compra.textContent).toContain("10 ×");
@@ -132,14 +140,15 @@ describe("Depósito · Contar", () => {
 describe("Depósito · según los permisos", () => {
   beforeEach(() => { apiFalsa.mockReset(); });
 
-  it("quien solo ve las compras no tiene el formulario de ingreso ni puede anular", async () => {
+  it("quien solo ve las compras no tiene la pestaña Ingreso; las compras las ve en Cómo va el negocio, sin anular", async () => {
     conPermisos("deposito.compras");
     armar(null);
-    expect(await screen.findByText(/Proveedor uno/)).toBeTruthy();
-    expect(screen.queryByTestId("busqueda")).toBeNull();
+    expect(screen.queryByRole("tab", { name: "Ingreso" })).toBeNull();
     expect(screen.queryByRole("tab", { name: "Estanterías" })).toBeNull();
-    fireEvent.click(screen.getByText(/Proveedor uno/));
-    expect(screen.queryByRole("button", { name: "Anular esta compra" })).toBeNull();
+    const { container } = render(<ComprasRecientes soloVer />);
+    fireEvent.click(within(await within(container).findByTestId("compra-reciente")).getAllByRole("button")[0]!);
+    expect(container.textContent).toContain("CINTA AISLADORA");
+    expect(within(container).queryByRole("button", { name: "Anular esta compra" })).toBeNull();
   });
 
   it("sin permisos de depósito abre en Inventario, que se puede mirar pero no corregir", async () => {
@@ -151,10 +160,10 @@ describe("Depósito · según los permisos", () => {
     expect(screen.queryByTestId("corregir")).toBeNull();
   });
 
-  it("desde el menú, Depósito abre siempre en la primera pestaña: Pedidos (decisión 56)", async () => {
+  it("desde el menú, Depósito abre siempre en la primera pestaña: Inventario (decisiones 56 y 68)", async () => {
     armar(null);
-    expect(screen.getByRole("tab", { name: "Pedidos" }).getAttribute("aria-selected")).toBe("true");
-    expect(await screen.findByTestId("pedidos")).toBeTruthy();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Inventario", "Ingreso", "Estanterías", "Pedidos"]);
+    expect(screen.getByRole("tab", { name: "Inventario" }).getAttribute("aria-selected")).toBe("true");
   });
 
   it("cada pestaña lleva a su propia dirección: Ingreso no cae en la primera", () => {
