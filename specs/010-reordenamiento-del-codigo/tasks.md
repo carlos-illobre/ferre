@@ -5,7 +5,7 @@ etapas. Cada tarea termina con todo funcionando y desplegado en pruebas.
 
 ## Tareas
 
-- [ ] T001 Etapa 1: todo el código bajo `microservices/` (web, api, listas) y el proxy en `deployment/`
+- [x] T001 Etapa 1: todo el código bajo `microservices/` (web, api, listas) y el proxy en `deployment/`
 - [ ] T002 Etapa 2: tecnología reutilizable del front en `plataforma/`, sin dependencias del negocio, con control automático (depende de T001)
 - [ ] T003 Etapa 3a: negocio de vender una sola vez, con las dos interfaces encima (depende de T002)
 - [ ] T004 Etapa 3b: negocio de depósito (ingreso, inventario, estanterías, pedidos) una sola vez (depende de T003)

@@ -32,7 +32,7 @@ jobs:
 
   listas-de-proveedores:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: microservices/listas-de-proveedores } }
+    defaults: { run: { working-directory: microservices/listas } }
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -136,9 +136,9 @@ jobs:
       - name: Armar el sitio
         run: |
           mkdir -p sitio
-          cp -r produccion/clientes/gestion-del-local-web/dist/. sitio/
+          cp -r produccion/microservices/web/dist/. sitio/
           mkdir -p sitio/pruebas
-          cp -r pruebas/clientes/gestion-del-local-web/dist/. sitio/pruebas/
+          cp -r pruebas/microservices/web/dist/. sitio/pruebas/
       - uses: actions/upload-pages-artifact@v3
         with: { path: sitio }
       - id: deploy

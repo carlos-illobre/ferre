@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
 // Las carpetas donde vive el código: editarlas exige una tarea empezada.
-const CODIGO = ['clientes/', 'microservices/'];
+const CODIGO = ['microservices/', 'libraries/'];
 const EN_CURSO = join(RAIZ, '.specify', 'en-curso.json');
 const TIPOS = ['arreglo', 'ajuste', 'interfaz', 'regla'];
 const LINEA = /^- \[( |x|X)\] (T\d{3})((?: \[[^\]]+\])*) (.+)$/;
@@ -96,7 +96,7 @@ function terminar(referencia) {
     if (todas.every((t) => t.hecha)) {
       const numero = tarea.carpeta.slice(0, 3);
       const escenarios = [...new Set(leer(`specs/${tarea.carpeta}/spec.md`).match(/\bE\d{2}\b/g) || [])];
-      const sinPrueba = escenarios.filter((e) => !git('grep', '-l', `${numero}-${e}`, '--', ...['clientes/', 'microservices/', 'tests/']).trim());
+      const sinPrueba = escenarios.filter((e) => !git('grep', '-l', `${numero}-${e}`, '--', ...['microservices/', 'libraries/', 'tests/']).trim());
       if (sinPrueba.length) throw new Error(`Era la última tarea de ${tarea.carpeta} y hay escenarios sin prueba que los nombre (${sinPrueba.map((e) => `${numero}-${e}`).join(', ')}).`);
       if (!existsSync(join(RAIZ, 'specs', tarea.carpeta, 'revision.md'))) throw new Error(`Era la última tarea de ${tarea.carpeta}: falta specs/${tarea.carpeta}/revision.md, la revisión independiente (paso 7).`);
     }

@@ -20,7 +20,7 @@ services:
     environment:
       SITIO: ${SITIO:?falta SITIO en el .env}
     volumes:
-      - ./infrastructure/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./deployment/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile:ro
       # Certificados y estado de ACME. Sin este volumen, cada reinicio vuelve a emitir
       # y agota el cupo de Let's Encrypt.
       - caddy-data:/data
@@ -33,7 +33,7 @@ services:
     build:
       # Contexto en la raíz por el workspace compartido (ADR-010).
       context: .
-      dockerfile: microservices/gestion-del-local/Dockerfile
+      dockerfile: microservices/api/Dockerfile
     restart: unless-stopped
     environment:
       DATABASE_URL: ${DATABASE_URL:?falta DATABASE_URL en el .env}
@@ -61,7 +61,7 @@ services:
 
   listas-de-proveedores:
     image: ${REGISTRO:?falta REGISTRO en el .env}/listas-de-proveedores:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
-    build: ./microservices/listas-de-proveedores
+    build: ./microservices/listas
     restart: unless-stopped
     environment:
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}

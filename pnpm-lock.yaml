@@ -15,7 +15,53 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.2)(jsdom@25.0.1)(terser@5.51.2)
 
-  clientes/gestion-del-local-web:
+  libraries/calculo-de-precios:
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@22.20.2)(jsdom@25.0.1)(terser@5.51.2)
+
+  microservices/api:
+    dependencies:
+      '@ferre/calculo-de-precios':
+        specifier: workspace:*
+        version: link:../../libraries/calculo-de-precios
+      '@hono/node-server':
+        specifier: ^1.13.0
+        version: 1.19.17(hono@4.13.7)
+      '@simplewebauthn/server':
+        specifier: ^13.3.3
+        version: 13.3.3
+      google-auth-library:
+        specifier: ^11.0.2
+        version: 11.0.2
+      hono:
+        specifier: ^4.6.0
+        version: 4.13.7
+      pg:
+        specifier: ^8.13.0
+        version: 8.23.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.2
+      '@types/pg':
+        specifier: ^8.11.0
+        version: 8.23.1
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.13
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@22.20.2)(jsdom@25.0.1)(terser@5.51.2)
+
+  microservices/web:
     dependencies:
       '@ferre/calculo-de-precios':
         specifier: workspace:*
@@ -87,52 +133,6 @@ importers:
       vite-plugin-pwa:
         specifier: ^1.3.0
         version: 1.3.0(vite@5.4.21(@types/node@22.20.2)(terser@5.51.2))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1)
-      vitest:
-        specifier: ^2.1.0
-        version: 2.1.9(@types/node@22.20.2)(jsdom@25.0.1)(terser@5.51.2)
-
-  libraries/calculo-de-precios:
-    devDependencies:
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.0
-        version: 2.1.9(@types/node@22.20.2)(jsdom@25.0.1)(terser@5.51.2)
-
-  microservices/gestion-del-local:
-    dependencies:
-      '@ferre/calculo-de-precios':
-        specifier: workspace:*
-        version: link:../../libraries/calculo-de-precios
-      '@hono/node-server':
-        specifier: ^1.13.0
-        version: 1.19.17(hono@4.13.7)
-      '@simplewebauthn/server':
-        specifier: ^13.3.3
-        version: 13.3.3
-      google-auth-library:
-        specifier: ^11.0.2
-        version: 11.0.2
-      hono:
-        specifier: ^4.6.0
-        version: 4.13.7
-      pg:
-        specifier: ^8.13.0
-        version: 8.23.0
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.2
-      '@types/pg':
-        specifier: ^8.11.0
-        version: 8.23.1
-      tsx:
-        specifier: ^4.19.0
-        version: 4.23.13
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
       vitest:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.2)(jsdom@25.0.1)(terser@5.51.2)

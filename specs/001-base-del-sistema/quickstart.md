@@ -142,9 +142,9 @@ Cada pedido del dueño que cambia un comportamiento trae la suya.
 | Dónde | Qué cubre |
 |---|---|
 | `libraries/calculo-de-precios` | Redondeo para arriba a $1.000, precio de venta con margen de botón o tipeado, explicación paso a paso, margen real de un precio a mano, búsqueda (orden de palabras, acentos, códigos, velocidad con 50.000 productos) |
-| `microservices/gestion-del-local` (`src/**/*.test.ts`, base simulada en `src/pruebas/base-falsa.ts`) | Validaciones y permisos de las rutas: margen entero, unidad, foto (subida, servida sin sesión, nombres raros), Excel original de una lista, auditoría paginada, roles (admin no toca dueños), ventas (validación, reenvío sin duplicar, ítems con precio/margen/explicación, stock), unir y separar productos, orden de migraciones |
-| `clientes/gestion-del-local-web` (`src/**/*.test.ts(x)`, jsdom + IndexedDB simulada) | Cantidades enteras o a granel; cola de cambios (orden, fusión por producto, reintentos, rechazos); debounce; atajos sin foco; elección de interfaz por ancho; ambiente de prueba; Desplegable, Explicación «?», foto ampliada y sacar foto; Productos; Vender; Compras; Administración. Cada interfaz tiene las suyas al lado de sus pantallas |
-| `microservices/listas-de-proveedores` (pytest) | Los lectores contra muestras anonimizadas (y contra las listas reales de `privado/` cuando existen), el cálculo de costo neto, la API del servicio y su token |
+| `microservices/api` (`src/**/*.test.ts`, base simulada en `src/pruebas/base-falsa.ts`) | Validaciones y permisos de las rutas: margen entero, unidad, foto (subida, servida sin sesión, nombres raros), Excel original de una lista, auditoría paginada, roles (admin no toca dueños), ventas (validación, reenvío sin duplicar, ítems con precio/margen/explicación, stock), unir y separar productos, orden de migraciones |
+| `microservices/web` (`src/**/*.test.ts(x)`, jsdom + IndexedDB simulada) | Cantidades enteras o a granel; cola de cambios (orden, fusión por producto, reintentos, rechazos); debounce; atajos sin foco; elección de interfaz por ancho; ambiente de prueba; Desplegable, Explicación «?», foto ampliada y sacar foto; Productos; Vender; Compras; Administración. Cada interfaz tiene las suyas al lado de sus pantallas |
+| `microservices/listas` (pytest) | Los lectores contra muestras anonimizadas (y contra las listas reales de `privado/` cuando existen), el cálculo de costo neto, la API del servicio y su token |
 
 ## Convenciones de los datos sembrados
 
@@ -163,5 +163,5 @@ un token conocido, guardado hasheado como lo hace la API.
 - Los scripts de integración usan otra marca: correos `prueba-*@ferre.test` y proveedores
   con `(prueba)` en el nombre.
 - Las planillas de muestra están anonimizadas y versionadas en
-  `microservices/listas-de-proveedores/tests/muestras/`; las listas reales viven en
+  `microservices/listas/tests/muestras/`; las listas reales viven en
   `privado/`, que no se sube.

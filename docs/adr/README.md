@@ -22,3 +22,4 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [015](ADR-015-la-interfaz-elegida-es-la-version-5.md) | La interfaz elegida es la versión 5: celular sobre las pantallas de la versión 1, computadora sobre las de la 2, lo nuevo compartido; solo ella tiene pruebas | Aceptado | 2026-10-11 |
 | [016](ADR-016-pedido-de-foto-con-codigo-qr.md) | La computadora pide las fotos al celular con un código QR; el servidor solo pasa la imagen | Aceptado | 2026-10-11 |
 | [017](ADR-017-permisos-fijos-y-roles-armados-por-el-negocio.md) | Permisos fijos en el código y roles armados por el negocio, varios por usuario | Aceptado | 2026-10-11 |
+| [018](ADR-018-servicios-y-capas.md) | El código se organiza en servicios bajo `microservices/` y en capas; un solo front; sin librerías compartidas; precios en el servidor |

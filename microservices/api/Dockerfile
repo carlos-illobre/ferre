@@ -6,13 +6,13 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
-COPY microservices/gestion-del-local/package.json microservices/gestion-del-local/
+COPY microservices/api/package.json microservices/api/
 COPY libraries/calculo-de-precios/package.json libraries/calculo-de-precios/
 RUN pnpm install --frozen-lockfile --filter gestion-del-local...
 
 FROM deps AS build
 COPY libraries/calculo-de-precios libraries/calculo-de-precios
-COPY microservices/gestion-del-local microservices/gestion-del-local
+COPY microservices/api microservices/api
 RUN pnpm --filter gestion-del-local... build && pnpm --filter gestion-del-local --prod deploy --legacy /out
 
 FROM node:22-alpine AS runtime
@@ -22,8 +22,8 @@ ENV NODE_ENV=production
 RUN addgroup -g 10001 app && adduser -u 10001 -G app -D app
 WORKDIR /app
 COPY --from=build --chown=app:app /out ./
-COPY --from=build --chown=app:app /app/microservices/gestion-del-local/dist ./dist
-COPY --from=build --chown=app:app /app/microservices/gestion-del-local/migrations ./migrations
+COPY --from=build --chown=app:app /app/microservices/api/dist ./dist
+COPY --from=build --chown=app:app /app/microservices/api/migrations ./migrations
 RUN mkdir -p /app/datos/listas && chown app:app /app/datos/listas
 USER app
 EXPOSE 8080

@@ -88,7 +88,7 @@ el reconocimiento automático no entendió.
 ## Estado de los lectores
 
 Los cuatro lectores del MVP están hechos (issues #7 a #10) en
-`microservices/listas-de-proveedores/listas_de_proveedores/lectores/`. Cada uno
+`microservices/listas/listas_de_proveedores/lectores/`. Cada uno
 reconoce su planilla por el nombre del archivo o las hojas, y devuelve el mismo formato:
 código, descripción, marca, grupo, precio de lista, descuentos aplicados, costo neto sin
 IVA con su explicación paso a paso, IVA, bulto, código de barras y precio sugerido cuando

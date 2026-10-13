@@ -1,7 +1,7 @@
-# Un solo workspace para compartir libraries/ entre servicios y clientes en TypeScript.
+# Un solo workspace para el front y el servidor. libraries/ se elimina en la etapa 4 del reordenamiento (ADR-018).
 # Cada servicio se empaqueta solo con lo suyo (pnpm deploy), ver ADR-010.
 packages:
-  - microservices/gestion-del-local
-  - clientes/gestion-del-local-web
+  - microservices/api
+  - microservices/web
   - libraries/calculo-de-precios
   - tests/e2e

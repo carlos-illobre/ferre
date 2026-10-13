@@ -1,5 +1,5 @@
 // Datos de mentira para las pantallas de Más: Cómo va el negocio, Usuarios y sesiones,
-// Quién hizo qué. Mismas formas que el servidor real (microservices/gestion-del-local/src/rutas).
+// Quién hizo qué. Mismas formas que el servidor real (microservices/api/src/rutas).
 import deA from "./rutas-u-mas-a.mjs";
 
 const ahora = Date.now();

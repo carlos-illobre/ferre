@@ -63,7 +63,7 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 ## La interfaz
 
 - **La aplicación es una sola y abre en la raíz.** Su código está en
-  `clientes/gestion-del-local-web/src/principal/`.
+  `microservices/web/src/principal/`.
   Cómo está armada y dónde vive cada cosa:
   [ADR-015](docs/adr/ADR-015-la-interfaz-elegida-es-la-version-5.md). Lo que Carlos pidió de
   ella, que es regla para cualquier cambio:

@@ -11,7 +11,7 @@ const EMAIL = "e2e-listas@ferre.test";
 const PROVEEDOR = "Comodo (e2e)";
 // El nombre lleva paréntesis: escapado para usarlo en expresiones regulares.
 const PROVEEDOR_RE = new RegExp(PROVEEDOR.replace(/[()]/g, "\\$&"));
-const MUESTRA = path.resolve("../../microservices/listas-de-proveedores/tests/muestras/LISTA GENERAL PRUEBA 11-8.xlsx");
+const MUESTRA = path.resolve("../../microservices/listas/tests/muestras/LISTA GENERAL PRUEBA 11-8.xlsx");
 
 function psql(sql: string): string {
   return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();

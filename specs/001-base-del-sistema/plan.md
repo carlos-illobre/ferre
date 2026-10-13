@@ -75,11 +75,11 @@ specs/001-base-del-sistema/
 La estructura y los nombres los fija ADR-010.
 
 ```text
-microservices/gestion-del-local/       Lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base y de sus migraciones
-microservices/listas-de-proveedores/   Recibe listas de proveedores por cualquier canal y las convierte en precios
-clientes/gestion-del-local-web/        Las pantallas, en sus dos interfaces. Se publica como sitio estático
+microservices/api/       Lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base y de sus migraciones
+microservices/listas/   Recibe listas de proveedores por cualquier canal y las convierte en precios
+microservices/web/        Las pantallas, en sus dos interfaces. Se publica como sitio estático
 libraries/calculo-de-precios/          Costo, margen y precio, siempre con su explicación; búsqueda. Compartida entre servidor y cliente
-infrastructure/reverse-proxy/          Proxy para desarrollo y CI
+deployment/reverse-proxy/          Proxy para desarrollo y CI
 deployment/                            Plantillas de configuración por ambiente y despliegue en la máquina
 tests/                                 Corredores de unitarias, integración y punta a punta (una carpeta por interfaz)
 docs/                                  ADR, operación, sistema visual, decisiones de negocio

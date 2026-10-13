@@ -7,4 +7,4 @@ echo "== TypeScript (workspace)"
 pnpm -r test
 
 echo "== listas-de-proveedores"
-(cd microservices/listas-de-proveedores && uv run pytest -q)
+(cd microservices/listas && uv run pytest -q)

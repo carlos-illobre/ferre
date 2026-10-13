@@ -1,5 +1,5 @@
 """Genera los archivos del logo de Ferrebress (la F-tornillo dentro de su tuerca) a partir de
-una sola definición: los SVG y los íconos de la app en clientes/gestion-del-local-web/public/,
+una sola definición: los SVG y los íconos de la app en microservices/web/public/,
 el isotipo y el logotipo que dibuja la aplicación (src/principal) y una hoja de prueba en tests/capturas/salida/.
 Uso: python tests/capturas/logo.py   (necesita Playwright)"""
 import os, re, urllib.parse
