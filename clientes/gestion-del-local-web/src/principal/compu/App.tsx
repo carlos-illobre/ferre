@@ -148,6 +148,15 @@ function Pantallas() {
   // lista y el cursor de escritura queda en su caja de texto. Con la lista vacía no hace nada,
   // y la marca se queda en las pestañas o en el menú (decisión 82).
   const focoALaPantalla = () => irAlPrimerItem();
+  // Dejar la marca de las flechas en un lugar aunque la pantalla nueva, al abrirse, ponga el
+  // foco en su búsqueda: se insiste un momento, salvo que la persona ya haya tocado otra cosa.
+  function dejarElFocoEn(buscar: () => HTMLElement | null | undefined): void {
+    let cancelado = false;
+    const cancelar = () => { cancelado = true; };
+    window.addEventListener("keydown", cancelar, { once: true, capture: true });
+    window.addEventListener("mousedown", cancelar, { once: true, capture: true });
+    for (const espera of [60, 150, 350, 600]) setTimeout(() => { if (!cancelado) buscar()?.focus(); }, espera);
+  }
   const pestanaActual = () => document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button");
   // En el menú lateral: ↑ ↓ recorren todo lo que tiene (las partes y, debajo, los botones del
   // espejo y Salir). → abre la parte y pasa a sus pestañas, si tiene; si no, a la pantalla.
@@ -162,7 +171,7 @@ function Pantallas() {
       // Enter abre la parte y deja la marca de las flechas en su primera pestaña (en Más, en su primera opción).
       e.preventDefault();
       botones[i]!.click();
-      setTimeout(() => (pestanaActual() ?? document.querySelector<HTMLButtonElement>(".cuerpo .mas-grilla button"))?.focus(), 150);
+      dejarElFocoEn(() => pestanaActual() ?? document.querySelector<HTMLButtonElement>(".cuerpo .mas-grilla button"));
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
       // Solo las partes se abren con →; desde Desvincular o Salir, → vuelve a la pantalla sin tocarlos.
@@ -170,7 +179,8 @@ function Pantallas() {
       const cambia = esParte && botones[i]!.getAttribute("aria-current") !== "page";
       if (cambia) botones[i]!.click();
       // Al cambiar de parte hay que esperar a que la pantalla nueva esté dibujada.
-      setTimeout(() => { const pestana = esParte ? pestanaActual() : null; if (pestana) pestana.focus(); else (document.querySelector<HTMLButtonElement>(".cuerpo .mas-grilla button") ?? null)?.focus(); }, cambia ? 150 : 0);
+      const destino = () => (esParte ? pestanaActual() : null) ?? document.querySelector<HTMLButtonElement>(".cuerpo .mas-grilla button");
+      if (cambia) dejarElFocoEn(destino); else destino()?.focus();
     }
   }
   // En las pestañas de una parte (Productos, Listas, Duplicados): ← → pasan el foco de una a
@@ -191,7 +201,7 @@ function Pantallas() {
       const elegida = botones[i]!;
       // Enter abre la pestaña que tiene el foco y lo deja en ella; si ya estaba abierta, entra a la pantalla.
       if (elegida.getAttribute("aria-current") === "page") focoALaPantalla();
-      else { elegida.click(); setTimeout(() => pestanaActual()?.focus(), 150); }
+      else elegida.click();
     } else if (e.key === "ArrowDown") {
       e.preventDefault(); e.stopPropagation();
       focoALaPantalla();
@@ -249,7 +259,7 @@ function Pantallas() {
             {pestanas.map((p) => (
               <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={`Alt+${atajoDe(p.ruta)}`} data-testid={`pestana-${p.ruta}`}
                 // Al abrirla (con un clic o con Enter), la marca de las flechas queda en esta pestaña: la pantalla nueva no se la lleva.
-                onClick={() => { irA(p.ruta); setTimeout(() => document.querySelector<HTMLButtonElement>(`[data-testid="pestana-${p.ruta}"]`)?.focus(), 150); }}>
+                onClick={() => { irA(p.ruta); dejarElFocoEn(() => document.querySelector<HTMLButtonElement>(`[data-testid="pestana-${p.ruta}"]`)); }}>
                 <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}<span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>
               </button>
             ))}

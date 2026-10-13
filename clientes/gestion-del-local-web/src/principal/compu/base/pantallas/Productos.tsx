@@ -89,7 +89,13 @@ export function Productos() {
       if (elegido === 0) document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']")?.focus();
       else setElegido((i) => Math.max(i - 1, 0));
     }
-    else if (e.key === "Enter" && resultados[elegido] && (e.target as HTMLElement).tagName !== "BUTTON") { e.preventDefault(); setAbiertoId(resultados[elegido]!.id); }
+    else if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "BUTTON") {
+      // Si la lista todavía no alcanzó a lo que se escribió (se filtra un instante después de
+      // tipear), Enter abre el primer resultado de lo escrito, no la fila de la lista vieja.
+      const alDia = consulta === consultaEstable;
+      const p = alDia ? resultados[elegido] : (consulta.trim() ? buscarProductos(consulta, 1)[0] : undefined);
+      if (p) { e.preventDefault(); setAbiertoId(p.id); }
+    }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
     else if (fijaMargen && e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
       // Se mira e.code porque con Mayúsculas la tecla «3» reporta «#».
@@ -97,7 +103,7 @@ export function Productos() {
       const p = resultados[elegido];
       if (p && p.costo_neto !== null) actualizar(p.id, { margen_elegido: MARGENES[Number(e.code.slice(5)) - 1]! });
     }
-  }, [resultados, elegido, actualizar, abiertoId]);
+  }, [resultados, elegido, actualizar, abiertoId, consulta, consultaEstable, buscarProductos]);
   useTeclasGlobales(teclas, caja.current);
 
   const abierto = abiertoId ? (catalogo ?? []).find((p) => p.id === abiertoId) ?? null : null;
