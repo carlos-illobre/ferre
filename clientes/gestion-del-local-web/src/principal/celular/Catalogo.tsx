@@ -9,7 +9,7 @@ import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Explicacion } from "./componentes/Explicacion";
 import { FotoProducto } from "./componentes/Foto";
-import { useCatalogo } from "../../catalogo";
+import { traerPorCodigo, useCatalogo } from "../../catalogo";
 import { useDebounce } from "../../debounce";
 import { useTeclasGlobales } from "../../teclas";
 import { descargar, subirFoto } from "../../api";
@@ -50,7 +50,7 @@ const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join("
 // Teclado: flechas eligen, Enter abre, Shift+1..5 fijan el margen del elegido, Esc limpia.
 export function Productos() {
   const fijaMargen = usePuede()("catalogo.margenes");
-  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto, enElServidor } = useCatalogo();
   const [error, setError] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
   const consultaEstable = useDebounce(consulta, 150);
@@ -61,11 +61,13 @@ export function Productos() {
   const [escaneando, setEscaneando] = useState(false);
   const alEscanear = useCallback((codigo: string) => {
     setEscaneando(false);
-    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-    if (p) { setConsulta(""); setAbiertoId(p.id); return; }
-    setConsulta(codigo);
-    setError(`Ningún producto tiene el código ${codigo}. Buscá el producto, abrilo y tocá «Escanear el código» para cargárselo.`);
-  }, [catalogo]);
+    // De la memoria o, buscando en el servidor (RF-82), del servidor.
+    void traerPorCodigo(codigo).then((p) => {
+      if (p) { setConsulta(""); setAbiertoId(p.id); return; }
+      setConsulta(codigo);
+      setError(`Ningún producto tiene el código ${codigo}. Buscá el producto, abrilo y tocá «Escanear el código» para cargárselo.`);
+    });
+  }, []);
   const caja = useRef<HTMLInputElement>(null);
   const centinela = useRef<HTMLDivElement>(null);
 
@@ -103,7 +105,7 @@ export function Productos() {
 
   return (
     <>
-      <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? `Buscar en ${catalogo.length.toLocaleString("es-AR")} productos` : "Bajando el catálogo…"} disabled={!catalogo} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
+      <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? (enElServidor ? "Buscar productos" : `Buscar en ${catalogo.length.toLocaleString("es-AR")} productos`) : "Bajando el catálogo…"} disabled={!catalogo} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
       {escaneando && <Escaner alDetectar={alEscanear} alCerrar={() => setEscaneando(false)} />}
       <small className="solo-escritorio">Flechas para elegir · Enter abre{fijaMargen ? " · Shift+1 a Shift+5 fijan el margen (300, 200, 100, 50, 25 %)" : ""} · Esc limpia</small>
       <AvisoError texto={error ?? errorCatalogo} alCerrar={() => setError(null)} />

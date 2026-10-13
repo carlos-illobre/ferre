@@ -22,12 +22,44 @@ export type ProductoCatalogo = {
   modificado_en: string;
 };
 
+// El texto de un producto como lo compara la búsqueda: minúsculas, sin acentos y con todo lo
+// que no es letra ni número convertido en espacio.
+const TEXTO_NORMALIZADO = "regexp_replace(translate(lower(p.descripcion || ' ' || coalesce(p.marca, '')), 'áéíóúüñ', 'aeiouun'), '[^a-z0-9]+', ' ', 'g')";
+export function normalizarBusqueda(texto: string): string[] {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
+
 productos.get("/", async (c) => {
   // De a tandas (`limite` y `desde`) para que la primera vez el dispositivo muestre algo
   // enseguida y baje el resto atrás; sin `limite` va el catálogo entero, como siempre.
   const limite = Math.floor(Number(c.req.query("limite")));
   const desde = Math.max(0, Math.floor(Number(c.req.query("desde")) || 0));
   const tanda = Number.isFinite(limite) && limite > 0 ? `, p.id LIMIT ${Math.min(limite, 20000)} OFFSET ${desde}` : "";
+  // Tres filtros para el celular que no guarda el catálogo y busca acá (RF-82): por texto
+  // (`buscar`), por código de barras o de proveedor exacto (`codigo`) y por una lista de
+  // productos (`ids`). Los valores van siempre como parámetros de la consulta.
+  const parametros: unknown[] = [];
+  const filtros: string[] = [];
+  const palabras = normalizarBusqueda(c.req.query("buscar") ?? "").slice(0, 8);
+  for (const palabra of palabras) {
+    parametros.push(palabra);
+    const n = parametros.length;
+    // Como en la aplicación: cada palabra es el comienzo de una palabra de la descripción o
+    // la marca, o el comienzo de un código.
+    filtros.push(`((' ' || ${TEXTO_NORMALIZADO}) LIKE '% ' || $${n} || '%'
+      OR lower(coalesce(p.codigo_barras, '')) LIKE $${n} || '%'
+      OR EXISTS (SELECT 1 FROM precio_proveedor c WHERE c.producto_id = p.id AND lower(coalesce(c.codigo_proveedor, '')) LIKE $${n} || '%'))`);
+  }
+  const codigo = (c.req.query("codigo") ?? "").trim();
+  if (codigo) {
+    parametros.push(codigo);
+    filtros.push(`(p.codigo_barras = $${parametros.length} OR EXISTS (SELECT 1 FROM precio_proveedor c WHERE c.producto_id = p.id AND c.codigo_proveedor = $${parametros.length}))`);
+  }
+  const ids = (c.req.query("ids") ?? "").split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f-]{36}$/i.test(x)).slice(0, 300);
+  if (c.req.query("ids") !== undefined) { parametros.push(ids); filtros.push(`p.id = ANY($${parametros.length}::uuid[])`); }
+  const donde = filtros.map((f) => ` AND ${f}`).join("");
+  // Una búsqueda trae primero las descripciones más cortas, que es lo que la aplicación muestra arriba.
+  const orden = palabras.length ? "length(p.descripcion), p.descripcion" : "p.descripcion";
   const { rows } = await pool.query(
     `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.modificado_en, p.sector_id, p.foto_url,
             pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text, pp.lista_importada_id,
@@ -49,8 +81,9 @@ productos.get("/", async (c) => {
               WHERE x.producto_id = p.id ORDER BY x.proveedor_id, x.fecha_lista DESC, x.creado_en DESC
            ) v
        ) prov ON true
-      WHERE p.activo AND p.reemplazado_por IS NULL
-      ORDER BY p.descripcion${tanda}`,
+      WHERE p.activo AND p.reemplazado_por IS NULL${donde}
+      ORDER BY ${orden}${tanda}`,
+    parametros,
   );
   return c.json(rows);
 });

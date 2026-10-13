@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { buscar, indexar } from "@ferre/calculo-de-precios";
+import { buscaEnElServidor } from "./guardado";
 import { api, EVENTO_CAMBIO } from "./api";
 import { borrar, guardar, guardarMeta, leerMeta, leerTodo, reemplazarTodo } from "./almacen";
 import { cambiosDeProductosPendientes, enviarOEncolar, enviarPendientes } from "./cola";
@@ -21,13 +22,14 @@ export type StockFila = { id: string; stock: string; costo_neto: string | null; 
 export type Cliente = { id: string; nombre: string; telefono: string | null; cuenta_corriente: boolean; deuda: string };
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad" | "foto_url"> & { proveedor_preferido_id?: string }>;
 // `completo`: el catálogo ya está entero (no solo los primeros, ni una tanda de la primera bajada).
-type Estado = { catalogo: Producto[] | null; completo: boolean; stock: Map<string, number>; clientes: Cliente[]; error: string | null; desdeDispositivo: boolean };
+// `buscando`: hay una consulta al servidor en curso (solo cuando se busca en el servidor, RF-82).
+type Estado = { catalogo: Producto[] | null; completo: boolean; stock: Map<string, number>; clientes: Cliente[]; error: string | null; desdeDispositivo: boolean; buscando: boolean };
 
 const PRIMEROS = 60;            // los que se guardan aparte para mostrar al instante
 const TANDA = 5000;             // la primera vez, el servidor se baja de a tandas
 const REFRESCO_MS = 60_000;     // al abrir una pantalla se vuelve a consultar al servidor si pasó este tiempo
 
-let estado: Estado = { catalogo: null, completo: false, stock: new Map(), clientes: [], error: null, desdeDispositivo: false };
+let estado: Estado = { catalogo: null, completo: false, stock: new Map(), clientes: [], error: null, desdeDispositivo: false, buscando: false };
 const oyentes = new Set<() => void>();
 function poner(cambios: Partial<Estado>) { estado = { ...estado, ...cambios }; oyentes.forEach((o) => o()); }
 const suscribir = (oyente: () => void) => { oyentes.add(oyente); return () => { oyentes.delete(oyente); }; };
@@ -42,6 +44,49 @@ function buscarEn(catalogo: Producto[] | null, consulta: string, maximo: number)
   if (!catalogo) return [];
   if (indice?.de !== catalogo) indice = { de: catalogo, valor: indexar(catalogo.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }))) };
   return buscar(indice.valor, consulta, maximo);
+}
+
+// Buscar en el servidor (RF-82): un celular que no guarda el catálogo y eligió no bajarlo tiene
+// en memoria solo lo que fue trayendo. Buscar o escanear mira primero ahí y después le pregunta
+// al servidor; lo que llega se suma a la memoria y la pantalla lo muestra.
+let consultasEnCurso = 0;
+const yaBuscado = new Set<string>();
+let espera: ReturnType<typeof setTimeout> | null = null;
+function sumar(traidos: Producto[]) {
+  if (traidos.length === 0) return;
+  const porId = new Map((estado.catalogo ?? []).map((p) => [p.id, p]));
+  let cambio = false;
+  for (const p of traidos) { const viejo = porId.get(p.id); if (!viejo || JSON.stringify(viejo) !== JSON.stringify(p)) { porId.set(p.id, p); cambio = true; } }
+  if (cambio) poner({ catalogo: ordenar([...porId.values()]) });
+}
+async function traer(consulta: string): Promise<Producto[]> {
+  consultasEnCurso += 1; poner({ buscando: true });
+  try { const traidos = await api<Producto[]>(`/productos?${consulta}`); sumar(traidos); return traidos; }
+  finally { consultasEnCurso -= 1; if (consultasEnCurso === 0) poner({ buscando: false }); }
+}
+function pedirAlServidor(consulta: string) {
+  const clave = consulta.trim().toLowerCase();
+  if (clave.length < 2 || yaBuscado.has(clave)) return;
+  if (espera) clearTimeout(espera);
+  // Se espera a que la persona deje de escribir: una consulta por búsqueda, no por letra.
+  espera = setTimeout(() => {
+    yaBuscado.add(clave);
+    traer(`buscar=${encodeURIComponent(clave)}&limite=60`).catch(() => { yaBuscado.delete(clave); });
+  }, 300);
+}
+// Un producto por su código de barras o de proveedor: de la memoria o, si no está, del servidor.
+export async function traerPorCodigo(codigo: string): Promise<Producto | null> {
+  const es = (p: Producto) => p.codigo_barras === codigo || p.codigo_proveedor === codigo;
+  const local = (estado.catalogo ?? []).find(es);
+  if (local || !buscaEnElServidor()) return local ?? null;
+  return (await traer(`codigo=${encodeURIComponent(codigo)}`).catch(() => [] as Producto[])).find(es) ?? null;
+}
+// Los productos que una pantalla necesita por su identificador (los de un pedido, los que tienen stock).
+export async function traerPorIds(ids: string[]): Promise<void> {
+  if (!buscaEnElServidor()) return;
+  const tengo = new Set((estado.catalogo ?? []).map((p) => p.id));
+  const faltan = [...new Set(ids)].filter((id) => !tengo.has(id));
+  for (let i = 0; i < faltan.length; i += 150) await traer(`ids=${faltan.slice(i, i + 150).join(",")}`).catch(() => undefined);
 }
 
 // Cambios hechos acá mientras una bajada estaba en vuelo: se vuelven a aplicar sobre lo que llega.
@@ -92,7 +137,17 @@ function refrescarDelServidor(): Promise<void> {
       // se muestra enseguida una primera tanda y el resto se va sumando atrás, de a tandas
       // grandes. Con el catálogo ya guardado alcanza un solo pedido, que nadie espera.
       const primeraVez = !estado.catalogo;
+      const enServidor = buscaEnElServidor();
       const bajarCatalogo = async (): Promise<Producto[]> => {
+        // Buscando en el servidor no se baja el catálogo: los primeros, para que la lista no
+        // esté vacía, y lo que ya se había traído, para tenerlo al día.
+        if (enServidor) {
+          const primeros = await api<Producto[]>(`/productos?limite=${PRIMEROS}`);
+          const tengo = (estado.catalogo ?? []).map((p) => p.id).filter((id) => !primeros.some((p) => p.id === id));
+          const resto: Producto[] = [];
+          for (let i = 0; i < tengo.length; i += 150) resto.push(...await api<Producto[]>(`/productos?ids=${tengo.slice(i, i + 150).join(",")}`));
+          return primeros.concat(resto);
+        }
         if (!primeraVez) return api<Producto[]>("/productos");
         let todo = await api<Producto[]>(`/productos?limite=${PRIMEROS}`);
         // Un servidor que todavía no reparte de a tandas contesta todo junto: listo.
@@ -128,7 +183,7 @@ function refrescarDelServidor(): Promise<void> {
       });
       pendientes.clear();
       if (enCola.size) enviarPendientes().catch(() => undefined);
-      const cambios: Partial<Estado> = { desdeDispositivo: false, error: null, completo: true };
+      const cambios: Partial<Estado> = { desdeDispositivo: false, error: null, completo: !enServidor };
       if (cambio || !anterior) cambios.catalogo = c;
       if (st) cambios.stock = new Map(st.map((x) => [x.id, Number(x.stock)]));
       if (cl) cambios.clientes = cl;
@@ -211,6 +266,10 @@ function ajustarStockLocal(id: string, delta: number) {
 export function useCatalogo() {
   const e = useSyncExternalStore(suscribir, () => estado);
   useEffect(() => { asegurar(); }, []);
-  const buscarProductos = useCallback((consulta: string, maximo = 50) => buscarEn(e.catalogo, consulta, maximo), [e.catalogo]);
-  return { catalogo: e.catalogo, catalogoCompleto: e.completo, stock: e.stock, clientes: e.clientes, error: e.error, desdeDispositivo: e.desdeDispositivo, buscarProductos, actualizarProducto, ajustarStockLocal };
+  const buscarProductos = useCallback((consulta: string, maximo = 50) => {
+    // Buscando en el servidor: se muestra lo que hay en memoria y se le pregunta al servidor; lo que llegue vuelve a pasar por acá.
+    if (buscaEnElServidor()) pedirAlServidor(consulta);
+    return buscarEn(e.catalogo, consulta, maximo);
+  }, [e.catalogo]);
+  return { catalogo: e.catalogo, catalogoCompleto: e.completo, buscandoEnElServidor: e.buscando, enElServidor: buscaEnElServidor(), stock: e.stock, clientes: e.clientes, error: e.error, desdeDispositivo: e.desdeDispositivo, buscarProductos, actualizarProducto, ajustarStockLocal };
 }

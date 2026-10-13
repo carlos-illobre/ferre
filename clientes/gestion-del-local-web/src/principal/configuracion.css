@@ -14,3 +14,11 @@
 .cfg-llave::before { content: ""; position: absolute; inset: -6px -4px; }
 .cfg-llave:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 3px; }
 .cfg-nota { margin: 12px 4px 0; color: var(--p-texto-2, #4a5451); font-size: 0.875rem; max-width: 640px; }
+/* Una preferencia con opciones para elegir: cada opción, una tarjeta con su ventaja y su desventaja. */
+.cfg-opciones { grid-template-columns: 1fr; }
+.cfg-opcion { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--p-borde, #c3cfc6); background: var(--p-superficie, #fff); color: var(--p-tinta, #18201e); font: inherit; font-size: 0.9375rem; line-height: 1.35; text-align: left; cursor: pointer; }
+.cfg-opcion strong { font-size: 1.0625rem; }
+.cfg-opcion span { color: var(--p-texto-2, #4a5451); }
+.cfg-opcion.elegida { border-color: var(--p-ok, #0f8a5f); background: var(--p-verde-suave, #e3f3ea); box-shadow: inset 0 0 0 1px var(--p-ok, #0f8a5f); }
+.cfg-opcion.elegida strong::after { content: " · elegida"; color: var(--p-verde-texto, #0f6b52); font-weight: 600; font-size: 0.875rem; }
+.cfg-opcion:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 2px; }

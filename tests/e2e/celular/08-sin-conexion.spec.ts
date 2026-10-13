@@ -136,3 +136,29 @@ test("con el trabajo sin conexión habilitado, la app abre sin red gracias al se
   await expect(page.getByTestId("sugerencias")).toContainText("DESTORNILLADOR OFFLINE");
   await context.setOffline(false);
 });
+
+// Con el guardado deshabilitado se puede elegir no bajar el catálogo y buscar en el servidor (RF-82).
+test("en el celular, buscando en el servidor no se baja el catálogo y se busca, se lee un código y se vende igual", async ({ page }) => {
+  const EN_EL_SERVIDOR = JSON.stringify({ animaciones: true, sinConexion: false, buscar: "servidor" });
+  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, EN_EL_SERVIDOR]);
+  const pedidos: string[] = [];
+  page.on("request", (r) => { const u = new URL(r.url()); if (u.pathname === "/productos" && r.method() === "GET") pedidos.push(u.search); });
+  await page.goto("/#/vender");
+  const busqueda = page.getByTestId("busqueda");
+  await expect(busqueda).toBeEnabled();
+
+  // Buscar por nombre (E17): el producto no está en memoria; llega del servidor y se agrega.
+  await busqueda.fill("e2e destornillador offline");
+  await expect(page.getByText(/DESTORNILLADOR OFFLINE/).first()).toBeVisible();
+  await busqueda.press("Enter");
+  await expect(page.getByTestId("item").filter({ hasText: "DESTORNILLADOR OFFLINE" })).toBeVisible();
+  await expect.poll(() => pedidos.some((q) => q.startsWith("?buscar="))).toBe(true);
+  // Nunca se pidió el catálogo entero: cada pedido lleva su límite o su filtro.
+  expect(pedidos.filter((q) => !/[?&](limite|buscar|codigo|ids)=/.test(q))).toEqual([]);
+  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
+
+  // La elección está en Configuración, con la ventaja y la desventaja de cada forma (E15).
+  await page.goto("/#/mas/configuracion");
+  await expect(page.getByTestId("cfg-buscar-servidor")).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByTestId("cfg-buscar-memoria")).toContainText("Desventaja:");
+});

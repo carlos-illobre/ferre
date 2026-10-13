@@ -23,7 +23,7 @@ export function catalogoFalso(productos: Producto[]) {
     return { encolado: false };
   });
   const valor = {
-    catalogo: productos, catalogoCompleto: true, stock: new Map<string, number>(), clientes: [], error: null, desdeDispositivo: false,
+    catalogo: productos, catalogoCompleto: true, buscandoEnElServidor: false, enElServidor: false, stock: new Map<string, number>(), clientes: [], error: null, desdeDispositivo: false,
     buscarProductos: (consulta: string, maximo = 50) => buscar(indice, consulta, maximo),
     actualizarProducto, ajustarStockLocal: vi.fn(),
   };
@@ -36,5 +36,7 @@ export function catalogoFalso(productos: Producto[]) {
     const buscarProductos = useMemo(() => (consulta: string, maximo = 50) => buscar(indice, consulta, maximo), [version]);
     return { ...valor, buscarProductos };
   }
-  return { ...valor, useCatalogoFalso };
+  // Como en el real con el catálogo en memoria: el producto que tiene ese código, o ninguno.
+  const traerPorCodigo = async (codigo: string) => productos.find((p) => p.codigo_barras === codigo || p.codigo_proveedor === codigo) ?? null;
+  return { ...valor, useCatalogoFalso, traerPorCodigo };
 }

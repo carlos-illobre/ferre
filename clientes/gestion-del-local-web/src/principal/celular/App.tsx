@@ -3,6 +3,7 @@ import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
 import { TEXTOS_DEL_VINCULO } from "../EspejoEstado";
+import { useCatalogo } from "../../catalogo";
 import { Configuracion } from "../Configuracion";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { alAvisoDelEspejo, pausarEspejo, useEspejar, useEspejo } from "../../espejo";
@@ -61,6 +62,12 @@ const DE_MAS: { parte: Parte | "tickets" | "anomalias" | "roles" | "configuracio
 const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
 );
+
+// Buscando en el servidor (RF-82): mientras una consulta está en curso, se dice arriba.
+function BuscandoEnElServidor() {
+  const { buscandoEnElServidor } = useCatalogo();
+  return buscandoEnElServidor ? <span className="estado-chico pendiente" role="status" data-testid="buscando-en-el-servidor"><i aria-hidden="true" />Buscando en el servidor…</span> : null;
+}
 
 // Lo que terminó en la computadora («venta cobrada») se dice acá un momento.
 function AvisoDeLaCompu() {
@@ -140,7 +147,7 @@ function Pantallas() {
     <div className="app">
       {/* La línea de arriba (decisión 76): cómo está la conexión, siempre a la vista, y lo que
           termina en la computadora, un momento. El estado del vínculo lo dice el color del botón. */}
-      <div className="linea-de-arriba"><EstadoDeConexion testId="conexion-celular" /><AvisoDeLaCompu /></div>
+      <div className="linea-de-arriba"><EstadoDeConexion testId="conexion-celular" /><BuscandoEnElServidor /><AvisoDeLaCompu /></div>
 
       {/* Un solo botón a la derecha del encabezado de cualquier pantalla (decisiones 70 y 73):
           sin vínculo, «Vincular»; con vínculo, «Desconectar» o «Reconectar». Desvincular está en Usuarios y sesiones. */}

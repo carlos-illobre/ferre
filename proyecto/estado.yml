@@ -688,9 +688,17 @@ RF-81:
     - "Sin prueba: que un ticket de Mejoras y errores sin conexión y sin guardado avise en vez de quedar esperando"
 
 RF-82:
-  estado: "Nuevo: especificado y aprobado (009-T003)"
-  pruebas: []
-  defectos: []
+  estado: "Hecho (009-T003): con el guardado deshabilitado se elige en Configuración entre bajar el catálogo al abrir o buscar en el servidor"
+  pruebas:
+    - clientes/gestion-del-local-web/src/buscar-en-el-servidor.test.tsx
+    - microservices/gestion-del-local/src/rutas/productos.test.ts
+    - tests/e2e/celular/08-sin-conexion.spec.ts
+  defectos:
+    - "Buscando en el servidor, Inventario muestra sin buscar solo los primeros 150 productos con stock; el resto aparece al buscarlo"
+    - "Buscando en el servidor, Duplicados y las listas que recorren el catálogo entero ven solo lo que ya se trajo"
+    - "La búsqueda del servidor trae hasta 60 productos por consulta, las descripciones más cortas primero: en una búsqueda muy amplia el orden puede no ser idéntico al del catálogo bajado"
+    - "Sin prueba de punta a punta: leer un código con la cámara buscando en el servidor (las pruebas no tienen cámara); está probado por unidad"
+    - "No está medido en un teléfono con los 11.000 productos reales cuánto tarda cada búsqueda"
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
   pruebas:

@@ -27,6 +27,31 @@ describe("GET /productos", () => {
 describe("PATCH /productos/:id", () => {
   beforeEach(() => { base.actual = baseFalsa(); base.actual.programar(/UPDATE producto SET/, { rowCount: 1 }); });
 
+  it("buscar, traer por código y traer por lista de productos: filtros que van como parámetros (RF-82)", async () => {
+    await pedir(app, "GET", "/productos?buscar=" + encodeURIComponent("Mechá 8mm'; DROP TABLE producto;--") + "&limite=60", { rol: "mostrador" });
+    const busqueda = base.actual.sqlDe(/FROM producto p/).at(-1)!;
+    // Cada palabra, normalizada, es un parámetro; nada del texto queda pegado en la consulta.
+    expect(busqueda.params).toEqual(["mecha", "8mm", "drop", "table", "producto"]);
+    expect(busqueda.sql).not.toMatch(/DROP TABLE/i);
+    expect(busqueda.sql).toMatch(/LIKE '% ' \|\| \$1 \|\| '%'/);
+    expect(busqueda.sql).toMatch(/ORDER BY length\(p\.descripcion\), p\.descripcion, p\.id LIMIT 60 OFFSET 0/);
+
+    await pedir(app, "GET", "/productos?codigo=7790250000358", { rol: "mostrador" });
+    const porCodigo = base.actual.sqlDe(/FROM producto p/).at(-1)!;
+    expect(porCodigo.params).toEqual(["7790250000358"]);
+    expect(porCodigo.sql).toMatch(/p\.codigo_barras = \$1 OR EXISTS/);
+
+    const id = "00000000-0000-0000-0000-0000000e5e02";
+    await pedir(app, "GET", `/productos?ids=${id},no-es-un-id`, { rol: "mostrador" });
+    const porIds = base.actual.sqlDe(/FROM producto p/).at(-1)!;
+    expect(porIds.params).toEqual([[id]]);
+    expect(porIds.sql).toMatch(/p\.id = ANY\(\$1::uuid\[\]\)/);
+    // Una lista vacía no trae el catálogo entero: no trae nada.
+    await pedir(app, "GET", "/productos?ids=", { rol: "mostrador" });
+    expect(base.actual.sqlDe(/FROM producto p/).at(-1)!.params).toEqual([[]]);
+    expect((await pedir(app, "GET", "/productos?buscar=mecha", { rol: null })).status).toBe(401);
+  });
+
   it("sin sesión, 401", async () => {
     expect((await pedir(app, "PATCH", "/productos/p1", { rol: null, cuerpo: { margen_elegido: 100 } })).status).toBe(401);
   });

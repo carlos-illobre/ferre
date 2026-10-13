@@ -14,7 +14,7 @@ import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../../
 import { api, ErrorApi, subirFoto } from "../../api";
 import { guardar, borrarAnterioresA } from "../../almacen";
 import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendientesEnCola } from "../../cola";
-import { useCatalogo } from "../../catalogo";
+import { traerPorCodigo, useCatalogo } from "../../catalogo";
 import { useTeclasGlobales } from "../../teclas";
 import { pesos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
@@ -84,7 +84,7 @@ export function ParteVender({ sub }: { sub: string | null }) {
 export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   const puedeEsto = usePuede();
   const fijaMargen = puedeEsto("catalogo.margenes");
-  const { catalogo, catalogoCompleto, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
+  const { catalogo, catalogoCompleto, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal, enElServidor } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
@@ -153,10 +153,16 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     const c = codigo.trim();
     const exacto = (catalogo ?? []).find((p) => p.codigo_barras === c || p.codigo_proveedor === c);
     if (exacto) { agregar(exacto); setCodigoDesconocido(null); return true; }
+    // Buscando en el servidor (RF-82), el producto puede no estar en memoria: se lo pide por su código.
+    if (enElServidor) {
+      setConsulta("");
+      void traerPorCodigo(c).then((p) => { if (p) { agregar(p); setCodigoDesconocido(null); } else setCodigoDesconocido(c); });
+      return true;
+    }
     setCodigoDesconocido(c);
     setConsulta("");
     return false;
-  }, [catalogo, agregar]);
+  }, [catalogo, agregar, enElServidor]);
   const manejarCodigo = useRef(agregarPorCodigo);
   useEffect(() => { manejarCodigo.current = agregarPorCodigo; }, [agregarPorCodigo]);
 

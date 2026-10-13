@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
-import { useCatalogo } from "../catalogo";
+import { traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
 import { Escaner, hayCamara } from "./celular/componentes/Escaner";
 import { usePuede } from "./permisos";
@@ -187,9 +187,10 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
   const cambiar = (id: string, cantidad: number) => setRenglones((l) => l.map((r) => (r.producto_id === id ? { ...r, cantidad } : r)));
   const alEscanear = useCallback((codigo: string) => {
     setEscaneando(false);
-    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-    if (p) agregar(p as Producto); else { setConsulta(codigo); setError(`Ningún producto tiene el código ${codigo}.`); }
-  }, [catalogo, agregar]);
+    void traerPorCodigo(codigo).then((p) => {
+      if (p) agregar(p as Producto); else { setConsulta(codigo); setError(`Ningún producto tiene el código ${codigo}.`); }
+    });
+  }, [agregar]);
 
   async function borrar() {
     if (existe.current) { try { await api(`/pedidos/${inicial.id}`, { method: "DELETE" }); } catch (e) { setError(mensajeDe(e, "borrar el borrador")); return; } }
@@ -379,7 +380,7 @@ export function usePedidoAIngresar(): { pedido: Pedido | null; error: string | n
   useEffect(() => {
     if (!id) { setPedido(null); setError(null); return; }
     let vigente = true;
-    api<Pedido>(`/pedidos/${id}`).then((p) => { if (vigente) { setPedido(p.estado === "enviado" || p.estado === "recibido_parcial" ? p : null); setError(p.estado === "enviado" || p.estado === "recibido_parcial" ? null : "Ese pedido ya no espera mercadería."); } })
+    api<Pedido>(`/pedidos/${id}`).then((p) => { void traerPorIds(p.items.map((i) => i.producto_id)); if (vigente) { setPedido(p.estado === "enviado" || p.estado === "recibido_parcial" ? p : null); setError(p.estado === "enviado" || p.estado === "recibido_parcial" ? null : "Ese pedido ya no espera mercadería."); } })
       .catch((e) => { if (vigente) setError(mensajeDe(e, "traer el pedido")); });
     return () => { vigente = false; };
   }, [id]);

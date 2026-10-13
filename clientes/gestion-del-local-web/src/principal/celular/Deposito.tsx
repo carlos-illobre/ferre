@@ -9,7 +9,7 @@ import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { api, ErrorApi } from "../../api";
 import { enviarOEncolar } from "../../cola";
-import { useCatalogo } from "../../catalogo";
+import { traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { fecha, pesos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
 import { cantidadValida, enteras, unidadDe } from "../../unidades";
@@ -68,6 +68,8 @@ function Stock() {
   useEffect(() => { void cargar(); }, [cargar]);
 
   const porId = useMemo(() => new Map((datos?.productos ?? []).map((s) => [s.id, s])), [datos]);
+  // Buscando en el servidor (RF-82) no está el catálogo en memoria: se traen los primeros productos con stock.
+  useEffect(() => { if (datos) void traerPorIds(datos.productos.slice(0, 150).map((s) => s.id)); }, [datos]);
   const filas = useMemo(() => {
     if (!catalogo) return [];
     return consulta.trim() ? buscarProductos(consulta, 100) : catalogo.filter((p) => porId.has(p.id)).sort((a, b) => a.descripcion.localeCompare(b.descripcion, "es")).slice(0, 100);
@@ -232,9 +234,10 @@ function Ingreso() {
   const cambiar = (clave: string, c: Partial<Renglon>) => setRenglones((l) => l.map((r) => (r.clave === clave ? { ...r, ...c } : r)));
   const quitar = (clave: string) => { setRenglones((l) => l.filter((r) => r.clave !== clave)); };
   const alDetectar = useCallback((codigo: string) => {
-    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-    if (p) { setEscaneando(false); agregar(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
-  }, [catalogo, agregar]);
+    void traerPorCodigo(codigo).then((p) => {
+      if (p) { setEscaneando(false); agregar(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
+    });
+  }, [agregar]);
 
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
@@ -437,8 +440,9 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     setConsulta("");
   }
   const alDetectar = useCallback((codigo: string) => {
-    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-    if (p) { setEscaneando(false); elegirProducto(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
+    void traerPorCodigo(codigo).then((p) => {
+      if (p) { setEscaneando(false); elegirProducto(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalogo]);
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {

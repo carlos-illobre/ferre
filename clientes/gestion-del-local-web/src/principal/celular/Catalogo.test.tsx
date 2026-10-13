@@ -5,8 +5,8 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 import { ObservadorFalso } from "../../pruebas/preparar";
 
-const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso() }));
+const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
+vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: (c: string) => catalogo.actual.traerPorCodigo(c), traerPorIds: async () => undefined }));
 const descargar = vi.fn<(...a: any[]) => Promise<void>>(async () => undefined);
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar: (...a: unknown[]) => descargar(...a), api: (...a: unknown[]) => apiFalsa(...a) }));
@@ -170,14 +170,17 @@ describe("Catálogo · Productos", () => {
   });
 
   // RF-08: buscar escaneando. La cámara se simula.
-  it("escanear el código de un producto abre su ficha; uno que nadie tiene lo dice y queda en la búsqueda", () => {
+  it("escanear el código de un producto abre su ficha; uno que nadie tiene lo dice y queda en la búsqueda", async () => {
     armar([producto({ id: "mecha", descripcion: "MECHA PARA MADERA 6 MM", codigo_barras: "7791234567890" }), producto({ id: "taladro", descripcion: "TALADRO PERCUTOR 750 W" })]);
     fireEvent.click(screen.getByTestId("escanear"));
     fireEvent.click(screen.getByRole("button", { name: "leer 7791234567890" }));
+    // Escanear responde un instante después: el producto puede venir del servidor (RF-82).
+    await act(async () => { await Promise.resolve(); });
     expect(within(ficha()).getByText("MECHA PARA MADERA 6 MM")).toBeTruthy();
     expect(within(ficha()).getByTestId("codigo-actual").textContent).toBe("7791234567890");
     fireEvent.click(screen.getByTestId("escanear"));
     fireEvent.click(screen.getByRole("button", { name: "leer 111" }));
+    await act(async () => { await Promise.resolve(); });
     expect((screen.getByTestId("busqueda") as HTMLInputElement).value).toBe("111");
     expect(document.body.textContent).toContain("Ningún producto tiene el código 111");
   });

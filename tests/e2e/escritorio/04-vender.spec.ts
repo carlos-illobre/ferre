@@ -18,6 +18,8 @@ function psql(sql: string): string {
 
 test.beforeAll(() => {
   psql(`DELETE FROM anomalia WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  // La prueba del atajo abre «Vincular el celular», que deja un código pedido por esa sesión: se borra antes que ella.
+  psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
