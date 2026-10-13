@@ -16,3 +16,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T005 [ajuste] En la computadora, la flecha para abajo saltea la caja de búsqueda y va directo a los ítems de la lista
 - [x] T006 [ajuste] En la computadora, en Más las flechas recorren las opciones como si fueran pestañas
 - [x] T007 [regla] En la computadora, las flechas tienen su propia marca (menú, pestañas y filas enteras) y el cursor de escritura queda en la caja de texto; con la lista vacía la marca se queda en las pestañas; igual en todas las pantallas
+- [x] T008 [arreglo] En el celular las animaciones al navegar no aparecen y cambiar de pantalla tarda casi tres segundos

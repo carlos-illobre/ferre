@@ -795,7 +795,7 @@ RNF-05:
     - clientes/gestion-del-local-web/src/teclas.test.tsx
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos:
-    - "Las animaciones de navegación del celular no se vieron en un teléfono: en las pruebas solo se comprueba que la pantalla cambia y a dónde"
+    - "Las animaciones de navegación del celular no se vieron en un teléfono. Medido en el navegador de pruebas: entrar a una pantalla tarda 0,4 s con el deslizamiento corriendo"
     - "Dos focos (decisión 82): Catálogo → Productos resalta su fila en azul con su propio mecanismo, y las demás pantallas en amarillo con el general; falta unificarlos. Probado de punta a punta solo en Inventario y en Vender"
     - "Atajos con Alt y una letra (decisión 80): en una pantalla con más de 23 botones sin tecla propia, los que sobran quedan sin atajo; no se probó en Windows que el navegador no se quede con la tecla"
     - "Las flechas que recorren cada pantalla (decisión 61, #77) tienen prueba de punta a punta en el menú, las pestañas y una venta completa; crear un rol, mandar un ticket, cargar un ingreso y la ficha de un producto se probaron a mano en un navegador"

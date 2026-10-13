@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 
 // Enrutamiento por hash (#/catalogo/listas, #/vincular-celular?codigo=…). Por hash y no por ruta
 // real porque el cliente vive en GitHub Pages, que no reescribe rutas: una URL real daría
@@ -22,7 +23,9 @@ function leer(): Ruta {
 export function useRuta(): Ruta {
   const [ruta, setRuta] = useState<Ruta>(leer);
   useEffect(() => {
-    const alCambiar = () => setRuta(leer());
+    // Durante una navegación animada la pantalla nueva se dibuja en el acto, dentro del mismo
+    // aviso de cambio de dirección: el navegador está esperando ese dibujo para animar.
+    const alCambiar = () => { if (enTransicion) flushSync(() => setRuta(leer())); else setRuta(leer()); };
     window.addEventListener("hashchange", alCambiar);
     return () => window.removeEventListener("hashchange", alCambiar);
   }, []);
@@ -32,6 +35,7 @@ export function useRuta(): Ruta {
 // La navegación animada del celular (decisión 78): la activa la aplicación del celular; las
 // demás siguen cambiando de pantalla sin animar.
 let animada = false;
+let enTransicion = false;
 export function animarNavegacion(si: boolean): void { animada = si; }
 
 // De dónde a dónde se va, para elegir el movimiento: entrar a una pantalla desde una lista
@@ -54,12 +58,16 @@ export function irA(camino: string): void {
   const deshabilitadas = document.documentElement.dataset.animaciones === "no";
   if (!animada || deshabilitadas || !doc.startViewTransition || sinMovimiento || location.hash === destino) { location.hash = destino; return; }
   document.documentElement.dataset.nav = movimientoDe(location.hash, destino);
-  // La pantalla nueva se dibuja cuando llega el aviso del cambio de dirección: se espera eso y un cuadro más.
+  // El navegador saca una foto de la pantalla, espera a que esté dibujada la nueva y anima de
+  // una a la otra. Mientras espera no corre ningún cuadro de animación, así que acá no se puede
+  // esperar uno: la pantalla nueva se dibuja en el aviso de cambio de dirección (ver `useRuta`)
+  // y con ese mismo aviso se le dice al navegador que ya está. El reloj es solo una red de
+  // seguridad por si el aviso no llegara.
+  enTransicion = true;
   const transicion = doc.startViewTransition(() => new Promise<void>((listo) => {
-    const seguir = () => requestAnimationFrame(() => listo());
-    window.addEventListener("hashchange", seguir, { once: true });
-    setTimeout(seguir, 300);
+    const red = setTimeout(listo, 400);
+    window.addEventListener("hashchange", () => { clearTimeout(red); listo(); }, { once: true });
     location.hash = destino;
   }));
-  void transicion.finished.catch(() => undefined).then(() => { delete document.documentElement.dataset.nav; });
+  void transicion.finished.catch(() => undefined).then(() => { enTransicion = false; delete document.documentElement.dataset.nav; });
 }

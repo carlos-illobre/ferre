@@ -53,7 +53,8 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 /* Movimiento al navegar, como en una aplicación de iPhone (decisión 78, docs/sistema-visual.md).
    El menú de abajo queda quieto; con «reducir movimiento» no se anima nada. */
 .nav-inferior.solo-celular { view-transition-name: menu-de-abajo; }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 180ms; animation-timing-function: ease-out; }
+/* Con `:root` delante para ganarle a la duración que trae el navegador (250 ms). */
+:root::view-transition-old(root), :root::view-transition-new(root), :root::view-transition-group(root) { animation-duration: 180ms; animation-timing-function: ease-out; }
 :root[data-nav="adelante"]::view-transition-old(root), :root[data-nav="adelante"]::view-transition-new(root),
 :root[data-nav="atras"]::view-transition-old(root), :root[data-nav="atras"]::view-transition-new(root) { animation-duration: 350ms; animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1); mix-blend-mode: normal; }
 :root[data-nav="adelante"]::view-transition-old(root) { animation-name: nav-se-corre; }
