@@ -815,7 +815,7 @@ RNF-11:
     - "Sin prueba: abrir la app y vender con el servidor apagado"
 
 RNF-12:
-  estado: "Pendiente (#19)"
+  estado: "Pendiente (#91)"
   pruebas: []
   defectos:
     - "Sin construir: no hay monitor externo ni aviso a los Administradores cuando la API o la base dejan de responder (contra ADR-002)"
@@ -852,7 +852,7 @@ RNF-20:
     - "Sin prueba: el aviso de cambios en espera desde hace más de una hora"
 
 RNF-21:
-  estado: "Pendiente (#19)"
+  estado: "Pendiente (#92)"
   pruebas: []
   defectos:
     - "Sin construir: no hay copia de la base cada hora ni ningún script o tarea de respaldo (contra ADR-002)"
@@ -860,13 +860,13 @@ RNF-21:
     - "docs/operacion/DEPLOYMENT.md describe el volcado horario como si estuviera en marcha"
 
 RNF-22:
-  estado: "Pendiente (#19)"
+  estado: "Pendiente (#92)"
   pruebas: []
   defectos:
     - "Sin construir: no hay copia semanal cifrada fuera de Oracle y de Supabase (contra ADR-002)"
 
 RNF-23:
-  estado: "Pendiente (#19)"
+  estado: "Pendiente (#92)"
   pruebas: []
   defectos:
     - "Sin construir: no hay prueba mensual de restauración (contra ADR-002)"

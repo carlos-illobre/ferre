@@ -18,7 +18,7 @@ riesgos:
     probabilidad: 2
     impacto: 5
     respuesta: mitigar
-    plan: Volcado horario, copia semanal externa y prueba mensual de restauración (#19, ADR-002)
+    plan: Volcado horario, copia semanal externa y prueba mensual de restauración (#92, ADR-002)
     contingencia: Reconstruir desde las ventas de los últimos 7 días que guarda cada dispositivo
     disparador: La base de Supabase no responde o falta información
     responsable: Carlos
@@ -62,7 +62,7 @@ riesgos:
     probabilidad: 2
     impacto: 4
     respuesta: mitigar
-    plan: Monitor externo que consulta la base a diario y alerta a los 350 MB (#19)
+    plan: Monitor externo que consulta la base a diario y alerta a los 350 MB (#91)
     contingencia: Restaurar el último volcado en otro PostgreSQL; el mostrador sigue vendiendo sin servidor
     disparador: Aviso del monitor o de Supabase
     responsable: Carlos
