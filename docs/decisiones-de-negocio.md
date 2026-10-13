@@ -410,6 +410,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       computadora, vincularla, mandarle una foto); cualquier otro lo dice.
     - En la computadora, el botón de Google pasa a tener borde, sombra y el tamaño de los
       demás botones: casi no se notaba que era un botón.
+    - El mismo día Carlos pidió cambiar el borde sólido por una sombra difusa, para que
+      el botón parezca sobresalir de la tarjeta.
 
 
 63. **El celular se vincula con la computadora sin salir de Ferrebress** (2026-10-12).
