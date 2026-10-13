@@ -16,12 +16,29 @@ const visible = (e: HTMLElement) => e.getClientRects().length > 0 && getComputed
 function itemsDeLaLista(foco: HTMLElement): HTMLElement[] {
   const lista = foco.closest<HTMLElement>(LISTAS);
   if (!lista || lista.closest(".lateral, .pestanas")) return [];
-  const propios = [...lista.querySelectorAll<HTMLElement>(ITEMS)].filter((i) => i.closest(LISTAS) === lista && visible(i));
+  // El encabezado de una tabla (sus títulos para ordenar) no es un ítem: se alcanza con Tab.
+  const propios = [...lista.querySelectorAll<HTMLElement>(ITEMS)].filter((i) => i.closest(LISTAS) === lista && !i.closest("thead") && !(i.tagName === "TBODY" && i.querySelector("tr")) && visible(i));
   // En una lista sin ítems marcados (botones sueltos, uno debajo del otro), cada hijo es un ítem.
   const filas = propios.length ? propios : ([...lista.children] as HTMLElement[]).filter(visible);
   const vistos = new Set<HTMLElement>();
-  return filas.map((f) => (f.matches(ENFOCABLES) ? f : [...f.querySelectorAll<HTMLElement>(ENFOCABLES)].find(visible)))
+  // De cada ítem, su acción principal si la marca; si no, lo primero que se puede enfocar.
+  return filas.map((f) => (f.matches(ENFOCABLES) ? f : [...f.querySelectorAll<HTMLElement>("[data-principal]")].find(visible) ?? [...f.querySelectorAll<HTMLElement>(ENFOCABLES)].find(visible)))
     .filter((c): c is HTMLElement => Boolean(c) && !vistos.has(c!) && Boolean(vistos.add(c!)));
+}
+
+// El primer ítem de la primera lista de la pantalla (o de la ventana abierta). Así ↓ saltea los
+// campos: desde las pestañas o desde una caja de búsqueda se va directo a los ítems.
+export function irAlPrimerItem(): boolean {
+  const ventanas = [...document.querySelectorAll<HTMLElement>("dialog[open], [role='dialog'], [aria-modal='true']")].filter(visible);
+  const donde = ventanas.at(-1) ?? document.querySelector<HTMLElement>(".cuerpo");
+  if (!donde) return false;
+  for (const lista of donde.querySelectorAll<HTMLElement>(LISTAS)) {
+    if (!visible(lista) || lista.closest(".lateral, .pestanas")) continue;
+    const dentro = [...lista.querySelectorAll<HTMLElement>(ENFOCABLES)].find((c) => visible(c) && !c.closest("thead"));
+    const primero = dentro ? itemsDeLaLista(dentro)[0] : undefined;
+    if (primero) { primero.focus(); primero.scrollIntoView?.({ block: "nearest" }); return true; }
+  }
+  return false;
 }
 
 function manejar(e: KeyboardEvent): void {
@@ -31,6 +48,8 @@ function manejar(e: KeyboardEvent): void {
   const tipo = foco instanceof HTMLInputElement ? foco.type : "";
   if (e.key === "Enter" && tipo === "checkbox") { e.preventDefault(); (foco as HTMLInputElement).click(); return; }
   if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+  // Desde una caja de texto de una sola línea, ↓ saltea los campos y va al primer ítem de la lista.
+  if (e.key === "ArrowDown" && foco.tagName === "INPUT" && ["text", "search", ""].includes(tipo)) { if (irAlPrimerItem()) e.preventDefault(); return; }
   // Dentro de un campo, las flechas son del campo.
   if (foco.isContentEditable || ["SELECT", "TEXTAREA"].includes(foco.tagName) || (foco.tagName === "INPUT" && !["checkbox", "button", "submit"].includes(tipo))) return;
   const items = itemsDeLaLista(foco);

@@ -170,20 +170,54 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
 
-  // Vender también tiene pestañas (decisión 72): → entra a ellas y ↓ baja a la búsqueda. La venta entera, con el teclado.
+  // En Más, las opciones se recorren con las flechas como pestañas; ← desde la primera vuelve al menú.
+  for (const _ of [1, 2, 3]) await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("menu-mas")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("mas-resumen")).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("mas-usuarios")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("mas-actividad")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("mas-resumen")).toBeFocused();
+  await expect(page.getByTestId("mas")).toBeVisible();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("menu-mas")).toBeFocused();
+  // Depósito abre en Inventario: desde la pestaña, ↓ saltea la caja de búsqueda y va al primer producto de la lista.
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("menu-deposito")).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("pestana-stock")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.locator('[data-testid="fila-stock"] [data-principal]').first()).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("pestana-stock")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("menu-deposito")).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("menu-vender")).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+
+  // Vender también tiene pestañas (decisión 72): → entra a ellas. A la caja de búsqueda no se va con
+  // las flechas sino con Tab (decisión 77). La venta entera, con el teclado.
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("pestana-vender")).toBeFocused();
-  await page.keyboard.press("ArrowDown");
+  const enfocado = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
+  for (let i = 0; i < 12 && (await enfocado()) !== "busqueda"; i++) await page.keyboard.press("Tab");
   await expect(page.getByTestId("busqueda")).toBeFocused();
   await page.keyboard.type("e2e mecha vender");
   await expect(page.getByTestId("sugerencias")).toContainText("MECHA VENDER");
   await page.keyboard.press("Enter");
   const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
   await expect(mecha).toBeVisible();
-  // Las flechas no recorren los controles de la pantalla (decisión 77): la búsqueda sigue con el foco.
+  // Desde la búsqueda, ↓ saltea los campos y va a los ítems de la lista (decisión 77).
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByTestId("busqueda")).toBeFocused();
+  await expect(page.getByTestId("busqueda")).not.toBeFocused();
   // A la cantidad se llega con Tab; ahí ↑ suma, como en cualquier campo de cantidad. F2 cobra.
   const conElFoco = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
   for (let i = 0; i < 40 && (await conElFoco()) !== "cantidad"; i++) await page.keyboard.press("Tab");

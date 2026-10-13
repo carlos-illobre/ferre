@@ -3,7 +3,7 @@ import { Pedidos } from "../Pedidos";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { useEspejar, useEspejo } from "../../espejo";
 import { EspejoEstado } from "../EspejoEstado";
-import { useFlechas } from "./flechas";
+import { irAlPrimerItem, useFlechas } from "./flechas";
 import { useAtajos } from "./atajos";
 import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
@@ -145,6 +145,8 @@ function Pantallas() {
   }, [conSesion]);
   // Poner el foco en la pantalla: primero la búsqueda (u otro campo); si no tiene, su primer botón.
   function focoALaPantalla() {
+    // Con las flechas no se va a los campos: si la pantalla tiene una lista, directo a su primer ítem.
+    if (irAlPrimerItem()) return;
     const cuerpo = document.querySelector<HTMLElement>(".cuerpo");
     if (!cuerpo) return;
     const deLaPantalla = (selector: string) => [...cuerpo.querySelectorAll<HTMLElement>(selector)].find((x) => !x.closest(".pestanas, .mas-volver"));

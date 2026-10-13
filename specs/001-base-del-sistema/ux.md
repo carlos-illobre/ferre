@@ -295,8 +295,10 @@ atajo. Las teclas significan lo mismo en todas las pantallas:
 |---|---|
 | ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Desconectar o Reconectar) y Salir. El foco se marca con el mismo borde amarillo en todos |
 | → en el menú | Entra a las pestañas de esa parte, o a la pantalla si no tiene |
-| ← → en las pestañas | Pasan el foco de una pestaña a otra sin abrirla, igual que ↑ ↓ en el menú; Enter abre la que tiene el foco; ← desde la primera vuelve al menú; ↓ entra a la pantalla que está abierta |
-| ↑ ↓ en una lista | Van al ítem anterior o al siguiente (un renglón de una tabla, una tarjeta de una lista); ↑ desde el primero vuelve a las pestañas |
+| ← → en las pestañas | Pasan el foco de una pestaña a otra sin abrirla, igual que ↑ ↓ en el menú; Enter abre la que tiene el foco; ← desde la primera vuelve al menú |
+| ← → ↑ ↓ en Más | Las opciones de Más se recorren como pestañas: → y ↓ pasan a la siguiente, ← y ↑ a la anterior, Enter abre la que tiene el foco y ← desde la primera vuelve al menú. Desde el menú, → entra a la primera opción |
+| ↓ desde las pestañas o desde una caja de búsqueda | Va directo al primer ítem de la lista de la pantalla, salteando los campos. Si la búsqueda tiene sus propios resultados desplegados, ↓ los recorre a ellos |
+| ↑ ↓ en una lista | Van al ítem anterior o al siguiente (un renglón de una tabla, una tarjeta de una lista); ↑ desde el primero vuelve a las pestañas. En cada ítem el foco queda en su acción principal, y Enter la abre |
 | ← en una lista | Vuelve al menú |
 | Enter | Acciona el botón o el ítem que tiene el foco |
 | Tab, Mayús + Tab | Van al campo o botón siguiente o anterior |

@@ -96,9 +96,8 @@ export function Inventario() {
 
 
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "ArrowDown") { e.preventDefault(); setMarcada((i) => Math.min(i + 1, filas.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setMarcada((i) => Math.max(i - 1, 0)); }
-    else if (e.key === "Enter" && filas[marcada]) { e.preventDefault(); setAbierto({ id: filas[marcada]!.id, corregir: false }); }
+    // ↓ no recorre nada desde acá: saltea la búsqueda y va al primer producto de la lista (decisión 77).
+    if (e.key === "Enter" && filas[marcada]) { e.preventDefault(); setAbierto({ id: filas[marcada]!.id, corregir: false }); }
     else if (e.key === "Escape" && consulta) { e.preventDefault(); setConsulta(""); }
   }
   useEffect(() => { document.querySelector(".stock-tabla tr[aria-selected='true']")?.scrollIntoView({ block: "nearest" }); }, [marcada]);
@@ -208,7 +207,7 @@ export function Inventario() {
                         <td><span className="nombre">{p.descripcion}</span><span className="detalle stock-bajo-nombre">{[p.marca, p.codigo_proveedor].filter(Boolean).join(" · ")}</span></td>
                         <td>{fila?.proveedor ?? p.proveedor ?? "—"}</td>
                         <td className="num">
-                          <button type="button" className={`explicado stock-numero ${n < 0 ? "stock-negativo" : ""}`} onClick={() => setAbierto({ id: p.id, corregir: false })} aria-haspopup="dialog" aria-label={`${numero(n)} ${unidad}. Ver los movimientos de ${p.descripcion}`} data-testid="stock">
+                          <button type="button" data-principal className={`explicado stock-numero ${n < 0 ? "stock-negativo" : ""}`} onClick={() => setAbierto({ id: p.id, corregir: false })} aria-haspopup="dialog" aria-label={`${numero(n)} ${unidad}. Ver los movimientos de ${p.descripcion}`} data-testid="stock">
                             <span>{n < 0 ? "−" : ""}{numero(Math.abs(n))} {unidad}</span><span className="signo" aria-hidden="true">?</span>
                           </button>
                           {porEnviar.has(p.id) && <div><Pastilla tipo="alerta">Se manda al volver internet</Pastilla></div>}

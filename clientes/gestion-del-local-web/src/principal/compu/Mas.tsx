@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from "react";
 import { Icono, Pagina, type NombreDeIcono } from "./base/ui";
 import type { Permiso } from "../permisos";
 import { irA } from "./base/rutas";
@@ -15,9 +16,21 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
 ];
 
 export function Mas({ atajoDe, opciones }: { atajoDe: (ruta: string) => string | null; opciones: typeof DE_MAS }) {
+  // Las opciones se recorren con las flechas como si fueran pestañas (pedido de Carlos del
+  // 2026-10-13): → y ↓ a la siguiente, ← y ↑ a la anterior; ← desde la primera vuelve al menú.
+  function teclas(e: KeyboardEvent<HTMLUListElement>) {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || !["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) return;
+    const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
+    const i = botones.indexOf(document.activeElement as HTMLButtonElement);
+    if (i < 0) return;
+    const destino = botones[i + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1)];
+    e.preventDefault(); e.stopPropagation();
+    if (destino) destino.focus();
+    else if (e.key === "ArrowLeft") (document.querySelector<HTMLButtonElement>(".lateral nav button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".lateral nav button"))?.focus();
+  }
   return (
     <Pagina titulo="Más" testId="mas" bajada="Lo que se usa de vez en cuando.">
-      <ul className="mas-grilla">
+      <ul className="mas-grilla" onKeyDown={teclas}>
         {opciones.map((d) => (
           <li key={d.ruta}>
             <button type="button" className="tarjeta mas-tarjeta" onClick={() => irA(d.ruta)} data-testid={`mas-${d.ruta}`}>
