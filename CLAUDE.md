@@ -22,41 +22,43 @@ vive en `proyecto/estado.yml`.
 
 ## Cómo se trabaja
 
-Cuatro roles, y ninguno más (el detalle está en la constitución):
+Una funcionalidad nueva pasa por siete pasos, en este orden (el detalle está en la
+constitución). El código se escribe recién en el sexto.
 
 | Paso | Rol | Usá | Aprueba Carlos |
 |---|---|---|---|
-| 1 | Analista de negocio | `/speckit-specify`, y `/speckit-clarify` para preguntarle a Carlos | Sí |
-| 2 | Diseñador, si hay pantallas nuevas | `/ux`: maquetas para que elija | Sí |
-| 3 | Planificador | `/speckit-plan` y `/speckit-tasks` | No |
-| 4 | Desarrollador | `/speckit-implement` | Lo prueba en el ambiente de pruebas |
+| 1 | Analista de negocio | `/speckit-specify` y `/speckit-clarify`: preguntarle todo lo que falte | Sí |
+| 2 | Diseñador gráfico, si hay pantallas | `/ux`: maquetas para que elija | Sí |
+| 3 | Arquitecto | `/speckit-plan`, con la sección «Seguridad»; ADR si hay una decisión | No |
+| 4 | QA | Escenarios numerados en la `spec.md`, con errores, bordes y seguridad | No |
+| 5 | Planificador | `/speckit-tasks`: tareas con dependencias | No |
+| 6 | Desarrollador | `/speckit-implement`: una prueba por escenario | Lo prueba él |
+| 7 | Revisor | El subagente `revisor`, que deja `revision.md` | No |
 
-- **Todo en una sola sesión y sin subagentes:** el mismo agente hace los cuatro pasos en
-  orden. Se lee la constitución y el `resumen.md` de la capacidad que se toca; la `spec.md`
+**Antes de tocar nada, decidí el tamaño del pedido** con las cinco preguntas de la
+constitución («Qué tamaño tiene el cambio») y decíselo a Carlos en una línea:
+
+| Tamaño | Cuándo | Dónde se escribe |
+|---|---|---|
+| Arreglo | El código no cumple lo que la documentación ya dice | No cambia la documentación |
+| Funcionalidad nueva | Pantalla o recorrido nuevo, dato nuevo que se guarda, integración, más de una capacidad o más de un día | **Carpeta nueva** en `specs/`, con los siete pasos |
+| Cambio de regla | Una regla del negocio nueva o distinta en una capacidad que existe | La `spec.md` de esa capacidad |
+| Cambio de interfaz | Una pantalla que existe cambia de un modo que Carlos tiene que ver | Maqueta en la carpeta de la capacidad |
+| Ajuste | Un color, un texto, la forma de un botón, el orden de un menú | El `ux.md` o la `spec.md` de la capacidad, o `docs/` |
+
+Solo la funcionalidad nueva crea carpeta; todo lo demás se escribe en la carpeta de la
+capacidad que toca. **Ningún cambio queda solo en el código:** si otro agente reconstruyera
+la aplicación leyendo solo la documentación, le tiene que salir igual que ahora.
+
+- **Todo en una sola sesión y sin subagentes:** el mismo agente hace los pasos en orden; el único
+  subagente es el revisor del final. Se lee la constitución y el `resumen.md` de la capacidad que se toca; la `spec.md`
   y el `ux.md` completos, solo en la parte que se va a cambiar. Si la capacidad no tiene
   resumen, lo escribe quien la lee completa por primera vez.
-- **Un arreglo** (el código no hace lo que la documentación dice) va solo con el
-  desarrollador, con su prueba; la documentación no cambia.
-- **Un ajuste** (Carlos pide que algo se vea o se comporte distinto de lo escrito, o algo
-  que no está escrito: un color, un texto, la forma de un botón) también va solo con el
-  desarrollador, pero **antes de programar lo escribe** en el `ux.md` de la capacidad, `docs/sistema-visual.md` o la `spec.md`.
-- **Ningún cambio queda solo en el código:** si otro agente reconstruyera la aplicación
-  leyendo solo la documentación, le tiene que salir igual que ahora.
-- **Un cambio de interfaz** que no toca ninguna regla va con diseñador y desarrollador:
-  maqueta aprobada y código, sin `spec.md`, `plan.md` ni `tasks.md`.
-- **Un cambio de regla** dentro de una capacidad va con analista y desarrollador: la regla
-  se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia.
-- **Toda lista de tareas termina con tres:** una prueba por escenario, comparar con la
-  maqueta aprobada si hay pantallas, y dejar al día `proyecto/estado.yml`, la `spec.md` de
-  la capacidad y el issue.
 - **Sin ramas ni pull requests:** todo se sube directo a `master`. `master` es el ambiente de
   pruebas y cada push lo despliega; `produccion` se promueve con
   `git push origin master:produccion` solo cuando Carlos lo pide.
 - **Nada avanza sin la aprobación que le toca:** la especificación y, si hay pantallas, la
   maqueta.
-- **Lo que falta hacer son los issues abiertos de GitHub.** Se toma uno solo si todo lo que
-  figura en su `## Depende de` está cerrado. Al tomarlo se le crea su carpeta en `specs/`.
-- **Trabajo nuevo que aparece:** un issue nuevo con su etapa (milestone). No se hace de paso.
 
 ## La interfaz
 
@@ -82,30 +84,21 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
   [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md) y, si es una regla, en la
   `spec.md` de la capacidad.
 
-## Cada pedido es una tarea
+## Cada pedido es una tarea, y se anota en `tasks.md`
 
-Todo lo que Carlos pide queda anotado como un issue, para que se vea en el tablero del
-portafolio mientras se hace y después de hecho. Vale también para un arreglo chico.
+`tasks.md` es la fuente de verdad de las tareas; lo lee el tablero del portafolio. **Los
+issues de GitHub no se usan.**
 
-1. **Antes de empezar,** buscar si el pedido ya tiene issue (`gh issue list --search`). Si
-   no tiene, crearlo con un título que diga qué se pidió, en palabras de Carlos, y con su
-   etapa (milestone). Ponerle la etiqueta `en curso`:
-   `gh issue edit N --add-label "en curso"`.
-   Al crearlo, decir también con etiquetas:
-   - **Quién la ejecuta:** `carlos` si la tiene que hacer él (llamar, comprar, firmar,
-     decidir, probar en el lugar) o `agente` si la puede hacer un agente.
-   - **Si hay algo por decidir antes:** `definir`. El tablero se la muestra a Carlos como
-     decisión pendiente y no la propone para ejecutar.
-   - **La prioridad**, solo si Carlos la dijo: `prioridad alta` o `prioridad baja`.
-   - **La duración**, en una línea del cuerpo: `Estimación: 3h` o `Estimación: 2d`.
-2. **Cada commit nombra su issue** al final del título, entre paréntesis: `(#N)`. Un commit
-   sin `#N` aparece en el tablero como trabajo sin tarea.
-3. **Al terminar,** cerrar el issue y sacarle la etiqueta:
-   `gh issue close N` y `gh issue edit N --remove-label "en curso"`. Si queda a medias,
-   se deja abierto con un comentario que diga qué falta.
+- **El plan** está en `proyecto/tasks.md`: lo previsto, por etapa. El trabajo nuevo que
+  aparece y no se hace ahora se anota ahí, con `[carlos]` o `[agente]`.
+- **El trabajo** se anota en el `tasks.md` de su carpeta de `specs/`, antes de empezarlo:
+  `- [ ] T014 [ajuste] El botón de Google va azul y redondeado`.
+- **Antes de tocar el código:** `node tests/compuerta.mjs empezar 003-T014`. Dice qué documentos
+  le faltan a la tarea según su tamaño. Sin eso, la compuerta no deja editar el código.
+- **Cada commit nombra su tarea** al final del título: `(003-T014)`.
+- **Al terminar:** marcarla `[x]` y `node tests/compuerta.mjs terminar 003-T014`.
 
-Un pedido que cambia de tema a mitad de la sesión es otro issue. Las preguntas y las
-consultas que no cambian nada en el repositorio no llevan issue.
+Las preguntas y las consultas que no cambian nada en el repositorio no llevan tarea.
 
 ## Qué no decide el agente
 
@@ -117,12 +110,11 @@ consultas que no cambian nada en el repositorio no llevan issue.
 ## Lo que lee el tablero del portafolio
 
 El tablero (<https://gratis-vnic.tail994934.ts.net:8444/>) lee `specs/README.md`,
-`proyecto/estado.yml`, `proyecto/proyecto.yml`, `proyecto/riesgos.yml` y los issues.
+`proyecto/estado.yml`, `proyecto/proyecto.yml`, `proyecto/riesgos.yml` y los `tasks.md`.
 
 - En `proyecto/estado.yml`, el `estado` de cada requerimiento empieza con `Hecho`,
   `Hecho en parte`, `A validar`, `Pendiente` o `Nuevo`. Si dice `fuera de esta etapa` o
-  `segunda versión`, no cuenta para el avance. Los `#N` se enlazan a esos issues.
-- En un issue, `## Depende de` seguido de `#13, #15` lo deja bloqueado hasta que se cierren.
+  `segunda versión`, no cuenta para el avance. Un `#19` nombra la tarea `T019` de `proyecto/tasks.md`.
 - En los YAML de `proyecto/`, un texto con ` #` o `: ` adentro va entre comillas.
 
 ## Comandos
@@ -145,6 +137,6 @@ Operación del servidor: [docs/operacion/](docs/operacion/).
 ## Qué sigue
 
 Este archivo no dice qué está hecho ni qué va primero. El avance está en
-[proyecto/estado.yml](proyecto/estado.yml) y en el tablero; las tareas y su orden, en los
-issues y sus etapas; lo que falta decidir, en
+[proyecto/estado.yml](proyecto/estado.yml) y en el tablero; las tareas y su orden, en
+`proyecto/tasks.md`; lo que falta decidir, en
 [specs/preguntas-abiertas.md](specs/preguntas-abiertas.md).

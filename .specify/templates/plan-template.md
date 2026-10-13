@@ -42,6 +42,17 @@
 
 [Gates determined based on constitution file]
 
+## Seguridad
+
+<!-- Se contesta siempre. Si un punto no aplica, se escribe por qué; no queda en blanco. -->
+
+- **Datos que toca:** [qué datos personales o del negocio lee o guarda]
+- **Permisos:** [quién puede hacer cada cosa, y qué pasa si lo intenta otro]
+- **Lo que entra desde afuera:** [archivos, texto, códigos, fotos; cómo se valida]
+- **Secretos:** [claves o tokens que usa y dónde viven]
+- **Registro:** [qué queda anotado de quién hizo qué]
+- **Decisión de arquitectura:** [ADR-NNN, o «ninguna»]
+
 ## Project Structure
 
 ### Documentation (this feature)

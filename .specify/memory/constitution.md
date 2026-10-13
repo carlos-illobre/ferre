@@ -115,21 +115,42 @@ Una funcionalidad, una carpeta en `specs/`. **No hay ramas ni pull requests:** t
 sube directo a `master`, que es el ambiente de pruebas; lo que no está terminado no se sube
 en un estado que rompa las pruebas. Los comandos de Spec Kit no crean rama.
 
-Cuatro roles, y ninguno más:
+Una funcionalidad nueva pasa por siete pasos, en este orden. **Son pasos, no agentes:** los
+hace el mismo agente en la misma sesión, y cada uno deja un documento del que parte el
+siguiente. El código se escribe recién en el sexto.
 
 | Paso | Rol | Cómo | Produce | Aprueba Carlos |
 |---|---|---|---|---|
-| 1 | Analista de negocio | `/speckit-specify` y `/speckit-clarify`: le pregunta a Carlos hasta poder escribir la regla | `spec.md` | Sí |
-| 2 | Diseñador | `/ux`: dos o tres maquetas de la pantalla principal para que Carlos elija | Maquetas y `ux.md` | Sí, elige la maqueta |
-| 3 | Planificador | `/speckit-plan` y `/speckit-tasks` | `plan.md` corto y `tasks.md` | No |
-| 4 | Desarrollador | `/speckit-implement` | Código, pruebas y el estado al día | Lo prueba en el ambiente de pruebas |
+| 1 | Analista de negocio | `/speckit-specify` y `/speckit-clarify`: le pregunta a Carlos todo lo que falte hasta poder escribir la regla | `spec.md` con «**Status**: Aprobada» | Sí |
+| 2 | Diseñador gráfico | `/ux`: dos o tres maquetas de cada pantalla que cambia, para que Carlos elija | `maquetas/` y `ux.md`; en `spec.md`, «**Maquetas**: Aprobadas» o «**Maquetas**: No lleva pantallas» | Sí |
+| 3 | Arquitecto | `/speckit-plan` | `plan.md`, con la sección «Seguridad», y un ADR en `docs/adr/` si hay una decisión de arquitectura | No |
+| 4 | QA | Completa los escenarios de la `spec.md` | Escenarios numerados (`E01`, `E02`…) que incluyen los de error, los de borde y los que salen de la sección de seguridad | No |
+| 5 | Planificador | `/speckit-tasks` | `tasks.md`: todas las tareas, con sus dependencias | No |
+| 6 | Desarrollador | `/speckit-implement` | Código y una prueba por escenario, que lo nombra (`009-E03`) | Lo prueba en el ambiente de pruebas |
+| 7 | Revisor | El subagente `revisor`, con el contexto limpio | `revision.md`: en qué se aparta el código de la especificación | No |
 
-El paso 2 se saltea cuando la funcionalidad no tiene pantallas nuevas. No se usan los
-comandos opcionales del kit (análisis de coherencia, listas de control).
+- **Paso 1.** No se inventan reglas: lo que no está definido se pregunta. Las preguntas van
+  todas juntas. La especificación no se da por aprobada mientras tenga un
+  `[NEEDS CLARIFICATION]`.
+- **Paso 3, seguridad.** La sección «Seguridad» de `plan.md` contesta siempre lo mismo:
+  qué datos personales o del negocio toca, quién puede hacer cada cosa (permisos), qué
+  entra desde afuera y cómo se valida, qué secretos usa y dónde viven, y qué queda
+  registrado de quién hizo qué. Si un punto no aplica, se escribe por qué; no queda en blanco.
+- **Paso 3, ADR.** Si hay que elegir entre alternativas técnicas razonables, el ADR se
+  escribe acá, antes del código, no al cerrar.
+- **Paso 4.** Los escenarios se escriben una sola vez, en la `spec.md`; no hay un archivo
+  aparte de casos de prueba que se pueda desincronizar. El QA no agrega reglas: si un caso
+  de borde no tiene respuesta en la especificación, vuelve al paso 1 y se le pregunta a Carlos.
+- **Paso 7.** Es el único subagente del flujo, porque quien programó no puede revisarse.
+  Corre una sola vez, al terminar la última tarea, y solo en funcionalidades nuevas. Lo que
+  encuentra se arregla o se anota como defecto en `proyecto/estado.yml`.
 
-**Los cuatro pasos corren en la misma sesión, uno detrás del otro, y los hace el mismo
-agente.** Un rol es un paso del trabajo, no un agente aparte: no se lanzan subagentes ni se
-abre una sesión por rol, porque cada uno arrancaría vacío y volvería a leer lo mismo. Para
+No se usan los comandos opcionales del kit (análisis de coherencia, listas de control). Los
+comandos de Spec Kit no crean rama.
+
+**Los pasos 1 a 6 corren en la misma sesión, uno detrás del otro, y los hace el mismo
+agente.** No se abre una sesión por rol ni se lanzan otros subagentes que el revisor,
+porque cada uno arrancaría vacío y volvería a leer lo mismo. Para
 gastar poco:
 
 - Se lee la constitución, el `resumen.md` de la capacidad que se toca y el código que hace
@@ -144,35 +165,107 @@ gastar poco:
 - Solo si la sesión se cortó se retoma en otra: `spec.md`, la maqueta aprobada y `tasks.md`
   alcanzan para seguir sin la conversación anterior.
 
-No todo cambio pasa por los cuatro:
+### Qué tamaño tiene el cambio
 
-| Tamaño | Ejemplo | Quién interviene |
-|---|---|---|
-| Arreglo | El código no hace lo que la documentación dice | Solo el desarrollador, con su prueba. La documentación no cambia; si el defecto estaba anotado en `proyecto/estado.yml`, se borra |
-| Ajuste | Carlos pide que algo se vea o se comporte distinto de lo escrito, o algo que no está escrito: un color, un texto, la forma de un botón, el orden de un menú | El desarrollador, con su prueba. **Antes de programar lo escribe** en el documento que corresponde (el `ux.md` de la capacidad, `docs/sistema-visual.md` o la `spec.md`). El pedido de Carlos vale como aprobación |
-| Cambio de interfaz | Cambia cómo se ve o cómo se usa una pantalla, sin cambiar ninguna regla de negocio | Diseñador y desarrollador: maqueta aprobada por Carlos y código. Sin `spec.md`, `plan.md` ni `tasks.md`; el `ux.md` se toca solo si cambia un requerimiento de interfaz |
-| Cambio de regla | Un requerimiento nuevo o modificado dentro de una capacidad | Analista y desarrollador. La regla se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia |
-| Funcionalidad nueva | Varias historias o pantallas nuevas | Los cuatro, con carpeta propia: `spec.md`, maquetas y `tasks.md` |
+Antes de tocar nada, el agente decide el tamaño del pedido con estas preguntas, en orden,
+y se queda con la primera que contesta que sí. **Se lo dice a Carlos en una línea** antes
+de empezar («Esto es un ajuste en 003-ventas, porque…»), para que pueda corregirlo.
+
+1. **¿La documentación ya dice lo que Carlos pide, y es el código el que no lo cumple?**
+   Es un **arreglo**.
+2. **¿Agrega una pantalla o un recorrido que no existe, un dato nuevo que se guarda, una
+   integración con algo de afuera, toca más de una capacidad, o lleva más de un día?**
+   Es una **funcionalidad nueva**: carpeta nueva en `specs/` y los siete pasos.
+3. **¿Agrega o cambia una regla del negocio** (qué se puede hacer, quién, con qué límites,
+   qué se calcula) dentro de una capacidad que ya existe? Es un **cambio de regla**: se
+   actualiza la `spec.md` de esa capacidad.
+4. **¿Cambia cómo se ve o cómo se usa una pantalla que ya existe, de un modo que Carlos
+   tiene que ver para aprobar?** Es un **cambio de interfaz**: maqueta primero.
+5. **Lo demás** (un color, un texto, la forma de un botón, el orden de un menú) es un
+   **ajuste**: se escribe en la documentación y se hace.
+
+Ante la duda entre dos tamaños, vale el más grande. Si a mitad del trabajo el cambio
+resulta ser más grande de lo que parecía, se frena y se vuelve a clasificar.
+
+| Tamaño | Dónde se escribe | Pasos | Antes de programar |
+|---|---|---|---|
+| Arreglo | La documentación no cambia; si el defecto estaba en `proyecto/estado.yml`, se borra | 6 | La tarea anotada |
+| Ajuste | En el `ux.md` o la `spec.md` de la capacidad, o en el documento de `docs/` que corresponda | 6 | El documento ya actualizado. El pedido de Carlos vale como aprobación |
+| Cambio de interfaz | Maqueta en `specs/<capacidad>/maquetas/` y, si cambia un requerimiento de interfaz, su `ux.md` | 2 y 6 | La maqueta aprobada por Carlos |
+| Cambio de regla | En la `spec.md` de la capacidad, con sus escenarios | 1, 4 y 6 | La regla escrita y aprobada por Carlos |
+| Funcionalidad nueva | Carpeta nueva `NNN-nombre` (el número que sigue), con `spec.md`, `plan.md`, `tasks.md` y, si hay pantallas, `maquetas/` | Los siete | Todo lo de los pasos 1 a 5 |
+
+**Carpeta nueva o carpeta existente.** Las carpetas de capacidad son la especificación
+vigente de cada parte del sistema. Un arreglo, un ajuste, un cambio de interfaz o un cambio
+de regla se escriben **en la carpeta de la capacidad que tocan**: no crean carpeta. Solo la
+funcionalidad nueva crea una, y al terminar lo que cambió de cada capacidad se incorpora a
+la `spec.md` de esa capacidad, con una nota de qué carpeta lo cambió y cuándo. Si el pedido
+no entra en ninguna capacidad existente, la carpeta nueva queda como capacidad nueva y se
+agrega al índice.
 
 **Ningún cambio queda solo en el código.** La pregunta para saber si hay que tocar la
 documentación es siempre la misma: si otro agente reconstruyera la aplicación leyendo solo
 la documentación, ¿le saldría igual que ahora? Si no, falta escribirlo, por chico que sea
 el cambio. Solo el arreglo se salva, porque ahí el documento ya decía lo correcto.
 
-Como nadie revisa después al desarrollador, toda lista de tareas termina con estas tres, y
-la funcionalidad no está terminada sin ellas:
+### El registro de tareas: `tasks.md`
 
-1. Una prueba por cada escenario de aceptación, anotada en `proyecto/estado.yml`.
-2. Si hay pantallas, comparar el resultado con la maqueta aprobada mediante capturas de
-   computadora y de celular, y mostrarle a Carlos las diferencias.
-3. Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de la capacidad,
-   escribir el ADR si hubo una decisión técnica y cerrar el issue.
+Todo trabajo queda anotado como una tarea en el `tasks.md` de su carpeta de `specs/`,
+**antes de empezarlo**. Es el registro de qué se pidió y qué se hizo; lo lee el tablero del
+portafolio. **Los issues de GitHub no se usan:** una tarea existe cuando está escrita en un
+`tasks.md`.
+
+- **Forma de una tarea:** `- [ ] T014 [ajuste] El botón de Google va azul y redondeado`.
+  El número sigue al último de ese archivo. La marca dice el tamaño: `[arreglo]`,
+  `[ajuste]`, `[interfaz]` o `[regla]`; una tarea sin marca de tamaño es de una
+  funcionalidad nueva. `[P]` dice que se puede hacer en paralelo con otras. Las
+  dependencias van al final: `(depende de T003, T004)`.
+- **Dónde:** hay dos clases de `tasks.md`.
+  - `proyecto/tasks.md` es **el plan**: lo que está previsto hacer, por etapa, con quién
+    lo hace (`[carlos]` o `[agente]`), su prioridad y de qué depende. Ahí se anota el
+    trabajo nuevo que aparece y no se va a hacer ahora.
+  - El `tasks.md` de cada carpeta de `specs/` es **el trabajo**: en la carpeta de una
+    funcionalidad nueva, las tareas que arma el planificador; en la de una capacidad, los
+    arreglos, ajustes y cambios de regla que se le fueron haciendo, uno debajo del otro.
+  Cuando se toma una tarea del plan, la tarea de `specs/` que la resuelve la nombra al
+  final (`(T056)`), y al terminar se marcan las dos.
+- **Se nombra como** carpeta y número: `003-T014` (las del plan, solo `T056`). Cada commit la lleva al final del
+  título, entre paréntesis: `(003-T014)`.
+- **Al terminar** se marca `[x]`.
+
+### La compuerta
+
+Para que ningún paso se saltee, `tests/compuerta.mjs` controla el orden y Claude Code lo corre solo
+antes de cada edición (`.claude/settings.json`): **no deja editar el código** si no hay una
+tarea empezada, o si a esa tarea le falta lo que su tamaño exige en la tabla de arriba.
+
+```bash
+node tests/compuerta.mjs empezar 003-T014    # antes de tocar el código; dice qué falta
+node tests/compuerta.mjs terminar 003-T014   # con la tarea ya marcada [x]
+node tests/compuerta.mjs estado              # qué tareas están empezadas
+```
+
+En una funcionalidad nueva exige además, al terminar la última tarea, que cada escenario
+tenga una prueba que lo nombre y que exista `revision.md`. Si la compuerta frena algo que
+debería pasar, se arregla la compuerta o la documentación; no se la esquiva editando por
+otro camino.
+
+### Toda lista de tareas termina con estas
+
+1. Una prueba por cada escenario de aceptación, que lo nombra, anotada en `proyecto/estado.yml`.
+2. Si hay pantallas, comparar el resultado con la maqueta aprobada mediante capturas de computadora y de celular,
+   y mostrarle a Carlos las diferencias.
+3. La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto.
+4. Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de la capacidad y
+   marcar la tarea del plan, si había una.
 
 ## Convenciones propias sobre Spec Kit
 
 - **Plantillas casi sin tocar.** Los títulos de las plantillas quedan como los trae el kit,
-  en inglés, para no apartarse del estándar; el contenido se escribe en castellano. El único
-  cambio propio es la fase final de `tasks-template.md`, con las tres tareas de cierre.
+  en inglés, para no apartarse del estándar; el contenido se escribe en castellano. Los cambios
+  propios son tres: en `spec-template.md`, las líneas de aprobación y los escenarios
+  numerados; en `plan-template.md`, la sección «Seguridad»; y en `tasks-template.md`, la
+  forma de las tareas y la fase final de cierre.
 - **Identificadores.** Los requerimientos conservan sus IDs (`RF-19`, `RNF-21`) en lugar de
   `FR-001`. Los nuevos siguen la numeración de su capacidad.
 - **Una carpeta por capacidad.** Las carpetas `001` a `007` especifican cada capacidad
@@ -219,4 +312,4 @@ cada capacidad tiene un `resumen.md` que se lee antes que la especificación com
 cambio que es solo de interfaz va con maqueta y código, sin los demás documentos; y las
 herramientas para mirar pantallas viven en `tests/capturas/`.
 
-**Version**: 1.6.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-13
+**Version**: 2.0.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-13

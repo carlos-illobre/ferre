@@ -4,9 +4,15 @@
 
 **Created**: [DATE]
 
-**Status**: Draft
+**Status**: Borrador  <!-- pasa a «Aprobada» cuando Carlos aprueba la especificación -->
+
+**Maquetas**: Pendientes  <!-- «Aprobadas» cuando Carlos elige, o «No lleva pantallas» -->
 
 **Input**: User description: "$ARGUMENTS"
+
+<!-- Cada escenario de aceptación lleva un número que no se repite en este archivo:
+     «1. **E01** **Given** …». El paso de QA agrega los de error, los de borde y los que
+     salen de la sección «Seguridad» del plan. Cada prueba nombra su escenario (009-E01). -->
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -52,6 +52,9 @@ jobs:
       - name: Especificación y estado
         run: node tests/trazabilidad.mjs
 
+      - name: Forma de los tasks.md
+        run: node tests/compuerta.mjs revisar
+
   imagenes:
     # La máquina de Oracle es Ampere (arm64): se construye en un runner ARM nativo, que
     # es varias veces más rápido que emular arm64 sobre x86 (ADR-007, ADR-012).

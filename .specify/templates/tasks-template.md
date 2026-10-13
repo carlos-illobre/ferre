@@ -15,6 +15,9 @@ description: "Task list template for feature implementation"
 
 ## Format: `[ID] [P?] [Story] Description`
 
+<!-- Propio de este proyecto: las dependencias van al final de la tarea, «(depende de
+     T003, T004)». Cada tarea se nombra con su carpeta: 009-T003, y así va en el commit. -->
+
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
 - Include exact file paths in descriptions
@@ -149,12 +152,12 @@ Examples of foundational tasks (adjust based on your project):
 
 ## Phase N: Cierre
 
-**Purpose**: Las tres tareas con las que termina toda funcionalidad (constitución, «Flujo de
-trabajo»). Nadie revisa después al desarrollador: sin estas tres, no está terminada.
+**Purpose**: lo que deja la funcionalidad terminada. No se saltea ninguna.
 
-- [ ] TXXX Una prueba por cada escenario de aceptación de spec.md, anotada en proyecto/estado.yml
-- [ ] TXXX Si hay pantallas: capturas de computadora y de celular comparadas con la maqueta aprobada, y las diferencias mostradas a Carlos
-- [ ] TXXX Estado al día en proyecto/estado.yml, lo nuevo incorporado a la spec.md de la capacidad, ADR si hubo una decisión técnica, e issue cerrado
+- [ ] TXXX Una prueba por cada escenario de la `spec.md`, que lo nombra (`NNN-E01`), anotada en `proyecto/estado.yml`
+- [ ] TXXX Comparar cada pantalla con la maqueta aprobada mediante capturas, y mostrarle a Carlos las diferencias
+- [ ] TXXX Revisión independiente con el subagente `revisor`: dejar `revision.md` y resolver o anotar cada punto
+- [ ] TXXX Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de la capacidad y marcar la tarea del plan si había una
 
 ---
 
