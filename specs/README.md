@@ -136,6 +136,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-76 | Entrar a la computadora con el celular: se lee el código QR de la entrada y se pone la huella; sin tipear y sin paso de confirmar | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-77 | El celular y la computadora emparejados trabajan en espejo: misma parte y misma venta en curso, con pausa | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-80 | Pantalla «Configuración» en Más, con las preferencias de la aplicación; la primera, habilitar o deshabilitar las animaciones | [009-configuracion](009-configuracion/spec.md) |
+| RF-81 | En el celular, guardar datos para trabajar sin conexión solo si la persona lo habilita en Configuración; deshabilitado de arranque | [009-configuracion](009-configuracion/spec.md) |
 | RF-71 | Quién hizo qué: cada acción queda con su usuario y se puede consultar, de a 10 por página, filtrando por usuario, fecha y tipo de acción | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-72 | Lo que se puede hacer se divide en permisos fijos; cada usuario tiene uno o más roles y puede lo que permita cualquiera de ellos. La aplicación ofrece solo eso y el servidor rechaza lo demás | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |
 | RF-75 | Los roles se arman desde la aplicación: un nombre y los permisos que agrupa. Arranca con Vendedor, Comprador, Recepción, Administrador y Gerente. Nunca queda el sistema sin quien administre usuarios y roles | [007-usuarios-y-acceso](007-usuarios-y-acceso/spec.md) |

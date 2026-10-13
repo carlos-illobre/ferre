@@ -267,4 +267,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T097 [agente] Un pedido de Carlos que cambia cómo se ve o se comporta algo se escribe en la documentación antes de programarlo (estimación 1h) (#97)
 - [x] T102 [agente] Flujo de siete pasos con compuerta, y las tareas pasan de los issues a tasks.md
 - [x] T103 [agente] Pasar a la documentación lo que decían los issues y cerrarlos
-- [ ] T104 [agente] Atajo de teclado para todos los botones de la computadora (decisión 77): falta que Carlos elija el esquema
+- [ ] T104 [agente] Atajo de teclado para todos los botones de la computadora (decisión 77): Carlos eligió letras con Alt; falta que apruebe cómo funciona

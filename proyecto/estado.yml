@@ -676,6 +676,11 @@ RF-80:
   defectos:
     - "No se probó en un teléfono que, deshabilitadas, de verdad no se vea ningún movimiento: las pruebas comprueban la marca y que la navegación no arma la transición"
     - "Falta la revisión independiente de la carpeta: se hace al terminar su última tarea"
+
+RF-81:
+  estado: "Nuevo: especificado, a la espera de la aprobación de Carlos (009-T002)"
+  pruebas: []
+  defectos: []
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
   pruebas:
