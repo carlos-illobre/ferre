@@ -1,0 +1,3 @@
+/* Las letras de los atajos, que aparecen sobre cada botón mientras se mantiene Alt (decisión 80). */
+.atajos-capa { position: fixed; inset: 0; z-index: 1000; pointer-events: none; }
+.atajo-letra { position: fixed; display: grid; place-items: center; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 6px; background: var(--p-amarillo, #f5c542); color: #18201e; font: 800 13px/1 "Manrope Variable", system-ui, sans-serif; box-shadow: 0 0 0 1.5px #18201e, 0 2px 6px rgb(0 0 0 / 0.35); }

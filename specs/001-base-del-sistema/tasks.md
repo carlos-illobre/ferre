@@ -12,3 +12,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T001 [ajuste] En la computadora, con las flechas solo se recorre el menú, las pestañas y los ítems de las listas; a los campos y botones se va con Tab
 - [x] T002 [ajuste] En el celular, la navegación se anima como en una aplicación de iPhone
 - [x] T003 [ajuste] En la computadora, las flechas solo seleccionan la pestaña; se abre con Enter, igual que el menú de la izquierda
+- [x] T004 [regla] En la computadora, todos los botones tienen atajo: con Alt apretado cada uno muestra una letra, y esa letra lo acciona

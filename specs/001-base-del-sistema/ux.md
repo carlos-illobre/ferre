@@ -307,9 +307,21 @@ Dentro de un campo, las flechas hacen lo que hacen siempre: mueven el cursor en 
 el valor en una cantidad, un selector o una fecha. En una búsqueda con resultados a la vista,
 ↑ ↓ eligen un resultado y Enter lo toma.
 
-**Atajos de los botones.** Los que ya existen: en Vender, F5 a F8 eligen el medio de pago y F2
-cobra. Carlos pidió que todos los botones tengan atajo (2026-10-13); el esquema está por
-definir con él y, hasta entonces, los demás botones se alcanzan con Tab.
+**Atajos de los botones (decisión 80).** En la computadora todos los botones tienen atajo:
+
+- Mientras se mantiene apretada la tecla Alt, cada botón que está a la vista muestra encima una
+  letra. Con Alt apretado, esa letra acciona el botón. Al soltar Alt, las letras desaparecen.
+- La letra sale del nombre del botón: la primera que no esté tomada por otro botón de más
+  arriba; si no le queda ninguna de su nombre, la primera libre del abecedario. Con los mismos
+  botones a la vista, a cada uno le toca siempre la misma letra.
+- No se usan la D, la E ni la F: en Windows el navegador las tiene para cosas propias.
+- Los botones que ya tienen su tecla (Alt + número, F2, F5 a F8) no llevan letra.
+- Las letras se reparten primero entre los botones de la pantalla, de arriba hacia abajo, y
+  después entre los del menú de la izquierda. Si hay más botones que letras, los que sobran
+  quedan sin atajo y se alcanzan con Tab.
+- Con una ventana abierta, las letras son solo de los botones de esa ventana.
+- Alt + número sigue abriendo las pantallas; en Vender, F5 a F8 eligen el medio de pago y F2 cobra.
+- En el celular no hay atajos.
 
 **Por dónde se entra en el celular (decisión 56).** Al entrar se abre siempre el Catálogo, y
 cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en Productos,

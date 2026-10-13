@@ -4,6 +4,7 @@ import { sincronizarEmparejamiento } from "../../puesto";
 import { useEspejar, useEspejo } from "../../espejo";
 import { EspejoEstado } from "../EspejoEstado";
 import { useFlechas } from "./flechas";
+import { useAtajos } from "./atajos";
 import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
@@ -82,6 +83,7 @@ function Pantallas() {
   const { emparejado } = useEspejo();
   // Todo con el teclado: las flechas recorren lo que hay en pantalla (ver flechas.ts).
   useFlechas(true);
+  useAtajos(true);
   // Con la sesión abierta, el emparejamiento con el celular se pone al día con el servidor (decisión 58).
   useEffect(() => { if (conSesion) void sincronizarEmparejamiento(); }, [conSesion]);
   // El menú de esta persona: solo las partes y pantallas que sus roles le permiten. Los atajos
@@ -219,7 +221,7 @@ function Pantallas() {
           {menu.map((m) => {
             const destino = m.clave === "mas" ? "mas" : m.pestanas[0]!.ruta;
             return (
-              <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`}>
+              <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} aria-keyshortcuts={atajoDe(destino) ? `Alt+${atajoDe(destino)}` : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`}>
                 <Icono nombre={m.icono} tam={19} grosor={parte === m.clave ? 2.3 : 1.9} />{m.nombre}
                 {/* El número que, con Alt, abre la primera pantalla de esta parte. */}
                 {atajoDe(m.pestanas[0]!.ruta) && <span className="atajo" aria-hidden="true">Alt+{atajoDe(m.pestanas[0]!.ruta)}</span>}
@@ -227,7 +229,7 @@ function Pantallas() {
             );
           })}
         </nav>
-        <p className="lateral-ayuda">Con el teclado: ↑ ↓ recorren el menú y las listas, ← → las pestañas, Tab pasa de un campo a otro, Enter acciona y Esc cierra. Alt + número abre cada pantalla.</p>
+        <p className="lateral-ayuda">Con el teclado: ↑ ↓ recorren el menú y las listas, ← → las pestañas, Tab pasa de un campo a otro, Enter acciona y Esc cierra. Alt + número abre cada pantalla; con Alt apretado, cada botón muestra su letra.</p>
         <EspejoEstado />
         {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
         <div className="lateral-pie">

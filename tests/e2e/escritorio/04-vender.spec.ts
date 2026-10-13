@@ -191,4 +191,17 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("F2");
   await expect(page.getByTestId("exito")).toContainText("Venta registrada");
   await expect(page.getByTestId("exito")).toContainText("$6.000"); // 2 × $3.000
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("exito")).toHaveCount(0);
+  // Todos los botones tienen atajo (decisión 80): con Alt apretado cada uno muestra su letra, y esa
+  // letra lo acciona. Los que ya tienen su tecla (Cobrar con F2, el menú con Alt + número) no llevan letra.
+  await page.keyboard.down("Alt");
+  await expect(page.locator('.atajo-letra[data-de="menu-vender"]')).toHaveCount(0);
+  const letra = await page.locator('.atajo-letra[data-de="emparejar-celular"]').textContent();
+  expect(letra).toMatch(/^[A-Z]$/);
+  expect(["D", "E", "F"]).not.toContain(letra);
+  await page.keyboard.press(`Key${letra}`);
+  await page.keyboard.up("Alt");
+  await expect(page.locator(".atajo-letra")).toHaveCount(0);
+  await expect(page.getByTestId("qr-vincular")).toBeVisible();
 });

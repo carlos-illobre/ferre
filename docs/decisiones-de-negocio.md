@@ -579,3 +579,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       dispositivo, arranca habilitada y vale en el momento.
     - Que la pantalla esté en los dos y que la opción valga también en la computadora lo
       decidió el agente, a pedido de Carlos, por lo más simple y consistente.
+
+80. **Todos los botones de la computadora tienen atajo: Alt y una letra** (2026-10-13).
+    Carlos eligió este esquema entre dos que propuso el agente. Con Alt apretado, cada botón
+    a la vista muestra una letra, y esa letra lo acciona. La letra sale del nombre del botón.
+    No se usan la D, la E ni la F, que el navegador tiene para sí. Completa la decisión 77.

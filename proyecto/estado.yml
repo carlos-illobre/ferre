@@ -772,7 +772,7 @@ RNF-05:
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos:
     - "Las animaciones de navegación del celular no se vieron en un teléfono: en las pruebas solo se comprueba que la pantalla cambia y a dónde"
-    - "Falta que todos los botones de la computadora tengan atajo de teclado (decisión 77): el esquema está por definir con Carlos"
+    - "Atajos con Alt y una letra (decisión 80): en una pantalla con más de 23 botones sin tecla propia, los que sobran quedan sin atajo; no se probó en Windows que el navegador no se quede con la tecla"
     - "Las flechas que recorren cada pantalla (decisión 61, #77) tienen prueba de punta a punta en el menú, las pestañas y una venta completa; crear un rol, mandar un ticket, cargar un ingreso y la ficha de un producto se probaron a mano en un navegador"
     - "No se recorrieron con el teclado todas las pantallas una por una hasta el final: puede quedar algún control al que no se llegue"
     - "Sin validar: el dueño no la revisó en la notebook del local"
