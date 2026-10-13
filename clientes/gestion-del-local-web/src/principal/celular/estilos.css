@@ -73,6 +73,12 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 .barra .salir { height: 32px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; font-size: 13px; font-weight: 600; }
 .contenido { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 8px 20px 40px; display: flex; flex-direction: column; gap: 10px; }
 .contenido.ancho { max-width: 1080px; }
+/* Vincular con la computadora: arriba a la derecha de cualquier pantalla, mientras no esté vinculado */
+.app { position: relative; }
+.vincular-arriba { position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px; z-index: 5; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; background: var(--p-superficie, #fff); color: var(--p-verde, #17312b); font-size: 15px; font-weight: 700; box-shadow: 0 0 0 1px rgb(23 49 43 / 0.10), 0 4px 12px rgb(23 49 43 / 0.12); }
+.vincular-error { margin: 66px 20px 0; }
+/* Lo que una pantalla pone a la derecha de su título le deja el lugar al botón */
+.app:has(> .vincular-arriba) .encabezado .fila-titulo { padding-right: 128px; }
 /* Dentro de una pantalla de Más: arriba, el botón que vuelve al menú de Más */
 .volver-a-mas { width: 100%; max-width: 760px; margin: 0 auto; padding: 10px 12px 0; }
 .volver-a-mas button { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 12px 0 6px; border-radius: 999px; color: var(--coral-texto); font-size: 16px; font-weight: 600; }

@@ -314,6 +314,10 @@ que poder alcanzarse y accionarse así: nada puede depender de un clic.
 cada parte del menú de abajo abre siempre en su primera pestaña (Catálogo en Productos,
 Depósito en Pedidos): la aplicación no recuerda en qué pestaña se estaba.
 
+**Vincular, siempre a mano (decisión 66).** En el celular, mientras no esté vinculado con una
+computadora, todas las pantallas llevan arriba a la derecha «Vincular». Vinculado, arriba queda
+la franja del espejo con «Desvincular».
+
 **Volver a Más (decisión 64).** En el celular, cada pantalla de Más lleva arriba a la
 izquierda «Volver a Más», que regresa al menú de Más.
 

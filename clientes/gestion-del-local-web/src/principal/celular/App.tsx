@@ -126,6 +126,16 @@ function Pantallas() {
     <div className="app">
       <EspejoEstado />
 
+      {/* Sin vincular, el botón para vincular está arriba a la derecha en todas las pantallas
+          (decisión 66); vinculado, ese lugar lo ocupa la franja del espejo, con «Desvincular». */}
+      {!emparejado && hayCamara() && (
+        <button type="button" className="vincular-arriba" onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }} data-testid="vincular-arriba" aria-label="Vincular con la computadora">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></svg>
+          <span>Vincular</span>
+        </button>
+      )}
+      {escaneando && <Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />}
+      {errorDeCodigo && pestana !== "mas" && <p className="aviso-suave vincular-error" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}
       {pestana === "mas" && parte && (
         <div className="volver-a-mas">
           <button type="button" onClick={() => irA("mas")} data-testid="volver-a-mas">
@@ -153,7 +163,6 @@ function Pantallas() {
               {errorDeCodigo && <p className="aviso-suave" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}
             </div>
           )}
-          {escaneando && <Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />}
           <div className="lista">
             {deMas.map((d) => (
               <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte}`)} data-testid={`mas-${d.parte}`}>

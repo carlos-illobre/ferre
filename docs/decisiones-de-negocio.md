@@ -435,3 +435,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Vale cuando ese celular ya tiene la huella vinculada. Si no, queda la entrada de
       siempre, con el aviso de que la computadora entra también, para entrar con Google.
     - Si la huella no se lee, lo dice y queda el botón para probar de nuevo.
+
+66. **En el celular, vincular con la computadora está en todas las pantallas** (2026-10-13).
+    Carlos pidió que el botón no esté solo en Más: en cada pantalla, arriba a la derecha.
+    - Sin vincular: el botón «Vincular», que abre la cámara dentro de Ferrebress.
+    - Vinculado: ese botón no aparece; arriba queda la franja del espejo, con «Desvincular»
+      (y «Pausar»), que ya estaba en todas las pantallas.
