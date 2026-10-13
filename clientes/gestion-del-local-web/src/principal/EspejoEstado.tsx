@@ -26,7 +26,13 @@ export function EspejoEstado({ sinBoton = false }: { sinBoton?: boolean } = {}) 
       {aviso && <span className="espejo-aviso" data-testid="espejo-aviso">{aviso}</span>}
       {!sinBoton && e.conectado && (
         <span className="espejo-botones">
-          <button type="button" onClick={() => pausarEspejo(!e.pausado)} data-testid="pausar-espejo">{e.pausado ? TEXTOS_DEL_VINCULO.juntar : TEXTOS_DEL_VINCULO.separar}</button>
+          <button type="button" onClick={() => pausarEspejo(!e.pausado)} data-testid="pausar-espejo">
+            {/* El mismo ícono que en el celular: flechas que se acercan para reconectar, que se alejan para desconectar. */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d={e.pausado ? "M3 12h6M21 12h-6M7 8l4 4-4 4M17 8l-4 4 4 4" : "M10 12H3M14 12h7M7 8l-4 4 4 4M17 8l4 4-4 4"} />
+            </svg>
+            {e.pausado ? TEXTOS_DEL_VINCULO.juntar : TEXTOS_DEL_VINCULO.separar}
+          </button>
         </span>
       )}
     </div>

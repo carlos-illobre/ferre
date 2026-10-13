@@ -295,7 +295,7 @@ atajo. Las teclas significan lo mismo en todas las pantallas:
 |---|---|
 | ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Desconectar o Reconectar) y Salir. El foco se marca con el mismo borde amarillo en todos |
 | → en el menú | Entra a las pestañas de esa parte, o a la pantalla si no tiene |
-| ← → en las pestañas | Pasan de una pestaña a otra y la abren; ← desde la primera vuelve al menú; ↓ entra a la pantalla |
+| ← → en las pestañas | Pasan el foco de una pestaña a otra sin abrirla, igual que ↑ ↓ en el menú; Enter abre la que tiene el foco; ← desde la primera vuelve al menú; ↓ entra a la pantalla que está abierta |
 | ↑ ↓ en una lista | Van al ítem anterior o al siguiente (un renglón de una tabla, una tarjeta de una lista); ↑ desde el primero vuelve a las pestañas |
 | ← en una lista | Vuelve al menú |
 | Enter | Acciona el botón o el ítem que tiene el foco |

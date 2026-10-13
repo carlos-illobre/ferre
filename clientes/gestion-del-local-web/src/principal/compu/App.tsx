@@ -169,23 +169,26 @@ function Pantallas() {
       setTimeout(() => { const pestana = esParte ? pestanaActual() : null; if (pestana) pestana.focus(); else focoALaPantalla(); }, cambia ? 150 : 0);
     }
   }
-  // En las pestañas de una parte (Productos, Listas, Duplicados): ← → pasan de una a otra y la
-  // abren; ← desde la primera vuelve al menú; ↓ (o Enter) entra a la pantalla.
+  // En las pestañas de una parte (Productos, Listas, Duplicados): ← → pasan el foco de una a
+  // otra sin abrirla; Enter abre la que tiene el foco; ← desde la primera vuelve al menú; ↓ entra
+  // a la pantalla que está abierta.
   function teclasDeLasPestanas(e: ReactKeyboardEvent<HTMLElement>) {
     const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
     const i = botones.indexOf(document.activeElement as HTMLButtonElement);
     if (i < 0 || e.altKey || e.ctrlKey || e.metaKey) return;
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      // Las flechas solo pasan el foco, como en el menú: la pestaña se abre con Enter (pedido de Carlos del 2026-10-13).
       e.preventDefault(); e.stopPropagation();
       const destino = botones[i + (e.key === "ArrowRight" ? 1 : -1)];
-      if (!destino) {
-        if (e.key === "ArrowLeft") (document.querySelector<HTMLButtonElement>(".lateral nav button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".lateral nav button"))?.focus();
-        return;
-      }
-      destino.click();
-      // La pantalla nueva pone el foco en su búsqueda: se lo devuelve a la pestaña, para seguir pasando.
-      setTimeout(() => pestanaActual()?.focus(), 150);
-    } else if (e.key === "ArrowDown" || e.key === "Enter") {
+      if (destino) destino.focus();
+      else if (e.key === "ArrowLeft") (document.querySelector<HTMLButtonElement>(".lateral nav button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".lateral nav button"))?.focus();
+    } else if (e.key === "Enter") {
+      e.preventDefault(); e.stopPropagation();
+      const elegida = botones[i]!;
+      // Enter abre la pestaña que tiene el foco y lo deja en ella; si ya estaba abierta, entra a la pantalla.
+      if (elegida.getAttribute("aria-current") === "page") focoALaPantalla();
+      else { elegida.click(); setTimeout(() => pestanaActual()?.focus(), 150); }
+    } else if (e.key === "ArrowDown") {
       e.preventDefault(); e.stopPropagation();
       focoALaPantalla();
     }

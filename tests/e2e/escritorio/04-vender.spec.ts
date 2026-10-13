@@ -149,13 +149,20 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   }
   expect(await fila()).toBe(elegida);
 
-  // → entra a las pestañas; ← → pasan de una a otra y la abren; ← desde la primera vuelve al menú.
+  // → entra a las pestañas; ← → pasan el foco de una a otra; ← desde la primera vuelve al menú.
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("pestana-productos")).toBeFocused();
+  // Las flechas solo pasan el foco: la pestaña se abre con Enter, igual que el menú.
   await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("pestana-listas")).toBeFocused();
+  await expect(page.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
+  await page.keyboard.press("Enter");
   await expect(page.getByTestId("pestana-listas")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("pestana-listas")).toBeFocused();
   await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("pestana-productos")).toBeFocused();
+  await expect(page.getByTestId("pestana-listas")).toHaveAttribute("aria-current", "page");
+  await page.keyboard.press("Enter");
   await expect(page.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("pestana-productos")).toBeFocused();
   await page.keyboard.press("ArrowLeft");

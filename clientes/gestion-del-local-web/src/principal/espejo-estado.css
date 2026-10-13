@@ -5,7 +5,7 @@
 .espejo-punto { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--p-borde-fuerte, #7c9085); }
 .espejo.activo .espejo-punto { background: var(--p-ok, #0f8a5f); }
 .espejo-botones { display: inline-flex; gap: 8px; }
-.espejo button { min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px solid currentColor; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
+.espejo button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px solid currentColor; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
 .espejo button:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 2px; }
 /* En el celular: pegada arriba, con lugar para la muesca. */
 @media (max-width: 899px) { .espejo { position: sticky; top: 0; z-index: 30; padding-top: calc(8px + env(safe-area-inset-top)); } .espejo button { min-height: 44px; } }
