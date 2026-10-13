@@ -449,11 +449,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     pantalla.
     - Las compras recientes no ayudan a recibir mercadería: pasan a «Cómo va el negocio».
       El ingreso queda solo con el proveedor, el comprobante y los renglones.
-    - Interpretación del agente, a confirmar con Carlos: quien tiene «Ver las compras» pero
+    - Confirmado por Carlos el mismo día: quien tiene «Ver las compras» pero
       no «Ver los números del negocio» abre «Cómo va el negocio» y ve solo las compras; y
       una compra se sigue anulando desde esa lista, con «Registrar ingresos».
-    - El resto de las pantallas se revisó con ese criterio y lo encontrado se le pasó a
-      Carlos para decidir; no se cambió nada más.
+    - El resto de las pantallas se revisó con ese criterio. Carlos vio las ocho que
+      mezclan procesos y decidió dejarlas como están por ahora.
 
 68. **El orden de Depósito: Inventario, Ingreso, Estanterías, Pedidos** (2026-10-13).
     Lo pidió Carlos. Como cada parte abre en su primera pestaña (decisión 56), Depósito
