@@ -142,7 +142,7 @@ export const TEXTOS_DE_ENTRADA = {
   bajada: "Ferrebress es el sistema del mostrador: se usa desde el celular y desde la computadora, con los mismos datos.",
   entrar: "Entrar",
   conElCelular: "Entrá con tu celular",
-  pasoLeer: "Apuntá la cámara del celular a este código y tocá el enlace.",
+  pasoLeer: "En el celular, abrí Ferrebress, tocá «Escanear el código de la computadora» y apuntá acá. También sirve la cámara del teléfono.",
   pasoHuella: "Poné la huella en el celular. Esta pantalla entra sola.",
   codigoSeRenueva: "El código se renueva solo cada 5 minutos. No hay contraseñas.",
   comoConHuella: "Acá no hay contraseñas. Entrás con la huella, si ya vinculaste este dispositivo, o con tu cuenta de Google.",

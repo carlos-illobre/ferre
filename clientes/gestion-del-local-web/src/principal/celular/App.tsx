@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
 import { EspejoEstado } from "../EspejoEstado";
-import { useEspejar } from "../../espejo";
+import { useEspejar, useEspejo } from "../../espejo";
+import { Escaner, hayCamara } from "./componentes/Escaner";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
@@ -14,7 +15,7 @@ import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { Roles } from "../Roles";
 import { irA, useRuta } from "../../rutas";
-import { Entrar } from "./Entrar";
+import { destinoDelCodigo, Entrar } from "./Entrar";
 import { VincularCelular } from "./pantallas/VincularCelular";
 import { Catalogo } from "./Catalogo";
 import { Icono as IconoDeMas, type NombreDeIcono } from "../compu/base/ui";
@@ -77,6 +78,15 @@ function Pantallas() {
   const parteEnEspejo = sesion.estado === "con-sesion" && soloElPedido && ["catalogo", "vender", "deposito", "mas"].includes(nombreDeParte)
     ? `${nombreDeParte}${ruta.nombre === "negocio" ? "/negocio" : ruta.sub ? `/${ruta.sub}` : ""}${pedidoDeLaRuta ? `?pedido=${pedidoDeLaRuta}` : ""}` : null;
   useEspejar<string | null>("ir", parteEnEspejo, (parte) => { if (parte && sesion.estado === "con-sesion") irA(parte); }, parteEnEspejo !== null);
+  // Vincular con la computadora sin salir de la aplicación: la cámara se abre acá adentro y lee
+  // el código que la computadora muestra en «Vincular el celular» (o en su entrada).
+  const { emparejado } = useEspejo();
+  const [escaneando, setEscaneando] = useState(false);
+  const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
+  const alLeerCodigo = useCallback((leido: string) => {
+    const destino = destinoDelCodigo(leido);
+    if (destino) location.hash = destino; else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora al tocar «Vincular el celular».");
+  }, []);
   const estadoAnterior = useRef(sesion.estado);
   const [recienEntro, setRecienEntro] = useState(false);
   useEffect(() => {
@@ -124,6 +134,18 @@ function Pantallas() {
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
+          {!emparejado && hayCamara() && (
+            <div className="lista">
+              <button type="button" className="fila con-foto" onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }} data-testid="vincular-con-la-compu">
+                <span className="miniatura mas-icono"><Icono nombre="escanear" tam={22} /></span>
+                <span className="nombre">Vincular con la computadora</span>
+                <Icono nombre="derecha" tam={18} grosor={2.4} />
+                <span className="detalle">Escaneá el código que muestra la computadora, sin salir de acá</span>
+              </button>
+              {errorDeCodigo && <p className="aviso-suave" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}
+            </div>
+          )}
+          {escaneando && <Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />}
           <div className="lista">
             {deMas.map((d) => (
               <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte}`)} data-testid={`mas-${d.parte}`}>

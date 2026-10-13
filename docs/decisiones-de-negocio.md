@@ -411,3 +411,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - En la computadora, el botón de Google pasa a tener borde, sombra y el tamaño de los
       demás botones: casi no se notaba que era un botón.
 
+
+63. **El celular se vincula con la computadora sin salir de Ferrebress** (2026-10-12).
+    Carlos avisó que, con la app abierta, vincular pedía salir a la cámara del teléfono y
+    eso abría otra copia en el navegador.
+    - En el celular, en Más, hay «Vincular con la computadora» mientras no esté vinculado:
+      abre la cámara dentro de Ferrebress y lee el código que muestra la computadora.
+    - Las instrucciones de la computadora nombran primero ese camino; la cámara del
+      teléfono sigue sirviendo.

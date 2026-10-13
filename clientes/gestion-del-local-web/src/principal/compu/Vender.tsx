@@ -594,8 +594,8 @@ export function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boo
               {qr ? <img src={qr} alt="Código para vincular el celular" width={220} height={220} /> : vencido || error ? <Icono nombre="celular" tam={56} grosor={1.4} /> : <div className="esqueleto" aria-label="Generando el código" />}
             </div>
             <ol className="pasos">
-              <li><span>Abrí la cámara del celular y apuntá al código.</span></li>
-              <li><span>Tocá el enlace que aparece y entrá con tu cuenta.</span></li>
+              <li><span>En el celular, abrí Ferrebress y andá a Más → «Vincular con la computadora».</span></li>
+              <li><span>Apuntá a este código. (También sirve la cámara del teléfono: tocá el enlace que aparece.)</span></li>
               <li><span>Listo: el celular y esta computadora trabajan en espejo. Lo que hagas en uno se ve en el otro, y el celular pone la cámara.</span></li>
             </ol>
           </div>
