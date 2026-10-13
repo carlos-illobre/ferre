@@ -20,7 +20,6 @@ import { pesos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
 import { Escaner, hayCamara } from "./componentes/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
-import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../../puesto";
 import { AnularVentas, NOMBRE_MEDIO, pesosCortos, VentasDeHoy } from "./pantallas/VentasDeHoy";
 import { Pestanas } from "./Pestanas";
@@ -290,10 +289,6 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   return (
     <main className="contenido vender-ancho">
       <div className="encabezado">
-        <div className="fila-titulo">
-          <span className="solo-celular"><EstadoDeConexion testId="conexion-celular" /></span>
-          <span className="solo-escritorio"><small>{pendientes > 0 ? `${pendientes} cambio(s) guardados sin enviar · ` : ""}Enter agrega · Esc descarta · F5 a F8 medio de pago · F2 cobrar</small></span>
-        </div>
         <h1 className="titulo">Vender</h1>
         {pestanas}
         <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Buscar producto o código" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja}

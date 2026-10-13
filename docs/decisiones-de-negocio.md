@@ -534,3 +534,17 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     73. «Desconectar» hace que cada dispositivo trabaje por su lado sin desvincularlos;
     «Reconectar» los vuelve a poner a trabajar juntos. El estado dice «Conectado con la
     computadora» (o «con el celular») y «Desconectados: cada uno por su lado».
+
+76. **En el celular, el estado del vínculo lo dice el botón** (2026-10-13). Carlos pidió sacar
+    la leyenda de arriba («Conectado con la computadora») y su círculo.
+    - El botón del encabezado lleva borde y cambia de color: verde cuando el celular y la
+      computadora están trabajando juntos; gris cuando están desconectados o la computadora
+      no está abierta. Sin vínculo es el botón «Vincular», también con borde.
+    - En el lugar de la leyenda va el estado de la conexión («Conectado», «Sincronizado hace
+      5 min», «Sin conexión · 2 por enviar»), en todas las pantallas del celular. Vender deja
+      de mostrarlo por su cuenta.
+    - Lo que termina en la computadora («venta cobrada en la computadora») se sigue avisando
+      un momento, en esa misma línea.
+    - Entre esa línea y el título de la pantalla no queda espacio de más.
+    - El botón lleva el ícono a la izquierda y la leyenda a la derecha, no debajo: el lugar
+      alcanza. Corrige eso de la decisión 70.

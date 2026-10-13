@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
-import { EspejoEstado, TEXTOS_DEL_VINCULO } from "../EspejoEstado";
-import { pausarEspejo, useEspejar, useEspejo } from "../../espejo";
+import { TEXTOS_DEL_VINCULO } from "../EspejoEstado";
+import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
+import { alAvisoDelEspejo, pausarEspejo, useEspejar, useEspejo } from "../../espejo";
 import { Escaner, hayCamara } from "./componentes/Escaner";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
@@ -59,6 +60,14 @@ const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
 );
 
+// Lo que terminó en la computadora («venta cobrada») se dice acá un momento.
+function AvisoDeLaCompu() {
+  const [aviso, setAviso] = useState<string | null>(null);
+  useEffect(() => alAvisoDelEspejo(setAviso), []);
+  useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 7000); return () => clearTimeout(t); }, [aviso]);
+  return aviso ? <span className="aviso-de-la-compu" role="status" data-testid="espejo-aviso">{aviso}</span> : null;
+}
+
 function Pantallas() {
   const { sesion, salir } = useSesion();
   const ruta = useRuta();
@@ -81,7 +90,7 @@ function Pantallas() {
   useEspejar<string | null>("ir", parteEnEspejo, (parte) => { if (parte && sesion.estado === "con-sesion") irA(parte); }, parteEnEspejo !== null);
   // Vincular con la computadora sin salir de la aplicación: la cámara se abre acá adentro y lee
   // el código que la computadora muestra en «Vincular el celular» (o en su entrada).
-  const { emparejado, pausado } = useEspejo();
+  const { emparejado, pausado, enEspejo } = useEspejo();
   const [escaneando, setEscaneando] = useState(false);
   const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
   const alLeerCodigo = useCallback((leido: string) => {
@@ -125,7 +134,9 @@ function Pantallas() {
 
   return (
     <div className="app">
-      <EspejoEstado sinBoton />
+      {/* La línea de arriba (decisión 76): cómo está la conexión, siempre a la vista, y lo que
+          termina en la computadora, un momento. El estado del vínculo lo dice el color del botón. */}
+      <div className="linea-de-arriba"><EstadoDeConexion testId="conexion-celular" /><AvisoDeLaCompu /></div>
 
       {/* Un solo botón a la derecha del encabezado de cualquier pantalla (decisiones 70 y 73):
           sin vínculo, «Vincular»; con vínculo, «Desconectar» o «Reconectar». Desvincular está en Usuarios y sesiones. */}
@@ -134,19 +145,19 @@ function Pantallas() {
           {!emparejado ? (
             <button type="button" className="vincular-boton" data-testid="vincular-arriba" aria-label="Vincular con la computadora" title="Vincular con la computadora"
               onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M12 7v6M9 10h6" /></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M12 7v6M9 10h6" /></svg>
               <span>{TEXTOS_DEL_VINCULO.vincular}</span>
             </button>
           ) : pausado ? (
-            <button type="button" className="vincular-boton" data-testid="reconectar-arriba" aria-label="Reconectar con la computadora: volver a trabajar juntos" title="Volver a trabajar junto con la computadora"
+            <button type="button" className="vincular-boton apagado" data-testid="reconectar-arriba" aria-label="Reconectar con la computadora: volver a trabajar juntos" title="Volver a trabajar junto con la computadora"
               onClick={() => pausarEspejo(false)}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12h6M21 12h-6M7 8l4 4-4 4M17 8l-4 4 4 4" /></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12h6M21 12h-6M7 8l4 4-4 4M17 8l-4 4 4 4" /></svg>
               <span>{TEXTOS_DEL_VINCULO.juntar}</span>
             </button>
           ) : (
-            <button type="button" className="vincular-boton vinculado" data-testid="desconectar-arriba" aria-label="Desconectar de la computadora: cada uno por su lado un rato" title="Trabajar por separado un rato"
+            <button type="button" className={`vincular-boton ${enEspejo ? "vinculado" : "apagado"}`} data-testid="desconectar-arriba" aria-label={enEspejo ? "Desconectar de la computadora: cada uno por su lado un rato" : "Vinculado, pero la computadora no está abierta"} title={enEspejo ? "Trabajar por separado un rato" : "La computadora no está abierta"}
               onClick={() => pausarEspejo(true)}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 12H3M14 12h7M7 8l-4 4 4 4M17 8l4 4-4 4" /></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 12H3M14 12h7M7 8l-4 4 4 4M17 8l4 4-4 4" /></svg>
               <span>{TEXTOS_DEL_VINCULO.separar}</span>
             </button>
           )}

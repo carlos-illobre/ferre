@@ -132,9 +132,11 @@ un solo botón (decisión 73): «Vincular» si no hay vínculo, «Desconectar» 
 «Reconectar» si están separados. «Desvincular» está solo en Más → Usuarios y sesiones, en los dos, y
 pregunta antes (decisión 74).
 En la computadora el estado y el botón van en el menú lateral.
-En el celular, el estado va en una franja arriba, sin botones; el botón va a la derecha del
-encabezado de cada pantalla, chico, con el ícono y la leyenda debajo, como los del menú de abajo
-(decisión 70): «Vincular» abre la cámara dentro de la aplicación para leer el código de la
+En el celular no hay leyenda del vínculo (decisión 76): el estado lo dice el color del botón, que
+lleva borde. Verde: están trabajando juntos. Gris: están desconectados o la computadora no está
+abierta. El botón va a la derecha del encabezado de cada pantalla, chico, con el ícono a la
+izquierda y la leyenda a su derecha (decisiones 70 y 76). Lo que termina en la computadora se
+avisa un momento en la línea de arriba, la del estado de la conexión. «Vincular» abre la cámara dentro de la aplicación para leer el código de la
 computadora (decisión 63). En Más, mientras no esté vinculado, el primer renglón es «Vincular con
 la computadora».
 

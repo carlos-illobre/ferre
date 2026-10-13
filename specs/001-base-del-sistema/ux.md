@@ -317,8 +317,8 @@ Depósito en Inventario; el orden de Depósito es Inventario, Ingreso, Estanter�
 
 **Vincular, siempre a mano (decisión 66).** En el celular, mientras no esté vinculado con una
 computadora, todas las pantallas llevan «Vincular» a la derecha de su encabezado: un botón chico,
-con el ícono y la leyenda debajo. Vinculado, ese mismo botón dice «Desconectar» o «Reconectar», y
-arriba queda la franja con el estado. «Desvincular» está solo en Más → Usuarios y sesiones (decisiones 70, 73 y 74).
+con borde, el ícono a la izquierda y la leyenda a su derecha. Vinculado, ese mismo botón dice «Desconectar» o «Reconectar», en verde o en
+gris según estén o no trabajando juntos. «Desvincular» está solo en Más → Usuarios y sesiones (decisiones 70, 73 y 74).
 
 **Las partes y sus pestañas (decisiones 68 y 72).** Catálogo: Productos, Listas, Duplicados.
 Vender: Vender, Hoy, Anular. Depósito: Inventario, Ingreso, Estanterías, Pedidos. Más no tiene
@@ -327,6 +327,11 @@ ve solo las que puede usar y, si le queda una sola, no se dibujan.
 
 **Más, en el celular.** Todas las opciones se ven igual: ícono a la izquierda, nombre, una línea
 que explica y la flecha a la derecha. «Salir» también, en su propio bloque al final.
+
+**La línea de arriba del celular (decisión 76).** Todas las pantallas del celular empiezan con una
+línea chica que dice cómo está la conexión: «Conectado», «Sincronizado hace 5 min», «Sin
+conexión · 2 por enviar» o «3 por enviar desde hace más de una hora». Debajo, sin espacio de
+más, va el título de la pantalla.
 
 **Volver a Más (decisión 64).** En el celular, cada pantalla de Más lleva arriba a la
 izquierda «Volver a Más», que regresa al menú de Más.

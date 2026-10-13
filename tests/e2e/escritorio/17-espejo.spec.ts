@@ -63,7 +63,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
 
   // Al abrirse el celular, los dos lo dicen, y el celular va a donde está la computadora.
   await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
-  await expect(celular.getByTestId("espejo-estado")).toContainText("Conectado con la computadora");
+  await expect(celular.getByTestId("desconectar-arriba")).toHaveClass(/vinculado/);
   await expect(celular.getByTestId("menu-vender")).toHaveAttribute("aria-current", "page");
   // Vinculado, el único botón del encabezado del celular es «Desconectar»; el de vincular no está (decisión 73).
   await expect(celular.getByTestId("desconectar-arriba")).toBeVisible();
@@ -156,7 +156,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   psql(`UPDATE puesto SET usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}'), compu_dispositivo = '${dispositivo}' WHERE codigo_hash = 'e2e-espejo'`);
   await compu.context().close();
   psql(`UPDATE sesion SET revocada_en = now() WHERE token_hash = '${hash(TOKEN_COMPU)}'`);
-  await expect(celular.getByTestId("espejo-estado")).toContainText("La computadora no está abierta");
+  await expect(celular.getByTestId("desconectar-arriba")).toHaveClass(/apagado/);
   const TOKEN_COMPU_2 = `${TOKEN_COMPU}-de-nuevo`;
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(TOKEN_COMPU_2)}', 'e2e compu de nuevo', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   const enEsteDispositivo = async (token: string) => {
@@ -185,7 +185,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await compu.getByTestId("desvincular-vinculo").click();
   await expect(compu.getByTestId("espejo")).toHaveCount(0);
   await expect(compu.getByTestId("emparejar-celular")).toBeVisible();
-  await expect(celular.getByTestId("espejo")).toHaveCount(0);
+  await expect(celular.getByTestId("desconectar-arriba")).toHaveCount(0);
   await celular.getByTestId("menu-vender").click();
   await compu.waitForTimeout(800);
   await expect(compu.getByRole("heading", { name: "Usuarios y sesiones" })).toBeVisible();
