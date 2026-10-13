@@ -29,6 +29,35 @@ export function useRuta(): Ruta {
   return ruta;
 }
 
+// La navegación animada del celular (decisión 78): la activa la aplicación del celular; las
+// demás siguen cambiando de pantalla sin animar.
+let animada = false;
+export function animarNavegacion(si: boolean): void { animada = si; }
+
+// De dónde a dónde se va, para elegir el movimiento: entrar a una pantalla desde una lista
+// («adelante»), volver («atras») o cambiar de parte o de pestaña («funde»).
+export function movimientoDe(desde: string, hacia: string): "adelante" | "atras" | "funde" {
+  const limpio = (c: string) => c.replace(/^#?\/?/, "").split("?")[0] ?? "";
+  const [a, b] = [limpio(desde), limpio(hacia)];
+  if (a === "mas" && b.startsWith("mas/")) return "adelante";
+  if (b === "mas" && (a.startsWith("mas/") || a === "negocio")) return "atras";
+  return "funde";
+}
+
+type ConTransicion = Document & { startViewTransition?: (cambio: () => Promise<void> | void) => { finished: Promise<void> } };
+
 export function irA(camino: string): void {
-  location.hash = `#/${camino}`;
+  const destino = `#/${camino}`;
+  const doc = document as ConTransicion;
+  const sinMovimiento = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!animada || !doc.startViewTransition || sinMovimiento || location.hash === destino) { location.hash = destino; return; }
+  document.documentElement.dataset.nav = movimientoDe(location.hash, destino);
+  // La pantalla nueva se dibuja cuando llega el aviso del cambio de dirección: se espera eso y un cuadro más.
+  const transicion = doc.startViewTransition(() => new Promise<void>((listo) => {
+    const seguir = () => requestAnimationFrame(() => listo());
+    window.addEventListener("hashchange", seguir, { once: true });
+    setTimeout(seguir, 300);
+    location.hash = destino;
+  }));
+  void transicion.finished.catch(() => undefined).then(() => { delete document.documentElement.dataset.nav; });
 }

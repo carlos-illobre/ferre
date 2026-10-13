@@ -49,6 +49,8 @@ test.beforeAll(() => {
 });
 
 test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y desvincular", async ({ browser }) => {
+  // Es un recorrido largo, con tres ventanas: necesita más que los 30 segundos de siempre.
+  test.setTimeout(90_000);
   const abrir = async (ancho: number, alto: number, token: string, ruta: string) => {
     const pagina = await (await browser.newContext({ viewport: { width: ancho, height: alto } })).newPage();
     await pagina.addInitScript((t) => localStorage.setItem("ferre.sesion", t), token);

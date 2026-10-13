@@ -15,7 +15,7 @@ import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { Roles } from "../Roles";
-import { irA, useRuta } from "../../rutas";
+import { animarNavegacion, irA, useRuta } from "../../rutas";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 import { VincularCelular } from "./pantallas/VincularCelular";
 import { Catalogo } from "./Catalogo";
@@ -69,6 +69,8 @@ function AvisoDeLaCompu() {
 }
 
 function Pantallas() {
+  // En el celular la navegación se anima (decisión 78).
+  useEffect(() => { animarNavegacion(true); return () => animarNavegacion(false); }, []);
   const { sesion, salir } = useSesion();
   const ruta = useRuta();
   const codigoVinculacion = ruta.parametros.get("codigo");

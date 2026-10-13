@@ -557,3 +557,17 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - A un campo de texto o a un botón se va con Tab.
     - Todos los botones tienen que tener un atajo de teclado. Qué tecla le toca a cada uno
       está por definir con Carlos; siguen los que ya había (F2 cobra, F5 a F8 el medio de pago).
+
+78. **El celular se mueve como una aplicación de iPhone** (2026-10-13). Carlos pidió
+    animaciones al navegar y dejó al agente elegir cómo hacerlas.
+    - Entrar a una pantalla desde una lista (de Más a una de sus pantallas) la trae desde la
+      derecha, mientras la anterior se corre un poco a la izquierda y se apaga; volver hace
+      lo contrario.
+    - Cambiar de parte en el menú de abajo, o de pestaña dentro de una parte, es un fundido
+      corto: en iPhone eso no desliza.
+    - El menú de abajo queda quieto mientras cambia la pantalla.
+    - Las hojas siguen subiendo desde abajo, ahora con la misma curva que el resto.
+    - Duran poco (un tercio de segundo el deslizamiento, menos el fundido) y no se usan si el
+      teléfono tiene pedido «reducir movimiento».
+    - Decisión del agente: se hacen con lo que trae el navegador (transiciones de vista), sin
+      sumar ninguna librería. En un navegador que no las tenga, la pantalla cambia sin animar.

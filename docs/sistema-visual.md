@@ -78,6 +78,22 @@ Salen del diseño de referencia.
   margen abajo; el margen se despliega en el mismo renglón con los cinco botones y el precio
   a mano.
 
+## Movimiento en el celular
+
+Se parece a una aplicación de iPhone (decisión 78). Una sola curva para todo lo que se desliza:
+`cubic-bezier(0.32, 0.72, 0, 1)`.
+
+| Qué pasa | Cómo se mueve | Cuánto dura |
+|---|---|---|
+| Entrar a una pantalla desde una lista (Más → una de sus pantallas) | La nueva entra desde la derecha; la anterior se corre un 30 % a la izquierda y baja a 60 % de opacidad | 350 ms |
+| Volver | Al revés: la que se va sale por la derecha y la anterior vuelve desde la izquierda | 350 ms |
+| Cambiar de parte (menú de abajo) o de pestaña dentro de una parte | Fundido | 180 ms |
+| Abrir una hoja | Sube desde abajo, con la misma curva | 350 ms |
+
+El menú de abajo no se mueve mientras cambia la pantalla. Con «reducir movimiento» pedido en el
+teléfono no hay animaciones. Se hacen con las transiciones de vista del navegador, sin
+librerías; donde no existen, la pantalla cambia sin animar. La computadora no anima la navegación.
+
 ## Reglas de la computadora
 
 - Mandan las tablas: nada de las reglas de layout del celular aplica.

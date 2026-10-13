@@ -328,6 +328,11 @@ ve solo las que puede usar y, si le queda una sola, no se dibujan.
 **Más, en el celular.** Todas las opciones se ven igual: ícono a la izquierda, nombre, una línea
 que explica y la flecha a la derecha. «Salir» también, en su propio bloque al final.
 
+**Movimiento (decisión 78).** En el celular la navegación se anima como en una aplicación de
+iPhone: entrar a una pantalla la trae desde la derecha, volver la saca por la derecha, y cambiar
+de parte o de pestaña es un fundido. El detalle (curva y duraciones) está en
+`docs/sistema-visual.md`, «Movimiento en el celular».
+
 **La línea de arriba del celular (decisión 76).** Todas las pantallas del celular empiezan con una
 línea chica que dice cómo está la conexión: «Conectado», «Sincronizado hace 5 min», «Sin
 conexión · 2 por enviar» o «3 por enviar desde hace más de una hora». Debajo, sin espacio de
