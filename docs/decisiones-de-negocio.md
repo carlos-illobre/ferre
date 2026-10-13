@@ -613,3 +613,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     las mantenía publicadas para comparar. Las maquetas aprobadas de cada capacidad
     (`specs/…/maquetas/`) se conservan: son parte de la especificación, no versiones viejas.
     Los ADR y las decisiones anteriores no se reescriben: cuentan por qué se llegó acá.
+
+84. **Se reordena el código según la auditoría de arquitectura** (2026-10-13). Carlos aprobó
+    el informe y pidió hacer el reordenamiento, con estas respuestas: el lector de planillas
+    en Python queda aparte por ahora; para un margen o un precio tipeado, el front muestra la
+    vista previa y el servidor confirma; se aceptan las librerías propuestas; y **se frenan
+    los cambios de pantallas** mientras se unifica cada proceso. No hay un servicio para el
+    celular y otro para la computadora. El plan y sus etapas están en
+    `specs/010-reordenamiento-del-codigo/`.

@@ -215,6 +215,7 @@ Los que son reglas generales están además en la constitución.
 | RNF-54 | El ambiente de pruebas se distingue a simple vista: la barra titila y dice «Ambiente de prueba» | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-55 | Pruebas automáticas: las unitarias corren en cada cambio; las de punta a punta cubren los caminos principales y se corren a mano | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-56 | Cada decisión técnica queda escrita con su porqué (un ADR) y la documentación se mantiene al día con el código | [001-base-del-sistema](001-base-del-sistema/spec.md) |
+| RNF-60 | El código se organiza en servicios, y en capas: tecnología reutilizable, negocio una sola vez y pantallas; el cálculo de precios vive en el servidor | [010-reordenamiento-del-codigo](010-reordenamiento-del-codigo/spec.md) |
 
 ## De dónde vino cada cosa
 

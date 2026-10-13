@@ -1036,3 +1036,8 @@ general:
     - "La tabla vinculacion quedó en la base sin uso desde que se quitó la entrada por QR (ADR-011, enmienda del 2026-10-09)"
     - "producto.unidad es texto libre en la base: los valores unidad, kg, m y l los valida solo la API"
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
+
+RNF-60:
+  estado: "Nuevo: aprobado, en curso por etapas (010-T001 a 010-T008)"
+  pruebas: []
+  defectos: []
