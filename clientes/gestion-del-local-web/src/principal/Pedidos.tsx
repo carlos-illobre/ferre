@@ -189,7 +189,7 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
     setEscaneando(false);
     void traerPorCodigo(codigo).then((p) => {
       if (p) agregar(p as Producto); else { setConsulta(codigo); setError(`Ningún producto tiene el código ${codigo}.`); }
-    });
+    }).catch((e: Error) => setError(e.message));
   }, [agregar]);
 
   async function borrar() {

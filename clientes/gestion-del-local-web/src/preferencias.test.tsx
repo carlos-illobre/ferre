@@ -5,7 +5,7 @@ import { cambiarPreferencia, preferencias, recargarPreferencias } from "./prefer
 import { Configuracion } from "./principal/Configuracion";
 import { animarNavegacion, irA } from "./rutas";
 
-// Configuración (RF-80, specs/009-configuracion): las animaciones se habilitan o deshabilitan
+// Configuración (RF-83, specs/009-configuracion): las animaciones se habilitan o deshabilitan
 // en cada dispositivo.
 describe("Configuración · animaciones", () => {
   beforeEach(() => { localStorage.clear(); recargarPreferencias(); });

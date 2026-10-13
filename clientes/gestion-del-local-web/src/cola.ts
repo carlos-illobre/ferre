@@ -68,7 +68,7 @@ export async function enviarOEncolar(tipo: string, metodo: Cambio["metodo"], rut
   const orden = await encolar({ tipo, metodo, ruta, cuerpo }).catch(() => null);
   if (orden === null) {
     // Sin base en el dispositivo (un navegador sin IndexedDB, o un celular con el guardado
-    // deshabilitado, RF-81): se manda directo. Si además no hay conexión, no se registra ni se
+    // deshabilitado, RF-84): se manda directo. Si además no hay conexión, no se registra ni se
     // guarda, y se dice cómo habilitar el trabajo sin conexión.
     try { await api(ruta, { method: metodo, body: JSON.stringify(cuerpo), keepalive: true }); }
     catch (e) { if (esErrorDeRed(e) && !guardaEnElDispositivo()) throw new ErrorApi(503, SIN_CONEXION_Y_SIN_GUARDADO); throw e; }

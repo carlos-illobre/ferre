@@ -13,7 +13,7 @@ export type Almacen = "catalogo" | "stock" | "clientes" | "ventas" | "cola" | "m
 let baseAbierta: Promise<IDBDatabase> | null = null;
 
 export function abrirBase(): Promise<IDBDatabase> {
-  // Con el guardado deshabilitado en un celular (RF-81) la base no se abre: cada parte de la
+  // Con el guardado deshabilitado en un celular (RF-84) la base no se abre: cada parte de la
   // aplicación ya sabe seguir sin ella, como en un navegador sin IndexedDB.
   if (!guardaEnElDispositivo()) return Promise.reject(new Error("El guardado en este celular está deshabilitado"));
   if (baseAbierta) return baseAbierta;
@@ -37,7 +37,7 @@ export function abrirBase(): Promise<IDBDatabase> {
   return baseAbierta;
 }
 
-// Borra del dispositivo todos los datos del negocio (al deshabilitar el guardado, RF-81).
+// Borra del dispositivo todos los datos del negocio (al deshabilitar el guardado, RF-84).
 export async function borrarLoGuardado(): Promise<void> {
   const abierta = baseAbierta;
   baseAbierta = null;
@@ -50,7 +50,7 @@ export async function borrarLoGuardado(): Promise<void> {
 }
 
 // Al abrir la aplicación: un celular con el guardado deshabilitado no conserva datos del
-// negocio, tampoco los que hubiera guardado una versión anterior (RF-81).
+// negocio, tampoco los que hubiera guardado una versión anterior (RF-84).
 export async function respetarElGuardado(): Promise<void> {
   if (!guardaEnElDispositivo()) await borrarLoGuardado();
 }

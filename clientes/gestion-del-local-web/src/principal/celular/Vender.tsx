@@ -153,10 +153,10 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     const c = codigo.trim();
     const exacto = (catalogo ?? []).find((p) => p.codigo_barras === c || p.codigo_proveedor === c);
     if (exacto) { agregar(exacto); setCodigoDesconocido(null); return true; }
-    // Buscando en el servidor (RF-82), el producto puede no estar en memoria: se lo pide por su código.
+    // Buscando en el servidor (RF-85), el producto puede no estar en memoria: se lo pide por su código.
     if (enElServidor) {
       setConsulta("");
-      void traerPorCodigo(c).then((p) => { if (p) { agregar(p); setCodigoDesconocido(null); } else setCodigoDesconocido(c); });
+      void traerPorCodigo(c).then((p) => { if (p) { agregar(p); setCodigoDesconocido(null); } else setCodigoDesconocido(c); }).catch((e: Error) => setError(e.message));
       return true;
     }
     setCodigoDesconocido(c);

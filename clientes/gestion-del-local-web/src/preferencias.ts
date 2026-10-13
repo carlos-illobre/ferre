@@ -1,11 +1,11 @@
 import { useSyncExternalStore } from "react";
 
-// Las preferencias de este dispositivo (RF-80): las elige cada persona acá y no cambian nada
+// Las preferencias de este dispositivo (RF-83): las elige cada persona acá y no cambian nada
 // en los demás. Se guardan en el navegador y no se borran al salir de la sesión. Si el
 // navegador no deja guardar, valen mientras la aplicación esté abierta.
 // - `animaciones`: el movimiento al navegar.
-// - `sinConexion`: en el celular, guardar los datos del negocio para trabajar sin conexión (RF-81).
-// - `buscar`: con el guardado deshabilitado, cómo se buscan los productos (RF-82).
+// - `sinConexion`: en el celular, guardar los datos del negocio para trabajar sin conexión (RF-84).
+// - `buscar`: con el guardado deshabilitado, cómo se buscan los productos (RF-85).
 export type Preferencias = { animaciones: boolean; sinConexion: boolean; buscar: "memoria" | "servidor" };
 const DE_ARRANQUE: Preferencias = { animaciones: true, sinConexion: false, buscar: "memoria" };
 const CLAVE = "ferre.preferencias";

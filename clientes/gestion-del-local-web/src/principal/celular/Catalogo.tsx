@@ -61,12 +61,12 @@ export function Productos() {
   const [escaneando, setEscaneando] = useState(false);
   const alEscanear = useCallback((codigo: string) => {
     setEscaneando(false);
-    // De la memoria o, buscando en el servidor (RF-82), del servidor.
+    // De la memoria o, buscando en el servidor (RF-85), del servidor.
     void traerPorCodigo(codigo).then((p) => {
       if (p) { setConsulta(""); setAbiertoId(p.id); return; }
       setConsulta(codigo);
       setError(`Ningún producto tiene el código ${codigo}. Buscá el producto, abrilo y tocá «Escanear el código» para cargárselo.`);
-    });
+    }).catch((e: Error) => setError(e.message));
   }, []);
   const caja = useRef<HTMLInputElement>(null);
   const centinela = useRef<HTMLDivElement>(null);

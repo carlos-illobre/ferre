@@ -174,7 +174,7 @@ describe("Catálogo · Productos", () => {
     armar([producto({ id: "mecha", descripcion: "MECHA PARA MADERA 6 MM", codigo_barras: "7791234567890" }), producto({ id: "taladro", descripcion: "TALADRO PERCUTOR 750 W" })]);
     fireEvent.click(screen.getByTestId("escanear"));
     fireEvent.click(screen.getByRole("button", { name: "leer 7791234567890" }));
-    // Escanear responde un instante después: el producto puede venir del servidor (RF-82).
+    // Escanear responde un instante después: el producto puede venir del servidor (RF-85).
     await act(async () => { await Promise.resolve(); });
     expect(within(ficha()).getByText("MECHA PARA MADERA 6 MM")).toBeTruthy();
     expect(within(ficha()).getByTestId("codigo-actual").textContent).toBe("7791234567890");

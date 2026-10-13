@@ -36,7 +36,7 @@ test.beforeAll(() => {
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '${ID_PROD}', '${ID_PROV}', 'DO2', 500, '[]', 500, 0.21, '2026-08-11')`);
 });
 
-// En el celular, trabajar sin conexión es una preferencia que arranca deshabilitada (RF-81):
+// En el celular, trabajar sin conexión es una preferencia que arranca deshabilitada (RF-84):
 // así queda como si la persona la hubiera habilitado en Configuración.
 const HABILITADO = JSON.stringify({ animaciones: true, sinConexion: true, buscar: "memoria" });
 
@@ -137,7 +137,7 @@ test("con el trabajo sin conexión habilitado, la app abre sin red gracias al se
   await context.setOffline(false);
 });
 
-// Con el guardado deshabilitado se puede elegir no bajar el catálogo y buscar en el servidor (RF-82).
+// Con el guardado deshabilitado se puede elegir no bajar el catálogo y buscar en el servidor (RF-85).
 test("en el celular, buscando en el servidor no se baja el catálogo y se busca, se lee un código y se vende igual", async ({ page }) => {
   const EN_EL_SERVIDOR = JSON.stringify({ animaciones: true, sinConexion: false, buscar: "servidor" });
   await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, EN_EL_SERVIDOR]);

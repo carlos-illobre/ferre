@@ -63,7 +63,7 @@ const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
 );
 
-// Buscando en el servidor (RF-82): mientras una consulta está en curso, se dice arriba.
+// Buscando en el servidor (RF-85): mientras una consulta está en curso, se dice arriba.
 function BuscandoEnElServidor() {
   const { buscandoEnElServidor } = useCatalogo();
   return buscandoEnElServidor ? <span className="estado-chico pendiente" role="status" data-testid="buscando-en-el-servidor"><i aria-hidden="true" />Buscando en el servidor…</span> : null;

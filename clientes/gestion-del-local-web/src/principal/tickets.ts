@@ -22,7 +22,7 @@ export async function crearTicket(datos: Omit<Pendiente, "id" | "creado_en" | "f
   // Las capturas se achican antes de guardarlas: pesan mucho menos y se leen igual.
   const achicadas = await Promise.all(fotos.slice(0, MAXIMO_DE_FOTOS).map((f) => reducirImagen(f, 1600)));
   const pendiente: Pendiente = { ...datos, id: crypto.randomUUID(), creado_en: new Date().toISOString(), fotos: achicadas };
-  // Un celular con el guardado deshabilitado (RF-81) no deja el ticket esperando: lo manda en el momento.
+  // Un celular con el guardado deshabilitado (RF-84) no deja el ticket esperando: lo manda en el momento.
   if (!guardaEnElDispositivo()) {
     try { await api("/tickets", { method: "POST", body: formularioDe(pendiente) }); }
     catch (e) { if (!(e as { estado?: number }).estado) throw new ErrorApi(503, SIN_CONEXION_Y_SIN_GUARDADO); throw e; }

@@ -9,15 +9,18 @@ import { buscaEnElServidor } from "./guardado";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
 import { Configuracion } from "./principal/Configuracion";
 
-// Cómo buscar productos cuando el celular no guarda el catálogo (RF-82, specs/009-configuracion).
-const ancho = (px: number) => { (window as any).innerWidth = px; };
+// Cómo buscar productos cuando el celular no guarda el catálogo (RF-85, specs/009-configuracion).
+// El aparato: un teléfono (Android) o una computadora, por su identificación.
+const TELEFONO = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36";
+const COMPUTADORA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36";
+const aparato = (ua: string) => Object.defineProperty(navigator, "userAgent", { value: ua, configurable: true });
 const prod = (id: string, descripcion: string, codigo_barras: string | null = null) => ({ id, descripcion, marca: "MARCA", codigo_barras, unidad: "unidad", margen_elegido: null, proveedor: "P", codigo_proveedor: null, costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-11", lista_importada_id: "l", explicacion_costo: [] });
 const PRIMEROS = [prod("a", "ARANDELA PLANA")];
 const pedidos = () => apiFalsa.mock.calls.map((c) => String(c[0]));
 
 describe("Cómo buscar productos sin guardar el catálogo", () => {
   beforeEach(() => {
-    ancho(390); localStorage.clear(); recargarPreferencias(); apiFalsa.mockReset();
+    aparato(TELEFONO); localStorage.clear(); recargarPreferencias(); apiFalsa.mockReset();
     apiFalsa.mockImplementation(async (ruta: string) => {
       if (ruta.startsWith("/productos?limite=")) return PRIMEROS;
       if (ruta.startsWith("/productos?buscar=mecha")) return [prod("m", "MECHA WIDIA 8 MM", "7790001112223")];
@@ -27,7 +30,7 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
       return [];
     });
   });
-  afterEach(() => { ancho(1024); });
+  afterEach(() => { aparato(COMPUTADORA); });
 
   it("E15: con el guardado deshabilitado aparecen las dos formas, cada una con su ventaja y su desventaja, y elegida la de bajar el catálogo", () => {
     render(<Configuracion celular alCambiarElGuardado={() => undefined} />);
@@ -51,7 +54,7 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
     expect(screen.queryByTestId("cfg-buscar-memoria")).toBeNull();
     expect(buscaEnElServidor()).toBe(false);
     celular.unmount();
-    ancho(1366);
+    aparato(COMPUTADORA);
     render(<Configuracion />);
     expect(screen.queryByTestId("cfg-buscar-memoria")).toBeNull();
   });
@@ -62,7 +65,8 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
     await waitFor(() => expect(result.current.catalogo?.map((p) => p.id)).toEqual(["a"]));
     // Nunca pidió el catálogo entero.
     expect(pedidos().filter((r) => r === "/productos")).toEqual([]);
-    expect(result.current.catalogoCompleto).toBe(false);
+    // Para lo que espera al catálogo (el espejo con la computadora) alcanza con que haya cargado.
+    expect(result.current.catalogoCompleto).toBe(true);
 
     // Buscar: primero lo que hay en memoria (nada) y, al dejar de escribir, la consulta al servidor.
     vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -73,11 +77,17 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
     expect(pedidos().filter((r) => r.startsWith("/productos?buscar=mecha"))).toHaveLength(1);
     expect(result.current.buscandoEnElServidor).toBe(false);
 
-    // Escanear un código que no está en memoria lo pide por su código, y queda en memoria.
+    // Escanear un código que no está en memoria lo pide por su código, y mientras tanto la pantalla lo dice (E18).
+    let soltar: (v: unknown) => void = () => undefined;
+    const lento = new Promise((r) => { soltar = r; });
+    const original = apiFalsa.getMockImplementation()!;
+    apiFalsa.mockImplementation(async (ruta: string) => { if (ruta.startsWith("/productos?codigo=7790009998887")) await lento; return original(ruta); });
     let leido: { id: string } | null = null;
-    let enCurso = false;
-    await act(async () => { const pedido = traerPorCodigo("7790009998887"); enCurso = true; leido = await pedido; });
-    expect(enCurso).toBe(true);
+    let pedido: Promise<void> = Promise.resolve();
+    act(() => { pedido = traerPorCodigo("7790009998887").then((p) => { leido = p; }); });
+    await waitFor(() => expect(result.current.buscandoEnElServidor).toBe(true));
+    await act(async () => { soltar(null); await pedido; });
+    expect(result.current.buscandoEnElServidor).toBe(false);
     expect(leido!.id).toBe("t");
     expect(result.current.catalogo?.map((p) => p.id).sort()).toEqual(["a", "m", "t"]);
     // Uno que ya está en memoria no vuelve a preguntar; uno que nadie tiene da «ninguno».
@@ -85,5 +95,8 @@ describe("Cómo buscar productos sin guardar el catálogo", () => {
     expect((await traerPorCodigo("7790001112223"))?.id).toBe("m");
     expect(apiFalsa.mock.calls.length).toBe(antes);
     expect(await traerPorCodigo("000")).toBeNull();
+    // Sin conexión no se sabe si el producto existe: se dice eso, no «ningún producto tiene ese código».
+    apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
+    await expect(traerPorCodigo("123456")).rejects.toThrow(/no hay conexión/);
   });
 });

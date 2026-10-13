@@ -15,6 +15,7 @@ export default defineConfig({
   use: { baseURL: process.env.BASE_URL ?? "http://localhost:4173", trace: "retain-on-failure", browserName: "chromium" },
   projects: [
     { name: "escritorio", testDir: "./escritorio", use: { viewport: { width: 1366, height: 768 } } },
-    { name: "celular", testDir: "./celular", use: { viewport: { width: 412, height: 915 } } },
+    // El celular se reconoce por el aparato, no por el ancho (RF-84): la prueba se presenta como un teléfono.
+    { name: "celular", testDir: "./celular", use: { viewport: { width: 412, height: 915 }, userAgent: "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36" } },
   ],
 });

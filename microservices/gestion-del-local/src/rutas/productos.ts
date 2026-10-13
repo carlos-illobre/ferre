@@ -35,7 +35,7 @@ productos.get("/", async (c) => {
   const limite = Math.floor(Number(c.req.query("limite")));
   const desde = Math.max(0, Math.floor(Number(c.req.query("desde")) || 0));
   const tanda = Number.isFinite(limite) && limite > 0 ? `, p.id LIMIT ${Math.min(limite, 20000)} OFFSET ${desde}` : "";
-  // Tres filtros para el celular que no guarda el catálogo y busca acá (RF-82): por texto
+  // Tres filtros para el celular que no guarda el catálogo y busca acá (RF-85): por texto
   // (`buscar`), por código de barras o de proveedor exacto (`codigo`) y por una lista de
   // productos (`ids`). Los valores van siempre como parámetros de la consulta.
   const parametros: unknown[] = [];
@@ -55,7 +55,7 @@ productos.get("/", async (c) => {
     parametros.push(codigo);
     filtros.push(`(p.codigo_barras = $${parametros.length} OR EXISTS (SELECT 1 FROM precio_proveedor c WHERE c.producto_id = p.id AND c.codigo_proveedor = $${parametros.length}))`);
   }
-  const ids = (c.req.query("ids") ?? "").split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f-]{36}$/i.test(x)).slice(0, 300);
+  const ids = (c.req.query("ids") ?? "").split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x)).slice(0, 300);
   if (c.req.query("ids") !== undefined) { parametros.push(ids); filtros.push(`p.id = ANY($${parametros.length}::uuid[])`); }
   const donde = filtros.map((f) => ` AND ${f}`).join("");
   // Una búsqueda trae primero las descripciones más cortas, que es lo que la aplicación muestra arriba.

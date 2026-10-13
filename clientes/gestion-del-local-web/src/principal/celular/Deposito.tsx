@@ -68,7 +68,7 @@ function Stock() {
   useEffect(() => { void cargar(); }, [cargar]);
 
   const porId = useMemo(() => new Map((datos?.productos ?? []).map((s) => [s.id, s])), [datos]);
-  // Buscando en el servidor (RF-82) no está el catálogo en memoria: se traen los primeros productos con stock.
+  // Buscando en el servidor (RF-85) no está el catálogo en memoria: se traen los primeros productos con stock.
   useEffect(() => { if (datos) void traerPorIds(datos.productos.slice(0, 150).map((s) => s.id)); }, [datos]);
   const filas = useMemo(() => {
     if (!catalogo) return [];
@@ -236,7 +236,7 @@ function Ingreso() {
   const alDetectar = useCallback((codigo: string) => {
     void traerPorCodigo(codigo).then((p) => {
       if (p) { setEscaneando(false); agregar(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
-    });
+    }).catch((e: Error) => setError(e.message));
   }, [agregar]);
 
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
@@ -442,7 +442,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   const alDetectar = useCallback((codigo: string) => {
     void traerPorCodigo(codigo).then((p) => {
       if (p) { setEscaneando(false); elegirProducto(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`);
-    });
+    }).catch((e: Error) => setError(e.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalogo]);
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {

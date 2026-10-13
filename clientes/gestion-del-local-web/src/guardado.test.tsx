@@ -11,15 +11,18 @@ import { guardaEnElDispositivo } from "./guardado";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
 import { Configuracion } from "./principal/Configuracion";
 
-// Trabajar sin conexión en el celular (RF-81, specs/009-configuracion): el celular guarda datos
+// Trabajar sin conexión en el celular (RF-84, specs/009-configuracion): el celular guarda datos
 // del negocio solo si la persona lo habilita; la computadora, siempre.
-const ancho = (px: number) => { (window as any).innerWidth = px; };
+// El aparato: un teléfono (Android) o una computadora, por su identificación.
+const TELEFONO = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36";
+const COMPUTADORA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36";
+const aparato = (ua: string) => Object.defineProperty(navigator, "userAgent", { value: ua, configurable: true });
 const hayBase = async () => (await indexedDB.databases()).some((b) => b.name === "ferre");
 const venta = { id: "v1", fecha: "2026-10-13T12:00:00Z", total: 100, medio_pago: "efectivo", items: [], enviada: false };
 
 describe("Trabajar sin conexión en el celular", () => {
-  beforeEach(async () => { ancho(390); localStorage.clear(); recargarPreferencias(); apiFalsa.mockReset(); await respetarElGuardado(); });
-  afterEach(() => { ancho(1024); });
+  beforeEach(async () => { aparato(TELEFONO); localStorage.clear(); recargarPreferencias(); apiFalsa.mockReset(); await respetarElGuardado(); });
+  afterEach(() => { aparato(COMPUTADORA); });
 
   it("E07: en un celular sin nada elegido, figura deshabilitada", () => {
     render(<Configuracion celular alCambiarElGuardado={() => undefined} />);
@@ -100,8 +103,18 @@ describe("Trabajar sin conexión en el celular", () => {
     preguntar.mockRestore();
   });
 
+  it("una computadora con la ventana angosta sigue siendo una computadora: guarda, y no se le borra nada", async () => {
+    aparato(COMPUTADORA);
+    (window as any).innerWidth = 600;
+    await guardar("ventas", venta);
+    await respetarElGuardado();
+    expect(guardaEnElDispositivo()).toBe(true);
+    expect(await leerTodo("ventas")).toHaveLength(1);
+    (window as any).innerWidth = 1024;
+  });
+
   it("E13: en la computadora la opción no aparece, y la computadora guarda siempre", async () => {
-    ancho(1366);
+    aparato(COMPUTADORA);
     render(<Configuracion />);
     expect(screen.queryByTestId("cfg-sin-conexion")).toBeNull();
     expect(guardaEnElDispositivo()).toBe(true);

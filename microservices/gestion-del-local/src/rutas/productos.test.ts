@@ -27,7 +27,7 @@ describe("GET /productos", () => {
 describe("PATCH /productos/:id", () => {
   beforeEach(() => { base.actual = baseFalsa(); base.actual.programar(/UPDATE producto SET/, { rowCount: 1 }); });
 
-  it("buscar, traer por código y traer por lista de productos: filtros que van como parámetros (RF-82)", async () => {
+  it("buscar, traer por código y traer por lista de productos: filtros que van como parámetros (RF-85)", async () => {
     await pedir(app, "GET", "/productos?buscar=" + encodeURIComponent("Mechá 8mm'; DROP TABLE producto;--") + "&limite=60", { rol: "mostrador" });
     const busqueda = base.actual.sqlDe(/FROM producto p/).at(-1)!;
     // Cada palabra, normalizada, es un parámetro; nada del texto queda pegado en la consulta.

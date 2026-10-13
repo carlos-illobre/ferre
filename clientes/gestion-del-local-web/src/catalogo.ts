@@ -22,7 +22,7 @@ export type StockFila = { id: string; stock: string; costo_neto: string | null; 
 export type Cliente = { id: string; nombre: string; telefono: string | null; cuenta_corriente: boolean; deuda: string };
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad" | "foto_url"> & { proveedor_preferido_id?: string }>;
 // `completo`: el catálogo ya está entero (no solo los primeros, ni una tanda de la primera bajada).
-// `buscando`: hay una consulta al servidor en curso (solo cuando se busca en el servidor, RF-82).
+// `buscando`: hay una consulta al servidor en curso (solo cuando se busca en el servidor, RF-85).
 type Estado = { catalogo: Producto[] | null; completo: boolean; stock: Map<string, number>; clientes: Cliente[]; error: string | null; desdeDispositivo: boolean; buscando: boolean };
 
 const PRIMEROS = 60;            // los que se guardan aparte para mostrar al instante
@@ -46,7 +46,7 @@ function buscarEn(catalogo: Producto[] | null, consulta: string, maximo: number)
   return buscar(indice.valor, consulta, maximo);
 }
 
-// Buscar en el servidor (RF-82): un celular que no guarda el catálogo y eligió no bajarlo tiene
+// Buscar en el servidor (RF-85): un celular que no guarda el catálogo y eligió no bajarlo tiene
 // en memoria solo lo que fue trayendo. Buscar o escanear mira primero ahí y después le pregunta
 // al servidor; lo que llega se suma a la memoria y la pantalla lo muestra.
 let consultasEnCurso = 0;
@@ -79,7 +79,9 @@ export async function traerPorCodigo(codigo: string): Promise<Producto | null> {
   const es = (p: Producto) => p.codigo_barras === codigo || p.codigo_proveedor === codigo;
   const local = (estado.catalogo ?? []).find(es);
   if (local || !buscaEnElServidor()) return local ?? null;
-  return (await traer(`codigo=${encodeURIComponent(codigo)}`).catch(() => [] as Producto[])).find(es) ?? null;
+  // Si la consulta falla no se sabe si el producto existe: se dice eso, no «no existe».
+  try { return (await traer(`codigo=${encodeURIComponent(codigo)}`)).find(es) ?? null; }
+  catch { throw new Error(`No se pudo buscar el código ${codigo}: no hay conexión con el servidor. Probá de nuevo.`); }
 }
 // Los productos que una pantalla necesita por su identificador (los de un pedido, los que tienen stock).
 export async function traerPorIds(ids: string[]): Promise<void> {
@@ -271,5 +273,7 @@ export function useCatalogo() {
     if (buscaEnElServidor()) pedirAlServidor(consulta);
     return buscarEn(e.catalogo, consulta, maximo);
   }, [e.catalogo]);
-  return { catalogo: e.catalogo, catalogoCompleto: e.completo, buscandoEnElServidor: e.buscando, enElServidor: buscaEnElServidor(), stock: e.stock, clientes: e.clientes, error: e.error, desdeDispositivo: e.desdeDispositivo, buscarProductos, actualizarProducto, ajustarStockLocal };
+  // Buscando en el servidor el catálogo nunca está entero: para lo que espera a tenerlo (el
+  // espejo con la computadora) alcanza con que haya cargado, y lo que falte se pide por su identificador.
+  return { catalogo: e.catalogo, catalogoCompleto: e.completo || (buscaEnElServidor() && e.catalogo !== null), buscandoEnElServidor: e.buscando, enElServidor: buscaEnElServidor(), stock: e.stock, clientes: e.clientes, error: e.error, desdeDispositivo: e.desdeDispositivo, buscarProductos, actualizarProducto, ajustarStockLocal };
 }

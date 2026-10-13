@@ -53,7 +53,7 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await expect(page.getByTestId("mas-tickets")).toBeVisible();
   for (const oculto of [RUTAS.enMas, "mas-roles", "mas-actividad", "mas-anomalias"]) await expect(page.getByTestId(oculto)).toHaveCount(0);
 
-  // Configuración la ve cualquiera, sin permisos (RF-80, E06). Deshabilitar las animaciones vale
+  // Configuración la ve cualquiera, sin permisos (RF-83, E06). Deshabilitar las animaciones vale
   // en el momento (E02) y queda en el dispositivo aunque se recargue (E03).
   await page.getByTestId("mas-configuracion").click();
   await expect(page.getByTestId("cfg-animaciones")).toHaveAttribute("aria-checked", "true");

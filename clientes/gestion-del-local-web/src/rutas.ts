@@ -50,7 +50,7 @@ export function irA(camino: string): void {
   const destino = `#/${camino}`;
   const doc = document as ConTransicion;
   const sinMovimiento = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  // Deshabilitadas en Configuración (RF-80): la raíz de la página lleva la marca.
+  // Deshabilitadas en Configuración (RF-83): la raíz de la página lleva la marca.
   const deshabilitadas = document.documentElement.dataset.animaciones === "no";
   if (!animada || deshabilitadas || !doc.startViewTransition || sinMovimiento || location.hash === destino) { location.hash = destino; return; }
   document.documentElement.dataset.nav = movimientoDe(location.hash, destino);

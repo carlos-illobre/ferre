@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { cambiarPreferencia, usePreferencias } from "../preferencias";
 import { borrarLoGuardado } from "../almacen";
 import { pendientes } from "../cola";
+import { esCelularAca } from "../guardado";
 import "./configuracion.css";
 
-// Configuración (RF-80, decisión 79): las preferencias de la aplicación en este dispositivo.
+// Configuración (RF-83, decisión 79): las preferencias de la aplicación en este dispositivo.
 // Una sola pantalla para el celular y la computadora; cada preferencia es un renglón con su
 // llave y una línea que dice qué cambia. La primera: las animaciones.
-// Las dos formas de buscar productos cuando el celular no guarda el catálogo (RF-82), cada una
+// Las dos formas de buscar productos cuando el celular no guarda el catálogo (RF-85), cada una
 // con lo que tiene de bueno y de malo.
 const FORMAS_DE_BUSCAR: { valor: "memoria" | "servidor"; nombre: string; ventaja: string; desventaja: string }[] = [
   { valor: "memoria", nombre: "Bajar el catálogo al abrir", ventaja: "la búsqueda es instantánea y escanear responde en el acto.", desventaja: "abrir la aplicación tarda unos segundos más y gasta datos cada vez." },
@@ -28,7 +29,7 @@ function useReducirMovimiento(): boolean {
 
 export function Configuracion({ celular = false, alCambiarElGuardado = () => location.reload() }: { celular?: boolean; alCambiarElGuardado?: () => void }) {
   const { animaciones, sinConexion, buscar } = usePreferencias();
-  // Trabajar sin conexión (RF-81): solo en el celular. Cambiarlo vuelve a abrir la aplicación,
+  // Trabajar sin conexión (RF-84): solo en el celular. Cambiarlo vuelve a abrir la aplicación,
   // para que arranque guardando todo o sin guardar nada. Deshabilitarlo borra lo guardado; si
   // había cambios sin enviar se pierden, y antes se avisa.
   async function cambiarSinConexion() {
@@ -44,6 +45,8 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
     alCambiarElGuardado();
   }
   const reducir = useReducirMovimiento();
+  // Las opciones de guardado son del aparato (un teléfono), no de la interfaz que se esté viendo.
+  const telefono = esCelularAca();
   const donde = celular ? "este celular" : "esta computadora";
   return (
     <main id="contenido" className={celular ? "contenido cfg" : "pagina cfg"} tabIndex={-1} data-testid="configuracion">
@@ -63,7 +66,7 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
           </span>
           {reducir && animaciones && <span className="cfg-detalle cfg-aviso" data-testid="cfg-reducir-movimiento">Este dispositivo tiene pedido «reducir movimiento»: no se anima igual, hasta que lo cambies en sus ajustes.</span>}
         </li>
-        {celular && (
+        {telefono && (
           <li className="cfg-fila">
             <span className="cfg-nombre" id="cfg-sin-conexion">Trabajar sin conexión</span>
             <button type="button" role="switch" aria-checked={sinConexion} aria-labelledby="cfg-sin-conexion" aria-describedby="cfg-sin-conexion-detalle"
@@ -75,7 +78,7 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
             </span>
           </li>
         )}
-        {celular && !sinConexion && (
+        {telefono && !sinConexion && (
           <li className="cfg-fila cfg-opciones" role="radiogroup" aria-labelledby="cfg-buscar">
             <span className="cfg-nombre" id="cfg-buscar">Cómo buscar productos</span>
             <span className="cfg-detalle">Como este celular no guarda el catálogo, hay dos formas de buscar. Elegí la que te resulte mejor.</span>

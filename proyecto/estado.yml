@@ -667,7 +667,7 @@ RF-77:
     - "En la computadora, un ingreso a medio cargar guardado de antes no se le manda al celular hasta que se le cambia algo"
 
 
-RF-80:
+RF-83:
   estado: "Hecho (009-T001): pantalla Configuración en Más, en celular y computadora, con la opción de las animaciones"
   pruebas:
     - clientes/gestion-del-local-web/src/preferencias.test.tsx
@@ -675,9 +675,9 @@ RF-80:
     - tests/e2e/escritorio/13-roles.spec.ts
   defectos:
     - "No se probó en un teléfono que, deshabilitadas, de verdad no se vea ningún movimiento: las pruebas comprueban la marca y que la navegación no arma la transición"
-    - "Falta la revisión independiente de la carpeta: se hace al terminar su última tarea"
+    - "Revisión, sin corregir: con «reducir movimiento» pedido en el teléfono, las hojas y los avisos del celular se siguen animando; solo se apaga el deslizamiento entre pantallas"
 
-RF-81:
+RF-84:
   estado: "Hecho (009-T002): en el celular el guardado para trabajar sin conexión arranca deshabilitado y se habilita en Configuración"
   pruebas:
     - clientes/gestion-del-local-web/src/guardado.test.tsx
@@ -686,8 +686,11 @@ RF-81:
     - "No está medido en un teléfono cuánto tarda en abrir ni cuántos datos gasta bajar el catálogo a la memoria con los 11.000 productos reales"
     - "Las fotos y los archivos que el navegador guarda por su cuenta (su caché) no se controlan desde la aplicación"
     - "Sin prueba: que un ticket de Mejoras y errores sin conexión y sin guardado avise en vez de quedar esperando"
+    - "Revisión, sin corregir: al deshabilitar el guardado no se cuentan los tickets de Mejoras y errores que estaban sin enviar"
+    - "Revisión, sin corregir: con la base abierta en otra pestaña el borrado queda pendiente y se da por hecho"
+    - "Las opciones «Trabajar sin conexión» y «Cómo buscar productos» no tuvieron maqueta: Carlos las pidió de palabra y falta que las vea"
 
-RF-82:
+RF-85:
   estado: "Hecho (009-T003): con el guardado deshabilitado se elige en Configuración entre bajar el catálogo al abrir o buscar en el servidor"
   pruebas:
     - clientes/gestion-del-local-web/src/buscar-en-el-servidor.test.tsx
@@ -699,6 +702,9 @@ RF-82:
     - "La búsqueda del servidor trae hasta 60 productos por consulta, las descripciones más cortas primero: en una búsqueda muy amplia el orden puede no ser idéntico al del catálogo bajado"
     - "Sin prueba de punta a punta: leer un código con la cámara buscando en el servidor (las pruebas no tienen cámara); está probado por unidad"
     - "No está medido en un teléfono con los 11.000 productos reales cuánto tarda cada búsqueda"
+    - "Revisión independiente (specs/009-configuracion/revision.md), sin corregir: buscando en el servidor, si una búsqueda por texto falla la pantalla dice «Nada con…» en vez de decir que no hay conexión"
+    - "Revisión, sin corregir: un código con guion, punto o barra escrito en el buscador no se encuentra en el servidor; una búsqueda de un solo carácter no va al servidor"
+    - "Revisión, sin corregir: buscando en el servidor, la venta que llega en espejo desde la computadora muestra sin su ficha los productos que el celular todavía no trajo"
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
   pruebas:
