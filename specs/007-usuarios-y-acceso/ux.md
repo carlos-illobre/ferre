@@ -126,26 +126,29 @@ y dice que entrar necesita internet.
 
 **Quién:** cualquier usuario con su celular y su computadora emparejados.
 
-**Qué necesita a la vista, en los dos:** con quién trabaja («Trabajando juntos con…»); si el otro
-no está abierto («trabajás solo acá»); si están separados («Separados: cada uno por su lado»); y
-un solo botón (decisión 73): «Vincular» si no hay vínculo, «Separar» si trabajan juntos y
-«Juntar» si están separados. «Desvincular» está solo en Más, en los dos, y pregunta antes.
+**Qué necesita a la vista, en los dos:** con quién trabaja («Conectado con…»); si el otro
+no está abierto («trabajás solo acá»); si están separados («Desconectados: cada uno por su lado»); y
+un solo botón (decisión 73): «Vincular» si no hay vínculo, «Desconectar» si trabajan juntos y
+«Reconectar» si están separados. «Desvincular» está solo en Más → Usuarios y sesiones, en los dos, y
+pregunta antes (decisión 74).
 En la computadora el estado y el botón van en el menú lateral.
 En el celular, el estado va en una franja arriba, sin botones; el botón va a la derecha del
 encabezado de cada pantalla, chico, con el ícono y la leyenda debajo, como los del menú de abajo
 (decisión 70): «Vincular» abre la cámara dentro de la aplicación para leer el código de la
-computadora (decisión 63). En Más, el primer renglón es «Vincular con la computadora» o, ya
-vinculado, «Desvincular de la computadora».
+computadora (decisión 63). En Más, mientras no esté vinculado, el primer renglón es «Vincular con
+la computadora».
 
-**Cuánto dura el vínculo:** en Más → Usuarios y sesiones, quien tiene «Administrar sesiones» ve
-«El vínculo entre celular y computadora dura N días» y lo cambia ahí.
+**El bloque «Vínculo entre celular y computadora»,** en Más → Usuarios y sesiones (decisión 74):
+a quien está vinculado le dice con qué dispositivo y le ofrece «Desvincular»; a quien tiene
+«Administrar sesiones» le muestra además cuántos días dura el vínculo, para cambiarlos. Quien no
+está vinculado ni administra sesiones no ve el bloque.
 Sin celular emparejado, la computadora muestra en el menú «Vincular el celular», siempre.
 
 **Reglas:**
 
 - Se espeja la parte en la que están y la venta en curso. No lo que hay abierto encima (una
   ficha, una hoja, la cámara) ni lo escrito en la búsqueda.
-- Separar y juntar se hacen con un toque. Desvincular pregunta antes, en los dos.
+- Desconectar y reconectar se hacen con un toque. Desvincular pregunta antes, en los dos.
 - Al conectarse los dos (se abre o se recarga cualquiera, o se acaban de vincular), la pantalla
   en la que quedan es la de la computadora: el celular va a ella, nunca al revés. Después, cada
   cambio de pantalla hecho en cualquiera de los dos mueve al otro (decisión 71).

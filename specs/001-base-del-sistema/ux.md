@@ -296,7 +296,7 @@ mismo en todas las pantallas:
 | ← | Lleva al menú (desde un campo de texto, solo con el cursor al principio) |
 | → | Desde el menú, entra a las pestañas de esa parte, o a la pantalla si no tiene. En la pantalla, va al control siguiente (desde un campo de texto, solo con el cursor al final) |
 | ← → en las pestañas | Pasan de una pestaña a otra y la abren; ← desde la primera vuelve al menú; ↓ entra a la pantalla |
-| ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Separar o Juntar) y Salir. El foco se marca con el mismo borde amarillo en todos |
+| ↑ ↓ en el menú | Recorren las partes y, debajo, el botón del vínculo (Vincular el celular, Desconectar o Reconectar) y Salir. El foco se marca con el mismo borde amarillo en todos |
 | Esc | Cierra lo que esté abierto |
 | Alt + número | Abre cada pantalla |
 
@@ -317,8 +317,8 @@ Depósito en Inventario; el orden de Depósito es Inventario, Ingreso, Estanter�
 
 **Vincular, siempre a mano (decisión 66).** En el celular, mientras no esté vinculado con una
 computadora, todas las pantallas llevan «Vincular» a la derecha de su encabezado: un botón chico,
-con el ícono y la leyenda debajo. Vinculado, ese mismo botón dice «Separar» o «Juntar», y
-arriba queda la franja con el estado. «Desvincular» está solo en Más (decisiones 70 y 73).
+con el ícono y la leyenda debajo. Vinculado, ese mismo botón dice «Desconectar» o «Reconectar», y
+arriba queda la franja con el estado. «Desvincular» está solo en Más → Usuarios y sesiones (decisiones 70, 73 y 74).
 
 **Las partes y sus pestañas (decisiones 68 y 72).** Catálogo: Productos, Listas, Duplicados.
 Vender: Vender, Hoy, Anular. Depósito: Inventario, Ingreso, Estanterías, Pedidos. Más no tiene

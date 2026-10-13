@@ -5,7 +5,7 @@ import { Lector } from "./Lector";
 import { EspejoEstado, TEXTOS_DEL_VINCULO } from "../EspejoEstado";
 import { pausarEspejo, useEspejar, useEspejo } from "../../espejo";
 import { Escaner, hayCamara } from "./componentes/Escaner";
-import { sincronizarEmparejamiento, soltarEmparejamiento } from "../../puesto";
+import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "./componentes/OfrecerHuella";
@@ -128,7 +128,7 @@ function Pantallas() {
       <EspejoEstado sinBoton />
 
       {/* Un solo botón a la derecha del encabezado de cualquier pantalla (decisiones 70 y 73):
-          sin vínculo, «Vincular»; con vínculo, «Separar» o «Juntar». Desvincular está en Más. */}
+          sin vínculo, «Vincular»; con vínculo, «Desconectar» o «Reconectar». Desvincular está en Usuarios y sesiones. */}
       {(emparejado || hayCamara()) && (
         <div className="vincular-lugar">
           {!emparejado ? (
@@ -138,13 +138,13 @@ function Pantallas() {
               <span>{TEXTOS_DEL_VINCULO.vincular}</span>
             </button>
           ) : pausado ? (
-            <button type="button" className="vincular-boton" data-testid="juntar-arriba" aria-label="Juntar con la computadora: volver a trabajar en espejo" title="Volver a trabajar junto con la computadora"
+            <button type="button" className="vincular-boton" data-testid="reconectar-arriba" aria-label="Reconectar con la computadora: volver a trabajar juntos" title="Volver a trabajar junto con la computadora"
               onClick={() => pausarEspejo(false)}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12h6M21 12h-6M7 8l4 4-4 4M17 8l-4 4 4 4" /></svg>
               <span>{TEXTOS_DEL_VINCULO.juntar}</span>
             </button>
           ) : (
-            <button type="button" className="vincular-boton vinculado" data-testid="separar-arriba" aria-label="Separar de la computadora: cada uno por su lado un rato" title="Trabajar por separado un rato"
+            <button type="button" className="vincular-boton vinculado" data-testid="desconectar-arriba" aria-label="Desconectar de la computadora: cada uno por su lado un rato" title="Trabajar por separado un rato"
               onClick={() => pausarEspejo(true)}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 12H3M14 12h7M7 8l-4 4 4 4M17 8l4 4-4 4" /></svg>
               <span>{TEXTOS_DEL_VINCULO.separar}</span>
@@ -174,17 +174,6 @@ function Pantallas() {
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
-          {emparejado && (
-            <div className="lista">
-              <button type="button" className="fila con-foto" data-testid="desvincular-en-mas"
-                onClick={() => { if (window.confirm("¿Desvincular este celular de la computadora? Para volver a trabajar juntos vas a tener que escanear su código.")) void soltarEmparejamiento(); }}>
-                <span className="miniatura mas-icono"><Icono nombre="escanear" tam={22} /></span>
-                <span className="nombre">Desvincular de la computadora</span>
-                <Icono nombre="derecha" tam={18} grosor={2.4} />
-                <span className="detalle">Dejan de trabajar juntos hasta que vuelvas a escanear su código</span>
-              </button>
-            </div>
-          )}
           {!emparejado && hayCamara() && (
             <div className="lista">
               <button type="button" className="fila con-foto" onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }} data-testid="vincular-con-la-compu">

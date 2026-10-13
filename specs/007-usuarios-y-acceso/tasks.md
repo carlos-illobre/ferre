@@ -9,3 +9,5 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 
 ## Tareas
 
+- [x] T001 [ajuste] «Desvincular» va dentro de Usuarios y sesiones, no suelto en la lista de Más
+- [x] T002 [ajuste] En lugar de «Separar» y «Juntar», los botones dicen «Desconectar» y «Reconectar»

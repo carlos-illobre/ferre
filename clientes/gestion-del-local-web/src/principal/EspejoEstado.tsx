@@ -3,10 +3,10 @@ import { alAvisoDelEspejo, pausarEspejo, useEspejo } from "../espejo";
 import "./espejo-estado.css";
 
 // El estado del vínculo, siempre a la vista en los dos: con quién se trabaja, si el otro no está
-// abierto o si están separados. Y un solo botón (decisión 73): «Separar» para que cada uno
-// trabaje por su lado un rato, y «Juntar» para volver a trabajar en espejo. «Desvincular», el
-// corte definitivo, está solo en Más.
-export const TEXTOS_DEL_VINCULO = { separar: "Separar", juntar: "Juntar", vincular: "Vincular", desvincular: "Desvincular" };
+// abierto o si están desconectados. Y un solo botón (decisiones 73 y 75): «Desconectar» para que
+// cada uno trabaje por su lado un rato, y «Reconectar» para volver a trabajar en espejo. «Desvincular», el
+// corte definitivo, está solo en Usuarios y sesiones.
+export const TEXTOS_DEL_VINCULO = { separar: "Desconectar", juntar: "Reconectar", vincular: "Vincular", desvincular: "Desvincular" };
 // `sinBoton`: en el celular el botón va en el encabezado de la pantalla, no en la franja.
 export function EspejoEstado({ sinBoton = false }: { sinBoton?: boolean } = {}) {
   const e = useEspejo();
@@ -18,8 +18,8 @@ export function EspejoEstado({ sinBoton = false }: { sinBoton?: boolean } = {}) 
   const otro = e.lado === "computadora" ? "el celular" : "la computadora";
   const texto = !e.conectado ? `Conectando con ${otro}…`
     : !e.otroPresente ? `${e.lado === "computadora" ? "El celular no está abierto" : "La computadora no está abierta"}: trabajás solo acá`
-    : e.pausado ? "Separados: cada uno por su lado"
-    : `Trabajando juntos con ${otro}`;
+    : e.pausado ? "Desconectados: cada uno por su lado"
+    : `Conectado con ${otro}`;
   return (
     <div className={`espejo ${e.enEspejo ? "activo" : ""}`} role="status" data-testid="espejo">
       <span className="espejo-texto" data-testid="espejo-estado"><span className="espejo-punto" aria-hidden="true" />{texto}</span>

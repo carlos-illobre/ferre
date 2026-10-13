@@ -522,3 +522,15 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - **Los nombres:** «Separar» y «Juntar» reemplazan a «Pausar» y «Reanudar» (propuesta del
       agente, a confirmar por Carlos). El estado dice «Trabajando juntos» o «Separados: cada
       uno por su lado».
+
+74. **«Desvincular» está en Usuarios y sesiones** (2026-10-13). Carlos lo pidió ahí y no
+    suelto en la lista de Más. En Más → Usuarios y sesiones hay un bloque «Vínculo entre
+    celular y computadora»: a quien está vinculado le dice con qué y le ofrece «Desvincular»
+    (pregunta antes); a quien tiene «Administrar sesiones» le muestra además los días que
+    dura. Corrige de la decisión 73 solo el lugar del botón.
+
+75. **Los botones del vínculo se llaman «Desconectar» y «Reconectar»** (2026-10-13). Carlos
+    los eligió en lugar de «Separar» y «Juntar», que había propuesto el agente en la decisión
+    73. «Desconectar» hace que cada dispositivo trabaje por su lado sin desvincularlos;
+    «Reconectar» los vuelve a poner a trabajar juntos. El estado dice «Conectado con la
+    computadora» (o «con el celular») y «Desconectados: cada uno por su lado».

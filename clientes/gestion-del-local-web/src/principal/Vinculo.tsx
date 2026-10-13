@@ -1,18 +1,28 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../api";
+import { useEspejo } from "../espejo";
+import { soltarEmparejamiento } from "../puesto";
 import { usePuede } from "./permisos";
-import "./dias-de-vinculo.css";
+import "./vinculo.css";
 
-// Cuántos días dura el vínculo entre un celular y una computadora (decisión 73). Lo cambia
-// quien tiene «Administrar sesiones»; vale para los vínculos nuevos y los que se renueven.
-export function DiasDeVinculo() {
+// El vínculo entre un celular y una computadora, en Usuarios y sesiones (decisiones 73 y 74).
+// A quien está vinculado le dice con qué y le ofrece «Desvincular», que es el corte definitivo
+// y por eso pregunta. A quien tiene «Administrar sesiones» le muestra los días que dura; el
+// cambio vale para los vínculos nuevos y los que se renueven.
+export function Vinculo() {
   const cambia = usePuede()("admin.sesiones");
+  const { emparejado, lado } = useEspejo();
+  const otro = lado === "computadora" ? "el celular" : "la computadora";
+  function desvincular() {
+    if (window.confirm(`¿Desvincular ${lado === "computadora" ? "el celular de esta computadora" : "este celular de la computadora"}? Para volver a trabajar juntos vas a tener que escanear el código.`)) void soltarEmparejamiento();
+  }
   const [dias, setDias] = useState<string>("");
   const [guardado, setGuardado] = useState<number | null>(null);
   const [mensaje, setMensaje] = useState<{ texto: string; mal?: boolean } | null>(null);
   const [ocupado, setOcupado] = useState(false);
   useEffect(() => { api<{ dias: number }>("/puestos/configuracion").then((r) => { if (Number.isInteger(r.dias)) { setDias(String(r.dias)); setGuardado(r.dias); } }).catch(() => undefined); }, []);
-  if (!cambia || guardado === null) return null;
+  const conDias = cambia && guardado !== null;
+  if (!emparejado && !conDias) return null;
   const numero = Number(dias);
   const valido = Number.isInteger(numero) && numero >= 1 && numero <= 365;
   async function guardar(e: FormEvent) {
@@ -24,8 +34,15 @@ export function DiasDeVinculo() {
     finally { setOcupado(false); }
   }
   return (
-    <form className="dias-de-vinculo" onSubmit={guardar} data-testid="dias-de-vinculo">
+    <form className="dias-de-vinculo" onSubmit={guardar} data-testid="vinculo">
       <h2>Vínculo entre celular y computadora</h2>
+      {emparejado && (
+        <div className="dias-de-vinculo-fila" data-testid="vinculo-actual">
+          <span className="dias-de-vinculo-estado">{lado === "computadora" ? "Esta computadora está vinculada con tu celular." : "Este celular está vinculado con tu computadora."}</span>
+          <button type="button" className="peligro" onClick={desvincular} data-testid="desvincular-vinculo" aria-label={`Desvincular ${otro}`}>Desvincular</button>
+        </div>
+      )}
+      {conDias && <>
       <p>Cuántos días quedan vinculados sin tener que escanear de nuevo. Se renueva cada vez que se entra a la computadora escaneando su código con el celular.</p>
       <div className="dias-de-vinculo-fila">
         <label htmlFor="dias-vinculo">Dura</label>
@@ -35,6 +52,7 @@ export function DiasDeVinculo() {
       </div>
       {!valido && dias !== "" && <p className="dias-de-vinculo-mal" role="alert">Tiene que ser un número entero entre 1 y 365.</p>}
       {mensaje && <p className={mensaje.mal ? "dias-de-vinculo-mal" : "dias-de-vinculo-bien"} role="status">{mensaje.texto}</p>}
+      </>}
     </form>
   );
 }

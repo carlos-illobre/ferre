@@ -1,4 +1,4 @@
-/* Los días que dura el vínculo entre celular y computadora: un bloque chico en Usuarios y sesiones. */
+/* El vínculo entre celular y computadora, en Usuarios y sesiones: desvincular y los días que dura. */
 .dias-de-vinculo { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 16px; background: var(--p-superficie, #fff); box-shadow: 0 0 0 1px var(--p-borde-suave, #cfd8d2); color: var(--p-tinta, #18201e); }
 .dias-de-vinculo h2 { margin: 0; font-size: 1.125rem; font-weight: 700; }
 .dias-de-vinculo p { margin: 0; color: var(--p-texto-2, #56635e); font-size: 0.9375rem; line-height: 1.4; max-width: 60ch; }
@@ -9,3 +9,5 @@
 .dias-de-vinculo-fila input:focus-visible, .dias-de-vinculo-fila button:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 2px; }
 .dias-de-vinculo p.dias-de-vinculo-mal { color: var(--p-rojo-texto, #a3261a); font-weight: 600; }
 .dias-de-vinculo p.dias-de-vinculo-bien { color: var(--p-verde-texto, #0f6b52); font-weight: 600; }
+.dias-de-vinculo-estado { flex: 1 1 200px; font-weight: 600; }
+.dias-de-vinculo-fila button.peligro { background: transparent; color: var(--p-rojo-texto, #a3261a); box-shadow: inset 0 0 0 1.5px currentColor; }
