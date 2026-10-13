@@ -91,8 +91,8 @@ export function BotonGoogle({ tema = "outline" }: { tema?: "outline" | "filled_b
         },
       });
       // Google pide el ancho en píxeles (entre 200 y 400): el del lugar que le toca.
-      const ancho = Math.round(Math.min(400, Math.max(200, lugar.current.clientWidth || 320)));
-      google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "rectangular", text: "continue_with", logo_alignment: "left", locale: "es", width: ancho });
+      const ancho = Math.round(Math.min(400, Math.max(200, (lugar.current.clientWidth || 336) - 16)));
+      google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "rectangular", text: "continue_with", logo_alignment: "center", locale: "es", width: ancho });
       setEstado("listo");
     }, 200);
     return () => clearInterval(intervalo);
