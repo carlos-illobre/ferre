@@ -148,10 +148,16 @@ No todo cambio pasa por los cuatro:
 
 | Tamaño | Ejemplo | Quién interviene |
 |---|---|---|
-| Arreglo | Un error o un texto; no cambia ninguna regla | Solo el desarrollador, con su prueba. Sin documentos |
+| Arreglo | El código no hace lo que la documentación dice | Solo el desarrollador, con su prueba. La documentación no cambia; si el defecto estaba anotado en `proyecto/estado.yml`, se borra |
+| Ajuste | Carlos pide que algo se vea o se comporte distinto de lo escrito, o algo que no está escrito: un color, un texto, la forma de un botón, el orden de un menú | El desarrollador, con su prueba. **Antes de programar lo escribe** en el documento que corresponde (el `ux.md` de la capacidad, `docs/sistema-visual.md` o la `spec.md`). El pedido de Carlos vale como aprobación |
 | Cambio de interfaz | Cambia cómo se ve o cómo se usa una pantalla, sin cambiar ninguna regla de negocio | Diseñador y desarrollador: maqueta aprobada por Carlos y código. Sin `spec.md`, `plan.md` ni `tasks.md`; el `ux.md` se toca solo si cambia un requerimiento de interfaz |
 | Cambio de regla | Un requerimiento nuevo o modificado dentro de una capacidad | Analista y desarrollador. La regla se escribe directamente en la `spec.md` de la capacidad, sin carpeta propia |
 | Funcionalidad nueva | Varias historias o pantallas nuevas | Los cuatro, con carpeta propia: `spec.md`, maquetas y `tasks.md` |
+
+**Ningún cambio queda solo en el código.** La pregunta para saber si hay que tocar la
+documentación es siempre la misma: si otro agente reconstruyera la aplicación leyendo solo
+la documentación, ¿le saldría igual que ahora? Si no, falta escribirlo, por chico que sea
+el cambio. Solo el arreglo se salva, porque ahí el documento ya decía lo correcto.
 
 Como nadie revisa después al desarrollador, toda lista de tareas termina con estas tres, y
 la funcionalidad no está terminada sin ellas:
@@ -213,4 +219,4 @@ cada capacidad tiene un `resumen.md` que se lee antes que la especificación com
 cambio que es solo de interfaz va con maqueta y código, sin los demás documentos; y las
 herramientas para mirar pantallas viven en `tests/capturas/`.
 
-**Version**: 1.5.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-11
+**Version**: 1.6.0 | **Ratified**: 2026-10-10 | **Last Amended**: 2026-10-13

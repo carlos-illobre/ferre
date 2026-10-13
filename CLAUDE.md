@@ -35,7 +35,13 @@ Cuatro roles, y ninguno más (el detalle está en la constitución):
   orden. Se lee la constitución y el `resumen.md` de la capacidad que se toca; la `spec.md`
   y el `ux.md` completos, solo en la parte que se va a cambiar. Si la capacidad no tiene
   resumen, lo escribe quien la lee completa por primera vez.
-- **Un arreglo** que no cambia ninguna regla va solo con el desarrollador, con su prueba.
+- **Un arreglo** (el código no hace lo que la documentación dice) va solo con el
+  desarrollador, con su prueba; la documentación no cambia.
+- **Un ajuste** (Carlos pide que algo se vea o se comporte distinto de lo escrito, o algo
+  que no está escrito: un color, un texto, la forma de un botón) también va solo con el
+  desarrollador, pero **antes de programar lo escribe** en el `ux.md` de la capacidad, `docs/sistema-visual.md` o la `spec.md`.
+- **Ningún cambio queda solo en el código:** si otro agente reconstruyera la aplicación
+  leyendo solo la documentación, le tiene que salir igual que ahora.
 - **Un cambio de interfaz** que no toca ninguna regla va con diseñador y desarrollador:
   maqueta aprobada y código, sin `spec.md`, `plan.md` ni `tasks.md`.
 - **Un cambio de regla** dentro de una capacidad va con analista y desarrollador: la regla
