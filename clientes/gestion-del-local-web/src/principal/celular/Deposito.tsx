@@ -40,7 +40,7 @@ export function Deposito({ sub }: { sub: string | null }) {
     <main className="contenido">
       <div className="encabezado">
         <h1 className="titulo">Depósito</h1>
-        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor === "pedidos" ? "listas" : s.valor }))} actual={actual} alElegir={(v) => irA(v === "ingreso" ? "deposito" : `deposito/${v}`)} />
+        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor === "pedidos" ? "listas" : s.valor }))} actual={actual} alElegir={(v) => irA(`deposito/${v}`)} />
       </div>
       {actual === "pedidos" ? <Pedidos celular alIngresar={(id) => irA(`deposito/ingreso?pedido=${id}`)} /> : actual === "stock" ? <Stock /> : actual === "ingreso" ? (puedeEsto("deposito.ingresos") ? <Ingreso /> : <ComprasRecientes version={0} soloVer />) : <Contar />}
     </main>

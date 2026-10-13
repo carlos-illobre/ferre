@@ -157,6 +157,14 @@ describe("Depósito · según los permisos", () => {
     expect(await screen.findByTestId("pedidos")).toBeTruthy();
   });
 
+  it("cada pestaña lleva a su propia dirección: Ingreso no cae en la primera", () => {
+    armar("stock");
+    for (const [nombre, direccion] of [["Ingreso", "#/deposito/ingreso"], ["Pedidos", "#/deposito/pedidos"], ["Estanterías", "#/deposito/contar"], ["Inventario", "#/deposito/stock"]] as const) {
+      fireEvent.click(screen.getByRole("tab", { name: nombre }));
+      expect(location.hash).toBe(direccion);
+    }
+  });
+
   it("entrar por la dirección a Estanterías sin permiso dice qué permiso falta", () => {
     conPermisos("deposito.ingresos");
     armar("contar");
