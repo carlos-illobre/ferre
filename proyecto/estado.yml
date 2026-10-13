@@ -80,7 +80,7 @@ RF-07:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/principal/celular/Catalogo.test.tsx
-    - microservices/web/src/teclas.test.tsx
+    - microservices/web/src/plataforma/teclado/teclas.test.tsx
   defectos:
     - "La búsqueda no tolera errores de tipeo"
     - "Los resultados no muestran el precio por bulto"
@@ -132,7 +132,7 @@ RF-10:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/principal/celular/Catalogo.test.tsx
-    - microservices/web/src/teclas.test.tsx
+    - microservices/web/src/plataforma/teclado/teclas.test.tsx
     - microservices/web/src/cola.test.ts
     - microservices/api/src/rutas/productos.test.ts
     - libraries/calculo-de-precios/src/precio.test.ts
@@ -791,7 +791,7 @@ RNF-05:
   pruebas:
     - microservices/web/src/vista.test.ts
     - tests/e2e/escritorio/00-arranque.spec.ts
-    - microservices/web/src/teclas.test.tsx
+    - microservices/web/src/plataforma/teclado/teclas.test.tsx
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos:
     - "Las animaciones de navegación del celular no se vieron en un teléfono. Medido en el navegador de pruebas: entrar a una pantalla tarda 0,4 s con el deslizamiento corriendo"
