@@ -268,3 +268,5 @@ Las reglas no van acá: van en `specs/`.
 - [x] T102 [agente] Flujo de siete pasos con compuerta, y las tareas pasan de los issues a tasks.md
 - [x] T103 [agente] Pasar a la documentación lo que decían los issues y cerrarlos
 - [x] T104 [agente] Atajo de teclado para todos los botones de la computadora: Alt y una letra (decisión 80, 001-T004)
+- [x] T106 [agente] Auditoría de arquitectura del código: informe en docs/auditoria-de-arquitectura.md, sin cambios en el código
+- [ ] T107 [carlos] Decidir las cuatro preguntas del final de la auditoría de arquitectura antes de empezar el reordenamiento
