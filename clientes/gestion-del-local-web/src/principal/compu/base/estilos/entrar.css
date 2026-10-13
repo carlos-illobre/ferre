@@ -79,9 +79,5 @@
 .entrar-puerta .entrar-como { margin-top: 0; }
 @media (max-width: 899px) { .entrar-codigo { flex-direction: column; align-items: flex-start; } }
 
-/* El botón de Google lo dibuja Google, y tiene que quedar a la vista y sin nada encima: si se
-   lo tapa o se lo hace invisible, Google puede no tomar el clic. Para que se note, va sobre
-   una base blanca con sombra difusa, que lo hace sobresalir de la tarjeta. */
-.entrar-google-lugar { min-height: 60px; padding: 8px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px rgb(23 49 43 / 0.08), 0 2px 4px rgb(23 49 43 / 0.10), 0 10px 26px rgb(23 49 43 / 0.22); transition: box-shadow var(--rapido) ease-out; }
-.entrar-google-lugar:hover { box-shadow: 0 0 0 1px rgb(23 49 43 / 0.10), 0 3px 6px rgb(23 49 43 / 0.12), 0 14px 32px rgb(23 49 43 / 0.28); }
-.entrar-google-lugar.esperando { animation: none; background: #fff; }
+/* El botón de Google es el original, azul y redondeado, sin estilos nuestros (decisión 69). */
+.entrar-google-lugar.esperando { animation: none; background: none; }

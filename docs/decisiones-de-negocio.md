@@ -458,3 +458,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
 68. **El orden de Depósito: Inventario, Ingreso, Estanterías, Pedidos** (2026-10-13).
     Lo pidió Carlos. Como cada parte abre en su primera pestaña (decisión 56), Depósito
     abre ahora en Inventario. Vale para el celular y la computadora.
+
+69. **El botón de Google es el original: azul y redondeado** (2026-10-13).
+    Carlos vio las tres variantes que ofrece Google y eligió la azul con puntas redondeadas,
+    en el celular y en la computadora. Que el azul no sea de nuestra paleta es a propósito:
+    marca que ese botón es de un servicio externo.
+    - Se va el botón propio con el de Google invisible encima, y la base con sombra de la
+      computadora: el botón queda tal como lo dibuja Google, sin estilos nuestros.
+    - Reemplaza lo que decían del botón de Google las decisiones 55 y 62.

@@ -36,7 +36,9 @@ export function BotonGoogle() {
           }
         },
       });
-      google.accounts.id.renderButton(boton.current, { theme: "filled_black", size: "large", text: "continue_with", locale: "es", width: 320 });
+      // El botón original de Google, sin nada encima ni estilos nuestros (decisión 69).
+      const ancho = Math.round(Math.min(400, Math.max(200, boton.current.clientWidth || 320)));
+      google.accounts.id.renderButton(boton.current, { theme: "filled_blue", size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
     }, 200);
     return () => clearInterval(intervalo);
   }, [entrar]);

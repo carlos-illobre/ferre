@@ -53,7 +53,7 @@ function ErrorEnElLugar({ error, testId }: { error: ErrorDeEntrada | null; testI
 
 // El botón lo dibuja Google; acá va su lugar, lo que pasa mientras se entra y el resultado.
 // Al entrar, el servidor acepta solo los correos autorizados en «Usuarios y sesiones».
-export function BotonGoogle({ tema = "outline" }: { tema?: "outline" | "filled_blue" | "filled_black" }) {
+export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "filled_blue" | "filled_black" }) {
   const { entrar } = useSesion();
   const [error, setError] = useState<ErrorDeEntrada | null>(null);
   const [entrando, setEntrando] = useState(false);
@@ -91,8 +91,8 @@ export function BotonGoogle({ tema = "outline" }: { tema?: "outline" | "filled_b
         },
       });
       // Google pide el ancho en píxeles (entre 200 y 400): el del lugar que le toca.
-      const ancho = Math.round(Math.min(400, Math.max(200, (lugar.current.clientWidth || 336) - 16)));
-      google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "rectangular", text: "continue_with", logo_alignment: "center", locale: "es", width: ancho });
+      const ancho = Math.round(Math.min(400, Math.max(200, lugar.current.clientWidth || 320)));
+      google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
       setEstado("listo");
     }, 200);
     return () => clearInterval(intervalo);
