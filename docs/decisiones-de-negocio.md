@@ -658,3 +658,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     dónde y cómo se entra. Cada uno ve solo las pestañas que su rol le permite. Las pestañas
     no llevan atajo Alt: se recorren con las flechas. Maquetas aprobadas en
     `specs/007-usuarios-y-acceso/maquetas/`.
+
+89. **El servidor valida con Zod y el front sigue con los contratos** (2026-10-14). En el
+    reordenamiento (`specs/010-reordenamiento-del-codigo/`, T017), Zod valida en el servidor
+    todo lo que llega en cada pedido, y la forma de lo que el front manda sale de esas
+    validaciones. El front no usa el cliente tipado de Hono: sigue leyendo la forma de los
+    datos de los contratos del servidor (`api/src/contratos/`). Carlos eligió el menor cambio:
+    el cliente de Hono obligaba a reescribir las veinte rutas y a que el front revisara el
+    código del servidor al compilar. Lo que queda sin controlar al compilar es la dirección y el
+    método de cada llamada. Precisa la decisión 84, que había aceptado ese cliente.
