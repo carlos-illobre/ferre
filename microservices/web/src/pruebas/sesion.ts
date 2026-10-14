@@ -1,4 +1,4 @@
-import { PERMISOS, type Permiso } from "../principal/permisos";
+import { PERMISOS, type Permiso } from "../pantallas/permisos";
 
 // La sesión con la que corren las pruebas de pantallas. Por defecto la persona puede todo;
 // `conPermisos` la deja solo con los que se le pasan, para probar qué se ve y qué no (RF-72).

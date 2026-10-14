@@ -1,4 +1,4 @@
-import type { Producto } from "../../principal/celular/pantallas/Productos";
+import type { Producto } from "../../pantallas/celular/pantallas/Productos";
 
 // La venta en curso, como viaja entre el celular y la computadora en espejo (decisión 60): los
 // renglones con su cantidad, unidad, precio a mano y margen, el medio de pago y el cliente. De

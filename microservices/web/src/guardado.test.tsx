@@ -9,7 +9,7 @@ import { abrirBase, guardar, leerTodo, respetarElGuardado } from "./almacen";
 import { enviarOEncolar, pendientes } from "./cola";
 import { guardaEnElDispositivo } from "./guardado";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./principal/Configuracion";
+import { Configuracion } from "./pantallas/Configuracion";
 
 // Trabajar sin conexión en el celular (RF-84, specs/009-configuracion): el celular guarda datos
 // del negocio solo si la persona lo habilita; la computadora, siempre.

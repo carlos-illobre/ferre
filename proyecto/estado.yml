@@ -26,7 +26,7 @@ RF-01:
 RF-01b:
   estado: "Hecho"
   pruebas:
-    - microservices/web/src/principal/celular/Catalogo.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.test.tsx
     - microservices/api/src/rutas/listas.test.ts
   defectos: []
 
@@ -64,7 +64,7 @@ RF-06:
     - tests/e2e/escritorio/11-duplicados.spec.ts
     - tests/e2e/celular/11-duplicados.spec.ts
     - microservices/api/src/duplicados/datos.test.ts
-    - microservices/web/src/principal/celular/Catalogo.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.test.tsx
   defectos:
     - "Solo se sugieren duplicados con la misma descripción (sin acentos, símbolos ni espacios, de 8 caracteres o más); no por descripción similar"
     - "Unir productos modifica filas de los históricos de precios, ventas, compras y stock, y borra renglones de conteo repetidos (roza RNF-30)"
@@ -79,7 +79,7 @@ RF-07:
     - microservices/web/src/plataforma/busqueda/busqueda.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-    - microservices/web/src/principal/celular/Catalogo.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.test.tsx
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
   defectos:
     - "La búsqueda no tolera errores de tipeo"
@@ -92,12 +92,12 @@ RF-08:
   pruebas:
     - tests/e2e/escritorio/10-escaner.spec.ts
     - tests/e2e/celular/10-escaner.spec.ts
-    - microservices/web/src/principal/CodigoDeBarras.test.tsx
+    - microservices/web/src/pantallas/CodigoDeBarras.test.tsx
     - microservices/api/src/rutas/puestos.test.ts
-    - microservices/web/src/principal/PedidosDeLaCompu.test.tsx
+    - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
-    - microservices/web/src/principal/celular/Catalogo.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.test.tsx
   defectos:
     - "La lectura con la cámara real no tiene prueba automática y no hay medición de los 3 segundos"
     - "La prueba del escáner es el mismo archivo copiado para las dos interfaces; no hay una variante por interfaz"
@@ -134,7 +134,7 @@ RF-10:
   pruebas:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-    - microservices/web/src/principal/celular/Catalogo.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.test.tsx
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
     - microservices/web/src/cola.test.ts
     - microservices/api/src/rutas/productos.test.ts
@@ -161,7 +161,7 @@ RF-12:
   pruebas:
     - microservices/api/src/rutas/productos.test.ts
     - microservices/web/src/unidades.test.ts
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
   defectos: []
 
 RF-13:
@@ -224,7 +224,7 @@ RF-20:
     - tests/e2e/celular/04-vender.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - microservices/web/src/unidades.test.ts
     - microservices/web/src/cola.test.ts
     - microservices/api/src/precios.test.ts
@@ -246,7 +246,7 @@ RF-20b:
     - tests/e2e/celular/04-vender.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - microservices/api/src/precios.test.ts
   defectos:
     - "Sin prueba que mida que el cambio de margen responde en menos de 100 ms (RNF-07)"
@@ -258,7 +258,7 @@ RF-21:
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/.dependency-cruiser.cjs
   defectos:
@@ -271,7 +271,7 @@ RF-21:
 RF-22:
   estado: "Hecho en parte (#17): se vende como ítem libre. Falta darlo de alta ahí mismo"
   pruebas:
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/.dependency-cruiser.cjs
   defectos:
@@ -286,8 +286,8 @@ RF-23:
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
-    - microservices/web/src/principal/celular/Vender.test.tsx
-    - microservices/web/src/principal/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Negocio.test.tsx
   defectos:
     - "No se puede corregir una venta: solo anularla y cargarla de nuevo"
     - "No se pueden ver las ventas de días anteriores: el servidor acepta la fecha, pero ninguna interfaz la pide"
@@ -316,7 +316,7 @@ RF-25:
     - tests/e2e/celular/04-vender.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
   defectos:
     - "El motivo no se puede cargar desde ninguna interfaz, aunque el servidor lo acepta"
     - "No existe la vista para consultar lo anotado, aunque el servidor lo devuelve"
@@ -368,7 +368,7 @@ RF-32:
 RF-40:
   estado: "Hecho en parte (#15): se vende a cuenta corriente, sin prueba del camino completo. Falta la pantalla para marcarla pagada (#57)"
   pruebas:
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/.dependency-cruiser.cjs
   defectos:
@@ -410,12 +410,12 @@ RF-50:
   estado: "Hecho en parte (#30): se aparta de la regla en 14 puntos"
   pruebas:
     - tests/e2e/escritorio/15-foto-con-celular.spec.ts
-    - microservices/web/src/principal/FotoDeFactura.test.tsx
+    - microservices/web/src/pantallas/FotoDeFactura.test.tsx
     - microservices/api/src/rutas/pedidos-de-foto.test.ts
     - microservices/api/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts
-    - microservices/web/src/principal/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/Deposito.test.tsx
   defectos:
     - "Los pedidos de foto (el código QR) viven en la memoria del servidor: si el servidor se reinicia mientras se espera una foto, hay que pedir el código de nuevo"
     - "La foto del comprobante reemplaza al número tipeado"
@@ -446,7 +446,7 @@ RF-52:
   pruebas:
     - tests/e2e/escritorio/07-contar.spec.ts
     - tests/e2e/celular/07-contar.spec.ts
-    - microservices/web/src/principal/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/Deposito.test.tsx
   defectos:
     - "En el celular la cantidad contada solo acepta enteros, aunque el producto se venda a granel (RF-12)"
     - "Crear un sector, empezar un conteo y cerrarlo exigen conexión; solo contar un producto funciona sin internet. Qué exige la regla está preguntado en la spec (historia 4, escenario 13)"
@@ -463,7 +463,7 @@ RF-53:
   pruebas:
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
-    - microservices/web/src/principal/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/Deposito.test.tsx
   defectos:
     - "En Inventario tampoco se muestra el costo de cada producto; no está dicho si el Comprador debe verlo ahí"
     - "El motivo al corregir el stock a mano es opcional y la regla lo pide"
@@ -481,7 +481,7 @@ RF-59:
     - tests/e2e/celular/04-vender.spec.ts
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/src/rutas/anomalias.test.ts
-    - microservices/web/src/principal/Anomalias.test.tsx
+    - microservices/web/src/pantallas/Anomalias.test.tsx
   defectos:
     - "En la computadora el renglón de la venta no avisa que el stock no alcanza; en el celular sí"
     - "Los stocks que ya estaban en negativo antes de esta regla siguen negativos hasta que se cuenten o corrijan"
@@ -497,7 +497,7 @@ RF-55:
   estado: "Hecho en parte (#36): se arma desde cero y se manda como texto; faltan la sugerencia, el correo y el PDF"
   pruebas:
     - microservices/api/src/rutas/pedidos.test.ts
-    - microservices/web/src/principal/Pedidos.test.tsx
+    - microservices/web/src/pantallas/Pedidos.test.tsx
     - tests/e2e/celular/16-pedidos.spec.ts
     - tests/e2e/escritorio/16-pedidos.spec.ts
   defectos:
@@ -529,7 +529,7 @@ RF-58:
 RF-60:
   estado: "Pendiente (#39)"
   pruebas:
-    - microservices/web/src/principal/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/Negocio.test.tsx
     - tests/e2e/celular/04-vender.spec.ts
   defectos:
     - "Del tablero solo existe, en el celular, lo vendido en el día con la cantidad de ventas y el total por medio de pago; no hay semana ni mes"
@@ -570,8 +570,8 @@ RF-65:
   pruebas:
     - tests/e2e/celular/05-compras.spec.ts
     - tests/e2e/escritorio/05-compras.spec.ts
-    - microservices/web/src/principal/celular/Deposito.test.tsx
-    - microservices/web/src/principal/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/Negocio.test.tsx
   defectos:
     - "Que una compra anulada no sume al gasto no tiene prueba"
     - "Que una compra con fecha fuera de la semana no sume no tiene prueba, y la consulta de la API no tiene ninguna prueba propia"
@@ -617,7 +617,7 @@ RF-71:
   estado: "Hecho en parte (#41): consulta paginada. Faltan los filtros en pantalla (#58)"
   pruebas:
     - microservices/api/src/rutas/auditoria.test.ts
-    - microservices/web/src/principal/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/Negocio.test.tsx
     - tests/integration/autenticacion.sh
     - microservices/api/src/rutas/credenciales.test.ts
     - tests/e2e/celular/01-login.spec.ts
@@ -630,10 +630,10 @@ RF-72:
   pruebas:
     - microservices/api/src/rutas/roles.test.ts
     - microservices/api/src/rutas/usuarios.test.ts
-    - microservices/web/src/principal/celular/Negocio.test.tsx
-    - microservices/web/src/principal/celular/Catalogo.test.tsx
-    - microservices/web/src/principal/celular/Deposito.test.tsx
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.test.tsx
+    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - tests/e2e/celular/13-roles.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts
   defectos:
@@ -648,7 +648,7 @@ RF-76:
   estado: "Hecho (#72): la computadora entra leyendo su código con el celular, sin paso de confirmar"
   pruebas:
     - microservices/api/src/rutas/sesiones.test.ts
-    - microservices/web/src/principal/celular/EntrarEnLaCompu.test.tsx
+    - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
   defectos:
@@ -719,7 +719,7 @@ RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
   pruebas:
     - microservices/api/src/rutas/roles.test.ts
-    - microservices/web/src/principal/Roles.test.tsx
+    - microservices/web/src/pantallas/Roles.test.tsx
     - tests/e2e/celular/13-roles.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts
   defectos:
@@ -729,7 +729,7 @@ RF-73:
   estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
   pruebas:
     - microservices/api/src/rutas/usuarios.test.ts
-    - microservices/web/src/principal/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/Negocio.test.tsx
     - tests/integration/autenticacion.sh
   defectos:
     - "Reemplazado: los roles dueño, admin y mostrador ya no existen (RF-72, decisión 50)"
@@ -740,7 +740,7 @@ RF-74:
     - tests/e2e/celular/12-cerrar-sesion.spec.ts
     - tests/e2e/escritorio/12-cerrar-sesion.spec.ts
     - tests/integration/autenticacion.sh
-    - microservices/web/src/principal/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/Negocio.test.tsx
     - microservices/api/src/rutas/usuarios.test.ts
   defectos:
     - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
@@ -752,7 +752,7 @@ RF-80:
   pruebas:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts
-    - microservices/web/src/principal/Tickets.test.tsx
+    - microservices/web/src/pantallas/Tickets.test.tsx
     - microservices/api/src/rutas/tickets.test.ts
   defectos:
     - "La foto de un ticket por enviar se guarda en el dispositivo sin tope de espacio"
@@ -762,7 +762,7 @@ RF-81:
   pruebas:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts
-    - microservices/web/src/principal/Tickets.test.tsx
+    - microservices/web/src/pantallas/Tickets.test.tsx
     - microservices/api/src/rutas/tickets.test.ts
   defectos:
     - "Cualquier usuario puede marcar resuelto o reabrir: no hay un permiso para eso"
@@ -842,7 +842,7 @@ RNF-08:
 RNF-09:
   estado: "Hecho"
   pruebas:
-    - microservices/web/src/principal/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos:
     - "Sin prueba: la barra de progreso mientras se aplica una lista"
@@ -1075,12 +1075,10 @@ RNF-60:
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "El precio del servidor engorda el catálogo que baja la computadora (la explicación de cada precio viaja con cada producto); no se midió todavía con los 11.000 productos reales"
-    - "Las pantallas siguen en `principal/celular` y `principal/compu`; pasan a `pantallas/` con el juego único de piezas de interfaz (010-T012)"
+    - "El celular y la computadora siguen con un juego de piezas de interfaz cada uno (botón, hoja, aviso, visor de la cámara), y se ven distinto: unificarlos cambia cómo se ve una de las dos interfaces y espera la decisión de Carlos (010-T012)"
     - "Los roles asignables, los celulares con huella y la entrada todavía piden al servidor desde la pantalla, sin la memoria compartida de consultas"
     - "Pedidos a proveedores ya es una sola pantalla para los dos lados, pero su regla sigue escrita dentro de la pantalla, no en la carpeta de negocio"
     - "El borrador del ingreso (lo cargado sobrevive a una recarga) vale solo en la computadora; en el celular no se guarda, para no ocupar su almacenamiento"
     - "En el celular, si anular una venta falla (sin conexión o sin permiso) no se avisa: la lista queda igual. Se arregla al descongelar las pantallas"
     - "En la computadora, «Cómo va el negocio» y los sugeridos de Vender todavía piden las ventas de hoy por su cuenta, sin la consulta compartida"
-    - "Las piezas de interfaz (botón, hoja, aviso, tabla) siguen duplicadas: un juego en la computadora y otro en el celular; se unifican con la etapa 3 (010-T012)"
-    - "Los estilos del visor de la cámara están en las hojas del celular y de la computadora, no junto al lector (010-T012)"
     - "Las piezas nuevas de la plataforma (base local, cola, preferencias, navegación) se prueban a través de las pruebas de Ferrebress; no tienen pruebas propias que no nombren a Ferrebress"

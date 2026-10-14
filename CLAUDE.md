@@ -63,7 +63,7 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 ## La interfaz
 
 - **La aplicación es una sola y abre en la raíz.** Su código está en
-  `microservices/web/src/principal/`.
+  `microservices/web/src/pantallas/`.
   Cómo está armada y dónde vive cada cosa:
   [ADR-015](docs/adr/ADR-015-la-interfaz-elegida-es-la-version-5.md). Lo que Carlos pidió de
   ella, que es regla para cualquier cambio:
@@ -76,8 +76,13 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 - **Es la interfaz definitiva** (decisión 83). Las versiones anteriores y sus mockups se
   borraron el 2026-10-13: no hay otra interfaz en el repositorio. Lo común a las dos (la
   llamada a la API, el catálogo, el envío sin conexión, la sesión) está en `src/`.
+- **Capas** ([ADR-018](docs/adr/ADR-018-servicios-y-capas.md)): la regla de cada proceso
+  está una sola vez en `src/negocio/` y las pantallas solo muestran; la tecnología que sirve
+  para cualquier aplicación está en `src/plataforma/`, que no puede importar nada del negocio.
+  En el servidor, cada tema tiene ruta, `reglas.ts` y `datos.ts`. Las dos reglas las controla
+  `pnpm capas` en cada subida.
 - **Solo la aplicación principal tiene pruebas.** Un cambio en una pantalla va con su prueba
-  en `src/principal/` y, si toca un camino principal, en `tests/e2e/`.
+  en `src/pantallas/` y, si toca un camino principal, en `tests/e2e/`.
 - **Cada cosa que Carlos decide** se anota con su número en
   [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md) y, si es una regla, en la
   `spec.md` de la capacidad.

@@ -7,7 +7,7 @@ vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api"
 import { traerPorCodigo, useCatalogo } from "./catalogo";
 import { buscaEnElServidor } from "./guardado";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./principal/Configuracion";
+import { Configuracion } from "./pantallas/Configuracion";
 
 // Cómo buscar productos cuando el celular no guarda el catálogo (RF-85, specs/009-configuracion).
 // El aparato: un teléfono (Android) o una computadora, por su identificación.

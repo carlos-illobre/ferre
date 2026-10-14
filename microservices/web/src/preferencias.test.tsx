@@ -2,7 +2,7 @@ import { conPermisos } from "./pruebas/sesion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./principal/Configuracion";
+import { Configuracion } from "./pantallas/Configuracion";
 import { animarNavegacion, irA } from "./rutas";
 
 // Configuración (RF-83, specs/009-configuracion): las animaciones se habilitan o deshabilitan

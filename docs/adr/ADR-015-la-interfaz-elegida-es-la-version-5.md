@@ -16,15 +16,15 @@ versión 4 (decisión 27). El 2026-10-11 eligió la versión 5, que junta esas t
 (decisión 28), y pidió que las otras versiones sigan publicadas pero sin pruebas (decisión 43).
 
 > **Actualización del 2026-10-11 (decisiones 46 y 47).** La «versión 5» pasó a llamarse
-> **la principal**: su código está en `src/principal/` y se publica en la raíz. Las versiones
+> **la principal**: su código está en `src/pantallas/` y se publica en la raíz. Las versiones
 > 1 a 4 son históricas y se publican bajo `historico/`. Donde este documento dice «versión 5»
 > hay que leer «la principal». Se sumaron tres archivos que comparten las dos interfaces:
-> `src/principal/textos.ts` (textos y listas; forma larga para la computadora y corta para
-> el celular), `src/principal/paleta.css` (todos los colores) y las reglas, que tienen que
+> `src/pantallas/textos.ts` (textos y listas; forma larga para la computadora y corta para
+> el celular), `src/pantallas/paleta.css` (todos los colores) y las reglas, que tienen que
 > ser idénticas en las dos.
 >
 > **La aplicación ya no depende de las versiones históricas.** Las pantallas, los componentes
-> y los estilos de las versiones 1 y 2 que usaba se copiaron adentro de `src/principal/`
+> y los estilos de las versiones 1 y 2 que usaba se copiaron adentro de `src/pantallas/`
 > (`celular/pantallas`, `celular/componentes`, `celular/estilos.css` y `compu/base/`). Lo que
 > más abajo dice sobre importar pantallas de las versiones 1 y 2, y sobre no poder borrarlas,
 > ya no vale: el código de las históricas quedó congelado y un cambio en la aplicación no las
@@ -56,17 +56,17 @@ Dónde está cada cosa en el código:
 
 | Qué | Dónde |
 |---|---|
-| Entrada de la aplicación y elección del árbol | `clientes/gestion-del-local-web/src/principal/main.tsx` (la carga `index.html`, en la raíz) |
-| Árbol del celular: menú, copias de pantallas y estilos | `src/principal/celular/` (`App.tsx`, `tema.css`) |
-| Árbol de la computadora: menú, atajos, copias y estilos | `src/principal/compu/` (`App.tsx`, `tema.css`) |
-| Lo compartido por los dos árboles | `src/principal/*.tsx` y `src/principal/*.css` |
+| Entrada de la aplicación y elección del árbol | `clientes/gestion-del-local-web/src/pantallas/main.tsx` (la carga `index.html`, en la raíz) |
+| Árbol del celular: menú, copias de pantallas y estilos | `src/pantallas/celular/` (`App.tsx`, `tema.css`) |
+| Árbol de la computadora: menú, atajos, copias y estilos | `src/pantallas/compu/` (`App.tsx`, `tema.css`) |
+| Lo compartido por los dos árboles | `src/pantallas/*.tsx` y `src/pantallas/*.css` |
 | Pantallas de la versión 1 que usa el celular | `src/pantallas/`, `src/componentes/` |
 | Pantallas de la versión 2 que usa la computadora | `src/v2/` |
-| Textos y listas comunes, y la paleta | `src/principal/textos.ts`, `src/principal/paleta.css` |
+| Textos y listas comunes, y la paleta | `src/pantallas/textos.ts`, `src/pantallas/paleta.css` |
 | Las versiones históricas | `historico/v1/`, `historico/v2/`, `historico/v4/` (entradas), `public/historico/` (maquetas 3 y 4 y la lista) |
 | Redirecciones desde las direcciones viejas | `public/v1/` … `public/v5/`, `public/versiones.html` |
 
-**Pruebas.** Solo se prueba la versión 5. Las unitarias están en `src/principal/` (las de las
+**Pruebas.** Solo se prueba la versión 5. Las unitarias están en `src/pantallas/` (las de las
 pantallas del celular y de la computadora, más las de lo nuevo) y corren en cada push. Los
 archivos de prueba de las otras versiones quedaron en su lugar y están excluidos en
 `vitest.config.ts`. Los escenarios de punta a punta (`tests/e2e/`, una carpeta por árbol) corren contra la versión 5,
@@ -90,4 +90,4 @@ una vez por semana y a pedido; `tests/e2e.sh` explica cómo correrlos en el serv
 
 Las versiones 1 a 4, sus páginas publicadas y los mockups se borraron del repositorio
 (decisión 83): la interfaz elegida es la única y es la definitiva. Lo que este ADR dice de
-dónde vivía cada versión vale como historia; hoy todo está en `src/principal/` y lo común en `src/`.
+dónde vivía cada versión vale como historia; hoy todo está en `src/pantallas/` y lo común en `src/`.

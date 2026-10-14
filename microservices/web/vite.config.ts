@@ -15,7 +15,7 @@ export default defineConfig(({ command }) => {
       react(),
       // Service worker (issue #18): precachea la app entera para que abra sin conexión. La API
       // y Google nunca pasan por el caché. Es «prompt» y no «autoUpdate» porque cuándo se
-      // aplica una versión nueva lo decide la app (src/principal/actualizacion.ts): sola al
+      // aplica una versión nueva lo decide la app (src/pantallas/actualizacion.ts): sola al
       // abrir, con un aviso si ya se estaba usando, para no perder una venta a medio armar.
       VitePWA({
         registerType: "prompt",
@@ -51,7 +51,7 @@ export default defineConfig(({ command }) => {
       }),
     ],
     base: process.env.VITE_BASE ?? "/",
-    // La raíz es la aplicación (src/principal): es la única que hay (decisión 83).
+    // La raíz es la aplicación (src/pantallas): es la única que hay (decisión 83).
     build: { outDir: "dist", emptyOutDir: true },
   };
 });

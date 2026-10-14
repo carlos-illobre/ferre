@@ -1,6 +1,6 @@
 """Genera los archivos del logo de Ferrebress (la F-tornillo dentro de su tuerca) a partir de
 una sola definición: los SVG y los íconos de la app en microservices/web/public/,
-el isotipo y el logotipo que dibuja la aplicación (src/principal) y una hoja de prueba en tests/capturas/salida/.
+el isotipo y el logotipo que dibuja la aplicación (src/pantallas) y una hoja de prueba en tests/capturas/salida/.
 Uso: python tests/capturas/logo.py   (necesita Playwright)"""
 import os, re, urllib.parse
 from playwright.sync_api import sync_playwright
@@ -76,18 +76,18 @@ def en_estilos(ruta, patron, regla):
 escribir("public/logo-ferrebress.svg", "<!-- Ferrebress: la F que es un tornillo, dentro de su tuerca. Para fondo claro. Lo genera tests/capturas/logo.py -->\n" + svg(SOBRE_CLARO) + "\n")
 escribir("public/icono-v5.svg", "<!-- Ferrebress: el ícono de la pestaña del navegador. Lo genera tests/capturas/logo.py -->\n" + svg(SOBRE_CLARO) + "\n")
 # El isotipo para dibujarlo dentro de la aplicación (sobre fondo claro y sobre fondo oscuro).
-escribir("src/principal/isotipo.ts", "// El isotipo de Ferrebress: la F que es un tornillo, dentro de su marco. Lo genera\n// tests/capturas/logo.py a partir de una sola definición: no se edita a mano.\n"
+escribir("src/pantallas/isotipo.ts", "// El isotipo de Ferrebress: la F que es un tornillo, dentro de su marco. Lo genera\n// tests/capturas/logo.py a partir de una sola definición: no se edita a mano.\n"
          f"export const ISOTIPO_SOBRE_CLARO = `{svg(SOBRE_CLARO)}`;\nexport const ISOTIPO_SOBRE_OSCURO = `{svg(SOBRE_OSCURO)}`;\n")
 
 # El logotipo: el isotipo hace de F en la palabra Ferrebress (decisión 48). El isotipo no cambia;
 # el resto de la palabra va en la tipografía de la marca, inclinada igual que la F y pegada a su
-# diagonal. Estas medidas son las mismas que usa la aplicación (src/principal/logotipo.css).
+# diagonal. Estas medidas son las mismas que usa la aplicación (src/pantallas/logotipo.css).
 LOGOTIPO_CSS = (".logotipo{display:inline-flex;align-items:baseline;font-family:'Space Grotesk Variable','Segoe UI',system-ui,sans-serif;font-weight:700;line-height:1;letter-spacing:-.01em;white-space:nowrap}"
                 ".logotipo-isotipo,.logotipo>svg{flex:none;display:inline-block;width:1.5em;height:1.5em;transform:translateY(.36em);margin-right:-.33em}.logotipo-isotipo svg{display:block;width:100%;height:100%}"
                 ".logotipo>span:last-child{display:inline-block;transform:skewX(-6deg)}"
                 "")
 logotipo = lambda isotipo: f'<span class="logotipo" role="img" aria-label="Ferrebress">{isotipo}<span aria-hidden="true">errebress</span></span>'
-escribir("src/principal/logotipo.css", "/* El logotipo de Ferrebress: el isotipo hace de F en la palabra. Lo genera tests/capturas/logo.py. */\n" + LOGOTIPO_CSS.replace("}", "}\n"))
+escribir("src/pantallas/logotipo.css", "/* El logotipo de Ferrebress: el isotipo hace de F en la palabra. Lo genera tests/capturas/logo.py. */\n" + LOGOTIPO_CSS.replace("}", "}\n"))
 
 fila = lambda fondo, color, c: (f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:22px;padding:20px;border-radius:14px;background:{fondo};color:{color};margin-top:10px">'
     + "".join(svg(c, n) for n in (150, 64, 32, 16)) + f'<span style="font-size:2.6rem">{logotipo(svg(c))}</span>{svg(EN_NARANJA, 110)}</div>')
