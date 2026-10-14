@@ -7,6 +7,7 @@ import { usePuede } from "./permisos";
 import { contarAlEspejo, useEspejar } from "../espejo";
 import { useVolverCierra } from "../plataforma/navegacion/volver";
 import "./pedidos.css";
+import type { Proveedor as ProveedorDelServidor } from "@servidor/proveedores";
 
 // Pedidos a proveedores (RF-55, decisión 52). La misma pantalla en el celular y en la
 // computadora (maqueta B, aprobada el 2026-10-11): la lista de pedidos; el pedido, que es
@@ -19,7 +20,7 @@ export type Pedido = {
   proveedor_id: string; proveedor: string; whatsapp: string | null; creado_en: string; enviado_en: string | null; cerrado_en: string | null;
   enviado_por: string | null; cerrado_por: string | null; items: ItemDelPedido[];
 };
-type Proveedor = { id: string; nombre: string; activo: boolean; whatsapp: string | null };
+type Proveedor = Pick<ProveedorDelServidor, "id" | "nombre" | "activo" | "whatsapp">;
 type Renglon = { producto_id: string; descripcion: string; marca: string | null; unidad: string; codigo: string | null; cantidad: number; costo: number | null };
 type Borrador = { id: string; proveedorId: string; renglones: Renglon[] };
 

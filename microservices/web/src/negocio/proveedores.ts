@@ -2,8 +2,9 @@ import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 import { consultas } from "../consultas";
+import type { Proveedor, ProveedorEntrada } from "@servidor/proveedores";
 
-export type Proveedor = { id: string; nombre: string; precios_incluyen_iva: boolean; descuento_general: string; descuento_contado: string; lector: string | null; activo: boolean };
+export type { Proveedor };
 
 const CLAVE = ["proveedores"] as const;
 export const proveedoresCambiaron = (): Promise<void> => consultas.invalidateQueries({ queryKey: CLAVE });
@@ -41,7 +42,7 @@ export function faltaEnProveedor(d: DatosDeProveedor): FaltaEnProveedor | null {
 export async function altaDeProveedor(d: DatosDeProveedor): Promise<void> {
   await api("/proveedores", {
     method: "POST",
-    body: JSON.stringify({ nombre: d.nombre.trim(), lector: d.lector || null, precios_incluyen_iva: d.preciosIncluyenIva, descuento_general: porcentaje(d.descuentoGeneral) / 100, descuento_contado: porcentaje(d.descuentoContado) / 100 }),
+    body: JSON.stringify({ nombre: d.nombre.trim(), lector: d.lector || null, precios_incluyen_iva: d.preciosIncluyenIva, descuento_general: porcentaje(d.descuentoGeneral) / 100, descuento_contado: porcentaje(d.descuentoContado) / 100 } satisfies ProveedorEntrada),
   });
   await proveedoresCambiaron();
 }

@@ -2,10 +2,12 @@ import { randomUUID } from "node:crypto";
 import { base } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
+import type { Proveedor, ProveedorEntrada } from "../contratos/proveedores.js";
+import type { Enviable } from "../enviable.js";
 
 // Proveedores con su configuración de costo (issue #11): si sus precios incluyen IVA,
 // descuento general, descuento por contado, y qué lector entiende su planilla.
-export type ProveedorEntrada = { nombre?: string; precios_incluyen_iva?: boolean; descuento_general?: number; descuento_contado?: number; lector?: string | null; activo?: boolean };
+export type { ProveedorEntrada };
 
 export function validar(p: ProveedorEntrada, completo: boolean): string | null {
   if (completo && !p.nombre?.trim()) return "Hace falta el nombre";
@@ -16,7 +18,7 @@ export function validar(p: ProveedorEntrada, completo: boolean): string | null {
   return null;
 }
 
-export const proveedores = () => datos.todosLosProveedores(base);
+export const proveedores = (): Promise<Enviable<Proveedor>[]> => datos.todosLosProveedores(base);
 
 // Alta: `null` si ya existe uno con ese nombre.
 export async function alta(p: ProveedorEntrada, usuarioId: string): Promise<string | null> {

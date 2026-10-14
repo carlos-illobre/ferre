@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import * as reglas from "../catalogo/reglas.js";
+import type { ProveedorCreado } from "../contratos/proveedores.js";
 
 // Proveedores: la ruta solo traduce (ADR-018); las reglas y los datos están en `catalogo/`.
 export const proveedores = new Hono();
@@ -13,7 +14,7 @@ proveedores.post("/", exigirPermiso("catalogo.listas"), async (c) => {
   const error = reglas.validar(cuerpo, true);
   if (error) return c.json({ error }, 400);
   const id = await reglas.alta(cuerpo, c.get("sesion").usuario.id);
-  return id ? c.json({ id }, 201) : c.json({ error: `Ya existe un proveedor llamado ${cuerpo.nombre}` }, 409);
+  return id ? c.json({ id } satisfies ProveedorCreado, 201) : c.json({ error: `Ya existe un proveedor llamado ${cuerpo.nombre}` }, 409);
 });
 
 proveedores.patch("/:id", exigirPermiso("catalogo.listas"), async (c) => {
