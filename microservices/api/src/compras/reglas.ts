@@ -2,7 +2,9 @@ import { randomUUID } from "node:crypto";
 import { base, Deshacer, enTransaccion } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
-import type { CompraEntrada, CompraRegistrada, CompraReciente, CompraRepetida, FotoDeComprobante, GastosDeLaSemana, ItemDeCompraEntrada, RenglonDeCompra } from "../contratos/compras.js";
+import type { z } from "zod";
+import type { CompraRegistrada, CompraReciente, CompraRepetida, FotoDeComprobante, GastosDeLaSemana, RenglonDeCompra } from "../contratos/compras.js";
+import { ARCHIVO_DE_FOTO, type compraNueva } from "./esquemas.js";
 import type { Enviable } from "../enviable.js";
 
 export { carpetaComprobantes } from "./datos.js";
@@ -11,30 +13,11 @@ export { carpetaComprobantes } from "./datos.js";
 // stock (lo que entra). Cada renglón suma stock; si el costo de la factura difiere del de la
 // lista, pasa a ser el costo vigente de ese producto para ese proveedor, con la explicación
 // «según factura», porque el precio de venta sigue la realidad, no la lista.
-export const COMPROBANTES = ["factura", "remito", "sin_comprobante"] as const;
-export type ItemEntrada = ItemDeCompraEntrada;
-export type { CompraEntrada };
+// Lo que llega ya viene validado con su esquema (`esquemas.ts`).
+export type CompraEntrada = z.output<typeof compraNueva>;
 export type Rechazo = { error: string; estado: 400 | 404 | 409 };
 const TIPOS_DE_FOTO: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
-const ARCHIVO_DE_FOTO = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
 const MAXIMO_DE_FOTO = 10 * 1024 * 1024;
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-export function validar(v: CompraEntrada): string | null {
-  if (v.id && !UUID.test(v.id)) return "El id de la compra tiene que ser un UUID";
-  if (!v.proveedor_id || !UUID.test(v.proveedor_id)) return "Elegí el proveedor";
-  if (v.pedido_id && !UUID.test(v.pedido_id)) return "El pedido no es válido";
-  if (!COMPROBANTES.includes(v.comprobante_tipo)) return `El comprobante es uno de ${COMPROBANTES.join(", ")}`;
-  if (v.foto && !ARCHIVO_DE_FOTO.test(v.foto)) return "La foto del comprobante no es válida";
-  if (v.fecha && !/^\d{4}-\d{2}-\d{2}$/.test(v.fecha)) return "La fecha tiene que ser AAAA-MM-DD";
-  if (!Array.isArray(v.items) || v.items.length === 0) return "La compra no tiene productos";
-  for (const [i, it] of v.items.entries()) {
-    if (!it.descripcion?.trim()) return `El renglón ${i + 1} no tiene descripción`;
-    if (!(it.cantidad > 0)) return `El renglón ${i + 1} tiene cantidad inválida`;
-    if (!(it.costo_unitario >= 0)) return `El renglón ${i + 1} tiene costo inválido`;
-  }
-  return null;
-}
 
 const fechaLegible = (iso: string) => { const [a, m, d] = iso.split("-"); return `${d}/${m}/${a}`; };
 
