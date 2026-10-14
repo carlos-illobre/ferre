@@ -78,6 +78,9 @@ jobs:
       - name: "15 · Foto de la factura con código QR"
         if: always() && matrix.interfaz == 'escritorio'
         run: PLAYWRIGHT_JSON=/tmp/e2e-15.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 15-foto-con-celular.spec.ts
+      - name: "18 · Procesos"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-18.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 18-procesos.spec.ts
       - name: Resumen
         if: always()
         run: |

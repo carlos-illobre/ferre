@@ -176,4 +176,4 @@
 .procesos-menu-celu { display: flex; flex-direction: column; }
 .procesos-menu-celu button { display: flex; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--procesos-borde-suave, #dbe3dc); background: none; font: inherit; color: var(--procesos-tinta, #18201e); text-align: left; padding: 12px 4px; min-height: 52px; cursor: pointer; }
 .procesos-menu-celu button.peligro { color: var(--procesos-peligro, #b42318); border-bottom: 0; }
-.procesos-dibujo-celu .bjs-powered-by { top: 8px; left: 8px; right: auto; bottom: auto; }
+.procesos-dibujo-celu .bjs-powered-by { top: 8px !important; left: 8px !important; right: auto !important; bottom: auto !important; }

@@ -193,7 +193,7 @@ export function EditorCompu({ procesos, puede, pantallas, guardarLocal }: { proc
             {FIGURAS.map((f) => (
               <button key={f.tipo} type="button" className="procesos-figura" title={f.nombre} aria-label={f.nombre} data-testid={`procesos-figura-${f.tipo}`}
                 onMouseDown={(e) => { e.preventDefault(); d.lienzo.current?.empezarArrastre(e.nativeEvent, f.tipo); }}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); d.lienzo.current?.agregar(f.tipo, d.elegido); } }}>
+                onClick={() => d.lienzo.current?.agregar(f.tipo, d.elegido)}>
                 <Icono nombre={f.tipo as NombreDeIcono} tam={figuras ? 22 : 24} />{figuras && <span>{f.nombre}</span>}
               </button>
             ))}

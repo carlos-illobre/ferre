@@ -114,6 +114,24 @@ export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, sol
       marcarErrores();
       avisos.current.alCambiar?.();
     });
+    // Un nombre largo se parte en renglones dentro de la figura: si no entra, la tarea crece (E15).
+    // Se mira después de dibujar, cuando el texto ya tiene sus renglones.
+    bus.on("elements.changed", (e) => {
+      if (soloLectura) return;
+      const elementos = (e as unknown as { elements: Elemento[] }).elements;
+      const registro = v.get("elementRegistry") as { getGraphics(e: Elemento): SVGGElement | null };
+      for (const el of elementos) {
+        if (!/Task$|^bpmn:SubProcess$|^bpmn:CallActivity$/.test(el.type ?? "")) continue;
+        const texto = registro.getGraphics(el)?.querySelector<SVGTextElement>(".djs-visual text");
+        const alto = texto?.getBBox().height ?? 0;
+        if (alto + 16 <= el.height) continue;
+        setTimeout(() => {
+          if (visor.current !== v) return;
+          (v.get("modeling") as { resizeShape(e: Elemento, b: { x: number; y: number; width: number; height: number }): void })
+            .resizeShape(el, { x: el.x, y: el.y, width: el.width, height: Math.ceil(alto + 24) });
+        }, 0);
+      }
+    });
     bus.on("selection.changed", (e) => {
       const elegido = e.newSelection?.length === 1 ? e.newSelection[0]! : null;
       avisos.current.alElegir?.(elegido && !elegido.labelTarget ? elegido.id : null);

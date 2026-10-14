@@ -136,7 +136,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
                 <button key={f.tipo} type="button" className="procesos-figura-celu" data-testid={`procesos-figura-${f.tipo}`}
                   onTouchStart={(e) => d.lienzo.current?.empezarArrastre(e.nativeEvent, f.tipo)}
                   onMouseDown={(e) => { if (e.button === 0) d.lienzo.current?.empezarArrastre(e.nativeEvent, f.tipo); }}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); d.lienzo.current?.agregar(f.tipo, d.elegido); } }}>
+                  onClick={() => d.lienzo.current?.agregar(f.tipo, d.elegido)}>
                   <Icono nombre={f.tipo as NombreDeIcono} tam={28} /><span>{f.nombre}</span>
                 </button>
               ))}
@@ -251,6 +251,10 @@ function ListaDePasos({ items, dibuja, elegido, alTocar, alMover, alAgregar }: {
       return;
     }
     e.preventDefault();
+    // Cerca del borde de arriba o de abajo, la pantalla se corre para llegar a toda la lista.
+    const borde = 90;
+    if (e.clientY > window.innerHeight - borde) window.scrollBy(0, 24);
+    else if (e.clientY < borde) window.scrollBy(0, -24);
     const bajo = document.elementsFromPoint?.(e.clientX, e.clientY).find((el) => el.hasAttribute("data-lugar"));
     setArrastre({ ...arrastre, dy: e.clientY - arrastre.y0, lugar: bajo?.getAttribute("data-lugar") ?? arrastre.lugar });
   };
