@@ -7,6 +7,10 @@ import { config } from "../config.js";
 import type { CompraReciente, RenglonDeCompra } from "../contratos/compras.js";
 import type { Enviable } from "../enviable.js";
 
+// Los tipos van con alias: la prueba del SQL con parámetros reconoce `sql<Tipo>` sin anidar.
+type Reciente = Enviable<CompraReciente>;
+type Renglon = Enviable<RenglonDeCompra>;
+
 // Compras (ingreso de mercadería): el acceso a los datos (ADR-018). Consultas escritas a mano
 // con Kysely (`sql`), con el tipo de lo que devuelven; los valores van como parámetros. Las
 // fotos de los comprobantes son archivos en una carpeta propia.
@@ -63,7 +67,7 @@ export async function renglonesQueFaltan(e: Ejecutor, pedidoId: string): Promise
 }
 export const estadoDelPedido = (e: Ejecutor, pedidoId: string, estado: string) => sql`UPDATE pedido SET estado = ${estado} WHERE id = ${pedidoId}`.execute(e);
 
-export const recientes = (e: Ejecutor) => sql<Enviable<CompraReciente>>`SELECT co.id, co.fecha::text, co.comprobante_tipo, co.comprobante_numero, co.total, co.estado, co.nota, co.creado_en, pr.nombre AS proveedor,
+export const recientes = (e: Ejecutor) => sql<Reciente>`SELECT co.id, co.fecha::text, co.comprobante_tipo, co.comprobante_numero, co.total, co.estado, co.nota, co.creado_en, pr.nombre AS proveedor,
         (SELECT '/compras/fotos/' || f.archivo FROM foto_comprobante f WHERE f.compra_id = co.id ORDER BY f.creado_en LIMIT 1) AS foto,
         (SELECT count(*) FROM item_compra i WHERE i.compra_id = co.id) AS renglones,
         COALESCE((SELECT json_agg(json_build_object('descripcion', p.descripcion, 'cantidad', i.cantidad, 'costo_unitario', i.costo_unitario) ORDER BY i.orden)
@@ -77,7 +81,7 @@ export const gastosDeLaSemana = (e: Ejecutor) => sql<{ proveedor: string; total:
   GROUP BY pr.nombre ORDER BY SUM(co.total) DESC`.execute(e).then((r) => r.rows);
 
 export const renglonesDe = (e: Ejecutor, compraId: string) =>
-  sql<Enviable<RenglonDeCompra>>`SELECT i.orden, i.cantidad, i.costo_unitario, p.descripcion, p.marca FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = ${compraId} ORDER BY i.orden`.execute(e).then((r) => r.rows);
+  sql<Renglon>`SELECT i.orden, i.cantidad, i.costo_unitario, p.descripcion, p.marca FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = ${compraId} ORDER BY i.orden`.execute(e).then((r) => r.rows);
 
 export async function marcarAnulada(e: Ejecutor, id: string): Promise<boolean> {
   return Number((await sql`UPDATE compra SET estado = 'anulada' WHERE id = ${id} AND estado = 'confirmada'`.execute(e)).numAffectedRows ?? 0n) > 0;
