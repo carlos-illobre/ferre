@@ -157,3 +157,33 @@ test("011-E37 011-E38 quien solo puede ver mira el vigente sin poder cambiarlo; 
   await expect(page.getByTestId("mas")).toBeVisible();
   await expect(page.getByTestId("mas-procesos")).toHaveCount(0);
 });
+
+// Un proceso grande: 200 pasos en fila, con su dibujo.
+function procesoDe(pasos: number): string {
+  const nodos = Array.from({ length: pasos }, (_, i) => i === 0 ? `<bpmn:startEvent id="N0" />` : i === pasos - 1 ? `<bpmn:endEvent id="N${i}" />` : `<bpmn:task id="N${i}" name="Paso ${i}" />`).join("");
+  const flechas = Array.from({ length: pasos - 1 }, (_, i) => `<bpmn:sequenceFlow id="F${i}" sourceRef="N${i}" targetRef="N${i + 1}" />`).join("");
+  const formas = Array.from({ length: pasos }, (_, i) => `<bpmndi:BPMNShape id="N${i}_di" bpmnElement="N${i}"><dc:Bounds x="${(i % 20) * 160}" y="${Math.floor(i / 20) * 140}" width="${i === 0 || i === pasos - 1 ? 36 : 100}" height="${i === 0 || i === pasos - 1 ? 36 : 80}" /></bpmndi:BPMNShape>`).join("");
+  const lineas = Array.from({ length: pasos - 1 }, (_, i) => `<bpmndi:BPMNEdge id="F${i}_di" bpmnElement="F${i}"><di:waypoint x="${(i % 20) * 160 + 100}" y="${Math.floor(i / 20) * 140 + 40}" /><di:waypoint x="${((i + 1) % 20) * 160}" y="${Math.floor((i + 1) / 20) * 140 + 40}" /></bpmndi:BPMNEdge>`).join("");
+  return `<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="D" targetNamespace="x"><bpmn:process id="P">${nodos}${flechas}</bpmn:process><bpmndi:BPMNDiagram id="DD"><bpmndi:BPMNPlane id="PL" bpmnElement="P">${formas}${lineas}</bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn:definitions>`;
+}
+
+test("011-E43 un proceso de 200 pasos se abre y se mueve sin trabarse", async ({ page }) => {
+  const api = process.env.API_URL ?? "http://localhost";
+  const creado = await page.request.post(`${api}/procesos`, { headers: { Authorization: `Bearer ${TOKEN}` }, data: { nombre: "Grande E2E", bpmn: procesoDe(200) } });
+  expect(creado.status()).toBe(201);
+  const { id } = (await creado.json()) as { id: string };
+  await page.addInitScript(([t, ultimo]) => { localStorage.setItem("ferre.sesion", t); localStorage.setItem("procesos.ultimo", JSON.stringify(ultimo)); }, [TOKEN, id] as const);
+  const inicio = Date.now();
+  await page.goto("/#/procesos");
+  await expect(page.getByText("Grande E2E", { exact: true })).toBeVisible();
+  await expect(formas(page)).toHaveCount(200);
+  expect(Date.now() - inicio).toBeLessThan(8000);
+  // Mover el dibujo arrastrando el fondo: 20 pasos del mouse en menos de un segundo.
+  const lienzo = await page.getByTestId("procesos-lienzo").boundingBox();
+  const antes = Date.now();
+  await page.mouse.move(lienzo!.x + 30, lienzo!.y + lienzo!.height - 30);
+  await page.mouse.down();
+  await page.mouse.move(lienzo!.x + 330, lienzo!.y + lienzo!.height - 130, { steps: 20 });
+  await page.mouse.up();
+  expect(Date.now() - antes).toBeLessThan(1000);
+});

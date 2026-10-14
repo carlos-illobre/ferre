@@ -1095,36 +1095,61 @@ RNF-60:
     - "Las piezas nuevas de la plataforma (base local, cola, preferencias, navegación) se prueban a través de las pruebas de Ferrebress; no tienen pruebas propias que no nombren a Ferrebress"
 
 RF-90:
-  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
-  pruebas: []
+  estado: "Hecho (011-T002, 011-T006, 011-T007): Procesos en Más, con la lista, crear, cambiar el nombre, buscar, abrir y borrar, en la computadora y en el celular"
+  pruebas:
+    - microservices/procesos/servidor/src/reglas.test.ts
+    - microservices/procesos/servidor/src/rutas.test.ts
+    - microservices/procesos/web/src/compu/EditorCompu.test.tsx
+    - microservices/procesos/web/src/celu/ProcesosCelu.test.tsx
+    - microservices/web/src/pantallas/Procesos.test.tsx
   defectos: []
 
 RF-91:
-  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
-  pruebas: []
+  estado: "Hecho (011-T005, 011-T006, 011-T009): dibujar con bpmn-js arrastrando y soltando, con los tres paneles plegables, el paso elegido y la tabla de pasos"
+  pruebas:
+    - microservices/procesos/web/src/modelo/modelo.test.ts
+    - microservices/procesos/web/src/compu/EditorCompu.test.tsx
+    - tests/e2e/escritorio/18-procesos.spec.ts
   defectos: []
 
 RF-92:
-  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
-  pruebas: []
+  estado: "A validar (011-T007, 011-T009): «Pasos» y «Diagrama» en el celular, probados en un navegador con tamaño de teléfono; falta probarlos con el dedo en un teléfono de verdad"
+  pruebas:
+    - microservices/procesos/web/src/celu/ProcesosCelu.test.tsx
+    - microservices/procesos/web/src/modelo/modelo.test.ts
+    - tests/e2e/celular/18-procesos.spec.ts
   defectos: []
 
 RF-93:
-  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
-  pruebas: []
+  estado: "Hecho (011-T002, 011-T006): borrador, vigente e historial con copiar al borrador"
+  pruebas:
+    - microservices/procesos/servidor/src/reglas.test.ts
+    - microservices/procesos/servidor/src/datos.test.ts
+    - microservices/procesos/web/src/compu/EditorCompu.test.tsx
   defectos: []
 
 RF-94:
-  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
-  pruebas: []
+  estado: "Hecho (011-T006, 011-T009): exportar en PNG o BPMN 2.0 e importar BPMN 2.0, validado en el servicio"
+  pruebas:
+    - microservices/procesos/servidor/src/reglas.test.ts
+    - microservices/procesos/web/src/compu/EditorCompu.test.tsx
+    - tests/e2e/escritorio/18-procesos.spec.ts
   defectos: []
 
 RF-95:
-  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
-  pruebas: []
+  estado: "Hecho (011-T004): «Ver procesos» y «Dibujar procesos», controlados en Ferrebress y en el servicio; los dos en el rol Gerente"
+  pruebas:
+    - microservices/procesos/servidor/src/rutas.test.ts
+    - microservices/api/src/rutas/procesos.test.ts
+    - microservices/api/src/rutas/roles.test.ts
+    - microservices/web/src/pantallas/Procesos.test.tsx
+    - tests/e2e/escritorio/18-procesos.spec.ts
   defectos: []
 
 RNF-61:
-  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
-  pruebas: []
+  estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"
+  pruebas:
+    - microservices/procesos/servidor/.dependency-cruiser.cjs
+    - microservices/procesos/web/.dependency-cruiser.cjs
+    - microservices/procesos/servidor/src/datos.test.ts
   defectos: []

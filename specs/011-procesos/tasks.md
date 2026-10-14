@@ -14,7 +14,7 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T007 El celular: «Pasos» y «Diagrama», con la hoja de figuras y el menú «⋯» (depende de T006)
 - [x] T008 Sin conexión y dos personas a la vez: mirar lo ya abierto y no perder un borrador ajeno (depende de T006)
 - [x] T009 Pruebas de punta a punta de dibujar, en el celular y en la computadora (depende de T007)
-- [ ] T010 Una prueba por escenario (E01 a E45), anotadas en `proyecto/estado.yml` (depende de T009)
+- [x] T010 Una prueba por escenario (E01 a E45), anotadas en `proyecto/estado.yml` (depende de T009)
 - [ ] T011 Comparar con la maqueta aprobada con capturas de computadora y de celular, y mostrarle a Carlos las diferencias (depende de T007)
 - [ ] T012 La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T010, T011)
 - [ ] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

@@ -14,6 +14,19 @@ function obligatoria(nombre: string): string {
 }
 
 const pool = new pg.Pool({ connectionString: obligatoria("DATABASE_URL") });
+
+// La base puede tardar más que este proceso en aceptar conexiones (arranque en frío): se espera
+// con reintentos. Un minuto sin base sigue siendo un error y corta el arranque.
+for (let intento = 1; ; intento++) {
+  try {
+    await pool.query("SELECT 1");
+    break;
+  } catch (error) {
+    if (intento >= 30) throw error;
+    console.log(`procesos: base sin responder (intento ${intento}/30), reintentando en 2 s`);
+    await new Promise((listo) => setTimeout(listo, 2000));
+  }
+}
 const aplicadas = await aplicarMigraciones(pool, path.resolve(process.cwd(), "migraciones"));
 if (aplicadas.length) console.log(`procesos: migraciones aplicadas ${aplicadas.join(", ")}`);
 
