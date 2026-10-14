@@ -270,3 +270,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T104 [agente] Atajo de teclado para todos los botones de la computadora: Alt y una letra (decisión 80, 001-T004)
 - [x] T106 [agente] Auditoría de arquitectura del código: informe en docs/auditoria-de-arquitectura.md, sin cambios en el código
 - [x] T107 [carlos] Decidir las cuatro preguntas del final de la auditoría de arquitectura (decisión 84)
+- [x] T108 [agente] Preparar el proyecto para sesiones de Claude Code en la nube
