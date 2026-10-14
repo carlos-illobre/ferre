@@ -3,6 +3,7 @@ import type { ApiDelLienzo } from "../editor/Lienzo";
 import type { Grafo } from "../modelo/grafo";
 import type { Procesos } from "../estado";
 import { exportarBpmn, exportarPng, leerArchivo } from "./exportar";
+import { avisoDeLoQueNoSeVe, loQueNoSeVe } from "../modelo/noSeVe";
 
 // Lo que comparten las dos interfaces alrededor del dibujo: el grafo al día para la tabla y la
 // lista, el paso elegido, el guardado medio segundo después del último cambio (E10), importar y
@@ -10,7 +11,8 @@ import { exportarBpmn, exportarPng, leerArchivo } from "./exportar";
 
 const VACIO: Grafo = { pasos: [], flechas: [], carriles: [] };
 
-export function useDibujo(procesos: Procesos) {
+/** `corto`: los avisos con los textos del celular. */
+export function useDibujo(procesos: Procesos, corto = false) {
   const lienzo = useRef<ApiDelLienzo>(null);
   const [grafo, setGrafo] = useState<Grafo>(VACIO);
   const [elegido, setElegido] = useState<string | null>(null);
@@ -45,7 +47,8 @@ export function useDibujo(procesos: Procesos) {
     }
   }, [procesos]);
 
-  /** E35, E36: lo que no se puede leer se dice acá; si es BPMN, lo dice el servicio. */
+  /** E35, E36: lo que no se puede leer se dice acá; si es BPMN, lo dice el servicio. Lo que trae
+   *  y acá no se ve se avisa después de importarlo. */
   const importar = useCallback(async (archivo: File) => {
     const leido = await leerArchivo(archivo);
     if ("error" in leido) {
@@ -55,8 +58,10 @@ export function useDibujo(procesos: Procesos) {
     const usados = new Set((procesos.lista ?? []).map((p) => p.nombre.toLocaleLowerCase("es")));
     let nombre = leido.nombre.slice(0, 110);
     for (let n = 2; usados.has(nombre.toLocaleLowerCase("es")); n++) nombre = `${leido.nombre.slice(0, 110)} (${n})`;
-    await procesos.crear(nombre, leido.texto);
-  }, [procesos]);
+    if (!(await procesos.crear(nombre, leido.texto))) return;
+    const aviso = avisoDeLoQueNoSeVe(loQueNoSeVe(leido.texto), corto);
+    if (aviso) procesos.avisar(aviso);
+  }, [procesos, corto]);
 
   const pasoElegido = elegido ? grafo.pasos.find((p) => p.id === elegido) ?? null : null;
   return { lienzo, grafo, elegido, setElegido, pasoElegido, alCambiar, alCargar: leerGrafo, exportar, importar };

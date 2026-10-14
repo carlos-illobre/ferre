@@ -239,3 +239,5 @@
 /* El paso elegido, con el naranja de la aplicación (maqueta aprobada), no con el azul de bpmn-js. */
 .procesos .djs-container { --element-selected-outline-stroke-color: var(--procesos-accion); }
 .procesos .djs-element.selected .djs-outline { stroke-dasharray: 4 3; stroke-width: 2px; }
+.procesos-acciones-celu .procesos-boton.ancho.principal { background: var(--procesos-accion); color: #fff; box-shadow: none; }
+.procesos-acciones-celu .procesos-boton.ancho.principal:active { background: var(--procesos-accion-fuerte); }

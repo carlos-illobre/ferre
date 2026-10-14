@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:otro="http://otro.programa/schema" id="D" targetNamespace="http://otro.programa">
+  <bpmn:process id="P" isExecutable="true">
+    <bpmn:extensionElements><otro:motor version="7"><otro:dato>x</otro:dato></otro:motor></bpmn:extensionElements>
+    <bpmn:startEvent id="I" />
+    <bpmn:task id="T" name="Hacer" />
+    <bpmn:boundaryEvent id="B" attachedToRef="T" />
+    <bpmn:task id="Oculta" name="Sin dibujo" />
+    <bpmn:sequenceFlow id="F" sourceRef="I" targetRef="T" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="DI"><bpmndi:BPMNPlane id="Plano" bpmnElement="P">
+    <bpmndi:BPMNShape id="I_di" bpmnElement="I"><dc:Bounds x="0" y="0" width="36" height="36" /></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="T_di" bpmnElement="T"><dc:Bounds x="100" y="0" width="100" height="80" /></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="B_di" bpmnElement="B"><dc:Bounds x="150" y="60" width="36" height="36" /></bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="F_di" bpmnElement="F" />
+  </bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+</bpmn:definitions>

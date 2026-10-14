@@ -56,7 +56,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
     observador.observe(hoja);
     return () => observador.disconnect();
   });
-  const d = useDibujo(procesos);
+  const d = useDibujo(procesos, true);
   const dibuja = puede.dibujar && !procesos.sinConexion;
   const { abierto, lista } = procesos;
   const xml = abierto ? bpmnAMostrar(abierto, puede) : null;
@@ -182,7 +182,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
           <FormularioDelPaso corto paso={d.pasoElegido} grafo={d.grafo} pantallas={pantallas} soloLectura={!dibuja} alCambiar={(c) => d.lienzo.current?.cambiar(d.pasoElegido!.id, c)} />
           {dibuja && (
             <div className="procesos-acciones-celu">
-              <button type="button" className="procesos-boton ancho" onClick={() => { const siguiente = d.grafo.flechas.find((f) => f.desde === d.pasoElegido!.id)?.hasta ?? null; setLugarNuevo({ desde: d.pasoElegido!.id, hasta: siguiente }); setHoja("agregar"); }} data-testid="procesos-agregar-despues"><Icono nombre="mas" /> Agregar un paso después</button>
+              <button type="button" className="procesos-boton ancho principal" onClick={() => { const siguiente = d.grafo.flechas.find((f) => f.desde === d.pasoElegido!.id)?.hasta ?? null; setLugarNuevo({ desde: d.pasoElegido!.id, hasta: siguiente }); setHoja("agregar"); }} data-testid="procesos-agregar-despues"><Icono nombre="mas" /> Agregar un paso después</button>
               <button type="button" className="procesos-boton texto peligro" onClick={() => { d.lienzo.current?.aplicarFlechas([alQuitar(d.grafo, d.pasoElegido!.id)]); d.lienzo.current?.quitar(d.pasoElegido!.id); setHoja(null); }} data-testid="procesos-quitar-paso"><Icono nombre="tacho" /> Quitar el paso</button>
             </div>
           )}

@@ -159,6 +159,21 @@ test("011-E33 011-E34 exportar baja una imagen PNG y un BPMN con el nombre del p
   expect(datos.length).toBeGreaterThan(5000);
 });
 
+test("011-E35 importar un BPMN de otro programa avisa lo que no se ve, y al exportarlo sale igual", async ({ page }) => {
+  await procesoVigente(page, "Antes de importar E2E");
+  await entrar(page);
+  await expect(page.getByTestId("procesos-lienzo")).toBeVisible();
+  await page.getByTestId("procesos-archivo").setInputFiles("../../microservices/procesos/web/src/modelo/ejemplos/de-otro-programa.bpmn");
+  await expect(page.getByRole("alert").filter({ hasText: "acá no se ven" })).toContainText("1 elemento de BPMN que Procesos no maneja, 1 paso sin lugar en el dibujo, 1 dato del programa de donde viene");
+  await expect(page.locator(".procesos-selector-nombre")).toHaveText("de-otro-programa");
+  await page.getByTestId("procesos-exportar").click();
+  const [bpmn] = await Promise.all([page.waitForEvent("download"), page.getByTestId("procesos-exportar-bpmn").click()]);
+  const exportado = readFileSync((await bpmn.path())!, "utf8");
+  expect(exportado).toContain("<otro:motor");
+  expect(exportado).toMatch(/<bpmn:boundaryEvent id="B"/);
+  expect(exportado).toMatch(/<bpmn:task id="Oculta"/);
+});
+
 test("011-E37 011-E38 quien solo puede ver mira el vigente sin poder cambiarlo; sin permiso, Más no lo ofrece", async ({ page }) => {
   await procesoVigente(page, "Para mirar E2E");
   await entrar(page, TOKEN_LECTOR);
