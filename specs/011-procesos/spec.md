@@ -4,9 +4,9 @@
 
 **Created**: 2026-10-14
 
-**Status**: Para aprobar
+**Status**: Aprobada (2026-10-14)
 
-**Maquetas**: Elegida, a confirmar con los tres paneles plegables (`maquetas/elegida.html`)
+**Maquetas**: Aprobada `maquetas/elegida.html` (2026-10-14); `a-`, `b-` y `c-` son las variantes de las que salió
 
 **Input**: «Quiero que agregues a la opción "Más" una pantalla nueva llamada "Procesos". Esta
 pantalla la quiero reutilizar en varios otros proyectos, así que tratá de hacerla lo más

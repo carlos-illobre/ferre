@@ -1095,36 +1095,36 @@ RNF-60:
     - "Las piezas nuevas de la plataforma (base local, cola, preferencias, navegación) se prueban a través de las pruebas de Ferrebress; no tienen pruebas propias que no nombren a Ferrebress"
 
 RF-90:
-  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
   pruebas: []
   defectos: []
 
 RF-91:
-  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
   pruebas: []
   defectos: []
 
 RF-92:
-  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
   pruebas: []
   defectos: []
 
 RF-93:
-  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
   pruebas: []
   defectos: []
 
 RF-94:
-  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
   pruebas: []
   defectos: []
 
 RF-95:
-  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
   pruebas: []
   defectos: []
 
 RNF-61:
-  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  estado: "Nuevo: especificado y aprobado en 011-procesos, sin construir"
   pruebas: []
   defectos: []
