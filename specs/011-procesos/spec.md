@@ -55,7 +55,7 @@ decisión y dos fines, unirlos, cerrar la pantalla, volver y encontrarlo igual.
 
 **Acceptance Scenarios**:
 
-- **E01** **Given** alguien con «Dibujar procesos» en la computadora, **When** abre Más → Procesos, **Then** ve el último proceso que abrió (o la lista, si nunca abrió uno), con las figuras a la izquierda, el dibujo y los tres paneles plegados.
+- **E01** **Given** alguien con «Dibujar procesos» en la computadora, **When** abre Más → Procesos, **Then** ve el último proceso que abrió (o el primero de la lista, que es el último que alguien cambió, si nunca abrió uno en ese dispositivo; decisión de Carlos del 2026-10-14), con las figuras a la izquierda, el dibujo y los tres paneles plegados.
 - **E02** **Given** un proceso abierto, **When** arrastra una figura de la izquierda al dibujo, **Then** el paso aparece donde la soltó, queda elegido y el panel del paso elegido se abre si estaba plegado.
 - **E03** **Given** las figuras de la izquierda, **When** se las mira, **Then** están las de BPMN que usa un negocio: inicio, tarea, tarea de una persona, tarea del sistema, decisión, en paralelo, espera, fin, subproceso, carril, documento y nota; cada una con su nombre, o solo con el ícono si el panel está plegado (el nombre aparece al pasar el mouse).
 - **E04** **Given** dos pasos en el dibujo, **When** se arrastra desde el borde de uno hasta el otro, **Then** quedan unidos por una flecha; si sale de una decisión, la flecha lleva el nombre de la opción («Sí», «No»).

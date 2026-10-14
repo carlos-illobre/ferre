@@ -29,4 +29,8 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T023 [arreglo] En el celular, mantener apretado un paso del diagrama y arrastrarlo lo mueve (011-E05 y E30 con el dedo; avisó Carlos el 2026-10-14)
 - [x] T024 [ajuste] En el celular, la hoja del paso sigue el estilo de los formularios de la aplicación: tarjeta blanca con un renglón por dato, botones anchos y una cruz para cerrarla; los botoncitos del paso elegido quedan por debajo de los botones y las hojas (pedido de Carlos del 2026-10-14)
 - [x] T025 [ajuste] El paso elegido se marca con el naranja de la aplicación, como en la maqueta; elegir un paso en la computadora abre su panel si estaba plegado (T011; decisión de Carlos del 2026-10-14)
+- [x] T026 [regla] E01: quien nunca abrió un proceso en ese dispositivo ve el primero de la lista (revisión; decisión de Carlos del 2026-10-14)
+- [ ] T027 [arreglo] E35: al importar, avisar lo que Procesos no muestra y comprobar que sale igual al exportar (revisión)
+- [ ] T028 [arreglo] Seguridad, «Qué queda registrado»: cambiar el borrador se anota en «Quién hizo qué», y el borrado lleva el nombre del proceso (revisión)
+- [ ] T029 [arreglo] Si se corta la conexión con un proceso abierto, se deja de dibujar hasta que vuelva, sin perder el último cambio (aclaración «Sin conexión», E42; revisión)
 - [ ] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

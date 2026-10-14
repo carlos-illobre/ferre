@@ -37,6 +37,14 @@ describe("dibujar en la computadora", () => {
     expect(screen.queryByTestId("procesos-tabla")).toBeNull();
   });
 
+  it("011-E01 quien nunca abrió uno en esta computadora ve el primero de la lista", async () => {
+    await s.cargar("Compra a un proveedor");
+    await s.cargar("Venta en el mostrador");
+    const [primero] = (await s.como(DIBUJA)("/procesos")) as { nombre: string }[];
+    abrir();
+    expect(await screen.findByText(primero.nombre, { selector: ".procesos-selector-nombre" })).toBeTruthy();
+  });
+
   it("011-E02 apretar una figura de la izquierda empieza a arrastrarla al dibujo; elegir un paso abre su panel", async () => {
     await s.cargar("Venta");
     abrir();

@@ -103,7 +103,7 @@ export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: 
     }
   }, [pedir, guardarLocal, recordar]);
 
-  // Al entrar: la lista y el último proceso abierto en este dispositivo (E01), o el primero.
+  // Al entrar: la lista y el último proceso abierto en este dispositivo o, si nunca se abrió uno, el primero de la lista (E01).
   useEffect(() => {
     let vivo = true;
     void (async () => {
