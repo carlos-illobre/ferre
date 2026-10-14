@@ -12,7 +12,7 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T005 El modelo del front, sin pantallas: el recorrido para «Pasos» y la tabla, los errores de forma y los cambios de la lista (depende de T001)
 - [x] T006 La computadora: editor con `bpmn-js`, los tres paneles, el paso elegido, la tabla, los procesos, borrador y vigente, historial, importar y exportar (depende de T004, T005)
 - [x] T007 El celular: «Pasos» y «Diagrama», con la hoja de figuras y el menú «⋯» (depende de T006)
-- [ ] T008 Sin conexión y dos personas a la vez: mirar lo ya abierto y no perder un borrador ajeno (depende de T006)
+- [x] T008 Sin conexión y dos personas a la vez: mirar lo ya abierto y no perder un borrador ajeno (depende de T006)
 - [ ] T009 Pruebas de punta a punta de dibujar, en el celular y en la computadora (depende de T007)
 - [ ] T010 Una prueba por escenario (E01 a E45), anotadas en `proyecto/estado.yml` (depende de T009)
 - [ ] T011 Comparar con la maqueta aprobada con capturas de computadora y de celular, y mostrarle a Carlos las diferencias (depende de T007)

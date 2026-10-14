@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Proceso, ProcesoEnLista, Version, VersionEnHistorial } from "procesos-servidor/contrato";
 import { esErrorDePedido, type GuardarLocal, type Pedir, type Puede } from "./tipos";
 
@@ -37,7 +37,18 @@ export function estadoDe(p: Pick<Proceso, "vigente" | "borrador">): "vigente" | 
 }
 export const TEXTO_DEL_ESTADO = { vigente: "Vigente", borrador: "Borrador", "vigente-con-borrador": "Vigente, con cambios en borrador" } as const;
 
-export function useProcesos({ pedir, puede, guardarLocal }: { pedir: Pedir; puede: Puede; guardarLocal?: GuardarLocal | null }) {
+export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: GuardarLocal | null }) {
+  const { puede } = props;
+  // `pedir` y el guardado pueden llegar distintos en cada render: se usan los últimos sin
+  // volver a cargar todo cada vez.
+  const ultimos = useRef(props);
+  ultimos.current = props;
+  const pedir = useCallback<Pedir>((ruta, init) => ultimos.current.pedir(ruta, init), []);
+  const guardarLocal = useMemo<GuardarLocal>(() => ({
+    getItem: (k) => ultimos.current.guardarLocal?.getItem(k) ?? null,
+    setItem: (k, v) => ultimos.current.guardarLocal?.setItem(k, v),
+    removeItem: (k) => ultimos.current.guardarLocal?.removeItem(k),
+  }), []);
   const [lista, setLista] = useState<ProcesoEnLista[] | null>(null);
   const [abierto, setAbierto] = useState<Proceso | null>(null);
   const [cargando, setCargando] = useState(true);
