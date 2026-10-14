@@ -28,22 +28,15 @@ otro proceso, para después poder usar esa información para tomar decisiones.»
 - Q: ¿Qué datos guarda cada paso? → A: Por ahora, lo que se ve: nombre, tipo, quién lo hace, en qué pantalla de Ferrebress se hace, cómo se hace y con qué sigue. Después se van a ir agregando más.
 - Q: ¿Los procesos se conectan con lo que pasa en Ferrebress (medir cuánto tarda una venta real)? → A: Por ahora solo se dibujan. Se van a conectar más adelante.
 - Q: ¿Hay borrador y vigente, y se guardan las versiones anteriores? → A: Sí, como en la maqueta.
-- Q: ¿Quién puede dibujar? → A: Hace falta un permiso nuevo.
 - Q: ¿Se guarda en un formato estándar? → A: Sí, en BPMN. Al exportar se elige entre una imagen (PNG) y el formato estándar.
 - Q: ¿Se puede traer un proceso de otro programa? → A: Sí: al lado de Exportar hay un botón Importar que recibe el formato estándar (BPMN).
 - Q: ¿Por qué el código va aparte? → A: Carlos quiere llevar esta pantalla a otros proyectos. Si no hubiera una sola base de datos, sería un servicio aparte; como hay una sola, usa la de Ferrebress, pero sus datos y su código no dependen de los de Ferrebress.
 
-**Lo que decidió el agente, a confirmar por Carlos al aprobar:**
-
-- Ver los procesos no pide permiso: cualquiera con sesión los puede mirar, porque cuentan
-  cómo se trabaja. El permiso nuevo es para dibujar, cambiar, marcar vigente, importar y
-  borrar.
-- El permiso nuevo arranca dado al rol Gerente.
-- Un proceso se guarda solo a medida que se dibuja, como los demás borradores de la
-  aplicación; no hay botón «Guardar».
-- Sin conexión se pueden mirar los procesos ya abiertos en ese dispositivo, pero no se
-  dibuja: no es trabajo del mostrador y así no hay dos versiones que unir.
-- Borrar un proceso pide confirmación, porque no se puede recuperar.
+- Q: ¿Qué permisos hay? → A: Dos. «Ver procesos» deja mirarlos. «Dibujar procesos» deja todo lo de ver, más cambiarlos y exportarlos (también crear, marcar vigente, importar y borrar). Sin ninguno de los dos, «Procesos» no aparece en Más.
+- Q: ¿Quién los tiene al empezar? → A: El rol Gerente, los dos (propuesta del agente, aceptada).
+- Q: ¿Hay botón «Guardar»? → A: No: un proceso se guarda solo a medida que se dibuja, como los demás borradores de la aplicación (propuesta del agente, aceptada).
+- Q: ¿Sin conexión? → A: Se pueden mirar los procesos ya abiertos en ese dispositivo, pero no se dibuja: no es trabajo del mostrador y así no hay dos versiones que unir (propuesta del agente, aceptada).
+- Q: ¿Borrar pide confirmación? → A: Sí, porque no se puede recuperar (propuesta del agente, aceptada).
 
 ## User Scenarios & Testing
 
@@ -61,7 +54,7 @@ decisión y dos fines, unirlos, cerrar la pantalla, volver y encontrarlo igual.
 
 **Acceptance Scenarios**:
 
-- **E01** **Given** alguien con el permiso de dibujar procesos en la computadora, **When** abre Más → Procesos, **Then** ve el último proceso que abrió (o la lista, si nunca abrió uno), con las figuras a la izquierda, el dibujo y los tres paneles plegados.
+- **E01** **Given** alguien con «Dibujar procesos» en la computadora, **When** abre Más → Procesos, **Then** ve el último proceso que abrió (o la lista, si nunca abrió uno), con las figuras a la izquierda, el dibujo y los tres paneles plegados.
 - **E02** **Given** un proceso abierto, **When** arrastra una figura de la izquierda al dibujo, **Then** el paso aparece donde la soltó, queda elegido y el panel del paso elegido se abre si estaba plegado.
 - **E03** **Given** las figuras de la izquierda, **When** se las mira, **Then** están las de BPMN que usa un negocio: inicio, tarea, tarea de una persona, tarea del sistema, decisión, en paralelo, espera, fin, subproceso, carril, documento y nota; cada una con su nombre, o solo con el ícono si el panel está plegado (el nombre aparece al pasar el mouse).
 - **E04** **Given** dos pasos en el dibujo, **When** se arrastra desde el borde de uno hasta el otro, **Then** quedan unidos por una flecha; si sale de una decisión, la flecha lleva el nombre de la opción («Sí», «No»).
@@ -89,7 +82,7 @@ mostrador» desde la lista, volver, borrar el primero.
 
 **Acceptance Scenarios**:
 
-- **E16** **Given** ningún proceso cargado, **When** se abre Procesos, **Then** la pantalla dice qué es un proceso y ofrece «Proceso nuevo» (si tiene el permiso) o explica que todavía no hay ninguno (si no lo tiene).
+- **E16** **Given** ningún proceso cargado, **When** se abre Procesos, **Then** la pantalla dice qué es un proceso y ofrece «Proceso nuevo» (con «Dibujar procesos») o explica que todavía no hay ninguno (con «Ver procesos» solo).
 - **E17** **Given** «Proceso nuevo», **When** se escribe un nombre, **Then** se crea con un inicio ya puesto, en borrador, y se abre.
 - **E18** **Given** un nombre vacío o igual al de otro proceso, **When** se lo quiere guardar, **Then** no se guarda y se dice por qué.
 - **E19** **Given** el selector de procesos, **When** se lo abre, **Then** lista todos, con su estado (borrador o vigente) y cuántos pasos tiene, con un buscador; elegir uno lo abre.
@@ -107,7 +100,7 @@ vigente otra vez y encontrar la versión anterior en el historial.
 
 **Acceptance Scenarios**:
 
-- **E21** **Given** un proceso vigente, **When** alguien con el permiso le cambia algo, **Then** el cambio queda en un borrador; quien no tiene el permiso sigue viendo el vigente.
+- **E21** **Given** un proceso vigente, **When** alguien con «Dibujar procesos» le cambia algo, **Then** el cambio queda en un borrador; quien tiene solo «Ver procesos» sigue viendo el vigente.
 - **E22** **Given** un borrador, **When** se lo marca vigente, **Then** pasa a ser el que vale, la versión anterior queda en el historial con su fecha y quién la hizo, y queda registrado en «Quién hizo qué».
 - **E23** **Given** el historial de un proceso, **When** se elige una versión anterior, **Then** se la ve sin poder cambiarla, y se la puede copiar al borrador para volver a ella.
 - **E24** **Given** un borrador, **When** se lo descarta, **Then** el proceso vuelve a ser el vigente.
@@ -146,7 +139,7 @@ BPMN como un proceso nuevo y encontrarlo igual.
 
 **Acceptance Scenarios**:
 
-- **E32** **Given** un proceso abierto, **When** se elige Exportar, **Then** se ofrece «Imagen (PNG)», para mandar o imprimir, y «BPMN (estándar)», para abrirlo en otro programa de procesos; en el celular, desde el menú «⋯».
+- **E32** **Given** un proceso abierto por alguien con «Dibujar procesos», **When** se elige Exportar, **Then** se ofrece «Imagen (PNG)», para mandar o imprimir, y «BPMN (estándar)», para abrirlo en otro programa de procesos; en el celular, desde el menú «⋯».
 - **E33** **Given** «Imagen (PNG)», **When** se lo elige, **Then** se baja una imagen con el proceso entero, su nombre, su estado y la fecha, legible al imprimirla en una hoja A4.
 - **E34** **Given** «BPMN (estándar)», **When** se lo elige, **Then** se baja un archivo BPMN 2.0 que otro programa de BPMN abre con los mismos pasos, flechas, carriles y posiciones.
 - **E35** **Given** un archivo BPMN 2.0 de otro programa, **When** se lo trae con el botón Importar, al lado de Exportar (en el celular, desde el menú «⋯»), **Then** queda como un proceso nuevo en borrador; lo que Procesos no sabe mostrar se conserva al volver a exportarlo y se avisa que no se ve.
@@ -154,14 +147,17 @@ BPMN como un proceso nuevo y encontrarlo igual.
 
 ### User Story 6 - Quién puede qué (Priority: P2)
 
-Dibujar procesos pide un permiso nuevo, «Dibujar procesos». Mirarlos no pide permiso.
+Hay dos permisos nuevos: «Ver procesos», para mirar, y «Dibujar procesos», que deja todo lo
+de ver más cambiar y exportar. Sin ninguno de los dos, la pantalla no existe para esa
+persona.
 
 **Acceptance Scenarios**:
 
-- **E37** **Given** cualquier usuario con sesión, **When** abre Más, **Then** ve «Procesos» y puede mirar los procesos vigentes, sus pasos y exportarlos.
-- **E38** **Given** un usuario sin «Dibujar procesos», **When** abre un proceso, **Then** no ve las figuras, los botones de cambiar ni los borradores; el dibujo no se puede mover de lugar ni editar.
-- **E39** **Given** un usuario sin «Dibujar procesos», **When** pide al servidor crear, cambiar, marcar vigente, importar o borrar un proceso, **Then** el servidor lo rechaza diciendo qué permiso hace falta.
-- **E40** **Given** el sistema recién actualizado, **When** se miran los roles, **Then** «Dibujar procesos» figura en la parte «Negocio» y lo tiene el rol Gerente.
+- **E37** **Given** un usuario sin «Ver procesos» ni «Dibujar procesos», **When** abre Más en el celular o en la computadora, **Then** «Procesos» no aparece; si entra a su dirección, ve que no tiene permiso y cuáles hacen falta.
+- **E38** **Given** un usuario con «Ver procesos» y sin «Dibujar procesos», **When** abre un proceso, **Then** ve el vigente, sus pasos (en la tabla o en «Pasos») y su historial, y puede acercar, alejar y mover la vista; no ve las figuras, Importar, Exportar, Proceso nuevo, los botones de cambiar ni los borradores, y los pasos no se pueden mover ni editar.
+- **E39** **Given** un usuario sin «Dibujar procesos», **When** pide al servidor crear, cambiar, marcar vigente, importar, exportar o borrar un proceso, **Then** el servidor lo rechaza diciendo qué permiso hace falta; sin ninguno de los dos, también rechaza leerlos.
+- **E40** **Given** el sistema recién actualizado, **When** se miran los roles, **Then** «Ver procesos» y «Dibujar procesos» figuran en la parte «Negocio» y los tiene el rol Gerente.
+- **E45** **Given** un usuario con «Dibujar procesos» y sin «Ver procesos», **When** abre Más, **Then** ve «Procesos» y puede todo: dibujar incluye ver.
 
 ### Edge Cases
 
@@ -179,11 +175,11 @@ Dibujar procesos pide un permiso nuevo, «Dibujar procesos». Mirarlos no pide p
 - **RF-92**: En el celular, el proceso se arma como lista de pasos que se ordenan arrastrando, o en el dibujo.
 - **RF-93**: Cada proceso tiene un vigente y un borrador; al marcar vigente el borrador, la versión anterior queda en el historial.
 - **RF-94**: Exportar un proceso como imagen PNG o en BPMN 2.0 estándar, e importar un BPMN 2.0 de otro programa.
-- **RF-95**: Dibujar procesos pide el permiso «Dibujar procesos»; mirarlos no pide permiso.
+- **RF-95**: Dos permisos: «Ver procesos» deja mirarlos; «Dibujar procesos» deja además cambiarlos, importarlos y exportarlos. Sin ninguno, «Procesos» no aparece en Más.
 
 ### Non-Functional Requirements
 
-- **RNF-61**: Procesos se puede llevar a otro proyecto sin el resto de Ferrebress: su regla, sus datos y sus pantallas están aparte y no usan nada propio de Ferrebress. Lo que necesita de la aplicación que lo usa (la sesión, quién tiene el permiso, la lista de pantallas que se nombran en un paso, la paleta) se lo da esa aplicación. Usa la misma base de datos que Ferrebress, con sus propias tablas, sin unirlas a las de Ferrebress, para poder pasarlas a una base propia moviéndolas tal cual. Cada proceso se guarda en BPMN 2.0, que es estándar.
+- **RNF-61**: Procesos se puede llevar a otro proyecto sin el resto de Ferrebress: su regla, sus datos y sus pantallas están aparte y no usan nada propio de Ferrebress. Lo que necesita de la aplicación que lo usa (la sesión, quién tiene cada permiso, la lista de pantallas que se nombran en un paso, la paleta) se lo da esa aplicación. Usa la misma base de datos que Ferrebress, con sus propias tablas, sin unirlas a las de Ferrebress, para poder pasarlas a una base propia moviéndolas tal cual. Cada proceso se guarda en BPMN 2.0, que es estándar.
 
 ### Key Entities
 
@@ -196,7 +192,7 @@ Dibujar procesos pide un permiso nuevo, «Dibujar procesos». Mirarlos no pide p
 
 - **SC-01**: Carlos dibuja «Venta en el mostrador» completo (unos 10 pasos, dos carriles y una decisión) en menos de 15 minutos la primera vez, sin manual.
 - **SC-02**: Un BPMN exportado se abre en otro programa de BPMN con los mismos pasos y flechas.
-- **SC-03**: Llevar Procesos a otro proyecto no requiere cambiar su regla ni sus pantallas: solo darle la sesión, el permiso, la lista de pantallas y la paleta.
+- **SC-03**: Llevar Procesos a otro proyecto no requiere cambiar su regla ni sus pantallas: solo darle la sesión, los permisos, la lista de pantallas y la paleta.
 
 ## Out of Scope (por ahora)
 

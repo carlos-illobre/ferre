@@ -160,7 +160,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-92 | En el celular, el proceso se arma como lista de pasos que se ordenan arrastrando, o en el dibujo | [011-procesos](011-procesos/spec.md) |
 | RF-93 | Cada proceso tiene un vigente y un borrador; al marcar vigente el borrador, la versión anterior queda en el historial | [011-procesos](011-procesos/spec.md) |
 | RF-94 | Exportar un proceso como imagen PNG o en BPMN 2.0 estándar, e importar un BPMN 2.0 de otro programa | [011-procesos](011-procesos/spec.md) |
-| RF-95 | Dibujar procesos pide el permiso «Dibujar procesos»; mirarlos no pide permiso | [011-procesos](011-procesos/spec.md) |
+| RF-95 | Dos permisos: «Ver procesos» deja mirarlos; «Dibujar procesos» deja además cambiarlos, importarlos y exportarlos. Sin ninguno, «Procesos» no aparece en Más | [011-procesos](011-procesos/spec.md) |
 
 ## Requerimientos no funcionales
 
