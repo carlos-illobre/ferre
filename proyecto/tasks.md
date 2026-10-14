@@ -274,5 +274,5 @@ Las reglas no van acá: van en `specs/`.
 - [x] T109 [agente] Las skills de animación adaptadas pasan al repositorio para las sesiones en la nube
 - [x] T110 [agente] Revisión de tipos después de cada edición
 - [x] T111 [agente] Procesos: tres maquetas del editor de procesos con BPMN (Más → Procesos), en computadora y celular, en specs/011-procesos/maquetas; se puede llevar a otros proyectos y usa la misma base de datos
-- [ ] T112 [carlos] Procesos: elegir una maqueta y decir qué cambiarle
+- [x] T112 [carlos] Procesos: elegir una maqueta y decir qué cambiarle (computadora: A con el panel de pasos de C, plegable; celular: B con «Pasos» y «Diagrama» como en A; maquetas/elegida.html)
 - [ ] T113 [agente] Procesos: especificación, con las preguntas que la maqueta dejó abiertas (depende de T112)
