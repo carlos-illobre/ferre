@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
 import { computadorasDelCelular } from "../acceso/reglas.js";
 import * as fotos from "../acceso/fotos.js";
+import type { FotoRecibida, PedidoDeFotoNuevo } from "../contratos/pedidos-de-foto.js";
 
 // Pedido de foto (la computadora le pide una foto al celular). La ruta solo traduce (ADR-018);
 // las reglas están en `acceso/fotos.ts`.
@@ -11,7 +12,7 @@ pedidosDeFoto.use("/*", exigirSesion);
 export const fotosQueEsperan = fotos.queEsperan;
 
 pedidosDeFoto.post("/", async (c) => {
-  const cuerpo = await c.req.json<{ para?: string }>().catch(() => ({}) as { para?: string });
+  const cuerpo = await c.req.json<PedidoDeFotoNuevo>().catch(() => ({}) as PedidoDeFotoNuevo);
   return c.json(fotos.pedir(cuerpo.para, c.get("sesion").id), 201);
 });
 
@@ -27,7 +28,7 @@ pedidosDeFoto.get("/:codigo", (c) => {
 
 pedidosDeFoto.post("/:codigo/foto", async (c) => {
   const rechazo = await fotos.recibir(c.req.param("codigo"), (await c.req.parseBody()).foto);
-  return rechazo ? c.json({ error: rechazo.error }, rechazo.estado) : c.json({ ok: true }, 201);
+  return rechazo ? c.json({ error: rechazo.error }, rechazo.estado) : c.json({ ok: true } satisfies FotoRecibida, 201);
 });
 
 pedidosDeFoto.get("/:codigo/foto", (c) => {

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { EstadoDelPedidoDeFoto, FotoQueEspera, PedidoDeFoto } from "../contratos/pedidos-de-foto.js";
 
 // Pedido de foto, en sus reglas (ADR-018): la computadora no tiene cámara. Donde haga falta una
 // foto (la factura de un ingreso, un producto, un ticket) pide una y muestra un código QR; el
@@ -21,7 +22,7 @@ function vigente(codigo: string): Pedido | null {
 }
 
 // La computadora pide una foto y dice para qué (se le muestra a quien la saca).
-export function pedir(para: unknown, sesionId: string): { codigo: string; expiraEnSegundos: number } {
+export function pedir(para: unknown, sesionId: string): PedidoDeFoto {
   vigente("");
   if (pedidos.size >= MAXIMO_DE_PEDIDOS) pedidos.delete(pedidos.keys().next().value!);
   const codigo = randomUUID();
@@ -30,14 +31,14 @@ export function pedir(para: unknown, sesionId: string): { codigo: string; expira
 }
 
 // Los pedidos de foto que esperan esas computadoras (las emparejadas con un celular).
-export function queEsperan(computadoras: string[]): { codigo: string; para: string }[] {
+export function queEsperan(computadoras: string[]): FotoQueEspera[] {
   vigente("");
   const de = new Set(computadoras);
   return [...pedidos].filter(([, p]) => p.foto === null && de.has(p.de)).map(([codigo, p]) => ({ codigo, para: p.para }));
 }
 
 // Si el código vale, para qué es la foto y si ya llegó.
-export function estado(codigo: string): { para: string; lista: boolean } | null {
+export function estado(codigo: string): EstadoDelPedidoDeFoto | null {
   const p = vigente(codigo);
   return p ? { para: p.para, lista: p.foto !== null } : null;
 }

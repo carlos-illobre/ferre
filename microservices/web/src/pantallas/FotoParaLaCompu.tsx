@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, reducirImagen } from "../api";
 import "./foto-de-factura.css";
+import type { EstadoDelPedidoDeFoto } from "@servidor/pedidos-de-foto";
 
 // La pantalla que abre el celular al leer el código QR de la computadora: saca la foto y la
 // manda con ese código, para que aparezca en la computadora donde se pidió (la factura de un
@@ -12,7 +13,7 @@ export function FotoParaLaCompu({ codigo }: { codigo: string }) {
   const archivo = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    api<{ para: string }>(`/pedidos-de-foto/${encodeURIComponent(codigo)}`)
+    api<EstadoDelPedidoDeFoto>(`/pedidos-de-foto/${encodeURIComponent(codigo)}`)
       .then((p) => { setPara(p.para); setEstado("lista"); })
       .catch((e) => { if ((e as { estado?: number }).estado === 404) setEstado("vencido"); else { setEstado("lista"); setError("Sin conexión: para mandar la foto hace falta internet."); } });
   }, [codigo]);

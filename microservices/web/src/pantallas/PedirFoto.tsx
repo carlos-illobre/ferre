@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { api, leerToken, urlApi } from "../api";
 import { puestoLocal } from "../puesto";
 import "./foto-de-factura.css";
+import type { EstadoDelPedidoDeFoto, PedidoDeFoto, PedidoDeFotoNuevo } from "@servidor/pedidos-de-foto";
 
 // La computadora no tiene cámara: donde haga falta una foto muestra un código QR, el celular
 // lo lee, saca la foto y la foto llega sola acá, como un archivo más (decisión 41). Sirve
@@ -22,7 +23,7 @@ export function PedirFotoAlCelular({ para, alRecibir, alCancelar }: { para: stri
     let vigente = true;
     (async () => {
       try {
-        const { codigo, expiraEnSegundos } = await api<{ codigo: string; expiraEnSegundos: number }>("/pedidos-de-foto", { method: "POST", body: JSON.stringify({ para }) });
+        const { codigo, expiraEnSegundos } = await api<PedidoDeFoto>("/pedidos-de-foto", { method: "POST", body: JSON.stringify({ para } satisfies PedidoDeFotoNuevo) });
         const enlace = `${location.origin}${location.pathname}#/foto?codigo=${encodeURIComponent(codigo)}`;
         const qr = await QRCode.toDataURL(enlace, { width: 240, margin: 1, color: { dark: "#17312b", light: "#ffffff" } });
         // Para probar sin celular: el enlace que el celular abriría.
@@ -39,7 +40,7 @@ export function PedirFotoAlCelular({ para, alRecibir, alCancelar }: { para: stri
     const reloj = setInterval(async () => {
       if (Date.now() > pedido.vence) { setPedido(null); setError("El código venció. Cancelá y pedí otro."); return; }
       try {
-        const estado = await api<{ lista: boolean }>(`/pedidos-de-foto/${pedido.codigo}`);
+        const estado = await api<EstadoDelPedidoDeFoto>(`/pedidos-de-foto/${pedido.codigo}`);
         if (!vigente || !estado.lista) return;
         clearInterval(reloj); setRecibiendo(true);
         const r = await fetch(urlApi(`/pedidos-de-foto/${pedido.codigo}/foto`), { headers: { Authorization: `Bearer ${leerToken() ?? ""}` } });
