@@ -16,3 +16,6 @@ export function fecha(valor: string | null | undefined): string {
   const d = new Date(valor.length === 10 ? `${valor}T00:00:00` : valor);
   return d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
+
+// Un importe sin centavos, con el punto de los miles: $12.000. Es como se dice en el mostrador.
+export const pesosCortos = (v: number | string): string => "$" + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

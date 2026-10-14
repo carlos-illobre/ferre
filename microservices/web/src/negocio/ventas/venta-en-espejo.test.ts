@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { producto } from "../pruebas/catalogo-falso";
+import { producto } from "../../pruebas/catalogo-falso";
 import { renglonesDelEspejo, ventaParaElEspejo } from "./venta-en-espejo";
 
 const mecha = producto({ id: "mecha", descripcion: "MECHA 8 MM", margen_elegido: 100 });

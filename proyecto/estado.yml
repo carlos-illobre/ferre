@@ -650,7 +650,7 @@ RF-77:
   estado: "Hecho (#75, #101): navegación, venta, ingreso y pedido en espejo, con presencia, separar y juntar, y avisos; el vínculo es de los dispositivos y sobrevive al cierre de sesión"
   pruebas:
     - microservices/api/src/rutas/puestos.test.ts
-    - microservices/web/src/principal/venta-en-espejo.test.ts
+    - microservices/web/src/negocio/ventas/venta-en-espejo.test.ts
     - microservices/web/src/principal/ingreso-en-espejo.test.ts
     - tests/e2e/celular/17-espejo.spec.ts
     - tests/e2e/escritorio/17-espejo.spec.ts
@@ -853,6 +853,7 @@ RNF-11:
   estado: "Hecho"
   pruebas:
     - microservices/web/src/cola.test.ts
+    - microservices/web/src/negocio/ventas/venta.test.tsx
   defectos:
     - "Sin prueba: que una venta quede en espera y se reintente cuando el servidor responde con un error propio"
     - "Sin prueba: abrir la app y vender con el servidor apagado"
@@ -1038,7 +1039,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas) y etapa 2 (tecnología reutilizable aparte, con control automático), salvo las piezas de interfaz. Faltan las etapas 3, 4 y 5 (010-T003 a 010-T008 y 010-T012)"
+  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, la regla de la venta una sola vez. Falta el resto de la 3 y las etapas 4 y 5 (010-T004 a 010-T008, 010-T012 y 010-T013)"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx

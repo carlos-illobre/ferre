@@ -5,7 +5,7 @@ import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
 import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
-import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "../venta-en-espejo";
+import { precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
@@ -28,27 +28,6 @@ import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 // La venta, en el orden del mostrador: buscar → costo, margen y precio → cantidad → cobro.
 // Nada obligatorio que el cuaderno no tenga. En la computadora todo sale con el teclado:
 // Enter agrega, F5 a F8 eligen cómo paga, F2 (o Enter con la búsqueda vacía) cobra.
-type Item = {
-  clave: string; producto: Producto | null; descripcion: string; cantidad: number;
-  unidad: Unidad;
-  precioManual: number | null; // precio tipeado para esta venta; no se guarda en el producto
-  abierto: boolean; // celular: el margen y el precio a mano desplegados
-};
-
-function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: number | null; costo: number | null } {
-  const p = item.producto;
-  const costo = p?.costo_neto != null ? Number(p.costo_neto) : null;
-  const iva = p?.iva != null ? Number(p.iva) : 0.21;
-  if (item.precioManual !== null) {
-    const real = costo !== null ? margenReal({ costoNeto: costo, iva, precio: item.precioManual }) : null;
-    return { unitario: item.precioManual, pasos: real ? real.pasos : [`Precio puesto a mano ${pesos(item.precioManual)}`], margen: null, costo };
-  }
-  if (p && costo !== null && p.margen_elegido !== null) {
-    const r = precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva });
-    return { unitario: r.valor, pasos: r.pasos, margen: p.margen_elegido, costo };
-  }
-  return { unitario: null, pasos: [], margen: null, costo };
-}
 const precioDeLista = (p: Producto) => (p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null);
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const pasosDeCosto = (p: Producto, costo: number) => (p.explicacion_costo?.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`]);
@@ -60,68 +39,37 @@ export function Vender() {
   const esCelular = useEsCelular();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
-  const [items, setItems] = useState<Item[]>([]);
-  const [medio, setMedio] = useState<Medio | null>("efectivo"); // Efectivo viene elegido: es lo más común y muestra que los medios se tocan
-  const [clienteId, setClienteId] = useState("");
-  const [mensaje, setMensaje] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [escaneando, setEscaneando] = useState(false);
   const [ultimoEscaneo, setUltimoEscaneo] = useState<string | null>(null);
   const [puestoVinculado, setPuestoVinculado] = useState(false);
-  const [codigoDesconocido, setCodigoDesconocido] = useState<string | null>(null);
-  const [ocupado, setOcupado] = useState(false);
   const [eligiendoCliente, setEligiendoCliente] = useState(false);
-  const [exito, setExito] = useState<{ total: number; medio: string; detalle: string; encolado: boolean } | null>(null);
   const caja = useRef<HTMLInputElement>(null);
+
+  // La venta en sí (renglones, precios, cobrar, «no llevó») está una sola vez, en el negocio:
+  // acá va solo lo de esta interfaz: sus textos largos, su foco y sus ventanas.
+  const venta = useVenta({
+    lado: "computadora", dispositivo: describirDispositivo, fijaMargen: puedeEsto("catalogo.margenes"),
+    textoDe: (motivo) => TEXTOS.vender[motivo === "sin-precio" ? "sinPrecio" : motivo === "sin-medio" ? "elegiComoPaga" : "faltaElCliente"].largo,
+    textoDeRechazo: (m) => `${m}. La venta sigue armada: corregila y cobrá de nuevo.`,
+    alCambiar: useCallback((motivo: MotivoDeCambio) => { if (motivo === "agregar") setConsulta(""); caja.current?.focus(); }, []),
+    alFaltarCliente: () => setEligiendoCliente(true),
+  });
+  const { items, medio, setMedio, clienteId, setClienteId, cliente, total, sinPrecio, mensaje, setMensaje, error, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, quitar, elegirMargen, subirFotoDe, elegirSugerencia, elegirMedio, cobrar } = venta;
+  // Un código que no es de ningún producto deja la búsqueda limpia, para elegir a cuál asociarlo.
+  const agregarPorCodigo = useCallback((codigo: string) => { const conocido = venta.agregarPorCodigo(codigo); setConsulta(""); return conocido; }, [venta.agregarPorCodigo]);
+  const noLlevo = () => venta.noLlevo(TEXTOS.vender.noLlevo.largo);
+  // Lo que se dice de la venta recién cobrada, con las palabras de la computadora.
+  const exito = useMemo(() => cobro && {
+    total: cobro.total, encolado: cobro.encolado,
+    medio: NOMBRE_MEDIO[cobro.medio]! + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
+    detalle: cobro.encolado ? "Sin conexión: quedó guardada en este dispositivo y se envía sola cuando vuelva internet." : `${cobro.productos} ${cobro.productos === 1 ? "producto" : "productos"} a las ${hora(cobro.fecha)}. El stock ya se descontó.`,
+  }, [cobro]);
   const sugeridos = useSugeridos(catalogo, exito);
 
-  // En espejo con la computadora (decisión 60): la venta es una sola, la arme quien la arme.
-  useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
-    setItems((previos) => renglonesDelEspejo(v, catalogo ?? [], previos));
-    setMedio(v.medio as typeof medio); setClienteId(v.clienteId);
-  }, catalogo !== null && catalogoCompleto !== false); // con el catálogo a medio cargar no se reconocerían los productos
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
-  // Un aviso se va solo apenas se corrige su causa.
-  useEffect(() => { setError(null); }, [items, medio, clienteId]);
   useEffect(() => { caja.current?.focus(); }, [catalogo]);
-  useEffect(() => {
-    const reintentar = () => { enviarPendientes().catch(() => undefined); };
-    window.addEventListener("online", reintentar);
-    // Las ventas confirmadas se conservan 7 días en el dispositivo.
-    borrarAnterioresA("ventas", "fecha", new Date(Date.now() - 7 * 86400000).toISOString()).catch(() => undefined);
-    return () => window.removeEventListener("online", reintentar);
-  }, []);
 
-  // Cada renglón se redondea para arriba a $1.000: toda venta es múltiplo de $1.000.
-  const total = items.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: precioDe(it).unitario ?? 0, cantidad: it.cantidad }).valor, 0);
-  const sinPrecio = items.some((it) => precioDe(it).unitario === null);
-  const cliente = clientes.find((c) => c.id === clienteId);
-
-  const agregar = useCallback((p: Producto | null, descripcionLibre?: string) => {
-    setItems((lista) => {
-      if (p) {
-        const ya = lista.find((it) => it.producto?.id === p.id);
-        if (ya) return lista.map((it) => (it === ya ? { ...it, cantidad: it.cantidad + 1 } : it));
-        return [...lista, { clave: crypto.randomUUID(), producto: p, descripcion: p.descripcion, cantidad: 1, unidad: unidadDe(p), precioManual: null, abierto: p.margen_elegido === null }];
-      }
-      return [...lista, { clave: crypto.randomUUID(), producto: null, descripcion: descripcionLibre ?? "", cantidad: 1, unidad: "unidad", precioManual: null, abierto: false }];
-    });
-    setConsulta("");
-    setMensaje(null);
-    caja.current?.focus();
-  }, []);
-
-  // Un código de barras, venga de la cámara, del celular vinculado o de un lector que tipea
-  // y manda Enter: si es de un producto, se agrega; si no, se ofrece asociarlo.
-  const agregarPorCodigo = useCallback((codigo: string): boolean => {
-    const c = codigo.trim();
-    const exacto = (catalogo ?? []).find((p) => p.codigo_barras === c || p.codigo_proveedor === c);
-    if (exacto) { agregar(exacto); setCodigoDesconocido(null); return true; }
-    setCodigoDesconocido(c);
-    setConsulta("");
-    return false;
-  }, [catalogo, agregar]);
   // El oyente del celular vinculado se crea una vez y tiene que ver siempre la versión nueva.
   const manejarCodigo = useRef(agregarPorCodigo);
   useEffect(() => { manejarCodigo.current = agregarPorCodigo; }, [agregarPorCodigo]);
@@ -145,43 +93,6 @@ export function Vender() {
     setUltimoEscaneo(conocido ? `${codigo}: agregado` : `${codigo}: no está en el catálogo`);
     if (puestoRemoto()) enviarCodigoAlPuesto(codigo).then((ok) => { if (ok) setUltimoEscaneo((u) => `${u ?? codigo}. Enviado a la computadora.`); });
   }, []);
-
-  function cambiarItem(clave: string, cambios: Partial<Item>) {
-    setItems((lista) => lista.map((it) => (it.clave === clave ? { ...it, ...cambios } : it)));
-  }
-  function cambiarUnidad(item: Item, unidad: Unidad) {
-    cambiarItem(item.clave, { unidad, cantidad: cantidadValida(String(item.cantidad), unidad) || 1 });
-    // Queda guardado en el producto: la próxima vez ya se vende así.
-    if (item.producto) actualizarProducto(item.producto.id, { unidad }).catch(() => undefined);
-  }
-  function quitar(clave: string) {
-    setItems((lista) => lista.filter((it) => it.clave !== clave));
-    caja.current?.focus();
-  }
-  function elegirMargen(item: Item, margen: number) {
-    if (!item.producto) return;
-    // Queda guardado en el producto solo si la persona puede fijar márgenes; si no, vale para esta venta.
-    if (puedeEsto("catalogo.margenes")) actualizarProducto(item.producto.id, { margen_elegido: margen }).catch(() => undefined);
-    cambiarItem(item.clave, { precioManual: null, producto: { ...item.producto, margen_elegido: margen } });
-  }
-  async function subirFotoDe(item: Item, archivo: File) {
-    if (!item.producto) return;
-    const foto_url = await subirFoto(item.producto.id, archivo);
-    actualizarProducto(item.producto.id, { foto_url }).catch(() => undefined);
-    cambiarItem(item.clave, { producto: { ...item.producto, foto_url } });
-  }
-  function elegirSugerencia(p: Producto) {
-    if (codigoDesconocido) {
-      // Asociar el código escaneado al producto elegido: la próxima vez se encuentra directo.
-      actualizarProducto(p.id, { codigo_barras: codigoDesconocido }).catch(() => undefined);
-      agregar({ ...p, codigo_barras: codigoDesconocido });
-      setCodigoDesconocido(null);
-    } else agregar(p);
-  }
-  function elegirMedio(valor: Medio) {
-    setMedio(valor);
-    if (valor === "cuenta_corriente" && !clienteId) setEligiendoCliente(true);
-  }
 
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {
     // Sin resultados a la vista, ↑ ↓ no son para elegir uno: recorren la pantalla (flechas.ts).
@@ -216,57 +127,6 @@ export function Vender() {
     else if (e.key === "ArrowUp" && resultados.length) { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Escape") { caja.current?.focus(); }
   }, [resultados.length, hayVentana]), caja.current);
-
-  async function cobrar() {
-    if (items.length === 0 || ocupado) return;
-    if (sinPrecio) { setError(TEXTOS.vender.sinPrecio.largo); return; }
-    if (!medio) { setError(TEXTOS.vender.elegiComoPaga.largo); return; }
-    if (medio === "cuenta_corriente" && !clienteId) { setError(TEXTOS.vender.faltaElCliente.largo); setEligiendoCliente(true); return; }
-    setOcupado(true);
-    setError(null);
-    const id = crypto.randomUUID();
-    const cuerpo = {
-      id,
-      fecha: new Date().toISOString(),
-      medio_pago: medio,
-      cliente_id: medio === "cuenta_corriente" ? clienteId : null,
-      dispositivo_id: describirDispositivo(),
-      items: items.map((it) => {
-        const p = precioDe(it);
-        return {
-          producto_id: it.producto?.id ?? null, descripcion: it.descripcion, cantidad: it.cantidad, precio_unitario: p.unitario ?? 0,
-          costo_neto: p.costo, margen_aplicado: p.margen, explicacion: { pasos: p.pasos, costo: it.producto?.explicacion_costo ?? [] },
-        };
-      }),
-    };
-    try {
-      const { encolado } = await enviarOEncolar("venta", "POST", "/ventas", cuerpo);
-      // Copia local de la venta (7 días) y stock que ve el mostrador.
-      guardar("ventas", { id, fecha: cuerpo.fecha, total, medio_pago: medio, items: cuerpo.items, enviada: !encolado }).catch(() => undefined);
-      for (const it of items) if (it.producto) ajustarStockLocal(it.producto.id, -it.cantidad);
-      const n = items.length;
-      contarAlEspejo(`Venta de ${pesosCortos(total)} cobrada en la computadora`);
-      setExito({
-        total, encolado,
-        medio: NOMBRE_MEDIO[medio]! + (cliente ? ` · ${cliente.nombre}` : ""),
-        detalle: encolado ? "Sin conexión: quedó guardada en este dispositivo y se envía sola cuando vuelva internet." : `${n} ${n === 1 ? "producto" : "productos"} a las ${hora(cuerpo.fecha)}. El stock ya se descontó.`,
-      });
-    } catch (e) {
-      setOcupado(false);
-      if (e instanceof ErrorApi) { setError(`${e.message}. La venta sigue armada: corregila y cobrá de nuevo.`); return; }
-      throw e;
-    }
-    setItems([]); setMedio("efectivo"); setClienteId(""); setOcupado(false);
-  }
-
-  function noLlevo() {
-    if (items.length === 0) return;
-    const consultaItems = items.map((it) => ({ producto_id: it.producto?.id ?? null, descripcion: it.descripcion, precio_ofrecido: precioDe(it).unitario }));
-    enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: describirDispositivo() }).catch(() => undefined);
-    setItems([]); setMedio("efectivo"); setClienteId("");
-    setMensaje(TEXTOS.vender.noLlevo.largo);
-    caja.current?.focus();
-  }
 
   const vacio = items.length === 0 && !consulta.trim() && !codigoDesconocido;
   const filas = items.map((it) => ({
@@ -400,7 +260,7 @@ export function Vender() {
       {eligiendoCliente && <ElegirCliente clientes={clientes} elegido={clienteId} alCerrar={() => setEligiendoCliente(false)} alElegir={(id) => { setClienteId(id); setMedio("cuenta_corriente"); setEligiendoCliente(false); }} />}
       {exito && (
         <Exito que={exito.encolado ? "Venta guardada en este dispositivo" : "Venta registrada"} importe={pesosCortos(exito.total)} medio={exito.medio} detalle={exito.detalle} boton="Nueva venta"
-          alCerrar={() => { setExito(null); setTimeout(() => caja.current?.focus(), 0); }} />
+          alCerrar={() => { venta.cerrarCobro(); setTimeout(() => caja.current?.focus(), 0); }} />
       )}
     </Pagina>
   );
