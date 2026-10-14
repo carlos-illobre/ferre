@@ -6,7 +6,7 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 ## Tareas
 
 - [x] T001 El módulo: dos paquetes en `microservices/procesos/` (servidor y web), en el workspace, con su control de capas y su README
-- [ ] T002 El servicio: esquema y migraciones, datos, regla, rutas y validación de BPMN, con sus pruebas (depende de T001)
+- [x] T002 El servicio: esquema y migraciones, datos, regla, rutas y validación de BPMN, con sus pruebas (depende de T001)
 - [ ] T003 El contenedor «procesos»: imagen, compose y CI (depende de T002)
 - [ ] T004 Ferrebress lo conecta: permisos `procesos.ver` y `procesos.dibujar` con el rol Gerente, la ruta de paso con el registro de eventos y «Procesos» en Más (depende de T002)
 - [ ] T005 El modelo del front, sin pantallas: el recorrido para «Pasos» y la tabla, los errores de forma y los cambios de la lista (depende de T001)
