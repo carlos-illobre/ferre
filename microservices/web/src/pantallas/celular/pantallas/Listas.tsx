@@ -4,7 +4,7 @@ import { ErrorApi } from "../../../api";
 import { aplicarLista, cargarLista, descartarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useLectores, useListas, type Avance, type Cargada, type ListaFila, type Proveedor } from "../../../negocio/catalogo/listas";
 import { altaDeProveedor, faltaEnProveedor } from "../../../negocio/proveedores";
 import { Explicacion } from "../componentes/Explicacion";
-import { AvisoError, Hoja, Icono, Toast } from "../componentes/base";
+import { AvisoError, Hoja, Icono, Toast, Lista } from "../componentes/base";
 import { fecha, pesos, porcentaje } from "../../../formato";
 
 
@@ -43,8 +43,8 @@ export function Listas() {
       {/* El orden lo pidió Carlos: primero cargar, después las últimas tres cargas y al final los proveedores. */}
       {historial.length > 0 && (
         <>
-          <div className="seccion">Últimas cargas</div>
-          <div className="lista" data-testid="historial">
+          <h2 className="seccion">Últimas cargas</h2>
+          <Lista data-testid="historial">
             {historial.slice(0, 3).map((l) => (
               <div key={l.id} className="fila">
                 <span className="nombre">{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
@@ -52,14 +52,14 @@ export function Listas() {
                 <span className="detalle">{new Date(l.creado_en).toLocaleString("es-AR")} · {l.archivo_nombre} · {l.estado === "aplicada" ? `${l.resumen.nuevos} nuevos, ${l.resumen.modificados} cambiados` : `${l.resumen.leidas} leídos`}</span>
               </div>
             ))}
-          </div>
+          </Lista>
         </>
       )}
       </div>
       <div className="columna">
-      <div className="seccion"><span>Proveedores</span>{esDueno && <button type="button" className="enlace" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">+ Agregar</button>}</div>
+      <h2 className="seccion"><span>Proveedores</span>{esDueno && <button type="button" className="enlace" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">+ Agregar</button>}</h2>
       {proveedores.length === 0 ? <div className="aviso-suave">Todavía no hay proveedores cargados.</div> : (
-        <div className="lista" data-testid="estado-proveedores">
+        <Lista data-testid="estado-proveedores">
           {proveedores.filter((p) => p.activo).map((p) => {
             const l = ultima.get(p.id);
             const dias = l ? Math.floor((Date.now() - new Date(l.fecha_lista).getTime()) / 86400000) : null;
@@ -72,7 +72,7 @@ export function Listas() {
               </div>
             );
           })}
-        </div>
+        </Lista>
       )}
       </div>
       </div>
@@ -198,7 +198,7 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
       {cargada.salteadas.length > 0 && (
         <>
           <button type="button" className="enlace" onClick={() => setVerSalteadas((v) => !v)}>{verSalteadas ? "Ocultar" : "Ver"} las filas salteadas</button>
-          {verSalteadas && <div className="lista">{cargada.salteadas.map((s) => <div key={s.fila} className="fila"><span className="nombre">Fila {s.fila}: {s.motivo}</span><span /><span className="detalle">{s.contenido.join(" | ")}</span></div>)}</div>}
+          {verSalteadas && <Lista>{cargada.salteadas.map((s) => <div key={s.fila} className="fila"><span className="nombre">Fila {s.fila}: {s.motivo}</span><span /><span className="detalle">{s.contenido.join(" | ")}</span></div>)}</Lista>}
         </>
       )}
       {progreso ? (
@@ -213,8 +213,8 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
         </div>
       )}
       <AvisoError texto={error} />
-      <div className="seccion">Vista previa · cambios primero{total > filas.length ? ` · primeras ${filas.length} de ${total}` : ""}</div>
-      <div className="lista" data-testid="vista-previa">
+      <h2 className="seccion">Vista previa · cambios primero{total > filas.length ? ` · primeras ${filas.length} de ${total}` : ""}</h2>
+      <Lista data-testid="vista-previa">
         {filas.map((f) => {
           const cambio = f.costo_anterior !== null && Number(f.costo_anterior) > 0 ? ((Number(f.costo_neto) - Number(f.costo_anterior)) / Number(f.costo_anterior)) * 100 : null;
           return (
@@ -228,7 +228,7 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
             </div>
           );
         })}
-      </div>
+      </Lista>
     </Hoja>
   );
 }

@@ -1,5 +1,5 @@
 import { useVolverCierra } from "../../../plataforma/navegacion/volver";
-import { useEffect, useRef, type ReactNode } from "react";
+import { Children, useEffect, useRef, type HTMLAttributes, type ReactNode } from "react";
 
 // Piezas del sistema visual (docs/sistema-visual.md, rediseño de mockups/Ferre iOS.html): íconos de
 // trazo, hoja que sube desde abajo, avisos, segmentos, buscador, contador de cantidad,
@@ -143,4 +143,15 @@ export function Pasos({ pasos }: { pasos: string[] }) {
 
 export function Miniatura({ url }: { url?: string | null }) {
   return <span className="miniatura">{url ? <img src={url} alt="" /> : null}</span>;
+}
+
+// Un listado (decisión: HTML semántico, docs/sistema-visual.md): una lista `ul` con un `li` por
+// renglón, para que un lector de pantalla diga que es una lista y cuántos tiene. Se ve igual
+// que antes: el renglón sigue siendo el botón o la fila de adentro.
+export function Lista({ children, className, ...resto }: HTMLAttributes<HTMLUListElement> & { "data-testid"?: string }) {
+  return (
+    <ul className={`lista ${className ?? ""}`.trim()} {...resto}>
+      {Children.map(children, (renglon) => (renglon === null || renglon === undefined || renglon === false || renglon === "" ? null : <li>{renglon}</li>))}
+    </ul>
+  );
 }

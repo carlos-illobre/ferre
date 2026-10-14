@@ -9,7 +9,7 @@ import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
 import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { FotoProducto } from "./componentes/Foto";
-import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "./componentes/base";
+import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast, Lista } from "./componentes/base";
 import { Explicacion } from "./componentes/Explicacion";
 import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto } from "../../api";
@@ -208,12 +208,12 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </ul>
         )}
         {consulta.trim() && resultados.length === 0 && catalogo && (
-          <div className="lista">
+          <Lista>
             <button type="button" className="fila" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
               <span className="nombre">Agregar “{consulta.trim()}” como ítem libre</span><span />
               <span className="detalle">No está en ninguna lista. Le ponés el precio a mano.</span>
             </button>
-          </div>
+          </Lista>
         )}
 
         {vacio && (
@@ -262,7 +262,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
 
       {hoja === "clientes" && (
         <Hoja titulo={TEXTOS.vender.quienLleva.corto} alCerrar={() => setHoja(null)} testId="hoja-clientes">
-          <div className="lista">
+          <Lista>
             {clientes.length === 0 && <div className="fila"><span className="nombre">Todavía no hay clientes con cuenta corriente.</span></div>}
             {clientes.map((c) => (
               <button key={c.id} type="button" className={`fila ${clienteId === c.id ? "elegida" : ""}`} onClick={() => { setClienteId(c.id); setMedio("cuenta_corriente"); setHoja(null); }}>
@@ -270,7 +270,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
                 <small style={{ color: Number(c.deuda) > 0 ? "var(--coral-texto)" : undefined }}>{Number(c.deuda) > 0 ? `debe ${pesos(c.deuda)}` : "al día"}</small>
               </button>
             ))}
-          </div>
+          </Lista>
         </Hoja>
       )}
       {exito && (

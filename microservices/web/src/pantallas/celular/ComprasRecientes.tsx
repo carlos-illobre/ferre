@@ -3,7 +3,7 @@ import { usePuede } from "../permisos";
 import { VerComprobante } from "../FotoDeFactura";
 import { anularCompra, nombreDelComprobante, useComprasRecientes, type CompraFila } from "../../negocio/compras";
 import { fecha, pesos } from "../../formato";
-import { Toast } from "./componentes/base";
+import { Toast, Lista } from "./componentes/base";
 
 
 // Compras recientes: el papel que ya no se tira. Van en Cómo va el negocio (decisión 67). Cada compra se
@@ -22,9 +22,9 @@ export function ComprasRecientes({ soloVer = false }: { soloVer?: boolean } = {}
   }
   return (
     <>
-      <div className="seccion"><span>Compras recientes</span></div>
+      <h2 className="seccion"><span>Compras recientes</span></h2>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
-      <div className="lista" data-testid="compras-recientes">
+      <Lista data-testid="compras-recientes">
         {filas.map((c) => {
           const anulada = c.estado === "anulada";
           const abierta = abiertas.has(c.id);
@@ -47,7 +47,7 @@ export function ComprasRecientes({ soloVer = false }: { soloVer?: boolean } = {}
             </div>
           );
         })}
-      </div>
+      </Lista>
     </>
   );
 }

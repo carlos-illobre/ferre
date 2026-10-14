@@ -5,7 +5,7 @@ import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
-import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
+import { AvisoError, Buscador, Hoja, Toast, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Explicacion } from "./componentes/Explicacion";
 import { FotoProducto } from "./componentes/Foto";
@@ -112,9 +112,9 @@ export function Productos() {
       {catalogo && catalogo.length === 0 && <div className="aviso-suave">Todavía no hay productos: cargá una lista de precios primero.</div>}
       {consultaEstable.trim() && resultados.length === 0 && catalogo && catalogo.length > 0 && <div className="aviso-suave" data-testid="sin-resultados">Nada con "{consultaEstable}". Probá con menos palabras.</div>}
       {resultados.length > 0 && (
-        <div className="lista" data-testid="resultados">
+        <Lista data-testid="resultados">
           {resultados.map((p, i) => <FilaProducto key={p.id} producto={p} elegida={i === elegido} alAbrir={() => { setElegido(i); setAbiertoId(p.id); }} />)}
-        </div>
+        </Lista>
       )}
       {hayMas && <div ref={centinela} className="aviso-suave" data-testid="cargar-mas">Cargando más…</div>}
       {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== abierto.id && x.codigo_barras === codigo)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
@@ -182,8 +182,8 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
       </div>
       {veCostos && (p.proveedores?.length ?? 0) > 0 && (
         <>
-          <div className="seccion">Proveedores · el costo sale del elegido</div>
-          <div className="lista" data-testid="otros-proveedores">
+          <h2 className="seccion">Proveedores · el costo sale del elegido</h2>
+          <Lista data-testid="otros-proveedores">
             {p.proveedores!.map((v) => {
               const activo = v.proveedor === p.proveedor;
               return (
@@ -197,7 +197,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
                 </button>
               );
             })}
-          </div>
+          </Lista>
         </>
       )}
       {veCostos && costo !== null && (

@@ -12,7 +12,7 @@ import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { OfrecerHuella } from "./componentes/OfrecerHuella";
-import { Icono } from "./componentes/base";
+import { Icono, Lista } from "./componentes/base";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
@@ -201,7 +201,7 @@ function Pantallas() {
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
           {!emparejado && hayCamara() && (
-            <div className="lista">
+            <Lista>
               <button type="button" className="fila con-foto" onClick={() => { setErrorDeCodigo(null); setEscaneando(true); }} data-testid="vincular-con-la-compu">
                 <span className="miniatura mas-icono"><Icono nombre="escanear" tam={22} /></span>
                 <span className="nombre">Vincular con la computadora</span>
@@ -209,9 +209,9 @@ function Pantallas() {
                 <span className="detalle">Escaneá el código que muestra la computadora, sin salir de acá</span>
               </button>
               {errorDeCodigo && <p className="aviso-suave" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}
-            </div>
+            </Lista>
           )}
-          <div className="lista">
+          <Lista>
             {deMas.map((d) => (
               <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte}`)} data-testid={`mas-${d.parte}`}>
                 <span className="miniatura mas-icono"><IconoDeMas nombre={d.icono} tam={22} /></span>
@@ -220,15 +220,15 @@ function Pantallas() {
                 <span className="detalle">{d.detalle}</span>
               </button>
             ))}
-          </div>
-          <div className="lista">
+          </Lista>
+          <Lista>
             <button type="button" className="fila con-foto" onClick={salir} data-testid="salir">
               <span className="miniatura mas-icono"><Icono nombre="salir" tam={22} /></span>
               <span className="nombre">Salir</span>
               <Icono nombre="derecha" tam={18} grosor={2.4} />
               <span className="detalle" data-testid="usuario">Entraste como {usuario.nombre}</span>
             </button>
-          </div>
+          </Lista>
         </main>
       ) : pestana === "catalogo" ? <Catalogo sub={sinDireccion ? null : ruta.sub} />
         : pestana === "deposito" ? <Deposito sub={ruta.sub} />

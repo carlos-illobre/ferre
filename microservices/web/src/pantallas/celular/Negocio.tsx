@@ -12,7 +12,7 @@ import { useSesion } from "../../sesion";
 import { usePuede } from "../permisos";
 import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../RolesDeUsuario";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../credenciales";
-import { AvisoError, Hoja, Icono, Toast } from "./componentes/base";
+import { AvisoError, Hoja, Icono, Toast, Lista } from "./componentes/base";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { describirDispositivo } from "./pantallas/Login";
 import { pesosCortos } from "../../formato";
@@ -72,8 +72,8 @@ export function Negocio({ parte }: { parte: Parte }) {
 
       {gastos && gastos.por_proveedor.length > 0 && (
         <>
-          <div className="seccion" data-testid="gastos-semana"><span>Gastos de la semana</span><span className="importe" style={{ fontSize: 16 }}>{pesosCortos(gastos.total)}</span></div>
-          <div className="lista">
+          <h2 className="seccion" data-testid="gastos-semana"><span>Gastos de la semana</span><span className="importe" style={{ fontSize: 16 }}>{pesosCortos(gastos.total)}</span></h2>
+          <Lista>
             {gastos.por_proveedor.map((g) => (
               <div key={g.proveedor} className="fila">
                 <span className="nombre">{g.proveedor}</span>
@@ -81,7 +81,7 @@ export function Negocio({ parte }: { parte: Parte }) {
                 <span className="detalle">{g.compras} {Number(g.compras) === 1 ? "compra" : "compras"} desde el {fecha(gastos.desde)}</span>
               </div>
             ))}
-          </div>
+          </Lista>
         </>
       )}
 
@@ -128,10 +128,10 @@ function Usuarios() {
 
   return (
     <>
-      <div className="seccion">{NOMBRES.usuariosAutorizados}</div>
+      <h2 className="seccion">{NOMBRES.usuariosAutorizados}</h2>
       <small style={{ padding: "0 4px" }}>{TEXTOS.usuarios.queSonLosRoles.corto}</small>
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(usuarios.error); }} />
-      <div className="lista" data-testid="usuarios">
+      <Lista data-testid="usuarios">
         {filas.map((u) => (
           <div key={u.id} className={`usuario-con-roles ${u.activo ? "" : "apagada"}`} data-testid="usuario-fila">
             <div className="fila">
@@ -143,7 +143,7 @@ function Usuarios() {
           </div>
         ))}
         <button type="button" className="fila" onClick={() => setAlta(true)} data-testid="autorizar"><span className="nombre" style={{ color: "var(--coral-texto)" }}>+ Autorizar otro correo de Google</span></button>
-      </div>
+      </Lista>
       {alta && (
         <Hoja titulo="Autorizar a alguien" alCerrar={() => setAlta(false)} testId="hoja-autorizar">
           <form onSubmit={autorizar} className="formulario" data-testid="alta-usuario">
@@ -180,11 +180,11 @@ function Celulares() {
   }
   return (
     <div data-testid="celulares" style={{ display: "contents" }}>
-      <div className="seccion">Mis celulares con huella</div>
+      <h2 className="seccion">Mis celulares con huella</h2>
       <small style={{ padding: "0 4px" }}>Vinculá el celular una vez y desde entonces entra con la huella, sin Google. Si lo perdés, quitalo de acá.</small>
       <AvisoError texto={error} alCerrar={() => setError(null)} />
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-celular" />
-      <div className="lista">
+      <Lista>
         {filas.map((c) => (
           <div key={c.id} className="fila" data-testid="celular">
             <span className="nombre">{c.dispositivo ?? "celular"}</span>
@@ -195,7 +195,7 @@ function Celulares() {
         {hayHuella() ? (
           <button type="button" className="fila" onClick={vincular} data-testid="vincular-celular"><span className="nombre" style={{ color: "var(--coral-texto)", display: "flex", gap: 8, alignItems: "center" }}><Icono nombre="huella" tam={18} />Vincular este celular con mi huella</span></button>
         ) : <div className="fila"><small>Este dispositivo no tiene lector de huella o desbloqueo compatible: vinculá desde el celular.</small></div>}
-      </div>
+      </Lista>
     </div>
   );
 }
@@ -217,9 +217,9 @@ function Sesiones() {
   }
   return (
     <>
-      <div className="seccion">Sesiones abiertas</div>
+      <h2 className="seccion">Sesiones abiertas</h2>
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(sesiones.error); }} />
-      <div className="lista" data-testid="sesiones">
+      <Lista data-testid="sesiones">
         {filas.map((s) => {
           const propia = s.id === propiaId;
           return (
@@ -230,7 +230,7 @@ function Sesiones() {
             </div>
           );
         })}
-      </div>
+      </Lista>
     </>
   );
 }
@@ -242,8 +242,8 @@ function Auditoria() {
   const resumen = (contenido: Record<string, unknown>) => { const t = JSON.stringify(contenido); return t.length > 120 ? `${t.slice(0, 120)}…` : t; };
   return (
     <div data-testid="auditoria" style={{ display: "contents" }}>
-      <div className="seccion">Quién hizo qué</div>
-      <div className="lista">
+      <h2 className="seccion">Quién hizo qué</h2>
+      <Lista>
         {(datos?.eventos ?? []).map((e) => (
           <div key={e.id} className="fila">
             <span className="nombre"><strong>{e.nombre ?? "sistema"}</strong> · {e.tipo}</span>
@@ -251,7 +251,7 @@ function Auditoria() {
             <span className="detalle"><code title={JSON.stringify(e.contenido)}>{resumen(e.contenido)}</code></span>
           </div>
         ))}
-      </div>
+      </Lista>
       {datos && (
         <div className="paginado" data-testid="paginado">
           <button type="button" className="boton chico" disabled={pagina <= 1} onClick={() => setPagina((p) => p - 1)}>← Anteriores</button>

@@ -14,7 +14,7 @@ import { traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
 import { cantidadValida, enteras, unidadDe } from "../../unidades";
-import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast } from "./componentes/base";
+import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import type { Producto } from "./pantallas/Productos";
@@ -78,9 +78,9 @@ function Stock() {
       <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
       {escaneando && <Escaner alDetectar={(codigo) => { setEscaneando(false); setConsulta(codigo); setAbierto(null); }} alCerrar={() => setEscaneando(false)} />}
       <p className="subtitulo">El stock es la suma de compras, ventas y ajustes desde que se usa el sistema. Hasta el conteo, lo que no se cargó no está.</p>
-      <div className="lista" data-testid="tabla-stock">
+      <Lista data-testid="tabla-stock">
         {filas.map((p) => <FilaStock key={p.id} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={setMensaje} />)}
-      </div>
+      </Lista>
       {consulta.trim() && filas.length === 0 && catalogo && <div className="aviso-suave">Nada con "{consulta}".</div>}
       </div>
       </div>
@@ -229,7 +229,7 @@ function Ingreso() {
       <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Producto que llegó" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclas} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
       {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
       {consulta.trim() && (
-        <div className="lista" data-testid="sugerencias">
+        <Lista data-testid="sugerencias">
           {resultados.map((p, i) => (
             <button key={p.id} type="button" className={`fila ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); agregar(p); }}>
               <span className="nombre">{p.descripcion}</span>
@@ -242,7 +242,7 @@ function Ingreso() {
               <span className="nombre">Agregar “{consulta.trim()}” como producto nuevo</span><span /><span className="detalle">Le ponés el costo de la factura.</span>
             </button>
           )}
-        </div>
+        </Lista>
       )}
       {renglones.map((r) => {
         const dif = diferenciaConLaLista(r);
@@ -274,9 +274,9 @@ function Ingreso() {
       </div>
       {hoja === "proveedores" && (
         <Hoja titulo="¿De qué proveedor llegó?" alCerrar={() => setHoja(null)} testId="hoja-proveedores">
-          <div className="lista">
+          <Lista>
             {proveedores.map((p) => <button key={p.id} type="button" className={`fila ${proveedorId === p.id ? "elegida" : ""}`} onClick={() => { setProveedorId(p.id); setHoja(null); }} data-testid="opcion-proveedor"><span className="nombre">{p.nombre}</span></button>)}
-          </div>
+          </Lista>
         </Hoja>
       )}
       {exito && <Exito que="Ingreso registrado" importe={pesosCortos(exito.total)} medio={exito.proveedor} detalle={exito.detalle} boton="Listo" alCerrar={() => setExito(null)} />}
@@ -440,7 +440,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Buscá o escaneá el producto" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
           {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
           {resultados.length > 0 && (
-            <div className="lista" data-testid="sugerencias">
+            <Lista data-testid="sugerencias">
               {resultados.map((p, i) => (
                 <button key={p.id} type="button" className={`fila ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); elegirProducto(p); }}>
                   <span className="nombre">{p.descripcion}</span>
@@ -448,15 +448,15 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
                   <span className="detalle">{detalleDe(p)}</span>
                 </button>
               ))}
-            </div>
+            </Lista>
           )}
         </>
       )}
       </div>
       <div className="columna">
-      <div className="seccion"><span>Contados · {conteo.renglones.length}</span><span className="suave">{conteo.sin_contar.length} sin contar</span></div>
+      <h2 className="seccion"><span>Contados · {conteo.renglones.length}</span><span className="suave">{conteo.sin_contar.length} sin contar</span></h2>
       {conteo.renglones.length === 0 ? <div className="aviso-suave">Todavía nada. Buscá el primer producto de la estantería.</div> : (
-        <div className="lista" data-testid="contados">
+        <Lista data-testid="contados">
           {conteo.renglones.map((r) => {
             const dif = Number(r.cantidad_contada) - Number(r.stock_teorico);
             return (
@@ -467,12 +467,12 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
               </button>
             );
           })}
-        </div>
+        </Lista>
       )}
       {conteo.sin_contar.length > 0 && (
         <>
-          <div className="seccion">Del sector, sin contar todavía</div>
-          <div className="lista">{conteo.sin_contar.map((p) => <div key={p.producto_id} className="fila"><span className="nombre">{p.descripcion}</span><small className="derecha">teórico {Number(p.stock_teorico)}</small></div>)}</div>
+          <h2 className="seccion">Del sector, sin contar todavía</h2>
+          <Lista>{conteo.sin_contar.map((p) => <div key={p.producto_id} className="fila"><span className="nombre">{p.descripcion}</span><small className="derecha">teórico {Number(p.stock_teorico)}</small></div>)}</Lista>
         </>
       )}
       {conteo.renglones.length > 0 && !cerrando && <button type="button" className="boton tinta principal centrado" onClick={() => setCerrando(true)} data-testid="cerrar">Cerrar {conteo.sector}</button>}

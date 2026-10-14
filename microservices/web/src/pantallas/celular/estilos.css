@@ -136,6 +136,7 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 .tarjeta { background: #fff; border-radius: var(--radio); box-shadow: var(--sombra); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
 .tarjeta.oscura { background: var(--tinta); color: #fff; }
 .tarjeta.oscura small { color: rgba(255,255,255,0.6); }
+ul.lista { margin: 0; padding: 0; list-style: none; }
 .lista { background: #fff; border-radius: var(--radio); box-shadow: var(--sombra); overflow: hidden; display: flex; flex-direction: column; }
 .lista > * { border-bottom: 1px solid var(--linea); }
 .lista > *:last-child { border-bottom: 0; }

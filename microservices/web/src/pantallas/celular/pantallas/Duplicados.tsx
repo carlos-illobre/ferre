@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { buscarDuplicados, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Resumen, type Sugerencia, type Union } from "../../../negocio/catalogo/duplicados";
 import { useCatalogo } from "../../../catalogo";
 import { fecha, pesos } from "../../../formato";
-import { AvisoError, Buscador, Hoja, Toast } from "../componentes/base";
+import { AvisoError, Buscador, Hoja, Toast, Lista } from "../componentes/base";
 
 // Un mismo artículo en varios proveedores (issue #29): quien administra ve las sugerencias
 // lado a lado y decide "es el mismo" o "son distintos". También une dos a mano y separa.
@@ -83,7 +83,7 @@ function UnionManual({ alCerrar, alUnir }: { alCerrar: () => void; alUnir: (mens
           {c.id ? <div className="fila-otro"><span>{nombre(c.id)}</span><button type="button" className="enlace" onClick={() => c.setId("")}>cambiar</button></div> : (
             <>
               <Buscador chico valor={c.q} alCambiar={c.setQ} placeholder="Buscar producto" testId={`buscar-${c.testId}`} />
-              {c.r.length > 0 && <div className="lista">{c.r.map((p) => <button key={p.id} type="button" className="fila" onClick={() => { c.setId(p.id); c.setQ(""); }}><span className="nombre">{p.descripcion}</span><span /><span className="detalle">{p.proveedor ?? ""}</span></button>)}</div>}
+              {c.r.length > 0 && <Lista>{c.r.map((p) => <button key={p.id} type="button" className="fila" onClick={() => { c.setId(p.id); c.setQ(""); }}><span className="nombre">{p.descripcion}</span><span /><span className="detalle">{p.proveedor ?? ""}</span></button>)}</Lista>}
             </>
           )}
         </div>
@@ -104,10 +104,10 @@ function Unidos({ uniones }: { uniones: Union[] }) {
   }
   return (
     <>
-      <div className="seccion" data-testid="unidos">Unidos · se pueden separar</div>
+      <h2 className="seccion" data-testid="unidos">Unidos · se pueden separar</h2>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-separar" />
       {uniones.length === 0 ? <div className="aviso-suave">Todavía no se unió ningún producto.</div> : (
-        <div className="lista">
+        <Lista>
           {uniones.map((u) => (
             <div key={u.absorbido_id} className="fila" data-testid="union">
               <span className="nombre">{u.conservado}</span>
@@ -115,7 +115,7 @@ function Unidos({ uniones }: { uniones: Union[] }) {
               <span className="detalle">absorbió a “{u.absorbido}” el {fecha(u.unido_en.slice(0, 10))}{u.proveedores ? ` · ${u.proveedores}` : ""}</span>
             </div>
           ))}
-        </div>
+        </Lista>
       )}
     </>
   );

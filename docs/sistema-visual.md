@@ -44,6 +44,21 @@ Toda función nueva con pantalla se hace en las dos.
 - **Botones:** un solo estilo de botón principal por pantalla; el resto, secundarios.
 - **Barra de progreso** con lo que está haciendo, para lo que va a tardar (cargar una lista).
 
+## HTML semántico
+
+Las dos interfaces usan el elemento que corresponde a lo que es cada cosa, para que el
+navegador, el teclado y un lector de pantalla lo entiendan sin ayuda:
+
+- Un **listado** (productos, ventas, usuarios, sesiones, proveedores) es una lista `ul` con un
+  `li` por renglón; una tabla de la computadora es una `table` de verdad.
+- El **título de una sección** dentro de una pantalla es un encabezado (`h2`), debajo del `h1`
+  de la pantalla.
+- Lo que se toca para hacer algo es un `button`; lo que lleva a otro lado, un enlace. Las
+  ventanas que se abren encima son diálogos.
+- La parte principal de cada pantalla es `main` y el menú es `nav`.
+
+Esto no cambia cómo se ve nada.
+
 ## Lo que no es nuestro
 
 - **El botón de Google** es el original, azul y con puntas redondeadas, tal como lo dibuja

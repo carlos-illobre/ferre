@@ -1,3 +1,4 @@
+import { Lista } from "../componentes/base";
 import { useState } from "react";
 import { pesos, pesosCortos } from "../../../formato";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../negocio/ventas/venta";
@@ -11,7 +12,7 @@ const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: 
 export function ListaDeVentas({ ventas, alAnular, sinVentas = "Todavía no hay ventas hoy." }: { ventas: VentaDelDia[]; alAnular: ((v: VentaDelDia) => void) | null; sinVentas?: string }) {
   if (ventas.length === 0) return <div className="aviso-suave">{sinVentas}</div>;
   return (
-    <div className="lista" data-testid="ventas-de-hoy">
+    <Lista data-testid="ventas-de-hoy">
       {ventas.map((v) => {
         const anulada = v.estado === "anulada";
         return (
@@ -27,7 +28,7 @@ export function ListaDeVentas({ ventas, alAnular, sinVentas = "Todavía no hay v
           </div>
         );
       })}
-    </div>
+    </Lista>
   );
 }
 
