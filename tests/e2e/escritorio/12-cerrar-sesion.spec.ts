@@ -27,7 +27,7 @@ test.beforeEach(() => {
 
 test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/usuarios");
+  await page.goto("/#/sesiones");
   const otra = page.getByTestId("sesion").filter({ hasText: "otro celular" });
   await expect(otra).toBeVisible();
   await expect(otra.getByRole("button", { name: /Cerrar/ })).not.toHaveClass(/peligro/);
@@ -39,7 +39,7 @@ test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page 
 
 test("cerrar la sesión propia desde Administración vuelve al login", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/usuarios");
+  await page.goto("/#/sesiones");
   const propia = page.getByTestId("sesion").filter({ hasText: "esta computadora" });
   await expect(propia).toBeVisible();
   await expect(propia).toContainText("Esta sesión");

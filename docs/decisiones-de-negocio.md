@@ -648,3 +648,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     Pantalla elegida: en la computadora, el editor clásico con los
     tres paneles plegables (arrancan cerrados) y los pasos como tabla abajo; en el celular,
     «Pasos» y «Diagrama». Está en `specs/011-procesos/`.
+
+88. **Usuarios, sesiones, roles y quién hizo qué, en una sola opción de Más con cuatro
+    pestañas** (2026-10-14). Carlos: Más tenía ocho opciones y cuatro eran de los usuarios.
+    Ahora hay una, «Usuarios» («Quién entra y desde dónde, qué puede hacer y qué hizo»), con
+    las pestañas Usuarios, Sesiones, Roles y Quién hizo qué, como en Depósito. Quién hizo qué
+    va ahí porque el «quién» es un usuario. Sesiones junta las sesiones abiertas, los
+    celulares con huella y el vínculo entre celular y computadora: todo lo que dice desde
+    dónde y cómo se entra. Cada uno ve solo las pestañas que su rol le permite. Las pestañas
+    no llevan atajo Alt: se recorren con las flechas. Maquetas aprobadas en
+    `specs/007-usuarios-y-acceso/maquetas/`.

@@ -193,11 +193,12 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
   await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
 
-  // Desvincular es el corte definitivo y está solo en Usuarios y sesiones (decisión 74): los dos quedan sueltos y la computadora ofrece vincular.
+  // Desvincular es el corte definitivo y está solo en Más → Usuarios, pestaña Sesiones (decisiones 74 y 88): los dos quedan sueltos y la computadora ofrece vincular.
   await expect(compu.getByTestId("desvincular-espejo")).toHaveCount(0);
   await compu.getByTestId("menu-mas").click();
   await expect(compu.getByTestId("desvincular-en-mas")).toHaveCount(0);
   await compu.getByTestId("mas-usuarios").click();
+  await compu.getByTestId("pestana-sesiones").click();
   await expect(compu.getByTestId("vinculo-actual")).toContainText("vinculada con tu celular");
   compu.once("dialog", (d) => void d.accept());
   await compu.getByTestId("desvincular-vinculo").click();
@@ -206,7 +207,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(celular.getByTestId("desconectar-arriba")).toHaveCount(0);
   await celular.getByTestId("menu-vender").click();
   await compu.waitForTimeout(800);
-  await expect(compu.getByRole("heading", { name: "Usuarios y sesiones" })).toBeVisible();
+  await expect(compu.getByTestId("pestana-sesiones")).toHaveAttribute("aria-current", "page");
   // Se cierran las tres ventanas: abiertas, seguirían vivas con estas sesiones en la prueba que sigue.
   for (const pagina of [compu, celular, otra]) await pagina.context().close();
 });

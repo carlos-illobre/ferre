@@ -2,7 +2,7 @@ import { api } from "../api";
 import { consultas } from "../consultas";
 import { useDelServidor } from "./del-servidor";
 
-// Usuarios y sesiones, una sola vez para el celular y la computadora (RNF-60). Quién puede
+// Usuarios y sesiones (Más → Usuarios), una sola vez para el celular y la computadora (RNF-60). Quién puede
 // entrar, con qué roles, y las sesiones abiertas de todos (decisiones 50 y 51).
 export type RolDeUsuario = { id: string; nombre: string };
 export type UsuarioFila = { id: string; email: string; nombre: string; activo: boolean; roles: RolDeUsuario[] };

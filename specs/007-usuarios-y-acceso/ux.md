@@ -129,7 +129,7 @@ y dice que entrar necesita internet.
 **Qué necesita a la vista, en los dos:** con quién trabaja («Conectado con…»); si el otro
 no está abierto («trabajás solo acá»); si están separados («Desconectados: cada uno por su lado»); y
 un solo botón (decisión 73): «Vincular» si no hay vínculo, «Desconectar» si trabajan juntos y
-«Reconectar» si están separados. «Desvincular» está solo en Más → Usuarios y sesiones, en los dos, y
+«Reconectar» si están separados. «Desvincular» está solo en Más → Usuarios, pestaña Sesiones, en los dos, y
 pregunta antes (decisión 74).
 En la computadora el estado y el botón van en el menú lateral; el botón lleva a la izquierda el
 mismo ícono que en el celular (dos flechas que se alejan para «Desconectar», dos que se acercan
@@ -142,7 +142,7 @@ avisa un momento en la línea de arriba, la del estado de la conexión. «Vincul
 computadora (decisión 63). En Más, mientras no esté vinculado, el primer renglón es «Vincular con
 la computadora».
 
-**El bloque «Vínculo entre celular y computadora»,** en Más → Usuarios y sesiones (decisión 74):
+**El bloque «Vínculo entre celular y computadora»,** en Más → Usuarios, pestaña Sesiones (decisión 74):
 a quien está vinculado le dice con qué dispositivo y le ofrece «Desvincular»; a quien tiene
 «Administrar sesiones» le muestra además cuántos días dura el vínculo, para cambiarlos. Quien no
 está vinculado ni administra sesiones no ve el bloque.
@@ -162,6 +162,32 @@ Sin celular emparejado, la computadora muestra en el menú «Vincular el celular
   porque la computadora cambie de parte, y al salir de ella el celular vuelve a donde está
   la computadora.
 - No hay aviso por cada cambio que llega del otro lado: la pantalla simplemente lo muestra.
+
+## Más → Usuarios: cuatro pestañas (decisión 88)
+
+Lo de los usuarios está en una sola opción de Más, **«Usuarios»**, con la bajada «Quién
+entra y desde dónde, qué puede hacer y qué hizo». Adentro hay cuatro pestañas, como en
+Depósito, en este orden:
+
+| Pestaña | Qué tiene | Quién la ve |
+|---|---|---|
+| **Usuarios** | Los usuarios autorizados y autorizar a alguien (Historia 2) | «Administrar usuarios» |
+| **Sesiones** | Las sesiones abiertas (Historia 5), mis celulares con huella (Historia 4) y el vínculo entre celular y computadora (Historia 1c) | Cualquier usuario; cada bloque, con su propio permiso |
+| **Roles** | Los roles y armar uno (Historia 3b) | «Administrar roles» |
+| **Quién hizo qué** | El registro de acciones (Historia 6) | «Ver quién hizo qué» |
+
+- Cada uno ve solo las pestañas que su rol le permite, y la opción entra en la primera que
+  ve. Como Sesiones la ve cualquiera, «Usuarios» está siempre en Más.
+- En el celular la cuarta pestaña dice «Actividad», porque el nombre largo no entra; cada
+  pestaña lleva su ícono arriba del nombre. En la computadora dice «Quién hizo qué».
+- Las pestañas no llevan atajo Alt (los números ya son del menú y de Depósito): en la
+  computadora se recorren con las flechas, como el resto de Más.
+- Cada pestaña tiene su propia dirección, para volver a ella al recargar y para el espejo
+  entre el celular y la computadora.
+- Arriba de las pestañas está «Volver a Más», en los dos.
+
+Maquetas aprobadas por Carlos el 2026-10-14: `maquetas/mas-con-usuarios.html` y
+`maquetas/usuarios-pestanas.html`.
 
 ## Historia 2: administrar usuarios
 
@@ -238,7 +264,7 @@ roles a cada persona; desactivar y reactivar.
 
 ## Historia 3b: armar los roles
 
-**Quién:** quien tiene el permiso «Administrar roles». Se llega desde Más → Roles.
+**Quién:** quien tiene el permiso «Administrar roles». Se llega desde Más → Usuarios, pestaña Roles.
 
 **Qué tiene que poder hacer:** ver los roles; crear uno; cambiarle el nombre y los permisos;
 borrar el que nadie tiene.

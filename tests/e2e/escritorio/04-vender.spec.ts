@@ -217,7 +217,7 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("mas-usuarios")).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByTestId("mas-actividad")).toBeFocused();
+  await expect(page.getByTestId("mas-anomalias")).toBeFocused();
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("mas-resumen")).toBeFocused();

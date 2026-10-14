@@ -5,7 +5,7 @@ import "./espejo-estado.css";
 // El estado del vínculo, siempre a la vista en los dos: con quién se trabaja, si el otro no está
 // abierto o si están desconectados. Y un solo botón (decisiones 73 y 75): «Desconectar» para que
 // cada uno trabaje por su lado un rato, y «Reconectar» para volver a trabajar en espejo. «Desvincular», el
-// corte definitivo, está solo en Usuarios y sesiones.
+// corte definitivo, está solo en Más → Usuarios, pestaña Sesiones.
 export const TEXTOS_DEL_VINCULO = { separar: "Desconectar", juntar: "Reconectar", vincular: "Vincular", desvincular: "Desvincular" };
 // `sinBoton`: en el celular el botón va en el encabezado de la pantalla, no en la franja.
 export function EspejoEstado({ sinBoton = false }: { sinBoton?: boolean } = {}) {

@@ -16,4 +16,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T005 [ajuste] En la computadora, el botón Desconectar/Reconectar lleva su ícono, como en el celular
 - [x] T006 [ajuste] En la computadora, «Autorizar a alguien» aprovecha el ancho: nombre, correo y el botón en una línea, y los roles debajo, repartidos en columnas
 - [x] T007 [arreglo] Vinculados, ir a Depósito y enseguida a Más desde el celular hace que el celular vuelva solo a Depósito un segundo después
-- [ ] T008 [interfaz] En Más, Usuarios y sesiones, Roles y Quién hizo qué se juntan en una sola opción, «Usuarios», con cuatro pestañas como Depósito: Usuarios, Sesiones, Roles y Quién hizo qué
+- [x] T008 [interfaz] En Más, Usuarios y sesiones, Roles y Quién hizo qué se juntan en una sola opción, «Usuarios», con cuatro pestañas como Depósito: Usuarios, Sesiones, Roles y Quién hizo qué

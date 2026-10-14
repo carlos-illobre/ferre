@@ -48,7 +48,7 @@ La computadora y el celular no usan las mismas direcciones:
 | Catálogo | `productos`, `listas`, `duplicados` | `catalogo`, `catalogo/listas`, `catalogo/duplicados` |
 | Vender | `vender` | `vender` |
 | Depósito | `pedidos`, `compras` (Ingreso), `stock` (Inventario), `contar` (Estanterías) | `deposito/pedidos`, `deposito`, `deposito/stock`, `deposito/contar` |
-| Más | `mas`, `resumen`, `usuarios`, `roles`, `actividad`, `anomalias`, `tickets`, `procesos` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/roles`, `mas/actividad`, `mas/anomalias`, `mas/tickets`, `mas/procesos` |
+| Más | `mas`, `resumen`, `usuarios`, `sesiones`, `roles`, `actividad`, `anomalias`, `tickets`, `procesos` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/sesiones`, `mas/roles`, `mas/actividad`, `mas/anomalias`, `mas/tickets`, `mas/procesos` |
 
 `--entera` (página completa) se cuelga en la computadora: ahí conviene bajar con
 `--py "page.locator('...').scroll_into_view_if_needed()"`.

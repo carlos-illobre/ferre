@@ -49,8 +49,9 @@ versión 4 (decisión 27). El 2026-10-11 eligió la versión 5, que junta esas t
 - **El aspecto se ajusta con una hoja de estilos por árbol,** que pisa los colores y las
   piezas de la versión de la que sale, en vez de tocar las hojas de esa versión.
 - **Un solo menú en los dos árboles:** Catálogo (Productos, Listas, Duplicados), Vender,
-  Depósito (Ingreso, Inventario, Estanterías) y Más (Cómo va el negocio, Usuarios y sesiones,
-  Quién hizo qué, Anomalías, Mejoras y errores).
+  Depósito (Ingreso, Inventario, Estanterías) y Más (Cómo va el negocio, Usuarios, Anomalías,
+  Procesos, Mejoras y errores, Configuración; Usuarios con sus pestañas Usuarios, Sesiones,
+  Roles y Quién hizo qué, decisión 88).
 
 Dónde está cada cosa en el código:
 

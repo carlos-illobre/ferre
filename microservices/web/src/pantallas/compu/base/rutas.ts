@@ -26,7 +26,8 @@ export const GRUPOS: Grupo[] = [
   ] },
   { clave: "negocio", nombre: "Negocio", icono: "negocio", pantallas: [
     { ruta: "resumen", nombre: "Resumen", icono: "resumen" },
-    { ruta: "usuarios", nombre: "Usuarios y sesiones", corto: "Usuarios", icono: "usuarios" },
+    { ruta: "usuarios", nombre: "Usuarios", icono: "usuarios" },
+    { ruta: "sesiones", nombre: "Sesiones", icono: "sesiones" },
     { ruta: "actividad", nombre: "Quién hizo qué", corto: "Actividad", icono: "actividad" },
   ] },
 ];

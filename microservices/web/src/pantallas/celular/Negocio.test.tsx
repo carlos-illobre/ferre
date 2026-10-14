@@ -87,7 +87,7 @@ describe("Negocio", () => {
 
   it("sin permisos de administración no se ven los usuarios ni las sesiones de los demás, y sin los números tampoco el resumen", async () => {
     conPermisos("ventas.registrar");
-    render(<Negocio parte="usuarios" />);
+    render(<Negocio parte="sesiones" />);
     expect(await screen.findByTestId("celulares")).toBeTruthy();
     expect(screen.queryByTestId("usuarios")).toBeNull();
     expect(screen.queryByTestId("sesiones")).toBeNull();
@@ -95,7 +95,7 @@ describe("Negocio", () => {
   });
 
   it("Sesiones: todos los botones dicen Cerrar; el de la propia es coral", async () => {
-    render(<Negocio parte="usuarios" />);
+    render(<Negocio parte="sesiones" />);
     await waitFor(() => expect(screen.getAllByTestId("sesion")).toHaveLength(2));
     const botones = within(screen.getByTestId("sesiones")).getAllByRole("button", { name: "Cerrar" });
     expect(botones).toHaveLength(2);

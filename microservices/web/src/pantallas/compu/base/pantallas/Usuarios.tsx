@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { Vinculo } from "../../../Vinculo";
-import { TEXTOS } from "../../../textos";
+import { NOMBRES, TEXTOS } from "../../../textos";
 import { api, ErrorApi } from "../../../../api";
 import { fecha } from "../../../../formato";
 import { useSesion } from "../../../../sesion";
@@ -24,27 +24,41 @@ function enPalabras(e: unknown, queNoSePudo: string): string {
   return `${queNoSePudo}: ${texto}`;
 }
 
-// Quién puede entrar, qué sesiones están abiertas y qué celulares entran con la huella.
+// Más → Usuarios (decisión 88): la pestaña Usuarios es quién puede entrar y con qué roles; la
+// pestaña Sesiones, desde dónde está abierto y cómo se entra sin escribir nada (las sesiones
+// abiertas, los celulares con huella y el vínculo entre celular y computadora).
 export function Usuarios() {
   const enLinea = useEnLinea();
   const [mensaje, setMensaje] = useState<Mensaje | null>(null);
-  const [vueltaDeSesiones, setVueltaDeSesiones] = useState(0);
+  return (
+    <Pagina titulo={NOMBRES.usuarios} testId="usuarios-autorizados" className="usuarios" bajada={TEXTOS.usuarios.pestanaUsuarios.largo}>
+      {!enLinea && <Aviso tipo="alerta" testId="usuarios-sin-conexion">Sin conexión: administrar usuarios necesita internet. Lo que ves puede no estar al día.</Aviso>}
+      <Autorizados enLinea={enLinea} avisar={setMensaje} />
+      <Toast texto={mensaje?.texto ?? null} alCerrar={() => setMensaje(null)} testId={mensaje?.testId ?? "mensaje"} />
+    </Pagina>
+  );
+}
+
+export function SesionesYDispositivos() {
+  const enLinea = useEnLinea();
+  const [mensaje, setMensaje] = useState<Mensaje | null>(null);
   const puedeEsto = usePuede();
   return (
-    <Pagina titulo="Usuarios y sesiones" testId="usuarios-y-sesiones" className="usuarios" bajada="Quién puede entrar a Ferrebress, desde qué dispositivos está abierto ahora y qué celulares entran con la huella.">
-      {!enLinea && <Aviso tipo="alerta" testId="usuarios-sin-conexion">Sin conexión: administrar usuarios, sesiones y celulares necesita internet. Lo que ves puede no estar al día.</Aviso>}
-      {puedeEsto("admin.usuarios") && <Autorizados enLinea={enLinea} avisar={setMensaje} alCerrarSesiones={() => setVueltaDeSesiones((v) => v + 1)} />}
+    <Pagina titulo={NOMBRES.sesiones} testId="sesiones-y-dispositivos" className="usuarios" bajada={TEXTOS.usuarios.pestanaSesiones.largo}>
+      {!enLinea && <Aviso tipo="alerta" testId="usuarios-sin-conexion">Sin conexión: administrar sesiones y celulares necesita internet. Lo que ves puede no estar al día.</Aviso>}
       <div className="usuarios-columnas">
-        <Vinculo />
-        {puedeEsto("admin.sesiones") && <Sesiones enLinea={enLinea} avisar={setMensaje} vuelta={vueltaDeSesiones} />}
-        <Celulares enLinea={enLinea} avisar={setMensaje} />
+        {puedeEsto("admin.sesiones") && <Sesiones enLinea={enLinea} avisar={setMensaje} />}
+        <div className="usuarios-pila">
+          <Celulares enLinea={enLinea} avisar={setMensaje} />
+          <Vinculo />
+        </div>
       </div>
       <Toast texto={mensaje?.texto ?? null} alCerrar={() => setMensaje(null)} testId={mensaje?.testId ?? "mensaje"} />
     </Pagina>
   );
 }
 
-function Autorizados({ enLinea, avisar, alCerrarSesiones }: { enLinea: boolean; avisar: Avisar; alCerrarSesiones: () => void }) {
+function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
   const { sesion } = useSesion();
   const yo = sesion.estado === "con-sesion" ? sesion.usuario.id : null;
   const esCelular = useEsCelular();
@@ -59,7 +73,7 @@ function Autorizados({ enLinea, avisar, alCerrarSesiones }: { enLinea: boolean; 
     setOcupada(u.id); setErrorDeFila(null);
     try {
       await cambiarUsuario(u.id, cambios);
-      if (cambios.activo === false) { avisar({ texto: `${u.nombre} ya no puede entrar: se le cerraron las sesiones abiertas.` }); alCerrarSesiones(); }
+      if (cambios.activo === false) { avisar({ texto: `${u.nombre} ya no puede entrar: se le cerraron las sesiones abiertas.` }); }
       else if (cambios.activo) avisar({ texto: `${u.nombre} puede entrar de nuevo.` });
       else if (cambios.roles) avisar({ texto: `Roles de ${u.nombre} guardados.` });
       return null;
@@ -197,7 +211,7 @@ function AltaDeUsuario({ disponibles, enLinea, alAutorizar }: { disponibles: Rol
   );
 }
 
-function Sesiones({ enLinea, avisar, vuelta }: { enLinea: boolean; avisar: Avisar; vuelta: number }) {
+function Sesiones({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
   const { sesion, salir } = useSesion();
   const propiaId = sesion.estado === "con-sesion" ? sesion.sesionId : null;
   const esCelular = useEsCelular();
@@ -206,7 +220,6 @@ function Sesiones({ enLinea, avisar, vuelta }: { enLinea: boolean; avisar: Avisa
   const [cerradas, setCerradas] = useState<string[]>([]);
   const [fallo, setFallo] = useState<{ sesion: SesionFila; texto: string } | null>(null);
   const [saliendo, setSaliendo] = useState(false);
-  useEffect(() => { if (vuelta > 0) recargar(); }, [vuelta, recargar]);
   const filas = (lista.datos ?? []).filter((s) => !cerradas.includes(s.id));
 
   async function cerrar(s: SesionFila) {

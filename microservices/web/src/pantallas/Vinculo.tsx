@@ -5,7 +5,7 @@ import { soltarEmparejamiento } from "../puesto";
 import { usePuede } from "./permisos";
 import "./vinculo.css";
 
-// El vínculo entre un celular y una computadora, en Usuarios y sesiones (decisiones 73 y 74).
+// El vínculo entre un celular y una computadora, en Más → Usuarios, pestaña Sesiones (decisiones 73, 74 y 88).
 // A quien está vinculado le dice con qué y le ofrece «Desvincular», que es el corte definitivo
 // y por eso pregunta. A quien tiene «Administrar sesiones» le muestra los días que dura; el
 // cambio vale para los vínculos nuevos y los que se renueven.

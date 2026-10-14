@@ -17,8 +17,8 @@ const ROL_NUEVO = "Encargado E2E";
 const VENDEDOR = "00000000-0000-4000-8000-0000000000a1";
 const ADMINISTRADOR = "00000000-0000-4000-8000-0000000000a4";
 const RUTAS = CELULAR
-  ? { mas: "mas", usuarios: "mas/usuarios", roles: "mas/roles", numeros: "mas/negocio", deposito: "deposito", enMas: "mas-negocio" }
-  : { mas: "mas", usuarios: "usuarios", roles: "roles", numeros: "resumen", deposito: "stock", enMas: "mas-resumen" };
+  ? { mas: "mas", usuarios: "mas/usuarios", roles: "mas/roles", sesiones: "mas/sesiones", numeros: "mas/negocio", deposito: "deposito", enMas: "mas-negocio" }
+  : { mas: "mas", usuarios: "usuarios", roles: "roles", sesiones: "sesiones", numeros: "resumen", deposito: "stock", enMas: "mas-resumen" };
 
 function psql(sql: string): string {
   return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
@@ -52,6 +52,12 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.mas);
   await expect(page.getByTestId("mas-tickets")).toBeVisible();
   for (const oculto of [RUTAS.enMas, "mas-roles", "mas-actividad", "mas-anomalias"]) await expect(page.getByTestId(oculto)).toHaveCount(0);
+  // De Usuarios ve solo la pestaña Sesiones, que es la de su huella, y se abre directo ahí (decisión 88).
+  await page.getByTestId("mas-usuarios").click();
+  await expect(page).toHaveURL(new RegExp(`#/${RUTAS.sesiones}$`));
+  await expect(page.getByTestId("celulares")).toBeVisible();
+  for (const oculta of ["Usuarios", "Roles", "Quién hizo qué", "Actividad"]) await expect(page.getByRole(CELULAR ? "tab" : "button", { name: oculta, exact: true })).toHaveCount(0);
+  await page.goto(`/#/${RUTAS.mas}`);
 
   // Configuración la ve cualquiera, sin permisos (RF-83, E06). Deshabilitar las animaciones vale
   // en el momento (E02) y queda en el dispositivo aunque se recargue (E03).

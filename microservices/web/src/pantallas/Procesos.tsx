@@ -17,7 +17,7 @@ export const PANTALLAS_DE_FERREBRESS = [
   "Catálogo → Productos", "Catálogo → Listas", "Catálogo → Duplicados",
   "Vender", "Vender → Cobrar", "Vender → Ventas de hoy", "Vender → Anular",
   "Depósito → Pedidos", "Depósito → Ingreso", "Depósito → Inventario", "Depósito → Estanterías",
-  "Más → Cómo va el negocio", "Más → Usuarios y sesiones", "Más → Quién hizo qué", "Más → Anomalías", "Más → Mejoras y errores",
+  "Más → Cómo va el negocio", "Más → Usuarios", "Más → Usuarios → Quién hizo qué", "Más → Anomalías", "Más → Mejoras y errores",
 ];
 
 // Como el cliente de siempre, pero sin perder el cuerpo de un error: un 409 trae cómo quedó el

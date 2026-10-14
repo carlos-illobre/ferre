@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { NOMBRES, TEXTOS } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
@@ -23,11 +23,12 @@ import { esAmbienteDePrueba } from "../../ambiente";
 
 // Negocio: quién soy, ventas de hoy, gastos de la semana y, para quien administra, usuarios,
 // celulares con huella, sesiones y quién hizo qué.
-// Una misma pantalla, partida en las tres opciones de «Más».
-export type Parte = "negocio" | "usuarios" | "actividad";
-const TITULOS: Record<Parte, string> = { negocio: NOMBRES.comoVaElNegocio, usuarios: NOMBRES.usuariosYSesiones, actividad: NOMBRES.quienHizoQue };
+// Una misma pantalla, partida en «Cómo va el negocio» y tres pestañas de Más → Usuarios
+// (decisión 88); la cuarta pestaña, Roles, es su propia pantalla. Las pestañas traen su
+// encabezado (`cabeza`), con el título y las pestañas.
+export type Parte = "negocio" | "usuarios" | "sesiones" | "actividad";
 
-export function Negocio({ parte }: { parte: Parte }) {
+export function Negocio({ parte, cabeza }: { parte: Parte; cabeza?: ReactNode }) {
   const { sesion, salir } = useSesion();
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const puedeEsto = usePuede();
@@ -41,7 +42,7 @@ export function Negocio({ parte }: { parte: Parte }) {
 
   return (
     <main className="contenido">
-      <div className="encabezado"><h1 className="titulo">{TITULOS[parte]}</h1></div>
+      <div className="encabezado">{cabeza ?? <h1 className="titulo">{NOMBRES.comoVaElNegocio}</h1>}</div>
       <div className="dos-columnas">
       <div className="columna" hidden={parte !== "negocio"}>
       {usuario && (
@@ -90,9 +91,9 @@ export function Negocio({ parte }: { parte: Parte }) {
       </div>
       <div className="columna">
       {parte === "usuarios" && puedeEsto("admin.usuarios") && <Usuarios />}
-      {parte === "usuarios" && <Celulares />}
-      {parte === "usuarios" && <Vinculo />}
-      {parte === "usuarios" && puedeEsto("admin.sesiones") && <Sesiones />}
+      {parte === "sesiones" && puedeEsto("admin.sesiones") && <Sesiones />}
+      {parte === "sesiones" && <Celulares />}
+      {parte === "sesiones" && <Vinculo />}
       {parte === "actividad" && puedeEsto("negocio.actividad") && <Auditoria />}
       </div>
       </div>

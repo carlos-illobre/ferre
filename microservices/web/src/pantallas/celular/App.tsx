@@ -27,6 +27,9 @@ import { Deposito } from "./Deposito";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { Negocio, type Parte } from "./Negocio";
 import { Tickets } from "../Tickets";
+import { CabezaDeUsuarios } from "./Usuarios";
+import { PESTANAS_DE_USUARIOS } from "../pestanas-de-usuarios";
+import { NOMBRES, TEXTOS } from "../textos";
 import { Anomalias } from "../Anomalias";
 import { ParteVender } from "./Vender";
 import "./estilos.css";
@@ -51,11 +54,10 @@ const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: stri
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ];
-export const DE_MAS: { parte: Parte | "tickets" | "anomalias" | "roles" | "configuracion" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
+export const DE_MAS: { parte: Exclude<Parte, "sesiones" | "actividad"> | "tickets" | "anomalias" | "configuracion" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
   { parte: "negocio", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy, los gastos y las compras", icono: "resumen", pide: ["negocio.numeros", "deposito.compras"] },
-  { parte: "usuarios", nombre: "Usuarios y sesiones", detalle: "Quién puede entrar y desde qué dispositivos", icono: "usuarios" },
-  { parte: "roles", nombre: "Roles", detalle: "Qué puede hacer cada rol", icono: "usuarios", pide: ["admin.roles"] },
-  { parte: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad", pide: ["negocio.actividad"] },
+  // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
+  { parte: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.corto, icono: "usuarios" },
   { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: ["negocio.anomalias"] },
   { parte: "procesos", nombre: "Procesos", detalle: "Cómo se hace cada cosa en el negocio, paso a paso", icono: "procesos", pide: ["procesos.ver", "procesos.dibujar"] },
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
@@ -141,12 +143,16 @@ function Pantallas() {
   // Sin dirección, la app abre en lo primero del menú. Las direcciones viejas de Negocio siguen andando.
   const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
   const nombre = sinDireccion ? "catalogo" : ruta.nombre === "negocio" ? "mas" : ruta.nombre;
-  const elegida = DE_MAS.find((d) => d.parte === (ruta.nombre === "negocio" ? "negocio" : ruta.sub)) ?? null;
+  // Las pestañas de Usuarios (decisión 88) son de la opción «Usuarios» de Más.
+  const deUsuarios = PESTANAS_DE_USUARIOS.find((p) => ruta.nombre === "mas" && p.valor === ruta.sub) ?? null;
+  const primeraDeUsuarios = PESTANAS_DE_USUARIOS.find((p) => permitido(p.pide))?.valor ?? "sesiones";
+  const elegida = deUsuarios ? DE_MAS.find((d) => d.parte === "usuarios")! : DE_MAS.find((d) => d.parte === (ruta.nombre === "negocio" ? "negocio" : ruta.sub)) ?? null;
   const parte = elegida?.parte ?? null;
   const pestana = PESTANAS.find((p) => p.ruta === nombre)?.ruta ?? "catalogo";
   // Lo que pide la pantalla a la que se llegó; si no se tiene, se dice en vez de mostrarla.
   const falta = !permitido(PESTANAS.find((p) => p.ruta === pestana)?.pide) ? PESTANAS.find((p) => p.ruta === pestana)!.pide!
-    : pestana === "mas" && elegida && !permitido(elegida.pide) ? elegida.pide! : null;
+    : pestana === "mas" && elegida && !permitido(elegida.pide) ? elegida.pide!
+    : pestana === "mas" && deUsuarios && !permitido(deUsuarios.pide) ? deUsuarios.pide! : null;
 
   return (
     <div className="app">
@@ -155,7 +161,7 @@ function Pantallas() {
       <div className="linea-de-arriba"><EstadoDeConexion testId="conexion-celular" /><BuscandoEnElServidor /><AvisoDeLaCompu /></div>
 
       {/* Un solo botón a la derecha del encabezado de cualquier pantalla (decisiones 70 y 73):
-          sin vínculo, «Vincular»; con vínculo, «Desconectar» o «Reconectar». Desvincular está en Usuarios y sesiones. */}
+          sin vínculo, «Vincular»; con vínculo, «Desconectar» o «Reconectar». Desvincular está en Más → Usuarios, pestaña Sesiones. */}
       {(emparejado || hayCamara()) && (
         <div className="vincular-lugar">
           {!emparejado ? (
@@ -193,13 +199,14 @@ function Pantallas() {
         : pestana === "mas" && parte === "tickets" ? <Tickets />
         : pestana === "mas" && parte === "configuracion" ? <Configuracion celular />
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />
-        : pestana === "mas" && parte === "roles" ? <Roles />
+        : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeUsuarios actual="roles" />} />
+        : pestana === "mas" && deUsuarios ? <Negocio parte={deUsuarios.valor as Exclude<typeof deUsuarios.valor, "roles">} cabeza={<CabezaDeUsuarios actual={deUsuarios.valor} />} />
         : pestana === "mas" && parte === "anomalias" ? <Anomalias />
         : pestana === "mas" && parte === "negocio" && !permitido(["negocio.numeros"]) ? (
           // Quien ve las compras pero no los números del negocio: de esta pantalla le toca solo esa parte.
           <main className="contenido"><div className="encabezado"><h1 className="titulo">Cómo va el negocio</h1></div><ComprasRecientes soloVer /></main>
         )
-        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "roles" && parte !== "configuracion" && parte !== "procesos" ? <Negocio parte={parte} />
+        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "configuracion" && parte !== "procesos" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>
@@ -216,7 +223,7 @@ function Pantallas() {
           )}
           <Lista>
             {deMas.map((d) => (
-              <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte}`)} data-testid={`mas-${d.parte}`}>
+              <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte === "usuarios" ? primeraDeUsuarios : d.parte}`)} data-testid={`mas-${d.parte}`}>
                 <span className="miniatura mas-icono"><IconoDeMas nombre={d.icono} tam={22} /></span>
                 <span className="nombre">{d.nombre}</span>
                 <Icono nombre="derecha" tam={18} grosor={2.4} />

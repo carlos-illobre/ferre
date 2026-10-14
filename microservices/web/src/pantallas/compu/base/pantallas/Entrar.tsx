@@ -34,11 +34,11 @@ function explicar(e: unknown, medio: "google" | "huella"): ErrorDeEntrada {
     const correo = /\S+@\S+/.exec(e.message)?.[0];
     return {
       titulo: "No autorizado",
-      texto: `${correo ?? "Ese correo"} no está autorizado para entrar a Ferrebress. Pedile a un Administrador del negocio que lo agregue en «Usuarios y sesiones», o probá con otra cuenta de Google.`,
+      texto: `${correo ?? "Ese correo"} no está autorizado para entrar a Ferrebress. Pedile a un Administrador del negocio que lo agregue en Más → Usuarios, o probá con otra cuenta de Google.`,
     };
   }
   if (e.estado === 403) return { titulo: "Usuario desactivado", texto: "Tu usuario está desactivado. Pedile a un Administrador del negocio que lo reactive." };
-  if (e.estado === 401 && medio === "huella") return { texto: "Este dispositivo no está vinculado a ninguna cuenta. Entrá con Google; después lo vinculás desde Negocio, en «Usuarios y sesiones»." };
+  if (e.estado === 401 && medio === "huella") return { texto: "Este dispositivo no está vinculado a ninguna cuenta. Entrá con Google; después lo vinculás desde Más → Usuarios, en «Sesiones»." };
   if (e.estado === 401) return { texto: "Google no pudo verificar la cuenta. Probá de nuevo." };
   return { texto: err.message };
 }
@@ -53,7 +53,7 @@ function ErrorEnElLugar({ error, testId }: { error: ErrorDeEntrada | null; testI
 }
 
 // El botón lo dibuja Google; acá va su lugar, lo que pasa mientras se entra y el resultado.
-// Al entrar, el servidor acepta solo los correos autorizados en «Usuarios y sesiones».
+// Al entrar, el servidor acepta solo los correos autorizados en Más → Usuarios.
 export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "filled_blue" | "filled_black" }) {
   const { entrar } = useSesion();
   const [error, setError] = useState<ErrorDeEntrada | null>(null);

@@ -1,16 +1,17 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { api } from "../api";
 import "./roles.css";
 
 // Roles (RF-75): cada rol es un nombre y un grupo de permisos. Los permisos son fijos y los
 // trae el servidor, cada uno con su explicación. La misma pantalla en el celular y en la
-// computadora. Asignar un rol a una persona se hace en Usuarios y sesiones.
+// computadora. Asignar un rol a una persona se hace en la pestaña Usuarios (decisión 88).
 type PermisoDelSistema = { clave: string; parte: string; nombre: string; detalle: string };
 type Rol = { id: string; nombre: string; descripcion: string | null; permisos: string[]; usuarios: number };
 type Borrador = { id: string | null; nombre: string; permisos: Set<string> };
 const mensajeDe = (e: unknown, quehacer: string) => ((e as { estado?: number }).estado ? `${(e as Error).message}.` : `Sin conexión: ${quehacer} necesita internet.`);
 
-export function Roles() {
+// `cabeza`: en el celular, el título y las pestañas de Usuarios en lugar del título «Roles» (decisión 88).
+export function Roles({ cabeza }: { cabeza?: ReactNode } = {}) {
   const [roles, setRoles] = useState<Rol[] | null>(null);
   const [permisos, setPermisos] = useState<PermisoDelSistema[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +42,7 @@ export function Roles() {
     try {
       if (borrador.id) await api(`/roles/${borrador.id}`, { method: "PATCH", body: cuerpo });
       else await api("/roles", { method: "POST", body: cuerpo });
-      setAviso(borrador.id ? `Rol «${borrador.nombre.trim()}» guardado. Vale desde ahora para quienes lo tienen.` : `Rol «${borrador.nombre.trim()}» creado. Ya se puede asignar en Usuarios y sesiones.`);
+      setAviso(borrador.id ? `Rol «${borrador.nombre.trim()}» guardado. Vale desde ahora para quienes lo tienen.` : `Rol «${borrador.nombre.trim()}» creado. Ya se puede asignar en la pestaña Usuarios.`);
       setBorrador(null); await cargar();
     } catch (e2) { setFalta(mensajeDe(e2, "guardar un rol")); }
     finally { setGuardando(false); }
@@ -55,8 +56,8 @@ export function Roles() {
 
   return (
     <main id="contenido" className="rl" data-testid="roles" tabIndex={-1}>
-      <h1>Roles</h1>
-      <p className="rl-bajada">Un rol es un grupo de permisos con un nombre. Armá los que necesite el negocio y después asignáselos a cada persona en Usuarios y sesiones; una persona puede tener más de uno.</p>
+      {cabeza ? <div className="encabezado">{cabeza}</div> : <h1>Roles</h1>}
+      <p className="rl-bajada">Un rol es un grupo de permisos con un nombre. Armá los que necesite el negocio y después asignáselos a cada persona en la pestaña Usuarios; una persona puede tener más de uno.</p>
       {error && <p className="rl-error" role="alert">{error} <button type="button" className="rl-boton" onClick={() => void cargar()}>Reintentar</button></p>}
       {aviso && <p className="rl-aviso" role="status" data-testid="mensaje-roles">{aviso}</p>}
 

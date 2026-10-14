@@ -120,7 +120,7 @@ RF-09:
     - microservices/api/src/sql-con-parametros.test.ts
   defectos:
     - "La forma de los datos llega del servidor solo en las ventas (`contratos/ventas.ts`); producto y los demás temas siguen escritos a mano en el front. Zod, el cliente tipado de Hono y React Router, aprobados en ADR-018, no se adoptaron todavía (010-T016, 010-T017 y 010-T018)"
-    - "Pedidos a proveedores, roles, tickets, el vínculo en Usuarios y sesiones, la foto pedida a la compu, anomalías y dinero invertido son pantallas compartidas que todavía le piden al servidor desde la pantalla, sin pasar por `negocio/`"
+    - "Pedidos a proveedores, roles, tickets, el vínculo en Más → Usuarios, la foto pedida a la compu, anomalías y dinero invertido son pantallas compartidas que todavía le piden al servidor desde la pantalla, sin pasar por `negocio/`"
     - "Las piezas de la plataforma (base local, cola, cámara, tiempo real) se prueban a través de las pantallas: no tienen pruebas propias"
     - "Nada automático impide que vuelva una carpeta de librerías compartidas entre servicios (E07): se comprueba mirando el repositorio"
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"

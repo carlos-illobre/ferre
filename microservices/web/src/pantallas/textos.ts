@@ -26,8 +26,10 @@ export const MOTIVOS_DE_AJUSTE = ["Conté la estantería", "Rotura", "Se usó en
 // Cómo se llama cada pantalla y cada parte, igual en el menú, en el título y en las dos interfaces.
 export const NOMBRES = {
   comoVaElNegocio: "Cómo va el negocio",
-  usuariosYSesiones: "Usuarios y sesiones",
+  usuarios: "Usuarios",
+  sesiones: "Sesiones",
   quienHizoQue: "Quién hizo qué",
+  actividad: "Actividad",
   anomalias: "Anomalías",
   mejorasYErrores: "Mejoras y errores",
   roles: "Roles",
@@ -52,8 +54,18 @@ export const TEXTOS = {
     faltaElMotivo: { largo: "Elegí un motivo o escribilo: sin motivo no se guarda.", corto: "Falta el motivo: sin motivo no se guarda." },
   },
   usuarios: {
+    // Más → Usuarios y sus pestañas (decisión 88).
+    queHayEnUsuarios: { largo: "Quién entra y desde dónde, qué puede hacer y qué hizo", corto: "Quién entra, qué puede hacer y qué hizo" },
+    pestanaUsuarios: {
+      largo: "Quién puede entrar a Ferrebress y qué puede hacer cada uno. Se entra con el correo de Google: no hay contraseñas.",
+      corto: "Quién puede entrar y con qué roles. Se entra con Google.",
+    },
+    pestanaSesiones: {
+      largo: "Desde qué computadoras y celulares está abierto Ferrebress ahora, y cómo se entra sin escribir nada: con la huella o escaneando el código con el celular.",
+      corto: "Dónde está abierto ahora y cómo se entra sin escribir nada.",
+    },
     queSonLosRoles: {
-      largo: "Cada persona puede lo que le permiten sus roles, y puede tener más de uno. Qué permite cada rol se arma en «Roles».",
+      largo: "Cada persona puede lo que le permiten sus roles, y puede tener más de uno. Qué permite cada rol se arma en la pestaña «Roles».",
       corto: "Cada persona puede lo que le permiten sus roles; puede tener más de uno.",
     },
     faltaUnRol: igual("Elegí al menos un rol. Para que no pueda nada, desactivá al usuario."),

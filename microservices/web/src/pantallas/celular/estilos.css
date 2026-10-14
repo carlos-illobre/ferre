@@ -116,6 +116,8 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 
 /* Encabezado de pantalla: título grande y, opcional, segmentos */
 .encabezado { display: flex; flex-direction: column; gap: 12px; padding-top: 14px; }
+/* Lo que hay en la pestaña de Usuarios, debajo de las pestañas (decisión 88). */
+.encabezado .bajada-de-pestana { margin: 0 2px; font-size: 15px; line-height: 1.4; color: var(--p-texto-2); }
 .encabezado .fila-titulo { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; min-height: 30px; }
 .titulo { font-size: 34px; font-weight: 700; letter-spacing: -0.025em; line-height: 1; }
 .subtitulo { font-size: 15px; color: var(--gris); line-height: 1.4; text-wrap: pretty; }
