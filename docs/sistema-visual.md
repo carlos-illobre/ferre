@@ -22,6 +22,19 @@ Toda función nueva con pantalla se hace en las dos.
   (`#f3f4f7`).
 - Lo que falta (sin margen, sin cliente) se marca con coral tenue.
 
+## Textos: mínimos en el celular, que explican en la computadora
+
+Dicen lo mismo en las dos interfaces (decisión 47), pero con distinto largo, y esto vale para
+toda pantalla nueva, también la de un módulo aparte como Procesos (pedido de Carlos del 2026-10-14):
+
+- **Celular, minimalista:** títulos, rótulos y avisos de pocas palabras, en un renglón si se
+  puede. Nada de párrafos que expliquen: si hace falta explicar, el texto corto alcanza para
+  actuar y la explicación queda para la computadora. Un nombre largo se acorta («Persona» por
+  «Tarea de una persona»), y el completo queda para los lectores de pantalla.
+- **Computadora, autoexplicativa:** cada pantalla se entiende sin manual: el estado vacío dice
+  qué es y qué hacer, los botones y los paneles explican qué cambian, los avisos dicen qué pasó
+  y por qué.
+
 ## Tipografía
 
 - **Los importes van en tipografía condensada (Archivo Narrow)**, más grandes que el resto:

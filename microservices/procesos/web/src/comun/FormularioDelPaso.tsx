@@ -7,8 +7,10 @@ import type { CambiosDelPaso } from "../editor/Lienzo";
 
 const TIPOS = Object.entries(NOMBRE_DEL_TIPO) as [TipoDePaso, string][];
 
-export function FormularioDelPaso({ paso, grafo, pantallas, soloLectura, alCambiar }: {
+export function FormularioDelPaso({ paso, grafo, pantallas, soloLectura, alCambiar, corto = false }: {
   paso: Paso; grafo: Grafo; pantallas: string[]; soloLectura: boolean; alCambiar: (cambios: CambiosDelPaso) => void;
+  /** En el celular, los textos mínimos (sistema visual, «Textos»). */
+  corto?: boolean;
 }) {
   const [nombre, setNombre] = useState(paso.nombre);
   const [como, setComo] = useState(paso.como);
@@ -39,7 +41,7 @@ export function FormularioDelPaso({ paso, grafo, pantallas, soloLectura, alCambi
             {!paso.carril && <option value="">—</option>}
             {grafo.carriles.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-        ) : <span className="procesos-ayuda">Sin carriles todavía: arrastrá «Carril» al dibujo para decir quién hace cada paso.</span>}
+        ) : <span className="procesos-ayuda">{corto ? "Sin carriles todavía." : "Sin carriles todavía: arrastrá «Carril» al dibujo para decir quién hace cada paso."}</span>}
       </label>
       {conPantalla && (
         <label className="procesos-campo">
@@ -53,7 +55,7 @@ export function FormularioDelPaso({ paso, grafo, pantallas, soloLectura, alCambi
       )}
       <label className="procesos-campo">
         <span>Cómo se hace</span>
-        <textarea value={como} readOnly={soloLectura} rows={3} onChange={(e) => setComo(e.target.value)} onBlur={() => { if (como !== paso.como) alCambiar({ como }); }} placeholder={soloLectura ? "" : "Lo que hay que saber para hacerlo bien"} data-testid="procesos-paso-como" />
+        <textarea value={como} readOnly={soloLectura} rows={3} onChange={(e) => setComo(e.target.value)} onBlur={() => { if (como !== paso.como) alCambiar({ como }); }} placeholder={soloLectura || corto ? "" : "Lo que hay que saber para hacerlo bien"} data-testid="procesos-paso-como" />
       </label>
       {paso.tipo !== "fin" && paso.tipo !== "nota" && paso.tipo !== "documento" && (
         <label className="procesos-campo">

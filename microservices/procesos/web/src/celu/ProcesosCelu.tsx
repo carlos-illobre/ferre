@@ -86,13 +86,12 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
           <h1>Procesos</h1>
           {dibuja && <button type="button" className="procesos-boton icono" aria-label="Importar" onClick={() => archivo.current?.click()} data-testid="procesos-importar"><Icono nombre="subir" /></button>}
         </div>
-        {procesos.sinConexion && <p className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo se puede mirar</p>}
+        {procesos.sinConexion && <p className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo lectura</p>}
         {avisos}
         {lista === null ? <p className="procesos-ayuda" role="status">Buscando los procesos…</p>
           : lista.length === 0 ? (
             <div className="procesos-vacio" data-testid="procesos-vacio">
-              <p>Un proceso es cómo se hace una tarea del negocio, paso a paso: vender en el mostrador, comprar a un proveedor, recibir mercadería.</p>
-              {!dibuja && <p>Todavía no hay ninguno vigente.</p>}
+              <p>{dibuja ? "Todavía no hay procesos." : "Todavía no hay procesos vigentes."}</p>
             </div>
           ) : (
             <ul className="procesos-tarjetas" data-testid="procesos-lista">
@@ -125,7 +124,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
       <div className="procesos-celu-estado">
         {estado && <span className={`procesos-chip ${estado}`} data-testid="procesos-estado">{TEXTO_DEL_ESTADO[estado]}</span>}
         {dibuja && <span className={`procesos-guardado ${procesos.guardado}`} data-testid="procesos-guardado">{{ guardado: "Guardado", guardando: "Guardando…", "sin-conexion": "Sin conexión: no se guardó", error: "No se guardó" }[procesos.guardado]}</span>}
-        {procesos.sinConexion && <span className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo se puede mirar</span>}
+        {procesos.sinConexion && <span className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo lectura</span>}
       </div>
       {avisos}
       <div className="procesos-segmentos" role="tablist">
@@ -136,7 +135,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
       {pestana === "pasos" && (
         <div className="procesos-pasos-celu" data-testid="procesos-pasos-celu">
           {items === null ? (
-            <p className="procesos-ayuda" data-testid="procesos-no-es-lista">Este proceso tiene caminos que vuelven atrás o pasos sueltos, y no se puede mostrar como lista. Miralo y cambialo en «Diagrama».</p>
+            <p className="procesos-ayuda" data-testid="procesos-no-es-lista">No entra en una lista: miralo en «Diagrama».</p>
           ) : (
             <ListaDePasos items={items} dibuja={dibuja} elegido={d.elegido}
               alTocar={(id) => { d.setElegido(id); setHoja("paso"); }}
@@ -179,7 +178,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
         <Hoja alCerrar={() => setHoja(null)} testId="procesos-hoja-paso">
           <div className="procesos-hoja-cabeza"><Icono nombre={d.pasoElegido.tipo} tam={24} /><b>{d.pasoElegido.nombre || NOMBRE_DEL_TIPO[d.pasoElegido.tipo]}</b></div>
           {erroresDeForma(d.grafo).porPaso.get(d.pasoElegido.id) && <p className="procesos-ayuda"><span className="procesos-marca-error">!</span> {erroresDeForma(d.grafo).porPaso.get(d.pasoElegido.id)}</p>}
-          <FormularioDelPaso paso={d.pasoElegido} grafo={d.grafo} pantallas={pantallas} soloLectura={!dibuja} alCambiar={(c) => d.lienzo.current?.cambiar(d.pasoElegido!.id, c)} />
+          <FormularioDelPaso corto paso={d.pasoElegido} grafo={d.grafo} pantallas={pantallas} soloLectura={!dibuja} alCambiar={(c) => d.lienzo.current?.cambiar(d.pasoElegido!.id, c)} />
           {dibuja && (
             <div className="procesos-botones">
               <button type="button" className="procesos-boton peligro" onClick={() => { d.lienzo.current?.aplicarFlechas([alQuitar(d.grafo, d.pasoElegido!.id)]); d.lienzo.current?.quitar(d.pasoElegido!.id); setHoja(null); }} data-testid="procesos-quitar-paso"><Icono nombre="tacho" /> Quitar el paso</button>
@@ -206,9 +205,9 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
           <div className="procesos-menu-celu">
             {dibuja && abierto.borrador && <button type="button" onClick={() => { setHoja(null); void procesos.marcarVigente(); }} data-testid="procesos-marcar-vigente"><Icono nombre="ok" /> Marcar vigente</button>}
             {dibuja && abierto.borrador && abierto.vigente && <button type="button" onClick={() => { setHoja(null); void procesos.descartarBorrador(); }} data-testid="procesos-descartar">Descartar el borrador</button>}
-            {dibuja && <button type="button" onClick={() => { setHoja(null); void d.exportar("png", abierto.nombre, TEXTO_DEL_ESTADO[estado!]); }} data-testid="procesos-exportar-png"><Icono nombre="bajar" /> Exportar como imagen (PNG)</button>}
-            {dibuja && <button type="button" onClick={() => { setHoja(null); void d.exportar("bpmn", abierto.nombre, TEXTO_DEL_ESTADO[estado!]); }} data-testid="procesos-exportar-bpmn"><Icono nombre="bajar" /> Exportar en BPMN (estándar)</button>}
-            {dibuja && <button type="button" onClick={() => { setHoja(null); archivo.current?.click(); }} data-testid="procesos-importar"><Icono nombre="subir" /> Importar un BPMN</button>}
+            {dibuja && <button type="button" onClick={() => { setHoja(null); void d.exportar("png", abierto.nombre, TEXTO_DEL_ESTADO[estado!]); }} data-testid="procesos-exportar-png"><Icono nombre="bajar" /> Exportar imagen (PNG)</button>}
+            {dibuja && <button type="button" onClick={() => { setHoja(null); void d.exportar("bpmn", abierto.nombre, TEXTO_DEL_ESTADO[estado!]); }} data-testid="procesos-exportar-bpmn"><Icono nombre="bajar" /> Exportar BPMN</button>}
+            {dibuja && <button type="button" onClick={() => { setHoja(null); archivo.current?.click(); }} data-testid="procesos-importar"><Icono nombre="subir" /> Importar BPMN</button>}
             <button type="button" onClick={() => { setHoja(null); setDialogo("historial"); }} data-testid="procesos-ver-historial"><Icono nombre="reloj" /> Historial</button>
             {dibuja && <button type="button" onClick={() => { setHoja(null); setDialogo("renombrar"); }} data-testid="procesos-renombrar"><Icono nombre="lapiz" /> Cambiar el nombre</button>}
             {dibuja && <button type="button" className="peligro" onClick={() => { setHoja(null); setDialogo("borrar"); }} data-testid="procesos-borrar"><Icono nombre="tacho" /> Borrar el proceso</button>}

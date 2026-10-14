@@ -49,6 +49,8 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
 
 ## Celular (historia 4)
 
+- **Textos mínimos** (sistema visual, «Textos»): en el celular, rótulos y avisos de pocas palabras; las explicaciones largas son de la computadora (pedido de Carlos del 2026-10-14).
+
 - Arriba: volver, el nombre del proceso, deshacer y el menú «⋯» (Importar, Exportar, Marcar
   vigente, Cambiar el nombre, Borrar, Historial).
 - Dos pestañas con ícono: primero «Diagrama» (elegida al abrir) y después «Pasos» (pedido de Carlos del 2026-10-14).

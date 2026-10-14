@@ -149,6 +149,6 @@ describe("el celular", () => {
       lienzoFalso.grafo = { ...lienzoFalso.grafo, flechas: [...lienzoFalso.grafo.flechas, { id: "atras", desde: "Cobrar", hasta: "Buscar", nombre: "" }] };
       lienzoFalso.props!.alCambiar!();
     });
-    expect((await screen.findByTestId("procesos-no-es-lista")).textContent).toMatch(/Miralo y cambialo en «Diagrama»/);
+    expect((await screen.findByTestId("procesos-no-es-lista")).textContent).toBe("No entra en una lista: miralo en «Diagrama».");
   });
 });
