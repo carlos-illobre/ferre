@@ -22,6 +22,9 @@ export const usuarios: Record<string, Usuario & { rol: string }> = {
   soloVende: { id: "u-solo-vende", email: "vende@ferre.test", nombre: "Solo vende", rol: "soloVende", roles: ["Vendedor"], permisos: ["ventas.registrar"] },
 };
 
+// Como Postgres, cada respuesta dice qué comando fue (INSERT, UPDATE…): las consultas con tipos lo usan para contar filas.
+const comando = (sql: string) => sql.trim().split(/\s/)[0]!.toUpperCase();
+
 export function baseFalsa() {
   const consultas: Consulta[] = [];
   const programadas: { patron: RegExp; respuesta: Respuesta }[] = [];
@@ -36,10 +39,10 @@ export function baseFalsa() {
     for (const p of programadas) {
       if (p.patron.test(sql)) {
         const r = typeof p.respuesta === "function" ? p.respuesta(params) : p.respuesta;
-        return { rows: r.rows ?? [], rowCount: r.rowCount ?? (r.rows?.length ?? 0) };
+        return { rows: r.rows ?? [], rowCount: r.rowCount ?? (r.rows?.length ?? 0), command: comando(sql) };
       }
     }
-    return { rows: [], rowCount: 0 };
+    return { rows: [], rowCount: 0, command: comando(sql) };
   });
   const cliente = { query, release: vi.fn() };
   const pool = { query, connect: vi.fn(async () => cliente) };

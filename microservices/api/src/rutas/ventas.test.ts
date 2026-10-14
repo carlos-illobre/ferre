@@ -28,66 +28,66 @@ describe("POST /ventas", () => {
   });
 
   it("registra la venta con su total, guarda cada ítem con precio, margen y explicación, y descuenta stock", async () => {
-    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "10" }] });
+    base.actual.programar(/SUM\(cantidad\), 0\) as "stock" from "movimiento_stock"/, { rows: [{ stock: "10" }] });
     const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
     expect(r.status).toBe(201);
-    const ventaSql = base.actual.sqlDe(/INSERT INTO venta \(/)[0]!;
+    const ventaSql = base.actual.sqlDe(/insert into "venta" \(/)[0]!;
     expect(ventaSql.params[0]).toBe(venta.id);
     expect(ventaSql.params[4]).toBe("9000.00");
-    const item = base.actual.sqlDe(/INSERT INTO item_venta/)[0]!;
+    const item = base.actual.sqlDe(/insert into "item_venta"/)[0]!;
     expect(item.params).toEqual(expect.arrayContaining(["MECHA", 3, 100, "3000.00", JSON.stringify({ pasos: ["+ 100 % de margen"] })]));
-    const movimiento = base.actual.sqlDe(/INSERT INTO movimiento_stock/)[0]!;
+    const movimiento = base.actual.sqlDe(/insert into "movimiento_stock"/)[0]!;
     expect(movimiento.params).toContain(-3);
-    expect(base.actual.sqlDe(/INSERT INTO anomalia/)).toHaveLength(0);
-    expect(base.actual.sqlDe(/^COMMIT/)).toHaveLength(1);
+    expect(base.actual.sqlDe(/insert into "anomalia"/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/^commit/)).toHaveLength(1);
   });
 
   // RF-59: una venta nunca deja el stock por debajo de cero; lo que faltaba es una anomalía.
   it("con stock en cero la venta se registra igual, el stock no baja y queda anotada la anomalía", async () => {
-    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "0" }] });
+    base.actual.programar(/SUM\(cantidad\), 0\) as "stock" from "movimiento_stock"/, { rows: [{ stock: "0" }] });
     const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
     expect(r.status).toBe(201);
-    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)).toHaveLength(0);
-    const anomalia = base.actual.sqlDe(/INSERT INTO anomalia/)[0]!;
+    expect(base.actual.sqlDe(/insert into "movimiento_stock"/)).toHaveLength(0);
+    const anomalia = base.actual.sqlDe(/insert into "anomalia"/)[0]!;
     expect(anomalia.params.slice(1, 5)).toEqual(["p1", "u-mostrador", venta.id, 3]);
     expect(String(anomalia.params[5])).toContain("faltaban 3");
-    expect(JSON.stringify(base.actual.sqlDe(/INSERT INTO evento/)[0]?.params ?? "")).toContain("anomalias");
+    expect(JSON.stringify(base.actual.sqlDe(/insert into "evento"/)[0]?.params ?? "")).toContain("anomalias");
   });
 
   it("si alcanza solo en parte, descuenta lo que hay y anota lo que faltó; un stock ya negativo no baja más", async () => {
-    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "2" }] });
+    base.actual.programar(/SUM\(cantidad\), 0\) as "stock" from "movimiento_stock"/, { rows: [{ stock: "2" }] });
     await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
-    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)[0]!.params).toContain(-2);
-    expect(base.actual.sqlDe(/INSERT INTO anomalia/)[0]!.params[4]).toBe(1);
+    expect(base.actual.sqlDe(/insert into "movimiento_stock"/)[0]!.params).toContain(-2);
+    expect(base.actual.sqlDe(/insert into "anomalia"/)[0]!.params[4]).toBe(1);
     base.actual = baseFalsa();
-    base.actual.programar(/SUM\(cantidad\), 0\) AS stock FROM movimiento_stock/, { rows: [{ stock: "-4" }] });
+    base.actual.programar(/SUM\(cantidad\), 0\) as "stock" from "movimiento_stock"/, { rows: [{ stock: "-4" }] });
     await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
-    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)).toHaveLength(0);
-    expect(base.actual.sqlDe(/INSERT INTO anomalia/)[0]!.params[4]).toBe(3);
+    expect(base.actual.sqlDe(/insert into "movimiento_stock"/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/insert into "anomalia"/)[0]!.params[4]).toBe(3);
   });
 
   it("anular devuelve al stock lo que la venta descontó, no lo que se vendió", async () => {
-    base.actual.programar(/UPDATE venta SET estado = 'anulada'/, { rowCount: 1 });
+    base.actual.programar(/update "venta" set "estado"/, { rowCount: 1 });
     const r = await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "admin", cuerpo: {} });
     expect(r.status).toBeLessThan(300);
-    expect(base.actual.sqlDe(/INSERT INTO movimiento_stock/)[0]!.sql).toMatch(/-cantidad[\s\S]*FROM movimiento_stock WHERE referencia_tipo = 'venta'/);
+    expect(base.actual.sqlDe(/insert into "movimiento_stock"/)[0]!.sql).toMatch(/-cantidad[\s\S]*from "movimiento_stock" where "referencia_tipo" = \$/);
   });
 
   it("quien anula ventas del día no anula las de un día anterior; con «de cualquier día», sí (decisión 53)", async () => {
-    base.actual.programar(/UPDATE venta SET estado = 'anulada'/, { rowCount: 1 });
-    base.actual.programar(/AS de_hoy FROM venta/, { rows: [{ de_hoy: false }] });
+    base.actual.programar(/update "venta" set "estado"/, { rowCount: 1 });
+    base.actual.programar(/as "de_hoy" from "venta"/, { rows: [{ de_hoy: false }] });
     const r = await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "cajero", cuerpo: {} });
     expect(r.status).toBe(403);
     expect(((await r.json()) as { error: string }).error).toContain("Anular ventas de cualquier día");
-    expect(base.actual.sqlDe(/UPDATE venta SET estado = 'anulada'/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/update "venta" set "estado"/)).toHaveLength(0);
     // La de hoy sí.
-    base.actual.programar(/AS de_hoy FROM venta/, { rows: [{ de_hoy: true }] });
+    base.actual.programar(/as "de_hoy" from "venta"/, { rows: [{ de_hoy: true }] });
     expect((await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "cajero", cuerpo: {} })).status).toBeLessThan(300);
     // Con el permiso de cualquier día no se mira la fecha.
     base.actual = baseFalsa();
-    base.actual.programar(/UPDATE venta SET estado = 'anulada'/, { rowCount: 1 });
+    base.actual.programar(/update "venta" set "estado"/, { rowCount: 1 });
     expect((await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "admin", cuerpo: {} })).status).toBeLessThan(300);
-    expect(base.actual.sqlDe(/AS de_hoy FROM venta/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/as "de_hoy" from "venta"/)).toHaveLength(0);
     expect((await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "soloVende", cuerpo: {} })).status).toBe(403);
   });
 
@@ -99,17 +99,17 @@ describe("POST /ventas", () => {
     ];
     const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: { ...venta, items } });
     expect(await r.json()).toMatchObject({ total: 7000 });
-    expect(base.actual.sqlDe(/INSERT INTO venta \(/)[0]!.params[4]).toBe("7000.00");
+    expect(base.actual.sqlDe(/insert into "venta" \(/)[0]!.params[4]).toBe("7000.00");
     // El precio por unidad y la cantidad se guardan tal cual: el redondeo es del renglón.
-    expect(base.actual.sqlDe(/INSERT INTO item_venta/)[0]!.params).toEqual(expect.arrayContaining([0.5, "3000.00"]));
+    expect(base.actual.sqlDe(/insert into "item_venta"/)[0]!.params).toEqual(expect.arrayContaining([0.5, "3000.00"]));
   });
 
   it("una venta reenviada (sin conexión, reintento) no se duplica", async () => {
-    base.actual.programar(/SELECT id, total, estado FROM venta WHERE id = \$1/, { rows: [{ id: venta.id, total: "9000.00", estado: "confirmada" }] });
+    base.actual.programar(/select "id", "total", "estado" from "venta" where "id" = \$1/, { rows: [{ id: venta.id, total: "9000.00", estado: "confirmada" }] });
     const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
     expect(r.status).toBe(200);
     expect(await r.json()).toMatchObject({ id: venta.id, total: 9000, repetida: true });
-    expect(base.actual.sqlDe(/INSERT INTO venta/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/insert into "venta"/)).toHaveLength(0);
   });
 });
 
@@ -117,7 +117,7 @@ describe("GET /ventas", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
   it("cada renglón llega con su subtotal calculado en el servidor, redondeado como se cobró (010-E06)", async () => {
-    base.actual.programar(/FROM venta v/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "3000", estado: "confirmada", pagada_en: null, cliente: null, items: [{ descripcion: "CABLE", cantidad: "1.5", precio_unitario: "1500", margen_aplicado: null, explicacion: null }] }] });
+    base.actual.programar(/from "venta" as "v"/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "3000", estado: "confirmada", pagada_en: null, cliente: null, items: [{ descripcion: "CABLE", cantidad: "1.5", precio_unitario: "1500", margen_aplicado: null, explicacion: null }] }] });
     const r = await pedir(app, "GET", "/ventas");
     const cuerpo = await r.json();
     expect(cuerpo.ventas[0].items[0].subtotal).toBe(3000);

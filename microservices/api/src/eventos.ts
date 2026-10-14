@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type pg from "pg";
+import type { Ejecutor } from "./base.js";
 
 // Registro de eventos de dominio (ADR-003). Es también la auditoría: quién, cuándo,
 // desde dónde y qué. Toda escritura de negocio pasa por acá.
@@ -18,5 +19,14 @@ export async function registrarEvento(ejecutor: pg.Pool | pg.PoolClient, evento:
      VALUES ($1, $2, $3, now(), $4, $5, $6)`,
     [id, evento.tipo, evento.version ?? 1, evento.dispositivoId ?? null, evento.usuarioId, JSON.stringify(evento.contenido)],
   );
+  return id;
+}
+
+// Lo mismo, dentro de una transacción con tipos (los temas que ya están en tres capas).
+export async function anotarEvento(ejecutor: Ejecutor, evento: Evento): Promise<string> {
+  const id = randomUUID();
+  await ejecutor.insertInto("evento").values({
+    id, tipo: evento.tipo, version: evento.version ?? 1, fecha: new Date(), dispositivo_id: evento.dispositivoId ?? null, usuario_id: evento.usuarioId, contenido: JSON.stringify(evento.contenido),
+  }).execute();
   return id;
 }

@@ -115,6 +115,7 @@ RF-09:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/api/src/rutas/productos.test.ts
+    - microservices/api/src/rutas/ventas.test.ts
   defectos:
     - "La foto no se muestra en el conteo de stock"
     - "Sin prueba: reemplazar la foto de un producto que ya tiene una"
@@ -1039,7 +1040,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Falta mover las pantallas a `pantallas/`, un solo juego de piezas de interfaz y la etapa 5 (010-T008 y 010-T012)"
+  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 empezada: ventas ya está en tres capas, con consultas con tipos. Falta el resto de los temas del servidor, mover las pantallas a `pantallas/` y un solo juego de piezas de interfaz (010-T008 y 010-T012)"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
@@ -1055,6 +1056,7 @@ RNF-60:
     - microservices/web/src/negocio/usuarios.test.tsx
     - microservices/web/src/negocio/precios/vista-previa.test.ts
     - microservices/api/src/rutas/productos.test.ts
+    - microservices/api/src/rutas/ventas.test.ts
   defectos:
     - "El precio del servidor engorda el catálogo que baja la computadora (la explicación de cada precio viaja con cada producto); no se midió todavía con los 11.000 productos reales"
     - "Las pantallas siguen en `principal/celular` y `principal/compu`; pasan a `pantallas/` con el juego único de piezas de interfaz (010-T012)"

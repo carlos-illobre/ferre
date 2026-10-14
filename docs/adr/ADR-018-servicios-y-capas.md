@@ -43,6 +43,20 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
   no llega nada del servidor. Mientras el servidor no esté en tres capas (etapa 5), se escribe
   a mano el contrato de cada tema que se va unificando.
 
+## Cómo se aplica en el servidor
+
+Cada tema pasa a las tres capas por separado (ventas fue el primero):
+
+- **La ruta** (`src/rutas/<tema>.ts`) solo traduce: lee el pedido, llama a la regla y elige el
+  código de respuesta. No tiene SQL ni reglas.
+- **Las reglas** (`src/<tema>/reglas.ts`): qué se valida, qué se calcula, qué se anota en el
+  registro de eventos, y la transacción que lo agrupa.
+- **Los datos** (`src/<tema>/datos.ts`): cada lectura y escritura, con Kysely (`src/base.ts`).
+  Las tablas tienen tipos en `src/tablas.ts`: un nombre de columna mal escrito no compila. Los
+  valores siempre van como parámetros.
+- Los temas que todavía no pasaron siguen con `pool.query` y conviven sin problema: usan el
+  mismo pool. `anotarEvento` es el registro de eventos para quien ya usa Kysely.
+
 ## Consecuencias
 
 - Mientras dure la unificación de cada proceso no se cambian sus pantallas.

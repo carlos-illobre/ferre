@@ -16,6 +16,7 @@
     "@simplewebauthn/server": "^13.3.3",
     "google-auth-library": "^11.0.2",
     "hono": "^4.6.0",
+    "kysely": "0.29.6",
     "pg": "^8.13.0"
   },
   "devDependencies": {
