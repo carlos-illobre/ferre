@@ -1,6 +1,7 @@
 import { base, Deshacer, enTransaccion } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
+import type { BorradorDePedido } from "../contratos/pedidos.js";
 
 // Pedidos a proveedores (RF-55, decisión 52). Un pedido nace como borrador, se manda como
 // texto (el servidor no manda nada: anota que se mandó) y el ingreso de mercadería lo va
@@ -9,8 +10,8 @@ export type Resultado = { ok: true } | { ok: false; estado: 400 | 404 | 409; err
 const mal = (estado: 400 | 404 | 409, error: string): Resultado => ({ ok: false, estado, error });
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const ESPERAN = ["enviado", "recibido_parcial"];
-export type ItemEntrada = { producto_id: string; cantidad: number };
-export type Entrada = { id?: string; proveedor_id?: string; items?: ItemEntrada[] };
+export type ItemEntrada = NonNullable<BorradorDePedido["items"]>[number];
+export type Entrada = BorradorDePedido & { id?: string };
 
 export function validar(v: Entrada): string | null {
   if (v.id && !UUID.test(v.id)) return "El id del pedido tiene que ser un UUID";

@@ -8,18 +8,14 @@ import { contarAlEspejo, useEspejar } from "../espejo";
 import { useVolverCierra } from "../plataforma/navegacion/volver";
 import "./pedidos.css";
 import type { Proveedor as ProveedorDelServidor } from "@servidor/proveedores";
+import type { BorradorDePedido, EnvioDePedido, Pedido } from "@servidor/pedidos";
 
 // Pedidos a proveedores (RF-55, decisión 52). La misma pantalla en el celular y en la
 // computadora (maqueta B, aprobada el 2026-10-11): la lista de pedidos; el pedido, que es
 // solo sus renglones; y «Revisar y mandar», una hoja con el mensaje tal como lo recibe el
 // proveedor. Se manda como texto, por WhatsApp o copiándolo. Lo que el proveedor recibe no
 // lleva costos: el estimado lo ve solo quien arma el pedido.
-type ItemDelPedido = { producto_id: string; descripcion: string; marca: string | null; unidad: string; codigo_proveedor: string | null; cantidad: string; costo_estimado: string | null; recibido: string };
-export type Pedido = {
-  id: string; estado: "borrador" | "enviado" | "recibido_parcial" | "recibido" | "cancelado" | "cerrado_incompleto";
-  proveedor_id: string; proveedor: string; whatsapp: string | null; creado_en: string; enviado_en: string | null; cerrado_en: string | null;
-  enviado_por: string | null; cerrado_por: string | null; items: ItemDelPedido[];
-};
+export type { Pedido };
 type Proveedor = Pick<ProveedorDelServidor, "id" | "nombre" | "activo" | "whatsapp">;
 type Renglon = { producto_id: string; descripcion: string; marca: string | null; unidad: string; codigo: string | null; cantidad: number; costo: number | null };
 type Borrador = { id: string; proveedorId: string; renglones: Renglon[] };
@@ -160,7 +156,7 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
   const guardar = useCallback(async (lista: Renglon[]) => {
     setGuardado("guardando");
     try {
-      await api(`/pedidos/${inicial.id}`, { method: "PUT", body: JSON.stringify({ proveedor_id: proveedor.id, items: lista.map((r) => ({ producto_id: r.producto_id, cantidad: r.cantidad })) }) });
+      await api(`/pedidos/${inicial.id}`, { method: "PUT", body: JSON.stringify({ proveedor_id: proveedor.id, items: lista.map((r) => ({ producto_id: r.producto_id, cantidad: r.cantidad })) } satisfies BorradorDePedido) });
       existe.current = true; setGuardado("si"); setError(null); return true;
     } catch (e) { setGuardado("no"); setError(mensajeDe(e, "guardar el pedido")); return false; }
   }, [inicial.id, proveedor.id]);
@@ -288,7 +284,7 @@ function MandarPedido({ id, proveedor, renglones, total, alCerrar, alMandar }: {
 
   async function marcar(whatsapp?: string) {
     setOcupado(true); setError(null);
-    try { await api(`/pedidos/${id}/enviar`, { method: "POST", body: JSON.stringify(whatsapp ? { whatsapp } : {}) }); alMandar(); }
+    try { await api(`/pedidos/${id}/enviar`, { method: "POST", body: JSON.stringify((whatsapp ? { whatsapp } : {}) satisfies EnvioDePedido) }); alMandar(); }
     catch (e) { setError(mensajeDe(e, "mandar el pedido")); setOcupado(false); }
   }
   function porWhatsApp() {

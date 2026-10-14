@@ -1,10 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { sql, type Sql } from "kysely";
 import type { Ejecutor } from "../base.js";
+import type { Pedido as PedidoDelContrato } from "../contratos/pedidos.js";
+import type { Enviable } from "../enviable.js";
 
 // Pedidos a proveedores: el acceso a los datos (ADR-018). Consultas escritas a mano con Kysely
 // (`sql`), con el tipo de lo que devuelven; los valores van como parámetros.
-export type Pedido = { id: string; estado: string; proveedor_id: string; proveedor: string; whatsapp: string | null; creado_en: Date; enviado_en: Date | null; cerrado_en: Date | null; enviado_por: string | null; cerrado_por: string | null; items: unknown[] };
+export type Pedido = Enviable<PedidoDelContrato>;
 
 const seleccion = (donde: ReturnType<Sql["raw"]> | ReturnType<typeof sql>) => sql<Pedido>`
   SELECT pe.id, pe.estado, pe.proveedor_id, pr.nombre AS proveedor, pr.whatsapp, pe.creado_en, pe.enviado_en, pe.cerrado_en,

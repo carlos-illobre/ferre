@@ -6,6 +6,7 @@ import { hoyLocal } from "../../formato";
 import type { Producto } from "../../producto";
 import { useProveedoresActivos, type Proveedor } from "../proveedores";
 import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo, type IngresoEnEspejo } from "./ingreso-en-espejo";
+import type { ItemDePedido, Pedido } from "@servidor/pedidos";
 
 // El ingreso de mercadería, una sola vez para el celular y la computadora (RNF-60): proveedor y
 // comprobante, los renglones que llegaron y registrar. Suma stock y, si el comprobante trae
@@ -15,7 +16,7 @@ export type Renglon = { clave: string; producto: Producto | null; descripcion: s
 export type { Proveedor };
 
 // El pedido del que viene la mercadería (RF-55): el ingreso arranca con su proveedor y con lo que falta llegar.
-export type PedidoAIngresar = { id: string; proveedor_id: string; items: { producto_id: string; descripcion: string; cantidad: string; recibido: string; costo_estimado: string | null }[] };
+export type PedidoAIngresar = Pick<Pedido, "id" | "proveedor_id"> & { items: Pick<ItemDePedido, "producto_id" | "descripcion" | "cantidad" | "recibido" | "costo_estimado">[] };
 // Lo que falta para poder registrar, en el orden en que se pide.
 export type Falta = "proveedor" | "productos" | "renglones";
 export type Registro = { total: number; proveedor: string; renglones: number; costosActualizados: number; productosNuevos: number; dePedido: boolean };

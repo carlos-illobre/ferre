@@ -1,6 +1,7 @@
 import { Hono, type Context } from "hono";
 import { exigirPermiso, exigirSesion, puede } from "../autenticacion.js";
 import * as reglas from "../pedidos/reglas.js";
+import type { BorradorGuardado, EnvioDePedido } from "../contratos/pedidos.js";
 
 // Pedidos a proveedores (RF-55, decisión 52). La ruta solo traduce (ADR-018); las reglas y
 // los datos están en `pedidos/`. Armar, mandar, cancelar y cerrar pide «Encargar compras».
@@ -22,13 +23,13 @@ pedidos.put("/:id", exigirPermiso("deposito.pedidos"), async (c) => {
   const error = reglas.validar(v);
   if (error) return c.json({ error }, 400);
   const r = await reglas.guardarBorrador(v, c.get("sesion").usuario.id);
-  return r.ok ? c.json({ id: v.id }, 200) : responder(c, r);
+  return r.ok ? c.json({ id: v.id } satisfies BorradorGuardado, 200) : responder(c, r);
 });
 
 pedidos.delete("/:id", exigirPermiso("deposito.pedidos"), async (c) => responder(c, await reglas.borrar(c.req.param("id"))));
 
 pedidos.post("/:id/enviar", exigirPermiso("deposito.pedidos"), async (c) => {
-  const { whatsapp } = await c.req.json<{ whatsapp?: string }>().catch(() => ({}) as { whatsapp?: string });
+  const { whatsapp } = await c.req.json<EnvioDePedido>().catch(() => ({}) as EnvioDePedido);
   return responder(c, await reglas.mandar(c.req.param("id"), whatsapp, c.get("sesion").usuario.id));
 });
 
