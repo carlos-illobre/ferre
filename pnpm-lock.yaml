@@ -94,9 +94,6 @@ importers:
       bpmn-js:
         specifier: 18.29.1
         version: 18.29.1
-      procesos-servidor:
-        specifier: workspace:*
-        version: link:../servidor
     devDependencies:
       '@testing-library/dom':
         specifier: ^10.4.2
@@ -113,12 +110,18 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.7(@types/react@18.3.31)
+      bpmn-moddle:
+        specifier: 10.3.1
+        version: 10.3.1
       dependency-cruiser:
         specifier: 18.6.0
         version: 18.6.0
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
+      procesos-servidor:
+        specifier: workspace:*
+        version: link:../servidor
       react:
         specifier: ^18.3.0
         version: 18.3.1
