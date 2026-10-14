@@ -1,6 +1,8 @@
 import { pool } from "../db.js";
 import { Deshacer, enTransaccionPg } from "../base.js";
 import { registrarEvento } from "../eventos.js";
+import type { Sugerencia, Union } from "../contratos/equivalencias.js";
+import type { Enviable } from "../enviable.js";
 import { separarProductos, sugerirEquivalencias, unirProductos, type Movidos } from "./datos.js";
 
 // Duplicados entre proveedores (issue #29), en sus reglas (ADR-018): quien tiene el permiso ve
@@ -13,10 +15,10 @@ const RESUMEN = `
     LEFT JOIN proveedor pr ON pr.id = pp.proveedor_id
    WHERE p.id = $1`;
 
-export async function sugerencias() {
+export async function sugerencias(): Promise<Enviable<Sugerencia>[]> {
   const { rows } = await pool.query<{ id: string; producto_a: string; producto_b: string; motivo: string; creado_en: string }>(
     "SELECT id, producto_a, producto_b, motivo, creado_en FROM equivalencia_sugerida WHERE estado = 'pendiente' ORDER BY creado_en DESC LIMIT 100");
-  const salida = [];
+  const salida: Enviable<Sugerencia>[] = [];
   for (const r of rows) {
     const [a, b] = await Promise.all([pool.query(RESUMEN, [r.producto_a]), pool.query(RESUMEN, [r.producto_b])]);
     salida.push({ id: r.id, motivo: r.motivo, creado_en: r.creado_en, a: a.rows[0], b: b.rows[0] });
@@ -25,7 +27,7 @@ export async function sugerencias() {
 }
 
 // Volver a buscar duplicados en todo el catálogo (las listas ya lo hacen al aplicarse).
-export const buscar = () => sugerirEquivalencias(pool, null);
+export const buscar = (): Promise<number> => sugerirEquivalencias(pool, null);
 
 export type Resultado = { ok: true } | { ok: false; estado: 400 | 404 | 409; error: string };
 const mal = (estado: 400 | 404 | 409, error: string): Resultado => ({ ok: false, estado, error });
@@ -62,7 +64,7 @@ export function unirAMano(conservar: string | undefined, absorber: string | unde
 }
 
 // Las uniones hechas, mientras el absorbido siga dentro del conservado: se pueden separar.
-export const unidos = () => pool.query(
+export const unidos = (): Promise<Enviable<Union>[]> => pool.query(
   `SELECT a.id AS absorbido_id, a.descripcion AS absorbido, c.id AS conservado_id, c.descripcion AS conservado, a.modificado_en AS unido_en,
           (SELECT string_agg(DISTINCT pr.nombre, ', ') FROM precio_proveedor pp JOIN proveedor pr ON pr.id = pp.proveedor_id WHERE pp.producto_id = c.id) AS proveedores
      FROM producto a JOIN producto c ON c.id = a.reemplazado_por
