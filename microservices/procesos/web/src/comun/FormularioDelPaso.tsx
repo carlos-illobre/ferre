@@ -21,7 +21,7 @@ export function FormularioDelPaso({ paso, grafo, pantallas, soloLectura, alCambi
   const conPantalla = paso.tipo !== "inicio" && paso.tipo !== "fin" && paso.tipo !== "nota" && paso.tipo !== "documento";
 
   return (
-    <div className="procesos-formulario" data-testid="procesos-formulario-paso">
+    <div className={`procesos-formulario ${corto ? "renglones" : ""}`} data-testid="procesos-formulario-paso">
       <label className="procesos-campo">
         <span>Nombre</span>
         <input id="procesos-nombre-del-paso" value={nombre} readOnly={soloLectura} onChange={(e) => setNombre(e.target.value)}
@@ -53,7 +53,7 @@ export function FormularioDelPaso({ paso, grafo, pantallas, soloLectura, alCambi
           </select>
         </label>
       )}
-      <label className="procesos-campo">
+      <label className="procesos-campo largo">
         <span>Cómo se hace</span>
         <textarea value={como} readOnly={soloLectura} rows={3} onChange={(e) => setComo(e.target.value)} onBlur={() => { if (como !== paso.como) alCambiar({ como }); }} placeholder={soloLectura || corto ? "" : "Lo que hay que saber para hacerlo bien"} data-testid="procesos-paso-como" />
       </label>

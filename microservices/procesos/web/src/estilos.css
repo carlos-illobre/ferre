@@ -209,3 +209,30 @@
 /* Celular: el dibujo maneja los dedos (mover, acercar, levantar un paso): la página no se corre ni
    se acerca desde ahí. */
 .procesos-dibujo-celu .procesos-lienzo { touch-action: none; -webkit-user-select: none; user-select: none; }
+
+/* Celular: las hojas y el formulario del paso con el estilo de los formularios de la aplicación:
+   fondo claro, título grande, una tarjeta blanca con un renglón por dato (rótulo a la izquierda,
+   valor a la derecha, sin recuadros) y botones anchos (Carlos, 2026-10-14). */
+.procesos-hoja-celu { background: var(--procesos-fondo-2, #eef3ee); border-radius: 28px 28px 0 0; padding: 8px 20px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; }
+.procesos-hoja-celu .procesos-tirador { margin-bottom: 0; }
+.procesos-hoja-cabeza h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.procesos-hoja-cabeza .procesos-icono { color: var(--procesos-titulo, #17312b); }
+.procesos-formulario.renglones { background: var(--procesos-superficie, #fff); border-radius: 18px; padding: 2px 16px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(14, 18, 32, 0.06); }
+.procesos-formulario.renglones .procesos-campo { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; margin: 0; border-bottom: 1px solid rgba(23, 49, 43, 0.1); }
+.procesos-formulario.renglones .procesos-campo:last-child { border-bottom: 0; }
+.procesos-formulario.renglones .procesos-campo > span:first-child { font-size: 16px; font-weight: 400; color: var(--procesos-texto-2, #4a5451); flex: none; }
+.procesos-formulario.renglones .procesos-campo input, .procesos-formulario.renglones .procesos-campo select, .procesos-formulario.renglones .procesos-valor { border: 0; background: transparent; padding: 0; min-height: 48px; text-align: right; font-size: 16px; font-weight: 600; color: var(--procesos-tinta, #18201e); flex: 1; min-width: 0; width: auto; }
+.procesos-formulario.renglones .procesos-campo select { appearance: none; -webkit-appearance: none; direction: rtl; text-overflow: ellipsis; }
+.procesos-formulario.renglones .procesos-campo select option { direction: ltr; }
+.procesos-formulario.renglones .procesos-valor { display: flex; align-items: center; justify-content: flex-end; }
+.procesos-formulario.renglones .procesos-ayuda { text-align: right; font-size: 15px; }
+.procesos-formulario.renglones .procesos-campo.largo { flex-direction: column; align-items: stretch; gap: 6px; padding: 12px 0; }
+.procesos-formulario.renglones .procesos-campo.largo textarea { border: 0; border-radius: 12px; background: var(--procesos-fondo-2, #eef3ee); padding: 10px 12px; font-size: 16px; min-height: 72px; text-align: left; font-weight: 400; }
+.procesos-acciones-celu { display: flex; flex-direction: column; gap: 6px; }
+.procesos-acciones-celu .procesos-boton.ancho { min-height: 54px; border-radius: 16px; font-size: 17px; border: 0; background: var(--procesos-superficie, #fff); box-shadow: 0 1px 2px rgba(14, 18, 32, 0.06); justify-content: center; }
+.procesos-boton.texto { border: 0; background: transparent; justify-content: center; }
+.procesos-boton.texto.peligro { color: var(--procesos-peligro, #b42318); }
+.procesos-hoja-cabeza .procesos-cerrar-hoja { margin-left: auto; flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #fff; color: var(--procesos-titulo, #17312b); display: grid; place-items: center; cursor: pointer; }
+.procesos-hoja-cabeza .procesos-cerrar-hoja:active { background: var(--procesos-borde, #e2e8e5); }
+/* Lo de bpmn-js (el menú del paso elegido trae z-index 100) queda adentro del dibujo: nunca tapa los botones de acercar ni las hojas. */
+.procesos-lienzo { z-index: 0; }

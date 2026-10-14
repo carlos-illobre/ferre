@@ -35,6 +35,7 @@ const TRAZOS = {
   puntos: '<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
   reloj: '<circle cx="12" cy="12" r="8"/><path d="M12 8 V12 L15 14"/>',
   ok: '<path d="M5 12 L10 17 L19 7"/>',
+  cerrar: '<path d="M6 6 L18 18 M18 6 L6 18"/>',
 } as const;
 
 export type NombreDeIcono = keyof typeof TRAZOS;

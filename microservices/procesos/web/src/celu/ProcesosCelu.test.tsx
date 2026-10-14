@@ -89,7 +89,11 @@ describe("el celular", () => {
     fireEvent.click(within(screen.getByTestId("procesos-paso-Cobrar")).getByRole("button"));
     const hoja = screen.getByTestId("procesos-hoja-paso");
     expect((within(hoja).getByTestId("procesos-paso-nombre") as HTMLInputElement).value).toBe("Cobrar");
-    fireEvent.click(within(hoja).getByTestId("procesos-quitar-paso"));
+    // El botón de cerrar la cierra sin cambiar nada.
+    fireEvent.click(within(hoja).getByRole("button", { name: "Cerrar" }));
+    expect(screen.queryByTestId("procesos-hoja-paso")).toBeNull();
+    fireEvent.click(within(screen.getByTestId("procesos-paso-Cobrar")).getByRole("button"));
+    fireEvent.click(within(screen.getByTestId("procesos-hoja-paso")).getByTestId("procesos-quitar-paso"));
     expect(lienzoFalso.llamadas.filter(([n]) => n === "aplicarFlechas" || n === "quitar").map(([n]) => n)).toEqual(["aplicarFlechas", "quitar"]);
     expect(lienzoFalso.llamadas).toContainEqual(["quitar", "Cobrar"]);
   });

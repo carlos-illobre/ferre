@@ -27,4 +27,5 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T021 [interfaz] En el celular, el botón de volver desde un proceso vuelve a la lista de procesos, no a Más; la explicación de «Agregar un paso» queda «Arrastrá un paso al dibujo.» (pedidos de Carlos del 2026-10-14)
 - [x] T022 [ajuste] Los textos del celular, mínimos; los que explican quedan en la computadora (pedido de Carlos del 2026-10-14)
 - [x] T023 [arreglo] En el celular, mantener apretado un paso del diagrama y arrastrarlo lo mueve (011-E05 y E30 con el dedo; avisó Carlos el 2026-10-14)
+- [x] T024 [ajuste] En el celular, la hoja del paso sigue el estilo de los formularios de la aplicación: tarjeta blanca con un renglón por dato, botones anchos y una cruz para cerrarla; los botoncitos del paso elegido quedan por debajo de los botones y las hojas (pedido de Carlos del 2026-10-14)
 - [ ] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

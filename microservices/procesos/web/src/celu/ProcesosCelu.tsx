@@ -176,13 +176,14 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
 
       {hoja === "paso" && d.pasoElegido && (
         <Hoja alCerrar={() => setHoja(null)} testId="procesos-hoja-paso">
-          <div className="procesos-hoja-cabeza"><Icono nombre={d.pasoElegido.tipo} tam={24} /><b>{d.pasoElegido.nombre || NOMBRE_DEL_TIPO[d.pasoElegido.tipo]}</b></div>
+          <div className="procesos-hoja-cabeza"><Icono nombre={d.pasoElegido.tipo} tam={26} /><h2>{d.pasoElegido.nombre || NOMBRE_DEL_TIPO[d.pasoElegido.tipo]}</h2>
+            <button type="button" className="procesos-cerrar-hoja" onClick={() => setHoja(null)} aria-label="Cerrar" title="Cerrar" data-testid="procesos-cerrar-paso"><Icono nombre="cerrar" /></button></div>
           {erroresDeForma(d.grafo).porPaso.get(d.pasoElegido.id) && <p className="procesos-ayuda"><span className="procesos-marca-error">!</span> {erroresDeForma(d.grafo).porPaso.get(d.pasoElegido.id)}</p>}
           <FormularioDelPaso corto paso={d.pasoElegido} grafo={d.grafo} pantallas={pantallas} soloLectura={!dibuja} alCambiar={(c) => d.lienzo.current?.cambiar(d.pasoElegido!.id, c)} />
           {dibuja && (
-            <div className="procesos-botones">
-              <button type="button" className="procesos-boton peligro" onClick={() => { d.lienzo.current?.aplicarFlechas([alQuitar(d.grafo, d.pasoElegido!.id)]); d.lienzo.current?.quitar(d.pasoElegido!.id); setHoja(null); }} data-testid="procesos-quitar-paso"><Icono nombre="tacho" /> Quitar el paso</button>
-              <button type="button" className="procesos-boton" onClick={() => { const siguiente = d.grafo.flechas.find((f) => f.desde === d.pasoElegido!.id)?.hasta ?? null; setLugarNuevo({ desde: d.pasoElegido!.id, hasta: siguiente }); setHoja("agregar"); }} data-testid="procesos-agregar-despues"><Icono nombre="mas" /> Agregar un paso después</button>
+            <div className="procesos-acciones-celu">
+              <button type="button" className="procesos-boton ancho" onClick={() => { const siguiente = d.grafo.flechas.find((f) => f.desde === d.pasoElegido!.id)?.hasta ?? null; setLugarNuevo({ desde: d.pasoElegido!.id, hasta: siguiente }); setHoja("agregar"); }} data-testid="procesos-agregar-despues"><Icono nombre="mas" /> Agregar un paso después</button>
+              <button type="button" className="procesos-boton texto peligro" onClick={() => { d.lienzo.current?.aplicarFlechas([alQuitar(d.grafo, d.pasoElegido!.id)]); d.lienzo.current?.quitar(d.pasoElegido!.id); setHoja(null); }} data-testid="procesos-quitar-paso"><Icono nombre="tacho" /> Quitar el paso</button>
             </div>
           )}
         </Hoja>
@@ -234,7 +235,7 @@ function Hoja({ children, alCerrar, testId }: { children: ReactNode; alCerrar: (
   }, [alCerrar]);
   return (
     <div className="procesos-fondo procesos-fondo-hoja" onMouseDown={(e) => { if (e.target === e.currentTarget) alCerrar(); }}>
-      <div className="procesos-hoja" role="dialog" aria-modal="true" data-testid={testId}>
+      <div className="procesos-hoja procesos-hoja-celu" role="dialog" aria-modal="true" data-testid={testId}>
         <div className="procesos-tirador" />
         {children}
       </div>

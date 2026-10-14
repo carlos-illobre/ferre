@@ -64,6 +64,8 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
 - La hoja «Agregar un paso» se pliega y se despliega tocando su título (arranca abierta); plegada deja a la vista solo el título, para ver más dibujo. El logo de bpmn.io flota abajo a la derecha del dibujo, justo encima de la hoja, y se mueve con ella (pedido de Carlos del 2026-10-14).
 - Debajo de «Agregar un paso», una sola línea: «Arrastrá un paso al dibujo.» Tocar una figura también la agrega, después del paso elegido, pero la frase no lo dice (pedido de Carlos del 2026-10-14).
 - El botón de volver del celular, adentro de un proceso, vuelve a la lista de procesos (con algo abierto encima, primero cierra eso); desde la lista, vuelve a Más (pedido de Carlos del 2026-10-14).
+- La hoja de un paso usa el estilo de los formularios del celular: título grande, una tarjeta blanca con un renglón por dato (el rótulo a la izquierda, el valor a la derecha, sin recuadros) y abajo los botones anchos; arriba a la derecha, un botón chico con una cruz la cierra (pedidos de Carlos del 2026-10-14).
+- Los botoncitos que aparecen junto al paso elegido quedan siempre por debajo de los botones de acercar y alejar y de las hojas (pedido de Carlos del 2026-10-14).
 - Todo se alcanza con una mano; nada se corre hacia el costado salvo el dibujo.
 
 ## Exportar e importar (historia 5)
