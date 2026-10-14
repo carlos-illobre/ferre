@@ -2,7 +2,7 @@ import type { Context, MiddlewareHandler } from "hono";
 import { OAuth2Client } from "google-auth-library";
 import { config } from "./config.js";
 import { pool } from "./db.js";
-import { buscarSesion, type SesionActiva, type Usuario } from "./sesiones.js";
+import { buscarSesion, type SesionActiva, type Usuario } from "./acceso/sesiones.js";
 import { nombreDePermiso, type Permiso } from "./permisos.js";
 
 // Quién es el que llama. Sin sesión válida, 401; sin el permiso que pide la operación, 403.

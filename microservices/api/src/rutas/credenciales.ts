@@ -8,7 +8,7 @@ import { pool } from "../db.js";
 import { config } from "../config.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirSesion, limitarIntentos, puede } from "../autenticacion.js";
-import { crearSesion, usuarioConPermisos } from "../sesiones.js";
+import { crearSesion, usuarioConPermisos } from "../acceso/sesiones.js";
 
 // Passkeys (WebAuthn, ADR-011 enmienda): el usuario, ya entrado con Google, vincula su
 // celular; desde entonces ese celular entra con la huella, sin Gmail. La clave privada

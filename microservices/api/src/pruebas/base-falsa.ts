@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
 import { vi } from "vitest";
-import type { Usuario } from "../sesiones.js";
+import type { Usuario } from "../acceso/sesiones.js";
 import { PERMISOS } from "../permisos.js";
 
 // Base de datos simulada para probar las rutas sin Postgres: cada consulta se anota y se

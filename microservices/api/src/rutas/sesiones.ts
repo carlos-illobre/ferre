@@ -3,8 +3,8 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { emailVerificadoPorGoogle, exigirPermiso, exigirSesion, limitarIntentos } from "../autenticacion.js";
 import { randomUUID } from "node:crypto";
-import { anotarDispositivo, cortarVinculosDe, emparejar } from "../emparejamiento.js";
-import { crearSesion, generarToken, hashear, revocarSesion, usuarioConPermisos } from "../sesiones.js";
+import { anotarDispositivo, cortarVinculosDe, emparejar } from "../acceso/vinculo.js";
+import { crearSesion, generarToken, hashear, revocarSesion, usuarioConPermisos } from "../acceso/sesiones.js";
 
 export const sesiones = new Hono();
 

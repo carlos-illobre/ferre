@@ -4,8 +4,8 @@ import { streamSSE } from "hono/streaming";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirPermiso, exigirSesion } from "../autenticacion.js";
-import { generarToken, hashear } from "../sesiones.js";
-import { adoptarVinculos, anotarDispositivo, computadorasDe, diasDeVinculo, sellarVinculo, soltarAnteriores } from "../emparejamiento.js";
+import { generarToken, hashear } from "../acceso/sesiones.js";
+import { adoptarVinculos, anotarDispositivo, computadorasDe, diasDeVinculo, sellarVinculo, soltarAnteriores } from "../acceso/vinculo.js";
 import { fotosQueEsperan } from "./pedidos-de-foto.js";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). Nace solo cuando el celular

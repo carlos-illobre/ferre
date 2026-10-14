@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir, usuarios } from "../pruebas/base-falsa.js";
-import { hashear } from "../sesiones.js";
+import { hashear } from "../acceso/sesiones.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
 vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));

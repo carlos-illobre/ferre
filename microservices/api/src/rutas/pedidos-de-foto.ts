@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
 import { pool } from "../db.js";
-import { computadorasDe } from "../emparejamiento.js";
+import { computadorasDe } from "../acceso/vinculo.js";
 
 // Pedido de foto: la computadora no tiene cámara. Donde haga falta una foto (la factura de un
 // ingreso, un producto, un ticket) pide una y muestra un código QR; el celular lo lee, saca
