@@ -10,6 +10,17 @@ se publica por Tailscale. Para eso hace falta una sesión en el servidor.
 
 No trabajen a la vez una sesión en la nube y una en el servidor: las dos suben a `master`.
 
+## Dominios que no están en la lista
+
+**Si hace falta un dominio que la red no deja pasar, se le pide permiso a Carlos.** En una
+sesión en la nube, si una descarga o una conexión falla porque el dominio no está entre los
+permitidos del entorno, el agente frena esa parte y le dice a Carlos qué dominio es, para
+qué lo necesita y qué alternativa hay. Carlos decide si lo agrega al entorno. Mientras tanto
+no se busca otro camino para llegar igual (otro espejo, otro servicio, bajarlo por otro
+lado ni copiarlo al repositorio).
+
+La lista vigente es la de la sección siguiente; cuando Carlos agrega uno, se anota ahí.
+
 ## El entorno `ferre`
 
 Se crea una vez, con **Add cloud environment**.
