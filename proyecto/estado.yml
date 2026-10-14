@@ -1110,10 +1110,10 @@ RF-91:
     - microservices/procesos/web/src/modelo/modelo.test.ts
     - microservices/procesos/web/src/compu/EditorCompu.test.tsx
     - tests/e2e/escritorio/18-procesos.spec.ts
-  defectos: []
-
-RF-92:
-  estado: "A validar (011-T007, 011-T009): «Pasos» y «Diagrama» en el celular, probados en un navegador con tamaño de teléfono; falta probarlos con el dedo en un teléfono de verdad"
+  defectos:
+    - "La flecha que sale de una decisión no recibe el nombre de la opción (E04), y en la tabla solo se cambia el nombre del paso (E11) #119"
+    - "Faltan pruebas de que cambiar de carril cambia quién lo hace (E05) y del nombre largo de un paso (E44) #119"
+  estado: "Hecho (011-T007, 011-T009, 011-T023, 011-T024): «Pasos» y «Diagrama» en el celular; Carlos los probó con el dedo en su teléfono el 2026-10-14"
   pruebas:
     - microservices/procesos/web/src/celu/ProcesosCelu.test.tsx
     - microservices/procesos/web/src/modelo/modelo.test.ts
@@ -1133,8 +1133,11 @@ RF-94:
   pruebas:
     - microservices/procesos/servidor/src/reglas.test.ts
     - microservices/procesos/web/src/compu/EditorCompu.test.tsx
+    - microservices/procesos/web/src/modelo/noSeVe.test.ts
     - tests/e2e/escritorio/18-procesos.spec.ts
-  defectos: []
+  defectos:
+    - "Las pruebas no comprueban que la imagen se lea en A4 (E33) ni abren el BPMN en otro programa (E34) #119"
+    - "Un BPMN de casi 5 MB puede pasar el tope al ir dentro del JSON y decir que pesa más de 5 MB #119"
 
 RF-95:
   estado: "Hecho (011-T004): «Ver procesos» y «Dibujar procesos», controlados en Ferrebress y en el servicio; los dos en el rol Gerente"

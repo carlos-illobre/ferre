@@ -292,3 +292,27 @@ según el código y sus pruebas, con estas salvedades:
   - Elegir un paso abre su panel.
 - Todo eso coincide.
 - Las únicas diferencias que encontré son las del punto 4.1, y son de documentación.
+
+---
+
+## Qué se hizo con cada punto
+
+Lo agregó quien programó, después de la revisión (2026-10-14).
+
+**Los que frenaban el cierre, resueltos:**
+
+- **1.1 E35:** al importar se cuenta lo que el archivo trae y acá no se ve, y se avisa. Son tres clases: elementos de BPMN que Procesos no maneja, pasos sin lugar en el dibujo y datos del programa de donde viene. Una prueba de punta a punta importa un archivo así, mira el aviso y comprueba que al exportarlo sale todo. Es la tarea T027; el texto está en ux.md.
+- **1.2 E01:** Carlos decidió que se abra el primero de la lista, y se corrigió el escenario. Se agregó la prueba del caso sin un proceso abierto antes. Es la tarea T026.
+- **2.1 Qué queda registrado:**
+  - Cambiar el borrador se anota en «Quién hizo qué»: el primer cambio de cada persona en cada proceso y, si sigue, uno cada media hora.
+  - El borrado lleva el nombre del proceso, que se lee antes de borrar.
+  - El plan lo dice así. Es la tarea T028.
+
+**Otro punto resuelto:**
+
+- **3.1 Sin conexión:** si se corta la conexión mientras se dibuja, el dibujo queda para mirar, con el último cambio a la vista. Ese cambio se manda cuando vuelve la conexión. Así cumple la aclaración «sin conexión no se dibuja» sin perder lo último. Es la tarea T029; está en ux.md.
+
+**Los defectos, anotados en el plan del proyecto:**
+
+- Los demás puntos de 1, 2.2, 3 y 4 quedan como tarea T119 en `proyecto/tasks.md`.
+- **4.1:** la posición del zoom y del logo en la computadora se escribe en ux.md dentro de esa tarea.

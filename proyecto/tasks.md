@@ -277,7 +277,9 @@ Las reglas no van acá: van en `specs/`.
 - [x] T112 [carlos] Procesos: elegir una maqueta y decir qué cambiarle (computadora: A con el panel de pasos de C, plegable; celular: B con «Pasos» y «Diagrama» como en A; maquetas/elegida.html)
 - [x] T113 [agente] Procesos: especificación, con las preguntas que la maqueta dejó abiertas (depende de T112)
 - [x] T114 [carlos] Procesos: aprobar la especificación (specs/011-procesos/spec.md) y lo que decidió el agente (depende de T113)
-- [ ] T115 [agente] Procesos: ux.md, plan con la sección «Seguridad» y ADR de cómo va aparte, tareas, y programarlo (depende de T114)
+- [x] T115 [agente] Procesos: ux.md, plan con la sección «Seguridad» y ADR de cómo va aparte, tareas, y programarlo (depende de T114)
 - [x] T116 [agente] Las sesiones en la nube arrancan Docker para las pruebas de punta a punta
 - [x] T117 [agente] Documentar cómo se construyen las imágenes en las sesiones en la nube
 - [x] T118 [agente] En la nube, un dominio que no está permitido se le pide a Carlos
+- [ ] T119 [agente] Procesos: los defectos que dejó la revisión (specs/011-procesos/revision.md): nombre de la flecha que sale de una decisión (E04), más datos editables en la tabla (E11), pruebas que faltan o no comprueban del todo (E05, E33, E34, E37, E40, E43, E44, datos en Postgres en la CI), lo guardado en el dispositivo al cerrar la sesión, el tope de 5 MB, el error si falla anotar el evento, los errores de forma en el celular, y la documentación que quedó atrás (zoom y logo de la computadora, pantallas de Ferrebress que se nombran en un paso, numerar las decisiones de Carlos posteriores a la 87, reglas que solo están en el código)
+- [ ] T120 [carlos] Reinstalar el script de despliegue en el servidor, para que el despliegue espere a que Procesos esté sano
