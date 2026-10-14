@@ -272,3 +272,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T107 [carlos] Decidir las cuatro preguntas del final de la auditoría de arquitectura (decisión 84)
 - [x] T108 [agente] Preparar el proyecto para sesiones de Claude Code en la nube
 - [x] T109 [agente] Las skills de animación adaptadas pasan al repositorio para las sesiones en la nube
+- [x] T110 [agente] Revisión de tipos después de cada edición

@@ -60,6 +60,13 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 - **Nada avanza sin la aprobación que le toca:** la especificación y, si hay pantallas, la
   maqueta.
 
+## Revisión al editar
+
+Después de cada edición de un archivo de código, `tests/revisar-al-editar.mjs` corre solo (`.claude/settings.json`,
+PostToolUse) el control de tipos del paquete, de forma incremental (`microservices/api` y `microservices/web`). Si hay
+errores, el agente los ve en ese momento: se corrigen los que causó la tarea antes de seguir.
+Tarda unos segundos por edición. No reemplaza las compuertas de antes de subir.
+
 ## La interfaz
 
 - **La aplicación es una sola y abre en la raíz.** Su código está en
