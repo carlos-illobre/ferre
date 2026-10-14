@@ -60,7 +60,8 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
   «Sistema», «Paralelo»); el nombre completo queda para los lectores de pantalla (pedido de
   Carlos del 2026-10-14).
 - La hoja «Agregar un paso» se pliega y se despliega tocando su título (arranca abierta); plegada deja a la vista solo el título, para ver más dibujo. El logo de bpmn.io flota abajo a la derecha del dibujo, justo encima de la hoja, y se mueve con ella (pedido de Carlos del 2026-10-14).
-- Debajo de «Agregar un paso», una sola línea: «Arrastrá un paso al dibujo o tocalo.» (tocarla la pone después del paso elegido; pedido de Carlos del 2026-10-14).
+- Debajo de «Agregar un paso», una sola línea: «Arrastrá un paso al dibujo.» Tocar una figura también la agrega, después del paso elegido, pero la frase no lo dice (pedido de Carlos del 2026-10-14).
+- El botón de volver del celular, adentro de un proceso, vuelve a la lista de procesos (con algo abierto encima, primero cierra eso); desde la lista, vuelve a Más (pedido de Carlos del 2026-10-14).
 - Todo se alcanza con una mano; nada se corre hacia el costado salvo el dibujo.
 
 ## Exportar e importar (historia 5)

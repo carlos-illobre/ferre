@@ -120,7 +120,7 @@ describe("el celular", () => {
     for (const id of ["procesos-exportar-png", "procesos-exportar-bpmn", "procesos-importar", "procesos-ver-historial", "procesos-renombrar", "procesos-borrar"]) expect(within(menu).getByTestId(id)).toBeTruthy();
   });
 
-  it("el botón de volver del celular cierra el menú «⋯» y deja el proceso a la vista", async () => {
+  it("el botón de volver del celular cierra el menú «⋯», y después vuelve a la lista de procesos", async () => {
     await abrirVenta();
     fireEvent.click(screen.getByTestId("procesos-menu-celu"));
     expect(screen.getByTestId("procesos-hoja-menu")).toBeTruthy();
@@ -128,6 +128,9 @@ describe("el celular", () => {
     act(() => { window.dispatchEvent(new PopStateEvent("popstate")); });
     expect(screen.queryByTestId("procesos-hoja-menu")).toBeNull();
     expect(screen.getByTestId("procesos-pasos-celu")).toBeTruthy();
+    // Sin nada encima, volver lleva a la lista de procesos.
+    act(() => { window.dispatchEvent(new PopStateEvent("popstate")); });
+    expect(screen.getByTestId("procesos-lista")).toBeTruthy();
   });
 
   it("011-E38 quien solo mira no tiene asas, ni menú de cambios, ni hoja de figuras", async () => {

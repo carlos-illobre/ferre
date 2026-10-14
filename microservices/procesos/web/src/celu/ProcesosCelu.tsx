@@ -115,6 +115,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
   const items = listaDe(d.grafo);
   return (
     <div className="procesos procesos-celu procesos-celu-proceso" data-testid="procesos">
+      <AtrasVuelveALaLista alVolver={() => setVista("lista")} />
       <div className="procesos-celu-barra">
         <button type="button" className="procesos-boton icono" aria-label="Volver a la lista" onClick={() => setVista("lista")} data-testid="procesos-volver"><Icono nombre="izquierda" /></button>
         <h1 title={abierto?.nombre}>{abierto?.nombre ?? "Abriendo…"}</h1>
@@ -159,7 +160,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
               <span className="procesos-tirador" />
               <span className="procesos-hoja-titulo-texto"><b>Agregar un paso</b><Icono nombre={figurasAbiertas ? "abajo" : "arriba"} /></span>
             </button>
-            <p className="procesos-ayuda procesos-un-renglon">Arrastrá un paso al dibujo o tocalo.</p>
+            <p className="procesos-ayuda procesos-un-renglon">Arrastrá un paso al dibujo.</p>
             <div className="procesos-figuras-celu">
               {FIGURAS_CELU.map((f) => (
                 <button key={f.tipo} type="button" className="procesos-figura-celu" aria-label={f.nombre} title={f.nombre} data-testid={`procesos-figura-${f.tipo}`}
@@ -217,6 +218,12 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
       {dialogos}
     </div>
   );
+}
+
+// Adentro de un proceso, el botón de volver del celular vuelve a la lista (lo de encima, primero).
+function AtrasVuelveALaLista({ alVolver }: { alVolver: () => void }) {
+  useAtrasCierra(alVolver);
+  return null;
 }
 
 function Hoja({ children, alCerrar, testId }: { children: ReactNode; alCerrar: () => void; testId?: string }) {

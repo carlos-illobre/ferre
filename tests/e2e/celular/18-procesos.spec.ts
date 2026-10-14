@@ -83,12 +83,16 @@ test("011-E30 011-E31 «Diagrama» muestra el dibujo y la hoja de figuras; tocar
   await sinCorrerseAlCostado(page);
 });
 
-test("el botón de volver del celular cierra el menú «⋯» y deja el proceso a la vista", async ({ page }) => {
+test("el botón de volver del celular cierra el menú «⋯», y después vuelve a la lista de procesos", async ({ page }) => {
   await abrirVenta(page, "Venta celular E2E (volver)");
   await page.getByTestId("procesos-menu-celu").click();
   await expect(page.getByTestId("procesos-hoja-menu")).toBeVisible();
   await page.goBack();
   await expect(page.getByTestId("procesos-hoja-menu")).toHaveCount(0);
   await expect(page.getByTestId("procesos-pasos-celu")).toBeVisible();
+  await expect(page).toHaveURL(/#\/mas\/procesos/);
+  // Sin nada encima, volver lleva a la lista de procesos, no a Más.
+  await page.goBack();
+  await expect(page.getByTestId("procesos-lista")).toBeVisible();
   await expect(page).toHaveURL(/#\/mas\/procesos/);
 });
