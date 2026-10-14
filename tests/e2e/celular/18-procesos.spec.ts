@@ -96,3 +96,57 @@ test("el botón de volver del celular cierra el menú «⋯», y después vuelve
   await expect(page.getByTestId("procesos-lista")).toBeVisible();
   await expect(page).toHaveURL(/#\/mas\/procesos/);
 });
+
+test.describe("con el dedo", () => {
+  // Toques de verdad (eventos táctiles del navegador), no el mouse.
+  test.use({ hasTouch: true });
+
+  test("011-E05 011-E30 en el celular, mantener apretado un paso y arrastrarlo con el dedo lo mueve; deslizar rápido mueve el dibujo", async ({ page }) => {
+    await abrirVenta(page, "Venta celular E2E (dedo)");
+    await page.getByTestId("procesos-pestana-diagrama").click();
+    await page.getByTestId("procesos-plegar-hoja").click();
+    const paso = page.locator(".procesos-dibujo-celu g.djs-element[data-element-id='Cobrar'] .djs-hit").first();
+    const antes = (await paso.boundingBox())!;
+    const cdp = await page.context().newCDPSession(page);
+    const tocar = (type: string, x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
+    const x = antes.x + antes.width / 2;
+    const y = antes.y + antes.height / 2;
+
+    // Mantener apretado y arrastrar: el paso baja.
+    await tocar("touchStart", x, y);
+    await page.waitForTimeout(400);
+    for (let i = 1; i <= 10; i++) await tocar("touchMove", x, y + i * 8);
+    await tocar("touchEnd");
+    await expect.poll(async () => (await paso.boundingBox())!.y).toBeGreaterThan(antes.y + 40);
+    await expect(page.getByTestId("procesos-guardado")).toHaveText("Guardado");
+
+    // Deslizar rápido sobre un paso mueve el dibujo entero, no el paso.
+    const ahora = (await paso.boundingBox())!;
+    const otro = page.locator(".procesos-dibujo-celu g.djs-element[data-element-id='Buscar'] .djs-hit").first();
+    const otroAntes = (await otro.boundingBox())!;
+    await tocar("touchStart", ahora.x + ahora.width / 2, ahora.y + ahora.height / 2);
+    for (let i = 1; i <= 6; i++) await tocar("touchMove", ahora.x + ahora.width / 2 - i * 10, ahora.y + ahora.height / 2);
+    await tocar("touchEnd");
+    const ahoraDespues = (await paso.boundingBox())!;
+    const otroDespues = (await otro.boundingBox())!;
+    expect(ahoraDespues.x).toBeLessThan(ahora.x - 30);
+    expect(otroDespues.x - otroAntes.x).toBeCloseTo(ahoraDespues.x - ahora.x, 0);
+  });
+
+  test("011-E30 una figura de «Agregar un paso» se arrastra con el dedo al dibujo", async ({ page }) => {
+    await abrirVenta(page, "Venta celular E2E (figura con el dedo)");
+    await page.getByTestId("procesos-pestana-diagrama").click();
+    const formas = page.locator(".procesos-dibujo-celu g.djs-element.djs-shape:not([data-element-id$='_label']):not([data-element-id^='Participante']):not([data-element-id^='Carril'])");
+    await expect(formas).toHaveCount(10);
+    const figura = (await page.getByTestId("procesos-figura-tarea").boundingBox())!;
+    const lienzo = (await page.getByTestId("procesos-lienzo").boundingBox())!;
+    const cdp = await page.context().newCDPSession(page);
+    const tocar = (type: string, x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
+    const desde = { x: figura.x + figura.width / 2, y: figura.y + figura.height / 2 };
+    const hasta = { x: lienzo.x + lienzo.width / 2, y: lienzo.y + 120 };
+    await tocar("touchStart", desde.x, desde.y);
+    for (let i = 1; i <= 12; i++) await tocar("touchMove", desde.x + ((hasta.x - desde.x) * i) / 12, desde.y + ((hasta.y - desde.y) * i) / 12);
+    await tocar("touchEnd");
+    await expect(formas).toHaveCount(11);
+  });
+});

@@ -206,3 +206,6 @@
 .procesos-dibujo-celu .bjs-powered-by { top: auto !important; left: auto !important; right: 10px !important; bottom: 10px !important; transform: translateY(calc(-1 * var(--procesos-hoja-visible, 0px))); transition: transform 350ms cubic-bezier(0.32, 0.72, 0, 1); }
 @media (prefers-reduced-motion: reduce) { .procesos-hoja-figuras, .procesos-dibujo-celu .bjs-powered-by { transition: none; } }
 .procesos-un-renglon { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Celular: el dibujo maneja los dedos (mover, acercar, levantar un paso): la página no se corre ni
+   se acerca desde ahí. */
+.procesos-dibujo-celu .procesos-lienzo { touch-action: none; -webkit-user-select: none; user-select: none; }

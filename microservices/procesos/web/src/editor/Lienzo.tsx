@@ -109,7 +109,10 @@ export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, sol
     };
     const v = soloLectura ? new NavigatedViewer(opciones) : new Modeler(opciones);
     visor.current = v;
-    const bus = v.get("eventBus") as { on(evento: string, f: (e: { newSelection?: Elemento[] }) => void): void };
+    const bus = v.get("eventBus") as {
+      on(evento: string, f: (e: { newSelection?: Elemento[] }) => void): void;
+      on(evento: string, prioridad: number, f: (e: unknown) => void): void;
+    };
     // El logo de bpmn.io queda a la vista (lo pide su licencia), pero no es parte de la pantalla:
     // fuera del teclado y de los lectores de pantalla.
     const logo = contenedor.current!.querySelector<HTMLAnchorElement>(".bjs-powered-by");
@@ -155,20 +158,42 @@ export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, sol
       canvas.zoom(nuevo, { x: e.clientX - caja.left, y: e.clientY - caja.top });
     };
     contenedor.current!.addEventListener("wheel", rueda, { passive: false });
-    // Con el dedo: sobre el fondo (no sobre un paso), uno mueve y dos acercan o alejan.
+    // Con el dedo: sobre el fondo, uno mueve el dibujo y dos lo acercan o alejan. Sobre un paso,
+    // mantenerlo apretado un momento lo levanta y se arrastra (bpmn-js solo lo hace con el mouse);
+    // si el dedo se desliza antes, mueve el dibujo como sobre el fondo.
     let toque: { x: number; y: number; distancia: number; zoom: number } | null = null;
+    let levantar: ReturnType<typeof setTimeout> | null = null;
+    let arrastrando = false;
     const distancia = (t: TouchList) => Math.hypot(t[0]!.clientX - t[1]!.clientX, t[0]!.clientY - t[1]!.clientY);
     const canvasDe = () => v.get("canvas") as { zoom(n?: number, c?: { x: number; y: number }): number; scroll(d: { dx: number; dy: number }): void };
+    const cancelarLevantar = () => { if (levantar) { clearTimeout(levantar); levantar = null; } };
     const empezarToque = (e: TouchEvent) => {
-      const sobrePaso = (e.target as Element).closest?.(".djs-element:not(.djs-root), .djs-context-pad, .djs-overlay");
-      if (sobrePaso && e.touches.length === 1) { toque = null; return; }
+      cancelarLevantar();
       const t = e.touches;
       toque = { x: t[0]!.clientX, y: t[0]!.clientY, distancia: t.length > 1 ? distancia(t) : 0, zoom: canvasDe().zoom() };
+      if (t.length !== 1 || soloLectura) return;
+      if ((e.target as Element).closest?.(".djs-context-pad, .djs-overlay")) { toque = null; return; }
+      const gfx = (e.target as Element).closest?.(".djs-element:not(.djs-root)");
+      const el = gfx ? (v.get("elementRegistry") as { get(g: Element): Elemento | undefined }).get(gfx) : undefined;
+      if (!el || (el as unknown as { waypoints?: unknown }).waypoints || !el.parent) return;
+      levantar = setTimeout(() => {
+        levantar = null;
+        toque = null;
+        arrastrando = true;
+        (v.get("selection") as { select(e: Elemento): void }).select(el);
+        (v.get("move") as { start(ev: Event, el: Elemento, activar: boolean): void }).start(e, el, true);
+        navigator.vibrate?.(15);
+      }, 250);
     };
     const moverToque = (e: TouchEvent) => {
+      if (arrastrando) { e.preventDefault(); return; }
       if (!toque) return;
-      e.preventDefault();
       const t = e.touches;
+      if (levantar) {
+        if (Math.hypot(t[0]!.clientX - toque.x, t[0]!.clientY - toque.y) < 10) return;
+        cancelarLevantar();
+      }
+      e.preventDefault();
       if (t.length > 1 && toque.distancia) {
         const caja = contenedor.current!.getBoundingClientRect();
         const centro = { x: (t[0]!.clientX + t[1]!.clientX) / 2 - caja.left, y: (t[0]!.clientY + t[1]!.clientY) / 2 - caja.top };
@@ -178,7 +203,22 @@ export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, sol
       canvasDe().scroll({ dx: t[0]!.clientX - toque.x, dy: t[0]!.clientY - toque.y });
       toque = { ...toque, x: t[0]!.clientX, y: t[0]!.clientY };
     };
-    const terminarToque = () => { toque = null; };
+    // Mientras se arrastra con el dedo, bpmn-js no sabe sobre qué está (lo calcula con el mouse):
+    // se le dice en cada movimiento, para que el paso caiga en el carril o el lugar correcto.
+    if (tactil && !soloLectura) {
+      bus.on("drag.move", 1600, (ev: unknown) => {
+        const evento = ev as unknown as { isTouch?: boolean; hover?: Elemento; originalEvent?: TouchEvent };
+        const dedo = evento.originalEvent?.touches?.[0] ?? evento.originalEvent?.changedTouches?.[0];
+        if (!evento.isTouch || !dedo) return;
+        const debajo = document.elementFromPoint(dedo.clientX, dedo.clientY)?.closest(".djs-element");
+        const registro = v.get("elementRegistry") as { get(g: Element): Elemento | undefined };
+        const canvas = v.get("canvas") as { getRootElement(): Elemento; getGraphics(e: Elemento): Element };
+        const el = (debajo && registro.get(debajo)) || canvas.getRootElement();
+        if (el !== evento.hover) (v.get("dragging") as { hover(h: { element: Elemento; gfx: Element }): void }).hover({ element: el, gfx: canvas.getGraphics(el) });
+      });
+      bus.on("drag.cleanup", () => { arrastrando = false; });
+    }
+    const terminarToque = () => { toque = null; cancelarLevantar(); };
     if (tactil) {
       contenedor.current!.addEventListener("touchstart", empezarToque, { passive: true });
       contenedor.current!.addEventListener("touchmove", moverToque, { passive: false });
