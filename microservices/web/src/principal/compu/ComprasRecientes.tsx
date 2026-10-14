@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import { usePuede } from "../permisos";
-import { api } from "../../api";
+import { anularCompra, useComprasRecientes, type CompraFila } from "../../negocio/compras";
 import { fecha, pesos } from "../../formato";
 import { Aviso, Boton, Hoja, Icono, Pastilla, Plegable, numero as cifra, pesosCortos } from "./base/ui";
 import { useEsCelular } from "./base/vista";
@@ -8,7 +8,6 @@ import { mensajeDe, plural, useEnLinea } from "./base/pantallas/deposito-comun";
 import "./base/estilos/compras.css";
 import { VerComprobante } from "../FotoDeFactura";
 
-type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; foto: string | null; total: string; estado: string; proveedor: string; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[] };
 
 // Las compras recientes van en Cómo va el negocio (decisión 67): sirven para mirar qué se
 // compró, no para recibir mercadería. Quien registra ingresos las anula desde acá.
@@ -31,14 +30,11 @@ const nombreComprobante = (c: CompraFila) => (c.comprobante_tipo === "sin_compro
 // no se deshace, por eso pide confirmación con el motivo ahí mismo.
 function Lista({ version, enLinea, esCelular, alAnular }: { version: number; enLinea: boolean; esCelular: boolean; alAnular: (mensaje: string) => void }) {
   const anula = usePuede()("deposito.ingresos");
-  const [filas, setFilas] = useState<CompraFila[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const compras = useComprasRecientes();
+  const filas = compras.datos;
+  const error = compras.error ? mensajeDe(compras.error, "Sin conexión: las compras recientes se ven cuando vuelve internet.") : null;
   const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
   const [anulando, setAnulando] = useState<CompraFila | null>(null);
-  const cargar = useCallback(() => api<CompraFila[]>("/compras").then((f) => { setFilas(f); setError(null); })
-    .catch((e) => setError(mensajeDe(e, "Sin conexión: las compras recientes se ven cuando vuelve internet."))), []);
-  useEffect(() => { void cargar(); }, [cargar, version]);
-  useEffect(() => { if (enLinea && error) void cargar(); }, [enLinea, error, cargar]);
   const alternar = (id: string) => setAbiertas((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   // Flechas recorren las compras; Supr anula la que tiene el foco.
@@ -53,7 +49,7 @@ function Lista({ version, enLinea, esCelular, alAnular }: { version: number; enL
   return (
     <Plegable titulo="Compras recientes" extra={filas?.length ? plural(filas.length, "compra", "compras") : undefined} testId="compras-recientes" relleno={false}>
       <div className="compras-recientes">
-        <Aviso tipo="alerta" accion={<Boton tam="chico" icono="repetir" onClick={() => void cargar()}>Reintentar</Boton>}>{error}</Aviso>
+        <Aviso tipo="alerta" accion={<Boton tam="chico" icono="repetir" onClick={compras.recargar}>Reintentar</Boton>}>{error}</Aviso>
         {filas === null && !error && <div className="compras-cargando" aria-busy="true"><span className="solo-lectores">Trayendo las compras…</span><div className="esqueleto" /><div className="esqueleto" /><div className="esqueleto" /></div>}
         {filas?.length === 0 && <p className="detalle compras-sin-compras">No hay compras registradas. La primera aparece acá cuando registres un ingreso de mercadería.</p>}
         {filas && filas.length > 0 && (esCelular ? (
@@ -138,7 +134,7 @@ function AnularCompra({ compra: c, enLinea, alCerrar, alAnular }: { compra: Comp
     if (ocupado) return;
     setOcupado(true); setError(null);
     try {
-      await api(`/compras/${c.id}/anular`, { method: "POST", body: JSON.stringify({ motivo: motivo.trim() }) });
+      await anularCompra(c.id, motivo);
       alAnular();
     } catch (e) {
       setError(mensajeDe(e, "No se anuló: se cortó la conexión. Probá de nuevo cuando vuelva internet."));

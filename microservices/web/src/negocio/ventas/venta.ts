@@ -1,5 +1,6 @@
 import type { MedioDePago } from "@servidor/ventas";
-import { ventasCambiaron } from "./ventas-del-dia";
+import { CONSULTAS, ventasCambiaron } from "./ventas-del-dia";
+import { consultas } from "../../consultas";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { ErrorApi, subirFoto } from "../../api";
@@ -212,7 +213,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
   function noLlevo(aviso: string) {
     if (items.length === 0) return;
     const consultaItems = items.map((it) => ({ producto_id: it.producto?.id ?? null, descripcion: it.descripcion, precio_ofrecido: precioDe(it).unitario }));
-    enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: opciones.dispositivo() }).catch(() => undefined);
+    enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: opciones.dispositivo() }).then(({ encolado }) => { if (!encolado) void consultas.invalidateQueries({ queryKey: CONSULTAS }); }).catch(() => undefined);
     vaciar();
     setMensaje(aviso);
     alCambiar?.("no-llevo");

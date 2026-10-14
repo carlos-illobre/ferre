@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { api, ErrorApi } from "../../../../api";
+import { useEffect, useState } from "react";
+import { ErrorApi } from "../../../../api";
 
 // Lo que comparten la entrada y las pantallas de Negocio: saber si hay conexión, traer
 // datos con sus tres estados (cargando, error, listo) y decir los errores en castellano.
@@ -26,26 +26,10 @@ export function textoDeError(e: unknown, queNoSePudo: string): string {
 
 export type Carga<T> = { datos: T | null; error: string | null; cargando: boolean; recargar: () => void };
 
-// Trae una ruta de la API. Cada bloque de una pantalla usa la suya: uno lento o caído no
-// frena a los demás. Vuelve a pedir solo cuando vuelve la conexión.
-export function useCarga<T>(ruta: string, queNoSePudo: string): Carga<T> {
-  const [estado, setEstado] = useState<{ datos: T | null; error: string | null; cargando: boolean }>({ datos: null, error: null, cargando: true });
-  const [vuelta, setVuelta] = useState(0);
-  const recargar = useCallback(() => setVuelta((v) => v + 1), []);
-  useEffect(() => {
-    let vigente = true;
-    setEstado((s) => ({ ...s, cargando: true }));
-    api<T>(ruta)
-      .then((datos) => { if (vigente) setEstado({ datos, error: null, cargando: false }); })
-      // Con error no quedan a la vista los datos de antes: parecerían los de ahora.
-      .catch((e: unknown) => { if (vigente) setEstado({ datos: null, error: textoDeError(e, queNoSePudo), cargando: false }); });
-    return () => { vigente = false; };
-  }, [ruta, queNoSePudo, vuelta]);
-  useEffect(() => {
-    window.addEventListener("online", recargar);
-    return () => window.removeEventListener("online", recargar);
-  }, [recargar]);
-  return { ...estado, recargar };
+// Lo que trae una consulta del servidor, con el error dicho en castellano. Cada bloque de una
+// pantalla usa la suya: uno lento o caído no frena a los demás.
+export function comoCarga<T>(r: { datos: T | null; error: unknown; cargando: boolean; recargar: () => void }, queNoSePudo: string): Carga<T> {
+  return { datos: r.error ? null : r.datos, error: r.error ? textoDeError(r.error, queNoSePudo) : null, cargando: r.cargando, recargar: r.recargar };
 }
 
 // Día y hora como se dicen en el mostrador: «hoy 10:40», «ayer 18:05», «03/10 09:12».

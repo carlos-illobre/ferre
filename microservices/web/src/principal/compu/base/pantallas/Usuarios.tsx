@@ -8,13 +8,12 @@ import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, v
 import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";
-import { IconoCompu, esFallaDeRed, fechaCompleta, textoDeError, useCarga, useEnLinea } from "./negocio-comun";
+import { IconoCompu, comoCarga, esFallaDeRed, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
+import { autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, useSesiones, useUsuarios, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
 import { usePuede } from "../../../permisos";
 import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
 import "../estilos/negocio.css";
 
-type UsuarioFila = { id: string; email: string; nombre: string; activo: boolean; roles: RolAsignable[] };
-type SesionFila = { id: string; dispositivo: string; ultimo_uso_en: string; email: string; nombre: string };
 type Mensaje = { texto: string; testId?: string };
 type Avisar = (m: Mensaje) => void;
 
@@ -49,7 +48,7 @@ function Autorizados({ enLinea, avisar, alCerrarSesiones }: { enLinea: boolean; 
   const { sesion } = useSesion();
   const yo = sesion.estado === "con-sesion" ? sesion.usuario.id : null;
   const esCelular = useEsCelular();
-  const lista = useCarga<UsuarioFila[]>("/usuarios", "No se pudieron traer los usuarios");
+  const lista = comoCarga(useUsuarios(), "No se pudieron traer los usuarios");
   const [ocupada, setOcupada] = useState<string | null>(null);
   const [errorDeFila, setErrorDeFila] = useState<{ id: string; texto: string } | null>(null);
   const [alta, setAlta] = useState(false);
@@ -59,8 +58,7 @@ function Autorizados({ enLinea, avisar, alCerrarSesiones }: { enLinea: boolean; 
   async function cambiar(u: UsuarioFila, cambios: { roles?: string[]; activo?: boolean }): Promise<string | null> {
     setOcupada(u.id); setErrorDeFila(null);
     try {
-      await api(`/usuarios/${u.id}`, { method: "PATCH", body: JSON.stringify(cambios) });
-      lista.recargar();
+      await cambiarUsuario(u.id, cambios);
       if (cambios.activo === false) { avisar({ texto: `${u.nombre} ya no puede entrar: se le cerraron las sesiones abiertas.` }); alCerrarSesiones(); }
       else if (cambios.activo) avisar({ texto: `${u.nombre} puede entrar de nuevo.` });
       else if (cambios.roles) avisar({ texto: `Roles de ${u.nombre} guardados.` });
@@ -81,7 +79,7 @@ function Autorizados({ enLinea, avisar, alCerrarSesiones }: { enLinea: boolean; 
   );
   const estadoDe = (u: UsuarioFila) => <Pastilla tipo={u.activo ? "ok" : undefined}>{u.activo ? "Activo" : "Desactivado"}</Pastilla>;
   const errorDe = (u: UsuarioFila) => errorDeFila?.id === u.id ? <Aviso tipo="error">{errorDeFila.texto}</Aviso> : null;
-  const formulario = <AltaDeUsuario disponibles={disponibles} enLinea={enLinea} alAutorizar={(u) => { lista.recargar(); setAlta(false); avisar({ texto: `${u.nombre} ya puede entrar con su cuenta de Google.` }); }} />;
+  const formulario = <AltaDeUsuario disponibles={disponibles} enLinea={enLinea} alAutorizar={(u) => { setAlta(false); avisar({ texto: `${u.nombre} ya puede entrar con su cuenta de Google.` }); }} />;
 
   return (
     <section className="negocio-seccion" aria-labelledby="usuarios-autorizados">
@@ -151,17 +149,14 @@ function AltaDeUsuario({ disponibles, enLinea, alAutorizar }: { disponibles: Rol
 
   async function autorizar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const faltas: typeof errores = {};
-    if (!nombre.trim()) faltas.nombre = "Escribí el nombre de la persona.";
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) faltas.email = email.trim() ? "Ese correo está mal escrito: revisá que tenga la arroba y el dominio." : "Escribí su correo de Google.";
-    if (roles.length === 0) faltas.roles = TEXTOS.usuarios.faltaUnRol.largo;
+    const faltas: typeof errores = faltaEnAlta({ nombre, email, roles }, TEXTOS.usuarios.faltaUnRol.largo) ?? {};
     setErrores(faltas);
     if (faltas.nombre) { cajaNombre.current?.focus(); return; }
     if (faltas.email) { document.getElementById(`${id}-email`)?.focus(); return; }
     if (faltas.roles) return;
     setGuardando(true);
     try {
-      await api("/usuarios", { method: "POST", body: JSON.stringify({ email: email.trim().toLowerCase(), nombre: nombre.trim(), roles }) });
+      await autorizarPersona({ nombre, email, roles });
       const autorizado = nombre.trim();
       // El alta queda lista para cargar a otra persona.
       setNombre(""); setEmail(""); setRoles([]); setErrores({});
@@ -206,7 +201,7 @@ function Sesiones({ enLinea, avisar, vuelta }: { enLinea: boolean; avisar: Avisa
   const { sesion, salir } = useSesion();
   const propiaId = sesion.estado === "con-sesion" ? sesion.sesionId : null;
   const esCelular = useEsCelular();
-  const lista = useCarga<SesionFila[]>("/sesiones", "No se pudieron traer las sesiones");
+  const lista = comoCarga(useSesiones(), "No se pudieron traer las sesiones");
   const { recargar } = lista;
   const [cerradas, setCerradas] = useState<string[]>([]);
   const [fallo, setFallo] = useState<{ sesion: SesionFila; texto: string } | null>(null);
@@ -220,9 +215,8 @@ function Sesiones({ enLinea, avisar, vuelta }: { enLinea: boolean; avisar: Avisa
     if (s.id === propiaId) { setSaliendo(true); await salir(); return; }
     setCerradas((c) => [...c, s.id]); // sale de la lista en el momento
     try {
-      await api(`/sesiones/${s.id}`, { method: "DELETE" });
+      await cerrarSesion(s.id);
       avisar({ texto: `Se cerró la sesión de ${s.nombre} en ${s.dispositivo}.` });
-      recargar();
     } catch (e) {
       setCerradas((c) => c.filter((id) => id !== s.id));
       setFallo({ sesion: s, texto: enPalabras(e, `No se pudo cerrar la sesión de ${s.nombre}`) });

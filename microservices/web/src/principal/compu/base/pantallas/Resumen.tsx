@@ -9,11 +9,11 @@ import type { VentasDelDia as DatosHoy } from "../../../../negocio/ventas/ventas
 import { irA } from "../rutas";
 import { useEsCelular } from "../vista";
 import { Aviso, Boton, EstadoDeConexion, Explicado, Icono, Indicador, Pagina, Pastilla, Vacio, pesosCortos, type NombreDeIcono } from "../ui";
-import { diaYHora, useCarga, useEnLinea, type Carga } from "./negocio-comun";
+import { comoCarga, diaYHora, useEnLinea, type Carga } from "./negocio-comun";
+import { useConsultas, useVentasDelDia, type Consulta } from "../../../../negocio/ventas/ventas-del-dia";
+import { useGastosDeLaSemana, type Gastos } from "../../../../negocio/compras";
 import "../estilos/negocio.css";
 
-type Gastos = { desde: string; por_proveedor: { proveedor: string; compras: string; total: string }[]; total: number };
-type Consulta = { id: string; fecha: string; descripcion: string; precio_ofrecido: string | null; motivo: string | null };
 
 const ICONO_MEDIO: Record<string, NombreDeIcono> = { efectivo: "plata", mercado_pago: "celular", tarjeta: "caja", cuenta_corriente: "contar" };
 const CONSULTAS_A_LA_VISTA = 6;
@@ -26,9 +26,9 @@ export function Resumen() {
   const { sesion } = useSesion();
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const enLinea = useEnLinea();
-  const hoy = useCarga<DatosHoy>("/ventas", "No se pudieron traer las ventas de hoy");
-  const gastos = useCarga<Gastos>("/compras/semana", "No se pudieron traer los gastos de la semana");
-  const consultas = useCarga<Consulta[]>("/consultas", "No se pudieron traer las consultas");
+  const hoy = comoCarga(useVentasDelDia(), "No se pudieron traer las ventas de hoy");
+  const gastos = comoCarga(useGastosDeLaSemana(), "No se pudieron traer los gastos de la semana");
+  const consultas = comoCarga(useConsultas(), "No se pudieron traer las consultas");
   const hoyTexto = new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
 
   const confirmadas = hoy.datos?.ventas.filter((v) => v.estado === "confirmada").length ?? 0;

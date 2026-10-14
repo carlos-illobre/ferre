@@ -1039,7 +1039,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) y catálogo (listas, proveedores, duplicados y el precio de cada producto) una sola vez. Falta el resto de la 3 y las etapas 4 y 5 (010-T006 a 010-T008 y 010-T012)"
+  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Falta mover las pantallas a `pantallas/`, un solo juego de piezas de interfaz y las etapas 4 y 5 (010-T007, 010-T008 y 010-T012)"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
@@ -1052,7 +1052,10 @@ RNF-60:
     - microservices/web/src/negocio/deposito/conteo.test.tsx
     - microservices/web/src/negocio/catalogo/duplicados.test.tsx
     - microservices/web/src/negocio/catalogo/listas.test.tsx
+    - microservices/web/src/negocio/usuarios.test.tsx
   defectos:
+    - "Las pantallas siguen en `principal/celular` y `principal/compu`; pasan a `pantallas/` con el juego único de piezas de interfaz (010-T012)"
+    - "Los roles asignables, los celulares con huella y la entrada todavía piden al servidor desde la pantalla, sin la memoria compartida de consultas"
     - "Pedidos a proveedores ya es una sola pantalla para los dos lados, pero su regla sigue escrita dentro de la pantalla, no en la carpeta de negocio"
     - "El borrador del ingreso (lo cargado sobrevive a una recarga) vale solo en la computadora; en el celular no se guarda, para no ocupar su almacenamiento"
     - "En el celular, si anular una venta falla (sin conexión o sin permiso) no se avisa: la lista queda igual. Se arregla al descongelar las pantallas"

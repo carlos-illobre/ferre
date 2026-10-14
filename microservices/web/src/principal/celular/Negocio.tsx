@@ -3,7 +3,10 @@ import { NOMBRES, TEXTOS } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { Vinculo } from "../Vinculo";
-import { api, urlApi } from "../../api";
+import { urlApi } from "../../api";
+import { autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, useSesiones, useUsuarios, type SesionFila } from "../../negocio/usuarios";
+import { useGastosDeLaSemana } from "../../negocio/compras";
+import { paginasDe, useActividad } from "../../negocio/actividad";
 import { fecha, pesos } from "../../formato";
 import { useSesion } from "../../sesion";
 import { usePuede } from "../permisos";
@@ -17,10 +20,6 @@ import { MEDIOS, NOMBRE_DE_MEDIO } from "../../negocio/ventas/venta";
 import { useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
 import { esAmbienteDePrueba } from "../../ambiente";
 
-type UsuarioFila = { id: string; email: string; nombre: string; activo: boolean; roles: RolAsignable[] };
-type SesionFila = { id: string; dispositivo: string; ultimo_uso_en: string; email: string; nombre: string };
-type EventoFila = { id: string; tipo: string; fecha: string; email: string | null; nombre: string | null; contenido: Record<string, unknown> };
-type Gastos = { desde: string; por_proveedor: { proveedor: string; compras: string; total: string }[]; total: number };
 
 // Negocio: quién soy, ventas de hoy, gastos de la semana y, para quien administra, usuarios,
 // celulares con huella, sesiones y quién hizo qué.
@@ -33,10 +32,9 @@ export function Negocio({ parte }: { parte: Parte }) {
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const puedeEsto = usePuede();
   const { datos: hoy } = useVentasDelDia();
-  const [gastos, setGastos] = useState<Gastos | null>(null);
+  const gastos = useGastosDeLaSemana().datos;
   const [servidor, setServidor] = useState<string | null>(null);
   useEffect(() => {
-    api<Gastos>("/compras/semana").then(setGastos).catch(() => undefined);
     fetch(urlApi("/health")).then((r) => r.json() as Promise<{ ok: boolean; db: string; version?: string }>).then((s) => setServidor(`Servidor ${s.ok ? "ok" : "con problemas"} · base ${s.db}`)).catch(() => setServidor("Sin conexión con el servidor."));
   }, []);
   const hoyTexto = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -104,25 +102,27 @@ export function Negocio({ parte }: { parte: Parte }) {
 
 function Usuarios() {
   const disponibles = useRolesAsignables();
-  const [filas, setFilas] = useState<UsuarioFila[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const usuarios = useUsuarios();
+  const filas = usuarios.datos ?? [];
+  const [aviso, setError] = useState<string | null>(null);
+  const [cerrado, setCerrado] = useState<unknown>(null);
+  const error = aviso ?? (usuarios.error && usuarios.error !== cerrado ? (usuarios.error as Error).message : null);
   const [alta, setAlta] = useState(false);
   const [rolesDelNuevo, setRolesDelNuevo] = useState<string[]>([]);
-  const cargar = () => api<UsuarioFila[]>("/usuarios").then(setFilas).catch((e: Error) => setError(e.message));
-  useEffect(() => { void cargar(); }, []);
 
   async function autorizar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const datos = new FormData(e.currentTarget);
-    if (rolesDelNuevo.length === 0) { setError("Elegí al menos un rol para la persona."); return; }
+    const persona = { nombre: String(datos.get("nombre") ?? ""), email: String(datos.get("email") ?? ""), roles: rolesDelNuevo };
+    const falta = faltaEnAlta(persona, "Elegí al menos un rol para la persona.");
+    if (falta) { setError(falta.nombre ?? falta.email ?? falta.roles ?? null); return; }
     try {
-      await api("/usuarios", { method: "POST", body: JSON.stringify({ email: datos.get("email"), nombre: datos.get("nombre"), roles: rolesDelNuevo }) });
+      await autorizarPersona(persona);
       setError(null); setAlta(false); setRolesDelNuevo([]);
-      await cargar();
     } catch (err) { setError((err as Error).message); }
   }
   async function cambiar(id: string, cambios: { activo?: boolean; roles?: string[] }): Promise<string | null> {
-    try { await api(`/usuarios/${id}`, { method: "PATCH", body: JSON.stringify(cambios) }); setError(null); await cargar(); return null; }
+    try { await cambiarUsuario(id, cambios); setError(null); return null; }
     catch (err) { return (err as Error).message; }
   }
 
@@ -130,7 +130,7 @@ function Usuarios() {
     <>
       <div className="seccion">{NOMBRES.usuariosAutorizados}</div>
       <small style={{ padding: "0 4px" }}>{TEXTOS.usuarios.queSonLosRoles.corto}</small>
-      <AvisoError texto={error} alCerrar={() => setError(null)} />
+      <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(usuarios.error); }} />
       <div className="lista" data-testid="usuarios">
         {filas.map((u) => (
           <div key={u.id} className={`usuario-con-roles ${u.activo ? "" : "apagada"}`} data-testid="usuario-fila">
@@ -203,22 +203,22 @@ function Celulares() {
 function Sesiones() {
   const { sesion, salir } = useSesion();
   const propiaId = sesion.estado === "con-sesion" ? sesion.sesionId : null;
-  const [filas, setFilas] = useState<SesionFila[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const cargar = () => api<SesionFila[]>("/sesiones").then((f) => { setFilas(f); setError(null); }).catch((e: Error) => setError(e.message));
-  useEffect(() => { void cargar(); }, []);
+  const sesiones = useSesiones();
+  const filas = sesiones.datos ?? [];
+  const [aviso, setError] = useState<string | null>(null);
+  const [cerrado, setCerrado] = useState<unknown>(null);
+  const error = aviso ?? (sesiones.error && sesiones.error !== cerrado ? (sesiones.error as Error).message : null);
 
   async function cerrar(s: SesionFila) {
     // La propia es "Salir": se sale de forma explícita, sin esperar a que otra llamada falle.
     if (s.id === propiaId) { await salir(); return; }
-    try { await api(`/sesiones/${s.id}`, { method: "DELETE" }); }
-    catch (e) { setError(`No se pudo cerrar: ${(e as Error).message}`); }
-    await cargar();
+    try { await cerrarSesion(s.id); }
+    catch (e) { setError(`No se pudo cerrar: ${(e as Error).message}`); sesiones.recargar(); }
   }
   return (
     <>
       <div className="seccion">Sesiones abiertas</div>
-      <AvisoError texto={error} alCerrar={() => setError(null)} />
+      <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(sesiones.error); }} />
       <div className="lista" data-testid="sesiones">
         {filas.map((s) => {
           const propia = s.id === propiaId;
@@ -236,10 +236,9 @@ function Sesiones() {
 }
 
 function Auditoria() {
-  const [datos, setDatos] = useState<{ eventos: EventoFila[]; total: number; pagina: number; por_pagina: number } | null>(null);
   const [pagina, setPagina] = useState(1);
-  useEffect(() => { api<{ eventos: EventoFila[]; total: number; pagina: number; por_pagina: number }>(`/auditoria?pagina=${pagina}`).then(setDatos).catch(() => undefined); }, [pagina]);
-  const paginas = datos ? Math.max(1, Math.ceil(datos.total / datos.por_pagina)) : 1;
+  const { datos } = useActividad({ pagina });
+  const paginas = paginasDe(datos);
   const resumen = (contenido: Record<string, unknown>) => { const t = JSON.stringify(contenido); return t.length > 120 ? `${t.slice(0, 120)}…` : t; };
   return (
     <div data-testid="auditoria" style={{ display: "contents" }}>

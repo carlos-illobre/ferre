@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "../../../../api";
+import { useActividad, type Evento } from "../../../../negocio/actividad";
+import { useUsuarios, type UsuarioFila as Usuario } from "../../../../negocio/usuarios";
 import { fecha } from "../../../../formato";
 import { nombreDeMedio } from "../../../../negocio/ventas/venta";
 import { useEsCelular } from "../vista";
@@ -8,9 +9,7 @@ import { diaYHora, fechaCompleta, textoDeError, useEnLinea } from "./negocio-com
 import "../estilos/negocio.css";
 
 type Contenido = Record<string, unknown>;
-type Evento = { id: string; tipo: string; fecha: string; email: string | null; nombre: string | null; contenido: Contenido };
-type PaginaDeEventos = { eventos: Evento[]; total: number; pagina: number; por_pagina: number };
-type UsuarioFila = { id: string; nombre: string; activo: boolean };
+type UsuarioFila = Pick<Usuario, "id" | "nombre" | "activo">;
 type Filtros = { usuario: string; tipo: string; desde: string; hasta: string };
 type Color = "ok" | "alerta" | "mal" | "azul" | undefined;
 
@@ -118,33 +117,13 @@ export function Actividad() {
   const enLinea = useEnLinea();
   const [filtros, setFiltros] = useState<Filtros>(SIN_FILTROS);
   const [pagina, setPagina] = useState(1);
-  const [datos, setDatos] = useState<PaginaDeEventos | null>(null);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [intento, setIntento] = useState(0);
-  const [usuarios, setUsuarios] = useState<UsuarioFila[]>([]);
+  const desde = filtros.desde ? inicioDelDia(filtros.desde) : undefined;
+  const hasta = filtros.hasta ? inicioDelDia(filtros.hasta, 1) : undefined; // el «hasta» de la pantalla incluye ese día
+  const registro = useActividad({ pagina, usuario: filtros.usuario || undefined, tipo: filtros.tipo || undefined, desde, hasta });
+  const { datos, cargando } = registro;
+  const error = registro.error ? textoDeError(registro.error, "No se pudo traer el registro") : null;
+  const usuarios = useUsuarios().datos ?? [];
   const [abierto, setAbierto] = useState<Evento | null>(null);
-
-  useEffect(() => { api<UsuarioFila[]>("/usuarios").then(setUsuarios).catch(() => undefined); }, []);
-  useEffect(() => {
-    let vigente = true;
-    const consulta = new URLSearchParams({ pagina: String(pagina) });
-    if (filtros.usuario) consulta.set("usuario", filtros.usuario);
-    if (filtros.tipo) consulta.set("tipo", filtros.tipo);
-    if (filtros.desde) consulta.set("desde", inicioDelDia(filtros.desde));
-    if (filtros.hasta) consulta.set("hasta", inicioDelDia(filtros.hasta, 1)); // el «hasta» de la pantalla incluye ese día
-    setCargando(true);
-    api<PaginaDeEventos>(`/auditoria?${consulta}`)
-      .then((d) => { if (vigente) { setDatos(d); setError(null); } })
-      .catch((e: unknown) => { if (vigente) setError(textoDeError(e, "No se pudo traer el registro")); })
-      .finally(() => { if (vigente) setCargando(false); });
-    return () => { vigente = false; };
-  }, [filtros, pagina, intento]);
-  useEffect(() => {
-    const alVolver = () => setIntento((n) => n + 1);
-    window.addEventListener("online", alVolver);
-    return () => window.removeEventListener("online", alVolver);
-  }, []);
 
   // Cambiar un filtro lleva a la página 1; avanzar y retroceder los conserva.
   const filtrar = (cambio: Partial<Filtros>) => { setFiltros((f) => ({ ...f, ...cambio })); setPagina(1); };
@@ -191,7 +170,7 @@ export function Actividad() {
         {cargando && datos && <span className="detalle">Trayendo la página…</span>}
       </div>
 
-      <Aviso tipo="error" accion={<Boton tam="chico" onClick={() => setIntento((n) => n + 1)}>Reintentar</Boton>}>{error}</Aviso>
+      <Aviso tipo="error" accion={<Boton tam="chico" onClick={registro.recargar}>Reintentar</Boton>}>{error}</Aviso>
       {!datos && !error && <Progreso texto="Trayendo las últimas acciones…" />}
 
       {datos && datos.total === 0 && (

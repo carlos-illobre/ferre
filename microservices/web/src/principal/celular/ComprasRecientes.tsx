@@ -1,28 +1,24 @@
 import { useEffect, useState } from "react";
 import { usePuede } from "../permisos";
 import { VerComprobante } from "../FotoDeFactura";
-import { api } from "../../api";
+import { anularCompra, nombreDelComprobante, useComprasRecientes, type CompraFila } from "../../negocio/compras";
 import { fecha, pesos } from "../../formato";
 import { Toast } from "./componentes/base";
 
-type CompraFila = { id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; foto: string | null; total: string; estado: string; proveedor: string; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[] };
 
 // Compras recientes: el papel que ya no se tira. Van en Cómo va el negocio (decisión 67). Cada compra se
 // abre para ver sus renglones y se puede anular.
 export function ComprasRecientes({ soloVer = false }: { soloVer?: boolean } = {}) {
   const anula = usePuede()("deposito.ingresos");
-  const [filas, setFilas] = useState<CompraFila[]>([]);
+  const filas = useComprasRecientes().datos ?? [];
   const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
   const [mensaje, setMensaje] = useState<string | null>(null);
-  const cargar = () => api<CompraFila[]>("/compras").then(setFilas).catch(() => setFilas([]));
-  useEffect(() => { void cargar(); }, []);
   if (filas.length === 0) return soloVer ? <div className="aviso-suave">Todavía no hay compras registradas.</div> : null;
-  const nombreComprobante = (c: CompraFila) => c.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${c.comprobante_tipo}${c.comprobante_numero ? ` ${c.comprobante_numero}` : c.foto ? " con foto" : " sin foto"}`;
+  const nombreComprobante = nombreDelComprobante;
   async function anular(c: CompraFila) {
     const motivo = window.prompt(`¿Anular la compra de ${pesos(c.total)} a ${c.proveedor}? Motivo (opcional):`);
     if (motivo === null) return;
-    await api(`/compras/${c.id}/anular`, { method: "POST", body: JSON.stringify({ motivo }) }).catch((e: Error) => setMensaje(e.message));
-    await cargar();
+    await anularCompra(c.id, motivo).catch((e: Error) => setMensaje(e.message));
   }
   return (
     <>

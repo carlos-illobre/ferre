@@ -33,8 +33,8 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
 ## Cómo se aplica en el front
 
 - **Los datos del servidor se piden con TanStack Query**, con una sola memoria para toda la
-  aplicación (`src/consultas.ts`). Cada tema tiene su consulta en `negocio/` y las pantallas
-  la usan; dos pantallas que piden lo mismo comparten la respuesta. Lo que cambia un dato
+  aplicación (`src/consultas.ts`). Cada tema tiene su consulta en `negocio/` (las que solo
+  traen una ruta usan `negocio/del-servidor.ts`) y las pantallas la usan; dos pantallas que piden lo mismo comparten la respuesta. Lo que cambia un dato
   (cobrar, anular) avisa, y lo que esté en pantalla se vuelve a pedir. No se reintenta ni se
   espera a «estar en línea»: sin conexión, la pantalla lo dice enseguida.
 - **La forma de las respuestas la escribe el servidor**, en `microservices/api/src/contratos/`,

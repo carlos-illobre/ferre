@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { VentaDelDia, VentasDelDia } from "@servidor/ventas";
 import { api } from "../../api";
 import { consultas } from "../../consultas";
+import { useDelServidor } from "../del-servidor";
 import { hoyLocal } from "../../formato";
 
 export { hoyLocal };
@@ -30,7 +31,7 @@ export function useVentasDelDia(dia: string | null = null) {
   }, consultas);
   const { refetch } = consulta;
   const recargar = useCallback(() => { void refetch({ cancelRefetch: false }); }, [refetch]);
-  return { datos: consulta.data ?? null, error: consulta.error, recargar };
+  return { datos: consulta.data ?? null, error: consulta.error, cargando: consulta.isFetching, recargar };
 }
 
 // Anular una venta: queda marcada y sus productos vuelven al stock. Rechaza con el error del
@@ -42,3 +43,8 @@ export function useAnularVenta() {
   }, consultas);
   return { anular: (venta: VentaDelDia, motivo: string): Promise<unknown> => anulacion.mutateAsync({ venta, motivo }), anulando: anulacion.isPending };
 }
+
+// Lo que se consultó y no se llevó (RF «No llevó»), para Cómo va el negocio.
+export type Consulta = { id: string; fecha: string; descripcion: string; precio_ofrecido: string | null; motivo: string | null };
+export const CONSULTAS = ["consultas"] as const;
+export const useConsultas = () => useDelServidor<Consulta[]>(CONSULTAS, "/consultas");

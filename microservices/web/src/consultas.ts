@@ -10,3 +10,4 @@ export const consultas = new QueryClient({
     mutations: { retry: false, networkMode: "always" },
   },
 });
+
