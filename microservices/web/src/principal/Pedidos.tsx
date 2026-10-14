@@ -389,14 +389,6 @@ export function usePedidoAIngresar(): { pedido: Pedido | null; error: string | n
 
 // Lo que falta llegar de un pedido, como renglones del ingreso: la cantidad que resta y el
 // costo de la lista, para que quien recibe corrija solo lo que llegó distinto.
-export function renglonesDelPedido(pedido: Pedido, catalogo: Producto[]) {
-  return pedido.items.filter((i) => Number(i.recibido) < Number(i.cantidad)).map((i) => {
-    const producto = catalogo.find((p) => p.id === i.producto_id) ?? null;
-    const costo = i.costo_estimado === null ? null : Number(i.costo_estimado);
-    return { clave: crypto.randomUUID(), producto, descripcion: i.descripcion, cantidad: Math.round((Number(i.cantidad) - Number(i.recibido)) * 1000) / 1000, costo, costoTexto: costo === null ? "" : String(costo).replace(".", ","), costoLista: costo };
-  });
-}
-
 export function AvisoDePedido({ pedido, error }: { pedido: Pedido | null; error: string | null }) {
   if (error) return <p className="pd-error" role="alert">{error}</p>;
   if (!pedido) return null;

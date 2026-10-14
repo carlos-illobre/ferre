@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { contarAlEspejo, useEspejar } from "../../espejo";
-import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo, type IngresoEnEspejo } from "../ingreso-en-espejo";
-import { AvisoDePedido, renglonesDelPedido, usePedidoAIngresar } from "../Pedidos";
+import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { detalleDelRegistro, diferenciaConLaLista, incompleto, useIngreso, type Proveedor, type Renglon } from "../../negocio/deposito/ingreso";
+import { AvisoDePedido, usePedidoAIngresar } from "../Pedidos";
 import { irA } from "./base/rutas";
 import { usePuede } from "../permisos";
-import { COMPROBANTES, type Comprobante } from "../textos";
+import { COMPROBANTES } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
-import { api } from "../../api";
-import { useCatalogo } from "../../catalogo";
-import { fecha, pesos, porcentaje } from "../../formato";
+import { hoyLocal, pesos, porcentaje } from "../../formato";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { Aviso, Boton, Contador, Exito, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Segmentos, Toast, Vacio, numero as cifra, pesosCortos } from "./base/ui";
 import { useEsCelular } from "./base/vista";
-import { BuscadorDeProducto, detalleDe, mensajeDe, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
+import { BuscadorDeProducto, detalleDe, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
 import "./base/estilos/compras.css";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 
@@ -21,58 +18,21 @@ import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 // registrar. Suma stock y, si el comprobante trae otro costo, ese pasa a ser el vigente.
 // Abajo, las compras recientes (se despliegan y se anulan). Los gastos de la semana están
 // en Cómo va el negocio (decisión 34).
-type Proveedor = { id: string; nombre: string; activo: boolean };
-type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoTexto: string; costoLista: number | null };
-type Semana = { desde: string; por_proveedor: { proveedor: string; total: string; compras: string }[]; total: number };
-type Borrador = { proveedorId: string; comprobante: Comprobante; foto: string | null; fechaCompra: string; renglones: Renglon[] };
-
 const CLAVE_BORRADOR = "ferre.v2.ingreso";
-// La fecha del día según el reloj del local, no la de Greenwich (a la noche ya es mañana).
-const hoy = () => new Date().toLocaleDateString("sv-SE");
-
-// Un ingreso a medio cargar sobrevive a una recarga o a un corte: queda en el dispositivo
-// hasta que se registra o se descarta.
-function leerBorrador(): Borrador | null {
-  try {
-    const b = JSON.parse(localStorage.getItem(CLAVE_BORRADOR) ?? "null") as Borrador | null;
-    return b && Array.isArray(b.renglones) && b.renglones.length > 0 ? b : null;
-  } catch { return null; }
-}
-
-const diferencia = (r: Renglon) => (r.costo !== null && r.costoLista !== null && r.costoLista > 0 ? ((r.costo - r.costoLista) / r.costoLista) * 100 : null);
-const incompleto = (r: Renglon) => r.costo === null || !r.descripcion.trim() || r.cantidad <= 0;
+const costoATexto = (costo: number) => String(costo).replace(".", ",");
 
 export function Ingreso() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const { catalogo, catalogoCompleto, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
-  const [borrador] = useState(leerBorrador);
-  const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
-  const [proveedorId, setProveedorId] = useState(borrador?.proveedorId ?? "");
-  const [comprobante, setComprobante] = useState<Comprobante>(borrador?.comprobante ?? "factura");
-  const [foto, setFoto] = useState<string | null>(borrador?.foto ?? null);
-  const [fechaCompra, setFechaCompra] = useState(borrador?.fechaCompra ?? hoy());
-  const [consulta, setConsulta] = useState("");
-  const [renglones, setRenglones] = useState<Renglon[]>(borrador?.renglones ?? []);
-  // En espejo (decisión 60): el ingreso es uno solo, lo cargue quien lo cargue.
-  useEspejar<IngresoEnEspejo>("ingreso", useMemo(() => ingresoParaElEspejo(proveedorId, comprobante, foto, fechaCompra, renglones), [proveedorId, comprobante, foto, fechaCompra, renglones]), (v) => {
-    setProveedorId(v.proveedorId); setComprobante(v.comprobante as Comprobante); setFoto(v.foto); setFechaCompra(v.fecha);
-    setRenglones((previos) => renglonesDeIngresoDelEspejo(v, catalogo ?? [], previos, (c) => String(c).replace(".", ",")));
-  }, catalogo !== null && catalogoCompleto !== false);
   // Si se viene de un pedido (RF-55), el ingreso arranca con su proveedor y con lo que falta llegar.
   const { pedido, error: errorPedido } = usePedidoAIngresar();
-  const hayCatalogo = catalogo !== null;
-  useEffect(() => {
-    if (!pedido || !catalogo) return;
-    setProveedorId(pedido.proveedor_id);
-    setRenglones(renglonesDelPedido(pedido, catalogo));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pedido, hayCatalogo]);
+  const ingreso = useIngreso({
+    lado: "computadora", costoATexto, pedido, borrador: CLAVE_BORRADOR,
+    textoSinConexion: "No se registró: se cortó la conexión y registrar un ingreso necesita internet. Lo cargado sigue acá; probá de nuevo cuando vuelva.",
+  });
+  const { catalogo, errorCatalogo, proveedores, proveedor, proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra, consulta, setConsulta, resultados, renglones, cambiar, cambiarCosto, cambiarFoto, total, incompletos, error, ocupado } = ingreso;
   const [intento, setIntento] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [errorCodigo, setErrorCodigo] = useState<string | null>(null);
-  const [ocupado, setOcupado] = useState(false);
-  const [version, setVersion] = useState(0);
   const [eligiendoProveedor, setEligiendoProveedor] = useState(false);
   const [escaneando, setEscaneando] = useState(false);
   const [ultimoEscaneado, setUltimoEscaneado] = useState<string | null>(null);
@@ -83,42 +43,16 @@ export function Ingreso() {
   const selector = useRef<HTMLSelectElement>(null);
   const zona = useRef<HTMLDivElement>(null);
   const focoPedido = useRef<string | null>(null);
-  const lista = useRef(renglones);
-  lista.current = renglones;
   const id = useId();
 
-  useEffect(() => { api<Proveedor[]>("/proveedores").then((p) => setProveedores(p.filter((x) => x.activo))).catch(() => setProveedores([])); }, []);
-  const proveedor = proveedores?.find((p) => p.id === proveedorId) ?? null;
-
-  useEffect(() => {
-    try {
-      if (renglones.length) localStorage.setItem(CLAVE_BORRADOR, JSON.stringify({ proveedorId, comprobante, foto, fechaCompra, renglones } satisfies Borrador));
-      else localStorage.removeItem(CLAVE_BORRADOR);
-    } catch { /* sin lugar o sin permiso: se sigue sin borrador */ }
-  }, [proveedorId, comprobante, foto, fechaCompra, renglones]);
-  // Lo que respondió el servidor deja de valer en cuanto se toca lo cargado.
-  useEffect(() => { setError(null); }, [proveedorId, comprobante, foto, fechaCompra, renglones]);
-
-  // Primero los productos del proveedor elegido; después el resto.
-  const resultados = useMemo(() => {
-    if (!consulta.trim()) return [];
-    const todos = buscarProductos(consulta, 16);
-    return proveedor ? [...todos.filter((p) => p.proveedor === proveedor.nombre), ...todos.filter((p) => p.proveedor !== proveedor.nombre)].slice(0, 8) : todos.slice(0, 8);
-  }, [buscarProductos, consulta, proveedor]);
-
   const agregar = useCallback((p: Producto | null, libre?: string) => {
-    const ya = p ? lista.current.find((r) => r.producto?.id === p.id) : undefined;
-    const clave = ya?.clave ?? crypto.randomUUID();
-    const costoLista = p && p.costo_neto !== null ? Number(p.costo_neto) : null;
-    setRenglones((l) => ya
-      ? l.map((r) => (r.clave === clave ? { ...r, cantidad: r.cantidad + 1 } : r))
-      : [...l, { clave, producto: p, descripcion: p?.descripcion ?? libre ?? "", cantidad: 1, costo: costoLista, costoTexto: costoLista === null ? "" : String(costoLista).replace(".", ","), costoLista }]);
-    setConsulta(""); setErrorCodigo(null); setDescartado(null);
+    const { clave, cantidad } = ingreso.agregar(p, libre);
+    setErrorCodigo(null); setDescartado(null);
     focoPedido.current = clave;
-    return ya ? ya.cantidad + 1 : 1;
-  }, []);
-  const cambiar = (clave: string, c: Partial<Renglon>) => setRenglones((l) => l.map((r) => (r.clave === clave ? { ...r, ...c } : r)));
-  const quitar = (clave: string) => { setRenglones((l) => l.filter((r) => r.clave !== clave)); caja.current?.focus(); };
+    return cantidad;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ingreso.agregar]);
+  const quitar = (clave: string) => { ingreso.quitar(clave); caja.current?.focus(); };
 
   // Después de agregar: en la computadora el foco pasa solo a la cantidad; en el celular
   // alcanza con dejar el renglón a la vista (abrir el teclado taparía la lista).
@@ -145,13 +79,14 @@ export function Ingreso() {
 
   // Escanear agrega el renglón y deja la cámara lista para el siguiente.
   const alDetectar = useCallback((codigo: string) => {
-    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-    if (p) { const n = agregar(p); setUltimoEscaneado(`Agregado: ${p.descripcion}${n > 1 ? ` (van ${n})` : ""}. Escaneá el siguiente.`); }
-    else { setEscaneando(false); setUltimoEscaneado(null); setErrorCodigo(`El código ${codigo} no está en el catálogo. Buscá el producto por su nombre; si no existe, lo agregás como producto nuevo.`); caja.current?.focus(); }
-  }, [catalogo, agregar]);
+    const noEsta = (texto: string) => { setEscaneando(false); setUltimoEscaneado(null); setErrorCodigo(texto); caja.current?.focus(); };
+    ingreso.agregarPorCodigo(codigo).then((agregado) => {
+      if (agregado) { setErrorCodigo(null); setDescartado(null); focoPedido.current = agregado.clave; setUltimoEscaneado(`Agregado: ${agregado.producto.descripcion}${agregado.cantidad > 1 ? ` (van ${agregado.cantidad})` : ""}. Escaneá el siguiente.`); }
+      else noEsta(`El código ${codigo} no está en el catálogo. Buscá el producto por su nombre; si no existe, lo agregás como producto nuevo.`);
+    }).catch((e: Error) => noEsta(e.message));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ingreso.agregarPorCodigo]);
 
-  const total = renglones.reduce((s, r) => s + (r.costo ?? 0) * r.cantidad, 0);
-  const incompletos = renglones.filter(incompleto).length;
   // Lo que falta para poder registrar. Se calcula de lo cargado: al corregirlo, desaparece.
   const faltaProveedor = intento && !proveedorId;
   const problema = !intento ? null
@@ -162,35 +97,17 @@ export function Ingreso() {
   async function registrar() {
     if (ocupado || !enLinea) return;
     setIntento(true);
-    if (!proveedorId) { if (esCelular) setEligiendoProveedor(true); else selector.current?.focus(); return; }
-    if (renglones.length === 0) return;
-    if (incompletos) { zona.current?.querySelector<HTMLElement>("[aria-invalid='true'], .falta input")?.focus(); return; }
-    setOcupado(true); setError(null);
-    try {
-      const r = await api<{ total: number; productos_nuevos: number; costos_actualizados: number }>("/compras", {
-        method: "POST",
-        body: JSON.stringify({
-          id: crypto.randomUUID(), proveedor_id: proveedorId, fecha: fechaCompra, comprobante_tipo: comprobante, foto: comprobante === "sin_comprobante" ? null : foto,
-          pedido_id: pedido?.id ?? null,
-          items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion.trim(), cantidad: x.cantidad, costo_unitario: x.costo })),
-        }),
-      });
-      const n = renglones.length;
-      setExito({
-        total: r.total, proveedor: proveedor?.nombre ?? "",
-        detalle: `${plural(n, "renglón sumado", "renglones sumados")} al stock · ${plural(r.costos_actualizados, "costo actualizado", "costos actualizados")} según el comprobante${r.productos_nuevos ? ` · ${plural(r.productos_nuevos, "producto nuevo", "productos nuevos")}` : ""}.`,
-      });
-      setRenglones([]); setFoto(null); setIntento(false); setDescartado(null); setVersion((v) => v + 1);
-      contarAlEspejo(`Ingreso de ${proveedor?.nombre ?? "mercadería"} registrado en la computadora`);
-      if (pedido) irA("compras");
-    } catch (e) {
-      setError(mensajeDe(e, "No se registró: se cortó la conexión y registrar un ingreso necesita internet. Lo cargado sigue acá; probá de nuevo cuando vuelva."));
-    } finally {
-      setOcupado(false);
-    }
+    if (ingreso.falta === "proveedor") { if (esCelular) setEligiendoProveedor(true); else selector.current?.focus(); return; }
+    if (ingreso.falta === "productos") return;
+    if (ingreso.falta === "renglones") { zona.current?.querySelector<HTMLElement>("[aria-invalid='true'], .falta input")?.focus(); return; }
+    const registro = await ingreso.registrar();
+    if (!registro) return;
+    setExito({ total: registro.total, proveedor: registro.proveedor, detalle: detalleDelRegistro(registro) });
+    setIntento(false); setDescartado(null);
+    if (registro.dePedido) irA("compras");
   }
 
-  function descartar() { setDescartado(renglones); setRenglones([]); setIntento(false); caja.current?.focus(); }
+  function descartar() { setDescartado(ingreso.descartar()); setIntento(false); caja.current?.focus(); }
 
   const pasosDelTotal = [
     ...renglones.slice(0, 12).map((r) => `${r.descripcion || "Producto nuevo"}: ${cifra(r.cantidad)} × ${r.costo === null ? "sin costo" : pesos(r.costo)} = ${pesos((r.costo ?? 0) * r.cantidad)}`),
@@ -213,11 +130,11 @@ export function Ingreso() {
     <label className={`con-prefijo compras-costo ${r.costo === null ? "falta" : ""}`}>
       <span aria-hidden="true">$</span>
       <input inputMode="decimal" placeholder="costo" value={r.costoTexto} aria-label={`Costo unitario sin IVA de ${r.descripcion || "producto nuevo"}`} aria-invalid={intento && r.costo === null ? true : undefined} onFocus={(e) => e.target.select()}
-        onChange={(e) => { const t = e.target.value.replace(/[^\d,.]/g, ""); const v = Number(t.replace(",", ".")); cambiar(r.clave, { costoTexto: t, costo: t === "" || !Number.isFinite(v) ? null : v }); }} data-testid="costo" />
+        onChange={(e) => cambiarCosto(r.clave, e.target.value)} data-testid="costo" />
     </label>
   );
   const segunLista = (r: Renglon) => {
-    const dif = diferencia(r);
+    const dif = diferenciaConLaLista(r);
     if (r.costoLista === null) return <span className="detalle">{r.producto ? "sin costo de lista" : "no tiene lista"}</span>;
     if (dif === null || Math.abs(dif) < 0.05) return <span className="detalle">{dif === null ? `lista ${pesos(r.costoLista)}` : `igual que la lista (${pesos(r.costoLista)})`}</span>;
     return (
@@ -232,7 +149,7 @@ export function Ingreso() {
     );
   };
   const nombreDe = (r: Renglon) => r.producto
-    ? <span className="con-foto-de-producto"><FotoDeProducto producto={r.producto} alCambiar={(f) => { cambiar(r.clave, { producto: { ...r.producto!, foto_url: f } }); actualizarProducto(r.producto!.id, { foto_url: f }).catch(() => undefined); }} /><span><span className="nombre">{r.descripcion}</span><span className="detalle compras-bajo-nombre">{detalleDe(r.producto) || "Sin marca ni proveedor"}</span></span></span>
+    ? <span className="con-foto-de-producto"><FotoDeProducto producto={r.producto} alCambiar={(f) => cambiarFoto(r, f)} /><span><span className="nombre">{r.descripcion}</span><span className="detalle compras-bajo-nombre">{detalleDe(r.producto) || "Sin marca ni proveedor"}</span></span></span>
     : (
       <span className="compras-nuevo">
         <Pastilla tipo="azul" sinPunto>Producto nuevo</Pastilla>
@@ -272,7 +189,7 @@ export function Ingreso() {
           {comprobante !== "sin_comprobante" && (
             <div className="campo compras-foto"><span>{comprobante === "remito" ? "Foto del remito" : "Foto de la factura"}</span><FotoDeFactura foto={foto} alCambiar={setFoto} conCelular={!esCelular} nombre={comprobante === "remito" ? "remito" : "factura"} /></div>
           )}
-          <label className="campo compras-fecha"><span>Fecha</span><input className="entrada" type="date" value={fechaCompra} max={hoy()} onChange={(e) => setFechaCompra(e.target.value || hoy())} data-testid="fecha" /></label>
+          <label className="campo compras-fecha"><span>Fecha</span><input className="entrada" type="date" value={fechaCompra} max={hoyLocal()} onChange={(e) => setFechaCompra(e.target.value || hoyLocal())} data-testid="fecha" /></label>
         </div>
 
         <BuscadorDeProducto consulta={consulta} alCambiar={(v) => { setConsulta(v); setErrorCodigo(null); }} resultados={resultados} alElegir={(p) => agregar(p)} alCrear={(d) => agregar(null, d)} cajaRef={caja}
@@ -282,7 +199,7 @@ export function Ingreso() {
         <Aviso tipo="error" testId="codigo-desconocido">{errorCodigo}</Aviso>
         {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} ultimo={ultimoEscaneado} />}
 
-        <Aviso tipo="info" accion={<Boton tam="chico" icono="deshacer" onClick={() => { if (descartado) setRenglones(descartado); setDescartado(null); }} data-testid="deshacer-descarte">Deshacer</Boton>}>
+        <Aviso tipo="info" accion={<Boton tam="chico" icono="deshacer" onClick={() => { if (descartado) ingreso.reponer(descartado); setDescartado(null); }} data-testid="deshacer-descarte">Deshacer</Boton>}>
           {descartado && renglones.length === 0 ? `Descartaste el ingreso (${plural(descartado.length, "renglón", "renglones")}).` : null}
         </Aviso>
 

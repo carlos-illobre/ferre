@@ -19,3 +19,9 @@ export function fecha(valor: string | null | undefined): string {
 
 // Un importe sin centavos, con el punto de los miles: $12.000. Es como se dice en el mostrador.
 export const pesosCortos = (v: number | string): string => "$" + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+// El día de hoy según el reloj del dispositivo (AAAA-MM-DD), no el de Greenwich: a la noche ya es mañana.
+export const hoyLocal = (): string => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};

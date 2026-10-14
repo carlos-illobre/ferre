@@ -651,7 +651,7 @@ RF-77:
   pruebas:
     - microservices/api/src/rutas/puestos.test.ts
     - microservices/web/src/negocio/ventas/venta-en-espejo.test.ts
-    - microservices/web/src/principal/ingreso-en-espejo.test.ts
+    - microservices/web/src/negocio/deposito/ingreso-en-espejo.test.ts
     - tests/e2e/celular/17-espejo.spec.ts
     - tests/e2e/escritorio/17-espejo.spec.ts
   defectos:

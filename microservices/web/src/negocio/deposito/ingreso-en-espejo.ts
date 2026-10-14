@@ -1,4 +1,4 @@
-import type { Producto } from "./celular/pantallas/Productos";
+import type { Producto } from "../../producto";
 
 // El ingreso de mercadería en curso, como viaja entre el celular y la computadora en espejo
 // (decisión 60): el proveedor, el comprobante, su foto, la fecha y los renglones con cantidad y

@@ -10,7 +10,7 @@ vi.mock("../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara:
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
-import { Pedidos, renglonesDelPedido, textoDelPedido, type Pedido } from "./Pedidos";
+import { Pedidos, textoDelPedido, type Pedido } from "./Pedidos";
 
 const TRESGE = "pv-tresge";
 const item = (id: string, descripcion: string, cantidad: string, recibido = "0", extra: Record<string, unknown> = {}) => ({ producto_id: id, descripcion, marca: "Stanley", unidad: "unidad", codigo_proveedor: `TR-${id}`, cantidad, costo_estimado: "1000", recibido, ...extra });
@@ -152,13 +152,5 @@ describe("Pedidos a proveedores", () => {
     expect(screen.queryByTestId("cancelar-pedido")).toBeNull();
     fireEvent.click(screen.getByTestId("cerrar-pedido"));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/pedidos/p-parcial/cerrar", { method: "POST", body: "{}" }));
-  });
-
-  it("el ingreso desde un pedido se precarga solo con lo que falta llegar, al costo de la lista", () => {
-    const p = pedido("p-parcial", "recibido_parcial", [item("mecha", "MECHA 6 MM", "10", "4", { costo_estimado: "2480" }), item("clavo", "CLAVO", "2", "2")]);
-    const renglones = renglonesDelPedido(p, [producto({ id: "mecha", descripcion: "MECHA 6 MM" })]);
-    expect(renglones).toHaveLength(1);
-    expect(renglones[0]).toMatchObject({ descripcion: "MECHA 6 MM", cantidad: 6, costo: 2480, costoLista: 2480, costoTexto: "2480" });
-    expect(renglones[0]!.producto?.id).toBe("mecha");
   });
 });

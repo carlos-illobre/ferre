@@ -1,3 +1,4 @@
+import type { Comprobante } from "../negocio/deposito/ingreso";
 // Los textos y las listas que comparten el celular y la computadora (decisión 47). Las dos
 // interfaces tienen que decir lo mismo: lo que cambia es el largo. En la computadora el texto
 // explica, casi como una ayuda; en el celular va resumido porque no entra más. Nunca pueden
@@ -13,7 +14,7 @@ export const MEDIOS: { valor: Medio; nombre: string; corto: string; tecla: strin
   { valor: "tarjeta", nombre: "Tarjeta", corto: "Tarjeta", tecla: "F7" },
   { valor: "cuenta_corriente", nombre: "Cuenta corriente", corto: "Cta. cte.", tecla: "F8" },
 ];
-export type Comprobante = "factura" | "remito" | "sin_comprobante";
+export type { Comprobante };
 export const COMPROBANTES: { valor: Comprobante; nombre: string; corto: string }[] = [
   { valor: "factura", nombre: "Factura", corto: "Factura" },
   { valor: "remito", nombre: "Remito", corto: "Remito" },

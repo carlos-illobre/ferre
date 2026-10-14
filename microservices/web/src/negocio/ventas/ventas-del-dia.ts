@@ -2,17 +2,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { VentaDelDia, VentasDelDia } from "@servidor/ventas";
 import { api } from "../../api";
 import { consultas } from "../../consultas";
+import { hoyLocal } from "../../formato";
+
+export { hoyLocal };
 
 // Las ventas de un día, una sola vez para «Hoy», «Anular» y «Cómo va el negocio», en el
 // celular y en la computadora (decisión 72). Los tipos son los que responde el servidor.
 export type { VentaDelDia, VentasDelDia };
 
 const CLAVE = ["ventas"] as const;
-
-export const hoyLocal = (): string => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-};
 
 export const confirmadas = (ventas: VentaDelDia[]): VentaDelDia[] => ventas.filter((v) => v.estado === "confirmada");
 

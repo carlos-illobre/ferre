@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { producto } from "../pruebas/catalogo-falso";
+import { producto } from "../../pruebas/catalogo-falso";
 import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo } from "./ingreso-en-espejo";
 
 const cinta = producto({ id: "cinta", descripcion: "CINTA AISLADORA", costo_neto: "1000" });
