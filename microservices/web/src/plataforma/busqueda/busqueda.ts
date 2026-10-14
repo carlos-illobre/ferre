@@ -1,7 +1,7 @@
-// Búsqueda instantánea sobre el catálogo en memoria (issue #14): varias palabras en
-// cualquier orden, sin acentos ni mayúsculas, por descripción, marca, código del
-// proveedor o código de barras. Índice precalculado una vez: con 50.000 productos sigue
-// respondiendo en milisegundos.
+// Búsqueda instantánea sobre una lista en memoria: varias palabras en cualquier orden, sin
+// acentos ni mayúsculas, por descripción, marca o cualquiera de sus códigos. El índice se
+// arma una vez: con 50.000 elementos sigue respondiendo en milisegundos. No depende de
+// nada de la aplicación: se puede copiar a otro proyecto tal cual.
 
 export type Buscable = { id: string; descripcion: string; marca?: string | null; codigos?: (string | null | undefined)[] };
 

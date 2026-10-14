@@ -1,6 +1,8 @@
 // Precio de venta a partir del costo neto y el margen elegido (issue #13), siempre con
-// su explicación paso a paso (issue #47). Se comparte entre la API y el cliente para que
-// el precio calculado sin conexión sea idéntico al del servidor (ADR-001).
+// su explicación paso a paso (issue #47). El servidor es el que calcula y el que manda
+// (ADR-018). El front tiene la misma cuenta solo para la vista previa de un margen o un
+// precio tipeado; una prueba del front verifica que las dos cuentas sean idénticas.
+export const VERSION_DE_PRECIOS = "0.4.0";
 
 // Los cinco botones de margen. Cualquier otro porcentaje entero se puede tipear a mano.
 export const MARGENES = [300, 200, 100, 50, 25] as const;

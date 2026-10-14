@@ -78,7 +78,6 @@ La estructura y los nombres los fija ADR-010.
 microservices/api/       Lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base y de sus migraciones
 microservices/listas/   Recibe listas de proveedores por cualquier canal y las convierte en precios
 microservices/web/        Las pantallas, en sus dos interfaces. Se publica como sitio estático
-libraries/calculo-de-precios/          Costo, margen y precio, siempre con su explicación; búsqueda. Compartida entre servidor y cliente
 deployment/reverse-proxy/          Proxy para desarrollo y CI
 deployment/                            Plantillas de configuración por ambiente y despliegue en la máquina
 tests/                                 Corredores de unitarias, integración y punta a punta (una carpeta por interfaz)
@@ -122,10 +121,9 @@ C4Context
 
 | Componente | Responsabilidad | Tecnología | ADR |
 |---|---|---|---|
-| `gestion-del-local` | Todo lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock, usuarios y sesiones. Dueño de la base y de sus migraciones. Expone la API | Node, Hono, TypeScript | 001, 003, 010, 011 |
+| `gestion-del-local` | Todo lo que pasa dentro del local: catálogo y precios (los calcula, con su explicación paso a paso), ventas, cuenta corriente, compras, stock, usuarios y sesiones. Dueño de la base y de sus migraciones. Expone la API | Node, Hono, TypeScript | 001, 003, 010, 011 |
 | `listas-de-proveedores` | Recibe una lista de un proveedor y devuelve filas normalizadas. Sin base y sin estado | Python | 001, 003 |
 | `gestion-del-local-web` | Las pantallas, en dos interfaces que comparten todo lo que no es pantalla: tarjetas y pestañas para el celular, tablas y teclado para la computadora. Funciona sin conexión | React, Vite, TypeScript, PWA | 001, 005, 010, 014 |
-| `calculo-de-precios` | Costo neto, margen y precio de venta, que devuelve siempre con su explicación paso a paso; búsqueda. El mismo código corre en el servidor y en el dispositivo | TypeScript | 001, 010 |
 | Base de datos | PostgreSQL administrado, uno por ambiente, usado por cadena de conexión | PostgreSQL | 002 |
 | Reverse proxy | Termina HTTPS y deriva a la API de cada ambiente. En la máquina lo administra la máquina, fuera del repositorio; el del repositorio es solo para desarrollo y CI | Caddy | 006, 013 |
 | Servicio de despliegue | Corre en la máquina; escucha el aviso, verifica y despliega cada ambiente | Unidad de usuario de systemd | 013 |

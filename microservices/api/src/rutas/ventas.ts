@@ -1,4 +1,4 @@
-import { subtotalDeRenglon } from "@ferre/calculo-de-precios";
+import { subtotalDeRenglon } from "../precios.js";
 import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { pool } from "../db.js";

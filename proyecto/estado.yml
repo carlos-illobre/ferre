@@ -51,7 +51,7 @@ RF-04:
 RF-05:
   estado: "Hecho en parte (#6): se aparta de la regla en 1 punto"
   pruebas:
-    - libraries/calculo-de-precios/src/busqueda.test.ts
+    - microservices/web/src/plataforma/busqueda/busqueda.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - tests/integration/listas.sh
@@ -76,7 +76,7 @@ RF-06:
 RF-07:
   estado: "Hecho en parte (#14): se aparta de la regla en 4 puntos"
   pruebas:
-    - libraries/calculo-de-precios/src/busqueda.test.ts
+    - microservices/web/src/plataforma/busqueda/busqueda.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/principal/celular/Catalogo.test.tsx
@@ -135,7 +135,7 @@ RF-10:
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
     - microservices/web/src/cola.test.ts
     - microservices/api/src/rutas/productos.test.ts
-    - libraries/calculo-de-precios/src/precio.test.ts
+    - microservices/api/src/precios.test.ts
   defectos:
     - "En el celular el producto sin margen dice «sin margen»; la regla dice «sin precio»"
     - "Un cambio guardado en el dispositivo que el servidor rechaza al reconectar se descarta sin avisar"
@@ -164,7 +164,7 @@ RF-12:
 RF-13:
   estado: "Hecho (#47)"
   pruebas:
-    - libraries/calculo-de-precios/src/precio.test.ts
+    - microservices/api/src/precios.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - tests/e2e/escritorio/02-listas.spec.ts
@@ -205,7 +205,7 @@ RF-18:
 RF-19:
   estado: "Hecho en parte (#60): el precio a mano se redondea en vez de respetarse y avisar"
   pruebas:
-    - libraries/calculo-de-precios/src/precio.test.ts
+    - microservices/api/src/precios.test.ts
     - microservices/api/src/rutas/ventas.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
@@ -224,7 +224,7 @@ RF-20:
     - microservices/web/src/principal/celular/Vender.test.tsx
     - microservices/web/src/unidades.test.ts
     - microservices/web/src/cola.test.ts
-    - libraries/calculo-de-precios/src/precio.test.ts
+    - microservices/api/src/precios.test.ts
     - microservices/api/src/rutas/ventas.test.ts
   defectos:
     - "En la computadora la venta se cobra con F2; el Enter final no la cierra, como pide la regla"
@@ -242,7 +242,7 @@ RF-20b:
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - microservices/web/src/principal/celular/Vender.test.tsx
-    - libraries/calculo-de-precios/src/precio.test.ts
+    - microservices/api/src/precios.test.ts
   defectos:
     - "Sin prueba que mida que el cambio de margen responde en menos de 100 ms (RNF-07)"
     - "La explicación del subtotal paso por paso solo tiene prueba en el celular"
@@ -812,7 +812,7 @@ RNF-06:
 RNF-07:
   estado: "Hecho en parte (#14): se aparta de la regla en 3 puntos"
   pruebas:
-    - libraries/calculo-de-precios/src/busqueda.test.ts
+    - microservices/web/src/plataforma/busqueda/busqueda.test.ts
     - tests/e2e/escritorio/09-carga.spec.ts
     - tests/e2e/celular/09-carga.spec.ts
   defectos:

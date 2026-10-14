@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { precioDeVenta } from "@ferre/calculo-de-precios";
+import { precioDeVenta } from "../precios/vista-previa";
 import { producto } from "../../pruebas/catalogo-falso";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());

@@ -6,7 +6,7 @@ import { SiVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
-import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
+import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
 import { FotoProducto } from "./componentes/Foto";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "./componentes/base";
 import { Explicacion } from "./componentes/Explicacion";

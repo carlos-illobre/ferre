@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buscar, indexar, normalizar } from "./busqueda.js";
+import { buscar, indexar, normalizar } from "./busqueda";
 
 const catalogo = indexar([
   { id: "1", descripcion: "MECHA PARA MADERA DE 6 MM / (BLACK & DECKER) - 17060E", marca: "BLACK & DECKER", codigos: ["BB17060E"] },

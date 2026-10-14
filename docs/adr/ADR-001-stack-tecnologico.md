@@ -80,7 +80,7 @@ ADR-002, ADR-003, ADR-005. Issues #2, #18, #19, #47.
 Los nombres cambiaron: "API del mostrador" es `microservices/gestion-del-local`, el
 "importador" es `microservices/listas-de-proveedores`, la PWA es
 `clientes/gestion-del-local-web` y el paquete `precios` es
-`libraries/calculo-de-precios`. La API ya no sirve la PWA: el cliente se publica en
+`libraries/calculo-de-precios` (eliminado en 2026-10 por [ADR-018](ADR-018-servicios-y-capas.md): el cálculo vive en el servidor). La API ya no sirve la PWA: el cliente se publica en
 GitHub Pages. El resto del ADR sigue vigente.
 
 → [ADR-010](ADR-010-servicios-clientes-y-librerias.md)

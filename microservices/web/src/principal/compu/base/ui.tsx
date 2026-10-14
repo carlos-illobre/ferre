@@ -5,7 +5,7 @@ import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
 import { leerMeta } from "../../../almacen";
 import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../cola";
 import { urlDeFoto } from "../../../api";
-import { MARGENES } from "@ferre/calculo-de-precios";
+import { MARGENES } from "../../../negocio/precios/vista-previa";
 import { UNIDADES, type Unidad } from "../../../unidades";
 
 // Piezas de Ferrebress v2. Todas las pantallas arman con estas y con las clases de

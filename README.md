@@ -66,7 +66,6 @@ Los nombres dicen qué parte del negocio resuelve cada pieza (ADR-010).
 microservices/api        Lo que pasa dentro del local: catálogo, precios, ventas, cuenta corriente, compras, stock (Hono, TypeScript)
 microservices/listas    Recibe listas de proveedores y las convierte en precios (FastAPI, Python)
 microservices/web         Pantalla del empleado y del dueño (React, PWA, GitHub Pages)
-libraries/calculo-de-precios           Costo, margen y precio con su explicación (compartida)
 infrastructure/                        Caddy
 deployment/oracle-single/              Plantilla de configuración y despliegue en Oracle Cloud
 tests/                                 Corredores E2E, unitarias e integración

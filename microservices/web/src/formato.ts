@@ -1,6 +1,6 @@
 // Números como los lee el empleado: $1.649,14 y 12,5 %. El formato de pesos es el de la
 // librería compartida, así se ve igual en la explicación y en la pantalla.
-import { pesos as pesosLib } from "@ferre/calculo-de-precios";
+import { pesos as pesosLib } from "./negocio/precios/vista-previa";
 
 export function pesos(valor: string | number | null | undefined): string {
   if (valor === null || valor === undefined || valor === "") return "—";

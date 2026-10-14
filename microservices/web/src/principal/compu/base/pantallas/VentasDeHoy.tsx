@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePuede } from "../../../permisos";
-import { subtotalDeRenglon } from "@ferre/calculo-de-precios";
+import { subtotalDeRenglon } from "../../../../negocio/precios/vista-previa";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../../negocio/ventas/venta";
 import { confirmadas as lasConfirmadas, fueSinConexion, hoyLocal, useAnularVenta, useVentasDelDia, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
 import { fecha as fechaLarga } from "../../../../formato";

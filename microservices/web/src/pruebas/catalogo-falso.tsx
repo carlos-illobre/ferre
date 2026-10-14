@@ -1,7 +1,7 @@
 import { useMemo, useReducer } from "react";
 import { vi } from "vitest";
 import type { Producto } from "../producto";
-import { buscar, indexar } from "@ferre/calculo-de-precios";
+import { buscar, indexar } from "../plataforma/busqueda/busqueda";
 
 // Un catálogo en memoria con la misma búsqueda que la app, y `actualizarProducto` espiado.
 export function producto(extra: Partial<Producto> & { id: string; descripcion: string }): Producto {

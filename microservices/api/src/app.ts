@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { VERSION_CALCULO_DE_PRECIOS } from "@ferre/calculo-de-precios";
+import { VERSION_DE_PRECIOS } from "./precios.js";
 import { config } from "./config.js";
 import { baseResponde } from "./db.js";
 import { sesiones } from "./rutas/sesiones.js";
@@ -32,7 +32,7 @@ app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders:
 app.get("/health", async (c) => {
   const db = await baseResponde();
   return c.json(
-    { ok: db, db: db ? "ok" : "sin-respuesta", version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_CALCULO_DE_PRECIOS },
+    { ok: db, db: db ? "ok" : "sin-respuesta", version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_DE_PRECIOS },
     db ? 200 : 503,
   );
 });

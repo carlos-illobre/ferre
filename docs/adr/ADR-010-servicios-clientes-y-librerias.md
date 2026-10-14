@@ -1,6 +1,6 @@
 # ADR-010: Servicios, clientes y librerías separados; nombres por responsabilidad de negocio; cliente web en GitHub Pages
 
-**Estado:** Aceptado
+**Estado:** Aceptado; la parte de las librerías compartidas la reemplaza [ADR-018](ADR-018-servicios-y-capas.md): `libraries/` ya no existe
 **Fecha:** 2026-09-13
 
 ---

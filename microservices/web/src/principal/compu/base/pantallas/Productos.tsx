@@ -3,7 +3,7 @@ import { SiVeCostos, useVeCostos } from "../../../Costos";
 import { CodigoDeBarras } from "../../../CodigoDeBarras";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
 import { usePuede } from "../../../permisos";
-import { MARGENES } from "@ferre/calculo-de-precios";
+import { MARGENES } from "../../../../negocio/precios/vista-previa";
 import { useCatalogo } from "../../../../catalogo";
 import { useDebounce } from "../../../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";

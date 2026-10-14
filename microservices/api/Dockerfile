@@ -1,4 +1,4 @@
-# Contexto de build: la raíz del repo, porque el workspace comparte libraries/ (ADR-010).
+# Contexto de build: la raíz del repo, por el lockfile del workspace (ADR-018).
 # Solo entra lo que este servicio necesita; el .dockerignore de la raíz excluye el resto.
 FROM node:22-alpine AS base
 RUN corepack enable pnpm
@@ -7,11 +7,9 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY microservices/api/package.json microservices/api/
-COPY libraries/calculo-de-precios/package.json libraries/calculo-de-precios/
 RUN pnpm install --frozen-lockfile --filter gestion-del-local...
 
 FROM deps AS build
-COPY libraries/calculo-de-precios libraries/calculo-de-precios
 COPY microservices/api microservices/api
 RUN pnpm --filter gestion-del-local... build && pnpm --filter gestion-del-local --prod deploy --legacy /out
 

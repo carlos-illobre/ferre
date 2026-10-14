@@ -1,0 +1,85 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+import { margenReal, precioDeVenta, redondear, subtotalDeRenglon } from "./vista-previa";
+
+describe("redondear", () => {
+  it("para arriba, al múltiplo de $1.000 siguiente", () => {
+    expect(redondear(1994.57)).toBe(2000);
+    expect(redondear(1000.01)).toBe(2000);
+    expect(redondear(1000)).toBe(1000);
+    expect(redondear(15.1)).toBe(1000);
+    expect(redondear(181_500)).toBe(182_000);
+  });
+});
+
+describe("precioDeVenta", () => {
+  it("costo × (1 + margen) × (1 + IVA), redondeado, con los pasos", () => {
+    const r = precioDeVenta({ costoNeto: 1649.14, margen: 100, iva: 0.21 });
+    expect(r.valor).toBe(4000); // 1649,14 × 2 × 1,21 = 3990,92 → 4000
+    expect(r.pasos).toEqual(["Costo $1.649,14", "+ 100 % de margen = $3.298,28", "+ IVA 21 % = $3.990,92", "Redondeado para arriba a $4.000,00 (múltiplo de $1.000,00)"]);
+  });
+  it("un clavo con 300 % y un taladro con 25 %", () => {
+    expect(precioDeVenta({ costoNeto: 12.5, margen: 300, iva: 0.21 }).valor).toBe(1000);
+    expect(precioDeVenta({ costoNeto: 120_000, margen: 25, iva: 0.21 }).valor).toBe(182_000);
+  });
+  it("acepta un margen tipeado a mano, no solo los de los botones", () => {
+    expect(precioDeVenta({ costoNeto: 1500, margen: 20, iva: 0.21 }).valor).toBe(3000); // 2178 → 3000
+  });
+  it("respeta el IVA reducido de la fila", () => {
+    expect(precioDeVenta({ costoNeto: 1000, margen: 50, iva: 0.105 }).valor).toBe(2000); // 1657,5 → 2000
+  });
+});
+
+describe("margenReal", () => {
+  it("dice qué margen deja un precio tipeado a mano", () => {
+    const r = margenReal({ costoNeto: 1000, iva: 0.21, precio: 2420 });
+    expect(r.valor).toBe(100);
+    expect(r.pasos[3]).toBe("Margen real 100 %");
+  });
+  it("no divide por cero si el costo es cero", () => {
+    expect(margenReal({ costoNeto: 0, iva: 0.21, precio: 100 }).valor).toBe(0);
+  });
+});
+
+describe("esMargenBoton", () => {
+  it("distingue los cinco botones de un margen tipeado a mano", async () => {
+    const { esMargenBoton } = await import("./vista-previa");
+    expect([300, 200, 100, 50, 25].every(esMargenBoton)).toBe(true);
+    expect(esMargenBoton(20)).toBe(false);
+    expect(esMargenBoton(150)).toBe(false);
+  });
+});
+
+describe("subtotalDeRenglon", () => {
+  it("una unidad de un precio ya redondeado queda igual y no agrega pasos", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 6000, cantidad: 1 })).toEqual({ valor: 6000, pasos: [] });
+  });
+  it("varias unidades multiplican sin redondear de más", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 3000, cantidad: 3 })).toEqual({ valor: 9000, pasos: ["× 3 = $9.000,00"] });
+  });
+  it("lo fraccionado se redondea para arriba a $1.000 para no dar vuelto, y lo explica", () => {
+    const r = subtotalDeRenglon({ precioUnitario: 3000, cantidad: 0.5, unidad: "kg" });
+    expect(r.valor).toBe(2000);
+    expect(r.pasos).toEqual(["× 0,5 kg = $1.500,00", "Redondeado para arriba a $2.000,00 (múltiplo de $1.000,00) para no dar vuelto"]);
+  });
+  it("no sube mil pesos por un error de coma flotante", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 10000, cantidad: 0.3, unidad: "m" }).valor).toBe(3000);
+    expect(subtotalDeRenglon({ precioUnitario: 7000, cantidad: 1.1, unidad: "l" }).valor).toBe(8000);
+  });
+  it("un precio tipeado a mano que no es múltiplo de $1.000 también se redondea", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 1500, cantidad: 1 }).valor).toBe(2000);
+  });
+});
+
+// La vista previa no puede dar un precio distinto del que cobra el servidor (ADR-018): la cuenta
+// es la misma, letra por letra, salvo los comentarios.
+describe("la vista previa y el servidor", () => {
+  // Las pruebas corren desde la carpeta del front.
+  it("hacen exactamente la misma cuenta", () => {
+    const cuenta = (texto: string) => texto.split("\n").filter((l) => !l.trim().startsWith("//")).join("\n").trim();
+    const delServidor = readFileSync(resolve(process.cwd(), "../api/src/precios.ts"), "utf8");
+    const deAca = readFileSync(resolve(process.cwd(), "src/negocio/precios/vista-previa.ts"), "utf8");
+    expect(cuenta(deAca)).toBe(cuenta(delServidor));
+  });
+});

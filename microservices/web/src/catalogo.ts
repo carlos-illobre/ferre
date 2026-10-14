@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
-import { buscar, indexar } from "@ferre/calculo-de-precios";
+import { buscar, indexar } from "./plataforma/busqueda/busqueda";
 import { buscaEnElServidor } from "./guardado";
 import { api, EVENTO_CAMBIO } from "./api";
 import { borrar, guardar, guardarMeta, leerMeta, leerTodo, reemplazarTodo } from "./almacen";

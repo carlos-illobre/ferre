@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { margenReal, precioDeVenta, redondear, subtotalDeRenglon } from "./precio.js";
+import { margenReal, precioDeVenta, redondear, subtotalDeRenglon } from "./precios.js";
 
 describe("redondear", () => {
   it("para arriba, al múltiplo de $1.000 siguiente", () => {
@@ -42,7 +42,7 @@ describe("margenReal", () => {
 
 describe("esMargenBoton", () => {
   it("distingue los cinco botones de un margen tipeado a mano", async () => {
-    const { esMargenBoton } = await import("./precio.js");
+    const { esMargenBoton } = await import("./precios.js");
     expect([300, 200, 100, 50, 25].every(esMargenBoton)).toBe(true);
     expect(esMargenBoton(20)).toBe(false);
     expect(esMargenBoton(150)).toBe(false);

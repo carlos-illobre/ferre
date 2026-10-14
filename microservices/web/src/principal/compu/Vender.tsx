@@ -6,7 +6,7 @@ import QRCode from "qrcode";
 import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { NOMBRE_DE_MEDIO, precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
-import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
+import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
 import { guardar, borrarAnterioresA } from "../../almacen";

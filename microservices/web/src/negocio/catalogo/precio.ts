@@ -1,4 +1,4 @@
-import { esMargenBoton, precioDeVenta } from "@ferre/calculo-de-precios";
+import { esMargenBoton, precioDeVenta } from "../precios/vista-previa";
 import type { Producto } from "../../producto";
 
 // El precio de un producto, una sola vez para todas las pantallas (RNF-60): costo de la

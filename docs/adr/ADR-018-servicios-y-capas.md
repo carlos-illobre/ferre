@@ -47,6 +47,11 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
 
 - Mientras dure la unificación de cada proceso no se cambian sus pantallas.
 - Reemplaza la parte de [ADR-010](ADR-010-servicios-clientes-y-librerias.md) que justificaba `libraries/`; esa
-  carpeta se elimina en la etapa 4.
+  carpeta se eliminó en la etapa 4. El cálculo del precio está en el servidor
+  (`microservices/api/src/precios.ts`); el front tiene la misma cuenta solo para la vista previa
+  de un margen o un precio tipeado y para vender sin conexión
+  (`microservices/web/src/negocio/precios/vista-previa.ts`), y una prueba del front falla si
+  las dos cuentas dejan de ser idénticas. La búsqueda es tecnología genérica y está en
+  `microservices/web/src/plataforma/busqueda/`.
 - [ADR-014](ADR-014-dos-interfaces-celular-y-escritorio.md) sigue valiendo en que hay dos
   juegos de pantallas; deja de valer que cada uno tenga sus propios datos y reglas.

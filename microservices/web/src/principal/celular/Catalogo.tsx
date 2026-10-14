@@ -4,7 +4,7 @@ import { CodigoDeBarras } from "../CodigoDeBarras";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
-import { esMargenBoton, MARGENES } from "@ferre/calculo-de-precios";
+import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
 import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Explicacion } from "./componentes/Explicacion";

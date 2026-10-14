@@ -2,7 +2,7 @@ import type { MedioDePago } from "@servidor/ventas";
 import { CONSULTAS, ventasCambiaron } from "./ventas-del-dia";
 import { consultas } from "../../consultas";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
+import { margenReal, precioDeVenta, subtotalDeRenglon } from "../precios/vista-previa";
 import { ErrorApi, subirFoto } from "../../api";
 import { borrarAnterioresA, guardar } from "../../almacen";
 import { traerPorCodigo, useCatalogo } from "../../catalogo";
