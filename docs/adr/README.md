@@ -23,3 +23,4 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [016](ADR-016-pedido-de-foto-con-codigo-qr.md) | La computadora pide las fotos al celular con un código QR; el servidor solo pasa la imagen | Aceptado | 2026-10-11 |
 | [017](ADR-017-permisos-fijos-y-roles-armados-por-el-negocio.md) | Permisos fijos en el código y roles armados por el negocio, varios por usuario | Aceptado | 2026-10-11 |
 | [018](ADR-018-servicios-y-capas.md) | El código se organiza en servicios bajo `microservices/` y en capas; un solo front; sin librerías compartidas; precios en el servidor |
+| [019](ADR-019-procesos-como-modulo-que-se-lleva.md) | Procesos es un módulo aparte que se puede llevar a otro proyecto: servicio propio, esquema propio en la misma base, `bpmn-js` y pantallas como paquete de React | Aceptado | 2026-10-14 |

@@ -6,7 +6,7 @@
 
 **Status**: Aprobada (2026-10-14)
 
-**Maquetas**: Aprobada `maquetas/elegida.html` (2026-10-14); `a-`, `b-` y `c-` son las variantes de las que salió
+**Maquetas**: Aprobadas (2026-10-14): `maquetas/elegida.html`; `a-`, `b-` y `c-` son las variantes de las que salió
 
 **Input**: «Quiero que agregues a la opción "Más" una pantalla nueva llamada "Procesos". Esta
 pantalla la quiero reutilizar en varios otros proyectos, así que tratá de hacerla lo más
@@ -155,7 +155,7 @@ persona.
 
 - **E37** **Given** un usuario sin «Ver procesos» ni «Dibujar procesos», **When** abre Más en el celular o en la computadora, **Then** «Procesos» no aparece; si entra a su dirección, ve que no tiene permiso y cuáles hacen falta.
 - **E38** **Given** un usuario con «Ver procesos» y sin «Dibujar procesos», **When** abre un proceso, **Then** ve el vigente, sus pasos (en la tabla o en «Pasos») y su historial, y puede acercar, alejar y mover la vista; no ve las figuras, Importar, Exportar, Proceso nuevo, los botones de cambiar ni los borradores, y los pasos no se pueden mover ni editar.
-- **E39** **Given** un usuario sin «Dibujar procesos», **When** pide al servidor crear, cambiar, marcar vigente, importar, exportar o borrar un proceso, **Then** el servidor lo rechaza diciendo qué permiso hace falta; sin ninguno de los dos, también rechaza leerlos.
+- **E39** **Given** un usuario sin «Dibujar procesos», **When** pide al servidor crear, cambiar, marcar vigente, importar o borrar un proceso, o ver un borrador, **Then** el servidor lo rechaza diciendo qué permiso hace falta; sin ninguno de los dos, también rechaza leerlos. Exportar no se le ofrece.
 - **E40** **Given** el sistema recién actualizado, **When** se miran los roles, **Then** «Ver procesos» y «Dibujar procesos» figuran en la parte «Negocio» y los tiene el rol Gerente.
 - **E45** **Given** un usuario con «Dibujar procesos» y sin «Ver procesos», **When** abre Más, **Then** ve «Procesos» y puede todo: dibujar incluye ver.
 
