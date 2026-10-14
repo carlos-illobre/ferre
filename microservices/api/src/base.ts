@@ -8,5 +8,15 @@ import type { Base } from "./tablas.js";
 const pool = { connect: () => db.pool.connect(), end: async () => undefined };
 export const base = new Kysely<Base>({ dialect: new PostgresDialect({ pool: pool as never }) });
 
+// Para salir de una transacción deshaciendo lo hecho y devolver una respuesta (no un error):
+// `throw new Deshacer(resultado)` adentro de `enTransaccion`.
+export class Deshacer<T> extends Error {
+  constructor(public resultado: T) { super("se deshace la transacción"); }
+}
+export async function enTransaccion<T>(trabajo: (trx: Transaction<Base>) => Promise<T>): Promise<T> {
+  try { return await base.transaction().execute(trabajo); }
+  catch (e) { if (e instanceof Deshacer) return e.resultado as T; throw e; }
+}
+
 // Lo que puede ejecutar una consulta: la base o una transacción abierta.
 export type Ejecutor = Kysely<Base> | Transaction<Base>;

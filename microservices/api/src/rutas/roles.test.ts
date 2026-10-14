@@ -36,7 +36,7 @@ describe("roles", () => {
     expect(r.status).toBe(201);
     expect(base.actual.sqlDe(/INSERT INTO rol \(/)[0]!.params[1]).toBe("Encargado");
     expect(base.actual.sqlDe(/INSERT INTO rol_permiso/)[0]!.params[1]).toEqual(["ventas.registrar", "deposito.ingresos"]);
-    expect(base.actual.sqlDe(/INSERT INTO evento/)[0]!.params[1]).toBe("rol.creado");
+    expect(base.actual.sqlDe(/insert into "evento"/)[0]!.params[1]).toBe("rol.creado");
   });
 
   it("sin nombre, sin permisos o con un permiso que no existe, no se guarda; un nombre repetido, 409", async () => {
@@ -65,7 +65,7 @@ describe("roles", () => {
     expect(((await r.json()) as { error: string }).error).toContain("sin nadie que pueda administrar");
     administran("u-dueño");
     expect((await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["ventas.ver"] } })).status).toBe(400);
-    expect(base.actual.sqlDe(/^COMMIT/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/^commit/)).toHaveLength(0);
   });
 
   it("un rol que alguien tiene no se borra; uno libre sí", async () => {

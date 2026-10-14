@@ -38,6 +38,12 @@ export interface Base {
     motivo: string | null; dispositivo_id: string | null; creado_en: Generated<Date>;
   };
   usuario: { id: string; email: string; nombre: string };
+  producto: { id: string; descripcion: string; unidad: string };
+  ticket: {
+    id: string; tipo: "error" | "mejora"; descripcion: string; dispositivo: string | null; version: string | null; usuario_id: string; creado_en: Generated<Date>;
+    estado: ConValor<"abierto" | "resuelto">; resuelto_en: ColumnType<Date | null, never, Date | string | null>; resuelto_por: ColumnType<string | null, never, string | null>; nota: ColumnType<string | null, never, string | null>;
+  };
+  ticket_foto: { ticket_id: string; orden: number; archivo: string };
   proveedor: {
     id: string; nombre: string; precios_incluyen_iva: ConValor<boolean>; descuento_general: ColumnType<string, number | undefined, number>;
     descuento_contado: ColumnType<string, number | undefined, number>; lector: string | null; activo: ConValor<boolean>; whatsapp: ColumnType<string | null, string | null | undefined, string | null>;

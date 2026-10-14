@@ -15,13 +15,13 @@ describe("GET /anomalias", () => {
 
   it("las lista de la más nueva a la más vieja, con producto y usuario, de a 50, y dice si hay más", async () => {
     const filas = Array.from({ length: 51 }, (_, i) => ({ id: `a${i}`, tipo: "venta_sin_stock", cantidad: "1", detalle: "faltaba 1", creado_en: "2026-10-11T12:00:00Z", producto: "MECHA", usuario: "Marta" }));
-    base.actual.programar(/FROM anomalia a JOIN producto p/, { rows: filas });
+    base.actual.programar(/from "anomalia" as "a" inner join "producto" as "p"/, { rows: filas });
     const r = await pedir(app, "GET", "/anomalias?pagina=2", { rol: "mostrador" });
     const cuerpo = (await r.json()) as { pagina: number; hay_mas: boolean; anomalias: unknown[] };
     expect(cuerpo).toMatchObject({ pagina: 2, hay_mas: true });
     expect(cuerpo.anomalias).toHaveLength(50);
-    const consulta = base.actual.sqlDe(/FROM anomalia a JOIN producto p/)[0]!;
-    expect(consulta.sql).toMatch(/ORDER BY a\.creado_en DESC/);
+    const consulta = base.actual.sqlDe(/from "anomalia" as "a" inner join "producto" as "p"/)[0]!;
+    expect(consulta.sql).toMatch(/order by "a"\."creado_en" desc/);
     expect(consulta.params).toEqual([51, 50]);
   });
 });
