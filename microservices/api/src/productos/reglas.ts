@@ -2,7 +2,9 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { preciosDeUnProducto } from "../precios.js";
 import * as datos from "./datos.js";
-import type { CambiosDeProducto, FotoSubida, ProductoDelCatalogo } from "../contratos/productos.js";
+import type { z } from "zod";
+import type { FotoSubida, ProductoDelCatalogo } from "../contratos/productos.js";
+import type { cambiosDeProducto } from "./esquemas.js";
 
 export { normalizarBusqueda, type ProductoCatalogo } from "./datos.js";
 
@@ -20,39 +22,16 @@ export function conPrecio<T extends { costo_neto: string | null; iva: string | n
 
 export const catalogo = async (q: datos.FiltrosDelCatalogo): Promise<ProductoDelCatalogo[]> => (await datos.catalogo(q)).map(conPrecio);
 
-export type CambiosEntrada = CambiosDeProducto;
+export type CambiosValidados = z.output<typeof cambiosDeProducto>;
 export type Rechazo = { error: string; estado: 400 | 403 | 404 | 413; permiso?: string };
 
-// Elegir margen: uno de los botones (300/200/100/50/25), cualquier porcentaje entero tipeado a
-// mano, o ninguno; también la unidad, el código de barras, el proveedor preferido y la foto.
-// Fijar el margen de un producto es de quien tiene ese permiso; en una venta el margen vale solo
-// para esa venta y no llega acá (RF-72). Queda auditado.
-export async function cambiar(id: string, cuerpo: CambiosEntrada, fijaMargenes: boolean, usuarioId: string): Promise<Rechazo | null> {
-  const cambios: datos.CambiosDeProducto = {};
-  if ("margen_elegido" in cuerpo) {
-    if (!fijaMargenes) return { error: "No tenés permiso para esto. Hace falta: Fijar márgenes", permiso: "catalogo.margenes", estado: 403 };
-    const m = cuerpo.margen_elegido;
-    if (m !== null && (typeof m !== "number" || !Number.isInteger(m) || m <= 0 || m > 10000)) return { error: "El margen es un porcentaje entero mayor que cero (por ejemplo 20) o ninguno", estado: 400 };
-    cambios.margen_elegido = m;
-  }
-  if ("unidad" in cuerpo) {
-    if (!["unidad", "kg", "m", "l"].includes(cuerpo.unidad as string)) return { error: "La unidad es unidad, kg, m o l", estado: 400 };
-    cambios.unidad = cuerpo.unidad;
-  }
-  if ("codigo_barras" in cuerpo) {
-    const cb = cuerpo.codigo_barras === null ? null : String(cuerpo.codigo_barras).trim();
-    if (cb !== null && !/^[0-9A-Za-z-]{4,32}$/.test(cb)) return { error: "El código de barras tiene que tener entre 4 y 32 letras o números", estado: 400 };
-    cambios.codigo_barras = cb;
-  }
-  if ("proveedor_preferido_id" in cuerpo) cambios.proveedor_preferido_id = cuerpo.proveedor_preferido_id ?? null;
-  if ("foto_url" in cuerpo) {
-    const f = cuerpo.foto_url === null ? null : String(cuerpo.foto_url).trim();
-    if (f !== null && !/^(https?:\/\/|\/fotos\/).{4,500}$/.test(f)) return { error: "La foto tiene que ser una dirección https o una foto subida", estado: 400 };
-    cambios.foto_url = f;
-  }
-  if (Object.keys(cambios).length === 0) return { error: "Nada que cambiar: mandá margen_elegido, unidad, codigo_barras, proveedor_preferido_id o foto_url", estado: 400 };
+// Lo que cambia de un producto, ya validado con su esquema (`esquemas.ts`). Fijar el margen de
+// un producto es de quien tiene ese permiso; en una venta el margen vale solo para esa venta y
+// no llega acá (RF-72). Queda auditado.
+export async function cambiar(id: string, cambios: CambiosValidados, fijaMargenes: boolean, usuarioId: string): Promise<Rechazo | null> {
+  if ("margen_elegido" in cambios && !fijaMargenes) return { error: "No tenés permiso para esto. Hace falta: Fijar márgenes", permiso: "catalogo.margenes", estado: 403 };
   if (!(await datos.cambiar(id, cambios))) return { error: "No existe ese producto", estado: 404 };
-  await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId, contenido: { id, ...cuerpo } });
+  await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId, contenido: { id, ...cambios } });
   return null;
 }
 

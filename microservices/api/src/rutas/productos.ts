@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { exigirSesion, puede } from "../autenticacion.js";
 import * as reglas from "../productos/reglas.js";
+import { cambiosDeProducto } from "../productos/esquemas.js";
+import { leerCuerpo } from "../validar.js";
 
 export { conPrecio, normalizarBusqueda, type ProductoCatalogo } from "../productos/reglas.js";
 
@@ -15,9 +17,10 @@ productos.get("/", async (c) => {
 });
 
 productos.patch("/:id", async (c) => {
-  const cuerpo = await c.req.json<reglas.CambiosEntrada>().catch(() => ({}) as reglas.CambiosEntrada);
+  const cuerpo = await leerCuerpo(c, cambiosDeProducto);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
   const usuario = c.get("sesion").usuario;
-  const r = await reglas.cambiar(c.req.param("id"), cuerpo, puede(usuario, "catalogo.margenes"), usuario.id);
+  const r = await reglas.cambiar(c.req.param("id"), cuerpo.datos, puede(usuario, "catalogo.margenes"), usuario.id);
   return r ? c.json({ error: r.error, ...(r.permiso ? { permiso: r.permiso } : {}) }, r.estado) : c.body(null, 204);
 });
 
