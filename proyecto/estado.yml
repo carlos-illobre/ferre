@@ -1093,3 +1093,38 @@ RNF-60:
     - "En el celular, si anular una venta falla (sin conexión o sin permiso) no se avisa: la lista queda igual. Se arregla al descongelar las pantallas"
     - "En la computadora, «Cómo va el negocio» y los sugeridos de Vender todavía piden las ventas de hoy por su cuenta, sin la consulta compartida"
     - "Las piezas nuevas de la plataforma (base local, cola, preferencias, navegación) se prueban a través de las pruebas de Ferrebress; no tienen pruebas propias que no nombren a Ferrebress"
+
+RF-90:
+  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  pruebas: []
+  defectos: []
+
+RF-91:
+  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  pruebas: []
+  defectos: []
+
+RF-92:
+  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  pruebas: []
+  defectos: []
+
+RF-93:
+  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  pruebas: []
+  defectos: []
+
+RF-94:
+  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  pruebas: []
+  defectos: []
+
+RF-95:
+  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  pruebas: []
+  defectos: []
+
+RNF-61:
+  estado: "Nuevo: especificado en 011-procesos, para aprobar"
+  pruebas: []
+  defectos: []

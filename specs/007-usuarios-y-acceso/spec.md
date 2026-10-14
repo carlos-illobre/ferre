@@ -366,6 +366,7 @@ Los **permisos** son fijos y los define el sistema:
 | Negocio | Ver los números del negocio | Cómo va el negocio: ventas, gastos y dinero invertido en inventario |
 | Negocio | Ver las anomalías | Abrir «Anomalías» |
 | Negocio | Ver quién hizo qué | Abrir el registro de acciones |
+| Negocio | Dibujar procesos | Crear, cambiar, marcar vigentes, importar y borrar los procesos del negocio (RF-95). Mirarlos no pide permiso |
 | Administración | Administrar usuarios | Autorizar personas, asignarles roles, desactivarlas |
 | Administración | Administrar roles | Crear roles, cambiarles el nombre y los permisos, borrarlos |
 | Administración | Administrar sesiones | Ver y cerrar las sesiones de todos y quitar celulares de otros |
@@ -378,7 +379,7 @@ Los **roles** los arma el negocio. El sistema arranca con estos cinco, que se pu
 | Comprador | Encargar compras · Cargar listas de precios · Unir duplicados · Ver las compras · Ver costos |
 | Recepción | Registrar ingresos · Ver las compras · Contar y corregir stock · Ver las anomalías · Ver costos |
 | Administrador | Administrar usuarios · Administrar roles · Administrar sesiones · Ver quién hizo qué |
-| Gerente | Ver los números del negocio · Fijar márgenes · Ver las ventas del día · Anular ventas del día · Anular ventas de cualquier día · Ver costos · Ver las compras · Ver las anomalías · Ver quién hizo qué |
+| Gerente | Ver los números del negocio · Fijar márgenes · Ver las ventas del día · Anular ventas del día · Anular ventas de cualquier día · Ver costos · Ver las compras · Ver las anomalías · Ver quién hizo qué · Dibujar procesos |
 
 Decisión 50 del 2026-10-11, que reemplaza a las decisiones 8, 15 y 18 en lo que toca a roles.
 

@@ -151,6 +151,17 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-80 | Crear un ticket para avisar de un error o proponer una mejora, con texto y hasta 5 fotos o capturas; sin conexión se guarda y se envía solo | [008-mejoras-y-errores](008-mejoras-y-errores/spec.md) |
 | RF-81 | Todos ven todos los tickets, abiertos y resueltos; se marcan resueltos con una nota opcional y se pueden reabrir | [008-mejoras-y-errores](008-mejoras-y-errores/spec.md) |
 
+### Procesos
+
+| ID | Requerimiento | Especificación |
+|---|---|---|
+| RF-90 | Pantalla «Procesos» en Más, con los procesos del negocio: crear, cambiar el nombre, buscar, abrir y borrar | [011-procesos](011-procesos/spec.md) |
+| RF-91 | Dibujar un proceso con BPMN arrastrando y soltando; cada paso con nombre, tipo, quién lo hace, dónde en Ferrebress, cómo se hace y con qué sigue; en la computadora, también como tabla en un panel plegable | [011-procesos](011-procesos/spec.md) |
+| RF-92 | En el celular, el proceso se arma como lista de pasos que se ordenan arrastrando, o en el dibujo | [011-procesos](011-procesos/spec.md) |
+| RF-93 | Cada proceso tiene un vigente y un borrador; al marcar vigente el borrador, la versión anterior queda en el historial | [011-procesos](011-procesos/spec.md) |
+| RF-94 | Exportar un proceso como imagen PNG o en BPMN 2.0 estándar, e importar un BPMN 2.0 de otro programa | [011-procesos](011-procesos/spec.md) |
+| RF-95 | Dibujar procesos pide el permiso «Dibujar procesos»; mirarlos no pide permiso | [011-procesos](011-procesos/spec.md) |
+
 ## Requerimientos no funcionales
 
 Los que son reglas generales están además en la constitución.
@@ -216,6 +227,7 @@ Los que son reglas generales están además en la constitución.
 | RNF-55 | Pruebas automáticas: las unitarias corren en cada cambio; las de punta a punta cubren los caminos principales y se corren a mano | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-56 | Cada decisión técnica queda escrita con su porqué (un ADR) y la documentación se mantiene al día con el código | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-60 | El código se organiza en servicios, y en capas: tecnología reutilizable, negocio una sola vez y pantallas; el cálculo de precios vive en el servidor | [010-reordenamiento-del-codigo](010-reordenamiento-del-codigo/spec.md) |
+| RNF-61 | Procesos se puede llevar a otro proyecto: su regla, sus datos y sus pantallas están aparte y no usan nada propio de Ferrebress; usa la misma base de datos con tablas propias y guarda en BPMN 2.0 | [011-procesos](011-procesos/spec.md) |
 
 ## De dónde vino cada cosa
 

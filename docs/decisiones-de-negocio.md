@@ -635,3 +635,14 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     recalcula el redondeo de cada renglón a $1.000 y el total, que son los que valen. Precisa
     la decisión 84: «el servidor confirma» quiere decir eso, no que vuelva a calcular el precio.
 
+87. **Procesos: una pantalla para dibujar los procesos del negocio con BPMN, que se pueda
+    llevar a otros proyectos** (2026-10-14). Carlos la pidió en Más, con arrastrar y soltar,
+    para dibujar la venta, la compra, la recepción de mercadería y cualquier otro proceso, y
+    usar después esa información para decidir. Va aparte del resto de Ferrebress para poder
+    llevarla a otros proyectos; usa la misma base de datos porque hoy hay una sola (si no,
+    sería un servicio aparte). Por ahora solo se dibuja y guarda lo que se ve; se conectará
+    con lo que pasa en Ferrebress más adelante. Tiene borrador, vigente y versiones; se
+    guarda en BPMN 2.0, se exporta como imagen PNG o como BPMN y se importa BPMN. Dibujar
+    pide un permiso nuevo. Pantalla elegida: en la computadora, el editor clásico con los
+    tres paneles plegables (arrancan cerrados) y los pasos como tabla abajo; en el celular,
+    «Pasos» y «Diagrama». Está en `specs/011-procesos/`.

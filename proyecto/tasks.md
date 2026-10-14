@@ -275,4 +275,6 @@ Las reglas no van acá: van en `specs/`.
 - [x] T110 [agente] Revisión de tipos después de cada edición
 - [x] T111 [agente] Procesos: tres maquetas del editor de procesos con BPMN (Más → Procesos), en computadora y celular, en specs/011-procesos/maquetas; se puede llevar a otros proyectos y usa la misma base de datos
 - [x] T112 [carlos] Procesos: elegir una maqueta y decir qué cambiarle (computadora: A con el panel de pasos de C, plegable; celular: B con «Pasos» y «Diagrama» como en A; maquetas/elegida.html)
-- [ ] T113 [agente] Procesos: especificación, con las preguntas que la maqueta dejó abiertas (depende de T112)
+- [x] T113 [agente] Procesos: especificación, con las preguntas que la maqueta dejó abiertas (depende de T112)
+- [ ] T114 [carlos] Procesos: aprobar la especificación (specs/011-procesos/spec.md) y lo que decidió el agente (depende de T113)
+- [ ] T115 [agente] Procesos: ux.md, plan con la sección «Seguridad» y ADR de cómo va aparte, tareas, y programarlo (depende de T114)
