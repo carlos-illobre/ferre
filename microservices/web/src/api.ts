@@ -1,5 +1,6 @@
 import { crearCliente, ErrorDelServidor } from "./plataforma/servidor/cliente";
 import { reducirImagen } from "./plataforma/imagenes/reducir";
+import type { FotoSubida } from "@servidor/productos";
 
 // Única puerta a la API de Ferrebress. El cliente en sí es tecnología de la plataforma; acá
 // se dice dónde está la API, dónde vive la sesión (ADR-011) y qué pasa cuando se pierde o
@@ -39,6 +40,6 @@ export function urlDeFoto(url: string | null | undefined): string | null {
 export async function subirFoto(productoId: string, archivo: File): Promise<string> {
   const datos = new FormData();
   datos.append("foto", await reducirImagen(archivo), "foto.jpg");
-  const r = await api<{ foto_url: string }>(`/productos/${productoId}/foto`, { method: "POST", body: datos });
+  const r = await api<FotoSubida>(`/productos/${productoId}/foto`, { method: "POST", body: datos });
   return r.foto_url;
 }

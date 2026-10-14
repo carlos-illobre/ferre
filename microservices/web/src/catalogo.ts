@@ -5,6 +5,7 @@ import { api, EVENTO_CAMBIO } from "./api";
 import { borrar, guardar, guardarMeta, leerMeta, leerTodo, reemplazarTodo } from "./almacen";
 import { cambiosDeProductosPendientes, enviarOEncolar, enviarPendientes } from "./cola";
 import type { Producto } from "./producto";
+import type { CambiosDeProducto } from "@servidor/productos";
 
 // Los datos del mostrador (catálogo, stock, clientes) en memoria y en IndexedDB (#18):
 // arrancan desde el dispositivo, se refrescan del servidor cuando hay conexión, y los
@@ -245,7 +246,7 @@ async function actualizarProducto(id: string, cambios: Cambios) {
     poner({ catalogo: nuevo });
     guardarCatalogo(nuevo, anterior).catch(() => undefined);
   }
-  const cuerpo: Record<string, number | string | null> = {};
+  const cuerpo: CambiosDeProducto = {};
   if ("margen_elegido" in cambios) cuerpo.margen_elegido = cambios.margen_elegido ?? null;
   if ("codigo_barras" in cambios) cuerpo.codigo_barras = cambios.codigo_barras ?? null;
   if ("unidad" in cambios) cuerpo.unidad = cambios.unidad ?? "unidad";

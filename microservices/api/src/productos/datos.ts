@@ -3,16 +3,12 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { config } from "../config.js";
 import { pool } from "../db.js";
+import type { ProductoDelCatalogo } from "../contratos/productos.js";
 
 // Productos: el acceso a los datos (ADR-018). La consulta del catálogo se arma a mano porque
 // sus filtros son opcionales; los valores van siempre como parámetros, nunca pegados al texto.
-export type ProductoCatalogo = {
-  id: string; descripcion: string; marca: string | null; codigo_barras: string | null; unidad: string;
-  margen_elegido: number | null;
-  proveedor_id: string | null; proveedor: string | null; codigo_proveedor: string | null;
-  costo_neto: string | null; iva: string | null; fecha_lista: string | null; lista_importada_id: string | null; explicacion_costo: string[];
-  modificado_en: string;
-};
+// La fila del catálogo, sin el precio: el precio lo suma la regla.
+export type ProductoCatalogo = Omit<ProductoDelCatalogo, "precio" | "explicacion_precio" | "margen_del_precio" | "precios">;
 
 // El texto de un producto como lo compara la búsqueda: minúsculas, sin acentos y con todo lo
 // que no es letra ni número convertido en espacio.

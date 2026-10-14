@@ -2,6 +2,7 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { preciosDeUnProducto } from "../precios.js";
 import * as datos from "./datos.js";
+import type { CambiosDeProducto, FotoSubida, ProductoDelCatalogo } from "../contratos/productos.js";
 
 export { normalizarBusqueda, type ProductoCatalogo } from "./datos.js";
 
@@ -17,9 +18,9 @@ export function conPrecio<T extends { costo_neto: string | null; iva: string | n
   return { ...p, precio: precio?.valor ?? null, explicacion_precio: precio?.pasos ?? [], margen_del_precio: precio ? p.margen_elegido : null, precios: porMargen };
 }
 
-export const catalogo = async (q: datos.FiltrosDelCatalogo) => (await datos.catalogo(q)).map(conPrecio);
+export const catalogo = async (q: datos.FiltrosDelCatalogo): Promise<ProductoDelCatalogo[]> => (await datos.catalogo(q)).map(conPrecio);
 
-export type CambiosEntrada = { margen_elegido?: number | null; unidad?: string; codigo_barras?: string | null; proveedor_preferido_id?: string | null; foto_url?: string | null };
+export type CambiosEntrada = CambiosDeProducto;
 export type Rechazo = { error: string; estado: 400 | 403 | 404 | 413; permiso?: string };
 
 // Elegir margen: uno de los botones (300/200/100/50/25), cualquier porcentaje entero tipeado a
@@ -57,7 +58,7 @@ export async function cambiar(id: string, cuerpo: CambiosEntrada, fijaMargenes: 
 
 // Foto sacada con el celular (el cliente ya la achica a 800 px). Tipos: jpeg, png, webp; hasta 10 MB.
 const TIPOS_DE_FOTO: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
-export async function subirFoto(id: string, archivo: unknown, usuarioId: string): Promise<Rechazo | { foto_url: string }> {
+export async function subirFoto(id: string, archivo: unknown, usuarioId: string): Promise<Rechazo | FotoSubida> {
   if (!(archivo instanceof File)) return { error: "Falta la foto", estado: 400 };
   const extension = TIPOS_DE_FOTO[archivo.type];
   if (!extension) return { error: "La foto tiene que ser jpeg, png o webp", estado: 400 };
