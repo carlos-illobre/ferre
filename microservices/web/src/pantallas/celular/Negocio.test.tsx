@@ -94,14 +94,14 @@ describe("Negocio", () => {
     expect(apiFalsa).not.toHaveBeenCalledWith("/usuarios");
   });
 
-  it("Sesiones: todos los botones dicen Cerrar; el de la propia es el de la acción principal (naranja)", async () => {
+  it("Sesiones: todos los botones dicen Cerrar; el de la propia es coral", async () => {
     render(<Negocio parte="usuarios" />);
     await waitFor(() => expect(screen.getAllByTestId("sesion")).toHaveLength(2));
     const botones = within(screen.getByTestId("sesiones")).getAllByRole("button", { name: "Cerrar" });
     expect(botones).toHaveLength(2);
     const propia = screen.getByText(/esta sesión/).closest("[data-testid=sesion]")!;
-    expect(propia.querySelector("button.principal")).toBeTruthy();
+    expect(propia.querySelector("button.coral")).toBeTruthy();
     const otra = screen.getAllByTestId("sesion").find((s) => s.textContent?.includes("celular"))!;
-    expect(otra.querySelector("button.principal")).toBeNull();
+    expect(otra.querySelector("button.coral")).toBeNull();
   });
 });

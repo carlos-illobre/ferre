@@ -6,7 +6,7 @@
 
 **Status**: Aprobada
 
-**Maquetas**: Aprobadas (las piezas de interfaz unificadas, decisión 85: `maquetas/piezas-unificadas.html`)
+**Maquetas**: No lleva pantallas
 
 **Input**: Carlos aprobó el 2026-10-13 la auditoría de arquitectura (`docs/auditoria-de-arquitectura.md`) y pidió hacer el reordenamiento. Mientras dure no se cambian pantallas.
 

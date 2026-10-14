@@ -151,7 +151,7 @@ function Usuarios() {
             <label className="renglon"><span>Correo de Google</span><input name="email" type="email" placeholder="correo@gmail.com" required /></label>
             <div style={{ padding: "10px 16px" }}><ElegirRoles disponibles={disponibles} elegidos={rolesDelNuevo} alCambiar={setRolesDelNuevo} /></div>
             <AvisoError texto={error} />
-            <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton marino">Autorizar</button></div>
+            <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton tinta">Autorizar</button></div>
           </form>
         </Hoja>
       )}
@@ -225,7 +225,7 @@ function Sesiones() {
           return (
             <div key={s.id} className={`fila ${propia ? "propia" : ""}`} data-testid="sesion" role="row" aria-label={`${s.nombre} ${s.dispositivo}${propia ? " esta sesión" : ""}`}>
               <span className="nombre">{s.nombre}{propia ? <small> · esta sesión</small> : null}</span>
-              <button type="button" className={`boton chico derecha ${propia ? "principal" : ""}`} onClick={() => cerrar(s)} title={propia ? "Cierra esta sesión: volvés al login" : "Cierra la sesión en ese dispositivo"}>Cerrar</button>
+              <button type="button" className={`boton chico derecha ${propia ? "coral" : ""}`} onClick={() => cerrar(s)} title={propia ? "Cierra esta sesión: volvés al login" : "Cierra la sesión en ese dispositivo"}>Cerrar</button>
               <span className="detalle">{s.dispositivo} · {new Date(s.ultimo_uso_en).toLocaleString("es-AR")}</span>
             </div>
           );

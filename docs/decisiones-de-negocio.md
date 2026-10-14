@@ -622,13 +622,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     celular y otro para la computadora. El plan y sus etapas están en
     `specs/010-reordenamiento-del-codigo/`.
 
-85. **Un solo juego de piezas de interfaz para el celular y la computadora** (2026-10-14).
-    Carlos vio las maquetas (botones, avisos, hoja de confirmar y visor de la cámara, cada una
-    como está hoy en el celular, como quedaría unificada y en la computadora) y eligió
-    unificar. El celular usa las piezas de la computadora, que ya se acomodan al ancho del
-    celular: la computadora no cambia. Lo que cambia en el celular: el botón de la acción
-    principal es naranja con borde, el secundario oscuro es verde con borde; los avisos llevan
-    ícono, borde y su acción («Reintentar», «Cerrar»); la hoja tiene cabecera con la cruz para
-    cerrar; y el visor de la cámara tiene la guía naranja y el panel verde oscuro. El botón
-    grande de cobrar o registrar sigue mostrando el importe adentro. Las piezas viven en la
-    tecnología reutilizable (ADR-018) y toman los colores de la paleta.
+85. **Cada interfaz conserva sus propias piezas de interfaz** (2026-10-14). Se probó usar en el
+    celular las piezas de la computadora (botón, hoja, avisos y visor de la cámara) y Carlos
+    pidió volver atrás: como hay dos juegos de pantallas a propósito (decisión 46), cada uno
+    mantiene sus piezas y su aspecto. Lo compartido entre los dos sigue siendo la paleta, los
+    textos, las reglas de negocio (`negocio/`) y la tecnología reutilizable (`plataforma/`).

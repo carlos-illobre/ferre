@@ -48,13 +48,13 @@ export function Duplicados() {
             ))}
           </div>
           <div className="cuadricula-2">
-            <button type="button" className="boton marino" onClick={() => resolver(s, "unir", "a")} data-testid="unir">Es el mismo</button>
+            <button type="button" className="boton tinta" onClick={() => resolver(s, "unir", "a")} data-testid="unir">Es el mismo</button>
             <button type="button" className="boton" onClick={() => resolver(s, "rechazar")}>Son distintos</button>
           </div>
         </div>
       ))}
       </div>}
-      <button type="button" className="boton marino grande ancho" onClick={buscar} data-testid="buscar-duplicados">Buscar duplicados en todo el catálogo</button>
+      <button type="button" className="boton blanco" onClick={buscar} data-testid="buscar-duplicados">Buscar duplicados en todo el catálogo</button>
       <button type="button" className="boton texto" onClick={() => setAMano(true)} data-testid="unir-a-mano">Unir dos productos a mano</button>
       {aMano && <UnionManual alCerrar={() => setAMano(false)} alUnir={async (m) => { setMensaje(m); setAMano(false); }} />}
       <Unidos uniones={uniones ?? []} />
@@ -88,7 +88,7 @@ function UnionManual({ alCerrar, alUnir }: { alCerrar: () => void; alUnir: (mens
           )}
         </div>
       ))}
-      <button type="button" className="boton marino" disabled={!id1 || !id2 || id1 === id2} onClick={unir}>Unir</button>
+      <button type="button" className="boton tinta" disabled={!id1 || !id2 || id1 === id2} onClick={unir}>Unir</button>
     </Hoja>
   );
 }

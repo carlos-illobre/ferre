@@ -32,29 +32,16 @@ Toda función nueva con pantalla se hace en las dos.
 
 ## Componentes
 
-Las piezas son **una sola para el celular y la computadora** (decisión 85): botón, hoja,
-aviso, aviso flotante y visor de la cámara se ven igual en las dos interfaces y se acomodan
-al ancho. Lo que sigue describe para qué se usa cada una.
-
-- **Botones:** blanco con borde el común; **naranja el de la acción principal** (uno por
-  pantalla); verde oscuro el de una acción que ordena; borde rojo el de una acción que no se
-  deshace (anular, descartar). Chicos para acciones de un renglón; anchos y grandes para
-  cobrar o registrar, con el importe adentro en el celular.
-- **Avisos en el lugar** con ícono y borde: error (rojo), alerta (naranja), información
-  (verde claro) y listo (verde); llevan su acción a la derecha cuando hay una («Reintentar»,
-  «Cerrar»). El aviso flotante oscuro confirma lo que salió bien.
-- **Visor de la cámara:** a pantalla completa, guía naranja y abajo un panel verde oscuro con
-  lo último leído, el código a mano y «Cerrar».
-
 - **Tarjetas** blancas redondeadas sobre fondo niebla. Cada fila de una lista es nombre +
   detalle a la izquierda e importe a la derecha.
-- **Hojas que suben desde abajo** (en la computadora, una ventana centrada) para lo que se
-  abre sobre lo que se está haciendo: explicación de un número, ficha del producto, elegir
-  cliente o proveedor, revisar una lista. Tienen cabecera con el título y la cruz para
-  cerrar; Escape, tocar afuera o el botón de volver del celular también cierran.
+- **Hojas que suben desde abajo** para lo que se abre sobre lo que se está haciendo:
+  explicación de un número, ficha del producto, elegir cliente o proveedor, revisar una
+  lista. Escape o tocar afuera cierra.
 - **Pantalla de éxito a pantalla completa** al cobrar o registrar un ingreso: el importe
   grande, cómo pagó y un solo botón para seguir.
-- Los avisos se van solos al corregir la causa.
+- **Avisos en el lugar:** un toast oscuro para lo que salió bien, un aviso coral para lo que
+  falta; se van solos al corregir la causa.
+- **Botones:** un solo estilo de botón principal por pantalla; el resto, secundarios.
 - **Barra de progreso** con lo que está haciendo, para lo que va a tardar (cargar una lista).
 
 ## Lo que no es nuestro

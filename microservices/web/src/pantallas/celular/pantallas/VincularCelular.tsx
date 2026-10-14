@@ -35,7 +35,7 @@ export function VincularCelular({ codigo }: { codigo: string }) {
       <h1>Vincular celular</h1>
       {resultado && <p role="status" data-testid="vinculacion-ok">{resultado}</p>}
       <AvisoError texto={error} />
-      {(resultado || error) && <button type="button" className="boton marino" onClick={() => irA("vender")}>Ir a vender</button>}
+      {(resultado || error) && <button type="button" className="boton tinta" onClick={() => irA("vender")}>Ir a vender</button>}
     </main>
   );
 }

@@ -15,7 +15,7 @@ export function Explicacion({ valor, pasos, etiqueta, className, conCosto }: { v
       {abierta && (
         <Hoja titulo={`De dónde sale ${valor}`} alCerrar={() => setAbierta(false)} testId="hoja-explicacion">
           <Pasos pasos={pasos} />
-          <button type="button" className="boton marino" onClick={() => setAbierta(false)}>Listo</button>
+          <button type="button" className="boton tinta" onClick={() => setAbierta(false)}>Listo</button>
         </Hoja>
       )}
     </>

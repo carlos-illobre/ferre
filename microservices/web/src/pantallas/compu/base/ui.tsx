@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Aviso, Boton as BotonDePlataforma, Hoja, Toast, useDialogo, type PropiedadesDeBoton } from "../../../plataforma/interfaz/piezas";
 import { useVeCostos } from "../../Costos";
 import { Isotipo, Logotipo } from "../../Logotipo";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
@@ -79,9 +78,18 @@ export function Marca({ tam = 30, soloSimbolo }: { tam?: number; soloSimbolo?: b
 }
 
 type VarianteBoton = "principal" | "marino" | "peligro" | "sobre-marino";
-// Las piezas son las de plataforma/interfaz (decisión 85); acá el botón recibe el ícono por su nombre.
-export function Boton({ icono, tam, ...resto }: Omit<PropiedadesDeBoton, "icono"> & { icono?: NombreDeIcono }) {
-  return <BotonDePlataforma {...resto} tam={tam} icono={icono ? <Icono nombre={icono} tam={tam === "chico" ? 16 : 20} /> : undefined} />;
+export function Boton({ children, variante, tam, icono, ancho, tecla, className, ...resto }: {
+  children?: ReactNode; variante?: VarianteBoton; tam?: "chico" | "grande"; icono?: NombreDeIcono; ancho?: boolean; tecla?: string; className?: string;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const soloIcono = icono && (children === undefined || children === null);
+  const clases = ["boton", variante, tam, ancho && "ancho", soloIcono && "solo-icono", className].filter(Boolean).join(" ");
+  return (
+    <button type="button" className={clases} aria-keyshortcuts={tecla} {...resto}>
+      {icono && <Icono nombre={icono} tam={tam === "chico" ? 16 : 20} />}
+      {children}
+      {tecla && <span className="tecla solo-compu" aria-hidden="true">{tecla}</span>}
+    </button>
+  );
 }
 
 // Encabezado y cuerpo de una pantalla. `acciones` va a la derecha del título.
@@ -98,7 +106,66 @@ export function Pagina({ titulo, bajada, acciones, children, className, testId }
   );
 }
 
-export { Aviso, Hoja, Toast, useDialogo };
+// Ventana sobre lo que se está haciendo. Usa <dialog>: el navegador encierra el foco, lo
+// devuelve al cerrar y cierra con Escape. En el celular sube desde abajo.
+export function Hoja({ titulo, alCerrar, children, pie, ancha, testId }: { titulo: ReactNode; alCerrar: () => void; children: ReactNode; pie?: ReactNode; ancha?: boolean; testId?: string }) {
+  const ref = useDialogo(alCerrar);
+  const idTitulo = useId();
+  return (
+    <dialog ref={ref} className={`hoja ${ancha ? "ancha" : ""}`} aria-labelledby={idTitulo} data-testid={testId}
+      onClick={(e) => { if (e.target === e.currentTarget) alCerrar(); }}>
+      <div className="hoja-cabeza">
+        <h2 id={idTitulo}>{titulo}</h2>
+        <Boton icono="cerrar" aria-label="Cerrar" onClick={alCerrar} />
+      </div>
+      <div className="hoja-cuerpo">
+        {children}
+        {pie && <div className="hoja-pie">{pie}</div>}
+      </div>
+    </dialog>
+  );
+}
+
+// Abre el <dialog> como modal al montarse y avisa al cerrarse (Escape incluido).
+export function useDialogo(alCerrar: () => void) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const cerrar = useRef(alCerrar);
+  cerrar.current = alCerrar;
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    const anterior = document.activeElement as HTMLElement | null;
+    if (typeof d.showModal === "function") { if (!d.open) d.showModal(); } else d.setAttribute("open", "");
+    const alCancelar = (e: Event) => { e.preventDefault(); cerrar.current(); };
+    d.addEventListener("cancel", alCancelar);
+    return () => { d.removeEventListener("cancel", alCancelar); if (typeof d.close === "function" && d.open) d.close(); anterior?.focus?.(); };
+  }, []);
+  return ref;
+}
+
+export function Toast({ texto, alCerrar, testId = "mensaje" }: { texto: string | null; alCerrar: () => void; testId?: string }) {
+  if (!texto) return null;
+  return (
+    <div className="toast" role="status" data-testid={testId}>
+      <Icono nombre="ok" />
+      <span>{texto}</span>
+      <button type="button" onClick={alCerrar} aria-label="Cerrar aviso"><Icono nombre="cerrar" tam={18} /></button>
+    </div>
+  );
+}
+
+// Aviso en el lugar. "error" y "alerta" se anuncian; desaparece cuando quien lo muestra
+// deja de pasarle texto (al corregirse la causa).
+export function Aviso({ tipo = "info", children, accion, testId }: { tipo?: "info" | "error" | "alerta" | "ok"; children: ReactNode; accion?: ReactNode; testId?: string }) {
+  if (children === null || children === undefined || children === false || children === "") return null;
+  return (
+    <div className={`aviso ${tipo}`} role={tipo === "error" ? "alert" : "status"} data-testid={testId}>
+      <Icono nombre={tipo === "ok" ? "ok" : tipo === "info" ? "info" : tipo === "error" ? "error" : "alerta"} />
+      <div>{children}</div>
+      {accion}
+    </div>
+  );
+}
 
 export function Vacio({ icono, titulo, children, accion }: { icono: NombreDeIcono; titulo: string; children?: ReactNode; accion?: ReactNode }) {
   return (

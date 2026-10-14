@@ -255,7 +255,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
               <span>No llevó</span>
             </button>
             <div className="cobro-total"><span>Total</span><strong className="importe" data-testid="total">{pesosCortos(total)}</strong></div>
-            <button type="button" className="boton principal grande ancho centrado" onClick={cobrar} disabled={ocupado} data-testid="cobrar">{ocupado ? "Cobrando…" : "Cobrar"}</button>
+            <button type="button" className="boton coral principal centrado" onClick={cobrar} disabled={ocupado} data-testid="cobrar">{ocupado ? "Cobrando…" : "Cobrar"}</button>
           </div>
         </div>
       )}

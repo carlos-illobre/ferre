@@ -36,7 +36,7 @@ export function Listas() {
           <span className="seccion" style={{ padding: 0, color: "var(--coral-claro)" }}>Lista pendiente de revisar</span>
           <span style={{ fontSize: 19, fontWeight: 600 }}>{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
           <small>{l.resumen.leidas} productos · {l.resumen.modificados} cambian de precio{l.resumen.modificados > 0 ? ` (${porcentaje(l.resumen.variacion_promedio)} en promedio)` : ""} · {l.resumen.nuevos} nuevos</small>
-          <span className="boton principal" style={{ alignSelf: "flex-start", height: 36, fontSize: 14 }}>Revisar y aplicar</span>
+          <span className="boton coral" style={{ alignSelf: "flex-start", height: 36, fontSize: 14 }}>Revisar y aplicar</span>
         </button>
       ))}
       <ZonaDeCarga proveedores={proveedores} alCargar={setCargada} />
@@ -124,7 +124,7 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
             {proveedores.filter((p) => p.activo).map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
           <div className="acciones dos">
-            <button type="button" className="boton marino" onClick={() => proveedorElegido.current?.value && enviar(archivo, { proveedor_id: proveedorElegido.current.value })}>Leer</button>
+            <button type="button" className="boton tinta" onClick={() => proveedorElegido.current?.value && enviar(archivo, { proveedor_id: proveedorElegido.current.value })}>Leer</button>
             <button type="button" className="boton" onClick={() => { setArchivo(null); setEstado("esperando"); }}>Cancelar</button>
           </div>
         </div>
@@ -134,7 +134,7 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
           <span>La planilla no dice su fecha. ¿De qué fecha es la lista?</span>
           <input ref={fechaElegida} type="date" className="campo grande" defaultValue={new Date().toISOString().slice(0, 10)} />
           <div className="acciones dos">
-            <button type="button" className="boton marino" onClick={() => fechaElegida.current?.value && enviar(archivo, { fecha_lista: fechaElegida.current.value, ...(proveedorElegido.current?.value ? { proveedor_id: proveedorElegido.current.value } : {}) })}>Leer</button>
+            <button type="button" className="boton tinta" onClick={() => fechaElegida.current?.value && enviar(archivo, { fecha_lista: fechaElegida.current.value, ...(proveedorElegido.current?.value ? { proveedor_id: proveedorElegido.current.value } : {}) })}>Leer</button>
             <button type="button" className="boton" onClick={() => { setArchivo(null); setEstado("esperando"); }}>Cancelar</button>
           </div>
         </div>
@@ -181,7 +181,11 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
   const porcentajeProgreso = Math.round(fraccionAplicada(progreso, r.leidas) * 100);
 
   return (
-    <Hoja titulo={`Lista de precios · ${cargada.proveedor} · ${fecha(cargada.fecha_lista)}`} alCerrar={() => !ocupado && alTerminar()} testId="revision">
+    <Hoja alCerrar={() => !ocupado && alTerminar()} testId="revision">
+      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <span className="seccion" style={{ padding: 0 }}>Lista de precios</span>
+        <span className="titulo-hoja" role="heading" aria-level={2}>{cargada.proveedor} · {fecha(cargada.fecha_lista)}</span>
+      </div>
       {cargada.avisos.map((a, i) => <div key={i} className="aviso-suave">{a}</div>)}
       <div className="numeros-lista" data-testid="resumen">
         <div><span className="importe">{r.leidas}</span><small>Productos leídos</small></div>
@@ -205,7 +209,7 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
       ) : (
         <div className="acciones auto-1fr">
           <button type="button" className="boton blanco" onClick={descartar} disabled={ocupado}>Descartar</button>
-          <button type="button" className="boton principal grande ancho centrado" onClick={aplicar} disabled={ocupado} data-testid="aplicar">Aplicar {r.leidas} precios</button>
+          <button type="button" className="boton coral principal centrado" onClick={aplicar} disabled={ocupado} data-testid="aplicar">Aplicar {r.leidas} precios</button>
         </div>
       )}
       <AvisoError texto={error} />
@@ -254,7 +258,7 @@ function AltaDeProveedor({ alCerrar, alCambiar }: { alCerrar: () => void; alCamb
         <label className="renglon"><span>Precios con IVA</span><input type="checkbox" name="iva" style={{ width: 22, height: 22, flex: "none" }} /></label>
         <label className="renglon"><span>Dto. general %</span><input name="general" type="number" min="0" max="100" step="0.5" defaultValue="0" /></label>
         <label className="renglon"><span>Dto. contado %</span><input name="contado" type="number" min="0" max="100" step="0.5" defaultValue="0" /></label>
-        <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton marino">Agregar</button></div>
+        <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton tinta">Agregar</button></div>
       </form>
       <AvisoError texto={error} />
     </Hoja>

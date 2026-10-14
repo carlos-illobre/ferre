@@ -48,15 +48,15 @@ export function OfrecerHuella() {
         <>
           <div className="ficha-cabeza"><span className="avatar"><Icono nombre="tilde" tam={24} grosor={3} /></span><div className="textos"><strong>Listo</strong></div></div>
           <p className="subtitulo">La próxima vez entrás con la huella, sin Google. Podés quitar este celular desde Negocio.</p>
-          <button type="button" className="boton marino grande ancho centrado" onClick={() => setVisible(false)}>Entendido</button>
+          <button type="button" className="boton tinta principal centrado" onClick={() => setVisible(false)}>Entendido</button>
         </>
       ) : (
         <>
           <div className="ficha-cabeza"><span className="avatar"><Icono nombre="huella" tam={24} /></span><div className="textos"><strong>¿Entrar con la huella?</strong></div></div>
           <p className="subtitulo">Vinculá este celular a tu cuenta y la próxima vez entrás con la huella, sin la cuenta de Google.</p>
           <AvisoError texto={error} />
-          <button type="button" className="boton marino grande ancho centrado" onClick={aceptar} disabled={estado === "vinculando"} data-testid="aceptar-huella">{estado === "vinculando" ? "Leyendo la huella…" : "Sí, usar la huella"}</button>
-          <button type="button" className="boton texto" onClick={ahoraNo} data-testid="ahora-no">Ahora no</button>
+          <button type="button" className="boton tinta principal centrado" onClick={aceptar} disabled={estado === "vinculando"} data-testid="aceptar-huella">{estado === "vinculando" ? "Leyendo la huella…" : "Sí, usar la huella"}</button>
+          <button type="button" className="boton texto gris" onClick={ahoraNo} data-testid="ahora-no">Ahora no</button>
         </>
       )}
     </Hoja>
