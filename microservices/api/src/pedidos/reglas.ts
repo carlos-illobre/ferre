@@ -1,7 +1,8 @@
 import { base, Deshacer, enTransaccion } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
-import type { BorradorDePedido } from "../contratos/pedidos.js";
+import type { z } from "zod";
+import type { borradorDePedido } from "./esquemas.js";
 
 // Pedidos a proveedores (RF-55, decisión 52). Un pedido nace como borrador, se manda como
 // texto (el servidor no manda nada: anota que se mandó) y el ingreso de mercadería lo va
@@ -10,22 +11,8 @@ export type Resultado = { ok: true } | { ok: false; estado: 400 | 404 | 409; err
 const mal = (estado: 400 | 404 | 409, error: string): Resultado => ({ ok: false, estado, error });
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const ESPERAN = ["enviado", "recibido_parcial"];
-export type ItemEntrada = NonNullable<BorradorDePedido["items"]>[number];
-export type Entrada = BorradorDePedido & { id?: string };
-
-export function validar(v: Entrada): string | null {
-  if (v.id && !UUID.test(v.id)) return "El id del pedido tiene que ser un UUID";
-  if (!v.proveedor_id || !UUID.test(v.proveedor_id)) return "Elegí el proveedor";
-  if (v.items !== undefined && !Array.isArray(v.items)) return "Los renglones no son válidos";
-  const vistos = new Set<string>();
-  for (const [i, it] of (v.items ?? []).entries()) {
-    if (!it.producto_id || !UUID.test(it.producto_id)) return `El renglón ${i + 1} no tiene producto`;
-    if (!(it.cantidad > 0)) return `El renglón ${i + 1} tiene cantidad inválida`;
-    if (vistos.has(it.producto_id)) return `El renglón ${i + 1} repite un producto que ya está en el pedido`;
-    vistos.add(it.producto_id);
-  }
-  return null;
-}
+// Lo que llega ya viene validado con su esquema (`esquemas.ts`).
+export type Entrada = z.output<typeof borradorDePedido>;
 
 export const lista = (todos: boolean) => datos.lista(base, todos ? null : ESPERAN);
 
@@ -36,14 +23,14 @@ export async function uno(id: string, todos: boolean) {
 }
 
 // Guardar el borrador: lo crea o lo reemplaza entero. Se llama cada vez que cambia.
-export function guardarBorrador(v: Entrada & { id: string }, usuarioId: string): Promise<Resultado> {
+export function guardarBorrador(v: Entrada, usuarioId: string): Promise<Resultado> {
   return enTransaccion(async (trx) => {
-    if (!(await datos.proveedorActivo(trx, v.proveedor_id!))) throw new Deshacer(mal(404, "No existe ese proveedor"));
+    if (!(await datos.proveedorActivo(trx, v.proveedor_id))) throw new Deshacer(mal(404, "No existe ese proveedor"));
     const estado = await datos.estadoTrabado(trx, v.id);
     if (estado && estado !== "borrador") throw new Deshacer(mal(409, "Ese pedido ya se mandó: no se puede cambiar"));
-    if (estado) await datos.cambiarProveedor(trx, v.id, v.proveedor_id!);
-    else await datos.crear(trx, v.id, v.proveedor_id!, usuarioId);
-    await datos.reemplazarRenglones(trx, v.id, v.proveedor_id!, v.items ?? []);
+    if (estado) await datos.cambiarProveedor(trx, v.id, v.proveedor_id);
+    else await datos.crear(trx, v.id, v.proveedor_id, usuarioId);
+    await datos.reemplazarRenglones(trx, v.id, v.proveedor_id, v.items ?? []);
     return { ok: true } as Resultado;
   });
 }
