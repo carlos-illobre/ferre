@@ -1,33 +1,29 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { api } from "../../../api";
+import { useMemo, useState } from "react";
+import { buscarDuplicados, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Resumen, type Sugerencia, type Union } from "../../../negocio/catalogo/duplicados";
 import { useCatalogo } from "../../../catalogo";
 import { fecha, pesos } from "../../../formato";
 import { AvisoError, Buscador, Hoja, Toast } from "../componentes/base";
 
 // Un mismo artículo en varios proveedores (issue #29): quien administra ve las sugerencias
 // lado a lado y decide "es el mismo" o "son distintos". También une dos a mano y separa.
-type Resumen = { id: string; descripcion: string; marca: string | null; codigo_barras: string | null; proveedor: string | null; costo_neto: string | null; fecha_lista: string | null };
-type Sugerencia = { id: string; motivo: string; creado_en: string; a: Resumen; b: Resumen };
-type Union = { absorbido_id: string; absorbido: string; conservado_id: string; conservado: string; unido_en: string; proveedores: string | null };
-
 const detalle = (p: Resumen) => [p.marca, p.proveedor ?? "sin proveedor", p.costo_neto ? pesos(p.costo_neto) : "sin costo", p.fecha_lista ? `lista del ${fecha(p.fecha_lista)}` : null].filter(Boolean).join(" · ");
 
 export function Duplicados() {
-  const [sugerencias, setSugerencias] = useState<Sugerencia[]>([]);
+  const { sugerencias: traidas, uniones, error: fallo } = useDuplicados();
+  const sugerencias = traidas ?? [];
   const [mensaje, setMensaje] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [aviso, setError] = useState<string | null>(null);
+  const [cerrado, setCerrado] = useState<unknown>(null);
+  const error = aviso ?? (fallo && fallo !== cerrado ? fallo.message : null);
   const [aMano, setAMano] = useState(false);
-  const cargar = useCallback(() => api<Sugerencia[]>("/equivalencias").then(setSugerencias).catch((e: Error) => setError(e.message)), []);
-  useEffect(() => { void cargar(); }, [cargar]);
 
   async function buscar() {
-    try { const r = await api<{ nuevas: number }>("/equivalencias/buscar", { method: "POST" }); setMensaje(r.nuevas ? `${r.nuevas} sugerencia(s) nueva(s).` : "Sin sugerencias nuevas."); await cargar(); }
+    try { const nuevas = await buscarDuplicados(); setMensaje(nuevas ? `${nuevas} sugerencia(s) nueva(s).` : "Sin sugerencias nuevas."); }
     catch (e) { setError((e as Error).message); }
   }
   async function resolver(s: Sugerencia, accion: "unir" | "rechazar", conservar: "a" | "b" = "a") {
     try {
-      await api(`/equivalencias/${s.id}/${accion}`, { method: "POST", body: JSON.stringify({ conservar }) });
-      setSugerencias((l) => l.filter((x) => x.id !== s.id));
+      await resolverSugerencia(s, accion, conservar);
       setMensaje(accion === "unir" ? `Unidos: "${(conservar === "a" ? s.a : s.b).descripcion}" ahora tiene ${s.a.proveedor} y ${s.b.proveedor}.` : "Marcados como distintos.");
     } catch (e) { setError((e as Error).message); }
   }
@@ -36,7 +32,7 @@ export function Duplicados() {
     <>
       <p className="subtitulo">El mismo artículo en varias listas. Al unirlos queda un producto con todos sus proveedores y el precio sale del más barato. Las ventas, el stock y los precios se conservan.</p>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
-      <AvisoError texto={error} alCerrar={() => setError(null)} />
+      <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(fallo); }} />
       {sugerencias.length === 0 && <div className="aviso-suave">No hay sugerencias pendientes.</div>}
       {sugerencias.length > 0 && <div className="tarjetas">
       {sugerencias.map((s) => (
@@ -60,8 +56,8 @@ export function Duplicados() {
       </div>}
       <button type="button" className="boton blanco" onClick={buscar} data-testid="buscar-duplicados">Buscar duplicados en todo el catálogo</button>
       <button type="button" className="boton texto" onClick={() => setAMano(true)} data-testid="unir-a-mano">Unir dos productos a mano</button>
-      {aMano && <UnionManual alCerrar={() => setAMano(false)} alUnir={async (m) => { setMensaje(m); setAMano(false); await cargar(); }} />}
-      <Unidos version={mensaje} />
+      {aMano && <UnionManual alCerrar={() => setAMano(false)} alUnir={async (m) => { setMensaje(m); setAMano(false); }} />}
+      <Unidos uniones={uniones ?? []} />
     </>
   );
 }
@@ -75,7 +71,7 @@ function UnionManual({ alCerrar, alUnir }: { alCerrar: () => void; alUnir: (mens
   const r2 = useMemo(() => (q2.trim() ? buscarProductos(q2, 6) : []), [buscarProductos, q2]);
   const nombre = (id: string) => catalogo?.find((p) => p.id === id)?.descripcion ?? "";
   async function unir() {
-    try { await api("/equivalencias/unir", { method: "POST", body: JSON.stringify({ conservar_id: id1, absorber_id: id2 }) }); await alUnir(`Unidos: "${nombre(id1)}" absorbió a "${nombre(id2)}".`); }
+    try { await unirProductos(id1, id2); await alUnir(`Unidos: "${nombre(id1)}" absorbió a "${nombre(id2)}".`); }
     catch (e) { setError((e as Error).message); }
   }
   return (
@@ -99,14 +95,11 @@ function UnionManual({ alCerrar, alUnir }: { alCerrar: () => void; alUnir: (mens
 
 // Lo ya unido, para poder separarlo si fue un error. El absorbido no aparece en las
 // búsquedas (quedó dentro del otro), así que este es el único lugar donde se lo ve.
-function Unidos({ version }: { version: string | null }) {
-  const [uniones, setUniones] = useState<Union[]>([]);
+function Unidos({ uniones }: { uniones: Union[] }) {
   const [mensaje, setMensaje] = useState<string | null>(null);
-  const cargar = useCallback(() => api<Union[]>("/equivalencias/unidos").then(setUniones).catch(() => setUniones([])), []);
-  useEffect(() => { void cargar(); }, [cargar, version]);
   async function separar(u: Union) {
     if (!window.confirm(`¿Separar "${u.absorbido}" de "${u.conservado}"? Cada uno vuelve a tener sus precios, ventas y stock.`)) return;
-    try { await api("/equivalencias/separar", { method: "POST", body: JSON.stringify({ absorbido_id: u.absorbido_id }) }); setMensaje(`Separados: "${u.absorbido}" vuelve a ser un producto aparte.`); await cargar(); }
+    try { await separarProductos(u.absorbido_id); setMensaje(`Separados: "${u.absorbido}" vuelve a ser un producto aparte.`); }
     catch (e) { setMensaje((e as Error).message); }
   }
   return (

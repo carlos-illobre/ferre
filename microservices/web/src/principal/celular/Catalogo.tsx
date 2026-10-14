@@ -4,7 +4,7 @@ import { CodigoDeBarras } from "../CodigoDeBarras";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
-import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
+import { esMargenBoton, MARGENES } from "@ferre/calculo-de-precios";
 import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Explicacion } from "./componentes/Explicacion";
@@ -18,6 +18,7 @@ import { irA } from "../../rutas";
 import { Listas } from "./pantallas/Listas";
 import { Duplicados } from "./pantallas/Duplicados";
 import type { Producto } from "./pantallas/Productos";
+import { margenAMano, otroMargen, precioDelProducto } from "../../negocio/catalogo/precio";
 
 // Catálogo: productos con margen y proveedores, listas de precios, duplicados. Tres
 // sub-pantallas con un segmento arriba.
@@ -122,8 +123,7 @@ export function Productos() {
 }
 
 function FilaProducto({ producto: p, elegida, alAbrir }: { producto: Producto; elegida: boolean; alAbrir: () => void }) {
-  const costo = p.costo_neto === null ? null : Number(p.costo_neto);
-  const precio = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null;
+  const { costo, valor: precio } = precioDelProducto(p);
   return (
     <button type="button" className={`fila con-foto ${elegida ? "elegida" : ""}`} onClick={alAbrir} data-testid="producto" aria-selected={elegida}>
       <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : null}</span>
@@ -141,10 +141,8 @@ function FilaProducto({ producto: p, elegida, alAbrir }: { producto: Producto; e
 // más barato, foto, y la lista de origen para bajar el Excel.
 export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; alCerrar: () => void; quienLoTiene: (codigo: string) => Producto | undefined; alCambiar: (c: Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string }) => void }) {
   const fijaMargen = usePuede()("catalogo.margenes");
-  const costo = p.costo_neto === null ? null : Number(p.costo_neto);
-  const iva = p.iva === null ? 0.21 : Number(p.iva);
-  const calculado = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva }) : null;
-  const manual = p.margen_elegido !== null && !esMargenBoton(p.margen_elegido) ? p.margen_elegido : null;
+  const { costo, iva, calculo: calculado } = precioDelProducto(p);
+  const manual = margenAMano(p);
   const veCostos = useVeCostos();
   const [otro, setOtro] = useState(manual === null ? "" : String(manual));
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -177,8 +175,8 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
           <span>Otro margen{manual !== null ? ` · ${manual} % a mano` : ""}</span>
           <label className="campo"><input inputMode="numeric" placeholder="ej. 120" value={otro} disabled={costo === null} data-testid="otro-margen"
             onChange={(e) => setOtro(e.target.value.replace(/[^\d]/g, ""))}
-            onKeyDown={(e) => { if (e.key === "Enter") { const v = Number(otro); if (v > 0) alCambiar({ margen_elegido: v }); } }}
-            onBlur={() => { const v = Number(otro); if (v > 0 && v !== p.margen_elegido) alCambiar({ margen_elegido: v }); }} /><span>%</span></label>
+            onKeyDown={(e) => { if (e.key === "Enter") { const v = otroMargen(otro); if (v !== null) alCambiar({ margen_elegido: v }); } }}
+            onBlur={() => { const v = otroMargen(otro); if (v !== null && v !== p.margen_elegido) alCambiar({ margen_elegido: v }); }} /><span>%</span></label>
         </div>
         </>}
       </div>

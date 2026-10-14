@@ -1,51 +1,37 @@
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from "react";
 import { usePuede } from "../../permisos";
-import { api, ErrorApi } from "../../../api";
+import { ErrorApi } from "../../../api";
+import { aplicarLista, cargarLista, descartarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useLectores, useListas, type Avance, type Cargada, type ListaFila, type Proveedor } from "../../../negocio/catalogo/listas";
+import { altaDeProveedor, faltaEnProveedor } from "../../../negocio/proveedores";
 import { Explicacion } from "../componentes/Explicacion";
 import { AvisoError, Hoja, Icono, Toast } from "../componentes/base";
 import { fecha, pesos, porcentaje } from "../../../formato";
 
-type Proveedor = { id: string; nombre: string; precios_incluyen_iva: boolean; descuento_general: string; descuento_contado: string; lector: string | null; activo: boolean };
-type ListaFila = { id: string; archivo_nombre: string; fecha_lista: string; estado: string; resumen: Resumen; avisos: string[]; importada_en: string | null; creado_en: string; proveedor_id: string; proveedor: string };
-type Resumen = { leidas: number; salteadas: number; ofertas?: number; nuevos: number; modificados: number; sin_cambio: number; dados_de_baja: number; variacion_promedio: number; salteadas_detalle?: { fila: number; motivo: string; contenido: string[] }[] };
-type Cargada = { id: string; proveedor: string; fecha_lista: string; resumen: Resumen; avisos: string[]; salteadas: { fila: number; motivo: string; contenido: string[] }[] };
-type Fila = { codigo_proveedor: string; descripcion: string; marca: string | null; costo_neto: string; costo_anterior: string | null; explicacion: string[] };
 
 // Cargar una lista de precios (issue #12): elegir el archivo → revisar el resumen y la
 // vista previa en una hoja → aplicar o descartar. Nada se guarda hasta "Aplicar".
 export function Listas() {
   const esDueno = usePuede()("catalogo.listas");
-  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const [historial, setHistorial] = useState<ListaFila[]>([]);
+  const { proveedores: traidos, historial, error: fallo, recargar } = useListas();
+  const proveedores = traidos ?? [];
   const [cargada, setCargada] = useState<Cargada | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // El aviso se puede cerrar; vuelve si el próximo pedido falla de nuevo.
+  const [cerrado, setCerrado] = useState<unknown>(null);
+  const error = !fallo || fallo === cerrado ? null : fallo instanceof ErrorApi ? fallo.message : "Sin conexión con el servidor. Cargar una lista necesita internet.";
   const [resultado, setResultado] = useState<string | null>(null);
   const [altaAbierta, setAltaAbierta] = useState(false);
 
-  const recargar = useCallback(async () => {
-    try {
-      const [p, h] = await Promise.all([api<Proveedor[]>("/proveedores"), api<ListaFila[]>("/listas")]);
-      setProveedores(p);
-      setHistorial(h);
-      setError(null);
-    } catch (e) {
-      setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor. Cargar una lista necesita internet.");
-    }
-  }, []);
-  useEffect(() => { void recargar(); }, [recargar]);
-
-  const pendientes = historial.filter((l) => l.estado === "pendiente");
-  const abrirPendiente = (l: ListaFila) => setCargada({ id: l.id, proveedor: l.proveedor, fecha_lista: l.fecha_lista, resumen: l.resumen, avisos: l.avisos, salteadas: l.resumen.salteadas_detalle ?? [] });
-  const ultima = new Map<string, ListaFila>();
-  for (const l of historial) if (l.estado === "aplicada" && !ultima.has(l.proveedor_id)) ultima.set(l.proveedor_id, l);
+  const sinAplicar = pendientes(historial);
+  const abrirPendiente = (l: ListaFila) => setCargada(retomar(l));
+  const ultima = ultimaAplicada(historial);
 
   return (
     <>
-      <AvisoError texto={error} alCerrar={() => setError(null)} />
+      <AvisoError texto={error} alCerrar={() => setCerrado(fallo)} />
       <Toast texto={resultado} alCerrar={() => setResultado(null)} testId="resultado" />
       <div className="dos-columnas">
       <div className="columna">
-      {pendientes.map((l) => (
+      {sinAplicar.map((l) => (
         <button key={l.id} type="button" className="tarjeta oscura" style={{ textAlign: "left", gap: 8 }} onClick={() => abrirPendiente(l)} data-testid="lista-pendiente">
           <span className="seccion" style={{ padding: 0, color: "var(--coral-claro)" }}>Lista pendiente de revisar</span>
           <span style={{ fontSize: 19, fontWeight: 600 }}>{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
@@ -108,19 +94,14 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
   async function enviar(f: File, extra: Record<string, string> = {}) {
     setEstado("leyendo");
     setError(null);
-    const cuerpo = new FormData();
-    cuerpo.set("archivo", f, f.name);
-    for (const [k, v] of Object.entries(extra)) cuerpo.set(k, v);
     try {
-      const r = await api<Cargada>("/listas", { method: "POST", body: cuerpo });
+      const r = await cargarLista(f, extra);
+      if ("falta" in r) { setEstado(r.falta === "proveedor" ? "falta-proveedor" : "falta-fecha"); return; }
       setArchivo(null);
       setEstado("esperando");
-      alCargar(r);
+      alCargar(r.cargada);
     } catch (e) {
-      const mensaje = e instanceof ErrorApi ? e.message : "Sin conexión con el servidor. Cargar una lista necesita internet.";
-      if (mensaje.includes("de qué proveedor")) setEstado("falta-proveedor");
-      else if (mensaje.includes("fecha")) setEstado("falta-fecha");
-      else { setEstado("esperando"); setError(mensaje); }
+      setEstado("esperando"); setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor. Cargar una lista necesita internet.");
     }
   }
   function elegir(f: File | undefined) { if (!f) return; setArchivo(f); void enviar(f); }
@@ -165,36 +146,27 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
 }
 
 function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mensaje?: string) => void }) {
-  const [filas, setFilas] = useState<Fila[]>([]);
-  const [total, setTotal] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const { filas: traidas, total, error: falloDeFilas } = useFilasDeLista(cargada.id);
+  const filas = traidas ?? [];
+  const [aviso, setError] = useState<string | null>(null);
+  const error = aviso ?? (falloDeFilas ? falloDeFilas.message : null);
   const [ocupado, setOcupado] = useState(false);
   const [verSalteadas, setVerSalteadas] = useState(false);
   const r = cargada.resumen;
 
-  useEffect(() => {
-    api<{ total: number; filas: Fila[] }>(`/listas/${cargada.id}/filas`).then((x) => { setFilas(x.filas); setTotal(x.total); }).catch((e: Error) => setError(e.message));
-  }, [cargada.id]);
-
-  const [progreso, setProgreso] = useState<{ procesadas: number; total: number | null; etapa?: string } | null>(null);
+  const [progreso, setProgreso] = useState<Avance | null>(null);
 
   // Aplicar corre en el servidor en segundo plano; acá se consulta el avance cada segundo.
   async function aplicar() {
     setOcupado(true); setError(null);
     try {
-      await api(`/listas/${cargada.id}/aplicar`, { method: "POST" });
-      setProgreso({ procesadas: 0, total: cargada.resumen.leidas });
-      for (;;) {
-        await new Promise((res) => setTimeout(res, 800));
-        const l = await api<{ estado: string; resumen: Resumen & { progreso?: { procesadas: number; total: number | null; etapa?: string }; error?: string } }>(`/listas/${cargada.id}`);
-        if (l.estado === "aplicada") {
-          const x = l.resumen;
-          alTerminar(`Lista de ${cargada.proveedor} del ${fecha(cargada.fecha_lista)} aplicada: ${x.nuevos + x.modificados} precios actualizados (${x.nuevos} productos nuevos, ${x.modificados} con precio nuevo, ${x.sin_cambio} sin cambio).`);
-          return;
-        }
-        if (l.estado !== "aplicando") { setError(l.resumen.error ?? "La aplicación se interrumpió. Volvé a intentar."); break; }
-        if (l.resumen.progreso) setProgreso({ procesadas: l.resumen.progreso.procesadas, total: l.resumen.progreso.total ?? cargada.resumen.leidas, etapa: l.resumen.progreso.etapa });
+      const fin = await aplicarLista(cargada, setProgreso);
+      if ("aplicada" in fin) {
+        const x = fin.aplicada;
+        alTerminar(`Lista de ${cargada.proveedor} del ${fecha(cargada.fecha_lista)} aplicada: ${x.nuevos + x.modificados} precios actualizados (${x.nuevos} productos nuevos, ${x.modificados} con precio nuevo, ${x.sin_cambio} sin cambio).`);
+        return;
       }
+      if ("interrumpida" in fin) setError(fin.interrumpida ?? "La aplicación se interrumpió. Volvé a intentar.");
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -203,10 +175,10 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
   }
   async function descartar() {
     setOcupado(true);
-    try { await api(`/listas/${cargada.id}/descartar`, { method: "POST" }); alTerminar("Lista descartada. No se guardó ningún precio."); }
+    try { await descartarLista(cargada.id); alTerminar("Lista descartada. No se guardó ningún precio."); }
     catch (e) { setError((e as Error).message); setOcupado(false); }
   }
-  const porcentajeProgreso = progreso ? (progreso.etapa === "duplicados" ? 95 : Math.round((progreso.total ? progreso.procesadas / progreso.total : 0.05) * 90)) : 0;
+  const porcentajeProgreso = Math.round(fraccionAplicada(progreso, r.leidas) * 100);
 
   return (
     <Hoja alCerrar={() => !ocupado && alTerminar()} testId="revision">
@@ -262,21 +234,17 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
 }
 
 function AltaDeProveedor({ alCerrar, alCambiar }: { alCerrar: () => void; alCambiar: () => Promise<void> }) {
-  const [lectores, setLectores] = useState<string[]>([]);
+  const lectores = useLectores();
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { api<string[]>("/listas/lectores").then(setLectores).catch(() => setLectores([])); }, []);
 
   async function alta(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const d = new FormData(e.currentTarget);
+    const datos = { nombre: String(d.get("nombre") ?? ""), lector: String(d.get("lector") ?? "") || null, preciosIncluyenIva: d.get("iva") === "on", descuentoGeneral: String(d.get("general") ?? ""), descuentoContado: String(d.get("contado") ?? "") };
+    const falta = faltaEnProveedor(datos);
+    if (falta) { setError(falta.texto); return; }
     try {
-      await api("/proveedores", {
-        method: "POST",
-        body: JSON.stringify({
-          nombre: d.get("nombre"), lector: d.get("lector") || null, precios_incluyen_iva: d.get("iva") === "on",
-          descuento_general: Number(d.get("general") || 0) / 100, descuento_contado: Number(d.get("contado") || 0) / 100,
-        }),
-      });
+      await altaDeProveedor(datos);
       setError(null);
       await alCambiar();
     } catch (err) { setError((err as Error).message); }

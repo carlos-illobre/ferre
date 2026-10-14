@@ -1,18 +1,13 @@
 import { useCallback, useEffect, useId, useRef, useState, type DragEvent, type FormEvent, type KeyboardEvent } from "react";
-import { api, ErrorApi } from "../../../../api";
+import { ErrorApi } from "../../../../api";
+import { aplicarLista, cargarLista, descartarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useLectores, useListas, variacion, type Avance, type Cargada, type Fila, type ListaFila, type Proveedor, type Salteada } from "../../../../negocio/catalogo/listas";
+import { altaDeProveedor, faltaEnProveedor } from "../../../../negocio/proveedores";
 import { fecha, pesos, porcentaje } from "../../../../formato";
 import { irA } from "../rutas";
 import { Aviso, Boton, Explicado, Hoja, Icono, Indicador, Pagina, Pastilla, Plegable, Progreso, Toast, Vacio, numero } from "../ui";
 import { useEsCelular } from "../vista";
 import "../estilos/listas.css";
 
-type Proveedor = { id: string; nombre: string; precios_incluyen_iva: boolean; descuento_general: string; descuento_contado: string; lector: string | null; activo: boolean };
-type Salteada = { fila: number; motivo: string; contenido: string[] };
-type Resumen = { leidas: number; salteadas: number; ofertas?: number; nuevos: number; modificados: number; sin_cambio: number; dados_de_baja: number; variacion_promedio: number; salteadas_detalle?: Salteada[] };
-type ListaFila = { id: string; archivo_nombre: string; fecha_lista: string; estado: string; resumen: Resumen; avisos: string[]; importada_en: string | null; creado_en: string; proveedor_id: string; proveedor: string };
-type Cargada = { id: string; proveedor: string; fecha_lista: string; resumen: Resumen; avisos: string[]; salteadas: Salteada[] };
-type Fila = { codigo_proveedor: string; descripcion: string; marca: string | null; costo_neto: string; costo_anterior: string | null; explicacion: string[] };
-type Avance = { procesadas: number; total: number | null; etapa?: string };
 type Resultado = { titulo: string; detalle: string };
 
 const SIN_CONEXION = "Sin conexión con el servidor. Cargar una lista necesita internet.";
@@ -42,25 +37,13 @@ function useEnLinea(): boolean {
 export function Listas() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
-  const [historial, setHistorial] = useState<ListaFila[]>([]);
+  const { proveedores, historial, error: fallo, recargar } = useListas();
+  const error = fallo && mensajeDe(fallo);
   const [cargada, setCargada] = useState<Cargada | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [altaAbierta, setAltaAbierta] = useState(false);
 
-  const recargar = useCallback(async () => {
-    try {
-      const [p, h] = await Promise.all([api<Proveedor[]>("/proveedores"), api<ListaFila[]>("/listas")]);
-      setProveedores(p);
-      setHistorial(h);
-      setError(null);
-    } catch (e) {
-      setError(mensajeDe(e));
-    }
-  }, []);
-  useEffect(() => { void recargar(); }, [recargar]);
   // Al volver la conexión se recupera sola: el aviso desaparece cuando se corrige la causa.
   useEffect(() => { if (enLinea && error) void recargar(); }, [enLinea]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -72,17 +55,15 @@ export function Listas() {
     return (
       <Revision cargada={cargada} esCelular={esCelular}
         alVolver={() => { setCargada(null); void recargar(); }}
-        alDescartar={() => { setCargada(null); setToast("Lista descartada. No se guardó ningún precio."); void recargar(); }}
-        alAplicar={(r) => { setCargada(null); setResultado(r); void recargar(); }} />
+        alDescartar={() => { setCargada(null); setToast("Lista descartada. No se guardó ningún precio."); }}
+        alAplicar={(r) => { setCargada(null); setResultado(r); }} />
     );
   }
 
   const activos = (proveedores ?? []).filter((p) => p.activo);
-  const pendientes = historial.filter((l) => l.estado === "pendiente");
-  const abrirPendiente = (l: ListaFila) => { setResultado(null); setCargada({ id: l.id, proveedor: l.proveedor, fecha_lista: l.fecha_lista, resumen: l.resumen, avisos: l.avisos, salteadas: l.resumen.salteadas_detalle ?? [] }); };
-  // El historial viene de la más nueva a la más vieja: la primera aplicada de cada proveedor es la vigente.
-  const ultima = new Map<string, ListaFila>();
-  for (const l of historial) if (l.estado === "aplicada" && !ultima.has(l.proveedor_id)) ultima.set(l.proveedor_id, l);
+  const sinAplicar = pendientes(historial);
+  const abrirPendiente = (l: ListaFila) => { setResultado(null); setCargada(retomar(l)); };
+  const ultima = ultimaAplicada(historial);
 
   return (
     <Pagina titulo="Listas de precios" bajada="Cargá la planilla de un proveedor para actualizar los costos. Antes de guardar vas a ver qué cambia.">
@@ -103,11 +84,11 @@ export function Listas() {
         </section>
       )}
 
-      {pendientes.length > 0 && (
-        <section className="listas-seccion" aria-labelledby="listas-pendientes">
-          <h2 id="listas-pendientes" className="seccion-titulo">{pendientes.length === 1 ? "Una lista espera tu revisión" : `${pendientes.length} listas esperan tu revisión`}</h2>
-          <ul className="listas-pendientes">
-            {pendientes.map((l) => (
+      {sinAplicar.length > 0 && (
+        <section className="listas-seccion" aria-labelledby="listas-sinAplicar">
+          <h2 id="listas-sinAplicar" className="seccion-titulo">{sinAplicar.length === 1 ? "Una lista espera tu revisión" : `${sinAplicar.length} listas esperan tu revisión`}</h2>
+          <ul className="listas-sinAplicar">
+            {sinAplicar.map((l) => (
               <li key={l.id} className="listas-pendiente" data-testid="lista-pendiente">
                 <span className="listas-pendiente-icono" aria-hidden="true"><Icono nombre="listas" tam={22} /></span>
                 <div className="listas-pendiente-texto">
@@ -261,19 +242,14 @@ function ZonaDeCarga({ proveedores, enLinea, alCargar }: { proveedores: Proveedo
   async function enviar(f: File, extra: Record<string, string> = {}) {
     setEstado("leyendo");
     setError(null);
-    const cuerpo = new FormData();
-    cuerpo.set("archivo", f, f.name);
-    for (const [k, v] of Object.entries(extra)) cuerpo.set(k, v);
     try {
-      const r = await api<Cargada>("/listas", { method: "POST", body: cuerpo });
+      const r = await cargarLista(f, extra);
+      // Si le falta saber de qué proveedor o de qué fecha es, el archivo queda elegido para no pedirlo de nuevo.
+      if ("falta" in r) { setEstado(r.falta === "proveedor" ? "falta-proveedor" : "falta-fecha"); return; }
       cancelar();
-      alCargar(r);
+      alCargar(r.cargada);
     } catch (e) {
-      const mensaje = mensajeDe(e);
-      // El servidor avisa con texto qué le falta; el archivo queda elegido para no pedirlo de nuevo.
-      if (mensaje.includes("de qué proveedor")) setEstado("falta-proveedor");
-      else if (mensaje.includes("fecha")) setEstado("falta-fecha");
-      else { cancelar(); setError({ archivo: f.name, motivo: mensaje }); }
+      cancelar(); setError({ archivo: f.name, motivo: mensajeDe(e) });
     }
   }
   function cancelar() { setArchivo(null); setEstado("esperando"); setProveedorId(""); setFalta(false); }
@@ -363,10 +339,8 @@ function ZonaDeCarga({ proveedores, enLinea, alCargar }: { proveedores: Proveedo
 }
 
 function Revision({ cargada, esCelular, alVolver, alDescartar, alAplicar }: { cargada: Cargada; esCelular: boolean; alVolver: () => void; alDescartar: () => void; alAplicar: (r: Resultado) => void }) {
-  const [filas, setFilas] = useState<Fila[] | null>(null);
-  const [total, setTotal] = useState(0);
-  const [errorDeFilas, setErrorDeFilas] = useState<string | null>(null);
-  const [trayendo, setTrayendo] = useState(false);
+  const { filas, total, error: falloDeFilas, trayendo, traerMas } = useFilasDeLista(cargada.id);
+  const errorDeFilas = falloDeFilas && mensajeDe(falloDeFilas);
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [progreso, setProgreso] = useState<Avance | null>(null);
@@ -375,42 +349,20 @@ function Revision({ cargada, esCelular, alVolver, alDescartar, alAplicar }: { ca
 
   useEffect(() => { vivo.current = true; return () => { vivo.current = false; }; }, []);
 
-  const traer = useCallback(async (desde: number) => {
-    setTrayendo(true);
-    try {
-      const x = await api<{ total: number; filas: Fila[] }>(`/listas/${cargada.id}/filas${desde ? `?desde=${desde}` : ""}`);
-      if (!vivo.current) return;
-      setFilas((antes) => (desde && antes ? [...antes, ...x.filas] : x.filas));
-      setTotal(x.total);
-      setErrorDeFilas(null);
-    } catch (e) {
-      if (vivo.current) setErrorDeFilas(mensajeDe(e));
-    } finally {
-      if (vivo.current) setTrayendo(false);
-    }
-  }, [cargada.id]);
-  useEffect(() => { void traer(0); }, [traer]);
-
   // Aplicar corre en el servidor en segundo plano; acá se consulta el avance cada segundo.
   async function aplicar() {
     setOcupado(true); setError(null);
     try {
-      await api(`/listas/${cargada.id}/aplicar`, { method: "POST" });
-      setProgreso({ procesadas: 0, total: r.leidas });
-      while (vivo.current) {
-        await new Promise((listo) => setTimeout(listo, 800));
-        const l = await api<{ estado: string; resumen: Resumen & { progreso?: Avance; error?: string } }>(`/listas/${cargada.id}`);
-        if (l.estado === "aplicada") {
-          const x = l.resumen;
-          alAplicar({
-            titulo: `Listo: ${numero(x.nuevos + x.modificados)} precios actualizados`,
-            detalle: `Lista de ${cargada.proveedor} del ${fecha(cargada.fecha_lista)} aplicada: ${numero(x.nuevos)} productos nuevos, ${numero(x.modificados)} con precio nuevo y ${numero(x.sin_cambio)} sin cambio.`,
-          });
-          return;
-        }
-        if (l.estado !== "aplicando") { setError(l.resumen.error ?? "La aplicación se interrumpió y no se terminó de guardar. La lista sigue acá: volvé a tocar «Aplicar»."); break; }
-        if (l.resumen.progreso) setProgreso({ procesadas: l.resumen.progreso.procesadas, total: l.resumen.progreso.total ?? r.leidas, etapa: l.resumen.progreso.etapa });
+      const fin = await aplicarLista(cargada, setProgreso, () => vivo.current);
+      if ("aplicada" in fin) {
+        const x = fin.aplicada;
+        alAplicar({
+          titulo: `Listo: ${numero(x.nuevos + x.modificados)} precios actualizados`,
+          detalle: `Lista de ${cargada.proveedor} del ${fecha(cargada.fecha_lista)} aplicada: ${numero(x.nuevos)} productos nuevos, ${numero(x.modificados)} con precio nuevo y ${numero(x.sin_cambio)} sin cambio.`,
+        });
+        return;
       }
+      if ("interrumpida" in fin) setError(fin.interrumpida ?? "La aplicación se interrumpió y no se terminó de guardar. La lista sigue acá: volvé a tocar «Aplicar».");
     } catch (e) {
       setError(mensajeDe(e));
     } finally {
@@ -419,14 +371,13 @@ function Revision({ cargada, esCelular, alVolver, alDescartar, alAplicar }: { ca
   }
   async function descartar() {
     setOcupado(true); setError(null);
-    try { await api(`/listas/${cargada.id}/descartar`, { method: "POST" }); alDescartar(); }
+    try { await descartarLista(cargada.id); alDescartar(); }
     catch (e) { setError(mensajeDe(e)); setOcupado(false); }
   }
 
   const buscandoDuplicados = progreso?.etapa === "duplicados";
   const totalAGuardar = progreso?.total ?? r.leidas;
-  // Los precios llenan hasta el 90 %; lo que queda es la búsqueda de duplicados, que no avisa su avance.
-  const fraccion = progreso ? (buscandoDuplicados ? 0.95 : (totalAGuardar ? progreso.procesadas / totalAGuardar : 0) * 0.9) : 0;
+  const fraccion = fraccionAplicada(progreso, r.leidas);
 
   return (
     <Pagina titulo={`${cargada.proveedor} · lista del ${fecha(cargada.fecha_lista)}`} testId="revision"
@@ -481,19 +432,15 @@ function Revision({ cargada, esCelular, alVolver, alDescartar, alAplicar }: { ca
           <h2 id="listas-previa" className="seccion-titulo">Vista previa</h2>
           {filas && <span className="detalle">Los que cambian de precio van primero{total > filas.length ? ` · ${numero(filas.length)} de ${numero(total)}` : ""}</span>}
         </div>
-        <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={() => void traer(filas?.length ?? 0)}>Reintentar</Boton>}>{errorDeFilas && `No se pudo traer la vista previa. ${errorDeFilas}`}</Aviso>
+        <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={traerMas}>Reintentar</Boton>}>{errorDeFilas && `No se pudo traer la vista previa. ${errorDeFilas}`}</Aviso>
         {filas === null ? (errorDeFilas ? null : <div className="esqueleto listas-esqueleto" role="status" aria-label="Cargando la vista previa" />)
           : esCelular ? <PreviaEnTarjetas filas={filas} /> : <PreviaEnTabla filas={filas} />}
-        {filas && total > filas.length && <Boton className="listas-mas" disabled={trayendo} onClick={() => void traer(filas.length)} data-testid="mas-filas">{trayendo ? "Trayendo más…" : `Mostrar ${numero(Math.min(TANDA, total - filas.length))} más`}</Boton>}
+        {filas && total > filas.length && <Boton className="listas-mas" disabled={trayendo} onClick={traerMas} data-testid="mas-filas">{trayendo ? "Trayendo más…" : `Mostrar ${numero(Math.min(TANDA, total - filas.length))} más`}</Boton>}
       </section>
     </Pagina>
   );
 }
 
-function variacion(f: Fila): number | null {
-  const antes = Number(f.costo_anterior);
-  return f.costo_anterior !== null && antes > 0 ? ((Number(f.costo_neto) - antes) / antes) * 100 : null;
-}
 
 function Cambio({ fila }: { fila: Fila }) {
   const cambio = variacion(fila);
@@ -557,28 +504,21 @@ function PreviaEnTarjetas({ filas }: { filas: Fila[] }) {
 }
 
 function AltaDeProveedor({ enLinea, alCerrar, alCambiar }: { enLinea: boolean; alCerrar: () => void; alCambiar: (nombre: string) => Promise<void> }) {
-  const [lectores, setLectores] = useState<string[]>([]);
+  const lectores = useLectores();
   const [error, setError] = useState<{ campo: "nombre" | "general" | "contado" | null; texto: string } | null>(null);
   const [guardando, setGuardando] = useState(false);
   const idError = useId();
-  useEffect(() => { api<string[]>("/listas/lectores").then(setLectores).catch(() => setLectores([])); }, []);
 
   async function alta(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const d = new FormData(e.currentTarget);
-    const nombre = String(d.get("nombre") ?? "").trim();
-    const general = Number(String(d.get("general") || 0).replace(",", "."));
-    const contado = Number(String(d.get("contado") || 0).replace(",", "."));
-    const fuera = (v: number) => !Number.isFinite(v) || v < 0 || v > 100;
-    if (!nombre) return setError({ campo: "nombre", texto: "Escribí el nombre del proveedor." });
-    if (fuera(general)) return setError({ campo: "general", texto: "El descuento general va de 0 a 100 %." });
-    if (fuera(contado)) return setError({ campo: "contado", texto: "El descuento por contado va de 0 a 100 %." });
+    const datos = { nombre: String(d.get("nombre") ?? ""), lector: String(d.get("lector") ?? "") || null, preciosIncluyenIva: d.get("iva") === "on", descuentoGeneral: String(d.get("general") ?? ""), descuentoContado: String(d.get("contado") ?? "") };
+    const nombre = datos.nombre.trim();
+    const falta = faltaEnProveedor(datos);
+    if (falta) return setError(falta);
     setGuardando(true);
     try {
-      await api("/proveedores", {
-        method: "POST",
-        body: JSON.stringify({ nombre, lector: d.get("lector") || null, precios_incluyen_iva: d.get("iva") === "on", descuento_general: general / 100, descuento_contado: contado / 100 }),
-      });
+      await altaDeProveedor(datos);
       setError(null);
       await alCambiar(nombre);
     } catch (err) {

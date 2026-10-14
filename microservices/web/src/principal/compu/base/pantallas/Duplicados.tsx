@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, ErrorApi } from "../../../../api";
+import { ErrorApi } from "../../../../api";
+import { buscarDuplicados, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Lado, type Sugerencia, type Union } from "../../../../negocio/catalogo/duplicados";
 import { useCatalogo } from "../../../../catalogo";
 import { fecha, pesos } from "../../../../formato";
 import { Aviso, Boton, Buscador, Icono, Pagina, Pastilla, Plegable, Progreso, Vacio, numero } from "../ui";
@@ -9,11 +10,6 @@ import "../estilos/duplicados.css";
 // Un mismo artículo en varios proveedores (RF-06): quien administra ve las sugerencias lado
 // a lado y decide «es el mismo» o «son distintos». También une dos a mano y separa. Unir y
 // separar se deshacen una con la otra, por eso ninguna pide confirmar.
-type Resumen = { id: string; descripcion: string; marca: string | null; codigo_barras: string | null; proveedor: string | null; costo_neto: string | null; fecha_lista: string | null };
-type Sugerencia = { id: string; motivo: string; creado_en: string; a: Resumen; b: Resumen };
-type Union = { absorbido_id: string; absorbido: string; conservado_id: string; conservado: string; unido_en: string; proveedores: string | null };
-type Lado = "a" | "b";
-// Lo último que se hizo, con la forma de volver atrás cuando la hay.
 type Hecho = { tipo: "union" | "separacion" | "otro"; texto: string; deshacer?: { absorbido_id: string } | { conservar_id: string; absorber_id: string } };
 
 const SIN_CONEXION = "Sin conexión con el servidor. Unir, separar y buscar duplicados necesitan internet.";
@@ -34,28 +30,18 @@ function useEnLinea(): boolean {
 export function Duplicados() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const [sugerencias, setSugerencias] = useState<Sugerencia[] | null>(null);
-  const [uniones, setUniones] = useState<Union[]>([]);
+  const { sugerencias, uniones: unidos, error: fallo, recargar } = useDuplicados();
+  const uniones = unidos ?? [];
   const [conservar, setConservar] = useState<Record<string, Lado>>({});
   const [hecho, setHecho] = useState<Hecho | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [errorAlHacer, setError] = useState<string | null>(null);
+  const error = errorAlHacer ?? (fallo ? mensajeDe(fallo) : null);
   const [buscando, setBuscando] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const lista = useRef<HTMLUListElement>(null);
   const enfocar = useRef<number | null>(null);
 
-  const cargar = useCallback(async () => {
-    try {
-      const [s, u] = await Promise.all([api<Sugerencia[]>("/equivalencias"), api<Union[]>("/equivalencias/unidos")]);
-      setSugerencias(s);
-      setUniones(u);
-      setError(null);
-    } catch (e) {
-      setError(mensajeDe(e));
-    }
-  }, []);
-  useEffect(() => { void cargar(); }, [cargar]);
-  useEffect(() => { if (enLinea && error) void cargar(); }, [enLinea]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (enLinea && error) recargar(); }, [enLinea]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Con teclado se resuelve una tras otra: al salir una sugerencia, el foco pasa a la que ocupa su lugar.
   useEffect(() => {
@@ -74,47 +60,38 @@ export function Duplicados() {
   async function buscar() {
     setBuscando(true); setError(null); setHecho(null);
     try {
-      const r = await api<{ nuevas: number }>("/equivalencias/buscar", { method: "POST" });
-      await cargar();
-      setHecho({ tipo: "otro", texto: r.nuevas === 0 ? "No encontré duplicados nuevos en el catálogo." : r.nuevas === 1 ? "Encontré 1 posible duplicado nuevo." : `Encontré ${numero(r.nuevas)} posibles duplicados nuevos.` });
+      const nuevas = await buscarDuplicados();
+      setHecho({ tipo: "otro", texto: nuevas === 0 ? "No encontré duplicados nuevos en el catálogo." : nuevas === 1 ? "Encontré 1 posible duplicado nuevo." : `Encontré ${numero(nuevas)} posibles duplicados nuevos.` });
     } catch (e) { setError(mensajeDe(e)); } finally { setBuscando(false); }
   }
 
   const resolver = (s: Sugerencia, i: number, accion: "unir" | "rechazar") => hacer(async () => {
-    const lado = conservar[s.id] ?? "a";
-    await api(`/equivalencias/${s.id}/${accion}`, { method: "POST", body: JSON.stringify({ conservar: lado }) });
-    const queda = s[lado];
-    const sale = lado === "a" ? s.b : s.a;
     enfocar.current = i;
-    setSugerencias((l) => (l ?? []).filter((x) => x.id !== s.id));
+    const { queda, sale } = await resolverSugerencia(s, accion, conservar[s.id] ?? "a");
     setHecho(accion === "unir"
       ? { tipo: "union", texto: `Unidos: «${queda.descripcion}» ahora tiene ${[s.a.proveedor, s.b.proveedor].filter(Boolean).join(" y ") || "los dos proveedores"}. Si fue un error, deshacelo.`, deshacer: { absorbido_id: sale.id } }
       : { tipo: "otro", texto: `Marcados como distintos: «${s.a.descripcion}» y «${s.b.descripcion}» no se van a volver a sugerir.` });
-    if (accion === "unir") setUniones(await api<Union[]>("/equivalencias/unidos"));
   });
 
   const unirAMano = (queda: { id: string; descripcion: string }, sale: { id: string; descripcion: string }) => hacer(async () => {
-    await api("/equivalencias/unir", { method: "POST", body: JSON.stringify({ conservar_id: queda.id, absorber_id: sale.id }) });
+    await unirProductos(queda.id, sale.id);
     setHecho({ tipo: "union", texto: `Unidos: «${queda.descripcion}» absorbió a «${sale.descripcion}». Si fue un error, deshacelo.`, deshacer: { absorbido_id: sale.id } });
-    await cargar();
   });
 
   const separar = (u: Union) => hacer(async () => {
-    await api("/equivalencias/separar", { method: "POST", body: JSON.stringify({ absorbido_id: u.absorbido_id }) });
+    await separarProductos(u.absorbido_id);
     setHecho({ tipo: "separacion", texto: `Separados: «${u.absorbido}» vuelve a ser un producto aparte, con sus precios, ventas y stock.`, deshacer: { conservar_id: u.conservado_id, absorber_id: u.absorbido_id } });
-    await cargar();
   });
 
   const deshacer = (h: Hecho) => hacer(async () => {
     if (!h.deshacer) return;
     if ("absorbido_id" in h.deshacer) {
-      await api("/equivalencias/separar", { method: "POST", body: JSON.stringify(h.deshacer) });
+      await separarProductos(h.deshacer.absorbido_id);
       setHecho({ tipo: "separacion", texto: "Unión deshecha: vuelven a ser dos productos, cada uno con sus precios, ventas y stock." });
     } else {
-      await api("/equivalencias/unir", { method: "POST", body: JSON.stringify(h.deshacer) });
+      await unirProductos(h.deshacer.conservar_id, h.deshacer.absorber_id);
       setHecho({ tipo: "union", texto: "Separación deshecha: vuelven a ser un solo producto." });
     }
-    await cargar();
   });
 
   const cuantas = sugerencias?.length ?? 0;
@@ -126,7 +103,7 @@ export function Duplicados() {
       bajada="El mismo artículo llega en la lista de varios proveedores. Al unirlos queda un solo producto con todos sus proveedores y el precio sale del más barato. Las ventas, el stock y los precios se conservan."
       acciones={<Boton variante={sinNada ? "principal" : undefined} className="duplicados-buscar" icono="buscar" disabled={quieto} onClick={() => void buscar()} data-testid="buscar-duplicados">Buscar duplicados en todo el catálogo</Boton>}>
       {!enLinea && <Aviso tipo="alerta">Sin conexión. Unir, separar y buscar duplicados necesitan internet.</Aviso>}
-      <Aviso tipo="error" accion={sugerencias === null ? <Boton tam="chico" icono="repetir" onClick={() => void cargar()}>Reintentar</Boton> : undefined}>{error}</Aviso>
+      <Aviso tipo="error" accion={sugerencias === null ? <Boton tam="chico" icono="repetir" onClick={recargar}>Reintentar</Boton> : undefined}>{error}</Aviso>
       {buscando && <div className="tarjeta relleno"><Progreso texto="Buscando duplicados en todo el catálogo: comparo códigos de barras y descripciones…" /></div>}
 
       {hecho && (

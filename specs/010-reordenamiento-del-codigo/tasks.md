@@ -13,7 +13,7 @@ etapas. Cada tarea termina con todo funcionando y desplegado en pruebas.
 - [x] T003 Etapa 3a: la regla de la venta (renglones, precios, cobrar, «no llevó») una sola vez, con las dos interfaces encima y sus pruebas sin pantalla (depende de T002)
 - [x] T013 Etapa 3a, segunda parte: «Hoy» y «Anular» una sola vez, con TanStack Query, y los tipos de la venta que llegan del servidor (depende de T003)
 - [x] T004 Etapa 3b: negocio de depósito (ingreso, inventario, estanterías, pedidos) una sola vez (depende de T003)
-- [ ] T005 Etapa 3c: negocio de catálogo, listas y duplicados una sola vez (depende de T003)
+- [x] T005 Etapa 3c: negocio de catálogo, listas y duplicados una sola vez (depende de T003)
 - [ ] T006 Etapa 3d: negocio de usuarios, sesiones, vínculo y lo de Más una sola vez (depende de T003)
 - [ ] T007 Etapa 4: el cálculo de precios en el servidor, precios precalculados y fin de `libraries/` (depende de T003)
 - [ ] T008 Etapa 5: servidor en tres capas, con consultas con tipos (depende de T001)

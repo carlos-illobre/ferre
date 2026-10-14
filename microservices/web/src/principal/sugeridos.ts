@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { precioDeVenta } from "@ferre/calculo-de-precios";
 import { api } from "../api";
 import { leerTodo } from "../almacen";
 import type { Producto } from "./celular/pantallas/Productos";
+import { precioDelProducto } from "../negocio/catalogo/precio";
 
 // Para que la venta nueva no arranque vacía: lo último que se vendió y lo que más se vende,
 // a un toque. Sale de las ventas guardadas en este dispositivo (los últimos 7 días) y de
@@ -12,8 +12,7 @@ type VentaDelDia = { fecha: string; estado: string; items: { descripcion: string
 export type Sugeridos = { ultimos: Producto[]; masVendidos: Producto[]; hay: boolean };
 const CUANTOS = 4;
 
-export const precioDe = (p: Producto): number | null =>
-  p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null;
+export const precioDe = (p: Producto): number | null => precioDelProducto(p).valor;
 
 // `clave` vuelve a calcular cuando cambia (después de cobrar).
 export function useSugeridos(catalogo: Producto[] | null, clave?: unknown): Sugeridos {

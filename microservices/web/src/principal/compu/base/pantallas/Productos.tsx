@@ -3,7 +3,7 @@ import { SiVeCostos, useVeCostos } from "../../../Costos";
 import { CodigoDeBarras } from "../../../CodigoDeBarras";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
 import { usePuede } from "../../../permisos";
-import { esMargenBoton, MARGENES, precioDeVenta } from "@ferre/calculo-de-precios";
+import { MARGENES } from "@ferre/calculo-de-precios";
 import { useCatalogo } from "../../../../catalogo";
 import { useDebounce } from "../../../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
@@ -14,6 +14,7 @@ import { useEsCelular } from "../vista";
 import { irA } from "../rutas";
 import { Aviso, Boton, Buscador, Explicado, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Progreso, Vacio, numero, pesosCortos } from "../ui";
 import "../estilos/productos.css";
+import { margenAMano, otroMargen, precioDelProducto } from "../../../../negocio/catalogo/precio";
 
 // Productos: búsqueda al instante sobre el catálogo guardado en el dispositivo, y el margen
 // de cada uno. En la computadora todo se cambia en la fila; en el celular, cada producto
@@ -23,10 +24,8 @@ type Cambios = Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_ba
 const PASO = 30;
 
 function calcular(p: Producto) {
-  const costo = p.costo_neto === null ? null : Number(p.costo_neto);
-  const iva = p.iva === null ? 0.21 : Number(p.iva);
-  const precio = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva }) : null;
-  const manual = p.margen_elegido !== null && !esMargenBoton(p.margen_elegido) ? p.margen_elegido : null;
+  const { costo, calculo: precio } = precioDelProducto(p);
+  const manual = margenAMano(p);
   return { costo, precio, manual, pasosCosto: costo === null ? [] : p.explicacion_costo.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`] };
 }
 const codigosDe = (p: Producto) => [p.marca, p.codigo_proveedor, p.codigo_barras].filter(Boolean).join(" · ");
@@ -175,7 +174,7 @@ export function Productos() {
 function OtroMargen({ producto: p, manual, alCambiar, id }: { producto: Producto; manual: number | null; alCambiar: (c: Cambios) => void; id?: string }) {
   const [texto, setTexto] = useState(manual === null ? "" : String(manual));
   useEffect(() => { setTexto(manual === null ? "" : String(manual)); }, [manual]);
-  const guardar = () => { const v = Math.round(Number(texto)); if (v > 0 && v !== p.margen_elegido) alCambiar({ margen_elegido: v }); else if (!texto) setTexto(manual === null ? "" : String(manual)); };
+  const guardar = () => { const v = otroMargen(texto); if (v !== null && v !== p.margen_elegido) alCambiar({ margen_elegido: v }); else if (!texto) setTexto(manual === null ? "" : String(manual)); };
   return (
     <label className={`con-prefijo productos-otro ${manual !== null ? "activo" : ""}`} title="Un porcentaje de margen distinto de los cinco botones" onClick={(e) => e.stopPropagation()}>
       <input id={id} inputMode="numeric" placeholder="otro" aria-label={`Otro margen para ${p.descripcion}, en porcentaje`} value={texto} disabled={p.costo_neto === null} data-testid="otro-margen"
