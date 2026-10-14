@@ -32,6 +32,6 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T026 [regla] E01: quien nunca abrió un proceso en ese dispositivo ve el primero de la lista (revisión; decisión de Carlos del 2026-10-14)
 - [x] T027 [arreglo] E35: al importar, avisar lo que Procesos no muestra y comprobar que sale igual al exportar (revisión)
 - [x] T028 [arreglo] Seguridad, «Qué queda registrado»: cambiar el borrador se anota en «Quién hizo qué», y el borrado lleva el nombre del proceso (revisión)
-- [ ] T029 [arreglo] Si se corta la conexión con un proceso abierto, se deja de dibujar hasta que vuelva, sin perder el último cambio (aclaración «Sin conexión», E42; revisión)
+- [x] T029 [arreglo] Si se corta la conexión con un proceso abierto, se deja de dibujar hasta que vuelva, sin perder el último cambio (aclaración «Sin conexión», E42; revisión)
 - [x] T030 [ajuste] En el celular, «Agregar un paso después» de la hoja del paso va con el color del botón principal (pedido de Carlos del 2026-10-14)
 - [ ] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

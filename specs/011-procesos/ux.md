@@ -27,6 +27,7 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
   un paso a otro; Alt+P abre y cierra los pasos en orden; Alt+F, las figuras; Alt+E, el paso
   elegido; Insert agrega una tarea a continuación del paso elegido; Enter va al nombre del
   paso elegido.
+- **Si se corta la conexión mientras se dibuja,** el dibujo queda para mirar, con el último cambio a la vista y el aviso «Sin conexión: no se guardó»; ese cambio se manda solo cuando vuelve la conexión, y ahí se puede seguir dibujando.
 - **Estado vacío:** sin procesos, una frase que dice qué es un proceso y el botón «Proceso
   nuevo» (o, sin permiso para dibujar, que todavía no hay ninguno).
 - **Textos:** «Guardado», «Guardando…», «Sin conexión: no se guardó»; el error de forma dice

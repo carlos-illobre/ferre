@@ -118,7 +118,7 @@ export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: 
   }, [cargarLista, abrir, guardarLocal]);
 
   // Guarda el borrador, uno a la vez: si llega otro cambio mientras se guarda, va después con
-  // la revisión nueva (E10). Sin conexión, queda pendiente y se avisa (E42).
+  // la revisión nueva (E10). Sin conexión, queda pendiente, se avisa y no se dibuja hasta que vuelva (E42).
   const guardarBorrador = useCallback((id: string, bpmn: string) => {
     if (!puede.dibujar) return;
     pendiente.current = { id, bpmn };
@@ -131,6 +131,7 @@ export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: 
       try {
         const p = (await pedir(`/procesos/${cambio.id}/borrador`, { method: "PUT", body: JSON.stringify({ bpmn: cambio.bpmn, revision: revision.current }) })) as Proceso;
         recordar(p);
+        setSinConexion(false);
         setGuardado("guardado");
       } catch (e) {
         if (esErrorDePedido(e) && e.estado === 409 && e.datos && typeof e.datos === "object" && "proceso" in e.datos) {
@@ -141,7 +142,14 @@ export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: 
           return;
         }
         if (esErrorDePedido(e) && e.estado === 0) {
+          // Sin conexión no se dibuja (aclaración «Sin conexión», E42): el dibujo queda para
+          // mirar, con el último cambio a la vista, y ese cambio sale cuando vuelve la conexión.
           pendiente.current ??= cambio;
+          setAbierto((a) => {
+            const base = a?.borrador ?? a?.vigente;
+            return a && base && a.id === cambio.id ? { ...a, borrador: { ...base, bpmn: cambio.bpmn } } : a;
+          });
+          setSinConexion(true);
           setGuardado("sin-conexion");
           return;
         }

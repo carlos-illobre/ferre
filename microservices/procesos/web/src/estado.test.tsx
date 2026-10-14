@@ -31,7 +31,7 @@ describe("sin conexión", () => {
     expect(otra.result.current.abierto).toBeNull();
   });
 
-  it("011-E42 si se corta mientras se dibuja, dice que no se guardó y lo manda cuando vuelve la conexión", async () => {
+  it("011-E42 si se corta mientras se dibuja, dice que no se guardó, deja de dibujar y lo manda cuando vuelve la conexión", async () => {
     const s = servicio();
     const id = await s.cargar("Venta", VENTA, false);
     const { result } = renderHook(() => useProcesos({ pedir: s.dibuja, puede: DIBUJA, guardarLocal: guardadoEnMemoria() }));
@@ -39,9 +39,13 @@ describe("sin conexión", () => {
     s.sinConexion(true);
     act(() => result.current.guardarBorrador(id, VENTA.replace('name="Cobrar"', 'name="Cobrar ya"')));
     await waitFor(() => expect(result.current.guardado).toBe("sin-conexion"));
+    // No se dibuja hasta que vuelva, y el último cambio sigue a la vista.
+    expect(result.current.sinConexion).toBe(true);
+    expect(result.current.abierto?.borrador?.bpmn).toContain("Cobrar ya");
     s.sinConexion(false);
     act(() => { window.dispatchEvent(new Event("online")); });
     await waitFor(() => expect(result.current.guardado).toBe("guardado"));
+    expect(result.current.sinConexion).toBe(false);
     expect(((await s.dibuja(`/procesos/${id}`)) as { borrador: { bpmn: string } }).borrador.bpmn).toContain("Cobrar ya");
   });
 });
