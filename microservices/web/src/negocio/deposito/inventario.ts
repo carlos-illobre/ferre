@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api, ErrorApi } from "../../api";
 import { leerTodo } from "../../almacen";
 import { traerPorIds, type StockFila } from "../../catalogo";
+import type { Movimiento, Stock } from "@servidor/stock";
 import { enviarOEncolar } from "../../cola";
 import { consultas } from "../../consultas";
 import type { Producto } from "../../producto";
@@ -11,16 +12,15 @@ import { cantidadValida, unidadDe } from "../../unidades";
 // El inventario, una sola vez para el celular y la computadora (RNF-60): cuánto hay de cada
 // producto, los movimientos que lo explican y la corrección a mano, que siempre lleva motivo (RF-53).
 export type { StockFila };
-type PorProveedor = Record<string, { unidades: number; valor: number; productos: number }>;
-export type Stock = { productos: StockFila[]; valor_total: number; por_proveedor: PorProveedor };
-export type Movimiento = { id: string; tipo: string; cantidad: string; referencia_tipo: string | null; fecha: string; nota: string | null };
+export type { Stock };
+export type { Movimiento };
 
 const CLAVE = ["stock"] as const;
 type Traido = Stock & { delDispositivo: boolean };
 
 // Lo guardado en el dispositivo trae las filas pero no los totales: se rearman acá.
 function armar(filas: StockFila[]): Stock {
-  const por_proveedor: PorProveedor = {};
+  const por_proveedor: Stock["por_proveedor"] = {};
   for (const f of filas) {
     const g = (por_proveedor[f.proveedor ?? "Sin proveedor"] ??= { unidades: 0, valor: 0, productos: 0 });
     g.unidades += Math.max(0, Number(f.stock)); g.valor += Number(f.valor); g.productos += 1;

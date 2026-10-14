@@ -62,7 +62,7 @@ describe("el inventario (010-E05)", () => {
     await waitFor(() => expect(result.current.movimientos).toHaveLength(1));
     expect(apiFalsa).toHaveBeenCalledWith("/stock/cinta/movimientos");
     expect(nombreDeMovimiento(result.current.movimientos![0]!)).toBe("Conteo");
-    expect(nombreDeMovimiento({ id: "m", tipo: "venta", cantidad: "-1", referencia_tipo: null, fecha: "", nota: null })).toBe("Venta");
+    expect(nombreDeMovimiento({ id: "m", tipo: "venta", cantidad: "-1", referencia_tipo: null, referencia_id: null, fecha: "", nota: null })).toBe("Venta");
   });
 
   it("«¿cuántas hay?» acepta cero o más, con coma, y los decimales que admite la unidad", () => {

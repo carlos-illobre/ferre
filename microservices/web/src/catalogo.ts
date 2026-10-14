@@ -6,6 +6,7 @@ import { borrar, guardar, guardarMeta, leerMeta, leerTodo, reemplazarTodo } from
 import { cambiosDeProductosPendientes, enviarOEncolar, enviarPendientes } from "./cola";
 import type { Producto } from "./producto";
 import type { CambiosDeProducto } from "@servidor/productos";
+import type { FilaDeStock } from "@servidor/stock";
 
 // Los datos del mostrador (catálogo, stock, clientes) en memoria y en IndexedDB (#18):
 // arrancan desde el dispositivo, se refrescan del servidor cuando hay conexión, y los
@@ -19,7 +20,7 @@ import type { CambiosDeProducto } from "@servidor/productos";
 //   2. El catálogo entero del dispositivo, atrás.
 //   3. El del servidor, atrás también; si no cambió nada, no se toca la pantalla.
 // El índice de búsqueda se arma recién cuando alguien busca.
-export type StockFila = { id: string; stock: string; costo_neto: string | null; proveedor: string | null; valor: string; ultimo_movimiento: string | null };
+export type StockFila = FilaDeStock;
 export type Cliente = { id: string; nombre: string; telefono: string | null; cuenta_corriente: boolean; deuda: string };
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad" | "foto_url"> & { proveedor_preferido_id?: string }>;
 // `completo`: el catálogo ya está entero (no solo los primeros, ni una tanda de la primera bajada).

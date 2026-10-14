@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { pesos } from "../formato";
 import "./dinero-invertido.css";
+import type { Stock } from "@servidor/stock";
 
 // Dinero invertido en inventario (RF-53): lo que hay de cada producto por su costo vigente,
 // sin IVA, en total y por proveedor. Va en Cómo va el negocio y no en Inventario, que es de
 // quien compra y solo muestra cantidades (decisión 31).
-type Datos = { valor_total: number; por_proveedor: Record<string, { unidades: number; valor: number; productos: number }> };
+type Datos = Pick<Stock, "valor_total" | "por_proveedor">;
 const enteros = (n: number) => pesos(Math.round(n)).replace(/,00$/, "");
 
 export function DineroInvertido() {
