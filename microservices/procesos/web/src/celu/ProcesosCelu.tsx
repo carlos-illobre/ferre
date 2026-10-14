@@ -12,20 +12,28 @@ import { erroresDeForma } from "../modelo/recorrido";
 import type { Puede } from "../tipos";
 import { EntradaDeArchivo } from "../compu/EditorCompu";
 
-// El celular (historia 4): la lista de procesos y, adentro de cada uno, dos pestañas: «Pasos»,
-// una tarjeta por paso que se ordena arrastrando (E26 a E29), y «Diagrama», el dibujo con las
-// figuras en una hoja que sube desde abajo (E30). Las reglas y los textos son los de la computadora.
+// El celular (historia 4): la lista de procesos y, adentro de cada uno, dos pestañas: «Diagrama»,
+// el dibujo con las figuras en una hoja que sube desde abajo (E30), y «Pasos», una tarjeta por
+// paso que se ordena arrastrando (E26 a E29). Las reglas y los textos son los de la computadora.
 
-const FIGURAS_CELU: { tipo: TipoDePaso; nombre: string }[] = [
-  { tipo: "inicio", nombre: "Inicio" }, { tipo: "tarea", nombre: "Tarea" }, { tipo: "persona", nombre: "Tarea de una persona" }, { tipo: "sistema", nombre: "Tarea del sistema" },
-  { tipo: "decision", nombre: "Decisión" }, { tipo: "paralelo", nombre: "En paralelo" }, { tipo: "espera", nombre: "Espera" }, { tipo: "fin", nombre: "Fin" },
+// Las doce figuras, como en la computadora, con nombres cortos para que entren en el celular
+// (los textos se resumen en el celular, decisión 47); el nombre completo queda para los lectores.
+const FIGURAS_CELU: { tipo: TipoDePaso | "carril"; nombre: string; corto: string }[] = [
+  { tipo: "inicio", nombre: "Inicio", corto: "Inicio" }, { tipo: "tarea", nombre: "Tarea", corto: "Tarea" },
+  { tipo: "persona", nombre: "Tarea de una persona", corto: "Persona" }, { tipo: "sistema", nombre: "Tarea del sistema", corto: "Sistema" },
+  { tipo: "decision", nombre: "Decisión", corto: "Decisión" }, { tipo: "paralelo", nombre: "En paralelo", corto: "Paralelo" },
+  { tipo: "espera", nombre: "Espera", corto: "Espera" }, { tipo: "fin", nombre: "Fin", corto: "Fin" },
+  { tipo: "subproceso", nombre: "Subproceso", corto: "Subproceso" }, { tipo: "carril", nombre: "Carril", corto: "Carril" },
+  { tipo: "documento", nombre: "Documento", corto: "Documento" }, { tipo: "nota", nombre: "Nota", corto: "Nota" },
 ];
+// Los que se pueden poner en el recorrido desde «Pasos».
+const PASOS_DEL_RECORRIDO = FIGURAS_CELU.filter((f): f is { tipo: TipoDePaso; nombre: string; corto: string } => ["tarea", "persona", "sistema", "decision", "paralelo", "espera", "fin", "subproceso"].includes(f.tipo));
 
 const claveDe = (l: Lugar) => `${l.desde}>${l.hasta ?? ""}`;
 
 export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Procesos; puede: Puede; pantallas: string[] }) {
   const [vista, setVista] = useState<"lista" | "proceso">("lista");
-  const [pestana, setPestana] = useState<"pasos" | "diagrama">("pasos");
+  const [pestana, setPestana] = useState<"pasos" | "diagrama">("diagrama");
   const [hoja, setHoja] = useState<null | "menu" | "paso" | "agregar">(null);
   const [lugarNuevo, setLugarNuevo] = useState<Lugar | null>(null);
   const [dialogo, setDialogo] = useState<null | "nuevo" | "renombrar" | "borrar" | "historial">(null);
@@ -36,8 +44,8 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
   const xml = abierto ? bpmnAMostrar(abierto, puede) : null;
   const estado = abierto ? estadoDe(abierto) : null;
 
-  // Al abrir un proceso, arranca en «Pasos» (E25).
-  useEffect(() => { setPestana("pasos"); setHoja(null); }, [abierto?.id]);
+  // Al abrir un proceso, arranca en «Diagrama», la primera pestaña (E25).
+  useEffect(() => { setPestana("diagrama"); setHoja(null); }, [abierto?.id]);
   useEffect(() => { if (pestana === "diagrama") setTimeout(() => d.lienzo.current?.verTodo(), 0); }, [pestana, d.lienzo]);
 
   const avisos = procesos.aviso && (
@@ -102,8 +110,8 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
       </div>
       {avisos}
       <div className="procesos-segmentos" role="tablist">
-        <button type="button" role="tab" aria-selected={pestana === "pasos"} className={pestana === "pasos" ? "elegido" : ""} onClick={() => setPestana("pasos")} data-testid="procesos-pestana-pasos"><Icono nombre="lista" /> Pasos</button>
         <button type="button" role="tab" aria-selected={pestana === "diagrama"} className={pestana === "diagrama" ? "elegido" : ""} onClick={() => setPestana("diagrama")} data-testid="procesos-pestana-diagrama"><Icono nombre="diagrama" /> Diagrama</button>
+        <button type="button" role="tab" aria-selected={pestana === "pasos"} className={pestana === "pasos" ? "elegido" : ""} onClick={() => setPestana("pasos")} data-testid="procesos-pestana-pasos"><Icono nombre="lista" /> Pasos</button>
       </div>
 
       {pestana === "pasos" && (
@@ -130,14 +138,14 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
           <div className="procesos-hoja procesos-hoja-figuras" data-testid="procesos-hoja-figuras">
             <div className="procesos-tirador" />
             <b>Agregar un paso</b>
-            <p className="procesos-ayuda">Mantené apretado y arrastralo al dibujo, o tocalo para ponerlo después del paso elegido.</p>
+            <p className="procesos-ayuda">Arrastralo al dibujo, o tocalo para ponerlo después del paso elegido.</p>
             <div className="procesos-figuras-celu">
               {FIGURAS_CELU.map((f) => (
-                <button key={f.tipo} type="button" className="procesos-figura-celu" data-testid={`procesos-figura-${f.tipo}`}
+                <button key={f.tipo} type="button" className="procesos-figura-celu" aria-label={f.nombre} title={f.nombre} data-testid={`procesos-figura-${f.tipo}`}
                   onTouchStart={(e) => d.lienzo.current?.empezarArrastre(e.nativeEvent, f.tipo)}
                   onMouseDown={(e) => { if (e.button === 0) d.lienzo.current?.empezarArrastre(e.nativeEvent, f.tipo); }}
                   onClick={() => d.lienzo.current?.agregar(f.tipo, d.elegido)}>
-                  <Icono nombre={f.tipo as NombreDeIcono} tam={28} /><span>{f.nombre}</span>
+                  <Icono nombre={f.tipo as NombreDeIcono} tam={26} /><span>{f.corto}</span>
                 </button>
               ))}
             </div>
@@ -213,9 +221,9 @@ function AgregarPaso({ alCerrar, alAgregar }: { alCerrar: () => void; alAgregar:
     <Hoja alCerrar={alCerrar} testId="procesos-hoja-agregar">
       <b>Agregar un paso</b>
       <div className="procesos-figuras-celu">
-        {FIGURAS_CELU.filter((f) => f.tipo !== "inicio").map((f) => (
-          <button key={f.tipo} type="button" className={`procesos-figura-celu ${tipo === f.tipo ? "elegida" : ""}`} aria-pressed={tipo === f.tipo} onClick={() => setTipo(f.tipo)}>
-            <Icono nombre={f.tipo as NombreDeIcono} tam={28} /><span>{f.nombre}</span>
+        {PASOS_DEL_RECORRIDO.map((f) => (
+          <button key={f.tipo} type="button" className={`procesos-figura-celu ${tipo === f.tipo ? "elegida" : ""}`} aria-pressed={tipo === f.tipo} aria-label={f.nombre} title={f.nombre} onClick={() => setTipo(f.tipo)}>
+            <Icono nombre={f.tipo as NombreDeIcono} tam={26} /><span>{f.corto}</span>
           </button>
         ))}
       </div>

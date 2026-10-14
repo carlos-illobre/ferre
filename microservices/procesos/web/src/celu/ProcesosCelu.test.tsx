@@ -15,11 +15,12 @@ beforeEach(() => {
   lienzoFalso.llamadas = [];
 });
 
-async function abrirVenta(puede: Puede = DIBUJA) {
+async function abrirVenta(puede: Puede = DIBUJA, irAPasos = true) {
   const id = await s.cargar("Venta en el mostrador");
   render(<Procesos interfaz="celu" pedir={s.como(puede)} puede={puede} pantallas={["Vender → Cobrar"]} guardarLocal={guardadoEnMemoria()} />);
   fireEvent.click(await screen.findByTestId(`procesos-item-${id}`));
   await waitFor(() => expect(lienzoFalso.grafo.pasos.length).toBe(10));
+  if (irAPasos) fireEvent.click(screen.getByTestId("procesos-pestana-pasos"));
   return id;
 }
 const tarjetas = (dentro: HTMLElement) => within(dentro).getAllByTestId(/^procesos-paso-/).map((t) => t.textContent);
@@ -33,10 +34,11 @@ describe("el celular", () => {
     expect(within(lista).getAllByRole("button").map((b) => b.textContent)).toEqual(["Cierre de cajaBorrador · 10 pasos", "Venta en el mostradorVigente · 10 pasos"]);
   });
 
-  it("011-E25 al abrir un proceso hay dos pestañas, y «Pasos» está elegida", async () => {
-    await abrirVenta();
-    expect(screen.getByTestId("procesos-pestana-pasos").getAttribute("aria-selected")).toBe("true");
-    expect(screen.getByTestId("procesos-pestana-diagrama").getAttribute("aria-selected")).toBe("false");
+  it("011-E25 al abrir un proceso hay dos pestañas, primero «Diagrama», que está elegida, y después «Pasos»", async () => {
+    await abrirVenta(DIBUJA, false);
+    expect(screen.getAllByRole("tab").map((t) => t.textContent?.trim())).toEqual(["Diagrama", "Pasos"]);
+    expect(screen.getByTestId("procesos-pestana-diagrama").getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByTestId("procesos-pestana-pasos").getAttribute("aria-selected")).toBe("false");
   });
 
   it("011-E26 cada paso es una tarjeta con su nombre y quién lo hace; después de la decisión, una rama por opción", async () => {
@@ -72,7 +74,7 @@ describe("el celular", () => {
     fireEvent.click(within(screen.getByTestId("procesos-paso-Cobrar")).getByRole("button"));
     fireEvent.click(screen.getByTestId("procesos-agregar-despues"));
     const hoja = screen.getByTestId("procesos-hoja-agregar");
-    fireEvent.click(within(hoja).getByRole("button", { name: /Tarea de una persona/ }));
+    fireEvent.click(within(hoja).getByRole("button", { name: "Tarea de una persona" }));
     fireEvent.change(within(hoja).getByTestId("procesos-nombre-nuevo"), { target: { value: "Dar el ticket" } });
     fireEvent.click(within(hoja).getByTestId("procesos-agregar"));
     expect(lienzoFalso.llamadas.filter(([n]) => n !== "elegir").map(([n, ...a]) => [n, ...a])).toEqual([
@@ -96,7 +98,9 @@ describe("el celular", () => {
     await abrirVenta();
     fireEvent.click(screen.getByTestId("procesos-pestana-diagrama"));
     const hoja = screen.getByTestId("procesos-hoja-figuras");
-    expect(within(hoja).getAllByRole("button").map((b) => b.textContent)).toEqual(["Inicio", "Tarea", "Tarea de una persona", "Tarea del sistema", "Decisión", "En paralelo", "Espera", "Fin"]);
+    // Las doce, con nombres cortos; el nombre completo, para los lectores de pantalla.
+    expect(within(hoja).getAllByRole("button").map((b) => b.textContent)).toEqual(["Inicio", "Tarea", "Persona", "Sistema", "Decisión", "Paralelo", "Espera", "Fin", "Subproceso", "Carril", "Documento", "Nota"]);
+    expect(within(hoja).getByRole("button", { name: "Tarea de una persona" })).toBeTruthy();
     fireEvent.touchStart(within(hoja).getByText("Decisión"));
     expect(lienzoFalso.llamadas.find(([n]) => n === "empezarArrastre")?.[2]).toBe("decision");
     for (const nombre of ["Acercar", "Alejar", "Ver todo"]) fireEvent.click(screen.getByRole("button", { name: nombre }));

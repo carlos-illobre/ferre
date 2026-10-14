@@ -110,6 +110,11 @@ export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, sol
     const v = soloLectura ? new NavigatedViewer(opciones) : new Modeler(opciones);
     visor.current = v;
     const bus = v.get("eventBus") as { on(evento: string, f: (e: { newSelection?: Elemento[] }) => void): void };
+    // El logo de bpmn.io queda a la vista (lo pide su licencia), pero no es parte de la pantalla:
+    // fuera del teclado y de los lectores de pantalla.
+    const logo = contenedor.current!.querySelector<HTMLAnchorElement>(".bjs-powered-by");
+    logo?.setAttribute("tabindex", "-1");
+    logo?.setAttribute("aria-hidden", "true");
     bus.on("commandStack.changed", () => {
       marcarErrores();
       avisos.current.alCambiar?.();

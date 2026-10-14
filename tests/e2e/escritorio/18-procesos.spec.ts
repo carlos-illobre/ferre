@@ -3,6 +3,8 @@ import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 
+const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos/venta.bpmn", "utf8");
+
 // Procesos (specs/011-procesos) en la computadora: dibujar con bpmn-js de verdad, pasando por
 // el servidor de Ferrebress y el servicio de Procesos (ADR-019).
 const TOKEN = "token-e2e-procesos-escritorio";
@@ -73,13 +75,14 @@ test("011-E02 011-E04 011-E05 011-E09 011-E10 011-E13 011-E14 011-E15 011-E22 di
   await page.getByTestId("procesos-paso-nombre").fill(largo);
   await page.getByTestId("procesos-paso-nombre").press("Enter");
   const tarea = page.locator("g.djs-element.djs-shape").filter({ hasText: "Revisar que" });
-  const caja = await tarea.locator(".djs-visual rect").first().boundingBox();
-  const texto = await tarea.locator(".djs-visual text").first().boundingBox();
-  await page.screenshot({ path: "test-results/procesos-largo.png" });
   expect(await tarea.locator("text tspan").count()).toBeGreaterThan(1);
-  expect(texto!.width).toBeLessThanOrEqual(caja!.width);
-  expect(texto!.y).toBeGreaterThanOrEqual(caja!.y);
-  expect(texto!.y + texto!.height).toBeLessThanOrEqual(caja!.y + caja!.height);
+  // La tarea crece un instante después de cambiar el nombre: se espera a que el texto quede adentro.
+  await expect.poll(async () => {
+    const caja = await tarea.locator(".djs-visual rect").first().boundingBox();
+    const texto = await tarea.locator(".djs-visual text").first().boundingBox();
+    if (!caja || !texto) return false;
+    return texto.width <= caja.width && texto.y >= caja.y && texto.y + texto.height <= caja.y + caja.height;
+  }).toBe(true);
 
   // E04: se une el inicio con la tarea, desde la botonera del paso.
   await page.locator("g.djs-element[data-element-id^='Inicio_']:not([data-element-id$='_label'])").click();
@@ -128,22 +131,36 @@ test("011-E02 011-E04 011-E05 011-E09 011-E10 011-E13 011-E14 011-E15 011-E22 di
   expect(psql(`SELECT count(*) FROM evento e JOIN usuario u ON u.id = e.usuario_id WHERE u.email = '${EMAIL}' AND e.tipo = 'proceso.vigente'`)).toBe("1");
 });
 
+// Crea un proceso por la API de Ferrebress (como lo haría la pantalla) y lo deja vigente.
+async function procesoVigente(page: Page, nombre: string, bpmn = VENTA) {
+  const api = process.env.API_URL ?? "http://localhost";
+  const cabeceras = { Authorization: `Bearer ${TOKEN}` };
+  const creado = await page.request.post(`${api}/procesos`, { headers: cabeceras, data: { nombre, bpmn } });
+  expect(creado.status()).toBe(201);
+  const p = (await creado.json()) as { id: string; revision: number };
+  expect((await page.request.post(`${api}/procesos/${p.id}/vigente`, { headers: cabeceras, data: { revision: p.revision } })).status()).toBe(200);
+  return p.id;
+}
+
 test("011-E33 011-E34 exportar baja una imagen PNG y un BPMN con el nombre del proceso", async ({ page }) => {
+  const id = await procesoVigente(page, "Exportar E2E");
+  await page.addInitScript((ultimo) => localStorage.setItem("procesos.ultimo", JSON.stringify(ultimo)), id);
   await entrar(page);
   await expect(page.getByTestId("procesos-lienzo")).toBeVisible();
   await page.getByTestId("procesos-exportar").click();
   const [bpmn] = await Promise.all([page.waitForEvent("download"), page.getByTestId("procesos-exportar-bpmn").click()]);
-  expect(bpmn.suggestedFilename()).toBe("Venta E2E.bpmn");
-  expect(readFileSync((await bpmn.path())!, "utf8")).toMatch(/<bpmn:definitions[\s\S]*Revisar que el producto/);
+  expect(bpmn.suggestedFilename()).toBe("Exportar E2E.bpmn");
+  expect(readFileSync((await bpmn.path())!, "utf8")).toMatch(/<bpmn:definitions[\s\S]*Cobrar/);
   await page.getByTestId("procesos-exportar").click();
   const [png] = await Promise.all([page.waitForEvent("download"), page.getByTestId("procesos-exportar-png").click()]);
-  expect(png.suggestedFilename()).toBe("Venta E2E.png");
+  expect(png.suggestedFilename()).toBe("Exportar E2E.png");
   const datos = readFileSync((await png.path())!);
   expect(datos.subarray(0, 4).toString("hex")).toBe("89504e47");
   expect(datos.length).toBeGreaterThan(5000);
 });
 
 test("011-E37 011-E38 quien solo puede ver mira el vigente sin poder cambiarlo; sin permiso, Más no lo ofrece", async ({ page }) => {
+  await procesoVigente(page, "Para mirar E2E");
   await entrar(page, TOKEN_LECTOR);
   await expect(page.getByTestId("procesos-lienzo")).toBeVisible();
   await expect(page.getByTestId("procesos-estado")).toHaveText("Vigente");

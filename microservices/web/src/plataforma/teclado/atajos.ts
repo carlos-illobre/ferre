@@ -27,12 +27,13 @@ const nombreDe = (b: HTMLElement) => (b.getAttribute("aria-label") || b.textCont
 let alFinal: string | null = null;
 
 // Los botones que reciben letra: los de la ventana abierta, si hay una; si no, los de la pantalla.
-function botonesALaVista(): HTMLElement[] {
+export function botonesALaVista(): HTMLElement[] {
   const ventanas = [...document.querySelectorAll<HTMLElement>("dialog[open], [role='dialog'], [aria-modal='true']")].filter(visible);
   const donde: ParentNode = ventanas.at(-1) ?? document;
   // Los que ya tienen su tecla (Alt + número, F2, F5 a F8) no llevan letra: así alcanzan para los demás.
   const todos = [...donde.querySelectorAll<HTMLElement>("button:not([disabled]), a[href], [role='button']:not([aria-disabled='true'])")]
-    .filter((b) => visible(b) && !b.closest(".atajos-capa") && !b.hasAttribute("aria-keyshortcuts") && nombreDe(b) !== "");
+    // Lo que está oculto para los lectores de pantalla (aria-hidden) no es algo que se use: no lleva letra.
+    .filter((b) => visible(b) && !b.closest(".atajos-capa") && !b.closest("[aria-hidden='true']") && !b.hasAttribute("aria-keyshortcuts") && nombreDe(b) !== "");
   // Primero los de la pantalla; después los que la aplicación deja para el final.
   return alFinal ? [...todos.filter((b) => !b.closest(alFinal!)), ...todos.filter((b) => b.closest(alFinal!))] : todos;
 }

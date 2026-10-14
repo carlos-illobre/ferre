@@ -23,6 +23,7 @@ otro proceso, para después poder usar esa información para tomar decisiones.»
 
 ### Session 2026-10-14
 
+- Q: ¿En qué orden van las pestañas del celular? → A: Primero «Diagrama» y después «Pasos»; abre en «Diagrama» (Carlos, 2026-10-14, ya probándola).
 - Q: ¿Cómo es la pantalla? → A: Carlos eligió entre tres maquetas. En la computadora, el editor clásico: las figuras a la izquierda, el dibujo en el medio y el paso elegido a la derecha, con abajo un panel plegable con los pasos en orden, como tabla. En el celular, dos pestañas: «Pasos», una lista que se ordena arrastrando, y «Diagrama», el dibujo con las figuras en una hoja que sube desde abajo.
 - Q: ¿Los paneles de la computadora se pliegan? → A: Los tres: las figuras de la izquierda (quedan solo los íconos), el paso elegido de la derecha y los pasos de abajo. Los tres arrancan cerrados, para que el dibujo tenga todo el lugar.
 - Q: ¿Qué datos guarda cada paso? → A: Por ahora, lo que se ve: nombre, tipo, quién lo hace, en qué pantalla de Ferrebress se hace, cómo se hace y con qué sigue. Después se van a ir agregando más.
@@ -119,7 +120,7 @@ computadora.
 
 **Acceptance Scenarios**:
 
-- **E25** **Given** un proceso abierto en el celular, **When** se lo mira, **Then** hay dos pestañas: «Pasos», elegida al abrir, y «Diagrama».
+- **E25** **Given** un proceso abierto en el celular, **When** se lo mira, **Then** hay dos pestañas: primero «Diagrama», elegida al abrir, y después «Pasos» (pedido de Carlos del 2026-10-14).
 - **E26** **Given** «Pasos», **When** se lo mira, **Then** cada paso es una tarjeta con su ícono, su nombre y quién lo hace, en el orden del recorrido; después de una decisión, cada opción es una rama con su nombre.
 - **E27** **Given** una tarjeta, **When** se la mantiene apretada y se la arrastra, **Then** se mueve a otro lugar del recorrido o a otra rama, y el dibujo se rearma solo.
 - **E28** **Given** «Pasos», **When** se toca «Agregar un paso acá» entre dos tarjetas, **Then** se elige el tipo y el nombre y el paso queda en ese lugar.

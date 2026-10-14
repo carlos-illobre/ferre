@@ -34,6 +34,9 @@ async function abrirVenta(page: Page, nombre: string) {
   await page.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN);
   await page.goto("/#/mas/procesos");
   await page.getByTestId(`procesos-item-${id}`).click();
+  // Abre en «Diagrama», la primera pestaña.
+  await expect(page.getByTestId("procesos-pestana-diagrama")).toHaveAttribute("aria-selected", "true");
+  await page.getByTestId("procesos-pestana-pasos").click();
   await expect(page.getByTestId("procesos-pasos-celu")).toBeVisible();
   return id;
 }
@@ -41,7 +44,6 @@ const sinCorrerseAlCostado = async (page: Page) => expect(await page.evaluate(()
 
 test("011-E25 011-E26 011-E27 011-E31 los pasos se leen como lista y una tarjeta se arrastra a otra rama", async ({ page }) => {
   const id = await abrirVenta(page, "Venta celular E2E (pasos)");
-  await expect(page.getByTestId("procesos-pestana-pasos")).toHaveAttribute("aria-selected", "true");
   await expect(page.getByTestId("procesos-rama-F4")).toContainText("Cobrar");
   await sinCorrerseAlCostado(page);
 
@@ -55,9 +57,12 @@ test("011-E25 011-E26 011-E27 011-E31 los pasos se leen como lista y una tarjeta
   // La ranura queda abajo, fuera de la pantalla: llevar la tarjeta al borde corre la lista.
   const alto = page.viewportSize()!.height;
   for (let i = 0; i < 30 && (await ranura.boundingBox())!.y > alto - 150; i++) await page.mouse.move(asa!.x + 40, alto - 40 + (i % 2), { steps: 1 });
-  const destino = await ranura.boundingBox();
-  await page.mouse.move(destino!.x + 60, destino!.y + destino!.height / 2, { steps: 10 });
-  await expect(ranura).toHaveClass(/activa/);
+  // La lista puede seguir corriéndose: se apunta a la ranura hasta que la marca como elegida.
+  await expect.poll(async () => {
+    const destino = await ranura.boundingBox();
+    await page.mouse.move(destino!.x + 60, destino!.y + destino!.height / 2, { steps: 3 });
+    return (await ranura.getAttribute("class")) ?? "";
+  }).toMatch(/activa/);
   await page.mouse.up();
   await expect(page.getByTestId("procesos-rama-F5")).toContainText("Cobrar");
   await expect(page.getByTestId("procesos-rama-F4")).not.toContainText("Cobrar");

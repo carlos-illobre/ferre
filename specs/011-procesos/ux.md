@@ -14,6 +14,8 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
 - **A la vista, en este orden:** arriba, qué proceso está abierto (y desde ahí, los demás), su
   estado, si está guardado, deshacer y rehacer, Importar, Exportar y Proceso nuevo; abajo, el
   dibujo ocupando todo lo que dejan los paneles.
+- **Los menús desplegables tapan todo,** también el dibujo y su botonera. El logo de bpmn.io queda a la vista (lo pide su licencia), pero no es parte de la pantalla: no lleva atajo de teclado ni recibe el foco (pedidos de Carlos del 2026-10-14).
+- **Las figuras, con el panel abierto,** van una por renglón: el ícono a la izquierda y el nombre a la derecha, todas a la vista sin desplazarse (pedido de Carlos del 2026-10-14).
 - **Tres paneles que se pliegan y arrancan plegados:** las figuras a la izquierda (plegado,
   solo los íconos, que se siguen pudiendo arrastrar), el paso elegido a la derecha (plegado,
   muestra su nombre) y «Los pasos, en orden» abajo. Cada uno recuerda cómo quedó en esa
@@ -49,12 +51,14 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
 
 - Arriba: volver, el nombre del proceso, deshacer y el menú «⋯» (Importar, Exportar, Marcar
   vigente, Cambiar el nombre, Borrar, Historial).
-- Dos pestañas con ícono: «Pasos» (elegida al abrir) y «Diagrama».
+- Dos pestañas con ícono: primero «Diagrama» (elegida al abrir) y después «Pasos» (pedido de Carlos del 2026-10-14).
 - «Pasos»: una tarjeta por paso con el asa para arrastrar, el ícono del tipo, el nombre y quién
   lo hace; las ramas de una decisión, con su nombre, corridas a la derecha; «Agregar un paso
   acá» entre tarjetas; tocar una tarjeta abre una hoja con sus datos.
 - «Diagrama»: el dibujo, con los botones de acercar, alejar y ver todo, y la hoja «Agregar un
-  paso» abajo, con las figuras.
+  paso» abajo, con las doce figuras, todas del mismo tamaño y con nombres cortos («Persona»,
+  «Sistema», «Paralelo»); el nombre completo queda para los lectores de pantalla (pedido de
+  Carlos del 2026-10-14).
 - Todo se alcanza con una mano; nada se corre hacia el costado salvo el dibujo.
 
 ## Exportar e importar (historia 5)
