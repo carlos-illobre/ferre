@@ -40,6 +40,10 @@ Las instala `.claude/scripts/preparar-nube.sh` al empezar cada sesión (un hook
 `SessionStart` de `.claude/settings.json`): `pnpm install` y `uv sync`. Fuera de la nube no
 hace nada.
 
+El mismo script arranca Docker, que viene instalado pero apagado: las pruebas de punta a
+punta levantan el stack con Docker Compose, igual que en el CI. Si Docker no arranca, la
+sesión lo avisa; no se reemplaza por servicios levantados a mano.
+
 ## Las skills de animación
 
 Las skills de animación (`animate`, `animation-performance`, `review-animations`,
