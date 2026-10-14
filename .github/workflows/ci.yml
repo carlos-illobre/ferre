@@ -26,8 +26,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: VITE_API_URL=http://localhost pnpm build
-      # Unitarias de la librería de precios, la API (rutas contra una base simulada) y el
-      # cliente web (pantallas sobre jsdom): la red de seguridad de cada push.
+      # Unitarias de la librería de precios, la API (rutas contra una base simulada), el
+      # cliente web (pantallas sobre jsdom) y Procesos: la red de seguridad de cada push.
       - run: pnpm test
 
   listas-de-proveedores:
@@ -70,8 +70,8 @@ jobs:
       # alcanza porque ninguna entra en la imagen. IMAGEN_TAG del entorno pisa a la del .env.
       - run: cp .env.example .env
       - run: echo "IMAGEN_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-      - run: docker compose build gestion-del-local listas-de-proveedores
-      - run: docker compose push gestion-del-local listas-de-proveedores
+      - run: docker compose build gestion-del-local listas-de-proveedores procesos
+      - run: docker compose push gestion-del-local listas-de-proveedores procesos
 
   avisar:
     # GitHub no entra a la máquina (ADR-013): publica un aviso en ntfy y la máquina, que

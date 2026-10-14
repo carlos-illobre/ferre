@@ -12,3 +12,5 @@ if [[ "$codigo" != "200" ]]; then
 fi
 docker compose exec -T listas-de-proveedores python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health').status==200 else 1)" \
   || { echo "listas-de-proveedores /health no respondió 200"; exit 1; }
+docker compose exec -T procesos node -e "fetch('http://127.0.0.1:8090/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" \
+  || { echo "procesos /health no respondió 200"; exit 1; }

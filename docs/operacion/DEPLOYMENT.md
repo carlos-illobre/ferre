@@ -30,7 +30,7 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   ([ADR-013](../adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
   producción: `git push origin master:produccion`.
 - Máquina Always Free (Ampere, arm64), sin estado: dos proyectos de compose, uno por
-  ambiente, con `gestion-del-local` y `listas-de-proveedores`, corriendo como el usuario
+  ambiente, con `gestion-del-local`, `listas-de-proveedores` y `procesos`, corriendo como el usuario
   `ferre` con Docker rootless, publicados solo en `127.0.0.1` (8081 y 8082), detrás del
   reverse proxy de la máquina, que no es parte de este proyecto (contrato en la guía).
 - Base de datos en Supabase ([ADR-002](../adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md)).

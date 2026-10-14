@@ -15,7 +15,7 @@ set -euo pipefail
 
 REPO=carlos-illobre/ferre
 BASE="${FERRE_BASE:-$HOME/ferre}"
-SERVICIOS=(gestion-del-local listas-de-proveedores)
+SERVICIOS=(gestion-del-local listas-de-proveedores procesos)
 
 ok()    { printf '  \033[0;32m✓\033[0m %s\n' "$1"; }
 info()  { printf '    %s\n' "$1"; }
