@@ -14,7 +14,10 @@ No trabajen a la vez una sesión en la nube y una en el servidor: las dos suben 
 
 Se crea una vez, con **Add cloud environment**.
 
-- **Acceso a internet:** Trusted (npm, PyPI, GitHub y Docker Hub entran en esa lista).
+- **Acceso a internet:** personalizado: la lista por defecto (npm, PyPI, GitHub, Docker Hub)
+  más `cdn.playwright.dev`, de donde Playwright baja el navegador de las pruebas, y sus dos
+  espejos, `playwright.download.prss.microsoft.com` y `playwright.azureedge.net`. Con solo
+  Trusted, el script de preparación falla con `ENOTFOUND cdn.playwright.dev`.
 - **Variables de entorno:** ninguna. Las pruebas de punta a punta levantan su propia base
   con Docker, dentro de la máquina.
 - **Script de preparación:** prepara la máquina, no el proyecto. Corre antes de que exista
