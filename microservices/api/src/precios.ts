@@ -73,3 +73,16 @@ export function margenReal(entrada: { costoNeto: number; iva: number; precio: nu
     ],
   };
 }
+
+// El IVA que se usa si la lista del proveedor no lo dice.
+export const IVA_SI_NO_SE_SABE = 0.21;
+
+// Todo el precio de un producto: el de su margen elegido, con los pasos, y el de cada uno de
+// los cinco botones. Sin costo no hay precio; sin margen, solo los de los botones.
+export function preciosDeUnProducto(p: { costo_neto: string | null; iva: string | null; margen_elegido: number | null }) {
+  const costo = p.costo_neto === null ? null : Number(p.costo_neto);
+  const iva = p.iva === null ? IVA_SI_NO_SE_SABE : Number(p.iva);
+  const precio = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva }) : null;
+  const porMargen = costo === null ? null : (Object.fromEntries(MARGENES.map((m) => [m, precioDeVenta({ costoNeto: costo, margen: m, iva }).valor])) as Record<Margen, number>);
+  return { costo, iva, precio, porMargen };
+}

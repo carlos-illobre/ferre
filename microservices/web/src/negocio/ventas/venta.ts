@@ -1,5 +1,6 @@
 import type { MedioDePago } from "@servidor/ventas";
 import { CONSULTAS, ventasCambiaron } from "./ventas-del-dia";
+import { IVA_SI_NO_SE_SABE, precioDelProducto } from "../catalogo/precio";
 import { consultas } from "../../consultas";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { margenReal, precioDeVenta, subtotalDeRenglon } from "../precios/vista-previa";
@@ -33,15 +34,13 @@ export type Item = {
 export function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: number | null; costo: number | null; iva: number } {
   const p = item.producto;
   const costo = p?.costo_neto != null ? Number(p.costo_neto) : null;
-  const iva = p?.iva != null ? Number(p.iva) : 0.21;
+  const iva = p?.iva != null ? Number(p.iva) : IVA_SI_NO_SE_SABE;
   if (item.precioManual !== null) {
     const real = costo !== null ? margenReal({ costoNeto: costo, iva, precio: item.precioManual }) : null;
     return { unitario: item.precioManual, pasos: real ? real.pasos : [`Precio puesto a mano ${pesos(item.precioManual)}`], margen: null, costo, iva };
   }
-  if (p && costo !== null && p.margen_elegido !== null) {
-    const r = precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva });
-    return { unitario: r.valor, pasos: r.pasos, margen: p.margen_elegido, costo, iva };
-  }
+  const r = p ? precioDelProducto(p).calculo : null;
+  if (p && r) return { unitario: r.valor, pasos: r.pasos, margen: p.margen_elegido, costo, iva };
   return { unitario: null, pasos: [], margen: null, costo, iva };
 }
 

@@ -6,7 +6,8 @@ import QRCode from "qrcode";
 import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { NOMBRE_DE_MEDIO, precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
-import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
+import { esMargenBoton, margenReal, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
+import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
 import { guardar, borrarAnterioresA } from "../../almacen";
@@ -27,7 +28,7 @@ import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 // La venta, en el orden del mostrador: buscar → costo, margen y precio → cantidad → cobro.
 // Nada obligatorio que el cuaderno no tenga. En la computadora todo sale con el teclado:
 // Enter agrega, F5 a F8 eligen cómo paga, F2 (o Enter con la búsqueda vacía) cobra.
-const precioDeLista = (p: Producto) => (p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null);
+const precioDeLista = (p: Producto) => precioDelProducto(p).valor;
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const pasosDeCosto = (p: Producto, costo: number) => (p.explicacion_costo?.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`]);
 const soloDigitos = (v: string) => (v === "" ? null : Number(v.replace(/[^\d]/g, "")) || null);

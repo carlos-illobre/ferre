@@ -113,6 +113,7 @@ ventas.get("/", exigirPermiso("ventas.ver", "negocio.numeros"), async (c) => {
       GROUP BY v.id, cl.nombre ORDER BY v.fecha DESC`,
     [dia],
   );
+  for (const v of rows) for (const i of v.items) i.subtotal = subtotalDeRenglon({ precioUnitario: Number(i.precio_unitario), cantidad: Number(i.cantidad) }).valor;
   const totales: VentasDelDia["totales"] = {};
   for (const v of rows) if (v.estado === "confirmada") totales[v.medio_pago] = (totales[v.medio_pago] ?? 0) + Number(v.total);
   const respuesta: VentasDelDia = { dia: dia ?? new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 10), ventas: rows, totales, total: Object.values(totales).reduce((a, b) => a + b, 0) };

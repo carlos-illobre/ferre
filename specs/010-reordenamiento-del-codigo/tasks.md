@@ -15,6 +15,6 @@ etapas. Cada tarea termina con todo funcionando y desplegado en pruebas.
 - [x] T004 Etapa 3b: negocio de depósito (ingreso, inventario, estanterías, pedidos) una sola vez (depende de T003)
 - [x] T005 Etapa 3c: negocio de catálogo, listas y duplicados una sola vez (depende de T003)
 - [x] T006 Etapa 3d: negocio de usuarios, sesiones, vínculo y lo de Más una sola vez (depende de T003)
-- [ ] T007 Etapa 4: el cálculo de precios en el servidor, precios precalculados y fin de `libraries/` (depende de T003)
+- [x] T007 Etapa 4: el cálculo de precios en el servidor, precios precalculados y fin de `libraries/` (depende de T003)
 - [ ] T008 Etapa 5: servidor en tres capas, con consultas con tipos (depende de T001)
 - [x] T009 La publicación del front arma juntas producción y pruebas: tiene que aceptar las carpetas viejas de producción hasta que se promueva (arreglo de la etapa 1)

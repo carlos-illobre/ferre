@@ -7,7 +7,7 @@ const apiFalsa = vi.fn();
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 const venta = (id: string, estado: VentaDelDia["estado"] = "confirmada"): VentaDelDia =>
-  ({ id, fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "1500.00", estado, pagada_en: null, cliente: null, items: [{ descripcion: "Martillo", cantidad: "1.000", precio_unitario: "1500.00", margen_aplicado: null, explicacion: null }] });
+  ({ id, fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "1500.00", estado, pagada_en: null, cliente: null, items: [{ descripcion: "Martillo", cantidad: "1.000", precio_unitario: "1500.00", margen_aplicado: null, explicacion: null, subtotal: 2000 }] });
 const dia = (ventas: VentaDelDia[]) => ({ dia: "2026-10-13", ventas, totales: { efectivo: 1500 }, total: 1500 });
 
 // Reordenamiento (010-E05): las ventas del día se piden y se anulan de una sola manera, sin pantalla.

@@ -6,7 +6,8 @@ import { SiVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
-import { esMargenBoton, margenReal, MARGENES, precioDeVenta, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
+import { esMargenBoton, margenReal, MARGENES, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
+import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { FotoProducto } from "./componentes/Foto";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "./componentes/base";
 import { Explicacion } from "./componentes/Explicacion";
@@ -192,7 +193,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         {resultados.length > 0 && (
           <ul className="sugerencias" role="listbox" data-testid="sugerencias">
             {resultados.map((p, i) => {
-              const precio = p.costo_neto !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: Number(p.costo_neto), margen: p.margen_elegido, iva: Number(p.iva ?? 0.21) }).valor : null;
+              const precio = precioDelProducto(p).valor;
               return (
                 <li key={p.id} role="option" aria-selected={i === elegido}>
                   <button type="button" className={`fila con-foto ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); if (codigoDesconocido) { actualizarProducto(p.id, { codigo_barras: codigoDesconocido } as never).catch(() => undefined); setCodigoDesconocido(null); agregar({ ...p, codigo_barras: codigoDesconocido }); } else agregar(p); }}>

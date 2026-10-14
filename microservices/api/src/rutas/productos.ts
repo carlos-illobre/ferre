@@ -6,11 +6,12 @@ import { pool } from "../db.js";
 import { config } from "../config.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirSesion, puede } from "../autenticacion.js";
+import { preciosDeUnProducto } from "../precios.js";
 
 // El catálogo para el mostrador (issues #13 y #14): cada producto con su costo vigente
-// (la fila más reciente de precio_proveedor) y el margen o precio manual elegidos. El
-// cliente lo baja entero y busca en memoria; el precio de venta lo calcula la librería
-// compartida, igual acá que en el navegador.
+// (la fila más reciente de precio_proveedor), el margen elegido y el precio ya calculado
+// acá, con su explicación y el de cada uno de los cinco márgenes (ADR-018). El front solo
+// calcula la vista previa de un margen o un precio tipeado.
 export const productos = new Hono();
 productos.use("/*", exigirSesion);
 
@@ -21,6 +22,13 @@ export type ProductoCatalogo = {
   costo_neto: string | null; iva: string | null; fecha_lista: string | null; lista_importada_id: string | null; explicacion_costo: string[];
   modificado_en: string;
 };
+
+// Lo que se le suma a cada producto: el precio de su margen (y para qué margen se calculó,
+// así el front sabe si quedó viejo después de cambiarlo) y el de cada botón.
+export function conPrecio<T extends { costo_neto: string | null; iva: string | null; margen_elegido: number | null }>(p: T) {
+  const { precio, porMargen } = preciosDeUnProducto(p);
+  return { ...p, precio: precio?.valor ?? null, explicacion_precio: precio?.pasos ?? [], margen_del_precio: precio ? p.margen_elegido : null, precios: porMargen };
+}
 
 // El texto de un producto como lo compara la búsqueda: minúsculas, sin acentos y con todo lo
 // que no es letra ni número convertido en espacio.
@@ -85,7 +93,7 @@ productos.get("/", async (c) => {
       ORDER BY ${orden}${tanda}`,
     parametros,
   );
-  return c.json(rows);
+  return c.json(rows.map(conPrecio));
 });
 
 // Elegir margen: uno de los botones (300/200/100/50/25), cualquier porcentaje entero

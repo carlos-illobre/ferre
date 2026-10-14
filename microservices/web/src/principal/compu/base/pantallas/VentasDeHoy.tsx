@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { usePuede } from "../../../permisos";
-import { subtotalDeRenglon } from "../../../../negocio/precios/vista-previa";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../../negocio/ventas/venta";
 import { confirmadas as lasConfirmadas, fueSinConexion, hoyLocal, useAnularVenta, useVentasDelDia, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
 import { fecha as fechaLarga } from "../../../../formato";
@@ -114,7 +113,7 @@ export function VentasDeHoy({ modo }: { modo: "hoy" | "anular" }) {
                       <td className="tachable">{numero(Number(i.cantidad))} × {i.descripcion}</td>
                       <td className="num">{pesosCortos(i.precio_unitario)}</td>
                       <td />
-                      <td className="num tachable">{pesosCortos(subtotalDeRenglon({ precioUnitario: Number(i.precio_unitario), cantidad: Number(i.cantidad) }).valor)}</td>
+                      <td className="num tachable">{pesosCortos(i.subtotal)}</td>
                       <td />
                     </tr>
                   ))}

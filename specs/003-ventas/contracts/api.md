@@ -57,7 +57,7 @@ Cuerpo:
   (America/Argentina/Buenos_Aires), no el del servidor.
 - **200** `{ dia, ventas, totales, total }`. Cada venta: `id`, `fecha`, `medio_pago`,
   `total`, `estado`, `pagada_en`, `cliente` (nombre o null) e `items` en orden
-  (`descripcion`, `cantidad`, `precio_unitario`, `margen_aplicado`, `explicacion`). Las más
+  (`descripcion`, `cantidad`, `precio_unitario`, `margen_aplicado`, `explicacion` y `subtotal`, que calcula el servidor: precio × cantidad, redondeado como se cobró). Las más
   nuevas primero. `totales` es el total por medio de pago y `total` la suma; los dos cuentan
   solo las ventas confirmadas.
 

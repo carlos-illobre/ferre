@@ -112,3 +112,15 @@ describe("POST /ventas", () => {
     expect(base.actual.sqlDe(/INSERT INTO venta/)).toHaveLength(0);
   });
 });
+
+describe("GET /ventas", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+
+  it("cada renglón llega con su subtotal calculado en el servidor, redondeado como se cobró (010-E06)", async () => {
+    base.actual.programar(/FROM venta v/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "3000", estado: "confirmada", pagada_en: null, cliente: null, items: [{ descripcion: "CABLE", cantidad: "1.5", precio_unitario: "1500", margen_aplicado: null, explicacion: null }] }] });
+    const r = await pedir(app, "GET", "/ventas");
+    const cuerpo = await r.json();
+    expect(cuerpo.ventas[0].items[0].subtotal).toBe(3000);
+    expect(cuerpo.totales).toEqual({ efectivo: 3000 });
+  });
+});

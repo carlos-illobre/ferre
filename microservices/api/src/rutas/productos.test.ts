@@ -24,6 +24,28 @@ describe("GET /productos", () => {
   });
 });
 
+describe("el precio que manda el servidor (010-E06)", () => {
+  it("cada producto llega con su precio calculado, su explicación y el de los cinco márgenes", async () => {
+    const { conPrecio } = await import("./productos.js");
+    const p = conPrecio({ id: "a", costo_neto: "1649.14", iva: "0.21", margen_elegido: 100 });
+    expect(p.precio).toBe(4000);
+    expect(p.margen_del_precio).toBe(100);
+    expect(p.explicacion_precio).toEqual(["Costo $1.649,14", "+ 100 % de margen = $3.298,28", "+ IVA 21 % = $3.990,92", "Redondeado para arriba a $4.000,00 (múltiplo de $1.000,00)"]);
+    expect(p.precios).toEqual({ 300: 8000, 200: 6000, 100: 4000, 50: 3000, 25: 3000 });
+  });
+  it("sin margen llegan solo los de los botones; sin costo, ningún precio", async () => {
+    const { conPrecio } = await import("./productos.js");
+    expect(conPrecio({ costo_neto: "1000", iva: null, margen_elegido: null })).toMatchObject({ precio: null, explicacion_precio: [], margen_del_precio: null, precios: { 100: 3000 } });
+    expect(conPrecio({ costo_neto: null, iva: null, margen_elegido: 100 })).toMatchObject({ precio: null, precios: null });
+  });
+  it("la ruta los agrega a cada producto del catálogo", async () => {
+    base.actual = baseFalsa();
+    base.actual.programar(/FROM producto p/, { rows: [{ id: "a", costo_neto: "1000", iva: "0.21", margen_elegido: 50 }] });
+    const r = await pedir(app, "GET", "/productos");
+    expect((await r.json())[0]).toMatchObject({ id: "a", precio: 2000, margen_del_precio: 50 });
+  });
+});
+
 describe("PATCH /productos/:id", () => {
   beforeEach(() => { base.actual = baseFalsa(); base.actual.programar(/UPDATE producto SET/, { rowCount: 1 }); });
 

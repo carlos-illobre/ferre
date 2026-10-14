@@ -101,6 +101,13 @@ describe("el precio de un producto (010-E05)", () => {
     expect(precioDelProducto(producto({ id: "d", descripcion: "D", costo_neto: "1000", margen_elegido: 100, iva: null })).iva).toBe(0.21);
   });
 
+  it("usa el precio que calculó el servidor, y la vista previa solo si cambió el margen acá (010-E06)", () => {
+    const delServidor = producto({ id: "a", descripcion: "A", costo_neto: "1000", margen_elegido: 100, precio: 9999, explicacion_precio: ["del servidor"], margen_del_precio: 100 });
+    expect(precioDelProducto(delServidor)).toMatchObject({ valor: 9999, delServidor: true, calculo: { pasos: ["del servidor"] } });
+    const recienCambiado = { ...delServidor, margen_elegido: 50 };
+    expect(precioDelProducto(recienCambiado)).toMatchObject({ valor: precioDeVenta({ costoNeto: 1000, margen: 50, iva: 0.21 }).valor, delServidor: false });
+  });
+
   it("el margen a mano es el que no está en los cinco botones, y se tipea entero y mayor que cero", () => {
     expect(margenAMano(producto({ id: "a", descripcion: "A", margen_elegido: 100 }))).toBeNull();
     expect(margenAMano(producto({ id: "a", descripcion: "A", margen_elegido: 120 }))).toBe(120);

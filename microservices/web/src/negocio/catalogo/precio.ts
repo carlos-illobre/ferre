@@ -1,16 +1,18 @@
-import { esMargenBoton, precioDeVenta } from "../precios/vista-previa";
+import { esMargenBoton, preciosDeUnProducto, type Explicado } from "../precios/vista-previa";
 import type { Producto } from "../../producto";
 
-// El precio de un producto, una sola vez para todas las pantallas (RNF-60): costo de la
-// lista × margen elegido × IVA, con sus pasos para explicarlo. Sin costo o sin margen no hay precio.
-// (En la etapa 4 del reordenamiento lo calcula el servidor; acá queda solo lo que se muestra.)
-export const IVA_SI_NO_SE_SABE = 0.21;
+// El precio de un producto, una sola vez para todas las pantallas (RNF-60). Lo calcula el
+// servidor y llega con el producto (ADR-018). La cuenta del front (la vista previa) se usa solo
+// cuando el precio del servidor no corresponde al margen que hay ahora: recién cambiado acá y
+// todavía sin confirmar, o un catálogo guardado de antes. Las dos cuentas son idénticas.
+export { IVA_SI_NO_SE_SABE } from "../precios/vista-previa";
 
-export function precioDelProducto(p: Producto) {
-  const costo = p.costo_neto === null ? null : Number(p.costo_neto);
-  const iva = p.iva === null ? IVA_SI_NO_SE_SABE : Number(p.iva);
-  const calculo = costo !== null && p.margen_elegido !== null ? precioDeVenta({ costoNeto: costo, margen: p.margen_elegido, iva }) : null;
-  return { costo, iva, calculo, valor: calculo?.valor ?? null };
+export function precioDelProducto(p: Producto): { costo: number | null; iva: number; calculo: Explicado | null; valor: number | null; delServidor: boolean } {
+  const vista = preciosDeUnProducto(p);
+  if (p.precio != null && p.margen_del_precio === p.margen_elegido) {
+    return { costo: vista.costo, iva: vista.iva, calculo: { valor: p.precio, pasos: p.explicacion_precio ?? vista.precio?.pasos ?? [] }, valor: p.precio, delServidor: true };
+  }
+  return { costo: vista.costo, iva: vista.iva, calculo: vista.precio, valor: vista.precio?.valor ?? null, delServidor: false };
 }
 
 // El margen elegido cuando no es uno de los cinco botones: el que se tipeó a mano.
