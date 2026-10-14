@@ -11,6 +11,7 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
   { ruta: "actividad", nombre: "Quién hizo qué", detalle: "El registro de todo lo que pasó", icono: "actividad", pide: ["negocio.actividad"] },
   { ruta: "roles", nombre: "Roles", detalle: "Qué puede hacer cada rol", icono: "usuarios", pide: ["admin.roles"] },
   { ruta: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: ["negocio.anomalias"] },
+  { ruta: "procesos", nombre: "Procesos", detalle: "Cómo se hace cada cosa en el negocio, dibujado paso a paso", icono: "procesos", pide: ["procesos.ver", "procesos.dibujar"] },
   { ruta: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
   { ruta: "configuracion", nombre: "Configuración", detalle: "Cómo se comporta la aplicación en esta computadora", icono: "ajustes" },
 ];

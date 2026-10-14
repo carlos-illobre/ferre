@@ -19,6 +19,8 @@ export const PERMISOS = {
   "negocio.numeros": "Ver los números del negocio",
   "negocio.anomalias": "Ver las anomalías",
   "negocio.actividad": "Ver quién hizo qué",
+  "procesos.ver": "Ver procesos",
+  "procesos.dibujar": "Dibujar procesos",
   "admin.usuarios": "Administrar usuarios",
   "admin.roles": "Administrar roles",
   "admin.sesiones": "Administrar sesiones",

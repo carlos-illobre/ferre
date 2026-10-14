@@ -20,6 +20,8 @@ export const usuarios: Record<string, Usuario & { rol: string }> = {
   recepcion: { id: "u-recepcion", email: "recepcion@ferre.test", nombre: "Recepción", rol: "recepcion", roles: ["Recepción"], permisos: ["deposito.ingresos", "deposito.compras", "deposito.stock"] },
   cajero: { id: "u-cajero", email: "cajero@ferre.test", nombre: "Cajero", rol: "cajero", roles: ["Vendedor"], permisos: ["ventas.registrar", "ventas.ver", "ventas.anular"] },
   soloVende: { id: "u-solo-vende", email: "vende@ferre.test", nombre: "Solo vende", rol: "soloVende", roles: ["Vendedor"], permisos: ["ventas.registrar"] },
+  miraProcesos: { id: "u-mira", email: "mira@ferre.test", nombre: "Núñez Mira", rol: "miraProcesos", roles: ["Lector"], permisos: ["procesos.ver"] },
+  dibujaProcesos: { id: "u-dibuja", email: "dibuja@ferre.test", nombre: "Dibuja", rol: "dibujaProcesos", roles: ["Dibujante"], permisos: ["procesos.dibujar"] },
 };
 
 // Como Postgres, cada respuesta dice qué comando fue (INSERT, UPDATE…): las consultas con tipos lo usan para contar filas.

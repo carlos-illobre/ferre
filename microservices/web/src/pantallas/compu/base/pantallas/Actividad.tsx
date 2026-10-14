@@ -45,6 +45,12 @@ const QUE: Record<string, { nombre: string; color?: Color }> = {
   "cliente.creado": { nombre: "Cliente nuevo" },
   "proveedor.creado": { nombre: "Proveedor nuevo" },
   "proveedor.modificado": { nombre: "Cambio en un proveedor" },
+  "proceso.creado": { nombre: "Proceso nuevo" },
+  "proceso.importado": { nombre: "Proceso importado" },
+  "proceso.renombrado": { nombre: "Proceso con otro nombre" },
+  "proceso.vigente": { nombre: "Proceso vigente", color: "azul" },
+  "proceso.borrador_descartado": { nombre: "Borrador de un proceso descartado" },
+  "proceso.borrado": { nombre: "Proceso borrado", color: "mal" },
 };
 
 // El filtro de la API compara el comienzo del tipo: «venta.» trae todo lo de ventas.
@@ -58,6 +64,7 @@ const TIPOS: { valor: string; nombre: string }[] = [
   { valor: "stock.", nombre: "Ajustes de stock" },
   { valor: "conteo.", nombre: "Conteos" },
   { valor: "usuario.", nombre: "Usuarios" },
+  { valor: "proceso.", nombre: "Procesos" },
   { valor: "sesion.", nombre: "Entradas y salidas de la app" },
   { valor: "credencial.", nombre: "Celulares con huella" },
   { valor: "cliente.", nombre: "Clientes" },
@@ -93,7 +100,7 @@ function detalleDe(e: Evento, usuarios: UsuarioFila[]): string {
     }
     case "sesion.iniciada": return juntar(c.medio === "huella" ? "Con la huella" : "Con Google", texto(c.dispositivo));
     case "credencial.vinculada": return texto(c.dispositivo);
-    case "sector.creado": case "cliente.creado": case "proveedor.creado": return texto(c.nombre);
+    case "sector.creado": case "cliente.creado": case "proveedor.creado": case "proceso.creado": case "proceso.importado": case "proceso.renombrado": case "proceso.vigente": return texto(c.nombre);
     default: return "";
   }
 }

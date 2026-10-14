@@ -155,6 +155,9 @@ importers:
       '@zxing/library':
         specifier: ^0.23.0
         version: 0.23.0
+      procesos-web:
+        specifier: workspace:*
+        version: link:../procesos/web
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
