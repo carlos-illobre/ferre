@@ -39,3 +39,11 @@ acá y en el entorno.
 Las instala `.claude/scripts/preparar-nube.sh` al empezar cada sesión (un hook
 `SessionStart` de `.claude/settings.json`): `pnpm install` y `uv sync`. Fuera de la nube no
 hace nada.
+
+## Las skills de animación
+
+Las skills de animación (`animate`, `animation-performance`, `review-animations`,
+`find-animation-opportunities`, `improve-animations`) están copiadas en `.claude/skills/`
+porque la nube no tiene las globales del servidor. Son una versión adaptada: ninguna
+animación corre en el hilo principal. El detalle está en el `ADAPTATION.md` de cada una;
+no se actualizan reinstalando el paquete original.
