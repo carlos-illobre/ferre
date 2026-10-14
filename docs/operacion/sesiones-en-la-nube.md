@@ -53,3 +53,20 @@ Las skills de animación (`animate`, `animation-performance`, `review-animations
 porque la nube no tiene las globales del servidor. Son una versión adaptada: ninguna
 animación corre en el hilo principal. El detalle está en el `ADAPTATION.md` de cada una;
 no se actualizan reinstalando el paquete original.
+
+## Construir imágenes en la nube
+
+La máquina de la nube sale a internet por un proxy de Anthropic que inspecciona el
+tráfico cifrado. La máquina confía en el certificado de ese proxy, pero un contenedor que se
+está construyendo no: por eso `pnpm install` falla dentro de `docker build`.
+
+Para las pruebas de punta a punta, las imágenes se construyen con una **copia temporal** de
+cada Dockerfile que agrega ese certificado, con el nombre que espera `docker-compose.yml`:
+
+- La copia va en una carpeta temporal fuera del repositorio, o en una carpeta ignorada por
+  git. **Nunca se commitea**, ni el certificado ni el Dockerfile modificado.
+- Esas imágenes sirven solo para probar en esa sesión. Las que llegan a producción las
+  construye el CI, que no pasa por el proxy, con los Dockerfiles del repositorio.
+- Las imágenes que publica el CI no sirven en la nube: son para ARM (el servidor) y la
+  máquina de la nube es x86.
+

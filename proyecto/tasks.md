@@ -279,3 +279,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T114 [carlos] Procesos: aprobar la especificación (specs/011-procesos/spec.md) y lo que decidió el agente (depende de T113)
 - [ ] T115 [agente] Procesos: ux.md, plan con la sección «Seguridad» y ADR de cómo va aparte, tareas, y programarlo (depende de T114)
 - [x] T116 [agente] Las sesiones en la nube arrancan Docker para las pruebas de punta a punta
+- [x] T117 [agente] Documentar cómo se construyen las imágenes en las sesiones en la nube
