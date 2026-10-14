@@ -1,169 +1,34 @@
-import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { Hono } from "hono";
-import { pool } from "../db.js";
-import { config } from "../config.js";
-import { registrarEvento } from "../eventos.js";
 import { exigirSesion, puede } from "../autenticacion.js";
-import { preciosDeUnProducto } from "../precios.js";
+import * as reglas from "../productos/reglas.js";
 
-// El catálogo para el mostrador (issues #13 y #14): cada producto con su costo vigente
-// (la fila más reciente de precio_proveedor), el margen elegido y el precio ya calculado
-// acá, con su explicación y el de cada uno de los cinco márgenes (ADR-018). El front solo
-// calcula la vista previa de un margen o un precio tipeado.
+export { conPrecio, normalizarBusqueda, type ProductoCatalogo } from "../productos/reglas.js";
+
+// El catálogo para el mostrador (issues #13 y #14). La ruta solo traduce (ADR-018); las reglas
+// y los datos están en `productos/`.
 export const productos = new Hono();
 productos.use("/*", exigirSesion);
 
-export type ProductoCatalogo = {
-  id: string; descripcion: string; marca: string | null; codigo_barras: string | null; unidad: string;
-  margen_elegido: number | null;
-  proveedor_id: string | null; proveedor: string | null; codigo_proveedor: string | null;
-  costo_neto: string | null; iva: string | null; fecha_lista: string | null; lista_importada_id: string | null; explicacion_costo: string[];
-  modificado_en: string;
-};
-
-// Lo que se le suma a cada producto: el precio de su margen (y para qué margen se calculó,
-// así el front sabe si quedó viejo después de cambiarlo) y el de cada botón.
-export function conPrecio<T extends { costo_neto: string | null; iva: string | null; margen_elegido: number | null }>(p: T) {
-  const { precio, porMargen } = preciosDeUnProducto(p);
-  return { ...p, precio: precio?.valor ?? null, explicacion_precio: precio?.pasos ?? [], margen_del_precio: precio ? p.margen_elegido : null, precios: porMargen };
-}
-
-// El texto de un producto como lo compara la búsqueda: minúsculas, sin acentos y con todo lo
-// que no es letra ni número convertido en espacio.
-const TEXTO_NORMALIZADO = "regexp_replace(translate(lower(p.descripcion || ' ' || coalesce(p.marca, '')), 'áéíóúüñ', 'aeiouun'), '[^a-z0-9]+', ' ', 'g')";
-export function normalizarBusqueda(texto: string): string[] {
-  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-}
-
 productos.get("/", async (c) => {
-  // De a tandas (`limite` y `desde`) para que la primera vez el dispositivo muestre algo
-  // enseguida y baje el resto atrás; sin `limite` va el catálogo entero, como siempre.
-  const limite = Math.floor(Number(c.req.query("limite")));
-  const desde = Math.max(0, Math.floor(Number(c.req.query("desde")) || 0));
-  const tanda = Number.isFinite(limite) && limite > 0 ? `, p.id LIMIT ${Math.min(limite, 20000)} OFFSET ${desde}` : "";
-  // Tres filtros para el celular que no guarda el catálogo y busca acá (RF-85): por texto
-  // (`buscar`), por código de barras o de proveedor exacto (`codigo`) y por una lista de
-  // productos (`ids`). Los valores van siempre como parámetros de la consulta.
-  const parametros: unknown[] = [];
-  const filtros: string[] = [];
-  const palabras = normalizarBusqueda(c.req.query("buscar") ?? "").slice(0, 8);
-  for (const palabra of palabras) {
-    parametros.push(palabra);
-    const n = parametros.length;
-    // Como en la aplicación: cada palabra es el comienzo de una palabra de la descripción o
-    // la marca, o el comienzo de un código.
-    filtros.push(`((' ' || ${TEXTO_NORMALIZADO}) LIKE '% ' || $${n} || '%'
-      OR lower(coalesce(p.codigo_barras, '')) LIKE $${n} || '%'
-      OR EXISTS (SELECT 1 FROM precio_proveedor c WHERE c.producto_id = p.id AND lower(coalesce(c.codigo_proveedor, '')) LIKE $${n} || '%'))`);
-  }
-  const codigo = (c.req.query("codigo") ?? "").trim();
-  if (codigo) {
-    parametros.push(codigo);
-    filtros.push(`(p.codigo_barras = $${parametros.length} OR EXISTS (SELECT 1 FROM precio_proveedor c WHERE c.producto_id = p.id AND c.codigo_proveedor = $${parametros.length}))`);
-  }
-  const ids = (c.req.query("ids") ?? "").split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x)).slice(0, 300);
-  if (c.req.query("ids") !== undefined) { parametros.push(ids); filtros.push(`p.id = ANY($${parametros.length}::uuid[])`); }
-  const donde = filtros.map((f) => ` AND ${f}`).join("");
-  // Una búsqueda trae primero las descripciones más cortas, que es lo que la aplicación muestra arriba.
-  const orden = palabras.length ? "length(p.descripcion), p.descripcion" : "p.descripcion";
-  const { rows } = await pool.query(
-    `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.modificado_en, p.sector_id, p.foto_url,
-            pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text, pp.lista_importada_id,
-            COALESCE(pp.descuentos->'explicacion', '[]'::jsonb) AS explicacion_costo,
-            COALESCE(prov.lista, '[]'::json) AS proveedores
-       FROM producto p
-       LEFT JOIN LATERAL (
-         SELECT * FROM precio_proveedor x
-          WHERE x.producto_id = p.id
-            AND (p.proveedor_preferido_id IS NULL OR x.proveedor_id = p.proveedor_preferido_id)
-          ORDER BY x.fecha_lista DESC, x.creado_en DESC LIMIT 1
-       ) pp ON true
-       LEFT JOIN proveedor pr ON pr.id = pp.proveedor_id
-       LEFT JOIN LATERAL (
-         SELECT json_agg(json_build_object('proveedor_id', v.proveedor_id, 'proveedor', v.nombre, 'costo_neto', v.costo_neto, 'fecha_lista', v.fecha_lista, 'codigo_proveedor', v.codigo_proveedor) ORDER BY v.costo_neto) AS lista
-           FROM (
-             SELECT DISTINCT ON (x.proveedor_id) x.proveedor_id, pv.nombre, x.costo_neto, x.fecha_lista::text, x.codigo_proveedor
-               FROM precio_proveedor x JOIN proveedor pv ON pv.id = x.proveedor_id
-              WHERE x.producto_id = p.id ORDER BY x.proveedor_id, x.fecha_lista DESC, x.creado_en DESC
-           ) v
-       ) prov ON true
-      WHERE p.activo AND p.reemplazado_por IS NULL${donde}
-      ORDER BY ${orden}${tanda}`,
-    parametros,
-  );
-  return c.json(rows.map(conPrecio));
+  const { limite, desde, buscar, codigo, ids } = c.req.query();
+  return c.json(await reglas.catalogo({ limite, desde, buscar, codigo, ids }));
 });
 
-// Elegir margen: uno de los botones (300/200/100/50/25), cualquier porcentaje entero
-// tipeado a mano, o ninguno. Lo hace el empleado en el mostrador; queda auditado.
 productos.patch("/:id", async (c) => {
-  const cuerpo = await c.req.json<{ margen_elegido?: number | null; unidad?: string; codigo_barras?: string | null; proveedor_preferido_id?: string | null; foto_url?: string | null }>().catch(() => ({}) as Record<string, never>);
-  const cambios: string[] = [];
-  const valores: unknown[] = [c.req.param("id")];
-  if ("margen_elegido" in cuerpo) {
-    // Fijar el margen de un producto es de quien tiene ese permiso; en una venta el margen
-    // vale solo para esa venta y no llega acá (RF-72).
-    if (!puede(c.get("sesion").usuario, "catalogo.margenes")) return c.json({ error: "No tenés permiso para esto. Hace falta: Fijar márgenes", permiso: "catalogo.margenes" }, 403);
-    const m = cuerpo.margen_elegido;
-    if (m !== null && (typeof m !== "number" || !Number.isInteger(m) || m <= 0 || m > 10000)) return c.json({ error: "El margen es un porcentaje entero mayor que cero (por ejemplo 20) o ninguno" }, 400);
-    valores.push(m); cambios.push(`margen_elegido = $${valores.length}`);
-  }
-  if ("unidad" in cuerpo) {
-    if (!["unidad", "kg", "m", "l"].includes(cuerpo.unidad as string)) return c.json({ error: "La unidad es unidad, kg, m o l" }, 400);
-    valores.push(cuerpo.unidad); cambios.push(`unidad = $${valores.length}`);
-  }
-  if ("codigo_barras" in cuerpo) {
-    const cb = cuerpo.codigo_barras === null ? null : String(cuerpo.codigo_barras).trim();
-    if (cb !== null && !/^[0-9A-Za-z\-]{4,32}$/.test(cb)) return c.json({ error: "El código de barras tiene que tener entre 4 y 32 letras o números" }, 400);
-    valores.push(cb); cambios.push(`codigo_barras = $${valores.length}`);
-  }
-  if ("proveedor_preferido_id" in cuerpo) {
-    valores.push(cuerpo.proveedor_preferido_id ?? null); cambios.push(`proveedor_preferido_id = $${valores.length}`);
-  }
-  if ("foto_url" in cuerpo) {
-    const f = cuerpo.foto_url === null ? null : String(cuerpo.foto_url).trim();
-    if (f !== null && !/^(https?:\/\/|\/fotos\/).{4,500}$/.test(f)) return c.json({ error: "La foto tiene que ser una dirección https o una foto subida" }, 400);
-    valores.push(f); cambios.push(`foto_url = $${valores.length}`);
-  }
-  if (cambios.length === 0) return c.json({ error: "Nada que cambiar: mandá margen_elegido, unidad, codigo_barras, proveedor_preferido_id o foto_url" }, 400);
-  const { rowCount } = await pool.query(`UPDATE producto SET ${cambios.join(", ")} WHERE id = $1 AND activo`, valores);
-  if (!rowCount) return c.json({ error: "No existe ese producto" }, 404);
-  await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id"), ...cuerpo } });
-  return c.body(null, 204);
+  const cuerpo = await c.req.json<reglas.CambiosEntrada>().catch(() => ({}) as reglas.CambiosEntrada);
+  const usuario = c.get("sesion").usuario;
+  const r = await reglas.cambiar(c.req.param("id"), cuerpo, puede(usuario, "catalogo.margenes"), usuario.id);
+  return r ? c.json({ error: r.error, ...(r.permiso ? { permiso: r.permiso } : {}) }, r.estado) : c.body(null, 204);
 });
 
-// Foto sacada con el celular: se guarda en el volumen de datos (junto a los Excel) con un
-// nombre al azar y queda como foto del producto. Tipos: jpeg, png, webp; hasta 10 MB (el
-// cliente ya la achica a 800 px antes de mandarla).
-const TIPOS_DE_FOTO: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
-export const carpetaFotos = () => path.join(config.carpetaListas, "fotos");
 productos.post("/:id/foto", async (c) => {
-  const cuerpo = await c.req.parseBody();
-  const archivo = cuerpo["foto"];
-  if (!(archivo instanceof File)) return c.json({ error: "Falta la foto" }, 400);
-  const extension = TIPOS_DE_FOTO[archivo.type];
-  if (!extension) return c.json({ error: "La foto tiene que ser jpeg, png o webp" }, 400);
-  if (archivo.size > 10 * 1024 * 1024) return c.json({ error: "La foto pesa más de 10 MB" }, 413);
-  const nombre = `${randomUUID()}${extension}`;
-  await mkdir(carpetaFotos(), { recursive: true });
-  await writeFile(path.join(carpetaFotos(), nombre), Buffer.from(await archivo.arrayBuffer()));
-  const url = `/fotos/${nombre}`;
-  const { rowCount } = await pool.query("UPDATE producto SET foto_url = $2 WHERE id = $1 AND activo", [c.req.param("id"), url]);
-  if (!rowCount) return c.json({ error: "No existe ese producto" }, 404);
-  await registrarEvento(pool, { tipo: "producto.foto", usuarioId: c.get("sesion").usuario.id, contenido: { id: c.req.param("id"), foto_url: url } });
-  return c.json({ foto_url: url });
+  const r = await reglas.subirFoto(c.req.param("id"), (await c.req.parseBody())["foto"], c.get("sesion").usuario.id);
+  return "error" in r ? c.json({ error: r.error }, r.estado) : c.json(r);
 });
 
-// Las fotos se sirven sin sesión: una etiqueta <img> no puede mandar el token, y el
-// nombre al azar hace que no se puedan adivinar. Son fotos de tornillos, no datos.
+// Las fotos se sirven sin sesión (ver `productos/reglas.ts`).
 export const fotos = new Hono();
 fotos.get("/:nombre", async (c) => {
-  const nombre = c.req.param("nombre");
-  if (!/^[0-9a-f-]{36}\.(jpg|png|webp)$/.test(nombre)) return c.json({ error: "No existe esa foto" }, 404);
-  const contenido = await readFile(path.join(carpetaFotos(), nombre)).catch(() => null);
-  if (!contenido) return c.json({ error: "No existe esa foto" }, 404);
-  const tipo = nombre.endsWith(".png") ? "image/png" : nombre.endsWith(".webp") ? "image/webp" : "image/jpeg";
-  return c.body(contenido, 200, { "Content-Type": tipo, "Cache-Control": "public, max-age=31536000, immutable" });
+  const f = await reglas.foto(c.req.param("nombre"));
+  return f ? c.body(f.contenido, 200, { "Content-Type": f.tipo, "Cache-Control": "public, max-age=31536000, immutable" }) : c.json({ error: "No existe esa foto" }, 404);
 });

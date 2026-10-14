@@ -1,8 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
-import { pool } from "../db.js";
-import { computadorasDe } from "../acceso/vinculo.js";
+import { computadorasDelCelular } from "../acceso/reglas.js";
 
 // Pedido de foto: la computadora no tiene cámara. Donde haga falta una foto (la factura de un
 // ingreso, un producto, un ticket) pide una y muestra un código QR; el celular lo lee, saca
@@ -46,7 +45,7 @@ export function fotosQueEsperan(computadoras: string[]): { codigo: string; para:
 // El celular emparejado (decisión 58) pregunta si su computadora está esperando alguna foto:
 // así no hace falta leer el código. Va antes de «/:codigo» para que no la tape.
 pedidosDeFoto.get("/para-mi", async (c) => {
-  return c.json(fotosQueEsperan(await computadorasDe(pool, c.get("sesion").id)));
+  return c.json(fotosQueEsperan(await computadorasDelCelular(c.get("sesion").id)));
 });
 
 // La computadora pregunta si ya llegó; el celular, si el código vale y para qué es la foto.

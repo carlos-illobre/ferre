@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { baseFalsa, pedir } from "./pruebas/base-falsa.js";
-import { separarProductos, unirProductos, type Movidos } from "./equivalencias.js";
+import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
+import { separarProductos, unirProductos, type Movidos } from "./datos.js";
 
-const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("./pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("./db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));
-const { app } = await import("./app.js");
+const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
+vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));
+const { app } = await import("../app.js");
 
 type Cliente = Parameters<typeof unirProductos>[0];
 

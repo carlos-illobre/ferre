@@ -1,4 +1,4 @@
-import { config } from "./config.js";
+import { config } from "../config.js";
 
 // Cliente del servicio listas-de-proveedores (ADR-003): recibe la planilla y devuelve
 // filas normalizadas con el costo neto ya calculado y explicado.

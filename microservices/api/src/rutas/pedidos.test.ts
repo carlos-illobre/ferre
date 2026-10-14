@@ -10,7 +10,7 @@ const PROVEEDOR = "0b0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c11";
 const MECHA = "1c0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c21";
 const DISCO = "2d0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c31";
 const borrador = (cambios: Record<string, unknown> = {}) => ({ proveedor_id: PROVEEDOR, items: [{ producto_id: MECHA, cantidad: 24 }, { producto_id: DISCO, cantidad: 7.5 }], ...cambios });
-const tipos = () => base.actual.sqlDe(/INSERT INTO evento/).map((c) => c.params.find((p) => typeof p === "string" && p.startsWith("pedido."))).filter(Boolean);
+const tipos = () => base.actual.sqlDe(/insert into "?evento/i).map((c) => c.params.find((p) => typeof p === "string" && p.startsWith("pedido."))).filter(Boolean);
 
 // Pedidos a proveedores (RF-55, decisión 52).
 describe("pedidos a proveedores", () => {
@@ -39,7 +39,7 @@ describe("pedidos a proveedores", () => {
     const items = base.actual.sqlDe(/INSERT INTO item_pedido/);
     expect(items).toHaveLength(2);
     expect(items[0]!.sql).toContain("FROM precio_proveedor");
-    expect(items[1]!.params.slice(2)).toEqual([2, DISCO, 7.5, PROVEEDOR]);
+    expect(items[1]!.params.slice(2)).toEqual([2, 7.5, PROVEEDOR, DISCO]);
     // Guardarlo de nuevo lo reemplaza: no duplica renglones.
     base.actual.programar(/SELECT estado FROM pedido WHERE id/, { rows: [{ estado: "borrador" }] });
     await pedir(app, "PUT", `/pedidos/${PEDIDO}`, { rol: "mostrador", cuerpo: borrador({ items: [{ producto_id: MECHA, cantidad: 10 }] }) });

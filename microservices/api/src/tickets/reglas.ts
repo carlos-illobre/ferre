@@ -2,6 +2,8 @@ import { base } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
 
+export { carpetaTickets } from "./datos.js";
+
 // Tickets (RF-80): errores y mejoras que reporta quien usa el sistema, con texto y fotos.
 // Todos los usuarios ven todos.
 const EXTENSION: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };

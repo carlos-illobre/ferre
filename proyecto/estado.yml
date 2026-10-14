@@ -63,7 +63,7 @@ RF-06:
   pruebas:
     - tests/e2e/escritorio/11-duplicados.spec.ts
     - tests/e2e/celular/11-duplicados.spec.ts
-    - microservices/api/src/equivalencias.test.ts
+    - microservices/api/src/duplicados/datos.test.ts
     - microservices/web/src/principal/celular/Catalogo.test.tsx
   defectos:
     - "Solo se sugieren duplicados con la misma descripción (sin acentos, símbolos ni espacios, de 8 caracteres o más); no por descripción similar"
@@ -116,7 +116,9 @@ RF-09:
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/api/src/rutas/productos.test.ts
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "La foto no se muestra en el conteo de stock"
     - "Sin prueba: reemplazar la foto de un producto que ya tiene una"
     - "Las fotos y los archivos de las listas se guardan en el disco del servidor, sin copia (contradice ADR-002)"
@@ -227,7 +229,9 @@ RF-20:
     - microservices/web/src/cola.test.ts
     - microservices/api/src/precios.test.ts
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "En la computadora la venta se cobra con F2; el Enter final no la cierra, como pide la regla"
     - "Un cambio guardado sin conexión que el servidor rechaza al reconectar se descarta sin avisar si la venta ya no está abierta"
     - "La venta de la computadora acepta un código tipeado por un lector USB, y la regla dice que el único lector es la cámara del celular (RNF-41)"
@@ -256,7 +260,9 @@ RF-21:
     - tests/e2e/celular/04-vender.spec.ts
     - microservices/web/src/principal/celular/Vender.test.tsx
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "Cobrar sin elegir el medio de pago frena la venta con el aviso «Elegí cómo paga»; el relevamiento y el pedido original dicen que saltearlo no debe frenar (regla a confirmar por Carlos)"
     - "Sin prueba que elija Mercado Pago ni tarjeta"
     - "Sin prueba del camino completo de cuenta corriente: elegir el cliente y cobrar"
@@ -267,7 +273,9 @@ RF-22:
   pruebas:
     - microservices/web/src/principal/celular/Vender.test.tsx
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "El ítem libre no se puede dar de alta como producto desde la venta"
     - "No existe la lista de ítems libres para que el Administrador los revise"
     - "El ítem libre no tiene prueba en la computadora, solo en el celular"
@@ -362,7 +370,9 @@ RF-40:
   pruebas:
     - microservices/web/src/principal/celular/Vender.test.tsx
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "No hay forma de cargar un cliente desde la aplicación: la ruta para crearlo existe, pero ninguna interfaz la usa"
     - "No se puede marcar una venta como pagada desde la aplicación, en ninguna de las dos interfaces: la ruta existe y ninguna interfaz la usa (#57)"
     - "No hay vista de las ventas a cuenta corriente sin pagar por cliente, ni ruta de la API que devuelva las ventas de un cliente"
@@ -845,7 +855,9 @@ RNF-10:
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - microservices/web/src/cola.test.ts
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "Sin prueba: corregir stock y cargar un renglón de conteo sin conexión"
     - "Sin prueba: una hora sin conexión con 30 ventas"
     - "Sin prueba: el aviso de que una operación que no es del mostrador necesita conexión"
@@ -889,7 +901,9 @@ RNF-20:
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/cola.test.ts
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "Un cambio encolado que el servidor rechaza al reconectar se descarta sin avisar, si la pantalla que lo pidió ya no está abierta"
     - "En un navegador sin IndexedDB el cambio se manda directo, sin cola: sin conexión se pierde"
     - "Sin construir: reenviar al servidor las ventas de los últimos 7 días guardadas en el dispositivo después de restaurar una copia vieja"
@@ -1040,7 +1054,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 empezada: ventas, «no llevó», clientes, registro de acciones, stock y proveedores ya están en tres capas, con consultas con tipos. Falta el resto de los temas del servidor, mover las pantallas a `pantallas/` y un solo juego de piezas de interfaz (010-T008 y 010-T012)"
+  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 hecha: todo el servidor está en tres capas (ruta, reglas, datos), con control automático. Falta mover las pantallas a `pantallas/` y un solo juego de piezas de interfaz (010-T012)"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
@@ -1057,7 +1071,9 @@ RNF-60:
     - microservices/web/src/negocio/precios/vista-previa.test.ts
     - microservices/api/src/rutas/productos.test.ts
     - microservices/api/src/rutas/ventas.test.ts
+    - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "El precio del servidor engorda el catálogo que baja la computadora (la explicación de cada precio viaja con cada producto); no se midió todavía con los 11.000 productos reales"
     - "Las pantallas siguen en `principal/celular` y `principal/compu`; pasan a `pantallas/` con el juego único de piezas de interfaz (010-T012)"
     - "Los roles asignables, los celulares con huella y la entrada todavía piden al servidor desde la pantalla, sin la memoria compartida de consultas"

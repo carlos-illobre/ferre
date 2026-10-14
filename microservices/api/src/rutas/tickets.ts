@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
 import * as reglas from "../tickets/reglas.js";
 
-export { carpetaTickets } from "../tickets/datos.js";
+export { carpetaTickets } from "../tickets/reglas.js";
 
 // Tickets: la ruta solo traduce (ADR-018); las reglas y los datos están en `tickets/`.
 export const tickets = new Hono();
