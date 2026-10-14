@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent }
 import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
 import { MEDIOS, TEXTOS, type Medio } from "../textos";
-import QRCode from "qrcode";
 import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
-import { NOMBRE_DE_MEDIO, precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
-import { esMargenBoton, margenReal, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
+import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { esMargenBoton } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
+import { useCodigoParaVincular } from "../../negocio/vinculo";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
 import { guardar, borrarAnterioresA } from "../../almacen";
@@ -273,7 +273,7 @@ type PropsDeRenglon = {
 
 function useRenglon(it: Item) {
   const p = precioDe(it);
-  const renglon = p.unitario === null ? null : subtotalDeRenglon({ precioUnitario: p.unitario, cantidad: it.cantidad, unidad: it.unidad });
+  const renglon = subtotalDe(it);
   const margenTexto = it.precioManual !== null ? "precio a mano" : p.margen === null ? "elegí el margen" : `margen ${p.margen} %${esMargenBoton(p.margen) ? "" : " a mano"}`;
   return { p, renglon, margenTexto };
 }
@@ -401,30 +401,10 @@ function ElegirCliente({ clientes, elegido, alElegir, alCerrar }: { clientes: Cl
 // que escanea aparece en esta venta.
 export function VincularParaEscanear({ vinculado, alVincular }: { vinculado: boolean; alVincular: (puestoId: string) => void }) {
   const [abierta, setAbierta] = useState(false);
-  const [qr, setQr] = useState<string | null>(null);
-  const [vencido, setVencido] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const consulta = useRef<ReturnType<typeof setInterval> | null>(null);
-  const parar = () => { if (consulta.current) clearInterval(consulta.current); consulta.current = null; };
-  useEffect(() => parar, []);
-
-  async function generar() {
-    setAbierta(true); setError(null); setVencido(false); setQr(null); parar();
-    try {
-      const { id, codigo, expiraEnSegundos } = await api<{ id: string; codigo: string; expiraEnSegundos: number }>("/puestos", { method: "POST", body: JSON.stringify({ nombre: "computadora del mostrador" }) });
-      const enlace = `${location.origin}${location.pathname}#/vincular-celular?codigo=${encodeURIComponent(codigo)}`;
-      setQr(await QRCode.toDataURL(enlace, { width: 260, margin: 1, color: { dark: "#0f1e36", light: "#ffffff" } }));
-      // Para las pruebas automáticas: el enlace que el celular abriría.
-      (window as unknown as { __enlaceVinculacion?: string }).__enlaceVinculacion = enlace;
-      const fin = Date.now() + expiraEnSegundos * 1000;
-      consulta.current = setInterval(async () => {
-        if (Date.now() > fin) { parar(); setQr(null); setVencido(true); return; }
-        const estado = await api<{ vinculado_en: string | null; expira_en: string }>(`/puestos/${id}`).catch(() => null);
-        if (estado?.vinculado_en) { parar(); guardarPuestoLocal({ id, expira_en: estado.expira_en }); setAbierta(false); alVincular(id); }
-      }, 2000);
-    } catch (e) { const err = e as { estado?: number; message: string }; setError(err.estado ? err.message : "Sin conexión: para vincular el celular hace falta internet."); }
-  }
-  function cerrar() { parar(); setAbierta(false); }
+  const codigo = useCodigoParaVincular((id) => { setAbierta(false); alVincular(id); }, { ancho: 260, oscuro: "#0f1e36" });
+  const { qr, vencido, error } = codigo;
+  async function generar() { setAbierta(true); await codigo.generar(); }
+  function cerrar() { codigo.cerrar(); setAbierta(false); }
   // Con el celular emparejado no hay código que leer: se le pide que abra el lector (decisión 59).
   const [pedido, setPedido] = useState<"si" | "no" | null>(null);
   async function pedir() { setPedido((await pedirLector()) ? "si" : "no"); }

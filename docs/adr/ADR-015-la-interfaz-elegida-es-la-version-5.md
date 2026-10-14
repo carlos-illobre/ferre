@@ -90,4 +90,11 @@ una vez por semana y a pedido; `tests/e2e.sh` explica cómo correrlos en el serv
 
 Las versiones 1 a 4, sus páginas publicadas y los mockups se borraron del repositorio
 (decisión 83): la interfaz elegida es la única y es la definitiva. Lo que este ADR dice de
-dónde vivía cada versión vale como historia; hoy todo está en `src/pantallas/` y lo común en `src/`.
+dónde vivía cada versión vale como historia, incluida la tabla de «Dónde está cada cosa».
+
+Desde el reordenamiento ([ADR-018](ADR-018-servicios-y-capas.md)), el front está en
+`microservices/web/src/` así: `pantallas/celular/` y `pantallas/compu/` (cada interfaz, con su
+menú, sus pantallas, sus piezas y sus estilos), `pantallas/` (lo compartido por las dos:
+textos, paleta y pantallas comunes), `negocio/` (la regla de cada proceso, una sola vez),
+`plataforma/` (la tecnología reutilizable) y lo común de la aplicación en `src/` (cliente del
+servidor, catálogo, cola, sesión). La entrada es `pantallas/main.tsx`.

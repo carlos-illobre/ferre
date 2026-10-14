@@ -118,6 +118,11 @@ RF-09:
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/.dependency-cruiser.cjs
   defectos:
+    - "La forma de los datos llega del servidor solo en las ventas (`contratos/ventas.ts`); producto y los demás temas siguen escritos a mano en el front. Zod, el cliente tipado de Hono y React Router, aprobados en ADR-018, no se adoptaron todavía"
+    - "Pedidos a proveedores, roles, tickets, el vínculo en Usuarios y sesiones, la foto pedida a la compu, anomalías y dinero invertido son pantallas compartidas que todavía le piden al servidor desde la pantalla, sin pasar por `negocio/`"
+    - "Las piezas de la plataforma (base local, cola, cámara, tiempo real) se prueban a través de las pantallas: no tienen pruebas propias"
+    - "Nada automático impide que vuelva una carpeta de librerías compartidas entre servicios (E07): se comprueba mirando el repositorio"
+    - "Según la especificación el servidor «confirma» al cobrar el precio de la vista previa, pero guarda el precio que manda la pantalla y solo recalcula el redondeo y el total: falta decidir qué quiere decir confirmar (revision.md, 1.2)"
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "La foto no se muestra en el conteo de stock"
     - "Sin prueba: reemplazar la foto de un producto que ya tiene una"
@@ -639,7 +644,7 @@ RF-72:
   defectos:
     - "Lo que se muestra según los permisos tiene pruebas unitarias en las pantallas del celular; en la computadora lo cubre solo la prueba de punta a punta"
     - "Un cambio hecho sin conexión que el servidor rechaza por permiso se descarta sin avisarle a la persona"
-    - "«Ver costos» esconde los costos en las pantallas, pero el servidor los sigue entregando con el catálogo: el precio se calcula en el dispositivo, también sin conexión"
+    - "«Ver costos» esconde los costos en las pantallas, pero el servidor los sigue entregando con el catálogo (y la explicación del precio empieza por el costo). Desde que el servidor calcula el precio (010-T007) podría dejar de mandarlos a quien no tiene el permiso; lo que lo frena es la vista previa sin conexión de un margen cambiado, que necesita el costo"
     - "Con el margen y el precio a la vista, quien no ve costos puede deducirlos"
     - "Que no se pueda anular una venta de otro día sin el permiso tiene prueba en el servidor, no en pantalla ni de punta a punta"
     - "El último que administra no se puede quitar: tiene prueba en el servidor, no de punta a punta"

@@ -1,38 +1,12 @@
-import { useEffect, useState } from "react";
-import QRCode from "qrcode";
-import { api } from "../../../api";
+import { useEffect } from "react";
+import { useCodigoParaVincular } from "../../../negocio/vinculo";
 import { guardarPuestoLocal, puestoLocal } from "../../../puesto";
 
-// En la laptop: "Vincular celular" muestra un QR; cuando el celular lo lee, el puesto queda
-// vinculado 12 horas y esta pantalla lo indica.
+// Cuando Vender del celular se ve en una pantalla ancha: "Vincular celular" muestra un QR; cuando
+// el celular lo lee, quedan vinculados y esta pantalla lo indica. La regla está en negocio/vinculo.ts.
 export function VincularCelular({ vinculado, alVincular }: { vinculado: boolean; alVincular: (puestoId: string) => void }) {
-  const [qr, setQr] = useState<string | null>(null);
-  const [puestoId, setPuestoId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function generar() {
-    try {
-      const { id, codigo, expiraEnSegundos } = await api<{ id: string; codigo: string; expiraEnSegundos: number }>("/puestos", { method: "POST", body: JSON.stringify({ nombre: "computadora del mostrador" }) });
-      // La dirección de esta misma interfaz (vive en /v1/): el celular tiene que abrir la misma.
-      const enlace = `${location.origin}${location.pathname}#/vincular-celular?codigo=${encodeURIComponent(codigo)}`;
-      setQr(await QRCode.toDataURL(enlace, { width: 220, margin: 1 }));
-      setPuestoId(id);
-      setError(null);
-      // Para las pruebas automáticas: el enlace que el celular abriría.
-      (window as unknown as { __enlaceVinculacion?: string }).__enlaceVinculacion = enlace;
-      const fin = Date.now() + expiraEnSegundos * 1000;
-      const consulta = setInterval(async () => {
-        if (Date.now() > fin) { clearInterval(consulta); setQr(null); return; }
-        const estado = await api<{ vinculado_en: string | null; expira_en: string }>(`/puestos/${id}`).catch(() => null);
-        if (estado?.vinculado_en) {
-          clearInterval(consulta);
-          guardarPuestoLocal({ id, expira_en: estado.expira_en });
-          setQr(null);
-          alVincular(id);
-        }
-      }, 2000);
-    } catch (e) { setError((e as Error).message); }
-  }
+  const codigo = useCodigoParaVincular(alVincular, { ancho: 220 });
+  const { qr, vencido, error, generar } = codigo;
   useEffect(() => { const p = puestoLocal(); if (p && !vinculado) alVincular(p.id); }, [vinculado, alVincular]);
 
   if (vinculado) {
@@ -49,7 +23,7 @@ export function VincularCelular({ vinculado, alVincular }: { vinculado: boolean;
         <button className="enlace" onClick={generar} data-testid="vincular-celular">Vincular celular para escanear</button>
       )}
       {error && <span className="error">{error}</span>}
-      {puestoId && !qr && !vinculado && <small> El código venció. <button className="enlace chico" onClick={generar}>Generar otro</button></small>}
+      {vencido && !qr && !vinculado && <small> El código venció. <button className="enlace chico" onClick={generar}>Generar otro</button></small>}
     </span>
   );
 }

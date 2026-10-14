@@ -27,7 +27,7 @@ export type Rechazo = { error: string; estado: 400 | 403 | 404 | 413; permiso?: 
 // Fijar el margen de un producto es de quien tiene ese permiso; en una venta el margen vale solo
 // para esa venta y no llega acá (RF-72). Queda auditado.
 export async function cambiar(id: string, cuerpo: CambiosEntrada, fijaMargenes: boolean, usuarioId: string): Promise<Rechazo | null> {
-  const cambios: Record<string, unknown> = {};
+  const cambios: datos.CambiosDeProducto = {};
   if ("margen_elegido" in cuerpo) {
     if (!fijaMargenes) return { error: "No tenés permiso para esto. Hace falta: Fijar márgenes", permiso: "catalogo.margenes", estado: 403 };
     const m = cuerpo.margen_elegido;

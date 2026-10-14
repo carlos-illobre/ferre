@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../../../api";
 import { useSesion, type Usuario } from "../../../sesion";
 import { entrarConHuella, hayHuella } from "../../../credenciales";
 import { marcarEntradaConGoogle } from "../componentes/OfrecerHuella";
 import { AvisoError, Icono } from "../componentes/base";
+import { entrarConGoogle } from "../../../negocio/vinculo";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -25,10 +25,7 @@ export function BotonGoogle() {
         ux_mode: "popup",
         callback: async ({ credential }) => {
           try {
-            const r = await api<{ token: string; usuario: Usuario }>("/sesiones/google", {
-              method: "POST",
-              body: JSON.stringify({ credencial: credential, dispositivo: describirDispositivo() }),
-            });
+            const r = await entrarConGoogle(credential, describirDispositivo());
             marcarEntradaConGoogle();
             entrar(r.token, r.usuario);
           } catch (e) {

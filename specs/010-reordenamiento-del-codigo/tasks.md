@@ -18,3 +18,4 @@ etapas. Cada tarea termina con todo funcionando y desplegado en pruebas.
 - [x] T007 Etapa 4: el cálculo de precios en el servidor, precios precalculados y fin de `libraries/` (depende de T003)
 - [x] T008 Etapa 5: servidor en tres capas, con consultas con tipos (depende de T001)
 - [x] T009 La publicación del front arma juntas producción y pruebas: tiene que aceptar las carpetas viejas de producción hasta que se promueva (arreglo de la etapa 1)
+- [x] T014 [arreglo] Lo que encontró la revisión: el vínculo y la entrada con Google una sola vez, el subtotal del renglón desde la regla de la venta, el negocio sin depender de las pantallas, controles de capas que faltaban, las columnas que se cambian de un producto y las reglas de las fotos pedidas fuera de la ruta

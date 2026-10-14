@@ -82,10 +82,19 @@ export async function catalogo(q: FiltrosDelCatalogo): Promise<ProductoCatalogo[
   return rows;
 }
 
+// Las únicas columnas de un producto que se cambian desde la aplicación. El nombre de la
+// columna va pegado al SQL, así que solo se aceptan estas: cualquier otra hace fallar.
+const COLUMNAS_QUE_SE_CAMBIAN = ["margen_elegido", "unidad", "codigo_barras", "proveedor_preferido_id", "foto_url"] as const;
+export type CambiosDeProducto = Partial<Record<(typeof COLUMNAS_QUE_SE_CAMBIAN)[number], unknown>>;
+
 // Cambia las columnas pedidas (ya validadas) de un producto activo; dice si existía.
-export async function cambiar(id: string, cambios: Record<string, unknown>): Promise<boolean> {
+export async function cambiar(id: string, cambios: CambiosDeProducto): Promise<boolean> {
   const valores: unknown[] = [id];
-  const sets = Object.entries(cambios).map(([columna, valor]) => { valores.push(valor); return `${columna} = $${valores.length}`; });
+  const sets = Object.entries(cambios).map(([columna, valor]) => {
+    if (!(COLUMNAS_QUE_SE_CAMBIAN as readonly string[]).includes(columna)) throw new Error(`No se cambia la columna ${columna} de un producto`);
+    valores.push(valor);
+    return `${columna} = $${valores.length}`;
+  });
   const { rowCount } = await pool.query(`UPDATE producto SET ${sets.join(", ")} WHERE id = $1 AND activo`, valores);
   return Boolean(rowCount);
 }

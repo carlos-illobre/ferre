@@ -44,6 +44,12 @@ export function precioDe(item: Item): { unitario: number | null; pasos: string[]
   return { unitario: null, pasos: [], margen: null, costo, iva };
 }
 
+// El subtotal de un renglón (precio × cantidad, redondeado como se cobra), con sus pasos; sin precio, ninguno.
+export function subtotalDe(item: Item) {
+  const unitario = precioDe(item).unitario;
+  return unitario === null ? null : subtotalDeRenglon({ precioUnitario: unitario, cantidad: item.cantidad, unidad: item.unidad });
+}
+
 // Lo que quedó de una venta recién cobrada, para que cada pantalla lo cuente con sus palabras.
 export type Cobro = { total: number; encolado: boolean; medio: Medio; cliente: string | null; productos: number; fecha: string };
 

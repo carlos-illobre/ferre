@@ -1,27 +1,11 @@
 import { useEffect, useState } from "react";
-import { api } from "../../../../api";
-import { dispositivoId, guardarPuestoRemoto } from "../../../../puesto";
+import { vincularConCodigo, type Vinculado } from "../../../../negocio/vinculo";
 import { useSesion } from "../../../../sesion";
 import { irA } from "../rutas";
 import { BotonGoogle, BotonHuella, MarcoDeEntrada } from "./Entrar";
 import { esFallaDeRed } from "./negocio-comun";
 import { Aviso, Boton, Icono, Progreso } from "../ui";
 import "../estilos/entrar.css";
-
-type Vinculado = { id: string; nombre: string | null; expira_en: string; dias: number };
-
-// El código de la computadora vale una sola vez: si la pantalla se monta dos veces, el
-// segundo pedido lo encontraría usado. Se guarda el pedido en curso de cada código.
-const pedidos = new Map<string, Promise<Vinculado>>();
-function vincular(codigo: string): Promise<Vinculado> {
-  let pedido = pedidos.get(codigo);
-  if (!pedido) {
-    pedido = api<Vinculado>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST", body: JSON.stringify({ dispositivo_id: dispositivoId() }) });
-    pedidos.set(codigo, pedido);
-    pedido.catch(() => pedidos.delete(codigo));
-  }
-  return pedido;
-}
 
 // Se abre en el celular al leer el código QR de la computadora: los empareja, y
 // desde entonces lo que el celular escanea aparece en la venta de la computadora.
@@ -36,11 +20,8 @@ export function VincularCelular({ codigo }: { codigo: string }) {
     if (!conSesion) return;
     let vigente = true;
     setError(null);
-    vincular(codigo)
-      .then((r) => {
-        guardarPuestoRemoto({ id: r.id, nombre: r.nombre, expira_en: r.expira_en });
-        if (vigente) setResultado(r);
-      })
+    vincularConCodigo(codigo)
+      .then((r) => { if (vigente) setResultado(r); })
       .catch((e: Error) => {
         if (!vigente) return;
         setError(esFallaDeRed(e)

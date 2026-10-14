@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { irA } from "../../rutas";
 import { contarAlEspejo, useEspejar } from "../../espejo";
-import { NOMBRE_DE_MEDIO, precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { SiVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
 import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
-import { esMargenBoton, margenReal, MARGENES, subtotalDeRenglon } from "../../negocio/precios/vista-previa";
+import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { FotoProducto } from "./componentes/Foto";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast } from "./componentes/base";
@@ -286,7 +286,7 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
 }) {
   const p = precioDe(it);
   const producto = it.producto;
-  const renglon = p.unitario === null ? null : subtotalDeRenglon({ precioUnitario: p.unitario, cantidad: it.cantidad, unidad: it.unidad });
+  const renglon = subtotalDe(it);
   const subtotal = renglon?.valor ?? null;
   const margenTexto = it.precioManual !== null ? "a mano" : p.margen === null ? "elegí margen" : `${p.margen} %${esMargenBoton(p.margen) ? "" : " a mano"}`;
   return (

@@ -9,6 +9,7 @@ import { marcarEntradaConGoogle } from "./OfrecerHuella";
 import { useEnLinea } from "./negocio-comun";
 import { Aviso, Boton, Icono, Marca, Progreso, type NombreDeIcono } from "../ui";
 import "../estilos/entrar.css";
+import { entrarConGoogle } from "../../../../negocio/vinculo";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -77,10 +78,7 @@ export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "fill
         callback: async ({ credential }) => {
           setEntrando(true); setError(null);
           try {
-            const r = await api<{ token: string; usuario: Usuario }>("/sesiones/google", {
-              method: "POST",
-              body: JSON.stringify({ credencial: credential, dispositivo: describirDispositivo() }),
-            });
+            const r = await entrarConGoogle(credential, describirDispositivo());
             marcarEntradaConGoogle();
             sesionCerradaPorElServidor = false;
             entrar(r.token, r.usuario);
