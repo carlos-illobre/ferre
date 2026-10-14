@@ -1113,6 +1113,8 @@ RF-91:
   defectos:
     - "La flecha que sale de una decisión no recibe el nombre de la opción (E04), y en la tabla solo se cambia el nombre del paso (E11) #119"
     - "Faltan pruebas de que cambiar de carril cambia quién lo hace (E05) y del nombre largo de un paso (E44) #119"
+
+RF-92:
   estado: "Hecho (011-T007, 011-T009, 011-T023, 011-T024): «Pasos» y «Diagrama» en el celular; Carlos los probó con el dedo en su teléfono el 2026-10-14"
   pruebas:
     - microservices/procesos/web/src/celu/ProcesosCelu.test.tsx
