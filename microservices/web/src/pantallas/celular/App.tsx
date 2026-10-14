@@ -29,6 +29,7 @@ import { Tickets } from "../Tickets";
 import { Anomalias } from "../Anomalias";
 import { ParteVender } from "./Vender";
 import "./estilos.css";
+import "../piezas.css";
 import "./tema.css";
 
 // La interfaz de celular (una cosa por vez, tarjetas y hojas), con la

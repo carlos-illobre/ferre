@@ -1,4 +1,4 @@
-import { useVolverCierra } from "../../../plataforma/navegacion/volver";
+import { Aviso, Boton, Hoja, Toast } from "../../../plataforma/interfaz/piezas";
 import { useEffect, useRef, type ReactNode } from "react";
 
 // Piezas del sistema visual (docs/sistema-visual.md, rediseño de mockups/Ferre iOS.html): íconos de
@@ -31,48 +31,11 @@ export function Icono({ nombre, tam = 20, grosor = 2, className }: { nombre: key
   );
 }
 
-// Hoja: en el celular sube desde abajo; en la computadora es una ventana centrada. Cierra
-// tocando el fondo, con Escape o con el botón que le pase el contenido.
-const hojasAbiertas: (() => void)[] = [];
-export function Hoja({ titulo, extra, alCerrar, children, testId }: { titulo?: ReactNode; extra?: ReactNode; alCerrar: () => void; children: ReactNode; testId?: string }) {
-  // El botón de volver del celular cierra la hoja y deja la pantalla de abajo como estaba.
-  useVolverCierra(alCerrar);
-  useEffect(() => {
-    // Con varias hojas apiladas (la ficha y, encima, una explicación), Escape cierra la de arriba.
-    hojasAbiertas.push(alCerrar);
-    const tecla = (e: KeyboardEvent) => { if (e.key === "Escape" && hojasAbiertas[hojasAbiertas.length - 1] === alCerrar) { e.stopPropagation(); alCerrar(); } };
-    window.addEventListener("keydown", tecla, true);
-    return () => { window.removeEventListener("keydown", tecla, true); const i = hojasAbiertas.lastIndexOf(alCerrar); if (i >= 0) hojasAbiertas.splice(i, 1); };
-  }, [alCerrar]);
-  return (
-    <div className="hoja-fondo" onClick={alCerrar} role="presentation">
-      <div className="hoja" role="dialog" aria-label={typeof titulo === "string" ? titulo : undefined} onClick={(e) => e.stopPropagation()} data-testid={testId}>
-        <div className="manija" aria-hidden="true" />
-        {titulo !== undefined && <div className="titulo-hoja"><span>{titulo}</span>{extra}</div>}
-        {children}
-      </div>
-    </div>
-  );
-}
-
-export function Toast({ texto, alCerrar, testId = "mensaje" }: { texto: string | null; alCerrar: () => void; testId?: string }) {
-  if (!texto) return null;
-  return (
-    <div className="toast" role="status" data-testid={testId}>
-      <span>{texto}</span>
-      <button type="button" onClick={alCerrar} aria-label="Cerrar aviso">×</button>
-    </div>
-  );
-}
-
+// Hoja, aviso flotante y aviso de error: las piezas compartidas con la computadora
+// (plataforma/interfaz, decisión 85). El aviso de error del celular se cierra con «Cerrar».
+export { Hoja, Toast };
 export function AvisoError({ texto, alCerrar }: { texto: string | null | undefined; alCerrar?: () => void }) {
-  if (!texto) return null;
-  return (
-    <div className="aviso-error" role="alert">
-      <span>{texto}</span>
-      {alCerrar && <button type="button" onClick={alCerrar}>Cerrar</button>}
-    </div>
-  );
+  return <Aviso tipo="error" accion={alCerrar && <Boton tam="chico" onClick={alCerrar}>Cerrar</Boton>}>{texto || null}</Aviso>;
 }
 
 export function Segmentos<T extends string>({ opciones, actual, alElegir, chico }: { opciones: { valor: T; nombre: string }[]; actual: T; alElegir: (v: T) => void; chico?: boolean }) {

@@ -44,6 +44,7 @@ import { Roles } from "../Roles";
 import { Tickets } from "../Tickets";
 import { Anomalias } from "../Anomalias";
 import "./base/estilos/base.css";
+import "../piezas.css";
 import "./base/estilos/entrar.css";
 import "./tema.css";
 

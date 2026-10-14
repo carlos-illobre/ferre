@@ -204,13 +204,13 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
         <div className="acciones" style={{ flexWrap: "wrap" }}>
           <Explicacion className="boton texto" valor={`¿Cómo se calcula el costo ${pesos(costo)}?`} pasos={p.explicacion_costo.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`]} />
           {p.fecha_lista && p.lista_importada_id && (
-            <button type="button" className="boton texto gris" data-testid="bajar-lista" onClick={() => descargar(`/listas/${p.lista_importada_id}/archivo`, `lista ${p.proveedor ?? ""} ${p.fecha_lista}.xlsx`).catch((err: Error) => setMensaje(`No se pudo bajar la lista: ${err.message}`))}>
+            <button type="button" className="boton texto" data-testid="bajar-lista" onClick={() => descargar(`/listas/${p.lista_importada_id}/archivo`, `lista ${p.proveedor ?? ""} ${p.fecha_lista}.xlsx`).catch((err: Error) => setMensaje(`No se pudo bajar la lista: ${err.message}`))}>
               Bajar el Excel de la lista del {fecha(p.fecha_lista)}
             </button>
           )}
         </div>
       )}
-      <button type="button" className="boton tinta" onClick={alCerrar}>Listo</button>
+      <button type="button" className="boton marino" onClick={alCerrar}>Listo</button>
     </Hoja>
   );
 }

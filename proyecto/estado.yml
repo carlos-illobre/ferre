@@ -1054,7 +1054,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 hecha: todo el servidor está en tres capas (ruta, reglas, datos), con control automático. Falta mover las pantallas a `pantallas/` y un solo juego de piezas de interfaz (010-T012)"
+  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 hecha: todo el servidor está en tres capas (ruta, reglas, datos), con control automático. Las pantallas están en `pantallas/` y las piezas de interfaz (botón, hoja, aviso, aviso flotante y visor de la cámara) son una sola para el celular y la computadora (decisión 85). Falta la revisión independiente"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
@@ -1075,7 +1075,6 @@ RNF-60:
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "El precio del servidor engorda el catálogo que baja la computadora (la explicación de cada precio viaja con cada producto); no se midió todavía con los 11.000 productos reales"
-    - "El celular y la computadora siguen con un juego de piezas de interfaz cada uno (botón, hoja, aviso, visor de la cámara), y se ven distinto: unificarlos cambia cómo se ve una de las dos interfaces y espera la decisión de Carlos (010-T012)"
     - "Los roles asignables, los celulares con huella y la entrada todavía piden al servidor desde la pantalla, sin la memoria compartida de consultas"
     - "Pedidos a proveedores ya es una sola pantalla para los dos lados, pero su regla sigue escrita dentro de la pantalla, no en la carpeta de negocio"
     - "El borrador del ingreso (lo cargado sobrevive a una recarga) vale solo en la computadora; en el celular no se guarda, para no ocupar su almacenamiento"

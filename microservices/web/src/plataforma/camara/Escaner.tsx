@@ -1,5 +1,7 @@
+import "./escaner.css";
 import { useEffect, useRef, useState } from "react";
 import { useVolverCierra } from "../navegacion/volver";
+import { useDialogo } from "../interfaz/piezas";
 
 // Escaneo con la cámara del celular (issue #52). Detección nativa del navegador donde
 // existe (Chrome en Android); si no, una librería de decodificación cargada recién ahí.
@@ -19,6 +21,8 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
   useEffect(() => { alCerrarRef.current = alCerrar; }, [alCerrar]);
   // El botón de volver del celular cierra la cámara y deja la pantalla como estaba.
   useVolverCierra(alCerrar);
+  // Es una ventana modal: queda encima de cualquier otra (una hoja abierta) y se puede usar.
+  const contenedor = useDialogo(alCerrar);
 
   useEffect(() => {
     let vivo = true;
@@ -64,7 +68,7 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
   }, [alDetectar]);
 
   return (
-    <div className="escaner" role="dialog" aria-label="Escanear código de barras" data-testid="escaner">
+    <dialog ref={contenedor} className="escaner" aria-label="Escanear código de barras" data-testid="escaner">
       <video ref={video} muted playsInline className={activa ? "activa" : ""} />
       {activa && <div className="guia" aria-hidden="true" />}
       <div className="escaner-abajo">
@@ -75,6 +79,6 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
           <button type="button" className="grande" onClick={alCerrar}>Cerrar</button>
         </form>
       </div>
-    </div>
+    </dialog>
   );
 }

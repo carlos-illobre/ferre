@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { urlDeFoto } from "../../../api";
-import { Icono } from "./base";
+import { AvisoError, Icono } from "./base";
 import { useVolverCierra } from "../../../plataforma/navegacion/volver";
 
 // Con la foto abierta en grande, el botón de volver del celular la cierra (como cualquier otra
@@ -49,12 +49,12 @@ export function FotoProducto({ id, url: urlCruda, descripcion, alSubir }: { id: 
           <figure className="foto-grande" onClick={(e) => e.stopPropagation()}>
             {url ? <img src={url} alt={descripcion} style={{ viewTransitionName: nombre }} /> : <div className="sin-foto grande" style={{ viewTransitionName: nombre }}><Icono nombre="camara" tam={64} grosor={1.2} /></div>}
             <figcaption>{descripcion}{!url && <><br /><small>Este producto todavía no tiene foto.</small></>}</figcaption>
-            {error && <div className="aviso-error" role="alert"><span>{error}</span></div>}
+            <AvisoError texto={error} />
             <div className="acciones">
               {alSubir && (
                 <>
                   <input ref={archivo} type="file" accept="image/*" capture="environment" hidden onChange={elegida} data-testid="archivo-foto" />
-                  <button type="button" className="boton coral" disabled={subiendo} onClick={() => archivo.current?.click()} data-testid="sacar-foto"><Icono nombre="camara" tam={18} />{subiendo ? "Subiendo…" : url ? "Sacar otra foto" : "Sacar foto"}</button>
+                  <button type="button" className="boton principal" disabled={subiendo} onClick={() => archivo.current?.click()} data-testid="sacar-foto"><Icono nombre="camara" tam={18} />{subiendo ? "Subiendo…" : url ? "Sacar otra foto" : "Sacar foto"}</button>
                 </>
               )}
               <button type="button" className="boton" onClick={() => cambiar(false)}>Cerrar</button>

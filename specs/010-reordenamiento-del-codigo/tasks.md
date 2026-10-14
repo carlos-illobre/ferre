@@ -9,7 +9,7 @@ etapas. Cada tarea termina con todo funcionando y desplegado en pruebas.
 - [x] T002 Etapa 2a: carpeta `plataforma/` con las piezas que ya no dependían del negocio (teclas, flechas, atajos, botón de volver, lector con la cámara, espera al tipear) y control automático de la regla (depende de T001)
 - [x] T010 Etapa 2b: desatar del negocio y pasar a `plataforma/` el guardado local, la cola de envíos, las preferencias y la navegación; y sacar de la tecnología de teclado los nombres propios de la aplicación (depende de T002)
 - [x] T011 Etapa 2c: el cliente del servidor, el achicado de fotos y la conexión en tiempo real pasan a `plataforma/`; en la aplicación queda solo lo propio de Ferrebress (depende de T010)
-- [ ] T012 Etapa 2d: un solo juego de piezas de interfaz en `plataforma/` (botón, hoja, aviso, tabla) y los estilos del visor de la cámara junto al lector; se hace con la etapa 3, al unificar las pantallas (depende de T003)
+- [x] T012 [interfaz] Etapa 2d: un solo juego de piezas de interfaz en `plataforma/` (botón, hoja, aviso, aviso flotante) y los estilos del visor de la cámara junto al lector, con el aspecto de la computadora en las dos interfaces (decisión 85); las pantallas pasan a `pantallas/` (depende de T003)
 - [x] T003 Etapa 3a: la regla de la venta (renglones, precios, cobrar, «no llevó») una sola vez, con las dos interfaces encima y sus pruebas sin pantalla (depende de T002)
 - [x] T013 Etapa 3a, segunda parte: «Hoy» y «Anular» una sola vez, con TanStack Query, y los tipos de la venta que llegan del servidor (depende de T003)
 - [x] T004 Etapa 3b: negocio de depósito (ingreso, inventario, estanterías, pedidos) una sola vez (depende de T003)

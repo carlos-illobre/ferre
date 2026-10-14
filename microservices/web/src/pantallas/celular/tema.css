@@ -27,7 +27,7 @@
 .sugeridos h2 { margin: 6px 4px 0; font-size: 15px; font-weight: 700; color: var(--gris); }
 
 /* El margen elegido se sigue leyendo al tocarlo o pasarle el mouse. */
-.cuadricula-5 .boton.activo:hover, .cuadricula-5 .boton.activo:active { background: var(--tinta); color: #fff; }
+.cuadricula-5 .boton.activo, .cuadricula-5 .boton.activo:hover, .cuadricula-5 .boton.activo:active { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
 
 /* Entrar: todo en el centro de la pantalla, no pegado abajo. */
 .entrar { justify-content: center; gap: 32px; padding: 32px 28px; }
@@ -49,13 +49,6 @@ button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; backgroun
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3v11H4Z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3Cpath d='M19 2v4M17 4h4'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3v11H4Z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3Cpath d='M19 2v4M17 4h4'/%3E%3C/svg%3E") center / contain no-repeat; }
 
-/* Un botón blanco sobre fondo claro no parecía botón: lleva borde. Y el de buscar duplicados,
-   que es la acción de esa pantalla, va lleno y a todo el ancho. */
-.boton.blanco { border: 1.500px solid var(--p-borde-fuerte); box-shadow: none; }
-.boton[data-testid="buscar-duplicados"] { width: 100%; height: 52px; border: 0; border-radius: 14px; background: var(--p-verde); color: #fff; font-size: 16px; white-space: normal; }
-.boton[data-testid="buscar-duplicados"]::before { content: ""; flex: none; width: 20px; height: 20px; background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.800-3.800'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.800-3.800'/%3E%3C/svg%3E") center / contain no-repeat; }
 
 /* Vender: los atajos (lo último que se vendió) son cuatro cuadrados amarillos pegados a la
    búsqueda; lo que ya está en la venta va aparte, con título verde y franja naranja, para
@@ -77,7 +70,7 @@ button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; backgroun
    marcado, así lo blanco resalta; todo lo que se toca lleva borde o color; y cada color
    dice una cosa: verde oscuro = dónde estoy y títulos, naranja = la acción principal,
    amarillo = atajos y avisos, blanco con borde = botones comunes y campos. */
-body, .hoja { background: var(--p-fondo); }
+body { background: var(--p-fondo); }
 .titulo { color: var(--p-verde); }
 
 /* Tarjetas y listas: borde fino, para que se despeguen del fondo. */
@@ -91,13 +84,6 @@ body, .hoja { background: var(--p-fondo); }
 .tarjeta .seccion { padding-left: 12px; }
 
 /* Botones: el común es blanco con borde; el oscuro y el naranja siguen llenos. */
-.boton { background: #fff; border: 1.500px solid var(--p-borde-fuerte); }
-.boton.tinta, .boton.coral, .boton.principal, .cuadricula-5 .boton.activo { border-color: transparent; }
-.boton.tinta { background: var(--p-verde); color: #fff; }
-.boton.coral { background: var(--p-naranja); color: #fff; box-shadow: 0 2px 0 var(--p-naranja-sombra); }
-.boton.texto { background: var(--p-naranja-suave); border-color: var(--p-naranja-borde); color: var(--p-naranja-texto-fuerte); }
-.boton.texto.gris { background: #fff; border-color: var(--p-borde-fuerte); color: var(--p-texto-medio); }
-.boton:disabled { background: var(--p-relleno); border-color: var(--p-relleno); color: var(--p-texto-2); box-shadow: none; }
 .cuadricula-5 .boton { border-color: var(--p-borde-fuerte); }
 .cuadricula-5 .boton.activo { background: var(--p-verde); }
 
@@ -191,7 +177,7 @@ body, .hoja { background: var(--p-fondo); }
 .cobro .medios button { display: grid; place-items: center; width: 42px; height: 44px; padding: 0; border-radius: 12px; }
 .cobro .acciones { grid-template-columns: 52px minmax(0, 1fr); }
 .cobro .no-llevo { display: grid; place-items: center; width: 52px; height: 48px; padding: 0; border-radius: 14px; }
-.cobro .boton.principal { height: 48px; border-radius: 14px; }
+.cobro .boton.principal { height: 48px; }
 .cobro-total { flex: 1; }
 .cobro-total .importe { font-size: 24px; }
 .cobro .medios { gap: 5px; }
@@ -219,8 +205,6 @@ body, .hoja { background: var(--p-fondo); }
 .fila-stock.abierta { border: 2px solid var(--p-verde); }
 .fila-stock.abierta > .fila { background: var(--p-fondo-2); }
 .detalle-stock { padding: 12px 16px 14px; border-top: 1px solid var(--p-borde); background: var(--p-fondo-2); }
-.boton.corregir-stock { width: 100%; height: 48px; background: var(--p-verde); border-color: var(--p-verde); color: #fff; font-size: 16px; font-weight: 700; }
-.boton.corregir-stock:active { background: var(--p-verde-2); }
 
 /* La foto del producto al lado de su renglón, en Inventario y en Ingreso. */
 .con-foto-de-producto { display: flex; align-items: center; gap: 4px; padding-left: 12px; }
@@ -243,7 +227,6 @@ body, .hoja { background: var(--p-fondo); }
 
 /* Motivos frecuentes al corregir un stock: se tocan en vez de escribirlos. */
 .motivos-de-ajuste { display: flex; flex-wrap: wrap; gap: 6px; }
-.motivos-de-ajuste .boton.chico { height: 36px; font-size: 13px; padding: 0 10px; border-radius: 10px; }
 .entrar-marca-celular { font-size: 38px; padding-bottom: 14px; }
 
 /* El menú de abajo reparte el ancho entre las partes que la persona puede usar (RF-72). */

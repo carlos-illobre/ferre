@@ -146,14 +146,14 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: {
                 <input className="campo" style={{ flex: 1, height: 44, minWidth: 0 }} placeholder="Motivo" value={motivo} onChange={(e) => setMotivo(e.target.value)} data-testid="motivo" />
               </div>
               <div className="motivos-de-ajuste" role="group" aria-label="Motivos frecuentes">
-                {MOTIVOS_DE_AJUSTE.map((m) => <button key={m} type="button" className={`boton chico ${motivo === m ? "tinta" : ""}`} aria-pressed={motivo === m} onClick={() => setMotivo(m)}>{m}</button>)}
+                {MOTIVOS_DE_AJUSTE.map((m) => <button key={m} type="button" className={`boton chico ${motivo === m ? "marino" : ""}`} aria-pressed={motivo === m} onClick={() => setMotivo(m)}>{m}</button>)}
               </div>
               <div className="cuadricula-2">
-                <button type="button" className="boton tinta" onClick={guardar} data-testid="guardar-ajuste">Guardar</button>
+                <button type="button" className="boton marino" onClick={guardar} data-testid="guardar-ajuste">Guardar</button>
                 <button type="button" className="boton" onClick={() => setCorrigiendo(false)}>Cancelar</button>
               </div>
             </>
-          ) : corrige && <button type="button" className="boton corregir-stock" onClick={() => { setCorrigiendo(true); setReal(String(cantidad)); setMotivo(""); }} data-testid="corregir">
+          ) : corrige && <button type="button" className="boton marino ancho" onClick={() => { setCorrigiendo(true); setReal(String(cantidad)); setMotivo(""); }} data-testid="corregir">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4ZM13.500 6.500l4 4" /></svg>Corregir el stock
           </button>}
         </div>
@@ -266,7 +266,7 @@ function Ingreso() {
         );
       })}
       {renglones.length > 0 && (
-        <button type="button" className="boton coral principal" onClick={confirmar} disabled={ocupado} data-testid="registrar">
+        <button type="button" className="boton principal grande ancho" onClick={confirmar} disabled={ocupado} data-testid="registrar">
           <span>Registrar ingreso</span><span className="importe" data-testid="total">{pesosCortos(total)}</span>
         </button>
       )}
@@ -335,7 +335,7 @@ function Contar() {
         <Hoja titulo="Sector nuevo" alCerrar={() => setNuevo(false)}>
           <form className="formulario" onSubmit={(e) => { e.preventDefault(); const n = String(new FormData(e.currentTarget).get("nombre") ?? "").trim(); if (n) void crearSector(n); }}>
             <label className="renglon"><span>Nombre</span><input name="nombre" placeholder="Sector nuevo (Estantería 1, Pared herramientas…)" required autoFocus /></label>
-            <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton tinta">Agregar sector</button></div>
+            <div className="acciones" style={{ padding: "12px 0" }}><button type="submit" className="boton marino">Agregar sector</button></div>
           </form>
         </Hoja>
       )}
@@ -411,7 +411,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           <div className="tilde"><Icono nombre="tilde" tam={30} grosor={3} className="" /></div>
           <strong>{conteo.sector} cerrado</strong>
           <p className="subtitulo" role="status" data-testid="resultado-conteo">{resultado.contados} productos contados, {resultado.ajustados} con diferencia ajustada{resultado.puestos_en_cero ? `, ${resultado.puestos_en_cero} puestos en cero` : ""}.</p>
-          <button type="button" className="boton tinta" onClick={alSalir}>Contar otro sector</button>
+          <button type="button" className="boton marino" onClick={alSalir}>Contar otro sector</button>
         </div>
       </>
     );
@@ -432,7 +432,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           </label>
           <div className="acciones auto-1fr">
             <button type="button" className="boton gris-oscuro" onClick={() => setProducto(null)}>Cancelar</button>
-            <button type="button" className="boton coral" style={{ height: 50 }} onClick={guardar} data-testid="siguiente">Siguiente</button>
+            <button type="button" className="boton principal" style={{ height: 50 }} onClick={guardar} data-testid="siguiente">Siguiente</button>
           </div>
         </div>
       ) : (
@@ -475,13 +475,13 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           <div className="lista">{conteo.sin_contar.map((p) => <div key={p.producto_id} className="fila"><span className="nombre">{p.descripcion}</span><small className="derecha">teórico {Number(p.stock_teorico)}</small></div>)}</div>
         </>
       )}
-      {conteo.renglones.length > 0 && !cerrando && <button type="button" className="boton tinta principal centrado" onClick={() => setCerrando(true)} data-testid="cerrar">Cerrar {conteo.sector}</button>}
+      {conteo.renglones.length > 0 && !cerrando && <button type="button" className="boton marino grande ancho centrado" onClick={() => setCerrando(true)} data-testid="cerrar">Cerrar {conteo.sector}</button>}
       {cerrando && (
         <div className="tarjeta" data-testid="confirmar-cierre">
           <p>Cada diferencia se aplica al stock como ajuste explicado.{conteo.sin_contar.length > 0 ? ` Hay ${conteo.sin_contar.length} ${conteo.sin_contar.length === 1 ? "producto" : "productos"} del sector que no contaste.` : ""}</p>
-          {conteo.sin_contar.length > 0 && <button type="button" className="boton coral" onClick={() => cerrar(true)}>Cerrar y poner en cero los no contados</button>}
-          <button type="button" className="boton tinta" onClick={() => cerrar(false)} data-testid="cerrar-confirmar">{conteo.sin_contar.length > 0 ? "Cerrar y dejar los no contados como están" : "Sí, cerrar"}</button>
-          <button type="button" className="boton texto gris" onClick={() => setCerrando(false)}>Volver</button>
+          {conteo.sin_contar.length > 0 && <button type="button" className="boton principal" onClick={() => cerrar(true)}>Cerrar y poner en cero los no contados</button>}
+          <button type="button" className="boton marino" onClick={() => cerrar(false)} data-testid="cerrar-confirmar">{conteo.sin_contar.length > 0 ? "Cerrar y dejar los no contados como están" : "Sí, cerrar"}</button>
+          <button type="button" className="boton texto" onClick={() => setCerrando(false)}>Volver</button>
         </div>
       )}
       </div>
