@@ -9,12 +9,12 @@ const { app } = await import("../app.js");
 // pedido al servicio con quién lo hace, firmado con el token entre servicios.
 describe("/procesos", () => {
   let llamadas: { url: string; init: RequestInit }[];
-  let responder: () => Response;
+  let responder: (url: string, init: RequestInit) => Response;
   beforeEach(() => {
     base.actual = baseFalsa();
     llamadas = [];
     responder = () => Response.json([]);
-    vi.stubGlobal("fetch", async (url: string, init: RequestInit) => { llamadas.push({ url, init }); return responder(); });
+    vi.stubGlobal("fetch", async (url: string, init: RequestInit) => { llamadas.push({ url, init }); return responder(url, init); });
   });
   afterEach(() => vi.unstubAllGlobals());
 
@@ -54,14 +54,17 @@ describe("/procesos", () => {
     expect(base.actual.sqlDe(/insert into "evento"/)).toHaveLength(0);
   });
 
-  it("011-E22 crear, importar, marcar vigente y borrar quedan en «Quién hizo qué»; guardar el borrador no", async () => {
+  it("011-E22 crear, importar, cambiar el borrador, marcar vigente y borrar quedan en «Quién hizo qué», con el nombre del proceso", async () => {
     responder = () => Response.json({ id: "p1", nombre: "Venta en el mostrador" }, { status: 201 });
     await pedir(app, "POST", "/procesos", { rol: "dueño", cuerpo: { nombre: "Venta en el mostrador" } });
     await pedir(app, "POST", "/procesos", { rol: "dueño", cuerpo: { nombre: "Importado", bpmn: "<x/>" } });
     responder = () => Response.json({ id: "p1", nombre: "Venta en el mostrador" });
     await pedir(app, "POST", "/procesos/p1/vigente", { rol: "dueño", cuerpo: { revision: 3 } });
+    // El borrador se guarda a cada rato: se anota el primero de cada persona en cada proceso, no cada uno.
     await pedir(app, "PUT", "/procesos/p1/borrador", { rol: "dueño", cuerpo: { revision: 4, bpmn: "<x/>" } });
-    responder = () => new Response(null, { status: 204 });
+    await pedir(app, "PUT", "/procesos/p1/borrador", { rol: "dueño", cuerpo: { revision: 5, bpmn: "<y/>" } });
+    // El servicio borra sin devolver nada: el nombre se lee antes.
+    responder = (_url, init) => init.method === "DELETE" ? new Response(null, { status: 204 }) : Response.json({ id: "p1", nombre: "Venta en el mostrador" });
     const borrado = await pedir(app, "DELETE", "/procesos/p1", { rol: "dueño" });
     expect(borrado.status).toBe(204);
     const eventos = base.actual.sqlDe(/insert into "evento"/).map((c) => [c.params[1], JSON.parse(String(c.params.at(-1)))]);
@@ -69,7 +72,8 @@ describe("/procesos", () => {
       ["proceso.creado", { id: "p1", nombre: "Venta en el mostrador" }],
       ["proceso.importado", { id: "p1", nombre: "Venta en el mostrador" }],
       ["proceso.vigente", { id: "p1", nombre: "Venta en el mostrador" }],
-      ["proceso.borrado", { id: "p1" }],
+      ["proceso.borrador_cambiado", { id: "p1", nombre: "Venta en el mostrador" }],
+      ["proceso.borrado", { id: "p1", nombre: "Venta en el mostrador" }],
     ]);
     expect(JSON.parse(new TextDecoder().decode(llamadas[0]!.init.body as ArrayBuffer))).toEqual({ nombre: "Venta en el mostrador" });
   });

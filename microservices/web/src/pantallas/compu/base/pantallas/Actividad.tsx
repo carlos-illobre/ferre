@@ -49,6 +49,7 @@ const QUE: Record<string, { nombre: string; color?: Color }> = {
   "proceso.importado": { nombre: "Proceso importado" },
   "proceso.renombrado": { nombre: "Proceso con otro nombre" },
   "proceso.vigente": { nombre: "Proceso vigente", color: "azul" },
+  "proceso.borrador_cambiado": { nombre: "Cambio en el borrador de un proceso" },
   "proceso.borrador_descartado": { nombre: "Borrador de un proceso descartado" },
   "proceso.borrado": { nombre: "Proceso borrado", color: "mal" },
 };

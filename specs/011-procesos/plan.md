@@ -124,7 +124,10 @@ Ferrebress anota cada cambio en su registro de eventos (E22).
   El servicio no publica puertos: solo lo alcanza el servidor de Ferrebress por la red interna.
   Las cabeceras de quién llama solo valen con el token: no se pueden fabricar desde el navegador.
 - **Qué queda registrado:** el autor y la fecha de cada versión en el módulo, y cada cambio
-  (crear, cambiar, marcar vigente, importar, borrar) en «Quién hizo qué» de Ferrebress.
+  (crear, cambiar el nombre, cambiar el borrador, marcar vigente, descartar el borrador,
+  importar, borrar) en «Quién hizo qué» de Ferrebress, con el nombre del proceso. El borrador
+  se guarda solo a cada rato mientras se dibuja: se anota el primer cambio de cada persona en
+  cada proceso y, si sigue dibujando, uno cada media hora.
 
 ## Pruebas
 
