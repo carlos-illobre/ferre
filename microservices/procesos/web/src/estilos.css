@@ -236,3 +236,6 @@
 .procesos-hoja-cabeza .procesos-cerrar-hoja:active { background: var(--procesos-borde, #e2e8e5); }
 /* Lo de bpmn-js (el menú del paso elegido trae z-index 100) queda adentro del dibujo: nunca tapa los botones de acercar ni las hojas. */
 .procesos-lienzo { z-index: 0; }
+/* El paso elegido, con el naranja de la aplicación (maqueta aprobada), no con el azul de bpmn-js. */
+.procesos .djs-container { --element-selected-outline-stroke-color: var(--procesos-accion); }
+.procesos .djs-element.selected .djs-outline { stroke-dasharray: 4 3; stroke-width: 2px; }

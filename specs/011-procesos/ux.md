@@ -20,6 +20,7 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
   solo los íconos, que se siguen pudiendo arrastrar), el paso elegido a la derecha (plegado,
   muestra su nombre) y «Los pasos, en orden» abajo. Cada uno recuerda cómo quedó en esa
   computadora.
+- **Elegir un paso en el dibujo abre su panel** si estaba plegado, para ver sus datos sin un clic más; el paso elegido se marca con el naranja de la aplicación, en el celular también (decisión de Carlos del 2026-10-14, al comparar con la maqueta).
 - **El paso elegido** muestra nombre, tipo, quién lo hace, pantalla de Ferrebress donde se
   hace, cómo se hace y con qué sigue, y el botón con el tacho para quitarlo.
 - **Teclado:** Ctrl+Z y Ctrl+Y deshacen y rehacen; Supr quita lo elegido; las flechas pasan de
