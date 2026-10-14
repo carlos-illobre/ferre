@@ -29,6 +29,9 @@ const FIGURAS_CELU: { tipo: TipoDePaso | "carril"; nombre: string; corto: string
 // Los que se pueden poner en el recorrido desde «Pasos».
 const PASOS_DEL_RECORRIDO = FIGURAS_CELU.filter((f): f is { tipo: TipoDePaso; nombre: string; corto: string } => ["tarea", "persona", "sistema", "decision", "paralelo", "espera", "fin", "subproceso"].includes(f.tipo));
 
+// Lo que queda a la vista de «Agregar un paso» plegada: solo su título.
+const ALTO_HOJA_PLEGADA = 64;
+
 const claveDe = (l: Lugar) => `${l.desde}>${l.hasta ?? ""}`;
 
 export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Procesos; puede: Puede; pantallas: string[] }) {
@@ -38,6 +41,20 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
   const [lugarNuevo, setLugarNuevo] = useState<Lugar | null>(null);
   const [dialogo, setDialogo] = useState<null | "nuevo" | "renombrar" | "borrar" | "historial">(null);
   const archivo = useRef<HTMLInputElement>(null);
+  // «Agregar un paso» se pliega (arranca abierta); el logo de bpmn.io flota encima de lo que se ve
+  // de la hoja y se mueve con ella.
+  const [figurasAbiertas, setFigurasAbiertas] = useState(true);
+  const hojaFiguras = useRef<HTMLDivElement>(null);
+  const [altoHoja, setAltoHoja] = useState(0);
+  useEffect(() => {
+    const hoja = hojaFiguras.current;
+    if (!hoja || typeof ResizeObserver === "undefined") return;
+    const medir = () => setAltoHoja(hoja.offsetHeight);
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(hoja);
+    return () => observador.disconnect();
+  });
   const d = useDibujo(procesos);
   const dibuja = puede.dibujar && !procesos.sinConexion;
   const { abierto, lista } = procesos;
@@ -127,7 +144,8 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
         </div>
       )}
 
-      <div className={`procesos-panel procesos-dibujo procesos-dibujo-celu ${pestana === "diagrama" ? "" : "oculto"}`} aria-hidden={pestana !== "diagrama"}>
+      <div className={`procesos-panel procesos-dibujo procesos-dibujo-celu ${pestana === "diagrama" ? "" : "oculto"}`} aria-hidden={pestana !== "diagrama"}
+        style={{ "--procesos-hoja-visible": `${dibuja && pestana === "diagrama" ? (figurasAbiertas ? altoHoja : ALTO_HOJA_PLEGADA) : 0}px` } as React.CSSProperties}>
         {xml && <Lienzo ref={d.lienzo} xml={xml} soloLectura={!dibuja} tactil alCambiar={d.alCambiar} alCargar={d.alCargar} alElegir={d.setElegido} alError={procesos.avisar} />}
         <div className="procesos-zoom procesos-zoom-celu">
           <button type="button" className="procesos-boton icono" aria-label="Acercar" onClick={() => d.lienzo.current?.acercar()}><Icono nombre="mas" /></button>
@@ -135,9 +153,11 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
           <button type="button" className="procesos-boton icono" aria-label="Ver todo" onClick={() => d.lienzo.current?.verTodo()}><Icono nombre="ajustar" /></button>
         </div>
         {dibuja && pestana === "diagrama" && (
-          <div className="procesos-hoja procesos-hoja-figuras" data-testid="procesos-hoja-figuras">
-            <div className="procesos-tirador" />
-            <b>Agregar un paso</b>
+          <div ref={hojaFiguras} className={`procesos-hoja procesos-hoja-figuras ${figurasAbiertas ? "abierta" : "plegada"}`} data-testid="procesos-hoja-figuras">
+            <button type="button" className="procesos-hoja-titulo" aria-expanded={figurasAbiertas} onClick={() => setFigurasAbiertas((a) => !a)} data-testid="procesos-plegar-hoja">
+              <span className="procesos-tirador" />
+              <span className="procesos-hoja-titulo-texto"><b>Agregar un paso</b><Icono nombre={figurasAbiertas ? "abajo" : "arriba"} /></span>
+            </button>
             <p className="procesos-ayuda">Arrastralo al dibujo, o tocalo para ponerlo después del paso elegido.</p>
             <div className="procesos-figuras-celu">
               {FIGURAS_CELU.map((f) => (

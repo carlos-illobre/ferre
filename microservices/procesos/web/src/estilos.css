@@ -176,7 +176,6 @@
 .procesos-menu-celu { display: flex; flex-direction: column; }
 .procesos-menu-celu button { display: flex; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--procesos-borde-suave, #dbe3dc); background: none; font: inherit; color: var(--procesos-tinta, #18201e); text-align: left; padding: 12px 4px; min-height: 52px; cursor: pointer; }
 .procesos-menu-celu button.peligro { color: var(--procesos-peligro, #b42318); border-bottom: 0; }
-.procesos-dibujo-celu .bjs-powered-by { top: 8px !important; right: 66px !important; left: auto !important; bottom: auto !important; }
 
 /* Panel de figuras abierto: una por renglón, el ícono a la izquierda y el nombre a la derecha,
    todas a la vista sin desplazarse (ajuste de Carlos, 2026-10-14). */
@@ -194,3 +193,15 @@
 .procesos-figuras-celu { grid-auto-rows: 64px; }
 .procesos-figura-celu { min-height: 0; height: 64px; justify-content: center; padding: 6px 2px; font-size: 13px; }
 .procesos-figura-celu span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* Celular: «Agregar un paso» se pliega deslizándose hacia abajo y deja a la vista solo su título;
+   el logo de bpmn.io flota abajo a la izquierda, encima de lo que se ve de la hoja, y se mueve con
+   ella. Solo posición, con la curva de la aplicación (Carlos, 2026-10-14). */
+.procesos-hoja-figuras { transition: transform 350ms cubic-bezier(0.32, 0.72, 0, 1); padding-top: 0; }
+.procesos-hoja-figuras.plegada { transform: translateY(calc(100% - 64px)); }
+.procesos-hoja-figuras.plegada > :not(.procesos-hoja-titulo) { visibility: hidden; }
+.procesos-hoja-titulo { display: block; width: 100%; border: 0; background: none; font: inherit; color: inherit; padding: 8px 0 4px; min-height: 48px; cursor: pointer; text-align: left; }
+.procesos-hoja-titulo .procesos-tirador { display: block; margin-bottom: 8px; }
+.procesos-hoja-titulo-texto { display: flex; align-items: center; justify-content: space-between; }
+.procesos-dibujo-celu .bjs-powered-by { top: auto !important; right: auto !important; left: 10px !important; bottom: 10px !important; transform: translateY(calc(-1 * var(--procesos-hoja-visible, 0px))); transition: transform 350ms cubic-bezier(0.32, 0.72, 0, 1); }
+@media (prefers-reduced-motion: reduce) { .procesos-hoja-figuras, .procesos-dibujo-celu .bjs-powered-by { transition: none; } }

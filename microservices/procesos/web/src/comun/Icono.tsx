@@ -27,6 +27,7 @@ const TRAZOS = {
   izquierda: '<path d="M15 5 L8 12 L15 19"/>',
   derecha: '<path d="M9 5 L16 12 L9 19"/>',
   abajo: '<path d="M5 9 L12 16 L19 9"/>',
+  arriba: '<path d="M5 15 L12 8 L19 15"/>',
   lista: '<path d="M9 6 H20 M9 12 H20 M9 18 H20"/><circle cx="5" cy="6" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="18" r="1"/>',
   diagrama: '<rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/><path d="M10 7 H17 V14"/>',
   arrastrar: '<circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/>',

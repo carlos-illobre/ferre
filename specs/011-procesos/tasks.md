@@ -19,4 +19,5 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [ ] T012 La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T010, T011)
 - [x] T014 [ajuste] Con el panel de figuras abierto, cada figura va en un renglón con el ícono a la izquierda y el nombre a la derecha, sin barra de desplazamiento; los menús tapan el dibujo; el logo de bpmn.io sin atajo (pedidos de Carlos del 2026-10-14)
 - [x] T015 [interfaz] En el celular, primero la pestaña «Diagrama», que es la que se abre, y después «Pasos»; las doce figuras del mismo tamaño y con nombres cortos (pedidos de Carlos del 2026-10-14)
+- [x] T016 [interfaz] En el celular, «Agregar un paso» se pliega y se despliega; el logo de bpmn.io flota abajo a la izquierda, encima de la hoja, y la acompaña al abrirse y cerrarse (pedido de Carlos del 2026-10-14)
 - [ ] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

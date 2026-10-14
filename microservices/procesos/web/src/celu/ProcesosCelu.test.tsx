@@ -94,16 +94,22 @@ describe("el celular", () => {
     expect(lienzoFalso.llamadas).toContainEqual(["quitar", "Cobrar"]);
   });
 
-  it("011-E30 «Diagrama» muestra el dibujo con acercar, alejar y ver todo, y la hoja «Agregar un paso» con las figuras", async () => {
+  it("011-E30 «Diagrama» muestra el dibujo con acercar, alejar y ver todo, y la hoja «Agregar un paso» con las figuras, que se pliega", async () => {
     await abrirVenta();
     fireEvent.click(screen.getByTestId("procesos-pestana-diagrama"));
     const hoja = screen.getByTestId("procesos-hoja-figuras");
     // Las doce, con nombres cortos; el nombre completo, para los lectores de pantalla.
-    expect(within(hoja).getAllByRole("button").map((b) => b.textContent)).toEqual(["Inicio", "Tarea", "Persona", "Sistema", "Decisión", "Paralelo", "Espera", "Fin", "Subproceso", "Carril", "Documento", "Nota"]);
+    expect(within(hoja).getAllByRole("button").filter((b) => b.className.includes("procesos-figura-celu")).map((b) => b.textContent)).toEqual(["Inicio", "Tarea", "Persona", "Sistema", "Decisión", "Paralelo", "Espera", "Fin", "Subproceso", "Carril", "Documento", "Nota"]);
     expect(within(hoja).getByRole("button", { name: "Tarea de una persona" })).toBeTruthy();
     fireEvent.touchStart(within(hoja).getByText("Decisión"));
     expect(lienzoFalso.llamadas.find(([n]) => n === "empezarArrastre")?.[2]).toBe("decision");
     for (const nombre of ["Acercar", "Alejar", "Ver todo"]) fireEvent.click(screen.getByRole("button", { name: nombre }));
+    // La hoja se pliega y se despliega tocando su título.
+    fireEvent.click(screen.getByTestId("procesos-plegar-hoja"));
+    expect(hoja.className).toContain("plegada");
+    expect(screen.getByTestId("procesos-plegar-hoja").getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(screen.getByTestId("procesos-plegar-hoja"));
+    expect(hoja.className).toContain("abierta");
     expect(lienzoFalso.llamadas.filter(([n]) => ["acercar", "alejar"].includes(n)).map(([n]) => n)).toEqual(["acercar", "alejar"]);
   });
 
