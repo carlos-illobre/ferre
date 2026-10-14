@@ -3,6 +3,7 @@ import { api, reducirImagen } from "../api";
 import { useFoto } from "./tickets";
 import { PedirFotoAlCelular } from "./PedirFoto";
 import "./foto-de-factura.css";
+import type { FotoDeComprobante } from "@servidor/compras";
 
 // La foto del comprobante reemplaza al número tipeado (RF-50, decisión 32): se le saca una
 // foto a la factura o al remito y, cuando hace falta el número o cualquier otro dato, se
@@ -26,7 +27,7 @@ export function FotoDeFactura({ foto, alCambiar, conCelular = false, nombre }: {
     try {
       const datos = new FormData();
       datos.append("foto", await reducirImagen(f, 2000), "comprobante.jpg");
-      alCambiar((await api<{ foto: string }>("/compras/fotos", { method: "POST", body: datos })).foto);
+      alCambiar((await api<FotoDeComprobante>("/compras/fotos", { method: "POST", body: datos })).foto);
     } catch (e) { const err = e as { estado?: number; message: string }; setError(err.estado ? `${err.message}.` : "Sin conexión: la foto se sube cuando vuelva internet. Probá de nuevo."); }
     finally { setSubiendo(false); }
   }

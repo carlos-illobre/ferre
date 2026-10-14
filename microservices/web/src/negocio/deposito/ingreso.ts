@@ -7,11 +7,12 @@ import type { Producto } from "../../producto";
 import { useProveedoresActivos, type Proveedor } from "../proveedores";
 import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo, type IngresoEnEspejo } from "./ingreso-en-espejo";
 import type { ItemDePedido, Pedido } from "@servidor/pedidos";
+import type { CompraEntrada, CompraRegistrada, CompraRepetida, TipoDeComprobante } from "@servidor/compras";
 
 // El ingreso de mercadería, una sola vez para el celular y la computadora (RNF-60): proveedor y
 // comprobante, los renglones que llegaron y registrar. Suma stock y, si el comprobante trae
 // otro costo, ese pasa a ser el vigente. Las pantallas solo muestran y deciden dónde va el foco.
-export type Comprobante = "factura" | "remito" | "sin_comprobante";
+export type Comprobante = TipoDeComprobante;
 export type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoTexto: string; costoLista: number | null };
 export type { Proveedor };
 
@@ -152,17 +153,17 @@ export function useIngreso(opciones: OpcionesDeIngreso) {
     if (ocupado || falta) return null;
     setOcupado(true); setError(null);
     try {
-      const r = await api<{ total: number; productos_nuevos: number; costos_actualizados: number }>("/compras", {
+      const r = await api<CompraRegistrada | CompraRepetida>("/compras", {
         method: "POST",
         body: JSON.stringify({
           id: crypto.randomUUID(), proveedor_id: proveedorId, fecha: fechaCompra, comprobante_tipo: comprobante, foto: comprobante === "sin_comprobante" ? null : foto,
           pedido_id: pedido?.id ?? null,
-          items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion.trim(), cantidad: x.cantidad, costo_unitario: x.costo })),
-        }),
+          items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion.trim(), cantidad: x.cantidad, costo_unitario: x.costo! })),
+        } satisfies CompraEntrada),
       });
       setRenglones([]); setFoto(null);
       contarAlEspejo(`Ingreso de ${proveedor?.nombre ?? "mercadería"} registrado en ${opciones.lado === "celular" ? "el celular" : "la computadora"}`);
-      return { total: r.total, proveedor: proveedor?.nombre ?? "", renglones: renglones.length, costosActualizados: r.costos_actualizados, productosNuevos: r.productos_nuevos, dePedido: pedido !== null };
+      return { total: r.total, proveedor: proveedor?.nombre ?? "", renglones: renglones.length, costosActualizados: "repetida" in r ? 0 : r.costos_actualizados, productosNuevos: "repetida" in r ? 0 : r.productos_nuevos, dePedido: pedido !== null };
     } catch (e) {
       setError(e instanceof ErrorApi ? e.message : opciones.textoSinConexion);
       return null;

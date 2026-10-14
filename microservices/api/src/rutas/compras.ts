@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import * as reglas from "../compras/reglas.js";
+import type { AnulacionDeCompra } from "../contratos/compras.js";
 
 export { carpetaComprobantes } from "../compras/reglas.js";
 
@@ -33,6 +34,6 @@ compras.get("/semana", exigirPermiso("negocio.numeros"), async (c) => c.json(awa
 compras.get("/:id", exigirPermiso("deposito.compras", "deposito.ingresos"), async (c) => c.json(await reglas.renglones(c.req.param("id"))));
 
 compras.post("/:id/anular", exigirPermiso("deposito.ingresos"), async (c) => {
-  const { motivo } = await c.req.json<{ motivo?: string }>().catch(() => ({}) as { motivo?: string });
+  const { motivo } = await c.req.json<AnulacionDeCompra>().catch(() => ({}) as AnulacionDeCompra);
   return (await reglas.anular(c.req.param("id"), motivo, c.get("sesion").usuario.id)) ? c.body(null, 204) : c.json({ error: "La compra no existe o ya está anulada" }, 409);
 });

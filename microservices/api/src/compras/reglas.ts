@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import { base, Deshacer, enTransaccion } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
+import type { CompraEntrada, CompraRegistrada, CompraReciente, CompraRepetida, FotoDeComprobante, GastosDeLaSemana, ItemDeCompraEntrada, RenglonDeCompra } from "../contratos/compras.js";
+import type { Enviable } from "../enviable.js";
 
 export { carpetaComprobantes } from "./datos.js";
 
@@ -10,8 +12,8 @@ export { carpetaComprobantes } from "./datos.js";
 // lista, pasa a ser el costo vigente de ese producto para ese proveedor, con la explicación
 // «según factura», porque el precio de venta sigue la realidad, no la lista.
 export const COMPROBANTES = ["factura", "remito", "sin_comprobante"] as const;
-export type ItemEntrada = { producto_id?: string | null; descripcion: string; marca?: string | null; cantidad: number; costo_unitario: number };
-export type CompraEntrada = { id?: string; proveedor_id: string; fecha?: string; comprobante_tipo: (typeof COMPROBANTES)[number]; comprobante_numero?: string | null; foto?: string | null; nota?: string | null; pedido_id?: string | null; items: ItemEntrada[] };
+export type ItemEntrada = ItemDeCompraEntrada;
+export type { CompraEntrada };
 export type Rechazo = { error: string; estado: 400 | 404 | 409 };
 const TIPOS_DE_FOTO: Record<string, string> = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
 const ARCHIVO_DE_FOTO = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
@@ -38,7 +40,7 @@ const fechaLegible = (iso: string) => { const [a, m, d] = iso.split("-"); return
 
 // La foto del comprobante se sube sola, antes de registrar la compra. Queda suelta, a nombre
 // de quien la subió, hasta que una compra la toma.
-export async function subirFoto(f: unknown, usuarioId: string): Promise<{ foto: string } | { error: string }> {
+export async function subirFoto(f: unknown, usuarioId: string): Promise<FotoDeComprobante | { error: string }> {
   if (!(f instanceof File)) return { error: "Falta la foto" };
   if (!TIPOS_DE_FOTO[f.type]) return { error: "La foto tiene que ser jpeg, png o webp" };
   if (f.size > MAXIMO_DE_FOTO) return { error: "La foto pesa más de 10 MB" };
@@ -54,7 +56,7 @@ export async function foto(archivo: string) {
 }
 
 // Registra una compra ya validada. Si ese id ya estaba (un reenvío), devuelve la guardada.
-export async function registrar(v: CompraEntrada, usuarioId: string): Promise<Rechazo | Record<string, unknown>> {
+export async function registrar(v: CompraEntrada, usuarioId: string): Promise<Rechazo | CompraRegistrada | CompraRepetida> {
   const id = v.id ?? randomUUID();
   const fecha = v.fecha ?? new Date().toISOString().slice(0, 10);
   const total = v.items.reduce((s, it) => s + it.cantidad * it.costo_unitario, 0);
@@ -103,15 +105,15 @@ export async function registrar(v: CompraEntrada, usuarioId: string): Promise<Re
   });
 }
 
-export const recientes = () => datos.recientes(base);
+export const recientes = (): Promise<Enviable<CompraReciente>[]> => datos.recientes(base);
 
 // El papel de gastos de la semana, que ya no se tira: total por proveedor, últimos 7 días.
-export async function semana() {
+export async function semana(): Promise<GastosDeLaSemana> {
   const filas = await datos.gastosDeLaSemana(base);
   return { desde: new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10), por_proveedor: filas, total: filas.reduce((s, r) => s + Number(r.total), 0) };
 }
 
-export const renglones = (id: string) => datos.renglonesDe(base, id);
+export const renglones = (id: string): Promise<Enviable<RenglonDeCompra>[]> => datos.renglonesDe(base, id);
 
 // Anular: la compra queda marcada y el stock vuelve con un ajuste. El costo que se registró por
 // la factura no se toca: fue real aunque la compra se haya anulado.

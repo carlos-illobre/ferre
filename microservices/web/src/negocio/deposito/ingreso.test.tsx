@@ -85,6 +85,16 @@ describe("el ingreso de mercadería (010-E05)", () => {
     expect(result.current.renglones).toHaveLength(0);
   });
 
+  it("si la compra ya estaba registrada (un reintento), cuenta que no cambió costos ni productos", async () => {
+    apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/proveedores" ? PROVEEDORES : { id: "c1", total: 1000.5, repetida: true }));
+    const { result } = armar();
+    act(() => { result.current.setProveedorId("pv-tresge"); result.current.agregar(cinta); });
+    await waitFor(() => expect(result.current.proveedor?.nombre).toBe("Tresge"));
+    let registro: Awaited<ReturnType<typeof result.current.registrar>> = null;
+    await act(async () => { registro = await result.current.registrar(); });
+    expect(registro).toMatchObject({ total: 1000.5, costosActualizados: 0, productosNuevos: 0 });
+  });
+
   it("si el servidor no lo acepta o no hay conexión, lo cargado sigue y el motivo se dice", async () => {
     const { result } = armar();
     act(() => { result.current.setProveedorId("pv-tresge"); result.current.agregar(cinta); });
