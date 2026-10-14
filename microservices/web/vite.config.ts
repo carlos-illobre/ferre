@@ -45,6 +45,9 @@ export default defineConfig(({ command }) => {
           clientsClaim: true,
           navigateFallback: "index.html",
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+          // Procesos (con bpmn-js, unos 600 KB) se baja solo al entrar a Procesos, no en cada
+          // dispositivo al instalar (ADR-019).
+          globIgnores: ["**/procesos-*.{js,css}"],
           // Nada de la API ni de Google se cachea: siempre red.
           runtimeCaching: [],
         },
@@ -52,6 +55,12 @@ export default defineConfig(({ command }) => {
     ],
     base: process.env.VITE_BASE ?? "/",
     // La raíz es la aplicación (src/pantallas): es la única que hay (decisión 83).
-    build: { outDir: "dist", emptyOutDir: true },
+    build: {
+      outDir: "dist",
+      emptyOutDir: true,
+      // Procesos va en su propio archivo, con nombre fijo, para que el service worker lo deje afuera.
+      // React, aparte: si no, Rollup lo mete en el archivo de Procesos y la aplicación lo bajaría igual.
+      rollupOptions: { output: { manualChunks: (id: string) => /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id) ? "react" : (/[\\/](procesos[\\/]web|bpmn-js|diagram-js|bpmn-moddle|moddle|moddle-xml|min-dash|min-dom|tiny-svg|path-intersection|didi|ids|inherits-browser|object-refs|saxen|diagram-js-direct-editing)[\\/]/.test(id) ? "procesos" : undefined) } },
+    },
   };
 });

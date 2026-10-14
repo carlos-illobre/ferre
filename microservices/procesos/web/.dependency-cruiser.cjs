@@ -7,7 +7,7 @@ module.exports = {
       name: "procesos-no-importa-nada-de-afuera",
       comment: "El módulo se tiene que poder copiar solo: nada de Ferrebress ni de otra carpeta del repositorio.",
       severity: "error",
-      from: { path: "^src/" },
+      from: { path: "^src/", pathNot: "\\.test\\.tsx?$|^src/pruebas/" },
       to: { path: "^\\.\\./(?!servidor/src/contrato\\.ts$)", pathNot: "node_modules/" },
     },
     {

@@ -6,6 +6,12 @@ import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELU } from "./celular/App";
 import { PantallaDeProcesos, pedirAProcesos } from "./Procesos";
 
+// El módulo se prueba en su paquete; acá solo importa qué le da Ferrebress.
+vi.mock("procesos-web", () => ({
+  Procesos: (p: { interfaz: string; puede: { ver: boolean; dibujar: boolean }; pantallas: string[] }) => <p data-testid="modulo">{JSON.stringify({ interfaz: p.interfaz, puede: p.puede, pantallas: p.pantallas.length })}</p>,
+}));
+vi.mock("procesos-web/estilos.css", () => ({}));
+
 // Procesos en Ferrebress (ADR-019): la opción de Más y lo que se le pasa al módulo.
 const enMasCompu = () => DE_MAS_COMPU.filter((d) => puede(usuarioDePrueba, ...(d.pide ?? []))).map((d) => d.ruta);
 const enMasCelu = () => DE_MAS_CELU.filter((d) => puede(usuarioDePrueba, ...(d.pide ?? []))).map((d) => d.parte);
@@ -30,7 +36,7 @@ describe("Procesos en Más", () => {
   it("011-E38 al módulo le llega qué puede quien lo usa", async () => {
     conPermisos("procesos.ver");
     render(<PantallaDeProcesos interfaz="compu" />);
-    expect(await screen.findByText("Acá se van a ver los procesos del negocio.")).toBeTruthy();
+    expect(JSON.parse((await screen.findByTestId("modulo")).textContent!)).toEqual({ interfaz: "compu", puede: { ver: true, dibujar: false }, pantallas: 16 });
   });
 });
 

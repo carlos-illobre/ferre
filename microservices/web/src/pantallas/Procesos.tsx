@@ -3,6 +3,7 @@ import { borrarToken, leerToken, urlApi } from "../api";
 import { guardaEnElDispositivo } from "../guardado";
 import { irA } from "../rutas";
 import { usePuede } from "./permisos";
+import "./procesos.css";
 
 // Procesos (RF-90 a RF-95) es un módulo aparte que se lleva a otros proyectos (ADR-019). Acá
 // Ferrebress le da lo que necesita: cómo pedir al servidor, qué puede quien lo usa, sus
@@ -47,7 +48,9 @@ export async function pedirAProcesos(ruta: string, init: RequestInit = {}): Prom
 
 export function PantallaDeProcesos({ interfaz }: { interfaz: "compu" | "celu" }) {
   const puede = usePuede();
+  // En la computadora es una página más; en el celular, el contenido de Más.
   return (
+    <main id={interfaz === "compu" ? "contenido" : undefined} className={`${interfaz === "compu" ? "pagina" : "contenido"} procesos-en-ferrebress`} tabIndex={-1}>
     <Suspense fallback={<p className="detalle" role="status" style={{ padding: 16 }}>Abriendo Procesos…</p>}>
       <Modulo
         interfaz={interfaz}
@@ -58,5 +61,6 @@ export function PantallaDeProcesos({ interfaz }: { interfaz: "compu" | "celu" })
         alVolver={() => irA("mas")}
       />
     </Suspense>
+    </main>
   );
 }

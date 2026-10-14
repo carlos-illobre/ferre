@@ -1,0 +1,24 @@
+/* Procesos en Ferrebress (ADR-019): el módulo trae sus colores como variables y acá se le dan
+   los de la paleta, para que se vea como el resto de la aplicación. */
+.procesos-en-ferrebress .procesos, .procesos-fondo {
+  --procesos-accion: var(--p-naranja);
+  --procesos-accion-fuerte: var(--p-naranja-fuerte);
+  --procesos-accion-suave: var(--p-naranja-suave);
+  --procesos-accion-texto: var(--p-naranja-texto);
+  --procesos-tinta: var(--p-tinta);
+  --procesos-texto-2: var(--p-texto-2);
+  --procesos-fondo: var(--p-fondo);
+  --procesos-fondo-2: var(--p-fondo-2);
+  --procesos-superficie: var(--p-superficie);
+  --procesos-borde: var(--p-borde);
+  --procesos-borde-suave: var(--p-borde-suave);
+  --procesos-titulo: var(--p-verde);
+  --procesos-ok: var(--p-verde-texto);
+  --procesos-ok-suave: var(--p-verde-suave);
+  --procesos-aviso: var(--p-amarillo-suave);
+  --procesos-aviso-borde: var(--p-amarillo-borde);
+  --procesos-aviso-texto: var(--p-amarillo-texto);
+}
+/* En la computadora el editor ocupa toda la altura, debajo de «Volver a Más». */
+.pagina.procesos-en-ferrebress { height: calc(100vh - 84px); min-height: 600px; overflow: hidden; padding-top: var(--e3, 12px); }
+.pagina.procesos-en-ferrebress > .procesos { flex: 1; min-height: 0; }

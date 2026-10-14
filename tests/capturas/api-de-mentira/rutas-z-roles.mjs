@@ -18,6 +18,8 @@ const PERMISOS = [
   ["negocio.numeros", "Negocio", "Ver los números del negocio", "Cómo va el negocio: ventas, gastos y dinero invertido en inventario"],
   ["negocio.anomalias", "Negocio", "Ver las anomalías", "Abrir «Anomalías»"],
   ["negocio.actividad", "Negocio", "Ver quién hizo qué", "Abrir el registro de acciones"],
+  ["procesos.ver", "Negocio", "Ver procesos", "Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial"],
+  ["procesos.dibujar", "Negocio", "Dibujar procesos", "Todo lo de «Ver procesos», más crear, cambiar, marcar vigentes, importar, exportar y borrar los procesos"],
   ["admin.usuarios", "Administración", "Administrar usuarios", "Autorizar personas, asignarles roles, desactivarlas"],
   ["admin.roles", "Administración", "Administrar roles", "Crear roles, cambiarles el nombre y los permisos, borrarlos"],
   ["admin.sesiones", "Administración", "Administrar sesiones", "Ver y cerrar las sesiones de todos y quitar celulares de otros"],
@@ -29,7 +31,7 @@ let roles = [
   { id: "r-2", nombre: "Comprador", permisos: ["deposito.pedidos", "catalogo.listas", "catalogo.duplicados", "deposito.compras"] },
   { id: "r-3", nombre: "Recepción", permisos: ["deposito.ingresos", "deposito.compras", "deposito.stock", "negocio.anomalias"] },
   { id: "r-4", nombre: "Administrador", permisos: ["admin.usuarios", "admin.roles", "admin.sesiones", "negocio.actividad"] },
-  { id: "r-5", nombre: "Gerente", permisos: ["negocio.numeros", "catalogo.margenes", "ventas.ver", "ventas.anular", "deposito.compras", "negocio.anomalias", "negocio.actividad"] },
+  { id: "r-5", nombre: "Gerente", permisos: ["negocio.numeros", "catalogo.margenes", "ventas.ver", "ventas.anular", "deposito.compras", "negocio.anomalias", "negocio.actividad", "procesos.ver", "procesos.dibujar"] },
   { id: "r-6", nombre: "Encargado de sábados", permisos: ["ventas.registrar", "deposito.ingresos"] },
 ];
 let usuarios = [
@@ -39,6 +41,8 @@ let usuarios = [
   { id: "u-4", email: "lucia.fernandez.deposito@ferre.test", nombre: "Lucía Fernández", activo: false, creado_en: "2026-09-02T12:00:00Z", roles: ["r-3", "r-2"] },
 ];
 let permisosDeLaSesion = TODOS;
+// Procesos (rutas-procesos.mjs) responde según lo que puede la sesión.
+export const permisosDeMentira = () => permisosDeLaSesion;
 let codigoAprobado = false;
 const sesion = () => ({ id: "u-1", email: "carlos@ferre.test", nombre: "Carlos", roles: permisosDeLaSesion.length === TODOS.length ? roles.slice(0, 5).map((r) => r.nombre) : ["Rol de la captura"], permisos: permisosDeLaSesion });
 const conRoles = (u) => ({ ...u, roles: u.roles.map((id) => roles.find((r) => r.id === id)).filter(Boolean).map((r) => ({ id: r.id, nombre: r.nombre })) });

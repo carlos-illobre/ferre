@@ -26,6 +26,9 @@ tests/capturas/levantar.sh --apagar
 
 ## La API de mentira
 
+Procesos arranca con tres procesos de ejemplo; `PUT /mentira/procesos` con `{ "vacio": true }` deja la
+lista vacía, y sin cuerpo la vuelve al inicio.
+
 `api-de-mentira/servidor.mjs` carga todos los `rutas-*.mjs` de su carpeta, en orden
 alfabético; si dos definen la misma ruta, gana el último. Cada archivo exporta
 `{ "GET /ruta/:id": ({ params, query, body }) => valor | [estado, valor] }`. Los datos son
@@ -45,7 +48,7 @@ La computadora y el celular no usan las mismas direcciones:
 | Catálogo | `productos`, `listas`, `duplicados` | `catalogo`, `catalogo/listas`, `catalogo/duplicados` |
 | Vender | `vender` | `vender` |
 | Depósito | `pedidos`, `compras` (Ingreso), `stock` (Inventario), `contar` (Estanterías) | `deposito/pedidos`, `deposito`, `deposito/stock`, `deposito/contar` |
-| Más | `mas`, `resumen`, `usuarios`, `roles`, `actividad`, `anomalias`, `tickets` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/roles`, `mas/actividad`, `mas/anomalias`, `mas/tickets` |
+| Más | `mas`, `resumen`, `usuarios`, `roles`, `actividad`, `anomalias`, `tickets`, `procesos` | `mas`, `mas/negocio`, `mas/usuarios`, `mas/roles`, `mas/actividad`, `mas/anomalias`, `mas/tickets`, `mas/procesos` |
 
 `--entera` (página completa) se cuelga en la computadora: ahí conviene bajar con
 `--py "page.locator('...').scroll_into_view_if_needed()"`.
