@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import "./anomalias.css";
+import type { PaginaDeAnomalias } from "@servidor/anomalias";
 
 // Anomalías (RF-59): el registro de cada vez que lo que dice el sistema no coincidió con lo
 // que hay en la realidad. Hoy se anota una cuando se vende un producto que según el sistema
 // no tenía stock (la venta se registra igual y el stock queda en cero). Es solo para leer:
 // más adelante va a haber avisos. La misma pantalla en el celular y en la computadora.
-type Anomalia = { id: string; tipo: string; cantidad: string; detalle: string; creado_en: string; producto: string; unidad: string | null; usuario: string | null };
-type Pagina = { pagina: number; hay_mas: boolean; anomalias: Anomalia[] };
+type Pagina = PaginaDeAnomalias;
 const TITULOS: Record<string, string> = { venta_sin_stock: "Venta sin stock" };
 const cuando = (iso: string) => new Date(iso).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 

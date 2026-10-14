@@ -3,6 +3,7 @@ import { api } from "../api";
 import { MAXIMO_DE_FOTOS, crearTicket, useFoto, useTickets, type Pendiente, type Ticket } from "./tickets";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "./PedirFoto";
 import "./tickets.css";
+import type { ResolucionDeTicket } from "@servidor/tickets";
 
 // Mejoras y errores (RF-80): quien usa la app cuenta lo que encontró o lo que se le ocurrió,
 // con fotos o capturas de pantalla. La misma pantalla en el celular y en la computadora.
@@ -133,7 +134,7 @@ function Fila({ ticket: t, alCambiar }: { ticket: Ticket | Pendiente; alCambiar?
   const [grande, setGrande] = useState<string | Blob | null>(null);
   async function pedir(accion: "resolver" | "reabrir") {
     setError(null);
-    try { await api(`/tickets/${t.id}/${accion}`, { method: "POST", body: JSON.stringify(accion === "resolver" ? { nota } : {}) }); setResolviendo(false); setNota(""); await alCambiar?.(); }
+    try { await api(`/tickets/${t.id}/${accion}`, { method: "POST", body: JSON.stringify((accion === "resolver" ? { nota } : {}) satisfies ResolucionDeTicket) }); setResolviendo(false); setNota(""); await alCambiar?.(); }
     catch (e) { const err = e as { estado?: number; message: string }; setError(err.estado ? `${err.message}.` : "Sin conexión: probá de nuevo cuando vuelva internet."); }
   }
   return (
