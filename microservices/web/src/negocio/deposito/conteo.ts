@@ -4,16 +4,14 @@ import { api } from "../../api";
 import { enviarOEncolar } from "../../cola";
 import { consultas } from "../../consultas";
 import type { Producto } from "../../producto";
+import type { Contado, Conteo, ConteoAbierto, ConteoCerrado, Sector, SectorCreado, SinContar } from "@servidor/conteos";
 import { stockCambio } from "./inventario";
 
 // El conteo de estanterías, una sola vez para el celular y la computadora (RNF-60): se abre un
 // sector, se cuenta producto por producto (también sin conexión) y al cerrar las diferencias
 // contra el stock del sistema se aplican como ajustes.
-export type Sector = { id: string; nombre: string; productos: string; ultimo_conteo: string | null; conteo_abierto: string | null };
-export type Contado = { producto_id: string; cantidad_contada: string; contado_en: string; descripcion: string; marca: string | null; stock_teorico: string };
-export type SinContar = { producto_id: string; descripcion: string; marca: string | null; stock_teorico: string };
-export type Conteo = { id: string; estado: string; sector_id: string; sector: string; renglones: Contado[]; sin_contar: SinContar[] };
-export type Cierre = { ajustados: number; puestos_en_cero: number; contados: number };
+export type { Contado, Conteo, Sector, SinContar };
+export type Cierre = ConteoCerrado;
 
 const SECTORES = ["sectores"] as const;
 
@@ -33,12 +31,12 @@ export function useSectores() {
 
 // Empezar a contar un sector, o retomar el conteo que quedó abierto. Necesita conexión.
 export async function abrirConteo(sectorId: string): Promise<Conteo> {
-  const { id } = await api<{ id: string }>("/conteos", { method: "POST", body: JSON.stringify({ sector_id: sectorId }) });
+  const { id } = await api<ConteoAbierto>("/conteos", { method: "POST", body: JSON.stringify({ sector_id: sectorId }) });
   return api<Conteo>(`/conteos/${id}`);
 }
 
 export async function crearSector(nombre: string): Promise<string> {
-  const { id } = await api<{ id: string }>("/sectores", { method: "POST", body: JSON.stringify({ nombre: nombre.trim() }) });
+  const { id } = await api<SectorCreado>("/sectores", { method: "POST", body: JSON.stringify({ nombre: nombre.trim() }) });
   await consultas.invalidateQueries({ queryKey: SECTORES });
   return id;
 }

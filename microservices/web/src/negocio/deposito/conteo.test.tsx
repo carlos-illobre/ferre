@@ -15,9 +15,9 @@ import { abrirConteo, crearSector, ordenarSectores, useConteo, useSectores, type
 
 // El conteo de estanterías, probado una sola vez y sin pantalla (010-E05).
 const cinta = producto({ id: "cinta", descripcion: "CINTA AISLADORA", marca: "3M" });
-const sector = (id: string, extra: Partial<Sector> = {}): Sector => ({ id, nombre: id, productos: "3", ultimo_conteo: null, conteo_abierto: null, ...extra });
+const sector = (id: string, extra: Partial<Sector> = {}): Sector => ({ id, nombre: id, orden: 0, productos: "3", ultimo_conteo: null, conteo_abierto: null, ...extra });
 const CONTEO: Conteo = {
-  id: "c1", estado: "abierto", sector_id: "s1", sector: "Estantería 1",
+  id: "c1", estado: "abierto", abierto_en: "2026-10-13T09:00:00Z", cerrado_en: null, resumen: null, sector_id: "s1", sector: "Estantería 1",
   renglones: [{ producto_id: "clavo", cantidad_contada: "5", contado_en: "2026-10-13T10:00:00Z", descripcion: "CLAVO", marca: null, stock_teorico: "5" }],
   sin_contar: [{ producto_id: "cinta", descripcion: "CINTA AISLADORA", marca: "3M", stock_teorico: "17" }],
 };

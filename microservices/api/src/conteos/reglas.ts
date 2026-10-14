@@ -2,12 +2,14 @@ import { randomUUID } from "node:crypto";
 import { base, Deshacer, enTransaccion } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
+import type { Conteo, ConteoAbierto, ConteoCerrado, Sector } from "../contratos/conteos.js";
+import type { Enviable } from "../enviable.js";
 
 // Sectores y conteos (issue #31). Se cuenta de a un sector; el conteo queda abierto hasta que
 // se cierra; al cerrar, cada diferencia contra el stock teórico es un ajuste con la nota
 // «conteo de <sector> del <fecha>», y los productos del sector que no se contaron se pueden
 // poner en cero de una vez o dejar como están.
-export const sectores = () => datos.sectores(base);
+export const sectores = (): Promise<Enviable<Sector>[]> => datos.sectores(base);
 
 // `null` si ya hay uno con ese nombre.
 export async function crearSector(nombre: string, usuarioId: string): Promise<string | null> {
@@ -19,7 +21,7 @@ export async function crearSector(nombre: string, usuarioId: string): Promise<st
 }
 
 // Abrir el conteo de un sector, o retomar el que quedó abierto.
-export async function abrir(sectorId: string, usuarioId: string): Promise<{ id: string; retomado: boolean }> {
+export async function abrir(sectorId: string, usuarioId: string): Promise<ConteoAbierto> {
   const abierto = await datos.conteoAbiertoDe(base, sectorId);
   if (abierto) return { id: abierto, retomado: true };
   const id = randomUUID();
@@ -28,7 +30,7 @@ export async function abrir(sectorId: string, usuarioId: string): Promise<{ id: 
   return { id, retomado: false };
 }
 
-export async function conteo(id: string) {
+export async function conteo(id: string): Promise<Enviable<Conteo> | null> {
   const cab = await datos.cabecera(base, id);
   if (!cab) return null;
   const [renglones, sinContar] = await Promise.all([datos.contados(base, id), datos.sinContar(base, id, cab.sector_id)]);
@@ -47,7 +49,7 @@ export const descontar = (conteoId: string, productoId: string) => datos.descont
 
 // Cerrar: las diferencias pasan a ser ajustes. Con `faltantesEnCero`, los productos del sector
 // que no se contaron se dan por inexistentes (ajuste a cero). `null` si ya estaba cerrado.
-export async function cerrar(id: string, faltantesEnCero: boolean, usuarioId: string) {
+export async function cerrar(id: string, faltantesEnCero: boolean, usuarioId: string): Promise<ConteoCerrado | null> {
   return enTransaccion(async (trx) => {
     const cab = await datos.abiertoParaCerrar(trx, id);
     if (!cab) throw new Deshacer(null);
