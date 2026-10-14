@@ -159,7 +159,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
               <span className="procesos-tirador" />
               <span className="procesos-hoja-titulo-texto"><b>Agregar un paso</b><Icono nombre={figurasAbiertas ? "abajo" : "arriba"} /></span>
             </button>
-            <p className="procesos-ayuda procesos-un-renglon">Arrastrá una al dibujo o tocala para agregarla.</p>
+            <p className="procesos-ayuda procesos-un-renglon">Arrastrá un paso al dibujo o tocalo.</p>
             <div className="procesos-figuras-celu">
               {FIGURAS_CELU.map((f) => (
                 <button key={f.tipo} type="button" className="procesos-figura-celu" aria-label={f.nombre} title={f.nombre} data-testid={`procesos-figura-${f.tipo}`}
