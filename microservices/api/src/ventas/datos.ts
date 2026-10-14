@@ -22,11 +22,7 @@ export type RenglonNuevo = {
 };
 export const insertarRenglon = (e: Ejecutor, r: RenglonNuevo) => e.insertInto("item_venta").values({ id: randomUUID(), ...r }).execute();
 
-// Cuánto hay de un producto: la suma de sus movimientos.
-export async function stockDe(e: Ejecutor, productoId: string): Promise<number> {
-  const fila = await e.selectFrom("movimiento_stock").select(sql<string>`COALESCE(SUM(cantidad), 0)`.as("stock")).where("producto_id", "=", productoId).executeTakeFirst();
-  return Number(fila?.stock ?? 0);
-}
+export { stockDe } from "../deposito/datos.js";
 
 export const descontarStock = (e: Ejecutor, m: { producto_id: string; cantidad: number; venta_id: string; fecha: string }) =>
   e.insertInto("movimiento_stock").values({ id: randomUUID(), producto_id: m.producto_id, tipo: "venta", cantidad: -m.cantidad, referencia_tipo: "venta", referencia_id: m.venta_id, fecha: m.fecha }).execute();
@@ -76,3 +72,10 @@ export async function marcarPagada(e: Ejecutor, id: string): Promise<boolean> {
     .where("medio_pago", "=", "cuenta_corriente").where("estado", "=", "confirmada").where("pagada_en", "is", null).executeTakeFirst();
   return r.numUpdatedRows > 0n;
 }
+
+// Lo que preguntaron y no se llevaron: demanda que hoy se pierde.
+export const anotarConsulta = (e: Ejecutor, c: { producto_id: string | null; descripcion: string; precio_ofrecido: number | null; motivo: string | null; dispositivo_id: string | null }) =>
+  e.insertInto("consulta").values({ id: randomUUID(), fecha: sql<Date>`now()`, ...c }).execute();
+
+export const ultimasConsultas = (e: Ejecutor) =>
+  e.selectFrom("consulta").select(["id", "fecha", "descripcion", "precio_ofrecido", "motivo"]).orderBy("fecha", "desc").limit(200).execute();

@@ -1040,7 +1040,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 empezada: ventas ya está en tres capas, con consultas con tipos. Falta el resto de los temas del servidor, mover las pantallas a `pantallas/` y un solo juego de piezas de interfaz (010-T008 y 010-T012)"
+  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 empezada: ventas, «no llevó», clientes, registro de acciones, stock y proveedores ya están en tres capas, con consultas con tipos. Falta el resto de los temas del servidor, mover las pantallas a `pantallas/` y un solo juego de piezas de interfaz (010-T008 y 010-T012)"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx

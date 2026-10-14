@@ -101,3 +101,15 @@ export async function pagar(id: string, usuarioId: string): Promise<boolean> {
   await anotarEvento(base, { tipo: "venta.pagada", usuarioId, contenido: { id } });
   return true;
 }
+
+// «No llevó»: cada producto consultado, con lo que se le ofreció. Los renglones sin descripción no cuentan.
+export type ConsultaEntrada = { items?: { producto_id?: string | null; descripcion: string; precio_ofrecido?: number | null }[]; motivo?: string; dispositivo_id?: string | null };
+export async function anotarConsultas(c: ConsultaEntrada): Promise<boolean> {
+  if (!c.items?.length) return false;
+  for (const it of c.items) {
+    if (!it.descripcion?.trim()) continue;
+    await datos.anotarConsulta(base, { producto_id: it.producto_id ?? null, descripcion: it.descripcion.trim(), precio_ofrecido: it.precio_ofrecido ?? null, motivo: c.motivo?.trim() || null, dispositivo_id: c.dispositivo_id ?? null });
+  }
+  return true;
+}
+export const consultas = () => datos.ultimasConsultas(base);

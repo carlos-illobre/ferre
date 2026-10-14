@@ -30,5 +30,16 @@ export interface Base {
     id: string; tipo: string; version: ConValor<number>; fecha: Momento; dispositivo_id: string | null; usuario_id: string | null;
     contenido: ColumnType<unknown, string, string>; creado_en: Generated<Date>;
   };
-  cliente: { id: string; nombre: string };
+  cliente: {
+    id: string; nombre: string; telefono: string | null; cuenta_corriente: ConValor<boolean>; activo: ConValor<boolean>; creado_en: Generated<Date>; modificado_en: Generated<Date>;
+  };
+  consulta: {
+    id: string; fecha: Momento; producto_id: string | null; descripcion: string; precio_ofrecido: ColumnType<string | null, number | string | null, number | string | null>;
+    motivo: string | null; dispositivo_id: string | null; creado_en: Generated<Date>;
+  };
+  usuario: { id: string; email: string; nombre: string };
+  proveedor: {
+    id: string; nombre: string; precios_incluyen_iva: ConValor<boolean>; descuento_general: ColumnType<string, number | undefined, number>;
+    descuento_contado: ColumnType<string, number | undefined, number>; lector: string | null; activo: ConValor<boolean>; whatsapp: ColumnType<string | null, string | null | undefined, string | null>;
+  };
 }
