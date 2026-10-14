@@ -627,3 +627,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     pidió volver atrás: como hay dos juegos de pantallas a propósito (decisión 46), cada uno
     mantiene sus piezas y su aspecto. Lo compartido entre los dos sigue siendo la paleta, los
     textos, las reglas de negocio (`negocio/`) y la tecnología reutilizable (`plataforma/`).
+
+86. **Al cobrar, el servidor guarda lo que se cobró** (2026-10-14). Carlos: el precio de cada
+    renglón es el que se le cobró al cliente, sea el de la lista, un margen elegido en esa
+    venta, un precio puesto a mano o el de una venta hecha sin conexión con el costo de ese
+    momento. El servidor lo guarda tal cual, con su costo, su margen y su explicación, y
+    recalcula el redondeo de cada renglón a $1.000 y el total, que son los que valen. Precisa
+    la decisión 84: «el servidor confirma» quiere decir eso, no que vuelva a calcular el precio.
+

@@ -15,7 +15,8 @@ describe("GET /productos", () => {
     await pedir(app, "GET", "/productos?limite=60&desde=120");
     const [entero, tanda] = base.actual.consultas.filter((q) => /FROM producto p/.test(q.sql));
     expect(entero!.sql).not.toMatch(/OFFSET/);
-    expect(tanda!.sql).toMatch(/ORDER BY p\.descripcion, p\.id LIMIT 60 OFFSET 120/);
+    expect(tanda!.sql).toMatch(/ORDER BY p\.descripcion, p\.id LIMIT \$1 OFFSET \$2/);
+    expect(tanda!.params).toEqual([60, 120]);
   });
 
   it("un `limite` que no es un número se ignora", async () => {
@@ -53,10 +54,10 @@ describe("PATCH /productos/:id", () => {
     await pedir(app, "GET", "/productos?buscar=" + encodeURIComponent("Mechá 8mm'; DROP TABLE producto;--") + "&limite=60", { rol: "mostrador" });
     const busqueda = base.actual.sqlDe(/FROM producto p/).at(-1)!;
     // Cada palabra, normalizada, es un parámetro; nada del texto queda pegado en la consulta.
-    expect(busqueda.params).toEqual(["mecha", "8mm", "drop", "table", "producto"]);
+    expect(busqueda.params).toEqual(["mecha", "8mm", "drop", "table", "producto", 60, 0]);
     expect(busqueda.sql).not.toMatch(/DROP TABLE/i);
     expect(busqueda.sql).toMatch(/LIKE '% ' \|\| \$1 \|\| '%'/);
-    expect(busqueda.sql).toMatch(/ORDER BY length\(p\.descripcion\), p\.descripcion, p\.id LIMIT 60 OFFSET 0/);
+    expect(busqueda.sql).toMatch(/ORDER BY length\(p\.descripcion\), p\.descripcion, p\.id LIMIT \$6 OFFSET \$7/);
 
     await pedir(app, "GET", "/productos?codigo=7790250000358", { rol: "mostrador" });
     const porCodigo = base.actual.sqlDe(/FROM producto p/).at(-1)!;

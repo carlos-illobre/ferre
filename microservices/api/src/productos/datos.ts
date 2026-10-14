@@ -27,8 +27,8 @@ export type FiltrosDelCatalogo = { limite?: string; desde?: string; buscar?: str
 // no guarda el catálogo y busca acá (RF-85): por texto, por código exacto y por lista de ids.
 export async function catalogo(q: FiltrosDelCatalogo): Promise<ProductoCatalogo[]> {
   const limite = Math.floor(Number(q.limite));
-  const desde = Math.max(0, Math.floor(Number(q.desde) || 0));
-  const tanda = Number.isFinite(limite) && limite > 0 ? `, p.id LIMIT ${Math.min(limite, 20000)} OFFSET ${desde}` : "";
+  const desde = Math.min(Math.max(0, Math.floor(Number(q.desde) || 0)), 10_000_000);
+  const conTanda = Number.isFinite(limite) && limite > 0;
   // Tres filtros para el celular que no guarda el catálogo y busca acá (RF-85): por texto
   // (`buscar`), por código de barras o de proveedor exacto (`codigo`) y por una lista de
   // productos (`ids`). Los valores van siempre como parámetros de la consulta.
@@ -52,6 +52,8 @@ export async function catalogo(q: FiltrosDelCatalogo): Promise<ProductoCatalogo[
   const ids = (q.ids ?? "").split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x)).slice(0, 300);
   if (q.ids !== undefined) { parametros.push(ids); filtros.push(`p.id = ANY($${parametros.length}::uuid[])`); }
   const donde = filtros.map((f) => ` AND ${f}`).join("");
+  let tanda = "";
+  if (conTanda) { parametros.push(Math.min(limite, 20000), desde); tanda = `, p.id LIMIT $${parametros.length - 1} OFFSET $${parametros.length}`; }
   // Una búsqueda trae primero las descripciones más cortas, que es lo que la aplicación muestra arriba.
   const orden = palabras.length ? "length(p.descripcion), p.descripcion" : "p.descripcion";
   const { rows } = await pool.query<ProductoCatalogo>(

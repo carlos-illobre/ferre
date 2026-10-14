@@ -32,9 +32,11 @@ aprobó. Acá va cómo se ejecuta.
   sesión y los mismos permisos.
 - **Tipos que llegan del servidor al front:** viajan solo al compilar; no se publica código
   del servidor ni nombres de tablas en el front.
-- **Precios en el servidor (etapa 4):** el servidor ya recalcula al cobrar y es quien manda;
-  la vista previa del front no se guarda ni se cobra sin esa confirmación. El costo sigue
-  saliendo solo para quien tiene «Ver costos».
+- **Precios en el servidor (etapa 4):** el servidor calcula el precio de cada producto. Al
+  cobrar guarda lo que se cobró en cada renglón, tal como se le cobró al cliente (un precio a
+  mano, un margen de esa venta o una venta hecha sin conexión con el costo de ese momento), y
+  recalcula el redondeo de cada renglón y el total, que son los que mandan (decisión 86). El
+  costo sigue saliendo solo para quien tiene «Ver costos».
 - **Consultas con tipos (etapa 5):** los valores siguen yendo como parámetros, nunca pegados
   al texto de la consulta.
 - **Librerías nuevas:** se fijan en una versión exacta y pasan por la verificación de cada subida.

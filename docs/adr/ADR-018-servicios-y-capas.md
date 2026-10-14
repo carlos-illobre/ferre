@@ -25,7 +25,8 @@ repartido en la raíz, entre la documentación. Carlos aprobó el informe (decis
 4. **El servidor en tres capas:** la ruta traduce el pedido, un caso de uso tiene la regla y
    un repositorio tiene el acceso a los datos.
 5. **Librerías que reemplazan código propio:** TanStack Query, Zod con el cliente tipado de
-   Hono, React Router y Kysely.
+   Hono, React Router y Kysely. TanStack Query y Kysely ya se usan; Zod, el cliente tipado de Hono y
+   React Router están pendientes (`specs/010-reordenamiento-del-codigo/tasks.md`, T016 a T018).
 
 Se hace por etapas (`specs/010-reordenamiento-del-codigo/`). Los nombres de los servicios, de
 las imágenes y de los paquetes no cambian con las carpetas: el despliegue los usa.

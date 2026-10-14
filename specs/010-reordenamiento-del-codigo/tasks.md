@@ -19,3 +19,9 @@ etapas. Cada tarea termina con todo funcionando y desplegado en pruebas.
 - [x] T008 Etapa 5: servidor en tres capas, con consultas con tipos (depende de T001)
 - [x] T009 La publicación del front arma juntas producción y pruebas: tiene que aceptar las carpetas viejas de producción hasta que se promueva (arreglo de la etapa 1)
 - [x] T014 [arreglo] Lo que encontró la revisión: el vínculo y la entrada con Google una sola vez, el subtotal del renglón desde la regla de la venta, el negocio sin depender de las pantallas, controles de capas que faltaban, las columnas que se cambian de un producto y las reglas de las fotos pedidas fuera de la ruta
+- [x] T015 [arreglo] Ningún valor que llega en un pedido se pega en el SQL: el límite y el desde del catálogo van como parámetros, y una prueba revisa todo el SQL del servidor
+- [ ] T016 La forma de los datos llega del servidor para todos los temas (contratos en `api/src/contratos/`), no solo para las ventas; empezando por producto (depende de T008)
+- [ ] T017 Zod valida en el servidor lo que llega en cada pedido y el front usa el cliente tipado de Hono, tema por tema (depende de T016)
+- [ ] T018 La navegación de las dos interfaces pasa a React Router, sin cambiar las direcciones ni el espejo (depende de T012)
+- [x] T019 [regla] Al cobrar, el servidor guarda lo que se cobró (precio, costo y margen de cada renglón) y solo recalcula el redondeo y el total; la especificación, el plan y la decisión 84 lo dicen así (decisión 86)
+

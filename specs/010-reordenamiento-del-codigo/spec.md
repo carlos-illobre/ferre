@@ -16,6 +16,7 @@
 
 - Q: ¿El lector de planillas en Python queda como servicio aparte? → A: Sí, por ahora queda aparte.
 - Q: Para «precio a mano» y «otro margen», ¿quién calcula? → A: La vista previa la calcula el front y el servidor confirma.
+- Q: ¿Qué quiere decir que el servidor «confirma» al cobrar? → A: Guarda lo que se cobró, tal como se le cobró al cliente; recalcula el redondeo de cada renglón y el total, pero no el precio (decisión 86).
 - Q: ¿Se aceptan las librerías propuestas (manejo de datos del servidor, validación con tipos que llegan del servidor, navegación, consultas con tipos)? → A: Sí.
 - Q: ¿Se frenan los cambios de pantallas mientras se unifica cada proceso? → A: Sí.
 - Q: ¿Un servicio para el celular y otro para la computadora? → A: No: un solo front, con el negocio una sola vez y dos juegos de pantallas.
@@ -42,7 +43,7 @@ pasaban siguen pasando, y la aplicación se despliega en pruebas.
 - **E03** **Given** cualquier etapa terminada, **When** se sube, **Then** se despliega en pruebas con los mismos nombres de servicio y de imagen que antes, sin tocar nada en la máquina.
 - **E04** **Given** la etapa 2 terminada, **When** se mira la tecnología reutilizable (teclado, navegación, cámara, guardado local, cola de envíos, canal en tiempo real, piezas de interfaz), **Then** está en archivos que no dependen de nada del negocio, y una verificación automática falla si alguno pasa a depender.
 - **E05** **Given** la etapa 3 terminada para un proceso (por ejemplo, vender), **When** se busca dónde está su regla, **Then** está una sola vez y la usan las pantallas del celular y las de la computadora.
-- **E06** **Given** la etapa 4 terminada, **When** se pide un producto al servidor, **Then** llega con su precio ya calculado, su explicación y el precio para cada uno de los cinco márgenes; el front no calcula precios, salvo la vista previa de un margen o un precio tipeado, que el servidor confirma al cobrar.
+- **E06** **Given** la etapa 4 terminada, **When** se pide un producto al servidor, **Then** llega con su precio ya calculado, su explicación y el precio para cada uno de los cinco márgenes; el front no calcula precios, salvo la vista previa de un margen o un precio tipeado. Al cobrar, el servidor guarda lo que se cobró en cada renglón (precio, costo, margen y explicación) y recalcula el redondeo de cada renglón y el total (decisión 86).
 - **E07** **Given** la etapa 4 terminada, **When** se mira el repositorio, **Then** no hay ninguna carpeta de librerías compartidas entre servicios.
 - **E08** **Given** una etapa a medio hacer, **When** algo falla, **Then** se puede volver a la versión anterior con el mecanismo de despliegue de siempre: ninguna etapa cambia datos guardados de un modo que no se pueda deshacer.
 - **E09** **Given** el reordenamiento en curso, **When** Carlos pide un cambio de pantalla del proceso que se está unificando, **Then** se anota para después y no se hace en el medio.
