@@ -4,7 +4,7 @@ import { api } from "../../api";
 import { enviarOEncolar } from "../../cola";
 import { consultas } from "../../consultas";
 import type { Producto } from "../../producto";
-import type { Contado, Conteo, ConteoAbierto, ConteoCerrado, Sector, SectorCreado, SinContar } from "@servidor/conteos";
+import type { CierreDeConteo, Contado, Conteo, ConteoAbierto, ConteoCerrado, ConteoNuevo, RenglonContado, Sector, SectorCreado, SectorNuevo, SinContar } from "@servidor/conteos";
 import { stockCambio } from "./inventario";
 
 // El conteo de estanterías, una sola vez para el celular y la computadora (RNF-60): se abre un
@@ -31,12 +31,12 @@ export function useSectores() {
 
 // Empezar a contar un sector, o retomar el conteo que quedó abierto. Necesita conexión.
 export async function abrirConteo(sectorId: string): Promise<Conteo> {
-  const { id } = await api<ConteoAbierto>("/conteos", { method: "POST", body: JSON.stringify({ sector_id: sectorId }) });
+  const { id } = await api<ConteoAbierto>("/conteos", { method: "POST", body: JSON.stringify({ sector_id: sectorId } satisfies ConteoNuevo) });
   return api<Conteo>(`/conteos/${id}`);
 }
 
 export async function crearSector(nombre: string): Promise<string> {
-  const { id } = await api<SectorCreado>("/sectores", { method: "POST", body: JSON.stringify({ nombre: nombre.trim() }) });
+  const { id } = await api<SectorCreado>("/sectores", { method: "POST", body: JSON.stringify({ nombre: nombre.trim() } satisfies SectorNuevo) });
   await consultas.invalidateQueries({ queryKey: SECTORES });
   return id;
 }
@@ -54,7 +54,7 @@ export function useConteo(conteo: Conteo, alActualizar: (c: Conteo) => void) {
 
   // Anota cuántas hay de un producto. Rechaza si no se pudo guardar ni en el servidor ni en el dispositivo.
   async function contar(producto: Producto, cantidad: number): Promise<{ encolado: boolean }> {
-    const { encolado } = await enviarOEncolar("conteo.renglon", "PUT", `/conteos/${conteo.id}/renglones/${producto.id}`, { cantidad });
+    const { encolado } = await enviarOEncolar("conteo.renglon", "PUT", `/conteos/${conteo.id}/renglones/${producto.id}`, { cantidad } satisfies RenglonContado);
     if (!encolado) { await recargar(); return { encolado }; }
     const habia = contadoPorId.get(producto.id)?.stock_teorico ?? conteo.sin_contar.find((s) => s.producto_id === producto.id)?.stock_teorico ?? "0";
     alActualizar({
@@ -75,7 +75,7 @@ export function useConteo(conteo: Conteo, alActualizar: (c: Conteo) => void) {
 
   // Cierra el sector: aplica las diferencias como ajustes y, si se pide, pone en cero lo que no se contó. Necesita conexión.
   async function cerrar(faltantesEnCero: boolean): Promise<Cierre> {
-    const cierre = await api<Cierre>(`/conteos/${conteo.id}/cerrar`, { method: "POST", body: JSON.stringify({ faltantes_en_cero: faltantesEnCero }) });
+    const cierre = await api<Cierre>(`/conteos/${conteo.id}/cerrar`, { method: "POST", body: JSON.stringify({ faltantes_en_cero: faltantesEnCero } satisfies CierreDeConteo) });
     void consultas.invalidateQueries({ queryKey: SECTORES });
     void stockCambio();
     return cierre;

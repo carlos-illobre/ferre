@@ -25,14 +25,12 @@ export async function stockConValor(veLosNumeros: boolean): Promise<Enviable<Sto
 export const movimientos = (productoId: string): Promise<Enviable<Movimiento>[]> => datos.movimientosDe(base, productoId);
 
 // Ajuste rápido: «hay tantas». Se registra la diferencia contra el stock actual, con motivo,
-// que es obligatorio (RF-53) venga de la interfaz que venga.
-export async function ajustar(productoId: string, cantidadReal: unknown, motivo: string | undefined, usuarioId: string): Promise<{ error: string } | StockAjustado> {
-  if (typeof cantidadReal !== "number" || !Number.isFinite(cantidadReal) || cantidadReal < 0) return { error: "Decí cuántas hay (un número mayor o igual a cero)" };
-  if (!motivo?.trim()) return { error: "Falta el motivo: sin motivo no se guarda" };
+// que es obligatorio (RF-53) venga de la interfaz que venga: lo exige el esquema del pedido.
+export async function ajustar(productoId: string, cantidadReal: number, motivo: string, usuarioId: string): Promise<StockAjustado> {
   const actual = await datos.stockDe(base, productoId);
   const diferencia = cantidadReal - actual;
   if (Math.abs(diferencia) < 0.0005) return { stock: actual, diferencia: 0 };
-  await datos.anotarAjuste(base, { producto_id: productoId, cantidad: diferencia, nota: `había ${actual}, hay ${cantidadReal}: ${motivo.trim()}` });
-  await anotarEvento(base, { tipo: "stock.ajustado", usuarioId, contenido: { productoId, antes: actual, despues: cantidadReal, motivo: motivo.trim() } });
+  await datos.anotarAjuste(base, { producto_id: productoId, cantidad: diferencia, nota: `había ${actual}, hay ${cantidadReal}: ${motivo}` });
+  await anotarEvento(base, { tipo: "stock.ajustado", usuarioId, contenido: { productoId, antes: actual, despues: cantidadReal, motivo: motivo } });
   return { stock: cantidadReal, diferencia };
 }
