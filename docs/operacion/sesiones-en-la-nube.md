@@ -18,6 +18,8 @@ Se crea una vez, con **Add cloud environment**.
   más `cdn.playwright.dev`, de donde Playwright baja el navegador de las pruebas, y sus dos
   espejos, `playwright.download.prss.microsoft.com` y `playwright.azureedge.net`. Con solo
   Trusted, el script de preparación falla con `ENOTFOUND cdn.playwright.dev`.
+  También `ghcr.io` y `pkg-containers.githubusercontent.com`: la imagen de
+  `listas-de-proveedores` parte de `ghcr.io/astral-sh/uv`, y sin esos dos no se construye.
 - **Variables de entorno:** ninguna. Las pruebas de punta a punta levantan su propia base
   con Docker, dentro de la máquina.
 - **Script de preparación:** prepara la máquina, no el proyecto. Corre antes de que exista
