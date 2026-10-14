@@ -1,27 +1,14 @@
 import { config } from "../config.js";
+import type { FilaDeLista, Salteada } from "../contratos/listas.js";
 
 // Cliente del servicio listas-de-proveedores (ADR-003): recibe la planilla y devuelve
 // filas normalizadas con el costo neto ya calculado y explicado.
-export type FilaLeida = {
-  codigo_proveedor: string;
-  descripcion: string;
-  marca: string | null;
-  grupo: string | null;
-  codigo_barras: string | null;
-  precio_lista: string;
-  costo_neto: string;
-  iva: string;
-  descuentos: { tipo: string; porcentaje: string }[];
-  explicacion: string[];
-  cantidad_bulto: number | null;
-  precio_bulto: string | null;
-  precio_sugerido: string | null;
-};
+export type FilaLeida = FilaDeLista;
 export type Lectura = {
   proveedor: string;
   fecha_lista: string | null;
   filas: FilaLeida[];
-  salteadas: { fila: number; motivo: string; contenido: string[] }[];
+  salteadas: Salteada[];
   ofertas: unknown[];
   avisos: string[];
   resumen: { leidas: number; salteadas: number; ofertas: number };

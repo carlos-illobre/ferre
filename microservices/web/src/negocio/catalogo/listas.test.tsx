@@ -8,7 +8,7 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 import { ErrorApi } from "../../api";
-import { aplicarLista, cargarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useListas, variacion, type Cargada, type ListaFila } from "./listas";
+import { aplicarLista, cargarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useListas, variacion, type Cargada, type Fila, type ListaFila } from "./listas";
 import { altaDeProveedor, faltaEnProveedor, useProveedoresActivos } from "../proveedores";
 import { margenAMano, otroMargen, precioDelProducto } from "./precio";
 
@@ -17,7 +17,7 @@ const resumen = { leidas: 3, salteadas: 0, nuevos: 1, modificados: 1, sin_cambio
 const lista = (id: string, proveedor_id: string, estado: string): ListaFila => ({ id, archivo_nombre: `${id}.xlsx`, fecha_lista: "2026-10-01", estado, resumen, avisos: [], importada_en: null, creado_en: "2026-10-01", proveedor_id, proveedor: proveedor_id });
 const PROVEEDORES = [{ id: "tresge", nombre: "Tresge", activo: true }, { id: "viejo", nombre: "Viejo", activo: false }];
 const cargada: Cargada = { id: "l1", proveedor: "Tresge", fecha_lista: "2026-10-01", resumen, avisos: [], salteadas: [] };
-const fila = (n: number) => ({ codigo_proveedor: `C${n}`, descripcion: `P${n}`, marca: null, costo_neto: "110", costo_anterior: "100", explicacion: [] });
+const fila = (n: number): Fila => ({ codigo_proveedor: `C${n}`, descripcion: `P${n}`, marca: null, grupo: null, codigo_barras: null, precio_lista: "100", costo_neto: "110", iva: "21", descuentos: [], explicacion: [], cantidad_bulto: null, precio_bulto: null, precio_sugerido: null, costo_anterior: "100" });
 
 beforeEach(() => { apiFalsa.mockReset(); });
 afterEach(() => { vi.useRealTimers(); });

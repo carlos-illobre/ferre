@@ -3,15 +3,16 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { api, ErrorApi } from "../../api";
 import { consultas } from "../../consultas";
 import { useProveedores, type Proveedor } from "../proveedores";
+import type { EstadoDeLista, FilasDeLista, ListaCargada, ListaEnHistorial, ResumenDeLista, Salteada } from "@servidor/listas";
 
 // Las listas de precios de los proveedores, una sola vez para el celular y la computadora
 // (RNF-60): cargar la planilla, ver qué cambia, aplicarla o descartarla.
-export type Salteada = { fila: number; motivo: string; contenido: string[] };
-export type Resumen = { leidas: number; salteadas: number; ofertas?: number; nuevos: number; modificados: number; sin_cambio: number; dados_de_baja: number; variacion_promedio: number; salteadas_detalle?: Salteada[] };
-export type ListaFila = { id: string; archivo_nombre: string; fecha_lista: string; estado: string; resumen: Resumen; avisos: string[]; importada_en: string | null; creado_en: string; proveedor_id: string; proveedor: string };
-export type Cargada = { id: string; proveedor: string; fecha_lista: string; resumen: Resumen; avisos: string[]; salteadas: Salteada[] };
-export type Fila = { codigo_proveedor: string; descripcion: string; marca: string | null; costo_neto: string; costo_anterior: string | null; explicacion: string[] };
-export type Avance = { procesadas: number; total: number | null; etapa?: string };
+export type { Salteada };
+export type Resumen = ResumenDeLista;
+export type ListaFila = ListaEnHistorial;
+export type Cargada = ListaCargada;
+export type Fila = FilasDeLista["filas"][number];
+export type Avance = NonNullable<ResumenDeLista["progreso"]>;
 export type { Proveedor };
 
 const LISTAS = ["listas"] as const;
@@ -65,7 +66,7 @@ export async function cargarLista(archivo: File, extra: Record<string, string> =
 export function useFilasDeLista(id: string) {
   const consulta = useInfiniteQuery({
     queryKey: [...LISTAS, id, "filas"],
-    queryFn: ({ pageParam }) => api<{ total: number; filas: Fila[] }>(`/listas/${id}/filas${pageParam ? `?desde=${pageParam}` : ""}`),
+    queryFn: ({ pageParam }) => api<FilasDeLista>(`/listas/${id}/filas${pageParam ? `?desde=${pageParam}` : ""}`),
     initialPageParam: 0,
     getNextPageParam: (ultima, todas) => { const van = todas.reduce((n, p) => n + p.filas.length, 0); return van < ultima.total && ultima.filas.length > 0 ? van : undefined; },
   }, consultas);
@@ -94,7 +95,7 @@ export async function aplicarLista(cargada: Cargada, alAvanzar: (a: Avance) => v
   alAvanzar({ procesadas: 0, total: cargada.resumen.leidas });
   while (sigue()) {
     await new Promise((listo) => setTimeout(listo, 800));
-    const l = await api<{ estado: string; resumen: Resumen & { progreso?: Avance; error?: string } }>(`/listas/${cargada.id}`);
+    const l = await api<EstadoDeLista>(`/listas/${cargada.id}`);
     if (l.estado === "aplicada") { void listasCambiaron(); return { aplicada: l.resumen }; }
     if (l.estado !== "aplicando") return { interrumpida: l.resumen.error ?? null };
     if (l.resumen.progreso) alAvanzar({ procesadas: l.resumen.progreso.procesadas, total: l.resumen.progreso.total ?? cargada.resumen.leidas, etapa: l.resumen.progreso.etapa });

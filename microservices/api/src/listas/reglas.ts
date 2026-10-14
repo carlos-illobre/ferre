@@ -6,6 +6,8 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { sugerirEquivalencias } from "../duplicados/datos.js";
 import * as datos from "./datos.js";
+import type { EstadoDeLista, FilasDeLista, ListaAplicandose, ListaCargada, ListaEnHistorial } from "../contratos/listas.js";
+import type { Enviable } from "../enviable.js";
 import { detectarProveedor, ErrorDeLectura, leerPlanilla, type FilaLeida, type Lectura } from "./lector.js";
 
 // Carga y aplicación de listas de precios (issues #7 a #12), en sus reglas (ADR-018). Nada se
@@ -14,7 +16,7 @@ import { detectarProveedor, ErrorDeLectura, leerPlanilla, type FilaLeida, type L
 export type Rechazo = { error: string; estado: 400 | 404 | 409 | 413 | 422 | 502 };
 const LOTE = 500;
 
-export const historial = () => datos.historial();
+export const historial = (): Promise<Enviable<ListaEnHistorial>[]> => datos.historial();
 
 // Resumen contra lo vigente: qué es nuevo, qué cambia de precio y qué desaparece.
 async function compararConVigente(proveedorId: string, filas: FilaLeida[]) {
@@ -33,7 +35,7 @@ async function compararConVigente(proveedorId: string, filas: FilaLeida[]) {
 }
 
 // Cargar una planilla. Sin proveedor, se lo detecta por la planilla; sin fecha, la de la planilla.
-export async function cargar(archivo: unknown, proveedorDado: unknown, fechaDada: unknown, usuarioId: string): Promise<Rechazo | Record<string, unknown>> {
+export async function cargar(archivo: unknown, proveedorDado: unknown, fechaDada: unknown, usuarioId: string): Promise<Rechazo | ListaCargada> {
   if (!(archivo instanceof File)) return { error: "Falta el archivo", estado: 400 };
   if (archivo.size > 30 * 1024 * 1024) return { error: "El archivo pesa más de 30 MB", estado: 413 };
   let proveedorId = typeof proveedorDado === "string" && proveedorDado ? proveedorDado : null;
@@ -72,7 +74,7 @@ export async function lectores(): Promise<string[] | null> {
 
 // Vista previa: filas con costo, explicación y el costo vigente hasta ahora, de a 200. Las que
 // cambian de precio van primero.
-export async function filas(id: string, desde: number) {
+export async function filas(id: string, desde: number): Promise<FilasDeLista | null> {
   const lista = await datos.buscarLista(id);
   if (!lista) return null;
   const lectura = await datos.releer(lista);
@@ -85,7 +87,7 @@ export async function filas(id: string, desde: number) {
 
 // Aplicar corre en segundo plano: miles de filas contra una base remota tardan, y la pantalla
 // muestra el progreso consultando la lista.
-export async function aplicar(id: string, usuarioId: string): Promise<Rechazo | { id: string; estado: "aplicando" }> {
+export async function aplicar(id: string, usuarioId: string): Promise<Rechazo | ListaAplicandose> {
   const lista = await datos.buscarLista(id);
   if (!lista) return { error: "No existe esa lista", estado: 404 };
   if (!(await datos.empezarAAplicar(lista.id))) return { error: `La lista ya está ${lista.estado === "aplicando" ? "aplicándose" : lista.estado}`, estado: 409 };
@@ -148,7 +150,7 @@ export async function archivo(id: string): Promise<{ error: string } | { nombre:
   return { nombre: lista.archivo_nombre.replace(/[^\w. -]+/g, "_"), original: lista.archivo_nombre, contenido };
 }
 
-export const estado = (id: string) => datos.estadoDe(id);
+export const estado = (id: string): Promise<Enviable<EstadoDeLista> | null> => datos.estadoDe(id);
 
 export async function descartar(id: string, usuarioId: string): Promise<boolean> {
   if (!(await datos.descartar(id))) return false;
