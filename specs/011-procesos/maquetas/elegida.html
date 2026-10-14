@@ -134,6 +134,16 @@ button{font:inherit;color:inherit;cursor:pointer}
  .agregar{display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px dashed var(--naranjaborde);background:var(--naranjasuave);color:var(--naranjatx);border-radius:12px;min-height:44px;font-weight:700;font-size:16px}
 }
 
+.pal-plegar{display:flex;align-items:center;gap:4px;border:1.5px solid var(--borde);border-radius:10px;padding:5px 6px;margin-bottom:6px;cursor:pointer;min-height:40px}
+.pal-plegar .pal-tit{margin:0;text-align:left;line-height:1.15}
+.pal-plegar .pf{display:flex;color:var(--verde);transition:transform .2s}
+.paleta-e{transition:width .2s}
+#pal-cerrada:checked ~ .cuerpo-a .paleta-e{width:64px}
+#pal-cerrada:checked ~ .cuerpo-a .paleta-e .pal span,#pal-cerrada:checked ~ .cuerpo-a .paleta-e .pal-tit{display:none}
+#pal-cerrada:checked ~ .cuerpo-a .paleta-e .pal{padding:8px 2px}
+#pal-cerrada:checked ~ .cuerpo-a .pal-plegar{justify-content:center}
+#pal-cerrada:checked ~ .cuerpo-a .pf{transform:rotate(180deg)}
+#pal-cerrada:checked ~ .cuerpo-a .dib-e{left:-60px}
 .centro-e{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
 .dib-e{position:absolute;left:-150px;top:8px;width:900px;height:350px}
 .pasos-e{flex:none}
@@ -169,9 +179,10 @@ tr.sel td:first-child{box-shadow:inset 3px 0 var(--naranja)}
   <button class="btn"><svg class="i" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 V16 M7 11 L12 16 L17 11 M5 20 H19"/></svg> Exportar</button>
   <button class="btn prim"><svg class="i" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5 V19 M5 12 H19"/></svg> Proceso nuevo</button>
 </div>
+<input type="checkbox" id="pal-cerrada" hidden>
 <div class="cuerpo-a">
-  <div class="paleta-a panel">
-    <div class="pal-tit">Arrastrá al dibujo</div>
+  <div class="paleta-a panel paleta-e">
+    <label for="pal-cerrada" class="pal-plegar" title="Mostrar u ocultar los nombres (Alt+F)" data-testid="plegar-paleta"><span class="pf"><svg class="i" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19"/></svg></span><span class="pal-tit">Arrastrá al dibujo</span></label>
     <button class="pal" title="Inicio"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg><span>Inicio</span></button><button class="pal" title="Tarea"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/></svg><span>Tarea</span></button><button class="pal" title="Tarea de una persona"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="8" cy="10.5" r="1.6"/><path d="M5.5 15 q2.5 -3 5 0"/></svg><span>Tarea de una persona</span></button><button class="pal" title="Tarea del sistema"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="8" cy="11" r="2.4"/></svg><span>Tarea del sistema</span></button><button class="pal" title="Decisión"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L21 12 L12 21 L3 12 Z"/><path d="M9 9 L15 15 M15 9 L9 15"/></svg><span>Decisión</span></button><button class="pal" title="En paralelo"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L21 12 L12 21 L3 12 Z"/><path d="M12 8 V16 M8 12 H16"/></svg><span>En paralelo</span></button><button class="pal" title="Espera"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="5.5"/></svg><span>Espera</span></button><button class="pal" title="Fin"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke-width="3.5"/></svg><span>Fin</span></button><button class="pal" title="Subproceso"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/><rect x="9.5" y="13" width="5" height="5"/><path d="M12 14 v3 M10.5 15.5 h3"/></svg><span>Subproceso</span></button><button class="pal" title="Carril"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M7 5 V19 M7 12 H21"/></svg><span>Carril</span></button><button class="pal" title="Documento"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3 H14 L18 7 V21 H6 Z M14 3 V7 H18"/></svg><span>Documento</span></button><button class="pal" title="Nota"><svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 H5 V20 H9"/><path d="M12 9 H19 M12 13 H19"/></svg><span>Nota</span></button>
   </div>
   <div class="centro-e">
