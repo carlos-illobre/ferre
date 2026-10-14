@@ -1038,13 +1038,13 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas) y casi toda la 2 (tecnología reutilizable aparte, con control automático). Faltan el final de la 2 y las etapas 3, 4 y 5 (010-T011 y 010-T003 a 010-T008)"
+  estado: "Hecho en parte: etapa 1 (carpetas) y etapa 2 (tecnología reutilizable aparte, con control automático), salvo las piezas de interfaz. Faltan las etapas 3, 4 y 5 (010-T003 a 010-T008 y 010-T012)"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
     - microservices/web/src/guardado.test.tsx
     - microservices/web/src/cola.test.ts
   defectos:
-    - "Siguen fuera de la plataforma, atados al negocio: el canal en tiempo real, el cliente del servidor y las piezas de interfaz"
-    - "Los estilos del visor de la cámara están en la hoja del celular, no junto al lector"
+    - "Las piezas de interfaz (botón, hoja, aviso, tabla) siguen duplicadas: un juego en la computadora y otro en el celular; se unifican con la etapa 3 (010-T012)"
+    - "Los estilos del visor de la cámara están en las hojas del celular y de la computadora, no junto al lector (010-T012)"
     - "Las piezas nuevas de la plataforma (base local, cola, preferencias, navegación) se prueban a través de las pruebas de Ferrebress; no tienen pruebas propias que no nombren a Ferrebress"

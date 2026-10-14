@@ -1,78 +1,33 @@
-// Única puerta a la API. El origen se fija al construir (ADR-010): falta = error al
-// construir, no un fallback silencioso.
+import { crearCliente, ErrorDelServidor } from "./plataforma/servidor/cliente";
+import { reducirImagen } from "./plataforma/imagenes/reducir";
+
+// Única puerta a la API de Ferrebress. El cliente en sí es tecnología de la plataforma; acá
+// se dice dónde está la API, dónde vive la sesión (ADR-011) y qué pasa cuando se pierde o
+// cuando algo se guarda. El origen se fija al construir (ADR-010): falta = error al construir,
+// no un fallback silencioso.
 const origen = import.meta.env.VITE_API_URL;
 if (origen === undefined) throw new Error("Falta VITE_API_URL al construir el cliente web");
 
-export function urlApi(ruta: string): string {
-  return `${origen}${ruta}`;
-}
-
-export class ErrorApi extends Error {
-  constructor(public estado: number, mensaje: string) {
-    super(mensaje);
-  }
-}
-
-// Todas las llamadas llevan el token de sesión si existe. Un 401 significa que la
-// sesión ya no vale: se borra y la app vuelve al login.
-export async function api<T>(ruta: string, opciones: RequestInit = {}): Promise<T> {
-  const cabeceras = new Headers(opciones.headers);
-  // Un FormData (subida de archivos) fija su propio Content-Type con el separador.
-  if (!(opciones.body instanceof FormData)) cabeceras.set("Content-Type", "application/json");
-  const token = leerToken();
-  if (token) cabeceras.set("Authorization", `Bearer ${token}`);
-  const respuesta = await fetch(urlApi(ruta), { ...opciones, headers: cabeceras });
-  if (respuesta.status === 401 && token) {
-    borrarToken();
-    window.dispatchEvent(new Event("sesion-cerrada"));
-  }
-  if (!respuesta.ok) {
-    const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string };
-    throw new ErrorApi(respuesta.status, cuerpo.error ?? `Error ${respuesta.status}`);
-  }
-  // Lo que se guardó en el servidor puede cambiar lo que el dispositivo tiene en memoria (el
-  // catálogo, el stock): quien lo tenga se entera y lo vuelve a pedir cuando haga falta.
-  if (opciones.method && opciones.method !== "GET") window.dispatchEvent(new CustomEvent(EVENTO_CAMBIO, { detail: ruta }));
-  return respuesta.status === 204 ? (undefined as T) : ((await respuesta.json()) as T);
-}
+// Lo que se guardó en el servidor puede cambiar lo que el dispositivo tiene en memoria (el
+// catálogo, el stock): quien lo tenga se entera y lo vuelve a pedir cuando haga falta.
 export const EVENTO_CAMBIO = "ferre:cambio-guardado";
 
-// El token de sesión vive en este dispositivo (ADR-011). Sin conexión, sigue valiendo.
-const CLAVE = "ferre.sesion";
-export function leerToken(): string | null {
-  try {
-    return localStorage.getItem(CLAVE);
-  } catch {
-    return null;
-  }
-}
-export function guardarToken(token: string): void {
-  localStorage.setItem(CLAVE, token);
-}
-export function borrarToken(): void {
-  localStorage.removeItem(CLAVE);
-}
+const cliente = crearCliente({
+  origen,
+  claveDelToken: "ferre.sesion",
+  // La sesión ya no vale: la aplicación vuelve a la entrada.
+  alPerderLaSesion: () => window.dispatchEvent(new Event("sesion-cerrada")),
+  alGuardar: (ruta) => window.dispatchEvent(new CustomEvent(EVENTO_CAMBIO, { detail: ruta })),
+});
 
-// Bajar un archivo de la API con la sesión puesta. Un enlace común no sirve: el token va
-// en la cabecera, no en una cookie. Se pide, se arma un blob y se dispara la descarga.
-export async function descargar(ruta: string, nombre: string): Promise<void> {
-  const cabeceras = new Headers();
-  const token = leerToken();
-  if (token) cabeceras.set("Authorization", `Bearer ${token}`);
-  const respuesta = await fetch(urlApi(ruta), { headers: cabeceras });
-  if (!respuesta.ok) {
-    const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string };
-    throw new ErrorApi(respuesta.status, cuerpo.error ?? `Error ${respuesta.status}`);
-  }
-  const url = URL.createObjectURL(await respuesta.blob());
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = nombre;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 10_000);
-}
+export { ErrorDelServidor as ErrorApi };
+export const urlApi = cliente.url;
+export const api = cliente.pedir;
+export const descargar = cliente.descargar;
+export const leerToken = cliente.leerToken;
+export const guardarToken = cliente.guardarToken;
+export const borrarToken = cliente.borrarToken;
+export { reducirImagen };
 
 // Una foto subida se guarda como "/fotos/..." (relativa a la API); una externa, completa.
 export function urlDeFoto(url: string | null | undefined): string | null {
@@ -80,23 +35,7 @@ export function urlDeFoto(url: string | null | undefined): string | null {
   return url.startsWith("/") ? urlApi(url) : url;
 }
 
-// La foto del celular se achica a 800 px de lado antes de subir: pesa 20 veces menos y
-// en pantalla se ve igual. Si el navegador no puede (raro), va la original.
-export async function reducirImagen(archivo: File, lado = 800): Promise<Blob> {
-  try {
-    const imagen = await createImageBitmap(archivo);
-    const escala = Math.min(1, lado / Math.max(imagen.width, imagen.height));
-    if (escala === 1 && archivo.type === "image/jpeg") return archivo;
-    const lienzo = document.createElement("canvas");
-    lienzo.width = Math.round(imagen.width * escala);
-    lienzo.height = Math.round(imagen.height * escala);
-    lienzo.getContext("2d")!.drawImage(imagen, 0, 0, lienzo.width, lienzo.height);
-    return await new Promise<Blob>((r, j) => lienzo.toBlob((b) => (b ? r(b) : j(new Error("No se pudo achicar la foto"))), "image/jpeg", 0.85));
-  } catch {
-    return archivo;
-  }
-}
-
+// La foto del celular se achica a 800 px de lado antes de subir.
 export async function subirFoto(productoId: string, archivo: File): Promise<string> {
   const datos = new FormData();
   datos.append("foto", await reducirImagen(archivo), "foto.jpg");

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { api, leerToken, urlApi } from "./api";
+import { escucharFlujo } from "./plataforma/tiempo-real/flujo-de-eventos";
 import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoLocal, puestoRemoto } from "./puesto";
 
 // El espejo entre el celular y la computadora emparejados (decisión 60). Con la aplicación
@@ -50,67 +51,53 @@ function conectar() {
   for (const t of ["ir", ...DOCUMENTOS] as Tipo[]) delete acordado[t];
   if (!id || !lado) { poner({ emparejado: false, lado: null, conectado: false, otroPresente: false, pausado: false }); return; }
   poner({ emparejado: true, lado, conectado: false, otroPresente: false });
-  let activo = true;
-  let control: AbortController | null = null;
   const presencia = (p: { computadora: boolean; celular: boolean }) => poner({ otroPresente: lado === "computadora" ? p.celular : p.computadora });
-  (async () => {
-    while (activo) {
-      control = new AbortController();
-      try {
-        const r = await fetch(urlApi(`/puestos/${id}/espejo`), { headers: { Authorization: `Bearer ${leerToken() ?? ""}` }, signal: control.signal });
-        if (r.status === 404 || r.status === 401) { if (r.status === 404) { guardarPuestoLocal(null); guardarPuestoRemoto(null); } return; }
-        if (!r.ok || !r.body) throw new Error(`espejo ${r.status}`);
-        const lector = r.body.getReader();
-        const decodificador = new TextDecoder();
-        let resto = "";
-        while (activo) {
-          const { value, done } = await lector.read();
-          if (done) break;
-          resto += decodificador.decode(value, { stream: true });
-          const bloques = resto.split("\n\n");
-          resto = bloques.pop() ?? "";
-          for (const bloque of bloques) {
-            const lineas = bloque.split("\n");
-            const evento = lineas.find((l) => l.startsWith("event:"))?.slice(6).trim();
-            const crudo = lineas.filter((l) => l.startsWith("data:")).map((l) => l.slice(5).trim()).join("\n");
-            if (!evento || evento === "latido") continue;
-            const datos = crudo ? (JSON.parse(crudo) as unknown) : null;
-            if (evento === "estado") {
-              const e = datos as { parte: string | null; docs: Record<string, unknown>; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
-              const hayAlgo = e.parte !== null || DOCUMENTOS.some((d) => (e.docs?.[d] ?? null) !== null);
-              poner({ conectado: true, pausado: e.pausado });
-              presencia(e.presentes);
-              // El que llega con el otro ya trabajando se suma a lo que el otro tiene. Si el otro no
-              // está (o no hay nada todavía), este lado sigue con lo suyo y lo cuenta: lo guardado
-              // puede ser de hace horas, y no tiene que mover a quien acaba de abrir la aplicación.
-              const elOtroEsta = lado === "computadora" ? e.presentes.celular : e.presentes.computadora;
-              // La excepción es dónde se está parado: ahí manda siempre la computadora (decisión 71).
-              // La computadora cuenta su pantalla y el celular va a ella, nunca al revés al conectarse.
-              if (elOtroEsta && hayAlgo) {
-                // Si la computadora todavía está abriendo (sin pantalla que contar), la cuenta apenas la tenga.
-                if (lado !== "computadora") entregar("ir", e.parte);
-                else if (!reanudar("ir")) irSinContar = true;
-                for (const d of DOCUMENTOS) entregar(d, e.docs?.[d]);
-              }
-              // Con los dos recién llegados y nada acordado todavía, cuenta lo suyo solo la
-              // computadora, que es la principal: si contaran los dos, se cruzarían.
-              else if (!elOtroEsta || lado === "computadora") reanudar();
-            } else if (evento === "presencia") presencia(datos as { computadora: boolean; celular: boolean });
-            else if (evento === "pausa") {
-              const pausado = Boolean(datos);
-              const reanuda = estado.pausado && !pausado;
-              poner({ pausado });
-              if (reanuda && lado === "computadora") reanudar();
-            } else if (evento === "desvinculado") { guardarPuestoLocal(null); guardarPuestoRemoto(null); return; }
-            else if (evento === "aviso") { if (!estado.pausado) oyentesDeAvisos.forEach((o) => o(String(datos ?? ""))); }
-            else if (evento === "ir" || DOCUMENTOS.includes(evento as Tipo)) entregar(evento as Tipo, datos);
-          }
+  // La conexión (escuchar el flujo y reconectar) es tecnología de la plataforma; acá va qué
+  // significa cada evento del espejo.
+  cortar = escucharFlujo({
+    url: urlApi(`/puestos/${id}/espejo`),
+    cabeceras: () => ({ Authorization: `Bearer ${leerToken() ?? ""}` }),
+    ignorar: ["latido"],
+    // El vínculo ya no existe (404) o la sesión no vale (401): no se insiste.
+    alResponder: (codigo) => {
+      if (codigo !== 404 && codigo !== 401) return;
+      if (codigo === 404) { guardarPuestoLocal(null); guardarPuestoRemoto(null); }
+      return "cortar";
+    },
+    alDesconectar: () => poner({ conectado: false, otroPresente: false }),
+    alEvento: (evento, datos) => {
+      if (evento === "estado") {
+        const e = datos as { parte: string | null; docs: Record<string, unknown>; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
+        const hayAlgo = e.parte !== null || DOCUMENTOS.some((d) => (e.docs?.[d] ?? null) !== null);
+        poner({ conectado: true, pausado: e.pausado });
+        presencia(e.presentes);
+        // El que llega con el otro ya trabajando se suma a lo que el otro tiene. Si el otro no
+        // está (o no hay nada todavía), este lado sigue con lo suyo y lo cuenta: lo guardado
+        // puede ser de hace horas, y no tiene que mover a quien acaba de abrir la aplicación.
+        const elOtroEsta = lado === "computadora" ? e.presentes.celular : e.presentes.computadora;
+        // La excepción es dónde se está parado: ahí manda siempre la computadora (decisión 71).
+        // La computadora cuenta su pantalla y el celular va a ella, nunca al revés al conectarse.
+        if (elOtroEsta && hayAlgo) {
+          // Si la computadora todavía está abriendo (sin pantalla que contar), la cuenta apenas la tenga.
+          if (lado !== "computadora") entregar("ir", e.parte);
+          else if (!reanudar("ir")) irSinContar = true;
+          for (const d of DOCUMENTOS) entregar(d, e.docs?.[d]);
         }
-      } catch { /* se reconecta abajo */ }
-      if (activo) { poner({ conectado: false, otroPresente: false }); await new Promise((r) => setTimeout(r, 3000)); }
-    }
-  })();
-  cortar = () => { activo = false; control?.abort(); };
+        // Con los dos recién llegados y nada acordado todavía, cuenta lo suyo solo la
+        // computadora, que es la principal: si contaran los dos, se cruzarían.
+        else if (!elOtroEsta || lado === "computadora") reanudar();
+      } else if (evento === "presencia") presencia(datos as { computadora: boolean; celular: boolean });
+      else if (evento === "pausa") {
+        const pausado = Boolean(datos);
+        const reanuda = estado.pausado && !pausado;
+        poner({ pausado });
+        if (reanuda && lado === "computadora") reanudar();
+      } else if (evento === "desvinculado") { guardarPuestoLocal(null); guardarPuestoRemoto(null); return "cortar"; }
+      else if (evento === "aviso") { if (!estado.pausado) oyentesDeAvisos.forEach((o) => o(String(datos ?? ""))); }
+      else if (evento === "ir" || DOCUMENTOS.includes(evento as Tipo)) entregar(evento as Tipo, datos);
+      return;
+    },
+  });
 }
 
 let arrancado = false;
