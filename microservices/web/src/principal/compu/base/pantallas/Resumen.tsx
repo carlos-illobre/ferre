@@ -4,7 +4,8 @@ import { urlApi } from "../../../../api";
 import { esAmbienteDePrueba } from "../../../../ambiente";
 import { fecha, pesos } from "../../../../formato";
 import { useSesion } from "../../../../sesion";
-import { NOMBRE_MEDIO, type DatosDelDia as DatosHoy } from "./VentasDeHoy";
+import { MEDIOS, NOMBRE_DE_MEDIO as NOMBRE_MEDIO } from "../../../../negocio/ventas/venta";
+import type { VentasDelDia as DatosHoy } from "../../../../negocio/ventas/ventas-del-dia";
 import { irA } from "../rutas";
 import { useEsCelular } from "../vista";
 import { Aviso, Boton, EstadoDeConexion, Explicado, Icono, Indicador, Pagina, Pastilla, Vacio, pesosCortos, type NombreDeIcono } from "../ui";
@@ -68,7 +69,7 @@ export function Resumen() {
           {!hoy.datos && !hoy.error && <Esqueleto renglones={4} />}
           {hoy.datos && (
             <ul className="resumen-medios">
-              {Object.keys(NOMBRE_MEDIO).map((m) => {
+              {MEDIOS.map((m) => {
                 const importe = hoy.datos!.totales[m] ?? 0;
                 const parte = hoy.datos!.total > 0 ? importe / hoy.datos!.total : 0;
                 return (
@@ -104,7 +105,7 @@ export function Resumen() {
 }
 
 function pasosDeVentas(d: DatosHoy, anuladas: number): string[] {
-  const pasos = Object.keys(NOMBRE_MEDIO).filter((m) => (d.totales[m] ?? 0) > 0).map((m) => `${NOMBRE_MEDIO[m]}: ${pesos(d.totales[m])}`);
+  const pasos = MEDIOS.filter((m) => (d.totales[m] ?? 0) > 0).map((m) => `${NOMBRE_MEDIO[m]}: ${pesos(d.totales[m])}`);
   if (anuladas) pasos.push(`${plural(anuladas, "venta anulada", "ventas anuladas")}: no ${anuladas === 1 ? "suma" : "suman"}`);
   if (!pasos.length) pasos.push("Todavía no se registraron ventas en el día");
   return [...pasos, `Vendido hoy: ${pesos(d.total)}`];

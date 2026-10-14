@@ -10,13 +10,12 @@ import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { api, ErrorApi } from "../../api";
 import { enviarOEncolar } from "../../cola";
 import { traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
-import { fecha, pesos, porcentaje } from "../../formato";
+import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
 import { cantidadValida, enteras, unidadDe } from "../../unidades";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
-import { pesosCortos } from "./pantallas/VentasDeHoy";
 import type { Producto } from "./pantallas/Productos";
 
 // Depósito: inventario (cantidades, sin dinero), ingreso de mercadería y conteo por sector. Tres

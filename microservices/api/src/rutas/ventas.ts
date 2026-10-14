@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { exigirPermiso, exigirSesion, puede } from "../autenticacion.js";
+import type { VentaDelDia, VentasDelDia } from "../contratos/ventas.js";
 
 // La venta (issue #15): reemplaza el renglón del cuaderno. Cada ítem guarda costo, margen,
 // precio y explicación DE ESE MOMENTO, así el precio se puede explicar para siempre aunque
@@ -104,7 +105,7 @@ ventas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
 ventas.get("/", exigirPermiso("ventas.ver", "negocio.numeros"), async (c) => {
   // "Hoy" es el día del local (Buenos Aires), no el día UTC del servidor: a la noche difieren.
   const dia = c.req.query("dia") || null;
-  const { rows } = await pool.query(
+  const { rows } = await pool.query<VentaDelDia>(
     `SELECT v.id, v.fecha, v.medio_pago, v.total, v.estado, v.pagada_en, cl.nombre AS cliente,
             COALESCE(json_agg(json_build_object('descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'explicacion', i.explicacion) ORDER BY i.orden) FILTER (WHERE i.id IS NOT NULL), '[]') AS items
        FROM venta v LEFT JOIN cliente cl ON cl.id = v.cliente_id LEFT JOIN item_venta i ON i.venta_id = v.id
@@ -112,9 +113,10 @@ ventas.get("/", exigirPermiso("ventas.ver", "negocio.numeros"), async (c) => {
       GROUP BY v.id, cl.nombre ORDER BY v.fecha DESC`,
     [dia],
   );
-  const totales: Record<string, number> = {};
+  const totales: VentasDelDia["totales"] = {};
   for (const v of rows) if (v.estado === "confirmada") totales[v.medio_pago] = (totales[v.medio_pago] ?? 0) + Number(v.total);
-  return c.json({ dia: dia ?? new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 10), ventas: rows, totales, total: Object.values(totales).reduce((a, b) => a + b, 0) });
+  const respuesta: VentasDelDia = { dia: dia ?? new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 10), ventas: rows, totales, total: Object.values(totales).reduce((a, b) => a + b, 0) };
+  return c.json(respuesta);
 });
 
 // Anular: la venta queda marcada (no se borra) y vuelve al stock lo que la venta descontó de

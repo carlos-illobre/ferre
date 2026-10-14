@@ -13,11 +13,10 @@ import { traerPorCodigo, useCatalogo } from "../../catalogo";
 import { useDebounce } from "../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { descargar, subirFoto } from "../../api";
-import { fecha, pesos } from "../../formato";
+import { fecha, pesos, pesosCortos } from "../../formato";
 import { irA } from "../../rutas";
 import { Listas } from "./pantallas/Listas";
 import { Duplicados } from "./pantallas/Duplicados";
-import { pesosCortos } from "./pantallas/VentasDeHoy";
 import type { Producto } from "./pantallas/Productos";
 
 // Catálogo: productos con margen y proveedores, listas de precios, duplicados. Tres

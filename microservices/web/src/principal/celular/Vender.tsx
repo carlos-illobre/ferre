@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { irA } from "../../rutas";
 import { contarAlEspejo, useEspejar } from "../../espejo";
-import { precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { NOMBRE_DE_MEDIO, precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { SiVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
@@ -16,12 +16,12 @@ import { guardar, borrarAnterioresA } from "../../almacen";
 import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendientesEnCola } from "../../cola";
 import { traerPorCodigo, useCatalogo } from "../../catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
-import { pesos } from "../../formato";
+import { pesos, pesosCortos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../../puesto";
-import { AnularVentas, NOMBRE_MEDIO, pesosCortos, VentasDeHoy } from "./pantallas/VentasDeHoy";
+import { AnularVentas, VentasDeHoy } from "./pantallas/VentasDeHoy";
 import { Pestanas } from "./Pestanas";
 import { SinPermiso } from "../SinPermiso";
 import type { Producto } from "./pantallas/Productos";
@@ -90,7 +90,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     textoDeRechazo: (m) => m,
     alCambiar: useCallback((motivo: MotivoDeCambio) => { if (motivo === "agregar") setConsulta(""); }, []),
     alFaltarCliente: () => setHoja("clientes"),
-    alCobrar: (c) => setMensaje(c.encolado ? `Venta guardada en este dispositivo (${pesos(c.total)}). Sin conexión: se envía sola cuando vuelva.` : `Venta registrada: ${pesos(c.total)} en ${(NOMBRE_MEDIO[c.medio] ?? c.medio).toLowerCase()}.`),
+    alCobrar: (c) => setMensaje(c.encolado ? `Venta guardada en este dispositivo (${pesos(c.total)}). Sin conexión: se envía sola cuando vuelva.` : `Venta registrada: ${pesos(c.total)} en ${(NOMBRE_DE_MEDIO[c.medio]).toLowerCase()}.`),
   });
   const { items, medio, setMedio, clienteId, setClienteId, cliente, total, sinPrecio, mensaje, setMensaje, error, setError, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, quitar, elegirMargen, elegirSugerencia, elegirMedio, cobrar } = venta;
   // Un código que no es de ningún producto deja la búsqueda limpia, para elegir a cuál asociarlo.
@@ -99,7 +99,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   // Lo que se dice de la venta recién cobrada, con las palabras del celular.
   const exito = useMemo(() => cobro && {
     total: cobro.total,
-    medio: (NOMBRE_MEDIO[cobro.medio] ?? cobro.medio) + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
+    medio: (NOMBRE_DE_MEDIO[cobro.medio]) + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
     detalle: cobro.encolado ? "Sin conexión: se envía sola cuando vuelva internet." : `${cobro.productos} ${cobro.productos === 1 ? "producto" : "productos"} · ${new Date(cobro.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })} · el stock ya se descontó.`,
   }, [cobro]);
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía media pantalla.

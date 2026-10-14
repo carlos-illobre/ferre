@@ -5,7 +5,7 @@ import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import QRCode from "qrcode";
 import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
-import { precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { NOMBRE_DE_MEDIO, precioDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { esMargenBoton, margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
@@ -18,7 +18,6 @@ import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { enviarCodigoAlPuesto, escucharPuesto, EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, pedirLector, puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
 import type { Producto } from "../celular/pantallas/Productos";
 import { describirDispositivo } from "./base/dispositivo";
-import { NOMBRE_MEDIO, useVentasDelDia } from "./base/pantallas/VentasDeHoy";
 import { useEsCelular } from "./base/vista";
 import { irA } from "./base/rutas";
 import { Aviso, Boton, Buscador, Contador, Exito, Explicado, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Progreso, Toast, Vacio, hora, numero, pesosCortos } from "./base/ui";
@@ -61,7 +60,7 @@ export function Vender() {
   // Lo que se dice de la venta recién cobrada, con las palabras de la computadora.
   const exito = useMemo(() => cobro && {
     total: cobro.total, encolado: cobro.encolado,
-    medio: NOMBRE_MEDIO[cobro.medio]! + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
+    medio: NOMBRE_DE_MEDIO[cobro.medio] + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
     detalle: cobro.encolado ? "Sin conexión: quedó guardada en este dispositivo y se envía sola cuando vuelva internet." : `${cobro.productos} ${cobro.productos === 1 ? "producto" : "productos"} a las ${hora(cobro.fecha)}. El stock ya se descontó.`,
   }, [cobro]);
   const sugeridos = useSugeridos(catalogo, exito);

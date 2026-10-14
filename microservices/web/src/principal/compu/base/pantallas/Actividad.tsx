@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../../api";
 import { fecha } from "../../../../formato";
-import { NOMBRE_MEDIO } from "./VentasDeHoy";
+import { nombreDeMedio } from "../../../../negocio/ventas/venta";
 import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Progreso, Vacio, numero, pesosCortos } from "../ui";
 import { diaYHora, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
@@ -79,7 +79,7 @@ function detalleDe(e: Evento, usuarios: UsuarioFila[]): string {
   const c = e.contenido;
   const persona = (id: unknown) => usuarios.find((u) => u.id === id)?.nombre ?? "un usuario";
   switch (e.tipo) {
-    case "venta.registrada": return juntar(pesosCortos(c.total as number), NOMBRE_MEDIO[String(c.medio_pago)] ?? texto(c.medio_pago), cuantos(c.items, "producto", "productos"));
+    case "venta.registrada": return juntar(pesosCortos(c.total as number), nombreDeMedio(texto(c.medio_pago)), cuantos(c.items, "producto", "productos"));
     case "venta.anulada": case "compra.anulada": return c.motivo ? `Motivo: ${texto(c.motivo)}` : "Sin motivo anotado";
     case "compra.registrada": return juntar(texto(c.proveedor), pesosCortos(c.total as number), c.comprobante ? `comprobante ${texto(c.comprobante)}` : "", cuantos(c.items, "producto", "productos"));
     case "producto.precio_elegido": return juntar("margen_elegido" in c && (c.margen_elegido === null ? "Sin margen elegido" : `Margen del ${texto(c.margen_elegido)} %`), "unidad" in c && `Se vende por ${texto(c.unidad)}`, "codigo_barras" in c && (c.codigo_barras ? `Código de barras ${texto(c.codigo_barras)}` : "Sin código de barras"), "proveedor_preferido_id" in c && "Cambió el proveedor preferido", "foto_url" in c && "Cambió la foto");

@@ -1,6 +1,7 @@
 import "fake-indexeddb/auto";
 import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
+import { consultas } from "../consultas";
 import { conTodosLosPermisos, usuarioDePrueba } from "./sesion";
 
 // Las pantallas se prueban sueltas, sin el proveedor de sesión: la sesión es la de prueba.
@@ -31,4 +32,4 @@ if (!globalThis.crypto.randomUUID) {
 window.confirm = () => true;
 window.alert = () => undefined;
 
-afterEach(() => { cleanup(); localStorage.clear(); conTodosLosPermisos(); });
+afterEach(() => { cleanup(); localStorage.clear(); consultas.clear(); conTodosLosPermisos(); });

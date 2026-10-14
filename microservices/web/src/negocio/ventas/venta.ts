@@ -1,3 +1,5 @@
+import type { MedioDePago } from "@servidor/ventas";
+import { ventasCambiaron } from "./ventas-del-dia";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { margenReal, precioDeVenta, subtotalDeRenglon } from "@ferre/calculo-de-precios";
 import { ErrorApi, subirFoto } from "../../api";
@@ -13,8 +15,11 @@ import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "./ven
 // La venta, una sola vez para el celular y la computadora (RNF-60). Acá están los renglones,
 // el precio de cada uno, cómo se paga, cobrar y «no llevó». Las pantallas solo muestran y
 // reciben lo que la persona toca: qué tecla, qué hoja y qué texto son cosa de cada interfaz.
-export type Medio = "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente";
+export type Medio = MedioDePago;
 export const NOMBRE_DE_MEDIO: Record<Medio, string> = { efectivo: "Efectivo", mercado_pago: "Mercado Pago", tarjeta: "Tarjeta", cuenta_corriente: "Cuenta corriente" };
+export const MEDIOS = Object.keys(NOMBRE_DE_MEDIO) as Medio[];
+// Para un medio que llega como texto suelto (el registro de acciones): su nombre, o el texto tal cual.
+export const nombreDeMedio = (medio: string): string => (NOMBRE_DE_MEDIO as Record<string, string>)[medio] ?? medio;
 
 export type Item = {
   clave: string; producto: Producto | null; descripcion: string; cantidad: number;
@@ -193,6 +198,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
       contarAlEspejo(`Venta de ${pesosCortos(total)} cobrada en ${opciones.lado === "computadora" ? "la computadora" : "el celular"}`);
       const hecho: Cobro = { total, encolado, medio, cliente: cliente?.nombre ?? null, productos: items.length, fecha: cuerpo.fecha };
       setCobro(hecho);
+      if (!encolado) void ventasCambiaron();
       opciones.alCobrar?.(hecho);
     } catch (e) {
       setOcupado(false);

@@ -12,7 +12,9 @@ import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, v
 import { AvisoError, Hoja, Icono, Toast } from "./componentes/base";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { describirDispositivo } from "./pantallas/Login";
-import { NOMBRE_MEDIO, pesosCortos, useVentasDeHoy } from "./pantallas/VentasDeHoy";
+import { pesosCortos } from "../../formato";
+import { MEDIOS, NOMBRE_DE_MEDIO } from "../../negocio/ventas/venta";
+import { useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
 import { esAmbienteDePrueba } from "../../ambiente";
 
 type UsuarioFila = { id: string; email: string; nombre: string; activo: boolean; roles: RolAsignable[] };
@@ -30,7 +32,7 @@ export function Negocio({ parte }: { parte: Parte }) {
   const { sesion, salir } = useSesion();
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const puedeEsto = usePuede();
-  const { datos: hoy } = useVentasDeHoy(null);
+  const { datos: hoy } = useVentasDelDia();
   const [gastos, setGastos] = useState<Gastos | null>(null);
   const [servidor, setServidor] = useState<string | null>(null);
   useEffect(() => {
@@ -62,7 +64,7 @@ export function Negocio({ parte }: { parte: Parte }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}><small>Ventas de hoy · {hoyTexto}</small><small>{hoy.ventas.filter((v) => v.estado === "confirmada").length} ventas</small></div>
           <span className="importe" style={{ fontSize: 44, lineHeight: 1 }}>{pesosCortos(hoy.total)}</span>
           <div className="totales-hoy">
-            {Object.keys(NOMBRE_MEDIO).map((m) => <div key={m}><small>{NOMBRE_MEDIO[m]}</small><span className="importe">{pesosCortos(hoy.totales[m] ?? 0)}</span></div>)}
+            {MEDIOS.map((m) => <div key={m}><small>{NOMBRE_DE_MEDIO[m]}</small><span className="importe">{pesosCortos(hoy.totales[m] ?? 0)}</span></div>)}
           </div>
         </div>
       )}
