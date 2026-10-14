@@ -21,4 +21,5 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T015 [interfaz] En el celular, primero la pestaña «Diagrama», que es la que se abre, y después «Pasos»; las doce figuras del mismo tamaño y con nombres cortos (pedidos de Carlos del 2026-10-14)
 - [x] T016 [interfaz] En el celular, «Agregar un paso» se pliega y se despliega; el logo de bpmn.io flota abajo a la derecha, encima de la hoja, y la acompaña al abrirse y cerrarse (pedido de Carlos del 2026-10-14)
 - [x] T017 [ajuste] En el celular, el logo de bpmn.io flota abajo a la derecha en vez de a la izquierda (pedido de Carlos del 2026-10-14)
+- [x] T018 [ajuste] En el celular, la explicación de «Agregar un paso» en un solo renglón (pedido de Carlos del 2026-10-14)
 - [ ] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

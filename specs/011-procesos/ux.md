@@ -60,6 +60,7 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
   «Sistema», «Paralelo»); el nombre completo queda para los lectores de pantalla (pedido de
   Carlos del 2026-10-14).
 - La hoja «Agregar un paso» se pliega y se despliega tocando su título (arranca abierta); plegada deja a la vista solo el título, para ver más dibujo. El logo de bpmn.io flota abajo a la derecha del dibujo, justo encima de la hoja, y se mueve con ella (pedido de Carlos del 2026-10-14).
+- Debajo de «Agregar un paso», una sola línea: «Arrastrá una al dibujo o tocala para agregarla.» (tocarla la pone después del paso elegido; pedido de Carlos del 2026-10-14).
 - Todo se alcanza con una mano; nada se corre hacia el costado salvo el dibujo.
 
 ## Exportar e importar (historia 5)
