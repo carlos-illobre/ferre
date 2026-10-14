@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { detalleDelRegistro, diferenciaConLaLista, useIngreso } from "../../negocio/deposito/ingreso";
+import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStock, useMovimientos, useStock, type StockFila } from "../../negocio/deposito/inventario";
+import { abrirConteo, crearSector as crearSectorNuevo, useConteo, useSectores, type Conteo } from "../../negocio/deposito/conteo";
 import { AvisoDePedido, Pedidos, usePedidoAIngresar } from "../Pedidos";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { COMPROBANTES, MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
-import { api, ErrorApi } from "../../api";
-import { enviarOEncolar } from "../../cola";
+import { ErrorApi } from "../../api";
 import { traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
@@ -48,35 +49,27 @@ export function Deposito({ sub }: { sub: string | null }) {
 }
 
 // ---------- Stock ----------
-type StockFila = { id: string; stock: string; costo_neto: string | null; proveedor: string | null; valor: string; ultimo_movimiento: string | null };
-type Datos = { productos: StockFila[]; valor_total: number; por_proveedor: Record<string, { unidades: number; valor: number; productos: number }> };
-type Movimiento = { id: string; tipo: string; cantidad: string; referencia_tipo: string | null; fecha: string; nota: string | null };
-
 // Inventario: cuánto hay de cada producto, explicado con sus movimientos. Sin sumas de
 // dinero: el dinero invertido está en Cómo va el negocio (decisión 31).
 function Stock() {
   const { catalogo, buscarProductos, actualizarProducto } = useCatalogo();
-  const [datos, setDatos] = useState<Datos | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { porId, error: fallo } = useStock();
+  // El aviso se puede cerrar; vuelve si el próximo pedido falla de nuevo.
+  const [cerrado, setCerrado] = useState<unknown>(null);
+  const error = !fallo || fallo === cerrado ? null : fallo instanceof ErrorApi ? fallo.message : "Sin conexión con el servidor.";
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
   const [abierto, setAbierto] = useState<string | null>(null);
   const [escaneando, setEscaneando] = useState(false);
 
-  const cargar = useCallback(() => api<Datos>("/stock").then((d) => { setDatos(d); setError(null); }).catch((e) => setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor.")), []);
-  useEffect(() => { void cargar(); }, [cargar]);
-
-  const porId = useMemo(() => new Map((datos?.productos ?? []).map((s) => [s.id, s])), [datos]);
-  // Buscando en el servidor (RF-85) no está el catálogo en memoria: se traen los primeros productos con stock.
-  useEffect(() => { if (datos) void traerPorIds(datos.productos.slice(0, 150).map((s) => s.id)); }, [datos]);
   const filas = useMemo(() => {
     if (!catalogo) return [];
-    return consulta.trim() ? buscarProductos(consulta, 100) : catalogo.filter((p) => porId.has(p.id)).sort((a, b) => a.descripcion.localeCompare(b.descripcion, "es")).slice(0, 100);
+    return consulta.trim() ? buscarProductos(consulta, 100) : productosConStock(catalogo, porId).slice(0, 100);
   }, [catalogo, consulta, buscarProductos, porId]);
 
   return (
     <>
-      <AvisoError texto={error} alCerrar={() => setError(null)} />
+      <AvisoError texto={error} alCerrar={() => setCerrado(fallo)} />
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
       <div className="lateral">
       <div className="columna al-costado">
@@ -86,7 +79,7 @@ function Stock() {
       {escaneando && <Escaner alDetectar={(codigo) => { setEscaneando(false); setConsulta(codigo); setAbierto(null); }} alCerrar={() => setEscaneando(false)} />}
       <p className="subtitulo">El stock es la suma de compras, ventas y ajustes desde que se usa el sistema. Hasta el conteo, lo que no se cargó no está.</p>
       <div className="lista" data-testid="tabla-stock">
-        {filas.map((p) => <FilaStock key={p.id} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={async (texto) => { setMensaje(texto); await cargar(); }} />)}
+        {filas.map((p) => <FilaStock key={p.id} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={setMensaje} />)}
       </div>
       {consulta.trim() && filas.length === 0 && catalogo && <div className="aviso-suave">Nada con "{consulta}".</div>}
       </div>
@@ -95,30 +88,31 @@ function Stock() {
   );
 }
 
-function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: { alFoto: (foto_url: string) => void; producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => Promise<void> }) {
+function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: { alFoto: (foto_url: string) => void; producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => void }) {
   const corrige = usePuede()("deposito.stock");
   const cantidad = fila ? Number(fila.stock) : 0;
-  const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null);
+  const { movimientos: traidos, error: sinMovimientos } = useMovimientos(p.id, abierto);
+  const movimientos = traidos ?? (sinMovimientos ? [] : null);
+  const { faltaEn, corregir } = useCorregirStock(p);
   const [corrigiendo, setCorrigiendo] = useState(false);
   const [real, setReal] = useState("");
   const [motivo, setMotivo] = useState("");
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { if (abierto) api<Movimiento[]>(`/stock/${p.id}/movimientos`).then(setMovimientos).catch(() => setMovimientos([])); else setCorrigiendo(false); }, [abierto, p.id]);
+  useEffect(() => { if (!abierto) setCorrigiendo(false); }, [abierto]);
 
   async function guardar() {
-    const n = Number(real.replace(",", "."));
-    if (real === "" || !Number.isFinite(n) || n < 0) { setError(TEXTOS.inventario.faltaCuantasHay.corto); return; }
+    const falta = faltaEn(real, motivo);
+    if (falta?.real) { setError(TEXTOS.inventario.faltaCuantasHay.corto); return; }
     // El motivo es obligatorio, igual que en la computadora (RF-53).
-    if (!motivo.trim()) { setError(TEXTOS.inventario.faltaElMotivo.corto); return; }
+    if (falta?.motivo) { setError(TEXTOS.inventario.faltaElMotivo.corto); return; }
     try {
-      await enviarOEncolar("stock.ajuste", "POST", `/stock/${p.id}/ajustes`, { cantidad_real: n, motivo: motivo.trim() });
+      const { hay } = await corregir(real, motivo);
       setCorrigiendo(false); setError(null);
-      const dif = n - cantidad;
-      await alAjustar(dif === 0 ? "Sin diferencia: el stock ya decía eso." : `Stock corregido a ${num(n)} (${dif > 0 ? "+" : ""}${num(dif)}).`);
-      api<Movimiento[]>(`/stock/${p.id}/movimientos`).then(setMovimientos).catch(() => undefined);
+      const dif = hay - cantidad;
+      alAjustar(dif === 0 ? "Sin diferencia: el stock ya decía eso." : `Stock corregido a ${num(hay)} (${dif > 0 ? "+" : ""}${num(dif)}).`);
     } catch (e) { setError((e as Error).message); }
   }
-  const nombreTipo = (m: Movimiento) => m.tipo === "venta" ? "Venta" : m.tipo === "compra" ? "Compra" : m.referencia_tipo === "conteo" ? "Conteo" : "Ajuste";
+  const nombreTipo = nombreDeMovimiento;
   const unidad = p.unidad === "unidad" ? "u." : p.unidad === "l" ? "L" : p.unidad;
 
   return (
@@ -291,33 +285,30 @@ function Ingreso() {
 }
 
 // ---------- Contar ----------
-type Sector = { id: string; nombre: string; productos: string; ultimo_conteo: string | null; conteo_abierto: string | null };
-type RenglonConteo = { producto_id: string; cantidad_contada: string; contado_en: string; descripcion: string; marca: string | null; stock_teorico: string };
-type Conteo = { id: string; estado: string; sector_id: string; sector: string; renglones: RenglonConteo[]; sin_contar: { producto_id: string; descripcion: string; marca: string | null; stock_teorico: string }[] };
 
 // Conteo cíclico con el celular (issue #31), con una mano: elegir sector → buscar o
 // escanear → cuántas hay → siguiente. El sector queda abierto hasta cerrarlo; al cerrar,
 // las diferencias contra el stock teórico se aplican como ajustes explicados.
 function Contar() {
-  const [sectores, setSectores] = useState<Sector[]>([]);
+  const { sectores: traidos, error: fallo, recargar: cargarSectores } = useSectores();
+  const sectores = traidos ?? [];
   const [conteo, setConteo] = useState<Conteo | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // El aviso se puede cerrar; vuelve si el próximo pedido falla de nuevo.
+  const [cerrado, setCerrado] = useState<unknown>(null);
+  const [aviso, setError] = useState<string | null>(null);
+  const error = aviso ?? (!fallo || fallo === cerrado ? null : fallo instanceof ErrorApi ? fallo.message : "Sin conexión con el servidor.");
   const [nuevo, setNuevo] = useState(false);
-  const cargarSectores = useCallback(() => api<Sector[]>("/sectores").then(setSectores).catch((e) => setError(e instanceof ErrorApi ? e.message : "Sin conexión con el servidor.")), []);
-  useEffect(() => { void cargarSectores(); }, [cargarSectores]);
 
   async function abrir(sectorId: string) {
     try {
-      const { id } = await api<{ id: string }>("/conteos", { method: "POST", body: JSON.stringify({ sector_id: sectorId }) });
-      setConteo(await api<Conteo>(`/conteos/${id}`));
+      setConteo(await abrirConteo(sectorId));
       setError(null);
     } catch (e) { setError((e as Error).message); }
   }
   async function crearSector(nombre: string) {
     try {
-      const { id } = await api<{ id: string }>("/sectores", { method: "POST", body: JSON.stringify({ nombre }) });
+      const id = await crearSectorNuevo(nombre);
       setNuevo(false);
-      await cargarSectores();
       await abrir(id);
     } catch (err) { setError((err as Error).message); }
   }
@@ -327,7 +318,7 @@ function Contar() {
   return (
     <>
       <p className="subtitulo">Se cuenta de a un sector. Al cerrarlo, las diferencias contra el stock teórico se ajustan solas.</p>
-      <AvisoError texto={error} alCerrar={() => setError(null)} />
+      <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(fallo); }} />
       <div className="sectores" data-testid="sectores">
         {sectores.map((s) => {
           const dias = s.ultimo_conteo ? Math.floor((Date.now() - new Date(s.ultimo_conteo).getTime()) / 86400000) : null;
@@ -370,8 +361,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   // La búsqueda no toma el foco sola (abriría el teclado y taparía el menú); la cantidad sí, porque se acaba de elegir el producto.
   useEffect(() => { if (producto) cajaCantidad.current?.focus(); }, [producto]);
 
-  const recargar = useCallback(() => api<Conteo>(`/conteos/${conteo.id}`).then(alActualizar).catch(() => undefined), [conteo.id, alActualizar]);
-  const contadoPorId = new Map(conteo.renglones.map((r) => [r.producto_id, r]));
+  const { contadoPorId, contar, cerrar: cerrarConteo } = useConteo(conteo, alActualizar);
 
   function elegirProducto(p: Producto) {
     setProducto(p);
@@ -393,22 +383,16 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   }
   async function guardar() {
     if (!producto) return;
-    const n = Number(cantidad);
-    if (cantidad === "" || !Number.isFinite(n) || n < 0) { setError("Escribí cuántas hay."); return; }
+    const n = cantidadContada(cantidad, producto);
+    if (Number.isNaN(n)) { setError("Escribí cuántas hay."); return; }
     try {
-      const { encolado } = await enviarOEncolar("conteo.renglon", "PUT", `/conteos/${conteo.id}/renglones/${producto.id}`, { cantidad: n });
+      await contar(producto, n);
       setError(null); setProducto(null); setCantidad("");
-      if (encolado) {
-        alActualizar({ ...conteo, renglones: [{ producto_id: producto.id, cantidad_contada: String(n), contado_en: new Date().toISOString(), descripcion: producto.descripcion, marca: producto.marca, stock_teorico: String(contadoPorId.get(producto.id)?.stock_teorico ?? "0") }, ...conteo.renglones.filter((r) => r.producto_id !== producto.id)] });
-      } else {
-        await recargar();
-      }
     } catch (e) { setError((e as Error).message); }
   }
   async function cerrar(faltantesEnCero: boolean) {
     try {
-      const r = await api<{ ajustados: number; puestos_en_cero: number; contados: number }>(`/conteos/${conteo.id}/cerrar`, { method: "POST", body: JSON.stringify({ faltantes_en_cero: faltantesEnCero }) });
-      setResultado(r); setCerrando(false);
+      setResultado(await cerrarConteo(faltantesEnCero)); setCerrando(false);
     } catch (e) { setError((e as Error).message); }
   }
 

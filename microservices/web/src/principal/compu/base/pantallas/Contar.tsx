@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
-import { api } from "../../../../api";
-import { enviarOEncolar } from "../../../../cola";
+import { abrirConteo, crearSector, ordenarSectores, useConteo, useSectores, type Cierre, type Contado, type Conteo, type Sector } from "../../../../negocio/deposito/conteo";
+import { cantidadContada } from "../../../../negocio/deposito/inventario";
 import { useCatalogo } from "../../../../catalogo";
 import { fecha } from "../../../../formato";
 import { enteras, unidadDe } from "../../../../unidades";
@@ -14,11 +14,7 @@ import "../estilos/contar.css";
 // Conteo por sector, caminando el local con el celular en una mano: elegir el sector, buscar
 // o escanear, cuántas hay, siguiente. El sector queda abierto hasta cerrarlo (si se
 // interrumpe, se retoma); al cerrar, cada diferencia contra el sistema pasa a ser un ajuste.
-type Sector = { id: string; nombre: string; productos: string; ultimo_conteo: string | null; conteo_abierto: string | null };
-type Renglon = { producto_id: string; cantidad_contada: string; contado_en: string; descripcion: string; marca: string | null; stock_teorico: string };
-type SinContar = { producto_id: string; descripcion: string; marca: string | null; stock_teorico: string };
-type Conteo = { id: string; estado: string; sector_id: string; sector: string; renglones: Renglon[]; sin_contar: SinContar[] };
-type Cierre = { ajustados: number; puestos_en_cero: number; contados: number };
+type Renglon = Contado;
 
 const diasDesde = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 const cuando = (s: Sector) => (s.ultimo_conteo === null ? "Nunca contado" : diasDesde(s.ultimo_conteo) === 0 ? "Contado hoy" : diasDesde(s.ultimo_conteo) === 1 ? "Contado ayer" : `Contado hace ${diasDesde(s.ultimo_conteo)} días`);
@@ -27,34 +23,27 @@ const claseDif = (dif: number) => (dif === 0 ? "igual" : dif < 0 ? "falta" : "so
 export function Contar() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const [sectores, setSectores] = useState<Sector[] | null>(null);
+  const { sectores, error: falloDeSectores, recargar: cargarSectores } = useSectores();
   const [conteo, setConteo] = useState<Conteo | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [errorAlAbrir, setError] = useState<string | null>(null);
+  const error = errorAlAbrir ?? (falloDeSectores && sectores === null ? mensajeDe(falloDeSectores, "Sin conexión: no se pudieron traer los sectores. Revisá internet y tocá «Reintentar».") : null);
   const [abriendo, setAbriendo] = useState<string | null>(null);
   const [nuevo, setNuevo] = useState(false);
 
-  const cargarSectores = useCallback(() => api<Sector[]>("/sectores").then((s) => { setSectores(s); setError(null); })
-    .catch((e) => setError(mensajeDe(e, "Sin conexión: no se pudieron traer los sectores. Revisá internet y tocá «Reintentar»."))), []);
-  useEffect(() => { void cargarSectores(); }, [cargarSectores]);
   useEffect(() => { if (enLinea && sectores === null) void cargarSectores(); }, [enLinea, sectores, cargarSectores]);
 
   async function abrir(sectorId: string) {
     if (abriendo) return;
     setAbriendo(sectorId);
     try {
-      const { id } = await api<{ id: string }>("/conteos", { method: "POST", body: JSON.stringify({ sector_id: sectorId }) });
-      setConteo(await api<Conteo>(`/conteos/${id}`));
+      setConteo(await abrirConteo(sectorId));
       setError(null);
     } catch (e) {
       setError(mensajeDe(e, "No se pudo abrir el conteo: empezar o retomar un sector necesita internet. Una vez abierto, se cuenta sin conexión."));
     } finally { setAbriendo(null); }
   }
 
-  // Primero lo que quedó a medias, después lo nunca contado, después lo más atrasado.
-  const ordenados = useMemo(() => [...(sectores ?? [])].sort((a, b) => {
-    const peso = (s: Sector) => (s.conteo_abierto ? 0 : s.ultimo_conteo === null ? 1 : 2);
-    return peso(a) - peso(b) || (a.ultimo_conteo ?? "").localeCompare(b.ultimo_conteo ?? "") || a.nombre.localeCompare(b.nombre, "es");
-  }), [sectores]);
+  const ordenados = useMemo(() => ordenarSectores(sectores ?? []), [sectores]);
 
   if (conteo) return <ConteoDeSector conteo={conteo} alActualizar={setConteo} alSalir={() => { setConteo(null); void cargarSectores(); }} />;
 
@@ -130,8 +119,7 @@ function SectorNuevo({ alCerrar, alCrear }: { alCerrar: () => void; alCrear: (id
     if (!nombre.trim()) { setError("Escribí el nombre del sector."); return; }
     setOcupado(true);
     try {
-      const r = await api<{ id: string }>("/sectores", { method: "POST", body: JSON.stringify({ nombre: nombre.trim() }) });
-      await alCrear(r.id);
+      await alCrear(await crearSector(nombre));
     } catch (err) {
       setError(mensajeDe(err, "No se creó: se cortó la conexión. Crear un sector necesita internet."));
       setOcupado(false);
@@ -169,14 +157,12 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   const [errorCantidad, setErrorCantidad] = useState<string | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
   // Contados sin conexión: se ven en la lista, marcados, hasta que el servidor los recibe.
-  const [enElDispositivo, setEnElDispositivo] = useState<Set<string>>(new Set());
+  const { contadoPorId, conDiferencia, enElDispositivo, recargar, contar, quitar: quitarDeLoContado, cerrar } = useConteo(conteo, alActualizar);
   const caja = useRef<HTMLInputElement>(null);
   const cajaCantidad = useRef<HTMLInputElement>(null);
   const id = useId();
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 6) : []), [buscarProductos, consulta]);
-  const contadoPorId = useMemo(() => new Map(conteo.renglones.map((r) => [r.producto_id, r])), [conteo.renglones]);
-  const conDiferencia = conteo.renglones.filter((r) => Number(r.cantidad_contada) !== Number(r.stock_teorico));
 
   // En la computadora el foco va y vuelve solo: buscador, cantidad, buscador. En el celular
   // solo se abre el teclado para la cantidad: después de «Siguiente» se puede escanear.
@@ -185,9 +171,6 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     else if (!esCelular) caja.current?.focus();
   }, [producto, catalogo, esCelular]);
 
-  const recargar = useCallback(async () => {
-    try { alActualizar(await api<Conteo>(`/conteos/${conteo.id}`)); setEnElDispositivo(new Set()); } catch { /* sin conexión: queda lo que se ve */ }
-  }, [conteo.id, alActualizar]);
   useEffect(() => { if (enLinea && enElDispositivo.size) void recargar(); }, [enLinea, enElDispositivo.size, recargar]);
 
   const elegir = useCallback((p: Producto) => {
@@ -205,7 +188,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   }, [catalogo, elegir]);
 
   const unidad = unidadDe(producto);
-  const leida = (() => { const t = cantidad.trim().replace(",", "."); const n = t === "" ? NaN : Number(t); return Number.isFinite(n) && n >= 0 ? (enteras(unidad) ? Math.floor(n) : Math.round(n * 10) / 10) : NaN; })();
+  const leida = producto ? cantidadContada(cantidad, producto) : NaN;
   const mover = (paso: number) => { setCantidad(String(Math.max(0, Math.round(((Number.isNaN(leida) ? 0 : leida) + paso) * 10) / 10)).replace(".", ",")); setErrorCantidad(null); cajaCantidad.current?.focus(); };
 
   async function guardar(e?: FormEvent) {
@@ -214,18 +197,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     if (Number.isNaN(leida)) { setErrorCantidad("Escribí cuántas hay: un número, cero o más."); cajaCantidad.current?.focus(); return; }
     setGuardando(true);
     try {
-      const { encolado } = await enviarOEncolar("conteo.renglon", "PUT", `/conteos/${conteo.id}/renglones/${producto.id}`, { cantidad: leida });
+      await contar(producto, leida);
       setError(null); setProducto(null); setCantidad("");
-      if (encolado) {
-        // Sin conexión: se muestra lo contado igual; el servidor lo recibe al reconectar.
-        const habia = contadoPorId.get(producto.id)?.stock_teorico ?? conteo.sin_contar.find((s) => s.producto_id === producto.id)?.stock_teorico ?? "0";
-        alActualizar({
-          ...conteo,
-          renglones: [{ producto_id: producto.id, cantidad_contada: String(leida), contado_en: new Date().toISOString(), descripcion: producto.descripcion, marca: producto.marca, stock_teorico: habia }, ...conteo.renglones.filter((r) => r.producto_id !== producto.id)],
-          sin_contar: conteo.sin_contar.filter((s) => s.producto_id !== producto.id),
-        });
-        setEnElDispositivo((s) => new Set(s).add(producto.id));
-      } else await recargar();
     } catch (err) {
       setError(`No se guardó ${producto.descripcion}: ${(err as Error).message}`);
     } finally { setGuardando(false); }
@@ -235,10 +208,9 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     if (!producto || guardando) return;
     setGuardando(true);
     try {
-      const { encolado } = await enviarOEncolar("conteo.renglon", "DELETE", `/conteos/${conteo.id}/renglones/${producto.id}`, null);
+      await quitarDeLoContado(producto);
       setMensaje(`${producto.descripcion} salió de lo contado.`);
       setProducto(null); setCantidad(""); setError(null);
-      if (encolado) alActualizar({ ...conteo, renglones: conteo.renglones.filter((r) => r.producto_id !== producto.id) }); else await recargar();
     } catch (err) {
       setError(`No se quitó ${producto.descripcion}: ${(err as Error).message}`);
     } finally { setGuardando(false); }
@@ -395,7 +367,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
       {esCelular && !producto && <div className="deposito-pie contar-pie">{botonCerrar}</div>}
 
       {cerrando && (
-        <CerrarSector conteo={conteo} conDiferencia={conDiferencia.length} enLinea={enLinea} pendientes={enElDispositivo.size} alCerrar={() => setCerrando(false)}
+        <CerrarSector conteo={conteo} cerrarConteo={cerrar} conDiferencia={conDiferencia.length} enLinea={enLinea} pendientes={enElDispositivo.size} alCerrar={() => setCerrando(false)}
           alCerrado={(cierre) => { setCerrando(false); setResultado({ cierre, ajustes: conDiferencia }); }} />
       )}
     </Pagina>
@@ -404,7 +376,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
 
 // Cerrar no se deshace: antes muestra qué se contó, qué tiene diferencia y qué quedó sin
 // contar, y las dos salidas se leen completas.
-function CerrarSector({ conteo, conDiferencia, enLinea, pendientes, alCerrar, alCerrado }: { conteo: Conteo; conDiferencia: number; enLinea: boolean; pendientes: number; alCerrar: () => void; alCerrado: (c: Cierre) => void }) {
+function CerrarSector({ conteo, cerrarConteo, conDiferencia, enLinea, pendientes, alCerrar, alCerrado }: { conteo: Conteo; cerrarConteo: (faltantesEnCero: boolean) => Promise<Cierre>; conDiferencia: number; enLinea: boolean; pendientes: number; alCerrar: () => void; alCerrado: (c: Cierre) => void }) {
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const faltan = conteo.sin_contar.length;
@@ -413,7 +385,7 @@ function CerrarSector({ conteo, conDiferencia, enLinea, pendientes, alCerrar, al
     if (bloqueado) return;
     setOcupado(true); setError(null);
     try {
-      alCerrado(await api<Cierre>(`/conteos/${conteo.id}/cerrar`, { method: "POST", body: JSON.stringify({ faltantes_en_cero: faltantesEnCero }) }));
+      alCerrado(await cerrarConteo(faltantesEnCero));
     } catch (e) {
       setError(mensajeDe(e, "No se cerró: se cortó la conexión. Lo contado sigue guardado; probá de nuevo cuando vuelva internet."));
       setOcupado(false);

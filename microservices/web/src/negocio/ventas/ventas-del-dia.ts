@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { VentaDelDia, VentasDelDia } from "@servidor/ventas";
 import { api } from "../../api";
@@ -27,7 +28,9 @@ export function useVentasDelDia(dia: string | null = null) {
     queryKey: [...CLAVE, pedido ?? "hoy"],
     queryFn: () => api<VentasDelDia>(`/ventas${pedido ? `?dia=${pedido}` : ""}`),
   }, consultas);
-  return { datos: consulta.data ?? null, error: consulta.error, recargar: () => { void consulta.refetch(); } };
+  const { refetch } = consulta;
+  const recargar = useCallback(() => { void refetch({ cancelRefetch: false }); }, [refetch]);
+  return { datos: consulta.data ?? null, error: consulta.error, recargar };
 }
 
 // Anular una venta: queda marcada y sus productos vuelven al stock. Rechaza con el error del

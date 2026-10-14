@@ -2,12 +2,11 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEven
 import { usePuede } from "../permisos";
 import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
-import { api, ErrorApi } from "../../api";
-import { leerTodo } from "../../almacen";
-import { enviarOEncolar } from "../../cola";
-import { useCatalogo, type StockFila } from "../../catalogo";
+import { ErrorApi } from "../../api";
+import { useCatalogo } from "../../catalogo";
+import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStock, useMovimientos, useStock, type StockFila } from "../../negocio/deposito/inventario";
 import { fecha, pesos } from "../../formato";
-import { cantidadValida, enteras, unidadDe } from "../../unidades";
+import { enteras, unidadDe } from "../../unidades";
 import { irA } from "./base/rutas";
 import { Aviso, Boton, Buscador, Explicado, Hoja, Icono, Indicador, Pagina, Pastilla, Progreso, Segmentos, Toast, Vacio, numero } from "./base/ui";
 import { useEsCelular } from "./base/vista";
@@ -18,9 +17,6 @@ import "./base/estilos/stock.css";
 // Cómo va el negocio; decisión 31). Cada número se explica: el stock, con sus movimientos; el
 // valor, como stock × costo vigente. Corregir pide cuántas hay y por qué, y no confirma: el
 // ajuste queda a la vista entre los movimientos.
-type PorProveedor = Record<string, { unidades: number; valor: number; productos: number }>;
-type Datos = { productos: StockFila[]; valor_total: number; por_proveedor: PorProveedor };
-type Movimiento = { id: string; tipo: string; cantidad: string; referencia_tipo: string | null; fecha: string; nota: string | null };
 type Filtro = "todos" | "con" | "sin";
 type Columna = "producto" | "stock" | "ultimo";
 type Orden = { columna: Columna; sube: boolean };
@@ -29,24 +25,13 @@ type Abierto = { id: string; corregir: boolean };
 const FILTROS: { valor: Filtro; nombre: string }[] = [{ valor: "todos", nombre: "Todos" }, { valor: "con", nombre: "Con stock" }, { valor: "sin", nombre: "En cero o negativo" }];
 const TOPE = 100;
 
-// Lo guardado en el dispositivo trae las filas pero no los totales: se rearman acá.
-function armar(filas: StockFila[]): Datos {
-  const por_proveedor: PorProveedor = {};
-  for (const f of filas) {
-    const g = (por_proveedor[f.proveedor ?? "Sin proveedor"] ??= { unidades: 0, valor: 0, productos: 0 });
-    g.unidades += Math.max(0, Number(f.stock)); g.valor += Number(f.valor); g.productos += 1;
-  }
-  return { productos: filas, valor_total: filas.reduce((s, f) => s + Number(f.valor), 0), por_proveedor };
-}
-
 export function Inventario() {
   const corrige = usePuede()("deposito.stock");
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
-  const [datos, setDatos] = useState<Datos | null>(null);
-  const [delDispositivo, setDelDispositivo] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { datos, porId, delDispositivo, error: fallo, recargar: cargar } = useStock();
+  const error = !fallo ? null : fallo instanceof ErrorApi ? `No se pudo traer el stock: ${fallo.message}` : "Sin conexión con el servidor y sin stock guardado en este dispositivo. Revisá internet y tocá «Reintentar».";
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
   const [filtro, setFiltro] = useState<Filtro>("todos");
@@ -57,21 +42,10 @@ export function Inventario() {
   const [porEnviar, setPorEnviar] = useState<Map<string, number>>(new Map());
   const caja = useRef<HTMLInputElement>(null);
 
-  const cargar = useCallback(async () => {
-    try {
-      setDatos(await api<Datos>("/stock"));
-      setDelDispositivo(false); setError(null); setPorEnviar(new Map());
-    } catch (e) {
-      if (e instanceof ErrorApi) { setError(`No se pudo traer el stock: ${e.message}`); return; }
-      const guardado = await leerTodo<StockFila>("stock").catch(() => [] as StockFila[]);
-      if (guardado.length) { setDatos((d) => d ?? armar(guardado)); setDelDispositivo(true); setError(null); }
-      else setError("Sin conexión con el servidor y sin stock guardado en este dispositivo. Revisá internet y tocá «Reintentar».");
-    }
-  }, []);
-  useEffect(() => { void cargar(); }, [cargar]);
-  useEffect(() => { if (enLinea && delDispositivo) void cargar(); }, [enLinea, delDispositivo, cargar]);
+  // Cuando el servidor vuelve a contestar, lo que estaba por enviarse ya está en lo que trae.
+  useEffect(() => { if (datos && !delDispositivo) setPorEnviar(new Map()); }, [datos, delDispositivo]);
+  useEffect(() => { if (enLinea && delDispositivo) cargar(); }, [enLinea, delDispositivo, cargar]);
 
-  const porId = useMemo(() => new Map((datos?.productos ?? []).map((s) => [s.id, s])), [datos]);
   const cantidadDe = useCallback((id: string) => porEnviar.get(id) ?? Number(porId.get(id)?.stock ?? 0), [porEnviar, porId]);
 
   const cuenta = useMemo(() => {
@@ -83,7 +57,7 @@ export function Inventario() {
 
   const { filas, hayMas } = useMemo(() => {
     if (!catalogo) return { filas: [] as Producto[], hayMas: false };
-    let base = consulta.trim() ? buscarProductos(consulta, TOPE) : catalogo.filter((p) => porId.has(p.id)).sort((a, b) => a.descripcion.localeCompare(b.descripcion, "es"));
+    let base = consulta.trim() ? buscarProductos(consulta, TOPE) : productosConStock(catalogo, porId);
     if (filtro === "con") base = base.filter((p) => cantidadDe(p.id) > 0);
     if (filtro === "sin") base = base.filter((p) => cantidadDe(p.id) <= 0);
     if (orden) {
@@ -102,12 +76,11 @@ export function Inventario() {
   }
   useEffect(() => { document.querySelector(".stock-tabla tr[aria-selected='true']")?.scrollIntoView({ block: "nearest" }); }, [marcada]);
 
-  async function corregido(p: Producto, habia: number, hay: number, encolado: boolean) {
+  function corregido(p: Producto, habia: number, hay: number, encolado: boolean) {
     setAbierto(null);
     const dif = hay - habia;
     if (encolado) { setPorEnviar((m) => new Map(m).set(p.id, hay)); setMensaje(`${p.descripcion}: quedó en ${numero(hay)}. Guardado en este dispositivo, se manda al volver internet.`); return; }
     setMensaje(dif === 0 ? `${p.descripcion}: sin diferencia, el stock ya decía ${numero(hay)}.` : `${p.descripcion}: había ${numero(habia)}, hay ${numero(hay)} (${conSigno(dif)}).`);
-    await cargar();
   }
 
   const ordenar = (columna: Columna) => setOrden((o) => (o?.columna === columna ? (o.sube === (columna === "producto") ? { columna, sube: !o.sube } : null) : { columna, sube: columna === "producto" }));
@@ -128,7 +101,7 @@ export function Inventario() {
 
   return (
     <Pagina titulo="Inventario" testId="pantalla-stock" bajada="Cuánto hay de cada producto. El stock de cada producto es la suma de sus compras, ventas, ajustes y conteos. Lo que todavía no se cargó figura en cero.">
-      <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={() => void cargar()}>Reintentar</Boton>}>{error}</Aviso>
+      <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={cargar}>Reintentar</Boton>}>{error}</Aviso>
       <Aviso tipo="error">{!error ? errorCatalogo : null}</Aviso>
       <Aviso tipo="alerta" testId="sin-conexion">{!enLinea || delDispositivo ? "Sin conexión: ves el último stock que bajó este dispositivo. Si corregís un stock queda guardado acá y se manda solo al volver internet." : null}</Aviso>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
@@ -233,7 +206,7 @@ export function Inventario() {
   );
 }
 
-const nombreTipo = (m: Movimiento) => (m.tipo === "venta" ? "Venta" : m.tipo === "compra" ? "Compra" : m.referencia_tipo === "conteo" ? "Conteo" : "Ajuste");
+const nombreTipo = nombreDeMovimiento;
 
 // El detalle de un producto: lo que hay, lo que vale, cada movimiento que lo explica y la
 // corrección a mano. Se abre sobre la lista, sin perder dónde se estaba.
@@ -241,46 +214,35 @@ function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnv
   producto: Producto; fila: StockFila | null; cantidad: number; corregirDeEntrada: boolean; porEnviar: boolean; alCerrar: () => void; alCorregir: (habia: number, hay: number, encolado: boolean) => void;
 }) {
   const corrige = usePuede()("deposito.stock");
-  const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null);
-  const [errorMovimientos, setErrorMovimientos] = useState<string | null>(null);
+  const { movimientos, error: falloDeMovimientos } = useMovimientos(p.id);
+  const errorMovimientos = falloDeMovimientos && mensajeDe(falloDeMovimientos, "Sin conexión: los movimientos se ven cuando vuelve internet. Corregir el stock se puede igual.");
+  const { faltaEn, corregir, guardando } = useCorregirStock(p);
   const [corrigiendo, setCorrigiendo] = useState(corregirDeEntrada && corrige);
   const [real, setReal] = useState(String(cantidad).replace(".", ","));
   const [motivo, setMotivo] = useState("");
   const [falta, setFalta] = useState<{ real?: string; motivo?: string }>({});
   const [error, setError] = useState<string | null>(null);
-  const [guardando, setGuardando] = useState(false);
   const id = useId();
   const unidad = unidadDe(p);
   const rotulo = nombreUnidad(p.unidad);
 
-  useEffect(() => {
-    let vigente = true;
-    api<Movimiento[]>(`/stock/${p.id}/movimientos`).then((m) => { if (vigente) setMovimientos(m); })
-      .catch((e) => { if (vigente) setErrorMovimientos(mensajeDe(e, "Sin conexión: los movimientos se ven cuando vuelve internet. Corregir el stock se puede igual.")); });
-    return () => { vigente = false; };
-  }, [p.id]);
-
-  const texto = real.trim().replace(",", ".");
-  const n = texto === "" ? NaN : Number(texto);
-  const valida = Number.isFinite(n) && n >= 0;
-  const hay = valida ? (n === 0 ? 0 : cantidadValida(texto, unidad)) : NaN;
-
   async function guardar(e: FormEvent) {
     e.preventDefault();
     if (guardando) return;
-    const faltas = { real: valida ? undefined : TEXTOS.inventario.faltaCuantasHay.largo, motivo: motivo.trim() ? undefined : TEXTOS.inventario.faltaElMotivo.largo };
-    setFalta(faltas);
-    if (faltas.real || faltas.motivo) return;
-    setGuardando(true); setError(null);
+    const faltan = faltaEn(real, motivo);
+    setFalta({ real: faltan?.real ? TEXTOS.inventario.faltaCuantasHay.largo : undefined, motivo: faltan?.motivo ? TEXTOS.inventario.faltaElMotivo.largo : undefined });
+    if (faltan) return;
+    setError(null);
     try {
-      const { encolado } = await enviarOEncolar("stock.ajuste", "POST", `/stock/${p.id}/ajustes`, { cantidad_real: hay, motivo: motivo.trim() });
+      const { hay, encolado } = await corregir(real, motivo);
       alCorregir(cantidad, hay, encolado);
     } catch (err) {
       setError(`No se guardó la corrección: ${(err as Error).message}`);
-      setGuardando(false);
     }
   }
 
+  const hay = cantidadContada(real, p);
+  const valida = !Number.isNaN(hay);
   const suma = movimientos?.reduce((s, m) => s + Number(m.cantidad), 0) ?? 0;
 
   return (

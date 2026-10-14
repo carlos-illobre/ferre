@@ -1039,7 +1039,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender completo (la venta, «Hoy» y «Anular») una sola vez. Falta el resto de la 3 y las etapas 4 y 5 (010-T004 a 010-T008 y 010-T012)"
+  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») y depósito (ingreso, inventario y estanterías) una sola vez. Falta el resto de la 3 y las etapas 4 y 5 (010-T005 a 010-T008 y 010-T012)"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
@@ -1047,7 +1047,12 @@ RNF-60:
     - microservices/web/src/cola.test.ts
     - microservices/web/src/negocio/ventas/venta.test.tsx
     - microservices/web/src/negocio/ventas/ventas-del-dia.test.tsx
+    - microservices/web/src/negocio/deposito/ingreso.test.tsx
+    - microservices/web/src/negocio/deposito/inventario.test.tsx
+    - microservices/web/src/negocio/deposito/conteo.test.tsx
   defectos:
+    - "Pedidos a proveedores ya es una sola pantalla para los dos lados, pero su regla sigue escrita dentro de la pantalla, no en la carpeta de negocio"
+    - "El borrador del ingreso (lo cargado sobrevive a una recarga) vale solo en la computadora; en el celular no se guarda, para no ocupar su almacenamiento"
     - "En el celular, si anular una venta falla (sin conexión o sin permiso) no se avisa: la lista queda igual. Se arregla al descongelar las pantallas"
     - "En la computadora, «Cómo va el negocio» y los sugeridos de Vender todavía piden las ventas de hoy por su cuenta, sin la consulta compartida"
     - "Las piezas de interfaz (botón, hoja, aviso, tabla) siguen duplicadas: un juego en la computadora y otro en el celular; se unifican con la etapa 3 (010-T012)"
