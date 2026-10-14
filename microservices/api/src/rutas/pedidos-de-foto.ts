@@ -2,7 +2,9 @@ import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
 import { computadorasDelCelular } from "../acceso/reglas.js";
 import * as fotos from "../acceso/fotos.js";
-import type { FotoRecibida, PedidoDeFotoNuevo } from "../contratos/pedidos-de-foto.js";
+import type { FotoRecibida } from "../contratos/pedidos-de-foto.js";
+import { pedidoDeFotoNuevo } from "../acceso/esquemas.js";
+import { leerCuerpo } from "../validar.js";
 
 // Pedido de foto (la computadora le pide una foto al celular). La ruta solo traduce (ADR-018);
 // las reglas están en `acceso/fotos.ts`.
@@ -12,8 +14,9 @@ pedidosDeFoto.use("/*", exigirSesion);
 export const fotosQueEsperan = fotos.queEsperan;
 
 pedidosDeFoto.post("/", async (c) => {
-  const cuerpo = await c.req.json<PedidoDeFotoNuevo>().catch(() => ({}) as PedidoDeFotoNuevo);
-  return c.json(fotos.pedir(cuerpo.para, c.get("sesion").id), 201);
+  const cuerpo = await leerCuerpo(c, pedidoDeFotoNuevo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  return c.json(fotos.pedir(cuerpo.datos.para, c.get("sesion").id), 201);
 });
 
 // El celular emparejado (decisión 58) pregunta si su computadora está esperando alguna foto:

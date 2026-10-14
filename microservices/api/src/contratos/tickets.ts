@@ -1,6 +1,8 @@
 // Lo que el servidor responde sobre los tickets (errores y mejoras que reporta quien usa la
 // app). Solo tipos: el cliente web los toma al compilar (ADR-018), así que acá no va código ni
-// nombres de tablas.
+// nombres de tablas. Lo que manda el front en JSON sale de la validación del servidor (decisión 89).
+import type { z } from "zod";
+import type { resolucionDeTicket } from "../tickets/esquemas.js";
 
 // GET /tickets: los últimos 200, del más nuevo al más viejo, con la dirección de cada foto.
 export type Ticket = {
@@ -13,4 +15,4 @@ export type Ticket = {
 export type TicketCreado = { id: string; repetido?: true };
 
 // POST /tickets/:id/resolver
-export type ResolucionDeTicket = { nota?: string };
+export type ResolucionDeTicket = z.input<typeof resolucionDeTicket>;

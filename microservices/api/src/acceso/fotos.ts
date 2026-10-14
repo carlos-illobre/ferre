@@ -22,11 +22,11 @@ function vigente(codigo: string): Pedido | null {
 }
 
 // La computadora pide una foto y dice para qué (se le muestra a quien la saca).
-export function pedir(para: unknown, sesionId: string): PedidoDeFoto {
+export function pedir(para: string | undefined, sesionId: string): PedidoDeFoto {
   vigente("");
   if (pedidos.size >= MAXIMO_DE_PEDIDOS) pedidos.delete(pedidos.keys().next().value!);
   const codigo = randomUUID();
-  pedidos.set(codigo, { para: String(para ?? "").trim().slice(0, 120) || "la computadora", de: sesionId, vence: Date.now() + MINUTOS * 60_000, foto: null });
+  pedidos.set(codigo, { para: para || "la computadora", de: sesionId, vence: Date.now() + MINUTOS * 60_000, foto: null });
   return { codigo, expiraEnSegundos: MINUTOS * 60 };
 }
 

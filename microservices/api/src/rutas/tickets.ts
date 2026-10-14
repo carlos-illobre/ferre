@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
 import * as reglas from "../tickets/reglas.js";
-import type { ResolucionDeTicket, TicketCreado } from "../contratos/tickets.js";
+import type { TicketCreado } from "../contratos/tickets.js";
+import { resolucionDeTicket } from "../tickets/esquemas.js";
+import { leerCuerpo } from "../validar.js";
 
 export { carpetaTickets } from "../tickets/reglas.js";
 
@@ -23,8 +25,9 @@ tickets.post("/", async (c) => {
 });
 
 tickets.post("/:id/resolver", async (c) => {
-  const { nota } = await c.req.json<ResolucionDeTicket>().catch(() => ({}) as ResolucionDeTicket);
-  if (!(await reglas.resolver(c.req.param("id"), nota, c.get("sesion").usuario.id))) return c.json({ error: "Ese ticket no existe o ya está resuelto" }, 409);
+  const cuerpo = await leerCuerpo(c, resolucionDeTicket);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  if (!(await reglas.resolver(c.req.param("id"), cuerpo.datos.nota, c.get("sesion").usuario.id))) return c.json({ error: "Ese ticket no existe o ya está resuelto" }, 409);
   return c.body(null, 204);
 });
 
