@@ -44,7 +44,6 @@ import "procesos-web/estilos.css";
   puede={{ ver: true, dibujar: true }}
   pantallas={["Vender → Cobrar", "Inventario"]} // las pantallas propias que se pueden nombrar en un paso
   guardarLocal={localStorage}             // opcional: dónde guardar lo último abierto para mirarlo sin conexión
-  alVolver={() => irA("mas")}              // opcional, para el celular
 />
 ```
 

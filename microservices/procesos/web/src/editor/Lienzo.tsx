@@ -54,13 +54,15 @@ type Props = {
   /** Aviso de un error al leer el BPMN (un archivo que bpmn-js no puede dibujar). */
   alError?: (mensaje: string) => void;
   className?: string;
+  /** En el celular: un dedo sobre el fondo mueve el dibujo y dos lo acercan o alejan (E30). */
+  tactil?: boolean;
 };
 
 type Elemento = { id: string; type: string; businessObject: ObjetoBpmn & { $parent?: ObjetoBpmn }; x: number; y: number; width: number; height: number; parent?: Elemento; incoming?: Elemento[]; outgoing?: Elemento[]; source?: Elemento; target?: Elemento; labelTarget?: unknown };
 // bpmn-js no publica tipos para cada servicio: se usa por nombre, con lo poco que hace falta.
 type Servicio = Record<string, (...args: never[]) => unknown>;
 
-export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, soloLectura, alCambiar, alCargar, alElegir, alZoom, alError, className }, ref) {
+export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, soloLectura, alCambiar, alCargar, alElegir, alZoom, alError, className, tactil = false }, ref) {
   const contenedor = useRef<HTMLDivElement>(null);
   const visor = useRef<Modeler | NavigatedViewer | null>(null);
   const ultimoXml = useRef<string | null>(null);
@@ -130,14 +132,46 @@ export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, sol
       canvas.zoom(nuevo, { x: e.clientX - caja.left, y: e.clientY - caja.top });
     };
     contenedor.current!.addEventListener("wheel", rueda, { passive: false });
+    // Con el dedo: sobre el fondo (no sobre un paso), uno mueve y dos acercan o alejan.
+    let toque: { x: number; y: number; distancia: number; zoom: number } | null = null;
+    const distancia = (t: TouchList) => Math.hypot(t[0]!.clientX - t[1]!.clientX, t[0]!.clientY - t[1]!.clientY);
+    const canvasDe = () => v.get("canvas") as { zoom(n?: number, c?: { x: number; y: number }): number; scroll(d: { dx: number; dy: number }): void };
+    const empezarToque = (e: TouchEvent) => {
+      const sobrePaso = (e.target as Element).closest?.(".djs-element:not(.djs-root), .djs-context-pad, .djs-overlay");
+      if (sobrePaso && e.touches.length === 1) { toque = null; return; }
+      const t = e.touches;
+      toque = { x: t[0]!.clientX, y: t[0]!.clientY, distancia: t.length > 1 ? distancia(t) : 0, zoom: canvasDe().zoom() };
+    };
+    const moverToque = (e: TouchEvent) => {
+      if (!toque) return;
+      e.preventDefault();
+      const t = e.touches;
+      if (t.length > 1 && toque.distancia) {
+        const caja = contenedor.current!.getBoundingClientRect();
+        const centro = { x: (t[0]!.clientX + t[1]!.clientX) / 2 - caja.left, y: (t[0]!.clientY + t[1]!.clientY) / 2 - caja.top };
+        canvasDe().zoom(Math.min(4, Math.max(0.2, toque.zoom * (distancia(t) / toque.distancia))), centro);
+        return;
+      }
+      canvasDe().scroll({ dx: t[0]!.clientX - toque.x, dy: t[0]!.clientY - toque.y });
+      toque = { ...toque, x: t[0]!.clientX, y: t[0]!.clientY };
+    };
+    const terminarToque = () => { toque = null; };
+    if (tactil) {
+      contenedor.current!.addEventListener("touchstart", empezarToque, { passive: true });
+      contenedor.current!.addEventListener("touchmove", moverToque, { passive: false });
+      contenedor.current!.addEventListener("touchend", terminarToque);
+    }
     const quitarRueda = contenedor.current!;
     return () => {
       quitarRueda.removeEventListener("wheel", rueda);
+      quitarRueda.removeEventListener("touchstart", empezarToque);
+      quitarRueda.removeEventListener("touchmove", moverToque);
+      quitarRueda.removeEventListener("touchend", terminarToque);
       v.destroy();
       visor.current = null;
       ultimoXml.current = null;
     };
-  }, [soloLectura]);
+  }, [soloLectura, tactil]);
 
   // Se carga el BPMN cuando cambia desde afuera (otro proceso, otra versión, un conflicto),
   // no cuando es el que acaba de salir de acá.

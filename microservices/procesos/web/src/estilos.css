@@ -131,3 +131,49 @@
 .procesos-pasos-cabeza b, .procesos-pasos-cabeza .procesos-ayuda { white-space: nowrap; }
 .procesos-pasos-cabeza .procesos-ayuda:first-of-type { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .procesos-tabla td:nth-child(2), .procesos-tabla td:nth-child(3) { white-space: nowrap; }
+
+/* Celular */
+.procesos-celu { display: flex; flex-direction: column; gap: 10px; font-size: 18px; }
+.procesos-celu-proceso { min-height: calc(100vh - 160px); }
+.procesos-celu-barra { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.procesos-celu-barra h1 { flex: 1; min-width: 0; margin: 0; font-size: 22px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.procesos-celu-estado { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.procesos-boton.ancho { width: 100%; justify-content: center; }
+.procesos-tarjetas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.procesos-tarjeta { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; background: var(--procesos-superficie); border: 1.5px solid var(--procesos-borde-suave); border-radius: 14px; padding: 12px 14px; font: inherit; color: var(--procesos-tinta); cursor: pointer; min-height: 64px; }
+.procesos-tarjeta-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.procesos-tarjeta-texto b { overflow-wrap: anywhere; }
+.procesos-tarjeta-texto span { font-size: 15px; color: var(--procesos-texto-2); }
+.procesos-segmentos { display: flex; background: var(--procesos-fondo-2); border-radius: 12px; padding: 4px; }
+.procesos-segmentos button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: none; border-radius: 9px; padding: 9px; font: inherit; font-weight: 700; min-height: 44px; color: var(--procesos-tinta); cursor: pointer; }
+.procesos-segmentos button.elegido { background: var(--procesos-superficie); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+.procesos-pasos-celu { display: flex; flex-direction: column; }
+.procesos-lista-pasos { display: flex; flex-direction: column; gap: 6px; touch-action: pan-y; }
+.procesos-paso-celu { display: flex; align-items: center; gap: 4px; background: var(--procesos-superficie); border: 1.5px solid var(--procesos-borde-suave); border-radius: 14px; padding: 4px 6px; min-height: 56px; position: relative; user-select: none; -webkit-user-select: none; }
+.procesos-paso-celu.elegido { border-color: var(--procesos-accion); }
+.procesos-paso-celu.moviendo { z-index: 5; border-color: var(--procesos-accion); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); opacity: 0.95; }
+.procesos-asa { display: flex; align-items: center; justify-content: center; width: 36px; min-height: 48px; color: var(--procesos-texto-2); touch-action: none; cursor: grab; flex: none; }
+.procesos-paso-celu-boton { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; border: 0; background: none; font: inherit; color: var(--procesos-tinta); text-align: left; padding: 6px 4px; cursor: pointer; min-height: 48px; }
+.procesos-paso-celu-boton .procesos-icono { color: var(--procesos-titulo); }
+.procesos-rama { border-left: 3px solid var(--procesos-borde); margin-left: 18px; padding-left: 10px; display: flex; flex-direction: column; gap: 6px; }
+.procesos-rama-nombre { font-size: 15px; font-weight: 800; color: var(--procesos-ok); }
+.procesos-ranura { height: 0; border-radius: 8px; transition: height 0.15s; }
+.procesos-ranura.visible { height: 14px; border: 1.5px dashed var(--procesos-borde); }
+.procesos-ranura.activa { height: 40px; border-color: var(--procesos-accion); background: var(--procesos-accion-suave); }
+.procesos-agregar-aca { display: flex; align-items: center; justify-content: center; gap: 6px; border: 1.5px dashed var(--procesos-accion); background: var(--procesos-accion-suave); color: var(--procesos-accion-texto); border-radius: 12px; min-height: 44px; font: inherit; font-weight: 700; font-size: 16px; cursor: pointer; }
+.procesos-dibujo-celu { height: calc(100vh - 330px); min-height: 360px; }
+.procesos-dibujo-celu.oculto { position: absolute; left: -10000px; width: 360px; height: 480px; visibility: hidden; }
+.procesos-zoom-celu { left: auto; right: 8px; top: 8px; bottom: auto; flex-direction: column; }
+.procesos-hoja { position: absolute; left: 0; right: 0; bottom: 0; background: var(--procesos-superficie, #fff); color: var(--procesos-tinta, #18201e); border-radius: 20px 20px 0 0; box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18); padding: 8px 14px 14px; z-index: 6; }
+.procesos-hoja-figuras .procesos-ayuda { margin: 2px 0 8px; font-size: 14px; }
+.procesos-tirador { width: 44px; height: 5px; border-radius: 3px; background: var(--procesos-borde, #c3cfc6); margin: 0 auto 10px; }
+.procesos-figuras-celu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0; }
+.procesos-figura-celu { display: flex; flex-direction: column; align-items: center; gap: 2px; border: 1.5px solid var(--procesos-borde, #c3cfc6); border-radius: 12px; background: var(--procesos-fondo-2, #eef3ee); padding: 8px 2px; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.15; text-align: center; min-height: 72px; color: var(--procesos-tinta, #18201e); touch-action: none; }
+.procesos-figura-celu.elegida { border-color: var(--procesos-accion, #d83f0e); background: var(--procesos-accion-suave, #fff0ea); }
+.procesos-fondo-hoja { align-items: flex-end; padding: 0; }
+.procesos-fondo-hoja .procesos-hoja { position: relative; max-height: 85vh; overflow: auto; width: 100%; }
+.procesos-hoja-cabeza { display: flex; align-items: center; gap: 10px; font-size: 20px; }
+.procesos-menu-celu { display: flex; flex-direction: column; }
+.procesos-menu-celu button { display: flex; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--procesos-borde-suave, #dbe3dc); background: none; font: inherit; color: var(--procesos-tinta, #18201e); text-align: left; padding: 12px 4px; min-height: 52px; cursor: pointer; }
+.procesos-menu-celu button.peligro { color: var(--procesos-peligro, #b42318); border-bottom: 0; }
+.procesos-dibujo-celu .bjs-powered-by { top: 8px; left: 8px; right: auto; bottom: auto; }
