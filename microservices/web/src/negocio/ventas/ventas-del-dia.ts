@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { VentaDelDia, VentasDelDia } from "@servidor/ventas";
+import type { AnulacionDeVenta, Consulta, VentaDelDia, VentasDelDia } from "@servidor/ventas";
 import { api } from "../../api";
 import { consultas } from "../../consultas";
 import { useDelServidor } from "../del-servidor";
@@ -38,13 +38,13 @@ export function useVentasDelDia(dia: string | null = null) {
 // servidor, o sin `estado` si no hubo conexión; quien llama decide cómo decirlo.
 export function useAnularVenta() {
   const anulacion = useMutation({
-    mutationFn: ({ venta, motivo }: { venta: VentaDelDia; motivo: string }) => api(`/ventas/${venta.id}/anular`, { method: "POST", body: JSON.stringify({ motivo }) }),
+    mutationFn: ({ venta, motivo }: { venta: VentaDelDia; motivo: string }) => api(`/ventas/${venta.id}/anular`, { method: "POST", body: JSON.stringify({ motivo } satisfies AnulacionDeVenta) }),
     onSuccess: ventasCambiaron,
   }, consultas);
   return { anular: (venta: VentaDelDia, motivo: string): Promise<unknown> => anulacion.mutateAsync({ venta, motivo }), anulando: anulacion.isPending };
 }
 
 // Lo que se consultó y no se llevó (RF «No llevó»), para Cómo va el negocio.
-export type Consulta = { id: string; fecha: string; descripcion: string; precio_ofrecido: string | null; motivo: string | null };
+export type { Consulta };
 export const CONSULTAS = ["consultas"] as const;
 export const useConsultas = () => useDelServidor<Consulta[]>(CONSULTAS, "/consultas");

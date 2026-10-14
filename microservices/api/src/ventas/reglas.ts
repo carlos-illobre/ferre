@@ -4,6 +4,8 @@ import { anotarEvento } from "../eventos.js";
 import { subtotalDeRenglon } from "../precios.js";
 import type { VentaDelDia, VentasDelDia } from "../contratos/ventas.js";
 import * as datos from "./datos.js";
+import type { Consulta, ConsultaEntrada, ItemDeVentaEntrada, VentaEntrada, VentaRegistrada } from "../contratos/ventas.js";
+import type { Enviable } from "../enviable.js";
 
 // La venta (issue #15), en sus reglas (ADR-018, etapa 5): reemplaza el renglón del cuaderno.
 // Cada ítem guarda costo, margen, precio y explicación DE ESE MOMENTO, así el precio se puede
@@ -11,11 +13,8 @@ import * as datos from "./datos.js";
 // (#33). El id lo genera el cliente: una venta hecha sin conexión se reenvía y no se duplica (#18).
 export const MEDIOS = ["efectivo", "mercado_pago", "tarjeta", "cuenta_corriente"] as const;
 export type Medio = (typeof MEDIOS)[number];
-export type ItemEntrada = {
-  producto_id?: string | null; descripcion: string; cantidad: number; precio_unitario: number;
-  costo_neto?: number | null; margen_aplicado?: number | null; explicacion?: unknown; precio_proveedor_id?: string | null;
-};
-export type VentaEntrada = { id?: string; fecha?: string; cliente_id?: string | null; medio_pago: Medio; items: ItemEntrada[]; dispositivo_id?: string | null };
+export type ItemEntrada = ItemDeVentaEntrada;
+export type { VentaEntrada };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // Los números del detalle de una anomalía, con coma decimal.
@@ -34,7 +33,7 @@ export function validar(v: VentaEntrada): string | null {
   return null;
 }
 
-export type Registrada = { id: string; total: number; estado: string; repetida?: true };
+export type Registrada = VentaRegistrada;
 
 // Registra una venta ya validada. Si ese id ya estaba (un reenvío), devuelve la guardada.
 export async function registrar(v: VentaEntrada, usuarioId: string): Promise<Registrada> {
@@ -103,7 +102,7 @@ export async function pagar(id: string, usuarioId: string): Promise<boolean> {
 }
 
 // «No llevó»: cada producto consultado, con lo que se le ofreció. Los renglones sin descripción no cuentan.
-export type ConsultaEntrada = { items?: { producto_id?: string | null; descripcion: string; precio_ofrecido?: number | null }[]; motivo?: string; dispositivo_id?: string | null };
+export type { ConsultaEntrada };
 export async function anotarConsultas(c: ConsultaEntrada): Promise<boolean> {
   if (!c.items?.length) return false;
   for (const it of c.items) {
@@ -112,4 +111,4 @@ export async function anotarConsultas(c: ConsultaEntrada): Promise<boolean> {
   }
   return true;
 }
-export const consultas = () => datos.ultimasConsultas(base);
+export const consultas = (): Promise<Enviable<Consulta>[]> => datos.ultimasConsultas(base);

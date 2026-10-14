@@ -3,6 +3,7 @@ import { api } from "../api";
 import { leerTodo } from "../almacen";
 import type { Producto } from "./celular/pantallas/Productos";
 import { precioDelProducto } from "../negocio/catalogo/precio";
+import type { VentasDelDia } from "@servidor/ventas";
 
 // Para que la venta nueva no arranque vacía: lo último que se vendió y lo que más se vende,
 // a un toque. Sale de las ventas guardadas en este dispositivo (los últimos 7 días) y de
@@ -21,7 +22,7 @@ export function useSugeridos(catalogo: Producto[] | null, clave?: unknown): Suge
     let vigente = true;
     (async () => {
       const locales = await leerTodo<VentaLocal>("ventas").catch(() => [] as VentaLocal[]);
-      const deHoy = await (async () => (await api<{ ventas: VentaDelDia[] }>("/ventas")).ventas.filter((v) => v.estado !== "anulada"))().catch(() => [] as VentaDelDia[]);
+      const deHoy = await (async () => (await api<VentasDelDia>("/ventas")).ventas.filter((v) => v.estado !== "anulada"))().catch(() => [] as VentaDelDia[]);
       if (!vigente) return;
       setRenglones([
         ...locales.flatMap((v) => (v.items ?? []).map((i) => ({ fecha: v.fecha, id: i.producto_id, descripcion: i.descripcion }))),

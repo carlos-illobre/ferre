@@ -1,4 +1,4 @@
-import type { MedioDePago } from "@servidor/ventas";
+import type { ConsultaEntrada, MedioDePago, VentaEntrada } from "@servidor/ventas";
 import { CONSULTAS, ventasCambiaron } from "./ventas-del-dia";
 import { IVA_SI_NO_SE_SABE, precioDelProducto } from "../catalogo/precio";
 import { consultas } from "../../consultas";
@@ -195,7 +195,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
           costo_neto: p.costo, margen_aplicado: p.margen, explicacion: { pasos: p.pasos, costo: it.producto?.explicacion_costo ?? [] },
         };
       }),
-    };
+    } satisfies VentaEntrada;
     try {
       const { encolado } = await enviarOEncolar("venta", "POST", "/ventas", cuerpo);
       // Copia local de la venta (7 días) y stock que ve el mostrador.
@@ -218,7 +218,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
   function noLlevo(aviso: string) {
     if (items.length === 0) return;
     const consultaItems = items.map((it) => ({ producto_id: it.producto?.id ?? null, descripcion: it.descripcion, precio_ofrecido: precioDe(it).unitario }));
-    enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: opciones.dispositivo() }).then(({ encolado }) => { if (!encolado) void consultas.invalidateQueries({ queryKey: CONSULTAS }); }).catch(() => undefined);
+    enviarOEncolar("consulta", "POST", "/consultas", { items: consultaItems, dispositivo_id: opciones.dispositivo() } satisfies ConsultaEntrada).then(({ encolado }) => { if (!encolado) void consultas.invalidateQueries({ queryKey: CONSULTAS }); }).catch(() => undefined);
     vaciar();
     setMensaje(aviso);
     alCambiar?.("no-llevo");

@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { exigirPermiso, exigirSesion, puede } from "../autenticacion.js";
 import * as reglas from "../ventas/reglas.js";
+import type { AnulacionDeVenta } from "../contratos/ventas.js";
 
 // Ventas: la ruta solo traduce el pedido y la respuesta (ADR-018, etapa 5). Las reglas están en
 // `ventas/reglas.ts` y el acceso a los datos en `ventas/datos.ts`.
@@ -18,7 +19,7 @@ ventas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
 ventas.get("/", exigirPermiso("ventas.ver", "negocio.numeros"), async (c) => c.json(await reglas.delDia(c.req.query("dia") || null)));
 
 ventas.post("/:id/anular", exigirPermiso("ventas.anular", "ventas.anular_cualquiera"), async (c) => {
-  const { motivo } = await c.req.json<{ motivo?: string }>().catch(() => ({}) as { motivo?: string });
+  const { motivo } = await c.req.json<AnulacionDeVenta>().catch(() => ({}) as AnulacionDeVenta);
   const usuario = c.get("sesion").usuario;
   const r = await reglas.anular(c.req.param("id"), motivo, usuario.id, puede(usuario, "ventas.anular_cualquiera"));
   if (r === "no-es-de-hoy") return c.json({ error: "Esa venta no es de hoy. Hace falta: Anular ventas de cualquier día", permiso: "ventas.anular_cualquiera" }, 403);
