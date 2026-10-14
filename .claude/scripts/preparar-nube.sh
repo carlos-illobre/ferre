@@ -22,3 +22,18 @@ if docker info >/dev/null 2>&1; then
 else
   echo "Aviso: Docker no arrancó (ver /tmp/dockerd.log). Las pruebas de punta a punta lo necesitan; no las reemplaces con servicios levantados a mano."
 fi
+
+# Docker Hub limita las descargas sin cuenta por dirección, y las máquinas de la nube comparten
+# la salida: sin entrar, las imágenes base fallan con «429 Too Many Requests». Se entra con un
+# token de solo lectura que Carlos cargó en el entorno; el token no se muestra.
+if docker info >/dev/null 2>&1; then
+  if [ -n "$DOCKERHUB_USUARIO" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+    if printf '%s' "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USUARIO" --password-stdin >/dev/null 2>&1; then
+      echo "Docker Hub: sesión iniciada."
+    else
+      echo "Aviso: no se pudo entrar a Docker Hub con DOCKERHUB_USUARIO y DOCKERHUB_TOKEN; las imágenes base pueden fallar con 429."
+    fi
+  else
+    echo "Aviso: faltan DOCKERHUB_USUARIO y DOCKERHUB_TOKEN en el entorno; sin ellas, bajar imágenes de Docker Hub puede fallar con 429."
+  fi
+fi

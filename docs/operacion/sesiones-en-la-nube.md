@@ -57,6 +57,14 @@ El mismo script arranca Docker, que viene instalado pero apagado: las pruebas de
 punta levantan el stack con Docker Compose, igual que en el CI. Si Docker no arranca, la
 sesión lo avisa; no se reemplaza por servicios levantados a mano.
 
+Después entra a Docker Hub con `DOCKERHUB_USUARIO` y `DOCKERHUB_TOKEN`, dos variables del
+entorno que cargó Carlos (un token de acceso de solo lectura, «Public Repo Read-only»). Sin
+cuenta, Docker Hub limita las descargas por dirección, y las máquinas de la nube comparten la
+salida: las imágenes base (`node`, `python`, `postgres`, `caddy`) fallan con «429 Too Many
+Requests». Si las variables no están, la sesión lo avisa y sigue; el token nunca se escribe
+en el repositorio ni en la conversación. Las variables nuevas del entorno las ve recién la
+sesión siguiente.
+
 ## Las skills de animación
 
 Las skills de animación (`animate`, `animation-performance`, `review-animations`,

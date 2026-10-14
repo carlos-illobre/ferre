@@ -22,3 +22,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T011 [ajuste] Borrar las versiones viejas de la interfaz (1 a 4), sus mockups y toda referencia a ellas: la interfaz actual es la definitiva
 - [x] T012 [arreglo] En la computadora, al abrir una parte con Enter la marca a veces no queda en la pestaña; y en Catálogo, Enter apretado enseguida después de escribir abre un producto que no es el buscado
 - [x] T013 [ajuste] HTML semántico en el celular: los listados son listas (`ul`/`li`) y los títulos de cada sección son encabezados, sin cambiar cómo se ven
+- [x] T014 [ajuste] Las sesiones en la nube entran a Docker Hub al arrancar, con DOCKERHUB_USUARIO y DOCKERHUB_TOKEN del entorno, para que las pruebas de punta a punta no choquen con el límite de descargas sin cuenta
