@@ -22,4 +22,5 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T016 [interfaz] En el celular, «Agregar un paso» se pliega y se despliega; el logo de bpmn.io flota abajo a la derecha, encima de la hoja, y la acompaña al abrirse y cerrarse (pedido de Carlos del 2026-10-14)
 - [x] T017 [ajuste] En el celular, el logo de bpmn.io flota abajo a la derecha en vez de a la izquierda (pedido de Carlos del 2026-10-14)
 - [x] T018 [ajuste] En el celular, la explicación de «Agregar un paso» en un solo renglón (pedido de Carlos del 2026-10-14)
+- [x] T019 [arreglo] En el celular, el botón de volver cierra el menú «⋯» y las hojas y ventanas de Procesos en vez de volver a Más (regla de 001, ux.md, «El botón de volver del celular»)
 - [ ] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

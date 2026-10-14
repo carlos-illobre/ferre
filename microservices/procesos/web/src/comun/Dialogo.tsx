@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useAtrasCierra } from "./atras";
 
 // Una ventana sobre la pantalla: Escape o tocar afuera la cierra.
 export function Dialogo({ titulo, children, alCerrar, testId }: { titulo: string; children: ReactNode; alCerrar: () => void; testId?: string }) {
   const caja = useRef<HTMLDivElement>(null);
+  useAtrasCierra(alCerrar);
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") alCerrar(); };
     document.addEventListener("keydown", tecla);

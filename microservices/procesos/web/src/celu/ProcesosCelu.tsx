@@ -11,6 +11,7 @@ import { alMover, alPoner, alQuitar, listaDe, type Item, type Lugar } from "../m
 import { erroresDeForma } from "../modelo/recorrido";
 import type { Puede } from "../tipos";
 import { EntradaDeArchivo } from "../compu/EditorCompu";
+import { useAtrasCierra } from "../comun/atras";
 
 // El celular (historia 4): la lista de procesos y, adentro de cada uno, dos pestañas: «Diagrama»,
 // el dibujo con las figuras en una hoja que sube desde abajo (E30), y «Pasos», una tarjeta por
@@ -219,6 +220,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
 }
 
 function Hoja({ children, alCerrar, testId }: { children: ReactNode; alCerrar: () => void; testId?: string }) {
+  useAtrasCierra(alCerrar);
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") alCerrar(); };
     document.addEventListener("keydown", tecla);
