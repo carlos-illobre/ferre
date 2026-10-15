@@ -108,8 +108,9 @@ body[data-rol=ninguno] .sin-permiso{display:block!important}
 .indicadores.dos{grid-template-columns:repeat(2,1fr)}
 .indicadores.uno{grid-template-columns:minmax(0,420px)}
 .solo-una .arriba [role=tab]{display:none}
+.volver{display:none}
 @media (max-width:700px){
-  .volver{border:0;background:none;color:var(--naranja-texto);font-size:20px;padding:4px 0}
+  .volver{display:inline-block;border:0;background:none;color:var(--naranja-texto);font-size:20px;padding:4px 0}
   .titulo-celu{display:block;font-size:34px;margin:6px 0 10px}
   .arriba{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--relleno);border-radius:14px;padding:4px;margin:0 0 12px}
   .arriba .boton{display:none}
@@ -128,7 +129,7 @@ body[data-rol=ninguno] .sin-permiso{display:block!important}
     <a class="volver">‹ Volver a Más</a>
     <h1 class="titulo-celu">Cómo va el negocio</h1>
     <div class="sin-permiso"><strong>No tenés permiso para ver los números del negocio.</strong><br>Hace falta «Ver las ventas del negocio», «Ver los gastos», «Ver las compras» o «Ver el dinero invertido». Pedíselo a quien administra.</div>
-    <div class="arriba" role="tablist"><button class="pildora" role="tab" data-sec="ventas" aria-selected="true" onclick="elegir('ventas')"><span class="ic">$</span>Ventas</button><button class="pildora" role="tab" data-sec="compras" aria-selected="false" onclick="elegir('compras')"><span class="ic">⛟</span>Compras</button><button class="pildora" role="tab" data-sec="inventario" aria-selected="false" onclick="elegir('inventario')"><span class="ic">▣</span>Inventario</button><button class="boton">Actualizar</button></div><div class="panel" role="tabpanel" data-sec="ventas" data-panel="ventas" ><p class="bajada-pestana">Lo vendido hoy, jueves 15 de octubre, cómo se cobró y lo que preguntaron y no llevaron.</p><div class="indicadores tres">
+    <div class="arriba" role="tablist"><button class="pildora" role="tab" data-sec="ventas" aria-selected="true" onclick="elegir('ventas')"><span class="ic">$</span>Ventas</button><button class="pildora" role="tab" data-sec="compras" aria-selected="false" onclick="elegir('compras')"><span class="ic">⛟</span>Compras</button><button class="pildora" role="tab" data-sec="inventario" aria-selected="false" onclick="elegir('inventario')"><span class="ic">▣</span>Inventario</button><button class="boton"><span aria-hidden="true">↻</span> Actualizar</button></div><div class="panel" role="tabpanel" data-sec="ventas" data-panel="ventas" ><p class="bajada-pestana">Lo vendido hoy, jueves 15 de octubre, cómo se cobró y lo que preguntaron y no llevaron.</p><div class="indicadores tres">
   <div class="indicador"><div class="rotulo">Vendido hoy</div><div class="valor importe">$293.000</div><div class="detalle">Suma de las ventas confirmadas</div></div>
   <div class="indicador"><div class="rotulo">Ventas de hoy</div><div class="valor importe">3</div><div class="detalle">1 anulada, que no suma</div></div>
   <div class="indicador rojo"><div class="rotulo">No llevaron hoy</div><div class="valor importe">3</div><div class="detalle">Preguntaron el precio y no compraron</div></div></div>

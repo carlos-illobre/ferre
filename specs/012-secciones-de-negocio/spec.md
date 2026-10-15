@@ -6,7 +6,7 @@
 
 **Status**: Aprobada (2026-10-15)
 
-**Maquetas**: Pendientes
+**Maquetas**: Aprobadas (2026-10-15): `maquetas/elegida.html`; `a-`, `b-` y `c-` son las variantes de las que salió
 
 **Input**: «La pantalla de "Cómo va el negocio", ¿crees que se pueda separar en secciones donde
 cada sección esté en un submenú?» y después: «Me interesa separarla en secciones para poder
@@ -22,7 +22,7 @@ agregarle a cada sección un permiso distinto de lectura, para poder ocultar dat
 - Q: ¿Qué permiso muestra los gastos de la semana? → A: Uno nuevo, «Ver los gastos». «Ver las compras» sigue mostrando las compras recientes. La sección Compras aparece con cualquiera de los dos y muestra solo lo que cada uno permite.
 - Q: ¿Y el valor en pesos del stock en Depósito → Inventario, que hoy se ve con «Ver los números del negocio»? → A: Lo muestra el mismo permiso que la sección Inventario: es el mismo dato sensible.
 - Q: ¿Cómo se llaman los permisos? → A: «Ver las ventas del negocio», «Ver los gastos» y «Ver el dinero invertido», en la parte «Negocio» de la lista de permisos de un rol.
-- Q: ¿Las secciones van en pestañas (un submenú) o una debajo de la otra? → A: Lo decide Carlos al elegir la maqueta (paso 2).
+- Q: ¿Las secciones van en pestañas (un submenú) o una debajo de la otra? → A: En pestañas, con el submenú arriba como en Catálogo y Usuarios. Los números de cada sección van dentro de su pestaña. «Actualizar» lleva su ícono y en la computadora no hay «Volver a Más»: se vuelve con el teclado (Carlos, 2026-10-15, al aprobar la maqueta).
 
 ## User Scenarios & Testing
 

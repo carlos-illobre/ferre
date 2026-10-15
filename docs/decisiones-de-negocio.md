@@ -666,5 +666,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     para las compras recientes) e Inventario («Ver el dinero invertido», que también muestra el
     valor del stock en Depósito). Los números de arriba siguen el permiso de su sección.
     «Ver los números del negocio» desaparece y los roles que lo tenían reciben los tres nuevos.
-    El servidor no entrega lo que el permiso no deja ver. Está en
-    `specs/012-secciones-de-negocio/`.
+    El servidor no entrega lo que el permiso no deja ver. Pantalla elegida: pestañas Ventas,
+    Compras e Inventario con el submenú arriba, como en Catálogo y Usuarios; los números de
+    cada sección van en su pestaña; «Actualizar» con ícono y, en la computadora, sin «Volver
+    a Más». Está en `specs/012-secciones-de-negocio/`.
