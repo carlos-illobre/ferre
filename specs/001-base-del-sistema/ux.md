@@ -301,7 +301,7 @@ Vale igual en todas las pantallas:
 | → en el menú | Pasa la marca a las pestañas de esa parte; en Más, a su primera opción |
 | Clic en una pestaña | La abre y deja la marca de las flechas en esa pestaña |
 | ← → en las pestañas | Pasan la marca de una pestaña a otra sin abrirla; Enter abre la marcada; ← desde la primera vuelve al menú |
-| ← → ↑ ↓ en Más | Las opciones de Más se recorren como pestañas: → y ↓ a la siguiente, ← y ↑ a la anterior, Enter abre, ← desde la primera vuelve al menú |
+| ← → ↑ ↓ en Más | Las opciones de Más se recorren como la grilla que se ve: → a la siguiente y ← a la anterior; ↓ a la de abajo y ↑ a la de arriba, en la misma columna (en la última o la primera fila no se mueve); Enter abre; ← desde la primera vuelve al menú (pedido de Carlos del 2026-10-15) |
 | ↓ desde las pestañas | Marca la primera fila de la lista de la pantalla, y el cursor de escritura queda en la búsqueda. **Si la lista está vacía, la marca se queda en las pestañas** |
 | ↑ ↓ con una fila marcada | Marcan la fila anterior o la siguiente, entera; el cursor de escritura no se mueve. ↑ desde la primera vuelve a las pestañas |
 | ↓ desde la búsqueda | Marca la primera fila de la lista, si hay; el cursor sigue en la búsqueda |

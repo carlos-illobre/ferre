@@ -209,7 +209,8 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
 
-  // En Más, las opciones se recorren con las flechas como pestañas; ← desde la primera vuelve al menú.
+  // En Más, las opciones se recorren como la grilla que se ve (pedido de Carlos del 2026-10-15):
+  // → y ← a la siguiente y a la anterior, ↓ y ↑ a la de abajo y a la de arriba; ← desde la primera vuelve al menú.
   for (const _ of [1, 2, 3]) await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("menu-mas")).toBeFocused();
   await page.keyboard.press("Enter");
@@ -217,8 +218,9 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("mas-usuarios")).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByTestId("mas-anomalias")).toBeFocused();
+  await expect(page.getByTestId("mas-tickets")).toBeFocused();
   await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("mas-procesos")).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("mas-resumen")).toBeFocused();
   await expect(page.getByTestId("mas")).toBeVisible();
