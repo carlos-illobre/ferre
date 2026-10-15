@@ -70,6 +70,19 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 Las sesiones que programan corren en la nube; cómo está armado el entorno, en
 `docs/operacion/sesiones-en-la-nube.md`.
 
+**Al empezar, comprobá que la preparación corrió.** El hook `SessionStart` corre
+`.claude/scripts/preparar-nube.sh` (dependencias, Docker y Docker Hub), pero a veces no se
+dispara. Antes de la primera prueba: `docker info` y que exista `node_modules/`. Si falta
+cualquiera de los dos, corré `bash .claude/scripts/preparar-nube.sh` y mirá que diga
+«Docker listo.». No sigas con Docker apagado ni lo reemplaces con servicios levantados a mano.
+
+**Antes de subir un cambio de código, corré las e2e en Docker.** En la nube:
+`.claude/scripts/imagenes-nube.sh` (construye las imágenes con el certificado del proxy) y
+después `tests/e2e.sh`. A Carlos se le dice el resultado tal cual: cuántas pasaron y cuáles
+fallaron. Una que falla se corre sola (`tests/e2e.sh --solo "<nombre>"`) para ver si es del
+cambio; si no lo es, se dice cuál, por qué y que se repitió sola. Un cambio que solo toca
+documentación no las necesita.
+
 **Si hace falta un dominio que la red no deja pasar, se le pide permiso a Carlos.** En una
 sesión en la nube, si una descarga o una conexión falla porque el dominio no está entre los
 permitidos del entorno, el agente frena esa parte y le dice a Carlos qué dominio es, para
@@ -151,6 +164,8 @@ tests/utest.sh               # unitarias, sin nada levantado
 node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
 tests/e2e.sh                 # caminos principales de la aplicación, en celular y computadora (levanta el stack)
+bash .claude/scripts/preparar-nube.sh   # en la nube: dependencias, Docker y Docker Hub, si no corrió al empezar
+.claude/scripts/imagenes-nube.sh        # en la nube: construye las imágenes para tests/e2e.sh
 tests/capturas/levantar.sh   # API de mentira y cliente, para mirar pantallas sin Docker
 python tests/capturas/capturar.py vender   # captura una pantalla de la aplicación en computadora y celular
 ```

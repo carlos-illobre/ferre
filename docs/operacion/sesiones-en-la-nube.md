@@ -53,6 +53,11 @@ Las instala `.claude/scripts/preparar-nube.sh` al empezar cada sesión (un hook
 `SessionStart` de `.claude/settings.json`): `pnpm install` y `uv sync`. Fuera de la nube no
 hace nada.
 
+**El hook a veces no se dispara** (pasó el 2026-10-15: la sesión arrancó sin dependencias y
+con Docker apagado). Por eso el agente lo comprueba antes de la primera prueba: si
+`docker info` falla o no existe `node_modules/`, corre `bash .claude/scripts/preparar-nube.sh`
+a mano y sigue solo cuando dice «Docker listo.».
+
 El mismo script arranca Docker, que viene instalado pero apagado: las pruebas de punta a
 punta levantan el stack con Docker Compose, igual que en el CI. Si Docker no arranca, la
 sesión lo avisa; no se reemplaza por servicios levantados a mano.
@@ -88,4 +93,23 @@ cada Dockerfile que agrega ese certificado, con el nombre que espera `docker-com
   construye el CI, que no pasa por el proxy, con los Dockerfiles del repositorio.
 - Las imágenes que publica el CI no sirven en la nube: son para ARM (el servidor) y la
   máquina de la nube es x86.
+
+Lo hace `.claude/scripts/imagenes-nube.sh`: copia los tres Dockerfiles a una carpeta temporal
+con el certificado agregado en la etapa que baja dependencias, crea el `.env` desde
+`.env.example` si no hay, y construye con `docker compose build`. Al terminar borra las
+copias. Si un Dockerfile cambia su primer `FROM`, el script avisa y hay que actualizarlo.
+
+## Antes de subir: las pruebas de punta a punta
+
+Un cambio de código no se sube sin correr las e2e en Docker, también desde la nube:
+
+```bash
+bash .claude/scripts/preparar-nube.sh   # solo si no corrió al empezar
+.claude/scripts/imagenes-nube.sh        # cada vez que cambia el código de un servicio
+tests/e2e.sh                            # computadora y celular; tarda unos seis minutos
+```
+
+El resultado se le dice a Carlos tal cual: cuántas pasaron y cuáles fallaron. Una que falla
+se repite sola (`tests/e2e.sh --solo "<nombre>"`) para ver si es del cambio; si es del
+cambio, se arregla antes de subir. Un cambio que solo toca documentación no las necesita.
 
