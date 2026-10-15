@@ -239,7 +239,7 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **En la computadora, la acción de la pantalla va a la derecha de las pestañas, en la misma
   fila** (nunca hay más de cuatro pestañas, así que el lugar está libre): «Escanear con el
   celular» en Vender, el día en Anular, «Sector nuevo» en Estanterías, «Rol nuevo» en Roles y
-  «Pedido nuevo» en Pedidos. Cada acción lleva su ícono («Rol nuevo», como «Sector nuevo», un «+»). Una caja de texto ancha, como la búsqueda de Duplicados, sigue en su
+  «Pedido nuevo» en Pedidos. Cada acción lleva su ícono («Rol nuevo» y «Pedido nuevo», como «Sector nuevo», un «+» dibujado, no escrito en el texto). Una caja de texto ancha, como la búsqueda de Duplicados, sigue en su
   propia línea. En el celular no cambia (pedido de Carlos del 2026-10-15; maqueta
   `maquetas/acciones-al-lado-del-submenu.html`).
 - **Cobro:** Efectivo viene elegido; el total se ve grande y fuera del botón «Cobrar», que
@@ -367,8 +367,9 @@ línea chica que dice cómo está la conexión: «Conectado», «Sincronizado ha
 conexión · 2 por enviar» o «3 por enviar desde hace más de una hora». Debajo, sin espacio de
 más, va el título de la pantalla.
 
-**Volver a Más (decisión 64).** En el celular, cada pantalla de Más lleva arriba a la
-izquierda «Volver a Más», que regresa al menú de Más.
+**Sin «Volver a Más» (decisión 90).** Ninguna pantalla de Más lleva un botón para volver a Más,
+ni en el celular ni en la computadora: se vuelve con «Más» del menú (abajo en el celular, a la
+izquierda en la computadora) o con el botón de volver del celular.
 
 **El botón de volver del celular (pedido de Carlos del 2026-10-12).** Con algo abierto encima
 de la pantalla (la ficha de un producto, cualquier hoja que sube desde abajo, la cámara del

@@ -26,3 +26,6 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T015 [ajuste] En la computadora, en Más ↓ va a la opción de abajo y ↑ a la de arriba, como en la grilla que se ve; → y ← siguen a la siguiente y a la anterior (pedido de Carlos del 2026-10-15)
 - [x] T016 [interfaz] En la computadora, la acción de la pantalla va a la derecha de las pestañas, en la misma fila: Vender, Anular, Estanterías, Roles y Pedidos; Duplicados no (pedido de Carlos del 2026-10-15)
 - [x] T017 [ajuste] «Rol nuevo» lleva su ícono, el «+» de «Sector nuevo» (pedido de Carlos del 2026-10-15)
+- [x] T018 [ajuste] «Pedido nuevo» lleva el ícono «+» en vez del «+» escrito en el texto (pedido de Carlos del 2026-10-15)
+- [x] T019 [arreglo] En Roles de la computadora, «Rol nuevo» queda alineado con el borde derecho del contenido, que es angosto, y no con el de la ventana (avisó Carlos el 2026-10-15)
+- [x] T020 [ajuste] Sin «Volver a Más» en ninguna pantalla, ni en el celular ni en la computadora (decisión 90)

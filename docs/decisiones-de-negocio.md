@@ -422,7 +422,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Las instrucciones de la computadora nombran primero ese camino; la cámara del
       teléfono sigue sirviendo.
 
-64. **En el celular, cada pantalla de Más tiene su «Volver a Más»** (2026-10-12).
+64. **En el celular, cada pantalla de Más tiene su «Volver a Más»** (2026-10-12). Reemplazada por la 90.
     Carlos pidió que, al entrar a una opción de Más (por ejemplo Roles), haya un botón para
     volver al menú de Más. Va arriba a la izquierda, en todas las pantallas de Más, también
     en la que avisa que falta un permiso. En la computadora no hace falta: el menú está
@@ -667,3 +667,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     el cliente de Hono obligaba a reescribir las veinte rutas y a que el front revisara el
     código del servidor al compilar. Lo que queda sin controlar al compilar es la dirección y el
     método de cada llamada. Precisa la decisión 84, que había aceptado ese cliente.
+
+90. **Sin «Volver a Más»** (2026-10-15). Carlos pidió sacar todos los botones «Volver a Más»
+    porque no hacen falta: a Más se vuelve con «Más» del menú, que siempre está a la vista
+    (abajo en el celular, a la izquierda en la computadora), o con el botón de volver del
+    celular. Reemplaza la decisión 64.

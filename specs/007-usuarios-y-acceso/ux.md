@@ -188,7 +188,7 @@ Depósito, en este orden:
   computadora se recorren con las flechas, como el resto de Más.
 - Cada pestaña tiene su propia dirección, para volver a ella al recargar y para el espejo
   entre el celular y la computadora.
-- Arriba de las pestañas está «Volver a Más», en los dos.
+- No hay «Volver a Más»: se vuelve con «Más» del menú (decisión 90).
 
 Maquetas aprobadas por Carlos el 2026-10-14: `maquetas/mas-con-usuarios.html` y
 `maquetas/usuarios-pestanas.html`.

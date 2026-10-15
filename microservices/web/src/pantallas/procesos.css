@@ -19,6 +19,6 @@
   --procesos-aviso-borde: var(--p-amarillo-borde);
   --procesos-aviso-texto: var(--p-amarillo-texto);
 }
-/* En la computadora el editor ocupa toda la altura, debajo de «Volver a Más». */
+/* En la computadora el editor ocupa toda la altura, debajo del encabezado. */
 .pagina.procesos-en-ferrebress { height: calc(100vh - 84px); min-height: 600px; overflow: hidden; padding-top: var(--e3, 12px); }
 .pagina.procesos-en-ferrebress > .procesos { flex: 1; min-height: 0; }

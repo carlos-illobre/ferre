@@ -11,7 +11,7 @@ zonasConTeclasPropias(".lateral, .pestanas");
 const DISPOSICION: DisposicionParaFlechas = {
   pantalla: ".cuerpo",
   noSonListas: ".lateral, .pestanas, .mas-grilla",
-  noSonCajas: ".pestanas, .mas-volver",
+  noSonCajas: ".pestanas",
   sinCaja: () => document.getElementById("contenido"),
   arribaDeLaLista: () => document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']"),
 };
@@ -277,7 +277,6 @@ function Pantallas() {
         </div>
       </aside>
       <div className={`cuerpo ${pestanas ? "con-pestanas" : ""}`}>
-        {parte === "mas" && actual !== "mas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
         {pestanas && (
           <div className="pestanas-fila">
           <nav className="pestanas" aria-label={NOMBRES.get(actual)} onKeyDown={teclasDeLasPestanas}>
