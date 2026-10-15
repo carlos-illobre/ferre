@@ -61,6 +61,25 @@ gastos y el dinero invertido y que los niegue.
 - **E09** **Given** alguien sin «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve las cantidades pero no el valor en pesos, y el servidor no se lo manda.
 - **E10** **Given** alguien con «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve también el valor en pesos.
 
+### User Story 4 - Pasar de una sección a otra (Priority: P1)
+
+**Acceptance Scenarios**:
+
+- **E11** **Given** alguien que puede ver las tres secciones, **When** toca «Cómo va el negocio» en Más, **Then** se abre Ventas, con el submenú Ventas, Compras e Inventario arriba, en ese orden, en el celular y en la computadora.
+- **E12** **Given** alguien que puede ver Compras e Inventario pero no Ventas, **When** abre la opción desde Más, **Then** se abre Compras y el submenú tiene solo Compras e Inventario.
+- **E13** **Given** alguien que puede ver una sola sección, **When** abre la opción, **Then** ve esa sección con el título «Cómo va el negocio» y sin submenú.
+- **E14** **Given** la computadora, en una sección, **When** se usan las flechas sobre el submenú, **Then** se pasa a la sección de al lado; las secciones no tienen atajo Alt y no hay «Volver a Más».
+- **E15** **Given** una sección abierta, **When** se toca «Actualizar» (con su ícono), **Then** se vuelven a traer los números de esa sección sin recargar la página.
+- **E16** **Given** alguien con «Ver los gastos» y «Ver las compras», **When** abre Compras, **Then** ve los gastos de la semana y las compras recientes.
+- **E17** **Given** alguien sin «Ver las ventas del negocio», **When** entra por la dirección de la sección Ventas, **Then** la pantalla dice qué permiso hace falta.
+
+### User Story 5 - Los permisos nuevos en los roles (Priority: P2)
+
+**Acceptance Scenarios**:
+
+- **E18** **Given** quien administra roles, **When** quiere darle a un rol «Ver los números del negocio» por la API, **Then** el servidor lo rechaza porque ese permiso ya no existe.
+- **E19** **Given** quien administra roles, **When** le da a un rol «Ver los gastos», **Then** quien tiene ese rol ve la sección Compras con los gastos de la semana.
+
 ### Edge Cases
 
 - Quien tiene «Ver las ventas de hoy» (de Vender) sigue viendo la lista de ventas del día en Vender, aunque no tenga «Ver las ventas del negocio»: son pantallas distintas y no cambian.
