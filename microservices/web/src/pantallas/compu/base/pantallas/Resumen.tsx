@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { NOMBRES } from "../../../textos";
+import { NOMBRES, TEXTOS } from "../../../textos";
+import { usePuede } from "../../../permisos";
 import { urlApi } from "../../../../api";
 import { esAmbienteDePrueba } from "../../../../ambiente";
 import { fecha, pesos } from "../../../../formato";
@@ -20,30 +21,22 @@ const CONSULTAS_A_LA_VISTA = 6;
 const plural = (n: number, uno: string, muchos: string) => `${n.toLocaleString("es-AR")} ${n === 1 ? uno : muchos}`;
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
 
-// Cómo va el negocio hoy: lo vendido y por qué medio, lo gastado en compras en la semana y
-// lo que preguntaron y no llevaron. Cada bloque carga por su cuenta.
-export function Resumen() {
-  const { sesion } = useSesion();
-  const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
+// Cómo va el negocio, en tres secciones con su permiso cada una (decisión 89): Ventas (lo
+// vendido, por qué medio y lo que preguntaron y no llevaron), Compras (los gastos de la semana
+// y las compras recientes) e Inventario (el dinero invertido). Son pestañas de la opción de
+// Más; cada bloque carga por su cuenta y «Actualizar» vuelve a traer los de la sección.
+export function ResumenVentas() {
   const enLinea = useEnLinea();
   const hoy = comoCarga(useVentasDelDia(), "No se pudieron traer las ventas de hoy");
-  const gastos = comoCarga(useGastosDeLaSemana(), "No se pudieron traer los gastos de la semana");
   const consultas = comoCarga(useConsultas(), "No se pudieron traer las consultas");
   const hoyTexto = new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
 
   const confirmadas = hoy.datos?.ventas.filter((v) => v.estado === "confirmada").length ?? 0;
   const anuladas = hoy.datos ? hoy.datos.ventas.length - confirmadas : 0;
   const deHoy = consultas.datos?.filter((c) => esDeHoy(c.fecha)) ?? [];
-  const hasta = gastos.datos ? new Date(new Date(`${gastos.datos.desde}T00:00:00`).getTime() + 6 * 86_400_000).toISOString().slice(0, 10) : null;
-  const periodo = gastos.datos ? `del ${fecha(gastos.datos.desde).slice(0, 5)} al ${fecha(hasta).slice(0, 5)}` : "";
-
-  function actualizar() { hoy.recargar(); gastos.recargar(); consultas.recargar(); }
 
   return (
-    <Pagina titulo={NOMBRES.comoVaElNegocio} testId="resumen" bajada={`Cómo va el negocio hoy, ${hoyTexto}.`}
-      acciones={<Boton icono="repetir" onClick={actualizar} disabled={!enLinea || hoy.cargando || gastos.cargando || consultas.cargando}>Actualizar</Boton>}>
-      {!enLinea && <Aviso tipo="alerta" testId="resumen-sin-conexion">Sin conexión: los números se ven cuando vuelva internet. Se actualizan solos.</Aviso>}
-
+    <SeccionDelNegocio testId="resumen" bajada={`Hoy, ${hoyTexto}. ${TEXTOS.negocio.seccionVentas.largo}`} cargando={hoy.cargando || consultas.cargando} alActualizar={() => { hoy.recargar(); consultas.recargar(); }}>
       <div className="indicadores">
         <Indicador rotulo="Vendido hoy" icono="plata" color="ambar" testId="indicador-vendido"
           valor={<Numero carga={hoy}>{hoy.datos && <Explicado valor={pesosCortos(hoy.datos.total)} etiqueta="Vendido hoy" titulo="De dónde sale lo vendido hoy" pasos={pasosDeVentas(hoy.datos, anuladas)} />}</Numero>}
@@ -51,9 +44,6 @@ export function Resumen() {
         <Indicador rotulo="Ventas de hoy" icono="ventas" testId="indicador-ventas"
           valor={<Numero carga={hoy}>{confirmadas.toLocaleString("es-AR")}</Numero>}
           detalle={hoy.datos ? (anuladas ? `${plural(anuladas, "anulada", "anuladas")}, que no ${anuladas === 1 ? "suma" : "suman"}` : "Ninguna anulada") : textoDeEspera(hoy, enLinea)} />
-        <Indicador rotulo="Gastos de la semana" icono="compras" testId="indicador-gastos"
-          valor={<Numero carga={gastos}>{gastos.datos && <Explicado valor={pesosCortos(gastos.datos.total)} etiqueta="Gastos de la semana" titulo="De dónde salen los gastos de la semana" pasos={pasosDeGastos(gastos.datos, periodo)} />}</Numero>}
-          detalle={gastos.datos ? `En compras, ${periodo}` : textoDeEspera(gastos, enLinea)} />
         <Indicador rotulo="No llevaron hoy" icono="info" color={deHoy.length ? "rojo" : undefined} testId="indicador-consultas"
           valor={<Numero carga={consultas}>{deHoy.length.toLocaleString("es-AR")}</Numero>}
           detalle={consultas.datos ? (deHoy.length ? "Preguntaron el precio y no compraron" : "Nadie se fue sin comprar") : textoDeEspera(consultas, enLinea)} />
@@ -90,11 +80,65 @@ export function Resumen() {
           </footer>
         </section>
 
-        <GastosDeLaSemana gastos={gastos} periodo={periodo} />
+        <NoLlevaron consultas={consultas} deHoy={deHoy.length} />
       </div>
+    </SeccionDelNegocio>
+  );
+}
 
-      <NoLlevaron consultas={consultas} deHoy={deHoy.length} />
+// Compras: los gastos de la semana con «Ver los gastos» y las compras recientes con «Ver las
+// compras». La sección se ve con cualquiera de los dos y muestra lo que cada uno deja.
+export function ResumenCompras({ recientes }: { recientes: (vuelta: number) => ReactNode }) {
+  const puedeEsto = usePuede();
+  const veGastos = puedeEsto("negocio.gastos");
+  const [vuelta, setVuelta] = useState(0);
+  return (
+    <SeccionDelNegocio testId="resumen-compras" bajada={TEXTOS.negocio.seccionCompras.largo} alActualizar={() => setVuelta((v) => v + 1)}>
+      {veGastos && <GastosConSuNumero key={`gastos-${vuelta}`} />}
+      {puedeEsto("deposito.compras") && recientes(vuelta)}
+    </SeccionDelNegocio>
+  );
+}
 
+function GastosConSuNumero() {
+  const enLinea = useEnLinea();
+  const gastos = comoCarga(useGastosDeLaSemana(), "No se pudieron traer los gastos de la semana");
+  const hasta = gastos.datos ? new Date(new Date(`${gastos.datos.desde}T00:00:00`).getTime() + 6 * 86_400_000).toISOString().slice(0, 10) : null;
+  const periodo = gastos.datos ? `del ${fecha(gastos.datos.desde).slice(0, 5)} al ${fecha(hasta).slice(0, 5)}` : "";
+  return (
+    <>
+      <div className="indicadores">
+        <Indicador rotulo="Gastos de la semana" icono="compras" testId="indicador-gastos"
+          valor={<Numero carga={gastos}>{gastos.datos && <Explicado valor={pesosCortos(gastos.datos.total)} etiqueta="Gastos de la semana" titulo="De dónde salen los gastos de la semana" pasos={pasosDeGastos(gastos.datos, periodo)} />}</Numero>}
+          detalle={gastos.datos ? `En compras, ${periodo}` : textoDeEspera(gastos, enLinea)} />
+      </div>
+      <GastosDeLaSemana gastos={gastos} periodo={periodo} />
+    </>
+  );
+}
+
+// Inventario: el dinero invertido, en total y por proveedor.
+export function ResumenInventario({ invertido }: { invertido: (vuelta: number) => ReactNode }) {
+  const [vuelta, setVuelta] = useState(0);
+  return (
+    <SeccionDelNegocio testId="resumen-inventario" bajada={TEXTOS.negocio.seccionInventario.largo} alActualizar={() => setVuelta((v) => v + 1)}>
+      {invertido(vuelta)}
+    </SeccionDelNegocio>
+  );
+}
+
+// Lo común a las tres secciones: el título (que con las pestañas a la vista queda solo para
+// los lectores de pantalla), «Actualizar», el aviso sin conexión y, al pie, quién entró y
+// cómo está el servidor.
+function SeccionDelNegocio({ testId, bajada, cargando, alActualizar, children }: { testId: string; bajada: string; cargando?: boolean; alActualizar: () => void; children: ReactNode }) {
+  const { sesion } = useSesion();
+  const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
+  const enLinea = useEnLinea();
+  return (
+    <Pagina titulo={NOMBRES.comoVaElNegocio} testId={testId} bajada={bajada} className="negocio-seccion"
+      acciones={<Boton icono="repetir" onClick={alActualizar} disabled={!enLinea || cargando} data-testid="actualizar-negocio">Actualizar</Boton>}>
+      {!enLinea && <Aviso tipo="alerta" testId="resumen-sin-conexion">Sin conexión: los números se ven cuando vuelva internet. Se actualizan solos.</Aviso>}
+      {children}
       <footer className="resumen-pie">
         {usuario && <span>Entraste como <strong data-testid="usuario-negocio">{usuario.nombre}</strong> <span className="detalle">({usuario.email})</span></span>}
         <EstadoDeConexion testId="conexion-negocio" />

@@ -10,7 +10,7 @@ Carlos del 2026-10-15.
 - [x] T003 Plan con la sección «Seguridad», escenarios E01 a E19 y estas tareas (pasos 3 a 5)
 - [x] T004 El servidor: permisos `negocio.ventas`, `negocio.gastos` y `negocio.invertido` en lugar de `negocio.numeros`, la migración que se los da a los roles que lo tenían y cada ruta con su permiso, con sus pruebas (E06, E07, E08, E09, E10, E18) (depende de T003)
 - [x] T005 Lo compartido del cliente: los permisos, las tres secciones con su permiso y sus textos (depende de T004)
-- [ ] T006 La computadora: las secciones como pestañas de «Cómo va el negocio», sin «Volver a Más», con «Actualizar» con ícono (E01 a E05, E11 a E17) (depende de T005)
+- [x] T006 La computadora: las secciones como pestañas de «Cómo va el negocio», sin «Volver a Más», con «Actualizar» con ícono (E01 a E05, E11 a E17) (depende de T005)
 - [ ] T007 El celular: las mismas secciones con sus pestañas, sin «Actualizar» como en la maqueta (E01 a E05, E11 a E13, E16, E17) (depende de T005)
 - [ ] T008 La API de mentira de las capturas y las pruebas de punta a punta, en el celular y en la computadora, con los permisos nuevos (E19) (depende de T006, T007)
 - [ ] T009 Comparar con la maqueta aprobada con capturas de computadora y de celular, y mostrarle a Carlos las diferencias (depende de T006, T007)

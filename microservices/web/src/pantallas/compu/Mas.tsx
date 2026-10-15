@@ -3,11 +3,13 @@ import { Icono, Pagina, type NombreDeIcono } from "./base/ui";
 import type { Permiso } from "../permisos";
 import { irA } from "./base/rutas";
 import { NOMBRES, TEXTOS } from "../textos";
+import { PIDE_EL_NEGOCIO } from "../pestanas-de-negocio";
 
 // «Más» guarda las pantallas que se usan poco, para que el menú tenga solo lo de todos los días.
 // Cada una dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
 export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
-  { ruta: "resumen", nombre: "Cómo va el negocio", detalle: "Lo vendido hoy, los gastos y las compras", icono: "resumen", pide: ["negocio.numeros", "deposito.compras"] },
+  // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 89).
+  { ruta: "resumen", nombre: NOMBRES.comoVaElNegocio, detalle: TEXTOS.negocio.queHayEnElNegocio.largo, icono: "resumen", pide: PIDE_EL_NEGOCIO },
   // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
   { ruta: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.largo, icono: "usuarios" },
   { ruta: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: ["negocio.anomalias"] },
@@ -16,7 +18,7 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
   { ruta: "configuracion", nombre: "Configuración", detalle: "Cómo se comporta la aplicación en esta computadora", icono: "ajustes" },
 ];
 
-// `destino`: adónde lleva la opción, si no es su propia ruta (Usuarios va a su primera pestaña).
+// `destino`: adónde lleva la opción, si no es su propia ruta (Usuarios y Cómo va el negocio van a su primera pestaña).
 export function Mas({ atajoDe, opciones }: { atajoDe: (ruta: string) => string | null; opciones: ((typeof DE_MAS)[number] & { destino?: string })[] }) {
   // Las opciones se recorren con las flechas como si fueran pestañas (pedido de Carlos del
   // 2026-10-13): → y ↓ a la siguiente, ← y ↑ a la anterior; ← desde la primera vuelve al menú.
