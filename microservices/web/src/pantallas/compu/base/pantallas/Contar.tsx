@@ -10,6 +10,7 @@ import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progr
 import { useEsCelular } from "../vista";
 import { BuscadorDeProducto, conSigno, detalleDe, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./deposito-comun";
 import "../estilos/contar.css";
+import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 
 // Conteo por sector, caminando el local con el celular en una mano: elegir el sector, buscar
 // o escanear, cuántas hay, siguiente. El sector queda abierto hasta cerrarlo (si se
@@ -58,7 +59,7 @@ export function Contar() {
 
   return (
     <Pagina titulo="Contar" testId="pantalla-contar" bajada="Se cuenta de a un sector: una estantería, una pared, el mostrador. Al cerrarlo, las diferencias contra el sistema se ajustan solas."
-      acciones={sectores && sectores.length > 0 ? <Boton icono="mas" onClick={() => setNuevo(true)} disabled={!enLinea} data-testid="sector-nuevo">Sector nuevo</Boton> : undefined}>
+      acciones={sectores && sectores.length > 0 ? <AlLadoDeLasPestanas><Boton icono="mas" onClick={() => setNuevo(true)} disabled={!enLinea} data-testid="sector-nuevo">Sector nuevo</Boton></AlLadoDeLasPestanas> : undefined}>
       <Aviso tipo="alerta" testId="sin-conexion">{!enLinea ? "Sin conexión: empezar o retomar un sector, y crear uno nuevo, necesitan internet. Un conteo que ya está abierto en esta pantalla se sigue contando igual." : null}</Aviso>
       <Aviso tipo="error" accion={sectores === null ? <Boton tam="chico" icono="repetir" onClick={() => void cargarSectores()}>Reintentar</Boton> : undefined}>{error}</Aviso>
       {sectores === null && !error && <Progreso texto="Trayendo los sectores…" />}

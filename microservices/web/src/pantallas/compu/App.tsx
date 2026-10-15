@@ -48,6 +48,7 @@ import { Anomalias } from "../Anomalias";
 import "./base/estilos/base.css";
 import "./base/estilos/entrar.css";
 import "./tema.css";
+import { LUGAR_AL_LADO_DE_LAS_PESTANAS } from "../AlLadoDeLasPestanas";
 
 // La interfaz de computadora (menú lateral, tablas, todo con teclado), con
 // la paleta de la v5, la venta con sugeridos y el menú reducido a lo de todos los días: lo
@@ -278,6 +279,7 @@ function Pantallas() {
       <div className={`cuerpo ${pestanas ? "con-pestanas" : ""}`}>
         {parte === "mas" && actual !== "mas" && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
         {pestanas && (
+          <div className="pestanas-fila">
           <nav className="pestanas" aria-label={NOMBRES.get(actual)} onKeyDown={teclasDeLasPestanas}>
             {pestanas.map((p) => (
               <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={atajoDe(p.ruta) && !RUTAS_DE_USUARIOS.has(p.ruta) ? `Alt+${atajoDe(p.ruta)}` : undefined} data-testid={`pestana-${p.ruta}`}
@@ -287,6 +289,9 @@ function Pantallas() {
               </button>
             ))}
           </nav>
+          {/* La acción de la pantalla, a la derecha de las pestañas (pedido de Carlos del 2026-10-15). */}
+          <div className="pestanas-acciones" id={LUGAR_AL_LADO_DE_LAS_PESTANAS} />
+          </div>
         )}
         {falta ? <SinPermiso falta={falta} />
           : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />

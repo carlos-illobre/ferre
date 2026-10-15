@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from
 import { api } from "../api";
 import "./roles.css";
 import type { PermisoDelSistema, Rol, RolNuevo } from "@servidor/usuarios";
+import { AlLadoDeLasPestanas } from "./AlLadoDeLasPestanas";
 
 // Roles (RF-75): cada rol es un nombre y un grupo de permisos. Los permisos son fijos y los
 // trae el servidor, cada uno con su explicación. La misma pantalla en el celular y en la
@@ -84,7 +85,7 @@ export function Roles({ cabeza }: { cabeza?: ReactNode } = {}) {
           </div>
         </form>
       ) : (
-        <button type="button" className="rl-boton fuerte rl-nuevo" disabled={!roles} onClick={() => setBorrador({ id: null, nombre: "", permisos: new Set() })} data-testid="rol-nuevo">Rol nuevo</button>
+        <AlLadoDeLasPestanas><button type="button" className="rl-boton fuerte rl-nuevo" disabled={!roles} onClick={() => setBorrador({ id: null, nombre: "", permisos: new Set() })} data-testid="rol-nuevo">Rol nuevo</button></AlLadoDeLasPestanas>
       )}
 
       {!roles && !error && <p className="rl-bajada" aria-busy="true">Buscando los roles…</p>}

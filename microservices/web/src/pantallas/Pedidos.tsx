@@ -9,6 +9,7 @@ import { useVolverCierra } from "../plataforma/navegacion/volver";
 import "./pedidos.css";
 import type { Proveedor as ProveedorDelServidor } from "@servidor/proveedores";
 import type { BorradorDePedido, EnvioDePedido, Pedido } from "@servidor/pedidos";
+import { AlLadoDeLasPestanas } from "./AlLadoDeLasPestanas";
 
 // Pedidos a proveedores (RF-55, decisión 52). La misma pantalla en el celular y en la
 // computadora (maqueta B, aprobada el 2026-10-11): la lista de pedidos; el pedido, que es
@@ -105,7 +106,7 @@ export function Pedidos({ celular = false, alIngresar }: { celular?: boolean; al
     <section className="pd" data-testid="pedidos">
       <header className="pd-cabeza">
         <div className="pd-crece"><h1>Pedidos a proveedores</h1><p className="pd-bajada">Lo que se encargó y todavía no llegó, primero.</p></div>
-        {encarga && <button type="button" className="pd-boton principal" onClick={() => setEligiendo(true)} data-testid="pedido-nuevo">+ Pedido nuevo</button>}
+        {encarga && <AlLadoDeLasPestanas><button type="button" className="pd-boton principal" onClick={() => setEligiendo(true)} data-testid="pedido-nuevo">+ Pedido nuevo</button></AlLadoDeLasPestanas>}
       </header>
       {aviso && <p className="pd-aviso" role="status" data-testid="mensaje-pedidos">{aviso}</p>}
       {error && <p className="pd-error" role="alert">{error} <button type="button" className="pd-boton chico" onClick={() => void cargar()}>Reintentar</button></p>}

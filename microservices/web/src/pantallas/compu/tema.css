@@ -53,7 +53,7 @@
 .mas-tarjeta .tecla { position: absolute; top: var(--e3); right: var(--e3); }
 .mas-volver { padding: var(--e4) var(--e5) 0; }
 /* En Usuarios, «Volver a Más» va arriba de las pestañas (decisión 88). */
-.mas-volver + .pestanas { padding-top: var(--e3); }
+.mas-volver + .pestanas, .mas-volver + .pestanas-fila .pestanas, .mas-volver + .pestanas-fila .pestanas-acciones { padding-top: var(--e3); }
 .con-pestanas .rl { margin: 0; padding-inline: var(--e5); }
 .mas-volver + .pagina { padding-top: var(--e3); }
 
@@ -74,6 +74,11 @@
 
 /* Pestañas dentro de Catálogo y Depósito, como en el celular. Hacen de título de la pantalla. */
 .pestanas { display: flex; gap: var(--e2); padding: var(--e4) var(--e5) 0; }
+/* La fila de las pestañas, con la acción de la pantalla a la derecha (pedido de Carlos del 2026-10-15). */
+.pestanas-fila { display: flex; align-items: flex-end; gap: var(--e3); }
+.pestanas-fila .pestanas { flex: 1 1 auto; }
+.pestanas-acciones { display: flex; align-items: center; gap: var(--e2); padding: var(--e4) var(--e5) 0 0; }
+.pestanas-acciones:empty { display: none; }
 .pestanas button { display: inline-flex; align-items: center; gap: var(--e2); min-height: 44px; padding: 0 var(--e5); border-radius: var(--r-pastilla); border: 1px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto-2); font-weight: 650; font-size: var(--t-medio); }
 .pestanas button:hover { border-color: var(--marino); color: var(--tinta); }
 .pestanas button[aria-current="page"] { background: var(--marino); border-color: var(--marino); color: #fff; }

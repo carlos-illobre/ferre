@@ -53,3 +53,14 @@ La computadora y el celular no usan las mismas direcciones:
 
 `--entera` (página completa) se cuelga en la computadora: ahí conviene bajar con
 `--py "page.locator('...').scroll_into_view_if_needed()"`.
+
+## El vínculo
+
+Por omisión no hay celular vinculado. Para ver una pantalla de la computadora con su celular
+vinculado (por ejemplo, «Escanear con el celular» en Vender), la captura guarda un identificador
+de dispositivo que empiece con `con-celular` y recarga:
+
+```bash
+python tests/capturas/capturar.py vender --compu \
+  --py "page.evaluate('''() => localStorage.setItem('ferre.dispositivo', 'con-celular-1')''')" --py "page.reload()"
+```

@@ -236,6 +236,12 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **Lo que se toca tiene que parecer un botón:** borde o color; un texto de color solo no
   alcanza.
 - **Las pestañas de adentro de una pantalla llevan ícono.**
+- **En la computadora, la acción de la pantalla va a la derecha de las pestañas, en la misma
+  fila** (nunca hay más de cuatro pestañas, así que el lugar está libre): «Escanear con el
+  celular» en Vender, el día en Anular, «Sector nuevo» en Estanterías, «Rol nuevo» en Roles y
+  «Pedido nuevo» en Pedidos. Una caja de texto ancha, como la búsqueda de Duplicados, sigue en su
+  propia línea. En el celular no cambia (pedido de Carlos del 2026-10-15; maqueta
+  `maquetas/acciones-al-lado-del-submenu.html`).
 - **Cobro:** Efectivo viene elegido; el total se ve grande y fuera del botón «Cobrar», que
   solo dice «Cobrar»; el panel de cobro es lo que más resalta de Vender (decisión 37).
 - **Fotos:** un producto sin foto muestra una cámara donde se toca para sacarla. La foto de
