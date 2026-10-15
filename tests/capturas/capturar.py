@@ -93,7 +93,7 @@ def main() -> int:
         if o.permisos: print(f"no se pudieron fijar los permisos: {e}")
 
     with sync_playwright() as pw:
-        navegador = pw.chromium.launch()
+        navegador = pw.chromium.launch(executable_path=os.environ.get("CHROMIUM") or None)
         for medida in medidas:
             contexto = navegador.new_context(locale="es-AR", **MEDIDAS[medida])
             contexto.route("https://accounts.google.com/**", lambda r: r.fulfill(status=200, content_type="application/javascript", body=GOOGLE))

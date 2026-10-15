@@ -90,7 +90,11 @@ arriba a … (múltiplo de $1.000,00)».
 
 **Computadora:** un atajo por cada una de las cinco opciones, que funciona con el foco en la
 búsqueda y sobre el resultado elegido; el porcentaje a mano se tipea y se confirma con una
-tecla, y Escape lo cancela.
+tecla, y Escape lo cancela. En la ficha del producto (2026-10-15): ← y → recorren las cinco
+opciones sin elegir ninguna y Enter elige la que tiene el foco; ↑ y ↓ recorren, uno por uno,
+los proveedores de «Quién lo vende» y el botón «Listo», donde Enter usa ese proveedor o cierra
+la ficha; ↑ desde el primer proveedor vuelve a las opciones de margen. Las flechas valen
+desde cualquier lugar de la ficha, salvo ← y → en una caja de texto, que mueven el cursor.
 
 **Celular:** las cinco opciones entran en un renglón y se aciertan con el pulgar; el
 porcentaje a mano abre el teclado numérico.

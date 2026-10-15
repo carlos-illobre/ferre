@@ -10,3 +10,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 ## Tareas
 
 - [x] T001 [ajuste] En Listas va primero «Cargar una lista», después las últimas tres cargas y después los proveedores
+- [x] T002 [ajuste] En la ficha del producto en la computadora, ← → recorren los márgenes y Enter elige; ↑ ↓ recorren los proveedores y el botón Listo

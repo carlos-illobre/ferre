@@ -68,6 +68,46 @@ describe("Productos (v2)", () => {
     expect(descargar).toHaveBeenCalledWith("/listas/lista-1/archivo", expect.stringContaining("2026-08-11.xlsx"));
   });
 
+  // 002-T002: en la ficha, ← → recorren los márgenes y Enter elige; ↑ ↓ recorren los proveedores y «Listo».
+  it("en la ficha las flechas recorren márgenes, proveedores y «Listo», y Enter elige", () => {
+    const falso = catalogoFalso([producto({ id: "sil", descripcion: "SILICONA", costo_neto: "2400", margen_elegido: 100, proveedor: "Barato", proveedores: [
+      { proveedor_id: "b", proveedor: "Barato", costo_neto: "2400", fecha_lista: "2026-08-11", codigo_proveedor: "S1" },
+      { proveedor_id: "c", proveedor: "Caro", costo_neto: "3000", fecha_lista: "2026-08-11", codigo_proveedor: "S2" },
+    ] })]);
+    catalogo.actual = falso;
+    render(<Productos />);
+    fireEvent.keyDown(window, { key: "Enter" });
+    const ficha = screen.getByTestId("ficha-producto");
+    const tecla = (key: string) => fireEvent.keyDown(document.activeElement ?? ficha, { key });
+    const foco = () => document.activeElement;
+    // Al abrirse, el navegador pone el foco en la ficha (jsdom no lo hace solo).
+    within(ficha).getByRole("button", { name: "Cerrar" }).focus();
+
+    tecla("ArrowRight");
+    expect(foco()).toBe(within(ficha).getByTestId("margen-100"));
+    tecla("ArrowRight");
+    expect(foco()).toBe(within(ficha).getByTestId("margen-50"));
+    tecla("ArrowLeft"); tecla("ArrowLeft");
+    expect(foco()).toBe(within(ficha).getByTestId("margen-200"));
+    // Moverse no elige: elige Enter (el botón con el foco).
+    expect(falso.actualizarProducto).not.toHaveBeenCalled();
+    fireEvent.click(foco()!);
+    expect(falso.actualizarProducto).toHaveBeenCalledWith("sil", { margen_elegido: 200 });
+
+    const [barato, caro] = within(ficha).getAllByTestId("proveedor-de-producto");
+    tecla("ArrowDown");
+    expect(foco()).toBe(barato);
+    tecla("ArrowDown");
+    expect(foco()).toBe(caro);
+    tecla("ArrowDown");
+    expect(foco()).toBe(within(ficha).getByTestId("ficha-listo"));
+    tecla("ArrowDown");
+    expect(foco()).toBe(within(ficha).getByTestId("ficha-listo"));
+    tecla("ArrowUp"); tecla("ArrowUp"); tecla("ArrowUp");
+    // ↑ desde el primer proveedor vuelve al margen elegido.
+    expect(foco()).toBe(within(ficha).getByTestId("margen-200"));
+  });
+
   it("Enter abre la ficha del producto elegido", () => {
     armar();
     fireEvent.keyDown(window, { key: "Enter" });

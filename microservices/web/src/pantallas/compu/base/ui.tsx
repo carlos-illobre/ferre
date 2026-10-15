@@ -111,11 +111,11 @@ export function Pagina({ titulo, bajada, acciones, children, className, testId }
 
 // Ventana sobre lo que se está haciendo. Usa <dialog>: el navegador encierra el foco, lo
 // devuelve al cerrar y cierra con Escape. En el celular sube desde abajo.
-export function Hoja({ titulo, alCerrar, children, pie, ancha, testId }: { titulo: ReactNode; alCerrar: () => void; children: ReactNode; pie?: ReactNode; ancha?: boolean; testId?: string }) {
+export function Hoja({ titulo, alCerrar, children, pie, ancha, testId, alTeclear }: { titulo: ReactNode; alCerrar: () => void; children: ReactNode; pie?: ReactNode; ancha?: boolean; testId?: string; alTeclear?: (e: React.KeyboardEvent<HTMLDialogElement>) => void }) {
   const ref = useDialogo(alCerrar);
   const idTitulo = useId();
   return (
-    <dialog ref={ref} className={`hoja ${ancha ? "ancha" : ""}`} aria-labelledby={idTitulo} data-testid={testId}
+    <dialog ref={ref} className={`hoja ${ancha ? "ancha" : ""}`} aria-labelledby={idTitulo} data-testid={testId} onKeyDown={alTeclear}
       onClick={(e) => { if (e.target === e.currentTarget) alCerrar(); }}>
       <div className="hoja-cabeza">
         <h2 id={idTitulo}>{titulo}</h2>
@@ -210,10 +210,11 @@ export function Segmentos<T extends string>({ opciones, actual, alElegir, etique
 
 // Los cinco márgenes de un toque. Es un grupo de opciones: Tab entra una vez y las flechas
 // izquierda y derecha pasan de un margen a otro y lo eligen.
-export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", atajos, compacto }: { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; atajos?: boolean; compacto?: boolean }) {
+// Con `flechasDeAfuera`, las flechas no eligen: las maneja quien lo contiene, y se elige con Enter.
+export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", atajos, compacto, flechasDeAfuera }: { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; atajos?: boolean; compacto?: boolean; flechasDeAfuera?: boolean }) {
   const conFoco = MARGENES.includes(elegido as never) ? elegido : MARGENES[0];
   function flechas(e: React.KeyboardEvent<HTMLDivElement>) {
-    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    if (flechasDeAfuera || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
     e.preventDefault(); e.stopPropagation();
     const botones = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>("button"));
     const i = botones.indexOf(document.activeElement as HTMLButtonElement);

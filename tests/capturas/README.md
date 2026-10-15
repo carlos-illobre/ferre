@@ -12,7 +12,8 @@ tests/capturas/levantar.sh --apagar
 ```
 
 - **Qué necesita:** Node, las dependencias del repo instaladas y Python con Playwright
-  (`pip install playwright && playwright install chromium`).
+  (`pip install playwright && playwright install chromium`). Si ya hay un Chromium instalado
+  (en las sesiones en la nube, `/opt/pw-browsers/chromium`), `CHROMIUM=<ruta>` lo usa sin bajar otro.
 - **Dónde quedan:** en `tests/capturas/salida/` (no se sube), como `<nombre>-compu.png`
   (1366×768) y `<nombre>-celu.png` (390×844).
 - **Qué avisa:** desplazamiento hacia el costado, texto de menos de 14 px, objetivos táctiles
