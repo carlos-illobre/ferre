@@ -475,5 +475,5 @@ tr.cambia td { background: #fff8e8; }
 .numero-del-negocio strong.rojo { color: var(--p-naranja-texto); }
 .tarjeta-titulo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 18px; }
 .medio-de-pago { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 16px; }
-.medio-de-pago .barra { display: block; grid-column: 1 / -1; height: 7px; border-radius: 9px; background: var(--p-relleno); overflow: hidden; }
-.medio-de-pago .barra i { display: block; height: 100%; background: var(--p-verde-texto); border-radius: 9px; transform-origin: left; }
+.medio-de-pago .medio-barra { display: block; grid-column: 1 / -1; height: 7px; border-radius: 9px; background: var(--p-relleno); overflow: hidden; }
+.medio-de-pago .medio-barra i { display: block; height: 100%; margin: 0; background: var(--p-verde-texto); border-radius: 9px; }

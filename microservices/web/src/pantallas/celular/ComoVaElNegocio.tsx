@@ -61,7 +61,7 @@ function Ventas() {
               <div key={m} className="medio-de-pago" data-testid={`medio-${m}`}>
                 <span>{NOMBRE_DE_MEDIO[m]}</span>
                 <strong className="importe">{pesosCortos(importe)} · {Math.round(parte * 100)} %</strong>
-                <span className="barra" aria-hidden="true"><i style={{ transform: `scaleX(${parte})` }} /></span>
+                <span className="medio-barra" aria-hidden="true"><i style={{ width: `${Math.round(parte * 100)}%` }} /></span>
               </div>
             );
           })}
