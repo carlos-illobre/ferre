@@ -58,11 +58,10 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await expect(page.getByTestId("celulares")).toBeVisible();
   for (const oculta of ["Usuarios", "Roles", "Quién hizo qué", "Actividad"]) await expect(page.getByRole(CELULAR ? "tab" : "button", { name: oculta, exact: true })).toHaveCount(0);
   await page.goto(`/#/${RUTAS.mas}`);
-  // En el celular no hay «Volver a Más»: se vuelve con «Más» del menú de abajo (decisión 90).
+  // En el celular, de cada pantalla de Más se vuelve al menú de Más con su botón.
   if (CELULAR) {
     await page.getByTestId("mas-tickets").click();
-    await expect(page.getByTestId("volver-a-mas")).toHaveCount(0);
-    await page.getByTestId("menu-mas").click();
+    await page.getByTestId("volver-a-mas").click();
     await expect(page.getByTestId("mas-tickets")).toBeVisible();
   }
 

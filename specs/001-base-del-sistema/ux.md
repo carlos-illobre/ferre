@@ -367,9 +367,9 @@ línea chica que dice cómo está la conexión: «Conectado», «Sincronizado ha
 conexión · 2 por enviar» o «3 por enviar desde hace más de una hora». Debajo, sin espacio de
 más, va el título de la pantalla.
 
-**Sin «Volver a Más» (decisión 90).** Ninguna pantalla de Más lleva un botón para volver a Más,
-ni en el celular ni en la computadora: se vuelve con «Más» del menú (abajo en el celular, a la
-izquierda en la computadora) o con el botón de volver del celular.
+**Volver a Más (decisiones 64 y 90).** En el celular, cada pantalla de Más lleva arriba a la
+izquierda «Volver a Más», que regresa al menú de Más. En la computadora no lo lleva: se vuelve
+con «Más» del menú de la izquierda.
 
 **El botón de volver del celular (pedido de Carlos del 2026-10-12).** Con algo abierto encima
 de la pantalla (la ficha de un producto, cualquier hoja que sube desde abajo, la cámara del

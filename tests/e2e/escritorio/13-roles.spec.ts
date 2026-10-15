@@ -57,6 +57,8 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await expect(page).toHaveURL(new RegExp(`#/${RUTAS.sesiones}$`));
   await expect(page.getByTestId("celulares")).toBeVisible();
   for (const oculta of ["Usuarios", "Roles", "Quién hizo qué", "Actividad"]) await expect(page.getByRole(CELULAR ? "tab" : "button", { name: oculta, exact: true })).toHaveCount(0);
+  // En la computadora no hay «Volver a Más»: se vuelve con «Más» del menú (decisión 90).
+  if (!CELULAR) await expect(page.getByRole("button", { name: "Volver a Más" })).toHaveCount(0);
   await page.goto(`/#/${RUTAS.mas}`);
 
   // Configuración la ve cualquiera, sin permisos (RF-83, E06). Deshabilitar las animaciones vale

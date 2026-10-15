@@ -189,6 +189,14 @@ function Pantallas() {
       )}
       {escaneando && <Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />}
       {errorDeCodigo && pestana !== "mas" && <p className="aviso-suave vincular-error" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}
+      {pestana === "mas" && parte && (
+        <div className="volver-a-mas">
+          <button type="button" onClick={() => irA("mas")} data-testid="volver-a-mas">
+            <Icono nombre="izquierda" tam={18} grosor={2.4} />
+            <span>Volver a Más</span>
+          </button>
+        </div>
+      )}
       {falta ? <SinPermiso falta={falta} />
         : pestana === "mas" && parte === "tickets" ? <Tickets />
         : pestana === "mas" && parte === "configuracion" ? <Configuracion celular />

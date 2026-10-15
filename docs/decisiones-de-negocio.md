@@ -422,7 +422,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Las instrucciones de la computadora nombran primero ese camino; la cámara del
       teléfono sigue sirviendo.
 
-64. **En el celular, cada pantalla de Más tiene su «Volver a Más»** (2026-10-12). Reemplazada por la 90.
+64. **En el celular, cada pantalla de Más tiene su «Volver a Más»** (2026-10-12). Sigue vigente en el celular; la computadora no lo tiene (decisión 90).
     Carlos pidió que, al entrar a una opción de Más (por ejemplo Roles), haya un botón para
     volver al menú de Más. Va arriba a la izquierda, en todas las pantallas de Más, también
     en la que avisa que falta un permiso. En la computadora no hace falta: el menú está
@@ -668,7 +668,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     código del servidor al compilar. Lo que queda sin controlar al compilar es la dirección y el
     método de cada llamada. Precisa la decisión 84, que había aceptado ese cliente.
 
-90. **Sin «Volver a Más»** (2026-10-15). Carlos pidió sacar todos los botones «Volver a Más»
-    porque no hacen falta: a Más se vuelve con «Más» del menú, que siempre está a la vista
-    (abajo en el celular, a la izquierda en la computadora), o con el botón de volver del
-    celular. Reemplaza la decisión 64.
+90. **Sin «Volver a Más» en la computadora** (2026-10-15). Carlos pidió sacar los botones
+    «Volver a Más» porque no hacen falta, y después aclaró que solo en la computadora: ahí se
+    vuelve con «Más» del menú de la izquierda, que siempre está a la vista. En el celular el
+    botón se queda (decisión 64).
