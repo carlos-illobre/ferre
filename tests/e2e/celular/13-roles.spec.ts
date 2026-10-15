@@ -17,8 +17,8 @@ const ROL_NUEVO = "Encargado E2E";
 const VENDEDOR = "00000000-0000-4000-8000-0000000000a1";
 const ADMINISTRADOR = "00000000-0000-4000-8000-0000000000a4";
 const RUTAS = CELULAR
-  ? { mas: "mas", usuarios: "mas/usuarios", roles: "mas/roles", sesiones: "mas/sesiones", numeros: "mas/negocio", deposito: "deposito", enMas: "mas-negocio" }
-  : { mas: "mas", usuarios: "usuarios", roles: "roles", sesiones: "sesiones", numeros: "resumen", deposito: "stock", enMas: "mas-resumen" };
+  ? { mas: "mas", usuarios: "mas/usuarios", roles: "mas/roles", sesiones: "mas/sesiones", numeros: "mas/negocio", gastos: "mas/gastos", deposito: "deposito", enMas: "mas-negocio" }
+  : { mas: "mas", usuarios: "usuarios", roles: "roles", sesiones: "sesiones", numeros: "resumen", gastos: "gastos", deposito: "stock", enMas: "mas-resumen" };
 
 function psql(sql: string): string {
   return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
@@ -75,9 +75,9 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await expect(page.getByTestId("cfg-animaciones")).toHaveAttribute("aria-checked", "false");
   await expect(page.locator("html")).toHaveAttribute("data-animaciones", "no");
 
-  // Por la dirección tampoco: dice qué permiso hace falta.
+  // Por la dirección tampoco: dice qué permiso hace falta (012-E17).
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.numeros);
-  await expect(page.getByTestId("sin-permiso")).toContainText("Ver los números del negocio");
+  await expect(page.getByTestId("sin-permiso")).toContainText("Ver las ventas del negocio");
 
   // En Depósito solo queda mirar el inventario: ni ingresar mercadería ni contar ni corregir.
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.deposito);
@@ -97,7 +97,7 @@ test("se arma un rol, se lo asigna y la persona gana ese acceso", async ({ page 
   await entrarComo(page, TOKEN_ADMIN, RUTAS.roles);
   await page.getByTestId("rol-nuevo").click();
   await page.getByTestId("nombre-rol").fill(ROL_NUEVO);
-  await page.getByTestId("permiso-negocio.numeros").check();
+  await page.getByTestId("permiso-negocio.ventas").check();
   await page.getByTestId("guardar-rol").click();
   await expect(page.getByTestId("lista-de-roles")).toContainText(ROL_NUEVO);
 
@@ -131,4 +131,57 @@ test("nadie se quita a sí mismo la administración, y un rol en uso no se borra
   for (const e of estados) expect(e).toBeGreaterThanOrEqual(400);
   expect(psql(`SELECT count(*) FROM usuario_rol WHERE rol_id = '${ADMINISTRADOR}' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
   expect(psql(`SELECT activo::text FROM usuario WHERE email = '${EMAIL_ADMIN}'`)).toBe("true");
+});
+
+// 012: Cómo va el negocio en tres secciones, cada una con su permiso de lectura (decisión 89).
+const TOKEN_GASTOS = "token-e2e-roles-gastos";
+const EMAIL_GASTOS = "e2e-roles-gastos@ferre.test";
+const ROL_GASTOS = "Gastos e inventario E2E";
+const GERENTE = "00000000-0000-4000-8000-0000000000a5";
+
+test("012: las secciones de Cómo va el negocio siguen los permisos de cada rol", async ({ page }) => {
+  // 012-E07: el permiso viejo ya no lo tiene nadie; el Gerente, que lo tenía, tiene los tres nuevos.
+  expect(psql(`SELECT count(*) FROM rol_permiso WHERE permiso = 'negocio.numeros'`)).toBe("0");
+  expect(psql(`SELECT count(*) FROM rol_permiso WHERE rol_id = '${GERENTE}' AND permiso IN ('negocio.ventas', 'negocio.gastos', 'negocio.invertido')`)).toBe("3");
+
+  // 012-E19: un rol con «Ver los gastos» y «Ver el dinero invertido», y nada de ventas.
+  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL_GASTOS}')`);
+  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL_GASTOS}')`);
+  psql(`DELETE FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
+  psql(`DELETE FROM usuario_rol WHERE rol_id IN (SELECT id FROM rol WHERE nombre = '${ROL_GASTOS}')`);
+  psql(`DELETE FROM rol WHERE nombre = '${ROL_GASTOS}'`);
+  psql(`INSERT INTO rol (id, nombre, descripcion) VALUES (gen_random_uuid(), '${ROL_GASTOS}', 'Prueba')`);
+  psql(`INSERT INTO rol_permiso (rol_id, permiso) SELECT id, p FROM rol, unnest(ARRAY['negocio.gastos', 'negocio.invertido']) AS p WHERE nombre = '${ROL_GASTOS}'`);
+  psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_GASTOS}', 'Gastos E2E')`);
+  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u, rol r WHERE u.email = '${EMAIL_GASTOS}' AND r.nombre = '${ROL_GASTOS}'`);
+  const hash = createHash("sha256").update(TOKEN_GASTOS).digest("hex");
+  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
+
+  // 012-E12: desde Más se abre la primera sección que puede ver, Compras, con su submenú de dos.
+  await entrarComo(page, TOKEN_GASTOS, RUTAS.mas);
+  await page.getByTestId(RUTAS.enMas).click();
+  await expect(page).toHaveURL(new RegExp(`#/${RUTAS.gastos}$`));
+  await expect(page.getByTestId("gastos-semana")).toBeVisible();
+  await expect(page.getByTestId("compras-recientes")).toHaveCount(0);
+  if (CELULAR) {
+    await expect(page.getByRole("tab")).toHaveText(["Compras", "Inventario"]);
+  } else {
+    await expect(page.getByTestId("pestana-resumen")).toHaveCount(0);
+    // 012-E14: sin «Volver a Más» y sin atajo Alt; con las flechas se pasa de sección y Enter la abre.
+    await expect(page.getByRole("button", { name: "Volver a Más" })).toHaveCount(0);
+    await expect(page.getByTestId("pestana-gastos")).not.toHaveAttribute("aria-keyshortcuts", /Alt/);
+    await expect(page.getByTestId("actualizar-negocio").locator("svg")).toHaveCount(1);
+    await page.getByTestId("pestana-gastos").focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.getByTestId("pestana-invertido")).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#\/invertido$/);
+    await expect(page.getByTestId("dinero-invertido-total")).toBeVisible();
+  }
+  // 012-E06: el servidor tampoco le da las ventas ni lo que no llevaron.
+  const estados = await page.evaluate(async ([token, API]) => {
+    const cabeceras = { Authorization: `Bearer ${token}` };
+    return [(await fetch(`${API}/consultas`, { headers: cabeceras })).status, (await fetch(`${API}/compras/semana`, { headers: cabeceras })).status];
+  }, [TOKEN_GASTOS, API] as const);
+  expect(estados).toEqual([403, 200]);
 });

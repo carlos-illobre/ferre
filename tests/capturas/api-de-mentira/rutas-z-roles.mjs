@@ -15,7 +15,9 @@ const PERMISOS = [
   ["deposito.ingresos", "Depósito", "Registrar ingresos", "Registrar la mercadería que llega y anular un ingreso"],
   ["deposito.compras", "Depósito", "Ver las compras", "Ver las compras recientes y sus comprobantes"],
   ["deposito.stock", "Depósito", "Contar y corregir stock", "Contar estanterías y corregir el stock a mano"],
-  ["negocio.numeros", "Negocio", "Ver los números del negocio", "Cómo va el negocio: ventas, gastos y dinero invertido en inventario"],
+  ["negocio.ventas", "Negocio", "Ver las ventas del negocio", "Cómo va el negocio → Ventas: lo vendido, cómo se cobró y lo que preguntaron y no llevaron"],
+  ["negocio.gastos", "Negocio", "Ver los gastos", "Cómo va el negocio → Compras: los gastos de la semana por proveedor"],
+  ["negocio.invertido", "Negocio", "Ver el dinero invertido", "Cómo va el negocio → Inventario, y el valor en pesos del stock en cualquier pantalla"],
   ["negocio.anomalias", "Negocio", "Ver las anomalías", "Abrir «Anomalías»"],
   ["negocio.actividad", "Negocio", "Ver quién hizo qué", "Abrir el registro de acciones"],
   ["procesos.ver", "Negocio", "Ver procesos", "Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial"],
@@ -31,7 +33,7 @@ let roles = [
   { id: "r-2", nombre: "Comprador", permisos: ["deposito.pedidos", "catalogo.listas", "catalogo.duplicados", "deposito.compras"] },
   { id: "r-3", nombre: "Recepción", permisos: ["deposito.ingresos", "deposito.compras", "deposito.stock", "negocio.anomalias"] },
   { id: "r-4", nombre: "Administrador", permisos: ["admin.usuarios", "admin.roles", "admin.sesiones", "negocio.actividad"] },
-  { id: "r-5", nombre: "Gerente", permisos: ["negocio.numeros", "catalogo.margenes", "ventas.ver", "ventas.anular", "deposito.compras", "negocio.anomalias", "negocio.actividad", "procesos.ver", "procesos.dibujar"] },
+  { id: "r-5", nombre: "Gerente", permisos: ["negocio.ventas", "negocio.gastos", "negocio.invertido", "catalogo.margenes", "ventas.ver", "ventas.anular", "deposito.compras", "negocio.anomalias", "negocio.actividad", "procesos.ver", "procesos.dibujar"] },
   { id: "r-6", nombre: "Encargado de sábados", permisos: ["ventas.registrar", "deposito.ingresos"] },
 ];
 let usuarios = [

@@ -93,7 +93,7 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   // Anular devuelve el stock; el costo según factura se mantiene.
   // En el ingreso no hay compras recientes: están en Cómo va el negocio (decisión 67).
   await expect(page.getByTestId("compras-recientes")).toHaveCount(0);
-  await page.goto("/#/mas/negocio");
+  await page.goto("/#/mas/gastos");
   const recientes = page.getByTestId("compras-recientes");
   await expect(recientes).toContainText(PROVEEDOR);
   // La compra se despliega y muestra sus dos renglones.

@@ -1152,16 +1152,37 @@ RF-95:
   defectos: []
 
 RF-96:
-  estado: "Nuevo (012): especificación aprobada el 2026-10-15; maqueta aprobada; falta programarlo"
+  estado: "Hecho (012-T006, 012-T007): Ventas, Compras e Inventario como pestañas de «Cómo va el negocio», en el celular y en la computadora"
+  pruebas:
+    - microservices/web/src/pantallas/secciones-de-negocio.test.tsx
+    - tests/e2e/escritorio/13-roles.spec.ts
+    - tests/e2e/celular/13-roles.spec.ts
+  defectos: []
 
 RF-97:
-  estado: "Nuevo (012): especificación aprobada el 2026-10-15; maqueta aprobada; falta programarlo"
+  estado: "Hecho (012-T004 a 012-T007): cada sección y cada dato con su permiso, en las pantallas y en el servidor"
+  pruebas:
+    - microservices/api/src/rutas/secciones-de-negocio.test.ts
+    - microservices/web/src/pantallas/secciones-de-negocio.test.tsx
+    - microservices/api/src/rutas/roles.test.ts
+    - tests/e2e/escritorio/13-roles.spec.ts
+    - tests/e2e/celular/13-roles.spec.ts
+  defectos: []
 
 RF-98:
-  estado: "Nuevo (012): especificación aprobada el 2026-10-15; maqueta aprobada; falta programarlo"
+  estado: "Hecho (012-T004): la migración 0022 da los tres permisos nuevos a los roles que tenían «Ver los números del negocio» y lo quita"
+  pruebas:
+    - microservices/api/src/rutas/secciones-de-negocio.test.ts
+    - tests/e2e/escritorio/13-roles.spec.ts
+    - tests/e2e/celular/13-roles.spec.ts
+  defectos: []
 
 RF-99:
-  estado: "Nuevo (012): especificación aprobada el 2026-10-15; maqueta aprobada; falta programarlo"
+  estado: "Hecho (012-T004): GET /stock trae el valor en pesos solo con «Ver el dinero invertido»"
+  pruebas:
+    - microservices/api/src/rutas/secciones-de-negocio.test.ts
+    - microservices/api/src/rutas/roles.test.ts
+  defectos: []
 
 RNF-61:
   estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"
