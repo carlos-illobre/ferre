@@ -658,3 +658,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     dónde y cómo se entra. Cada uno ve solo las pestañas que su rol le permite. Las pestañas
     no llevan atajo Alt: se recorren con las flechas. Maquetas aprobadas en
     `specs/007-usuarios-y-acceso/maquetas/`.
+
+89. **«Cómo va el negocio» en tres secciones, cada una con su permiso de lectura**
+    (2026-10-15). Carlos quiere ocultar datos sensibles según el rol. La pantalla se separa en
+    Ventas («Ver las ventas del negocio»: lo vendido, por medio de pago y lo que preguntaron y
+    no llevaron), Compras («Ver los gastos» para los gastos de la semana y «Ver las compras»
+    para las compras recientes) e Inventario («Ver el dinero invertido», que también muestra el
+    valor del stock en Depósito). Los números de arriba siguen el permiso de su sección.
+    «Ver los números del negocio» desaparece y los roles que lo tenían reciben los tres nuevos.
+    El servidor no entrega lo que el permiso no deja ver. Está en
+    `specs/012-secciones-de-negocio/`.

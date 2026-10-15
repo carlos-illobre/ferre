@@ -1151,6 +1151,18 @@ RF-95:
     - tests/e2e/escritorio/18-procesos.spec.ts
   defectos: []
 
+RF-96:
+  estado: "Nuevo (012): especificación aprobada el 2026-10-15; faltan las maquetas"
+
+RF-97:
+  estado: "Nuevo (012): especificación aprobada el 2026-10-15; faltan las maquetas"
+
+RF-98:
+  estado: "Nuevo (012): especificación aprobada el 2026-10-15; faltan las maquetas"
+
+RF-99:
+  estado: "Nuevo (012): especificación aprobada el 2026-10-15; faltan las maquetas"
+
 RNF-61:
   estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"
   pruebas:

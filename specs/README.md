@@ -162,6 +162,15 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-94 | Exportar un proceso como imagen PNG o en BPMN 2.0 estándar, e importar un BPMN 2.0 de otro programa | [011-procesos](011-procesos/spec.md) |
 | RF-95 | Dos permisos: «Ver procesos» deja mirarlos; «Dibujar procesos» deja además cambiarlos, importarlos y exportarlos. Sin ninguno, «Procesos» no aparece en Más | [011-procesos](011-procesos/spec.md) |
 
+### Secciones de «Cómo va el negocio»
+
+| ID | Requerimiento | Especificación |
+|---|---|---|
+| RF-96 | «Cómo va el negocio» se separa en tres secciones: Ventas, Compras e Inventario | [012-secciones-de-negocio](012-secciones-de-negocio/spec.md) |
+| RF-97 | Cada sección se ve con su permiso de lectura («Ver las ventas del negocio», «Ver los gastos» y «Ver las compras», «Ver el dinero invertido»); lo que no se puede ver no aparece y el servidor no lo entrega | [012-secciones-de-negocio](012-secciones-de-negocio/spec.md) |
+| RF-98 | «Ver los números del negocio» deja de existir; los roles que lo tenían reciben los tres permisos nuevos | [012-secciones-de-negocio](012-secciones-de-negocio/spec.md) |
+| RF-99 | El valor en pesos del stock se ve con «Ver el dinero invertido» | [012-secciones-de-negocio](012-secciones-de-negocio/spec.md) |
+
 ## Requerimientos no funcionales
 
 Los que son reglas generales están además en la constitución.
