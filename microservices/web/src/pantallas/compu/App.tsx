@@ -19,7 +19,7 @@ import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
-import { irA, useRuta } from "./base/rutas";
+import { ConRutas, irA, useRuta } from "./base/rutas";
 import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } from "./base/ui";
 import { Entrar } from "./base/pantallas/Entrar";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
@@ -54,9 +54,11 @@ import "./tema.css";
 // que se usa poco va en «Más». Alt + número abre cada pantalla.
 export function App() {
   return (
-    <ProveedorDeSesion>
-      <Pantallas />
-    </ProveedorDeSesion>
+    <ConRutas>
+      <ProveedorDeSesion>
+        <Pantallas />
+      </ProveedorDeSesion>
+    </ConRutas>
   );
 }
 

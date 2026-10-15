@@ -18,7 +18,7 @@ import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { Roles } from "../Roles";
-import { animarNavegacion, irA, useRuta } from "../../rutas";
+import { animarNavegacion, ConRutas, irA, useRuta } from "../../rutas";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 import { VincularCelular } from "./pantallas/VincularCelular";
 import { Catalogo } from "./Catalogo";
@@ -40,9 +40,11 @@ import "./tema.css";
 // el mismo que en la computadora: Catálogo, Vender, Depósito y Más, con sus pestañas adentro.
 export function App() {
   return (
-    <ProveedorDeSesion>
-      <Pantallas />
-    </ProveedorDeSesion>
+    <ConRutas>
+      <ProveedorDeSesion>
+        <Pantallas />
+      </ProveedorDeSesion>
+    </ConRutas>
   );
 }
 
@@ -113,7 +115,7 @@ function Pantallas() {
   const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
   const alLeerCodigo = useCallback((leido: string) => {
     const destino = destinoDelCodigo(leido);
-    if (destino) location.hash = destino; else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora al tocar «Vincular el celular».");
+    if (destino) irA(destino.replace(/^#\//, "")); else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora al tocar «Vincular el celular».");
   }, []);
   const estadoAnterior = useRef(sesion.estado);
   const [recienEntro, setRecienEntro] = useState(false);

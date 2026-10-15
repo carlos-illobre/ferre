@@ -25,9 +25,8 @@ repartido en la raíz, entre la documentación. Carlos aprobó el informe (decis
 4. **El servidor en tres capas:** la ruta traduce el pedido, un caso de uso tiene la regla y
    un repositorio tiene el acceso a los datos.
 5. **Librerías que reemplazan código propio:** TanStack Query, Zod, React Router y Kysely.
-   TanStack Query y Kysely ya se usan; Zod y React Router están pendientes
-   (`specs/010-reordenamiento-del-codigo/tasks.md`, T017 y T018). El cliente tipado de Hono no
-   se usa (decisión 89): el front lee la forma de los datos de los contratos.
+   El cliente tipado de Hono no se usa (decisión 89): el front lee la forma de los datos de los
+   contratos.
 
 Se hace por etapas (`specs/010-reordenamiento-del-codigo/`). Los nombres de los servicios, de
 las imágenes y de los paquetes no cambian con las carpetas: el despliegue los usa.
@@ -39,6 +38,12 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
   traen una ruta usan `negocio/del-servidor.ts`) y las pantallas la usan; dos pantallas que piden lo mismo comparten la respuesta. Lo que cambia un dato
   (cobrar, anular) avisa, y lo que esté en pantalla se vuelve a pedir. No se reintenta ni se
   espera a «estar en línea»: sin conexión, la pantalla lo dice enseguida.
+- **La navegación es de React Router**, por hash (`#/catalogo/listas`), en
+  `plataforma/navegacion/rutas-por-hash.tsx`: React Router lleva la dirección, el historial y la
+  transición animada, y una sola ruta comodín muestra la aplicación, que elige la pantalla con
+  `useRuta`. Cada interfaz tiene su configuración (`src/rutas.ts` el celular, que anima;
+  `pantallas/compu/base/rutas.ts` la computadora, que no) y va envuelta en su `ConRutas`. `irA`
+  se puede llamar desde cualquier lado (el espejo, un aviso).
 - **La forma de las respuestas la escribe el servidor**, en `microservices/api/src/contratos/`,
   un archivo por tema y solo con tipos. El servidor arma su respuesta con ese tipo y el front
   lo lee como `@servidor/<tema>`; como son solo tipos, al compilar desaparecen y al navegador
