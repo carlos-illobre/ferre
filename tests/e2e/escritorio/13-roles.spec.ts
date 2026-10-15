@@ -69,7 +69,7 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   await expect(page.getByTestId("cfg-animaciones")).toHaveAttribute("aria-checked", "false");
   await expect(page.locator("html")).toHaveAttribute("data-animaciones", "no");
 
-  // Por la dirección tampoco: dice qué permiso hace falta (012-E17).
+  // Por la dirección tampoco: dice qué permisos hacen falta (012-E05).
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.numeros);
   await expect(page.getByTestId("sin-permiso")).toContainText("Ver las ventas del negocio");
 
@@ -104,6 +104,9 @@ test("se arma un rol, se lo asigna y la persona gana ese acceso", async ({ page 
 
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.numeros);
   await expect(page.getByTestId("resumen-hoy")).toBeVisible();
+  // 012-E13: con una sola sección, el título y sin submenú.
+  await expect(page.getByRole("heading", { name: "Cómo va el negocio" })).toBeVisible();
+  await expect(CELULAR ? page.getByRole("tab") : page.getByTestId("pestana-gastos")).toHaveCount(0);
   await expect(page.getByTestId("sin-permiso")).toHaveCount(0);
   expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'rol.creado' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
 });
@@ -172,6 +175,10 @@ test("012: las secciones de Cómo va el negocio siguen los permisos de cada rol"
     await expect(page).toHaveURL(/#\/invertido$/);
     await expect(page.getByTestId("dinero-invertido-total")).toBeVisible();
   }
+  // 012-E17: por la dirección de Ventas, dice que hace falta «Ver las ventas del negocio».
+  await entrarComo(page, TOKEN_GASTOS, RUTAS.numeros);
+  await expect(page.getByTestId("sin-permiso")).toContainText("Ver las ventas del negocio");
+  await expect(page.getByTestId("sin-permiso")).not.toContainText("Ver los gastos");
   // 012-E06: el servidor tampoco le da las ventas ni lo que no llevaron.
   const estados = await page.evaluate(async ([token, API]) => {
     const cabeceras = { Authorization: `Bearer ${token}` };

@@ -41,7 +41,7 @@ variante A (`a-pestanas.html`), con el submenú arriba como en Catálogo y Usuar
   decisión 88).
 - **Celular:** «Volver a Más», el título «Cómo va el negocio» y debajo el submenú, con ícono
   y nombre en cada sección. Se usa con una mano y sin desplazarse hacia el costado.
-- «Actualizar» vuelve a traer los números de la sección abierta, sin recargar la página.
+- «Actualizar» (solo en la computadora; en el celular no está, como en la maqueta) vuelve a traer los números de la sección abierta, sin recargar la página.
 
 **Estados**
 

@@ -37,7 +37,7 @@ import { Contar } from "./base/pantallas/Contar";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./base/pantallas/Resumen";
 import { SesionesYDispositivos, Usuarios } from "./base/pantallas/Usuarios";
 import { PESTANAS_DE_USUARIOS } from "../pestanas-de-usuarios";
-import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
+import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
 import { Actividad } from "./base/pantallas/Actividad";
 import { Vender } from "./Vender";
 import { DE_MAS, Mas } from "./Mas";
@@ -120,7 +120,9 @@ function Pantallas() {
   const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)).filter((r) => !SIN_ATAJO.has(r) || r === deUsuarios[0]?.ruta || r === deNegocio[0]?.ruta), [menu, deUsuarios, deNegocio]);
   const atajoDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
   const actual = sinDireccion || !NOMBRES.has(ruta.nombre) ? "productos" : ruta.nombre;
-  const falta = usuario && !puede(usuario, ...(TODAS.find((p) => p.ruta === actual)?.pide ?? [])) ? TODAS.find((p) => p.ruta === actual)!.pide! : null;
+  const pideActual = RUTAS_DE_NEGOCIO.has(actual) && !puede(usuario, ...PIDE_EL_NEGOCIO) ? PIDE_EL_NEGOCIO : TODAS.find((p) => p.ruta === actual)?.pide;
+  // Sin ninguno de los permisos de Cómo va el negocio se nombran todos, como en el celular (012-E05).
+  const falta = usuario && !puede(usuario, ...(pideActual ?? [])) ? pideActual! : null;
   // En espejo con el celular (decisión 60): los dos están en la misma parte. Las direcciones
   // del celular y las de la computadora no son las mismas: viajan con un nombre común.
   // El ingreso que se abre desde un pedido («llegó la mercadería») también viaja, con su pedido.

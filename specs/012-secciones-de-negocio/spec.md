@@ -69,7 +69,7 @@ gastos y el dinero invertido y que los niegue.
 - **E12** **Given** alguien que puede ver Compras e Inventario pero no Ventas, **When** abre la opción desde Más, **Then** se abre Compras y el submenú tiene solo Compras e Inventario.
 - **E13** **Given** alguien que puede ver una sola sección, **When** abre la opción, **Then** ve esa sección con el título «Cómo va el negocio» y sin submenú.
 - **E14** **Given** la computadora, en una sección, **When** se usan las flechas sobre el submenú, **Then** se pasa a la sección de al lado; las secciones no tienen atajo Alt y no hay «Volver a Más».
-- **E15** **Given** una sección abierta, **When** se toca «Actualizar» (con su ícono), **Then** se vuelven a traer los números de esa sección sin recargar la página.
+- **E15** **Given** una sección abierta en la computadora, **When** se toca «Actualizar» (con su ícono), **Then** se vuelven a traer los números de esa sección sin recargar la página.
 - **E16** **Given** alguien con «Ver los gastos» y «Ver las compras», **When** abre Compras, **Then** ve los gastos de la semana y las compras recientes.
 - **E17** **Given** alguien sin «Ver las ventas del negocio», **When** entra por la dirección de la sección Ventas, **Then** la pantalla dice qué permiso hace falta.
 

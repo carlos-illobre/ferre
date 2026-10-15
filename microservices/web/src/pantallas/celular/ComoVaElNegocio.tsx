@@ -53,7 +53,7 @@ function Ventas() {
       </div>
       {hoy ? (
         <div className="tarjeta" data-testid="resumen-hoy">
-          <h2 className="tarjeta-titulo"><span>Por medio de pago</span><span className="importe">{pesosCortos(hoy.total)}</span></h2>
+          <h2 className="tarjeta-titulo"><span>{NOMBRES.ventasDeHoy} por medio de pago</span><span className="importe">{pesosCortos(hoy.total)}</span></h2>
           {MEDIOS.map((m) => {
             const importe = hoy.totales[m] ?? 0;
             const parte = hoy.total > 0 ? importe / hoy.total : 0;

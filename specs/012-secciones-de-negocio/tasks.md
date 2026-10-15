@@ -14,4 +14,5 @@ Carlos del 2026-10-15.
 - [x] T007 El celular: las mismas secciones con sus pestañas, sin «Actualizar» como en la maqueta (E01 a E05, E11 a E13, E16, E17) (depende de T005)
 - [x] T008 La API de mentira de las capturas y las pruebas de punta a punta, en el celular y en la computadora, con los permisos nuevos (E19) (depende de T006, T007)
 - [x] T009 Comparar con la maqueta aprobada con capturas de computadora y de celular, y mostrarle a Carlos las diferencias (depende de T006, T007)
-- [ ] T010 La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T008, T009)
+- [x] T010 La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T008, T009)
+- [ ] T011 [carlos] Decidir si Depósito → Inventario muestra el valor en pesos con «Ver el dinero invertido» (choca con la decisión 31), si va el número «Dinero invertido» arriba de Inventario, y qué hacer con los costos y totales que hoy llegan sin esos permisos (revisión, E10)

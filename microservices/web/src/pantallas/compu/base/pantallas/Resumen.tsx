@@ -27,6 +27,7 @@ const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toD
 // Más; cada bloque carga por su cuenta y «Actualizar» vuelve a traer los de la sección.
 export function ResumenVentas() {
   const enLinea = useEnLinea();
+  const puedeEsto = usePuede();
   const hoy = comoCarga(useVentasDelDia(), "No se pudieron traer las ventas de hoy");
   const consultas = comoCarga(useConsultas(), "No se pudieron traer las consultas");
   const hoyTexto = new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
@@ -76,7 +77,7 @@ export function ResumenVentas() {
           )}
           <footer className="negocio-bloque-pie">
             <span className="detalle">{hoy.datos ? `${plural(confirmadas, "venta", "ventas")} en el día` : ""}</span>
-            <Boton icono="ventas" onClick={() => irA("hoy")} data-testid="ver-ventas">Ver las ventas de hoy</Boton>
+            {puedeEsto("ventas.ver") && <Boton icono="ventas" onClick={() => irA("hoy")} data-testid="ver-ventas">Ver las ventas de hoy</Boton>}
           </footer>
         </section>
 

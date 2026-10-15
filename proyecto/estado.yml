@@ -1157,7 +1157,8 @@ RF-96:
     - microservices/web/src/pantallas/secciones-de-negocio.test.tsx
     - tests/e2e/escritorio/13-roles.spec.ts
     - tests/e2e/celular/13-roles.spec.ts
-  defectos: []
+  defectos:
+    - "En el celular, los números de las secciones no se explican al tocarlos y dicen «Sin conexión» mientras cargan (venía de antes de 012)"
 
 RF-97:
   estado: "Hecho (012-T004 a 012-T007): cada sección y cada dato con su permiso, en las pantallas y en el servidor"
@@ -1167,7 +1168,9 @@ RF-97:
     - microservices/api/src/rutas/roles.test.ts
     - tests/e2e/escritorio/13-roles.spec.ts
     - tests/e2e/celular/13-roles.spec.ts
-  defectos: []
+  defectos:
+    - "El dinero invertido se puede calcular con los costos de GET /productos y las cantidades de GET /stock, que llegan a cualquiera con sesión (venía de antes; a decidir por Carlos)"
+    - "Los gastos de la semana se pueden sumar con GET /compras, que pide «Ver las compras» y no «Ver los gastos»"
 
 RF-98:
   estado: "Hecho (012-T004): la migración 0022 da los tres permisos nuevos a los roles que tenían «Ver los números del negocio» y lo quita"
@@ -1178,11 +1181,12 @@ RF-98:
   defectos: []
 
 RF-99:
-  estado: "Hecho (012-T004): GET /stock trae el valor en pesos solo con «Ver el dinero invertido»"
+  estado: "Hecho en parte (012-T004): el servidor manda el valor del stock solo con «Ver el dinero invertido»; falta decidir si Depósito → Inventario lo muestra"
   pruebas:
     - microservices/api/src/rutas/secciones-de-negocio.test.ts
     - microservices/api/src/rutas/roles.test.ts
-  defectos: []
+  defectos:
+    - "Depósito → Inventario no muestra el valor en pesos a nadie (decisión 31): falta que Carlos decida si se muestra con «Ver el dinero invertido» #012-T011"
 
 RNF-61:
   estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"

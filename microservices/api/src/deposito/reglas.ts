@@ -5,11 +5,11 @@ import type { Movimiento, Stock, StockAjustado } from "../contratos/stock.js";
 import type { Enviable } from "../enviable.js";
 
 // Stock actual y valorización (issue #33). El valor es stock × costo vigente.
-// El dinero invertido es de quien ve los números del negocio (RF-53, RF-72): a los demás les
-// llegan las cantidades, sin costos ni valores.
-export async function stockConValor(veLosNumeros: boolean): Promise<Enviable<Stock>> {
+// El dinero invertido es de quien tiene «Ver el dinero invertido» (RF-53, RF-99): a los demás
+// les llegan las cantidades, sin costos ni valores.
+export async function stockConValor(veElDineroInvertido: boolean): Promise<Enviable<Stock>> {
   const filas = await datos.stockDeTodos(base);
-  if (!veLosNumeros) return { productos: filas.map((r) => ({ id: r.id, stock: r.stock, proveedor: r.proveedor, ultimo_movimiento: r.ultimo_movimiento, costo_neto: null, valor: "0" })), valor_total: 0, por_proveedor: {} };
+  if (!veElDineroInvertido) return { productos: filas.map((r) => ({ id: r.id, stock: r.stock, proveedor: r.proveedor, ultimo_movimiento: r.ultimo_movimiento, costo_neto: null, valor: "0" })), valor_total: 0, por_proveedor: {} };
   const porProveedor: Record<string, { unidades: number; valor: number; productos: number }> = {};
   let total = 0;
   for (const r of filas) {
