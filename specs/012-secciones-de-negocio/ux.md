@@ -41,16 +41,16 @@ variante A (`a-pestanas.html`), con el submenú arriba como en Catálogo y Usuar
   decisión 88).
 - **Celular:** «Volver a Más», el título «Cómo va el negocio» y debajo el submenú, con ícono
   y nombre en cada sección. Se usa con una mano y sin desplazarse hacia el costado.
-- «Actualizar» vuelve a traer los números de todas las secciones que el rol puede ver.
+- «Actualizar» vuelve a traer los números de la sección abierta, sin recargar la página.
 
 **Estados**
 
 Los de 006 para todo bloque (cargando, vacío, error, sin conexión, éxito), dentro de cada
 sección. Uno propio:
 
-- *Sin permiso:* «No tenés permiso para ver los números del negocio. Hace falta «Ver las
-  ventas del negocio», «Ver los gastos», «Ver las compras» o «Ver el dinero invertido».
-  Pedíselo a quien administra.»
+- *Sin permiso* (se llega por la dirección a una sección que no puede ver): «No tenés permiso
+  para esta pantalla. Hace falta el permiso «…». Pedile a quien administra los roles que te lo
+  dé.», con el nombre del permiso de esa sección, como en cualquier pantalla.
 
 ## Historia 3: el valor del stock en Depósito
 
