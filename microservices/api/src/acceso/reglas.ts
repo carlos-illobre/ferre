@@ -12,6 +12,7 @@ import { adoptarVinculos, anotarDispositivo, computadorasDe, cortarVinculosDe, d
 import type { CodigoAprobado, CodigoDeEntrada, EstadoDelCodigo, SesionAbierta, SesionNueva } from "../contratos/sesiones.js";
 import type { Enviable } from "../enviable.js";
 import type { CodigoEscaneado, DiasDelVinculo, EstadoDelPuesto, PuestoParaVincular, Vinculado, VinculosDeLaSesion } from "../contratos/puestos.js";
+import type { Credencial as CredencialDelContrato, DesafioDeHuella, HuellaVinculada, SesionConHuella } from "../contratos/credenciales.js";
 
 // Acceso, en sus reglas (ADR-018): entrar (con Google, con la huella o con el celular), las
 // sesiones abiertas y el vínculo entre un celular y una computadora (decisiones 57, 58 y 73).
@@ -104,7 +105,7 @@ function retirarDesafio(id: string | undefined): { desafio: string; usuarioId: s
   return d && d.vence > Date.now() ? d : null;
 }
 
-export async function opcionesParaVincularHuella(usuario: SesionActiva["usuario"]) {
+export async function opcionesParaVincularHuella(usuario: SesionActiva["usuario"]): Promise<DesafioDeHuella> {
   const vigentes = await datos.credencialesVigentesDe(usuario.id);
   const opciones = await generateRegistrationOptions({
     rpName: NOMBRE_APP, rpID: rpID(), userName: usuario.email, userDisplayName: usuario.nombre, attestationType: "none",
@@ -115,7 +116,7 @@ export async function opcionesParaVincularHuella(usuario: SesionActiva["usuario"
   return { desafioId: guardarDesafio(opciones.challenge, usuario.id), opciones };
 }
 
-export async function vincularHuella(usuarioId: string, desafioId: string | undefined, respuesta: RegistrationResponseJSON | undefined, dispositivoDado: string | undefined, userAgent: string | undefined) {
+export async function vincularHuella(usuarioId: string, desafioId: string | undefined, respuesta: RegistrationResponseJSON | undefined, dispositivoDado: string | undefined, userAgent: string | undefined): Promise<Resultado<HuellaVinculada>> {
   const pendiente = retirarDesafio(desafioId);
   if (!pendiente || pendiente.usuarioId !== usuarioId || !respuesta) return mal(400, "El pedido venció: probá vincular de nuevo");
   let verificacion;
@@ -132,7 +133,7 @@ export async function vincularHuella(usuarioId: string, desafioId: string | unde
   return bien({ id: credential.id, dispositivo }, 201);
 }
 
-export const celularesDe = (usuarioId: string) => datos.celularesDe(usuarioId);
+export const celularesDe = (usuarioId: string): Promise<Enviable<CredencialDelContrato>[]> => datos.celularesDe(usuarioId);
 
 // Quitar un celular: el propio, o cualquiera si administra las sesiones.
 export async function quitarCelular(id: string, actorId: string, administra: boolean) {
@@ -141,12 +142,12 @@ export async function quitarCelular(id: string, actorId: string, administra: boo
   return bien();
 }
 
-export async function opcionesParaEntrarConHuella() {
+export async function opcionesParaEntrarConHuella(): Promise<DesafioDeHuella> {
   const opciones = await generateAuthenticationOptions({ rpID: rpID(), userVerification: "required", allowCredentials: [] });
   return { desafioId: guardarDesafio(opciones.challenge, null), opciones };
 }
 
-export async function entrarConHuella(desafioId: string | undefined, respuesta: AuthenticationResponseJSON | undefined, dispositivoDado: string | undefined) {
+export async function entrarConHuella(desafioId: string | undefined, respuesta: AuthenticationResponseJSON | undefined, dispositivoDado: string | undefined): Promise<Resultado<SesionConHuella>> {
   const pendiente = retirarDesafio(desafioId);
   if (!pendiente || !respuesta) return mal(400, "El pedido venció: probá de nuevo");
   const cred = await datos.credencialConUsuario(respuesta.id);

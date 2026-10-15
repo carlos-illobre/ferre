@@ -3,6 +3,8 @@ import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simp
 import { exigirSesion, limitarIntentos, puede } from "../autenticacion.js";
 import * as reglas from "../acceso/reglas.js";
 import { responder } from "./sesiones.js";
+import { entradaConHuella, huellaNueva } from "../acceso/esquemas.js";
+import { leerCuerpo } from "../validar.js";
 
 // Huellas (passkeys, ADR-011 enmienda). La ruta solo traduce (ADR-018).
 export const credenciales = new Hono();
@@ -11,8 +13,11 @@ export const credenciales = new Hono();
 credenciales.post("/registro/opciones", exigirSesion, async (c) => c.json(await reglas.opcionesParaVincularHuella(c.get("sesion").usuario)));
 
 credenciales.post("/registro", exigirSesion, async (c) => {
-  const cuerpo = await c.req.json<{ desafioId?: string; respuesta?: RegistrationResponseJSON; dispositivo?: string }>().catch(() => ({}) as Record<string, never>);
-  return responder(c, await reglas.vincularHuella(c.get("sesion").usuario.id, cuerpo.desafioId, cuerpo.respuesta, cuerpo.dispositivo, c.req.header("user-agent")));
+  const cuerpo = await leerCuerpo(c, huellaNueva);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const { desafioId, respuesta, dispositivo } = cuerpo.datos;
+  // La forma de la respuesta del celular la verifica la librería de passkeys.
+  return responder(c, await reglas.vincularHuella(c.get("sesion").usuario.id, desafioId, respuesta as RegistrationResponseJSON | undefined, dispositivo, c.req.header("user-agent")));
 });
 
 credenciales.get("/", exigirSesion, async (c) => c.json(await reglas.celularesDe(c.get("sesion").usuario.id)));
@@ -27,6 +32,8 @@ credenciales.delete("/:id", exigirSesion, async (c) => {
 credenciales.post("/login/opciones", limitarIntentos(20), async (c) => c.json(await reglas.opcionesParaEntrarConHuella()));
 
 credenciales.post("/login", limitarIntentos(20), async (c) => {
-  const cuerpo = await c.req.json<{ desafioId?: string; respuesta?: AuthenticationResponseJSON; dispositivo?: string }>().catch(() => ({}) as Record<string, never>);
-  return responder(c, await reglas.entrarConHuella(cuerpo.desafioId, cuerpo.respuesta, cuerpo.dispositivo));
+  const cuerpo = await leerCuerpo(c, entradaConHuella);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const { desafioId, respuesta, dispositivo } = cuerpo.datos;
+  return responder(c, await reglas.entrarConHuella(desafioId, respuesta as AuthenticationResponseJSON | undefined, dispositivo));
 });

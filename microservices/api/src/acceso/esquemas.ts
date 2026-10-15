@@ -43,3 +43,12 @@ export const cambioEnEspejo = z.object({ tipo: z.string("No se entiende el cambi
 
 // POST /puestos/:id/codigos: un código que el celular escaneó, para la computadora.
 export const codigoEscaneado = z.object({ codigo: z.string("Falta el código").trim().min(1, "Falta el código") }, "Falta el código");
+
+// ---------- La huella (passkeys) ----------
+
+// POST /credenciales/registro y POST /credenciales/login: el desafío que dio el servidor y la
+// respuesta del celular, que verifica la librería de passkeys. Si el desafío venció o falta la
+// respuesta, lo dicen las reglas.
+const respuestaDelCelular = z.record(z.string(), z.unknown(), "La respuesta del celular no se entiende").optional();
+export const huellaNueva = z.object({ desafioId: z.string("El pedido venció: probá vincular de nuevo").optional(), respuesta: respuestaDelCelular, dispositivo });
+export const entradaConHuella = z.object({ desafioId: z.string("El pedido venció: probá de nuevo").optional(), respuesta: respuestaDelCelular, dispositivo });
