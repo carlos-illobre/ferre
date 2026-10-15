@@ -1,9 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, borrarToken, guardarToken, leerToken } from "./api";
+import type { SesionActual, UsuarioDeLaSesion } from "@servidor/sesiones";
 
 // `roles` son los nombres de sus roles y `permisos` lo que esos roles le dejan hacer (RF-72).
 // `rol` es el dato viejo de un solo rol: ya no viene del servidor; lo leen las versiones históricas.
-export type Usuario = { id: string; email: string; nombre: string; roles?: string[]; permisos?: string[]; rol?: "dueño" | "admin" | "mostrador" };
+// Una sesión guardada por una versión anterior puede no traer los roles ni los permisos.
+export type Usuario = Omit<UsuarioDeLaSesion, "roles" | "permisos"> & Partial<Pick<UsuarioDeLaSesion, "roles" | "permisos">> & { rol?: "dueño" | "admin" | "mostrador" };
 export const administra = (u: Usuario | null | undefined) => u?.rol === "dueño" || u?.rol === "admin" || Boolean(u?.permisos?.includes("admin.usuarios"));
 type Estado = { estado: "cargando" } | { estado: "sin-sesion" } | { estado: "con-sesion"; usuario: Usuario; sinConexion: boolean; sesionId: string | null };
 
@@ -18,7 +20,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = leerToken();
     if (!token) return setSesion({ estado: "sin-sesion" });
-    api<{ id: string; usuario: Usuario }>("/sesiones/actual")
+    api<SesionActual>("/sesiones/actual")
       .then((r) => { guardarUsuario(r.usuario); setSesion({ estado: "con-sesion", usuario: r.usuario, sinConexion: false, sesionId: r.id }); })
       .catch((e: { estado?: number }) => {
         if (e.estado === 401) return setSesion({ estado: "sin-sesion" });
@@ -34,7 +36,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
     guardarToken(token);
     guardarUsuario(usuario);
     setSesion({ estado: "con-sesion", usuario, sinConexion: false, sesionId: null });
-    api<{ id: string }>("/sesiones/actual").then((r) => setSesion((s) => (s.estado === "con-sesion" ? { ...s, sesionId: r.id } : s))).catch(() => undefined);
+    api<SesionActual>("/sesiones/actual").then((r) => setSesion((s) => (s.estado === "con-sesion" ? { ...s, sesionId: r.id } : s))).catch(() => undefined);
   }, []);
 
   const salir = useCallback(async () => {

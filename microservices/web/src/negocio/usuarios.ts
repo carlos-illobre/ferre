@@ -2,12 +2,13 @@ import { api } from "../api";
 import { consultas } from "../consultas";
 import { useDelServidor } from "./del-servidor";
 import type { CambiosDeUsuario, RolDeUsuario, Usuario, UsuarioNuevo } from "@servidor/usuarios";
+import type { SesionAbierta } from "@servidor/sesiones";
 
 // Usuarios y sesiones (Más → Usuarios), una sola vez para el celular y la computadora (RNF-60). Quién puede
 // entrar, con qué roles, y las sesiones abiertas de todos (decisiones 50 y 51).
 export type { RolDeUsuario };
 export type UsuarioFila = Usuario;
-export type SesionFila = { id: string; dispositivo: string; ultimo_uso_en: string; email: string; nombre: string };
+export type SesionFila = SesionAbierta;
 
 const USUARIOS = ["usuarios"] as const;
 const SESIONES = ["sesiones"] as const;

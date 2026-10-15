@@ -9,6 +9,8 @@ import { registrarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
 import { crearSesion, generarToken, revocarSesion, usuarioConPermisos, type SesionActiva } from "./sesiones.js";
 import { adoptarVinculos, anotarDispositivo, computadorasDe, cortarVinculosDe, diasDeVinculo, emparejar, sellarVinculo, soltarAnteriores } from "./vinculo.js";
+import type { CodigoAprobado, CodigoDeEntrada, EstadoDelCodigo, SesionAbierta, SesionNueva } from "../contratos/sesiones.js";
+import type { Enviable } from "../enviable.js";
 
 // Acceso, en sus reglas (ADR-018): entrar (con Google, con la huella o con el celular), las
 // sesiones abiertas y el vínculo entre un celular y una computadora (decisiones 57, 58 y 73).
@@ -20,7 +22,7 @@ export const dispositivoDe = (userAgent: string | undefined, dado?: string): str
 
 // ---------- Entrar con Google ----------
 // Si el correo que verificó Google está autorizado y activo, se abre una sesión.
-export async function entrarConGoogle(email: string, dispositivo: string) {
+export async function entrarConGoogle(email: string, dispositivo: string): Promise<Resultado<SesionNueva>> {
   const id = await datos.usuarioActivoPorCorreo(email);
   const usuario = id ? await usuarioConPermisos(pool, id) : null;
   if (!usuario) return mal(403, `${email} no está autorizado. Pedile a quien administra los usuarios que te dé de alta.`);
@@ -36,7 +38,7 @@ export async function entrarConGoogle(email: string, dispositivo: string) {
 export const VIGENCIA_DEL_CODIGO_S = 300;
 const SIN_CODIGO = "Ese código venció o ya se usó. Leé el que la computadora muestra ahora.";
 
-export async function pedirCodigoDeEntrada(dispositivo: string) {
+export async function pedirCodigoDeEntrada(dispositivo: string): Promise<CodigoDeEntrada> {
   const id = randomUUID();
   const codigo = generarToken(); // va en el QR
   const clave = generarToken(); // queda en la computadora: con ella retira la sesión
@@ -44,8 +46,7 @@ export async function pedirCodigoDeEntrada(dispositivo: string) {
   return { id, codigo, clave, expiraEnSegundos: VIGENCIA_DEL_CODIGO_S };
 }
 
-export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: string | undefined, dispositivoId: unknown) {
-  if (!codigo) return mal(400, "Falta el código");
+export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: string, dispositivoId: unknown): Promise<Resultado<CodigoAprobado>> {
   await anotarDispositivo(pool, sesion.id, dispositivoId);
   const aprobada = await datos.aprobarVinculacion(codigo, sesion.usuario.id, sesion.id);
   return aprobada ? bien({ dispositivo: aprobada.dispositivo }) : mal(410, SIN_CODIGO);
@@ -53,8 +54,7 @@ export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: strin
 
 // La computadora pregunta cómo va su código. Si fue aprobado, retira la sesión: una sola vez.
 // El celular que la dejó entrar queda emparejado con esta computadora (decisión 58).
-export async function estadoDelCodigo(id: string, clave: string | undefined, dispositivoId: unknown) {
-  if (!clave) return mal(400, "Falta la clave");
+export async function estadoDelCodigo(id: string, clave: string, dispositivoId: unknown): Promise<Resultado<EstadoDelCodigo>> {
   const aprobada = await datos.retirarVinculacion(id, clave);
   if (!aprobada) return bien({ estado: (await datos.vinculacionVigente(id, clave)) ? "pendiente" : "vencida" });
   const usuario = await usuarioConPermisos(pool, aprobada.aprobada_por);
@@ -73,7 +73,7 @@ export async function salir(sesion: SesionActiva) {
   await revocarSesion(pool, sesion.id);
   await registrarEvento(pool, { tipo: "sesion.cerrada", usuarioId: sesion.usuario.id, contenido: { sesionId: sesion.id } });
 }
-export const sesionesAbiertas = () => datos.sesionesAbiertas();
+export const sesionesAbiertas = (): Promise<Enviable<SesionAbierta>[]> => datos.sesionesAbiertas();
 // Cerrar a distancia la sesión de un dispositivo corta también su vínculo (decisión 73).
 export async function cerrarSesion(sesionId: string, actorId: string) {
   await revocarSesion(pool, sesionId);

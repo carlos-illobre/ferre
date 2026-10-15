@@ -4,6 +4,7 @@ import { irA } from "../../rutas";
 import { dispositivoId, sincronizarEmparejamiento } from "../../puesto";
 import { Logotipo } from "../Logotipo";
 import "./entrar.css";
+import type { AprobacionDeCodigo } from "@servidor/sesiones";
 
 // El celular leyó el código de una computadora y ya tiene sesión (RF-76). Si acaba de entrar
 // con la huella o con Google, eso fue la confirmación: la computadora entra sola. Si la sesión
@@ -20,7 +21,7 @@ export function EntrarEnLaCompu({ codigo, automatico, nombre }: { codigo: string
     pedido.current = true;
     setEstado("entrando");
     try {
-      await api("/sesiones/vinculaciones/aprobar", { method: "POST", body: JSON.stringify({ codigo, dispositivo_id: dispositivoId() }) });
+      await api("/sesiones/vinculaciones/aprobar", { method: "POST", body: JSON.stringify({ codigo, dispositivo_id: dispositivoId() } satisfies AprobacionDeCodigo) });
       setEstado("listo");
       // El emparejamiento nace cuando la computadora retira su sesión, un par de segundos después.
       for (let i = 0; i < 6; i++) { await new Promise((r) => setTimeout(r, 1500)); if ((await sincronizarEmparejamiento())?.comoCelular) { setEmparejado(true); break; } }

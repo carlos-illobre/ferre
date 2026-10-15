@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api, ErrorApi } from "../../../../api";
-import { useSesion, type Usuario } from "../../../../sesion";
+import { useSesion } from "../../../../sesion";
 import QRCode from "qrcode";
 import { dispositivoId, guardarPuestoLocal } from "../../../../puesto";
 import { entrarConHuella, hayHuella, huellaVinculadaAca } from "../../../../credenciales";
@@ -10,6 +10,7 @@ import { useEnLinea } from "./negocio-comun";
 import { Aviso, Boton, Icono, Marca, Progreso, type NombreDeIcono } from "../ui";
 import "../estilos/entrar.css";
 import { entrarConGoogle } from "../../../../negocio/vinculo";
+import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -208,7 +209,7 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
     const esperar = (ms: number, que: () => void) => { espera = setTimeout(que, ms); };
     async function pedir() {
       try {
-        const { id, codigo, clave, expiraEnSegundos } = await api<{ id: string; codigo: string; clave: string; expiraEnSegundos: number }>("/sesiones/vinculaciones", { method: "POST", body: JSON.stringify({ dispositivo: describirDispositivo() }) });
+        const { id, codigo, clave, expiraEnSegundos } = await api<CodigoDeEntrada>("/sesiones/vinculaciones", { method: "POST", body: JSON.stringify({ dispositivo: describirDispositivo() } satisfies PedidoDeCodigo) });
         if (!vigente) return;
         const enlace = `${location.origin}${location.pathname}#/entrar-compu?codigo=${encodeURIComponent(codigo)}`;
         // Para las pruebas automáticas: el enlace que el celular abriría.
@@ -221,7 +222,7 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
           if (Date.now() > vence) return void pedir();
           // Con la ventana tapada no se pregunta: nadie está por entrar.
           if (document.visibilityState === "hidden") return esperar(CADA_MS, () => void preguntar());
-          const r = await api<{ estado: "pendiente" | "vencida" | "aprobada"; token?: string; usuario?: Usuario; puesto?: { id: string; expira_en: string } | null }>(`/sesiones/vinculaciones/${id}/estado`, { method: "POST", body: JSON.stringify({ clave, dispositivo_id: dispositivoId() }) }).catch(() => null);
+          const r = await api<EstadoDelCodigo>(`/sesiones/vinculaciones/${id}/estado`, { method: "POST", body: JSON.stringify({ clave, dispositivo_id: dispositivoId() } satisfies ConsultaDeCodigo) }).catch(() => null);
           if (!vigente) return;
           if (r?.estado === "aprobada" && r.token && r.usuario) {
             // El celular que la dejó entrar queda emparejado: escanea y manda fotos sin leer más códigos.

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { api, ErrorApi } from "../api";
 import { dispositivoId, guardarPuestoLocal, guardarPuestoRemoto } from "../puesto";
-import type { Usuario } from "../sesion";
+import type { EntradaConGoogle, SesionNueva } from "@servidor/sesiones";
 
 // El vínculo entre el celular y la computadora (decisiones 58 y 73) y la entrada con Google,
 // una sola vez para las dos interfaces (RNF-60). Las pantallas solo muestran.
@@ -58,4 +58,4 @@ export function useCodigoParaVincular(alVincular: (puestoId: string) => void, qr
 
 // Entrar con la credencial que devolvió el botón de Google.
 export const entrarConGoogle = (credencial: string, dispositivo: string) =>
-  api<{ token: string; usuario: Usuario }>("/sesiones/google", { method: "POST", body: JSON.stringify({ credencial, dispositivo }) });
+  api<SesionNueva>("/sesiones/google", { method: "POST", body: JSON.stringify({ credencial, dispositivo } satisfies EntradaConGoogle) });
