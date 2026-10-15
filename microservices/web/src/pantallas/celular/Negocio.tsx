@@ -21,74 +21,17 @@ import { useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
 import { esAmbienteDePrueba } from "../../ambiente";
 
 
-// Negocio: quién soy, ventas de hoy, gastos de la semana y, para quien administra, usuarios,
-// celulares con huella, sesiones y quién hizo qué.
-// Una misma pantalla, partida en «Cómo va el negocio» y tres pestañas de Más → Usuarios
-// (decisión 88); la cuarta pestaña, Roles, es su propia pantalla. Las pestañas traen su
-// encabezado (`cabeza`), con el título y las pestañas.
-export type Parte = "negocio" | "usuarios" | "sesiones" | "actividad";
+// Usuarios, celulares con huella, sesiones y quién hizo qué: tres pestañas de Más → Usuarios
+// (decisión 88); la cuarta, Roles, es su propia pantalla. «Cómo va el negocio» tiene la suya
+// (decisión 89). Las pestañas traen su encabezado (`cabeza`), con el título y las pestañas.
+export type Parte = "usuarios" | "sesiones" | "actividad";
 
 export function Negocio({ parte, cabeza }: { parte: Parte; cabeza?: ReactNode }) {
-  const { sesion, salir } = useSesion();
-  const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const puedeEsto = usePuede();
-  const { datos: hoy } = useVentasDelDia();
-  const gastos = useGastosDeLaSemana().datos;
-  const [servidor, setServidor] = useState<string | null>(null);
-  useEffect(() => {
-    fetch(urlApi("/health")).then((r) => r.json() as Promise<{ ok: boolean; db: string; version?: string }>).then((s) => setServidor(`Servidor ${s.ok ? "ok" : "con problemas"} · base ${s.db}`)).catch(() => setServidor("Sin conexión con el servidor."));
-  }, []);
-  const hoyTexto = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
-
   return (
     <main className="contenido">
-      <div className="encabezado">{cabeza ?? <h1 className="titulo">{NOMBRES.comoVaElNegocio}</h1>}</div>
+      <div className="encabezado">{cabeza ?? <h1 className="titulo">{NOMBRES.usuarios}</h1>}</div>
       <div className="dos-columnas">
-      <div className="columna" hidden={parte !== "negocio"}>
-      {usuario && (
-        <div className="tarjeta usuario-actual">
-          <div className="avatar">{usuario.nombre.charAt(0).toUpperCase()}</div>
-          <div className="textos">
-            <strong data-testid="usuario-negocio">{usuario.nombre}</strong>
-            <small>{(usuario.roles ?? []).join(", ") || "sin roles"} · <EstadoDeConexion testId="conexion-negocio" /></small>
-          </div>
-          <button type="button" className="boton chico solo-celular" style={{ height: 34, fontSize: 13, borderRadius: 10 }} onClick={salir}>Salir</button>
-        </div>
-      )}
-      {esAmbienteDePrueba() && <div className="aviso-suave" data-testid="ambiente-negocio">Ambiente de prueba · {servidor ?? "…"} · versión {import.meta.env.VITE_VERSION ?? "local"}</div>}
-      {!esAmbienteDePrueba() && servidor && <small style={{ padding: "0 4px" }} data-testid="estado">{servidor}</small>}
-
-      {hoy && (
-        <div className="tarjeta oscura" data-testid="resumen-hoy">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}><small>Ventas de hoy · {hoyTexto}</small><small>{hoy.ventas.filter((v) => v.estado === "confirmada").length} ventas</small></div>
-          <span className="importe" style={{ fontSize: 44, lineHeight: 1 }}>{pesosCortos(hoy.total)}</span>
-          <div className="totales-hoy">
-            {MEDIOS.map((m) => <div key={m}><small>{NOMBRE_DE_MEDIO[m]}</small><span className="importe">{pesosCortos(hoy.totales[m] ?? 0)}</span></div>)}
-          </div>
-        </div>
-      )}
-      {!hoy && <div className="aviso-suave">Sin conexión: las ventas de hoy se ven cuando vuelva internet.</div>}
-
-      <DineroInvertido />
-
-      {gastos && gastos.por_proveedor.length > 0 && (
-        <>
-          <h2 className="seccion" data-testid="gastos-semana"><span>Gastos de la semana</span><span className="importe" style={{ fontSize: 16 }}>{pesosCortos(gastos.total)}</span></h2>
-          <Lista>
-            {gastos.por_proveedor.map((g) => (
-              <div key={g.proveedor} className="fila">
-                <span className="nombre">{g.proveedor}</span>
-                <strong className="derecha importe">{pesos(g.total)}</strong>
-                <span className="detalle">{g.compras} {Number(g.compras) === 1 ? "compra" : "compras"} desde el {fecha(gastos.desde)}</span>
-              </div>
-            ))}
-          </Lista>
-        </>
-      )}
-
-      {puedeEsto("deposito.compras") && <ComprasRecientes />}
-
-      </div>
       <div className="columna">
       {parte === "usuarios" && puedeEsto("admin.usuarios") && <Usuarios />}
       {parte === "sesiones" && puedeEsto("admin.sesiones") && <Sesiones />}
