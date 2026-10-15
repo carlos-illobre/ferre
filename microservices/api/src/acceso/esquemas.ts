@@ -24,3 +24,22 @@ export const aprobacionDeCodigo = z.object({ codigo: z.string("Falta el código"
 
 // POST /sesiones/vinculaciones/:id/estado: la computadora pregunta por su código, con su clave.
 export const consultaDeCodigo = z.object({ clave: z.string("Falta la clave").min(1, "Falta la clave"), dispositivo_id: dispositivoId }, "Falta la clave");
+
+// ---------- El vínculo entre la computadora y el celular ----------
+
+// POST /puestos: la computadora pide un código para el QR, con un nombre para reconocerla.
+export const puestoNuevo = z.object({ nombre: z.string("El nombre es un texto").optional() });
+
+// POST /puestos/:codigo/vincular: el celular lee el QR y se vincula.
+export const vinculacion = z.object({ dispositivo_id: dispositivoId });
+
+// PUT /puestos/configuracion: cuántos días dura el vínculo.
+const DIAS = "Los días tienen que ser un número entero entre 1 y 365";
+export const diasDelVinculo = z.object({ dias: z.number(DIAS).int(DIAS).min(1, DIAS).max(365, DIAS) }, DIAS);
+
+// POST /puestos/:id/espejo: un cambio para el otro lado. Qué tipos hay y cuánto pueden pesar lo
+// decide el espejo.
+export const cambioEnEspejo = z.object({ tipo: z.string("No se entiende el cambio").optional(), datos: z.unknown() });
+
+// POST /puestos/:id/codigos: un código que el celular escaneó, para la computadora.
+export const codigoEscaneado = z.object({ codigo: z.string("Falta el código").trim().min(1, "Falta el código") }, "Falta el código");

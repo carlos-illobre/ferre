@@ -11,6 +11,7 @@ import { crearSesion, generarToken, revocarSesion, usuarioConPermisos, type Sesi
 import { adoptarVinculos, anotarDispositivo, computadorasDe, cortarVinculosDe, diasDeVinculo, emparejar, sellarVinculo, soltarAnteriores } from "./vinculo.js";
 import type { CodigoAprobado, CodigoDeEntrada, EstadoDelCodigo, SesionAbierta, SesionNueva } from "../contratos/sesiones.js";
 import type { Enviable } from "../enviable.js";
+import type { CodigoEscaneado, DiasDelVinculo, EstadoDelPuesto, PuestoParaVincular, Vinculado, VinculosDeLaSesion } from "../contratos/puestos.js";
 
 // Acceso, en sus reglas (ADR-018): entrar (con Google, con la huella o con el celular), las
 // sesiones abiertas y el vínculo entre un celular y una computadora (decisiones 57, 58 y 73).
@@ -172,7 +173,7 @@ export async function entrarConHuella(desafioId: string | undefined, respuesta: 
 const MINUTOS_QR = 5;
 
 // La computadora pide un código para que el celular la lea en Vender.
-export async function codigoParaVincular(sesionId: string, nombre: string | undefined) {
+export async function codigoParaVincular(sesionId: string, nombre: string | undefined): Promise<PuestoParaVincular> {
   const id = randomUUID();
   const codigo = generarToken();
   await datos.nuevoPuesto(id, sesionId, codigo, nombre?.trim() || null, MINUTOS_QR);
@@ -181,7 +182,7 @@ export async function codigoParaVincular(sesionId: string, nombre: string | unde
 
 // El celular lee el código y se vincula. Solo se emparejan dos sesiones del mismo usuario
 // (decisión 60): en espejo los dos hacen lo mismo.
-export async function vincular(sesion: SesionActiva, codigo: string, dispositivoId: unknown) {
+export async function vincular(sesion: SesionActiva, codigo: string, dispositivoId: unknown): Promise<Resultado<Vinculado>> {
   const duenio = await datos.duenioDelCodigo(codigo);
   if (duenio && duenio !== sesion.usuario.id) return mal(403, "Esa computadora tiene la sesión de otra persona. El celular se empareja solo con una computadora donde entraste vos.");
   await anotarDispositivo(pool, sesion.id, dispositivoId);
@@ -196,7 +197,7 @@ export async function vincular(sesion: SesionActiva, codigo: string, dispositivo
 
 // Con quién está vinculada esta sesión, como computadora y como celular. Si el dispositivo
 // tenía un vínculo dormido de este usuario, se reactiva acá.
-export async function vinculosDe(sesion: SesionActiva, dispositivo: string | undefined) {
+export async function vinculosDe(sesion: SesionActiva, dispositivo: string | undefined): Promise<VinculosDeLaSesion> {
   await anotarDispositivo(pool, sesion.id, dispositivo);
   await adoptarVinculos(pool, sesion.id, sesion.usuario.id, dispositivo);
   const filas = await datos.vinculosDeLaSesion(sesion.id);
@@ -205,9 +206,9 @@ export async function vinculosDe(sesion: SesionActiva, dispositivo: string | und
 }
 
 export const diasDelVinculo = () => diasDeVinculo(pool);
-export async function cambiarDiasDelVinculo(dias: unknown, actorId: string) {
-  if (!Number.isInteger(dias) || (dias as number) < 1 || (dias as number) > 365) return mal(400, "Los días tienen que ser un número entero entre 1 y 365");
-  await datos.guardarDiasDeVinculo(dias as number);
+// Los días ya llegan validados (entre 1 y 365: `esquemas.ts`).
+export async function cambiarDiasDelVinculo(dias: number, actorId: string): Promise<Resultado<DiasDelVinculo>> {
+  await datos.guardarDiasDeVinculo(dias);
   await registrarEvento(pool, { tipo: "vinculo.dias_cambiados", usuarioId: actorId, contenido: { dias } });
   return bien({ dias });
 }
@@ -222,14 +223,13 @@ export async function soltar(puestoId: string, sesion: SesionActiva): Promise<bo
   return true;
 }
 
-export async function mandarCodigo(puestoId: string, sesionId: string, codigo: string | undefined) {
-  if (!codigo?.trim()) return mal(400, "Falta el código");
+export async function mandarCodigo(puestoId: string, sesionId: string, codigo: string): Promise<Resultado<CodigoEscaneado>> {
   if (!(await datos.esCelularDelPuesto(puestoId, sesionId))) return mal(403, "Este celular no está vinculado a esa computadora, o la vinculación venció");
-  return bien(await datos.guardarCodigo(puestoId, codigo.trim()), 201);
+  return bien(await datos.guardarCodigo(puestoId, codigo), 201);
 }
 export const codigoRecibido = datos.codigoRecibido;
 
-export async function estadoDelPuesto(puestoId: string, sesionId: string) {
+export async function estadoDelPuesto(puestoId: string, sesionId: string): Promise<EstadoDelPuesto | null> {
   const p = await datos.puestoDe(puestoId, sesionId);
   return p ? { ...p, vigente: new Date(p.expira_en).getTime() > Date.now() } : null;
 }
