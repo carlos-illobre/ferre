@@ -253,3 +253,15 @@ sube desde abajo en el celular, y visor con guía naranja y panel verde oscuro: 
   `pantallas/compu/base/estilos/tokens.css`. La decisión 85 dice que las piezas «toman los
   colores de la paleta» y `CLAUDE.md` que la paleta es una sola (`paleta.css`). Se ven igual,
   pero un cambio de color en la paleta no les llega.
+
+---
+
+## Al cerrar la carpeta (2026-10-15)
+
+- E02, E08 y E09 pasaron de la spec a las reglas de la ejecución del plan, por decisión de Carlos:
+  son de cómo se trabaja y no se comprueban con una prueba del código. Se cumplieron:
+  - **E02:** cada subida corrió las unitarias, y cada tarea grande, todas las de punta a punta.
+  - **E08:** ninguna etapa cambió datos guardados.
+  - **E09:** los pedidos de pantalla que llegaron durante T016 a T020 esperaron a que el otro
+    agente terminara, o se hicieron en Procesos, que no estaba en el reordenamiento.
+- E01, E03, E04 y E07 los comprueba en cada subida `tests/integration/reordenamiento.sh`.

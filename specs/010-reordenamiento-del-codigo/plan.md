@@ -22,8 +22,14 @@ aprobó. Acá va cómo se ejecuta.
   se lo cambia. Así se ve qué cambió.
 - **Los nombres de los servicios, de las imágenes y de los paquetes no cambian en la etapa 1:**
   el despliegue de la máquina los usa. Cambian solo las carpetas.
+- **Cada etapa terminada pasa todas las pruebas** que pasaban antes, unitarias y de punta a
+  punta (era el escenario E02).
 - **Las pruebas no se debilitan para que pasen.** Si una prueba hay que tocarla, es porque
   cambió dónde vive algo, no qué se comprueba.
+- **Cada etapa se puede volver atrás** con el despliegue de siempre: ninguna cambia datos
+  guardados de un modo que no se pueda deshacer (era el escenario E08).
+- **Mientras se unifica un proceso no se cambian sus pantallas:** lo que Carlos pida se anota
+  para después (decisión 84; era el escenario E09).
 - La decisión de arquitectura queda en un ADR nuevo.
 
 ## Seguridad
