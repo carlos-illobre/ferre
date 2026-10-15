@@ -34,6 +34,14 @@ describe("Mejoras y errores", () => {
     Object.defineProperty(URL, "revokeObjectURL", { value: () => undefined, configurable: true });
   });
 
+  it("al abrir, el cursor ya está en la caja de texto; primero «Tengo una idea», que es la elegida", () => {
+    render(<Tickets />);
+    expect(document.activeElement).toBe(screen.getByTestId("descripcion"));
+    const opciones = within(screen.getByRole("radiogroup")).getAllByRole("radio");
+    expect(opciones.map((o) => o.getAttribute("data-testid"))).toEqual(["tipo-mejora", "tipo-error"]);
+    expect(opciones[0]!.getAttribute("aria-checked")).toBe("true");
+  });
+
   it("sin texto no se envía y dice qué falta", async () => {
     render(<Tickets />);
     fireEvent.click(screen.getByTestId("enviar"));

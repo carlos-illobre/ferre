@@ -9,3 +9,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 
 ## Tareas
 
+- [x] T001 [ajuste] Mejoras y errores: el cursor ya en la caja de texto; primero «Tengo una idea» y después «Encontré un error»; la opción elegida en verde suave en vez de naranja (pedido de Carlos del 2026-10-15)

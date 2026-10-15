@@ -7,9 +7,10 @@ import type { ResolucionDeTicket } from "@servidor/tickets";
 
 // Mejoras y errores (RF-80): quien usa la app cuenta lo que encontró o lo que se le ocurrió,
 // con fotos o capturas de pantalla. La misma pantalla en el celular y en la computadora.
+// Primero la idea, que es la elegida al abrir (pedido de Carlos del 2026-10-15).
 const TIPOS = [
-  { valor: "error", nombre: "Encontré un error", ayuda: "Algo no anda o anda mal" },
   { valor: "mejora", nombre: "Tengo una idea", ayuda: "Algo que falta o que se puede mejorar" },
+  { valor: "error", nombre: "Encontré un error", ayuda: "Algo no anda o anda mal" },
 ] as const;
 const describirDispositivo = () => {
   const ua = navigator.userAgent;
@@ -19,7 +20,7 @@ const cuando = (iso: string) => new Date(iso).toLocaleString("es-AR", { day: "2-
 
 export function Tickets() {
   const { tickets, pendientes, error, cargar } = useTickets();
-  const [tipo, setTipo] = useState<Ticket["tipo"]>("error");
+  const [tipo, setTipo] = useState<Ticket["tipo"]>("mejora");
   const [texto, setTexto] = useState("");
   const [fotos, setFotos] = useState<File[]>([]);
   const [falta, setFalta] = useState<string | null>(null);
@@ -27,6 +28,9 @@ export function Tickets() {
   const [enviando, setEnviando] = useState(false);
   const [viendo, setViendo] = useState<"abierto" | "resuelto">("abierto");
   const archivo = useRef<HTMLInputElement>(null);
+  // Al abrir, el cursor ya está en la caja de texto: así se nota que ahí se escribe.
+  const caja = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => { caja.current?.focus({ preventScroll: true }); }, []);
   const [pidiendo, setPidiendo] = useState(false);
 
   function agregarFotos(nuevas: File[]) {
@@ -71,7 +75,7 @@ export function Tickets() {
         </div>
         <label className="tk-campo">
           <span>{tipo === "error" ? "¿Qué pasó? ¿Qué estabas haciendo?" : "¿Qué te gustaría que tenga o que cambie?"}</span>
-          <textarea value={texto} onChange={(e) => { setTexto(e.target.value); if (falta) setFalta(null); }} rows={4} maxLength={5000}
+          <textarea ref={caja} value={texto} onChange={(e) => { setTexto(e.target.value); if (falta) setFalta(null); }} rows={4} maxLength={5000}
             placeholder={tipo === "error" ? "Ej.: al cobrar con tarjeta la pantalla quedó en blanco" : "Ej.: estaría bueno ver el stock al buscar un producto"}
             aria-invalid={falta !== null && texto.trim().length < 3} aria-describedby={falta ? "tk-falta" : undefined} data-testid="descripcion" />
         </label>

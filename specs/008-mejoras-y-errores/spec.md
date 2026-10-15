@@ -25,6 +25,11 @@ Quien usa la aplicación encuentra algo que no anda, o se le ocurre algo que fal
 «Mejoras y errores» dentro de Más, elige si es un error o una idea, lo cuenta con sus
 palabras y, si quiere, suma fotos o capturas de pantalla. Lo envía y sigue trabajando.
 
+Al abrir la pantalla, el cursor ya está en la caja de texto, para que se note que ahí se escribe.
+Las dos opciones van en este orden: primero «Tengo una idea» (elegida al abrir) y después
+«Encontré un error». La elegida se marca en verde suave, no en naranja: avisar de algo no es
+una alarma (pedido de Carlos del 2026-10-15).
+
 **Why this priority**: La aplicación se está probando en el local; lo que se encuentra hoy
 se cuenta de palabra y se pierde. No frena el mostrador, por eso no es P1.
 
