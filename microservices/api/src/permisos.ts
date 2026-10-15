@@ -15,7 +15,10 @@ export const PERMISOS = [
   { clave: "deposito.ingresos", parte: "Depósito", nombre: "Registrar ingresos", detalle: "Registrar la mercadería que llega y anular un ingreso" },
   { clave: "deposito.compras", parte: "Depósito", nombre: "Ver las compras", detalle: "Ver las compras recientes y sus comprobantes" },
   { clave: "deposito.stock", parte: "Depósito", nombre: "Contar y corregir stock", detalle: "Contar estanterías y corregir el stock a mano" },
-  { clave: "negocio.numeros", parte: "Negocio", nombre: "Ver los números del negocio", detalle: "Cómo va el negocio: ventas, gastos y dinero invertido en inventario" },
+  // Cómo va el negocio, en tres secciones con su permiso cada una (decisión 89, 012).
+  { clave: "negocio.ventas", parte: "Negocio", nombre: "Ver las ventas del negocio", detalle: "Cómo va el negocio → Ventas: lo vendido, cómo se cobró y lo que preguntaron y no llevaron" },
+  { clave: "negocio.gastos", parte: "Negocio", nombre: "Ver los gastos", detalle: "Cómo va el negocio → Compras: los gastos de la semana por proveedor" },
+  { clave: "negocio.invertido", parte: "Negocio", nombre: "Ver el dinero invertido", detalle: "Cómo va el negocio → Inventario, y el valor en pesos del stock en cualquier pantalla" },
   { clave: "negocio.anomalias", parte: "Negocio", nombre: "Ver las anomalías", detalle: "Abrir «Anomalías»" },
   { clave: "negocio.actividad", parte: "Negocio", nombre: "Ver quién hizo qué", detalle: "Abrir el registro de acciones" },
   { clave: "procesos.ver", parte: "Negocio", nombre: "Ver procesos", detalle: "Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial" },

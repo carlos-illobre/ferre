@@ -13,4 +13,4 @@ consultas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
   return c.body(null, 204);
 });
 
-consultas.get("/", exigirPermiso("negocio.numeros"), async (c) => c.json(await reglas.consultas()));
+consultas.get("/", exigirPermiso("negocio.ventas"), async (c) => c.json(await reglas.consultas()));

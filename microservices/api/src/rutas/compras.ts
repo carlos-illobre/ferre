@@ -30,7 +30,7 @@ compras.post("/", exigirPermiso("deposito.ingresos"), async (c) => {
 });
 
 compras.get("/", exigirPermiso("deposito.compras", "deposito.ingresos"), async (c) => c.json(await reglas.recientes()));
-compras.get("/semana", exigirPermiso("negocio.numeros"), async (c) => c.json(await reglas.semana()));
+compras.get("/semana", exigirPermiso("negocio.gastos"), async (c) => c.json(await reglas.semana()));
 compras.get("/:id", exigirPermiso("deposito.compras", "deposito.ingresos"), async (c) => c.json(await reglas.renglones(c.req.param("id"))));
 
 compras.post("/:id/anular", exigirPermiso("deposito.ingresos"), async (c) => {

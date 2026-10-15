@@ -15,7 +15,7 @@ ventas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
   return r.repetida ? c.json(r) : c.json(r, 201);
 });
 
-ventas.get("/", exigirPermiso("ventas.ver", "negocio.numeros"), async (c) => c.json(await reglas.delDia(c.req.query("dia") || null)));
+ventas.get("/", exigirPermiso("ventas.ver", "negocio.ventas"), async (c) => c.json(await reglas.delDia(c.req.query("dia") || null)));
 
 ventas.post("/:id/anular", exigirPermiso("ventas.anular", "ventas.anular_cualquiera"), async (c) => {
   const { motivo } = await c.req.json<{ motivo?: string }>().catch(() => ({}) as { motivo?: string });

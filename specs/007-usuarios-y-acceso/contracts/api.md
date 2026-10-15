@@ -66,7 +66,7 @@ Los permisos son fijos: los define el sistema. Los roles los arma el negocio.
 
 Las claves de permiso: `ventas.registrar`, `ventas.ver`, `ventas.anular` (del día), `ventas.anular_cualquiera`, `catalogo.costos`, `catalogo.margenes`,
 `catalogo.listas`, `catalogo.duplicados`, `deposito.pedidos`, `deposito.ingresos`, `deposito.compras`,
-`deposito.stock`, `negocio.numeros`, `negocio.anomalias`, `negocio.actividad`,
+`deposito.stock`, `negocio.ventas`, `negocio.gastos`, `negocio.invertido`, `negocio.anomalias`, `negocio.actividad`,
 `admin.usuarios`, `admin.roles`, `admin.sesiones`. Qué deja hacer cada una está en la tabla
 de permisos de [spec.md](../spec.md).
 
@@ -144,7 +144,7 @@ Lo que la computadora le pide a su celular emparejado:
 | `GET /productos`, `PATCH /productos/:id` (foto, código de barras, unidad), `GET /proveedores`, `GET /clientes`, `GET /stock`, `GET /stock/:id/movimientos`, `GET /listas/:id/archivo`, `/tickets`, `/puestos` | Sesión |
 | `PATCH /productos/:id` cuando trae el margen | `catalogo.margenes` |
 | `POST /ventas`, `POST /ventas/:id/pagar`, `POST /consultas`, `POST /clientes` | `ventas.registrar` |
-| `GET /ventas` | `ventas.ver` o `negocio.numeros` |
+| `GET /ventas` | `ventas.ver` o `negocio.ventas` |
 | `POST /ventas/:id/anular` | `ventas.anular` si la venta es de hoy (el día del local); `ventas.anular_cualquiera` para cualquier día. Con solo la primera, una venta de otro día da `403` |
 | `/listas` (salvo bajar el archivo), `POST /proveedores`, `PATCH /proveedores/:id` | `catalogo.listas` |
 | `/equivalencias/*` | `catalogo.duplicados` |
@@ -153,11 +153,12 @@ Lo que la computadora le pide a su celular emparejado:
 | `POST /compras`, `POST /compras/fotos`, `POST /compras/:id/anular` | `deposito.ingresos` |
 | `GET /compras`, `GET /compras/:id` | `deposito.compras` o `deposito.ingresos` |
 | `POST /stock/ajustes`, `/sectores`, `/conteos` | `deposito.stock` |
-| `GET /compras/semana`, `GET /consultas` | `negocio.numeros` |
+| `GET /compras/semana` | `negocio.gastos` |
+| `GET /consultas` | `negocio.ventas` |
 | `GET /anomalias` | `negocio.anomalias` |
 
 `GET /stock` no trae el valor en dinero (ni el de cada producto ni el total) a quien no tiene
-`negocio.numeros`.
+`negocio.invertido`.
 
 `catalogo.costos` («Ver costos») no lo exige ninguna ruta: decide qué muestran las pantallas.
 `GET /productos` trae el costo a cualquiera con sesión, porque el precio de venta se calcula

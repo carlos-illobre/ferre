@@ -13,10 +13,10 @@ const administran = (...ids: string[]) => base.actual.programar(/FROM usuario u\
 describe("roles", () => {
   beforeEach(() => { base.actual = baseFalsa(); administran("u-admin"); base.actual.programar(/UPDATE rol SET nombre/, { rowCount: 1 }); });
 
-  it("011-E40 la lista de permisos sale del servidor: veinte, con «Ver procesos» y «Dibujar procesos» en Negocio, cada uno con su parte, nombre y explicación", async () => {
+  it("011-E40 la lista de permisos sale del servidor: veintidós, con «Ver procesos» y «Dibujar procesos» en Negocio, cada uno con su parte, nombre y explicación", async () => {
     const r = await pedir(app, "GET", "/permisos", { rol: "admin" });
     const lista = (await r.json()) as { clave: string; parte: string; nombre: string; detalle: string }[];
-    expect(lista).toHaveLength(20);
+    expect(lista).toHaveLength(22);
     expect(lista.filter((p) => p.clave.startsWith("procesos.")).map((p) => [p.parte, p.nombre])).toEqual([["Negocio", "Ver procesos"], ["Negocio", "Dibujar procesos"]]);
     expect(lista.every((p) => p.clave && p.parte && p.nombre && p.detalle)).toBe(true);
     expect(new Set(lista.map((p) => p.parte))).toEqual(new Set(["Vender", "Catálogo", "Depósito", "Negocio", "Administración"]));
@@ -88,9 +88,9 @@ describe("permisos por operación", () => {
     ["GET", "/ventas", "Ver las ventas del día"], ["POST", "/ventas/x/anular", "Anular ventas del día"],
     ["GET", "/listas", "Cargar listas de precios"], ["POST", "/proveedores", "Cargar listas de precios"],
     ["GET", "/equivalencias", "Unir duplicados"],
-    ["PUT", "/pedidos/x", "Encargar compras"], ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los números del negocio"],
+    ["PUT", "/pedidos/x", "Encargar compras"], ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los gastos"],
     ["POST", "/stock/p1/ajustes", "Contar y corregir stock"], ["GET", "/sectores", "Contar y corregir stock"],
-    ["GET", "/auditoria", "Ver quién hizo qué"], ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver los números del negocio"],
+    ["GET", "/auditoria", "Ver quién hizo qué"], ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver las ventas del negocio"],
     ["GET", "/usuarios", "Administrar usuarios"], ["GET", "/sesiones", "Administrar sesiones"], ["GET", "/roles", "Administrar roles"],
     ["PATCH", "/productos/p1", "Fijar márgenes"],
   ];
@@ -106,7 +106,7 @@ describe("permisos por operación", () => {
       expect((await pedir(app, "GET", ruta, { rol: "soloVende" })).status, ruta).toBe(200);
     }
   });
-  it("el inventario no lleva dinero para quien no ve los números del negocio", async () => {
+  it("el inventario no lleva dinero para quien no ve el dinero invertido", async () => {
     base.actual.programar(/WITH movimientos AS/, { rows: [{ id: "p1", stock: "17", costo_neto: "1000", proveedor: "Comodo", valor: "17000", ultimo_movimiento: null }] });
     const sin = (await (await pedir(app, "GET", "/stock", { rol: "soloVende" })).json()) as { productos: { stock: string; costo_neto: unknown; valor: string }[]; valor_total: number; por_proveedor: object };
     expect(sin.productos[0]).toMatchObject({ stock: "17", costo_neto: null, valor: "0" });
@@ -117,8 +117,9 @@ describe("permisos por operación", () => {
   });
   it("todos los permisos de la lista se usan en alguna ruta de esta prueba o de las de roles", () => {
     // «Anular ventas de cualquier día» se prueba con las ventas; «Ver costos» no lo exige ninguna
-    // ruta: decide qué muestran las pantallas. Los de Procesos, con su ruta (procesos.test.ts).
-    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender", "Anular ventas de cualquier día", "Ver costos", "Ver procesos", "Dibujar procesos"]);
+    // ruta: decide qué muestran las pantallas. Los de Procesos, con su ruta (procesos.test.ts);
+    // «Ver el dinero invertido», con el stock (secciones-de-negocio.test.ts).
+    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender", "Anular ventas de cualquier día", "Ver costos", "Ver procesos", "Dibujar procesos", "Ver el dinero invertido"]);
     expect(PERMISOS.filter((p) => !usados.has(p.nombre)).map((p) => p.nombre)).toEqual([]);
   });
 });

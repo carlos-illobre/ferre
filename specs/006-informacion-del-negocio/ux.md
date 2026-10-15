@@ -40,15 +40,17 @@ especificación (RF-60 a RF-65); lo que acá depende de una aclaración lo dice.
 
 ## Qué tiene hoy la pantalla «Cómo va el negocio»
 
-Es la pantalla del proceso «analizar el negocio» (decisión 67). Está en Más y pide «Ver los
-números del negocio» o «Ver las compras».
+Es la pantalla del proceso «analizar el negocio» (decisión 67). Está en Más y se separa en
+tres secciones, cada una con su permiso (decisión 89; el detalle, en
+[012-secciones-de-negocio](../012-secciones-de-negocio/ux.md)):
 
-- **Con «Ver los números del negocio»:** lo vendido hoy (total, cantidad de ventas y total por
-  medio de pago), los gastos de la semana por proveedor, lo que preguntaron y no llevaron (en
-  la computadora) y el dinero invertido en inventario, en total y por proveedor.
-- **Con «Ver las compras»:** las compras recientes, que se abren para ver sus renglones y la
-  foto del comprobante; quien tiene «Registrar ingresos» las anula desde ahí. Con este permiso
-  solo, la pantalla muestra nada más que las compras.
+- **Ventas, con «Ver las ventas del negocio»:** lo vendido hoy (total, cantidad de ventas y
+  total por medio de pago) y lo que preguntaron y no llevaron.
+- **Compras:** con «Ver los gastos», los gastos de la semana por proveedor; con «Ver las
+  compras», las compras recientes, que se abren para ver sus renglones y la foto del
+  comprobante; quien tiene «Registrar ingresos» las anula desde ahí.
+- **Inventario, con «Ver el dinero invertido»:** el dinero invertido en inventario, en total
+  y por proveedor.
 - **No tiene** el detalle de cada venta ni forma de anular ventas: eso está en las pestañas
   «Hoy» y «Anular» de Vender (decisión 72). En la computadora, «Ver las ventas de hoy» lleva
   a la pestaña «Hoy».

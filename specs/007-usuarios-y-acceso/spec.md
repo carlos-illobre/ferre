@@ -143,7 +143,7 @@ mercadería.
 4. **Given** un usuario sin el permiso de una pantalla, **When** entra a su dirección, **Then** ve que no tiene permiso y qué permiso hace falta, y el menú no se la ofrece.
 5. **Given** cualquier usuario con sesión, **When** usa la app, **Then** puede buscar en el catálogo, ver el stock de un producto, sacarle la foto, cargarle el código de barras, avisar de un error o una mejora, cerrar su sesión y vincular su celular: eso no pide ningún permiso.
 6. **Given** un usuario que vende pero no tiene «Fijar márgenes», **When** elige un margen dentro de una venta, **Then** vale para esa venta y no queda guardado en el producto.
-7. **Given** un usuario sin «Ver los números del negocio», **When** mira el inventario, **Then** no recibe ninguna suma de dinero, ni en la pantalla ni del servidor.
+7. **Given** un usuario sin «Ver el dinero invertido», **When** mira el inventario, **Then** no recibe ninguna suma de dinero, ni en la pantalla ni del servidor.
 8. **Given** un cambio hecho sin conexión por alguien a quien después le sacaron el permiso, **When** el dispositivo reconecta, **Then** el servidor lo rechaza y el dispositivo lo descarta avisando.
 9. **Given** alguien sin sesión, o un usuario desactivado, **When** le pide cualquier operación al servidor, **Then** el servidor la rechaza (historia 1).
 
@@ -363,7 +363,9 @@ Los **permisos** son fijos y los define el sistema:
 | Depósito | Encargar compras | Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos (RF-55) |
 | Depósito | Ver las compras | Ver las compras recientes y sus comprobantes, en «Cómo va el negocio» |
 | Depósito | Contar y corregir stock | Contar estanterías y corregir el stock a mano |
-| Negocio | Ver los números del negocio | Cómo va el negocio: ventas, gastos y dinero invertido en inventario |
+| Negocio | Ver las ventas del negocio | Cómo va el negocio → Ventas: lo vendido, cómo se cobró y lo que preguntaron y no llevaron (decisión 89) |
+| Negocio | Ver los gastos | Cómo va el negocio → Compras: los gastos de la semana por proveedor (decisión 89) |
+| Negocio | Ver el dinero invertido | Cómo va el negocio → Inventario, y el valor en pesos del stock en cualquier pantalla (decisión 89) |
 | Negocio | Ver las anomalías | Abrir «Anomalías» |
 | Negocio | Ver quién hizo qué | Abrir el registro de acciones |
 | Negocio | Ver procesos | Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial (RF-95) |
@@ -380,7 +382,7 @@ Los **roles** los arma el negocio. El sistema arranca con estos cinco, que se pu
 | Comprador | Encargar compras · Cargar listas de precios · Unir duplicados · Ver las compras · Ver costos |
 | Recepción | Registrar ingresos · Ver las compras · Contar y corregir stock · Ver las anomalías · Ver costos |
 | Administrador | Administrar usuarios · Administrar roles · Administrar sesiones · Ver quién hizo qué |
-| Gerente | Ver los números del negocio · Fijar márgenes · Ver las ventas del día · Anular ventas del día · Anular ventas de cualquier día · Ver costos · Ver las compras · Ver las anomalías · Ver quién hizo qué · Ver procesos · Dibujar procesos |
+| Gerente | Ver las ventas del negocio · Ver los gastos · Ver el dinero invertido · Fijar márgenes · Ver las ventas del día · Anular ventas del día · Anular ventas de cualquier día · Ver costos · Ver las compras · Ver las anomalías · Ver quién hizo qué · Ver procesos · Dibujar procesos |
 
 Decisión 50 del 2026-10-11, que reemplaza a las decisiones 8, 15 y 18 en lo que toca a roles.
 

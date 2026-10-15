@@ -8,7 +8,8 @@ export const stock = new Hono();
 stock.use("/*", exigirSesion);
 
 // Stock y valor de todos los productos con movimientos. El cliente lo cruza con su catálogo.
-stock.get("/", async (c) => c.json(await reglas.stockConValor(puede(c.get("sesion").usuario, "negocio.numeros"))));
+// El valor en pesos solo con «Ver el dinero invertido» (RF-99); sin él, las cantidades.
+stock.get("/", async (c) => c.json(await reglas.stockConValor(puede(c.get("sesion").usuario, "negocio.invertido"))));
 
 stock.get("/:productoId/movimientos", async (c) => c.json(await reglas.movimientos(c.req.param("productoId"))));
 
