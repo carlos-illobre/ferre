@@ -2,32 +2,35 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../api";
 import { irA } from "../../rutas";
 import { dispositivoId, sincronizarEmparejamiento } from "../../puesto";
+import { avisarEnEsteDispositivo } from "../../espejo";
 import { Logotipo } from "../Logotipo";
 import "./entrar.css";
 import type { AprobacionDeCodigo } from "@servidor/sesiones";
 
 // El celular leyó el código de una computadora y ya tiene sesión (RF-76). Si acaba de entrar
 // con la huella o con Google, eso fue la confirmación: la computadora entra sola. Si la sesión
-// ya estaba abierta, hace falta un toque, porque abrir un enlace no puede alcanzar.
-type Estado = "preguntar" | "entrando" | "listo" | "error";
+// ya estaba abierta, hace falta un toque, porque abrir un enlace no puede alcanzar. Cuando la
+// computadora entró, el celular sigue a su pantalla de siempre con un aviso breve; esta pantalla
+// queda solo si no entró, para decir por qué (pedido de Carlos del 2026-10-15).
+type Estado = "preguntar" | "entrando" | "error";
 
 export function EntrarEnLaCompu({ codigo, automatico, nombre }: { codigo: string; automatico: boolean; nombre: string }) {
   const [estado, setEstado] = useState<Estado>(automatico ? "entrando" : "preguntar");
   const [error, setError] = useState<string | null>(null);
   const pedido = useRef(false);
-  const [emparejado, setEmparejado] = useState(false);
   const dejarEntrar = useCallback(async () => {
     if (pedido.current) return;
     pedido.current = true;
     setEstado("entrando");
     try {
       await api("/sesiones/vinculaciones/aprobar", { method: "POST", body: JSON.stringify({ codigo, dispositivo_id: dispositivoId() } satisfies AprobacionDeCodigo) });
-      setEstado("listo");
+      avisarEnEsteDispositivo(`Listo: la computadora entró como ${nombre}`);
+      irA("catalogo");
       // El emparejamiento nace cuando la computadora retira su sesión, un par de segundos después.
-      for (let i = 0; i < 6; i++) { await new Promise((r) => setTimeout(r, 1500)); if ((await sincronizarEmparejamiento())?.comoCelular) { setEmparejado(true); break; } }
+      void (async () => { for (let i = 0; i < 6; i++) { await new Promise((r) => setTimeout(r, 1500)); if ((await sincronizarEmparejamiento())?.comoCelular) break; } })();
     }
     catch (e) { pedido.current = false; setError((e as { estado?: number }).estado ? (e as Error).message : "Sin conexión: para dejar entrar a la computadora hace falta internet."); setEstado("error"); }
-  }, [codigo]);
+  }, [codigo, nombre]);
   useEffect(() => { if (automatico) void dejarEntrar(); }, [automatico, dejarEntrar]);
   const seguir = () => irA("catalogo");
 
@@ -44,16 +47,6 @@ export function EntrarEnLaCompu({ codigo, automatico, nombre }: { codigo: string
           </>
         )}
         {estado === "entrando" && <><h2>Entrando en la computadora…</h2><p>Un momento.</p></>}
-        {estado === "listo" && (
-          <>
-            <span className="en-tilde" aria-hidden="true">✓</span>
-            <h2 data-testid="compu-entro">Listo: la computadora ya entró</h2>
-            <p>Entraste como <strong>{nombre}</strong> en los dos. Ya podés seguir en la computadora.</p>
-            {emparejado && <p data-testid="quedo-emparejado">Este celular quedó emparejado con ella: lo que escanees le llega, y si te pide una foto te aparece acá.</p>}
-            {emparejado && <button type="button" className="en-boton naranja" onClick={() => irA("lector")} data-testid="usar-como-lector">Usar este celular como lector</button>}
-            <button type="button" className="en-boton verde" onClick={seguir} data-testid="seguir-en-el-celular">Seguir en el celular</button>
-          </>
-        )}
         {estado === "error" && (
           <>
             <h2>La computadora no entró</h2>

@@ -116,7 +116,11 @@ solo si esa computadora fue vinculada.
 - Sin sesión: la entrada de siempre, con un aviso de que al entrar ahí la computadora entra
   también, y el botón de la huella primero, que lo dice: «Entrar acá y en la computadora».
 - Con la sesión ya abierta: un solo botón, «Entrar en la computadora», y «Ahora no».
-- Después: que la computadora ya entró, con qué usuario, y cómo seguir en el celular.
+- Después: el celular sigue a su pantalla de siempre y dice unos segundos, en la línea de arriba,
+  «Listo: la computadora entró como …». No hay pantalla de «Listo» ni botón para abrir el lector:
+  el lector se abre cuando la computadora lo pide (pedido de Carlos del 2026-10-15; maqueta
+  `maquetas/entrar-con-el-celular-sin-pantalla-de-listo.html`). Si la computadora no entró, una
+  pantalla dice por qué, con «Seguir en el celular».
 
 **Reglas:** no hay pantalla de confirmación aparte; un código vencido o ya usado dice que hay
 que leer el que la computadora muestra ahora; sin conexión, la computadora no muestra código

@@ -17,3 +17,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T006 [ajuste] En la computadora, «Autorizar a alguien» aprovecha el ancho: nombre, correo y el botón en una línea, y los roles debajo, repartidos en columnas
 - [x] T007 [arreglo] Vinculados, ir a Depósito y enseguida a Más desde el celular hace que el celular vuelva solo a Depósito un segundo después
 - [x] T008 [interfaz] En Más, Usuarios y sesiones, Roles y Quién hizo qué se juntan en una sola opción, «Usuarios», con cuatro pestañas como Depósito: Usuarios, Sesiones, Roles y Quién hizo qué
+- [x] T009 [interfaz] Al entrar en la computadora con el celular, el celular ya no muestra la pantalla «Listo: la computadora ya entró»: sigue a su pantalla de siempre con un aviso breve; la pantalla queda solo para cuando la computadora no entró (pedido de Carlos del 2026-10-15)

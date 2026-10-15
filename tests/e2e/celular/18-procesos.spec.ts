@@ -108,7 +108,7 @@ test.describe("con el dedo", () => {
     const paso = page.locator(".procesos-dibujo-celu g.djs-element[data-element-id='Cobrar'] .djs-hit").first();
     const antes = (await paso.boundingBox())!;
     const cdp = await page.context().newCDPSession(page);
-    const tocar = (type: string, x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
+    const tocar = (type: "touchStart" | "touchMove" | "touchEnd", x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
     const x = antes.x + antes.width / 2;
     const y = antes.y + antes.height / 2;
 
@@ -141,7 +141,7 @@ test.describe("con el dedo", () => {
     const figura = (await page.getByTestId("procesos-figura-tarea").boundingBox())!;
     const lienzo = (await page.getByTestId("procesos-lienzo").boundingBox())!;
     const cdp = await page.context().newCDPSession(page);
-    const tocar = (type: string, x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
+    const tocar = (type: "touchStart" | "touchMove" | "touchEnd", x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
     const desde = { x: figura.x + figura.width / 2, y: figura.y + figura.height / 2 };
     const hasta = { x: lienzo.x + lienzo.width / 2, y: lienzo.y + 120 };
     await tocar("touchStart", desde.x, desde.y);
