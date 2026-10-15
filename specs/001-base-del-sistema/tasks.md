@@ -25,3 +25,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T014 [ajuste] Las sesiones en la nube entran a Docker Hub al arrancar, con DOCKERHUB_USUARIO y DOCKERHUB_TOKEN del entorno, para que las pruebas de punta a punta no choquen con el límite de descargas sin cuenta
 - [x] T015 [ajuste] En la computadora, en Más ↓ va a la opción de abajo y ↑ a la de arriba, como en la grilla que se ve; → y ← siguen a la siguiente y a la anterior (pedido de Carlos del 2026-10-15)
 - [x] T016 [interfaz] En la computadora, la acción de la pantalla va a la derecha de las pestañas, en la misma fila: Vender, Anular, Estanterías, Roles y Pedidos; Duplicados no (pedido de Carlos del 2026-10-15)
+- [x] T017 [ajuste] «Rol nuevo» lleva su ícono, el «+» de «Sector nuevo» (pedido de Carlos del 2026-10-15)

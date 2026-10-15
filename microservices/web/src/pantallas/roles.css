@@ -25,7 +25,7 @@
 .rl-permiso span { display: flex; flex-direction: column; }
 .rl-permiso small { color: var(--p-texto-2); font-size: 0.875rem; }
 .rl-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.rl-boton { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 16px; border-radius: 12px; border: 1.500px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font: inherit; font-weight: 650; cursor: pointer; }
+.rl-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 16px; border-radius: 12px; border: 1.500px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font: inherit; font-weight: 650; cursor: pointer; }
 .rl-boton:hover:not(:disabled) { background: var(--p-fondo-2); }
 .rl-boton:disabled { background: var(--p-relleno); border-color: var(--p-relleno); color: var(--p-texto-2); cursor: not-allowed; }
 .rl-boton.fuerte { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }

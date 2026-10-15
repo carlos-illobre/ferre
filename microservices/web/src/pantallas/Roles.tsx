@@ -85,7 +85,7 @@ export function Roles({ cabeza }: { cabeza?: ReactNode } = {}) {
           </div>
         </form>
       ) : (
-        <AlLadoDeLasPestanas><button type="button" className="rl-boton fuerte rl-nuevo" disabled={!roles} onClick={() => setBorrador({ id: null, nombre: "", permisos: new Set() })} data-testid="rol-nuevo">Rol nuevo</button></AlLadoDeLasPestanas>
+        <AlLadoDeLasPestanas><button type="button" className="rl-boton fuerte rl-nuevo" disabled={!roles} onClick={() => setBorrador({ id: null, nombre: "", permisos: new Set() })} data-testid="rol-nuevo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>Rol nuevo</button></AlLadoDeLasPestanas>
       )}
 
       {!roles && !error && <p className="rl-bajada" aria-busy="true">Buscando los roles…</p>}

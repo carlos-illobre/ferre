@@ -239,7 +239,7 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **En la computadora, la acción de la pantalla va a la derecha de las pestañas, en la misma
   fila** (nunca hay más de cuatro pestañas, así que el lugar está libre): «Escanear con el
   celular» en Vender, el día en Anular, «Sector nuevo» en Estanterías, «Rol nuevo» en Roles y
-  «Pedido nuevo» en Pedidos. Una caja de texto ancha, como la búsqueda de Duplicados, sigue en su
+  «Pedido nuevo» en Pedidos. Cada acción lleva su ícono («Rol nuevo», como «Sector nuevo», un «+»). Una caja de texto ancha, como la búsqueda de Duplicados, sigue en su
   propia línea. En el celular no cambia (pedido de Carlos del 2026-10-15; maqueta
   `maquetas/acciones-al-lado-del-submenu.html`).
 - **Cobro:** Efectivo viene elegido; el total se ve grande y fuera del botón «Cobrar», que
