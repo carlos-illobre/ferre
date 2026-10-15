@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import "./roles.css";
+import type { Rol } from "@servidor/usuarios";
 
 // Los roles de una persona (RF-72, RF-75): una casilla por rol, se tildan varias. Lo usan las
 // dos interfaces, en la lista de usuarios y al autorizar a alguien, para que la regla y las
 // palabras sean las mismas.
-export type RolAsignable = { id: string; nombre: string; descripcion?: string | null };
+export type RolAsignable = Pick<Rol, "id" | "nombre"> & Partial<Pick<Rol, "descripcion">>;
 
 export function useRolesAsignables(): RolAsignable[] {
   const [roles, setRoles] = useState<RolAsignable[]>([]);

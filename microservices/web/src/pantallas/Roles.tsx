@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { api } from "../api";
 import "./roles.css";
+import type { PermisoDelSistema, Rol, RolNuevo } from "@servidor/usuarios";
 
 // Roles (RF-75): cada rol es un nombre y un grupo de permisos. Los permisos son fijos y los
 // trae el servidor, cada uno con su explicación. La misma pantalla en el celular y en la
 // computadora. Asignar un rol a una persona se hace en la pestaña Usuarios (decisión 88).
-type PermisoDelSistema = { clave: string; parte: string; nombre: string; detalle: string };
-type Rol = { id: string; nombre: string; descripcion: string | null; permisos: string[]; usuarios: number };
 type Borrador = { id: string | null; nombre: string; permisos: Set<string> };
 const mensajeDe = (e: unknown, quehacer: string) => ((e as { estado?: number }).estado ? `${(e as Error).message}.` : `Sin conexión: ${quehacer} necesita internet.`);
 
@@ -38,7 +37,7 @@ export function Roles({ cabeza }: { cabeza?: ReactNode } = {}) {
     if (!borrador.nombre.trim()) { setFalta("Poné el nombre del rol."); return; }
     if (borrador.permisos.size === 0) { setFalta("Elegí al menos un permiso para el rol."); return; }
     setGuardando(true); setFalta(null);
-    const cuerpo = JSON.stringify({ nombre: borrador.nombre.trim(), permisos: [...borrador.permisos] });
+    const cuerpo = JSON.stringify({ nombre: borrador.nombre.trim(), permisos: [...borrador.permisos] } satisfies RolNuevo);
     try {
       if (borrador.id) await api(`/roles/${borrador.id}`, { method: "PATCH", body: cuerpo });
       else await api("/roles", { method: "POST", body: cuerpo });
