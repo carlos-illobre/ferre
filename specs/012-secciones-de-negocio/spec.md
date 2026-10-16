@@ -59,7 +59,7 @@ gastos y el dinero invertido y que los niegue.
 **Acceptance Scenarios**:
 
 - **E09** **Given** alguien sin «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve las cantidades pero no el valor en pesos, y el servidor no se lo manda.
-- **E10** **Given** alguien con «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve también el valor en pesos.
+- **E10** **Given** alguien con «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve también el dinero invertido en total, arriba, y el valor en pesos de cada producto (decisión 90).
 
 ### User Story 4 - Pasar de una sección a otra (Priority: P1)
 

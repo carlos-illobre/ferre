@@ -54,6 +54,13 @@ sección. Uno propio:
 
 ## Historia 3: el valor del stock en Depósito
 
+**Maqueta aprobada por Carlos el 2026-10-16:** `maquetas/inventario-a-compu.png` y
+`maquetas/inventario-a-celu.png` (la B, solo el total, no se eligió). Decisión 90.
+
+- Con «Ver el dinero invertido», Depósito → Inventario suma un tercer número arriba,
+  «Dinero invertido», con el total y su explicación («El stock por su costo vigente, sin
+  IVA»), y el valor en pesos de cada producto: en la computadora, una columna «Valor» al lado
+  de Stock; en el celular, debajo de la cantidad. Un producto sin costo o sin stock dice «—».
 - Sin «Ver el dinero invertido», Depósito → Inventario muestra las cantidades y no el valor
   en pesos, ni su columna ni su total. No se reemplaza por un $0.
 

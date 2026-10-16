@@ -67,3 +67,6 @@
   .stock-filtro .segmentos button { flex: none; padding: 0 var(--e4); min-height: 46px; }
   .stock-correccion { max-width: 100%; }
 }
+
+/* El valor del producto, debajo de la cantidad, con «Ver el dinero invertido» (decisión 90). */
+.stock-valor { display: block; font-weight: 500; color: var(--texto-2); }

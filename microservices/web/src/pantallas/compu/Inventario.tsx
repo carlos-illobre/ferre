@@ -13,8 +13,8 @@ import { useEsCelular } from "./base/vista";
 import { conSigno, detalleDe, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
 import "./base/estilos/stock.css";
 
-// Inventario: cuánto hay de cada producto, sin sumas de dinero (el dinero invertido está en
-// Cómo va el negocio; decisión 31). Cada número se explica: el stock, con sus movimientos; el
+// Inventario: cuánto hay de cada producto. El dinero invertido, en total y por producto, solo
+// con «Ver el dinero invertido» (decisión 90); sin ese permiso, solo cantidades. Cada número se explica: el stock, con sus movimientos; el
 // valor, como stock × costo vigente. Corregir pide cuántas hay y por qué, y no confirma: el
 // ajuste queda a la vista entre los movimientos.
 type Filtro = "todos" | "con" | "sin";
@@ -26,7 +26,9 @@ const FILTROS: { valor: Filtro; nombre: string }[] = [{ valor: "todos", nombre: 
 const TOPE = 100;
 
 export function Inventario() {
-  const corrige = usePuede()("deposito.stock");
+  const puedeEsto = usePuede();
+  const corrige = puedeEsto("deposito.stock");
+  const veInvertido = puedeEsto("negocio.invertido");
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
@@ -116,6 +118,11 @@ export function Inventario() {
           <Indicador icono="alerta" color={cuenta.negativos ? "rojo" : undefined} rotulo="En cero o negativo" testId="sin-stock"
             valor={<Explicado valor={numero(cuenta.enCero + cuenta.negativos)} etiqueta={`${cuenta.enCero + cuenta.negativos} productos en cero o negativo`} titulo="En cero o negativo" pasos={[`En cero: ${numero(cuenta.enCero)}`, `En negativo (se vendió más de lo que figuraba): ${numero(cuenta.negativos)}`, `En cero o negativo: ${numero(cuenta.enCero + cuenta.negativos)}`]} />}
             detalle={`${numero(cuenta.enCero)} en cero · ${numero(cuenta.negativos)} en negativo`} />
+          {veInvertido && (
+            <Indicador icono="plata" rotulo="Dinero invertido" testId="dinero-invertido-stock"
+              valor={<Explicado valor={pesosEnteros(datos.valor_total)} etiqueta="Dinero invertido" titulo="De dónde sale el dinero invertido" pasos={pasosDelInvertido(datos.por_proveedor, datos.valor_total)} />}
+              detalle="El stock por su costo vigente, sin IVA" />
+          )}
         </div>
       )}
 
@@ -151,7 +158,7 @@ export function Inventario() {
                   <li key={p.id} data-testid="fila-stock">
                     <button type="button" className="renglon" onClick={() => setAbierto({ id: p.id, corregir: false })} data-testid="stock" aria-haspopup="dialog">
                       <span className="nombre">{p.descripcion}</span>
-                      <span className={`importe ${n < 0 ? "stock-negativo" : ""}`}>{n < 0 ? "−" : ""}{numero(Math.abs(n))} <small>{nombreUnidad(p.unidad)}</small></span>
+                      <span className={`importe ${n < 0 ? "stock-negativo" : ""}`}>{n < 0 ? "−" : ""}{numero(Math.abs(n))} <small>{nombreUnidad(p.unidad)}</small>{veInvertido && <small className="stock-valor" data-testid="valor-stock">{valorDe(fila)}</small>}</span>
                       <span className="detalle stock-pie-renglon">
                         <span className="corta">{detalleDe(p) || "Sin proveedor"}</span>
                         <span>{porEnviar.has(p.id) ? <Pastilla tipo="alerta">Se manda al volver internet</Pastilla> : fila?.ultimo_movimiento ? `último ${fecha(fila.ultimo_movimiento)}` : "sin movimientos"}</span>
@@ -166,7 +173,7 @@ export function Inventario() {
               <table className="tabla stock-tabla" data-testid="tabla-stock">
                 <thead>
                   <tr>
-                    <th><span className="solo-lectores">Foto</span></th>{cabeza("producto", "Producto")}<th>Proveedor</th>{cabeza("stock", "Stock", true)}{cabeza("ultimo", "Último movimiento")}<th><span className="solo-lectores">Corregir</span></th>
+                    <th><span className="solo-lectores">Foto</span></th>{cabeza("producto", "Producto")}<th>Proveedor</th>{cabeza("stock", "Stock", true)}{veInvertido && <th className="num">Valor</th>}{cabeza("ultimo", "Último movimiento")}<th><span className="solo-lectores">Corregir</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -185,6 +192,7 @@ export function Inventario() {
                           </button>
                           {porEnviar.has(p.id) && <div><Pastilla tipo="alerta">Se manda al volver internet</Pastilla></div>}
                         </td>
+                        {veInvertido && <td className="num" data-testid="valor-stock"><span className="importe chico">{valorDe(fila)}</span></td>}
                         <td>{fila?.ultimo_movimiento ? fecha(fila.ultimo_movimiento) : <span className="detalle">sin movimientos</span>}</td>
                         <td className="angosta">{corrige && <Boton tam="chico" icono="editar" onClick={() => setAbierto({ id: p.id, corregir: true })} aria-label={`Corregir el stock de ${p.descripcion}`}>Corregir</Boton>}</td>
                       </tr>
@@ -314,4 +322,16 @@ function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnv
       </section>
     </Hoja>
   );
+}
+
+// El valor de un producto en el depósito (stock × costo vigente); sin costo o sin stock, «—».
+const pesosEnteros = (n: number) => pesos(Math.round(n)).replace(/,00$/, "");
+function valorDe(fila: StockFila | null): string {
+  const valor = Number(fila?.valor ?? 0);
+  return fila?.costo_neto == null || valor <= 0 ? "—" : pesosEnteros(valor);
+}
+function pasosDelInvertido(porProveedor: Record<string, { valor: number; productos: number }>, total: number): string[] {
+  const pasos = Object.entries(porProveedor).filter(([, v]) => v.valor > 0).sort((a, b) => b[1].valor - a[1].valor)
+    .map(([nombre, v]) => `${nombre}, ${plural(v.productos, "producto", "productos")}: ${pesosEnteros(v.valor)}`);
+  return [...(pasos.length ? pasos : ["Ningún producto con stock tiene costo cargado"]), `Dinero invertido: ${pesosEnteros(total)}`];
 }

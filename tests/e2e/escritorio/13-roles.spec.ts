@@ -76,6 +76,9 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
   // En Depósito solo queda mirar el inventario: ni ingresar mercadería ni contar ni corregir.
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.deposito);
   await expect(page.getByText("Inventario").first()).toBeVisible();
+  // 012-E09: sin «Ver el dinero invertido», ni el total ni el valor de cada producto.
+  await expect(page.getByTestId("dinero-invertido-stock")).toHaveCount(0);
+  await expect(page.getByTestId("valor-stock")).toHaveCount(0);
   await expect(CELULAR ? page.getByRole("tab", { name: "Ingreso" }) : page.getByTestId("pestana-compras")).toHaveCount(0);
   await expect(CELULAR ? page.getByRole("tab", { name: "Estanterías" }) : page.getByTestId("pestana-contar")).toHaveCount(0);
 

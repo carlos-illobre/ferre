@@ -37,15 +37,15 @@ test.beforeAll(() => {
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/stock");
-  // La pantalla se llama Inventario y muestra cantidades, sin ninguna suma de dinero (decisión 31).
+  // Inventario muestra las cantidades y, con «Ver el dinero invertido», el dinero (decisión 90).
   await expect(page.getByRole("button", { name: /^Inventario/ })).toBeVisible();
-  await expect(page.getByTestId("plata-invertida")).toHaveCount(0);
-  await expect(page.getByTestId("por-proveedor")).toHaveCount(0);
 
   await page.getByTestId("busqueda").fill("e2e candado stock");
   const fila = page.getByTestId("fila-stock").filter({ hasText: "CANDADO STOCK 40 MM" });
   await expect(fila.getByTestId("stock")).toContainText("17");
-  await expect(fila).not.toContainText("$");
+  // 012-E10: quien prueba tiene el rol Gerente: ve el valor del producto (17 × $2.500) y el total.
+  await expect(fila.getByTestId("valor-stock")).toContainText("$42.500");
+  await expect(page.getByTestId("dinero-invertido-stock")).toBeVisible();
 
   // La explicación del número: sus movimientos.
   await fila.getByTestId("stock").click();

@@ -37,13 +37,14 @@ test.beforeAll(() => {
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/deposito/stock");
-  // Inventario muestra cantidades y ninguna suma de dinero (decisión 31).
-  await expect(page.getByTestId("valorizacion")).toHaveCount(0);
+  // Inventario muestra las cantidades y, con «Ver el dinero invertido», el dinero (decisión 90).
 
   await page.getByTestId("busqueda").fill("e2e candado stock");
   const fila = page.getByTestId("fila-stock").filter({ hasText: "CANDADO STOCK 40 MM" });
   await expect(fila.getByTestId("stock")).toContainText("17");
-  await expect(fila).not.toContainText("$");
+  // 012-E10: quien prueba tiene el rol Gerente: ve el valor del producto (17 × $2.500) y el total.
+  await expect(fila.getByTestId("valor-stock")).toContainText("$42.500");
+  await expect(page.getByTestId("dinero-invertido-stock")).toBeVisible();
 
   // La explicación del número: sus movimientos.
   await fila.getByTestId("stock").click();
@@ -59,7 +60,6 @@ test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) =>
   await page.getByPlaceholder(/Motivo/).fill("conté la estantería");
   await page.getByTestId("guardar-ajuste").click();
   await expect(fila.getByTestId("stock")).toContainText("15");
-  await expect(fila).not.toContainText("$");
   await expect(movimientos).toContainText("Conteo");
   await expect(movimientos).toContainText("había 17, hay 15: conté la estantería");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("15.000");

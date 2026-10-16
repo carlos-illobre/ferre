@@ -1179,12 +1179,15 @@ RF-98:
   defectos: []
 
 RF-99:
-  estado: "Hecho en parte (012-T004): el servidor manda el valor del stock solo con «Ver el dinero invertido»; falta decidir si Depósito → Inventario lo muestra"
+  estado: "Hecho (012-T004, 012-T012): el servidor manda el valor del stock solo con «Ver el dinero invertido», y Depósito → Inventario lo muestra (total y por producto) a quien lo tiene"
   pruebas:
     - microservices/api/src/rutas/secciones-de-negocio.test.ts
     - microservices/api/src/rutas/roles.test.ts
-  defectos:
-    - "Depósito → Inventario no muestra el valor en pesos a nadie (decisión 31): falta que Carlos decida si se muestra con «Ver el dinero invertido» #012-T011"
+    - tests/e2e/escritorio/06-stock.spec.ts
+    - tests/e2e/celular/06-stock.spec.ts
+    - tests/e2e/escritorio/13-roles.spec.ts
+    - tests/e2e/celular/13-roles.spec.ts
+  defectos: []
 
 RNF-61:
   estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"

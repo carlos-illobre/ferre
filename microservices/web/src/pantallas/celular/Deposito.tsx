@@ -49,11 +49,12 @@ export function Deposito({ sub }: { sub: string | null }) {
 }
 
 // ---------- Stock ----------
-// Inventario: cuánto hay de cada producto, explicado con sus movimientos. Sin sumas de
-// dinero: el dinero invertido está en Cómo va el negocio (decisión 31).
+// Inventario: cuánto hay de cada producto, explicado con sus movimientos. El dinero invertido,
+// en total y por producto, solo con «Ver el dinero invertido» (decisión 90).
 function Stock() {
   const { catalogo, buscarProductos, actualizarProducto } = useCatalogo();
-  const { porId, error: fallo } = useStock();
+  const { datos, porId, error: fallo } = useStock();
+  const veInvertido = usePuede()("negocio.invertido");
   // El aviso se puede cerrar; vuelve si el próximo pedido falla de nuevo.
   const [cerrado, setCerrado] = useState<unknown>(null);
   const error = !fallo || fallo === cerrado ? null : fallo instanceof ErrorApi ? fallo.message : "Sin conexión con el servidor.";
@@ -78,8 +79,14 @@ function Stock() {
       <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
       {escaneando && <Escaner alDetectar={(codigo) => { setEscaneando(false); setConsulta(codigo); setAbierto(null); }} alCerrar={() => setEscaneando(false)} />}
       <p className="subtitulo">El stock es la suma de compras, ventas y ajustes desde que se usa el sistema. Hasta el conteo, lo que no se cargó no está.</p>
+      {veInvertido && datos && (
+        <div className="tarjeta dinero-invertido-stock" data-testid="dinero-invertido-stock">
+          <small>Dinero invertido</small>
+          <strong className="importe">{pesosEnteros(datos.valor_total)}</strong>
+        </div>
+      )}
       <Lista data-testid="tabla-stock">
-        {filas.map((p) => <FilaStock key={p.id} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={setMensaje} />)}
+        {filas.map((p) => <FilaStock key={p.id} veInvertido={veInvertido} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={setMensaje} />)}
       </Lista>
       {consulta.trim() && filas.length === 0 && catalogo && <div className="aviso-suave">Nada con "{consulta}".</div>}
       </div>
@@ -88,7 +95,7 @@ function Stock() {
   );
 }
 
-function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: { alFoto: (foto_url: string) => void; producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => void }) {
+function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto, veInvertido }: { veInvertido: boolean; alFoto: (foto_url: string) => void; producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => void }) {
   const corrige = usePuede()("deposito.stock");
   const cantidad = fila ? Number(fila.stock) : 0;
   const { movimientos: traidos, error: sinMovimientos } = useMovimientos(p.id, abierto);
@@ -123,6 +130,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto }: {
         <span className="nombre">{p.descripcion}</span>
         <span className="derecha">
           <strong className="importe" style={{ fontSize: 24, color: cantidad < 0 ? "var(--coral-texto)" : undefined }}>{num(cantidad)} {unidad}</strong>
+          {veInvertido && <small className="valor-stock" data-testid="valor-stock">{fila?.costo_neto == null || Number(fila.valor) <= 0 ? "—" : pesosEnteros(Number(fila.valor))}</small>}
         </span>
         <span className="detalle">{detalleDe(p)}{fila?.ultimo_movimiento ? ` · último ${fecha(fila.ultimo_movimiento.slice(0, 10))}` : ""}</span>
       </button>
@@ -489,3 +497,5 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     </>
   );
 }
+
+const pesosEnteros = (n: number) => pesos(Math.round(n)).replace(/,00$/, "");

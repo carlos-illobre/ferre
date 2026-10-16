@@ -477,3 +477,9 @@ tr.cambia td { background: #fff8e8; }
 .medio-de-pago { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 16px; }
 .medio-de-pago .medio-barra { display: block; grid-column: 1 / -1; height: 7px; border-radius: 9px; background: var(--p-relleno); overflow: hidden; }
 .medio-de-pago .medio-barra i { display: block; height: 100%; margin: 0; background: var(--p-verde-texto); border-radius: 9px; }
+
+/* Depósito → Inventario con «Ver el dinero invertido» (decisión 90): el total y el valor de cada producto. */
+.dinero-invertido-stock { flex-direction: row; justify-content: space-between; align-items: baseline; }
+.dinero-invertido-stock small { font-size: 15px; color: var(--p-texto-2); }
+.dinero-invertido-stock strong { font-size: 24px; }
+.valor-stock { display: block; text-align: right; font-size: 15px; color: var(--p-texto-2); }
