@@ -1,0 +1,85 @@
+/* El manual de uso (RF-97): copia la maqueta aprobada, specs/012-manual-de-uso/maquetas/manual-entrar.html. */
+
+/* Los colores son los de la paleta de la aplicación (paleta.css, decisión 47). */
+.manual{--verde:var(--p-verde);--verde-2:var(--p-verde-2);--menta:var(--p-verde-suave);--naranja:var(--p-naranja);--naranja-suave:var(--p-naranja-suave);--tinta:var(--p-tinta);--texto-2:var(--p-texto-2);--borde:var(--p-borde-suave);--papel:var(--p-superficie);--fondo:var(--p-fondo-2);--amarillo:var(--p-amarillo-suave);--amarillo-borde:var(--p-amarillo-borde);--gris:var(--p-borde-fuerte)}
+.manual{min-height:100vh;background:var(--fondo);color:var(--tinta);font:17px/1.6 var(--fuente, Manrope, system-ui, sans-serif)}
+.manual *{box-sizing:border-box}
+/* Barra de arriba */
+.manual-barra{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:18px;height:64px;padding:0 28px;background:var(--verde);color:#fff;box-shadow:0 2px 10px rgb(0 0 0 / .15)}
+.manual-barra img{height:30px;filter:brightness(0) invert(1)}
+.manual-titulo{font-weight:700;opacity:.9;border-left:1px solid rgb(255 255 255 / .25);padding-left:18px}
+/* Índice y hoja */
+.manual-marco{display:grid;grid-template-columns:260px minmax(0,880px);gap:36px;justify-content:center;padding:36px 28px 80px}
+.manual-indice{position:sticky;top:96px;align-self:start;font-size:15px}
+.manual-indice h2{font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--texto-2);margin:0 0 12px}
+.manual-indice ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.manual-indice ul{list-style:none;margin:4px 0 8px 40px;padding:0;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.manual-hoja{background:var(--papel);border-radius:18px;box-shadow:0 1px 0 var(--borde),0 18px 50px rgb(23 49 43 / .08);padding:52px 64px 64px}
+/* Encabezado del capítulo */
+.manual-capitulo{font-size:14px;letter-spacing:.22em;text-transform:uppercase;color:var(--naranja);font-weight:800;margin:0}
+.manual-hoja h1{font-size:44px;line-height:1.1;margin:8px 0 14px;letter-spacing:-.02em}
+.manual-entrada{font-size:20px;color:var(--texto-2);margin:0 0 28px;max-width:62ch}
+.manual-resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 36px}
+.manual-resumen div{background:var(--fondo);border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.45}
+.manual-resumen strong{display:block;font-size:16px;margin-bottom:2px}
+.manual-hoja h2{font-size:28px;margin:52px 0 10px;letter-spacing:-.01em;scroll-margin-top:90px}
+.manual-hoja h3{font-size:20px;margin:30px 0 8px}
+.manual-hoja p{margin:0 0 14px;max-width:68ch}
+/* Recuadros */
+.manual-nota{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:16px 20px;border-radius:14px;margin:18px 0 24px;font-size:16px;line-height:1.5}
+.manual-nota svg{width:26px;height:26px}
+.manual-nota.importante{background:var(--amarillo);box-shadow:inset 0 0 0 1px var(--amarillo-borde)}
+.manual-nota.consejo{background:var(--p-verde-suave);box-shadow:inset 0 0 0 1px var(--p-borde)}
+.manual-nota p{margin:0}
+/* El clip */
+.manual-clip{margin:22px 0 34px;border-radius:18px;overflow:hidden;background:var(--verde);box-shadow:0 14px 40px rgb(23 49 43 / .22)}
+.manual-clip video{display:block;width:100%;height:auto;background:#0b342c}
+.manual-clip figcaption{display:flex;align-items:center;gap:12px;padding:14px 20px;color:var(--p-relleno);font-size:15px}
+.manual-clip figcaption b{color:#fff}
+.manual-clip figcaption span{margin-left:auto;font-weight:700;color:var(--menta)}
+/* Los pasos */
+.manual-paso{display:grid;grid-template-columns:52px 1fr;gap:20px;margin:28px 0 8px}
+.manual-paso .manual-numero{width:52px;height:52px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:24px;display:grid;place-items:center;box-shadow:0 6px 14px rgb(217 64 15 / .3)}
+.manual-paso h3{margin:10px 0 6px}
+.manual-figura{margin:18px 0 6px}
+.manual-figura .manual-imagen{position:relative;display:inline-block;max-width:100%;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--borde),0 10px 30px rgb(23 49 43 / .12)}
+.manual-figura img{display:block;max-width:100%;height:auto}
+.manual-figura figcaption{font-size:14px;color:var(--texto-2);margin-top:10px}
+.manual-figura figcaption b{color:var(--tinta)}
+.manual-lado{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:32px;align-items:start}
+.manual-lado .manual-figura{margin-top:4px}
+.manual-imagen.celular{width:230px;border-radius:30px!important;box-shadow:0 0 0 8px #1c1f1e,0 18px 36px rgb(0 0 0 / .25)!important}
+.manual-par{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:28px;align-items:end}
+/* Marcas numeradas sobre las capturas */
+.manual-marca{position:absolute;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:16px;display:grid;place-items:center;box-shadow:0 0 0 3px #fff,0 4px 10px rgb(0 0 0 / .3)}
+.manual-leyenda{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px;font-size:15px}
+.manual-leyenda li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.manual-leyenda li span{width:24px;height:24px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;margin-top:2px}
+/* Tabla de problemas */
+.manual-problemas{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:16px}
+.manual-problemas th{text-align:left;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-2);padding:10px 14px;border-bottom:2px solid var(--borde)}
+.manual-problemas td{padding:14px;border-bottom:1px solid var(--borde);vertical-align:top;line-height:1.5}
+.manual-problemas td:first-child{font-weight:700;width:34%}
+.manual-boton-ui{font-weight:700;color:var(--naranja);white-space:nowrap}
+.manual-pie{display:flex;justify-content:space-between;margin-top:56px;padding-top:22px;border-top:1px solid var(--borde);font-size:15px}
+@media (max-width:1100px){.manual-lado,.manual-par{grid-template-columns:1fr}.manual-marco{grid-template-columns:1fr}.manual-indice{position:static}.manual-hoja{padding:32px 24px}.manual-resumen{grid-template-columns:1fr}}
+
+/* Lo que en la maqueta eran enlaces, acá son botones (el «#» es la dirección de la pantalla). */
+.manual button{font:inherit;cursor:pointer}
+.manual .manual-volver{margin-left:auto;background:none;border:0;color:#fff;font-weight:600;font-size:15px;opacity:.85;padding:8px 0}
+.manual-volver:hover{opacity:1}
+.manual-indice li > button,.manual-indice li > span{display:flex;gap:10px;width:100%;padding:8px 12px;border:0;border-radius:10px;background:none;color:var(--tinta);text-align:left}
+.manual-indice li > button b,.manual-indice li > span b{color:var(--texto-2);font-weight:700;min-width:18px}
+.manual-indice li.actual > button{background:var(--papel);box-shadow:0 0 0 1px var(--borde);font-weight:700}
+.manual-indice li.actual > button b{color:var(--naranja)}
+.manual-indice li.pronto > span{color:var(--gris)}
+.manual-indice li.pronto em{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;color:var(--gris);border:1px solid var(--p-borde);border-radius:999px;padding:0 8px;line-height:20px;align-self:center}
+.manual .manual-indice ul button{background:none;border:0;padding:4px 0;color:var(--texto-2)}
+.manual-indice ul button:hover{color:var(--tinta)}
+.manual-pie span{color:var(--gris)}
+.manual :focus-visible{outline:3px solid var(--naranja);outline-offset:2px}
+.manual-paso > div:last-child{min-width:0}
+.manual-nota svg{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.manual-nota.importante svg{stroke:var(--p-amarillo-texto)}
+.manual-nota.consejo svg{stroke:var(--p-verde-texto)}
+.manual-indice h2{margin:0 0 12px}

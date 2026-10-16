@@ -86,4 +86,10 @@ describe("el celular deja entrar a la computadora", () => {
     expect(destinoDelCodigo("7790250000358")).toBeNull();
     expect(destinoDelCodigo("https://otro-sitio.test/#/mas/usuarios")).toBeNull();
   });
+
+  it("012-E07: la entrada del celular no tiene «Ver tutorial»: el manual es solo de la computadora", () => {
+    render(<Entrar />);
+    expect(screen.queryByTestId("ver-tutorial")).toBeNull();
+    expect(screen.queryByText("Ver tutorial")).toBeNull();
+  });
 });

@@ -14,6 +14,7 @@ import "../estilos/entrar-con-celular.css";
 import fondoDeLaEntrada from "../imagenes/entrar-fondo.jpg";
 import celularVendiendo from "../imagenes/entrar-celular.png";
 import { entrarConGoogle } from "../../../../negocio/vinculo";
+import { irA } from "../rutas";
 import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -166,7 +167,6 @@ export const TEXTOS_DE_ENTRADA = {
   rapido: "Es rápido, seguro y sin contraseñas.",
   protegidos: "Tus datos están protegidos",
   tutorial: "Ver tutorial",
-  tutorialPronto: "Muy pronto: el manual de uso, con capturas, textos y videos",
   sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
 };
 
@@ -295,8 +295,8 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
           <ul className="entrar-cc-puntos">
             {QUE_HACE.map((q) => { const [a, b] = partirEnDos(q.texto); return <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span><span className="texto">{a}<br />{b}</span></li>; })}
           </ul>
-          {/* El manual de usuario se arma más adelante: por ahora el botón no lleva a ningún lado. */}
-        <button type="button" className="entrar-cc-tutorial" title={TEXTOS_DE_ENTRADA.tutorialPronto} data-testid="ver-tutorial"><Icono nombre="reproducir" tam={22} />{TEXTOS_DE_ENTRADA.tutorial}</button>
+          {/* Abre el manual de uso, en la misma pestaña (RF-97). */}
+        <button type="button" className="entrar-cc-tutorial" onClick={() => irA("manual")} data-testid="ver-tutorial"><Icono nombre="reproducir" tam={22} />{TEXTOS_DE_ENTRADA.tutorial}</button>
         </section>
         <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
         <section className="entrar-cc-tarjeta">

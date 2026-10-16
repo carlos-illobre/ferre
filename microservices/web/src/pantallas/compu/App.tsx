@@ -22,6 +22,7 @@ import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { ConRutas, irA, useRuta } from "./base/rutas";
 import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } from "./base/ui";
 import { Entrar } from "./base/pantallas/Entrar";
+import { Manual } from "./base/pantallas/Manual";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
 import { VentasDeHoy } from "./base/pantallas/VentasDeHoy";
 import { Productos } from "./base/pantallas/Productos";
@@ -232,6 +233,8 @@ function Pantallas() {
 
   if (sesion.estado === "cargando") return <main className="entrar-cargando" aria-busy="true"><Marca tam={44} /><p>Abriendo Ferrebress…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
+  // El manual de uso se ve sin sesión: lo abre «Ver tutorial» en la entrada (RF-97).
+  if (ruta.nombre === "manual") return <Manual />;
   if (sesion.estado === "sin-sesion") return <Entrar />;
   // El celular llega acá al leer el código QR de la computadora: con la sesión ya iniciada, saca la foto que
   // pidió la computadora.

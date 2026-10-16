@@ -64,3 +64,18 @@ de dispositivo que empiece con `con-celular` y recarga:
 python tests/capturas/capturar.py vender --compu \
   --py "page.evaluate('''() => localStorage.setItem('ferre.dispositivo', 'con-celular-1')''')" --py "page.reload()"
 ```
+
+## El manual de uso
+
+`tutorial/<capítulo>.py` arma las capturas y el clip de un capítulo del manual
+(`specs/012-manual-de-uso/`) con la API de mentira y el cliente de acá, al ritmo de una persona,
+con el puntero y los toques a la vista. Los deja en `microservices/web/public/manual/<capítulo>/`.
+Se vuelve a correr cuando cambia alguna de esas pantallas:
+
+```bash
+tests/capturas/levantar.sh
+uv run --with playwright==1.56.0 python tests/capturas/tutorial/entrar.py
+```
+
+Va siempre contra la API de mentira (datos inventados): nunca contra un ambiente con datos reales.
+Las pruebas de punta a punta no graban video ni usan estos recorridos (ADR-004).

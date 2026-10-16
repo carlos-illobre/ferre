@@ -1160,6 +1160,17 @@ RF-96:
     - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
   defectos: []
 
+RF-97:
+  estado: "Hecho en parte (012-T002 a 012-T007): el manual con el capítulo «Entrar»; los otros ocho dicen «pronto»"
+  pruebas:
+    - microservices/web/src/pantallas/compu/base/pantallas/Manual.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Manual.config.test.ts
+    - microservices/web/src/pantallas/compu/base/pantallas/Entrar.test.tsx
+    - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
+    - tests/e2e/escritorio/01-login.spec.ts
+  defectos:
+    - "Sin escribir: los capítulos Catálogo, Vender y las secciones de Más"
+
 RNF-61:
   estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"
   pruebas:

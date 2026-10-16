@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { ConRutas } from "../rutas";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../../../api", async (original) => ({ ...(await original<typeof import("../../../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
@@ -48,5 +49,11 @@ describe("la entrada de la computadora", () => {
     expect(screen.getByText(TEXTOS_DE_ENTRADA.protegidos)).toBeTruthy();
     // Sin «¿Necesitás ayuda?»: Carlos lo sacó.
     expect(entrada.textContent).not.toContain("Necesitás ayuda");
+  });
+
+  it("012-E01: «Ver tutorial» abre el manual en la misma pestaña", async () => {
+    render(<ConRutas><Entrar /></ConRutas>);
+    fireEvent.click(screen.getByTestId("ver-tutorial"));
+    await waitFor(() => expect(location.hash).toBe("#/manual"));
   });
 });

@@ -38,6 +38,23 @@ test("sin sesión se pide entrar", async ({ page }) => {
   await expect(page.getByText(/No hay contraseñas/)).toBeVisible();
 });
 
+test("012-E01 012-E04 012-E05 «Ver tutorial» abre el manual en la misma pestaña y se vuelve a la entrada", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("ver-tutorial").click();
+  await expect(page).toHaveURL(/#\/manual$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Entrar a Ferrebress" })).toBeVisible();
+  // El clip se puede ver: el archivo existe y está quieto.
+  const clip = page.getByTestId("manual-clip");
+  await expect.poll(() => clip.evaluate((v: HTMLVideoElement) => v.readyState)).toBeGreaterThan(0);
+  expect(await clip.evaluate((v: HTMLVideoElement) => v.paused && v.muted)).toBe(true);
+  // Con el botón de volver del navegador, y con «Volver a Ferrebress».
+  await page.goBack();
+  await expect(page.getByTestId("qr-entrar")).toBeVisible();
+  await page.goForward();
+  await page.getByTestId("manual-volver").click();
+  await expect(page.getByTestId("qr-entrar")).toBeVisible();
+});
+
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");

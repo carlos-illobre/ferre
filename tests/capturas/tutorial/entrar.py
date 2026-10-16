@@ -3,7 +3,8 @@ mentira y el cliente de tests/capturas (tests/capturas/levantar.sh).
 
     uv run --with playwright==1.56.0 python tests/capturas/tutorial/entrar.py [carpeta]
 
-Deja en la carpeta (por defecto specs/012-manual-de-uso/maquetas/entrar/):
+Deja en la carpeta (por defecto microservices/web/public/manual/entrar/, de donde las toma la
+pantalla del manual; las de la maqueta están en specs/012-manual-de-uso/maquetas/entrar/):
 - clip.mp4: la computadora y el celular uno al lado del otro. La computadora muestra su código, el
   celular lo lee y deja entrar, y la computadora entra sola.
 - las capturas que usa el manual (computadora y celular).
@@ -13,6 +14,7 @@ donde se toca en el celular. Se vuelve a correr cuando cambia alguna de estas pa
 """
 import json
 import os
+import time
 import shutil
 import subprocess
 import sys
@@ -25,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from capturar import GOOGLE  # noqa: E402  el botón de Google de mentira
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-SALIDA = sys.argv[1] if len(sys.argv) > 1 else os.path.join(RAIZ, "specs/012-manual-de-uso/maquetas/entrar")
+SALIDA = sys.argv[1] if len(sys.argv) > 1 else os.path.join(RAIZ, "microservices/web/public/manual/entrar")
 BASE = os.environ.get("BASE", "http://localhost:5199/")
 API = os.environ.get("API", "http://localhost:8799")
 COMPU = {"width": 1366, "height": 768}
@@ -75,6 +77,7 @@ def main():
     mentira("/mentira/permisos", {"permisos": []})
     with sync_playwright() as pw:
         nav = pw.chromium.launch(executable_path=os.environ.get("CHROMIUM") or None)
+        inicio = time.monotonic()
         compu = nav.new_context(locale="es-AR", viewport=COMPU, record_video_dir=videos + "/compu", record_video_size=COMPU)
         celu = nav.new_context(locale="es-AR", viewport=CELU, is_mobile=True, has_touch=True, user_agent=UA_CELU,
                                record_video_dir=videos + "/celu", record_video_size=CELU)
@@ -88,6 +91,8 @@ def main():
             p.add_style_tag(content=SIN_MARCO)
         pc.wait_for_selector("[data-testid=qr-entrar] img")
         pm.wait_for_timeout(1200)
+        # Lo que tardaron en cargar las dos pantallas no va en el clip.
+        listo = time.monotonic() - inicio
         pc.mouse.move(683, 384)
 
         # 1. La computadora muestra su código.
@@ -136,11 +141,11 @@ def main():
         nav.close()
 
     # El clip: la computadora a la izquierda y el celular a la derecha, sobre el verde de la marca.
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", video_compu, "-i", video_celu, "-filter_complex",
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{listo:.2f}", "-i", video_compu, "-ss", f"{listo:.2f}", "-i", video_celu, "-filter_complex",
                     "[0:v]scale=1280:720,setsar=1[c];[1:v]scale=333:720,setsar=1[m];"
                     "color=c=0x0b342c:s=1704x800:r=25[f];[f][c]overlay=30:40:shortest=1[a];[a][m]overlay=1341:40:shortest=1,format=yuv420p",
                     "-c:v", "libx264", "-crf", "28", "-preset", "slow", "-movflags", "+faststart", f"{SALIDA}/clip.mp4"], check=True)
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", "1.5", "-i", f"{SALIDA}/clip.mp4", "-frames:v", "1", f"{SALIDA}/clip-portada.jpg"], check=True)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", "1", "-i", f"{SALIDA}/clip.mp4", "-frames:v", "1", f"{SALIDA}/clip-portada.jpg"], check=True)
     shutil.rmtree(videos, ignore_errors=True)
     print("listo:", SALIDA, sorted(os.listdir(SALIDA)))
 

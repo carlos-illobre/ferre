@@ -704,8 +704,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       están protegidos» (solo texto) y el logotipo.
     - Solo en la computadora: la entrada del celular no cambia. Sin «¿Necesitás ayuda?», que
       Carlos sacó.
-    - El 2026-10-16 la frase manuscrita se reemplazó por el botón «Ver tutorial», que va a abrir
-      el manual de usuario (capturas, texto y videos); por ahora no lleva a ningún lado.
+    - El 2026-10-16 la frase manuscrita se reemplazó por el botón «Ver tutorial», que abre el
+      manual de uso (decisión 94).
 
 94. **El manual de uso** (2026-10-16). Lo abre «Ver tutorial», solo desde la entrada de la
     computadora y en la misma pestaña. Un capítulo por pantalla principal: Entrar, Catálogo,
