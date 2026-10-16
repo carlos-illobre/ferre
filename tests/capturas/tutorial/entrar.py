@@ -71,6 +71,21 @@ def mover(page, selector, pasos=28):
     page.mouse.move(caja["x"] + caja["width"] / 2, caja["y"] + caja["height"] / 2, steps=pasos)
 
 
+# Dónde van las marcas numeradas de cada captura, en porcentaje de la imagen: el manual las pone
+# encima (Manual.tsx). Se imprimen al final; si una pantalla cambió, se copian de ahí.
+MARCAS = {}
+
+
+def marcar(page, captura, localizador, contenedor=None):
+    """Se llama justo antes de la captura, con la pantalla quieta. Con contenedor, la posición es
+    dentro de él (la captura recortada a ese elemento)."""
+    caja = localizador.first.bounding_box()
+    base = contenedor.bounding_box() if contenedor else {"x": 0, "y": 0, **page.viewport_size}
+    MARCAS.setdefault(captura, []).append({k: round(v, 1) for k, v in {
+        "x": (caja["x"] - base["x"]) / base["width"] * 100, "y": (caja["y"] - base["y"]) / base["height"] * 100,
+        "ancho": caja["width"] / base["width"] * 100, "alto": caja["height"] / base["height"] * 100}.items()})
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     videos = tempfile.mkdtemp()
@@ -107,6 +122,8 @@ def main():
         pm.add_style_tag(content=SIN_MARCO)
         pm.wait_for_selector("[data-testid=dejar-entrar]")
         pm.wait_for_timeout(2800)
+        marcar(pm, "celu-dejar-entrar", pm.get_by_test_id("dejar-entrar"))
+        marcar(pm, "celu-dejar-entrar", pm.get_by_role("button", name="Ahora no"))
         pm.screenshot(path=f"{SALIDA}/celu-dejar-entrar.png")
 
         # 3. Se toca «Entrar en la computadora»: la computadora entra sola.
@@ -117,6 +134,8 @@ def main():
         pc.add_style_tag(content=SIN_MARCO)
         pc.mouse.move(683, 300, steps=10)
         pc.wait_for_timeout(3600)
+        marcar(pc, "compu-adentro", pc.get_by_role("button", name="Salir").locator(".."))
+        marcar(pm, "celu-despues", pm.get_by_text("Listo: la computadora entró"))
         pc.screenshot(path=f"{SALIDA}/compu-adentro.png")
         pm.screenshot(path=f"{SALIDA}/celu-despues.png")
         pm.wait_for_timeout(400)
@@ -127,6 +146,7 @@ def main():
         # Las capturas sueltas: la entrada del celular y lo que pasa si el correo no está autorizado.
         suelta = nav.new_context(locale="es-AR", viewport=CELU, is_mobile=True, has_touch=True, user_agent=UA_CELU, device_scale_factor=2)
         p = suelta.new_page(); p.goto(BASE); p.add_style_tag(content=SIN_MARCO); p.wait_for_timeout(1200)
+        marcar(p, "celu-entrada", p.get_by_test_id("escanear-codigo-de-la-compu"))
         p.screenshot(path=f"{SALIDA}/celu-entrada.png")
         suelta.close()
         error = nav.new_context(locale="es-AR", viewport=COMPU)
@@ -135,8 +155,9 @@ def main():
         p.evaluate("() => window.__google && window.__google.callback({ credential: 'no' })")
         p.wait_for_timeout(800)
         p.locator("[data-testid=error-google]").scroll_into_view_if_needed()
-        tarjeta = p.locator(".entrar-cc-tarjeta").bounding_box()
-        p.screenshot(path=f"{SALIDA}/compu-no-autorizado.png", clip=tarjeta)
+        p.wait_for_timeout(600)
+        marcar(p, "compu-no-autorizado", p.get_by_test_id("error-google"), p.locator(".entrar-cc-tarjeta"))
+        p.locator(".entrar-cc-tarjeta").screenshot(path=f"{SALIDA}/compu-no-autorizado.png")
         error.close()
         nav.close()
 
@@ -148,6 +169,7 @@ def main():
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", "1", "-i", f"{SALIDA}/clip.mp4", "-frames:v", "1", f"{SALIDA}/clip-portada.jpg"], check=True)
     shutil.rmtree(videos, ignore_errors=True)
     print("listo:", SALIDA, sorted(os.listdir(SALIDA)))
+    print("marcas:", json.dumps(MARCAS, indent=1))
 
 
 if __name__ == "__main__":

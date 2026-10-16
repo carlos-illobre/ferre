@@ -52,6 +52,11 @@
 .manual-par{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:28px;align-items:end}
 /* Marcas numeradas sobre las capturas */
 .manual-marca{position:absolute;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:16px;display:grid;place-items:center;box-shadow:0 0 0 3px #fff,0 4px 10px rgb(0 0 0 / .3)}
+.manual-recuadro{position:absolute;outline:3px solid var(--naranja);outline-offset:3px;border-radius:10px;box-shadow:0 0 0 2px #fff}
+.manual-recuadro .manual-marca{left:100%;top:50%}
+.manual-recuadro.fuera .manual-marca{left:calc(100% + 24px)}
+.manual-par .manual-marca,.manual-imagen.celular .manual-marca{width:26px;height:26px;margin:-13px 0 0 -13px;font-size:14px}
+.manual-clip.chico{max-width:760px;margin-top:0}
 .manual-leyenda{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px;font-size:15px}
 .manual-leyenda li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
 .manual-leyenda li span{width:24px;height:24px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;margin-top:2px}

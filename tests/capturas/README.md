@@ -58,7 +58,10 @@ La computadora y el celular no usan las mismas direcciones:
 
 Por omisión no hay celular vinculado. Para ver una pantalla de la computadora con su celular
 vinculado (por ejemplo, «Escanear con el celular» en Vender), la captura guarda un identificador
-de dispositivo que empiece con `con-celular` y recarga:
+de dispositivo que empiece con `con-celular` y recarga. Del otro lado, un celular con un
+identificador que empiece con `celular-vinculado` y un token que empiece con `celular` queda
+vinculado a esa computadora, y la API de mentira pasa el espejo entre los dos
+(`api-de-mentira/rutas-w-espejo.mjs`; `PUT /mentira/espejo` lo vuelve a empezar):
 
 ```bash
 python tests/capturas/capturar.py vender --compu \
@@ -75,7 +78,11 @@ Se vuelve a correr cuando cambia alguna de esas pantallas:
 ```bash
 tests/capturas/levantar.sh
 uv run --with playwright==1.56.0 python tests/capturas/tutorial/entrar.py
+uv run --with playwright==1.56.0 python tests/capturas/tutorial/espejo.py   # el clip de «quedan vinculados»
 ```
+
+`entrar.py` imprime al final dónde van las marcas numeradas de cada captura (en porcentaje); si
+una pantalla cambió, se copian a `Manual.tsx`.
 
 Va siempre contra la API de mentira (datos inventados): nunca contra un ambiente con datos reales.
 Las pruebas de punta a punta no graban video ni usan estos recorridos (ADR-004).

@@ -12,3 +12,5 @@ maqueta del capítulo «Entrar» el 2026-10-16.
 - [x] T005 Comparar con la maqueta aprobada mediante capturas y mostrarle a Carlos las diferencias (solo computadora: el manual no está en el celular) (depende de T003)
 - [x] T006 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T004)
 - [x] T007 Actualizar `proyecto/estado.yml` y la documentación que quedó atrás (depende de T006)
+- [x] T008 [ajuste] En «De paso, quedan vinculados», un clip que muestra cómo, al navegar por el celular, la computadora va cambiando de pantalla sola (pedido de Carlos del 2026-10-16)
+- [x] T009 [ajuste] Marcas numeradas en todas las capturas del capítulo, con un recuadro en el botón que se toca, como en la primera (pedido de Carlos del 2026-10-16)

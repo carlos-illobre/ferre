@@ -92,14 +92,21 @@ function Paso({ numero, titulo, children, celular }: { numero: number; titulo: s
   );
 }
 
-function Figura({ src, alt, numero, pie, celular, ancho, children, leyenda }: { src: string; alt: string; numero: string; pie: string; celular?: boolean; ancho?: number; children?: ReactNode; leyenda?: ReactNode }) {
+// Una marca numerada sobre una captura, en porcentaje de la imagen: un punto o, con ancho y alto,
+// un recuadro alrededor del botón que se toca, con el número en su borde derecho (o, si adentro no
+// hay lugar, `fuera`, al lado). Las posiciones las imprime tests/capturas/tutorial/entrar.py.
+type Marca = { x: number; y: number; ancho?: number; alto?: number; fuera?: boolean; texto: string };
+
+function Figura({ src, alt, numero, pie, celular, ancho, marcas }: { src: string; alt: string; numero: string; pie: string; celular?: boolean; ancho?: number; marcas?: Marca[] }) {
   return (
     <figure className="manual-figura">
       <div className={`manual-imagen ${celular ? "celular" : ""}`} style={ancho ? { width: ancho } : undefined}>
         <img src={ARCHIVOS + src} alt={alt} loading="lazy" />
-        {children}
+        {marcas?.map((m, i) => m.ancho !== undefined && m.alto !== undefined
+          ? <span key={i} className={`manual-recuadro${m.fuera ? " fuera" : ""}`} style={{ left: `${m.x}%`, top: `${m.y}%`, width: `${m.ancho}%`, height: `${m.alto}%` }} aria-hidden="true"><span className="manual-marca">{i + 1}</span></span>
+          : <span key={i} className="manual-marca" style={{ left: `${m.x}%`, top: `${m.y}%` }} aria-hidden="true">{i + 1}</span>)}
       </div>
-      {leyenda}
+      {marcas && <ol className="manual-leyenda" data-testid="manual-leyenda">{marcas.map((m, i) => <li key={i}><span aria-hidden="true">{i + 1}</span>{m.texto}</li>)}</ol>}
       <figcaption><b>Figura {numero}</b> · {pie}</figcaption>
     </figure>
   );
@@ -108,7 +115,7 @@ function Figura({ src, alt, numero, pie, celular, ancho, children, leyenda }: { 
 const Boton = ({ children }: { children: ReactNode }) => <span className="manual-boton-ui">{children}</span>;
 
 function CapituloEntrar() {
-  const marcas = [
+  const marcas: Marca[] = [
     { x: 60.8, y: 23, texto: "El código que lee el celular." },
     { x: 75.2, y: 23, texto: "Los dos pasos, por si te olvidás." },
     { x: 60.8, y: 48.5, texto: "El código cambia solo cada 5 minutos: si se venció, leé el que está a la vista." },
@@ -138,20 +145,22 @@ function CapituloEntrar() {
 
       <Paso numero={1} titulo="Abrí Ferrebress en la computadora">
         <p>Aparece la pantalla de entrada, con el código ya listo. No hace falta tocar nada.</p>
-        <Figura src="entrar/compu-codigo.png" alt="La pantalla de entrada de la computadora, con el código para leer con el celular" numero="1.1" pie="La entrada de la computadora."
-          leyenda={<ol className="manual-leyenda">{marcas.map((m, i) => <li key={i}><span aria-hidden="true">{i + 1}</span>{m.texto}</li>)}</ol>}>
-          {marcas.map((m, i) => <span key={i} className="manual-marca" style={{ left: `${m.x}%`, top: `${m.y}%` }} aria-hidden="true">{i + 1}</span>)}
-        </Figura>
+        <Figura src="entrar/compu-codigo.png" alt="La pantalla de entrada de la computadora, con el código para leer con el celular" numero="1.1" pie="La entrada de la computadora." marcas={marcas} />
       </Paso>
       <Paso numero={2} titulo="Leé el código con el celular" celular={
-        <Figura src="entrar/celu-entrada.png" alt="La entrada del celular, con el botón para escanear el código de la computadora" numero="1.2" pie="En el celular, «Escanear el código de la computadora»." celular />
+        <Figura src="entrar/celu-entrada.png" alt="La entrada del celular, con el botón para escanear el código de la computadora" numero="1.2" pie="En el celular, «Escanear el código de la computadora»." celular
+          marcas={[{ x: 5.6, y: 49.1, ancho: 88.7, alto: 9.6, texto: "Tocá acá para leer el código de la computadora." }]} />
       }>
         <p>Abrí Ferrebress en el celular y tocá <Boton>Escanear el código de la computadora</Boton>. Apuntá la cámara al
           código de la pantalla. También sirve la cámara del teléfono, sin abrir Ferrebress.</p>
         <p>Si es la primera vez en ese celular, antes entrá con <Boton>Continuar con Google</Boton> (más abajo, en «Otras formas de entrar»).</p>
       </Paso>
       <Paso numero={3} titulo="Confirmá en el celular" celular={
-        <Figura src="entrar/celu-dejar-entrar.png" alt="El celular pregunta si entrar en la computadora" numero="1.3" pie="El celular pregunta antes de dejar entrar a la computadora." celular />
+        <Figura src="entrar/celu-dejar-entrar.png" alt="El celular pregunta si entrar en la computadora" numero="1.3" pie="El celular pregunta antes de dejar entrar a la computadora." celular
+          marcas={[
+            { x: 5.6, y: 55.3, ancho: 88.7, alto: 6.6, texto: "Deja entrar a la computadora con tu usuario." },
+            { x: 5.6, y: 64, ancho: 88.7, alto: 6.6, texto: "No la deja entrar: el celular sigue donde estaba." },
+          ]} />
       }>
         <p>Si en el celular ya tenías la sesión abierta, pregunta <b>«¿Entrar en la computadora?»</b>: tocá <Boton>Entrar en la computadora</Boton>. Si no la tenías, poné la huella.</p>
         <p>Con «Ahora no», la computadora no entra y el celular sigue donde estaba.</p>
@@ -159,12 +168,20 @@ function CapituloEntrar() {
       <Paso numero={4} titulo="Listo: la computadora entra sola">
         <p>En unos segundos la computadora entra con tu usuario, y el celular avisa arriba <b>«Listo: la computadora entró como …»</b>. Los dos siguen con lo suyo.</p>
         <div className="manual-par">
-          <Figura src="entrar/compu-adentro.png" alt="La computadora, ya adentro de Ferrebress" numero="1.4" pie="La computadora, ya adentro." />
-          <Figura src="entrar/celu-despues.png" alt="El celular avisa que la computadora entró" numero="1.5" pie="El aviso en el celular." celular ancho={170} />
+          <Figura src="entrar/compu-adentro.png" alt="La computadora, ya adentro de Ferrebress" numero="1.4" pie="La computadora, ya adentro."
+            marcas={[{ x: 1.2, y: 90.5, ancho: 12.3, alto: 4.2, fuera: true, texto: "Tu usuario: la computadora entró como vos. «Salir» la cierra." }]} />
+          <Figura src="entrar/celu-despues.png" alt="El celular avisa que la computadora entró" numero="1.5" pie="El aviso en el celular." celular ancho={170}
+            marcas={[{ x: 5.1, y: 3.4, ancho: 89.7, alto: 3.6, texto: "El aviso de que la computadora entró." }]} />
         </div>
       </Paso>
       <Nota tipo="consejo"><b>De paso, quedan vinculados.</b> El celular que dejó entrar a la computadora queda unido a ella: lo
-        que escanees con el celular aparece en la computadora, y desde la computadora le podés pedir fotos.</Nota>
+        que escanees con el celular aparece en la computadora, y desde la computadora le podés pedir fotos. Y van juntos: si cambiás
+        de pantalla en el celular, la computadora va sola a la misma.</Nota>
+      <figure className="manual-clip chico">
+        <video src={`${ARCHIVOS}entrar/clip-espejo.mp4`} poster={`${ARCHIVOS}entrar/clip-espejo-portada.jpg`} controls muted playsInline preload="metadata" data-testid="manual-clip-espejo"
+          aria-label="Clip: en el celular se toca Vender, Depósito y Catálogo, y la computadora va sola a cada una" />
+        <figcaption><b>Van juntos.</b> Se toca en el celular, a la derecha, y la computadora lo sigue. <span>Sin sonido</span></figcaption>
+      </figure>
 
       <h2 id="otras-formas" tabIndex={-1}>Otras formas de entrar</h2>
       <h3>Con tu cuenta de Google</h3>
@@ -184,7 +201,8 @@ function CapituloEntrar() {
           <tr><td>Dice «Hay que iniciar sesión»</td><td>La sesión de ese dispositivo se cerró o venció. Entrá de nuevo.</td></tr>
         </tbody>
       </table>
-      <Figura src="entrar/compu-no-autorizado.png" alt="El aviso de correo no autorizado en la entrada de la computadora" numero="1.6" pie="Así se ve cuando el correo no está autorizado." ancho={420} />
+      <Figura src="entrar/compu-no-autorizado.png" alt="El aviso de correo no autorizado en la entrada de la computadora" numero="1.6" pie="Así se ve cuando el correo no está autorizado." ancho={420}
+        marcas={[{ x: 7.2, y: 61.4, ancho: 85.6, alto: 18.2, texto: "El aviso: ese correo de Google no está autorizado." }]} />
     </article>
   );
 }

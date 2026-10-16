@@ -24,10 +24,20 @@ describe("el manual de uso", () => {
     expect(capitulo.textContent).toContain("Antes de empezar");
     expect(screen.getAllByTestId("manual-paso").map((p) => p.querySelector("h3")?.textContent?.replace(/^Paso \d+: /, ""))).toEqual([
       "Abrí Ferrebress en la computadora", "Leé el código con el celular", "Confirmá en el celular", "Listo: la computadora entra sola"]);
-    expect(capitulo.querySelectorAll(".manual-marca")).toHaveLength(4);
-    expect(capitulo.querySelectorAll(".manual-leyenda li")).toHaveLength(4);
+    // Cada captura marca con números lo que se mira o se toca, y su leyenda dice qué es cada número.
+    const figuras = [...capitulo.querySelectorAll(".manual-figura")];
+    expect(figuras).toHaveLength(6);
+    expect(figuras.map((f) => f.querySelectorAll(".manual-marca").length)).toEqual([4, 1, 2, 1, 1, 1]);
+    for (const f of figuras) expect(f.querySelectorAll(".manual-leyenda li").length).toBe(f.querySelectorAll(".manual-marca").length);
+    // En los pasos del celular, la marca es un recuadro alrededor del botón que se toca.
+    expect(figuras[1]!.querySelector(".manual-leyenda")?.textContent).toContain("leer el código");
+    expect(figuras[2]!.querySelectorAll(".manual-recuadro")).toHaveLength(2);
     expect(capitulo.querySelector(".manual-resumen")?.textContent).toMatch(/Qué necesitás.*Cuánto tarda.*Dónde se hace/);
     expect(capitulo.textContent).toContain("De paso, quedan vinculados");
+    // Después de ese aviso, su clip: el celular cambia de pantalla y la computadora lo sigue.
+    const espejo = screen.getByTestId("manual-clip-espejo");
+    expect(screen.getAllByTestId("manual-paso")[3]!.compareDocumentPosition(espejo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(espejo.compareDocumentPosition(screen.getByRole("heading", { name: "Otras formas de entrar" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(capitulo.textContent).toContain("Figura 1.6");
     expect(screen.getByRole("heading", { name: "Otras formas de entrar" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Si algo no funciona" })).toBeTruthy();
@@ -36,13 +46,15 @@ describe("el manual de uso", () => {
     expect(clip.compareDocumentPosition(screen.getAllByTestId("manual-paso")[0]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("012-E04: el clip está quieto, sin sonido y con sus controles", () => {
+  it("012-E04: los clips están quietos, sin sonido y con sus controles", () => {
     render(<Manual />);
-    const clip = screen.getByTestId("manual-clip") as HTMLVideoElement;
-    expect(clip.autoplay).toBe(false);
-    expect(clip.muted).toBe(true);
-    expect(clip.controls).toBe(true);
-    expect(clip.getAttribute("src")).toMatch(/manual\/entrar\/clip\.mp4$/);
+    for (const [id, archivo] of [["manual-clip", /manual\/entrar\/clip\.mp4$/], ["manual-clip-espejo", /manual\/entrar\/clip-espejo\.mp4$/]] as const) {
+      const clip = screen.getByTestId(id) as HTMLVideoElement;
+      expect(clip.autoplay).toBe(false);
+      expect(clip.muted).toBe(true);
+      expect(clip.controls).toBe(true);
+      expect(clip.getAttribute("src")).toMatch(archivo);
+    }
   });
 
   it("012-E05: «Volver a Ferrebress» vuelve a la entrada", async () => {
@@ -62,5 +74,6 @@ describe("el manual de uso", () => {
     fireEvent.click(screen.getByRole("button", { name: "Si algo no funciona" }));
     expect(document.activeElement?.id).toBe("problemas");
     expect(screen.getByTestId("manual-clip").getAttribute("aria-label")).toBeTruthy();
+    expect(screen.getByTestId("manual-clip-espejo").getAttribute("aria-label")).toBeTruthy();
   });
 });

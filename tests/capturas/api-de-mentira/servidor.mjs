@@ -1,6 +1,6 @@
 // API de mentira para sacar capturas de la interfaz sin Docker ni base de datos. Cada archivo rutas-*.mjs de esta carpeta
 // exporta por defecto { "GET /ruta": (ctx) => valor | [estado, valor] }. Las rutas admiten
-// :parametros. ctx = { params, query, body }. Uso: node servidor.mjs [puerto]
+// :parametros. ctx = { params, query, body, headers }. Uso: node servidor.mjs [puerto]
 import http from "node:http";
 import { readdirSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -26,10 +26,18 @@ http.createServer(async (req, res) => {
   const r = [...rutas].reverse().find((r) => r.metodo === req.method && r.re.test(url.pathname));
   if (!r) { console.log("SIN RUTA", req.method, url.pathname); res.writeHead(404, { ...cab, "Content-Type": "application/json" }); return res.end(JSON.stringify({ error: `(mock) sin ruta ${req.method} ${url.pathname}` })); }
   const m = url.pathname.match(r.re); const params = Object.fromEntries(r.nombres.map((n, i) => [n, decodeURIComponent(m[i + 1])]));
-  let out = await r.fn({ params, query: url.searchParams, body });
+  let out = await r.fn({ params, query: url.searchParams, body, headers: req.headers });
   let estado = 200; if (Array.isArray(out) && typeof out[0] === "number" && out.length === 2) [estado, out] = out;
   if (out === undefined) { res.writeHead(204, cab); return res.end(); }
   // Una ruta puede devolver un archivo: { tipo: "image/svg+xml", cuerpo: "..." }.
   if (out && typeof out === "object" && typeof out.tipo === "string" && "cuerpo" in out) { res.writeHead(estado, { ...cab, "Content-Type": out.tipo }); return res.end(out.cuerpo); }
+  // O un flujo de eventos (SSE) que queda abierto: { flujo: (enviar, alCerrar) => … }, donde
+  // enviar(evento, datos) manda un evento y alCerrar(fn) corre fn cuando el cliente se va.
+  if (out && typeof out === "object" && typeof out.flujo === "function") {
+    res.writeHead(estado, { ...cab, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" });
+    const enviar = (evento, datos) => res.write(`event: ${evento}\ndata: ${JSON.stringify(datos ?? null)}\n\n`);
+    out.flujo(enviar, (fn) => res.on("close", fn));
+    return;
+  }
   res.writeHead(estado, { ...cab, "Content-Type": "application/json" }); res.end(JSON.stringify(out));
 }).listen(Number(process.argv[2] ?? 8799), () => console.log("mock listo"));
