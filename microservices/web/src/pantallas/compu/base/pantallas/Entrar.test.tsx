@@ -23,7 +23,13 @@ describe("la entrada de la computadora", () => {
     expect(entrada.querySelector(".entrar-cc-antetitulo")?.textContent).toBe("El sistema del mostrador");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Precios al día,ventas y stockde la ferretería.");
     expect(entrada.querySelector("h1 em")?.textContent).toBe("de la ferretería.");
-    expect(entrada.querySelectorAll(".entrar-cc-puntos li")).toHaveLength(3);
+    // Cada una corta en dos renglones, en el mismo lugar que la referencia.
+    const renglones = [...entrada.querySelectorAll(".entrar-cc-puntos .texto")].map((t) => t.innerHTML.split("<br>"));
+    expect(renglones).toEqual([
+      ["Buscás el producto,", "decís el precio y cobrás."],
+      ["Los precios se actualizan", "con las listas de los proveedores."],
+      ["Lo que se vende baja del stock;", "lo que se compra, sube."],
+    ]);
     expect(entrada.querySelector(".entrar-cc-manuscrito")?.textContent).toBe("Más tiempopara hacer crecertu negocio");
     // El medio: la foto del local y el celular con la captura de una venta, que no se leen en voz alta.
     expect(container.querySelector(".entrar-cc-foto")?.getAttribute("aria-hidden")).toBe("true");

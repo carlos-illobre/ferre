@@ -117,6 +117,12 @@ una venta en curso y el menú de abajo (una captura real, que se vuelve a sacar 
 cambia); y a la derecha, sobre fondo claro, la tarjeta para entrar, con un pie «Tus datos están
 protegidos». En una ventana angosta primero se van el celular y la foto, y después la marca: la
 tarjeta queda siempre. Solo en la computadora: la entrada del celular sigue como está.
+El 2026-10-16 Carlos volvió a pasar la referencia (`maquetas/entrar-compu-referencia.webp`) y su
+kit de capas (`maquetas/entrar-compu-kit-de-capas.webp`) para que se parezca más, con dos
+diferencias: el celular muestra la venta y no hay «¿Necesitás ayuda?». De ahí: el celular tiene
+marco metálico, espesor y muesca, apoyado en la mesa; el botón de Google ocupa el ancho de la
+tarjeta; cada una de las tres cosas que hace corta en el mismo lugar que la referencia; y el verde
+tiene un degradé suave con arcos.
 
 **Qué necesita a la vista en el celular:**
 

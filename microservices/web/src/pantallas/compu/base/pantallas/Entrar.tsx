@@ -58,7 +58,9 @@ function ErrorEnElLugar({ error, testId }: { error: ErrorDeEntrada | null; testI
 
 // El botón lo dibuja Google; acá va su lugar, lo que pasa mientras se entra y el resultado.
 // Al entrar, el servidor acepta solo los correos autorizados en Más → Usuarios.
-export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "filled_blue" | "filled_black" }) {
+// `estirar`: Google lo dibuja de 400 px como mucho; estirado, se agranda en proporción hasta
+// ocupar el ancho de su lugar (la tarjeta de la entrada de la computadora, decisión 93).
+export function BotonGoogle({ tema = "filled_blue", estirar = false }: { tema?: "outline" | "filled_blue" | "filled_black"; estirar?: boolean }) {
   const { entrar } = useSesion();
   const [error, setError] = useState<ErrorDeEntrada | null>(null);
   const [entrando, setEntrando] = useState(false);
@@ -68,6 +70,7 @@ export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "fill
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || !lugar.current) return;
     const desde = Date.now();
+    let dibujado = 400; // el ancho con que Google dibujó el botón
     const intervalo = setInterval(() => {
       const google = window.google;
       if (!google || !lugar.current) {
@@ -95,15 +98,22 @@ export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "fill
       // Google pide el ancho en píxeles (entre 200 y 400): el del lugar que le toca.
       const ancho = Math.round(Math.min(400, Math.max(200, lugar.current.clientWidth || 320)));
       google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
+      dibujado = ancho;
       setEstado("listo");
+      if (estirar) ajustar();
     }, 200);
-    return () => clearInterval(intervalo);
-  }, [entrar, tema]);
+    // El lugar puede ser más ancho que el botón: la escala es la que lo llena, y se vuelve a
+    // calcular cada vez que el lugar cambia de ancho.
+    const ajustar = () => { const l = lugar.current; if (l) l.style.setProperty("--escala-google", String(Math.max(1, l.clientWidth / dibujado))); };
+    const observador = estirar && typeof ResizeObserver !== "undefined" ? new ResizeObserver(ajustar) : null;
+    if (observador && lugar.current) observador.observe(lugar.current);
+    return () => { clearInterval(intervalo); observador?.disconnect(); };
+  }, [entrar, tema, estirar]);
 
   if (!GOOGLE_CLIENT_ID) return <Aviso tipo="alerta">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</Aviso>;
   return (
     <div className="entrar-google">
-      <div className={`entrar-google-lugar ${estado === "listo" ? "" : "esperando"} ${entrando ? "ocupado" : ""}`} ref={lugar} aria-busy={estado === "esperando" || entrando} />
+      <div className={`entrar-google-lugar ${estirar ? "estirado" : ""} ${estado === "listo" ? "" : "esperando"} ${entrando ? "ocupado" : ""}`} ref={lugar} aria-busy={estado === "esperando" || entrando} />
       {estado === "esperando" && <span className="solo-lectores" role="status">Cargando el botón de Google…</span>}
       {estado === "sin-google" && <Aviso tipo="alerta" accion={<Boton tam="chico" onClick={() => location.reload()}>Reintentar</Boton>}>Google no responde. Revisá la conexión y reintentá.{hayHuella() ? " Si este dispositivo ya está vinculado, podés entrar con la huella." : ""}</Aviso>}
       {entrando && <Progreso texto="Entrando con tu cuenta de Google…" />}
@@ -258,12 +268,31 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
 // con la marca a la izquierda; en el medio, la foto del local entre dos bordes curvos, con un
 // celular que muestra una venta (una captura real de Vender); a la derecha, la tarjeta para
 // entrar. En el celular la entrada es otra (celular/pantallas/Login.tsx) y no cambia.
+// Cada una de las tres cosas que hace va en dos renglones, cortada donde la corta la referencia:
+// después del «;», antes de «con» o después de la primera coma.
+function partirEnDos(texto: string): [string, string] {
+  const puntoYComa = texto.indexOf("; ");
+  if (puntoYComa >= 0) return [texto.slice(0, puntoYComa + 1), texto.slice(puntoYComa + 2)];
+  const con = texto.indexOf(" con ");
+  if (con >= 0) return [texto.slice(0, con), texto.slice(con + 1)];
+  const coma = texto.indexOf(", ");
+  if (coma >= 0) return [texto.slice(0, coma + 1), texto.slice(coma + 2)];
+  return [texto, ""];
+}
+
 function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
   return (
     <main className="entrar-cc" data-testid="entrar">
       <div className="entrar-cc-foto" style={{ backgroundImage: `url(${fotoDelLocal})` }} aria-hidden="true" />
       <svg className="entrar-cc-fondo" viewBox="0 0 1536 1024" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path className="verde" d="M0 0H830C770 90 712 230 684 400C656 570 610 760 540 880C500 950 455 995 418 1024H0Z" />
+        <defs>
+          <linearGradient id="entrar-cc-verde" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#173a32" /><stop offset="0.55" stopColor="#14322b" /><stop offset="1" stopColor="#0f2924" /></linearGradient>
+          <radialGradient id="entrar-cc-reflejo" cx="760" cy="40" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#3f7a64" stopOpacity="0.45" /><stop offset="1" stopColor="#3f7a64" stopOpacity="0" /></radialGradient>
+        </defs>
+        <path className="verde" d="M0 0H830C770 90 712 230 684 400C656 570 610 760 540 880C500 950 455 995 418 1024H0Z" fill="url(#entrar-cc-verde)" />
+        <path className="reflejo" d="M0 0H830C770 90 712 230 684 400C656 570 610 760 540 880C500 950 455 995 418 1024H0Z" fill="url(#entrar-cc-reflejo)" />
+        <path className="arco" d="M560 0C640 70 700 150 735 260" />
+        <path className="arco" d="M470 0C590 110 655 210 690 340" />
         <path className="cinta" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024" strokeDasharray="0 270 470 2000" />
         <path className="claro" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024H1536V0Z" />
         <path className="curva" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024H1536V1010C1360 1000 1150 930 1010 700C930 560 900 420 910 300C918 190 930 90 960 0Z" />
@@ -276,7 +305,7 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
         <h1>Precios al día,<br />ventas y stock<br /><em>de la ferretería.</em></h1>
         <p className="entrar-cc-bajada">{TEXTOS_DE_ENTRADA.bajada}</p>
         <ul className="entrar-cc-puntos">
-          {QUE_HACE.map((q) => <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span>{q.texto}</li>)}
+          {QUE_HACE.map((q) => { const [a, b] = partirEnDos(q.texto); return <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span><span className="texto">{a}<br />{b}</span></li>; })}
         </ul>
         <div className="entrar-cc-lema" aria-hidden="true">
           <p className="entrar-cc-manuscrito">{TEXTOS_DE_ENTRADA.manuscrito.map((l) => <span key={l}>{l}</span>)}</p>
@@ -284,7 +313,10 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
         </div>
       </section>
       <div className="entrar-cc-sombra" aria-hidden="true" />
-      <div className="entrar-cc-celular" aria-hidden="true"><img src={celularVendiendo} alt="" /></div>
+      <div className="entrar-cc-celular" aria-hidden="true">
+        <span className="botones" />
+        <div className="pantalla"><img src={celularVendiendo} alt="" /><span className="muesca" /><span className="brillo" /></div>
+      </div>
       <section className="entrar-cc-tarjeta">
         {children}
         <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>
@@ -319,7 +351,7 @@ export function Entrar() {
       <Aviso tipo="error">{errorDeCodigo}</Aviso>
       <div className="entrar-o" aria-hidden="true"><span>o</span></div>
       {conHuella && <BotonHuella />}
-      <BotonGoogle />
+      <BotonGoogle estirar />
       <p className="entrar-nota">
         <Icono nombre="error" tam={18} />
         <span>{TEXTOS_DE_ENTRADA.nota}</span>
