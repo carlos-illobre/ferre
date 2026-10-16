@@ -12,12 +12,24 @@ No trabajen a la vez una sesión en la nube y una en el servidor: las dos suben 
 
 ## Dominios que no están en la lista
 
-**Si hace falta un dominio que la red no deja pasar, se le pide permiso a Carlos.** En una
-sesión en la nube, si una descarga o una conexión falla porque el dominio no está entre los
-permitidos del entorno, el agente frena esa parte y le dice a Carlos qué dominio es, para
-qué lo necesita y qué alternativa hay. Carlos decide si lo agrega al entorno. Mientras tanto
-no se busca otro camino para llegar igual (otro espejo, otro servicio, bajarlo por otro
-lado ni copiarlo al repositorio).
+**Si hace falta un sitio de internet que no está permitido, se le pide permiso a Carlos.**
+Vale para cualquier acceso: leer una página o documentación, buscar en la web, bajar un
+paquete, una imagen o un archivo, o conectarse a un servicio, con la herramienta que sea
+(búsqueda o lectura web, `curl`, `pnpm`, `uv`, `docker`, el navegador de las pruebas). Se
+nota porque falla con un error de red (`ENOTFOUND`, «403» o «blocked» del proxy, «host not
+allowed», conexión rechazada). Entonces el agente:
+
+1. Frena esa parte del trabajo y no reintenta.
+2. Le dice a Carlos, en un mensaje aparte y antes de seguir: el dominio exacto
+   (`ejemplo.com`), la dirección que quería abrir, para qué lo necesita, qué hace mientras
+   tanto y qué alternativa hay sin ese sitio.
+3. Espera su respuesta. Carlos decide si lo agrega a los dominios permitidos del entorno;
+   el agente no lo da por permitido ni lo pide dos veces si dijo que no.
+
+Mientras tanto no se busca otro camino para llegar igual (otro espejo, otro servicio, una
+copia en caché, bajarlo por otro lado ni copiarlo al repositorio). Si Carlos lo agrega, se
+anota en la lista de dominios del entorno (`docs/operacion/sesiones-en-la-nube.md`, «El
+entorno `ferre`») con para qué hace falta.
 
 La lista vigente es la de la sección siguiente; cuando Carlos agrega uno, se anota ahí.
 

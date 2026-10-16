@@ -286,3 +286,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T121 [agente] Las sesiones en la nube suben a master sin preguntar por su rama
 - [x] T122 [agente] Las sesiones en la nube comprueban que corrió la preparación y corren las e2e en Docker antes de subir código
 - [x] T123 [agente] Pasar al repositorio cómo pide Carlos los cambios de interfaz
+- [x] T124 [agente] Los agentes piden permiso a Carlos antes de usar un sitio de internet que no está permitido
