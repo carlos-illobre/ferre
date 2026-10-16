@@ -125,8 +125,12 @@ tarjeta; cada una de las tres cosas que hace corta en el mismo lugar que la refe
 tiene un degradé suave con arcos. Después Carlos pasó las capas sueltas
 (`maquetas/capas/`): el fondo, la foto del local y el celular salen de ellas; el texto y la
 tarjeta siguen siendo de la aplicación (las capas los traen como imagen, con letras deformadas).
-La pantalla del celular es la captura real de la venta, puesta en perspectiva sobre la del
-celular de la capa.
+El celular es el que pasó Carlos con la venta ya puesta (`maquetas/capas/celular-con-venta.png`),
+sin su fondo: se ve más nítido que el de la capa. Si cambia la pantalla de Vender, se vuelve a
+armar con la captura nueva sobre el celular de la capa, o con otro celular que pase Carlos.
+La separación de los textos de la izquierda (logotipo, antetítulo, título, bajada y las tres cosas
+que hace) y el tamaño de sus íconos se midieron sobre un recorte de la referencia que pasó Carlos
+el 2026-10-16: quedan a 2 o 3 píxeles de ella en una pantalla de 1536 × 1024.
 
 **Qué necesita a la vista en el celular:**
 

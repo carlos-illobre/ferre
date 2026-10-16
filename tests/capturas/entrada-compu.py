@@ -3,6 +3,7 @@ Carlos (specs/007-usuarios-y-acceso/maquetas/capas/) y de una captura real de Ve
 
     python tests/capturas/capturar.py vender --celu ...   # la venta, en 390 × 790 (ver más abajo)
     uv run --with pillow --with numpy python tests/capturas/entrada-compu.py tests/capturas/salida/cel-vender-celu.png
+    uv run --with pillow --with numpy --with scipy python tests/capturas/entrada-compu.py --celular-con-venta
 
 Deja en microservices/web/src/pantallas/compu/base/imagenes/:
 - entrar-fondo.jpg: las formas del fondo, la foto del local y la mesa, sin el celular.
@@ -100,5 +101,34 @@ def main(captura: str):
     print("listo:", SALIDA / "entrar-fondo.jpg", SALIDA / "entrar-celular.png", "celular en", (x0, y0, x1, y1), "de", (ancho, alto))
 
 
+def recortar_celular(origen: Path):
+    """El celular que armó Carlos con la venta ya puesta (capas/celular-con-venta.png), sin su
+    fondo. El marco es negro o gris sin color, y el fondo es verde o madera: se toma la mancha
+    más grande de gris oscuro (el marco) y todo lo que queda adentro de ella."""
+    from scipy import ndimage
+    im = Image.open(origen).convert("RGBA")
+    a = np.array(im).astype(int)
+    gris = (np.abs(a[..., 0] - a[..., 1]) < 14) & (np.abs(a[..., 1] - a[..., 2]) < 14) & (a[..., :3].max(-1) < 110)
+    manchas, n = ndimage.label(gris)
+    marco = manchas == 1 + int(np.argmax(ndimage.sum(gris, manchas, range(1, n + 1))))
+    # Arriba, el marco se toca con un pedacito del fondo: el celular empieza donde el marco ya es ancho.
+    anchos = marco.sum(1)
+    arriba = int(np.argmax(anchos > 60))
+    marco[:arriba] = False
+    adentro = np.zeros_like(marco)
+    for y in range(marco.shape[0]):
+        xs = np.where(marco[y])[0]
+        if len(xs) > 1: adentro[y, xs.min():xs.max() + 1] = True
+    adentro = ndimage.binary_erosion(adentro, iterations=1)
+    mascara = Image.fromarray((adentro * 255).astype("uint8")).filter(ImageFilter.GaussianBlur(0.7))
+    im.putalpha(mascara)
+    im.crop(im.getbbox()).save(SALIDA / "entrar-celular.png", optimize=True)
+    print("listo:", SALIDA / "entrar-celular.png", im.getbbox())
+
+
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else str(RAIZ / "tests/capturas/salida/cel-vender-celu.png"))
+    # --celular-con-venta: usa el celular que pasó Carlos (con la venta ya puesta) en vez de armarlo.
+    if "--celular-con-venta" in sys.argv:
+        recortar_celular(CAPAS / "celular-con-venta.png")
+    else:
+        main(sys.argv[1] if len(sys.argv) > 1 else str(RAIZ / "tests/capturas/salida/cel-vender-celu.png"))

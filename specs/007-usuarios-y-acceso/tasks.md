@@ -21,3 +21,5 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T010 [interfaz] La entrada de la computadora copia la imagen de referencia de Carlos: verde con la marca, foto con un celular que muestra una venta, y la tarjeta sobre fondo claro (decisión 93); el celular no cambia
 - [x] T011 [interfaz] La entrada de la computadora se parece más a la referencia de Carlos y su kit de capas: un celular con espesor y marco metálico, el botón de Google a todo el ancho de la tarjeta, los tres puntos cortados como en la referencia y el verde con su degradé (decisión 93)
 - [x] T012 [interfaz] La entrada de la computadora se arma con las capas que pasó Carlos: sus formas del fondo, la foto del local y el celular, con la pantalla real de la venta puesta en perspectiva (decisión 93)
+- [x] T013 [interfaz] El celular de la entrada de la computadora es el que pasó Carlos con la venta ya puesta, sin su fondo, que se ve más nítido (decisión 93)
+- [x] T014 [ajuste] En la entrada de la computadora, la separación entre el logotipo, el antetítulo, el título, la bajada y las tres cosas que hace, y el tamaño de sus íconos, siguen la imagen de referencia de Carlos (decisión 93)
