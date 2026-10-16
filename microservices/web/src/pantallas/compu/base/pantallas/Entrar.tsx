@@ -10,8 +10,9 @@ import { useEnLinea } from "./negocio-comun";
 import { Aviso, Boton, Icono, Marca, Progreso, type NombreDeIcono } from "../ui";
 import "../estilos/entrar.css";
 import "../estilos/entrar-con-celular.css";
-import fotoDelLocal from "../imagenes/entrar-foto.jpg";
-import celularVendiendo from "../imagenes/entrar-celular-venta.jpg";
+// Las arma tests/capturas/entrada-compu.py con las capas de Carlos y una captura real de Vender.
+import fondoDeLaEntrada from "../imagenes/entrar-fondo.jpg";
+import celularVendiendo from "../imagenes/entrar-celular.png";
 import { entrarConGoogle } from "../../../../negocio/vinculo";
 import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
@@ -264,10 +265,10 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
   return { qr, error };
 }
 
-// La entrada de la computadora (decisión 93): copia la imagen de referencia de Carlos. El verde
-// con la marca a la izquierda; en el medio, la foto del local entre dos bordes curvos, con un
-// celular que muestra una venta (una captura real de Vender); a la derecha, la tarjeta para
-// entrar. En el celular la entrada es otra (celular/pantallas/Login.tsx) y no cambia.
+// La entrada de la computadora (decisión 93): copia la imagen de referencia de Carlos, armada con
+// sus capas. El verde con la marca a la izquierda; en el medio, la foto del local entre dos bordes
+// curvos, con un celular que muestra una venta (una captura real de Vender); a la derecha, la
+// tarjeta para entrar. En el celular la entrada es otra (celular/pantallas/Login.tsx) y no cambia.
 // Cada una de las tres cosas que hace va en dos renglones, cortada donde la corta la referencia:
 // después del «;», antes de «con» o después de la primera coma.
 function partirEnDos(texto: string): [string, string] {
@@ -283,22 +284,7 @@ function partirEnDos(texto: string): [string, string] {
 function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
   return (
     <main className="entrar-cc" data-testid="entrar">
-      <div className="entrar-cc-foto" style={{ backgroundImage: `url(${fotoDelLocal})` }} aria-hidden="true" />
-      <svg className="entrar-cc-fondo" viewBox="0 0 1536 1024" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <defs>
-          <linearGradient id="entrar-cc-verde" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#173a32" /><stop offset="0.55" stopColor="#14322b" /><stop offset="1" stopColor="#0f2924" /></linearGradient>
-          <radialGradient id="entrar-cc-reflejo" cx="760" cy="40" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#3f7a64" stopOpacity="0.45" /><stop offset="1" stopColor="#3f7a64" stopOpacity="0" /></radialGradient>
-        </defs>
-        <path className="verde" d="M0 0H830C770 90 712 230 684 400C656 570 610 760 540 880C500 950 455 995 418 1024H0Z" fill="url(#entrar-cc-verde)" />
-        <path className="reflejo" d="M0 0H830C770 90 712 230 684 400C656 570 610 760 540 880C500 950 455 995 418 1024H0Z" fill="url(#entrar-cc-reflejo)" />
-        <path className="arco" d="M560 0C640 70 700 150 735 260" />
-        <path className="arco" d="M470 0C590 110 655 210 690 340" />
-        <path className="cinta" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024" strokeDasharray="0 270 470 2000" />
-        <path className="claro" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024H1536V0Z" />
-        <path className="curva" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024H1536V1010C1360 1000 1150 930 1010 700C930 560 900 420 910 300C918 190 930 90 960 0Z" />
-        <path className="curva-2" d="M1536 760C1420 820 1300 930 1250 1024H1536Z" />
-        <path className="curva-3" d="M1536 60C1470 200 1480 380 1536 470Z" />
-      </svg>
+      <div className="entrar-cc-fondo" style={{ backgroundImage: `url(${fondoDeLaEntrada})` }} aria-hidden="true" />
       <section className="entrar-cc-marca">
         <Marca tam={64} />
         <p className="entrar-cc-antetitulo">{TEXTOS_DE_ENTRADA.antetitulo}</p>
@@ -312,11 +298,7 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
           <svg className="entrar-cc-flecha" viewBox="0 0 122 70" focusable="false"><path d="M4 62C40 66 80 58 112 10M96 12 113 8 114 26" /></svg>
         </div>
       </section>
-      <div className="entrar-cc-sombra" aria-hidden="true" />
-      <div className="entrar-cc-celular" aria-hidden="true">
-        <span className="botones" />
-        <div className="pantalla"><img src={celularVendiendo} alt="" /><span className="muesca" /><span className="brillo" /></div>
-      </div>
+      <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
       <section className="entrar-cc-tarjeta">
         {children}
         <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>

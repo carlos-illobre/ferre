@@ -122,7 +122,11 @@ kit de capas (`maquetas/entrar-compu-kit-de-capas.webp`) para que se parezca má
 diferencias: el celular muestra la venta y no hay «¿Necesitás ayuda?». De ahí: el celular tiene
 marco metálico, espesor y muesca, apoyado en la mesa; el botón de Google ocupa el ancho de la
 tarjeta; cada una de las tres cosas que hace corta en el mismo lugar que la referencia; y el verde
-tiene un degradé suave con arcos.
+tiene un degradé suave con arcos. Después Carlos pasó las capas sueltas
+(`maquetas/capas/`): el fondo, la foto del local y el celular salen de ellas; el texto y la
+tarjeta siguen siendo de la aplicación (las capas los traen como imagen, con letras deformadas).
+La pantalla del celular es la captura real de la venta, puesta en perspectiva sobre la del
+celular de la capa.
 
 **Qué necesita a la vista en el celular:**
 

@@ -32,10 +32,10 @@ describe("la entrada de la computadora", () => {
     ]);
     expect(entrada.querySelector(".entrar-cc-manuscrito")?.textContent).toBe("Más tiempopara hacer crecertu negocio");
     // El medio: la foto del local y el celular con la captura de una venta, que no se leen en voz alta.
-    expect(container.querySelector(".entrar-cc-foto")?.getAttribute("aria-hidden")).toBe("true");
+    expect(container.querySelector(".entrar-cc-fondo")?.getAttribute("aria-hidden")).toBe("true");
     const celular = container.querySelector(".entrar-cc-celular");
     expect(celular?.getAttribute("aria-hidden")).toBe("true");
-    expect(celular?.querySelector("img")?.getAttribute("src")).toMatch(/entrar-celular-venta/);
+    expect(celular?.getAttribute("src")).toMatch(/entrar-celular/);
     // La tarjeta: título, «Es rápido…», el código, que se renueva, Google, quién entra y el pie.
     expect(screen.getByRole("heading", { name: TEXTOS_DE_ENTRADA.conElCelular })).toBeTruthy();
     expect(screen.getByText(TEXTOS_DE_ENTRADA.rapido)).toBeTruthy();

@@ -15,15 +15,9 @@
   position: relative; min-height: 100vh; min-width: 100%; overflow: hidden; background: var(--cc-claro); color: var(--p-tinta, #18201e); font-family: var(--fuente);
 }
 
-/* El fondo: la foto del local en el medio, el verde con su borde sigmoide y lo claro con su borde en S. */
-.entrar-cc-foto { position: absolute; top: 0; bottom: 0; left: calc(380 / 1536 * 100%); width: calc(580 / 1536 * 100%); background: #3a3127 center / 100% 100% no-repeat; }
-.entrar-cc-fondo { position: absolute; inset: 0; width: 100%; height: 100%; }
-.entrar-cc-fondo .arco { fill: none; stroke: #2c5a4c; stroke-width: 1.5; opacity: 0.55; }
-.entrar-cc-fondo .cinta { fill: none; stroke: #b7dbc2; stroke-width: 34; stroke-linecap: round; }
-.entrar-cc-fondo .claro { fill: var(--cc-claro); }
-.entrar-cc-fondo .curva { fill: #e2ece4; opacity: 0.55; }
-.entrar-cc-fondo .curva-2 { fill: #d4e3d8; opacity: 0.7; }
-.entrar-cc-fondo .curva-3 { fill: #dfe9e2; opacity: 0.8; }
+/* El fondo y el celular son imágenes armadas con las capas de Carlos (800 × 512, al doble). Se
+   estiran a la ventana, y el celular se ubica en el mismo lugar de esa imagen, sin deformarse. */
+.entrar-cc-fondo { position: absolute; inset: 0; background: #0b3a30 center / 100% 100% no-repeat; }
 
 /* La marca, a la izquierda sobre el verde */
 .entrar-cc-marca { position: absolute; left: calc(80 / 1536 * 100%); top: calc(76 * var(--u)); width: max(330px, calc(480 * var(--u))); color: #fff; }
@@ -46,19 +40,7 @@
 .entrar-cc-manuscrito span:nth-child(3) { padding-left: calc(66 * var(--u)); }
 .entrar-cc-flecha { position: absolute; left: calc(192 * var(--u)); top: calc(32 * var(--u)); width: calc(116 * var(--u)); height: calc(64 * var(--u)); fill: none; stroke: #8fd0a8; stroke-width: 2.4; stroke-linecap: round; }
 
-/* El celular apoyado en la mesa, con una venta en curso: marco metálico, borde negro, muesca,
-   botones al costado y el espesor a la derecha, un poco echado hacia atrás. */
-.entrar-cc-celular { position: absolute; left: calc(516 / 1536 * 100%); top: calc(338 * var(--u)); width: calc(322 * var(--u)); height: calc(584 * var(--u)); padding: calc(5 * var(--u)); border-radius: calc(50 * var(--u));
-  transform: perspective(1600px) rotateX(6deg) rotateY(-10deg) rotate(7deg); transform-origin: 50% 80%;
-  background: linear-gradient(118deg, #b9bebb 0%, #4a4f4d 9%, #1e2120 22%, #2c302e 55%, #151817 80%, #8d9290 100%);
-  box-shadow: calc(7 * var(--u)) calc(3 * var(--u)) 0 calc(-1 * var(--u)) #262928, calc(8 * var(--u)) calc(4 * var(--u)) 0 calc(-1 * var(--u)) #6f7471, -22px 34px 44px rgb(0 0 0 / 0.5), 0 0 0 1px #0b0d0c; }
-.entrar-cc-celular .botones { position: absolute; left: calc(-3 * var(--u)); top: calc(118 * var(--u)); width: calc(4 * var(--u)); height: calc(150 * var(--u)); border-radius: 2px;
-  background: linear-gradient(180deg, #5d625f 0 18%, transparent 18% 30%, #5d625f 30% 62%, transparent 62% 72%, #5d625f 72% 100%); }
-.entrar-cc-celular .pantalla { position: relative; width: 100%; height: 100%; border-radius: calc(45 * var(--u)); border: calc(9 * var(--u)) solid #050606; overflow: hidden; background: #fff; }
-.entrar-cc-celular img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.entrar-cc-celular .muesca { position: absolute; left: 50%; top: 0; width: calc(132 * var(--u)); height: calc(26 * var(--u)); margin-left: calc(-66 * var(--u)); border-radius: 0 0 calc(18 * var(--u)) calc(18 * var(--u)); background: #050606; }
-.entrar-cc-celular .brillo { position: absolute; inset: 0; background: linear-gradient(115deg, rgb(255 255 255 / 0.16) 0%, rgb(255 255 255 / 0) 38%); pointer-events: none; }
-.entrar-cc-sombra { position: absolute; left: calc(522 / 1536 * 100%); top: calc(892 * var(--u)); width: calc(350 * var(--u)); height: calc(46 * var(--u)); border-radius: 50%; background: radial-gradient(ellipse at center, rgb(0 0 0 / 0.55), transparent 70%); }
+.entrar-cc-celular { position: absolute; left: calc(524 / 1600 * 100%); top: calc(330 / 1024 * 100%); height: calc(600 / 1024 * 100%); width: auto; aspect-ratio: 376 / 600; pointer-events: none; }
 
 /* La tarjeta para entrar, a la derecha sobre lo claro */
 .entrar-cc-tarjeta { position: absolute; right: calc(46 / 1536 * 100%); top: calc(100 * var(--u)); width: max(440px, calc(588 * var(--u))); display: flex; flex-direction: column; gap: calc(20 * var(--u));
@@ -88,10 +70,10 @@
 
 /* Ventana angosta: primero se van el celular, la foto y la frase; después la marca. La tarjeta queda. */
 @media (max-width: 1180px) {
-  .entrar-cc-celular, .entrar-cc-sombra, .entrar-cc-lema { display: none; }
+  .entrar-cc-celular, .entrar-cc-lema { display: none; }
 }
 @media (max-width: 860px) {
-  .entrar-cc-marca, .entrar-cc-foto, .entrar-cc-fondo { display: none; }
+  .entrar-cc-marca, .entrar-cc-fondo { display: none; }
   .entrar-cc-tarjeta { position: relative; right: auto; top: auto; margin: 24px auto; width: min(560px, calc(100% - 32px)); }
 }
 /* Ventana baja: la tarjeta puede pasar el alto de la ventana; entonces la página se corre. */
