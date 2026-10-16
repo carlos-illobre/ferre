@@ -124,6 +124,20 @@ Tarda unos segundos por edición. No reemplaza las compuertas de antes de subir.
   [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md) y, si es una regla, en la
   `spec.md` de la capacidad.
 
+### Cómo pide Carlos los cambios de interfaz
+
+Lo observado trabajando con él (2026-10-11 a 13):
+
+- **Prueba en el ambiente de pruebas y manda una captura con un pedido corto por vez.**
+  Espera el cambio subido y verificado con una captura propia (las herramientas están en
+  `tests/capturas/`), no una descripción.
+- **Quiere consistencia:** entre el celular y la computadora, y entre pantallas. Rechaza
+  colores propios en una sola pantalla o un panel con un relieve distinto al resto.
+- **Antes de programar una pantalla nueva, la maqueta de una sola pantalla** y, si puede,
+  una referencia visual suya: lo que acertó fue un estilo que diseñó él en Figma.
+- **Si descarta una pregunta, no se insiste:** se anota como pregunta abierta y se sigue con
+  otra cosa.
+
 ## Cada pedido es una tarea, y se anota en `tasks.md`
 
 `tasks.md` es la fuente de verdad de las tareas; lo lee el tablero del portafolio. **Los
