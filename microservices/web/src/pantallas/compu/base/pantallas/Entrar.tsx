@@ -164,8 +164,9 @@ export const TEXTOS_DE_ENTRADA = {
   // Solo en la entrada de la computadora (decisión 93).
   antetitulo: "El sistema del mostrador",
   rapido: "Es rápido, seguro y sin contraseñas.",
-  manuscrito: ["Más tiempo", "para hacer crecer", "tu negocio"],
   protegidos: "Tus datos están protegidos",
+  tutorial: "Ver tutorial",
+  tutorialPronto: "Muy pronto: el manual de uso, con capturas, textos y videos",
   sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
 };
 
@@ -294,10 +295,8 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
           <ul className="entrar-cc-puntos">
             {QUE_HACE.map((q) => { const [a, b] = partirEnDos(q.texto); return <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span><span className="texto">{a}<br />{b}</span></li>; })}
           </ul>
-          <div className="entrar-cc-lema" aria-hidden="true">
-            <p className="entrar-cc-manuscrito">{TEXTOS_DE_ENTRADA.manuscrito.map((l) => <span key={l}>{l}</span>)}</p>
-            <svg className="entrar-cc-flecha" viewBox="0 0 122 70" focusable="false"><path d="M4 62C40 66 80 58 112 10M96 12 113 8 114 26" /></svg>
-          </div>
+          {/* El manual de usuario se arma más adelante: por ahora el botón no lleva a ningún lado. */}
+        <button type="button" className="entrar-cc-tutorial" title={TEXTOS_DE_ENTRADA.tutorialPronto} data-testid="ver-tutorial"><Icono nombre="reproducir" tam={22} />{TEXTOS_DE_ENTRADA.tutorial}</button>
         </section>
         <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
         <section className="entrar-cc-tarjeta">

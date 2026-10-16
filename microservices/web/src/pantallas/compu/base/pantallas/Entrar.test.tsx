@@ -19,7 +19,7 @@ describe("la entrada de la computadora", () => {
   it("tiene la marca a la izquierda, el celular con una venta en el medio y la tarjeta para entrar a la derecha", async () => {
     const { container } = render(<Entrar />);
     const entrada = screen.getByTestId("entrar");
-    // La marca: antetítulo, título con «de la ferretería.» resaltado, bajada, lo que hace y la frase manuscrita.
+    // La marca: antetítulo, título con «de la ferretería.» resaltado, bajada y lo que hace.
     expect(entrada.querySelector(".entrar-cc-antetitulo")?.textContent).toBe("El sistema del mostrador");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Precios al día,ventas y stockde la ferretería.");
     expect(entrada.querySelector("h1 em")?.textContent).toBe("de la ferretería.");
@@ -30,7 +30,10 @@ describe("la entrada de la computadora", () => {
       ["Los precios se actualizan", "con las listas de los proveedores."],
       ["Lo que se vende baja del stock;", "lo que se compra, sube."],
     ]);
-    expect(entrada.querySelector(".entrar-cc-manuscrito")?.textContent).toBe("Más tiempopara hacer crecertu negocio");
+    // Debajo, «Ver tutorial», que por ahora no lleva a ningún lado (la frase manuscrita se sacó).
+    expect(screen.getByTestId("ver-tutorial").textContent).toBe("Ver tutorial");
+    expect(entrada.querySelector(".entrar-cc-marca [data-testid='ver-tutorial']")).toBeTruthy();
+    expect(entrada.querySelector(".entrar-cc-manuscrito")).toBeNull();
     // El medio: la foto del local y el celular con la captura de una venta, que no se leen en voz alta.
     expect(container.querySelector(".entrar-cc-fondo")?.getAttribute("aria-hidden")).toBe("true");
     const celular = container.querySelector(".entrar-cc-celular");

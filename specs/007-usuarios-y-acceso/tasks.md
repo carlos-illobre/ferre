@@ -25,3 +25,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T014 [ajuste] En la entrada de la computadora, la separación entre el logotipo, el antetítulo, el título, la bajada y las tres cosas que hace, y el tamaño de sus íconos, siguen la imagen de referencia de Carlos (decisión 93)
 - [x] T015 [interfaz] En monitores más anchos que 16:9, la entrada de la computadora no se estira: queda centrada y a los costados siguen el verde y el fondo claro (Carlos eligió la opción 1 el 2026-10-16)
 - [x] T016 [ajuste] El verde de la entrada de la computadora es la imagen que pasó Carlos el 2026-10-16, sin su logo: tres tonos en curva en las esquinas y el centro más oscuro
+- [x] T017 [interfaz] En la entrada de la computadora, el botón «Ver tutorial» (naranja, ancho, con ícono) va debajo de las tres cosas que hace, en lugar de la frase manuscrita; por ahora no lleva a ningún lado (Carlos, 2026-10-16)

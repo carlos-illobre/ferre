@@ -138,6 +138,13 @@ Carlos el 2026-10-16). Hasta 16:9 se ve igual que antes. El verde no es liso: es
 pasó Carlos ese día (`maquetas/capas/fondo-verde-con-logo.png`), sin su logo, estirada sobre la
 zona verde: tres tonos en curva en las esquinas (arriba junto a la curva y abajo a la izquierda) y
 el centro más oscuro. La foto y el lado claro no cambian.
+En la columna de la izquierda, debajo de las tres cosas que hace, va el botón «Ver tutorial», con
+el naranja de los botones principales, ancho y con un ícono de reproducir; reemplaza a la frase
+manuscrita. Carlos lo eligió el 2026-10-16 entre tres lugares (arriba del celular, debajo, o este). Va a abrir el manual de usuario (capturas de la aplicación, texto y videos), que se
+arma más adelante; mientras tanto el botón no lleva a ningún lado y dice «Muy pronto» al pasar
+el mouse.
+La tarjeta para entrar es más ancha, para que los pasos no queden apretados; si el celular la
+alcanza, pasa por encima de su borde sin tapar el código.
 
 **Qué necesita a la vista en el celular:**
 

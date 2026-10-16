@@ -2,8 +2,7 @@
    (specs/007-usuarios-y-acceso/maquetas/entrar-compu-con-celular.html). Se diseñó en 1536 × 1024:
    lo horizontal sigue el ancho de la ventana y los tamaños siguen su alto (--u es un píxel del
    diseño), así en una notebook se achica sin cortarse. El texto no baja de 14 px.
-   La frase manuscrita va en Caveat, recortada a sus letras (licencia OFL). */
-@font-face { font-family: "Caveat"; font-weight: 500; font-display: swap; src: url("../fuentes/caveat-500-lema.woff2") format("woff2"); }
+ */
 
 .entrar-cc {
   --u: clamp(0.62px, calc(100vh / 1024), 1.1px);
@@ -43,18 +42,18 @@
 .entrar-cc-puntos li > span:first-child { flex: none; display: grid; place-items: center; width: calc(66 * var(--u)); height: calc(68 * var(--u)); border-radius: 12px; background: #21443b; color: var(--cc-naranja); }
 .entrar-cc-puntos li > span:first-child svg { width: calc(44 * var(--u)); height: calc(44 * var(--u)); stroke-width: 1.9; }
 
-/* La frase manuscrita, con su flecha */
-.entrar-cc-lema { position: relative; margin: calc(78 * var(--u)) 0 0 calc(4 * var(--u)); }
-.entrar-cc-manuscrito { margin: 0; font-family: "Caveat", cursive; font-weight: 500; font-size: calc(36 * var(--u)); line-height: 0.98; color: #8fd0a8; transform: rotate(-8deg); transform-origin: left top; pointer-events: none; }
-.entrar-cc-manuscrito span { display: block; }
-.entrar-cc-manuscrito span:nth-child(2) { padding-left: calc(22 * var(--u)); }
-.entrar-cc-manuscrito span:nth-child(3) { padding-left: calc(66 * var(--u)); }
-.entrar-cc-flecha { position: absolute; left: calc(192 * var(--u)); top: calc(32 * var(--u)); width: calc(116 * var(--u)); height: calc(64 * var(--u)); fill: none; stroke: #8fd0a8; stroke-width: 2.4; stroke-linecap: round; }
-
-.entrar-cc-celular { position: absolute; left: calc(524 / 1600 * 100%); top: calc(330 / 1024 * 100%); height: calc(600 / 1024 * 100%); width: auto; aspect-ratio: 387 / 603; pointer-events: none; }
+.entrar-cc-celular { position: absolute; left: calc(524 / 1600 * 100%); top: calc(330 / 1024 * 100%); height: calc(600 / 1024 * 100%); width: auto; aspect-ratio: 387 / 603; pointer-events: none; z-index: 2; }
+/* «Ver tutorial», debajo de las tres cosas que hace (por ahora no lleva a ningún lado): con el
+   naranja de los botones principales y ancho, para que se note. */
+.entrar-cc-tutorial { display: inline-flex; align-items: center; justify-content: center; gap: calc(12 * var(--u)); margin-top: calc(54 * var(--u)); white-space: nowrap;
+  min-width: calc(290 * var(--u)); padding: calc(16 * var(--u)) calc(34 * var(--u)); border: 1px solid var(--ambar-fuerte); border-radius: 999px; background: var(--ambar); color: #fff; font: inherit; font-size: max(16px, calc(20 * var(--u))); font-weight: 800; cursor: pointer;
+  box-shadow: 0 12px 28px rgb(217 64 15 / 0.38), 0 2px 0 rgb(0 0 0 / 0.12); transition: transform 120ms ease-out, background-color 120ms ease-out, box-shadow 120ms ease-out; }
+.entrar-cc-tutorial svg { width: calc(28 * var(--u)); height: calc(28 * var(--u)); color: #fff; }
+.entrar-cc-tutorial:hover { background: var(--ambar-fuerte); transform: translateY(-1px); box-shadow: 0 16px 32px rgb(217 64 15 / 0.45), 0 2px 0 rgb(0 0 0 / 0.12); }
+.entrar-cc-tutorial:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
 /* La tarjeta para entrar, a la derecha sobre lo claro */
-.entrar-cc-tarjeta { position: absolute; right: calc(46 / 1536 * 100%); top: calc(100 * var(--u)); width: max(440px, calc(588 * var(--u))); display: flex; flex-direction: column; gap: calc(20 * var(--u));
+.entrar-cc-tarjeta { position: absolute; right: calc(46 / 1536 * 100%); top: calc(100 * var(--u)); width: max(530px, calc(650 * var(--u))); display: flex; z-index: 1; flex-direction: column; gap: calc(20 * var(--u));
   padding: calc(36 * var(--u)) calc(51 * var(--u)) 0; border-radius: 18px; background: rgb(255 255 255 / 0.96); box-shadow: 0 30px 70px rgb(23 49 43 / 0.14), 0 0 0 1px rgb(223 229 224 / 0.8); overflow: hidden; }
 .entrar-cc-tarjeta h2 { margin: 0 0 0 calc(8 * var(--u)); font-size: max(26px, calc(37 * var(--u))); font-weight: 800; letter-spacing: -0.01em; line-height: 1.1; }
 .entrar-cc-rapido { margin: calc(-14 * var(--u)) 0 calc(8 * var(--u)) calc(8 * var(--u)); font-size: max(15px, calc(19 * var(--u))); color: var(--p-texto-2, #4a5451); }
@@ -81,7 +80,7 @@
 
 /* Ventana angosta: primero se van el celular, la foto y la frase; después la marca. La tarjeta queda. */
 @media (max-width: 1180px) {
-  .entrar-cc-celular, .entrar-cc-lema { display: none; }
+  .entrar-cc-celular { display: none; }
 }
 @media (max-width: 860px) {
   .entrar-cc-marca, .entrar-cc-fondo { display: none; }
