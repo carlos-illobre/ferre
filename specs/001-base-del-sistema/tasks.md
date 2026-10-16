@@ -31,3 +31,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T020 [ajuste] Sin «Volver a Más» en ninguna pantalla, ni en el celular ni en la computadora (decisión 90)
 - [x] T021 [ajuste] «Volver a Más» vuelve al celular; solo la computadora queda sin él (Carlos lo aclaró el 2026-10-15, decisión 90)
 - [x] T022 [regla] El timer que busca versión nueva corre solo con la app a la vista; el análisis de cómo enterarse queda en el ADR-020 (decisión 91)
+- [x] T023 [ajuste] Las pruebas de punta a punta no graban video: los clips del manual se arman aparte (ADR-004, pedido de Carlos del 2026-10-16)

@@ -12,7 +12,9 @@ export default defineConfig({
   reporter: process.env.CI
     ? [["list"], ["github"], ["json", { outputFile: process.env.PLAYWRIGHT_JSON ?? "resultados.json" }]]
     : [["list"]],
-  use: { baseURL: process.env.BASE_URL ?? "http://localhost:4173", trace: "retain-on-failure", browserName: "chromium" },
+  // Sin video: los clips del manual de uso se graban aparte (tests/capturas/tutorial/), para que estas
+  // pruebas no se hagan más lentas (ADR-004, pedido de Carlos del 2026-10-16).
+  use: { baseURL: process.env.BASE_URL ?? "http://localhost:4173", trace: "retain-on-failure", video: "off", browserName: "chromium" },
   projects: [
     { name: "escritorio", testDir: "./escritorio", use: { viewport: { width: 1366, height: 768 } } },
     // El celular se reconoce por el aparato, no por el ancho (RF-84): la prueba se presenta como un teléfono.

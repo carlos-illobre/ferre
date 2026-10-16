@@ -706,3 +706,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       Carlos sacó.
     - El 2026-10-16 la frase manuscrita se reemplazó por el botón «Ver tutorial», que va a abrir
       el manual de usuario (capturas, texto y videos); por ahora no lleva a ningún lado.
+
+94. **El manual de uso** (2026-10-16). Lo abre «Ver tutorial», solo desde la entrada de la
+    computadora y en la misma pestaña. Un capítulo por pantalla principal: Entrar, Catálogo,
+    Vender y cada sección de Más. Cada capítulo explica con texto, pasos y capturas; un clip corto
+    muestra lo que se explica, como complemento. Las capturas y los clips se arman con la
+    aplicación de verdad, aparte de las pruebas de punta a punta (`specs/012-manual-de-uso/`).

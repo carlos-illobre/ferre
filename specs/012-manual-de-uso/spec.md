@@ -22,10 +22,15 @@ funcionalidad, es un complemento.» (Carlos, 2026-10-16)
 - El primer capítulo es «Entrar». Los demás (Vender, Catálogo y precios, Depósito, Más) figuran como
   «pronto».
 
-## Preguntas para Carlos
+## Clarifications
 
-- [NEEDS CLARIFICATION: ¿El manual se abre sin entrar a Ferrebress (desde la entrada) y también desde
-  adentro, por ejemplo desde Más?]
-- [NEEDS CLARIFICATION: ¿También desde el celular? Hoy «Ver tutorial» está solo en la computadora.]
-- [NEEDS CLARIFICATION: ¿Qué capítulos y en qué orden, después de «Entrar»?]
-- [NEEDS CLARIFICATION: ¿Se abre en la misma pestaña o en una nueva?]
+### Session 2026-10-16
+
+- Q: ¿Se abre también desde adentro de la aplicación? → A: No: solo desde la entrada.
+- Q: ¿También en el celular? → A: No, solo en la computadora.
+- Q: ¿Qué capítulos? → A: Uno por cada pantalla principal, en este orden: Entrar, Catálogo,
+  Vender y, después, cada sección de Más (Cómo va el negocio, Usuarios, Anomalías, Procesos, Mejoras
+  y errores, Configuración).
+- Q: ¿Misma pestaña o nueva? → A: En la misma pestaña; «Volver a Ferrebress» vuelve a la entrada.
+- Los clips y las capturas se arman aparte de las pruebas de punta a punta: esas pruebas no graban
+  video ni tienen las pausas del tutorial, para no hacerse más lentas (pedido de Carlos).
