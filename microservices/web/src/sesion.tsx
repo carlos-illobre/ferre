@@ -1,4 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+// Quien dependa de la sesión para conectarse (el espejo con el celular) se entera al entrar.
+export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
 import { api, borrarToken, guardarToken, leerToken } from "./api";
 
 // `roles` son los nombres de sus roles y `permisos` lo que esos roles le dejan hacer (RF-72).
@@ -32,6 +34,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
 
   const entrar = useCallback((token: string, usuario: Usuario) => {
     guardarToken(token);
+    window.dispatchEvent(new Event(EVENTO_SESION_ABIERTA));
     guardarUsuario(usuario);
     setSesion({ estado: "con-sesion", usuario, sinConexion: false, sesionId: null });
     api<{ id: string }>("/sesiones/actual").then((r) => setSesion((s) => (s.estado === "con-sesion" ? { ...s, sesionId: r.id } : s))).catch(() => undefined);

@@ -18,3 +18,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T007 [arreglo] Vinculados, ir a Depósito y enseguida a Más desde el celular hace que el celular vuelva solo a Depósito un segundo después
 - [x] T008 [interfaz] En Más, Usuarios y sesiones, Roles y Quién hizo qué se juntan en una sola opción, «Usuarios», con cuatro pestañas como Depósito: Usuarios, Sesiones, Roles y Quién hizo qué
 - [x] T009 [interfaz] Descartada por Carlos el 2026-10-16: probar el botón de Google del celular sobre un fondo azul del tamaño de los otros. Con el fondo, el texto del botón quedaba chico en proporción; queda como estaba
+- [x] T010 [arreglo] Al entrar a la computadora con el código QR del celular, la computadora quedaba en «Conectando con el celular…» y no se espejaba hasta recargar: el espejo salía antes que la sesión, el servidor lo rechazaba y no se volvía a intentar

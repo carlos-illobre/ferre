@@ -225,8 +225,10 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
           if (!vigente) return;
           if (r?.estado === "aprobada" && r.token && r.usuario) {
             // El celular que la dejó entrar queda emparejado: escanea y manda fotos sin leer más códigos.
+            // Primero la sesión: guardar el emparejamiento conecta el espejo, y sin sesión el servidor lo rechaza.
+            entrar(r.token, r.usuario);
             if (r.puesto) guardarPuestoLocal(r.puesto);
-            return entrar(r.token, r.usuario);
+            return;
           }
           if (r?.estado === "vencida") return void pedir();
           esperar(CADA_MS, () => void preguntar());

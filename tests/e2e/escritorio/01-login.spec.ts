@@ -121,6 +121,8 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
 
   // Quedan emparejados (decisión 58): sin leer más códigos, la computadora ya tiene su celular…
   await expect(celular.getByTestId("quedo-emparejado")).toBeVisible({ timeout: 15000 });
+  // …y se espejan enseguida, sin recargar la computadora (antes quedaba «Conectando con el celular…»).
+  await expect(compu.getByTestId("espejo")).toHaveClass(/activo/, { timeout: 15000 });
   expect(psql(`SELECT count(*) FROM puesto WHERE vinculado_en IS NOT NULL AND expira_en > now() + interval '29 days' AND celular_sesion_id = (SELECT id FROM sesion WHERE token_hash = '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}')`)).toBe("1");
   await compu.goto("/#/vender");
   await expect(compu.getByTestId("celular-vinculado")).toBeVisible();

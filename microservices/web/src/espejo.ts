@@ -2,6 +2,7 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { api, leerToken, urlApi } from "./api";
 import { escucharFlujo } from "./plataforma/tiempo-real/flujo-de-eventos";
 import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoLocal, puestoRemoto } from "./puesto";
+import { EVENTO_SESION_ABIERTA } from "./sesion";
 
 // El espejo entre el celular y la computadora emparejados (decisión 60). Con la aplicación
 // abierta en los dos, están en la misma parte y comparten el trabajo en curso (la venta).
@@ -58,10 +59,12 @@ function conectar() {
     url: urlApi(`/puestos/${id}/espejo`),
     cabeceras: () => ({ Authorization: `Bearer ${leerToken() ?? ""}` }),
     ignorar: ["latido"],
-    // El vínculo ya no existe (404) o la sesión no vale (401): no se insiste.
+    // El vínculo ya no existe (404) o la sesión no vale (401): no se insiste. Con 401 se vuelve
+    // a intentar cuando se abra una sesión: si no, quedaría «Conectando…» para siempre.
     alResponder: (codigo) => {
       if (codigo !== 404 && codigo !== 401) return;
       if (codigo === 404) { guardarPuestoLocal(null); guardarPuestoRemoto(null); }
+      else { cortar = null; puestoId = null; poner({ conectado: false, otroPresente: false }); }
       return "cortar";
     },
     alDesconectar: () => poner({ conectado: false, otroPresente: false }),
@@ -105,6 +108,7 @@ function arrancar() {
   if (arrancado || typeof window === "undefined") return;
   arrancado = true;
   window.addEventListener(EVENTO_EMPAREJAMIENTO, conectar);
+  window.addEventListener(EVENTO_SESION_ABIERTA, conectar);
   conectar();
 }
 
