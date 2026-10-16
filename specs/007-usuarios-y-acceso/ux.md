@@ -109,6 +109,15 @@ el botón de Google de verdad.
 que se renueva solo; «Continuar con Google» debajo, como alternativa. «Entrar con la huella»
 solo si esa computadora fue vinculada.
 
+**Cómo se ve la entrada de la computadora (decisión 93, maqueta aprobada por Carlos el
+2026-10-16: `maquetas/entrar-compu-con-celular.html`):** copia una imagen de referencia de
+Carlos. Tres zonas: el verde de la marca a la izquierda; en el medio una foto desenfocada de
+estantes y una mesa, con bordes curvos, y un celular apoyado que muestra la pantalla de Vender con
+una venta en curso y el menú de abajo (una captura real, que se vuelve a sacar si esa pantalla
+cambia); y a la derecha, sobre fondo claro, la tarjeta para entrar, con un pie «Tus datos están
+protegidos». En una ventana angosta primero se van el celular y la foto, y después la marca: la
+tarjeta queda siempre. Solo en la computadora: la entrada del celular sigue como está.
+
 **Qué necesita a la vista en el celular:**
 
 - En la entrada del celular, un botón «Escanear el código de la computadora» que abre la cámara

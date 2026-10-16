@@ -9,6 +9,9 @@ import { marcarEntradaConGoogle } from "./OfrecerHuella";
 import { useEnLinea } from "./negocio-comun";
 import { Aviso, Boton, Icono, Marca, Progreso, type NombreDeIcono } from "../ui";
 import "../estilos/entrar.css";
+import "../estilos/entrar-con-celular.css";
+import fotoDelLocal from "../imagenes/entrar-foto.jpg";
+import celularVendiendo from "../imagenes/entrar-celular-venta.jpg";
 import { entrarConGoogle } from "../../../../negocio/vinculo";
 import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
@@ -147,6 +150,11 @@ export const TEXTOS_DE_ENTRADA = {
   comoConHuella: "Acá no hay contraseñas. Entrás con la huella, si ya vinculaste este dispositivo, o con tu cuenta de Google.",
   comoSinHuella: "Acá no hay contraseñas. Entrás con tu cuenta de Google.",
   nota: "Solo entran las personas que un Administrador del negocio autorizó. Si es tu primera vez, pedile que agregue tu correo de Google.",
+  // Solo en la entrada de la computadora (decisión 93).
+  antetitulo: "El sistema del mostrador",
+  rapido: "Es rápido, seguro y sin contraseñas.",
+  manuscrito: ["Más tiempo", "para hacer crecer", "tu negocio"],
+  protegidos: "Tus datos están protegidos",
   sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
 };
 
@@ -246,16 +254,54 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
   return { qr, error };
 }
 
+// La entrada de la computadora (decisión 93): copia la imagen de referencia de Carlos. El verde
+// con la marca a la izquierda; en el medio, la foto del local entre dos bordes curvos, con un
+// celular que muestra una venta (una captura real de Vender); a la derecha, la tarjeta para
+// entrar. En el celular la entrada es otra (celular/pantallas/Login.tsx) y no cambia.
+function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
+  return (
+    <main className="entrar-cc" data-testid="entrar">
+      <div className="entrar-cc-foto" style={{ backgroundImage: `url(${fotoDelLocal})` }} aria-hidden="true" />
+      <svg className="entrar-cc-fondo" viewBox="0 0 1536 1024" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path className="verde" d="M0 0H830C770 90 712 230 684 400C656 570 610 760 540 880C500 950 455 995 418 1024H0Z" />
+        <path className="cinta" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024" strokeDasharray="0 270 470 2000" />
+        <path className="claro" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024H1536V0Z" />
+        <path className="curva" d="M872 0C826 90 796 190 805 300C815 420 868 520 880 640C890 760 912 870 878 1024H1536V1010C1360 1000 1150 930 1010 700C930 560 900 420 910 300C918 190 930 90 960 0Z" />
+        <path className="curva-2" d="M1536 760C1420 820 1300 930 1250 1024H1536Z" />
+        <path className="curva-3" d="M1536 60C1470 200 1480 380 1536 470Z" />
+      </svg>
+      <section className="entrar-cc-marca">
+        <Marca tam={64} />
+        <p className="entrar-cc-antetitulo">{TEXTOS_DE_ENTRADA.antetitulo}</p>
+        <h1>Precios al día,<br />ventas y stock<br /><em>de la ferretería.</em></h1>
+        <p className="entrar-cc-bajada">{TEXTOS_DE_ENTRADA.bajada}</p>
+        <ul className="entrar-cc-puntos">
+          {QUE_HACE.map((q) => <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span>{q.texto}</li>)}
+        </ul>
+        <div className="entrar-cc-lema" aria-hidden="true">
+          <p className="entrar-cc-manuscrito">{TEXTOS_DE_ENTRADA.manuscrito.map((l) => <span key={l}>{l}</span>)}</p>
+          <svg className="entrar-cc-flecha" viewBox="0 0 122 70" focusable="false"><path d="M4 62C40 66 80 58 112 10M96 12 113 8 114 26" /></svg>
+        </div>
+      </section>
+      <div className="entrar-cc-sombra" aria-hidden="true" />
+      <div className="entrar-cc-celular" aria-hidden="true"><img src={celularVendiendo} alt="" /></div>
+      <section className="entrar-cc-tarjeta">
+        {children}
+        <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>
+      </section>
+    </main>
+  );
+}
+
 export function Entrar() {
   const enLinea = useEnLinea();
   const [cerrada] = useState(() => sesionCerradaPorElServidor);
   const conHuella = hayHuella() && huellaVinculadaAca();
   const { qr, error: errorDeCodigo } = useCodigoParaEntrar(enLinea);
   return (
-    <MarcoDeEntrada testId="entrar" conPuntos
-      titulo={TEXTOS_DE_ENTRADA.titulo}
-      bajada={TEXTOS_DE_ENTRADA.bajada}>
+    <MarcoDeEntradaConCelular>
       <h2>{TEXTOS_DE_ENTRADA.conElCelular}</h2>
+      <p className="entrar-cc-rapido">{TEXTOS_DE_ENTRADA.rapido}</p>
       {cerrada && <Aviso tipo="alerta" testId="sesion-cerrada"><strong className="entrar-error-titulo">Hay que iniciar sesión</strong>La sesión de este dispositivo se cerró o venció. Entrá de nuevo para seguir.</Aviso>}
       {!enLinea && <Aviso tipo="alerta" testId="entrar-sin-conexion">{TEXTOS_DE_ENTRADA.sinConexion}</Aviso>}
       {enLinea && (
@@ -269,15 +315,15 @@ export function Entrar() {
           </ol>
         </div>
       )}
-      {enLinea && <p className="entrar-como">{TEXTOS_DE_ENTRADA.codigoSeRenueva}</p>}
+      {enLinea && <p className="entrar-como entrar-cc-renueva"><Icono nombre="reloj" tam={26} /><span>{TEXTOS_DE_ENTRADA.codigoSeRenueva}</span></p>}
       <Aviso tipo="error">{errorDeCodigo}</Aviso>
       <div className="entrar-o" aria-hidden="true"><span>o</span></div>
       {conHuella && <BotonHuella />}
       <BotonGoogle />
       <p className="entrar-nota">
-        <Icono nombre="info" tam={18} />
+        <Icono nombre="error" tam={18} />
         <span>{TEXTOS_DE_ENTRADA.nota}</span>
       </p>
-    </MarcoDeEntrada>
+    </MarcoDeEntradaConCelular>
   );
 }

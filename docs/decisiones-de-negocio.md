@@ -688,3 +688,19 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     eso lo hace el navegador. Carlos fijó el mínimo, el máximo, los valores y la
     llave, después de ver un campo para escribir los minutos a mano y una casilla, y preferir
     esto. Arranca en 15 min, con la llave prendida. Precisa la decisión 91.
+
+93. **La entrada de la computadora sigue una imagen de referencia de Carlos** (2026-10-16).
+    Carlos no quería el verde liso y pasó una imagen; pidió copiarla lo más fiel posible y
+    eligió, entre dos versiones, que el celular dibujado muestre una venta en curso.
+    - A la izquierda, el verde con la marca, «EL SISTEMA DEL MOSTRADOR», el título con «de la
+      ferretería.» en verde claro, la bajada, las tres cosas que hace y la frase manuscrita «Más
+      tiempo para hacer crecer tu negocio» con una flecha.
+    - En el medio, una foto desenfocada de estantes y una mesa de madera, entre dos bordes curvos
+      (el del verde en forma de sigmoide, el de la derecha en forma de S), y un celular apoyado en
+      la mesa que muestra la pantalla real de Vender con dos productos, el cobro y el menú de abajo.
+    - A la derecha, sobre fondo claro, la tarjeta para entrar: «Entrá con tu celular», «Es rápido,
+      seguro y sin contraseñas.», el código y los dos pasos, «El código se renueva solo cada 5
+      minutos. No hay contraseñas.», el botón de Google, quién puede entrar y un pie con «Tus datos
+      están protegidos» (solo texto) y el logotipo.
+    - Solo en la computadora: la entrada del celular no cambia. Sin «¿Necesitás ayuda?», que
+      Carlos sacó. La frase manuscrita va en Caveat.

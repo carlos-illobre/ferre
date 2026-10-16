@@ -57,6 +57,7 @@ const TRAZOS = {
   archivo: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8ZM14 3v5h5",
   proveedor: "M3 21V9l9-6 9 6v12M9 21v-7h6v7",
   reloj: "M12 7v5l3 2M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9Z",
+  candado: "M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5Z",
   ajustes: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4",
   procesos: "M3 4h7v6H3zM14 14h7v6h-7zM10 7h7v7",
   estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
