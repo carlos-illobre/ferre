@@ -1168,9 +1168,7 @@ RF-97:
     - microservices/api/src/rutas/roles.test.ts
     - tests/e2e/escritorio/13-roles.spec.ts
     - tests/e2e/celular/13-roles.spec.ts
-  defectos:
-    - "El dinero invertido se puede calcular con los costos de GET /productos y las cantidades de GET /stock, que llegan a cualquiera con sesión (venía de antes; a decidir por Carlos)"
-    - "Los gastos de la semana se pueden sumar con GET /compras, que pide «Ver las compras» y no «Ver los gastos»"
+  defectos: []
 
 RF-98:
   estado: "Hecho (012-T004): la migración 0022 da los tres permisos nuevos a los roles que tenían «Ver los números del negocio» y lo quita"

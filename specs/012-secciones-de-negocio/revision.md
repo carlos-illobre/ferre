@@ -212,3 +212,4 @@ Lo comparé con capturas de computadora (1366×768) y de celular (390×844).
 - **E15 en el celular y comentarios viejos:** la spec y el `ux.md` dicen que «Actualizar» es solo de la computadora; corregidos los comentarios de `DineroInvertido` y de la regla del stock.
 - **Pruebas unitarias de la computadora que no pueden fallar, E07 en la base, E19 con INSERT:** lo que verifican de verdad está en las de punta a punta; se deja anotado.
 - **En el celular los números no se explican al tocarlos y dicen «Sin conexión» mientras cargan:** ya era así antes de 012; anotado como defecto en RF-96.
+- **Decisiones de Carlos del 2026-10-16 (decisión 90):** Depósito → Inventario mostrará el valor con «Ver el dinero invertido» (012-T012); la sección Inventario queda sin número arriba; los costos del catálogo y los importes de las compras se dejan como estaban, a sabiendas.

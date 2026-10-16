@@ -21,7 +21,7 @@ variante A (`a-pestanas.html`), con el submenú arriba como en Catálogo y Usuar
 3. Los números de la sección:
    - Ventas: «Vendido hoy», «Ventas de hoy» y «No llevaron hoy».
    - Compras: «Gastos de la semana» (solo con «Ver los gastos»).
-   - Inventario: «Dinero invertido».
+   - Inventario: ninguno arriba; el bloque del dinero invertido ya muestra el total (Carlos, 2026-10-16).
 4. El detalle de la sección:
    - Ventas: ventas de hoy por medio de pago, con «Ver las ventas de hoy», y lo que
      preguntaron y no llevaron.

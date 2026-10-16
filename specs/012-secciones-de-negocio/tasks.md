@@ -15,4 +15,5 @@ Carlos del 2026-10-15.
 - [x] T008 La API de mentira de las capturas y las pruebas de punta a punta, en el celular y en la computadora, con los permisos nuevos (E19) (depende de T006, T007)
 - [x] T009 Comparar con la maqueta aprobada con capturas de computadora y de celular, y mostrarle a Carlos las diferencias (depende de T006, T007)
 - [x] T010 La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T008, T009)
-- [ ] T011 [carlos] Decidir si Depósito → Inventario muestra el valor en pesos con «Ver el dinero invertido» (choca con la decisión 31), si va el número «Dinero invertido» arriba de Inventario, y qué hacer con los costos y totales que hoy llegan sin esos permisos (revisión, E10)
+- [x] T011 [carlos] Decidir lo que dejó abierto la revisión (decisión 90): Depósito → Inventario muestra el valor con «Ver el dinero invertido»; sin número arriba en la sección Inventario; costos e importes de compras como estaban
+- [ ] T012 [interfaz] Depósito → Inventario con el valor en pesos para quien tiene «Ver el dinero invertido», en el celular y en la computadora (E10; maquetas `inventario-a-*` y `inventario-b-*`, a elegir por Carlos)

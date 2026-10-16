@@ -670,3 +670,16 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     Compras e Inventario con el submenú arriba, como en Catálogo y Usuarios; los números de
     cada sección van en su pestaña; «Actualizar» con ícono y, en la computadora, sin «Volver
     a Más». Está en `specs/012-secciones-de-negocio/`.
+
+90. **El valor del stock en Depósito, con «Ver el dinero invertido»; los costos y los importes
+    de las compras, como estaban** (2026-10-16). Al revisar 012, Carlos decidió:
+    - Depósito → Inventario muestra el valor en pesos a quien tiene «Ver el dinero invertido».
+      Cambia la decisión 31, que dejaba Inventario solo con cantidades: quien no tiene el
+      permiso sigue viendo solo cantidades. La forma, con maqueta (`specs/012-secciones-de-negocio/maquetas/inventario-*`).
+    - La sección Inventario de «Cómo va el negocio» no lleva el número arriba: el total ya está
+      en su bloque.
+    - Los costos de los productos siguen llegando a cualquiera con sesión, como hasta ahora,
+      aunque con ellos y las cantidades se pueda calcular el dinero invertido: lo necesitan
+      Vender y el cambio de margen sin conexión. Las compras recientes siguen con su importe
+      para quien tiene «Ver las compras», aunque sumándolas se saquen los gastos de la semana.
+
