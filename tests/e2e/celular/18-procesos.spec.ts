@@ -85,8 +85,12 @@ test("011-E30 011-E31 «Diagrama» muestra el dibujo y la hoja de figuras; tocar
 
 test("el botón de volver del celular cierra el menú «⋯», y después vuelve a la lista de procesos", async ({ page }) => {
   await abrirVenta(page, "Venta celular E2E (volver)");
+  const largo = await page.evaluate(() => history.length);
   await page.getByTestId("procesos-menu-celu").click();
   await expect(page.getByTestId("procesos-hoja-menu")).toBeVisible();
+  // El menú anota su paso en el historial un instante después de aparecer: si «volver» llega
+  // antes (la máquina de las pruebas cargada), deshace el paso del proceso y vuelve a la lista.
+  await expect.poll(() => page.evaluate(() => history.length)).toBe(largo + 1);
   await page.goBack();
   await expect(page.getByTestId("procesos-hoja-menu")).toHaveCount(0);
   await expect(page.getByTestId("procesos-pasos-celu")).toBeVisible();
