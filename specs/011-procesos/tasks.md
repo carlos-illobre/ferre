@@ -34,4 +34,6 @@ proyecto (ADR-019). Especificación y maqueta aprobadas por Carlos el 2026-10-14
 - [x] T028 [arreglo] Seguridad, «Qué queda registrado»: cambiar el borrador se anota en «Quién hizo qué», y el borrado lleva el nombre del proceso (revisión)
 - [x] T029 [arreglo] Si se corta la conexión con un proceso abierto, se deja de dibujar hasta que vuelva, sin perder el último cambio (aclaración «Sin conexión», E42; revisión)
 - [x] T030 [ajuste] En el celular, «Agregar un paso después» de la hoja del paso va con el color del botón principal (pedido de Carlos del 2026-10-14)
+- [x] T031 [arreglo] Tocar un proceso mientras se abre solo el último (E01) muestra el que se tocó: la respuesta que llega tarde no lo pisa ni vuelve a «Diagrama» (la prueba del botón de volver del celular fallaba por esto con la suite completa)
+- [x] T032 [arreglo] E43 mide en el navegador si el dibujo se traba al moverlo, no el tiempo que tarda la prueba en mandar el mouse (fallaba con la máquina cargada: 1010 ms contra 1000)
 - [x] T013 Actualizar `proyecto/estado.yml`, escribir el `resumen.md` de la capacidad y marcar T115 del plan (depende de T012)

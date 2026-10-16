@@ -86,12 +86,19 @@ export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: 
     }
   }, [pedir, guardarLocal]);
 
+  // Vale solo la respuesta del último proceso que se pidió abrir: si se toca uno mientras se abre
+  // solo el último (E01), la respuesta que llega tarde no lo pisa.
+  const ultimoPedido = useRef(0);
   const abrir = useCallback(async (id: string) => {
+    const pedido = ++ultimoPedido.current;
     setCargando(true);
     try {
-      recordar((await pedir(`/procesos/${id}`)) as Proceso);
+      const p = (await pedir(`/procesos/${id}`)) as Proceso;
+      if (pedido !== ultimoPedido.current) return;
+      recordar(p);
       setSinConexion(false);
     } catch (e) {
+      if (pedido !== ultimoPedido.current) return;
       const enMemoria = leerGuardado<Proceso>(guardarLocal, claveDe(id));
       if (esErrorDePedido(e) && e.estado === 0) {
         setSinConexion(true);
@@ -99,7 +106,7 @@ export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: 
         else setAviso("Sin conexión: este proceso no se abrió antes en este dispositivo. Hace falta conexión para verlo");
       } else setAviso(e instanceof Error ? e.message : "No se pudo abrir el proceso");
     } finally {
-      setCargando(false);
+      if (pedido === ultimoPedido.current) setCargando(false);
     }
   }, [pedir, guardarLocal, recordar]);
 
@@ -108,7 +115,8 @@ export function useProcesos(props: { pedir: Pedir; puede: Puede; guardarLocal?: 
     let vivo = true;
     void (async () => {
       const l = await cargarLista();
-      if (!vivo) return;
+      // Si mientras llegaba la lista ya se abrió uno, no se abre otro encima.
+      if (!vivo || ultimoPedido.current > 0) return;
       const ultimo = leerGuardado<string>(guardarLocal, CLAVE_ULTIMO);
       const elegido = l.find((p) => p.id === ultimo)?.id ?? l[0]?.id;
       if (elegido) await abrir(elegido);
