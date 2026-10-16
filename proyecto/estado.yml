@@ -1183,6 +1183,7 @@ RF-99:
   pruebas:
     - microservices/api/src/rutas/secciones-de-negocio.test.ts
     - microservices/api/src/rutas/roles.test.ts
+    - microservices/web/src/pantallas/celular/Deposito.test.tsx
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts

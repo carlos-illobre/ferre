@@ -101,11 +101,18 @@ describe("Depósito · Ingreso", () => {
 describe("Depósito · Stock", () => {
   beforeEach(() => { apiFalsa.mockReset(); enviarOEncolar.mockClear(); });
 
-  it("muestra cantidades y ninguna suma de dinero, los movimientos de cada producto, y corrige", async () => {
+  it("012-E10 con «Ver el dinero invertido», el total y el valor de cada producto (decisión 90)", async () => {
     armar("stock");
     const fila = await screen.findByTestId("fila-stock");
-    // Inventario es de quien compra: sin dinero invertido ni valor de cada producto (decisión 31).
-    expect(screen.queryByTestId("valorizacion")).toBeNull();
+    expect(within(fila).getByTestId("valor-stock").textContent).toBe("$17.000");
+    expect(screen.getByTestId("dinero-invertido-stock")).toBeTruthy();
+  });
+
+  it("012-E09 sin «Ver el dinero invertido», cantidades y ninguna suma de dinero; los movimientos de cada producto, y corrige", async () => {
+    conPermisos("deposito.stock");
+    armar("stock");
+    const fila = await screen.findByTestId("fila-stock");
+    expect(screen.queryByTestId("dinero-invertido-stock")).toBeNull();
     expect(screen.getByTestId("tabla-stock").textContent).not.toContain("$");
     expect(within(fila).getByTestId("foto-chica")).toBeTruthy(); // la foto del producto también se saca desde acá
     expect(within(fila).getByTestId("stock").textContent).toContain("17 u.");
