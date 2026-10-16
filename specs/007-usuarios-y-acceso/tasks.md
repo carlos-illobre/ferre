@@ -17,4 +17,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T006 [ajuste] En la computadora, «Autorizar a alguien» aprovecha el ancho: nombre, correo y el botón en una línea, y los roles debajo, repartidos en columnas
 - [x] T007 [arreglo] Vinculados, ir a Depósito y enseguida a Más desde el celular hace que el celular vuelva solo a Depósito un segundo después
 - [x] T008 [interfaz] En Más, Usuarios y sesiones, Roles y Quién hizo qué se juntan en una sola opción, «Usuarios», con cuatro pestañas como Depósito: Usuarios, Sesiones, Roles y Quién hizo qué
-- [ ] T009 [interfaz] En la entrada del celular, el botón de Google va centrado sobre un fondo del mismo azul y del mismo alto, ancho y redondeo que «Entrar con la huella», para que se vea del tamaño de los otros (maqueta `maquetas/celular-google-con-fondo.png`, a aprobar por Carlos)
+- [x] T009 [interfaz] Descartada por Carlos el 2026-10-16: probar el botón de Google del celular sobre un fondo azul del tamaño de los otros. Con el fondo, el texto del botón quedaba chico en proporción; queda como estaba
