@@ -896,6 +896,7 @@ RNF-13:
     - tests/integration/migraciones.sh
     - microservices/api/src/migraciones.test.ts
     - microservices/listas/tests/test_health.py
+    - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
   defectos:
     - "Sin prueba: la vuelta atrás automática cuando la versión nueva no queda sana"
     - "Sin prueba: que el cliente tome solo la versión nueva y conserve lo guardado en el dispositivo"

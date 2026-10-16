@@ -24,3 +24,4 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [017](ADR-017-permisos-fijos-y-roles-armados-por-el-negocio.md) | Permisos fijos en el código y roles armados por el negocio, varios por usuario | Aceptado | 2026-10-11 |
 | [018](ADR-018-servicios-y-capas.md) | El código se organiza en servicios bajo `microservices/` y en capas; un solo front; sin librerías compartidas; precios en el servidor |
 | [019](ADR-019-procesos-como-modulo-que-se-lleva.md) | Procesos es un módulo aparte que se puede llevar a otro proyecto: servicio propio, esquema propio en la misma base, `bpmn-js` y pantallas como paquete de React | Aceptado | 2026-10-14 |
+| [020](ADR-020-como-se-entera-la-app-de-una-version-nueva.md) | La app busca una versión nueva al abrir, al volver a primer plano y con un timer solo mientras está a la vista; sin eventos desde el servidor | Aceptado | 2026-10-16 |

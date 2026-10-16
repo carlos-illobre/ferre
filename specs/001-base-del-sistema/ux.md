@@ -285,8 +285,9 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **La primera vez en un dispositivo** el catálogo no se espera entero: se ve una primera
   tanda y el resto baja atrás.
 
-**Versión nueva (decisión 54).** La app instalada busca sola si hay una versión nueva: al
-abrirse, al volver a primer plano y cada media hora. Recién abierta, se actualiza sin
+**Versión nueva (decisiones 54 y 91, ADR-020).** La app instalada busca sola si hay una
+versión nueva: al abrirse, al volver a primer plano, al volver la conexión y cada media hora
+mientras está a la vista; oculta, no busca. Recién abierta, se actualiza sin
 preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
 tapa lo que se está haciendo, y nunca se recarga sola.
 

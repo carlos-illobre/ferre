@@ -672,3 +672,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     «Volver a Más» porque no hacen falta, y después aclaró que solo en la computadora: ahí se
     vuelve con «Más» del menú de la izquierda, que siempre está a la vista. En el celular el
     botón se queda (decisión 64).
+
+91. **El timer que busca versión nueva corre solo con la app a la vista** (2026-10-16). Carlos
+    preguntó si el timer se podía reemplazar por un aviso que mande GitHub al publicar. Se
+    compararon las opciones (ADR-020) y eligió quedarse con el timer, sin eventos: se busca al
+    abrir, al volver a primer plano, al volver la conexión y cada media hora, pero el timer se
+    para mientras la app está oculta. Que la API avise su versión en cada respuesta queda para
+    más adelante. Precisa la decisión 54.

@@ -1,9 +1,11 @@
 import { registerSW } from "virtual:pwa-register";
+import { repetirMientrasSeVe } from "../plataforma/tiempo/mientras-se-ve";
 import { EVENTO_VERSION_NUEVA } from "./VersionNueva";
 
-// Cómo se actualiza la app instalada. El navegador solo busca una versión nueva cuando la app
-// se carga, y un celular puede tenerla abierta en segundo plano durante días: por eso se busca
-// también cada vez que vuelve a primer plano y cada media hora.
+// Cómo se actualiza la app instalada (decisiones 54 y 91, ADR-020). El navegador solo busca una
+// versión nueva cuando la app se carga, y un celular puede tenerla abierta en segundo plano
+// durante días: por eso se busca también cada vez que vuelve a primer plano, al volver la
+// conexión y cada media hora mientras está a la vista (oculta no gasta nada).
 // Cuando aparece una versión nueva: si la app se acaba de abrir, se actualiza sola (todavía
 // no hay nada a medio hacer); si ya se estaba usando, se avisa y la persona elige cuándo.
 const RECIEN_ABIERTA_MS = 15_000;
@@ -20,9 +22,9 @@ export function mantenerActualizada(): void {
     onRegisteredSW(_url, registro) {
       if (!registro) return;
       const buscar = () => { if (navigator.onLine) registro.update().catch(() => undefined); };
-      document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") buscar(); });
+      // Al volver a la vista busca en el momento y el timer cuenta desde cero.
+      repetirMientrasSeVe(buscar, () => CADA_MS);
       window.addEventListener("online", buscar);
-      setInterval(buscar, CADA_MS);
     },
   });
 }
