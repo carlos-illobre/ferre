@@ -23,3 +23,5 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T012 [interfaz] La entrada de la computadora se arma con las capas que pasó Carlos: sus formas del fondo, la foto del local y el celular, con la pantalla real de la venta puesta en perspectiva (decisión 93)
 - [x] T013 [interfaz] El celular de la entrada de la computadora es el que pasó Carlos con la venta ya puesta, sin su fondo, que se ve más nítido (decisión 93)
 - [x] T014 [ajuste] En la entrada de la computadora, la separación entre el logotipo, el antetítulo, el título, la bajada y las tres cosas que hace, y el tamaño de sus íconos, siguen la imagen de referencia de Carlos (decisión 93)
+- [x] T015 [interfaz] En monitores más anchos que 16:9, la entrada de la computadora no se estira: queda centrada y a los costados siguen el verde y el fondo claro (Carlos eligió la opción 1 el 2026-10-16)
+- [x] T016 [ajuste] El verde de la entrada de la computadora es la imagen que pasó Carlos el 2026-10-16, sin su logo: tres tonos en curva en las esquinas y el centro más oscuro

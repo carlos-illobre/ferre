@@ -284,25 +284,27 @@ function partirEnDos(texto: string): [string, string] {
 function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
   return (
     <main className="entrar-cc" data-testid="entrar">
-      <div className="entrar-cc-fondo" style={{ backgroundImage: `url(${fondoDeLaEntrada})` }} aria-hidden="true" />
-      <section className="entrar-cc-marca">
-        <Marca tam={64} />
-        <p className="entrar-cc-antetitulo">{TEXTOS_DE_ENTRADA.antetitulo}</p>
-        <h1>Precios al día,<br />ventas y stock<br /><em>de la ferretería.</em></h1>
-        <p className="entrar-cc-bajada">{TEXTOS_DE_ENTRADA.bajada}</p>
-        <ul className="entrar-cc-puntos">
-          {QUE_HACE.map((q) => { const [a, b] = partirEnDos(q.texto); return <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span><span className="texto">{a}<br />{b}</span></li>; })}
-        </ul>
-        <div className="entrar-cc-lema" aria-hidden="true">
-          <p className="entrar-cc-manuscrito">{TEXTOS_DE_ENTRADA.manuscrito.map((l) => <span key={l}>{l}</span>)}</p>
-          <svg className="entrar-cc-flecha" viewBox="0 0 122 70" focusable="false"><path d="M4 62C40 66 80 58 112 10M96 12 113 8 114 26" /></svg>
-        </div>
-      </section>
-      <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
-      <section className="entrar-cc-tarjeta">
-        {children}
-        <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>
-      </section>
+      <div className="entrar-cc-escena">
+        <div className="entrar-cc-fondo" style={{ backgroundImage: `url(${fondoDeLaEntrada})` }} aria-hidden="true" />
+        <section className="entrar-cc-marca">
+          <Marca tam={64} />
+          <p className="entrar-cc-antetitulo">{TEXTOS_DE_ENTRADA.antetitulo}</p>
+          <h1>Precios al día,<br />ventas y stock<br /><em>de la ferretería.</em></h1>
+          <p className="entrar-cc-bajada">{TEXTOS_DE_ENTRADA.bajada}</p>
+          <ul className="entrar-cc-puntos">
+            {QUE_HACE.map((q) => { const [a, b] = partirEnDos(q.texto); return <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span><span className="texto">{a}<br />{b}</span></li>; })}
+          </ul>
+          <div className="entrar-cc-lema" aria-hidden="true">
+            <p className="entrar-cc-manuscrito">{TEXTOS_DE_ENTRADA.manuscrito.map((l) => <span key={l}>{l}</span>)}</p>
+            <svg className="entrar-cc-flecha" viewBox="0 0 122 70" focusable="false"><path d="M4 62C40 66 80 58 112 10M96 12 113 8 114 26" /></svg>
+          </div>
+        </section>
+        <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
+        <section className="entrar-cc-tarjeta">
+          {children}
+          <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>
+        </section>
+      </div>
     </main>
   );
 }

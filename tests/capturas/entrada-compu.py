@@ -46,6 +46,42 @@ def redondeado(tam, radio, margen=0):
     return m
 
 
+def verde_de_fondo(tam) -> Image.Image:
+    """El verde de la referencia que pasó Carlos (capas/fondo-verde-con-logo.png): bandas en curva
+    más claras en las esquinas y el centro más oscuro. Se le borra el logo, rellenando su lugar con
+    los tonos de alrededor, y se agranda al tamaño de la escena (son tonos suaves: no se nota)."""
+    im = Image.open(CAPAS / "fondo-verde-con-logo.png").convert("RGB")
+    a = np.array(im).astype(float)
+    tapa = np.zeros(a.shape[:2], bool)
+    tapa[62:118, 48:228] = True  # el logo, con margen
+    # Relleno: el promedio de lo que rodea, cada vez más difuso, solo donde estaba el logo.
+    peso = (~tapa).astype(float)
+    for radio in (6, 12, 24):
+        img = Image.fromarray((a * peso[..., None]).clip(0, 255).astype("uint8"))
+        suma = np.array(img.filter(ImageFilter.GaussianBlur(radio))).astype(float)
+        cuenta = np.array(Image.fromarray((peso * 255).astype("uint8")).filter(ImageFilter.GaussianBlur(radio))).astype(float) / 255
+        relleno = suma / np.maximum(cuenta[..., None], 1e-3)
+        a[tapa] = relleno[tapa]
+    limpio = Image.fromarray(a.clip(0, 255).astype("uint8"))
+    return limpio.resize(tam, Image.BICUBIC).filter(ImageFilter.GaussianBlur(tam[0] / 600))
+
+
+def con_esquinas(fondo: Image.Image, formas: Image.Image) -> Image.Image:
+    """Donde el fondo es verde, va el verde de la referencia de Carlos."""
+    f = np.array(formas).astype(int)
+    verde = (f[..., 3] > 200) & (f[..., 0] < 45) & (f[..., 1] < 90)
+    verde = np.array(Image.fromarray((verde * 255).astype("uint8")).filter(ImageFilter.GaussianBlur(1.5))) / 255.0
+    base = np.array(fondo.convert("RGB")).astype(float)
+    # La imagen cubre la zona verde (de la izquierda hasta donde llega la curva arriba), no toda la
+    # escena: así sus bandas de arriba a la derecha quedan junto a la curva, como en la referencia.
+    hasta = int(np.where(verde.max(0) > 0.5)[0].max()) + 1
+    textura = np.zeros_like(np.array(fondo.convert("RGB"))).astype(float)
+    textura[:, :hasta] = np.array(verde_de_fondo((hasta, fondo.size[1]))).astype(float)
+    m = verde[..., None]
+    final = base * (1 - m) + textura * m
+    return Image.fromarray(final.clip(0, 255).astype("uint8")).convert("RGBA")
+
+
 def main(captura: str):
     ancho, alto = 800 * ESCALA, 512 * ESCALA
     capa = lambda n: Image.open(CAPAS / n).convert("RGBA").resize((ancho, alto), Image.LANCZOS)
@@ -97,6 +133,7 @@ def main(captura: str):
     ImageDraw.Draw(sombra).ellipse((262 * ESCALA, 448 * ESCALA, 440 * ESCALA, 468 * ESCALA), fill=(0, 0, 0, 120))
     foto = Image.alpha_composite(foto, sombra.filter(ImageFilter.GaussianBlur(14)))
     fondo = Image.alpha_composite(foto, formas)
+    fondo = con_esquinas(fondo, formas)
     fondo.convert("RGB").save(SALIDA / "entrar-fondo.jpg", quality=84)
     print("listo:", SALIDA / "entrar-fondo.jpg", SALIDA / "entrar-celular.png", "celular en", (x0, y0, x1, y1), "de", (ancho, alto))
 

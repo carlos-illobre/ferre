@@ -81,7 +81,9 @@ cualquiera de los dos, corré `bash .claude/scripts/preparar-nube.sh` y mirá qu
 después `tests/e2e.sh`. A Carlos se le dice el resultado tal cual: cuántas pasaron y cuáles
 fallaron. Una que falla se corre sola (`tests/e2e.sh --solo "<nombre>"`) para ver si es del
 cambio; si no lo es, se dice cuál, por qué y que se repitió sola. Un cambio que solo toca
-documentación no las necesita.
+documentación no las necesita, ni uno solo estético (estilos, imágenes, colores, separaciones:
+nada de lógica ni de qué hay en la pantalla), que se sube con las unitarias y una captura
+(Carlos, 2026-10-16).
 
 **Si hace falta un sitio de internet que no está permitido, se le pide permiso a Carlos.**
 Vale para cualquier acceso: leer una página o documentación, buscar en la web, bajar un

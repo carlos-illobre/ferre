@@ -12,12 +12,23 @@
   --cc-menta: #86d0a2;
   --cc-naranja: #f0782f;
   --cc-verde-paso: #2d8a5c;
-  position: relative; min-height: 100vh; min-width: 100%; overflow: hidden; background: var(--cc-claro); color: var(--p-tinta, #18201e); font-family: var(--fuente);
+  position: relative; min-height: 100vh; min-width: 100%; overflow: hidden;
+  /* Más ancho que 16:9, la escena queda centrada y a los dos costados va un verde casi negro, liso
+     (pedido de Carlos del 2026-10-16). */
+  background: #03110e; color: var(--p-tinta, #18201e); font-family: var(--fuente);
 }
 
 /* El fondo y el celular son imágenes armadas con las capas de Carlos (800 × 512, al doble). Se
    estiran a la ventana, y el celular se ubica en el mismo lugar de esa imagen, sin deformarse. */
 .entrar-cc-fondo { position: absolute; inset: 0; background: #0b3a30 center / 100% 100% no-repeat; }
+
+.entrar-cc-escena { position: relative; width: min(100%, calc(100vh * 16 / 9)); min-height: 100vh; margin: 0 auto; }
+/* Con costados (más ancho que 16:9), la escena va como una tarjeta: con las puntas redondeadas y
+   un margen arriba y abajo. Todo se mide con el alto que le queda. */
+@media (min-aspect-ratio: 181/100) {
+  .entrar-cc { --u: clamp(0.62px, calc((100vh - 48px) / 1024), 1.1px); }
+  .entrar-cc-escena { width: calc((100vh - 48px) * 16 / 9); min-height: calc(100vh - 48px); margin: 24px auto; border-radius: 28px; overflow: hidden; }
+}
 
 /* La marca, a la izquierda sobre el verde */
 .entrar-cc-marca { position: absolute; left: calc(80 / 1536 * 100%); top: calc(64 * var(--u)); width: max(330px, calc(480 * var(--u))); color: #fff; }

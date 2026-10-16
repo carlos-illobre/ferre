@@ -131,6 +131,13 @@ armar con la captura nueva sobre el celular de la capa, o con otro celular que p
 La separación de los textos de la izquierda (logotipo, antetítulo, título, bajada y las tres cosas
 que hace) y el tamaño de sus íconos se midieron sobre un recorte de la referencia que pasó Carlos
 el 2026-10-16: quedan a 2 o 3 píxeles de ella en una pantalla de 1536 × 1024.
+En un monitor más ancho que 16:9 (un ultra ancho de 2560 × 1080, por ejemplo) la escena no se
+estira, porque la foto se deformaba y quedaba un hueco en el medio: queda centrada, del ancho de un
+16:9, con las puntas redondeadas y un margen arriba y abajo, y a los dos costados va un verde casi negro, liso (elegido por
+Carlos el 2026-10-16). Hasta 16:9 se ve igual que antes. El verde no es liso: es la imagen que
+pasó Carlos ese día (`maquetas/capas/fondo-verde-con-logo.png`), sin su logo, estirada sobre la
+zona verde: tres tonos en curva en las esquinas (arriba junto a la curva y abajo a la izquierda) y
+el centro más oscuro. La foto y el lado claro no cambian.
 
 **Qué necesita a la vista en el celular:**
 
