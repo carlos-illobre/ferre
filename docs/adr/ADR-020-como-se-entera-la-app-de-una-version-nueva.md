@@ -131,3 +131,10 @@ Elegido por Carlos el 2026-10-16: **1 + 2 + 4**.
   quiera enterarse antes lo baja en Configuración, gastando un poco más de datos (contra
   GitHub Pages, no contra nuestra máquina).
 - La máquina no suma carga ni conexiones por esto, con uno o con muchos locales.
+
+## Enmienda (2026-10-16)
+
+El tiempo del timer lo elige cada dispositivo en Configuración: 5 min, 15 min, 1 hora o 24
+horas, y una llave que lo apaga (decisión 92, RF-96). Arranca en 15 min, no en 30. Con la
+llave apagada, la aplicación no busca nada mientras está abierta (ni 2 ni 4): queda solo 1, que
+hace el navegador al abrirla y no se puede apagar. La pantalla lo dice.

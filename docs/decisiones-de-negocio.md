@@ -679,3 +679,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     abrir, al volver a primer plano, al volver la conexión y cada media hora, pero el timer se
     para mientras la app está oculta. Que la API avise su versión en cada respuesta queda para
     más adelante. Precisa la decisión 54.
+
+92. **Cada dispositivo elige cada cuánto busca versión nueva** (2026-10-16). En Configuración,
+    cuatro botones (5 min, 15 min, 1 hora y 24 horas) y una llave, como la de «Animaciones» y al
+    costado de la descripción. Prendida, busca; apagada, no busca mientras la aplicación está
+    abierta (ni con el timer, ni al volver a ella, ni al volver la conexión) y los botones no se
+    muestran. Igual la versión nueva llega al cerrar la aplicación y volver a abrirla, porque
+    eso lo hace el navegador. Carlos fijó el mínimo, el máximo, los valores y la
+    llave, después de ver un campo para escribir los minutos a mano y una casilla, y preferir
+    esto. Arranca en 15 min, con la llave prendida. Precisa la decisión 91.

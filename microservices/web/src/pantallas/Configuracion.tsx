@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { cambiarPreferencia, usePreferencias } from "../preferencias";
+import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias, type TiempoDeVersion } from "../preferencias";
 import { borrarLoGuardado } from "../almacen";
 import { pendientes } from "../cola";
 import { esCelularAca } from "../guardado";
@@ -15,6 +15,9 @@ const FORMAS_DE_BUSCAR: { valor: "memoria" | "servidor"; nombre: string; ventaja
   { valor: "servidor", nombre: "Buscar en el servidor", ventaja: "no baja el catálogo: abre enseguida y casi no gasta datos.", desventaja: "cada búsqueda y cada código escaneado espera a la red." },
 ];
 
+// Cada cuánto se busca una versión nueva con la aplicación a la vista (RF-96, decisión 92).
+const NOMBRE_DEL_TIEMPO: Record<TiempoDeVersion, string> = { 5: "5 min", 15: "15 min", 60: "1 hora", 1440: "24 horas" };
+
 function useReducirMovimiento(): boolean {
   const consulta = typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : null;
   const [pedido, setPedido] = useState(consulta?.matches ?? false);
@@ -28,7 +31,7 @@ function useReducirMovimiento(): boolean {
 }
 
 export function Configuracion({ celular = false, alCambiarElGuardado = () => location.reload() }: { celular?: boolean; alCambiarElGuardado?: () => void }) {
-  const { animaciones, sinConexion, buscar } = usePreferencias();
+  const { animaciones, sinConexion, buscar, versionCada, versionNunca } = usePreferencias();
   // Trabajar sin conexión (RF-84): solo en el celular. Cambiarlo vuelve a abrir la aplicación,
   // para que arranque guardando todo o sin guardar nada. Deshabilitarlo borra lo guardado; si
   // había cambios sin enviar se pierden, y antes se avisa.
@@ -92,6 +95,24 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
             ))}
           </li>
         )}
+        <li className="cfg-fila" data-testid="cfg-version">
+          <span className="cfg-nombre" id="cfg-version">Buscar versión nueva</span>
+          <button type="button" role="switch" aria-checked={!versionNunca} aria-labelledby="cfg-version" aria-describedby="cfg-version-detalle"
+            className={`cfg-llave ${versionNunca ? "" : "si"}`} onClick={() => cambiarPreferencia("versionNunca", !versionNunca)} data-testid="cfg-version-llave" />
+          <span className="cfg-detalle" id="cfg-version-detalle">
+            {versionNunca
+              ? (celular ? "No busca. La versión nueva llega al cerrar la app y volver a abrirla." : "No busca versiones nuevas mientras está abierta. La versión nueva llega recién al cerrarla y volver a abrirla.")
+              : (celular ? "Cada cuánto, con la app abierta. Más seguido gasta un poco más de datos." : "Mientras la aplicación está a la vista, cada cuánto se fija si hay una versión nueva. También se fija al abrirla y cada vez que se vuelve a ella. Más seguido se entera antes y gasta un poco más de datos.")}
+          </span>
+          {!versionNunca && (
+            <div className="cfg-tramos" role="radiogroup" aria-labelledby="cfg-version">
+              {TIEMPOS_DE_VERSION.map((t) => (
+                <button key={t} type="button" role="radio" aria-checked={versionCada === t} className={versionCada === t ? "elegido" : ""}
+                  onClick={() => cambiarPreferencia("versionCada", t)} data-testid={`cfg-version-${t}`}>{NOMBRE_DEL_TIEMPO[t]}</button>
+              ))}
+            </div>
+          )}
+        </li>
       </ul>
       <p className="cfg-nota">Se guarda en {donde}. No cambia nada en los demás dispositivos.</p>
     </main>

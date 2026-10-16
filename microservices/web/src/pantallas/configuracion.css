@@ -22,3 +22,9 @@
 .cfg-opcion.elegida { border-color: var(--p-ok, #0f8a5f); background: var(--p-verde-suave, #e3f3ea); box-shadow: inset 0 0 0 1px var(--p-ok, #0f8a5f); }
 .cfg-opcion.elegida strong::after { content: " · elegida"; color: var(--p-verde-texto, #0f6b52); font-weight: 600; font-size: 0.875rem; }
 .cfg-opcion:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 2px; }
+/* Cada cuánto buscar versión nueva: la llave al costado, como las demás, y debajo cuatro
+   botones en una fila, que no se muestran con la llave apagada. */
+.cfg-tramos { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; max-width: 440px; padding: 4px; border-radius: 14px; background: var(--p-fondo-2, #eef3ee); }
+.cfg-tramos button { min-height: 44px; padding: 0 4px; border: 0; border-radius: 11px; background: transparent; color: var(--p-texto-2, #3a4441); font: inherit; font-size: 0.9375rem; font-weight: 600; cursor: pointer; }
+.cfg-tramos button.elegido { background: var(--p-superficie, #fff); color: var(--p-verde-texto, #0f6b52); box-shadow: 0 0 0 2px var(--p-ok, #0f8a5f); }
+.cfg-tramos button:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 2px; }
