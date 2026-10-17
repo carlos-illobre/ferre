@@ -20,6 +20,7 @@ venta, la categoría ni el estado «Activo».
 
 - Q: ¿Qué entra de la imagen de referencia? → A: El encabezado con la foto, la etiqueta de stock, el código de barras con copiar y escanear, «Código actualizado» con la última lectura, el proveedor en uso primero, «Así se calcula», el archivo de origen y, aunque no está en la imagen, «Agregar a la venta». No entran «Guardar cambios» (el margen se guarda al tocarlo, como hoy), el lápiz del precio (el precio a mano vale solo para una venta), la categoría (los productos no tienen) ni «Activo» (no existe ese estado).
 - Q: ¿Qué es la «última lectura» del código? → A: La última vez que se cargó o se cambió el código de ese producto (desde su ficha o al asociar un código desconocido); escanearlo para buscar o vender no la cambia (decisión 107).
+- Q: ¿Qué maqueta? → A: La A, como la referencia: una tarjeta por tema, en el orden código, proveedor, precio y archivo, con «Listo» y «Agregar a la venta» fijos abajo. Se acepta que el precio no se vea sin bajar.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -162,7 +163,7 @@ la mecha con cantidad 1.
 
 ### Measurable Outcomes
 
-- **SC-001**: En el celular, sin bajar, se ven la foto, el nombre, el stock, el código de barras y el precio de venta.
+- **SC-001**: En el celular, sin bajar, se ven la foto, el nombre, el stock y el código de barras; el precio de venta, bajando una vez (Carlos eligió la maqueta A, que deja el precio debajo del proveedor, 2026-10-17).
 - **SC-002**: Saber de dónde sale un precio (costo, margen, IVA y redondeo) lleva un toque, sin salir de la ficha.
 - **SC-003**: Copiar el código de barras de un producto lleva un toque (hoy no se puede).
 - **SC-004**: Agregar a la venta un producto desde su ficha lleva un toque, en lugar de cerrar la ficha y buscarlo en Vender.
