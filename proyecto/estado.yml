@@ -795,11 +795,14 @@ RF-108:
   estado: "A validar (015): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
     - microservices/web/src/negocio/ventas/venta-en-curso.test.tsx
+    - microservices/web/src/sesion.test.tsx
     - microservices/web/src/pantallas/celular/Catalogo.para-vender.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
     - tests/e2e/celular/17-espejo.spec.ts
     - tests/e2e/escritorio/17-espejo.spec.ts
-  defectos: []
+  defectos:
+    - "El espejo se prueba solo agregando desde el celular; desde la computadora usa el mismo camino, sin prueba propia (revisión 015, 1.3)"
+    - "E08 y E10 no cobran en la prueba: el cobro y el aviso «Hay productos sin precio» son los de Vender, con sus pruebas (revisión 015, 1.4 y 1.5)"
 
 RF-109:
   estado: "A validar (015): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
@@ -807,7 +810,8 @@ RF-109:
     - microservices/web/src/negocio/catalogo/stock-y-filtros.test.ts
     - microservices/web/src/pantallas/celular/Catalogo.para-vender.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
-  defectos: []
+  defectos:
+    - "No se midió con 11.000 productos que buscar con filtros sea tan rápido como sin ellos (SC-004 de 015, revisión 4.3)"
 
 RF-110:
   estado: "A validar (015): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"

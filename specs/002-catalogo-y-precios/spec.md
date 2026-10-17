@@ -519,6 +519,7 @@ catálogo y ver si aparece entre los primeros resultados.
 - **Dos usuarios cambian el margen del mismo producto:** vale el último, y los dos cambios quedan en el registro de acciones.
 - **Unir un producto consigo mismo, o con uno que ya fue absorbido:** no se permite y lo dice.
 - **Vincular el celular sin conexión:** no se puede; el celular igual escanea y busca en su propio catálogo.
+- **El Catálogo también sirve para vender (lo cambió 015, 2026-10-17):** cada producto dice su stock con su unidad o «Sin stock»; quien puede vender lo agrega a la venta en curso desde ahí, sin ir a Vender; y la lista se filtra por disponibilidad y por marca desde un botón, con las marcas de lo encontrado. Las reglas están en `specs/015-catalogo-para-vender/` (RF-107 a RF-110).
 - **Código de barras que ya tiene otro producto:** al asociarlo, [NEEDS CLARIFICATION: si un código de barras desconocido se quiere asociar a un producto, pero ese código ya lo tiene otro producto, ¿se rechaza, se pasa al producto nuevo o se sugiere que los dos son el mismo artículo?].
 
 ## Requirements *(mandatory)*

@@ -13,4 +13,4 @@ y marca, pestañas más altas y el buscador que dice qué busca (pedido de Carlo
 - [x] T006 Una prueba por escenario (E01 a E30), anotada en `proyecto/estado.yml` (depende de T004 y T005)
 - [x] T007 Comparar con las maquetas aprobadas mediante capturas de celular y computadora y mostrarle a Carlos las diferencias (depende de T004 y T005)
 - [x] T008 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T006)
-- [ ] T009 Actualizar `proyecto/estado.yml` y llevar lo nuevo a las `spec.md` de Catálogo (002) y Ventas (003) (depende de T008)
+- [x] T009 Actualizar `proyecto/estado.yml` y llevar lo nuevo a las `spec.md` de Catálogo (002) y Ventas (003) (depende de T008)

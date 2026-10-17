@@ -511,7 +511,8 @@ comprueba que en la otra no existe ningún dato de la primera.
 ### Edge Cases
 
 - **Precio a mano que no es múltiplo de $1.000:** se respeta tal cual ($1.500 tipeado se cobra $1.500) y el renglón muestra un aviso que lo dice; el aviso no impide cobrar (decisión 16 del 2026-10-10).
-- **Mismo producto agregado dos veces:** no se abre otro renglón; se suma 1 a la cantidad del que ya está.
+- **Mismo producto agregado dos veces:** no se abre otro renglón; se suma 1 a la cantidad del que ya está. Vale igual si se agrega desde el Catálogo (RF-108).
+- **La venta en curso no es de la pantalla Vender (lo cambió 015, 2026-10-17):** se arma también desde el Catálogo, con las mismas reglas, y el menú muestra en Vender cuántos renglones lleva. Ir a otra parte de la aplicación no la pierde; recargar la aplicación o cerrar la sesión («Salir», o que el servidor la cierre) la vacía, para que quien entre después no la encuentre.
 - **Vender más de lo que hay:** no se impide. El renglón avisa que no alcanza; el stock queda en cero y lo que faltaba se anota como anomalía (RF-59).
 - **El servidor no acepta la venta** (un dato inválido): el aviso aparece en el lugar, en castellano, dice qué hacer, y la venta queda armada para corregirla.
 - **Ítem libre sin descripción:** el servidor rechaza la venta.
