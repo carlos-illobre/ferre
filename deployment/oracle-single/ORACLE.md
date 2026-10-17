@@ -101,7 +101,8 @@ nada. El nombre ya está cargado en GitHub como variable `NTFY_AVISOS`; el mismo
 `NTFY_AVISOS=` de `~/ferre/despliegue.env`. Si el ntfy fuera propio, también `NTFY_URL`.
 
 En GitHub ya están cargadas las variables `API_URL` (`https://ferre-api.duckdns.org`) y
-`API_URL_PRUEBAS` (`https://ferre-api-pruebas.duckdns.org`). Falta `GOOGLE_CLIENT_ID`.
+`API_URL_PRUEBAS` (`https://ferre-api-pruebas.duckdns.org`). `GOOGLE_CLIENT_ID` no va en GitHub:
+la aplicación se lo pide a la API, que lo lee del `.env` de cada ambiente (007-T043).
 
 ## 8. El reverse proxy: el contrato
 

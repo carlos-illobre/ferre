@@ -13,8 +13,6 @@ const lector = vi.hoisted(() => ({ registrar: vi.fn<(...a: any[]) => Promise<any
 vi.unmock("../sesion");
 vi.mock("@simplewebauthn/browser", () => ({ browserSupportsWebAuthn: () => true, startRegistration: lector.registrar, startAuthentication: lector.leer }));
 
-// El botón de Google se dibuja solo si la versión tiene su identificador: se fija antes de importar.
-vi.stubEnv("VITE_GOOGLE_CLIENT_ID", "cliente-de-prueba");
 const { ErrorApi } = await import("../api");
 const { ProveedorDeSesion, useSesion } = await import("../sesion");
 const compu = await import("./compu/base/pantallas/Entrar");
@@ -47,6 +45,7 @@ beforeEach(() => {
   } } };
   apiFalsa.mockReset(); lector.registrar.mockReset(); lector.leer.mockReset();
   apiFalsa.mockImplementation(async (ruta: string) => {
+    if (ruta === "/sesiones/google/cliente") return { clienteId: "cliente-de-prueba" };
     if (ruta === "/sesiones/google" || ruta === "/credenciales/login") return { token: "token-nuevo", usuario: CARLOS };
     if (ruta === "/sesiones/actual") return { id: "s-1", usuario: CARLOS };
     if (ruta.endsWith("/opciones")) return { desafioId: "d-1", opciones: { challenge: "x" } };

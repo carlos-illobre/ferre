@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const entrarConGoogle = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../negocio/vinculo", async (original) => ({ ...(await original<typeof import("../../negocio/vinculo")>()), entrarConGoogle: (...a: unknown[]) => entrarConGoogle(...a) }));
+// El identificador de Google lo da el servidor (007-T043): acá, uno de prueba.
+vi.mock("../../negocio/vinculo", async (original) => ({ ...(await original<typeof import("../../negocio/vinculo")>()), entrarConGoogle: (...a: unknown[]) => entrarConGoogle(...a), useClienteDeGoogle: () => ({ clienteId: "prueba.apps.googleusercontent.com", fallo: false }) }));
 
 // El botón de Google, de mentira: guarda la función que Google llama al volver con la cuenta.
 let alVolverDeGoogle: ((r: { credential: string }) => Promise<void>) | null = null;
@@ -15,7 +16,7 @@ function googleDeMentira() {
 
 // 007-T021: al volver de Google, mientras se abre la sesión, no se ve la entrada.
 describe("Conectando tu cuenta de Google", () => {
-  beforeEach(() => { vi.stubEnv("VITE_GOOGLE_CLIENT_ID", "prueba.apps.googleusercontent.com"); vi.resetModules(); alVolverDeGoogle = null; googleDeMentira(); entrarConGoogle.mockReset(); });
+  beforeEach(() => { vi.resetModules(); alVolverDeGoogle = null; googleDeMentira(); entrarConGoogle.mockReset(); });
 
   async function boton() {
     const { BotonGoogle } = await import("./pantallas/Login");

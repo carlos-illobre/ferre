@@ -5,9 +5,9 @@ import { useSesion, type Usuario } from "../../../sesion";
 import { entrarConHuella, hayHuella } from "../../../credenciales";
 import { marcarEntradaConGoogle } from "../componentes/OfrecerHuella";
 import { AvisoError, Icono } from "../componentes/base";
-import { entrarConGoogle } from "../../../negocio/vinculo";
+import { entrarConGoogle, useClienteDeGoogle } from "../../../negocio/vinculo";
+import { TEXTOS_DE_ENTRADA } from "../../compu/base/pantallas/Entrar";
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 // Cuánto se espera la cuenta de Google después de volver de su ventana antes de dar por cancelado.
 export const ESPERA_DE_GOOGLE_MS = 6000;
 
@@ -21,6 +21,7 @@ export function BotonGoogle({ conPantallaDeCarga = false }: { conPantallaDeCarga
   const [conectando, setConectando] = useState(false);
   const boton = useRef<HTMLDivElement>(null);
   const sinRespuesta = useRef<number | undefined>(undefined);
+  const { clienteId, fallo } = useClienteDeGoogle();
 
   // Google avisa la cuenta un instante después de que se vuelve de su ventana, y en ese instante
   // se veía la entrada. Por eso la pantalla de carga sale apenas se vuelve a la página después de
@@ -44,13 +45,13 @@ export function BotonGoogle({ conPantallaDeCarga = false }: { conPantallaDeCarga
   }, [conPantallaDeCarga]);
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !boton.current) return;
+    if (!clienteId || !boton.current) return;
     const intervalo = setInterval(() => {
       const google = window.google;
       if (!google || !boton.current) return;
       clearInterval(intervalo);
       google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
+        client_id: clienteId,
         ux_mode: "popup",
         callback: async ({ credential }) => {
           window.clearTimeout(sinRespuesta.current);
@@ -79,11 +80,12 @@ export function BotonGoogle({ conPantallaDeCarga = false }: { conPantallaDeCarga
       dibujar();
     }, 200);
     return () => clearInterval(intervalo);
-  }, [entrar, conPantallaDeCarga]);
+  }, [entrar, conPantallaDeCarga, clienteId]);
 
   return (
     <>
-      {GOOGLE_CLIENT_ID ? <div className="boton-google" ref={boton} /> : <p className="ayuda-clara">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</p>}
+      <div className="boton-google" ref={boton} />
+      {fallo && !clienteId && <AvisoError texto={TEXTOS_DE_ENTRADA.googleNoResponde} />}
       {error && <div data-testid="error-google"><AvisoError texto={error} /></div>}
       {conectando && createPortal(<ConectandoConGoogle />, document.body)}
     </>

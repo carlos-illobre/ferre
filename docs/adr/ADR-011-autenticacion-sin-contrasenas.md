@@ -153,3 +153,18 @@ hay pantalla de confirmación (la huella después de leerlo es la confirmación)
   queda en la lista de sesiones abiertas y en el registro, donde se puede cerrar.
 - La tabla `vinculacion`, que había quedado sin uso, se vuelve a usar para esto.
 
+
+## Enmienda (2026-10-17): el identificador de Google lo da la API
+
+El identificador de cliente de Google estaba en dos lugares: el cliente web lo recibía al
+construirse (una variable de GitHub, la misma para producción y para pruebas) y la API lo leía
+del `.env` de cada ambiente para verificar las credenciales. Si no coincidían, Google dejaba
+elegir la cuenta y la API rechazaba a todos, sin que ninguna prueba lo viera.
+
+- Ahora el cliente web lo pide al abrir la entrada: `GET /sesiones/google/cliente`, sin sesión,
+  devuelve el mismo valor con el que la API verifica. Queda en un solo lugar, el `.env` de cada
+  ambiente, y la variable de GitHub ya no se usa (007-T043, pedido de Carlos).
+- Seguridad: el identificador no es secreto (Google lo muestra en su ventana y va en cada página
+  que dibuja el botón); la ruta no devuelve nada más ni depende de quién pregunta.
+- Sin conexión con la API no hay botón de Google, y la entrada dice «Google no responde»; entrar
+  ya necesitaba internet.

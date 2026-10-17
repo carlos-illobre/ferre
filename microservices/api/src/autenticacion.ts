@@ -44,6 +44,9 @@ export const puede = (usuario: Usuario, ...claves: Permiso[]) => claves.some((p)
 // Google. Sin contraseñas: la identidad la afirma Google, nosotros solo decidimos si ese
 // correo está autorizado (tabla usuario).
 const clienteGoogle = new OAuth2Client(config.googleClientId);
+// El identificador lo tiene solo el servidor: la aplicación se lo pide para dibujar el botón, y
+// así no puede haber uno distinto en la aplicación y en el servidor (007-T043).
+export const clienteDeGoogle = () => config.googleClientId;
 
 export async function emailVerificadoPorGoogle(credencial: string): Promise<string | null> {
   try {

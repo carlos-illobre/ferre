@@ -13,7 +13,6 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 vi.unmock("../../sesion");
 const lector = vi.hoisted(() => ({ leer: vi.fn<(...a: any[]) => Promise<any>>() }));
 vi.mock("@simplewebauthn/browser", () => ({ browserSupportsWebAuthn: () => true, startRegistration: vi.fn(), startAuthentication: lector.leer }));
-vi.stubEnv("VITE_GOOGLE_CLIENT_ID", "cliente-de-prueba");
 // Cada prueba carga la aplicación de cero: la anterior deja trabajo andando (el espejo que se
 // reconecta, el control de la sesión) que no tiene que mezclarse con la siguiente.
 let App: typeof import("./App")["App"];
@@ -26,6 +25,7 @@ type Pedido = [ruta: string, opciones: { body?: string }];
 const pedidos: Pedido[] = [];
 const aprobaciones = () => pedidos.filter((c) => c[0] === "/sesiones/vinculaciones/aprobar");
 function contestar(ruta: string): unknown {
+  if (ruta === "/sesiones/google/cliente") return { clienteId: "cliente-de-prueba" };
   if (ruta === "/sesiones/google" || ruta === "/credenciales/login") return { token: "token-nuevo", usuario: CARLOS };
   if (ruta === "/sesiones/actual") return { id: "s-1", usuario: CARLOS };
   if (ruta === "/credenciales/login/opciones") return { desafioId: "d-1", opciones: { challenge: "x" } };

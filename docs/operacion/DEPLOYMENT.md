@@ -40,8 +40,9 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   `~/ferre/pruebas/.env`, a partir de las plantillas `deployment/oracle-single/<ambiente>/.env.oracle`.
   Nunca se versionan.
 - **Cliente web en GitHub Pages:** un sitio, dos carpetas: la raíz es `produccion` y
-  `/pruebas/` es `master`. CI lo construye con las variables de repositorio `API_URL`,
-  `API_URL_PRUEBAS` y `GOOGLE_CLIENT_ID`. Es lo único que vive fuera del `.env`.
+  `/pruebas/` es `master`. CI lo construye con las variables de repositorio `API_URL` y
+  `API_URL_PRUEBAS`. Es lo único que vive fuera del `.env`. El identificador de Google no va:
+  la aplicación se lo pide al servidor de su ambiente (007-T043).
   Cada carpeta tiene una sola aplicación, que abre en su raíz.
 - **Sin acceso entrante:** GitHub no entra a la máquina. El job `avisar` publica en el
   canal `NTFY_AVISOS` y el servicio `ferre-despliegue` de la máquina hace el resto.

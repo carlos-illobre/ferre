@@ -61,12 +61,11 @@ Es la credencial que identifica al sistema ante Google.
 
 ## 4. Cargar el ID en el sistema
 
-El ID de cliente **no es secreto**: va en el cliente web y en la API.
-
-- En el `.env` de producción (`deployment/oracle-single/.env`) y en el `.env` local:
-  `GOOGLE_CLIENT_ID=<el id copiado>`.
-- En GitHub: Settings → Secrets and variables → Actions → **Variables** →
-  `GOOGLE_CLIENT_ID` con el mismo valor. CI lo usa al construir el cliente web.
+El ID de cliente **no es secreto**, pero se carga en un solo lugar: el `.env` de la API de cada
+ambiente (`~/ferre/produccion/.env`, `~/ferre/pruebas/.env` y el `.env` local):
+`GOOGLE_CLIENT_ID=<el id copiado>`. El cliente web se lo pide a la API al abrir la entrada
+(`GET /sesiones/google/cliente`), así que no puede quedar uno distinto en cada lado (007-T043).
+No hace falta cargarlo en GitHub.
 
 Después de eso, levantar de nuevo el servicio (`docker compose up -d`). El primer
 usuario dueño se registra con el comando que documenta el issue #41; los siguientes se
@@ -90,5 +89,6 @@ Cuando toque automatizar la lectura de listas por mail:
 - **"origin_mismatch" o "El origen de JavaScript no está autorizado":** falta la URL
   exacta en el paso 3.3. Tiene que coincidir letra por letra, incluido `https` y sin
   barra final.
-- **El botón de Google no aparece:** el cliente web se construyó sin `GOOGLE_CLIENT_ID`.
-  Revisar la variable en GitHub y volver a publicar.
+- **El botón de Google no aparece y dice «Google no responde»:** el cliente web no pudo pedirle
+  el ID a la API (`GET /sesiones/google/cliente`) o no llegó el script de Google. Revisar que
+  la API de ese ambiente responda y que su `.env` tenga `GOOGLE_CLIENT_ID`.

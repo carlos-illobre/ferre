@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { api, ErrorApi } from "../api";
 import { dispositivoId, guardarPuestoLocal, guardarPuestoRemoto } from "../puesto";
-import type { EntradaConGoogle, SesionNueva } from "@servidor/sesiones";
+import type { ClienteDeGoogle, EntradaConGoogle, SesionNueva } from "@servidor/sesiones";
 import type { EstadoDelPuesto, PuestoNuevo, PuestoParaVincular, Vinculacion, Vinculado } from "@servidor/puestos";
 
 // El vínculo entre el celular y la computadora (decisiones 58 y 73) y la entrada con Google,
@@ -55,6 +55,33 @@ export function useCodigoParaVincular(alVincular: (puestoId: string) => void, qr
     }
   }
   return { qr: imagen, vencido, error, generar, cerrar: () => { parar(); setImagen(null); } };
+}
+
+// El identificador de esta aplicación en Google lo tiene el servidor, que verifica las credenciales
+// con él: se le pide una vez por apertura de la aplicación. Así no puede haber uno distinto en la
+// aplicación y en el servidor (007-T043).
+let clienteDeGoogle: Promise<string> | null = null;
+export function pedirClienteDeGoogle(): Promise<string> {
+  clienteDeGoogle ??= api<ClienteDeGoogle>("/sesiones/google/cliente").then((r) => r.clienteId).catch((e: unknown) => { clienteDeGoogle = null; throw e; });
+  return clienteDeGoogle;
+}
+// Para el botón de Google: el identificador, o nada mientras llega. Si no se pudo pedir (sin
+// conexión), `fallo` lo dice y se vuelve a pedir a los 5 segundos.
+export function useClienteDeGoogle(): { clienteId: string | null; fallo: boolean } {
+  const [clienteId, setClienteId] = useState<string | null>(null);
+  const [fallo, setFallo] = useState(false);
+  useEffect(() => {
+    let vigente = true;
+    let espera: ReturnType<typeof setTimeout> | undefined;
+    const pedir = () => {
+      pedirClienteDeGoogle()
+        .then((id) => { if (vigente) { setClienteId(id); setFallo(false); } })
+        .catch(() => { if (vigente) { setFallo(true); espera = setTimeout(pedir, 5000); } });
+    };
+    pedir();
+    return () => { vigente = false; clearTimeout(espera); };
+  }, []);
+  return { clienteId, fallo };
 }
 
 // Entrar con la credencial que devolvió el botón de Google.

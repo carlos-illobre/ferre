@@ -13,11 +13,10 @@ import "../estilos/entrar-con-celular.css";
 // Las arma tests/capturas/entrada-compu.py con las capas de Carlos y una captura real de Vender.
 import fondoDeLaEntrada from "../imagenes/entrar-fondo.jpg";
 import celularVendiendo from "../imagenes/entrar-celular.png";
-import { entrarConGoogle } from "../../../../negocio/vinculo";
+import { entrarConGoogle, useClienteDeGoogle } from "../../../../negocio/vinculo";
 import { irA } from "../rutas";
 import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 // Si el servidor dio por terminada la sesión (la cerraron a distancia o venció), la app
 // vuelve sola a la entrada y la entrada lo dice. Se anota acá porque la entrada todavía no
@@ -68,9 +67,10 @@ export function BotonGoogle({ tema = "filled_blue", estirar = false }: { tema?: 
   const [entrando, setEntrando] = useState(false);
   const [estado, setEstado] = useState<"esperando" | "listo" | "sin-google">("esperando");
   const lugar = useRef<HTMLDivElement>(null);
+  const { clienteId, fallo } = useClienteDeGoogle();
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !lugar.current) return;
+    if (!clienteId || !lugar.current) return;
     const desde = Date.now();
     let dibujado = 400; // el ancho con que Google dibujó el botón
     const intervalo = setInterval(() => {
@@ -82,7 +82,7 @@ export function BotonGoogle({ tema = "filled_blue", estirar = false }: { tema?: 
       }
       clearInterval(intervalo);
       google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
+        client_id: clienteId,
         ux_mode: "popup",
         callback: async ({ credential }) => {
           setEntrando(true); setError(null);
@@ -119,14 +119,13 @@ export function BotonGoogle({ tema = "filled_blue", estirar = false }: { tema?: 
     const observador = estirar && typeof ResizeObserver !== "undefined" ? new ResizeObserver(ajustar) : null;
     if (observador && lugar.current) observador.observe(lugar.current);
     return () => { clearInterval(intervalo); observador?.disconnect(); };
-  }, [entrar, tema, estirar]);
+  }, [entrar, tema, estirar, clienteId]);
 
-  if (!GOOGLE_CLIENT_ID) return <Aviso tipo="alerta">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</Aviso>;
   return (
     <div className="entrar-google">
       <div className={`entrar-google-lugar ${estirar ? "estirado" : ""} ${estado === "listo" ? "" : "esperando"} ${entrando ? "ocupado" : ""}`} ref={lugar} aria-busy={estado === "esperando" || entrando} />
       {estado === "esperando" && <span className="solo-lectores" role="status">Cargando el botón de Google…</span>}
-      {estado === "sin-google" && <Aviso tipo="alerta" accion={<Boton tam="chico" onClick={() => location.reload()}>Reintentar</Boton>}>Google no responde. Revisá la conexión y reintentá.{hayHuella() ? " Si este dispositivo ya está vinculado, podés entrar con la huella." : ""}</Aviso>}
+      {(estado === "sin-google" || fallo) && <Aviso tipo="alerta" accion={<Boton tam="chico" onClick={() => location.reload()}>Reintentar</Boton>}>{TEXTOS_DE_ENTRADA.googleNoResponde}{hayHuella() ? " Si este dispositivo ya está vinculado, podés entrar con la huella." : ""}</Aviso>}
       {entrando && <Progreso texto="Entrando con tu cuenta de Google…" />}
       <ErrorEnElLugar error={error} testId="error-google" />
     </div>
@@ -177,6 +176,7 @@ export const TEXTOS_DE_ENTRADA = {
   protegidos: "Tus datos están protegidos",
   tutorial: "Ver tutorial",
   sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
+  googleNoResponde: "Google no responde. Revisá la conexión y reintentá.",
 };
 
 // Debajo de la tarjeta de la computadora (pedido de Carlos del 2026-10-17), cada uno en dos renglones.

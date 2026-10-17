@@ -10,6 +10,9 @@ export type UsuarioDeLaSesion = { id: string; email: string; nombre: string; rol
 
 // POST /sesiones/google: abre una sesión si el correo está autorizado y activo.
 export type EntradaConGoogle = z.input<typeof entradaConGoogle>;
+// GET /sesiones/google/cliente: el identificador de esta aplicación en Google, el mismo con el que
+// el servidor verifica las credenciales. Es público: Google lo muestra en su ventana.
+export type ClienteDeGoogle = { clienteId: string };
 export type SesionNueva = { token: string; usuario: UsuarioDeLaSesion };
 
 // POST /sesiones/vinculaciones: el código que la computadora muestra como QR (vence a los 5

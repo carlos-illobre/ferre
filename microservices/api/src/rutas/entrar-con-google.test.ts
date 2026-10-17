@@ -28,6 +28,12 @@ describe("entrar con Google", () => {
     base.actual.programar(/FROM usuario u WHERE u.id = \$1 AND u.activo/, (p) => ({ rows: p[0] === AUTORIZADO.id ? [AUTORIZADO] : [] }));
   });
 
+  it("la aplicación pide el identificador de Google sin sesión, y es el mismo con el que se verifican las credenciales", async () => {
+    const r = await pedir(app, "GET", "/sesiones/google/cliente", { rol: null });
+    expect(r.status).toBe(200);
+    expect(await r.json()).toEqual({ clienteId: process.env.GOOGLE_CLIENT_ID });
+  });
+
   it("A2: con un correo autorizado se abre una sesión en ese dispositivo y queda registrado que fue con Google", async () => {
     const r = await entrar("google:Carlos@Ferre.test");
     expect(r.status).toBe(201);

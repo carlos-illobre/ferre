@@ -120,7 +120,6 @@ jobs:
           pnpm --filter gestion-del-local-web... build
         env:
           VITE_API_URL: ${{ vars.API_URL }}
-          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VITE_BASE: /${{ github.event.repository.name }}/
           VITE_VERSION: produccion ${{ github.sha }}
       - name: Construir pruebas (/pruebas/)
@@ -130,7 +129,6 @@ jobs:
           pnpm --filter gestion-del-local-web... build
         env:
           VITE_API_URL: ${{ vars.API_URL_PRUEBAS }}
-          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VITE_BASE: /${{ github.event.repository.name }}/pruebas/
           VITE_VERSION: pruebas ${{ github.sha }}
       - name: Armar el sitio

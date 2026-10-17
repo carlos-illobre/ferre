@@ -1,8 +1,8 @@
 import { Hono, type Context } from "hono";
-import { emailVerificadoPorGoogle, exigirPermiso, exigirSesion, limitarIntentos } from "../autenticacion.js";
+import { clienteDeGoogle, emailVerificadoPorGoogle, exigirPermiso, exigirSesion, limitarIntentos } from "../autenticacion.js";
 import * as reglas from "../acceso/reglas.js";
 import { aprobacionDeCodigo, consultaDeCodigo, entradaConGoogle, pedidoDeCodigo } from "../acceso/esquemas.js";
-import type { SesionActual } from "../contratos/sesiones.js";
+import type { ClienteDeGoogle, SesionActual } from "../contratos/sesiones.js";
 import { leerCuerpo } from "../validar.js";
 
 // Sesiones: entrar con Google o con el celular, salir y las sesiones de todos. La ruta solo
@@ -13,6 +13,8 @@ export function responder(c: Context, r: reglas.Resultado) {
   if (!r.ok) return c.json({ error: r.error }, r.estado);
   return r.cuerpo !== undefined ? c.json(r.cuerpo, r.estado ?? 200) : c.body(null, 204);
 }
+
+sesiones.get("/google/cliente", (c) => c.json({ clienteId: clienteDeGoogle() } satisfies ClienteDeGoogle));
 
 sesiones.post("/google", limitarIntentos(10), async (c) => {
   const cuerpo = await leerCuerpo(c, entradaConGoogle);
