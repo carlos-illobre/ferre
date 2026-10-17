@@ -39,6 +39,14 @@ export interface Base {
   };
   usuario: { id: string; email: string; nombre: string };
   producto: { id: string; descripcion: string; unidad: string };
+  sesion: { id: string; usuario_id: string; dispositivo: string | null; revocada_en: Date | null };
+  // Lo apartado de alguien a quien desactivaron (014, ADR-021).
+  cambio_apartado: {
+    id: string; usuario_id: string; sesion_id: string; orden: ColumnType<string, number, never>; tipo: string; metodo: "POST" | "PUT" | "PATCH" | "DELETE"; ruta: string;
+    cuerpo: ColumnType<unknown, string | null, never>; hecho_en: Momento; llegado_en: Generated<Date>;
+    decision: ColumnType<"aceptado" | "descartado" | null, never, "aceptado" | "descartado">; decidido_por: ColumnType<string | null, never, string>;
+    decidido_en: ColumnType<Date | null, never, Date>; error: ColumnType<string | null, never, string | null>;
+  };
   ticket: {
     id: string; tipo: "error" | "mejora"; descripcion: string; dispositivo: string | null; version: string | null; usuario_id: string; creado_en: Generated<Date>;
     estado: ConValor<"abierto" | "resuelto">; resuelto_en: ColumnType<Date | null, never, Date | string | null>; resuelto_por: ColumnType<string | null, never, string | null>; nota: ColumnType<string | null, never, string | null>;

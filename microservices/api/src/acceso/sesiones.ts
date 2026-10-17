@@ -40,9 +40,12 @@ const ROLES_Y_PERMISOS = `
   COALESCE((SELECT array_agg(DISTINCT r.nombre) FROM usuario_rol ur JOIN rol r ON r.id = ur.rol_id WHERE ur.usuario_id = u.id), '{}') AS roles,
   COALESCE((SELECT array_agg(DISTINCT rp.permiso) FROM usuario_rol ur JOIN rol_permiso rp ON rp.rol_id = ur.rol_id WHERE ur.usuario_id = u.id), '{}') AS permisos`;
 
-// El usuario como lo recibe la aplicación al entrar: con sus roles y permisos.
-export async function usuarioConPermisos(db: Pick<pg.Pool, "query">, id: string): Promise<Usuario | null> {
-  const { rows } = await db.query<Usuario>(`SELECT u.id, u.email, u.nombre, ${ROLES_Y_PERMISOS} FROM usuario u WHERE u.id = $1 AND u.activo`, [id]);
+// El usuario como lo recibe la aplicación al entrar: con sus roles y permisos. Desactivado (y
+// solo desactivado), para repetir lo que hizo antes de que lo desactivaran (lo apartado, ADR-021).
+export async function usuarioConPermisos(db: Pick<pg.Pool, "query">, id: string, aunqueEsteDesactivado = false): Promise<Usuario | null> {
+  const { rows } = await db.query<Usuario>(aunqueEsteDesactivado
+    ? `SELECT u.id, u.email, u.nombre, ${ROLES_Y_PERMISOS} FROM usuario u WHERE u.id = $1 AND NOT u.activo`
+    : `SELECT u.id, u.email, u.nombre, ${ROLES_Y_PERMISOS} FROM usuario u WHERE u.id = $1 AND u.activo`, [id]);
   const u = rows[0];
   return u ? { id: u.id, email: u.email, nombre: u.nombre, roles: u.roles ?? [], permisos: u.permisos ?? [] } : null;
 }
