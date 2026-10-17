@@ -7,11 +7,11 @@ B quedan como referencia descartada.
 
 ## Cómo va el día (historias 1 y 2)
 
-- Arriba, el día que se mira: «Hoy, viernes 17/10» con «Hasta las 11:52» (la hora en que se
-  miró), o «Miércoles 15/10» para otro día; al lado, «Cambiar fecha».
+- Arriba, el día que se mira: «Hoy, sábado 17/10» con «Hasta las 11:52» (la hora en que se
+  miró), o «Jueves 15/10» para otro día; al lado, «Cambiar fecha».
 - Una tarjeta oscura con todo el resumen: «Total de ventas», el total grande, la comparación
   («+17 %» en una pastilla verde, o el porcentaje que baja en una pastilla del color de lo que
-  falta, y «vs. ayer a esta hora ($250.000)»; para otro día, «vs. el martes 14/10»), el gráfico
+  falta, y «vs. ayer a esta hora ($250.000)»; para otro día, «vs. el miércoles 14/10»), el gráfico
   de barras por hora a lo ancho (las horas debajo; la hora actual, vacía hasta que haya ventas;
   tocar una barra dice su importe), y los cuatro medios en renglones: ícono en su color, nombre,
   cuántas ventas e importe.

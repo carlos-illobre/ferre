@@ -100,7 +100,7 @@ comparación con anteayer; volver a hoy.
 
 **Acceptance Scenarios**:
 
-1. **E16** **Given** «Hoy» abierto, **When** se toca «Cambiar fecha» y se elige el 15/10/2026, **Then** el título dice «Ventas del miércoles 15/10» y todo (total, comparación, gráfico, medios, números y lista) es de ese día.
+1. **E16** **Given** «Hoy» abierto, **When** se toca «Cambiar fecha» y se elige el 15/10/2026, **Then** el título dice «Jueves 15/10» y todo (total, comparación, gráfico, medios, números y lista) es de ese día.
 2. **E17** **Given** otro día elegido, **When** se mira la comparación, **Then** es el día entero contra el día anterior a ese, entero.
 3. **E18** **Given** otro día elegido, **When** se toca «Volver a hoy», **Then** se ve hoy otra vez.
 4. **E19** **Given** «Cambiar fecha», **When** se elige una fecha futura, **Then** no se puede: el calendario llega hasta hoy.
