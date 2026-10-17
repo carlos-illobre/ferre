@@ -34,7 +34,7 @@ test.beforeAll(() => {
   psql(`DELETE FROM item_compra WHERE compra_id IN (SELECT id FROM compra WHERE proveedor_id = '${ID_PROV}')`);
   psql(`DELETE FROM compra WHERE proveedor_id = '${ID_PROV}'`);
   psql(`DELETE FROM precio_proveedor WHERE proveedor_id = '${ID_PROV}'`);
-  psql(`DELETE FROM producto WHERE id = '${ID_CINTA}' OR (proveedor_preferido_id = '${ID_PROV}' AND id NOT IN (SELECT producto_id FROM item_venta))`);
+  psql(`DELETE FROM producto WHERE id = '${ID_CINTA}' OR (proveedor_preferido_id = '${ID_PROV}' AND id NOT IN (SELECT producto_id FROM item_venta WHERE producto_id IS NOT NULL))`);
   psql(`DELETE FROM proveedor WHERE id = '${ID_PROV}'`);
   psql(`INSERT INTO proveedor (id, nombre) VALUES ('${ID_PROV}', '${PROVEEDOR}')`);
   psql(`INSERT INTO producto (id, descripcion, marca, margen_elegido) VALUES ('${ID_CINTA}', 'CINTA AISLADORA COMPRAS (E2E)', 'MARCA E2E', 100)`);

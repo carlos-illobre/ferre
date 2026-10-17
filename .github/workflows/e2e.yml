@@ -81,6 +81,9 @@ jobs:
       - name: "18 · Procesos"
         if: always()
         run: PLAYWRIGHT_JSON=/tmp/e2e-18.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 18-procesos.spec.ts
+      - name: "19 · Para revisar lo apartado"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-19.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 19-para-revisar.spec.ts
       - name: Resumen
         if: always()
         run: |

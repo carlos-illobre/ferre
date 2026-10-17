@@ -121,6 +121,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   // La anomalía del tornillo se ve en Más > Anomalías.
   await page.getByTestId("menu-mas").click();
   await page.getByTestId("mas-anomalias").click();
+  // Anomalías abre en «Para revisar» (014): las anotadas están en la otra pestaña.
+  await page.getByTestId("pestana-anomalias").click();
   await expect(page.getByTestId("anomalia").filter({ hasText: "TORNILLO VENDER" }).first()).toContainText("Venta sin stock");
 
   // "No llevó": la consulta queda registrada.

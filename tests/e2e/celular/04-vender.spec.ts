@@ -125,6 +125,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   // La anomalía se ve en Más > Anomalías.
   await page.getByRole("button", { name: "Más", exact: true }).click();
   await page.getByRole("button", { name: /Anomalías/ }).click();
+  // Anomalías abre en «Para revisar» (014): las anotadas están en la otra pestaña.
+  await page.getByRole("tab", { name: "Anotadas" }).click();
   await expect(page.getByTestId("anomalia").filter({ hasText: "TORNILLO VENDER" })).toContainText("Venta sin stock");
   await page.getByRole("button", { name: "Vender" }).click();
 
