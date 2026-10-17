@@ -276,7 +276,7 @@ maquetas aprobadas `maquetas/celular-duplicados-renovada*.png`):
   a todo el ancho, la marca, «Unió «…»», los proveedores y «Unido el dd/mm/aaaa», cada uno con
   su ícono. Se ven las tres últimas; «Ver todo (N)» abre las demás.
 - **Al separar**, sin preguntar: un aviso «Separados: **«nombre»** vuelve a ser un producto
-  aparte, con sus precios, ventas y stock», con el nombre del producto en negrita y «Deshacer»,
+  aparte, con sus precios, ventas y stock», con el nombre del producto en negrita y verde claro (el mismo de «Ver N usuarios» en los filtros de Usuarios), para que se distinga, y «Deshacer»,
   que los vuelve a unir.
 
 ## Escanear con la cámara (historia 8 · RF-08)

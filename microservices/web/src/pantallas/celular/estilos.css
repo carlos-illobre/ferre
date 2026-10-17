@@ -219,6 +219,7 @@ button.fila:active, .fila.tocable:active { background: var(--niebla); }
 .toast { display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--tinta); color: #fff; font-size: 15px; line-height: 1.35; animation: subir 0.25s ease-out; }
 .toast span { flex: 1; }
 .toast button { color: rgba(255,255,255,0.6); font-size: 20px; line-height: 1; }
+.toast b { color: #8fd9b3; }
 .toast .toast-accion { flex: none; min-height: 36px; padding: 0 12px; border-radius: 10px; background: rgb(255 255 255 / 0.12); color: var(--p-amarillo); font-size: 15px; font-weight: 700; }
 .aviso-error { padding: 12px 14px; border-radius: 14px; background: var(--coral-tinte); color: var(--coral-texto); font-size: 15px; line-height: 1.35; font-weight: 500; display: flex; gap: 10px; align-items: center; }
 .aviso-error span { flex: 1; }
