@@ -605,6 +605,7 @@ RF-70:
     - microservices/api/src/rutas/usuarios.test.ts
     - microservices/api/src/rutas/credenciales.test.ts
     - microservices/api/src/rutas/entrar-con-google.test.ts
+    - microservices/api/src/autenticacion.test.ts
     - microservices/web/src/pantallas/entrar-simulado.test.tsx
     - microservices/web/src/sesion.test.tsx
     - docs/pruebas-manuales/entrar.md

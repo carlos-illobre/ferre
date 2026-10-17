@@ -175,3 +175,36 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   await otro.getByTestId("dejar-entrar").click();
   await expect(otro.getByTestId("compu-no-entro")).toContainText("Leé el que la computadora muestra ahora");
 });
+
+// Lo único de entrar con la cámara que no se prueba con unitarias (007-T041): que el lector de
+// la aplicación, en un navegador de verdad, lea el código que muestra la computadora. La cámara
+// es de mentira: muestra la imagen del código de la pantalla de la computadora. Lo que pasa
+// después de leerlo lo prueban las unitarias.
+test("C5 la cámara del celular lee el código que muestra la computadora y lleva a dejarla entrar", async ({ browser, page }) => {
+  const compu = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
+  await compu.goto("/");
+  const qr = compu.getByTestId("qr-entrar").locator("img");
+  await expect(qr).toBeVisible();
+  const imagen = (await qr.getAttribute("src"))!;
+  const enlace = await compu.evaluate(() => (window as unknown as { __enlaceParaEntrar: string }).__enlaceParaEntrar);
+
+  // La cámara de mentira: un video que muestra el código sobre blanco, como al apuntarle a la pantalla.
+  await page.addInitScript((src) => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      const lienzo = Object.assign(document.createElement("canvas"), { width: 640, height: 480 });
+      const ctx = lienzo.getContext("2d")!;
+      const img = new Image();
+      img.src = src;
+      await img.decode();
+      const dibujar = () => { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 640, 480); ctx.drawImage(img, 170, 90, 300, 300); };
+      dibujar();
+      setInterval(dibujar, 100);
+      return lienzo.captureStream(10);
+    };
+  }, imagen);
+  await page.goto("/");
+  await page.getByTestId("escanear-codigo-de-la-compu").click();
+  await expect(page.getByTestId("entrar-para-la-compu")).toBeVisible({ timeout: 15000 });
+  expect(await page.evaluate(() => location.hash)).toBe(enlace.slice(enlace.indexOf("#")));
+  await expect(page.getByTestId("escaner")).toHaveCount(0);
+});

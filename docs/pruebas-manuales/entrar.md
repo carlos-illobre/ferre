@@ -17,6 +17,10 @@ lee o no lee el dedo, la cámara «lee» un texto) y prueban qué hace Ferrebres
 
 Todo lo demás tiene prueba automática; a mano vale como repaso con equipos de verdad.
 
+Las pruebas de punta a punta prueban solo lo que una unitaria no puede: que las piezas funcionen
+juntas en un navegador de verdad (por ejemplo, que el lector de la cámara lea el código de la
+computadora). Lo demás va en unitarias, que son más rápidas (pedido de Carlos del 2026-10-17).
+
 ## Qué prueba la máquina
 
 Unitarias (corren en cada subida, en segundos; las de la aplicación en `microservices/web/src/`, las del servidor en `microservices/api/src/`) y de punta a punta (`tests/e2e/`, en Docker):
@@ -25,6 +29,7 @@ Unitarias (corren en cada subida, en segundos; las de la aplicación en `microse
 |---|---|
 | A1, B2, B4, B5, B7, C1, C2, D1 | De punta a punta: `01-login` (celular y computadora) |
 | A2, A3, A4, A5 (Google simulado) | Unitarias: `pantallas/entrar-simulado.test.tsx` y, en el servidor, `rutas/entrar-con-google.test.ts` |
+| A2, A5 (la credencial de Google) | Servidor: `autenticacion.test.ts`, con credenciales firmadas con una clave de prueba: firma, aplicación, emisor, vencimiento y correo verificado |
 | A2, A8 («Conectando tu cuenta de Google») | Unitarias: `celular/ConectandoConGoogle.test.tsx` |
 | A6, A7 | Servidor: `rutas/entrar-con-google.test.ts` y `rutas/usuarios.test.ts` |
 | B1, B3, B4, B5 (huella simulada) | Unitarias: `pantallas/entrar-simulado.test.tsx` |
@@ -32,6 +37,7 @@ Unitarias (corren en cada subida, en segundos; las de la aplicación en `microse
 | B6, C7 | Servidor: `rutas/credenciales.test.ts` y `rutas/sesiones.test.ts` |
 | C3, C5, C8, C9 (cámara simulada) | Unitarias: `celular/EntrarEnLaCompu.test.tsx`; en el servidor, `rutas/sesiones.test.ts` |
 | C8, C10 | Unitarias: `compu/base/pantallas/Entrar.test.tsx` |
+| C2, C5 (la cámara lee el código) | De punta a punta: `01-login` del celular, con una cámara de mentira que muestra el código real de la computadora |
 | C11 | De punta a punta: `17-espejo` |
 | D2 | De punta a punta: `08-sin-conexion` |
 | D3, D3b | De punta a punta: `12-cerrar-sesion` |
