@@ -12,6 +12,9 @@ export type CostoDeProveedor = { proveedor_id: string; proveedor: string; costo_
 // llegan como texto, con sus decimales.
 export type ProductoDelCatalogo = {
   id: string; descripcion: string; marca: string | null; codigo_barras: string | null; unidad: string;
+  // Cuándo se cargó o se cambió el código (specs/016); null si se cargó antes de guardarlo. Puede
+  // faltar en un catálogo guardado en el dispositivo antes de que existiera.
+  codigo_leido_en?: string | null;
   margen_elegido: number | null;
   sector_id: string | null; foto_url: string | null; modificado_en: string;
   proveedor_id: string | null; proveedor: string | null; codigo_proveedor: string | null;

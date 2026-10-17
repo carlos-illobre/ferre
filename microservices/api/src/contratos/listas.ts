@@ -33,4 +33,8 @@ export type FilasDeLista = { total: number; filas: (FilaDeLista & { costo_anteri
 export type ListaAplicandose = { id: string; estado: "aplicando" };
 
 // GET /listas/:id: cómo va.
+// GET /listas/:id/origen: de qué lista sale el costo de un producto (specs/016, RF-115), para la
+// ficha. Pide «Ver costos», no «Cargar listas».
+export type OrigenDeLista = { id: string; archivo_nombre: string; proveedor: string; fecha_lista: string; productos: number };
+
 export type EstadoDeLista = { id: string; estado: string; resumen: ResumenDeLista; avisos: string[]; fecha_lista: string; archivo_nombre: string; proveedor: string };

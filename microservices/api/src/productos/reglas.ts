@@ -23,6 +23,16 @@ export function conPrecio<T extends { costo_neto: string | null; iva: string | n
 export const catalogo = async (q: datos.FiltrosDelCatalogo): Promise<ProductoDelCatalogo[]> => (await datos.catalogo(q)).map(conPrecio);
 
 export type CambiosValidados = z.output<typeof cambiosDeProducto>;
+
+// La última lectura del código (specs/016, RF-112): cargarlo o cambiarlo la pone; borrarlo la
+// borra. Vale la hora en que se leyó, que manda el dispositivo; si no la manda, si está en el
+// futuro o si es anterior al sistema, la del servidor.
+const DESDE = Date.parse("2026-01-01T00:00:00Z");
+export function horaDeLectura(codigo: string | null, mandada: string | undefined, ahora = new Date()): string | null {
+  if (codigo === null) return null;
+  const leida = mandada === undefined ? NaN : Date.parse(mandada);
+  return Number.isFinite(leida) && leida <= ahora.getTime() && leida >= DESDE ? new Date(leida).toISOString() : ahora.toISOString();
+}
 export type Rechazo = { error: string; estado: 400 | 403 | 404 | 413; permiso?: string };
 
 // Lo que cambia de un producto, ya validado con su esquema (`esquemas.ts`). Fijar el margen de
@@ -30,8 +40,9 @@ export type Rechazo = { error: string; estado: 400 | 403 | 404 | 413; permiso?: 
 // no llega acá (RF-72). Queda auditado.
 export async function cambiar(id: string, cambios: CambiosValidados, fijaMargenes: boolean, usuarioId: string): Promise<Rechazo | null> {
   if ("margen_elegido" in cambios && !fijaMargenes) return { error: "No tenés permiso para esto. Hace falta: Fijar márgenes", permiso: "catalogo.margenes", estado: 403 };
-  if (!(await datos.cambiar(id, cambios))) return { error: "No existe ese producto", estado: 404 };
-  await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId, contenido: { id, ...cambios } });
+  const conLectura = "codigo_barras" in cambios ? { ...cambios, codigo_leido_en: horaDeLectura(cambios.codigo_barras ?? null, cambios.codigo_leido_en) } : cambios;
+  if (!(await datos.cambiar(id, conLectura))) return { error: "No existe ese producto", estado: 404 };
+  await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId, contenido: { id, ...conLectura } });
   return null;
 }
 

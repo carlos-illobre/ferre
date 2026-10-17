@@ -53,7 +53,7 @@ export async function catalogo(q: FiltrosDelCatalogo): Promise<ProductoCatalogo[
   // Una búsqueda trae primero las descripciones más cortas, que es lo que la aplicación muestra arriba.
   const orden = palabras.length ? "length(p.descripcion), p.descripcion" : "p.descripcion";
   const { rows } = await pool.query<ProductoCatalogo>(
-    `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.unidad, p.margen_elegido, p.modificado_en, p.sector_id, p.foto_url,
+    `SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.codigo_leido_en, p.unidad, p.margen_elegido, p.modificado_en, p.sector_id, p.foto_url,
             pp.proveedor_id, pr.nombre AS proveedor, pp.codigo_proveedor, pp.costo_neto, pp.iva, pp.fecha_lista::text, pp.lista_importada_id,
             COALESCE(pp.descuentos->'explicacion', '[]'::jsonb) AS explicacion_costo,
             COALESCE(prov.lista, '[]'::json) AS proveedores
@@ -82,7 +82,7 @@ export async function catalogo(q: FiltrosDelCatalogo): Promise<ProductoCatalogo[
 
 // Las únicas columnas de un producto que se cambian desde la aplicación. El nombre de la
 // columna va pegado al SQL, así que solo se aceptan estas: cualquier otra hace fallar.
-const COLUMNAS_QUE_SE_CAMBIAN = ["margen_elegido", "unidad", "codigo_barras", "proveedor_preferido_id", "foto_url"] as const;
+const COLUMNAS_QUE_SE_CAMBIAN = ["margen_elegido", "unidad", "codigo_barras", "codigo_leido_en", "proveedor_preferido_id", "foto_url"] as const;
 export type CambiosDeProducto = Partial<Record<(typeof COLUMNAS_QUE_SE_CAMBIAN)[number], unknown>>;
 
 // Cambia las columnas pedidas (ya validadas) de un producto activo; dice si existía.

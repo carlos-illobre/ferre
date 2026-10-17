@@ -7,6 +7,7 @@ const MARGEN = "El margen es un porcentaje entero mayor que cero (por ejemplo 20
 const UNIDAD = "La unidad es unidad, kg, m o l";
 const CODIGO = "El código de barras tiene que tener entre 4 y 32 letras o números";
 const FOTO = "La foto tiene que ser una dirección https o una foto subida";
+const LECTURA = "La hora de la lectura del código es una fecha y hora, y va junto con el código";
 
 // Un texto que también puede llegar como número (un código de barras tipeado), sin espacios.
 const texto = (mensaje: string) => z.union([z.string(), z.number()], mensaje).transform((v) => String(v).trim());
@@ -19,5 +20,9 @@ export const cambiosDeProducto = z.object({
   codigo_barras: texto(CODIGO).pipe(z.string().regex(/^[0-9A-Za-z-]{4,32}$/, CODIGO)).nullable().optional(),
   proveedor_preferido_id: z.string("El proveedor preferido es un id o ninguno").nullable().optional(),
   foto_url: texto(FOTO).pipe(z.string().regex(/^(https?:\/\/|\/fotos\/).{4,500}$/, FOTO)).nullable().optional(),
+  // Cuándo se leyó el código (specs/016, RF-112): la hora del dispositivo, que sin conexión manda
+  // el cambio más tarde. Solo junto con el código; el servidor no la deja en el futuro.
+  codigo_leido_en: z.iso.datetime({ offset: true, message: LECTURA }).optional(),
 }, "Nada que cambiar: mandá margen_elegido, unidad, codigo_barras, proveedor_preferido_id o foto_url")
-  .refine((c) => Object.keys(c).length > 0, "Nada que cambiar: mandá margen_elegido, unidad, codigo_barras, proveedor_preferido_id o foto_url");
+  .refine((c) => Object.keys(c).length > 0, "Nada que cambiar: mandá margen_elegido, unidad, codigo_barras, proveedor_preferido_id o foto_url")
+  .refine((c) => c.codigo_leido_en === undefined || "codigo_barras" in c, LECTURA);

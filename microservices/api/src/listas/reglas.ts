@@ -6,7 +6,7 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import { sugerirEquivalencias } from "../duplicados/datos.js";
 import * as datos from "./datos.js";
-import type { EstadoDeLista, FilasDeLista, ListaAplicandose, ListaCargada, ListaEnHistorial } from "../contratos/listas.js";
+import type { EstadoDeLista, FilasDeLista, ListaAplicandose, ListaCargada, ListaEnHistorial, OrigenDeLista } from "../contratos/listas.js";
 import type { Enviable } from "../enviable.js";
 import { detectarProveedor, ErrorDeLectura, leerPlanilla, type FilaLeida, type Lectura } from "./lector.js";
 
@@ -149,6 +149,10 @@ export async function archivo(id: string): Promise<{ error: string } | { nombre:
   if (!contenido) return { error: "El archivo de esa lista ya no está en el disco" };
   return { nombre: lista.archivo_nombre.replace(/[^\w. -]+/g, "_"), original: lista.archivo_nombre, contenido };
 }
+
+// De qué lista sale el costo de un producto (specs/016): un id que no es de una lista es «no existe».
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const origen = async (id: string): Promise<OrigenDeLista | null> => (UUID.test(id) ? datos.origenDe(id) : null);
 
 export const estado = (id: string): Promise<Enviable<EstadoDeLista> | null> => datos.estadoDe(id);
 

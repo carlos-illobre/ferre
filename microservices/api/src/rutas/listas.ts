@@ -40,6 +40,12 @@ listas.get("/:id/archivo", async (c) => {
   });
 });
 
+// La ficha del producto muestra de qué lista sale su costo: lo ve quien ve costos (specs/016).
+listas.get("/:id/origen", exigirPermiso("catalogo.costos"), async (c) => {
+  const r = await reglas.origen(c.req.param("id"));
+  return r ? c.json(r) : c.json({ error: "No existe esa lista" }, 404);
+});
+
 listas.get("/:id", exigirPermiso("catalogo.listas"), async (c) => {
   const r = await reglas.estado(c.req.param("id"));
   return r ? c.json(r) : c.json({ error: "No existe esa lista" }, 404);

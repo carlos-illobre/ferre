@@ -74,6 +74,15 @@ export async function archivoDe(id: string) {
   return rows[0] ?? null;
 }
 
+// El archivo, el proveedor, la fecha y cuántos productos cargó la lista (los costos que dejó).
+export async function origenDe(id: string) {
+  const { rows } = await pool.query<{ id: string; archivo_nombre: string; proveedor: string; fecha_lista: string; productos: number }>(
+    `SELECT l.id, l.archivo_nombre, p.nombre AS proveedor, l.fecha_lista::text,
+            (SELECT count(*)::int FROM precio_proveedor c WHERE c.lista_importada_id = l.id) AS productos
+       FROM lista_importada l JOIN proveedor p ON p.id = l.proveedor_id WHERE l.id = $1`, [id]);
+  return rows[0] ?? null;
+}
+
 export async function estadoDe(id: string) {
   const { rows } = await pool.query(
     `SELECT l.id, l.estado, l.resumen, l.avisos, l.fecha_lista::text, l.archivo_nombre, p.nombre AS proveedor FROM lista_importada l JOIN proveedor p ON p.id = l.proveedor_id WHERE l.id = $1`, [id]);
