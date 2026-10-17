@@ -92,6 +92,23 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(celular.getByTestId("item")).toHaveCount(0);
   await compu.getByTestId("cerrar-exito").click();
 
+  // 015-E09 015-E26: lo que se agrega desde el Catálogo del celular entra a la venta de la
+  // computadora, sin que ninguno de los dos esté en Vender; al cobrar, el número del menú se va en los dos.
+  await celular.getByTestId("menu-catalogo").click();
+  await expect(compu.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
+  await celular.getByTestId("busqueda").fill("e2e mecha espejo");
+  await celular.locator(".tarjeta-producto", { hasText: "MECHA ESPEJO" }).getByTestId("agregar").click();
+  await expect(celular.getByTestId("agregado")).toContainText("Agregado a la venta");
+  await expect(celular.getByTestId("cuenta-venta")).toHaveText("1");
+  await expect(compu.getByTestId("cuenta-venta")).toHaveText("1");
+  await compu.getByTestId("menu-vender").click();
+  await expect(compu.getByTestId("item").filter({ hasText: "MECHA ESPEJO" })).toBeVisible();
+  await compu.getByTestId("cobrar").click();
+  await expect(compu.getByTestId("exito")).toContainText("Venta registrada");
+  await expect(compu.getByTestId("cuenta-venta")).toHaveCount(0);
+  await expect(celular.getByTestId("cuenta-venta")).toHaveCount(0);
+  await compu.getByTestId("cerrar-exito").click();
+
   // La navegación va junta, en las dos direcciones.
   await celular.getByTestId("menu-deposito").click();
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");

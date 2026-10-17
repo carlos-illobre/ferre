@@ -1,5 +1,6 @@
 import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
+import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
 import { Pedidos } from "../Pedidos";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { useEspejar, useEspejo } from "../../espejo";
@@ -111,6 +112,8 @@ function Pantallas() {
   const { sesion, salir } = useSesion();
   // La venta en curso viaja al otro dispositivo desde cualquier pantalla (ADR-022).
   useVentaEnEspejo();
+  // Cuántos renglones lleva la venta, en Vender del menú (015-E24).
+  const enLaVenta = useVentaEnCurso().items.length;
   const ruta = useRuta();
   const codigoVinculacion = ruta.parametros.get("codigo");
   // Sin dirección, la app abre en lo primero del menú.
@@ -286,6 +289,7 @@ function Pantallas() {
                 <Icono nombre={m.icono} tam={19} grosor={parte === m.clave ? 2.3 : 1.9} />{m.nombre}
                 {/* El número que, con Alt, abre la primera pantalla de esta parte. */}
                 {atajoDe(m.pestanas[0]!.ruta) && <span className="atajo" aria-hidden="true">Alt+{atajoDe(m.pestanas[0]!.ruta)}</span>}
+                {m.pestanas.some((p) => p.ruta === "vender") && enLaVenta > 0 && <b className="cuenta-menu" aria-label={`${enLaVenta} en la venta`} data-testid="cuenta-venta">{enLaVenta}</b>}
               </button>
             );
           })}

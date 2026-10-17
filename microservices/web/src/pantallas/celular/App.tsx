@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
+import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
@@ -99,6 +100,8 @@ function Pantallas() {
   const { sesion, salir } = useSesion();
   // La venta en curso viaja al otro dispositivo desde cualquier pantalla (ADR-022).
   useVentaEnEspejo();
+  // Cuántos renglones lleva la venta, en Vender del menú (015-E24).
+  const enLaVenta = useVentaEnCurso().items.length;
   const ruta = useRuta();
   const codigoVinculacion = ruta.parametros.get("codigo");
   useEffect(() => { window.scrollTo(0, 0); }, [ruta.nombre, ruta.sub]);
@@ -270,6 +273,7 @@ function Pantallas() {
           <button key={p.ruta} type="button" data-testid={`menu-${p.ruta}`} className={pestana === p.ruta ? "activo" : ""} onClick={() => irA(p.ruta)} aria-current={pestana === p.ruta ? "page" : undefined}>
             {p.ruta === "mas" ? <IconoMas grosor={pestana === "mas" ? 2.2 : 1.8} /> : <Icono nombre={p.ruta} tam={26} grosor={pestana === p.ruta ? 2.2 : 1.8} />}
             <span>{p.nombre}</span>
+            {p.ruta === "vender" && enLaVenta > 0 && <b className="cuenta-menu" aria-label={`${enLaVenta} en la venta`} data-testid="cuenta-venta">{enLaVenta}</b>}
           </button>
         ))}
       </nav>

@@ -7,6 +7,9 @@ import { Children, useEffect, useRef, type HTMLAttributes, type ReactNode } from
 
 const TRAZOS: Record<string, string> = {
   vender: "M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0",
+  // Agregar a la venta desde el Catálogo y los filtros (015).
+  carrito: "M3 4h2.2l2.1 10.4a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.3M8.2 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0M15.7 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0",
+  filtros: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0M8 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0M16 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0",
   catalogo: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
   deposito: "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16ZM3.3 7l8.7 5 8.7-5M12 22V12",
   negocio: "M3 3v18h18M7 15l4-5 4 3 5-7",
@@ -86,9 +89,10 @@ export function Segmentos<T extends string>({ opciones, actual, alElegir, chico 
 }
 
 // Caja de búsqueda con lupa, "×" para borrar y, si hay cámara, el botón de escanear.
-export function Buscador({ valor, alCambiar, placeholder, alEscanear, chico, autoFoco, disabled, onKeyDown, cajaRef, testId = "busqueda" }: {
+// `extra`: un botón más al lado del lector (los filtros del Catálogo, 015).
+export function Buscador({ valor, alCambiar, placeholder, alEscanear, chico, autoFoco, disabled, onKeyDown, cajaRef, testId = "busqueda", extra }: {
   valor: string; alCambiar: (v: string) => void; placeholder: string; alEscanear?: () => void; chico?: boolean; autoFoco?: boolean; disabled?: boolean;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void; cajaRef?: React.RefObject<HTMLInputElement>; testId?: string;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void; cajaRef?: React.RefObject<HTMLInputElement>; testId?: string; extra?: ReactNode;
 }) {
   return (
     <div className={`buscador ${chico ? "chico" : ""}`}>
@@ -98,6 +102,7 @@ export function Buscador({ valor, alCambiar, placeholder, alEscanear, chico, aut
         {valor && <button type="button" className="limpiar" aria-label="Borrar" onClick={() => alCambiar("")}>×</button>}
       </div>
       {alEscanear && <button type="button" className="escanear" aria-label="Escanear" onClick={alEscanear} data-testid="escanear"><Icono nombre="escanear" tam={22} /></button>}
+      {extra}
     </div>
   );
 }

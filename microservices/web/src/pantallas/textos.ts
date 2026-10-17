@@ -47,6 +47,25 @@ export const NOMBRES = {
 };
 
 export const TEXTOS = {
+  catalogo: {
+    // Catálogo para vender (015): el buscador dice qué busca; resumido en el celular (decisión 47).
+    buscar: { largo: "Buscar productos, códigos o marcas…", corto: "Producto, código o marca" },
+    agregar: igual("Agregar"),
+    agregarALaVenta: igual("Agregar a la venta"),
+    agregado: igual("Agregado a la venta"),
+    enStock: igual("en stock"),
+    filtros: igual("Filtros"),
+    sacarFiltros: igual("Sacar filtros"),
+    disponibilidad: igual("Disponibilidad"),
+    todos: igual("Todos"),
+    conStock: igual("Con stock"),
+    sinStock: igual("Sin stock"),
+    marca: igual("Marca"),
+    buscarMarca: igual("Buscar una marca"),
+    todasLasMarcas: igual("Todas las marcas"),
+    sinProductosConFiltros: igual("No hay productos con esos filtros."),
+    teclaAgregar: igual("agrega el elegido a la venta"),
+  },
   vender: {
     noLlevo: { largo: "Anotado como «No llevó»: qué pidió y a cuánto se le ofreció.", corto: "Anotado como «No llevó»." },
     sinPrecio: { largo: "Hay productos sin precio: elegí un margen o poné el precio a mano en el renglón marcado.", corto: "Hay productos sin precio: elegí un margen o poné el precio a mano." },

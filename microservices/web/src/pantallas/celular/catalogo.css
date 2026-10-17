@@ -1,0 +1,38 @@
+/* El Catálogo para vender (015), según la maqueta B aprobada: cada producto es una tarjeta suelta
+   con 1 px entre una y otra; el stock arriba del nombre; el nombre en negrita y mayúsculas; el
+   margen en verde; «Agregar» es un botón secundario (36 px como mínimo, decisión 104). */
+.lista.productos-para-vender { gap: 1px; background: none; box-shadow: none; overflow: visible; border-radius: 0; border: 0; }
+.lista.productos-para-vender > li { border-bottom: 0; }
+.tarjeta-producto { position: relative; }
+.tarjeta-producto .fila { border-radius: 16px; background: var(--p-superficie); box-shadow: 0 1px 2px rgb(23 49 43 / .08); }
+.tarjeta-producto .fila.elegida { background: var(--p-amarillo-suave); box-shadow: 0 1px 2px rgb(23 49 43 / .08); }
+.tarjeta-producto .nombre { font-weight: 700; text-transform: uppercase; }
+.tarjeta-producto .derecha small { color: var(--p-verde-texto) !important; }
+/* «Agregar» va al lado del botón de la fila (no adentro), sobre su esquina de abajo a la derecha:
+   la columna del precio deja el lugar. */
+.tarjeta-producto.con-agregar .derecha { padding-bottom: 46px; min-width: 124px; }
+.agregar-a-la-venta { position: absolute; right: 16px; bottom: 14px; display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--p-borde-suave); background: color-mix(in srgb, var(--p-fondo-2) 45%, var(--p-superficie)); color: var(--p-tinta); font-weight: 600; font-size: 16px; }
+.agregar-a-la-venta:active { background: var(--p-fondo-2); }
+.etiqueta-stock { display: table; text-transform: none; white-space: nowrap; font-size: 13px; line-height: 1.35; font-weight: 700; padding: 1px 8px; border-radius: 8px; margin-bottom: 3px; }
+.etiqueta-stock.hay { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.etiqueta-stock.no { background: var(--p-naranja-suave); color: var(--p-naranja-texto-fuerte); }
+
+/* El botón de filtros, al lado del lector, con cuántos hay puestos. */
+.boton-filtros { position: relative; flex: none; width: 52px; min-height: 52px; border-radius: 16px; border: 1.5px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-verde); display: grid; place-items: center; }
+.boton-filtros b { position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--p-naranja); color: #fff; font-size: 13px; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--p-fondo); }
+.con-filtros { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 8px; font-size: 15px; color: var(--p-texto-2); }
+.con-filtros button, .aviso-suave .enlace { min-height: 36px; font-weight: 700; color: var(--p-naranja-texto); background: none; border: 0; }
+
+/* La hoja de filtros. */
+.filtros-titulo { margin: 16px 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--p-texto-2); }
+.filtros-disponibilidad { display: grid; grid-template-columns: repeat(3, 1fr); }
+.filtros-disponibilidad button { min-height: 44px; }
+.filtros-marcas { list-style: none; margin: 8px 0 0; padding: 0; max-height: 40vh; overflow-y: auto; }
+.filtros-marcas button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; border-bottom: 1px solid var(--p-borde-suave); font-size: 17px; text-align: left; }
+.filtros-marcas button i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--p-borde-fuerte); flex: none; }
+.filtros-marcas button.elegida { font-weight: 700; }
+.filtros-marcas button.elegida i { border: 7px solid var(--p-naranja); }
+.ver-productos { width: 100%; margin-top: 16px; min-height: 56px; }
+
+/* El aviso de «Agregado a la venta», arriba del menú de abajo. */
+.aviso-agregado { position: fixed; left: 16px; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 40; }

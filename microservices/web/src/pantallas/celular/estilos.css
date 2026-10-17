@@ -582,3 +582,7 @@ tr.cambia td { background: #fff8e8; }
 .ut-flecha { margin-left: auto; color: rgb(255 255 255 / 0.8); }
 .ut-activar { width: 100%; display: flex; gap: 10px; align-items: center; justify-content: center; min-height: 52px; padding: 0 14px; border: 1px solid var(--p-naranja-borde); background: var(--p-naranja-suave); color: var(--p-naranja-texto); border-radius: 12px; font: inherit; font-size: 16px; font-weight: 600; }
 .ut-activar.reactivar { border-color: #bfe3cf; background: var(--p-verde-suave); color: var(--p-verde-texto); }
+
+/* Cuántos renglones lleva la venta, sobre el ícono de Vender del menú de abajo. */
+.nav-inferior button { position: relative; }
+.cuenta-menu { position: absolute; top: 0; left: calc(50% + 6px); min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--p-naranja); color: #fff; font-size: 12px; font-weight: 800; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--p-superficie); }

@@ -60,6 +60,9 @@ const TRAZOS = {
   candado: "M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5Z",
   reproducir: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM10 8.500v7l5.500-3.500Z",
   ajustes: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4",
+  // Los filtros y el carrito de «Agregar» del Catálogo (015), los mismos que en el celular.
+  filtros: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0M8 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0M16 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0",
+  carrito: "M3 4h2.2l2.1 10.4a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.3M8.2 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0M15.7 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0",
   procesos: "M3 4h7v6H3zM14 14h7v6h-7zM10 7h7v7",
   estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
   google: "M21 12.200c0-.700-.060-1.300-.180-1.900H12v3.700h5a4.300 4.300 0 0 1-1.900 2.800v2.300h3A9 9 0 0 0 21 12.200ZM12 21a8.800 8.800 0 0 0 6.100-2.200l-3-2.300A5.500 5.500 0 0 1 6.900 13.600H3.800V16A9 9 0 0 0 12 21Z",
@@ -187,10 +190,12 @@ export function Vacio({ icono, titulo, children, accion }: { icono: NombreDeIcon
   );
 }
 
-export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, autoFoco, disabled, onKeyDown, cajaRef, testId = "busqueda", controla, activo }: {
+// `extra`: un botón más al lado del buscador (los filtros del Catálogo, 015).
+export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, autoFoco, disabled, onKeyDown, cajaRef, testId = "busqueda", controla, activo, extra }: {
   valor: string; alCambiar: (v: string) => void; placeholder: string; etiqueta?: string; alEscanear?: () => void; autoFoco?: boolean; disabled?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void; cajaRef?: React.RefObject<HTMLInputElement>; testId?: string;
   controla?: string; activo?: string; // id de la lista de resultados y del resultado marcado
+  extra?: React.ReactNode;
 }) {
   return (
     <div className="buscador" role="search">
@@ -202,6 +207,7 @@ export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, 
         {valor && <button type="button" className="borrar" aria-label="Borrar la búsqueda" onClick={() => { alCambiar(""); cajaRef?.current?.focus(); }}><Icono nombre="cerrar" tam={18} /></button>}
       </div>
       {alEscanear && <Boton icono="escanear" variante="marino" aria-label="Escanear el código de barras" onClick={alEscanear} data-testid="escanear" />}
+      {extra}
     </div>
   );
 }

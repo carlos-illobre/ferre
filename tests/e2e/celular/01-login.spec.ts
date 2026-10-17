@@ -180,7 +180,9 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
 // la aplicación, en un navegador de verdad, lea el código que muestra la computadora. La cámara
 // es de mentira: muestra la imagen del código de la pantalla de la computadora. Lo que pasa
 // después de leerlo lo prueban las unitarias.
-test("C5 la cámara del celular lee el código que muestra la computadora y lleva a dejarla entrar", async ({ browser, page }) => {
+// @tiempo: decodificar el código del video depende de la carga de la máquina; corre al final, sin
+// la otra interfaz a la vez (tests/e2e.sh). Con todo corriendo junto no llegaba a leerlo.
+test("C5 la cámara del celular lee el código que muestra la computadora y lleva a dejarla entrar", { tag: "@tiempo" }, async ({ browser, page }) => {
   const compu = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
   await compu.goto("/");
   const qr = compu.getByTestId("qr-entrar").locator("img");
@@ -196,7 +198,7 @@ test("C5 la cámara del celular lee el código que muestra la computadora y llev
       const img = new Image();
       img.src = src;
       await img.decode();
-      const dibujar = () => { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 640, 480); ctx.drawImage(img, 170, 90, 300, 300); };
+      const dibujar = () => { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 640, 480); ctx.drawImage(img, 120, 40, 400, 400); };
       dibujar();
       setInterval(dibujar, 100);
       return lienzo.captureStream(10);
@@ -204,6 +206,7 @@ test("C5 la cámara del celular lee el código que muestra la computadora y llev
   }, imagen);
   await page.goto("/");
   await page.getByTestId("escanear-codigo-de-la-compu").click();
+  await expect(page.getByTestId("escaner")).toBeVisible();
   await expect(page.getByTestId("entrar-para-la-compu")).toBeVisible({ timeout: 15000 });
   expect(await page.evaluate(() => location.hash)).toBe(enlace.slice(enlace.indexOf("#")));
   await expect(page.getByTestId("escaner")).toHaveCount(0);

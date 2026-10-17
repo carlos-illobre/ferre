@@ -784,23 +784,36 @@ RF-81:
     - "Cualquier usuario puede marcar resuelto o reabrir: no hay un permiso para eso"
 
 RF-107:
-  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
-  pruebas: []
+  estado: "A validar (015): programado y probado, salvo «Stock bajo», que espera al stock mínimo (RF-54)"
+  pruebas:
+    - microservices/web/src/negocio/catalogo/stock-y-filtros.test.ts
+    - microservices/web/src/pantallas/celular/Catalogo.para-vender.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
   defectos: []
 
 RF-108:
-  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
-  pruebas: []
+  estado: "A validar (015): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/negocio/ventas/venta-en-curso.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.para-vender.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
+    - tests/e2e/celular/17-espejo.spec.ts
+    - tests/e2e/escritorio/17-espejo.spec.ts
   defectos: []
 
 RF-109:
-  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
-  pruebas: []
+  estado: "A validar (015): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/negocio/catalogo/stock-y-filtros.test.ts
+    - microservices/web/src/pantallas/celular/Catalogo.para-vender.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
   defectos: []
 
 RF-110:
-  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
-  pruebas: []
+  estado: "A validar (015): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/pantallas/celular/Catalogo.para-vender.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
   defectos: []
 
 RNF-01:

@@ -39,6 +39,8 @@
 
 /* Pestañas con ícono, y los íconos de «Más». */
 .segmentos.con-icono button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+/* Las pestañas se tocan cómodas con el dedo: 44 px como mínimo (015, decisión 104). */
+.segmentos.con-icono button { min-height: 44px; }
 .segmentos.con-icono svg { flex: none; }
 .miniatura.mas-icono { display: grid; place-items: center; background: var(--coral-tinte); color: var(--coral-texto); }
 
