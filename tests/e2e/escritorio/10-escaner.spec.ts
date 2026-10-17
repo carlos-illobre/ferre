@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
 
-// La API del stack contra el que corren los escenarios (API_URL permite otro puerto).
-const API = process.env.API_URL ?? "http://localhost";
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { API, psql } = stack("escritorio");
 
 // Celular que escanea, laptop que muestra (issue #52): la laptop muestra el QR, el celular
 // lo abre y queda vinculado, y cada código que "escanea" (acá, tipeado en el escáner)
@@ -15,10 +15,6 @@ const EMAIL = "e2e-escaner@ferre.test";
 const ID_PROV = "00000000-0000-0000-0000-00000000e2f2";
 const ID_PROD = "00000000-0000-0000-0000-00000000e2f3";
 const ID_PROD2 = "00000000-0000-0000-0000-00000000e2f4";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')))`);
@@ -85,7 +81,7 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   // La segunda vez, el mismo código entra directo (cantidad 2).
   expect(await mandar("7790009998887")).toBe(201);
   await expect(laptop.getByTestId("item").filter({ hasText: "GUANTES ESCANER" }).getByTestId("cantidad")).toHaveValue("2", { timeout: 10000 });
-  expect(psql(`SELECT count(*) FROM codigo_escaneado WHERE entregado_en IS NOT NULL AND puesto_id = '${puestoRemoto!.id}'`)).toBe("3");
+  await expect.poll(() => psql(`SELECT count(*) FROM codigo_escaneado WHERE entregado_en IS NOT NULL AND puesto_id = '${puestoRemoto!.id}'`)).toBe("3");
   // Se cierran los dos: si quedaran abiertos y emparejados, la prueba que sigue (con la misma
   // sesión de computadora) entraría en espejo con este celular y se iría a su pantalla.
   await laptop.context().close();

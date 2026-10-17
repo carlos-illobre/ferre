@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
+import { stack } from "../comun/stack";
 
-// La API del stack contra el que corren los escenarios (API_URL permite otro puerto).
-const API = process.env.API_URL ?? "http://localhost";
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { API } = stack("escritorio");
 
 // Escenario del esqueleto: la PWA abre y le habla a la API y a la base. Los happy paths
 // reales (cargar lista, buscar y vender, ingresar mercadería, contar, ver stock) se

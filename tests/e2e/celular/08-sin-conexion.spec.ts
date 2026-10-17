@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { archivosSinCachear } from "../comun/dispositivo";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("celular");
 
 // Sin internet no se nota (issue #18): con la app ya abierta se corta la red, se vende y
 // se cambia un margen; al volver la red todo llega al servidor una sola vez. Y la app
@@ -9,10 +13,6 @@ const TOKEN = "token-e2e-sin-conexion";
 const EMAIL = "e2e-sin-conexion@ferre.test";
 const ID_PROV = "00000000-0000-0000-0000-00000000e2f0";
 const ID_PROD = "00000000-0000-0000-0000-00000000e2f1";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM anomalia WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -63,7 +63,7 @@ test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y 
   await expect(page.getByTestId("item")).toHaveCount(1);
   expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
   await context.setOffline(false);
-  expect(psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");
+  await expect.poll(() => psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");
 
   // La llave está en Configuración, deshabilitada de arranque (E07); habilitarla hace que el celular guarde (E10).
   await page.goto("/#/mas/configuracion");
@@ -106,18 +106,18 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
   await expect(page.getByTestId("item")).toContainText("$1.000"); // 500 × 1,5 × 1,21 = 907,5 → 1000
   await page.getByRole("button", { name: "No llevó" }).click();
   await expect(page.getByTestId("conexion-celular")).toContainText("3 por enviar");
-  expect(psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");
+  await expect.poll(() => psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");
 
   // Vuelve la red: se envía todo, en orden, una sola vez.
   await context.setOffline(false);
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(page.getByTestId("conexion-celular")).toContainText("Sincronizado", { timeout: 15000 });
-  expect(psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("1");
   // El producto no tenía stock cargado: se vendió igual, el stock no bajó de cero y quedó la anomalía (RF-59).
-  expect(psql(`SELECT count(*) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("0");
-  expect(psql(`SELECT count(*) FROM anomalia WHERE producto_id = '${ID_PROD}'`)).toBe("1");
-  expect(psql(`SELECT margen_elegido FROM producto WHERE id = '${ID_PROD}'`)).toBe("50");
-  expect(psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_PROD}'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("0");
+  await expect.poll(() => psql(`SELECT count(*) FROM anomalia WHERE producto_id = '${ID_PROD}'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT margen_elegido FROM producto WHERE id = '${ID_PROD}'`)).toBe("50");
+  await expect.poll(() => psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_PROD}'`)).toBe("1");
 });
 
 test("con el trabajo sin conexión habilitado, la app abre sin red gracias al service worker", async ({ page, context }) => {
@@ -127,7 +127,7 @@ test("con el trabajo sin conexión habilitado, la app abre sin red gracias al se
   // Esperar a que el service worker controle la página y haya precacheado la app.
   await page.evaluate(() => navigator.serviceWorker.ready);
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)), { timeout: 15000 }).toBe(true);
-  await page.waitForTimeout(1000);
+  await expect.poll(() => archivosSinCachear(page), { timeout: 15000 }).toBe(0);
 
   await context.setOffline(true);
   await page.reload();

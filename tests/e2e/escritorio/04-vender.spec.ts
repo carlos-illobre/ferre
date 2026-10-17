@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Happy path "buscar un producto y registrar una venta" (issue #15): el empleado busca,
 // agrega con Enter, cambia la cantidad, elige cómo paga y cobra. La venta queda con el
@@ -11,10 +14,6 @@ const PROVEEDOR = "Proveedor vender (e2e)";
 const ID_PROV = "00000000-0000-0000-0000-00000000e2e5";
 const ID_MECHA = "00000000-0000-0000-0000-00000000e2e6";
 const ID_TORNILLO = "00000000-0000-0000-0000-00000000e2e7";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM anomalia WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -94,14 +93,14 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(page.getByTestId("item")).toHaveCount(0);
 
   // Quedó en la base con el stock descontado y el precio explicado.
-  expect(psql(`SELECT count(*) FROM venta v JOIN item_venta i ON i.venta_id = v.id WHERE i.producto_id = '${ID_MECHA}' AND v.estado = 'confirmada'`)).toBe("1");
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("7.000");
+  await expect.poll(() => psql(`SELECT count(*) FROM venta v JOIN item_venta i ON i.venta_id = v.id WHERE i.producto_id = '${ID_MECHA}' AND v.estado = 'confirmada'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("7.000");
   // El tornillo no tenía stock: se vendió igual, su stock no bajó de cero y quedó la anomalía.
-  expect(psql(`SELECT count(*) FROM movimiento_stock WHERE producto_id = '${ID_TORNILLO}'`)).toBe("0");
-  expect(psql(`SELECT count(*) FROM anomalia WHERE producto_id = '${ID_TORNILLO}' AND tipo = 'venta_sin_stock'`)).toBe("1");
-  expect(psql(`SELECT margen_aplicado FROM item_venta WHERE producto_id = '${ID_TORNILLO}' ORDER BY creado_en DESC LIMIT 1`)).toBe("300");
-  expect(psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
-  expect(psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
+  await expect.poll(() => psql(`SELECT count(*) FROM movimiento_stock WHERE producto_id = '${ID_TORNILLO}'`)).toBe("0");
+  await expect.poll(() => psql(`SELECT count(*) FROM anomalia WHERE producto_id = '${ID_TORNILLO}' AND tipo = 'venta_sin_stock'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT margen_aplicado FROM item_venta WHERE producto_id = '${ID_TORNILLO}' ORDER BY creado_en DESC LIMIT 1`)).toBe("300");
+  await expect.poll(() => psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
+  await expect.poll(() => psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
   // La pestaña Hoy de Vender la muestra, sin anular (decisión 72).
   await page.getByTestId("pestana-hoy").click();
@@ -117,7 +116,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.getByTestId("motivo-anular").fill("se arrepintió");
   await page.getByTestId("confirmar-anular").click();
   await expect(venta).toContainText(/anulada/i);
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
 
   // La anomalía del tornillo se ve en Más > Anomalías.
   await page.getByTestId("menu-mas").click();

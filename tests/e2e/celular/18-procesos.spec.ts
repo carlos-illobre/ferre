@@ -1,18 +1,16 @@
 import { test, expect, type Page } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { API, psql } = stack("celular");
 
 // Procesos (specs/011-procesos) en el celular: «Pasos» que se ordenan arrastrando y «Diagrama»
 // con la hoja de figuras, pasando por el servidor de Ferrebress y el servicio de Procesos.
 const TOKEN = "token-e2e-procesos-celular";
 const EMAIL = "e2e-procesos-celular@ferre.test";
-const API = process.env.API_URL ?? "http://localhost";
 const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos/venta.bpmn", "utf8");
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql("DELETE FROM procesos.proceso WHERE nombre LIKE 'Venta celular E2E%'");
@@ -101,7 +99,8 @@ test("el botón de volver del celular cierra el menú «⋯», y después vuelve
   await expect(page).toHaveURL(/#\/mas\/procesos/);
 });
 
-test.describe("con el dedo", () => {
+// @tiempo: el arrastre depende de cuánto se mantiene apretado; corre al final, sin la otra interfaz a la vez (tests/e2e.sh).
+test.describe("con el dedo", { tag: "@tiempo" }, () => {
   // Toques de verdad (eventos táctiles del navegador), no el mouse.
   test.use({ hasTouch: true });
 

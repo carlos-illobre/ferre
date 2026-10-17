@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { cambiosEnLaCola } from "../comun/dispositivo";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Happy path "buscar un producto y elegir su margen" (issues #13 y #14): con un catálogo
 // sembrado, el empleado escribe dos palabras en cualquier orden, encuentra el producto,
@@ -9,10 +13,6 @@ import { createHash } from "node:crypto";
 const TOKEN = "token-e2e-productos";
 const EMAIL = "e2e-productos@ferre.test";
 const PROVEEDOR = "Proveedor productos (e2e)";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -74,7 +74,7 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   await page.route("**/productos/*", async (ruta) => { await new Promise((r) => setTimeout(r, 5000)); await ruta.continue().catch(() => undefined); });
   await fila.getByTestId("margen-50").click();
   await expect(fila.getByTestId("margen-50")).toHaveAttribute("aria-checked", "true");
-  await page.waitForTimeout(300); // que llegue a anotarse en el dispositivo
+  await expect.poll(() => cambiosEnLaCola(page)).toBeGreaterThan(0); // que llegue a anotarse en el dispositivo
   await page.unroute("**/productos/*");
   await page.reload();
   await page.getByTestId("busqueda").fill("me6");
@@ -82,7 +82,8 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   await expect(primera.getByTestId("margen-50")).toHaveAttribute("aria-checked", "true");
   await primera.getByTestId("margen-100").click();
   await expect(primera.getByTestId("explicacion").last()).toContainText("$4.000");
-  await page.waitForTimeout(300); // que llegue a anotarse en el dispositivo
+  // Que llegue al servidor antes de recargar.
+  await expect.poll(() => psql(`SELECT margen_elegido FROM producto WHERE id = '00000000-0000-0000-0000-00000000e2e2'`)).toBe("100");
   await page.reload();
   await page.getByTestId("busqueda").fill("me6");
   await expect(page.getByTestId("producto").first().getByTestId("margen-100")).toHaveAttribute("aria-checked", "true");

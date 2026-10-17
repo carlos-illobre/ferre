@@ -1,0 +1,8 @@
+# El segundo stack de las pruebas de punta a punta: el del celular, para que las dos interfaces
+# corran a la vez sin pisarse los datos (tests/e2e.sh). Es el mismo compose; solo cambia que la
+# base se publica en un puerto libre en vez del 5432, que ya usa el primero (comun/stack.ts lo
+# averigua con `docker compose port`). El resto sale de segundo-stack.env.
+services:
+  db:
+    ports: !override
+      - "127.0.0.1::5432"

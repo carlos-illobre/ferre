@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Happy path "ver el stock valorizado" (issue #33): con una compra y una venta cargadas,
 // la pantalla muestra el stock como suma de movimientos, el valor como stock × costo, la
@@ -9,10 +12,6 @@ const TOKEN = "token-e2e-stock";
 const EMAIL = "e2e-stock@ferre.test";
 const ID_PROV = "00000000-0000-0000-0000-00000000e2ea";
 const ID_PROD = "00000000-0000-0000-0000-00000000e2eb";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -61,7 +60,7 @@ test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) =>
   await detalle.getByTestId("cantidad-real").fill("15");
   await detalle.getByTestId("motivo").fill("conté la estantería");
   await detalle.getByTestId("guardar-ajuste").click();
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("15.000");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("15.000");
 
   // En la venta se ve el stock del producto.
   await page.goto("/#/vender");

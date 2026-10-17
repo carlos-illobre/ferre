@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // La computadora no tiene cámara (ADR-016): en el ingreso pide la foto de la factura, muestra
 // un código QR, el celular abre el enlace del código, saca la foto y la foto aparece sola en
@@ -8,10 +11,6 @@ import { createHash } from "node:crypto";
 const TOKEN = "token-e2e-foto-qr";
 const EMAIL = "e2e-foto-qr@ferre.test";
 const FOTO = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   const delUsuario = `(SELECT id FROM usuario WHERE email = '${EMAIL}')`;
@@ -48,7 +47,7 @@ test("la computadora pide la foto de la factura con un código QR y el celular l
   await expect(page.getByTestId("foto-comprobante")).toContainText("Foto de la factura cargada", { timeout: 15000 });
   await page.getByTestId("foto-comprobante").getByTestId("ver-comprobante").click();
   await expect(page.getByRole("dialog", { name: "Foto de la factura" })).toBeVisible();
-  expect(psql(`SELECT count(*) FROM foto_comprobante WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM foto_comprobante WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
 
   // Un código que ya se usó no sirve para otra foto.
   await telefono.reload();

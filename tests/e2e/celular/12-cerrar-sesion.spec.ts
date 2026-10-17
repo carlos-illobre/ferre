@@ -1,16 +1,15 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("celular");
 
 // Cerrar sesiones desde Administración: cerrar la de otro dispositivo la saca de la lista;
 // cerrar la propia vuelve al login. Y "Salir" también vuelve al login.
 const TOKEN = "token-e2e-cerrar-propia";
 const TOKEN_OTRA = "token-e2e-cerrar-otra";
 const EMAIL = "e2e-cerrar-sesion@ferre.test";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeEach(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -34,7 +33,7 @@ test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page 
   await otra.getByRole("button", { name: "Cerrar" }).click();
   await expect(page.getByRole("row", { name: /otro celular/ })).toHaveCount(0);
   await expect(page.getByRole("row", { name: /esta computadora/ })).toBeVisible();
-  expect(psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'otro celular' AND revocada_en IS NOT NULL`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'otro celular' AND revocada_en IS NOT NULL`)).toBe("1");
 });
 
 test("cerrar la sesión propia desde Administración vuelve al login", async ({ page }) => {
@@ -58,5 +57,5 @@ test("Salir vuelve al login", async ({ page }) => {
   await page.goto("/#/mas/negocio");
   await page.getByRole("button", { name: "Salir" }).click();
   await expect(page.getByTestId("entrar")).toBeVisible();
-  expect(psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NOT NULL`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NOT NULL`)).toBe("1");
 });

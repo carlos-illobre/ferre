@@ -118,7 +118,7 @@ Un cambio de código no se sube sin correr las e2e en Docker, también desde la 
 ```bash
 bash .claude/scripts/preparar-nube.sh   # solo si no corrió al empezar
 .claude/scripts/imagenes-nube.sh        # cada vez que cambia el código de un servicio
-tests/e2e.sh                            # computadora y celular; tarda unos seis minutos
+tests/e2e.sh                            # computadora y celular a la vez; tarda unos cuatro minutos
 ```
 
 El resultado se le dice a Carlos tal cual: cuántas pasaron y cuáles fallaron. Una que falla

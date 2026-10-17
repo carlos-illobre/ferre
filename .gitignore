@@ -23,6 +23,8 @@ __pycache__/
 # Dependencias y artefactos de build
 **/node_modules/
 **/dist/
+# El cliente web del segundo stack de las pruebas de punta a punta (tests/e2e.sh)
+microservices/web/dist-celular/
 microservices/mostrador/api/public/
 **/.venv/
 **/__pycache__/

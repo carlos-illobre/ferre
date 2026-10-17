@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Un mismo artículo en dos proveedores (issue #29): dos productos con el mismo código de
 // barras aparecen como sugerencia, el dueño los une, y en Productos el producto muestra
@@ -11,10 +14,6 @@ const ID_PROV_A = "00000000-0000-0000-0000-00000000e2f5";
 const ID_PROV_B = "00000000-0000-0000-0000-00000000e2f6";
 const ID_A = "00000000-0000-0000-0000-00000000e2f7";
 const ID_B = "00000000-0000-0000-0000-00000000e2f8";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -54,10 +53,10 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await sugerencia.getByTestId("unir").click();
   await expect(page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" })).toBeVisible();
   // El absorbido queda inactivo y su venta ahora apunta al conservado; el preferido es el barato.
-  expect(psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe(`false ${ID_A}`);
-  expect(psql(`SELECT producto_id FROM item_venta WHERE venta_id = '00000000-0000-0000-0000-00000000e2f9'`)).toBe(ID_A);
-  expect(psql(`SELECT proveedor_preferido_id FROM producto WHERE id = '${ID_A}'`)).toBe(ID_PROV_B);
-  expect(psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("2");
+  await expect.poll(() => psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe(`false ${ID_A}`);
+  await expect.poll(() => psql(`SELECT producto_id FROM item_venta WHERE venta_id = '00000000-0000-0000-0000-00000000e2f9'`)).toBe(ID_A);
+  await expect.poll(() => psql(`SELECT proveedor_preferido_id FROM producto WHERE id = '${ID_A}'`)).toBe(ID_PROV_B);
+  await expect.poll(() => psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("2");
 
   // En Productos: un solo producto, dos proveedores, el barato con estrella y el precio sobre su costo.
   await page.goto("/#/productos");
@@ -80,8 +79,8 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await expect(union).toBeVisible();
   await union.getByTestId("separar").click();
   await expect(union).toHaveCount(0);
-  expect(psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe("true");
-  expect(psql(`SELECT producto_id FROM item_venta WHERE venta_id = '00000000-0000-0000-0000-00000000e2f9'`)).toBe(ID_B);
-  expect(psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("1");
-  expect(psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_B}'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe("true");
+  await expect.poll(() => psql(`SELECT producto_id FROM item_venta WHERE venta_id = '00000000-0000-0000-0000-00000000e2f9'`)).toBe(ID_B);
+  await expect.poll(() => psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_B}'`)).toBe("1");
 });

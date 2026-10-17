@@ -1,16 +1,15 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Sin sesión se ve el login; con una sesión válida en el dispositivo, la app entra
 // directo y el dueño ve la administración. La sesión se siembra en la base sin pasar
 // por Google (que no se puede automatizar).
 const TOKEN = "token-e2e-dueno";
 const EMAIL = "e2e-dueno@ferre.test";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   // Si una corrida anterior se cortó puede haber quedado una huella vinculada.
@@ -87,14 +86,14 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await page.getByTestId("confirmar-vincular").click();
   await expect(page.getByTestId("mensaje-celular")).toContainText("«Celular E2E» entra con la huella");
   await expect(page.getByTestId("celular")).toContainText("Celular E2E");
-  expect(psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
 
   // Salir y entrar con la huella: sin Google.
   await page.getByRole("button", { name: "Salir" }).click();
   await expect(page.getByTestId("entrar-huella")).toBeVisible();
   await page.getByTestId("entrar-huella").click();
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
-  expect(psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
+  await expect.poll(() => psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
   // Quitar el celular: ya no entra con la huella.
   await page.goto("/#/sesiones");
@@ -135,7 +134,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   // El celular sigue a su pantalla de siempre y lo dice arriba un momento (pedido de Carlos del 2026-10-15).
   await expect(celular.getByTestId("espejo-aviso")).toContainText("Listo: la computadora entró como");
   await expect(compu.getByTestId("usuario")).toContainText("Dueño E2E", { timeout: 10000 });
-  expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'sesion.iniciada' AND contenido->>'medio' = 'celular' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM evento WHERE tipo = 'sesion.iniciada' AND contenido->>'medio' = 'celular' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
 
   // Quedan emparejados (decisión 58): sin leer más códigos, la computadora ya tiene su celular…
   await expect.poll(() => psql(`SELECT count(*) FROM puesto WHERE vinculado_en IS NOT NULL AND expira_en > now() + interval '29 days' AND celular_sesion_id = (SELECT id FROM sesion WHERE token_hash = '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}')`), { timeout: 15000 }).toBe("1");
