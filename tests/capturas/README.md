@@ -80,7 +80,12 @@ tests/capturas/levantar.sh
 uv run --with playwright==1.56.0 python tests/capturas/tutorial/formas_de_entrar.py   # «Entrar»: una sección por forma de entrar
 uv run --with playwright==1.56.0 python tests/capturas/tutorial/espejo.py   # el clip de «quedan vinculados»
 uv run --with playwright==1.56.0 python tests/capturas/tutorial/catalogo.py  # «Catálogo»: la pantalla Productos de la computadora
+uv run --with playwright==1.56.0 --with pillow python tests/capturas/tutorial/catalogo_celular.py  # «Catálogo» en el celular
 ```
+
+`catalogo_celular.py` le da al navegador una cámara de mentira con un código de barras EAN-13 de
+verdad (lo dibuja él), que el lector de la aplicación lee: así se graban «Buscar escaneando» y
+«Cargar el código». Sus marcas van en `manual-catalogo-celular-marcas.json`.
 
 `catalogo.py` deja sus marcas en `manual-catalogo-marcas.json`, al lado de la pantalla del manual, y
 con `SOLO_CAPTURAS=1` saca solo las capturas (los clips quedan como están). Para «Buscar
