@@ -172,6 +172,17 @@ describe("Vender", () => {
     confirmar.mockRestore();
   });
 
+  it("la venta vacía muestra el dibujo y explica cómo se agrega, sin nada que tocar; con un producto se va", () => {
+    const { agregar } = armar();
+    expect(screen.getByText("Venta nueva")).toBeTruthy();
+    const como = screen.getByTestId("como-se-agrega");
+    expect(within(como).getAllByRole("listitem").map((li) => li.querySelector("b")?.textContent)).toEqual(["Escaneá", "Buscá", "Explorá"]);
+    expect(within(como).queryAllByRole("button")).toHaveLength(0);
+    expect(within(como).queryAllByRole("link")).toHaveLength(0);
+    agregar("mecha vender");
+    expect(screen.queryByTestId("como-se-agrega")).toBeNull();
+  });
+
   it("quitar un producto es un botón con nombre, y la unidad litro se escribe L", () => {
     const { agregar, item, unidad } = armar();
     agregar("mecha vender");

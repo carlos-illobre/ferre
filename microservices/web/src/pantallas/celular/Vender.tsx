@@ -220,10 +220,16 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         )}
 
         {vacio && (
-          <div className="vacio">
-            <div className="icono"><Icono nombre="vender" tam={30} grosor={1.8} /></div>
+          <div className="vacio venta-vacia">
+            <img className="dibujo" src="/ilustraciones/venta-nueva.png" alt="" />
             <strong>Venta nueva</strong>
             <p>Tocá la búsqueda y escribí el producto, o escaneá el código de barras.</p>
+            {/* Solo explican: no se tocan, porque repetirían la búsqueda, el escáner y el menú (003-T003). */}
+            <ul className="como-se-agrega" aria-label="Cómo se agrega un producto" data-testid="como-se-agrega">
+              <li><Icono nombre="barras" tam={30} grosor={1.9} /><b>Escaneá</b><span>Con la cámara o el lector</span></li>
+              <li><Icono nombre="buscar" tam={30} grosor={1.9} /><b>Buscá</b><span>Por nombre o código</span></li>
+              <li><Icono nombre="catalogo" tam={30} grosor={1.9} /><b>Explorá</b><span>En Catálogo, en el menú</span></li>
+            </ul>
           </div>
         )}
 

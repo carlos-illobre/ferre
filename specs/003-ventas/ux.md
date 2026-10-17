@@ -86,6 +86,12 @@ el total quedan al alcance del pulgar.
 **Estados:**
 
 - *Vacío:* la venta nueva dice que se escriba el nombre del producto o se escanee el código.
+  En el celular (Carlos, 2026-10-17; maqueta aprobada `maquetas/celular-venta-vacia.png`): el
+  dibujo de un carrito con productos de ferretería sobre semicírculos verde claro, «Venta nueva»
+  grande y debajo tres explicaciones en un panel verde clarito: «Escaneá» (con la cámara o el
+  lector), «Buscá» (por nombre o código) y «Explorá» (en Catálogo, en el menú). Las tres solo
+  explican: no se tocan, porque repetirían la búsqueda, el escáner y el menú de abajo. No hay
+  atajos, subtítulo ni consejos.
 - *Cargando:* mientras el catálogo baja por primera vez, la búsqueda lo dice y muestra el
   avance.
 - *Error:* si el servidor no acepta la venta, el aviso dice qué está mal y la venta queda

@@ -31,6 +31,8 @@ const TRAZOS: Record<string, string> = {
   subirArchivo: "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M12 17v-6M9 14l3-3 3 3",
   caja: "M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8",
   lector: "M4 6h16M4 12h10M4 18h7",
+  // Un código de barras, en la explicación de la venta vacía (003-T003).
+  barras: "M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14",
   porcentaje: "M19 5L5 19M7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
   reloj: "M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z",
   // Duplicados (002-T005).
