@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
@@ -74,6 +75,14 @@ describe("foto de la factura", () => {
     fireEvent.change(screen.getByTestId("archivo-para-la-compu"), { target: { files: [new File(["x"], "f.jpg", { type: "image/jpeg" })] } });
     await waitFor(() => expect(screen.getByRole("status").textContent).toContain("ya está en la computadora"));
     expect(apiFalsa).toHaveBeenCalledWith("/pedidos-de-foto/cod-1/foto", expect.objectContaining({ method: "POST" }));
+  });
+
+  it("002-T012: el código QR tiene su tamaño fijo aunque esté dentro de la foto grande del producto, que estira sus imágenes", async () => {
+    const estilos = readFileSync(`${process.cwd()}/src/pantallas/foto-de-factura.css`, "utf8");
+    expect(estilos).toMatch(/\.ff-pedido img\.ff-qr \{ width: 150px; height: 150px; aspect-ratio: auto;/);
+    render(<FotoDeFactura foto={null} alCambiar={vi.fn()} nombre="factura" conCelular />);
+    fireEvent.click(screen.getByTestId("foto-con-celular"));
+    expect((await screen.findByRole("img", { name: "Código para sacar la foto con el celular" })).className).toBe("ff-qr");
   });
 
   it("un código vencido se dice con claridad y no deja sacar la foto", async () => {

@@ -254,16 +254,16 @@
  "foto-qr": [
   {
    "x": 3.1,
-   "y": 25.7,
-   "ancho": 93.8,
-   "alto": 50.3,
+   "y": 28.8,
+   "ancho": 28.8,
+   "alto": 43.7,
    "texto": "Apuntá la cámara del celular a este código."
   },
   {
    "x": 80.9,
-   "y": 81.2,
+   "y": 83.7,
    "ancho": 16.0,
-   "alto": 13.4,
+   "alto": 11.7,
    "texto": "Cuando llega la foto, «Cerrar»."
   }
  ],

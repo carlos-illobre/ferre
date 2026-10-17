@@ -418,7 +418,7 @@ function FotoGrande({ url, nombre, descripcion, alSubir, alCerrar }: { url: stri
     finally { setSubiendo(false); }
   }
   return (
-    <dialog ref={ref} className="foto-grande" aria-label={`Foto de ${descripcion}`} onClick={(e) => { if (e.target === e.currentTarget) alCerrar(); }} data-testid="foto-grande">
+    <dialog ref={ref} className={`foto-grande${pidiendo ? " pidiendo" : ""}`} aria-label={`Foto de ${descripcion}`} onClick={(e) => { if (e.target === e.currentTarget) alCerrar(); }} data-testid="foto-grande">
       <figure>
         {url ? <img src={url} alt={descripcion} style={{ viewTransitionName: nombre }} /> : <div className="sin-foto" style={{ viewTransitionName: nombre }}><Icono nombre="camara" tam={72} grosor={1.2} /></div>}
         <figcaption>

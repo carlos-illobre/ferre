@@ -44,5 +44,8 @@ dialog.ff-grande .ff-botones { justify-content: flex-end; }
 .ff-pedido ol { list-style: decimal; }
 .ff-pedido ol li { list-style: decimal; }
 .ff-qr-vacio { flex: none; width: 150px; height: 150px; border-radius: 10px; background: var(--p-relleno); }
-.ff-pedido { text-align: left; color: var(--p-tinta); font-size: 1rem; }
+.ff-pedido { text-align: left; color: var(--p-tinta); font-size: 1rem; font-weight: 400; }
+/* El código tiene su tamaño fijo también dentro de la foto grande del producto, cuya regla
+   estira cualquier imagen a todo el ancho y dejaba los pasos sin lugar. */
+.ff-pedido img.ff-qr { width: 150px; height: 150px; aspect-ratio: auto; object-fit: contain; }
 .ff-pedido .ff-error { color: var(--p-naranja-texto); font-weight: 650; }

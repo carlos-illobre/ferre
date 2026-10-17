@@ -343,7 +343,11 @@ dialog.exito[open] { display: flex; flex-direction: column; align-items: center;
 /* Foto ampliada. */
 dialog.foto-grande { padding: 0; border: 0; border-radius: var(--r-hoja); background: var(--superficie); box-shadow: var(--sombra-3); width: min(520px, calc(100vw - 32px)); max-height: 92dvh; overflow: auto; }
 dialog.foto-grande::backdrop { background: rgb(15 30 54 / 0.7); }
-.foto-grande img, .foto-grande .sin-foto { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--superficie-2); }
+.foto-grande figure > img, .foto-grande .sin-foto { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--superficie-2); }
+/* Se abre desde una celda que no corta renglones: el diálogo vuelve a cortarlos. Mientras
+   espera la foto del celular, la foto se achica para que entren el código, los pasos y «Cancelar». */
+dialog.foto-grande { white-space: normal; }
+.foto-grande.pidiendo figure > img, .foto-grande.pidiendo .sin-foto { aspect-ratio: auto; height: 160px; }
 .foto-grande .sin-foto { display: grid; place-items: center; color: var(--borde-fuerte); }
 .foto-grande figcaption { padding: var(--e4); display: flex; flex-direction: column; gap: var(--e3); font-weight: 650; }
 .foto-grande figcaption small { font-weight: 400; color: var(--texto-2); font-size: var(--t-chico); }

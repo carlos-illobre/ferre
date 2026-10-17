@@ -345,7 +345,8 @@ que reemplaza a la anterior; cerrar la ampliada con una acción (Escape en la co
 **Estados:** sin foto (ícono, nunca imagen rota; la ampliada dice que todavía no tiene foto y
 ofrece sacarla); subiendo (avance); éxito (se ve la foto nueva); archivo que no es una imagen
 o demasiado pesado (lo dice); sin conexión (dice que subir la foto necesita internet); en la
-computadora no se ofrece la cámara.
+computadora no se ofrece la cámara. Pedida al celular, en la computadora: la foto ampliada se
+achica y en el mismo cuadro se ven, sin desplazar, el código QR, los pasos y «Cancelar».
 
 ## Productos sueltos (historia 10 · RF-12)
 

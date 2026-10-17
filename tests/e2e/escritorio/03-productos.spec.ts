@@ -126,6 +126,23 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   await expect(grande).toBeVisible();
   await expect(grande).toContainText("TUERCA SCROLL");
   await expect(grande).toContainText("todavía no tiene foto");
+  // Pedida al celular: el código, los pasos y «Cancelar» entran en el diálogo (002-T012).
+  await grande.getByTestId("foto-con-celular").click();
+  const pedido = grande.getByTestId("pedido-de-foto");
+  await expect(pedido.getByRole("img", { name: "Código para sacar la foto con el celular" })).toBeVisible();
+  await expect(pedido.getByText("Abrí la cámara del celular y apuntá a este código.")).toBeVisible();
+  const caja = (await grande.boundingBox())!;
+  const pasos = (await pedido.locator(".ff-texto").boundingBox())!;
+  expect(pasos.width).toBeGreaterThan(150);
+  for (const paso of await pedido.getByRole("listitem").all()) {
+    const b = (await paso.boundingBox())!;
+    expect(b.x + b.width).toBeLessThanOrEqual(caja.x + caja.width);
+  }
+  // «Cancelar» se ve sin desplazar el diálogo.
+  const cancelar = (await pedido.getByRole("button", { name: "Cancelar" }).boundingBox())!;
+  expect(cancelar.y + cancelar.height).toBeLessThanOrEqual(caja.y + caja.height);
+  await pedido.getByRole("button", { name: "Cancelar" }).click();
+  await expect(pedido).toHaveCount(0);
   await page.keyboard.press("Escape");
   await expect(grande).toHaveCount(0);
 });

@@ -59,7 +59,7 @@ export function PedirFotoAlCelular({ para, alRecibir, alCancelar }: { para: stri
 
   return (
     <div className="ff-pedido" role="status" data-testid="pedido-de-foto">
-      {pedido ? <img src={pedido.qr} alt="Código para sacar la foto con el celular" width={150} height={150} /> : <span className="ff-qr-vacio" aria-hidden="true" />}
+      {pedido ? <img className="ff-qr" src={pedido.qr} alt="Código para sacar la foto con el celular" width={150} height={150} /> : <span className="ff-qr-vacio" aria-hidden="true" />}
       <div className="ff-texto">
         <strong>{recibiendo ? "Llegó la foto, un momento…" : emparejado ? "Pedida a tu celular" : "Sacá la foto con el celular"}</strong>
         {emparejado ? (
