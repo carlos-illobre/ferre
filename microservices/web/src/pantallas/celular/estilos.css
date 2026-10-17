@@ -485,6 +485,22 @@ tr.cambia td { background: #fff8e8; }
 .valor-stock { display: block; text-align: right; font-size: 15px; color: var(--p-texto-2); }
 
 /* Más → Usuarios en el celular (007-T032): cabecera, autorizar a alguien y una tarjeta por persona. */
+.ut-alta { display: flex; gap: 14px; align-items: center; width: 100%; border: 0; border-radius: 18px; padding: 16px; background: var(--p-naranja-texto); color: #fff; font: inherit; text-align: left; box-shadow: var(--sombra); }
+.ut-alta strong { display: block; color: #fff; font-size: 16px; }
+.ut-alta small { font-size: 14px; color: #fff; }
+.ut-mas { flex: none; width: 34px; height: 34px; border-radius: 50%; background: #fff; color: var(--p-naranja-texto); display: grid; place-items: center; font-size: 22px; line-height: 1; font-weight: 700; }
+/* Sus sesiones y sus celulares con huella, en la tarjeta (decisión 100) */
+.ua-linea { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--p-borde); background: #fff; border-radius: 12px; font: inherit; font-size: 15px; color: var(--p-tinta); text-align: left; }
+.ua-linea b { font-weight: 600; }
+.ua-flecha { margin-left: auto; color: var(--p-texto-2); font-size: 18px; }
+.ua-linea.abierta { border-color: var(--p-verde-texto); border-radius: 12px 12px 0 0; }
+.ua-lista { border: 1px solid var(--p-verde-texto); border-top: 0; border-radius: 0 0 12px 12px; padding: 4px 14px 10px; background: #fff; }
+.ua-lista h4 { margin: 10px 0 4px; font-size: 14px; color: var(--p-texto-medio); font-weight: 600; }
+.ua-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--p-borde-suave); }
+.ua-lista h4 + .ua-item { border-top: 0; }
+.ua-item > span { flex: 1; min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
+.ua-item small { display: block; color: var(--p-texto-2); font-size: 14px; }
+.ua-item button { flex: none; min-height: 44px; padding: 0 14px; border: 1.5px solid var(--p-naranja); background: #fff; color: var(--p-naranja-texto); border-radius: 12px; font: inherit; font-size: 14px; font-weight: 600; }
 /* Buscar y filtrar por rol (decisión 98) */
 .fu { display: flex; flex-direction: column; gap: 10px; }
 .fu-fila { position: relative; display: flex; gap: 10px; }
@@ -510,10 +526,6 @@ tr.cambia td { background: #fff8e8; }
 .fu-sugerencias small { display: block; color: var(--p-texto-2); font-size: 14px; }
 .fu-av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: #e8eefc; color: #2f4fa8; }
 .fu-resultado { margin: 0; font-size: 14px; color: var(--p-texto-2); padding: 0 2px; }
-.ut-alta { display: flex; gap: 14px; align-items: center; width: 100%; border: 1.5px dashed var(--p-borde); border-radius: 18px; padding: 16px; background: rgb(255 255 255 / 0.55); font: inherit; text-align: left; }
-.ut-alta strong { display: block; color: var(--p-naranja-texto); font-size: 16px; }
-.ut-alta small { font-size: 14px; color: var(--p-texto-2); }
-.ut-mas { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--p-naranja); color: #fff; display: grid; place-items: center; font-size: 22px; line-height: 1; }
 .ut-lista { display: flex; flex-direction: column; gap: 14px; }
 .ut { background: #fff; border-radius: 18px; box-shadow: var(--sombra); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 .ut.apagada { opacity: 0.8; }

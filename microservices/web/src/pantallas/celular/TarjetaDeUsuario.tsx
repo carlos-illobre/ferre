@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ElegirRoles, type RolAsignable } from "../RolesDeUsuario";
+import { resumenDelAcceso, type Acceso, type CelularDeOtroFila, type SesionFila } from "../../negocio/usuarios";
+import { fecha } from "../../formato";
 import { TEXTOS } from "../textos";
 
 // Más → Usuarios en el celular (007-T032): cada persona en su tarjeta, con sus iniciales, su
@@ -22,9 +24,10 @@ const iniciales = (nombre: string) => nombre.trim().split(/\s+/).map((p) => p[0]
 
 export type Persona = { id: string; nombre: string; email: string; activo: boolean; roles?: RolAsignable[] };
 
-export function TarjetaDeUsuario({ persona: u, orden, disponibles, alCambiarRoles, alActivar }: {
+export function TarjetaDeUsuario({ persona: u, orden, disponibles, alCambiarRoles, alActivar, acceso }: {
   persona: Persona; orden: number; disponibles: RolAsignable[];
   alCambiarRoles: (ids: string[]) => Promise<string | null>; alActivar: () => void;
+  acceso?: Acceso & { alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void };
 }) {
   const actuales = u.roles ?? [];
   const [abierto, setAbierto] = useState(false);
@@ -55,6 +58,7 @@ export function TarjetaDeUsuario({ persona: u, orden, disponibles, alCambiarRole
           )) : <li className="sin">Sin roles</li>}
         </ul>
       </div>
+      {acceso && <AccesoDeUsuario nombre={u.nombre} {...acceso} />}
       {abierto ? (
         <div className="ru-panel">
           <ElegirRoles disponibles={disponibles} elegidos={elegidos} alCambiar={(ids) => { setElegidos(ids); setError(null); }} nombre={u.nombre} />
@@ -75,6 +79,40 @@ export function TarjetaDeUsuario({ persona: u, orden, disponibles, alCambiarRole
         </div>
       )}
     </article>
+  );
+}
+
+// Sus sesiones y sus celulares con huella (decisión 100): una línea plegada que dice cuánto tiene y,
+// al tocarla, cada uno con «Cerrar» o «Quitar». Sin nada, la línea no está.
+const ultimoUso = (iso: string | null) => (iso ? `usada ${new Date(iso).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}` : "todavía no se usó");
+function AccesoDeUsuario({ nombre, sesiones, celulares, alCerrarSesion, alQuitarCelular }: Acceso & { nombre: string; alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void }) {
+  const [abierto, setAbierto] = useState(false);
+  const resumen = resumenDelAcceso({ sesiones, celulares });
+  if (!resumen) return null;
+  return (
+    <div className="ua">
+      <button type="button" className={`ua-linea ${abierto ? "abierta" : ""}`} aria-expanded={abierto} onClick={() => setAbierto(!abierto)} aria-label={`Sesiones y celulares de ${nombre}: ${resumen}`} data-testid="acceso-de-usuario">
+        {trazo({ d: "M3 5.5A1.5 1.5 0 0 1 4.5 4h10A1.5 1.5 0 0 1 16 5.5V14H3zM7 18h5M18 9h3v11h-5v-3", tam: 18 })}<b>{resumen}</b><span className="ua-flecha" aria-hidden="true">{abierto ? "⌃" : "›"}</span>
+      </button>
+      {abierto && (
+        <div className="ua-lista">
+          {sesiones.length > 0 && <h4>Sesiones abiertas</h4>}
+          {sesiones.map((s) => (
+            <div key={s.id} className="ua-item" data-testid="sesion">
+              <span>{s.dispositivo}<small>{ultimoUso(s.ultimo_uso_en)}</small></span>
+              <button type="button" onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar</button>
+            </div>
+          ))}
+          {celulares.length > 0 && <h4>Celulares con huella</h4>}
+          {celulares.map((c) => (
+            <div key={c.id} className="ua-item" data-testid="celular-de-otro">
+              <span>{c.dispositivo ?? "celular"}<small>vinculado el {fecha(c.creada_en.slice(0, 10))} · {c.ultimo_uso_en ? `último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : "todavía no se usó"}</small></span>
+              <button type="button" onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

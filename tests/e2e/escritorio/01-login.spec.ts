@@ -75,9 +75,9 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
 
   // En la computadora la app no ofrece la huella aunque se acabe de entrar con Google
-  // (eso es del celular): se vincula a mano desde Administración.
+  // (eso es del celular): se vincula a mano desde Configuración.
   await page.addInitScript((token) => { localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1"); }, TOKEN);
-  await page.goto("/#/sesiones");
+  await page.goto("/#/configuracion");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   await expect(page.getByTestId("ofrecer-huella")).toHaveCount(0);
   await expect(page.getByTestId("celular")).toHaveCount(0);
@@ -96,7 +96,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await expect.poll(() => psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
   // Quitar el celular: ya no entra con la huella.
-  await page.goto("/#/sesiones");
+  await page.goto("/#/configuracion");
   await page.getByTestId("celular").getByRole("button", { name: /Quitar/ }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
   await page.getByRole("button", { name: "Salir" }).click();

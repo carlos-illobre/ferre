@@ -66,13 +66,13 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
     localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1");
     Object.defineProperty(navigator, "userAgent", { get: () => "Mozilla/5.0 (Linux; Android 14; Pixel 7) Chrome/128.0 Mobile Safari/537.36" });
   }, TOKEN);
-  await page.goto("/#/mas/sesiones");
+  await page.goto("/#/mas/configuracion");
   await expect(page.getByTestId("ofrecer-huella")).toContainText("¿Entrar con la huella?");
   await page.getByTestId("aceptar-huella").click();
   await expect(page.getByTestId("ofrecer-huella")).toContainText("Listo");
   await page.getByRole("button", { name: "Entendido" }).click();
   await expect(page.getByTestId("celular")).toHaveCount(1);
-  // No vuelve a ofrecerlo; y desde Administración se puede quitar y vincular a mano.
+  // No vuelve a ofrecerlo; y desde Configuración se puede quitar y vincular a mano.
   await page.reload();
   await expect(page.getByTestId("ofrecer-huella")).toHaveCount(0);
   page.once("dialog", (d) => d.accept());
@@ -99,7 +99,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await expect.poll(() => psql(`SELECT contenido->>'medio' FROM evento WHERE tipo = 'sesion.iniciada' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
   // Quitar el celular: ya no entra con la huella.
-  await page.goto("/#/mas/sesiones");
+  await page.goto("/#/mas/configuracion");
   page.once("dialog", (d) => d.accept());
   await page.getByTestId("celular").getByRole("button", { name: "Quitar" }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);

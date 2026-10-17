@@ -51,10 +51,10 @@ sesiones.delete("/actual", exigirSesion, async (c) => {
   return c.body(null, 204);
 });
 
-// Quien administra las sesiones ve y cierra cualquiera.
-sesiones.get("/", exigirSesion, exigirPermiso("admin.sesiones"), async (c) => c.json(await reglas.sesionesAbiertas()));
+// Quien administra usuarios ve y cierra cualquiera (decisión 100), salvo la propia, que se cierra saliendo.
+sesiones.get("/", exigirSesion, exigirPermiso("admin.usuarios"), async (c) => c.json(await reglas.sesionesAbiertas(c.get("sesion").id)));
 
-sesiones.delete("/:id", exigirSesion, exigirPermiso("admin.sesiones"), async (c) => {
+sesiones.delete("/:id", exigirSesion, exigirPermiso("admin.usuarios"), async (c) => {
   await reglas.cerrarSesion(c.req.param("id"), c.get("sesion").usuario.id);
   return c.body(null, 204);
 });

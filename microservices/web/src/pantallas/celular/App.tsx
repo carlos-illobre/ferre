@@ -28,7 +28,9 @@ import { ComprasRecientes } from "./ComprasRecientes";
 import { Negocio, type Parte } from "./Negocio";
 import { Tickets } from "../Tickets";
 import { CabezaDeUsuarios } from "./Usuarios";
-import { PESTANAS_DE_USUARIOS } from "../pestanas-de-usuarios";
+import { PESTANAS_DE_USUARIOS, PIDE_USUARIOS } from "../pestanas-de-usuarios";
+import { MisCelulares } from "./MisCelulares";
+import { VinculoPropio } from "../Vinculo";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../pestanas-de-negocio";
 import { ComoVaElNegocio, SUB_DE_SECCION } from "./ComoVaElNegocio";
 import { NOMBRES, TEXTOS } from "../textos";
@@ -61,16 +63,16 @@ const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: stri
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ];
-export const DE_MAS: { parte: Exclude<Parte, "sesiones" | "actividad"> | "negocio" | "tickets" | "anomalias" | "configuracion" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
+export const DE_MAS: { parte: Exclude<Parte, "actividad"> | "negocio" | "tickets" | "anomalias" | "configuracion" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
   // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 95).
   { parte: "negocio", nombre: NOMBRES.comoVaElNegocio, detalle: TEXTOS.negocio.queHayEnElNegocio.corto, icono: "resumen", pide: PIDE_EL_NEGOCIO },
   // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
-  { parte: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.corto, icono: "usuarios" },
+  { parte: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.corto, icono: "usuarios", pide: PIDE_USUARIOS },
   // Anomalías abre en la primera de sus pestañas que la persona puede ver: «Para revisar» o «Anotadas» (014).
   { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: PIDE_LAS_ANOMALIAS },
   { parte: "procesos", nombre: "Procesos", detalle: "Cómo se hace cada cosa en el negocio, paso a paso", icono: "procesos", pide: ["procesos.ver", "procesos.dibujar"] },
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
-  { parte: "configuracion", nombre: "Configuración", detalle: "Cómo se comporta la aplicación en este celular", icono: "ajustes" },
+  { parte: "configuracion", nombre: "Configuración", detalle: TEXTOS.configuracion.queHay.corto, icono: "ajustes" },
 ];
 const IconoMas = ({ grosor }: { grosor: number }) => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
@@ -154,7 +156,7 @@ function Pantallas() {
   const nombre = sinDireccion ? "catalogo" : ruta.nombre === "negocio" ? "mas" : ruta.nombre;
   // Las pestañas de Usuarios (decisión 88) son de la opción «Usuarios» de Más.
   const deUsuarios = PESTANAS_DE_USUARIOS.find((p) => ruta.nombre === "mas" && p.valor === ruta.sub) ?? null;
-  const primeraDeUsuarios = PESTANAS_DE_USUARIOS.find((p) => permitido(p.pide))?.valor ?? "sesiones";
+  const primeraDeUsuarios = PESTANAS_DE_USUARIOS.find((p) => permitido(p.pide))?.valor ?? "usuarios";
   // Las secciones de Cómo va el negocio (decisión 95), cada una con su dirección.
   const subDeNegocio = ruta.nombre === "negocio" ? "negocio" : ruta.nombre === "mas" ? ruta.sub : null;
   const deNegocio = SECCIONES_DE_NEGOCIO.find((s) => SUB_DE_SECCION[s.valor] === subDeNegocio) ?? null;
@@ -215,7 +217,7 @@ function Pantallas() {
       )}
       {falta ? <SinPermiso falta={falta} />
         : pestana === "mas" && parte === "tickets" ? <Tickets />
-        : pestana === "mas" && parte === "configuracion" ? <Configuracion celular />
+        : pestana === "mas" && parte === "configuracion" ? <Configuracion celular propio={<><MisCelulares /><VinculoPropio /></>} />
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />
         : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeUsuarios actual="roles" />} />
         : pestana === "mas" && deUsuarios ? <Negocio parte={deUsuarios.valor as Exclude<typeof deUsuarios.valor, "roles">} cabeza={<CabezaDeUsuarios actual={deUsuarios.valor} />} />

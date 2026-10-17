@@ -243,8 +243,9 @@ Maquetas aprobadas por Carlos el 2026-10-14: `maquetas/mas-con-usuarios.html` y
 `maquetas/celular-usuarios.png`, sobre su modelo `maquetas/celular-usuarios-referencia-de-carlos.png`):
 
 1. La bajada: «Gestioná quién puede entrar y con qué roles. Se entra con Google.»
-2. «Autorizar otro correo de Google» («Invitá a más personas de tu negocio.»), en un
-   recuadro punteado con un «+» naranja. La cabecera «Usuarios autorizados» con cuántos son,
+2. «Autorizar otro correo de Google» («Invitá a más personas de tu negocio.»): un botón naranja
+   lleno, con la letra y el «+» en blanco, para que llame la atención (Carlos, 2026-10-17; antes
+   era un recuadro punteado). La cabecera «Usuarios autorizados» con cuántos son,
    que estaba arriba, se sacó: ocupaba lugar y no hacía falta (Carlos, 2026-10-17).
 3. Debajo, el buscador y la lista «Rol» (ver «Buscar y filtrar por rol»).
 4. Una tarjeta por persona: sus iniciales en un círculo de color, el nombre con «Activo» o
@@ -435,7 +436,8 @@ dice cuánto tiene, por ejemplo «2 sesiones abiertas · 1 celular con huella �
 despliegan sus sesiones (dispositivo, navegador y último uso, con «Cerrar») y sus celulares con
 huella (nombre y último uso, con «Quitar»). Sin nada, la línea no está. En la computadora, la
 fila de la tabla tiene una columna «Acceso» con la misma línea, que despliega lo mismo debajo
-de la fila.
+de la fila. Maquetas aprobadas por Carlos el 2026-10-17: `maquetas/celular-usuarios-acceso.png`
+y `maquetas/compu-usuarios-acceso.png`.
 
 **Qué necesita a la vista el Administrador:**
 

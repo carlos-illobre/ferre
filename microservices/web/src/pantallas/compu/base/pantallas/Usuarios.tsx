@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { Vinculo } from "../../../Vinculo";
+import { DiasDelVinculoDelNegocio } from "../../../Vinculo";
 import { NOMBRES, TEXTOS } from "../../../textos";
 import { api, ErrorApi } from "../../../../api";
 import { fecha } from "../../../../formato";
@@ -9,7 +9,7 @@ import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";
 import { IconoCompu, comoCarga, esFallaDeRed, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
-import { autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, partesResaltadas, useSesiones, useUsuarios, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
+import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, partesResaltadas, quitarCelularDeOtro, resumenDelAcceso, useCelularesDeOtros, useSesiones, useUsuarios, type Acceso, type CelularDeOtroFila, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
 import { useFiltroDeUsuarios } from "../../../filtro-de-usuarios";
 import { usePuede } from "../../../permisos";
 import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
@@ -26,9 +26,9 @@ function enPalabras(e: unknown, queNoSePudo: string): string {
   return `${queNoSePudo}: ${texto}`;
 }
 
-// Más → Usuarios (decisión 88): la pestaña Usuarios es quién puede entrar y con qué roles; la
-// pestaña Sesiones, desde dónde está abierto y cómo se entra sin escribir nada (las sesiones
-// abiertas, los celulares con huella y el vínculo entre celular y computadora).
+// Más → Usuarios (decisiones 88 y 100): la pestaña Usuarios es quién puede entrar y con qué roles
+// y, en la fila de cada persona, sus sesiones y sus celulares con huella; al final, cuántos días
+// dura el vínculo. Los celulares propios y el vínculo de cada uno están en Configuración.
 export function Usuarios() {
   const enLinea = useEnLinea();
   const [mensaje, setMensaje] = useState<Mensaje | null>(null);
@@ -41,22 +41,15 @@ export function Usuarios() {
   );
 }
 
-export function SesionesYDispositivos() {
+// Mis celulares con huella, en Configuración (decisión 99): cada uno los suyos.
+export function MisCelulares() {
   const enLinea = useEnLinea();
   const [mensaje, setMensaje] = useState<Mensaje | null>(null);
-  const puedeEsto = usePuede();
   return (
-    <Pagina titulo={NOMBRES.sesiones} testId="sesiones-y-dispositivos" className="usuarios" bajada={TEXTOS.usuarios.pestanaSesiones.largo}>
-      {!enLinea && <Aviso tipo="alerta" testId="usuarios-sin-conexion">Sin conexión: administrar sesiones y celulares necesita internet. Lo que ves puede no estar al día.</Aviso>}
-      <div className="usuarios-columnas">
-        {puedeEsto("admin.sesiones") && <Sesiones enLinea={enLinea} avisar={setMensaje} />}
-        <div className="usuarios-pila">
-          <Celulares enLinea={enLinea} avisar={setMensaje} />
-          <Vinculo />
-        </div>
-      </div>
+    <>
+      <Celulares enLinea={enLinea} avisar={setMensaje} />
       <Toast texto={mensaje?.texto ?? null} alCerrar={() => setMensaje(null)} testId={mensaje?.testId ?? "mensaje"} />
-    </Pagina>
+    </>
   );
 }
 
@@ -88,6 +81,35 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
 
   const disponibles = useRolesAsignables();
   const filtro = useFiltroDeUsuarios(filas, disponibles);
+  // Sus sesiones y sus celulares con huella (decisión 100), en la fila de cada persona.
+  const sesiones = useSesiones();
+  const celulares = useCelularesDeOtros();
+  const [desplegado, setDesplegado] = useState<string | null>(null);
+  async function cerrarLaSesion(u: UsuarioFila, s: SesionFila) {
+    setErrorDeFila(null);
+    try { await cerrarSesion(s.id); avisar({ texto: `Se cerró la sesión de ${u.nombre} en ${s.dispositivo}.` }); }
+    catch (e) { setErrorDeFila({ id: u.id, texto: enPalabras(e, `No se pudo cerrar la sesión de ${u.nombre}`) }); sesiones.recargar(); }
+  }
+  async function quitarElCelular(u: UsuarioFila, c: CelularDeOtroFila) {
+    setErrorDeFila(null);
+    try { await quitarCelularDeOtro(c.id); avisar({ texto: `«${c.dispositivo ?? "Ese celular"}» de ${u.nombre} ya no entra con la huella.`, testId: "mensaje-celular" }); }
+    catch (e) { setErrorDeFila({ id: u.id, texto: enPalabras(e, `No se pudo quitar el celular de ${u.nombre}`) }); celulares.recargar(); }
+  }
+  const accesoDeLaFila = (u: UsuarioFila) => accesoDe(u.id, sesiones.datos, celulares.datos);
+  const lineaDeAcceso = (u: UsuarioFila) => {
+    const resumen = resumenDelAcceso(accesoDeLaFila(u), !esCelular);
+    if (!resumen) return <span className="detalle" aria-label="Sin sesiones ni celulares">—</span>;
+    const abierto = desplegado === u.id;
+    return (
+      <button type="button" className={`usuarios-acceso ${abierto ? "abierto" : ""}`} aria-expanded={abierto} onClick={() => setDesplegado(abierto ? null : u.id)}
+        aria-label={`Sesiones y celulares de ${u.nombre}: ${resumen}`} data-testid="acceso-de-usuario">
+        <span>{resumen}</span><Icono nombre={abierto ? "arriba" : "derecha"} tam={14} />
+      </button>
+    );
+  };
+  const listaDeAcceso = (u: UsuarioFila) => desplegado === u.id && (
+    <ListaDeAcceso nombre={u.nombre} {...accesoDeLaFila(u)} enLinea={enLinea} alCerrarSesion={(s) => void cerrarLaSesion(u, s)} alQuitarCelular={(c) => void quitarElCelular(u, c)} />
+  );
   const rolDe = (u: UsuarioFila) => <RolesDeUsuario disponibles={disponibles} actuales={u.roles ?? []} nombre={u.nombre} bloqueado={ocupada === u.id || !enLinea} alGuardar={(ids) => cambiar(u, { roles: ids })} />;
   const accionDe = (u: UsuarioFila) => u.id === yo ? <span className="detalle">A vos te desactiva otra persona</span> : (
     <Boton tam={esCelular ? undefined : "chico"} variante={u.activo ? "peligro" : undefined} disabled={ocupada === u.id || !enLinea} onClick={() => cambiar(u, { activo: !u.activo })} aria-label={`${u.activo ? "Desactivar" : "Reactivar"} a ${u.nombre}`}>
@@ -119,6 +141,8 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
                 </div>
                 <span className="detalle usuarios-correo">{u.email}</span>
                 <div className="fila usuarios-acciones">{rolDe(u)}{accionDe(u)}</div>
+                {lineaDeAcceso(u)}
+                {listaDeAcceso(u)}
                 {errorDe(u)}
               </li>
             ))}
@@ -129,15 +153,16 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
       ) : (
         <div className="tabla-marco">
           <table className="tabla" data-testid="usuarios">
-            <thead><tr><th scope="col">Nombre</th><th scope="col">Correo de Google</th><th scope="col">Roles</th><th scope="col">Estado</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
+            <thead><tr><th scope="col">Nombre</th><th scope="col">Correo de Google</th><th scope="col">Roles</th><th scope="col">Estado</th><th scope="col">Acceso</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
             <tbody>
               {filtro.visibles.map((u) => (
-                <FilaConError key={u.id} error={errorDe(u)} columnas={5}>
+                <FilaConError key={u.id} error={errorDe(u)} columnas={6} debajo={listaDeAcceso(u)}>
                   <tr className={u.activo ? "" : "atenuada"} data-testid="usuario-fila">
                     <td className="nombre">{u.nombre}{u.id === yo && <> <Pastilla tipo="azul" sinPunto>Vos</Pastilla></>}</td>
                     <td>{u.email}</td>
                     <td>{rolDe(u)}</td>
                     <td>{estadoDe(u)}</td>
+                    <td>{lineaDeAcceso(u)}</td>
                     <td className="angosta usuarios-celda-accion">{accionDe(u)}</td>
                   </tr>
                 </FilaConError>
@@ -147,7 +172,31 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
           <div className="usuarios-alta">{formulario}</div>
         </div>
       ))}
+      {lista.datos && <DiasDelVinculoDelNegocio />}
     </section>
+  );
+}
+
+// Lo que se despliega de la línea de acceso: las sesiones de la persona, con «Cerrar», y sus
+// celulares con huella, con «Quitar» (decisión 100).
+function ListaDeAcceso({ nombre, sesiones, celulares, enLinea, alCerrarSesion, alQuitarCelular }: Acceso & { nombre: string; enLinea: boolean; alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void }) {
+  return (
+    <div className="usuarios-acceso-lista" data-testid="lista-de-acceso">
+      {sesiones.length > 0 && <h3>Sesiones abiertas</h3>}
+      {sesiones.map((s) => (
+        <div key={s.id} className="usuarios-acceso-item" data-testid="sesion">
+          <span><span className="usuarios-dispositivo">{/celular/i.test(s.dispositivo) ? <Icono nombre="celular" tam={18} /> : <IconoCompu tam={18} />}{s.dispositivo}</span><small className="detalle" title={fechaCompleta(s.ultimo_uso_en)}>usada {haceCuanto(s.ultimo_uso_en)}</small></span>
+          <Boton tam="chico" variante="peligro" disabled={!enLinea} onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar</Boton>
+        </div>
+      ))}
+      {celulares.length > 0 && <h3>Celulares con huella</h3>}
+      {celulares.map((c) => (
+        <div key={c.id} className="usuarios-acceso-item" data-testid="celular-de-otro">
+          <span><span className="usuarios-dispositivo"><Icono nombre="celular" tam={18} />{c.dispositivo ?? "Celular"}</span><small className="detalle">vinculado el {fecha(c.creada_en.slice(0, 10))} · {c.ultimo_uso_en ? `último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : "todavía no se usó"}</small></span>
+          <Boton tam="chico" variante="peligro" disabled={!enLinea} onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar</Boton>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -190,8 +239,8 @@ function FiltroDeUsuarios({ filtro: f, roles }: { filtro: ReturnType<typeof useF
   );
 }
 
-function FilaConError({ children, error, columnas }: { children: React.ReactNode; error: React.ReactNode; columnas: number }) {
-  return <>{children}{error && <tr className="hija"><td colSpan={columnas}>{error}</td></tr>}</>;
+function FilaConError({ children, error, columnas, debajo }: { children: React.ReactNode; error: React.ReactNode; columnas: number; debajo?: React.ReactNode }) {
+  return <>{children}{debajo && <tr className="hija"><td colSpan={columnas} className="usuarios-acceso-celda">{debajo}</td></tr>}{error && <tr className="hija"><td colSpan={columnas}>{error}</td></tr>}</>;
 }
 
 // Autorizar es agregar el correo de Google de la persona: no hay contraseña que crear.
@@ -254,89 +303,8 @@ function AltaDeUsuario({ disponibles, enLinea, alAutorizar }: { disponibles: Rol
   );
 }
 
-function Sesiones({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
-  const { sesion, salir } = useSesion();
-  const propiaId = sesion.estado === "con-sesion" ? sesion.sesionId : null;
-  const esCelular = useEsCelular();
-  const lista = comoCarga(useSesiones(), "No se pudieron traer las sesiones");
-  const { recargar } = lista;
-  const [cerradas, setCerradas] = useState<string[]>([]);
-  const [fallo, setFallo] = useState<{ sesion: SesionFila; texto: string } | null>(null);
-  const [saliendo, setSaliendo] = useState(false);
-  const filas = (lista.datos ?? []).filter((s) => !cerradas.includes(s.id));
-
-  async function cerrar(s: SesionFila) {
-    setFallo(null);
-    // La propia es «Salir»: se sale de forma explícita y se vuelve a la entrada.
-    if (s.id === propiaId) { setSaliendo(true); await salir(); return; }
-    setCerradas((c) => [...c, s.id]); // sale de la lista en el momento
-    try {
-      await cerrarSesion(s.id);
-      avisar({ texto: `Se cerró la sesión de ${s.nombre} en ${s.dispositivo}.` });
-    } catch (e) {
-      setCerradas((c) => c.filter((id) => id !== s.id));
-      setFallo({ sesion: s, texto: enPalabras(e, `No se pudo cerrar la sesión de ${s.nombre}`) });
-    }
-  }
-
-  const dispositivo = (s: SesionFila) => <span className="usuarios-dispositivo">{/celular/i.test(s.dispositivo) ? <Icono nombre="celular" tam={18} /> : <IconoCompu tam={18} />}{s.dispositivo}</span>;
-  const boton = (s: SesionFila) => {
-    const propia = s.id === propiaId;
-    return (
-      <Boton tam={esCelular ? undefined : "chico"} variante={propia ? "peligro" : undefined} icono={propia ? "salir" : undefined} disabled={(propia && saliendo) || (!propia && !enLinea)} onClick={() => cerrar(s)}
-        aria-label={propia ? "Cerrar esta sesión y volver a la entrada" : `Cerrar la sesión de ${s.nombre} en ${s.dispositivo}`} title={propia ? "Cierra esta sesión: volvés a la entrada" : "Cierra la sesión en ese dispositivo"}>Cerrar</Boton>
-    );
-  };
-  const etiqueta = (s: SesionFila) => `${s.nombre} ${s.dispositivo}${s.id === propiaId ? " esta sesión" : ""}`;
-
-  return (
-    <section className="negocio-seccion" aria-labelledby="usuarios-sesiones">
-      <header className="negocio-seccion-cabeza">
-        <h2 id="usuarios-sesiones">Sesiones abiertas</h2>
-        {lista.datos && <span className="detalle">{filas.length === 1 ? "1 dispositivo" : `${filas.length} dispositivos`} con la app abierta</span>}
-      </header>
-      <Aviso tipo="error" accion={<Boton tam="chico" onClick={recargar}>Reintentar</Boton>}>{lista.error}</Aviso>
-      <Aviso tipo="error" accion={fallo ? <Boton tam="chico" onClick={() => cerrar(fallo.sesion)}>Reintentar</Boton> : undefined}>{fallo?.texto}</Aviso>
-      {!lista.datos && !lista.error && <div className="tarjeta negocio-esqueleto" role="status" aria-label="Trayendo las sesiones">{[0, 1, 2].map((i) => <span key={i} className="esqueleto" />)}</div>}
-      {lista.datos && (esCelular ? (
-        <ul className="lista" data-testid="sesiones">
-          {filas.map((s) => {
-            const propia = s.id === propiaId;
-            return (
-              <li key={s.id} className={`renglon ${propia ? "usuarios-propia" : ""}`} data-testid="sesion" aria-label={etiqueta(s)}>
-                <span className="nombre">{s.nombre}{propia && <> <Pastilla tipo="azul" sinPunto>Esta sesión</Pastilla></>}</span>
-                {boton(s)}
-                <span className="detalle">{dispositivo(s)} · usada {haceCuanto(s.ultimo_uso_en)}{propia && <><br />Si la cerrás, volvés a la entrada.</>}</span>
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <div className="tabla-marco">
-          <table className="tabla" data-testid="sesiones">
-            <thead><tr><th scope="col">Quién</th><th scope="col">Dispositivo</th><th scope="col">Último uso</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
-            <tbody>
-              {filas.map((s) => {
-                const propia = s.id === propiaId;
-                return (
-                  <tr key={s.id} className={propia ? "usuarios-propia" : ""} data-testid="sesion" aria-label={etiqueta(s)}>
-                    <td><span className="nombre">{s.nombre}</span>{propia && <> <Pastilla tipo="azul" sinPunto>Esta sesión</Pastilla></>}</td>
-                    <td>{dispositivo(s)}</td>
-                    <td className="angosta" title={fechaCompleta(s.ultimo_uso_en)}>{haceCuanto(s.ultimo_uso_en)}</td>
-                    <td className="angosta usuarios-celda-accion">{boton(s)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      ))}
-    </section>
-  );
-}
-
-// Mis celulares vinculados: desde acá se vincula este dispositivo con la huella, y se
-// quita uno perdido. Cada usuario ve los suyos.
+// Mis celulares vinculados: desde acá se vincula este dispositivo con la huella, y se quita uno
+// perdido. Cada usuario ve los suyos; los de otros, quien administra usuarios, en su fila.
 function Celulares({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
   const esCelular = useEsCelular();
   const [filas, setFilas] = useState<Credencial[] | null>(null);

@@ -83,3 +83,18 @@ describe("entrar a la computadora con el celular", () => {
     expect(base.actual.sqlDe(/INSERT INTO sesion/)).toHaveLength(0);
   });
 });
+
+// 007-T037: las sesiones de todos las ve y las cierra quien administra usuarios, sin la propia (decisiones 99 y 100).
+describe("las sesiones de todos", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+
+  it("pide «Administrar usuarios», dice de quién es cada una y no trae la de quien pregunta", async () => {
+    expect((await pedir(app, "GET", "/sesiones", { rol: "mostrador" })).status).toBe(403);
+    expect((await pedir(app, "DELETE", "/sesiones/s-1", { rol: "mostrador" })).status).toBe(403);
+    expect((await pedir(app, "GET", "/sesiones", { rol: "admin" })).status).toBe(200);
+    const { sql, params } = base.actual.sqlDe(/s.revocada_en IS NULL AND s.expira_en > now\(\) AND s.id/)[0]!;
+    expect(sql).toMatch(/s\.usuario_id/);
+    expect(sql).toMatch(/s\.id <> \$1/);
+    expect(params).toEqual(["sesion-admin"]);
+  });
+});

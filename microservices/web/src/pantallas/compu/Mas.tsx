@@ -1,4 +1,5 @@
 import type { KeyboardEvent } from "react";
+import { PIDE_USUARIOS } from "../pestanas-de-usuarios";
 import { Icono, Pagina, type NombreDeIcono } from "./base/ui";
 import type { Permiso } from "../permisos";
 import { irA } from "./base/rutas";
@@ -11,13 +12,13 @@ import { PIDE_LAS_ANOMALIAS } from "../pestanas-de-anomalias";
 export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
   // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 95).
   { ruta: "resumen", nombre: NOMBRES.comoVaElNegocio, detalle: TEXTOS.negocio.queHayEnElNegocio.largo, icono: "resumen", pide: PIDE_EL_NEGOCIO },
-  // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
-  { ruta: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.largo, icono: "usuarios" },
+  // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisiones 88 y 100).
+  { ruta: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.largo, icono: "usuarios", pide: PIDE_USUARIOS },
   // Anomalías abre en la primera de sus pestañas que la persona puede ver: «Para revisar» o «Anotadas» (014).
   { ruta: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: PIDE_LAS_ANOMALIAS },
   { ruta: "procesos", nombre: "Procesos", detalle: "Cómo se hace cada cosa en el negocio, dibujado paso a paso", icono: "procesos", pide: ["procesos.ver", "procesos.dibujar"] },
   { ruta: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
-  { ruta: "configuracion", nombre: "Configuración", detalle: "Cómo se comporta la aplicación en esta computadora", icono: "ajustes" },
+  { ruta: "configuracion", nombre: "Configuración", detalle: TEXTOS.configuracion.queHay.largo, icono: "ajustes" },
 ];
 
 // `destino`: adónde lleva la opción, si no es su propia ruta (Usuarios y Cómo va el negocio van a su primera pestaña).

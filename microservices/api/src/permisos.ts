@@ -23,9 +23,9 @@ export const PERMISOS = [
   { clave: "negocio.actividad", parte: "Negocio", nombre: "Ver quién hizo qué", detalle: "Abrir el registro de acciones" },
   { clave: "procesos.ver", parte: "Negocio", nombre: "Ver procesos", detalle: "Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial" },
   { clave: "procesos.dibujar", parte: "Negocio", nombre: "Dibujar procesos", detalle: "Todo lo de «Ver procesos», más crear, cambiar, marcar vigentes, importar, exportar y borrar los procesos" },
-  { clave: "admin.usuarios", parte: "Administración", nombre: "Administrar usuarios", detalle: "Autorizar personas, asignarles roles, desactivarlas" },
+  // «Administrar sesiones» se unió a este (decisión 100).
+  { clave: "admin.usuarios", parte: "Administración", nombre: "Administrar usuarios", detalle: "Autorizar personas, asignarles roles, desactivarlas, cerrarles las sesiones, quitarles los celulares con huella y fijar cuántos días dura el vínculo" },
   { clave: "admin.roles", parte: "Administración", nombre: "Administrar roles", detalle: "Crear roles, cambiarles el nombre y los permisos, borrarlos" },
-  { clave: "admin.sesiones", parte: "Administración", nombre: "Administrar sesiones", detalle: "Ver y cerrar las sesiones de todos y quitar celulares de otros" },
 ] as const;
 export type Permiso = (typeof PERMISOS)[number]["clave"];
 export const CLAVES_DE_PERMISO: readonly string[] = PERMISOS.map((p) => p.clave);

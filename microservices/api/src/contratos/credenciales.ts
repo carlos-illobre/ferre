@@ -20,3 +20,7 @@ export type SesionConHuella = { token: string; usuario: UsuarioDeLaSesion | null
 
 // GET /credenciales: los celulares con huella de quien pregunta.
 export type Credencial = { id: string; dispositivo: string | null; creada_en: string; ultimo_uso_en: string | null };
+
+// GET /credenciales/de-otros: los celulares con huella de las demás personas, para quien administra
+// usuarios; los propios no, que están en Configuración (decisiones 99 y 100).
+export type CelularDeOtro = Credencial & { usuario_id: string };

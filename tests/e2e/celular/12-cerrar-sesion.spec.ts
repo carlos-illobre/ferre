@@ -5,8 +5,8 @@ import { stack } from "../comun/stack";
 // La API y la base del stack de esta interfaz (comun/stack.ts).
 const { psql } = stack("celular");
 
-// Cerrar sesiones desde Administración: cerrar la de otro dispositivo la saca de la lista;
-// cerrar la propia vuelve al login. Y "Salir" también vuelve al login.
+// Cerrar la sesión de otro dispositivo desde la tarjeta de la persona, en Usuarios (decisión 100);
+// la propia se cierra con "Salir", que vuelve al login.
 const TOKEN = "token-e2e-cerrar-propia";
 const TOKEN_OTRA = "token-e2e-cerrar-otra";
 const EMAIL = "e2e-cerrar-sesion@ferre.test";
@@ -24,31 +24,20 @@ test.beforeEach(() => {
   }
 });
 
-test("cerrar la sesión de otro dispositivo la saca de la lista", async ({ page }) => {
+test("007-T037 en la tarjeta de la persona se cierra la sesión de otro dispositivo; la de este no figura", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/mas/sesiones");
-  const otra = page.getByRole("row", { name: /otro celular/ });
-  await expect(otra).toBeVisible();
-  await expect(otra.getByRole("button", { name: "Cerrar" })).not.toHaveClass(/coral/);
-  await otra.getByRole("button", { name: "Cerrar" }).click();
-  await expect(page.getByRole("row", { name: /otro celular/ })).toHaveCount(0);
-  await expect(page.getByRole("row", { name: /esta computadora/ })).toBeVisible();
+  await page.goto("/#/mas/usuarios");
+  const linea = page.getByRole("button", { name: /Sesiones y celulares de Dueño cerrar E2E/ });
+  await expect(linea).toContainText("1 sesión");
+  await linea.click();
+  await expect(page.getByTestId("sesion").filter({ hasText: "otro celular" })).toBeVisible();
+  // La de este dispositivo se cierra con «Salir»: no se repite en la lista (decisión 99).
+  await expect(page.getByTestId("sesion").filter({ hasText: "esta computadora" })).toHaveCount(0);
+  page.once("dialog", (d) => void d.accept());
+  await page.getByRole("button", { name: "Cerrar la sesión de Dueño cerrar E2E en otro celular" }).click();
   await expect.poll(() => psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'otro celular' AND revocada_en IS NOT NULL`)).toBe("1");
-});
-
-test("cerrar la sesión propia desde Administración vuelve al login", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/mas/sesiones");
-  const propia = page.getByRole("row", { name: /esta computadora/ });
-  await expect(propia).toBeVisible();
-  await expect(propia).toContainText("esta sesión");
-  await expect(propia.getByRole("button", { name: "Cerrar" })).toHaveClass(/coral/);
-  await propia.getByRole("button", { name: "Cerrar" }).click();
-  await expect(page.getByTestId("entrar")).toBeVisible();
-  expect(await page.evaluate(() => localStorage.getItem("ferre.sesion"))).toBeNull();
-  // Recargar no vuelve a entrar.
-  await page.reload();
-  await expect(page.getByTestId("entrar")).toBeVisible();
+  await expect(page.getByTestId("sesion").filter({ hasText: "otro celular" })).toHaveCount(0);
+  await expect.poll(() => psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NULL`)).toBe("1");
 });
 
 test("Salir vuelve al login", async ({ page }) => {

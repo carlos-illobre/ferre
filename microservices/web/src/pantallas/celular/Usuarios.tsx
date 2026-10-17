@@ -9,7 +9,7 @@ import { Pestanas } from "./Pestanas";
 export function CabezaDeUsuarios({ actual }: { actual: PestanaDeUsuarios }) {
   const puedeEsto = usePuede();
   const visibles = PESTANAS_DE_USUARIOS.filter((p) => puedeEsto(...(p.pide ?? [])));
-  const bajada = actual === "usuarios" ? TEXTOS.usuarios.pestanaUsuarios.corto : actual === "sesiones" ? TEXTOS.usuarios.pestanaSesiones.corto : null;
+  const bajada = actual === "usuarios" ? TEXTOS.usuarios.pestanaUsuarios.corto : null;
   return (
     <>
       <h1 className="titulo">{NOMBRES.usuarios}</h1>

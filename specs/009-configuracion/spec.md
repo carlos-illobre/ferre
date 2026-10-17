@@ -24,6 +24,7 @@
 ### Session 2026-10-17
 
 - Q: ¿Qué más va en Configuración? → A: Todo lo que la persona puede decidir para sí misma: sus celulares con huella y su vínculo entre celular y computadora, que estaban en Más → Usuarios, pestaña Sesiones, que se sacó (decisión 100). Las sesiones abiertas no: cerrar la de otro es cosa de quien administra, porque es la respuesta a un celular perdido (decisión 99).
+- Las maquetas `maquetas/celular-configuracion-propio.png` y `maquetas/compu-configuracion-propio.png` las aprobó Carlos el 2026-10-17: debajo de las preferencias, «Mis celulares con huella» y «Vínculo entre celular y computadora» (con qué está vinculado, hasta cuándo y «Desvincular»).
 - Q: ¿Puede una opción estar en Configuración y en Sesiones? → A: No: cada cosa en un solo lugar. Por eso la sesión del propio dispositivo sale de la lista de sesiones (se cierra con «Salir»), los celulares propios no figuran en Sesiones y los días que dura el vínculo no figuran en Configuración.
 - Q: ¿La pantalla está también en la computadora? → A: Carlos lo dejó a criterio del agente, por lo más simple y consistente: está en los dos, como todas las opciones de Más (decisión 47), y la opción de las animaciones vale en los dos. En la computadora no hay deslizamiento entre pantallas, pero sí el movimiento de las ventanas y los avisos, que también se apaga.
 - La maqueta del celular se le mostró a Carlos el 2026-10-13 junto con estas preguntas; las contestó sin pedir cambios.

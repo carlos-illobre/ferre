@@ -754,13 +754,13 @@ RF-74:
     - tests/e2e/escritorio/12-cerrar-sesion.spec.ts
     - tests/integration/autenticacion.sh
     - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/acceso-de-usuarios.test.tsx
+    - microservices/api/src/rutas/sesiones.test.ts
     - microservices/api/src/rutas/usuarios.test.ts
     - microservices/web/src/sesion.test.tsx
     - microservices/web/src/cola.test.ts
   defectos:
-    - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
     - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
-    - "Las sesiones todavía están en una pestaña Sesiones aparte, con la del propio dispositivo y con su propio permiso (decisiones 99 y 100; 009-T006)"
 
 RF-80:
   estado: "Hecho (pedido directo de Carlos)"
@@ -1165,8 +1165,13 @@ RF-96:
     - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
   defectos: []
 RF-106:
-  estado: "Pendiente (009-T006): lo propio pasa de Sesiones a Configuración; maquetas a aprobar por Carlos"
-  pruebas: []
+  estado: "Hecho (009-T006): en Configuración, mis celulares con huella y mi vínculo, en el celular y en la computadora; sin pestaña Sesiones"
+  pruebas:
+    - microservices/web/src/pantallas/acceso-de-usuarios.test.tsx
+    - tests/e2e/celular/01-login.spec.ts
+    - tests/e2e/escritorio/01-login.spec.ts
+    - tests/e2e/celular/17-espejo.spec.ts
+    - tests/e2e/escritorio/17-espejo.spec.ts
   defectos: []
 
 RF-97:

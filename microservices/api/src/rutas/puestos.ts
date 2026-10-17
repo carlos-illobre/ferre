@@ -30,9 +30,9 @@ puestos.post("/:codigo/vincular", async (c) => {
 
 puestos.get("/mio", async (c) => c.json(await reglas.vinculosDe(c.get("sesion"), c.req.query("dispositivo"))));
 
-// Cuántos días dura el vínculo: lo ve cualquiera con sesión y lo cambia quien administra sesiones.
+// Cuántos días dura el vínculo: lo ve cualquiera con sesión y lo cambia quien administra usuarios (decisión 100).
 puestos.get("/configuracion", async (c) => c.json({ dias: await reglas.diasDelVinculo() } satisfies DiasDelVinculo));
-puestos.put("/configuracion", exigirPermiso("admin.sesiones"), async (c) => {
+puestos.put("/configuracion", exigirPermiso("admin.usuarios"), async (c) => {
   const cuerpo = await leerCuerpo(c, diasDelVinculo);
   if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
   return responder(c, await reglas.cambiarDiasDelVinculo(cuerpo.datos.dias, c.get("sesion").usuario.id));

@@ -3,18 +3,23 @@ import { consultas } from "../consultas";
 import { useDelServidor } from "./del-servidor";
 import type { CambiosDeUsuario, RolDeUsuario, Usuario, UsuarioNuevo } from "@servidor/usuarios";
 import type { SesionAbierta } from "@servidor/sesiones";
+import type { CelularDeOtro } from "@servidor/credenciales";
 
 // Usuarios y sesiones (Más → Usuarios), una sola vez para el celular y la computadora (RNF-60). Quién puede
 // entrar, con qué roles, y las sesiones abiertas de todos (decisiones 50 y 51).
 export type { RolDeUsuario };
 export type UsuarioFila = Usuario;
 export type SesionFila = SesionAbierta;
+export type CelularDeOtroFila = CelularDeOtro;
 
 const USUARIOS = ["usuarios"] as const;
 const SESIONES = ["sesiones"] as const;
+const CELULARES_DE_OTROS = ["celulares-de-otros"] as const;
 
 export const useUsuarios = () => useDelServidor<UsuarioFila[]>(USUARIOS, "/usuarios");
 export const useSesiones = () => useDelServidor<SesionFila[]>(SESIONES, "/sesiones");
+// Los celulares con huella de las demás personas: los propios están en Configuración (decisión 99).
+export const useCelularesDeOtros = () => useDelServidor<CelularDeOtroFila[]>(CELULARES_DE_OTROS, "/credenciales/de-otros");
 
 export type AltaDeUsuario = { nombre: string; email: string; roles: string[] };
 export type FaltaEnAlta = { nombre?: string; email?: string; roles?: string };
@@ -39,6 +44,27 @@ export async function cambiarUsuario(id: string, cambios: CambiosDeUsuario): Pro
   await api(`/usuarios/${id}`, { method: "PATCH", body: JSON.stringify(cambios) });
   await consultas.invalidateQueries({ queryKey: USUARIOS });
   if (cambios.activo === false) void consultas.invalidateQueries({ queryKey: SESIONES });
+}
+
+// Le quita a otra persona un celular con huella: deja de entrar con ella (el celular perdido).
+export async function quitarCelularDeOtro(id: string): Promise<void> {
+  await api(`/credenciales/${encodeURIComponent(id)}`, { method: "DELETE" });
+  await consultas.invalidateQueries({ queryKey: CELULARES_DE_OTROS });
+}
+
+// Lo que cada persona tiene abierto, en su tarjeta de Usuarios (decisión 100): sus sesiones, salvo
+// la de este dispositivo (el servidor no la manda), y sus celulares con huella, salvo los propios.
+export type Acceso = { sesiones: SesionFila[]; celulares: CelularDeOtroFila[] };
+export function accesoDe(usuarioId: string, sesiones: SesionFila[] | null | undefined, celulares: CelularDeOtroFila[] | null | undefined): Acceso {
+  return { sesiones: (sesiones ?? []).filter((s) => s.usuario_id === usuarioId), celulares: (celulares ?? []).filter((c) => c.usuario_id === usuarioId) };
+}
+// «2 sesiones · 1 celular con huella»; corto, «2 sesiones · 1 huella». Nada si no tiene nada.
+export function resumenDelAcceso({ sesiones, celulares }: Acceso, corto = false): string | null {
+  const partes = [
+    sesiones.length ? `${sesiones.length} ${sesiones.length === 1 ? "sesión" : "sesiones"}` : "",
+    celulares.length ? `${celulares.length} ${corto ? (celulares.length === 1 ? "huella" : "huellas") : (celulares.length === 1 ? "celular con huella" : "celulares con huella")}` : "",
+  ].filter(Boolean);
+  return partes.length ? partes.join(" · ") : null;
 }
 
 // Cierra la sesión de otro dispositivo (la propia se cierra con «Salir»).

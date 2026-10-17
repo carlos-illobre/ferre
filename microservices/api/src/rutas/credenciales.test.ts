@@ -91,4 +91,12 @@ describe("passkeys", () => {
     expect((await pedir(app, "DELETE", "/credenciales/cred-1", { rol: "admin" })).status).toBe(204);
     expect(base.actual.sqlDe(/UPDATE credencial SET revocada_en/)[1]!.params).toEqual(["cred-1", "u-admin", true]);
   });
+
+  it("007-T037 los celulares de las demás personas los ve solo quien administra usuarios, sin los suyos", async () => {
+    expect((await pedir(app, "GET", "/credenciales/de-otros", { rol: "mostrador" })).status).toBe(403);
+    base.actual.programar(/FROM credencial WHERE usuario_id <> \$1/, { rows: [{ id: "cred-2", usuario_id: "u-marta", dispositivo: "Samsung de Marta", creada_en: "2026-09-14", ultimo_uso_en: null }] });
+    const r = await pedir(app, "GET", "/credenciales/de-otros", { rol: "admin" });
+    expect(await r.json()).toEqual([{ id: "cred-2", usuario_id: "u-marta", dispositivo: "Samsung de Marta", creada_en: "2026-09-14", ultimo_uso_en: null }]);
+    expect(base.actual.sqlDe(/FROM credencial WHERE usuario_id <> \$1/)[0]!.params).toEqual(["u-admin"]);
+  });
 });

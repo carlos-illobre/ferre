@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
-import { exigirSesion, limitarIntentos, puede } from "../autenticacion.js";
+import { exigirPermiso, exigirSesion, limitarIntentos, puede } from "../autenticacion.js";
 import * as reglas from "../acceso/reglas.js";
 import { responder } from "./sesiones.js";
 import { entradaConHuella, huellaNueva } from "../acceso/esquemas.js";
@@ -21,11 +21,12 @@ credenciales.post("/registro", exigirSesion, async (c) => {
 });
 
 credenciales.get("/", exigirSesion, async (c) => c.json(await reglas.celularesDe(c.get("sesion").usuario.id)));
+credenciales.get("/de-otros", exigirSesion, exigirPermiso("admin.usuarios"), async (c) => c.json(await reglas.celularesDeOtros(c.get("sesion").usuario.id)));
 
 // Quitar un celular: el propio, o cualquiera si administra.
 credenciales.delete("/:id", exigirSesion, async (c) => {
   const { usuario } = c.get("sesion");
-  return responder(c, await reglas.quitarCelular(c.req.param("id"), usuario.id, puede(usuario, "admin.sesiones")));
+  return responder(c, await reglas.quitarCelular(c.req.param("id"), usuario.id, puede(usuario, "admin.usuarios")));
 });
 
 // ---- Entrar con la huella (sin sesión) ----

@@ -13,10 +13,10 @@ const administran = (...ids: string[]) => base.actual.programar(/FROM usuario u\
 describe("roles", () => {
   beforeEach(() => { base.actual = baseFalsa(); administran("u-admin"); base.actual.programar(/UPDATE rol SET nombre/, { rowCount: 1 }); });
 
-  it("011-E40 la lista de permisos sale del servidor: veintidós, con «Ver procesos» y «Dibujar procesos» en Negocio, cada uno con su parte, nombre y explicación", async () => {
+  it("011-E40 la lista de permisos sale del servidor: veintiuno (Administrar sesiones se unió a Administrar usuarios: decisión 100), con «Ver procesos» y «Dibujar procesos» en Negocio, cada uno con su parte, nombre y explicación", async () => {
     const r = await pedir(app, "GET", "/permisos", { rol: "admin" });
     const lista = (await r.json()) as { clave: string; parte: string; nombre: string; detalle: string }[];
-    expect(lista).toHaveLength(22);
+    expect(lista).toHaveLength(21);
     expect(lista.filter((p) => p.clave.startsWith("procesos.")).map((p) => [p.parte, p.nombre])).toEqual([["Negocio", "Ver procesos"], ["Negocio", "Dibujar procesos"]]);
     expect(lista.every((p) => p.clave && p.parte && p.nombre && p.detalle)).toBe(true);
     expect(new Set(lista.map((p) => p.parte))).toEqual(new Set(["Vender", "Catálogo", "Depósito", "Negocio", "Administración"]));
@@ -91,7 +91,7 @@ describe("permisos por operación", () => {
     ["PUT", "/pedidos/x", "Encargar compras"], ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los gastos"],
     ["POST", "/stock/p1/ajustes", "Contar y corregir stock"], ["GET", "/sectores", "Contar y corregir stock"],
     ["GET", "/auditoria", "Ver quién hizo qué"], ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver las ventas del negocio"],
-    ["GET", "/usuarios", "Administrar usuarios"], ["GET", "/sesiones", "Administrar sesiones"], ["GET", "/roles", "Administrar roles"],
+    ["GET", "/usuarios", "Administrar usuarios"], ["GET", "/sesiones", "Administrar usuarios"], ["GET", "/roles", "Administrar roles"],
     ["PATCH", "/productos/p1", "Fijar márgenes"],
   ];
   it("sin el permiso, 403 diciendo cuál hace falta, y la sesión sigue", async () => {

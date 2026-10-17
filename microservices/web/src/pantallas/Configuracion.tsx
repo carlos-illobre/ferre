@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias, type TiempoDeVersion } from "../preferencias";
 import { borrarLoGuardado } from "../almacen";
 import { apartados, pendientes } from "../cola";
@@ -7,7 +7,8 @@ import "./configuracion.css";
 
 // Configuración (RF-83, decisión 79): las preferencias de la aplicación en este dispositivo.
 // Una sola pantalla para el celular y la computadora; cada preferencia es un renglón con su
-// llave y una línea que dice qué cambia. La primera: las animaciones.
+// llave y una línea que dice qué cambia. La primera: las animaciones. Debajo, lo propio que se
+// guarda en el servidor (RF-106, decisión 99): cada interfaz pasa sus celulares con huella y el vínculo.
 // Las dos formas de buscar productos cuando el celular no guarda el catálogo (RF-85), cada una
 // con lo que tiene de bueno y de malo.
 const FORMAS_DE_BUSCAR: { valor: "memoria" | "servidor"; nombre: string; ventaja: string; desventaja: string }[] = [
@@ -30,7 +31,7 @@ function useReducirMovimiento(): boolean {
   return pedido;
 }
 
-export function Configuracion({ celular = false, alCambiarElGuardado = () => location.reload() }: { celular?: boolean; alCambiarElGuardado?: () => void }) {
+export function Configuracion({ celular = false, alCambiarElGuardado = () => location.reload(), propio }: { celular?: boolean; alCambiarElGuardado?: () => void; propio?: ReactNode }) {
   const { animaciones, sinConexion, buscar, versionCada, versionNunca } = usePreferencias();
   // Trabajar sin conexión (RF-84): solo en el celular. Cambiarlo vuelve a abrir la aplicación,
   // para que arranque guardando todo o sin guardar nada. Deshabilitarlo borra lo guardado; si
@@ -56,7 +57,7 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
     <main id="contenido" className={celular ? "contenido cfg" : "pagina cfg"} tabIndex={-1} data-testid="configuracion">
       <header className={celular ? "encabezado" : "pagina-cabeza"}>
         <h1 className={celular ? "titulo" : undefined}>Configuración</h1>
-        <p className={celular ? "cfg-bajada" : "bajada"}>Cómo se comporta la aplicación en {donde}.</p>
+        <p className={celular ? "cfg-bajada" : "bajada"}>Cómo se comporta la aplicación en {donde}, y lo tuyo: tus celulares con huella y tu vínculo.</p>
       </header>
       <ul className="cfg-lista">
         <li className="cfg-fila">
@@ -116,6 +117,7 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
         </li>
       </ul>
       <p className="cfg-nota">Se guarda en {donde}. No cambia nada en los demás dispositivos.</p>
+      {propio && <div className="cfg-propio">{propio}</div>}
     </main>
   );
 }

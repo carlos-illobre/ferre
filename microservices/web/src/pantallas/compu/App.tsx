@@ -36,7 +36,8 @@ import { PantallaDeProcesos } from "../Procesos";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { Contar } from "./base/pantallas/Contar";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./base/pantallas/Resumen";
-import { SesionesYDispositivos, Usuarios } from "./base/pantallas/Usuarios";
+import { MisCelulares, Usuarios } from "./base/pantallas/Usuarios";
+import { VinculoPropio } from "../Vinculo";
 import { PESTANAS_DE_USUARIOS } from "../pestanas-de-usuarios";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
 import { Actividad } from "./base/pantallas/Actividad";
@@ -99,7 +100,7 @@ const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 const A_PARTE_COMUN: Record<string, string> = {
   productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy", anular: "vender/anular",
   pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
-  mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", sesiones: "mas/sesiones", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", "para-revisar": "mas/para-revisar", tickets: "mas/tickets", configuracion: "mas/configuracion", procesos: "mas/procesos",
+  mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", "para-revisar": "mas/para-revisar", tickets: "mas/tickets", configuracion: "mas/configuracion", procesos: "mas/procesos",
 };
 const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
@@ -264,7 +265,7 @@ function Pantallas() {
   // En Más, solo Usuarios y Cómo va el negocio tienen pestañas.
   const deLaParte = RUTAS_DE_USUARIOS.has(actual) ? deUsuarios : RUTAS_DE_NEGOCIO.has(actual) ? deNegocio : RUTAS_DE_ANOMALIAS.has(actual) ? deAnomalias : parte === "mas" ? null : (menu.find((m) => m.clave === parte)?.pestanas ?? null);
   const pestanas = deLaParte && deLaParte.length > 1 ? deLaParte : null;
-  const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? []))).map((d) => (d.ruta === "usuarios" ? { ...d, destino: deUsuarios[0]?.ruta ?? "sesiones" } : d.ruta === "resumen" ? { ...d, destino: deNegocio[0]?.ruta ?? "resumen" } : d.ruta === "anomalias" ? { ...d, destino: deAnomalias[0]?.ruta ?? "anomalias" } : d));
+  const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? []))).map((d) => (d.ruta === "usuarios" ? { ...d, destino: deUsuarios[0]?.ruta ?? "usuarios" } : d.ruta === "resumen" ? { ...d, destino: deNegocio[0]?.ruta ?? "resumen" } : d.ruta === "anomalias" ? { ...d, destino: deAnomalias[0]?.ruta ?? "anomalias" } : d));
   const prueba = esAmbienteDePrueba();
 
   return (
@@ -322,8 +323,8 @@ function Pantallas() {
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />
-          : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? <Usuarios /> : actual === "sesiones" ? <SesionesYDispositivos />
-          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anomalias cabeza={pestanas ? null : undefined} /> : actual === "para-revisar" ? <ParaRevisar cabeza={pestanas ? null : <h1>Anomalías</h1>} /> : <Vender />}
+          : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? <Usuarios />
+          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion propio={<><MisCelulares /><VinculoPropio /></>} /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anomalias cabeza={pestanas ? null : undefined} /> : actual === "para-revisar" ? <ParaRevisar cabeza={pestanas ? null : <h1>Anomalías</h1>} /> : <Vender />}
       </div>
     </div>
   );

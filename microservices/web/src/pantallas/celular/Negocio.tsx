@@ -2,9 +2,9 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { NOMBRES, TEXTOS } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
-import { Vinculo } from "../Vinculo";
+import { DiasDelVinculoDelNegocio } from "../Vinculo";
 import { urlApi } from "../../api";
-import { autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, useSesiones, useUsuarios, type SesionFila } from "../../negocio/usuarios";
+import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, quitarCelularDeOtro, useCelularesDeOtros, useSesiones, useUsuarios, type CelularDeOtroFila, type SesionFila } from "../../negocio/usuarios";
 import { useGastosDeLaSemana } from "../../negocio/compras";
 import { paginasDe, useActividad } from "../../negocio/actividad";
 import { fecha, pesos } from "../../formato";
@@ -24,10 +24,11 @@ import { useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
 import { esAmbienteDePrueba } from "../../ambiente";
 
 
-// Usuarios, celulares con huella, sesiones y quién hizo qué: tres pestañas de Más → Usuarios
-// (decisión 88); la cuarta, Roles, es su propia pantalla. «Cómo va el negocio» tiene la suya
-// (decisión 95). Las pestañas traen su encabezado (`cabeza`), con el título y las pestañas.
-export type Parte = "usuarios" | "sesiones" | "actividad";
+// Usuarios y quién hizo qué: dos pestañas de Más → Usuarios (decisiones 88 y 100); la tercera,
+// Roles, es su propia pantalla. Las sesiones y los celulares de cada persona van en su tarjeta; los
+// propios, en Configuración. «Cómo va el negocio» tiene la suya (decisión 95). Las pestañas traen
+// su encabezado (`cabeza`), con el título y las pestañas.
+export type Parte = "usuarios" | "actividad";
 
 export function Negocio({ parte, cabeza }: { parte: Parte; cabeza?: ReactNode }) {
   const puedeEsto = usePuede();
@@ -37,9 +38,6 @@ export function Negocio({ parte, cabeza }: { parte: Parte; cabeza?: ReactNode })
       <div className="dos-columnas">
       <div className="columna">
       {parte === "usuarios" && puedeEsto("admin.usuarios") && <Usuarios />}
-      {parte === "sesiones" && puedeEsto("admin.sesiones") && <Sesiones />}
-      {parte === "sesiones" && <Celulares />}
-      {parte === "sesiones" && <Vinculo />}
       {parte === "actividad" && puedeEsto("negocio.actividad") && <Auditoria />}
       </div>
       </div>
@@ -57,6 +55,16 @@ function Usuarios() {
   const [alta, setAlta] = useState(false);
   const [rolesDelNuevo, setRolesDelNuevo] = useState<string[]>([]);
   const filtro = useFiltroDeUsuarios(filas, disponibles);
+  const sesiones = useSesiones();
+  const celulares = useCelularesDeOtros();
+  async function cerrarLaSesion(s: SesionFila) {
+    if (!window.confirm(`¿Cerrar la sesión de ${s.nombre} en ${s.dispositivo}? Ese dispositivo vuelve a la entrada.`)) return;
+    try { await cerrarSesion(s.id); } catch (err) { setError(`No se pudo cerrar: ${(err as Error).message}`); sesiones.recargar(); }
+  }
+  async function quitarElCelular(c: CelularDeOtroFila) {
+    if (!window.confirm(`¿Quitar "${c.dispositivo ?? "ese celular"}"? Ya no va a poder entrar con la huella.`)) return;
+    try { await quitarCelularDeOtro(c.id); } catch (err) { setError(`No se pudo quitar: ${(err as Error).message}`); celulares.recargar(); }
+  }
 
   async function autorizar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -82,9 +90,11 @@ function Usuarios() {
       <div className="ut-lista" data-testid="usuarios">
         {filtro.visibles.map((u) => (
           <TarjetaDeUsuario key={u.id} persona={u} orden={filas.indexOf(u)} disponibles={disponibles} alCambiarRoles={(ids) => cambiar(u.id, { roles: ids })}
-            alActivar={async () => { const falla = await cambiar(u.id, { activo: !u.activo }); if (falla) setError(falla); }} />
+            alActivar={async () => { const falla = await cambiar(u.id, { activo: !u.activo }); if (falla) setError(falla); }}
+            acceso={{ ...accesoDe(u.id, sesiones.datos, celulares.datos), alCerrarSesion: (s) => void cerrarLaSesion(s), alQuitarCelular: (c) => void quitarElCelular(c) }} />
         ))}
       </div>
+      <DiasDelVinculoDelNegocio />
       {alta && (
         <Hoja titulo="Autorizar a alguien" alCerrar={() => setAlta(false)} testId="hoja-autorizar">
           <form onSubmit={autorizar} className="formulario" data-testid="alta-usuario">
@@ -100,81 +110,6 @@ function Usuarios() {
   );
 }
 
-// Mis celulares vinculados: desde acá se vincula este dispositivo con la huella, y se
-// quita uno perdido. Cada usuario ve los suyos.
-function Celulares() {
-  const [filas, setFilas] = useState<Credencial[]>([]);
-  const [mensaje, setMensaje] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const cargar = () => listarCredenciales().then(setFilas).catch(() => undefined);
-  useEffect(() => { void cargar(); window.addEventListener(EVENTO_CREDENCIALES, cargar); return () => window.removeEventListener(EVENTO_CREDENCIALES, cargar); }, []);
-  async function vincular() {
-    setError(null); setMensaje(null);
-    const nombre = window.prompt("¿Cómo llamamos a este celular?", describirDispositivo().slice(0, 40));
-    if (nombre === null) return;
-    try { const c = await vincularEsteDispositivo(nombre); setMensaje(`Listo: "${c.dispositivo}" entra con la huella desde ahora.`); await cargar(); }
-    catch (e) { setError((e as Error).name === "NotAllowedError" ? "No se pudo leer la huella. Probá de nuevo." : (e as Error).message); }
-  }
-  async function quitar(c: Credencial) {
-    if (!window.confirm(`¿Quitar "${c.dispositivo ?? "este celular"}"? Ya no va a poder entrar con la huella.`)) return;
-    try { await quitarCredencial(c.id); await cargar(); } catch (e) { setError((e as Error).message); }
-  }
-  return (
-    <div data-testid="celulares" style={{ display: "contents" }}>
-      <h2 className="seccion">Mis celulares con huella</h2>
-      <small style={{ padding: "0 4px" }}>Vinculá el celular una vez y desde entonces entra con la huella, sin Google. Si lo perdés, quitalo de acá.</small>
-      <AvisoError texto={error} alCerrar={() => setError(null)} />
-      <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-celular" />
-      <Lista>
-        {filas.map((c) => (
-          <div key={c.id} className="fila" data-testid="celular">
-            <span className="nombre">{c.dispositivo ?? "celular"}</span>
-            <button type="button" className="boton chico texto derecha" onClick={() => quitar(c)}>Quitar</button>
-            <span className="detalle">vinculado el {fecha(c.creada_en.slice(0, 10))} · último uso {c.ultimo_uso_en ? fecha(c.ultimo_uso_en.slice(0, 10)) : "todavía no"}</span>
-          </div>
-        ))}
-        {hayHuella() ? (
-          <button type="button" className="fila" onClick={vincular} data-testid="vincular-celular"><span className="nombre" style={{ color: "var(--coral-texto)", display: "flex", gap: 8, alignItems: "center" }}><Icono nombre="huella" tam={18} />Vincular este celular con mi huella</span></button>
-        ) : <div className="fila"><small>Este dispositivo no tiene lector de huella o desbloqueo compatible: vinculá desde el celular.</small></div>}
-      </Lista>
-    </div>
-  );
-}
-
-function Sesiones() {
-  const { sesion, salir } = useSesion();
-  const propiaId = sesion.estado === "con-sesion" ? sesion.sesionId : null;
-  const sesiones = useSesiones();
-  const filas = sesiones.datos ?? [];
-  const [aviso, setError] = useState<string | null>(null);
-  const [cerrado, setCerrado] = useState<unknown>(null);
-  const error = aviso ?? (sesiones.error && sesiones.error !== cerrado ? (sesiones.error as Error).message : null);
-
-  async function cerrar(s: SesionFila) {
-    // La propia es "Salir": se sale de forma explícita, sin esperar a que otra llamada falle.
-    if (s.id === propiaId) { await salir(); return; }
-    try { await cerrarSesion(s.id); }
-    catch (e) { setError(`No se pudo cerrar: ${(e as Error).message}`); sesiones.recargar(); }
-  }
-  return (
-    <>
-      <h2 className="seccion">Sesiones abiertas</h2>
-      <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(sesiones.error); }} />
-      <Lista data-testid="sesiones">
-        {filas.map((s) => {
-          const propia = s.id === propiaId;
-          return (
-            <div key={s.id} className={`fila ${propia ? "propia" : ""}`} data-testid="sesion" role="row" aria-label={`${s.nombre} ${s.dispositivo}${propia ? " esta sesión" : ""}`}>
-              <span className="nombre">{s.nombre}{propia ? <small> · esta sesión</small> : null}</span>
-              <button type="button" className={`boton chico derecha ${propia ? "coral" : ""}`} onClick={() => cerrar(s)} title={propia ? "Cierra esta sesión: volvés al login" : "Cierra la sesión en ese dispositivo"}>Cerrar</button>
-              <span className="detalle">{s.dispositivo} · {new Date(s.ultimo_uso_en).toLocaleString("es-AR")}</span>
-            </div>
-          );
-        })}
-      </Lista>
-    </>
-  );
-}
 
 function Auditoria() {
   const [pagina, setPagina] = useState(1);

@@ -25,7 +25,6 @@ export const PERMISOS = {
   "procesos.dibujar": "Dibujar procesos",
   "admin.usuarios": "Administrar usuarios",
   "admin.roles": "Administrar roles",
-  "admin.sesiones": "Administrar sesiones",
 } as const;
 export type Permiso = keyof typeof PERMISOS;
 

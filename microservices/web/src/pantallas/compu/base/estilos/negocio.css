@@ -151,3 +151,13 @@
 .usuarios-sugerencias small { color: var(--texto-2); font-size: 14px; white-space: nowrap; }
 .usuarios-rol .entrada { min-width: 190px; }
 .usuarios-quedan { margin-left: auto; align-self: center; }
+
+/* Sus sesiones y sus celulares con huella, en la fila de cada persona (decisión 100) */
+.usuarios-acceso { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 10px; border: 1px solid var(--borde); border-radius: var(--r-control); background: var(--superficie); color: inherit; font: inherit; font-size: 14px; white-space: nowrap; cursor: pointer; }
+.usuarios-acceso.abierto { border-color: var(--verde); }
+.usuarios-acceso-celda { padding: 0 var(--e4) var(--e4); }
+.usuarios-acceso-lista { max-width: 560px; margin-left: auto; padding: var(--e2) var(--e4) var(--e3); border: 1px solid var(--verde); border-radius: var(--r-tarjeta); background: var(--superficie); }
+.usuarios-acceso-lista h3 { margin: var(--e3) 0 var(--e1); font-size: 14px; font-weight: 600; color: var(--texto-2); }
+.usuarios-acceso-item { display: flex; align-items: center; gap: var(--e3); padding: var(--e2) 0; border-top: 1px solid var(--borde); }
+.usuarios-acceso-lista h3 + .usuarios-acceso-item { border-top: 0; }
+.usuarios-acceso-item > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }

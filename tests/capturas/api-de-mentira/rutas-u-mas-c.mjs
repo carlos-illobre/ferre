@@ -1,4 +1,5 @@
-// Datos de mentira para las pantallas de Más: Cómo va el negocio, Usuarios (con Sesiones),
+// Datos de mentira para las pantallas de Más: Cómo va el negocio, Usuarios (con las sesiones y los
+// celulares de cada persona),
 // Quién hizo qué. Mismas formas que el servidor real (microservices/api/src/rutas).
 import deA from "./rutas-u-mas-a.mjs";
 
@@ -15,13 +16,16 @@ let usuarios = [
   { id: "u-4", email: "ramiro.deposito@ferre.test", nombre: "Ramiro", rol: "mostrador", activo: false, creado_en: "2026-09-02T12:00:00Z" },
 ];
 const SESIONES = () => [
-  { id: "s-1", dispositivo: "computadora · Chrome", creada_en: hace(600), ultimo_uso_en: hace(0), expira_en: hace(-40000), email: "carlos@ferre.test", nombre: "Carlos" },
-  { id: "s-4", dispositivo: "celular · Chrome", creada_en: hace(3000), ultimo_uso_en: hace(125), expira_en: hace(-40000), email: "carlos@ferre.test", nombre: "Carlos" },
-  { id: "s-2", dispositivo: "computadora · Firefox", creada_en: hace(9000), ultimo_uso_en: hace(1500), expira_en: hace(-40000), email: "marta.bress@ferre.test", nombre: "Marta" },
+  { id: "s-1", usuario_id: "u-1", dispositivo: "computadora · Chrome", creada_en: hace(600), ultimo_uso_en: hace(0), expira_en: hace(-40000), email: "carlos@ferre.test", nombre: "Carlos" },
+  { id: "s-4", usuario_id: "u-1", dispositivo: "celular · Chrome", creada_en: hace(3000), ultimo_uso_en: hace(125), expira_en: hace(-40000), email: "carlos@ferre.test", nombre: "Carlos" },
+  { id: "s-2", usuario_id: "u-2", dispositivo: "computadora · Firefox", creada_en: hace(9000), ultimo_uso_en: hace(1500), expira_en: hace(-40000), email: "marta.bress@ferre.test", nombre: "Marta" },
+  { id: "s-5", usuario_id: "u-2", dispositivo: "celular · Chrome", creada_en: hace(900), ultimo_uso_en: hace(20), expira_en: hace(-40000), email: "marta.bress@ferre.test", nombre: "Marta" },
 ];
 let sesiones = SESIONES();
 const CREDENCIALES = () => [{ id: "c-1", dispositivo: "Motorola del depósito", creada_en: "2026-06-02T14:00:00Z", ultimo_uso_en: hace(60 * 24 * 61) }];
 let credenciales = CREDENCIALES();
+// Los de las demás personas, para quien administra usuarios (decisión 100).
+let deOtros = [{ id: "c-9", usuario_id: "u-2", dispositivo: "Samsung de Marta", creada_en: "2026-09-20T14:00:00Z", ultimo_uso_en: hace(30) }];
 const USUARIOS = usuarios;
 
 const U = { c: ["u-1", "carlos@ferre.test", "Carlos"], m: ["u-2", "marta.bress@ferre.test", "Marta"], n: ["u-3", "nico.mostrador@ferre.test", "Nicolás"], r: ["u-4", "ramiro.deposito@ferre.test", "Ramiro"], s: [null, null, null] };
@@ -95,10 +99,12 @@ export default {
     usuarios = usuarios.map((u) => (u.id === params.id ? { ...u, ...body } : u));
     if (body.activo === false) { const u = usuarios.find((x) => x.id === params.id); sesiones = sesiones.filter((s) => s.email !== u.email); }
   },
-  "GET /sesiones": () => sesiones,
+  // La de quien pregunta (s-1) no va: se cierra con «Salir» (decisión 99).
+  "GET /sesiones": () => sesiones.filter((x) => x.id !== "s-1"),
   "DELETE /sesiones/:id": ({ params }) => { sesiones = sesiones.filter((s) => s.id !== params.id); },
   "GET /credenciales": () => credenciales,
-  "DELETE /credenciales/:id": ({ params }) => { credenciales = credenciales.filter((c) => c.id !== params.id); },
+  "DELETE /credenciales/:id": ({ params }) => { credenciales = credenciales.filter((c) => c.id !== params.id); deOtros = deOtros.filter((c) => c.id !== params.id); },
+  "GET /credenciales/de-otros": () => deOtros,
   "POST /credenciales/registro": ({ body }) => { const c = { id: `c-${Date.now()}`, dispositivo: body.dispositivo, creada_en: new Date().toISOString(), ultimo_uso_en: null }; credenciales = [c, ...credenciales]; return [201, c]; },
   // Para volver a capturar desde cero.
   "POST /mock-c/reiniciar": () => { usuarios = USUARIOS; sesiones = SESIONES(); credenciales = CREDENCIALES(); return { ok: true }; },

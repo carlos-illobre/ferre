@@ -24,7 +24,6 @@ const PERMISOS = [
   ["procesos.dibujar", "Negocio", "Dibujar procesos", "Todo lo de «Ver procesos», más crear, cambiar, marcar vigentes, importar, exportar y borrar los procesos"],
   ["admin.usuarios", "Administración", "Administrar usuarios", "Autorizar personas, asignarles roles, desactivarlas"],
   ["admin.roles", "Administración", "Administrar roles", "Crear roles, cambiarles el nombre y los permisos, borrarlos"],
-  ["admin.sesiones", "Administración", "Administrar sesiones", "Ver y cerrar las sesiones de todos y quitar celulares de otros"],
 ].map(([clave, parte, nombre, detalle]) => ({ clave, parte, nombre, detalle }));
 const TODOS = PERMISOS.map((p) => p.clave);
 
@@ -32,7 +31,7 @@ let roles = [
   { id: "r-1", nombre: "Vendedor", permisos: ["ventas.registrar", "ventas.ver", "ventas.anular"] },
   { id: "r-2", nombre: "Comprador", permisos: ["deposito.pedidos", "catalogo.listas", "catalogo.duplicados", "deposito.compras"] },
   { id: "r-3", nombre: "Recepción", permisos: ["deposito.ingresos", "deposito.compras", "deposito.stock", "negocio.anomalias"] },
-  { id: "r-4", nombre: "Administrador", permisos: ["admin.usuarios", "admin.roles", "admin.sesiones", "negocio.actividad"] },
+  { id: "r-4", nombre: "Administrador", permisos: ["admin.usuarios", "admin.roles", "negocio.actividad"] },
   { id: "r-5", nombre: "Gerente", permisos: ["negocio.ventas", "negocio.gastos", "negocio.invertido", "catalogo.margenes", "ventas.ver", "ventas.anular", "deposito.compras", "negocio.anomalias", "negocio.actividad", "procesos.ver", "procesos.dibujar"] },
   { id: "r-6", nombre: "Encargado de sábados", permisos: ["ventas.registrar", "deposito.ingresos"] },
 ];

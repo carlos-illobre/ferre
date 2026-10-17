@@ -21,7 +21,8 @@ describe("Negocio", () => {
       if (ruta.startsWith("/auditoria")) return eventos(Number(new URL(`http://x${ruta}`).searchParams.get("pagina")));
       if (ruta === "/usuarios") return [{ id: "d1", email: "d@b", nombre: "Dueño", activo: true, roles: [{ id: "r3", nombre: "Administrador" }] }, { id: "m1", email: "m@b", nombre: "Marta", activo: true, roles: [{ id: "r1", nombre: "Vendedor" }] }];
       if (ruta === "/roles") return [{ id: "r1", nombre: "Vendedor" }, { id: "r2", nombre: "Recepción" }, { id: "r3", nombre: "Administrador" }];
-      if (ruta === "/sesiones") return [{ id: "s1", dispositivo: "laptop", ultimo_uso_en: "2026-09-14T12:00:00Z", email: "a@b", nombre: "Ana" }, { id: "s2", dispositivo: "celular", ultimo_uso_en: "2026-09-14T11:00:00Z", email: "m@b", nombre: "Mostrador" }];
+      if (ruta === "/sesiones") return [{ id: "s1", usuario_id: "m1", dispositivo: "computadora · Firefox", ultimo_uso_en: "2026-09-14T12:00:00Z", email: "m@b", nombre: "Marta" }, { id: "s2", usuario_id: "m1", dispositivo: "celular · Chrome", ultimo_uso_en: "2026-09-14T11:00:00Z", email: "m@b", nombre: "Marta" }];
+      if (ruta === "/credenciales/de-otros") return [{ id: "c1", usuario_id: "m1", dispositivo: "Samsung de Marta", creada_en: "2026-09-01T10:00:00Z", ultimo_uso_en: null }];
       if (ruta === "/ventas") return { total: 10500, totales: { efectivo: 10500 }, ventas: [{ id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [{ descripcion: "MECHA", cantidad: "3", precio_unitario: "3000" }] }] };
       if (ruta === "/compras/semana") return { desde: "2026-09-08", por_proveedor: [{ proveedor: "Proveedor uno", compras: "2", total: "40000" }], total: 40000 };
       return [];
@@ -72,23 +73,35 @@ describe("Negocio", () => {
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/usuarios", { method: "POST", body: JSON.stringify({ email: "p@b.com", nombre: "Pedro", roles: ["r2"] }) }));
   });
 
-  it("sin permisos de administración no se ven los usuarios ni las sesiones de los demás, y sin los números tampoco el resumen", async () => {
+  it("sin permisos de administración no se ven los usuarios ni las sesiones de los demás", async () => {
     conPermisos("ventas.registrar");
-    render(<Negocio parte="sesiones" />);
-    expect(await screen.findByTestId("celulares")).toBeTruthy();
-    expect(screen.queryByTestId("usuarios")).toBeNull();
-    expect(screen.queryByTestId("sesiones")).toBeNull();
+    render(<Negocio parte="usuarios" />);
+    await waitFor(() => expect(screen.queryByTestId("usuarios")).toBeNull());
     expect(apiFalsa).not.toHaveBeenCalledWith("/usuarios");
+    expect(apiFalsa).not.toHaveBeenCalledWith("/sesiones");
+    expect(apiFalsa).not.toHaveBeenCalledWith("/credenciales/de-otros");
   });
 
-  it("Sesiones: todos los botones dicen Cerrar; el de la propia es coral", async () => {
-    render(<Negocio parte="sesiones" />);
-    await waitFor(() => expect(screen.getAllByTestId("sesion")).toHaveLength(2));
-    const botones = within(screen.getByTestId("sesiones")).getAllByRole("button", { name: "Cerrar" });
-    expect(botones).toHaveLength(2);
-    const propia = screen.getByText(/esta sesión/).closest("[data-testid=sesion]")!;
-    expect(propia.querySelector("button.coral")).toBeTruthy();
-    const otra = screen.getAllByTestId("sesion").find((s) => s.textContent?.includes("celular"))!;
-    expect(otra.querySelector("button.coral")).toBeNull();
+  it("007-T037 en la tarjeta de cada persona, una línea dice sus sesiones y celulares, y al abrirla se cierran y se quitan", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<Negocio parte="usuarios" />);
+    const marta = (await screen.findAllByTestId("usuario-fila")).find((f) => f.textContent?.includes("Marta"))!;
+    const linea = await within(marta).findByTestId("acceso-de-usuario");
+    expect(linea.textContent).toContain("2 sesiones · 1 celular con huella");
+    // Quien no tiene nada no tiene la línea.
+    const dueno = screen.getAllByTestId("usuario-fila").find((f) => f.textContent?.includes("Dueño"))!;
+    expect(within(dueno).queryByTestId("acceso-de-usuario")).toBeNull();
+    fireEvent.click(linea);
+    expect(within(marta).getAllByTestId("sesion").map((s) => s.textContent)).toEqual([expect.stringContaining("computadora · Firefox"), expect.stringContaining("celular · Chrome")]);
+    fireEvent.click(within(marta).getByRole("button", { name: "Cerrar la sesión de Marta en celular · Chrome" }));
+    await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/sesiones/s2", { method: "DELETE" }));
+    fireEvent.click(within(marta).getByRole("button", { name: /Quitar el celular Samsung de Marta/ }));
+    await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/credenciales/c1", { method: "DELETE" }));
+  });
+
+  it("007-T037 al final de Usuarios, quien administra usuarios ve cuántos días dura el vínculo", async () => {
+    apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/puestos/configuracion" ? { dias: 30 } : []));
+    render(<Negocio parte="usuarios" />);
+    expect(((await screen.findByTestId("dias-vinculo")) as HTMLInputElement).value).toBe("30");
   });
 });

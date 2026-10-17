@@ -31,5 +31,6 @@ export type EstadoDelCodigo =
 // GET /sesiones/actual
 export type SesionActual = { id: string; usuario: UsuarioDeLaSesion };
 
-// GET /sesiones: las abiertas de todos, de la más usada a la menos.
-export type SesionAbierta = { id: string; dispositivo: string; creada_en: string; ultimo_uso_en: string; expira_en: string; email: string; nombre: string };
+// GET /sesiones: las abiertas de todos, de la más usada a la menos, salvo la de quien pregunta
+// (esa se cierra con «Salir»: decisión 99). Cada una dice de quién es.
+export type SesionAbierta = { id: string; usuario_id: string; dispositivo: string; creada_en: string; ultimo_uso_en: string; expira_en: string; email: string; nombre: string };

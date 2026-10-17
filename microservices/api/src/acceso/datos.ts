@@ -42,11 +42,11 @@ export async function vinculacionVigente(id: string, clave: string): Promise<boo
   return rows[0]?.vigente ?? false;
 }
 
-export const sesionesAbiertas = () => pool.query(
-  `SELECT s.id, s.dispositivo, s.creada_en, s.ultimo_uso_en, s.expira_en, u.email, u.nombre
+export const sesionesAbiertas = (salvo: string) => pool.query(
+  `SELECT s.id, s.usuario_id, s.dispositivo, s.creada_en, s.ultimo_uso_en, s.expira_en, u.email, u.nombre
      FROM sesion s JOIN usuario u ON u.id = s.usuario_id
-    WHERE s.revocada_en IS NULL AND s.expira_en > now()
-    ORDER BY s.ultimo_uso_en DESC`).then((r) => r.rows);
+    WHERE s.revocada_en IS NULL AND s.expira_en > now() AND s.id <> $1
+    ORDER BY s.ultimo_uso_en DESC`, [salvo]).then((r) => r.rows);
 
 // ---------- Huellas (passkeys) ----------
 export type Credencial = { id: string; usuario_id: string; clave_publica: Buffer; contador: string; transportes: string[]; dispositivo: string | null; creada_en: string; ultimo_uso_en: string | null };
@@ -57,6 +57,8 @@ export const guardarCredencial = (c: { id: string; usuarioId: string; clavePubli
     [c.id, c.usuarioId, c.clavePublica, c.contador, c.transportes, c.dispositivo]);
 export const celularesDe = (usuarioId: string) =>
   pool.query<Credencial>("SELECT id, dispositivo, creada_en, ultimo_uso_en FROM credencial WHERE usuario_id = $1 AND revocada_en IS NULL ORDER BY creada_en", [usuarioId]).then((r) => r.rows);
+export const celularesDeOtros = (usuarioId: string) =>
+  pool.query<Credencial>("SELECT id, usuario_id, dispositivo, creada_en, ultimo_uso_en FROM credencial WHERE usuario_id <> $1 AND revocada_en IS NULL ORDER BY creada_en", [usuarioId]).then((r) => r.rows);
 export async function quitarCredencial(id: string, usuarioId: string, cualquiera: boolean): Promise<boolean> {
   const { rowCount } = await pool.query("UPDATE credencial SET revocada_en = now() WHERE id = $1 AND revocada_en IS NULL AND ($3 OR usuario_id = $2)", [id, usuarioId, cualquiera]);
   return Boolean(rowCount);

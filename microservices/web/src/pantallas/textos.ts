@@ -27,7 +27,6 @@ export const MOTIVOS_DE_AJUSTE = ["Conté la estantería", "Rotura", "Se usó en
 export const NOMBRES = {
   comoVaElNegocio: "Cómo va el negocio",
   usuarios: "Usuarios",
-  sesiones: "Sesiones",
   quienHizoQue: "Quién hizo qué",
   actividad: "Actividad",
   anomalias: "Anomalías",
@@ -67,10 +66,6 @@ export const TEXTOS = {
       largo: "Quién puede entrar a Ferrebress y qué puede hacer cada uno. Se entra con el correo de Google: no hay contraseñas.",
       corto: "Gestioná quién puede entrar y con qué roles. Se entra con Google.",
     },
-    pestanaSesiones: {
-      largo: "Desde qué computadoras y celulares está abierto Ferrebress ahora, y cómo se entra sin escribir nada: con la huella o escaneando el código con el celular.",
-      corto: "Dónde está abierto ahora y cómo se entra sin escribir nada.",
-    },
     autorizarOtro: { largo: "Autorizar a alguien", corto: "Autorizar otro correo de Google" },
     invitarAMas: { largo: "Con su correo de Google ya puede entrar. No hay contraseñas que crear.", corto: "Invitá a más personas de tu negocio." },
     queSonLosRoles: {
@@ -84,6 +79,10 @@ export const TEXTOS = {
     borrarBusqueda: igual("Borrar la búsqueda"),
     rol: igual("Rol"),
     todosLosRoles: igual("Todos"),
+  },
+  configuracion: {
+    // Más → Configuración: las preferencias del dispositivo y lo propio (decisión 99).
+    queHay: { largo: "Cómo se comporta la aplicación en esta computadora, y tus celulares con huella y tu vínculo", corto: "Este celular, tus huellas y tu vínculo" },
   },
   entrar: {
     // Volviendo de Google, mientras se abre la sesión (007-T021). Solo en el celular.

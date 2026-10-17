@@ -12,7 +12,7 @@ import { adoptarVinculos, anotarDispositivo, computadorasDe, cortarVinculosDe, d
 import type { CodigoAprobado, CodigoDeEntrada, EstadoDelCodigo, SesionAbierta, SesionNueva } from "../contratos/sesiones.js";
 import type { Enviable } from "../enviable.js";
 import type { CodigoEscaneado, DiasDelVinculo, EstadoDelPuesto, PuestoParaVincular, Vinculado, VinculosDeLaSesion } from "../contratos/puestos.js";
-import type { Credencial as CredencialDelContrato, DesafioDeHuella, HuellaVinculada, SesionConHuella } from "../contratos/credenciales.js";
+import type { CelularDeOtro, Credencial as CredencialDelContrato, DesafioDeHuella, HuellaVinculada, SesionConHuella } from "../contratos/credenciales.js";
 
 // Acceso, en sus reglas (ADR-018): entrar (con Google, con la huella o con el celular), las
 // sesiones abiertas y el vínculo entre un celular y una computadora (decisiones 57, 58 y 73).
@@ -75,7 +75,8 @@ export async function salir(sesion: SesionActiva) {
   await revocarSesion(pool, sesion.id);
   await registrarEvento(pool, { tipo: "sesion.cerrada", usuarioId: sesion.usuario.id, contenido: { sesionId: sesion.id } });
 }
-export const sesionesAbiertas = (): Promise<Enviable<SesionAbierta>[]> => datos.sesionesAbiertas();
+// La de quien pregunta no va: se cierra con «Salir» (decisión 99).
+export const sesionesAbiertas = (salvo: string): Promise<Enviable<SesionAbierta>[]> => datos.sesionesAbiertas(salvo);
 // Cerrar a distancia la sesión de un dispositivo corta también su vínculo (decisión 73).
 export async function cerrarSesion(sesionId: string, actorId: string) {
   await revocarSesion(pool, sesionId);
@@ -134,8 +135,9 @@ export async function vincularHuella(usuarioId: string, desafioId: string | unde
 }
 
 export const celularesDe = (usuarioId: string): Promise<Enviable<CredencialDelContrato>[]> => datos.celularesDe(usuarioId);
+export const celularesDeOtros = (usuarioId: string): Promise<Enviable<CelularDeOtro>[]> => datos.celularesDeOtros(usuarioId);
 
-// Quitar un celular: el propio, o cualquiera si administra las sesiones.
+// Quitar un celular: el propio, o cualquiera si administra usuarios (decisión 100).
 export async function quitarCelular(id: string, actorId: string, administra: boolean) {
   if (!(await datos.quitarCredencial(id, actorId, administra))) return mal(404, "No existe ese celular vinculado");
   await registrarEvento(pool, { tipo: "credencial.quitada", usuarioId: actorId, contenido: { id } });

@@ -11,7 +11,7 @@ import { PESTANAS_DE_USUARIOS } from "./pestanas-de-usuarios";
 import { DE_MAS as DE_MAS_COMPU, Mas } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 import { CabezaDeUsuarios } from "./celular/Usuarios";
-import { SesionesYDispositivos, Usuarios } from "./compu/base/pantallas/Usuarios";
+import { Usuarios } from "./compu/base/pantallas/Usuarios";
 
 // Más → Usuarios (decisión 88): una sola opción con cuatro pestañas, igual en las dos interfaces.
 describe("Más → Usuarios", () => {
@@ -26,11 +26,10 @@ describe("Más → Usuarios", () => {
     });
   });
 
-  it("las pestañas son Usuarios, Sesiones, Roles y Quién hizo qué, en ese orden; en el celular la última dice Actividad", () => {
-    expect(PESTANAS_DE_USUARIOS.map((p) => p.nombre)).toEqual(["Usuarios", "Sesiones", "Roles", "Quién hizo qué"]);
-    expect(PESTANAS_DE_USUARIOS.map((p) => p.corto)).toEqual(["Usuarios", "Sesiones", "Roles", "Actividad"]);
-    // Sesiones la ve cualquiera: ahí está la huella de cada uno.
-    expect(PESTANAS_DE_USUARIOS.find((p) => p.valor === "sesiones")!.pide).toBeUndefined();
+  it("007-T037 las pestañas son Usuarios, Roles y Quién hizo qué, en ese orden, sin Sesiones; en el celular la última dice Actividad", () => {
+    expect(PESTANAS_DE_USUARIOS.map((p) => p.nombre)).toEqual(["Usuarios", "Roles", "Quién hizo qué"]);
+    expect(PESTANAS_DE_USUARIOS.map((p) => p.corto)).toEqual(["Usuarios", "Roles", "Actividad"]);
+    expect(PESTANAS_DE_USUARIOS.every((p) => p.pide?.length)).toBe(true);
   });
 
   it("en Más hay una sola opción «Usuarios», sin Roles ni Quién hizo qué sueltos, en las dos interfaces", () => {
@@ -40,46 +39,37 @@ describe("Más → Usuarios", () => {
       expect(nombres).not.toContain("Quién hizo qué");
       expect(nombres).not.toContain("Usuarios y sesiones");
     }
-    expect(DE_MAS_COMPU.find((d) => d.ruta === "usuarios")!.pide).toBeUndefined();
-    expect(DE_MAS_CELULAR.find((d) => d.parte === "usuarios")!.pide).toBeUndefined();
+    // Quien no ve ninguna pestaña no tiene «Usuarios» en Más (decisión 100).
+    expect(DE_MAS_COMPU.find((d) => d.ruta === "usuarios")!.pide).toEqual(["admin.usuarios", "admin.roles", "negocio.actividad"]);
+    expect(DE_MAS_CELULAR.find((d) => d.parte === "usuarios")!.pide).toEqual(["admin.usuarios", "admin.roles", "negocio.actividad"]);
   });
 
   it("en la computadora, la opción de Más lleva a la pestaña que se le indique", () => {
-    render(<Mas atajoDe={() => null} opciones={DE_MAS_COMPU.filter((d) => d.ruta === "usuarios").map((d) => ({ ...d, destino: "sesiones" }))} />);
+    render(<Mas atajoDe={() => null} opciones={DE_MAS_COMPU.filter((d) => d.ruta === "usuarios").map((d) => ({ ...d, destino: "roles" }))} />);
     fireEvent.click(screen.getByTestId("mas-usuarios"));
-    expect(location.hash).toBe("#/sesiones");
+    expect(location.hash).toBe("#/roles");
   });
 
   it("en el celular se ven solo las pestañas que el rol permite, y tocar una lleva a su dirección", () => {
-    conPermisos("admin.roles");
-    render(<CabezaDeUsuarios actual="sesiones" />);
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Sesiones", "Roles"]);
+    conPermisos("admin.roles", "negocio.actividad");
+    render(<CabezaDeUsuarios actual="actividad" />);
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Roles", "Actividad"]);
     fireEvent.click(screen.getByRole("tab", { name: "Roles" }));
     expect(location.hash).toBe("#/mas/roles");
   });
 
   it("en el celular, con una sola pestaña a la vista no se dibujan pestañas", () => {
-    conPermisos();
-    render(<CabezaDeUsuarios actual="sesiones" />);
+    conPermisos("admin.roles");
+    render(<CabezaDeUsuarios actual="roles" />);
     expect(screen.getByRole("heading", { name: "Usuarios" })).toBeTruthy();
     expect(screen.queryAllByRole("tab")).toHaveLength(0);
   });
 
-  it("en la computadora, la pestaña Usuarios tiene los autorizados y no las sesiones; la de Sesiones, las sesiones, la huella y el vínculo", async () => {
-    const { unmount } = render(<Usuarios />);
+  it("007-T037 en la computadora, la pestaña Usuarios tiene la columna «Acceso» con lo de cada persona, y no hay sección de sesiones", async () => {
+    render(<Usuarios />);
     expect(await screen.findByText("Marta")).toBeTruthy();
+    expect(screen.getByRole("columnheader", { name: "Acceso" })).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Sesiones abiertas" })).toBeNull();
-    unmount();
-    render(<SesionesYDispositivos />);
-    expect(await screen.findByRole("heading", { name: "Sesiones abiertas" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Mis celulares con huella" })).toBeTruthy();
-    expect(screen.queryByRole("heading", { name: "Usuarios autorizados" })).toBeNull();
-  });
-
-  it("en la computadora, sin «Administrar sesiones» la pestaña Sesiones muestra solo la huella", async () => {
-    conPermisos();
-    render(<SesionesYDispositivos />);
-    expect(await screen.findByRole("heading", { name: "Mis celulares con huella" })).toBeTruthy();
-    expect(screen.queryByRole("heading", { name: "Sesiones abiertas" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Mis celulares con huella" })).toBeNull();
   });
 });
