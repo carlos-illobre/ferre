@@ -59,6 +59,31 @@ describe("cola de cambios", () => {
     expect(await pendientes()).toHaveLength(0);
   });
 
+  // Decisión 97 (007, historia 5, escenario 4d).
+  it("lo que dejó sin mandar una persona no sale con la sesión de otra que entra después; sale si vuelve ella", async () => {
+    const quien = (u: string) => localStorage.setItem("ferre.usuario", JSON.stringify({ id: u, email: `${u}@ferre.test`, nombre: u }));
+    quien("ana");
+    apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
+    const { enviarOEncolar, pendientes, apartados, enviarPendientes } = await import("./cola");
+    await enviarOEncolar("venta", "POST", "/ventas", { id: "de-ana" });
+    // A Ana la desactivan y entra Beto en el mismo dispositivo, ya con conexión.
+    quien("beto");
+    apiFalsa.mockReset(); apiFalsa.mockResolvedValue(undefined);
+    expect(await pendientes()).toHaveLength(0);
+    expect((await apartados()).map((c) => c.autor)).toEqual(["ana"]);
+    await enviarOEncolar("venta", "POST", "/ventas", { id: "de-beto" });
+    await enviarPendientes();
+    expect(apiFalsa.mock.calls.map((c) => JSON.parse((c[1] as { body: string }).body).id)).toEqual(["de-beto"]);
+    expect((await apartados()).map((c) => (c.cuerpo as { id: string }).id)).toEqual(["de-ana"]);
+    // Ana vuelve a entrar (la reactivaron): lo suyo sale con su sesión.
+    quien("ana");
+    apiFalsa.mockClear();
+    expect(await enviarPendientes()).toBe(0);
+    expect(apiFalsa.mock.calls.map((c) => JSON.parse((c[1] as { body: string }).body).id)).toEqual(["de-ana"]);
+    expect(await apartados()).toHaveLength(0);
+    localStorage.removeItem("ferre.usuario");
+  });
+
   it("un 401 no se descarta: se reintenta cuando vuelva la sesión", async () => {
     apiFalsa.mockRejectedValue(new ErrorApi(401, "Hay que iniciar sesión"));
     const { enviarOEncolar, pendientes } = await import("./cola");

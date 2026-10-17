@@ -2,6 +2,7 @@ import { api, ErrorApi } from "./api";
 import { abrirBase, guardarMeta } from "./almacen";
 import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "./guardado";
 import { crearCola, type Cambio } from "./plataforma/sin-conexion/cola";
+import { idDelUsuarioDeEsteDispositivo } from "./sesion";
 
 // La cola de cambios de Ferrebress hechos sin conexión (issue #18): ventas, «no llevó»,
 // márgenes y precios, ajustes de stock, renglones de conteo. La cola en sí es tecnología de la
@@ -9,7 +10,9 @@ import { crearCola, type Cambio } from "./plataforma/sin-conexion/cola";
 // - un cambio de producto reemplaza al anterior del mismo producto que siga en la cola;
 // - cada envío anota cuándo fue el último, para mostrar «Sincronizado hace…»;
 // - un celular con el guardado deshabilitado (RF-84) manda directo, y si no hay conexión no
-//   registra ni guarda nada y dice cómo habilitar el trabajo sin conexión.
+//   registra ni guarda nada y dice cómo habilitar el trabajo sin conexión;
+// - cada cambio queda a nombre de quien lo hizo y sale solo con su sesión: si entra otra persona
+//   en el dispositivo, lo que quedó sin mandar no sale a su nombre (decisión 97).
 export type { Cambio };
 
 const cola = crearCola({
@@ -19,11 +22,13 @@ const cola = crearCola({
   estadoDe: (e) => (e as { estado?: number }).estado,
   seFunde: (c) => c.tipo === "producto.cambio",
   alEnviar: () => guardarMeta("ultimo_envio", new Date().toISOString()),
+  autor: idDelUsuarioDeEsteDispositivo,
   errorSinBase: (e) => (!(e instanceof ErrorApi) && !guardaEnElDispositivo() ? new ErrorApi(503, SIN_CONEXION_Y_SIN_GUARDADO) : e),
 });
 
 export const alCambiarLaCola = cola.alCambiar;
 export const pendientes = cola.pendientes;
+export const apartados = cola.apartados;
 export const enviarPendientes = cola.enviarPendientes;
 export const enviarOEncolar = cola.enviarOEncolar;
 

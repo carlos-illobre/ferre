@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias, type TiempoDeVersion } from "../preferencias";
 import { borrarLoGuardado } from "../almacen";
-import { pendientes } from "../cola";
+import { apartados, pendientes } from "../cola";
 import { esCelularAca } from "../guardado";
 import "./configuracion.css";
 
@@ -37,7 +37,8 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
   // había cambios sin enviar se pierden, y antes se avisa.
   async function cambiarSinConexion() {
     if (sinConexion) {
-      const sinEnviar = (await pendientes().catch(() => [])).length;
+      // También cuenta lo que dejó sin mandar otra persona que usó este celular: se borraría igual.
+      const sinEnviar = (await pendientes().catch(() => [])).length + (await apartados().catch(() => [])).length;
       const pregunta = sinEnviar > 0
         ? `Hay ${sinEnviar} ${sinEnviar === 1 ? "cambio que todavía no se envió" : "cambios que todavía no se enviaron"} al servidor. Si dejás de guardar en este celular, se ${sinEnviar === 1 ? "pierde" : "pierden"}. ¿Seguir?`
         : "Se va a borrar de este celular el catálogo y lo demás que estaba guardado. ¿Seguir?";

@@ -6,7 +6,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 // contesta 401 y la aplicación borra la sesión y vuelve sola a la entrada. Se simula el servidor
 // (fetch); la sesión y el cliente son los de verdad. Casos D4 a D6 de docs/pruebas-manuales/entrar.md.
 vi.unmock("./sesion");
-const { ProveedorDeSesion, useSesion } = await import("./sesion");
+const { ProveedorDeSesion, useSesion, CONTROL_DE_SESION_MS } = await import("./sesion");
 const { api } = await import("./api");
 
 const CARLOS = { id: "u-1", email: "carlos@ferre.test", nombre: "Carlos", roles: [], permisos: [] };
@@ -45,6 +45,40 @@ describe("el servidor da por terminada la sesión", () => {
     await act(async () => { await api("/ventas").catch(() => undefined); });
     expect(screen.getByTestId("estado").textContent).toBe("sin-sesion");
     expect(localStorage.getItem("ferre.sesion")).toBeNull();
+  });
+
+  // Decisión 97 (historia 5, escenarios 4 y 4b): no hace falta que el dispositivo pida algo.
+  it("escenario 4: con la aplicación abierta y sin tocar nada, en menos de 30 segundos vuelve a la entrada", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+      render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+      await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+      // La desactivaron (o le cerraron la sesión a distancia).
+      servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
+      await act(async () => { await vi.advanceTimersByTimeAsync(CONTROL_DE_SESION_MS); });
+      await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
+      expect(CONTROL_DE_SESION_MS).toBeLessThanOrEqual(30_000);
+      expect(localStorage.getItem("ferre.sesion")).toBeNull();
+    } finally { vi.useRealTimers(); }
+  });
+
+  it("escenario 4: si estaba en otra ventana, sale apenas vuelve a la aplicación", async () => {
+    servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+    render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+    servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
+    await act(async () => { document.dispatchEvent(new Event("visibilitychange")); });
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
+  });
+
+  it("escenario 4b: sin conexión sigue trabajando; al recuperarla, vuelve a la entrada", async () => {
+    servidor = async () => { throw new TypeError("Failed to fetch"); };
+    render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro sin conexión"));
+    servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
+    await act(async () => { window.dispatchEvent(new Event("online")); });
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
   });
 
   it("D1: con una sesión que vale, al abrir entra directo, sin pedir Google ni la huella", async () => {

@@ -747,3 +747,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       (una venta cobrada, por ejemplo) no se registra solo ni se pierde: queda apartado para que
       un Administrador decida si lo acepta. Responde la pregunta abierta P8 de 007. Cómo se
       aparta y se revisa es una funcionalidad aparte.
+    - Mientras esa funcionalidad no exista, lo que quedó sin mandar sigue guardado en el
+      dispositivo, a nombre de quien lo hizo: si entra otra persona, no se manda con su sesión;
+      sale solo si vuelve a entrar esa misma persona (reactivada, o con la sesión cerrada a
+      distancia y abierta de nuevo).
+    - Carlos aprobó la regla escrita el 2026-10-17.

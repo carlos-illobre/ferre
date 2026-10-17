@@ -1,4 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+// Con la aplicación abierta se pregunta cada tanto si la sesión sigue valiendo (decisión 97).
+export const CONTROL_DE_SESION_MS = 30_000;
 // Quien dependa de la sesión para conectarse (el espejo con el celular) se entera al entrar.
 export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
 import { api, borrarToken, guardarToken, leerToken } from "./api";
@@ -34,6 +36,20 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("sesion-cerrada", alCerrar);
   }, []);
 
+  // La sesión puede cerrarse en el servidor: a distancia, o al desactivar al usuario. Con la
+  // aplicación abierta se pregunta cada 30 segundos, al volver a la ventana y al recuperar la
+  // conexión; si ya no vale, el 401 la cierra y vuelve sola a la entrada (api.ts). En otra
+  // ventana no se pregunta: se pregunta al volver.
+  const conSesion = sesion.estado === "con-sesion";
+  useEffect(() => {
+    if (!conSesion) return;
+    const controlar = () => { if (document.visibilityState !== "hidden") api("/sesiones/actual").catch(() => undefined); };
+    const cada = setInterval(controlar, CONTROL_DE_SESION_MS);
+    document.addEventListener("visibilitychange", controlar);
+    window.addEventListener("online", controlar);
+    return () => { clearInterval(cada); document.removeEventListener("visibilitychange", controlar); window.removeEventListener("online", controlar); };
+  }, [conSesion]);
+
   const entrar = useCallback((token: string, usuario: Usuario) => {
     guardarToken(token);
     window.dispatchEvent(new Event(EVENTO_SESION_ABIERTA));
@@ -60,6 +76,10 @@ export function useSesion() {
 const CLAVE_USUARIO = "ferre.usuario";
 function guardarUsuario(u: Usuario) {
   try { localStorage.setItem(CLAVE_USUARIO, JSON.stringify(u)); } catch { /* sin almacenamiento: se pide login al reconectar */ }
+}
+// Quién usa este dispositivo: el último que entró. La cola de cambios guarda cada uno a su nombre.
+export function idDelUsuarioDeEsteDispositivo(): string | null {
+  return leerUsuarioGuardado()?.id ?? null;
 }
 function leerUsuarioGuardado(): Usuario | null {
   try { const v = localStorage.getItem(CLAVE_USUARIO); return v ? (JSON.parse(v) as Usuario) : null; } catch { return null; }

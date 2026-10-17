@@ -756,6 +756,7 @@ RF-74:
     - microservices/web/src/pantallas/celular/Negocio.test.tsx
     - microservices/api/src/rutas/usuarios.test.ts
     - microservices/web/src/sesion.test.tsx
+    - microservices/web/src/cola.test.ts
   defectos:
     - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
     - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
