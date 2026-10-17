@@ -8,6 +8,8 @@ import { AvisoError, Icono } from "../componentes/base";
 import { entrarConGoogle } from "../../../negocio/vinculo";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+// Cuánto se espera la cuenta de Google después de volver de su ventana antes de dar por cancelado.
+export const ESPERA_DE_GOOGLE_MS = 6000;
 
 // Dos formas de entrar, sin contraseñas (ADR-011): la huella del celular vinculado o la
 // cuenta de Google.
@@ -18,6 +20,28 @@ export function BotonGoogle({ conPantallaDeCarga = false }: { conPantallaDeCarga
   const [error, setError] = useState<string | null>(null);
   const [conectando, setConectando] = useState(false);
   const boton = useRef<HTMLDivElement>(null);
+  const sinRespuesta = useRef<number | undefined>(undefined);
+
+  // Google avisa la cuenta un instante después de que se vuelve de su ventana, y en ese instante
+  // se veía la entrada. Por eso la pantalla de carga sale apenas se vuelve a la página después de
+  // tocar el botón de Google (el foco se fue a su recuadro); si Google no manda la cuenta (se
+  // canceló), a los pocos segundos vuelve la entrada.
+  useEffect(() => {
+    if (!conPantallaDeCarga) return;
+    let fueAGoogle = false;
+    const alSalir = () => { const activo = document.activeElement; if (activo instanceof HTMLIFrameElement && boton.current?.contains(activo)) fueAGoogle = true; };
+    const alVolver = () => {
+      if (!fueAGoogle || document.visibilityState !== "visible") return;
+      fueAGoogle = false;
+      setConectando(true);
+      window.clearTimeout(sinRespuesta.current);
+      sinRespuesta.current = window.setTimeout(() => setConectando(false), ESPERA_DE_GOOGLE_MS);
+    };
+    window.addEventListener("blur", alSalir);
+    window.addEventListener("focus", alVolver);
+    document.addEventListener("visibilitychange", alVolver);
+    return () => { window.removeEventListener("blur", alSalir); window.removeEventListener("focus", alVolver); document.removeEventListener("visibilitychange", alVolver); window.clearTimeout(sinRespuesta.current); };
+  }, [conPantallaDeCarga]);
 
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || !boton.current) return;
@@ -29,6 +53,7 @@ export function BotonGoogle({ conPantallaDeCarga = false }: { conPantallaDeCarga
         client_id: GOOGLE_CLIENT_ID,
         ux_mode: "popup",
         callback: async ({ credential }) => {
+          window.clearTimeout(sinRespuesta.current);
           if (conPantallaDeCarga) setConectando(true);
           try {
             const r = await entrarConGoogle(credential, describirDispositivo());

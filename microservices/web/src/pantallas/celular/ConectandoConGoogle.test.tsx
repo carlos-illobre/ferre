@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const entrarConGoogle = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../negocio/vinculo", async (original) => ({ ...(await original<typeof import("../../negocio/vinculo")>()), entrarConGoogle: (...a: unknown[]) => entrarConGoogle(...a) }));
@@ -30,6 +30,32 @@ describe("Conectando tu cuenta de Google", () => {
     expect(pantalla.textContent).toContain("Cuenta de Google verificada");
     expect(pantalla.textContent).toContain("Abriendo tu sesión");
     expect(pantalla.querySelectorAll(".cg-pasos li")).toHaveLength(2);
+  });
+
+  // Tocar el botón de Google pone el foco en su recuadro (un iframe) y la ventana pierde el foco.
+  function irAGoogleYVolver() {
+    const recuadro = document.createElement("iframe");
+    document.querySelector(".boton-google")!.appendChild(recuadro);
+    recuadro.focus();
+    fireEvent.blur(window);
+    fireEvent.focus(window);
+  }
+
+  it("007-T023 al volver de la ventana de Google, la pantalla sale enseguida, antes de que Google mande la cuenta", async () => {
+    await boton();
+    act(() => irAGoogleYVolver());
+    expect(screen.getByTestId("conectando-con-google")).toBeTruthy();
+  });
+
+  it("007-T023 si se vuelve de Google sin cuenta (se canceló), a los pocos segundos vuelve la entrada", async () => {
+    await boton();
+    vi.useFakeTimers();
+    try {
+      act(() => irAGoogleYVolver());
+      expect(screen.getByTestId("conectando-con-google")).toBeTruthy();
+      act(() => { vi.advanceTimersByTime(6001); });
+      expect(screen.queryByTestId("conectando-con-google")).toBeNull();
+    } finally { vi.useRealTimers(); }
   });
 
   it("si el servidor no deja entrar, vuelve la entrada con el error", async () => {
