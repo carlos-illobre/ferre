@@ -197,6 +197,11 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-114 | En la ficha, «Así se calcula» despliega la cuenta del precio: costo, margen, IVA y redondeo a $1.000 | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
 | RF-115 | En la ficha, el archivo de origen del costo con sus datos, y se descarga | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
 | RF-116 | Desde la ficha se agrega el producto a la venta en curso, con las reglas del Catálogo | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
+| RF-117 | «Hoy» muestra el total con su comparación contra ayer y un gráfico de lo vendido por hora | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
+| RF-118 | Cada medio de pago con su ícono y su color, el importe y cuántas ventas; el mismo color en toda la aplicación | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
+| RF-119 | «Hoy» muestra las ventas realizadas, los productos vendidos y el ticket promedio | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
+| RF-120 | Cada venta del día es un renglón corto que se abre para ver sus productos | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
+| RF-121 | «Cambiar fecha» muestra lo mismo para un día anterior (completa RF-23) | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
 
 ## Requerimientos no funcionales
 

@@ -873,6 +873,31 @@ RF-116:
     - microservices/web/src/pantallas/compu/Productos.test.tsx
   defectos: []
 
+RF-117:
+  estado: "Nuevo (017): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-118:
+  estado: "Nuevo (017): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-119:
+  estado: "Nuevo (017): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-120:
+  estado: "Nuevo (017): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-121:
+  estado: "Nuevo (017): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
 RNF-01:
   estado: "A validar en el piloto (#21)"
   pruebas: []
