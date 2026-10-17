@@ -1291,7 +1291,7 @@ RF-106:
   defectos: []
 
 RF-97:
-  estado: "Hecho en parte (012-T002 a 012-T007, 012-T012, 012-T013): el manual, con el selector Computadora / Celular; «Entrar» en los dos y «Catálogo: los productos» en la computadora; lo demás dice «pronto»"
+  estado: "Hecho en parte (012-T002 a 012-T007, 012-T012 a 012-T014): el manual, con el selector Computadora / Celular; «Entrar» y «Catálogo: los productos» en los dos; lo demás dice «pronto»"
   pruebas:
     - microservices/web/src/pantallas/compu/base/pantallas/Manual.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Manual.config.test.ts
@@ -1299,7 +1299,7 @@ RF-97:
     - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
     - tests/e2e/escritorio/01-login.spec.ts
   defectos:
-    - "Sin escribir: Catálogo en el celular (Listas y Duplicados en los dos), Vender y las secciones de Más"
+    - "Sin escribir: Listas y Duplicados del Catálogo, Vender y las secciones de Más"
 
 RF-98:
   estado: "Hecho (013-T006, 013-T007): Ventas, Compras e Inventario como pestañas de «Cómo va el negocio», en el celular y en la computadora"

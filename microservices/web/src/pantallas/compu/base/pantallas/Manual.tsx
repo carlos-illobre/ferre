@@ -4,6 +4,7 @@ import { Logotipo } from "../../../Logotipo";
 import { irASeccion, type Dispositivo } from "./manual/piezas";
 import { CapituloEntrar, SECCIONES_DE_ENTRAR } from "./manual/Entrar";
 import { CapituloCatalogo, SECCIONES_DE_CATALOGO } from "./manual/Catalogo";
+import { CapituloCatalogoCelular, SECCIONES_DE_CATALOGO_CELULAR } from "./manual/CatalogoCelular";
 import "../estilos/manual.css";
 
 // El manual de uso (RF-97, specs/012-manual-de-uso): lo abre «Ver tutorial» en la entrada de la
@@ -53,7 +54,7 @@ export const CAPITULOS: Capitulo[] = [
       ],
     },
   } },
-  { nombre: "Catálogo", secciones: SECCIONES_DE_CATALOGO, testId: "manual-catalogo", escrito: {
+  { nombre: "Catálogo", secciones: [...SECCIONES_DE_CATALOGO, ...SECCIONES_DE_CATALOGO_CELULAR], testId: "manual-catalogo", escrito: {
     compu: {
       contenido: () => <CapituloCatalogo />,
       consejo: "Para encontrar rápido un producto, escribí solo una parte: con «mecha 6» aparecen todas las mechas de 6 mm.",
@@ -61,6 +62,15 @@ export const CAPITULOS: Capitulo[] = [
         { id: "cat-margen", titulo: "Poner el margen", detalle: "Para que tenga precio de venta.", icono: ICONOS.porcentaje },
         { id: "cat-agregar", titulo: "Agregar a la venta", detalle: "Sin ir a Vender.", icono: ICONOS.carrito },
         { id: "cat-codigo", titulo: "Cargar el código de barras", detalle: "Para encontrarlo escaneándolo.", icono: ICONOS.barras },
+      ],
+    },
+    celu: {
+      contenido: () => <CapituloCatalogoCelular />,
+      consejo: "Para buscar más rápido, escaneá el código de barras: tocá el botón de las barras, al lado del buscador.",
+      relacionados: [
+        { id: "cat-escanear", titulo: "Buscar escaneando", detalle: "Con la cámara, sin escribir.", icono: ICONOS.barras },
+        { id: "cat-margen", titulo: "Poner el margen", detalle: "Para que tenga precio de venta.", icono: ICONOS.porcentaje },
+        { id: "cat-agregar", titulo: "Agregar a la venta", detalle: "Sin ir a Vender.", icono: ICONOS.carrito },
       ],
     },
   } },

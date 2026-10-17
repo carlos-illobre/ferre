@@ -6,7 +6,7 @@
 
 **Status**: Aprobada
 
-**Maquetas**: Aprobadas (`maquetas/manual-entrar.html`, el capítulo «Entrar», aprobado por Carlos el 2026-10-16; lo reemplaza `maquetas/manual-entrar-v2.html`, aprobada el 2026-10-17; el selector Computadora / Celular, `maquetas/manual-dispositivo.html`, y el capítulo «Catálogo», `maquetas/manual-catalogo.html`, aprobadas el 2026-10-17)
+**Maquetas**: Aprobadas (`maquetas/manual-entrar.html`, el capítulo «Entrar», aprobado por Carlos el 2026-10-16; lo reemplaza `maquetas/manual-entrar-v2.html`, aprobada el 2026-10-17; el selector Computadora / Celular, `maquetas/manual-dispositivo.html`, el capítulo «Catálogo», `maquetas/manual-catalogo.html`, y su versión del celular, `maquetas/manual-catalogo-celular.html`, aprobadas el 2026-10-17)
 
 **Input**: «El tutorial es la página que se abre al presionar "Ver tutorial": tiene que verse como un
 manual de instrucciones, con texto explicativo, capturas, y el video actúa como un clip de esa
@@ -55,7 +55,8 @@ con sus pasos, sus capturas y su clip; «Volver a Ferrebress» vuelve a la entra
 - **E10** **Given** el manual abierto, **When** se aprieta Ctrl+F o se toca el buscador y se escribe «huella», **Then** aparecen hasta seis resultados, solo de lo que se ve para el dispositivo elegido, con su capítulo y su sección y lo buscado resaltado; elegir uno, con un clic o con las flechas y Enter, lleva a esa parte, y Escape lo cierra sin moverse (012-T011).
 - **E11** **Given** el capítulo abierto, **When** se baja leyendo, **Then** la sección que se lee se marca en el menú de la izquierda y en las migas de pan, que nombran el dispositivo elegido (012-T011, 012-T013).
 - **E12** **Given** el manual, **When** se lo abre por primera vez en esa computadora, **Then** arriba del índice «¿Dónde lo usás?» tiene elegida Computadora; al elegir Celular, el índice, el capítulo, las migas, el consejo y los artículos relacionados muestran solo lo del celular, y la próxima vez abre en Celular (012-T013).
-- **E13** **Given** Computadora elegida, **When** se abre el capítulo 2, **Then** «Catálogo: los productos» explica la pantalla Productos: «¿Qué querés hacer?», la pantalla, buscar, filtrar, de dónde sale el precio, poner el margen, usar otro proveedor, bajar la lista, sacarle una foto, agregar a la venta, la ficha, cargar el código de barras, buscar escaneando, el teclado y «Si algo no funciona»; cada tarea con pasos cortos, capturas con sus marcas y, donde se puede grabar, un clip (bajar la lista no lleva clip). Con Celular elegido, el capítulo dice «pronto» mientras no esté escrito para el celular (012-T012).
+- **E13** **Given** Computadora elegida, **When** se abre el capítulo 2, **Then** «Catálogo: los productos» explica la pantalla Productos: «¿Qué querés hacer?», la pantalla, buscar, filtrar, de dónde sale el precio, poner el margen, usar otro proveedor, bajar la lista, sacarle una foto, agregar a la venta, la ficha, cargar el código de barras, buscar escaneando, el teclado y «Si algo no funciona»; cada tarea con pasos cortos, capturas con sus marcas y, donde se puede grabar, un clip (bajar la lista no lleva clip; 012-T012).
+- **E14** **Given** Celular elegido, **When** se abre el capítulo 2, **Then** «Catálogo: los productos» explica Catálogo → Productos del teléfono: «¿Qué querés hacer?», la pantalla, buscar, buscar escaneando con la cámara, filtrar, agregar a la venta, la ficha, poner el margen, de dónde sale el precio, usar otro proveedor, cargar el código de barras, sacarle una foto, bajar la lista y «Si algo no funciona»; cada tarea con pasos cortos, capturas del teléfono con sus marcas y, donde se puede grabar, un clip del ancho de un teléfono (012-T014).
 
 ### Edge Cases
 

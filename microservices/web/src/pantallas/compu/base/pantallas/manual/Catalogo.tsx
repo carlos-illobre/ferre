@@ -1,6 +1,6 @@
 import MARCAS from "../manual-catalogo-marcas.json";
 import type { ReactNode } from "react";
-import { Boton, Clip, Figura, Nota, Paso, Tarjetas, Tecla, Titulo } from "./piezas";
+import { Boton, Clip, Figura, Nota, Paso, Tarjetas, Tecla, Titulo, type Dispositivo } from "./piezas";
 
 // El capítulo «Catálogo: los productos» en la computadora (012-T012, maqueta manual-catalogo.html):
 // todo lo que se hace en la pantalla Productos, para el empleado de mostrador. Las capturas y los
@@ -15,22 +15,22 @@ const Video = ({ nombre, etiqueta, children }: { nombre: string; etiqueta: strin
   </Clip>
 );
 
-export const SECCIONES_DE_CATALOGO = [
-  { id: "cat-que", nombre: "¿Qué querés hacer?" },
-  { id: "cat-pantalla", nombre: "La pantalla" },
-  { id: "cat-buscar", nombre: "Buscar un producto" },
-  { id: "cat-filtros", nombre: "Filtrar por stock o marca" },
-  { id: "cat-precio", nombre: "De dónde sale el precio" },
-  { id: "cat-margen", nombre: "Poner el margen" },
-  { id: "cat-proveedor", nombre: "Usar otro proveedor" },
-  { id: "cat-lista", nombre: "Bajar la lista" },
-  { id: "cat-foto", nombre: "Sacarle una foto" },
-  { id: "cat-agregar", nombre: "Agregar a la venta" },
-  { id: "cat-ficha", nombre: "La ficha del producto" },
-  { id: "cat-codigo", nombre: "Cargar el código de barras" },
-  { id: "cat-escanear", nombre: "Buscar escaneando" },
-  { id: "cat-teclado", nombre: "Con el teclado" },
-  { id: "cat-problemas", nombre: "Si algo no funciona" },
+export const SECCIONES_DE_CATALOGO: { id: string; nombre: string; de: Dispositivo }[] = [
+  { id: "cat-que", nombre: "¿Qué querés hacer?", de: "compu" },
+  { id: "cat-pantalla", nombre: "La pantalla", de: "compu" },
+  { id: "cat-buscar", nombre: "Buscar un producto", de: "compu" },
+  { id: "cat-filtros", nombre: "Filtrar por stock o marca", de: "compu" },
+  { id: "cat-precio", nombre: "De dónde sale el precio", de: "compu" },
+  { id: "cat-margen", nombre: "Poner el margen", de: "compu" },
+  { id: "cat-proveedor", nombre: "Usar otro proveedor", de: "compu" },
+  { id: "cat-lista", nombre: "Bajar la lista", de: "compu" },
+  { id: "cat-foto", nombre: "Sacarle una foto", de: "compu" },
+  { id: "cat-agregar", nombre: "Agregar a la venta", de: "compu" },
+  { id: "cat-ficha", nombre: "La ficha del producto", de: "compu" },
+  { id: "cat-codigo", nombre: "Cargar el código de barras", de: "compu" },
+  { id: "cat-escanear", nombre: "Buscar escaneando", de: "compu" },
+  { id: "cat-teclado", nombre: "Con el teclado", de: "compu" },
+  { id: "cat-problemas", nombre: "Si algo no funciona", de: "compu" },
 ];
 
 const TAREAS = [

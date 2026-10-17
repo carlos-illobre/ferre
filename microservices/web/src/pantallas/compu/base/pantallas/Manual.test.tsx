@@ -20,9 +20,10 @@ describe("el manual de uso", () => {
     expect(abiertos()).toEqual(["Entrar", "Catálogo"]);
     for (const c of capitulos().slice(2)) expect(c.textContent).toContain("pronto");
     elegir("celu");
-    expect(abiertos()).toEqual(["Entrar"]);
-    expect(capitulos()[1]!.textContent).toContain("pronto");
+    expect(abiertos()).toEqual(["Entrar", "Catálogo"]);
+    for (const c of capitulos().slice(2)) expect(c.textContent).toContain("pronto");
     expect(CAPITULOS.filter((c) => c.escrito?.compu).map((c) => c.nombre)).toEqual(["Entrar", "Catálogo"]);
+    expect(CAPITULOS.filter((c) => c.escrito?.celu).map((c) => c.nombre)).toEqual(["Entrar", "Catálogo"]);
   });
 
   it("012-E03 012-T010 012-T013: «Entrar» en la computadora tiene el aviso, sus tres formas, una sección por forma con sus pasos y capturas, y los problemas", () => {
@@ -139,13 +140,15 @@ describe("el manual de uso", () => {
     expect(screen.getByTestId("manual-catalogo").hidden).toBe(false);
     expect(screen.getByTestId("manual-entrar").hidden).toBe(true);
     await waitFor(() => expect(document.activeElement?.textContent).toMatch(/otro proveedor/i));
-    // En el celular, el Catálogo todavía no está escrito: no aparece, y lo de la computadora tampoco.
+    // En el celular, lo que es solo de la computadora (las teclas, vincular) no aparece.
     elegir("celu");
     fireEvent.focus(caja);
-    fireEvent.change(caja, { target: { value: "otro proveedor" } });
+    fireEvent.change(caja, { target: { value: "Mayús" } });
     expect(screen.queryByTestId("manual-resultado")).toBeNull();
     fireEvent.change(caja, { target: { value: "vincular" } });
     expect(screen.queryByTestId("manual-resultado")).toBeNull();
+    fireEvent.change(caja, { target: { value: "escanear" } });
+    expect(screen.getAllByTestId("manual-resultado").some((r) => r.textContent?.startsWith("Catálogo"))).toBe(true);
   });
 
   it("012-E11: el menú tiene el dispositivo y las secciones del capítulo; la que se lee se marca en el menú y en las migas", () => {
@@ -183,13 +186,13 @@ describe("el manual de uso", () => {
     unmount();
     render(<Manual />);
     expect(screen.getByTestId("manual-dispositivo-celu").getAttribute("aria-checked")).toBe("true");
-    // Con el Catálogo abierto, pasar al celular, donde no está escrito, vuelve a «Entrar».
+    // Con el Catálogo abierto, pasar al otro dispositivo deja el Catálogo, con lo de ese dispositivo.
     elegir("compu");
     fireEvent.click(within(screen.getByRole("navigation", { name: "Capítulos" })).getByRole("button", { name: /Catálogo/ }));
-    expect(screen.getByTestId("manual-catalogo").hidden).toBe(false);
+    expect(nombres(screen.getByTestId("manual-catalogo"))).toContain("Con el teclado");
     elegir("celu");
-    expect(screen.queryByTestId("manual-catalogo")).toBeNull();
-    expect(screen.getByTestId("manual-entrar").hidden).toBe(false);
+    expect(screen.getByTestId("manual-catalogo").hidden).toBe(false);
+    expect(nombres(screen.getByTestId("manual-catalogo"))).not.toContain("Con el teclado");
   });
 
   it("012-E13 012-T012: «Catálogo: los productos» explica todo Productos, con capturas marcadas y un clip por tarea", () => {
@@ -216,6 +219,33 @@ describe("el manual de uso", () => {
     // El pie lleva al capítulo anterior.
     fireEvent.click(screen.getByRole("button", { name: "← Anterior: Entrar" }));
     expect(screen.getByTestId("manual-entrar").hidden).toBe(false);
+  });
+
+  it("012-E14 012-T014: en el celular, «Catálogo: los productos» explica Productos del teléfono, con capturas del teléfono y un clip por tarea", () => {
+    render(<Manual />);
+    elegir("celu");
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Capítulos" })).getByRole("button", { name: /Catálogo/ }));
+    const capitulo = screen.getByTestId("manual-catalogo");
+    expect(capitulo.textContent).toContain("abajo a la izquierda");
+    expect(nombres(capitulo)).toEqual(["¿Qué querés hacer?", "La pantalla", "Buscar un producto", "Buscar escaneando", "Filtrar por stock o marca",
+      "Agregar a la venta", "La ficha del producto", "Poner el margen", "De dónde sale el precio", "Usar el costo de otro proveedor",
+      "Cargar el código de barras", "Sacarle una foto", "Bajar la lista del proveedor", "Si algo no funciona"]);
+    expect(within(screen.getByTestId("manual-tareas")).getAllByRole("button")).toHaveLength(11);
+    const figuras = [...capitulo.querySelectorAll(".manual-figura")];
+    expect(figuras).toHaveLength(18);
+    for (const f of figuras) {
+      expect(f.querySelector(".manual-imagen.celular")).toBeTruthy();
+      expect(f.querySelectorAll(".manual-marca").length).toBeGreaterThan(0);
+      expect(f.querySelectorAll(".manual-leyenda li").length).toBe(f.querySelectorAll(".manual-marca").length);
+      expect(f.querySelector("img")?.getAttribute("src")).toMatch(/manual\/catalogo-celular\/[a-z-]+\.png$/);
+    }
+    expect([...capitulo.querySelectorAll("video")].map((v) => v.getAttribute("data-testid"))).toEqual(
+      ["buscar", "escanear", "filtros", "agregar", "ficha", "margen", "codigo", "foto"].map((n) => `manual-clip-celu-${n}`));
+    expect(screen.getByTestId("manual-consejo").textContent).toContain("escaneá");
+    // Las secciones del índice son las del celular.
+    const menu = screen.getByRole("navigation", { name: "Capítulos" });
+    expect(within(menu).getByRole("button", { name: "Buscar escaneando" })).toBeTruthy();
+    expect(within(menu).queryByRole("button", { name: "Con el teclado" })).toBeNull();
   });
 
   it("012-T011: cada clip tiene su botón de play, que lo arranca y se esconde mientras anda", () => {

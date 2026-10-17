@@ -37,7 +37,7 @@ test("sin sesión se pide entrar", async ({ page }) => {
   await expect(page.getByText(/No hay contraseñas/)).toBeVisible();
 });
 
-test("012-E01 012-E04 012-E05 012-E12 012-E13 «Ver tutorial» abre el manual en la misma pestaña y se vuelve a la entrada", async ({ page }) => {
+test("012-E01 012-E04 012-E05 012-E12 012-E13 012-E14 «Ver tutorial» abre el manual en la misma pestaña y se vuelve a la entrada", async ({ page }) => {
   await page.goto("/");
   await page.getByTestId("ver-tutorial").click();
   await expect(page).toHaveURL(/#\/manual$/);
@@ -46,12 +46,15 @@ test("012-E01 012-E04 012-E05 012-E12 012-E13 «Ver tutorial» abre el manual en
   const clip = page.getByTestId("manual-clip");
   await expect.poll(() => clip.evaluate((v: HTMLVideoElement) => v.readyState)).toBeGreaterThan(0);
   expect(await clip.evaluate((v: HTMLVideoElement) => v.paused && v.muted)).toBe(true);
-  // El capítulo «Catálogo» de la computadora, con su clip; en el celular todavía dice «pronto» (012-E12, 012-E13).
+  // El capítulo «Catálogo» de la computadora y el del celular, cada uno con sus clips (012-E12, 012-E13, 012-E14).
   await page.getByRole("navigation", { name: "Capítulos" }).getByRole("button", { name: /Catálogo/ }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Catálogo: los productos" })).toBeVisible();
   await expect.poll(() => page.getByTestId("manual-clip-cat-buscar").evaluate((v: HTMLVideoElement) => v.readyState)).toBeGreaterThan(0);
   await page.getByTestId("manual-dispositivo-celu").click();
   await expect(page.getByTestId("manual-migas")).toContainText("Celular");
+  await expect(page.getByRole("heading", { level: 2, name: "Buscar escaneando" })).toBeVisible();
+  await expect.poll(() => page.getByTestId("manual-clip-celu-escanear").evaluate((v: HTMLVideoElement) => v.readyState)).toBeGreaterThan(0);
+  await page.getByRole("navigation", { name: "Capítulos" }).getByRole("button", { name: /Entrar/ }).click();
   await expect(page.getByRole("heading", { level: 2, name: "Con la huella" })).toBeVisible();
   await page.getByTestId("manual-dispositivo-compu").click();
   // Con el botón de volver del navegador, y con «Volver a Ferrebress».

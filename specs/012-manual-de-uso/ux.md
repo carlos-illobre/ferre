@@ -101,3 +101,20 @@ segunda persona, una acción por paso.
   todas las mechas de 6 mm». Artículos relacionados: Poner el margen, Agregar a la venta y Cargar
   el código de barras.
 
+**El capítulo «Catálogo: los productos» en el celular** (2026-10-17, maqueta
+`maquetas/manual-catalogo-celular.html`, aprobada por Carlos). Mismo tono; las capturas son del
+teléfono, al lado del paso, como en «Entrar».
+
+- «Para llegar»: Catálogo, abajo a la izquierda. «¿Qué querés hacer?», once tarjetas.
+- Las secciones, en este orden (en el teléfono casi todo se hace desde la ficha): La pantalla;
+  Buscar un producto; Buscar escaneando; Filtrar por stock o marca; Agregar a la venta; La ficha
+  del producto; Poner el margen; De dónde sale el precio; Usar el costo de otro proveedor; Cargar el
+  código de barras; Sacarle una foto; Bajar la lista del proveedor; Si algo no funciona. Sin
+  «Con el teclado».
+- Llevan clip, del ancho de un teléfono: buscar, buscar escaneando, filtrar, agregar, la ficha,
+  el margen, cargar el código y sacarle una foto (la cámara del teléfono no aparece: la foto llega
+  sola).
+- El consejo: «Para buscar más rápido, escaneá el código de barras: tocá el botón de las barras,
+  al lado del buscador». Artículos relacionados: Buscar escaneando, Poner el margen y Agregar a la
+  venta.
+
