@@ -7,9 +7,9 @@
   .vacio.mq .mq-dibujo{width:260px;height:auto;display:block}
   .vacio.mq strong{font-size:26px;font-weight:800;margin-top:4px;color:var(--p-tinta)}
   .vacio.mq p{font-size:16px;color:var(--p-texto-2);max-width:300px}
-  .mq-como{margin-top:18px;width:100%;display:grid;grid-template-columns:repeat(3,1fr);background:var(--p-fondo-2);border:1px solid var(--p-borde-suave);border-radius:16px;padding:14px 4px}
+  .mq-como{margin-top:18px;width:100%;display:grid;grid-template-columns:repeat(3,1fr);background:var(--p-verde-suave);border:1px solid #cfe6d8;border-radius:16px;padding:14px 4px}
   .mq-como div{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 6px;text-align:center}
-  .mq-como div+div{border-left:1px solid var(--p-borde-suave)}
+  .mq-como div+div{border-left:1px solid #cfe6d8}
   .mq-como svg{width:30px;height:30px;fill:none;stroke:var(--p-verde);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px}
   .mq-como b{font-size:16px;color:var(--p-tinta)}
   .mq-como span{font-size:14px;line-height:1.3;color:var(--p-texto-2)}`;
