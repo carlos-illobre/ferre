@@ -196,7 +196,7 @@ function HojaDeFiltros({ filtros, marcas, cuantos, alCambiar, alCerrar }: { filt
           <li key={m ?? ""}><button type="button" role="radio" aria-checked={filtros.marca === m} className={filtros.marca === m ? "elegida" : ""} onClick={() => alCambiar({ ...filtros, marca: m })} data-testid="marca"><i aria-hidden="true" />{m ?? t.todasLasMarcas.corto}</button></li>
         ))}
       </ul>
-      <button type="button" className="boton naranja ver-productos" onClick={alCerrar} data-testid="ver-productos">{n === 0 ? t.sinProductosConFiltros.corto : `Ver ${n} ${n === 1 ? "producto" : "productos"}`}</button>
+      <button type="button" className="boton coral principal centrado ver-productos" onClick={alCerrar} data-testid="ver-productos">{n === 0 ? t.sinProductosConFiltros.corto : `Ver ${n} ${n === 1 ? "producto" : "productos"}`}</button>
     </Hoja>
   );
 }

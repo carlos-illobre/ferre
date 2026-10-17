@@ -27,7 +27,7 @@
 .filtros-titulo { margin: 16px 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--p-texto-2); }
 .filtros-disponibilidad { display: grid; grid-template-columns: repeat(3, 1fr); }
 .filtros-disponibilidad button { min-height: 44px; }
-.filtros-marcas { list-style: none; margin: 8px 0 0; padding: 0; max-height: 40vh; overflow-y: auto; }
+.filtros-marcas { list-style: none; margin: 8px 0 0; padding: 0; max-height: 236px; overflow-y: auto; }
 .filtros-marcas button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; border-bottom: 1px solid var(--p-borde-suave); font-size: 17px; text-align: left; }
 .filtros-marcas button i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--p-borde-fuerte); flex: none; }
 .filtros-marcas button.elegida { font-weight: 700; }
