@@ -94,15 +94,24 @@ export function BotonGoogle({ tema = "filled_blue", estirar = false }: { tema?: 
           } catch (e) {
             setError(explicar(e, "google"));
             setEntrando(false);
+            // Al volver, el botón de Google queda con el foco y se ve más claro: se lo suelta y se
+            // lo vuelve a dibujar, con su color de siempre (007-T030, como en el celular).
+            if (document.activeElement instanceof HTMLElement && lugar.current?.contains(document.activeElement)) document.activeElement.blur();
+            dibujar();
           }
         },
       });
       // Google pide el ancho en píxeles (entre 200 y 400): el del lugar que le toca.
-      const ancho = Math.round(Math.min(400, Math.max(200, lugar.current.clientWidth || 320)));
-      google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
-      dibujado = ancho;
+      const dibujar = () => {
+        if (!lugar.current) return;
+        const ancho = Math.round(Math.min(400, Math.max(200, lugar.current.clientWidth || 320)));
+        lugar.current.replaceChildren();
+        google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
+        dibujado = ancho;
+        if (estirar) ajustar();
+      };
+      dibujar();
       setEstado("listo");
-      if (estirar) ajustar();
     }, 200);
     // El lugar puede ser más ancho que el botón: la escala es la que lo llena, y se vuelve a
     // calcular cada vez que el lugar cambia de ancho.

@@ -77,6 +77,21 @@ describe("entrar con Google (simulado)", () => {
     expect(localStorage.getItem("ferre.sesion")).toBeNull();
   });
 
+  it("007-T030: en la computadora, después de un correo no autorizado el botón de Google se vuelve a dibujar, sin el foco", async () => {
+    const dibujar = vi.fn((el: HTMLElement, _opciones?: unknown) => { el.innerHTML = "<button>Continuar con Google</button>"; });
+    window.google!.accounts.id.renderButton = dibujar as never;
+    apiFalsa.mockRejectedValueOnce(new ErrorApi(403, "extrano@gmail.com no está autorizado."));
+    conSesion(<compu.BotonGoogle />);
+    await waitFor(() => expect(dibujar).toHaveBeenCalledTimes(1));
+    screen.getByRole("button", { name: "Continuar con Google" }).focus();
+    await elegirCuenta("credencial-de-google");
+    await screen.findByTestId("error-google");
+    expect(dibujar).toHaveBeenCalledTimes(2);
+    expect(dibujar.mock.calls[1]![1]).toMatchObject({ theme: "filled_blue" });
+    expect(document.activeElement).toBe(document.body);
+    expect(screen.getAllByRole("button", { name: "Continuar con Google" })).toHaveLength(1);
+  });
+
   it("A4: en la computadora, después de Google no se ofrece la huella", async () => {
     conSesion(<compu.BotonGoogle />);
     await elegirCuenta("credencial-de-google");
