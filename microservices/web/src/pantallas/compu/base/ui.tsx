@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useVeCostos } from "../../Costos";
 import { Isotipo, Logotipo } from "../../Logotipo";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
@@ -202,14 +202,24 @@ export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, 
   controla?: string; activo?: string; // id de la lista de resultados y del resultado marcado
   extra?: React.ReactNode;
 }) {
+  const propia = useRef<HTMLInputElement>(null);
+  const caja = cajaRef ?? propia;
+  // Como autoFocus, pero sin quitarle el foco a lo que la persona eligió con el teclado (el menú,
+  // una pestaña): la caja puede aparecer tarde, cuando llegan los datos de la pantalla (decisión 82).
+  useLayoutEffect(() => {
+    const foco = document.activeElement;
+    if (autoFoco && !(foco instanceof HTMLElement && foco !== document.body && foco.matches(":focus-visible"))) caja.current?.focus();
+    // Solo al aparecer, como autoFocus.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="buscador" role="search">
       <div className="buscador-caja">
         <Icono nombre="buscar" tam={22} grosor={2.2} />
-        <input ref={cajaRef} type="search" value={valor} onChange={(e) => alCambiar(e.target.value)} placeholder={placeholder} aria-label={etiqueta ?? placeholder}
-          autoFocus={autoFoco} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="search" disabled={disabled} onKeyDown={onKeyDown} data-testid={testId}
+        <input ref={caja} type="search" value={valor} onChange={(e) => alCambiar(e.target.value)} placeholder={placeholder} aria-label={etiqueta ?? placeholder}
+          autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="search" disabled={disabled} onKeyDown={onKeyDown} data-testid={testId}
           {...(controla ? { role: "combobox", "aria-controls": controla, "aria-expanded": Boolean(activo), "aria-activedescendant": activo, "aria-autocomplete": "list" as const } : {})} />
-        {valor && <button type="button" className="borrar" aria-label="Borrar la búsqueda" onClick={() => { alCambiar(""); cajaRef?.current?.focus(); }}><Icono nombre="cerrar" tam={18} /></button>}
+        {valor && <button type="button" className="borrar" aria-label="Borrar la búsqueda" onClick={() => { alCambiar(""); caja.current?.focus(); }}><Icono nombre="cerrar" tam={18} /></button>}
       </div>
       {alEscanear && <Boton icono="escanear" variante="marino" aria-label="Escanear el código de barras" onClick={alEscanear} data-testid="escanear" />}
       {extra}

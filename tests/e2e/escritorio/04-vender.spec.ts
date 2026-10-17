@@ -164,12 +164,19 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
+  // El stock se retiene hasta que la marca vuelve al menú: la búsqueda de Inventario aparece
+  // tarde, como con internet lento, y no le saca el foco al menú (decisión 82).
+  let soltarElStock = () => {};
+  const stockSuelto = new Promise<void>((listo) => { soltarElStock = listo; });
+  await page.route("**/stock", async (r) => { await stockSuelto; await r.continue(); }, { times: 1 });
   await page.keyboard.press("Enter");
   await expect(page.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("pestana-stock")).toBeFocused();
   // En Más, Enter deja la marca en la primera opción, y se ve su borde.
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowDown");
+  soltarElStock();
+  await expect(page.getByTestId("pantalla-stock").getByTestId("busqueda")).toBeVisible();
   await expect(page.getByTestId("menu-mas")).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByTestId("mas-resumen")).toBeFocused();
