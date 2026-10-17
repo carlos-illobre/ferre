@@ -35,6 +35,7 @@ Unitarias (corren en cada subida, en segundos; las de la aplicación en `microse
 | B1, B3, B4, B5 (huella simulada) | Unitarias: `pantallas/entrar-simulado.test.tsx` |
 | B5b | Servidor: `rutas/credenciales.test.ts` |
 | B6, C7 | Servidor: `rutas/credenciales.test.ts` y `rutas/sesiones.test.ts` |
+| C5, C6 (la computadora entra sola si el celular entra desde el código; con sesión, pide el toque) | Unitarias: `celular/App.entrar-compu.test.tsx`, la aplicación del celular entera con Google y la huella simulados |
 | C3, C5, C8, C9 (cámara simulada) | Unitarias: `celular/EntrarEnLaCompu.test.tsx`; en el servidor, `rutas/sesiones.test.ts` |
 | C8, C10 | Unitarias: `compu/base/pantallas/Entrar.test.tsx` |
 | C2, C5 (la cámara lee el código) | De punta a punta: `01-login` del celular, con una cámara de mentira que muestra el código real de la computadora |
