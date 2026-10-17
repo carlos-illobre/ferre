@@ -34,3 +34,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T023 [ajuste] Las pruebas de punta a punta no graban video: los clips del manual se arman aparte (ADR-004, pedido de Carlos del 2026-10-16)
 - [x] T024 [arreglo] La búsqueda que aparece tarde (Inventario, cuando llega el stock) no le saca al menú ni a las pestañas el foco que la persona puso con las flechas (decisión 82; la prueba «sin mouse» de vender falló 1 de 5 el 2026-10-17)
 - [x] T025 [ajuste] En el celular, con una hoja abierta (la ficha de un producto, los filtros, cualquier otra) la pantalla de atrás no se desplaza (pedido de Carlos del 2026-10-17)
+- [x] T026 [regla] Colores por significado: un color que tiene sentido para un elemento puntual (los medios de pago) se usa, siempre el mismo, en todas las pantallas donde aparece ese elemento; ninguna pantalla entera con colores propios (Carlos, 2026-10-17)

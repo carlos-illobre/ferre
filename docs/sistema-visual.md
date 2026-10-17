@@ -21,6 +21,10 @@ Toda función nueva con pantalla se hace en las dos.
 - **Un solo color de acción: coral.** Todo lo demás es tinta (`#0e1220`) y niebla
   (`#f3f4f7`).
 - Lo que falta (sin margen, sin cliente) se marca con coral tenue.
+- **Colores por significado (decisión 108).** Un elemento puntual que significa algo (cada medio
+  de pago) puede tener su color. Va en la paleta compartida y es el mismo en todas las
+  pantallas donde aparece ese elemento, en el celular y en la computadora. Nunca una pantalla
+  entera, un fondo o un panel con colores propios.
 
 ## Textos: mínimos en el celular, que explican en la computadora
 

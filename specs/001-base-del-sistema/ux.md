@@ -265,7 +265,10 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **Colores** (decisión 36): fondo marcado para que lo blanco resalte; verde oscuro para
   dónde se está y los títulos; naranja para la acción principal y la parte actual del menú;
   amarillo para avisos y el panel de cobro; blanco con borde para botones comunes y campos.
-  Ninguna pantalla usa colores propios.
+  Ninguna pantalla entera usa colores propios. Un elemento puntual que tiene un significado
+  (un medio de pago, por ejemplo) puede llevar su color, y entonces lo lleva siempre: el mismo
+  en todas las pantallas y en las dos interfaces, definido en la paleta compartida (decisión
+  108, que cambia la regla de antes, «ningún color propio»).
 - **Vender** (decisión 38): sin «lo último que se vendió» (ocupa lugar y se toca por error).
   El panel de cobro ocupa dos renglones: los medios de pago con ícono y nombre chico debajo,
   como el menú de abajo (Mercado Pago con su isotipo), y debajo «No llevó», el total y

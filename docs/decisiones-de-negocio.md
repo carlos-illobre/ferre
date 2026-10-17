@@ -845,3 +845,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      No entran «Guardar cambios», el lápiz del precio, la categoría ni «Activo». La «última
      lectura» es la última vez que se cargó o se cambió el código del producto; escanearlo para
      buscar o vender no la cambia (`specs/016-ficha-del-producto/`).
+
+108. **Colores por significado** (2026-10-17). Al mirar una referencia de «Ventas de hoy», Carlos
+     cambió la regla de «ninguna pantalla usa colores propios»: si un color tiene sentido para
+     un elemento puntual (los medios de pago, por ejemplo), se usa, y siempre el mismo, en
+     todas las pantallas donde aparece ese elemento. Lo que sigue prohibido es una pantalla
+     entera, un fondo o un panel con colores propios. Los colores van en la paleta compartida
+     (`specs/001-base-del-sistema/ux.md`, `docs/sistema-visual.md`).

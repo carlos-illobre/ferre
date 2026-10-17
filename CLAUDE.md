@@ -145,8 +145,10 @@ Lo observado trabajando con él (2026-10-11 a 13):
 - **Prueba en el ambiente de pruebas y manda una captura con un pedido corto por vez.**
   Espera el cambio subido y verificado con una captura propia (las herramientas están en
   `tests/capturas/`), no una descripción.
-- **Quiere consistencia:** entre el celular y la computadora, y entre pantallas. Rechaza
-  colores propios en una sola pantalla o un panel con un relieve distinto al resto.
+- **Quiere consistencia:** entre el celular y la computadora, y entre pantallas. Rechaza una
+  pantalla o un panel con colores o un relieve distintos al resto. Un elemento puntual con
+  significado (un medio de pago) sí puede tener su color, siempre el mismo en todas partes
+  (decisión 108).
 - **Antes de programar una pantalla nueva, la maqueta de una sola pantalla** y, si puede,
   una referencia visual suya: lo que acertó fue un estilo que diseñó él en Figma.
 - **Si descarta una pregunta, no se insiste:** se anota como pregunta abierta y se sigue con
