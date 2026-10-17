@@ -79,7 +79,13 @@ Se vuelve a correr cuando cambia alguna de esas pantallas:
 tests/capturas/levantar.sh
 uv run --with playwright==1.56.0 python tests/capturas/tutorial/formas_de_entrar.py   # «Entrar»: una sección por forma de entrar
 uv run --with playwright==1.56.0 python tests/capturas/tutorial/espejo.py   # el clip de «quedan vinculados»
+uv run --with playwright==1.56.0 python tests/capturas/tutorial/catalogo.py  # «Catálogo»: la pantalla Productos de la computadora
 ```
+
+`catalogo.py` deja sus marcas en `manual-catalogo-marcas.json`, al lado de la pantalla del manual, y
+con `SOLO_CAPTURAS=1` saca solo las capturas (los clips quedan como están). Para «Buscar
+escaneando», `PUT /mentira/escanear` con `{ "codigo": "…" }` le manda a la computadora vinculada ese
+código, como si lo hubiera leído el celular (`api-de-mentira/rutas-x-lector.mjs`).
 
 `formas_de_entrar.py` escribe dónde van las marcas numeradas de cada captura (en porcentaje) y su
 leyenda en `microservices/web/src/pantallas/compu/base/pantallas/manual-entrar-marcas.json`, que

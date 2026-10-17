@@ -1,0 +1,442 @@
+{
+ "pantalla": [
+  {
+   "x": 2.5,
+   "y": 33.2,
+   "ancho": 84.2,
+   "alto": 13.3,
+   "texto": "El buscador: escribí lo que buscás."
+  },
+  {
+   "x": 87.4,
+   "y": 33.2,
+   "ancho": 10.0,
+   "alto": 13.3,
+   "texto": "Filtros: con stock, sin stock o de una marca."
+  },
+  {
+   "x": 12.0,
+   "y": 22.1,
+   "ancho": 9.4,
+   "alto": 6.0,
+   "texto": "Cuántos productos todavía no tienen margen."
+  },
+  {
+   "x": 42.6,
+   "y": 65.3,
+   "texto": "Cuánto hay en el local."
+  },
+  {
+   "x": 52.4,
+   "y": 65.3,
+   "texto": "El costo: lo que cobra el proveedor, sin IVA."
+  },
+  {
+   "x": 71.7,
+   "y": 65.3,
+   "texto": "El margen: cuánto le sumás al costo."
+  },
+  {
+   "x": 91.4,
+   "y": 65.3,
+   "texto": "El precio de venta, con IVA y redondeado."
+  },
+  {
+   "x": 86.5,
+   "y": 83.4,
+   "ancho": 9.7,
+   "alto": 9.2,
+   "texto": "«Agregar»: lo suma a la venta."
+  }
+ ],
+ "buscar": [
+  {
+   "x": 0.9,
+   "y": 5.1,
+   "ancho": 87.2,
+   "alto": 12.4,
+   "texto": "Escribí parte del nombre, la marca o el código."
+  },
+  {
+   "x": 6.9,
+   "y": 45.2,
+   "ancho": 14.0,
+   "alto": 5.3,
+   "texto": "Aparecen los que coinciden, al instante."
+  }
+ ],
+ "sin-resultados": [
+  {
+   "x": 39.2,
+   "y": 68.7,
+   "ancho": 21.5,
+   "alto": 7.3,
+   "texto": "No hay ninguno con esas palabras: probá con menos."
+  }
+ ],
+ "filtros": [
+  {
+   "x": 67.6,
+   "y": 2.6,
+   "ancho": 29.4,
+   "alto": 11.2,
+   "texto": "Hacé clic en «Filtros»."
+  },
+  {
+   "x": 7.9,
+   "y": 34.8,
+   "ancho": 84.2,
+   "alto": 9.9,
+   "texto": "Elegí si querés ver los que hay o los que faltan."
+  },
+  {
+   "x": 17.6,
+   "y": 54.6,
+   "ancho": 71.3,
+   "alto": 5.2,
+   "texto": "Escribí la marca para encontrarla rápido."
+  },
+  {
+   "x": 7.9,
+   "y": 79.4,
+   "ancho": 84.2,
+   "alto": 8.2,
+   "texto": "Hacé clic en la marca."
+  }
+ ],
+ "filtros-puestos": [
+  {
+   "x": 97.8,
+   "y": 3.6,
+   "ancho": 1.9,
+   "alto": 5.5,
+   "texto": "Cuántos filtros hay puestos."
+  },
+  {
+   "x": 0.9,
+   "y": 29.4,
+   "ancho": 98.3,
+   "alto": 5.0,
+   "texto": "Cuántos productos quedan a la vista."
+  },
+  {
+   "x": 14.6,
+   "y": 27.9,
+   "ancho": 8.3,
+   "alto": 8.0,
+   "texto": "«Sacar filtros» vuelve a mostrar todos."
+  }
+ ],
+ "precio": [
+  {
+   "x": 3.6,
+   "y": 30.2,
+   "ancho": 92.9,
+   "alto": 46.1,
+   "texto": "La cuenta, paso por paso."
+  },
+  {
+   "x": 76.3,
+   "y": 81.3,
+   "ancho": 20.1,
+   "alto": 12.5,
+   "texto": "«Entendido» la cierra."
+  }
+ ],
+ "margen": [
+  {
+   "x": 2.9,
+   "y": 52.1,
+   "ancho": 45.1,
+   "alto": 21.2,
+   "texto": "Hacé clic en un porcentaje."
+  },
+  {
+   "x": 52.3,
+   "y": 50.8,
+   "ancho": 11.1,
+   "alto": 23.7,
+   "texto": "O escribí otro y apretá Enter."
+  },
+  {
+   "x": 70.3,
+   "y": 42.0,
+   "ancho": 25.1,
+   "alto": 13.7,
+   "texto": "Sin margen no hay precio."
+  }
+ ],
+ "margen-listo": [
+  {
+   "x": 22.8,
+   "y": 52.1,
+   "ancho": 8.7,
+   "alto": 21.2,
+   "texto": "El margen elegido queda marcado."
+  },
+  {
+   "x": 76.1,
+   "y": 41.0,
+   "ancho": 20.2,
+   "alto": 16.4,
+   "texto": "El precio de venta nuevo, al instante."
+  }
+ ],
+ "proveedores": [
+  {
+   "x": 2.7,
+   "y": 19.7,
+   "ancho": 77.3,
+   "alto": 18.1,
+   "texto": "Baja el Excel que mandó el proveedor."
+  },
+  {
+   "x": 2.7,
+   "y": 60.7,
+   "ancho": 47.0,
+   "alto": 13.3,
+   "texto": "El que cobra menos."
+  },
+  {
+   "x": 53.4,
+   "y": 61.8,
+   "ancho": 19.5,
+   "alto": 11.1,
+   "texto": "El costo que se usa hoy."
+  },
+  {
+   "x": 71.3,
+   "y": 76.3,
+   "ancho": 25.9,
+   "alto": 18.1,
+   "texto": "«Usar» toma el costo de ese otro proveedor."
+  }
+ ],
+ "foto-chica": [
+  {
+   "x": 7.9,
+   "y": 6.4,
+   "ancho": 17.4,
+   "alto": 9.3,
+   "texto": "Con foto: hacé clic para verla grande."
+  },
+  {
+   "x": 7.9,
+   "y": 82.7,
+   "ancho": 17.4,
+   "alto": 9.3,
+   "texto": "Sin foto: hacé clic para agregarle una."
+  }
+ ],
+ "foto-grande": [
+  {
+   "x": 7.8,
+   "y": 84.6,
+   "ancho": 50.5,
+   "alto": 5.7,
+   "texto": "Sacá la foto con el celular."
+  },
+  {
+   "x": 60.6,
+   "y": 84.6,
+   "ancho": 36.3,
+   "alto": 5.7,
+   "texto": "O elegí una foto guardada en la computadora."
+  },
+  {
+   "x": 80.9,
+   "y": 92.0,
+   "ancho": 16.0,
+   "alto": 5.7,
+   "texto": "«Cerrar» vuelve a la lista."
+  }
+ ],
+ "foto-qr": [
+  {
+   "x": 3.1,
+   "y": 25.7,
+   "ancho": 93.8,
+   "alto": 50.3,
+   "texto": "Apuntá la cámara del celular a este código."
+  },
+  {
+   "x": 80.9,
+   "y": 81.2,
+   "ancho": 16.0,
+   "alto": 13.4,
+   "texto": "Cuando llega la foto, «Cerrar»."
+  }
+ ],
+ "agregar": [
+  {
+   "x": 89.0,
+   "y": 43.8,
+   "ancho": 8.4,
+   "alto": 4.7,
+   "texto": "Hacé clic en «Agregar»."
+  },
+  {
+   "x": 68.0,
+   "y": 90.3,
+   "ancho": 30.2,
+   "alto": 6.6,
+   "texto": "El aviso: ya está en la venta."
+  }
+ ],
+ "ficha-abrir": [
+  {
+   "x": 0.8,
+   "y": 45.3,
+   "ancho": 98.5,
+   "alto": 52.4,
+   "texto": "Hacé clic en la fila del producto y apretá Enter."
+  }
+ ],
+ "ficha": [
+  {
+   "x": 2.8,
+   "y": 14.0,
+   "ancho": 10.9,
+   "alto": 4.8,
+   "texto": "La foto: «Subir foto» o «Cambiar foto»."
+  },
+  {
+   "x": 16.3,
+   "y": 3.0,
+   "ancho": 14.5,
+   "alto": 4.0,
+   "texto": "Cuánto hay en el local."
+  },
+  {
+   "x": 2.2,
+   "y": 25.2,
+   "ancho": 47.1,
+   "alto": 15.3,
+   "texto": "El código de barras."
+  },
+  {
+   "x": 4.0,
+   "y": 48.7,
+   "ancho": 43.4,
+   "alto": 14.5,
+   "texto": "El proveedor y lo que cobra."
+  },
+  {
+   "x": 2.2,
+   "y": 67.2,
+   "ancho": 47.1,
+   "alto": 21.1,
+   "texto": "La lista de donde salió el costo."
+  },
+  {
+   "x": 50.8,
+   "y": 25.2,
+   "ancho": 47.1,
+   "alto": 36.2,
+   "texto": "El precio de venta y el margen."
+  },
+  {
+   "x": 76.2,
+   "y": 92.3,
+   "ancho": 21.7,
+   "alto": 6.0,
+   "texto": "«Agregar a la venta»."
+  }
+ ],
+ "ficha-calculo": [
+  {
+   "x": 4.2,
+   "y": 40.7,
+   "ancho": 91.7,
+   "alto": 9.7,
+   "texto": "Hacé clic en «Así se calcula»."
+  },
+  {
+   "x": 4.2,
+   "y": 50.3,
+   "ancho": 91.7,
+   "alto": 46.6,
+   "texto": "Costo, más margen, más IVA."
+  },
+  {
+   "x": 74.3,
+   "y": 83.4,
+   "ancho": 18.3,
+   "alto": 5.2,
+   "texto": "Lo que se cobra, redondeado."
+  }
+ ],
+ "ficha-proveedores": [
+  {
+   "x": 3.9,
+   "y": 18.7,
+   "ancho": 92.1,
+   "alto": 43.9,
+   "texto": "Hacé clic en el proveedor para ver los otros."
+  },
+  {
+   "x": 82.0,
+   "y": 73.1,
+   "ancho": 13.2,
+   "alto": 14.4,
+   "texto": "«Usar» toma el costo de ese."
+  }
+ ],
+ "codigo-tipear": [
+  {
+   "x": 3.9,
+   "y": 39.6,
+   "ancho": 92.1,
+   "alto": 15.3,
+   "texto": "Escribí el número que está debajo de las barras."
+  },
+  {
+   "x": 56.8,
+   "y": 58.0,
+   "ancho": 39.3,
+   "alto": 14.6,
+   "texto": "Hacé clic en «Guardar el código»."
+  }
+ ],
+ "codigo-listo": [
+  {
+   "x": 38.4,
+   "y": 26.3,
+   "ancho": 8.3,
+   "alto": 23.2,
+   "texto": "Lo copia, para pegarlo en un pedido o un mensaje."
+  },
+  {
+   "x": 3.9,
+   "y": 56.5,
+   "ancho": 92.1,
+   "alto": 36.0,
+   "texto": "El aviso, con la fecha y la hora."
+  }
+ ],
+ "escanear": [
+  {
+   "x": 27.3,
+   "y": 13.2,
+   "ancho": 50.7,
+   "alto": 3.6,
+   "texto": "Se abre la ficha del producto que escaneaste."
+  }
+ ],
+ "sin-permisos": [
+  {
+   "x": 69.6,
+   "y": 34.5,
+   "ancho": 3.4,
+   "alto": 8.6,
+   "texto": "El margen solo se lee: no se puede cambiar."
+  },
+  {
+   "x": 41.7,
+   "y": 18.2,
+   "ancho": 13.8,
+   "alto": 40.9,
+   "texto": "Sin costo, ni lista, ni otros proveedores."
+  }
+ ]
+}
