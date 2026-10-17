@@ -144,6 +144,8 @@ el naranja de los botones principales, ancho y con un ícono de reproducir; reem
 manuscrita. Carlos lo eligió el 2026-10-16 entre tres lugares (arriba del celular, debajo, o este). Abre el manual de uso en la misma pestaña (`specs/012-manual-de-uso/`).
 La tarjeta para entrar es más ancha, para que los pasos no queden apretados; si el celular la
 alcanza, pasa por encima de su borde sin tapar el código.
+El celular va centrado en el alto de la escena: queda el mismo espacio arriba que abajo (pedido de
+Carlos del 2026-10-17; antes estaba más abajo y casi tocaba el borde de abajo).
 
 **Qué necesita a la vista en el celular:**
 
