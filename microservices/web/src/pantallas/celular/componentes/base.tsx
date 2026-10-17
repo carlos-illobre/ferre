@@ -33,6 +33,14 @@ const TRAZOS: Record<string, string> = {
   lector: "M4 6h16M4 12h10M4 18h7",
   porcentaje: "M19 5L5 19M7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
   reloj: "M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z",
+  // Duplicados (002-T005).
+  enlace: "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7",
+  separar: "M16 3h5v5M8 21H3v-5M21 3l-7 7M3 21l7-7M14 14l7 7M3 3l7 7",
+  marca: "M3 12V4h8l10 10-8 8L3 12zM7.5 7.5h.01",
+  calendario: "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 10h18M8 3v4M16 3v4",
+  codigoDeBarras: "M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14",
+  lista: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
+  imagen: "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01",
   salir: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
 };
 export function Icono({ nombre, tam = 20, grosor = 2, className }: { nombre: keyof typeof TRAZOS | string; tam?: number; grosor?: number; className?: string }) {

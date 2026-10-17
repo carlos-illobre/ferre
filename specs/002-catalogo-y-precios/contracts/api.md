@@ -54,7 +54,7 @@ Todas exigen dueño o admin.
 | POST | `/equivalencias/:id/unir` | Dueño o admin | Une los dos productos de una sugerencia; `conservar` (`a` o `b`) dice cuál queda. 409 si la sugerencia no existe o ya se resolvió |
 | POST | `/equivalencias/:id/rechazar` | Dueño o admin | Marca la sugerencia como «son distintos». 409 si ya se resolvió |
 | POST | `/equivalencias/unir` | Dueño o admin | Une a mano dos productos cualesquiera (`conservar_id`, `absorber_id`). 400 si no son dos distintos, 404 si alguno no existe o ya fue unido |
-| GET | `/equivalencias/unidos` | Dueño o admin | Las últimas 100 uniones que se pueden separar, con los proveedores del producto conservado |
+| GET | `/equivalencias/unidos` | Dueño o admin | Las últimas 100 uniones que se pueden separar, con la marca, la foto y los proveedores del producto conservado |
 | POST | `/equivalencias/separar` | Dueño o admin | Deshace una unión (`absorbido_id`) con el registro de lo que se movió. 409 si el producto no está unido o no hay registro de la unión |
 
 ## Vincular el celular para escanear

@@ -1,12 +1,25 @@
 import { useMemo, useState } from "react";
-import { buscarDuplicados, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Resumen, type Sugerencia, type Union } from "../../../negocio/catalogo/duplicados";
+import { buscarDuplicados, buscarUniones, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Resumen, type Sugerencia, type Union } from "../../../negocio/catalogo/duplicados";
 import { useCatalogo } from "../../../catalogo";
 import { fecha, pesos } from "../../../formato";
-import { AvisoError, Buscador, Hoja, Toast, Lista } from "../componentes/base";
+import { AvisoError, Buscador, Hoja, Icono, Toast, Lista } from "../componentes/base";
+import { FotoProducto } from "../componentes/Foto";
 
 // Un mismo artículo en varios proveedores (issue #29): quien administra ve las sugerencias
 // lado a lado y decide "es el mismo" o "son distintos". También une dos a mano y separa.
-const detalle = (p: Resumen) => [p.marca, p.proveedor ?? "sin proveedor", p.costo_neto ? pesos(p.costo_neto) : "sin costo", p.fecha_lista ? `lista del ${fecha(p.fecha_lista)}` : null].filter(Boolean).join(" · ");
+// Cada candidato de una sugerencia: la marca, el proveedor, el costo y la fecha de la lista,
+// cada dato con su ícono (002-T005).
+function Candidato({ p }: { p: Resumen }) {
+  return (
+    <>
+      <strong>{p.descripcion}</strong>
+      {p.marca && <span className="dp-dato"><Icono nombre="marca" tam={16} />{p.marca}</span>}
+      <span className="dp-dato"><Icono nombre="proveedor" tam={16} />{p.proveedor ?? "Sin proveedor"}</span>
+      <span className="dp-dato dp-costo">{p.costo_neto ? pesos(p.costo_neto) : "Sin costo"}</span>
+      {p.fecha_lista && <span className="dp-dato"><Icono nombre="calendario" tam={16} />{fecha(p.fecha_lista)}</span>}
+    </>
+  );
+}
 
 export function Duplicados() {
   const { sugerencias: traidas, uniones, error: fallo } = useDuplicados();
@@ -16,6 +29,8 @@ export function Duplicados() {
   const [cerrado, setCerrado] = useState<unknown>(null);
   const error = aviso ?? (fallo && fallo !== cerrado ? fallo.message : null);
   const [aMano, setAMano] = useState(false);
+  // «Separar» y «Ver todo» abren la lista de todos los productos unidos, con su buscador.
+  const [todas, setTodas] = useState(false);
 
   async function buscar() {
     try { const nuevas = await buscarDuplicados(); setMensaje(nuevas ? `${nuevas} sugerencia(s) nueva(s).` : "Sin sugerencias nuevas."); }
@@ -30,34 +45,44 @@ export function Duplicados() {
 
   return (
     <>
-      <p className="subtitulo">El mismo artículo en varias listas. Al unirlos queda un producto con todos sus proveedores y el precio sale del más barato. Las ventas, el stock y los precios se conservan.</p>
+      <div className="dp-nota">
+        <span className="dp-circulo"><Icono nombre="enlace" tam={18} /></span>
+        <span><b>Unificá productos duplicados</b><small>El mismo artículo puede estar en varias listas. Al unirlos queda uno solo, con todos sus proveedores y el precio del más barato.</small></span>
+      </div>
+      <div className="dp-acciones">
+        <span><button type="button" className="dp-accion fuerte" onClick={buscar} data-testid="buscar-duplicados"><span className="dp-circulo"><Icono nombre="buscar" tam={15} /></span>Buscar</button><small>Duplicados en todo el catálogo</small></span>
+        <span><button type="button" className="dp-accion" onClick={() => setAMano(true)} data-testid="unir-a-mano"><span className="dp-circulo naranja"><Icono nombre="enlace" tam={15} /></span>Unir</button><small>Dos productos, elegidos a mano</small></span>
+        <span><button type="button" className="dp-accion" onClick={() => setTodas(true)} data-testid="separar-uno"><span className="dp-circulo"><Icono nombre="separar" tam={15} /></span>Separar</button><small>Deshacer una unión</small></span>
+      </div>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(fallo); }} />
-      {sugerencias.length === 0 && <div className="aviso-suave">No hay sugerencias pendientes.</div>}
+      {sugerencias.length === 0 && (
+        <div className="dp-vacio">
+          <span className="dp-circulo"><Icono nombre="reloj" tam={20} /></span>
+          <span><b>No hay sugerencias pendientes</b><small>Tocá «Buscar» para revisar el catálogo.</small></span>
+        </div>
+      )}
       {sugerencias.length > 0 && <div className="tarjetas">
       {sugerencias.map((s) => (
-        <div key={s.id} className="tarjeta" data-testid="sugerencia">
-          <span className="seccion" style={{ padding: 0 }}>{s.motivo === "codigo_barras" ? "Mismo código de barras" : "Misma descripción"}</span>
-          <div className="cuadricula-2">
+        <div key={s.id} className="dp-sugerencia" data-testid="sugerencia">
+          <span className="dp-motivo"><Icono nombre={s.motivo === "codigo_barras" ? "codigoDeBarras" : "lector"} tam={16} />{s.motivo === "codigo_barras" ? "Mismo código de barras" : "Misma descripción"}</span>
+          <div className="dp-candidatos">
             {(["a", "b"] as const).map((lado) => (
-              <button key={lado} type="button" className="candidato" onClick={() => resolver(s, "unir", lado)}>
-                <strong>{s[lado].descripcion}</strong>
-                <small>{detalle(s[lado])}</small>
-                <span className="accion">Es el mismo: conservar este nombre</span>
+              <button key={lado} type="button" className="dp-candidato" onClick={() => resolver(s, "unir", lado)} aria-label={`Es el mismo: conservar «${s[lado].descripcion}»`}>
+                <Candidato p={s[lado]} />
+                <em>Conservar este</em>
               </button>
             ))}
           </div>
-          <div className="cuadricula-2">
+          <div className="dp-botones">
             <button type="button" className="boton tinta" onClick={() => resolver(s, "unir", "a")} data-testid="unir">Es el mismo</button>
             <button type="button" className="boton" onClick={() => resolver(s, "rechazar")}>Son distintos</button>
           </div>
         </div>
       ))}
       </div>}
-      <button type="button" className="boton blanco" onClick={buscar} data-testid="buscar-duplicados">Buscar duplicados en todo el catálogo</button>
-      <button type="button" className="boton texto" onClick={() => setAMano(true)} data-testid="unir-a-mano">Unir dos productos a mano</button>
       {aMano && <UnionManual alCerrar={() => setAMano(false)} alUnir={async (m) => { setMensaje(m); setAMano(false); }} />}
-      <Unidos uniones={uniones ?? []} />
+      <Unidos uniones={uniones ?? []} todas={todas} alVerTodas={setTodas} />
     </>
   );
 }
@@ -94,29 +119,60 @@ function UnionManual({ alCerrar, alUnir }: { alCerrar: () => void; alUnir: (mens
 }
 
 // Lo ya unido, para poder separarlo si fue un error. El absorbido no aparece en las
-// búsquedas (quedó dentro del otro), así que este es el único lugar donde se lo ve.
-function Unidos({ uniones }: { uniones: Union[] }) {
+// búsquedas (quedó dentro del otro), así que este es el único lugar donde se lo ve. Se ven las
+// tres últimas uniones; «Ver todo» y «Separar» abren todas, con un buscador (002-T005).
+const A_LA_VISTA = 3;
+function Unidos({ uniones, todas, alVerTodas }: { uniones: Union[]; todas: boolean; alVerTodas: (abierta: boolean) => void }) {
   const [mensaje, setMensaje] = useState<string | null>(null);
+  const [buscado, setBuscado] = useState("");
   async function separar(u: Union) {
     if (!window.confirm(`¿Separar "${u.absorbido}" de "${u.conservado}"? Cada uno vuelve a tener sus precios, ventas y stock.`)) return;
     try { await separarProductos(u.absorbido_id); setMensaje(`Separados: "${u.absorbido}" vuelve a ser un producto aparte.`); }
     catch (e) { setMensaje((e as Error).message); }
   }
+  const lista = (cuales: Union[]) => (
+    <Lista className="dp-lista">
+      {cuales.map((u) => <UnionHecha key={u.absorbido_id} u={u} alSeparar={() => void separar(u)} />)}
+    </Lista>
+  );
   return (
     <>
-      <h2 className="seccion" data-testid="unidos">Unidos · se pueden separar</h2>
+      <h2 className="seccion dp-titulo" data-testid="unidos"><span>Productos unidos {uniones.length > 0 && <span className="dp-cuenta">{uniones.length}</span>}</span></h2>
+      <p className="dp-bajada">Cada uno junta varios productos. Se pueden separar si hace falta.</p>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-separar" />
       {uniones.length === 0 ? <div className="aviso-suave">Todavía no se unió ningún producto.</div> : (
-        <Lista>
-          {uniones.map((u) => (
-            <div key={u.absorbido_id} className="fila" data-testid="union">
-              <span className="nombre">{u.conservado}</span>
-              <button type="button" className="boton chico derecha" onClick={() => separar(u)}>Separar</button>
-              <span className="detalle">absorbió a “{u.absorbido}” el {fecha(u.unido_en.slice(0, 10))}{u.proveedores ? ` · ${u.proveedores}` : ""}</span>
-            </div>
-          ))}
-        </Lista>
+        <div className="dp-unidos">
+          {lista(uniones.slice(0, A_LA_VISTA))}
+          {uniones.length > A_LA_VISTA && (
+            <button type="button" className="dp-ver-todo" onClick={() => alVerTodas(true)} data-testid="ver-todas-las-uniones">
+              <Icono nombre="lista" tam={20} />Ver todo ({uniones.length})<Icono nombre="derecha" tam={20} />
+            </button>
+          )}
+        </div>
+      )}
+      {todas && (
+        <Hoja titulo="Productos unidos" alCerrar={() => { alVerTodas(false); setBuscado(""); }} testId="todas-las-uniones">
+          <Buscador chico valor={buscado} alCambiar={setBuscado} placeholder="Buscar un producto unido" testId="buscar-union" />
+          {buscarUniones(uniones, buscado).length === 0 ? <div className="aviso-suave">{uniones.length ? "Ningún producto unido coincide con la búsqueda." : "Todavía no se unió ningún producto."}</div> : lista(buscarUniones(uniones, buscado))}
+        </Hoja>
       )}
     </>
+  );
+}
+
+// Una unión: la foto, el nombre con «Separar» a su derecha y, debajo, la marca, a cuál unió,
+// los proveedores y cuándo.
+function UnionHecha({ u, alSeparar }: { u: Union; alSeparar: () => void }) {
+  return (
+    <div className="dp-union" data-testid="union">
+      <span className="dp-foto">{u.foto_url ? <FotoProducto id={u.conservado_id} url={u.foto_url} descripcion={u.conservado} /> : <Icono nombre="imagen" tam={22} />}</span>
+      <span className="dp-datos">
+        <span className="dp-cabeza"><b>{u.conservado}</b><button type="button" className="dp-separar" onClick={alSeparar} aria-label={`Separar «${u.absorbido}» de «${u.conservado}»`}><Icono nombre="separar" tam={15} />Separar</button></span>
+        {u.marca && <small><Icono nombre="marca" tam={15} /><i>{u.marca}</i></small>}
+        <small><Icono nombre="enlace" tam={15} /><i>Unió «{u.absorbido}»</i></small>
+        {u.proveedores && <small><Icono nombre="proveedor" tam={15} /><i>{u.proveedores}</i></small>}
+        <small><Icono nombre="calendario" tam={15} /><i>Unido el {fecha(u.unido_en.slice(0, 10))}</i></small>
+      </span>
+    </div>
   );
 }

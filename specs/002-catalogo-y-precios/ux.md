@@ -254,6 +254,28 @@ dice al hacerlas.
 | No se pudo (ya resuelta, producto ya unido) | Lo dice en el lugar |
 | Sin conexión | Dice que necesita internet |
 
+**La pantalla Duplicados en el celular** (Carlos, 2026-10-17, sobre una referencia suya;
+maquetas aprobadas `maquetas/celular-duplicados-renovada*.png`):
+
+- **Arriba, una nota** (sin tarjeta, con ícono y una raya verde a la izquierda, para que no se
+  confunda con un botón): «Unificá productos duplicados. El mismo artículo puede estar en varias
+  listas. Al unirlos queda uno solo, con todos sus proveedores y el precio del más barato.»
+- **Tres botones** de 44 px, con su ícono y la acción alineados a la izquierda, y debajo de cada
+  uno, fuera del botón, qué hace: «Buscar» (duplicados en todo el catálogo; el principal, verde
+  oscuro), «Unir» (dos productos, elegidos a mano) y «Separar» (deshacer una unión: abre la
+  lista de todos los productos unidos, con un buscador por nombre).
+- **Sin sugerencias,** un aviso amarillo con un reloj: «No hay sugerencias pendientes. Tocá
+  «Buscar» para revisar el catálogo.»
+- **Cada sugerencia:** su motivo en una pastilla («Mismo código de barras», «Misma
+  descripción»); los dos productos lado a lado, cada uno con la marca, el proveedor, el costo en
+  negrita, la fecha de la lista (cada dato con su ícono) y «Conservar este»; abajo, «Es el
+  mismo» y «Son distintos».
+- **«Productos unidos»** con la cantidad en una pastilla y la bajada «Cada uno junta varios
+  productos. Se pueden separar si hace falta.» Cada unión, en filas separadas por 1 px: la foto
+  del producto, el nombre en negrita con «Separar» a su derecha (verde suave, 36 px), y debajo,
+  a todo el ancho, la marca, «Unió «…»», los proveedores y «Unido el dd/mm/aaaa», cada uno con
+  su ícono. Se ven las tres últimas; «Ver todo (N)» abre las demás.
+
 ## Escanear con la cámara (historia 8 · RF-08)
 
 **Rol:** Vendedor.

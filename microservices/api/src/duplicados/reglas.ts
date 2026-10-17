@@ -65,7 +65,7 @@ export function unirAMano(conservar: string, absorber: string, usuarioId: string
 
 // Las uniones hechas, mientras el absorbido siga dentro del conservado: se pueden separar.
 export const unidos = (): Promise<Enviable<Union>[]> => pool.query(
-  `SELECT a.id AS absorbido_id, a.descripcion AS absorbido, c.id AS conservado_id, c.descripcion AS conservado, a.modificado_en AS unido_en,
+  `SELECT a.id AS absorbido_id, a.descripcion AS absorbido, c.id AS conservado_id, c.descripcion AS conservado, c.marca, c.foto_url, a.modificado_en AS unido_en,
           (SELECT string_agg(DISTINCT pr.nombre, ', ') FROM precio_proveedor pp JOIN proveedor pr ON pr.id = pp.proveedor_id WHERE pp.producto_id = c.id) AS proveedores
      FROM producto a JOIN producto c ON c.id = a.reemplazado_por
     WHERE a.reemplazado_por IS NOT NULL

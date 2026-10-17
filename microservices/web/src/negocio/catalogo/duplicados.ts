@@ -50,3 +50,11 @@ export async function separar(absorbidoId: string): Promise<void> {
   await api("/equivalencias/separar", { method: "POST", body: JSON.stringify({ absorbido_id: absorbidoId } satisfies Separar) });
   await todoCambio();
 }
+
+// Buscar entre lo ya unido por el nombre de cualquiera de los dos productos, sin importar
+// mayúsculas ni tildes.
+const plano = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+export function buscarUniones(uniones: Union[], texto: string): Union[] {
+  const buscado = plano(texto);
+  return buscado ? uniones.filter((u) => plano(u.conservado).includes(buscado) || plano(u.absorbido).includes(buscado)) : uniones;
+}

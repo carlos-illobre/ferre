@@ -53,8 +53,8 @@ const SUGERENCIAS = () => [
   { id: "s-4", motivo: "descripcion", creado_en: momento(1), a: prod("p-15", "Disco de corte 115 mm", "Tyrolit", null, "Erpa", 990, 40), b: prod("d-15", "Disco de corte 115 mm", null, null, "Dimetal", null, 6) },
 ];
 const UNIDOS = () => [
-  { absorbido_id: "d-9", absorbido: "LLAVE FRANCESA 10\" BAHCO", conservado_id: "p-9", conservado: "Llave francesa 10 pulgadas", unido_en: momento(3), proveedores: "Comodo, Dimetal" },
-  { absorbido_id: "d-12", absorbido: "Thinner sello oro x 1 lt", conservado_id: "p-12", conservado: "Thinner sello de oro", unido_en: momento(12), proveedores: "Comodo, Tresge, Ixnova" },
+  { absorbido_id: "d-9", absorbido: "LLAVE FRANCESA 10\" BAHCO", conservado_id: "p-9", conservado: "Llave francesa 10 pulgadas", marca: "Bahco", foto_url: null, unido_en: momento(3), proveedores: "Comodo, Dimetal" },
+  { absorbido_id: "d-12", absorbido: "Thinner sello oro x 1 lt", conservado_id: "p-12", conservado: "Thinner sello de oro", marca: "Sello de Oro", foto_url: null, unido_en: momento(12), proveedores: "Comodo, Tresge, Ixnova" },
 ];
 
 import { productos } from "./rutas-00-base.mjs";
@@ -139,7 +139,7 @@ export default {
   "POST /equivalencias/unir": ({ body }) => {
     if (!body?.conservar_id || !body?.absorber_id || body.conservar_id === body.absorber_id) return [400, { error: "Hacen falta dos productos distintos" }];
     const antes = separados.get(body.absorber_id);
-    unidos.unshift(antes ?? { absorbido_id: body.absorber_id, absorbido: nombres.get(body.absorber_id) ?? "Producto absorbido", conservado_id: body.conservar_id, conservado: nombres.get(body.conservar_id) ?? "Producto conservado", unido_en: new Date().toISOString(), proveedores: "Comodo, Dimetal" });
+    unidos.unshift(antes ?? { absorbido_id: body.absorber_id, absorbido: nombres.get(body.absorber_id) ?? "Producto absorbido", conservado_id: body.conservar_id, conservado: nombres.get(body.conservar_id) ?? "Producto conservado", marca: null, foto_url: null, unido_en: new Date().toISOString(), proveedores: "Comodo, Dimetal" });
     return { ok: true };
   },
   "GET /equivalencias/unidos": () => unidos,

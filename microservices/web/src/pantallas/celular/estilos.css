@@ -624,3 +624,49 @@ tr.cambia td { background: #fff8e8; }
 /* Cuántos renglones lleva la venta, sobre el ícono de Vender del menú de abajo. */
 .nav-inferior button { position: relative; }
 .cuenta-menu { position: absolute; top: 0; left: calc(50% + 6px); min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--p-naranja); color: #fff; font-size: 12px; font-weight: 800; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--p-superficie); }
+/* Duplicados en el celular (002-T005): la nota, los tres botones, las sugerencias y lo unido. */
+.dp-nota { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start; padding: 2px 4px 2px 12px; border-left: 4px solid #bfe3cf; }
+.dp-nota b { display: block; font-size: 16px; color: var(--p-verde); }
+.dp-nota small, .dp-vacio small { display: block; margin-top: 2px; font-size: 14px; color: var(--p-texto-2); line-height: 1.4; }
+.dp-circulo { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--p-verde-suave); color: var(--p-verde-texto); flex: none; }
+.dp-acciones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.dp-acciones > span { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.dp-acciones small { font-size: 13px; color: var(--p-texto-2); line-height: 1.3; padding: 0 4px; }
+.dp-accion { display: flex; align-items: center; justify-content: flex-start; gap: 7px; height: 44px; padding: 0 10px; border-radius: 12px; background: #fff; border: 1px solid var(--p-borde); box-shadow: 0 1px 3px rgb(23 49 43 / 0.12); font: inherit; font-size: 15px; font-weight: 700; color: var(--p-tinta); }
+.dp-accion .dp-circulo { width: 24px; height: 24px; background: var(--p-fondo-2); color: var(--p-verde); }
+.dp-accion .dp-circulo.naranja { background: var(--p-naranja-suave); color: var(--p-naranja-texto); }
+.dp-accion.fuerte { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+.dp-accion.fuerte .dp-circulo { background: rgb(255 255 255 / 0.14); color: #fff; }
+.dp-vacio { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; background: var(--p-amarillo-suave); border: 1px solid var(--p-amarillo-borde); border-radius: 16px; padding: 14px; }
+.dp-vacio .dp-circulo { width: 40px; height: 40px; background: #fff; color: var(--p-amarillo-texto); }
+.dp-vacio b { display: block; font-size: 16px; color: var(--p-tinta); }
+.dp-sugerencia { background: #fff; border: 1px solid var(--p-borde); border-radius: 18px; box-shadow: var(--sombra); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.dp-motivo { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; padding: 2px 10px; border-radius: 99px; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); color: var(--p-verde); }
+.dp-candidatos, .dp-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dp-candidato { display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 12px; border: 1px solid var(--p-borde); border-radius: 14px; background: #fff; font: inherit; color: var(--p-tinta); min-width: 0; }
+.dp-candidato strong { font-size: 15px; line-height: 1.25; margin-bottom: 4px; overflow-wrap: anywhere; }
+.dp-dato { display: flex; align-items: center; gap: 5px; font-size: 14px; color: var(--p-texto-2); }
+.dp-dato svg { flex: none; }
+.dp-dato.dp-costo { color: var(--p-tinta); font-weight: 700; }
+.dp-candidato em { margin-top: 6px; font-style: normal; font-size: 14px; font-weight: 600; color: var(--p-naranja-texto); }
+.dp-titulo > span { display: inline-flex; align-items: center; gap: 8px; }
+.dp-cuenta { font-size: 14px; font-weight: 600; padding: 1px 9px; border-radius: 99px; background: var(--p-relleno); color: var(--p-texto-medio); }
+.dp-bajada { margin: -4px 4px 0; font-size: 14px; color: var(--p-texto-2); }
+.dp-unidos { display: flex; flex-direction: column; gap: 1px; }
+.lista.dp-lista { background: transparent; border: 0; box-shadow: none; gap: 1px; overflow: visible; }
+.lista.dp-lista > li { border-bottom: 0; background: #fff; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
+.dp-unidos > :first-child > li:first-child, .hoja .dp-lista > li:first-child { border-radius: 16px 16px 0 0; }
+.dp-unidos > :last-child > li:last-child, .hoja .dp-lista > li:last-child { border-radius: 0 0 16px 16px; }
+.dp-unidos > .dp-lista:only-child > li:only-child, .hoja .dp-lista > li:only-child { border-radius: 16px; }
+.dp-union { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; align-items: start; padding: 12px 12px 12px 14px; }
+.dp-foto { width: 48px; height: 48px; border-radius: 12px; overflow: hidden; display: grid; place-items: center; background: repeating-linear-gradient(135deg, #eceef2 0 5px, #f6f7f9 5px 10px); color: var(--p-texto-2); }
+.dp-datos { min-width: 0; display: block; }
+.dp-cabeza { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 2px; }
+.dp-cabeza b { flex: 1; min-width: 0; padding-top: 7px; font-size: 15px; font-weight: 700; color: var(--p-tinta); line-height: 1.25; }
+.dp-separar { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 10px; border: 1px solid #bfe3cf; border-radius: 10px; background: var(--p-verde-suave); color: var(--p-verde-texto); font: inherit; font-size: 14px; font-weight: 600; }
+.dp-datos small { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 14px; line-height: 1.35; color: var(--p-texto-2); }
+.dp-datos small svg { flex: none; }
+.dp-datos small i { font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp-ver-todo { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 14px; border: 0; border-radius: 0 0 16px 16px; background: #fff; box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); font: inherit; font-size: 15px; font-weight: 600; color: var(--p-verde); text-align: left; }
+.dp-ver-todo svg:last-child { margin-left: auto; }
+.dp-unidos:has(.dp-ver-todo) .dp-lista > li:last-child { border-radius: 0; }

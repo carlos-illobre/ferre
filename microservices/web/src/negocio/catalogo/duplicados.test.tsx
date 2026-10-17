@@ -5,7 +5,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
-import { buscarDuplicados, resolverSugerencia, separar, unir, useDuplicados, type Resumen, type Sugerencia } from "./duplicados";
+import { buscarUniones, buscarDuplicados, resolverSugerencia, separar, unir, useDuplicados, type Resumen, type Sugerencia } from "./duplicados";
 
 // Los duplicados, probados una sola vez y sin pantalla (010-E05).
 const resumen = (id: string, proveedor: string): Resumen => ({ id, descripcion: `MECHA ${id}`, marca: null, codigo_barras: "779", proveedor, costo_neto: "100", fecha_lista: null });
@@ -59,5 +59,18 @@ describe("los duplicados (010-E05)", () => {
     await separar("p2");
     expect(apiFalsa).toHaveBeenCalledWith("/equivalencias/separar", { method: "POST", body: JSON.stringify({ absorbido_id: "p2" }) });
     expect(pedidos("/equivalencias")).toBe(4);
+  });
+});
+
+// 002-T005: «Separar» y «Ver todo» abren todas las uniones, con un buscador.
+describe("buscar entre los productos unidos (002-T005)", () => {
+  const union = (conservado: string, absorbido: string) => ({ absorbido_id: absorbido, absorbido, conservado_id: conservado, conservado, marca: null, foto_url: null, unido_en: "2026-10-14T10:00:00Z", proveedores: null });
+  const uniones = [union("Llave francesa 10 pulgadas", "LLAVE FRANCESA 10\" BAHCO"), union("Thinner sello de oro", "Thinner sello oro x 1 lt"), union("Lámpara LED 9 W", "FOCO LED 9W E27")];
+
+  it("busca por el nombre del que quedó o del que se unió, sin importar mayúsculas ni tildes", () => {
+    expect(buscarUniones(uniones, "lampara").map((u) => u.conservado)).toEqual(["Lámpara LED 9 W"]);
+    expect(buscarUniones(uniones, "BAHCO").map((u) => u.conservado)).toEqual(["Llave francesa 10 pulgadas"]);
+    expect(buscarUniones(uniones, "  ")).toHaveLength(3);
+    expect(buscarUniones(uniones, "zz")).toEqual([]);
   });
 });

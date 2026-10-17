@@ -19,6 +19,7 @@ export type ResolverSugerencia = z.input<typeof resolverSugerencia>;
 export type UnirAMano = z.input<typeof unirAMano>;
 
 // GET /equivalencias/unidos: lo ya unido, que se puede separar.
-export type Union = { absorbido_id: string; absorbido: string; conservado_id: string; conservado: string; unido_en: string; proveedores: string | null };
+// La marca y la foto son las del producto conservado.
+export type Union = { absorbido_id: string; absorbido: string; conservado_id: string; conservado: string; marca: string | null; foto_url: string | null; unido_en: string; proveedores: string | null };
 // POST /equivalencias/separar
 export type Separar = z.input<typeof separar>;
