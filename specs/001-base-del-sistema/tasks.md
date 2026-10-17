@@ -36,3 +36,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T025 [ajuste] En el celular, con una hoja abierta (la ficha de un producto, los filtros, cualquier otra) la pantalla de atrás no se desplaza (pedido de Carlos del 2026-10-17)
 - [x] T026 [regla] Colores por significado: un color que tiene sentido para un elemento puntual (los medios de pago) se usa, siempre el mismo, en todas las pantallas donde aparece ese elemento; ninguna pantalla entera con colores propios (Carlos, 2026-10-17)
 - [x] T027 [arreglo] Vender y Catálogo, al terminar de bajar el catálogo, no le sacan al menú ni a las pestañas el foco que la persona puso con las flechas (decisión 82; lo mismo que T024)
+- [x] T028 [arreglo] La prueba del celular «C5 la cámara del celular lee el código…» comprueba que el escáner se abrió sin depender de verlo a tiempo: con la máquina cargada lee el código y se cierra antes de que la prueba mire (proyecto T128)

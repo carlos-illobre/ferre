@@ -203,10 +203,16 @@ test("C5 la cámara del celular lee el código que muestra la computadora y llev
       setInterval(dibujar, 100);
       return lienzo.captureStream(10);
     };
+    // El escáner puede leer el código y cerrarse antes de que la prueba lo mire: se anota al aparecer.
+    new MutationObserver((_, observador) => {
+      if (!document.querySelector("[data-testid=escaner]")?.getClientRects().length) return;
+      sessionStorage.setItem("e2e.escaner-abierto", "1");
+      observador.disconnect();
+    }).observe(document, { childList: true, subtree: true });
   }, imagen);
   await page.goto("/");
   await page.getByTestId("escanear-codigo-de-la-compu").click();
-  await expect(page.getByTestId("escaner")).toBeVisible();
+  await expect.poll(() => page.evaluate(() => sessionStorage.getItem("e2e.escaner-abierto"))).toBe("1");
   await expect(page.getByTestId("entrar-para-la-compu")).toBeVisible({ timeout: 15000 });
   expect(await page.evaluate(() => location.hash)).toBe(enlace.slice(enlace.indexOf("#")));
   await expect(page.getByTestId("escaner")).toHaveCount(0);
