@@ -102,9 +102,11 @@ test("cargarle el código de barras a un producto desde su ficha y encontrarlo p
   await ficha.getByTestId("codigo-tipeado").fill("7790009998881");
   await ficha.getByTestId("guardar-codigo").click();
   await expect(ficha.getByTestId("codigo-actual")).toHaveText("7790009998881");
-  await expect(ficha.getByTestId("codigo-guardado")).toContainText("Ya se puede buscar");
+  await expect(ficha.getByTestId("codigo-guardado")).toContainText("Código actualizado");
   // Por nombre y no por id: la corrida del otro tamaño de pantalla deja un producto que se llama igual.
   await expect.poll(() => psql(`SELECT count(*) FROM producto WHERE codigo_barras = '7790009998881' AND descripcion LIKE 'GUANTES ESCANER%'`)).toBe("1");
+  // 016-E09: con la hora de la lectura guardada en el servidor, de hace un momento.
+  await expect.poll(() => psql(`SELECT count(*) FROM producto WHERE codigo_barras = '7790009998881' AND descripcion LIKE 'GUANTES ESCANER%' AND codigo_leido_en > now() - interval '5 minutes'`)).toBe("1");
 
   await ficha.getByRole("button", { name: "Listo" }).click();
   await page.getByTestId("busqueda").fill("7790009998881");

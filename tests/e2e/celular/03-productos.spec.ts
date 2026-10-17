@@ -57,19 +57,18 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   await expect(page.getByTestId("producto")).toHaveCount(1);
   await expect(fila).toContainText("sin margen");
 
-  // La ficha se abre con Enter. Ahí, costo con explicación, margen 100 %, precio calculado.
+  // La ficha se abre con Enter. Ahí, margen 100 %, precio calculado y «Así se calcula» con el
+  // costo explicado (specs/016).
   await busqueda.press("Enter");
   const ficha = page.getByTestId("ficha-producto");
   await expect(ficha).toContainText("MECHA PARA MADERA DE 6 MM (E2E)");
-  await ficha.getByRole("button", { name: /Cómo se calcula el costo/ }).click();
-  await expect(page.getByTestId("hoja-explicacion")).toContainText("− 25 % (linea)");
-  await page.keyboard.press("Escape");
   await ficha.getByRole("button", { name: "100 %" }).click();
   await expect(ficha.getByRole("button", { name: "100 %" })).toHaveClass(/activo/);
   await expect(ficha).toContainText("$4.000"); // 1500 × 2 × 1,21 = 3630 → para arriba a 4000
-  await ficha.getByRole("button", { name: "De dónde sale $4.000" }).click();
-  await expect(page.getByTestId("hoja-explicacion")).toContainText("+ 100 % de margen");
-  await page.keyboard.press("Escape");
+  await ficha.getByTestId("abrir-calculo").click();
+  await expect(ficha.getByTestId("cuenta")).toContainText("− 25 % (linea)");
+  await expect(ficha.getByTestId("cuenta")).toContainText("+ Margen 100 %");
+  await expect(ficha.getByTestId("se-cobra")).toHaveText("$4.000");
 
   // Queda guardado aunque se recargue con el pedido en vuelo: el cambio se anota en el
   // dispositivo antes de mandarse y se reenvía al arrancar. Acá el servidor "tarda" 5 s.

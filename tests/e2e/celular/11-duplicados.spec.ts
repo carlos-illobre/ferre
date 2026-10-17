@@ -64,14 +64,16 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await expect(page.getByTestId("producto")).toHaveCount(1);
   await page.getByTestId("producto").first().click();
   const ficha = page.getByTestId("ficha-producto");
-  await expect(ficha.getByTestId("otros-proveedores")).toContainText("★ Proveedor barato (e2e)");
-  await expect(ficha.getByTestId("otros-proveedores")).toContainText("$2.400,00");
+  // Primero el proveedor en uso, el barato, con la estrella; la flecha muestra el otro (specs/016).
+  await expect(ficha.getByTestId("proveedor-en-uso")).toContainText("Proveedor barato (e2e)★");
+  await expect(ficha.getByTestId("proveedor-en-uso")).toContainText("$2.400,00");
+  await expect(ficha).toContainText("$6.000"); // 2400 × 2 × 1,21 = 5808 → 6000
+  await ficha.getByTestId("proveedor-en-uso").click();
   await expect(ficha.getByTestId("otros-proveedores")).toContainText("Proveedor caro (e2e)");
   await expect(ficha.getByTestId("otros-proveedores")).toContainText("$3.000,00");
-  await expect(ficha).toContainText("$6.000"); // 2400 × 2 × 1,21 = 5808 → 6000
 
   // Elegir el caro a mano: el precio sigue a ese costo.
-  await ficha.getByTestId("proveedor-de-producto").filter({ hasText: "Proveedor caro" }).click();
+  await ficha.getByTestId("proveedor-de-producto").click();
   await expect(ficha).toContainText("$8.000", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
   await page.keyboard.press("Escape");
 

@@ -2,16 +2,25 @@
 .cb { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 14px; color: var(--p-tinta); font-size: 1rem; line-height: 1.4; }
 .cb *, .cb *::before { box-sizing: border-box; }
 .cb p { margin: 0; }
-.cb-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.cb-rotulo { font-weight: 700; }
-.cb code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.05rem; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 8px; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); }
+/* La ficha renovada (specs/016, maqueta A): el código en su caja con «copiar» adentro, y escanear al lado. */
+.cb-titulo { margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--p-verde); }
+.cb-fila { display: flex; align-items: stretch; gap: 8px; }
+.cb-caja { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 48px; padding: 0 4px 0 12px; border-radius: 12px; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); }
+.cb code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1rem; letter-spacing: 0.02em; white-space: nowrap; }
 .cb-sin { color: var(--p-texto-2); }
+.cb-copiar { flex: none; width: 36px; height: 40px; border-radius: 10px; border: 0; background: none; color: var(--p-verde); display: grid; place-items: center; cursor: pointer; }
+.cb-copiar:hover { background: var(--p-superficie); }
+.cb-ok { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-size: 0.9375rem; }
+.cb-ok b { display: block; color: var(--p-verde); }
+.cb-ok i { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--p-ok); color: #fff; display: grid; place-items: center; font-style: normal; }
+.cb-lectura { color: var(--p-texto-2); font-size: 0.9375rem; }
+.cb-copiado { color: var(--p-verde-texto); font-weight: 650; font-size: 0.9375rem; }
 .cb-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 16px; border-radius: 12px; border: 1.5px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font: inherit; font-weight: 700; cursor: pointer; }
-.cb-fila .cb-boton { margin-left: auto; }
+.cb-fila .cb-boton { flex: none; max-width: 52%; line-height: 1.15; text-align: left; }
 .cb-boton:hover { background: var(--p-fondo-2); }
 .cb-boton.fuerte { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
 .cb-boton.fuerte:hover { background: var(--p-verde-2); }
-.cb-aviso { padding: 10px 14px; border-radius: 12px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-weight: 650; }
+.cb-aviso { padding: 10px 14px; border-radius: 12px; background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); font-weight: 650; }
 .cb-error { color: var(--p-naranja-texto); font-weight: 650; }
 .cb-panel { display: flex; flex-direction: column; gap: 10px; }
 .cb-campo { display: flex; flex-direction: column; gap: 6px; }
@@ -20,4 +29,5 @@
 .cb-acciones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 .cb-ayuda { color: var(--p-texto-2); font-size: 0.9375rem; }
 .cb :focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
-@media (max-width: 899px) { .cb-fila .cb-boton { margin-left: 0; flex: 1 1 100%; } .cb-acciones .cb-boton { flex: 1; } }
+@media (max-width: 899px) { .cb-fila .cb-boton { max-width: 38%; padding: 0 10px; } .cb-acciones .cb-boton { flex: 1; } }
+.cb-boton svg, .cb-copiar svg { width: 20px; height: 20px; flex: none; }

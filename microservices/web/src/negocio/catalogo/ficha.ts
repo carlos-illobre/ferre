@@ -45,7 +45,10 @@ export function useOrigenDeLista(listaId: string | null | undefined, puedeVerlo:
     let vigente = true;
     setOrigen({ estado: "cargando" });
     api<OrigenDeLista>(`/listas/${listaId}/origen`)
-      .then((o) => { memoria.set(listaId, o); if (vigente) setOrigen({ estado: "listo", origen: o }); })
+      .then((o) => {
+        if (typeof o?.archivo_nombre !== "string" || typeof o.productos !== "number") { if (vigente) setOrigen({ estado: "no-esta" }); return; }
+        memoria.set(listaId, o); if (vigente) setOrigen({ estado: "listo", origen: o });
+      })
       .catch((e: unknown) => { if (vigente) setOrigen(e instanceof ErrorApi ? { estado: "no-esta" } : { estado: "sin-conexion" }); });
     return () => { vigente = false; };
   }, [listaId, puedeVerlo]);

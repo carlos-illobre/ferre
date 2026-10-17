@@ -64,6 +64,7 @@ const TRAZOS = {
   filtros: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0M8 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0M16 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0",
   carrito: "M3 4h2.2l2.1 10.4a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.3M8.2 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0M15.7 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0",
   procesos: "M3 4h7v6H3zM14 14h7v6h-7zM10 7h7v7",
+  calculadora: "M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM8 6h8M16 14v4M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01",
   estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
   google: "M21 12.200c0-.700-.060-1.300-.180-1.900H12v3.700h5a4.300 4.300 0 0 1-1.900 2.800v2.300h3A9 9 0 0 0 21 12.200ZM12 21a8.800 8.800 0 0 0 6.100-2.200l-3-2.300A5.500 5.500 0 0 1 6.900 13.600H3.800V16A9 9 0 0 0 12 21Z",
   filtro: "M4 5h16l-6 7.500V19l-4-2v-4.500Z",
@@ -120,14 +121,17 @@ export function Pagina({ titulo, bajada, acciones, children, className, testId }
 
 // Ventana sobre lo que se está haciendo. Usa <dialog>: el navegador encierra el foco, lo
 // devuelve al cerrar y cierra con Escape. En el celular sube desde abajo.
-export function Hoja({ titulo, alCerrar, children, pie, ancha, testId, alTeclear }: { titulo: ReactNode; alCerrar: () => void; children: ReactNode; pie?: ReactNode; ancha?: boolean; testId?: string; alTeclear?: (e: React.KeyboardEvent<HTMLDialogElement>) => void }) {
+// `foto`, `sobreTitulo` y `bajoTitulo` arman un encabezado más rico (la ficha del producto, specs/016):
+// la foto a la izquierda y, alrededor del título, una etiqueta y un renglón de detalle.
+export function Hoja({ titulo, alCerrar, children, pie, ancha, testId, alTeclear, foto, sobreTitulo, bajoTitulo }: { titulo: ReactNode; alCerrar: () => void; children: ReactNode; pie?: ReactNode; ancha?: boolean; testId?: string; alTeclear?: (e: React.KeyboardEvent<HTMLDialogElement>) => void; foto?: ReactNode; sobreTitulo?: ReactNode; bajoTitulo?: ReactNode }) {
   const ref = useDialogo(alCerrar);
   const idTitulo = useId();
   return (
     <dialog ref={ref} className={`hoja ${ancha ? "ancha" : ""}`} aria-labelledby={idTitulo} data-testid={testId} onKeyDown={alTeclear}
       onClick={(e) => { if (e.target === e.currentTarget) alCerrar(); }}>
-      <div className="hoja-cabeza">
-        <h2 id={idTitulo}>{titulo}</h2>
+      <div className={`hoja-cabeza ${foto ? "con-foto" : ""}`}>
+        {foto}
+        {sobreTitulo || bajoTitulo ? <div className="hoja-titulos">{sobreTitulo}<h2 id={idTitulo}>{titulo}</h2>{bajoTitulo}</div> : <h2 id={idTitulo}>{titulo}</h2>}
         <Boton icono="cerrar" aria-label="Cerrar" onClick={alCerrar} />
       </div>
       <div className="hoja-cuerpo">

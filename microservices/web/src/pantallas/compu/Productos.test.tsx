@@ -8,6 +8,7 @@ vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalog
 const descargar = vi.hoisted(() => vi.fn(async () => undefined));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar }));
 
+import { ventaActual } from "../../negocio/ventas/venta-en-curso";
 import { Productos } from "./base/pantallas/Productos";
 
 function armar() {
@@ -94,18 +95,36 @@ describe("Productos (v2)", () => {
     fireEvent.click(foco()!);
     expect(falso.actualizarProducto).toHaveBeenCalledWith("sil", { margen_elegido: 200 });
 
-    const [barato, caro] = within(ficha).getAllByTestId("proveedor-de-producto");
+    // ↓ recorre las partes de la ficha: el proveedor en uso (Enter muestra los demás), «Usar»
+    // del otro, «Así se calcula», «Listo» y «Agregar a la venta» (specs/016).
     tecla("ArrowDown");
-    expect(foco()).toBe(barato);
+    const enUso = within(ficha).getByTestId("proveedor-en-uso");
+    expect(foco()).toBe(enUso);
+    fireEvent.click(enUso);
     tecla("ArrowDown");
-    expect(foco()).toBe(caro);
-    tecla("ArrowDown");
-    expect(foco()).toBe(within(ficha).getByTestId("ficha-listo"));
-    tecla("ArrowDown");
-    expect(foco()).toBe(within(ficha).getByTestId("ficha-listo"));
-    tecla("ArrowUp"); tecla("ArrowUp"); tecla("ArrowUp");
-    // ↑ desde el primer proveedor vuelve al margen elegido.
+    expect(foco()).toBe(within(ficha).getByTestId("proveedor-de-producto"));
+    fireEvent.click(foco()!);
+    expect(falso.actualizarProducto).toHaveBeenCalledWith("sil", { proveedor_preferido_id: "c" });
+    for (let i = 0; i < 6; i++) tecla("ArrowDown");
+    expect(foco()).toBe(within(ficha).getByTestId("ficha-agregar"));
+    for (let i = 0; i < 8; i++) tecla("ArrowUp");
+    // ↑ desde la primera parte vuelve al margen elegido.
     expect(foco()).toBe(within(ficha).getByTestId("margen-200"));
+  });
+
+  it("016-E27: en la ficha, «+» agrega a la venta (con Ctrl no) y Mayús + 1 a 5 fijan el margen", () => {
+    const falso = catalogoFalso([producto({ id: "sil", descripcion: "SILICONA", costo_neto: "2400", margen_elegido: 100 })]);
+    catalogo.actual = falso;
+    render(<Productos />);
+    fireEvent.keyDown(window, { key: "Enter" });
+    const ficha = screen.getByTestId("ficha-producto");
+    fireEvent.keyDown(ficha, { key: "+", ctrlKey: true });
+    expect(ventaActual().items).toHaveLength(0);
+    fireEvent.keyDown(ficha, { key: "+" });
+    expect(ventaActual().items.map((it) => it.descripcion)).toEqual(["SILICONA"]);
+    expect(within(ficha).getByTestId("mensaje-ficha").textContent).toContain("Agregado a la venta: SILICONA");
+    fireEvent.keyDown(ficha, { key: "!", code: "Digit1", shiftKey: true });
+    expect(falso.actualizarProducto).toHaveBeenCalledWith("sil", { margen_elegido: 300 });
   });
 
   it("Enter abre la ficha del producto elegido", () => {

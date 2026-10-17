@@ -1,27 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { SiVeCostos, useVeCostos } from "../Costos";
-import { CodigoDeBarras } from "../CodigoDeBarras";
+import { SiVeCostos } from "../Costos";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
 import { AvisoError, Buscador, Hoja, Icono, Toast, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
-import { Explicacion } from "./componentes/Explicacion";
-import { FotoProducto } from "./componentes/Foto";
 import { traerPorCodigo, useCatalogo } from "../../catalogo";
 import { useDebounce } from "../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
-import { descargar, subirFoto } from "../../api";
-import { fecha, pesos, pesosCortos } from "../../formato";
+import { pesos, pesosCortos } from "../../formato";
 import { irA } from "../../rutas";
 import { Listas } from "./pantallas/Listas";
 import { Duplicados } from "./pantallas/Duplicados";
 import type { Producto } from "./pantallas/Productos";
-import { margenAMano, otroMargen, precioDelProducto } from "../../negocio/catalogo/precio";
+import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { cuantosFiltros, filtrar, marcasDe, SIN_FILTROS, stockDe, type Disponibilidad, type Filtros } from "../../negocio/catalogo/stock-y-filtros";
 import { agregarALaVenta } from "../../negocio/ventas/venta-en-curso";
 import { cuantosProductos, TEXTOS } from "../textos";
+import { FichaProducto } from "./FichaProducto";
 import "./catalogo.css";
 
 // Catálogo: productos con margen y proveedores, listas de precios, duplicados. Tres
@@ -202,80 +199,3 @@ function HojaDeFiltros({ filtros, marcas, cuantos, alCambiar, alCerrar }: { filt
   );
 }
 
-// Ficha del producto: precio con explicación, margen (botones u otro), proveedores con el
-// más barato, foto, y la lista de origen para bajar el Excel.
-export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; alCerrar: () => void; quienLoTiene: (codigo: string) => Producto | undefined; alCambiar: (c: Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string }) => void }) {
-  const fijaMargen = usePuede()("catalogo.margenes");
-  const { costo, iva, calculo: calculado } = precioDelProducto(p);
-  const manual = margenAMano(p);
-  const veCostos = useVeCostos();
-  const [otro, setOtro] = useState(manual === null ? "" : String(manual));
-  const [mensaje, setMensaje] = useState<string | null>(null);
-  useEffect(() => { setOtro(manual === null ? "" : String(manual)); }, [manual]);
-  const masBarato = p.proveedores?.[0]?.proveedor_id;
-
-  return (
-    <Hoja alCerrar={alCerrar} testId="ficha-producto">
-      <div className="ficha-cabeza">
-        <FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} alSubir={async (archivo) => alCambiar({ foto_url: await subirFoto(p.id, archivo) })} />
-        <div className="textos">
-          <strong>{p.descripcion}</strong>
-          <small>{[p.marca, p.codigo_proveedor ? `código ${p.codigo_proveedor}` : null].filter(Boolean).join(" · ")}</small>
-        </div>
-      </div>
-      <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-ficha" />
-      <CodigoDeBarras producto={p} celular alGuardar={(codigo) => alCambiar({ codigo_barras: codigo })} quienLoTiene={quienLoTiene} />
-      <div className="tarjeta">
-        <div className="fila-precio">
-          <small>Precio de venta</small>
-          {calculado ? <Explicacion conCosto valor={pesosCortos(calculado.valor)} pasos={calculado.pasos} /> : <span className="importe" style={{ fontSize: 22, color: "var(--coral-texto)" }} data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
-        </div>
-        {fijaMargen && <>
-        <div className="cuadricula-5" role="radiogroup" aria-label="margen">
-          {MARGENES.map((m, i) => (
-            <button key={m} type="button" className={`boton ${p.margen_elegido === m ? "activo" : ""}`} title={`Shift+${i + 1}`} disabled={costo === null} onClick={() => alCambiar({ margen_elegido: m })}>{m} %</button>
-          ))}
-        </div>
-        <div className="fila-otro">
-          <span>Otro margen{manual !== null ? ` · ${manual} % a mano` : ""}</span>
-          <label className="campo"><input inputMode="numeric" placeholder="ej. 120" value={otro} disabled={costo === null} data-testid="otro-margen"
-            onChange={(e) => setOtro(e.target.value.replace(/[^\d]/g, ""))}
-            onKeyDown={(e) => { if (e.key === "Enter") { const v = otroMargen(otro); if (v !== null) alCambiar({ margen_elegido: v }); } }}
-            onBlur={() => { const v = otroMargen(otro); if (v !== null && v !== p.margen_elegido) alCambiar({ margen_elegido: v }); }} /><span>%</span></label>
-        </div>
-        </>}
-      </div>
-      {veCostos && (p.proveedores?.length ?? 0) > 0 && (
-        <>
-          <h2 className="seccion">Proveedores · el costo sale del elegido</h2>
-          <Lista data-testid="otros-proveedores">
-            {p.proveedores!.map((v) => {
-              const activo = v.proveedor === p.proveedor;
-              return (
-                <button key={v.proveedor_id} type="button" className="fila" onClick={() => !activo && alCambiar({ proveedor_preferido_id: v.proveedor_id })} data-testid="proveedor-de-producto">
-                  <span className="nombre">{v.proveedor_id === masBarato ? "★ " : ""}{v.proveedor}</span>
-                  <span className="derecha" style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                    <strong className="importe" style={{ fontSize: 19 }}>{pesos(v.costo_neto)}</strong>
-                    <span className={`radio-circulo ${activo ? "activo" : ""}`} aria-label={activo ? "en uso" : "usar"}>{activo && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5 5L20 7" /></svg>}</span>
-                  </span>
-                  <span className="detalle">lista del {fecha(v.fecha_lista)}{v.proveedor_id === masBarato ? " · el más barato" : ""}{activo ? " · en uso" : " · tocá para usar"}</span>
-                </button>
-              );
-            })}
-          </Lista>
-        </>
-      )}
-      {veCostos && costo !== null && (
-        <div className="acciones" style={{ flexWrap: "wrap" }}>
-          <Explicacion className="boton texto" valor={`¿Cómo se calcula el costo ${pesos(costo)}?`} pasos={p.explicacion_costo.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`]} />
-          {p.fecha_lista && p.lista_importada_id && (
-            <button type="button" className="boton texto gris" data-testid="bajar-lista" onClick={() => descargar(`/listas/${p.lista_importada_id}/archivo`, `lista ${p.proveedor ?? ""} ${p.fecha_lista}.xlsx`).catch((err: Error) => setMensaje(`No se pudo bajar la lista: ${err.message}`))}>
-              Bajar el Excel de la lista del {fecha(p.fecha_lista)}
-            </button>
-          )}
-        </div>
-      )}
-      <button type="button" className="boton tinta" onClick={alCerrar}>Listo</button>
-    </Hoja>
-  );
-}

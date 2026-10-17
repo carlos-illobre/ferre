@@ -50,13 +50,13 @@ describe("Catálogo · Productos", () => {
     fireEvent.click(fila("MECHA"));
     fireEvent.click(within(ficha()).getByRole("button", { name: "100 %" }));
     expect(within(ficha()).getByRole("button", { name: "100 %" }).className).toContain("activo");
-    expect(within(ficha()).getByRole("button", { name: "De dónde sale $4.000" })).toBeTruthy(); // 1500 × 2 × 1,21 = 3630 → 4000
+    expect(within(ficha()).getByTestId("precio-de-venta").textContent).toBe("$4.000"); // 1500 × 2 × 1,21 = 3630 → 4000
     fireEvent.keyDown(window, { key: "Escape" });
     expect(fila("MECHA").textContent).toContain("$4.000");
     buscar("taladro");
     fireEvent.click(fila("TALADRO"));
     fireEvent.click(within(ficha()).getByRole("button", { name: "25 %" }));
-    expect(within(ficha()).getByRole("button", { name: "De dónde sale $182.000" })).toBeTruthy(); // 181.500 → 182.000
+    expect(within(ficha()).getByTestId("precio-de-venta").textContent).toBe("$182.000"); // 181.500 → 182.000
   });
 
   it("el margen elegido se guarda en el producto (memoria al recargar)", () => {
@@ -75,23 +75,29 @@ describe("Catálogo · Productos", () => {
     fireEvent.change(caja, { target: { value: "20" } });
     fireEvent.keyDown(caja, { key: "Enter" });
     expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { margen_elegido: 20 });
-    expect(within(ficha()).getByRole("button", { name: "De dónde sale $3.000" })).toBeTruthy(); // 1500 × 1,2 × 1,21 = 2178 → 3000
+    expect(within(ficha()).getByTestId("precio-de-venta").textContent).toBe("$3.000"); // 1500 × 1,2 × 1,21 = 2178 → 3000
     expect(ficha().textContent).toContain("20 % a mano");
     for (const m of ["300 %", "200 %", "100 %", "50 %", "25 %"]) expect(within(ficha()).getByRole("button", { name: m }).className).not.toContain("activo");
   });
 
-  it("la explicación del costo y del precio muestran los pasos numerados", () => {
+  it("016-E18 016-E19: «Así se calcula» se despliega con la cuenta del costo y del precio, y sigue al margen", () => {
     const { buscar } = armar();
     buscar("mecha");
     fireEvent.click(fila("MECHA"));
     fireEvent.click(within(ficha()).getByRole("button", { name: "100 %" }));
-    fireEvent.click(within(ficha()).getByRole("button", { name: /Cómo se calcula el costo/ }));
-    expect(screen.getByTestId("hoja-explicacion").textContent).toContain("− 25 % (linea) = 1500");
-    fireEvent.keyDown(window, { key: "Escape" });
-    fireEvent.click(within(ficha()).getByRole("button", { name: "De dónde sale $4.000" }));
-    const pasos = within(screen.getByTestId("hoja-explicacion")).getAllByRole("listitem").map((li) => li.textContent);
-    expect(pasos[1]).toContain("+ 100 % de margen");
-    expect(pasos[3]).toContain("Redondeado para arriba a $4.000,00");
+    expect(within(ficha()).queryByTestId("cuenta")).toBeNull(); // plegado al abrir
+    fireEvent.click(within(ficha()).getByTestId("abrir-calculo"));
+    const cuenta = within(ficha()).getByTestId("cuenta").textContent!;
+    expect(cuenta).toContain("− 25 % (linea) = 1500"); // de dónde sale el costo
+    expect(cuenta).toContain("+ Margen 100 %$1.500,00");
+    expect(cuenta).toContain("+ IVA 21 %$630,00");
+    expect(cuenta).toContain("= Precio con IVA$3.630,00");
+    expect(within(ficha()).getByTestId("se-cobra").textContent).toBe("$4.000");
+    expect(cuenta).toContain("Se redondea hacia arriba a $1.000");
+    fireEvent.click(within(ficha()).getByRole("button", { name: "50 %" })); // 1500 × 1,5 × 1,21 = 2722,5 → 3000
+    expect(within(ficha()).getByTestId("se-cobra").textContent).toBe("$3.000");
+    fireEvent.click(within(ficha()).getByTestId("abrir-calculo"));
+    expect(within(ficha()).queryByTestId("cuenta")).toBeNull(); // se pliega
   });
 
   it("flechas, Enter y Shift+número funcionan aunque la búsqueda no tenga el foco", () => {
@@ -137,10 +143,16 @@ describe("Catálogo · Productos", () => {
     ] })]);
     buscar("silicona");
     fireEvent.click(fila("SILICONA"));
+    // 016-E14 016-E15 016-E16: primero el que está en uso, con la estrella si es el más barato; la flecha muestra los demás.
+    const enUso = within(ficha()).getByTestId("proveedor-en-uso");
+    expect(enUso.textContent).toContain("Barato★Proveedor principal");
+    expect(enUso.textContent).toContain("Costo de compra$2.400,00");
+    expect(within(ficha()).queryByTestId("otros-proveedores")).toBeNull();
+    fireEvent.click(enUso);
     const otros = within(ficha()).getByTestId("otros-proveedores");
-    expect(otros.textContent).toContain("★ Barato");
-    expect(otros.textContent).toContain("en uso");
-    fireEvent.click(within(otros).getAllByTestId("proveedor-de-producto")[1]!);
+    expect(otros.textContent).toContain("Caro");
+    expect(otros.textContent).toContain("$3.000,00");
+    fireEvent.click(within(otros).getByTestId("proveedor-de-producto"));
     expect(falso.actualizarProducto).toHaveBeenCalledWith("sil", { proveedor_preferido_id: "c" });
   });
 
@@ -194,7 +206,10 @@ describe("Catálogo · Productos", () => {
     expect(fila("MECHA").textContent).not.toContain("1.500");
     fireEvent.click(fila("MECHA"));
     expect(ficha().textContent).toContain("$4.000"); // el precio sí: 1500 × 2 × 1,21 = 3630 → 4000
-    expect(within(ficha()).getByTestId("sin-explicacion").textContent).toBe("$4.000");
+    expect(within(ficha()).getByTestId("precio-de-venta").textContent).toBe("$4.000");
+    expect(within(ficha()).queryByTestId("asi-se-calcula")).toBeNull(); // 016-E21
+    expect(within(ficha()).queryByTestId("proveedor-en-uso")).toBeNull();
+    expect(within(ficha()).queryByTestId("archivo-de-origen")).toBeNull();
     expect(ficha().textContent).not.toContain("1.500");
     expect(within(ficha()).queryByTestId("otros-proveedores")).toBeNull();
     expect(within(ficha()).queryByTestId("bajar-lista")).toBeNull();
