@@ -6,6 +6,8 @@
 
 **Status**: Aprobada (Carlos, 2026-10-17, con sus respuestas a las dos aclaraciones)
 
+**Maquetas**: Aprobadas (variante C, Carlos, 2026-10-17: `maquetas/celular-hoy-c.html` y `maquetas/compu-hoy.html`)
+
 **Input**: Carlos, el 2026-10-17, sobre una imagen de referencia de «Ventas de hoy»: que entren la
 comparación con ayer, un gráfico de lo vendido por hora, cada medio de pago en su tarjeta con su
 color y cuántas ventas, tres números (ventas realizadas, productos vendidos, ticket promedio),
@@ -108,7 +110,7 @@ comparación con anteayer; volver a hoy.
 ### Edge Cases
 
 - Una venta cerca de la medianoche cuenta en el día del local (hora de Buenos Aires), como hoy (capacidad 003).
-- Una venta sin mandar todavía (sin conexión): aparece en la lista como hoy, marcada como pendiente, y suma en el total del dispositivo.
+- Una venta sin mandar todavía (sin conexión): como ahora, aparece en «Hoy» cuando llega al servidor.
 - Ayer con ventas solo después de la hora actual: la comparación dice «Ayer a esta hora no había ventas».
 - Un día de muchas ventas (200): la lista sigue siendo de renglones cortos y se desplaza; los números de arriba se ven sin bajar.
 - Quien no tiene «Ver las ventas del día» no ve la pestaña, como hoy.

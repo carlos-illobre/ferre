@@ -24,7 +24,9 @@ Toda función nueva con pantalla se hace en las dos.
 - **Colores por significado (decisión 108).** Un elemento puntual que significa algo (cada medio
   de pago) puede tener su color. Va en la paleta compartida y es el mismo en todas las
   pantallas donde aparece ese elemento, en el celular y en la computadora. Nunca una pantalla
-  entera, un fondo o un panel con colores propios.
+  entera, un fondo o un panel con colores propios. Los medios de pago (017): efectivo verde
+  `#0f6b52` sobre `#e3f3ea`, Mercado Pago celeste `#0a6aa8` sobre `#e2f0fa`, tarjeta violeta
+  `#5b3fb5` sobre `#ece8fb`, cuenta corriente ámbar `#9a5a00` sobre `#fff0d6`.
 
 ## Textos: mínimos en el celular, que explican en la computadora
 
