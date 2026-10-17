@@ -208,6 +208,6 @@ export function useVenta(opciones: OpcionesDeVenta) {
     items, medio, setMedio, clienteId, setClienteId, cliente, total, sinPrecio,
     mensaje, setMensaje, error, setError, ocupado, codigoDesconocido, setCodigoDesconocido,
     cobro, cerrarCobro: () => setCobro(null),
-    agregar, agregarPorCodigo, cambiarItem, cambiarUnidad, quitar, elegirMargen, subirFotoDe, elegirSugerencia, elegirMedio, cobrar, noLlevo,
+    agregar, agregarPorCodigo, cambiarItem, cambiarUnidad, quitar, elegirMargen, subirFotoDe, elegirSugerencia, elegirMedio, cobrar, noLlevo, vaciar,
   };
 }

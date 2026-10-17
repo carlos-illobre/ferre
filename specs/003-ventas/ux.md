@@ -70,6 +70,19 @@ renglón sin soltar el teclado. Con la venta armada, el Enter final la cierra.
 a la cámara al lado de la búsqueda lee el código de barras y agrega el producto. Cobrar y
 el total quedan al alcance del pulgar.
 
+**La lista de la venta en el celular** (Carlos, 2026-10-17; maqueta aprobada
+`maquetas/celular-venta-renglones.png`, sobre su referencia `maquetas/celular-venta-referencia-de-carlos.png`):
+
+- Arriba, «Productos en esta venta», con «Vaciar» (pregunta antes) y cuántos productos hay.
+- Cada renglón, en una tarjeta compacta: la foto, el nombre y debajo marca, proveedor y stock; a
+  la derecha, el precio por unidad en una pastilla verde suave, con la unidad debajo («cada uno»,
+  «el m», «el kg»); y un menú «⋮».
+- Abajo, en una sola fila: el tacho para quitar (debajo de la foto), la cantidad con − y +, el
+  margen y, a la derecha, el total del renglón (precio por cantidad).
+- El menú «⋮» tiene «Precio a mano», «Vender por metro, kilo o unidad» (ahí se cambia la unidad,
+  que no está a la vista porque se cambia poco), «Ver la ficha del producto» y «Sacar foto».
+  Un ítem libre (sin producto) tiene solo «Precio a mano» y la unidad.
+
 **Estados:**
 
 - *Vacío:* la venta nueva dice que se escriba el nombre del producto o se escanee el código.

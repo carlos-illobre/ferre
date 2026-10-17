@@ -81,6 +81,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(page.getByTestId("total")).toContainText("$10.000");
   // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto. 1,5 kg × $1.000 =
   // $1.500: el renglón se redondea para arriba a $2.000 para no dar vuelto (RF-19).
+  await tornillo.getByTestId("mas-del-renglon").click();
+  await tornillo.getByRole("menuitem", { name: "Vender por metro, kilo o unidad" }).click();
   await tornillo.getByTestId("unidad").selectOption("kg");
   await tornillo.getByTestId("cantidad").fill("1.5");
   await expect(page.getByTestId("total")).toContainText("$11.000");

@@ -28,7 +28,13 @@ function armar(ventas: unknown = ventasVacias, sub: string | null = null) {
   const busqueda = screen.queryByTestId("busqueda")!;
   const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
   const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.includes(texto))!;
-  return { falso, busqueda, agregar, item, unmount };
+  // La unidad se cambia desde el menú «⋮» del renglón (003-T001).
+  const unidad = (texto: string) => {
+    fireEvent.click(within(item(texto)).getByTestId("mas-del-renglon"));
+    fireEvent.click(within(item(texto)).getByRole("menuitem", { name: "Vender por metro, kilo o unidad" }));
+    return within(item(texto)).getByTestId("unidad");
+  };
+  return { falso, busqueda, agregar, item, unidad, unmount };
 }
 
 // Todo lo que pidió el dueño para Vender, sobre el rediseño: renglones como tarjetas,
@@ -59,9 +65,9 @@ describe("Vender", () => {
   });
 
   it("a granel (kg) admite un decimal, el + suma de a 0,5 y la unidad queda guardada en el producto", () => {
-    const { agregar, item, falso } = armar();
+    const { agregar, item, unidad, falso } = armar();
     agregar("mecha vender");
-    fireEvent.change(within(item("MECHA")).getByTestId("unidad"), { target: { value: "kg" } });
+    fireEvent.change(unidad("MECHA"), { target: { value: "kg" } });
     expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { unidad: "kg" });
     const cantidad = within(item("MECHA")).getByTestId("cantidad") as HTMLInputElement;
     fireEvent.change(cantidad, { target: { value: "1.55" } });
@@ -136,10 +142,40 @@ describe("Vender", () => {
     expect(screen.getByTestId("titulo-venta").textContent).toContain("1 producto");
   });
 
-  it("quitar un producto es un botón con nombre, y la unidad litro se escribe L", () => {
+  it("cada renglón muestra el precio por unidad y su total; la unidad queda detrás del menú «⋮»", () => {
     const { agregar, item } = armar();
     agregar("mecha vender");
-    expect(within(item("MECHA")).getByTestId("unidad").textContent).toContain("L");
+    const mecha = within(item("MECHA"));
+    expect(mecha.queryByTestId("unidad")).toBeNull();
+    expect(item("MECHA").querySelector(".unitario")?.textContent).toContain("$3.000");
+    expect(item("MECHA").querySelector(".unitario")?.textContent).toContain("cada uno");
+    fireEvent.click(mecha.getByRole("button", { name: "Más" }));
+    expect(mecha.getByTestId("subtotal").textContent).toBe("$6.000");
+    fireEvent.click(mecha.getByTestId("mas-del-renglon"));
+    const menu = mecha.getByRole("menu");
+    expect(within(menu).getAllByRole("menuitem").map((b) => b.textContent)).toEqual(["Precio a mano", "Vender por metro, kilo o unidad", "Ver la ficha del producto", "Sacar foto"]);
+    fireEvent.click(within(menu).getByRole("menuitem", { name: "Precio a mano" }));
+    expect(mecha.queryByRole("menu")).toBeNull();
+    expect(mecha.getByTestId("precio-manual")).toBeTruthy();
+  });
+
+  it("Vaciar saca todos los productos, después de confirmar", () => {
+    const { agregar } = armar();
+    agregar("mecha vender");
+    agregar("tornillo vender");
+    const confirmar = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
+    fireEvent.click(screen.getByTestId("vaciar-venta"));
+    expect(screen.getAllByTestId("item")).toHaveLength(2);
+    fireEvent.click(screen.getByTestId("vaciar-venta"));
+    expect(confirmar).toHaveBeenCalledWith("¿Vaciar la venta? Se sacan todos los productos.");
+    expect(screen.queryAllByTestId("item")).toHaveLength(0);
+    confirmar.mockRestore();
+  });
+
+  it("quitar un producto es un botón con nombre, y la unidad litro se escribe L", () => {
+    const { agregar, item, unidad } = armar();
+    agregar("mecha vender");
+    expect(unidad("MECHA").textContent).toContain("L");
     fireEvent.click(within(item("MECHA")).getByRole("button", { name: /Quitar MECHA VENDER 8 MM de la venta/ }));
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
   });
@@ -247,6 +283,6 @@ describe("Vender", () => {
     fireEvent.click(within(item("TORNILLO")).getByRole("button", { name: "300 %" }));
     expect(item("TORNILLO").textContent).toContain("$1.000");
     expect(item("TORNILLO").textContent).not.toContain("Costo");
-    expect(within(item("TORNILLO")).getByTestId("sin-explicacion")).toBeTruthy();
+    expect(within(item("TORNILLO")).getAllByTestId("sin-explicacion")).toHaveLength(2); // el precio por unidad y el total del renglón
   });
 });

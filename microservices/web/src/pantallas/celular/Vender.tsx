@@ -26,6 +26,7 @@ import { AnularVentas, VentasDeHoy } from "./pantallas/VentasDeHoy";
 import { Pestanas } from "./Pestanas";
 import { SinPermiso } from "../SinPermiso";
 import type { Producto } from "./pantallas/Productos";
+import { FichaProducto } from "./Catalogo";
 
 // La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
 // precio → cantidad → cobro. Enter agrega; Esc descarta ("no llevó"); F2 cobra. Cada
@@ -94,6 +95,8 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     alCobrar: (c) => setMensaje(c.encolado ? `Venta guardada en este dispositivo (${pesos(c.total)}). Sin conexión: se envía sola cuando vuelva.` : `Venta registrada: ${pesos(c.total)} en ${(NOMBRE_DE_MEDIO[c.medio]).toLowerCase()}.`),
   });
   const { items, medio, setMedio, clienteId, setClienteId, cliente, total, sinPrecio, mensaje, setMensaje, error, setError, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, quitar, elegirMargen, elegirSugerencia, elegirMedio, cobrar } = venta;
+  const [ficha, setFicha] = useState<string | null>(null);
+  const productoDeLaFicha = ficha ? (catalogo ?? []).find((p) => p.id === ficha) ?? items.find((i) => i.producto?.id === ficha)?.producto ?? null : null;
   // Un código que no es de ningún producto deja la búsqueda limpia, para elegir a cuál asociarlo.
   const agregarPorCodigo = useCallback((codigo: string) => { const conocido = venta.agregarPorCodigo(codigo); setConsulta(""); return conocido; }, [venta.agregarPorCodigo]);
   const noLlevo = () => venta.noLlevo(TEXTOS.vender.noLlevo.corto);
@@ -224,10 +227,19 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </div>
         )}
 
-        {items.length > 0 && <h2 className="en-venta" data-testid="titulo-venta">En esta venta<span>{items.length} {items.length === 1 ? "producto" : "productos"}</span></h2>}
+        {items.length > 0 && (
+          <div className="en-venta" data-testid="titulo-venta">
+            <h2>Productos en esta venta</h2>
+            <button type="button" className="vaciar" onClick={() => { if (window.confirm("¿Vaciar la venta? Se sacan todos los productos.")) venta.vaciar(); }} data-testid="vaciar-venta">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>Vaciar
+            </button>
+            <span>{items.length} {items.length === 1 ? "producto" : "productos"}</span>
+          </div>
+        )}
         {items.map((it) => (
           <ItemDeVenta key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined}
             alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it.clave)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
+            alVerFicha={it.producto ? () => setFicha(it.producto!.id) : undefined}
             alSubirFoto={it.producto ? async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); } : undefined} />
         ))}
       </div>
@@ -273,6 +285,11 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </Lista>
         </Hoja>
       )}
+      {productoDeLaFicha && (
+        <FichaProducto producto={productoDeLaFicha as Producto} alCerrar={() => setFicha(null)}
+          quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== productoDeLaFicha.id && x.codigo_barras === codigo) as Producto | undefined}
+          alCambiar={(c) => { actualizarProducto(productoDeLaFicha.id, c as never).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`)); }} />
+      )}
       {exito && (
         <Exito que={exito.detalle.startsWith("Sin conexión") ? "Guardada en este dispositivo" : "Venta registrada"} importe={pesosCortos(exito.total)} medio={exito.medio} detalle={exito.detalle} boton="Nueva venta"
           alCerrar={() => { venta.cerrarCobro(); setMensaje(null);  }} />
@@ -281,42 +298,68 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   );
 }
 
-function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto }: {
-  item: Item; stock: number | undefined; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alSubirFoto?: (archivo: File) => Promise<void>;
+// Un renglón de la venta (003-T001, maqueta celular-venta-renglones.png): arriba la foto, el nombre y
+// el precio por unidad en una pastilla, con un menú «⋮»; abajo el tacho, la cantidad, el margen y el
+// total del renglón. La unidad se cambia desde el menú, porque se cambia poco.
+const POR_UNIDAD: Record<Unidad, string> = { unidad: "cada uno", kg: "el kg", m: "el m", l: "el L" };
+
+function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto, alVerFicha }: {
+  item: Item; stock: number | undefined; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alSubirFoto?: (archivo: File) => Promise<void>; alVerFicha?: () => void;
 }) {
   const p = precioDe(it);
   const producto = it.producto;
   const renglon = subtotalDe(it);
   const subtotal = renglon?.valor ?? null;
+  const [menu, setMenu] = useState(false);
+  const [viendoUnidad, setViendoUnidad] = useState(false);
+  const raiz = useRef<HTMLDivElement>(null);
   const margenTexto = it.precioManual !== null ? "a mano" : p.margen === null ? "elegí margen" : `${p.margen} %${esMargenBoton(p.margen) ? "" : " a mano"}`;
+  const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
+  const elegir = (accion: () => void) => () => { setMenu(false); accion(); };
   return (
-    <div className="item" data-testid="item">
+    <div className="item" data-testid="item" ref={raiz}>
       <div className="cabeza">
         {producto ? <FotoProducto id={producto.id} url={producto.foto_url ?? null} descripcion={producto.descripcion} alSubir={alSubirFoto} /> : <span className="miniatura foto-chica" />}
-        {producto ? <span className="nombre" style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.25 }}>{it.descripcion}</span>
+        {producto ? <span className="nombre">{it.descripcion}</span>
           : <input className="linea-editable" value={it.descripcion} placeholder="¿Qué se lleva?" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
-        {subtotal !== null ? (
-          <Explicacion conCosto className="subtotal" valor={pesosCortos(subtotal)} pasos={[...p.pasos, ...(renglon?.pasos ?? [])]} />
+        {p.unitario !== null ? (
+          <span className="unitario"><Explicacion conCosto valor={pesosCortos(p.unitario)} pasos={p.pasos} /><small>{POR_UNIDAD[it.unidad]}</small></span>
+        ) : producto ? (
+          <button type="button" className="unitario falta" onClick={() => alCambiar({ abierto: true })} data-testid="sin-precio">sin precio</button>
         ) : (
-          <label className="campo falta importe-campo"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus={!producto} value={it.precioManual ?? ""} onChange={(e) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) })} data-testid="precio-manual" /></label>
+          <label className="campo falta importe-campo"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus value={it.precioManual ?? ""} onChange={precioAMano} data-testid="precio-manual" /></label>
         )}
+        <button type="button" className="mas-del-renglon" onClick={() => setMenu(!menu)} aria-expanded={menu} aria-haspopup="menu" aria-label={`Más opciones de ${it.descripcion || "este renglón"}`} data-testid="mas-del-renglon">⋮</button>
         <small className="detalle">{producto ? `${detalleDe(producto)}${stock !== undefined ? ` · stock ${num(stock)}${stock - it.cantidad < 0 ? ` (${TEXTOS.vender.stockNoAlcanza.corto})` : ""}` : ""}` : "Ítem libre"}</small>
       </div>
+      {menu && (
+        <div className="menu-del-renglon" role="menu" data-testid="menu-del-renglon">
+          {producto && p.costo !== null && <button type="button" role="menuitem" onClick={elegir(() => alCambiar({ abierto: true }))}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6" /></svg>Precio a mano</button>}
+          <button type="button" role="menuitem" onClick={elegir(() => setViendoUnidad(true))}><Icono nombre="lista" tam={20} />Vender por metro, kilo o unidad</button>
+          {alVerFicha && <button type="button" role="menuitem" onClick={elegir(alVerFicha)}><Icono nombre="archivo" tam={20} />Ver la ficha del producto</button>}
+          {producto && alSubirFoto && <button type="button" role="menuitem" onClick={elegir(() => raiz.current?.querySelector<HTMLButtonElement>("[data-testid=foto-chica]")?.click())}><Icono nombre="camara" tam={20} />Sacar foto</button>}
+        </div>
+      )}
       <div className="pie">
-        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })}>
-          <select className="selector-nativo unidad" value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
-            {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
-          </select>
-        </Contador>
+        <button type="button" className="quitar" onClick={alQuitar} aria-label={`Quitar ${it.descripcion} de la venta`} title="Quitar de la venta" data-testid="quitar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+        </button>
+        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} />
         {producto && p.costo !== null && (
           <button type="button" className={`chip-margen ${p.margen === null && it.precioManual === null ? "falta" : ""}`} onClick={() => alCambiar({ abierto: !it.abierto })} aria-expanded={it.abierto} aria-label={`Margen: ${margenTexto}`} data-testid="margen">
             {margenTexto}<Icono nombre={it.abierto ? "arriba" : "abajo"} tam={14} grosor={2.5} />
           </button>
         )}
-        <button type="button" className="quitar" onClick={alQuitar} aria-label={`Quitar ${it.descripcion} de la venta`} title="Quitar de la venta" data-testid="quitar">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
-        </button>
+        <span className="total-del-renglon" data-testid="subtotal">{subtotal !== null && <Explicacion conCosto className="subtotal" valor={pesosCortos(subtotal)} pasos={[...p.pasos, ...(renglon?.pasos ?? [])]} />}</span>
       </div>
+      {viendoUnidad && (
+        <div className="abierto unidad-del-renglon">
+          <div className="cabecera"><span>Se vende por</span><button type="button" className="enlace" onClick={() => setViendoUnidad(false)}>Listo</button></div>
+          <select className="selector-nativo unidad" value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
+            {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
+          </select>
+        </div>
+      )}
       {it.abierto && producto && p.costo !== null && (
         <div className="abierto">
           <div className="cabecera">
@@ -328,7 +371,7 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
           </div>
           <div className="fila-otro">
             <span>Otro precio solo para esta venta</span>
-            <label className="campo"><span>$</span><input inputMode="numeric" placeholder="a mano" value={it.precioManual ?? ""} onChange={(e) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) })} data-testid="precio-manual" /></label>
+            <label className="campo"><span>$</span><input inputMode="numeric" placeholder="a mano" value={it.precioManual ?? ""} onChange={precioAMano} data-testid="precio-manual" /></label>
           </div>
         </div>
       )}
