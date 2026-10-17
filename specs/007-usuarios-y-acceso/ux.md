@@ -241,13 +241,35 @@ Maquetas aprobadas por Carlos el 2026-10-14: `maquetas/mas-con-usuarios.html` y
 `maquetas/celular-usuarios.png`, sobre su modelo `maquetas/celular-usuarios-referencia-de-carlos.png`):
 
 1. La bajada: «Gestioná quién puede entrar y con qué roles. Se entra con Google.»
-2. Una cabecera «Usuarios autorizados», «Cada persona puede tener uno o más roles.» y cuántos son.
-3. Justo debajo, «Autorizar otro correo de Google» («Invitá a más personas de tu negocio.»), en un
-   recuadro punteado con un «+» naranja.
+2. «Autorizar otro correo de Google» («Invitá a más personas de tu negocio.»), en un
+   recuadro punteado con un «+» naranja. La cabecera «Usuarios autorizados» con cuántos son,
+   que estaba arriba, se sacó: ocupaba lugar y no hacía falta (Carlos, 2026-10-17).
+3. Debajo, el buscador y la lista «Rol» (ver «Buscar y filtrar por rol»).
 4. Una tarjeta por persona: sus iniciales en un círculo de color, el nombre con «Activo» o
    «Inactivo» y el correo entero debajo; «Roles asignados», cada rol en una pastilla con su
    ícono (el Administrador resaltado); y abajo, «Cambiar roles» y a su derecha «Desactivar»
-   (naranja) o «Reactivar» (verde).
+   (naranja) o «Reactivar» (verde). Nada de la tarjeta usa el color del fondo de la pantalla,
+   para que se destaque (Carlos, 2026-10-17): «Cambiar roles» va en verde lleno con letra
+   blanca; «Desactivar» y «Reactivar», en blanco con borde y letra naranja o verde; y cada
+   pastilla de rol, en blanco con un borde marcado.
+
+**Buscar y filtrar por rol** (Carlos, 2026-10-17; maquetas aprobadas
+`maquetas/celular-usuarios-filtro.png` y `maquetas/compu-usuarios-filtro.png`). En el celular va
+debajo de «Autorizar otro correo de Google»; en la computadora, arriba de la tabla, porque ahí el
+alta está al final. En una misma fila:
+
+- **Un buscador «Correo o nombre»**, con la lupa a la izquierda y una cruz para borrarlo cuando
+  tiene algo. Encuentra a quien tenga lo escrito en cualquier parte del correo o del nombre, sin
+  importar mayúsculas ni tildes («lucia» encuentra a «Lucía»). Mientras se escribe, debajo
+  aparecen hasta cinco sugerencias, del ancho de la fila: el correo con lo escrito resaltado y el
+  nombre. Elegir una (tocándola, o con las flechas y Enter en la computadora) deja el correo en
+  el buscador y cierra las sugerencias; Escape las cierra sin elegir.
+- **Una lista desplegable «Rol»**, que empieza en «Todos» y tiene los roles que existen. Con un
+  rol elegido quedan solo quienes lo tienen; en el celular, la lista se marca en verde.
+- Los dos se combinan. Con cualquiera de los dos puesto, una línea dice cuántos quedan:
+  «2 de 4 usuarios con el rol Recepción», o «1 de 4 usuarios» si solo se buscó. Si no queda
+  nadie: «Nadie coincide con la búsqueda.»
+- Buscar no cambia nada guardado; al salir de la pantalla, el filtro se pierde.
 
 ## Historia 2: administrar usuarios
 

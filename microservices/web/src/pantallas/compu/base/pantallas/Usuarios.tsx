@@ -9,7 +9,8 @@ import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";
 import { IconoCompu, comoCarga, esFallaDeRed, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
-import { autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, useSesiones, useUsuarios, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
+import { autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, partesResaltadas, useSesiones, useUsuarios, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
+import { useFiltroDeUsuarios } from "../../../filtro-de-usuarios";
 import { usePuede } from "../../../permisos";
 import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
 import "../estilos/negocio.css";
@@ -86,6 +87,7 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
   }
 
   const disponibles = useRolesAsignables();
+  const filtro = useFiltroDeUsuarios(filas, disponibles);
   const rolDe = (u: UsuarioFila) => <RolesDeUsuario disponibles={disponibles} actuales={u.roles ?? []} nombre={u.nombre} bloqueado={ocupada === u.id || !enLinea} alGuardar={(ids) => cambiar(u, { roles: ids })} />;
   const accionDe = (u: UsuarioFila) => u.id === yo ? <span className="detalle">A vos te desactiva otra persona</span> : (
     <Boton tam={esCelular ? undefined : "chico"} variante={u.activo ? "peligro" : undefined} disabled={ocupada === u.id || !enLinea} onClick={() => cambiar(u, { activo: !u.activo })} aria-label={`${u.activo ? "Desactivar" : "Reactivar"} a ${u.nombre}`}>
@@ -105,10 +107,11 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
       <Aviso tipo="error" accion={<Boton tam="chico" onClick={lista.recargar}>Reintentar</Boton>}>{lista.error}</Aviso>
       {!lista.datos && !lista.error && <div className="tarjeta negocio-esqueleto" role="status" aria-label="Trayendo los usuarios">{[0, 1, 2].map((i) => <span key={i} className="esqueleto" />)}</div>}
 
+      {lista.datos && <FiltroDeUsuarios filtro={filtro} roles={disponibles} />}
       {lista.datos && (esCelular ? (
         <>
           <ul className="lista" data-testid="usuarios">
-            {filas.map((u) => (
+            {filtro.visibles.map((u) => (
               <li key={u.id} className={`usuarios-tarjeta ${u.activo ? "" : "apagada"}`} data-testid="usuario-fila">
                 <div className="fila">
                   <strong className="crece nombre">{u.nombre}{u.id === yo && <> <Pastilla tipo="azul" sinPunto>Vos</Pastilla></>}</strong>
@@ -128,7 +131,7 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
           <table className="tabla" data-testid="usuarios">
             <thead><tr><th scope="col">Nombre</th><th scope="col">Correo de Google</th><th scope="col">Roles</th><th scope="col">Estado</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
             <tbody>
-              {filas.map((u) => (
+              {filtro.visibles.map((u) => (
                 <FilaConError key={u.id} error={errorDe(u)} columnas={5}>
                   <tr className={u.activo ? "" : "atenuada"} data-testid="usuario-fila">
                     <td className="nombre">{u.nombre}{u.id === yo && <> <Pastilla tipo="azul" sinPunto>Vos</Pastilla></>}</td>
@@ -145,6 +148,45 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
         </div>
       ))}
     </section>
+  );
+}
+
+// Arriba de la tabla (decisión 98): el buscador con sus sugerencias, la lista «Rol» y cuántos quedan.
+function FiltroDeUsuarios({ filtro: f, roles }: { filtro: ReturnType<typeof useFiltroDeUsuarios<UsuarioFila>>; roles: RolAsignable[] }) {
+  const t = TEXTOS.usuarios;
+  return (
+    <div className="usuarios-filtro" data-testid="filtro-usuarios">
+      <label className="campo usuarios-buscar">
+        <span>{t.buscar.largo}</span>
+        <span className="usuarios-buscar-caja">
+          <Icono nombre="buscar" tam={18} />
+          <input {...f.combo} className="entrada" type="search" value={f.texto} placeholder={t.correoONombre.largo} autoComplete="off" autoCapitalize="none" spellCheck={false}
+            onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
+          {f.texto && <button type="button" className="usuarios-borrar" onClick={f.borrar} aria-label={t.borrarBusqueda.largo}>✕</button>}
+          {f.sugerencias.length > 0 && (
+            <ul className="usuarios-sugerencias" id={f.listaId} role="listbox" aria-label={t.buscar.largo}>
+              {f.sugerencias.map((u, i) => {
+                const [antes, igual, despues] = partesResaltadas(u.email, f.texto);
+                return (
+                  <li key={u.id} id={f.opcionId(i)} role="option" aria-selected={i === f.activa} className={i === f.activa ? "activa" : ""}
+                    onMouseDown={(e) => e.preventDefault()} onClick={() => f.elegir(u)} data-testid="sugerencia-usuario">
+                    <span>{antes}<b>{igual}</b>{despues}</span><small>{u.nombre}</small>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </span>
+      </label>
+      <label className="campo usuarios-rol">
+        <span>{t.rol.largo}</span>
+        <select className="entrada" value={f.rol ?? ""} onChange={(e) => f.elegirRol(e.target.value)} data-testid="filtro-rol">
+          <option value="">{t.todosLosRoles.largo}</option>
+          {roles.map((r) => <option key={r.id} value={r.id}>{r.nombre}</option>)}
+        </select>
+      </label>
+      {f.resumen && <span className="detalle usuarios-quedan" role="status" data-testid="cuantos-quedan">{f.resumen}</span>}
+    </div>
   );
 }
 

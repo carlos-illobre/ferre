@@ -485,10 +485,31 @@ tr.cambia td { background: #fff8e8; }
 .valor-stock { display: block; text-align: right; font-size: 15px; color: var(--p-texto-2); }
 
 /* Más → Usuarios en el celular (007-T032): cabecera, autorizar a alguien y una tarjeta por persona. */
-.ut-cabeza { display: flex; align-items: center; gap: 12px; background: var(--p-verde-suave); border-radius: 16px; padding: 14px 16px; color: var(--p-verde-texto); }
-.ut-cabeza strong { display: block; font-size: 17px; color: var(--p-verde); }
-.ut-cabeza small { font-size: 14px; color: var(--p-texto-2); }
-.ut-cuantos { margin-left: auto; background: #fff; border-radius: 99px; padding: 6px 12px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+/* Buscar y filtrar por rol (decisión 98) */
+.fu { display: flex; flex-direction: column; gap: 10px; }
+.fu-fila { position: relative; display: flex; gap: 10px; }
+.fu-caja { position: relative; flex: 1; min-width: 0; }
+.fu-caja input { width: 100%; height: 52px; border: 1.5px solid var(--p-borde); border-radius: 14px; padding: 0 44px 0 46px; font: inherit; font-size: 16px; background: #fff; color: var(--p-tinta); appearance: none; }
+.fu-caja input::-webkit-search-cancel-button { display: none; }
+.fu-caja input:focus { outline: none; border-color: var(--p-verde-texto); box-shadow: 0 0 0 3px var(--p-verde-suave); }
+.fu-lupa { position: absolute; left: 14px; top: 15px; color: var(--p-texto-2); pointer-events: none; }
+.fu-borrar { position: absolute; right: 4px; top: 4px; width: 44px; height: 44px; border: 0; background: none; display: grid; place-items: center; color: var(--p-texto-2); font-size: 15px; }
+.fu-borrar::before { content: ""; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: var(--p-relleno); z-index: -1; }
+.fu-borrar { isolation: isolate; }
+.fu-rol { position: relative; flex: none; width: 132px; height: 52px; border: 1.5px solid var(--p-borde); border-radius: 14px; background: #fff; }
+.fu-rol span { position: absolute; left: 12px; top: 6px; font-size: 14px; line-height: 1; color: var(--p-texto-2); pointer-events: none; }
+.fu-rol select { position: absolute; inset: 0; width: 100%; height: 100%; appearance: none; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 600; color: var(--p-verde); padding: 18px 28px 0 12px; border-radius: 14px; text-overflow: ellipsis; }
+.fu-rol::after { content: "▾"; position: absolute; right: 12px; top: 15px; color: var(--p-texto-2); pointer-events: none; }
+.fu-rol.si { border-color: var(--p-verde-texto); background: var(--p-verde-suave); }
+.fu-sugerencias { position: absolute; left: 0; right: 0; top: 58px; z-index: 5; background: #fff; border-radius: 14px; box-shadow: 0 10px 28px rgb(23 49 43 / 0.18); list-style: none; margin: 0; padding: 6px 0; }
+.fu-sugerencias li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; padding: 10px 14px; font-size: 15px; min-height: 44px; }
+.fu-sugerencias li + li { border-top: 1px solid var(--p-borde-suave); }
+.fu-sugerencias li.activa { background: var(--p-verde-suave); }
+.fu-correo { overflow-wrap: anywhere; }
+.fu-sugerencias b { color: var(--p-verde); }
+.fu-sugerencias small { display: block; color: var(--p-texto-2); font-size: 14px; }
+.fu-av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: #e8eefc; color: #2f4fa8; }
+.fu-resultado { margin: 0; font-size: 14px; color: var(--p-texto-2); padding: 0 2px; }
 .ut-alta { display: flex; gap: 14px; align-items: center; width: 100%; border: 1.5px dashed var(--p-borde); border-radius: 18px; padding: 16px; background: rgb(255 255 255 / 0.55); font: inherit; text-align: left; }
 .ut-alta strong { display: block; color: var(--p-naranja-texto); font-size: 16px; }
 .ut-alta small { font-size: 14px; color: var(--p-texto-2); }
@@ -511,11 +532,11 @@ tr.cambia td { background: #fff8e8; }
 .ut-correo { display: block; font-size: 15px; color: var(--p-texto-2); overflow-wrap: anywhere; }
 .ut-rotulo { display: block; font-size: 14px; font-weight: 600; color: var(--p-texto-medio); margin-bottom: 8px; }
 .ut-roles ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.ut-roles li { display: flex; gap: 6px; align-items: center; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); border-radius: 99px; padding: 6px 12px; font-size: 14px; }
+.ut-roles li { display: flex; gap: 6px; align-items: center; background: #fff; border: 1px solid var(--p-borde); color: var(--p-tinta); border-radius: 99px; padding: 6px 12px; font-size: 14px; }
 .ut-roles li.admin { background: var(--p-verde-suave); border-color: #bfe3cf; color: var(--p-verde-texto); }
 .ut-roles li.sin { color: var(--p-texto-2); }
 .ut-abajo { display: flex; gap: 10px; }
-.ut-cambiar { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); border-radius: 12px; font: inherit; font-size: 15px; font-weight: 600; color: var(--p-verde); }
-.ut-flecha { margin-left: auto; color: var(--p-texto-2); }
-.ut-activar { display: flex; gap: 6px; align-items: center; min-height: 48px; padding: 0 14px; border: 1px solid var(--p-naranja-borde); background: var(--p-naranja-suave); color: var(--p-naranja-texto); border-radius: 12px; font: inherit; font-size: 14px; font-weight: 600; }
-.ut-activar.reactivar { border-color: #bfe3cf; background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.ut-cambiar { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; background: var(--p-verde); border: 1px solid var(--p-verde); border-radius: 12px; font: inherit; font-size: 15px; font-weight: 600; color: #fff; }
+.ut-flecha { margin-left: auto; color: rgb(255 255 255 / 0.8); }
+.ut-activar { display: flex; gap: 6px; align-items: center; min-height: 48px; padding: 0 14px; border: 1.5px solid var(--p-naranja); background: #fff; color: var(--p-naranja-texto); border-radius: 12px; font: inherit; font-size: 14px; font-weight: 600; }
+.ut-activar.reactivar { border-color: var(--p-verde-texto); color: var(--p-verde-texto); }

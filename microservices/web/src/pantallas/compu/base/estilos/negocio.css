@@ -134,3 +134,20 @@
 }
 
 @media (max-width: 899px) { .usuarios [data-testid="vincular-celular"] { white-space: normal; padding-block: var(--e2); } }
+
+/* Buscar y filtrar por rol, arriba de la tabla de usuarios (decisión 98) */
+.usuarios-filtro { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.usuarios-filtro .campo { margin: 0; }
+.usuarios-buscar { flex: 0 1 420px; min-width: 240px; }
+.usuarios-buscar-caja { position: relative; display: block; }
+.usuarios-buscar-caja > svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--texto-2); pointer-events: none; }
+.usuarios-buscar-caja .entrada { width: 100%; padding-left: 38px; padding-right: 36px; }
+.usuarios-buscar-caja .entrada::-webkit-search-cancel-button { display: none; }
+.usuarios-borrar { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--superficie-2); color: var(--texto-2); font-size: 13px; display: grid; place-items: center; cursor: pointer; }
+.usuarios-sugerencias { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 5; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-control); box-shadow: 0 10px 28px rgb(23 49 43 / 0.16); list-style: none; margin: 0; padding: 4px 0; }
+.usuarios-sugerencias li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; font-size: 14px; cursor: pointer; }
+.usuarios-sugerencias li:hover, .usuarios-sugerencias li.activa { background: var(--verde-suave); }
+.usuarios-sugerencias b { color: var(--verde); }
+.usuarios-sugerencias small { color: var(--texto-2); font-size: 14px; white-space: nowrap; }
+.usuarios-rol .entrada { min-width: 190px; }
+.usuarios-quedan { margin-left: auto; align-self: center; }

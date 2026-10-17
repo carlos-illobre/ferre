@@ -11,7 +11,9 @@ import { fecha, pesos } from "../../formato";
 import { useSesion } from "../../sesion";
 import { usePuede } from "../permisos";
 import { ElegirRoles, useRolesAsignables } from "../RolesDeUsuario";
-import { AutorizarOtro, CabeceraDeUsuarios, TarjetaDeUsuario } from "./TarjetaDeUsuario";
+import { AutorizarOtro, TarjetaDeUsuario } from "./TarjetaDeUsuario";
+import { FiltroDeUsuarios } from "./FiltroDeUsuarios";
+import { useFiltroDeUsuarios } from "../filtro-de-usuarios";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../credenciales";
 import { AvisoError, Hoja, Icono, Toast, Lista } from "./componentes/base";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
@@ -54,6 +56,7 @@ function Usuarios() {
   const error = aviso ?? (usuarios.error && usuarios.error !== cerrado ? (usuarios.error as Error).message : null);
   const [alta, setAlta] = useState(false);
   const [rolesDelNuevo, setRolesDelNuevo] = useState<string[]>([]);
+  const filtro = useFiltroDeUsuarios(filas, disponibles);
 
   async function autorizar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,12 +76,12 @@ function Usuarios() {
 
   return (
     <>
-      <CabeceraDeUsuarios cuantos={filas.length} />
       <AutorizarOtro alTocar={() => setAlta(true)} />
+      <FiltroDeUsuarios filtro={filtro} roles={disponibles} />
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(usuarios.error); }} />
       <div className="ut-lista" data-testid="usuarios">
-        {filas.map((u, i) => (
-          <TarjetaDeUsuario key={u.id} persona={u} orden={i} disponibles={disponibles} alCambiarRoles={(ids) => cambiar(u.id, { roles: ids })}
+        {filtro.visibles.map((u) => (
+          <TarjetaDeUsuario key={u.id} persona={u} orden={filas.indexOf(u)} disponibles={disponibles} alCambiarRoles={(ids) => cambiar(u.id, { roles: ids })}
             alActivar={async () => { const falla = await cambiar(u.id, { activo: !u.activo }); if (falla) setError(falla); }} />
         ))}
       </div>

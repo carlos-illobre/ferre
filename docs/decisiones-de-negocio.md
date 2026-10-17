@@ -752,3 +752,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       sale solo si vuelve a entrar esa misma persona (reactivada, o con la sesión cerrada a
       distancia y abierta de nuevo).
     - Carlos aprobó la regla escrita el 2026-10-17.
+
+98. **Buscar usuarios por correo o nombre, y filtrarlos por rol** (2026-10-17). En Más →
+    Usuarios, en el celular y en la computadora, un buscador «Correo o nombre» con sugerencias
+    mientras se escribe y una lista desplegable «Rol» (Carlos prefirió la lista a las pastillas).
+    En el celular, debajo de «Autorizar otro correo de Google», y se saca la cabecera «Usuarios
+    autorizados» con cuántos son, porque ocupaba lugar; en la computadora, arriba de la tabla.
+    Maquetas aprobadas el 2026-10-17 (007-T033, `specs/007-usuarios-y-acceso/ux.md`).

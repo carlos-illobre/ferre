@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { AutorizarOtro, CabeceraDeUsuarios, TarjetaDeUsuario } from "./TarjetaDeUsuario";
+import { AutorizarOtro, TarjetaDeUsuario, type Persona } from "./TarjetaDeUsuario";
+import { FiltroDeUsuarios } from "./FiltroDeUsuarios";
+import { useFiltroDeUsuarios } from "../filtro-de-usuarios";
 
 const ROLES = [{ id: "r1", nombre: "Administrador" }, { id: "r2", nombre: "Vendedor" }];
 const LUCIA = { id: "u1", nombre: "Lucía Fernández", email: "lucia.fernandez.deposito@ferre.test", activo: false, roles: [ROLES[1]!] };
@@ -35,11 +37,57 @@ describe("tarjeta de una persona en el celular", () => {
     expect(alActivar).toHaveBeenCalled();
   });
 
-  it("la cabecera dice cuántos son, y «Autorizar otro correo de Google» se toca", () => {
+  it("«Autorizar otro correo de Google» se toca", () => {
     const alTocar = vi.fn();
-    render(<><CabeceraDeUsuarios cuantos={4} /><AutorizarOtro alTocar={alTocar} /></>);
-    expect(screen.getByTestId("cuantos-usuarios").textContent).toBe("4 usuarios");
+    render(<AutorizarOtro alTocar={alTocar} />);
     fireEvent.click(screen.getByTestId("autorizar"));
     expect(alTocar).toHaveBeenCalled();
+  });
+});
+
+// 007-T033: debajo de «Autorizar otro correo de Google», buscar por correo o nombre y filtrar por rol.
+describe("buscar y filtrar por rol en el celular", () => {
+  const GENTE: Persona[] = [
+    { id: "u4", nombre: "Carlos", email: "carlos@ferre.test", activo: true, roles: [ROLES[0]!, ROLES[1]!] },
+    { id: "u2", nombre: "Marta", email: "marta.bress@ferre.test", activo: true, roles: [ROLES[0]!] },
+    LUCIA,
+  ];
+  function Lista() {
+    const f = useFiltroDeUsuarios(GENTE, ROLES);
+    return <><FiltroDeUsuarios filtro={f} roles={ROLES} /><ul>{f.visibles.map((u) => <li key={u.id} data-testid="visible">{u.nombre}</li>)}</ul></>;
+  }
+  const visibles = () => screen.queryAllByTestId("visible").map((l) => l.textContent);
+
+  it("al escribir sugiere con el correo resaltado y el nombre; elegir una deja solo a esa persona", () => {
+    render(<Lista />);
+    fireEvent.change(screen.getByTestId("buscar-usuario"), { target: { value: "lu" } });
+    const [sugerencia] = screen.getAllByTestId("sugerencia-usuario");
+    expect(sugerencia!.querySelector("b")!.textContent).toBe("lu");
+    expect(sugerencia!.textContent).toContain("Lucía Fernández");
+    expect(visibles()).toEqual(["Lucía Fernández"]);
+    fireEvent.click(sugerencia!);
+    expect((screen.getByTestId("buscar-usuario") as HTMLInputElement).value).toBe("lucia.fernandez.deposito@ferre.test");
+    expect(screen.queryByTestId("sugerencia-usuario")).toBeNull();
+    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("1 de 3 usuarios");
+  });
+
+  it("la cruz borra la búsqueda y vuelven todos", () => {
+    render(<Lista />);
+    fireEvent.change(screen.getByTestId("buscar-usuario"), { target: { value: "marta" } });
+    expect(visibles()).toEqual(["Marta"]);
+    fireEvent.click(screen.getByRole("button", { name: "Borrar la búsqueda" }));
+    expect(visibles()).toEqual(["Carlos", "Marta", "Lucía Fernández"]);
+    expect(screen.queryByTestId("cuantos-quedan")).toBeNull();
+  });
+
+  it("con un rol elegido quedan solo quienes lo tienen, la lista se marca y dice cuántos", () => {
+    render(<Lista />);
+    expect(screen.getByTestId("filtro-rol").textContent).toBe("TodosAdministradorVendedor");
+    fireEvent.change(screen.getByTestId("filtro-rol"), { target: { value: "r2" } });
+    expect(visibles()).toEqual(["Carlos", "Lucía Fernández"]);
+    expect(screen.getByTestId("filtro-rol").closest("label")!.className).toContain("si");
+    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("2 de 3 usuarios con el rol Vendedor");
+    fireEvent.change(screen.getByTestId("buscar-usuario"), { target: { value: "zz" } });
+    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("Nadie coincide con la búsqueda.");
   });
 });

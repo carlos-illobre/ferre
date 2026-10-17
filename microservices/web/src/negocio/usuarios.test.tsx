@@ -7,7 +7,7 @@ vi.mock("../api", async (original) => ({ ...(await original<typeof import("../ap
 vi.mock("../almacen", async (original) => ({ ...(await original<typeof import("../almacen")>()), leerTodo: async () => [] }));
 vi.mock("../catalogo", () => ({ traerPorIds: async () => undefined }));
 
-import { autorizar, cambiarUsuario, cerrarSesion, faltaEnAlta, useSesiones, useUsuarios } from "./usuarios";
+import { autorizar, cambiarUsuario, cerrarSesion, cuantosQuedan, faltaEnAlta, filtrarUsuarios, partesResaltadas, sugerenciasDeUsuarios, useSesiones, useUsuarios } from "./usuarios";
 import { anularCompra, nombreDelComprobante, useComprasRecientes, type CompraFila } from "./compras";
 import { paginasDe, useActividad } from "./actividad";
 
@@ -69,5 +69,49 @@ describe("compras recientes y registro de acciones (010-E05)", () => {
     expect(apiFalsa).toHaveBeenCalledWith("/auditoria?pagina=2&usuario=u1&desde=2026-10-01T03%3A00%3A00.000Z");
     expect(paginasDe(result.current.datos)).toBe(3);
     expect(paginasDe(null)).toBe(1);
+  });
+});
+
+// 007-T033: buscar por correo o nombre y filtrar por rol (decisión 98).
+describe("buscar usuarios y filtrarlos por rol (007-T033)", () => {
+  const RECEPCION = { id: "r4", nombre: "Recepción" }, VENDEDOR = { id: "r2", nombre: "Vendedor" };
+  const GENTE = [
+    { id: "u1", nombre: "Carlos", email: "carlos@ferre.test", roles: [VENDEDOR, RECEPCION] },
+    { id: "u2", nombre: "Marta", email: "marta.bress@ferre.test", roles: [VENDEDOR] },
+    { id: "u3", nombre: "Lucía Fernández", email: "lucia.fernandez.deposito@ferre.test", roles: [RECEPCION] },
+  ];
+  const ids = (l: { id: string }[]) => l.map((u) => u.id);
+
+  it("encuentra lo escrito en cualquier parte del correo o del nombre, sin importar mayúsculas ni tildes", () => {
+    expect(ids(filtrarUsuarios(GENTE, { texto: "LUCIA", rol: null }))).toEqual(["u3"]);
+    expect(ids(filtrarUsuarios(GENTE, { texto: "fernández", rol: null }))).toEqual(["u3"]);
+    expect(ids(filtrarUsuarios(GENTE, { texto: "bress", rol: null }))).toEqual(["u2"]);
+    expect(ids(filtrarUsuarios(GENTE, { texto: "  ", rol: null }))).toEqual(["u1", "u2", "u3"]);
+  });
+
+  it("con un rol quedan solo quienes lo tienen, y se combina con lo escrito", () => {
+    expect(ids(filtrarUsuarios(GENTE, { texto: "", rol: "r4" }))).toEqual(["u1", "u3"]);
+    expect(ids(filtrarUsuarios(GENTE, { texto: "carlos", rol: "r4" }))).toEqual(["u1"]);
+    expect(filtrarUsuarios(GENTE, { texto: "marta", rol: "r4" })).toEqual([]);
+  });
+
+  it("sugiere hasta cinco, y nada con el buscador vacío o con un correo ya elegido", () => {
+    const muchos = Array.from({ length: 8 }, (_, i) => ({ nombre: `Ana ${i}`, email: `ana${i}@ferre.test` }));
+    expect(sugerenciasDeUsuarios(muchos, "ana")).toHaveLength(5);
+    expect(sugerenciasDeUsuarios(GENTE, "")).toEqual([]);
+    expect(sugerenciasDeUsuarios(GENTE, "lucia.fernandez.deposito@ferre.test")).toEqual([]);
+    expect(ids(sugerenciasDeUsuarios(GENTE, "lu"))).toEqual(["u3"]);
+  });
+
+  it("resalta en el correo la parte que coincide", () => {
+    expect(partesResaltadas("lucia.fernandez@ferre.test", "FERN")).toEqual(["lucia.", "fern", "andez@ferre.test"]);
+    expect(partesResaltadas("marta@ferre.test", "zz")).toEqual(["marta@ferre.test", "", ""]);
+  });
+
+  it("dice cuántos quedan solo si se filtra, y avisa si no queda nadie", () => {
+    expect(cuantosQuedan(4, 4, { texto: "", rol: null })).toBeNull();
+    expect(cuantosQuedan(1, 4, { texto: "lu", rol: null })).toBe("1 de 4 usuarios");
+    expect(cuantosQuedan(2, 4, { texto: "", rol: "r4" }, "Recepción")).toBe("2 de 4 usuarios con el rol Recepción");
+    expect(cuantosQuedan(0, 4, { texto: "zz", rol: null })).toBe("Nadie coincide con la búsqueda.");
   });
 });

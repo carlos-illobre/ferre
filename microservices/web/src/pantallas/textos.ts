@@ -68,7 +68,6 @@ export const TEXTOS = {
       largo: "Desde qué computadoras y celulares está abierto Ferrebress ahora, y cómo se entra sin escribir nada: con la huella o escaneando el código con el celular.",
       corto: "Dónde está abierto ahora y cómo se entra sin escribir nada.",
     },
-    autorizados: igual("Usuarios autorizados"),
     autorizarOtro: { largo: "Autorizar a alguien", corto: "Autorizar otro correo de Google" },
     invitarAMas: { largo: "Con su correo de Google ya puede entrar. No hay contraseñas que crear.", corto: "Invitá a más personas de tu negocio." },
     queSonLosRoles: {
@@ -76,6 +75,12 @@ export const TEXTOS = {
       corto: "Cada persona puede tener uno o más roles.",
     },
     faltaUnRol: igual("Elegí al menos un rol. Para que no pueda nada, desactivá al usuario."),
+    // Buscar y filtrar por rol (decisión 98).
+    buscar: igual("Buscar"),
+    correoONombre: igual("Correo o nombre"),
+    borrarBusqueda: igual("Borrar la búsqueda"),
+    rol: igual("Rol"),
+    todosLosRoles: igual("Todos"),
   },
   entrar: {
     // Volviendo de Google, mientras se abre la sesión (007-T021). Solo en el celular.

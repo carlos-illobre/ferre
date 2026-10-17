@@ -46,3 +46,41 @@ export async function cerrarSesion(id: string): Promise<void> {
   await api(`/sesiones/${id}`, { method: "DELETE" });
   await consultas.invalidateQueries({ queryKey: SESIONES });
 }
+
+// Buscar y filtrar por rol en Más → Usuarios (decisión 98). Lo escrito se busca en cualquier parte
+// del correo o del nombre, sin importar mayúsculas ni tildes.
+export type FiltroDeUsuarios = { texto: string; rol: string | null };
+type Buscable = { nombre: string; email: string; roles?: RolDeUsuario[] };
+export const MAXIMO_DE_SUGERENCIAS = 5;
+const plano = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+
+export function coincideConLaBusqueda(u: Buscable, texto: string): boolean {
+  const buscado = plano(texto);
+  return !buscado || plano(u.email).includes(buscado) || plano(u.nombre).includes(buscado);
+}
+
+export function filtrarUsuarios<U extends Buscable>(filas: U[], { texto, rol }: FiltroDeUsuarios): U[] {
+  return filas.filter((u) => coincideConLaBusqueda(u, texto) && (!rol || (u.roles ?? []).some((r) => r.id === rol)));
+}
+
+// Las sugerencias mientras se escribe: hasta cinco, y ninguna si el buscador está vacío o si lo
+// escrito ya es el correo entero de alguien (se eligió una).
+export function sugerenciasDeUsuarios<U extends Buscable>(filas: U[], texto: string): U[] {
+  if (!plano(texto) || filas.some((u) => plano(u.email) === plano(texto))) return [];
+  return filas.filter((u) => coincideConLaBusqueda(u, texto)).slice(0, MAXIMO_DE_SUGERENCIAS);
+}
+
+// La parte del correo que coincide con lo escrito, para resaltarla: [antes, lo escrito, después].
+export function partesResaltadas(email: string, texto: string): [string, string, string] {
+  const buscado = plano(texto);
+  const desde = buscado ? plano(email).indexOf(buscado) : -1;
+  if (desde < 0) return [email, "", ""];
+  return [email.slice(0, desde), email.slice(desde, desde + buscado.length), email.slice(desde + buscado.length)];
+}
+
+// «2 de 4 usuarios con el rol Recepción»; nada si no se filtra.
+export function cuantosQuedan(quedan: number, total: number, filtro: FiltroDeUsuarios, nombreDelRol?: string): string | null {
+  if (!plano(filtro.texto) && !filtro.rol) return null;
+  if (quedan === 0) return "Nadie coincide con la búsqueda.";
+  return `${quedan} de ${total} ${total === 1 ? "usuario" : "usuarios"}${filtro.rol && nombreDelRol ? ` con el rol ${nombreDelRol}` : ""}`;
+}

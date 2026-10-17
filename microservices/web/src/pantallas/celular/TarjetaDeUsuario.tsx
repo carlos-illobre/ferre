@@ -78,17 +78,7 @@ export function TarjetaDeUsuario({ persona: u, orden, disponibles, alCambiarRole
   );
 }
 
-// La cabecera de la lista y el recuadro para autorizar a alguien, que va justo debajo.
-export function CabeceraDeUsuarios({ cuantos }: { cuantos: number }) {
-  return (
-    <div className="ut-cabeza">
-      {trazo({ d: "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7.5M18 14a6 6 0 0 1 4 7", tam: 26 })}
-      <span><strong>{TEXTOS.usuarios.autorizados.corto}</strong><small>{TEXTOS.usuarios.queSonLosRoles.corto}</small></span>
-      <span className="ut-cuantos" data-testid="cuantos-usuarios">{cuantos} {cuantos === 1 ? "usuario" : "usuarios"}</span>
-    </div>
-  );
-}
-
+// El recuadro para autorizar a alguien, arriba de la lista (la cabecera con cuántos son se sacó: decisión 98).
 export function AutorizarOtro({ alTocar }: { alTocar: () => void }) {
   return (
     <button type="button" className="ut-alta" onClick={alTocar} data-testid="autorizar">
