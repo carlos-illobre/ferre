@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Queda una aclaración: qué es la «última lectura» del código (E10, RF-112). Se le pregunta a Carlos antes de aprobar.
+- La «última lectura» es la última vez que se cargó o se cambió el código (Carlos, 2026-10-17, decisión 107). Aprobada.

@@ -837,3 +837,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
        Depósito decían «u.»).
      - Las pestañas de 44 px valen para todas las pestañas del celular.
      - «Producto, código o marca» cortado en un celular angosto se acepta, como en la maqueta.
+
+107. **Ficha del producto renovada** (2026-10-17). Sobre una imagen de referencia, Carlos
+     eligió que entren el encabezado con la foto grande, la etiqueta de stock, el código de barras
+     con copiar y escanear al lado, «Código actualizado» con la última lectura, el proveedor en uso
+     primero, «Así se calcula» plegable, el archivo de origen con sus datos y «Agregar a la venta».
+     No entran «Guardar cambios», el lápiz del precio, la categoría ni «Activo». La «última
+     lectura» es la última vez que se cargó o se cambió el código del producto; escanearlo para
+     buscar o vender no la cambia (`specs/016-ficha-del-producto/`).

@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-17
 
-**Status**: Borrador, a aprobar por Carlos
+**Status**: Aprobada (Carlos, 2026-10-17)
 
 **Input**: Carlos, el 2026-10-17, sobre una imagen de referencia de la ficha de un producto (la
 que se abre al tocar un producto en el Catálogo): que entren el encabezado con la foto grande,
@@ -19,7 +19,7 @@ venta, la categoría ni el estado «Activo».
 ### Session 2026-10-17
 
 - Q: ¿Qué entra de la imagen de referencia? → A: El encabezado con la foto, la etiqueta de stock, el código de barras con copiar y escanear, «Código actualizado» con la última lectura, el proveedor en uso primero, «Así se calcula», el archivo de origen y, aunque no está en la imagen, «Agregar a la venta». No entran «Guardar cambios» (el margen se guarda al tocarlo, como hoy), el lápiz del precio (el precio a mano vale solo para una venta), la categoría (los productos no tienen) ni «Activo» (no existe ese estado).
-- Q: ¿Qué es la «última lectura» del código? → A: [NEEDS CLARIFICATION: ¿es la última vez que se cargó o se cambió el código de ese producto (desde su ficha o al asociar un código desconocido), o la última vez que alguien escaneó ese código en cualquier parte (en una venta, en Depósito, en el Catálogo)?]
+- Q: ¿Qué es la «última lectura» del código? → A: La última vez que se cargó o se cambió el código de ese producto (desde su ficha o al asociar un código desconocido); escanearlo para buscar o vender no la cambia (decisión 107).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -62,7 +62,7 @@ actualizado» con la fecha y la hora, copiarlo y pegarlo en otro lado.
 2. **E07** **Given** el botón de copiar, **When** se toca, **Then** el código queda copiado para pegarlo en otra aplicación, y un aviso breve dice «Código copiado».
 3. **E08** **Given** un producto sin código de barras, **When** se abre su ficha, **Then** en lugar del código dice «Sin código» y no hay botón de copiar; «Escanear código» está igual.
 4. **E09** **Given** «Escanear código», **When** se lee un código que nadie más tiene, **Then** queda cargado en el producto y la ficha muestra «Código actualizado» con la fecha y la hora de esa lectura.
-5. **E10** **Given** un producto con código cargado antes, **When** se abre su ficha otro día, **Then** debajo del código dice «Última lectura:» con la fecha y la hora en que se cargó (o, según lo que decida Carlos, en que se escaneó por última vez).
+5. **E10** **Given** un producto con código cargado antes, **When** se abre su ficha otro día, **Then** debajo del código dice «Última lectura:» con la fecha y la hora en que se cargó o se cambió; escanearlo para buscarlo o venderlo no la cambia.
 6. **E11** **Given** un producto cuyo código se cargó antes de que existiera este dato, **When** se abre su ficha, **Then** no dice ninguna fecha: no se inventa una.
 7. **E12** **Given** un código que ya tiene otro producto, **When** se lo escanea en la ficha, **Then** pasa lo de hoy (RF-08) y la fecha de la última lectura no cambia si el código no quedó cargado.
 8. **E13** **Given** la computadora, **When** se toca «Escanear código», **Then** el código llega desde el celular vinculado, como hoy; sin celular vinculado, se puede tipear.
