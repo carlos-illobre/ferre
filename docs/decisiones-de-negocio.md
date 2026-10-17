@@ -775,3 +775,17 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Quien no tiene ninguna pestaña de Usuarios no ve «Usuarios» en Más (antes estaba siempre,
       porque Sesiones la veía cualquiera; cambia la decisión 88).
     - Carlos aprobó la regla escrita el 2026-10-17. RF-70b, RF-74 y RF-77 en 007; RF-106 en 009.
+
+100. **Sin pestaña Sesiones: las sesiones y los celulares de cada persona, en su tarjeta de
+     Usuarios** (2026-10-17). Carlos pidió sacar la pestaña Sesiones e incorporarla a Usuarios;
+     ajusta la decisión 99 y la 88:
+     - Más → Usuarios queda con tres pestañas: Usuarios, Roles y Quién hizo qué.
+     - En la tarjeta de cada persona (en la computadora, en su fila), una línea plegada dice
+       cuánto tiene («2 sesiones abiertas · 1 celular con huella ›») y despliega sus sesiones,
+       con «Cerrar», y sus celulares con huella, con «Quitar». En la propia no figuran la sesión
+       de ese dispositivo (se cierra con «Salir») ni los celulares propios (están en Configuración).
+     - Cuántos días dura el vínculo entre celular y computadora, al final de la pestaña Usuarios.
+     - «Administrar sesiones» se une a «Administrar usuarios», que pasa a incluir cerrar sesiones,
+       quitar celulares de otros y fijar los días del vínculo. Un rol que tenía «Administrar
+       sesiones» sin «Administrar usuarios» pierde eso: nadie gana permisos que no tenía.
+     - Carlos lo aprobó el 2026-10-17.

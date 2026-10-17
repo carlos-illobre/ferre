@@ -193,8 +193,8 @@ la computadora».
 **El bloque «Vínculo entre celular y computadora»,** en Más → Configuración (decisiones 74 y 99):
 a quien está vinculado le dice con qué dispositivo y le ofrece «Desvincular». Quien no está
 vinculado no ve el bloque. **Cuántos días dura el vínculo** vale para todo el negocio: está solo
-en Más → Usuarios, pestaña Sesiones, para quien tiene «Administrar sesiones», que lo cambia ahí;
-Configuración no lo muestra.
+al final de Más → Usuarios, en un recuadro «Vínculo entre celular y computadora: dura 30 días», para
+quien tiene «Administrar usuarios», que lo cambia ahí (decisión 100); Configuración no lo muestra.
 Sin celular emparejado, la computadora muestra en el menú «Vincular el celular», siempre.
 
 **Reglas:**
@@ -212,24 +212,23 @@ Sin celular emparejado, la computadora muestra en el menú «Vincular el celular
   la computadora.
 - No hay aviso por cada cambio que llega del otro lado: la pantalla simplemente lo muestra.
 
-## Más → Usuarios: cuatro pestañas (decisión 88)
+## Más → Usuarios: tres pestañas (decisiones 88 y 100)
 
 Lo de los usuarios está en una sola opción de Más, **«Usuarios»**, con la bajada «Quién
-entra y desde dónde, qué puede hacer y qué hizo». Adentro hay cuatro pestañas, como en
-Depósito, en este orden:
+entra y desde dónde, qué puede hacer y qué hizo». Adentro hay tres pestañas, como en
+Depósito, en este orden (la cuarta, Sesiones, se sacó el 2026-10-17: decisión 100):
 
 | Pestaña | Qué tiene | Quién la ve |
 |---|---|---|
-| **Usuarios** | Los usuarios autorizados y autorizar a alguien (Historia 2) | «Administrar usuarios» |
-| **Sesiones** | Las sesiones abiertas de todos (Historia 5), los celulares con huella de las demás personas (Historia 4) y cuántos días dura el vínculo entre celular y computadora (Historia 1c) | «Administrar sesiones» |
+| **Usuarios** | Los usuarios autorizados y autorizar a alguien (Historia 2); en la tarjeta de cada persona, sus sesiones abiertas (Historia 5) y sus celulares con huella (Historia 4); al final, cuántos días dura el vínculo (Historia 1c) | «Administrar usuarios» |
 | **Roles** | Los roles y armar uno (Historia 3b) | «Administrar roles» |
 | **Quién hizo qué** | El registro de acciones (Historia 6) | «Ver quién hizo qué» |
 
 - Cada uno ve solo las pestañas que su rol le permite, y la opción entra en la primera que
   ve. Quien no ve ninguna no tiene «Usuarios» en Más.
 - Lo que cada persona decide para sí misma está en Más → Configuración, no acá: sus celulares
-  con huella y su vínculo entre celular y computadora (decisión 99). Nada figura en los dos lugares.
-- En el celular la cuarta pestaña dice «Actividad», porque el nombre largo no entra; cada
+  con huella y su vínculo entre celular y computadora (decisiones 99 y 100). Nada figura en los dos lugares.
+- En el celular la tercera pestaña dice «Actividad», porque el nombre largo no entra; cada
   pestaña lleva su ícono arriba del nombre. En la computadora dice «Quién hizo qué».
 - Las pestañas no llevan atajo Alt (los números ya son del menú y de Depósito): en la
   computadora se recorren con las flechas, como el resto de Más.
@@ -383,7 +382,7 @@ borrar el que nadie tiene.
 **Quién:** cualquier usuario.
 
 **Qué tiene que poder hacer:** aceptar o dejar pasar la oferta; ver sus celulares
-vinculados; vincular el que tiene en la mano; quitar uno. Quien tiene «Administrar sesiones»,
+vinculados; vincular el que tiene en la mano; quitar uno. Quien tiene «Administrar usuarios»,
 además, quitar el de otro usuario.
 
 **La oferta (solo en el celular):**
@@ -409,10 +408,10 @@ además, quitar el de otro usuario.
 - Quitar uno es un paso, y dice después que ese celular ya no entra con la huella.
 - Todo usuario llega a su lista desde el celular y desde la computadora.
 
-**Celulares de otros («Administrar sesiones»),** en Más → Usuarios, pestaña Sesiones: junto a
-cada usuario, sus celulares vinculados con la misma información y la posibilidad de quitarlos.
-Los propios no figuran ahí, porque están en Configuración. Es la respuesta a un celular perdido,
-junto con cerrar sus sesiones.
+**Celulares de otros («Administrar usuarios»),** en la tarjeta de cada persona, en Más →
+Usuarios, junto con sus sesiones (decisión 100): cada celular con la misma información y
+«Quitar». En la tarjeta propia no figuran, porque están en Configuración. Es la respuesta a un
+celular perdido, junto con cerrar sus sesiones.
 
 **Estados:**
 
@@ -428,8 +427,15 @@ junto con cerrar sus sesiones.
 
 ## Historia 5: sesiones
 
-**Quién:** quien tiene «Administrar sesiones» para ver y cerrar las de todos, en Más → Usuarios,
-pestaña Sesiones; cualquier usuario para salir de la suya, con «Salir».
+**Quién:** quien tiene «Administrar usuarios» para ver y cerrar las de todos, en la tarjeta de
+cada persona en Más → Usuarios; cualquier usuario para salir de la suya, con «Salir».
+
+**Dónde (decisión 100):** en la tarjeta de cada persona, debajo de sus roles, una línea plegada
+dice cuánto tiene, por ejemplo «2 sesiones abiertas · 1 celular con huella ›». Al tocarla se
+despliegan sus sesiones (dispositivo, navegador y último uso, con «Cerrar») y sus celulares con
+huella (nombre y último uso, con «Quitar»). Sin nada, la línea no está. En la computadora, la
+fila de la tabla tiene una columna «Acceso» con la misma línea, que despliega lo mismo debajo
+de la fila.
 
 **Qué necesita a la vista el Administrador:**
 

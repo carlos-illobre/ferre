@@ -349,7 +349,7 @@ Depósito en Inventario; el orden de Depósito es Inventario, Ingreso, Estanter�
 **Vincular, siempre a mano (decisión 66).** En el celular, mientras no esté vinculado con una
 computadora, todas las pantallas llevan «Vincular» a la derecha de su encabezado: un botón chico,
 con borde, el ícono a la izquierda y la leyenda a su derecha. Vinculado, ese mismo botón dice «Desconectar» o «Reconectar», en verde o en
-gris según estén o no trabajando juntos. «Desvincular» está solo en Más → Usuarios, pestaña Sesiones (decisiones 70, 73 y 74).
+gris según estén o no trabajando juntos. «Desvincular» está solo en Más → Configuración (decisiones 70, 73, 74 y 99).
 
 **Las partes y sus pestañas (decisiones 68 y 72).** Catálogo: Productos, Listas, Duplicados.
 Vender: Vender, Hoy, Anular. Depósito: Inventario, Ingreso, Estanterías, Pedidos. Más no tiene

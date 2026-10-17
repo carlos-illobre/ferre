@@ -28,8 +28,8 @@ En la columna «Exige», «sesión» quiere decir cualquier persona con sesión,
 | POST | `/sesiones/google` | Nada; 10 intentos por minuto | Entrar con Google. Cuerpo: `credencial` (el token del botón de Google) y `dispositivo` opcional. `201` con `token` y `usuario` (`id`, `email`, `nombre`, `rol`). `400` sin credencial; `401` si Google no verifica la cuenta; `403` «<correo> no está autorizado. Pedile a quien administra los usuarios que te dé de alta.» si el correo no está cargado o está desactivado. Registra `sesion.iniciada` con medio `google` |
 | GET | `/sesiones/actual` | Sesión | Quién soy: `id` de la sesión y `usuario` |
 | DELETE | `/sesiones/actual` | Sesión | Salir: revoca la sesión propia. `204`. Registra `sesion.cerrada` |
-| GET | `/sesiones` | `admin.sesiones` | Sesiones abiertas de todos los usuarios (sin revocar ni vencidas), la más usada recientemente primero: `id`, `dispositivo`, `creada_en`, `ultimo_uso_en`, `expira_en`, `email`, `nombre` |
-| DELETE | `/sesiones/:id` | `admin.sesiones` | Cerrar a distancia la sesión de cualquiera. `204` (también si el id no existe). Registra `sesion.revocada` |
+| GET | `/sesiones` | `admin.usuarios` | Sesiones abiertas de todos los usuarios (sin revocar ni vencidas), la más usada recientemente primero: `id`, `dispositivo`, `creada_en`, `ultimo_uso_en`, `expira_en`, `email`, `nombre` |
+| DELETE | `/sesiones/:id` | `admin.usuarios` | Cerrar a distancia la sesión de cualquiera. `204` (también si el id no existe). Registra `sesion.revocada` |
 
 ### Entrar a la computadora con el celular (RF-76)
 
@@ -67,7 +67,7 @@ Los permisos son fijos: los define el sistema. Los roles los arma el negocio.
 Las claves de permiso: `ventas.registrar`, `ventas.ver`, `ventas.anular` (del día), `ventas.anular_cualquiera`, `catalogo.costos`, `catalogo.margenes`,
 `catalogo.listas`, `catalogo.duplicados`, `deposito.pedidos`, `deposito.ingresos`, `deposito.compras`,
 `deposito.stock`, `negocio.ventas`, `negocio.gastos`, `negocio.invertido`, `negocio.anomalias`, `negocio.actividad`,
-`admin.usuarios`, `admin.roles`, `admin.sesiones`. Qué deja hacer cada una está en la tabla
+`admin.usuarios`, `admin.roles` (`admin.sesiones` se unió a `admin.usuarios`: decisión 100). Qué deja hacer cada una está en la tabla
 de permisos de [spec.md](../spec.md).
 
 ## Celulares con huella (`/credenciales`)
@@ -77,7 +77,7 @@ de permisos de [spec.md](../spec.md).
 | POST | `/credenciales/registro/opciones` | Sesión | Empezar a vincular este dispositivo: devuelve `desafioId` y las `opciones` de WebAuthn (clave descubrible, verificación del usuario obligatoria, atadas al dominio del cliente web; excluye los ya vinculados del usuario) |
 | POST | `/credenciales/registro` | Sesión | Terminar de vincular. Cuerpo: `desafioId`, `respuesta` del teléfono, `dispositivo` (nombre). `201` con `id` y `dispositivo`. `400` si el desafío venció, ya se usó o es de otro usuario, o si la clave no verifica. Registra `credencial.vinculada` |
 | GET | `/credenciales` | Sesión | Mis celulares vinculados sin quitar: `id`, `dispositivo`, `creada_en`, `ultimo_uso_en` |
-| DELETE | `/credenciales/:id` | Sesión; el de otro usuario, `admin.sesiones` | Quitar un celular. `204`; `404` si no existe o no es propio. Registra `credencial.quitada` |
+| DELETE | `/credenciales/:id` | Sesión; el de otro usuario, `admin.usuarios` | Quitar un celular. `204`; `404` si no existe o no es propio. Registra `credencial.quitada` |
 | POST | `/credenciales/login/opciones` | Nada; 20 intentos por minuto | Empezar a entrar con la huella: devuelve `desafioId` y `opciones` |
 | POST | `/credenciales/login` | Nada; 20 intentos por minuto | Entrar con la huella. Cuerpo: `desafioId`, `respuesta`, `dispositivo` opcional. `201` con `token` y `usuario`, igual que Google. `400` si el desafío venció o se repitió; `401` si el celular no está vinculado o la firma no verifica; `403` si el usuario está desactivado. Actualiza el contador y el último uso. Registra `sesion.iniciada` con medio `huella` |
 
@@ -104,7 +104,7 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 | POST | `/puestos/:codigo/vincular` | Sesión | El celular leyó el QR de «Vincular el celular». Cuerpo opcional: `dispositivo_id` (el identificador que ese celular guarda para sí). Quedan vinculados los días configurados (`dias` en la respuesta) y se suelta el vínculo anterior de cualquiera de los dos. Guarda de qué usuario y de qué dos dispositivos es el vínculo. Registra `puesto.vinculado` |
 | GET | `/puestos/mio?dispositivo=…` | Sesión | Con quién está vinculada esta sesión: `comoComputadora` y `comoCelular` (cada uno `id`, `nombre`, `expira_en`, o `null`). `dispositivo` es el identificador de este dispositivo (8 a 64 letras, números, guiones): se anota en la sesión y, si este usuario tenía en ese dispositivo un vínculo vigente de una sesión anterior, el vínculo pasa a esta sesión. Cuenta aunque la sesión del otro lado esté cerrada |
 | GET | `/puestos/configuracion` | Sesión | `dias`: cuántos días dura un vínculo (30 de arranque) |
-| PUT | `/puestos/configuracion` | «Administrar sesiones» (si no, `403`) | Cuerpo: `dias`, entero de 1 a 365 (si no, `400`). Vale para los vínculos nuevos y los que se renueven. Registra `vinculo.dias_cambiados` |
+| PUT | `/puestos/configuracion` | «Administrar usuarios» (si no, `403`) | Cuerpo: `dias`, entero de 1 a 365 (si no, `400`). Vale para los vínculos nuevos y los que se renueven. Registra `vinculo.dias_cambiados` |
 | DELETE | `/puestos/:id` | Sesión de cualquiera de los dos | Desvincular. `204`. Registra `puesto.desvinculado`. Es la única forma de cortarlo desde la aplicación, junto con el cierre a distancia de la sesión de uno de los dos (`DELETE /sesiones/:id`); salir (`DELETE /sesiones/actual`) no lo corta |
 | POST | `/puestos/:id/codigos` | Sesión del celular vinculado a ese puesto (si no, `403`) | El celular manda un código escaneado |
 | POST | `/puestos/:id/codigos/:codigoId/recibido` | Sesión de la computadora dueña del puesto | La computadora confirma que lo recibió. `204` |

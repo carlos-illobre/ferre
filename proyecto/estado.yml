@@ -760,7 +760,7 @@ RF-74:
   defectos:
     - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
     - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
-    - "La sesión del propio dispositivo todavía figura en la lista de Sesiones, que además ve cualquiera (decisión 99; 009-T006)"
+    - "Las sesiones todavía están en una pestaña Sesiones aparte, con la del propio dispositivo y con su propio permiso (decisiones 99 y 100; 009-T006)"
 
 RF-80:
   estado: "Hecho (pedido directo de Carlos)"
