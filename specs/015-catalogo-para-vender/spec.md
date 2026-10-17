@@ -6,7 +6,7 @@
 
 **Status**: Aprobada (Carlos, 2026-10-17)
 
-**Maquetas**: Pendientes  <!-- «Aprobadas» cuando Carlos elige, o «No lleva pantallas» -->
+**Maquetas**: Aprobadas (variante B, Carlos, 2026-10-17: `maquetas/celular-catalogo-b.html`, `maquetas/celular-filtros.html`, `maquetas/compu-catalogo.html` y `maquetas/compu-filtros.html`)
 
 **Input**: Carlos, el 2026-10-17, sobre una imagen de referencia del Catálogo: que entren el
 stock de cada producto, filtrar por disponibilidad y por marca, «Agregar» a la venta desde el
@@ -20,6 +20,7 @@ Catálogo, las pestañas más altas y un buscador que diga qué busca. No entran
 - Q: ¿Qué entra de la imagen de referencia? → A: El stock de cada producto, filtrar por disponibilidad y por marca, «Agregar» a la venta, las pestañas más altas y el buscador que dice qué busca. No entran categorías, «Avisar», un menú por producto, ordenar ni el «+» en el margen.
 - Q: «Stock bajo» necesita el stock mínimo, que todavía no existe (RF-54). → A: Espera al mínimo: por ahora, la cantidad y «Sin stock»; «Stock bajo» aparece cuando exista RF-54 (decisión 103).
 - Q: ¿Qué pasa después de «Agregar»? → A: Se queda en el Catálogo, con un aviso breve, y el menú muestra en Vender cuántos productos lleva la venta (decisión 103).
+- Al elegir la maqueta (variante B): en el celular el buscador dice «Producto, código o marca», porque el texto largo no entra (decisión 47: mismos textos, resumidos en el celular); la computadora dice «Buscar productos, códigos o marcas…». Se aceptan uno o dos productos menos por pantalla a cambio del stock y «Agregar». Los botones secundarios como «Agregar» miden al menos 36 px; las pestañas, al menos 44 (decisión 104).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -103,7 +104,7 @@ que encuentra por nombre, por código y por marca.
 **Acceptance Scenarios**:
 
 1. **E21** **Given** el Catálogo en el celular, **When** se miden las pestañas Productos, Listas y Duplicados, **Then** cada una tiene al menos 44 px de alto, la medida mínima para tocar con el dedo.
-2. **E22** **Given** el buscador vacío, **When** se lo mira, **Then** dice «Buscar productos, códigos o marcas…».
+2. **E22** **Given** el buscador vacío, **When** se lo mira, **Then** en la computadora dice «Buscar productos, códigos o marcas…» y en el celular, «Producto, código o marca».
 3. **E23** **Given** una marca escrita en el buscador, **When** se busca, **Then** aparecen los productos de esa marca (lo que el buscador promete).
 
 ### Edge Cases
@@ -121,7 +122,7 @@ que encuentra por nombre, por código y por marca.
 - **RF-107**: En el Catálogo, cada producto muestra su stock: la cantidad con su unidad, o «Sin stock» si no tiene, distinto a la vista; y «Stock bajo» cuando exista el stock mínimo (RF-54). En el celular y en la computadora.
 - **RF-108**: Desde el Catálogo se agrega un producto a la venta en curso con un toque, con las mismas reglas que agregarlo en Vender (cantidad 1, suma si ya está, sin precio o sin stock entra igual); con el espejo, aparece en el otro dispositivo. Se sigue en el Catálogo, con un aviso breve, y el menú muestra en Vender cuántos productos lleva la venta. Solo lo ve quien puede vender.
 - **RF-109**: El Catálogo se filtra por disponibilidad (todos, con stock, sin stock) y por marca, junto con la búsqueda; los filtros se abren desde un botón y no ocupan lugar fijo arriba de la lista.
-- **RF-110**: Las pestañas del Catálogo tienen al menos 44 px de alto en el celular, y el buscador dice «Buscar productos, códigos o marcas…».
+- **RF-110**: Las pestañas del Catálogo tienen al menos 44 px de alto en el celular, y el buscador dice qué busca: «Buscar productos, códigos o marcas…» en la computadora y «Producto, código o marca» en el celular.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -134,7 +135,7 @@ que encuentra por nombre, por código y por marca.
 
 - **SC-001**: El Vendedor sabe si hay un producto sin salir del Catálogo: cero pantallas extra (hoy, ir a Depósito y buscarlo de nuevo).
 - **SC-002**: Agregar a la venta un producto encontrado en el Catálogo lleva un toque, en lugar de ir a Vender y buscarlo otra vez.
-- **SC-003**: Sin filtros, la lista muestra al menos tantos productos en la pantalla del celular como hoy.
+- **SC-003**: Sin filtros, la lista del celular muestra al menos 4 productos por pantalla (hoy, 7; Carlos aceptó ver menos a cambio del stock y «Agregar»).
 - **SC-004**: Buscar con stock y filtros responde tan rápido como hoy, con 11.000 productos.
 
 ## Assumptions

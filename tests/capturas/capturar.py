@@ -14,7 +14,7 @@
 credencial (el mock rechaza la credencial "no" con 403). Se puede repetir.
 Guarda en $CAPTURAS (por defecto tests/capturas/salida/, que no se sube) como <nombre>-compu.png y <nombre>-celu.png
 (nombre = --nombre o la ruta). Avisa: desplazamiento hacia el costado, textos de menos de 14 px,
-objetivos táctiles de menos de 44 px (solo en el celular) y errores de consola. Tiene que decir «bien».
+objetivos táctiles de menos de 36 px, y los de 36 a 44 px, que valen solo en botones secundarios (solo en el celular; decisión 104) y errores de consola. Tiene que decir «bien».
 Hacen falta la API de mentira (8799) y el Vite del cliente (5199); ver tests/capturas/README.md.
 """
 import argparse
@@ -53,7 +53,7 @@ MEDIR = """(celular) => {
   const visible = (e) => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
   const nombre = (e) => (e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.split(' ')[0] : '') + ' «' + (e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 28) + '»');
   const escondido = (e) => { const r = e.getBoundingClientRect(); return r.width <= 2 || r.height <= 2; };
-  const desbordes = [], chicas = new Map(), bajos = [];
+  const desbordes = [], chicas = new Map(), bajos = [], medianos = [];
   for (const e of document.querySelectorAll('body *')) {
     if (!visible(e) || e.closest('svg') || e.closest('.entrar__google')) continue;
     if (e.closest('dialog:not([open])')) continue;
@@ -62,9 +62,9 @@ MEDIR = """(celular) => {
     if (!recortado && (r.right > ancho + 1 || r.left < -1)) desbordes.push(nombre(e) + ' ' + Math.round(r.left) + '..' + Math.round(r.right));
     const propio = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
     if (propio && !escondido(e) && e.tagName !== 'OPTION') { const t = parseFloat(getComputedStyle(e).fontSize); if (t < 14) chicas.set(nombre(e), t); }
-    if (celular && e.matches('button, a[href], input, select, textarea, [role=button], [role=option]') && r.height < 43.5) bajos.push(nombre(e) + ' ' + Math.round(r.height) + 'px');
+    if (celular && e.matches('button, a[href], input, select, textarea, [role=button], [role=option]') && r.height < 43.5) (r.height < 35.5 ? bajos : medianos).push(nombre(e) + ' ' + Math.round(r.height) + 'px');
   }
-  return { ancho, anchoTotal: document.documentElement.scrollWidth, desbordes: desbordes.slice(0, 8), chicas: [...chicas].slice(0, 8), bajos: bajos.slice(0, 8) };
+  return { ancho, anchoTotal: document.documentElement.scrollWidth, desbordes: desbordes.slice(0, 8), chicas: [...chicas].slice(0, 8), bajos: bajos.slice(0, 8), medianos: medianos.slice(0, 8) };
 }"""
 
 
@@ -133,7 +133,9 @@ def main() -> int:
             if m["chicas"]:
                 avisos.append(f"TEXTO de menos de 14 px: {m['chicas']}")
             if m["bajos"]:
-                avisos.append(f"TOQUE de menos de 44 px de alto: {m['bajos']}")
+                avisos.append(f"TOQUE de menos de 36 px de alto: {m['bajos']}")
+            if m.get("medianos"):
+                avisos.append(f"TOQUE de 36 a 44 px de alto (vale solo si es un botón secundario, decisión 104): {m['medianos']}")
             if errores:
                 avisos.append(f"CONSOLA: {errores[:4]}")
             problemas += len(avisos)

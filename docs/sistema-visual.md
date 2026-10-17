@@ -88,6 +88,10 @@ Salen del diseño de referencia.
 - Tarjetas; nada de tablas anchas.
 - Hojas, pantalla de éxito y avisos como se describen en «Componentes».
 - La cámara está a un toque al lado de cada buscador.
+- **Tamaño para tocar (decisión 104):** las acciones principales, las pestañas y los campos miden
+  al menos 44 px de alto; los botones secundarios (como «Agregar» en cada producto del
+  Catálogo), al menos 36 px. `tests/capturas/capturar.py` avisa de lo que mide menos de 36 px y
+  de lo que mide entre 36 y 44 px, para revisar que sea secundario.
 - Cada renglón de venta es una tarjeta: producto y subtotal arriba, cantidad (− +), unidad y
   margen abajo; el margen se despliega en el mismo renglón con los cinco botones y el precio
   a mano.

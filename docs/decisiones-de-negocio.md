@@ -816,3 +816,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      margen. «Stock bajo» espera al stock mínimo (RF-54): hasta entonces, la cantidad y «Sin
      stock». Después de «Agregar» se sigue en el Catálogo, con un aviso breve, y el menú muestra
      en Vender cuántos productos lleva la venta (`specs/015-catalogo-para-vender/`).
+
+104. **Botones secundarios de 36 px en el celular** (2026-10-17). Al aprobar la maqueta del
+     Catálogo, Carlos pidió «Agregar» más bajo y fijó la regla: las acciones principales, las
+     pestañas y los campos miden al menos 44 px de alto para tocar con el dedo; los botones
+     secundarios, como «Agregar» en cada producto, al menos 36 px (`docs/sistema-visual.md`).

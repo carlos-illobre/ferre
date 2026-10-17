@@ -784,22 +784,22 @@ RF-81:
     - "Cualquier usuario puede marcar resuelto o reabrir: no hay un permiso para eso"
 
 RF-107:
-  estado: "Nuevo (015): especificación aprobada; faltan las maquetas"
+  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
   pruebas: []
   defectos: []
 
 RF-108:
-  estado: "Nuevo (015): especificación aprobada; faltan las maquetas"
+  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
   pruebas: []
   defectos: []
 
 RF-109:
-  estado: "Nuevo (015): especificación aprobada; faltan las maquetas"
+  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
   pruebas: []
   defectos: []
 
 RF-110:
-  estado: "Nuevo (015): especificación aprobada; faltan las maquetas"
+  estado: "Nuevo (015): especificación y maquetas aprobadas; falta programarlo"
   pruebas: []
   defectos: []
 

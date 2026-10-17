@@ -190,7 +190,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-107 | En el Catálogo, cada producto muestra su stock: la cantidad con su unidad, «Sin stock» o «Stock bajo» | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
 | RF-108 | Desde el Catálogo se agrega un producto a la venta en curso con un toque, con las reglas de Vender y el espejo; se sigue en el Catálogo y Vender muestra cuántos lleva | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
 | RF-109 | El Catálogo se filtra por disponibilidad y por marca, desde un botón, sin lugar fijo arriba de la lista | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
-| RF-110 | Las pestañas del Catálogo miden al menos 44 px de alto en el celular, y el buscador dice «Buscar productos, códigos o marcas…» | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
+| RF-110 | Las pestañas del Catálogo miden al menos 44 px de alto en el celular, y el buscador dice qué busca («Producto, código o marca» en el celular) | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
 
 ## Requerimientos no funcionales
 
