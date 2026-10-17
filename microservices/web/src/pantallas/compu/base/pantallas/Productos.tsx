@@ -55,7 +55,6 @@ export function Productos() {
   const caja = useRef<HTMLInputElement>(null);
   const centinela = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { caja.current?.focus(); }, [catalogo]);
   // Buscar escaneando (RF-08): lo que lee el celular vinculado abre la ficha de ese producto o,
   // si nadie tiene ese código, queda escrito en la búsqueda. Con una ficha abierta no escucha:
   // ahí el código es para ese producto.

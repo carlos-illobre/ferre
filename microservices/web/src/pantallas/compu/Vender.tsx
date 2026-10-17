@@ -69,7 +69,6 @@ export function Vender() {
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
-  useEffect(() => { caja.current?.focus(); }, [catalogo]);
 
   // El oyente del celular vinculado se crea una vez y tiene que ver siempre la versión nueva.
   const manejarCodigo = useRef(agregarPorCodigo);

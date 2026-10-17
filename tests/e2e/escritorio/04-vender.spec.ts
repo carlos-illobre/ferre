@@ -134,6 +134,25 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect.poll(() => psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_MECHA}'`)).toBe("1");
 });
 
+// Dos focos (decisión 82): la búsqueda espera deshabilitada a que baje el catálogo y, al habilitarse,
+// no le saca el foco al menú si la persona ya lo recorre con las flechas.
+test("sin mouse: el catálogo que termina de bajar no le saca el foco al menú", async ({ page }) => {
+  let soltarElCatalogo = () => {};
+  const catalogoSuelto = new Promise<void>((listo) => { soltarElCatalogo = listo; });
+  await page.route((url) => url.pathname.endsWith("/productos"), async (r) => { await catalogoSuelto; await r.continue(); }, { times: 1 });
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.goto("/#/vender");
+  const busqueda = page.getByTestId("busqueda");
+  await expect(busqueda).toBeDisabled();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("menu-vender")).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+  soltarElCatalogo();
+  await expect(busqueda).toBeEnabled();
+  await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+});
+
 // Todo con el teclado (decisión 61, RNF-05): el menú, las pestañas y una venta completa, sin mouse.
 test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una venta con Tab y los atajos", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);

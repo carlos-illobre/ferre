@@ -204,14 +204,15 @@ export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, 
 }) {
   const propia = useRef<HTMLInputElement>(null);
   const caja = cajaRef ?? propia;
-  // Como autoFocus, pero sin quitarle el foco a lo que la persona eligió con el teclado (el menú,
-  // una pestaña): la caja puede aparecer tarde, cuando llegan los datos de la pantalla (decisión 82).
+  // Como autoFocus, pero también al habilitarse (la caja espera deshabilitada a que baje el
+  // catálogo) y sin quitarle el foco a lo que la persona eligió con el teclado (el menú, una
+  // pestaña): la caja puede aparecer o habilitarse tarde, cuando llegan los datos (decisión 82).
   useLayoutEffect(() => {
     const foco = document.activeElement;
-    if (autoFoco && !(foco instanceof HTMLElement && foco !== document.body && foco.matches(":focus-visible"))) caja.current?.focus();
-    // Solo al aparecer, como autoFocus.
+    if (autoFoco && !disabled && !(foco instanceof HTMLElement && foco !== document.body && foco.matches(":focus-visible"))) caja.current?.focus();
+    // Solo al aparecer y al habilitarse.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [disabled]);
   return (
     <div className="buscador" role="search">
       <div className="buscador-caja">
