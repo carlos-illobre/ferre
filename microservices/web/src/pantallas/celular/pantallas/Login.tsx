@@ -108,7 +108,7 @@ export function Login() {
 }
 
 // Entrar con la huella: solo en dispositivos que la tienen; el celular tiene que estar
-// vinculado antes desde Negocio (entrando con Google una vez).
+// vinculado antes desde Más → Configuración (entrando con Google una vez).
 // `enseguida`: pide la huella apenas aparece, sin esperar el toque (se viene de escanear el
 // código de la computadora, decisión 65). Si no se lee, el botón queda para probar de nuevo.
 export function BotonHuella({ detalle, titulo = "Entrar con la huella", enseguida = false }: { detalle?: string; titulo?: string; enseguida?: boolean } = {}) {

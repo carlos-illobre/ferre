@@ -153,7 +153,7 @@ export async function entrarConHuella(desafioId: string | undefined, respuesta: 
   const pendiente = retirarDesafio(desafioId);
   if (!pendiente || !respuesta) return mal(400, "El pedido venció: probá de nuevo");
   const cred = await datos.credencialConUsuario(respuesta.id);
-  if (!cred) return mal(401, "Este celular no está vinculado a ninguna cuenta. Entrá con Google y vinculalo desde Administración.");
+  if (!cred) return mal(401, "Este celular no está vinculado a ninguna cuenta. Entrá con Google y vinculalo desde Más → Configuración.");
   if (!cred.activo) return mal(403, "Tu usuario está desactivado");
   let verificacion;
   try {

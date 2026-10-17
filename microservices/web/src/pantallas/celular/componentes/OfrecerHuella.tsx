@@ -35,7 +35,7 @@ export function OfrecerHuella() {
     } catch (e) {
       const err = e as Error;
       if (err.name === "InvalidStateError") { yaOfrecida(); setVisible(false); return; } // ya estaba vinculado
-      setError(err.name === "NotAllowedError" ? "No se leyó la huella. Podés vincularlo después desde Negocio." : err.message);
+      setError(err.name === "NotAllowedError" ? "No se leyó la huella. Podés vincularlo después desde Más → Configuración." : err.message);
       setEstado("error");
     }
   }
@@ -47,7 +47,7 @@ export function OfrecerHuella() {
       {estado === "listo" ? (
         <>
           <div className="ficha-cabeza"><span className="avatar"><Icono nombre="tilde" tam={24} grosor={3} /></span><div className="textos"><strong>Listo</strong></div></div>
-          <p className="subtitulo">La próxima vez entrás con la huella, sin Google. Podés quitar este celular desde Negocio.</p>
+          <p className="subtitulo">La próxima vez entrás con la huella, sin Google. Podés quitar este celular desde Más → Configuración.</p>
           <button type="button" className="boton tinta principal centrado" onClick={() => setVisible(false)}>Entendido</button>
         </>
       ) : (

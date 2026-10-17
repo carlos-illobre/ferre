@@ -38,9 +38,9 @@ export function OfrecerHuella() {
       const err = e as Error;
       if (err.name === "InvalidStateError") { yaOfrecida(); setVisible(false); return; } // ya estaba vinculado
       // No se marca como ofrecida: vuelve a aparecer en la próxima entrada con Google.
-      setError(err.name === "NotAllowedError" ? "No se leyó la huella. Probá de nuevo, o vinculalo después desde Más → Usuarios, en «Sesiones»."
-        : esFallaDeRed(e) ? "Vincular la huella necesita internet. Probá de nuevo, o hacelo después desde Más → Usuarios, en «Sesiones»."
-        : `${err.message}. Podés vincularlo después desde Más → Usuarios, en «Sesiones».`);
+      setError(err.name === "NotAllowedError" ? "No se leyó la huella. Probá de nuevo, o vinculalo después desde Más → Configuración."
+        : esFallaDeRed(e) ? "Vincular la huella necesita internet. Probá de nuevo, o hacelo después desde Más → Configuración."
+        : `${err.message}. Podés vincularlo después desde Más → Configuración.`);
       setEstado("error");
     }
   }
@@ -52,7 +52,7 @@ export function OfrecerHuella() {
       <Hoja titulo="Listo" alCerrar={() => setVisible(false)} testId="ofrecer-huella">
         <div className="ofrecer-huella">
           <span className="ofrecer-huella-icono listo"><Icono nombre="tilde" tam={36} grosor={3} /></span>
-          <p role="status">Desde ahora entrás con la huella, sin la cuenta de Google. Si perdés este celular, lo quitás desde Más → Usuarios, en «Sesiones».</p>
+          <p role="status">Desde ahora entrás con la huella, sin la cuenta de Google. Si perdés este celular, lo quitás desde Más → Configuración.</p>
           <div className="ofrecer-huella-botones"><Boton variante="principal" tam="grande" autoFocus onClick={() => setVisible(false)}>Entendido</Boton></div>
         </div>
       </Hoja>

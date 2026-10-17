@@ -48,3 +48,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T037 [regla] Se saca la pestaña Sesiones: las sesiones y los celulares con huella de cada persona van en su tarjeta de Usuarios, los días del vínculo al final de Usuarios, y «Administrar sesiones» se une a «Administrar usuarios» (decisión 100, aprobada por Carlos el 2026-10-17)
 - [x] T038 [ajuste] En el celular, «Autorizar otro correo de Google» pasa a ser un botón naranja lleno, para que llame más la atención (pedido de Carlos del 2026-10-17)
 - [x] T039 [ajuste] Las pruebas manuales de entrar siguen a las decisiones 97, 99 y 100: celulares con huella en Configuración, sesiones en la tarjeta de cada persona, salida sola en menos de 30 segundos y «Conectando tu cuenta de Google» (pedido de Carlos del 2026-10-17)
+- [x] T040 [arreglo] Los textos que dicen dónde vincular o quitar el celular con huella apuntan a Más → Configuración (decisión 99), no a Negocio, «Sesiones» ni Administración

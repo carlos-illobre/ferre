@@ -188,7 +188,7 @@ function CapituloEntrar() {
       <p>En la entrada de la computadora o del celular, tocá <Boton>Continuar con Google</Boton> y elegí tu cuenta. Es la forma de entrar la primera vez en un celular.</p>
       <h3>Con la huella</h3>
       <p>En un celular que ya vinculaste con tu cuenta, tocá <Boton>Entrar con la huella</Boton>. La primera vez que entrás con Google desde un
-        celular, Ferrebress te ofrece vincularlo; también se hace desde <b>Más → Usuarios</b>, en la pestaña «Sesiones».</p>
+        celular, Ferrebress te ofrece vincularlo; también se hace desde <b>Más → Configuración</b>, en «Mis celulares con huella».</p>
 
       <h2 id="problemas" tabIndex={-1}>Si algo no funciona</h2>
       <table className="manual-problemas">

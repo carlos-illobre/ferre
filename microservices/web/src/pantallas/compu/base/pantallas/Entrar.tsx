@@ -44,7 +44,7 @@ function explicar(e: unknown, medio: "google" | "huella"): ErrorDeEntrada {
     };
   }
   if (e.estado === 403) return { titulo: "Usuario desactivado", texto: "Tu usuario está desactivado. Pedile a un Administrador del negocio que lo reactive." };
-  if (e.estado === 401 && medio === "huella") return { texto: "Este dispositivo no está vinculado a ninguna cuenta. Entrá con Google; después lo vinculás desde Más → Usuarios, en «Sesiones»." };
+  if (e.estado === 401 && medio === "huella") return { texto: "Este dispositivo no está vinculado a ninguna cuenta. Entrá con Google; después lo vinculás desde Más → Configuración." };
   if (e.estado === 401) return { texto: "Google no pudo verificar la cuenta. Probá de nuevo." };
   return { texto: err.message };
 }

@@ -141,7 +141,7 @@ describe("la huella (simulada)", () => {
     lector.registrar.mockRejectedValue(Object.assign(new Error("cancelado"), { name: "NotAllowedError" }));
     render(<OfrecerEnElCelular />);
     fireEvent.click(screen.getByTestId("aceptar-huella"));
-    expect(await screen.findByText("No se leyó la huella. Podés vincularlo después desde Negocio.")).toBeTruthy();
+    expect(await screen.findByText("No se leyó la huella. Podés vincularlo después desde Más → Configuración.")).toBeTruthy();
     expect(apiFalsa.mock.calls.map((c) => c[0])).not.toContain("/credenciales/registro");
     expect(localStorage.getItem("ferre.huella-ofrecida")).toBeNull();
   });
@@ -159,7 +159,7 @@ describe("la huella (simulada)", () => {
   it("B5: un celular que ya no está vinculado no entra y dice que entre con Google", async () => {
     lector.leer.mockResolvedValue({ id: "clave-quitada", response: {} });
     apiFalsa.mockImplementation(async (ruta: string) => {
-      if (ruta === "/credenciales/login") throw new ErrorApi(401, "Este celular no está vinculado a ninguna cuenta. Entrá con Google y vinculalo desde Administración.");
+      if (ruta === "/credenciales/login") throw new ErrorApi(401, "Este celular no está vinculado a ninguna cuenta. Entrá con Google y vinculalo desde Más → Configuración.");
       return { desafioId: "d-1", opciones: {} };
     });
     conSesion(<celular.BotonHuella />);
