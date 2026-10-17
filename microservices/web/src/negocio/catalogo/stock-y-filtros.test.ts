@@ -18,6 +18,10 @@ describe("el stock en el Catálogo", () => {
   it("015-E03: cero, negativo o nunca cargado es «Sin stock»", () => {
     for (const p of [CINTA, CINTA2, SIN_MARCA]) expect(stockDe(p, stock)).toEqual({ hay: false, texto: "Sin stock" });
   });
+  it("015-E03: muy poco no se escribe «0»: es stock, con su primera cifra", () => {
+    expect(stockDe(CLAVO, new Map([["clavo", 0.04]]))).toEqual({ hay: true, texto: "0,04 kg" });
+    expect(stockDe(MECHA, new Map([["mecha", 0.4]]))).toEqual({ hay: true, texto: "0,4 u." });
+  });
   it("015-E05: con el stock nuevo, dice el stock nuevo", () => {
     expect(stockDe(MECHA, new Map([["mecha", 4]])).texto).toBe("4 u.");
   });

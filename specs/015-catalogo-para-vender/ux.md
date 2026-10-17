@@ -21,8 +21,8 @@ celular y en la computadora.
 - «Agregar», con un carrito, en cada producto: en el celular debajo del precio; en la
   computadora debajo del precio de venta. Es un botón secundario: borde suave y fondo claro,
   al menos 36 px de alto (decisión 104).
-- En la computadora, con el teclado: la tecla «+» agrega el producto elegido; la línea de
-  atajos lo dice.
+- En la computadora, con el teclado: la tecla «+» agrega el producto elegido, también con el foco
+  en el buscador; con Ctrl, Cmd o Alt no hace nada. La línea de atajos lo dice.
 - Al agregar se sigue en el Catálogo, con la misma búsqueda y en el mismo lugar; un aviso breve
   dice «Agregado a la venta: <producto>». En el menú, Vender muestra cuántos renglones lleva la
   venta; sin venta, sin número.
@@ -35,12 +35,21 @@ celular y en la computadora.
 - Abiertos: en el celular, una hoja que sube desde abajo; en la computadora, un panel debajo
   del botón, que se cierra con Esc. Tienen «Disponibilidad» (Todos, Con stock, Sin stock), «Marca»
   con un buscador y la lista de marcas, y «Sacar filtros». En el celular, «Ver N productos»
-  cierra la hoja; en la computadora la lista se filtra mientras se elige.
+  cierra la hoja; en la computadora la lista se filtra mientras se elige. Si no queda ninguno, el
+  botón dice «No hay productos con esos filtros.» en lugar de «Ver 0 productos».
+- Las marcas para elegir son las de lo encontrado con la búsqueda escrita; el buscador de marcas
+  lleva lupa en las dos interfaces.
+- En la computadora, el panel recibe el foco al abrirse, en lo elegido, y no lo vuelve a mover
+  mientras se elige: se recorre entero con el teclado.
+- Con filtros puestos, arriba de la lista, un renglón dice cuántos productos quedan («12
+  productos con filtros») y ofrece «Sacar filtros» de un toque. No está en la maqueta: se agregó
+  al programar, para cumplir E18 y E19.
 - Con filtros que no dejan nada, la lista lo dice y ofrece sacarlos.
 
 ## Pestañas, buscador y tarjetas (historia 4)
 
-- Pestañas Productos, Listas y Duplicados de al menos 44 px de alto en el celular.
+- Pestañas Productos, Listas y Duplicados de al menos 44 px de alto en el celular; las demás
+  pestañas del celular son las mismas y miden lo mismo.
 - Buscador: «Producto, código o marca» en el celular; «Buscar productos, códigos o marcas…» en
   la computadora.
 - En el celular, cada producto es una tarjeta suelta, con 1 px de separación entre una y otra;

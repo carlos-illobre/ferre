@@ -17,7 +17,7 @@ import "../estilos/productos.css";
 import { margenAMano, otroMargen, precioDelProducto } from "../../../../negocio/catalogo/precio";
 import { cuantosFiltros, filtrar, marcasDe, SIN_FILTROS, stockDe, type Disponibilidad, type Filtros } from "../../../../negocio/catalogo/stock-y-filtros";
 import { agregarALaVenta } from "../../../../negocio/ventas/venta-en-curso";
-import { TEXTOS } from "../../../textos";
+import { cuantosProductos, TEXTOS } from "../../../textos";
 
 // Productos: búsqueda al instante sobre el catálogo guardado en el dispositivo, y el margen
 // de cada uno. En la computadora todo se cambia en la fila; en el celular, cada producto
@@ -72,12 +72,13 @@ export function Productos() {
     if (!emparejado || abiertoId) return;
     return escucharPuesto(emparejado, (codigo) => alEscanear.current(codigo), undefined, true);
   }, [abiertoId, emparejado]);
-  // Con filtros se filtra todo lo buscado y después se muestra de a tramos, para no perder productos.
-  const resultados = useMemo(() => {
-    const busqueda = (maximo: number) => (consultaEstable.trim() ? buscarProductos(consultaEstable, maximo) : (catalogo ?? []).slice(0, maximo));
-    return conFiltros ? filtrar(busqueda(Number.MAX_SAFE_INTEGER), stock, filtros).slice(0, limite) : busqueda(limite);
-  }, [buscarProductos, consultaEstable, limite, catalogo, conFiltros, filtros, stock]);
-  const marcas = useMemo(() => marcasDe(catalogo ?? []), [catalogo]);
+  // Con filtros se filtra todo lo encontrado y después se muestra de a tramos, para no perder
+  // productos. Lo encontrado entero se arma solo con filtros o con los filtros abiertos: sin eso se
+  // busca de a tramos, como siempre. Las marcas para elegir son las de lo encontrado (015-E29).
+  const encontrados = useMemo(() => (conFiltros || viendoFiltros ? (consultaEstable.trim() ? buscarProductos(consultaEstable, Number.MAX_SAFE_INTEGER) : catalogo ?? []) : []), [conFiltros, viendoFiltros, consultaEstable, buscarProductos, catalogo]);
+  const filtrados = useMemo(() => (conFiltros ? filtrar(encontrados, stock, filtros) : null), [conFiltros, encontrados, stock, filtros]);
+  const resultados = useMemo(() => (filtrados ? filtrados.slice(0, limite) : consultaEstable.trim() ? buscarProductos(consultaEstable, limite) : (catalogo ?? []).slice(0, limite)), [filtrados, limite, consultaEstable, buscarProductos, catalogo]);
+  const marcas = useMemo(() => marcasDe(encontrados), [encontrados]);
   const hayMas = resultados.length === limite;
   useEffect(() => { setElegido(0); setLimite(PASO); }, [consultaEstable, filtros]);
   // Trae más resultados al llegar al final de los que están a la vista.
@@ -114,7 +115,7 @@ export function Productos() {
     }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
     // «+» agrega el elegido a la venta (015-E27); sin permiso de vender, no hace nada.
-    else if (e.key === "+" && puedeVender && resultados[elegido]) { e.preventDefault(); agregar(resultados[elegido]!); }
+    else if (e.key === "+" && !e.ctrlKey && !e.metaKey && !e.altKey && puedeVender && resultados[elegido]) { e.preventDefault(); agregar(resultados[elegido]!); }
     else if (fijaMargen && e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
       // Se mira e.code porque con Mayúsculas la tecla «3» reporta «#».
       e.preventDefault();
@@ -160,7 +161,7 @@ export function Productos() {
         </Vacio>
       )}
       {conFiltros && (
-        <p className="con-filtros detalle" data-testid="con-filtros">{resultados.length < limite ? `${numero(resultados.length)} ${resultados.length === 1 ? "producto" : "productos"}` : "Productos"} con filtros
+        <p className="con-filtros detalle" data-testid="con-filtros">{cuantosProductos(filtrados?.length ?? 0)} {TEXTOS.catalogo.conFiltros.largo}
           <button type="button" className="enlace" onClick={() => setFiltros(SIN_FILTROS)} data-testid="sacar-filtros">{TEXTOS.catalogo.sacarFiltros.largo}</button></p>
       )}
       {conFiltros && resultados.length === 0 && catalogo && catalogo.length > 0 ? (
@@ -370,14 +371,18 @@ function PanelDeFiltros({ filtros, marcas, alCambiar, alCerrar }: { filtros: Fil
   const [buscarMarca, setBuscarMarca] = useState("");
   const panel = useRef<HTMLDivElement>(null);
   const t = TEXTOS.catalogo;
+  // El foco entra una sola vez, al abrir; el padre pasa un `alCerrar` nuevo en cada dibujo, y
+  // depender de él movería el foco cada vez que cambia la lista (015-E30).
+  const cerrar = useRef(alCerrar);
+  cerrar.current = alCerrar;
   useEffect(() => {
     panel.current?.querySelector<HTMLElement>("[aria-checked='true']")?.focus();
-    const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") { e.stopPropagation(); alCerrar(); } };
-    const afuera = (e: MouseEvent) => { if (panel.current && !panel.current.parentElement?.contains(e.target as Node)) alCerrar(); };
+    const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") { e.stopPropagation(); cerrar.current(); } };
+    const afuera = (e: MouseEvent) => { if (panel.current && !panel.current.parentElement?.contains(e.target as Node)) cerrar.current(); };
     window.addEventListener("keydown", tecla, true);
     document.addEventListener("mousedown", afuera);
     return () => { window.removeEventListener("keydown", tecla, true); document.removeEventListener("mousedown", afuera); };
-  }, [alCerrar]);
+  }, []);
   const opciones: { valor: Disponibilidad; nombre: string }[] = [{ valor: "todos", nombre: t.todos.largo }, { valor: "con-stock", nombre: t.conStock.largo }, { valor: "sin-stock", nombre: t.sinStock.largo }];
   const visibles = marcas.filter((m) => m.toLocaleLowerCase("es-AR").includes(buscarMarca.trim().toLocaleLowerCase("es-AR")));
   return (
@@ -388,7 +393,7 @@ function PanelDeFiltros({ filtros, marcas, alCambiar, alCerrar }: { filtros: Fil
         {opciones.map((o) => <button key={o.valor} type="button" role="radio" aria-checked={filtros.disponibilidad === o.valor} onClick={() => alCambiar({ ...filtros, disponibilidad: o.valor })} data-testid={`disponibilidad-${o.valor}`}>{o.nombre}</button>)}
       </div>
       <h3>{t.marca.largo}</h3>
-      <input type="search" className="filtros-buscar-marca" value={buscarMarca} onChange={(e) => setBuscarMarca(e.target.value)} placeholder={t.buscarMarca.largo} aria-label={t.buscarMarca.largo} data-testid="buscar-marca" />
+      <label className="filtros-buscar-marca"><Icono nombre="buscar" tam={18} /><input type="search" value={buscarMarca} onChange={(e) => setBuscarMarca(e.target.value)} placeholder={t.buscarMarca.largo} aria-label={t.buscarMarca.largo} data-testid="buscar-marca" /></label>
       <ul className="filtros-marcas" role="radiogroup" aria-label={t.marca.largo}>
         {[null, ...visibles].map((m) => (
           <li key={m ?? ""}><button type="button" role="radio" aria-checked={filtros.marca === m} onClick={() => alCambiar({ ...filtros, marca: m })} data-testid="marca"><i aria-hidden="true" />{m ?? t.todasLasMarcas.largo}</button></li>

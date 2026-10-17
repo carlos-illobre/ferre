@@ -65,6 +65,9 @@ export const TEXTOS = {
     todasLasMarcas: igual("Todas las marcas"),
     sinProductosConFiltros: igual("No hay productos con esos filtros."),
     teclaAgregar: igual("agrega el elegido a la venta"),
+    // «12 productos con filtros», «Ver 12 productos»: la cantidad, con `cuantosProductos`.
+    conFiltros: igual("con filtros"),
+    ver: igual("Ver"),
   },
   vender: {
     noLlevo: { largo: "Anotado como «No llevó»: qué pidió y a cuánto se le ofreció.", corto: "Anotado como «No llevó»." },
@@ -144,3 +147,6 @@ export const TEXTOS = {
     },
   },
 } satisfies Record<string, Record<string, Texto>>;
+
+// «1 producto», «1.250 productos»: igual en las dos interfaces.
+export const cuantosProductos = (n: number) => `${n.toLocaleString("es-AR")} ${n === 1 ? "producto" : "productos"}`;

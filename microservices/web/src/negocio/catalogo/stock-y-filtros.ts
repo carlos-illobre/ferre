@@ -11,7 +11,10 @@ export function stockDe(p: Producto, stock: ReadonlyMap<string, number>): { hay:
   const cantidad = stock.get(p.id);
   if (cantidad === undefined || !Number.isFinite(cantidad) || cantidad <= 0) return { hay: false, texto: "Sin stock" };
   const unidad = unidadDe(p);
-  const numero = cantidad.toLocaleString("es-AR", { maximumFractionDigits: unidad === "unidad" ? 0 : 1 });
+  // Lo que redondeado daría «0» (0,04 kg) se escribe con su primera cifra: hay stock, y un «0» en
+  // verde contradiría «Sin stock».
+  const redondeado = cantidad.toLocaleString("es-AR", { maximumFractionDigits: unidad === "unidad" ? 0 : 1 });
+  const numero = redondeado === "0" ? cantidad.toLocaleString("es-AR", { maximumSignificantDigits: 1 }) : redondeado;
   return { hay: true, texto: `${numero} ${unidad === "unidad" ? "u." : escribirUnidad(unidad)}` };
 }
 

@@ -21,7 +21,7 @@ import type { Producto } from "./pantallas/Productos";
 import { margenAMano, otroMargen, precioDelProducto } from "../../negocio/catalogo/precio";
 import { cuantosFiltros, filtrar, marcasDe, SIN_FILTROS, stockDe, type Disponibilidad, type Filtros } from "../../negocio/catalogo/stock-y-filtros";
 import { agregarALaVenta } from "../../negocio/ventas/venta-en-curso";
-import { TEXTOS } from "../textos";
+import { cuantosProductos, TEXTOS } from "../textos";
 import "./catalogo.css";
 
 // Catálogo: productos con margen y proveedores, listas de precios, duplicados. Tres
@@ -83,12 +83,13 @@ export function Productos() {
   const centinela = useRef<HTMLDivElement>(null);
 
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía el menú.
-  // Con filtros se filtra todo lo buscado y después se muestra de a 30, para no perder productos.
-  const resultados = useMemo(() => {
-    const busqueda = (maximo: number) => (consultaEstable.trim() ? buscarProductos(consultaEstable, maximo) : (catalogo ?? []).slice(0, maximo));
-    return conFiltros ? filtrar(busqueda(Number.MAX_SAFE_INTEGER), stock, filtros).slice(0, limite) : busqueda(limite);
-  }, [buscarProductos, consultaEstable, limite, catalogo, conFiltros, filtros, stock]);
-  const marcas = useMemo(() => marcasDe(catalogo ?? []), [catalogo]);
+  // Con filtros se filtra todo lo encontrado y después se muestra de a 30, para no perder
+  // productos. Lo encontrado entero se arma solo con filtros o con los filtros abiertos: sin eso se
+  // busca de a tramos, como siempre. Las marcas para elegir son las de lo encontrado (015-E29).
+  const encontrados = useMemo(() => (conFiltros || viendoFiltros ? (consultaEstable.trim() ? buscarProductos(consultaEstable, Number.MAX_SAFE_INTEGER) : catalogo ?? []) : []), [conFiltros, viendoFiltros, consultaEstable, buscarProductos, catalogo]);
+  const filtrados = useMemo(() => (conFiltros ? filtrar(encontrados, stock, filtros) : null), [conFiltros, encontrados, stock, filtros]);
+  const resultados = useMemo(() => (filtrados ? filtrados.slice(0, limite) : consultaEstable.trim() ? buscarProductos(consultaEstable, limite) : (catalogo ?? []).slice(0, limite)), [filtrados, limite, consultaEstable, buscarProductos, catalogo]);
+  const marcas = useMemo(() => marcasDe(encontrados), [encontrados]);
   const agregar = useCallback((p: Producto) => { agregarALaVenta(p); setAgregado(`${TEXTOS.catalogo.agregado.corto}: ${p.descripcion}`); }, []);
   useEffect(() => { if (!agregado) return; const t = setTimeout(() => setAgregado(null), 3000); return () => clearTimeout(t); }, [agregado]);
   const hayMas = resultados.length === limite;
@@ -128,7 +129,7 @@ export function Productos() {
           <Icono nombre="filtros" tam={22} />{conFiltros && <b data-testid="cuantos-filtros">{cuantosFiltros(filtros)}</b>}
         </button>} />
       {conFiltros && (
-        <p className="con-filtros" data-testid="con-filtros">{resultados.length < limite ? `${resultados.length} ${resultados.length === 1 ? "producto" : "productos"}` : "Productos"} con filtros
+        <p className="con-filtros" data-testid="con-filtros">{cuantosProductos(filtrados?.length ?? 0)} {TEXTOS.catalogo.conFiltros.corto}
           <button type="button" onClick={() => setFiltros(SIN_FILTROS)} data-testid="sacar-filtros">{TEXTOS.catalogo.sacarFiltros.corto}</button></p>
       )}
       {escaneando && <Escaner alDetectar={alEscanear} alCerrar={() => setEscaneando(false)} />}
@@ -144,7 +145,7 @@ export function Productos() {
       )}
       {hayMas && <div ref={centinela} className="aviso-suave" data-testid="cargar-mas">Cargando más…</div>}
       {agregado && <div className="aviso-agregado"><Toast texto={agregado} alCerrar={() => setAgregado(null)} testId="agregado" /></div>}
-      {viendoFiltros && <HojaDeFiltros filtros={filtros} marcas={marcas} cuantos={(f) => filtrar(consultaEstable.trim() ? buscarProductos(consultaEstable, Number.MAX_SAFE_INTEGER) : catalogo ?? [], stock, f).length} alCambiar={setFiltros} alCerrar={() => setViendoFiltros(false)} />}
+      {viendoFiltros && <HojaDeFiltros filtros={filtros} marcas={marcas} cuantos={filtrados?.length ?? encontrados.length} alCambiar={setFiltros} alCerrar={() => setViendoFiltros(false)} />}
       {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== abierto.id && x.codigo_barras === codigo)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
     </>
   );
@@ -177,12 +178,12 @@ function FilaProducto({ producto: p, stock, elegida, alAbrir, alAgregar }: { pro
 
 // Los filtros, en una hoja que sube desde abajo (maqueta de 015): la disponibilidad y la marca,
 // con su buscador. Se aplican mientras se eligen; «Ver N productos» cierra la hoja.
-function HojaDeFiltros({ filtros, marcas, cuantos, alCambiar, alCerrar }: { filtros: Filtros; marcas: string[]; cuantos: (f: Filtros) => number; alCambiar: (f: Filtros) => void; alCerrar: () => void }) {
+function HojaDeFiltros({ filtros, marcas, cuantos, alCambiar, alCerrar }: { filtros: Filtros; marcas: string[]; cuantos: number; alCambiar: (f: Filtros) => void; alCerrar: () => void }) {
   const [buscarMarca, setBuscarMarca] = useState("");
   const t = TEXTOS.catalogo;
   const opciones: { valor: Disponibilidad; nombre: string }[] = [{ valor: "todos", nombre: t.todos.corto }, { valor: "con-stock", nombre: t.conStock.corto }, { valor: "sin-stock", nombre: t.sinStock.corto }];
   const visibles = marcas.filter((m) => m.toLocaleLowerCase("es-AR").includes(buscarMarca.trim().toLocaleLowerCase("es-AR")));
-  const n = cuantos(filtros);
+  const n = cuantos;
   return (
     <Hoja titulo={t.filtros.corto} extra={<button type="button" className="enlace" onClick={() => alCambiar(SIN_FILTROS)} data-testid="hoja-sacar-filtros">{t.sacarFiltros.corto}</button>} alCerrar={alCerrar} testId="hoja-filtros">
       <h3 className="filtros-titulo">{t.disponibilidad.corto}</h3>
@@ -196,7 +197,7 @@ function HojaDeFiltros({ filtros, marcas, cuantos, alCambiar, alCerrar }: { filt
           <li key={m ?? ""}><button type="button" role="radio" aria-checked={filtros.marca === m} className={filtros.marca === m ? "elegida" : ""} onClick={() => alCambiar({ ...filtros, marca: m })} data-testid="marca"><i aria-hidden="true" />{m ?? t.todasLasMarcas.corto}</button></li>
         ))}
       </ul>
-      <button type="button" className="boton coral principal centrado ver-productos" onClick={alCerrar} data-testid="ver-productos">{n === 0 ? t.sinProductosConFiltros.corto : `Ver ${n} ${n === 1 ? "producto" : "productos"}`}</button>
+      <button type="button" className="boton coral principal centrado ver-productos" onClick={alCerrar} data-testid="ver-productos">{n === 0 ? t.sinProductosConFiltros.corto : `${t.ver.corto} ${cuantosProductos(n)}`}</button>
     </Hoja>
   );
 }

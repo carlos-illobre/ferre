@@ -116,6 +116,28 @@ describe("Catálogo para vender · celular", () => {
     expect(screen.getAllByTestId("producto")).toHaveLength(2);
   });
 
+  it("015-E29: las marcas para elegir son las de lo encontrado, no las de todo lo que trajo la memoria", async () => {
+    armar(); // buscando en el servidor, la memoria junta lo de búsquedas anteriores: acá, todo el catálogo
+    fireEvent.change(screen.getByTestId("busqueda"), { target: { value: "cinta" } });
+    await waitFor(() => expect(screen.getAllByTestId("producto")).toHaveLength(2));
+    fireEvent.click(screen.getByTestId("filtros"));
+    expect(screen.getAllByTestId("marca").map((b) => b.textContent)).toEqual(["Todas las marcas", "3M"]);
+  });
+
+  it("015-E18: con más productos de los que entran de una vez, dice cuántos son", () => {
+    const muchos = Array.from({ length: 45 }, (_, i) => producto({ id: `tornillo-${i}`, descripcion: `Tornillo ${i}`, marca: "Fischer" }));
+    const falso = catalogoFalso([...muchos, { ...CINTA }]);
+    muchos.forEach((p) => falso.stock.set(p.id, 10));
+    catalogo.actual = falso;
+    render(<Catalogo sub={null} />);
+    fireEvent.click(screen.getByTestId("filtros"));
+    fireEvent.click(screen.getByTestId("disponibilidad-con-stock"));
+    expect(screen.getByTestId("ver-productos").textContent).toBe("Ver 45 productos");
+    fireEvent.click(screen.getByTestId("ver-productos"));
+    expect(screen.getByTestId("con-filtros").textContent).toContain("45 productos con filtros");
+    expect(screen.getAllByTestId("producto")).toHaveLength(30); // se muestran de a tramos
+  });
+
   it("015-E08: lo agregado desde el Catálogo está en Vender, con su precio", () => {
     const { unmount } = armar();
     fireEvent.click(within(tarjeta("mecha")).getByTestId("agregar"));

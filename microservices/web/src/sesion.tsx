@@ -4,6 +4,7 @@ export const CONTROL_DE_SESION_MS = 30_000;
 // Quien dependa de la sesión para conectarse (el espejo con el celular) se entera al entrar.
 export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
 import { api, borrarToken, guardarToken, leerToken } from "./api";
+import { vaciarVenta } from "./negocio/ventas/venta-en-curso";
 import type { SesionActual, UsuarioDeLaSesion } from "@servidor/sesiones";
 
 // `roles` son los nombres de sus roles y `permisos` lo que esos roles le dejan hacer (RF-72).
@@ -31,7 +32,9 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
         const guardado = leerUsuarioGuardado();
         setSesion(guardado ? { estado: "con-sesion", usuario: guardado, sinConexion: true, sesionId: null } : { estado: "sin-sesion" });
       });
-    const alCerrar = () => setSesion({ estado: "sin-sesion" });
+    // La venta a medio armar es de quien la estaba armando: al cerrarse su sesión no queda para
+    // el que entre después (015, ADR-022; antes se perdía al cerrar Vender).
+    const alCerrar = () => { vaciarVenta(); setSesion({ estado: "sin-sesion" }); };
     window.addEventListener("sesion-cerrada", alCerrar);
     return () => window.removeEventListener("sesion-cerrada", alCerrar);
   }, []);
@@ -61,6 +64,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
   const salir = useCallback(async () => {
     await api("/sesiones/actual", { method: "DELETE" }).catch(() => undefined);
     borrarToken();
+    vaciarVenta();
     setSesion({ estado: "sin-sesion" });
   }, []);
 

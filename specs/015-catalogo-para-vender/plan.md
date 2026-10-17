@@ -34,8 +34,11 @@ Sin cambios en el servidor ni en la base: todo es del cliente web, en las dos in
 
 - Cliente web (React, Vite) de `microservices/web`; el negocio compartido en `src/negocio/`, las
   pantallas en `src/pantallas/celular/` y `src/pantallas/compu/` (ADR-018).
-- Rendimiento: el filtro corre sobre la lista ya buscada (cientos de productos como mucho), no
-  sobre los 11.000; las marcas se calculan una vez por catálogo.
+- Rendimiento: sin filtros, la búsqueda trae de a tramos, como siempre. Con filtros puestos o
+  abiertos se toma todo lo encontrado (con la búsqueda vacía, el catálogo entero, hasta 11.000) y
+  se filtra una vez por cambio de búsqueda, de filtro o de stock; las marcas salen de eso mismo.
+  Es un recorrido de la lista en memoria: no se midió con 11.000 (SC-004 queda por medir, en
+  `proyecto/estado.yml`).
 - Sin conexión: agregar no habla con el servidor; la venta se cobra como siempre (cola).
 
 ## Constitution Check

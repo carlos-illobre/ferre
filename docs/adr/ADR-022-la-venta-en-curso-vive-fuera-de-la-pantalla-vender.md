@@ -37,6 +37,9 @@ aparecer en el otro dispositivo aunque ninguno de los dos esté en Vender.
   venta.
 - Vive en memoria mientras la aplicación está abierta. No se guarda en el dispositivo: recargar
   la aplicación la vacía, como hoy.
+- Es de quien la está armando: cerrar la sesión («Salir», o que el servidor la cierre) la vacía,
+  para que quien entre después en el mismo dispositivo no la encuentre (antes pasaba sola, al
+  cerrarse Vender).
 
 ## Consecuencias
 

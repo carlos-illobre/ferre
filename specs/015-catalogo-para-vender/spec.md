@@ -120,6 +120,17 @@ que encuentra por nombre, por código y por marca.
 - Un catálogo de 11.000 productos: el stock y los filtros no hacen más lenta la búsqueda que hoy.
 - Una marca escrita distinto por dos proveedores («3M» y «3m»): en la lista de marcas figura una sola vez.
 - Un producto sin marca: no figura en ninguna marca, y sí con el filtro de marca sin elegir.
+- Muy poco stock (0,04 kg): se escribe con su primera cifra, «0,04 kg en stock»; nunca un «0»
+  que parezca que hay y diga que no.
+- Con filtros y más productos de los que la lista muestra de una vez: el renglón de filtros dice
+  igual cuántos son («81 productos con filtros»).
+- Cerrar la sesión («Salir», o que el servidor la cierre): la venta a medio armar se vacía; quien
+  entra después en el mismo dispositivo no la encuentra ni puede cobrarla.
+- En la computadora, la tecla «+» con el foco en el buscador agrega el elegido: el buscador no
+  busca signos, así que no se pierde nada. Con Ctrl, Cmd o Alt no agrega (Ctrl y «+» agranda la
+  página).
+- Las pestañas de 44 px valen para todas las pestañas del celular, no solo las del Catálogo: son
+  las mismas en toda la aplicación (consistencia, como pide Carlos).
 
 ## Requirements *(mandatory)*
 

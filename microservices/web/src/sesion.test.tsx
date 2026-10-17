@@ -8,6 +8,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 vi.unmock("./sesion");
 const { ProveedorDeSesion, useSesion, CONTROL_DE_SESION_MS } = await import("./sesion");
 const { api } = await import("./api");
+const { agregarALaVenta, ventaActual } = await import("./negocio/ventas/venta-en-curso");
 
 const CARLOS = { id: "u-1", email: "carlos@ferre.test", nombre: "Carlos", roles: [], permisos: [] };
 const respuesta = (estado: number, cuerpo: unknown = {}) => new Response(JSON.stringify(cuerpo), { status: estado, headers: { "Content-Type": "application/json" } });
@@ -85,5 +86,33 @@ describe("el servidor da por terminada la sesión", () => {
     servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
     render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
     await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+  });
+});
+
+// La venta a medio armar es de quien la armaba (015, ADR-022): al salir, o al cerrarla el
+// servidor, no queda para el que entre después en el mismo dispositivo.
+describe("la venta en curso al cerrarse la sesión", () => {
+  const MECHA = { id: "mecha", descripcion: "Mecha para madera 6 mm", unidad: "unidad", margen_elegido: 100 } as never;
+  function Salir() { const { salir } = useSesion(); return <button type="button" onClick={() => void salir()}>Salir</button>; }
+
+  it("015: «Salir» vacía la venta", async () => {
+    servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+    render(<ProveedorDeSesion><Estado /><Salir /></ProveedorDeSesion>);
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+    act(() => { agregarALaVenta(MECHA); });
+    await act(async () => { screen.getByRole("button", { name: "Salir" }).click(); });
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
+    expect(ventaActual().items).toHaveLength(0);
+  });
+
+  it("015: si el servidor cierra la sesión, la venta se vacía", async () => {
+    servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+    render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+    act(() => { agregarALaVenta(MECHA); });
+    servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
+    await act(async () => { await api("/productos").catch(() => undefined); });
+    expect(screen.getByTestId("estado").textContent).toBe("sin-sesion");
+    expect(ventaActual().items).toHaveLength(0);
   });
 });
