@@ -31,7 +31,8 @@ listas.post("/:id/aplicar", exigirPermiso("catalogo.listas"), async (c) => {
   return "error" in r ? c.json({ error: r.error }, r.estado as 404) : c.json(r, 202);
 });
 
-listas.get("/:id/archivo", async (c) => {
+// El Excel original trae todos los costos del proveedor: lo baja quien ve costos o carga listas (decisión 53).
+listas.get("/:id/archivo", exigirPermiso("catalogo.costos", "catalogo.listas"), async (c) => {
   const r = await reglas.archivo(c.req.param("id"));
   if ("error" in r) return c.json(r, 404);
   return c.body(new Uint8Array(r.contenido), 200, {

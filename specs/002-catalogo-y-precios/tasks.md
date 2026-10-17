@@ -19,3 +19,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T008 [ajuste] En el celular, el aviso de «Separados» en Duplicados lleva el nombre del producto en negrita (pedido de Carlos del 2026-10-17)
 - [x] T009 [ajuste] En el aviso de «Separados» del celular, el nombre del producto, además de en negrita, en verde claro para que se distinga del resto del texto (pedido de Carlos del 2026-10-17)
 - [x] T010 [ajuste] En el aviso de «Separados» del celular, el nombre del producto en amarillo, que resalta más sobre el fondo oscuro; «Deshacer» pasa a blanco para no confundirse con el nombre (pedido de Carlos del 2026-10-17)
+- [x] T011 [arreglo] Bajar el Excel de una lista pide «Ver costos» (o «Cargar listas»): el archivo trae todos los costos del proveedor, y hasta ahora bastaba tener sesión (decisión 53; revisión de 016)

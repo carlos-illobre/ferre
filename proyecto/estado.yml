@@ -863,8 +863,7 @@ RF-115:
     - microservices/web/src/negocio/catalogo/ficha.test.tsx
     - microservices/web/src/pantallas/celular/FichaProducto.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/FichaProducto.test.tsx
-  defectos:
-    - "Bajar el Excel de una lista (anterior a 016) pide solo sesión, no «Ver costos», aunque el archivo trae todos los costos del proveedor (revisión 016, a decidir por Carlos)"
+  defectos: []
 
 RF-116:
   estado: "A validar (016): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"

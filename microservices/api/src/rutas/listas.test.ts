@@ -29,4 +29,10 @@ describe("GET /listas/:id/archivo", () => {
     expect((await pedir(app, "GET", "/listas/l1/archivo")).status).toBe(404);
     expect((await pedir(app, "GET", "/listas/l1/archivo", { rol: null })).status).toBe(401);
   });
+
+  it("002-T011: trae todos los costos del proveedor: sin «Ver costos» ni «Cargar listas», 403 (decisión 53)", async () => {
+    const r = await pedir(app, "GET", "/listas/l1/archivo", { rol: "soloVende" });
+    expect(r.status).toBe(403);
+    expect(base.actual.sqlDe(/SELECT archivo_nombre, archivo_ruta/)).toHaveLength(0);
+  });
 });
