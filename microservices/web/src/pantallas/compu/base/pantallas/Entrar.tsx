@@ -170,6 +170,13 @@ export const TEXTOS_DE_ENTRADA = {
   sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
 };
 
+// Debajo de la tarjeta de la computadora (pedido de Carlos del 2026-10-17), cada uno en dos renglones.
+export const SELLOS: { icono: NombreDeIcono; renglones: [string, string] }[] = [
+  { icono: "escudo", renglones: ["Seguro", "y confiable"] },
+  { icono: "nube", renglones: ["Siempre", "actualizado"] },
+  { icono: "dispositivos", renglones: ["Desde cualquier", "dispositivo"] },
+];
+
 export const QUE_HACE: { icono: NombreDeIcono; texto: string }[] = [
   { icono: "vender", texto: "Buscás el producto, decís el precio y cobrás." },
   { icono: "listas", texto: "Los precios se actualizan con las listas de los proveedores." },
@@ -301,10 +308,15 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
         <button type="button" className="entrar-cc-tutorial" onClick={() => irA("manual")} data-testid="ver-tutorial"><Icono nombre="reproducir" tam={22} />{TEXTOS_DE_ENTRADA.tutorial}</button>
         </section>
         <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
-        <section className="entrar-cc-tarjeta">
-          {children}
-          <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>
-        </section>
+        <div className="entrar-cc-derecha">
+          <section className="entrar-cc-tarjeta">
+            {children}
+            <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>
+          </section>
+          <ul className="entrar-cc-sellos" data-testid="sellos">
+            {SELLOS.map((s) => <li key={s.icono}><Icono nombre={s.icono} tam={26} grosor={1.7} /><span>{s.renglones[0]}<br />{s.renglones[1]}</span></li>)}
+          </ul>
+        </div>
       </div>
     </main>
   );
@@ -338,7 +350,7 @@ export function Entrar() {
       {conHuella && <BotonHuella />}
       <BotonGoogle estirar />
       <p className="entrar-nota">
-        <Icono nombre="error" tam={18} />
+        <Icono nombre="escudo" tam={18} />
         <span>{TEXTOS_DE_ENTRADA.nota}</span>
       </p>
     </MarcoDeEntradaConCelular>

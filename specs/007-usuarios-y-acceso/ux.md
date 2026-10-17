@@ -144,6 +144,12 @@ el naranja de los botones principales, ancho y con un ícono de reproducir; reem
 manuscrita. Carlos lo eligió el 2026-10-16 entre tres lugares (arriba del celular, debajo, o este). Abre el manual de uso en la misma pestaña (`specs/012-manual-de-uso/`).
 La tarjeta para entrar es más ancha, para que los pasos no queden apretados; si el celular la
 alcanza, pasa por encima de su borde sin tapar el código.
+Debajo de la tarjeta, centrados respecto de ella, tres sellos con ícono y texto en dos renglones:
+«Seguro y confiable» (escudo), «Siempre actualizado» (nube) y «Desde cualquier dispositivo»
+(computadora y celular). El aviso de quién puede entrar lleva un escudo en vez del signo de
+atención. Carlos lo eligió el 2026-10-17 de una referencia suya, sin el resto de sus detalles
+(frases manuscritas, «¿Necesitás ayuda?», duración del tutorial): maqueta
+`maquetas/entrar-compu-sellos.png`. En una ventana angosta, cuando se va la marca, se van también los sellos.
 El celular va abajo, apoyado en la mesa de la foto. El 2026-10-17 Carlos probó subirlo (centrado
 en el alto, y después a mitad de camino) y lo volvió a poner abajo: así parece apoyado.
 

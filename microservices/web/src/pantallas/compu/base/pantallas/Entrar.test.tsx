@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { ConRutas } from "../rutas";
+import { Icono } from "../ui";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../../../api", async (original) => ({ ...(await original<typeof import("../../../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
@@ -87,6 +88,15 @@ describe("la entrada de la computadora", () => {
     window.dispatchEvent(new Event("sesion-cerrada"));
     render(<Entrar />);
     expect(screen.getByTestId("sesion-cerrada").textContent).toContain("Hay que iniciar sesión");
+  });
+
+  it("debajo de la tarjeta, tres sellos; el aviso de quién puede entrar lleva un escudo", async () => {
+    const { container } = render(<ConRutas><Entrar /></ConRutas>);
+    const sellos = within(screen.getByTestId("sellos")).getAllByRole("listitem").map((li) => li.innerHTML.split("</svg>")[1]);
+    expect(sellos).toEqual(["<span>Seguro<br>y confiable</span>", "<span>Siempre<br>actualizado</span>", "<span>Desde cualquier<br>dispositivo</span>"]);
+    expect(container.querySelector(".entrar-cc-derecha > .entrar-cc-tarjeta + .entrar-cc-sellos")).toBeTruthy();
+    const escudo = render(<Icono nombre="escudo" />).container.querySelector("path")?.getAttribute("d");
+    expect(container.querySelector(".entrar-nota path")?.getAttribute("d")).toBe(escudo);
   });
 
   it("012-E01: «Ver tutorial» abre el manual en la misma pestaña", async () => {
