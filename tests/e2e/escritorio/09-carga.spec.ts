@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
 // se corre a mano con CARGA=1, idealmente en la laptop del local antes del piloto.
 test.skip(!process.env.CARGA, "correr con CARGA=1 tests/e2e.sh --solo carga");
 
-test("carga: 50.000 productos y 10.000 ventas en el navegador", async ({ page }) => {
+test("carga: 50.000 productos y 10.000 ventas en el navegador", { tag: "@tiempo" }, async ({ page }) => {
   await page.goto("/");
   const medidas = await page.evaluate(async () => {
     const abrir = () => new Promise<IDBDatabase>((r, j) => { const p = indexedDB.open("ferre-carga", 1); p.onupgradeneeded = () => { p.result.createObjectStore("catalogo", { keyPath: "id" }); p.result.createObjectStore("ventas", { keyPath: "id" }).createIndex("fecha", "fecha"); }; p.onsuccess = () => r(p.result); p.onerror = () => j(p.error); });

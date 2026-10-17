@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Happy path "cargar una lista de precios y aplicarla" (issue #12): el dueño da de alta
 // un proveedor, arrastra la muestra anonimizada de Comodo, revisa el resumen, ve la
@@ -12,10 +15,6 @@ const PROVEEDOR = "Comodo (e2e)";
 // El nombre lleva paréntesis: escapado para usarlo en expresiones regulares.
 const PROVEEDOR_RE = new RegExp(PROVEEDOR.replace(/[()]/g, "\\$&"));
 const MUESTRA = path.resolve("../../microservices/listas/tests/muestras/LISTA GENERAL PRUEBA 11-8.xlsx");
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);

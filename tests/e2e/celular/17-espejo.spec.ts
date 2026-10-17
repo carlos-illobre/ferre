@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("celular");
 
 // El espejo entre el celular y la computadora emparejados (decisión 60): están en la misma
 // parte y comparten la venta en curso; «Desconectar» los separa un rato; cada emparejamiento es de
@@ -13,10 +16,6 @@ const EMAIL_OTRA = "e2e-espejo-otra@ferre.test";
 const ID_PROV = "00000000-0000-0000-0000-0000000e5e01";
 const ID_MECHA = "00000000-0000-0000-0000-0000000e5e02";
 const hash = (t: string) => createHash("sha256").update(t).digest("hex");
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   const deEstos = `(SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email IN ('${EMAIL}', '${EMAIL_OTRA}')))`;
@@ -101,12 +100,19 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   // Ir a Depósito y enseguida a Más desde el celular: los dos quedan en Más, y el celular no vuelve solo a Depósito.
   // Con la red de la computadora lenta, como en el local: lo que ella contesta al primer toque llega
   // cuando el celular ya está en Más.
-  const lenta = async (ruta: import("@playwright/test").Route) => { if (ruta.request().method() === "POST") await new Promise((r) => setTimeout(r, 700)); await ruta.continue(); };
+  let avisosEnVuelo = 0;
+  const lenta = async (ruta: import("@playwright/test").Route) => {
+    if (ruta.request().method() !== "POST") return ruta.continue();
+    avisosEnVuelo++;
+    await new Promise((r) => setTimeout(r, 700));
+    await ruta.fetch().then((r) => ruta.fulfill({ response: r })).catch(() => undefined).finally(() => { avisosEnVuelo--; });
+  };
   await compu.route("**/puestos/*/espejo", lenta);
   await celular.getByTestId("menu-deposito").click();
-  await celular.waitForTimeout(450);
+  await celular.waitForTimeout(450); // el segundo toque, antes de que llegue la respuesta del primero
   await celular.getByTestId("menu-mas").click();
-  await celular.waitForTimeout(2000);
+  // Que la computadora termine de contestar los dos toques (lo que ella avisa va por el servidor al celular).
+  await expect.poll(() => avisosEnVuelo).toBe(0);
   await compu.unroute("**/puestos/*/espejo", lenta);
   await expect(celular.getByTestId("menu-mas")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("mas")).toBeVisible();
@@ -160,10 +166,11 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(compu.getByTestId("espejo-estado")).toContainText("Desconectados");
   await celular.getByTestId("menu-catalogo").click();
   await expect(celular.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
-  await compu.waitForTimeout(800);
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
   await celular.getByTestId("reconectar-arriba").click();
+  // Al reconectar manda la computadora: si se hubiera ido a Catálogo, el celular quedaría ahí.
   await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+  await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
 
   // El vínculo es de los dispositivos y del usuario (decisión 73): si la persona sale de la
@@ -205,8 +212,10 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(compu.getByTestId("espejo")).toHaveCount(0);
   await expect(compu.getByTestId("emparejar-celular")).toBeVisible();
   await expect(celular.getByTestId("desconectar-arriba")).toHaveCount(0);
+  // El servidor ya no tiene el vínculo activo: lo que haga el celular no le llega a la computadora.
+  await expect.poll(() => psql(`SELECT count(*) FROM puesto WHERE expira_en > now() AND (sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')))`)).toBe("0");
   await celular.getByTestId("menu-vender").click();
-  await compu.waitForTimeout(800);
+  await expect(celular.getByTestId("menu-vender")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("pestana-sesiones")).toHaveAttribute("aria-current", "page");
   // Se cierran las tres ventanas: abiertas, seguirían vivas con estas sesiones en la prueba que sigue.
   for (const pagina of [compu, celular, otra]) await pagina.context().close();

@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Happy path "ingresar mercadería de un proveedor" (issue #30): el empleado elige proveedor
 // y comprobante, agrega dos renglones, uno con el costo de la factura distinto al de la
@@ -14,10 +17,6 @@ const ID_CINTA = "00000000-0000-0000-0000-00000000e2e9";
 
 // Una imagen mínima (PNG de 1 × 1) que hace de foto de la factura.
 const FOTO = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM foto_comprobante WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -80,11 +79,11 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   await page.getByTestId("cerrar-exito").click();
 
   // Stock, costo vigente con explicación, gasto de la semana.
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("10.000");
-  expect(psql(`SELECT costo_neto FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toBe("1200.0000");
-  expect(psql(`SELECT descuentos->'explicacion'->>0 FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toContain("según factura de");
-  expect(psql(`SELECT count(*) FROM producto WHERE descripcion = 'PINCEL NUEVO COMPRAS (E2E)' AND proveedor_preferido_id = '${ID_PROV}'`)).toBe("1");
-  expect(psql(`SELECT count(*) FROM foto_comprobante f JOIN compra c ON c.id = f.compra_id WHERE c.proveedor_id = '${ID_PROV}'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("10.000");
+  await expect.poll(() => psql(`SELECT costo_neto FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toBe("1200.0000");
+  await expect.poll(() => psql(`SELECT descuentos->'explicacion'->>0 FROM precio_proveedor WHERE producto_id = '${ID_CINTA}' ORDER BY fecha_lista DESC, creado_en DESC LIMIT 1`)).toContain("según factura de");
+  await expect.poll(() => psql(`SELECT count(*) FROM producto WHERE descripcion = 'PINCEL NUEVO COMPRAS (E2E)' AND proveedor_preferido_id = '${ID_PROV}'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM foto_comprobante f JOIN compra c ON c.id = f.compra_id WHERE c.proveedor_id = '${ID_PROV}'`)).toBe("1");
   // Los gastos de la semana ya no están en el ingreso (decisión 34).
   await expect(page.getByTestId("gastos-semana")).toHaveCount(0);
 
@@ -102,5 +101,5 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   await page.getByTestId("motivo-anular").fill("error de carga");
   await page.getByTestId("anular-confirmar").click();
   await expect(recientes.getByTestId("compra-reciente").filter({ hasText: PROVEEDOR }).first()).toContainText(/anulada/i);
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("0.000");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_CINTA}'`)).toBe("0.000");
 });

@@ -63,7 +63,7 @@ tests/e2e.sh                 # caminos principales, en las dos interfaces (levan
 |---|---|---|
 | `tests/utest.sh` | Unitarias del workspace TypeScript (vitest, `pnpm -r test`) y de `listas-de-proveedores` (pytest) | Nada levantado |
 | `tests/itest.sh` | Los scripts de `tests/integration/`. `--rapido` saltea los que necesitan el stack | Docker (salvo `--rapido`) |
-| `tests/e2e.sh` | Levanta el stack, construye y sirve el cliente web contra esa API (`vite preview` en el puerto 4173) y corre los escenarios Playwright de `tests/e2e/escritorio/` (ventana de 1366×768) y `tests/e2e/celular/` (412×915), en Chromium y de a uno. `--solo <nombre>` repite uno. `CARGA=1` activa además la prueba de carga | Docker, pnpm |
+| `tests/e2e.sh` | Levanta dos stacks (el del compose para la computadora y uno aparte para el celular, `tests/e2e/segundo-stack.yml`), construye y sirve un cliente web contra cada API (`vite preview` en 4173 y 4174; no lo reconstruye si no cambió) y corre los escenarios Playwright de `tests/e2e/escritorio/` (ventana de 1366×768) y `tests/e2e/celular/` (412×915) en Chromium, las dos interfaces a la vez. Al final, solas, las marcadas `@tiempo`. `--solo <nombre>` repite uno. `CARGA=1` activa además la prueba de carga. Con `API_URL`, todo contra ese único stack, de a uno | Docker, pnpm |
 | `node tests/trazabilidad.mjs` | Que la especificación (`specs/`) y el estado del proyecto (`proyecto/`) coincidan, que las pruebas que el estado nombra existan y que `specs/` no nombre código | Nada |
 
 ### Qué corre en cada push
@@ -157,7 +157,17 @@ un token conocido, guardado hasheado como lo hace la API.
 - **Proveedores:** `(e2e)` en el nombre.
 - **Ids fijos** por escenario, para poder limpiar: se borran y se vuelven a crear en cada
   corrida.
-- Corren de a uno (`workers: 1`) porque comparten la base del compose.
+- Dentro de cada interfaz corren de a uno, porque comparten la base. La computadora y el
+  celular van a la vez, cada uno contra su stack (`tests/e2e.sh`); en el CI, un job por
+  interfaz.
+- **La base, desde las pruebas:** `psql()` de `tests/e2e/comun/stack.ts`, que va por una
+  sola conexión abierta y contesta como `psql -tA`. Lo que se comprueba en la base después de
+  una acción va con `expect.poll(() => psql(…))`: el servidor puede no haber guardado todavía.
+- **Sin esperas fijas:** se espera a una condición (`expect.poll`, un pedido, lo que guarda el
+  dispositivo: `tests/e2e/comun/dispositivo.ts`). `waitForTimeout` queda solo cuando el tiempo
+  es parte de lo que se prueba (mantener apretado, dos toques seguidos).
+- **`@tiempo`:** las pruebas que miden cuánto tarda algo o dependen del reloj llevan esa
+  marca y corren al final, solas.
 - El conteo en el celular (07) y el celular del escáner (10) fijan su propia ventana de
   390×844; el escáner abre dos navegadores, laptop y celular, en las dos suites.
 - Los scripts de integración usan otra marca: correos `prueba-*@ferre.test` y proveedores

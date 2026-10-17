@@ -1,7 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { API, psql } = stack("escritorio");
 
 const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos/venta.bpmn", "utf8");
 
@@ -12,10 +15,6 @@ const EMAIL = "e2e-procesos-escritorio@ferre.test";
 const TOKEN_LECTOR = "token-e2e-procesos-lector";
 const EMAIL_LECTOR = "e2e-procesos-lector@ferre.test";
 const ROL_LECTOR = "00000000-0000-4000-9000-0000000000e1";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 function crearUsuario(email: string, token: string, roles: string) {
   const id = `(SELECT id FROM usuario WHERE email = '${email}')`;
@@ -128,17 +127,16 @@ test("011-E02 011-E04 011-E05 011-E09 011-E10 011-E13 011-E14 011-E15 011-E22 di
   // E22: marcarlo vigente queda en «Quién hizo qué».
   await page.getByTestId("procesos-marcar-vigente").click();
   await expect(page.getByTestId("procesos-estado")).toHaveText("Vigente");
-  expect(psql(`SELECT count(*) FROM evento e JOIN usuario u ON u.id = e.usuario_id WHERE u.email = '${EMAIL}' AND e.tipo = 'proceso.vigente'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM evento e JOIN usuario u ON u.id = e.usuario_id WHERE u.email = '${EMAIL}' AND e.tipo = 'proceso.vigente'`)).toBe("1");
 });
 
 // Crea un proceso por la API de Ferrebress (como lo haría la pantalla) y lo deja vigente.
 async function procesoVigente(page: Page, nombre: string, bpmn = VENTA) {
-  const api = process.env.API_URL ?? "http://localhost";
   const cabeceras = { Authorization: `Bearer ${TOKEN}` };
-  const creado = await page.request.post(`${api}/procesos`, { headers: cabeceras, data: { nombre, bpmn } });
+  const creado = await page.request.post(`${API}/procesos`, { headers: cabeceras, data: { nombre, bpmn } });
   expect(creado.status()).toBe(201);
   const p = (await creado.json()) as { id: string; revision: number };
-  expect((await page.request.post(`${api}/procesos/${p.id}/vigente`, { headers: cabeceras, data: { revision: p.revision } })).status()).toBe(200);
+  expect((await page.request.post(`${API}/procesos/${p.id}/vigente`, { headers: cabeceras, data: { revision: p.revision } })).status()).toBe(200);
   return p.id;
 }
 
@@ -199,9 +197,9 @@ function procesoDe(pasos: number): string {
   return `<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="D" targetNamespace="x"><bpmn:process id="P">${nodos}${flechas}</bpmn:process><bpmndi:BPMNDiagram id="DD"><bpmndi:BPMNPlane id="PL" bpmnElement="P">${formas}${lineas}</bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn:definitions>`;
 }
 
-test("011-E43 un proceso de 200 pasos se abre y se mueve sin trabarse", async ({ page }) => {
-  const api = process.env.API_URL ?? "http://localhost";
-  const creado = await page.request.post(`${api}/procesos`, { headers: { Authorization: `Bearer ${TOKEN}` }, data: { nombre: "Grande E2E", bpmn: procesoDe(200) } });
+// @tiempo: mide cuánto tarda; corre al final, sin la otra interfaz a la vez (tests/e2e.sh).
+test("011-E43 un proceso de 200 pasos se abre y se mueve sin trabarse", { tag: "@tiempo" }, async ({ page }) => {
+  const creado = await page.request.post(`${API}/procesos`, { headers: { Authorization: `Bearer ${TOKEN}` }, data: { nombre: "Grande E2E", bpmn: procesoDe(200) } });
   expect(creado.status()).toBe(201);
   const { id } = (await creado.json()) as { id: string };
   await page.addInitScript(([t, ultimo]) => { localStorage.setItem("ferre.sesion", t); localStorage.setItem("procesos.ultimo", JSON.stringify(ultimo)); }, [TOKEN, id] as const);

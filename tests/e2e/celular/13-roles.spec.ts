@@ -1,9 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
 
-// La API del stack contra el que corren los escenarios (API_URL permite otro puerto).
-const API = process.env.API_URL ?? "http://localhost";
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { API, psql } = stack("celular");
+
 const CELULAR = true;
 
 // Permisos y roles (RF-72, RF-75): cada persona ve y puede lo que le dejan sus roles; un rol
@@ -19,10 +20,6 @@ const ADMINISTRADOR = "00000000-0000-4000-8000-0000000000a4";
 const RUTAS = CELULAR
   ? { mas: "mas", usuarios: "mas/usuarios", roles: "mas/roles", sesiones: "mas/sesiones", numeros: "mas/negocio", gastos: "mas/gastos", deposito: "deposito", enMas: "mas-negocio" }
   : { mas: "mas", usuarios: "usuarios", roles: "roles", sesiones: "sesiones", numeros: "resumen", gastos: "gastos", deposito: "stock", enMas: "mas-resumen" };
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   for (const e of [EMAIL_ADMIN, EMAIL_VENDEDOR]) {
@@ -117,7 +114,7 @@ test("se arma un rol, se lo asigna y la persona gana ese acceso", async ({ page 
   await expect(page.getByRole("heading", { name: "Cómo va el negocio" })).toBeVisible();
   await expect(CELULAR ? page.getByRole("tab") : page.getByTestId("pestana-gastos")).toHaveCount(0);
   await expect(page.getByTestId("sin-permiso")).toHaveCount(0);
-  expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'rol.creado' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM evento WHERE tipo = 'rol.creado' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
 });
 
 test("nadie se quita a sí mismo la administración, y un rol en uso no se borra", async ({ page }) => {
@@ -135,8 +132,8 @@ test("nadie se quita a sí mismo la administración, y un rol en uso no se borra
     return [await cambiar({ roles: [vendedor] }), await cambiar({ activo: false }), await cambiar({ roles: [] }), borrar];
   }, [TOKEN_ADMIN, EMAIL_ADMIN, API, VENDEDOR, ADMINISTRADOR] as const);
   for (const e of estados) expect(e).toBeGreaterThanOrEqual(400);
-  expect(psql(`SELECT count(*) FROM usuario_rol WHERE rol_id = '${ADMINISTRADOR}' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
-  expect(psql(`SELECT activo::text FROM usuario WHERE email = '${EMAIL_ADMIN}'`)).toBe("true");
+  await expect.poll(() => psql(`SELECT count(*) FROM usuario_rol WHERE rol_id = '${ADMINISTRADOR}' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
+  await expect.poll(() => psql(`SELECT activo::text FROM usuario WHERE email = '${EMAIL_ADMIN}'`)).toBe("true");
 });
 
 // 013: Cómo va el negocio en tres secciones, cada una con su permiso de lectura (decisión 95).

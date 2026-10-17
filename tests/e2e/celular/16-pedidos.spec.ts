@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("celular");
 
 const CELULAR = true;
 
@@ -14,10 +17,6 @@ const ID_MECHA = "00000000-0000-0000-0000-0000000ed002";
 const ID_DISCO = "00000000-0000-0000-0000-0000000ed003";
 const FOTO = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
 const RUTA = CELULAR ? "deposito/pedidos" : "pedidos";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   // Limpieza en orden de dependencias: compras y pedidos del proveedor, movimientos, precios, productos, usuario.
@@ -76,9 +75,9 @@ test("armar un pedido, mandarlo, recibirlo en parte desde el ingreso y cerrarlo 
   await hoja.getByTestId("mandar-whatsapp").click();
   await expect(page.getByTestId("mensaje-pedidos")).toContainText("Pedido enviado");
   expect(await page.evaluate(() => (window as unknown as { __abierto: string }).__abierto)).toContain("https://wa.me/5491155550101?text=Ferrebress");
-  expect(psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("enviado");
-  expect(psql(`SELECT whatsapp FROM proveedor WHERE id = '${ID_PROV}'`)).toBe("5491155550101");
-  expect(psql(`SELECT count(*) FROM item_pedido WHERE costo_estimado IS NOT NULL AND pedido_id IN (SELECT id FROM pedido WHERE proveedor_id = '${ID_PROV}')`)).toBe("2");
+  await expect.poll(() => psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("enviado");
+  await expect.poll(() => psql(`SELECT whatsapp FROM proveedor WHERE id = '${ID_PROV}'`)).toBe("5491155550101");
+  await expect.poll(() => psql(`SELECT count(*) FROM item_pedido WHERE costo_estimado IS NOT NULL AND pedido_id IN (SELECT id FROM pedido WHERE proveedor_id = '${ID_PROV}')`)).toBe("2");
 
   // Llegó la mercadería: el ingreso viene con el proveedor y los renglones del pedido. Llegan 6 de las 10 mechas.
   const enLista = page.getByTestId("por-llegar").getByTestId("pedido").filter({ hasText: PROVEEDOR });
@@ -94,8 +93,8 @@ test("armar un pedido, mandarlo, recibirlo en parte desde el ingreso y cerrarlo 
   await (CELULAR ? page.getByTestId("registrar") : page.getByRole("button", { name: "Registrar ingreso" })).click();
   await expect(page.getByTestId("exito")).toContainText("Ingreso registrado");
   await page.getByTestId("cerrar-exito").click();
-  expect(psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("recibido_parcial");
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("6.000");
+  await expect.poll(() => psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("recibido_parcial");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("6.000");
 
   // El pedido dice qué falta; el resto no va a llegar: se cierra incompleto.
   await page.goto(`/#/${RUTA}`);
@@ -108,6 +107,6 @@ test("armar un pedido, mandarlo, recibirlo en parte desde el ingreso y cerrarlo 
   await page.getByTestId("cerrar-pedido").click();
   await expect(page.getByTestId("mensaje-pedidos")).toContainText("cerrado incompleto");
   await expect(page.getByTestId("cerrados").getByTestId("pedido").filter({ hasText: PROVEEDOR })).toContainText("Cerrado incompleto");
-  expect(psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("cerrado_incompleto");
-  expect(psql(`SELECT string_agg(tipo, ',' ORDER BY creado_en) FROM evento WHERE tipo LIKE 'pedido.%' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("pedido.enviado,pedido.recibido,pedido.cerrado");
+  await expect.poll(() => psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("cerrado_incompleto");
+  await expect.poll(() => psql(`SELECT string_agg(tipo, ',' ORDER BY creado_en) FROM evento WHERE tipo LIKE 'pedido.%' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("pedido.enviado,pedido.recibido,pedido.cerrado");
 });

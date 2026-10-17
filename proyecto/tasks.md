@@ -287,3 +287,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T122 [agente] Las sesiones en la nube comprueban que corrió la preparación y corren las e2e en Docker antes de subir código
 - [x] T123 [agente] Pasar al repositorio cómo pide Carlos los cambios de interfaz
 - [x] T124 [agente] Los agentes piden permiso a Carlos antes de usar un sitio de internet que no está permitido
+- [x] T125 [agente] Las pruebas de punta a punta corren más rápido: una conexión a la base, celular y computadora a la vez, sin esperas fijas y sin reconstruir la web si no cambió

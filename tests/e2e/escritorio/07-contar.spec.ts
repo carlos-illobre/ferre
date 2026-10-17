@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stack } from "../comun/stack";
+
+// La API y la base del stack de esta interfaz (comun/stack.ts).
+const { psql } = stack("escritorio");
 
 // Happy path "contar un sector y ajustar stock" (issue #31), desde la computadora: crear
 // el sector, contar dos productos (uno coincide, otro no), cerrar, y verificar que la
@@ -13,10 +16,6 @@ const SECTOR = "Estantería E2E";
 const ID_PROV = "00000000-0000-0000-0000-00000000e2ec";
 const ID_A = "00000000-0000-0000-0000-00000000e2ed";
 const ID_B = "00000000-0000-0000-0000-00000000e2ee";
-
-function psql(sql: string): string {
-  return execSync(`docker compose exec -T db psql -U ferre -d ferre -tAc "${sql.replace(/"/g, '\\"')}"`, { cwd: "../..", encoding: "utf8" }).trim();
-}
 
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -78,11 +77,11 @@ test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
   await page.getByTestId("cerrar").click();
   await page.getByTestId("cerrar-confirmar").click();
   await expect(page.getByTestId("resultado-conteo")).toContainText("2 productos contados, 1 con diferencia ajustada");
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_A}'`)).toBe("8.000");
-  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_B}'`)).toBe("5.000");
-  expect(psql(`SELECT nota FROM movimiento_stock WHERE producto_id = '${ID_A}' AND referencia_tipo = 'conteo'`)).toContain(`conteo de ${SECTOR} del`);
-  expect(psql(`SELECT nota FROM movimiento_stock WHERE producto_id = '${ID_A}' AND referencia_tipo = 'conteo'`)).toContain("había 10, hay 8");
-  expect(psql(`SELECT count(*) FROM producto WHERE sector_id = (SELECT id FROM sector WHERE nombre = '${SECTOR}')`)).toBe("2");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_A}'`)).toBe("8.000");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_B}'`)).toBe("5.000");
+  await expect.poll(() => psql(`SELECT nota FROM movimiento_stock WHERE producto_id = '${ID_A}' AND referencia_tipo = 'conteo'`)).toContain(`conteo de ${SECTOR} del`);
+  await expect.poll(() => psql(`SELECT nota FROM movimiento_stock WHERE producto_id = '${ID_A}' AND referencia_tipo = 'conteo'`)).toContain("había 10, hay 8");
+  await expect.poll(() => psql(`SELECT count(*) FROM producto WHERE sector_id = (SELECT id FROM sector WHERE nombre = '${SECTOR}')`)).toBe("2");
 
   // El sector muestra que se contó hoy.
   await page.getByTestId("otro-sector").click();
