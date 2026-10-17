@@ -10,7 +10,8 @@ import { paginasDe, useActividad } from "../../negocio/actividad";
 import { fecha, pesos } from "../../formato";
 import { useSesion } from "../../sesion";
 import { usePuede } from "../permisos";
-import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../RolesDeUsuario";
+import { ElegirRoles, useRolesAsignables } from "../RolesDeUsuario";
+import { AutorizarOtro, CabeceraDeUsuarios, TarjetaDeUsuario } from "./TarjetaDeUsuario";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../credenciales";
 import { AvisoError, Hoja, Icono, Toast, Lista } from "./componentes/base";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
@@ -72,22 +73,15 @@ function Usuarios() {
 
   return (
     <>
-      <h2 className="seccion">{NOMBRES.usuariosAutorizados}</h2>
-      <small style={{ padding: "0 4px" }}>{TEXTOS.usuarios.queSonLosRoles.corto}</small>
+      <CabeceraDeUsuarios cuantos={filas.length} />
+      <AutorizarOtro alTocar={() => setAlta(true)} />
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(usuarios.error); }} />
-      <Lista data-testid="usuarios">
-        {filas.map((u) => (
-          <div key={u.id} className={`usuario-con-roles ${u.activo ? "" : "apagada"}`} data-testid="usuario-fila">
-            <div className="fila">
-              <span className="nombre">{u.nombre}</span>
-              <span className="derecha"><button type="button" className="boton chico texto" onClick={async () => { const falla = await cambiar(u.id, { activo: !u.activo }); if (falla) setError(falla); }}>{u.activo ? "Desactivar" : "Reactivar"}</button></span>
-              <span className="detalle">{u.email}{u.activo ? "" : " · desactivado"}</span>
-            </div>
-            <RolesDeUsuario disponibles={disponibles} actuales={u.roles ?? []} nombre={u.nombre} alGuardar={(ids) => cambiar(u.id, { roles: ids })} />
-          </div>
+      <div className="ut-lista" data-testid="usuarios">
+        {filas.map((u, i) => (
+          <TarjetaDeUsuario key={u.id} persona={u} orden={i} disponibles={disponibles} alCambiarRoles={(ids) => cambiar(u.id, { roles: ids })}
+            alActivar={async () => { const falla = await cambiar(u.id, { activo: !u.activo }); if (falla) setError(falla); }} />
         ))}
-        <button type="button" className="fila" onClick={() => setAlta(true)} data-testid="autorizar"><span className="nombre" style={{ color: "var(--coral-texto)" }}>+ Autorizar otro correo de Google</span></button>
-      </Lista>
+      </div>
       {alta && (
         <Hoja titulo="Autorizar a alguien" alCerrar={() => setAlta(false)} testId="hoja-autorizar">
           <form onSubmit={autorizar} className="formulario" data-testid="alta-usuario">

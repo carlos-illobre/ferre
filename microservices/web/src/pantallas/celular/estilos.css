@@ -483,3 +483,39 @@ tr.cambia td { background: #fff8e8; }
 .dinero-invertido-stock small { font-size: 15px; color: var(--p-texto-2); }
 .dinero-invertido-stock strong { font-size: 24px; }
 .valor-stock { display: block; text-align: right; font-size: 15px; color: var(--p-texto-2); }
+
+/* Más → Usuarios en el celular (007-T032): cabecera, autorizar a alguien y una tarjeta por persona. */
+.ut-cabeza { display: flex; align-items: center; gap: 12px; background: var(--p-verde-suave); border-radius: 16px; padding: 14px 16px; color: var(--p-verde-texto); }
+.ut-cabeza strong { display: block; font-size: 17px; color: var(--p-verde); }
+.ut-cabeza small { font-size: 14px; color: var(--p-texto-2); }
+.ut-cuantos { margin-left: auto; background: #fff; border-radius: 99px; padding: 6px 12px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.ut-alta { display: flex; gap: 14px; align-items: center; width: 100%; border: 1.5px dashed var(--p-borde); border-radius: 18px; padding: 16px; background: rgb(255 255 255 / 0.55); font: inherit; text-align: left; }
+.ut-alta strong { display: block; color: var(--p-naranja-texto); font-size: 16px; }
+.ut-alta small { font-size: 14px; color: var(--p-texto-2); }
+.ut-mas { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--p-naranja); color: #fff; display: grid; place-items: center; font-size: 22px; line-height: 1; }
+.ut-lista { display: flex; flex-direction: column; gap: 14px; }
+.ut { background: #fff; border-radius: 18px; box-shadow: var(--sombra); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.ut.apagada { opacity: 0.8; }
+.ut-arriba { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; }
+.ut-avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 16px; }
+.ut-avatar.verde { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.ut-avatar.naranja { background: var(--p-naranja-suave); color: var(--p-naranja-texto); }
+.ut-avatar.amarillo { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); }
+.ut-avatar.azul { background: #e8eefc; color: #2f4fa8; }
+.ut-quien { min-width: 0; }
+.ut-nombre { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ut-nombre strong { font-size: 18px; color: var(--p-verde); }
+.ut-estado { font-size: 14px; font-weight: 600; border-radius: 99px; padding: 2px 10px; }
+.ut-estado.si { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.ut-estado.no { background: var(--p-relleno); color: var(--p-texto-2); }
+.ut-correo { display: block; font-size: 15px; color: var(--p-texto-2); overflow-wrap: anywhere; }
+.ut-rotulo { display: block; font-size: 14px; font-weight: 600; color: var(--p-texto-medio); margin-bottom: 8px; }
+.ut-roles ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.ut-roles li { display: flex; gap: 6px; align-items: center; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); border-radius: 99px; padding: 6px 12px; font-size: 14px; }
+.ut-roles li.admin { background: var(--p-verde-suave); border-color: #bfe3cf; color: var(--p-verde-texto); }
+.ut-roles li.sin { color: var(--p-texto-2); }
+.ut-abajo { display: flex; gap: 10px; }
+.ut-cambiar { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); border-radius: 12px; font: inherit; font-size: 15px; font-weight: 600; color: var(--p-verde); }
+.ut-flecha { margin-left: auto; color: var(--p-texto-2); }
+.ut-activar { display: flex; gap: 6px; align-items: center; min-height: 48px; padding: 0 14px; border: 1px solid var(--p-naranja-borde); background: var(--p-naranja-suave); color: var(--p-naranja-texto); border-radius: 12px; font: inherit; font-size: 14px; font-weight: 600; }
+.ut-activar.reactivar { border-color: #bfe3cf; background: var(--p-verde-suave); color: var(--p-verde-texto); }

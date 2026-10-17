@@ -237,6 +237,18 @@ Depósito, en este orden:
 Maquetas aprobadas por Carlos el 2026-10-14: `maquetas/mas-con-usuarios.html` y
 `maquetas/usuarios-pestanas.html`.
 
+**La pestaña Usuarios en el celular** (Carlos, 2026-10-17; maqueta aprobada
+`maquetas/celular-usuarios.png`, sobre su modelo `maquetas/celular-usuarios-referencia-de-carlos.png`):
+
+1. La bajada: «Gestioná quién puede entrar y con qué roles. Se entra con Google.»
+2. Una cabecera «Usuarios autorizados», «Cada persona puede tener uno o más roles.» y cuántos son.
+3. Justo debajo, «Autorizar otro correo de Google» («Invitá a más personas de tu negocio.»), en un
+   recuadro punteado con un «+» naranja.
+4. Una tarjeta por persona: sus iniciales en un círculo de color, el nombre con «Activo» o
+   «Inactivo» y el correo entero debajo; «Roles asignados», cada rol en una pastilla con su
+   ícono (el Administrador resaltado); y abajo, «Cambiar roles» y a su derecha «Desactivar»
+   (naranja) o «Reactivar» (verde).
+
 ## Historia 2: administrar usuarios
 
 **Quién:** quien tiene el permiso «Administrar usuarios».

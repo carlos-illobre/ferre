@@ -62,15 +62,18 @@ export const TEXTOS = {
     queHayEnUsuarios: { largo: "Quién entra y desde dónde, qué puede hacer y qué hizo", corto: "Quién entra, qué puede hacer y qué hizo" },
     pestanaUsuarios: {
       largo: "Quién puede entrar a Ferrebress y qué puede hacer cada uno. Se entra con el correo de Google: no hay contraseñas.",
-      corto: "Quién puede entrar y con qué roles. Se entra con Google.",
+      corto: "Gestioná quién puede entrar y con qué roles. Se entra con Google.",
     },
     pestanaSesiones: {
       largo: "Desde qué computadoras y celulares está abierto Ferrebress ahora, y cómo se entra sin escribir nada: con la huella o escaneando el código con el celular.",
       corto: "Dónde está abierto ahora y cómo se entra sin escribir nada.",
     },
+    autorizados: igual("Usuarios autorizados"),
+    autorizarOtro: { largo: "Autorizar a alguien", corto: "Autorizar otro correo de Google" },
+    invitarAMas: { largo: "Con su correo de Google ya puede entrar. No hay contraseñas que crear.", corto: "Invitá a más personas de tu negocio." },
     queSonLosRoles: {
       largo: "Cada persona puede lo que le permiten sus roles, y puede tener más de uno. Qué permite cada rol se arma en la pestaña «Roles».",
-      corto: "Cada persona puede lo que le permiten sus roles; puede tener más de uno.",
+      corto: "Cada persona puede tener uno o más roles.",
     },
     faltaUnRol: igual("Elegí al menos un rol. Para que no pueda nada, desactivá al usuario."),
   },
