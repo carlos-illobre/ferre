@@ -4,7 +4,7 @@
   const st = document.createElement("style");
   st.textContent = `
   .vacio.mq{margin-top:12px;gap:6px;padding:0}
-  .vacio.mq .mq-dibujo{width:230px;height:auto;display:block}
+  .vacio.mq .mq-dibujo{width:260px;height:auto;display:block}
   .vacio.mq strong{font-size:26px;font-weight:800;margin-top:4px;color:var(--p-tinta)}
   .vacio.mq p{font-size:16px;color:var(--p-texto-2);max-width:300px}
   .mq-como{margin-top:18px;width:100%;display:grid;grid-template-columns:repeat(3,1fr);background:var(--p-fondo-2);border:1px solid var(--p-borde-suave);border-radius:16px;padding:14px 4px}
