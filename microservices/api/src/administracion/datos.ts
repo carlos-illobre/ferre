@@ -1,6 +1,11 @@
 import { sql } from "kysely";
 import type { Ejecutor } from "../base.js";
 import { PARA_ADMINISTRAR } from "../permisos.js";
+import type { Usuario } from "../contratos/usuarios.js";
+import type { Enviable } from "../enviable.js";
+
+// Con alias: la prueba del SQL con parámetros reconoce `sql<Tipo>` sin anidar.
+type UsuarioConRoles = Enviable<Usuario>;
 
 // Usuarios y roles: el acceso a los datos (ADR-018). Las listas de ids o permisos van como un
 // solo parámetro (un arreglo), igual que antes.
@@ -41,7 +46,7 @@ export const borrarRol = (e: Ejecutor, id: string) => sql`DELETE FROM rol WHERE 
 
 // ---------- Usuarios ----------
 export const usuariosConRoles = (e: Ejecutor) =>
-  sql`SELECT u.id, u.email, u.nombre, u.activo, u.creado_en,
+  sql<UsuarioConRoles>`SELECT u.id, u.email, u.nombre, u.activo, u.creado_en,
             COALESCE((SELECT json_agg(json_build_object('id', r.id, 'nombre', r.nombre) ORDER BY r.nombre) FROM usuario_rol ur JOIN rol r ON r.id = ur.rol_id WHERE ur.usuario_id = u.id), '[]'::json) AS roles
        FROM usuario u ORDER BY u.creado_en`.execute(e).then((r) => r.rows);
 

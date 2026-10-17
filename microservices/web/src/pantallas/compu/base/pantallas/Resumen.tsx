@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { NOMBRES, TEXTOS } from "../../../textos";
 import { usePuede } from "../../../permisos";
+import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 import { urlApi } from "../../../../api";
 import { esAmbienteDePrueba } from "../../../../ambiente";
 import { fecha, pesos } from "../../../../formato";
@@ -21,7 +22,7 @@ const CONSULTAS_A_LA_VISTA = 6;
 const plural = (n: number, uno: string, muchos: string) => `${n.toLocaleString("es-AR")} ${n === 1 ? uno : muchos}`;
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
 
-// Cómo va el negocio, en tres secciones con su permiso cada una (decisión 89): Ventas (lo
+// Cómo va el negocio, en tres secciones con su permiso cada una (decisión 95): Ventas (lo
 // vendido, por qué medio y lo que preguntaron y no llevaron), Compras (los gastos de la semana
 // y las compras recientes) e Inventario (el dinero invertido). Son pestañas de la opción de
 // Más; cada bloque carga por su cuenta y «Actualizar» vuelve a traer los de la sección.
@@ -136,8 +137,8 @@ function SeccionDelNegocio({ testId, bajada, cargando, alActualizar, children }:
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const enLinea = useEnLinea();
   return (
-    <Pagina titulo={NOMBRES.comoVaElNegocio} testId={testId} bajada={bajada} className="negocio-seccion"
-      acciones={<Boton icono="repetir" onClick={alActualizar} disabled={!enLinea || cargando} data-testid="actualizar-negocio">Actualizar</Boton>}>
+    <Pagina titulo={NOMBRES.comoVaElNegocio} testId={testId} bajada={bajada}
+      acciones={<AlLadoDeLasPestanas><Boton icono="repetir" onClick={alActualizar} disabled={!enLinea || cargando} data-testid="actualizar-negocio">Actualizar</Boton></AlLadoDeLasPestanas>}>
       {!enLinea && <Aviso tipo="alerta" testId="resumen-sin-conexion">Sin conexión: los números se ven cuando vuelva internet. Se actualizan solos.</Aviso>}
       {children}
       <footer className="resumen-pie">

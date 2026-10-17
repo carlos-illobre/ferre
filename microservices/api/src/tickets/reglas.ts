@@ -1,6 +1,8 @@
 import { base } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
+import type { Ticket } from "../contratos/tickets.js";
+import type { Enviable } from "../enviable.js";
 
 export { carpetaTickets } from "./datos.js";
 
@@ -10,7 +12,7 @@ const EXTENSION: Record<string, string> = { "image/jpeg": ".jpg", "image/png": "
 const MAXIMO_DE_FOTOS = 5;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const ultimos = () => datos.ultimos(base);
+export const ultimos = (): Promise<Enviable<Ticket>[]> => datos.ultimos(base);
 
 export type TicketEntrada = { id: string; tipo: string; descripcion: string; dispositivo: string; version: string; fotos: File[] };
 export type Rechazo = { error: string; estado: 400 | 413 };

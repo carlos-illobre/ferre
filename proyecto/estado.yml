@@ -658,6 +658,7 @@ RF-76:
   pruebas:
     - microservices/api/src/rutas/sesiones.test.ts
     - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Entrar.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
   defectos:
@@ -896,6 +897,7 @@ RNF-13:
     - tests/integration/migraciones.sh
     - microservices/api/src/migraciones.test.ts
     - microservices/listas/tests/test_health.py
+    - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
   defectos:
     - "Sin prueba: la vuelta atrás automática cuando la versión nueva no queda sana"
     - "Sin prueba: que el cliente tome solo la versión nueva y conserve lo guardado en el dispositivo"
@@ -1065,7 +1067,7 @@ general:
     - "El límite de intentos de entrada y el desafío del ingreso con huella viven en la memoria del proceso: un reinicio de la API los reinicia"
 
 RNF-60:
-  estado: "Hecho en parte: etapa 1 (carpetas), etapa 2 (tecnología reutilizable aparte, con control automático) y, de la 3, vender (la venta, «Hoy» y «Anular») depósito (ingreso, inventario y estanterías) catálogo (listas, proveedores, duplicados y el precio de cada producto) y lo de Más (usuarios, sesiones, compras recientes, gastos y registro de acciones) una sola vez. Etapa 4 hecha: no hay librerías compartidas, el servidor calcula y manda los precios, y el front solo hace la vista previa. Etapa 5 hecha: todo el servidor está en tres capas (ruta, reglas, datos), con control automático. Las pantallas están en `pantallas/`; cada interfaz conserva sus piezas (decisión 85). La revisión independiente (revision.md) dejó tres puntos que frenan el cierre"
+  estado: "Hecho (010-T001 a 010-T020): todo el código bajo microservices/; en el front, plataforma/ sin dependencias del negocio, el negocio una sola vez en negocio/ y las pantallas de cada interfaz en pantallas/ (cada una con sus piezas, decisión 85); el servidor en tres capas y con los precios; la forma de los datos llega del servidor (contratos) y Zod valida lo que llega (decisión 89); la navegación es de React Router. Lo controlan pnpm capas y tests/integration/reordenamiento.sh en cada subida"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
@@ -1152,7 +1154,25 @@ RF-95:
   defectos: []
 
 RF-96:
-  estado: "Hecho (012-T006, 012-T007): Ventas, Compras e Inventario como pestañas de «Cómo va el negocio», en el celular y en la computadora"
+  estado: "Hecho (009-T005): cuatro tiempos y una llave en Configuración, en el celular y en la computadora; el timer corre solo con la app a la vista"
+  pruebas:
+    - microservices/web/src/version-nueva-cada.test.tsx
+    - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
+  defectos: []
+
+RF-97:
+  estado: "Hecho en parte (012-T002 a 012-T007): el manual con el capítulo «Entrar»; los otros ocho dicen «pronto»"
+  pruebas:
+    - microservices/web/src/pantallas/compu/base/pantallas/Manual.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Manual.config.test.ts
+    - microservices/web/src/pantallas/compu/base/pantallas/Entrar.test.tsx
+    - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
+    - tests/e2e/escritorio/01-login.spec.ts
+  defectos:
+    - "Sin escribir: los capítulos Catálogo, Vender y las secciones de Más"
+
+RF-98:
+  estado: "Hecho (013-T006, 013-T007): Ventas, Compras e Inventario como pestañas de «Cómo va el negocio», en el celular y en la computadora"
   pruebas:
     - microservices/web/src/pantallas/secciones-de-negocio.test.tsx
     - tests/e2e/escritorio/13-roles.spec.ts
@@ -1160,8 +1180,8 @@ RF-96:
   defectos:
     - "En el celular, los números de las secciones no se explican al tocarlos y dicen «Sin conexión» mientras cargan (venía de antes de 012)"
 
-RF-97:
-  estado: "Hecho (012-T004 a 012-T007): cada sección y cada dato con su permiso, en las pantallas y en el servidor"
+RF-99:
+  estado: "Hecho (013-T004 a 013-T007): cada sección y cada dato con su permiso, en las pantallas y en el servidor"
   pruebas:
     - microservices/api/src/rutas/secciones-de-negocio.test.ts
     - microservices/web/src/pantallas/secciones-de-negocio.test.tsx
@@ -1170,16 +1190,16 @@ RF-97:
     - tests/e2e/celular/13-roles.spec.ts
   defectos: []
 
-RF-98:
-  estado: "Hecho (012-T004): la migración 0022 da los tres permisos nuevos a los roles que tenían «Ver los números del negocio» y lo quita"
+RF-100:
+  estado: "Hecho (013-T004): la migración 0022 da los tres permisos nuevos a los roles que tenían «Ver los números del negocio» y lo quita"
   pruebas:
     - microservices/api/src/rutas/secciones-de-negocio.test.ts
     - tests/e2e/escritorio/13-roles.spec.ts
     - tests/e2e/celular/13-roles.spec.ts
   defectos: []
 
-RF-99:
-  estado: "Hecho (012-T004, 012-T012): el servidor manda el valor del stock solo con «Ver el dinero invertido», y Depósito → Inventario lo muestra (total y por producto) a quien lo tiene"
+RF-101:
+  estado: "Hecho (013-T004, 013-T012): el servidor manda el valor del stock solo con «Ver el dinero invertido», y Depósito → Inventario lo muestra (total y por producto) a quien lo tiene"
   pruebas:
     - microservices/api/src/rutas/secciones-de-negocio.test.ts
     - microservices/api/src/rutas/roles.test.ts

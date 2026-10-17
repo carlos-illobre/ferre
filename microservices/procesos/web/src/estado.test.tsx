@@ -64,3 +64,51 @@ describe("dos personas a la vez", () => {
     expect(result.current.aviso).toBeNull();
   });
 });
+
+describe("abrir", () => {
+  it("011-E01 si se toca un proceso mientras se abre solo el último, queda el que se tocó aunque la otra respuesta llegue después", async () => {
+    const s = servicio();
+    const b = await s.cargar("Compra");
+    const a = await s.cargar("Venta");
+    const guardado = guardadoEnMemoria();
+    guardado.setItem("procesos.ultimo", JSON.stringify(a));
+    // El que se abre solo (el último) tarda; el que se toca responde enseguida.
+    let soltarA: () => void = () => undefined;
+    const aTarda = new Promise<void>((r) => { soltarA = r; });
+    const pedir: typeof s.dibuja = async (ruta, init) => {
+      if (ruta === `/procesos/${a}`) await aTarda;
+      return s.dibuja(ruta, init);
+    };
+    const { result } = renderHook(() => useProcesos({ pedir, puede: DIBUJA, guardarLocal: guardado }));
+    await waitFor(() => expect(result.current.lista?.length).toBe(2));
+    await act(() => result.current.abrir(b));
+    expect(result.current.abierto?.id).toBe(b);
+    await act(async () => { soltarA(); await aTarda; });
+    await new Promise((r) => setTimeout(r, 20));
+    expect(result.current.abierto?.id).toBe(b);
+    expect(JSON.parse(guardado.getItem("procesos.ultimo")!)).toBe(b);
+  });
+
+  it("011-E01 si se toca un proceso antes de que llegue la lista, no se abre solo el último", async () => {
+    const s = servicio();
+    const b = await s.cargar("Compra");
+    const a = await s.cargar("Venta");
+    const guardado = guardadoEnMemoria();
+    guardado.setItem("procesos.ultimo", JSON.stringify(a));
+    let soltarLista: () => void = () => undefined;
+    const listaTarda = new Promise<void>((r) => { soltarLista = r; });
+    const pedidos: string[] = [];
+    const pedir: typeof s.dibuja = async (ruta, init) => {
+      pedidos.push(ruta);
+      if (ruta === "/procesos") await listaTarda;
+      return s.dibuja(ruta, init);
+    };
+    const { result } = renderHook(() => useProcesos({ pedir, puede: DIBUJA, guardarLocal: guardado }));
+    await act(() => result.current.abrir(b));
+    await act(async () => { soltarLista(); await listaTarda; });
+    await waitFor(() => expect(result.current.lista?.length).toBe(2));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(result.current.abierto?.id).toBe(b);
+    expect(pedidos).not.toContain(`/procesos/${a}`);
+  });
+});

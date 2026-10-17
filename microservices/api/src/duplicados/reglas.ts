@@ -52,8 +52,8 @@ export function resolver(id: string, accion: "unir" | "rechazar", lado: "a" | "b
 }
 
 // Unión manual de dos productos cualesquiera.
-export function unirAMano(conservar: string | undefined, absorber: string | undefined, usuarioId: string): Promise<Resultado> {
-  if (!conservar || !absorber || conservar === absorber) return Promise.resolve(mal(400, "Elegí dos productos distintos"));
+// Los dos productos ya llegan distintos: lo exige el esquema del pedido.
+export function unirAMano(conservar: string, absorber: string, usuarioId: string): Promise<Resultado> {
   return enTransaccionPg(async (cliente) => {
     const { rowCount } = await cliente.query("SELECT 1 FROM producto WHERE id IN ($1, $2) AND activo", [conservar, absorber]);
     if (rowCount !== 2) throw new Deshacer(mal(404, "Alguno de los productos no existe o ya fue unido"));
@@ -72,8 +72,7 @@ export const unidos = (): Promise<Enviable<Union>[]> => pool.query(
     ORDER BY a.modificado_en DESC LIMIT 100`).then((r) => r.rows);
 
 // Deshacer una unión a partir del registro de lo que se movió (evento producto.unido).
-export function separar(absorbido: string | undefined, usuarioId: string): Promise<Resultado> {
-  if (!absorbido) return Promise.resolve(mal(400, "Falta absorbido_id"));
+export function separar(absorbido: string, usuarioId: string): Promise<Resultado> {
   return enTransaccionPg(async (cliente) => {
     const { rows } = await cliente.query<{ reemplazado_por: string | null }>("SELECT reemplazado_por FROM producto WHERE id = $1 FOR UPDATE", [absorbido]);
     const conservar = rows[0]?.reemplazado_por;

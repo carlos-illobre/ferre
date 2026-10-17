@@ -23,7 +23,7 @@ import { esAmbienteDePrueba } from "../../ambiente";
 
 // Usuarios, celulares con huella, sesiones y quién hizo qué: tres pestañas de Más → Usuarios
 // (decisión 88); la cuarta, Roles, es su propia pantalla. «Cómo va el negocio» tiene la suya
-// (decisión 89). Las pestañas traen su encabezado (`cabeza`), con el título y las pestañas.
+// (decisión 95). Las pestañas traen su encabezado (`cabeza`), con el título y las pestañas.
 export type Parte = "usuarios" | "sesiones" | "actividad";
 
 export function Negocio({ parte, cabeza }: { parte: Parte; cabeza?: ReactNode }) {

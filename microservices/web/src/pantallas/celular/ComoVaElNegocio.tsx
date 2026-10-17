@@ -16,7 +16,7 @@ import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 
-// Más → Cómo va el negocio (decisión 89): las mismas tres secciones que en la computadora, cada
+// Más → Cómo va el negocio (decisión 95): las mismas tres secciones que en la computadora, cada
 // una con su permiso. La dirección de cada sección en el celular.
 export const SUB_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "negocio", compras: "gastos", inventario: "invertido" };
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();

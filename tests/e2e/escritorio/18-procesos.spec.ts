@@ -210,12 +210,25 @@ test("011-E43 un proceso de 200 pasos se abre y se mueve sin trabarse", async ({
   await expect(page.getByText("Grande E2E", { exact: true })).toBeVisible();
   await expect(formas(page)).toHaveCount(200);
   expect(Date.now() - inicio).toBeLessThan(8000);
-  // Mover el dibujo arrastrando el fondo: 20 pasos del mouse en menos de un segundo.
+  // Mover el dibujo arrastrando el fondo. «Sin trabarse» se mide en el navegador: mientras se
+  // arrastra, ningún cuadro tarda más de 200 ms en dibujarse. El tiempo que tarda la prueba en
+  // mandar el mouse no sirve: depende de lo cargada que esté la máquina que corre las pruebas.
   const lienzo = await page.getByTestId("procesos-lienzo").boundingBox();
-  const antes = Date.now();
-  await page.mouse.move(lienzo!.x + 30, lienzo!.y + lienzo!.height - 30);
+  const vista = page.getByTestId("procesos-lienzo").locator("g.viewport");
+  const antes = await vista.getAttribute("transform");
+  await page.evaluate(() => {
+    const w = window as unknown as { huecos: number[]; midiendo: boolean };
+    w.huecos = []; w.midiendo = true;
+    let previo = performance.now();
+    const cuadro = (t: number) => { w.huecos.push(t - previo); previo = t; if (w.midiendo) requestAnimationFrame(cuadro); };
+    requestAnimationFrame(cuadro);
+  });
+  // Desde el fondo vacío de abajo, al centro: a la izquierda están los botones del zoom.
+  await page.mouse.move(lienzo!.x + lienzo!.width / 2, lienzo!.y + lienzo!.height - 30);
   await page.mouse.down();
-  await page.mouse.move(lienzo!.x + 330, lienzo!.y + lienzo!.height - 130, { steps: 20 });
+  await page.mouse.move(lienzo!.x + lienzo!.width / 2 + 300, lienzo!.y + lienzo!.height - 130, { steps: 20 });
   await page.mouse.up();
-  expect(Date.now() - antes).toBeLessThan(1000);
+  const huecos = await page.evaluate(() => { const w = window as unknown as { huecos: number[]; midiendo: boolean }; w.midiendo = false; return w.huecos; });
+  expect(Math.max(...huecos)).toBeLessThan(200);
+  expect(await vista.getAttribute("transform")).not.toBe(antes);
 });

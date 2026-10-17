@@ -41,8 +41,8 @@ especificación (RF-60 a RF-65); lo que acá depende de una aclaración lo dice.
 ## Qué tiene hoy la pantalla «Cómo va el negocio»
 
 Es la pantalla del proceso «analizar el negocio» (decisión 67). Está en Más y se separa en
-tres secciones, cada una con su permiso (decisión 89; el detalle, en
-[012-secciones-de-negocio](../012-secciones-de-negocio/ux.md)):
+tres secciones, cada una con su permiso (decisión 95; el detalle, en
+[013-secciones-de-negocio](../013-secciones-de-negocio/ux.md)):
 
 - **Ventas, con «Ver las ventas del negocio»:** lo vendido hoy (total, cantidad de ventas y
   total por medio de pago) y lo que preguntaron y no llevaron.

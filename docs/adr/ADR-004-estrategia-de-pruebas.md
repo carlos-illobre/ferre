@@ -77,3 +77,10 @@ despliega a pruebas. Se cambia:
   desarrollo.
 - Regla nueva: **cada pedido del dueño que cambie un comportamiento trae su unitaria**
   (en la pantalla o en la ruta), además de actualizar el caso E2E si lo toca.
+
+## Enmienda (2026-10-16): los clips del manual van aparte
+
+Los clips y las capturas del manual de uso (`specs/012-manual-de-uso/`) se arman con recorridos
+propios en `tests/capturas/tutorial/`, contra la API de mentira, al ritmo de una persona y
+grabando video. Las pruebas de punta a punta no graban video (`video: "off"`) ni comparten esos
+recorridos: no se hacen más lentas por el manual (pedido de Carlos).

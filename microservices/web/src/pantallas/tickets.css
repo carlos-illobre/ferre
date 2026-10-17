@@ -17,7 +17,8 @@
 .tk-tipos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tk-tipos button { display: flex; flex-direction: column; gap: 2px; min-height: 64px; padding: 10px 14px; border: 1.500px solid var(--tk-borde-fuerte); border-radius: 12px; background: #fff; color: var(--tk-tinta); text-align: left; font: inherit; cursor: pointer; }
 .tk-tipos button span { color: var(--tk-detalle); font-size: 0.875rem; }
-.tk-tipos button[aria-checked="true"] { border-color: var(--tk-naranja); background: var(--tk-naranja-suave); box-shadow: inset 0 0 0 1px var(--tk-naranja); }
+/* La elegida, en verde suave: avisar de algo no es una alarma (pedido de Carlos del 2026-10-15). */
+.tk-tipos button[aria-checked="true"] { border-color: var(--tk-verde-texto); background: var(--tk-verde-suave); box-shadow: inset 0 0 0 1px var(--tk-verde-texto); }
 
 .tk-campo { display: flex; flex-direction: column; gap: 6px; }
 .tk-campo > span { font-weight: 650; }

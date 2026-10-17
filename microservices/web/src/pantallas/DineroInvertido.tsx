@@ -6,7 +6,7 @@ import type { Stock } from "@servidor/stock";
 
 // Dinero invertido en inventario (RF-53): lo que hay de cada producto por su costo vigente,
 // sin IVA, en total y por proveedor. Va en Cómo va el negocio → Inventario, con «Ver el dinero
-// invertido» (decisión 89), y no en Depósito → Inventario, que solo muestra cantidades (decisión 31).
+// invertido» (decisión 95), y no en Depósito → Inventario, que solo muestra cantidades (decisión 31).
 type Datos = Pick<Stock, "valor_total" | "por_proveedor">;
 const enteros = (n: number) => pesos(Math.round(n)).replace(/,00$/, "");
 

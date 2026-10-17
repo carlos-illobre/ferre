@@ -236,6 +236,12 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **Lo que se toca tiene que parecer un botón:** borde o color; un texto de color solo no
   alcanza.
 - **Las pestañas de adentro de una pantalla llevan ícono.**
+- **En la computadora, la acción de la pantalla va a la derecha de las pestañas, en la misma
+  fila** (nunca hay más de cuatro pestañas, así que el lugar está libre): «Escanear con el
+  celular» en Vender, el día en Anular, «Sector nuevo» en Estanterías, «Rol nuevo» en Roles y
+  «Pedido nuevo» en Pedidos. Cada acción lleva su ícono («Rol nuevo» y «Pedido nuevo», como «Sector nuevo», un «+» dibujado, no escrito en el texto). Una caja de texto ancha, como la búsqueda de Duplicados, sigue en su
+  propia línea. En el celular no cambia (pedido de Carlos del 2026-10-15; maqueta
+  `maquetas/acciones-al-lado-del-submenu.html`).
 - **Cobro:** Efectivo viene elegido; el total se ve grande y fuera del botón «Cobrar», que
   solo dice «Cobrar»; el panel de cobro es lo que más resalta de Vender (decisión 37).
 - **Fotos:** un producto sin foto muestra una cámara donde se toca para sacarla. La foto de
@@ -279,8 +285,10 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
 - **La primera vez en un dispositivo** el catálogo no se espera entero: se ve una primera
   tanda y el resto baja atrás.
 
-**Versión nueva (decisión 54).** La app instalada busca sola si hay una versión nueva: al
-abrirse, al volver a primer plano y cada media hora. Recién abierta, se actualiza sin
+**Versión nueva (decisiones 54, 91 y 92, ADR-020).** La app instalada busca sola si hay una
+versión nueva: al abrirse, al volver a primer plano, al volver la conexión y, mientras está a la vista, cada el tiempo elegido en Configuración
+(15 min de arranque; decisión 92); oculta, no busca. Con la llave de Configuración apagada no
+busca mientras está abierta: la versión nueva llega al cerrarla y volver a abrirla. Recién abierta, se actualiza sin
 preguntar. Si ya se estaba usando, muestra un aviso con el botón «Actualizar ahora», que no
 tapa lo que se está haciendo, y nunca se recarga sola.
 
@@ -301,7 +309,7 @@ Vale igual en todas las pantallas:
 | → en el menú | Pasa la marca a las pestañas de esa parte; en Más, a su primera opción |
 | Clic en una pestaña | La abre y deja la marca de las flechas en esa pestaña |
 | ← → en las pestañas | Pasan la marca de una pestaña a otra sin abrirla; Enter abre la marcada; ← desde la primera vuelve al menú |
-| ← → ↑ ↓ en Más | Las opciones de Más se recorren como pestañas: → y ↓ a la siguiente, ← y ↑ a la anterior, Enter abre, ← desde la primera vuelve al menú |
+| ← → ↑ ↓ en Más | Las opciones de Más se recorren como la grilla que se ve: → a la siguiente y ← a la anterior; ↓ a la de abajo y ↑ a la de arriba, en la misma columna (en la última o la primera fila no se mueve); Enter abre; ← desde la primera vuelve al menú (pedido de Carlos del 2026-10-15) |
 | ↓ desde las pestañas | Marca la primera fila de la lista de la pantalla, y el cursor de escritura queda en la búsqueda. **Si la lista está vacía, la marca se queda en las pestañas** |
 | ↑ ↓ con una fila marcada | Marcan la fila anterior o la siguiente, entera; el cursor de escritura no se mueve. ↑ desde la primera vuelve a las pestañas |
 | ↓ desde la búsqueda | Marca la primera fila de la lista, si hay; el cursor sigue en la búsqueda |
@@ -361,8 +369,9 @@ línea chica que dice cómo está la conexión: «Conectado», «Sincronizado ha
 conexión · 2 por enviar» o «3 por enviar desde hace más de una hora». Debajo, sin espacio de
 más, va el título de la pantalla.
 
-**Volver a Más (decisión 64).** En el celular, cada pantalla de Más lleva arriba a la
-izquierda «Volver a Más», que regresa al menú de Más.
+**Volver a Más (decisiones 64 y 90).** En el celular, cada pantalla de Más lleva arriba a la
+izquierda «Volver a Más», que regresa al menú de Más. En la computadora no lo lleva: se vuelve
+con «Más» del menú de la izquierda.
 
 **El botón de volver del celular (pedido de Carlos del 2026-10-12).** Con algo abierto encima
 de la pantalla (la ficha de un producto, cualquier hoja que sube desde abajo, la cámara del

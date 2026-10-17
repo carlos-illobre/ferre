@@ -22,7 +22,7 @@ export const usuarios: Record<string, Usuario & { rol: string }> = {
   soloVende: { id: "u-solo-vende", email: "vende@ferre.test", nombre: "Solo vende", rol: "soloVende", roles: ["Vendedor"], permisos: ["ventas.registrar"] },
   miraProcesos: { id: "u-mira", email: "mira@ferre.test", nombre: "Núñez Mira", rol: "miraProcesos", roles: ["Lector"], permisos: ["procesos.ver"] },
   dibujaProcesos: { id: "u-dibuja", email: "dibuja@ferre.test", nombre: "Dibuja", rol: "dibujaProcesos", roles: ["Dibujante"], permisos: ["procesos.dibujar"] },
-  // Cada uno ve una sola sección de «Cómo va el negocio» (decisión 89).
+  // Cada uno ve una sola sección de «Cómo va el negocio» (decisión 95).
   veVentas: { id: "u-ve-ventas", email: "ventas@ferre.test", nombre: "Ve ventas", rol: "veVentas", roles: ["Ventas"], permisos: ["negocio.ventas"] },
   veGastos: { id: "u-ve-gastos", email: "gastos@ferre.test", nombre: "Ve gastos", rol: "veGastos", roles: ["Gastos"], permisos: ["negocio.gastos"] },
   veInvertido: { id: "u-ve-invertido", email: "invertido@ferre.test", nombre: "Ve invertido", rol: "veInvertido", roles: ["Inventario"], permisos: ["negocio.invertido"] },

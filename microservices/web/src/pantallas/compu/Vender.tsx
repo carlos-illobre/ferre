@@ -24,6 +24,7 @@ import { irA } from "./base/rutas";
 import { Aviso, Boton, Buscador, Contador, Exito, Explicado, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Progreso, Toast, Vacio, hora, numero, pesosCortos } from "./base/ui";
 import "./base/estilos/vender.css";
 import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
+import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
 
 // La venta, en el orden del mostrador: buscar → costo, margen y precio → cantidad → cobro.
 // Nada obligatorio que el cuaderno no tenga. En la computadora todo sale con el teclado:
@@ -137,13 +138,13 @@ export function Vender() {
 
   return (
     <Pagina titulo="Vender" testId="vender" className={`vender ${items.length ? "con-cobro" : ""}`}
-      acciones={
+      acciones={<AlLadoDeLasPestanas>
         <div className="fila envuelve">
           {/* Sin celular emparejado, «Vincular el celular» está en el menú lateral, siempre a la vista. */}
           {!esCelular && puestoVinculado && <VincularParaEscanear vinculado={puestoVinculado} alVincular={alVincular} />}
           {puestoRemoto() && <span data-testid="celular-vinculado-remoto"><Pastilla tipo="ok">Vinculado a la computadora</Pastilla></span>}
         </div>
-      }>
+      </AlLadoDeLasPestanas>}>
       <div className="vender-busqueda">
         <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco disabled={!catalogo} onKeyDown={teclasBusqueda}
           placeholder={!catalogo ? "Bajando el catálogo…" : esCelular ? "Buscar producto o código" : "Escribí el nombre del producto o el código"}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { crearRutasPorHash } from "../../../plataforma/navegacion/rutas-por-hash";
 import type { NombreDeIcono } from "./ui";
 
 // Enrutamiento por hash (#/productos, #/vincular-celular?codigo=…): el cliente se publica
@@ -36,23 +36,13 @@ export const PANTALLAS: Pantalla[] = GRUPOS.flatMap((g) => g.pantallas);
 // Nombres de las versiones anteriores que siguen abriendo lo que abrían.
 const ALIAS: Record<string, string> = { inicio: "vender", catalogo: "productos", deposito: "stock", negocio: "resumen", administracion: "usuarios" };
 
-function leer(): Ruta {
-  const hash = location.hash.replace(/^#\/?/, "");
-  const [camino = "", consulta = ""] = hash.split("?");
-  const primero = camino.split("/")[0] || "inicio";
-  return { nombre: ALIAS[primero] ?? primero, parametros: new URLSearchParams(consulta) };
-}
+// En la computadora la pantalla es la primera parte del camino; sin camino, la de arranque. La
+// navegación en sí es tecnología de la plataforma (React Router); la computadora no anima.
+const rutas = crearRutasPorHash({
+  resolver: (camino) => { const primero = camino.split("/")[0] || "inicio"; return ALIAS[primero] ?? primero; },
+});
 
-export function useRuta(): Ruta {
-  const [ruta, setRuta] = useState<Ruta>(leer);
-  useEffect(() => {
-    const alCambiar = () => setRuta(leer());
-    window.addEventListener("hashchange", alCambiar);
-    return () => window.removeEventListener("hashchange", alCambiar);
-  }, []);
-  return ruta;
-}
-
-export function irA(camino: string): void {
-  location.hash = `#/${camino}`;
-}
+// La aplicación de la computadora va envuelta en `ConRutas`.
+export const ConRutas = rutas.ConRutas;
+export const useRuta: () => Ruta = rutas.useRuta;
+export const irA = rutas.irA;

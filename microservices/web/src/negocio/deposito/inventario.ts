@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api, ErrorApi } from "../../api";
 import { leerTodo } from "../../almacen";
 import { traerPorIds, type StockFila } from "../../catalogo";
-import type { Movimiento, Stock } from "@servidor/stock";
+import type { AjusteDeStock, Movimiento, Stock } from "@servidor/stock";
 import { enviarOEncolar } from "../../cola";
 import { consultas } from "../../consultas";
 import type { Producto } from "../../producto";
@@ -91,7 +91,7 @@ export function useCorregirStock(producto: Producto) {
     const hay = cantidadContada(real, producto);
     setGuardando(true);
     try {
-      const { encolado } = await enviarOEncolar("stock.ajuste", "POST", `/stock/${producto.id}/ajustes`, { cantidad_real: hay, motivo: motivo.trim() });
+      const { encolado } = await enviarOEncolar("stock.ajuste", "POST", `/stock/${producto.id}/ajustes`, { cantidad_real: hay, motivo: motivo.trim() } satisfies AjusteDeStock);
       if (!encolado) await stockCambio();
       return { hay, encolado };
     } finally {

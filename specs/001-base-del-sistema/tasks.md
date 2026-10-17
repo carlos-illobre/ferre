@@ -23,3 +23,12 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T012 [arreglo] En la computadora, al abrir una parte con Enter la marca a veces no queda en la pestaña; y en Catálogo, Enter apretado enseguida después de escribir abre un producto que no es el buscado
 - [x] T013 [ajuste] HTML semántico en el celular: los listados son listas (`ul`/`li`) y los títulos de cada sección son encabezados, sin cambiar cómo se ven
 - [x] T014 [ajuste] Las sesiones en la nube entran a Docker Hub al arrancar, con DOCKERHUB_USUARIO y DOCKERHUB_TOKEN del entorno, para que las pruebas de punta a punta no choquen con el límite de descargas sin cuenta
+- [x] T015 [ajuste] En la computadora, en Más ↓ va a la opción de abajo y ↑ a la de arriba, como en la grilla que se ve; → y ← siguen a la siguiente y a la anterior (pedido de Carlos del 2026-10-15)
+- [x] T016 [interfaz] En la computadora, la acción de la pantalla va a la derecha de las pestañas, en la misma fila: Vender, Anular, Estanterías, Roles y Pedidos; Duplicados no (pedido de Carlos del 2026-10-15)
+- [x] T017 [ajuste] «Rol nuevo» lleva su ícono, el «+» de «Sector nuevo» (pedido de Carlos del 2026-10-15)
+- [x] T018 [ajuste] «Pedido nuevo» lleva el ícono «+» en vez del «+» escrito en el texto (pedido de Carlos del 2026-10-15)
+- [x] T019 [arreglo] En Roles de la computadora, «Rol nuevo» queda alineado con el borde derecho del contenido, que es angosto, y no con el de la ventana (avisó Carlos el 2026-10-15)
+- [x] T020 [ajuste] Sin «Volver a Más» en ninguna pantalla, ni en el celular ni en la computadora (decisión 90)
+- [x] T021 [ajuste] «Volver a Más» vuelve al celular; solo la computadora queda sin él (Carlos lo aclaró el 2026-10-15, decisión 90)
+- [x] T022 [regla] El timer que busca versión nueva corre solo con la app a la vista; el análisis de cómo enterarse queda en el ADR-020 (decisión 91)
+- [x] T023 [ajuste] Las pruebas de punta a punta no graban video: los clips del manual se arman aparte (ADR-004, pedido de Carlos del 2026-10-16)

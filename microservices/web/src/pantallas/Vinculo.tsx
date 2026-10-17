@@ -4,6 +4,7 @@ import { useEspejo } from "../espejo";
 import { soltarEmparejamiento } from "../puesto";
 import { usePuede } from "./permisos";
 import "./vinculo.css";
+import type { DiasDelVinculo } from "@servidor/puestos";
 
 // El vínculo entre un celular y una computadora, en Más → Usuarios, pestaña Sesiones (decisiones 73, 74 y 88).
 // A quien está vinculado le dice con qué y le ofrece «Desvincular», que es el corte definitivo
@@ -20,7 +21,7 @@ export function Vinculo() {
   const [guardado, setGuardado] = useState<number | null>(null);
   const [mensaje, setMensaje] = useState<{ texto: string; mal?: boolean } | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  useEffect(() => { api<{ dias: number }>("/puestos/configuracion").then((r) => { if (Number.isInteger(r.dias)) { setDias(String(r.dias)); setGuardado(r.dias); } }).catch(() => undefined); }, []);
+  useEffect(() => { api<DiasDelVinculo>("/puestos/configuracion").then((r) => { if (Number.isInteger(r.dias)) { setDias(String(r.dias)); setGuardado(r.dias); } }).catch(() => undefined); }, []);
   const conDias = cambia && guardado !== null;
   if (!emparejado && !conDias) return null;
   const numero = Number(dias);
@@ -29,7 +30,7 @@ export function Vinculo() {
     e.preventDefault();
     if (!valido || ocupado) return;
     setOcupado(true); setMensaje(null);
-    try { const r = await api<{ dias: number }>("/puestos/configuracion", { method: "PUT", body: JSON.stringify({ dias: numero }) }); setGuardado(r.dias); setMensaje({ texto: `Listo: el vínculo dura ${r.dias} ${r.dias === 1 ? "día" : "días"}.` }); }
+    try { const r = await api<DiasDelVinculo>("/puestos/configuracion", { method: "PUT", body: JSON.stringify({ dias: numero } satisfies DiasDelVinculo) }); setGuardado(r.dias); setMensaje({ texto: `Listo: el vínculo dura ${r.dias} ${r.dias === 1 ? "día" : "días"}.` }); }
     catch (err) { setMensaje({ texto: (err as Error).message || "No se pudo guardar. Probá de nuevo.", mal: true }); }
     finally { setOcupado(false); }
   }

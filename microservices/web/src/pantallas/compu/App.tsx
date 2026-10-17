@@ -11,7 +11,7 @@ zonasConTeclasPropias(".lateral, .pestanas");
 const DISPOSICION: DisposicionParaFlechas = {
   pantalla: ".cuerpo",
   noSonListas: ".lateral, .pestanas, .mas-grilla",
-  noSonCajas: ".pestanas, .mas-volver",
+  noSonCajas: ".pestanas",
   sinCaja: () => document.getElementById("contenido"),
   arribaDeLaLista: () => document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']"),
 };
@@ -19,9 +19,10 @@ import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { esAmbienteDePrueba } from "../../ambiente";
 import { ProveedorDeSesion, useSesion } from "../../sesion";
-import { irA, useRuta } from "./base/rutas";
+import { ConRutas, irA, useRuta } from "./base/rutas";
 import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } from "./base/ui";
 import { Entrar } from "./base/pantallas/Entrar";
+import { Manual } from "./base/pantallas/Manual";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
 import { VentasDeHoy } from "./base/pantallas/VentasDeHoy";
 import { Productos } from "./base/pantallas/Productos";
@@ -49,15 +50,18 @@ import { Anomalias } from "../Anomalias";
 import "./base/estilos/base.css";
 import "./base/estilos/entrar.css";
 import "./tema.css";
+import { LUGAR_AL_LADO_DE_LAS_PESTANAS } from "../AlLadoDeLasPestanas";
 
 // La interfaz de computadora (menú lateral, tablas, todo con teclado), con
 // la paleta de la v5, la venta con sugeridos y el menú reducido a lo de todos los días: lo
 // que se usa poco va en «Más». Alt + número abre cada pantalla.
 export function App() {
   return (
-    <ProveedorDeSesion>
-      <Pantallas />
-    </ProveedorDeSesion>
+    <ConRutas>
+      <ProveedorDeSesion>
+        <Pantallas />
+      </ProveedorDeSesion>
+    </ConRutas>
   );
 }
 
@@ -68,7 +72,7 @@ type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono; pide?: Perm
 type Parte = { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] };
 const DE_USUARIOS: Pestana[] = PESTANAS_DE_USUARIOS.map((p) => ({ ruta: p.valor, nombre: p.nombre, icono: p.icono, pide: p.pide }));
 const RUTAS_DE_USUARIOS = new Set(DE_USUARIOS.map((p) => p.ruta));
-// Cómo va el negocio también es una opción de Más con pestañas, una por sección (decisión 89).
+// Cómo va el negocio también es una opción de Más con pestañas, una por sección (decisión 95).
 const RUTA_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "resumen", compras: "gastos", inventario: "invertido" };
 const DE_NEGOCIO: Pestana[] = SECCIONES_DE_NEGOCIO.map((s) => ({ ruta: RUTA_DE_SECCION[s.valor], nombre: s.nombre, icono: s.icono, pide: s.pide }));
 const RUTAS_DE_NEGOCIO = new Set(DE_NEGOCIO.map((p) => p.ruta));
@@ -78,7 +82,7 @@ const MENU: Parte[] = [
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
   { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }, { ruta: "hoy", icono: "ventas", nombre: "Hoy", pide: ["ventas.ver"] }, { ruta: "anular", icono: "deshacer", nombre: "Anular", pide: ["ventas.anular", "ventas.anular_cualquiera"] }] },
   { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos"] }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }, { ruta: "pedidos", icono: "listas", nombre: "Pedidos", pide: ["deposito.pedidos", "deposito.ingresos"] }] },
-  // Usuarios (decisión 88) y Cómo va el negocio (decisión 89) son opciones de Más con pestañas: en el menú cuentan sus pestañas.
+  // Usuarios (decisión 88) y Cómo va el negocio (decisión 95) son opciones de Más con pestañas: en el menú cuentan sus pestañas.
   { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.flatMap((d) => (d.ruta === "usuarios" ? DE_USUARIOS : d.ruta === "resumen" ? DE_NEGOCIO : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
 ];
 // Pantallas que no están en el menú pero tienen dirección.
@@ -239,6 +243,8 @@ function Pantallas() {
 
   if (sesion.estado === "cargando") return <main className="entrar-cargando" aria-busy="true"><Marca tam={44} /><p>Abriendo Ferrebress…</p></main>;
   if (ruta.nombre === "vincular-celular" && codigoVinculacion) return <VincularCelular codigo={codigoVinculacion} />;
+  // El manual de uso se ve sin sesión: lo abre «Ver tutorial» en la entrada (RF-97).
+  if (ruta.nombre === "manual") return <Manual />;
   if (sesion.estado === "sin-sesion") return <Entrar />;
   // El celular llega acá al leer el código QR de la computadora: con la sesión ya iniciada, saca la foto que
   // pidió la computadora.
@@ -284,9 +290,8 @@ function Pantallas() {
         </div>
       </aside>
       <div className={`cuerpo ${pestanas ? "con-pestanas" : ""}`}>
-        {/* En Cómo va el negocio no hace falta: se vuelve con el teclado (pedido de Carlos del 2026-10-15). */}
-        {parte === "mas" && actual !== "mas" && !RUTAS_DE_NEGOCIO.has(actual) && <div className="mas-volver"><Boton icono="izquierda" tam="chico" onClick={() => irA("mas")}>Volver a Más</Boton></div>}
         {pestanas && (
+          <div className="pestanas-fila">
           <nav className="pestanas" aria-label={NOMBRES.get(actual)} onKeyDown={teclasDeLasPestanas}>
             {pestanas.map((p) => (
               <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) ? `Alt+${atajoDe(p.ruta)}` : undefined} data-testid={`pestana-${p.ruta}`}
@@ -296,6 +301,9 @@ function Pantallas() {
               </button>
             ))}
           </nav>
+          {/* La acción de la pantalla, a la derecha de las pestañas (pedido de Carlos del 2026-10-15). */}
+          <div className="pestanas-acciones" id={LUGAR_AL_LADO_DE_LAS_PESTANAS} />
+          </div>
         )}
         {falta ? <SinPermiso falta={falta} />
           : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />

@@ -37,7 +37,7 @@ export const NOMBRES = {
   sesionesAbiertas: "Sesiones abiertas",
   celularesConHuella: "Mis celulares con huella",
   gastosDeLaSemana: "Gastos de la semana",
-  // Las secciones de «Cómo va el negocio» (decisión 89).
+  // Las secciones de «Cómo va el negocio» (decisión 95).
   ventas: "Ventas",
   compras: "Compras",
   inventario: "Inventario",
@@ -75,7 +75,7 @@ export const TEXTOS = {
     faltaUnRol: igual("Elegí al menos un rol. Para que no pueda nada, desactivá al usuario."),
   },
   negocio: {
-    // Más → Cómo va el negocio y sus secciones (decisión 89).
+    // Más → Cómo va el negocio y sus secciones (decisión 95).
     queHayEnElNegocio: { largo: "Lo vendido, los gastos, las compras y el dinero invertido", corto: "Lo vendido, los gastos y el inventario" },
     seccionVentas: {
       largo: "Lo vendido hoy, cómo se cobró y lo que preguntaron y no llevaron.",

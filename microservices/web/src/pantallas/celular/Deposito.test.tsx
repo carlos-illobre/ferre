@@ -101,14 +101,14 @@ describe("Depósito · Ingreso", () => {
 describe("Depósito · Stock", () => {
   beforeEach(() => { apiFalsa.mockReset(); enviarOEncolar.mockClear(); });
 
-  it("012-E10 con «Ver el dinero invertido», el total y el valor de cada producto (decisión 90)", async () => {
+  it("013-E10 con «Ver el dinero invertido», el total y el valor de cada producto (decisión 96)", async () => {
     armar("stock");
     const fila = await screen.findByTestId("fila-stock");
     expect(within(fila).getByTestId("valor-stock").textContent).toBe("$17.000");
     expect(screen.getByTestId("dinero-invertido-stock")).toBeTruthy();
   });
 
-  it("012-E09 sin «Ver el dinero invertido», cantidades y ninguna suma de dinero; los movimientos de cada producto, y corrige", async () => {
+  it("013-E09 sin «Ver el dinero invertido», cantidades y ninguna suma de dinero; los movimientos de cada producto, y corrige", async () => {
     conPermisos("deposito.stock");
     armar("stock");
     const fila = await screen.findByTestId("fila-stock");

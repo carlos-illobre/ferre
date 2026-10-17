@@ -35,6 +35,23 @@ describe("foto del comprobante de una compra", () => {
     expect(base.actual.sqlDe(/INSERT INTO foto_comprobante/)[0]!.params).toEqual([foto, "u-mostrador"]);
   });
 
+  it("una compra mal armada dice qué le falta, renglón por renglón, y no llega a la base", async () => {
+    const error = async (cambios: Record<string, unknown>) => {
+      const r = await pedir(app, "POST", "/compras", { cuerpo: compra(cambios) });
+      expect(r.status).toBe(400);
+      return ((await r.json()) as { error: string }).error;
+    };
+    expect(await error({ id: "uno" })).toBe("El id de la compra tiene que ser un UUID");
+    expect(await error({ proveedor_id: undefined })).toBe("Elegí el proveedor");
+    expect(await error({ comprobante_tipo: "ticket" })).toBe("El comprobante es uno de factura, remito, sin_comprobante");
+    expect(await error({ fecha: "11/10/2026" })).toBe("La fecha tiene que ser AAAA-MM-DD");
+    expect(await error({ items: [] })).toBe("La compra no tiene productos");
+    expect(await error({ items: [{ descripcion: "Cinta", cantidad: 1, costo_unitario: 1 }, { descripcion: "  ", cantidad: 1, costo_unitario: 1 }] })).toBe("El renglón 2 no tiene descripción");
+    expect(await error({ items: [{ descripcion: "Cinta", cantidad: -1, costo_unitario: 1 }] })).toBe("El renglón 1 tiene cantidad inválida");
+    expect(await error({ items: [{ descripcion: "Cinta", cantidad: 1, costo_unitario: -5 }] })).toBe("El renglón 1 tiene costo inválido");
+    expect(base.actual.sqlDe(/FROM proveedor WHERE id/)).toHaveLength(0);
+  });
+
   it("no acepta lo que no es una imagen", async () => {
     expect((await pedir(app, "POST", "/compras/fotos", { formulario: conFoto("application/pdf") })).status).toBe(400);
     expect((await pedir(app, "POST", "/compras/fotos", { formulario: new FormData() })).status).toBe(400);

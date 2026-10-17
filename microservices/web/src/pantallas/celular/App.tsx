@@ -18,7 +18,7 @@ import { ProveedorDeSesion, useSesion } from "../../sesion";
 import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { Roles } from "../Roles";
-import { animarNavegacion, irA, useRuta } from "../../rutas";
+import { animarNavegacion, ConRutas, irA, useRuta } from "../../rutas";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 import { VincularCelular } from "./pantallas/VincularCelular";
 import { Catalogo } from "./Catalogo";
@@ -42,9 +42,11 @@ import "./tema.css";
 // el mismo que en la computadora: Catálogo, Vender, Depósito y Más, con sus pestañas adentro.
 export function App() {
   return (
-    <ProveedorDeSesion>
-      <Pantallas />
-    </ProveedorDeSesion>
+    <ConRutas>
+      <ProveedorDeSesion>
+        <Pantallas />
+      </ProveedorDeSesion>
+    </ConRutas>
   );
 }
 
@@ -57,7 +59,7 @@ const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: stri
   { ruta: "mas", nombre: "Más" },
 ];
 export const DE_MAS: { parte: Exclude<Parte, "sesiones" | "actividad"> | "negocio" | "tickets" | "anomalias" | "configuracion" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
-  // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 89).
+  // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 95).
   { parte: "negocio", nombre: NOMBRES.comoVaElNegocio, detalle: TEXTOS.negocio.queHayEnElNegocio.corto, icono: "resumen", pide: PIDE_EL_NEGOCIO },
   // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
   { parte: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.corto, icono: "usuarios" },
@@ -116,7 +118,7 @@ function Pantallas() {
   const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
   const alLeerCodigo = useCallback((leido: string) => {
     const destino = destinoDelCodigo(leido);
-    if (destino) location.hash = destino; else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora al tocar «Vincular el celular».");
+    if (destino) irA(destino.replace(/^#\//, "")); else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora al tocar «Vincular el celular».");
   }, []);
   const estadoAnterior = useRef(sesion.estado);
   const [recienEntro, setRecienEntro] = useState(false);
@@ -149,7 +151,7 @@ function Pantallas() {
   // Las pestañas de Usuarios (decisión 88) son de la opción «Usuarios» de Más.
   const deUsuarios = PESTANAS_DE_USUARIOS.find((p) => ruta.nombre === "mas" && p.valor === ruta.sub) ?? null;
   const primeraDeUsuarios = PESTANAS_DE_USUARIOS.find((p) => permitido(p.pide))?.valor ?? "sesiones";
-  // Las secciones de Cómo va el negocio (decisión 89), cada una con su dirección.
+  // Las secciones de Cómo va el negocio (decisión 95), cada una con su dirección.
   const subDeNegocio = ruta.nombre === "negocio" ? "negocio" : ruta.nombre === "mas" ? ruta.sub : null;
   const deNegocio = SECCIONES_DE_NEGOCIO.find((s) => SUB_DE_SECCION[s.valor] === subDeNegocio) ?? null;
   const primeraDeNegocio = SUB_DE_SECCION[SECCIONES_DE_NEGOCIO.find((s) => permitido(s.pide))?.valor ?? "ventas"];

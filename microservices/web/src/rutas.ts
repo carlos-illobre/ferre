@@ -28,6 +28,8 @@ const rutas = crearRutasPorHash({
   sePuedeAnimar: () => document.documentElement.dataset.animaciones !== "no",
 });
 
+// La aplicación del celular va envuelta en `ConRutas` (React Router).
+export const ConRutas = rutas.ConRutas;
 export const useRuta = rutas.useRuta;
 export const irA = rutas.irA;
 // La navegación animada del celular: la activa la aplicación del celular; la computadora no anima.

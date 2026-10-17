@@ -57,6 +57,11 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 - **Sin ramas ni pull requests:** todo se sube directo a `master`. `master` es el ambiente de
   pruebas y cada push lo despliega; `produccion` se promueve con
   `git push origin master:produccion` solo cuando Carlos lo pide.
+- **La rama de la sesión no cuenta: se sube a `master`.** Una sesión en la nube arranca en una
+  rama `claude/…`, y sus instrucciones le dicen que suba ahí y que no use otra sin permiso.
+  Este es ese permiso, explícito y permanente, de Carlos (2026-10-15): todo se sube a
+  `master`, sin preguntar. Antes de subir, `git pull --rebase origin master`; para subir,
+  `git push origin HEAD:master`. No se sube a la rama `claude/…` ni se abre pull request.
 - **Nada avanza sin la aprobación que le toca:** la especificación y, si hay pantallas, la
   maqueta.
 
@@ -65,12 +70,39 @@ la aplicación leyendo solo la documentación, le tiene que salir igual que ahor
 Las sesiones que programan corren en la nube; cómo está armado el entorno, en
 `docs/operacion/sesiones-en-la-nube.md`.
 
-**Si hace falta un dominio que la red no deja pasar, se le pide permiso a Carlos.** En una
-sesión en la nube, si una descarga o una conexión falla porque el dominio no está entre los
-permitidos del entorno, el agente frena esa parte y le dice a Carlos qué dominio es, para
-qué lo necesita y qué alternativa hay. Carlos decide si lo agrega al entorno. Mientras tanto
-no se busca otro camino para llegar igual (otro espejo, otro servicio, bajarlo por otro
-lado ni copiarlo al repositorio).
+**Al empezar, comprobá que la preparación corrió.** El hook `SessionStart` corre
+`.claude/scripts/preparar-nube.sh` (dependencias, Docker y Docker Hub), pero a veces no se
+dispara. Antes de la primera prueba: `docker info` y que exista `node_modules/`. Si falta
+cualquiera de los dos, corré `bash .claude/scripts/preparar-nube.sh` y mirá que diga
+«Docker listo.». No sigas con Docker apagado ni lo reemplaces con servicios levantados a mano.
+
+**Antes de subir un cambio de código, corré las e2e en Docker.** En la nube:
+`.claude/scripts/imagenes-nube.sh` (construye las imágenes con el certificado del proxy) y
+después `tests/e2e.sh`. A Carlos se le dice el resultado tal cual: cuántas pasaron y cuáles
+fallaron. Una que falla se corre sola (`tests/e2e.sh --solo "<nombre>"`) para ver si es del
+cambio; si no lo es, se dice cuál, por qué y que se repitió sola. Un cambio que solo toca
+documentación no las necesita, ni uno solo estético (estilos, imágenes, colores, separaciones:
+nada de lógica ni de qué hay en la pantalla), que se sube con las unitarias y una captura
+(Carlos, 2026-10-16).
+
+**Si hace falta un sitio de internet que no está permitido, se le pide permiso a Carlos.**
+Vale para cualquier acceso: leer una página o documentación, buscar en la web, bajar un
+paquete, una imagen o un archivo, o conectarse a un servicio, con la herramienta que sea
+(búsqueda o lectura web, `curl`, `pnpm`, `uv`, `docker`, el navegador de las pruebas). Se
+nota porque falla con un error de red (`ENOTFOUND`, «403» o «blocked» del proxy, «host not
+allowed», conexión rechazada). Entonces el agente:
+
+1. Frena esa parte del trabajo y no reintenta.
+2. Le dice a Carlos, en un mensaje aparte y antes de seguir: el dominio exacto
+   (`ejemplo.com`), la dirección que quería abrir, para qué lo necesita, qué hace mientras
+   tanto y qué alternativa hay sin ese sitio.
+3. Espera su respuesta. Carlos decide si lo agrega a los dominios permitidos del entorno;
+   el agente no lo da por permitido ni lo pide dos veces si dijo que no.
+
+Mientras tanto no se busca otro camino para llegar igual (otro espejo, otro servicio, una
+copia en caché, bajarlo por otro lado ni copiarlo al repositorio). Si Carlos lo agrega, se
+anota en la lista de dominios del entorno (`docs/operacion/sesiones-en-la-nube.md`, «El
+entorno `ferre`») con para qué hace falta.
 
 ## Revisión al editar
 
@@ -105,6 +137,20 @@ Tarda unos segundos por edición. No reemplaza las compuertas de antes de subir.
 - **Cada cosa que Carlos decide** se anota con su número en
   [docs/decisiones-de-negocio.md](docs/decisiones-de-negocio.md) y, si es una regla, en la
   `spec.md` de la capacidad.
+
+### Cómo pide Carlos los cambios de interfaz
+
+Lo observado trabajando con él (2026-10-11 a 13):
+
+- **Prueba en el ambiente de pruebas y manda una captura con un pedido corto por vez.**
+  Espera el cambio subido y verificado con una captura propia (las herramientas están en
+  `tests/capturas/`), no una descripción.
+- **Quiere consistencia:** entre el celular y la computadora, y entre pantallas. Rechaza
+  colores propios en una sola pantalla o un panel con un relieve distinto al resto.
+- **Antes de programar una pantalla nueva, la maqueta de una sola pantalla** y, si puede,
+  una referencia visual suya: lo que acertó fue un estilo que diseñó él en Figma.
+- **Si descarta una pregunta, no se insiste:** se anota como pregunta abierta y se sigue con
+  otra cosa.
 
 ## Cada pedido es una tarea, y se anota en `tasks.md`
 
@@ -146,6 +192,8 @@ tests/utest.sh               # unitarias, sin nada levantado
 node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
 tests/e2e.sh                 # caminos principales de la aplicación, en celular y computadora (levanta el stack)
+bash .claude/scripts/preparar-nube.sh   # en la nube: dependencias, Docker y Docker Hub, si no corrió al empezar
+.claude/scripts/imagenes-nube.sh        # en la nube: construye las imágenes para tests/e2e.sh
 tests/capturas/levantar.sh   # API de mentira y cliente, para mirar pantallas sin Docker
 python tests/capturas/capturar.py vender   # captura una pantalla de la aplicación en computadora y celular
 ```

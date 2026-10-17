@@ -1,7 +1,9 @@
 import { Hono, type Context } from "hono";
 import { exigirPermiso, exigirSesion, puede } from "../autenticacion.js";
 import * as reglas from "../pedidos/reglas.js";
-import type { BorradorGuardado, EnvioDePedido } from "../contratos/pedidos.js";
+import type { BorradorGuardado } from "../contratos/pedidos.js";
+import { borradorDePedido, envioDePedido } from "../pedidos/esquemas.js";
+import { leerCuerpo } from "../validar.js";
 
 // Pedidos a proveedores (RF-55, decisión 52). La ruta solo traduce (ADR-018); las reglas y
 // los datos están en `pedidos/`. Armar, mandar, cancelar y cerrar pide «Encargar compras».
@@ -19,18 +21,19 @@ pedidos.get("/:id", exigirPermiso("deposito.pedidos", "deposito.ingresos"), asyn
 });
 
 pedidos.put("/:id", exigirPermiso("deposito.pedidos"), async (c) => {
-  const v = { ...(await c.req.json<reglas.Entrada>().catch(() => ({}) as reglas.Entrada)), id: c.req.param("id") };
-  const error = reglas.validar(v);
-  if (error) return c.json({ error }, 400);
-  const r = await reglas.guardarBorrador(v, c.get("sesion").usuario.id);
-  return r.ok ? c.json({ id: v.id } satisfies BorradorGuardado, 200) : responder(c, r);
+  const crudo: unknown = await c.req.json().catch(() => ({}));
+  const v = borradorDePedido.safeParse({ ...(crudo && typeof crudo === "object" ? crudo : {}), id: c.req.param("id") });
+  if (!v.success) return c.json({ error: v.error.issues[0]?.message ?? "El pedido no tiene la forma esperada" }, 400);
+  const r = await reglas.guardarBorrador(v.data, c.get("sesion").usuario.id);
+  return r.ok ? c.json({ id: v.data.id } satisfies BorradorGuardado, 200) : responder(c, r);
 });
 
 pedidos.delete("/:id", exigirPermiso("deposito.pedidos"), async (c) => responder(c, await reglas.borrar(c.req.param("id"))));
 
 pedidos.post("/:id/enviar", exigirPermiso("deposito.pedidos"), async (c) => {
-  const { whatsapp } = await c.req.json<EnvioDePedido>().catch(() => ({}) as EnvioDePedido);
-  return responder(c, await reglas.mandar(c.req.param("id"), whatsapp, c.get("sesion").usuario.id));
+  const cuerpo = await leerCuerpo(c, envioDePedido);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  return responder(c, await reglas.mandar(c.req.param("id"), cuerpo.datos.whatsapp, c.get("sesion").usuario.id));
 });
 
 pedidos.post("/:id/cancelar", exigirPermiso("deposito.pedidos"), async (c) => responder(c,

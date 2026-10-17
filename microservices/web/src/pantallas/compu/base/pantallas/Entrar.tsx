@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api, ErrorApi } from "../../../../api";
-import { useSesion, type Usuario } from "../../../../sesion";
+import { useSesion } from "../../../../sesion";
 import QRCode from "qrcode";
 import { dispositivoId, guardarPuestoLocal } from "../../../../puesto";
 import { entrarConHuella, hayHuella, huellaVinculadaAca } from "../../../../credenciales";
@@ -9,7 +9,13 @@ import { marcarEntradaConGoogle } from "./OfrecerHuella";
 import { useEnLinea } from "./negocio-comun";
 import { Aviso, Boton, Icono, Marca, Progreso, type NombreDeIcono } from "../ui";
 import "../estilos/entrar.css";
+import "../estilos/entrar-con-celular.css";
+// Las arma tests/capturas/entrada-compu.py con las capas de Carlos y una captura real de Vender.
+import fondoDeLaEntrada from "../imagenes/entrar-fondo.jpg";
+import celularVendiendo from "../imagenes/entrar-celular.png";
 import { entrarConGoogle } from "../../../../negocio/vinculo";
+import { irA } from "../rutas";
+import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -54,7 +60,9 @@ function ErrorEnElLugar({ error, testId }: { error: ErrorDeEntrada | null; testI
 
 // El botón lo dibuja Google; acá va su lugar, lo que pasa mientras se entra y el resultado.
 // Al entrar, el servidor acepta solo los correos autorizados en Más → Usuarios.
-export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "filled_blue" | "filled_black" }) {
+// `estirar`: Google lo dibuja de 400 px como mucho; estirado, se agranda en proporción hasta
+// ocupar el ancho de su lugar (la tarjeta de la entrada de la computadora, decisión 93).
+export function BotonGoogle({ tema = "filled_blue", estirar = false }: { tema?: "outline" | "filled_blue" | "filled_black"; estirar?: boolean }) {
   const { entrar } = useSesion();
   const [error, setError] = useState<ErrorDeEntrada | null>(null);
   const [entrando, setEntrando] = useState(false);
@@ -64,6 +72,7 @@ export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "fill
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || !lugar.current) return;
     const desde = Date.now();
+    let dibujado = 400; // el ancho con que Google dibujó el botón
     const intervalo = setInterval(() => {
       const google = window.google;
       if (!google || !lugar.current) {
@@ -91,15 +100,22 @@ export function BotonGoogle({ tema = "filled_blue" }: { tema?: "outline" | "fill
       // Google pide el ancho en píxeles (entre 200 y 400): el del lugar que le toca.
       const ancho = Math.round(Math.min(400, Math.max(200, lugar.current.clientWidth || 320)));
       google.accounts.id.renderButton(lugar.current, { theme: tema, size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
+      dibujado = ancho;
       setEstado("listo");
+      if (estirar) ajustar();
     }, 200);
-    return () => clearInterval(intervalo);
-  }, [entrar, tema]);
+    // El lugar puede ser más ancho que el botón: la escala es la que lo llena, y se vuelve a
+    // calcular cada vez que el lugar cambia de ancho.
+    const ajustar = () => { const l = lugar.current; if (l) l.style.setProperty("--escala-google", String(Math.max(1, l.clientWidth / dibujado))); };
+    const observador = estirar && typeof ResizeObserver !== "undefined" ? new ResizeObserver(ajustar) : null;
+    if (observador && lugar.current) observador.observe(lugar.current);
+    return () => { clearInterval(intervalo); observador?.disconnect(); };
+  }, [entrar, tema, estirar]);
 
   if (!GOOGLE_CLIENT_ID) return <Aviso tipo="alerta">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</Aviso>;
   return (
     <div className="entrar-google">
-      <div className={`entrar-google-lugar ${estado === "listo" ? "" : "esperando"} ${entrando ? "ocupado" : ""}`} ref={lugar} aria-busy={estado === "esperando" || entrando} />
+      <div className={`entrar-google-lugar ${estirar ? "estirado" : ""} ${estado === "listo" ? "" : "esperando"} ${entrando ? "ocupado" : ""}`} ref={lugar} aria-busy={estado === "esperando" || entrando} />
       {estado === "esperando" && <span className="solo-lectores" role="status">Cargando el botón de Google…</span>}
       {estado === "sin-google" && <Aviso tipo="alerta" accion={<Boton tam="chico" onClick={() => location.reload()}>Reintentar</Boton>}>Google no responde. Revisá la conexión y reintentá.{hayHuella() ? " Si este dispositivo ya está vinculado, podés entrar con la huella." : ""}</Aviso>}
       {entrando && <Progreso texto="Entrando con tu cuenta de Google…" />}
@@ -146,6 +162,11 @@ export const TEXTOS_DE_ENTRADA = {
   comoConHuella: "Acá no hay contraseñas. Entrás con la huella, si ya vinculaste este dispositivo, o con tu cuenta de Google.",
   comoSinHuella: "Acá no hay contraseñas. Entrás con tu cuenta de Google.",
   nota: "Solo entran las personas que un Administrador del negocio autorizó. Si es tu primera vez, pedile que agregue tu correo de Google.",
+  // Solo en la entrada de la computadora (decisión 93).
+  antetitulo: "El sistema del mostrador",
+  rapido: "Es rápido, seguro y sin contraseñas.",
+  protegidos: "Tus datos están protegidos",
+  tutorial: "Ver tutorial",
   sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
 };
 
@@ -208,7 +229,7 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
     const esperar = (ms: number, que: () => void) => { espera = setTimeout(que, ms); };
     async function pedir() {
       try {
-        const { id, codigo, clave, expiraEnSegundos } = await api<{ id: string; codigo: string; clave: string; expiraEnSegundos: number }>("/sesiones/vinculaciones", { method: "POST", body: JSON.stringify({ dispositivo: describirDispositivo() }) });
+        const { id, codigo, clave, expiraEnSegundos } = await api<CodigoDeEntrada>("/sesiones/vinculaciones", { method: "POST", body: JSON.stringify({ dispositivo: describirDispositivo() } satisfies PedidoDeCodigo) });
         if (!vigente) return;
         const enlace = `${location.origin}${location.pathname}#/entrar-compu?codigo=${encodeURIComponent(codigo)}`;
         // Para las pruebas automáticas: el enlace que el celular abriría.
@@ -221,7 +242,7 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
           if (Date.now() > vence) return void pedir();
           // Con la ventana tapada no se pregunta: nadie está por entrar.
           if (document.visibilityState === "hidden") return esperar(CADA_MS, () => void preguntar());
-          const r = await api<{ estado: "pendiente" | "vencida" | "aprobada"; token?: string; usuario?: Usuario; puesto?: { id: string; expira_en: string } | null }>(`/sesiones/vinculaciones/${id}/estado`, { method: "POST", body: JSON.stringify({ clave, dispositivo_id: dispositivoId() }) }).catch(() => null);
+          const r = await api<EstadoDelCodigo>(`/sesiones/vinculaciones/${id}/estado`, { method: "POST", body: JSON.stringify({ clave, dispositivo_id: dispositivoId() } satisfies ConsultaDeCodigo) }).catch(() => null);
           if (!vigente) return;
           if (r?.estado === "aprobada" && r.token && r.usuario) {
             // El celular que la dejó entrar queda emparejado: escanea y manda fotos sin leer más códigos.
@@ -247,16 +268,57 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
   return { qr, error };
 }
 
+// La entrada de la computadora (decisión 93): copia la imagen de referencia de Carlos, armada con
+// sus capas. El verde con la marca a la izquierda; en el medio, la foto del local entre dos bordes
+// curvos, con un celular que muestra una venta (una captura real de Vender); a la derecha, la
+// tarjeta para entrar. En el celular la entrada es otra (celular/pantallas/Login.tsx) y no cambia.
+// Cada una de las tres cosas que hace va en dos renglones, cortada donde la corta la referencia:
+// después del «;», antes de «con» o después de la primera coma.
+function partirEnDos(texto: string): [string, string] {
+  const puntoYComa = texto.indexOf("; ");
+  if (puntoYComa >= 0) return [texto.slice(0, puntoYComa + 1), texto.slice(puntoYComa + 2)];
+  const con = texto.indexOf(" con ");
+  if (con >= 0) return [texto.slice(0, con), texto.slice(con + 1)];
+  const coma = texto.indexOf(", ");
+  if (coma >= 0) return [texto.slice(0, coma + 1), texto.slice(coma + 2)];
+  return [texto, ""];
+}
+
+function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
+  return (
+    <main className="entrar-cc" data-testid="entrar">
+      <div className="entrar-cc-escena">
+        <div className="entrar-cc-fondo" style={{ backgroundImage: `url(${fondoDeLaEntrada})` }} aria-hidden="true" />
+        <section className="entrar-cc-marca">
+          <Marca tam={64} />
+          <p className="entrar-cc-antetitulo">{TEXTOS_DE_ENTRADA.antetitulo}</p>
+          <h1>Precios al día,<br />ventas y stock<br /><em>de la ferretería.</em></h1>
+          <p className="entrar-cc-bajada">{TEXTOS_DE_ENTRADA.bajada}</p>
+          <ul className="entrar-cc-puntos">
+            {QUE_HACE.map((q) => { const [a, b] = partirEnDos(q.texto); return <li key={q.icono}><span><Icono nombre={q.icono} tam={30} /></span><span className="texto">{a}<br />{b}</span></li>; })}
+          </ul>
+          {/* Abre el manual de uso, en la misma pestaña (RF-97). */}
+        <button type="button" className="entrar-cc-tutorial" onClick={() => irA("manual")} data-testid="ver-tutorial"><Icono nombre="reproducir" tam={22} />{TEXTOS_DE_ENTRADA.tutorial}</button>
+        </section>
+        <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
+        <section className="entrar-cc-tarjeta">
+          {children}
+          <p className="entrar-cc-pie"><span><Icono nombre="candado" tam={18} />{TEXTOS_DE_ENTRADA.protegidos}</span><span className="raya" aria-hidden="true" /><img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" /></p>
+        </section>
+      </div>
+    </main>
+  );
+}
+
 export function Entrar() {
   const enLinea = useEnLinea();
   const [cerrada] = useState(() => sesionCerradaPorElServidor);
   const conHuella = hayHuella() && huellaVinculadaAca();
   const { qr, error: errorDeCodigo } = useCodigoParaEntrar(enLinea);
   return (
-    <MarcoDeEntrada testId="entrar" conPuntos
-      titulo={TEXTOS_DE_ENTRADA.titulo}
-      bajada={TEXTOS_DE_ENTRADA.bajada}>
+    <MarcoDeEntradaConCelular>
       <h2>{TEXTOS_DE_ENTRADA.conElCelular}</h2>
+      <p className="entrar-cc-rapido">{TEXTOS_DE_ENTRADA.rapido}</p>
       {cerrada && <Aviso tipo="alerta" testId="sesion-cerrada"><strong className="entrar-error-titulo">Hay que iniciar sesión</strong>La sesión de este dispositivo se cerró o venció. Entrá de nuevo para seguir.</Aviso>}
       {!enLinea && <Aviso tipo="alerta" testId="entrar-sin-conexion">{TEXTOS_DE_ENTRADA.sinConexion}</Aviso>}
       {enLinea && (
@@ -270,15 +332,15 @@ export function Entrar() {
           </ol>
         </div>
       )}
-      {enLinea && <p className="entrar-como">{TEXTOS_DE_ENTRADA.codigoSeRenueva}</p>}
+      {enLinea && <p className="entrar-como entrar-cc-renueva"><Icono nombre="reloj" tam={26} /><span>{TEXTOS_DE_ENTRADA.codigoSeRenueva}</span></p>}
       <Aviso tipo="error">{errorDeCodigo}</Aviso>
       <div className="entrar-o" aria-hidden="true"><span>o</span></div>
       {conHuella && <BotonHuella />}
-      <BotonGoogle />
+      <BotonGoogle estirar />
       <p className="entrar-nota">
-        <Icono nombre="info" tam={18} />
+        <Icono nombre="error" tam={18} />
         <span>{TEXTOS_DE_ENTRADA.nota}</span>
       </p>
-    </MarcoDeEntrada>
+    </MarcoDeEntradaConCelular>
   );
 }

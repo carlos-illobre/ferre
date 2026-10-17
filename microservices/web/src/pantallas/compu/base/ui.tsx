@@ -57,6 +57,8 @@ const TRAZOS = {
   archivo: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8ZM14 3v5h5",
   proveedor: "M3 21V9l9-6 9 6v12M9 21v-7h6v7",
   reloj: "M12 7v5l3 2M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9Z",
+  candado: "M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5Z",
+  reproducir: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM10 8.500v7l5.500-3.500Z",
   ajustes: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4",
   procesos: "M3 4h7v6H3zM14 14h7v6h-7zM10 7h7v7",
   estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
@@ -111,11 +113,11 @@ export function Pagina({ titulo, bajada, acciones, children, className, testId }
 
 // Ventana sobre lo que se está haciendo. Usa <dialog>: el navegador encierra el foco, lo
 // devuelve al cerrar y cierra con Escape. En el celular sube desde abajo.
-export function Hoja({ titulo, alCerrar, children, pie, ancha, testId }: { titulo: ReactNode; alCerrar: () => void; children: ReactNode; pie?: ReactNode; ancha?: boolean; testId?: string }) {
+export function Hoja({ titulo, alCerrar, children, pie, ancha, testId, alTeclear }: { titulo: ReactNode; alCerrar: () => void; children: ReactNode; pie?: ReactNode; ancha?: boolean; testId?: string; alTeclear?: (e: React.KeyboardEvent<HTMLDialogElement>) => void }) {
   const ref = useDialogo(alCerrar);
   const idTitulo = useId();
   return (
-    <dialog ref={ref} className={`hoja ${ancha ? "ancha" : ""}`} aria-labelledby={idTitulo} data-testid={testId}
+    <dialog ref={ref} className={`hoja ${ancha ? "ancha" : ""}`} aria-labelledby={idTitulo} data-testid={testId} onKeyDown={alTeclear}
       onClick={(e) => { if (e.target === e.currentTarget) alCerrar(); }}>
       <div className="hoja-cabeza">
         <h2 id={idTitulo}>{titulo}</h2>
@@ -210,10 +212,11 @@ export function Segmentos<T extends string>({ opciones, actual, alElegir, etique
 
 // Los cinco márgenes de un toque. Es un grupo de opciones: Tab entra una vez y las flechas
 // izquierda y derecha pasan de un margen a otro y lo eligen.
-export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", atajos, compacto }: { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; atajos?: boolean; compacto?: boolean }) {
+// Con `flechasDeAfuera`, las flechas no eligen: las maneja quien lo contiene, y se elige con Enter.
+export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", atajos, compacto, flechasDeAfuera }: { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; atajos?: boolean; compacto?: boolean; flechasDeAfuera?: boolean }) {
   const conFoco = MARGENES.includes(elegido as never) ? elegido : MARGENES[0];
   function flechas(e: React.KeyboardEvent<HTMLDivElement>) {
-    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    if (flechasDeAfuera || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
     e.preventDefault(); e.stopPropagation();
     const botones = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>("button"));
     const i = botones.indexOf(document.activeElement as HTMLButtonElement);

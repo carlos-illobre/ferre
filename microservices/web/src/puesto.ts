@@ -1,11 +1,12 @@
 import { api, leerToken, urlApi } from "./api";
+import type { CodigoEscaneado, CodigoEscaneadoEntrada, VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). La computadora es un "puesto";
 // el celular emparejado le manda cada código escaneado y recibe sus pedidos de foto. Nace solo
 // cuando el celular deja entrar a la computadora, o leyendo el código de Vender. Ambos guardan
 // su lado en el dispositivo y lo ponen al día con el servidor al abrir la aplicación.
-export type PuestoLocal = { id: string; expira_en: string };           // en la laptop
-export type PuestoRemoto = { id: string; expira_en: string; nombre: string | null }; // en el celular
+export type PuestoLocal = Pick<VinculoDeLaSesion, "id" | "expira_en">; // en la laptop
+export type PuestoRemoto = VinculoDeLaSesion;                          // en el celular
 
 const CLAVE_LOCAL = "ferre.puesto";
 const CLAVE_REMOTO = "ferre.puesto-remoto";
@@ -41,7 +42,7 @@ export const guardarPuestoRemoto = (p: PuestoRemoto | null) => guardarLado(CLAVE
 export async function sincronizarEmparejamiento(): Promise<{ comoComputadora: PuestoLocal | null; comoCelular: PuestoRemoto | null } | null> {
   try {
     const alPedir = cambios;
-    const r = await api<{ comoComputadora: PuestoLocal | null; comoCelular: PuestoRemoto | null }>(`/puestos/mio?dispositivo=${encodeURIComponent(dispositivoId())}`);
+    const r = await api<VinculosDeLaSesion>(`/puestos/mio?dispositivo=${encodeURIComponent(dispositivoId())}`);
     // Si mientras tanto se vinculó o desvinculó acá, esta respuesta es vieja: no pisa lo nuevo.
     if (alPedir !== cambios) return r;
     guardarPuestoLocal(r.comoComputadora ? { id: r.comoComputadora.id, expira_en: r.comoComputadora.expira_en } : null);
@@ -71,7 +72,7 @@ export async function enviarCodigoAlPuesto(codigo: string): Promise<boolean> {
   const p = puestoRemoto();
   if (!p) return false;
   try {
-    await api(`/puestos/${p.id}/codigos`, { method: "POST", body: JSON.stringify({ codigo }) });
+    await api(`/puestos/${p.id}/codigos`, { method: "POST", body: JSON.stringify({ codigo } satisfies CodigoEscaneadoEntrada) });
     return true;
   } catch (e) {
     if ((e as { estado?: number }).estado === 403) guardarPuestoRemoto(null);
@@ -108,7 +109,7 @@ export function escucharPuesto(puestoId: string, alRecibir: (codigo: string) => 
             const evento = lineas.find((l) => l.startsWith("event:"))?.slice(6).trim();
             const datos = lineas.filter((l) => l.startsWith("data:")).map((l) => l.slice(5).trim()).join("\n");
             if (evento === "codigo" && datos) {
-              const c = JSON.parse(datos) as { id: string; codigo: string };
+              const c = JSON.parse(datos) as CodigoEscaneado;
               alRecibir(c.codigo);
               api(`/puestos/${puestoId}/codigos/${c.id}/recibido`, { method: "POST" }).catch(() => undefined);
             }

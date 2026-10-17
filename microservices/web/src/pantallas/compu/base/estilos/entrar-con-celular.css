@@ -1,0 +1,90 @@
+/* La entrada de la computadora (decisión 93): copia la imagen de referencia de Carlos
+   (specs/007-usuarios-y-acceso/maquetas/entrar-compu-con-celular.html). Se diseñó en 1536 × 1024:
+   lo horizontal sigue el ancho de la ventana y los tamaños siguen su alto (--u es un píxel del
+   diseño), así en una notebook se achica sin cortarse. El texto no baja de 14 px.
+ */
+
+.entrar-cc {
+  --u: clamp(0.62px, calc(100vh / 1024), 1.1px);
+  --cc-verde: var(--p-verde, #17312b);
+  --cc-claro: #eef3ee;
+  --cc-menta: #86d0a2;
+  --cc-naranja: #f0782f;
+  --cc-verde-paso: #2d8a5c;
+  position: relative; min-height: 100vh; min-width: 100%; overflow: hidden;
+  /* Más ancho que 16:9, la escena queda centrada y a los dos costados va un verde casi negro, liso
+     (pedido de Carlos del 2026-10-16). */
+  background: #03110e; color: var(--p-tinta, #18201e); font-family: var(--fuente);
+}
+
+/* El fondo y el celular son imágenes armadas con las capas de Carlos (800 × 512, al doble). Se
+   estiran a la ventana, y el celular se ubica en el mismo lugar de esa imagen, sin deformarse. */
+.entrar-cc-fondo { position: absolute; inset: 0; background: #0b3a30 center / 100% 100% no-repeat; }
+
+.entrar-cc-escena { position: relative; width: min(100%, calc(100vh * 16 / 9)); min-height: 100vh; margin: 0 auto; }
+/* Con costados (más ancho que 16:9), la escena va como una tarjeta: con las puntas redondeadas y
+   un margen arriba y abajo. Todo se mide con el alto que le queda. */
+@media (min-aspect-ratio: 181/100) {
+  .entrar-cc { --u: clamp(0.62px, calc((100vh - 48px) / 1024), 1.1px); }
+  .entrar-cc-escena { width: calc((100vh - 48px) * 16 / 9); min-height: calc(100vh - 48px); margin: 24px auto; border-radius: 28px; overflow: hidden; }
+}
+
+/* La marca, a la izquierda sobre el verde */
+.entrar-cc-marca { position: absolute; left: calc(80 / 1536 * 100%); top: calc(64 * var(--u)); width: max(330px, calc(480 * var(--u))); color: #fff; }
+/* La marca trae su tamaño escrito en el elemento; acá sigue el alto de la ventana. */
+.entrar-cc-marca .marca { display: block; font-size: calc(50 * var(--u)) !important; margin: 0 0 calc(35 * var(--u)) calc(-6 * var(--u)); }
+.entrar-cc-antetitulo { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: 0.34em; text-transform: uppercase; color: #7fae98; }
+.entrar-cc-marca h1 { margin: calc(9 * var(--u)) 0 calc(31 * var(--u)); font-size: calc(60 * var(--u)); line-height: 1.07; font-weight: 800; letter-spacing: -0.015em; color: #fff; }
+.entrar-cc-marca h1 em { font-style: normal; color: var(--cc-menta); }
+.entrar-cc-bajada { margin: 0 0 calc(46 * var(--u)); max-width: max(330px, calc(470 * var(--u))); font-size: max(14px, calc(17.5 * var(--u))); line-height: 1.55; color: #c4d4cd; }
+.entrar-cc-puntos { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: calc(25 * var(--u)); }
+.entrar-cc-puntos li { display: flex; align-items: center; gap: calc(20 * var(--u)); font-size: max(14px, calc(19 * var(--u))); line-height: 1.42; color: #f2f6f4; }
+.entrar-cc-puntos li > span:first-child { flex: none; display: grid; place-items: center; width: calc(66 * var(--u)); height: calc(68 * var(--u)); border-radius: 12px; background: #21443b; color: var(--cc-naranja); }
+.entrar-cc-puntos li > span:first-child svg { width: calc(44 * var(--u)); height: calc(44 * var(--u)); stroke-width: 1.9; }
+
+.entrar-cc-celular { position: absolute; left: calc(524 / 1600 * 100%); top: calc(330 / 1024 * 100%); height: calc(600 / 1024 * 100%); width: auto; aspect-ratio: 387 / 603; pointer-events: none; z-index: 2; }
+/* «Ver tutorial», debajo de las tres cosas que hace (por ahora no lleva a ningún lado): con el
+   naranja de los botones principales y ancho, para que se note. */
+.entrar-cc-tutorial { display: inline-flex; align-items: center; justify-content: center; gap: calc(12 * var(--u)); margin-top: calc(54 * var(--u)); white-space: nowrap;
+  min-width: calc(290 * var(--u)); padding: calc(16 * var(--u)) calc(34 * var(--u)); border: 1px solid var(--ambar-fuerte); border-radius: 999px; background: var(--ambar); color: #fff; font: inherit; font-size: max(16px, calc(20 * var(--u))); font-weight: 800; cursor: pointer;
+  box-shadow: 0 12px 28px rgb(217 64 15 / 0.38), 0 2px 0 rgb(0 0 0 / 0.12); transition: transform 120ms ease-out, background-color 120ms ease-out, box-shadow 120ms ease-out; }
+.entrar-cc-tutorial svg { width: calc(28 * var(--u)); height: calc(28 * var(--u)); color: #fff; }
+.entrar-cc-tutorial:hover { background: var(--ambar-fuerte); transform: translateY(-1px); box-shadow: 0 16px 32px rgb(217 64 15 / 0.45), 0 2px 0 rgb(0 0 0 / 0.12); }
+.entrar-cc-tutorial:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* La tarjeta para entrar, a la derecha sobre lo claro */
+.entrar-cc-tarjeta { position: absolute; right: calc(46 / 1536 * 100%); top: calc(100 * var(--u)); width: max(530px, calc(650 * var(--u))); display: flex; z-index: 1; flex-direction: column; gap: calc(20 * var(--u));
+  padding: calc(36 * var(--u)) calc(51 * var(--u)) 0; border-radius: 18px; background: rgb(255 255 255 / 0.96); box-shadow: 0 30px 70px rgb(23 49 43 / 0.14), 0 0 0 1px rgb(223 229 224 / 0.8); overflow: hidden; }
+.entrar-cc-tarjeta h2 { margin: 0 0 0 calc(8 * var(--u)); font-size: max(26px, calc(37 * var(--u))); font-weight: 800; letter-spacing: -0.01em; line-height: 1.1; }
+.entrar-cc-rapido { margin: calc(-14 * var(--u)) 0 calc(8 * var(--u)) calc(8 * var(--u)); font-size: max(15px, calc(19 * var(--u))); color: var(--p-texto-2, #4a5451); }
+.entrar-cc-tarjeta .entrar-codigo { align-items: flex-start; gap: calc(30 * var(--u)); }
+.entrar-cc-tarjeta .entrar-qr { width: calc(234 * var(--u)); height: calc(236 * var(--u)); padding: calc(18 * var(--u)); border: 0; border-radius: 18px; box-shadow: 0 4px 16px rgb(0 0 0 / 0.08), 0 0 0 1px #e3e8e4; }
+.entrar-cc-tarjeta .entrar-pasos { gap: calc(22 * var(--u)); font-size: max(14px, calc(17 * var(--u))); line-height: 1.42; color: #26302d; }
+.entrar-cc-tarjeta .entrar-pasos li { gap: calc(19 * var(--u)); }
+.entrar-cc-tarjeta .entrar-pasos li::before { width: calc(38 * var(--u)); height: calc(38 * var(--u)); background: var(--cc-verde-paso); font-weight: 600; font-size: max(14px, calc(19 * var(--u))); }
+.entrar-cc-renueva { display: flex; align-items: center; gap: calc(19 * var(--u)); margin: 0; min-height: calc(76 * var(--u)); padding: calc(10 * var(--u)) calc(17 * var(--u)); border-radius: 12px; background: #f0f3f1; color: #26302d; font-size: max(14px, calc(16 * var(--u))); line-height: 1.5; }
+.entrar-cc-renueva svg { flex: none; width: calc(28 * var(--u)); height: calc(28 * var(--u)); color: #2d6b55; }
+/* El texto dice las dos cosas en dos renglones, como la referencia. */
+.entrar-cc-renueva span { max-width: 32ch; }
+.entrar-cc-tarjeta .entrar-o { font-size: max(14px, calc(15 * var(--u))); font-weight: 400; color: var(--p-texto-2, #4a5451); }
+/* El botón de Google ocupa el ancho de la tarjeta, como en la referencia: se agranda en proporción. */
+.entrar-cc-tarjeta .entrar-google { align-self: stretch; }
+.entrar-cc-tarjeta .entrar-google-lugar.estirado { max-width: none; min-height: calc(44px * var(--escala-google, 1)); }
+.entrar-cc-tarjeta .entrar-google-lugar.estirado > * { transform: scale(var(--escala-google, 1)); transform-origin: center; }
+.entrar-cc-tarjeta .entrar-nota { padding-top: 0; border-top: 0; gap: calc(16 * var(--u)); font-size: max(14px, calc(16 * var(--u))); line-height: 1.42; color: var(--p-texto-2, #4a5451); }
+.entrar-cc-tarjeta .entrar-nota svg { width: calc(28 * var(--u)); height: calc(28 * var(--u)); color: #2d6b55; }
+.entrar-cc-pie { display: flex; align-items: center; justify-content: center; gap: calc(24 * var(--u)); margin: calc(6 * var(--u)) calc(-51 * var(--u)) 0; min-height: calc(80 * var(--u)); background: #f4f6f5; border-top: 1px solid #e9eeea; color: var(--p-texto-2, #4a5451); font-size: max(14px, calc(15 * var(--u))); }
+.entrar-cc-pie > span:first-child { display: flex; align-items: center; gap: calc(10 * var(--u)); }
+.entrar-cc-pie .raya { width: 1px; height: calc(26 * var(--u)); background: #cfd6d1; }
+.entrar-cc-pie img { height: calc(32 * var(--u)); opacity: 0.8; }
+
+/* Ventana angosta: primero se van el celular, la foto y la frase; después la marca. La tarjeta queda. */
+@media (max-width: 1180px) {
+  .entrar-cc-celular { display: none; }
+}
+@media (max-width: 860px) {
+  .entrar-cc-marca, .entrar-cc-fondo { display: none; }
+  .entrar-cc-tarjeta { position: relative; right: auto; top: auto; margin: 24px auto; width: min(560px, calc(100% - 32px)); }
+}
+/* Ventana baja: la tarjeta puede pasar el alto de la ventana; entonces la página se corre. */
+@media (max-height: 700px) { .entrar-cc { overflow-y: auto; min-height: 720px; } }

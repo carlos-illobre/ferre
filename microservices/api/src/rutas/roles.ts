@@ -2,6 +2,8 @@ import { Hono, type Context } from "hono";
 import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import { PERMISOS } from "../permisos.js";
 import * as reglas from "../administracion/reglas.js";
+import { cambiosDeRol, rolNuevo } from "../administracion/esquemas.js";
+import { leerCuerpo } from "../validar.js";
 
 // Roles y permisos (RF-75, ADR-017). La ruta solo traduce (ADR-018); las reglas y los datos
 // están en `administracion/`.
@@ -22,17 +24,15 @@ permisos.get("/", exigirPermiso("admin.roles", "admin.usuarios"), (c) => c.json(
 roles.get("/", exigirPermiso("admin.roles", "admin.usuarios"), async (c) => c.json(await reglas.roles()));
 
 roles.post("/", exigirPermiso("admin.roles"), async (c) => {
-  const cuerpo = await c.req.json<reglas.RolEntrada>().catch(() => ({}) as reglas.RolEntrada);
-  const error = reglas.validarRol(cuerpo, false);
-  if (error) return c.json({ error }, 400);
-  return responder(c, await reglas.crearRol(cuerpo, c.get("sesion").usuario.id));
+  const cuerpo = await leerCuerpo(c, rolNuevo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  return responder(c, await reglas.crearRol(cuerpo.datos, c.get("sesion").usuario.id));
 });
 
 roles.patch("/:id", exigirPermiso("admin.roles"), async (c) => {
-  const cuerpo = await c.req.json<reglas.RolEntrada>().catch(() => ({}) as reglas.RolEntrada);
-  const error = reglas.validarRol(cuerpo, true);
-  if (error) return c.json({ error }, 400);
-  return responder(c, await reglas.cambiarRol(c.req.param("id"), cuerpo, c.get("sesion").usuario.id));
+  const cuerpo = await leerCuerpo(c, cambiosDeRol);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  return responder(c, await reglas.cambiarRol(c.req.param("id"), cuerpo.datos, c.get("sesion").usuario.id));
 });
 
 roles.delete("/:id", exigirPermiso("admin.roles"), async (c) => responder(c, await reglas.borrarRol(c.req.param("id"), c.get("sesion").usuario.id)));

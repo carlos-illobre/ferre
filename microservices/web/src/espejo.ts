@@ -3,6 +3,7 @@ import { api, leerToken, urlApi } from "./api";
 import { escucharFlujo } from "./plataforma/tiempo-real/flujo-de-eventos";
 import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoLocal, puestoRemoto } from "./puesto";
 import { EVENTO_SESION_ABIERTA } from "./sesion";
+import type { CambioEnEspejo } from "@servidor/puestos";
 
 // El espejo entre el celular y la computadora emparejados (decisión 60). Con la aplicación
 // abierta en los dos, están en la misma parte y comparten el trabajo en curso (la venta).
@@ -116,18 +117,31 @@ function arrancar() {
 export function avisarAlEspejo(tipo: Tipo, datos: unknown): void {
   if (!puestoId || !estado.conectado || estado.pausado) return;
   acordado[tipo] = datos;
-  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo, datos }) }).catch(() => undefined);
+  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo, datos } satisfies CambioEnEspejo) }).catch(() => undefined);
 }
 // Contarle al otro lado algo que terminó acá: se le muestra un momento y no se guarda.
 export function contarAlEspejo(texto: string): void {
   if (!puestoId || !enEspejo()) return;
-  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "aviso", datos: texto }) }).catch(() => undefined);
+  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "aviso", datos: texto } satisfies CambioEnEspejo) }).catch(() => undefined);
 }
-export function alAvisoDelEspejo(oyente: (texto: string) => void): () => void { oyentesDeAvisos.add(oyente); return () => { oyentesDeAvisos.delete(oyente); }; }
+export function alAvisoDelEspejo(oyente: (texto: string) => void): () => void {
+  oyentesDeAvisos.add(oyente);
+  if (avisoPendiente && avisoPendiente.hasta > Date.now()) oyente(avisoPendiente.texto);
+  avisoPendiente = null;
+  return () => { oyentesDeAvisos.delete(oyente); };
+}
+// Un aviso de algo que pasó en la computadora por una acción de este celular (la computadora
+// entró): se muestra en el mismo lugar que los avisos del espejo. Si todavía no hay dónde
+// mostrarlo (la pantalla de siempre no se abrió), espera unos segundos a que aparezca.
+let avisoPendiente: { texto: string; hasta: number } | null = null;
+export function avisarEnEsteDispositivo(texto: string): void {
+  if (oyentesDeAvisos.size) { oyentesDeAvisos.forEach((o) => o(texto)); return; }
+  avisoPendiente = { texto, hasta: Date.now() + 5000 };
+}
 export function pausarEspejo(pausar: boolean): void {
   if (!puestoId) return;
   poner({ pausado: pausar });
-  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "pausa", datos: pausar }) }).catch(() => undefined);
+  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "pausa", datos: pausar } satisfies CambioEnEspejo) }).catch(() => undefined);
 }
 
 export function useEspejo(): EstadoDelEspejo & { enEspejo: boolean } {

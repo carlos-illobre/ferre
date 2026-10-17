@@ -24,9 +24,9 @@ repartido en la raíz, entre la documentación. Carlos aprobó el informe (decis
    servidor; el front solo muestra la vista previa de un margen o precio tipeado.
 4. **El servidor en tres capas:** la ruta traduce el pedido, un caso de uso tiene la regla y
    un repositorio tiene el acceso a los datos.
-5. **Librerías que reemplazan código propio:** TanStack Query, Zod con el cliente tipado de
-   Hono, React Router y Kysely. TanStack Query y Kysely ya se usan; Zod, el cliente tipado de Hono y
-   React Router están pendientes (`specs/010-reordenamiento-del-codigo/tasks.md`, T016 a T018).
+5. **Librerías que reemplazan código propio:** TanStack Query, Zod, React Router y Kysely.
+   El cliente tipado de Hono no se usa (decisión 89): el front lee la forma de los datos de los
+   contratos.
 
 Se hace por etapas (`specs/010-reordenamiento-del-codigo/`). Los nombres de los servicios, de
 las imágenes y de los paquetes no cambian con las carpetas: el despliegue los usa.
@@ -38,11 +38,22 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
   traen una ruta usan `negocio/del-servidor.ts`) y las pantallas la usan; dos pantallas que piden lo mismo comparten la respuesta. Lo que cambia un dato
   (cobrar, anular) avisa, y lo que esté en pantalla se vuelve a pedir. No se reintenta ni se
   espera a «estar en línea»: sin conexión, la pantalla lo dice enseguida.
+- **La navegación es de React Router**, por hash (`#/catalogo/listas`), en
+  `plataforma/navegacion/rutas-por-hash.tsx`: React Router lleva la dirección, el historial y la
+  transición animada, y una sola ruta comodín muestra la aplicación, que elige la pantalla con
+  `useRuta`. Cada interfaz tiene su configuración (`src/rutas.ts` el celular, que anima;
+  `pantallas/compu/base/rutas.ts` la computadora, que no) y va envuelta en su `ConRutas`. `irA`
+  se puede llamar desde cualquier lado (el espejo, un aviso).
 - **La forma de las respuestas la escribe el servidor**, en `microservices/api/src/contratos/`,
   un archivo por tema y solo con tipos. El servidor arma su respuesta con ese tipo y el front
   lo lee como `@servidor/<tema>`; como son solo tipos, al compilar desaparecen y al navegador
-  no llega nada del servidor. Mientras el servidor no esté en tres capas (etapa 5), se escribe
-  a mano el contrato de cada tema que se va unificando.
+  no llega nada del servidor. Donde el servidor devuelve una fecha de la base, el contrato dice
+  texto (así llega en JSON) y el servidor usa `Enviable<Contrato>` (`src/enviable.ts`), que
+  acepta la fecha en ese lugar.
+- **Lo que el front manda** también tiene su forma en el contrato, y el front la comprueba con
+  `satisfies` antes de mandarla. Esa forma sale de la validación con Zod del servidor
+  (`src/<tema>/esquemas.ts`): el contrato la toma con `import type`, así que al front no llega
+  Zod ni ningún código del servidor.
 
 ## Cómo se aplica en el servidor
 
@@ -52,6 +63,11 @@ anomalias, actividad):
 
 - **La ruta** (`src/rutas/<tema>.ts`) solo traduce: lee el pedido, llama a la regla y elige el
   código de respuesta. No tiene SQL ni reglas.
+- **Lo que llega se valida con Zod** (decisión 89): cada tema escribe en `src/<tema>/esquemas.ts`
+  la forma de lo que recibe, con los mensajes en castellano que ve la persona, y la ruta lo lee
+  con `leerCuerpo` (`src/validar.ts`). Si no cumple, responde 400 con el primer motivo y la
+  regla no se llama. Las reglas del negocio que necesitan la base (que el proveedor exista, que
+  la venta sea de hoy) siguen en las reglas.
 - **Las reglas** (`src/<tema>/reglas.ts`): qué se valida, qué se calcula, qué se anota en el
   registro de eventos, y la transacción que lo agrupa.
 - **Los datos** (`src/<tema>/datos.ts`): cada lectura y escritura, con Kysely (`src/base.ts`).

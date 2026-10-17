@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { api, ErrorApi } from "../api";
 import { dispositivoId, guardarPuestoLocal, guardarPuestoRemoto } from "../puesto";
-import type { Usuario } from "../sesion";
+import type { EntradaConGoogle, SesionNueva } from "@servidor/sesiones";
+import type { EstadoDelPuesto, PuestoNuevo, PuestoParaVincular, Vinculacion, Vinculado } from "@servidor/puestos";
 
 // El vínculo entre el celular y la computadora (decisiones 58 y 73) y la entrada con Google,
 // una sola vez para las dos interfaces (RNF-60). Las pantallas solo muestran.
 
-export type Vinculado = { id: string; nombre: string | null; expira_en: string; dias: number };
+export type { Vinculado };
 
 // En el celular, al leer el código de la computadora. El código vale una sola vez: si la
 // pantalla se monta dos veces, el segundo pedido lo encontraría usado, así que se comparte el
@@ -16,7 +17,7 @@ const pedidos = new Map<string, Promise<Vinculado>>();
 export function vincularConCodigo(codigo: string): Promise<Vinculado> {
   let pedido = pedidos.get(codigo);
   if (!pedido) {
-    pedido = api<Vinculado>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST", body: JSON.stringify({ dispositivo_id: dispositivoId() }) })
+    pedido = api<Vinculado>(`/puestos/${encodeURIComponent(codigo)}/vincular`, { method: "POST", body: JSON.stringify({ dispositivo_id: dispositivoId() } satisfies Vinculacion) })
       .then((r) => { guardarPuestoRemoto({ id: r.id, nombre: r.nombre, expira_en: r.expira_en }); return r; });
     pedidos.set(codigo, pedido);
     pedido.catch(() => pedidos.delete(codigo));
@@ -38,7 +39,7 @@ export function useCodigoParaVincular(alVincular: (puestoId: string) => void, qr
   async function generar() {
     parar(); setError(null); setVencido(false); setImagen(null);
     try {
-      const { id, codigo, expiraEnSegundos } = await api<{ id: string; codigo: string; expiraEnSegundos: number }>("/puestos", { method: "POST", body: JSON.stringify({ nombre: "computadora del mostrador" }) });
+      const { id, codigo, expiraEnSegundos } = await api<PuestoParaVincular>("/puestos", { method: "POST", body: JSON.stringify({ nombre: "computadora del mostrador" } satisfies PuestoNuevo) });
       const enlace = `${location.origin}${location.pathname}#/vincular-celular?codigo=${encodeURIComponent(codigo)}`;
       setImagen(await QRCode.toDataURL(enlace, { width: qr.ancho, margin: 1, ...(qr.oscuro ? { color: { dark: qr.oscuro, light: "#ffffff" } } : {}) }));
       // Para las pruebas automáticas: el enlace que el celular abriría.
@@ -46,7 +47,7 @@ export function useCodigoParaVincular(alVincular: (puestoId: string) => void, qr
       const fin = Date.now() + expiraEnSegundos * 1000;
       consulta.current = setInterval(async () => {
         if (Date.now() > fin) { parar(); setImagen(null); setVencido(true); return; }
-        const estado = await api<{ vinculado_en: string | null; expira_en: string }>(`/puestos/${id}`).catch(() => null);
+        const estado = await api<EstadoDelPuesto>(`/puestos/${id}`).catch(() => null);
         if (estado?.vinculado_en) { parar(); guardarPuestoLocal({ id, expira_en: estado.expira_en }); setImagen(null); alVincular(id); }
       }, 2000);
     } catch (e) {
@@ -58,4 +59,4 @@ export function useCodigoParaVincular(alVincular: (puestoId: string) => void, qr
 
 // Entrar con la credencial que devolvió el botón de Google.
 export const entrarConGoogle = (credencial: string, dispositivo: string) =>
-  api<{ token: string; usuario: Usuario }>("/sesiones/google", { method: "POST", body: JSON.stringify({ credencial, dispositivo }) });
+  api<SesionNueva>("/sesiones/google", { method: "POST", body: JSON.stringify({ credencial, dispositivo } satisfies EntradaConGoogle) });

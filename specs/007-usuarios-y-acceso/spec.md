@@ -220,9 +220,9 @@ aplicación con ese usuario, sin haber tocado nada en ella.
 **Acceptance Scenarios**:
 
 1. **Given** la computadora sin sesión y con conexión, **When** abre la aplicación, **Then** la entrada muestra un código QR sin que haya que pedirlo, con dos pasos escritos: leerlo con el celular y poner la huella. «Continuar con Google» queda debajo, como alternativa.
-2. **Given** el código en pantalla y un celular sin sesión con la huella ya vinculada, **When** la persona lee el código con la cámara del celular y entra con la huella, **Then** el celular queda con la sesión iniciada, la computadora entra sola con ese mismo usuario, y el celular dice que la computadora ya entró. No hay una pantalla aparte que pida confirmar: entrar con la huella después de leer el código es la confirmación.
+2. **Given** el código en pantalla y un celular sin sesión con la huella ya vinculada, **When** la persona lee el código con la cámara del celular y entra con la huella, **Then** el celular queda con la sesión iniciada, la computadora entra sola con ese mismo usuario, y el celular sigue a su pantalla de siempre con un aviso breve arriba, «Listo: la computadora entró como …». No hay una pantalla aparte que pida confirmar ni una que diga «Listo»: entrar con la huella después de leer el código es la confirmación (pedido de Carlos del 2026-10-15).
 3. **Given** el código en pantalla y un celular que nunca vinculó la huella, **When** la persona lee el código y entra con Google, **Then** pasa lo mismo que en el escenario 2, y después se le ofrece vincular la huella (RF-70b).
-4. **Given** el código en pantalla y un celular que ya tiene la sesión iniciada, **When** lee el código, **Then** ve un solo botón, «Entrar en la computadora», y al tocarlo la computadora entra. Abrir el enlace no alcanza: hace falta ese toque.
+4. **Given** el código en pantalla y un celular que ya tiene la sesión iniciada, **When** lee el código, **Then** ve un solo botón, «Entrar en la computadora», y al tocarlo la computadora entra y el celular sigue como en el escenario 2. Abrir el enlace no alcanza: hace falta ese toque. Si la computadora no entra, el celular lo dice y por qué.
 5. **Given** un código que nadie leyó en 5 minutos, **When** vence, **Then** la computadora lo reemplaza sola por uno nuevo; el vencido ya no sirve.
 6. **Given** un código que ya dejó entrar a una computadora, **When** otro celular lo lee, **Then** no sirve: dice que hay que leer el que la computadora muestra ahora.
 7. **Given** un usuario desactivado o un correo no autorizado, **When** intenta entrar desde el celular después de leer el código, **Then** no entra ni el celular ni la computadora (RF-70).
@@ -363,9 +363,9 @@ Los **permisos** son fijos y los define el sistema:
 | Depósito | Encargar compras | Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos (RF-55) |
 | Depósito | Ver las compras | Ver las compras recientes y sus comprobantes, en «Cómo va el negocio» |
 | Depósito | Contar y corregir stock | Contar estanterías y corregir el stock a mano |
-| Negocio | Ver las ventas del negocio | Cómo va el negocio → Ventas: lo vendido, cómo se cobró y lo que preguntaron y no llevaron (decisión 89) |
-| Negocio | Ver los gastos | Cómo va el negocio → Compras: los gastos de la semana por proveedor (decisión 89) |
-| Negocio | Ver el dinero invertido | Cómo va el negocio → Inventario, y el valor en pesos del stock en cualquier pantalla (decisión 89) |
+| Negocio | Ver las ventas del negocio | Cómo va el negocio → Ventas: lo vendido, cómo se cobró y lo que preguntaron y no llevaron (decisión 95) |
+| Negocio | Ver los gastos | Cómo va el negocio → Compras: los gastos de la semana por proveedor (decisión 95) |
+| Negocio | Ver el dinero invertido | Cómo va el negocio → Inventario, y el valor en pesos del stock en cualquier pantalla (decisión 95) |
 | Negocio | Ver las anomalías | Abrir «Anomalías» |
 | Negocio | Ver quién hizo qué | Abrir el registro de acciones |
 | Negocio | Ver procesos | Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial (RF-95) |

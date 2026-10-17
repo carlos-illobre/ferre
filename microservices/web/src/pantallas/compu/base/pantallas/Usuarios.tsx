@@ -13,6 +13,7 @@ import { autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlt
 import { usePuede } from "../../../permisos";
 import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
 import "../estilos/negocio.css";
+import type { HuellaVinculada } from "@servidor/credenciales";
 
 type Mensaje = { texto: string; testId?: string };
 type Avisar = (m: Mensaje) => void;
@@ -378,7 +379,7 @@ function Celulares({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
 }
 
 // El nombre se pide dentro de la app, con uno propuesto que se puede dejar como está.
-function NombrarCelular({ alCerrar, alVincular }: { alCerrar: () => void; alVincular: (c: Credencial) => void }) {
+function NombrarCelular({ alCerrar, alVincular }: { alCerrar: () => void; alVincular: (c: HuellaVinculada) => void }) {
   const [nombre, setNombre] = useState(() => describirDispositivo().slice(0, 40));
   const [vinculando, setVinculando] = useState(false);
   const [error, setError] = useState<string | null>(null);

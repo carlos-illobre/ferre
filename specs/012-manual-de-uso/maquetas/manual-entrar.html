@@ -1,0 +1,249 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manual de uso · Entrar a Ferrebress</title>
+<!-- Maqueta del manual de uso (specs/012-manual-de-uso): el capítulo «Entrar», como ejemplo. Lo
+     abre «Ver tutorial» en la entrada de la computadora. Las capturas y el clip los arma
+     tests/capturas/tutorial/entrar.py con la aplicación de verdad. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#17312b;--verde-2:#21443b;--menta:#86d0a2;--naranja:#d9400f;--naranja-suave:#fdeee6;--tinta:#18201e;--texto-2:#4a5451;--borde:#dfe5e0;--papel:#fff;--fondo:#eef1ee;--amarillo:#fff6dc;--amarillo-borde:#f0d78a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:17px/1.6 Manrope,system-ui,sans-serif}
+a{color:var(--naranja)}
+/* Barra de arriba */
+.barra{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:18px;height:64px;padding:0 28px;background:var(--verde);color:#fff;box-shadow:0 2px 10px rgb(0 0 0 / .15)}
+.barra img{height:30px;filter:brightness(0) invert(1)}
+.barra .titulo{font-weight:700;opacity:.9;border-left:1px solid rgb(255 255 255 / .25);padding-left:18px}
+.barra .volver{margin-left:auto;color:#fff;text-decoration:none;font-weight:600;font-size:15px;opacity:.85}
+/* Índice y hoja */
+.marco{display:grid;grid-template-columns:260px minmax(0,880px);gap:36px;justify-content:center;padding:36px 28px 80px}
+.indice{position:sticky;top:96px;align-self:start;font-size:15px}
+.indice h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--texto-2);margin:0 0 12px}
+.indice ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.indice li a{display:flex;gap:10px;padding:8px 12px;border-radius:10px;color:var(--tinta);text-decoration:none}
+.indice li a b{color:var(--texto-2);font-weight:700;min-width:18px}
+.indice li.actual > a{background:var(--papel);box-shadow:0 0 0 1px var(--borde);font-weight:700}
+.indice li.actual > a b{color:var(--naranja)}
+.indice li.pronto a{color:#9aa3a0;pointer-events:none}
+.indice li.pronto a::after{content:"pronto";margin-left:auto;font-size:11px;font-weight:700;color:#9aa3a0;border:1px solid #d3dad5;border-radius:999px;padding:0 8px;line-height:20px}
+.indice ul{list-style:none;margin:4px 0 8px 40px;padding:0;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.indice ul a{color:var(--texto-2);text-decoration:none}
+.hoja{background:var(--papel);border-radius:18px;box-shadow:0 1px 0 var(--borde),0 18px 50px rgb(23 49 43 / .08);padding:52px 64px 64px}
+/* Encabezado del capítulo */
+.capitulo{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--naranja);font-weight:800;margin:0}
+h1{font-size:44px;line-height:1.1;margin:8px 0 14px;letter-spacing:-.02em}
+.entrada{font-size:20px;color:var(--texto-2);margin:0 0 28px;max-width:62ch}
+.resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 36px}
+.resumen div{background:var(--fondo);border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.45}
+.resumen strong{display:block;font-size:16px;margin-bottom:2px}
+h2{font-size:28px;margin:52px 0 10px;letter-spacing:-.01em;scroll-margin-top:90px}
+h3{font-size:20px;margin:30px 0 8px}
+p{margin:0 0 14px;max-width:68ch}
+/* Recuadros */
+.nota{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:16px 20px;border-radius:14px;margin:18px 0 24px;font-size:16px;line-height:1.5}
+.nota svg{width:26px;height:26px}
+.nota.importante{background:var(--amarillo);box-shadow:inset 0 0 0 1px var(--amarillo-borde)}
+.nota.consejo{background:#e9f5ee;box-shadow:inset 0 0 0 1px #bfe2cc}
+.nota p{margin:0}
+/* El clip */
+.clip{margin:22px 0 34px;border-radius:18px;overflow:hidden;background:var(--verde);box-shadow:0 14px 40px rgb(23 49 43 / .22)}
+.clip video{display:block;width:100%;height:auto;background:#0b342c}
+.clip figcaption{display:flex;align-items:center;gap:12px;padding:14px 20px;color:#dbe7e1;font-size:15px}
+.clip figcaption b{color:#fff}
+.clip figcaption .duracion{margin-left:auto;font-weight:700;color:var(--menta)}
+/* Los pasos */
+.paso{display:grid;grid-template-columns:52px 1fr;gap:20px;margin:28px 0 8px}
+.paso .numero{width:52px;height:52px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:24px;display:grid;place-items:center;box-shadow:0 6px 14px rgb(217 64 15 / .3)}
+.paso h3{margin:10px 0 6px}
+.figura{margin:18px 0 6px}
+.figura .marco-img{position:relative;display:inline-block;max-width:100%;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--borde),0 10px 30px rgb(23 49 43 / .12)}
+.figura img{display:block;max-width:100%;height:auto}
+.figura figcaption{font-size:14px;color:var(--texto-2);margin-top:10px}
+.figura figcaption b{color:var(--tinta)}
+.lado{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:32px;align-items:start}
+.lado .figura{margin-top:4px}
+.celular-img{width:230px;border-radius:30px!important;box-shadow:0 0 0 8px #1c1f1e,0 18px 36px rgb(0 0 0 / .25)!important}
+.par{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:28px;align-items:end}
+/* Marcas numeradas sobre las capturas */
+.marca{position:absolute;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:16px;display:grid;place-items:center;box-shadow:0 0 0 3px #fff,0 4px 10px rgb(0 0 0 / .3)}
+.leyenda{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px;font-size:15px}
+.leyenda li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.leyenda li span{width:24px;height:24px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;margin-top:2px}
+/* Tabla de problemas */
+.problemas{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:16px}
+.problemas th{text-align:left;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-2);padding:10px 14px;border-bottom:2px solid var(--borde)}
+.problemas td{padding:14px;border-bottom:1px solid var(--borde);vertical-align:top;line-height:1.5}
+.problemas td:first-child{font-weight:700;width:34%}
+kbd{font:inherit;font-weight:700;background:var(--fondo);border:1px solid var(--borde);border-bottom-width:2px;border-radius:6px;padding:0 6px}
+.boton-ui{font-weight:700;color:var(--naranja);white-space:nowrap}
+.pie{display:flex;justify-content:space-between;margin-top:56px;padding-top:22px;border-top:1px solid var(--borde);font-size:15px}
+.pie a{text-decoration:none;font-weight:700}
+.pie .gris{color:#9aa3a0}
+@media (max-width:1100px){.lado,.par{grid-template-columns:1fr}.marco{grid-template-columns:1fr}.indice{position:static}.hoja{padding:32px 24px}.resumen{grid-template-columns:1fr}}
+</style></head><body>
+<header class="barra">
+  <img src="logotipo.png" alt="Ferrebress">
+  <span class="titulo">Manual de uso</span>
+  <a class="volver" href="#">← Volver a Ferrebress</a>
+</header>
+<div class="marco">
+  <nav class="indice" aria-label="Capítulos">
+    <h2>Capítulos</h2>
+    <ol>
+      <li class="actual"><a href="#"><b>1</b>Entrar</a>
+        <ul>
+          <li><a href="#con-el-celular">Con el celular</a></li>
+          <li><a href="#otras-formas">Otras formas</a></li>
+          <li><a href="#problemas">Si algo no funciona</a></li>
+        </ul>
+      </li>
+      <li class="pronto"><a href="#"><b>2</b>Catálogo</a></li>
+      <li class="pronto"><a href="#"><b>3</b>Vender</a></li>
+      <li class="pronto"><a href="#"><b>4</b>Cómo va el negocio</a></li>
+      <li class="pronto"><a href="#"><b>5</b>Usuarios</a></li>
+      <li class="pronto"><a href="#"><b>6</b>Anomalías</a></li>
+      <li class="pronto"><a href="#"><b>7</b>Procesos</a></li>
+      <li class="pronto"><a href="#"><b>8</b>Mejoras y errores</a></li>
+      <li class="pronto"><a href="#"><b>9</b>Configuración</a></li>
+    </ol>
+  </nav>
+
+  <main class="hoja">
+    <p class="capitulo">Capítulo 1</p>
+    <h1>Entrar a Ferrebress</h1>
+    <p class="entrada">Ferrebress no usa contraseñas. En la computadora entrás con tu celular, leyendo un
+      código que aparece en la pantalla. Tarda unos segundos.</p>
+
+    <div class="resumen">
+      <div><strong>Qué necesitás</strong>Tu celular con Ferrebress y tu cuenta de Google autorizada.</div>
+      <div><strong>Cuánto tarda</strong>Menos de un minuto la primera vez; después, unos segundos.</div>
+      <div><strong>Dónde se hace</strong>En la pantalla de entrada de la computadora.</div>
+    </div>
+
+    <div class="nota importante">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#9a6a00" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 4 2.7 17.5A2 2 0 0 0 4.4 20.5h15.2a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0Z"/></svg>
+      <p><b>Antes de empezar:</b> solo entran las personas que un Administrador del negocio autorizó. Si
+        es tu primera vez, pedile que agregue tu correo de Google en <b>Más → Usuarios</b>.</p>
+    </div>
+
+    <h2 id="con-el-celular">Entrar en la computadora con el celular</h2>
+    <p>Es la forma más rápida: la computadora muestra un código, el celular lo lee y la computadora
+      entra sola, con tu usuario.</p>
+
+    <figure class="clip">
+      <video src="entrar/clip.mp4" poster="entrar/clip-portada.jpg" controls muted playsinline preload="metadata"></video>
+      <figcaption><b>Mirá cómo se hace.</b> A la izquierda, la computadora; a la derecha, el celular. <span class="duracion">15 segundos</span></figcaption>
+    </figure>
+
+    <div class="paso">
+      <div class="numero">1</div>
+      <div>
+        <h3>Abrí Ferrebress en la computadora</h3>
+        <p>Aparece la pantalla de entrada, con el código ya listo. No hace falta tocar nada.</p>
+        <figure class="figura">
+          <div class="marco-img">
+            <img src="entrar/compu-codigo.png" alt="La pantalla de entrada de la computadora, con el código para leer con el celular">
+            <span class="marca" style="left:60.8%;top:23%">1</span>
+            <span class="marca" style="left:75.2%;top:23%">2</span>
+            <span class="marca" style="left:60.8%;top:48.5%">3</span>
+            <span class="marca" style="left:60.8%;top:62.5%">4</span>
+          </div>
+          <ul class="leyenda">
+            <li><span>1</span>El código que lee el celular.</li>
+            <li><span>2</span>Los dos pasos, por si te olvidás.</li>
+            <li><span>3</span>El código cambia solo cada 5 minutos: si se venció, leé el que está a la vista.</li>
+            <li><span>4</span>La otra forma de entrar, con tu cuenta de Google (más abajo).</li>
+          </ul>
+          <figcaption><b>Figura 1.1</b> · La entrada de la computadora.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="paso">
+      <div class="numero">2</div>
+      <div>
+        <div class="lado"><div>
+        <h3>Leé el código con el celular</h3>
+        <p>Abrí Ferrebress en el celular y tocá <span class="boton-ui">Escanear el código de la computadora</span>.
+          Apuntá la cámara al código de la pantalla. También sirve la cámara del teléfono, sin abrir Ferrebress.</p>
+        <p>Si es la primera vez en ese celular, antes entrá con <span class="boton-ui">Continuar con Google</span>
+          (más abajo, en «Otras formas de entrar»).</p></div>
+        <figure class="figura">
+          <div class="marco-img celular-img"><img src="entrar/celu-entrada.png" alt="La entrada del celular, con el botón para escanear el código de la computadora"></div>
+          <figcaption><b>Figura 1.2</b> · En el celular, «Escanear el código de la computadora».</figcaption>
+        </figure></div>
+      </div>
+    </div>
+
+    <div class="paso">
+      <div class="numero">3</div>
+      <div>
+        <div class="lado"><div>
+        <h3>Confirmá en el celular</h3>
+        <p>Si en el celular ya tenías la sesión abierta, pregunta <b>«¿Entrar en la computadora?»</b>: tocá
+          <span class="boton-ui">Entrar en la computadora</span>. Si no la tenías, poné la huella.</p>
+        <p>Con «Ahora no», la computadora no entra y el celular sigue donde estaba.</p></div>
+        <figure class="figura">
+          <div class="marco-img celular-img"><img src="entrar/celu-dejar-entrar.png" alt="El celular pregunta si entrar en la computadora"></div>
+          <figcaption><b>Figura 1.3</b> · El celular pregunta antes de dejar entrar a la computadora.</figcaption>
+        </figure></div>
+      </div>
+    </div>
+
+    <div class="paso">
+      <div class="numero">4</div>
+      <div>
+        <h3>Listo: la computadora entra sola</h3>
+        <p>En unos segundos la computadora entra con tu usuario, y el celular avisa arriba
+          <b>«Listo: la computadora entró como …»</b>. Los dos siguen con lo suyo.</p>
+        <div class="par">
+          <figure class="figura">
+            <div class="marco-img"><img src="entrar/compu-adentro.png" alt="La computadora, ya adentro de Ferrebress"></div>
+            <figcaption><b>Figura 1.4</b> · La computadora, ya adentro.</figcaption>
+          </figure>
+          <figure class="figura">
+            <div class="marco-img celular-img" style="width:170px;border-radius:22px!important;box-shadow:0 0 0 6px #1c1f1e,0 14px 28px rgb(0 0 0 / .25)!important"><img src="entrar/celu-despues.png" alt="El celular avisa que la computadora entró"></div>
+            <figcaption><b>Figura 1.5</b> · El aviso en el celular.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <div class="nota consejo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1f7a53" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z"/></svg>
+      <p><b>De paso, quedan vinculados.</b> El celular que dejó entrar a la computadora queda unido a ella: lo
+        que escanees con el celular aparece en la computadora, y desde la computadora le podés pedir fotos.</p>
+    </div>
+
+    <h2 id="otras-formas">Otras formas de entrar</h2>
+    <h3>Con tu cuenta de Google</h3>
+    <p>En la entrada de la computadora o del celular, tocá <span class="boton-ui">Continuar con Google</span> y elegí
+      tu cuenta. Es la forma de entrar la primera vez en un celular.</p>
+    <h3>Con la huella</h3>
+    <p>En un celular que ya vinculaste con tu cuenta, tocá <span class="boton-ui">Entrar con la huella</span>. La
+      primera vez que entrás con Google desde un celular, Ferrebress te ofrece vincularlo; también se hace
+      desde <b>Más → Usuarios</b>, en la pestaña «Sesiones».</p>
+
+    <h2 id="problemas">Si algo no funciona</h2>
+    <table class="problemas">
+      <thead><tr><th>Qué pasa</th><th>Qué hacer</th></tr></thead>
+      <tbody>
+        <tr><td>Dice «No autorizado»</td><td>Tu correo de Google no está autorizado. Pedile a un Administrador que lo agregue en <b>Más → Usuarios</b>, o probá con otra cuenta.</td></tr>
+        <tr><td>El celular dice que el código venció</td><td>El código dura 5 minutos y sirve una sola vez. Leé el que la computadora muestra ahora.</td></tr>
+        <tr><td>No aparece el código</td><td>La computadora no tiene internet. Cuando vuelva la conexión, el código aparece solo.</td></tr>
+        <tr><td>No se pudo leer la huella</td><td>Probá de nuevo, o entrá con tu cuenta de Google.</td></tr>
+        <tr><td>Dice «Hay que iniciar sesión»</td><td>La sesión de ese dispositivo se cerró o venció. Entrá de nuevo.</td></tr>
+      </tbody>
+    </table>
+    <figure class="figura">
+      <div class="marco-img"><img src="entrar/compu-no-autorizado.png" alt="El aviso de correo no autorizado en la entrada de la computadora" style="width:420px"></div>
+      <figcaption><b>Figura 1.6</b> · Así se ve cuando el correo no está autorizado.</figcaption>
+    </figure>
+
+    <nav class="pie">
+      <span class="gris">Este es el primer capítulo</span>
+      <span class="gris">Siguiente: Catálogo (pronto) →</span>
+    </nav>
+  </main>
+</div>
+</body></html>

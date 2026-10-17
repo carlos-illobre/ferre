@@ -108,6 +108,8 @@ Vendedor: la app ya está en el dispositivo y lo que no se pudo mandar espera.
 5. **Given** un Vendedor con una venta a medio armar, **When** se despliega una versión nueva del servidor, **Then** la venta se completa y llega al servidor una sola vez.
 6. **Given** una versión nueva del servidor publicada para un ambiente, **When** la máquina la despliega y los servicios no quedan sanos, **Then** vuelve sola a la versión que estaba corriendo.
 7. **Given** un aviso de despliegue que no llegó a la máquina, **When** la máquina arranca o alguien lanza el despliegue a mano, **Then** queda en la versión que corresponde a su ambiente.
+8. **Given** la app abierta y a la vista, sin que nadie la oculte, **When** pasa el tiempo elegido en Configuración (15 min de arranque, decisión 92), **Then** busca sola si hay una versión nueva y, si la hay, muestra «Hay una versión nueva» con «Actualizar ahora» (decisión 91).
+9. **Given** la app oculta (otra app adelante, la pantalla apagada, la ventana minimizada), **When** pasa el tiempo, **Then** no busca versiones; al volver a la vista busca en el momento y el timer vuelve a contar desde cero (decisión 91).
 
 ---
 

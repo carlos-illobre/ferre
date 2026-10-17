@@ -1,4 +1,4 @@
--- Cómo va el negocio en tres secciones (decisión 89, specs/012-secciones-de-negocio): «Ver los
+-- Cómo va el negocio en tres secciones (decisión 95, specs/013-secciones-de-negocio): «Ver los
 -- números del negocio» se reemplaza por «Ver las ventas del negocio», «Ver los gastos» y «Ver el
 -- dinero invertido». Cada rol que tenía el permiso viejo recibe los tres, así nadie pierde nada.
 INSERT INTO rol_permiso (rol_id, permiso)

@@ -7,6 +7,7 @@ import { useEsCelular } from "../vista";
 import { irA } from "../rutas";
 import { Aviso, Boton, Hoja, Icono, Indicador, Pagina, Pastilla, Toast, Vacio, hora, numero, pesosCortos } from "../ui";
 import "../estilos/ventas.css";
+import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 
 // Las ventas de un día, como en el cuaderno: cada venta con sus productos, uno por renglón.
 const ICONO_MEDIO = { efectivo: "plata", mercado_pago: "celular", tarjeta: "caja", cuenta_corriente: "usuarios" } as const;
@@ -34,13 +35,14 @@ export function VentasDeHoy({ modo }: { modo: "hoy" | "anular" }) {
   return (
     <Pagina titulo={titulo} testId={modo === "anular" ? "anular-ventas" : "ventas-de-hoy"}
       bajada={modo === "anular" ? "La venta anulada queda marcada y sus productos vuelven al stock. No se puede deshacer." : undefined}
-      acciones={otroDia &&
+      acciones={otroDia && <AlLadoDeLasPestanas>
         <div className="fila envuelve">
           <label className="ventas-dia"><span className="solo-lectores">Día que se muestra</span>
             <input type="date" className="entrada" value={dia} max={hoyLocal()} onChange={(e) => e.target.value && setDia(e.target.value)} data-testid="dia" />
           </label>
           {!esHoy && <Boton icono="deshacer" onClick={() => setDia(hoyLocal())}>Volver a hoy</Boton>}
         </div>
+      </AlLadoDeLasPestanas>
       }>
       <Aviso tipo="error" accion={<Boton tam="chico" onClick={recargar}>Reintentar</Boton>}>{error}</Aviso>
 

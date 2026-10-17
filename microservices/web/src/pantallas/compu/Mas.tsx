@@ -8,7 +8,7 @@ import { PIDE_EL_NEGOCIO } from "../pestanas-de-negocio";
 // «Más» guarda las pantallas que se usan poco, para que el menú tenga solo lo de todos los días.
 // Cada una dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
 export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
-  // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 89).
+  // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 95).
   { ruta: "resumen", nombre: NOMBRES.comoVaElNegocio, detalle: TEXTOS.negocio.queHayEnElNegocio.largo, icono: "resumen", pide: PIDE_EL_NEGOCIO },
   // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
   { ruta: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.largo, icono: "usuarios" },
@@ -20,15 +20,20 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
 
 // `destino`: adónde lleva la opción, si no es su propia ruta (Usuarios y Cómo va el negocio van a su primera pestaña).
 export function Mas({ atajoDe, opciones }: { atajoDe: (ruta: string) => string | null; opciones: ((typeof DE_MAS)[number] & { destino?: string })[] }) {
-  // Las opciones se recorren con las flechas como si fueran pestañas (pedido de Carlos del
-  // 2026-10-13): → y ↓ a la siguiente, ← y ↑ a la anterior; ← desde la primera vuelve al menú.
+  // Las opciones se recorren con las flechas como la grilla que se ve (pedido de Carlos del
+  // 2026-10-15): → a la siguiente y ← a la anterior; ↓ a la de abajo y ↑ a la de arriba, en la
+  // misma columna; ← desde la primera vuelve al menú.
   function teclas(e: KeyboardEvent<HTMLUListElement>) {
     if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || !["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) return;
     const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
     const i = botones.indexOf(document.activeElement as HTMLButtonElement);
     if (i < 0) return;
-    const destino = botones[i + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1)];
+    // Cuántas opciones entran por fila: las que empiezan a la misma altura que la primera.
+    const arriba = botones[0]!.getBoundingClientRect().top;
+    const columnas = Math.max(1, botones.filter((b) => Math.abs(b.getBoundingClientRect().top - arriba) < 2).length);
+    const paso = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columnas, ArrowUp: -columnas }[e.key as "ArrowRight" | "ArrowLeft" | "ArrowDown" | "ArrowUp"];
     e.preventDefault(); e.stopPropagation();
+    const destino = botones[i + paso];
     if (destino) destino.focus();
     else if (e.key === "ArrowLeft") (document.querySelector<HTMLButtonElement>(".lateral nav button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".lateral nav button"))?.focus();
   }

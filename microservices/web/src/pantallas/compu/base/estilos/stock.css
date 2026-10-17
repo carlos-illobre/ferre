@@ -68,5 +68,5 @@
   .stock-correccion { max-width: 100%; }
 }
 
-/* El valor del producto, debajo de la cantidad, con «Ver el dinero invertido» (decisión 90). */
+/* El valor del producto, debajo de la cantidad, con «Ver el dinero invertido» (decisión 96). */
 .stock-valor { display: block; font-weight: 500; color: var(--texto-2); }

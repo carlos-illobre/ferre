@@ -47,7 +47,8 @@ export default defineConfig(({ command }) => {
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
           // Procesos (con bpmn-js, unos 600 KB) se baja solo al entrar a Procesos, no en cada
           // dispositivo al instalar (ADR-019).
-          globIgnores: ["**/procesos-*.{js,css}"],
+          // El manual de uso (capturas y clips) tampoco: no ocupa lugar en cada dispositivo (012, E09).
+          globIgnores: ["**/procesos-*.{js,css}", "**/manual/**"],
           // Nada de la API ni de Google se cachea: siempre red.
           runtimeCaching: [],
         },

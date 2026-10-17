@@ -1,8 +1,8 @@
 import { useDelServidor } from "./del-servidor";
+import type { Evento, PaginaDeEventos } from "@servidor/actividad";
 
 // Quién hizo qué (el registro de acciones), una sola vez para el celular y la computadora (RNF-60).
-export type Evento = { id: string; tipo: string; fecha: string; email: string | null; nombre: string | null; contenido: Record<string, unknown> };
-export type PaginaDeEventos = { eventos: Evento[]; total: number; pagina: number; por_pagina: number };
+export type { Evento, PaginaDeEventos };
 export type FiltrosDeActividad = { pagina: number; usuario?: string; tipo?: string; desde?: string; hasta?: string };
 
 // `desde` y `hasta` van como momentos (ISO); quien filtra por días los arma.

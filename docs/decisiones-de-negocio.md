@@ -422,7 +422,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Las instrucciones de la computadora nombran primero ese camino; la cámara del
       teléfono sigue sirviendo.
 
-64. **En el celular, cada pantalla de Más tiene su «Volver a Más»** (2026-10-12).
+64. **En el celular, cada pantalla de Más tiene su «Volver a Más»** (2026-10-12). Sigue vigente en el celular; la computadora no lo tiene (decisión 90).
     Carlos pidió que, al entrar a una opción de Más (por ejemplo Roles), haya un botón para
     volver al menú de Más. Va arriba a la izquierda, en todas las pantallas de Más, también
     en la que avisa que falta un permiso. En la computadora no hace falta: el menú está
@@ -659,7 +659,61 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     no llevan atajo Alt: se recorren con las flechas. Maquetas aprobadas en
     `specs/007-usuarios-y-acceso/maquetas/`.
 
-89. **«Cómo va el negocio» en tres secciones, cada una con su permiso de lectura**
+89. **El servidor valida con Zod y el front sigue con los contratos** (2026-10-14). En el
+    reordenamiento (`specs/010-reordenamiento-del-codigo/`, T017), Zod valida en el servidor
+    todo lo que llega en cada pedido, y la forma de lo que el front manda sale de esas
+    validaciones. El front no usa el cliente tipado de Hono: sigue leyendo la forma de los
+    datos de los contratos del servidor (`api/src/contratos/`). Carlos eligió el menor cambio:
+    el cliente de Hono obligaba a reescribir las veinte rutas y a que el front revisara el
+    código del servidor al compilar. Lo que queda sin controlar al compilar es la dirección y el
+    método de cada llamada. Precisa la decisión 84, que había aceptado ese cliente.
+
+90. **Sin «Volver a Más» en la computadora** (2026-10-15). Carlos pidió sacar los botones
+    «Volver a Más» porque no hacen falta, y después aclaró que solo en la computadora: ahí se
+    vuelve con «Más» del menú de la izquierda, que siempre está a la vista. En el celular el
+    botón se queda (decisión 64).
+
+91. **El timer que busca versión nueva corre solo con la app a la vista** (2026-10-16). Carlos
+    preguntó si el timer se podía reemplazar por un aviso que mande GitHub al publicar. Se
+    compararon las opciones (ADR-020) y eligió quedarse con el timer, sin eventos: se busca al
+    abrir, al volver a primer plano, al volver la conexión y cada media hora, pero el timer se
+    para mientras la app está oculta. Que la API avise su versión en cada respuesta queda para
+    más adelante. Precisa la decisión 54.
+
+92. **Cada dispositivo elige cada cuánto busca versión nueva** (2026-10-16). En Configuración,
+    cuatro botones (5 min, 15 min, 1 hora y 24 horas) y una llave, como la de «Animaciones» y al
+    costado de la descripción. Prendida, busca; apagada, no busca mientras la aplicación está
+    abierta (ni con el timer, ni al volver a ella, ni al volver la conexión) y los botones no se
+    muestran. Igual la versión nueva llega al cerrar la aplicación y volver a abrirla, porque
+    eso lo hace el navegador. Carlos fijó el mínimo, el máximo, los valores y la
+    llave, después de ver un campo para escribir los minutos a mano y una casilla, y preferir
+    esto. Arranca en 15 min, con la llave prendida. Precisa la decisión 91.
+
+93. **La entrada de la computadora sigue una imagen de referencia de Carlos** (2026-10-16).
+    Carlos no quería el verde liso y pasó una imagen; pidió copiarla lo más fiel posible y
+    eligió, entre dos versiones, que el celular dibujado muestre una venta en curso.
+    - A la izquierda, el verde con la marca, «EL SISTEMA DEL MOSTRADOR», el título con «de la
+      ferretería.» en verde claro, la bajada, las tres cosas que hace y la frase manuscrita «Más
+      tiempo para hacer crecer tu negocio» con una flecha.
+    - En el medio, una foto desenfocada de estantes y una mesa de madera, entre dos bordes curvos
+      (el del verde en forma de sigmoide, el de la derecha en forma de S), y un celular apoyado en
+      la mesa que muestra la pantalla real de Vender con dos productos, el cobro y el menú de abajo.
+    - A la derecha, sobre fondo claro, la tarjeta para entrar: «Entrá con tu celular», «Es rápido,
+      seguro y sin contraseñas.», el código y los dos pasos, «El código se renueva solo cada 5
+      minutos. No hay contraseñas.», el botón de Google, quién puede entrar y un pie con «Tus datos
+      están protegidos» (solo texto) y el logotipo.
+    - Solo en la computadora: la entrada del celular no cambia. Sin «¿Necesitás ayuda?», que
+      Carlos sacó.
+    - El 2026-10-16 la frase manuscrita se reemplazó por el botón «Ver tutorial», que abre el
+      manual de uso (decisión 94).
+
+94. **El manual de uso** (2026-10-16). Lo abre «Ver tutorial», solo desde la entrada de la
+    computadora y en la misma pestaña. Un capítulo por pantalla principal: Entrar, Catálogo,
+    Vender y cada sección de Más. Cada capítulo explica con texto, pasos y capturas; un clip corto
+    muestra lo que se explica, como complemento. Las capturas y los clips se arman con la
+    aplicación de verdad, aparte de las pruebas de punta a punta (`specs/012-manual-de-uso/`).
+
+95. **«Cómo va el negocio» en tres secciones, cada una con su permiso de lectura**
     (2026-10-15). Carlos quiere ocultar datos sensibles según el rol. La pantalla se separa en
     Ventas («Ver las ventas del negocio»: lo vendido, por medio de pago y lo que preguntaron y
     no llevaron), Compras («Ver los gastos» para los gastos de la semana y «Ver las compras»
@@ -669,17 +723,16 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     El servidor no entrega lo que el permiso no deja ver. Pantalla elegida: pestañas Ventas,
     Compras e Inventario con el submenú arriba, como en Catálogo y Usuarios; los números de
     cada sección van en su pestaña; «Actualizar» con ícono y, en la computadora, sin «Volver
-    a Más». Está en `specs/012-secciones-de-negocio/`.
+    a Más». Está en `specs/013-secciones-de-negocio/`.
 
-90. **El valor del stock en Depósito, con «Ver el dinero invertido»; los costos y los importes
-    de las compras, como estaban** (2026-10-16). Al revisar 012, Carlos decidió:
+96. **El valor del stock en Depósito, con «Ver el dinero invertido»; los costos y los importes
+    de las compras, como estaban** (2026-10-16). Al revisar 013, Carlos decidió:
     - Depósito → Inventario muestra el valor en pesos a quien tiene «Ver el dinero invertido».
       Cambia la decisión 31, que dejaba Inventario solo con cantidades: quien no tiene el
-      permiso sigue viendo solo cantidades. La forma, con maqueta (`specs/012-secciones-de-negocio/maquetas/inventario-*`).
+      permiso sigue viendo solo cantidades. La forma, con maqueta (`specs/013-secciones-de-negocio/maquetas/inventario-*`).
     - La sección Inventario de «Cómo va el negocio» no lleva el número arriba: el total ya está
       en su bloque.
     - Los costos de los productos siguen llegando a cualquiera con sesión, como hasta ahora,
       aunque con ellos y las cantidades se pueda calcular el dinero invertido: lo necesitan
       Vender y el cambio de margen sin conexión. Las compras recientes siguen con su importe
       para quien tiene «Ver las compras», aunque sumándolas se saquen los gastos de la semana.
-

@@ -1,5 +1,6 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type pg from "pg";
+import type { UsuarioDeLaSesion } from "../contratos/sesiones.js";
 
 // Sesiones con token opaco (ADR-011). El token solo existe en el dispositivo; acá se
 // guarda su hash, así una copia de la base no sirve para entrar.
@@ -8,7 +9,7 @@ export const DURACION_SESION_DIAS = 90;
 const RENOVAR_CADA_MS = 60 * 60 * 1000; // se extiende con el uso, como mucho una vez por hora
 
 // `roles` son los nombres de sus roles; `permisos`, la unión de lo que esos roles permiten.
-export type Usuario = { id: string; email: string; nombre: string; roles: string[]; permisos: string[] };
+export type Usuario = UsuarioDeLaSesion;
 export type SesionActiva = { id: string; usuario: Usuario };
 
 export function hashear(token: string): string {

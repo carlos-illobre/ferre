@@ -7,6 +7,7 @@ import { BotonGoogle, BotonHuella } from "./pantallas/Login";
 import { TEXTOS_DE_ENTRADA } from "../compu/base/pantallas/Entrar";
 import { Icono, type NombreDeIcono } from "../compu/base/ui";
 import "./entrar.css";
+import { irA } from "../../rutas";
 
 // La entrada del celular (decisión 55, sobre una referencia que pasó Carlos el 2026-10-12):
 // la marca arriba y al centro, las dos formas de entrar como tarjetas, una línea que dice que
@@ -51,7 +52,7 @@ export function Entrar({ paraLaCompu = false }: { paraLaCompu?: boolean } = {}) 
     const destino = destinoDelCodigo(leido);
     // Leído el código de la computadora, se pide la huella enseguida: con ella entra el
     // celular, entra la computadora y quedan vinculados (decisión 65).
-    if (destino) { setPedirHuella(destino.startsWith("#/entrar-compu") && huellaVinculadaAca()); location.hash = destino; } else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora en su pantalla de entrada.");
+    if (destino) { setPedirHuella(destino.startsWith("#/entrar-compu") && huellaVinculadaAca()); irA(destino.replace(/^#\//, "")); } else setErrorDeCodigo("Ese código no es de Ferrebress. Apuntá al que muestra la computadora en su pantalla de entrada.");
   }, []);
   return (
     <main className="en" data-testid="entrar">

@@ -12,7 +12,8 @@ tests/capturas/levantar.sh --apagar
 ```
 
 - **Qué necesita:** Node, las dependencias del repo instaladas y Python con Playwright
-  (`pip install playwright && playwright install chromium`).
+  (`pip install playwright && playwright install chromium`). Si ya hay un Chromium instalado
+  (en las sesiones en la nube, `/opt/pw-browsers/chromium`), `CHROMIUM=<ruta>` lo usa sin bajar otro.
 - **Dónde quedan:** en `tests/capturas/salida/` (no se sube), como `<nombre>-compu.png`
   (1366×768) y `<nombre>-celu.png` (390×844).
 - **Qué avisa:** desplazamiento hacia el costado, texto de menos de 14 px, objetivos táctiles
@@ -52,3 +53,36 @@ La computadora y el celular no usan las mismas direcciones:
 
 `--entera` (página completa) se cuelga en la computadora: ahí conviene bajar con
 `--py "page.locator('...').scroll_into_view_if_needed()"`.
+
+## El vínculo
+
+Por omisión no hay celular vinculado. Para ver una pantalla de la computadora con su celular
+vinculado (por ejemplo, «Escanear con el celular» en Vender), la captura guarda un identificador
+de dispositivo que empiece con `con-celular` y recarga. Del otro lado, un celular con un
+identificador que empiece con `celular-vinculado` y un token que empiece con `celular` queda
+vinculado a esa computadora, y la API de mentira pasa el espejo entre los dos
+(`api-de-mentira/rutas-w-espejo.mjs`; `PUT /mentira/espejo` lo vuelve a empezar):
+
+```bash
+python tests/capturas/capturar.py vender --compu \
+  --py "page.evaluate('''() => localStorage.setItem('ferre.dispositivo', 'con-celular-1')''')" --py "page.reload()"
+```
+
+## El manual de uso
+
+`tutorial/<capítulo>.py` arma las capturas y el clip de un capítulo del manual
+(`specs/012-manual-de-uso/`) con la API de mentira y el cliente de acá, al ritmo de una persona,
+con el puntero y los toques a la vista. Los deja en `microservices/web/public/manual/<capítulo>/`.
+Se vuelve a correr cuando cambia alguna de esas pantallas:
+
+```bash
+tests/capturas/levantar.sh
+uv run --with playwright==1.56.0 python tests/capturas/tutorial/entrar.py
+uv run --with playwright==1.56.0 python tests/capturas/tutorial/espejo.py   # el clip de «quedan vinculados»
+```
+
+`entrar.py` imprime al final dónde van las marcas numeradas de cada captura (en porcentaje); si
+una pantalla cambió, se copian a `Manual.tsx`.
+
+Va siempre contra la API de mentira (datos inventados): nunca contra un ambiente con datos reales.
+Las pruebas de punta a punta no graban video ni usan estos recorridos (ADR-004).

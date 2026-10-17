@@ -16,6 +16,21 @@ const tipos = () => base.actual.sqlDe(/insert into "?evento/i).map((c) => c.para
 describe("pedidos a proveedores", () => {
   beforeEach(() => { base.actual = baseFalsa(); base.actual.programar(/FROM proveedor WHERE id/, { rows: [{ nombre: "Tresge" }] }); });
 
+  it("el borrador dice qué está mal, renglón por renglón, y no llega a la base", async () => {
+    const error = async (cuerpo: unknown, id = PEDIDO) => {
+      const r = await pedir(app, "PUT", `/pedidos/${id}`, { cuerpo });
+      expect(r.status).toBe(400);
+      return ((await r.json()) as { error: string }).error;
+    };
+    expect(await error(borrador(), "no-es-uuid")).toBe("El id del pedido tiene que ser un UUID");
+    expect(await error(borrador({ proveedor_id: undefined }))).toBe("Elegí el proveedor");
+    expect(await error(borrador({ items: "mecha" }))).toBe("Los renglones no son válidos");
+    expect(await error(borrador({ items: [{ producto_id: MECHA, cantidad: 1 }, { cantidad: 2 }] }))).toBe("El renglón 2 no tiene producto");
+    expect(await error(borrador({ items: [{ producto_id: MECHA, cantidad: 0 }] }))).toBe("El renglón 1 tiene cantidad inválida");
+    expect(await error(borrador({ items: [{ producto_id: MECHA, cantidad: 1 }, { producto_id: MECHA, cantidad: 2 }] }))).toBe("El renglón 2 repite un producto que ya está en el pedido");
+    expect(base.actual.sqlDe(/FROM proveedor WHERE id/)).toHaveLength(0);
+  });
+
   it("armar, mandar, cancelar y cerrar pide «Encargar compras»; quien registra ingresos solo ve los que esperan mercadería", async () => {
     expect((await pedir(app, "GET", "/pedidos", { rol: null })).status).toBe(401);
     expect((await pedir(app, "GET", "/pedidos", { rol: "soloVende" })).status).toBe(403);

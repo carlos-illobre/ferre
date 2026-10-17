@@ -5,6 +5,9 @@ import * as reglas from "../acceso/reglas.js";
 import * as espejo from "../acceso/espejo.js";
 import { fotosQueEsperan } from "./pedidos-de-foto.js";
 import { responder } from "./sesiones.js";
+import { cambioEnEspejo, codigoEscaneado, diasDelVinculo, puestoNuevo, vinculacion } from "../acceso/esquemas.js";
+import type { AvisosParaElCelular, CodigoMandado, DiasDelVinculo } from "../contratos/puestos.js";
+import { leerCuerpo } from "../validar.js";
 
 // Vínculo computadora–celular (issue #52, decisiones 58, 60 y 73). La ruta solo traduce
 // (ADR-018); las reglas están en `acceso/reglas.ts`, el espejo en `acceso/espejo.ts`.
@@ -13,23 +16,26 @@ puestos.use("/*", exigirSesion);
 
 // La laptop pide un código para el QR.
 puestos.post("/", async (c) => {
-  const cuerpo = await c.req.json<{ nombre?: string }>().catch(() => ({}) as { nombre?: string });
-  return c.json(await reglas.codigoParaVincular(c.get("sesion").id, cuerpo.nombre), 201);
+  const cuerpo = await leerCuerpo(c, puestoNuevo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  return c.json(await reglas.codigoParaVincular(c.get("sesion").id, cuerpo.datos.nombre), 201);
 });
 
 // El celular lee el QR y se vincula.
 puestos.post("/:codigo/vincular", async (c) => {
-  const cuerpo = await c.req.json<{ dispositivo_id?: string }>().catch(() => ({}) as { dispositivo_id?: string });
-  return responder(c, await reglas.vincular(c.get("sesion"), c.req.param("codigo"), cuerpo.dispositivo_id));
+  const cuerpo = await leerCuerpo(c, vinculacion);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  return responder(c, await reglas.vincular(c.get("sesion"), c.req.param("codigo"), cuerpo.datos.dispositivo_id));
 });
 
 puestos.get("/mio", async (c) => c.json(await reglas.vinculosDe(c.get("sesion"), c.req.query("dispositivo"))));
 
 // Cuántos días dura el vínculo: lo ve cualquiera con sesión y lo cambia quien administra sesiones.
-puestos.get("/configuracion", async (c) => c.json({ dias: await reglas.diasDelVinculo() }));
+puestos.get("/configuracion", async (c) => c.json({ dias: await reglas.diasDelVinculo() } satisfies DiasDelVinculo));
 puestos.put("/configuracion", exigirPermiso("admin.sesiones"), async (c) => {
-  const { dias } = await c.req.json<{ dias?: number }>().catch(() => ({}) as { dias?: number });
-  return responder(c, await reglas.cambiarDiasDelVinculo(dias, c.get("sesion").usuario.id));
+  const cuerpo = await leerCuerpo(c, diasDelVinculo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  return responder(c, await reglas.cambiarDiasDelVinculo(cuerpo.datos.dias, c.get("sesion").usuario.id));
 });
 
 // La computadora le pide a su celular que haga de lector (decisión 59).
@@ -43,7 +49,7 @@ puestos.post("/:id/lector", async (c) => {
 // Lo que la computadora emparejada espera de este celular: que haga de lector, o alguna foto.
 puestos.get("/avisos", async (c) => {
   const computadoras = await reglas.computadorasDelCelular(c.get("sesion").id);
-  return c.json({ lector: espejo.esperanLector(computadoras), fotos: fotosQueEsperan(computadoras) });
+  return c.json({ lector: espejo.esperanLector(computadoras), fotos: fotosQueEsperan(computadoras) } satisfies AvisosParaElCelular);
 });
 puestos.delete("/avisos/lector", async (c) => {
   espejo.lectorAtendido(await reglas.computadorasDelCelular(c.get("sesion").id));
@@ -54,8 +60,9 @@ puestos.delete("/avisos/lector", async (c) => {
 puestos.post("/:id/espejo", async (c) => {
   const lado = await reglas.ladoEnElPuesto(c.req.param("id"), c.get("sesion").id);
   if (!lado) return c.json({ error: "Este dispositivo no está emparejado" }, 404);
-  const { tipo, datos } = await c.req.json<{ tipo?: string; datos?: unknown }>().catch(() => ({}) as { tipo?: string; datos?: unknown });
-  const error = espejo.cambio(c.req.param("id"), lado, tipo, datos);
+  const cuerpo = await leerCuerpo(c, cambioEnEspejo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const error = espejo.cambio(c.req.param("id"), lado, cuerpo.datos.tipo, cuerpo.datos.datos);
   return error ? c.json({ error: error.error }, error.estado) : c.body(null, 204);
 });
 
@@ -86,11 +93,12 @@ puestos.delete("/:id", async (c) => {
 
 // El celular manda un código escaneado; la computadora lo recibe por su flujo.
 puestos.post("/:id/codigos", async (c) => {
-  const cuerpo = await c.req.json<{ codigo?: string }>().catch(() => ({}) as { codigo?: string });
-  const r = await reglas.mandarCodigo(c.req.param("id"), c.get("sesion").id, cuerpo.codigo);
+  const cuerpo = await leerCuerpo(c, codigoEscaneado);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const r = await reglas.mandarCodigo(c.req.param("id"), c.get("sesion").id, cuerpo.datos.codigo);
   if (!r.ok) return c.json({ error: r.error }, r.estado);
   espejo.avisarCodigo(c.req.param("id"), r.cuerpo!);
-  return c.json({ id: r.cuerpo!.id }, 201);
+  return c.json({ id: r.cuerpo!.id } satisfies CodigoMandado, 201);
 });
 
 puestos.post("/:id/codigos/:codigoId/recibido", async (c) => {

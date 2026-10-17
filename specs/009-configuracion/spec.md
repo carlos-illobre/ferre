@@ -99,6 +99,33 @@ ventajas y desventajas:
 - Cómo buscar productos: «Como este celular no guarda el catálogo, hay dos formas de buscar. Elegí la que te resulte mejor.» y las dos opciones con su ventaja y su desventaja, como en la tabla de arriba.
 - Mientras consulta: «Buscando en el servidor…».
 
+### User Story 3 - Elegir cada cuánto se busca una versión nueva (Priority: P3)
+
+La aplicación busca sola si hay una versión nueva al abrirse, al volver a la vista y, mientras
+está a la vista, cada tanto (decisión 91, ADR-020). Cada persona elige en Configuración ese
+«cada tanto» para su dispositivo: más seguido se entera antes y gasta un poco más de datos.
+Pedido de Carlos del 2026-10-16.
+
+**Acceptance Scenarios**:
+
+- **E19** **Given** un dispositivo donde nunca se cambió, **When** se abre Configuración, en el celular o en la computadora, **Then** «Buscar versión nueva» muestra cuatro botones (5 min, 15 min, 1 hora y 24 horas) con 15 min elegido, y su llave prendida, al costado de la descripción, como la de «Animaciones».
+- **E20** **Given** elegido otro botón, **When** pasa ese tiempo con la aplicación a la vista, **Then** busca si hay una versión nueva; vale desde que se elige, sin recargar.
+- **E21** **Given** la llave apagada («nunca»), **When** pasa cualquier tiempo, se vuelve a la aplicación o vuelve la conexión, **Then** no busca versiones nuevas. Los botones no se muestran. La versión nueva llega solo al cerrar la aplicación del todo y volver a abrirla: eso lo hace el navegador y no se puede apagar.
+- **E22** **Given** la llave apagada, **When** se la prende, **Then** vuelven los botones, con el que estaba elegido antes de apagarla, y busca cada ese tiempo.
+- **E23** **Given** un botón elegido o la llave apagada, **When** se cierra la aplicación y se la vuelve a abrir, o se sale de la sesión y se vuelve a entrar, **Then** sigue igual en ese dispositivo y no cambia en los demás.
+- **E24** **Given** un valor guardado que no es ninguno de los cuatro (de otra versión, o tocado a mano), **When** se abre la aplicación, **Then** vale 15 min.
+
+**Los textos de la pantalla, que son regla:** en el celular, «Cada cuánto, con la app
+abierta. Más seguido gasta un poco más de datos.» y, con la llave apagada, «No busca. La
+versión nueva llega al cerrar la app y volver a abrirla.»; en la computadora, «Mientras la
+aplicación está a la vista, cada cuánto se fija si hay una versión nueva. También se fija al
+abrirla y cada vez que se vuelve a ella. Más seguido se entera antes y gasta un poco más de
+datos.» y, apagada, «No busca versiones nuevas mientras está abierta. La versión nueva llega
+recién al cerrarla y volver a abrirla.»
+Las opciones las fijó Carlos el 2026-10-16 (decisión 92); el arranque en 15 min lo eligió el
+agente, por ser lo más parecido a la media hora de antes.
+Maqueta: `maquetas/version-nueva.html`, aprobada por Carlos el 2026-10-16 junto con la regla.
+
 ## Requirements
 
 ### Functional Requirements
@@ -109,9 +136,11 @@ ventajas y desventajas:
 
 - **RF-84**: En el celular, guardar datos del negocio en el dispositivo para trabajar sin conexión es una preferencia de cada persona (RF-83), que arranca deshabilitada. Deshabilitada, el celular guarda solo lo mínimo para mantener la sesión y el vínculo (menos de 150 KB, sin contar los archivos de la aplicación), y sin conexión no registra ni guarda nada. Habilitada, guarda y trabaja sin conexión como la computadora. No aplica a la computadora.
 
+- **RF-96**: En Configuración, cada persona elige en su dispositivo cada cuánto se busca una versión nueva mientras la aplicación está a la vista: 5 min, 15 min (de arranque), 1 hora o 24 horas. Con su llave apagada la aplicación no busca versiones nuevas mientras está abierta (ni con el timer, ni al volver a ella, ni al volver la conexión); la toma al cerrarla y volver a abrirla. Al abrir y al volver a la aplicación se busca siempre, elija lo que elija (decisión 91, ADR-020). Está en el celular y en la computadora.
+
 ### Key Entities
 
-- **Preferencia del dispositivo**: un valor que se guarda en el dispositivo (no en el servidor) y no se borra al salir de la sesión. Hoy: `animaciones` (sí o no).
+- **Preferencia del dispositivo**: un valor que se guarda en el dispositivo (no en el servidor) y no se borra al salir de la sesión. Hoy: `animaciones` (sí o no), `sinConexion` y `buscar` (RF-84, RF-85) y cada cuánto se busca una versión nueva (RF-96).
 
 ## Success Criteria
 

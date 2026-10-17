@@ -6,7 +6,9 @@ import { borrar, guardar, guardarMeta, leerMeta, leerTodo, reemplazarTodo } from
 import { cambiosDeProductosPendientes, enviarOEncolar, enviarPendientes } from "./cola";
 import type { Producto } from "./producto";
 import type { CambiosDeProducto } from "@servidor/productos";
-import type { FilaDeStock } from "@servidor/stock";
+import type { FilaDeStock, Stock } from "@servidor/stock";
+import type { Cliente } from "@servidor/clientes";
+import type { Unidad } from "./unidades";
 
 // Los datos del mostrador (catálogo, stock, clientes) en memoria y en IndexedDB (#18):
 // arrancan desde el dispositivo, se refrescan del servidor cuando hay conexión, y los
@@ -21,8 +23,8 @@ import type { FilaDeStock } from "@servidor/stock";
 //   3. El del servidor, atrás también; si no cambió nada, no se toca la pantalla.
 // El índice de búsqueda se arma recién cuando alguien busca.
 export type StockFila = FilaDeStock;
-export type Cliente = { id: string; nombre: string; telefono: string | null; cuenta_corriente: boolean; deuda: string };
-type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "unidad" | "foto_url"> & { proveedor_preferido_id?: string }>;
+export type { Cliente };
+type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "foto_url"> & { unidad: Unidad; proveedor_preferido_id?: string }>;
 // `completo`: el catálogo ya está entero (no solo los primeros, ni una tanda de la primera bajada).
 // `buscando`: hay una consulta al servidor en curso (solo cuando se busca en el servidor, RF-85).
 type Estado = { catalogo: Producto[] | null; completo: boolean; stock: Map<string, number>; clientes: Cliente[]; error: string | null; desdeDispositivo: boolean; buscando: boolean };
@@ -166,7 +168,7 @@ function refrescarDelServidor(): Promise<void> {
       };
       const [bajado, st, cl] = await Promise.all([
         bajarCatalogo(),
-        api<{ productos: StockFila[] }>("/stock").then((d) => d.productos).catch(() => null),
+        api<Stock>("/stock").then((d) => d.productos).catch(() => null),
         api<Cliente[]>("/clientes").catch(() => null),
       ]);
       // Lo que quedó en la cola (sin red, o una recarga con el pedido en vuelo) va sobre lo
@@ -216,7 +218,7 @@ async function refrescarStock() {
   if (stockEnVuelo) return;
   stockEnVuelo = true;
   try {
-    const [st, cl] = await Promise.all([api<{ productos: StockFila[] }>("/stock").then((d) => d.productos).catch(() => null), api<Cliente[]>("/clientes").catch(() => null)]);
+    const [st, cl] = await Promise.all([api<Stock>("/stock").then((d) => d.productos).catch(() => null), api<Cliente[]>("/clientes").catch(() => null)]);
     const cambios: Partial<Estado> = {};
     if (st) cambios.stock = new Map(st.map((x) => [x.id, Number(x.stock)]));
     if (cl) cambios.clientes = cl;

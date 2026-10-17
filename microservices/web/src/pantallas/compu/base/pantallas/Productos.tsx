@@ -245,6 +245,32 @@ function FilaProducto({ producto: p, stock, elegido, alElegir, alCambiar, alErro
   );
 }
 
+// Teclado en la ficha: ← → recorren los márgenes sin elegir (Enter elige el que tiene el
+// foco); ↑ ↓ recorren los proveedores y «Listo» (Enter usa ese proveedor o cierra); ↑ desde
+// el primero vuelve a los márgenes. En una caja de texto, ← → mueven el cursor.
+function teclasDeLaFicha(e: React.KeyboardEvent<HTMLDialogElement>) {
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  const ficha = e.currentTarget;
+  const foco = document.activeElement as HTMLElement | null;
+  const margenes = [...ficha.querySelectorAll<HTMLButtonElement>(".margenes button:not([disabled])")];
+  const alMargen = () => (margenes.find((b) => b.getAttribute("aria-checked") === "true") ?? margenes[0])?.focus();
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    if (margenes.length === 0 || foco?.tagName === "INPUT" || foco?.tagName === "TEXTAREA") return;
+    e.preventDefault();
+    const i = margenes.indexOf(foco as HTMLButtonElement);
+    if (i < 0) alMargen();
+    else margenes[(i + (e.key === "ArrowRight" ? 1 : -1) + margenes.length) % margenes.length]!.focus();
+  } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    if (foco?.tagName === "TEXTAREA") return;
+    e.preventDefault();
+    const lugares = [...ficha.querySelectorAll<HTMLElement>("[data-ficha-vertical]:not([disabled])")];
+    const i = lugares.indexOf(foco as HTMLElement);
+    if (e.key === "ArrowDown") lugares[i < 0 ? 0 : Math.min(i + 1, lugares.length - 1)]?.focus();
+    else if (i > 0) lugares[i - 1]!.focus();
+    else alMargen();
+  }
+}
+
 // Ficha del producto: precio con su explicación, margen, proveedores con el más barato,
 // foto y la lista de la que salió el costo.
 function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; stock: number | undefined; quienLoTiene: (codigo: string) => Producto | undefined; alCerrar: () => void; alCambiar: (c: Cambios) => void }) {
@@ -254,7 +280,7 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }
   const [error, setError] = useState<string | null>(null);
   const masBarato = p.proveedores?.[0]?.proveedor_id;
   return (
-    <Hoja titulo={p.descripcion} alCerrar={alCerrar} testId="ficha-producto" pie={<Boton variante="marino" onClick={alCerrar}>Listo</Boton>}>
+    <Hoja titulo={p.descripcion} alCerrar={alCerrar} testId="ficha-producto" alTeclear={teclasDeLaFicha} pie={<Boton variante="marino" onClick={alCerrar} data-ficha-vertical="" data-testid="ficha-listo">Listo</Boton>}>
       <div className="fila">
         <FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} alSubir={async (archivo) => alCambiar({ foto_url: await subirFoto(p.id, archivo) })} />
         <div className="crece pila junta">
@@ -271,7 +297,7 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }
           {precio ? <Explicado conCosto className="importe productos-precio" valor={pesosCortos(precio.valor)} pasos={precio.pasos} etiqueta={`Precio de venta ${pesosCortos(precio.valor)}`} />
             : <span className="falta-texto" data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
         </div>
-        {fijaMargen && <><Margenes elegido={p.margen_elegido} disabled={costo === null} etiqueta="Margen" alElegir={(m) => alCambiar({ margen_elegido: m })} />
+        {fijaMargen && <><Margenes flechasDeAfuera elegido={p.margen_elegido} disabled={costo === null} etiqueta="Margen" alElegir={(m) => alCambiar({ margen_elegido: m })} />
         <div className="fila">
           <label className="crece detalle" htmlFor="ficha-otro-margen">Otro margen{manual !== null ? `: hoy ${manual} % a mano` : ""}</label>
           <OtroMargen producto={p} manual={manual} alCambiar={alCambiar} id="ficha-otro-margen" />
@@ -287,7 +313,7 @@ function FichaProducto({ producto: p, stock, alCerrar, alCambiar, quienLoTiene }
               const actual = v.proveedor === p.proveedor;
               return (
                 <li key={v.proveedor_id}>
-                  <button type="button" className={`renglon ${actual ? "elegido" : ""}`} aria-pressed={actual} onClick={() => !actual && alCambiar({ proveedor_preferido_id: v.proveedor_id })} data-testid="proveedor-de-producto">
+                  <button type="button" className={`renglon ${actual ? "elegido" : ""}`} aria-pressed={actual} onClick={() => !actual && alCambiar({ proveedor_preferido_id: v.proveedor_id })} data-testid="proveedor-de-producto" data-ficha-vertical="">
                     <span className="nombre">{v.proveedor}</span>
                     <span className="importe chico">{pesos(v.costo_neto)}</span>
                     <span className="detalle fila envuelve">lista del {fecha(v.fecha_lista)}{v.proveedor_id === masBarato && <Pastilla tipo="ok" sinPunto>el más barato</Pastilla>}{actual ? <Pastilla tipo="azul" sinPunto>en uso</Pastilla> : "tocá para usar su costo"}</span>

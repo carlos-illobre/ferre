@@ -9,6 +9,10 @@ import { registrarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
 import { crearSesion, generarToken, revocarSesion, usuarioConPermisos, type SesionActiva } from "./sesiones.js";
 import { adoptarVinculos, anotarDispositivo, computadorasDe, cortarVinculosDe, diasDeVinculo, emparejar, sellarVinculo, soltarAnteriores } from "./vinculo.js";
+import type { CodigoAprobado, CodigoDeEntrada, EstadoDelCodigo, SesionAbierta, SesionNueva } from "../contratos/sesiones.js";
+import type { Enviable } from "../enviable.js";
+import type { CodigoEscaneado, DiasDelVinculo, EstadoDelPuesto, PuestoParaVincular, Vinculado, VinculosDeLaSesion } from "../contratos/puestos.js";
+import type { Credencial as CredencialDelContrato, DesafioDeHuella, HuellaVinculada, SesionConHuella } from "../contratos/credenciales.js";
 
 // Acceso, en sus reglas (ADR-018): entrar (con Google, con la huella o con el celular), las
 // sesiones abiertas y el vínculo entre un celular y una computadora (decisiones 57, 58 y 73).
@@ -20,7 +24,7 @@ export const dispositivoDe = (userAgent: string | undefined, dado?: string): str
 
 // ---------- Entrar con Google ----------
 // Si el correo que verificó Google está autorizado y activo, se abre una sesión.
-export async function entrarConGoogle(email: string, dispositivo: string) {
+export async function entrarConGoogle(email: string, dispositivo: string): Promise<Resultado<SesionNueva>> {
   const id = await datos.usuarioActivoPorCorreo(email);
   const usuario = id ? await usuarioConPermisos(pool, id) : null;
   if (!usuario) return mal(403, `${email} no está autorizado. Pedile a quien administra los usuarios que te dé de alta.`);
@@ -36,7 +40,7 @@ export async function entrarConGoogle(email: string, dispositivo: string) {
 export const VIGENCIA_DEL_CODIGO_S = 300;
 const SIN_CODIGO = "Ese código venció o ya se usó. Leé el que la computadora muestra ahora.";
 
-export async function pedirCodigoDeEntrada(dispositivo: string) {
+export async function pedirCodigoDeEntrada(dispositivo: string): Promise<CodigoDeEntrada> {
   const id = randomUUID();
   const codigo = generarToken(); // va en el QR
   const clave = generarToken(); // queda en la computadora: con ella retira la sesión
@@ -44,8 +48,7 @@ export async function pedirCodigoDeEntrada(dispositivo: string) {
   return { id, codigo, clave, expiraEnSegundos: VIGENCIA_DEL_CODIGO_S };
 }
 
-export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: string | undefined, dispositivoId: unknown) {
-  if (!codigo) return mal(400, "Falta el código");
+export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: string, dispositivoId: unknown): Promise<Resultado<CodigoAprobado>> {
   await anotarDispositivo(pool, sesion.id, dispositivoId);
   const aprobada = await datos.aprobarVinculacion(codigo, sesion.usuario.id, sesion.id);
   return aprobada ? bien({ dispositivo: aprobada.dispositivo }) : mal(410, SIN_CODIGO);
@@ -53,8 +56,7 @@ export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: strin
 
 // La computadora pregunta cómo va su código. Si fue aprobado, retira la sesión: una sola vez.
 // El celular que la dejó entrar queda emparejado con esta computadora (decisión 58).
-export async function estadoDelCodigo(id: string, clave: string | undefined, dispositivoId: unknown) {
-  if (!clave) return mal(400, "Falta la clave");
+export async function estadoDelCodigo(id: string, clave: string, dispositivoId: unknown): Promise<Resultado<EstadoDelCodigo>> {
   const aprobada = await datos.retirarVinculacion(id, clave);
   if (!aprobada) return bien({ estado: (await datos.vinculacionVigente(id, clave)) ? "pendiente" : "vencida" });
   const usuario = await usuarioConPermisos(pool, aprobada.aprobada_por);
@@ -73,7 +75,7 @@ export async function salir(sesion: SesionActiva) {
   await revocarSesion(pool, sesion.id);
   await registrarEvento(pool, { tipo: "sesion.cerrada", usuarioId: sesion.usuario.id, contenido: { sesionId: sesion.id } });
 }
-export const sesionesAbiertas = () => datos.sesionesAbiertas();
+export const sesionesAbiertas = (): Promise<Enviable<SesionAbierta>[]> => datos.sesionesAbiertas();
 // Cerrar a distancia la sesión de un dispositivo corta también su vínculo (decisión 73).
 export async function cerrarSesion(sesionId: string, actorId: string) {
   await revocarSesion(pool, sesionId);
@@ -103,7 +105,7 @@ function retirarDesafio(id: string | undefined): { desafio: string; usuarioId: s
   return d && d.vence > Date.now() ? d : null;
 }
 
-export async function opcionesParaVincularHuella(usuario: SesionActiva["usuario"]) {
+export async function opcionesParaVincularHuella(usuario: SesionActiva["usuario"]): Promise<DesafioDeHuella> {
   const vigentes = await datos.credencialesVigentesDe(usuario.id);
   const opciones = await generateRegistrationOptions({
     rpName: NOMBRE_APP, rpID: rpID(), userName: usuario.email, userDisplayName: usuario.nombre, attestationType: "none",
@@ -114,7 +116,7 @@ export async function opcionesParaVincularHuella(usuario: SesionActiva["usuario"
   return { desafioId: guardarDesafio(opciones.challenge, usuario.id), opciones };
 }
 
-export async function vincularHuella(usuarioId: string, desafioId: string | undefined, respuesta: RegistrationResponseJSON | undefined, dispositivoDado: string | undefined, userAgent: string | undefined) {
+export async function vincularHuella(usuarioId: string, desafioId: string | undefined, respuesta: RegistrationResponseJSON | undefined, dispositivoDado: string | undefined, userAgent: string | undefined): Promise<Resultado<HuellaVinculada>> {
   const pendiente = retirarDesafio(desafioId);
   if (!pendiente || pendiente.usuarioId !== usuarioId || !respuesta) return mal(400, "El pedido venció: probá vincular de nuevo");
   let verificacion;
@@ -131,7 +133,7 @@ export async function vincularHuella(usuarioId: string, desafioId: string | unde
   return bien({ id: credential.id, dispositivo }, 201);
 }
 
-export const celularesDe = (usuarioId: string) => datos.celularesDe(usuarioId);
+export const celularesDe = (usuarioId: string): Promise<Enviable<CredencialDelContrato>[]> => datos.celularesDe(usuarioId);
 
 // Quitar un celular: el propio, o cualquiera si administra las sesiones.
 export async function quitarCelular(id: string, actorId: string, administra: boolean) {
@@ -140,12 +142,12 @@ export async function quitarCelular(id: string, actorId: string, administra: boo
   return bien();
 }
 
-export async function opcionesParaEntrarConHuella() {
+export async function opcionesParaEntrarConHuella(): Promise<DesafioDeHuella> {
   const opciones = await generateAuthenticationOptions({ rpID: rpID(), userVerification: "required", allowCredentials: [] });
   return { desafioId: guardarDesafio(opciones.challenge, null), opciones };
 }
 
-export async function entrarConHuella(desafioId: string | undefined, respuesta: AuthenticationResponseJSON | undefined, dispositivoDado: string | undefined) {
+export async function entrarConHuella(desafioId: string | undefined, respuesta: AuthenticationResponseJSON | undefined, dispositivoDado: string | undefined): Promise<Resultado<SesionConHuella>> {
   const pendiente = retirarDesafio(desafioId);
   if (!pendiente || !respuesta) return mal(400, "El pedido venció: probá de nuevo");
   const cred = await datos.credencialConUsuario(respuesta.id);
@@ -172,7 +174,7 @@ export async function entrarConHuella(desafioId: string | undefined, respuesta: 
 const MINUTOS_QR = 5;
 
 // La computadora pide un código para que el celular la lea en Vender.
-export async function codigoParaVincular(sesionId: string, nombre: string | undefined) {
+export async function codigoParaVincular(sesionId: string, nombre: string | undefined): Promise<PuestoParaVincular> {
   const id = randomUUID();
   const codigo = generarToken();
   await datos.nuevoPuesto(id, sesionId, codigo, nombre?.trim() || null, MINUTOS_QR);
@@ -181,7 +183,7 @@ export async function codigoParaVincular(sesionId: string, nombre: string | unde
 
 // El celular lee el código y se vincula. Solo se emparejan dos sesiones del mismo usuario
 // (decisión 60): en espejo los dos hacen lo mismo.
-export async function vincular(sesion: SesionActiva, codigo: string, dispositivoId: unknown) {
+export async function vincular(sesion: SesionActiva, codigo: string, dispositivoId: unknown): Promise<Resultado<Vinculado>> {
   const duenio = await datos.duenioDelCodigo(codigo);
   if (duenio && duenio !== sesion.usuario.id) return mal(403, "Esa computadora tiene la sesión de otra persona. El celular se empareja solo con una computadora donde entraste vos.");
   await anotarDispositivo(pool, sesion.id, dispositivoId);
@@ -196,7 +198,7 @@ export async function vincular(sesion: SesionActiva, codigo: string, dispositivo
 
 // Con quién está vinculada esta sesión, como computadora y como celular. Si el dispositivo
 // tenía un vínculo dormido de este usuario, se reactiva acá.
-export async function vinculosDe(sesion: SesionActiva, dispositivo: string | undefined) {
+export async function vinculosDe(sesion: SesionActiva, dispositivo: string | undefined): Promise<VinculosDeLaSesion> {
   await anotarDispositivo(pool, sesion.id, dispositivo);
   await adoptarVinculos(pool, sesion.id, sesion.usuario.id, dispositivo);
   const filas = await datos.vinculosDeLaSesion(sesion.id);
@@ -205,9 +207,9 @@ export async function vinculosDe(sesion: SesionActiva, dispositivo: string | und
 }
 
 export const diasDelVinculo = () => diasDeVinculo(pool);
-export async function cambiarDiasDelVinculo(dias: unknown, actorId: string) {
-  if (!Number.isInteger(dias) || (dias as number) < 1 || (dias as number) > 365) return mal(400, "Los días tienen que ser un número entero entre 1 y 365");
-  await datos.guardarDiasDeVinculo(dias as number);
+// Los días ya llegan validados (entre 1 y 365: `esquemas.ts`).
+export async function cambiarDiasDelVinculo(dias: number, actorId: string): Promise<Resultado<DiasDelVinculo>> {
+  await datos.guardarDiasDeVinculo(dias);
   await registrarEvento(pool, { tipo: "vinculo.dias_cambiados", usuarioId: actorId, contenido: { dias } });
   return bien({ dias });
 }
@@ -222,14 +224,13 @@ export async function soltar(puestoId: string, sesion: SesionActiva): Promise<bo
   return true;
 }
 
-export async function mandarCodigo(puestoId: string, sesionId: string, codigo: string | undefined) {
-  if (!codigo?.trim()) return mal(400, "Falta el código");
+export async function mandarCodigo(puestoId: string, sesionId: string, codigo: string): Promise<Resultado<CodigoEscaneado>> {
   if (!(await datos.esCelularDelPuesto(puestoId, sesionId))) return mal(403, "Este celular no está vinculado a esa computadora, o la vinculación venció");
-  return bien(await datos.guardarCodigo(puestoId, codigo.trim()), 201);
+  return bien(await datos.guardarCodigo(puestoId, codigo), 201);
 }
 export const codigoRecibido = datos.codigoRecibido;
 
-export async function estadoDelPuesto(puestoId: string, sesionId: string) {
+export async function estadoDelPuesto(puestoId: string, sesionId: string): Promise<EstadoDelPuesto | null> {
   const p = await datos.puestoDe(puestoId, sesionId);
   return p ? { ...p, vigente: new Date(p.expira_en).getTime() > Date.now() } : null;
 }

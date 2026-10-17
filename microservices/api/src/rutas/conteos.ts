@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import * as reglas from "../conteos/reglas.js";
-import type { CierreDeConteo, ConteoNuevo, RenglonContado, SectorCreado, SectorNuevo } from "../contratos/conteos.js";
+import type { SectorCreado } from "../contratos/conteos.js";
+import { cierreDeConteo, conteoNuevo, renglonContado, sectorNuevo } from "../conteos/esquemas.js";
+import { leerCuerpo } from "../validar.js";
 
 // Sectores y conteos (issue #31). La ruta solo traduce (ADR-018); las reglas y los datos están en `conteos/`.
 export const sectores = new Hono();
@@ -12,16 +14,17 @@ conteos.use("/*", exigirSesion, exigirPermiso("deposito.stock"));
 sectores.get("/", async (c) => c.json(await reglas.sectores()));
 
 sectores.post("/", async (c) => {
-  const nombre = (await c.req.json<SectorNuevo>().catch(() => ({}) as SectorNuevo)).nombre?.trim();
-  if (!nombre) return c.json({ error: "Hace falta el nombre del sector (por ejemplo: Estantería 1)" }, 400);
+  const cuerpo = await leerCuerpo(c, sectorNuevo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const { nombre } = cuerpo.datos;
   const id = await reglas.crearSector(nombre, c.get("sesion").usuario.id);
   return id ? c.json({ id, nombre } satisfies SectorCreado, 201) : c.json({ error: `Ya existe un sector llamado ${nombre}` }, 409);
 });
 
 conteos.post("/", async (c) => {
-  const { sector_id } = await c.req.json<ConteoNuevo>().catch(() => ({}) as ConteoNuevo);
-  if (!sector_id) return c.json({ error: "Elegí el sector" }, 400);
-  const r = await reglas.abrir(sector_id, c.get("sesion").usuario.id);
+  const cuerpo = await leerCuerpo(c, conteoNuevo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const r = await reglas.abrir(cuerpo.datos.sector_id, c.get("sesion").usuario.id);
   return r.retomado ? c.json(r) : c.json(r, 201);
 });
 
@@ -31,9 +34,9 @@ conteos.get("/:id", async (c) => {
 });
 
 conteos.put("/:id/renglones/:productoId", async (c) => {
-  const { cantidad } = await c.req.json<RenglonContado>().catch(() => ({}) as RenglonContado);
-  if (typeof cantidad !== "number" || !Number.isFinite(cantidad) || cantidad < 0) return c.json({ error: "Decí cuántas hay (un número mayor o igual a cero)" }, 400);
-  if (!(await reglas.contar(c.req.param("id"), c.req.param("productoId"), cantidad, c.get("sesion").usuario.id))) return c.json({ error: "El conteo no existe o ya se cerró" }, 409);
+  const cuerpo = await leerCuerpo(c, renglonContado);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  if (!(await reglas.contar(c.req.param("id"), c.req.param("productoId"), cuerpo.datos.cantidad, c.get("sesion").usuario.id))) return c.json({ error: "El conteo no existe o ya se cerró" }, 409);
   return c.body(null, 204);
 });
 
@@ -43,7 +46,8 @@ conteos.delete("/:id/renglones/:productoId", async (c) => {
 });
 
 conteos.post("/:id/cerrar", async (c) => {
-  const { faltantes_en_cero } = await c.req.json<CierreDeConteo>().catch(() => ({}) as CierreDeConteo);
-  const r = await reglas.cerrar(c.req.param("id"), Boolean(faltantes_en_cero), c.get("sesion").usuario.id);
+  const cuerpo = await leerCuerpo(c, cierreDeConteo);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const r = await reglas.cerrar(c.req.param("id"), cuerpo.datos.faltantes_en_cero ?? false, c.get("sesion").usuario.id);
   return r ? c.json(r) : c.json({ error: "El conteo no existe o ya se cerró" }, 409);
 });

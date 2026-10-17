@@ -2,14 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { api, ErrorApi, leerToken, reducirImagen, urlApi } from "../api";
 import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "../guardado";
 import { guardarMeta, leerMeta } from "../almacen";
+import type { Ticket } from "@servidor/tickets";
 
 // Tickets (RF-80): errores y mejoras que reporta quien usa la app. Un ticket se guarda
 // primero en el dispositivo, con sus fotos, y se manda después: si no hay conexión queda
 // esperando y sale solo cuando vuelve. El id lo pone el dispositivo, así reenviar no duplica.
-export type Ticket = {
-  id: string; tipo: "error" | "mejora"; descripcion: string; dispositivo: string | null; version: string | null; creado_en: string;
-  estado: "abierto" | "resuelto"; resuelto_en: string | null; nota: string | null; usuario: string; resuelto_por: string | null; fotos: string[];
-};
+export type { Ticket };
 export type Pendiente = { id: string; tipo: Ticket["tipo"]; descripcion: string; dispositivo: string; version: string; creado_en: string; fotos: Blob[] };
 export const MAXIMO_DE_FOTOS = 5;
 

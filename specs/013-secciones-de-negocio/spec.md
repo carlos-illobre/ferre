@@ -1,6 +1,6 @@
 # Feature Specification: Secciones de «Cómo va el negocio», cada una con su permiso
 
-**Feature Branch**: `012-secciones-de-negocio`
+**Feature Branch**: `013-secciones-de-negocio`
 
 **Created**: 2026-10-15
 
@@ -59,7 +59,7 @@ gastos y el dinero invertido y que los niegue.
 **Acceptance Scenarios**:
 
 - **E09** **Given** alguien sin «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve las cantidades pero no el valor en pesos, y el servidor no se lo manda.
-- **E10** **Given** alguien con «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve también el dinero invertido en total, arriba, y el valor en pesos de cada producto (decisión 90).
+- **E10** **Given** alguien con «Ver el dinero invertido», **When** abre Depósito → Inventario, **Then** ve también el dinero invertido en total, arriba, y el valor en pesos de cada producto (decisión 96).
 
 ### User Story 4 - Pasar de una sección a otra (Priority: P1)
 
@@ -90,10 +90,10 @@ gastos y el dinero invertido y que los niegue.
 
 ### Functional Requirements
 
-- **RF-96**: «Cómo va el negocio» se separa en tres secciones, Ventas, Compras e Inventario. Cada número y cada bloque pertenece a una sola sección.
-- **RF-97**: Cada sección se ve con su propio permiso de lectura: «Ver las ventas del negocio» (Ventas), «Ver los gastos» y «Ver las compras» (Compras, cada uno su parte) y «Ver el dinero invertido» (Inventario). Lo que un permiso no deja ver no aparece, y el servidor no lo entrega.
-- **RF-98**: «Ver los números del negocio» deja de existir. Los roles que lo tenían reciben los tres permisos nuevos.
-- **RF-99**: El valor en pesos del stock, en cualquier pantalla, se ve con «Ver el dinero invertido».
+- **RF-98**: «Cómo va el negocio» se separa en tres secciones, Ventas, Compras e Inventario. Cada número y cada bloque pertenece a una sola sección.
+- **RF-99**: Cada sección se ve con su propio permiso de lectura: «Ver las ventas del negocio» (Ventas), «Ver los gastos» y «Ver las compras» (Compras, cada uno su parte) y «Ver el dinero invertido» (Inventario). Lo que un permiso no deja ver no aparece, y el servidor no lo entrega.
+- **RF-100**: «Ver los números del negocio» deja de existir. Los roles que lo tenían reciben los tres permisos nuevos.
+- **RF-101**: El valor en pesos del stock, en cualquier pantalla, se ve con «Ver el dinero invertido».
 
 ## Success Criteria
 

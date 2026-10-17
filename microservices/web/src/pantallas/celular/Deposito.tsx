@@ -50,7 +50,7 @@ export function Deposito({ sub }: { sub: string | null }) {
 
 // ---------- Stock ----------
 // Inventario: cuánto hay de cada producto, explicado con sus movimientos. El dinero invertido,
-// en total y por producto, solo con «Ver el dinero invertido» (decisión 90).
+// en total y por producto, solo con «Ver el dinero invertido» (decisión 96).
 function Stock() {
   const { catalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const { datos, porId, error: fallo } = useStock();

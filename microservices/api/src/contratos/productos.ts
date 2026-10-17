@@ -1,5 +1,7 @@
 // Lo que el servidor responde sobre los productos. Solo tipos: el cliente web los toma al
 // compilar (ADR-018), así que acá no va código ni nombres de tablas.
+import type { z } from "zod";
+import type { cambiosDeProducto } from "../productos/esquemas.js";
 
 // Cada proveedor que tiene el producto, con su último costo.
 export type CostoDeProveedor = { proveedor_id: string; proveedor: string; costo_neto: string; fecha_lista: string; codigo_proveedor: string };
@@ -18,8 +20,9 @@ export type ProductoDelCatalogo = {
   precio: number | null; explicacion_precio: string[]; margen_del_precio: number | null; precios: Record<string, number> | null;
 };
 
-// PATCH /productos/:id: lo único que se cambia de un producto desde la aplicación.
-export type CambiosDeProducto = { margen_elegido?: number | null; unidad?: string; codigo_barras?: string | null; proveedor_preferido_id?: string | null; foto_url?: string | null };
+// PATCH /productos/:id: lo único que se cambia de un producto desde la aplicación. La forma
+// sale de la validación del servidor (decisión 89).
+export type CambiosDeProducto = z.input<typeof cambiosDeProducto>;
 
 // POST /productos/:id/foto
 export type FotoSubida = { foto_url: string };

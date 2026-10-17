@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../puesto";
 import "./pedidos-de-la-compu.css";
+import type { AvisosParaElCelular } from "@servidor/puestos";
+import type { FotoQueEspera } from "@servidor/pedidos-de-foto";
 
 // En el celular emparejado (decisiones 58 y 59): cuando la computadora pide una foto (la
 // factura de un ingreso, un producto, la captura de un ticket) o que el celular haga de lector
 // de códigos de barras, acá aparece un aviso con un botón que abre la cámara. No hay que leer ningún código. Se pregunta cada pocos segundos, solo con el
 // celular emparejado y la aplicación a la vista.
 const CADA_MS = 3000;
-type Pedido = { codigo: string; para: string };
+type Pedido = FotoQueEspera;
 
 export function PedidosDeLaCompu({ alSacar, alLeer }: { alSacar: (codigo: string) => void; alLeer: () => void }) {
   const [emparejado, setEmparejado] = useState(() => Boolean(puestoRemoto()));
@@ -25,7 +27,7 @@ export function PedidosDeLaCompu({ alSacar, alLeer }: { alSacar: (codigo: string
     let vigente = true;
     const preguntar = () => {
       if (document.visibilityState === "hidden" || !navigator.onLine) return;
-      api<{ lector: boolean; fotos: Pedido[] }>("/puestos/avisos").then((a) => { if (vigente) { setPedidos(a.fotos); setLector(a.lector); } }).catch(() => undefined);
+      api<AvisosParaElCelular>("/puestos/avisos").then((a) => { if (vigente) { setPedidos(a.fotos); setLector(a.lector); } }).catch(() => undefined);
     };
     preguntar();
     const reloj = setInterval(preguntar, CADA_MS);

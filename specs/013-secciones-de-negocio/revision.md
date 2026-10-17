@@ -1,8 +1,8 @@
 # Revisión: Secciones de «Cómo va el negocio», cada una con su permiso
 
 **Revisor:** subagente `revisor` (paso 7), 2026-10-15. Revisé `spec.md` (E01 a E19), `plan.md`
-(«Seguridad»), `ux.md`, `maquetas/elegida.html`, `tasks.md` y los commits `012-T004` a
-`012-T009`.
+(«Seguridad»), `ux.md`, `maquetas/elegida.html`, `tasks.md` y los commits `013-T004` a
+`013-T009`.
 
 **Qué corrí:** las pruebas unitarias del servidor (`secciones-de-negocio.test.ts`,
 `roles.test.ts`: pasan) y del cliente (`secciones-de-negocio.test.tsx` y `celular/`: pasan),
@@ -23,16 +23,16 @@ Gravedad: **frena el cierre** (hay que resolverlo antes de cerrar la funcionalid
      `microservices/web/src/pantallas/celular/Deposito.tsx:52-54`; el comentario de
      `microservices/web/src/pantallas/DineroInvertido.tsx:7-9`.
    - Qué dice la especificación: E10 dice que con «Ver el dinero invertido», en Depósito →
-     Inventario se ve también el valor en pesos. RF-99 y la decisión 89 piden lo mismo.
+     Inventario se ve también el valor en pesos. RF-101 y la decisión 95 piden lo mismo.
    - Qué hace el código: Depósito → Inventario no muestra ningún importe a nadie, tenga el
      permiso o no. Así lo dice la decisión 31 («Inventario sin dinero»), que sigue vigente. El
-     servidor manda el valor (eso lo prueba `012-E10` en el servidor), pero ninguna de las dos
+     servidor manda el valor (eso lo prueba `013-E10` en el servidor), pero ninguna de las dos
      interfaces lo dibuja. La aclaración de la especificación parte de algo que no es cierto
      («el valor en pesos del stock en Depósito → Inventario, que hoy se ve con "Ver los
      números del negocio"»): no se veía.
    - Hay dos salidas: dibujar el valor (columna y total) para quien tiene el permiso, o
-     corregir E10, RF-99 y la decisión 89 para que digan que en Depósito no se ve el dinero.
-     Elegir entre las dos le toca a Carlos. `proyecto/estado.yml` da RF-99 por «Hecho», y no
+     corregir E10, RF-101 y la decisión 95 para que digan que en Depósito no se ve el dinero.
+     Elegir entre las dos le toca a Carlos. `proyecto/estado.yml` da RF-101 por «Hecho», y no
      lo está.
 
 2. **E05 por la dirección: la computadora nombra un solo permiso y el celular nombra cuatro.**
@@ -46,7 +46,7 @@ Gravedad: **frena el cierre** (hay que resolverlo antes de cerrar la funcionalid
    - Qué hace el código: sin ninguno de los cuatro, `#/resumen` en la computadora dice
      «Hace falta el permiso «Ver las ventas del negocio»». En el celular, `#/mas/negocio`
      nombra los cuatro. Lo comprobé con capturas.
-   - Prueba: la unitaria `012-E05` solo compara la lista `pide` de la opción de Más y no mira
+   - Prueba: la unitaria `013-E05` solo compara la lista `pide` de la opción de Más y no mira
      qué dice la pantalla.
 
 3. **E17: la prueba que lo nombra comprueba en realidad E05.** Defecto.
@@ -60,15 +60,15 @@ Gravedad: **frena el cierre** (hay que resolverlo antes de cerrar la funcionalid
      (`compu/App.tsx:123`) sí lo cumplen.
 
 4. **Pruebas unitarias que pasan siempre.** Defecto.
-   - `secciones-de-negocio.test.tsx:61-69` (`012-E01`, computadora) monta `<ResumenVentas />`
+   - `secciones-de-negocio.test.tsx:61-69` (`013-E01`, computadora) monta `<ResumenVentas />`
      con todos los permisos. Ese componente no tiene gastos, así que la prueba no puede fallar.
      Tampoco mira que falten las pestañas Compras e Inventario, que es lo que pide E01. En la
      computadora no hay ninguna prueba de E01 a nivel de la aplicación, ni unitaria ni de punta
      a punta.
-   - `secciones-de-negocio.test.tsx:54-58` (`012-E12`, computadora) le pasa a `Mas` el destino
+   - `secciones-de-negocio.test.tsx:54-58` (`013-E12`, computadora) le pasa a `Mas` el destino
      `"gastos"` a mano: no prueba que la aplicación calcule la primera sección visible. La
      prueba de punta a punta `13-roles.spec.ts:154-157` sí lo prueba, pero no la corrí.
-   - `secciones-de-negocio.test.tsx:104-110` (`012-E04`, computadora) monta solo
+   - `secciones-de-negocio.test.tsx:104-110` (`013-E04`, computadora) monta solo
      `ResumenInventario` con `DineroInvertido`, que nunca tiene ventas ni gastos.
 
 5. **Escenarios sin prueba que los nombre, o con prueba parcial.** Defecto.
@@ -96,7 +96,7 @@ los nombra y que comprueba lo que dicen, en el servidor, en la pantalla o en las
    solo con `negocio.invertido`. No queda ninguna mención de `negocio.numeros` en el código,
    salvo la migración 0015, que ya estaba aplicada, y la 0022, que lo borra.
 2. **`negocio.numeros` ya no se puede dar a un rol.** Comprobado: sale del catálogo fijo, y
-   `012-E18` prueba que `POST /roles` con esa clave da 400.
+   `013-E18` prueba que `POST /roles` con esa clave da 400.
 3. **La migración** (`microservices/api/migrations/0022_secciones_de_negocio.sql`) da los
    tres permisos a cada rol que tenía el viejo (con `ON CONFLICT DO NOTHING` sobre la clave
    `(rol_id, permiso)`) y después borra el viejo. Es correcta. No deja evento, como dice el
@@ -107,7 +107,7 @@ los nombra y que comprueba lo que dicen, en el servidor, en la pantalla o en las
      `costo_neto` a cualquiera con sesión) y `microservices/api/src/rutas/stock.ts:12` (las
      cantidades le llegan a cualquiera con sesión).
    - Qué dice la especificación: SC-01, «ningún importe de gastos ni de inventario llega al
-     navegador»; RF-97, «el servidor no lo entrega».
+     navegador»; RF-99, «el servidor no lo entrega».
    - Qué hace el código: el total no viaja, pero cantidad × costo de cada producto da el
      dinero invertido, total y por proveedor. El contrato de 007 lo deja escrito a propósito:
      el costo va a cualquiera porque el precio se calcula en el cliente. No es una fuga que
@@ -154,7 +154,7 @@ los nombra y que comprueba lo que dicen, en el servidor, en la pantalla o en las
    punto 1.1). También quedaron con el texto viejo `DineroInvertido.tsx:7-9` y
    `microservices/api/src/deposito/reglas.ts:8-10` (que sigue diciendo «quien ve los números
    del negocio», con el parámetro `veLosNumeros`). Defecto.
-3. **`proyecto/estado.yml`** da RF-99 por «Hecho» sin defectos, y RF-97 tampoco anota los
+3. **`proyecto/estado.yml`** da RF-101 por «Hecho» sin defectos, y RF-99 tampoco anota los
    puntos 1.2 y 2.4. Defecto.
 4. **Lo que muestra la opción de Más no dice lo mismo en las dos interfaces.**
    `textos.ts:79`: el texto largo nombra «las compras» y el corto no; el corto dice
@@ -199,9 +199,9 @@ Lo comparé con capturas de computadora (1366×768) y de celular (390×844).
 
 ## Qué se hizo con cada punto (2026-10-15)
 
-- **E10 (Depósito → Inventario sin valor para nadie):** queda para Carlos. La decisión 31 dice que Inventario solo muestra cantidades; el servidor ya respeta «Ver el dinero invertido». RF-99 queda «Hecho en parte» hasta que Carlos decida (012-T011).
+- **E10 (Depósito → Inventario sin valor para nadie):** queda para Carlos. La decisión 31 dice que Inventario solo muestra cantidades; el servidor ya respeta «Ver el dinero invertido». RF-101 queda «Hecho en parte» hasta que Carlos decida (013-T011).
 - **E05 distinto en cada interfaz:** arreglado. En la computadora, sin ninguno de los cuatro permisos se nombran los cuatro, como en el celular.
-- **El dinero invertido se puede calcular con `/productos` y `/stock`, y los gastos con `/compras`:** ya era así antes; anotado como defecto en `proyecto/estado.yml` (RF-97) para que decida Carlos.
+- **El dinero invertido se puede calcular con `/productos` y `/stock`, y los gastos con `/compras`:** ya era así antes; anotado como defecto en `proyecto/estado.yml` (RF-99) para que decida Carlos.
 - **E17 mal etiquetada:** la prueba de antes ahora dice E05, y E17 se prueba con un rol que ve Compras e Inventario y no Ventas, en las dos interfaces.
 - **E13 en la computadora sin prueba:** agregada a la de punta a punta, en las dos interfaces.
 - **«Ver las ventas de hoy» sin «Ver las ventas del día»:** arreglado: el botón solo aparece con ese permiso.
@@ -211,5 +211,5 @@ Lo comparé con capturas de computadora (1366×768) y de celular (390×844).
 - **Compras en una columna en la computadora:** la tabla de compras recientes no entra en media pantalla; se deja así.
 - **E15 en el celular y comentarios viejos:** la spec y el `ux.md` dicen que «Actualizar» es solo de la computadora; corregidos los comentarios de `DineroInvertido` y de la regla del stock.
 - **Pruebas unitarias de la computadora que no pueden fallar, E07 en la base, E19 con INSERT:** lo que verifican de verdad está en las de punta a punta; se deja anotado.
-- **En el celular los números no se explican al tocarlos y dicen «Sin conexión» mientras cargan:** ya era así antes de 012; anotado como defecto en RF-96.
-- **Decisiones de Carlos del 2026-10-16 (decisión 90):** Depósito → Inventario mostrará el valor con «Ver el dinero invertido» (012-T012); la sección Inventario queda sin número arriba; los costos del catálogo y los importes de las compras se dejan como estaban, a sabiendas.
+- **En el celular los números no se explican al tocarlos y dicen «Sin conexión» mientras cargan:** ya era así antes de 012; anotado como defecto en RF-98.
+- **Decisiones de Carlos del 2026-10-16 (decisión 96):** Depósito → Inventario mostrará el valor con «Ver el dinero invertido» (013-T012); la sección Inventario queda sin número arriba; los costos del catálogo y los importes de las compras se dejan como estaban, a sabiendas.

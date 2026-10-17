@@ -85,8 +85,12 @@ test("011-E30 011-E31 «Diagrama» muestra el dibujo y la hoja de figuras; tocar
 
 test("el botón de volver del celular cierra el menú «⋯», y después vuelve a la lista de procesos", async ({ page }) => {
   await abrirVenta(page, "Venta celular E2E (volver)");
+  const largo = await page.evaluate(() => history.length);
   await page.getByTestId("procesos-menu-celu").click();
   await expect(page.getByTestId("procesos-hoja-menu")).toBeVisible();
+  // El menú anota su paso en el historial un instante después de aparecer: si «volver» llega
+  // antes (la máquina de las pruebas cargada), deshace el paso del proceso y vuelve a la lista.
+  await expect.poll(() => page.evaluate(() => history.length)).toBe(largo + 1);
   await page.goBack();
   await expect(page.getByTestId("procesos-hoja-menu")).toHaveCount(0);
   await expect(page.getByTestId("procesos-pasos-celu")).toBeVisible();
@@ -108,7 +112,7 @@ test.describe("con el dedo", () => {
     const paso = page.locator(".procesos-dibujo-celu g.djs-element[data-element-id='Cobrar'] .djs-hit").first();
     const antes = (await paso.boundingBox())!;
     const cdp = await page.context().newCDPSession(page);
-    const tocar = (type: string, x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
+    const tocar = (type: "touchStart" | "touchMove" | "touchEnd", x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
     const x = antes.x + antes.width / 2;
     const y = antes.y + antes.height / 2;
 
@@ -141,7 +145,7 @@ test.describe("con el dedo", () => {
     const figura = (await page.getByTestId("procesos-figura-tarea").boundingBox())!;
     const lienzo = (await page.getByTestId("procesos-lienzo").boundingBox())!;
     const cdp = await page.context().newCDPSession(page);
-    const tocar = (type: string, x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
+    const tocar = (type: "touchStart" | "touchMove" | "touchEnd", x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
     const desde = { x: figura.x + figura.width / 2, y: figura.y + figura.height / 2 };
     const hasta = { x: lienzo.x + lienzo.width / 2, y: lienzo.y + 120 };
     await tocar("touchStart", desde.x, desde.y);

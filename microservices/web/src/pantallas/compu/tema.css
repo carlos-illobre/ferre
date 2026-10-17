@@ -51,11 +51,8 @@
 .mas-icono { grid-row: 1 / span 2; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 12px; background: var(--ambar-suave); color: var(--ambar-texto); }
 .mas-tarjeta .nombre { font-weight: 700; font-size: var(--t-medio); }
 .mas-tarjeta .tecla { position: absolute; top: var(--e3); right: var(--e3); }
-.mas-volver { padding: var(--e4) var(--e5) 0; }
-/* En Usuarios, «Volver a Más» va arriba de las pestañas (decisión 88). */
-.mas-volver + .pestanas { padding-top: var(--e3); }
+/* En Usuarios, las pestañas van alineadas con el contenido. */
 .con-pestanas .rl { margin: 0; padding-inline: var(--e5); }
-.mas-volver + .pagina { padding-top: var(--e3); }
 
 /* Lo último que se vendió y lo que más se vende, para que la venta nueva no arranque vacía. */
 .sugeridos { display: flex; flex-direction: column; gap: var(--e5); }
@@ -74,6 +71,14 @@
 
 /* Pestañas dentro de Catálogo y Depósito, como en el celular. Hacen de título de la pantalla. */
 .pestanas { display: flex; gap: var(--e2); padding: var(--e4) var(--e5) 0; }
+/* La fila de las pestañas, con la acción de la pantalla a la derecha (pedido de Carlos del 2026-10-15). */
+.pestanas-fila { display: flex; align-items: flex-end; gap: var(--e3); }
+.pestanas-fila .pestanas { flex: 1 1 auto; }
+.pestanas-acciones { display: flex; align-items: center; gap: var(--e2); padding: var(--e4) var(--e5) 0 0; }
+.pestanas-acciones:empty { display: none; }
+/* Una pantalla con el contenido angosto (Roles) angosta también la fila, para que la acción quede
+   alineada con el borde derecho del contenido y no con el de la ventana. */
+.cuerpo:has(> .rl) .pestanas-fila { max-width: 860px; }
 .pestanas button { display: inline-flex; align-items: center; gap: var(--e2); min-height: 44px; padding: 0 var(--e5); border-radius: var(--r-pastilla); border: 1px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto-2); font-weight: 650; font-size: var(--t-medio); }
 .pestanas button:hover { border-color: var(--marino); color: var(--tinta); }
 .pestanas button[aria-current="page"] { background: var(--marino); border-color: var(--marino); color: #fff; }
@@ -138,7 +143,3 @@
 /* El botón para vincular el celular, siempre a la vista en el menú cuando no hay uno emparejado (decisión 60). */
 .lateral-vincular { padding: 0 var(--e3) var(--e3); }
 .lateral-vincular .boton { width: 100%; }
-
-/* Cómo va el negocio (decisión 89): «Actualizar» va a la derecha de las pestañas, en su misma línea. */
-.con-pestanas .negocio-seccion { position: relative; }
-.con-pestanas .negocio-seccion .pagina-cabeza > .boton { position: absolute; top: -44px; right: var(--e5); min-height: 44px; }

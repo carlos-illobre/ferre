@@ -109,6 +109,41 @@ el botón de Google de verdad.
 que se renueva solo; «Continuar con Google» debajo, como alternativa. «Entrar con la huella»
 solo si esa computadora fue vinculada.
 
+**Cómo se ve la entrada de la computadora (decisión 93, maqueta aprobada por Carlos el
+2026-10-16: `maquetas/entrar-compu-con-celular.html`):** copia una imagen de referencia de
+Carlos. Tres zonas: el verde de la marca a la izquierda; en el medio una foto desenfocada de
+estantes y una mesa, con bordes curvos, y un celular apoyado que muestra la pantalla de Vender con
+una venta en curso y el menú de abajo (una captura real, que se vuelve a sacar si esa pantalla
+cambia); y a la derecha, sobre fondo claro, la tarjeta para entrar, con un pie «Tus datos están
+protegidos». En una ventana angosta primero se van el celular y la foto, y después la marca: la
+tarjeta queda siempre. Solo en la computadora: la entrada del celular sigue como está.
+El 2026-10-16 Carlos volvió a pasar la referencia (`maquetas/entrar-compu-referencia.webp`) y su
+kit de capas (`maquetas/entrar-compu-kit-de-capas.webp`) para que se parezca más, con dos
+diferencias: el celular muestra la venta y no hay «¿Necesitás ayuda?». De ahí: el celular tiene
+marco metálico, espesor y muesca, apoyado en la mesa; el botón de Google ocupa el ancho de la
+tarjeta; cada una de las tres cosas que hace corta en el mismo lugar que la referencia; y el verde
+tiene un degradé suave con arcos. Después Carlos pasó las capas sueltas
+(`maquetas/capas/`): el fondo, la foto del local y el celular salen de ellas; el texto y la
+tarjeta siguen siendo de la aplicación (las capas los traen como imagen, con letras deformadas).
+El celular es el que pasó Carlos con la venta ya puesta (`maquetas/capas/celular-con-venta.png`),
+sin su fondo: se ve más nítido que el de la capa. Si cambia la pantalla de Vender, se vuelve a
+armar con la captura nueva sobre el celular de la capa, o con otro celular que pase Carlos.
+La separación de los textos de la izquierda (logotipo, antetítulo, título, bajada y las tres cosas
+que hace) y el tamaño de sus íconos se midieron sobre un recorte de la referencia que pasó Carlos
+el 2026-10-16: quedan a 2 o 3 píxeles de ella en una pantalla de 1536 × 1024.
+En un monitor más ancho que 16:9 (un ultra ancho de 2560 × 1080, por ejemplo) la escena no se
+estira, porque la foto se deformaba y quedaba un hueco en el medio: queda centrada, del ancho de un
+16:9, con las puntas redondeadas y un margen arriba y abajo, y a los dos costados va un verde casi negro, liso (elegido por
+Carlos el 2026-10-16). Hasta 16:9 se ve igual que antes. El verde no es liso: es la imagen que
+pasó Carlos ese día (`maquetas/capas/fondo-verde-con-logo.png`), sin su logo, estirada sobre la
+zona verde: tres tonos en curva en las esquinas (arriba junto a la curva y abajo a la izquierda) y
+el centro más oscuro. La foto y el lado claro no cambian.
+En la columna de la izquierda, debajo de las tres cosas que hace, va el botón «Ver tutorial», con
+el naranja de los botones principales, ancho y con un ícono de reproducir; reemplaza a la frase
+manuscrita. Carlos lo eligió el 2026-10-16 entre tres lugares (arriba del celular, debajo, o este). Abre el manual de uso en la misma pestaña (`specs/012-manual-de-uso/`).
+La tarjeta para entrar es más ancha, para que los pasos no queden apretados; si el celular la
+alcanza, pasa por encima de su borde sin tapar el código.
+
 **Qué necesita a la vista en el celular:**
 
 - En la entrada del celular, un botón «Escanear el código de la computadora» que abre la cámara
@@ -116,7 +151,11 @@ solo si esa computadora fue vinculada.
 - Sin sesión: la entrada de siempre, con un aviso de que al entrar ahí la computadora entra
   también, y el botón de la huella primero, que lo dice: «Entrar acá y en la computadora».
 - Con la sesión ya abierta: un solo botón, «Entrar en la computadora», y «Ahora no».
-- Después: que la computadora ya entró, con qué usuario, y cómo seguir en el celular.
+- Después: el celular sigue a su pantalla de siempre y dice unos segundos, en la línea de arriba,
+  «Listo: la computadora entró como …». No hay pantalla de «Listo» ni botón para abrir el lector:
+  el lector se abre cuando la computadora lo pide (pedido de Carlos del 2026-10-15; maqueta
+  `maquetas/entrar-con-el-celular-sin-pantalla-de-listo.html`). Si la computadora no entró, una
+  pantalla dice por qué, con «Seguir en el celular».
 
 **Reglas:** no hay pantalla de confirmación aparte; un código vencido o ya usado dice que hay
 que leer el que la computadora muestra ahora; sin conexión, la computadora no muestra código
@@ -184,7 +223,7 @@ Depósito, en este orden:
   computadora se recorren con las flechas, como el resto de Más.
 - Cada pestaña tiene su propia dirección, para volver a ella al recargar y para el espejo
   entre el celular y la computadora.
-- Arriba de las pestañas está «Volver a Más», en los dos.
+- En el celular, arriba de las pestañas está «Volver a Más»; en la computadora no, se vuelve con «Más» del menú (decisión 90).
 
 Maquetas aprobadas por Carlos el 2026-10-14: `maquetas/mas-con-usuarios.html` y
 `maquetas/usuarios-pestanas.html`.

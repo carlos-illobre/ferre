@@ -6,6 +6,8 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { ErrorApi } from "../../api";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
+import { alAvisoDelEspejo } from "../../espejo";
+import { irA } from "../../rutas";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 
 const huella = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
@@ -21,21 +23,29 @@ describe("el celular deja entrar a la computadora", () => {
   beforeEach(() => { apiFalsa.mockReset(); apiFalsa.mockResolvedValue({ dispositivo: "computadora · Chrome" }); });
   const aprobaciones = () => apiFalsa.mock.calls.filter((c) => c[0] === "/sesiones/vinculaciones/aprobar");
 
-  it("recién entrado con la huella: la computadora entra sola, sin preguntar", async () => {
+  it("recién entrado con la huella: la computadora entra sola, sin preguntar, y el celular sigue con un aviso breve", async () => {
+    const avisos: string[] = [];
+    const dejar = alAvisoDelEspejo((t) => avisos.push(t));
     render(<EntrarEnLaCompu codigo="abc" automatico nombre="Carlos" />);
     expect(screen.queryByTestId("dejar-entrar")).toBeNull();
-    expect((await screen.findByTestId("compu-entro")).textContent).toContain("la computadora ya entró");
+    await waitFor(() => expect(location.hash).toBe("#/catalogo"));
+    expect(avisos).toEqual(["Listo: la computadora entró como Carlos"]);
     expect(aprobaciones()).toHaveLength(1);
     expect(JSON.parse(aprobaciones()[0]![1].body)).toMatchObject({ codigo: "abc" });
-    expect(screen.getByText(/Entraste como/).textContent).toContain("Carlos");
+    // No hay pantalla de «Listo» ni botón para abrir el lector (pedido de Carlos del 2026-10-15).
+    expect(screen.queryByTestId("compu-entro")).toBeNull();
+    expect(screen.queryByTestId("usar-como-lector")).toBeNull();
+    dejar();
   });
 
   it("con la sesión ya abierta hace falta un toque: abrir el enlace no alcanza", async () => {
     render(<EntrarEnLaCompu codigo="abc" automatico={false} nombre="Carlos" />);
     expect(screen.getByRole("heading", { name: "¿Entrar en la computadora?" })).toBeTruthy();
     expect(aprobaciones()).toHaveLength(0);
+    irA("entrar-compu?codigo=abc");
+    await waitFor(() => expect(location.hash).toBe("#/entrar-compu?codigo=abc"));
     fireEvent.click(screen.getByTestId("dejar-entrar"));
-    expect(await screen.findByTestId("compu-entro")).toBeTruthy();
+    await waitFor(() => expect(location.hash).toBe("#/catalogo"));
     expect(aprobaciones()).toHaveLength(1);
   });
 
@@ -75,5 +85,11 @@ describe("el celular deja entrar a la computadora", () => {
     expect(destinoDelCodigo("https://ejemplo.test/#/foto?codigo=5d1f0a52-93a1")).toBe("#/foto?codigo=5d1f0a52-93a1");
     expect(destinoDelCodigo("7790250000358")).toBeNull();
     expect(destinoDelCodigo("https://otro-sitio.test/#/mas/usuarios")).toBeNull();
+  });
+
+  it("012-E07: la entrada del celular no tiene «Ver tutorial»: el manual es solo de la computadora", () => {
+    render(<Entrar />);
+    expect(screen.queryByTestId("ver-tutorial")).toBeNull();
+    expect(screen.queryByText("Ver tutorial")).toBeNull();
   });
 });

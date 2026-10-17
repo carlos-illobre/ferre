@@ -14,7 +14,7 @@ import { conSigno, detalleDe, mensajeDe, nombreUnidad, plural, useEnLinea, type 
 import "./base/estilos/stock.css";
 
 // Inventario: cuánto hay de cada producto. El dinero invertido, en total y por producto, solo
-// con «Ver el dinero invertido» (decisión 90); sin ese permiso, solo cantidades. Cada número se explica: el stock, con sus movimientos; el
+// con «Ver el dinero invertido» (decisión 96); sin ese permiso, solo cantidades. Cada número se explica: el stock, con sus movimientos; el
 // valor, como stock × costo vigente. Corregir pide cuántas hay y por qué, y no confirma: el
 // ajuste queda a la vista entre los movimientos.
 type Filtro = "todos" | "con" | "sin";
