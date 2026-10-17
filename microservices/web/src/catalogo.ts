@@ -24,7 +24,7 @@ import type { Unidad } from "./unidades";
 // El índice de búsqueda se arma recién cuando alguien busca.
 export type StockFila = FilaDeStock;
 export type { Cliente };
-type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "foto_url"> & { unidad: Unidad; proveedor_preferido_id?: string }>;
+type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "codigo_leido_en" | "foto_url"> & { unidad: Unidad; proveedor_preferido_id?: string }>;
 // `completo`: el catálogo ya está entero (no solo los primeros, ni una tanda de la primera bajada).
 // `buscando`: hay una consulta al servidor en curso (solo cuando se busca en el servidor, RF-85).
 type Estado = { catalogo: Producto[] | null; completo: boolean; stock: Map<string, number>; clientes: Cliente[]; error: string | null; desdeDispositivo: boolean; buscando: boolean };
@@ -241,7 +241,11 @@ function asegurar() {
   });
 }
 
-async function actualizarProducto(id: string, cambios: Cambios) {
+async function actualizarProducto(id: string, cambiosPedidos: Cambios) {
+  // Cargar o cambiar el código anota la hora de la lectura (specs/016, RF-112): la de acá, que sin
+  // conexión es la de verdad aunque el cambio llegue al servidor más tarde. Borrarlo la borra.
+  const cambios: Cambios = "codigo_barras" in cambiosPedidos && cambiosPedidos.codigo_leido_en === undefined
+    ? { ...cambiosPedidos, codigo_leido_en: cambiosPedidos.codigo_barras ? new Date().toISOString() : null } : cambiosPedidos;
   pendientes.set(id, { ...pendientes.get(id), ...cambios });
   const anterior = estado.catalogo;
   if (anterior) {
@@ -252,6 +256,7 @@ async function actualizarProducto(id: string, cambios: Cambios) {
   const cuerpo: CambiosDeProducto = {};
   if ("margen_elegido" in cambios) cuerpo.margen_elegido = cambios.margen_elegido ?? null;
   if ("codigo_barras" in cambios) cuerpo.codigo_barras = cambios.codigo_barras ?? null;
+  if (cambios.codigo_leido_en && cuerpo.codigo_barras) cuerpo.codigo_leido_en = cambios.codigo_leido_en;
   if ("unidad" in cambios) cuerpo.unidad = cambios.unidad ?? "unidad";
   if ("foto_url" in cambios) cuerpo.foto_url = cambios.foto_url ?? null;
   if ("proveedor_preferido_id" in cambios) cuerpo.proveedor_preferido_id = cambios.proveedor_preferido_id ?? null;
