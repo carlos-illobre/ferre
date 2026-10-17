@@ -1,0 +1,214 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manual de uso · Entrar a Ferrebress</title>
+<!-- Maqueta (012-T010): el capítulo «Entrar», una sección por cada forma de entrar. Las capturas y los
+     clips los arma tests/capturas/tutorial/formas_de_entrar.py con la aplicación de verdad. -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>/* La paleta de la aplicación, una sola para el celular y la computadora (decisión 47). Cada
+   color dice una cosa: verde oscuro = dónde estoy y títulos; naranja = la acción principal;
+   amarillo = avisos y el cobro; blanco con borde = botones comunes y campos. Las hojas de
+   estilo de cada interfaz y las de las pantallas compartidas toman los colores de acá: para
+   cambiar un color se cambia en este archivo y en ningún otro. El magenta del marco del
+   ambiente de prueba queda afuera a propósito: no es de la aplicación. */
+:root {
+  --p-verde: #17312b;
+  --p-verde-2: #25443d;
+  --p-verde-3: #33574e;
+  --p-verde-texto: #0f6b52;
+  --p-verde-suave: #e3f3ea;
+  --p-ok: #0f8a5f;
+  --p-naranja: #d83f0e;
+  --p-naranja-fuerte: #b9350a;
+  --p-naranja-sombra: #8f2a08;
+  --p-naranja-texto: #c2370b;
+  --p-naranja-texto-fuerte: #a52e08;
+  --p-naranja-suave: #fff0ea;
+  --p-naranja-borde: #f0b9a3;
+  --p-amarillo: #f7c445;
+  --p-amarillo-suave: #fff7d6;
+  --p-amarillo-borde: #f0c64a;
+  --p-fondo: #e6ece6;
+  --p-fondo-2: #eef3ee;
+  --p-superficie: #ffffff;
+  --p-borde: #c3cfc6;
+  --p-borde-suave: #dbe3dc;
+  --p-borde-fuerte: #7c9085;
+  --p-tinta: #18201e;
+  --p-texto-medio: #33403b;
+  --p-texto-2: #4a5451;
+  --p-relleno: #dfe5e0;
+  --p-relleno-fuerte: #d3ddd5;
+  --p-naranja-apretado: #ffd9cb;
+  --p-amarillo-texto: #6b4a00;
+}
+
+/* Animaciones deshabilitadas en Configuración (RF-83): nada se mueve, en ninguna de las dos interfaces. */
+:root[data-animaciones="no"] *, :root[data-animaciones="no"] *::before, :root[data-animaciones="no"] *::after { animation-duration: 0.001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+:root[data-animaciones="no"]::view-transition-group(*), :root[data-animaciones="no"]::view-transition-old(*), :root[data-animaciones="no"]::view-transition-new(*) { animation: none !important; }
+/* El manual de uso (RF-97): copia la maqueta aprobada, specs/012-manual-de-uso/maquetas/manual-entrar.html. */
+
+/* Los colores son los de la paleta de la aplicación (paleta.css, decisión 47). */
+.manual{--verde:var(--p-verde);--verde-2:var(--p-verde-2);--menta:var(--p-verde-suave);--naranja:var(--p-naranja);--naranja-suave:var(--p-naranja-suave);--tinta:var(--p-tinta);--texto-2:var(--p-texto-2);--borde:var(--p-borde-suave);--papel:var(--p-superficie);--fondo:var(--p-fondo-2);--amarillo:var(--p-amarillo-suave);--amarillo-borde:var(--p-amarillo-borde);--gris:var(--p-borde-fuerte)}
+.manual{min-height:100vh;background:var(--fondo);color:var(--tinta);font:17px/1.6 var(--fuente, Manrope, system-ui, sans-serif)}
+.manual *{box-sizing:border-box}
+/* Barra de arriba */
+.manual-barra{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:18px;height:64px;padding:0 28px;background:var(--verde);color:#fff;box-shadow:0 2px 10px rgb(0 0 0 / .15)}
+.manual-barra img{height:30px;filter:brightness(0) invert(1)}
+.manual-titulo{font-weight:700;opacity:.9;border-left:1px solid rgb(255 255 255 / .25);padding-left:18px}
+/* Índice y hoja */
+.manual-marco{display:grid;grid-template-columns:260px minmax(0,880px);gap:36px;justify-content:center;padding:36px 28px 80px}
+.manual-indice{position:sticky;top:96px;align-self:start;font-size:15px}
+.manual-indice h2{font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--texto-2);margin:0 0 12px}
+.manual-indice ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.manual-indice ul{list-style:none;margin:4px 0 8px 40px;padding:0;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.manual-hoja{background:var(--papel);border-radius:18px;box-shadow:0 1px 0 var(--borde),0 18px 50px rgb(23 49 43 / .08);padding:52px 64px 64px}
+/* Encabezado del capítulo */
+.manual-capitulo{font-size:14px;letter-spacing:.22em;text-transform:uppercase;color:var(--naranja);font-weight:800;margin:0}
+.manual-hoja h1{font-size:44px;line-height:1.1;margin:8px 0 14px;letter-spacing:-.02em}
+.manual-entrada{font-size:20px;color:var(--texto-2);margin:0 0 28px;max-width:62ch}
+.manual-resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 36px}
+.manual-resumen div{background:var(--fondo);border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.45}
+.manual-resumen strong{display:block;font-size:16px;margin-bottom:2px}
+.manual-hoja h2{font-size:28px;margin:52px 0 10px;letter-spacing:-.01em;scroll-margin-top:90px}
+.manual-hoja h3{font-size:20px;margin:30px 0 8px}
+.manual-hoja p{margin:0 0 14px;max-width:68ch}
+/* Recuadros */
+.manual-nota{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:16px 20px;border-radius:14px;margin:18px 0 24px;font-size:16px;line-height:1.5}
+.manual-nota svg{width:26px;height:26px}
+.manual-nota.importante{background:var(--amarillo);box-shadow:inset 0 0 0 1px var(--amarillo-borde)}
+.manual-nota.consejo{background:var(--p-verde-suave);box-shadow:inset 0 0 0 1px var(--p-borde)}
+.manual-nota p{margin:0}
+/* El clip */
+.manual-clip{margin:22px 0 34px;border-radius:18px;overflow:hidden;background:var(--verde);box-shadow:0 14px 40px rgb(23 49 43 / .22)}
+.manual-clip video{display:block;width:100%;height:auto;background:#0b342c}
+.manual-clip figcaption{display:flex;align-items:center;gap:12px;padding:14px 20px;color:var(--p-relleno);font-size:15px}
+.manual-clip figcaption b{color:#fff}
+.manual-clip figcaption span{margin-left:auto;font-weight:700;color:var(--menta)}
+/* Los pasos */
+.manual-paso{display:grid;grid-template-columns:52px 1fr;gap:20px;margin:28px 0 8px}
+.manual-paso .manual-numero{width:52px;height:52px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:24px;display:grid;place-items:center;box-shadow:0 6px 14px rgb(217 64 15 / .3)}
+.manual-paso h3{margin:10px 0 6px}
+.manual-figura{margin:18px 0 6px}
+.manual-figura .manual-imagen{position:relative;display:inline-block;max-width:100%;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--borde),0 10px 30px rgb(23 49 43 / .12)}
+.manual-figura img{display:block;max-width:100%;height:auto}
+.manual-figura figcaption{font-size:14px;color:var(--texto-2);margin-top:10px}
+.manual-figura figcaption b{color:var(--tinta)}
+.manual-lado{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:32px;align-items:start}
+.manual-lado .manual-figura{margin-top:4px}
+.manual-imagen.celular{width:230px;border-radius:30px!important;box-shadow:0 0 0 8px #1c1f1e,0 18px 36px rgb(0 0 0 / .25)!important}
+.manual-par{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:28px;align-items:end}
+/* Marcas numeradas sobre las capturas */
+.manual-marca{position:absolute;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:16px;display:grid;place-items:center;box-shadow:0 0 0 3px #fff,0 4px 10px rgb(0 0 0 / .3)}
+.manual-recuadro{position:absolute;outline:3px solid var(--naranja);outline-offset:3px;border-radius:10px;box-shadow:0 0 0 2px #fff}
+.manual-recuadro .manual-marca{left:100%;top:50%}
+.manual-recuadro.fuera .manual-marca{left:calc(100% + 24px)}
+.manual-par .manual-marca,.manual-imagen.celular .manual-marca{width:26px;height:26px;margin:-13px 0 0 -13px;font-size:14px}
+.manual-clip.chico{max-width:760px;margin-top:0}
+.manual-leyenda{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px;font-size:15px}
+.manual-leyenda li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.manual-leyenda li span{width:24px;height:24px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center;margin-top:2px}
+/* Tabla de problemas */
+.manual-problemas{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:16px}
+.manual-problemas th{text-align:left;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-2);padding:10px 14px;border-bottom:2px solid var(--borde)}
+.manual-problemas td{padding:14px;border-bottom:1px solid var(--borde);vertical-align:top;line-height:1.5}
+.manual-problemas td:first-child{font-weight:700;width:34%}
+.manual-boton-ui{font-weight:700;color:var(--naranja);white-space:nowrap}
+.manual-pie{display:flex;justify-content:space-between;margin-top:56px;padding-top:22px;border-top:1px solid var(--borde);font-size:15px}
+@media (max-width:1100px){.manual-lado,.manual-par{grid-template-columns:1fr}.manual-marco{grid-template-columns:1fr}.manual-indice{position:static}.manual-hoja{padding:32px 24px}.manual-resumen{grid-template-columns:1fr}}
+
+/* Lo que en la maqueta eran enlaces, acá son botones (el «#» es la dirección de la pantalla). */
+.manual button{font:inherit;cursor:pointer}
+.manual .manual-volver{margin-left:auto;background:none;border:0;color:#fff;font-weight:600;font-size:15px;opacity:.85;padding:8px 0}
+.manual-volver:hover{opacity:1}
+.manual-indice li > button,.manual-indice li > span{display:flex;gap:10px;width:100%;padding:8px 12px;border:0;border-radius:10px;background:none;color:var(--tinta);text-align:left}
+.manual-indice li > button b,.manual-indice li > span b{color:var(--texto-2);font-weight:700;min-width:18px}
+.manual-indice li.actual > button{background:var(--papel);box-shadow:0 0 0 1px var(--borde);font-weight:700}
+.manual-indice li.actual > button b{color:var(--naranja)}
+.manual-indice li.pronto > span{color:var(--gris)}
+.manual-indice li.pronto em{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;color:var(--gris);border:1px solid var(--p-borde);border-radius:999px;padding:0 8px;line-height:20px;align-self:center}
+.manual .manual-indice ul button{background:none;border:0;padding:4px 0;color:var(--texto-2)}
+.manual-indice ul button:hover{color:var(--tinta)}
+.manual-pie span{color:var(--gris)}
+.manual :focus-visible{outline:3px solid var(--naranja);outline-offset:2px}
+.manual-paso > div:last-child{min-width:0}
+.manual-nota svg{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.manual-nota.importante svg{stroke:var(--p-amarillo-texto)}
+.manual-nota.consejo svg{stroke:var(--p-verde-texto)}
+.manual-indice h2{margin:0 0 12px}
+
+body{margin:0;font-family:Manrope,system-ui,sans-serif}
+.manual-indice a{color:inherit;text-decoration:none}
+.manual-formas{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:12px 0 24px}
+.manual-forma{display:flex;flex-direction:column;gap:2px;padding:16px 18px;border-radius:14px;background:var(--p-fondo-2,#eef3ee);color:inherit;text-decoration:none;box-shadow:inset 0 0 0 1px var(--p-borde-suave,#dbe3dc)}
+.manual-forma:hover{box-shadow:inset 0 0 0 2px var(--p-naranja,#d83f0e)}
+.manual-forma small{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--p-texto-2,#56635e)}
+.manual-forma strong{font-size:19px}
+.manual-forma span{font-size:15px;color:var(--p-texto-2,#56635e);line-height:1.4}
+.manual-clip.celu{max-width:320px;margin-left:auto;margin-right:auto}.manual-clip.celu figcaption{flex-wrap:wrap}
+.manual-caso{margin-top:34px;padding:8px 14px;border-left:4px solid var(--p-naranja,#d83f0e);background:var(--p-naranja-suave,#fff0ea);border-radius:0 10px 10px 0}
+</style></head><body>
+<div class="manual"><header class="manual-barra"><img src="logotipo.png" alt="Ferrebress"><span class="manual-titulo">Manual de uso</span><span class="manual-volver">← Volver a Ferrebress</span></header>
+<div class="manual-marco"><nav class="manual-indice"><h2>Capítulos</h2><ol><li class="actual"><button aria-current="page"><b>1</b>Entrar</button><ul><li><a href="#cual">¿Cuál uso?</a></li><li><a href="#compu-celular">Computadora: con el celular</a></li><li><a href="#compu-google">Computadora: con Google</a></li><li><a href="#compu-huella">Computadora: con la huella</a></li><li><a href="#celu-google">Celular: con Google</a></li><li><a href="#celu-huella">Celular: con la huella</a></li><li><a href="#problemas">Si algo no funciona</a></li></ul></li><li class="pronto"><span><b>2</b>Catálogo<em>pronto</em></span></li><li class="pronto"><span><b>3</b>Vender<em>pronto</em></span></li><li class="pronto"><span><b>4</b>Cómo va el negocio<em>pronto</em></span></li><li class="pronto"><span><b>5</b>Usuarios<em>pronto</em></span></li><li class="pronto"><span><b>6</b>Anomalías<em>pronto</em></span></li><li class="pronto"><span><b>7</b>Procesos<em>pronto</em></span></li><li class="pronto"><span><b>8</b>Mejoras y errores<em>pronto</em></span></li><li class="pronto"><span><b>9</b>Configuración<em>pronto</em></span></li></ol></nav>
+<main class="manual-hoja"><article>
+<p class="manual-capitulo">Capítulo 1</p>
+<h1>Entrar a Ferrebress</h1>
+<p class="manual-entrada">Ferrebress no tiene contraseñas. Entrás con el celular, con tu cuenta de Google o con la huella.</p>
+<div class="manual-nota importante"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 4 2.7 17.5A2 2 0 0 0 4.4 20.5h15.2a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0Z" /></svg><p><b>Antes de la primera vez:</b> pedile a un Administrador que agregue tu correo de Google en <b>Más → Usuarios</b>. Si no, Ferrebress no te deja entrar.</p></div>
+
+<h2 id="cual">¿Cuál uso?</h2>
+<p>Elegí según dónde estés. Tocá una para ir directo.</p>
+<div class="manual-formas"><a class="manual-forma" href="#compu-celular"><small>En la computadora</small><strong>Con el celular</strong><span>La más rápida. La computadora muestra un código y el celular lo lee.</span></a><a class="manual-forma" href="#compu-google"><small>En la computadora</small><strong>Con Google</strong><span>Si no tenés el celular a mano.</span></a><a class="manual-forma" href="#compu-huella"><small>En la computadora</small><strong>Con la huella</strong><span>Solo si la computadora tiene lector de huella.</span></a><a class="manual-forma" href="#celu-google"><small>En el celular</small><strong>Con Google</strong><span>La primera vez que usás Ferrebress en ese celular.</span></a><a class="manual-forma" href="#celu-huella"><small>En el celular</small><strong>Con la huella</strong><span>Todas las veces siguientes. Un toque y el dedo.</span></a></div>
+<div class="manual-nota consejo"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" /></svg><p><b>Entrás una sola vez.</b> Ferrebress se acuerda de vos en ese celular o esa computadora. Te pide entrar de nuevo solo si tocás «Salir» o si pasan 90 días sin usarlo.</p></div>
+
+<h2 id="compu-celular">En la computadora, con el celular</h2>
+<p>La computadora muestra un código. El celular lo lee y la computadora entra sola, con tu nombre.</p>
+<figure class="manual-clip"><video src="entrar-v2/clip-celular.mp4" poster="entrar-v2/clip-celular-portada.jpg" controls muted playsinline preload="metadata"></video><figcaption><b>Mirá cómo se hace.</b> A la izquierda, la computadora; a la derecha, el celular. <span>Sin sonido</span></figcaption></figure>
+<h3 class="manual-caso">Si en el celular ya tenés Ferrebress abierto</h3>
+<section class="manual-paso"><div class="manual-numero">1</div><div><h3>Abrí Ferrebress en la computadora</h3><p>Aparece el código. No toques nada.</p><figure class="manual-figura"><div class="manual-imagen "><img src="entrar-v2/compu-codigo.png" alt="La entrada de la computadora, con el código"><span class="manual-recuadro" style="left:61.0%;top:23.3%;width:12.8%;height:23.0%"><span class="manual-marca">1</span></span><span class="manual-recuadro" style="left:61.0%;top:62.5%;width:33.2%;height:5.9%"><span class="manual-marca">2</span></span></div><ol class="manual-leyenda"><li><span>1</span>El código que lee el celular.</li><li><span>2</span>La otra forma: con tu cuenta de Google.</li></ol><figcaption><b>Figura 1.1</b> · La entrada de la computadora.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">2</div><div class="manual-lado"><div><h3>En el celular, tocá «Vincular»</h3><p>Está arriba a la derecha, en cualquier pantalla. Se abre la cámara.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-vincular.png" alt="El celular con el botón Vincular arriba a la derecha"><span class="manual-recuadro" style="left:66.9%;top:3.6%;width:27.9%;height:5.2%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Tocá «Vincular»: se abre la cámara.</li></ol><figcaption><b>Figura 1.2</b> · «Vincular», arriba a la derecha.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">3</div><div class="manual-lado"><div><h3>Apuntá al código</h3><p>Apuntá la cámara al código de la computadora. Lo lee solo: no hay que sacar foto.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-camara.png" alt="La cámara del celular apuntando al código"><span class="manual-marca" style="left:50.0%;top:45.5%">1</span></div><ol class="manual-leyenda"><li><span>1</span>Apuntá al código de la computadora: lo lee solo.</li></ol><figcaption><b>Figura 1.3</b> · La cámara, leyendo el código.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">4</div><div class="manual-lado"><div><h3>Tocá «Entrar en la computadora»</h3><p>El celular pregunta si dejás entrar a la computadora. Tocá <span class="manual-boton-ui">Entrar en la computadora</span>.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-dejar-entrar.png" alt="El celular pregunta si entrar en la computadora"><span class="manual-recuadro" style="left:5.6%;top:55.3%;width:88.7%;height:6.6%"><span class="manual-marca">1</span></span><span class="manual-recuadro" style="left:5.6%;top:64.0%;width:88.7%;height:6.6%"><span class="manual-marca">2</span></span></div><ol class="manual-leyenda"><li><span>1</span>Deja entrar a la computadora con tu usuario.</li><li><span>2</span>No la deja entrar.</li></ol><figcaption><b>Figura 1.4</b> · La pregunta en el celular.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">5</div><div><h3>Listo</h3><p>En unos segundos la computadora entra con tu nombre. El celular avisa arriba.</p><div class="manual-par"><figure class="manual-figura"><div class="manual-imagen "><img src="entrar-v2/compu-adentro.png" alt="La computadora ya adentro"><span class="manual-recuadro" style="left:1.2%;top:90.5%;width:12.3%;height:4.2%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Tu nombre: la computadora entró como vos. «Salir» la cierra.</li></ol><figcaption><b>Figura 1.5</b> · La computadora, adentro.</figcaption></figure><figure class="manual-figura"><div class="manual-imagen celular" style="width:170px"><img src="entrar-v2/celu-despues.png" alt="El aviso en el celular"><span class="manual-recuadro" style="left:5.1%;top:3.4%;width:89.7%;height:3.6%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>El aviso de que la computadora entró.</li></ol><figcaption><b>Figura 1.6</b> · El aviso.</figcaption></figure></div></div></section>
+
+<h3 class="manual-caso">Si en el celular todavía no entraste</h3>
+<section class="manual-paso"><div class="manual-numero">1</div><div class="manual-lado"><div><h3>Tocá «Escanear el código de la computadora»</h3><p>Está en la entrada del celular.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-entrada-escanear.png" alt="La entrada del celular, con el botón para escanear"><span class="manual-recuadro" style="left:5.6%;top:49.1%;width:88.7%;height:9.6%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Tocá acá y apuntá al código de la computadora.</li></ol><figcaption><b>Figura 1.7</b> · La entrada del celular.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">2</div><div class="manual-lado"><div><h3>Apuntá al código y poné la huella</h3><p>Después de leer el código, tocá <span class="manual-boton-ui">Entrar acá y en la computadora</span> y poné la huella. Entran los dos a la vez.</p><p>Si nunca usaste la huella en ese celular, tocá <span class="manual-boton-ui">Continuar con Google</span>.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-entrar-los-dos.png" alt="El celular ofrece entrar en los dos con la huella"><span class="manual-recuadro" style="left:5.6%;top:40.7%;width:88.7%;height:10.5%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Poné la huella: entran el celular y la computadora.</li></ol><figcaption><b>Figura 1.8</b> · Entrar en los dos, con la huella.</figcaption></figure></div></section>
+<div class="manual-nota consejo"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" /></svg><p><b>De paso, quedan vinculados.</b> Lo que hacés en el celular aparece en la computadora: si cambiás de pantalla en uno, el otro va a la misma.</p></div>
+<figure class="manual-clip chico"><video src="../../../microservices/web/public/manual/entrar/clip-espejo.mp4" poster="../../../microservices/web/public/manual/entrar/clip-espejo-portada.jpg" controls muted playsinline preload="metadata"></video><figcaption><b>Van juntos.</b> Se toca en el celular, a la derecha, y la computadora lo sigue. <span>Sin sonido</span></figcaption></figure>
+
+<h2 id="compu-google">En la computadora, con Google</h2>
+<p>Para entrar sin el celular.</p>
+<figure class="manual-clip"><video src="entrar-v2/clip-google-compu.mp4" poster="entrar-v2/clip-google-compu-portada.jpg" controls muted playsinline preload="metadata"></video><figcaption><b>Mirá cómo se hace.</b> La ventana de Google no aparece en el clip. <span>Sin sonido</span></figcaption></figure>
+<section class="manual-paso"><div class="manual-numero">1</div><div><h3>Hacé clic en «Continuar con Google»</h3><p>Es el botón azul, debajo del código.</p><figure class="manual-figura"><div class="manual-imagen "><img src="entrar-v2/compu-google.png" alt="La entrada de la computadora con el botón de Google"><span class="manual-recuadro" style="left:61.0%;top:62.5%;width:33.2%;height:5.9%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Hacé clic en «Continuar con Google».</li></ol><figcaption><b>Figura 1.9</b> · El botón de Google.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">2</div><div><h3>Elegí tu cuenta</h3><p>Se abre una ventana de Google. Hacé clic en tu correo, el que te autorizaron.</p><p>Si tu correo no aparece, hacé clic en «Usar otra cuenta» y escribí tu correo y la contraseña de Google.</p></div></section>
+<section class="manual-paso"><div class="manual-numero">3</div><div><h3>Listo</h3><p>Ferrebress se abre. Abajo a la izquierda está tu nombre.</p></div></section>
+
+<h2 id="compu-huella">En la computadora, con la huella</h2>
+<p>Solo en una computadora con lector de huella que ya usaste para entrar con la huella.</p>
+<section class="manual-paso"><div class="manual-numero">1</div><div><h3>Hacé clic en «Entrar con la huella»</h3><p>Está arriba del botón de Google.</p><figure class="manual-figura"><div class="manual-imagen "><img src="entrar-v2/compu-huella.png" alt="La entrada de la computadora con el botón Entrar con la huella"><span class="manual-recuadro" style="left:61.0%;top:62.2%;width:33.2%;height:6.8%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Hacé clic en «Entrar con la huella» y poné el dedo en el lector.</li></ol><figcaption><b>Figura 1.10</b> · El botón de la huella.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">2</div><div><h3>Poné el dedo en el lector</h3><p>La computadora te pide la huella (o el PIN de Windows). Ferrebress entra solo.</p></div></section>
+<div class="manual-nota consejo"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" /></svg><p><b>¿No aparece el botón?</b> Esa computadora todavía no tiene la huella. Entrá con Google y activala en <b>Más → Configuración</b>, en «Mis celulares con huella».</p></div>
+
+<h2 id="celu-google">En el celular, con Google</h2>
+<p>La primera vez que usás Ferrebress en un celular.</p>
+<figure class="manual-clip celu"><video src="entrar-v2/clip-google-celu.mp4" poster="entrar-v2/clip-google-celu-portada.jpg" controls muted playsinline preload="metadata"></video><figcaption><b>Mirá cómo se hace.</b> La ventana de Google no aparece en el clip. <span>Sin sonido</span></figcaption></figure>
+<section class="manual-paso"><div class="manual-numero">1</div><div class="manual-lado"><div><h3>Tocá «Continuar con Google»</h3><p>Es el botón azul de arriba.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-google.png" alt="La entrada del celular con el botón de Google"><span class="manual-recuadro" style="left:5.6%;top:28.0%;width:88.7%;height:4.7%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Tocá «Continuar con Google» y elegí tu cuenta.</li></ol><figcaption><b>Figura 1.11</b> · El botón de Google.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">2</div><div><h3>Elegí tu cuenta</h3><p>Google te muestra tus cuentas. Tocá la tuya, la que te autorizaron.</p></div></section>
+<section class="manual-paso"><div class="manual-numero">3</div><div class="manual-lado"><div><h3>Activá la huella</h3><p>Ferrebress te pregunta si querés entrar con la huella. Tocá <span class="manual-boton-ui">Sí, usar la huella</span> y poné el dedo. La próxima vez entrás más rápido.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-ofrecer-huella.png" alt="El celular ofrece entrar con la huella"><span class="manual-recuadro" style="left:5.1%;top:83.9%;width:89.7%;height:6.4%"><span class="manual-marca">1</span></span><span class="manual-recuadro" style="left:5.1%;top:91.9%;width:89.7%;height:5.2%"><span class="manual-marca">2</span></span></div><ol class="manual-leyenda"><li><span>1</span>Tocá «Sí, usar la huella»: la próxima vez entrás con el dedo.</li><li><span>2</span>Si preferís, «Ahora no»: lo podés hacer después.</li></ol><figcaption><b>Figura 1.12</b> · La pregunta de la huella.</figcaption></figure></div></section>
+
+<h2 id="celu-huella">En el celular, con la huella</h2>
+<p>Todas las veces después de la primera.</p>
+<section class="manual-paso"><div class="manual-numero">1</div><div class="manual-lado"><div><h3>Tocá «Entrar con la huella»</h3><p>Es el botón naranja.</p></div><figure class="manual-figura"><div class="manual-imagen celular"><img src="entrar-v2/celu-huella.png" alt="La entrada del celular con el botón Entrar con la huella"><span class="manual-recuadro" style="left:5.6%;top:38.9%;width:88.7%;height:8.5%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>Tocá «Entrar con la huella» y apoyá el dedo, como para desbloquear el teléfono.</li></ol><figcaption><b>Figura 1.13</b> · El botón de la huella.</figcaption></figure></div></section>
+<section class="manual-paso"><div class="manual-numero">2</div><div><h3>Apoyá el dedo</h3><p>El teléfono te pide la huella, como cuando lo desbloqueás. Ferrebress se abre solo.</p></div></section>
+
+<h2 id="problemas">Si algo no funciona</h2>
+<table class="manual-problemas"><thead><tr><th>Qué pasa</th><th>Qué hacer</th></tr></thead><tbody>
+<tr><td>Dice «No autorizado»</td><td>Tu correo no está autorizado. Pedile a un Administrador que lo agregue en <b>Más → Usuarios</b>, o probá con otra cuenta.</td></tr>
+<tr><td>El celular dice que el código venció</td><td>El código cambia cada 5 minutos. Leé el que está ahora en la pantalla.</td></tr>
+<tr><td>No aparece el código</td><td>La computadora no tiene internet. Cuando vuelva, el código aparece solo.</td></tr>
+<tr><td>No se pudo leer la huella</td><td>Probá de nuevo, o entrá con Google.</td></tr>
+<tr><td>Dice «Este dispositivo no está vinculado»</td><td>En ese celular o computadora nunca activaste la huella. Entrá con Google.</td></tr>
+<tr><td>Dice «Hay que iniciar sesión»</td><td>Se cerró tu sesión en ese dispositivo. Entrá de nuevo.</td></tr>
+</tbody></table>
+<figure class="manual-figura"><div class="manual-imagen " style="width:420px"><img src="entrar-v2/compu-no-autorizado.png" alt="El aviso de correo no autorizado"><span class="manual-recuadro" style="left:7.2%;top:61.4%;width:85.6%;height:18.2%"><span class="manual-marca">1</span></span></div><ol class="manual-leyenda"><li><span>1</span>El aviso: ese correo de Google no está autorizado.</li></ol><figcaption><b>Figura 1.14</b> · Así se ve cuando el correo no está autorizado.</figcaption></figure>
+</article><nav class="manual-pie"><span>Este es el primer capítulo</span><span>Siguiente: Catálogo (pronto) →</span></nav></main></div></div>
+</body></html>
