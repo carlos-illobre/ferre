@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-17
 
-**Status**: Borrador, a aprobar por Carlos
+**Status**: Aprobada (Carlos, 2026-10-17, con sus respuestas a las dos aclaraciones)
 
 **Input**: Carlos, el 2026-10-17, sobre una imagen de referencia de «Ventas de hoy»: que entren la
 comparación con ayer, un gráfico de lo vendido por hora, cada medio de pago en su tarjeta con su
@@ -18,8 +18,8 @@ comprobantes. Los colores de los medios de pago siguen la decisión 108 (colores
 ### Session 2026-10-17
 
 - Q: ¿Qué entra de la imagen de referencia? → A: Los seis puntos de arriba; no entran el número de venta, el «Tip», «Ver todas» ni imprimir.
-- Q: ¿Contra qué se compara el total de hoy? → A: [NEEDS CLARIFICATION: ¿contra lo vendido ayer hasta la misma hora (a las 11 se compara con ayer a las 11), contra el día completo de ayer, o contra el mismo día de la semana pasada hasta la misma hora?]
-- Q: ¿Quién ve las ventas de otros días? → A: [NEEDS CLARIFICATION: ¿cualquiera con «Ver las ventas del día» (el permiso de la pestaña Hoy), o hace falta un permiso aparte para los días anteriores?]
+- Q: ¿Contra qué se compara el total de hoy? → A: Contra lo vendido ayer hasta la misma hora: a las 11 se compara con ayer a las 11. Un día anterior, ya terminado, se compara entero con el suyo entero (decisión 109).
+- Q: ¿Quién ve las ventas de otros días? → A: Cualquiera con «Ver las ventas del día», el permiso de la pestaña «Hoy»; no hay un permiso aparte (decisión 109).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -36,8 +36,8 @@ comprobar el total, la comparación, el gráfico y las tarjetas de cada medio.
 **Acceptance Scenarios**:
 
 1. **E01** **Given** ventas confirmadas hoy por $293.000, **When** se abre «Hoy», **Then** el total dice $293.000; las anuladas no suman.
-2. **E02** **Given** hoy $293.000 y ayer $250.000 (según la regla de comparación que elija Carlos), **When** se abre «Hoy», **Then** debajo del total dice «+17 % vs. ayer ($250.000)», en verde; si hoy va por debajo, el porcentaje es negativo y en el color de lo que baja.
-3. **E03** **Given** ayer no hubo ventas (cerrado), **When** se abre «Hoy», **Then** dice «Ayer no hubo ventas» en lugar de un porcentaje.
+2. **E02** **Given** hoy $293.000 hasta las 11:30 y ayer $250.000 hasta las 11:30, **When** se abre «Hoy», **Then** debajo del total dice «+17 % vs. ayer ($250.000)», en verde; si hoy va por debajo, el porcentaje es negativo y en el color de lo que baja.
+3. **E03** **Given** ayer no hubo ventas (cerrado), **When** se abre «Hoy», **Then** dice «Ayer a esta hora no había ventas» en lugar de un porcentaje.
 4. **E04** **Given** ventas a las 9, 10 y 11, **When** se abre «Hoy», **Then** el gráfico muestra una barra por hora con lo vendido en esa hora, desde la primera hora con ventas hasta la última (y, si es hoy, hasta la hora actual); tocar o señalar una barra dice el importe y la hora.
 5. **E05** **Given** ventas en efectivo, Mercado Pago y cuenta corriente, **When** se abre «Hoy», **Then** hay una tarjeta por medio de pago (Efectivo, Mercado Pago, Tarjeta, Cuenta corriente), cada una con su ícono, su color, el importe y cuántas ventas («1 venta», «0 ventas»).
 6. **E06** **Given** los medios de pago en otra pantalla (Vender, el cobro, Anular), **When** se los ve, **Then** cada medio tiene el mismo color que en «Hoy» (decisión 108).
@@ -98,7 +98,7 @@ comparación con anteayer; volver a hoy.
 **Acceptance Scenarios**:
 
 1. **E16** **Given** «Hoy» abierto, **When** se toca «Cambiar fecha» y se elige el 15/10/2026, **Then** el título dice «Ventas del miércoles 15/10» y todo (total, comparación, gráfico, medios, números y lista) es de ese día.
-2. **E17** **Given** otro día elegido, **When** se mira la comparación, **Then** es contra el día anterior a ese.
+2. **E17** **Given** otro día elegido, **When** se mira la comparación, **Then** es el día entero contra el día anterior a ese, entero.
 3. **E18** **Given** otro día elegido, **When** se toca «Volver a hoy», **Then** se ve hoy otra vez.
 4. **E19** **Given** «Cambiar fecha», **When** se elige una fecha futura, **Then** no se puede: el calendario llega hasta hoy.
 5. **E20** **Given** un día sin ventas, **When** se lo elige, **Then** dice «No hubo ventas ese día» y los números en 0.
@@ -108,7 +108,7 @@ comparación con anteayer; volver a hoy.
 
 - Una venta cerca de la medianoche cuenta en el día del local (hora de Buenos Aires), como hoy (capacidad 003).
 - Una venta sin mandar todavía (sin conexión): aparece en la lista como hoy, marcada como pendiente, y suma en el total del dispositivo.
-- Ayer con ventas solo después de la hora actual: la comparación hasta la misma hora puede dar «Ayer a esta hora no había ventas» (según la regla que elija Carlos).
+- Ayer con ventas solo después de la hora actual: la comparación dice «Ayer a esta hora no había ventas».
 - Un día de muchas ventas (200): la lista sigue siendo de renglones cortos y se desplaza; los números de arriba se ven sin bajar.
 - Quien no tiene «Ver las ventas del día» no ve la pestaña, como hoy.
 

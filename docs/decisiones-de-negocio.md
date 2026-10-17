@@ -863,3 +863,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      - Un capítulo que todavía no está escrito para el dispositivo elegido dice «pronto».
      - El capítulo 2 se llama «Catálogo: los productos» y explica la pantalla Productos; Listas y
        Duplicados se suman después al mismo capítulo.
+
+109. **Ventas de hoy renovada** (2026-10-17). Sobre una imagen de referencia, Carlos eligió que
+     entren la comparación con ayer, el gráfico por hora, cada medio de pago con su color y
+     cuántas ventas, ventas realizadas, productos vendidos y ticket promedio, cada venta en un
+     renglón corto que se abre, y «Cambiar fecha». No entran el número de venta, el «Tip»,
+     «Ver todas» ni imprimir. Hoy se compara con lo vendido ayer hasta la misma hora; un día
+     anterior, entero contra el suyo. Las ventas de otros días las ve cualquiera con «Ver las
+     ventas del día» (`specs/017-ventas-de-hoy/`).
