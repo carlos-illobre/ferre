@@ -9,3 +9,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 
 ## Tareas
 
+- [ ] T001 [interfaz] En el celular, Vender: la lista de la venta con otro aspecto, sobre una referencia de Carlos: «Productos en esta venta» con «Vaciar»; en cada renglón, el precio por unidad en una pastilla, un menú «⋮» (precio a mano, ver la ficha, sacar foto), el tacho a la izquierda debajo de la foto y el total del renglón abajo a la derecha; tarjetas más compactas (pedido de Carlos del 2026-10-17; maqueta `maquetas/celular-venta-renglones.png`, a aprobar por Carlos)
