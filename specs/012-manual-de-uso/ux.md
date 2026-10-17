@@ -41,3 +41,27 @@ mostrador, que no es técnico: frases cortas, en segunda persona, una acción po
 - Los clips del celular solo van angostos, del ancho de un teléfono. La ventana de Google no se
   graba ni se captura: su paso va con texto y el clip lo dice en el pie.
 - Al final, «Si algo no funciona».
+
+**El marco del manual** (2026-10-17, maqueta `maquetas/manual-marco.html`, aprobada por Carlos sobre su
+referencia `maquetas/marco-referencia-de-carlos.webp`; el contenido de los capítulos no cambia):
+
+- La barra de arriba: el logotipo de Ferrebress (el de fondo oscuro), «Manual de uso» con el
+  subtítulo «Aprendé a tu ritmo, sin complicaciones», el buscador en el medio y «Volver a
+  Ferrebress» a la derecha.
+- El buscador, «Buscar en el manual…», se abre también con Ctrl+F, que en el manual reemplaza al
+  buscar del navegador. Busca en los títulos y en el texto de los capítulos escritos, sin importar
+  mayúsculas ni tildes, y muestra hasta seis resultados: el capítulo y la sección, el título del
+  paso y un pedacito del texto, con lo buscado resaltado. Se elige con un clic o con las flechas y
+  Enter, y lleva ahí; Escape lo cierra.
+- A la izquierda, un panel pegado al borde: «Inicio del manual» (con una casa; sin portada, lleva
+  al comienzo del primer capítulo), «Capítulos» con el número de cada uno en un círculo (el elegido,
+  más grande, naranja y resaltado), y debajo del elegido sus secciones, cada una con un punto sobre
+  una línea que baja del número. Al bajar, la sección que se lee se marca sola: punto naranja,
+  negrita y fondo naranja suave.
+- Arriba del capítulo, las migas de pan: «Manual de uso › 1. Entrar › la sección que se lee».
+- A la derecha, «Consejo» (uno propio del capítulo, que no repite el texto) y «Artículos
+  relacionados», que llevan a otras secciones. Las secciones no se repiten ahí: están en el menú.
+  En una ventana de menos de 1180 px la columna derecha no se ve.
+- La hoja ocupa toda la columna del medio, a 24 px del menú y de la columna derecha.
+- Cada clip lleva un botón redondo naranja de play en el medio y su duración arriba a la derecha;
+  al tocarlo arranca y el botón se esconde. Siguen los controles de siempre.

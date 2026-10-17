@@ -1,11 +1,13 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { irA } from "../rutas";
+import { Logotipo } from "../../../Logotipo";
 import MARCAS from "./manual-entrar-marcas.json";
 import "../estilos/manual.css";
 
 // El manual de uso (RF-97, specs/012-manual-de-uso): lo abre «Ver tutorial» en la entrada de la
 // computadora, sin sesión y en la misma pestaña. Un capítulo por pantalla principal; los que faltan
-// escribir dicen «pronto». Copia la maqueta aprobada (maquetas/manual-entrar.html). Las capturas y
+// escribir dicen «pronto». El marco copia maquetas/manual-marco.html y el capítulo «Entrar»,
+// maquetas/manual-entrar-v2.html (las dos aprobadas). Las capturas y
 // el clip están en public/manual/<capítulo>/ y los arma tests/capturas/tutorial/<capítulo>.py con la
 // aplicación de verdad; no se guardan para usar sin conexión.
 const ARCHIVOS = `${import.meta.env.BASE_URL}manual/`;
@@ -37,39 +39,204 @@ const irASeccion = (id: string) => {
   titulo?.scrollIntoView({ behavior: "smooth", block: "start" });
   titulo?.focus({ preventScroll: true });
 };
+const irAlInicio = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  document.getElementById("contenido")?.focus({ preventScroll: true });
+};
+
+// La sección que se lee: la última cuyo título ya pasó por debajo de la barra de arriba.
+function useSeccionQueSeLee(ids: string[]): string {
+  const [actual, setActual] = useState(ids[0] ?? "");
+  useEffect(() => {
+    const mirar = () => {
+      let leida = ids[0] ?? "";
+      for (const id of ids) { const t = document.getElementById(id); if (t && t.getBoundingClientRect().top < 160) leida = id; }
+      setActual(leida);
+    };
+    mirar();
+    window.addEventListener("scroll", mirar, { passive: true });
+    return () => window.removeEventListener("scroll", mirar);
+  }, [ids]);
+  return actual;
+}
 
 export function Manual() {
+  const capitulo = CAPITULOS[0]!;
+  const secciones = capitulo.secciones ?? [];
+  const [ids] = useState(() => secciones.map((x) => x.id));
+  const actual = useSeccionQueSeLee(ids);
   return (
     <div className="manual" data-testid="manual">
       <header className="manual-barra">
-        <img src={`${import.meta.env.BASE_URL}logotipo-ferrebress.png`} alt="Ferrebress" />
-        <span className="manual-titulo">Manual de uso</span>
+        <span className="manual-logo"><Logotipo sobre="oscuro" /></span>
+        <span className="manual-titulo"><strong>Manual de uso</strong><small>Aprendé a tu ritmo, sin complicaciones</small></span>
+        <Buscador />
         <button type="button" className="manual-volver" onClick={() => irA("")} data-testid="manual-volver">← Volver a Ferrebress</button>
       </header>
       <div className="manual-marco">
         <nav className="manual-indice" aria-label="Capítulos">
+          <button type="button" className="manual-inicio" onClick={irAlInicio} data-testid="manual-inicio">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z" /></svg>Inicio del manual
+          </button>
           <h2>Capítulos</h2>
           <ol>
             {CAPITULOS.map((c, i) => (
               <li key={c.nombre} className={c.escrito ? "actual" : "pronto"} data-testid="manual-capitulo">
                 {c.escrito
-                  ? <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-current="page"><b>{i + 1}</b>{c.nombre}</button>
+                  ? <button type="button" onClick={irAlInicio} aria-current="page"><b>{i + 1}</b>{c.nombre}</button>
                   : <span aria-disabled="true"><b>{i + 1}</b>{c.nombre}<em>pronto</em></span>}
                 {c.secciones && (
-                  <ul>{c.secciones.map((s) => <li key={s.id}><button type="button" onClick={() => irASeccion(s.id)}>{s.nombre}</button></li>)}</ul>
+                  <ul className="manual-secciones">{c.secciones.map((x) => (
+                    <li key={x.id} className={x.id === actual ? "actual" : undefined}>
+                      <button type="button" onClick={() => irASeccion(x.id)} aria-current={x.id === actual ? "location" : undefined}>{x.nombre}</button>
+                    </li>
+                  ))}</ul>
                 )}
               </li>
             ))}
           </ol>
         </nav>
         <main className="manual-hoja" id="contenido" tabIndex={-1}>
+          <nav className="manual-migas" aria-label="Estás en" data-testid="manual-migas">
+            <button type="button" onClick={irAlInicio}>Manual de uso</button><span aria-hidden="true">›</span>
+            <button type="button" onClick={irAlInicio}>1. {capitulo.nombre}</button><span aria-hidden="true">›</span>
+            <b>{TITULO_DE_SECCION[actual] ?? ""}</b>
+          </nav>
           <CapituloEntrar />
           <nav className="manual-pie">
             <span>Este es el primer capítulo</span>
             <span>Siguiente: {CAPITULOS[1]?.nombre} (pronto) →</span>
           </nav>
         </main>
+        <aside className="manual-derecha" aria-label="Para seguir">
+          <div className="manual-caja manual-consejo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" /></svg>
+            <div><strong>Consejo</strong><p>Con Ferrebress abierto en el celular, entrás a la computadora en segundos: tocá «Vincular» y apuntá al código.</p></div>
+          </div>
+          <div className="manual-caja">
+            <h2>Artículos relacionados</h2>
+            {RELACIONADOS.map((r) => (
+              <button key={r.id} type="button" className="manual-relacionado" onClick={() => irASeccion(r.id)}>
+                <span className="manual-relacionado-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d={r.icono} /></svg></span>
+                <span><strong>{r.titulo}</strong><small>{r.detalle}</small></span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="manual-relacionado-flecha"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+            ))}
+          </div>
+        </aside>
       </div>
+    </div>
+  );
+}
+
+// Cómo se llama cada sección del capítulo, para las migas de pan.
+const TITULO_DE_SECCION: Record<string, string> = {
+  cual: "¿Cuál uso?", "compu-celular": "En la computadora, con el celular", "compu-google": "En la computadora, con Google",
+  "compu-huella": "En la computadora, con la huella", "celu-google": "En el celular, con Google", "celu-huella": "En el celular, con la huella",
+  problemas: "Si algo no funciona",
+};
+
+const RELACIONADOS = [
+  { id: "problemas", titulo: "Si algo no funciona", detalle: "Qué hacer si no podés entrar.", icono: "M12 9v4M12 17h.01M10.3 4 2.7 17.5A2 2 0 0 0 4.4 20.5h15.2a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0Z" },
+  { id: "celu-huella", titulo: "Entrar con la huella", detalle: "La forma más rápida en el celular.", icono: "M12 11v3a6 6 0 0 1-1.2 3.6M8.5 9.5a4 4 0 0 1 7 2.5v1.5M6 13v-1a6 6 0 0 1 10.8-3.6M15.5 17.5c.3-1 .5-2 .5-3" },
+  { id: "compu-google", titulo: "Entrar con tu cuenta de Google", detalle: "Si no tenés el celular a mano.", icono: "M21 12a9 9 0 1 1-2.6-6.4M12 12h9" },
+];
+
+// El buscador del manual: busca en lo que está escrito en la hoja (títulos, pasos, notas, la tabla),
+// sin importar mayúsculas ni tildes. Ctrl+F lo abre en lugar del buscar del navegador.
+type Encontrado = { elemento: HTMLElement; ruta: string; titulo: string; texto: string };
+const plano = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const MAXIMO = 6;
+
+function buscarEnLaHoja(texto: string): Encontrado[] {
+  const buscado = plano(texto.trim());
+  const hoja = document.querySelector<HTMLElement>("[data-testid=manual-entrar]");
+  if (buscado.length < 2 || !hoja) return [];
+  const encontrados: Encontrado[] = [];
+  const vistos = new Set<unknown>();
+  const sinPaso = (t: string) => t.replace(/^Paso \d+: /, "");
+  let seccion = "";
+  for (const e of hoja.querySelectorAll<HTMLElement>("h2, h3, p, td, .manual-forma, .manual-leyenda li")) {
+    if (e.tagName === "H2") seccion = e.textContent ?? "";
+    const forma = e.closest<HTMLElement>(".manual-forma");
+    if (forma && e !== forma) continue;
+    // Un resultado por paso, por tarjeta, por renglón de la tabla y, lo demás, por sección: el primero que coincide.
+    const grupo = e.closest(".manual-paso") ?? forma ?? e.closest("tr") ?? `seccion:${seccion}`;
+    if (encontrados.length >= MAXIMO || vistos.has(grupo) || !plano(e.textContent ?? "").includes(buscado)) continue;
+    vistos.add(grupo);
+    const paso = e.closest(".manual-paso")?.querySelector("h3")?.textContent;
+    const ruta = seccion && e.tagName !== "H2" ? `Entrar › ${seccion}` : "Entrar";
+    let titulo: string, detalle = "";
+    if (forma) { titulo = `${forma.querySelector("small")?.textContent ?? ""}, ${(forma.querySelector("strong")?.textContent ?? "").toLowerCase()}`; detalle = forma.querySelector("span")?.textContent ?? ""; }
+    else if (e.tagName === "H2" || e.tagName === "H3") titulo = sinPaso(e.textContent ?? "");
+    else if (paso) { titulo = sinPaso(paso); detalle = e.textContent ?? ""; }
+    else if (e.tagName === "TD") { titulo = e.closest("tr")?.firstElementChild?.textContent ?? seccion; detalle = e === e.closest("tr")?.firstElementChild ? "" : (e.textContent ?? ""); }
+    else { titulo = seccion || "Entrar a Ferrebress"; detalle = e.textContent ?? ""; }
+    encontrados.push({ elemento: forma ?? e, ruta, titulo, texto: detalle });
+  }
+  return encontrados;
+}
+
+function Resaltado({ texto, buscado }: { texto: string; buscado: string }) {
+  const desde = plano(texto).indexOf(plano(buscado.trim()));
+  if (desde < 0 || !buscado.trim()) return <>{texto}</>;
+  const hasta = desde + buscado.trim().length;
+  return <>{texto.slice(0, desde)}<mark>{texto.slice(desde, hasta)}</mark>{texto.slice(hasta)}</>;
+}
+const recortar = (texto: string, buscado: string) => {
+  const desde = Math.max(0, plano(texto).indexOf(plano(buscado.trim())) - 40);
+  return (desde > 0 ? "…" : "") + texto.slice(desde, desde + 110) + (texto.length > desde + 110 ? "…" : "");
+};
+
+function Buscador() {
+  const [texto, setTexto] = useState("");
+  const [abierto, setAbierto] = useState(false);
+  const [activa, setActiva] = useState(0);
+  const caja = useRef<HTMLInputElement>(null);
+  const resultados = abierto ? buscarEnLaHoja(texto) : [];
+  useEffect(() => {
+    const alTeclear = (e: globalThis.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") { e.preventDefault(); caja.current?.focus(); caja.current?.select(); setAbierto(true); }
+    };
+    window.addEventListener("keydown", alTeclear);
+    return () => window.removeEventListener("keydown", alTeclear);
+  }, []);
+  function ir(r: Encontrado) {
+    setAbierto(false);
+    r.elemento.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!r.elemento.hasAttribute("tabindex")) r.elemento.setAttribute("tabindex", "-1");
+    r.elemento.focus({ preventScroll: true });
+    r.elemento.classList.add("manual-encontrado");
+    setTimeout(() => r.elemento.classList.remove("manual-encontrado"), 2000);
+  }
+  function alTeclear(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Escape") { setAbierto(false); caja.current?.blur(); }
+    else if (e.key === "ArrowDown" && resultados.length) { e.preventDefault(); setActiva((i) => (i + 1) % resultados.length); }
+    else if (e.key === "ArrowUp" && resultados.length) { e.preventDefault(); setActiva((i) => (i <= 0 ? resultados.length : i) - 1); }
+    else if (e.key === "Enter" && resultados[activa]) { e.preventDefault(); ir(resultados[activa]); }
+  }
+  return (
+    <div className={`manual-buscar${abierto ? " abierto" : ""}`}>
+      <label>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
+        <input ref={caja} value={texto} placeholder="Buscar en el manual…" aria-label="Buscar en el manual" role="combobox" aria-expanded={resultados.length > 0}
+          aria-controls="manual-resultados" aria-autocomplete="list" aria-activedescendant={resultados.length ? `manual-resultado-${activa}` : undefined}
+          onChange={(e) => { setTexto(e.target.value); setAbierto(true); setActiva(0); }} onFocus={() => setAbierto(true)} onBlur={() => setAbierto(false)} onKeyDown={alTeclear} data-testid="manual-buscar" />
+        <kbd>Ctrl + F</kbd>
+      </label>
+      {resultados.length > 0 && (
+        <ol className="manual-resultados" id="manual-resultados" role="listbox" aria-label="Resultados">
+          {resultados.map((r, i) => (
+            <li key={i} id={`manual-resultado-${i}`} role="option" aria-selected={i === activa} className={i === activa ? "activa" : undefined}
+              onMouseDown={(e) => e.preventDefault()} onClick={() => ir(r)} data-testid="manual-resultado">
+              <span className="manual-resultado-ruta">{r.ruta}</span>
+              <strong><Resaltado texto={r.titulo} buscado={texto} /></strong>
+              {r.texto && <small><Resaltado texto={recortar(r.texto, texto)} buscado={texto} /></small>}
+            </li>
+          ))}
+        </ol>
+      )}
+      {abierto && texto.trim().length >= 2 && resultados.length === 0 && <p className="manual-resultados vacio" role="status">No hay nada con «{texto}».</p>}
     </div>
   );
 }
@@ -121,9 +288,22 @@ function Figura({ captura, alt, numero, pie, celular, ancho }: { captura: Captur
 }
 
 function Clip({ nombre, testId, etiqueta, celular, chico, children }: { nombre: string; testId: string; etiqueta: string; celular?: boolean; chico?: boolean; children: ReactNode }) {
+  const video = useRef<HTMLVideoElement>(null);
+  const [andando, setAndando] = useState(false);
+  const [duracion, setDuracion] = useState<string | null>(null);
+  const alCargar = () => { const d = video.current?.duration; if (d && Number.isFinite(d)) setDuracion(`${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, "0")}`); };
   return (
     <figure className={`manual-clip${chico ? " chico" : ""}${celular ? " celu" : ""}`}>
-      <video src={`${ARCHIVOS}entrar/${nombre}.mp4`} poster={`${ARCHIVOS}entrar/${nombre}-portada.jpg`} controls muted playsInline preload="metadata" data-testid={testId} aria-label={etiqueta} />
+      <div className="manual-video">
+        {duracion && !andando && <span className="manual-duracion" aria-hidden="true">▶ {duracion}</span>}
+        {!andando && (
+          <button type="button" className="manual-play" onClick={() => void video.current?.play()} aria-label={`Ver el clip: ${etiqueta.replace(/^Clip: /, "")}`} data-testid={`${testId}-play`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+          </button>
+        )}
+        <video ref={video} src={`${ARCHIVOS}entrar/${nombre}.mp4`} poster={`${ARCHIVOS}entrar/${nombre}-portada.jpg`} controls muted playsInline preload="metadata" data-testid={testId} aria-label={etiqueta}
+          onLoadedMetadata={alCargar} onPlay={() => setAndando(true)} onPause={() => setAndando(false)} onEnded={() => setAndando(false)} />
+      </div>
       <figcaption>{children} <span>Sin sonido</span></figcaption>
     </figure>
   );

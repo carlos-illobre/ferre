@@ -50,6 +50,8 @@ con sus pasos, sus capturas y su clip; «Volver a Ferrebress» vuelve a la entra
 - **E07** **Given** un celular, **When** se abre la aplicación, **Then** no hay «Ver tutorial» ni manual: es solo de la computadora.
 - **E08** **Given** las capturas y el clip, **When** cambia una pantalla de la aplicación, **Then** se vuelven a generar con un comando, con la aplicación de verdad y datos de ejemplo, sin tocar las pruebas de punta a punta, que no graban video.
 - **E09** **Given** la aplicación instalada, **When** se baja para usar sin conexión, **Then** las capturas y el clip del manual no se guardan en el dispositivo (no ocupan lugar); el manual necesita internet, como entrar.
+- **E10** **Given** el manual abierto, **When** se aprieta Ctrl+F o se toca el buscador y se escribe «huella», **Then** aparecen hasta seis resultados con su capítulo y su sección y lo buscado resaltado; elegir uno, con un clic o con las flechas y Enter, lleva a esa parte, y Escape lo cierra sin moverse (012-T011).
+- **E11** **Given** el capítulo abierto, **When** se baja leyendo, **Then** la sección que se lee se marca en el menú de la izquierda y en las migas de pan; «Inicio del manual» vuelve al comienzo (012-T011).
 
 ### Edge Cases
 

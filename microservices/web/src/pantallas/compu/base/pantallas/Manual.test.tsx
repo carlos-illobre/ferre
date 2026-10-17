@@ -23,7 +23,7 @@ describe("el manual de uso", () => {
     render(<Manual />);
     const capitulo = screen.getByTestId("manual-entrar");
     expect(capitulo.textContent).toContain("Antes de la primera vez");
-    expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent).filter((t) => t !== "Capítulos")).toEqual([
+    expect(within(capitulo).getAllByRole("heading", { level: 2 }).map((h) => h.textContent)).toEqual([
       "¿Cuál uso?", "En la computadora, con el celular", "En la computadora, con Google", "En la computadora, con la huella",
       "En el celular, con Google", "En el celular, con la huella", "Si algo no funciona"]);
     // Cada forma de «¿Cuál uso?» lleva a su sección.
@@ -80,5 +80,57 @@ describe("el manual de uso", () => {
     expect(document.activeElement?.id).toBe("problemas");
     expect(screen.getByTestId("manual-clip").getAttribute("aria-label")).toBeTruthy();
     expect(screen.getByTestId("manual-clip-espejo").getAttribute("aria-label")).toBeTruthy();
+  });
+
+  it("012-E10: Ctrl+F abre el buscador, que encuentra «huella» sin importar tildes y lleva ahí con las flechas y Enter", () => {
+    Element.prototype.scrollIntoView = () => undefined;
+    render(<Manual />);
+    const caja = screen.getByTestId("manual-buscar") as HTMLInputElement;
+    fireEvent.keyDown(window, { key: "f", ctrlKey: true });
+    expect(document.activeElement).toBe(caja);
+    fireEvent.change(caja, { target: { value: "HUELLA" } });
+    const resultados = screen.getAllByTestId("manual-resultado");
+    expect(resultados.length).toBeGreaterThan(1);
+    expect(resultados.length).toBeLessThanOrEqual(6);
+    expect(resultados[0]!.querySelector("mark")?.textContent?.toLowerCase()).toBe("huella");
+    expect(resultados.every((r) => r.textContent?.startsWith("Entrar"))).toBe(true);
+    fireEvent.change(caja, { target: { value: "codigo vencio" } });
+    expect(screen.getAllByTestId("manual-resultado")[0]!.textContent).toContain("venció");
+    fireEvent.keyDown(caja, { key: "Enter" });
+    expect(screen.queryByTestId("manual-resultado")).toBeNull();
+    expect(document.activeElement?.textContent).toContain("venció");
+    fireEvent.change(caja, { target: { value: "huella" } });
+    fireEvent.keyDown(caja, { key: "Escape" });
+    expect(screen.queryByTestId("manual-resultado")).toBeNull();
+  });
+
+  it("012-E11: el menú tiene «Inicio del manual» y las secciones del capítulo; la que se lee se marca en el menú y en las migas", () => {
+    // Dónde está cada título: arriba, «¿Cuál uso?»; el resto, más abajo. Después se baja hasta «Si algo no funciona».
+    let leido = "cual";
+    const original = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = function (this: Element) { return { top: this.id === leido ? 100 : this.id ? 900 : 0 } as DOMRect; };
+    render(<Manual />);
+    expect(screen.getByTestId("manual-inicio").textContent).toBe("Inicio del manual");
+    const menu = screen.getByRole("navigation", { name: "Capítulos" });
+    expect(within(menu).getByRole("button", { name: "¿Cuál uso?" }).getAttribute("aria-current")).toBe("location");
+    // Bajar hasta «Si algo no funciona»: su título queda arriba, debajo de la barra.
+    leido = "problemas";
+    fireEvent.scroll(window);
+    Element.prototype.getBoundingClientRect = original;
+    expect(within(menu).getByRole("button", { name: "Si algo no funciona" }).getAttribute("aria-current")).toBe("location");
+    expect(screen.getByTestId("manual-migas").textContent).toBe("Manual de uso›1. Entrar›Si algo no funciona");
+  });
+
+  it("012-T011: cada clip tiene su botón de play, que lo arranca y se esconde mientras anda", () => {
+    render(<Manual />);
+    const clip = screen.getByTestId("manual-clip") as HTMLVideoElement;
+    let arranco = false;
+    clip.play = () => { arranco = true; fireEvent.play(clip); return Promise.resolve(); };
+    fireEvent.click(screen.getByTestId("manual-clip-play"));
+    expect(arranco).toBe(true);
+    expect(screen.queryByTestId("manual-clip-play")).toBeNull();
+    fireEvent.pause(clip);
+    expect(screen.getByTestId("manual-clip-play")).toBeTruthy();
+    for (const id of ["manual-clip-espejo", "manual-clip-google-compu", "manual-clip-google-celu"]) expect(screen.getByTestId(`${id}-play`)).toBeTruthy();
   });
 });
