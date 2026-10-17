@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — quedan dos: «Stock bajo» (E04) y qué pasa después de «Agregar» (E14)
+- [x] No [NEEDS CLARIFICATION] markers remain (Carlos contestó las dos el 2026-10-17)
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Las dos preguntas se le hacen a Carlos antes de aprobar la especificación.
+- Carlos contestó las dos preguntas el 2026-10-17 (decisión 103).

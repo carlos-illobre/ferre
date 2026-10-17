@@ -808,3 +808,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      o inactivos); y se puede ordenar por correo o por estado. El buscador dice «Email». Las
      reglas de filtrar y ordenar valen igual en la computadora. Maquetas aprobadas el 2026-10-17
      (007-T044, `specs/007-usuarios-y-acceso/ux.md`).
+
+103. **Catálogo para vender** (2026-10-17). Sobre una imagen de referencia del Catálogo, Carlos
+     eligió que entren el stock de cada producto, filtrar por disponibilidad y por marca,
+     «Agregar» a la venta desde el Catálogo, las pestañas más altas y el buscador que dice qué
+     busca; no entran categorías, «Avisar», un menú por producto, ordenar ni el «+» en el
+     margen. «Stock bajo» espera al stock mínimo (RF-54): hasta entonces, la cantidad y «Sin
+     stock». Después de «Agregar» se sigue en el Catálogo, con un aviso breve, y el menú muestra
+     en Vender cuántos productos lleva la venta (`specs/015-catalogo-para-vender/`).

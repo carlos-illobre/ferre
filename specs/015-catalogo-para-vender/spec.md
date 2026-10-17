@@ -13,6 +13,14 @@ stock de cada producto, filtrar por disponibilidad y por marca, «Agregar» a la
 Catálogo, las pestañas más altas y un buscador que diga qué busca. No entran: categorías,
 «Avisar» en los productos sin stock, un menú por producto, ordenar, ni el signo «+» en el margen.
 
+## Clarifications
+
+### Session 2026-10-17
+
+- Q: ¿Qué entra de la imagen de referencia? → A: El stock de cada producto, filtrar por disponibilidad y por marca, «Agregar» a la venta, las pestañas más altas y el buscador que dice qué busca. No entran categorías, «Avisar», un menú por producto, ordenar ni el «+» en el margen.
+- Q: «Stock bajo» necesita el stock mínimo, que todavía no existe (RF-54). → A: Espera al mínimo: por ahora, la cantidad y «Sin stock»; «Stock bajo» aparece cuando exista RF-54 (decisión 103).
+- Q: ¿Qué pasa después de «Agregar»? → A: Se queda en el Catálogo, con un aviso breve, y el menú muestra en Vender cuántos productos lleva la venta (decisión 103).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Saber si hay, sin salir del Catálogo (Priority: P1)
@@ -30,7 +38,7 @@ para saberlo tiene que ir a Depósito y buscarlo de nuevo.
 1. **E01** **Given** un producto con stock 12 que se vende por unidad, **When** aparece en el Catálogo, **Then** dice «12 u.».
 2. **E02** **Given** un producto que se vende por kilo con 3,5 kg, **When** aparece en el Catálogo, **Then** dice «3,5 kg», con la unidad en que se vende.
 3. **E03** **Given** un producto con stock 0, o con stock que nunca se cargó, **When** aparece en el Catálogo, **Then** dice «Sin stock», de modo que se distinga a la vista de los que tienen.
-4. **E04** **Given** un producto con stock mínimo cargado y un stock igual o menor, **When** aparece en el Catálogo, **Then** dice su cantidad marcada como «Stock bajo». [NEEDS CLARIFICATION: el stock mínimo todavía no existe (RF-54, pendiente). ¿«Stock bajo» espera a que exista el mínimo, o se hace antes con otra regla?]
+4. **E04** **Given** un producto con stock mínimo cargado y un stock igual o menor, **When** aparece en el Catálogo, **Then** dice su cantidad marcada como «Stock bajo». Depende del stock mínimo (RF-54): mientras no exista, ningún producto dice «Stock bajo» (decisión 103).
 5. **E05** **Given** el stock de un producto cambió en otro dispositivo (una venta, un ingreso, un ajuste), **When** se vuelve a mirar el Catálogo, **Then** muestra el stock nuevo, con la misma demora con que hoy se actualizan los precios.
 
 ---
@@ -57,7 +65,8 @@ vez, ir a Vender y ver un renglón de la mecha con cantidad 2.
 6. **E11** **Given** un producto sin stock, **When** se lo agrega, **Then** entra igual: la venta no se impide por falta de stock (la regla de Vender).
 7. **E12** **Given** alguien sin el permiso de vender, **When** mira el Catálogo, **Then** no ve «Agregar».
 8. **E13** **Given** el dispositivo sin conexión, **When** se agrega un producto desde el Catálogo, **Then** entra a la venta igual, como en Vender sin conexión.
-9. **E14** **Given** un producto agregado desde el Catálogo, **When** termina de agregarse, **Then** [NEEDS CLARIFICATION: ¿el Vendedor se queda en el Catálogo, con un aviso breve y cuántos productos lleva la venta (por ejemplo, en el menú de Vender), o pasa a Vender?]
+9. **E14** **Given** un producto agregado desde el Catálogo, **When** termina de agregarse, **Then** el Vendedor sigue en el Catálogo, con la misma búsqueda y en el mismo lugar de la lista; un aviso breve dice que se agregó, y el menú muestra en Vender cuántos productos lleva la venta (decisión 103).
+10. **E24** **Given** la venta en curso con productos, **When** se mira el menú desde cualquier parte, **Then** Vender muestra cuántos renglones lleva la venta; con la venta vacía (o recién cobrada) no muestra número.
 
 ---
 
@@ -109,8 +118,8 @@ que encuentra por nombre, por código y por marca.
 
 ### Functional Requirements
 
-- **RF-107**: En el Catálogo, cada producto muestra su stock: la cantidad con su unidad, o «Sin stock» si no tiene, distinto a la vista; y «Stock bajo» según el stock mínimo (E04). En el celular y en la computadora.
-- **RF-108**: Desde el Catálogo se agrega un producto a la venta en curso con un toque, con las mismas reglas que agregarlo en Vender (cantidad 1, suma si ya está, sin precio o sin stock entra igual); con el espejo, aparece en el otro dispositivo. Solo lo ve quien puede vender.
+- **RF-107**: En el Catálogo, cada producto muestra su stock: la cantidad con su unidad, o «Sin stock» si no tiene, distinto a la vista; y «Stock bajo» cuando exista el stock mínimo (RF-54). En el celular y en la computadora.
+- **RF-108**: Desde el Catálogo se agrega un producto a la venta en curso con un toque, con las mismas reglas que agregarlo en Vender (cantidad 1, suma si ya está, sin precio o sin stock entra igual); con el espejo, aparece en el otro dispositivo. Se sigue en el Catálogo, con un aviso breve, y el menú muestra en Vender cuántos productos lleva la venta. Solo lo ve quien puede vender.
 - **RF-109**: El Catálogo se filtra por disponibilidad (todos, con stock, sin stock) y por marca, junto con la búsqueda; los filtros se abren desde un botón y no ocupan lugar fijo arriba de la lista.
 - **RF-110**: Las pestañas del Catálogo tienen al menos 44 px de alto en el celular, y el buscador dice «Buscar productos, códigos o marcas…».
 
