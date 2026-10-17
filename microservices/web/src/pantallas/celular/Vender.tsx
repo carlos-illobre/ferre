@@ -26,7 +26,7 @@ import { AnularVentas, VentasDeHoy } from "./pantallas/VentasDeHoy";
 import { Pestanas } from "./Pestanas";
 import { SinPermiso } from "../SinPermiso";
 import type { Producto } from "./pantallas/Productos";
-import { FichaProducto } from "./Catalogo";
+import { FichaProducto } from "./FichaProducto";
 
 // La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
 // precio → cantidad → cobro. Enter agrega; Esc descarta ("no llevó"); F2 cobra. Cada
