@@ -56,9 +56,19 @@ export function Icono({ nombre, tam = 20, grosor = 2, className }: { nombre: key
 // Hoja: en el celular sube desde abajo; en la computadora es una ventana centrada. Cierra
 // tocando el fondo, con Escape o con el botón que le pase el contenido.
 const hojasAbiertas: (() => void)[] = [];
+// Mientras haya alguna hoja abierta, la pantalla de atrás no se desplaza (001, «Lo de atrás queda
+// quieto»): la página entera se traba y queda donde estaba. Se cuenta para las hojas apiladas.
+let trabas = 0;
+function useTrabarLoDeAtras() {
+  useEffect(() => {
+    if (trabas++ === 0) document.documentElement.classList.add("con-hoja");
+    return () => { if (--trabas === 0) document.documentElement.classList.remove("con-hoja"); };
+  }, []);
+}
 export function Hoja({ titulo, extra, alCerrar, children, testId }: { titulo?: ReactNode; extra?: ReactNode; alCerrar: () => void; children: ReactNode; testId?: string }) {
   // El botón de volver del celular cierra la hoja y deja la pantalla de abajo como estaba.
   useVolverCierra(alCerrar);
+  useTrabarLoDeAtras();
   useEffect(() => {
     // Con varias hojas apiladas (la ficha y, encima, una explicación), Escape cierra la de arriba.
     hojasAbiertas.push(alCerrar);
