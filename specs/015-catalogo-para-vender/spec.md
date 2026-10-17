@@ -1,0 +1,140 @@
+# Feature Specification: Catálogo para vender
+
+**Feature Branch**: `015-catalogo-para-vender`
+
+**Created**: 2026-10-17
+
+**Status**: Borrador  <!-- pasa a «Aprobada» cuando Carlos aprueba la especificación -->
+
+**Maquetas**: Pendientes  <!-- «Aprobadas» cuando Carlos elige, o «No lleva pantallas» -->
+
+**Input**: Carlos, el 2026-10-17, sobre una imagen de referencia del Catálogo: que entren el
+stock de cada producto, filtrar por disponibilidad y por marca, «Agregar» a la venta desde el
+Catálogo, las pestañas más altas y un buscador que diga qué busca. No entran: categorías,
+«Avisar» en los productos sin stock, un menú por producto, ordenar, ni el signo «+» en el margen.
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Saber si hay, sin salir del Catálogo (Priority: P1)
+
+El Vendedor busca un producto que le pide el cliente y, en la misma lista, ve cuánto hay. Hoy
+para saberlo tiene que ir a Depósito y buscarlo de nuevo.
+
+**Why this priority**: Es la pregunta que sigue a «¿cuánto sale?» en el mostrador: «¿tenés?».
+
+**Independent Test**: Con un producto con stock 12, otro con 0 y otro vendido por kilo con
+3,5 kg, buscarlos en el Catálogo y ver la cantidad de cada uno, en el celular y en la computadora.
+
+**Acceptance Scenarios**:
+
+1. **E01** **Given** un producto con stock 12 que se vende por unidad, **When** aparece en el Catálogo, **Then** dice «12 u.».
+2. **E02** **Given** un producto que se vende por kilo con 3,5 kg, **When** aparece en el Catálogo, **Then** dice «3,5 kg», con la unidad en que se vende.
+3. **E03** **Given** un producto con stock 0, o con stock que nunca se cargó, **When** aparece en el Catálogo, **Then** dice «Sin stock», de modo que se distinga a la vista de los que tienen.
+4. **E04** **Given** un producto con stock mínimo cargado y un stock igual o menor, **When** aparece en el Catálogo, **Then** dice su cantidad marcada como «Stock bajo». [NEEDS CLARIFICATION: el stock mínimo todavía no existe (RF-54, pendiente). ¿«Stock bajo» espera a que exista el mínimo, o se hace antes con otra regla?]
+5. **E05** **Given** el stock de un producto cambió en otro dispositivo (una venta, un ingreso, un ajuste), **When** se vuelve a mirar el Catálogo, **Then** muestra el stock nuevo, con la misma demora con que hoy se actualizan los precios.
+
+---
+
+### User Story 2 - Agregar a la venta desde el Catálogo (Priority: P1)
+
+El Vendedor encontró el producto en el Catálogo y lo agrega a la venta en curso con un toque,
+sin ir a Vender ni buscarlo otra vez. Si está trabajando en espejo con la computadora, lo
+agregado aparece también en la venta de la computadora.
+
+**Why this priority**: Ahorra buscar dos veces el mismo producto, que es lo más frecuente
+cuando el cliente pregunta primero y compra después.
+
+**Independent Test**: Con la venta vacía, agregar una mecha desde el Catálogo, agregarla otra
+vez, ir a Vender y ver un renglón de la mecha con cantidad 2.
+
+**Acceptance Scenarios**:
+
+1. **E06** **Given** la venta en curso vacía, **When** el Vendedor toca «Agregar» en una mecha del Catálogo, **Then** la mecha queda en la venta con cantidad 1, como si la hubiera agregado en Vender, y el Catálogo lo confirma a la vista sin perder la búsqueda ni el lugar en la lista.
+2. **E07** **Given** la mecha ya en la venta, **When** la agrega otra vez desde el Catálogo, **Then** no se abre otro renglón: se suma 1 a la cantidad (la regla de Vender).
+3. **E08** **Given** productos agregados desde el Catálogo, **When** el Vendedor va a Vender, **Then** están en la venta, con su precio, y la venta se cobra como cualquier otra.
+4. **E09** **Given** el celular y la computadora en espejo, **When** se agrega un producto desde el Catálogo de uno de los dos, **Then** aparece en la venta del otro.
+5. **E10** **Given** un producto sin precio (sin margen elegido), **When** se lo agrega, **Then** entra a la venta y la venta avisa «Hay productos sin precio» al cobrar, como en Vender.
+6. **E11** **Given** un producto sin stock, **When** se lo agrega, **Then** entra igual: la venta no se impide por falta de stock (la regla de Vender).
+7. **E12** **Given** alguien sin el permiso de vender, **When** mira el Catálogo, **Then** no ve «Agregar».
+8. **E13** **Given** el dispositivo sin conexión, **When** se agrega un producto desde el Catálogo, **Then** entra a la venta igual, como en Vender sin conexión.
+9. **E14** **Given** un producto agregado desde el Catálogo, **When** termina de agregarse, **Then** [NEEDS CLARIFICATION: ¿el Vendedor se queda en el Catálogo, con un aviso breve y cuántos productos lleva la venta (por ejemplo, en el menú de Vender), o pasa a Vender?]
+
+---
+
+### User Story 3 - Filtrar por disponibilidad y por marca (Priority: P2)
+
+Cuando el cliente pregunta «¿qué tenés de tal marca?» o «¿qué discos de corte tenés?», el
+Vendedor filtra la lista para ver solo lo que hay, o solo una marca.
+
+**Why this priority**: Ayuda a contestar rápido, pero buscar ya resuelve la mayoría de los casos.
+
+**Independent Test**: Con productos de dos marcas, algunos con stock y otros sin, buscar
+«disco», filtrar «Con stock» y una marca, y ver solo los que cumplen las dos cosas.
+
+**Acceptance Scenarios**:
+
+1. **E15** **Given** el Catálogo, **When** el Vendedor mira la lista sin filtrar, **Then** los filtros no ocupan un renglón fijo arriba de la lista: se abren desde un botón junto al buscador, y la lista empieza tan arriba como hoy.
+2. **E16** **Given** los filtros abiertos, **When** elige disponibilidad «Con stock», **Then** la lista muestra solo los productos con stock mayor que cero; con «Sin stock», solo los que no tienen; con «Todos», todos.
+3. **E17** **Given** los filtros abiertos, **When** elige una marca de la lista de marcas del catálogo, **Then** la lista muestra solo los productos de esa marca.
+4. **E18** **Given** una búsqueda escrita y filtros elegidos, **When** se mira la lista, **Then** muestra solo lo que cumple la búsqueda y todos los filtros, y la cantidad de productos que muestra.
+5. **E19** **Given** algún filtro elegido, **When** se mira el botón de filtros, **Then** se nota que hay filtros puestos y cuántos, y hay una forma de sacarlos todos de un toque.
+6. **E20** **Given** filtros que no dejan ningún producto, **When** se mira la lista, **Then** dice que no hay productos con esos filtros y ofrece sacarlos.
+
+---
+
+### User Story 4 - Pestañas cómodas y un buscador que dice qué busca (Priority: P3)
+
+Las pestañas Productos, Listas y Duplicados se tocan cómodas con el dedo, y el buscador dice
+que encuentra por nombre, por código y por marca.
+
+**Why this priority**: Es comodidad; no cambia lo que se puede hacer.
+
+**Independent Test**: Medir la altura de las pestañas en el celular y leer el buscador vacío.
+
+**Acceptance Scenarios**:
+
+1. **E21** **Given** el Catálogo en el celular, **When** se miden las pestañas Productos, Listas y Duplicados, **Then** cada una tiene al menos 44 px de alto, la medida mínima para tocar con el dedo.
+2. **E22** **Given** el buscador vacío, **When** se lo mira, **Then** dice «Buscar productos, códigos o marcas…».
+3. **E23** **Given** una marca escrita en el buscador, **When** se busca, **Then** aparecen los productos de esa marca (lo que el buscador promete).
+
+### Edge Cases
+
+- Un producto con stock negativo por un ajuste viejo: se muestra como «Sin stock», nunca con
+  un número negativo (el stock no baja de 0, regla de Ventas).
+- Un catálogo de 11.000 productos: el stock y los filtros no hacen más lenta la búsqueda que hoy.
+- Una marca escrita distinto por dos proveedores («3M» y «3m»): en la lista de marcas figura una sola vez.
+- Un producto sin marca: no figura en ninguna marca, y sí con el filtro de marca sin elegir.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **RF-107**: En el Catálogo, cada producto muestra su stock: la cantidad con su unidad, o «Sin stock» si no tiene, distinto a la vista; y «Stock bajo» según el stock mínimo (E04). En el celular y en la computadora.
+- **RF-108**: Desde el Catálogo se agrega un producto a la venta en curso con un toque, con las mismas reglas que agregarlo en Vender (cantidad 1, suma si ya está, sin precio o sin stock entra igual); con el espejo, aparece en el otro dispositivo. Solo lo ve quien puede vender.
+- **RF-109**: El Catálogo se filtra por disponibilidad (todos, con stock, sin stock) y por marca, junto con la búsqueda; los filtros se abren desde un botón y no ocupan lugar fijo arriba de la lista.
+- **RF-110**: Las pestañas del Catálogo tienen al menos 44 px de alto en el celular, y el buscador dice «Buscar productos, códigos o marcas…».
+
+### Key Entities *(include if feature involves data)*
+
+- **Producto**: su stock y su unidad de venta, que ya existen; no se guarda nada nuevo.
+- **Venta en curso**: la misma de Vender, compartida con el espejo; el Catálogo le agrega renglones.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: El Vendedor sabe si hay un producto sin salir del Catálogo: cero pantallas extra (hoy, ir a Depósito y buscarlo de nuevo).
+- **SC-002**: Agregar a la venta un producto encontrado en el Catálogo lleva un toque, en lugar de ir a Vender y buscarlo otra vez.
+- **SC-003**: Sin filtros, la lista muestra al menos tantos productos en la pantalla del celular como hoy.
+- **SC-004**: Buscar con stock y filtros responde tan rápido como hoy, con 11.000 productos.
+
+## Assumptions
+
+- El stock es el mismo que muestra Depósito (capacidad 005); el Catálogo solo lo muestra.
+- La computadora tiene los mismos cambios que el celular, adaptados a su tabla (decisión 47): una
+  columna o dato de stock, «Agregar» y los filtros; las pestañas ya son cómodas en la computadora.
+- Agregar sigue las reglas de agregar en Vender (capacidad 003); no hay reglas nuevas de venta.
+- «Agregar» no pide cantidad: se ajusta después en Vender, como cuando se agrega allá.
+- Los filtros no se recuerdan al cerrar la aplicación.
+- No entran (Carlos, 2026-10-17): categorías, «Avisar» en los productos sin stock, un menú por
+  producto, ordenar la lista, ni el signo «+» en el margen.

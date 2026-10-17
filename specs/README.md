@@ -183,6 +183,15 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-104 | Un cambio aceptado se registra a nombre de quien lo hizo, con su fecha y hora; el registro dice quién lo aceptó o descartó | [014-cambios-apartados](014-cambios-apartados/spec.md) |
 | RF-105 | Lo apartado lo ve y lo decide solo quien tiene «Administrar usuarios»; con ese permiso, Anomalías aparece en Más | [014-cambios-apartados](014-cambios-apartados/spec.md) |
 
+### Catálogo para vender
+
+| ID | Requerimiento | Especificación |
+|---|---|---|
+| RF-107 | En el Catálogo, cada producto muestra su stock: la cantidad con su unidad, «Sin stock» o «Stock bajo» | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
+| RF-108 | Desde el Catálogo se agrega un producto a la venta en curso con un toque, con las reglas de Vender y el espejo | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
+| RF-109 | El Catálogo se filtra por disponibilidad y por marca, desde un botón, sin lugar fijo arriba de la lista | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
+| RF-110 | Las pestañas del Catálogo miden al menos 44 px de alto en el celular, y el buscador dice «Buscar productos, códigos o marcas…» | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
+
 ## Requerimientos no funcionales
 
 Los que son reglas generales están además en la constitución.

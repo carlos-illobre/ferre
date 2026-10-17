@@ -783,6 +783,26 @@ RF-81:
   defectos:
     - "Cualquier usuario puede marcar resuelto o reabrir: no hay un permiso para eso"
 
+RF-107:
+  estado: "Nuevo (015): especificación en borrador, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-108:
+  estado: "Nuevo (015): especificación en borrador, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-109:
+  estado: "Nuevo (015): especificación en borrador, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-110:
+  estado: "Nuevo (015): especificación en borrador, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
 RNF-01:
   estado: "A validar en el piloto (#21)"
   pruebas: []
