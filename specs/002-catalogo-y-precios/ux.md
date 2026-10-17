@@ -55,7 +55,8 @@ existe. Si hay más de un proveedor, que se note.
 atajos de margen funcionan sobre el resultado elegido sin sacar el foco de la búsqueda.
 
 **Celular:** la caja de búsqueda queda fija a la vista mientras se recorren los resultados;
-tocar un resultado abre su ficha.
+tocar un resultado abre su ficha. Al lado de la caja, el botón de escanear y el de los filtros tienen el
+mismo tamaño y el mismo redondeo (Carlos, 2026-10-17).
 
 **Estados:**
 
