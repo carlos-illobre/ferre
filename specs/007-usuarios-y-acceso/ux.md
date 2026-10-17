@@ -177,8 +177,8 @@ y dice que entrar necesita internet.
 **Qué necesita a la vista, en los dos:** con quién trabaja («Conectado con…»); si el otro
 no está abierto («trabajás solo acá»); si están separados («Desconectados: cada uno por su lado»); y
 un solo botón (decisión 73): «Vincular» si no hay vínculo, «Desconectar» si trabajan juntos y
-«Reconectar» si están separados. «Desvincular» está solo en Más → Usuarios, pestaña Sesiones, en los dos, y
-pregunta antes (decisión 74).
+«Reconectar» si están separados. «Desvincular» está solo en Más → Configuración, en los dos, y
+pregunta antes (decisiones 74 y 99).
 En la computadora el estado y el botón van en el menú lateral; el botón lleva a la izquierda el
 mismo ícono que en el celular (dos flechas que se alejan para «Desconectar», dos que se acercan
 para «Reconectar»).
@@ -190,10 +190,11 @@ avisa un momento en la línea de arriba, la del estado de la conexión. «Vincul
 computadora (decisión 63). En Más, mientras no esté vinculado, el primer renglón es «Vincular con
 la computadora».
 
-**El bloque «Vínculo entre celular y computadora»,** en Más → Usuarios, pestaña Sesiones (decisión 74):
-a quien está vinculado le dice con qué dispositivo y le ofrece «Desvincular»; a quien tiene
-«Administrar sesiones» le muestra además cuántos días dura el vínculo, para cambiarlos. Quien no
-está vinculado ni administra sesiones no ve el bloque.
+**El bloque «Vínculo entre celular y computadora»,** en Más → Configuración (decisiones 74 y 99):
+a quien está vinculado le dice con qué dispositivo y le ofrece «Desvincular». Quien no está
+vinculado no ve el bloque. **Cuántos días dura el vínculo** vale para todo el negocio: está solo
+en Más → Usuarios, pestaña Sesiones, para quien tiene «Administrar sesiones», que lo cambia ahí;
+Configuración no lo muestra.
 Sin celular emparejado, la computadora muestra en el menú «Vincular el celular», siempre.
 
 **Reglas:**
@@ -220,12 +221,14 @@ Depósito, en este orden:
 | Pestaña | Qué tiene | Quién la ve |
 |---|---|---|
 | **Usuarios** | Los usuarios autorizados y autorizar a alguien (Historia 2) | «Administrar usuarios» |
-| **Sesiones** | Las sesiones abiertas (Historia 5), mis celulares con huella (Historia 4) y el vínculo entre celular y computadora (Historia 1c) | Cualquier usuario; cada bloque, con su propio permiso |
+| **Sesiones** | Las sesiones abiertas de todos (Historia 5), los celulares con huella de las demás personas (Historia 4) y cuántos días dura el vínculo entre celular y computadora (Historia 1c) | «Administrar sesiones» |
 | **Roles** | Los roles y armar uno (Historia 3b) | «Administrar roles» |
 | **Quién hizo qué** | El registro de acciones (Historia 6) | «Ver quién hizo qué» |
 
 - Cada uno ve solo las pestañas que su rol le permite, y la opción entra en la primera que
-  ve. Como Sesiones la ve cualquiera, «Usuarios» está siempre en Más.
+  ve. Quien no ve ninguna no tiene «Usuarios» en Más.
+- Lo que cada persona decide para sí misma está en Más → Configuración, no acá: sus celulares
+  con huella y su vínculo entre celular y computadora (decisión 99). Nada figura en los dos lugares.
 - En el celular la cuarta pestaña dice «Actividad», porque el nombre largo no entra; cada
   pestaña lleva su ícono arriba del nombre. En la computadora dice «Quién hizo qué».
 - Las pestañas no llevan atajo Alt (los números ya son del menú y de Depósito): en la
@@ -380,8 +383,8 @@ borrar el que nadie tiene.
 **Quién:** cualquier usuario.
 
 **Qué tiene que poder hacer:** aceptar o dejar pasar la oferta; ver sus celulares
-vinculados; vincular el que tiene en la mano; quitar uno. El Administrador, además, quitar
-el de otro usuario.
+vinculados; vincular el que tiene en la mano; quitar uno. Quien tiene «Administrar sesiones»,
+además, quitar el de otro usuario.
 
 **La oferta (solo en el celular):**
 
@@ -396,7 +399,7 @@ el de otro usuario.
 - Si la huella no se lee, dice que se puede vincular después y dónde, y la oferta vuelve a
   aparecer en la próxima entrada con Google.
 
-**Mis celulares vinculados (celular y computadora):**
+**Mis celulares vinculados (celular y computadora),** en Más → Configuración (decisión 99):
 
 - Por cada uno: el nombre que le puso, cuándo se vinculó y cuándo se usó por última vez.
 - Cuál es el dispositivo que tiene en la mano, si está en la lista.
@@ -406,8 +409,9 @@ el de otro usuario.
 - Quitar uno es un paso, y dice después que ese celular ya no entra con la huella.
 - Todo usuario llega a su lista desde el celular y desde la computadora.
 
-**Celulares de otros (Administrador):** junto a cada usuario, sus celulares vinculados con
-la misma información y la posibilidad de quitarlos. Es la respuesta a un celular perdido,
+**Celulares de otros («Administrar sesiones»),** en Más → Usuarios, pestaña Sesiones: junto a
+cada usuario, sus celulares vinculados con la misma información y la posibilidad de quitarlos.
+Los propios no figuran ahí, porque están en Configuración. Es la respuesta a un celular perdido,
 junto con cerrar sus sesiones.
 
 **Estados:**
@@ -424,22 +428,21 @@ junto con cerrar sus sesiones.
 
 ## Historia 5: sesiones
 
-**Quién:** quien tiene «Administrar sesiones» para ver y cerrar las de todos; cualquier usuario para salir de la
-suya.
+**Quién:** quien tiene «Administrar sesiones» para ver y cerrar las de todos, en Más → Usuarios,
+pestaña Sesiones; cualquier usuario para salir de la suya, con «Salir».
 
 **Qué necesita a la vista el Administrador:**
 
 - Por cada sesión abierta: de quién es, en qué dispositivo y cuándo se usó por última vez.
   Ordenadas de la usada más recientemente a la más vieja.
-- Cuál es la suya en ese dispositivo, señalada con texto y no solo con color.
+- La suya en ese dispositivo no figura: se cierra con «Salir», que no se repite en la lista
+  (decisión 99). Sus sesiones en otros dispositivos sí figuran.
 
 **Reglas:**
 
-- Cerrar la propia se distingue a la vista de cerrar las demás, porque lo saca de la app.
-  La diferencia no depende solo del color.
 - Cerrar una sesión de otro la quita de la lista en el momento y deja al Administrador
   donde estaba.
-- Cerrar la propia, o «Salir», lleva a la entrada.
+- «Salir» lleva a la entrada.
 - «Salir» está al alcance de cualquier usuario desde cualquier parte, en un paso.
 - El dispositivo al que le cerraron la sesión vuelve solo a la entrada, con «Hay que iniciar
   sesión»: con la aplicación abierta y conexión, en menos de 30 segundos, sin que nadie toque
@@ -451,7 +454,7 @@ suya.
 
 | Estado | Qué se ve |
 |---|---|
-| Vacío | No existe: siempre figura al menos la propia |
+| Vacío | Que no hay otras sesiones abiertas |
 | Cargando | Que la lista se está trayendo |
 | Éxito | La lista sin la sesión cerrada |
 | Error | Que no se pudo cerrar, con la sesión en la lista y reintento |

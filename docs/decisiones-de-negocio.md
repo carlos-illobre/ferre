@@ -759,3 +759,19 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     En el celular, debajo de «Autorizar otro correo de Google», y se saca la cabecera «Usuarios
     autorizados» con cuántos son, porque ocupaba lugar; en la computadora, arriba de la tabla.
     Maquetas aprobadas el 2026-10-17 (007-T033, `specs/007-usuarios-y-acceso/ux.md`).
+
+99. **Configuración tiene lo que cada persona decide para sí; Sesiones, lo que administra otro**
+    (2026-10-17). Carlos pidió pasar a Configuración lo que es propio del usuario y de su
+    dispositivo, sin opciones repetidas:
+    - A Más → Configuración, en el celular y en la computadora: los celulares con huella propios
+      (vincular este, quitar uno) y el vínculo entre celular y computadora (con qué dispositivo,
+      «Desvincular»).
+    - Queda en Más → Usuarios, pestaña Sesiones, solo para «Administrar sesiones»: las sesiones
+      abiertas de todos y cerrarlas, los celulares con huella de las demás personas y quitarlos,
+      y cuántos días dura el vínculo. Es la respuesta a un celular perdido.
+    - Nada figura en los dos lugares: la sesión del propio dispositivo sale de la lista (se cierra
+      con «Salir»), los celulares propios no figuran en Sesiones y los días del vínculo no figuran
+      en Configuración.
+    - Quien no tiene ninguna pestaña de Usuarios no ve «Usuarios» en Más (antes estaba siempre,
+      porque Sesiones la veía cualquiera; cambia la decisión 88).
+    - Carlos aprobó la regla escrita el 2026-10-17. RF-70b, RF-74 y RF-77 en 007; RF-106 en 009.

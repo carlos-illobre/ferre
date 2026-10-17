@@ -760,6 +760,7 @@ RF-74:
   defectos:
     - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
     - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
+    - "La sesión del propio dispositivo todavía figura en la lista de Sesiones, que además ve cualquiera (decisión 99; 009-T006)"
 
 RF-80:
   estado: "Hecho (pedido directo de Carlos)"
@@ -1162,6 +1163,10 @@ RF-96:
   pruebas:
     - microservices/web/src/version-nueva-cada.test.tsx
     - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
+  defectos: []
+RF-106:
+  estado: "Pendiente (009-T006): lo propio pasa de Sesiones a Configuración; maquetas a aprobar por Carlos"
+  pruebas: []
   defectos: []
 
 RF-97:
