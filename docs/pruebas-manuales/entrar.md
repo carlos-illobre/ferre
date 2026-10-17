@@ -25,44 +25,49 @@ Unitarias (corren en cada subida, en segundos; las de la aplicación en `microse
 |---|---|
 | A1, B2, B4, B5, B7, C1, C2, D1 | De punta a punta: `01-login` (celular y computadora) |
 | A2, A3, A4, A5 (Google simulado) | Unitarias: `pantallas/entrar-simulado.test.tsx` y, en el servidor, `rutas/entrar-con-google.test.ts` |
+| A2, A8 («Conectando tu cuenta de Google») | Unitarias: `celular/ConectandoConGoogle.test.tsx` |
 | A6, A7 | Servidor: `rutas/entrar-con-google.test.ts` y `rutas/usuarios.test.ts` |
 | B1, B3, B4, B5 (huella simulada) | Unitarias: `pantallas/entrar-simulado.test.tsx` |
+| B5b | Servidor: `rutas/credenciales.test.ts` |
 | B6, C7 | Servidor: `rutas/credenciales.test.ts` y `rutas/sesiones.test.ts` |
 | C3, C5, C8, C9 (cámara simulada) | Unitarias: `celular/EntrarEnLaCompu.test.tsx`; en el servidor, `rutas/sesiones.test.ts` |
 | C8, C10 | Unitarias: `compu/base/pantallas/Entrar.test.tsx` |
 | C11 | De punta a punta: `17-espejo` |
 | D2 | De punta a punta: `08-sin-conexion` |
-| D3 | De punta a punta: `12-cerrar-sesion` |
-| D4, D5, D6 | Unitarias: `sesion.test.tsx` y `compu/base/pantallas/Entrar.test.tsx`; en el servidor, `rutas/usuarios.test.ts` |
+| D3, D3b | De punta a punta: `12-cerrar-sesion` |
+| D4, D5, D6 (los 30 segundos) | Unitarias: `sesion.test.tsx` y `compu/base/pantallas/Entrar.test.tsx`; en el servidor, `rutas/usuarios.test.ts` |
+| D7 | Unitarias: `cola.test.ts`; de punta a punta: `19-para-revisar` |
 
 ## Antes de empezar
 
 - Una cuenta de Google **autorizada** y otra que **no** esté cargada en Más → Usuarios.
 - Un segundo usuario autorizado, para desactivarlo.
 - Un celular con lector de huella y una computadora.
-- Para los casos de «primera vez» con la huella, quitar antes la del celular (Más → Usuarios → Sesiones).
+- Para los casos de «primera vez» con la huella, quitar antes la del celular (Más → Configuración, «Mis celulares con huella»).
 
 ## A. Con Google
 
 | # | Pasos | Qué tiene que pasar |
 |---|---|---|
 | A1 | Celular sin sesión: abrir la aplicación | Solo ofrece entrar, con Google o con la huella; no hay contraseña (1·1) |
-| A2 | Celular: «Continuar con Google» con la cuenta autorizada | Entra y muestra el nombre (1·2) |
+| A2 | Celular: «Continuar con Google» con la cuenta autorizada | Al volver de Google se ve enseguida «Conectando tu cuenta de Google», con sus pasos, hasta que la sesión queda abierta; después, el Catálogo, con su nombre (1·2) |
 | A3 | Seguido de A2, en un celular que nunca se vinculó | Ofrece «¿Entrar con la huella?», con aceptar o dejarlo para después (4·1) |
 | A4 | Computadora: «Continuar con Google» con la cuenta autorizada | Entra; **no** ofrece vincular la huella (4·5) |
 | A5 | Celular o computadora: entrar con la cuenta **no autorizada** | No entra; muestra el correo, dice «No autorizado» y a quién pedirle el alta (1·3) |
 | A6 | Desactivar al segundo usuario y entrar con su cuenta | Igual que A5 (1·4) |
 | A7 | Reactivarlo y volver a entrar | Entra (2·9) |
+| A8 | Celular: «Continuar con Google» y cerrar la ventana de Google sin elegir cuenta | «Conectando tu cuenta de Google» desaparece a los pocos segundos y vuelve la entrada |
 
 ## B. Con la huella
 
 | # | Pasos | Qué tiene que pasar |
 |---|---|---|
-| B1 | En la oferta de A3, aceptar y apoyar el dedo | Lo confirma, y el celular aparece en Más → Usuarios → Sesiones con su nombre y la fecha (4·2) |
+| B1 | En la oferta de A3, aceptar y apoyar el dedo | Lo confirma, y el celular aparece en Más → Configuración, «Mis celulares con huella», con su nombre y la fecha (4·2) |
 | B2 | Salir y volver a entrar con Google en ese celular | **No** vuelve a ofrecer la huella (4·3) |
-| B3 | Aceptar la oferta pero cancelar la lectura del dedo | Avisa que se puede vincular después y dónde (4·4) |
+| B3 | Aceptar la oferta pero cancelar la lectura del dedo | Avisa que se puede vincular después, desde Más → Configuración (4·4) |
 | B4 | Celular vinculado: «Salir» → «Entrar con la huella» → dedo | Entra sin elegir cuenta ni escribir nada (4·8) |
-| B5 | Quitar ese celular de la lista y probar con la huella | No entra; dice que el celular no está vinculado y que entre con Google (4·9) |
+| B5 | Quitarlo en Más → Configuración, «Mis celulares con huella», salir y probar con la huella | No entra; dice que el celular no está vinculado y que entre con Google (4·9) |
+| B5b | Quien tiene «Administrar usuarios», en otro dispositivo: Más → Usuarios, tarjeta de la persona, quitar su celular | Ese celular deja de entrar con la huella (4·11) |
 | B6 | Vincular la huella del segundo usuario, desactivarlo y probar | No entra (4·12) |
 | B7 | Computadora nunca vinculada: mirar la entrada | **No** ofrece «Entrar con la huella» (4b·10) |
 
@@ -89,9 +94,11 @@ Unitarias (corren en cada subida, en segundos; las de la aplicación en `microse
 | D1 | Con sesión, cerrar la aplicación y volver a abrirla | Entra directo, sin Google ni huella (1·6) |
 | D2 | Con sesión y en modo avión, abrir la aplicación | Abre igual y deja buscar y vender (1·8) |
 | D3 | «Salir» | Vuelve a la entrada; al abrir de nuevo, no entra solo (5·6) |
-| D4 | Desde otro dispositivo, Más → Usuarios → Sesiones: cerrar la sesión del primero | El primero, en su próximo movimiento, vuelve solo a la entrada (5·4) |
-| D5 | Igual que D4, con el primero en modo avión mientras se cierra | Al volver la conexión, vuelve solo a la entrada (1·9) |
-| D6 | Desactivar a un usuario con sesión abierta | Se le cierra la sesión y no vuelve a entrar ni con Google ni con la huella (2·8) |
+| D3b | Quien administra abre su propia tarjeta en Más → Usuarios | La sesión de ese dispositivo no figura (se cierra con «Salir»); las de sus otros dispositivos sí (5·2) |
+| D4 | Con la aplicación abierta en el primero, sin tocarlo: desde otro dispositivo, Más → Usuarios, tarjeta de la persona, cerrar esa sesión | En menos de 30 segundos, sin que nadie toque nada, el primero vuelve solo a la entrada con «Hay que iniciar sesión»; si estaba en otra ventana, apenas se vuelve a la aplicación (5·4) |
+| D5 | Igual que D4, con el primero en modo avión mientras se cierra | Mientras no tiene conexión sigue trabajando; al volver, en menos de 30 segundos vuelve solo a la entrada (5·4b) |
+| D6 | Desactivar a un usuario con la aplicación abierta | En menos de 30 segundos su dispositivo vuelve solo a la entrada, y no vuelve a entrar ni con Google ni con la huella (2·8) |
+| D7 | Con la sesión de A en un celular y sin red, cobrar una venta; cerrarle la sesión desde otro dispositivo; volver la red y entrar con B en ese celular | La venta de A no sale a nombre de B. Si A sigue activa, queda en el celular y sale cuando A vuelve a entrar ahí; si a A la desactivaron, queda apartada para que un Administrador decida (5·4d, 014) |
 
 ## Lo que no se prueba a mano
 
