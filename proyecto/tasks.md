@@ -288,4 +288,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T123 [agente] Pasar al repositorio cómo pide Carlos los cambios de interfaz
 - [x] T124 [agente] Los agentes piden permiso a Carlos antes de usar un sitio de internet que no está permitido
 - [x] T125 [agente] Las pruebas de punta a punta corren más rápido: una conexión a la base, celular y computadora a la vez, sin esperas fijas y sin reconstruir la web si no cambió
-- [ ] T126 [agente] Lo que un usuario hizo sin conexión y no llegó al servidor antes de que lo desactivaran: sube al servidor apartado y se revisa en Más → Anomalías, «Para revisar», con «Administrar usuarios» (decisión 97). Funcionalidad nueva `specs/014-cambios-apartados/`: especificación aprobada por Carlos el 2026-10-17; maquetas A y B esperando que elija
+- [x] T126 [agente] Lo que un usuario hizo sin conexión y no llegó al servidor antes de que lo desactivaran: sube al servidor apartado y se revisa en Más → Anomalías, «Para revisar», con «Administrar usuarios» (decisión 97). Funcionalidad nueva `specs/014-cambios-apartados/`: especificación aprobada por Carlos el 2026-10-17; maqueta aprobada el mismo día; programada y revisada (revision.md)

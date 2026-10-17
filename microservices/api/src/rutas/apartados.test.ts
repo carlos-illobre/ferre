@@ -120,7 +120,23 @@ describe("Para revisar: listar, aceptar y descartar", () => {
     expect(base.actual.sqlDe(/insert into "evento"/).some((e) => e.params.includes("apartado.descartado"))).toBe(true);
   });
 
-  it("014-E08 014-E19: si la ruta no lo acepta (aquí, Ana ya no tiene el permiso), no se registra, sigue apartado y dice por qué", async () => {
+  it("014-E01: la sesión cerrada sirve para subir hasta 30 días después de cerrada", async () => {
+    sesionDeAna(false);
+    await subir({ cambios: [cambio()] });
+    expect(base.actual.sqlDe(/FROM usuario u JOIN sesion s/)[0]!.sql).toMatch(/COALESCE\(s\.revocada_en, s\.expira_en\) > now\(\) - interval '30 days'/);
+  });
+
+  it("014-E08: una venta de un producto que se unió con otro no se registra, sigue apartada y dice con cuál se unió", async () => {
+    programarPendiente({ ...pendiente, cuerpo: { ...VENTA, items: [{ producto_id: PRODUCTO, descripcion: "Tornillo 8x1", cantidad: 3, precio_unitario: 1400 }] } }); ana();
+    base.actual.programar(/FROM producto p LEFT JOIN producto r ON r.id = p.reemplazado_por/, (p) => ({ rows: (p[0] as string[]).includes(PRODUCTO) ? [{ descripcion: "Tornillo 8x1", reemplazo: "Tornillo autoperf. 8x1 punta mecha" }] : [] }));
+    const r = await pedir(app, "POST", "/apartados/apa-1/aceptar", { rol: "admin" });
+    expect(r.status).toBe(409);
+    expect(((await r.json()) as { error: string }).error).toBe("No se pudo aceptar: «Tornillo 8x1» se unió con «Tornillo autoperf. 8x1 punta mecha». Si querés, descartalo y cargalo de nuevo");
+    expect(base.actual.sqlDe(/insert into "venta"/)).toHaveLength(0);
+    expect(base.actual.sqlDe(/update "cambio_apartado" set "error"/)).toHaveLength(1);
+  });
+
+  it("014-E19: si la ruta no lo acepta (aquí, Ana ya no tiene el permiso), no se registra, sigue apartado y dice por qué", async () => {
     programarPendiente(); ana([]);
     const r = await pedir(app, "POST", "/apartados/apa-1/aceptar", { rol: "admin" });
     expect(r.status).toBe(409);

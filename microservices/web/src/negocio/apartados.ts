@@ -16,11 +16,12 @@ export function useParaRevisar(activo = true) {
   return useDelServidor<CambiosParaRevisar>(CLAVE, "/apartados", { activo });
 }
 
-// Aceptar o descartar uno. Si falla, el error dice por qué (lo dice el servidor) y la lista se
-// vuelve a pedir igual: puede que otra persona ya lo haya decidido.
+// Aceptar o descartar uno. Si sale bien, la lista se vuelve a pedir y el cambio se va. Si no,
+// el error dice por qué (lo dice el servidor: no se pudo aplicar, u otra persona ya lo decidió) y
+// la lista no se vuelve a pedir: la tarjeta queda con el motivo a la vista hasta que se actualice.
 export async function decidir(id: string, decision: "aceptar" | "descartar"): Promise<void> {
-  try { await api(`/apartados/${id}/${decision}`, { method: "POST" }); }
-  finally { await consultas.invalidateQueries({ queryKey: CLAVE }); }
+  await api(`/apartados/${id}/${decision}`, { method: "POST" });
+  await consultas.invalidateQueries({ queryKey: CLAVE });
 }
 
 // De a una persona, en el orden en que llegaron sus cambios.
@@ -50,7 +51,7 @@ type CambioDeProducto = { margen_elegido?: number | null; unidad?: string; codig
 
 export function describir(c: CambioApartado): Descripcion {
   const llego = mismoDia(c.hecho_en, c.llegado_en) ? `llegó a las ${hora(c.llegado_en)}` : `llegó el ${diaYHora(c.llegado_en)}`;
-  const cuando = (verbo: string) => `${verbo} el ${diaYHora(c.hecho_en)} · ${llego}`;
+  const cuando = (verbo: string | null) => `${verbo ? `${verbo} el` : "El"} ${diaYHora(c.hecho_en)} · ${llego}`;
   const producto = c.producto ?? "un producto que ya no está";
   if (c.tipo === "venta") {
     const v = (c.cuerpo ?? {}) as Venta;
@@ -69,7 +70,7 @@ export function describir(c: CambioApartado): Descripcion {
   }
   if (c.tipo === "stock.ajuste") {
     const a = (c.cuerpo ?? {}) as Ajuste;
-    return { titulo: "Ajuste de stock", resumen: producto, renglones: [[`Hay ${numero(a.cantidad_real)}`, a.motivo ? `«${a.motivo}»` : null].filter(Boolean).join(" · ")], cuando: cuando("Hecho") };
+    return { titulo: "Ajuste de stock", resumen: producto, renglones: [[`Hay ${numero(a.cantidad_real)}`, a.motivo ? `«${a.motivo}»` : null].filter(Boolean).join(" · ")], cuando: cuando(null) };
   }
   if (c.tipo === "producto.cambio") {
     const p = (c.cuerpo ?? {}) as CambioDeProducto;
@@ -80,11 +81,11 @@ export function describir(c: CambioApartado): Descripcion {
       "proveedor_preferido_id" in p ? "Otro proveedor preferido" : null,
       "foto_url" in p ? "Otra foto" : null,
     ].filter((r): r is string => Boolean(r));
-    return { titulo: "Cambio de producto", resumen: producto, renglones, cuando: cuando("Hecho") };
+    return { titulo: "Cambio de producto", resumen: producto, renglones, cuando: cuando(null) };
   }
   if (c.tipo === "conteo.renglon") {
     const r = (c.cuerpo ?? {}) as { cantidad?: number };
-    return { titulo: "Conteo", resumen: producto, renglones: [c.metodo === "DELETE" ? "Sacó el renglón del conteo" : `Contó ${numero(r.cantidad)}`], cuando: cuando("Hecho") };
+    return { titulo: "Conteo", resumen: producto, renglones: [c.metodo === "DELETE" ? "Sacó el renglón del conteo" : `Contó ${numero(r.cantidad)}`], cuando: cuando(null) };
   }
-  return { titulo: c.tipo, resumen: null, renglones: [], cuando: cuando("Hecho") };
+  return { titulo: c.tipo, resumen: null, renglones: [], cuando: cuando(null) };
 }

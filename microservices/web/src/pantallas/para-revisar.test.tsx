@@ -40,7 +40,7 @@ describe("Para revisar", () => {
   it("014-E05 muestra cada cambio agrupado por persona, con qué es, cuándo lo hizo, cuándo llegó y desde qué dispositivo", async () => {
     render(<ParaRevisar />);
     const ana = await screen.findByRole("region", { name: "Ana López" });
-    expect(ana.textContent).toContain("desactivada el 17/10 a las 09:12 · desde «celular del mostrador»");
+    expect(ana.textContent).toContain("sesión cerrada el 17/10 a las 09:12 · desde «celular del mostrador»");
     const [venta, ajuste] = within(ana).getAllByTestId("apartado");
     expect(venta!.textContent).toContain("Venta · $27.000 · Efectivo");
     expect(venta!.textContent).toContain("2 × Candado bronce 40 mm — $22.000");
@@ -72,14 +72,17 @@ describe("Para revisar", () => {
     // El motivo de la última vez, que guardó el servidor.
     const beto = await screen.findByRole("region", { name: "Beto" });
     expect(within(beto).getByTestId("error-de-apartado").textContent).toBe("No se pudo aceptar: el producto se unió con otro");
-    // Y lo que dice el servidor ahora (por ejemplo, que otra persona ya lo decidió).
+    // Y lo que dice el servidor ahora: otra persona ya lo decidió, así que ya no está en la lista
+    // del servidor. La tarjeta no se va: queda con el motivo a la vista.
     apiFalsa.mockImplementation(async (ruta: string, opciones?: { method?: string }) => {
-      if (opciones?.method === "POST") throw new ErrorApi(409, "Ya se decidió: lo aceptó Marta");
+      if (opciones?.method === "POST") { lista = lista.filter((c) => (c as { id: string }).id !== "apa-1"); throw new ErrorApi(409, "Ya se decidió: lo aceptó Marta"); }
       return ruta === "/apartados" ? { apartados: lista } : {};
     });
     const ana = screen.getByRole("region", { name: "Ana López" });
     fireEvent.click(within(ana).getAllByTestId("aceptar-apartado")[0]!);
     expect((await within(ana).findByTestId("error-de-apartado")).textContent).toBe("Ya se decidió: lo aceptó Marta");
+    await act(async () => { await new Promise((r) => setTimeout(r, 50)); });
+    expect(within(ana).getByTestId("error-de-apartado").textContent).toBe("Ya se decidió: lo aceptó Marta");
   });
 
   it("014-E10 sin nada para revisar, lo dice", async () => {

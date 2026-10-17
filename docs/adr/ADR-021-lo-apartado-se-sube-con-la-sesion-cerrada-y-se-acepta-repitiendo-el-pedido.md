@@ -25,9 +25,9 @@ Hay dos problemas técnicos:
 ## Decisión
 
 1. **La subida se autentica con el token de la sesión cerrada.** El dispositivo conserva el
-   token que el servidor acaba de rechazar y lo usa una sola vez para `POST /apartados`. El
-   servidor lo acepta solo si el token es de una sesión que existe y cuyo usuario está
-   desactivado. Si el usuario sigue activo (le cerraron la sesión a distancia), contesta 409 y
+   token que el servidor acaba de rechazar y lo usa para `POST /apartados` (de a 200 cambios). El
+   servidor lo acepta solo si el token es de una sesión que existe, cerrada o vencida hace menos
+   de 30 días, y cuyo usuario está desactivado. Si el usuario sigue activo (le cerraron la sesión a distancia), contesta 409 y
    el dispositivo se queda con lo suyo hasta que la persona vuelva a entrar. Ese token no sirve
    para ninguna otra ruta.
 2. **Solo se aparta lo que la cola sabe mandar.** Cada cambio subido tiene que ser de un tipo
@@ -52,4 +52,10 @@ Hay dos problemas técnicos:
 - Un cambio nuevo en la cola (otro tipo) tiene que agregarse a la lista de tipos que se pueden
   apartar; si no, el servidor lo rechaza y queda en el dispositivo.
 - El token de una sesión cerrada queda guardado en el dispositivo hasta que la subida termina.
-  Solo sirve para subir lo apartado de una persona desactivada, que después revisa alguien.
+  Solo sirve para subir lo apartado de una persona desactivada, hasta 30 días después de cerrada
+  la sesión, y lo subido no se aplica hasta que alguien lo revisa.
+- El pedido repetido se confirma en su propia transacción, antes de marcar la decisión. Si marcar
+  la decisión fallara justo después, el cambio quedaría aplicado y todavía pendiente; aceptarlo de
+  nuevo no duplica una venta (tiene su id), pero sí podría repetir un «no llevó».
+- Antes de repetir, se mira que ningún producto del cambio se haya unido con otro o dado de baja:
+  la ruta original no lo controla, y una venta vieja no debe quedar en un producto que ya no se usa.

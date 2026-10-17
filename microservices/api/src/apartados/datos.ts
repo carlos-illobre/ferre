@@ -5,9 +5,10 @@ import type { CambioParaApartar } from "../contratos/apartados.js";
 
 // Lo apartado: el acceso a los datos (ADR-018).
 
-// La sesión de un token, aunque esté cerrada, y si su usuario sigue activo.
+// La sesión de un token, aunque esté cerrada, y si su usuario sigue activo. Sirve hasta 30 días
+// después de cerrada (o de vencida): después, lo que haya quedado en el dispositivo ya no sube.
 export const sesionDelToken = (e: Ejecutor, tokenHash: string) =>
-  sql<{ id: string; usuario_id: string; activo: boolean }>`SELECT s.id, s.usuario_id, u.activo FROM usuario u JOIN sesion s ON s.usuario_id = u.id WHERE s.token_hash = ${tokenHash}`
+  sql<{ id: string; usuario_id: string; activo: boolean }>`SELECT s.id, s.usuario_id, u.activo FROM usuario u JOIN sesion s ON s.usuario_id = u.id WHERE s.token_hash = ${tokenHash} AND COALESCE(s.revocada_en, s.expira_en) > now() - interval '30 days'`
     .execute(e).then((r) => r.rows[0] ?? null);
 
 // Guarda cada cambio una sola vez: si ya llegó (misma sesión y mismo orden), no hace nada.
@@ -42,3 +43,8 @@ export const decidir = (e: Ejecutor, id: string, decision: "aceptado" | "descart
 
 export const anotarError = (e: Ejecutor, id: string, error: string) =>
   e.updateTable("cambio_apartado").set({ error }).where("id", "=", id).execute();
+
+// De estos productos, los que ya no están: unidos con otro (y con cuál) o dados de baja.
+export const productosQueYaNoEstan = (e: Ejecutor, ids: string[]) =>
+  sql<{ descripcion: string; reemplazo: string | null }>`SELECT p.descripcion, r.descripcion AS reemplazo FROM producto p LEFT JOIN producto r ON r.id = p.reemplazado_por WHERE p.id::text = ANY(${ids}) AND NOT p.activo`
+    .execute(e).then((r) => r.rows);

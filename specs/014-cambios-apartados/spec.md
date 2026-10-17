@@ -94,6 +94,10 @@ ningún lado salvo en el registro.
 - **La hora del dispositivo está mal.** Se muestra la hora que dice el dispositivo y cuándo llegó al servidor, para que se note.
 - **Cambios que se funden.** Si la persona cambió el margen de un producto dos veces, llega uno solo, con el último valor, como en la cola de siempre.
 - **Sin conexión, quien revisa** no puede aceptar ni descartar: la pantalla lo dice.
+- **Hasta cuándo sube.** Lo que quedó en el dispositivo sube hasta 30 días después de cerrada (o vencida) la sesión de esa persona; después ya no, y queda en el dispositivo (aclarado en la revisión, 2026-10-17).
+- **Lo que no se puede apartar.** Si el servidor rechaza lo que sube el dispositivo (un cambio de más de 100.000 caracteres, por ejemplo), no se reintenta: queda en el dispositivo. Si la persona sigue activa, también queda ahí, para cuando vuelva a entrar.
+- **Una fecha que no se entiende.** Si la hora que mandó el dispositivo no es una fecha, se toma la hora en que llegó al servidor.
+- **«Sesión cerrada el…».** La pantalla dice cuándo se cerró la sesión desde la que llegó, que es cuando la desactivaron salvo que la sesión ya estuviera cerrada de antes.
 - **La fecha de lo aceptado.** Una venta queda con la fecha y la hora en que se cobró, porque la venta la trae. Un ajuste de stock, un cambio de margen o un renglón de conteo quedan con la fecha en que se aceptan, porque esa fecha la pone el servidor al recibirlos; la pantalla de revisión y el registro guardan cuándo se hicieron (aclarado al planificar, 2026-10-17).
 
 ## Requirements

@@ -13,4 +13,4 @@ Anomalías) y 007 (usuarios y acceso). Pedido de Carlos del 2026-10-17 (decisió
 - [x] T006 La computadora y el celular: Anomalías con las pestañas «Para revisar» y «Anotadas», la cantidad a la derecha, y la opción de Más con cualquiera de los dos permisos (E05, E10 a E12) (depende de T005)
 - [x] T007 La API de mentira de las capturas y las pruebas de punta a punta, en el celular y en la computadora (E06) (depende de T006)
 - [x] T008 Comparar con la maqueta aprobada con capturas de computadora y de celular, y mostrarle a Carlos las diferencias: iguales; el medio de pago sale con su nombre de la aplicación (depende de T006)
-- [ ] T009 La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T007, T008)
+- [x] T009 La revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T007, T008)

@@ -789,3 +789,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
        quitar celulares de otros y fijar los días del vínculo. Un rol que tenía «Administrar
        sesiones» sin «Administrar usuarios» pierde eso: nadie gana permisos que no tenía.
      - Carlos lo aprobó el 2026-10-17.
+
+101. **Lo apartado se revisa en Anomalías** (2026-10-17). Al especificar 014, Carlos decidió:
+    - Lo que una persona desactivada dejó sin mandar sube al servidor apartado y se revisa
+      desde cualquier dispositivo, no solo en el que quedó.
+    - Se revisa en Más → Anomalías, con el submenú de pestañas de las otras pantallas: primero
+      «Para revisar», con la cantidad a la derecha del nombre, y después «Anotadas».
+    - Lo decide quien tiene «Administrar usuarios»; con ese permiso, Anomalías aparece en Más.
+    - Lo aceptado queda a nombre de quien lo hizo; el registro dice quién lo aceptó.
+

@@ -24,7 +24,7 @@ export function ParaRevisar({ cabeza = null }: { cabeza?: ReactNode }) {
       {datos && grupos.length === 0 && <p className="an-vacio" data-testid="nada-para-revisar">No hay nada para revisar.</p>}
       {grupos.map((g) => (
         <section key={g.usuario_id} className="pr-persona" aria-label={g.usuario}>
-          <p className="pr-quien"><strong>{g.usuario}</strong>{(g.desactivado_en || g.dispositivo) && <span>{[g.desactivado_en ? `desactivada el ${diaYHora(g.desactivado_en)}` : null, g.dispositivo ? `desde «${g.dispositivo}»` : null].filter(Boolean).join(" · ")}</span>}</p>
+          <p className="pr-quien"><strong>{g.usuario}</strong>{(g.desactivado_en || g.dispositivo) && <span>{[g.desactivado_en ? `sesión cerrada el ${diaYHora(g.desactivado_en)}` : null, g.dispositivo ? `desde «${g.dispositivo}»` : null].filter(Boolean).join(" · ")}</span>}</p>
           <ul className="pr-lista">{g.cambios.map((c) => <Tarjeta key={c.id} cambio={c} conRed={conRed} />)}</ul>
         </section>
       ))}

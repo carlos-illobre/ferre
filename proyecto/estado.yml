@@ -1225,20 +1225,40 @@ RF-101:
   defectos: []
 
 RF-102:
-  estado: "Nuevo (014): especificación y maqueta aprobadas; en construcción"
-  pruebas: []
+  estado: "Hecho (014)"
+  pruebas:
+    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/web/src/pantallas/para-revisar.test.tsx
+    - microservices/web/src/cola.test.ts
+    - tests/e2e/escritorio/19-para-revisar.spec.ts
+    - tests/e2e/celular/19-para-revisar.spec.ts
 
 RF-103:
-  estado: "Nuevo (014): especificación y maqueta aprobadas; en construcción"
-  pruebas: []
+  estado: "Hecho (014)"
+  pruebas:
+    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/web/src/pantallas/para-revisar.test.tsx
+    - microservices/web/src/cola.test.ts
+    - tests/e2e/escritorio/19-para-revisar.spec.ts
+    - tests/e2e/celular/19-para-revisar.spec.ts
 
 RF-104:
-  estado: "Nuevo (014): especificación y maqueta aprobadas; en construcción"
-  pruebas: []
+  estado: "Hecho (014)"
+  pruebas:
+    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/web/src/pantallas/para-revisar.test.tsx
+    - microservices/web/src/cola.test.ts
+    - tests/e2e/escritorio/19-para-revisar.spec.ts
+    - tests/e2e/celular/19-para-revisar.spec.ts
 
 RF-105:
-  estado: "Nuevo (014): especificación y maqueta aprobadas; en construcción"
-  pruebas: []
+  estado: "Hecho (014)"
+  pruebas:
+    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/web/src/pantallas/para-revisar.test.tsx
+    - microservices/web/src/cola.test.ts
+    - tests/e2e/escritorio/19-para-revisar.spec.ts
+    - tests/e2e/celular/19-para-revisar.spec.ts
 
 RNF-61:
   estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"

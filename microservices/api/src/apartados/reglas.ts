@@ -35,7 +35,7 @@ export async function aceptar(id: string, quien: Usuario): Promise<Resultado<{ a
     // Puede que ya la hayan reactivado: lo apartado se acepta igual (014, casos de borde).
     const autor = (await usuarioConPermisos(pool, cambio.usuario_id)) ?? (await usuarioConPermisos(pool, cambio.usuario_id, true));
     if (!autor) return mal(404, "La persona que hizo ese cambio ya no existe");
-    const error = await repetir(cambio, { id: cambio.sesion_id, usuario: autor });
+    const error = (await productoQueYaNoEsta(cambio)) ?? (await repetir(cambio, { id: cambio.sesion_id, usuario: autor }));
     if (error) {
       await datos.anotarError(trx, id, error);
       return mal(409, `No se pudo aceptar: ${error}`);
@@ -55,6 +55,19 @@ export async function descartar(id: string, quien: Usuario): Promise<Resultado<{
     await anotarEvento(trx, { tipo: "apartado.descartado", usuarioId: quien.id, contenido: { apartado_id: id, de: cambio.usuario_id, tipo: cambio.tipo, ruta: cambio.ruta } });
     return { ok: true, cuerpo: { descartado: true } };
   });
+}
+
+// Un cambio que toca un producto que se unió con otro o se dio de baja no se aplica (014-E08): la
+// venta o el ajuste quedarían en un producto que ya no se usa. Se dice cuál y por qué.
+const UUID = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/g;
+async function productoQueYaNoEsta(cambio: { ruta: string; cuerpo: unknown }): Promise<string | null> {
+  const deLaRuta = cambio.ruta.startsWith("/conteos/") ? (cambio.ruta.match(UUID) ?? []).slice(1) : (cambio.ruta.match(UUID) ?? []);
+  const items = (cambio.cuerpo as { items?: { producto_id?: string | null }[] } | null)?.items ?? [];
+  const ids = [...new Set([...deLaRuta, ...items.map((i) => i.producto_id).filter((id): id is string => typeof id === "string")])];
+  if (ids.length === 0) return null;
+  const p = (await datos.productosQueYaNoEstan(base, ids))[0];
+  if (!p) return null;
+  return p.reemplazo ? `«${p.descripcion}» se unió con «${p.reemplazo}». Si querés, descartalo y cargalo de nuevo` : `«${p.descripcion}» se dio de baja. Si querés, descartalo y cargalo de nuevo`;
 }
 
 // El pedido original, otra vez, contra la misma aplicación y sin pasar por la red, con la

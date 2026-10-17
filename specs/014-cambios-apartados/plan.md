@@ -20,8 +20,10 @@
     Con límite de intentos por dirección, como los demás puntos sin sesión.
   - `GET /apartados`, `POST /apartados/:id/aceptar` y `POST /apartados/:id/descartar`: con
     «Administrar usuarios». La lista trae lo pendiente, de lo más viejo a lo más nuevo, con el
-    nombre de quien lo hizo, cuándo se cerró su sesión y el dispositivo, y una descripción
-    legible de cada cambio (qué es, el producto, el importe) armada en el servidor.
+    nombre de quien lo hizo, cuándo se cerró su sesión, el dispositivo, el cambio tal como estaba
+    en la cola y el nombre del producto al que apunta; la descripción legible (qué es, el
+    producto, el importe) la arma el cliente, en lo compartido de las dos interfaces. El contrato
+    está en [contracts/api.md](contracts/api.md).
   - Aceptar: dentro de una transacción que bloquea el cambio, se repite el pedido original con
     la identidad de quien lo hizo (ADR-021); si la ruta contesta un error, se guarda el motivo
     y el cambio sigue apartado; si sale bien, queda aceptado. Descartar: queda descartado.

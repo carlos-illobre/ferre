@@ -16,6 +16,7 @@ const TOKEN_ANA = "token-e2e-apartados-ana";
 const EMAIL_ADMIN = "e2e-apartados-admin@ferre.test";
 const EMAIL_ANA = "e2e-apartados-ana@ferre.test";
 const VENTA = "00000000-0000-0000-0000-00000000a9a1";
+const CANDADO = "00000000-0000-0000-0000-00000000a9a2";
 const COBRADA = "2026-10-01T13:47:00.000Z";
 // Los roles con los que arranca el sistema tienen id fijo (migración 0015).
 const VENDEDOR = "00000000-0000-4000-8000-0000000000a1";
@@ -29,8 +30,14 @@ const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 test.beforeAll(() => {
   const deEllos = `(SELECT id FROM usuario WHERE email IN ('${EMAIL_ADMIN}', '${EMAIL_ANA}'))`;
   psql(`DELETE FROM cambio_apartado WHERE usuario_id IN ${deEllos}`);
-  psql(`DELETE FROM item_venta WHERE venta_id = '${VENTA}'`);
+  psql(`DELETE FROM item_venta WHERE venta_id = '${VENTA}' OR producto_id = '${CANDADO}'`);
   psql(`DELETE FROM venta WHERE id = '${VENTA}'`);
+  psql(`DELETE FROM anomalia WHERE producto_id = '${CANDADO}'`);
+  psql(`DELETE FROM movimiento_stock WHERE producto_id = '${CANDADO}'`);
+  psql(`DELETE FROM producto WHERE id = '${CANDADO}'`);
+  // Un candado con 10 en stock: la venta aceptada lo tiene que bajar.
+  psql(`INSERT INTO producto (id, descripcion, marca, margen_elegido) VALUES ('${CANDADO}', 'CANDADO APARTADO (E2E)', 'MARCA E2E', 100)`);
+  psql(`INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, fecha, nota) VALUES (gen_random_uuid(), '${CANDADO}', 'ajuste', 10, 'conteo', now(), 'stock inicial e2e')`);
   psql(`DELETE FROM sesion WHERE usuario_id IN ${deEllos}`);
   psql(`DELETE FROM evento WHERE usuario_id IN ${deEllos}`);
   psql(`DELETE FROM usuario_rol WHERE usuario_id IN ${deEllos}`);
@@ -43,10 +50,12 @@ test.beforeAll(() => {
   }
 });
 
-// La venta de prueba tiene un renglón sin producto: se borra al terminar para no dejar datos sueltos.
+// Se borra lo de la prueba al terminar, para no dejar datos sueltos.
 test.afterAll(() => {
   psql(`DELETE FROM item_venta WHERE venta_id = '${VENTA}'`);
   psql(`DELETE FROM venta WHERE id = '${VENTA}'`);
+  psql(`DELETE FROM movimiento_stock WHERE producto_id = '${CANDADO}'`);
+  psql(`DELETE FROM producto WHERE id = '${CANDADO}'`);
 });
 
 async function entrarComo(page: Page, token: string, ruta: string) {
@@ -65,7 +74,7 @@ test("014-E01 014-E06 014-E14 una venta sin mandar de Ana, desactivada, sube apa
   const directo = await page.request.post(`${API}/ventas`, { headers: { Authorization: `Bearer ${TOKEN_ANA}` }, data: { id: VENTA, medio_pago: "efectivo", items: [{ descripcion: "x", cantidad: 1, precio_unitario: 1000 }] } });
   expect(directo.status()).toBe(401);
   // …pero su dispositivo sube lo que tenía sin mandar, que queda apartado (014-E01).
-  const venta = { id: VENTA, medio_pago: "efectivo", fecha: COBRADA, items: [{ descripcion: "Candado apartado (E2E)", cantidad: 2, precio_unitario: 11000 }] };
+  const venta = { id: VENTA, medio_pago: "efectivo", fecha: COBRADA, items: [{ producto_id: CANDADO, descripcion: "Candado apartado (E2E)", cantidad: 2, precio_unitario: 11000 }] };
   const subida = await page.request.post(`${API}/apartados`, { headers: { Authorization: `Bearer ${TOKEN_ANA}` }, data: { cambios: [{ orden: 1, creado_en: COBRADA, tipo: "venta", metodo: "POST", ruta: "/ventas", cuerpo: venta }] } });
   expect(subida.status()).toBe(200);
   expect(psql(`SELECT count(*) FROM venta WHERE id = '${VENTA}'`)).toBe("0");
@@ -87,5 +96,6 @@ test("014-E01 014-E06 014-E14 una venta sin mandar de Ana, desactivada, sube apa
   // Quedó registrada a nombre de Ana, con la fecha en que la cobró, y se anotó quién la aceptó.
   await expect.poll(() => psql(`SELECT to_char(fecha AT TIME ZONE 'UTC', 'YYYY-MM-DD HH24:MI') FROM venta WHERE id = '${VENTA}'`)).toBe("2026-10-01 13:47");
   expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'venta.registrada' AND usuario_id = '${ana}' AND contenido->>'id' = '${VENTA}'`)).toBe("1");
+  expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${CANDADO}'`)).toBe("8.000");
   expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'apartado.aceptado' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
 });
