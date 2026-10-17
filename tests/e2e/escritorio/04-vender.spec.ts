@@ -104,12 +104,12 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
 
   // La pestaña Hoy de Vender la muestra, sin anular (decisión 72).
   await page.getByTestId("pestana-hoy").click();
-  // La más reciente primero (017): la que se acaba de cobrar, en un renglón; Enter abre sus productos.
+  // La más reciente primero (017): la que se acaba de cobrar, en un renglón que se abre.
   const hoy = page.getByTestId("ventas-de-hoy");
   const ultima = hoy.getByTestId("venta-dia").first();
   await expect(ultima).toContainText("2 productos");
   await expect(ultima).toContainText("Efectivo");
-  await page.keyboard.press("Enter");
+  await ultima.getByRole("button", { name: "Ver el detalle" }).click();
   await expect(ultima.getByTestId("detalle-venta").filter({ hasText: "MECHA VENDER" })).toHaveCount(1);
   await expect(ultima.getByTestId("detalle-venta").filter({ hasText: "TORNILLO VENDER" })).toHaveCount(1);
   await expect(hoy.getByRole("button", { name: "Anular" })).toHaveCount(0);
