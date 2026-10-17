@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
@@ -96,6 +97,8 @@ function Pantallas() {
   // En el celular la navegación se anima (decisión 78).
   useEffect(() => { animarNavegacion(true); return () => animarNavegacion(false); }, []);
   const { sesion, salir } = useSesion();
+  // La venta en curso viaja al otro dispositivo desde cualquier pantalla (ADR-022).
+  useVentaEnEspejo();
   const ruta = useRuta();
   const codigoVinculacion = ruta.parametros.get("codigo");
   useEffect(() => { window.scrollTo(0, 0); }, [ruta.nombre, ruta.sub]);

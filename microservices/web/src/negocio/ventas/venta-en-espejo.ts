@@ -1,3 +1,8 @@
+import { useMemo } from "react";
+import { useCatalogo } from "../../catalogo";
+import { useEspejar } from "../../espejo";
+import type { MedioDePago } from "@servidor/ventas";
+import { cambiarVenta, useVentaEnCurso, ventaActual } from "./venta-en-curso";
 import type { Producto } from "../../producto";
 
 // La venta en curso, como viaja entre el celular y la computadora en espejo (decisión 60): los
@@ -28,4 +33,14 @@ export function renglonesDelEspejo<T extends Renglon>(venta: VentaEnEspejo, cata
     const producto = base && base.margen_elegido !== it.margen ? { ...base, margen_elegido: it.margen } : base;
     return { clave: it.clave, producto, descripcion: it.descripcion, cantidad: it.cantidad, unidad: it.unidad, precioManual: it.precioManual, abierto: previos.find((p) => p.clave === it.clave)?.abierto ?? false } as T;
   });
+}
+
+// En espejo con el otro dispositivo (decisión 60): la venta es una sola, la arme quien la arme y
+// desde la pantalla que sea. Se engancha una vez, desde la aplicación, no desde Vender (ADR-022).
+export function useVentaEnEspejo(): void {
+  const { catalogo, catalogoCompleto } = useCatalogo();
+  const { items, medio, clienteId } = useVentaEnCurso();
+  useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
+    cambiarVenta({ items: renglonesDelEspejo(v, catalogo ?? [], ventaActual().items), medio: v.medio as MedioDePago | null, clienteId: v.clienteId });
+  }, catalogo !== null && catalogoCompleto !== false); // con el catálogo a medio cargar no se reconocerían los productos
 }

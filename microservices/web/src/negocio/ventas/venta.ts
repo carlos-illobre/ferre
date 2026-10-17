@@ -2,17 +2,18 @@ import type { ConsultaEntrada, MedioDePago, VentaEntrada } from "@servidor/venta
 import { CONSULTAS, ventasCambiaron } from "./ventas-del-dia";
 import { IVA_SI_NO_SE_SABE, precioDelProducto } from "../catalogo/precio";
 import { consultas } from "../../consultas";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { margenReal, precioDeVenta, subtotalDeRenglon } from "../precios/vista-previa";
 import { ErrorApi, subirFoto } from "../../api";
 import { borrarAnterioresA, guardar } from "../../almacen";
 import { traerPorCodigo, useCatalogo } from "../../catalogo";
 import { enviarOEncolar, enviarPendientes } from "../../cola";
-import { contarAlEspejo, useEspejar } from "../../espejo";
+import { contarAlEspejo } from "../../espejo";
 import { pesos, pesosCortos } from "../../formato";
 import type { Producto } from "../../producto";
-import { cantidadValida, unidadDe, type Unidad } from "../../unidades";
-import { renglonesDelEspejo, ventaParaElEspejo, type VentaEnEspejo } from "./venta-en-espejo";
+import { cantidadValida, type Unidad } from "../../unidades";
+import { agregarALaVenta, ponerCliente, ponerItems, ponerMedio, useVentaEnCurso, vaciarVenta, type Item } from "./venta-en-curso";
+export type { Item };
 
 // La venta, una sola vez para el celular y la computadora (RNF-60). Acá están los renglones,
 // el precio de cada uno, cómo se paga, cobrar y «no llevó». Las pantallas solo muestran y
@@ -23,12 +24,6 @@ export const MEDIOS = Object.keys(NOMBRE_DE_MEDIO) as Medio[];
 // Para un medio que llega como texto suelto (el registro de acciones): su nombre, o el texto tal cual.
 export const nombreDeMedio = (medio: string): string => (NOMBRE_DE_MEDIO as Record<string, string>)[medio] ?? medio;
 
-export type Item = {
-  clave: string; producto: Producto | null; descripcion: string; cantidad: number;
-  unidad: Unidad; // por unidades enteras o por kilo, metro o litro (con un decimal)
-  precioManual: number | null; // precio tipeado para esta venta; pisa al margen y no se guarda en el producto
-  abierto: boolean; // el margen y el precio a mano desplegados (lo decide la pantalla)
-};
 
 // El precio de un renglón y de dónde sale: del precio puesto a mano, o del costo con su margen.
 export function precioDe(item: Item): { unitario: number | null; pasos: string[]; margen: number | null; costo: number | null; iva: number } {
@@ -72,24 +67,16 @@ export type OpcionesDeVenta = {
   alCobrar?: (cobro: Cobro) => void;
 };
 
-const MEDIO_DE_ARRANQUE: Medio = "efectivo"; // lo más común, y muestra que los medios se tocan
-
 export function useVenta(opciones: OpcionesDeVenta) {
-  const { catalogo, catalogoCompleto, clientes, actualizarProducto, ajustarStockLocal, enElServidor } = useCatalogo();
-  const [items, setItems] = useState<Item[]>([]);
-  const [medio, setMedio] = useState<Medio | null>(MEDIO_DE_ARRANQUE);
-  const [clienteId, setClienteId] = useState("");
+  const { catalogo, clientes, actualizarProducto, ajustarStockLocal, enElServidor } = useCatalogo();
+  // La venta en curso no es de esta pantalla (ADR-022): la comparte la aplicación entera.
+  const { items, medio, clienteId } = useVentaEnCurso();
+  const setItems = ponerItems, setMedio = ponerMedio, setClienteId = ponerCliente;
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [codigoDesconocido, setCodigoDesconocido] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [cobro, setCobro] = useState<Cobro | null>(null);
-
-  // En espejo con el otro dispositivo (decisión 60): la venta es una sola, la arme quien la arme.
-  useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
-    setItems((previos) => renglonesDelEspejo(v, catalogo ?? [], previos));
-    setMedio(v.medio as Medio | null); setClienteId(v.clienteId);
-  }, catalogo !== null && catalogoCompleto !== false); // con el catálogo a medio cargar no se reconocerían los productos
 
   // Un aviso («elegí el cliente», «elegí cómo paga») se va solo apenas se corrige su causa.
   useEffect(() => { setError(null); }, [items, medio, clienteId]);
@@ -108,14 +95,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
 
   const { alCambiar } = opciones;
   const agregar = useCallback((p: Producto | null, descripcionLibre?: string) => {
-    setItems((lista) => {
-      if (p) {
-        const ya = lista.find((it) => it.producto?.id === p.id);
-        if (ya) return lista.map((it) => (it === ya ? { ...it, cantidad: it.cantidad + 1 } : it));
-        return [...lista, { clave: crypto.randomUUID(), producto: p, descripcion: p.descripcion, cantidad: 1, unidad: unidadDe(p), precioManual: null, abierto: p.margen_elegido === null }];
-      }
-      return [...lista, { clave: crypto.randomUUID(), producto: null, descripcion: descripcionLibre ?? "", cantidad: 1, unidad: "unidad", precioManual: null, abierto: false }];
-    });
+    agregarALaVenta(p, descripcionLibre);
     setMensaje(null);
     alCambiar?.("agregar");
   }, [alCambiar]);
@@ -172,7 +152,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
     setMedio(valor);
     if (valor === "cuenta_corriente" && !clienteId) opciones.alFaltarCliente?.();
   }
-  const vaciar = () => { setItems([]); setMedio(MEDIO_DE_ARRANQUE); setClienteId(""); };
+  const vaciar = vaciarVenta;
 
   async function cobrar() {
     if (items.length === 0 || ocupado) return;

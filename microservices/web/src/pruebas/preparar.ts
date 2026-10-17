@@ -3,6 +3,7 @@ import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 import { consultas } from "../consultas";
 import { conTodosLosPermisos, usuarioDePrueba } from "./sesion";
+import { vaciarVenta } from "../negocio/ventas/venta-en-curso";
 
 // Las pantallas se prueban sueltas, sin el proveedor de sesión: la sesión es la de prueba.
 // `entrar` y `salir` son siempre las mismas, como en la aplicación: una pantalla que depende de
@@ -37,4 +38,5 @@ if (!globalThis.crypto.randomUUID) {
 window.confirm = () => true;
 window.alert = () => undefined;
 
-afterEach(() => { cleanup(); localStorage.clear(); consultas.clear(); conTodosLosPermisos(); });
+// La venta en curso vive mientras la aplicación está abierta (ADR-022): cada prueba arranca sin venta.
+afterEach(() => { cleanup(); localStorage.clear(); consultas.clear(); conTodosLosPermisos(); vaciarVenta(); });
