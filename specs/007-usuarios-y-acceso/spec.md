@@ -113,7 +113,7 @@ en «quién hizo qué» y que el único Administrador no se puede dar de baja.
 5. (etapa posterior) **Given** un usuario con el rol Vendedor, **When** el Administrador le agrega Comprador, **Then** el usuario tiene los dos roles, puede hacer lo de ambos y el cambio queda registrado con quién lo hizo.
 6. (etapa posterior) **Given** un usuario con los roles Vendedor y Comprador, **When** el Administrador le quita Comprador, **Then** conserva Vendedor y deja de poder hacer lo que era solo del Comprador desde su próxima operación, sin tener que volver a entrar.
 7. (etapa posterior) **Given** un usuario con un solo rol, **When** el Administrador intenta quitárselo, **Then** no se guarda: un usuario activo tiene al menos un rol; para que no pueda hacer nada se lo desactiva.
-8. **Given** un usuario con sesiones abiertas, **When** el Administrador lo desactiva, **Then** se le cierran todas las sesiones, no puede volver a entrar ni con Google ni con la huella, y sigue en la lista como desactivado.
+8. **Given** un usuario con sesiones abiertas, **When** el Administrador lo desactiva, **Then** se le cierran todas las sesiones, cada dispositivo suyo con la aplicación abierta vuelve solo a la entrada en menos de 30 segundos (historia 5, escenario 4), no puede volver a entrar ni con Google ni con la huella, y sigue en la lista como desactivado.
 9. **Given** un usuario desactivado, **When** el Administrador lo reactiva, **Then** vuelve a poder entrar.
 10. **Given** un Administrador, **When** intenta desactivarse o quitarse el rol Administrador a sí mismo, **Then** no se guarda y la app le dice que eso lo tiene que hacer otro Administrador.
 11. **Given** un único Administrador activo en el sistema, **When** alguien intenta desactivarlo o quitarle el rol Administrador por cualquier camino, **Then** no se guarda: el sistema nunca queda sin un Administrador activo.
@@ -289,7 +289,9 @@ ver la entrada.
 1. **Given** un Administrador con sesión, **When** abre las sesiones abiertas, **Then** ve las de todos los usuarios, de la usada más recientemente a la más vieja, cada una con el usuario, el dispositivo y el último uso; las cerradas y las vencidas no figuran.
 2. **Given** la lista de sesiones, **When** el Administrador la mira, **Then** la suya en ese dispositivo está señalada como la propia y la acción de cerrarla se distingue a la vista de la de cerrar las demás.
 3. **Given** un Administrador y una sesión de otro dispositivo, **When** la cierra, **Then** desaparece de la lista, la suya sigue abierta y queda registrado quién la cerró.
-4. **Given** un dispositivo cuya sesión se cerró a distancia, **When** hace su próximo pedido al servidor, **Then** el servidor lo rechaza, el dispositivo descarta la sesión guardada y vuelve solo a la entrada.
+4. **Given** un dispositivo con la aplicación abierta y con conexión, **When** su sesión se cierra a distancia o se desactiva a su usuario, **Then** en menos de 30 segundos, sin que nadie toque nada, descarta la sesión guardada y vuelve solo a la entrada con «Hay que iniciar sesión»; si estaba en otra ventana, apenas vuelve a la aplicación (decisión 97).
+4b. **Given** un dispositivo sin conexión cuya sesión se cerró a distancia o cuyo usuario se desactivó, **When** recupera la conexión, **Then** en menos de 30 segundos vuelve solo a la entrada. Mientras no tiene conexión sigue trabajando: no hay forma de avisarle.
+4c. **Given** un dispositivo cuya sesión se cerró, **When** hace cualquier pedido al servidor antes de que pasen esos 30 segundos, **Then** el servidor lo rechaza y vuelve a la entrada en ese momento, como hasta ahora.
 5. **Given** un Administrador en la lista de sesiones, **When** cierra la suya, **Then** vuelve a la entrada y abrir la app de nuevo no entra sin autenticarse.
 6. **Given** cualquier usuario con sesión, **When** elige «Salir», **Then** vuelve a la entrada, esa sesión deja de valer en el servidor y queda registrado el cierre.
 7. (etapa posterior) **Given** un usuario sin el rol Administrador, **When** intenta ver las sesiones abiertas o cerrar la de otro, desde la app o pidiéndoselo directo al servidor, **Then** la app no se lo ofrece y el servidor lo rechaza.
@@ -334,7 +336,7 @@ hizo qué», ver 3 páginas, filtrar por un usuario y un día y ver solo las suy
 - **Pedido de huella interrumpido.** Un pedido de vinculación o de entrada con la huella vale 5 minutos y un solo uso; si se interrumpe, el usuario empieza de nuevo y no queda nada a medias.
 - **Cambio de dirección de la app.** La vinculación de la huella queda atada a la dirección web de la app: si cambia, cada celular se vincula de nuevo (ADR-011).
 - **Sin conexión.** La sesión guardada se da por válida mientras no haya servidor que diga lo contrario. Los cambios de usuarios, roles y sesiones necesitan conexión: sin ella no se ofrecen, y la app lo dice.
-- **Operación en cola de alguien a quien desactivaron.** [NEEDS CLARIFICATION: P8, ver «Preguntas abiertas»]
+- **Operación en cola de alguien a quien desactivaron.** Lo que hizo sin conexión antes de que lo desactivaran y todavía no llegó al servidor no se registra solo ni se pierde: queda apartado para que un Administrador decida si lo acepta (decisión 97). Cómo se aparta y se revisa es una funcionalidad aparte, todavía sin especificar. Mientras tanto, nada de eso puede salir a nombre de otra persona que entre después en ese dispositivo.
 - **Computadora con lector de huella.** [NEEDS CLARIFICATION: P7, ver «Preguntas abiertas»]
 - **Salir sin conexión.** [NEEDS CLARIFICATION: P9, ver «Preguntas abiertas»]
 - **El celular como lector de códigos de la computadora** (RF-08) usa un código QR, pero no es una forma de entrar: los dos dispositivos ya tienen sesión. Pertenece a la capacidad de catálogo.
@@ -408,7 +410,7 @@ entonces, ninguna especificación de capacidad restringe una operación por rol.
 
 - **P4** (RF-72, RF-73) Respondida el 2026-10-11 (decisión 50): no hay un dueño protegido; lo que el sistema impide es quedarse sin nadie que pueda administrar usuarios y roles, y que alguien se quite a sí mismo esos permisos.
 - **P7** (RF-70b) [NEEDS CLARIFICATION: en una computadora que tiene lector de huella, ¿se puede vincular a mano y entrar con la huella, o la huella es solo para el celular y la computadora entra siempre con Google? Lo decidido es que en la computadora nunca se ofrece sola.]
-- **P8** (RF-72) [NEEDS CLARIFICATION: una venta cobrada sin conexión por alguien a quien se desactivó antes de que el dispositivo reconecte: ¿se registra igual al reconectar, porque nada del mostrador se pierde, o se rechaza?]
+- **P8** (RF-72) Respondida el 2026-10-17 (decisión 97): ni se registra sola ni se rechaza; queda apartada para que un Administrador decida si la acepta.
 - **P9** (RF-74) [NEEDS CLARIFICATION: si el dispositivo no tiene internet, ¿«Salir» lo lleva igual a la entrada y la sesión se cierra en el servidor cuando reconecte, o no se puede salir sin conexión?]
 
 ### Functional Requirements
@@ -421,7 +423,7 @@ entonces, ninguna especificación de capacidad restringe una operación por rol.
 - **RF-72**: Lo que se puede hacer en el sistema se divide en permisos, que son fijos (tabla «Actores y roles»). Cada usuario tiene uno o más roles y puede lo que permita cualquiera de ellos; la aplicación le ofrece solo eso y el servidor rechaza lo demás diciendo qué permiso hace falta. Buscar en el catálogo, ver el stock de un producto, sacarle la foto, cargarle el código de barras, avisar de un error o una mejora y manejar la propia sesión no piden permiso. Las reglas son las mismas en el celular y en la computadora.
 - **RF-75**: Los roles se arman desde la aplicación: un nombre y los permisos que agrupa. El sistema arranca con cinco roles (Vendedor, Comprador, Recepción, Administrador y Gerente) que se pueden cambiar. Un rol no se borra si alguien lo tiene asignado, dos roles no se llaman igual, y un usuario activo tiene al menos un rol. El sistema nunca queda sin una persona activa que pueda administrar usuarios y roles, y nadie se quita a sí mismo esos permisos. Todo cambio de roles queda en el registro de acciones (RF-71).
 - **RF-73**: Reemplazado por RF-72 (decisión 8 del 2026-10-09; ADR-011, enmienda del 2026-10-09). Los roles dueño, admin y mostrador dejan de ser una regla. Equivalencia para esta versión: los tres pasan a Administrador. De RF-73 siguen valiendo, dentro de RF-72, las reglas que no dependen de esos nombres: nadie se desactiva a sí mismo y desactivar a un usuario le cierra las sesiones. Si se conserva la protección del dueño frente a otros administradores es la pregunta P4.
-- **RF-74**: El Administrador ve las sesiones abiertas, con el usuario, el dispositivo y el último uso, y cierra cualquiera a distancia; la sesión cerrada deja de servir en el próximo pedido de ese dispositivo. Cualquier usuario sale de la suya. Cerrar la propia, por la lista o saliendo, vuelve a la entrada.
+- **RF-74**: El Administrador ve las sesiones abiertas, con el usuario, el dispositivo y el último uso, y cierra cualquiera a distancia; la sesión cerrada deja de servir en el momento, y el dispositivo que la tenía abierta vuelve solo a la entrada en menos de 30 segundos (o al recuperar la conexión). Lo mismo pasa con las sesiones de un usuario al desactivarlo. Cualquier usuario sale de la suya. Cerrar la propia, por la lista o saliendo, vuelve a la entrada.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -441,7 +443,7 @@ El detalle del contrato del servidor está en [data-model.md](data-model.md) y
 - **SC-001**: Nadie cuyo correo no esté autorizado y activo puede ver ni cambiar un dato: el 100 % de los pedidos sin sesión vigente se rechaza.
 - **SC-002**: Ningún usuario tiene que recordar una contraseña: las únicas formas de entrar son Google y la huella.
 - **SC-003**: En un celular vinculado se entra con un toque más la huella, sin elegir cuenta ni escribir nada.
-- **SC-004**: Una sesión cerrada a distancia deja de servir en el pedido siguiente de ese dispositivo.
+- **SC-004**: Una sesión cerrada a distancia, o la de un usuario desactivado, deja de servir en el momento, y el dispositivo con la aplicación abierta y conexión vuelve a la entrada en menos de 30 segundos.
 - **SC-005**: Todo usuario autorizado y activo puede hacer todas las operaciones del sistema; nada se rechaza por rol.
 - **SC-006**: En ningún momento el sistema tiene cero Administradores activos.
 - **SC-007**: El Administrador responde «qué hizo tal usuario tal día» eligiendo un usuario y una fecha, sin recorrer páginas.

@@ -97,7 +97,7 @@ la huella. Nada más: sin sesión no se ve ningún dato del negocio.
 | Demasiados intentos | El texto de la regla |
 | Sin conexión | Que para entrar se necesita internet, y reintento |
 | Google no responde | Que Google no responde; la huella sigue disponible donde esté vinculada |
-| Sesión cerrada a distancia o vencida | Se vuelve solo a la entrada, con «Hay que iniciar sesión» |
+| Sesión cerrada a distancia o vencida, o usuario desactivado | Se vuelve solo a la entrada, con «Hay que iniciar sesión». Con la aplicación abierta y conexión, en menos de 30 segundos y sin tocar nada; si estaba en otra ventana, al volver; sin conexión, al recuperarla |
 
 ## Historia 1b: entrar a la computadora con el celular (RF-76)
 

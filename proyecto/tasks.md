@@ -288,3 +288,4 @@ Las reglas no van acá: van en `specs/`.
 - [x] T123 [agente] Pasar al repositorio cómo pide Carlos los cambios de interfaz
 - [x] T124 [agente] Los agentes piden permiso a Carlos antes de usar un sitio de internet que no está permitido
 - [x] T125 [agente] Las pruebas de punta a punta corren más rápido: una conexión a la base, celular y computadora a la vez, sin esperas fijas y sin reconstruir la web si no cambió
+- [ ] T126 [agente] Especificar como funcionalidad nueva qué pasa con lo que un usuario hizo sin conexión y no llegó al servidor antes de que lo desactivaran: queda apartado y un Administrador decide si lo acepta (decisión 97, P8 de 007). Hoy, si después entra otra persona en ese dispositivo, la cola lo mandaría a su nombre

@@ -736,3 +736,14 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       aunque con ellos y las cantidades se pueda calcular el dinero invertido: lo necesitan
       Vender y el cambio de margen sin conexión. Las compras recientes siguen con su importe
       para quien tiene «Ver las compras», aunque sumándolas se saquen los gastos de la semana.
+
+97. **Al desactivar a alguien o cerrarle una sesión a distancia, el dispositivo sale solo**
+    (2026-10-17). Carlos pidió que el usuario desactivado salga automáticamente:
+    - Con la aplicación abierta y conexión, el dispositivo vuelve a la entrada en menos de 30
+      segundos, sin que nadie toque nada; si estaba en otra ventana, apenas vuelve. Sin conexión,
+      al recuperarla. Antes salía recién en su próximo pedido al servidor.
+    - Vale igual para «Cerrar sesión» a distancia desde Más → Usuarios → Sesiones.
+    - Lo que esa persona hizo sin conexión antes de que la desactivaran y no llegó al servidor
+      (una venta cobrada, por ejemplo) no se registra solo ni se pierde: queda apartado para que
+      un Administrador decida si lo acepta. Responde la pregunta abierta P8 de 007. Cómo se
+      aparta y se revisa es una funcionalidad aparte.
