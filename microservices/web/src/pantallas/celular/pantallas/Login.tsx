@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { ConectandoConGoogle } from "../ConectandoConGoogle";
 import { useSesion, type Usuario } from "../../../sesion";
 import { entrarConHuella, hayHuella } from "../../../credenciales";
 import { marcarEntradaConGoogle } from "../componentes/OfrecerHuella";
@@ -9,9 +11,12 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 // Dos formas de entrar, sin contraseñas (ADR-011): la huella del celular vinculado o la
 // cuenta de Google.
-export function BotonGoogle() {
+// `conPantallaDeCarga`: al volver de Google, mientras se abre la sesión, se tapa la entrada con
+// «Conectando tu cuenta de Google» (007-T021): si no, parece que no se pudo entrar.
+export function BotonGoogle({ conPantallaDeCarga = false }: { conPantallaDeCarga?: boolean } = {}) {
   const { entrar } = useSesion();
   const [error, setError] = useState<string | null>(null);
+  const [conectando, setConectando] = useState(false);
   const boton = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,11 +29,13 @@ export function BotonGoogle() {
         client_id: GOOGLE_CLIENT_ID,
         ux_mode: "popup",
         callback: async ({ credential }) => {
+          if (conPantallaDeCarga) setConectando(true);
           try {
             const r = await entrarConGoogle(credential, describirDispositivo());
             marcarEntradaConGoogle();
             entrar(r.token, r.usuario);
           } catch (e) {
+            setConectando(false);
             setError((e as Error).message);
           }
         },
@@ -38,12 +45,13 @@ export function BotonGoogle() {
       google.accounts.id.renderButton(boton.current, { theme: "filled_blue", size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
     }, 200);
     return () => clearInterval(intervalo);
-  }, [entrar]);
+  }, [entrar, conPantallaDeCarga]);
 
   return (
     <>
       {GOOGLE_CLIENT_ID ? <div className="boton-google" ref={boton} /> : <p className="ayuda-clara">El botón de Google no está configurado en esta versión (falta VITE_GOOGLE_CLIENT_ID).</p>}
       {error && <div data-testid="error-google"><AvisoError texto={error} /></div>}
+      {conectando && createPortal(<ConectandoConGoogle />, document.body)}
     </>
   );
 }

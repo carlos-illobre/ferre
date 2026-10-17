@@ -53,3 +53,26 @@
 .en-escanear strong { display: block; font-size: 17px; font-weight: 700; line-height: 1.25; }
 .en-escanear small { display: block; font-size: 14.5px; color: var(--p-texto-2); }
 .en-escanear:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
+
+/* Volviendo de Google, mientras se abre la sesión (007-T021): tapa la entrada entera. */
+.en-conectando { position: fixed; inset: 0; z-index: 100; overflow-y: auto; }
+.cg { display: flex; flex-direction: column; gap: 18px; }
+.cg h2 { font-size: 30px; line-height: 1.15; text-align: center; color: var(--p-verde); }
+.cg-bajada { font-size: 16px; color: var(--p-texto-2); text-align: center; margin: -6px 8px 0; }
+.cg-camino { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0; }
+.cg-bola { position: relative; width: 72px; height: 72px; border-radius: 50%; background: #fff; box-shadow: 0 6px 18px rgb(23 49 43 / 0.1); display: grid; place-items: center; }
+.cg-bola.grande { width: 96px; height: 96px; }
+.cg-anillo { position: absolute; inset: -6px; border-radius: 50%; border: 4px solid transparent; border-top-color: var(--p-naranja); border-right-color: var(--p-naranja); animation: cg-girar 1.1s linear infinite; }
+.cg-punto { width: 5px; height: 5px; border-radius: 50%; background: var(--p-ok); }
+.cg-punto.falta { background: var(--p-borde); }
+.cg-bola.local { background: var(--p-verde-suave); }
+.cg-hecho { width: 22px; height: 22px; border-radius: 50%; background: var(--p-ok); display: grid; place-items: center; }
+.cg-pasos { list-style: none; margin: 6px 0 0; padding: 0 0 0 28px; display: flex; flex-direction: column; gap: 18px; position: relative; }
+.cg-pasos::before { content: ""; position: absolute; left: 39px; top: 14px; bottom: 14px; width: 2px; background: var(--p-borde-suave); }
+.cg-pasos li { display: grid; grid-template-columns: 24px 1fr; gap: 14px; align-items: start; text-align: left; }
+.cg-pasos strong { display: block; font-size: 16px; color: var(--p-verde); }
+.cg-pasos li > span:last-child > span { font-size: 15px; color: var(--p-texto-2); }
+.cg-marca { position: relative; z-index: 1; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #fff; }
+.cg-marca.hecho { background: var(--p-ok); }
+.cg-marca.ahora { border: 3px solid var(--p-relleno); border-top-color: var(--p-naranja); animation: cg-girar 1s linear infinite; }
+@keyframes cg-girar { to { transform: rotate(360deg); } }
