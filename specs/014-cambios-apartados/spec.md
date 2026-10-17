@@ -4,9 +4,9 @@
 
 **Created**: 2026-10-17
 
-**Status**: Esperando la aprobación de Carlos
+**Status**: Aprobada por Carlos (2026-10-17)
 
-**Maquetas**: Pendientes (paso 2)
+**Maquetas**: Dos variantes para que Carlos elija (2026-10-17): `maquetas/para-revisar-a-*.png` (un bloque «Para revisar» arriba de las anotadas, agrupado por persona) y `maquetas/para-revisar-b-*.png` (pestañas «Para revisar» y «Anotadas»)
 
 **Input**: Decisión 97: lo que una persona hizo sin conexión antes de que la desactivaran y
 todavía no llegó al servidor no se registra solo ni se pierde, queda apartado para que alguien
