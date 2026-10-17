@@ -49,6 +49,15 @@ describe("el celular deja entrar a la computadora", () => {
     expect(aprobaciones()).toHaveLength(1);
   });
 
+  it("C3: «Ahora no» no deja entrar a la computadora y el celular sigue en lo suyo", async () => {
+    irA("entrar-compu?codigo=abc");
+    await waitFor(() => expect(location.hash).toBe("#/entrar-compu?codigo=abc"));
+    render(<EntrarEnLaCompu codigo="abc" automatico={false} nombre="Carlos" />);
+    fireEvent.click(screen.getByRole("button", { name: "Ahora no" }));
+    await waitFor(() => expect(location.hash).toBe("#/catalogo"));
+    expect(aprobaciones()).toHaveLength(0);
+  });
+
   it("un código vencido o ya usado lo dice, con lo que hay que hacer", async () => {
     apiFalsa.mockRejectedValue(new ErrorApi(410, "Ese código venció o ya se usó. Leé el que la computadora muestra ahora."));
     render(<EntrarEnLaCompu codigo="viejo" automatico nombre="Carlos" />);

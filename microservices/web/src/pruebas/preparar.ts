@@ -5,10 +5,15 @@ import { consultas } from "../consultas";
 import { conTodosLosPermisos, usuarioDePrueba } from "./sesion";
 
 // Las pantallas se prueban sueltas, sin el proveedor de sesión: la sesión es la de prueba.
-vi.mock("../sesion", async (original) => ({
-  ...(await original<typeof import("../sesion")>()),
-  useSesion: () => ({ sesion: { estado: "con-sesion", usuario: usuarioDePrueba, sinConexion: false, sesionId: "s1" }, entrar: vi.fn(), salir: vi.fn() }),
-}));
+// `entrar` y `salir` son siempre las mismas, como en la aplicación: una pantalla que depende de
+// ellas no se reinicia en cada dibujo.
+vi.mock("../sesion", async (original) => {
+  const entrar = vi.fn(), salir = vi.fn();
+  return {
+    ...(await original<typeof import("../sesion")>()),
+    useSesion: () => ({ sesion: { estado: "con-sesion", usuario: usuarioDePrueba, sinConexion: false, sesionId: "s1" }, entrar, salir }),
+  };
+});
 
 // jsdom no trae IntersectionObserver; las pantallas lo usan para la carga progresiva.
 class ObservadorFalso {

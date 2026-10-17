@@ -594,7 +594,7 @@ RF-65:
     - "La semana es una ventana fija de siete días que termina en el día en curso; la definición de semana es una aclaración abierta de RF-65"
 
 RF-70:
-  estado: "Hecho en parte (#41): se aparta de la regla en 5 puntos"
+  estado: "Hecho en parte (#41): se aparta de la regla en 1 punto"
   pruebas:
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
@@ -604,11 +604,12 @@ RF-70:
     - microservices/api/src/rutas/sesiones.test.ts
     - microservices/api/src/rutas/usuarios.test.ts
     - microservices/api/src/rutas/credenciales.test.ts
+    - microservices/api/src/rutas/entrar-con-google.test.ts
+    - microservices/web/src/pantallas/entrar-simulado.test.tsx
+    - microservices/web/src/sesion.test.tsx
+    - docs/pruebas-manuales/entrar.md
   defectos:
-    - "Entrar bien con Google y el aviso de correo no autorizado no tienen prueba automática (el botón de Google no se puede automatizar)"
-    - "Reactivar un usuario desactivado no tiene prueba"
     - "El límite de intentos de entrada (10 por minuto con Google, 20 con la huella) no tiene prueba"
-    - "Que el dispositivo vuelva solo a la entrada cuando el servidor rechaza la sesión no tiene prueba"
 
 RF-70b:
   estado: "Hecho en parte: se aparta de la regla en 4 puntos"
@@ -616,6 +617,7 @@ RF-70b:
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
     - microservices/api/src/rutas/credenciales.test.ts
+    - microservices/web/src/pantallas/entrar-simulado.test.tsx
   defectos:
     - "En la computadora, la lista de celulares vinculados está dentro de la administración: quien no administra no tiene desde dónde ver ni quitar los suyos"
     - "Quitar un celular vinculado pide confirmación y vincularlo a mano pide el nombre con ventanas del navegador, no dentro de la app"
@@ -661,6 +663,7 @@ RF-76:
     - microservices/web/src/pantallas/compu/base/pantallas/Entrar.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
+    - docs/pruebas-manuales/entrar.md
   defectos:
     - "El recorrido completo con la huella (celular sin sesión que entra y deja entrar a la computadora) no tiene prueba de punta a punta: la huella y Google no se pueden automatizar; está probado por partes"
     - "No está probado con un celular y una computadora de verdad"
@@ -745,17 +748,17 @@ RF-73:
     - "Reemplazado: los roles dueño, admin y mostrador ya no existen (RF-72, decisión 50)"
 
 RF-74:
-  estado: "Hecho en parte (#41): se aparta de la regla en 3 puntos"
+  estado: "Hecho en parte (#41): se aparta de la regla en 2 puntos"
   pruebas:
     - tests/e2e/celular/12-cerrar-sesion.spec.ts
     - tests/e2e/escritorio/12-cerrar-sesion.spec.ts
     - tests/integration/autenticacion.sh
     - microservices/web/src/pantallas/celular/Negocio.test.tsx
     - microservices/api/src/rutas/usuarios.test.ts
+    - microservices/web/src/sesion.test.tsx
   defectos:
     - "Que quien no administra no pueda ver las sesiones ni cerrar la de otro no tiene prueba"
     - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
-    - "Que un dispositivo con la sesión cerrada a distancia vuelva solo a la entrada no tiene prueba"
 
 RF-80:
   estado: "Hecho (pedido directo de Carlos)"
