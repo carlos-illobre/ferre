@@ -820,6 +820,36 @@ RF-110:
     - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
   defectos: []
 
+RF-111:
+  estado: "Nuevo (016): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-112:
+  estado: "Nuevo (016): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-113:
+  estado: "Nuevo (016): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-114:
+  estado: "Nuevo (016): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-115:
+  estado: "Nuevo (016): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
+RF-116:
+  estado: "Nuevo (016): especificado, a aprobar por Carlos"
+  pruebas: []
+  defectos: []
+
 RNF-01:
   estado: "A validar en el piloto (#21)"
   pruebas: []

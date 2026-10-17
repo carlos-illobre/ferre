@@ -191,6 +191,12 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-108 | Desde el Catálogo se agrega un producto a la venta en curso con un toque, con las reglas de Vender y el espejo; se sigue en el Catálogo y Vender muestra cuántos lleva | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
 | RF-109 | El Catálogo se filtra por disponibilidad y por marca, desde un botón, sin lugar fijo arriba de la lista | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
 | RF-110 | Las pestañas del Catálogo miden al menos 44 px de alto en el celular, y el buscador dice qué busca («Producto, código o marca» en el celular) | [015-catalogo-para-vender](015-catalogo-para-vender/spec.md) |
+| RF-111 | La ficha del producto empieza con la foto grande, el nombre, la marca, el código y una etiqueta con el stock | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
+| RF-112 | En la ficha, el código de barras se copia y se escanea al lado; dice «Código actualizado» y la fecha y hora de la última lectura | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
+| RF-113 | En la ficha, primero el proveedor en uso con su costo y su última lista; con una flecha, los demás | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
+| RF-114 | En la ficha, «Así se calcula» despliega la cuenta del precio: costo, margen, IVA y redondeo a $1.000 | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
+| RF-115 | En la ficha, el archivo de origen del costo con sus datos, y se descarga | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
+| RF-116 | Desde la ficha se agrega el producto a la venta en curso, con las reglas del Catálogo | [016-ficha-del-producto](016-ficha-del-producto/spec.md) |
 
 ## Requerimientos no funcionales
 
