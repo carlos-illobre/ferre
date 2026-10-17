@@ -52,7 +52,9 @@
 .panel-filtros .filtros-marcas button[aria-checked="true"] { font-weight: 700; }
 .panel-filtros .filtros-marcas button[aria-checked="true"] i { border: 6px solid var(--p-naranja); }
 .panel-filtros > .detalle { margin: 10px 0 0; }
-.con-filtros { display: flex; align-items: center; gap: 12px; margin: 0; }
+/* Pegado a los atajos y a la tabla (decisión 105). */
+.con-filtros { display: flex; align-items: center; gap: 12px; margin: -8px 0; }
+.con-filtros .enlace { margin-block: -6px; }
 
 .aviso-agregado { position: fixed; right: 24px; bottom: 24px; z-index: 50; display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 16px; background: var(--p-verde); color: #fff; font-size: 1rem; box-shadow: 0 10px 28px rgb(0 0 0 / .28); }
 .aviso-agregado svg { color: #8fe0b8; }
