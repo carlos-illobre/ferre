@@ -42,8 +42,8 @@
 .entrar-cc-puntos li > span:first-child { flex: none; display: grid; place-items: center; width: calc(66 * var(--u)); height: calc(68 * var(--u)); border-radius: 12px; background: #21443b; color: var(--cc-naranja); }
 .entrar-cc-puntos li > span:first-child svg { width: calc(44 * var(--u)); height: calc(44 * var(--u)); stroke-width: 1.9; }
 
-/* A mitad de camino entre apoyado abajo (330) y centrado en el alto (212): 271. */
-.entrar-cc-celular { position: absolute; left: calc(524 / 1600 * 100%); top: calc(271 / 1024 * 100%); height: calc(600 / 1024 * 100%); width: auto; aspect-ratio: 387 / 603; pointer-events: none; z-index: 2; }
+/* Abajo, apoyado en la mesa de la foto (Carlos probó subirlo y lo prefirió así, 2026-10-17). */
+.entrar-cc-celular { position: absolute; left: calc(524 / 1600 * 100%); top: calc(330 / 1024 * 100%); height: calc(600 / 1024 * 100%); width: auto; aspect-ratio: 387 / 603; pointer-events: none; z-index: 2; }
 /* «Ver tutorial», debajo de las tres cosas que hace (por ahora no lleva a ningún lado): con el
    naranja de los botones principales y ancho, para que se note. */
 .entrar-cc-tutorial { display: inline-flex; align-items: center; justify-content: center; gap: calc(12 * var(--u)); margin-top: calc(54 * var(--u)); white-space: nowrap;

@@ -34,3 +34,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T023 [arreglo] Al volver de Google se veía la entrada un instante antes de «Conectando tu cuenta de Google»: Google avisa la cuenta un momento después de cerrar su ventana; ahora la pantalla sale apenas se vuelve a la página
 - [x] T024 [ajuste] En la entrada de la computadora, el celular sube hasta quedar centrado en el alto: el mismo espacio arriba que abajo
 - [x] T025 [ajuste] En la entrada de la computadora, el celular baja a mitad de camino entre como estaba y centrado: no casi toca el borde de abajo y sigue apoyado en la mesa
+- [x] T026 [ajuste] En la entrada de la computadora, el celular vuelve abajo, como estaba antes de T024: así parece apoyado en la mesa
