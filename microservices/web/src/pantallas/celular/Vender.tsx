@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { irA } from "../../rutas";
 import { contarAlEspejo, useEspejar } from "../../espejo";
-import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { SiVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
@@ -9,7 +9,7 @@ import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
 import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { FotoProducto } from "./componentes/Foto";
-import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Toast, Lista } from "./componentes/base";
+import { AvisoError, Buscador, Contador, Hoja, Icono, Toast, Lista } from "./componentes/base";
 import { Explicacion } from "./componentes/Explicacion";
 import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto } from "../../api";
@@ -100,12 +100,6 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   // Un código que no es de ningún producto deja la búsqueda limpia, para elegir a cuál asociarlo.
   const agregarPorCodigo = useCallback((codigo: string) => { const conocido = venta.agregarPorCodigo(codigo); setConsulta(""); return conocido; }, [venta.agregarPorCodigo]);
   const noLlevo = () => venta.noLlevo(TEXTOS.vender.noLlevo.corto);
-  // Lo que se dice de la venta recién cobrada, con las palabras del celular.
-  const exito = useMemo(() => cobro && {
-    total: cobro.total,
-    medio: (NOMBRE_DE_MEDIO[cobro.medio]) + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
-    detalle: cobro.encolado ? "Sin conexión: se envía sola cuando vuelva internet." : `${cobro.productos} ${cobro.productos === 1 ? "producto" : "productos"} · ${new Date(cobro.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })} · el stock ya se descontó.`,
-  }, [cobro]);
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía media pantalla.
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
@@ -296,10 +290,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== productoDeLaFicha.id && x.codigo_barras === codigo) as Producto | undefined}
           alCambiar={(c) => { actualizarProducto(productoDeLaFicha.id, c as never).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`)); }} />
       )}
-      {exito && (
-        <Exito que={exito.detalle.startsWith("Sin conexión") ? "Guardada en este dispositivo" : "Venta registrada"} importe={pesosCortos(exito.total)} medio={exito.medio} detalle={exito.detalle} boton="Nueva venta"
-          alCerrar={() => { venta.cerrarCobro(); setMensaje(null);  }} />
-      )}
+      {cobro && <VentaRegistrada cobro={cobro} alCerrar={() => { venta.cerrarCobro(); setMensaje(null); }} />}
     </main>
   );
 }
@@ -381,6 +372,68 @@ function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alC
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// El éxito de la venta (003-T004, maqueta celular-venta-registrada.png): el tilde con confeti, el
+// total cobrado con el medio y el stock, la fecha y cuántos productos, lo vendido y «Nueva venta».
+const CANTIDAD_EN: Record<Unidad, string> = { unidad: "un.", kg: "kg", m: "m", l: "L" };
+const CONFETI: [string, string, number, string][] = [
+  ["8%", "18%", -35, "#2fb37a"], ["20%", "54%", 40, "#f7c445"], ["4%", "82%", -50, "#f0b43a"], ["26%", "4%", 30, "#9fd8b8"], ["80%", "10%", -30, "#f7c445"],
+  ["88%", "48%", 40, "#2fb37a"], ["70%", "46%", -40, "#9fd8b8"], ["94%", "86%", 25, "#0f8a5f"], ["30%", "6%", 55, "#f7c445"], ["62%", "-4%", -60, "#2fb37a"],
+];
+const fotoDe = (url?: string | null) => (url ? (url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${url}` : url) : null);
+
+function VentaRegistrada({ cobro, alCerrar }: { cobro: Cobro; alCerrar: () => void }) {
+  const boton = useRef<HTMLButtonElement>(null);
+  useEffect(() => { boton.current?.focus(); }, []);
+  const que = cobro.encolado ? "Guardada en este dispositivo" : "¡Venta registrada!";
+  const fecha = new Date(cobro.fecha);
+  const cuando = `${fecha.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })} ${fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })}`;
+  const icono = (d: string, tam = 22) => <svg width={tam} height={tam} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>;
+  return (
+    <div className="exito venta-registrada" role="dialog" aria-label={que} data-testid="exito">
+      <div className="arriba">
+        <span className="confeti" aria-hidden="true">{CONFETI.map(([x, y, giro, color], i) => <i key={i} style={{ left: x, top: y, background: color, ["--giro" as string]: `${giro}deg` }} />)}</span>
+        <div className="tilde-ok"><Icono nombre="tilde" tam={44} grosor={3} /></div>
+        <h1>{que}</h1>
+      </div>
+      <section className="cobrado">
+        <small>Total cobrado</small>
+        <div className="importe" data-testid="exito-total">{pesosCortos(cobro.total)}</div>
+        <div className="medio">
+          {cobro.medio === "mercado_pago"
+            ? <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={ISOTIPO_DE_MERCADO_PAGO} /></svg>
+            : icono(DIBUJO_DE_MEDIO[cobro.medio] ?? "")}
+          {NOMBRE_DE_MEDIO[cobro.medio]}{cobro.cliente ? ` · ${cobro.cliente}` : ""}
+        </div>
+        {cobro.encolado
+          ? <div className="stock pendiente">{icono("M4 14a4 4 0 0 1 .5-8 6 6 0 0 1 11.3 1.5A3.5 3.5 0 0 1 19 14M8 18l4 3 4-3M12 11v10")}Sin conexión: se envía sola cuando vuelva internet.</div>
+          : <div className="stock">
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z" fill="#f7c445" stroke="#9a6b00" strokeWidth="1.6" strokeLinejoin="round" /><path d="M12 12l8-4.5v9L12 21z" fill="#e0a92c" /><path d="M4 7.5l8 4.5 8-4.5M12 12v9" fill="none" stroke="#9a6b00" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+              El stock ya se descontó<span className="ok"><Icono nombre="tilde" tam={22} grosor={2.4} /></span>
+            </div>}
+      </section>
+      <div className="datos">
+        <div className="dato">{icono("M4 6h16v14H4zM4 10h16M8 3v4M16 3v4", 24)}<small>Fecha y hora</small><b>{cuando}</b></div>
+        <div className="dato">{icono("M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0", 24)}<small>Productos</small><b data-testid="exito-cuantos">{cobro.productos}</b></div>
+      </div>
+      <section className="vendidos">
+        <h2>Productos vendidos</h2>
+        {cobro.items.map((it) => {
+          const foto = fotoDe(it.producto?.foto_url);
+          return (
+            <div key={it.clave} className="vendido" data-testid="vendido">
+              <span className="foto">{foto && <img src={foto} alt="" />}</span>
+              <span className="nombre"><b>{it.descripcion}</b>{it.producto && <small>{detalleDe(it.producto)}</small>}</span>
+              <span className="cantidad">{num(it.cantidad)} {CANTIDAD_EN[it.unidad]}</span>
+              <span className="total">{pesosCortos(subtotalDe(it)?.valor ?? 0)}</span>
+            </div>
+          );
+        })}
+      </section>
+      <button ref={boton} type="button" className="nueva" onClick={alCerrar} data-testid="cerrar-exito">{icono("M12 5v14M5 12h14")}Nueva venta</button>
     </div>
   );
 }

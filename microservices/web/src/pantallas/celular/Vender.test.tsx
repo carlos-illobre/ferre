@@ -208,6 +208,38 @@ describe("Vender", () => {
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
   });
 
+  it("el éxito muestra el total, el medio, el stock, la fecha, cuántos productos y lo vendido, con «Nueva venta» como único botón", async () => {
+    const { agregar } = armar();
+    agregar("mecha vender");
+    fireEvent.click(within(screen.getByTestId("item")).getByRole("button", { name: "Más" }));
+    fireEvent.click(screen.getByTestId("cobrar"));
+    const exito = await screen.findByTestId("exito");
+    expect(within(exito).getByRole("heading", { name: "¡Venta registrada!" })).toBeTruthy();
+    expect(within(exito).getByTestId("exito-total").textContent).toBe("$6.000");
+    expect(exito.textContent).toContain("Total cobrado");
+    expect(exito.textContent).toContain("Efectivo");
+    expect(exito.textContent).toContain("El stock ya se descontó");
+    expect(exito.textContent).toMatch(/Fecha y hora\d\d\/\d\d\/\d{4} \d\d:\d\d/);
+    expect(within(exito).getByTestId("exito-cuantos").textContent).toBe("1");
+    const vendido = within(exito).getByTestId("vendido");
+    expect(vendido.textContent).toContain("MECHA VENDER 8 MM");
+    expect(vendido.textContent).toContain("2 un.");
+    expect(vendido.textContent).toContain("$6.000");
+    expect(within(exito).getAllByRole("button").map((b) => b.textContent)).toEqual(["Nueva venta"]);
+    expect(exito.textContent).not.toMatch(/Costo|margen|ganancia|comprobante/i);
+  });
+
+  it("sin conexión, el éxito dice que quedó guardada y que se envía sola, sin decir que bajó el stock", async () => {
+    enviarOEncolar.mockResolvedValueOnce({ encolado: true });
+    const { agregar } = armar();
+    agregar("mecha vender");
+    fireEvent.click(screen.getByTestId("cobrar"));
+    const exito = await screen.findByTestId("exito");
+    expect(within(exito).getByRole("heading", { name: "Guardada en este dispositivo" })).toBeTruthy();
+    expect(exito.textContent).toContain("Sin conexión: se envía sola cuando vuelva internet.");
+    expect(exito.textContent).not.toContain("El stock ya se descontó");
+  });
+
   it("Vender tiene tres pestañas, cada una con su dirección; Vender ya no muestra las ventas del día", async () => {
     armar();
     expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Hoy", "Anular"]);

@@ -46,7 +46,8 @@ export function subtotalDe(item: Item) {
 }
 
 // Lo que quedó de una venta recién cobrada, para que cada pantalla lo cuente con sus palabras.
-export type Cobro = { total: number; encolado: boolean; medio: Medio; cliente: string | null; productos: number; fecha: string };
+// `items` son los renglones tal como se cobraron, para mostrarlos en el éxito.
+export type Cobro = { total: number; encolado: boolean; medio: Medio; cliente: string | null; productos: number; fecha: string; items: Item[] };
 
 // Por qué no se pudo cobrar: cada interfaz tiene su texto para cada motivo.
 export type MotivoDeNoCobrar = "sin-precio" | "sin-medio" | "sin-cliente";
@@ -182,7 +183,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
       guardar("ventas", { id, fecha: cuerpo.fecha, total, medio_pago: medio, items: cuerpo.items, enviada: !encolado }).catch(() => undefined);
       for (const it of items) if (it.producto) ajustarStockLocal(it.producto.id, -it.cantidad);
       contarAlEspejo(`Venta de ${pesosCortos(total)} cobrada en ${opciones.lado === "computadora" ? "la computadora" : "el celular"}`);
-      const hecho: Cobro = { total, encolado, medio, cliente: cliente?.nombre ?? null, productos: items.length, fecha: cuerpo.fecha };
+      const hecho: Cobro = { total, encolado, medio, cliente: cliente?.nombre ?? null, productos: items.length, fecha: cuerpo.fecha, items: [...items] };
       setCobro(hecho);
       if (!encolado) void ventasCambiaron();
       opciones.alCobrar?.(hecho);

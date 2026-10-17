@@ -83,6 +83,23 @@ el total quedan al alcance del pulgar.
   que no está a la vista porque se cambia poco), «Ver la ficha del producto» y «Sacar foto».
   Un ítem libre (sin producto) tiene solo «Precio a mano» y la unidad.
 
+**El éxito de la venta en el celular** (Carlos, 2026-10-17; maqueta aprobada
+`maquetas/celular-venta-registrada.png`):
+
+- Fondo claro; arriba, el tilde en un círculo verde con confeti verde y amarillo alrededor (cae
+  una sola vez, en menos de un segundo, y queda quieto) y «¡Venta registrada!» grande.
+- Un panel verde con «Total cobrado», el importe grande, el medio de pago con su ícono y una franja
+  «El stock ya se descontó» con una caja amarilla y un tilde.
+- Dos tarjetas: la fecha y hora, y cuántos productos.
+- «Productos vendidos»: cada uno con su foto, el nombre, marca y proveedor, la cantidad con su
+  unidad y su total. Si son muchos, la pantalla se desliza.
+- «Nueva venta», oscuro y fijo abajo, es el único botón.
+- No tiene número de comprobante (las ventas no tienen número), ni el detalle de costos y
+  ganancia, ni comprobante, compartir o ticket (el comprobante es la historia 14, pendiente).
+- Sin conexión dice «Guardada en este dispositivo» y, en lugar del stock, que se envía sola
+  cuando vuelva internet.
+- El éxito de Depósito («Ingreso registrado») queda como estaba.
+
 **Estados:**
 
 - *Vacío:* la venta nueva dice que se escriba el nombre del producto o se escanee el código.
