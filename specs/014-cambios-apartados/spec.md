@@ -6,7 +6,7 @@
 
 **Status**: Aprobada por Carlos (2026-10-17)
 
-**Maquetas**: Variante C para que Carlos la apruebe (2026-10-17): `maquetas/para-revisar-c-*.png`, con el submenú de pestañas de las otras pantallas («Anotadas» y «Para revisar»), pedido de Carlos al ver la A y la B (`maquetas/para-revisar-a-*.png`, `maquetas/para-revisar-b-*.png`)
+**Maquetas**: Variante C para que Carlos la apruebe (2026-10-17): `maquetas/para-revisar-c-*.png`, con el submenú de pestañas de las otras pantallas, primero «Para revisar» y después «Anotadas», y la cantidad a la derecha del nombre (pedidos de Carlos al ver la A, la B y la primera C: `maquetas/para-revisar-a-*.png`, `maquetas/para-revisar-b-*.png`)
 
 **Input**: Decisión 97: lo que una persona hizo sin conexión antes de que la desactivaran y
 todavía no llegó al servidor no se registra solo ni se pierde, queda apartado para que alguien
@@ -21,6 +21,7 @@ decida si lo acepta. Después: «hacé la pantalla».
 - Q: ¿Se revisa en el dispositivo donde quedó o en el servidor? → A: En el servidor. El dispositivo lo sube solo aunque su sesión ya no valga, y queda apartado sin aplicarse; se revisa desde cualquier dispositivo. Sirve aunque el dispositivo sea el celular propio de quien se fue y no vuelva al local.
 - Q: Al aceptar, ¿a nombre de quién queda? → A: De quien lo hizo, con la fecha y la hora en que lo hizo. El registro dice además quién lo aceptó y cuándo.
 - Q: ¿Quién lo revisa? → A: Quien tiene «Administrar usuarios», el mismo permiso que desactiva a las personas.
+- Q: ¿Cómo se ve dentro de Anomalías? → A: Con el submenú de pestañas de las otras pantallas: primero «Para revisar», con la cantidad pendiente a la derecha del nombre, y después «Anotadas», las anomalías de siempre.
 
 ## User Scenarios & Testing
 
