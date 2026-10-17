@@ -20,6 +20,7 @@ comprobantes. Los colores de los medios de pago siguen la decisión 108 (colores
 - Q: ¿Qué entra de la imagen de referencia? → A: Los seis puntos de arriba; no entran el número de venta, el «Tip», «Ver todas» ni imprimir.
 - Q: ¿Contra qué se compara el total de hoy? → A: Contra lo vendido ayer hasta la misma hora: a las 11 se compara con ayer a las 11. Un día anterior, ya terminado, se compara entero con el suyo entero (decisión 109).
 - Q: ¿Quién ve las ventas de otros días? → A: Cualquiera con «Ver las ventas del día», el permiso de la pestaña «Hoy»; no hay un permiso aparte (decisión 109).
+- Q: ¿Qué maqueta? → A: La C: el total, la comparación, el gráfico y los cuatro medios en renglones, todo en la tarjeta oscura; debajo, los tres números en una tira y la lista de ventas.
 
 ## User Scenarios & Testing *(mandatory)*
 
