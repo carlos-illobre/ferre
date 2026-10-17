@@ -6,6 +6,8 @@
 
 **Status**: Aprobada (Carlos, 2026-10-17)
 
+**Maquetas**: Aprobadas (variante A, Carlos, 2026-10-17: `maquetas/celular-ficha-a.html` y `maquetas/compu-ficha.html`)
+
 **Input**: Carlos, el 2026-10-17, sobre una imagen de referencia de la ficha de un producto (la
 que se abre al tocar un producto en el Catálogo): que entren el encabezado con la foto grande,
 una etiqueta con el stock, el código de barras con copiar y escanear al lado, «Código
@@ -156,7 +158,7 @@ la mecha con cantidad 1.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Producto**: suma la fecha y hora de la última lectura de su código de barras, y quién la hizo. Lo demás (foto, código, stock, proveedores, márgenes) ya existe.
+- **Producto**: suma la fecha y hora de la última lectura de su código de barras. Quién la hizo queda en el registro de acciones, como cualquier cambio del producto. Lo demás (foto, código, stock, proveedores, márgenes) ya existe.
 - **Lista de precios**: ya guarda el nombre del archivo, el proveedor, la fecha y sus productos; no se guarda nada nuevo.
 
 ## Success Criteria *(mandatory)*
