@@ -80,7 +80,6 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   const union = page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" });
   await expect(union).toBeVisible();
   await expect(union).toContainText("Proveedor barato (e2e), Proveedor caro (e2e)");
-  page.once("dialog", (d) => d.accept());
   await union.getByRole("button", { name: "Separar" }).click();
   await expect(page.getByTestId("mensaje-separar")).toContainText("Separados");
   await expect(union).toHaveCount(0);

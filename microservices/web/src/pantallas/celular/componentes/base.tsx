@@ -75,11 +75,13 @@ export function Hoja({ titulo, extra, alCerrar, children, testId }: { titulo?: R
   );
 }
 
-export function Toast({ texto, alCerrar, testId = "mensaje" }: { texto: string | null; alCerrar: () => void; testId?: string }) {
+// Un aviso breve; con `accion`, un botón para deshacer lo que se acaba de hacer.
+export function Toast({ texto, alCerrar, testId = "mensaje", accion }: { texto: string | null; alCerrar: () => void; testId?: string; accion?: { texto: string; alTocar: () => void } }) {
   if (!texto) return null;
   return (
     <div className="toast" role="status" data-testid={testId}>
       <span>{texto}</span>
+      {accion && <button type="button" className="toast-accion" onClick={accion.alTocar}>{accion.texto}</button>}
       <button type="button" onClick={alCerrar} aria-label="Cerrar aviso">×</button>
     </div>
   );

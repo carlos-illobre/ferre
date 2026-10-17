@@ -124,10 +124,17 @@ function UnionManual({ alCerrar, alUnir }: { alCerrar: () => void; alUnir: (mens
 const A_LA_VISTA = 3;
 function Unidos({ uniones, todas, alVerTodas }: { uniones: Union[]; todas: boolean; alVerTodas: (abierta: boolean) => void }) {
   const [mensaje, setMensaje] = useState<string | null>(null);
+  // La última separación, para deshacerla desde el aviso.
+  const [separada, setSeparada] = useState<Union | null>(null);
   const [buscado, setBuscado] = useState("");
+  // Separar no pide confirmar: se deshace uniéndolos de nuevo, desde el mismo aviso (como en la computadora).
   async function separar(u: Union) {
-    if (!window.confirm(`¿Separar "${u.absorbido}" de "${u.conservado}"? Cada uno vuelve a tener sus precios, ventas y stock.`)) return;
-    try { await separarProductos(u.absorbido_id); setMensaje(`Separados: "${u.absorbido}" vuelve a ser un producto aparte.`); }
+    try { await separarProductos(u.absorbido_id); setSeparada(u); setMensaje(`Separados: «${u.absorbido}» vuelve a ser un producto aparte, con sus precios, ventas y stock.`); }
+    catch (e) { setSeparada(null); setMensaje((e as Error).message); }
+  }
+  async function deshacer(u: Union) {
+    setSeparada(null);
+    try { await unirProductos(u.conservado_id, u.absorbido_id); setMensaje("Separación deshecha: vuelven a ser un solo producto."); }
     catch (e) { setMensaje((e as Error).message); }
   }
   const lista = (cuales: Union[]) => (
@@ -139,7 +146,7 @@ function Unidos({ uniones, todas, alVerTodas }: { uniones: Union[]; todas: boole
     <>
       <h2 className="seccion dp-titulo" data-testid="unidos"><span>Productos unidos {uniones.length > 0 && <span className="dp-cuenta">{uniones.length}</span>}</span></h2>
       <p className="dp-bajada">Cada uno junta varios productos. Se pueden separar si hace falta.</p>
-      <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-separar" />
+      <Toast texto={mensaje} alCerrar={() => { setMensaje(null); setSeparada(null); }} testId="mensaje-separar" accion={separada ? { texto: "Deshacer", alTocar: () => void deshacer(separada) } : undefined} />
       {uniones.length === 0 ? <div className="aviso-suave">Todavía no se unió ningún producto.</div> : (
         <div className="dp-unidos">
           {lista(uniones.slice(0, A_LA_VISTA))}
