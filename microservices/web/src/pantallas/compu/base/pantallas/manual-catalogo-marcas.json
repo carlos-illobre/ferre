@@ -254,17 +254,24 @@
  "foto-qr": [
   {
    "x": 3.1,
-   "y": 25.7,
-   "ancho": 93.8,
-   "alto": 50.3,
+   "y": 28.8,
+   "ancho": 28.8,
+   "alto": 43.7,
    "texto": "Apuntá la cámara del celular a este código."
   },
   {
-   "x": 80.9,
-   "y": 81.2,
-   "ancho": 16.0,
-   "alto": 13.4,
-   "texto": "Cuando llega la foto, «Cerrar»."
+   "x": 35.4,
+   "y": 30.1,
+   "ancho": 61.5,
+   "alto": 35.0,
+   "texto": "Los pasos: la foto aparece sola."
+  },
+  {
+   "x": 35.4,
+   "y": 67.4,
+   "ancho": 19.1,
+   "alto": 12.8,
+   "texto": "«Cancelar» deja de esperarla."
   }
  ],
  "agregar": [
@@ -400,9 +407,9 @@
  ],
  "codigo-listo": [
   {
-   "x": 38.4,
+   "x": 39.8,
    "y": 26.3,
-   "ancho": 8.3,
+   "ancho": 7.4,
    "alto": 23.2,
    "texto": "Lo copia, para pegarlo en un pedido o un mensaje."
   },
