@@ -78,7 +78,7 @@ export function Hoja({ titulo, extra, alCerrar, children, testId }: { titulo?: R
 }
 
 // Un aviso breve; con `accion`, un botón para deshacer lo que se acaba de hacer.
-export function Toast({ texto, alCerrar, testId = "mensaje", accion }: { texto: string | null; alCerrar: () => void; testId?: string; accion?: { texto: string; alTocar: () => void } }) {
+export function Toast({ texto, alCerrar, testId = "mensaje", accion }: { texto: ReactNode; alCerrar: () => void; testId?: string; accion?: { texto: string; alTocar: () => void } }) {
   if (!texto) return null;
   return (
     <div className="toast" role="status" data-testid={testId}>

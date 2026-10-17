@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { buscarDuplicados, buscarUniones, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Resumen, type Sugerencia, type Union } from "../../../negocio/catalogo/duplicados";
 import { useCatalogo } from "../../../catalogo";
 import { fecha, pesos } from "../../../formato";
@@ -123,13 +123,13 @@ function UnionManual({ alCerrar, alUnir }: { alCerrar: () => void; alUnir: (mens
 // tres últimas uniones; «Ver todo» y «Separar» abren todas, con un buscador (002-T005).
 const A_LA_VISTA = 3;
 function Unidos({ uniones, todas, alVerTodas }: { uniones: Union[]; todas: boolean; alVerTodas: (abierta: boolean) => void }) {
-  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [mensaje, setMensaje] = useState<ReactNode>(null);
   // La última separación, para deshacerla desde el aviso.
   const [separada, setSeparada] = useState<Union | null>(null);
   const [buscado, setBuscado] = useState("");
   // Separar no pide confirmar: se deshace uniéndolos de nuevo, desde el mismo aviso (como en la computadora).
   async function separar(u: Union) {
-    try { await separarProductos(u.absorbido_id); setSeparada(u); setMensaje(`Separados: «${u.absorbido}» vuelve a ser un producto aparte, con sus precios, ventas y stock.`); }
+    try { await separarProductos(u.absorbido_id); setSeparada(u); setMensaje(<>Separados: <b>«{u.absorbido}»</b> vuelve a ser un producto aparte, con sus precios, ventas y stock.</>); }
     catch (e) { setSeparada(null); setMensaje((e as Error).message); }
   }
   async function deshacer(u: Union) {
