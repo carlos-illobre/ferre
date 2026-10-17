@@ -17,7 +17,7 @@ Sin cambios en el servidor ni en la base: todo es del cliente web, en las dos in
   (`ventas.registrar`).
 - **Stock (RF-107).** El catálogo ya tiene en memoria el stock de cada producto (se baja siempre,
   también buscando en el servidor). Una función compartida arma el texto: la cantidad con la
-  abreviatura de su unidad («u.», «m», «kg», «l»), o «Sin stock» si es 0, negativo o no está.
+  abreviatura de su unidad («un.», «m», «kg», «L»), o «Sin stock» si es 0, negativo o no está.
   «Stock bajo» queda para RF-54.
 - **Filtros (RF-109).** Una regla compartida filtra la lista ya buscada por disponibilidad y por
   marca. Las marcas salen del catálogo en memoria, sin repetir mayúsculas y minúsculas

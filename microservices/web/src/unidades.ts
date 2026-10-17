@@ -8,6 +8,9 @@ export const UNIDADES = [
 export type Unidad = (typeof UNIDADES)[number]["valor"];
 // Cómo se escribe una unidad en pantalla: el litro siempre va con mayúscula (L).
 export const escribirUnidad = (u: string): string => (u === "l" ? "L" : u);
+// La unidad abreviada al lado de una cantidad («12 un.», «3,5 kg»): la misma en toda la
+// aplicación (decisión 106).
+export const abreviarUnidad = (u: string): string => (u === "unidad" ? "un." : escribirUnidad(u));
 export const unidadDe = (p: Producto | null | undefined): Unidad => (UNIDADES.some((u) => u.valor === p?.unidad) ? (p!.unidad as Unidad) : "unidad");
 export const enteras = (u: Unidad) => u === "unidad";
 

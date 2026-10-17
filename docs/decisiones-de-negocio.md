@@ -827,3 +827,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      «Proveedores») vayan como en su referencia: más grandes, en negrita, con mayúscula solo al
      principio y sin la rayita amarilla; y que sea así en todas las pantallas del celular, no
      solo en Listas (002-T003, `specs/002-catalogo-y-precios/ux.md`).
+
+106. **Lo que Carlos contestó de la revisión del Catálogo para vender** (2026-10-17):
+     - Cerrar la sesión («Salir», o que el servidor la cierre) vacía la venta a medio armar, para
+       que quien entre después en el mismo dispositivo no la encuentre (ADR-022).
+     - El renglón «N productos con filtros · Sacar filtros» arriba de la lista se queda, con menos
+       espacio arriba y abajo.
+     - Las unidades se abrevian «un.» en toda la aplicación, como ya hacía Vender (el Catálogo y
+       Depósito decían «u.»).
+     - Las pestañas de 44 px valen para todas las pestañas del celular.
+     - «Producto, código o marca» cortado en un celular angosto se acepta, como en la maqueta.

@@ -36,7 +36,7 @@ para saberlo tiene que ir a Depósito y buscarlo de nuevo.
 
 **Acceptance Scenarios**:
 
-1. **E01** **Given** un producto con stock 12 que se vende por unidad, **When** aparece en el Catálogo, **Then** dice «12 u.».
+1. **E01** **Given** un producto con stock 12 que se vende por unidad, **When** aparece en el Catálogo, **Then** dice «12 un.» (la abreviatura de Vender, en toda la aplicación; decisión 106).
 2. **E02** **Given** un producto que se vende por kilo con 3,5 kg, **When** aparece en el Catálogo, **Then** dice «3,5 kg», con la unidad en que se vende.
 3. **E03** **Given** un producto con stock 0, o con stock que nunca se cargó, **When** aparece en el Catálogo, **Then** dice «Sin stock», de modo que se distinga a la vista de los que tienen.
 4. **E04** **Given** un producto con stock mínimo cargado y un stock igual o menor, **When** aparece en el Catálogo, **Then** dice su cantidad marcada como «Stock bajo». Depende del stock mínimo (RF-54): mientras no exista, ningún producto dice «Stock bajo» (decisión 103).

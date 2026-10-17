@@ -115,7 +115,7 @@ describe("Depósito · Stock", () => {
     expect(screen.queryByTestId("dinero-invertido-stock")).toBeNull();
     expect(screen.getByTestId("tabla-stock").textContent).not.toContain("$");
     expect(within(fila).getByTestId("foto-chica")).toBeTruthy(); // la foto del producto también se saca desde acá
-    expect(within(fila).getByTestId("stock").textContent).toContain("17 u.");
+    expect(within(fila).getByTestId("stock").textContent).toContain("17 un.");
     fireEvent.click(within(fila).getByTestId("stock"));
     await screen.findByTestId("movimientos");
     expect(fila.textContent).toContain("Stock 17 = suma de estos movimientos");

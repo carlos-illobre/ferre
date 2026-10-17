@@ -2,6 +2,7 @@ import { useEffect, useId, useState, type KeyboardEvent, type ReactNode, type Re
 import { ErrorApi } from "../../../../api";
 import type { Producto } from "../../../celular/pantallas/Productos";
 import { Buscador, numero } from "../ui";
+import { abreviarUnidad } from "../../../../unidades";
 import "../estilos/deposito-comun.css";
 
 // Lo que comparten Stock, Compras y Contar: el buscador de productos que se maneja con
@@ -9,7 +10,7 @@ import "../estilos/deposito-comun.css";
 export type { Producto };
 
 export const detalleDe = (p: Pick<Producto, "marca" | "proveedor">) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
-export const nombreUnidad = (u: string) => (u === "unidad" ? "u." : u === "l" ? "L" : u);
+export const nombreUnidad = abreviarUnidad;
 // Diferencia con su signo; «=» cuando coincide.
 export const conSigno = (n: number) => (n === 0 ? "=" : `${n > 0 ? "+" : "−"}${numero(Math.abs(n))}`);
 // Un error del servidor ya viene en castellano; cualquier otro es que no hubo conexión.

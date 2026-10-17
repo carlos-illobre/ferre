@@ -14,3 +14,5 @@ y marca, pestañas más altas y el buscador que dice qué busca (pedido de Carlo
 - [x] T007 Comparar con las maquetas aprobadas mediante capturas de celular y computadora y mostrarle a Carlos las diferencias (depende de T004 y T005)
 - [x] T008 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T006)
 - [x] T009 Actualizar `proyecto/estado.yml` y llevar lo nuevo a las `spec.md` de Catálogo (002) y Ventas (003) (depende de T008)
+- [x] T010 [ajuste] El renglón «N productos con filtros» con menos espacio arriba y abajo (Carlos, 2026-10-17)
+- [x] T011 [ajuste] Las unidades se abrevian «un.» en toda la aplicación, como en Vender: Catálogo y Depósito decían «u.» (Carlos, 2026-10-17)

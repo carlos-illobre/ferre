@@ -13,7 +13,7 @@ import { ErrorApi } from "../../api";
 import { traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
-import { cantidadValida, enteras, unidadDe } from "../../unidades";
+import { abreviarUnidad, cantidadValida, enteras, unidadDe } from "../../unidades";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
@@ -120,7 +120,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto, veI
     } catch (e) { setError((e as Error).message); }
   }
   const nombreTipo = nombreDeMovimiento;
-  const unidad = p.unidad === "unidad" ? "u." : p.unidad === "l" ? "L" : p.unidad;
+  const unidad = abreviarUnidad(p.unidad);
 
   return (
     <div className={`fila-stock ${abierto ? "abierta" : ""}`} data-testid="fila-stock">

@@ -22,7 +22,7 @@
 .boton-filtros { position: relative; flex: none; width: 50px; height: 50px; border-radius: 15px; border: 1.5px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-verde); display: grid; place-items: center; }
 .buscador.chico ~ .boton-filtros, .buscador.chico .boton-filtros { width: 46px; height: 46px; border-radius: 14px; }
 .boton-filtros b { position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--p-naranja); color: #fff; font-size: 13px; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--p-fondo); }
-/* Pegado al buscador y a la lista (decisión 105): «Sacar filtros» conserva sus 36 px para el dedo
+/* Pegado al buscador y a la lista (decisión 106): «Sacar filtros» conserva sus 36 px para el dedo
    sin agrandar el renglón. */
 .con-filtros { display: flex; align-items: center; justify-content: space-between; margin: -2px 4px; font-size: 15px; color: var(--p-texto-2); }
 .con-filtros button { margin-block: -8px; }

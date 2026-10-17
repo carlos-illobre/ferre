@@ -30,7 +30,7 @@ describe("Catálogo para vender · computadora", () => {
 
   it("015-E01 015-E03: la columna Stock dice la cantidad con su unidad, o «Sin stock»", () => {
     armar();
-    expect(within(fila("Mecha")).getByTestId("stock").textContent).toBe("12 u.");
+    expect(within(fila("Mecha")).getByTestId("stock").textContent).toBe("12 un.");
     expect(within(fila("Cinta")).getByTestId("stock").textContent).toBe("Sin stock");
   });
 

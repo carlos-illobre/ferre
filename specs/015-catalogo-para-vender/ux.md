@@ -10,9 +10,9 @@ celular y en la computadora.
 
 ## Saber si hay (historia 1)
 
-- Cada producto dice su stock con la unidad en que se vende («120 m», «9 u.», «12,5 kg») o
+- Cada producto dice su stock con la unidad en que se vende («120 m», «9 un.», «12,5 kg») o
   «Sin stock». Los dos se distinguen a la vista: el que hay, en verde; el que no, en naranja.
-- En el celular, el stock va como etiqueta chica arriba del nombre («9 u. en stock»); en la
+- En el celular, el stock va como etiqueta chica arriba del nombre («9 un. en stock»); en la
   computadora, en la columna Stock, que ya existía.
 - «Stock bajo» no aparece hasta que exista el stock mínimo (RF-54).
 
@@ -43,7 +43,8 @@ celular y en la computadora.
   mientras se elige: se recorre entero con el teclado.
 - Con filtros puestos, arriba de la lista, un renglón dice cuántos productos quedan («12
   productos con filtros») y ofrece «Sacar filtros» de un toque. No está en la maqueta: se agregó
-  al programar, para cumplir E18 y E19.
+  al programar, para cumplir E18 y E19, y Carlos lo aprobó (decisión 106). Va pegado a lo que
+  tiene arriba y abajo, sin más aire que entre el buscador y la lista sin filtros.
 - Con filtros que no dejan nada, la lista lo dice y ofrece sacarlos.
 
 ## Pestañas, buscador y tarjetas (historia 4)

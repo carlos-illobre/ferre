@@ -8,8 +8,8 @@ const MECHA = producto("mecha", "Bosch"), CLAVO = producto("clavo", "Erpa", "kg"
 const stock = new Map([["mecha", 12], ["clavo", 3.5], ["cable", 120], ["cinta", 0], ["cinta2", -2]]);
 
 describe("el stock en el Catálogo", () => {
-  it("015-E01: por unidad, la cantidad entera con «u.»", () => {
-    expect(stockDe(MECHA, stock)).toEqual({ hay: true, texto: "12 u." });
+  it("015-E01: por unidad, la cantidad entera con «un.»", () => {
+    expect(stockDe(MECHA, stock)).toEqual({ hay: true, texto: "12 un." });
   });
   it("015-E02: por kilo o metro, con su unidad y un decimal", () => {
     expect(stockDe(CLAVO, stock).texto).toBe("3,5 kg");
@@ -20,10 +20,10 @@ describe("el stock en el Catálogo", () => {
   });
   it("015-E03: muy poco no se escribe «0»: es stock, con su primera cifra", () => {
     expect(stockDe(CLAVO, new Map([["clavo", 0.04]]))).toEqual({ hay: true, texto: "0,04 kg" });
-    expect(stockDe(MECHA, new Map([["mecha", 0.4]]))).toEqual({ hay: true, texto: "0,4 u." });
+    expect(stockDe(MECHA, new Map([["mecha", 0.4]]))).toEqual({ hay: true, texto: "0,4 un." });
   });
   it("015-E05: con el stock nuevo, dice el stock nuevo", () => {
-    expect(stockDe(MECHA, new Map([["mecha", 4]])).texto).toBe("4 u.");
+    expect(stockDe(MECHA, new Map([["mecha", 4]])).texto).toBe("4 un.");
   });
 });
 

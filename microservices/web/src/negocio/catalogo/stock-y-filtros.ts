@@ -1,11 +1,11 @@
 import type { Producto } from "../../producto";
-import { escribirUnidad, unidadDe } from "../../unidades";
+import { abreviarUnidad, unidadDe } from "../../unidades";
 
 // Lo que el Catálogo muestra y filtra del stock y de la marca (RF-107, RF-109), una sola vez
 // para el celular y la computadora (decisión 47). El stock es el mismo de Depósito.
 
 // El stock de un producto como se lee en el Catálogo: la cantidad con la unidad en que se vende
-// («12 u.», «3,5 kg»), o «Sin stock» si es cero, negativo o no se cargó nunca. «Stock bajo»
+// («12 un.», «3,5 kg»), o «Sin stock» si es cero, negativo o no se cargó nunca. «Stock bajo»
 // espera al stock mínimo (RF-54, decisión 103).
 export function stockDe(p: Producto, stock: ReadonlyMap<string, number>): { hay: boolean; texto: string } {
   const cantidad = stock.get(p.id);
@@ -15,7 +15,7 @@ export function stockDe(p: Producto, stock: ReadonlyMap<string, number>): { hay:
   // verde contradiría «Sin stock».
   const redondeado = cantidad.toLocaleString("es-AR", { maximumFractionDigits: unidad === "unidad" ? 0 : 1 });
   const numero = redondeado === "0" ? cantidad.toLocaleString("es-AR", { maximumSignificantDigits: 1 }) : redondeado;
-  return { hay: true, texto: `${numero} ${unidad === "unidad" ? "u." : escribirUnidad(unidad)}` };
+  return { hay: true, texto: `${numero} ${abreviarUnidad(unidad)}` };
 }
 
 export type Disponibilidad = "todos" | "con-stock" | "sin-stock";

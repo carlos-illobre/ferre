@@ -52,7 +52,7 @@
 .panel-filtros .filtros-marcas button[aria-checked="true"] { font-weight: 700; }
 .panel-filtros .filtros-marcas button[aria-checked="true"] i { border: 6px solid var(--p-naranja); }
 .panel-filtros > .detalle { margin: 10px 0 0; }
-/* Pegado a los atajos y a la tabla (decisión 105). */
+/* Pegado a los atajos y a la tabla (decisión 106). */
 .con-filtros { display: flex; align-items: center; gap: 12px; margin: -8px 0; }
 .con-filtros .enlace { margin-block: -6px; }
 

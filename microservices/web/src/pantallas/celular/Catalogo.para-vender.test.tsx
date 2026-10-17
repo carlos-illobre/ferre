@@ -36,7 +36,7 @@ describe("Catálogo para vender · celular", () => {
 
   it("015-E01 015-E02 015-E03 015-E04: cada producto dice su stock con su unidad, o «Sin stock»; ninguno dice «Stock bajo»", () => {
     armar();
-    expect(within(tarjeta("mecha")).getByTestId("stock").textContent).toBe("12 u. en stock");
+    expect(within(tarjeta("mecha")).getByTestId("stock").textContent).toBe("12 un. en stock");
     expect(within(tarjeta("clavo")).getByTestId("stock").textContent).toBe("3,5 kg en stock");
     const sin = within(tarjeta("aisladora")).getByTestId("stock");
     expect(sin.textContent).toBe("Sin stock");
