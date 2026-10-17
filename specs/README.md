@@ -173,6 +173,15 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-100 | «Ver los números del negocio» deja de existir; los roles que lo tenían reciben los tres permisos nuevos | [013-secciones-de-negocio](013-secciones-de-negocio/spec.md) |
 | RF-101 | El valor en pesos del stock se ve con «Ver el dinero invertido» | [013-secciones-de-negocio](013-secciones-de-negocio/spec.md) |
 
+### Lo apartado de alguien a quien desactivaron
+
+| ID | Requerimiento | Especificación |
+|---|---|---|
+| RF-102 | Lo que una persona hizo sin conexión y no llegó al servidor antes de que la desactivaran se manda apenas reconecta y queda apartado sin aplicarse | [014-cambios-apartados](014-cambios-apartados/spec.md) |
+| RF-103 | Lo apartado se revisa en Más → Anomalías, «Para revisar», y cada cambio se acepta o se descarta de a uno | [014-cambios-apartados](014-cambios-apartados/spec.md) |
+| RF-104 | Un cambio aceptado se registra a nombre de quien lo hizo, con su fecha y hora; el registro dice quién lo aceptó o descartó | [014-cambios-apartados](014-cambios-apartados/spec.md) |
+| RF-105 | Lo apartado lo ve y lo decide solo quien tiene «Administrar usuarios»; con ese permiso, Anomalías aparece en Más | [014-cambios-apartados](014-cambios-apartados/spec.md) |
+
 ## Requerimientos no funcionales
 
 Los que son reglas generales están además en la constitución.

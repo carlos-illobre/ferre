@@ -1214,6 +1214,22 @@ RF-101:
     - tests/e2e/celular/13-roles.spec.ts
   defectos: []
 
+RF-102:
+  estado: "Nuevo (014): esperando que Carlos apruebe la especificación"
+  pruebas: []
+
+RF-103:
+  estado: "Nuevo (014): esperando que Carlos apruebe la especificación"
+  pruebas: []
+
+RF-104:
+  estado: "Nuevo (014): esperando que Carlos apruebe la especificación"
+  pruebas: []
+
+RF-105:
+  estado: "Nuevo (014): esperando que Carlos apruebe la especificación"
+  pruebas: []
+
 RNF-61:
   estado: "Hecho (011-T001, 011-T003): módulo aparte en su carpeta, con su servicio y su esquema en la misma base; pnpm capas controla que no importe nada de Ferrebress"
   pruebas:
