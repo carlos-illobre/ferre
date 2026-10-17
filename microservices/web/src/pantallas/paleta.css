@@ -34,6 +34,15 @@
   --p-relleno-fuerte: #d3ddd5;
   --p-naranja-apretado: #ffd9cb;
   --p-amarillo-texto: #6b4a00;
+  /* Los medios de pago (decisión 108, specs/017): el color y su fondo suave. */
+  --p-medio-efectivo: #0f6b52;
+  --p-medio-efectivo-suave: #e3f3ea;
+  --p-medio-mp: #0a6aa8;
+  --p-medio-mp-suave: #e2f0fa;
+  --p-medio-tarjeta: #5b3fb5;
+  --p-medio-tarjeta-suave: #ece8fb;
+  --p-medio-cuenta: #9a5a00;
+  --p-medio-cuenta-suave: #fff0d6;
 }
 
 /* Animaciones deshabilitadas en Configuración (RF-83): nada se mueve, en ninguna de las dos interfaces. */

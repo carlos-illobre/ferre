@@ -1,3 +1,4 @@
+import { IconoDeMedio } from "../IconoDeMedio";
 import { useEffect, useState } from "react";
 import { irA } from "../../rutas";
 import { urlApi } from "../../api";
@@ -59,7 +60,7 @@ function Ventas() {
             const parte = hoy.total > 0 ? importe / hoy.total : 0;
             return (
               <div key={m} className="medio-de-pago" data-testid={`medio-${m}`}>
-                <span>{NOMBRE_DE_MEDIO[m]}</span>
+                <span className="medio-nombre"><IconoDeMedio medio={m} tam={18} conFondo />{NOMBRE_DE_MEDIO[m]}</span>
                 <strong className="importe">{pesosCortos(importe)} · {Math.round(parte * 100)} %</strong>
                 <span className="medio-barra" aria-hidden="true"><i style={{ width: `${Math.round(parte * 100)}%` }} /></span>
               </div>

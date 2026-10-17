@@ -5,7 +5,7 @@ import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Cobro, type Item,
 import { SiVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
-import { ISOTIPO_DE_MERCADO_PAGO } from "../mercado-pago";
+import { IconoDeMedio } from "../IconoDeMedio";
 import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { FotoProducto } from "./componentes/Foto";
@@ -34,11 +34,6 @@ import { FichaProducto } from "./FichaProducto";
 // renglón es una tarjeta; el margen se cambia ahí mismo y queda guardado en el producto.
 // Un dibujo por medio de pago, con su nombre chico debajo como en el menú de abajo: billete,
 // tarjeta y libreta. Mercado Pago lleva su propio isotipo.
-const DIBUJO_DE_MEDIO: Record<string, string> = {
-  efectivo: "M3 7h18v10H3ZM12 14.500a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5ZM6 10v4M18 10v4",
-  tarjeta: "M3 6h18v12H3ZM3 10h18M7 15h4",
-  cuenta_corriente: "M6 3h12v18H6ZM9 8h6M9 12h6M9 16h3",
-};
 
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
@@ -250,9 +245,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           <div className="medios" role="radiogroup" aria-label="Cómo paga">
             {MEDIOS.map((m) => (
               <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} className={medio === m.valor ? "activo" : ""} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
-                {m.valor === "mercado_pago"
-                  ? <svg className="isotipo-mp" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={ISOTIPO_DE_MERCADO_PAGO} /></svg>
-                  : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DIBUJO_DE_MEDIO[m.valor]} /></svg>}
+                <IconoDeMedio medio={m.valor} />
                 <span>{m.corto}</span>
               </button>
             ))}
@@ -404,9 +397,7 @@ function VentaRegistrada({ cobro, alCerrar }: { cobro: Cobro; alCerrar: () => vo
         <small>Total cobrado</small>
         <div className="importe" data-testid="exito-total">{pesosCortos(cobro.total)}</div>
         <div className="medio">
-          {cobro.medio === "mercado_pago"
-            ? <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={ISOTIPO_DE_MERCADO_PAGO} /></svg>
-            : icono(DIBUJO_DE_MEDIO[cobro.medio] ?? "")}
+          <IconoDeMedio medio={cobro.medio} tam={20} conFondo />
           {NOMBRE_DE_MEDIO[cobro.medio]}{cobro.cliente ? ` · ${cobro.cliente}` : ""}
         </div>
         {cobro.encolado

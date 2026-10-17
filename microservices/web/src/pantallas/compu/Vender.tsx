@@ -1,3 +1,4 @@
+import { IconoDeMedio } from "../IconoDeMedio";
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { SiVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
@@ -241,7 +242,7 @@ export function Vender() {
           <div className="vender-medios" role="radiogroup" aria-label="Cómo paga">
             {MEDIOS.map((m) => (
               <Boton key={m.valor} variante="sobre-marino" role="radio" aria-checked={medio === m.valor} aria-keyshortcuts={m.tecla} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
-                {!esCelular && <span className="tecla" aria-hidden="true">{m.tecla}</span>}{esCelular ? m.corto : m.nombre}
+                {!esCelular && <span className="tecla" aria-hidden="true">{m.tecla}</span>}<IconoDeMedio medio={m.valor} tam={16} conFondo className="chico" />{esCelular ? m.corto : m.nombre}
               </Boton>
             ))}
           </div>

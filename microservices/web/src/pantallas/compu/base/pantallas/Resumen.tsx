@@ -1,3 +1,4 @@
+import { IconoDeMedio } from "../../../IconoDeMedio";
 import { useEffect, useState, type ReactNode } from "react";
 import { NOMBRES, TEXTOS } from "../../../textos";
 import { usePuede } from "../../../permisos";
@@ -10,14 +11,13 @@ import { MEDIOS, NOMBRE_DE_MEDIO as NOMBRE_MEDIO } from "../../../../negocio/ven
 import type { VentasDelDia as DatosHoy } from "../../../../negocio/ventas/ventas-del-dia";
 import { irA } from "../rutas";
 import { useEsCelular } from "../vista";
-import { Aviso, Boton, EstadoDeConexion, Explicado, Icono, Indicador, Pagina, Pastilla, Vacio, pesosCortos, type NombreDeIcono } from "../ui";
+import { Aviso, Boton, EstadoDeConexion, Explicado, Icono, Indicador, Pagina, Pastilla, Vacio, pesosCortos } from "../ui";
 import { comoCarga, diaYHora, useEnLinea, type Carga } from "./negocio-comun";
 import { useConsultas, useVentasDelDia, type Consulta } from "../../../../negocio/ventas/ventas-del-dia";
 import { useGastosDeLaSemana, type Gastos } from "../../../../negocio/compras";
 import "../estilos/negocio.css";
 
 
-const ICONO_MEDIO: Record<string, NombreDeIcono> = { efectivo: "plata", mercado_pago: "celular", tarjeta: "caja", cuenta_corriente: "contar" };
 const CONSULTAS_A_LA_VISTA = 6;
 const plural = (n: number, uno: string, muchos: string) => `${n.toLocaleString("es-AR")} ${n === 1 ? uno : muchos}`;
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
@@ -66,7 +66,7 @@ export function ResumenVentas() {
                 const parte = hoy.datos!.total > 0 ? importe / hoy.datos!.total : 0;
                 return (
                   <li key={m} data-testid={`medio-${m}`}>
-                    <span className="resumen-medio-icono"><Icono nombre={ICONO_MEDIO[m] ?? "plata"} tam={18} /></span>
+                    <IconoDeMedio medio={m} tam={18} conFondo className="resumen-medio-icono" />
                     <span className="resumen-medio-nombre">{NOMBRE_MEDIO[m]}</span>
                     <span className="importe chico">{pesosCortos(importe)}</span>
                     <span className="resumen-barra" aria-hidden="true"><i style={{ transform: `scaleX(${parte})` }} /></span>
