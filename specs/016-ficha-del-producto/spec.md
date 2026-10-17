@@ -93,7 +93,7 @@ con su costo, tocar la flecha y elegir el otro, y desplegar «Así se calcula».
 4. **E17** **Given** un producto con un solo proveedor, **When** se abre su ficha, **Then** el proveedor se ve sin flecha.
 5. **E18** **Given** la ficha abierta, **When** se toca «Así se calcula», **Then** se despliega la cuenta: costo de compra + margen (con su porcentaje) + IVA = precio, y el precio redondeado a $1.000 que se cobra; al tocarlo otra vez se pliega.
 6. **E19** **Given** «Así se calcula» desplegado, **When** se elige otro margen, **Then** la cuenta y el precio cambian al momento, y el margen queda guardado sin otro paso, como hoy.
-7. **E20** **Given** un producto sin margen, o sin costo, **When** se abre su ficha, **Then** el precio dice «sin margen» o «sin costo», como hoy, y «Así se calcula» explica qué falta en lugar de una cuenta.
+7. **E20** **Given** un producto sin margen, o sin costo, **When** se abre su ficha, **Then** el precio dice «sin costo», o «elegí un margen» (a quien no puede fijar márgenes, «sin margen»), y «Así se calcula» explica qué falta en lugar de una cuenta.
 8. **E21** **Given** un usuario sin permiso para ver costos, **When** abre la ficha, **Then** no ve proveedores, costos ni «Así se calcula»: ve el precio de venta, como hoy.
 
 ---

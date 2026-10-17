@@ -184,6 +184,13 @@ export const TEXTOS = {
     sinConexionArchivo: igual("Sin conexión: el nombre del archivo y la descarga necesitan internet."),
     listo: igual("Listo"),
     teclaAgregar: igual("agrega a la venta"),
+    sinMarca: igual("Sin marca ni código"),
+    aMano: igual("a mano"),
+    sinCosto: igual("sin costo"),
+    eligeMargen: igual("elegí un margen"),
+    sinMargen: igual("sin margen"),
+    subiendo: igual("Subiendo…"),
+    noSubio: igual("No se pudo subir la foto"),
   },
 } satisfies Record<string, Record<string, Texto>>;
 

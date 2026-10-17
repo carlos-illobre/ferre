@@ -137,7 +137,7 @@ describe("Catálogo · Productos", () => {
   });
 
   it("con varios proveedores marca el más barato y permite usar otro", () => {
-    const { buscar, falso } = armar([producto({ id: "sil", descripcion: "SILICONA", costo_neto: "2400", proveedor: "Barato", proveedores: [
+    const { buscar, falso } = armar([producto({ id: "sil", descripcion: "SILICONA", costo_neto: "2400", proveedor: "Barato", proveedor_id: "b", proveedores: [
       { proveedor_id: "b", proveedor: "Barato", costo_neto: "2400", fecha_lista: "2026-08-11", codigo_proveedor: "S1" },
       { proveedor_id: "c", proveedor: "Caro", costo_neto: "3000", fecha_lista: "2026-08-11", codigo_proveedor: "S2" },
     ] })]);

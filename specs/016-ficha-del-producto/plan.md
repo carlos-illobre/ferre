@@ -44,8 +44,9 @@
   (`catalogo.costos`), igual que la tarjeta que los muestra. «Agregar a la venta» pide
   `ventas.registrar`, como en el Catálogo.
 - **Qué entra desde afuera:** la hora de la lectura llega del dispositivo: se valida que sea una
-  fecha y hora, que no esté en el futuro (se toma la del servidor si lo está), que no sea anterior
-  al 2026, y que venga con un código. El id de la lista del pedido nuevo se valida; una lista que
+  fecha y hora con su zona y que venga con un código (si no, 400); si está en el futuro o es
+  anterior a 2026, no se rechaza: vale la hora del servidor. Unir duplicados pasa la última
+  lectura junto con el código, y separarlos la devuelve. El id de la lista del pedido nuevo se valida; una lista que
   no existe da 404.
 - **Secretos:** ninguno.
 - **Registro de quién hizo qué:** cambiar el código ya se registra; el registro suma la hora de la

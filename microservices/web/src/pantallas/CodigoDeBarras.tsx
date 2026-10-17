@@ -22,7 +22,9 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
   const [tipeado, setTipeado] = useState("");
   const [aviso, setAviso] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [recien, setRecien] = useState(false); // el código se cargó en esta ficha
+  // El código que se cargó en esta ficha: «Código actualizado» mientras el producto lo tenga (si el
+  // servidor lo rechaza, vuelve el anterior y el aviso se va; specs/016, E12).
+  const [recien, setRecien] = useState<string | null>(null);
   const [copiado, setCopiado] = useState<string | null>(null);
   const caja = useRef<HTMLElement>(null);
   const conCamara = celular && hayCamara();
@@ -47,7 +49,7 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
     try {
       const otro = quienLoTiene(codigo);
       await alGuardar(codigo);
-      setRecien(true);
+      setRecien(codigo);
       setAviso(otro ? `También lo tiene «${otro.descripcion}»: si son el mismo artículo, unilos en Duplicados.` : null);
       setAbierto(false); setTipeado("");
     } catch (e) { setError(`No se pudo guardar el código: ${(e as Error).message}`); }
@@ -81,7 +83,7 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
           </button>
         )}
       </div>
-      {recien ? (
+      {recien && recien === p.codigo_barras ? (
         <div className="cb-ok" role="status" data-testid="codigo-guardado">
           <i aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg></i>
           <span><b>{t.actualizado.largo}</b>{lectura && <span data-testid="ultima-lectura">{t.ultimaLectura.largo}: {lectura}</span>}</span>

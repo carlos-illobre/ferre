@@ -2,6 +2,8 @@ import { productos } from "./rutas-00-base.mjs";
 
 // La ficha del producto renovada (specs/016): la última lectura del código de algunos productos
 // y el archivo de origen de cada lista (GET /listas/:id/origen).
+// Como el servidor: cada producto dice de qué proveedor sale su costo.
+productos.forEach((p) => { p.proveedor_id ??= p.proveedores?.find((v) => v.proveedor === p.proveedor)?.proveedor_id ?? `pv-${p.proveedor}`; });
 productos.forEach((p, i) => { if (p.codigo_barras && i % 2 === 0) p.codigo_leido_en = `2026-10-${String(10 + (i % 9)).padStart(2, "0")}T13:24:00.000Z`; });
 
 const LISTAS = { "l-0": ["Comodo", 7096], "l-1": ["Tresge", 2310], "l-2": ["Erpa", 15422], "l-3": ["Ixnova", 4875] };

@@ -55,12 +55,12 @@ const TABLAS_MOVIBLES = ["precio_proveedor", "item_venta", "item_compra", "movim
 export type Movidos = {
   movidos: Record<(typeof TABLAS_MOVIBLES)[number], string[]>;
   renglones_borrados: Record<string, unknown>[];
-  conservado_antes: { codigo_barras: string | null; marca: string | null; sector_id: string | null; margen_elegido: number | null; proveedor_preferido_id: string | null };
+  conservado_antes: { codigo_barras: string | null; codigo_leido_en?: string | null; marca: string | null; sector_id: string | null; margen_elegido: number | null; proveedor_preferido_id: string | null };
   absorbido_antes: { proveedor_preferido_id: string | null };
 };
 export async function unirProductos(db: pg.PoolClient, conservar: string, absorber: string): Promise<Movidos> {
   if (conservar === absorber) throw new Error("Es el mismo producto");
-  const antes = await db.query("SELECT id, codigo_barras, marca, sector_id, margen_elegido, proveedor_preferido_id FROM producto WHERE id IN ($1, $2)", [conservar, absorber]);
+  const antes = await db.query("SELECT id, codigo_barras, codigo_leido_en, marca, sector_id, margen_elegido, proveedor_preferido_id FROM producto WHERE id IN ($1, $2)", [conservar, absorber]);
   const c0 = antes.rows.find((r) => r.id === conservar)!;
   const a0 = antes.rows.find((r) => r.id === absorber)!;
   // Renglones de conteo: si el mismo conteo tiene los dos, se queda con el del conservado.
@@ -73,6 +73,8 @@ export async function unirProductos(db: pg.PoolClient, conservar: string, absorb
   await db.query(
     `UPDATE producto c SET
        codigo_barras = COALESCE(c.codigo_barras, a.codigo_barras),
+       -- El código que pasa del absorbido trae su última lectura (specs/016).
+       codigo_leido_en = CASE WHEN c.codigo_barras IS NULL THEN a.codigo_leido_en ELSE c.codigo_leido_en END,
        marca = COALESCE(c.marca, a.marca),
        sector_id = COALESCE(c.sector_id, a.sector_id),
        margen_elegido = COALESCE(c.margen_elegido, a.margen_elegido)
@@ -84,7 +86,7 @@ export async function unirProductos(db: pg.PoolClient, conservar: string, absorb
   await elegirPreferidoMasBarato(db, conservar);
   return {
     movidos, renglones_borrados: borrados.rows,
-    conservado_antes: { codigo_barras: c0.codigo_barras, marca: c0.marca, sector_id: c0.sector_id, margen_elegido: c0.margen_elegido, proveedor_preferido_id: c0.proveedor_preferido_id },
+    conservado_antes: { codigo_barras: c0.codigo_barras, codigo_leido_en: c0.codigo_leido_en ?? null, marca: c0.marca, sector_id: c0.sector_id, margen_elegido: c0.margen_elegido, proveedor_preferido_id: c0.proveedor_preferido_id },
     absorbido_antes: { proveedor_preferido_id: a0.proveedor_preferido_id },
   };
 }
@@ -102,8 +104,8 @@ export async function separarProductos(db: pg.PoolClient, conservar: string, abs
   }
   const c = registro.conservado_antes;
   await db.query(
-    `UPDATE producto SET codigo_barras = $2, marca = $3, sector_id = $4, margen_elegido = $5, proveedor_preferido_id = $6 WHERE id = $1`,
-    [conservar, c.codigo_barras, c.marca, c.sector_id, c.margen_elegido, c.proveedor_preferido_id],
+    `UPDATE producto SET codigo_barras = $2, marca = $3, sector_id = $4, margen_elegido = $5, proveedor_preferido_id = $6, codigo_leido_en = $7 WHERE id = $1`,
+    [conservar, c.codigo_barras, c.marca, c.sector_id, c.margen_elegido, c.proveedor_preferido_id, c.codigo_leido_en ?? null],
   );
   await db.query(`UPDATE producto SET activo = true, reemplazado_por = NULL, proveedor_preferido_id = $2 WHERE id = $1`, [absorbido, registro.absorbido_antes.proveedor_preferido_id]);
   await elegirPreferidoMasBarato(db, conservar);

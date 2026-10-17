@@ -13,7 +13,7 @@ import { margenAMano, otroMargen, precioDelProducto } from "../../negocio/catalo
 import { stockDe } from "../../negocio/catalogo/stock-y-filtros";
 import { cuentaDelPrecio, useOrigenDeLista } from "../../negocio/catalogo/ficha";
 import { agregarALaVenta } from "../../negocio/ventas/venta-en-curso";
-import { TEXTOS } from "../textos";
+import { cuantosProductos, TEXTOS } from "../textos";
 import "./ficha.css";
 
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string };
@@ -37,7 +37,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
         <div className="ficha-titulo">
           <span className={`etiqueta-stock ${hay.hay ? "hay" : "no"}`} data-testid="stock">{hay.hay ? `${hay.texto} ${TEXTOS.catalogo.enStock.corto}` : hay.texto}</span>
           <h2 className="ficha-nombre">{p.descripcion}</h2>
-          <small>{[p.marca, p.codigo_proveedor ? `Código ${p.codigo_proveedor}` : null].filter(Boolean).join(" · ")}</small>
+          <small>{[p.marca, p.codigo_proveedor ? `Código ${p.codigo_proveedor}` : null].filter(Boolean).join(" · ") || t.sinMarca.corto}</small>
         </div>
       </div>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-ficha" />
@@ -68,14 +68,14 @@ function FotoDeLaFicha({ producto: p, alSubir }: { producto: Producto; alSubir: 
     e.target.value = "";
     if (!f) return;
     setSubiendo(true); setError(null);
-    try { await alSubir(f); } catch (err) { setError(`No se pudo subir la foto: ${(err as Error).message}`); } finally { setSubiendo(false); }
+    try { await alSubir(f); } catch (err) { setError(`${t.noSubio.corto}: ${(err as Error).message}`); } finally { setSubiendo(false); }
   }
   return (
     <div className={`ficha-foto ${p.foto_url ? "" : "sin"}`}>
       <FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} alSubir={alSubir} />
       <input ref={archivo} type="file" accept="image/*" capture="environment" hidden onChange={elegida} data-testid="archivo-foto-ficha" />
       <button type="button" className="ficha-cambiar-foto" disabled={subiendo} onClick={() => archivo.current?.click()} data-testid="cambiar-foto">
-        <Icono nombre="camara" tam={16} />{subiendo ? "Subiendo…" : p.foto_url ? t.cambiarFoto.corto : t.sacarFoto.corto}
+        <Icono nombre="camara" tam={16} />{subiendo ? t.subiendo.corto : p.foto_url ? t.cambiarFoto.corto : t.sacarFoto.corto}
       </button>
       {error && <p className="ficha-foto-error" role="alert">{error}</p>}
     </div>
@@ -88,7 +88,7 @@ function TarjetaProveedor({ producto: p, alUsar }: { producto: Producto; alUsar:
   const todos = p.proveedores ?? [];
   if (!p.proveedor) return null;
   const masBarato = todos[0]?.proveedor_id;
-  const enUso = todos.find((v) => v.proveedor === p.proveedor);
+  const enUso = todos.find((v) => v.proveedor_id === p.proveedor_id);
   const otros = todos.filter((v) => v !== enUso);
   const elMasBarato = enUso ? enUso.proveedor_id === masBarato : todos.length <= 1;
   return (
@@ -134,7 +134,7 @@ function TarjetaPrecio({ producto: p, fijaMargen, veCostos, alCambiar }: { produ
       <div className="ficha-precio-fila">
         <span className="ficha-detalle">{t.precioDeVenta.corto}</span>
         {calculo ? <strong className="ficha-precio" data-testid="precio-de-venta">{pesosCortos(calculo.valor)}</strong>
-          : <span className="ficha-sin-precio" data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
+          : <span className="ficha-sin-precio" data-testid="sin-precio">{costo === null ? t.sinCosto.corto : fijaMargen ? t.eligeMargen.corto : t.sinMargen.corto}</span>}
       </div>
       {fijaMargen && <>
         <div className="cuadricula-5" role="radiogroup" aria-label="margen">
@@ -143,7 +143,7 @@ function TarjetaPrecio({ producto: p, fijaMargen, veCostos, alCambiar }: { produ
           ))}
         </div>
         <div className="fila-otro">
-          <span>{t.otroMargen.corto}{manual !== null ? ` · ${manual} % a mano` : ""}</span>
+          <span>{t.otroMargen.corto}{manual !== null ? ` · ${manual} % ${t.aMano.corto}` : ""}</span>
           <label className="campo"><input inputMode="numeric" placeholder="ej. 120" value={otro} disabled={costo === null} data-testid="otro-margen"
             onChange={(e) => setOtro(e.target.value.replace(/[^\d]/g, ""))}
             onKeyDown={(e) => { if (e.key === "Enter") { const v = otroMargen(otro); if (v !== null) alCambiar({ margen_elegido: v }); } }}
@@ -190,7 +190,7 @@ function TarjetaArchivo({ producto: p, alError }: { producto: Producto; alError:
         <span className="ficha-archivo-icono" aria-hidden="true"><Icono nombre="excel" tam={22} /></span>
         <span className="ficha-proveedor-texto">
           {o && <b className="ficha-archivo-nombre">{o.archivo_nombre}</b>}
-          <span className="ficha-detalle">{[o?.proveedor ?? p.proveedor, fecha(o?.fecha_lista ?? p.fecha_lista), o ? `${o.productos.toLocaleString("es-AR")} productos` : null].filter(Boolean).join(" · ")}</span>
+          <span className="ficha-detalle">{[o?.proveedor ?? p.proveedor, fecha(o?.fecha_lista ?? p.fecha_lista), o ? cuantosProductos(o.productos) : null].filter(Boolean).join(" · ")}</span>
         </span>
       </div>
       {origen?.estado === "sin-conexion" && <p className="ficha-detalle">{t.sinConexionArchivo.corto}</p>}

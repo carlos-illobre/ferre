@@ -7,5 +7,5 @@
 - [x] T005 Celular: la ficha según la maqueta A (E01–E27 que le tocan) (depende de T004)
 - [x] T006 Computadora: la ficha según su maqueta, con las teclas (E01–E27 que le tocan) (depende de T004)
 - [x] T007 Una prueba por escenario, anotada en `proyecto/estado.yml`; e2e solo de lo que no prueban las unitarias (depende de T005 y T006)
-- [ ] T008 Comparar con las maquetas aprobadas mediante capturas de celular y computadora y mostrarle a Carlos las diferencias (depende de T005 y T006)
-- [ ] T009 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T007)
+- [x] T008 Comparar con las maquetas aprobadas mediante capturas de celular y computadora y mostrarle a Carlos las diferencias (depende de T005 y T006)
+- [x] T009 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T007)

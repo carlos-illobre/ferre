@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { buscar, indexar } from "./plataforma/busqueda/busqueda";
 import { buscaEnElServidor } from "./guardado";
-import { api, EVENTO_CAMBIO } from "./api";
+import { api, ErrorApi, EVENTO_CAMBIO } from "./api";
 import { borrar, guardar, guardarMeta, leerMeta, leerTodo, reemplazarTodo } from "./almacen";
 import { cambiosDeProductosPendientes, enviarOEncolar, enviarPendientes } from "./cola";
 import type { Producto } from "./producto";
@@ -241,6 +241,16 @@ function asegurar() {
   });
 }
 
+function deshacerCodigo(id: string, codigo: string | null, leido: string | null) {
+  const pendiente = pendientes.get(id);
+  if (pendiente) { delete pendiente.codigo_barras; delete pendiente.codigo_leido_en; }
+  const anterior = estado.catalogo;
+  if (!anterior) return;
+  const nuevo = anterior.map((p) => (p.id === id ? { ...p, codigo_barras: codigo, codigo_leido_en: leido } : p));
+  poner({ catalogo: nuevo });
+  guardarCatalogo(nuevo, anterior).catch(() => undefined);
+}
+
 async function actualizarProducto(id: string, cambiosPedidos: Cambios) {
   // Cargar o cambiar el código anota la hora de la lectura (specs/016, RF-112): la de acá, que sin
   // conexión es la de verdad aunque el cambio llegue al servidor más tarde. Borrarlo la borra.
@@ -261,6 +271,12 @@ async function actualizarProducto(id: string, cambiosPedidos: Cambios) {
   if ("foto_url" in cambios) cuerpo.foto_url = cambios.foto_url ?? null;
   if ("proveedor_preferido_id" in cambios) cuerpo.proveedor_preferido_id = cambios.proveedor_preferido_id ?? null;
   const r = enviarOEncolar("producto.cambio", "PATCH", `/productos/${id}`, cuerpo);
+  // Un código que el servidor rechaza no quedó cargado: vuelve el que estaba, con su última
+  // lectura (specs/016, E12). Sin conexión el cambio queda en cola y no se deshace.
+  const previo = anterior?.find((p) => p.id === id);
+  if ("codigo_barras" in cambios && previo) {
+    void r.catch((e: unknown) => { if (e instanceof ErrorApi) deshacerCodigo(id, previo.codigo_barras, previo.codigo_leido_en ?? null); });
+  }
   // Cambiar el proveedor preferido cambia el costo vigente: se vuelve a bajar el catálogo.
   if ("proveedor_preferido_id" in cambios) void r.then(() => (enVuelo ?? Promise.resolve()).then(() => refrescarDelServidor())).catch(() => undefined);
   return r;

@@ -12,7 +12,7 @@ import { stockDe } from "../../../../negocio/catalogo/stock-y-filtros";
 import { cuentaDelPrecio, useOrigenDeLista } from "../../../../negocio/catalogo/ficha";
 import { agregarALaVenta } from "../../../../negocio/ventas/venta-en-curso";
 import { MARGENES } from "../../../../negocio/precios/vista-previa";
-import { TEXTOS } from "../../../textos";
+import { cuantosProductos, TEXTOS } from "../../../textos";
 import "../estilos/ficha.css";
 
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string };
@@ -42,9 +42,9 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
 
   return (
     <Hoja ancha titulo={p.descripcion} alCerrar={alCerrar} testId="ficha-producto" alTeclear={teclas}
-      foto={<FotoDeLaFicha producto={p} alSubir={async (archivo) => alCambiar({ foto_url: await subirFoto(p.id, archivo) })} />}
+      foto={<FotoDeLaFicha producto={p} alSubir={async (archivo) => alCambiar({ foto_url: await subirFoto(p.id, archivo) })} alError={setMensaje} />}
       sobreTitulo={<span className={`etiqueta-stock ${hay.hay ? "hay" : "no"}`} data-testid="stock">{hay.hay ? `${hay.texto} ${TEXTOS.catalogo.enStock.largo}` : hay.texto}</span>}
-      bajoTitulo={<span className="detalle">{[p.marca, p.codigo_proveedor ? `Código ${p.codigo_proveedor}` : null].filter(Boolean).join(" · ") || "Sin marca ni código"}</span>}
+      bajoTitulo={<span className="detalle">{[p.marca, p.codigo_proveedor ? `Código ${p.codigo_proveedor}` : null].filter(Boolean).join(" · ") || t.sinMarca.largo}</span>}
       pie={<div className="ficha-pie">
         <span className="ficha-teclas detalle">
           {fijaMargen && <span><kbd className="tecla">Mayús</kbd> + <kbd className="tecla">1</kbd> a <kbd className="tecla">5</kbd> margen</span>}
@@ -69,7 +69,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
   );
 }
 
-function FotoDeLaFicha({ producto: p, alSubir }: { producto: Producto; alSubir: (archivo: File) => Promise<void> }) {
+function FotoDeLaFicha({ producto: p, alSubir, alError }: { producto: Producto; alSubir: (archivo: File) => Promise<void>; alError: (m: string) => void }) {
   const archivo = useRef<HTMLInputElement>(null);
   const [subiendo, setSubiendo] = useState(false);
   async function elegida(e: React.ChangeEvent<HTMLInputElement>) {
@@ -77,14 +77,14 @@ function FotoDeLaFicha({ producto: p, alSubir }: { producto: Producto; alSubir: 
     e.target.value = "";
     if (!f) return;
     setSubiendo(true);
-    try { await alSubir(f); } finally { setSubiendo(false); }
+    try { await alSubir(f); } catch (err) { alError(`${t.noSubio.largo}: ${(err as Error).message}`); } finally { setSubiendo(false); }
   }
   return (
     <div className={`ficha-foto ${p.foto_url ? "" : "sin"}`}>
       <FotoProducto id={p.id} url={p.foto_url ?? null} descripcion={p.descripcion} alSubir={alSubir} />
       <input ref={archivo} type="file" accept="image/*" hidden onChange={elegida} data-testid="archivo-foto-ficha" />
       <button type="button" className="ficha-cambiar-foto" disabled={subiendo} onClick={() => archivo.current?.click()} data-testid="cambiar-foto">
-        <Icono nombre="camara" tam={16} />{subiendo ? "Subiendo…" : p.foto_url ? t.cambiarFoto.largo : t.sacarFoto.largo}
+        <Icono nombre="camara" tam={16} />{subiendo ? t.subiendo.largo : p.foto_url ? t.cambiarFoto.largo : t.sacarFoto.largo}
       </button>
     </div>
   );
@@ -95,7 +95,7 @@ function TarjetaProveedor({ producto: p, alUsar }: { producto: Producto; alUsar:
   const todos = p.proveedores ?? [];
   if (!p.proveedor) return null;
   const masBarato = todos[0]?.proveedor_id;
-  const enUso = todos.find((v) => v.proveedor === p.proveedor);
+  const enUso = todos.find((v) => v.proveedor_id === p.proveedor_id);
   const otros = todos.filter((v) => v !== enUso);
   const elMasBarato = enUso ? enUso.proveedor_id === masBarato : todos.length <= 1;
   return (
@@ -138,12 +138,12 @@ function TarjetaPrecio({ producto: p, fijaMargen, veCostos, alCambiar }: { produ
       <div className="ficha-precio-fila">
         <span className="detalle">{t.precioDeVenta.largo}</span>
         {calculo ? <strong className="ficha-precio" data-testid="precio-de-venta">{pesosCortos(calculo.valor)}</strong>
-          : <span className="ficha-sin-precio" data-testid="sin-precio">{costo === null ? "sin costo" : "elegí un margen"}</span>}
+          : <span className="ficha-sin-precio" data-testid="sin-precio">{costo === null ? t.sinCosto.largo : fijaMargen ? t.eligeMargen.largo : t.sinMargen.largo}</span>}
       </div>
       {fijaMargen && <>
         <Margenes flechasDeAfuera elegido={p.margen_elegido} disabled={costo === null} etiqueta="Margen" alElegir={(m) => alCambiar({ margen_elegido: m })} />
         <div className="ficha-otro">
-          <label className="detalle" htmlFor="ficha-otro-margen">{t.otroMargen.largo}{manual !== null ? `: hoy ${manual} % a mano` : ""}</label>
+          <label className="detalle" htmlFor="ficha-otro-margen">{t.otroMargen.largo}{manual !== null ? ` · ${manual} % ${t.aMano.largo}` : ""}</label>
           <OtroMargen producto={p} manual={manual} alCambiar={alCambiar} />
         </div>
       </>}
@@ -198,10 +198,10 @@ function TarjetaArchivo({ producto: p, alError }: { producto: Producto; alError:
     <section className="ficha-tarjeta" aria-labelledby="ficha-archivo" data-testid="archivo-de-origen">
       <h3 id="ficha-archivo" className="ficha-tarjeta-titulo">{t.archivo.largo}</h3>
       <div className="ficha-archivo">
-        <span className="ficha-archivo-icono" aria-hidden="true"><Icono nombre="archivo" tam={22} /></span>
+        <span className="ficha-archivo-icono" aria-hidden="true"><Icono nombre="excel" tam={22} /></span>
         <span className="ficha-proveedor-texto">
           {o && <b className="ficha-archivo-nombre">{o.archivo_nombre}</b>}
-          <span className="detalle">{[o?.proveedor ?? p.proveedor, fecha(o?.fecha_lista ?? p.fecha_lista), o ? `${o.productos.toLocaleString("es-AR")} productos` : null].filter(Boolean).join(" · ")}</span>
+          <span className="detalle">{[o?.proveedor ?? p.proveedor, fecha(o?.fecha_lista ?? p.fecha_lista), o ? cuantosProductos(o.productos) : null].filter(Boolean).join(" · ")}</span>
           {origen?.estado === "sin-conexion" && <span className="detalle">{t.sinConexionArchivo.largo}</span>}
         </span>
         <Boton tam="chico" icono="bajar" data-ficha-vertical="" data-testid="bajar-lista"

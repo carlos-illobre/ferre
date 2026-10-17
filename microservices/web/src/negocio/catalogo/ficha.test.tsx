@@ -54,6 +54,22 @@ describe("la última lectura del código (RF-112)", () => {
   });
 });
 
+describe("un código que el servidor rechaza (E12)", () => {
+  it("016-E12: no queda cargado: vuelven el código y la última lectura de antes", async () => {
+    const VIEJA = "2026-10-01T10:00:00.000Z";
+    const P = { id: "p-9", descripcion: "MECHA 6 MM", marca: null, codigo_barras: "7790000000001", codigo_leido_en: VIEJA, unidad: "unidad", margen_elegido: 100, proveedor: "Uno", codigo_proveedor: "C9", costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-01", explicacion_costo: [] };
+    apiFalsa.mockReset();
+    apiFalsa.mockImplementation(async (ruta: string) => (String(ruta).startsWith("/productos") ? [P] : []));
+    vi.resetModules();
+    const { useCatalogo } = await import("../../catalogo");
+    const { result } = renderHook(() => useCatalogo());
+    await waitFor(() => expect(result.current.catalogo?.find((p) => p.id === "p-9")).toBeTruthy());
+    enviar.mockRejectedValueOnce(new ErrorApi(400, "El código de barras tiene que tener entre 4 y 32 letras o números"));
+    await result.current.actualizarProducto("p-9", { codigo_barras: "7799999999999" }).catch(() => undefined);
+    await waitFor(() => expect(result.current.catalogo?.find((p) => p.id === "p-9")).toMatchObject({ codigo_barras: "7790000000001", codigo_leido_en: VIEJA }));
+  });
+});
+
 describe("el archivo de origen (RF-115)", () => {
   const ORIGEN = { id: "l-0", archivo_nombre: "lista_comodo_05-09-2026.xlsx", proveedor: "Comodo", fecha_lista: "2026-09-05", productos: 7096 };
   beforeEach(() => { apiFalsa.mockReset(); olvidarOrigenes(); });

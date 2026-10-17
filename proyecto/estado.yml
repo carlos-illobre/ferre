@@ -825,7 +825,8 @@ RF-111:
   pruebas:
     - microservices/web/src/pantallas/celular/FichaProducto.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/FichaProducto.test.tsx
-  defectos: []
+  defectos:
+    - "Las mayúsculas del nombre y el fondo neutro sin foto son de estilo: las pruebas las comprueban por la clase, no por cómo se ven (revisión 016)"
 
 RF-112:
   estado: "A validar (016): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
@@ -862,7 +863,8 @@ RF-115:
     - microservices/web/src/negocio/catalogo/ficha.test.tsx
     - microservices/web/src/pantallas/celular/FichaProducto.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/FichaProducto.test.tsx
-  defectos: []
+  defectos:
+    - "Bajar el Excel de una lista (anterior a 016) pide solo sesión, no «Ver costos», aunque el archivo trae todos los costos del proveedor (revisión 016, a decidir por Carlos)"
 
 RF-116:
   estado: "A validar (016): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"

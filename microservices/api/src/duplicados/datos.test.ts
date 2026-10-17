@@ -13,9 +13,9 @@ type Cliente = Parameters<typeof unirProductos>[0];
 describe("unir y separar productos", () => {
   beforeEach(() => {
     base.actual = baseFalsa();
-    base.actual.programar(/SELECT id, codigo_barras, marca, sector_id, margen_elegido, proveedor_preferido_id FROM producto WHERE id IN/, { rows: [
-      { id: "A", codigo_barras: null, marca: "M", sector_id: null, margen_elegido: 100, proveedor_preferido_id: "prov-a" },
-      { id: "B", codigo_barras: "779", marca: null, sector_id: "s1", margen_elegido: 50, proveedor_preferido_id: "prov-b" },
+    base.actual.programar(/SELECT id, codigo_barras, codigo_leido_en, marca, sector_id, margen_elegido, proveedor_preferido_id FROM producto WHERE id IN/, { rows: [
+      { id: "A", codigo_barras: null, codigo_leido_en: null, marca: "M", sector_id: null, margen_elegido: 100, proveedor_preferido_id: "prov-a" },
+      { id: "B", codigo_barras: "779", codigo_leido_en: "2026-10-13T13:24:00.000Z", marca: null, sector_id: "s1", margen_elegido: 50, proveedor_preferido_id: "prov-b" },
     ] });
     base.actual.programar(/UPDATE precio_proveedor SET producto_id = \$1 WHERE producto_id = \$2 RETURNING id/, { rows: [{ id: "pp1" }, { id: "pp2" }] });
     base.actual.programar(/UPDATE item_venta SET producto_id = \$1 WHERE producto_id = \$2 RETURNING id/, { rows: [{ id: "iv1" }] });
@@ -28,18 +28,20 @@ describe("unir y separar productos", () => {
     expect(registro.movidos.item_venta).toEqual(["iv1"]);
     expect(registro.movidos.movimiento_stock).toEqual([]);
     expect(registro.renglones_borrados).toEqual([{ id: "rc-dup", conteo_id: "c1", producto_id: "B", cantidad_contada: "3" }]);
-    expect(registro.conservado_antes).toEqual({ codigo_barras: null, marca: "M", sector_id: null, margen_elegido: 100, proveedor_preferido_id: "prov-a" });
+    expect(registro.conservado_antes).toEqual({ codigo_barras: null, codigo_leido_en: null, marca: "M", sector_id: null, margen_elegido: 100, proveedor_preferido_id: "prov-a" });
     expect(registro.absorbido_antes).toEqual({ proveedor_preferido_id: "prov-b" });
     expect(base.actual.sqlDe(/UPDATE producto SET activo = false, reemplazado_por/)[0]!.params).toEqual(["A", "B"]);
     // el conservado hereda lo que le faltaba (código de barras, sector)
     expect(base.actual.sqlDe(/COALESCE\(c\.codigo_barras, a\.codigo_barras\)/)).toHaveLength(1);
+    // 016: el código que pasa del absorbido trae su última lectura.
+    expect(base.actual.sqlDe(/codigo_leido_en = CASE WHEN c\.codigo_barras IS NULL THEN a\.codigo_leido_en ELSE c\.codigo_leido_en END/)).toHaveLength(1);
   });
 
   it("separar devuelve cada fila movida, reinserta los renglones borrados, restaura los productos y reactiva el absorbido", async () => {
     const registro: Movidos = {
       movidos: { precio_proveedor: ["pp1", "pp2"], item_venta: ["iv1"], item_compra: [], movimiento_stock: ["ms1"], consulta: [], renglon_conteo: [] },
       renglones_borrados: [{ id: "rc-dup", conteo_id: "c1", producto_id: "B", cantidad_contada: "3" }],
-      conservado_antes: { codigo_barras: null, marca: "M", sector_id: null, margen_elegido: 100, proveedor_preferido_id: "prov-a" },
+      conservado_antes: { codigo_barras: null, codigo_leido_en: null, marca: "M", sector_id: null, margen_elegido: 100, proveedor_preferido_id: "prov-a" },
       absorbido_antes: { proveedor_preferido_id: "prov-b" },
     };
     await separarProductos(base.actual.pool as unknown as Cliente, "A", "B", registro);
@@ -48,7 +50,7 @@ describe("unir y separar productos", () => {
       ["precio_proveedor", ["B", ["pp1", "pp2"], "A"]], ["item_venta", ["B", ["iv1"], "A"]], ["movimiento_stock", ["B", ["ms1"], "A"]],
     ]);
     expect(base.actual.sqlDe(/INSERT INTO renglon_conteo SELECT \* FROM jsonb_populate_recordset/)[0]!.params[0]).toBe(JSON.stringify(registro.renglones_borrados));
-    expect(base.actual.sqlDe(/UPDATE producto SET codigo_barras = \$2/)[0]!.params).toEqual(["A", null, "M", null, 100, "prov-a"]);
+    expect(base.actual.sqlDe(/UPDATE producto SET codigo_barras = \$2/)[0]!.params).toEqual(["A", null, "M", null, 100, "prov-a", null]);
     expect(base.actual.sqlDe(/UPDATE producto SET activo = true, reemplazado_por = NULL/)[0]!.params).toEqual(["B", "prov-b"]);
   });
 });

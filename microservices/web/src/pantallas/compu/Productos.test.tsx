@@ -71,7 +71,7 @@ describe("Productos (v2)", () => {
 
   // 002-T002: en la ficha, ← → recorren los márgenes y Enter elige; ↑ ↓ recorren los proveedores y «Listo».
   it("en la ficha las flechas recorren márgenes, proveedores y «Listo», y Enter elige", () => {
-    const falso = catalogoFalso([producto({ id: "sil", descripcion: "SILICONA", costo_neto: "2400", margen_elegido: 100, proveedor: "Barato", proveedores: [
+    const falso = catalogoFalso([producto({ id: "sil", descripcion: "SILICONA", costo_neto: "2400", margen_elegido: 100, proveedor: "Barato", proveedor_id: "b", proveedores: [
       { proveedor_id: "b", proveedor: "Barato", costo_neto: "2400", fecha_lista: "2026-08-11", codigo_proveedor: "S1" },
       { proveedor_id: "c", proveedor: "Caro", costo_neto: "3000", fecha_lista: "2026-08-11", codigo_proveedor: "S2" },
     ] })]);

@@ -4,11 +4,12 @@
 .cb p { margin: 0; }
 /* La ficha renovada (specs/016, maqueta A): el código en su caja con «copiar» adentro, y escanear al lado. */
 .cb-titulo { margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--p-verde); }
-.cb-fila { display: flex; align-items: stretch; gap: 8px; }
-.cb-caja { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 48px; padding: 0 4px 0 12px; border-radius: 12px; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); }
+.cb-fila { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+/* La caja nunca corta el código: si no entra al lado del botón (14 dígitos en un celular angosto), el botón baja. */
+.cb-caja { flex: 1 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 4px; min-height: 48px; padding: 0 2px 0 10px; border-radius: 12px; background: var(--p-fondo-2); border: 1px solid var(--p-borde-suave); }
 .cb code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1rem; letter-spacing: 0.02em; white-space: nowrap; }
 .cb-sin { color: var(--p-texto-2); }
-.cb-copiar { flex: none; width: 36px; height: 40px; border-radius: 10px; border: 0; background: none; color: var(--p-verde); display: grid; place-items: center; cursor: pointer; }
+.cb-copiar { flex: none; width: 32px; height: 40px; border-radius: 10px; border: 0; background: none; color: var(--p-verde); display: grid; place-items: center; cursor: pointer; }
 .cb-copiar:hover { background: var(--p-superficie); }
 .cb-ok { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-size: 0.9375rem; }
 .cb-ok b { display: block; color: var(--p-verde); }
@@ -29,5 +30,5 @@
 .cb-acciones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 .cb-ayuda { color: var(--p-texto-2); font-size: 0.9375rem; }
 .cb :focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
-@media (max-width: 899px) { .cb-fila .cb-boton { max-width: 38%; padding: 0 10px; } .cb-acciones .cb-boton { flex: 1; } }
+@media (max-width: 899px) { .cb-fila .cb-boton { max-width: 36%; padding: 0 8px; gap: 6px; } .cb-acciones .cb-boton { flex: 1; } }
 .cb-boton svg, .cb-copiar svg { width: 20px; height: 20px; flex: none; }

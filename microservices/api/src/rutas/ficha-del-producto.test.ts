@@ -36,7 +36,7 @@ describe("la última lectura del código (RF-112)", () => {
     expect((await pedir(app, "PATCH", "/productos/p1", { cuerpo: { codigo_barras: "779123", codigo_leido_en: "ayer" } })).status).toBe(400);
   });
 
-  it("016-E12: otro cambio del producto (el margen) no toca la última lectura", async () => {
+  it("016-E10: otro cambio del producto (el margen) no toca la última lectura", async () => {
     await pedir(app, "PATCH", "/productos/p1", { rol: "mostrador", cuerpo: { margen_elegido: 100 } });
     expect(base.actual.sqlDe(/UPDATE producto SET/).at(-1)!.sql).not.toMatch(/codigo_leido_en/);
   });

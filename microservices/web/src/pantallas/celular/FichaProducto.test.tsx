@@ -15,7 +15,7 @@ import { FichaProducto } from "./FichaProducto";
 import { olvidarOrigenes } from "../../negocio/catalogo/ficha";
 import { ventaActual } from "../../negocio/ventas/venta-en-curso";
 
-const CINTA = producto({ id: "cinta", descripcion: "Cinta aisladora negra 20 m", marca: "3M", codigo_proveedor: "CO-60127", costo_neto: "420", margen_elegido: 200, proveedor: "Comodo", fecha_lista: "2026-09-05", lista_importada_id: "l-0",
+const CINTA = producto({ id: "cinta", proveedor_id: "co", descripcion: "Cinta aisladora negra 20 m", marca: "3M", codigo_proveedor: "CO-60127", costo_neto: "420", margen_elegido: 200, proveedor: "Comodo", fecha_lista: "2026-09-05", lista_importada_id: "l-0",
   proveedores: [{ proveedor_id: "co", proveedor: "Comodo", costo_neto: "420", fecha_lista: "2026-09-05", codigo_proveedor: "CO-60127" }], foto_url: "/fotos/cinta.jpg" });
 const ORIGEN = { id: "l-0", archivo_nombre: "lista_comodo_05-09-2026.xlsx", proveedor: "Comodo", fecha_lista: "2026-09-05", productos: 7096 };
 
