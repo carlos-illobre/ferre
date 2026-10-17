@@ -7,8 +7,10 @@ vi.mock("../../negocio/vinculo", async (original) => ({ ...(await original<typeo
 
 // El botón de Google, de mentira: guarda la función que Google llama al volver con la cuenta.
 let alVolverDeGoogle: ((r: { credential: string }) => Promise<void>) | null = null;
+const dibujado = vi.fn();
 function googleDeMentira() {
-  (window as any).google = { accounts: { id: { initialize: (o: { callback: typeof alVolverDeGoogle }) => { alVolverDeGoogle = o.callback; }, renderButton: () => undefined } } };
+  dibujado.mockReset();
+  (window as any).google = { accounts: { id: { initialize: (o: { callback: typeof alVolverDeGoogle }) => { alVolverDeGoogle = o.callback; }, renderButton: (el: HTMLElement, o: unknown) => { el.innerHTML = '<div role="button">Continuar con Google</div>'; dibujado(o); } } } };
 }
 
 // 007-T021: al volver de Google, mientras se abre la sesión, no se ve la entrada.
@@ -64,5 +66,15 @@ describe("Conectando tu cuenta de Google", () => {
     await act(async () => { await alVolverDeGoogle!({ credential: "x" }); });
     expect(screen.queryByTestId("conectando-con-google")).toBeNull();
     expect(screen.getByTestId("error-google").textContent).toContain("no está autorizado");
+  });
+
+  it("007-T029 si el servidor no deja entrar, el botón de Google se vuelve a dibujar con su azul", async () => {
+    entrarConGoogle.mockRejectedValue(new Error("Ese correo no está autorizado"));
+    await boton();
+    expect(dibujado).toHaveBeenCalledTimes(1);
+    await act(async () => { await alVolverDeGoogle!({ credential: "x" }); });
+    expect(dibujado).toHaveBeenCalledTimes(2);
+    expect(dibujado).toHaveBeenLastCalledWith(expect.objectContaining({ theme: "filled_blue" }));
+    expect(document.querySelectorAll(".boton-google [role=button]")).toHaveLength(1);
   });
 });

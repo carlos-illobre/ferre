@@ -62,12 +62,21 @@ export function BotonGoogle({ conPantallaDeCarga = false }: { conPantallaDeCarga
           } catch (e) {
             setConectando(false);
             setError((e as Error).message);
+            // Al volver, el botón de Google queda con el foco o «tocado» y se ve más claro: se lo
+            // suelta y se lo vuelve a dibujar, con su azul de siempre (007-T029).
+            if (document.activeElement instanceof HTMLElement && boton.current?.contains(document.activeElement)) document.activeElement.blur();
+            dibujar();
           }
         },
       });
       // El botón original de Google, sin nada encima ni estilos nuestros (decisión 69).
-      const ancho = Math.round(Math.min(400, Math.max(200, boton.current.clientWidth || 320)));
-      google.accounts.id.renderButton(boton.current, { theme: "filled_blue", size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
+      const dibujar = () => {
+        if (!boton.current) return;
+        const ancho = Math.round(Math.min(400, Math.max(200, boton.current.clientWidth || 320)));
+        boton.current.replaceChildren();
+        google.accounts.id.renderButton(boton.current, { theme: "filled_blue", size: "large", shape: "pill", text: "continue_with", locale: "es", width: ancho });
+      };
+      dibujar();
     }, 200);
     return () => clearInterval(intervalo);
   }, [entrar, conPantallaDeCarga]);
