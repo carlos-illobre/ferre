@@ -6,7 +6,7 @@
 
 **Status**: Aprobada por Carlos (2026-10-17)
 
-**Maquetas**: Dos variantes para que Carlos elija (2026-10-17): `maquetas/para-revisar-a-*.png` (un bloque «Para revisar» arriba de las anotadas, agrupado por persona) y `maquetas/para-revisar-b-*.png` (pestañas «Para revisar» y «Anotadas»)
+**Maquetas**: Variante C para que Carlos la apruebe (2026-10-17): `maquetas/para-revisar-c-*.png`, con el submenú de pestañas de las otras pantallas («Anotadas» y «Para revisar»), pedido de Carlos al ver la A y la B (`maquetas/para-revisar-a-*.png`, `maquetas/para-revisar-b-*.png`)
 
 **Input**: Decisión 97: lo que una persona hizo sin conexión antes de que la desactivaran y
 todavía no llegó al servidor no se registra solo ni se pierde, queda apartado para que alguien
