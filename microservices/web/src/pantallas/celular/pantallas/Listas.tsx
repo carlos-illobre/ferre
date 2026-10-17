@@ -1,12 +1,23 @@
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from "react";
 import { usePuede } from "../../permisos";
 import { ErrorApi } from "../../../api";
-import { aplicarLista, cargarLista, descartarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useLectores, useListas, type Avance, type Cargada, type ListaFila, type Proveedor } from "../../../negocio/catalogo/listas";
+import { aplicarLista, buscarProveedores, cargarLista, descartarLista, descuentosDe, fraccionAplicada, pendientes, retomar, situacionDelProveedor, ultimaAplicada, useFilasDeLista, useLectores, useListas, type Avance, type Cargada, type ListaFila, type Proveedor } from "../../../negocio/catalogo/listas";
 import { altaDeProveedor, faltaEnProveedor } from "../../../negocio/proveedores";
 import { Explicacion } from "../componentes/Explicacion";
 import { AvisoError, Hoja, Icono, Toast, Lista } from "../componentes/base";
 import { fecha, pesos, porcentaje } from "../../../formato";
 
+const miles = (n: number | string) => Number(n).toLocaleString("es-AR");
+const mayuscula = (t: string) => t[0]!.toUpperCase() + t.slice(1);
+const diaYMes = (iso: string) => { const d = new Date(iso); return `${d.getDate()}/${d.getMonth() + 1}`; };
+
+// El estado de una carga, como pastilla: aplicada (verde, con tilde), pendiente o aplicándose
+// (amarilla, con reloj) o descartada (gris).
+function EstadoDeCarga({ estado }: { estado: ListaFila["estado"] }) {
+  if (estado === "aplicada") return <span className="lp-estado ok"><Icono nombre="tilde" tam={14} grosor={3} />Aplicada</span>;
+  if (estado === "pendiente" || estado === "aplicando") return <span className="lp-estado pend"><Icono nombre="reloj" tam={14} />{estado === "aplicando" ? "Aplicándose…" : "Pendiente"}</span>;
+  return <span className="lp-estado gris">{mayuscula(estado)}</span>;
+}
 
 // Cargar una lista de precios (issue #12): elegir el archivo → revisar el resumen y la
 // vista previa en una hoja → aplicar o descartar. Nada se guarda hasta "Aplicar".
@@ -20,6 +31,7 @@ export function Listas() {
   const error = !fallo || fallo === cerrado ? null : fallo instanceof ErrorApi ? fallo.message : "Sin conexión con el servidor. Cargar una lista necesita internet.";
   const [resultado, setResultado] = useState<string | null>(null);
   const [altaAbierta, setAltaAbierta] = useState(false);
+  const [buscado, setBuscado] = useState("");
 
   const sinAplicar = pendientes(historial);
   const abrirPendiente = (l: ListaFila) => setCargada(retomar(l));
@@ -32,11 +44,15 @@ export function Listas() {
       <div className="dos-columnas">
       <div className="columna">
       {sinAplicar.map((l) => (
-        <button key={l.id} type="button" className="tarjeta oscura" style={{ textAlign: "left", gap: 8 }} onClick={() => abrirPendiente(l)} data-testid="lista-pendiente">
-          <span className="seccion" style={{ padding: 0, color: "var(--coral-claro)" }}>Lista pendiente de revisar</span>
-          <span style={{ fontSize: 19, fontWeight: 600 }}>{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
-          <small>{l.resumen.leidas} productos · {l.resumen.modificados} cambian de precio{l.resumen.modificados > 0 ? ` (${porcentaje(l.resumen.variacion_promedio)} en promedio)` : ""} · {l.resumen.nuevos} nuevos</small>
-          <span className="boton coral" style={{ alignSelf: "flex-start", height: 36, fontSize: 14 }}>Revisar y aplicar</span>
+        <button key={l.id} type="button" className="tarjeta oscura lp-pendiente" onClick={() => abrirPendiente(l)} data-testid="lista-pendiente">
+          <span className="seccion">Lista pendiente de revisar</span>
+          <span className="lp-titulo">{l.proveedor}<small>Lista del {fecha(l.fecha_lista)}</small></span>
+          <span className="boton coral">Revisar y aplicar</span>
+          <span className="lp-numeros">
+            <span><b>{miles(l.resumen.leidas)}</b> productos</span>
+            <span><b>{miles(l.resumen.modificados)}</b> cambian{l.resumen.modificados > 0 ? ` (${porcentaje(l.resumen.variacion_promedio)})` : ""}</span>
+            <span><b>{miles(l.resumen.nuevos)}</b> nuevos</span>
+          </span>
         </button>
       ))}
       <ZonaDeCarga proveedores={proveedores} alCargar={setCargada} />
@@ -44,12 +60,20 @@ export function Listas() {
       {historial.length > 0 && (
         <>
           <h2 className="seccion">Últimas cargas</h2>
-          <Lista data-testid="historial">
+          <Lista data-testid="historial" className="lp-lista">
             {historial.slice(0, 3).map((l) => (
-              <div key={l.id} className="fila">
-                <span className="nombre">{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
-                <small className="derecha">{l.estado === "aplicando" ? "aplicándose…" : l.estado}</small>
-                <span className="detalle">{new Date(l.creado_en).toLocaleString("es-AR")} · {l.archivo_nombre} · {l.estado === "aplicada" ? `${l.resumen.nuevos} nuevos, ${l.resumen.modificados} cambiados` : `${l.resumen.leidas} leídos`}</span>
+              <div key={l.id} className="lp-fila">
+                <span className="lp-icono excel"><Icono nombre="excel" tam={22} /></span>
+                <span className="lp-datos">
+                  <span className="lp-cabeza"><b>{l.proveedor}</b><EstadoDeCarga estado={l.estado} /></span>
+                  <span className="lp-que">Lista del {fecha(l.fecha_lista)} <em>· subida {diaYMes(l.creado_en)}</em></span>
+                  <span className="lp-meta"><span className="lp-archivo"><Icono nombre="archivo" tam={16} /><i>{l.archivo_nombre}</i></span></span>
+                  <span className="lp-meta">
+                    {l.estado === "aplicada"
+                      ? <><span><b className="mas">+{miles(l.resumen.nuevos)}</b> nuevos</span><span><b>{miles(l.resumen.modificados)}</b> cambiados</span></>
+                      : <span><b>{miles(l.resumen.leidas)}</b> leídos</span>}
+                  </span>
+                </span>
               </div>
             ))}
           </Lista>
@@ -59,20 +83,35 @@ export function Listas() {
       <div className="columna">
       <h2 className="seccion"><span>Proveedores</span>{esDueno && <button type="button" className="enlace" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">+ Agregar</button>}</h2>
       {proveedores.length === 0 ? <div className="aviso-suave">Todavía no hay proveedores cargados.</div> : (
-        <Lista data-testid="estado-proveedores">
-          {proveedores.filter((p) => p.activo).map((p) => {
-            const l = ultima.get(p.id);
-            const dias = l ? Math.floor((Date.now() - new Date(l.fecha_lista).getTime()) / 86400000) : null;
-            const vieja = dias !== null && dias > 45;
-            return (
-              <div key={p.id} className="fila" role="row" aria-label={p.nombre}>
-                <span className="nombre">{p.nombre}</span>
-                <span className="boton chico derecha" style={vieja ? { background: "var(--coral-tinte)", color: "var(--coral-texto)" } : { color: "var(--gris)" }}>{l ? (dias === 0 ? "al día" : vieja ? "vieja" : "vigente") : "sin lista"}</span>
-                <span className="detalle">{l ? `última lista del ${fecha(l.fecha_lista)} (hace ${dias} días) · ${l.resumen.leidas} productos` : "nunca se cargó una lista"}{p.lector ? ` · lector ${p.lector}` : ""}{Number(p.descuento_general) || Number(p.descuento_contado) ? ` · dto. ${Number(p.descuento_general) * 100} % / ${Number(p.descuento_contado) * 100} % contado` : ""}</span>
-              </div>
-            );
-          })}
-        </Lista>
+        <>
+          <label className="lp-buscar">
+            <Icono nombre="buscar" tam={22} />
+            <input type="search" value={buscado} onChange={(e) => setBuscado(e.target.value)} placeholder="Buscar proveedor" aria-label="Buscar proveedor" autoComplete="off" data-testid="buscar-proveedor" />
+          </label>
+          <Lista data-testid="estado-proveedores" className="lp-lista">
+            {buscarProveedores(proveedores.filter((p) => p.activo), buscado).map((p) => {
+              const l = ultima.get(p.id);
+              const { estado, dias } = situacionDelProveedor(l);
+              const descuentos = descuentosDe(p);
+              return (
+                <div key={p.id} className="lp-fila" role="row" aria-label={p.nombre}>
+                  <span className="lp-icono"><Icono nombre="proveedor" tam={22} /></span>
+                  <span className="lp-datos">
+                    <span className="lp-cabeza"><b>{p.nombre}</b><span className={`lp-estado ${estado === "vieja" ? "vieja" : estado === "sin lista" ? "gris" : "ok"}`}>{mayuscula(estado)}</span></span>
+                    <span className="lp-que">{l ? <>Lista del {fecha(l.fecha_lista)} <em>· hace {dias} {dias === 1 ? "día" : "días"}</em></> : <em>Nunca se cargó una lista</em>}</span>
+                    {(l || p.lector || descuentos.length > 0) && (
+                      <span className="lp-meta">
+                        {l && <span><Icono nombre="caja" tam={16} /><b>{miles(l.resumen.leidas)}</b> productos</span>}
+                        {p.lector && <span><Icono nombre="lector" tam={16} />{p.lector}</span>}
+                        {descuentos.length > 0 && <span><Icono nombre="porcentaje" tam={16} />{descuentos.join(" · ")}</span>}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+          </Lista>
+        </>
       )}
       </div>
       </div>
@@ -109,13 +148,16 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
 
   return (
     <>
-      <button type="button" className={`zona-de-carga ${arrastrando ? "arrastrando" : ""}`} onClick={() => estado === "esperando" && entrada.current?.click()} onDragOver={(e) => { e.preventDefault(); setArrastrando(true); }} onDragLeave={() => setArrastrando(false)} onDrop={soltar} data-testid="zona-de-carga">
-        <span className="icono"><Icono nombre="subir" tam={22} /></span>
-        <span className="textos">
-          <span>{estado === "leyendo" ? `Leyendo ${archivo?.name}…` : "Cargar una lista nueva"}</span>
-          <small>Excel del proveedor (.xlsx). En la computadora también se puede arrastrar acá. Nada se guarda hasta aplicar.</small>
+      <div className={`lp-cargar ${arrastrando ? "arrastrando" : ""}`} onDragOver={(e) => { e.preventDefault(); setArrastrando(true); }} onDragLeave={() => setArrastrando(false)} onDrop={soltar} data-testid="zona-de-carga">
+        <span className="lp-icono"><Icono nombre="subirArchivo" tam={22} /></span>
+        <span className="lp-datos">
+          <b>{estado === "leyendo" ? `Leyendo ${archivo?.name}…` : "Cargar una lista"}</b>
+          <small>Excel del proveedor (.xlsx)</small>
         </span>
-      </button>
+        <button type="button" className="boton tinta lp-subir" disabled={estado !== "esperando"} onClick={() => entrada.current?.click()} data-testid="subir-lista">
+          <Icono nombre="subir" tam={18} />Subir lista
+        </button>
+      </div>
       {estado === "falta-proveedor" && archivo && (
         <div className="tarjeta">
           <span>No reconocí de qué proveedor es <strong>{archivo.name}</strong>. ¿De cuál es?</span>

@@ -128,6 +128,27 @@ tienen la lista vieja; las últimas cargas con su situación.
 computadora: primero «Cargar una lista», que es para lo que se entra; después las últimas tres
 cargas; y al final los proveedores, con «Agregar proveedor».
 
+**La pantalla Listas en el celular** (Carlos, 2026-10-17, sobre una referencia suya; maqueta
+aprobada `maquetas/celular-listas-renovada.png`):
+
+- **Una lista que espera revisión:** «Lista pendiente de revisar», el proveedor y «Lista del
+  dd/mm/aaaa» a la izquierda, «Revisar y aplicar» a la derecha, y abajo, en pastillas, cuántos
+  productos, cuántos cambian de precio (con su variación promedio) y cuántos nuevos.
+- **«Cargar una lista»** («Excel del proveedor (.xlsx)»), con «Subir lista» a la derecha: un
+  botón secundario, de 36 px de alto (decisión 104).
+- **Cada carga y cada proveedor**, en filas separadas por 1 px:
+  - un ícono (el de Excel en las cargas, uno de negocio en los proveedores);
+  - el nombre del proveedor en negrita y, a la derecha, su estado como pastilla de color:
+    «Aplicada» (verde, ✓) o «Pendiente» (amarilla, reloj) en las cargas; «Vigente» o «Al día»
+    (verde), «Vieja» (naranja suave) o «Sin lista» (gris) en los proveedores;
+  - una línea con qué lista es: «Lista del 11/10/2026 · subida 12/10» en las cargas, «Lista
+    del 28/09/2026 · hace 19 días» en los proveedores, o «Nunca se cargó una lista»;
+  - los datos, cada uno con su ícono y el número en negrita: el archivo y «+4 nuevos · 876
+    cambiados» (o «7.096 leídos» si no se aplicó) en las cargas; los productos, el lector y
+    los descuentos («10 %», «5 % contado»; el que es 0 no figura) en los proveedores.
+- **Un buscador «Buscar proveedor»**, pegado a la lista de proveedores, que deja los que tienen
+  lo escrito en el nombre, sin importar mayúsculas ni tildes.
+
 **Necesita ver al revisar:** proveedor y fecha de la lista; los avisos; el resumen en números
 (leídos, nuevos, cambian de precio con su variación promedio, sin cambio, ya no aparecen,
 filas salteadas); las filas salteadas con su motivo; la vista previa con los que cambian

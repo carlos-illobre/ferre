@@ -821,3 +821,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      Catálogo, Carlos pidió «Agregar» más bajo y fijó la regla: las acciones principales, las
      pestañas y los campos miden al menos 44 px de alto para tocar con el dedo; los botones
      secundarios, como «Agregar» en cada producto, al menos 36 px (`docs/sistema-visual.md`).
+
+105. **Los títulos de sección del celular, en negrita y sin mayúsculas** (2026-10-17). Al
+     aprobar la maqueta de Listas, Carlos pidió que los títulos de sección («Últimas cargas»,
+     «Proveedores») vayan como en su referencia: más grandes, en negrita, con mayúscula solo al
+     principio y sin la rayita amarilla; y que sea así en todas las pantallas del celular, no
+     solo en Listas (002-T003, `specs/002-catalogo-y-precios/ux.md`).

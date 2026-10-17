@@ -51,6 +51,10 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.locator('input[name="contado"]').fill("5");
   await page.getByRole("button", { name: "Agregar", exact: true }).click();
   await expect(page.getByTestId("estado-proveedores")).toContainText(PROVEEDOR);
+  // El buscador deja solo los proveedores con lo escrito en el nombre (002-T003).
+  await page.getByTestId("buscar-proveedor").fill(PROVEEDOR.toUpperCase());
+  await expect(page.getByTestId("estado-proveedores").getByRole("row")).toHaveCount(1);
+  await page.getByTestId("buscar-proveedor").fill("");
 
   // Soltar la planilla: se detecta el proveedor y aparece el resumen.
   await page.getByTestId("archivo").setInputFiles(MUESTRA);

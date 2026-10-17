@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState, type DragEvent, type FormEvent, type KeyboardEvent } from "react";
 import { ErrorApi } from "../../../../api";
-import { aplicarLista, cargarLista, descartarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useLectores, useListas, variacion, type Avance, type Cargada, type Fila, type ListaFila, type Proveedor, type Salteada } from "../../../../negocio/catalogo/listas";
+import { aplicarLista, cargarLista, DIAS_LISTA_VIEJA, descartarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useLectores, useListas, variacion, type Avance, type Cargada, type Fila, type ListaFila, type Proveedor, type Salteada } from "../../../../negocio/catalogo/listas";
 import { altaDeProveedor, faltaEnProveedor } from "../../../../negocio/proveedores";
 import { fecha, pesos, porcentaje } from "../../../../formato";
 import { irA } from "../rutas";
@@ -11,7 +11,7 @@ import "../estilos/listas.css";
 type Resultado = { titulo: string; detalle: string };
 
 const SIN_CONEXION = "Sin conexión con el servidor. Cargar una lista necesita internet.";
-const DIAS_LISTA_VIEJA = 45;
+
 const TANDA = 200;
 const mensajeDe = (e: unknown) => (e instanceof ErrorApi ? e.message : SIN_CONEXION);
 const diasDesde = (iso: string) => Math.max(0, Math.floor((Date.now() - new Date(`${iso.slice(0, 10)}T00:00:00`).getTime()) / 86400000));

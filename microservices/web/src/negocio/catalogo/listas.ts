@@ -36,6 +36,29 @@ export function ultimaAplicada(historial: ListaFila[]): Map<string, ListaFila> {
   return ultima;
 }
 
+// Cómo está la lista de cada proveedor: al día (cargada hoy), vigente, vieja (de más de 45
+// días) o sin lista; con los días desde la fecha de la lista.
+export const DIAS_LISTA_VIEJA = 45;
+export type SituacionDeProveedor = { estado: "al día" | "vigente" | "vieja" | "sin lista"; dias: number | null };
+export function situacionDelProveedor(ultima: ListaFila | undefined, ahora = Date.now()): SituacionDeProveedor {
+  if (!ultima) return { estado: "sin lista", dias: null };
+  const dias = Math.floor((ahora - new Date(ultima.fecha_lista).getTime()) / 86400000);
+  return { estado: dias === 0 ? "al día" : dias > DIAS_LISTA_VIEJA ? "vieja" : "vigente", dias };
+}
+
+// Los descuentos de un proveedor, sin los que son 0: «10 %», «5 % contado».
+export function descuentosDe(p: Pick<Proveedor, "descuento_general" | "descuento_contado">): string[] {
+  const enPorcentaje = (v: unknown) => Math.round(Number(v) * 10000) / 100;
+  return [
+    Number(p.descuento_general) ? `${enPorcentaje(p.descuento_general)} %` : null,
+    Number(p.descuento_contado) ? `${enPorcentaje(p.descuento_contado)} % contado` : null,
+  ].filter((d): d is string => d !== null);
+}
+
+// Buscar un proveedor por lo escrito en su nombre, sin importar mayúsculas ni tildes.
+const plano = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+export const buscarProveedores = <P extends { nombre: string }>(lista: P[], texto: string): P[] => lista.filter((p) => plano(p.nombre).includes(plano(texto)));
+
 // Una lista que quedó sin aplicar se retoma como si se acabara de cargar.
 export const retomar = (l: ListaFila): Cargada => ({ id: l.id, proveedor: l.proveedor, fecha_lista: l.fecha_lista, resumen: l.resumen, avisos: l.avisos, salteadas: l.resumen.salteadas_detalle ?? [] });
 

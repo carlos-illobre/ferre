@@ -8,7 +8,7 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 import { ErrorApi } from "../../api";
-import { aplicarLista, cargarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useListas, variacion, type Cargada, type Fila, type ListaFila } from "./listas";
+import { aplicarLista, buscarProveedores, cargarLista, descuentosDe, situacionDelProveedor, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useListas, variacion, type Cargada, type Fila, type ListaFila } from "./listas";
 import { altaDeProveedor, faltaEnProveedor, useProveedoresActivos } from "../proveedores";
 import { margenAMano, otroMargen, precioDelProducto } from "./precio";
 
@@ -114,5 +114,31 @@ describe("el precio de un producto (010-E05)", () => {
     expect(otroMargen("120")).toBe(120);
     expect(otroMargen(" 33.6 ")).toBe(34);
     for (const mal of ["", "0", "-5", "abc"]) expect(otroMargen(mal)).toBeNull();
+  });
+});
+
+// 002-T003: cómo se muestra cada proveedor en Listas, en el celular.
+describe("la situación de cada proveedor en Listas (002-T003)", () => {
+  const ahora = new Date("2026-10-17T12:00:00").getTime();
+  const lista = (fecha_lista: string) => ({ fecha_lista }) as ListaFila;
+
+  it("sin lista, al día, vigente o vieja (más de 45 días), con los días desde la lista", () => {
+    expect(situacionDelProveedor(undefined, ahora)).toEqual({ estado: "sin lista", dias: null });
+    expect(situacionDelProveedor(lista("2026-10-17T00:00:00"), ahora)).toEqual({ estado: "al día", dias: 0 });
+    expect(situacionDelProveedor(lista("2026-09-28T00:00:00"), ahora)).toEqual({ estado: "vigente", dias: 19 });
+    expect(situacionDelProveedor(lista("2026-08-16T00:00:00"), ahora)).toEqual({ estado: "vieja", dias: 62 });
+  });
+
+  it("los descuentos, sin los que son 0", () => {
+    expect(descuentosDe({ descuento_general: "0.25", descuento_contado: "0.05" })).toEqual(["25 %", "5 % contado"]);
+    expect(descuentosDe({ descuento_general: "0.1", descuento_contado: "0" })).toEqual(["10 %"]);
+    expect(descuentosDe({ descuento_general: "0", descuento_contado: "0" })).toEqual([]);
+  });
+
+  it("busca por el nombre, sin importar mayúsculas ni tildes", () => {
+    const provs = [{ nombre: "Tresge" }, { nombre: "Ferretería Núñez" }, { nombre: "Dimetal" }];
+    expect(buscarProveedores(provs, "TRES")).toEqual([{ nombre: "Tresge" }]);
+    expect(buscarProveedores(provs, "nunez")).toEqual([{ nombre: "Ferretería Núñez" }]);
+    expect(buscarProveedores(provs, "")).toHaveLength(3);
   });
 });

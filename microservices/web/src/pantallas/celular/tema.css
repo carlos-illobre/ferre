@@ -87,10 +87,10 @@ body, .hoja { background: var(--p-fondo); }
 .hoja .lista, .hoja .tarjeta:not(.oscura) { border: 1px solid var(--p-borde); }
 .lista > * { border-bottom-color: var(--p-borde-suave); }
 
-/* Títulos de sección: verde oscuro, con una marca amarilla. */
-.seccion { color: var(--p-verde); font-weight: 750; padding: 10px 4px 0 12px; position: relative; }
-.seccion::before { content: ""; position: absolute; left: 0; bottom: 1px; width: 5px; height: 16px; border-radius: 3px; background: var(--p-amarillo); }
-.tarjeta .seccion { padding-left: 12px; }
+/* Títulos de sección: verde oscuro, en negrita, con mayúscula solo al principio (decisión 105). */
+.seccion { color: var(--p-verde); font-size: 19px; font-weight: 700; letter-spacing: 0; text-transform: none; padding: 10px 4px 0; position: relative; }
+.seccion .suave { font-size: 15px; }
+.tarjeta:not(.oscura) .seccion { font-size: 17px; padding-left: 0; }
 
 /* Botones: el común es blanco con borde; el oscuro y el naranja siguen llenos. */
 .boton { background: #fff; border: 1.500px solid var(--p-borde-fuerte); }
@@ -142,9 +142,8 @@ body, .hoja { background: var(--p-fondo); }
 /* Lo oculto queda oculto aunque su clase le dé otra disposición (en Usuarios y en Quién hizo
    qué se colaba arriba el resumen del negocio). */
 [hidden] { display: none !important; }
-/* Sobre una tarjeta oscura el título de sección va claro y sin la marca. */
-.tarjeta.oscura .seccion { color: var(--p-amarillo); padding-left: 0; }
-.tarjeta.oscura .seccion::before { display: none; }
+/* Sobre una tarjeta oscura el título de sección va claro, chico y en mayúsculas: dice qué es la tarjeta. */
+.tarjeta.oscura .seccion { color: var(--p-amarillo); padding: 0; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
 
 /* Vender con la misma paleta que el resto: los dos títulos son títulos de sección (verde, en
    mayúsculas, con la marca amarilla), y los productos de la venta y los resultados de la
