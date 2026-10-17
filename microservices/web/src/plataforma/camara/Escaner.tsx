@@ -51,7 +51,7 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
           }, 250);
           detener = () => { clearInterval(intervalo); stream.getTracks().forEach((t) => t.stop()); };
         } else {
-          const { BrowserMultiFormatReader } = await import("@zxing/browser");
+          const [{ BrowserMultiFormatReader }] = await Promise.all([import("@zxing/browser"), import("./esquinasDelQR")]);
           const lector = new BrowserMultiFormatReader();
           const controles = await lector.decodeFromVideoElement(video.current, (resultado) => { if (resultado) entregar(resultado.getText()); });
           detener = () => { controles.stop(); stream.getTracks().forEach((t) => t.stop()); };
