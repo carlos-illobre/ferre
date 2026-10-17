@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { IconoDeMedio } from "../../IconoDeMedio";
 import { urlDeFoto } from "../../../api";
 import { pesosCortos } from "../../../formato";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../negocio/ventas/venta";
@@ -38,7 +39,7 @@ export function AnularVentas({ cualquierDia }: { cualquierDia: boolean }) {
       </div>
       <div className="an-medios" role="group" aria-label="Medio de pago">
         <button type="button" className={medio === null ? "si" : ""} aria-pressed={medio === null} onClick={() => setMedio(null)}>Todos</button>
-        {MEDIOS.map((m) => <button key={m} type="button" className={medio === m ? "si" : ""} aria-pressed={medio === m} onClick={() => setMedio(m)}><Icono nombre={m} tam={16} />{NOMBRE_DE_MEDIO[m]}</button>)}
+        {MEDIOS.map((m) => <button key={m} type="button" className={medio === m ? "si" : ""} aria-pressed={medio === m} onClick={() => setMedio(m)}><IconoDeMedio medio={m} tam={16} />{NOMBRE_DE_MEDIO[m]}</button>)}
       </div>
       {!datos ? <div className="aviso-suave">Sin conexión: para anular una venta hace falta internet.</div> : (
         <>
@@ -64,7 +65,7 @@ function Venta({ v, alAnular }: { v: VentaDelDia; alAnular: () => void }) {
       <div className="an-cab">
         <span className="an-hora"><b>{hora(v.fecha)}</b>{anulada && <span className="an-pastilla">Anulada</span>}</span>
         <strong className="an-total">{pesosCortos(v.total)}</strong>
-        <span className="an-medio"><Icono nombre={v.medio_pago} tam={16} />{NOMBRE_DE_MEDIO[v.medio_pago] ?? v.medio_pago} · {productos(v.items.length)}</span>
+        <span className="an-medio"><IconoDeMedio medio={v.medio_pago} tam={16} />{NOMBRE_DE_MEDIO[v.medio_pago] ?? v.medio_pago} · {productos(v.items.length)}</span>
         {!anulada && <button type="button" className="an-anular" onClick={alAnular} aria-label={`Anular la venta de ${pesosCortos(v.total)} de las ${hora(v.fecha)}`}><Icono nombre="prohibido" tam={16} />Anular</button>}
       </div>
       {v.cliente && <span className="an-medio"><Icono nombre="persona" tam={16} />{v.cliente}</span>}

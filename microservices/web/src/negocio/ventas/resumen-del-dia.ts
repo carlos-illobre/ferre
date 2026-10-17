@@ -46,7 +46,7 @@ export function totalHasta(ventas: VentaDelDia[], minuto: number | null): number
   return confirmadas(ventas).filter((v) => minuto === null || minutoDelDia(v.fecha) <= minuto).reduce((s, v) => s + Number(v.total), 0);
 }
 
-// Hoy contra ayer hasta la misma hora; otro día, entero contra el suyo (decisión 109).
+// Hoy contra ayer hasta la misma hora; otro día, entero contra el suyo (decisión 111).
 export type Comparacion = { sinVentas: true } | { sinVentas: false; porcentaje: number; anterior: number };
 export function comparar(actual: number, anterior: number): Comparacion {
   if (anterior <= 0) return { sinVentas: true };

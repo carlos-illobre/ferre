@@ -864,14 +864,6 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      - El capítulo 2 se llama «Catálogo: los productos» y explica la pantalla Productos; Listas y
        Duplicados se suman después al mismo capítulo.
 
-109. **Ventas de hoy renovada** (2026-10-17). Sobre una imagen de referencia, Carlos eligió que
-     entren la comparación con ayer, el gráfico por hora, cada medio de pago con su color y
-     cuántas ventas, ventas realizadas, productos vendidos y ticket promedio, cada venta en un
-     renglón corto que se abre, y «Cambiar fecha». No entran el número de venta, el «Tip»,
-     «Ver todas» ni imprimir. Hoy se compara con lo vendido ayer hasta la misma hora; un día
-     anterior, entero contra el suyo. Las ventas de otros días las ve cualquiera con «Ver las
-     ventas del día» (`specs/017-ventas-de-hoy/`).
-
 110. **Anular una venta pide confirmar, con un motivo opcional de una lista** (2026-10-17). Al
      aprobar la maqueta de Anular en el celular, Carlos decidió: «Anular» abre una hoja para
      confirmar, con la venta, el aviso de que no se puede deshacer y el motivo, que se elige de
@@ -879,3 +871,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      «Producto equivocado», «Devolución», «Cobrada dos veces»), con un comentario opcional. Se
      guarda el motivo elegido y el comentario («Devolución: la mecha vino fallada»). Responde la
      pregunta 4 de Ventas del día (RF-23). Igual en el celular y en la computadora (003-T005).
+
+111. **Ventas de hoy renovada** (2026-10-17). Sobre una imagen de referencia, Carlos eligió que
+     entren la comparación con ayer, el gráfico por hora, cada medio de pago con su color y
+     cuántas ventas, ventas realizadas, productos vendidos y ticket promedio, cada venta en un
+     renglón corto que se abre, y «Cambiar fecha». No entran el número de venta, el «Tip»,
+     «Ver todas» ni imprimir. Hoy se compara con lo vendido ayer hasta la misma hora; un día
+     anterior, entero contra el suyo. Las ventas de otros días las ve cualquiera con «Ver las
+     ventas del día» (`specs/017-ventas-de-hoy/`).

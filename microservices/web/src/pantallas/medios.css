@@ -4,8 +4,9 @@
 .medio-mercado_pago { --medio: var(--p-medio-mp); --medio-suave: var(--p-medio-mp-suave); }
 .medio-tarjeta { --medio: var(--p-medio-tarjeta); --medio-suave: var(--p-medio-tarjeta-suave); }
 .medio-cuenta_corriente { --medio: var(--p-medio-cuenta); --medio-suave: var(--p-medio-cuenta-suave); }
-.medio-icono { display: inline-grid; place-items: center; flex: none; color: var(--medio); }
+.medio-icono.medio-icono { display: inline-grid; place-items: center; flex: none; color: var(--medio); }
+.medio-icono .isotipo-mp.isotipo-mp { color: inherit; }
 .medio-icono svg { display: block; }
-.medio-icono.con-fondo { width: 36px; height: 36px; border-radius: 10px; background: var(--medio-suave); }
+.medio-icono.medio-icono.con-fondo { width: 36px; height: 36px; border-radius: 10px; background: var(--medio-suave); }
 /* Elegido (fondo oscuro), el ícono va del color del texto: el del medio no se vería. */
-[aria-checked="true"] > .medio-icono:not(.con-fondo) { color: inherit; }
+[aria-checked="true"] > .medio-icono.medio-icono:not(.con-fondo) { color: inherit; }

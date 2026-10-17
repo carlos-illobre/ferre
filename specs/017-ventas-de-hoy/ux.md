@@ -23,7 +23,7 @@ B quedan como referencia descartada.
   medio en su color, el producto («1 × Taladro inalámbrico 18 V») o «3 productos», debajo la hora,
   el medio y el cliente, el importe y una flecha. Tocarla la abre debajo: cada producto con su
   cantidad y su total (en la computadora también el precio por unidad); tocarla otra vez la cierra.
-- La anulada, tachada, con «anulada» en una pastilla.
+- La anulada, tachada, con «anulada» en una pastilla. Se abren de a varias.
 - Computadora: la tabla Hora · Productos · Cómo pagó (una pastilla con el ícono y el color del
   medio, el cliente debajo) · Total; ↑ ↓ eligen una venta, Enter abre o cierra su detalle, «F»
   abre «Cambiar fecha». El resumen oscuro, a la izquierda.
@@ -37,7 +37,9 @@ B quedan como referencia descartada.
 ## Colores de los medios de pago (decisión 108)
 
 Efectivo verde, Mercado Pago celeste, Tarjeta violeta, Cuenta corriente ámbar, con su versión
-suave de fondo. Están en la paleta compartida y se usan en el ícono de cada medio donde aparezca:
+suave de fondo. Los íconos son los del cobro de Vender (el billete, el isotipo de Mercado Pago, la
+tarjeta y la libreta de la cuenta corriente), no los de la maqueta, para que sean los mismos en
+toda la aplicación. Igual que ayer, la comparación dice «0 %» sin flecha y sin color. Están en la paleta compartida y se usan en el ícono de cada medio donde aparezca:
 «Hoy», «Anular», el cobro de Vender y «Cómo va el negocio».
 
 ## Chequeo contra los principios de interfaz

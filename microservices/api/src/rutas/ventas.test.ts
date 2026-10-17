@@ -123,4 +123,11 @@ describe("GET /ventas", () => {
     expect(cuerpo.ventas[0].items[0].subtotal).toBe(3000);
     expect(cuerpo.totales).toEqual({ efectivo: 3000 });
   });
+
+  it("017-E16: un día mal escrito da 400 y no llega a la base", async () => {
+    const r = await pedir(app, "GET", "/ventas?dia=" + encodeURIComponent("15/10'; DROP TABLE venta;--"));
+    expect(r.status).toBe(400);
+    expect(base.actual.sqlDe(/from "venta"/)).toHaveLength(0);
+    expect((await pedir(app, "GET", "/ventas?dia=2026-10-15")).status).toBe(200);
+  });
 });

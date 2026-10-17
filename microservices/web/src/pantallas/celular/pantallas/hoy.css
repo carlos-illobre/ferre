@@ -12,14 +12,15 @@
 .hoy-monto { font-size: 44px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
 .hoy-compara { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14.5px; }
 .hoy-total .hoy-pastilla { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 700; color: #fff; }
-.hoy-pastilla.sube { background: #2f7d5c; }
+.hoy-pastilla.sube { background: var(--p-sube); }
+.hoy-pastilla.igual { background: rgba(255,255,255,.18); }
 .hoy-pastilla.baja { background: var(--p-naranja); }
 .hoy-grafico { margin: 6px 0 4px; }
 .hoy-dato { min-height: 18px; font-size: 13px; text-align: right; opacity: .9; }
 .hoy-barras { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: end; gap: 4px; height: 64px; }
-.hoy-barras button { display: block; width: 100%; padding: 0; border: 0; border-radius: 4px 4px 0 0; background: #6fbf98; min-height: 3px; }
+.hoy-barras button { display: block; width: 100%; padding: 0; border: 0; border-radius: 4px 4px 0 0; background: var(--p-barra); min-height: 3px; }
 .hoy-barras button.vacia { background: rgba(255,255,255,.18); }
-.hoy-barras button.elegida { background: #b6e4cc; }
+.hoy-barras button.elegida { background: var(--p-barra-elegida); }
 .hoy-horas { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; font-size: 12px; text-align: center; opacity: .8; margin-top: 4px; }
 .hoy-medios { list-style: none; margin: 0; padding: 0; }
 .hoy-medios li { display: flex; align-items: center; gap: 10px; padding: 8px 2px; }

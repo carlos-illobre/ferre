@@ -74,4 +74,20 @@ describe("«Hoy» · computadora", () => {
     await abrir();
     expect(screen.getByTestId("sin-ventas").textContent).toContain("Todavía no hay ventas hoy.");
   });
+
+  it("017-E13: Enter con el foco en un botón es de ese botón, no abre la venta", async () => {
+    await abrir();
+    const boton = screen.getByTestId("cambiar-fecha");
+    boton.focus();
+    fireEvent.keyDown(boton, { key: "Enter" });
+    expect(screen.queryAllByTestId("detalle-venta")).toHaveLength(0);
+  });
+
+  it("017-E21: sin conexión con lo último bajado a la vista, no avisa nada: se ve eso", async () => {
+    await abrir();
+    apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
+    await consultas.refetchQueries();
+    expect(screen.getByTestId("total-de-hoy").textContent).toBe("$293.000");
+    expect(screen.queryByText(/Sin conexión/)).toBeNull();
+  });
 });

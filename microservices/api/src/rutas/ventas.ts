@@ -16,7 +16,12 @@ ventas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
   return r.repetida ? c.json(r) : c.json(r, 201);
 });
 
-ventas.get("/", exigirPermiso("ventas.ver", "negocio.ventas"), async (c) => c.json(await reglas.delDia(c.req.query("dia") || null)));
+// El día, en AAAA-MM-DD; uno mal escrito no llega a la base (specs/017, «Cambiar fecha»).
+ventas.get("/", exigirPermiso("ventas.ver", "negocio.ventas"), async (c) => {
+  const dia = c.req.query("dia") || null;
+  if (dia !== null && !/^\d{4}-\d{2}-\d{2}$/.test(dia)) return c.json({ error: "El día se escribe AAAA-MM-DD, por ejemplo 2026-10-15" }, 400);
+  return c.json(await reglas.delDia(dia));
+});
 
 ventas.post("/:id/anular", exigirPermiso("ventas.anular", "ventas.anular_cualquiera"), async (c) => {
   const cuerpo = await leerCuerpo(c, anulacionDeVenta);

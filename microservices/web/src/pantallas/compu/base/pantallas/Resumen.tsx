@@ -66,7 +66,7 @@ export function ResumenVentas() {
                 const parte = hoy.datos!.total > 0 ? importe / hoy.datos!.total : 0;
                 return (
                   <li key={m} data-testid={`medio-${m}`}>
-                    <IconoDeMedio medio={m} tam={18} conFondo className="resumen-medio-icono" />
+                    <IconoDeMedio medio={m} tam={18} conFondo className="resumen-medio-lugar" />
                     <span className="resumen-medio-nombre">{NOMBRE_MEDIO[m]}</span>
                     <span className="importe chico">{pesosCortos(importe)}</span>
                     <span className="resumen-barra" aria-hidden="true"><i style={{ transform: `scaleX(${parte})` }} /></span>

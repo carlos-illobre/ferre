@@ -35,10 +35,12 @@
 
 - **Datos que toca:** las ventas de un día (importes, medios, clientes) que ya muestra «Hoy».
   Nada nuevo se guarda.
-- **Permisos:** «Ver las ventas del día» para hoy y para otros días (decisión 109), el mismo
-  permiso que ya pide el servidor para cualquier día. «Hoy» sigue sin dejar tocar nada.
-- **Qué entra desde afuera:** la fecha elegida, que el calendario limita hasta hoy; el servidor
-  ya valida el día que se le pide.
+- **Permisos:** «Ver las ventas del día» para hoy y para otros días (decisión 111), el mismo
+  permiso que ya pide el servidor para cualquier día; el servidor también deja pedir un día a
+  quien tiene «Ver las ventas del negocio», que lo usa «Cómo va el negocio» (de antes de 017).
+  «Hoy» sigue sin dejar tocar nada.
+- **Qué entra desde afuera:** la fecha elegida: el calendario llega hasta hoy y una fecha futura
+  escrita a mano no se toma; el servidor rechaza con 400 un día que no esté escrito AAAA-MM-DD.
 - **Secretos:** ninguno.
 - **Registro de quién hizo qué:** mirar no se registra, como hoy.
 

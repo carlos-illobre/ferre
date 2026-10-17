@@ -35,6 +35,7 @@
 .resumen-columnas { display: grid; gap: var(--e4); }
 .resumen-medios { display: flex; flex-direction: column; padding: 0 var(--e4) var(--e3); }
 .resumen-medios li { display: grid; grid-template-columns: 34px minmax(0, 1fr) 6.5rem; grid-template-areas: "icono nombre importe" "icono barra parte"; align-items: center; gap: 6px var(--e3); padding: var(--e3) 0; border-top: 1px solid var(--borde); }
+.resumen-medio-lugar { grid-area: icono; }
 .resumen-medio-icono { grid-area: icono; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--azul-suave); color: var(--azul); }
 .resumen-medio-nombre { grid-area: nombre; font-weight: 650; }
 .resumen-medios .importe { grid-area: importe; justify-self: end; }

@@ -171,6 +171,16 @@ export const TEXTOS = {
     teclaElegir: igual("eligen una venta"),
     teclaAbrir: igual("abre o cierra su detalle"),
     teclaFecha: igual("cambia la fecha"),
+    tituloHoy: igual("Ventas de hoy"),
+    tituloDia: igual("Ventas del"),
+    columnaHora: igual("Hora"),
+    columnaProductos: igual("Productos"),
+    columnaMedio: igual("Cómo pagó"),
+    columnaTotal: igual("Total"),
+    verDetalle: igual("Ver el detalle"),
+    cerrarDetalle: igual("Cerrar el detalle"),
+    irAVender: igual("Ir a vender"),
+    buscando: igual("Buscando las ventas del día"),
   },
   // La ficha del producto (specs/016).
   ficha: {

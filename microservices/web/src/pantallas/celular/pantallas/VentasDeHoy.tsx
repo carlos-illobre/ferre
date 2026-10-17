@@ -57,10 +57,10 @@ export function VentasDeHoy() {
         </div>
         <button type="button" className="hoy-boton" onClick={abrirCalendario} data-testid="cambiar-fecha"><Icono nombre="calendario" tam={18} />{t.cambiarFecha.corto}</button>
         <input ref={calendario} type="date" className="hoy-calendario" value={r.dia} max={hoyLocal()} aria-label={t.cambiarFecha.corto}
-          onChange={(e) => e.target.value && setDia(e.target.value === hoyLocal() ? null : e.target.value)} data-testid="dia" />
+          onChange={(e) => { const v = e.target.value; if (v && v <= hoyLocal()) setDia(v === hoyLocal() ? null : v); }} data-testid="dia" />
       </div>
       {!r.resumen ? (
-        r.error && fueSinConexion(r.error) ? <div className="aviso-suave" data-testid="sin-conexion">{r.esHoy ? t.sinConexionHoy.corto : t.sinConexionOtroDia.corto}</div> : r.error ? <div className="aviso-suave">{(r.error as Error).message}</div> : <div className="aviso-suave" aria-busy="true">…</div>
+        r.error && fueSinConexion(r.error) ? <div className="aviso-suave" data-testid="sin-conexion">{r.esHoy ? t.sinConexionHoy.corto : t.sinConexionOtroDia.corto}</div> : r.error ? <div className="aviso-suave">{(r.error as Error).message}</div> : <div className="aviso-suave" aria-busy="true">{t.buscando.corto}…</div>
       ) : <>
         <section className="tarjeta oscura hoy-total" data-testid="resumen-hoy">
           <small>{t.totalDeVentas.corto}</small>
@@ -99,7 +99,7 @@ function Comparacion({ comparacion: c, esHoy, diaAnterior }: { comparacion: Comp
   const contra = esHoy ? t.vsAyer.corto : `${t.vsDia.corto} ${nombreDelDia(diaAnterior)}`;
   return (
     <div className="hoy-compara" data-testid="comparacion">
-      <span className={`hoy-pastilla ${c.porcentaje < 0 ? "baja" : "sube"}`}><Icono nombre={c.porcentaje < 0 ? "baja" : "sube"} tam={14} grosor={2.6} />{c.porcentaje > 0 ? "+" : ""}{c.porcentaje} %</span>
+      <span className={`hoy-pastilla ${c.porcentaje < 0 ? "baja" : c.porcentaje > 0 ? "sube" : "igual"}`}>{c.porcentaje !== 0 && <Icono nombre={c.porcentaje < 0 ? "baja" : "sube"} tam={14} grosor={2.6} />}{c.porcentaje > 0 ? "+" : ""}{c.porcentaje} %</span>
       <span>{contra} ({pesosCortos(c.anterior)})</span>
     </div>
   );
@@ -127,7 +127,8 @@ function Barras({ barras }: { barras: { hora: number; total: number }[] }) {
 
 // Cada venta, un renglón corto; tocarla la abre con sus productos.
 function VentasCortas({ ventas, sinVentas }: { ventas: VentaDelDia[]; sinVentas: string }) {
-  const [abierta, setAbierta] = useState<string | null>(null);
+  // Se abren de a varias, como en la computadora (decisión 47).
+  const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
   const t = TEXTOS.hoy;
   if (ventas.length === 0) return <div className="aviso-suave" data-testid="sin-ventas">{sinVentas}</div>;
   return (
@@ -135,10 +136,10 @@ function VentasCortas({ ventas, sinVentas }: { ventas: VentaDelDia[]; sinVentas:
       {ventas.map((v) => {
         const anulada = v.estado === "anulada";
         const una = v.items.length === 1 ? v.items[0]! : null;
-        const abre = abierta === v.id;
+        const abre = abiertas.has(v.id);
         return (
           <li key={v.id} className={anulada ? "anulada" : ""} data-testid="venta-dia">
-            <button type="button" className="hoy-venta" onClick={() => setAbierta(abre ? null : v.id)} aria-expanded={abre}>
+            <button type="button" className="hoy-venta" onClick={() => setAbiertas((s) => { const n = new Set(s); if (n.has(v.id)) n.delete(v.id); else n.add(v.id); return n; })} aria-expanded={abre}>
               <IconoDeMedio medio={v.medio_pago} tam={20} conFondo />
               <span className="hoy-venta-texto">
                 <b>{una ? `${numero(Number(una.cantidad))} × ${una.descripcion}` : `${v.items.length} ${t.productos.corto}`}{anulada && <span className="hoy-anulada">{t.anulada.corto}</span>}</b>

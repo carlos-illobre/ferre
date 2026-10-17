@@ -43,6 +43,10 @@
   --p-medio-tarjeta-suave: #ece8fb;
   --p-medio-cuenta: #9a5a00;
   --p-medio-cuenta-suave: #fff0d6;
+  /* «Hoy» (017): lo que sube, y las barras sobre la tarjeta oscura. */
+  --p-sube: #2f7d5c;
+  --p-barra: #6fbf98;
+  --p-barra-elegida: #b6e4cc;
 }
 
 /* Animaciones deshabilitadas en Configuración (RF-83): nada se mueve, en ninguna de las dos interfaces. */

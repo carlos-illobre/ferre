@@ -44,7 +44,7 @@ describe("lo vendido por hora", () => {
   });
 });
 
-describe("la comparación (decisión 109)", () => {
+describe("la comparación (decisión 111)", () => {
   const AYER = [venta("y1", a(9, 0, "2026-10-16"), "efectivo", 50000), venta("y2", a(11, 20, "2026-10-16"), "efectivo", 200000), venta("y3", a(17, 0, "2026-10-16"), "efectivo", 400000)];
   it("017-E02: hoy contra ayer hasta la misma hora", () => {
     expect(totalHasta(AYER, 11 * 60 + 30)).toBe(250000);

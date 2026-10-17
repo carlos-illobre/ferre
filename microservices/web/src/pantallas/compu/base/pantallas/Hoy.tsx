@@ -29,6 +29,8 @@ export function Hoy() {
 
   const teclas = useCallback((e: KeyboardEvent) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // Con el foco en un botón (Cambiar fecha, una barra), Enter es de ese botón.
+    if (e.key === "Enter" && (e.target as HTMLElement).closest?.("button, a")) return;
     if (e.key === "ArrowDown") { e.preventDefault(); setElegida((i) => Math.min(i + 1, ventas.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegida((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter" && ventas[elegida]) { e.preventDefault(); abrir(ventas[elegida]!.id); }
@@ -37,11 +39,12 @@ export function Hoy() {
   useTeclasGlobales(teclas);
   useEffect(() => { document.querySelector(".hoy-tabla tr.elegida")?.scrollIntoView?.({ block: "nearest" }); }, [elegida]);
 
-  const error = r.error && (fueSinConexion(r.error) ? (r.esHoy ? t.sinConexionHoy.largo : t.sinConexionOtroDia.largo) : r.error.message);
+  // Sin conexión con lo último guardado a la vista, no hay nada que avisar: se ve eso.
+  const error = !r.resumen && r.error && (fueSinConexion(r.error) ? (r.esHoy ? t.sinConexionHoy.largo : t.sinConexionOtroDia.largo) : r.error.message);
   return (
-    <Pagina titulo={r.esHoy ? "Ventas de hoy" : `Ventas del ${nombreDelDia(r.dia)}`} testId="ventas-de-hoy">
+    <Pagina titulo={r.esHoy ? t.tituloHoy.largo : `${t.tituloDia.largo} ${nombreDelDia(r.dia)}`} testId="ventas-de-hoy">
       <Aviso tipo="error">{error}</Aviso>
-      {!r.resumen && !error && <div className="esqueleto ventas-esqueleto" aria-busy="true" aria-label="Buscando las ventas del día" />}
+      {!r.resumen && !error && <div className="esqueleto ventas-esqueleto" aria-busy="true" aria-label={t.buscando.largo} />}
       {r.resumen && (
         <div className="hoy-columnas">
           <section className="hoy-total" data-testid="resumen-hoy" aria-label={t.totalDeVentas.largo}>
@@ -70,7 +73,7 @@ export function Hoy() {
               <span className="hoy-fecha-boton">
                 <Boton icono="calendario" onClick={abrirCalendario} data-testid="cambiar-fecha">{t.cambiarFecha.largo}</Boton>
                 <input ref={calendario} type="date" className="hoy-calendario" value={r.dia} max={hoyLocal()} aria-label={t.cambiarFecha.largo} tabIndex={-1}
-                  onChange={(e) => e.target.value && setDia(e.target.value === hoyLocal() ? null : e.target.value)} data-testid="dia" />
+                  onChange={(e) => { const v = e.target.value; if (v && v <= hoyLocal()) setDia(v === hoyLocal() ? null : v); }} data-testid="dia" />
               </span>
             </div>
             <div className="hoy-numeros" data-testid="numeros">
@@ -80,10 +83,10 @@ export function Hoy() {
             </div>
             {ventas.length === 0 ? (
               <div data-testid="sin-ventas"><Vacio icono="ventas" titulo={r.esHoy ? t.sinVentasHoy.largo : t.sinVentasDia.largo}
-                accion={r.esHoy ? <Boton variante="principal" icono="vender" onClick={() => irA("vender")}>Ir a vender</Boton> : undefined} /></div>
+                accion={r.esHoy ? <Boton variante="principal" icono="vender" onClick={() => irA("vender")}>{t.irAVender.largo}</Boton> : undefined} /></div>
             ) : (
               <table className="hoy-tabla" data-testid="lista-de-ventas">
-                <thead><tr><th>Hora</th><th>Productos</th><th>Cómo pagó</th><th className="num">Total</th><th><span className="solo-lectores">Detalle</span></th></tr></thead>
+                <thead><tr><th>{t.columnaHora.largo}</th><th>{t.columnaProductos.largo}</th><th>{t.columnaMedio.largo}</th><th className="num">{t.columnaTotal.largo}</th><th><span className="solo-lectores">{t.verDetalle.largo}</span></th></tr></thead>
                 {ventas.map((v, i) => <FilaDeVenta key={v.id} venta={v} elegida={i === elegida} abierta={abiertas.has(v.id)} alAbrir={() => { setElegida(i); abrir(v.id); }} />)}
               </table>
             )}
@@ -104,7 +107,7 @@ function LaComparacion({ comparacion: c, esHoy, diaAnterior }: { comparacion: Co
   if (c.sinVentas) return <div className="hoy-compara" data-testid="comparacion">{esHoy ? t.ayerSinVentas.largo : t.diaSinVentas.largo}</div>;
   return (
     <div className="hoy-compara" data-testid="comparacion">
-      <span className={`hoy-pastilla ${c.porcentaje < 0 ? "baja" : "sube"}`}>{c.porcentaje > 0 ? "+" : ""}{c.porcentaje} %</span>
+      <span className={`hoy-pastilla ${c.porcentaje < 0 ? "baja" : c.porcentaje > 0 ? "sube" : "igual"}`}>{c.porcentaje > 0 ? "+" : ""}{c.porcentaje} %</span>
       <span>{esHoy ? t.vsAyer.largo : `${t.vsDia.largo} ${nombreDelDia(diaAnterior)}`} ({pesosCortos(c.anterior)})</span>
     </div>
   );
@@ -140,7 +143,7 @@ function FilaDeVenta({ venta: v, elegida, abierta, alAbrir }: { venta: VentaDelD
         <td className="tach"><b>{una ? `${numero(Number(una.cantidad))} × ${una.descripcion}` : `${v.items.length} ${t.productos.largo}`}</b></td>
         <td><span className={`hoy-medio medio-${v.medio_pago}`}><IconoDeMedio medio={v.medio_pago} tam={16} />{NOMBRE_DE_MEDIO[v.medio_pago as keyof typeof NOMBRE_DE_MEDIO] ?? v.medio_pago}</span>{v.cliente && <small className="hoy-cliente">{v.cliente}</small>}</td>
         <td className="num"><b className="tach">{pesosCortos(v.total)}</b>{anulada && <span className="hoy-anulada">{t.anulada.largo}</span>}</td>
-        <td className="hoy-flecha"><button type="button" onClick={(e) => { e.stopPropagation(); alAbrir(); }} aria-expanded={abierta} aria-label={abierta ? "Cerrar el detalle" : "Ver el detalle"}><Icono nombre={abierta ? "abajo" : "derecha"} tam={18} /></button></td>
+        <td className="hoy-flecha"><button type="button" onClick={(e) => { e.stopPropagation(); alAbrir(); }} aria-expanded={abierta} aria-label={abierta ? t.cerrarDetalle.largo : t.verDetalle.largo}><Icono nombre={abierta ? "abajo" : "derecha"} tam={18} /></button></td>
       </tr>
       {abierta && v.items.map((i, n) => (
         <tr key={n} className="hoy-detalle" data-testid="detalle-venta">

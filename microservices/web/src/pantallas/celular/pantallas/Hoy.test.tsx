@@ -106,6 +106,41 @@ describe("«Hoy» · celular", () => {
     expect((await screen.findByTestId("sin-conexion")).textContent).toBe("Sin conexión: para ver otro día hace falta internet.");
   });
 
+  it("017-E19: una fecha futura escrita a mano no se toma", async () => {
+    await abrir();
+    fireEvent.change(screen.getByTestId("dia"), { target: { value: "2026-10-20" } });
+    expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Hoy, sábado 17/10");
+  });
+
+  it("017-E20: otro día sin ventas lo dice", async () => {
+    await abrir();
+    fireEvent.change(screen.getByTestId("dia"), { target: { value: "2026-10-14" } });
+    expect((await screen.findByTestId("sin-ventas")).textContent).toBe("No hubo ventas ese día.");
+  });
+
+  it("017-E21: sin conexión y sin nada bajado, hoy dice que se ve cuando vuelva internet", async () => {
+    apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
+    render(<VentasDeHoy />);
+    expect((await screen.findByTestId("sin-conexion")).textContent).toBe("Sin conexión: las ventas de hoy se ven cuando vuelva internet.");
+  });
+
+  it("017-E02: igual que ayer dice 0 %, sin flecha", async () => {
+    dias["2026-10-16"] = [venta("y", a("2026-10-16", 9), "efectivo", 293000, [renglon("x", "1", 293000)])];
+    await abrir();
+    const pastilla = screen.getByTestId("comparacion").querySelector(".hoy-pastilla")!;
+    expect(pastilla.className).toContain("igual");
+    expect(pastilla.textContent).toBe("0 %");
+    expect(pastilla.querySelector("svg")).toBeNull();
+  });
+
+  it("017-E13: se abren de a varias, como en la computadora", async () => {
+    await abrir();
+    const ventas = screen.getAllByTestId("venta-dia");
+    fireEvent.click(within(ventas[1]!).getByRole("button"));
+    fireEvent.click(within(ventas[3]!).getByRole("button"));
+    expect(screen.getAllByTestId("detalle-venta")).toHaveLength(2);
+  });
+
   it("sin permiso de ver ventas el servidor lo dice y no hay resumen", async () => {
     apiFalsa.mockRejectedValue(new ErrorApi(403, "No tenés permiso para esto"));
     render(<VentasDeHoy />);

@@ -20,8 +20,8 @@ comprobantes. Los colores de los medios de pago siguen la decisión 108 (colores
 ### Session 2026-10-17
 
 - Q: ¿Qué entra de la imagen de referencia? → A: Los seis puntos de arriba; no entran el número de venta, el «Tip», «Ver todas» ni imprimir.
-- Q: ¿Contra qué se compara el total de hoy? → A: Contra lo vendido ayer hasta la misma hora: a las 11 se compara con ayer a las 11. Un día anterior, ya terminado, se compara entero con el suyo entero (decisión 109).
-- Q: ¿Quién ve las ventas de otros días? → A: Cualquiera con «Ver las ventas del día», el permiso de la pestaña «Hoy»; no hay un permiso aparte (decisión 109).
+- Q: ¿Contra qué se compara el total de hoy? → A: Contra lo vendido ayer hasta la misma hora: a las 11 se compara con ayer a las 11. Un día anterior, ya terminado, se compara entero con el suyo entero (decisión 111).
+- Q: ¿Quién ve las ventas de otros días? → A: Cualquiera con «Ver las ventas del día», el permiso de la pestaña «Hoy»; no hay un permiso aparte (decisión 111).
 - Q: ¿Qué maqueta? → A: La C: el total, la comparación, el gráfico y los cuatro medios en renglones, todo en la tarjeta oscura; debajo, los tres números en una tira y la lista de ventas.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -81,7 +81,7 @@ productos · Cuenta corriente · $58.000») y tocarla para ver los tres.
 
 1. **E11** **Given** una venta de 3 productos en cuenta corriente a Constructora Martínez, **When** se mira la lista, **Then** su renglón dice la hora, «3 productos», el medio con su ícono, el cliente y el importe.
 2. **E12** **Given** una venta de un solo producto, **When** se mira la lista, **Then** el renglón dice el producto («1 × Taladro inalámbrico 18 V») en lugar de «1 producto».
-3. **E13** **Given** el renglón de una venta, **When** se lo toca, **Then** se ven sus productos, uno por renglón, con cantidad, precio por unidad y total (lo que hoy muestra «Hoy»); en la computadora, también con Enter.
+3. **E13** **Given** el renglón de una venta, **When** se lo toca, **Then** se ven sus productos, uno por renglón, con cantidad y total; en la computadora, también el precio por unidad, y se abre también con Enter.
 4. **E14** **Given** una venta anulada, **When** se mira la lista, **Then** sigue en su hora, tachada y con «anulada», y no suma en el total, los medios ni los tres números.
 5. **E15** **Given** la lista, **When** se mira, **Then** está ordenada de la más reciente a la más vieja.
 
@@ -109,7 +109,7 @@ comparación con anteayer; volver a hoy.
 
 ### Edge Cases
 
-- Una venta cerca de la medianoche cuenta en el día del local (hora de Buenos Aires), como hoy (capacidad 003).
+- Una venta cerca de la medianoche cuenta en el día del local (hora de Buenos Aires), como hoy (capacidad 003). Las horas del gráfico, «ayer a esta hora» y el tope del calendario salen del reloj del dispositivo, que está en el local: un dispositivo con otro huso vería las horas corridas.
 - Una venta sin mandar todavía (sin conexión): como ahora, aparece en «Hoy» cuando llega al servidor.
 - Ayer con ventas solo después de la hora actual: la comparación dice «Ayer a esta hora no había ventas».
 - Un día de muchas ventas (200): la lista sigue siendo de renglones cortos y se desplaza; los números de arriba se ven sin bajar.

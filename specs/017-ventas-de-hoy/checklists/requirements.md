@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Carlos contestó las dos aclaraciones (decisión 109). Aprobada.
+- Carlos contestó las dos aclaraciones (decisión 111). Aprobada.

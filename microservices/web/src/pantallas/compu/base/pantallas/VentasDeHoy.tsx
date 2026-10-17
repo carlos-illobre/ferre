@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { usePuede } from "../../../permisos";
-import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../../negocio/ventas/venta";
-import { confirmadas as lasConfirmadas, fueSinConexion, hoyLocal, MOTIVOS_DE_ANULACION, motivoDeAnulacion, SIN_MOTIVO, useAnularVenta, useVentasDelDia, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
+import { NOMBRE_DE_MEDIO } from "../../../../negocio/ventas/venta";
+import { fueSinConexion, hoyLocal, MOTIVOS_DE_ANULACION, motivoDeAnulacion, SIN_MOTIVO, useAnularVenta, useVentasDelDia, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
 import { fecha as fechaLarga } from "../../../../formato";
 import { useEsCelular } from "../vista";
 import { irA } from "../rutas";
-import { Aviso, Boton, Hoja, Icono, Indicador, Pagina, Pastilla, Toast, Vacio, hora, numero, pesosCortos } from "../ui";
+import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Toast, Vacio, hora, numero, pesosCortos } from "../ui";
 import "../estilos/ventas.css";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 import { IconoDeMedio } from "../../../IconoDeMedio";
 
 // Las ventas de un día, como en el cuaderno: cada venta con sus productos, uno por renglón.
-const ICONO_MEDIO = { efectivo: "plata", mercado_pago: "celular", tarjeta: "caja", cuenta_corriente: "usuarios" } as const;
 
 // Dos procesos, dos pestañas de Vender (decisión 72): «Hoy» muestra lo vendido en el día, sin
 // nada para tocar; «Anular» es para buscar una venta y anularla, de hoy o, con el permiso, de otro día.
@@ -30,7 +29,6 @@ export function VentasDeHoy({ modo }: { modo: "hoy" | "anular" }) {
   const esCelular = useEsCelular();
   const plegar = (id: string) => setPlegadas((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
-  const confirmadas = lasConfirmadas(datos?.ventas ?? []);
   const titulo = modo === "anular" ? (esHoy ? "Anular una venta de hoy" : `Anular una venta del ${fechaLarga(dia)}`) : "Ventas de hoy";
 
   return (
@@ -47,14 +45,6 @@ export function VentasDeHoy({ modo }: { modo: "hoy" | "anular" }) {
       }>
       <Aviso tipo="error" accion={<Boton tam="chico" onClick={recargar}>Reintentar</Boton>}>{error}</Aviso>
 
-      {datos && modo === "hoy" && (
-        <div className="indicadores">
-          <Indicador rotulo={esHoy ? "Vendido hoy" : "Vendido ese día"} valor={pesosCortos(datos.total)} detalle={`${confirmadas.length} ${confirmadas.length === 1 ? "venta" : "ventas"}`} icono="ganancia" color="ambar" testId="total-del-dia" />
-          {MEDIOS.map((m) => (
-            <Indicador key={m} rotulo={NOMBRE_DE_MEDIO[m]} valor={pesosCortos(datos.totales[m] ?? 0)} icono={ICONO_MEDIO[m]} />
-          ))}
-        </div>
-      )}
       {!datos && !error && <div className="esqueleto ventas-esqueleto" aria-busy="true" aria-label="Buscando las ventas del día" />}
 
       {datos && datos.ventas.length === 0 && (
