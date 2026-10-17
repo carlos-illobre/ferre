@@ -53,15 +53,51 @@ referencia `maquetas/marco-referencia-de-carlos.webp`; el contenido de los capí
   mayúsculas ni tildes, y muestra hasta seis resultados: el capítulo y la sección, el título del
   paso y un pedacito del texto, con lo buscado resaltado. Se elige con un clic o con las flechas y
   Enter, y lleva ahí; Escape lo cierra.
-- A la izquierda, un panel pegado al borde: «Inicio del manual» (con una casa; sin portada, lleva
-  al comienzo del primer capítulo), «Capítulos» con el número de cada uno en un círculo (el elegido,
+- A la izquierda, un panel pegado al borde: «¿Dónde lo usás?» (ver abajo), «Capítulos» con el número de cada uno en un círculo (el elegido,
   más grande, naranja y resaltado), y debajo del elegido sus secciones, cada una con un punto sobre
   una línea que baja del número. Al bajar, la sección que se lee se marca sola: punto naranja,
   negrita y fondo naranja suave.
-- Arriba del capítulo, las migas de pan: «Manual de uso › 1. Entrar › la sección que se lee».
+- Arriba del capítulo, las migas de pan: «Manual de uso › Computadora › 1. Entrar › la sección que se lee».
 - A la derecha, «Consejo» (uno propio del capítulo, que no repite el texto) y «Artículos
   relacionados», que llevan a otras secciones. Las secciones no se repiten ahí: están en el menú.
   En una ventana de menos de 1180 px la columna derecha no se ve.
 - La hoja ocupa toda la columna del medio, a 24 px del menú y de la columna derecha.
 - Cada clip lleva un botón redondo naranja de play en el medio y su duración arriba a la derecha;
   al tocarlo arranca y el botón se esconde. Siguen los controles de siempre.
+
+**Computadora o Celular** (2026-10-17, maqueta `maquetas/manual-dispositivo.html`, aprobada por
+Carlos; decisión 109). Reemplaza a «Inicio del manual».
+
+- Arriba del índice, «¿Dónde lo usás?» y dos botones del mismo ancho, uno al lado del otro, con su
+  ícono arriba del nombre: Computadora (una pantalla) y Celular (un teléfono). El elegido, en verde
+  oscuro con letra blanca; el otro, sobre un fondo gris suave. Se eligen con un clic o con las
+  flechas, como un grupo de opciones.
+- Abre en Computadora; la elección se recuerda en esa computadora.
+- Con un dispositivo elegido, todo el manual muestra solo lo suyo: en el índice, los capítulos y
+  las secciones escritos para él (los demás capítulos dicen «pronto»); en la hoja, el texto de
+  entrada, las tarjetas de «¿Cuál uso?», las secciones, los renglones de «Si algo no funciona» y
+  las capturas; las migas nombran el dispositivo; el consejo y los artículos relacionados son los
+  suyos; el buscador busca solo en eso. Al cambiar de dispositivo, la hoja vuelve arriba.
+- Las secciones ya no repiten el dispositivo: «Con Google», no «En el celular, con Google».
+- En «Entrar», con Celular, debajo de las tarjetas: «¿Querés entrar a la computadora con el
+  celular? Elegí Computadora, arriba a la izquierda: está en «Con el celular»».
+
+**El capítulo «Catálogo: los productos»** (2026-10-17, maqueta `maquetas/manual-catalogo.html`,
+aprobada por Carlos). Solo en la computadora, por ahora. Mismo tono que «Entrar»: frases cortas,
+segunda persona, una acción por paso.
+
+- Primero, «Para llegar» (Catálogo en el menú, o Alt + 1). Después «¿Qué querés hacer?», doce
+  tarjetas que llevan a su sección.
+- Las secciones, en este orden: La pantalla (una captura con cada parte numerada); Buscar un
+  producto; Filtrar por stock o marca; De dónde sale el precio; Poner el margen; Usar el costo de
+  otro proveedor; Bajar la lista del proveedor; Sacarle una foto; Agregar a la venta; La ficha del
+  producto; Cargar el código de barras; Buscar escaneando con el celular; Con el teclado (una
+  tabla de teclas); Si algo no funciona (una tabla, con la captura de lo que ve quien no puede ver
+  costos ni cambiar márgenes).
+- Cada sección con un clip arriba de los pasos, salvo «Bajar la lista» (es una descarga). Las
+  capturas de una parte de la pantalla (un panel, una fila) van al doble de resolución, para que
+  se lean; los números de las marcas no tapan lo que señalan.
+- El consejo: «Para encontrar rápido un producto, escribí solo una parte: con «mecha 6» aparecen
+  todas las mechas de 6 mm». Artículos relacionados: Poner el margen, Agregar a la venta y Cargar
+  el código de barras.
+

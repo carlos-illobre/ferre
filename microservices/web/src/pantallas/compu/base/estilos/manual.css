@@ -1,5 +1,5 @@
-/* El manual de uso (RF-97): el marco copia specs/012-manual-de-uso/maquetas/manual-marco.html y el
-   capítulo «Entrar», maquetas/manual-entrar-v2.html. */
+/* El manual de uso (RF-97): el marco copia specs/012-manual-de-uso/maquetas/manual-marco.html, con el
+   selector de manual-dispositivo.html; los capítulos, manual-entrar-v2.html y manual-catalogo.html. */
 
 /* Los colores son los de la paleta de la aplicación (paleta.css, decisión 47). */
 .manual{--verde:var(--p-verde);--verde-2:var(--p-verde-2);--menta:var(--p-verde-suave);--naranja:var(--p-naranja);--naranja-suave:var(--p-naranja-suave);--tinta:var(--p-tinta);--texto-2:var(--p-texto-2);--borde:var(--p-borde-suave);--papel:var(--p-superficie);--fondo:var(--p-fondo-2);--amarillo:var(--p-amarillo-suave);--amarillo-borde:var(--p-amarillo-borde);--gris:var(--p-borde-fuerte)}
@@ -64,6 +64,8 @@
 /* Lo que en la maqueta eran enlaces, acá son botones (el «#» es la dirección de la pantalla). */
 .manual button{font:inherit;cursor:pointer}
 .manual-pie span{color:var(--gris)}
+.manual .manual-pie button{padding:0;border:0;background:none;color:var(--verde);font:inherit;font-weight:600;cursor:pointer}
+.manual-pie button:hover{text-decoration:underline}
 .manual :focus-visible{outline:3px solid var(--naranja);outline-offset:2px}
 .manual-paso > div:last-child{min-width:0}
 .manual-nota svg{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -114,9 +116,6 @@
 .manual-indice { position: sticky; top: 68px; align-self: start; height: calc(100vh - 68px); overflow: auto; padding: 24px 14px 24px 16px; background: var(--p-fondo-2); border-right: 1px solid var(--borde); font-size: 15px; }
 .manual-indice h2 { font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--texto-2); margin: 0 0 12px; padding-left: 10px; }
 .manual-indice ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.manual .manual-inicio { display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 18px; padding: 9px 10px; border: 0; border-radius: 12px; background: none; color: var(--tinta); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
-.manual-inicio:hover { background: var(--papel); }
-.manual-inicio svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .manual-indice li > button, .manual-indice li > span { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 10px; border: 0; border-radius: 12px; background: none; color: var(--tinta); font: inherit; text-align: left; white-space: nowrap; }
 .manual-indice li > button b, .manual-indice li > span b { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; border: 1.5px solid var(--p-borde); color: var(--texto-2); }
 .manual-indice li.actual > button { background: var(--naranja-suave); font-weight: 700; cursor: pointer; }
@@ -129,12 +128,24 @@
 .manual-secciones button:hover { color: var(--tinta); }
 .manual-secciones li.actual button { color: var(--tinta); font-weight: 700; background: var(--naranja-suave); }
 .manual-secciones li.actual button::before { background: var(--naranja); }
+/* «¿Dónde lo usás?»: Computadora o Celular, en lugar de «Inicio del manual» (decisión 109). */
+.manual-donde { margin: 0 0 22px; }
+.manual-donde > span { display: block; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--texto-2); margin: 0 0 10px; padding-left: 10px; }
+.manual-donde-opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: var(--p-relleno); }
+.manual .manual-donde-opciones button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border: 0; border-radius: 11px; background: none; color: var(--texto-2); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.manual-donde-opciones button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.manual .manual-donde-opciones button[aria-checked="true"] { background: var(--verde); color: #fff; box-shadow: 0 4px 12px rgb(23 49 43 / 0.25); }
+.manual .manual-donde-opciones button:not([aria-checked="true"]):hover { background: var(--papel); color: var(--tinta); }
+.manual-donde-opciones button:focus-visible { outline: 3px solid var(--naranja); outline-offset: 2px; }
+.manual-indice li.escrito > button { cursor: pointer; }
+.manual-indice li.escrito > button:hover { background: var(--papel); }
 /* Las migas de pan */
 .manual-migas { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 18px; font-size: 14px; color: var(--texto-2); }
 .manual .manual-migas button { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
 .manual-migas button:hover { color: var(--tinta); text-decoration: underline; }
 .manual-migas span { opacity: 0.5; }
 .manual-migas b { color: var(--tinta); font-weight: 600; }
+.manual-migas .manual-migas-dispositivo { opacity: 1; font-weight: 600; }
 /* La columna derecha */
 .manual-derecha { position: sticky; top: 92px; align-self: start; margin-top: 24px; }
 .manual-caja { background: var(--papel); border-radius: 16px; box-shadow: 0 0 0 1px var(--borde); padding: 18px 20px; margin-bottom: 16px; }

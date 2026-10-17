@@ -852,3 +852,14 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      todas las pantallas donde aparece ese elemento. Lo que sigue prohibido es una pantalla
      entera, un fondo o un panel con colores propios. Los colores van en la paleta compartida
      (`specs/001-base-del-sistema/ux.md`, `docs/sistema-visual.md`).
+
+109. **El manual de uso, por dispositivo, y su capítulo «Catálogo»** (2026-10-17). Carlos aprobó
+     las maquetas `specs/012-manual-de-uso/maquetas/manual-dispositivo.html` y `manual-catalogo.html`.
+     - «Inicio del manual» se reemplaza por «¿Dónde lo usás?»: Computadora o Celular. El manual
+       muestra solo las instrucciones, capturas y clips del dispositivo elegido, en todos sus
+       capítulos; abre en Computadora y se acuerda de la elección en esa computadora.
+     - «Entrar con el celular» va con la computadora: es una forma de entrar a la computadora,
+       aunque tenga pasos en el teléfono. En Celular, un aviso lleva a elegir Computadora.
+     - Un capítulo que todavía no está escrito para el dispositivo elegido dice «pronto».
+     - El capítulo 2 se llama «Catálogo: los productos» y explica la pantalla Productos; Listas y
+       Duplicados se suman después al mismo capítulo.
