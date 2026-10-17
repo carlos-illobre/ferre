@@ -18,3 +18,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T007 [arreglo] En el celular, «Separar» en Duplicados pedía confirmar con un aviso del navegador, y la regla dice que ni unir ni separar piden confirmar porque cada una deshace a la otra: separa enseguida y el aviso de «Separados» trae «Deshacer», que los vuelve a unir, como en la computadora (pedido de Carlos del 2026-10-17)
 - [x] T008 [ajuste] En el celular, el aviso de «Separados» en Duplicados lleva el nombre del producto en negrita (pedido de Carlos del 2026-10-17)
 - [x] T009 [ajuste] En el aviso de «Separados» del celular, el nombre del producto, además de en negrita, en verde claro para que se distinga del resto del texto (pedido de Carlos del 2026-10-17)
+- [x] T010 [ajuste] En el aviso de «Separados» del celular, el nombre del producto en amarillo, que resalta más sobre el fondo oscuro; «Deshacer» pasa a blanco para no confundirse con el nombre (pedido de Carlos del 2026-10-17)
