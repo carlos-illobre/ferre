@@ -239,6 +239,8 @@ button.fila:active, .fila.tocable:active { background: var(--niebla); }
 /* Hoja (bottom sheet en el celular; ventana centrada en la computadora) */
 .hoja-fondo { position: fixed; inset: 0; z-index: 40; background: rgba(14, 18, 32, 0.4); display: flex; flex-direction: column; justify-content: flex-end; animation: fadein 0.2s; }
 .hoja { background: var(--niebla); border-radius: 28px 28px 0 0; padding: 8px 20px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; max-height: 92vh; overflow: auto; animation: hoja-sube 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
+/* La hoja baja con lo que tiene: nada adentro se achica (una lista achicada cortaba sus renglones). */
+.hoja > * { flex-shrink: 0; }
 .hoja .manija { width: 36px; height: 5px; border-radius: 3px; background: #c5c8d2; margin: 0 auto 4px; flex: none; }
 .hoja .titulo-hoja { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .hoja .lista, .hoja .tarjeta { box-shadow: none; }
