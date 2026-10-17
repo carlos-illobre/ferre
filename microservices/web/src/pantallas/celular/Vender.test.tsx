@@ -123,6 +123,8 @@ describe("Vender", () => {
     const { agregar } = armar();
     agregar("mecha vender");
     expect(screen.getByTestId("medio-efectivo").getAttribute("aria-checked")).toBe("true");
+    // 017-E06: cada medio con su ícono y su color, el mismo que en «Hoy».
+    for (const m of ["efectivo", "mercado_pago", "tarjeta", "cuenta_corriente"]) expect(screen.getByTestId(`medio-${m}`).querySelector(`.medio-icono.medio-${m}`)).not.toBeNull();
     fireEvent.click(screen.getByTestId("medio-cuenta_corriente"));
     expect(screen.getByTestId("hoja-clientes")).toBeTruthy(); // sin cliente elegido, pide elegirlo
     fireEvent.keyDown(window, { key: "Escape" });
@@ -259,10 +261,14 @@ describe("Vender", () => {
     expect((await screen.findByTestId("total-de-hoy")).textContent).toBe("$10.500");
     const ventas = screen.getAllByTestId("venta-dia");
     expect(ventas).toHaveLength(2);
-    expect(ventas[0]!.textContent).toContain("3 × MECHA VENDER 8 MM");
-    expect(ventas[0]!.textContent).toContain("1.5 × TORNILLO VENDER");
-    expect(ventas[0]!.textContent).toContain("Efectivo");
-    expect(ventas[1]!.textContent).toContain("anulada");
+    // 017-E15: de la más reciente a la más vieja; 017-E12 017-E14: la anulada, tachada y marcada.
+    expect(ventas[0]!.textContent).toContain("1 × MECHA VENDER 8 MManulada");
+    // 017-E11 017-E13: la de dos productos dice cuántos, y al tocarla se ven.
+    expect(ventas[1]!.textContent).toContain("2 productos");
+    expect(ventas[1]!.textContent).toContain("Efectivo");
+    fireEvent.click(within(ventas[1]!).getByRole("button", { expanded: false }));
+    expect(within(ventas[1]!).getByTestId("detalle-venta").textContent).toContain("3 × MECHA VENDER 8 MM");
+    expect(within(ventas[1]!).getByTestId("detalle-venta").textContent).toContain("1,5 × TORNILLO VENDER");
     expect(screen.queryByRole("button", { name: "Anular" })).toBeNull();
   });
 

@@ -111,11 +111,14 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
 
   // La pestaña Hoy de Vender muestra las ventas del día, con cada producto en su renglón y sin anular (decisión 72).
   await page.getByRole("tab", { name: "Hoy" }).click();
-  const deHoy = page.getByTestId("ventas-de-hoy").getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
-  await expect(deHoy).toContainText("3 × MECHA VENDER");
-  await expect(deHoy).toContainText("1.5 × TORNILLO VENDER");
+  // La más reciente primero (017): la que se acaba de cobrar, en un renglón que se abre.
+  const deHoy = page.getByTestId("ventas-de-hoy").getByTestId("venta-dia").first();
+  await expect(deHoy).toContainText("2 productos");
   await expect(deHoy).toContainText("Efectivo");
-  await expect(deHoy).toContainText("$11.000,00");
+  await expect(deHoy).toContainText("$11.000");
+  await deHoy.getByRole("button").first().click();
+  await expect(deHoy.getByTestId("detalle-venta")).toContainText("3 × MECHA VENDER");
+  await expect(deHoy.getByTestId("detalle-venta")).toContainText("1,5 × TORNILLO VENDER");
   await expect(page.getByRole("button", { name: "Anular" })).toHaveCount(0);
   // La pestaña Anular es para eso: anular la marca y devuelve el stock.
   await page.getByRole("tab", { name: "Anular" }).click();

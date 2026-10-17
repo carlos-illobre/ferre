@@ -290,7 +290,7 @@ RF-22:
     - "Sin prueba de que un ítem libre no mueve stock"
 
 RF-23:
-  estado: "Hecho en parte (#16): ver y anular. Falta corregir una venta y ver días anteriores (#56)"
+  estado: "Hecho en parte (#16): ver y anular; los días anteriores, con «Cambiar fecha» de «Hoy» (017, RF-121). Falta corregir una venta (#56)"
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
@@ -874,28 +874,46 @@ RF-116:
   defectos: []
 
 RF-117:
-  estado: "Nuevo (017): especificación y maquetas aprobadas; sin programar"
-  pruebas: []
+  estado: "A validar (017): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/negocio/ventas/resumen-del-dia.test.tsx
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
   defectos: []
 
 RF-118:
-  estado: "Nuevo (017): especificación y maquetas aprobadas; sin programar"
-  pruebas: []
+  estado: "A validar (017): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/pantallas/IconoDeMedio.test.tsx
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/compu/Vender.test.tsx
   defectos: []
 
 RF-119:
-  estado: "Nuevo (017): especificación y maquetas aprobadas; sin programar"
-  pruebas: []
+  estado: "A validar (017): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/negocio/ventas/resumen-del-dia.test.tsx
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
   defectos: []
 
 RF-120:
-  estado: "Nuevo (017): especificación y maquetas aprobadas; sin programar"
-  pruebas: []
+  estado: "A validar (017): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
+    - tests/e2e/celular/04-vender.spec.ts
+    - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []
 
 RF-121:
-  estado: "Nuevo (017): especificación y maquetas aprobadas; sin programar"
-  pruebas: []
+  estado: "A validar (017): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/negocio/ventas/resumen-del-dia.test.tsx
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
   defectos: []
 
 RNF-01:

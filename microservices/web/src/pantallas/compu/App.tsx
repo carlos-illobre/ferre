@@ -27,6 +27,7 @@ import { Entrar } from "./base/pantallas/Entrar";
 import { Manual } from "./base/pantallas/Manual";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
 import { VentasDeHoy } from "./base/pantallas/VentasDeHoy";
+import { Hoy } from "./base/pantallas/Hoy";
 import { Productos } from "./base/pantallas/Productos";
 import { Listas } from "./base/pantallas/Listas";
 import { Duplicados } from "./base/pantallas/Duplicados";
@@ -326,7 +327,7 @@ function Pantallas() {
           : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />
           : actual === "roles" ? <Roles />
           : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`compras?pedido=${id}`)} /></main>
-          : actual === "hoy" ? <VentasDeHoy modo="hoy" /> : actual === "anular" ? <VentasDeHoy modo="anular" /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
+          : actual === "hoy" ? <Hoy /> : actual === "anular" ? <VentasDeHoy modo="anular" /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />

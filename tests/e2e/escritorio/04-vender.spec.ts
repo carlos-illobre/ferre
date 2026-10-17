@@ -104,9 +104,14 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
 
   // La pestaña Hoy de Vender la muestra, sin anular (decisión 72).
   await page.getByTestId("pestana-hoy").click();
+  // La más reciente primero (017): la que se acaba de cobrar, en un renglón; Enter abre sus productos.
   const hoy = page.getByTestId("ventas-de-hoy");
-  await expect(hoy).toContainText("Efectivo");
-  await expect(hoy.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" })).toContainText("TORNILLO VENDER");
+  const ultima = hoy.getByTestId("venta-dia").first();
+  await expect(ultima).toContainText("2 productos");
+  await expect(ultima).toContainText("Efectivo");
+  await page.keyboard.press("Enter");
+  await expect(ultima.getByTestId("detalle-venta").filter({ hasText: "MECHA VENDER" })).toHaveCount(1);
+  await expect(ultima.getByTestId("detalle-venta").filter({ hasText: "TORNILLO VENDER" })).toHaveCount(1);
   await expect(hoy.getByRole("button", { name: "Anular" })).toHaveCount(0);
   // La pestaña Anular es para eso: anular la marca y devuelve el stock.
   await page.getByTestId("pestana-anular").click();

@@ -80,6 +80,8 @@ describe("Vender (v2)", () => {
     const { agregar, item } = armar();
     agregar("tornillo vender");
     expect(screen.getByTestId("medio-efectivo").getAttribute("aria-checked")).toBe("true");
+    // 017-E06: cada medio con su ícono y su color, el mismo que en «Hoy».
+    for (const m of ["efectivo", "mercado_pago", "tarjeta", "cuenta_corriente"]) expect(screen.getByTestId(`medio-${m}`).querySelector(`.medio-icono.medio-${m}`)).not.toBeNull();
     fireEvent.click(screen.getByTestId("cobrar"));
     expect(screen.getByTestId("error-cobro").textContent).toContain("Hay productos sin precio");
     expect(enviarOEncolar).not.toHaveBeenCalled();

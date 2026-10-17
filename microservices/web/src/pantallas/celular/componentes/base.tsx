@@ -39,6 +39,8 @@ const TRAZOS: Record<string, string> = {
   enlace: "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7",
   separar: "M16 3h5v5M8 21H3v-5M21 3l-7 7M3 21l7-7M14 14l7 7M3 3l7 7",
   marca: "M3 12V4h8l10 10-8 8L3 12zM7.5 7.5h.01",
+  sube: "M7 17 17 7M8 7h9v9",
+  baja: "M7 7l10 10M17 8v9H8",
   calendario: "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 10h18M8 3v4M16 3v4",
   codigoDeBarras: "M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14",
   lista: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",

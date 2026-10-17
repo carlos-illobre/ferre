@@ -8,6 +8,7 @@ import { irA } from "../rutas";
 import { Aviso, Boton, Hoja, Icono, Indicador, Pagina, Pastilla, Toast, Vacio, hora, numero, pesosCortos } from "../ui";
 import "../estilos/ventas.css";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
+import { IconoDeMedio } from "../../../IconoDeMedio";
 
 // Las ventas de un día, como en el cuaderno: cada venta con sus productos, uno por renglón.
 const ICONO_MEDIO = { efectivo: "plata", mercado_pago: "celular", tarjeta: "caja", cuenta_corriente: "usuarios" } as const;
@@ -105,7 +106,7 @@ export function VentasDeHoy({ modo }: { modo: "hoy" | "anular" }) {
                       ) : <span className="nombre tachable">{numero(Number(uno?.cantidad ?? 0))} × {uno?.descripcion ?? ""}</span>}
                     </td>
                     <td className="num">{varios ? "" : pesosCortos(uno?.precio_unitario)}</td>
-                    <td>{NOMBRE_DE_MEDIO[v.medio_pago] ?? v.medio_pago}{v.cliente ? ` · ${v.cliente}` : ""}</td>
+                    <td><span className="ventas-medio"><IconoDeMedio medio={v.medio_pago} tam={16} />{NOMBRE_DE_MEDIO[v.medio_pago] ?? v.medio_pago}</span>{v.cliente ? ` · ${v.cliente}` : ""}</td>
                     <td className="num"><span className="importe chico tachable">{pesosCortos(v.total)}</span></td>
                     <td className="angosta">{anulada ? <Pastilla tipo="mal">anulada</Pastilla> : anula && <Boton tam="chico" variante="peligro" onClick={() => setPorAnular(v)}>Anular</Boton>}</td>
                   </tr>

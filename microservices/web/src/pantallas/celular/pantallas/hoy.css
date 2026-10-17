@@ -1,0 +1,49 @@
+/* «Hoy» renovada en el celular (specs/017, maqueta C aprobada el 2026-10-17). */
+.hoy { display: flex; flex-direction: column; gap: 12px; }
+.hoy-fecha { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 2px 2px 0; }
+.hoy-fecha b { display: block; font-size: 17px; color: var(--p-tinta); }
+.hoy-fecha small { display: block; font-size: 14px; color: var(--p-texto-2); }
+.hoy-fecha .enlace { padding: 0; min-height: 28px; font-size: 14px; font-weight: 700; color: var(--p-naranja-texto); background: none; border: 0; }
+.hoy-boton { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--p-borde-fuerte); background: #fff; color: var(--p-tinta); font-size: 15px; font-weight: 700; }
+/* El calendario del sistema: invisible, debajo del botón que lo abre. */
+.hoy-calendario { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.hoy-total { border-radius: 22px; padding: 16px; gap: 6px; }
+.hoy-total small { font-size: 15px; opacity: .85; color: inherit; }
+.hoy-monto { font-size: 44px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.hoy-compara { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14.5px; }
+.hoy-total .hoy-pastilla { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 700; color: #fff; }
+.hoy-pastilla.sube { background: #2f7d5c; }
+.hoy-pastilla.baja { background: var(--p-naranja); }
+.hoy-grafico { margin: 6px 0 4px; }
+.hoy-dato { min-height: 18px; font-size: 13px; text-align: right; opacity: .9; }
+.hoy-barras { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: end; gap: 4px; height: 64px; }
+.hoy-barras button { display: block; width: 100%; padding: 0; border: 0; border-radius: 4px 4px 0 0; background: #6fbf98; min-height: 3px; }
+.hoy-barras button.vacia { background: rgba(255,255,255,.18); }
+.hoy-barras button.elegida { background: #b6e4cc; }
+.hoy-horas { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; font-size: 12px; text-align: center; opacity: .8; margin-top: 4px; }
+.hoy-medios { list-style: none; margin: 0; padding: 0; }
+.hoy-medios li { display: flex; align-items: center; gap: 10px; padding: 8px 2px; }
+.hoy-medios li + li { border-top: 1px solid rgba(255,255,255,.12); }
+.hoy-medio-nombre { flex: 1; font-size: 15px; }
+.hoy-medios small { font-size: 13px; opacity: .8; margin-right: 6px; }
+.hoy-medios b { font-size: 16px; }
+.hoy-numeros { background: #fff; border: 1px solid var(--p-borde); border-radius: 16px; display: grid; grid-template-columns: repeat(3, 1fr); }
+.hoy-numeros div { padding: 10px 8px; text-align: center; }
+.hoy-numeros div + div { border-left: 1px solid var(--p-borde-suave); }
+.hoy-numeros b { display: block; font-size: 19px; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+.hoy-numeros small { font-size: 13px; color: var(--p-texto-2); }
+.hoy-titulo { margin: 6px 2px 0; font-size: 20px; font-weight: 800; color: var(--p-tinta); }
+.hoy-ventas { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid var(--p-borde); border-radius: 18px; overflow: hidden; }
+.hoy-ventas > li + li { border-top: 1px solid var(--p-borde-suave); }
+.hoy-venta { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 10px 12px 14px; background: none; border: 0; text-align: left; color: inherit; min-height: 64px; }
+.hoy-venta .medio-icono.con-fondo { width: 40px; height: 40px; border-radius: 12px; }
+.hoy-venta-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.hoy-venta-texto b { font-size: 16px; color: var(--p-tinta); }
+.hoy-venta-texto small { font-size: 14px; color: var(--p-texto-2); }
+.hoy-venta strong { font-size: 17px; color: var(--p-tinta); }
+.hoy-venta > svg:last-child { flex: none; color: var(--p-texto-2); }
+.hoy-ventas .anulada .hoy-venta-texto b, .hoy-ventas .anulada strong { text-decoration: line-through; color: var(--p-texto-2); }
+.hoy-anulada { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--p-naranja-texto); background: var(--p-naranja-suave); text-decoration: none; }
+.hoy-detalle { list-style: none; margin: 0; padding: 4px 14px 10px 66px; background: var(--p-fondo-2); font-size: 14px; color: var(--p-texto-medio); }
+.hoy-detalle li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+.detalle.con-medio { display: inline-flex; align-items: center; gap: 6px; }
