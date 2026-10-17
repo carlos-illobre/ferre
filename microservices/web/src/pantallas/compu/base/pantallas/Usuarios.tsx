@@ -9,7 +9,7 @@ import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";
 import { IconoCompu, comoCarga, esFallaDeRed, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
-import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, partesResaltadas, quitarCelularDeOtro, resumenDelAcceso, useCelularesDeOtros, useSesiones, useUsuarios, type Acceso, type CelularDeOtroFila, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
+import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, partesResaltadas, quitarCelularDeOtro, resumenDelAcceso, useCelularesDeOtros, useSesiones, useUsuarios, type Acceso, type CelularDeOtroFila, type EstadoDeUsuario, type OrdenDeUsuarios, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
 import { useFiltroDeUsuarios } from "../../../filtro-de-usuarios";
 import { usePuede } from "../../../permisos";
 import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
@@ -80,7 +80,7 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
   }
 
   const disponibles = useRolesAsignables();
-  const filtro = useFiltroDeUsuarios(filas, disponibles);
+  const filtro = useFiltroDeUsuarios(filas);
   // Sus sesiones y sus celulares con huella (decisión 100), en la fila de cada persona.
   const sesiones = useSesiones();
   const celulares = useCelularesDeOtros();
@@ -200,16 +200,19 @@ function ListaDeAcceso({ nombre, sesiones, celulares, enLinea, alCerrarSesion, a
   );
 }
 
-// Arriba de la tabla (decisión 98): el buscador con sus sugerencias, la lista «Rol» y cuántos quedan.
+// Arriba de la tabla (decisiones 98 y 102): el buscador con sus sugerencias, «Filtros» (varios
+// roles, y activos o inactivos), el orden y cuántos son.
 function FiltroDeUsuarios({ filtro: f, roles }: { filtro: ReturnType<typeof useFiltroDeUsuarios<UsuarioFila>>; roles: RolAsignable[] }) {
   const t = TEXTOS.usuarios;
+  const [panel, setPanel] = useState(false);
+  const estados: [EstadoDeUsuario, string][] = [["todos", t.todos.largo], ["activos", t.activos.largo], ["inactivos", t.inactivos.largo]];
   return (
     <div className="usuarios-filtro" data-testid="filtro-usuarios">
       <label className="campo usuarios-buscar">
         <span>{t.buscar.largo}</span>
         <span className="usuarios-buscar-caja">
           <Icono nombre="buscar" tam={18} />
-          <input {...f.combo} className="entrada" type="search" value={f.texto} placeholder={t.correoONombre.largo} autoComplete="off" autoCapitalize="none" spellCheck={false}
+          <input {...f.combo} className="entrada" type="search" value={f.texto} placeholder={t.email.largo} autoComplete="off" autoCapitalize="none" spellCheck={false}
             onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
           {f.texto && <button type="button" className="usuarios-borrar" onClick={f.borrar} aria-label={t.borrarBusqueda.largo}>✕</button>}
           {f.sugerencias.length > 0 && (
@@ -227,14 +230,40 @@ function FiltroDeUsuarios({ filtro: f, roles }: { filtro: ReturnType<typeof useF
           )}
         </span>
       </label>
-      <label className="campo usuarios-rol">
-        <span>{t.rol.largo}</span>
-        <select className="entrada" value={f.rol ?? ""} onChange={(e) => f.elegirRol(e.target.value)} data-testid="filtro-rol">
-          <option value="">{t.todosLosRoles.largo}</option>
-          {roles.map((r) => <option key={r.id} value={r.id}>{r.nombre}</option>)}
+      <div className="usuarios-filtros">
+        <Boton tam="chico" icono="filtro" className={f.filtrado ? "con-filtros" : undefined} aria-expanded={panel} onClick={() => setPanel(!panel)} data-testid="abrir-filtros">
+          {t.filtros.largo}{f.filtrado && <span className="usuarios-aviso" aria-label="con filtros puestos" />}
+        </Boton>
+        {panel && (
+          <div className="usuarios-panel" role="dialog" aria-label={t.filtros.largo} data-testid="panel-filtros" onKeyDown={(e) => { if (e.key === "Escape") { e.stopPropagation(); setPanel(false); } }}>
+            <div className="usuarios-panel-cab"><h3>{t.roles.largo}</h3><small className="detalle">{t.unoOMas.largo}</small></div>
+            <div className="usuarios-opciones" role="group" aria-label={t.roles.largo}>
+              <button type="button" className={f.roles.length === 0 ? "si" : ""} aria-pressed={f.roles.length === 0} onClick={f.todosLosRoles}>{t.todos.largo}</button>
+              {roles.map((r) => <button key={r.id} type="button" className={f.roles.includes(r.id) ? "si" : ""} aria-pressed={f.roles.includes(r.id)} onClick={() => f.alternarRol(r.id)}>{r.nombre}</button>)}
+            </div>
+            <div className="usuarios-panel-cab"><h3>{t.estado.largo}</h3></div>
+            <div className="usuarios-opciones" role="group" aria-label={t.estado.largo}>
+              {estados.map(([valor, nombre]) => (
+                <button key={valor} type="button" className={f.estado === valor ? "si" : ""} aria-pressed={f.estado === valor} onClick={() => f.elegirEstado(valor)}>
+                  {valor !== "todos" && <i className={`usuarios-punto ${valor}`} />}{nombre}
+                </button>
+              ))}
+            </div>
+            <div className="usuarios-panel-pie">
+              <Boton tam="chico" onClick={f.quitarFiltros}>{t.quitarFiltros.largo}</Boton>
+              <Boton tam="chico" variante="principal" onClick={() => setPanel(false)} data-testid="ver-usuarios">{t.aplicarFiltros.largo} · Ver {f.conLosFiltros} {f.conLosFiltros === 1 ? "usuario" : "usuarios"}</Boton>
+            </div>
+          </div>
+        )}
+      </div>
+      <label className="campo usuarios-orden">
+        <span>{t.ordenarPor.largo}</span>
+        <select className="entrada" value={f.orden} onChange={(e) => f.elegirOrden(e.target.value as OrdenDeUsuarios)} data-testid="ordenar">
+          <option value="correo">{t.porCorreo.largo}</option>
+          <option value="estado">{t.porEstado.largo}</option>
         </select>
       </label>
-      {f.resumen && <span className="detalle usuarios-quedan" role="status" data-testid="cuantos-quedan">{f.resumen}</span>}
+      <span className="detalle usuarios-quedan" role="status" data-testid="cuantos-quedan">{f.resumen}</span>
     </div>
   );
 }

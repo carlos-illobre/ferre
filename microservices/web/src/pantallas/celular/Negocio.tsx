@@ -54,7 +54,7 @@ function Usuarios() {
   const error = aviso ?? (usuarios.error && usuarios.error !== cerrado ? (usuarios.error as Error).message : null);
   const [alta, setAlta] = useState(false);
   const [rolesDelNuevo, setRolesDelNuevo] = useState<string[]>([]);
-  const filtro = useFiltroDeUsuarios(filas, disponibles);
+  const filtro = useFiltroDeUsuarios(filas);
   const sesiones = useSesiones();
   const celulares = useCelularesDeOtros();
   async function cerrarLaSesion(s: SesionFila) {

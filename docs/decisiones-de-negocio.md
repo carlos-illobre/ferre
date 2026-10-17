@@ -798,3 +798,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     - Lo decide quien tiene «Administrar usuarios»; con ese permiso, Anomalías aparece en Más.
     - Lo aceptado queda a nombre de quien lo hizo; el registro dice quién lo aceptó.
 
+102. **Usuarios en el celular: tarjetas plegadas, filtros por rol y estado, y orden** (2026-10-17).
+     Sobre una referencia suya, Carlos pidió que la lista muestre lo principal de cada persona y
+     el detalle se abra de a una: la tarjeta plegada tiene el nombre, el estado, el correo y los
+     roles que entran en una línea; abierta, las pestañas Información (siempre la primera al
+     abrir: el correo, «Se unió el…» y «Desactivar»), Roles (con «Cambiar roles») y Sesiones.
+     Cambia la decisión 98: vuelve cuántos son, siempre a la vista; la lista «Rol» se reemplaza
+     por «Filtros», con varios roles a la vez (queda quien tiene cualquiera) y el estado (activos
+     o inactivos); y se puede ordenar por correo o por estado. El buscador dice «Email». Las
+     reglas de filtrar y ordenar valen igual en la computadora. Maquetas aprobadas el 2026-10-17
+     (007-T044, `specs/007-usuarios-y-acceso/ux.md`).

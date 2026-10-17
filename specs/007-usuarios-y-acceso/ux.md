@@ -247,32 +247,51 @@ Maquetas aprobadas por Carlos el 2026-10-14: `maquetas/mas-con-usuarios.html` y
    lleno, con la letra y el «+» en blanco, para que llame la atención (Carlos, 2026-10-17; antes
    era un recuadro punteado). La cabecera «Usuarios autorizados» con cuántos son,
    que estaba arriba, se sacó: ocupaba lugar y no hacía falta (Carlos, 2026-10-17).
-3. Debajo, el buscador y la lista «Rol» (ver «Buscar y filtrar por rol»).
-4. Una tarjeta por persona: sus iniciales en un círculo de color, el nombre con «Activo» o
-   «Inactivo» y el correo entero debajo; «Roles asignados», cada rol en una pastilla con su
-   ícono (el Administrador resaltado); y abajo, «Cambiar roles» y a su derecha «Desactivar»
-   (naranja) o «Reactivar» (verde). Nada de la tarjeta usa el color del fondo de la pantalla,
-   para que se destaque (Carlos, 2026-10-17): «Cambiar roles» va en verde lleno con letra
-   blanca; «Desactivar» y «Reactivar», en blanco con borde y letra naranja o verde; y cada
-   pastilla de rol, en blanco con un borde marcado.
+3. Debajo, el buscador «Email» y «Filtros»; debajo, cuántos son y «Ordenar» (ver «Buscar, filtrar
+   y ordenar»). «Autorizar otro correo de Google» lleva una flecha › a la derecha.
+4. **Una tarjeta por persona, plegada** (Carlos, 2026-10-17, decisión 102; maquetas aprobadas
+   `maquetas/celular-usuarios-plegadas-*.png`): sus iniciales en un círculo de color, el nombre
+   con «Activo» o «Inactivo» a la derecha, el correo (cortado con «…» si no entra) y, alineados
+   con el correo, los roles que entran en una línea, cada uno con su ícono (el Administrador
+   resaltado), y «+N» con los que no entran. Las pastillas de los roles tienen el mismo alto que
+   la del estado. A la derecha, una flecha ⌄. Así la lista muestra lo principal de cada uno y el
+   detalle se abre de a una persona.
+5. **Al tocarla se abre** (borde verde, flecha ⌃) con tres pestañas, siempre en «Información»
+   (no recuerda la última que se vio):
+   - **Información:** el correo entero, «Se unió el dd/mm/aaaa» (cuándo se autorizó) y
+     «Desactivar» o «Reactivar», a todo el ancho: fondo naranja suave, borde naranja claro,
+     ícono y letra naranja.
+   - **Roles:** todos sus roles y «Cambiar roles» (verde lleno, letra blanca), que abre las
+     casillas en el lugar.
+   - **Sesiones (N):** N es cuántas sesiones abiertas y celulares con huella tiene; sus sesiones
+     con «Cerrar» y sus celulares con «Quitar» (Historia 5). Sin ninguno, lo dice.
+   Nada de la tarjeta usa el color del fondo de la pantalla, para que se destaque.
 
-**Buscar y filtrar por rol** (Carlos, 2026-10-17; maquetas aprobadas
-`maquetas/celular-usuarios-filtro.png` y `maquetas/compu-usuarios-filtro.png`). En el celular va
-debajo de «Autorizar otro correo de Google»; en la computadora, arriba de la tabla, porque ahí el
-alta está al final. En una misma fila:
+**Buscar, filtrar y ordenar** (decisión 98, cambiada por la 102 el 2026-10-17; maquetas aprobadas
+`maquetas/celular-usuarios-plegadas-filtros.png` y `-ordenar.png`). En el celular va debajo de
+«Autorizar otro correo de Google»; en la computadora, arriba de la tabla, porque ahí el alta está
+al final.
 
-- **Un buscador «Correo o nombre»**, con la lupa a la izquierda y una cruz para borrarlo cuando
-  tiene algo. Encuentra a quien tenga lo escrito en cualquier parte del correo o del nombre, sin
-  importar mayúsculas ni tildes («lucia» encuentra a «Lucía»). Mientras se escribe, debajo
-  aparecen hasta cinco sugerencias, del ancho de la fila: el correo con lo escrito resaltado y el
-  nombre. Elegir una (tocándola, o con las flechas y Enter en la computadora) deja el correo en
-  el buscador y cierra las sugerencias; Escape las cierra sin elegir.
-- **Una lista desplegable «Rol»**, que empieza en «Todos» y tiene los roles que existen. Con un
-  rol elegido quedan solo quienes lo tienen; en el celular, la lista se marca en verde.
-- Los dos se combinan. Con cualquiera de los dos puesto, una línea dice cuántos quedan:
-  «2 de 4 usuarios con el rol Recepción», o «1 de 4 usuarios» si solo se buscó. Si no queda
-  nadie: «Nadie coincide con la búsqueda.»
-- Buscar no cambia nada guardado; al salir de la pantalla, el filtro se pierde.
+- **Un buscador «Email»**, con la lupa a la izquierda y una cruz para borrarlo cuando tiene algo.
+  Encuentra a quien tenga lo escrito en cualquier parte del correo o del nombre, sin importar
+  mayúsculas ni tildes («lucia» encuentra a «Lucía»). Mientras se escribe, debajo aparecen hasta
+  cinco sugerencias, del ancho de la fila: el correo con lo escrito resaltado y el nombre. Elegir
+  una (tocándola, o con las flechas y Enter en la computadora) deja el correo en el buscador y
+  cierra las sugerencias; Escape las cierra sin elegir.
+- **«Filtros»**, al lado del buscador, abre un panel con dos grupos de opciones, cada una con su
+  ícono:
+  - **Roles** («Seleccioná uno o más»): «Todos» y cada rol que existe. Se pueden elegir varios;
+    quedan quienes tienen **cualquiera** de los elegidos. «Todos» quita la elección.
+  - **Estado:** «Todos», «Activos» (punto verde) o «Inactivos» (punto naranja), uno a la vez.
+  - Abajo, «Quitar filtros» y «Aplicar filtros», verde lleno con «Ver N usuarios» debajo en verde
+    claro y una flecha ›, que cierra el panel (en la computadora, «Aplicar filtros · Ver N usuarios»). Los filtros se aplican al
+    elegir. Con alguno puesto, «Filtros» se marca en verde con un punto naranja.
+- **Cuántos son**, siempre a la vista debajo: «4 usuarios»; con búsqueda o filtros, «1 de 4
+  usuarios»; si no queda nadie, «Nadie coincide con la búsqueda.»
+- **«Ordenar»**, a la derecha de cuántos son y más bajo que «Filtros»: por correo (de arranque)
+  o por estado (primero los activos; entre iguales, por correo). Dice el orden elegido:
+  «Ordenar: correo».
+- Buscar, filtrar y ordenar no cambian nada guardado; al salir de la pantalla se pierden.
 
 ## Historia 2: administrar usuarios
 

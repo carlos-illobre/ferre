@@ -64,7 +64,7 @@
 .usuarios-acciones { margin-top: var(--e1); }
 .usuarios-acciones .selector { flex: 1; min-width: 0; }
 .usuarios-acciones > .detalle { flex: 1; text-align: right; }
-.usuarios-rol { min-width: 0; }
+.usuarios-orden { min-width: 0; }
 .usuarios-celda-accion { text-align: right; }
 .usuarios-dispositivo { display: inline-flex; align-items: center; gap: var(--e2); white-space: nowrap; }
 .usuarios-dispositivo svg { flex: none; color: var(--texto-3); }
@@ -84,7 +84,7 @@
   .usuarios-autorizar { min-height: 52px; }
 }
 @media (min-width: 900px) {
-  .usuarios-rol { width: auto; max-width: 240px; }
+  .usuarios-orden { width: auto; max-width: 240px; }
   /* «Autorizar a alguien» usa todo el ancho: nombre, correo y el botón en una línea; debajo, los
      roles repartidos en columnas, uno al lado del otro. */
   .usuarios-formulario { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto; align-items: start; }
@@ -135,7 +135,7 @@
 
 @media (max-width: 899px) { .usuarios [data-testid="vincular-celular"] { white-space: normal; padding-block: var(--e2); } }
 
-/* Buscar y filtrar por rol, arriba de la tabla de usuarios (decisión 98) */
+/* Buscar, filtrar y ordenar, arriba de la tabla de usuarios (decisiones 98 y 102) */
 .usuarios-filtro { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .usuarios-filtro .campo { margin: 0; }
 .usuarios-buscar { flex: 0 1 420px; min-width: 240px; }
@@ -149,7 +149,22 @@
 .usuarios-sugerencias li:hover, .usuarios-sugerencias li.activa { background: var(--verde-suave); }
 .usuarios-sugerencias b { color: var(--verde); }
 .usuarios-sugerencias small { color: var(--texto-2); font-size: 14px; white-space: nowrap; }
-.usuarios-rol .entrada { min-width: 190px; }
+.usuarios-filtros { position: relative; align-self: flex-end; }
+.usuarios-filtros .boton { position: relative; min-height: 40px; }
+.usuarios-filtros .boton.con-filtros { border-color: var(--verde); background: var(--verde-suave); }
+.usuarios-aviso { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--p-naranja); }
+.usuarios-panel { position: absolute; z-index: 6; left: 0; top: calc(100% + 6px); width: 440px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: 0 12px 32px rgb(23 49 43 / 0.18); padding: var(--e4); display: flex; flex-direction: column; gap: var(--e2); }
+.usuarios-panel-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.usuarios-panel-cab h3 { margin: 0; font-size: 15px; font-weight: 700; color: var(--verde); }
+.usuarios-opciones { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--e2); }
+.usuarios-opciones button { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid var(--borde); border-radius: 99px; background: var(--superficie); color: inherit; font: inherit; font-size: 14px; cursor: pointer; }
+.usuarios-opciones button.si { background: var(--verde); border-color: var(--verde); color: #fff; font-weight: 600; }
+.usuarios-punto { width: 10px; height: 10px; border-radius: 50%; }
+.usuarios-opciones button.si .usuarios-punto { box-shadow: 0 0 0 2px #fff; }
+.usuarios-punto.activos { background: var(--p-ok); }
+.usuarios-punto.inactivos { background: var(--p-naranja); }
+.usuarios-panel-pie { display: flex; justify-content: space-between; padding-top: var(--e2); border-top: 1px solid var(--borde); }
+.usuarios-orden .entrada { min-width: 150px; }
 .usuarios-quedan { margin-left: auto; align-self: center; }
 
 /* Sus sesiones y sus celulares con huella, en la fila de cada persona (decisión 100) */

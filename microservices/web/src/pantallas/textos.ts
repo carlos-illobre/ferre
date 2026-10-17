@@ -73,12 +73,27 @@ export const TEXTOS = {
       corto: "Cada persona puede tener uno o más roles.",
     },
     faltaUnRol: igual("Elegí al menos un rol. Para que no pueda nada, desactivá al usuario."),
-    // Buscar y filtrar por rol (decisión 98).
+    // Buscar, filtrar y ordenar (decisiones 98 y 102).
     buscar: igual("Buscar"),
-    correoONombre: igual("Correo o nombre"),
+    email: igual("Email"),
     borrarBusqueda: igual("Borrar la búsqueda"),
-    rol: igual("Rol"),
-    todosLosRoles: igual("Todos"),
+    filtros: igual("Filtros"),
+    roles: igual("Roles"),
+    unoOMas: igual("Seleccioná uno o más"),
+    estado: igual("Estado"),
+    todos: igual("Todos"),
+    activos: igual("Activos"),
+    inactivos: igual("Inactivos"),
+    quitarFiltros: igual("Quitar filtros"),
+    aplicarFiltros: igual("Aplicar filtros"),
+    ordenarPor: igual("Ordenar por"),
+    porCorreo: igual("Correo"),
+    porEstado: igual("Estado"),
+    // La tarjeta abierta de cada persona en el celular (decisión 102).
+    informacion: igual("Información"),
+    sesiones: igual("Sesiones"),
+    seUnio: igual("Se unió el"),
+    sinSesiones: igual("No tiene sesiones abiertas ni celulares con huella."),
   },
   configuracion: {
     // Más → Configuración: las preferencias del dispositivo y lo propio (decisión 99).

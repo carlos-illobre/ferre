@@ -51,6 +51,8 @@ describe("Negocio", () => {
     render(<Negocio parte="usuarios" />);
     const filas = await screen.findAllByTestId("usuario-fila");
     const marta = filas.find((f) => f.textContent?.includes("m@b"))!;
+    fireEvent.click(within(marta).getByTestId("abrir-usuario"));
+    fireEvent.click(within(marta).getByTestId("pestana-roles"));
     expect(within(marta).getByTestId("roles-de-usuario").textContent).toContain("Vendedor");
     fireEvent.click(within(marta).getByTestId("cambiar-roles"));
     fireEvent.click(await within(marta).findByTestId("rol-Recepción"));
@@ -82,16 +84,17 @@ describe("Negocio", () => {
     expect(apiFalsa).not.toHaveBeenCalledWith("/credenciales/de-otros");
   });
 
-  it("007-T037 en la tarjeta de cada persona, una línea dice sus sesiones y celulares, y al abrirla se cierran y se quitan", async () => {
+  it("007-T037 007-T044 en la pestaña «Sesiones» de cada persona están sus sesiones y celulares, y se cierran y se quitan", async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<Negocio parte="usuarios" />);
     const marta = (await screen.findAllByTestId("usuario-fila")).find((f) => f.textContent?.includes("Marta"))!;
-    const linea = await within(marta).findByTestId("acceso-de-usuario");
-    expect(linea.textContent).toContain("2 sesiones · 1 celular con huella");
-    // Quien no tiene nada no tiene la línea.
+    fireEvent.click(within(marta).getByTestId("abrir-usuario"));
+    await waitFor(() => expect(within(marta).getByTestId("pestana-sesiones").textContent).toBe("Sesiones (3)"));
+    fireEvent.click(within(marta).getByTestId("pestana-sesiones"));
+    // Quien no tiene nada lo dice.
     const dueno = screen.getAllByTestId("usuario-fila").find((f) => f.textContent?.includes("Dueño"))!;
-    expect(within(dueno).queryByTestId("acceso-de-usuario")).toBeNull();
-    fireEvent.click(linea);
+    fireEvent.click(within(dueno).getByTestId("abrir-usuario"));
+    expect(within(dueno).getByTestId("pestana-sesiones").textContent).toBe("Sesiones (0)");
     expect(within(marta).getAllByTestId("sesion").map((s) => s.textContent)).toEqual([expect.stringContaining("computadora · Firefox"), expect.stringContaining("celular · Chrome")]);
     fireEvent.click(within(marta).getByRole("button", { name: "Cerrar la sesión de Marta en celular · Chrome" }));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/sesiones/s2", { method: "DELETE" }));

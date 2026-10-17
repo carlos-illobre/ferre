@@ -99,6 +99,9 @@ test("se arma un rol, se lo asigna y la persona gana ese acceso", async ({ page 
 
   await entrarComo(page, TOKEN_ADMIN, RUTAS.usuarios);
   const fila = page.getByTestId("usuario-fila").filter({ hasText: EMAIL_VENDEDOR });
+  // La tarjeta está plegada: se abre y, en «Roles», «Cambiar roles» (decisión 102).
+  await fila.getByTestId("abrir-usuario").click();
+  await fila.getByTestId("pestana-roles").click();
   await fila.getByTestId("cambiar-roles").click();
   await fila.getByTestId(`rol-${ROL_NUEVO}`).check();
   await fila.getByTestId("guardar-roles").click();

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
@@ -16,7 +16,7 @@ const GENTE = [
   { id: "u3", email: "luis@ferre.test", nombre: "Luis", activo: true, roles: [VENDEDOR, RECEPCION] },
 ];
 
-// 007-T033: en la computadora, arriba de la tabla, buscar por correo o nombre y filtrar por rol (decisión 98).
+// 007-T033 y 007-T044: en la computadora, arriba de la tabla, buscar, filtrar por roles y estado, y ordenar (decisiones 98 y 102).
 describe("buscar y filtrar usuarios en la computadora", () => {
   beforeEach(() => {
     conTodosLosPermisos();
@@ -50,15 +50,33 @@ describe("buscar y filtrar usuarios en la computadora", () => {
     expect(buscador().value).toBe("lu");
   });
 
-  it("la lista «Rol» deja solo a quienes lo tienen, y se combina con lo escrito", async () => {
+  it("«Filtros» deja a quienes tienen cualquiera de los roles elegidos y el estado; se combina con lo escrito", async () => {
     render(<Usuarios />);
     await screen.findAllByTestId("usuario-fila");
-    await screen.findByRole("option", { name: "Recepción" });
-    fireEvent.change(screen.getByTestId("filtro-rol"), { target: { value: "r2" } });
+    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("3 usuarios");
+    fireEvent.click(screen.getByTestId("abrir-filtros"));
+    const roles = within(within(screen.getByTestId("panel-filtros")).getByRole("group", { name: "Roles" }));
+    fireEvent.click(await roles.findByRole("button", { name: "Recepción" }));
     expect(filas()).toEqual(["Lucía Fernández", "Luis"]);
-    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("2 de 3 usuarios con el rol Recepción");
+    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("2 de 3 usuarios");
+    fireEvent.click(within(within(screen.getByTestId("panel-filtros")).getByRole("group", { name: "Estado" })).getByRole("button", { name: "Activos" }));
+    expect(filas()).toEqual(["Luis"]);
+    fireEvent.click(screen.getByRole("button", { name: "Quitar filtros" }));
+    fireEvent.click(roles.getByRole("button", { name: "Vendedor" }));
+    fireEvent.click(roles.getByRole("button", { name: "Recepción" }));
+    expect(filas()).toEqual(["Lucía Fernández", "Luis", "Marta Vos"]);
     fireEvent.change(buscador(), { target: { value: "marta" } });
+    fireEvent.click(screen.getByRole("button", { name: "Quitar filtros" }));
+    fireEvent.change(buscador(), { target: { value: "zz" } });
     expect(screen.queryAllByTestId("usuario-fila")).toHaveLength(0);
     expect(screen.getByTestId("cuantos-quedan").textContent).toBe("Nadie coincide con la búsqueda.");
+  });
+
+  it("se ordena por correo o por estado, primero los activos", async () => {
+    render(<Usuarios />);
+    await screen.findAllByTestId("usuario-fila");
+    expect(filas()).toEqual(["Lucía Fernández", "Luis", "Marta Vos"]);
+    fireEvent.change(screen.getByTestId("ordenar"), { target: { value: "estado" } });
+    expect(filas()).toEqual(["Luis", "Marta Vos", "Lucía Fernández"]);
   });
 });

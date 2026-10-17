@@ -7,7 +7,7 @@ vi.mock("../api", async (original) => ({ ...(await original<typeof import("../ap
 vi.mock("../almacen", async (original) => ({ ...(await original<typeof import("../almacen")>()), leerTodo: async () => [] }));
 vi.mock("../catalogo", () => ({ traerPorIds: async () => undefined }));
 
-import { autorizar, cambiarUsuario, cerrarSesion, cuantosQuedan, faltaEnAlta, filtrarUsuarios, partesResaltadas, sugerenciasDeUsuarios, useSesiones, useUsuarios } from "./usuarios";
+import { autorizar, cambiarUsuario, cerrarSesion, cuantosQuedan, faltaEnAlta, filtrarUsuarios, ordenarUsuarios, partesResaltadas, SIN_FILTRO, sugerenciasDeUsuarios, useSesiones, useUsuarios } from "./usuarios";
 import { anularCompra, nombreDelComprobante, useComprasRecientes, type CompraFila } from "./compras";
 import { paginasDe, useActividad } from "./actividad";
 
@@ -72,27 +72,41 @@ describe("compras recientes y registro de acciones (010-E05)", () => {
   });
 });
 
-// 007-T033: buscar por correo o nombre y filtrar por rol (decisión 98).
-describe("buscar usuarios y filtrarlos por rol (007-T033)", () => {
-  const RECEPCION = { id: "r4", nombre: "Recepción" }, VENDEDOR = { id: "r2", nombre: "Vendedor" };
+// 007-T033 y 007-T044: buscar por correo o nombre, filtrar por roles y estado, y ordenar (decisiones 98 y 102).
+describe("buscar, filtrar y ordenar usuarios (007-T033, 007-T044)", () => {
+  const RECEPCION = { id: "r4", nombre: "Recepción" }, VENDEDOR = { id: "r2", nombre: "Vendedor" }, GERENTE = { id: "r5", nombre: "Gerente" };
   const GENTE = [
-    { id: "u1", nombre: "Carlos", email: "carlos@ferre.test", roles: [VENDEDOR, RECEPCION] },
-    { id: "u2", nombre: "Marta", email: "marta.bress@ferre.test", roles: [VENDEDOR] },
-    { id: "u3", nombre: "Lucía Fernández", email: "lucia.fernandez.deposito@ferre.test", roles: [RECEPCION] },
+    { id: "u1", nombre: "Carlos", email: "carlos@ferre.test", activo: true, roles: [VENDEDOR, RECEPCION] },
+    { id: "u2", nombre: "Marta", email: "marta.bress@ferre.test", activo: true, roles: [VENDEDOR] },
+    { id: "u3", nombre: "Lucía Fernández", email: "lucia.fernandez.deposito@ferre.test", activo: false, roles: [RECEPCION] },
+    { id: "u4", nombre: "Ana", email: "ana@ferre.test", activo: false, roles: [GERENTE] },
   ];
   const ids = (l: { id: string }[]) => l.map((u) => u.id);
+  const con = (f: Partial<typeof SIN_FILTRO>) => ({ ...SIN_FILTRO, ...f });
 
   it("encuentra lo escrito en cualquier parte del correo o del nombre, sin importar mayúsculas ni tildes", () => {
-    expect(ids(filtrarUsuarios(GENTE, { texto: "LUCIA", rol: null }))).toEqual(["u3"]);
-    expect(ids(filtrarUsuarios(GENTE, { texto: "fernández", rol: null }))).toEqual(["u3"]);
-    expect(ids(filtrarUsuarios(GENTE, { texto: "bress", rol: null }))).toEqual(["u2"]);
-    expect(ids(filtrarUsuarios(GENTE, { texto: "  ", rol: null }))).toEqual(["u1", "u2", "u3"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ texto: "LUCIA" })))).toEqual(["u3"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ texto: "fernández" })))).toEqual(["u3"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ texto: "bress" })))).toEqual(["u2"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ texto: "  " })))).toEqual(["u1", "u2", "u3", "u4"]);
   });
 
-  it("con un rol quedan solo quienes lo tienen, y se combina con lo escrito", () => {
-    expect(ids(filtrarUsuarios(GENTE, { texto: "", rol: "r4" }))).toEqual(["u1", "u3"]);
-    expect(ids(filtrarUsuarios(GENTE, { texto: "carlos", rol: "r4" }))).toEqual(["u1"]);
-    expect(filtrarUsuarios(GENTE, { texto: "marta", rol: "r4" })).toEqual([]);
+  it("con varios roles queda quien tiene cualquiera de ellos, y se combina con lo escrito", () => {
+    expect(ids(filtrarUsuarios(GENTE, con({ roles: ["r4"] })))).toEqual(["u1", "u3"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ roles: ["r4", "r5"] })))).toEqual(["u1", "u3", "u4"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ texto: "carlos", roles: ["r4"] })))).toEqual(["u1"]);
+    expect(filtrarUsuarios(GENTE, con({ texto: "marta", roles: ["r4"] }))).toEqual([]);
+  });
+
+  it("por estado quedan los activos o los inactivos, y se combina con los roles", () => {
+    expect(ids(filtrarUsuarios(GENTE, con({ estado: "activos" })))).toEqual(["u1", "u2"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ estado: "inactivos" })))).toEqual(["u3", "u4"]);
+    expect(ids(filtrarUsuarios(GENTE, con({ estado: "inactivos", roles: ["r4"] })))).toEqual(["u3"]);
+  });
+
+  it("ordena por correo, o por estado: primero los activos y, entre iguales, por correo", () => {
+    expect(ids(ordenarUsuarios(GENTE, "correo"))).toEqual(["u4", "u1", "u3", "u2"]);
+    expect(ids(ordenarUsuarios(GENTE, "estado"))).toEqual(["u1", "u2", "u4", "u3"]);
   });
 
   it("sugiere hasta cinco, y nada con el buscador vacío o con un correo ya elegido", () => {
@@ -108,10 +122,12 @@ describe("buscar usuarios y filtrarlos por rol (007-T033)", () => {
     expect(partesResaltadas("marta@ferre.test", "zz")).toEqual(["marta@ferre.test", "", ""]);
   });
 
-  it("dice cuántos quedan solo si se filtra, y avisa si no queda nadie", () => {
-    expect(cuantosQuedan(4, 4, { texto: "", rol: null })).toBeNull();
-    expect(cuantosQuedan(1, 4, { texto: "lu", rol: null })).toBe("1 de 4 usuarios");
-    expect(cuantosQuedan(2, 4, { texto: "", rol: "r4" }, "Recepción")).toBe("2 de 4 usuarios con el rol Recepción");
-    expect(cuantosQuedan(0, 4, { texto: "zz", rol: null })).toBe("Nadie coincide con la búsqueda.");
+  it("dice siempre cuántos son; con búsqueda o filtros, cuántos quedan; y avisa si no queda nadie", () => {
+    expect(cuantosQuedan(4, 4, SIN_FILTRO)).toBe("4 usuarios");
+    expect(cuantosQuedan(1, 1, SIN_FILTRO)).toBe("1 usuario");
+    expect(cuantosQuedan(1, 4, con({ texto: "lu" }))).toBe("1 de 4 usuarios");
+    expect(cuantosQuedan(2, 4, con({ roles: ["r4"] }))).toBe("2 de 4 usuarios");
+    expect(cuantosQuedan(2, 4, con({ estado: "activos" }))).toBe("2 de 4 usuarios");
+    expect(cuantosQuedan(0, 4, con({ texto: "zz" }))).toBe("Nadie coincide con la búsqueda.");
   });
 });
