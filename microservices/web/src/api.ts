@@ -12,12 +12,14 @@ if (origen === undefined) throw new Error("Falta VITE_API_URL al construir el cl
 // Lo que se guardó en el servidor puede cambiar lo que el dispositivo tiene en memoria (el
 // catálogo, el stock): quien lo tenga se entera y lo vuelve a pedir cuando haga falta.
 export const EVENTO_CAMBIO = "ferre:cambio-guardado";
+export const EVENTO_SESION_CERRADA = "sesion-cerrada";
 
 const cliente = crearCliente({
   origen,
   claveDelToken: "ferre.sesion",
-  // La sesión ya no vale: la aplicación vuelve a la entrada.
-  alPerderLaSesion: () => window.dispatchEvent(new Event("sesion-cerrada")),
+  // La sesión ya no vale: la aplicación vuelve a la entrada. El token perdido va en el aviso: con
+  // él se sube lo que la persona dejó sin mandar, si la desactivaron (cola.ts, ADR-021).
+  alPerderLaSesion: (token) => window.dispatchEvent(new CustomEvent(EVENTO_SESION_CERRADA, { detail: { token } })),
   alGuardar: (ruta) => window.dispatchEvent(new CustomEvent(EVENTO_CAMBIO, { detail: ruta })),
 });
 

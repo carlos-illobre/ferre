@@ -18,3 +18,28 @@
 .an :focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
 @media (max-width: 899px) { .an { padding-top: calc(40px + env(safe-area-inset-top)); } }
 @media (min-width: 900px) { .an { padding: 24px 24px 40px; } .an-lista li { grid-template-columns: 150px minmax(0, 1.2fr) minmax(0, 2fr) 120px; align-items: baseline; gap: 12px; } .an-fecha, .an-usuario, .an-producto, .an-que { grid-column: auto; grid-row: auto; } .an-usuario { order: 4; } }
+
+/* Para revisar (014, maqueta `para-revisar-c-*`): lo apartado, por persona, una tarjeta por cambio. */
+.pr-persona { display: flex; flex-direction: column; gap: 8px; }
+.pr-quien { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 1rem; }
+.pr-quien span { color: var(--p-texto-2); font-size: 0.9375rem; }
+.pr-lista { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.pr-tarjeta { display: grid; grid-template-columns: 1fr; gap: 6px; padding: 14px 16px; background: #fff; border: 1px solid var(--p-borde-suave); border-left: 5px solid var(--p-naranja); border-radius: 12px; }
+.pr-que { font-size: 1.0625rem; }
+.pr-que b { font-weight: 800; }
+.pr-renglones { margin: 0; padding: 0; list-style: none; color: var(--p-texto-medio); font-size: 0.9375rem; line-height: 1.5; }
+.pr-cuando { color: var(--p-texto-2); font-size: 0.875rem; }
+.pr-error { padding: 9px 12px; border-radius: 9px; background: var(--p-naranja-suave); color: var(--p-naranja-texto-fuerte); font-size: 0.9375rem; }
+.pr-botones { display: flex; gap: 8px; margin-top: 4px; }
+.pr-boton { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--p-borde); background: #fff; color: var(--p-verde); font: inherit; font-size: 0.9375rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.pr-boton.si { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+.pr-boton:disabled { opacity: 0.55; cursor: not-allowed; }
+@media (min-width: 900px) {
+  .pr-tarjeta { grid-template-columns: 1fr auto; gap: 6px 16px; align-items: start; }
+  .pr-tarjeta > :not(.pr-botones) { grid-column: 1; }
+  .pr-botones { grid-column: 2; grid-row: 1 / span 3; flex-direction: column; align-self: center; margin: 0; }
+  .pr-boton { flex: none; min-width: 130px; }
+  .pr-error { grid-column: 1 / -1 !important; }
+}
+/* La cantidad pendiente, a la derecha del nombre de la pestaña, en las dos interfaces. */
+.cuenta-pestana { display: inline-grid; place-items: center; min-width: 22px; height: 22px; margin-left: 6px; padding: 0 7px; border-radius: 11px; background: var(--p-naranja); color: #fff; font-size: 0.8125rem; font-weight: 800; line-height: 1; }

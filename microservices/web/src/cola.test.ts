@@ -84,6 +84,40 @@ describe("cola de cambios", () => {
     localStorage.removeItem("ferre.usuario");
   });
 
+  // 014: lo que dejó sin mandar alguien a quien desactivaron sube apartado, con el token de su sesión cerrada.
+  it("014-E01 014-E03 al cerrarse la sesión, lo de esa persona sube a /apartados y sale del dispositivo; si sigue activa (409), queda", async () => {
+    localStorage.setItem("ferre.usuario", JSON.stringify({ id: "ana", email: "ana@ferre.test", nombre: "Ana" }));
+    apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
+    const { enviarOEncolar, pendientes, apartarLoDeQuienSalio } = await import("./cola");
+    const { EVENTO_SESION_CERRADA } = await import("./api");
+    await enviarOEncolar("venta", "POST", "/ventas", { id: "de-ana" });
+    const subidas: { url: string; init: RequestInit }[] = [];
+    let respuesta = 409;
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init: RequestInit) => { subidas.push({ url, init }); return new Response(JSON.stringify({}), { status: respuesta }); }));
+    try {
+      // Sigue activa: no se aparta, queda para cuando vuelva a entrar.
+      window.dispatchEvent(new CustomEvent(EVENTO_SESION_CERRADA, { detail: { token: "token-de-ana" } }));
+      await vi.waitFor(() => expect(subidas).toHaveLength(1));
+      await apartarLoDeQuienSalio();
+      expect(subidas).toHaveLength(1);
+      expect(await pendientes()).toHaveLength(1);
+      // Desactivada: sube con el token de la sesión cerrada y sale del dispositivo.
+      respuesta = 200;
+      window.dispatchEvent(new CustomEvent(EVENTO_SESION_CERRADA, { detail: { token: "token-de-ana" } }));
+      await vi.waitFor(() => expect(subidas).toHaveLength(2));
+      const { url, init } = subidas[1]!;
+      expect(url).toMatch(/\/apartados$/);
+      expect(new Headers(init.headers).get("Authorization")).toBe("Bearer token-de-ana");
+      const cuerpo = JSON.parse(String(init.body)) as { cambios: { tipo: string; ruta: string; cuerpo: { id: string } }[] };
+      expect(cuerpo.cambios.map((c) => [c.tipo, c.ruta, c.cuerpo.id])).toEqual([["venta", "/ventas", "de-ana"]]);
+      await vi.waitFor(async () => expect(await pendientes()).toHaveLength(0));
+      expect(localStorage.getItem("ferre.para-apartar")).toBeNull();
+    } finally {
+      vi.unstubAllGlobals();
+      localStorage.removeItem("ferre.usuario");
+    }
+  });
+
   it("un 401 no se descarta: se reintenta cuando vuelva la sesión", async () => {
     apiFalsa.mockRejectedValue(new ErrorApi(401, "Hay que iniciar sesión"));
     const { enviarOEncolar, pendientes } = await import("./cola");

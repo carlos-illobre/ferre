@@ -140,5 +140,15 @@ export function crearCola(opciones: OpcionesDeCola) {
     return { encolado: (await pendientes()).some((c) => c.orden === orden) };
   }
 
-  return { alCambiar, pendientes, apartados, enviarPendientes, enviarOEncolar };
+  // Los cambios de una persona, para sacarlos del dispositivo por otro camino, y sacarlos.
+  const deAutor = async (autor: string): Promise<Cambio[]> => (await todos()).filter((c) => c.autor === autor);
+  async function quitar(ordenes: number[]): Promise<void> {
+    const db = await opciones.abrirBase();
+    const tx = db.transaction(opciones.almacen, "readwrite");
+    for (const orden of ordenes) tx.objectStore(opciones.almacen).delete(orden);
+    await terminada(tx);
+    avisar();
+  }
+
+  return { alCambiar, pendientes, apartados, deAutor, quitar, enviarPendientes, enviarOEncolar };
 }

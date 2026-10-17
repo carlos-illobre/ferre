@@ -42,6 +42,9 @@ export const NOMBRES = {
   compras: "Compras",
   inventario: "Inventario",
   ventasDeHoy: "Ventas de hoy",
+  // Las pestañas de Anomalías (014).
+  paraRevisar: "Para revisar",
+  anotadas: "Anotadas",
 };
 
 export const TEXTOS = {

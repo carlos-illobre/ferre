@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { api } from "../api";
 import "./anomalias.css";
 import type { PaginaDeAnomalias } from "@servidor/anomalias";
@@ -6,12 +6,14 @@ import type { PaginaDeAnomalias } from "@servidor/anomalias";
 // Anomalías (RF-59): el registro de cada vez que lo que dice el sistema no coincidió con lo
 // que hay en la realidad. Hoy se anota una cuando se vende un producto que según el sistema
 // no tenía stock (la venta se registra igual y el stock queda en cero). Es solo para leer:
-// más adelante va a haber avisos. La misma pantalla en el celular y en la computadora.
+// más adelante va a haber avisos. La misma pantalla en el celular y en la computadora. Es la
+// pestaña «Anotadas» (014): `cabeza` es lo de arriba (en el celular, el título y las pestañas);
+// sin `cabeza`, el título; con `null`, nada (en la computadora, cuando hay pestañas).
 type Pagina = PaginaDeAnomalias;
 const TITULOS: Record<string, string> = { venta_sin_stock: "Venta sin stock" };
 const cuando = (iso: string) => new Date(iso).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 
-export function Anomalias() {
+export function Anomalias({ cabeza = <h1>Anomalías</h1> }: { cabeza?: ReactNode }) {
   const [pagina, setPagina] = useState(1);
   const [datos, setDatos] = useState<Pagina | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export function Anomalias() {
 
   return (
     <main id="contenido" className="an" data-testid="anomalias" tabIndex={-1}>
-      <h1>Anomalías</h1>
+      {cabeza}
       <p className="an-bajada">Cada vez que lo que dice el sistema no coincide con lo que hay en el local queda anotado acá, con la fecha, el producto y quién estaba. Por ejemplo, cuando se vende algo que según el sistema no tenía stock.</p>
       {error && <p className="an-error" role="alert">{error} <button type="button" className="an-boton" onClick={cargar}>Reintentar</button></p>}
       {!datos && !error && <p className="an-bajada" aria-busy="true">Buscando las anomalías…</p>}

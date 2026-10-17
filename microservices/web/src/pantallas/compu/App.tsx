@@ -47,6 +47,9 @@ import { SinPermiso } from "../SinPermiso";
 import { Roles } from "../Roles";
 import { Tickets } from "../Tickets";
 import { Anomalias } from "../Anomalias";
+import { ParaRevisar } from "../ParaRevisar";
+import { PESTANAS_DE_ANOMALIAS } from "../pestanas-de-anomalias";
+import { useParaRevisar } from "../../negocio/apartados";
 import "./base/estilos/base.css";
 import "./base/estilos/entrar.css";
 import "./tema.css";
@@ -77,13 +80,16 @@ const RUTA_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "resumen", c
 const DE_NEGOCIO: Pestana[] = SECCIONES_DE_NEGOCIO.map((s) => ({ ruta: RUTA_DE_SECCION[s.valor], nombre: s.nombre, icono: s.icono, pide: s.pide }));
 const RUTAS_DE_NEGOCIO = new Set(DE_NEGOCIO.map((p) => p.ruta));
 // Las opciones de Más con pestañas: sus pestañas no llevan atajo Alt y se recorren con las flechas.
-const SIN_ATAJO = new Set([...RUTAS_DE_USUARIOS, ...RUTAS_DE_NEGOCIO]);
+// Anomalías también (014): «Para revisar» y «Anotadas».
+const DE_ANOMALIAS: Pestana[] = PESTANAS_DE_ANOMALIAS.map((p) => ({ ruta: p.valor, nombre: p.nombre, icono: p.icono, pide: p.pide }));
+const RUTAS_DE_ANOMALIAS = new Set(DE_ANOMALIAS.map((p) => p.ruta));
+const SIN_ATAJO = new Set([...RUTAS_DE_USUARIOS, ...RUTAS_DE_NEGOCIO, ...RUTAS_DE_ANOMALIAS]);
 const MENU: Parte[] = [
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
   { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }, { ruta: "hoy", icono: "ventas", nombre: "Hoy", pide: ["ventas.ver"] }, { ruta: "anular", icono: "deshacer", nombre: "Anular", pide: ["ventas.anular", "ventas.anular_cualquiera"] }] },
   { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos"] }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }, { ruta: "pedidos", icono: "listas", nombre: "Pedidos", pide: ["deposito.pedidos", "deposito.ingresos"] }] },
   // Usuarios (decisión 88) y Cómo va el negocio (decisión 95) son opciones de Más con pestañas: en el menú cuentan sus pestañas.
-  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.flatMap((d) => (d.ruta === "usuarios" ? DE_USUARIOS : d.ruta === "resumen" ? DE_NEGOCIO : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
+  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.flatMap((d) => (d.ruta === "usuarios" ? DE_USUARIOS : d.ruta === "resumen" ? DE_NEGOCIO : d.ruta === "anomalias" ? DE_ANOMALIAS : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
 ];
 // Pantallas que no están en el menú pero tienen dirección.
 const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }];
@@ -93,7 +99,7 @@ const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 const A_PARTE_COMUN: Record<string, string> = {
   productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy", anular: "vender/anular",
   pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
-  mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", sesiones: "mas/sesiones", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", tickets: "mas/tickets", configuracion: "mas/configuracion", procesos: "mas/procesos",
+  mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", sesiones: "mas/sesiones", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", "para-revisar": "mas/para-revisar", tickets: "mas/tickets", configuracion: "mas/configuracion", procesos: "mas/procesos",
 };
 const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
@@ -121,7 +127,10 @@ function Pantallas() {
   // Las pestañas de Usuarios no llevan atajo (decisión 88): lo lleva solo la opción de Más, que abre la primera que se ve.
   const deUsuarios = useMemo(() => DE_USUARIOS.filter((p) => puede(usuario, ...(p.pide ?? []))), [usuario]);
   const deNegocio = useMemo(() => DE_NEGOCIO.filter((p) => puede(usuario, ...(p.pide ?? []))), [usuario]);
-  const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)).filter((r) => !SIN_ATAJO.has(r) || r === deUsuarios[0]?.ruta || r === deNegocio[0]?.ruta), [menu, deUsuarios, deNegocio]);
+  const deAnomalias = useMemo(() => DE_ANOMALIAS.filter((p) => puede(usuario, ...(p.pide ?? []))), [usuario]);
+  // Lo que hay para revisar, para mostrar la cantidad en su pestaña (014).
+  const paraRevisar = useParaRevisar(puede(usuario, "admin.usuarios")).datos?.apartados.length ?? 0;
+  const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)).filter((r) => !SIN_ATAJO.has(r) || r === deUsuarios[0]?.ruta || r === deNegocio[0]?.ruta || r === deAnomalias[0]?.ruta), [menu, deUsuarios, deNegocio, deAnomalias]);
   const atajoDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
   const actual = sinDireccion || !NOMBRES.has(ruta.nombre) ? "productos" : ruta.nombre;
   const pideActual = RUTAS_DE_NEGOCIO.has(actual) && !puede(usuario, ...PIDE_EL_NEGOCIO) ? PIDE_EL_NEGOCIO : TODAS.find((p) => p.ruta === actual)?.pide;
@@ -253,9 +262,9 @@ function Pantallas() {
   const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === actual))?.clave ?? "mas";
   // Vender, Catálogo y Depósito tienen pestañas; con una sola a la vista no se dibujan.
   // En Más, solo Usuarios y Cómo va el negocio tienen pestañas.
-  const deLaParte = RUTAS_DE_USUARIOS.has(actual) ? deUsuarios : RUTAS_DE_NEGOCIO.has(actual) ? deNegocio : parte === "mas" ? null : (menu.find((m) => m.clave === parte)?.pestanas ?? null);
+  const deLaParte = RUTAS_DE_USUARIOS.has(actual) ? deUsuarios : RUTAS_DE_NEGOCIO.has(actual) ? deNegocio : RUTAS_DE_ANOMALIAS.has(actual) ? deAnomalias : parte === "mas" ? null : (menu.find((m) => m.clave === parte)?.pestanas ?? null);
   const pestanas = deLaParte && deLaParte.length > 1 ? deLaParte : null;
-  const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? []))).map((d) => (d.ruta === "usuarios" ? { ...d, destino: deUsuarios[0]?.ruta ?? "sesiones" } : d.ruta === "resumen" ? { ...d, destino: deNegocio[0]?.ruta ?? "resumen" } : d));
+  const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? []))).map((d) => (d.ruta === "usuarios" ? { ...d, destino: deUsuarios[0]?.ruta ?? "sesiones" } : d.ruta === "resumen" ? { ...d, destino: deNegocio[0]?.ruta ?? "resumen" } : d.ruta === "anomalias" ? { ...d, destino: deAnomalias[0]?.ruta ?? "anomalias" } : d));
   const prueba = esAmbienteDePrueba();
 
   return (
@@ -297,7 +306,7 @@ function Pantallas() {
               <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) ? `Alt+${atajoDe(p.ruta)}` : undefined} data-testid={`pestana-${p.ruta}`}
                 // Al abrirla (con un clic o con Enter), la marca de las flechas queda en esta pestaña: la pantalla nueva no se la lleva.
                 onClick={() => { irA(p.ruta); dejarElFocoEn(() => document.querySelector<HTMLButtonElement>(`[data-testid="pestana-${p.ruta}"]`)); }}>
-                <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}{atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) && <span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>}
+                <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}{p.ruta === "para-revisar" && paraRevisar > 0 && <span className="cuenta-pestana" data-testid="cuenta-para-revisar" aria-label={`${paraRevisar} para revisar`}>{paraRevisar}</span>}{atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) && <span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>}
               </button>
             ))}
           </nav>
@@ -314,7 +323,7 @@ function Pantallas() {
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />
           : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? <Usuarios /> : actual === "sesiones" ? <SesionesYDispositivos />
-          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anomalias /> : <Vender />}
+          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anomalias cabeza={pestanas ? null : undefined} /> : actual === "para-revisar" ? <ParaRevisar cabeza={pestanas ? null : <h1>Anomalías</h1>} /> : <Vender />}
       </div>
     </div>
   );

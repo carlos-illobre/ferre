@@ -33,6 +33,9 @@ import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../pestanas-de-negocio";
 import { ComoVaElNegocio, SUB_DE_SECCION } from "./ComoVaElNegocio";
 import { NOMBRES, TEXTOS } from "../textos";
 import { Anomalias } from "../Anomalias";
+import { ParaRevisar } from "../ParaRevisar";
+import { CabezaDeAnomalias } from "./CabezaDeAnomalias";
+import { PESTANAS_DE_ANOMALIAS, PIDE_LAS_ANOMALIAS } from "../pestanas-de-anomalias";
 import { ParteVender } from "./Vender";
 import "./estilos.css";
 import "./tema.css";
@@ -63,7 +66,8 @@ export const DE_MAS: { parte: Exclude<Parte, "sesiones" | "actividad"> | "negoci
   { parte: "negocio", nombre: NOMBRES.comoVaElNegocio, detalle: TEXTOS.negocio.queHayEnElNegocio.corto, icono: "resumen", pide: PIDE_EL_NEGOCIO },
   // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
   { parte: "usuarios", nombre: NOMBRES.usuarios, detalle: TEXTOS.usuarios.queHayEnUsuarios.corto, icono: "usuarios" },
-  { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: ["negocio.anomalias"] },
+  // Anomalías abre en la primera de sus pestañas que la persona puede ver: «Para revisar» o «Anotadas» (014).
+  { parte: "anomalias", nombre: "Anomalías", detalle: "Cuando el sistema y la realidad no coinciden", icono: "alerta", pide: PIDE_LAS_ANOMALIAS },
   { parte: "procesos", nombre: "Procesos", detalle: "Cómo se hace cada cosa en el negocio, paso a paso", icono: "procesos", pide: ["procesos.ver", "procesos.dibujar"] },
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
   { parte: "configuracion", nombre: "Configuración", detalle: "Cómo se comporta la aplicación en este celular", icono: "ajustes" },
@@ -155,14 +159,18 @@ function Pantallas() {
   const subDeNegocio = ruta.nombre === "negocio" ? "negocio" : ruta.nombre === "mas" ? ruta.sub : null;
   const deNegocio = SECCIONES_DE_NEGOCIO.find((s) => SUB_DE_SECCION[s.valor] === subDeNegocio) ?? null;
   const primeraDeNegocio = SUB_DE_SECCION[SECCIONES_DE_NEGOCIO.find((s) => permitido(s.pide))?.valor ?? "ventas"];
-  const elegida = deUsuarios ? DE_MAS.find((d) => d.parte === "usuarios")! : deNegocio ? DE_MAS.find((d) => d.parte === "negocio")! : DE_MAS.find((d) => d.parte === ruta.sub) ?? null;
+  // Las pestañas de Anomalías (014): `mas/para-revisar` y `mas/anomalias`.
+  const deAnomalias = PESTANAS_DE_ANOMALIAS.find((p) => ruta.nombre === "mas" && p.valor === ruta.sub) ?? null;
+  const primeraDeAnomalias = PESTANAS_DE_ANOMALIAS.find((p) => permitido(p.pide))?.valor ?? "anomalias";
+  const elegida = deUsuarios ? DE_MAS.find((d) => d.parte === "usuarios")! : deNegocio ? DE_MAS.find((d) => d.parte === "negocio")! : deAnomalias ? DE_MAS.find((d) => d.parte === "anomalias")! : DE_MAS.find((d) => d.parte === ruta.sub) ?? null;
   const parte = elegida?.parte ?? null;
   const pestana = PESTANAS.find((p) => p.ruta === nombre)?.ruta ?? "catalogo";
   // Lo que pide la pantalla a la que se llegó; si no se tiene, se dice en vez de mostrarla.
   const falta = !permitido(PESTANAS.find((p) => p.ruta === pestana)?.pide) ? PESTANAS.find((p) => p.ruta === pestana)!.pide!
     : pestana === "mas" && elegida && !permitido(elegida.pide) ? elegida.pide!
     : pestana === "mas" && deUsuarios && !permitido(deUsuarios.pide) ? deUsuarios.pide!
-    : pestana === "mas" && deNegocio && !permitido(deNegocio.pide) ? deNegocio.pide : null;
+    : pestana === "mas" && deNegocio && !permitido(deNegocio.pide) ? deNegocio.pide
+    : pestana === "mas" && deAnomalias && !permitido(deAnomalias.pide) ? deAnomalias.pide : null;
 
   return (
     <div className="app">
@@ -211,7 +219,8 @@ function Pantallas() {
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />
         : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeUsuarios actual="roles" />} />
         : pestana === "mas" && deUsuarios ? <Negocio parte={deUsuarios.valor as Exclude<typeof deUsuarios.valor, "roles">} cabeza={<CabezaDeUsuarios actual={deUsuarios.valor} />} />
-        : pestana === "mas" && parte === "anomalias" ? <Anomalias />
+        : pestana === "mas" && deAnomalias?.valor === "para-revisar" ? <ParaRevisar cabeza={<CabezaDeAnomalias actual="para-revisar" />} />
+        : pestana === "mas" && parte === "anomalias" ? <Anomalias cabeza={<CabezaDeAnomalias actual="anomalias" />} />
         : pestana === "mas" && deNegocio ? <ComoVaElNegocio seccion={deNegocio.valor} />
         : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "configuracion" && parte !== "procesos" && parte !== "negocio" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
@@ -230,7 +239,7 @@ function Pantallas() {
           )}
           <Lista>
             {deMas.map((d) => (
-              <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte === "usuarios" ? primeraDeUsuarios : d.parte === "negocio" ? primeraDeNegocio : d.parte}`)} data-testid={`mas-${d.parte}`}>
+              <button key={d.parte} type="button" className="fila con-foto" onClick={() => irA(`mas/${d.parte === "usuarios" ? primeraDeUsuarios : d.parte === "negocio" ? primeraDeNegocio : d.parte === "anomalias" ? primeraDeAnomalias : d.parte}`)} data-testid={`mas-${d.parte}`}>
                 <span className="miniatura mas-icono"><IconoDeMas nombre={d.icono} tam={22} /></span>
                 <span className="nombre">{d.nombre}</span>
                 <Icono nombre="derecha" tam={18} grosor={2.4} />

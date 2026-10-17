@@ -11,8 +11,9 @@ export type OpcionesDeCliente = {
   origen: string;
   // La clave bajo la que el token de sesión vive en este dispositivo. Sin conexión, sigue valiendo.
   claveDelToken: string;
-  // El servidor contestó que la sesión ya no vale (401): el token ya se borró.
-  alPerderLaSesion?: () => void;
+  // El servidor contestó que la sesión ya no vale (401): el token ya se borró. Se pasa el token
+  // perdido por si quien usa el cliente lo necesita una última vez.
+  alPerderLaSesion?: (tokenPerdido: string) => void;
   // Un pedido que no era de lectura salió bien: algo cambió en el servidor.
   alGuardar?: (ruta: string) => void;
 };
@@ -42,7 +43,7 @@ export function crearCliente(opciones: OpcionesDeCliente) {
     const respuesta = await fetch(url(ruta), { ...opcionesDelPedido, headers: cabeceras });
     if (respuesta.status === 401 && token) {
       borrarToken();
-      opciones.alPerderLaSesion?.();
+      opciones.alPerderLaSesion?.(token);
     }
     if (!respuesta.ok) await fallar(respuesta);
     if (opcionesDelPedido.method && opcionesDelPedido.method !== "GET") opciones.alGuardar?.(ruta);
