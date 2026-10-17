@@ -77,12 +77,15 @@ Se vuelve a correr cuando cambia alguna de esas pantallas:
 
 ```bash
 tests/capturas/levantar.sh
-uv run --with playwright==1.56.0 python tests/capturas/tutorial/entrar.py
+uv run --with playwright==1.56.0 python tests/capturas/tutorial/formas_de_entrar.py   # «Entrar»: una sección por forma de entrar
 uv run --with playwright==1.56.0 python tests/capturas/tutorial/espejo.py   # el clip de «quedan vinculados»
 ```
 
-`entrar.py` imprime al final dónde van las marcas numeradas de cada captura (en porcentaje); si
-una pantalla cambió, se copian a `Manual.tsx`.
+`formas_de_entrar.py` escribe dónde van las marcas numeradas de cada captura (en porcentaje) y su
+leyenda en `microservices/web/src/pantallas/compu/base/pantallas/manual-entrar-marcas.json`, que
+lee la pantalla del manual: no hay que copiarlas a mano. La cámara del celular es de mentira (un
+video con el código de la computadora); como el lector no lo descifra, el recorrido sigue solo
+después de mostrarla. La huella no tiene clip: la lee el teléfono.
 
 Va siempre contra la API de mentira (datos inventados): nunca contra un ambiente con datos reales.
 Las pruebas de punta a punta no graban video ni usan estos recorridos (ADR-004).

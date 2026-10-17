@@ -1,0 +1,147 @@
+{
+ "compu-codigo": [
+  {
+   "x": 61.0,
+   "y": 23.3,
+   "ancho": 12.8,
+   "alto": 23.0,
+   "texto": "El código que lee el celular."
+  },
+  {
+   "x": 61.0,
+   "y": 62.5,
+   "ancho": 33.2,
+   "alto": 5.9,
+   "texto": "La otra forma: con tu cuenta de Google."
+  }
+ ],
+ "celu-vincular": [
+  {
+   "x": 66.9,
+   "y": 3.6,
+   "ancho": 27.9,
+   "alto": 5.2,
+   "texto": "Tocá «Vincular»: se abre la cámara."
+  }
+ ],
+ "celu-camara": [
+  {
+   "x": 50.0,
+   "y": 45.5,
+   "texto": "Apuntá al código de la computadora: lo lee solo."
+  }
+ ],
+ "celu-dejar-entrar": [
+  {
+   "x": 5.6,
+   "y": 55.3,
+   "ancho": 88.7,
+   "alto": 6.6,
+   "texto": "Deja entrar a la computadora con tu usuario."
+  },
+  {
+   "x": 5.6,
+   "y": 64.0,
+   "ancho": 88.7,
+   "alto": 6.6,
+   "texto": "No la deja entrar."
+  }
+ ],
+ "compu-adentro": [
+  {
+   "x": 1.2,
+   "y": 90.5,
+   "ancho": 12.3,
+   "alto": 4.2,
+   "texto": "Tu nombre: la computadora entró como vos. «Salir» la cierra."
+  }
+ ],
+ "celu-despues": [
+  {
+   "x": 5.1,
+   "y": 3.4,
+   "ancho": 89.7,
+   "alto": 3.6,
+   "texto": "El aviso de que la computadora entró."
+  }
+ ],
+ "celu-entrada-escanear": [
+  {
+   "x": 5.6,
+   "y": 49.1,
+   "ancho": 88.7,
+   "alto": 9.6,
+   "texto": "Tocá acá y apuntá al código de la computadora."
+  }
+ ],
+ "celu-entrar-los-dos": [
+  {
+   "x": 5.6,
+   "y": 40.7,
+   "ancho": 88.7,
+   "alto": 10.5,
+   "texto": "Poné la huella: entran el celular y la computadora."
+  }
+ ],
+ "compu-google": [
+  {
+   "x": 61.0,
+   "y": 62.5,
+   "ancho": 33.2,
+   "alto": 5.9,
+   "texto": "Hacé clic en «Continuar con Google»."
+  }
+ ],
+ "compu-huella": [
+  {
+   "x": 61.0,
+   "y": 62.2,
+   "ancho": 33.2,
+   "alto": 6.8,
+   "texto": "Hacé clic en «Entrar con la huella» y poné el dedo en el lector."
+  }
+ ],
+ "celu-google": [
+  {
+   "x": 5.6,
+   "y": 28.0,
+   "ancho": 88.7,
+   "alto": 4.7,
+   "texto": "Tocá «Continuar con Google» y elegí tu cuenta."
+  }
+ ],
+ "celu-ofrecer-huella": [
+  {
+   "x": 5.1,
+   "y": 83.9,
+   "ancho": 89.7,
+   "alto": 6.4,
+   "texto": "Tocá «Sí, usar la huella»: la próxima vez entrás con el dedo."
+  },
+  {
+   "x": 5.1,
+   "y": 91.9,
+   "ancho": 89.7,
+   "alto": 5.2,
+   "texto": "Si preferís, «Ahora no»: lo podés hacer después."
+  }
+ ],
+ "celu-huella": [
+  {
+   "x": 5.6,
+   "y": 38.9,
+   "ancho": 88.7,
+   "alto": 8.5,
+   "texto": "Tocá «Entrar con la huella» y apoyá el dedo, como para desbloquear el teléfono."
+  }
+ ],
+ "compu-no-autorizado": [
+  {
+   "x": 7.2,
+   "y": 61.4,
+   "ancho": 85.6,
+   "alto": 18.2,
+   "texto": "El aviso: ese correo de Google no está autorizado."
+  }
+ ]
+}

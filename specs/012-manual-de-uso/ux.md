@@ -1,6 +1,6 @@
 # UX: Manual de uso
 
-Maqueta aprobada por Carlos el 2026-10-16: `maquetas/manual-entrar.html` (el capítulo «Entrar»).
+Maqueta aprobada por Carlos el 2026-10-16: `maquetas/manual-entrar.html` (el capítulo «Entrar»). La reemplaza `maquetas/manual-entrar-v2.html`, aprobada el 2026-10-17: el capítulo «Entrar» con una sección por cada forma de entrar.
 
 **Quién:** cualquiera, sin haber entrado, en la computadora. El celular no tiene manual.
 
@@ -26,3 +26,18 @@ su clip; las otras formas; y «Si algo no funciona».
   sección del índice lleva el foco a su título.
 - Los colores son los de la paleta de la aplicación.
 - En una ventana angosta el índice pasa arriba del texto, sin correrse al costado.
+
+**El capítulo «Entrar»** (2026-10-17, maqueta `maquetas/manual-entrar-v2.html`). Para el empleado de
+mostrador, que no es técnico: frases cortas, en segunda persona, una acción por paso.
+
+- Primero, el aviso de que un Administrador tiene que autorizar el correo.
+- «¿Cuál uso?»: cinco tarjetas, una por forma de entrar, con dónde (computadora o celular), el
+  nombre y cuándo conviene; tocar una va a su sección. Debajo, que se entra una sola vez por
+  dispositivo (hasta «Salir» o 90 días sin usarlo).
+- Una sección por forma, en este orden: computadora con el celular (dos casos: con Ferrebress ya
+  abierto en el celular, por «Vincular»; o desde la entrada del celular, con la huella),
+  computadora con Google, computadora con la huella, celular con Google (y la oferta de la huella),
+  celular con la huella. Cada caso empieza con una franja que dice cuál es.
+- Los clips del celular solo van angostos, del ancho de un teléfono. La ventana de Google no se
+  graba ni se captura: su paso va con texto y el clip lo dice en el pie.
+- Al final, «Si algo no funciona».

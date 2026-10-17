@@ -5,8 +5,9 @@ las capturas y graba los clips con la API de mentira y el cliente de tests/captu
     python3 tests/capturas/tutorial/formas_de_entrar.py [carpeta]
 
 Deja en la carpeta (por defecto microservices/web/public/manual/entrar/, de donde las toma la
-pantalla del manual) las capturas, los clips y `marcas.json`: dónde va cada marca numerada, en
-porcentaje de la imagen. Los clips:
+pantalla del manual) las capturas y los clips; y las marcas numeradas (dónde va cada una, en
+porcentaje de la imagen, y su leyenda) en `manual-entrar-marcas.json`, al lado de la pantalla del
+manual. Con otra carpeta, las marcas quedan en ella, en `marcas.json`. Los clips:
 - clip-celular.mp4: la computadora y el celular uno al lado del otro; el celular, con Ferrebress
   abierto, toca «Vincular», apunta al código y deja entrar a la computadora.
 - clip-google-compu.mp4: la computadora entra con «Continuar con Google».
@@ -32,6 +33,8 @@ from capturar import GOOGLE  # noqa: E402  el botón de Google de mentira
 from entrar import BASE, CELU, COMPU, PUNTERO, RAIZ, SIN_MARCO, TOQUE, UA_CELU, mentira, mover  # noqa: E402
 
 SALIDA = sys.argv[1] if len(sys.argv) > 1 else os.path.join(RAIZ, "microservices/web/public/manual/entrar")
+# La pantalla del manual toma las marcas de acá (no puede importar lo que está en public/).
+MARCAS_DEL_MANUAL = os.path.join(RAIZ, "microservices/web/src/pantallas/compu/base/pantallas/manual-entrar-marcas.json")
 WEB = os.path.join(RAIZ, "microservices/web")
 HUELLA_ACA = "try { localStorage.setItem('ferre.huella-en-este-dispositivo', '1'); } catch (e) {}"
 CON_SESION = "try { localStorage.setItem('ferre.sesion', 'x'); } catch (e) {}"
@@ -272,8 +275,11 @@ def main():
         huella_en_el_celular(nav)
         no_autorizado(nav)
         nav.close()
-    with open(f"{SALIDA}/marcas.json", "w") as f:
-        json.dump(MARCAS, f, indent=1, ensure_ascii=False)
+    destinos = [MARCAS_DEL_MANUAL] if len(sys.argv) <= 1 else [f"{SALIDA}/marcas.json"]
+    for destino in destinos:
+        with open(destino, "w") as f:
+            json.dump(MARCAS, f, indent=1, ensure_ascii=False)
+            f.write("\n")
     shutil.rmtree(tmp, ignore_errors=True)
     print("listo:", SALIDA, sorted(os.listdir(SALIDA)))
 

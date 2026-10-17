@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { irA } from "../rutas";
+import MARCAS from "./manual-entrar-marcas.json";
 import "../estilos/manual.css";
 
 // El manual de uso (RF-97, specs/012-manual-de-uso): lo abre «Ver tutorial» en la entrada de la
@@ -11,8 +12,12 @@ const ARCHIVOS = `${import.meta.env.BASE_URL}manual/`;
 
 export const CAPITULOS: { nombre: string; escrito?: boolean; secciones?: { id: string; nombre: string }[] }[] = [
   { nombre: "Entrar", escrito: true, secciones: [
-    { id: "con-el-celular", nombre: "Con el celular" },
-    { id: "otras-formas", nombre: "Otras formas" },
+    { id: "cual", nombre: "¿Cuál uso?" },
+    { id: "compu-celular", nombre: "Computadora: con el celular" },
+    { id: "compu-google", nombre: "Computadora: con Google" },
+    { id: "compu-huella", nombre: "Computadora: con la huella" },
+    { id: "celu-google", nombre: "Celular: con Google" },
+    { id: "celu-huella", nombre: "Celular: con la huella" },
     { id: "problemas", nombre: "Si algo no funciona" },
   ] },
   { nombre: "Catálogo" },
@@ -92,117 +97,192 @@ function Paso({ numero, titulo, children, celular }: { numero: number; titulo: s
   );
 }
 
-// Una marca numerada sobre una captura, en porcentaje de la imagen: un punto o, con ancho y alto,
-// un recuadro alrededor del botón que se toca, con el número en su borde derecho (o, si adentro no
-// hay lugar, `fuera`, al lado). Las posiciones las imprime tests/capturas/tutorial/entrar.py.
-type Marca = { x: number; y: number; ancho?: number; alto?: number; fuera?: boolean; texto: string };
+// Una marca numerada sobre una captura, en porcentaje de la imagen: un punto sobre lo que se mira
+// o, con ancho y alto, un recuadro alrededor de lo que se toca, con el número en su borde derecho.
+// Las posiciones y las leyendas las escribe tests/capturas/tutorial/formas_de_entrar.py en
+// manual-entrar-marcas.json, al sacar las capturas.
+type Marca = { x: number; y: number; ancho?: number; alto?: number; texto: string };
+type Captura = keyof typeof MARCAS;
 
-function Figura({ src, alt, numero, pie, celular, ancho, marcas }: { src: string; alt: string; numero: string; pie: string; celular?: boolean; ancho?: number; marcas?: Marca[] }) {
+function Figura({ captura, alt, numero, pie, celular, ancho }: { captura: Captura; alt: string; numero: string; pie: string; celular?: boolean; ancho?: number }) {
+  const marcas: Marca[] = MARCAS[captura];
   return (
     <figure className="manual-figura">
       <div className={`manual-imagen ${celular ? "celular" : ""}`} style={ancho ? { width: ancho } : undefined}>
-        <img src={ARCHIVOS + src} alt={alt} loading="lazy" />
-        {marcas?.map((m, i) => m.ancho !== undefined && m.alto !== undefined
-          ? <span key={i} className={`manual-recuadro${m.fuera ? " fuera" : ""}`} style={{ left: `${m.x}%`, top: `${m.y}%`, width: `${m.ancho}%`, height: `${m.alto}%` }} aria-hidden="true"><span className="manual-marca">{i + 1}</span></span>
+        <img src={`${ARCHIVOS}entrar/${captura}.png`} alt={alt} loading="lazy" />
+        {marcas.map((m, i) => m.ancho !== undefined && m.alto !== undefined
+          ? <span key={i} className="manual-recuadro" style={{ left: `${m.x}%`, top: `${m.y}%`, width: `${m.ancho}%`, height: `${m.alto}%` }} aria-hidden="true"><span className="manual-marca">{i + 1}</span></span>
           : <span key={i} className="manual-marca" style={{ left: `${m.x}%`, top: `${m.y}%` }} aria-hidden="true">{i + 1}</span>)}
       </div>
-      {marcas && <ol className="manual-leyenda" data-testid="manual-leyenda">{marcas.map((m, i) => <li key={i}><span aria-hidden="true">{i + 1}</span>{m.texto}</li>)}</ol>}
+      <ol className="manual-leyenda" data-testid="manual-leyenda">{marcas.map((m, i) => <li key={i}><span aria-hidden="true">{i + 1}</span>{m.texto}</li>)}</ol>
       <figcaption><b>Figura {numero}</b> · {pie}</figcaption>
+    </figure>
+  );
+}
+
+function Clip({ nombre, testId, etiqueta, celular, chico, children }: { nombre: string; testId: string; etiqueta: string; celular?: boolean; chico?: boolean; children: ReactNode }) {
+  return (
+    <figure className={`manual-clip${chico ? " chico" : ""}${celular ? " celu" : ""}`}>
+      <video src={`${ARCHIVOS}entrar/${nombre}.mp4`} poster={`${ARCHIVOS}entrar/${nombre}-portada.jpg`} controls muted playsInline preload="metadata" data-testid={testId} aria-label={etiqueta} />
+      <figcaption>{children} <span>Sin sonido</span></figcaption>
     </figure>
   );
 }
 
 const Boton = ({ children }: { children: ReactNode }) => <span className="manual-boton-ui">{children}</span>;
 
+// Las formas de entrar, para elegir: cada una lleva a su sección.
+const FORMAS = [
+  { id: "compu-celular", donde: "En la computadora", nombre: "Con el celular", cuando: "La más rápida. La computadora muestra un código y el celular lo lee." },
+  { id: "compu-google", donde: "En la computadora", nombre: "Con Google", cuando: "Si no tenés el celular a mano." },
+  { id: "compu-huella", donde: "En la computadora", nombre: "Con la huella", cuando: "Solo si la computadora tiene lector de huella." },
+  { id: "celu-google", donde: "En el celular", nombre: "Con Google", cuando: "La primera vez que usás Ferrebress en ese celular." },
+  { id: "celu-huella", donde: "En el celular", nombre: "Con la huella", cuando: "Todas las veces siguientes. Un toque y el dedo." },
+];
+
+const Titulo = ({ id, children }: { id: string; children: ReactNode }) => <h2 id={id} tabIndex={-1}>{children}</h2>;
+
+// El capítulo «Entrar» (012-T010, maqueta manual-entrar-v2.html): para el empleado de mostrador,
+// una sección por cada forma de entrar, con frases cortas y una acción por paso.
 function CapituloEntrar() {
-  const marcas: Marca[] = [
-    { x: 60.8, y: 23, texto: "El código que lee el celular." },
-    { x: 75.2, y: 23, texto: "Los dos pasos, por si te olvidás." },
-    { x: 60.8, y: 48.5, texto: "El código cambia solo cada 5 minutos: si se venció, leé el que está a la vista." },
-    { x: 60.8, y: 62.5, texto: "La otra forma de entrar, con tu cuenta de Google (más abajo)." },
-  ];
   return (
     <article data-testid="manual-entrar">
       <p className="manual-capitulo">Capítulo 1</p>
       <h1>Entrar a Ferrebress</h1>
-      <p className="manual-entrada">Ferrebress no usa contraseñas. En la computadora entrás con tu celular, leyendo un
-        código que aparece en la pantalla. Tarda unos segundos.</p>
-      <div className="manual-resumen">
-        <div><strong>Qué necesitás</strong>Tu celular con Ferrebress y tu cuenta de Google autorizada.</div>
-        <div><strong>Cuánto tarda</strong>Menos de un minuto la primera vez; después, unos segundos.</div>
-        <div><strong>Dónde se hace</strong>En la pantalla de entrada de la computadora.</div>
+      <p className="manual-entrada">Ferrebress no tiene contraseñas. Entrás con el celular, con tu cuenta de Google o con la huella.</p>
+      <Nota tipo="importante"><b>Antes de la primera vez:</b> pedile a un Administrador que agregue tu correo de Google en <b>Más → Usuarios</b>. Si no, Ferrebress no te deja entrar.</Nota>
+
+      <Titulo id="cual">¿Cuál uso?</Titulo>
+      <p>Elegí según dónde estés. Tocá una para ir directo.</p>
+      <div className="manual-formas" data-testid="manual-formas">
+        {FORMAS.map((f) => (
+          <button key={f.id} type="button" className="manual-forma" onClick={() => irASeccion(f.id)}>
+            <small>{f.donde}</small><strong>{f.nombre}</strong><span>{f.cuando}</span>
+          </button>
+        ))}
       </div>
-      <Nota tipo="importante"><b>Antes de empezar:</b> solo entran las personas que un Administrador del negocio autorizó. Si
-        es tu primera vez, pedile que agregue tu correo de Google en <b>Más → Usuarios</b>.</Nota>
+      <Nota tipo="consejo"><b>Entrás una sola vez.</b> Ferrebress se acuerda de vos en ese celular o esa computadora. Te pide entrar de nuevo solo si tocás «Salir» o si pasan 90 días sin usarlo.</Nota>
 
-      <h2 id="con-el-celular" tabIndex={-1}>Entrar en la computadora con el celular</h2>
-      <p>Es la forma más rápida: la computadora muestra un código, el celular lo lee y la computadora entra sola, con tu usuario.</p>
-      <figure className="manual-clip">
-        <video src={`${ARCHIVOS}entrar/clip.mp4`} poster={`${ARCHIVOS}entrar/clip-portada.jpg`} controls muted playsInline preload="metadata" data-testid="manual-clip"
-          aria-label="Clip: la computadora muestra el código, el celular lo lee y deja entrar, y la computadora entra sola" />
-        <figcaption><b>Mirá cómo se hace.</b> A la izquierda, la computadora; a la derecha, el celular. <span>Sin sonido</span></figcaption>
-      </figure>
-
+      <Titulo id="compu-celular">En la computadora, con el celular</Titulo>
+      <p>La computadora muestra un código. El celular lo lee y la computadora entra sola, con tu nombre.</p>
+      <Clip nombre="clip-celular" testId="manual-clip" etiqueta="Clip: en el celular se toca Vincular, se apunta al código de la computadora y se la deja entrar; la computadora entra sola">
+        <b>Mirá cómo se hace.</b> A la izquierda, la computadora; a la derecha, el celular.
+      </Clip>
+      <h3 className="manual-caso">Si en el celular ya tenés Ferrebress abierto</h3>
       <Paso numero={1} titulo="Abrí Ferrebress en la computadora">
-        <p>Aparece la pantalla de entrada, con el código ya listo. No hace falta tocar nada.</p>
-        <Figura src="entrar/compu-codigo.png" alt="La pantalla de entrada de la computadora, con el código para leer con el celular" numero="1.1" pie="La entrada de la computadora." marcas={marcas} />
+        <p>Aparece el código. No toques nada.</p>
+        <Figura captura="compu-codigo" alt="La entrada de la computadora, con el código para leer con el celular" numero="1.1" pie="La entrada de la computadora." />
       </Paso>
-      <Paso numero={2} titulo="Leé el código con el celular" celular={
-        <Figura src="entrar/celu-entrada.png" alt="La entrada del celular, con el botón para escanear el código de la computadora" numero="1.2" pie="En el celular, «Escanear el código de la computadora»." celular
-          marcas={[{ x: 5.6, y: 49.1, ancho: 88.7, alto: 9.6, texto: "Tocá acá para leer el código de la computadora." }]} />
+      <Paso numero={2} titulo="En el celular, tocá «Vincular»" celular={
+        <Figura captura="celu-vincular" alt="El celular, con el botón Vincular arriba a la derecha" numero="1.2" pie="«Vincular», arriba a la derecha." celular />
       }>
-        <p>Abrí Ferrebress en el celular y tocá <Boton>Escanear el código de la computadora</Boton>. Apuntá la cámara al
-          código de la pantalla. También sirve la cámara del teléfono, sin abrir Ferrebress.</p>
-        <p>Si es la primera vez en ese celular, antes entrá con <Boton>Continuar con Google</Boton> (más abajo, en «Otras formas de entrar»).</p>
+        <p>Está arriba a la derecha, en cualquier pantalla. Se abre la cámara.</p>
       </Paso>
-      <Paso numero={3} titulo="Confirmá en el celular" celular={
-        <Figura src="entrar/celu-dejar-entrar.png" alt="El celular pregunta si entrar en la computadora" numero="1.3" pie="El celular pregunta antes de dejar entrar a la computadora." celular
-          marcas={[
-            { x: 5.6, y: 55.3, ancho: 88.7, alto: 6.6, texto: "Deja entrar a la computadora con tu usuario." },
-            { x: 5.6, y: 64, ancho: 88.7, alto: 6.6, texto: "No la deja entrar: el celular sigue donde estaba." },
-          ]} />
+      <Paso numero={3} titulo="Apuntá al código" celular={
+        <Figura captura="celu-camara" alt="La cámara del celular apuntando al código de la computadora" numero="1.3" pie="La cámara, leyendo el código." celular />
       }>
-        <p>Si en el celular ya tenías la sesión abierta, pregunta <b>«¿Entrar en la computadora?»</b>: tocá <Boton>Entrar en la computadora</Boton>. Si no la tenías, poné la huella.</p>
-        <p>Con «Ahora no», la computadora no entra y el celular sigue donde estaba.</p>
+        <p>Apuntá la cámara al código de la computadora. Lo lee solo: no hay que sacar foto.</p>
       </Paso>
-      <Paso numero={4} titulo="Listo: la computadora entra sola">
-        <p>En unos segundos la computadora entra con tu usuario, y el celular avisa arriba <b>«Listo: la computadora entró como …»</b>. Los dos siguen con lo suyo.</p>
+      <Paso numero={4} titulo="Tocá «Entrar en la computadora»" celular={
+        <Figura captura="celu-dejar-entrar" alt="El celular pregunta si entrar en la computadora" numero="1.4" pie="La pregunta en el celular." celular />
+      }>
+        <p>El celular pregunta si dejás entrar a la computadora. Tocá <Boton>Entrar en la computadora</Boton>.</p>
+      </Paso>
+      <Paso numero={5} titulo="Listo">
+        <p>En unos segundos la computadora entra con tu nombre. El celular avisa arriba.</p>
         <div className="manual-par">
-          <Figura src="entrar/compu-adentro.png" alt="La computadora, ya adentro de Ferrebress" numero="1.4" pie="La computadora, ya adentro."
-            marcas={[{ x: 1.2, y: 90.5, ancho: 12.3, alto: 4.2, fuera: true, texto: "Tu usuario: la computadora entró como vos. «Salir» la cierra." }]} />
-          <Figura src="entrar/celu-despues.png" alt="El celular avisa que la computadora entró" numero="1.5" pie="El aviso en el celular." celular ancho={170}
-            marcas={[{ x: 5.1, y: 3.4, ancho: 89.7, alto: 3.6, texto: "El aviso de que la computadora entró." }]} />
+          <Figura captura="compu-adentro" alt="La computadora, ya adentro de Ferrebress" numero="1.5" pie="La computadora, adentro." />
+          <Figura captura="celu-despues" alt="El celular avisa que la computadora entró" numero="1.6" pie="El aviso." celular ancho={170} />
         </div>
       </Paso>
-      <Nota tipo="consejo"><b>De paso, quedan vinculados.</b> El celular que dejó entrar a la computadora queda unido a ella: lo
-        que escanees con el celular aparece en la computadora, y desde la computadora le podés pedir fotos. Y van juntos: si cambiás
-        de pantalla en el celular, la computadora va sola a la misma.</Nota>
-      <figure className="manual-clip chico">
-        <video src={`${ARCHIVOS}entrar/clip-espejo.mp4`} poster={`${ARCHIVOS}entrar/clip-espejo-portada.jpg`} controls muted playsInline preload="metadata" data-testid="manual-clip-espejo"
-          aria-label="Clip: en el celular se toca Vender, Depósito y Catálogo, y la computadora va sola a cada una" />
-        <figcaption><b>Van juntos.</b> Se toca en el celular, a la derecha, y la computadora lo sigue. <span>Sin sonido</span></figcaption>
-      </figure>
+      <h3 className="manual-caso">Si en el celular todavía no entraste</h3>
+      <Paso numero={1} titulo="Tocá «Escanear el código de la computadora»" celular={
+        <Figura captura="celu-entrada-escanear" alt="La entrada del celular, con el botón para escanear el código de la computadora" numero="1.7" pie="La entrada del celular." celular />
+      }>
+        <p>Está en la entrada del celular.</p>
+      </Paso>
+      <Paso numero={2} titulo="Apuntá al código y poné la huella" celular={
+        <Figura captura="celu-entrar-los-dos" alt="El celular ofrece entrar acá y en la computadora con la huella" numero="1.8" pie="Entrar en los dos, con la huella." celular />
+      }>
+        <p>Después de leer el código, tocá <Boton>Entrar acá y en la computadora</Boton> y poné la huella. Entran los dos a la vez.</p>
+        <p>Si nunca usaste la huella en ese celular, tocá <Boton>Continuar con Google</Boton>.</p>
+      </Paso>
+      <Nota tipo="consejo"><b>De paso, quedan vinculados.</b> Lo que hacés en el celular aparece en la computadora: si cambiás de pantalla en uno, el otro va a la misma.</Nota>
+      <Clip nombre="clip-espejo" testId="manual-clip-espejo" etiqueta="Clip: en el celular se toca Vender, Depósito y Catálogo, y la computadora va sola a cada una" chico>
+        <b>Van juntos.</b> Se toca en el celular, a la derecha, y la computadora lo sigue.
+      </Clip>
 
-      <h2 id="otras-formas" tabIndex={-1}>Otras formas de entrar</h2>
-      <h3>Con tu cuenta de Google</h3>
-      <p>En la entrada de la computadora o del celular, tocá <Boton>Continuar con Google</Boton> y elegí tu cuenta. Es la forma de entrar la primera vez en un celular.</p>
-      <h3>Con la huella</h3>
-      <p>En un celular que ya vinculaste con tu cuenta, tocá <Boton>Entrar con la huella</Boton>. La primera vez que entrás con Google desde un
-        celular, Ferrebress te ofrece vincularlo; también se hace desde <b>Más → Configuración</b>, en «Mis celulares con huella».</p>
+      <Titulo id="compu-google">En la computadora, con Google</Titulo>
+      <p>Para entrar sin el celular.</p>
+      <Clip nombre="clip-google-compu" testId="manual-clip-google-compu" etiqueta="Clip: en la computadora se hace clic en Continuar con Google y Ferrebress se abre">
+        <b>Mirá cómo se hace.</b> La ventana de Google no aparece en el clip.
+      </Clip>
+      <Paso numero={1} titulo="Hacé clic en «Continuar con Google»">
+        <p>Es el botón azul, debajo del código.</p>
+        <Figura captura="compu-google" alt="La entrada de la computadora, con el botón Continuar con Google" numero="1.9" pie="El botón de Google." />
+      </Paso>
+      <Paso numero={2} titulo="Elegí tu cuenta">
+        <p>Se abre una ventana de Google. Hacé clic en tu correo, el que te autorizaron.</p>
+        <p>Si tu correo no aparece, hacé clic en «Usar otra cuenta» y escribí tu correo y la contraseña de Google.</p>
+      </Paso>
+      <Paso numero={3} titulo="Listo">
+        <p>Ferrebress se abre. Abajo a la izquierda está tu nombre.</p>
+      </Paso>
 
-      <h2 id="problemas" tabIndex={-1}>Si algo no funciona</h2>
+      <Titulo id="compu-huella">En la computadora, con la huella</Titulo>
+      <p>Solo en una computadora con lector de huella que ya usaste para entrar con la huella.</p>
+      <Paso numero={1} titulo="Hacé clic en «Entrar con la huella»">
+        <p>Está arriba del botón de Google.</p>
+        <Figura captura="compu-huella" alt="La entrada de la computadora, con el botón Entrar con la huella" numero="1.10" pie="El botón de la huella." />
+      </Paso>
+      <Paso numero={2} titulo="Poné el dedo en el lector">
+        <p>La computadora te pide la huella (o el PIN de Windows). Ferrebress entra solo.</p>
+      </Paso>
+      <Nota tipo="consejo"><b>¿No aparece el botón?</b> Esa computadora todavía no tiene la huella. Entrá con Google y activala en <b>Más → Configuración</b>, en «Mis celulares con huella».</Nota>
+
+      <Titulo id="celu-google">En el celular, con Google</Titulo>
+      <p>La primera vez que usás Ferrebress en un celular.</p>
+      <Clip nombre="clip-google-celu" testId="manual-clip-google-celu" etiqueta="Clip: en el celular se toca Continuar con Google, Ferrebress se abre y ofrece usar la huella" celular>
+        <b>Mirá cómo se hace.</b> La ventana de Google no aparece en el clip.
+      </Clip>
+      <Paso numero={1} titulo="Tocá «Continuar con Google»" celular={
+        <Figura captura="celu-google" alt="La entrada del celular, con el botón Continuar con Google" numero="1.11" pie="El botón de Google." celular />
+      }>
+        <p>Es el botón azul de arriba.</p>
+      </Paso>
+      <Paso numero={2} titulo="Elegí tu cuenta">
+        <p>Google te muestra tus cuentas. Tocá la tuya, la que te autorizaron.</p>
+      </Paso>
+      <Paso numero={3} titulo="Activá la huella" celular={
+        <Figura captura="celu-ofrecer-huella" alt="El celular pregunta si entrar con la huella" numero="1.12" pie="La pregunta de la huella." celular />
+      }>
+        <p>Ferrebress te pregunta si querés entrar con la huella. Tocá <Boton>Sí, usar la huella</Boton> y poné el dedo. La próxima vez entrás más rápido.</p>
+      </Paso>
+
+      <Titulo id="celu-huella">En el celular, con la huella</Titulo>
+      <p>Todas las veces después de la primera.</p>
+      <Paso numero={1} titulo="Tocá «Entrar con la huella»" celular={
+        <Figura captura="celu-huella" alt="La entrada del celular, con el botón Entrar con la huella" numero="1.13" pie="El botón de la huella." celular />
+      }>
+        <p>Es el botón naranja.</p>
+      </Paso>
+      <Paso numero={2} titulo="Apoyá el dedo">
+        <p>El teléfono te pide la huella, como cuando lo desbloqueás. Ferrebress se abre solo.</p>
+      </Paso>
+
+      <Titulo id="problemas">Si algo no funciona</Titulo>
       <table className="manual-problemas">
         <thead><tr><th>Qué pasa</th><th>Qué hacer</th></tr></thead>
         <tbody>
-          <tr><td>Dice «No autorizado»</td><td>Tu correo de Google no está autorizado. Pedile a un Administrador que lo agregue en <b>Más → Usuarios</b>, o probá con otra cuenta.</td></tr>
-          <tr><td>El celular dice que el código venció</td><td>El código dura 5 minutos y sirve una sola vez. Leé el que la computadora muestra ahora.</td></tr>
-          <tr><td>No aparece el código</td><td>La computadora no tiene internet. Cuando vuelva la conexión, el código aparece solo.</td></tr>
-          <tr><td>No se pudo leer la huella</td><td>Probá de nuevo, o entrá con tu cuenta de Google.</td></tr>
-          <tr><td>Dice «Hay que iniciar sesión»</td><td>La sesión de ese dispositivo se cerró o venció. Entrá de nuevo.</td></tr>
+          <tr><td>Dice «No autorizado»</td><td>Tu correo no está autorizado. Pedile a un Administrador que lo agregue en <b>Más → Usuarios</b>, o probá con otra cuenta.</td></tr>
+          <tr><td>El celular dice que el código venció</td><td>El código cambia cada 5 minutos. Leé el que está ahora en la pantalla.</td></tr>
+          <tr><td>No aparece el código</td><td>La computadora no tiene internet. Cuando vuelva, el código aparece solo.</td></tr>
+          <tr><td>No se pudo leer la huella</td><td>Probá de nuevo, o entrá con Google.</td></tr>
+          <tr><td>Dice «Este dispositivo no está vinculado»</td><td>En ese celular o computadora nunca activaste la huella. Entrá con Google.</td></tr>
+          <tr><td>Dice «Hay que iniciar sesión»</td><td>Se cerró tu sesión en ese dispositivo. Entrá de nuevo.</td></tr>
         </tbody>
       </table>
-      <Figura src="entrar/compu-no-autorizado.png" alt="El aviso de correo no autorizado en la entrada de la computadora" numero="1.6" pie="Así se ve cuando el correo no está autorizado." ancho={420}
-        marcas={[{ x: 7.2, y: 61.4, ancho: 85.6, alto: 18.2, texto: "El aviso: ese correo de Google no está autorizado." }]} />
+      <Figura captura="compu-no-autorizado" alt="El aviso de correo no autorizado en la entrada de la computadora" numero="1.14" pie="Así se ve cuando el correo no está autorizado." ancho={420} />
     </article>
   );
 }

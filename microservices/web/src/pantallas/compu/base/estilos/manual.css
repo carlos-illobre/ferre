@@ -54,7 +54,6 @@
 .manual-marca{position:absolute;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:var(--naranja);color:#fff;font-weight:800;font-size:16px;display:grid;place-items:center;box-shadow:0 0 0 3px #fff,0 4px 10px rgb(0 0 0 / .3)}
 .manual-recuadro{position:absolute;outline:3px solid var(--naranja);outline-offset:3px;border-radius:10px;box-shadow:0 0 0 2px #fff}
 .manual-recuadro .manual-marca{left:100%;top:50%}
-.manual-recuadro.fuera .manual-marca{left:calc(100% + 24px)}
 .manual-par .manual-marca,.manual-imagen.celular .manual-marca{width:26px;height:26px;margin:-13px 0 0 -13px;font-size:14px}
 .manual-clip.chico{max-width:760px;margin-top:0}
 .manual-leyenda{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px;font-size:15px}
@@ -88,3 +87,14 @@
 .manual-nota.importante svg{stroke:var(--p-amarillo-texto)}
 .manual-nota.consejo svg{stroke:var(--p-verde-texto)}
 .manual-indice h2{margin:0 0 12px}
+
+/* El capítulo «Entrar» con una sección por forma de entrar (012-T010) */
+.manual-formas { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 12px 0 24px; }
+.manual-forma { display: flex; flex-direction: column; gap: 2px; padding: 16px 18px; border: 0; border-radius: 14px; background: var(--p-fondo-2); color: inherit; font: inherit; text-align: left; cursor: pointer; box-shadow: inset 0 0 0 1px var(--p-borde-suave); }
+.manual-forma:hover, .manual-forma:focus-visible { box-shadow: inset 0 0 0 2px var(--p-naranja); outline: none; }
+.manual-forma small { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--p-texto-2); }
+.manual-forma strong { font-size: 19px; }
+.manual-forma span { font-size: 15px; color: var(--p-texto-2); line-height: 1.4; }
+.manual-caso { margin-top: 34px; padding: 8px 14px; border-left: 4px solid var(--p-naranja); background: var(--p-naranja-suave); border-radius: 0 10px 10px 0; }
+.manual-clip.celu { max-width: 320px; margin-left: auto; margin-right: auto; }
+.manual-clip.celu figcaption { flex-wrap: wrap; }
