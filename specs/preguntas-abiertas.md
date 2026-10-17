@@ -38,7 +38,7 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 3. ¿Qué puede hacer el Administrador con la lista de ítems libres vendidos: convertir uno en producto, asociarlo a uno existente, marcarlo revisado?
 
 **Ventas del día (RF-23)**
-4. Al anular una venta, ¿se pide confirmación? ¿Se pide el motivo, obligatorio u opcional?
+4. ~~Al anular una venta, ¿se pide confirmación? ¿Se pide el motivo, obligatorio u opcional?~~ Respondida el 2026-10-17 (decisión 110): pide confirmar; el motivo es opcional, de una lista que empieza en «Sin motivo», con comentario.
 5. ¿Hasta cuándo se puede corregir o anular una venta: solo las del día, las de los últimos N días, o cualquiera?
 6. Al corregir una venta, ¿solo se cambian cantidad y precio de sus renglones, o también agregar o quitar un renglón, cambiar el medio de pago o el cliente?
 

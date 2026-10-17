@@ -9,7 +9,8 @@ export type EstadoDeVenta = "confirmada" | "anulada";
 
 // Los importes y las cantidades salen de la base como texto, con sus decimales.
 // El subtotal del renglón lo calcula el servidor (precio × cantidad, redondeado como se cobró).
-export type ItemDeVenta = { descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: string | null; explicacion: string | null; subtotal: number };
+// La foto es la del producto, si el renglón tiene producto y el producto tiene foto.
+export type ItemDeVenta = { descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: string | null; explicacion: string | null; foto_url: string | null; subtotal: number };
 export type VentaDelDia = { id: string; fecha: string; medio_pago: MedioDePago; total: string; estado: EstadoDeVenta; pagada_en: string | null; cliente: string | null; items: ItemDeVenta[] };
 
 // GET /ventas[?dia=AAAA-MM-DD]

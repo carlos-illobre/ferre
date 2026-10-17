@@ -256,9 +256,24 @@ cada venta con sus productos; ver los totales; elegir otra fecha.
   en el momento.
 - Si el servidor responde que la venta no existe o ya está anulada, el aviso lo dice con
   esas palabras.
-- Si se pide confirmación o motivo depende de la pregunta abierta de RF-23. Si se piden,
-  van en el lugar y se resuelven con el teclado en la computadora y con una mano en el
-  celular.
+- «Anular» abre una hoja para confirmar (decisión 110): «¿Anular esta venta?» con el aviso de que
+  no se puede deshacer; el resumen (fecha y hora, medio de pago, cliente si lo hay, total);
+  los productos, cada uno con su foto, «cantidad × precio c/u» y subtotal; el motivo, en una
+  lista desplegable que empieza en «Sin motivo» («Se arrepintió», «Error al cobrar», «Producto
+  equivocado», «Devolución», «Cobrada dos veces»), y un comentario opcional; un aviso verde
+  «Los productos vuelven al stock solos»; y «Cancelar» y «Anular venta». En la computadora,
+  todo con el teclado.
+
+**La pestaña Anular en el celular** (Carlos, 2026-10-17, sobre dos referencias suyas; maquetas
+aprobadas `maquetas/celular-anular-renovada*.png`): arriba, el aviso «Importante» con ícono en
+naranja suave («La venta anulada queda registrada, sus productos vuelven al stock y no se puede
+deshacer»); un buscador por producto o importe y, a su lado, para quien puede anular ventas de
+cualquier día, el día en un botón («Hoy» o la fecha) que abre el calendario; los medios de pago
+en pastillas para filtrar; «Ventas de hoy» (o del día elegido) con cuántas son; y cada venta en
+su tarjeta: la hora, el total grande, el medio de pago con su ícono y cuántos productos, el
+cliente si lo hay, «Anular» como botón naranja de 36 px, y cada producto con su foto,
+«cantidad × precio» y subtotal. Las anuladas, atenuadas, con el total tachado y la pastilla
+«Anulada».
 
 ## Historia 9: corregir una venta (Administrador)
 

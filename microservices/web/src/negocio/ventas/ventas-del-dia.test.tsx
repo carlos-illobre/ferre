@@ -7,7 +7,7 @@ const apiFalsa = vi.fn();
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 const venta = (id: string, estado: VentaDelDia["estado"] = "confirmada"): VentaDelDia =>
-  ({ id, fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "1500.00", estado, pagada_en: null, cliente: null, items: [{ descripcion: "Martillo", cantidad: "1.000", precio_unitario: "1500.00", margen_aplicado: null, explicacion: null, subtotal: 2000 }] });
+  ({ id, fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "1500.00", estado, pagada_en: null, cliente: null, items: [{ descripcion: "Martillo", cantidad: "1.000", precio_unitario: "1500.00", margen_aplicado: null, explicacion: null, foto_url: null, subtotal: 2000 }] });
 const dia = (ventas: VentaDelDia[]) => ({ dia: "2026-10-13", ventas, totales: { efectivo: 1500 }, total: 1500 });
 
 // Reordenamiento (010-E05): las ventas del día se piden y se anulan de una sola manera, sin pantalla.
@@ -60,5 +60,16 @@ describe("las ventas del día (010-E05)", () => {
     const fallo = await result.current.anular(venta("v1"), "").catch((e: unknown) => e);
     expect(fueSinConexion(fallo)).toBe(false);
     expect((fallo as Error).message).toBe("Esa venta no es de hoy");
+  });
+});
+
+// 003-T005: el motivo de una anulación (decisión 110).
+describe("el motivo de una anulación", () => {
+  it("junta el motivo elegido y el comentario; «Sin motivo» no se guarda", async () => {
+    const { motivoDeAnulacion } = await import("./ventas-del-dia");
+    expect(motivoDeAnulacion("Devolución", " la mecha vino fallada ")).toBe("Devolución: la mecha vino fallada");
+    expect(motivoDeAnulacion("Devolución", "")).toBe("Devolución");
+    expect(motivoDeAnulacion("Sin motivo", "se cobró mal")).toBe("se cobró mal");
+    expect(motivoDeAnulacion("Sin motivo", "")).toBe("");
   });
 });

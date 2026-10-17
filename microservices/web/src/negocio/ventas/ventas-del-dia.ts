@@ -48,3 +48,24 @@ export function useAnularVenta() {
 export type { Consulta };
 export const CONSULTAS = ["consultas"] as const;
 export const useConsultas = () => useDelServidor<Consulta[]>(CONSULTAS, "/consultas");
+
+// Anular: los motivos que se eligen de la lista, que empieza en «Sin motivo» (decisión 110).
+// Se guarda el motivo elegido y el comentario: «Devolución: la mecha vino fallada».
+export const SIN_MOTIVO = "Sin motivo";
+export const MOTIVOS_DE_ANULACION = ["Se arrepintió", "Error al cobrar", "Producto equivocado", "Devolución", "Cobrada dos veces"] as const;
+export function motivoDeAnulacion(elegido: string, comentario: string): string {
+  const motivo = elegido === SIN_MOTIVO ? "" : elegido;
+  const texto = comentario.trim();
+  return motivo && texto ? `${motivo}: ${texto}` : motivo || texto;
+}
+
+// Buscar una venta para anular, por un producto o por el importe, y filtrar por medio de pago
+// (003-T005). El importe se compara sin puntos ni signo: «58.000» encuentra la de $58.000.
+const plano = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+export function buscarVentas(ventas: VentaDelDia[], texto: string, medio: VentaDelDia["medio_pago"] | null): VentaDelDia[] {
+  const buscado = plano(texto);
+  const cifras = buscado.replace(/\D/g, "");
+  return ventas.filter((v) => (!medio || v.medio_pago === medio) && (!buscado
+    || v.items.some((i) => plano(i.descripcion).includes(buscado))
+    || (cifras.length > 0 && cifras === buscado.replace(/[$.\s]/g, "") && String(Math.round(Number(v.total))).includes(cifras))));
+}

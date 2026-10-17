@@ -8,7 +8,7 @@ iniciar sesión».
 | Método | Ruta | Rol que exige | Para qué sirve |
 |---|---|---|---|
 | POST | `/ventas` | Cualquier usuario con sesión | Registrar una venta con sus renglones |
-| GET | `/ventas` | Cualquier usuario con sesión | Las ventas de un día (por omisión, el día en curso) con sus renglones y los totales |
+| GET | `/ventas` | Cualquier usuario con sesión | Las ventas de un día (por omisión, el día en curso) con sus renglones (cada uno con la foto de su producto, si la tiene) y los totales |
 | POST | `/ventas/:id/anular` | Cualquier usuario con sesión | Anular una venta y devolver el stock |
 | POST | `/ventas/:id/pagar` | Cualquier usuario con sesión | Marcar pagada una venta a cuenta corriente (RF-40, capacidad de Clientes) |
 | POST | `/consultas` | Cualquier usuario con sesión | Anotar lo que pidieron y no llevaron |

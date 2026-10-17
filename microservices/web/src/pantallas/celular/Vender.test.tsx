@@ -276,10 +276,36 @@ describe("Vender", () => {
     const ventas = await screen.findAllByTestId("venta-dia");
     expect(screen.queryByTestId("dia")).toBeNull();
     expect(screen.queryByTestId("resumen-hoy")).toBeNull();
-    expect(within(ventas[1]!).queryByRole("button", { name: "Anular" })).toBeNull();
-    window.prompt = () => "se arrepintió";
-    fireEvent.click(within(ventas[0]!).getByRole("button", { name: "Anular" }));
-    await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/ventas/v1/anular", expect.objectContaining({ method: "POST" })));
+    expect(within(ventas[1]!).queryByRole("button", { name: /Anular/ })).toBeNull();
+    expect(within(ventas[1]!).getByText("Anulada")).toBeTruthy();
+    // 003-T005: «Anular» abre la hoja para confirmar, con el motivo de la lista y un comentario.
+    fireEvent.click(within(ventas[0]!).getByRole("button", { name: /Anular la venta de \$10\.500/ }));
+    const hoja = screen.getByTestId("hoja-anular");
+    expect(hoja.textContent).toContain("¿Anular esta venta?");
+    expect(hoja.textContent).toContain("MECHA VENDER 8 MM");
+    expect([...(within(hoja).getByTestId("motivo-anular") as HTMLSelectElement).options].map((o) => o.value)).toEqual(["Sin motivo", "Se arrepintió", "Error al cobrar", "Producto equivocado", "Devolución", "Cobrada dos veces"]);
+    fireEvent.change(within(hoja).getByTestId("motivo-anular"), { target: { value: "Devolución" } });
+    fireEvent.change(within(hoja).getByTestId("comentario-anular"), { target: { value: "la mecha vino fallada" } });
+    fireEvent.click(within(hoja).getByTestId("confirmar-anular"));
+    await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/ventas/v1/anular", { method: "POST", body: JSON.stringify({ motivo: "Devolución: la mecha vino fallada" }) }));
+  });
+
+  it("003-T005 Anular busca por producto o importe y filtra por medio de pago", async () => {
+    conPermisos("ventas.registrar", "ventas.ver", "ventas.anular");
+    armar({ total: 13500, totales: { efectivo: 10500, tarjeta: 3000 }, ventas: [
+      { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3500" }] },
+      { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "confirmada", cliente: null, items: [{ descripcion: "TORNILLO VENDER", cantidad: "1", precio_unitario: "3000" }] },
+    ] }, "anular");
+    await screen.findAllByTestId("venta-dia");
+    expect(screen.getByTestId("cuantas-ventas").textContent).toBe("2 ventas");
+    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "tornillo" } });
+    expect(screen.getAllByTestId("venta-dia")).toHaveLength(1);
+    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "10.500" } });
+    expect(screen.getAllByTestId("venta-dia")[0]!.textContent).toContain("MECHA");
+    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "" } });
+    fireEvent.click(within(screen.getByRole("group", { name: "Medio de pago" })).getByRole("button", { name: "Tarjeta" }));
+    expect(screen.getAllByTestId("venta-dia")).toHaveLength(1);
+    expect(screen.getByTestId("cuantas-ventas").textContent).toBe("1 venta");
   });
 
   it("'No llevó' anota la consulta y vacía la venta", () => {

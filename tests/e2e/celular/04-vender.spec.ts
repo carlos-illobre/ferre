@@ -120,9 +120,13 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   // La pestaña Anular es para eso: anular la marca y devuelve el stock.
   await page.getByRole("tab", { name: "Anular" }).click();
   const venta = page.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
-  page.once("dialog", (d) => d.accept("se arrepintió"));
-  await venta.getByRole("button", { name: "Anular" }).click();
-  await expect(venta).toContainText("anulada");
+  // «Anular» abre la hoja para confirmar, con el motivo de la lista y un comentario (003-T005).
+  await venta.getByRole("button", { name: /Anular/ }).click();
+  await page.getByTestId("motivo-anular").selectOption("Se arrepintió");
+  await page.getByTestId("comentario-anular").fill("cambió de idea");
+  await page.getByTestId("confirmar-anular").click();
+  await expect(venta).toContainText(/anulada/i);
+  await expect.poll(() => psql(`SELECT contenido->>'motivo' FROM evento WHERE tipo = 'venta.anulada' ORDER BY fecha DESC LIMIT 1`)).toBe("Se arrepintió: cambió de idea");
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
   // La anomalía se ve en Más > Anomalías.
   await page.getByRole("button", { name: "Más", exact: true }).click();

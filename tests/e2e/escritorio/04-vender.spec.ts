@@ -113,7 +113,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   const venta = page.getByTestId("anular-ventas").getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
   await expect(venta).toContainText("TORNILLO VENDER");
   await venta.getByRole("button", { name: "Anular" }).click();
-  await page.getByTestId("motivo-anular").fill("se arrepintió");
+  await page.getByTestId("motivo-anular").selectOption("Se arrepintió");
+  await page.getByTestId("comentario-anular").fill("cambió de idea");
   await page.getByTestId("confirmar-anular").click();
   await expect(venta).toContainText(/anulada/i);
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");

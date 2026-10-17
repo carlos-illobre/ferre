@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { usePuede } from "../../../permisos";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../../negocio/ventas/venta";
-import { confirmadas as lasConfirmadas, fueSinConexion, hoyLocal, useAnularVenta, useVentasDelDia, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
+import { confirmadas as lasConfirmadas, fueSinConexion, hoyLocal, MOTIVOS_DE_ANULACION, motivoDeAnulacion, SIN_MOTIVO, useAnularVenta, useVentasDelDia, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
 import { fecha as fechaLarga } from "../../../../formato";
 import { useEsCelular } from "../vista";
 import { irA } from "../rutas";
@@ -134,12 +134,14 @@ export function VentasDeHoy({ modo }: { modo: "hoy" | "anular" }) {
 
 // Anular no se puede deshacer: es de las pocas acciones que piden confirmar.
 function AnularVenta({ venta, alCerrar, alAnular }: { venta: VentaDelDia; alCerrar: () => void; alAnular: () => void }) {
-  const [motivo, setMotivo] = useState("");
+  // El motivo, de una lista que empieza en «Sin motivo», y un comentario (decisión 110).
+  const [elegido, setElegido] = useState<string>(SIN_MOTIVO);
+  const [comentario, setComentario] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { anular: anularVenta, anulando: ocupado } = useAnularVenta();
   async function anular() {
     setError(null);
-    try { await anularVenta(venta, motivo); alAnular(); }
+    try { await anularVenta(venta, motivoDeAnulacion(elegido, comentario)); alAnular(); }
     catch (e) { setError(fueSinConexion(e) ? "Sin conexión: para anular hace falta internet. Probá de nuevo cuando vuelva." : `${(e as Error).message}.`); }
   }
   return (
@@ -147,8 +149,12 @@ function AnularVenta({ venta, alCerrar, alAnular }: { venta: VentaDelDia; alCerr
       pie={<><Boton onClick={alCerrar}>No anular</Boton><Boton variante="peligro" disabled={ocupado} onClick={anular} data-testid="confirmar-anular">{ocupado ? "Anulando…" : "Anular la venta"}</Boton></>}>
       <p>La venta de las {hora(venta.fecha)} queda marcada como anulada y sus productos vuelven al stock. No se puede deshacer.</p>
       <form className="campo" onSubmit={(e) => { e.preventDefault(); void anular(); }}>
-        <label htmlFor="motivo-anular" className="rotulo">Motivo, si querés dejarlo anotado</label>
-        <input id="motivo-anular" className="entrada" value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Ej.: se cobró dos veces" autoComplete="off" data-testid="motivo-anular" />
+        <label htmlFor="motivo-anular" className="rotulo">Motivo de la anulación</label>
+        <select id="motivo-anular" className="entrada" value={elegido} onChange={(e) => setElegido(e.target.value)} data-testid="motivo-anular">
+          {[SIN_MOTIVO, ...MOTIVOS_DE_ANULACION].map((m) => <option key={m} value={m}>{m}</option>)}
+        </select>
+        <label htmlFor="comentario-anular" className="rotulo">Comentario (opcional)</label>
+        <input id="comentario-anular" className="entrada" value={comentario} onChange={(e) => setComentario(e.target.value)} placeholder="Ej.: la mecha vino fallada" autoComplete="off" data-testid="comentario-anular" />
       </form>
       <Aviso tipo="error">{error}</Aviso>
     </Hoja>

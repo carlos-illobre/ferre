@@ -1,10 +1,9 @@
 import { Lista } from "../componentes/base";
-import { useState } from "react";
 import { pesos, pesosCortos } from "../../../formato";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../negocio/ventas/venta";
-import { confirmadas, hoyLocal, useAnularVenta, useVentasDelDia, type VentaDelDia } from "../../../negocio/ventas/ventas-del-dia";
+import { confirmadas, useVentasDelDia, type VentaDelDia } from "../../../negocio/ventas/ventas-del-dia";
 
-// Las pestañas «Hoy» y «Anular» de Vender (decisión 72).
+// La pestaña «Hoy» de Vender (decisión 72); «Anular» está en AnularVentas.
 
 const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -46,32 +45,6 @@ export function VentasDeHoy() {
         </div>
       </div>
       <ListaDeVentas ventas={hoy.ventas} alAnular={null} />
-    </>
-  );
-}
-
-// Pestaña «Anular»: buscar la venta y anularla. Las de hoy, con «Anular ventas del día»; las de
-// otro día, solo con «Anular ventas de cualquier día», que es quien ve el selector de día.
-export function AnularVentas({ cualquierDia }: { cualquierDia: boolean }) {
-  const [dia, setDia] = useState(hoyLocal);
-  const esHoy = dia === hoyLocal();
-  const { datos } = useVentasDelDia(dia);
-  const { anular: anularVenta } = useAnularVenta();
-  async function anular(v: VentaDelDia) {
-    const motivo = window.prompt(`¿Anular la venta de ${pesos(v.total)}? Motivo (opcional):`);
-    if (motivo === null) return;
-    await anularVenta(v, motivo).catch(() => undefined);
-  }
-  return (
-    <>
-      <p className="ayuda-de-pantalla">La venta anulada queda marcada y sus productos vuelven al stock. No se puede deshacer.</p>
-      {cualquierDia && (
-        <label className="campo"><span>Día</span>
-          <input type="date" className="entrada" value={dia} max={hoyLocal()} onChange={(e) => e.target.value && setDia(e.target.value)} data-testid="dia" />
-        </label>
-      )}
-      {datos ? <ListaDeVentas ventas={datos.ventas} alAnular={anular} sinVentas={esHoy ? "Todavía no hay ventas hoy." : "Ese día no hubo ventas."} />
-        : <div className="aviso-suave">Sin conexión: para anular una venta hace falta internet.</div>}
     </>
   );
 }
