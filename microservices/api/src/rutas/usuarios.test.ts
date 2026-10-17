@@ -83,4 +83,13 @@ describe("usuarios", () => {
     base.actual.programar(/UPDATE usuario SET activo/, { rowCount: 0 });
     expect((await pedir(app, "PATCH", `/usuarios/${OTRO}`, { rol: "admin", cuerpo: { nombre: "X" } })).status).toBe(404);
   });
+
+  it("A7: reactivar a alguien lo deja activo otra vez, y entrar solo mira que esté activo", async () => {
+    expect((await pedir(app, "PATCH", `/usuarios/${OTRO}`, { rol: "admin", cuerpo: { activo: true } })).status).toBe(204);
+    const cambio = base.actual.sqlDe(/UPDATE usuario SET activo/)[0]!;
+    expect(cambio.params).toContain(true);
+    expect(cambio.params).toContain(OTRO);
+    // Reactivar no cierra sesiones: no hay ninguna que cerrar.
+    expect(base.actual.sqlDe(/UPDATE sesion SET revocada_en/)).toHaveLength(0);
+  });
 });

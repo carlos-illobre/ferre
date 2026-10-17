@@ -1,0 +1,55 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
+
+// La sesión del dispositivo cuando el servidor la da por terminada (RF-70, RF-74): la cerraron a
+// distancia, venció o desactivaron al usuario. Para el dispositivo es lo mismo: el servidor
+// contesta 401 y la aplicación borra la sesión y vuelve sola a la entrada. Se simula el servidor
+// (fetch); la sesión y el cliente son los de verdad. Casos D4 a D6 de docs/pruebas-manuales/entrar.md.
+vi.unmock("./sesion");
+const { ProveedorDeSesion, useSesion } = await import("./sesion");
+const { api } = await import("./api");
+
+const CARLOS = { id: "u-1", email: "carlos@ferre.test", nombre: "Carlos", roles: [], permisos: [] };
+const respuesta = (estado: number, cuerpo: unknown = {}) => new Response(JSON.stringify(cuerpo), { status: estado, headers: { "Content-Type": "application/json" } });
+let servidor: (ruta: string) => Promise<Response>;
+
+function Estado() {
+  const { sesion } = useSesion();
+  return <output data-testid="estado">{sesion.estado === "con-sesion" ? (sesion.sinConexion ? "adentro sin conexión" : "adentro") : sesion.estado}</output>;
+}
+
+beforeEach(() => {
+  localStorage.setItem("ferre.sesion", "token-guardado");
+  localStorage.setItem("ferre.usuario", JSON.stringify(CARLOS));
+  vi.stubGlobal("fetch", vi.fn((url: string) => servidor(new URL(url).pathname)));
+});
+afterEach(() => { vi.unstubAllGlobals(); });
+
+describe("el servidor da por terminada la sesión", () => {
+  it("D4 y D6: con la aplicación abierta, el próximo pedido rechazado la saca a la entrada y borra la sesión", async () => {
+    servidor = async (ruta) => (ruta === "/sesiones/actual" ? respuesta(200, { id: "s-1", usuario: CARLOS }) : respuesta(200, []));
+    render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+    // La cerraron desde otro dispositivo (o desactivaron al usuario): el servidor ya no la acepta.
+    servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
+    await act(async () => { await api("/productos").catch(() => undefined); });
+    expect(screen.getByTestId("estado").textContent).toBe("sin-sesion");
+    expect(localStorage.getItem("ferre.sesion")).toBeNull();
+  });
+
+  it("D5: sin internet sigue adentro; al volver la conexión y rechazarla el servidor, vuelve a la entrada", async () => {
+    servidor = async () => { throw new TypeError("Failed to fetch"); };
+    render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro sin conexión"));
+    servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
+    await act(async () => { await api("/ventas").catch(() => undefined); });
+    expect(screen.getByTestId("estado").textContent).toBe("sin-sesion");
+    expect(localStorage.getItem("ferre.sesion")).toBeNull();
+  });
+
+  it("D1: con una sesión que vale, al abrir entra directo, sin pedir Google ni la huella", async () => {
+    servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+    render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+  });
+});

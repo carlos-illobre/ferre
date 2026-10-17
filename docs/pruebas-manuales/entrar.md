@@ -4,8 +4,36 @@ Las tres formas de entrar (RF-70, RF-70b y RF-76) y lo que pasa con la sesión d
 paréntesis, el escenario de `specs/007-usuarios-y-acceso/spec.md` del que sale cada caso
 (historia·número; por ejemplo, «4b·2» es el escenario 2 de la historia 4b).
 
-Las que más valen son las que no tienen prueba automática (`proyecto/estado.yml`): A2, A5, A7,
-C5, C6, D4 y D5, y todo el recorrido con un celular y una computadora de verdad.
+## Qué hay que probar sí o sí a mano
+
+Lo que ninguna prueba automática puede hacer: la pantalla de Google de verdad, el lector de huella
+del teléfono y su cámara. Las pruebas automáticas los simulan (Google confirma una cuenta, el lector
+lee o no lee el dedo, la cámara «lee» un texto) y prueban qué hace Ferrebress con eso.
+
+- **A2** y **A5**: entrar con una cuenta de Google de verdad, autorizada y no autorizada.
+- **B1**: vincular la huella apoyando el dedo de verdad (una vez por modelo de celular).
+- **C4**: leer el código de la computadora con la cámara del teléfono, sin abrir Ferrebress.
+- **C6**: leer el código sin sesión y entrar con Google.
+
+Todo lo demás tiene prueba automática; a mano vale como repaso con equipos de verdad.
+
+## Qué prueba la máquina
+
+Unitarias (corren en cada subida, en segundos; las de la aplicación en `microservices/web/src/`, las del servidor en `microservices/api/src/`) y de punta a punta (`tests/e2e/`, en Docker):
+
+| Casos | Prueba |
+|---|---|
+| A1, B2, B4, B5, B7, C1, C2, D1 | De punta a punta: `01-login` (celular y computadora) |
+| A2, A3, A4, A5 (Google simulado) | Unitarias: `pantallas/entrar-simulado.test.tsx` y, en el servidor, `rutas/entrar-con-google.test.ts` |
+| A6, A7 | Servidor: `rutas/entrar-con-google.test.ts` y `rutas/usuarios.test.ts` |
+| B1, B3, B4, B5 (huella simulada) | Unitarias: `pantallas/entrar-simulado.test.tsx` |
+| B6, C7 | Servidor: `rutas/credenciales.test.ts` y `rutas/sesiones.test.ts` |
+| C3, C5, C8, C9 (cámara simulada) | Unitarias: `celular/EntrarEnLaCompu.test.tsx`; en el servidor, `rutas/sesiones.test.ts` |
+| C8, C10 | Unitarias: `compu/base/pantallas/Entrar.test.tsx` |
+| C11 | De punta a punta: `17-espejo` |
+| D2 | De punta a punta: `08-sin-conexion` |
+| D3 | De punta a punta: `12-cerrar-sesion` |
+| D4, D5, D6 | Unitarias: `sesion.test.tsx` y `compu/base/pantallas/Entrar.test.tsx`; en el servidor, `rutas/usuarios.test.ts` |
 
 ## Antes de empezar
 
