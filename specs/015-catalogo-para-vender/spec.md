@@ -68,6 +68,9 @@ vez, ir a Vender y ver un renglón de la mecha con cantidad 2.
 8. **E13** **Given** el dispositivo sin conexión, **When** se agrega un producto desde el Catálogo, **Then** entra a la venta igual, como en Vender sin conexión.
 9. **E14** **Given** un producto agregado desde el Catálogo, **When** termina de agregarse, **Then** el Vendedor sigue en el Catálogo, con la misma búsqueda y en el mismo lugar de la lista; un aviso breve dice que se agregó, y el menú muestra en Vender cuántos productos lleva la venta (decisión 103).
 10. **E24** **Given** la venta en curso con productos, **When** se mira el menú desde cualquier parte, **Then** Vender muestra cuántos renglones lleva la venta; con la venta vacía (o recién cobrada) no muestra número.
+11. **E25** **Given** productos agregados a la venta (desde el Catálogo o en Vender), **When** el Vendedor va a otra parte y vuelve a Vender, con o sin espejo, **Then** la venta sigue como la dejó (ADR-022).
+12. **E26** **Given** una venta cobrada en un dispositivo en espejo, **When** se mira el menú de los dos, **Then** ninguno muestra número en Vender.
+13. **E27** **Given** la computadora con un producto elegido en el Catálogo, **When** se aprieta «+», **Then** se agrega a la venta como con «Agregar»; quien no puede vender aprieta «+» y no pasa nada.
 
 ---
 
@@ -89,6 +92,9 @@ Vendedor filtra la lista para ver solo lo que hay, o solo una marca.
 4. **E18** **Given** una búsqueda escrita y filtros elegidos, **When** se mira la lista, **Then** muestra solo lo que cumple la búsqueda y todos los filtros, y la cantidad de productos que muestra.
 5. **E19** **Given** algún filtro elegido, **When** se mira el botón de filtros, **Then** se nota que hay filtros puestos y cuántos, y hay una forma de sacarlos todos de un toque.
 6. **E20** **Given** filtros que no dejan ningún producto, **When** se mira la lista, **Then** dice que no hay productos con esos filtros y ofrece sacarlos.
+7. **E28** **Given** la lista de marcas, **When** dos proveedores escriben la misma marca con distintas mayúsculas («3M» y «3m»), **Then** figura una sola vez y la elige para los dos.
+8. **E29** **Given** el celular que busca en el servidor (sin el catálogo en el dispositivo), **When** abre los filtros después de buscar, **Then** la lista de marcas son las de lo encontrado, y la disponibilidad filtra con el stock de siempre.
+9. **E30** **Given** los filtros abiertos en la computadora, **When** se aprieta Esc, **Then** el panel se cierra y los filtros elegidos quedan puestos; todo el panel se recorre con el teclado.
 
 ---
 
