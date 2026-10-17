@@ -6,7 +6,7 @@
 
 **Status**: Aprobada por Carlos (2026-10-17)
 
-**Maquetas**: Variante C para que Carlos la apruebe (2026-10-17): `maquetas/para-revisar-c-*.png`, con el submenú de pestañas de las otras pantallas, primero «Para revisar» y después «Anotadas», y la cantidad a la derecha del nombre (pedidos de Carlos al ver la A, la B y la primera C: `maquetas/para-revisar-a-*.png`, `maquetas/para-revisar-b-*.png`)
+**Maquetas**: Aprobadas (2026-10-17): variante C, `maquetas/para-revisar-c-*.png`, con el submenú de pestañas de las otras pantallas, primero «Para revisar» y después «Anotadas», y la cantidad a la derecha del nombre (pedidos de Carlos al ver la A, la B y la primera C: `maquetas/para-revisar-a-*.png`, `maquetas/para-revisar-b-*.png`)
 
 **Input**: Decisión 97: lo que una persona hizo sin conexión antes de que la desactivaran y
 todavía no llegó al servidor no se registra solo ni se pierde, queda apartado para que alguien
@@ -75,6 +75,17 @@ ningún lado salvo en el registro.
 - **E12** **Given** alguien con el permiso de ver las anomalías y sin «Administrar usuarios», **When** abre Anomalías, **Then** ve las anomalías de siempre y no «Para revisar».
 - **E13** **Given** alguien sin «Administrar usuarios», **When** le pide al servidor lo apartado, o aceptarlo o descartarlo, **Then** el servidor lo niega.
 
+### User Story 4 - Que no se pueda abusar (Priority: P1)
+
+**Acceptance Scenarios** (paso 4, QA):
+
+- **E14** **Given** la sesión cerrada de una persona desactivada, **When** con ella se intenta cualquier otra cosa que subir lo apartado, **Then** el servidor contesta «Hay que iniciar sesión», como hasta ahora.
+- **E15** **Given** un cambio para apartar que no es de un tipo que el dispositivo manda (o apunta a otra ruta que la de su tipo, por ejemplo la administración de usuarios), **When** se sube, **Then** el servidor rechaza el pedido entero y no aparta nada.
+- **E16** **Given** más de 200 cambios en un solo pedido, **When** se suben, **Then** el servidor lo rechaza; el dispositivo los manda de a 200.
+- **E17** **Given** el mismo cambio subido dos veces, **When** llega la segunda, **Then** no se guarda de nuevo y el servidor contesta igual que la primera.
+- **E18** **Given** un cambio ya aceptado o descartado, **When** alguien intenta aceptarlo o descartarlo de nuevo (dos personas a la vez, o una pantalla vieja), **Then** no se aplica dos veces y la pantalla dice que ya se decidió.
+- **E19** **Given** un cambio aceptado, **When** quien lo hizo ya no tiene el permiso para hacerlo (le cambiaron los roles), **Then** no se registra y la pantalla dice qué permiso le falta: lo aceptado tiene los mismos límites que si hubiera llegado a tiempo.
+
 ### Edge Cases
 
 - **Reactivan a la persona antes de revisar.** Lo apartado sigue apartado: se acepta o se descarta igual. Lo que todavía no llegó al servidor sale con su sesión cuando vuelve a entrar.
@@ -83,6 +94,7 @@ ningún lado salvo en el registro.
 - **La hora del dispositivo está mal.** Se muestra la hora que dice el dispositivo y cuándo llegó al servidor, para que se note.
 - **Cambios que se funden.** Si la persona cambió el margen de un producto dos veces, llega uno solo, con el último valor, como en la cola de siempre.
 - **Sin conexión, quien revisa** no puede aceptar ni descartar: la pantalla lo dice.
+- **La fecha de lo aceptado.** Una venta queda con la fecha y la hora en que se cobró, porque la venta la trae. Un ajuste de stock, un cambio de margen o un renglón de conteo quedan con la fecha en que se aceptan, porque esa fecha la pone el servidor al recibirlos; la pantalla de revisión y el registro guardan cuándo se hicieron (aclarado al planificar, 2026-10-17).
 
 ## Requirements
 
