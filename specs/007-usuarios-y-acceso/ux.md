@@ -441,8 +441,10 @@ suya.
   donde estaba.
 - Cerrar la propia, o «Salir», lleva a la entrada.
 - «Salir» está al alcance de cualquier usuario desde cualquier parte, en un paso.
-- El dispositivo al que le cerraron la sesión vuelve solo a la entrada en su próxima
-  operación, con «Hay que iniciar sesión».
+- El dispositivo al que le cerraron la sesión vuelve solo a la entrada, con «Hay que iniciar
+  sesión»: con la aplicación abierta y conexión, en menos de 30 segundos, sin que nadie toque
+  nada; si estaba en otra ventana, apenas vuelve; sin conexión, al recuperarla. Lo mismo pasa
+  al desactivar a alguien (decisión 97).
 - «Salir» sin conexión: [NEEDS CLARIFICATION: P9 de la spec: si el dispositivo no tiene internet, ¿«Salir» lo lleva igual a la entrada y la sesión se cierra en el servidor cuando reconecte, o no se puede salir sin conexión?]
 
 **Estados:**
