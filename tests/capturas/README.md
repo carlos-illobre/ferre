@@ -11,6 +11,10 @@ python tests/capturas/capturar.py stock --celu --py "page.get_by_test_id('stock'
 tests/capturas/levantar.sh --apagar
 ```
 
+Una maqueta que se dibuja sobre la pantalla real (un script que cambia la página antes de la
+captura) va en `maquetas/<carpeta de specs>/`; en `specs/` queda solo la imagen que Carlos
+aprueba: la documentación no lleva código (010-E01, lo controla `tests/itest.sh --rapido`).
+
 - **Qué necesita:** Node, las dependencias del repo instaladas y Python con Playwright
   (`pip install playwright && playwright install chromium`). Si ya hay un Chromium instalado
   (en las sesiones en la nube, `/opt/pw-browsers/chromium`), `CHROMIUM=<ruta>` lo usa sin bajar otro.

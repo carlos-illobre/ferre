@@ -1,7 +1,7 @@
 // Maqueta del éxito de la venta en el celular (003-T004), sobre la pantalla real. Se corre dos
 // veces: «antes» de cobrar guarda los renglones; «despues» rearma el éxito con ellos.
 // python tests/capturas/capturar.py vender --celu --py "b=page.get_by_test_id('busqueda'); b.fill('cable'); b.press('Enter'); b.fill('candado'); b.press('Enter')" \
-//   --py "js=open('specs/003-ventas/maquetas/celular-venta-registrada.js').read(); page.evaluate(js, 'antes'); page.get_by_test_id('cobrar').click(); page.wait_for_timeout(800); page.evaluate(js, 'despues')"
+//   --py "js=open('tests/capturas/maquetas/003-ventas/celular-venta-registrada.js').read(); page.evaluate(js, 'antes'); page.get_by_test_id('cobrar').click(); page.wait_for_timeout(800); page.evaluate(js, 'despues')"
 (modo) => {
   if (modo === "antes") {
     window.__renglones = [...document.querySelectorAll("[data-testid=item]")].map((it) => ({

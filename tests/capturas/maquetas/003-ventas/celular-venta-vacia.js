@@ -1,5 +1,5 @@
 // Maqueta de Vender sin productos en el celular (003-T003), sobre la pantalla real:
-// python tests/capturas/capturar.py vender --celu --py "page.evaluate(open('specs/003-ventas/maquetas/celular-venta-vacia.js').read())"
+// python tests/capturas/capturar.py vender --celu --py "page.evaluate(open('tests/capturas/maquetas/003-ventas/celular-venta-vacia.js').read())"
 () => {
   const st = document.createElement("style");
   st.textContent = `
