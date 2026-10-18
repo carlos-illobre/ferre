@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
+import { cerrarLasOtrasVentanas, otroContexto } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
 const { psql } = stack("escritorio");
@@ -25,6 +26,8 @@ test.beforeAll(() => {
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
 });
 
+test.afterEach(cerrarLasOtrasVentanas);
+
 test("la computadora pide la foto de la factura con un código QR y el celular la manda", async ({ page, browser }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/compras");
@@ -35,7 +38,7 @@ test("la computadora pide la foto de la factura con un código QR y el celular l
   expect(enlace).toContain("#/foto?codigo=");
 
   // El celular, con su sesión, abre el enlace, saca la foto y la manda.
-  const celular = await browser.newContext({ viewport: { width: 412, height: 915 } });
+  const celular = await otroContexto(browser, { viewport: { width: 412, height: 915 } });
   const telefono = await celular.newPage();
   await telefono.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await telefono.goto(enlace);

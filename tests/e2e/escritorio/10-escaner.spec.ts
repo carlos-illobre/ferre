@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
+import { cerrarLasOtrasVentanas, otraVentana } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
 const { API, psql } = stack("escritorio");
@@ -39,8 +40,10 @@ test.beforeAll(() => {
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '${ID_PROD}', '${ID_PROV}', 'CE19', 1000, '[]', 1000, 0.21, '2026-08-11'), (gen_random_uuid(), '${ID_PROD2}', '${ID_PROV}', 'GE9', 2000, '[]', 2000, 0.21, '2026-08-11')`);
 });
 
+test.afterEach(cerrarLasOtrasVentanas);
+
 test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ browser }) => {
-  const laptop = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
+  const laptop = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   await laptop.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
   await laptop.goto("/#/vender");
   await expect(laptop.getByTestId("busqueda")).toBeEnabled();
@@ -51,7 +54,7 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   expect(enlace).toContain("#/vincular-celular?codigo=");
 
   // El celular abre el enlace del QR (hayCamara() es falso en el navegador de prueba: se tipea el código).
-  const celular = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  const celular = await otraVentana(browser, { viewport: { width: 390, height: 844 } });
   await celular.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
   await celular.goto(enlace.replace(/^https?:\/\/[^/]+/, ""));
   await expect(celular.getByTestId("vinculacion-ok")).toContainText("quedó vinculado");

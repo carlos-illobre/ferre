@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
+import { cerrarLasOtrasVentanas, otraVentana } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
 const { psql } = stack("celular");
@@ -28,6 +29,8 @@ test.beforeAll(() => {
   const hash = createHash("sha256").update(TOKEN).digest("hex");
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
 });
+
+test.afterEach(cerrarLasOtrasVentanas);
 
 test("sin sesión se pide entrar", async ({ page }) => {
   await page.goto("/");
@@ -115,7 +118,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   // Una sesión propia para el celular: las otras pruebas de este archivo cierran la suya.
   const TOKEN_CELULAR = "token-e2e-login-celular";
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}', 'e2e celular', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
-  const compu = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
+  const compu = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   await compu.goto("/");
   await expect(compu.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
   await expect(compu.getByTestId("qr-entrar").locator("img")).toBeVisible();
@@ -126,13 +129,14 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   const ruta = enlace.replace(/^https?:\/\/[^/]+/, "");
 
   // Un celular sin sesión ve la entrada de siempre, que avisa que la computadora entra también.
-  const sinSesion = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  const sinSesion = await otraVentana(browser, { viewport: { width: 390, height: 844 } });
   await sinSesion.goto(ruta);
   await expect(sinSesion.getByTestId("entrar-para-la-compu")).toContainText("esa computadora entra también");
   await expect(compu.getByTestId("qr-entrar")).toBeVisible(); // nadie entró todavía
+  await sinSesion.context().close();
 
   // Un celular que ya tenía la sesión: un toque, y la computadora entra sola con ese usuario.
-  const celular = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  const celular = await otraVentana(browser, { viewport: { width: 390, height: 844 } });
   await celular.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
   await celular.goto(ruta);
   await celular.getByTestId("dejar-entrar").click();
@@ -169,7 +173,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   await expect(compu.getByTestId("foto-comprobante")).toContainText("cargada", { timeout: 15000 });
 
   // El código sirve una sola vez.
-  const otro = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  const otro = await otraVentana(browser, { viewport: { width: 390, height: 844 } });
   await otro.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
   await otro.goto(ruta);
   await otro.getByTestId("dejar-entrar").click();
@@ -183,7 +187,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
 // @tiempo: decodificar el código del video depende de la carga de la máquina; corre al final, sin
 // la otra interfaz a la vez (tests/e2e.sh). Con todo corriendo junto no llegaba a leerlo.
 test("C5 la cámara del celular lee el código que muestra la computadora y lleva a dejarla entrar", { tag: "@tiempo" }, async ({ browser, page }) => {
-  const compu = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
+  const compu = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   await compu.goto("/");
   const qr = compu.getByTestId("qr-entrar").locator("img");
   await expect(qr).toBeVisible();

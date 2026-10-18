@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
+import { cerrarLasOtrasVentanas, otraVentana, otroContexto } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
 const { psql } = stack("celular");
@@ -47,11 +48,13 @@ test.beforeAll(() => {
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '${ID_MECHA}', '${ID_PROV}', 'ME8', 1000, '[]', 1000, 0.21, '2026-08-01')`);
 });
 
+test.afterEach(cerrarLasOtrasVentanas);
+
 test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y desvincular", async ({ browser }) => {
   // Es un recorrido largo, con tres ventanas: necesita más que los 30 segundos de siempre.
   test.setTimeout(90_000);
   const abrir = async (ancho: number, alto: number, token: string, ruta: string) => {
-    const pagina = await (await browser.newContext({ viewport: { width: ancho, height: alto } })).newPage();
+    const pagina = await otraVentana(browser, { viewport: { width: ancho, height: alto } });
     await pagina.addInitScript((t) => localStorage.setItem("ferre.sesion", t), token);
     await pagina.goto(ruta);
     return pagina;
@@ -202,7 +205,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   const TOKEN_COMPU_2 = `${TOKEN_COMPU}-de-nuevo`;
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(TOKEN_COMPU_2)}', 'e2e compu de nuevo', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   const enEsteDispositivo = async (token: string) => {
-    const contexto = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+    const contexto = await otroContexto(browser, { viewport: { width: 1366, height: 768 } });
     await contexto.addInitScript(([t, d]) => { localStorage.setItem("ferre.sesion", t!); localStorage.setItem("ferre.dispositivo", d!); }, [token, dispositivo!]);
     const pagina = await contexto.newPage();
     await pagina.goto("/#/stock");
