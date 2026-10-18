@@ -100,6 +100,12 @@ export const vinculosDeLaSesion = (sesionId: string) => pool.query<{ id: string;
 export const guardarDiasDeVinculo = (dias: number) => pool.query(
   "INSERT INTO configuracion (clave, valor) VALUES ('vinculo.dias', $1) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor, actualizado_en = now()", [String(dias)]);
 
+// Los emparejamientos vigentes de una computadora (por su sesión).
+export async function puestosDeLaComputadora(sesionId: string): Promise<string[]> {
+  const { rows } = await pool.query<{ id: string }>("SELECT id FROM puesto WHERE sesion_id = $1 AND vinculado_en IS NOT NULL AND expira_en > now()", [sesionId]);
+  return rows.map((r) => r.id);
+}
+
 export async function esComputadoraVinculada(puestoId: string, sesionId: string): Promise<boolean> {
   const { rows } = await pool.query("SELECT id FROM puesto WHERE id = $1 AND sesion_id = $2 AND vinculado_en IS NOT NULL AND expira_en > now()", [puestoId, sesionId]);
   return Boolean(rows[0]);

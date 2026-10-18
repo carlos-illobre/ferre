@@ -218,6 +218,7 @@ export async function cambiarDiasDelVinculo(dias: number, actorId: string): Prom
 
 export const computadorasDelCelular = (sesionId: string) => computadorasDe(pool, sesionId);
 export const esComputadoraVinculada = datos.esComputadoraVinculada;
+export const puestosDeLaComputadora = datos.puestosDeLaComputadora;
 export const ladoEnElPuesto = datos.ladoEnElPuesto;
 
 export async function soltar(puestoId: string, sesion: SesionActiva): Promise<boolean> {

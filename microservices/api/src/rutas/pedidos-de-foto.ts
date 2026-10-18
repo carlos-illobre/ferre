@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { exigirSesion } from "../autenticacion.js";
-import { computadorasDelCelular } from "../acceso/reglas.js";
+import { computadorasDelCelular, puestosDeLaComputadora } from "../acceso/reglas.js";
+import { avisarPedidoAlCelular } from "../acceso/espejo.js";
 import * as fotos from "../acceso/fotos.js";
 import type { FotoRecibida } from "../contratos/pedidos-de-foto.js";
 import { pedidoDeFotoNuevo } from "../acceso/esquemas.js";
@@ -16,7 +17,10 @@ export const fotosQueEsperan = fotos.queEsperan;
 pedidosDeFoto.post("/", async (c) => {
   const cuerpo = await leerCuerpo(c, pedidoDeFotoNuevo);
   if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
-  return c.json(fotos.pedir(cuerpo.datos.para, c.get("sesion").id), 201);
+  const pedido = fotos.pedir(cuerpo.datos.para, c.get("sesion").id);
+  // Al celular emparejado le aparece el aviso en el momento (decisión 112).
+  for (const id of await puestosDeLaComputadora(c.get("sesion").id)) avisarPedidoAlCelular(id);
+  return c.json(pedido, 201);
 });
 
 // El celular emparejado (decisión 58) pregunta si su computadora está esperando alguna foto:

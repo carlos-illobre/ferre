@@ -30,6 +30,8 @@ function poner(cambios: Partial<EstadoDelEspejo>) { estado = { ...estado, ...cam
 const suscriptos: Record<Tipo, Set<(datos: unknown) => void>> = { ir: new Set(), venta: new Set(), ingreso: new Set(), pedido: new Set(), "pedido-renglones": new Set() };
 // Los avisos de algo que terminó del otro lado («venta cobrada»): pasan y no se guardan.
 const oyentesDeAvisos = new Set<(texto: string) => void>();
+// En el celular: la computadora le pidió que haga de lector o una foto, y hay que preguntar qué es.
+const oyentesDePedidos = new Set<() => void>();
 // Cada pantalla que espeja algo sabe contarlo; devuelve si tenía algo para contar.
 const alReanudar = new Map<() => boolean, Tipo>();
 const reanudar = (solo?: Tipo) => { let conto = false; alReanudar.forEach((tipo, f) => { if (!solo || tipo === solo) conto = f() || conto; }); return conto; };
@@ -98,6 +100,8 @@ function conectar() {
         if (reanuda && lado === "computadora") reanudar();
       } else if (evento === "desvinculado") { guardarPuestoLocal(null); guardarPuestoRemoto(null); return "cortar"; }
       else if (evento === "aviso") { if (!estado.pausado) oyentesDeAvisos.forEach((o) => o(String(datos ?? ""))); }
+      // La computadora le pidió algo a este celular (decisión 112): con o sin pausa, porque no es trabajo espejado.
+      else if (evento === "pedidos") oyentesDePedidos.forEach((o) => o());
       else if (evento === "ir" || DOCUMENTOS.includes(evento as Tipo)) entregar(evento as Tipo, datos);
       return;
     },
@@ -124,6 +128,11 @@ export function contarAlEspejo(texto: string): void {
   if (!puestoId || !enEspejo()) return;
   api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "aviso", datos: texto } satisfies CambioEnEspejo) }).catch(() => undefined);
 }
+export function alPedidoDeLaCompu(oyente: () => void): () => void {
+  oyentesDePedidos.add(oyente);
+  return () => { oyentesDePedidos.delete(oyente); };
+}
+
 export function alAvisoDelEspejo(oyente: (texto: string) => void): () => void {
   oyentesDeAvisos.add(oyente);
   if (avisoPendiente && avisoPendiente.hasta > Date.now()) oyente(avisoPendiente.texto);

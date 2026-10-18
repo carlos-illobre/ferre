@@ -94,6 +94,24 @@ describe("emparejamiento", () => {
     expect(((await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()) as { lector: boolean }).lector).toBe(false);
   });
 
+  // Decisión 112: lo que la computadora pide le aparece al celular en el momento, por su espejo.
+  it("002-E18d al pedir el lector o una foto, al celular emparejado le llega «pedidos» por el espejo", async () => {
+    base.actual.programar(/SELECT sesion_id, celular_sesion_id FROM puesto WHERE id = \$1/, (params) => ({ rows: params[1] === "sesion-admin" || params[1] === "sesion-mostrador" ? [{ sesion_id: "sesion-admin", celular_sesion_id: "sesion-mostrador" }] : [] }));
+    base.actual.programar(/SELECT id FROM puesto WHERE id = \$1 AND sesion_id = \$2 AND vinculado_en IS NOT NULL/, { rows: [{ id: "espejo-2" }] });
+    base.actual.programar(/SELECT id FROM puesto WHERE sesion_id = \$1 AND vinculado_en IS NOT NULL/, (params) => ({ rows: params[0] === "sesion-admin" ? [{ id: "espejo-2" }] : [] }));
+    const flujo = await pedir(app, "GET", "/puestos/espejo-2/espejo", { rol: "mostrador" });
+    const lector = flujo.body!.getReader();
+    let recibido = "";
+    const hasta = async (texto: string) => { for (let i = 0; i < 6 && !recibido.includes(texto); i++) recibido += new TextDecoder().decode((await lector.read()).value); return recibido; };
+    await hasta("event: estado");
+    expect((await pedir(app, "POST", "/puestos/espejo-2/lector", { rol: "admin" })).status).toBe(204);
+    expect(await hasta("event: pedidos")).toContain("event: pedidos");
+    recibido = "";
+    expect((await pedir(app, "POST", "/pedidos-de-foto", { rol: "admin", cuerpo: { para: "la factura del ingreso" } })).status).toBe(201);
+    expect(await hasta("event: pedidos")).toContain("event: pedidos");
+    await lector.cancel();
+  });
+
   // Decisión 60: el espejo.
   it("solo se emparejan dos sesiones del mismo usuario", async () => {
     base.actual.programar(/SELECT s\.usuario_id FROM puesto p JOIN sesion s/, { rows: [{ usuario_id: "u-admin" }] });

@@ -54,6 +54,11 @@ export function cerrar(puestoId: string) {
   espejos.delete(puestoId);
 }
 
+// La computadora le pidió algo al celular (que haga de lector, una foto): se le avisa en el
+// momento por su espejo, y el celular pregunta qué es (decisión 112). Si no está escuchando, lo
+// ve la próxima vez que pregunte.
+export function avisarPedidoAlCelular(puestoId: string) { espejos.get(puestoId)?.oyentes.celular.forEach((o) => o("pedidos", null)); }
+
 // ---------- Códigos escaneados hacia la computadora ----------
 export type Codigo = { id: string; codigo: string; creado_en: string };
 const oyentesDeCodigos = new Map<string, Set<(c: Codigo) => void>>();

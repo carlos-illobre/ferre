@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../puesto";
+import { alPedidoDeLaCompu } from "../espejo";
 import "./pedidos-de-la-compu.css";
 import type { AvisosParaElCelular } from "@servidor/puestos";
 import type { FotoQueEspera } from "@servidor/pedidos-de-foto";
 
 // En el celular emparejado (decisiones 58 y 59): cuando la computadora pide una foto (la
 // factura de un ingreso, un producto, la captura de un ticket) o que el celular haga de lector
-// de códigos de barras, acá aparece un aviso con un botón que abre la cámara. No hay que leer ningún código. Se pregunta cada pocos segundos, solo con el
-// celular emparejado y la aplicación a la vista.
+// de códigos de barras, acá aparece un aviso con un botón que abre la cámara. No hay que leer ningún código. El servidor avisa
+// por el espejo en el momento en que la computadora pide algo, y acá se pregunta qué es (decisión 112). Además se pregunta
+// cada pocos segundos, solo con el celular emparejado y la aplicación a la vista, por si esa conexión se cortó.
 const CADA_MS = 3000;
 type Pedido = FotoQueEspera;
 
@@ -31,8 +33,9 @@ export function PedidosDeLaCompu({ alSacar, alLeer }: { alSacar: (codigo: string
     };
     preguntar();
     const reloj = setInterval(preguntar, CADA_MS);
+    const dejar = alPedidoDeLaCompu(preguntar);
     document.addEventListener("visibilitychange", preguntar);
-    return () => { vigente = false; clearInterval(reloj); document.removeEventListener("visibilitychange", preguntar); };
+    return () => { vigente = false; clearInterval(reloj); dejar(); document.removeEventListener("visibilitychange", preguntar); };
   }, [emparejado]);
   const atendido = () => { setLector(false); api("/puestos/avisos/lector", { method: "DELETE" }).catch(() => undefined); };
   if (lector) {

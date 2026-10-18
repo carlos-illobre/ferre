@@ -43,6 +43,7 @@ puestos.post("/:id/lector", async (c) => {
   const sesionId = c.get("sesion").id;
   if (!(await reglas.esComputadoraVinculada(c.req.param("id"), sesionId))) return c.json({ error: "Esta computadora no tiene un celular emparejado" }, 404);
   espejo.pedirLector(sesionId);
+  espejo.avisarPedidoAlCelular(c.req.param("id"));
   return c.body(null, 204);
 });
 

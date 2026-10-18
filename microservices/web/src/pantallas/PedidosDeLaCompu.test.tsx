@@ -4,6 +4,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+const pedidosDelEspejo = vi.hoisted(() => new Set<() => void>());
+vi.mock("../espejo", async (original) => ({ ...(await original<typeof import("../espejo")>()), alPedidoDeLaCompu: (o: () => void) => { pedidosDelEspejo.add(o); return () => pedidosDelEspejo.delete(o); } }));
 import { guardarPuestoRemoto } from "../puesto";
 import { PedidosDeLaCompu } from "./PedidosDeLaCompu";
 
@@ -28,6 +30,21 @@ describe("la computadora pide una foto al celular emparejado", () => {
     expect(apiFalsa).toHaveBeenCalledWith("/puestos/avisos");
     fireEvent.click(screen.getByTestId("sacar-foto-para-la-compu"));
     expect(alSacar).toHaveBeenCalledWith("c-1");
+  });
+
+  // Decisión 112: el aviso del espejo hace preguntar en el momento, sin esperar la próxima vuelta.
+  it("002-E18d emparejado: cuando el espejo avisa que la computadora pidió algo, pregunta en el momento", async () => {
+    guardarPuestoRemoto({ id: "p1", nombre: "computadora", expira_en: "2099-01-01T00:00:00Z" });
+    apiFalsa.mockResolvedValue({ lector: false, fotos: [] });
+    const { unmount } = render(<PedidosDeLaCompu alSacar={vi.fn()} alLeer={vi.fn()} />);
+    await unInstante();
+    expect(apiFalsa).toHaveBeenCalledTimes(1);
+    apiFalsa.mockResolvedValue({ lector: true, fotos: [] });
+    await act(async () => { pedidosDelEspejo.forEach((o) => o()); });
+    expect(await screen.findByTestId("lector-para-la-compu")).toBeTruthy();
+    expect(apiFalsa).toHaveBeenCalledTimes(2);
+    unmount();
+    expect(pedidosDelEspejo.size).toBe(0);
   });
 
   it("«Ahora no» lo saca de la vista, y el emparejamiento que llega después empieza a preguntar", async () => {

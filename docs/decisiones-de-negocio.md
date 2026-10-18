@@ -879,3 +879,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      «Ver todas» ni imprimir. Hoy se compara con lo vendido ayer hasta la misma hora; un día
      anterior, entero contra el suyo. Las ventas de otros días las ve cualquiera con «Ver las
      ventas del día» (`specs/017-ventas-de-hoy/`).
+112. **Lo que la computadora le pide al celular emparejado le aparece en el momento**
+     (2026-10-18). Antes el celular preguntaba cada 3 segundos y el aviso «La computadora
+     quiere escanear» o «La computadora pide una foto» tardaba hasta ese tiempo. Ahora el
+     servidor se lo avisa por la conexión del espejo, que el celular ya tiene abierta; la
+     pregunta cada 3 segundos queda solo para cuando esa conexión se cortó
+     (`specs/002-catalogo-y-precios/`, escenario 18d).
