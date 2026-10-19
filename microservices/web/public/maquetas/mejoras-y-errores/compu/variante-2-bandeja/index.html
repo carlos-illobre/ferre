@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../mye.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .cabecera { padding-bottom: 0; }
   .migas { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
@@ -52,11 +54,11 @@
 <div class="app plegado">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
     <div class="pie">
       <div class="vinculo" style="padding:12px;justify-content:center"><i class="i" data-i="smartphone"></i><div class="txt">x</div></div>
       <div class="usuario" style="padding:0;justify-content:center"><span class="avatar">CI</span><div class="txt">x</div></div>
@@ -65,7 +67,7 @@
   <main class="contenido">
     <header class="cabecera">
       <div>
-        <div class="migas">Más <i class="i i-s" data-i="chevron-right"></i></div>
+        <div class="migas" data-mas>Más <i class="i i-s" data-i="chevron-right"></i></div>
         <div class="t-titulo">Mejoras y errores</div>
       </div>
       <div class="acciones">
@@ -80,27 +82,27 @@
         <div class="campo"><i class="i" data-i="search"></i>Buscar en los tickets <span class="kbd" style="margin-left:auto">/</span></div>
         <div class="segmentos"><button class="elegido">Abiertos 7</button><button>Resueltos 23</button><button>Míos 3</button></div>
         <div class="lista">
-          <div class="tk elegido">
+          <div class="tk elegido" data-id="t1">
             <span class="tipo error"><i class="i" data-i="bug"></i></span>
             <div><div class="texto">Los tarugos nylon S8 me salen sin precio aunque Fischer mandó la lista nueva ayer</div>
               <div class="pie"><span class="av">RB</span><span class="t-detalle">Rosa · hace 12 min</span><span class="cuenta"><i class="i i-s" data-i="image"></i>2</span><span class="cuenta"><i class="i i-s" data-i="thumbs-up"></i>2</span></div></div>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t2">
             <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
             <div><div class="texto">Al cobrar con Mercado Pago, que el QR salga grande para girar el monitor hacia el cliente</div>
               <div class="pie"><span class="av">MG</span><span class="t-detalle">Martín · hoy 9:40</span><span class="cuenta"><i class="i i-s" data-i="image"></i>1</span></div></div>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t3">
             <span class="tipo error"><i class="i" data-i="bug"></i></span>
             <div><div class="texto">En el celular, el botón Cobrar queda tapado por el teclado cuando busco un producto</div>
               <div class="pie"><span class="av c">CI</span><span class="t-detalle">Vos · ayer 18:05</span><span class="cuenta"><i class="i i-s" data-i="image"></i>3</span><span class="cuenta"><i class="i i-s" data-i="thumbs-up"></i>1</span></div></div>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t4">
             <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
             <div><div class="texto">Poder vender por metro la cadena y la soga, no solo por unidad</div>
               <div class="pie"><span class="av">JF</span><span class="t-detalle">Julián · ayer 11:20</span></div></div>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t5">
             <span class="tipo error"><i class="i" data-i="bug"></i></span>
             <div><div class="texto">Al contar el depósito, la balanza no toma los kilos de los clavos</div>
               <div class="pie"><span class="av">RB</span><span class="t-detalle">Rosa · lunes</span></div></div>
@@ -128,8 +130,8 @@
           <div class="galeria">
             <div class="grande"><img src="../../imagenes/cap-vender-celu.webp" alt="" style="object-position:50% 54%"><span class="marca-roja"></span><span class="pastilla" style="position:absolute;left:12px;top:12px;background:var(--superficie);box-shadow:var(--sombra-1)"><i class="i i-s" data-i="pen-line"></i>Marcada por Rosa</span><span class="btn chico ampliar"><i class="i i-s" data-i="maximize-2"></i>Ver en grande <span class="kbd">Espacio</span></span></div>
             <div class="tira">
-              <div class="mini sel"><img src="../../imagenes/cap-vender-celu.webp" alt="" style="object-position:0 50%"></div>
-              <div class="mini producto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+              <div class="mini sel" data-k="0"><img src="../../imagenes/cap-vender-celu.webp" alt="" style="object-position:0 50%"></div>
+              <div class="mini producto" data-k="1"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
             </div>
           </div>
           <div class="hilo">
@@ -137,16 +139,228 @@
             <div class="ev"><span class="av">RB</span><div><b>Rosa</b> lo abrió desde el celular<div class="burbuja">La caja dice $4.150 de costo. Saqué foto de la etiqueta.</div></div></div>
             <div class="ev"><span class="av">MG</span><div><b>Martín</b> · 10:52<div class="burbuja">Me pasó lo mismo con los S10.</div></div></div>
             <div class="tambien"><span class="av">JF</span><span class="t-detalle"><b style="color:var(--tinta)">Julián</b> también lo vio</span></div>
-            <button class="btn chico btn-suave" style="justify-self:start;align-self:flex-start"><i class="i i-s" data-i="thumbs-up"></i>A mí también</button>
+            <button class="btn chico btn-suave" data-tambien style="justify-self:start;align-self:flex-start"><i class="i i-s" data-i="thumbs-up"></i>A mí también</button>
           </div>
         </div>
         <div class="resolver">
           <div class="campo foco"><i class="i" data-i="message-square"></i><span class="t-etiqueta" style="white-space:nowrap">Nota:</span><span class="escrito" style="white-space:nowrap">cargué la lista de Fischer del 18/10</span><span class="cursor"></span></div>
-          <button class="btn btn-accion"><i class="i" data-i="check"></i>Marcar resuelto <span class="kbd">E</span></button>
+          <button class="btn btn-accion" data-resolver><i class="i" data-i="check"></i>Marcar resuelto <span class="kbd">E</span></button>
         </div>
       </div>
     </section>
   </main>
 </div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Compu 2 · La bandeja: la lista a la izquierda, el ticket elegido a la derecha. */
+document.addEventListener("DOMContentLoaded", function () {
+  var M = MYE, IMG = M.IMG;
+  var lista = document.querySelector(".col .lista");
+  var seg = document.querySelectorAll(".col .segmentos > button");
+  var det = document.querySelector(".detalle");
+  var cnt = { abierto: 7, resuelto: 23, mios: 3 };
+  var vista = "abierto", elegido = "t1", busqueda = "";
+
+  function plano(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function visibles() {
+    return M.TICKETS.filter(function (t) {
+      var ok = vista === "mios" ? t.mio : t.estado === vista;
+      return ok && (!busqueda || plano(t.texto + " " + t.autor).indexOf(plano(busqueda)) >= 0);
+    });
+  }
+  function tkHTML(t) {
+    var pie = '<span class="av' + (t.mio ? " c" : "") + '">' + t.ini + '</span><span class="t-detalle">' + t.corto + " · " + t.cuando + "</span>";
+    if (t.fotos.length) pie += '<span class="cuenta"><i class="i i-s" data-i="image"></i>' + t.fotos.length + "</span>";
+    if (t.tambien.length) pie += '<span class="cuenta"><i class="i i-s" data-i="thumbs-up"></i>' + t.tambien.length + "</span>";
+    if (t.estado === "resuelto") pie += '<span class="cuenta" style="color:var(--logro-texto)"><i class="i i-s" data-i="circle-check"></i></span>';
+    return '<div class="tk' + (t.id === elegido ? " elegido" : "") + '" data-id="' + t.id + '"><span class="tipo ' + t.tipo + '"><i class="i" data-i="' + (t.tipo === "idea" ? "lightbulb" : "bug") + '"></i></span>' +
+      '<div><div class="texto">' + M.esc(t.texto) + '</div><div class="pie">' + pie + "</div></div></div>";
+  }
+  function render(nuevoId) {
+    lista.innerHTML = "";
+    visibles().forEach(function (t) { var el = M.h(tkHTML(t)); lista.appendChild(el); if (t.id === nuevoId) M.entrar(el); });
+    if (!lista.children.length) lista.appendChild(M.h('<div class="aviso pino"><i class="i" data-i="search"></i><span>' + (busqueda ? "Nada con «" + M.esc(busqueda) + "»." : "No hay tickets acá.") + "</span></div>"));
+  }
+  function marcar() { lista.querySelectorAll(".tk").forEach(function (x) { x.classList.toggle("elegido", x.dataset.id === elegido); }); }
+
+  // ---------- Detalle ----------
+  function detalleHTML(t) {
+    var f0 = t.fotos[0];
+    var galeria = f0
+      ? '<div class="grande"><img src="' + f0.src + '" alt="" style="' + (f0.producto ? "object-fit:contain;padding:24px" : "object-position:" + (f0.pos || "50% 30%")) + '">' +
+        (f0.marcada ? '<span class="marca-roja"></span><span class="pastilla" style="position:absolute;left:12px;top:12px;background:var(--superficie);box-shadow:var(--sombra-1)"><i class="i i-s" data-i="pen-line"></i>Marcada por ' + t.corto + "</span>" : "") +
+        '<span class="btn chico ampliar"><i class="i i-s" data-i="maximize-2"></i>Ver en grande <span class="kbd">Espacio</span></span></div>' +
+        '<div class="tira">' + t.fotos.map(function (f, k) { return '<div class="mini' + (f.producto ? " producto" : "") + (k ? "" : " sel") + '" data-k="' + k + '"><img src="' + f.src + '" alt=""></div>'; }).join("") + "</div>"
+      : '<div class="grande" style="cursor:default"><div style="display:grid;justify-items:center;gap:8px;color:var(--texto-3)"><i class="i i-xl" data-i="image"></i><span class="t-detalle">Sin fotos ni capturas</span></div></div><div class="tira"></div>';
+    var hilo = '<div class="t-etiqueta">Lo que pasó</div>' + t.charla.map(function (e) {
+      return '<div class="ev"><span class="av' + (e.ini === "CI" ? " c" : "") + '">' + e.ini + "</span><div><b>" + e.quien + "</b> " + (/^\d/.test(e.hora) ? "· " : "") + e.hora + (e.texto ? '<div class="burbuja">' + M.esc(e.texto) + "</div>" : "") + "</div></div>";
+    }).join("");
+    if (t.estado === "resuelto") hilo += '<div class="ev"><span class="av c">CI</span><div><b>' + (t.resolvio || "Carlos") + "</b> lo resolvió " + (t.cuandoRes || "recién") + (t.nota ? '<div class="burbuja">' + M.esc(t.nota) + "</div>" : "") + "</div></div>";
+    hilo += '<div class="tambien"><span class="t-detalle">' + M.tambienTxt(t) + "</span></div>";
+    if (!t.mio) hilo += '<button class="btn chico btn-suave" data-tambien style="justify-self:start;align-self:flex-start' + (t.yoTambien ? ";background:var(--pino-suave);color:var(--pino-texto)" : "") + '"><i class="i i-s" data-i="thumbs-up"></i>A mí también</button>';
+    var pie = t.estado === "resuelto"
+      ? '<div class="aviso logro" style="flex:1"><i class="i" data-i="circle-check"></i><span>Resuelto' + (t.nota ? ": " + M.esc(t.nota) : "") + '</span></div><button class="btn" data-reabrir><i class="i" data-i="rotate-ccw"></i>Reabrir</button>'
+      : '<div class="campo"><i class="i" data-i="message-square"></i><span class="t-etiqueta" style="white-space:nowrap">Nota:</span><span class="escrito" style="white-space:nowrap;flex:1" data-ayuda="qué hiciste (opcional)"></span></div><button class="btn btn-accion" data-resolver><i class="i" data-i="check"></i>Marcar resuelto <span class="kbd">E</span></button>';
+    return '<div class="d-cab"><span class="tipo ' + t.tipo + ' grande"><i class="i i-l" data-i="' + (t.tipo === "idea" ? "lightbulb" : "bug") + '"></i></span><div><h2>' + M.esc(t.texto) + '</h2><div class="metas">' + M.metas(t) + "</div></div>" +
+      (t.estado === "resuelto" ? '<span class="pastilla logro"><i class="i i-s" data-i="circle-check"></i>Resuelto</span>' : '<span class="pastilla pino"><span class="punto"></span>Abierto</span>') + "</div>" +
+      '<div class="d-cuerpo"><div class="galeria">' + galeria + '</div><div class="hilo">' + hilo + "</div></div>" +
+      '<div class="resolver">' + pie + "</div>";
+  }
+  function preparar() {
+    var nota = det.querySelector(".resolver .escrito");
+    if (nota) {
+      M.editable(nota, { unaLinea: true, alEnter: function () { resolver(); } });
+      nota.addEventListener("focus", function () { var c = det.querySelector(".resolver .cursor"); if (c) c.remove(); nota.parentNode.classList.add("foco"); });
+      nota.addEventListener("blur", function () { if (!nota.textContent.trim()) nota.parentNode.classList.remove("foco"); });
+    }
+  }
+  function mostrar(id, animado) {
+    var t = M.ticket(id); if (!t) return;
+    elegido = id; marcar();
+    det.innerHTML = ""; det.appendChild(M.h("<div>" + detalleHTML(t) + "</div>"));
+    var envoltorio = det.firstChild; while (envoltorio.firstChild) det.appendChild(envoltorio.firstChild); envoltorio.remove();
+    preparar();
+    if (animado !== false) M.animar(det, "ix-funde", 220);
+    var el = lista.querySelector('[data-id="' + id + '"]'); if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
+  }
+  preparar();
+  var actual = 0;
+  det.addEventListener("click", function (e) {
+    var t = M.ticket(elegido); if (!t) return;
+    var m = e.target.closest(".tira .mini");
+    if (m) {
+      actual = +m.dataset.k; var f = t.fotos[actual];
+      det.querySelectorAll(".tira .mini").forEach(function (x) { x.classList.toggle("sel", x === m); });
+      var g = det.querySelector(".galeria .grande"), im = g.querySelector("img");
+      im.src = f.src; im.style.objectFit = f.producto ? "contain" : ""; im.style.padding = f.producto ? "24px" : ""; im.style.objectPosition = f.producto ? "" : (f.pos || "50% 30%");
+      g.querySelectorAll(".marca-roja, .pastilla").forEach(function (x) { x.style.opacity = actual === 0 && f.marcada ? "" : "0"; });
+      M.animar(im, "ix-funde", 220); return;
+    }
+    if (e.target.closest(".galeria .grande") && t.fotos.length) { M.verFotos(t.fotos, actual, det.querySelector(".galeria .grande img")); return; }
+    if (e.target.closest("[data-tambien]")) { tambien(); return; }
+    if (e.target.closest("[data-resolver]")) { resolver(); return; }
+    if (e.target.closest("[data-reabrir]")) { reabrir(t); }
+  });
+  function tambien() {
+    var t = M.ticket(elegido);
+    t.yoTambien = !t.yoTambien;
+    if (t.yoTambien) t.tambien.push("vos"); else t.tambien = t.tambien.filter(function (x) { return x !== "vos"; });
+    var b = det.querySelector("[data-tambien]");
+    b.style.background = t.yoTambien ? "var(--pino-suave)" : ""; b.style.color = t.yoTambien ? "var(--pino-texto)" : "";
+    M.animar(b, "ix-tilde", 300);
+    var tx = det.querySelector(".tambien .t-detalle"); tx.innerHTML = M.tambienTxt(t); M.animar(tx, "ix-funde", 220);
+    var el = lista.querySelector('[data-id="' + t.id + '"]');
+    if (el) { var nuevo = M.h(tkHTML(t)); el.replaceWith(nuevo); }
+  }
+  function resolver() {
+    var t = M.ticket(elegido); if (!t || t.estado === "resuelto") return;
+    var nota = det.querySelector(".resolver .escrito"); var nt = nota ? M.texto(nota) : "";
+    if (nota && nota.textContent.trim() && det.querySelector(".resolver .cursor") && !nota.isContentEditable) nt = nota.textContent.trim();
+    t.estado = "resuelto"; t.nota = nt; t.resolvio = "Carlos"; t.cuandoRes = "recién";
+    M.vibrar([10, 40, 10]);
+    var el = lista.querySelector('[data-id="' + t.id + '"]');
+    var sig = el && (el.nextElementSibling || el.previousElementSibling);
+    var b = det.querySelector("[data-resolver]"); if (b) { b.innerHTML = '<i class="i" data-i="check"></i>Resuelto'; window.pintarIconos(b); M.animar(b.firstChild, "ix-tilde", 300); }
+    if (el) {
+      var tipo = el.querySelector(".tipo"); tipo.className = "tipo"; tipo.style.background = "var(--logro-suave)"; tipo.style.color = "var(--logro-texto)";
+      tipo.innerHTML = '<i class="i" data-i="check"></i>'; window.pintarIconos(tipo); M.animar(tipo, "ix-tilde", 300);
+    }
+    cnt.abierto--; cnt.resuelto++;
+    M.rodar(M.numero(seg[0]), cnt.abierto); M.rodar(M.numero(seg[1]), cnt.resuelto);
+    setTimeout(function () {
+      if (el && vista === "abierto") M.sacarDeLista(el, function () { if (sig && sig.dataset.id) mostrar(sig.dataset.id); else mostrar(t.id); });
+      else { render(); mostrar(t.id); }
+    }, 320);
+    M.tostada("Resuelto · le avisamos a " + (t.mio ? "todos" : t.corto), { deshacer: function () { reabrir(t, true); } });
+  }
+  function reabrir(t, callado) {
+    t.estado = "abierto"; cnt.abierto++; cnt.resuelto--;
+    M.rodar(M.numero(seg[0]), cnt.abierto); M.rodar(M.numero(seg[1]), cnt.resuelto);
+    render(vista === "abierto" ? t.id : null); mostrar(t.id);
+    if (!callado) M.tostada("Reabierto", { icono: "rotate-ccw" });
+  }
+
+  lista.addEventListener("click", function (e) { var el = e.target.closest(".tk"); if (el) mostrar(el.dataset.id); });
+  seg.forEach(function (b, k) {
+    b.addEventListener("click", function () {
+      if (!M.elegir(b, "elegido")) return;
+      vista = ["abierto", "resuelto", "mios"][k]; render();
+      var v = visibles(); if (v.length && !v.some(function (t) { return t.id === elegido; })) mostrar(v[0].id); else marcar();
+    });
+  });
+
+  // ---------- Buscar ----------
+  var campo = document.querySelector(".col .campo");
+  var buscar = document.createElement("span"); buscar.style.flex = "1";
+  campo.childNodes.forEach(function (n) { if (n.nodeType === 3 && n.textContent.trim()) { buscar.textContent = n.textContent.trim(); campo.replaceChild(buscar, n); } });
+  campo.insertBefore(document.createTextNode(" "), buscar.nextSibling);
+  M.editable(buscar, { unaLinea: true, ayuda: "Buscar en los tickets", alEscribir: function (v) { busqueda = v.trim(); render(); } });
+  buscar.setAttribute("data-ejemplo", "");
+  buscar.addEventListener("focus", function () { campo.classList.add("foco"); });
+  buscar.addEventListener("blur", function () { if (!buscar.textContent.trim()) { campo.classList.remove("foco"); buscar.textContent = "Buscar en los tickets"; buscar.setAttribute("data-ejemplo", ""); } });
+  campo.addEventListener("click", function () { if (document.activeElement !== buscar) M.enfocar(buscar); });
+
+  // ---------- Nuevo (N o F1) ----------
+  function nuevo() {
+    if (M.hayCapa()) return;
+    var c = M.capa("ix-dialogo",
+      '<div class="ix-cab"><span class="t-seccion">Nuevo aviso</span><span class="t-detalle">Lo ven todos los de la ferretería</span><button class="btn btn-icono chico btn-fantasma" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div>' +
+      '<div class="ix-cuerpo">' +
+        '<div class="eleccion"><button class="elegida"><i class="i i-l" data-i="lightbulb"></i><span>Tengo una idea<small>Algo que falta</small></span></button><button><i class="i i-l" data-i="bug"></i><span>Encontré un error<small>Algo que no anda</small></span></button></div>' +
+        '<div class="caja foco" style="min-height:120px" data-foco></div>' +
+        '<div><div style="display:flex;justify-content:space-between"><span class="t-etiqueta">Fotos o capturas</span><span class="t-detalle" data-cuantas>0 de 5 · Ctrl V pega</span></div>' +
+        '<div class="minis" style="margin-top:8px"><button class="agregar"><i class="i" data-i="clipboard-paste"></i>Pegar</button></div></div>' +
+        '<div class="ix-metas"><span class="pastilla contorno"><span class="av c" style="width:20px;height:20px">C</span>Carlos Illobre</span><span class="pastilla contorno"><i class="i i-s" data-i="monitor"></i>Compu del mostrador</span><span class="pastilla contorno">Versión 5.3.2</span></div>' +
+      "</div>" +
+      '<div class="ix-pie"><span style="flex:1"></span><button class="btn btn-fantasma" data-cerrar>Cancelar <span class="kbd">Esc</span></button><button class="btn btn-accion" data-enviar><i class="i" data-i="send"></i><span>Enviar idea</span> <span class="kbd">Ctrl Enter</span></button></div>');
+    var caja = M.editable(c.querySelector(".caja"), { ayuda: "Contá qué falta o qué no anda" });
+    var tipo = "idea", et = c.querySelector("[data-enviar] span");
+    c.querySelectorAll(".eleccion > button").forEach(function (b, k) { b.addEventListener("click", function () { if (M.elegir(b)) { tipo = k ? "error" : "idea"; M.fundir(et, k ? "Enviar error" : "Enviar idea"); M.enfocar(caja); } }); });
+    var cuantas = c.querySelector("[data-cuantas]"), pegar = c.querySelector(".agregar");
+    var fotos = M.fotos({ contenedor: c.querySelector(".minis"), antes: pegar, botones: [pegar], contador: function (n, r) { cuantas.innerHTML = '<span class="ix-n">' + n + "</span> de 5 · Ctrl V pega"; if (r) M.animar(cuantas.firstChild, "ix-sube", 220); } });
+    pegar.addEventListener("click", function () { fotos.agregar(M.siguiente(M.CAPTURAS_COMPU), false, pegar); });
+    function teclas(e) {
+      if (!c.isConnected) return document.removeEventListener("keydown", teclas);
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); enviar(); }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v" && document.activeElement !== caja) { e.preventDefault(); pegar.click(); }
+    }
+    document.addEventListener("keydown", teclas);
+    function enviar() {
+      var txt = M.texto(caja);
+      if (!txt) { M.sacudir(caja); M.enfocar(caja); return; }
+      var t = { id: "n" + Date.now(), tipo: tipo, texto: txt, autor: "Carlos Illobre", corto: "Vos", ini: "CI", cuando: "recién", hora: "Hoy 10:42", disp: "Compu del mostrador", version: "5.3.2",
+        pantalla: "Mejoras y errores", icoPantalla: "lightbulb", fotos: fotos.lista(), charla: [{ ini: "CI", quien: "Vos", hora: "lo abriste recién" }], tambien: [], estado: "abierto", mio: true };
+      M.TICKETS.unshift(t); cnt.abierto++; cnt.mios++;
+      M.cerrar(c);
+      if (vista === "resuelto") { seg[0].classList.add("elegido"); seg[1].classList.remove("elegido"); vista = "abierto"; }
+      busqueda = ""; elegido = t.id; render(t.id); mostrar(t.id);
+      M.rodar(M.numero(seg[0]), cnt.abierto); M.rodar(M.numero(seg[2]), cnt.mios);
+      M.tostada((tipo === "idea" ? "Idea enviada" : "Error enviado") + " · lo ven todos");
+    }
+    c.querySelector("[data-enviar]").addEventListener("click", enviar);
+    M.abrir(c);
+  }
+  document.querySelector(".cabecera .acciones .btn").addEventListener("click", nuevo);
+
+  // ---------- Teclado ----------
+  document.addEventListener("keydown", function (e) {
+    if (M.hayCapa()) return;
+    var escribiendo = document.activeElement && document.activeElement.isContentEditable;
+    if (e.key === "F1") { e.preventDefault(); nuevo(); return; }
+    if (escribiendo) { if (e.key === "Escape") document.activeElement.blur(); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key.toLowerCase();
+    if (k === "n") { e.preventDefault(); nuevo(); }
+    else if (k === "/") { e.preventDefault(); M.enfocar(buscar); }
+    else if (k === "j" || k === "k" || e.key === "ArrowDown" || e.key === "ArrowUp") {
+      var tks = Array.prototype.slice.call(lista.querySelectorAll(".tk")); var i = tks.findIndex(function (x) { return x.dataset.id === elegido; });
+      var j = Math.max(0, Math.min(tks.length - 1, i + (k === "j" || e.key === "ArrowDown" ? 1 : -1)));
+      if (tks[j]) { e.preventDefault(); mostrar(tks[j].dataset.id); }
+    }
+    else if (k === "e") { e.preventDefault(); var t = M.ticket(elegido); if (t && t.estado !== "resuelto") resolver(); }
+    else if (e.key === " ") { e.preventDefault(); var t2 = M.ticket(elegido); if (t2 && t2.fotos.length) M.verFotos(t2.fotos, actual, det.querySelector(".galeria .grande img")); }
+  });
+});
+</script>
 </body>
 </html>

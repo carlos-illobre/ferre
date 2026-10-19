@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../mye.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { overflow: hidden; }
   .escena { position: relative; width: 1366px; height: 768px; background: var(--fondo); overflow: hidden; }
@@ -105,5 +107,157 @@
     </div>
   </aside>
 </div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Compu 3 · F1 sobre la pantalla: marcar la captura, escribir al costado, Esc vuelve a Vender. */
+document.addEventListener("DOMContentLoaded", function () {
+  var M = MYE;
+  var escena = document.querySelector(".escena"), lienzo = document.querySelector(".lienzo"), hoja = document.querySelector(".hoja");
+  var herr = document.querySelector(".herramientas"), pista = document.querySelector(".pista"), velo = document.querySelector(".velo");
+  [hoja, herr, pista, lienzo, velo].forEach(function (x) { x.classList.add("ix-se-va"); });
+
+  // ---------- Marcar sobre la captura ----------
+  var botones = herr.querySelectorAll(".grupo button");
+  var modos = ["marcar", "flecha", "nota", "tapar"], modo = "marcar";
+  function elegirModo(k) { if (k < 0) return; M.elegir(botones[k], "si"); modo = modos[k]; }
+  botones.forEach(function (b, k) { b.addEventListener("click", function () { if (k === 4) deshacer(); else elegirModo(k); }); });
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "0 0 864 486"); svg.setAttribute("style", "position:absolute;inset:0;width:100%;height:100%;overflow:visible");
+  svg.innerHTML = '<defs><marker id="punta" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#D7372A"/></marker></defs>';
+  lienzo.appendChild(svg);
+  var hechos = [lienzo.querySelector(".trazo"), lienzo.querySelector(".nota"), lienzo.querySelector(".tapado")];
+  function deshacer() {
+    var el = hechos.pop(); if (!el) { M.sacudir(botones[4]); return; }
+    el.style.transition = "opacity var(--t) var(--curva)"; el.style.opacity = "0"; setTimeout(function () { el.remove(); }, 220);
+  }
+  function suave(p) {
+    if (p.length < 3) return "M" + p.map(function (q) { return q.join(" "); }).join(" L");
+    var d = "M" + p[0][0] + " " + p[0][1];
+    for (var i = 1; i < p.length - 1; i++) { var mx = (p[i][0] + p[i + 1][0]) / 2, my = (p[i][1] + p[i + 1][1]) / 2; d += " Q" + p[i][0] + " " + p[i][1] + " " + mx + " " + my; }
+    return d + " L" + p[p.length - 1].join(" ");
+  }
+  var trazando = null;
+  function punto(e) { var r = lienzo.getBoundingClientRect(); return [Math.round(e.clientX - r.left), Math.round(e.clientY - r.top)]; }
+  lienzo.addEventListener("pointerdown", function (e) {
+    if (e.target.closest(".nota[contenteditable]")) return;
+    var p = punto(e); e.preventDefault();
+    if (modo === "nota") {
+      var n = document.createElement("div"); n.className = "nota ix-crece"; n.textContent = "Nota";
+      n.style.left = p[0] + "px"; n.style.top = p[1] + "px"; lienzo.appendChild(n); hechos.push(n);
+      M.editable(n, { unaLinea: true, alEnter: function () { n.blur(); } }); n.setAttribute("data-ejemplo", "");
+      n.focus(); return;
+    }
+    lienzo.setPointerCapture(e.pointerId);
+    if (modo === "tapar") {
+      var t = document.createElement("div"); t.className = "tapado"; t.style.cssText = "left:" + p[0] + "px;top:" + p[1] + "px;width:0;height:0";
+      lienzo.appendChild(t); trazando = { el: t, o: p };
+    } else {
+      var path = document.createElementNS(NS, "path");
+      path.setAttribute("fill", "none"); path.setAttribute("stroke", "#D7372A"); path.setAttribute("stroke-width", "4"); path.setAttribute("stroke-linecap", "round"); path.setAttribute("stroke-linejoin", "round");
+      if (modo === "flecha") path.setAttribute("marker-end", "url(#punta)");
+      svg.appendChild(path); trazando = { el: path, o: p, pts: [p] };
+      path.setAttribute("d", "M" + p.join(" "));
+    }
+  });
+  lienzo.addEventListener("pointermove", function (e) {
+    if (!trazando) return; var p = punto(e), o = trazando.o;
+    if (modo === "tapar") { var s = trazando.el.style; s.left = Math.min(o[0], p[0]) + "px"; s.top = Math.min(o[1], p[1]) + "px"; s.width = Math.abs(p[0] - o[0]) + "px"; s.height = Math.abs(p[1] - o[1]) + "px"; }
+    else if (modo === "flecha") trazando.el.setAttribute("d", "M" + o.join(" ") + " L" + p.join(" "));
+    else { trazando.pts.push(p); trazando.el.setAttribute("d", "M" + trazando.pts.map(function (q) { return q.join(" "); }).join(" L")); }
+  });
+  function soltar() {
+    if (!trazando) return; var t = trazando; trazando = null;
+    if (modo === "marcar") { if (t.pts.length < 2) return t.el.remove(); t.el.setAttribute("d", suave(t.pts)); }
+    if (modo === "tapar" && (parseFloat(t.el.style.width) < 8 || parseFloat(t.el.style.height) < 8)) { t.el.style.width = "140px"; t.el.style.height = "28px"; }
+    if (modo === "flecha" && t.el.getAttribute("d").indexOf("L") < 0) return t.el.remove();
+    hechos.push(t.el);
+  }
+  lienzo.addEventListener("pointerup", soltar); lienzo.addEventListener("pointercancel", soltar);
+
+  // ---------- La hoja ----------
+  var opciones = hoja.querySelectorAll(".eleccion > button");
+  var enviar = hoja.querySelector(".acc .btn-accion");
+  var etiqueta = document.createElement("span");
+  enviar.childNodes.forEach(function (n) { if (n.nodeType === 3 && n.textContent.trim()) { etiqueta.textContent = n.textContent.trim(); enviar.replaceChild(etiqueta, n); } });
+  enviar.insertBefore(document.createTextNode(" "), etiqueta.nextSibling);
+  var tipo = "error";
+  opciones.forEach(function (b, k) { b.addEventListener("click", function () { if (M.elegir(b)) { tipo = k ? "error" : "idea"; M.fundir(etiqueta, k ? "Enviar error" : "Enviar idea"); M.enfocar(caja); } }); });
+  var caja = M.editable(hoja.querySelector(".caja"), { ayuda: "Contá qué pasó en esta pantalla" });
+  var adj = hoja.querySelector(".adj"), otra = adj.querySelector(".agregar"), ayudaAdj = adj.querySelector(".t-detalle");
+  var rotulo = adj.parentNode.querySelector(".t-etiqueta");
+  var fotos = M.fotos({ contenedor: adj, antes: otra, botones: [otra], contador: function (n, r) {
+    rotulo.innerHTML = "Va con la captura marcada · <span class=\"ix-n\">" + n + "</span> de 5"; if (r) M.animar(rotulo.querySelector(".ix-n"), "ix-sube", 220);
+  } });
+  function sumarFoto() {
+    if (ayudaAdj.isConnected) { ayudaAdj.remove(); adj.style.flexWrap = "wrap"; }
+    if (fotos.agregar(M.siguiente(M.CAPTURAS_COMPU), false, otra)) { var ult = otra.previousElementSibling; ult.style.width = "64px"; }
+  }
+  otra.addEventListener("click", sumarFoto);
+  var sumarme = hoja.querySelector(".parecido .btn");
+  sumarme.addEventListener("click", function () {
+    sumarme.innerHTML = '<i class="i i-s" data-i="check"></i>Sumado'; window.pintarIconos(sumarme);
+    sumarme.style.background = "var(--logro-suave)"; sumarme.style.color = "var(--logro-texto)"; sumarme.style.borderColor = "transparent";
+    M.animar(sumarme, "ix-tilde", 300);
+    setTimeout(function () { volver("Te sumaste al aviso de Rosa · ya son 3"); }, 700);
+  });
+  hoja.querySelector(".hoja-cab .btn").addEventListener("click", function () { volver(); });
+  hoja.querySelector(".acc .btn-fantasma").addEventListener("click", function () { volver(); });
+  velo.addEventListener("click", function () { volver(); });
+
+  var listo = null;
+  enviar.addEventListener("click", function () {
+    var txt = M.texto(caja);
+    if (!txt) { M.sacudir(caja); M.enfocar(caja); return; }
+    listo = M.h('<div class="ix-listo ix-funde" style="position:absolute;inset:0;background:var(--superficie);border-radius:inherit;align-content:center">' +
+      '<span class="circulo ix-tilde"><i class="i" data-i="check"></i></span><div class="t-seccion">' + (tipo === "error" ? "Error enviado" : "Idea enviada") + '</div>' +
+      '<div class="t-cuerpo" style="color:var(--texto-2)">Va con la captura marcada y «Estaba en Vender». Lo ven todos los de la ferretería; te avisamos cuando se resuelva.</div></div>');
+    hoja.appendChild(listo); M.vibrar([10, 40, 10]);
+    setTimeout(function () { volver("Aviso enviado · seguí con la venta"); }, 1500);
+  });
+
+  // ---------- Volver a la pantalla de antes, y F1 para avisar de nuevo ----------
+  var vuelta = M.h('<div class="ix-vuelta"><img src="../../imagenes/cap-vender-compu.webp" alt="Vender">' +
+    '<div class="ix-pildora" style="left:50%;bottom:24px;margin-left:-230px;width:460px"><span style="flex:1"><span class="kbd">F1</span> avisa sobre esta pantalla</span>' +
+    '<button class="btn chico" data-f1>Avisar</button><button class="btn chico btn-accion" data-ir="vender">Ir a Vender</button></div></div>');
+  escena.appendChild(vuelta);
+  var vImg = vuelta.querySelector("img"), abierto = true;
+  function aLienzo() { return "translate(40px,96px) scale(" + 864 / 1366 + "," + 486 / 768 + ")"; }
+  function volver(msj) {
+    if (!abierto) return; abierto = false;
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    vImg.style.transition = "none"; vImg.style.transform = aLienzo(); vuelta.classList.add("si");
+    hoja.style.transform = "translateX(440px)"; hoja.style.opacity = "0";
+    herr.style.opacity = "0"; pista.style.opacity = "0";
+    requestAnimationFrame(function () { requestAnimationFrame(function () { vImg.style.transition = ""; vImg.style.transform = "none"; }); });
+    setTimeout(function () { vuelta.classList.add("lista"); if (msj) M.tostada(msj); }, 340);
+  }
+  function abrirOtraVez() {
+    if (abierto) return; abierto = true;
+    M.destello(); vuelta.classList.remove("lista");
+    if (listo) { listo.remove(); listo = null; caja.innerHTML = ""; fotos.vaciar(); }
+    setTimeout(function () {
+      vImg.style.transform = aLienzo();
+      hoja.style.transform = ""; hoja.style.opacity = ""; herr.style.opacity = ""; pista.style.opacity = "";
+      setTimeout(function () { vuelta.classList.remove("si"); M.enfocar(caja); }, 330);
+    }, 120);
+  }
+  vuelta.querySelector("[data-f1]").addEventListener("click", abrirOtraVez);
+
+  document.addEventListener("keydown", function (e) {
+    if (M.hayCapa()) return;
+    if (e.key === "F1") { e.preventDefault(); abrirOtraVez(); return; }
+    if (!abierto) return;
+    var escribiendo = document.activeElement && document.activeElement.isContentEditable;
+    if (e.key === "Escape") { e.preventDefault(); if (escribiendo && document.activeElement !== caja) document.activeElement.blur(); else volver(); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); enviar.click(); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !escribiendo) { e.preventDefault(); deshacer(); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v" && document.activeElement !== caja) { e.preventDefault(); sumarFoto(); return; }
+    if (escribiendo || e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = { m: 0, f: 1, t: 2, b: 3 }[e.key.toLowerCase()];
+    if (k !== undefined) { e.preventDefault(); elegirModo(k); }
+  });
+});
+</script>
 </body>
 </html>

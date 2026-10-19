@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../mye.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .cab { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 8px; padding: 0 16px 8px; border-bottom: 1px solid var(--borde); background: var(--superficie); }
@@ -50,14 +52,14 @@
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="currentColor"/></svg></span></div>
   <div class="cab">
-    <span class="btn btn-icono chico btn-fantasma" style="color:var(--pino-texto)"><i class="i i-l" data-i="chevron-left"></i></span>
+    <span class="btn btn-icono chico btn-fantasma" data-mas aria-label="Volver a Más" style="color:var(--pino-texto)"><i class="i i-l" data-i="chevron-left"></i></span>
     <div><div class="t">Mejoras y errores</div><div class="s">Toda la ferretería · 7 abiertos</div></div>
-    <span class="btn btn-icono chico btn-suave"><i class="i" data-i="search"></i></span>
+    <span class="btn btn-icono chico btn-suave" data-buscar aria-label="Buscar"><i class="i" data-i="search"></i></span>
   </div>
   <div class="filtro"><span class="chip elegido">Todo</span><span class="chip">Abiertos 7</span><span class="chip">Resueltos 23</span><span class="chip">Míos</span></div>
 
   <div class="feed">
-    <div class="msj">
+    <div class="msj" data-id="t4">
       <span class="av">JF</span>
       <div class="burbuja">
         <div class="de">Julián <span class="pastilla pino"><i class="i i-s" data-i="lightbulb"></i>Idea</span><span style="margin-left:auto;color:var(--texto-3);font-weight:600">ayer</span></div>
@@ -65,8 +67,8 @@
       </div>
     </div>
     <span class="dia">Hoy · 10:30</span>
-    <div class="resuelto"><i class="i i-s" data-i="circle-check" style="margin-top:2px"></i><span><b>Carlos resolvió</b> «El total no rodaba con 0,7 kg»: arreglado en la 5.3.1. <u>Reabrir</u></span></div>
-    <div class="msj">
+    <div class="resuelto" data-id="r1"><i class="i i-s" data-i="circle-check" style="margin-top:2px"></i><span><b>Carlos resolvió</b> «El total no rodaba con 0,7 kg»: arreglado en la 5.3.1. <u>Reabrir</u></span></div>
+    <div class="msj" data-id="t1">
       <span class="av">RB</span>
       <div class="burbuja">
         <div class="de">Rosa <span class="pastilla error"><i class="i i-s" data-i="bug"></i>Error</span></div>
@@ -75,7 +77,7 @@
         <div class="pie">10:30 · A15<span class="sumar"><i class="i i-s" data-i="thumbs-up"></i>A mí también · 2</span></div>
       </div>
     </div>
-    <div class="mio">
+    <div class="mio" data-id="m1">
       <div class="burbuja">
         <div class="tx">Que «llave» muestre primero las combinadas</div>
         <div class="pie">Enviado · recién <i class="i i-s" data-i="check"></i></div>
@@ -92,13 +94,144 @@
     </div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Celu 2 · La charla: cada ticket es un mensaje; se escribe abajo como en WhatsApp. */
+document.addEventListener("DOMContentLoaded", function () {
+  var M = MYE;
+  M.TICKETS.unshift({ id: "m1", tipo: "idea", texto: "Que «llave» muestre primero las combinadas", autor: "Carlos Illobre", corto: "Vos", ini: "CI", cuando: "recién", hora: "Hoy 10:41", disp: "Moto G54", version: "5.3.2",
+    pantalla: "Vender", icoPantalla: "shopping-cart", fotos: [], charla: [{ ini: "CI", quien: "Vos", hora: "lo abriste recién" }], tambien: [], estado: "abierto", mio: true });
+  M.ticket("t1").fotos = [{ src: M.IMG + "cap-vender-celu.webp", pos: "50% 54%", marcada: true }, { src: M.FOTO + "tarugos.webp", producto: true }];
+  var feed = document.querySelector(".feed");
+  // Que se pueda deslizar hacia arriba sin cambiar lo que se ve: el contenido queda abajo.
+  feed.style.overflowY = "auto"; feed.style.scrollbarWidth = "none"; feed.style.justifyContent = "flex-start";
+  feed.firstElementChild.style.marginTop = "auto"; feed.scrollTop = feed.scrollHeight;
+  function alFondo() { feed.scrollTo({ top: feed.scrollHeight, behavior: "smooth" }); }
+  var subt = document.querySelector(".cab .s"), chips = document.querySelectorAll(".filtro .chip");
+  var cnt = { abierto: 7, resuelto: 23 }, filtro = "todo", busqueda = "";
+  function contar(dA, dR) {
+    cnt.abierto += dA; cnt.resuelto += dR;
+    subt.innerHTML = 'Toda la ferretería · <span class="ix-n">' + cnt.abierto + "</span> abiertos"; M.animar(subt.querySelector(".ix-n"), dA >= 0 ? "ix-sube" : "ix-baja", 220);
+    if (dA) M.rodar(M.numero(chips[1]), cnt.abierto); if (dR) M.rodar(M.numero(chips[2]), cnt.resuelto);
+  }
+
+  // ---------- Filtros y búsqueda ----------
+  function plano(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function filtrar() {
+    Array.prototype.forEach.call(feed.children, function (el) {
+      var t = el.dataset.id && M.ticket(el.dataset.id);
+      if (!t) { el.classList.toggle("ix-oculto", filtro !== "todo" || !!busqueda); return; }
+      var esAviso = el.classList.contains("resuelto");
+      var ok = filtro === "todo" || (filtro === "mios" ? t.mio : filtro === "resuelto" ? (esAviso || t.estado === "resuelto") : (!esAviso && t.estado === "abierto"));
+      if (busqueda && plano(el.textContent).indexOf(plano(busqueda)) < 0) ok = false;
+      el.classList.toggle("ix-oculto", !ok);
+    });
+    feed.scrollTop = feed.scrollHeight; M.animar(feed, "ix-funde", 220);
+  }
+  chips.forEach(function (c, k) { c.addEventListener("click", function () { if (M.elegir(c, "elegido")) { filtro = ["todo", "abierto", "resuelto", "mios"][k]; setTimeout(filtrar, 10); } }); });
+  var filtroBar = document.querySelector(".filtro"), buscando = null;
+  document.querySelector("[data-buscar]").addEventListener("click", function () {
+    if (buscando) return;
+    chips.forEach(function (c) { c.style.display = "none"; });
+    buscando = M.h('<div style="display:flex;gap:8px;align-items:center;flex:1"><div class="campo foco" style="height:36px;flex:1;padding:0 12px;gap:8px"><i class="i i-s" data-i="search"></i><span data-q style="flex:1;color:var(--tinta)"></span></div><button class="btn chico btn-fantasma">Cancelar</button></div>');
+    filtroBar.appendChild(buscando); M.animar(buscando, "ix-funde", 220);
+    var q = M.editable(buscando.querySelector("[data-q]"), { unaLinea: true, ayuda: "Buscar en la charla", alEscribir: function (v) { busqueda = v.trim(); filtrar(); } });
+    M.enfocar(q);
+    buscando.querySelector("button").addEventListener("click", function () { buscando.remove(); buscando = null; busqueda = ""; chips.forEach(function (c) { c.style.display = ""; }); filtrar(); });
+  });
+
+  // ---------- Escribir ----------
+  var tipos = document.querySelectorAll(".tipos span"), tipo = "idea";
+  [tipos[0], tipos[1]].forEach(function (s, k) { s.style.cursor = "pointer"; s.addEventListener("click", function () { if (M.elegir(s, "si")) { tipo = k ? "error" : "idea"; M.vibrar(10); } }); });
+  var hasta = tipos[2];
+  var entrada = document.querySelector(".linea .entrada");
+  var ayuda = "";
+  entrada.childNodes.forEach(function (n) { if (n.nodeType === 3 && n.textContent.trim()) { ayuda = n.textContent.trim(); n.remove(); } });
+  var escribe = document.createElement("span"); escribe.style.color = "var(--tinta)"; escribe.style.minWidth = "0";
+  entrada.insertBefore(escribe, entrada.firstChild);
+  M.editable(escribe, { unaLinea: true, ayuda: ayuda, alEnter: function () { ir.click(); } });
+  escribe.addEventListener("focus", function () { var c = entrada.querySelector(".cursor"); if (c) c.remove(); escribe.style.flex = "1"; escribe.style.whiteSpace = "nowrap"; escribe.style.overflow = "hidden"; entrada.style.minWidth = "0"; entrada.style.overflow = "hidden"; });
+  entrada.addEventListener("click", function () { if (document.activeElement !== escribe) M.enfocar(escribe); });
+  var componer = document.querySelector(".componer"), linea = componer.querySelector(".linea");
+  var adj = M.h('<div class="minis ix-oculto" style="gap:6px"></div>'); componer.insertBefore(adj, linea);
+  var cam = linea.querySelector(".cam"), ir = linea.querySelector(".ir");
+  cam.style.cursor = ir.style.cursor = "pointer";
+  var fotos = M.fotos({ contenedor: adj, botones: [cam], claseMini: "chica", contador: function (n) {
+    adj.classList.toggle("ix-oculto", !n); hasta.textContent = n ? n + "/5 fotos" : "hasta 5 fotos";
+  } });
+  cam.addEventListener("click", function () { if (fotos.lleno()) return M.sacudir(cam); M.camara(function (src, prod) { fotos.agregar(src, prod, cam); }); });
+  ir.addEventListener("click", function () {
+    var txt = M.texto(escribe);
+    if (!txt) { M.sacudir(entrada); M.enfocar(escribe); return; }
+    var lista = fotos.lista();
+    var t = { id: "n" + Date.now(), tipo: tipo, texto: txt, autor: "Carlos Illobre", corto: "Vos", ini: "CI", cuando: "recién", hora: "Hoy 10:42", disp: "Moto G54", version: "5.3.2",
+      pantalla: "Mejoras y errores", icoPantalla: "lightbulb", fotos: lista, charla: [{ ini: "CI", quien: "Vos", hora: "lo abriste recién" }], tambien: [], estado: "abierto", mio: true };
+    M.TICKETS.unshift(t);
+    var fotosH = lista.length ? '<div class="fotos2">' + lista.slice(0, 2).map(function (f) { return '<div' + (f.producto ? ' class="prod"' : "") + '><img src="' + f.src + '" alt=""></div>'; }).join("") + "</div>" : "";
+    var b = M.h('<div class="mio" data-id="' + t.id + '"><div class="burbuja"><div class="de" style="color:#fff"><span class="pastilla" style="height:24px;padding:0 8px;background:rgba(255,255,255,.16);color:#fff"><i class="i i-s" data-i="' + (tipo === "idea" ? "lightbulb" : "bug") + '"></i>' + (tipo === "idea" ? "Idea" : "Error") + '</span></div><div class="tx">' + M.esc(txt) + "</div>" + fotosH +
+      '<div class="pie">Enviando… <i class="i i-s" data-i="clock"></i></div></div></div>');
+    if (filtro === "resuelto") { chips[0].click(); }
+    feed.appendChild(b); b.classList.add("ix-entra"); alFondo();
+    escribe.innerHTML = ""; fotos.vaciar(); M.vibrar([10, 40, 10]);
+    setTimeout(function () { var pie = b.querySelector(".pie"); pie.innerHTML = 'Enviado · recién <i class="i i-s" data-i="check"></i>'; window.pintarIconos(pie); M.animar(pie, "ix-funde", 220); contar(1, 0); }, 700);
+  });
+
+  // ---------- Tocar la charla ----------
+  feed.addEventListener("click", function (e) {
+    var sumar = e.target.closest(".sumar");
+    if (sumar) {
+      var t = M.ticket(sumar.closest("[data-id]").dataset.id); t.yoTambien = !t.yoTambien;
+      if (t.yoTambien) t.tambien.push("vos"); else t.tambien = t.tambien.filter(function (x) { return x !== "vos"; });
+      sumar.style.background = t.yoTambien ? "var(--pino-suave)" : ""; sumar.style.color = t.yoTambien ? "var(--pino-texto)" : "";
+      sumar.innerHTML = '<i class="i i-s" data-i="thumbs-up"></i>A mí también · <span class="ix-n">' + t.tambien.length + "</span>"; window.pintarIconos(sumar);
+      M.animar(sumar, "ix-tilde", 300); M.vibrar(10); return;
+    }
+    var u = e.target.closest(".resuelto u");
+    if (u) { reabrir(u.closest(".resuelto")); return; }
+    var foto = e.target.closest(".fotos2 > div");
+    if (foto) {
+      var cont = foto.parentNode, tt = M.ticket(foto.closest("[data-id]").dataset.id);
+      M.verFotos(tt.fotos.length ? tt.fotos : Array.prototype.map.call(cont.children, function (d) { return { src: d.querySelector("img").getAttribute("src"), producto: d.classList.contains("prod") }; }), Array.prototype.indexOf.call(cont.children, foto), foto.querySelector("img")); return;
+    }
+    var msj = e.target.closest(".msj, .mio");
+    if (msj) {
+      var t2 = M.ticket(msj.dataset.id); if (!t2) return;
+      M.detalle(t2, { alResolver: function (t, nota) { resolver(t, nota); }, alReabrir: function (t) { reabrirTicket(t); } });
+    }
+  });
+  function avisoResuelto(t, nota) {
+    var corto = t.texto.length > 46 ? t.texto.slice(0, 44).replace(/\s+\S*$/, "") + "…" : t.texto;
+    return M.h('<div class="resuelto" data-id="' + t.id + '"><i class="i i-s" data-i="circle-check" style="margin-top:2px"></i><span><b>Carlos resolvió</b> «' + M.esc(corto) + "»" + (nota ? ": " + M.esc(nota) : "") + ". <u>Reabrir</u></span></div>");
+  }
+  function resolver(t, nota) {
+    t.estado = "resuelto"; t.nota = nota; t.resolvio = "Carlos"; t.cuandoRes = "recién";
+    var a = avisoResuelto(t, nota); feed.appendChild(a); a.classList.add("ix-entra"); alFondo();
+    contar(-1, 1); M.vibrar([10, 40, 10]);
+    filtrar();
+    M.tostada("Resuelto · le avisamos a " + (t.mio ? "todos" : t.corto), { deshacer: function () { a.remove(); t.estado = "abierto"; contar(1, -1); } });
+  }
+  function reabrir(aviso) {
+    var t = M.ticket(aviso.dataset.id); if (!t || t.estado !== "resuelto") return;
+    var antes = aviso.innerHTML, estilo = aviso.getAttribute("style") || "";
+    reabrirTicket(t, true);
+    aviso.style.background = "var(--hundido)"; aviso.style.color = "var(--texto-2)";
+    aviso.innerHTML = '<i class="i i-s" data-i="rotate-ccw" style="margin-top:2px"></i><span><b>Reabriste</b> «' + M.esc(t.texto.replace(/ de clavos en la venta$/, "")) + "»: vuelve a los abiertos.</span>";
+    window.pintarIconos(aviso); M.animar(aviso, "ix-funde", 220);
+    M.tostada("Reabierto", { icono: "rotate-ccw", deshacer: function () { t.estado = "resuelto"; contar(-1, 1); aviso.innerHTML = antes; aviso.setAttribute("style", estilo); } });
+  }
+  function reabrirTicket(t, callado) {
+    t.estado = "abierto"; contar(1, -1);
+    if (!callado) { var a = feed.querySelector('.resuelto[data-id="' + t.id + '"]'); if (a) reabrir(a); }
+  }
+});
+</script>
 </body>
 </html>

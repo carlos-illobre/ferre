@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../mye.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .migas { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
   .cabecera { padding-bottom: 0; }
@@ -47,11 +49,11 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
@@ -61,7 +63,7 @@
   <main class="contenido">
     <header class="cabecera">
       <div>
-        <div class="migas">Más <i class="i i-s" data-i="chevron-right"></i></div>
+        <div class="migas" data-mas>Más <i class="i i-s" data-i="chevron-right"></i></div>
         <div class="t-titulo">Mejoras y errores</div>
       </div>
       <div class="acciones"><span class="t-detalle">Lo que se escribe acá lo ven todos los de la ferretería</span></div>
@@ -124,31 +126,31 @@
         </div>
 
         <div class="lista">
-          <div class="tk">
+          <div class="tk" data-id="t1">
             <span class="tipo error"><i class="i" data-i="bug"></i></span>
             <div><div class="texto">Los tarugos nylon S8 me salen sin precio aunque Fischer mandó la lista nueva ayer</div><div class="quien">Rosa Benítez · hace 12 min · Samsung A15</div></div>
             <div class="lado"><div class="apilado"><div class="mini chica"><img src="../../imagenes/cap-celu-tarugos.webp" alt=""></div><div class="mini chica producto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div></div></div>
             <i class="i chev" data-i="chevron-right"></i>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t2">
             <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
             <div><div class="texto">Al cobrar con Mercado Pago, que el QR salga grande para girar el monitor hacia el cliente</div><div class="quien">Martín Godoy · hoy 9:40 · Compu del mostrador</div></div>
             <div class="lado"><div class="apilado"><div class="mini chica"><img src="../../imagenes/cap-compu-cobro.webp" alt=""></div></div></div>
             <i class="i chev" data-i="chevron-right"></i>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t3">
             <span class="tipo error"><i class="i" data-i="bug"></i></span>
             <div><div class="texto">En el celular, el botón Cobrar queda tapado por el teclado cuando busco un producto</div><div class="quien">Carlos Illobre · ayer 18:05 · Moto G54</div></div>
             <div class="lado"><div class="apilado"><div class="mini chica"><img src="../../imagenes/cap-vender-celu.webp" alt=""></div><div class="mini chica"><img src="../../imagenes/cap-celu-cobrar.webp" alt=""></div><div class="mini chica mas">+1</div></div></div>
             <i class="i chev" data-i="chevron-right"></i>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t4">
             <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
             <div><div class="texto">Poder vender por metro la cadena y la soga, no solo por unidad</div><div class="quien">Julián Ferraro · ayer 11:20 · Compu del depósito</div></div>
             <div class="lado"></div>
             <i class="i chev" data-i="chevron-right"></i>
           </div>
-          <div class="tk">
+          <div class="tk" data-id="t5">
             <span class="tipo error"><i class="i" data-i="bug"></i></span>
             <div><div class="texto">Al contar el depósito, la balanza no toma los kilos de los clavos</div><div class="quien">Rosa Benítez · lunes 16:10 · Samsung A15 · hace 8 días</div></div>
             <div class="lado"><span class="pastilla urgente"><i class="i i-s" data-i="hourglass"></i>8 días</span></div>
@@ -159,5 +161,152 @@
     </section>
   </main>
 </div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Compu 1 · El buzón: escribir a la izquierda, seguir a la derecha. */
+document.addEventListener("DOMContentLoaded", function () {
+  var M = MYE, IMG = M.IMG, FOTO = M.FOTO;
+  M.ticket("t1").minis = [{ src: IMG + "cap-celu-tarugos.webp" }, { src: FOTO + "tarugos.webp", producto: true }];
+  M.ticket("t3").minis = [{ src: IMG + "cap-vender-celu.webp" }, { src: IMG + "cap-celu-cobrar.webp" }, { src: IMG + "cap-celu-camara.webp" }];
+
+  // ---------- Escribir ----------
+  var zona = document.querySelector(".escribir");
+  var opciones = zona.querySelectorAll(".eleccion > button");
+  var caja = M.editable(zona.querySelector(".caja"), { ayuda: "Contá qué falta o qué no anda" });
+  var enviar = zona.querySelector(".enviar .btn-accion");
+  var etiqueta = document.createElement("span"); etiqueta.textContent = "Enviar idea";
+  enviar.childNodes.forEach(function (n) { if (n.nodeType === 3 && n.textContent.trim()) enviar.replaceChild(etiqueta, n); });
+  enviar.insertBefore(document.createTextNode(" "), etiqueta.nextSibling);
+  var tipo = "idea";
+  opciones.forEach(function (b, k) {
+    b.addEventListener("click", function () {
+      if (!M.elegir(b)) return;
+      tipo = k ? "error" : "idea";
+      M.fundir(etiqueta, tipo === "idea" ? "Enviar idea" : "Enviar error");
+      M.enfocar(caja);
+    });
+  });
+
+  var cab = zona.querySelector(".fotos-cab .t-detalle");
+  var pegar = zona.querySelector(".agregar");
+  var via = zona.querySelectorAll(".via .btn");
+  var fotos = M.fotos({
+    contenedor: zona.querySelector(".minis"), antes: pegar, botones: [pegar, via[0], via[1]],
+    contador: function (n, rodando) {
+      cab.innerHTML = '<span class="ix-n">' + n + "</span> de 5 · Ctrl V pega";
+      if (rodando) M.animar(cab.firstChild, "ix-sube", 220);
+    }
+  });
+  function pegarCaptura(boton) { if (fotos.agregar(M.siguiente(M.CAPTURAS_COMPU), false, boton || pegar)) M.tostada("Captura pegada", { icono: "clipboard-paste", ms: 1600 }); }
+  pegar.addEventListener("click", function () { pegarCaptura(pegar); });
+  via[0].addEventListener("click", function () { fotos.agregar(M.siguiente(M.FOTOS), true, via[0]); });
+  via[1].addEventListener("click", function () {
+    if (fotos.lleno()) return M.sacudir(via[1]);
+    var c = M.capa("ix-dialogo",
+      '<div class="ix-cab"><span class="t-seccion">Sacar con el celular</span><button class="btn btn-icono chico btn-fantasma" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div>' +
+      '<div class="ix-cuerpo">' +
+        '<div class="aviso logro"><i class="i" data-i="smartphone"></i><span>Le abrí la cámara al <b>Moto G54 de Carlos</b>, que está en espejo. Sacá la foto y llega sola acá.</span></div>' +
+        '<div style="display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center">' +
+          '<div style="width:140px;height:140px;border-radius:16px;background:var(--hundido);display:grid;place-items:center;color:var(--tinta)"><i class="i" data-i="qr-code" style="width:96px;height:96px" data-trazo="1.5"></i></div>' +
+          '<div class="t-detalle">¿Otro celular? Escaneá este código con la cámara: abre la cámara de Ferrebress y la foto se suma a este aviso.</div>' +
+        "</div>" +
+        '<div class="pastilla contorno" style="justify-self:start" data-espera><i class="i i-s" data-i="hourglass"></i>Esperando la foto…</div>' +
+      "</div>" +
+      '<div class="ix-pie"><span style="flex:1"></span><button class="btn btn-fantasma" data-cerrar>Cancelar</button></div>');
+    var reloj = setTimeout(function () {
+      M.cerrar(c);
+      if (fotos.agregar(M.FOTO + "tarugos.webp", true, via[1])) M.tostada("Llegó la foto del Moto G54", { icono: "smartphone" });
+    }, 2600);
+    M.abrir(c, { alCerrar: function () { clearTimeout(reloj); } });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (M.hayCapa()) return;
+    if (e.altKey && e.key.toLowerCase() === "f") { e.preventDefault(); via[0].click(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); enviar.click(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v" && document.activeElement !== caja) { e.preventDefault(); pegarCaptura(); }
+  });
+
+  // ---------- Seguir ----------
+  var lista = document.querySelector(".lista");
+  var seg = document.querySelectorAll(".filtros .segmentos > button");
+  var chips = document.querySelectorAll(".filtros .chip");
+  var vas = document.querySelectorAll(".resumenes .va");
+  var cuentas = { abierto: { idea: 4, error: 3 }, resuelto: { idea: 11, error: 12 } };
+  var estado = "abierto", filtro = "todos";
+
+  function tkHTML(t) {
+    var lado = "";
+    var minis = t.minis || t.fotos;
+    if (t.estado === "resuelto") lado = '<span class="pastilla logro"><i class="i i-s" data-i="circle-check"></i>Resuelto</span>';
+    else if (t.dias) lado = '<span class="pastilla urgente"><i class="i i-s" data-i="hourglass"></i>' + t.dias + " días</span>";
+    else if (minis.length) lado = '<div class="apilado">' + minis.slice(0, 2).map(function (f) { return '<div class="mini chica' + (f.producto ? " producto" : "") + '"><img src="' + f.src + '" alt=""></div>'; }).join("") + (minis.length > 2 ? '<div class="mini chica mas">+' + (minis.length - 2) + "</div>" : "") + "</div>";
+    var quien = t.estado === "resuelto" ? t.autor + " · " + t.cuando + " · lo resolvió " + (t.resolvio || "Carlos") + " " + (t.cuandoRes || "recién") : t.autor + " · " + t.cuando + " · " + t.disp + (t.dias ? " · hace " + t.dias + " días" : "");
+    return '<div class="tk" data-id="' + t.id + '"><span class="tipo ' + t.tipo + '"><i class="i" data-i="' + (t.tipo === "idea" ? "lightbulb" : "bug") + '"></i></span>' +
+      '<div><div class="texto">' + M.esc(t.texto) + '</div><div class="quien">' + quien + "</div></div>" +
+      '<div class="lado">' + lado + '</div><i class="i chev" data-i="chevron-right"></i></div>';
+  }
+  function visibles() { return M.TICKETS.filter(function (t) { return t.estado === estado && (filtro === "todos" || t.tipo === filtro); }); }
+  function render(nuevoId) {
+    lista.innerHTML = "";
+    visibles().forEach(function (t) {
+      var el = M.h(tkHTML(t)); lista.appendChild(el);
+      if (t.id === nuevoId) { el.classList.add("ix-vuela", "ix-recien"); setTimeout(function () { el.classList.remove("ix-vuela", "ix-recien"); }, 1300); }
+    });
+    if (!lista.children.length) lista.appendChild(M.h('<div class="aviso pino"><i class="i" data-i="inbox"></i><span>No hay ' + (filtro === "idea" ? "ideas" : filtro === "error" ? "errores" : "tickets") + " " + (estado === "abierto" ? "abiertos" : "resueltos") + ".</span></div>"));
+    M.animar(lista, "ix-funde", 220);
+  }
+  function numeros(rodando) {
+    var c = cuentas[estado];
+    var set = function (el, v) { var n = M.numero(el); if (rodando && +n.textContent !== v) M.rodar(n, v); else n.textContent = v; };
+    set(seg[0], cuentas.abierto.idea + cuentas.abierto.error);
+    set(seg[1], cuentas.resuelto.idea + cuentas.resuelto.error);
+    set(chips[1], c.idea); set(chips[2], c.error);
+  }
+  seg.forEach(function (b, k) { b.addEventListener("click", function () { if (M.elegir(b, "elegido")) { estado = k ? "resuelto" : "abierto"; numeros(false); render(); } }); });
+  chips.forEach(function (b, k) { b.addEventListener("click", function () { if (b.classList.contains("elegido")) return; chips.forEach(function (x) { x.classList.toggle("elegido", x === b); }); filtro = ["todos", "idea", "error"][k]; render(); }); });
+
+  function mover(t, de, a) {
+    cuentas[de][t.tipo]--; cuentas[a][t.tipo]++;
+    numeros(true);
+    M.rodar(vas[0], cuentas.abierto.idea + cuentas.abierto.error);
+    if (t.dias) M.rodar(vas[1], +vas[1].textContent + (a === "resuelto" ? -1 : 1));
+    M.rodar(vas[2], +vas[2].textContent + (a === "resuelto" ? 1 : -1));
+  }
+  function resolver(t, nota) {
+    t.estado = "resuelto"; t.nota = nota || ""; t.resolvio = "Carlos"; t.cuandoRes = "recién";
+    var el = lista.querySelector('[data-id="' + t.id + '"]');
+    var tras = function () { mover(t, "abierto", "resuelto"); if (!visibles().length || estado === "resuelto") render(); };
+    if (el && estado === "abierto") M.sacarDeLista(el, tras); else tras();
+    M.tostada("Resuelto · le avisamos a " + (t.mio ? "todos" : t.corto), { deshacer: function () { reabrir(t, true); } });
+  }
+  function reabrir(t, callado) {
+    t.estado = "abierto"; mover(t, "resuelto", "abierto");
+    render(estado === "abierto" ? t.id : null);
+    if (!callado) M.tostada("Reabierto: vuelve a la lista de abiertos", { icono: "rotate-ccw" });
+  }
+  lista.addEventListener("click", function (e) {
+    var el = e.target.closest(".tk"); if (!el) return;
+    var t = M.ticket(el.dataset.id); if (!t) return;
+    M.detalle(t, { alResolver: resolver, alReabrir: function (t) { reabrir(t); } });
+  });
+
+  // ---------- Enviar ----------
+  enviar.addEventListener("click", function () {
+    var txt = M.texto(caja);
+    if (!txt) { M.sacudir(caja); M.enfocar(caja); M.tostada("Falta contar qué pasó: es lo único obligatorio", { icono: "pen-line" }); return; }
+    var t = { id: "n" + Date.now(), tipo: tipo, texto: txt, autor: "Carlos Illobre", corto: "Vos", ini: "CI", cuando: "recién", hora: "Hoy 10:42", disp: "Compu del mostrador", version: "5.3.2",
+      pantalla: "Mejoras y errores", icoPantalla: "lightbulb", fotos: fotos.lista(), charla: [{ ini: "CI", quien: "Vos", hora: "lo abriste recién" }], tambien: [], estado: "abierto", mio: true };
+    M.TICKETS.unshift(t);
+    cuentas.abierto[tipo]++;
+    if (estado !== "abierto") { seg[0].click(); }
+    if (filtro !== "todos" && filtro !== tipo) { chips.forEach(function (x, k) { x.classList.toggle("elegido", !k); }); filtro = "todos"; }
+    setTimeout(function () {
+      render(t.id); numeros(true); M.rodar(vas[0], cuentas.abierto.idea + cuentas.abierto.error);
+    }, estado === "abierto" ? 0 : 220);
+    M.vaciar(caja); fotos.vaciar();
+    M.tostada((tipo === "idea" ? "Idea enviada" : "Error enviado") + " · lo ven todos los de la ferretería");
+  });
+});
+</script>
 </body>
 </html>

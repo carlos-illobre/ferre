@@ -1,0 +1,164 @@
+/* Mejoras y errores: lo que se mueve al tocar la maqueta (capas, hojas, tostadas, cámara).
+   Quieta, nada de esto se ve. Movimiento solo con transform y opacity; con «reducir
+   movimiento», comun.css apaga transiciones y animaciones. */
+
+[contenteditable] { outline: none; cursor: text; }
+[data-mas], [data-ir], .tk, .mini img, .quitar, .agregar, .tomar, .chip, .segmentos > *, .eleccion > * { cursor: pointer; }
+.ix-n { display: inline-block; }
+.eleccion { position: relative; }
+
+/* ---------- Capas: velo + caja ---------- */
+.ix-capa { position: fixed; inset: 0; z-index: 50; visibility: hidden; pointer-events: none; }
+.celu .ix-capa { position: absolute; }
+.ix-capa.abierta { visibility: visible; pointer-events: auto; }
+.ix-velo { position: absolute; inset: 0; background: rgba(26, 29, 27, .3); opacity: 0; transition: opacity var(--t-nav) var(--curva); }
+.ix-capa.abierta .ix-velo { opacity: 1; }
+.ix-capa.sin-velo .ix-velo { background: transparent; }
+.ix-caja { position: absolute; background: var(--superficie); box-shadow: var(--sombra-3); opacity: 0; transition: transform var(--t-nav) var(--curva), opacity var(--t) var(--curva); }
+.ix-capa.abierta .ix-caja { opacity: 1; transform: none; }
+
+/* Diálogo centrado (computadora) */
+.ix-dialogo .ix-caja { left: 50%; top: 50%; width: 560px; max-height: 720px; margin-left: -280px; border-radius: var(--r-hoja); transform: translateY(-50%) scale(.96); translate: 0 0; overflow: hidden; display: flex; flex-direction: column; }
+.ix-dialogo.abierta .ix-caja { transform: translateY(-50%); }
+
+/* Panel que entra desde la derecha (computadora) */
+.ix-panel .ix-caja { right: 16px; top: 16px; bottom: 16px; width: 600px; border-radius: var(--r-hoja); transform: translateX(32px); display: flex; flex-direction: column; overflow: hidden; }
+
+/* Hoja que sube (celular) */
+.ix-hoja .ix-caja { left: 0; right: 0; bottom: 0; max-height: 92%; border-radius: var(--r-hoja) var(--r-hoja) 0 0; transform: translateY(100%); background: var(--fondo); display: flex; flex-direction: column; overflow: hidden; padding-bottom: 20px; }
+.ix-hoja .agarre { width: 40px; height: 5px; border-radius: 9px; background: var(--hundido-2); margin: 8px auto 4px; flex: none; }
+
+/* Menú chico (Más, computadora) */
+.ix-pop .ix-caja { width: 300px; border-radius: 16px; padding: 8px; transform: translateX(-8px); border: 1px solid var(--borde); }
+
+.ix-cab { display: flex; align-items: center; gap: 12px; padding: 16px 20px 8px; }
+.ix-cab .t-seccion { flex: 1; }
+.ix-cuerpo { padding: 8px 20px 16px; overflow: auto; display: grid; gap: 14px; align-content: start; }
+.ix-pie { padding: 14px 20px; border-top: 1px solid var(--borde); display: flex; gap: 12px; align-items: center; background: var(--superficie); }
+.ix-hoja .ix-pie { background: transparent; border-top: 0; padding-top: 4px; }
+
+/* Lista de Más */
+.ix-mas { display: grid; gap: 4px; }
+.ix-mas a { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 8px 10px; border-radius: 12px; color: var(--tinta); text-decoration: none; }
+.ix-mas a:hover { background: var(--hundido); }
+.ix-mas a.activo { background: var(--pino-suave); color: var(--pino); }
+.ix-mas .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+.ix-mas a.activo .ico { background: var(--superficie); color: var(--pino); }
+.ix-mas b { display: block; font-size: 16px; font-weight: 750; line-height: 20px; }
+.ix-mas small { display: block; font-size: 14px; color: var(--texto-2); font-weight: 500; line-height: 18px; }
+.celu .ix-mas a { background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); padding: 12px; min-height: 64px; }
+.celu .ix-mas a.activo { background: var(--pino-suave); border-color: transparent; }
+
+/* ---------- Detalle de un ticket ---------- */
+.ix-det-cab { display: grid; grid-template-columns: 48px 1fr auto; gap: 14px; align-items: start; padding: 20px 20px 4px; }
+.ix-det-cab h2 { margin: 2px 0 8px; font-size: 20px; line-height: 27px; font-weight: 750; letter-spacing: -.01em; }
+.ix-panel .ix-det-cab { grid-template-columns: 48px 1fr auto auto; }
+.celu .ix-det-cab { grid-template-columns: 40px 1fr auto; padding: 8px 16px 0; }
+.celu .ix-det-cab h2 { font-size: 18px; line-height: 24px; }
+.celu .ix-det-cab .estado { grid-column: 2; justify-self: start; }
+.ix-metas { display: flex; flex-wrap: wrap; gap: 6px; }
+.ix-metas .pastilla { height: 26px; }
+.ix-grande { position: relative; height: 240px; border-radius: 12px; overflow: hidden; background: var(--hundido); border: 1px solid var(--borde); }
+.ix-grande img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.ix-grande.producto img { object-fit: contain; padding: 16px; filter: drop-shadow(0 6px 8px rgba(26, 29, 27, .18)); }
+.celu .ix-grande { height: 200px; }
+.ix-tira { display: flex; gap: 8px; flex-wrap: wrap; }
+.ix-tira .mini { width: 72px; height: 54px; }
+.ix-tira .mini.sel { outline: 3px solid var(--pino); outline-offset: 1px; }
+.ix-hilo { display: grid; gap: 12px; }
+.ix-ev { display: grid; grid-template-columns: 28px 1fr; gap: 10px; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+.ix-ev b { color: var(--tinta); font-weight: 700; }
+.ix-ev .burbuja { margin-top: 4px; padding: 8px 12px; border-radius: 4px 12px 12px 12px; background: var(--hundido); color: var(--tinta); font-size: 15px; line-height: 22px; font-weight: 500; }
+.ix-tambien { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ix-tambien .btn.si { background: var(--pino-suave); color: var(--pino-texto); }
+.ix-nota { flex: 1; min-height: 48px; height: auto; box-shadow: none; padding: 10px 14px; font-size: 15px; }
+.ix-nota [contenteditable] { flex: 1; color: var(--tinta); font-weight: 600; min-width: 40px; }
+.ix-nota [contenteditable]:empty::before { content: attr(data-ayuda); color: var(--texto-3); font-weight: 500; }
+.ix-caja-txt:empty::before, [data-ayuda]:empty::before { content: attr(data-ayuda); color: var(--texto-3); }
+
+/* ---------- Tostadas ---------- */
+.ix-tostadas { position: fixed; left: 0; right: 0; bottom: 28px; z-index: 80; display: grid; justify-items: center; gap: 8px; pointer-events: none; }
+.celu .ix-tostadas { position: absolute; bottom: 168px; padding: 0 16px; }
+.ix-tostadas .tostada { pointer-events: auto; animation: ix-tostada-entra var(--t-nav) var(--curva); max-width: 100%; }
+.ix-tostadas .tostada.sale { animation: ix-tostada-sale var(--t) var(--curva-salida) forwards; }
+.tostada .deshacer { margin-left: 8px; border: 0; background: rgba(255, 255, 255, .14); color: #fff; font-weight: 800; font-size: 14px; height: 32px; padding: 0 12px; border-radius: 9px; }
+@keyframes ix-tostada-entra { from { opacity: 0; transform: translateY(12px); } }
+@keyframes ix-tostada-sale { to { opacity: 0; transform: translateY(8px); } }
+
+/* ---------- Lo que entra, sale, rueda y se sacude ---------- */
+.ix-entra { animation: ix-entra var(--t-nav) var(--rebote); }
+@keyframes ix-entra { from { opacity: 0; transform: translateY(8px); } }
+.ix-vuela { animation: ix-vuela 420ms var(--curva); }
+@keyframes ix-vuela { from { opacity: 0; transform: translate(-80px, -24px) scale(.94); } }
+.ix-recien { position: relative; }
+.ix-recien::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; border: 2px solid var(--logro); opacity: 0; pointer-events: none; animation: ix-borde 1.2s var(--curva); }
+@keyframes ix-borde { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+.ix-sale { animation: ix-sale 260ms var(--curva-salida) forwards; }
+@keyframes ix-sale { to { opacity: 0; transform: translateX(48px); } }
+.ix-tilde { animation: ix-tilde 300ms var(--rebote); }
+@keyframes ix-tilde { from { opacity: 0; transform: scale(.4); } }
+.ix-crece { animation: ix-crece 260ms var(--rebote); }
+@keyframes ix-crece { from { opacity: 0; transform: scale(.8); } }
+.ix-encoge { animation: ix-encoge 200ms var(--curva-salida) forwards; }
+@keyframes ix-encoge { to { opacity: 0; transform: scale(.6); } }
+.ix-sacude { animation: ix-sacude 320ms var(--curva); }
+@keyframes ix-sacude { 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.ix-sube { animation: ix-sube var(--t) var(--curva); }
+@keyframes ix-sube { from { opacity: 0; transform: translateY(40%); } }
+.ix-baja { animation: ix-baja var(--t) var(--curva); }
+@keyframes ix-baja { from { opacity: 0; transform: translateY(-40%); } }
+.ix-funde { animation: ix-funde var(--t) var(--curva); }
+@keyframes ix-funde { from { opacity: 0; } }
+.ix-apagado { opacity: .45; }
+.ix-oculto { display: none !important; }
+.ix-fantasma-sel { position: absolute; z-index: 2; pointer-events: none; mix-blend-mode: multiply; transition: transform var(--t) var(--curva); }
+
+/* Destello de la captura */
+.ix-destello { position: fixed; inset: 0; z-index: 90; background: #fff; pointer-events: none; animation: ix-destello 120ms linear forwards; }
+.celu .ix-destello { position: absolute; }
+@keyframes ix-destello { from { opacity: .95; } to { opacity: 0; } }
+
+/* ---------- Foto en grande ---------- */
+.ix-foto .ix-caja { left: 50%; top: 50%; background: transparent; box-shadow: none; transform-origin: 0 0; transition: transform var(--t-nav) var(--curva), opacity var(--t) var(--curva); }
+.ix-foto .ix-caja img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; background: var(--superficie); box-shadow: var(--sombra-3); }
+.ix-foto .ix-caja.producto img { padding: 32px; }
+.ix-foto .ctrl { position: absolute; z-index: 2; width: 44px; height: 44px; border-radius: 99px; border: 0; background: rgba(26, 29, 27, .72); color: #fff; display: grid; place-items: center; }
+.ix-foto .cuenta { position: absolute; z-index: 2; left: 50%; bottom: 20px; transform: translateX(-50%); }
+
+/* ---------- Cámara (celular) ---------- */
+.ix-camara .ix-caja { inset: 0; background: #0B1F1A; color: #fff; transform: scale(1.04); display: block; }
+.ix-camara .visor { position: absolute; left: 0; right: 0; top: 0; bottom: 180px; background: radial-gradient(90% 60% at 50% 45%, #2A3F38 0%, #10241E 70%, #07140F 100%); overflow: hidden; }
+.ix-camara .visor img { position: absolute; left: 50%; top: 50%; width: 300px; height: 300px; margin: -150px 0 0 -150px; object-fit: contain; filter: drop-shadow(0 18px 24px rgba(0, 0, 0, .5)); }
+.ix-camara .marco-foco { position: absolute; left: 40px; right: 40px; top: 150px; bottom: 140px; border-radius: 24px; border: 2px solid rgba(255, 255, 255, .7); }
+.ix-camara .arriba { position: absolute; top: 52px; left: 16px; right: 16px; display: flex; align-items: center; justify-content: space-between; }
+.ix-camara .redondo { width: 44px; height: 44px; border-radius: 99px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .2); color: #fff; display: grid; place-items: center; }
+.ix-camara .abajo { position: absolute; left: 0; right: 0; bottom: 0; height: 180px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 28px 24px; }
+.ix-camara .disparo { width: 76px; height: 76px; border-radius: 99px; background: #fff; border: 0; box-shadow: 0 0 0 5px rgba(255, 255, 255, .3); transition: transform var(--t-micro) var(--curva); }
+.ix-camara .disparo:active { transform: scale(.92); }
+.ix-camara .pista-c { text-align: center; font-size: 15px; font-weight: 650; color: rgba(255, 255, 255, .85); position: absolute; left: 0; right: 0; bottom: 186px; }
+
+/* Galería (celular) */
+.ix-galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.ix-galeria button { height: 110px; border: 0; padding: 0; border-radius: 10px; overflow: hidden; background: var(--hundido); }
+.ix-galeria img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.ix-galeria .producto img { object-fit: contain; padding: 10px; }
+
+/* Vuelta a la pantalla de antes (las audaces) */
+.ix-vuelta { position: absolute; inset: 0; z-index: 40; visibility: hidden; }
+.ix-vuelta.si { visibility: visible; }
+.ix-vuelta > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; transform-origin: 0 0; transition: transform var(--t-nav) var(--curva), opacity var(--t) var(--curva); }
+.ix-vuelta .ix-pildora { position: absolute; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 16px; border-radius: 16px; background: var(--pino); color: #fff; font-weight: 650; font-size: 15px; box-shadow: var(--sombra-3); opacity: 0; transform: translateY(12px); transition: transform var(--t-nav) var(--curva), opacity var(--t) var(--curva); }
+.ix-vuelta.lista .ix-pildora { opacity: 1; transform: none; }
+.ix-vuelta .ix-pildora .btn { min-height: 36px; }
+.ix-vuelta .ix-pildora .kbd { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .3); color: #fff; }
+.ix-se-va { transition: transform var(--t-nav) var(--curva), opacity var(--t) var(--curva); }
+
+/* Listo (después de mandar) */
+.ix-listo { display: grid; justify-items: center; text-align: center; gap: 12px; padding: 40px 24px; }
+.ix-listo .circulo { width: 72px; height: 72px; border-radius: 99px; background: var(--logro-suave); color: var(--logro-texto); display: grid; place-items: center; }
+.ix-listo .circulo .i { width: 36px; height: 36px; }
+
+/* Dictado (celular 3): las barras se mueven solo mientras se escucha */
+.ix-onda b { animation: ix-onda 900ms ease-in-out infinite; transform-origin: center; }
+.ix-onda b:nth-child(2) { animation-delay: -300ms; } .ix-onda b:nth-child(3) { animation-delay: -600ms; } .ix-onda b:nth-child(4) { animation-delay: -150ms; } .ix-onda b:nth-child(5) { animation-delay: -450ms; }
+@keyframes ix-onda { 50% { transform: scaleY(.4); } }

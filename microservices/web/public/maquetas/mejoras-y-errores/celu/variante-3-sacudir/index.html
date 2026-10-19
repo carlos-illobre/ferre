@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../mye.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; background: var(--pino); }
   .celu { background: radial-gradient(120% 70% at 50% 25%, var(--pino-2) 0%, var(--pino) 60%, #0B1F1A 100%); color: #fff; }
@@ -75,5 +77,161 @@
   </div>
   <span class="home-ind" style="background:var(--tinta)"></span>
 </div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Celu 3 · Sacudí y marcá: marcar con el dedo, dictar, mandar; × vuelve a Vender y «Sacudir»
+   (o sacudir el celular de verdad) abre el aviso otra vez. */
+document.addEventListener("DOMContentLoaded", function () {
+  var M = MYE;
+  var celu = document.querySelector(".celu"), lienzo = document.querySelector(".lienzo"), hoja = document.querySelector(".hoja");
+  var tope = document.querySelector(".tope"), herr = document.querySelector(".herram");
+  var redondos = tope.querySelectorAll(".redondo");
+  [hoja, tope, herr, lienzo].forEach(function (x) { x.classList.add("ix-se-va"); });
+  redondos.forEach(function (r) { r.style.cursor = "pointer"; });
+
+  // ---------- Marcar con el dedo ----------
+  var botones = herr.querySelectorAll("span:not(.color)");
+  botones = [herr.children[0], herr.children[1], herr.children[2]];
+  botones.forEach(function (b) { b.style.cursor = "pointer"; });
+  var modo = "marcar";
+  botones[0].addEventListener("click", function () { if (M.elegir(botones[0], "si")) modo = "marcar"; });
+  botones[1].addEventListener("click", function () { if (M.elegir(botones[1], "si")) modo = "tapar"; });
+  lienzo.style.touchAction = "none";
+  var NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "0 0 232 324"); svg.setAttribute("style", "position:absolute;inset:0;width:100%;height:100%;overflow:visible");
+  lienzo.appendChild(svg);
+  var hechos = [lienzo.querySelector(".trazo")], trazo = null;
+  function punto(e) { var r = lienzo.getBoundingClientRect(); return [Math.round((e.clientX - r.left) * 232 / r.width), Math.round((e.clientY - r.top) * 324 / r.height)]; }
+  lienzo.addEventListener("pointerdown", function (e) {
+    e.preventDefault(); lienzo.setPointerCapture(e.pointerId); var p = punto(e);
+    if (modo === "tapar") {
+      var t = document.createElement("div"); t.style.cssText = "position:absolute;left:" + p[0] + "px;top:" + p[1] + "px;width:0;height:0;border-radius:6px;background:var(--tinta)";
+      lienzo.appendChild(t); trazo = { el: t, o: p };
+    } else {
+      var path = document.createElementNS(NS, "path");
+      path.setAttribute("fill", "none"); path.setAttribute("stroke", "#E8541C"); path.setAttribute("stroke-width", "5"); path.setAttribute("stroke-linecap", "round"); path.setAttribute("stroke-linejoin", "round");
+      svg.appendChild(path); trazo = { el: path, pts: [p] }; path.setAttribute("d", "M" + p.join(" "));
+    }
+  });
+  lienzo.addEventListener("pointermove", function (e) {
+    if (!trazo) return; var p = punto(e);
+    if (trazo.o) { var o = trazo.o, s = trazo.el.style; s.left = Math.min(o[0], p[0]) + "px"; s.top = Math.min(o[1], p[1]) + "px"; s.width = Math.abs(p[0] - o[0]) + "px"; s.height = Math.abs(p[1] - o[1]) + "px"; }
+    else { trazo.pts.push(p); trazo.el.setAttribute("d", "M" + trazo.pts.map(function (q) { return q.join(" "); }).join(" L")); }
+  });
+  function soltar() {
+    if (!trazo) return; var t = trazo; trazo = null;
+    if (t.o) { if (parseFloat(t.el.style.width) < 8) { t.el.style.width = "90px"; t.el.style.height = "18px"; } }
+    else {
+      if (t.pts.length < 2) return t.el.remove();
+      var p = t.pts, d = "M" + p[0].join(" ");
+      for (var i = 1; i < p.length - 1; i++) d += " Q" + p[i].join(" ") + " " + (p[i][0] + p[i + 1][0]) / 2 + " " + (p[i][1] + p[i + 1][1]) / 2;
+      t.el.setAttribute("d", d + " L" + p[p.length - 1].join(" "));
+    }
+    hechos.push(t.el); M.vibrar(10);
+  }
+  lienzo.addEventListener("pointerup", soltar); lienzo.addEventListener("pointercancel", soltar);
+  redondos[1].addEventListener("click", function () {
+    var el = hechos.pop(); if (!el) return M.sacudir(redondos[1]);
+    el.style.transition = "opacity var(--t) var(--curva)"; el.style.opacity = "0"; setTimeout(function () { el.remove(); }, 220);
+  });
+
+  // ---------- Otra foto ----------
+  var va = hoja.querySelector(".va .pastilla"), extras = 0;
+  botones[2].addEventListener("click", function () {
+    if (extras >= 4) return M.sacudir(botones[2]);
+    M.galeria(function () {
+      extras++; va.innerHTML = '<i class="i i-s" data-i="image"></i>1 captura marcada + ' + extras + (extras > 1 ? " fotos" : " foto"); window.pintarIconos(va);
+      M.animar(va, "ix-crece", 280); M.vibrar(10);
+    });
+  });
+
+  // ---------- Idea o error, y dictar ----------
+  var enviar = hoja.querySelector(".acc .btn-accion"), etiqueta = document.createElement("span");
+  enviar.childNodes.forEach(function (n) { if (n.nodeType === 3 && n.textContent.trim()) { etiqueta.textContent = n.textContent.trim(); enviar.replaceChild(etiqueta, n); } });
+  var tipo = "error";
+  hoja.querySelectorAll(".eleccion > button").forEach(function (b, k) { b.addEventListener("click", function () { if (M.elegir(b)) { tipo = k ? "error" : "idea"; M.fundir(etiqueta, k ? "Enviar error" : "Enviar idea"); M.vibrar(10); } }); });
+  var dicho = hoja.querySelector(".dicho"), et = dicho.querySelector(".et"), onda = et.querySelector(".onda");
+  var txt = document.createElement("span");
+  while (et.nextSibling) txt.appendChild(et.nextSibling);
+  dicho.appendChild(txt);
+  var mic = hoja.querySelector(".mic"); mic.style.cursor = "pointer";
+  var escuchando = true, reloj = null;
+  function etiquetaDicho(html, color) { et.innerHTML = html; et.style.color = color || ""; window.pintarIconos(et); M.animar(et, "ix-funde", 220); }
+  function parar() {
+    escuchando = false; clearInterval(reloj); onda.classList.remove("ix-onda");
+    txt.querySelectorAll(".gris").forEach(function (g) { g.classList.remove("gris"); });
+    etiquetaDicho('<i class="i i-s" data-i="check"></i>Entendí · tocá para corregir');
+    M.editable(txt, { ayuda: "Tocá el micrófono y contá qué pasó" });
+  }
+  var FRASES = ["«Los tarugos S8 de Fischer salen sin precio y la lista llegó ayer»", "«En Vender, el precio de los tarugos queda vacío aunque cargué la lista»", "«Que se pueda dictar la cantidad cuando cuento el depósito»"];
+  var frase = 0;
+  function escuchar() {
+    escuchando = true; txt.removeAttribute("contenteditable"); txt.innerHTML = "";
+    et.innerHTML = ""; et.appendChild(onda); et.appendChild(document.createTextNode("Te escucho")); et.style.color = "";
+    onda.classList.add("ix-onda");
+    var palabras = FRASES[frase++ % FRASES.length].split(" "), k = 0;
+    reloj = setInterval(function () {
+      if (k >= palabras.length) { clearInterval(reloj); setTimeout(function () { if (escuchando) parar(); }, 500); return; }
+      var w = document.createElement("span"); w.className = "gris"; w.textContent = (k ? " " : "") + palabras[k];
+      txt.appendChild(w); M.animar(w, "ix-funde", 200);
+      var grises = txt.querySelectorAll(".gris"); if (grises.length > 2) grises[0].classList.remove("gris");
+      k++;
+    }, 180);
+    M.vibrar(10);
+  }
+  mic.addEventListener("click", function () { if (escuchando) parar(); else escuchar(); });
+
+  // ---------- Enviar ----------
+  var listo = null;
+  enviar.addEventListener("click", function () {
+    if (escuchando) parar();
+    if (!M.texto(txt)) { M.sacudir(dicho); return; }
+    listo = M.h('<div class="ix-listo ix-funde" style="position:absolute;inset:0;background:var(--fondo);border-radius:inherit;align-content:center">' +
+      '<span class="circulo ix-tilde"><i class="i" data-i="check"></i></span><div class="t-seccion">' + (tipo === "error" ? "Error enviado" : "Idea enviada") + "</div>" +
+      '<div class="t-cuerpo" style="color:var(--texto-2)">Con la captura marcada y «Estaba en Vender». Te avisamos cuando se resuelva.</div></div>');
+    hoja.appendChild(listo); M.vibrar([10, 40, 10]);
+    setTimeout(function () { volver("Aviso enviado · seguí vendiendo"); }, 1500);
+  });
+
+  // ---------- Volver a Vender y sacudir para avisar ----------
+  var vuelta = M.h('<div class="ix-vuelta" style="z-index:45"><img src="../../imagenes/cap-vender-celu.webp" alt="Vender" style="object-position:top center">' +
+    '<div class="ix-pildora" style="left:12px;right:12px;bottom:100px;padding:10px 10px 10px 14px;gap:8px"><i class="i" data-i="vibrate"></i><span style="flex:1;line-height:20px;white-space:nowrap">Sacudí para avisar</span>' +
+    '<button class="btn chico" data-sacudir>Sacudir</button><button class="btn chico btn-accion" data-ir="vender">Ir a Vender</button></div></div>');
+  celu.appendChild(vuelta);
+  var vImg = vuelta.querySelector("img"), abierto = true;
+  function enLienzo() {
+    var e = 232 / 390, cx = lienzo.offsetLeft + 116, cy = lienzo.offsetTop + 162;
+    return "translate(" + (cx - 390 * e / 2) + "px," + (cy - 844 * e * .62) + "px) rotate(-2deg) scale(" + e + ")";
+  }
+  function volver(msj) {
+    if (!abierto) return; abierto = false;
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    vImg.style.transition = "none"; vImg.style.transform = enLienzo(); vImg.style.opacity = ".6"; vuelta.classList.add("si");
+    hoja.style.transform = "translateY(100%)"; tope.style.opacity = "0"; herr.style.opacity = "0";
+    requestAnimationFrame(function () { requestAnimationFrame(function () { vImg.style.transition = ""; vImg.style.transform = "none"; vImg.style.opacity = "1"; }); });
+    setTimeout(function () { vuelta.classList.add("lista"); if (msj) M.tostada(msj); }, 340);
+  }
+  function sacudido() {
+    if (abierto) return; abierto = true;
+    vuelta.classList.remove("lista"); M.animar(vImg, "ix-sacude", 340); M.vibrar([10, 40, 10]);
+    setTimeout(function () {
+      M.destello();
+      if (listo) { listo.remove(); listo = null; txt.innerHTML = ""; extras = 0; va.innerHTML = '<i class="i i-s" data-i="image"></i>1 captura marcada'; window.pintarIconos(va); escuchar(); }
+      vImg.style.transform = enLienzo(); vImg.style.opacity = "0";
+      hoja.style.transform = ""; tope.style.opacity = ""; herr.style.opacity = "";
+      setTimeout(function () { vuelta.classList.remove("si"); }, 330);
+    }, 340);
+  }
+  redondos[0].addEventListener("click", function () { volver(); });
+  vuelta.querySelector("[data-sacudir]").addEventListener("click", sacudido);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !M.hayCapa() && !(document.activeElement && document.activeElement.isContentEditable)) volver(); });
+  var ultimo = 0;
+  window.addEventListener("devicemotion", function (e) {
+    var a = e.acceleration || e.accelerationIncludingGravity; if (!a || abierto) return;
+    var f = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
+    if (f > 30 && Date.now() - ultimo > 1500) { ultimo = Date.now(); sacudido(); }
+  });
+});
+</script>
 </body>
 </html>

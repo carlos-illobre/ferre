@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../mye.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .volver { display: inline-flex; align-items: center; gap: 2px; padding: 0 12px 0 8px; height: 22px; font-size: 15px; font-weight: 700; color: var(--pino-texto); }
@@ -31,7 +33,7 @@
 <body>
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="currentColor"/></svg></span></div>
-  <span class="volver"><i class="i i-s" data-i="chevron-left"></i>Más</span>
+  <span class="volver" data-mas><i class="i i-s" data-i="chevron-left"></i>Más</span>
   <div class="celu-cabecera"><span class="t-titulo">Mejoras y errores</span></div>
   <div class="celu-estado" style="color:var(--urgente-texto)"><span class="punto" style="background:var(--urgente)"></span>Sin conexión · 1 por enviar</div>
 
@@ -55,7 +57,7 @@
       <span class="t-seccion">Tickets</span>
       <div class="segmentos"><button class="elegido">Abiertos 7</button><button>Resueltos 23</button></div>
     </div>
-    <div class="tk porenviar">
+    <div class="tk porenviar" data-id="p1">
       <span class="tipo idea" style="background:var(--superficie)"><i class="i" data-i="lightbulb"></i></span>
       <div><div class="texto">Que «llave» muestre primero las combinadas</div><div class="quien" style="color:var(--urgente-texto);font-weight:650">Por enviar · sale al volver la señal</div></div>
       <i class="i" data-i="cloud-upload" style="color:var(--urgente-texto);margin-top:2px"></i>
@@ -65,13 +67,120 @@
 
   <div class="barra-accion"><button class="btn btn-accion grande"><i class="i" data-i="send"></i>Enviar idea</button></div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Celu 1 · El buzón, sin conexión: lo tuyo queda «por enviar». Tocá la línea de la conexión
+   para simular que vuelve la señal (o que se corta). */
+document.addEventListener("DOMContentLoaded", function () {
+  var M = MYE;
+  M.TICKETS.unshift({ id: "p1", porEnviar: true, tipo: "idea", texto: "Que «llave» muestre primero las combinadas", autor: "Carlos Illobre", corto: "Vos", ini: "CI",
+    cuando: "recién", hora: "Hoy 10:40", disp: "Moto G54", version: "5.3.2", pantalla: "Vender", icoPantalla: "shopping-cart", fotos: [], charla: [], tambien: [], estado: "abierto", mio: true });
+  var pantalla = document.querySelector(".celu-pantalla");
+  pantalla.style.overflowY = "auto"; pantalla.style.scrollbarWidth = "none";
+  var estadoEl = document.querySelector(".celu-estado");
+  var sec = document.querySelector(".sec"), seg = sec.querySelectorAll(".segmentos > button");
+  var enLinea = false, vista = "abierto", cnt = { abierto: 7, resuelto: 23 };
+
+  // ---------- Escribir ----------
+  var zona = document.querySelector(".escribir");
+  var caja = M.editable(zona.querySelector(".caja"), { ayuda: "Contá qué falta o qué no anda" });
+  var enviar = document.querySelector(".barra-accion .btn-accion");
+  var etiqueta = document.createElement("span");
+  enviar.childNodes.forEach(function (n) { if (n.nodeType === 3 && n.textContent.trim()) { etiqueta.textContent = n.textContent.trim(); enviar.replaceChild(etiqueta, n); } });
+  var tipo = "idea";
+  zona.querySelectorAll(".eleccion > button").forEach(function (b, k) {
+    b.addEventListener("click", function () { if (M.elegir(b)) { tipo = k ? "error" : "idea"; M.fundir(etiqueta, k ? "Enviar error" : "Enviar idea"); M.vibrar(10); } });
+  });
+  var cam = zona.querySelector(".tomar.cam"), gal = zona.querySelector(".tomar.gal"), cuantas = zona.querySelector(".cuantas");
+  var fotos = M.fotos({ contenedor: zona.querySelector(".fotos"), antes: cuantas, botones: [cam, gal], contador: function (n, r) {
+    cuantas.innerHTML = '<span class="ix-n">' + n + "</span>/5"; if (r) M.animar(cuantas.firstChild, "ix-sube", 220);
+  } });
+  cam.addEventListener("click", function () { if (fotos.lleno()) return M.sacudir(cam); M.camara(function (src, prod) { fotos.agregar(src, prod, cam); }); });
+  gal.addEventListener("click", function () { if (fotos.lleno()) return M.sacudir(gal); M.galeria(function (src, prod) { fotos.agregar(src, prod, gal); }); });
+
+  // ---------- La lista ----------
+  function porEnviar() { return M.TICKETS.filter(function (t) { return t.porEnviar; }); }
+  function pintarEstado() {
+    var n = porEnviar().length;
+    estadoEl.style.color = enLinea ? "" : "var(--urgente-texto)";
+    estadoEl.innerHTML = '<span class="punto"' + (enLinea ? "" : ' style="background:var(--urgente)"') + "></span>" + (enLinea ? "En línea · todo enviado" : "Sin conexión · " + (n ? n + " por enviar" : "nada por enviar"));
+    M.animar(estadoEl, "ix-funde", 220);
+  }
+  function tkHTML(t) {
+    var ico = '<i class="i" data-i="' + (t.tipo === "idea" ? "lightbulb" : "bug") + '"></i>';
+    if (t.porEnviar) return '<div class="tk porenviar" data-id="' + t.id + '"><span class="tipo ' + t.tipo + '" style="background:var(--superficie)">' + ico + '</span><div><div class="texto">' + M.esc(t.texto) +
+      '</div><div class="quien" style="color:var(--urgente-texto);font-weight:650">Por enviar · sale al volver la señal</div></div><i class="i" data-i="cloud-upload" style="color:var(--urgente-texto);margin-top:2px"></i></div>';
+    var lado = t.estado === "resuelto" ? '<i class="i" data-i="circle-check" style="color:var(--logro-texto);margin-top:10px"></i>'
+      : t.dias ? '<span class="pastilla urgente" style="height:26px;margin-top:6px">' + t.dias + " días</span>" : '<i class="i" data-i="chevron-right" style="color:var(--texto-3);margin-top:10px"></i>';
+    var quien = t.corto + " · " + t.cuando + (t.fotos.length ? " · " + t.fotos.length + (t.fotos.length > 1 ? " fotos" : " foto") : "") + (t.estado === "resuelto" ? " · resuelto" : "");
+    return '<div class="tk" data-id="' + t.id + '"><span class="tipo ' + t.tipo + '">' + ico + '</span><div><div class="texto">' + M.esc(t.texto) + '</div><div class="quien">' + quien + "</div></div>" + lado + "</div>";
+  }
+  function limpiar() { while (sec.nextElementSibling) sec.nextElementSibling.remove(); }
+  function render(nuevoId) {
+    limpiar();
+    var lista = enLinea ? M.TICKETS.filter(function (t) { return !t.porEnviar && t.estado === vista; }) : (vista === "abierto" ? porEnviar() : []);
+    lista.forEach(function (t) { var el = M.h(tkHTML(t)); pantalla.appendChild(el); if (t.id === nuevoId) { el.classList.add("ix-vuela", "ix-recien"); setTimeout(function () { el.classList.remove("ix-vuela", "ix-recien"); }, 1300); } });
+    if (!enLinea) pantalla.appendChild(M.h('<div class="aviso pino" style="margin-top:8px"><i class="i" data-i="wifi-off"></i><span>' + (vista === "abierto" ? "Los tickets enviados se ven cuando vuelva la conexión. Lo tuyo sale solo, una vez." : "Los resueltos se ven cuando vuelva la conexión.") + "</span></div>"));
+  }
+  seg.forEach(function (b, k) { b.addEventListener("click", function () { if (M.elegir(b, "elegido")) { vista = k ? "resuelto" : "abierto"; render(); M.animar(pantalla.lastElementChild, "ix-funde", 220); } }); });
+
+  estadoEl.style.cursor = "pointer";
+  estadoEl.addEventListener("click", function () {
+    if (enLinea) { enLinea = false; pintarEstado(); render(); M.tostada("Sin conexión: lo que mandes queda por enviar", { icono: "wifi-off" }); return; }
+    var pend = porEnviar(), els = pantalla.querySelectorAll(".tk.porenviar");
+    els.forEach(function (el) {
+      var nube = el.lastElementChild; nube.style.transition = "transform var(--t-nav) var(--curva), opacity var(--t-nav) var(--curva)"; nube.style.transform = "translateY(-12px)"; nube.style.opacity = "0";
+      var blanco = document.createElement("span"); blanco.style.cssText = "position:absolute;inset:0;border-radius:inherit;background:var(--superficie);opacity:0;transition:opacity var(--t-nav) var(--curva);pointer-events:none";
+      el.style.position = "relative"; el.appendChild(blanco); requestAnimationFrame(function () { blanco.style.opacity = "1"; });
+    });
+    setTimeout(function () {
+      pend.forEach(function (t) { t.porEnviar = false; t.cuando = "recién"; cnt.abierto++; });
+      enLinea = true; pintarEstado(); render();
+      if (pend.length) M.rodar(M.numero(seg[0]), cnt.abierto);
+      M.tostada(pend.length ? "Volvió la señal · " + (pend.length > 1 ? "se enviaron " + pend.length : "se envió el tuyo") : "Volvió la señal", { icono: "wifi" });
+    }, els.length ? 420 : 0);
+  });
+
+  // ---------- Enviar ----------
+  enviar.addEventListener("click", function () {
+    var txt = M.texto(caja);
+    if (!txt) { M.sacudir(zona.querySelector(".caja")); M.enfocar(caja); return; }
+    var t = { id: "n" + Date.now(), porEnviar: !enLinea, tipo: tipo, texto: txt, autor: "Carlos Illobre", corto: "Vos", ini: "CI", cuando: "recién", hora: "Hoy 10:42", disp: "Moto G54", version: "5.3.2",
+      pantalla: "Mejoras y errores", icoPantalla: "lightbulb", fotos: fotos.lista(), charla: [{ ini: "CI", quien: "Vos", hora: "lo abriste recién" }], tambien: [], estado: "abierto", mio: true };
+    M.TICKETS.unshift(t);
+    if (vista !== "abierto") { seg[0].classList.add("elegido"); seg[1].classList.remove("elegido"); vista = "abierto"; }
+    if (enLinea) { cnt.abierto++; M.rodar(M.numero(seg[0]), cnt.abierto); }
+    render(t.id); pintarEstado();
+    caja.innerHTML = ""; fotos.vaciar(); M.vibrar([10, 40, 10]);
+    pantalla.scrollTo({ top: sec.offsetTop - 12, behavior: "smooth" });
+    M.tostada(enLinea ? (tipo === "idea" ? "Idea enviada" : "Error enviado") + " · lo ven todos" : "Guardado · sale solo cuando vuelva la señal", { icono: enLinea ? "circle-check" : "cloud-upload" });
+  });
+
+  // ---------- Abrir un ticket ----------
+  pantalla.addEventListener("click", function (e) {
+    var el = e.target.closest(".tk"); if (!el) return;
+    var t = M.ticket(el.dataset.id); if (!t) return;
+    M.detalle(t, {
+      alResolver: function (t, nota) {
+        t.estado = "resuelto"; t.nota = nota; t.resolvio = "Carlos"; t.cuandoRes = "recién";
+        cnt.abierto--; cnt.resuelto++;
+        var el = pantalla.querySelector('.tk[data-id="' + t.id + '"]');
+        if (el) M.sacarDeLista(el);
+        M.rodar(M.numero(seg[0]), cnt.abierto); M.rodar(M.numero(seg[1]), cnt.resuelto);
+        M.tostada("Resuelto · le avisamos a " + (t.mio ? "todos" : t.corto), { deshacer: function () { t.estado = "abierto"; cnt.abierto++; cnt.resuelto--; M.rodar(M.numero(seg[0]), cnt.abierto); M.rodar(M.numero(seg[1]), cnt.resuelto); render(t.id); } });
+      },
+      alReabrir: function (t) { t.estado = "abierto"; cnt.abierto++; cnt.resuelto--; M.rodar(M.numero(seg[0]), cnt.abierto); M.rodar(M.numero(seg[1]), cnt.resuelto); render(); M.tostada("Reabierto", { icono: "rotate-ccw" }); }
+    });
+  });
+});
+</script>
 </body>
 </html>
