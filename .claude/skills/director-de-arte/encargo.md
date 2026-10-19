@@ -10,7 +10,8 @@
   diferencian en la idea, no en el estilo; la audaz puede romperlo diciendo qué rompe. Lo que
   falte (íconos, fotos) va en tu carpeta; `_comun/` no se modifica salvo que el encargo te pida
   definirlo.
-- **Qué podés leer:** `specs/`, `docs/` y `microservices/web/src/pantallas/paleta.css`, y las
+- **Qué podés leer:** `specs/`, `docs/` (sobre todo `docs/lenguaje-mostrador/`, el lenguaje
+  oficial) y `microservices/web/src/pantallas/paleta.css`, y las
   fuentes de `microservices/web/node_modules/@fontsource-variable/`. El resto del código no,
   ni `tests/capturas/`, ni la aplicación funcionando.
 - **Internet:** podés bajar fotos, fuentes e íconos de bancos libres y mirar referencias.

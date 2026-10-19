@@ -901,3 +901,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      botones no escriben pruebas con Playwright ni comparan capturas: alcanza con abrirlas una vez
      y mirar que no haya errores en la consola. Las pruebas siguen valiendo para lo que toca la
      aplicación de verdad.
+115. **El lenguaje «Mostrador» es el oficial** (2026-10-19). Carlos aprobó la paleta y todo lo
+     que define el lenguaje visual que armó el director de arte para las propuestas: colores con
+     su trabajo (papel cálido, pino para el lugar, naranja para la única acción principal, ámbar,
+     rojo y verde solo en piezas chicas, un color fijo por medio de pago), Manrope, íconos Lucide,
+     el molde de renglón y dato, botones, pastillas, espaciado, relieve, movimiento y el marco de
+     la aplicación. Queda en `docs/lenguaje-mostrador/` y lo toma por defecto toda pantalla nueva
+     o rediseñada. El director de arte puede proponer algo superador; si lo es, lo decide Carlos.
+     Reemplaza la paleta anterior (coral, tinta y niebla) y los colores de los medios de pago de
+     la decisión 108, que pasan a ser los de esa guía; la regla de la 108 (un color por
+     significado, siempre el mismo) sigue.

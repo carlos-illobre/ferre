@@ -49,6 +49,12 @@ para saber en qué situación se usa esa pantalla (en el mostrador, recibiendo m
 
 Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec.md).
 
+**Cómo se ve**
+
+- El lenguaje visual oficial es «Mostrador» (`docs/lenguaje-mostrador/`): paleta, letra, íconos,
+  piezas, movimiento y marco. Toda pantalla nueva o rediseñada lo toma por defecto; solo se cambia
+  si el director de arte propone algo superador y Carlos lo elige (decisión 115).
+
 **Aprender y operar**
 
 - Se aprende sin manual: cada pantalla se explica sola y su estado vacío dice qué hacer

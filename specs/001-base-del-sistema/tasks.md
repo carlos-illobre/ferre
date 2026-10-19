@@ -42,3 +42,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T031 [agente] Propuestas de diseño de todas las pantallas, en computadora y celular, hechas por el director de arte y guardadas en `docs/propuestas-de-diseno/` para que Carlos las revise; lo que rechaza se borra (Carlos, 2026-10-19)
 - [x] T032 [ajuste] El prompt del director de arte se guarda como la skill `/director-de-arte`, que corre solo cuando Carlos la pide (Carlos, 2026-10-19)
 - [x] T033 [ajuste] Las maquetas del director de arte se pueden navegar en el ambiente de pruebas, en /v2, /v3 y /v4, sin que la aplicación instalada las guarde (decisión 113)
+- [x] T034 [regla] El lenguaje «Mostrador» es el oficial: lo toma por defecto toda pantalla nueva o rediseñada, salvo que el director de arte proponga algo superador y Carlos lo elija (decisión 115)

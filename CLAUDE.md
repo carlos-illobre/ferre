@@ -122,6 +122,9 @@ Tarda unos segundos por edición. No reemplaza las compuertas de antes de subir.
   [ADR-015](docs/adr/ADR-015-la-interfaz-elegida-es-la-version-5.md). Lo que Carlos pidió de
   ella, que es regla para cualquier cambio:
   [specs/001-base-del-sistema/ux.md](specs/001-base-del-sistema/ux.md), sección «2026-10-11».
+- **El lenguaje visual oficial es «Mostrador»** ([docs/lenguaje-mostrador/](docs/lenguaje-mostrador/README.md),
+  decisión 115): paleta, letra, íconos, piezas y marco. Toda pantalla nueva o rediseñada lo toma
+  por defecto; solo cambia si el director de arte propone algo superador y Carlos lo elige.
 - **Tiene dos juegos de pantallas, celular y computadora, en archivos separados, a
   propósito** (decisión 46). Entre los dos: **las reglas son idénticas, la paleta es una sola
   (`paleta.css`) y los textos dicen lo mismo** (`textos.ts`: largos en la computadora, que

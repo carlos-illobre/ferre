@@ -45,8 +45,9 @@ le guste usarlo.
 - **Color con intención.** Colores llamativos y saturados solo donde hay que llamar la
   atención (lo urgente, la acción principal, un error, un logro), en piezas chicas
   (pastillas, insignias, un botón). Colores sobrios, grises cálidos y blanco para lo
-  secundario. Si la paleta actual (`microservices/web/src/pantallas/paleta.css`) no alcanza,
-  proponé otra: una sola para toda la aplicación, y mostrala aplicada.
+  secundario. Partí del lenguaje oficial «Mostrador»
+  (`docs/lenguaje-mostrador/`): es la paleta y el estilo por defecto. Si tenés algo superador,
+  proponelo aparte, mostrado aplicado y marcado como propuesta: lo decide Carlos.
 - **Un mismo molde.** Elementos del mismo tipo con la misma estructura en toda la pantalla
   (por ejemplo: ícono o foto a la izquierda, título y detalle, el número grande, la pastilla
   de estado, la flecha), para que se lea de un vistazo.

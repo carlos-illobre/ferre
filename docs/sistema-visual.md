@@ -4,6 +4,13 @@ Cómo se ve Ferrebress. La decisión de tener dos interfaces está en
 [ADR-014](adr/ADR-014-dos-interfaces-celular-y-escritorio.md); lo que Carlos pidió de cada
 pantalla, en [specs/001-base-del-sistema/ux.md](../specs/001-base-del-sistema/ux.md).
 
+## El lenguaje oficial: «Mostrador»
+
+Desde la decisión 115 (2026-10-19) el lenguaje visual oficial es **«Mostrador»**, en
+[lenguaje-mostrador/](lenguaje-mostrador/README.md): lo toma por defecto toda pantalla nueva o
+rediseñada. Lo que sigue en este archivo describe la aplicación de hoy, que pasa a «Mostrador»
+pantalla por pantalla; donde no coincidan, para lo nuevo manda «Mostrador».
+
 ## Dos interfaces
 
 Hay dos juegos de pantallas sobre la misma aplicación, con la misma paleta y la misma marca:
