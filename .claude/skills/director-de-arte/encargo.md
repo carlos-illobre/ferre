@@ -10,8 +10,9 @@
   diferencian en la idea, no en el estilo; la audaz puede romperlo diciendo qué rompe. Lo que
   falte (íconos, fotos) va en tu carpeta; `_comun/` no se modifica salvo que el encargo te pida
   definirlo.
-- **Qué podés leer:** `specs/`, `docs/` (sobre todo `docs/lenguaje-mostrador/`, el lenguaje
-  oficial) y `microservices/web/src/pantallas/paleta.css`, y las
+- **El lenguaje oficial de Ferrebress es «Mostrador»** (`docs/lenguaje-mostrador/`, decisión
+  115): partí de él. Una paleta o un estilo distinto va aparte, como propuesta para Carlos.
+- **Qué podés leer:** `specs/`, `docs/` y `microservices/web/src/pantallas/paleta.css`, y las
   fuentes de `microservices/web/node_modules/@fontsource-variable/`. El resto del código no,
   ni `tests/capturas/`, ni la aplicación funcionando.
 - **Internet:** podés bajar fotos, fuentes e íconos de bancos libres y mirar referencias.

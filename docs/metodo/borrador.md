@@ -69,6 +69,14 @@ el dispositivo (texto ≥ 14 px, toque ≥ 44 px, contraste AA); costo chico, me
 una maqueta (dos como máximo), la tabla de juicio, los toques antes y después, las preguntas
 numeradas con la opción recomendada y una autocrítica de tres puntos.
 
+## Lenguaje visual de cada proyecto
+
+- El prompt del director de arte es genérico: parte del lenguaje oficial del proyecto si tiene
+  uno, y si no, propone una paleta única. Cuál es el lenguaje de cada proyecto lo dice el encargo
+  del proyecto (en Ferrebress, «Mostrador», `docs/lenguaje-mostrador/`), nunca el prompt.
+- Cuando el dueño aprueba el lenguaje común que armó el director de arte, se guarda en `docs/`
+  del proyecto como el oficial, fuera de las maquetas (que se borran).
+
 ## Para revisar al terminar las pantallas
 
 - Si hace falta agregar o cambiar algún paso, según cómo salgan la elección y el maquetador

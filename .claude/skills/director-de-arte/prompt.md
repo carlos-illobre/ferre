@@ -45,9 +45,10 @@ le guste usarlo.
 - **Color con intención.** Colores llamativos y saturados solo donde hay que llamar la
   atención (lo urgente, la acción principal, un error, un logro), en piezas chicas
   (pastillas, insignias, un botón). Colores sobrios, grises cálidos y blanco para lo
-  secundario. Partí del lenguaje oficial «Mostrador»
-  (`docs/lenguaje-mostrador/`): es la paleta y el estilo por defecto. Si tenés algo superador,
-  proponelo aparte, mostrado aplicado y marcado como propuesta: lo decide Carlos.
+  secundario. Si el proyecto tiene un lenguaje visual oficial
+  (te lo dice el encargo), partí de él: es la paleta y el estilo por defecto. Si tenés algo
+  superador, proponelo aparte, mostrado aplicado y marcado como propuesta: lo decide el dueño.
+  Si no tiene uno, proponé una paleta única para toda la aplicación, mostrada aplicada.
 - **Un mismo molde.** Elementos del mismo tipo con la misma estructura en toda la pantalla
   (por ejemplo: ícono o foto a la izquierda, título y detalle, el número grande, la pastilla
   de estado, la flecha), para que se lea de un vistazo.
