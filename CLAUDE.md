@@ -51,7 +51,8 @@ capacidad que toca. **Ningún cambio queda solo en el código:** si otro agente 
 la aplicación leyendo solo la documentación, le tiene que salir igual que ahora.
 
 - **Todo en una sola sesión y sin subagentes:** el mismo agente hace los pasos en orden; el único
-  subagente es el revisor del final. Se lee la constitución y el `resumen.md` de la capacidad que se toca; la `spec.md`
+  subagente es el revisor del final (y el director de arte, solo cuando Carlos escribe
+  `/director-de-arte`: propone, no decide). Se lee la constitución y el `resumen.md` de la capacidad que se toca; la `spec.md`
   y el `ux.md` completos, solo en la parte que se va a cambiar. Si la capacidad no tiene
   resumen, lo escribe quien la lee completa por primera vez.
 - **Sin ramas ni pull requests:** todo se sube directo a `master`. `master` es el ambiente de

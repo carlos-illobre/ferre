@@ -40,3 +40,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T029 [arreglo] Las pruebas de punta a punta cierran las ventanas que abren además de la suya (otra computadora, otro celular): seguían abiertas y trabajando hasta el final de la tanda y la hacían más lenta (proyecto T129)
 - [x] T030 [ajuste] El entorno de las sesiones en la nube pasa a tener acceso completo a internet (Carlos, 2026-10-19), anotado en la documentación de operación
 - [x] T031 [agente] Propuestas de diseño de todas las pantallas, en computadora y celular, hechas por el director de arte y guardadas en `docs/propuestas-de-diseno/` para que Carlos las revise; lo que rechaza se borra (Carlos, 2026-10-19)
+- [x] T032 [ajuste] El prompt del director de arte se guarda como la skill `/director-de-arte`, que corre solo cuando Carlos la pide (Carlos, 2026-10-19)

@@ -13,7 +13,7 @@ su capacidad.
   las ponen lado a lado, y `resumen.md` explica cada variante y numera sus ideas.
 
 **Lo que Carlos rechaza se borra** de esta carpeta; lo que queda está todavía en revisión.
-El prompt con que se hicieron está en `director-de-arte.md`.
+Se hicieron con la skill `/director-de-arte` (`.claude/skills/director-de-arte/`), que corre solo cuando Carlos la pide.
 
 ## Las pantallas
 
