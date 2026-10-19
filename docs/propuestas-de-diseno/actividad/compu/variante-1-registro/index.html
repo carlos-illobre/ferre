@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quién hizo qué · computadora · 1 registro</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/actividad.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  .pantalla { display: grid; grid-template-columns: minmax(0,1fr) 312px; gap: 20px; padding-top: 16px; }
+  .izq { display: flex; flex-direction: column; min-width: 0; }
+  .filtros { display: flex; gap: 8px; align-items: center; }
+  .filtros .segmentos > * { min-height: 38px; }
+  .linea-total { display: flex; align-items: baseline; gap: 10px; margin: 14px 0 10px; }
+  .linea-total b { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+  .linea-total .t-detalle { flex: 1; }
+  .tabla { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); overflow: hidden; }
+  .fila { display: grid; grid-template-columns: 48px 100px 186px minmax(0,1fr) 16px; align-items: center; gap: 12px; height: 41px; padding: 0 14px; border-top: 1px solid var(--borde); font-size: 15px; }
+  .fila:first-child { border-top: 0; }
+  .fila.cab { height: 36px; background: var(--hundido); color: var(--texto-2); font-size: 14px; font-weight: 650; }
+  .fila .hora { font-weight: 700; color: var(--texto-2); }
+  .fila .quien { display: flex; align-items: center; gap: 8px; font-weight: 650; white-space: nowrap; }
+  .fila .quien .av { width: 26px; height: 26px; font-size: 14px; }
+  .fila .que { display: flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; }
+  .fila .que .tipo-ico { width: 26px; height: 26px; border-radius: 8px; }
+  .fila .det { color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila .det b { color: var(--tinta); font-weight: 650; }
+  .fila .mas { color: var(--texto-3); }
+  .fila.elegida { background: var(--pino-suave); box-shadow: inset 4px 0 0 var(--pino); }
+  .fila.elegida .mas { color: var(--pino); }
+  .pie-tabla { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+  .der { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .caja { padding: 16px; }
+  .caja h3 { margin: 0 0 10px; font-size: 16px; font-weight: 750; display: flex; align-items: center; gap: 8px; }
+  .caja h3 small { margin-left: auto; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .barras { display: grid; gap: 2px; }
+  .b { display: grid; grid-template-columns: 18px minmax(0,1fr) 56px 24px; align-items: center; gap: 8px; height: 30px; padding: 0 6px; border-radius: 8px; font-size: 14px; font-weight: 650; }
+  .b .n { text-align: right; font-weight: 800; }
+  .b .track { display: contents; }
+  .b .track span { grid-column: 2; grid-row: 1; white-space: nowrap; }
+  .b .track i { grid-column: 3; grid-row: 1; height: 8px; border-radius: 9px; background: var(--texto-3); justify-self: start; min-width: 6px; }
+  .b.r .track i { background: var(--error); } .b.r { color: var(--error-texto); }
+  .b.u .track i { background: var(--urgente); }
+  .det-cab { display: flex; gap: 12px; align-items: center; }
+  .det-cab .t-renglon { font-size: 18px; }
+  .kv { display: grid; grid-template-columns: 92px 1fr; gap: 6px 10px; margin-top: 14px; font-size: 14px; }
+  .kv dt { color: var(--texto-2); font-weight: 600; }
+  .kv dd { margin: 0; font-weight: 650; }
+  .cita { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--hundido); font-size: 14px; font-weight: 600; color: var(--texto-2); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Negocio</div>
+      <div class="acciones"><span class="t-detalle">Lunes 19 de octubre · 10:42</span><button class="btn chico"><i class="i i-s" data-i="file-down"></i>Bajar en planilla</button></div>
+    </header>
+    <nav class="pestanas"><a>Resumen</a><a>Usuarios</a><a class="activa">Quién hizo qué</a></nav>
+    <section class="pantalla">
+      <div class="izq">
+        <div class="filtros">
+          <span class="selector"><span class="et">Quién</span>Todos<i class="i i-s" data-i="chevron-down"></i></span>
+          <span class="segmentos"><button class="elegido">Hoy</button><button>Ayer</button><button>Esta semana</button><button><i class="i i-s" data-i="calendar-range"></i>Desde… hasta</button></span>
+          <span class="selector"><span class="et">Qué</span>Todo<i class="i i-s" data-i="chevron-down"></i></span>
+          
+        </div>
+        <div class="linea-total"><b>38 acciones</b><span class="t-detalle">hoy, de la más nueva a la más vieja</span><span class="t-detalle" style="flex:none">Página <b style="font-size:14px;color:var(--tinta)">1 de 4</b></span></div>
+        <div class="tabla">
+          <div class="fila cab"><span>Hora</span><span>Quién</span><span>Qué</span><span>Detalle</span><span></span></div>
+          <div class="fila"><span class="hora">10:41</span><span class="quien"><span class="av mb">MB</span>Marcos</span><span class="que"><span class="tipo-ico"><i class="i i-s" data-i="shopping-cart"></i></span>Venta cobrada</span><span class="det">Venta 0412 · 5 productos · <b>$45.500</b> en efectivo</span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">10:37</span><span class="quien"><span class="av ci">CI</span>Carlos</span><span class="que"><span class="tipo-ico urgente"><i class="i i-s" data-i="percent"></i></span>Cambio de margen</span><span class="det">Tarugos nylon S8 × 100 · <span class="cambio"><s>50 %</s><span class="flecha">→</span>100 %</span> · <span class="cambio"><s>$7.000</s><span class="flecha">→</span>$9.000</span></span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila elegida"><span class="hora">10:30</span><span class="quien"><span class="av mb">MB</span>Marcos</span><span class="que"><span class="tipo-ico error"><i class="i i-s" data-i="ban"></i></span>Venta anulada</span><span class="det">Venta 0409 · <b>$17.000</b> · «el cliente se arrepintió»</span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">10:22</span><span class="quien"><span class="av mb">MB</span>Marcos</span><span class="que"><span class="tipo-ico urgente"><i class="i i-s" data-i="package"></i></span>Ajuste de stock</span><span class="det">Clavos punta París 2" · <span class="cambio"><s>12,4 kg</s><span class="flecha">→</span>10 kg</span> · «bolsa rota»</span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">10:15</span><span class="quien"><span class="av ci">CI</span>Carlos</span><span class="que"><span class="tipo-ico"><i class="i i-s" data-i="file-text"></i></span>Lista aplicada</span><span class="det">Bulonera Centro · 1.284 productos · <b>312</b> cambiaron de precio</span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">10:02</span><span class="quien"><span class="av mb">MB</span>Marcos</span><span class="que"><span class="tipo-ico"><i class="i i-s" data-i="shopping-cart"></i></span>Venta cobrada</span><span class="det">Venta 0408 · 2 productos · <b>$24.000</b> con Mercado Pago</span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">09:48</span><span class="quien"><span class="av ci">CI</span>Carlos</span><span class="que"><span class="tipo-ico"><i class="i i-s" data-i="user-x"></i></span>Usuario desactivado</span><span class="det">Lucía Ferreyra · se le cerraron <b>2 sesiones</b></span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">09:31</span><span class="quien"><span class="av mb">MB</span>Marcos</span><span class="que"><span class="tipo-ico"><i class="i i-s" data-i="truck"></i></span>Compra recibida</span><span class="det">Distribuidora Oeste · Fact. A-0004-12345 · 18 productos · <b>$425.000</b></span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">09:05</span><span class="quien"><span class="av mb">MB</span>Marcos</span><span class="que"><span class="tipo-ico"><i class="i i-s" data-i="log-in"></i></span>Entró</span><span class="det">Con la huella · Moto G54 de Marcos</span><i class="i i-s mas" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="hora">08:58</span><span class="quien"><span class="av ci">CI</span>Carlos</span><span class="que"><span class="tipo-ico"><i class="i i-s" data-i="log-in"></i></span>Entró</span><span class="det">Compu del mostrador · abierta desde su celular</span><i class="i i-s mas" data-i="chevron-right"></i></div>
+        </div>
+        <div class="pie-tabla">
+          <span class="t-detalle">1 a 10 de 38 · <span class="kbd">↑</span> <span class="kbd">↓</span> recorren, <span class="kbd">Enter</span> abre</span>
+          <div class="paginador"><button class="btn chico btn-icono" disabled><i class="i i-s" data-i="chevron-left"></i></button><span class="pag actual">1</span><span class="pag">2</span><span class="pag">3</span><span class="pag">4</span><button class="btn chico"><span>Siguiente</span><i class="i i-s" data-i="chevron-right"></i><span class="kbd">→</span></button></div>
+        </div>
+      </div>
+
+      <aside class="der">
+        <div class="tarjeta caja">
+          <h3>Qué pasó hoy <small>tocá para filtrar</small></h3>
+          <div class="barras">
+            <div class="b"><i class="i i-s" data-i="shopping-cart"></i><div class="track"><i style="width:100%"></i><span>Ventas cobradas</span></div><span class="n">23</span></div>
+            <div class="b"><i class="i i-s" data-i="log-in"></i><div class="track"><i style="width:22%"></i><span>Entradas</span></div><span class="n">5</span></div>
+            <div class="b u"><i class="i i-s" data-i="percent"></i><div class="track"><i style="width:17%"></i><span>Precios y márgenes</span></div><span class="n">4</span></div>
+            <div class="b u"><i class="i i-s" data-i="package"></i><div class="track"><i style="width:9%"></i><span>Ajustes de stock</span></div><span class="n">2</span></div>
+            <div class="b r"><i class="i i-s" data-i="ban"></i><div class="track"><i style="width:5%"></i><span>Ventas anuladas</span></div><span class="n">1</span></div>
+            <div class="b"><i class="i i-s" data-i="truck"></i><div class="track"><i style="width:13%"></i><span>Compras, listas, usuarios</span></div><span class="n">3</span></div>
+          </div>
+        </div>
+        <div class="tarjeta-2 caja" style="flex:1">
+          <div class="det-cab"><span class="tipo-ico l error"><i class="i" data-i="ban"></i></span><div><div class="t-renglon">Venta anulada</div><div class="t-detalle">Hoy 10:30 · hace 12 minutos</div></div></div>
+          <dl class="kv">
+            <dt>Quién</dt><dd style="display:flex;gap:6px;align-items:center"><span class="av mb" style="width:22px;height:22px;font-size:14px">M</span>Marcos Benítez</dd>
+            <dt>Desde</dt><dd>Moto G54 de Marcos</dd>
+            <dt>Venta</dt><dd>0409, cobrada a las 10:12</dd>
+            <dt>Llevaba</dt><dd>Cinta métrica PowerLock 5 m · 1 un.</dd>
+            <dt>Total</dt><dd><span class="pastilla medio efectivo" style="background:var(--efectivo-suave);color:var(--efectivo);height:24px">Efectivo</span> $17.000</dd>
+          </dl>
+          <div class="cita">«El cliente se arrepintió»</div>
+          <div style="display:flex;gap:8px;margin-top:12px"><button class="btn chico btn-suave">Ver la venta<i class="i i-s" data-i="arrow-up-right"></i></button><button class="btn chico btn-suave">Lo de Marcos hoy</button></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+</div>
+</body>
+</html>

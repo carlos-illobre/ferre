@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quién hizo qué · computadora · 2 el día de cada uno</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/actividad.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  .pantalla { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
+  .semana { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)) 44px; gap: 8px; }
+  .dia { padding: 8px 12px; border-radius: 12px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 0 8px; }
+  .dia .d, .dia .n { grid-column: 1; }
+  .dia .d { font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .dia .n { font-size: 20px; font-weight: 800; line-height: 24px; }
+  .dia .mini { display: flex; gap: 2px; align-items: flex-end; height: 26px; grid-row: 1 / span 2; grid-column: 2; }
+  .dia .mini b { width: 6px; border-radius: 2px; background: var(--borde-fuerte); }
+  .dia .mini b.c { background: #F3B79E; } .dia .mini b.m { background: #8DB7A6; }
+  .dia.cerrado { background: transparent; box-shadow: none; border-style: dashed; }
+  .dia.cerrado .n { color: var(--texto-3); font-size: 15px; }
+  .dia.elegido { background: var(--pino); border-color: var(--pino); color: #fff; box-shadow: var(--sombra-2); }
+  .dia.elegido .d { color: rgba(255,255,255,.75); }
+  .dia.elegido .mini b.c { background: #F6A07C; } .dia.elegido .mini b.m { background: #9FD3BE; }
+  .dia .rojo { width: 8px; height: 8px; border-radius: 9px; background: var(--error); display: inline-block; margin-left: 6px; vertical-align: 1px; }
+  .dia.elegido .rojo { box-shadow: 0 0 0 2px var(--pino); background: #FF7A6B; }
+  .barra-tipos { display: flex; align-items: center; gap: 8px; }
+  .chip { height: 36px; padding: 0 14px; font-size: 14px; }
+  .chip .c { color: var(--texto-3); font-weight: 700; }
+  .chip.elegido .c { color: rgba(255,255,255,.7); }
+  .chip.rojo:not(.elegido) { border-color: #F0B8B1; color: var(--error-texto); }
+  .carriles { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) 212px; gap: 16px; }
+  .carril { display: flex; flex-direction: column; min-height: 0; }
+  .carril-cab { display: flex; align-items: center; gap: 10px; padding: 0 4px 10px; }
+  .carril-cab .t-renglon { font-size: 17px; }
+  .carril-cab .reparto { margin-left: auto; display: flex; height: 8px; width: 96px; border-radius: 9px; overflow: hidden; background: var(--hundido-2); }
+  .ev { display: grid; grid-template-columns: 44px 32px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 8px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; box-shadow: var(--sombra-1); }
+  .ev + .ev { margin-top: 6px; }
+  .ev .h { font-size: 14px; font-weight: 750; color: var(--texto-2); }
+  .ev .q { font-size: 15px; font-weight: 700; line-height: 20px; }
+  .ev .dt { font-size: 14px; color: var(--texto-2); line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ev .mn { font-weight: 800; font-size: 15px; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+  .carril-cab .reparto i { display: block; height: 100%; }
+  .ev.paquete { background: var(--hundido); border-style: dashed; border-color: var(--borde-fuerte); box-shadow: none; }
+  .ev.paquete .tipo-ico { background: var(--superficie); }
+  .ev.rojo { border-color: #F0B8B1; box-shadow: inset 4px 0 0 var(--error), var(--sombra-1); }
+  .vacio { padding: 16px; border-radius: 16px; border: 1px dashed var(--borde-fuerte); display: grid; gap: 8px; justify-items: start; }
+  .vacio + .vacio { margin-top: 12px; }
+  .respuesta { padding: 14px 16px; border-radius: 16px; background: var(--pino-suave); color: var(--pino-texto); font-size: 15px; font-weight: 600; line-height: 22px; margin-top: 12px; }
+  .respuesta b { color: var(--pino); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Negocio</div>
+      <div class="acciones"><button class="btn chico btn-fantasma"><i class="i i-s" data-i="list-filter"></i>Ver como lista <span class="kbd">L</span></button><button class="btn chico"><i class="i i-s" data-i="calendar-range"></i>Otro rango <span class="kbd">F</span></button></div>
+    </header>
+    <nav class="pestanas"><a>Resumen</a><a>Usuarios</a><a class="activa">Quién hizo qué</a></nav>
+    <section class="pantalla">
+      <div class="semana">
+        <div class="dia"><span class="d">Mar 13</span><span class="n">41</span><span class="mini"><b class="c" style="height:9px"></b><b class="m" style="height:20px"></b></span></div>
+        <div class="dia"><span class="d">Mié 14<span class="rojo"></span></span><span class="n">52</span><span class="mini"><b class="c" style="height:12px"></b><b class="m" style="height:24px"></b></span></div>
+        <div class="dia"><span class="d">Jue 15</span><span class="n">47</span><span class="mini"><b class="c" style="height:8px"></b><b class="m" style="height:24px"></b></span></div>
+        <div class="dia"><span class="d">Vie 16</span><span class="n">63</span><span class="mini"><b class="c" style="height:16px"></b><b class="m" style="height:26px"></b></span></div>
+        <div class="dia"><span class="d">Sáb 17<span class="rojo"></span></span><span class="n">58</span><span class="mini"><b class="c" style="height:6px"></b><b class="m" style="height:26px"></b></span></div>
+        <div class="dia cerrado"><span class="d">Dom 18</span><span class="n">Cerrado</span></div>
+        <div class="dia elegido"><span class="d">Hoy<span class="rojo"></span></span><span class="n">38</span><span class="mini"><b class="c" style="height:10px"></b><b class="m" style="height:22px"></b></span></div>
+        <button class="btn btn-icono" style="height:100%;flex-direction:column;gap:2px"><i class="i i-s" data-i="chevron-left"></i><span class="kbd">←</span></button>
+      </div>
+      <div class="barra-tipos">
+        <span class="chip elegido">Todo <span class="c">38</span></span>
+        <span class="chip"><i class="i i-s" data-i="shopping-cart"></i>Ventas <span class="c">23</span></span>
+        <span class="chip"><i class="i i-s" data-i="percent"></i>Precios <span class="c">5</span></span>
+        <span class="chip"><i class="i i-s" data-i="package"></i>Stock y compras <span class="c">3</span></span>
+        <span class="chip rojo"><i class="i i-s" data-i="ban"></i>Anulaciones <span class="c">1</span></span>
+        <span class="chip"><i class="i i-s" data-i="users"></i>Usuarios y entradas <span class="c">6</span></span>
+      </div>
+
+      <div class="carriles">
+        <div class="carril">
+          <div class="carril-cab"><span class="av l mb">MB</span><div><div class="t-renglon">Marcos Benítez</div><div class="t-detalle">27 acciones · desde las 09:05</div></div><span class="reparto"><i style="width:78%;background:var(--texto-3)"></i><i style="width:8%;background:var(--urgente)"></i><i style="width:5%;background:var(--error)"></i></span></div>
+          <div class="ev"><span class="h">10:41</span><span class="tipo-ico"><i class="i i-s" data-i="shopping-cart"></i></span><div><div class="q">Venta cobrada · 0412</div><div class="dt">5 productos · efectivo</div></div><span class="mn">$45.500</span></div>
+          <div class="ev rojo"><span class="h">10:30</span><span class="tipo-ico error"><i class="i i-s" data-i="ban"></i></span><div><div class="q">Anuló la venta 0409</div><div class="dt">«El cliente se arrepintió» · de 10:12</div></div><span class="mn" style="color:var(--error-texto)">−$17.000</span></div>
+          <div class="ev"><span class="h">10:22</span><span class="tipo-ico urgente"><i class="i i-s" data-i="package"></i></span><div><div class="q">Ajustó clavos punta París 2"</div><div class="dt"><span class="cambio"><s>12,4 kg</s><span class="flecha">→</span>10 kg</span> · «bolsa rota»</div></div><span class="mn">−2,4 kg</span></div>
+          <div class="ev paquete"><span class="h">10:20<br>09:12</span><span class="tipo-ico"><i class="i i-s" data-i="shopping-cart"></i></span><div><div class="q">20 ventas cobradas</div><div class="dt">12 efectivo · 6 M. Pago · 2 tarjeta</div></div><span class="mn">$318.000 <i class="i i-s" data-i="chevron-down" style="color:var(--texto-3)"></i></span></div>
+          <div class="ev"><span class="h">09:31</span><span class="tipo-ico"><i class="i i-s" data-i="truck"></i></span><div><div class="q">Recibió una compra</div><div class="dt">Distribuidora Oeste · 18 productos</div></div><span class="mn">$425.000</span></div>
+          <div class="ev"><span class="h">09:05</span><span class="tipo-ico"><i class="i i-s" data-i="fingerprint"></i></span><div><div class="q">Entró</div><div class="dt">Con la huella · Moto G54 de Marcos</div></div><span class="mn"></span></div>
+        </div>
+
+        <div class="carril">
+          <div class="carril-cab"><span class="av l ci">CI</span><div><div class="t-renglon">Carlos Illobre</div><div class="t-detalle">11 acciones · desde las 08:58</div></div><span class="reparto"><i style="width:18%;background:var(--texto-3)"></i><i style="width:40%;background:var(--urgente)"></i></span></div>
+          <div class="ev"><span class="h">10:37</span><span class="tipo-ico urgente"><i class="i i-s" data-i="percent"></i></span><div><div class="q">Margen de tarugos S8 × 100</div><div class="dt"><span class="cambio"><s>50 %</s><span class="flecha">→</span>100 %</span> · ahora $9.000</div></div><span class="mn">+$2.000</span></div>
+          <div class="ev paquete"><span class="h">10:34<br>10:25</span><span class="tipo-ico urgente"><i class="i i-s" data-i="percent"></i></span><div><div class="q">3 márgenes más</div><div class="dt">Mechas HSS 6, 8 y 10 mm · 50 → 100 %</div></div><span class="mn"><i class="i i-s" data-i="chevron-down" style="color:var(--texto-3)"></i></span></div>
+          <div class="ev"><span class="h">10:15</span><span class="tipo-ico"><i class="i i-s" data-i="file-text"></i></span><div><div class="q">Aplicó la lista de Bulonera Centro</div><div class="dt">1.284 productos · 312 cambiaron de precio</div></div><span class="mn"></span></div>
+          <div class="ev"><span class="h">09:48</span><span class="tipo-ico"><i class="i i-s" data-i="user-x"></i></span><div><div class="q">Desactivó a Lucía Ferreyra</div><div class="dt">Se le cerraron 2 sesiones</div></div><span class="mn"></span></div>
+          <div class="ev paquete"><span class="h">09:40<br>08:58</span><span class="tipo-ico"><i class="i i-s" data-i="log-in"></i></span><div><div class="q">3 entradas y 2 ventas</div><div class="dt">Compu del mostrador y Moto G54</div></div><span class="mn">$31.000 <i class="i i-s" data-i="chevron-down" style="color:var(--texto-3)"></i></span></div>
+          <div class="respuesta"><b>Hoy, en una línea:</b> Marcos vendió $363.500 y anuló una venta; Carlos cambió 4 márgenes y aplicó una lista.</div>
+        </div>
+
+        <div class="carril">
+          <div class="carril-cab"><span class="t-etiqueta" style="padding:10px 0 4px">Sin acciones hoy</span></div>
+          <div class="vacio"><div style="display:flex;gap:10px;align-items:center"><span class="av l lf">LF</span><div><div class="t-renglon" style="color:var(--texto-2)">Lucía Ferreyra</div><span class="pastilla" style="height:24px">Desactivada hoy</span></div></div><span class="t-detalle">Última acción: sáb 17, 18:52</span><button class="btn chico btn-suave">Ver su sábado</button></div>
+          <div class="vacio"><div style="display:flex;gap:10px;align-items:center"><span class="av l si"><i class="i" data-i="user-cog"></i></span><div class="t-renglon" style="color:var(--texto-2)">El sistema</div></div><span class="t-detalle">Lo que nadie hizo a mano: el alta del primer Administrador.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

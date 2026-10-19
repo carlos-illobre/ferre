@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quién hizo qué · celular · 2 el día de cada uno</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/actividad.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pestanas a { font-size: 14px; }
+  .gente { display: flex; gap: 14px; padding: 2px 2px 0; }
+  .p { display: grid; justify-items: center; gap: 4px; font-size: 14px; font-weight: 650; color: var(--texto-2); width: 60px; }
+  .p .av { width: 56px; height: 56px; font-size: 18px; position: relative; }
+  .p .av .n { position: absolute; right: -4px; bottom: -2px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); color: var(--tinta); font-size: 14px; font-weight: 800; display: grid; place-items: center; }
+  .p.elegido { color: var(--pino); font-weight: 800; }
+  .p.elegido .av { box-shadow: 0 0 0 3px var(--fondo), 0 0 0 5px var(--pino); }
+  .p.apagado { opacity: .6; }
+  .dias { display: flex; gap: 6px; margin-top: 14px; }
+  .dias span { flex: 1; height: 52px; border-radius: 12px; display: grid; place-items: center; align-content: center; gap: 0; font-size: 14px; font-weight: 650; color: var(--texto-2); background: var(--superficie); border: 1px solid var(--borde); line-height: 18px; }
+  .dias span b { font-size: 16px; color: var(--tinta); }
+  .dias span.el { background: var(--pino); border-color: var(--pino); color: rgba(255,255,255,.8); }
+  .dias span.el b { color: #fff; }
+  .dias span.cer { background: transparent; border-style: dashed; }
+  .frase { margin: 14px 2px 12px; font-size: 16px; line-height: 23px; font-weight: 600; color: var(--texto-2); }
+  .frase b { color: var(--tinta); font-weight: 800; }
+  .linea { position: relative; padding-left: 58px; }
+  .linea::before { content: ""; position: absolute; left: 49px; top: 10px; bottom: 0; width: 2px; background: var(--borde-fuerte); }
+  .it { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .it + .it { margin-top: 8px; }
+  .it .h { position: absolute; left: -58px; top: 12px; width: 40px; text-align: right; font-size: 14px; font-weight: 750; color: var(--texto-2); }
+  .it::before { content: ""; position: absolute; left: -14px; top: 17px; width: 10px; height: 10px; border-radius: 9px; background: var(--fondo); border: 2px solid var(--texto-3); }
+  .it.rojo::before { background: var(--error); border-color: var(--error); }
+  .it.amb::before { background: var(--urgente); border-color: var(--urgente); }
+  .it .q { font-weight: 750; font-size: 15px; line-height: 20px; }
+  .it .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
+  .it .m { font-weight: 800; font-size: 15px; white-space: nowrap; }
+  .it.paq { background: var(--hundido); border-style: dashed; border-color: var(--borde-fuerte); box-shadow: none; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Resumen</a><a>Usuarios</a><a class="activa">Quién hizo qué</a></nav>
+  <div class="celu-pantalla">
+    <div class="gente">
+      <div class="p"><span class="av si"><i class="i i-l" data-i="users"></i><span class="n">38</span></span>Todos</div>
+      <div class="p elegido"><span class="av mb">MB<span class="n">27</span></span>Marcos</div>
+      <div class="p"><span class="av ci">CI<span class="n">11</span></span>Carlos</div>
+      <div class="p apagado"><span class="av lf">LF</span>Lucía</div>
+      <div class="p apagado"><span class="av si"><i class="i i-l" data-i="user-cog"></i></span>Sistema</div>
+    </div>
+    <div class="dias"><span>Mié<b>14</b></span><span>Jue<b>15</b></span><span>Vie<b>16</b></span><span>Sáb<b>17</b></span><span class="cer">Dom<b style="color:var(--texto-3)">18</b></span><span class="el">Hoy<b>19</b></span></div>
+    <div class="frase"><b>Marcos</b> entró a las 09:05, <b>vendió $363.500</b> en 21 ventas y <b style="color:var(--error-texto)">anuló una</b>.</div>
+    <div class="linea">
+      <div class="it"><span class="h">10:41</span><div><div class="q">Venta 0412</div><div class="d">5 productos · efectivo</div></div><span class="m">$45.500</span></div>
+      <div class="it rojo" style="border-color:#F0B8B1"><span class="h">10:30</span><div><div class="q" style="color:var(--error-texto)">Anuló la venta 0409</div><div class="d">«El cliente se arrepintió»</div></div><span class="m" style="color:var(--error-texto)">−$17.000</span></div>
+      <div class="it amb"><span class="h">10:22</span><div><div class="q">Ajustó clavos París 2"</div><div class="d"><span class="cambio"><s>12,4 kg</s><span class="flecha">→</span>10 kg</span> · bolsa rota</div></div><span class="m">−2,4 kg</span></div>
+      <div class="it paq"><span class="h">10:20</span><div><div class="q">20 ventas cobradas</div><div class="d">desde las 09:12</div></div><span class="m">$318.000</span></div>
+      <div class="it"><span class="h">09:31</span><div><div class="q">Recibió una compra</div><div class="d">Distribuidora Oeste</div></div><span class="m">$425.000</span></div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

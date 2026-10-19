@@ -1,0 +1,39 @@
+/* Piezas propias de «Quién hizo qué». Todo con las variables de _comun/comun.css. */
+
+/* Avatares de las personas: siempre el mismo para cada una en todas las variantes */
+.av { width: 32px; height: 32px; border-radius: 99px; display: inline-grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; }
+.av.l { width: 44px; height: 44px; font-size: 16px; }
+.av.xl { width: 64px; height: 64px; font-size: 22px; }
+.av.ci { background: var(--accion-suave); color: var(--accion-texto); }
+.av.mb { background: var(--pino-suave); color: var(--pino-texto); }
+.av.lf { background: var(--hundido); color: var(--texto-3); }
+.av.si { background: var(--hundido-2); color: var(--texto-2); }
+
+/* Ícono del tipo de acción: neutro salvo lo que el dueño revisa */
+.tipo-ico { width: 32px; height: 32px; border-radius: 10px; display: inline-grid; place-items: center; background: var(--hundido); color: var(--texto-2); flex: none; }
+.tipo-ico.l { width: 44px; height: 44px; border-radius: 12px; }
+.tipo-ico.error { background: var(--error-suave); color: var(--error-texto); }
+.tipo-ico.urgente { background: var(--urgente-suave); color: var(--urgente-texto); }
+.tipo-ico.logro { background: var(--logro-suave); color: var(--logro-texto); }
+.tipo-ico.pino { background: var(--pino-suave); color: var(--pino-texto); }
+
+/* Antes → después, la forma de leer un cambio */
+.cambio { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; white-space: nowrap; }
+.cambio s { color: var(--texto-3); font-weight: 600; text-decoration-thickness: 1.5px; }
+.cambio .flecha { color: var(--texto-3); }
+
+/* Selector con valor: botón con rótulo arriba (filtros de la computadora) */
+.selector { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: var(--superficie); box-shadow: var(--sombra-1); font-weight: 700; font-size: 15px; white-space: nowrap; }
+.selector .et { color: var(--texto-2); font-weight: 600; }
+.selector.puesto { border-color: var(--pino); background: var(--pino-suave); color: var(--pino); }
+.selector .quitar { width: 22px; height: 22px; border-radius: 99px; display: grid; place-items: center; background: rgba(18, 56, 47, .1); }
+
+/* Paginador */
+.paginador { display: flex; align-items: center; gap: 8px; }
+.paginador .pag { min-width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-weight: 700; font-size: 14px; color: var(--texto-2); }
+.paginador .pag.actual { background: var(--pino); color: #fff; }
+
+/* Punto de densidad (calendario) */
+.dens { display: flex; gap: 3px; justify-content: center; }
+.dens b { width: 5px; height: 5px; border-radius: 9px; background: var(--borde-fuerte); }
+.dens b.r { background: var(--error); }

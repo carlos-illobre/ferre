@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quién hizo qué · celular · 3 quién tocó esto</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/actividad.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu { background: #0E1412; }
+  .camara { position: absolute; inset: 0 0 auto 0; height: 470px; overflow: hidden; background: radial-gradient(120% 80% at 50% 40%, #3A3A33 0%, #1B1D1A 70%); }
+  .estante { position: absolute; inset: 0; filter: blur(5px) saturate(.8) brightness(.75); }
+  .estante img { position: absolute; width: 150px; opacity: .9; }
+  .tabla { position: absolute; left: -20px; right: -20px; height: 18px; background: linear-gradient(#6b5b45, #463a2b); filter: blur(2px); }
+  .enfoque { position: absolute; left: 95px; top: 128px; width: 200px; height: 200px; }
+  .enfoque img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0,0,0,.5)); }
+  .marco-scan { position: absolute; left: 75px; top: 108px; width: 240px; height: 240px; }
+  .marco-scan i { position: absolute; width: 40px; height: 40px; border: 4px solid #fff; }
+  .marco-scan i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 16px 0 0 0; }
+  .marco-scan i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 16px 0 0; }
+  .marco-scan i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 16px; }
+  .marco-scan i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 16px 0; }
+  .leido { position: absolute; left: 50%; top: 354px; transform: translateX(-50%); white-space: nowrap; }
+  .arriba { position: absolute; top: 52px; left: 16px; right: 16px; display: flex; align-items: center; gap: 12px; color: #fff; }
+  .redondo { width: 44px; height: 44px; border-radius: 99px; background: rgba(0,0,0,.45); backdrop-filter: blur(10px); display: grid; place-items: center; color: #fff; flex: none; }
+  .arriba .t { font-weight: 750; font-size: 17px; line-height: 22px; flex: 1; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+  .arriba .t small { display: block; font-weight: 600; font-size: 14px; opacity: .8; }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; top: 410px; background: var(--fondo); border-radius: 24px 24px 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 0; }
+  .asa { width: 40px; height: 5px; border-radius: 9px; background: var(--borde-fuerte); margin: 0 auto 12px; }
+  .prod { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; }
+  .datos { display: flex; gap: 8px; margin: 12px 0 14px; }
+  .datos .dato { flex: 1; min-width: 0; }
+  .t-ev { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--borde); }
+  .t-ev:first-of-type { border-top: 0; }
+  .t-ev .q { font-weight: 700; font-size: 15px; line-height: 20px; }
+  .t-ev .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
+  .t-ev .h { font-size: 14px; font-weight: 700; color: var(--texto-2); text-align: right; line-height: 19px; }
+  .lista { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 2px 12px; }
+  .pie { position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="camara">
+    <div class="estante">
+      <img src="../../../_comun/fotos/tornillos.webp" style="left:-40px;top:70px">
+      <img src="../../../_comun/fotos/clavos.webp" style="left:260px;top:60px">
+      <div class="tabla" style="top:214px"></div>
+      <img src="../../../_comun/fotos/mecha.webp" style="left:-30px;top:250px">
+      <img src="../../../_comun/fotos/puntas.webp" style="left:270px;top:240px">
+      <div class="tabla" style="top:398px"></div>
+    </div>
+    <div class="enfoque"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+    <div class="marco-scan"><i></i><i></i><i></i><i></i></div>
+    <div class="arriba"><span class="redondo"><i class="i" data-i="x"></i></span><div class="t">¿Quién tocó esto?<small>Apuntá a un producto o su código</small></div><span class="redondo"><i class="i" data-i="flashlight"></i></span></div>
+    <div class="leido"><span class="tostada" style="font-size:14px"><i class="i i-s" data-i="check"></i>Leído · 7790123004512</span></div>
+  </div>
+
+  <div class="hoja">
+    <div class="asa"></div>
+    <div class="prod"><div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div><div class="t-renglon">Tarugos nylon S8 con tope × 100</div><div class="t-detalle">Fischer · 9 acciones en 30 días</div></div></div>
+    <div class="datos">
+      <div class="dato urgente"><span class="et">Precio</span><span class="va">$9.000</span></div>
+      <div class="dato"><span class="et">Costo</span><span class="va">$4.150</span></div>
+      <div class="dato logro"><span class="et">Stock</span><span class="va">3 un.</span></div>
+    </div>
+    <div class="lista">
+      <div class="t-ev"><span class="av ci">CI</span><div><div class="q">Margen <span class="cambio"><s>50 %</s><span class="flecha">→</span>100 %</span></div><div class="d">Carlos · precio $7.000 → $9.000</div></div><span class="h">Hoy<br>10:37</span></div>
+      <div class="t-ev"><span class="av mb">MB</span><div><div class="q">Vendió 2 un.</div><div class="d">Marcos · venta 0377 · $14.000</div></div><span class="h">Sáb<br>17:10</span></div>
+      <div class="t-ev"><span class="av ci">CI</span><div><div class="q">Lista de Fischer</div><div class="d">Carlos · costo $3.700 → $4.150</div></div><span class="h">Mié<br>16:20</span></div>
+    </div>
+  </div>
+  <div class="pie"><button class="btn grande" style="flex:1">Las 9 acciones<i class="i i-s" data-i="chevron-right"></i></button><button class="btn btn-oscuro grande btn-icono" style="width:56px"><i class="i i-l" data-i="scan-line"></i></button></div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>
