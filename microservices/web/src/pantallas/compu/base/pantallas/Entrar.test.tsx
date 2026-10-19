@@ -134,7 +134,7 @@ describe("la entrada de la computadora", () => {
   it("debajo de la tarjeta, las tres características técnicas (decisión 118); el aviso de quién puede entrar lleva un escudo", async () => {
     const { container } = render(<ConRutas><Entrar /></ConRutas>);
     const sellos = within(screen.getByTestId("sellos")).getAllByRole("listitem").map((li) => li.innerHTML.split("</svg>")[1]);
-    expect(sellos).toEqual(["<span>Ya adentro, sigue<br>funcionando sin internet</span>", "<span>Busca por código<br>de barras</span>", "<span>Maneja la computadora<br>desde el celular</span>"]);
+    expect(sellos).toEqual(["<span>Una vez dentro, resiste<br>cortes de internet</span>", "<span>Busca productos<br>por código de barras</span>", "<span>Maneja la computadora<br>desde el celular</span>"]);
     expect(container.querySelector(".entrar-cc-derecha > .entrar-cc-tarjeta + .entrar-cc-sellos")).toBeTruthy();
     const escudo = render(<Icono nombre="escudo" />).container.querySelector("path")?.getAttribute("d");
     expect(container.querySelector(".entrar-nota path")?.getAttribute("d")).toBe(escudo);

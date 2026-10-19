@@ -193,8 +193,8 @@ export const TEXTOS_DE_ENTRADA = {
 // Debajo de la tarjeta de la computadora, cada uno en dos renglones: las tres características
 // técnicas que más importan (decisión 118).
 export const SELLOS: { icono: NombreDeIcono; renglones: [string, string] }[] = [
-  { icono: "sin-internet", renglones: ["Ya adentro, sigue", "funcionando sin internet"] },
-  { icono: "escanear", renglones: ["Busca por código", "de barras"] },
+  { icono: "sin-internet", renglones: ["Una vez dentro, resiste", "cortes de internet"] },
+  { icono: "escanear", renglones: ["Busca productos", "por código de barras"] },
   { icono: "dispositivos", renglones: ["Maneja la computadora", "desde el celular"] },
 ];
 

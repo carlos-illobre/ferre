@@ -930,5 +930,5 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      protegidos» (ahí va a ir el sello de protección de datos personales). Arriba, «Computadora del
      mostrador» (fijo: el navegador no deja saber el nombre de la computadora) y el estado de la conexión con el servidor, que funciona de verdad: verde si
      contesta, gris mientras pregunta, ámbar si no; sin conexión el QR se ve apagado. Abajo, tres
-     características técnicas: ya adentro sigue funcionando sin internet (sin internet no se entra), busca por código de barras y maneja
+     características técnicas: una vez dentro resiste cortes de internet (sin internet no se entra), busca productos por código de barras y maneja
      la computadora desde el celular. Detalle en `specs/007-usuarios-y-acceso/ux.md`.
