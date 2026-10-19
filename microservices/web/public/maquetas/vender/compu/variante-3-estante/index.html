@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · Estante y boleta (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { overflow: hidden; }
+  .tope { height: 56px; background: var(--pino); color: #fff; display: flex; align-items: center; gap: 16px; padding: 0 20px; }
+  .tope .logo { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+  .tope b { font-size: 17px; font-weight: 800; }
+  .ir { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,.10); color: rgba(255,255,255,.8); font-size: 14px; font-weight: 600; width: 300px; }
+  .ir .kbd { margin-left: auto; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #fff; }
+  .tope .der { margin-left: auto; display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 650; }
+  .tope .p { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 99px; background: rgba(255,255,255,.10); }
+  .tope .p .punto { width: 8px; height: 8px; border-radius: 9px; background: #5EE0A0; }
+
+  .cuerpo { display: grid; grid-template-columns: minmax(0,1fr) 440px; height: calc(100vh - 56px); }
+  .estante { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .fila-sup { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 14px; }
+  .buscar { height: 60px; font-size: 18px; }
+  .camara { position: relative; height: 60px; border-radius: 14px; overflow: hidden; background: #0E1512; color: #fff; display: flex; align-items: center; gap: 12px; padding: 0 14px; box-shadow: var(--sombra-2); }
+  .camara .vivo { width: 44px; height: 44px; border-radius: 10px; background: radial-gradient(circle at 40% 40%, #3b4a44, #121a17); position: relative; overflow: hidden; flex: none; }
+  .camara .vivo::after { content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 2px; background: #FF6A33; box-shadow: 0 0 8px #FF6A33; }
+  .camara .t { font-size: 14px; line-height: 18px; font-weight: 700; }
+  .camara .t small { display: block; font-weight: 500; color: rgba(255,255,255,.7); font-size: 14px; }
+  .camara .rec { margin-left: auto; width: 10px; height: 10px; border-radius: 99px; background: #FF6A33; box-shadow: 0 0 0 4px rgba(255,106,51,.25); }
+  .rotulo { display: flex; align-items: baseline; gap: 10px; }
+  .rotulo .t-seccion { font-size: 18px; }
+  .grilla { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+  .prod { position: relative; background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .prod .img { height: 132px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; }
+  .prod .img img { height: 108px; width: 92%; object-fit: contain; filter: drop-shadow(0 6px 6px rgba(26,29,27,.18)); }
+  .prod .n { font-weight: 700; font-size: 15px; line-height: 19px; height: 38px; overflow: hidden; }
+  .prod .pie { display: flex; align-items: center; justify-content: space-between; }
+  .prod .precio { font-weight: 800; font-size: 19px; }
+  .prod .tecla { position: absolute; top: 16px; left: 16px; }
+  .prod.en { border: 2px solid var(--accion); padding: 9px; box-shadow: 0 8px 20px -10px rgba(232,84,28,.5); }
+  .prod .cuantos { position: absolute; top: 14px; right: 14px; height: 28px; min-width: 28px; padding: 0 9px; border-radius: 99px; background: var(--accion); color: #fff; font-weight: 800; font-size: 14px; display: grid; place-items: center; }
+
+  .mostrador { background: var(--hundido); border-left: 1px solid var(--borde); padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+  .boleta { position: relative; background: #fff; border-radius: 16px 16px 0 0; box-shadow: var(--sombra-2); padding: 20px 20px 18px; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .boleta::after { content: ""; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px; background: linear-gradient(-45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x, linear-gradient(45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x; filter: drop-shadow(0 4px 3px rgba(26,29,27,.06)); }
+  .boleta .cab { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 2px dashed var(--borde-fuerte); }
+  .linea { display: grid; grid-template-columns: 52px minmax(0,1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--borde); font-size: 15px; }
+  .linea .q { font-weight: 800; color: var(--texto-2); }
+  .linea .nm { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .linea .nm small { display: block; font-size: 14px; color: var(--texto-3); font-weight: 500; }
+  .linea .im { font-weight: 800; font-size: 16px; }
+  .linea.falta { background: var(--urgente-suave); margin: 0 -10px; padding: 9px 10px; border-radius: 10px; border: 0; }
+  .mini-m { display: inline-flex; gap: 3px; margin-top: 6px; }
+  .mini-m b { height: 26px; padding: 0 7px; border-radius: 6px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); color: var(--urgente-texto); font-size: 14px; display: grid; place-items: center; }
+  .boleta .tot { margin-top: auto; padding-top: 12px; border-top: 2px dashed var(--borde-fuerte); display: flex; align-items: flex-end; justify-content: space-between; }
+  .medios4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+  .md { height: 64px; border-radius: 14px; border: 1px solid var(--borde-fuerte); background: #fff; display: grid; justify-items: center; align-content: center; gap: 2px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .md .i { color: var(--c); }
+  .md.elegido { background: var(--c); border-color: var(--c); color: #fff; }
+  .md.elegido .i { color: #fff; }
+  .cobrar-xl { height: 64px; border-radius: 16px; font-size: 20px; justify-content: space-between; padding: 0 20px 0 24px; }
+</style>
+</head>
+<body>
+<header class="tope">
+  <span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b>
+  <span class="ir v-toca" data-ira role="button" tabindex="0"><i class="i i-s" data-i="command"></i>Ir a Catálogo, Stock, Hoy…<span class="kbd">Ctrl K</span></span>
+  <div class="der">
+    <span class="p"><span class="punto"></span>En línea</span>
+    <span class="p"><i class="i i-s" data-i="smartphone"></i>Celular en espejo</span>
+    <span class="p" data-ir="ventas-de-hoy" data-hoy>Hoy <b class="num">$412.000</b> · 23 ventas</span>
+    <span class="avatar v-toca" style="width:32px;height:32px" data-usuario>CI</span>
+  </div>
+</header>
+
+<div class="cuerpo">
+  <section class="estante">
+    <div class="fila-sup">
+      <div class="campo foco buscar"><i class="i i-l" data-i="search"></i><span>Buscá o escaneá con el lector<span class="cursor"></span></span><span class="kbd" style="margin-left:auto">/</span></div>
+      <div class="camara v-toca" data-escanear role="button"><span class="vivo"></span><div class="t">El celular está escaneando<small>Lo que lea entra a la boleta</small></div><span class="rec"></span></div>
+    </div>
+
+    <div class="rotulo"><span class="t-seccion">Lo que más sale a esta hora</span><span class="t-detalle">un clic o su número lo suma a la boleta</span></div>
+    <div class="grilla">
+      <div class="prod en v-toca" data-prod="mecha"><span class="kbd tecla">1</span><span class="cuantos">× 3</span><div class="img"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div class="n">Mecha acero rápido HSS 8 mm</div><div class="pie"><span class="precio num">$7.000</span><span class="pastilla logro">14 un.</span></div></div>
+      <div class="prod en v-toca" data-prod="cinta"><span class="kbd tecla">2</span><span class="cuantos">× 1</span><div class="img"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div class="n">Cinta métrica PowerLock 5 m</div><div class="pie"><span class="precio num">$17.000</span><span class="pastilla logro">6 un.</span></div></div>
+      <div class="prod en v-toca" data-prod="clavos"><span class="kbd tecla">3</span><span class="cuantos">0,7 kg</span><div class="img"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div class="n">Clavos punta París 2" por kilo</div><div class="pie"><span class="precio num">$8.000<small class="t-detalle"> /kg</small></span><span class="pastilla logro">12,4 kg</span></div></div>
+      <div class="prod v-toca" data-prod="lampara"><span class="kbd tecla">4</span><div class="img"><img src="../../../_comun/fotos/lampara.webp" alt=""></div><div class="n">Lámpara LED 9 W luz fría E27</div><div class="pie"><span class="precio num">$3.000</span><span class="pastilla logro">48 un.</span></div></div>
+      <div class="prod v-toca" data-prod="martillo"><span class="kbd tecla">5</span><div class="img"><img src="../../../_comun/fotos/martillo.webp" alt=""></div><div class="n">Martillo carpintero 27 mm mango tubular</div><div class="pie"><span class="precio num">$24.000</span><span class="pastilla urgente">2 un.</span></div></div>
+      <div class="prod v-toca" data-prod="pinza"><span class="kbd tecla">6</span><div class="img"><img src="../../../_comun/fotos/pinza.webp" alt=""></div><div class="n">Pinza universal 8" aislada</div><div class="pie"><span class="precio num">$19.000</span><span class="pastilla logro">7 un.</span></div></div>
+      <div class="prod v-toca" data-prod="pintura"><span class="kbd tecla">7</span><div class="img"><img src="../../../_comun/fotos/pintura.webp" alt=""></div><div class="n">Látex interior mate blanco 4 L</div><div class="pie"><span class="precio num">$38.000</span><span class="pastilla logro">9 un.</span></div></div>
+      <div class="prod v-toca" data-prod="puntas"><span class="kbd tecla">8</span><div class="img"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div class="n">Puntas Phillips PH2 × 25 mm × 10</div><div class="pie"><span class="precio num">$5.000</span><span class="pastilla">Sin stock</span></div></div>
+    </div>
+    <div class="otras" style="display:flex;gap:8px;margin-top:auto">
+      <button class="btn chico" data-libre><i class="i i-s" data-i="package-plus"></i>Ítem libre <span class="kbd">+</span></button>
+      <button class="btn chico" data-nollevo><i class="i i-s" data-i="undo-2"></i>No llevó <span class="kbd">Esc</span></button>
+      <button class="btn chico" data-pedido><i class="i i-s" data-i="clock"></i>Pasar a pedido</button>
+      <button class="btn chico" data-presupuesto><i class="i i-s" data-i="file-text"></i>Presupuesto</button>
+      <span class="t-detalle" style="margin-left:auto;align-self:center">Ganás en esta venta <b style="color:var(--pino-texto)">$21.200</b></span>
+    </div>
+  </section>
+
+  <aside class="mostrador">
+    <div class="boleta">
+      <div class="cab"><span class="t-renglon">Boleta de mostrador</span><span class="t-detalle">10:42 · Carlos</span></div>
+      <div class="linea"><span class="q num">3 ×</span><span class="nm">Mecha acero rápido HSS 8 mm<small>$7.000 c/u · margen 100 %</small></span><span class="im num">$21.000</span></div>
+      <div class="linea"><span class="q num">1 ×</span><span class="nm">Cinta métrica PowerLock 5 m<small>$17.000 · margen 50 % · <i class="i i-s" data-i="smartphone"></i> celular</small></span><span class="im num">$17.000</span></div>
+      <div class="linea"><span class="q num">0,7 kg</span><span class="nm">Clavos punta París 2"<small>$8.000 el kg · para arriba</small></span><span class="im num">$6.000</span></div>
+      <div class="linea falta"><span class="q num">1 ×</span><span class="nm">Tarugos nylon S8 × 100<small style="color:var(--urgente-texto)">Sin precio: elegí el margen</small><span class="mini-m"><b>300</b><b>200</b><b>100</b><b>50</b><b>25</b><b>$</b></span></span><span class="im" style="color:var(--urgente-texto)">—</span></div>
+      <div class="linea"><span class="q num">1 ×</span><span class="nm">Bolsa de arena × 25 kg<small style="color:var(--urgente-texto)">Ítem libre · no es múltiplo de $1.000</small></span><span class="im num">$1.500</span></div>
+      <div class="tot"><div><div class="t-etiqueta">Total</div><div class="t-detalle">5 productos</div></div><div class="t-total num"><span class="peso">$</span>45.500</div></div>
+    </div>
+    <div style="height:4px"></div>
+    <div class="medios4">
+      <button class="md medio efectivo elegido"><i class="i i-l" data-i="banknote"></i>Efectivo</button>
+      <button class="md medio mp"><i class="i i-l" data-i="qr-code"></i>M. Pago</button>
+      <button class="md medio tarjeta"><i class="i i-l" data-i="credit-card"></i>Tarjeta</button>
+      <button class="md medio cuenta"><i class="i i-l" data-i="notebook-pen"></i>Cta. cte.</button>
+    </div>
+    <button class="btn btn-accion cobrar-xl" data-cobrar><span>Cobrar <span class="num">$45.500</span> en efectivo</span><span class="kbd">F2</span></button>
+  </aside>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+// Compu 3 · El estante y la boleta: un clic en una foto (o su número) la suma a la boleta; el celular
+// que escanea también; cada renglón de la boleta abre su cantidad y su margen; Cobrar (F2) dice el medio.
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var boleta = $('.boleta'), btnCobrar = $('[data-cobrar]');
+  var items = [V.item('mecha', 3), V.item('cinta', 1, { celu: true }), V.item('clavos', .7, { nombre: 'Clavos punta París 2"' }), V.item('tarugos', 1, { nombre: 'Tarugos nylon S8 × 100' }), V.libre('Bolsa de arena × 25 kg', 1500)];
+  V.fijarGanancia(items, 21200);
+  var medio = 'efectivo', cliente = null, hoy = { total: 412000, ventas: 23 }, escaneos = ['lampara', 'tornillos', 'mecha', 'pinza', 'martillo'], nEsc = 0;
+
+  // Los renglones pasan a un contenedor propio que se desplaza (no cambia cómo se ve).
+  var lineas = document.createElement('div'); lineas.setAttribute('data-lineas', '');
+  lineas.style.cssText = 'margin:0 -10px;padding:0 10px;min-height:0;flex:none';
+  boleta.querySelectorAll('.linea').forEach(function (l) { lineas.appendChild(l); });
+  boleta.querySelector('.tot').before(lineas);
+  // Recién cuando la boleta crece se vuelve desplazable, para que quieta se vea igual que antes.
+  var yaDesplaza = false;
+  function desplazable() { if (yaDesplaza) return; yaDesplaza = true; lineas.style.flex = '0 1 auto'; V.sinBarras(lineas); }
+
+  function linea(it) {
+    var p = V.precio(it), s = V.subtotal(it), kg = it.unidad === 'kg';
+    var q = kg ? V.num(it.cant) + ' kg' : V.num(it.cant) + ' ×';
+    if (p == null) {
+      var mm = it.libre ? '<b data-mano>$</b>' : V.MARGENES.map(function (m) { return '<b data-m="' + m + '">' + m + '</b>'; }).join('') + '<b data-mano>$</b>';
+      return '<div class="linea falta v-toca" data-k="' + it.k + '"><span class="q num" data-rueda>' + q + '</span><span class="nm">' + V.html(it.nombre) + '<small style="color:var(--urgente-texto)">Sin precio: ' + (it.libre ? 'poné el precio' : 'elegí el margen') + '</small><span class="mini-m">' + mm + '</span></span><span class="im" style="color:var(--urgente-texto)">—</span></div>';
+    }
+    var det;
+    if (it.libre) det = V.noMultiplo(it) ? '<small style="color:var(--urgente-texto)">Ítem libre · no es múltiplo de $1.000</small>' : '<small>Ítem libre · precio a mano</small>';
+    else if (it.mano != null) det = '<small>' + V.pesos(p) + (it.cant !== 1 ? ' c/u' : '') + ' · a mano</small>';
+    else if (kg) det = '<small>' + V.pesos(p) + ' el kg · ' + (V.subio(it) ? 'para arriba' : 'margen ' + it.margen + ' %') + '</small>';
+    else det = '<small>' + V.pesos(p) + (it.cant !== 1 ? ' c/u' : '') + ' · margen ' + it.margen + ' %' + (it.celu ? ' · <i class="i i-s" data-i="smartphone"></i> celular' : '') + '</small>';
+    return '<div class="linea v-toca" data-k="' + it.k + '"><span class="q num" data-rueda>' + q + '</span><span class="nm">' + V.html(it.nombre) + det + '</span><span class="im num" data-rueda>' + V.pesos(s) + '</span></div>';
+  }
+  function render(nuevos) {
+    if (!items.length) { lineas.innerHTML = '<div class="t-detalle" style="padding:28px 8px;text-align:center">La boleta está vacía. Tocá un producto del estante, escaneá o buscá.</div>'; }
+    else V.redibujar(lineas, items.map(linea).join(''), nuevos);
+    var n = items.length, tot = V.total(items);
+    boleta.querySelector('.tot .t-detalle').textContent = n + (n === 1 ? ' producto' : ' productos');
+    V.poner(boleta.querySelector('.tot .t-total'), V.pesosG(tot));
+    V.poner($('.otras .t-detalle b'), V.pesos(V.ganancia(items)));
+    btnCobrar.querySelector('span').innerHTML = 'Cobrar <span class="num">' + V.pesos(tot) + '</span> ' + (medio === 'mp' ? 'con M. Pago' : V.MEDIOS[medio].en);
+    btnCobrar.disabled = !n;
+    document.querySelectorAll('[data-prod]').forEach(function (el) {
+      var id = el.getAttribute('data-prod'), it = items.filter(function (x) { return x.ref === id && x.mano == null; })[0], c = el.querySelector('.cuantos');
+      el.classList.toggle('en', !!it);
+      if (!it) { if (c) c.remove(); return; }
+      var t = it.unidad === 'kg' ? V.num(it.cant) + ' kg' : '× ' + V.num(it.cant);
+      if (!c) { c = document.createElement('span'); c.className = 'cuantos'; el.querySelector('.tecla').after(c); }
+      if (c.textContent !== t) { c.textContent = t; }
+    });
+  }
+  function buscarItem(k) { for (var i = 0; i < items.length; i++) if (items[i].k === k) return items[i]; return null; }
+  function elDe(k) { return lineas.querySelector('[data-k="' + k + '"]'); }
+  function agregar(id, extra) {
+    var antes = items.length, it = V.sumar(items, id, 1, extra);
+    desplazable(); render([it.k]);
+    var el = elDe(it.k); if (items.length === antes) V.entra(el);
+    el.scrollIntoView({ block: 'nearest' });
+    var pr = $('[data-prod="' + id + '"] .cuantos'); if (pr) V.saltar(pr);
+    return it;
+  }
+  function quitar(it) {
+    var i = items.indexOf(it);
+    V.sale([elDe(it.k)], function () {
+      items.splice(i, 1); render();
+      V.tostada('Quitaste ' + it.corto, { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items.splice(i, 0, it); render([it.k]); } });
+    });
+  }
+  function vaciar(texto, deshacer) {
+    if (!items.length) { V.tostada('La boleta ya está vacía', { icono: 'info' }); return; }
+    var copia = items.slice();
+    V.sale(lineas.children, function () { items = []; render(); V.tostada(texto, { icono: 'check', accion: deshacer ? 'Deshacer' : null, alAccion: function () { items = copia; render(copia.map(function (x) { return x.k; })); } }); });
+  }
+  function elegirMedio(k) { medio = k; document.querySelectorAll('.medios4 .md').forEach(function (b) { b.classList.toggle('elegido', b.classList.contains(k)); }); render(); }
+  function cobrar() {
+    var ok = V.puedeCobrar(items, medio, cliente, function (f) { var el = elDe(f[0].k); el.scrollIntoView({ block: 'nearest' }); V.sacudir(el); });
+    if (ok === 'cliente') { V.elegirCliente(function (n) { cliente = n; if (n) cobrar(); }); return; }
+    if (!ok) return;
+    V.llenar(btnCobrar, function () {
+      var total = V.total(items), n = items.length, cli = cliente, med = medio;
+      hoy.total += total; hoy.ventas++;
+      V.sale(lineas.children, function () {
+        items = []; cliente = null; elegirMedio('efectivo');
+        V.poner($('[data-hoy]'), 'Hoy <b class="num">' + V.pesos(hoy.total) + '</b> · ' + hoy.ventas + ' ventas');
+      });
+      V.listo({ total: total, medio: med, cliente: cli, cantidad: n, alCerrar: function () { buscador.activar(null, true); } });
+    });
+  }
+  function escanear() {
+    var vivo = $('.camara .vivo'); V.animar(vivo, [{ opacity: 1 }, { opacity: .3 }, { opacity: 1 }], 400);
+    setTimeout(function () { var it = agregar(escaneos[nEsc++ % escaneos.length], { celu: true }); V.tostada('El celular leyó: ' + it.nombre, { icono: 'smartphone' }); }, 700);
+  }
+  function lineaMenu(it) {
+    var ancla = elDe(it.k);
+    V.abrir({ tipo: 'menu', ancla: ancla, lado: 'izquierda-abajo', clase: 'v-menu-linea', html: '<div class="tit">' + V.html(it.nombre) + '</div><div data-cu></div><div class="v-sep"></div><button class="v-op" data-mano><i class="i" data-i="pencil"></i>Precio a mano</button><button class="v-op" data-donde><i class="i" data-i="calculator"></i>De dónde sale el precio</button><button class="v-op peligro" data-quitar><i class="i" data-i="trash-2"></i>Quitar de la boleta</button>',
+      alAbrir: function (caja, c) {
+        var cu = caja.querySelector('[data-cu]');
+        function dib() {
+          cu.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:2px 8px 8px"><span class="cantidad"><button data-menos aria-label="Uno menos"><i class="i i-s" data-i="minus"></i></button><span class="n">' + V.num(it.cant) + (it.unidad === 'kg' ? '<span class="u">kg</span>' : '') + '</span><button data-mas aria-label="Uno más"><i class="i i-s" data-i="plus"></i></button></span></div>' +
+            (it.libre ? '' : '<div style="padding:0 8px 8px"><span class="segmentos">' + V.MARGENES.map(function (m) { return '<button data-m="' + m + '"' + (it.mano == null && it.margen === m ? ' class="elegido"' : '') + '>' + m + '</button>'; }).join('') + '</span> <span class="t-detalle">%</span></div>');
+          V.pintar(cu);
+        }
+        dib();
+        caja.addEventListener('click', function (e) {
+          var m = e.target.closest('[data-m]');
+          if (m) { it.margen = +m.getAttribute('data-m'); it.mano = null; dib(); render(); return; }
+          if (e.target.closest('[data-mas]')) { it.cant = Math.round((it.cant + V.paso(it)) * 10) / 10; dib(); render(); return; }
+          if (e.target.closest('[data-menos]')) { if (it.cant - V.paso(it) > .05) { it.cant = Math.round((it.cant - V.paso(it)) * 10) / 10; dib(); render(); } return; }
+          if (e.target.closest('[data-mano]')) { c.cerrar('ok'); V.precioAMano(it, function (n) { it.mano = n; render(); }); return; }
+          if (e.target.closest('[data-donde]')) { c.cerrar('ok'); V.dondeSale(it); return; }
+          if (e.target.closest('[data-quitar]')) { c.cerrar('ok'); quitar(it); }
+        });
+      } });
+  }
+  var DESTINOS = [['vender', 'Vender', 'shopping-cart'], ['ventas-de-hoy', 'Ventas de hoy', 'receipt'], ['productos', 'Catálogo · Productos', 'tags'], ['listas', 'Listas de precios', 'tags'], ['duplicados', 'Duplicados', 'copy'], ['stock', 'Depósito · Stock', 'package'], ['compras', 'Compras', 'truck'], ['contar', 'Contar', 'list-checks'], ['resumen', 'Negocio · Resumen', 'chart-column'], ['usuarios', 'Usuarios', 'users'], ['actividad', 'Quién hizo qué', 'history'], ['anomalias', 'Anomalías', 'triangle-alert'], ['procesos', 'Procesos', 'workflow'], ['mejoras-y-errores', 'Mejoras y errores', 'bug'], ['configuracion', 'Configuración', 'settings'], ['entrar', 'Cerrar sesión', 'log-out']];
+  function irA() {
+    var sel = 0;
+    V.abrir({ tipo: 'dialogo', clase: 'arriba', html: '<label class="campo v-campo"><i class="i" data-i="command"></i><input class="v-entrada" autofocus placeholder="Ir a…"><span class="kbd">Esc</span></label><div data-l style="margin-top:8px;max-height:430px;overflow:auto" class="v-sin-barras"></div>',
+      alTecla: function (e) {
+        var bs = document.querySelectorAll('.v-ir'); if (!bs.length) return false;
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { sel = (sel + (e.key === 'ArrowDown' ? 1 : bs.length - 1)) % bs.length; marcar(); return true; }
+        if (e.key === 'Enter') { window.irAMaqueta && window.irAMaqueta(bs[sel].getAttribute('data-ir')); return true; }
+        return false;
+      },
+      alAbrir: function (caja) {
+        var inp = caja.querySelector('input'), l = caja.querySelector('[data-l]');
+        function dib() { var q = inp.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); sel = 0; l.innerHTML = DESTINOS.filter(function (d) { return d[1].toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').indexOf(q) >= 0; }).map(function (d) { return '<a class="v-op v-ir" data-ir="' + d[0] + '"><i class="i" data-i="' + d[2] + '"></i>' + d[1] + '</a>'; }).join('') || '<div class="t-detalle" style="padding:12px">No hay ninguna pantalla con ese nombre</div>'; V.pintar(l); marcar(); }
+        inp.addEventListener('input', dib); dib();
+      } });
+    function marcar() { document.querySelectorAll('.v-ir').forEach(function (b, i) { b.classList.toggle('sel', i === sel); if (i === sel) b.scrollIntoView({ block: 'nearest' }); }); }
+  }
+
+  var buscador = V.buscador($('.buscar'), {
+    alElegir: function (id) { agregar(id); },
+    alLibre: function (t) { V.itemLibre(function (n, p) { var it = V.libre(n, p); items.push(it); desplazable(); render([it.k]); elDe(it.k).scrollIntoView({ block: 'nearest' }); }, t.charAt(0).toUpperCase() + t.slice(1)); }
+  });
+  document.querySelectorAll('[data-prod]').forEach(function (el) { el.addEventListener('click', function () { agregar(el.getAttribute('data-prod')); }); });
+  lineas.addEventListener('click', function (e) {
+    var l = e.target.closest('.linea'); if (!l) return;
+    var it = buscarItem(l.getAttribute('data-k')); if (!it) return;
+    var m = e.target.closest('[data-m]'); if (m) { it.margen = +m.getAttribute('data-m'); it.mano = null; render(); return; }
+    if (e.target.closest('[data-mano]')) { V.precioAMano(it, function (n) { it.mano = n; render(); }); return; }
+    lineaMenu(it);
+  });
+  document.querySelectorAll('.medios4 .md').forEach(function (b) { b.addEventListener('click', function () { elegirMedio(V.ORDEN_MEDIOS.filter(function (k) { return b.classList.contains(k); })[0]); }); });
+  btnCobrar.addEventListener('click', cobrar);
+  $('[data-escanear]').addEventListener('click', escanear);
+  $('[data-libre]').addEventListener('click', function () { V.itemLibre(function (n, p) { var it = V.libre(n, p); items.push(it); desplazable(); render([it.k]); elDe(it.k).scrollIntoView({ block: 'nearest' }); }); });
+  $('[data-nollevo]').addEventListener('click', function () { var n = items.length; vaciar('Anotado: no lo llevó (' + n + (n === 1 ? ' producto)' : ' productos)'), true); });
+  $('[data-pedido]').addEventListener('click', function () { V.pasarAPedido(items, function (r) { vaciar('Pedido guardado para ' + r.nombre + ', para ' + r.dia, false); }); });
+  $('[data-presupuesto]').addEventListener('click', function () { V.presupuesto(items, function (c) { V.tostada(c === 'pdf' ? 'Se bajó el PDF del presupuesto P-0042' : 'Presupuesto P-0042 listo para mandar por WhatsApp', { icono: c === 'pdf' ? 'file-text' : 'message-circle' }); }); });
+  $('[data-ira]').addEventListener('click', irA);
+  $('[data-usuario]').addEventListener('click', function (e) { V.menuUsuario(e.currentTarget, 'izquierda-abajo'); });
+
+  document.addEventListener('keydown', function (e) {
+    if (V.abierta()) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); irA(); return; }
+    var f = { F2: cobrar, F5: function () { elegirMedio('efectivo'); }, F6: function () { elegirMedio('mp'); }, F7: function () { elegirMedio('tarjeta'); }, F8: function () { elegirMedio('cuenta'); } }[e.key];
+    if (f) { e.preventDefault(); f(); return; }
+    var buscaVacia = e.target && e.target.classList && e.target.classList.contains('v-entrada') && !e.target.value;
+    if (V.escribiendo(e) && !(buscaVacia && /^([1-8]|Escape)$/.test(e.key))) return;
+    if (/^[1-8]$/.test(e.key)) { e.preventDefault(); var el = document.querySelectorAll('[data-prod]')[+e.key - 1]; agregar(el.getAttribute('data-prod')); V.animar(el, [{ transform: 'scale(.97)' }, { transform: 'none' }], 120); return; }
+    if (e.key === '+') { e.preventDefault(); $('[data-libre]').click(); return; }
+    if (e.key === '/') { e.preventDefault(); buscador.activar(); return; }
+    if (e.key === 'Escape' && items.length) { $('[data-nollevo]').click(); return; }
+    if (V.letra(e)) { e.preventDefault(); buscador.activar(e.key); }
+  });
+  render([]);
+})();
+</script>
+</body>
+</html>

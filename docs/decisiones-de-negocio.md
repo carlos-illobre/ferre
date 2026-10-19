@@ -885,3 +885,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      servidor se lo avisa por la conexión del espejo, que el celular ya tiene abierta; la
      pregunta cada 3 segundos queda solo para cuando esa conexión se cortó
      (`specs/002-catalogo-y-precios/`, escenario 18d).
+113. **Las maquetas del director de arte se navegan en el ambiente de pruebas, en /v2, /v3 y /v4**
+     (2026-10-19). Para decidir qué tomar de las propuestas (`docs/propuestas-de-diseno/`),
+     Carlos quiere recorrerlas, no mirar capturas: /v2 es la evolución de cada pantalla, /v3 la
+     reinvención y /v4 la audaz, con los enlaces y los botones que abren pantallas, diálogos o
+     agregan elementos ficticios funcionando. Se decide pantalla por pantalla. Es una excepción
+     temporal a la decisión 83: las maquetas se borran cuando cada pantalla quede decidida y
+     programada. No llevan datos reales, así que se pueden abrir sin entrar; la aplicación
+     instalada no las guarda ni las descarga. Antes de pasar a producción con las maquetas
+     adentro, se le avisa a Carlos.

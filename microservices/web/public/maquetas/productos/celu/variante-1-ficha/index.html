@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha del producto · celular</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../ean.js"></script>
+<style>
+  body { width: 390px; }
+  .top { display: flex; align-items: center; gap: 8px; padding: 2px 12px 8px 8px; }
+  .top .volver { display: inline-flex; align-items: center; gap: 2px; height: 44px; padding: 0 8px; color: var(--pino); font-weight: 700; font-size: 16px; }
+  .top .der { margin-left: auto; display: flex; gap: 8px; }
+  .desliza { flex: 1; min-height: 0; overflow: hidden; padding: 0 16px; display: grid; gap: 12px; align-content: start; }
+  .hero { position: relative; height: 180px; border-radius: 20px; background: var(--hundido); display: grid; place-items: center; }
+  .hero img { height: 156px; filter: drop-shadow(0 12px 14px rgba(26,29,27,.24)); }
+  .hero .pastilla { position: absolute; left: 12px; top: 12px; background: #fff; box-shadow: var(--sombra-1); }
+  .hero .cambiar { position: absolute; right: 12px; bottom: 12px; }
+  .nombre { font-size: 22px; line-height: 27px; font-weight: 800; text-transform: uppercase; letter-spacing: -.015em; }
+  .precio-linea { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; padding: 12px 14px; border-radius: 16px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .precio-linea .t-numero { font-size: 36px; line-height: 40px; }
+  .precio-linea .mg { text-align: right; font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .precio-linea .mg b { display: block; color: var(--logro-texto); font-size: 16px; }
+  .tarjeta { padding: 12px 14px; }
+  .tarjeta h3 { margin: 0 0 8px; font-size: 16px; line-height: 22px; font-weight: 750; display: flex; align-items: center; justify-content: space-between; }
+  .codigo-caja { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 12px; border-radius: 12px; background: var(--hundido); }
+  .ean { width: 56px; height: 32px; fill: var(--tinta); flex: none; }
+  .codigo-caja b { flex: 1; font-size: 17px; letter-spacing: .04em; }
+  .lectura { font-size: 14px; color: var(--texto-2); margin-top: 8px; display: flex; gap: 6px; align-items: center; }
+  .prov { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 12px; align-items: center; }
+  .ini { width: 40px; height: 40px; border-radius: 10px; background: var(--pino); color: #fff; display: grid; place-items: center; font-weight: 800; }
+  .prov .n { font-weight: 750; display: flex; align-items: center; gap: 4px; }
+  .estrella { width: 16px; height: 16px; color: var(--urgente); fill: var(--urgente); }
+  .barra-accion { display: grid; grid-template-columns: 112px 1fr; gap: 8px; }
+  .tostada { position: absolute; left: 50%; transform: translateX(-50%); bottom: 172px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="top">
+    <span class="volver" data-mq="volver"><i class="i i-l" data-i="chevron-left"></i>Productos</span>
+    <div class="der"><span class="btn-vinculo" data-mq="espejo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  </div>
+  <div class="desliza">
+    <div class="hero">
+      <span class="pastilla logro"><span class="punto"></span>6 un. en stock</span>
+      <img src="../../../_comun/fotos/cinta-metrica.webp" alt="" data-mq="ampliar">
+      <button class="btn chico cambiar" data-mq="cambiar-foto"><i class="i i-s" data-i="camera"></i>Cambiar foto</button>
+    </div>
+    <div>
+      <div class="nombre">Cinta métrica PowerLock 5 m</div>
+      <div class="t-detalle">Stanley · Cód. 33-158 · Est. B-02-07</div>
+    </div>
+    <div class="precio-linea">
+      <div><div class="t-etiqueta">Precio de venta</div><div class="t-numero"><span class="peso">$</span>17.000</div></div>
+      <div class="mg" data-mq="cuenta"><b>margen 50 %</b>Así se calcula <i class="i i-s" data-i="chevron-down"></i></div>
+    </div>
+    <div class="tarjeta">
+      <h3>Código de barras</h3>
+      <div class="codigo-caja"><svg class="ean" data-ean="7897065211580"></svg><b>7897065211580</b><button class="btn chico btn-icono" title="Copiar" data-mq="copiar"><i class="i i-s" data-i="copy"></i></button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div class="lectura" style="margin:0"><i class="i i-s" data-i="history"></i>Última lectura: 13/10 · 10:24</div>
+        <button class="btn chico btn-oscuro" data-mq="escanear"><i class="i i-s" data-i="scan-barcode"></i>Escanear</button>
+      </div>
+    </div>
+    <div class="tarjeta">
+      <div class="prov"><span class="ini">D</span><div style="min-width:0"><div class="n">Dist. Oeste <svg class="estrella" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg></div><div class="t-detalle">Proveedor principal · 06/10</div></div><div style="text-align:right"><div style="font-weight:800;font-size:18px"><span class="peso">$</span>9.350</div><div class="t-detalle" data-mq="provs">+2 más <i class="i i-s" data-i="chevron-down"></i></div></div></div>
+    </div>
+  </div>
+  <div class="barra-accion"><button class="btn grande" data-mq="volver">Listo</button><button class="btn btn-accion grande" data-mq="agregar"><i class="i" data-i="shopping-cart"></i>Agregar a la venta</button></div>
+  <nav class="nav-inferior">
+    <a data-ir="vender" data-venta-destino><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia" data-venta-insignia>3</span></a>
+    <a class="activo" data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-no-ir data-mq="mas"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>
+/* Celu 1 · la ficha: viene de la lista (index.html#id), «Así se calcula» despliega el margen, «+2 más» los proveedores. */
+(function () {
+  var M = window.Maq, d = document, desliza = d.querySelector(".desliza");
+  if (!Object.keys(M.venta.lleva).length && M.venta.renglones === 3) M.venta.lleva = { mecha: 2 };
+  M.tostadaAbajo = 172;
+  var id = location.hash.replace("#", ""), p = M.porId(id) || M.porId("cinta");
+  var cuenta = null, provsAbiertos = false;
+  var Q = function (s) { return d.querySelector(s); };
+  var ESTRELLA = Q(".prov .estrella").outerHTML;
+
+  function pintarPrecio(antes) {
+    var pr = M.precioDe(p), num = Q(".precio-linea .t-numero");
+    num.style.color = pr ? "" : "var(--urgente-texto)";
+    num.style.fontSize = pr ? "" : "28px";
+    num.style.whiteSpace = "nowrap";
+    M.rodar(num, pr ? M.peso(pr) : "Sin precio", (pr || 0) >= (antes || 0));
+    var b = Q(".precio-linea .mg b");
+    b.textContent = p.margen == null ? "elegí el margen" : "margen " + p.margen + " %";
+    b.style.color = p.margen == null ? "var(--urgente-texto)" : "";
+    if (cuenta) pintarCuenta(antes != null);
+  }
+  function pintarProv() {
+    var t = Q(".prov").parentNode, barato = M.masBarato(p), otros = Object.keys(p.costos).filter(function (k) { return k !== p.uso; });
+    var pr = Q(".prov");
+    pr.querySelector(".ini").textContent = M.INI[p.uso];
+    pr.querySelector(".n").innerHTML = M.PROV[p.uso] + (p.uso === barato ? " " + ESTRELLA : "");
+    pr.querySelector(".t-detalle").textContent = "Proveedor principal · " + M.LISTA[p.uso];
+    var der = pr.lastElementChild;
+    der.firstElementChild.innerHTML = M.peso(M.costo(p));
+    var mas = der.querySelector('[data-mq="provs"]');
+    mas.style.display = otros.length ? "" : "none";
+    mas.innerHTML = (provsAbiertos ? "menos" : "+" + otros.length + " más") + ' <i class="i i-s" data-i="' + (provsAbiertos ? "chevron-up" : "chevron-down") + '"></i>';
+    t.querySelectorAll("[data-otro]").forEach(function (x) { x.remove(); });
+    if (provsAbiertos) otros.forEach(function (k) {
+      var dif = p.costos[k] - M.costo(p);
+      t.insertAdjacentHTML("beforeend", '<div class="prov" data-otro style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--borde)"><span class="ini" style="background:var(--hundido);color:var(--texto-2)">' + M.INI[k] + '</span><div style="min-width:0"><div class="n">' + M.PROV[k] + (k === barato ? " " + ESTRELLA : "") + '</div><div class="t-detalle">Lista ' + M.LISTA[k] + " · $" + M.miles(Math.round(Math.abs(dif))) + (dif >= 0 ? " más" : " menos") + '</div></div><button class="btn chico btn-suave" data-usar="' + k + '">Usar</button></div>');
+    });
+    M.iconos(t);
+  }
+  function pintarTodo() {
+    var h = Q(".hero .pastilla");
+    h.className = "pastilla " + (p.stock ? "logro" : "error");
+    h.innerHTML = '<span class="punto"></span>' + (p.stock ? M.stockTxt(p) + " en stock" : "Sin stock");
+    Q(".hero img").src = M.fotoDe(p);
+    Q(".nombre").textContent = p.nom;
+    Q(".nombre").nextElementSibling.textContent = p.marca + " · Cód. " + p.cod + " · Est. " + p.est;
+    pintarPrecio();
+    M.dibujarEan(Q(".codigo-caja svg"), p.ean);
+    Q(".codigo-caja b").textContent = p.ean;
+    Q(".lectura").lastChild.textContent = "Última lectura: 08/10 · 16:12";
+    pintarProv();
+  }
+  function pintarCuenta(cambio) {
+    var segs = M.MARGENES.map(function (m) { return '<button data-margen="' + m + '" class="' + (p.margen === m ? "elegido" : "") + '">' + m + "</button>"; }).join("") +
+      '<button data-margen="otro" class="' + (p.margen != null && M.MARGENES.indexOf(p.margen) < 0 ? "elegido" : "") + '">' + (p.margen != null && M.MARGENES.indexOf(p.margen) < 0 ? p.margen + " %" : "Otro") + "</button>";
+    var pr = M.precioDe(p);
+    var filas = '<div class="paso-c"><span>Costo de compra</span><b>' + M.centavos(M.costo(p)) + '</b></div><div class="paso-c"><span>+ ' + (p.margen || 0) + ' % de margen</span><b>' + M.centavos(M.conMargen(p)) + '</b></div><div class="paso-c"><span>+ IVA 21 %</span><b>' + M.centavos(M.conIva(p)) + '</b></div><div class="paso-c cobra"><span>Se cobra, a $1.000</span><b>' + (pr ? "$" + M.miles(pr) : "—") + "</b></div>";
+    var viejo = cuenta.querySelector(".segmentos .elegido"), x0 = viejo && viejo.getBoundingClientRect().left;
+    cuenta.innerHTML = '<h3>Así se calcula<span class="t-detalle">margen</span></h3><div class="segmentos" style="display:flex;margin-bottom:10px">' + segs + "</div>" + filas;
+    if (cambio) {
+      var nuevo = cuenta.querySelector(".segmentos .elegido");
+      if (nuevo && x0 != null) M.animar(nuevo, [{ transform: "translateX(" + (x0 - nuevo.getBoundingClientRect().left) + "px)" }, { transform: "none" }], 200);
+      M.brillar(cuenta.querySelector(".cobra"));
+    }
+  }
+  function abrirCuenta() {
+    var chev = Q('[data-mq="cuenta"] svg');
+    if (cuenta) {
+      var c = cuenta; cuenta = null;
+      M.despues(M.animar(c, [{ opacity: 1 }, { opacity: 0, transform: "translateY(-6px)" }], 160), function () { c.remove(); });
+      if (chev) chev.style.transform = "";
+      return;
+    }
+    cuenta = d.createElement("div");
+    cuenta.className = "tarjeta";
+    Q(".precio-linea").after(cuenta);
+    pintarCuenta(false);
+    if (chev) { chev.style.transition = "transform 200ms"; chev.style.transform = "rotate(180deg)"; }
+    desliza.style.overflowY = "auto";
+    M.entrar(cuenta, -6);
+  }
+  function margen(m) { var a = M.precioDe(p); p.margen = m; pintarPrecio(a); }
+  function salir(destino) {
+    var partes = [Q(".top"), desliza, Q(".barra-accion")], a = null;
+    partes.forEach(function (el) { a = M.animar(el, [{ transform: "none", opacity: 1 }, { transform: "translateX(100%)", opacity: .6 }], 240, M.SALIDA) || a; });
+    M.despues(a, function () { location.href = destino; });
+  }
+
+  var est = d.createElement("style");
+  est.textContent = ".paso-c{display:flex;justify-content:space-between;font-size:15px;line-height:24px;color:var(--texto-2)}.paso-c b{color:var(--tinta)}.paso-c.cobra{position:relative;margin:6px -8px 0;padding:4px 8px;border-radius:8px;background:var(--logro-suave);color:var(--logro-texto);font-weight:650}.paso-c.cobra b{color:var(--logro-texto);font-size:17px}.tarjeta .segmentos>*{flex:1;justify-content:center;padding:0 4px}";
+  d.head.appendChild(est);
+  if (M.porId(id)) {
+    pintarTodo();
+    [Q(".top"), desliza, Q(".barra-accion")].forEach(function (el) { M.animar(el, [{ transform: "translateX(100%)" }, { transform: "none" }], 320); });
+  }
+
+  d.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".mq-panel, .mq-fondo")) return;
+    var sg = t.closest("[data-margen]");
+    if (sg) { var v = sg.getAttribute("data-margen"); if (v === "otro") M.pedirMargen(p, margen); else margen(+v); return; }
+    var us = t.closest("[data-usar]");
+    if (us) { var a = M.precioDe(p); p.uso = us.getAttribute("data-usar"); pintarProv(); pintarPrecio(a); M.brillar(Q(".prov")); M.tostada("Ahora el costo sale de <b>" + M.PROV[p.uso] + "</b>"); return; }
+    var q = t.closest("[data-mq]");
+    if (!q) return;
+    switch (q.getAttribute("data-mq")) {
+      case "mas": M.menuMas(q); break;
+      case "espejo": M.espejo(q); break;
+      case "volver": salir("lista.html#volver"); break;
+      case "ampliar": M.ampliarFoto(p); break;
+      case "cambiar-foto": M.cambiarFoto(p, function () { M.brillar(Q(".hero")); }); break;
+      case "cuenta": abrirCuenta(); break;
+      case "copiar": M.copiar(q, p); break;
+      case "provs": provsAbiertos = !provsAbiertos; pintarProv(); desliza.style.overflowY = "auto"; break;
+      case "escanear": M.camara({ modo: "codigo", p: p, alLeer: function () {
+        Q(".lectura").lastChild.textContent = "Código actualizado · hoy " + M.ahora();
+        M.brillar(Q(".codigo-caja"));
+        M.tostada("Código actualizado: <b>" + p.ean + "</b>", { icono: "scan-barcode" });
+      } }); break;
+      case "agregar": M.apretar(q); M.agregar(p, { desde: Q(".hero img") }); break;
+    }
+  });
+})();
+</script>
+</body>
+</html>

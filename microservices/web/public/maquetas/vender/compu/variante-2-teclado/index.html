@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · Línea de mostrador (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .pantalla { padding: 16px 28px 0; display: flex; flex-direction: column; }
+  .zona { display: grid; grid-template-columns: minmax(0,1fr) 316px; gap: 20px; flex: 1; min-height: 0; }
+  .izq { position: relative; min-width: 0; display: flex; flex-direction: column; }
+
+  .comando { display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 16px; border-radius: 14px; background: #fff; border: 1.5px solid var(--pino); box-shadow: 0 0 0 5px rgba(18,56,47,.10), var(--sombra-2); font-size: 20px; font-weight: 700; }
+  .comando .cant { display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border-radius: 8px; background: var(--pino); color: #fff; font-size: 16px; font-weight: 800; }
+  .comando .resto { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .sintaxis { display: flex; gap: 16px; align-items: center; margin: 10px 4px 14px; font-size: 14px; color: var(--texto-2); font-weight: 600; white-space: nowrap; }
+  .sintaxis code { font: 700 14px var(--letra); color: var(--tinta); background: var(--hundido); padding: 2px 8px; border-radius: 6px; }
+
+  .sugerencias { position: relative; margin: 8px 0 12px; padding: 6px; border-radius: 16px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-3); }
+  .sug { display: grid; grid-template-columns: 40px 1fr auto 92px 110px; gap: 14px; align-items: center; padding: 5px 10px; border-radius: 12px; }
+  .sug .n { font-weight: 750; } .sug .d { font-size: 14px; color: var(--texto-2); }
+  .sug .p { text-align: right; font-weight: 800; font-size: 17px; }
+  .sug .s { text-align: right; font-weight: 800; color: var(--pino-texto); font-size: 17px; }
+  .sug.elegida { background: var(--pino-suave); }
+  .sug.elegida .s { color: var(--pino); }
+  .sug-pie { display: flex; gap: 16px; padding: 8px 10px 4px; margin-top: 4px; white-space: nowrap; border-top: 1px solid var(--borde); font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .sug-pie span { display: inline-flex; gap: 6px; align-items: center; }
+
+  .tabla { background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); overflow: hidden; }
+  .fila { display: grid; grid-template-columns: 44px minmax(0,1fr) 80px 72px 172px 80px 96px; gap: 12px; align-items: center; height: 52px; padding: 0 16px; border-top: 1px solid var(--borde); font-size: 15px; }
+  .fila.cab { height: 40px; border-top: 0; background: var(--hundido); font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .fila .r { text-align: right; }
+  .fila .nom { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila .nom small { display: block; font-size: 14px; font-weight: 500; color: var(--texto-2); }
+  .fila .sub { font-weight: 800; font-size: 17px; }
+  .fila.foco { background: #F7FBF9; box-shadow: inset 4px 0 0 var(--pino); }
+  .teclas5 { display: inline-flex; gap: 3px; }
+  .teclas5 b { width: 32px; height: 30px; border-radius: 7px; display: grid; place-items: center; font-size: 14px; font-weight: 700; color: var(--texto-2); background: var(--hundido); }
+  .teclas5 b.si { background: var(--pino); color: #fff; }
+  .fila.falta .teclas5 b { background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); color: var(--urgente-texto); }
+  .fila.falta { background: var(--urgente-suave); }
+  .celda-cant { display: inline-flex; align-items: center; justify-content: center; height: 32px; min-width: 64px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--borde-fuerte); font-weight: 800; }
+  .fila.foco .celda-cant { border: 2px solid var(--pino); }
+
+  .explica { padding: 18px; display: flex; flex-direction: column; gap: 4px; }
+  .paso { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 8px 0; border-bottom: 1px dashed var(--borde-fuerte); font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .paso b { color: var(--tinta); font-weight: 800; font-size: 15px; }
+  .paso.final { border-bottom: 0; padding-top: 12px; }
+  .paso.final b { font-size: 22px; }
+
+  .pie-cobro { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; margin: 14px -28px 0; padding: 14px 28px; background: #fff; border-top: 1px solid var(--borde); box-shadow: 0 -10px 30px -18px rgba(26,29,27,.25); }
+  .pie-cobro .tot .et { font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .pie-cobro .tot .t-numero { font-size: 36px; line-height: 40px; }
+  .medios-seg { display: flex; gap: 8px; justify-content: center; }
+  .ms { white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--borde-fuerte); background: #fff; font-weight: 700; font-size: 15px; }
+  .ms .pt { width: 10px; height: 10px; border-radius: 99px; background: var(--c); }
+  .ms.elegido { border: 2px solid var(--c); background: var(--cs); padding: 0 11px; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span></div>
+    <a class="nav-item activo" data-ir="vender" aria-label="Vender"><i class="i" data-i="shopping-cart"></i><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos" aria-label="Catálogo" title="Catálogo"><i class="i" data-i="tags"></i></a>
+    <a class="nav-item" data-ir="stock" aria-label="Depósito" title="Depósito"><i class="i" data-i="package"></i></a>
+    <a class="nav-item" data-ir="resumen" aria-label="Negocio" title="Negocio"><i class="i" data-i="chart-column"></i></a>
+    <a class="nav-item v-toca" data-menu-mas aria-label="Más" title="Más"><i class="i" data-i="ellipsis"></i></a>
+    <div class="pie" style="justify-items:center">
+      <span class="btn btn-icono" style="background:var(--logro-suave);border-color:transparent;color:var(--logro-texto)"><i class="i" data-i="smartphone"></i></span>
+      <span class="avatar v-toca" data-usuario>CI</span>
+    </div>
+  </nav>
+
+  <main class="contenido">
+    <header class="cabecera" style="padding:16px 28px 0">
+      <div class="t-titulo">Vender</div>
+      <nav class="segmentos" style="margin-left:16px"><button class="elegido" data-ir="vender">Vender</button><button data-ir="ventas-de-hoy">Ventas de hoy</button></nav>
+      <div class="acciones">
+        <span class="pastilla logro"><span class="punto"></span>En línea</span>
+        <span class="pastilla pino"><i class="i i-s" data-i="smartphone"></i>Celular en espejo</span>
+        <button class="btn chico" data-teclas><i class="i i-s" data-i="keyboard"></i>Teclas <span class="kbd">?</span></button>
+      </div>
+    </header>
+
+    <section class="pantalla">
+      <div class="zona">
+        <div class="izq">
+          <div class="comando"><i class="i i-l" data-i="search" style="color:var(--pino)"></i><span class="cant">2 ×</span><span>llave comb 13<span class="cursor"></span></span>
+            <span class="resto"><span class="kbd">↑</span><span class="kbd">↓</span><span class="kbd">Enter</span></span></div>
+          
+          <div class="sugerencias">
+            <div class="sug elegida"><div class="foto chica"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div><div><div class="n">Llave combinada 13 mm</div><div class="d">Bahco · Distribuidora Oeste</div></div><span class="pastilla logro">8 un.</span><div class="p num">$9.000</div><div class="s num">= $18.000</div></div>
+            <div class="sug"><div class="foto chica"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div><div><div class="n">Llave combinada 13 mm cromada</div><div class="d">Crossmaster · Bulonera Centro</div></div><span class="pastilla logro">21 un.</span><div class="p num">$6.000</div><div class="s num" style="color:var(--texto-3)">$12.000</div></div>
+            <div class="sug"><div class="foto chica"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div><div><div class="n">Juego de llaves combinadas 6 a 22 mm × 12</div><div class="d">Stanley · Distribuidora Oeste</div></div><span class="pastilla logro">2 un.</span><div class="p num">$58.000</div><div class="s num" style="color:var(--texto-3)">$116.000</div></div>
+                        <div class="sug-pie"><span><span class="kbd">Enter</span> agrega 2</span><span><span class="kbd">Tab</span> otra cantidad</span><span><span class="kbd">Ctrl</span><span class="kbd">Enter</span> como ítem libre</span><span style="margin-left:auto">3 de 11.240 productos · 6 ms</span></div>
+          </div>
+
+          <div class="tabla">
+            <div class="fila cab"><span></span><span>Producto</span><span class="r">Cantidad</span><span class="r">Costo</span><span>Margen %  <span style="font-weight:600">(1 a 5)</span></span><span class="r">Precio</span><span class="r">Subtotal</span></div>
+            <div class="fila"><div class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div class="nom">Mecha acero rápido HSS 8 mm<small>Ezeta · 14 un.</small></div><div class="r"><span class="celda-cant">3</span></div><div class="r num">$2.480</div><div class="teclas5"><b>300</b><b>200</b><b class="si">100</b><b>50</b><b>25</b></div><div class="r num">$7.000</div><div class="r sub num">$21.000</div></div>
+            <div class="fila"><div class="foto chica"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div class="nom">Cinta métrica PowerLock 5 m<small>Stanley · 6 un.</small></div><div class="r"><span class="celda-cant">1</span></div><div class="r num">$9.350</div><div class="teclas5"><b>300</b><b>200</b><b>100</b><b class="si">50</b><b>25</b></div><div class="r num">$17.000</div><div class="r sub num">$17.000</div></div>
+            <div class="fila foco"><div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div class="nom">Clavos punta París 2"<small>Acindar · 12,4 kg</small></div><div class="r"><span class="celda-cant">0,7 kg</span></div><div class="r num">$2.900</div><div class="teclas5"><b>300</b><b>200</b><b class="si">100</b><b>50</b><b>25</b></div><div class="r num">$8.000</div><div class="r sub num">$6.000</div></div>
+            <div class="fila falta"><div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div class="nom">Tarugos nylon S8 con tope × 100<small>Fischer · 3 un.</small></div><div class="r"><span class="celda-cant">1</span></div><div class="r num">$4.150</div><div class="teclas5"><b>300</b><b>200</b><b>100</b><b>50</b><b>25</b></div><div class="r" style="color:var(--urgente-texto);font-weight:700">elegí</div><div class="r" style="color:var(--urgente-texto);font-weight:800">Sin precio</div></div>
+            <div class="fila"><div class="foto chica" style="color:var(--texto-2)"><i class="i" data-i="package-plus"></i></div><div class="nom">Bolsa de arena × 25 kg<small>Ítem libre · precio a mano</small></div><div class="r"><span class="celda-cant">1</span></div><div class="r" style="color:var(--texto-3)">—</div><div><span class="pastilla urgente" style="height:26px">no es múltiplo de $1.000</span></div><div class="r num">$1.500</div><div class="r sub num">$1.500</div></div>
+          </div>
+        </div>
+
+        <aside class="tarjeta explica">
+          <div style="display:flex;align-items:center;gap:8px"><i class="i" data-i="calculator" style="color:var(--pino-texto)"></i><span class="t-renglon">De dónde sale</span><span class="kbd" style="margin-left:auto">F1</span></div>
+          <div class="t-detalle" style="margin-bottom:6px">Clavos punta París 2", el renglón elegido</div>
+          <div class="paso"><span>Costo · Bulonera Centro, lista del 14/10</span><b class="num">$2.900,00</b></div>
+          <div class="paso"><span>+ margen 100 % (× 2)</span><b class="num">$5.800,00</b></div>
+          <div class="paso"><span>+ IVA 21 % (× 1,21)</span><b class="num">$7.018,00</b></div>
+          <div class="paso"><span>Precio, para arriba a $1.000</span><b class="num">$8.000,00</b></div>
+          <div class="paso"><span>× 0,7 kg</span><b class="num">$5.600,00</b></div>
+          <div class="paso final"><span>Para arriba a $1.000, para no dar vuelto</span><b class="num">$6.000</b></div>
+          <div class="aviso pino" style="margin-top:auto;display:block"><div style="font-weight:800;margin-bottom:6px;display:flex;gap:8px;align-items:center"><i class="i i-s" data-i="keyboard"></i>Se escribe como en el cuaderno</div>
+            <div><b>3 mecha 8</b> · tres mechas de 8</div><div><b>0,7 kg clavos</b> · suelto, por kilo</div><div><b>$1500 arena</b> · ítem libre con su precio</div><div><b>Esc</b> · el cliente no lo llevó</div></div>
+        </aside>
+      </div>
+
+      <div class="pie-cobro">
+        <div class="tot"><div class="et">Total · falta 1 precio</div><div class="t-numero num"><span class="peso">$</span>45.500</div></div>
+        <div class="medios-seg">
+          <button class="ms medio efectivo elegido"><span class="pt"></span>Efectivo <span class="kbd">F5</span></button>
+          <button class="ms medio mp"><span class="pt"></span>Mercado Pago <span class="kbd">F6</span></button>
+          <button class="ms medio tarjeta"><span class="pt"></span>Tarjeta <span class="kbd">F7</span></button>
+          <button class="ms medio cuenta"><span class="pt"></span>Cuenta corriente <span class="kbd">F8</span></button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-fantasma" data-nollevo>No llevó <span class="kbd">Esc</span></button>
+          <button class="btn btn-accion grande" data-cobrar>Cobrar <span class="kbd">F2</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+// Compu 2 · Se escribe como en el cuaderno: la línea entiende «3 mecha 8», «0,7 kg clavos» o «$1500 arena»;
+// Enter suma el renglón a la planilla; el margen va con 1 a 5 sobre el renglón elegido; F5–F8 el medio; F2 cobra.
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var comando = $('.comando'), sug = $('.sugerencias'), tabla = $('.tabla'), explica = $('.explica'), izq = $('.izq'), btnCobrar = $('[data-cobrar]');
+  var items = [V.item('mecha', 3), V.item('cinta', 1), V.item('clavos', .7, { nombre: 'Clavos punta París 2"' }), V.item('tarugos', 1), V.libre('Bolsa de arena × 25 kg', 1500)];
+  V.fijarGanancia(items, 21200);
+  var focoK = items[2].k, medio = 'efectivo', cliente = null, enTabla = false, texto = '2 llave comb 13', res = [], sel = 0;
+
+  // Las filas pasan a un contenedor propio (no cambia cómo se ve) para poder redibujarlas.
+  var filas = document.createElement('div'); filas.setAttribute('data-filas', '');
+  tabla.querySelectorAll('.fila:not(.cab)').forEach(function (f) { filas.appendChild(f); });
+  tabla.appendChild(filas);
+  // Recién cuando la planilla crece se vuelve desplazable, para que quieta se vea igual que antes.
+  function desplazable() { if (izq.classList.contains('v-sin-barras')) return; izq.style.padding = '6px'; izq.style.margin = '-6px'; V.sinBarras(izq); }
+  comando.style.position = 'relative';
+  var entrada = document.createElement('input'); entrada.className = 'v-oculta'; entrada.setAttribute('aria-label', 'Línea de mostrador'); entrada.value = texto; comando.appendChild(entrada);
+
+  function leer(t) {
+    var m;
+    if ((m = t.match(/^\s*\$\s*([\d.]+)\s*(.*)$/))) return { mano: parseInt(m[1].replace(/\./g, ''), 10) || null, q: m[2] };
+    if ((m = t.match(/^\s*(\d+(?:[.,]\d+)?)\s*(kg)?\s+(.+)$/i))) return { cant: parseFloat(m[1].replace(',', '.')), kg: !!m[2], q: m[3] };
+    return { q: t };
+  }
+  function fila(it) {
+    var p = V.precio(it), s = V.subtotal(it), foco = it.k === focoK ? ' foco' : '';
+    var h = '<div class="fila' + foco + (p == null ? ' falta' : '') + '" data-k="' + it.k + '">';
+    h += it.libre ? '<div class="foto chica" style="color:var(--texto-2)"><i class="i" data-i="package-plus"></i></div>' : '<div class="foto chica"><img src="../../../_comun/fotos/' + it.foto + '.webp" alt=""></div>';
+    h += '<div class="nom">' + V.html(it.nombre) + '<small>' + (it.libre ? 'Ítem libre · ' + (p == null ? 'sin precio' : 'precio a mano') : it.marca + ' · ' + V.stockTexto(it)) + '</small></div>';
+    h += '<div class="r"><span class="celda-cant v-toca" data-rueda>' + V.cantTexto(it) + '</span></div>';
+    h += it.libre ? '<div class="r" style="color:var(--texto-3)">—</div>' : '<div class="r num">' + V.pesos(it.costo) + '</div>';
+    if (it.libre) h += '<div>' + (V.noMultiplo(it) ? '<span class="pastilla urgente" style="height:26px">no es múltiplo de $1.000</span>' : p == null ? '' : '<span class="pastilla" style="height:26px">precio a mano</span>') + '</div>';
+    else h += '<div class="teclas5">' + V.MARGENES.map(function (m) { return '<b' + (it.mano == null && it.margen === m ? ' class="si"' : '') + ' data-m="' + m + '">' + m + '</b>'; }).join('') + '</div>';
+    if (p == null) h += '<div class="r" style="color:var(--urgente-texto);font-weight:700">' + (it.libre ? 'poné' : 'elegí') + '</div><div class="r" style="color:var(--urgente-texto);font-weight:800">Sin precio</div>';
+    else h += '<div class="r num" data-rueda>' + V.pesos(p) + '</div><div class="r sub num" data-rueda>' + V.pesos(s) + '</div>';
+    return h + '</div>';
+  }
+  function buscarItem(k) { for (var i = 0; i < items.length; i++) if (items[i].k === k) return items[i]; return null; }
+  function elDe(k) { return filas.querySelector('[data-k="' + k + '"]'); }
+
+  function dibujarExplica() {
+    var it = buscarItem(focoK), det = explica.querySelector('.t-detalle');
+    explica.querySelectorAll('.paso, [data-sin]').forEach(function (p) { p.remove(); });
+    if (!it) { det.textContent = 'Elegí un renglón para ver su cuenta'; return; }
+    det.textContent = it.nombre + ', el renglón elegido';
+    var pasos = V.pasos(it), h = pasos.map(function (p, i) { return '<div class="paso' + (i === pasos.length - 1 ? ' final' : '') + '"><span>' + p[0] + '</span><b class="num">' + p[1] + '</b></div>'; }).join('');
+    if (V.precio(it) == null) h += '<div class="aviso urgente" data-sin style="margin-top:8px"><i class="i" data-i="triangle-alert"></i><div>Sin precio: elegí el margen con 1 a 5' + (it.libre ? ' o poné el precio a mano' : '') + '.</div></div>';
+    det.insertAdjacentHTML('afterend', h); V.pintar(explica);
+  }
+  function render(nuevos) {
+    if (!items.length) { filas.innerHTML = '<div class="t-detalle" style="padding:28px;text-align:center">La venta está vacía. Escribí en la línea de arriba: «3 mecha 8», «0,7 kg clavos» o «$1500 arena».</div>'; }
+    else V.redibujar(filas, items.map(fila).join(''), nuevos);
+    var f = V.faltan(items), tot = V.total(items);
+    var ins = $('.nav-item.activo .insignia'), antes = +ins.textContent; ins.textContent = items.length; ins.style.display = items.length ? '' : 'none'; if (items.length > antes) V.saltar(ins);
+    $('.pie-cobro .tot .et').textContent = 'Total' + (f.length ? ' · falta' + (f.length > 1 ? 'n ' + f.length + ' precios' : ' 1 precio') : '');
+    V.poner($('.pie-cobro .t-numero'), V.pesosG(tot));
+    btnCobrar.disabled = !items.length;
+    dibujarExplica();
+  }
+  function dibujarComando() {
+    comando.querySelectorAll('.cant, .v-txt, .resto ~ x').forEach(function (e) { e.remove(); });
+    var sp = comando.querySelector('svg ~ span:not(.resto):not(.cant)'); if (sp) sp.remove();
+    var r = leer(texto), cur = enTabla ? '' : '<span class="cursor"></span>', h = '';
+    if (r.cant != null) h += '<span class="cant">' + (r.kg ? V.num(r.cant) + ' kg' : V.num(r.cant) + ' ×') + '</span>';
+    if (r.mano) h += '<span class="cant">' + V.pesos(r.mano) + '</span>';
+    if (texto.trim()) h += '<span class="v-txt">' + V.html(r.q) + cur + '</span>';
+    else h += '<span class="v-txt" style="color:var(--texto-3);font-weight:600;font-size:17px">' + cur + 'Escribí como en el cuaderno: «3 mecha 8», «0,7 kg clavos», «$1500 arena»</span>';
+    comando.querySelector('.resto').insertAdjacentHTML('beforebegin', h);
+  }
+  function precioSug(p, cant) { if (p.margen == null) return null; return V.subtotal({ costo: p.costo, margen: p.margen, cant: cant, mano: null }); }
+  function dibujarSug() {
+    var r = leer(texto), q = r.q.trim();
+    if (!texto.trim() || enTabla) { sug.style.display = 'none'; return; }
+    sug.style.display = '';
+    res = r.mano ? [] : V.buscar(q, 3);
+    var cant = r.cant || 1, total = res.length + 1;
+    if (sel >= total) sel = 0;
+    var h = res.map(function (p, i) {
+      var pr = p.margen == null ? null : V.precioMargen(p.costo, p.margen), s = precioSug(p, cant), el = i === sel;
+      return '<div class="sug' + (el ? ' elegida' : '') + '" data-n="' + i + '"><div class="foto chica"><img src="../../../_comun/fotos/' + p.foto + '.webp" alt=""></div><div><div class="n">' + p.nombre + '</div><div class="d">' + p.marca + ' · ' + p.prov + '</div></div><span class="pastilla ' + V.stockClase(p) + '">' + V.stockTexto(p) + '</span><div class="p num">' + (pr == null ? '—' : V.pesos(pr)) + '</div>' +
+        (s == null ? '<div class="s" style="color:var(--urgente-texto);font-size:15px">Sin precio</div>' : '<div class="s num"' + (el ? '' : ' style="color:var(--texto-3)"') + '>' + (el ? '= ' : '') + V.pesos(s) + '</div>') + '</div>';
+    }).join('');
+    var el = sel === res.length, ml = r.mano ? r.mano : null;
+    h += '<div class="sug' + (el ? ' elegida' : '') + '" data-n="' + res.length + '"><div class="foto chica" style="color:var(--texto-2)"><i class="i" data-i="package-plus"></i></div><div><div class="n">' + (q ? '«' + V.html(q) + '» como ítem libre' : 'Ítem libre') + '</div><div class="d">' + (ml ? 'A ' + V.pesos(ml) + ', precio a mano' : 'No está en el catálogo: le ponés el precio') + '</div></div><span></span><div class="p num">' + (ml ? V.pesos(ml) : '') + '</div><div class="s num"' + (el ? '' : ' style="color:var(--texto-3)"') + '>' + (ml ? (el ? '= ' : '') + V.pesos(Math.round(ml * cant)) : '') + '</div></div>';
+    h += '<div class="sug-pie"><span><span class="kbd">Enter</span> agrega ' + (r.kg ? V.num(cant) + ' kg' : V.num(cant)) + '</span><span><span class="kbd">Tab</span> otra cantidad</span><span><span class="kbd">Ctrl</span><span class="kbd">Enter</span> como ítem libre</span><span style="margin-left:auto">' + res.length + ' de 11.240 productos · 6 ms</span></div>';
+    sug.innerHTML = h; V.pintar(sug);
+  }
+  function escribir(t) { texto = t; entrada.value = t; sel = 0; dibujarComando(); dibujarSug(); }
+  function aComando() { if (enTabla) { enTabla = false; dibujarComando(); dibujarSug(); } entrada.focus(); }
+  function aTabla(k) { if (k) focoK = k; if (!enTabla) { enTabla = true; dibujarComando(); dibujarSug(); } entrada.blur(); render(); }
+  function agregarElegido(i) {
+    var r = leer(texto), cant = r.cant || 1, it;
+    desplazable();
+    if (i < res.length) { var antes = items.length; it = V.sumar(items, res[i].id, cant); focoK = it.k; escribir(''); render([it.k]); if (items.length === antes) V.entra(elDe(it.k)); }
+    else { var nombre = r.q.trim() || 'Ítem libre'; it = V.libre(nombre.charAt(0).toUpperCase() + nombre.slice(1), r.mano || null); it.cant = cant; items.push(it); focoK = it.k; escribir(''); render([it.k]); }
+    var el = elDe(it.k); if (el) el.scrollIntoView({ block: 'nearest' });
+  }
+  function quitar(it) {
+    var i = items.indexOf(it);
+    V.sale([elDe(it.k)], function () {
+      items.splice(i, 1); if (focoK === it.k && items.length) focoK = items[Math.min(i, items.length - 1)].k; render();
+      V.tostada('Quitaste ' + it.corto, { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items.splice(i, 0, it); focoK = it.k; render([it.k]); } });
+    });
+  }
+  function noLlevo() {
+    if (!items.length) { V.tostada('La venta ya está vacía', { icono: 'info' }); return; }
+    var copia = items.slice(), n = items.length;
+    V.sale(filas.children, function () { items = []; render(); V.tostada('Anotado: no lo llevó (' + n + (n === 1 ? ' producto)' : ' productos)'), { icono: 'check', accion: 'Deshacer', alAccion: function () { items = copia; focoK = items[0].k; render(copia.map(function (x) { return x.k; })); } }); });
+  }
+  function elegirMedio(k) { medio = k; document.querySelectorAll('.medios-seg .ms').forEach(function (b) { b.classList.toggle('elegido', b.classList.contains(k)); }); }
+  function cobrar() {
+    var ok = V.puedeCobrar(items, medio, cliente, function (f) { aTabla(f[0].k); var el = elDe(f[0].k); el.scrollIntoView({ block: 'nearest' }); V.sacudir(el); });
+    if (ok === 'cliente') { V.elegirCliente(function (n) { cliente = n; if (n) cobrar(); }); return; }
+    if (!ok) return;
+    V.llenar(btnCobrar, function () {
+      var total = V.total(items), n = items.length, cli = cliente, med = medio;
+      V.sale(filas.children, function () { items = []; cliente = null; render(); elegirMedio('efectivo'); });
+      V.listo({ total: total, medio: med, cliente: cli, cantidad: n, alCerrar: function () { aComando(); } });
+    });
+  }
+  function margen(it, m) { if (!it || it.libre) return; it.margen = m; it.mano = null; render(); }
+  function cantidadMenu(it, ancla) {
+    V.abrir({ tipo: 'menu', ancla: ancla, lado: 'izquierda-abajo', html: '<div class="tit">Cantidad</div><div style="display:flex;align-items:center;gap:12px;padding:2px 8px 8px"><span class="cantidad"><button data-menos aria-label="Uno menos"><i class="i i-s" data-i="minus"></i></button><span class="n" data-n></span><button data-mas aria-label="Uno más"><i class="i i-s" data-i="plus"></i></button></span></div><div class="v-sep"></div>' +
+      (it.libre ? '<button class="v-op" data-mano><i class="i" data-i="pencil"></i>Precio a mano</button>' : '<button class="v-op" data-mano><i class="i" data-i="pencil"></i>Precio a mano</button>') + '<button class="v-op peligro" data-quitar><i class="i" data-i="trash-2"></i>Quitar de la venta<span class="kbd">Supr</span></button>',
+      alAbrir: function (caja, c) {
+        function n() { caja.querySelector('[data-n]').innerHTML = V.num(it.cant) + (it.unidad === 'kg' ? '<span class="u">kg</span>' : ''); }
+        n();
+        caja.addEventListener('click', function (e) {
+          if (e.target.closest('[data-mas]')) { it.cant = Math.round((it.cant + V.paso(it)) * 10) / 10; n(); render(); }
+          if (e.target.closest('[data-menos]') && it.cant - V.paso(it) > .05) { it.cant = Math.round((it.cant - V.paso(it)) * 10) / 10; n(); render(); }
+          if (e.target.closest('[data-mano]')) { c.cerrar('ok'); V.precioAMano(it, function (v) { it.mano = v; render(); }); }
+          if (e.target.closest('[data-quitar]')) { c.cerrar('ok'); quitar(it); }
+        });
+      } });
+  }
+  function atajos() {
+    var t = [['Enter', 'Suma lo elegido a la venta'], ['↑ ↓', 'Elegir en las sugerencias o en la planilla'], ['1 a 5', 'Margen 300, 200, 100, 50 o 25 % del renglón elegido'], ['Ctrl Enter', 'Lo escrito, como ítem libre'], ['F1', 'De dónde sale el precio'], ['F5 a F8', 'Efectivo, Mercado Pago, tarjeta, cuenta corriente'], ['F2', 'Cobrar'], ['Esc', 'Borra la línea; vacía, el cliente no lo llevó'], ['Supr', 'Quita el renglón elegido']];
+    V.capa(V.cab('Teclas', 'Todo se hace sin el mouse') + '<div class="v-teclas">' + t.map(function (x) { return '<span>' + x[0].split(' ').map(function (k) { return k === 'a' ? 'a' : '<span class="kbd">' + k + '</span>'; }).join(' ') + '</span><span>' + x[1] + '</span>'; }).join('') + '</div><div class="v-pie"><button class="btn btn-oscuro" data-cerrar>Entendido</button></div>');
+  }
+
+  // ---- Eventos ----
+  entrada.addEventListener('input', function () { texto = entrada.value; sel = 0; dibujarComando(); dibujarSug(); });
+  entrada.addEventListener('keydown', function (e) {
+    if (V.abierta()) return;
+    var total = res.length + 1, vis = sug.style.display !== 'none';
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (vis) { sel = (sel + (e.key === 'ArrowDown' ? 1 : total - 1)) % total; dibujarSug(); }
+      else if (items.length) aTabla(items[e.key === 'ArrowUp' ? items.length - 1 : 0].k);
+    } else if (e.key === 'Enter') { e.preventDefault(); if (texto.trim()) agregarElegido(e.ctrlKey ? res.length : sel); }
+    else if (e.key === 'Tab') { e.preventDefault(); if (!leer(texto).cant) escribir('2 ' + texto.trim()); else V.tostada('La cantidad va adelante: «3 mecha 8»', { icono: 'keyboard' }); }
+    else if (e.key === 'Escape') { e.preventDefault(); if (texto) escribir(''); else noLlevo(); }
+  });
+  comando.addEventListener('click', function () { aComando(); });
+  sug.addEventListener('mousedown', function (e) { var s = e.target.closest('[data-n]'); if (!s) return; e.preventDefault(); sel = +s.getAttribute('data-n'); agregarElegido(sel); entrada.focus(); });
+  filas.addEventListener('click', function (e) {
+    var f = e.target.closest('.fila'); if (!f) return;
+    var it = buscarItem(f.getAttribute('data-k')); if (!it) return;
+    focoK = it.k;
+    var b = e.target.closest('[data-m]'); if (b) { enTabla = true; dibujarComando(); dibujarSug(); margen(it, +b.getAttribute('data-m')); return; }
+    if (e.target.closest('.celda-cant')) { aTabla(it.k); cantidadMenu(it, elDe(it.k).querySelector('.celda-cant')); return; }
+    aTabla(it.k);
+  });
+  document.querySelectorAll('.medios-seg .ms').forEach(function (b) { b.addEventListener('click', function () { elegirMedio(V.ORDEN_MEDIOS.filter(function (k) { return b.classList.contains(k); })[0]); }); });
+  btnCobrar.addEventListener('click', cobrar);
+  $('[data-nollevo]').addEventListener('click', noLlevo);
+  $('[data-teclas]').addEventListener('click', atajos);
+  $('[data-menu-mas]').addEventListener('click', function (e) { V.mas(e.currentTarget); });
+  $('[data-usuario]').addEventListener('click', function (e) { V.menuUsuario(e.currentTarget, 'derecha'); });
+  document.addEventListener('keydown', function (e) {
+    if (V.abierta()) return;
+    var it = buscarItem(focoK);
+    var f = { F2: cobrar, F5: function () { elegirMedio('efectivo'); }, F6: function () { elegirMedio('mp'); }, F7: function () { elegirMedio('tarjeta'); }, F8: function () { elegirMedio('cuenta'); }, F1: function () { if (it) V.dondeSale(it); } }[e.key];
+    if (f) { e.preventDefault(); f(); return; }
+    if (e.target === entrada) return;
+    if (enTabla) {
+      if (/^[1-5]$/.test(e.key)) { e.preventDefault(); margen(it, V.MARGENES[+e.key - 1]); return; }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); var i = items.indexOf(it) + (e.key === 'ArrowDown' ? 1 : -1); if (i < 0) { aComando(); return; } focoK = items[Math.min(items.length - 1, i)].k; render(); elDe(focoK).scrollIntoView({ block: 'nearest' }); return; }
+      if ((e.key === '+' || e.key === '-') && it) { e.preventDefault(); var c = Math.round((it.cant + (e.key === '+' ? 1 : -1) * V.paso(it)) * 10) / 10; if (c > .05) { it.cant = c; render(); } return; }
+      if (e.key === 'Delete' && it) { quitar(it); return; }
+      if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); aComando(); return; }
+    }
+    if (e.key === '?') { e.preventDefault(); atajos(); return; }
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); aComando(); escribir((enTabla ? '' : texto) + e.key); }
+  });
+  render([]);
+  res = V.buscar(leer(texto).q, 3);
+  setTimeout(function () { entrada.focus({ preventScroll: true }); }, 0);
+})();
+</script>
+</body>
+</html>

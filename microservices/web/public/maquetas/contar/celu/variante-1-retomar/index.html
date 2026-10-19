@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · Seguí donde quedaste (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 12px; padding-bottom: 12px; }
+  .seguir { padding: 14px; display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; }
+  .anillo { position: relative; width: 64px; height: 64px; }
+  .anillo svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+  .anillo .c { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 17px; }
+  .seguir .et { font-size: 14px; font-weight: 700; color: var(--accion-texto); display: flex; align-items: center; gap: 6px; }
+  .seguir .n { font-weight: 800; font-size: 18px; line-height: 23px; }
+  .seguir .d { font-size: 14px; color: var(--texto-2); }
+  .hoy { padding: 12px 14px; display: grid; gap: 8px; }
+  .hoy .fila { display: flex; align-items: center; gap: 8px; }
+  .hoy .fila .t-renglon { flex: 1; }
+  .abc { display: flex; height: 8px; border-radius: 99px; overflow: hidden; gap: 2px; }
+  .abc b { display: block; height: 100%; }
+  .abc .a { background: var(--pino); } .abc .b { background: #5E8C7E; } .abc .c { background: #B9CEC6; }
+  .abc-ley { display: flex; gap: 14px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .abc-ley i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; }
+  .sec-tit { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+  .sec-tit .t-seccion { flex: 1; font-size: 18px; }
+  .sec { display: grid; grid-template-columns: 44px minmax(0,1fr) auto 16px; gap: 12px; align-items: center; padding: 10px 12px; background: #fff; border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .sec + .sec { margin-top: 8px; }
+  .sec .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .sec .n { font-weight: 700; font-size: 16px; line-height: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sec .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
+  .sec.nunca .ico { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .sec.curso .ico { background: var(--accion-suave); color: var(--accion-texto); }
+  .sec .flecha { color: var(--texto-3); }
+  .lista { overflow: hidden; -webkit-mask-image: linear-gradient(#000 78%, transparent); flex: 1; min-height: 0; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a data-ir="stock">Stock</a><a data-ir="compras">Compras</a><a class="activa" data-ir="contar">Contar</a></nav>
+  <div class="celu-pantalla">
+    <div class="tarjeta-2 seguir">
+      <div class="anillo"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#ECE9E1" stroke-width="4.5"/><circle cx="18" cy="18" r="15" fill="none" stroke="#E8541C" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="35.3 94.2"/></svg><div class="c num">37%</div></div>
+      <div><div class="et"><i class="i i-s" data-i="pause"></i>Seguí donde quedaste</div><div class="n">Pared de tornillería</div><div class="d">Faltan 40 · lo dejaste ayer 17:22</div></div>
+    </div>
+
+    <div class="tarjeta hoy">
+      <div class="fila"><i class="i" data-i="calendar-check" style="color:var(--pino-texto)"></i><span class="t-renglon">Hoy toca contar 31</span><span class="pastilla" style="background:var(--pino);color:#fff;height:26px">12 A</span></div>
+      <div class="abc"><b class="a" style="width:39%"></b><b class="b" style="width:48%"></b><b class="c" style="width:13%"></b></div>
+      <div class="abc-ley"><span><i style="background:var(--pino)"></i>A 12</span><span><i style="background:#5E8C7E"></i>B 15</span><span><i style="background:#B9CEC6"></i>C 4</span><span style="margin-left:auto;color:var(--pino-texto);font-weight:750">Ver cuáles</span></div>
+    </div>
+
+    <div class="sec-tit"><span class="t-seccion">Sectores</span><span class="t-detalle">9 de 14 contados</span><button class="btn btn-icono chico btn-suave"><i class="i" data-i="plus"></i></button></div>
+    <div class="lista">
+      <div class="sec curso"><span class="ico"><i class="i" data-i="pause"></i></span><div style="min-width:0"><div class="n">Exhibidor de mechas</div><div class="d"><b style="color:var(--accion-texto)">En curso</b> · 8 de 46</div></div><span></span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">Pared de electricidad</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 37</div></div><span class="pastilla" style="background:var(--pino);color:#fff;height:26px">9 A</span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">Cajones de bulones</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 120</div></div><span class="pastilla" style="background:var(--pino);color:#fff;height:26px">3 A</span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec"><span class="ico"><i class="i" data-i="check"></i></span><div style="min-width:0"><div class="n">Herramientas manuales</div><div class="d">Contado el 12/10 · 41</div></div><span></span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec"><span class="ico"><i class="i" data-i="check"></i></span><div style="min-width:0"><div class="n">Adhesivos y selladores</div><div class="d">Contado el 05/10 · 29</div></div><span></span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+    </div>
+  </div>
+  <div class="barra-accion" style="display:flex;gap:8px"><button class="btn btn-oscuro grande btn-icono" style="width:56px"><i class="i i-l" data-i="scan-barcode"></i></button><button class="btn btn-accion grande" style="flex:1">Seguir contando<i class="i" data-i="arrow-right"></i></button></div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo" data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a id="mas"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<style>
+  /* El modo de contar: tapa el marco, con la × arriba a la izquierda (lenguaje común). */
+  .cc-cab { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+  .cc-cab .tit { flex: 1; min-width: 0; }
+  .cc-cab .tit b { display: block; font-size: 18px; font-weight: 800; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-cab .tit span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .cc-cuerpo { flex: 1; min-height: 0; overflow: hidden; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+  .cc-busca { display: grid; grid-template-columns: 1fr 52px; gap: 8px; }
+  .cc-busca .btn { height: 52px; }
+  .cc-elegido { padding: 12px; display: grid; gap: 10px; }
+  .cc-elegido .prod { display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 12px; align-items: center; }
+  .cc-elegido .n { font-weight: 800; font-size: 16px; line-height: 21px; }
+  .cc-elegido .d { font-size: 14px; color: var(--texto-2); }
+  .cc-q { display: grid; grid-template-columns: 56px 1fr 56px; gap: 8px; align-items: center; }
+  .cc-q .btn { height: 56px; }
+  .cc-q label { display: flex; align-items: baseline; justify-content: center; gap: 6px; height: 56px; border-radius: 14px; border: 2px solid var(--pino); box-shadow: 0 0 0 4px rgba(18,56,47,.10); background: #fff; }
+  .cc-q input { width: 110px; border: 0; outline: 0; background: none; text-align: right; font-size: 32px; font-weight: 800; line-height: 52px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .cc-q .u { font-size: 16px; font-weight: 700; color: var(--texto-2); width: 40px; }
+  .cc-lista-cab { display: flex; align-items: center; gap: 8px; font-weight: 750; }
+  .cc-lista-cab .t-detalle { margin-left: auto; }
+  .cc-r { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 6px 10px 6px 6px; background: #fff; border: 1px solid var(--borde); border-radius: 12px; }
+  .cc-r + .cc-r { margin-top: 6px; }
+  .cc-r .n { font-weight: 700; font-size: 14px; line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-r .d { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .cc-r b { font-size: 16px; font-weight: 800; }
+  .cc-r.nuevo { border: 2px solid var(--logro); padding: 5px 9px 5px 5px; }
+  .cc-lista { flex: 1; min-height: 0; overflow: hidden; -webkit-mask-image: linear-gradient(#000 80%, transparent); }
+  .ig { color: var(--logro-texto); } .menos { color: var(--urgente-texto); } .mas { color: var(--pino-texto); }
+  .cc-pie { display: grid; grid-template-columns: auto 1fr; gap: 8px; padding-bottom: 30px; }
+</style>
+<script src="../../interacciones.js"></script>
+<script>
+/* Contar · celu 1: seguí donde quedaste, abrir un sector, contar (escanear simulado o buscar, y el número), cerrar con la hoja de la variante 4. */
+(function () {
+  var C = window.Contar, $ = function (s, r) { return (r || document).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var celu = $(".celu");
+  var TORN = { n: "Pared de tornillería", contados: 24, total: 64, estado: "curso",
+    lista: [
+      { n: "Tornillo autoperforante T2 8 × 1/2\" × 100", f: "tornillos", m: "Bulonera Centro · Cód. T2812", c: 12, s: 14, u: "un." },
+      { n: "Clavos punta París 2\" a granel", f: "clavos", m: "Acindar · se cuenta en kg", c: 7.2, s: 6.5, u: "kg" },
+      { n: "Arandela plana zincada 1/4\" × 100", f: "", m: "Bulonera Centro · Cód. AP14", c: 6, s: 6, u: "un." },
+      { n: "Tornillo fixer 8 mm con tarugo × 50", f: "tornillos", m: "Fischer · Cód. FX8", c: 0, s: 3, u: "un." }
+    ], ocultas: [{ n: "Tornillo T2 8 × 3/4\" × 100", c: 10, h: 11 }, { n: "Tarugos nylon S5 × 100", c: 15, h: 13 }, { n: "Tarugos nylon S8 con tope × 100", c: 9, h: 8 }] };
+  TORN.pend = [{ n: "Tarugos nylon S8 con tope × 100", m: "Fischer · Cód. 7780-S8", f: "tarugos", s: 8, u: "un." }].concat(C.productos(TORN.n));
+  // Los sectores de la lista.
+  var sectores = $$(".lista .sec").map(function (row) {
+    var d = $(".d", row).textContent, m = d.match(/(\d+) de (\d+)/), t = d.match(/· (\d+)$/);
+    return { row: row, n: $(".n", row).textContent, contados: m ? +m[1] : 0, total: m ? +m[2] : +(t ? t[1] : 0), estado: row.classList.contains("curso") ? "curso" : row.classList.contains("nunca") ? "nunca" : "contado", fecha: (d.match(/el (\S+)/) || [])[1] };
+  });
+  sectores.forEach(function (s) { if (s.n === "Exhibidor de mechas") s.nombreLargo = "Exhibidor de mechas y puntas"; });
+  var abiertos = 9, totalSec = 14;
+
+  // --- El modo de contar -------------------------------------------------------------------
+  var S, elegido, pant;
+  function abrirConteo(sec, conCamara) {
+    S = sec; S.pend = S.pend || C.productos(S.nombreLargo || S.n).slice(); S.lista = S.lista || []; S.ocultas = S.ocultas || [];
+    pant = C.abrir('<div class="cx-pantalla">' + $(".barra-estado").outerHTML +
+      '<div class="cc-cab"><button class="btn btn-icono" style="border-radius:99px" data-cerrar aria-label="Volver"><i class="i" data-i="x"></i></button><div class="tit"><b>' + S.n + '</b><span class="cc-av"></span></div></div>' +
+      '<div style="padding:10px 16px 0"><div class="barra" style="height:8px;margin:0"><b class="cc-barra" style="background:var(--pino)"></b></div></div>' +
+      '<div class="cc-cuerpo"><div class="cc-busca"><div class="campo" data-buscar><i class="i" data-i="search"></i>Buscá o escaneá</div><button class="btn btn-oscuro btn-icono" data-escanear aria-label="Escanear"><i class="i i-l" data-i="scan-barcode"></i></button></div>' +
+      '<div class="tarjeta-2 cc-elegido"></div>' +
+      '<div class="cc-lista-cab">Contados <span class="pastilla cc-nc" style="height:24px"></span><span class="t-detalle">el último arriba</span></div><div class="cc-lista"></div></div>' +
+      '<div class="barra-accion cc-pie"><button class="btn grande" data-cierre style="padding:0 16px"><i class="i" data-i="square-check-big"></i>Cerrar</button><button class="btn btn-accion grande" data-sig>Siguiente<i class="i" data-i="arrow-right"></i></button></div></div>', { sinVelo: true });
+    S.lista.slice(0, 6).forEach(function (p) { $(".cc-lista", pant).appendChild(fila(p)); });
+    C.pintar(pant); avance(); elegir(S.pend[0]);
+    pant.addEventListener("click", function (e) {
+      if (e.target.closest("[data-buscar]")) buscar();
+      else if (e.target.closest("[data-escanear]")) escanear();
+      else if (e.target.closest("[data-sig]")) contar();
+      else if (e.target.closest("[data-cierre]")) cierre();
+      else if (e.target.closest("[data-mas]")) cambiar(+1);
+      else if (e.target.closest("[data-menos]")) cambiar(-1);
+      else { var r = e.target.closest(".cc-r"); if (r && r._p) elegir({ n: r._p.n, m: r._p.m, f: r._p.f, s: r._p.s, u: r._p.u, antes: r._p.c }); }
+    });
+    if (conCamara) setTimeout(escanear, 340);
+  }
+  function fila(p) {
+    var d = C.dif(p.c, p.s), n = C.el('<div class="cc-r">' + C.foto(p.f, true) + '<div style="min-width:0"><div class="n">' + p.n + '</div><div class="d">' + C.fmt(p.c) + " " + p.u + " · había " + C.fmt(p.s) + '</div></div><b class="' + d.c + ' num">' + d.t + "</b></div>");
+    n._p = p; C.pintar(n); return n;
+  }
+  function avance() {
+    $(".cc-av", pant).textContent = S.contados + " de " + S.total + " · faltan " + (S.total - S.contados);
+    $(".cc-barra", pant).style.width = (S.total ? S.contados / S.total * 100 : 0) + "%";
+    C.rodar($(".cc-nc", pant), String(S.contados), true);
+  }
+  function elegir(p) {
+    elegido = p; var box = $(".cc-elegido", pant);
+    if (!p) { box.innerHTML = '<div class="t-detalle" style="text-align:center;padding:16px 0">No queda nada sin contar. Cerrá el sector.</div>'; return; }
+    box.innerHTML = '<div class="prod">' + C.foto(p.f) + '<div style="min-width:0"><div class="n">' + p.n + '</div><div class="d">' + p.m + "</div>" +
+      (p.antes != null ? '<span class="pastilla pino" style="height:26px;margin-top:4px"><i class="i i-s" data-i="history"></i>Antes ' + C.fmt(p.antes) + " " + p.u + "</span>" : "") + "</div></div>" +
+      '<div class="cc-q"><button class="btn btn-suave" data-menos aria-label="Uno menos"><i class="i i-l" data-i="minus"></i></button><label><input inputmode="decimal" placeholder="0" value="' + (p.antes != null ? C.fmt(p.antes) : "") + '"><span class="u">' + p.u + '</span></label><button class="btn btn-suave" data-mas aria-label="Uno más"><i class="i i-l" data-i="plus"></i></button></div>';
+    C.pintar(box);
+    var inp = $("input", box); inp.addEventListener("keydown", function (e) { if (e.key === "Enter") contar(); });
+    C.mover(box, [{ opacity: 0, transform: "translateY(16px)" }, { opacity: 1, transform: "none" }], 320);
+    if (p.antes != null) C.rebotar($(".pastilla", box));
+  }
+  function cambiar(d) {
+    var inp = $(".cc-elegido input", pant); if (!inp) return;
+    var v = parseFloat((inp.value || "0").replace(",", ".")) + d; inp.value = C.fmt(Math.max(0, v)); C.mover(inp, [{ transform: "translateY(" + (d > 0 ? 40 : -40) + "%)", opacity: 0 }, { transform: "none", opacity: 1 }], 200); C.vibrar(5);
+  }
+  function contar() {
+    var inp = $(".cc-elegido input", pant); if (!elegido || !inp) return;
+    if (inp.value === "") { inp.focus(); C.mover(inp.parentNode, [{ transform: "translateX(-4px)" }, { transform: "translateX(4px)" }, { transform: "none" }], 200); return; }
+    var p = elegido, c = parseFloat(inp.value.replace(",", ".")), reg = { n: p.n, m: p.m, f: p.f, s: p.s, u: p.u, c: c };
+    var ya = S.lista.filter(function (x) { return x.n === p.n; })[0];
+    S.lista = S.lista.filter(function (x) { return x.n !== p.n; }); S.lista.unshift(reg);
+    S.pend = S.pend.filter(function (x) { return x.n !== p.n; });
+    var lista = $(".cc-lista", pant);
+    $$(".cc-r", lista).forEach(function (r) { if (r._p && r._p.n === p.n) r.remove(); });
+    var n = fila(reg); lista.insertBefore(n, lista.firstChild); n.classList.add("nuevo"); C.nuevo(n); setTimeout(function () { n.classList.remove("nuevo"); }, 1000);
+    if (!ya) { S.contados = Math.min(S.total, S.contados + 1); avance(); pintarSector(S); }
+    C.mover($(".cc-elegido", pant), [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-16px)" }], 160);
+    setTimeout(function () { elegir(S.pend[0]); }, 160);
+  }
+  function buscar() {
+    var todos = S.pend.concat(S.lista.map(function (x) { return { n: x.n, m: x.m, f: x.f, s: x.s, u: x.u, antes: x.c }; }));
+    var h = C.hoja('<div class="campo foco"><i class="i" data-i="search"></i><input autofocus placeholder="Nombre o código" style="border:0;outline:0;flex:1;font-weight:600;background:none;min-width:0"></div><div class="cx-res" style="display:grid;gap:2px"></div><button class="btn btn-fantasma" data-cerrar>Cancelar</button>');
+    var inp = $("input", h), res = $(".cx-res", h);
+    function lista() {
+      var t = inp.value.toLowerCase();
+      res.innerHTML = todos.filter(function (p) { return !t || (p.n + p.m).toLowerCase().indexOf(t) >= 0; }).slice(0, 6).map(function (p) { return '<button class="cx-op" data-k="' + todos.indexOf(p) + '">' + C.foto(p.f, true) + '<span class="txt">' + p.n + "</span></button>"; }).join("");
+      C.pintar(res);
+    }
+    lista(); inp.addEventListener("input", lista);
+    res.addEventListener("click", function (e) { var b = e.target.closest("[data-k]"); if (!b) return; C.cerrar(C.capaDe(h)); elegir(todos[+b.getAttribute("data-k")]); });
+  }
+  function escanear() { var p = S.pend[1] || S.pend[0]; if (p) C.camara(p, function (x) { elegir(x); }); }
+  function cierre() {
+    var difs = S.lista.filter(function (x) { return x.c !== x.s; }).map(function (x) { return { n: x.n, c: x.c, h: x.s }; }).concat(S.ocultas);
+    var sin = []; for (var i = 0; i < S.total - S.contados; i++) sin.push(S.pend[i] || { f: "" });
+    C.cierre({ sector: S.n, contados: S.contados, difs: difs, sinContar: sin, hora: "10:44", alCerrar: function () { var c = C.capaDe(pant); if (c) C.cerrar(c); cerrado(S, difs.length); } });
+  }
+
+  // --- La pantalla de Contar ---------------------------------------------------------------
+  function pintarSector(s) {
+    if (s === TORN) { var pc = Math.round(s.contados / s.total * 100); $(".seguir .anillo .c").textContent = pc + "%"; $(".seguir .anillo circle:last-child").setAttribute("stroke-dasharray", (94.2 * pc / 100).toFixed(1) + " 94.2"); $(".seguir .d").textContent = "Faltan " + (s.total - s.contados) + " · lo seguiste hoy 10:44"; return; }
+    if (!s.row) return;
+    $(".d", s.row).innerHTML = '<b style="color:var(--accion-texto)">En curso</b> · ' + s.contados + " de " + s.total;
+  }
+  function cerrado(s, ajustes) {
+    s.estado = "contado"; abiertos++;
+    $(".sec-tit .t-detalle").textContent = abiertos + " de " + totalSec + " contados";
+    if (s === TORN) {
+      var card = $(".seguir");
+      $(".anillo circle:last-child", card).setAttribute("stroke", "#1E9E62"); $(".anillo circle:last-child", card).setAttribute("stroke-dasharray", "94.2 94.2");
+      $(".anillo .c", card).innerHTML = '<i class="i" data-i="check" style="color:var(--logro-texto)"></i>';
+      $(".et", card).innerHTML = '<i class="i i-s" data-i="circle-check"></i>Contado hoy'; $(".et", card).style.color = "var(--logro-texto)";
+      $(".d", card).textContent = ajustes + " ajustes de stock · 10:44";
+      C.pintar(card); C.rebotar($(".anillo", card));
+      var sig = sectores.filter(function (x) { return x.estado === "curso"; })[0];
+      var b = $(".barra-accion .btn-accion"); b.innerHTML = sig ? "Seguir con " + sig.n.replace("Exhibidor de ", "") + '<i class="i" data-i="arrow-right"></i>' : "Elegí un sector";
+      C.pintar(b); siguiente = sig;
+    } else {
+      s.row.classList.remove("curso", "nunca");
+      $(".ico", s.row).innerHTML = '<i class="i" data-i="check"></i>'; $(".d", s.row).textContent = "Contado hoy · " + s.total;
+      s.row.children[2].outerHTML = "<span></span>"; C.pintar(s.row); C.rebotar($(".ico", s.row));
+    }
+    C.tostada(s.n + " cerrado", "circle-check");
+  }
+  var siguiente = TORN;
+  $(".seguir").setAttribute("data-toca", "");
+  $(".seguir").addEventListener("click", function () { if (TORN.estado === "curso") abrirConteo(TORN); });
+  $(".barra-accion .btn-accion").addEventListener("click", function () { if (siguiente) abrirConteo(siguiente); });
+  $(".barra-accion .btn-oscuro").addEventListener("click", function () { abrirConteo(siguiente || TORN, true); });
+
+  // Tocar un sector: abrirlo.
+  $(".lista").addEventListener("click", function (e) {
+    var row = e.target.closest(".sec"); if (!row) return;
+    var s = sectores.filter(function (x) { return x.row === row; })[0]; if (!s) return;
+    var a = $(".pastilla", row);
+    var h = C.hoja(C.cabeza(s.nombreLargo || s.n, s.estado === "curso" ? "En curso · " + s.contados + " de " + s.total : s.estado === "nunca" ? "Nunca contado · " + s.total + " productos" + (a ? " · " + a.textContent + " del plan" : "") : "Contado el " + (s.fecha || "hoy") + " · " + s.total + " productos") +
+      '<div class="aviso pino"><i class="i" data-i="info"></i><div>Se puede seguir vendiendo mientras contás: lo que se venda después se descuenta al cerrar.</div></div>' +
+      '<div class="cx-celu-botones"><button class="btn btn-accion grande" data-abrir>' + (s.estado === "curso" ? "Seguir contando" : s.estado === "nunca" ? "Empezar a contar" : "Volver a contar") + '</button><button class="btn btn-fantasma" data-cerrar>Ahora no</button></div>');
+    $("[data-abrir]", h).addEventListener("click", function () {
+      C.cerrar(C.capaDe(h));
+      if (s.estado !== "curso") {
+        s.estado = "curso"; s.contados = 0; row.classList.remove("nunca"); row.classList.add("curso");
+        $(".ico", row).innerHTML = '<i class="i" data-i="pause"></i>'; C.pintar(row); pintarSector(s);
+      }
+      setTimeout(function () { abrirConteo(s); }, 120);
+    });
+  });
+
+  // Lo que toca hoy.
+  var HOY = [["Lámpara LED 12 W luz fría E27", "Pared de electricidad", "A", "lampara"], ["Mecha acero rápido HSS 8 mm", "Exhibidor de mechas", "A", "mecha"], ["Tarugos nylon S8 con tope × 100", "Pared de tornillería", "A", "tarugos"], ["Cinta métrica 5 m × 19 mm", "Herramientas manuales", "B", "cinta-metrica"], ["Látex interior blanco mate 4 l", "Góndola de pinturas", "B", "pintura"], ["Pinza universal 8\" aislada", "Herramientas manuales", "C", "pinza"]];
+  $(".hoy").setAttribute("data-toca", "");
+  $(".hoy").addEventListener("click", function () {
+    var h = C.hoja(C.cabeza("Hoy toca contar 31", "Primero los A: son los que más se venden o más valen") + '<div style="display:grid;gap:8px">' + HOY.map(function (x) {
+      return '<div class="cc-r">' + C.foto(x[3], true) + '<div style="min-width:0"><div class="n">' + x[0] + '</div><div class="d">' + x[1] + '</div></div><span class="pastilla" style="height:26px;' + (x[2] === "A" ? "background:var(--pino);color:#fff" : "") + '">' + x[2] + "</span></div>";
+    }).join("") + '<div class="t-detalle" style="text-align:center">y 25 más</div></div><div class="cx-celu-botones"><button class="btn btn-accion grande" data-abrir>Contar los A de electricidad</button><button class="btn btn-fantasma" data-cerrar>Cerrar</button></div>');
+    $("[data-abrir]", h).addEventListener("click", function () { C.cerrar(C.capaDe(h)); var s = sectores.filter(function (x) { return x.n === "Pared de electricidad"; })[0]; s.row.click(); });
+  });
+
+  // Nuevo sector.
+  $(".sec-tit .btn").addEventListener("click", function () {
+    var h = C.hoja(C.cabeza("Nuevo sector", "Un mueble o una pared que se cuenta de una vez") + '<label class="cx-campo"><span class="t-etiqueta">Nombre</span><input autofocus placeholder="Ej.: Góndola de plomería"></label><div class="cx-celu-botones"><button class="btn btn-accion grande" data-crear>Crear el sector</button><button class="btn btn-fantasma" data-cerrar>Cancelar</button></div>');
+    function crear() {
+      var nom = ($("input", h).value.trim() || "Góndola de plomería").replace(/[<&]/g, "");
+      var row = C.el('<div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">' + nom + '</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 0</div></div><span></span><i class="i i-s flecha" data-i="chevron-right"></i></div>');
+      var lista = $(".lista"); lista.insertBefore(row, lista.firstChild); C.pintar(row); C.nuevo(row);
+      sectores.push({ row: row, n: nom, contados: 0, total: 12, estado: "nunca" }); totalSec++;
+      $(".sec-tit .t-detalle").textContent = abiertos + " de " + totalSec + " contados";
+      C.cerrar(C.capaDe(h)); C.tostada("Sector «" + nom + "» creado");
+    }
+    $("[data-crear]", h).addEventListener("click", crear);
+    $("input", h).addEventListener("keydown", function (e) { if (e.key === "Enter") crear(); });
+  });
+
+  // El espejo con la computadora.
+  $(".btn-vinculo").setAttribute("data-toca", "");
+  $(".btn-vinculo").addEventListener("click", function () {
+    C.hoja(C.cabeza("En espejo con la computadora", "PC del mostrador · lo que contás acá aparece allá al instante") + '<div class="aviso logro"><i class="i" data-i="monitor"></i><div>Carlos ve el avance de la pared de tornillería desde el mostrador.</div></div><div class="cx-celu-botones"><button class="btn btn-fantasma" data-cerrar>Listo</button></div>');
+  });
+
+  $("#mas").addEventListener("click", function () { C.menuMas(); });
+})();
+</script>
+</body>
+</html>

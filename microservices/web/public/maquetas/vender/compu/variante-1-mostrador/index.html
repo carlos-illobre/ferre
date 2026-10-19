@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · Mostrador (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .vender { display: grid; grid-template-columns: minmax(0,1fr) 352px; gap: 24px; height: 100%; }
+  .izq { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .busqueda { display: flex; gap: 12px; }
+  .busqueda .campo { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; height: 56px; font-size: 17px; }
+  .busqueda .campo .ayuda { margin-left: auto; display: flex; gap: 6px; align-items: center; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .lista-cab { display: flex; align-items: center; gap: 10px; margin: 20px 0 10px; }
+  .lista-cab .t-seccion { font-size: 18px; }
+  .lista-cab .btn { margin-left: auto; }
+  .lista { flex: 1; min-height: 0; overflow: hidden; position: relative; padding: 2px 4px 0 2px; margin: -2px -4px 0 -2px; }
+  .lista::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(transparent, var(--fondo)); pointer-events: none; }
+
+  .item { display: grid; grid-template-columns: 56px 1fr auto 112px 28px; grid-template-rows: auto auto; column-gap: 16px; row-gap: 10px; align-items: center; padding: 12px 12px 12px 14px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); position: relative; }
+  .item + .item { margin-top: 8px; }
+  .item .foto { grid-row: 1 / span 2; align-self: start; }
+  .item .nombre { font-weight: 750; font-size: 16px; line-height: 22px; }
+  .item .det { font-size: 14px; color: var(--texto-2); line-height: 20px; display: flex; gap: 8px; align-items: center; }
+  .item .sub { text-align: right; font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+  .item .sub small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-3); letter-spacing: 0; }
+  .item .menu { color: var(--texto-3); }
+  .precio-fila { grid-column: 2 / 6; display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .precio-fila .valor { color: var(--tinta); font-weight: 800; font-size: 15px; }
+  .precio-fila .sep { width: 1px; height: 20px; background: var(--borde); }
+  .segmentos.margen > * { min-height: 30px; padding: 0 10px; }
+  .segmentos.margen > * .kbd { display: none; }
+  .item.foco { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10), var(--sombra-2); }
+  .item.foco .segmentos.margen > * .kbd { display: inline-flex; height: 20px; min-width: 20px; font-size: 14px; padding: 0 4px; }
+  .item.sinprecio { border-color: #F3C766; background: linear-gradient(90deg, var(--urgente-suave), #fff 40%); }
+  .item.sinprecio .segmentos.margen { background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); }
+  .item .marca-celu { position: absolute; top: -9px; left: 68px; }
+  .pastilla.mini { height: 24px; font-size: 14px; padding: 0 8px; }
+
+  .cobro { display: flex; flex-direction: column; padding: 20px; gap: 14px; height: 100%; }
+  .cobro .et { font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .total-linea { display: flex; align-items: baseline; justify-content: space-between; }
+  .ganas { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--r); background: var(--pino-suave); color: var(--pino-texto); font-size: 14px; font-weight: 700; }
+  .ganas b { margin-left: auto; font-size: 16px; }
+  .medios { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+  .m { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 8px; min-width: 0; border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: #fff; font-weight: 700; font-size: 14px; line-height: 17px; text-align: left; }
+  .m .ic { width: 30px; height: 30px; border-radius: 99px; background: var(--cs); color: var(--c); display: grid; place-items: center; flex: none; }
+  .m .kbd { margin-left: auto; }
+  .m.elegido { border: 2px solid var(--c); background: var(--cs); padding: 0 7px; }
+  .m.elegido .ic { background: var(--c); color: #fff; }
+  .cliente { height: 44px; font-size: 15px; }
+  .otras { display: grid; grid-template-columns: auto 1fr 1fr; gap: 4px; margin-top: -4px; }
+  .otras .btn { font-size: 14px; min-height: 36px; padding: 0 6px; gap: 6px; }
+  .cobrar { justify-content: space-between; padding: 0 16px 0 20px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item activo" data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="nav-item v-toca" data-menu-mas><i class="i" data-i="ellipsis"></i>Más<span class="pastilla urgente mini" style="margin-left:auto">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div>Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario v-toca" data-usuario><span class="avatar">CI</span><div><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Vender</div></div>
+      <div class="acciones">
+        <span class="t-detalle">Lunes 19 de octubre · 10:42</span>
+        <button class="btn chico" data-pyp><i class="i i-s" data-i="clipboard-list"></i>Pedidos y presupuestos</button>
+      </div>
+    </header>
+    <nav class="pestanas"><a class="activa" data-ir="vender">Vender</a><a data-ir="ventas-de-hoy">Ventas de hoy <span class="pastilla mini">23</span></a></nav>
+
+    <section class="pantalla">
+      <div class="vender">
+        <div class="izq">
+          <div class="busqueda">
+            <div class="campo foco"><i class="i" data-i="search"></i><span>Buscá por nombre o código, o escaneá<span class="cursor"></span></span>
+              <span class="ayuda"><span class="kbd">Enter</span></span></div>
+            <button class="btn btn-oscuro" style="height:56px" data-escanear><i class="i" data-i="scan-barcode"></i>Escanear con el celular</button>
+          </div>
+
+          <div class="lista-cab">
+            <span class="t-seccion">Esta venta</span><span class="pastilla">5 productos</span>
+            <button class="btn btn-fantasma chico" data-vaciar><i class="i i-s" data-i="trash-2"></i>Vaciar</button>
+          </div>
+
+          <div class="lista">
+            <article class="item foco">
+              <div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+              <div><div class="nombre">Mecha acero rápido HSS 8 mm</div><div class="det">Ezeta · Bulonera Centro · <span class="pastilla logro mini">14 un.</span></div></div>
+              <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">3</span><button><i class="i i-s" data-i="plus"></i></button></div>
+              <div class="sub num"><span class="peso">$</span>21.000<small>3 × $7.000</small></div>
+              <i class="i menu" data-i="ellipsis"></i>
+              <div class="precio-fila">Costo <span class="valor">$2.480</span><span class="sep"></span>Margen
+                <span class="segmentos margen"><button>300</button><button>200</button><button class="elegido">100</button><button>50</button><button>25</button></span>%
+                <span class="sep"></span>Precio <span class="valor">$7.000</span></div>
+            </article>
+
+            <article class="item">
+              <span class="pastilla pino mini marca-celu"><i class="i i-s" data-i="smartphone"></i>Llegó del celular</span>
+              <div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div>
+              <div><div class="nombre">Cinta métrica PowerLock 5 m</div><div class="det">Stanley · Distribuidora Oeste · <span class="pastilla logro mini">6 un.</span></div></div>
+              <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1</span><button><i class="i i-s" data-i="plus"></i></button></div>
+              <div class="sub num"><span class="peso">$</span>17.000<small>1 × $17.000</small></div>
+              <i class="i menu" data-i="ellipsis"></i>
+              <div class="precio-fila">Costo <span class="valor">$9.350</span><span class="sep"></span>Margen
+                <span class="segmentos margen"><button>300</button><button>200</button><button>100</button><button class="elegido">50</button><button>25</button></span>%
+                <span class="sep"></span>Precio <span class="valor">$17.000</span></div>
+            </article>
+
+            <article class="item sinprecio">
+              <div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+              <div><div class="nombre">Tarugos nylon S8 con tope × 100</div><div class="det">Fischer · Ferretera del Sur · <span class="pastilla logro mini">3 un.</span></div></div>
+              <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1</span><button><i class="i i-s" data-i="plus"></i></button></div>
+              <div class="sub" style="color:var(--urgente-texto);font-size:16px">Sin precio<small>elegí el margen</small></div>
+              <i class="i menu" data-i="ellipsis"></i>
+              <div class="precio-fila">Costo <span class="valor">$4.150</span><span class="sep"></span><span style="color:var(--urgente-texto);font-weight:750">Margen</span>
+                <span class="segmentos margen"><button>300</button><button>200</button><button>100</button><button>50</button><button>25</button></span>
+                <span class="sep"></span><button class="btn chico" style="min-height:32px"><i class="i i-s" data-i="pencil"></i>Precio a mano</button></div>
+            </article>
+
+            <article class="item">
+              <div class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></div>
+              <div><div class="nombre">Clavos punta París 2" por kilo</div><div class="det">Acindar · Bulonera Centro · <span class="pastilla logro mini">12,4 kg</span></div></div>
+              <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">0,7<span class="u">kg</span></span><button><i class="i i-s" data-i="plus"></i></button></div>
+              <div class="sub num"><span class="peso">$</span>6.000<small>0,7 × $8.000 ↑</small></div>
+              <i class="i menu" data-i="ellipsis"></i>
+              <div class="precio-fila">Costo <span class="valor">$2.900 el kg</span><span class="sep"></span>Margen
+                <span class="segmentos margen"><button>300</button><button>200</button><button class="elegido">100</button><button>50</button><button>25</button></span>%
+                <span class="sep"></span>Precio <span class="valor">$8.000 el kg</span></div>
+            </article>
+
+            <article class="item">
+              <div class="foto-icono"><i class="i i-l" data-i="package-plus"></i></div>
+              <div><div class="nombre">Bolsa de arena × 25 kg</div><div class="det">Ítem libre · no está en el catálogo · <a style="color:var(--pino-texto);font-weight:700">Guardar como producto</a></div></div>
+              <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1</span><button><i class="i i-s" data-i="plus"></i></button></div>
+              <div class="sub num"><span class="peso">$</span>1.500<small>precio a mano</small></div>
+              <i class="i menu" data-i="ellipsis"></i>
+            </article>
+          </div>
+        </div>
+
+        <aside class="tarjeta-2 cobro">
+          <div>
+            <div class="total-linea"><span class="et">Total</span><span class="t-detalle">5 productos · falta 1 precio</span></div>
+            <div class="t-total num" style="margin-top:4px"><span class="peso">$</span>45.500</div>
+          </div>
+          <div class="ganas"><i class="i i-s" data-i="trending-up"></i>Ganás en esta venta<b>$21.200</b></div>
+
+          <div>
+            <div class="et" style="margin-bottom:8px">Cómo paga</div>
+            <div class="medios">
+              <button class="m medio efectivo elegido"><span class="ic"><i class="i i-s" data-i="banknote"></i></span>Efectivo<span class="kbd">F5</span></button>
+              <button class="m medio mp"><span class="ic"><i class="i i-s" data-i="qr-code"></i></span>Mercado Pago<span class="kbd">F6</span></button>
+              <button class="m medio tarjeta"><span class="ic"><i class="i i-s" data-i="credit-card"></i></span>Tarjeta<span class="kbd">F7</span></button>
+              <button class="m medio cuenta"><span class="ic"><i class="i i-s" data-i="notebook-pen"></i></span>Cuenta corriente<span class="kbd">F8</span></button>
+            </div>
+          </div>
+          <div class="campo cliente v-toca" data-cliente><i class="i i-s" data-i="user-round"></i>Cliente (opcional)<span class="kbd" style="margin-left:auto">F9</span></div>
+
+          <div class="aviso urgente" style="margin-top:auto" data-aviso><i class="i" data-i="triangle-alert"></i><div>Los tarugos no tienen precio. Elegí el margen con 1 a 5 o poné el precio a mano.</div></div>
+          <button class="btn btn-accion grande cobrar" data-cobrar><span>Cobrar <span class="num">$45.500</span></span><span class="kbd">F2</span></button>
+          <div class="otras">
+            <button class="btn btn-fantasma" data-nollevo>No llevó <span class="kbd">Esc</span></button>
+            <button class="btn btn-fantasma" data-pedido>A pedido</button>
+            <button class="btn btn-fantasma" data-presupuesto>Presupuesto</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+// Compu 1 · Mostrador: buscar o escanear agrega un renglón; cantidad y margen cambian el total;
+// el medio de pago se elige con un clic o F5–F8; Cobrar (F2) muestra la venta registrada y la deja vacía.
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var lista = $('.lista'), aviso = $('[data-aviso]'), btnCobrar = $('[data-cobrar]');
+  var items = [V.item('mecha', 3), V.item('cinta', 1, { celu: true }), V.item('tarugos', 1), V.item('clavos', .7), V.libre('Bolsa de arena × 25 kg', 1500)];
+  V.fijarGanancia(items, 21200);
+  var focoK = items[0].k, medio = 'efectivo', cliente = null, escaneos = ['lampara', 'tornillos', 'martillo', 'mecha', 'pinza'], nEsc = 0;
+  V.sinBarras(lista);
+
+  function fila(it) {
+    var p = V.precio(it), s = V.subtotal(it), kg = it.unidad === 'kg', el = kg ? ' el kg' : '';
+    var h = '<article class="item' + (it.k === focoK ? ' foco' : '') + (p == null ? ' sinprecio' : '') + '" data-k="' + it.k + '">';
+    if (it.celu) h += '<span class="pastilla pino mini marca-celu"><i class="i i-s" data-i="smartphone"></i>Llegó del celular</span>';
+    h += it.libre ? '<div class="foto-icono"><i class="i i-l" data-i="package-plus"></i></div>' : '<div class="foto"><img src="../../../_comun/fotos/' + it.foto + '.webp" alt=""></div>';
+    var det = it.libre ? (it.guardado ? 'Guardado en el catálogo · precio a mano' : 'Ítem libre · no está en el catálogo · <a style="color:var(--pino-texto);font-weight:700" class="v-toca" data-guardar>Guardar como producto</a>')
+      : it.marca + ' · ' + it.prov + ' · <span class="pastilla ' + V.stockClase(it) + ' mini">' + V.stockTexto(it) + '</span>';
+    h += '<div><div class="nombre">' + V.html(it.nombre) + '</div><div class="det">' + det + '</div></div>';
+    h += '<div class="cantidad"><button data-menos aria-label="Uno menos"><i class="i i-s" data-i="minus"></i></button><span class="n" data-rueda>' + V.num(it.cant) + (kg ? '<span class="u">kg</span>' : '') + '</span><button data-mas aria-label="Uno más"><i class="i i-s" data-i="plus"></i></button></div>';
+    if (s == null) h += '<div class="sub" style="color:var(--urgente-texto);font-size:16px">Sin precio<small>' + (it.libre ? 'poné el precio' : 'elegí el margen') + '</small></div>';
+    else h += '<div class="sub num" data-rueda><span class="peso">$</span>' + V.miles(s) + '<small>' + (it.mano != null && it.cant === 1 ? 'precio a mano' : V.num(it.cant) + ' × ' + V.pesos(p) + (V.subio(it) ? ' ↑' : '') + (it.mano != null ? ' a mano' : '')) + '</small></div>';
+    h += '<i class="i menu" data-i="ellipsis"></i>';
+    var seg = '<span class="segmentos margen">' + V.MARGENES.map(function (m) { return '<button' + (it.mano == null && it.margen === m ? ' class="elegido"' : '') + ' data-m="' + m + '">' + m + '</button>'; }).join('') + '</span>';
+    var mano = '<button class="btn chico" style="min-height:32px" data-mano><i class="i i-s" data-i="pencil"></i>' + (it.mano != null ? 'A mano ' + V.pesos(it.mano) : 'Precio a mano') + '</button>';
+    if (!it.libre) {
+      if (p == null) h += '<div class="precio-fila">Costo <span class="valor">' + V.pesos(it.costo) + el + '</span><span class="sep"></span><span style="color:var(--urgente-texto);font-weight:750">Margen</span> ' + seg + ' <span class="sep"></span>' + mano + '</div>';
+      else if (it.mano != null) h += '<div class="precio-fila">Costo <span class="valor">' + V.pesos(it.costo) + el + '</span><span class="sep"></span>Margen ' + seg + '%<span class="sep"></span>' + mano + '</div>';
+      else h += '<div class="precio-fila">Costo <span class="valor">' + V.pesos(it.costo) + el + '</span><span class="sep"></span>Margen ' + seg + '%<span class="sep"></span>Precio <span class="valor" data-rueda>' + V.pesos(p) + el + '</span></div>';
+    } else if (p == null) h += '<div class="precio-fila">Ítem libre · sin costo<span class="sep"></span>' + mano + '</div>';
+    return h + '</article>';
+  }
+
+  function render(nuevos) {
+    if (!items.length) { lista.innerHTML = V.vacia('La venta está vacía', 'Buscá por nombre o código, escaneá con el lector o con el celular.'); V.pintar(lista); }
+    else V.redibujar(lista, items.map(fila).join(''), nuevos);
+    var n = items.length, f = V.faltan(items), tot = V.total(items);
+    $('.lista-cab .pastilla').textContent = n + (n === 1 ? ' producto' : ' productos');
+    var ins = $('.nav-item.activo .insignia'), antes = +ins.textContent;
+    ins.textContent = n; ins.style.display = n ? '' : 'none'; if (n > antes) V.saltar(ins);
+    $('.total-linea .t-detalle').textContent = n + (n === 1 ? ' producto' : ' productos') + (f.length ? ' · falta' + (f.length > 1 ? 'n ' + f.length + ' precios' : ' 1 precio') : '');
+    V.poner($('.cobro .t-total'), V.pesosG(tot));
+    V.poner($('.ganas b'), V.pesos(V.ganancia(items)));
+    V.poner($('.cobrar .num'), V.pesos(tot));
+    btnCobrar.disabled = !n;
+    if (f.length) { aviso.style.display = ''; btnCobrar.style.marginTop = ''; aviso.querySelector('div').textContent = V.avisoFaltan(f) + '. Elegí el margen con 1 a 5 o poné el precio a mano.'; }
+    else { aviso.style.display = 'none'; btnCobrar.style.marginTop = 'auto'; }
+  }
+  function buscarItem(k) { for (var i = 0; i < items.length; i++) if (items[i].k === k) return items[i]; return null; }
+  function elDe(k) { return lista.querySelector('[data-k="' + k + '"]'); }
+  function agregar(id, extra) {
+    var antes = items.length, it = V.sumar(items, id, 1, extra, true);
+    focoK = it.k; render([it.k]);
+    if (items.length === antes) { var el = elDe(it.k); V.entra(el); }
+    lista.scrollTop = 0;
+    return it;
+  }
+  function quitar(it) {
+    var i = items.indexOf(it), el = elDe(it.k);
+    V.sale([el], function () {
+      items.splice(i, 1); if (focoK === it.k && items.length) focoK = items[Math.min(i, items.length - 1)].k; render();
+      V.tostada('Quitaste ' + it.corto, { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items.splice(i, 0, it); focoK = it.k; render([it.k]); } });
+    });
+  }
+  function vaciar(texto, deshacer) {
+    if (!items.length) { V.tostada('La venta ya está vacía', { icono: 'info' }); return; }
+    var copia = items.slice();
+    V.sale(lista.children, function () {
+      items = []; render();
+      V.tostada(texto, { icono: 'check', accion: deshacer ? 'Deshacer' : null, alAccion: function () { items = copia; focoK = items[0].k; render(copia.map(function (x) { return x.k; })); } });
+    });
+  }
+  function elegirMedio(k) {
+    medio = k;
+    document.querySelectorAll('.medios .m').forEach(function (b) { b.classList.toggle('elegido', b.classList.contains(k)); });
+    if (k === 'cuenta' && !cliente) V.sacudir($('[data-cliente]'));
+  }
+  function ponerCliente(n) {
+    cliente = n; var c = $('[data-cliente]');
+    c.innerHTML = '<i class="i i-s" data-i="user-round"></i>' + (n ? '<span style="color:var(--tinta);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + V.html(n) + '</span>' : 'Cliente (opcional)') + '<span class="kbd" style="margin-left:auto">F9</span>';
+    V.pintar(c);
+  }
+  function cobrar() {
+    var ok = V.puedeCobrar(items, medio, cliente, function (f) { focoK = f[0].k; render(); var el = elDe(f[0].k); el.scrollIntoView({ block: 'nearest' }); V.sacudir(el); V.sacudir(aviso); });
+    if (ok === 'cliente') { V.elegirCliente(function (n) { ponerCliente(n); }); return; }
+    if (!ok) return;
+    V.llenar(btnCobrar, function () {
+      var total = V.total(items), n = items.length, cli = cliente, med = medio;
+      V.sale(lista.children, function () { items = []; render(); ponerCliente(null); elegirMedio('efectivo'); });
+      V.listo({ total: total, medio: med, cliente: cli, cantidad: n, alCerrar: function () { buscador.activar(null, true); } });
+    });
+  }
+  function escanear() {
+    V.tostada('El celular está escaneando: lo que lea entra acá', { icono: 'smartphone', ms: 1500 });
+    setTimeout(function () {
+      var it = agregar(escaneos[nEsc++ % escaneos.length], { celu: true });
+      it.celu = true; render();
+      V.tostada('Llegó del celular: ' + it.nombre, { icono: 'smartphone' });
+      setTimeout(function () { var el = elDe(it.k), pa = el && el.querySelector('.marca-celu'); if (pa) V.animar(pa, [{ opacity: 1 }, { opacity: 0 }], 300); setTimeout(function () { it.celu = false; render(); }, V.mover ? 290 : 0); }, 3000);
+    }, 1300);
+  }
+
+  var buscador = V.buscador($('.busqueda .campo'), {
+    alElegir: function (id) { agregar(id); },
+    alLibre: function (t) { var it = V.libre(t.charAt(0).toUpperCase() + t.slice(1), null); items.unshift(it); focoK = it.k; render([it.k]); lista.scrollTop = 0; }
+  });
+
+  lista.addEventListener('click', function (e) {
+    var art = e.target.closest('.item'); if (!art) return;
+    var it = buscarItem(art.getAttribute('data-k')); if (!it) return;
+    var m = e.target.closest('[data-m]');
+    if (m) { it.margen = +m.getAttribute('data-m'); it.mano = null; focoK = it.k; render(); return; }
+    if (e.target.closest('[data-mas]')) { it.cant = Math.round((it.cant + V.paso(it)) * 10) / 10; focoK = it.k; render(); return; }
+    if (e.target.closest('[data-menos]')) { if (it.cant - V.paso(it) > .05) { it.cant = Math.round((it.cant - V.paso(it)) * 10) / 10; focoK = it.k; render(); } else quitar(it); return; }
+    if (e.target.closest('[data-mano]')) { V.precioAMano(it, function (n) { it.mano = n; render(); }); return; }
+    if (e.target.closest('[data-guardar]')) { V.guardarProducto(it, function (n) { it.nombre = n; it.guardado = true; render(); V.tostada('Guardado en el catálogo: ' + n, { icono: 'check' }); }); return; }
+    var men = e.target.closest('.menu');
+    if (men) {
+      focoK = it.k; render();
+      var ops = [{ icono: 'calculator', texto: 'De dónde sale el precio', kbd: 'F1', fn: function () { V.dondeSale(it); } }, { icono: 'pencil', texto: 'Precio a mano', fn: function () { V.precioAMano(it, function (n) { it.mano = n; render(); }); } }];
+      if (it.libre && !it.guardado) ops.push({ icono: 'package-plus', texto: 'Guardar como producto', fn: function () { V.guardarProducto(it, function (n) { it.nombre = n; it.guardado = true; render(); V.tostada('Guardado en el catálogo: ' + n, { icono: 'check' }); }); } });
+      ops.push('-', { icono: 'trash-2', texto: 'Quitar de la venta', kbd: 'Supr', peligro: true, fn: function () { quitar(it); } });
+      V.menu(elDe(it.k).querySelector('.menu'), ops, { lado: 'izquierda-abajo' });
+      return;
+    }
+    if (focoK !== it.k) { focoK = it.k; render(); }
+  });
+  document.querySelectorAll('.medios .m').forEach(function (b) { b.addEventListener('click', function () { elegirMedio(V.ORDEN_MEDIOS.filter(function (k) { return b.classList.contains(k); })[0]); }); });
+  $('[data-cliente]').addEventListener('click', function () { V.elegirCliente(ponerCliente); });
+  btnCobrar.addEventListener('click', cobrar);
+  $('[data-escanear]').addEventListener('click', escanear);
+  $('[data-vaciar]').addEventListener('click', function () { vaciar('Vaciaste la venta', true); });
+  $('[data-nollevo]').addEventListener('click', function () { var n = items.length; vaciar('Anotado: no lo llevó (' + n + (n === 1 ? ' producto)' : ' productos)'), true); });
+  $('[data-pedido]').addEventListener('click', function () { V.pasarAPedido(items, function (r) { vaciar('Pedido guardado para ' + r.nombre + ', para ' + r.dia, false); }); });
+  $('[data-presupuesto]').addEventListener('click', function () { V.presupuesto(items, function (c) { V.tostada(c === 'pdf' ? 'Se bajó el PDF del presupuesto P-0042' : 'Presupuesto P-0042 listo para mandar por WhatsApp', { icono: c === 'pdf' ? 'file-text' : 'message-circle' }); }); });
+  $('[data-pyp]').addEventListener('click', V.pedidosYPresupuestos);
+  $('[data-menu-mas]').addEventListener('click', function (e) { V.mas(e.currentTarget); });
+  $('[data-usuario]').addEventListener('click', function (e) { V.menuUsuario(e.currentTarget, 'derecha'); });
+
+  render([]);
+
+  document.addEventListener('keydown', function (e) {
+    if (V.abierta()) return;
+    var escr = V.escribiendo(e), it = buscarItem(focoK);
+    var f = { F2: cobrar, F5: function () { elegirMedio('efectivo'); }, F6: function () { elegirMedio('mp'); }, F7: function () { elegirMedio('tarjeta'); }, F8: function () { elegirMedio('cuenta'); }, F9: function () { V.elegirCliente(ponerCliente); }, F1: function () { if (it) V.dondeSale(it); } }[e.key];
+    if (f) { e.preventDefault(); f(); return; }
+    if (escr && !(e.key === 'Escape' && !e.target.value)) return;
+    if (/^[1-5]$/.test(e.key) && it && !it.libre) { e.preventDefault(); it.margen = V.MARGENES[+e.key - 1]; it.mano = null; render(); return; }
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && items.length) { e.preventDefault(); var i = Math.max(0, items.indexOf(it)) + (e.key === 'ArrowDown' ? 1 : -1); focoK = items[Math.max(0, Math.min(items.length - 1, i))].k; render(); elDe(focoK).scrollIntoView({ block: 'nearest' }); return; }
+    if ((e.key === '+' || e.key === '-') && it) { e.preventDefault(); var c = Math.round((it.cant + (e.key === '+' ? 1 : -1) * V.paso(it)) * 10) / 10; if (c > .05) { it.cant = c; render(); } return; }
+    if ((e.key === 'Delete') && it) { quitar(it); return; }
+    if (e.key === 'Escape' && items.length) { $('[data-nollevo]').click(); return; }
+    if (e.key === 'Enter') { e.preventDefault(); buscador.activar(); return; }
+    if (V.letra(e)) { e.preventDefault(); buscador.activar(e.key); }
+  });
+})();
+</script>
+</body>
+</html>

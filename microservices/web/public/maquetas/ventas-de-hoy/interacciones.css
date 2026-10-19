@@ -1,0 +1,201 @@
+/* Interacciones de «Ventas de hoy»: diálogos, hojas, menú, tostada y movimiento.
+   Solo agrega piezas que aparecen al tocar: quieta, la maqueta se ve igual.
+   Movimiento solo con transform y opacity; con «reducir movimiento», nada se mueve. */
+
+[data-ir], [data-vh], .fila:not(.cab), .tl, .vr, .vt:not(.hueco), .chip, .nav-item, .nav-inferior a,
+.pestanas a, .celu-pestanas a, .segmentos > *, .cajon .vt { cursor: pointer; }
+
+/* ---- Fondo que oscurece y capas ---- */
+.vh-velo { position: fixed; inset: 0; background: rgba(26, 29, 27, .30); z-index: 40; animation: vh-fundido var(--t) var(--curva); }
+.vh-velo.claro { background: transparent; animation: none; }
+.celu .vh-velo { position: absolute; }
+.vh-saliendo { animation: vh-sale var(--t) var(--curva-salida) forwards !important; }
+.vh-hoja.vh-saliendo { animation: vh-hoja-sale var(--t) var(--curva-salida) forwards !important; }
+
+/* ---- Diálogo (computadora) ---- */
+.vh-dialogo { position: fixed; left: 50%; top: 50%; z-index: 41; width: 520px; max-width: calc(100vw - 48px); max-height: calc(100vh - 64px); overflow: auto;
+  transform: translate(-50%, -50%); background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); padding: 20px 24px 24px;
+  animation: vh-dialogo-c var(--t) var(--curva); }
+.vh-dcab { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.vh-dcab .t { font-size: 20px; font-weight: 800; line-height: 26px; }
+.vh-dcab .d { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+.vh-dcab .vh-x { margin-left: auto; }
+.vh-pie { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 16px; }
+
+/* ---- Hoja que sube (celular) ---- */
+.vh-hoja { position: absolute; left: 0; right: 0; bottom: 0; z-index: 41; max-height: 760px; overflow: auto; background: var(--superficie);
+  border-radius: var(--r-hoja) var(--r-hoja) 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 28px; display: flex; flex-direction: column;
+  animation: vh-hoja var(--t-nav) var(--curva); }
+.vh-hoja .agarre, .hoja .agarre { touch-action: none; cursor: grab; }
+.vh-hoja .agarre { width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 10px; flex: none; }
+.vh-hoja .vh-dcab .t { font-size: 18px; line-height: 22px; }
+
+/* ---- Menú chico (Más, en la computadora) ---- */
+.vh-menu { position: fixed; z-index: 41; width: 264px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta);
+  box-shadow: var(--sombra-3); padding: 8px; animation: vh-dialogo var(--t) var(--curva); transform-origin: left center; }
+.vh-op { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--r); background: transparent;
+  font-weight: 650; font-size: 15px; color: var(--tinta); text-align: left; }
+.vh-op:hover, .vh-op:focus-visible { background: var(--hundido); outline: none; }
+.vh-op .i { color: var(--texto-2); }
+.vh-op .pastilla { margin-left: auto; height: 24px; }
+.vh-op.elegido { background: var(--pino-suave); color: var(--pino); font-weight: 750; }
+.vh-op small { display: block; font-size: 14px; color: var(--texto-2); font-weight: 500; line-height: 18px; }
+.vh-hoja .vh-op { min-height: 56px; }
+
+/* ---- Tostada ---- */
+.vh-tostada { position: fixed; left: 50%; bottom: 28px; z-index: 60; transform: translateX(-50%); pointer-events: none; }
+.celu .vh-tostada { position: absolute; bottom: 100px; }
+.vh-tostada .tostada { animation: vh-entra var(--t) var(--rebote); white-space: nowrap; }
+.vh-tostada .tostada .i { animation: vh-rebote 300ms var(--rebote); }
+
+/* ---- Números que ruedan ---- */
+.vh-d { display: inline-block; }
+.vh-sube { animation: vh-dsube var(--t) var(--curva) both; }
+.vh-baja { animation: vh-dbaja var(--t) var(--curva) both; }
+
+/* ---- Entradas, latidos, rebotes ---- */
+.vh-entra { animation: vh-entra var(--t) var(--rebote) both; }
+.vh-fundir { animation: vh-fundido var(--t) var(--curva) both; }
+.vh-late { animation: vh-late 360ms var(--rebote); }
+.vh-rebota { animation: vh-rebote var(--t) var(--rebote) both; display: inline-flex; }
+.vh-nuevo { position: relative; }
+.vh-nuevo::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; box-shadow: 0 0 0 2px var(--logro); pointer-events: none; animation: vh-apaga 1s var(--curva) forwards; }
+.vh-crece { transform-origin: 50% 100%; animation: vh-crece 400ms var(--curva) both; }
+.vh-tenue { opacity: .4; transition: opacity var(--t-micro); }
+.horas .h, .pila .h { transition: opacity var(--t-micro); }
+.vh-globo { animation: vh-globo var(--t-micro) var(--curva); }
+
+/* La raya que tacha: se dibuja de izquierda a derecha */
+.vh-raya { position: relative; display: inline-block; color: var(--texto-3); font-weight: 600; }
+.vh-raya::after { content: ""; position: absolute; left: -1px; right: -1px; top: 52%; height: 2px; border-radius: 2px; background: var(--error); transform-origin: left center; animation: vh-raya var(--t) var(--curva) both; }
+.vh-tachando { position: relative; }
+.vh-tachando::before { content: ""; position: absolute; left: 12px; right: 12px; top: 50%; height: 2px; border-radius: 2px; background: var(--texto-3); transform-origin: left center; animation: vh-raya 320ms var(--curva) both, vh-sale 200ms 500ms var(--curva-salida) forwards; z-index: 3; pointer-events: none; }
+
+/* Campo que se está corrigiendo */
+.vh-foco { border: 1.5px solid var(--pino) !important; box-shadow: 0 0 0 4px rgba(18, 56, 47, .10) !important; }
+.vh-in { border: 0; outline: 0; background: transparent; padding: 0; font: inherit; font-weight: 800; color: var(--tinta); width: 5ch; }
+.vh-precio { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--borde-fuerte); background: #fff; font-weight: 750; font-size: 15px; }
+
+/* El panel de la venta (computadora 1 y diálogo de la 3) */
+.vh-venta .cab { display: flex; align-items: center; gap: 12px; }
+.vh-venta .cab .t { font-size: 18px; font-weight: 800; line-height: 24px; }
+.vh-venta .cab .d { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+.vh-venta .renglones { margin: 10px 0 0; }
+.vh-venta .rv { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 6px 0; border-top: 1px solid var(--borde); }
+.vh-venta .rv .nom { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vh-venta .rv .det { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+.vh-venta .rv .st { font-weight: 800; text-align: right; }
+.vh-venta .rv .st .vh-raya { display: block; font-size: 14px; }
+.vh-venta .rv .ed { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+.vh-venta .rv .ed .cantidad { height: 36px; }
+.vh-venta .rv .ed .cantidad button { width: 34px; }
+.vh-venta .rv .ed .cantidad .n { min-width: 40px; font-size: 15px; }
+.vh-venta .rv .ed .vh-precio { height: 36px; }
+.vh-venta .tot { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0 10px; border-top: 1px solid var(--borde-fuerte); }
+.vh-venta .tot b { font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
+.vh-venta .acciones3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.vh-venta .acciones3 .btn { min-height: 44px; padding: 0 10px; font-size: 15px; gap: 6px; }
+.vh-venta .acciones2 { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.vh-venta .rastro { margin-top: auto; padding-top: 10px; display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+.vh-venta .cambia-l { font-size: 14px; color: var(--texto-2); font-weight: 600; margin: -6px 0 8px; display: flex; gap: 12px; white-space: nowrap; overflow: hidden; }
+.vh-venta .cambia-l b { color: var(--tinta); font-weight: 800; }
+.vh-dialogo.vh-venta { display: flex; flex-direction: column; }
+aside.vh-venta { overflow: auto; }
+.vh-venta .renglones .rv:has(.ed) { padding: 5px 0; }
+.vh-venta .rv .ed { margin-top: 2px; }
+
+/* Elegir en el cambio */
+.vh-elige { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 8px 12px; border-radius: var(--r);
+  border: 1px solid var(--borde); background: var(--superficie); text-align: left; font-size: 15px; }
+.vh-elige + .vh-elige { margin-top: 6px; }
+.vh-elige .nom { font-weight: 700; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vh-elige .det { font-size: 14px; color: var(--texto-2); font-weight: 500; line-height: 18px; }
+.vh-elige .v { font-weight: 800; }
+.vh-elige.elegido { border: 1.5px solid var(--pino); background: var(--pino-suave); }
+.vh-elige .foto.chica, .vh-elige .foto-icono { width: 40px; height: 40px; border-radius: var(--r-chico); }
+.vh-et { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--texto-2); margin: 14px 0 6px; }
+.vh-difer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--borde-fuerte); }
+.vh-difer .t-numero { font-size: 32px; }
+.vh-medios { display: flex; gap: 6px; flex-wrap: wrap; }
+.vh-medios .m { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px 0 6px; border-radius: 99px; border: 1px solid var(--borde-fuerte); background: #fff; font-weight: 700; font-size: 14px; }
+.vh-medios .m .mico { width: 28px; height: 28px; }
+.vh-medios .m:not(.elegido) { padding: 0 5px; }
+.vh-medios .m.elegido { border: 2px solid var(--c); background: var(--cs); }
+.vh-medios .m.elegido .mico { background: var(--c); color: #fff; }
+.vh-campo { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: #fff; }
+.vh-campo input { flex: 1; border: 0; outline: 0; background: transparent; font-weight: 600; font-size: 16px; }
+.vh-campo.vh-foco { border-color: var(--pino); }
+
+/* La hoja de la venta en el celular (los mismos renglones que la hoja del celular 2) */
+.vh-hoja .hcab { display: flex; align-items: center; gap: 12px; }
+.vh-hoja .hcab .t { font-size: 18px; font-weight: 800; line-height: 22px; }
+.vh-hoja .hcab .btn { margin-left: auto; }
+.vh-hoja .segmentos { display: flex; margin-top: 12px; }
+.vh-hoja .segmentos > * { flex: 1; justify-content: center; min-height: 40px; }
+.vh-hoja .q { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vh-hoja .d { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vh-hoja .rh { display: grid; grid-template-columns: 48px minmax(0,1fr) auto; gap: 4px 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--borde); }
+.vh-hoja .rh .foto, .vh-hoja .rh .foto-icono { width: 48px; height: 48px; grid-row: span 2; }
+.vh-hoja .rh .st { text-align: right; font-weight: 800; }
+.vh-hoja .rh .ed { grid-column: 2 / 4; display: flex; align-items: center; gap: 8px; }
+.vh-hoja .cantidad { height: 36px; }
+.vh-hoja .cantidad button { width: 36px; }
+.vh-hoja .cantidad .n { min-width: 40px; }
+.vh-hoja .cantidad.tocada { border: 1.5px solid var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10); }
+.vh-hoja .precio { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--borde-fuerte); font-weight: 750; font-size: 15px; }
+.vh-hoja .precio.tocada { border: 1.5px solid var(--pino); }
+.vh-hoja .resumen-h { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 0; }
+.vh-hoja .resumen-h .t-numero { font-size: 28px; }
+.vh-hoja .barra-accion { margin: 12px -16px -28px; padding-bottom: 28px; }
+.vh-hoja .rh:last-of-type { border-bottom: 0; }
+.vh-hoja .viejo, .hoja .vh-raya { font-size: 14px; }
+
+/* ---- Pantalla de listo ---- */
+.vh-listo { position: absolute; inset: 0; z-index: 50; background: var(--fondo); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px 24px; gap: 8px; animation: vh-fundido var(--t) var(--curva); }
+.vh-listo .ok { width: 88px; height: 88px; border-radius: 99px; background: var(--logro); color: #fff; display: grid; place-items: center; margin-bottom: 12px; animation: vh-rebote 300ms var(--rebote) both; }
+.vh-listo .ok .i { width: 44px; height: 44px; }
+.vh-listo .btn { margin-top: 20px; min-width: 220px; }
+
+@keyframes vh-fundido { from { opacity: 0; } }
+@keyframes vh-sale { to { opacity: 0; } }
+@keyframes vh-hoja { from { transform: translateY(100%); } }
+@keyframes vh-hoja-sale { to { transform: translateY(100%); } }
+@keyframes vh-dialogo { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+@keyframes vh-dialogo-c { from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(.98); } }
+@keyframes vh-entra { from { opacity: 0; transform: translateY(8px); } }
+@keyframes vh-dsube { from { opacity: 0; transform: translateY(.45em); } }
+@keyframes vh-dbaja { from { opacity: 0; transform: translateY(-.45em); } }
+@keyframes vh-late { 50% { transform: scale(1.15); } }
+@keyframes vh-rebote { from { opacity: 0; transform: scale(.6); } }
+@keyframes vh-apaga { 0%, 60% { opacity: 1; } to { opacity: 0; } }
+@keyframes vh-crece { from { transform: scaleY(0); } }
+@keyframes vh-globo { from { opacity: 0; transform: translate(-50%, 6px); } }
+@keyframes vh-raya { from { transform: scaleX(0); } }
+@keyframes vh-pulso { 50% { opacity: .45; } }
+@keyframes vh-cierra { 50% { transform: scale(.86); } }
+@keyframes vh-empuja { 40% { transform: translateX(28px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .vh-velo, .vh-hoja, .vh-menu, .vh-dialogo, .vh-tostada .tostada, .vh-listo { animation: none !important; }
+}
+
+/* Agregados */
+.vh-saliendo { pointer-events: none; }
+.vh-subiendo { animation: vh-hoja var(--t-nav) var(--curva); }
+.vh-dialogo.vh-chico { width: 420px; }
+.vh-op { padding: 6px 12px; }
+.vh-raya.vh-ya::after, .vh-quieto { animation: none !important; }
+.vh-ayer::after { animation: vh-fundido var(--t) 380ms var(--curva) both; }
+.vh-hoja .vh-pie .btn { flex: 1; }
+.vh-hoja .vh-pie { justify-content: stretch; }
+.vh-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.vh-chips .chip { height: 36px; font-size: 14px; padding: 0 12px; }
+.vh-lista { max-height: 300px; overflow: auto; margin: 0 -4px; padding: 0 4px; }
+.vh-hoja .vh-lista { max-height: 260px; }
+
+/* Los cajones (computadora 3): el destino se tiñe del color de su medio */
+.cajon.vh-destino { background: var(--cs); box-shadow: inset 0 0 0 2px var(--c); }
+.cajon.vh-destino::after { background: linear-gradient(transparent, var(--cs)); }
+.cajon .vt, .arrastrada, .zonas { user-select: none; -webkit-user-select: none; }
+.zona { transition: transform var(--t-micro) var(--curva); }
+.vh-dialogo.vh-ira { width: 560px; }

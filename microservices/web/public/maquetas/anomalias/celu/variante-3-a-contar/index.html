@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anomalías · Sobres y a contar (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { padding-top: 12px; }
+  .sec { display: flex; white-space: nowrap; align-items: baseline; gap: 8px; margin: 0 0 8px; }
+  .sec b { font-size: 18px; font-weight: 800; }
+  .sec span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .sobre-pila { position: relative; padding-bottom: 12px; }
+  .sobre-pila::before, .sobre-pila::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 6px; height: 20px; border-radius: 0 0 16px 16px; background: #fff; border: 1px solid var(--borde); border-top: 0; }
+  .sobre-pila::after { left: 24px; right: 24px; bottom: 0; opacity: .7; }
+  .sobre { position: relative; z-index: 1; background: #fff; border: 1px solid var(--borde); border-radius: 18px; box-shadow: var(--sombra-2); padding: 14px; }
+  .sobre .top { display: flex; align-items: center; gap: 10px; }
+  .sobre .avatar { width: 40px; height: 40px; background: var(--hundido-2); color: var(--texto-2); }
+  .sobre .nm { font-weight: 800; font-size: 16px; line-height: 20px; }
+  .sobre .n { margin-left: auto; min-width: 32px; height: 32px; border-radius: 99px; background: var(--urgente); color: #3A2500; display: grid; place-items: center; font-weight: 800; font-size: 16px; }
+  .sobre .iconos { display: flex; gap: 6px; margin-top: 12px; }
+  .sobre .iconos span { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 10px; background: var(--hundido); font-size: 14px; font-weight: 700; }
+  .sobre .ver { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--borde); font-weight: 750; color: var(--pino-texto); font-size: 15px; }
+  .sobre .ver .fin { margin-left: auto; }
+  .otro { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 14px; border-radius: 14px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-1); margin-top: 4px; font-weight: 700; font-size: 15px; }
+  .otro .avatar { width: 30px; height: 30px; background: var(--hundido-2); color: var(--texto-2); font-size: 14px; }
+  .otro .pastilla { margin-left: auto; height: 26px; }
+  .faltas { display: flex; align-items: center; gap: 14px; margin: 18px 0 10px; }
+  .anillo { width: 56px; height: 56px; flex: none; }
+  .faltas .tt { font-size: 18px; font-weight: 800; line-height: 22px; }
+  .faltas .dd { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 19px; }
+  .grilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .gt { position: relative; background: #fff; border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); padding: 6px 6px 8px; text-align: center; }
+  .gt .foto { width: 100%; height: 62px; border-radius: 10px; }
+  .gt .q { margin-top: 6px; font-size: 15px; font-weight: 800; color: var(--error-texto); }
+  .gt .nn { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gt.ok { opacity: .7; } .gt.ok .q { color: var(--logro-texto); }
+  .gt .tilde { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 99px; background: var(--logro); color: #fff; display: grid; place-items: center; border: 2px solid var(--fondo); }
+  .hc { background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 12px; margin-bottom: 8px; }
+  .hc .fila { display: grid; grid-template-columns: 40px 1fr auto 16px; gap: 12px; align-items: center; cursor: pointer; }
+  .hc .ico { width: 40px; height: 40px; border-radius: 10px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .hc .t { font-weight: 750; font-size: 16px; line-height: 21px; } .hc .d { font-size: 14px; line-height: 19px; color: var(--texto-2); } .hc .m { font-weight: 800; } .hc .ch { color: var(--texto-3); }
+  .hc .mas { margin-top: 10px; } .hc .ov-pie { margin-top: 12px; }
+  .barra-accion .btn { width: 100%; justify-content: space-between; }
+  .barra-accion .izq { display: inline-flex; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Anomalías</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+
+  <div class="celu-pantalla">
+    <div class="sec"><b>Quedó sin mandar</b><span>no cuenta todavía</span></div>
+    <div class="sobre-pila">
+      <div class="sobre">
+        <div class="top"><span class="avatar">AG</span><div><div class="nm">Ana Gómez</div><div class="t-detalle">Desactivada jue · Samsung A15</div></div><span class="n">4</span></div>
+        <div class="iconos"><span data-chip="venta"><i class="i i-s" data-i="receipt"></i>2 ventas · $68.000</span><span data-chip="ajuste"><i class="i i-s" data-i="scale"></i>1</span><span data-chip="margen"><i class="i i-s" data-i="percent"></i>1</span></div>
+        <div class="ver tocable"><i class="i i-s" data-i="mail-open"></i>Abrir y decidir de a una<i class="i i-s fin" data-i="chevron-right"></i></div>
+      </div>
+    </div>
+    <div class="otro tocable" data-sobre="julian"><span class="avatar">JP</span>Julián Pereyra<span class="pastilla error"><i class="i i-s" data-i="git-merge"></i>1 no se puede</span></div>
+
+    <div class="faltas">
+      <svg class="anillo" viewBox="0 0 56 56"><circle cx="28" cy="28" r="23" fill="none" stroke="#E3DFD5" stroke-width="7"/><circle cx="28" cy="28" r="23" fill="none" stroke="#1E9E62" stroke-width="7" stroke-linecap="round" stroke-dasharray="48.2 144.5" transform="rotate(-90 28 28)"/><text x="28" y="33" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="15" fill="#1A1D1B">2/6</text></svg>
+      <div><div class="tt">Faltó stock: 14 un.</div><div class="dd" data-dd>Se vendió lo que el sistema no tenía. Contá estos 4 y quedan al día.</div></div>
+    </div>
+    <div class="grilla">
+      <div class="gt tocable" data-prod="mecha"><div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div class="q">−6 un.</div><div class="nn">Mecha 8</div></div>
+      <div class="gt tocable" data-prod="puntas"><div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div class="q">−5 un.</div><div class="nn">PH2 × 10</div></div>
+      <div class="gt tocable" data-prod="tarugos"><div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div class="q">−1 un.</div><div class="nn">Tarugo 8</div></div>
+      <div class="gt tocable" data-prod="lampara"><div class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></div><div class="q">−1 un.</div><div class="nn">LED 9 W</div></div>
+    </div>
+    <div class="otro tocable" data-registro style="margin-top:12px"><i class="i" data-i="lock"></i><div style="line-height:19px">Registro de lo vendido sin stock<div class="t-detalle">38 anotadas · última hoy 10:31</div></div><i class="i i-s" data-i="chevron-right" style="margin-left:auto;color:var(--texto-3)"></i></div>
+  </div>
+  <div class="barra-accion"><button class="btn btn-accion grande" data-ir="contar"><span class="izq"><i class="i i-l" data-i="scan-barcode"></i><span data-boton>Contar estos 4</span></span><span style="font-size:15px;opacity:.9">Est. A, B, C, D</span></button></div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-mas><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+(function (A) {
+  var quedan = A.CAMBIOS.map(function (c) { return c.id; });
+  var sobre = document.querySelector(".sobre"), pilaS = document.querySelector(".sobre-pila");
+  function deAna() { return quedan.map(A.porId).filter(function (c) { return c.quien === "ana"; }); }
+  function actualizarSobre() {
+    var suyos = deAna();
+    A.marcarPendientes(quedan.length);
+    if (!suyos.length) {
+      var hermanos = Array.prototype.slice.call(document.querySelector(".celu-pantalla").children);
+      A.sacar(pilaS, "arriba", hermanos);
+      return;
+    }
+    A.rodar(sobre.querySelector(".n"), String(suyos.length), false);
+    var v = suyos.filter(function (c) { return c.tipo === "venta"; });
+    var chip = function (k) { return sobre.querySelector('[data-chip="' + k + '"]'); };
+    chip("venta").hidden = !v.length;
+    chip("venta").innerHTML = '<i class="i i-s" data-i="receipt"></i>' + v.length + (v.length === 1 ? " venta · $" : " ventas · $") + A.miles(v.reduce(function (s, c) { return s + c.monto; }, 0));
+    chip("ajuste").hidden = !suyos.some(function (c) { return c.tipo === "ajuste"; });
+    chip("margen").hidden = !suyos.some(function (c) { return c.tipo === "margen"; });
+    pintarIconos(sobre);
+  }
+  function htmlCarta(c) {
+    var x = A.htmlCambio(c, true);
+    return '<div class="hc" data-id="' + c.id + '"><div class="fila"><span class="ico"' + (c.no ? ' style="background:var(--error-suave);color:var(--error-texto)"' : "") + '><i class="i" data-i="' + c.icono + '"></i></span><div><div class="t">' + c.titulo.replace(" · 2 productos", " · " + c.medioTxt) + '</div><div class="d">' + c.det.replace("jue 15/10 ", "jue ").replace(" · Efectivo", " · 2 productos").replace(" · Mercado Pago", " · 2 productos").replace("carpintero ", "") + '</div></div><span class="m">' + (c.monto ? A.pesos(c.monto) : '<span class="t-detalle">' + c.hora + "</span>") + '</span><i class="i i-s ch" data-i="chevron-down"></i></div>' +
+      '<div class="mas" hidden>' + x.html.replace(/<div class="ov-pie[\s\S]*$/, "") + "</div>" + x.html.match(/<div class="ov-pie[\s\S]*$/)[0].replace("btn btn-accion", "btn btn-suave").replace('data-i="check">', 'data-i="check" style="color:var(--logro-texto)">') + "</div>";
+  }
+  function abrirSobre(quien) {
+    var suyos = quedan.map(A.porId).filter(function (c) { return c.quien === quien; });
+    var per = A.PERSONAS[quien];
+    var h = A.cabecera(per.est + " · " + per.disp, "Lo de " + per.n.split(" ")[0] + " · " + suyos.length + (suyos.length === 1 ? " cambio" : " cambios")) +
+      '<div class="aviso pino" style="margin-bottom:12px"><i class="i i-s" data-i="info" style="margin-top:2px"></i><div>' + (quien === "julian" ? "No se puede aplicar: lo único que queda es descartarlo." : "No cuenta hasta que lo aceptás. Tocá uno para ver qué cambia.") + '</div></div>' +
+      '<div data-cartas>' + suyos.map(htmlCarta).join("") + "</div>";
+    var hoja = A.abrir(h, { tipo: "hoja" });
+    if (suyos.length === 1) { var m = hoja.querySelector(".mas"); m.hidden = false; }
+    hoja.addEventListener("click", function (e) {
+      var carta = e.target.closest(".hc"); if (!carta) return;
+      var si = e.target.closest("[data-aceptar]"), no = e.target.closest("[data-descartar]");
+      if (!si && !no) {
+        if (e.target.closest(".fila")) { var mas = carta.querySelector(".mas"); mas.hidden = !mas.hidden; if (!mas.hidden) A.fundido(mas); }
+        return;
+      }
+      var c = A.porId(carta.getAttribute("data-id"));
+      A.apretar(si || no); if (si) A.vibrar([10, 40, 10]);
+      quedan.splice(quedan.indexOf(c.id), 1);
+      var cartas = hoja.querySelector("[data-cartas]");
+      A.sacar(carta, si ? "arriba" : "izq", Array.prototype.slice.call(cartas.children)).then(function () {
+        if (!cartas.children.length) A.cerrar();
+      });
+      var t = hoja.querySelector(".ov-cab .t-seccion"), n = cartas.children.length - 1;
+      if (n > 0) t.textContent = "Lo de " + per.n.split(" ")[0] + " · " + n + (n === 1 ? " cambio" : " cambios");
+      A.tostada(si ? c.ok.replace(" en el jue 15/10", "") : "Descartado · queda en Quién hizo qué", { icono: si ? "circle-check" : "archive" });
+      if (quien === "ana") actualizarSobre();
+      else { A.marcarPendientes(quedan.length); var o = document.querySelector('[data-sobre="julian"]'); A.sacar(o, "izq", Array.prototype.slice.call(o.parentNode.children)); }
+    });
+  }
+  document.querySelector(".ver").addEventListener("click", function () { abrirSobre("ana"); });
+  document.querySelector('[data-sobre="julian"]').addEventListener("click", function () { abrirSobre("julian"); });
+  document.querySelector("[data-registro]").addEventListener("click", function () { A.abrirRegistro(); });
+  // Contar desde la grilla: el anillo avanza
+  var contados = 2;
+  document.querySelector(".grilla").addEventListener("click", function (e) {
+    var g = e.target.closest(".gt"); if (!g) return;
+    var k = g.getAttribute("data-prod");
+    if (g.classList.contains("ok")) { A.abrirProducto(k, null); return; }
+    A.abrirContar(k, function () {
+      g.classList.add("ok");
+      g.querySelector(".q").textContent = "contado";
+      g.insertAdjacentHTML("beforeend", '<span class="tilde"><i class="i i-s" data-i="check"></i></span>'); pintarIconos(g);
+      A.anim(g.querySelector(".tilde"), [{ transform: "scale(.4)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 320, easing: A.REBOTE });
+      contados++;
+      var faltan = 6 - contados;
+      var anillo = document.querySelector(".anillo"), arco = anillo.querySelectorAll("circle")[1];
+      arco.setAttribute("stroke-dasharray", (144.5 * contados / 6).toFixed(1) + " 144.5");
+      anillo.querySelector("text").textContent = contados + "/6";
+      document.querySelector("[data-dd]").textContent = faltan ? "Se vendió lo que el sistema no tenía. " + (faltan === 1 ? "Contá el que falta" : "Contá estos " + faltan) + " y quedan al día." : "Todo contado: el stock está al día.";
+      document.querySelector("[data-boton]").textContent = faltan ? (faltan === 1 ? "Contar el que falta" : "Contar estos " + faltan) : "Ver lo contado";
+    });
+  });
+})(window.Anom);
+</script>
+</body>
+</html>

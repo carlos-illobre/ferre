@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · Cerrar el sector (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .fondo-app { padding: 0 16px; }
+  .r { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 8px 10px; background: #fff; border: 1px solid var(--borde); border-radius: 14px; }
+  .r + .r { margin-top: 8px; }
+  .velo { position: absolute; inset: 0; background: rgba(18,24,22,.32); }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; background: var(--superficie); border-radius: 24px 24px 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 34px; display: grid; gap: 14px; }
+  .agarre { width: 40px; height: 5px; border-radius: 9px; background: var(--hundido-2); margin: 0 auto 2px; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tres > div { border-radius: 14px; padding: 10px 12px; background: var(--hundido); }
+  .tres .et { font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; }
+  .tres .va { font-size: 28px; font-weight: 800; letter-spacing: -.02em; line-height: 34px; }
+  .tres .urg { background: var(--urgente-suave); } .tres .urg .va { color: var(--urgente-texto); }
+  .tres .ok { background: var(--logro-suave); } .tres .ok .va { color: var(--logro-texto); }
+  .difs .f { display: grid; grid-template-columns: minmax(0,1fr) 120px 48px; gap: 10px; align-items: center; height: 34px; }
+  .difs .n { font-size: 14px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .difs .bar { height: 10px; border-radius: 9px; background: var(--hundido); position: relative; }
+  .difs .bar b { position: absolute; top: 0; bottom: 0; border-radius: 9px; }
+  .difs .bar .mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: var(--borde-fuerte); }
+  .difs .v { text-align: right; font-weight: 800; font-size: 15px; }
+  .menos { color: var(--urgente-texto); } .mas { color: var(--pino-texto); }
+  .faltan { border-radius: 14px; border: 1px solid var(--borde); padding: 10px 12px; }
+  .faltan .fotos { display: flex; gap: 6px; margin-top: 8px; }
+  .faltan .fotos .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .opciones { display: grid; gap: 8px; }
+  .opciones .btn { height: 60px; justify-content: flex-start; text-align: left; white-space: normal; line-height: 20px; padding: 0 16px; }
+  .opciones .btn small { display: block; font-size: 14px; font-weight: 600; opacity: .85; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>18:05</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Pared de tornillería</span></div>
+  <div class="celu-estado"><span class="punto"></span>58 de 64 contados</div>
+  <div class="fondo-app" style="margin-top:16px">
+    <div class="campo"><i class="i" data-i="search"></i>Buscá o escaneá</div>
+    <div style="margin-top:12px">
+      <div class="r"><div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div class="t-renglon">Tornillo T2 8 × 1"</div><b>=</b></div>
+      <div class="r"><div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div class="t-renglon">Tarugos S6 × 100</div><b>=</b></div>
+    </div>
+  </div>
+  <div class="velo"></div>
+
+  <div class="hoja">
+    <div class="agarre"></div>
+    <div><div class="t-seccion">Cerrar Pared de tornillería</div><div class="t-detalle">Lo que cambia en el stock al cerrar. No se deshace.</div></div>
+    <div class="tres">
+      <div class="ok"><div class="et">Contados</div><div class="va num">58</div></div>
+      <div class="urg"><div class="et">Diferencias</div><div class="va num">7</div></div>
+      <div><div class="et">Sin contar</div><div class="va num">6</div></div>
+    </div>
+    <div class="difs">
+      <div class="f"><span class="n">Tornillo fixer 8 mm × 50</span><span class="bar"><span class="mid"></span><b style="right:50%;width:36%;background:var(--urgente)"></b></span><span class="v menos num">−3</span></div>
+      <div class="f"><span class="n">Tornillo T2 8 × 1/2" × 100</span><span class="bar"><span class="mid"></span><b style="right:50%;width:24%;background:var(--urgente)"></b></span><span class="v menos num">−2</span></div>
+      <div class="f"><span class="n">Clavos París 2" (kg)</span><span class="bar"><span class="mid"></span><b style="left:50%;width:14%;background:var(--pino)"></b></span><span class="v mas num">+0,7</span></div>
+      <div class="t-detalle" style="margin-top:2px;color:var(--pino-texto);font-weight:700">Ver las 7 diferencias</div>
+    </div>
+    <div class="faltan">
+      <div class="t-renglon">6 que no contaste</div>
+      <div class="fotos"><span class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><span class="foto-icono" style="width:40px;height:40px;border-radius:8px;font-weight:800;font-size:14px">+3</span></div>
+    </div>
+    <div class="opciones">
+      <button class="btn btn-accion"><i class="i" data-i="check"></i><span>Cerrar y dejar los 6 como están<small>Su stock no cambia</small></span></button>
+      <button class="btn"><i class="i" data-i="circle-dashed"></i><span>Cerrar y poner en cero los 6<small>Cada uno queda con su ajuste</small></span></button>
+    </div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+<style>
+  .velo { transition: opacity var(--t-nav) var(--curva); }
+  .celu > .hoja { transition: transform var(--t-nav) var(--curva); }
+  .celu.sin-hoja > .velo { opacity: 0; pointer-events: none; }
+  .celu.sin-hoja > .hoja { transform: translateY(100%); }
+  .difs .ver { cursor: pointer; }
+</style>
+<script src="../../interacciones.js"></script>
+<script>
+/* Contar · celu 4: la hoja de cerrar el sector. Ver todas las diferencias, cerrar de una de las dos formas, o volver a contar. */
+(function () {
+  var C = window.Contar, $ = function (s, r) { return (r || document).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var celu = $(".celu"), hoja = $(".celu > .hoja"), velo = $(".celu > .velo"), abierta = true, cerrado = false;
+  function bajar() { if (!abierta) return; abierta = false; celu.classList.add("sin-hoja"); }
+  function subir() {
+    if (abierta || cerrado) return; abierta = true; celu.classList.remove("sin-hoja");
+    $$(".difs .bar b", hoja).forEach(function (b) { b.style.transformOrigin = b.style.right ? "right center" : "left center"; C.mover(b, [{ transform: "scaleX(0)" }, { transform: "none" }], 420); });
+  }
+  velo.addEventListener("click", bajar);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !C.abierto()) bajar(); });
+  $(".fondo-app").addEventListener("click", subir);
+  $(".celu-cabecera").addEventListener("click", subir);
+  // Ver las 7 diferencias.
+  var MAS = [["Tornillo T2 8 × 3/4\" × 100", -1, 12], ["Tarugos nylon S5 × 100", 2, 24], ["Tarugos S8 con tope × 100", 1, 12], ["Tuerca hexagonal 1/4\" × 100", -1, 12]];
+  var ver = $(".difs .t-detalle"); ver.classList.add("ver");
+  ver.addEventListener("click", function () {
+    MAS.forEach(function (m) {
+      var f = C.el('<div class="f"><span class="n">' + m[0] + '</span><span class="bar"><span class="mid"></span><b style="' + (m[1] < 0 ? "right" : "left") + ":50%;width:" + m[2] + "%;background:var(--" + (m[1] < 0 ? "urgente" : "pino") + ')"></b></span><span class="v ' + (m[1] < 0 ? "menos" : "mas") + ' num">' + (m[1] < 0 ? "−" + -m[1] : "+" + m[1]) + "</span></div>");
+      ver.parentNode.insertBefore(f, ver); C.mover(f, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 320);
+    });
+    ver.remove();
+  });
+  // Cerrar: tilde, vibración doble y el sector queda contado hoy.
+  $(".opciones").addEventListener("click", function (e) {
+    var b = e.target.closest(".btn"); if (!b) return;
+    var cero = !b.classList.contains("btn-accion"); C.vibrar([10, 40, 10]); cerrado = true;
+    hoja.innerHTML = '<div class="agarre"></div><div class="cx-listo"><span class="cx-tilde"><i class="i" data-i="check"></i></span><div class="t-seccion">Pared de tornillería quedó contada</div><div class="t-detalle">Hoy, 18:06 · 7 ajustes de stock' + (cero ? " y 6 en cero" : "") + '</div></div><button class="btn btn-oscuro grande" data-listo style="width:100%">Listo</button>';
+    C.pintar(hoja);
+    $("[data-listo]", hoja).addEventListener("click", function () {
+      abierta = true; bajar();
+      $(".celu-estado").innerHTML = '<span class="punto"></span>Contado hoy · 7 ajustes';
+      C.tostada("Pared de tornillería cerrada");
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+{
+ "actividad": {
+  "compu": [
+   "variante-1-registro",
+   "variante-2-el-dia-de-cada-uno",
+   "variante-3-pregunta"
+  ],
+  "celu": [
+   "variante-1-registro",
+   "variante-2-el-dia-de-cada-uno",
+   "variante-3-quien-toco-esto"
+  ]
+ },
+ "anomalias": {
+  "compu": [
+   "variante-1-bandeja",
+   "variante-2-por-producto",
+   "variante-3-conciliacion"
+  ],
+  "celu": [
+   "variante-1-tarjetas",
+   "variante-2-de-a-una",
+   "variante-3-a-contar"
+  ]
+ },
+ "compras": {
+  "compu": [
+   "variante-1-escritorio",
+   "variante-2-bandeja",
+   "variante-3-camino"
+  ],
+  "celu": [
+   "variante-1-resumen",
+   "variante-2-camara",
+   "variante-3-conversacion"
+  ]
+ },
+ "configuracion": {
+  "compu": [
+   "variante-1-dos-columnas",
+   "variante-2-por-dispositivo",
+   "variante-3-al-vuelo"
+  ],
+  "celu": [
+   "variante-1-ajustes",
+   "variante-2-perilla",
+   "variante-3-te-conviene"
+  ]
+ },
+ "contar": {
+  "compu": [
+   "variante-1-sectores",
+   "variante-2-plano",
+   "variante-3-planilla"
+  ],
+  "celu": [
+   "variante-1-retomar",
+   "variante-2-teclado",
+   "variante-3-una-por-una"
+  ]
+ },
+ "duplicados": {
+  "compu": [
+   "variante-1-bandeja",
+   "variante-2-asi-queda",
+   "variante-3-de-a-uno"
+  ],
+  "celu": [
+   "variante-1-renovada",
+   "variante-2-pila",
+   "variante-3-escaner"
+  ]
+ },
+ "entrar": {
+  "compu": [
+   "variante-1-mostrador",
+   "variante-2-quien-atiende",
+   "variante-3-cartel"
+  ],
+  "celu": [
+   "variante-1-mostrador",
+   "variante-2-huella-directa",
+   "variante-3-bloqueo"
+  ]
+ },
+ "listas": {
+  "compu": [
+   "variante-1-bandeja",
+   "variante-2-mostrador",
+   "variante-3-planilla"
+  ],
+  "celu": [
+   "variante-1-listas",
+   "variante-2-impacto",
+   "variante-3-remarcar"
+  ]
+ },
+ "mejoras-y-errores": {
+  "compu": [
+   "variante-1-buzon",
+   "variante-2-bandeja",
+   "variante-3-sobre-la-pantalla"
+  ],
+  "celu": [
+   "variante-1-buzon",
+   "variante-2-charla",
+   "variante-3-sacudir"
+  ]
+ },
+ "procesos": {
+  "compu": [
+   "variante-1-tablero",
+   "variante-2-recorrido",
+   "variante-3-contalo"
+  ],
+  "celu": [
+   "variante-1-diagrama",
+   "variante-2-linea",
+   "variante-3-y-despues"
+  ]
+ },
+ "productos": {
+  "compu": [
+   "variante-1-lado-a-lado",
+   "variante-2-bandeja",
+   "variante-3-planilla"
+  ],
+  "celu": [
+   "variante-1-ficha",
+   "variante-2-apunta",
+   "variante-3-etiqueta"
+  ]
+ },
+ "resumen": {
+  "compu": [
+   "variante-1-tablero",
+   "variante-2-el-dia",
+   "variante-3-la-cuenta"
+  ],
+  "celu": [
+   "variante-1-tablero",
+   "variante-2-deslizar",
+   "variante-3-conversacion"
+  ]
+ },
+ "stock": {
+  "compu": [
+   "variante-1-inventario",
+   "variante-2-bandeja",
+   "variante-3-cuenta"
+  ],
+  "celu": [
+   "variante-1-inventario",
+   "variante-2-apunta",
+   "variante-3-mazo"
+  ]
+ },
+ "usuarios": {
+  "compu": [
+   "variante-1-tabla-y-ficha",
+   "variante-2-planilla",
+   "variante-3-la-puerta"
+  ],
+  "celu": [
+   "variante-1-tarjetas",
+   "variante-2-hoja",
+   "variante-3-mostrale-el-codigo"
+  ]
+ },
+ "vender": {
+  "compu": [
+   "variante-1-mostrador",
+   "variante-2-teclado",
+   "variante-3-estante"
+  ],
+  "celu": [
+   "variante-1-mostrador",
+   "variante-2-camara",
+   "variante-3-dictado"
+  ]
+ },
+ "ventas-de-hoy": {
+  "compu": [
+   "variante-1-el-dia",
+   "variante-2-cuaderno",
+   "variante-3-cajones"
+  ],
+  "celu": [
+   "variante-1-el-dia",
+   "variante-2-hoja",
+   "variante-3-camara"
+  ]
+ }
+}

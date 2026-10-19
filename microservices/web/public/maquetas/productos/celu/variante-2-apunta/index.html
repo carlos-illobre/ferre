@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productos · apuntá y sabé</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../ean.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<style>
+  body { width: 390px; }
+  .celu { background: #0E1412; }
+  .camara { position: absolute; inset: 0 0 auto 0; height: 470px; background: radial-gradient(120% 80% at 50% 45%, #3A3F3B 0%, #1C211F 55%, #0E1412 100%); overflow: hidden; }
+  .camara .obj { position: absolute; left: 50%; top: 150px; width: 300px; margin-left: -150px; transform: rotate(-6deg); filter: drop-shadow(0 30px 30px rgba(0,0,0,.6)) brightness(.92); }
+  .etiq { position: absolute; left: 108px; top: 222px; width: 170px; padding: 8px 10px 6px; background: #F5F3EE; border-radius: 6px; transform: rotate(-6deg); box-shadow: 0 6px 18px rgba(0,0,0,.4); }
+  .etiq .ean { width: 100%; height: 46px; fill: #111; display: block; }
+  .etiq div { font-size: 14px; font-weight: 700; letter-spacing: .12em; text-align: center; color: #111; }
+  .marco { position: absolute; left: 82px; top: 196px; width: 226px; height: 130px; }
+  .marco i { position: absolute; width: 34px; height: 34px; border: 4px solid #fff; }
+  .marco i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 12px 0 0 0; }
+  .marco i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 12px 0 0; }
+  .marco i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 12px; }
+  .marco i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 12px 0; }
+  .marco.leido i { border-color: #5BD69A; }
+  .controles { position: absolute; top: 52px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px; }
+  .redondo { width: 48px; height: 48px; border-radius: 99px; background: rgba(255,255,255,.14); color: #fff; display: grid; place-items: center; backdrop-filter: blur(10px); }
+  .modos { flex: 1; display: flex; padding: 4px; border-radius: 99px; background: rgba(255,255,255,.14); backdrop-filter: blur(10px); }
+  .modos span { flex: 1; height: 40px; border-radius: 99px; display: grid; place-items: center; color: rgba(255,255,255,.82); font-weight: 700; font-size: 15px; }
+  .modos span.el { background: #fff; color: var(--tinta); }
+  .leyenda { position: absolute; top: 120px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.8); font-weight: 600; font-size: 15px; }
+  .barra-estado { color: #fff; position: relative; z-index: 2; }
+  .barra-estado svg rect { stroke: #fff; fill: #fff; }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; height: 430px; background: var(--fondo); border-radius: 28px 28px 0 0; box-shadow: 0 -20px 40px -10px rgba(0,0,0,.5); padding: 10px 16px 0; display: grid; gap: 12px; align-content: start; }
+  .agarre { width: 44px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 2px; }
+  .quien { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; gap: 12px; align-items: center; }
+  .quien .n { font-weight: 800; font-size: 16px; line-height: 21px; text-transform: uppercase; }
+  .precio-g { display: flex; align-items: flex-end; justify-content: space-between; }
+  .precio-g .t-total { font-size: 52px; line-height: 54px; }
+  .respuestas { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  .resp { padding: 10px 12px; border-radius: 14px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .resp .et { font-size: 14px; line-height: 18px; color: var(--texto-2); font-weight: 600; display: flex; gap: 6px; align-items: center; }
+  .resp .va { font-size: 18px; line-height: 24px; font-weight: 800; }
+  .resp.logro { background: var(--logro-suave); border-color: transparent; } .resp.logro .va { color: var(--logro-texto); }
+  .acc { display: grid; grid-template-columns: 1fr 56px; gap: 8px; }
+  .recientes { display: flex; gap: 8px; overflow: hidden; }
+  .reciente { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px 0 4px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); font-size: 14px; font-weight: 650; }
+  .reciente .foto { width: 32px; height: 32px; border-radius: 99px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="camara" data-mq="apuntar">
+    <img class="obj" src="../../../_comun/fotos/cinta-metrica.webp" alt="">
+    <div class="etiq"><svg class="ean" data-ean="7897065211580"></svg><div>7897065211580</div></div>
+    <div class="marco leido"><i></i><i></i><i></i><i></i></div>
+    <div class="controles">
+      <span class="redondo" data-ir="vender" title="Cerrar la cámara"><i class="i i-l" data-i="x"></i></span>
+      <div class="modos"><span class="el" data-modo="consultar">Consultar</span><span data-modo="codigo">Código</span><span data-modo="foto">Foto</span></div>
+      <span class="redondo" data-mq="linterna" title="Linterna"><i class="i i-l" data-i="flashlight"></i></span>
+    </div>
+    <div class="leyenda">Apuntá a cualquier producto</div>
+  </div>
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" opacity=".5"/><rect x="2" y="2" width="16" height="9" rx="2"/></svg></span></div>
+
+  <div class="hoja">
+    <div class="agarre" data-mq="ficha"></div>
+    <div class="quien">
+      <div class="foto" data-mq="ampliar"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div>
+      <div style="min-width:0"><div class="n">Cinta métrica PowerLock 5 m</div><div class="t-detalle">Stanley · Cód. 33-158</div></div>
+      <span class="redondo" data-mq="ficha" title="Ver todo" style="background:var(--superficie);color:var(--tinta);border:1px solid var(--borde);width:44px;height:44px"><i class="i" data-i="chevron-up"></i></span>
+    </div>
+    <div class="precio-g">
+      <div class="t-total"><span class="peso">$</span>17.000</div>
+      <div style="text-align:right;padding-bottom:6px"><div class="t-etiqueta" style="color:var(--logro-texto)">margen 50 %</div><div class="t-detalle">subió $1.000 el 06/10</div></div>
+    </div>
+    <div class="respuestas">
+      <div class="resp logro"><div class="et"><i class="i i-s" data-i="package"></i>Hay</div><div class="va">6 un.</div></div>
+      <div class="resp"><div class="et"><i class="i i-s" data-i="map-pin"></i>Está en</div><div class="va">B-02-07</div></div>
+      <div class="resp"><div class="et"><i class="i i-s" data-i="truck"></i>Costo</div><div class="va">$9.350</div></div>
+    </div>
+    <div class="acc"><button class="btn btn-accion grande" data-mq="agregar"><i class="i" data-i="shopping-cart"></i>Agregar a la venta</button><button class="btn grande btn-icono" style="width:56px" title="Ficha completa" data-mq="ficha"><i class="i" data-i="file-text"></i></button></div>
+    <div>
+      <div class="t-etiqueta" style="margin-bottom:8px">Consultaste antes</div>
+      <div class="recientes">
+        <span class="reciente" data-id="mecha"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span>Mecha 8 mm · $7.000</span>
+        <span class="reciente" data-id="tarugos"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span>Tarugos S8 · sin precio</span>
+      </div>
+    </div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+<script>
+/* Celu 2 · apuntá y sabé: tocar la cámara simula apuntar a otro producto; la hoja se reemplaza sin bajar. */
+(function () {
+  var M = window.Maq, d = document, Q = function (s) { return d.querySelector(s); };
+  var hoja = Q(".hoja"), camara = Q(".camara"), marco = Q(".marco");
+  var SIGUE = ["mecha", "martillo", "llave", "tarugos", "pintura", "lampara", "cinta"], i = -1, p = M.porId("cinta"), modo = "consultar", ocupado = false;
+  var recientes = ["mecha", "tarugos"];
+  M.tostadaAbajo = 444;
+
+  function pintarHoja() {
+    var pr = M.precioDe(p);
+    Q(".quien .foto img").src = M.fotoDe(p);
+    Q(".quien .n").textContent = p.nom;
+    Q(".quien .t-detalle").textContent = p.marca + " · Cód. " + p.cod;
+    var tot = Q(".precio-g .t-total");
+    tot.innerHTML = pr ? M.peso(pr) : "Sin precio";
+    tot.style.color = pr ? "" : "var(--urgente-texto)";
+    tot.style.fontSize = pr ? "" : "36px";
+    var der = Q(".precio-g").lastElementChild;
+    der.firstElementChild.textContent = p.margen == null ? "falta el margen" : "margen " + p.margen + " %";
+    der.firstElementChild.style.color = p.margen == null ? "var(--urgente-texto)" : "var(--logro-texto)";
+    der.lastElementChild.textContent = p.antes && pr && pr !== p.antes ? (pr > p.antes ? "subió $" : "bajó $") + M.miles(Math.abs(pr - p.antes)) + " el " + M.LISTA[p.uso] : (p.margen == null ? "nuevo en la lista del " + M.LISTA[p.uso] : "sin cambios desde junio");
+    var r = d.querySelectorAll(".resp");
+    r[0].className = "resp " + (p.stock ? "logro" : "");
+    r[0].querySelector(".va").textContent = p.stock ? M.stockTxt(p) : "No hay";
+    r[0].querySelector(".va").style.color = p.stock ? "" : "var(--error-texto)";
+    r[1].querySelector(".va").textContent = p.est;
+    r[2].querySelector(".va").textContent = "$" + M.miles(M.costo(p));
+  }
+  function pintarRecientes() {
+    var caja = Q(".recientes");
+    caja.innerHTML = recientes.map(function (id) { var q = M.porId(id), pr = M.precioDe(q); return '<span class="reciente" data-id="' + id + '"><span class="foto"><img src="' + M.fotoDe(q) + '" alt=""></span>' + q.corto.replace(/ × .*$/, "") + " · " + (pr ? "$" + M.miles(pr) : "sin precio") + "</span>"; }).join("");
+    M.entrar(caja.firstElementChild, 0);
+  }
+  function mostrar(nuevo, desdeCamara) {
+    if (nuevo === p) return;
+    recientes = [p.id].concat(recientes.filter(function (x) { return x !== p.id && x !== nuevo.id; })).slice(0, 3);
+    p = nuevo;
+    var cuerpo = Array.prototype.slice.call(hoja.children, 1, 5);
+    var a = null;
+    cuerpo.forEach(function (el) { a = M.animar(el, [{ opacity: 1 }, { opacity: 0 }], 100, M.SALIDA) || a; });
+    M.despues(a, function () {
+      pintarHoja(); pintarRecientes();
+      cuerpo.forEach(function (el) { M.animar(el, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], 200); });
+    });
+    if (!desdeCamara) ponerEnCamara(p);
+  }
+  function ponerEnCamara(q) {
+    Q(".camara .obj").src = M.fotoDe(q);
+    M.dibujarEan(Q(".etiq svg"), q.ean);
+    Q(".etiq div").textContent = q.ean;
+  }
+  // Apuntar: el marco se abre en blanco, se cierra sobre el código y se pone verde.
+  function apuntar() {
+    if (ocupado) return;
+    ocupado = true;
+    var q = modo === "consultar" ? M.porId(SIGUE[i = (i + 1) % SIGUE.length]) : p;
+    marco.classList.remove("leido");
+    if (modo === "consultar") {
+      ponerEnCamara(q);
+      M.animar(Q(".camara .obj"), [{ opacity: .3, transform: "rotate(-6deg) translateX(30px)" }, { opacity: 1, transform: "rotate(-6deg)" }], 260);
+      M.animar(Q(".etiq"), [{ opacity: .3, transform: "rotate(-6deg) translateX(30px)" }, { opacity: 1, transform: "rotate(-6deg)" }], 260);
+    }
+    M.animar(marco, [{ transform: "scale(1.12)" }, { transform: "none" }], 320);
+    setTimeout(function () {
+      marco.classList.add("leido");
+      M.vibrar(10);
+      ocupado = false;
+      if (modo === "consultar") mostrar(q, true);
+      else if (modo === "codigo") M.tostada("Leído <b>" + q.ean + "</b>: es de " + q.corto, { icono: "scan-barcode", abajo: 210 });
+    }, M.reducir ? 0 : 340);
+  }
+  function disparar() {
+    var f = Q(".mq-flash-cam");
+    if (!f) { camara.insertAdjacentHTML("beforeend", '<div class="mq-flash mq-flash-cam"></div>'); f = Q(".mq-flash-cam"); }
+    M.animar(f, [{ opacity: .9 }, { opacity: 0 }], 260);
+    M.vibrar(10);
+    M.tostada("Foto guardada para <b>" + p.corto + "</b>", { icono: "camera", abajo: 210 });
+  }
+  function elegirModo(m, el) {
+    if (m === modo) return;
+    M.elegirSegmento(el, "el");
+    var antes = modo; modo = m;
+    Q(".leyenda").textContent = m === "consultar" ? "Apuntá a cualquier producto" : (m === "codigo" ? "Apuntá al código de barras para cargarlo" : "Encuadrá el producto y sacá la foto");
+    M.fundir(Q(".leyenda"), 200);
+    var etiq = Q(".etiq");
+    etiq.style.visibility = m === "foto" ? "hidden" : "";
+    marco.classList.remove("leido");
+    Q(".mq-disparo-cam").style.display = m === "foto" ? "" : "none";
+    if (m !== "consultar" && antes === "consultar") M.animar(hoja, [{ transform: "none" }, { transform: "translateY(100%)" }], 240, M.SALIDA), hoja.style.transform = "translateY(100%)";
+    if (m === "consultar") { hoja.style.transform = ""; M.animar(hoja, [{ transform: "translateY(100%)" }, { transform: "none" }], 320); marco.classList.add("leido"); }
+  }
+  function abrirFicha() {
+    var c = M.abrir('<div class="mq-cab"><span class="t-seccion">Ficha</span><button class="btn btn-icono chico btn-suave" data-cerrar title="Cerrar"><i class="i i-s" data-i="x"></i></button></div><div data-mq="cuerpo"></div><div class="mq-pie"><button class="btn btn-accion grande" data-mq="agregar-ficha"><i class="i" data-i="shopping-cart"></i>Agregar a la venta</button></div>', { tipo: "hoja" });
+    M.montarFicha(c.el.querySelector('[data-mq="cuerpo"]'), p, function () { pintarHoja(); }, { una: true });
+    c.el.querySelector('[data-mq="agregar-ficha"]').addEventListener("click", function () { c.cerrar(); M.agregar(p, { ir: true }); });
+  }
+
+  // Lo que se agrega a la cámara: el destello y el disparador del modo Foto (escondidos hasta usarlos)
+  Q(".celu").insertAdjacentHTML("beforeend", '<div class="mq-cam-abajo mq-disparo-cam" style="display:none;bottom:72px"><button class="mq-disparo" data-mq="disparo" title="Sacar la foto"></button>Tocá para sacarla</div>');
+
+  d.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".mq-panel, .mq-fondo, .mq-tostadas")) return;
+    var md = t.closest("[data-modo]");
+    if (md) { e.stopPropagation(); elegirModo(md.getAttribute("data-modo"), md); return; }
+    var rc = t.closest(".reciente");
+    if (rc) { mostrar(M.porId(rc.getAttribute("data-id")), false); return; }
+    var q = t.closest("[data-mq]");
+    if (!q) return;
+    switch (q.getAttribute("data-mq")) {
+      case "linterna": q.style.background = q.style.background ? "" : "rgba(255,255,255,.4)"; camara.style.filter = camara.style.filter ? "" : "brightness(1.3)"; break;
+      case "apuntar": if (!t.closest(".controles")) apuntar(); break;
+      case "disparo": disparar(); break;
+      case "ampliar": M.ampliarFoto(p); break;
+      case "ficha": abrirFicha(); break;
+      case "agregar": M.apretar(q); M.agregar(p); break;
+    }
+  });
+})();
+</script>
+</body>
+</html>

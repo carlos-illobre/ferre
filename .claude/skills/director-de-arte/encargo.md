@@ -1,9 +1,9 @@
 # El entorno del director de arte (no es parte de su rol)
 
 - **Dónde trabajás:** solo en la carpeta de la pantalla que te pasaron,
-  `docs/propuestas-de-diseno/<pantalla>/`. No escribas en ningún otro lugar del repositorio, no
+  `microservices/web/public/maquetas/<pantalla>/`. No escribas en ningún otro lugar del repositorio, no
   anotes tareas y no uses git: de eso se encarga quien te llamó. No publiques páginas.
-- **Lenguaje común:** si existe `docs/propuestas-de-diseno/_comun/lenguaje.md`, es obligatorio.
+- **Lenguaje común:** si existe `microservices/web/public/maquetas/_comun/lenguaje.md`, es obligatorio.
   Mirá `_comun/muestra.png`, `marco-compu.html`, `marco-celu.html` y alguna pantalla ya hecha.
   Usá `_comun/comun.css`, `_comun/iconos.js`, las fuentes y las fotos con rutas relativas (desde
   `<pantalla>/compu/variante-N-nombre/index.html` es `../../../_comun/`). Las variantes se

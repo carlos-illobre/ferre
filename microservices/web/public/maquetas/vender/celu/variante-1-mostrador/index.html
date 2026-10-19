@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · Mostrador (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .buscar { display: flex; gap: 8px; }
+  .buscar .campo { flex: 1; height: 52px; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .buscar .btn { width: 52px; height: 52px; padding: 0; border-radius: 12px; }
+  .cab-lista { display: flex; align-items: center; gap: 8px; margin: 14px 0 8px; }
+  .cab-lista b { font-size: 18px; font-weight: 800; }
+  .cab-lista .btn { margin-left: auto; }
+  .lista { overflow: hidden; height: 380px; -webkit-mask-image: linear-gradient(#000 80%, transparent 96%); margin: 0 -16px; padding: 0 16px; }
+  .card { background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 12px; }
+  .card + .card { margin-top: 8px; }
+  .arriba { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; gap: 12px; align-items: start; }
+  .arriba .n { font-weight: 750; font-size: 16px; line-height: 21px; }
+  .arriba .d { font-size: 14px; line-height: 19px; color: var(--texto-2); margin-top: 2px; }
+  .precio-p { text-align: center; padding: 4px 10px; border-radius: 10px; background: var(--logro-suave); }
+  .precio-p b { display: block; font-size: 17px; font-weight: 800; color: var(--logro-texto); }
+  .precio-p span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .abajo { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .abajo .tacho { width: 56px; display: grid; place-items: center; color: var(--texto-3); }
+  .abajo .cantidad { height: 40px; }
+  .abajo .cantidad button { width: 40px; }
+  .margen-p { white-space: nowrap; height: 40px; padding: 0 10px; border-radius: 12px; background: var(--hundido); font-weight: 750; font-size: 14px; display: inline-flex; align-items: center; gap: 4px; }
+  .abajo .sub { margin-left: auto; font-weight: 800; font-size: 19px; }
+  .card.falta { border-color: #F3C766; background: linear-gradient(180deg, var(--urgente-suave), #fff 70%); }
+  .margenes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 10px; }
+  .margenes b { height: 40px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); color: var(--urgente-texto); display: grid; place-items: center; font-size: 15px; }
+  .medios-c { display: flex; gap: 6px; margin-bottom: 10px; }
+  .mc { flex: 1; height: 40px; border-radius: 12px; border: 1px solid var(--borde-fuerte); background: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 14px; white-space: nowrap; padding: 0 4px; }
+  .mc .pt { width: 8px; height: 8px; border-radius: 9px; background: var(--c); }
+  .mc.elegido { border: 2px solid var(--c); background: var(--cs); color: var(--tinta); }
+  .cobrar { width: 100%; height: 56px; border-radius: 14px; justify-content: space-between; padding: 0 18px; font-size: 18px; }
+  .cobrar small { font-size: 14px; font-weight: 600; opacity: .9; }
+  .aviso-c { display: flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 700; color: var(--urgente-texto); margin: -2px 0 8px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Vender</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a class="activa" data-ir="vender">Vender</a><a data-ir="ventas-de-hoy">Ventas de hoy</a></nav>
+
+  <div class="celu-pantalla">
+    <div class="buscar">
+      <div class="campo v-toca" data-buscar role="button"><i class="i" data-i="search"></i>Producto, código o marca</div>
+      <button class="btn btn-oscuro" data-escanear aria-label="Escanear"><i class="i i-l" data-i="scan-barcode"></i></button>
+    </div>
+    <div class="cab-lista"><b>Esta venta</b><span class="pastilla">5</span><button class="btn btn-fantasma chico" data-vaciar><i class="i i-s" data-i="trash-2"></i>Vaciar</button></div>
+
+    <div class="lista">
+      <div class="card">
+        <div class="arriba"><div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div><div class="n">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · 14 un.</div></div><div class="precio-p"><b class="num">$7.000</b><span>cada una</span></div></div>
+        <div class="abajo"><span class="tacho"><i class="i" data-i="trash-2"></i></span><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">3</span><button><i class="i i-s" data-i="plus"></i></button></span><span class="margen-p">100 %<i class="i i-s" data-i="chevron-down"></i></span><span class="sub num">$21.000</span></div>
+      </div>
+      <div class="card falta">
+        <div class="arriba"><div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · 3 un.</div></div><div class="precio-p" style="background:#fff;box-shadow:inset 0 0 0 1.5px var(--urgente)"><b style="color:var(--urgente-texto);font-size:15px">Sin precio</b><span>costo $4.150</span></div></div>
+        <div class="margenes"><b>300</b><b>200</b><b>100</b><b>50</b><b>25</b><b>$</b></div>
+      </div>
+      <div class="card">
+        <div class="arriba"><div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div><div class="n">Cinta métrica PowerLock 5 m</div><div class="d">Stanley · 6 un. · <i class="i i-s" data-i="monitor"></i> de la compu</div></div><div class="precio-p"><b class="num">$17.000</b><span>cada una</span></div></div>
+        <div class="abajo"><span class="tacho"><i class="i" data-i="trash-2"></i></span><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1</span><button><i class="i i-s" data-i="plus"></i></button></span><span class="margen-p">50 %<i class="i i-s" data-i="chevron-down"></i></span><span class="sub num">$17.000</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="barra-accion">
+    <div class="aviso-c"><i class="i i-s" data-i="triangle-alert"></i>Falta el precio de los tarugos</div>
+    <div class="medios-c">
+      <span class="mc medio efectivo elegido"><span class="pt"></span>Efectivo</span>
+      <span class="mc medio mp"><span class="pt"></span>M. Pago</span>
+      <span class="mc medio tarjeta"><span class="pt"></span>Tarjeta</span>
+      <span class="mc medio cuenta"><span class="pt"></span>Cta. cte.</span>
+    </div>
+    <button class="btn btn-accion cobrar" data-cobrar><span>Cobrar</span><span class="num">$45.500</span></button>
+  </div>
+  <nav class="nav-inferior">
+    <a class="activo" data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="v-toca" data-menu-mas><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+// Celu 1 · Mostrador: buscar o escanear suma un renglón arriba; − y + cambian la cantidad; el margen
+// se elige en el renglón (o en su hoja); los medios se tocan; Cobrar muestra la venta registrada.
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var lista = $('.lista'), btnCobrar = $('[data-cobrar]'), avisoC = $('.aviso-c'), celu = $('.celu');
+  var items = [V.item('mecha', 3), V.item('tarugos', 1), V.item('cinta', 1, { compu: true }), V.item('clavos', .7), V.libre('Bolsa de arena × 25 kg', 1500)];
+  var medio = 'efectivo', cliente = null;
+  V.ajustes.tostadaAbajo = celu.getBoundingClientRect().bottom - $('.barra-accion').getBoundingClientRect().top + 10;
+  // Se vuelve desplazable después del primer dibujo, para que quieta se vea idéntica.
+  var primerDibujo = true;
+
+  function cada(it) { return it.unidad === 'kg' ? 'el kg' : /^(la|las) /.test(it.corto || '') ? 'cada una' : 'cada uno'; }
+  function card(it) {
+    var p = V.precio(it), s = V.subtotal(it);
+    var foto = it.libre ? '<div class="foto-icono"><i class="i i-l" data-i="package-plus"></i></div>' : '<div class="foto"><img src="../../../_comun/fotos/' + it.foto + '.webp" alt=""></div>';
+    var d = it.libre ? 'Ítem libre · ' + (p == null ? 'sin precio' : 'a mano') : it.marca + ' · ' + V.stockTexto(it) + (it.compu ? ' · <i class="i i-s" data-i="monitor"></i> de la compu' : '');
+    var arriba = '<div class="arriba v-toca" data-ficha>' + foto + '<div><div class="n">' + V.html(it.nombre) + '</div><div class="d">' + d + '</div></div>';
+    if (p == null) {
+      var mm = it.libre ? '<b style="grid-column:1/-1" data-mano>Poné el precio a mano</b>' : V.MARGENES.map(function (m) { return '<b data-m="' + m + '">' + m + '</b>'; }).join('') + '<b data-mano>$</b>';
+      return '<div class="card falta" data-k="' + it.k + '">' + arriba + '<div class="precio-p" style="background:#fff;box-shadow:inset 0 0 0 1.5px var(--urgente)"><b style="color:var(--urgente-texto);font-size:15px">Sin precio</b><span>' + (it.libre ? 'ítem libre' : 'costo ' + V.pesos(it.costo)) + '</span></div></div><div class="margenes">' + mm + '</div></div>';
+    }
+    arriba += '<div class="precio-p"><b class="num" data-rueda>' + V.pesos(p) + '</b><span>' + (it.mano != null ? 'a mano' : cada(it)) + '</span></div></div>';
+    var mp = it.libre ? '<span class="margen-p v-toca" data-margen>$ a mano</span>' : '<span class="margen-p v-toca" data-margen>' + (it.mano != null ? 'a mano' : it.margen + ' %') + '<i class="i i-s" data-i="chevron-down"></i></span>';
+    return '<div class="card" data-k="' + it.k + '">' + arriba + '<div class="abajo"><span class="tacho v-toca" data-quitar><i class="i" data-i="trash-2"></i></span><span class="cantidad"><button data-menos aria-label="Uno menos"><i class="i i-s" data-i="minus"></i></button><span class="n" data-rueda>' + V.num(it.cant) + (it.unidad === 'kg' ? '<span class="u">kg</span>' : '') + '</span><button data-mas aria-label="Uno más"><i class="i i-s" data-i="plus"></i></button></span>' + mp + '<span class="sub num" data-rueda>' + V.pesos(s) + '</span></div></div>';
+  }
+  function render(nuevos) {
+    if (!primerDibujo) V.sinBarras(lista); primerDibujo = false;
+    if (!items.length) { lista.innerHTML = V.vacia('La venta está vacía', 'Buscá o escaneá un producto para empezar.'); V.pintar(lista); }
+    else V.redibujar(lista, items.map(card).join(''), nuevos);
+    var n = items.length, f = V.faltan(items), tot = V.total(items);
+    $('.cab-lista .pastilla').textContent = n;
+    var ins = $('.nav-inferior .insignia'), antes = +ins.textContent; ins.textContent = n; ins.style.display = n ? '' : 'none'; if (n > antes) V.saltar(ins);
+    if (f.length) { avisoC.style.display = ''; avisoC.lastChild.textContent = f.length === 1 ? 'Falta el precio de ' + f[0].corto : 'Faltan ' + f.length + ' precios: ' + f.map(function (x) { return x.corto; }).join(' y '); }
+    else avisoC.style.display = 'none';
+    V.poner($('.cobrar .num'), V.pesos(tot));
+    btnCobrar.disabled = !n;
+  }
+  function buscarItem(k) { for (var i = 0; i < items.length; i++) if (items[i].k === k) return items[i]; return null; }
+  function elDe(k) { return lista.querySelector('[data-k="' + k + '"]'); }
+  function agregar(id) {
+    var antes = items.length, it = V.sumar(items, id, 1, null, true);
+    render([it.k]); if (items.length === antes) V.entra(elDe(it.k));
+    elDe(it.k).scrollIntoView({ block: 'nearest' }); V.vibrar(10);
+    return it;
+  }
+  function quitar(it) {
+    var i = items.indexOf(it);
+    V.sale([elDe(it.k)], function () {
+      items.splice(i, 1); render();
+      V.tostada('Quitaste ' + it.corto, { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items.splice(i, 0, it); render([it.k]); } });
+    });
+  }
+  function elegirMedio(k) { medio = k; document.querySelectorAll('.medios-c .mc').forEach(function (b) { b.classList.toggle('elegido', b.classList.contains(k)); }); }
+  function cobrar() {
+    var ok = V.puedeCobrar(items, medio, cliente, function (f) { var el = elDe(f[0].k); el.scrollIntoView({ block: 'nearest' }); V.sacudir(el); V.sacudir(avisoC); V.vibrar([10, 40, 10]); });
+    if (ok === 'cliente') { V.elegirCliente(function (n) { cliente = n; if (n) cobrar(); }); return; }
+    if (!ok) return;
+    V.llenar(btnCobrar, function () {
+      var total = V.total(items), n = items.length, cli = cliente, med = medio;
+      V.sale(lista.children, function () { items = []; cliente = null; render(); elegirMedio('efectivo'); });
+      V.listo({ total: total, medio: med, cliente: cli, cantidad: n });
+    });
+  }
+  function ficha(it) { V.margenHoja(it, { conCantidad: true, alCambiar: function () { render(); }, alQuitar: function () { quitar(it); } }); }
+
+  lista.addEventListener('click', function (e) {
+    var c = e.target.closest('.card'); if (!c) return;
+    var it = buscarItem(c.getAttribute('data-k')); if (!it) return;
+    var m = e.target.closest('[data-m]');
+    if (m) { it.margen = +m.getAttribute('data-m'); it.mano = null; V.vibrar(10); render(); return; }
+    if (e.target.closest('[data-mano]')) { V.precioAMano(it, function (n) { it.mano = n; render(); }); return; }
+    if (e.target.closest('[data-mas]')) { it.cant = Math.round((it.cant + V.paso(it)) * 10) / 10; render(); return; }
+    if (e.target.closest('[data-menos]')) { if (it.cant - V.paso(it) > .05) { it.cant = Math.round((it.cant - V.paso(it)) * 10) / 10; render(); } else quitar(it); return; }
+    if (e.target.closest('[data-quitar]')) { quitar(it); return; }
+    if (e.target.closest('[data-margen]')) { if (it.libre) V.precioAMano(it, function (n) { it.mano = n; render(); }); else V.margenHoja(it, { alCambiar: function () { render(); } }); return; }
+    if (e.target.closest('[data-ficha]')) ficha(it);
+  });
+  document.querySelectorAll('.medios-c .mc').forEach(function (b) { b.classList.add('v-toca'); b.addEventListener('click', function () { elegirMedio(V.ORDEN_MEDIOS.filter(function (k) { return b.classList.contains(k); })[0]); }); });
+  btnCobrar.addEventListener('click', cobrar);
+  $('[data-buscar]').addEventListener('click', function () {
+    V.buscarHoja(function (id, texto) {
+      if (id) { agregar(id); return; }
+      var it = V.libre(texto.charAt(0).toUpperCase() + texto.slice(1), null); items.unshift(it); render([it.k]); lista.scrollTop = 0;
+      setTimeout(function () { V.precioAMano(it, function (n) { it.mano = n; render(); }); }, V.mover ? 340 : 0);
+    });
+  });
+  $('[data-escanear]').addEventListener('click', function () { V.camara({ alLeer: function (id) { return agregar(id); } }); });
+  $('[data-vaciar]').addEventListener('click', function () {
+    if (!items.length) { V.tostada('La venta ya está vacía', { icono: 'info' }); return; }
+    var copia = items.slice();
+    V.sale(lista.children, function () { items = []; render(); V.tostada('Vaciaste la venta', { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items = copia; render(copia.map(function (x) { return x.k; })); } }); });
+  });
+  $('[data-menu-mas]').addEventListener('click', function () { V.mas(); });
+  render([]);
+})();
+</script>
+</body>
+</html>

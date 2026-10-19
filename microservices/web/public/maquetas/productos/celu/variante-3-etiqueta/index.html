@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productos · la etiqueta, del lado del cliente</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../ean.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<style>
+  body { width: 390px; }
+  .celu { background: var(--hundido); }
+  .arriba { display: flex; align-items: center; gap: 8px; padding: 2px 16px 0; }
+  .busq { flex: 1; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); font-weight: 650; }
+  .busq .cuenta { margin-left: auto; color: var(--texto-2); font-size: 14px; font-weight: 600; }
+  .redondo { width: 44px; height: 44px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); display: grid; place-items: center; flex: none; }
+  .mazo { position: relative; height: 610px; margin-top: 16px; }
+  .detras { position: absolute; left: 28px; right: 28px; top: 0; height: 570px; border-radius: 28px; background: #FBFAF6; border: 1px solid var(--borde); }
+  .detras.d2 { left: 40px; right: 40px; top: -10px; background: #F7F5F0; }
+  .lado { position: absolute; top: 160px; width: 44px; height: 300px; border-radius: 24px; background: var(--superficie); border: 1px solid var(--borde); overflow: hidden; display: grid; place-items: center; }
+  .lado img { width: 120px; max-width: none; opacity: .9; }
+  .lado.izq { left: -24px; } .lado.der { right: -24px; }
+  .carta { position: absolute; left: 16px; right: 16px; top: 8px; height: 576px; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra-3); overflow: hidden; display: flex; flex-direction: column; }
+  .carta .tope { height: 248px; background: linear-gradient(180deg, #F4F2EC 0%, #EAE6DC 100%); display: grid; place-items: center; position: relative; }
+  .carta .tope img { height: 236px; filter: drop-shadow(0 18px 20px rgba(26,29,27,.28)); transform: rotate(-4deg); }
+  .carta .tope .pastilla { position: absolute; left: 16px; top: 16px; background: #fff; box-shadow: var(--sombra-1); height: 32px; }
+  .carta .tope .marca-f { position: absolute; right: 16px; top: 18px; font-weight: 800; font-size: 14px; color: var(--pino); display: flex; gap: 6px; align-items: center; }
+  .carta .cuerpo { padding: 18px 20px 0; flex: 1; display: flex; flex-direction: column; }
+  .carta .nom { font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; text-transform: uppercase; }
+  .carta .precio { font-size: 84px; line-height: 84px; font-weight: 800; letter-spacing: -.05em; margin-top: 12px; }
+  .carta .precio .peso { font-size: 40px; vertical-align: 32px; margin-right: 4px; }
+  .carta .pie { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 16px 0 20px; border-top: 1px dashed var(--borde-fuerte); }
+  .carta .pie .ean { width: 112px; height: 40px; fill: var(--tinta); }
+  .carta .pie .cod { font-weight: 750; letter-spacing: .05em; font-size: 15px; }
+  .puntos { position: absolute; left: 0; right: 0; bottom: 4px; display: flex; justify-content: center; gap: 6px; }
+  .puntos i { width: 8px; height: 8px; border-radius: 99px; background: var(--borde-fuerte); }
+  .puntos i.el { width: 24px; background: var(--pino); }
+  .abajo { display: grid; grid-template-columns: 56px 1fr 56px; gap: 10px; align-items: center; padding: 8px 16px 0; }
+  .abajo .btn.grande { min-height: 56px; }
+  .gira { width: 56px; height: 56px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; box-shadow: var(--sombra-2); }
+  .ayuda { text-align: center; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="arriba">
+    <span class="redondo" data-ir="vender" title="Volver"><i class="i" data-i="chevron-left"></i></span>
+    <div class="busq" data-mq="buscar"><i class="i" data-i="search"></i>cinta<span class="cuenta">1 de 7</span></div>
+    <span class="redondo" data-mq="escanear" title="Escanear" style="background:var(--pino);color:#fff;border-color:var(--pino)"><i class="i" data-i="scan-barcode"></i></span>
+  </div>
+  <div class="mazo">
+    <div class="detras d2"></div><div class="detras"></div>
+    <div class="lado izq" data-mq="anterior"><img src="../../../_comun/fotos/pinza.webp" alt=""></div>
+    <div class="lado der" data-mq="siguiente"><img src="../../../_comun/fotos/cinta-metrica.webp" alt="" style="transform:scale(-1,1)"></div>
+    <article class="carta frente">
+      <div class="tope">
+        <span class="pastilla logro"><span class="punto"></span>Hay 6 un.</span>
+        <span class="marca-f"><i class="i i-s" data-i="store"></i>Ferrebress</span>
+        <img src="../../../_comun/fotos/cinta-metrica.webp" alt="">
+      </div>
+      <div class="cuerpo">
+        <div class="nom">Cinta métrica PowerLock 5 m</div>
+        <div class="t-detalle" style="font-size:15px">Stanley · Cód. 33-158 · precio final con IVA</div>
+        <div class="precio"><span class="peso">$</span>17.000</div>
+        <div class="pie"><svg class="ean" data-ean="7897065211580"></svg><div><div class="cod">7897065211580</div><div class="t-detalle">Estante B-02-07</div></div></div>
+      </div>
+    </article>
+    <div class="puntos"><i class="el"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="abajo">
+    <span class="gira" data-mq="girar" title="Darla vuelta: costo y proveedores"><i class="i i-l" data-i="refresh-cw"></i></span>
+    <button class="btn btn-accion grande" data-mq="agregar"><i class="i" data-i="shopping-cart"></i>Agregar</button>
+    <span class="redondo" data-mq="compartir" title="Compartir la etiqueta" style="width:56px;height:56px"><i class="i i-l" data-i="share-2"></i></span>
+  </div>
+  <div class="ayuda">Deslizá: los otros 6 · Dos toques: darla vuelta</div>
+  <span class="home-ind"></span>
+</div>
+<style>
+  /* El dorso de la etiqueta (el mismo de dorso.html), del otro lado de la carta */
+  .carta.dorso { background: var(--pino); color: #fff; padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+  .mazo.girando { perspective: 1400px; }
+  .mazo.girando .carta.frente, .mazo.girando .carta.dorso { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .dorso .fila-sup { display: flex; align-items: center; gap: 12px; }
+  .dorso .fila-sup .mini { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.1); display: grid; place-items: center; }
+  .dorso .fila-sup .mini img { width: 40px; }
+  .dorso .fila-sup .n { font-weight: 800; font-size: 16px; line-height: 20px; text-transform: uppercase; }
+  .dorso .fila-sup .d { font-size: 14px; color: rgba(255,255,255,.7); }
+  .dorso .solo { margin-left: auto; display: inline-flex; gap: 6px; align-items: center; height: 28px; padding: 0 10px; border-radius: 99px; background: rgba(255,255,255,.12); font-size: 14px; font-weight: 700; }
+  .dorso .cuenta-g { background: rgba(255,255,255,.07); border-radius: 18px; padding: 12px 14px; }
+  .dorso .paso { display: flex; justify-content: space-between; font-size: 15px; line-height: 23px; color: rgba(255,255,255,.78); }
+  .dorso .paso b { color: #fff; }
+  .dorso .paso.total { border-top: 1px solid rgba(255,255,255,.16); margin-top: 6px; padding-top: 8px; align-items: baseline; }
+  .dorso .paso.total b { font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -.02em; display: inline-block; }
+  .dorso .mg { display: flex; padding: 3px; border-radius: 12px; background: rgba(255,255,255,.1); }
+  .dorso .mg span { flex: 1; height: 36px; display: grid; place-items: center; border-radius: 9px; font-weight: 750; font-size: 15px; color: rgba(255,255,255,.75); cursor: pointer; }
+  .dorso .mg span.el { background: #fff; color: var(--pino); }
+  .dorso .tit { font-size: 14px; font-weight: 700; color: rgba(255,255,255,.66); display: flex; justify-content: space-between; }
+  .dorso .prov { display: grid; grid-template-columns: 32px minmax(0,1fr) auto; gap: 10px; align-items: center; font-size: 15px; line-height: 20px; }
+  .dorso .prov + .prov { margin-top: 6px; }
+  .dorso .ini { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.12); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+  .dorso .ini.uso { background: #fff; color: var(--pino); }
+  .dorso .prov small { display: block; font-size: 14px; color: rgba(255,255,255,.62); }
+  .dorso .prov .c { font-weight: 800; text-align: right; }
+  .dorso .prov .usar { height: 32px; padding: 0 12px; border-radius: 9px; background: rgba(255,255,255,.12); font-weight: 700; font-size: 14px; display: inline-grid; place-items: center; cursor: pointer; }
+  .dorso .linea { display: flex; gap: 10px; }
+  .dorso .chipo { flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.07); font-size: 14px; line-height: 18px; color: rgba(255,255,255,.8); min-width: 0; cursor: pointer; }
+  .dorso .chipo b { display: block; color: #fff; font-size: 15px; }
+  .carta.frente { touch-action: pan-y; cursor: grab; }
+</style>
+<script>
+/* Celu 3 · la etiqueta: deslizar pasa de resultado, dos toques (o el botón) la dan vuelta; vuelve sola a los 30 s. */
+(function () {
+  var M = window.Maq, d = document, Q = function (s) { return d.querySelector(s); };
+  var MAS = [
+    { id: "cinta-3", nom: "Cinta métrica Tylon 3 m", corto: "Cinta Tylon 3 m", marca: "Stanley", cod: "30-686", est: "B-02-05", ean: M.ean("789706521030"), stock: 11, foto: "cinta-metrica", margen: 100, uso: "O", costos: { O: 2950, B: 3100 }, antes: 7000, hist: 9 },
+    { id: "cinta-8", nom: "Cinta métrica Global Tape 8 m", corto: "Cinta Global 8 m", marca: "Stanley", cod: "30-656", est: "B-02-08", ean: M.ean("789706521080"), stock: 4, foto: "cinta-metrica", margen: 50, uso: "O", costos: { O: 12800, S: 13400 }, antes: 22000, hist: 12 },
+    { id: "cinta-10", nom: "Cinta métrica fibra de vidrio 10 m", corto: "Cinta fibra 10 m", marca: "Bremen", cod: "CF10", est: "B-03-01", ean: M.ean("779123401010"), stock: 0, foto: "cinta-metrica", margen: 50, uso: "S", costos: { S: 8400 }, antes: 15000, hist: 7 },
+    { id: "cinta-3f", nom: "Cinta métrica 3 m con freno", corto: "Cinta 3 m con freno", marca: "Bremen", cod: "CM3F", est: "B-02-02", ean: M.ean("779123400303"), stock: 23, foto: "cinta-metrica", margen: 100, uso: "B", costos: { B: 1750, O: 1820 }, antes: 4000, hist: 15 },
+    { id: "cinta-5b", nom: "Cinta métrica Pro 5 m", corto: "Cinta Pro 5 m", marca: "Bahco", cod: "MTB-5", est: "B-02-09", ean: M.ean("731601200505"), stock: 3, foto: "cinta-metrica", margen: 50, uso: "O", costos: { O: 10900, B: 11300 }, antes: 19000, hist: 5 },
+    { id: "cinta-75", nom: "Cinta métrica 7,5 m", corto: "Cinta 7,5 m", marca: "Truper", cod: "FH-7.5", est: "B-03-04", ean: M.ean("750146500750"), stock: 6, foto: "cinta-metrica", margen: 50, uso: "R", costos: { R: 6100 }, antes: 11000, hist: 10 }
+  ];
+  MAS.forEach(function (p) { M.P.push(p); });
+  var mazo = Q(".mazo"), frente = Q(".carta.frente"), dorso, vuelta = false, reloj = null;
+  var deck = [M.porId("cinta")].concat(MAS), idx = 0, consulta = "cinta";
+  var p = function () { return deck[idx]; };
+  var ESTRELLA = " ★";
+
+  function pintarFrente() {
+    var q = p(), pr = M.precioDe(q);
+    var st = frente.querySelector(".tope .pastilla");
+    st.className = "pastilla " + (q.stock ? "logro" : "error");
+    st.innerHTML = '<span class="punto"></span>' + (q.stock ? "Hay " + M.stockTxt(q) : "No hay");
+    var img = frente.querySelector(".tope img");
+    img.src = M.fotoDe(q);
+    img.style.transform = idx % 2 ? "rotate(5deg) scaleX(-1)" : "";
+    frente.querySelector(".nom").textContent = q.nom;
+    frente.querySelector(".cuerpo .t-detalle").textContent = q.marca + " · Cód. " + q.cod + " · precio final con IVA";
+    var pe = frente.querySelector(".precio");
+    pe.innerHTML = pr ? M.peso(pr) : "Sin precio";
+    pe.style.fontSize = pr ? "" : "48px";
+    pe.style.color = pr ? "" : "var(--urgente-texto)";
+    M.dibujarEan(frente.querySelector(".pie svg"), q.ean);
+    frente.querySelector(".pie .cod").textContent = q.ean;
+    frente.querySelector(".pie .t-detalle").textContent = "Estante " + q.est;
+    Q(".busq .cuenta").textContent = (idx + 1) + " de " + deck.length;
+    var pts = Q(".puntos");
+    pts.innerHTML = deck.slice(0, 9).map(function (x, i) { return "<i" + (i === idx ? ' class="el"' : "") + "></i>"; }).join("");
+    Q(".lado.izq").style.visibility = idx === 0 && consulta !== "cinta" ? "hidden" : "";
+    Q(".lado.der").style.visibility = idx >= deck.length - 1 ? "hidden" : "";
+    if (idx > 0) Q(".lado.izq img").src = M.fotoDe(deck[idx - 1]);
+    if (idx < deck.length - 1) Q(".lado.der img").src = M.fotoDe(deck[idx + 1]);
+  }
+  function dorsoHTML(q) {
+    var pr = M.precioDe(q), barato = M.masBarato(q), otros = Object.keys(q.costos).filter(function (k) { return k !== q.uso; }).sort(function (a, b) { return q.costos[a] - q.costos[b]; }).slice(0, 1);
+    var enLista = M.MARGENES.indexOf(q.margen) >= 0;
+    return '<div class="fila-sup"><span class="mini"><img src="' + M.fotoDe(q) + '" alt=""></span><div style="min-width:0"><div class="n">' + q.nom + '</div><div class="d">Lo que el cliente no ve</div></div><span class="solo"><i class="i i-s" data-i="lock"></i>Vos</span></div>' +
+      '<div class="cuenta-g"><div class="paso"><span>Costo de compra</span><b>' + M.centavos(M.costo(q)) + '</b></div><div class="paso"><span>+ ' + (q.margen || 0) + ' % de margen</span><b>' + M.centavos(M.conMargen(q)) + '</b></div><div class="paso"><span>+ IVA 21 %</span><b>' + M.centavos(M.conIva(q)) + '</b></div><div class="paso total"><span>Se cobra, a $1.000</span><b data-mq="total">' + (pr ? M.peso(pr) : "—") + "</b></div></div>" +
+      '<div class="mg">' + M.MARGENES.map(function (m) { return '<span data-margen="' + m + '"' + (q.margen === m ? ' class="el">' + m + " %" : ">" + m) + "</span>"; }).join("") + '<span data-margen="otro"' + (q.margen != null && !enLista ? ' class="el">' + q.margen + " %" : ">Otro") + "</span></div>" +
+      '<div><div class="tit" style="margin-bottom:8px"><span>De quién se compra</span><span>costo</span></div><div class="prov"><span class="ini uso">' + M.INI[q.uso] + '</span><div style="min-width:0">' + M.PROV[q.uso] + (q.uso === barato ? ESTRELLA : "") + "<small>en uso · lista " + M.LISTA[q.uso] + '</small></div><span class="c">$' + M.miles(M.costo(q)) + "</span></div>" +
+      otros.map(function (k) { var dif = q.costos[k] - M.costo(q); return '<div class="prov"><span class="ini">' + M.INI[k] + '</span><div style="min-width:0">' + M.PROV[k] + (k === barato ? ESTRELLA : "") + "<small>lista " + M.LISTA[k] + " · $" + M.miles(Math.round(Math.abs(dif))) + (dif >= 0 ? " más" : " menos") + '</small></div><span class="usar" data-usar="' + k + '">Usar</span></div>'; }).join("") + "</div>" +
+      '<div class="linea"><div class="chipo" data-mq="historial"><i class="i" data-i="trending-up"></i><div><b>' + (q.hist >= 0 ? "+" : "−") + Math.abs(q.hist) + ' %</b>en 5 meses</div></div><div class="chipo" data-mq="descargar"><i class="i" data-i="file-spreadsheet"></i><div><b>Lista ' + M.LISTA[q.uso] + "</b>" + M.CANT_LISTA[q.uso] + " prod. ↓</div></div></div>" +
+      '<div class="linea"><div class="chipo"><i class="i" data-i="scan-barcode"></i><div style="min-width:0"><b>' + q.ean + '</b>leído 13/10 · 10:24</div></div><div class="chipo" data-mq="copiar" title="Copiar el código" style="flex:none;width:48px;justify-content:center"><i class="i" data-i="copy"></i></div></div>';
+  }
+  function pintarDorso(cambio, antes) {
+    dorso.innerHTML = dorsoHTML(p());
+    M.iconos(dorso);
+    if (cambio) {
+      var pr = M.precioDe(p()) || 0, tot = dorso.querySelector('[data-mq="total"]');
+      M.animar(tot, [{ opacity: 0, transform: "translateY(" + (pr >= (antes || 0) ? 10 : -10) + "px)" }, { opacity: 1, transform: "none" }], 200);
+      M.brillar(dorso.querySelector(".paso.total"));
+    }
+  }
+  function alReloj() { clearTimeout(reloj); if (vuelta) reloj = setTimeout(function () { if (vuelta) girar(); }, 30000); }
+  function girar() {
+    vuelta = !vuelta;
+    if (vuelta) pintarDorso();
+    var f0 = vuelta ? "rotateY(0deg)" : "rotateY(-180deg)", f1 = vuelta ? "rotateY(-180deg)" : "rotateY(0deg)";
+    var d0 = vuelta ? "rotateY(180deg)" : "rotateY(0deg)", d1 = vuelta ? "rotateY(0deg)" : "rotateY(180deg)";
+    // Mientras gira (y del lado del dorso) la carta usa 3D; de frente y quieta, se dibuja igual que la maqueta.
+    mazo.classList.add("girando");
+    dorso.style.display = "";
+    frente.style.transform = f1; dorso.style.transform = d1;
+    M.animar(frente, [{ transform: f0 }, { transform: f1 }], 320);
+    var giro = M.animar(dorso, [{ transform: d0 }, { transform: d1 }], 320);
+    M.despues(giro, function () { if (!vuelta) { mazo.classList.remove("girando"); dorso.style.display = "none"; frente.style.transform = ""; } });
+    frente.style.pointerEvents = vuelta ? "none" : "";
+    dorso.style.pointerEvents = vuelta ? "" : "none";
+    var g = Q('[data-mq="girar"]');
+    g.style.background = vuelta ? "var(--superficie)" : ""; g.style.color = vuelta ? "var(--pino)" : ""; g.style.border = vuelta ? "1px solid var(--borde)" : "";
+    g.title = vuelta ? "Volver al frente" : "Darla vuelta: costo y proveedores";
+    var der = Q('[data-mq="compartir"], [data-mq="foto"]');
+    der.setAttribute("data-mq", vuelta ? "foto" : "compartir");
+    der.title = vuelta ? "Cambiar la foto" : "Compartir la etiqueta";
+    M.icono(der, vuelta ? "camera" : "share-2");
+    Q(".ayuda").textContent = vuelta ? "Al bloquear la pantalla, vuelve sola al frente" : (deck.length > 1 ? "Deslizá: los otros " + (deck.length - 1) + " · Dos toques: darla vuelta" : "Dos toques: darla vuelta");
+    M.vibrar(10);
+    alReloj();
+  }
+  function pasar(dir, dx) {
+    var n = idx + dir;
+    dx = dx || 0;
+    if (vuelta || n < 0 || n >= deck.length) {
+      M.animar(frente, [{ transform: "translateX(" + dx + "px) rotate(" + dx / 20 + "deg)" }, { transform: "none" }], 240, M.REBOTE);
+      frente.style.transform = "";
+      return;
+    }
+    var a = M.animar(frente, [{ transform: "translateX(" + dx + "px) rotate(" + dx / 20 + "deg)", opacity: 1 }, { transform: "translateX(" + (-dir * 440) + "px) rotate(" + (-dir * 14) + "deg)", opacity: 0 }], 220, M.SALIDA);
+    frente.style.transform = "";
+    M.despues(a, function () {
+      idx = n; pintarFrente();
+      M.animar(frente, [{ transform: "translateY(-10px) scale(.94)", opacity: .5 }, { transform: "none", opacity: 1 }], 240);
+      M.fundir(Q(".puntos"), 200);
+    });
+  }
+  function irA(nuevoDeck, i, texto) {
+    deck = nuevoDeck; idx = i; consulta = texto;
+    Q(".busq").childNodes.forEach(function (n) { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = texto || "todo"; });
+    if (vuelta) girar();
+    pintarFrente();
+    M.animar(frente, [{ transform: "scale(.94)", opacity: .5 }, { transform: "none", opacity: 1 }], 240);
+  }
+  function buscar() {
+    var c = M.abrir('<div class="campo foco" style="margin-bottom:12px"><i class="i" data-i="search"></i><input class="mq-input" value="' + consulta + '" placeholder="Producto, código o marca" autofocus></div><div class="mq-tarjetas" data-mq="res"></div>', { tipo: "hoja" });
+    var inp = c.el.querySelector("input"), res = c.el.querySelector('[data-mq="res"]');
+    function lista() {
+      var q = inp.value.trim().toLowerCase(), r = M.P.filter(function (x) { return M.coincide(x, q); }).slice(0, 7);
+      res.innerHTML = r.length ? r.map(function (x) { var pr = M.precioDe(x); return '<button data-id="' + x.id + '" style="grid-template-columns:44px minmax(0,1fr) auto"><span class="foto" style="width:44px;height:44px"><img src="' + M.fotoDe(x) + '" alt=""></span><span><b>' + x.nom + "</b><small>" + x.marca + " · " + (x.stock ? "hay " + M.stockTxt(x) : "no hay") + '</small></span><b style="font-size:16px">' + (pr ? "$" + M.miles(pr) : "—") + "</b></button>"; }).join("") : '<div class="mq-vacio">No hay productos con «' + q + "».</div>";
+      res.mqLista = r;
+    }
+    inp.addEventListener("input", lista); lista();
+    res.addEventListener("click", function (e) { var b = e.target.closest("[data-id]"); if (!b) return; var r = res.mqLista; c.cerrar(); irA(r, r.indexOf(M.porId(b.getAttribute("data-id"))), inp.value.trim().toLowerCase()); });
+  }
+  function compartir() {
+    var q = p(), pr = M.precioDe(q);
+    var c = M.abrir('<div class="mq-cab"><span class="t-seccion">Compartir la etiqueta</span><button class="btn btn-icono chico btn-suave" data-cerrar title="Cerrar"><i class="i i-s" data-i="x"></i></button></div>' +
+      '<div class="t-detalle" style="margin-bottom:12px">Una imagen con la foto, el nombre y ' + (pr ? "$" + M.miles(pr) : "el precio") + '. Sin el costo.</div><div class="mq-tarjetas">' +
+      [["message-circle", "WhatsApp", "Al cliente que preguntó"], ["copy", "Copiar la imagen", "Para pegarla donde quieras"], ["send", "Otra app", "Mail, Telegram…"]].map(function (o) { return '<button data-cerrar data-mq="enviar"><span class="ico"><i class="i" data-i="' + o[0] + '"></i></span><span><b>' + o[1] + "</b><small>" + o[2] + '</small></span><i class="i flecha" data-i="chevron-right"></i></button>'; }).join("") + "</div>", { tipo: "hoja" });
+    c.el.addEventListener("click", function (e) { if (e.target.closest('[data-mq="enviar"]')) M.tostada("Etiqueta lista para mandar: <b>" + q.corto + "</b>", { icono: "share-2", abajo: 120 }); });
+  }
+  function margen(m) { var a = M.precioDe(p()); p().margen = m; pintarDorso(true, a); pintarFrente(); }
+
+  // Arma el dorso detrás de la carta
+  dorso = d.createElement("article");
+  dorso.className = "carta dorso";
+  dorso.style.transform = "rotateY(180deg)";
+  dorso.style.pointerEvents = "none";
+  dorso.style.display = "none";
+  frente.after(dorso);
+  pintarDorso();
+  M.tostadaAbajo = 120;
+
+  // Deslizar con el dedo (o el mouse)
+  var x0 = null, dx = 0, t0 = 0, ultimoToque = 0;
+  frente.addEventListener("pointerdown", function (e) { if (vuelta) return; x0 = e.clientX; dx = 0; t0 = Date.now(); try { frente.setPointerCapture(e.pointerId); } catch (er) { /* sin captura */ } });
+  frente.addEventListener("pointermove", function (e) {
+    if (x0 === null) return;
+    dx = e.clientX - x0;
+    if (Math.abs(dx) > 4 && !M.reducir) frente.style.transform = "translateX(" + dx + "px) rotate(" + dx / 20 + "deg)";
+  });
+  function soltar() {
+    if (x0 === null) return;
+    x0 = null;
+    if (Math.abs(dx) > 80) { pasar(dx < 0 ? 1 : -1, dx); }
+    else if (Math.abs(dx) > 4) { pasar(0, dx); }
+    else {
+      var ahora = Date.now();
+      if (ahora - ultimoToque < 320) { ultimoToque = 0; girar(); } else ultimoToque = ahora;
+    }
+    dx = 0;
+  }
+  frente.addEventListener("pointerup", soltar);
+  frente.addEventListener("pointercancel", soltar);
+  dorso.addEventListener("dblclick", function () { girar(); });
+
+  d.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".mq-panel, .mq-fondo, .mq-tostadas")) return;
+    if (vuelta) alReloj();
+    var sg = t.closest("[data-margen]");
+    if (sg) { var v = sg.getAttribute("data-margen"); if (v === "otro") M.pedirMargen(p(), margen); else margen(+v); return; }
+    var us = t.closest("[data-usar]");
+    if (us) { var a = M.precioDe(p()); p().uso = us.getAttribute("data-usar"); pintarDorso(true, a); pintarFrente(); M.tostada("Ahora el costo sale de <b>" + M.PROV[p().uso] + "</b>", { abajo: 120 }); return; }
+    var q = t.closest("[data-mq]");
+    if (!q) return;
+    switch (q.getAttribute("data-mq")) {
+      case "girar": girar(); break;
+      case "anterior": pasar(-1); break;
+      case "siguiente": pasar(1); break;
+      case "buscar": buscar(); break;
+      case "escanear": M.camara({ modo: "codigo", p: deck[Math.min(2, deck.length - 1)], alLeer: function (r) { irA(deck, deck.indexOf(r), consulta); M.tostada("Leído: <b>" + r.corto + "</b>", { icono: "scan-barcode" }); } }); break;
+      case "agregar": M.apretar(q); M.agregar(p()); break;
+      case "compartir": compartir(); break;
+      case "foto": M.cambiarFoto(p(), function () { M.brillar(dorso.querySelector(".mini")); }); break;
+      case "historial": M.historial(p()); break;
+      case "descargar": M.descargar(M.ARCHIVO[p().uso]); break;
+      case "copiar": M.copiar(q, p()); break;
+    }
+  });
+  d.addEventListener("keydown", function (e) {
+    if (M.hayCapa() || M.escribiendo(e)) return;
+    if (e.key === "ArrowRight") pasar(1); else if (e.key === "ArrowLeft") pasar(-1); else if (e.key === " " || e.key === "Enter") { e.preventDefault(); girar(); }
+  });
+  d.addEventListener("visibilitychange", function () { if (d.hidden && vuelta) girar(); });
+})();
+</script>
+</body>
+</html>

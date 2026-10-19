@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productos · celular</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<style>
+  body { width: 390px; }
+  .busca { display: flex; gap: 8px; }
+  .busca .campo { flex: 1; min-width: 0; height: 48px; padding: 0 12px; }
+  .busca .btn { height: 48px; width: 48px; padding: 0; }
+  .avisos { display: flex; gap: 8px; margin: 10px 0; }
+  .avisos .pastilla { height: 32px; }
+  .prod { display: grid; grid-template-columns: 64px minmax(0,1fr) auto; gap: 12px; padding: 10px 12px 10px 10px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); align-items: center; }
+  .prod + .prod { margin-top: 8px; }
+  .prod .foto { width: 64px; height: 64px; }
+  .prod .st { font-size: 14px; font-weight: 700; line-height: 18px; }
+  .prod .st.hay { color: var(--logro-texto); } .prod .st.no { color: var(--error-texto); }
+  .prod .n { font-weight: 750; font-size: 15px; line-height: 20px; text-transform: uppercase; }
+  .prod .d { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+  .prod .der { display: grid; justify-items: end; gap: 6px; }
+  .prod .pr { font-weight: 800; font-size: 18px; line-height: 22px; text-align: right; }
+  .prod .pr small { display: block; font-size: 14px; color: var(--logro-texto); font-weight: 650; }
+  .prod .pr.sin { color: var(--urgente-texto); font-size: 15px; }
+  .agregar { height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--borde-fuerte); background: var(--superficie); display: inline-flex; gap: 6px; align-items: center; font-weight: 700; font-size: 14px; }
+  .agregar.ok { background: var(--logro-suave); border-color: transparent; color: var(--logro-texto); }
+  .tostada { position: absolute; left: 16px; right: 16px; bottom: 88px; justify-content: space-between; }
+  .tostada b { font-weight: 800; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span><span class="btn-vinculo" data-mq="espejo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a class="activa" data-ir="productos">Productos</a><a data-ir="listas">Listas</a><a data-ir="duplicados">Duplicados</a></nav>
+  <div class="celu-pantalla">
+    <div class="busca">
+      <div class="campo"><i class="i" data-i="search"></i><span style="white-space:nowrap">Producto, código o marca</span></div>
+      <button class="btn" title="Filtros" data-mq="filtros"><i class="i" data-i="sliders-horizontal"></i></button>
+      <button class="btn btn-oscuro" title="Escanear" data-mq="escanear"><i class="i" data-i="scan-barcode"></i></button>
+    </div>
+    <div class="avisos"><span class="pastilla urgente" data-filtro="sinprecio"><i class="i i-s" data-i="triangle-alert"></i>28 sin precio</span><span class="pastilla accion" data-filtro="remarcar"><i class="i i-s" data-i="trending-up"></i>46 para remarcar</span></div>
+    <div class="prod" data-id="cinta">
+      <div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div>
+      <div style="min-width:0"><div class="st hay">6 un. en stock</div><div class="n">Cinta métrica PowerLock 5 m</div><div class="d">Stanley · 33-158</div></div>
+      <div class="der"><div class="pr"><span class="peso">$</span>17.000<small>50 %</small></div><button class="agregar"><i class="i i-s" data-i="shopping-cart"></i>Agregar</button></div>
+    </div>
+    <div class="prod" data-id="mecha">
+      <div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+      <div style="min-width:0"><div class="st hay">14 un. en stock</div><div class="n">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · ME080</div></div>
+      <div class="der"><div class="pr"><span class="peso">$</span>7.000<small>100 %</small></div><button class="agregar ok"><i class="i i-s" data-i="check"></i>Lleva 2</button></div>
+    </div>
+    <div class="prod" data-id="tarugos">
+      <div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+      <div style="min-width:0"><div class="st hay">3 un. en stock</div><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · S8T</div></div>
+      <div class="der"><div class="pr sin">Sin precio</div><button class="agregar"><i class="i i-s" data-i="shopping-cart"></i>Agregar</button></div>
+    </div>
+    <div class="prod" data-id="puntas">
+      <div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div>
+      <div style="min-width:0"><div class="st no">Sin stock</div><div class="n">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Bremen · PH2-10</div></div>
+      <div class="der"><div class="pr"><span class="peso">$</span>5.000<small>100 %</small></div><button class="agregar"><i class="i i-s" data-i="shopping-cart"></i>Agregar</button></div>
+    </div>
+    <div class="prod" data-id="martillo">
+      <div class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></div>
+      <div style="min-width:0"><div class="st hay">2 un. en stock</div><div class="n">Martillo carpintero 27 mm</div><div class="d">Bahco · MC27</div></div>
+      <div class="der"><div class="pr"><span class="peso">$</span>24.000<small>25 %</small></div><button class="agregar"><i class="i i-s" data-i="shopping-cart"></i>Agregar</button></div>
+    </div>
+  </div>
+  <div class="tostada" data-tostada-quieta><span style="display:inline-flex;gap:10px;align-items:center"><i class="i" data-i="circle-check"></i>Agregado: <b>Mecha HSS 8 mm</b></span><span style="color:#9FE3BF" data-mq="deshacer-quieta">Deshacer</span></div>
+  <nav class="nav-inferior">
+    <a data-ir="vender" data-venta-destino><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia" data-venta-insignia>3</span></a>
+    <a class="activo" data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-no-ir data-mq="mas"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>
+/* Celu 1 · la lista: tocar un producto abre su ficha (index.html), «Agregar» pasa a «Lleva 1». */
+(function () {
+  var M = window.Maq, d = document, pantalla = d.querySelector(".celu-pantalla");
+  var BASE = ["cinta", "mecha", "tarugos", "puntas", "martillo"], filtro = null, busq = "";
+  if (!Object.keys(M.venta.lleva).length && M.venta.renglones === 3) M.venta.lleva = { mecha: 2 };
+  M.tostadaAbajo = 88;
+  var quieta = d.querySelector("[data-tostada-quieta]");
+  function sacarQuieta() { if (quieta) { var q = quieta; quieta = null; M.despues(M.animar(q, [{ opacity: 1 }, { opacity: 0 }], 160), function () { q.remove(); }); } }
+
+  function boton(p) {
+    var n = M.venta.lleva[p.id];
+    return n ? '<button class="agregar ok"><i class="i i-s" data-i="check"></i>Lleva ' + n + "</button>" : '<button class="agregar"><i class="i i-s" data-i="shopping-cart"></i>Agregar</button>';
+  }
+  function prodHTML(p) {
+    var pr = M.precioDe(p);
+    return '<div class="prod" data-id="' + p.id + '"><div class="foto"><img src="' + M.fotoDe(p) + '" alt=""></div><div style="min-width:0"><div class="st ' + (p.stock ? "hay" : "no") + '">' + (p.stock ? M.stockTxt(p) + " en stock" : "Sin stock") + '</div><div class="n">' + p.nom + '</div><div class="d">' + p.marca + " · " + p.cod + "</div></div>" +
+      '<div class="der">' + (pr ? '<div class="pr"><span class="peso">$</span>' + M.miles(pr) + "<small>" + p.margen + " %</small></div>" : '<div class="pr sin">Sin precio</div>') + boton(p) + "</div></div>";
+  }
+  function pasa(p) {
+    if (filtro === "sinprecio") return p.margen == null;
+    if (filtro === "remarcar") return M.paraRemarcar(p);
+    if (filtro === "constock") return p.stock > 0;
+    if (filtro) return p.marca === filtro;
+    return true;
+  }
+  function pintar() {
+    pantalla.querySelectorAll(".prod, .mq-vacio").forEach(function (x) { x.remove(); });
+    var lista = (filtro || busq ? M.P.map(function (p) { return p.id; }) : BASE).map(M.porId).filter(function (p) { return pasa(p) && M.coincide(p, busq); }).slice(0, 5);
+    pantalla.insertAdjacentHTML("beforeend", lista.length ? lista.map(prodHTML).join("") : '<div class="mq-vacio">No hay productos con «' + busq + "».</div>");
+    M.iconos(pantalla);
+    pantalla.querySelectorAll(".prod").forEach(function (x, i) { M.animar(x, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 180 + i * 30); });
+    d.querySelectorAll("[data-filtro]").forEach(function (el) { el.style.boxShadow = el.getAttribute("data-filtro") === filtro ? "0 0 0 2px var(--pino)" : ""; });
+  }
+  function repintarBoton(p) {
+    var pr = pantalla.querySelector('.prod[data-id="' + p.id + '"]');
+    if (!pr) return;
+    var b = pr.querySelector(".agregar");
+    b.outerHTML = boton(p);
+    M.iconos(pr);
+    M.rebotar(pr.querySelector(".agregar"));
+  }
+  function abrirFicha(id) {
+    var el = pantalla.querySelector('.prod[data-id="' + id + '"]');
+    M.apretar(el);
+    setTimeout(function () { location.href = "index.html#" + id; }, M.reducir ? 0 : 120);
+  }
+  function filtros() {
+    var ops = [["constock", "Con stock"], ["sinprecio", "Sin precio"], ["remarcar", "Para remarcar"], ["Stanley", "Stanley"], ["Bahco", "Bahco"], ["Bremen", "Bremen"]], elegido = filtro;
+    var c = M.abrir('<div class="mq-cab"><span class="t-seccion">Filtros</span><button class="btn btn-icono chico btn-suave" data-cerrar title="Cerrar"><i class="i i-s" data-i="x"></i></button></div><div class="t-etiqueta" style="margin-bottom:8px">Mostrar</div><div class="chips">' +
+      ops.slice(0, 3).map(function (o) { return '<button class="chip' + (filtro === o[0] ? " elegido" : "") + '" data-f="' + o[0] + '">' + o[1] + "</button>"; }).join("") + '</div><div class="t-etiqueta" style="margin:14px 0 8px">Marca</div><div class="chips">' +
+      ops.slice(3).map(function (o) { return '<button class="chip' + (filtro === o[0] ? " elegido" : "") + '" data-f="' + o[0] + '">' + o[1] + "</button>"; }).join("") + "</div>" +
+      '<div class="mq-pie"><button class="btn grande" data-mq="quitar">Quitar</button><button class="btn btn-accion grande" data-mq="aplicar">Aplicar</button></div>', { tipo: "hoja" });
+    c.el.addEventListener("click", function (e) {
+      var ch = e.target.closest("[data-f]");
+      if (ch) { var f = ch.getAttribute("data-f"); elegido = elegido === f ? null : f; c.el.querySelectorAll("[data-f]").forEach(function (x) { x.classList.toggle("elegido", x.getAttribute("data-f") === elegido); }); return; }
+      var b = e.target.closest("[data-mq]");
+      if (!b) return;
+      filtro = b.getAttribute("data-mq") === "aplicar" ? elegido : null;
+      c.cerrar(); pintar();
+    });
+  }
+  // Lo que se agregó en la ficha se ve al volver (la maqueta quieta trae «Lleva 2» en la mecha)
+  pantalla.querySelectorAll(".prod").forEach(function (el) {
+    var p = M.porId(el.getAttribute("data-id")), n = M.venta.lleva[p.id] || 0, b = el.querySelector(".agregar");
+    if ((p.id === "mecha" ? 2 : 0) !== n) { b.outerHTML = boton(p); M.iconos(el); }
+  });
+  M.buscador(d.querySelector(".busca .campo"), function (q) { busq = q; pintar(); });
+  d.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".mq-panel, .mq-fondo")) return;
+    var ag = t.closest(".prod .agregar");
+    if (ag) {
+      var p = M.porId(ag.closest(".prod").getAttribute("data-id"));
+      sacarQuieta();
+      M.agregar(p, { desde: ag.closest(".prod").querySelector("img"), alDeshacer: function () { repintarBoton(p); } });
+      repintarBoton(p);
+      return;
+    }
+    var pr = t.closest(".prod");
+    if (pr) { abrirFicha(pr.getAttribute("data-id")); return; }
+    var fl = t.closest("[data-filtro]");
+    if (fl) { var f = fl.getAttribute("data-filtro"); filtro = filtro === f ? null : f; pintar(); return; }
+    var q = t.closest("[data-mq]");
+    if (!q) return;
+    switch (q.getAttribute("data-mq")) {
+      case "mas": M.menuMas(q); break;
+      case "espejo": M.espejo(q); break;
+      case "filtros": filtros(); break;
+      case "escanear": M.camara({ modo: "codigo", p: M.porId("llave"), alLeer: function (p) { location.href = "index.html#" + p.id; } }); break;
+      case "deshacer-quieta": M.quitar(M.porId("mecha")); repintarBoton(M.porId("mecha")); sacarQuieta(); break;
+    }
+  });
+  if (location.hash === "#volver") M.animar(pantalla, [{ opacity: 0, transform: "translateX(-24px)" }, { opacity: 1, transform: "none" }], 320);
+})();
+</script>
+</body>
+</html>

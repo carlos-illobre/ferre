@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventas de hoy · La venta en una hoja (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../ventas.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { position: relative; }
+  .mini { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  .mini .t-numero { font-size: 28px; line-height: 32px; }
+  .mini .der { margin-left: auto; display: grid; justify-items: end; gap: 6px; }
+  .barra-medios { display: flex; height: 8px; width: 120px; border-radius: 99px; overflow: hidden; gap: 2px; }
+  .barra-medios b { background: var(--c); }
+  .vr { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; }
+  .q { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .d { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vr .v { font-weight: 800; font-size: 16px; }
+  .lista { margin-top: 12px; display: grid; gap: 8px; }
+  /* renglón deslizado: debajo, Cambio y Anular */
+  .desliz { position: relative; border-radius: var(--r-tarjeta); overflow: hidden; background: var(--error); }
+  .desliz .debajo { position: absolute; inset: 0; display: flex; justify-content: flex-end; }
+  .desliz .debajo span { width: 80px; display: grid; place-items: center; align-content: center; gap: 2px; color: #fff; font-size: 14px; font-weight: 750; }
+  .desliz .debajo .cam { background: var(--pino); }
+  .desliz .vr { transform: translateX(-160px); border-radius: var(--r-tarjeta) 0 0 var(--r-tarjeta); }
+
+  .velo { position: absolute; inset: 0; background: rgba(26,29,27,.30); z-index: 4; }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; top: 306px; z-index: 5; background: var(--superficie); border-radius: var(--r-hoja) var(--r-hoja) 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 0; display: flex; flex-direction: column; }
+  .agarre { width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 10px; }
+  .hcab { display: flex; align-items: center; gap: 12px; }
+  .hcab .t { font-size: 18px; font-weight: 800; line-height: 22px; }
+  .hcab .btn { margin-left: auto; }
+  .hoja .segmentos { display: flex; margin-top: 12px; }
+  .hoja .segmentos > * { flex: 1; justify-content: center; min-height: 40px; }
+  .rh { display: grid; grid-template-columns: 48px minmax(0,1fr) auto; gap: 4px 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--borde); }
+  .rh .foto { width: 48px; height: 48px; grid-row: span 2; }
+  .rh .st { text-align: right; font-weight: 800; }
+  .rh .ed { grid-column: 2 / 4; display: flex; align-items: center; gap: 8px; }
+  .cantidad { height: 36px; }
+  .cantidad button { width: 36px; }
+  .cantidad .n { min-width: 40px; }
+  .cantidad.tocada { border: 1.5px solid var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10); }
+  .precio { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--borde-fuerte); font-weight: 750; font-size: 15px; }
+  .precio.tocada { border: 1.5px solid var(--pino); }
+  .resumen-h { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 0; }
+  .resumen-h .t-numero { font-size: 28px; }
+  .hoja .barra-accion { margin: auto -16px 0; padding-bottom: 28px; }
+  .rh:last-of-type { border-bottom: 0; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>17:41</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Vender</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <nav class="celu-pestanas"><a>Vender</a><a class="activa">Ventas de hoy</a></nav>
+  <div class="celu-pantalla">
+    <div class="tarjeta mini">
+      <div><div class="t-etiqueta">Hoy, hasta 17:40</div><div class="t-numero num"><span class="peso">$</span>412.000</div></div>
+      <div class="der"><span class="sube"><i class="i" data-i="arrow-up-right"></i>13 %</span><div class="barra-medios"><b class="medio efectivo" style="flex:148"></b><b class="medio mp" style="flex:171"></b><b class="medio tarjeta" style="flex:38"></b><b class="medio cuenta" style="flex:55"></b></div></div>
+    </div>
+    <div class="lista">
+      <div class="desliz"><div class="debajo"><span class="cam"><i class="i" data-i="arrow-left-right"></i>Cambio</span><span><i class="i" data-i="ban"></i>Anular</span></div>
+        <div class="tarjeta vr"><span class="mico medio efectivo"><i class="i i-s" data-i="banknote"></i></span><div style="min-width:0"><div class="q">2 productos</div><div class="d">17:22 · Efectivo</div></div><span class="v num">$21.000</span></div></div>
+      <div class="tarjeta vr"><span class="mico medio efectivo"><i class="i i-s" data-i="banknote"></i></span><div style="min-width:0"><div class="q">Cambio de pinza</div><div class="d">17:05 · Efectivo</div></div><span class="v num">+$4.000</span></div>
+      <div class="tarjeta vr"><span class="mico medio mp"><i class="i i-s" data-i="qr-code"></i></span><div style="min-width:0"><div class="q">1 × Juego de llaves combinadas</div><div class="d">17:36 · Mercado Pago</div></div><span class="v num">$78.000</span></div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a class="activo"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+
+  <div class="velo"></div>
+  <div class="hoja">
+    <div class="agarre"></div>
+    <div class="hcab">
+      <span class="mico medio cuenta"><i class="i" data-i="notebook-pen"></i></span>
+      <div style="min-width:0"><div class="t">Constructora Martínez</div><div class="d">16:48 · Cuenta corriente · Mariela</div></div>
+      <button class="btn btn-icono chico btn-suave"><i class="i" data-i="x"></i></button>
+    </div>
+    <div class="segmentos">
+      <button class="elegido"><i class="i i-s" data-i="square-pen"></i>Corregir</button>
+      <button><i class="i i-s" data-i="arrow-left-right"></i>Cambio</button>
+      <button style="color:var(--error-texto)"><i class="i i-s" data-i="ban"></i>Anular</button>
+    </div>
+    <div class="rh">
+      <span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span>
+      <div class="q" style="min-width:0">Látex interior mate blanco 4 L</div><span class="st num">$22.000</span>
+      <div class="ed"><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1<span class="u">un.</span></span><button><i class="i i-s" data-i="plus"></i></button></span><span class="precio">$22.000</span></div>
+    </div>
+    <div class="rh">
+      <span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span>
+      <div class="q" style="min-width:0">Clavos punta París 2"</div><span class="st num"><span class="viejo" style="font-size:14px">$8.000</span> $12.000</span>
+      <div class="ed"><span class="cantidad tocada"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1,5<span class="u">kg</span></span><button><i class="i i-s" data-i="plus"></i></button></span><span class="viejo" style="font-size:14px">1 kg</span><span class="precio" style="margin-left:auto">$8.000</span></div>
+    </div>
+    <div class="rh">
+      <span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span>
+      <div class="q" style="min-width:0">Tarugos nylon S8 con tope × 100</div><span class="st num"><span class="viejo" style="font-size:14px">$8.000</span> $7.000</span>
+      <div class="ed"><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1<span class="u">un.</span></span><button><i class="i i-s" data-i="plus"></i></button></span><span class="viejo" style="font-size:14px;margin-left:auto">$8.000</span><span class="precio tocada">$7.000 <i class="i i-s" data-i="pencil"></i></span></div>
+    </div>
+    <div class="aviso pino" style="margin-top:12px"><i class="i i-s" data-i="history" style="margin-top:2px"></i><span>Debe $3.000 más · lo de antes queda guardado</span></div>
+    <div class="barra-accion"><button class="btn btn-accion grande" style="width:100%;justify-content:space-between"><span><i class="i" data-i="check"></i> Guardar · queda $41.000</span><span class="pastilla" style="background:rgba(255,255,255,.2);color:#fff">+$3.000</span></button></div>
+  </div>
+  <span class="home-ind" style="z-index:6"></span>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Celular 2 · La venta en una hoja: quieta, la hoja de Constructora Martínez está abierta
+   corrigiéndose. Se baja con el agarre, la ×, tocando afuera o Esc. Tocar una venta la sube;
+   deslizarla a la izquierda muestra Cambio y Anular; pasado el 60 %, Anular pide confirmar. */
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  VH.marco();
+
+  VH.ligar($('.mini .t-numero'), function (d) { return VH.plata(d.total); });
+  var claves = ['efectivo', 'mp', 'tarjeta', 'cuenta'], pintarDia = VH.pintar;
+  VH.pintar = function () { pintarDia(); $$('.mini .barra-medios b').forEach(function (b, i) { b.style.flex = String(VH.dia.medios[claves[i]] / 1000); }); };
+
+  // La lista: las tres que se ven y el resto, que queda debajo de la hoja
+  var lista = $('.lista');
+  var vrs = $$('.vr', lista);
+  vrs[0].dataset.id = '1722'; vrs[1].dataset.id = '1705'; vrs[2].dataset.id = '1736';
+  function vrHTML(v) {
+    var an = v.estado === 'anulada', t = an ? ' style="text-decoration:line-through;color:var(--texto-3)"' : '';
+    var q = v.tipo === 'cambio' ? 'Cambio de ' + v.vuelve.nom.split(' ')[0].toLowerCase() : v.cliente || VH.titulo(v);
+    var d = v.hora + ' · ' + (an ? 'anulada' : v.estado === 'corregida' ? 'corregida · ' + v.nota : VH.MEDIOS[v.medio].nom);
+    return '<div class="tarjeta vr' + (an ? ' anulada' : '') + '" data-id="' + v.id + '">' + VH.mico(v.medio).replace('<i class="i"', '<i class="i i-s"') + '<div style="min-width:0"><div class="q"' + t + '>' + q + '</div><div class="d">' + d + '</div></div><span class="v num"' + t + '>' +
+      (v.tipo === 'cambio' && VH.total(v) > 0 ? '+' : '') + VH.plata(VH.total(v)) + '</span></div>';
+  }
+  ['1648', '1630', '1615', '1251', '1230'].forEach(function (id) { lista.insertAdjacentHTML('beforeend', vrHTML(VH.buscar(id))); });
+  VH.iconos(lista);
+  function repintar(v, efecto) {
+    var f = $('.vr[data-id="' + v.id + '"]', lista);
+    var nuevo = document.createElement('div'); nuevo.innerHTML = vrHTML(v); nuevo = nuevo.firstChild;
+    var caja = f.parentNode.classList.contains('desliz') ? f.parentNode : f;
+    caja.replaceWith(nuevo); VH.iconos(lista);
+    nuevo = $('.vr[data-id="' + v.id + '"]', lista);
+    if (efecto === 'late') nuevo.classList.add('vh-late');
+    if (efecto === 'tacha') { nuevo.classList.add('vh-tachando'); setTimeout(function () { nuevo.classList.remove('vh-tachando'); }, 800); }
+  }
+  var ganchos = {
+    guardado: function (v) { repintar(v, 'late'); },
+    anulada: function (v) { repintar(v, 'tacha'); },
+    cambioHecho: function (c) {
+      lista.insertAdjacentHTML('afterbegin', vrHTML(c)); VH.iconos(lista);
+      var f = $('.vr[data-id="' + c.id + '"]', lista); f.classList.add('vh-entra', 'vh-nuevo');
+    },
+  };
+
+  // La hoja que ya está abierta: la venta de Constructora Martínez, corrigiéndose
+  var hoja = $('.hoja'), velo = $('.velo'), v0 = VH.buscar('1648');
+  VH.empezar(v0); v0.ed[1].cant = 1.5; v0.ed[2].precio = 7000;
+  v0.ed[1].r = { c: true, s: true }; v0.ed[2].r = { p: true, s: true }; v0._ud = 3000;
+  var abierta = VH.hojaVenta(v0, { el: hoja, velo: velo, modo: 'corregir', quieta: true, ganchos: ganchos });
+  function subir(v) { abierta = VH.hojaVenta(v, { el: hoja, velo: velo, capa: abierta.capa, ganchos: ganchos }); }
+
+  // Deslizar una venta
+  var abiertaFila = $('.desliz'), gesto = null;
+  if (abiertaFila) abiertaFila.dataset.abierta = '1';
+  function envolver(f) {
+    if (f.parentNode.classList.contains('desliz')) return f.parentNode;
+    var w = document.createElement('div'); w.className = 'desliz';
+    w.innerHTML = '<div class="debajo"><span class="cam"><i class="i" data-i="arrow-left-right"></i>Cambio</span><span><i class="i" data-i="ban"></i>Anular</span></div>';
+    f.replaceWith(w); w.appendChild(f); VH.iconos(w);
+    return w;
+  }
+  function cerrarFila(w) {
+    if (!w) return;
+    var f = $('.vr', w);
+    f.style.transition = 'transform var(--t) var(--curva)'; f.style.transform = 'translateX(0)';
+    delete w.dataset.abierta;
+    if (abiertaFila === w) abiertaFila = null;
+    setTimeout(function () { if (!w.dataset.abierta && w.parentNode) { f.style.transition = ''; f.style.transform = ''; w.replaceWith(f); } }, 220);
+  }
+  lista.addEventListener('pointerdown', function (e) {
+    var f = e.target.closest('.vr[data-id]');
+    if (!f || e.target.closest('.debajo')) return;
+    gesto = { f: f, x: e.clientX, y: e.clientY, dx: 0, mueve: false, base: f.parentNode.dataset && f.parentNode.dataset.abierta ? -160 : 0 };
+  });
+  lista.addEventListener('pointermove', function (e) {
+    if (!gesto) return;
+    var dx = e.clientX - gesto.x, dy = e.clientY - gesto.y;
+    if (!gesto.mueve) {
+      if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
+      gesto.mueve = true; gesto.w = envolver(gesto.f);
+      if (abiertaFila && abiertaFila !== gesto.w) cerrarFila(abiertaFila);
+      try { lista.setPointerCapture(e.pointerId); } catch (x) { /* nada */ }
+    }
+    var w = gesto.w.offsetWidth, x = Math.min(0, Math.max(-w, gesto.base + dx));
+    gesto.dx = x;
+    gesto.f.style.transition = 'none'; gesto.f.style.transform = 'translateX(' + x + 'px)';
+    var lejos = -x > w * 0.6, an = $('.debajo span:last-child', gesto.w);
+    if (lejos !== !!gesto.lejos) { gesto.lejos = lejos; if (lejos) VH.vibrar(10); }
+    an.style.transition = 'transform var(--t-micro) var(--curva)';
+    an.style.transformOrigin = 'right center';
+    an.style.transform = lejos ? 'scaleX(' + (w / 80) + ')' : '';
+    $('.debajo .cam', gesto.w).style.opacity = lejos ? '0' : '';
+  });
+  function soltar() {
+    if (!gesto) return;
+    var g = gesto; gesto = null;
+    if (!g.mueve) return;
+    g.f.dataset.recien = String(Date.now());
+    var an = $('.debajo span:last-child', g.w); an.style.transform = ''; $('.debajo .cam', g.w).style.opacity = '';
+    if (g.lejos) { cerrarFila(g.w); var v = VH.buscar(g.f.dataset.id); if (v.estado !== 'anulada') VH.confirmarAnular(v, ganchos.anulada); return; }
+    if (g.dx < -60) {
+      g.f.style.transition = 'transform var(--t) var(--curva)'; g.f.style.transform = 'translateX(-160px)';
+      g.w.dataset.abierta = '1'; abiertaFila = g.w;
+    } else cerrarFila(g.w);
+  }
+  lista.addEventListener('pointerup', soltar);
+  lista.addEventListener('pointercancel', soltar);
+  lista.addEventListener('click', function (e) {
+    var b = e.target.closest('.debajo span');
+    if (b) {
+      var w = b.closest('.desliz'), v = VH.buscar($('.vr', w).dataset.id);
+      cerrarFila(w);
+      if (b.classList.contains('cam')) VH.abrirCambio(v.tipo === 'cambio' ? null : v, ganchos.cambioHecho);
+      else if (v.estado !== 'anulada') VH.confirmarAnular(v, ganchos.anulada);
+      return;
+    }
+    var f = e.target.closest('.vr[data-id]');
+    if (!f || Date.now() - Number(f.dataset.recien || 0) < 300) return;
+    if (abiertaFila) { cerrarFila(abiertaFila); return; }
+    subir(VH.buscar(f.dataset.id));
+  });
+  $$('.vr', lista).forEach(function (f) { f.style.touchAction = 'pan-y'; });
+})();
+</script>
+</body>
+</html>

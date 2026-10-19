@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · El plano del local (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .pantalla { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) 372px; gap: 16px; padding-top: 16px; padding-bottom: 20px; }
+  .izq { display: grid; grid-template-rows: minmax(0,1fr) auto; gap: 12px; min-height: 0; }
+  .mapa { padding: 14px 16px 12px; display: grid; grid-template-rows: auto minmax(0,1fr) auto; gap: 8px; min-height: 0; }
+  .mapa-cab { display: flex; align-items: center; gap: 12px; }
+  .mapa-cab .t-seccion { font-size: 18px; }
+  .mapa-cab .chips { margin-left: auto; }
+  .mapa-cab .chip { height: 32px; font-size: 14px; padding: 0 12px; } .mapa-cab .chips { flex-wrap: nowrap; }
+  svg.plano { width: 100%; height: 100%; display: block; }
+  svg text { font-family: var(--letra); }
+  .ley { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; font-weight: 600; color: var(--texto-2); }
+  .ley span { display: inline-flex; align-items: center; gap: 6px; }
+  .ley i.sw { width: 16px; height: 16px; border-radius: 5px; display: inline-block; }
+
+  .semana { padding: 12px 16px; }
+  .semana-cab { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .semana-cab .t-seccion { font-size: 18px; }
+  .semana-cab .t-detalle { margin-left: auto; }
+  .dias { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+  .dia { border-radius: 12px; background: var(--hundido); padding: 8px 10px; display: grid; gap: 2px; }
+  .dia .q { font-size: 14px; font-weight: 700; color: var(--texto-2); display: flex; justify-content: space-between; }
+  .dia .s { font-weight: 750; font-size: 14px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dia .m { font-size: 14px; color: var(--texto-2); white-space: nowrap; }
+  .dia.hoy { background: var(--superficie); border: 2px solid var(--pino); padding: 6px 8px; }
+  .dia.hoy .q { color: var(--pino-texto); }
+
+  .vivo { display: grid; grid-template-rows: auto auto minmax(0,1fr) auto; gap: 12px; padding: 16px; min-height: 0; }
+  .quien { display: flex; align-items: center; gap: 10px; }
+  .quien .pastilla { margin-left: auto; }
+  .anillo-fila { display: flex; align-items: center; gap: 16px; padding: 12px; border-radius: 14px; background: var(--hundido); }
+  .anillo { position: relative; width: 84px; height: 84px; flex: none; }
+  .anillo svg { width: 84px; height: 84px; transform: rotate(-90deg); }
+  .anillo .c { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; line-height: 1.05; }
+  .anillo .c b { font-size: 22px; font-weight: 800; }
+  .anillo .c small { font-size: 14px; color: var(--texto-2); font-weight: 650; }
+  .cifras { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; flex: 1; }
+  .cifras .et { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .cifras .va { font-size: 20px; font-weight: 800; }
+  .feed { min-height: 0; overflow: hidden; -webkit-mask-image: linear-gradient(#000 80%, transparent); }
+  .feed .t { font-size: 14px; color: var(--texto-3); font-weight: 650; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .f { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 6px 10px 6px 6px; border-radius: 12px; background: #fff; border: 1px solid var(--borde); }
+  .f + .f { margin-top: 6px; }
+  .f .n { font-weight: 700; font-size: 14px; line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .f .d { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+  .f .v { text-align: right; line-height: 18px; }
+  .f .v b { font-size: 16px; font-weight: 800; display: block; }
+  .f .v span { font-size: 14px; color: var(--texto-3); }
+  .f.nuevo { border: 2px solid var(--logro); padding: 5px 9px 5px 5px; }
+  .menos { color: var(--urgente-texto); } .mas { color: var(--pino-texto); } .ig { color: var(--logro-texto); }
+  .pie-vivo { display: grid; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" id="mas"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 del depósito</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <div class="sub">9 de 14 sectores con stock cargado</div>
+      <div class="acciones"><button class="btn chico"><i class="i i-s" data-i="plus"></i>Dibujar un sector <span class="kbd">Alt N</span></button></div>
+    </header>
+    <nav class="pestanas"><a data-ir="stock">Stock</a><a data-ir="compras">Compras</a><a class="activa" data-ir="contar">Contar</a></nav>
+    <section class="pantalla">
+      <div class="izq">
+        <div class="tarjeta mapa">
+          <div class="mapa-cab"><span class="t-seccion">El local</span><span class="t-detalle">tocá un sector para contarlo</span>            <div class="chips"><span class="chip elegido">Estado</span><span class="chip">Plan A B C</span><span class="chip">Diferencias</span></div></div>
+          <svg class="plano" viewBox="0 0 660 330" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <pattern id="rayas" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#FFF3D8"/><line x1="0" y1="0" x2="0" y2="8" stroke="#F6D58C" stroke-width="3"/></pattern>
+            </defs>
+            <!-- paredes -->
+            <rect x="6" y="6" width="648" height="318" rx="14" fill="#F8F6F1" stroke="#CEC8BA" stroke-width="3"/>
+            <line x1="250" y1="324" x2="350" y2="324" stroke="#F8F6F1" stroke-width="6"/>
+            <text x="300" y="316" text-anchor="middle" font-size="14" font-weight="650" fill="#6B706B">Puerta</text>
+            <!-- pared de fondo: tornillería (en curso) -->
+            <rect x="22" y="20" width="300" height="56" rx="10" fill="#FDEDE4" stroke="#E8541C" stroke-width="2.5"/>
+            <rect x="22" y="70" width="112" height="6" rx="3" fill="#E8541C"/>
+            <text x="38" y="44" font-size="15" font-weight="800" fill="#1A1D1B">Pared de tornillería</text>
+            <text x="38" y="63" font-size="14" font-weight="650" fill="#B23E0E">Contando ahora · 24 de 64</text>
+            <!-- electricidad: nunca, toca A -->
+            <rect x="336" y="20" width="200" height="56" rx="10" fill="url(#rayas)" stroke="#F0A20F" stroke-width="2"/>
+            <text x="350" y="44" font-size="15" font-weight="800" fill="#1A1D1B">Electricidad</text>
+            <text x="350" y="63" font-size="14" font-weight="650" fill="#845400">Nunca contado</text>
+            <rect x="500" y="30" width="26" height="22" rx="11" fill="#12382F"/><text x="513" y="46" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">A</text>
+            <!-- depósito del fondo -->
+            <rect x="550" y="20" width="90" height="120" rx="10" fill="#fff" stroke="#E6E2D8" stroke-width="1.5"/>
+            <text x="595" y="68" text-anchor="middle" font-size="14" font-weight="750" fill="#1A1D1B">Depósito</text>
+            <text x="595" y="86" text-anchor="middle" font-size="14" font-weight="600" fill="#545955">bolsas, cal</text>
+            <text x="595" y="104" text-anchor="middle" font-size="14" font-weight="600" fill="#11764A">15/09</text>
+            <!-- góndolas centrales -->
+            <rect x="96" y="112" width="190" height="44" rx="10" fill="#fff" stroke="#E6E2D8" stroke-width="1.5"/>
+            <text x="112" y="139" font-size="14" font-weight="750" fill="#1A1D1B">Pinturas</text>
+            <text x="270" y="139" text-anchor="end" font-size="14" font-weight="650" fill="#11764A">02/10</text>
+            <rect x="96" y="166" width="190" height="44" rx="10" fill="#fff" stroke="#E6E2D8" stroke-width="1.5"/>
+            <text x="112" y="193" font-size="14" font-weight="750" fill="#1A1D1B">Adhesivos</text>
+            <text x="270" y="193" text-anchor="end" font-size="14" font-weight="650" fill="#11764A">05/10</text>
+            <rect x="310" y="112" width="200" height="44" rx="10" fill="#FDEDE4" stroke="#E8541C" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <text x="326" y="139" font-size="14" font-weight="750" fill="#1A1D1B">Mechas y puntas</text>
+            <text x="496" y="139" text-anchor="end" font-size="14" font-weight="650" fill="#B23E0E">8 de 46</text>
+            <rect x="310" y="166" width="200" height="44" rx="10" fill="#fff" stroke="#E6E2D8" stroke-width="1.5"/>
+            <text x="326" y="193" font-size="14" font-weight="750" fill="#1A1D1B">Herramientas</text>
+            <text x="496" y="193" text-anchor="end" font-size="14" font-weight="650" fill="#11764A">12/10</text>
+            <!-- pared izquierda -->
+            <rect x="22" y="96" width="56" height="200" rx="10" fill="#fff" stroke="#E6E2D8" stroke-width="1.5"/>
+            <text x="50" y="196" text-anchor="middle" font-size="14" font-weight="750" fill="#1A1D1B" transform="rotate(-90 50 196)">Plomería · 28/09</text>
+            <!-- pared derecha -->
+            <rect x="550" y="152" width="90" height="144" rx="10" fill="url(#rayas)" stroke="#F0A20F" stroke-width="2"/>
+            <text x="595" y="216" text-anchor="middle" font-size="14" font-weight="750" fill="#1A1D1B">Jardín</text>
+            <text x="595" y="234" text-anchor="middle" font-size="14" font-weight="650" fill="#845400">Nunca</text>
+            <!-- mostrador -->
+            <rect x="96" y="236" width="300" height="48" rx="10" fill="#ECE9E1"/>
+            <rect x="110" y="246" width="150" height="28" rx="8" fill="url(#rayas)" stroke="#F0A20F" stroke-width="1.5"/>
+            <text x="185" y="265" text-anchor="middle" font-size="14" font-weight="750" fill="#1A1D1B">Cajones bulones</text>
+            <rect x="244" y="240" width="26" height="22" rx="11" fill="#12382F"/><text x="257" y="256" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">A</text>
+            <text x="330" y="265" text-anchor="middle" font-size="14" font-weight="650" fill="#545955">Mostrador</text>
+            <!-- celular contando -->
+            <g transform="translate(150 84)">
+              <circle r="16" fill="#E8541C" opacity=".16"/><circle r="9" fill="#E8541C" stroke="#fff" stroke-width="3"/>
+            </g>
+            <g transform="translate(166 86)">
+              <rect x="0" y="-2" width="130" height="26" rx="13" fill="#12382F"/>
+              <text x="65" y="16" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Lucas, con el celu</text>
+            </g>
+          </svg>
+          <div class="ley"><span><i class="sw" style="background:#FDEDE4;border:2px solid #E8541C"></i>En curso</span><span><i class="sw" style="background:url(#);background:repeating-linear-gradient(45deg,#FFF3D8 0 4px,#F6D58C 4px 7px);border:1.5px solid #F0A20F"></i>Nunca contado</span><span><i class="sw" style="background:#fff;border:1.5px solid #CEC8BA"></i>Contado (fecha)</span><span><i class="sw" style="background:var(--pino);border-radius:99px"></i>Le toca por el plan</span></div>
+        </div>
+
+        <div class="tarjeta semana">
+          <div class="semana-cab"><i class="i" data-i="calendar-check"></i><span class="t-seccion">Un sector por día</span><span class="t-detalle">Armado con el plan A B C: primero lo que más vale y nunca se contó</span></div>
+          <div class="dias">
+            <div class="dia hoy"><div class="q"><span>Hoy · lunes</span></div><div class="s">Pared de tornillería</div><div class="m">9 A · ~35 min</div></div>
+            <div class="dia"><div class="q"><span>Mar. 20</span></div><div class="s">Electricidad</div><div class="m">9 A · ~25 min</div></div>
+            <div class="dia"><div class="q"><span>Mié. 21</span></div><div class="s">Mechas y puntas</div><div class="m">6 A · ~20 min</div></div>
+            <div class="dia"><div class="q"><span>Jue. 22</span></div><div class="s">Bulones</div><div class="m">3 A · ~60 min</div></div>
+            <div class="dia"><div class="q"><span>Vie. 23</span></div><div class="s">Jardín y riego</div><div class="m">nunca · ~15 min</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tarjeta-2 vivo">
+        <div class="quien"><span class="avatar">LM</span><div><div class="t-renglon">Pared de tornillería</div><div class="t-detalle">Lucas cuenta con el celular</div></div><span class="pastilla logro"><span class="punto"></span>En vivo</span></div>
+        <div class="anillo-fila">
+          <div class="anillo"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#E3DFD5" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#12382F" stroke-width="4" stroke-linecap="round" stroke-dasharray="35.3 94.2"/></svg><div class="c"><div><b class="num">24</b><br><small>de 64</small></div></div></div>
+          <div class="cifras">
+            <div><div class="et">Iguales</div><div class="va ig num">19</div></div>
+            <div><div class="et">Con diferencia</div><div class="va menos num">5</div></div>
+            <div><div class="et">Ritmo</div><div class="va num">22 s<span class="t-detalle"> c/u</span></div></div>
+            <div><div class="et">Termina</div><div class="va num">~11:00</div></div>
+          </div>
+        </div>
+        <div class="feed">
+          <div class="t"><i class="i i-s" data-i="history"></i>Lo último que contó</div>
+          <div class="f nuevo"><div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div style="min-width:0"><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">9 un. · había 9</div></div><div class="v"><b class="ig">=</b><span>recién</span></div></div>
+          <div class="f"><div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div style="min-width:0"><div class="n">Tornillo autoperforante T2 8 × 1/2"</div><div class="d">12 un. · había 14</div></div><div class="v"><b class="menos num">−2</b><span>20 s</span></div></div>
+          <div class="f"><div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div style="min-width:0"><div class="n">Clavos punta París 2" a granel</div><div class="d">7,2 kg · había 6,5</div></div><div class="v"><b class="mas num">+0,7</b><span>45 s</span></div></div>
+          <div class="f"><div class="foto-icono" style="width:40px;height:40px;border-radius:8px"><i class="i" data-i="hash"></i></div><div style="min-width:0"><div class="n">Arandela plana zincada 1/4" × 100</div><div class="d">6 un. · había 6</div></div><div class="v"><b class="ig">=</b><span>1 min</span></div></div>
+          <div class="f"><div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div style="min-width:0"><div class="n">Tornillo fixer 8 mm con tarugo × 50</div><div class="d">0 un. · había 3</div></div><div class="v"><b class="menos num">−3</b><span>2 min</span></div></div>
+        </div>
+        <div class="pie-vivo">
+          <button class="btn btn-accion grande" style="width:100%">Revisar y cerrar el sector <span class="kbd">Alt C</span></button>
+          <div class="t-detalle" style="text-align:center">Lo podés cerrar vos o Lucas, desde donde esté</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<style>
+  .plano .toque { cursor: pointer; }
+  .plano .toque:hover { fill-opacity: .04; }
+  .plano .late { transform-box: fill-box; transform-origin: center; animation: cx-late 1.8s ease-in-out infinite; }
+  @keyframes cx-late { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.45); } }
+  .mapa-cab .chip { cursor: pointer; }
+</style>
+<script src="../../interacciones.js"></script>
+<script>
+/* Contar · compu 2: el plano (filtros, abrir un sector, dibujar uno), lo que cuenta el celular en vivo, cerrar. */
+(function () {
+  var C = window.Contar, $ = function (s, r) { return (r || document).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var svg = $("svg.plano"), NS = "http://www.w3.org/2000/svg";
+  function rectEn(x, y) { return svg.querySelector('rect[x="' + x + '"][y="' + y + '"]'); }
+  // Sectores del dibujo: estado, si le toca por el plan (A) y cuánto se movió en el último conteo.
+  var S = [
+    { id: "tornilleria", n: "Pared de tornillería", x: 22, y: 20, w: 300, h: 56, estado: "curso", a: true, total: 64, dif: "alta" },
+    { id: "electricidad", n: "Pared de electricidad", x: 336, y: 20, w: 200, h: 56, estado: "nunca", a: true, total: 37 },
+    { id: "deposito", n: "Depósito del fondo", x: 550, y: 20, w: 90, h: 120, estado: "contado", fecha: "15/09", total: 22, dif: "baja" },
+    { id: "pinturas", n: "Góndola de pinturas", x: 96, y: 112, w: 190, h: 44, estado: "contado", fecha: "02/10", total: 58, dif: "alta" },
+    { id: "adhesivos", n: "Adhesivos y selladores", x: 96, y: 166, w: 190, h: 44, estado: "contado", fecha: "05/10", total: 29, dif: "baja" },
+    { id: "mechas", n: "Exhibidor de mechas y puntas", x: 310, y: 112, w: 200, h: 44, estado: "curso", a: true, total: 46, contados: 8 },
+    { id: "herramientas", n: "Herramientas manuales", x: 310, y: 166, w: 200, h: 44, estado: "contado", fecha: "12/10", total: 41, dif: "baja" },
+    { id: "plomeria", n: "Pared de plomería", x: 22, y: 96, w: 56, h: 200, estado: "contado", fecha: "28/09", total: 35, dif: "alta" },
+    { id: "jardin", n: "Jardín y riego", x: 550, y: 152, w: 90, h: 144, estado: "nunca", total: 33 },
+    { id: "bulones", n: "Cajones de bulones", x: 110, y: 246, w: 150, h: 28, estado: "nunca", a: true, total: 120 }
+  ];
+  S.forEach(function (s) {
+    s.rect = rectEn(s.x, s.y);
+    s.orig = { fill: s.rect.getAttribute("fill"), stroke: s.rect.getAttribute("stroke"), sw: s.rect.getAttribute("stroke-width"), da: s.rect.getAttribute("stroke-dasharray") };
+    var t = document.createElementNS(NS, "rect");
+    ["x", "y", "width", "height"].forEach(function (k, i) { t.setAttribute(k, [s.x, s.y, s.w, s.h][i]); });
+    t.setAttribute("rx", 10); t.setAttribute("fill", "#12382F"); t.setAttribute("fill-opacity", "0"); t.setAttribute("class", "toque"); t._s = s;
+    svg.appendChild(t);
+  });
+  var torn = S[0], barraT = svg.querySelector('rect[x="22"][y="70"]'), textoT = $$("text", svg).filter(function (t) { return t.textContent.indexOf("Contando ahora") === 0; })[0];
+  svg.querySelector('g[transform="translate(150 84)"] circle').classList.add("late");
+
+  // Filtros del plano: el mismo dibujo responde tres preguntas.
+  var LEY = {
+    "Estado": $(".ley").innerHTML,
+    "Plan A B C": '<span><i class="sw" style="background:var(--pino-suave);border:2px solid var(--pino)"></i>Le toca por el plan (A)</span><span><i class="sw" style="background:#fff;border:1.5px solid #CEC8BA"></i>Puede esperar</span>',
+    "Diferencias": '<span><i class="sw" style="background:#FFF3D8;border:2px solid #F0A20F"></i>El último conteo movió mucho</span><span><i class="sw" style="background:#E2F4EA;border:1.5px solid #1E9E62"></i>Dio casi igual</span><span><i class="sw" style="background:#fff;border:1.5px solid #CEC8BA"></i>Sin conteo para comparar</span>'
+  };
+  function pintarModo(modo) {
+    S.forEach(function (s) {
+      var f = s.orig.fill, st = s.orig.stroke, sw = s.orig.sw, da = s.orig.da;
+      if (modo === "Plan A B C") { f = s.a ? "#E3EEE8" : "#fff"; st = s.a ? "#12382F" : "#E6E2D8"; sw = s.a ? 2.5 : 1.5; da = null; }
+      if (modo === "Diferencias") { f = s.dif === "alta" ? "#FFF3D8" : s.dif === "baja" ? "#E2F4EA" : "#fff"; st = s.dif === "alta" ? "#F0A20F" : s.dif === "baja" ? "#1E9E62" : "#E6E2D8"; sw = s.dif ? 2 : 1.5; da = null; }
+      s.rect.setAttribute("fill", f); s.rect.setAttribute("stroke", st); s.rect.setAttribute("stroke-width", sw);
+      if (da) s.rect.setAttribute("stroke-dasharray", da); else s.rect.removeAttribute("stroke-dasharray");
+    });
+    $(".ley").innerHTML = LEY[modo]; C.mover(svg, [{ opacity: .6 }, { opacity: 1 }], 200);
+  }
+  $(".mapa-cab .chips").addEventListener("click", function (e) {
+    var c = e.target.closest(".chip"); if (!c || c.classList.contains("elegido")) return;
+    $$(".mapa-cab .chip").forEach(function (x) { x.classList.remove("elegido"); }); c.classList.add("elegido");
+    pintarModo(c.textContent.trim());
+  });
+
+  // Tocar un sector: abrir su conteo (o verlo, si ya está en curso).
+  function abrirSector(s) {
+    var info = s.estado === "curso" ? "En curso · " + (s === torn ? cont : s.contados) + " de " + s.total + " contados" : s.estado === "nunca" ? "Nunca contado · " + s.total + " productos" + (s.a ? " · le toca por el plan" : "") : "Contado el " + s.fecha + " · " + s.total + " productos";
+    var d = C.dialogo(C.cabeza(s.n, info) +
+      (s === torn ? '<div class="aviso pino"><i class="i" data-i="smartphone"></i><div>Lucas lo está contando con el celular. Lo ves a la derecha, en vivo.</div></div>' :
+        '<div class="aviso pino"><i class="i" data-i="info"></i><div>Al abrirlo, el celular del depósito lo ofrece primero. Se puede seguir vendiendo.</div></div>') +
+      '<div class="cx-botones"><button class="btn btn-fantasma" data-cerrar>Cancelar</button>' + (s === torn ? '<button class="btn btn-oscuro" data-cerrar>Ver en vivo</button>' :
+        '<button class="btn btn-oscuro" data-abrir>' + (s.estado === "curso" ? "Seguir contando" : s.estado === "nunca" ? "Abrir el conteo" : "Volver a contar") + "</button>") + "</div>");
+    var b = $("[data-abrir]", d);
+    if (b) b.addEventListener("click", function () {
+      C.cerrar(C.capaDe(d));
+      if (s.estado !== "curso") {
+        s.estado = "curso"; s.orig = { fill: "#FDEDE4", stroke: "#E8541C", sw: "1.5", da: "5 4" };
+        var modo = $(".mapa-cab .chip.elegido").textContent.trim(); if (modo === "Estado") pintarModo("Estado");
+        C.mover(s.rect, [{ opacity: .3 }, { opacity: 1 }], 320);
+      }
+      C.tostada(s.n + " abierto · el celular ya lo puede contar", "smartphone");
+    });
+  }
+  svg.addEventListener("click", function (e) { var t = e.target.closest(".toque"); if (t) abrirSector(t._s); });
+  // Los días de la semana abren su sector.
+  var porDia = ["tornilleria", "electricidad", "mechas", "bulones", "jardin"];
+  $$(".dia").forEach(function (d, i) { d.addEventListener("click", function () { abrirSector(S.filter(function (s) { return s.id === porDia[i]; })[0]); }); });
+
+  // Dibujar un sector nuevo: aparece en el lugar libre del plano, sin contar.
+  var libre = { x: 420, y: 236, w: 116, h: 48 };
+  $(".cabecera .acciones .btn").addEventListener("click", dibujar);
+  function dibujar() {
+    var d = C.dialogo(C.cabeza("Dibujar un sector", "Lo ponemos en el lugar libre al lado del mostrador; después lo arrastrás") +
+      '<label class="cx-campo"><span class="t-etiqueta">Nombre</span><input autofocus placeholder="Ej.: Exhibidor de candados"></label>' +
+      '<div class="cx-botones"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-oscuro" data-crear>Dibujarlo</button></div>');
+    function crear() {
+      var nom = ($("input", d).value.trim() || "Exhibidor de candados").replace(/[<&]/g, "");
+      C.cerrar(C.capaDe(d));
+      if (!libre) { C.tostada("No queda lugar libre en el dibujo", "info"); return; }
+      var g = document.createElementNS(NS, "g"), l = libre; libre = null;
+      g.innerHTML = '<rect x="' + l.x + '" y="' + l.y + '" width="' + l.w + '" height="' + l.h + '" rx="10" fill="url(#rayas)" stroke="#F0A20F" stroke-width="2"/>' +
+        '<text x="' + (l.x + 12) + '" y="' + (l.y + 21) + '" font-size="14" font-weight="750" fill="#1A1D1B">' + (nom.length > 13 ? nom.slice(0, 12) + "…" : nom) + "</text>" +
+        '<text x="' + (l.x + 12) + '" y="' + (l.y + 39) + '" font-size="14" font-weight="650" fill="#845400">Nunca</text>';
+      svg.insertBefore(g, svg.querySelector(".toque"));
+      var s = { id: "nuevo", n: nom, x: l.x, y: l.y, w: l.w, h: l.h, estado: "nunca", total: 0, rect: g.firstChild };
+      s.orig = { fill: "url(#rayas)", stroke: "#F0A20F", sw: "2", da: null }; S.push(s);
+      var t = document.createElementNS(NS, "rect"); ["x", "y", "width", "height"].forEach(function (k, i) { t.setAttribute(k, [l.x, l.y, l.w, l.h][i]); });
+      t.setAttribute("rx", 10); t.setAttribute("fill", "#12382F"); t.setAttribute("fill-opacity", "0"); t.setAttribute("class", "toque"); t._s = s; svg.appendChild(t);
+      C.mover(g, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 320, "cubic-bezier(.34,1.4,.64,1)");
+      C.tostada("Sector «" + nom + "» dibujado");
+    }
+    $("[data-crear]", d).addEventListener("click", crear);
+    $("input", d).addEventListener("keydown", function (e) { if (e.key === "Enter") crear(); });
+  }
+
+  // En vivo: cada conteo del celular entra arriba del feed con su borde verde.
+  var cont = 24, iguales = 19, condif = 5, cerrado = false;
+  var cola = [
+    { n: "Tornillo madera fresada 4 × 40 × 100", f: "tornillos", c: 9, h: 9, u: "un." },
+    { n: "Tarugos nylon S6 con tope × 100", f: "tarugos", c: 10, h: 11, u: "un." },
+    { n: "Clavos punta París 2 1/2\" a granel", f: "clavos", c: 4.2, h: 4.2, u: "kg" },
+    { n: "Tuerca hexagonal zincada 1/4\" × 100", f: "", c: 5, h: 5, u: "un." },
+    { n: "Tornillo autoperforante T2 8 × 1\" × 100", f: "tornillos", c: 9, h: 7, u: "un." },
+    { n: "Tornillo drywall punta aguja 6 × 1\" × 100", f: "tornillos", c: 12, h: 12, u: "un." }
+  ];
+  var hechos = [{ n: "Tornillo autoperforante T2 8 × 1/2\" × 100", c: 12, h: 14 }, { n: "Clavos punta París 2\" a granel", c: 7.2, h: 6.5 }, { n: "Tornillo fixer 8 mm con tarugo × 50", c: 0, h: 3 }, { n: "Tornillo T2 8 × 3/4\" × 100", c: 10, h: 11 }, { n: "Tarugos nylon S5 × 100", c: 15, h: 13 }];
+  var feed = $(".feed"), cifras = $$(".cifras .va");
+  $$(".f", feed).forEach(function (f) { f._p = null; });
+  function filaFeed(p) {
+    var d = C.dif(p.c, p.h);
+    return '<div class="f">' + C.foto(p.f, true) + '<div style="min-width:0"><div class="n">' + p.n + '</div><div class="d">' + C.fmt(p.c) + " " + p.u + " · había " + C.fmt(p.h) + '</div></div><div class="v"><b class="' + d.c + ' num">' + d.t + "</b><span>recién</span></div></div>";
+  }
+  function pintarAvance() {
+    $(".anillo svg circle:last-child").setAttribute("stroke-dasharray", (94.2 * cont / 64).toFixed(1) + " 94.2");
+    C.rodar($(".anillo .c b"), String(cont), true);
+    C.rodar(cifras[0], String(iguales), true); C.rodar(cifras[1], String(condif), true);
+    textoT.textContent = "Contando ahora · " + cont + " de 64"; barraT.setAttribute("width", Math.round(300 * cont / 64));
+  }
+  function llega() {
+    if (cerrado || !cola.length || document.hidden) return;
+    var p = cola.shift(), viejos = $$(".f", feed);
+    viejos.forEach(function (f, i) { f.classList.remove("nuevo"); var sp = $(".v span", f); if (sp && sp.textContent === "recién") sp.textContent = "20 s"; });
+    var n = C.el(filaFeed(p)); n._p = p; feed.insertBefore(n, $(".f", feed)); C.pintar(n); n.classList.add("nuevo"); C.nuevo(n);
+    if (viejos.length >= 5) viejos[viejos.length - 1].remove();
+    cont++; if (p.c === p.h) iguales++; else { condif++; hechos.push({ n: p.n, c: p.c, h: p.h }); }
+    pintarAvance();
+  }
+  // Arranca con el primer toque, para que quieta la maqueta se vea como su captura.
+  var reloj = null;
+  function arrancar() { if (reloj || cerrado) return; reloj = setInterval(llega, 4500); setTimeout(llega, 1200); }
+  document.addEventListener("pointerdown", arrancar, { once: true }); document.addEventListener("keydown", arrancar, { once: true });
+  $(".quien .pastilla").setAttribute("data-toca", ""); $(".quien .pastilla").addEventListener("click", llega);
+
+  // Tocar un conteo del feed: corregirlo desde la computadora.
+  feed.addEventListener("click", function (e) {
+    var f = e.target.closest(".f"); if (!f) return;
+    var nombre = $(".n", f).textContent, det = $(".d", f).textContent, m = det.match(/^([\d,]+) (\S+) · había ([\d,]+)/);
+    var d = C.dialogo(C.cabeza("Corregir el conteo", nombre + " · " + det) +
+      '<label class="cx-campo"><span class="t-etiqueta">¿Cuántas hay?</span><input autofocus inputmode="decimal" value="' + (m ? m[1] : "") + '"></label>' +
+      '<div class="cx-botones"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-oscuro" data-ok>Guardar <span class="kbd">Enter</span></button></div>');
+    function ok() {
+      if (!m) { C.cerrar(C.capaDe(d)); return; }
+      var c = parseFloat($("input", d).value.replace(",", ".")); if (isNaN(c)) return;
+      var h = parseFloat(m[3].replace(",", ".")), r = C.dif(c, h);
+      $(".d", f).textContent = C.fmt(c) + " " + m[2] + " · había " + m[3];
+      var b = $(".v b", f); b.className = r.c + " num"; b.textContent = r.t; C.rebotar(b);
+      C.cerrar(C.capaDe(d)); C.tostada("Corregido: " + C.fmt(c) + " " + m[2]);
+    }
+    $("[data-ok]", d).addEventListener("click", ok);
+    $("input", d).addEventListener("keydown", function (e) { if (e.key === "Enter") ok(); });
+  });
+
+  // Revisar y cerrar el sector (la misma hoja que en el celular).
+  function abrirCierre() {
+    if (cerrado) return;
+    var sin = []; for (var i = 0; i < 64 - cont; i++) sin.push({ f: ["tornillos", "tarugos", "clavos"][i % 3] });
+    C.cierre({ sector: "Pared de tornillería", contados: cont, difs: hechos.slice(), sinContar: sin, hora: "10:46", alCerrar: function () {
+      cerrado = true; clearInterval(reloj);
+      torn.estado = "contado"; torn.fecha = "hoy"; torn.orig = { fill: "#fff", stroke: "#E6E2D8", sw: "1.5", da: null };
+      if ($(".mapa-cab .chip.elegido").textContent.trim() === "Estado") pintarModo("Estado");
+      barraT.style.display = "none"; textoT.textContent = "Contado hoy"; textoT.setAttribute("fill", "#11764A");
+      $$('g[transform^="translate(1"]', svg).forEach(function (g) { g.style.display = "none"; });
+      $(".cabecera .sub").textContent = "10 de 14 sectores con stock cargado";
+      var hoy = $(".dia.hoy .m"); hoy.innerHTML = '<span style="color:var(--logro-texto);font-weight:700">Hecho · 10:46</span>';
+      var v = $(".vivo"); v.innerHTML = '<div class="cx-listo" style="grid-row:1/-1;align-self:center"><span class="cx-tilde"><i class="i" data-i="check"></i></span><div class="t-seccion">Pared de tornillería quedó contada</div><div class="t-detalle">Ya ajustamos el stock. Mañana toca Electricidad.</div><button class="btn btn-oscuro" data-abrir-elec style="margin-top:8px">Abrir Electricidad</button></div>';
+      C.pintar(v); $("[data-abrir-elec]", v).addEventListener("click", function () { abrirSector(S[1]); });
+      C.tostada("Pared de tornillería cerrada · stock ajustado");
+    } });
+  }
+  $(".pie-vivo .btn").addEventListener("click", abrirCierre);
+  document.addEventListener("keydown", function (e) {
+    if (C.abierto()) return;
+    if (e.altKey && (e.key === "c" || e.key === "C")) { e.preventDefault(); abrirCierre(); }
+    if (e.altKey && (e.key === "n" || e.key === "N")) { e.preventDefault(); dibujar(); }
+  });
+
+  $("#mas").addEventListener("click", function () { C.menuMas($("#mas")); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productos · la planilla de proveedores y la vista rápida</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../ean.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<style>
+  body { height: 768px; overflow: hidden; }
+  .barra-sup { height: 56px; background: var(--pino); color: #fff; display: flex; align-items: center; gap: 16px; padding: 0 20px; }
+  .barra-sup .logo { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+  .barra-sup b { font-size: 17px; font-weight: 800; }
+  .ir { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px 0 12px; border-radius: 10px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.8); font-size: 14px; font-weight: 600; width: 300px; }
+  .ir .kbd { margin-left: auto; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #fff; }
+  .migas { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; }
+  .migas span { color: rgba(255,255,255,.66); }
+  .barra-sup .der { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 650; }
+  .barra-sup .chip-sup { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 99px; background: rgba(255,255,255,.1); }
+  .barra-sup .chip-sup .punto { width: 8px; height: 8px; border-radius: 99px; background: #5BD69A; }
+  .barra-sup .chip-sup.venta { background: var(--accion); }
+  .avatar-s { width: 32px; height: 32px; border-radius: 99px; background: var(--accion-suave); color: var(--accion-texto); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+
+  .zona { padding: 16px 24px 0; }
+  .cab { display: flex; align-items: center; gap: 12px; }
+  .cab .campo { width: 380px; height: 44px; }
+  .chips .chip { height: 36px; font-size: 14px; padding: 0 14px; }
+  .cab .nota { margin-left: auto; display: flex; gap: 14px; font-size: 14px; color: var(--texto-2); align-items: center; }
+  .cab .nota span { display: inline-flex; align-items: center; gap: 6px; }
+
+  .hoja { margin-top: 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-size: 14px; font-weight: 650; color: var(--texto-2); padding: 10px 8px; border-bottom: 1px solid var(--borde); background: #FCFBF8; white-space: nowrap; }
+  th.cg { text-align: right; }
+  th .grupo { display: block; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--borde); white-space: nowrap; height: 52px; }
+  tr.sel td { background: var(--pino-suave); }
+  tr.sel td:first-child { box-shadow: inset 4px 0 0 var(--pino); }
+  .prod { display: flex; align-items: center; gap: 10px; height: 40px; }
+  .prod .n { font-weight: 700; font-size: 15px; line-height: 19px; max-width: 232px; overflow: hidden; text-overflow: ellipsis; }
+  .prod .d { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .st { font-weight: 700; }
+  .st.hay { color: var(--logro-texto); }
+  .st.no { color: var(--error-texto); }
+  .c { text-align: right; font-weight: 600; color: var(--texto-2); position: relative; }
+  .c.vacio { color: var(--borde-fuerte); }
+  .c.barato { color: var(--logro-texto); font-weight: 800; }
+  .c.uso { color: var(--tinta); font-weight: 800; }
+  .c.uso .v { display: inline-block; padding: 3px 8px; margin-right: -4px; border: 2px solid var(--pino); border-radius: 9px; }
+  .mas-barato { display: block; font-size: 14px; line-height: 16px; font-weight: 700; color: var(--urgente-texto); }
+  .mg { display: inline-flex; gap: 2px; padding: 2px; border-radius: 9px; background: var(--hundido); }
+  .mg span { min-width: 32px; height: 28px; display: grid; place-items: center; border-radius: 7px; font-size: 14px; font-weight: 700; color: var(--texto-3); }
+  .mg span.el { background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-1); }
+  .mg span.vacio-m { color: var(--urgente-texto); background: var(--urgente-suave); }
+  .pr { text-align: right; font-weight: 800; font-size: 17px; }
+  .pr.sin { color: var(--urgente-texto); font-size: 15px; }
+
+  /* Vista rápida (Espacio), flota sobre la planilla */
+  .rapida { position: absolute; right: 24px; top: 132px; width: 400px; z-index: 2; background: var(--superficie); border-radius: 24px; box-shadow: var(--sombra-3), 0 0 0 1px rgba(18,56,47,.06); overflow: hidden; }
+  .rapida .foto-g { height: 188px; background: var(--hundido); display: grid; place-items: center; position: relative; }
+  .rapida .foto-g img { height: 160px; filter: drop-shadow(0 12px 14px rgba(26,29,27,.25)); }
+  .rapida .foto-g .pastilla { position: absolute; left: 16px; top: 16px; }
+  .rapida .foto-g .cerrar { position: absolute; right: 12px; top: 12px; }
+  .rapida .foto-g .cambiar { position: absolute; right: 14px; bottom: 14px; }
+  .rapida .cuerpo { padding: 16px 20px 18px; display: grid; gap: 12px; }
+  .rapida .nom { font-size: 20px; line-height: 25px; font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; }
+  .rapida .precio { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 14px; align-items: end; }
+  .cuentita { font-size: 14px; color: var(--texto-2); line-height: 20px; text-align: right; }
+  .cuentita b { color: var(--tinta); }
+  .cod { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--hundido); }
+  .cod .ean { width: 64px; height: 30px; fill: var(--tinta); }
+  .cod b { font-size: 16px; letter-spacing: .05em; flex: 1; }
+  .rapida .acciones { display: flex; gap: 8px; }
+  .rapida .acciones .btn-accion { flex: 1; }
+  .hint { position: absolute; left: 24px; bottom: 10px; display: flex; gap: 16px; font-size: 14px; color: var(--texto-2); align-items: center; }
+  .hint span { display: inline-flex; gap: 6px; align-items: center; }
+</style>
+</head>
+<body>
+  <div class="barra-sup">
+    <span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b>
+    <div class="migas"><span data-ir="productos">Catálogo</span><i class="i i-s" data-i="chevron-right" style="opacity:.6"></i>Productos</div>
+    <div class="ir" data-mq="ir"><i class="i i-s" data-i="command"></i>Ir a… Vender, Stock, Listas<span class="kbd">Ctrl K</span></div>
+    <div class="der">
+      <span class="chip-sup"><span class="punto"></span>En línea</span>
+      <span class="chip-sup" data-mq="espejo"><i class="i i-s" data-i="smartphone"></i>Celular en espejo</span>
+      <span class="chip-sup venta" data-ir="vender" data-venta-destino><i class="i i-s" data-i="shopping-cart"></i><span data-venta-chip>Venta: 3 · $45.500</span></span>
+      <span class="avatar-s" data-mq="persona">CI</span>
+    </div>
+  </div>
+  <div class="zona">
+    <div class="cab">
+      <div class="campo"><i class="i" data-i="search"></i><span style="white-space:nowrap">Buscar productos, códigos o marcas…</span></div>
+      <div class="chips"><span class="chip elegido" data-chip="todos">Lo que más sale</span><span class="chip" data-chip="constock">Con stock</span><span class="chip" data-chip="barato">Proveedor más barato sin usar <span class="pastilla urgente" style="height:22px;padding:0 8px">37</span></span><span class="chip" data-chip="marca"><i class="i i-s" data-i="sliders-horizontal"></i>Marca</span></div>
+      <div class="nota"><span><span class="kbd">Espacio</span>vista rápida</span></div>
+    </div>
+    <div class="hoja">
+      <table>
+        <thead><tr><th>Producto</th><th>Stock</th><th class="cg"><span class="grupo">Costo de compra por proveedor</span>Dist. Oeste</th><th class="cg">Bulonera Centro</th><th class="cg">Ferretera del Sur</th><th class="cg">Rexxi</th><th>Margen %</th><th class="cg">Precio</th><th>Costo</th></tr></thead>
+        <tbody>
+<tr class="sel" data-id="cinta"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div><div class="n">Cinta métrica PowerLock 5 m</div><div class="d">Stanley</div></div></div></td><td class="st hay">6 un.</td><td class="c uso barato"><span class="v"><span class="peso">$</span>9.350</span></td><td class="c"><span class="v"><span class="peso">$</span>9.980</span></td><td class="c"><span class="v"><span class="peso">$</span>10.420</span></td><td class="c vacio">—</td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="">100</span><span class="el">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>17.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,30 14,26 28,26 42,18 56,12" fill="none" stroke="var(--accion)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="mecha"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div><div class="n">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta</div></div></div></td><td class="st hay">14 un.</td><td class="c uso"><span class="v"><span class="peso">$</span>2.610</span></td><td class="c barato"><span class="v"><span class="peso">$</span>2.480</span><span class="mas-barato">más barato</span></td><td class="c vacio">—</td><td class="c"><span class="v"><span class="peso">$</span>2.550</span></td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="el">100</span><span class="">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>7.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,24 14,24 28,20 42,20 56,20" fill="none" stroke="var(--texto-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="martillo"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/martillo.webp" alt=""></div><div><div class="n">Martillo carpintero 27 mm mango tubular</div><div class="d">Bahco</div></div></div></td><td class="st hay">2 un.</td><td class="c"><span class="v"><span class="peso">$</span>16.400</span></td><td class="c uso barato"><span class="v"><span class="peso">$</span>15.800</span></td><td class="c vacio">—</td><td class="c"><span class="v"><span class="peso">$</span>17.100</span></td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="">100</span><span class="">50</span><span class="el">25</span></div></td><td class="pr"><span class="peso">$</span>24.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,22 14,22 28,22 42,20 56,20" fill="none" stroke="var(--texto-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="tarugos"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer</div></div></div></td><td class="st hay">3 un.</td><td class="c uso barato"><span class="v"><span class="peso">$</span>4.150</span></td><td class="c vacio">—</td><td class="c vacio">—</td><td class="c vacio">—</td><td><div class="mg"><span class="vacio-m">300</span><span class="vacio-m">200</span><span class="vacio-m">100</span><span class="vacio-m">50</span><span class="vacio-m">25</span></div></td><td class="pr sin">Sin precio</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,20 14,20 28,20 42,20 56,20" fill="none" stroke="var(--texto-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="pinza"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/pinza.webp" alt=""></div><div><div class="n">Pinza universal 8" aislada 1000 V</div><div class="d">Bremen</div></div></div></td><td class="st hay">7 un.</td><td class="c uso barato"><span class="v"><span class="peso">$</span>10.200</span></td><td class="c vacio">—</td><td class="c"><span class="v"><span class="peso">$</span>10.900</span></td><td class="c vacio">—</td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="">100</span><span class="el">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>19.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,30 14,28 28,22 42,18 56,10" fill="none" stroke="var(--accion)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="puntas"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div><div class="n">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Bremen</div></div></div></td><td class="st no">Sin stock</td><td class="c"><span class="v"><span class="peso">$</span>2.140</span></td><td class="c uso barato"><span class="v"><span class="peso">$</span>1.980</span></td><td class="c vacio">—</td><td class="c vacio">—</td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="el">100</span><span class="">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>5.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,18 14,18 28,18 42,18 56,18" fill="none" stroke="var(--texto-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="lampara"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/lampara.webp" alt=""></div><div><div class="n">Lámpara LED 9 W luz fría E27</div><div class="d">Philips</div></div></div></td><td class="st hay">48 un.</td><td class="c"><span class="v"><span class="peso">$</span>1.220</span></td><td class="c vacio">—</td><td class="c vacio">—</td><td class="c uso barato"><span class="v"><span class="peso">$</span>1.150</span></td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="el">100</span><span class="">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>3.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,14 14,16 28,18 42,20 56,22" fill="none" stroke="var(--texto-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="pintura"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/pintura.webp" alt=""></div><div><div class="n">Látex interior mate blanco 4 L</div><div class="d">Alba</div></div></div></td><td class="st hay">9 un.</td><td class="c"><span class="v"><span class="peso">$</span>21.500</span></td><td class="c vacio">—</td><td class="c uso barato"><span class="v"><span class="peso">$</span>20.700</span></td><td class="c vacio">—</td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="">100</span><span class="el">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>38.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,32 14,30 28,26 42,16 56,6" fill="none" stroke="var(--accion)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="llave"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div><div><div class="n">Llave combinada 13 mm cromada</div><div class="d">Bahco</div></div></div></td><td class="st hay">11 un.</td><td class="c uso barato"><span class="v"><span class="peso">$</span>6.400</span></td><td class="c"><span class="v"><span class="peso">$</span>6.700</span></td><td class="c vacio">—</td><td class="c vacio">—</td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="">100</span><span class="el">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>12.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,22 14,22 28,20 42,20 56,18" fill="none" stroke="var(--texto-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+<tr data-id="clavos"><td><div class="prod"><div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div><div class="n">Clavos punta París 2" por kilo</div><div class="d">Acindar</div></div></div></td><td class="st hay">12,4 kg</td><td class="c uso barato"><span class="v"><span class="peso">$</span>3.250</span></td><td class="c vacio">—</td><td class="c vacio">—</td><td class="c vacio">—</td><td><div class="mg"><span class="">300</span><span class="">200</span><span class="el">100</span><span class="">50</span><span class="">25</span></div></td><td class="pr"><span class="peso">$</span>8.000</td><td><svg width="56" height="34" viewBox="-2 0 60 34"><polyline points="0,24 14,22 28,22 42,20 56,20" fill="none" stroke="var(--texto-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside class="rapida">
+    <div class="foto-g">
+      <span class="pastilla logro"><span class="punto"></span>6 un. en stock</span>
+      <button class="btn chico btn-icono cerrar" title="Cerrar (Espacio)" data-mq="cerrar-rapida"><i class="i i-s" data-i="x"></i></button>
+      <img src="../../../_comun/fotos/cinta-metrica.webp" alt="" data-mq="ampliar" title="Ampliar la foto">
+      <button class="btn chico cambiar" data-mq="cambiar-foto"><i class="i i-s" data-i="camera"></i>Cambiar foto</button>
+    </div>
+    <div class="cuerpo">
+      <div><div class="nom">Cinta métrica PowerLock 5 m</div><div class="t-detalle">Stanley · Cód. 33-158 · Est. B-02-07</div></div>
+      <div class="precio">
+        <div><div class="t-etiqueta">Se cobra</div><div class="t-total" style="font-size:44px;line-height:48px"><span class="peso">$</span>17.000</div></div>
+        <div class="cuentita">Costo $9.350,85 (Oeste ★)<br>+ 50 % + IVA = <b>$16.971,79</b><br>para arriba a $1.000</div>
+      </div>
+      <div class="cod"><svg class="ean" data-ean="7897065211580"></svg><div style="flex:1"><b>7897065211580</b><div class="t-detalle">Última lectura: 13/10 · 10:24</div></div><button class="btn chico btn-icono" title="Copiar" data-mq="copiar"><i class="i i-s" data-i="copy"></i></button></div>
+      <div class="acciones"><button class="btn btn-icono" title="Descargar la lista de origen (06/10)" data-mq="descargar"><i class="i" data-i="file-spreadsheet"></i></button><button class="btn btn-accion" data-mq="agregar"><i class="i" data-i="shopping-cart"></i>Agregar a la venta <span class="kbd">+</span></button></div>
+    </div>
+  </aside>
+  <div class="hint"><span><span class="kbd">↑</span><span class="kbd">↓</span>producto</span><span><span class="kbd">←</span><span class="kbd">→</span>proveedor · <span class="kbd">U</span> usar</span><span><span class="kbd">Mayús</span><span class="kbd">1–5</span>margen</span><span data-mq="ficha"><span class="kbd">Enter</span>ficha completa</span></div>
+<script>
+/* Compu 3 · la planilla de proveedores: Espacio abre la vista rápida, ↑ ↓ cambia de fila, ← → y U usan otro proveedor. */
+(function () {
+  var M = window.Maq, d = document;
+  var tbody = d.querySelector("tbody"), rapida = d.querySelector(".rapida"), R = function (s) { return rapida.querySelector(s); };
+  var ORDEN = ["O", "B", "S", "R"], elegido = M.porId("cinta"), abierta = true, cursor = null, chip = "todos", marca = null, busq = "";
+  var fila = function (p) { return tbody.querySelector('tr[data-id="' + p.id + '"]'); };
+
+  function celdas(p) {
+    var barato = M.masBarato(p), tds = '<td class="st ' + (p.stock ? "hay" : "no") + '">' + (p.stock ? M.stockTxt(p) : "Sin stock") + "</td>";
+    ORDEN.forEach(function (k) {
+      var c = p.costos[k];
+      if (c == null) { tds += '<td class="c vacio" data-k="' + k + '">—</td>'; return; }
+      tds += '<td class="c' + (k === p.uso ? " uso" : "") + (k === barato ? " barato" : "") + '" data-k="' + k + '"><span class="v"><span class="peso">$</span>' + M.miles(c) + "</span>" + (k === barato && k !== p.uso ? '<span class="mas-barato">más barato</span>' : "") + "</td>";
+    });
+    tds += '<td><div class="mg">' + M.MARGENES.map(function (m) { return '<span class="' + (p.margen == null ? "vacio-m" : (m === p.margen ? "el" : "")) + '" data-margen="' + m + '">' + m + "</span>"; }).join("") + "</div></td>";
+    var pr = M.precioDe(p);
+    tds += pr ? '<td class="pr"><span class="peso">$</span>' + M.miles(pr) + "</td>" : '<td class="pr sin">Sin precio</td>';
+    return tds;
+  }
+  function pintarFila(p, salto) {
+    var tr = fila(p); if (!tr) return;
+    var vieja = tr.querySelector(".c.uso .v"), r0 = vieja && vieja.getBoundingClientRect();
+    var prod = tr.firstElementChild.outerHTML, tend = tr.lastElementChild.outerHTML;
+    tr.innerHTML = prod + celdas(p) + tend;
+    var nueva = tr.querySelector(".c.uso .v");
+    if (salto && r0 && nueva) { var r1 = nueva.getBoundingClientRect(); M.animar(nueva, [{ transform: "translate(" + (r0.left - r1.left) + "px," + (r0.top - r1.top) + "px)" }, { transform: "none" }], 240); }
+    M.rodar(tr.querySelector(".pr"), tr.querySelector(".pr").innerHTML, true);
+    marcarCursor();
+  }
+  function pintarRapida(cambio, precioAntes) {
+    var p = elegido, pr = M.precioDe(p);
+    var st = R(".foto-g .pastilla");
+    st.className = "pastilla " + (p.stock ? "logro" : "error");
+    st.innerHTML = '<span class="punto"></span>' + (p.stock ? M.stockTxt(p) + " en stock" : "Sin stock");
+    var img = R('.foto-g img');
+    if (cambio) { img.src = M.fotoDe(p); M.fundir(img, 120); }
+    R(".nom").textContent = p.nom;
+    R(".cuerpo .t-detalle").textContent = p.marca + " · Cód. " + p.cod + " · Est. " + p.est;
+    var tot = R(".t-total");
+    tot.style.color = pr ? "" : "var(--urgente-texto)";
+    tot.style.fontSize = pr ? "" : "32px";
+    tot.style.whiteSpace = "nowrap";
+    M.rodar(tot, pr ? M.peso(pr) : "Sin precio", (pr || 0) >= (precioAntes || 0));
+    R(".cuentita").innerHTML = "Costo " + M.centavos(M.costo(p)) + " (" + M.PROV_CORTO[p.uso] + (p.uso === M.masBarato(p) ? " ★" : "") + ")<br>" +
+      (p.margen == null ? "falta elegir el margen" : "+ " + p.margen + " % + IVA = <b>" + M.centavos(M.conIva(p)) + "</b>") + "<br>para arriba a $1.000";
+    if (!cambio) M.brillar(R(".precio"));
+    M.dibujarEan(R(".cod svg"), p.ean);
+    R(".cod b").textContent = p.ean;
+    R('[data-mq="descargar"]').title = "Descargar la lista de origen (" + M.LISTA[p.uso] + ")";
+  }
+  function abrirRapida() {
+    if (abierta) return;
+    abierta = true;
+    rapida.style.display = "";
+    var tr = fila(elegido), r = rapida.getBoundingClientRect(), y = tr ? tr.getBoundingClientRect().top + 26 - r.top : 0;
+    rapida.style.transformOrigin = "50% " + Math.max(0, Math.min(r.height, y)) + "px";
+    M.animar(rapida, [{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], 200);
+  }
+  function cerrarRapida() {
+    if (!abierta) return;
+    abierta = false;
+    var a = M.animar(rapida, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.96)" }], 160, M.SALIDA);
+    M.despues(a, function () { if (!abierta) rapida.style.display = "none"; });
+  }
+  function elegir(p) {
+    if (!p || p === elegido) return;
+    var vieja = fila(elegido); if (vieja) vieja.classList.remove("sel");
+    elegido = p; cursor = null;
+    var tr = fila(p); if (tr) tr.classList.add("sel");
+    marcarCursor();
+    pintarRapida(true);
+  }
+  function visibles() { return Array.prototype.filter.call(tbody.rows, function (tr) { return tr.style.display !== "none"; }); }
+  function mover(dir) {
+    var v = visibles(), i = v.indexOf(fila(elegido)), n = v[Math.max(0, Math.min(v.length - 1, i + dir))];
+    if (n) elegir(M.porId(n.getAttribute("data-id")));
+  }
+  function margen(m) { var a = M.precioDe(elegido); elegido.margen = m; pintarFila(elegido); pintarRapida(false, a); }
+  function usar(k) {
+    if (!elegido.costos[k] || k === elegido.uso) return;
+    var a = M.precioDe(elegido); elegido.uso = k; pintarFila(elegido, true); pintarRapida(false, a);
+    M.tostada("Ahora el costo sale de <b>" + M.PROV[k] + "</b>");
+  }
+  function marcarCursor() {
+    tbody.querySelectorAll("td.c").forEach(function (td) { td.style.outline = ""; });
+    if (!cursor) return;
+    var td = fila(elegido) && fila(elegido).querySelector('td.c[data-k="' + cursor + '"]');
+    if (td) { td.style.outline = "2px dashed var(--pino-texto)"; td.style.outlineOffset = "-4px"; }
+  }
+  function moverCursor(dir) {
+    var ks = ORDEN.filter(function (k) { return elegido.costos[k] != null; }), i = ks.indexOf(cursor || elegido.uso);
+    cursor = ks[(i + dir + ks.length) % ks.length];
+    marcarCursor();
+  }
+  function filtrar() {
+    Array.prototype.forEach.call(tbody.rows, function (tr) {
+      var p = M.porId(tr.getAttribute("data-id")), ok = M.coincide(p, busq);
+      if (chip === "constock") ok = ok && p.stock > 0;
+      if (chip === "barato") ok = ok && M.masBarato(p) !== p.uso;
+      if (marca) ok = ok && p.marca === marca;
+      tr.style.display = ok ? "" : "none";
+    });
+    var v = visibles();
+    if (v.length && v.indexOf(fila(elegido)) < 0) elegir(M.porId(v[0].getAttribute("data-id")));
+    if (!v.length) cerrarRapida();
+  }
+  function elegirChip(nombre, ancla) {
+    if (nombre === "marca") {
+      var c = M.abrir('<div class="mq-tit">Marca</div>' + ["Todas", "Stanley", "Bahco", "Bremen", "Philips"].map(function (m) { return '<button data-marca="' + m + '"><i class="i" data-i="tags"></i>' + m + ((marca || "Todas") === m ? '<i class="i i-s" data-i="check" style="margin-left:auto;color:var(--pino)"></i>' : "") + "</button>"; }).join(""), { tipo: "menu", ancla: ancla, lado: "izquierda" });
+      c.el.addEventListener("click", function (e) { var b = e.target.closest("[data-marca]"); if (!b) return; marca = b.getAttribute("data-marca") === "Todas" ? null : b.getAttribute("data-marca"); ancla.classList.toggle("elegido", !!marca); c.cerrar(); filtrar(); });
+      return;
+    }
+    chip = nombre;
+    d.querySelectorAll("[data-chip]").forEach(function (x) { if (x.getAttribute("data-chip") !== "marca") x.classList.toggle("elegido", x.getAttribute("data-chip") === nombre); });
+    filtrar();
+  }
+  function irA() {
+    var P = [["vender", "shopping-cart", "Vender"], ["ventas-de-hoy", "receipt", "Ventas de hoy"], ["productos", "tags", "Productos"], ["listas", "file-text", "Listas de precios"], ["duplicados", "copy", "Duplicados"], ["stock", "package", "Stock"], ["compras", "truck", "Compras"], ["contar", "list-checks", "Contar"], ["resumen", "chart-column", "Resumen"], ["usuarios", "users", "Usuarios"], ["actividad", "history", "Quién hizo qué"], ["anomalias", "triangle-alert", "Anomalías"], ["procesos", "workflow", "Procesos"], ["mejoras-y-errores", "bug", "Mejoras y errores"], ["configuracion", "settings", "Configuración"], ["entrar", "log-out", "Cerrar sesión"]];
+    var c = M.abrir('<div class="campo foco" style="height:48px;margin-bottom:10px"><i class="i" data-i="command"></i><input class="mq-input" placeholder="Ir a… Vender, Stock, Listas" autofocus></div><div class="mq-menu" data-mq="lista-ir" style="border:0;padding:0;box-shadow:none;max-height:420px;overflow:auto">' +
+      P.map(function (x) { return '<button data-ir="' + x[0] + '"><i class="i" data-i="' + x[1] + '"></i>' + x[2] + "</button>"; }).join("") + "</div>", { tipo: "dialogo" });
+    c.el.style.paddingBottom = "12px";
+    var inp = c.el.querySelector("input");
+    inp.addEventListener("input", function () { var q = inp.value.trim().toLowerCase(); c.el.querySelectorAll("[data-ir]").forEach(function (b) { b.style.display = b.textContent.toLowerCase().indexOf(q) >= 0 ? "" : "none"; }); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { var b = Array.prototype.find.call(c.el.querySelectorAll("[data-ir]"), function (x) { return x.style.display !== "none"; }); if (b) b.click(); } });
+  }
+  function agregar() {
+    M.agregar(elegido, { desde: abierta ? R(".foto-g img") : fila(elegido).querySelector("img") });
+  }
+  M.alCambiarVenta.push(function (v) { var el = d.querySelector("[data-venta-chip]"); M.rodar(el, "Venta: " + v.renglones + " · $" + M.miles(v.total), true); M.rebotar(el.parentNode); });
+
+  M.buscador(d.querySelector(".cab .campo"), function (q) { busq = q; filtrar(); });
+  d.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".mq-panel, .mq-fondo, .mq-tostadas")) return;
+    var tr = t.closest("tbody tr");
+    if (tr) {
+      var p = M.porId(tr.getAttribute("data-id")), ya = p === elegido;
+      elegir(p);
+      var mg = t.closest("[data-margen]"), td = t.closest("td.c[data-k]");
+      if (mg) margen(+mg.getAttribute("data-margen"));
+      else if (td && ya) usar(td.getAttribute("data-k"));
+      else if (!ya && !abierta) { /* elegir la fila no abre nada: Espacio abre la vista rápida */ }
+      return;
+    }
+    var ch = t.closest("[data-chip]");
+    if (ch) { elegirChip(ch.getAttribute("data-chip"), ch); return; }
+    var q = t.closest("[data-mq]");
+    if (!q) { if (abierta && !t.closest(".rapida")) cerrarRapida(); return; }
+    switch (q.getAttribute("data-mq")) {
+      case "ir": irA(); break;
+      case "espejo": M.espejo(q); break;
+      case "persona": M.menuPersona(q, "abajo"); break;
+      case "cerrar-rapida": cerrarRapida(); break;
+      case "ampliar": M.ampliarFoto(elegido); break;
+      case "cambiar-foto": M.cambiarFoto(elegido, function () { M.brillar(R(".foto-g")); }); break;
+      case "copiar": M.copiar(q, elegido); break;
+      case "descargar": M.descargar(M.ARCHIVO[elegido.uso]); break;
+      case "agregar": M.apretar(q); agregar(); break;
+      case "ficha": abrirFicha(); break;
+    }
+  });
+  function abrirFicha() { M.fichaCompleta(elegido, function () { pintarFila(elegido, true); pintarRapida(false); }); }
+  d.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); if (!M.hayCapa()) irA(); return; }
+    if (M.hayCapa() || M.escribiendo(e)) return;
+    if (e.key === " ") { e.preventDefault(); if (abierta) cerrarRapida(); else abrirRapida(); }
+    else if (e.key === "Escape") { cerrarRapida(); }
+    else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); mover(e.key === "ArrowDown" ? 1 : -1); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); moverCursor(e.key === "ArrowRight" ? 1 : -1); }
+    else if (e.key.toLowerCase() === "u") { e.preventDefault(); if (cursor) usar(cursor); cursor = null; marcarCursor(); }
+    else if (e.key === "Enter") { e.preventDefault(); abrirFicha(); }
+    else if (e.key === "+") { e.preventDefault(); agregar(); }
+    else if (e.shiftKey && /^Digit[1-5]$/.test(e.code)) { e.preventDefault(); margen(M.MARGENES[+e.code.slice(5) - 1]); }
+  });
+  // Marca los segmentos de margen y las celdas de proveedor que vienen en la maqueta
+  Array.prototype.forEach.call(tbody.rows, function (tr) {
+    tr.querySelectorAll(".mg span").forEach(function (s) { s.setAttribute("data-margen", s.textContent); });
+    tr.querySelectorAll("td.c").forEach(function (td, i) { td.setAttribute("data-k", ORDEN[i]); });
+  });
+})();
+</script>
+</body>
+</html>

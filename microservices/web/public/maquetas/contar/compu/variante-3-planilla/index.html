@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · La planilla ciega (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .cabecera .miga { display: flex; align-items: center; gap: 8px; color: var(--texto-2); font-weight: 650; font-size: 15px; }
+  .pantalla { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) 328px; gap: 16px; padding-top: 16px; padding-bottom: 16px; }
+  .hoja { display: grid; grid-template-rows: auto minmax(0,1fr) auto; min-height: 0; overflow: hidden; }
+  .hoja-cab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--borde); }
+  .hoja-cab .buscar { margin-left: auto; height: 40px; width: 280px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  thead th { position: sticky; top: 0; background: var(--hundido); text-align: left; font-size: 14px; font-weight: 700; color: var(--texto-2); height: 36px; padding: 0 12px; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+  tbody td { height: 37px; padding: 0 12px; border-bottom: 1px solid #EFECE5; white-space: nowrap; }
+  td.nro { color: var(--texto-3); font-weight: 650; width: 44px; text-align: right; }
+  td.prod { font-weight: 650; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+  td.cod { color: var(--texto-2); font-size: 14px; }
+  td.uni { color: var(--texto-2); font-size: 14px; }
+  td.cont { width: 128px; }
+  .celda { display: flex; align-items: center; justify-content: flex-end; gap: 4px; height: 30px; padding: 0 10px; border-radius: 8px; font-weight: 800; font-size: 16px; }
+  .celda.vacia { background: var(--hundido); color: transparent; }
+  .celda.llena { background: transparent; }
+  .celda.foco { background: #fff; border: 2px solid var(--pino); box-shadow: 0 0 0 4px rgba(18,56,47,.12); }
+  .celda small { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  td.sis { color: var(--texto-3); font-size: 14px; }
+  td.quien { color: var(--texto-2); font-size: 14px; }
+  tr.activa td { background: var(--pino-suave); }
+  tr.activa td.prod { color: var(--pino); }
+  tr.lista td.nro { color: var(--logro-texto); }
+  .ayuda { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--borde); background: #FBFAF7; font-size: 14px; color: var(--texto-2); font-weight: 600; flex-wrap: nowrap; }
+  .ayuda span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+  .panel { display: grid; gap: 12px; align-content: start; }
+  .ciego { padding: 14px 16px; display: grid; gap: 8px; }
+  .ciego .tit { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; }
+  .avance-n { display: flex; align-items: baseline; gap: 6px; }
+  .opciones { display: grid; gap: 8px; }
+  .op { display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--borde-fuerte); background: #fff; }
+  .op .rad { width: 20px; height: 20px; border-radius: 99px; border: 2px solid var(--borde-fuerte); margin-top: 2px; }
+  .op.si { border: 2px solid var(--pino); padding: 9px 11px; }
+  .op.si .rad { border: 6px solid var(--pino); }
+  .op b { font-size: 15px; font-weight: 750; display: block; line-height: 20px; }
+  .op span { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .dupla { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--hundido); font-size: 14px; font-weight: 600; color: var(--texto-2); line-height: 18px; }
+  .avatares { display: flex; }
+  .avatares .avatar { width: 32px; height: 32px; border: 2px solid var(--hundido); }
+  .avatares .avatar + .avatar { margin-left: -8px; background: var(--pino-suave); color: var(--pino-texto); }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" id="mas"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="usuario" style="padding:0"><span class="avatar">CI</span></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="miga"><span>Depósito</span><i class="i i-s" data-i="chevron-right"></i><span>Contar</span><i class="i i-s" data-i="chevron-right"></i></div><div class="t-titulo">Cajones de bulones</div></div>
+      <span class="pastilla urgente" style="align-self:flex-end;margin-bottom:4px">Nunca contado</span>
+      <div class="acciones"><button class="btn chico"><i class="i i-s" data-i="arrow-left"></i>Volver <span class="kbd">Esc</span></button><button class="btn chico"><i class="i i-s" data-i="printer"></i>Imprimir la planilla <span class="kbd">Ctrl P</span></button></div>
+    </header>
+    <section class="pantalla">
+      <div class="tarjeta hoja">
+        <div class="hoja-cab">
+          <span class="segmentos"><span class="elegido">En el orden del cajón</span><span>A–Z</span><span>Sin contar (79)</span></span>
+          <div class="campo buscar"><i class="i i-s" data-i="search"></i>Ir a uno o escanear<span style="flex:1"></span><span class="kbd">/</span></div>
+        </div>
+        <div style="overflow:hidden;min-height:0">
+        <table>
+          <thead><tr><th style="text-align:right">#</th><th>Producto</th><th>Código</th><th>Se cuenta en</th><th style="text-align:right;padding-right:22px">Contado</th><th><i class="i i-s" data-i="eye-off"></i> Sistema</th><th>Quién</th></tr></thead>
+          <tbody>
+            <tr class="lista"><td class="nro">1</td><td class="prod">Bulón cabeza hexagonal zincado 1/4 × 1"</td><td class="cod">BH-1410</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">37 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">2</td><td class="prod">Bulón cabeza hexagonal zincado 1/4 × 1 1/2"</td><td class="cod">BH-1415</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">52 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">3</td><td class="prod">Bulón cabeza hexagonal zincado 1/4 × 2"</td><td class="cod">BH-1420</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">18 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">4</td><td class="prod">Bulón cabeza hexagonal zincado 5/16 × 1"</td><td class="cod">BH-5610</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">44 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">5</td><td class="prod">Bulón cabeza hexagonal zincado 5/16 × 2"</td><td class="cod">BH-5620</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">0 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">6</td><td class="prod">Bulón carrocero cabeza redonda 1/4 × 2"</td><td class="cod">BC-1420</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">61 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">7</td><td class="prod">Bulón carrocero cabeza redonda 5/16 × 3"</td><td class="cod">BC-5630</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">25 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">8</td><td class="prod">Tuerca hexagonal zincada 1/4"</td><td class="cod">TH-14</td><td class="uni">kg, a granel</td><td class="cont"><div class="celda llena num">1,4 <small>kg</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">9</td><td class="prod">Tuerca hexagonal zincada 5/16"</td><td class="cod">TH-516</td><td class="uni">kg, a granel</td><td class="cont"><div class="celda llena num">0,9 <small>kg</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">10</td><td class="prod">Tuerca autofrenante con nylon 1/4"</td><td class="cod">TA-14</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">33 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="activa"><td class="nro">11</td><td class="prod">Arandela grower zincada 1/4"</td><td class="cod">AG-14</td><td class="uni">unidades</td><td class="cont"><div class="celda foco num">8<span class="cursor" style="height:18px"></span> <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr><td class="nro">12</td><td class="prod">Arandela grower zincada 5/16"</td><td class="cod">AG-516</td><td class="uni">unidades</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+            <tr><td class="nro">13</td><td class="prod">Arandela plana zincada 1/4"</td><td class="cod">AP-14</td><td class="uni">kg, a granel</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+            <tr><td class="nro">14</td><td class="prod">Varilla roscada zincada 1/4" × 1 m</td><td class="cod">VR-14</td><td class="uni">unidades</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+            <tr><td class="nro">15</td><td class="prod">Varilla roscada zincada 5/16" × 1 m</td><td class="cod">VR-516</td><td class="uni">unidades</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="ayuda"><span><span class="kbd">0–9</span>el número</span><span><span class="kbd">Enter</span>baja al siguiente</span><span><span class="kbd">↑</span><span class="kbd">↓</span>moverse</span><span><span class="kbd">Supr</span>borrar lo contado</span><span style="margin-left:auto"><i class="i i-s" data-i="cloud-upload"></i>Guardado 10:41</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="tarjeta ciego">
+          <div class="tit"><i class="i" data-i="eye-off"></i>Conteo a ciegas</div>
+          <div class="t-detalle">No mostramos cuánto dice el sistema hasta cerrar: así nadie cuenta «para que dé».</div>
+          <div class="avance-n"><span class="t-numero num">41</span><span class="t-detalle">de 120 contados</span></div>
+          <div class="barra" style="margin-top:0;height:8px"><b style="width:34%;background:var(--pino)"></b></div>
+          <div class="dupla"><div class="avatares"><span class="avatar">LM</span><span class="avatar">CI</span></div><div>Lucas cuenta en voz alta, Carlos tipea. Queda anotado quién cargó cada uno.</div></div>
+        </div>
+        <div class="tarjeta ciego">
+          <div class="tit">Al cerrar, los 79 sin contar…</div>
+          <div class="opciones">
+            <div class="op si"><span class="rad"></span><div><b>Quedan como están</b><span>Sirve si hoy no terminás el cajón</span></div></div>
+            <div class="op"><span class="rad"></span><div><b>Se ponen en cero</b><span>Si no los contaste es que no hay</span></div></div>
+          </div>
+          <button class="btn btn-accion grande" style="width:100%;margin-top:4px">Cerrar y ver diferencias <span class="kbd">Alt C</span></button>
+          <div class="t-detalle" style="text-align:center">Antes de ajustar te mostramos cada diferencia</div>
+        </div>
+        <div class="aviso pino"><i class="i" data-i="shopping-cart"></i><div>Se vendieron 4 bulones 1/4 × 1" después de contarlos: al cerrar se descuentan solos.</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+<style>
+  tbody tr { cursor: pointer; }
+  .op { cursor: pointer; }
+  .papel { background: #fff; border: 1px solid var(--borde); border-radius: 12px; box-shadow: var(--sombra-2); padding: 18px 20px; font-size: 14px; }
+  .papel table td { height: 30px; border-bottom: 1px solid #DDD8CC; font-size: 14px; }
+  .papel .linea { border-bottom: 1.5px solid #9C978C; width: 90px; display: inline-block; height: 18px; }
+  td.sis.visto { color: var(--tinta); font-weight: 700; }
+</style>
+<script src="../../interacciones.js"></script>
+<script>
+/* Contar · compu 3: la planilla a ciegas. Número y Enter baja; ↑ ↓; Supr borra; «/» busca o escanea; cerrar muestra las diferencias. */
+(function () {
+  var C = window.Contar, $ = function (s, r) { return (r || document).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var tbody = $("tbody"), caja = tbody.closest("table").parentNode;
+  // Lo que dice el sistema (oculto hasta cerrar) y el resto del cajón, que sigue abajo.
+  var SIS = [37, 50, 18, 48, 2, 61, 25, 1.4, 1.1, 33, 9, 30, 0.8, 12, 9];
+  var MAS = [["Varilla roscada zincada 3/8\" × 1 m", "VR-38", "unidades", 6], ["Tuerca mariposa zincada 1/4\"", "TM-14", "unidades", 40], ["Tuerca mariposa zincada 5/16\"", "TM-516", "unidades", 28], ["Bulón Parker cabeza tanque 3/16 × 1\"", "BP-316", "unidades", 75], ["Tornillo cabeza hexagonal 1/4 × 3/4\"", "TH-1434", "unidades", 60], ["Arandela plana zincada 5/16\"", "AP-516", "kg, a granel", 0.6], ["Perno de anclaje 3/8 × 3\"", "PA-383", "unidades", 14], ["Tuerca ciega zincada 1/4\"", "TC-14", "unidades", 22]];
+  MAS.forEach(function (m, i) {
+    var tr = C.el('<table><tbody><tr><td class="nro">' + (16 + i) + '</td><td class="prod">' + m[0] + '</td><td class="cod">' + m[1] + '</td><td class="uni">' + m[2] + '</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr></tbody></table>').querySelector("tr");
+    tbody.appendChild(tr); SIS.push(m[3]);
+  });
+  var filas = $$("tr", tbody).map(function (tr, i) {
+    var celda = $(".celda", tr), lleno = celda.classList.contains("llena"), u = $(".uni", tr).textContent.indexOf("kg") === 0 ? "kg" : "un.";
+    return { tr: tr, i: i, sis: SIS[i], u: u, c: lleno ? parseFloat(celda.firstChild.textContent.replace(",", ".")) : null, quien: $(".quien", tr).textContent };
+  });
+  var foco = 10, q = "8", contados = 41, total = 120, guardado = 41, cerrado = false;
+  var cuenta = $(".avance-n .t-numero"), barra = $(".ciego .barra b"), seg = $$(".hoja-cab .segmentos > span");
+
+  function pintarFila(f) {
+    var celda = $(".celda", f.tr), activa = f.i === foco && !cerrado;
+    f.tr.classList.toggle("activa", activa); f.tr.classList.toggle("lista", f.c != null && !activa);
+    if (activa) celda.className = "celda foco num", celda.innerHTML = (q || "") + '<span class="cursor" style="height:18px"></span> <small>' + f.u + "</small>";
+    else if (f.c != null) celda.className = "celda llena num", celda.innerHTML = C.fmt(f.c) + " <small>" + f.u + "</small>";
+    else celda.className = "celda vacia", celda.textContent = "–";
+    $(".quien", f.tr).textContent = f.quien || "";
+  }
+  function mover(a) {
+    var vis = filas.filter(function (f) { return f.tr.style.display !== "none"; });
+    var k = vis.indexOf(filas[foco]); if (k < 0) k = 0;
+    var nueva = vis[Math.max(0, Math.min(vis.length - 1, k + a))]; if (!nueva) return;
+    var vieja = filas[foco]; foco = nueva.i; q = nueva.c != null ? C.fmt(nueva.c) : "";
+    pintarFila(vieja); pintarFila(nueva); aVista(nueva.tr);
+  }
+  function aVista(tr) {
+    var top = tr.offsetTop, alto = caja.clientHeight;
+    if (top + tr.offsetHeight > caja.scrollTop + alto) caja.scrollTop = top + tr.offsetHeight - alto + 37;
+    else if (top < caja.scrollTop + 36) caja.scrollTop = Math.max(0, top - 36);
+  }
+  function anotar() {
+    var f = filas[foco]; if (q === "" || cerrado) return false;
+    var c = parseFloat(q.replace(",", ".")); if (isNaN(c)) return false;
+    if (f.c == null) contar(+1);
+    f.c = c; f.quien = "Carlos";
+    var hora = "10:" + (42 + Math.floor(guardado++ / 6) % 17);
+    $(".ayuda > span:last-child").lastChild.textContent = "Guardado " + hora;
+    return true;
+  }
+  function contar(d) {
+    contados += d; C.rodar(cuenta, String(contados), d > 0); barra.style.width = (contados / total * 100) + "%";
+    var sin = total - contados; seg[2].textContent = "Sin contar (" + sin + ")";
+    var tit = $$(".ciego .tit")[1]; if (tit) tit.textContent = "Al cerrar, los " + sin + " sin contar…";
+  }
+  function enter() {
+    var f = filas[foco];
+    if (anotar()) { pintarFila(f); C.mover($(".celda", f.tr), [{ transform: "scale(1.08)" }, { transform: "none" }], 200); }
+    mover(1);
+    if (seg[2].classList.contains("elegido")) filtrar();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (C.abierto() || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "P")) { e.preventDefault(); imprimir(); return; }
+    if (e.altKey && (e.key === "c" || e.key === "C")) { e.preventDefault(); abrirCierre(); return; }
+    if (e.key === "Escape") { e.preventDefault(); volver(); return; }
+    if (e.key === "/") { e.preventDefault(); buscar(); return; }
+    if (cerrado) return;
+    if (/^[0-9]$/.test(e.key)) { if (q.length < 5) q = (q === "0" ? "" : q) + e.key; pintarFila(filas[foco]); }
+    else if (e.key === "," || e.key === ".") { if (q.indexOf(",") < 0) q = (q || "0") + ","; pintarFila(filas[foco]); }
+    else if (e.key === "Backspace") { q = q.slice(0, -1); pintarFila(filas[foco]); }
+    else if (e.key === "Delete") { var f = filas[foco]; if (f.c != null) { f.c = null; f.quien = ""; contar(-1); } q = ""; pintarFila(f); }
+    else if (e.key === "Enter" && e.target.tagName !== "BUTTON") { e.preventDefault(); enter(); }
+    else if (e.key === "ArrowDown") { e.preventDefault(); if (anotar()) pintarFila(filas[foco]); mover(1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); if (anotar()) pintarFila(filas[foco]); mover(-1); }
+  });
+  tbody.addEventListener("click", function (e) {
+    var tr = e.target.closest("tr"); if (!tr || cerrado) return;
+    var f = filas.filter(function (x) { return x.tr === tr; })[0], vieja = filas[foco];
+    if (anotar()) pintarFila(vieja);
+    foco = f.i; q = f.c != null ? C.fmt(f.c) : ""; pintarFila(vieja); pintarFila(f);
+  });
+
+  // Orden del cajón · A–Z · solo los sin contar.
+  function filtrar() {
+    var modo = seg.indexOf($(".hoja-cab .segmentos > .elegido")), orden = filas.slice();
+    if (modo === 1) orden.sort(function (a, b) { return $(".prod", a.tr).textContent.localeCompare($(".prod", b.tr).textContent, "es"); });
+    orden.forEach(function (f) { tbody.appendChild(f.tr); f.tr.style.display = modo === 2 && f.c != null && f.i !== foco ? "none" : ""; });
+  }
+  seg.forEach(function (s) { s.addEventListener("click", function () { seg.forEach(function (x) { x.classList.remove("elegido"); }); s.classList.add("elegido"); filtrar(); caja.scrollTop = 0; C.mover(tbody, [{ opacity: .4 }, { opacity: 1 }], 200); }); });
+
+  // «/»: ir a uno por nombre o código; el lector de código escribe acá.
+  var campoB = $(".hoja-cab .buscar"); campoB.setAttribute("data-toca", "");
+  campoB.addEventListener("click", buscar);
+  function buscar() {
+    var m = C.abrir('<div class="cx-menu" style="width:360px"><div class="campo foco" style="height:44px;margin-bottom:4px"><i class="i i-s" data-i="search"></i><input autofocus placeholder="Nombre o código" style="border:0;outline:0;flex:1;font-weight:600;background:none"></div>' +
+      '<button class="cx-op" data-lector><i class="i" data-i="scan-barcode"></i><span class="txt">Probar el lector: pasá un código</span></button><div class="cx-res"></div></div>', { ancla: campoB, sinVelo: true });
+    var inp = $("input", m), res = $(".cx-res", m);
+    function lista() {
+      var t = inp.value.toLowerCase();
+      res.innerHTML = filas.filter(function (f) { return !t || f.tr.textContent.toLowerCase().indexOf(t) >= 0; }).slice(0, 6).map(function (f) {
+        return '<button class="cx-op" data-k="' + f.i + '"><span class="t-detalle" style="margin:0;min-width:24px;text-align:right">' + (f.i + 1) + '</span><span class="txt">' + $(".prod", f.tr).textContent + '</span><span class="t-detalle">' + (f.c != null ? C.fmt(f.c) + " " + f.u : "sin contar") + "</span></button>";
+      }).join("");
+    }
+    lista(); inp.addEventListener("input", lista);
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { var b = $("[data-k]", res); if (b) b.click(); } });
+    function ir(i) {
+      C.cerrar(C.capaDe(m)); var vieja = filas[foco]; if (anotar()) pintarFila(vieja);
+      if (filas[i].tr.style.display === "none") { seg[0].click(); }
+      foco = i; q = filas[i].c != null ? C.fmt(filas[i].c) : ""; pintarFila(vieja); pintarFila(filas[i]); aVista(filas[i].tr);
+      C.mover(filas[i].tr, [{ opacity: .3 }, { opacity: 1 }], 320);
+    }
+    res.addEventListener("click", function (e) { var b = e.target.closest("[data-k]"); if (b) ir(+b.getAttribute("data-k")); });
+    $("[data-lector]", m).addEventListener("click", function () { inp.value = "AP-14"; lista(); C.vibrar(10); setTimeout(function () { ir(12); C.tostada("Leído AP-14 · Arandela plana zincada 1/4\"", "scan-barcode"); }, 350); });
+  }
+
+  // Volver: elegir otro sector para contar.
+  var SECT = [["Pared de tornillería", "En curso · 24 de 64"], ["Exhibidor de mechas y puntas", "En curso · 8 de 46"], ["Pared de electricidad", "Nunca contado · 37"], ["Cajones de bulones", "Nunca contado · 41 de 120"], ["Jardín y riego", "Nunca contado · 33"], ["Herramientas manuales", "Contado el 12/10 · 41"]];
+  $(".cabecera .acciones .btn").addEventListener("click", volver);
+  function volver() {
+    var d = C.dialogo(C.cabeza("Elegí el sector", "Lo que contaste queda guardado: lo retomás cuando quieras") + '<div style="display:grid;gap:2px">' + SECT.map(function (s, i) {
+      return '<button class="cx-op" data-s="' + i + '"><i class="i" data-i="' + (s[1].indexOf("Contado") === 0 ? "check" : s[1].indexOf("Nunca") === 0 ? "circle-dashed" : "pause") + '"></i><span class="txt">' + s[0] + '</span><span class="t-detalle">' + s[1] + "</span></button>";
+    }).join("") + "</div>");
+    d.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-s]"); if (!b) return;
+      var s = SECT[+b.getAttribute("data-s")]; C.cerrar(C.capaDe(d));
+      if (s[0] === $(".cabecera .t-titulo").textContent) return;
+      abrirSector(s);
+    });
+  }
+  function abrirSector(s) {
+    var ps = C.productos(s[0]), m = s[1].match(/(\d+) de (\d+)|· (\d+)$/);
+    total = m && m[2] ? +m[2] : m ? +m[3] : ps.length; contados = m && m[1] ? +m[1] : 0; cerrado = false;
+    $(".cabecera .t-titulo").textContent = s[0];
+    if (!$(".op", tarjetaCierre)) { tarjetaCierre.innerHTML = moldeCierre; C.pintar(tarjetaCierre); conectarCierre(); }
+    $("thead th:nth-child(6)").innerHTML = '<i class="i i-s" data-i="eye-off"></i> Sistema'; C.pintar($("thead"));
+    var p = $(".cabecera > .pastilla"); p.className = "pastilla " + (s[1].indexOf("Nunca") === 0 ? "urgente" : s[1].indexOf("En curso") === 0 ? "accion" : "logro"); p.textContent = s[1].split(" · ")[0];
+    $$("tr", tbody).forEach(function (tr) { tr.remove(); });
+    filas = ps.map(function (x, i) {
+      var tr = C.el('<table><tbody><tr><td class="nro">' + (i + 1) + '</td><td class="prod">' + x.n + '</td><td class="cod">' + (x.m.split("Cód. ")[1] || "—") + '</td><td class="uni">' + (x.u === "kg" ? "kg, a granel" : x.u === "m" ? "metros" : "unidades") + '</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr></tbody></table>').querySelector("tr");
+      tbody.appendChild(tr); return { tr: tr, i: i, sis: x.s, u: x.u, c: null, quien: "" };
+    });
+    foco = 0; q = ""; filas.forEach(pintarFila); caja.scrollTop = 0; contar(0); cuenta.textContent = contados;
+    $$(".ciego .t-detalle")[1].textContent = "de " + total + " contados";
+    C.mover($(".hoja"), [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 320);
+    C.tostada("Abriste " + s[0], "list-todo");
+  }
+
+  // Imprimir la planilla en blanco.
+  $$(".cabecera .acciones .btn")[1].addEventListener("click", imprimir);
+  function imprimir() {
+    var t = $(".cabecera .t-titulo").textContent, rs = filas.slice(11, 16);
+    var d = C.dialogo(C.cabeza("Imprimir la planilla", "Para contar en papel y tipearla después · " + Math.ceil(filas.length / 30 + 2) + " hojas A4") +
+      '<div class="papel"><div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px"><span>' + t + '</span><span>Ferrebress · 19/10</span></div><div class="t-detalle">Contó: ____________ · Sin contar: ' + (total - contados) + '</div><table style="margin-top:8px">' +
+      rs.map(function (f) { return "<tr><td>" + (f.i + 1) + "</td><td>" + $(".prod", f.tr).textContent + '</td><td><span class="linea"></span> ' + f.u + "</td></tr>"; }).join("") + "</table></div>" +
+      '<div class="cx-botones"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-oscuro" data-imp><i class="i i-s" data-i="printer"></i>Imprimir</button></div>', { clase: "ancho" });
+    $("[data-imp]", d).addEventListener("click", function () { C.cerrar(C.capaDe(d)); C.tostada("Mandada a la impresora del mostrador", "printer"); });
+  }
+
+  // Qué pasa con los sin contar al cerrar (la tarjeta se rearma al abrir otro sector).
+  var tarjetaCierre = $$(".ciego")[1], moldeCierre = tarjetaCierre.innerHTML;
+  function conectarCierre() {
+    $$(".op").forEach(function (o) { o.addEventListener("click", function () { $$(".op").forEach(function (x) { x.classList.remove("si"); }); o.classList.add("si"); }); });
+    // Cerrar y ver diferencias: recién acá aparece lo que decía el sistema.
+    $(".btn-accion", tarjetaCierre).addEventListener("click", abrirCierre);
+  }
+  conectarCierre();
+  function abrirCierre() {
+    if (cerrado) return;
+    if (anotar()) pintarFila(filas[foco]);
+    var difs = filas.filter(function (f) { return f.c != null && Math.abs(f.c - f.sis) > 0.01; }).map(function (f) { return { n: $(".prod", f.tr).textContent, c: f.c, h: f.sis }; });
+    var sin = []; for (var i = 0; i < total - contados; i++) sin.push({ f: i % 2 ? "tornillos" : "" });
+    var n = C.cierre({ sector: $(".cabecera .t-titulo").textContent, contados: contados, difs: difs, sinContar: sin, hora: "10:47", alCerrar: function (cero) {
+      cerrado = true;
+      filas.forEach(function (f) {
+        if (cero && f.c == null) f.c = 0;
+        var s = $(".sis", f.tr); s.classList.add("visto");
+        if (f.c == null) { s.textContent = C.fmt(f.sis) + " " + f.u; s.classList.remove("visto"); }
+        else { var r = C.dif(f.c, f.sis); s.innerHTML = C.fmt(f.sis) + " " + f.u + (r.d ? ' <b style="color:var(--' + (r.d < 0 ? "urgente" : "pino") + '-texto)">' + r.t + "</b>" : ""); }
+        pintarFila(f);
+      });
+      $("thead th:nth-child(6)").innerHTML = '<i class="i i-s" data-i="eye"></i> Sistema'; C.pintar($("thead"));
+      var p = $(".cabecera > .pastilla"); p.className = "pastilla logro"; p.textContent = "Contado hoy";
+      $$(".ciego")[1].innerHTML = '<div class="cx-listo"><span class="cx-tilde"><i class="i" data-i="check"></i></span><div class="t-renglon">Sector cerrado</div><div class="t-detalle">' + difs.length + ' ajustes de stock. La columna Sistema ya se ve.</div></div>';
+      C.pintar($$(".ciego")[1]);
+      var av = $(".panel .aviso"); if (av) av.lastElementChild.textContent = "Descontamos los 4 bulones 1/4 × 1\" vendidos después de contarlos.";
+      C.tostada("Cerrado · stock ajustado");
+    } });
+    // Lo que se eligió en el panel queda primero.
+    if ($(".op.si") && $$(".op").indexOf($(".op.si")) === 1) { var o = $(".opciones", n); if (o && o.children[1]) { o.children[0].classList.remove("btn-accion"); o.children[1].classList.add("btn-accion"); o.insertBefore(o.children[1], o.children[0]); } }
+  }
+
+  $("#mas").addEventListener("click", function () { C.menuMas($("#mas")); });
+})();
+</script>
+</body>
+</html>

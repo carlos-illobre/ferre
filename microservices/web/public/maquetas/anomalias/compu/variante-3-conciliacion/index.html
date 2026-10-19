@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anomalías · La tarde de Ana (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .cabecera { padding-top: 16px; }
+  .sobres { display: flex; gap: 8px; margin-left: 16px; }
+  .sobre { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px 0 6px; border-radius: 99px; border: 1px solid var(--borde-fuerte); background: var(--superficie); font-weight: 700; font-size: 14px; }
+  .sobre .avatar { width: 28px; height: 28px; font-size: 14px; background: var(--hundido-2); color: var(--texto-2); }
+  .sobre.elegido { background: var(--pino); border-color: var(--pino); color: #fff; }
+  .sobre.elegido .avatar { background: rgba(255,255,255,.18); color: #fff; }
+  .sobre .n { min-width: 22px; height: 22px; border-radius: 99px; display: grid; place-items: center; background: var(--urgente); color: #3A2500; font-size: 14px; font-weight: 800; padding: 0 6px; }
+  .pantalla { display: grid; grid-template-columns: 1fr 360px; gap: 16px; padding-top: 16px; }
+  .izq { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .tarde { padding: 16px 20px 14px; }
+  .tarde .top { display: flex; align-items: center; gap: 12px; }
+  .tarde .top .avatar { width: 44px; height: 44px; font-size: 16px; }
+  .tarde .top .t-seccion { font-size: 20px; }
+  .tarde .top .der { margin-left: auto; text-align: right; }
+  .eje { position: relative; height: 92px; margin-top: 12px; }
+  .eje .base { position: absolute; left: 0; right: 0; top: 46px; height: 4px; border-radius: 4px; background: var(--hundido-2); }
+  .eje .sin { position: absolute; left: 18%; width: 60%; top: 44px; height: 8px; border-radius: 4px; background: repeating-linear-gradient(135deg, var(--urgente-suave) 0 6px, #F7D58A 6px 9px); }
+  .eje .corte { position: absolute; left: 78%; top: 30px; height: 36px; width: 3px; border-radius: 2px; background: var(--error); }
+  .eje .salto { position: absolute; left: 84%; top: 40px; color: var(--texto-3); font-weight: 800; font-size: 18px; }
+  .eje .llega { position: absolute; left: 92%; top: 38px; width: 20px; height: 20px; border-radius: 99px; background: var(--pino); box-shadow: 0 0 0 4px var(--pino-suave); }
+  .nodo { position: absolute; top: 34px; width: 28px; height: 28px; margin-left: -14px; border-radius: 99px; background: var(--superficie); border: 2px solid var(--tinta); display: grid; place-items: center; }
+  .nodo .i { width: 14px; height: 14px; }
+  .nodo.sel { background: var(--pino); border-color: var(--pino); color: #fff; box-shadow: 0 0 0 4px var(--pino-suave); }
+  .lbl { position: absolute; font-size: 14px; line-height: 18px; font-weight: 650; color: var(--texto-2); white-space: nowrap; transform: translateX(-50%); }
+  .lbl.arr { top: 0; } .lbl.abj { top: 70px; }
+  .lbl b { color: var(--tinta); }
+  .tabla { padding: 4px 0; overflow: hidden; }
+  .fila { display: grid; grid-template-columns: 36px 1fr 250px 236px; gap: 14px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--borde); }
+  .fila:first-child { border-top: 0; }
+  .fila .ico { width: 36px; height: 36px; border-radius: 10px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .fila .t { font-weight: 750; font-size: 15px; line-height: 20px; }
+  .fila .d { font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .diff { font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 600; }
+  .diff b { color: var(--tinta); font-weight: 800; }
+  .diff .baja { color: var(--error-texto); } .diff .sube { color: var(--logro-texto); }
+  .seg3 { display: grid; grid-template-columns: repeat(3, 1fr); padding: 3px; border-radius: 12px; background: var(--hundido); }
+  .seg3 span { height: 34px; display: grid; place-items: center; border-radius: 9px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .seg3 .si { background: var(--superficie); color: var(--logro-texto); box-shadow: var(--sombra-1); }
+  .seg3 .no { background: var(--superficie); color: var(--error-texto); box-shadow: var(--sombra-1); }
+  .seg3 .dsp { background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-1); }
+  .fila.sel { background: linear-gradient(90deg, var(--pino-suave), transparent 60%); }
+  .panel { padding: 20px; display: flex; flex-direction: column; gap: 14px; border-radius: 16px; }
+  .panel h3 { margin: 0; font-size: 18px; font-weight: 800; }
+  .imp { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--borde); }
+  .imp .et { font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .imp .va { display: flex; align-items: baseline; gap: 8px; font-weight: 800; font-size: 26px; letter-spacing: -.02em; }
+  .imp .va .de { font-size: 16px; color: var(--texto-3); text-decoration: line-through; font-weight: 700; }
+  .imp .va .mas { font-size: 15px; color: var(--logro-texto); font-weight: 800; margin-left: auto; }
+  .cuenta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .panel .btn-accion { width: 100%; justify-content: space-between; margin-top: auto; }
+  .toca { padding: 14px 16px; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .tile { display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 12px; background: var(--fondo); }
+  .tile .foto { width: 48px; height: 48px; background: var(--superficie); }
+  .tile .n { font-size: 14px; font-weight: 700; line-height: 18px; }
+  .tile .v { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .tile .v b { color: var(--tinta); font-weight: 800; }
+  .tile.falta { background: var(--urgente-suave); } .tile.falta .v { color: var(--urgente-texto); }
+  .seg3 span { cursor: pointer; } .seg3 span[aria-disabled="true"] { opacity: .4; cursor: not-allowed; }
+  .tile.igual { opacity: .55; }
+  .rompe { font-size: 14px; color: var(--texto-3); font-weight: 600; line-height: 20px; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="insignia" style="background:var(--urgente);color:#3A2500" data-pendientes>5</span></a>
+    <div class="pie">
+      <div class="vinculo" style="justify-content:center;padding:12px"><i class="i" data-i="smartphone"></i><div class="txt"></div></div>
+      <div class="usuario" style="justify-content:center"><span class="avatar">CI</span><div class="txt"></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Lo que quedó sin mandar</div>
+      <div class="sobres">
+        <span class="sobre elegido tocable" data-sobre="ana"><span class="avatar">AG</span>Ana Gómez<span class="n">4</span></span>
+        <span class="sobre tocable" data-sobre="julian"><span class="avatar">JP</span>Julián Pereyra<span class="n">1</span></span>
+      </div>
+      <div class="acciones"><button class="btn chico" data-registro><i class="i i-s" data-i="triangle-alert"></i>Vendido sin stock · 38 <i class="i i-s" data-i="arrow-right"></i></button></div>
+    </header>
+    <section class="pantalla">
+      <div class="izq">
+        <div class="tarde tarjeta">
+          <div class="top"><span class="avatar">AG</span><div><div class="t-seccion">La tarde de Ana, sin conexión</div><div class="t-detalle">Vendedora · Samsung A15 del local · 4 cambios que nunca llegaron</div></div>
+            <div class="der"><span class="pastilla error"><i class="i i-s" data-i="user-x"></i>Desactivada jue 15/10 18:40</span></div></div>
+          <div class="eje">
+            <div class="base"></div><div class="sin"></div><div class="corte"></div><div class="salto">⋯</div><div class="llega"></div>
+            <span class="lbl arr" style="left:18%">16:38 <b>pierde la señal</b></span>
+            <span class="lbl arr" style="left:80%"><b style="color:var(--error-texto)">18:40 la desactivan</b></span>
+            <span class="lbl abj" style="left:91%"><b>lun 09:14 llega</b></span>
+            <span class="nodo tocable" data-n="v1" style="left:44%"><i class="i" data-i="receipt"></i></span>
+            <span class="nodo sel tocable" data-n="v2" style="left:57%"><i class="i" data-i="receipt"></i></span>
+            <span class="nodo tocable" data-n="a1" style="left:63%"><i class="i" data-i="scale"></i></span>
+            <span class="nodo tocable" data-n="m1" style="left:68%"><i class="i" data-i="percent"></i></span>
+            <span class="lbl abj" style="left:44%">17:52</span><span class="lbl abj" style="left:57%"><b>18:21</b></span><span class="lbl abj" style="left:65.5%">18:30 · 18:35</span>
+            <span class="lbl abj" style="left:7%">jue 15/10</span>
+          </div>
+        </div>
+
+        <div class="tabla tarjeta">
+          <div class="fila tocable" data-id="v1"><span class="ico"><i class="i" data-i="receipt"></i></span><div><div class="t">Venta en efectivo · $25.000</div><div class="d">17:52 · Pinza universal 8" aislada, Tornillos fix 6 × 50 × 100</div></div>
+            <div class="diff">Pinza <b>7 → 6 un.</b> · Tornillos <b>48 → 47 un.</b></div>
+            <div class="seg3" role="radiogroup"><span class="si">Aceptar</span><span>Descartar</span><span>Después</span></div></div>
+          <div class="fila sel tocable" data-id="v2"><span class="ico" style="background:var(--pino);color:#fff"><i class="i" data-i="receipt"></i></span><div><div class="t">Venta con Mercado Pago · $43.000</div><div class="d">18:21 · Látex interior mate blanco 4 L, Puntas Phillips PH2 × 10</div></div>
+            <div class="diff">Látex <b>9 → 8 un.</b> · Puntas <b>0 → 0</b><br><span style="color:var(--urgente-texto)">+1 anomalía: no había puntas</span></div>
+            <div class="seg3" role="radiogroup"><span class="si">Aceptar</span><span>Descartar</span><span>Después</span></div></div>
+          <div class="fila tocable" data-id="a1"><span class="ico"><i class="i" data-i="scale"></i></span><div><div class="t">Ajuste de stock · Clavos punta París 2"</div><div class="d">18:30 · «Bolsa rota»: −1,5 kg</div></div>
+            <div class="diff">Clavos <b class="baja">12,4 → 10,9 kg</b><br>queda con la fecha de hoy</div>
+            <div class="seg3" role="radiogroup"><span>Aceptar</span><span class="no">Descartar</span><span>Después</span></div></div>
+          <div class="fila tocable" data-id="m1"><span class="ico"><i class="i" data-i="percent"></i></span><div><div class="t">Margen · Martillo carpintero 27 mm</div><div class="d">18:35 · de 50 % a 100 %</div></div>
+            <div class="diff">Precio <b class="sube">$24.000 → $32.000</b></div>
+            <div class="seg3" role="radiogroup"><span>Aceptar</span><span>Descartar</span><span class="dsp">Después</span></div></div>
+        </div>
+        <div class="toca tarjeta">
+          <div class="t-etiqueta" style="margin-bottom:10px">Los productos que toca, como quedarían</div>
+          <div class="tiles">
+            <div class="tile" data-de="v1"><div class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></div><div><div class="n">Pinza universal 8"</div><div class="v">7 → <b>6 un.</b></div></div></div>
+            <div class="tile" data-de="v1"><div class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div><div class="n">Tornillos fix 6 × 50</div><div class="v">48 → <b>47 un.</b></div></div></div>
+            <div class="tile" data-de="v2"><div class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></div><div><div class="n">Látex blanco 4 L</div><div class="v">9 → <b>8 un.</b></div></div></div>
+            <div class="tile falta" data-de="v2"><div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div><div class="n">Puntas PH2 × 10</div><div class="v">0 → <b>0 un.</b> · falta 1</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel tarjeta-2">
+        <h3>Si confirmás así</h3>
+        <div class="imp"><span class="et">Ventas del jueves 15/10</span><span class="va"><span class="de">$412.000</span><span><span class="peso">$</span>480.000</span><span class="mas">+ $68.000</span></span></div>
+        <div class="imp"><span class="et">Stock</span><span class="va" style="font-size:20px">3 productos bajan<span class="mas" style="color:var(--texto-2)">−3 un.</span></span><span class="t-detalle">Los clavos no se tocan: el ajuste se descarta.</span></div>
+        <div class="cuenta"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>2 aceptar</span><span class="pastilla error"><i class="i i-s" data-i="x"></i>1 descartar</span><span class="pastilla"><i class="i i-s" data-i="clock"></i>1 queda para después</span></div>
+        <div class="aviso urgente"><i class="i i-s" data-i="triangle-alert" style="margin-top:2px"></i><div>Las puntas PH2 no tienen stock: se anota 1 anomalía a nombre de Ana.</div></div>
+        <div class="rompe">Quién hizo qué va a decir que lo decidiste vos, hoy, uno por uno.</div>
+        <button class="btn btn-accion grande"><span>Confirmar 3 decisiones</span><span class="kbd" style="min-width:auto;white-space:nowrap">Ctrl ↵</span></button>
+      </aside>
+    </section>
+  </main>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+(function (A) {
+  var CLASE = ["si", "no", "dsp"];
+  var estado = { v1: "si", v2: "si", a1: "no", m1: "dsp", c1: "dsp" };
+  var hechos = {}, base = 412000, quien = "ana";
+  var tabla = document.querySelector(".tabla"), panel = document.querySelector(".panel"), izq = document.querySelector(".izq");
+  var tarde = document.querySelector(".tarde"), toca = document.querySelector(".toca");
+  var tardeAna = tarde.innerHTML, filasAna = Array.prototype.slice.call(tabla.children);
+  var filaJulian = document.createElement("div");
+  filaJulian.className = "fila sel tocable"; filaJulian.setAttribute("data-id", "c1");
+  filaJulian.innerHTML = '<span class="ico" style="background:var(--error-suave);color:var(--error-texto)"><i class="i" data-i="git-merge"></i></span><div><div class="t">Conteo · Lámpara LED 9 W luz fría E27</div><div class="d">vie 16/10 17:10 · contó 6 un. en D-04-02</div></div>' +
+    '<div class="diff" style="color:var(--error-texto)">Se unió con «Lámpara LED 9 W fría Macroled»: no hay a qué aplicarlo</div>' +
+    '<div class="seg3" role="radiogroup"><span aria-disabled="true" title="No se puede aplicar">Aceptar</span><span>Descartar</span><span class="dsp">Después</span></div>';
+  var tardeJulian = '<div class="top"><span class="avatar">JP</span><div><div class="t-seccion">El viernes de Julián, sin conexión</div><div class="t-detalle">Repositor · Moto E13 propio · 1 cambio que no se puede aplicar</div></div>' +
+    '<div class="der"><span class="pastilla error"><i class="i i-s" data-i="user-x"></i>Desactivado vie 16/10 19:00</span></div></div>' +
+    '<div class="eje"><div class="base"></div><div class="sin" style="left:26%;width:48%"></div><div class="corte" style="left:74%"></div><div class="salto">⋯</div><div class="llega"></div>' +
+    '<span class="lbl arr" style="left:26%">16:20 <b>pierde la señal</b></span><span class="lbl arr" style="left:76%"><b style="color:var(--error-texto)">19:00 lo desactivan</b></span>' +
+    '<span class="lbl abj" style="left:91%"><b>lun 09:14 llega</b></span><span class="nodo sel" data-n="c1" style="left:46%"><i class="i" data-i="git-merge"></i></span>' +
+    '<span class="lbl abj" style="left:46%"><b>17:10</b> contó la lámpara</span><span class="lbl abj" style="left:7%">vie 16/10</span></div>';
+
+  var filas = function () { return Array.prototype.slice.call(tabla.querySelectorAll(".fila")); };
+  function elegirFila(id) {
+    filas().forEach(function (f) {
+      var es = f.getAttribute("data-id") === id;
+      f.classList.toggle("sel", es);
+      var ico = f.querySelector(".ico");
+      if (f.getAttribute("data-id") !== "c1") { ico.style.background = es ? "var(--pino)" : ""; ico.style.color = es ? "#fff" : ""; }
+    });
+    tarde.querySelectorAll(".nodo").forEach(function (n) { n.classList.toggle("sel", n.getAttribute("data-n") === id); });
+  }
+  function poner(fila, cual) {
+    var id = fila.getAttribute("data-id"), spans = fila.querySelectorAll(".seg3 span");
+    var antes = fila.querySelector(".seg3 .si, .seg3 .no, .seg3 .dsp");
+    var nuevo = spans[CLASE.indexOf(cual)];
+    if (antes === nuevo) return;
+    estado[id] = cual;
+    spans.forEach(function (sp, i) { sp.className = i === CLASE.indexOf(cual) ? cual : ""; sp.setAttribute("aria-checked", i === CLASE.indexOf(cual)); });
+    if (antes) {
+      var dx = antes.getBoundingClientRect().left - nuevo.getBoundingClientRect().left;
+      A.anim(nuevo, [{ transform: "translateX(" + dx + "px)" }, { transform: "none" }], { duration: 200 });
+    }
+    calcular();
+  }
+  function calcular() {
+    var ids = filas().map(function (f) { return f.getAttribute("data-id"); });
+    var n = { si: 0, no: 0, dsp: 0 };
+    ids.forEach(function (id) { n[estado[id]]++; });
+    var ventas = ids.filter(function (id) { return /^v/.test(id) && estado[id] === "si"; }).map(A.porId);
+    var suma = ventas.reduce(function (s, c) { return s + c.monto; }, 0);
+    var bajan = ventas.reduce(function (s, c) { return s + c.prods.filter(function (p) { return !p.falta; }).length; }, 0);
+    var clavos = ids.indexOf("a1") < 0 ? "" : estado.a1 === "si" ? "Los clavos bajan de 12,4 a 10,9 kg: el ajuste se acepta." : estado.a1 === "no" ? "Los clavos no se tocan: el ajuste se descarta." : "El ajuste de los clavos queda para después.";
+    var puntas = ventas.some(function (c) { return c.id === "v2"; });
+    var precio = ids.indexOf("m1") >= 0 && estado.m1 === "si";
+    var dec = n.si + n.no;
+    var h = '<h3>Si confirmás así</h3>' +
+      '<div class="imp"><span class="et">Ventas del jueves 15/10</span><span class="va">' + (suma ? '<span class="de">$' + A.miles(base) + "</span>" : "") + "<span>" + A.pesos(base + suma) + "</span>" + (suma ? '<span class="mas">+ $' + A.miles(suma) + "</span>" : '<span class="mas" style="color:var(--texto-2)">sin cambio</span>') + "</span></div>" +
+      '<div class="imp"><span class="et">Stock</span><span class="va" style="font-size:20px">' + (bajan ? bajan + (bajan === 1 ? " producto baja" : " productos bajan") + '<span class="mas" style="color:var(--texto-2)">−' + bajan + " un.</span>" : "No baja nada") + '</span><span class="t-detalle">' + (clavos || (quien === "julian" ? "El conteo de la lámpara no se aplica: no hay a qué." : "&nbsp;")) + "</span></div>" +
+      '<div class="cuenta">' + (n.si ? '<span class="pastilla logro"><i class="i i-s" data-i="check"></i>' + n.si + " aceptar</span>" : "") + (n.no ? '<span class="pastilla error"><i class="i i-s" data-i="x"></i>' + n.no + " descartar</span>" : "") + (n.dsp ? '<span class="pastilla"><i class="i i-s" data-i="clock"></i>' + n.dsp + " queda para después</span>" : "") + "</div>" +
+      (puntas ? '<div class="aviso urgente"><i class="i i-s" data-i="triangle-alert" style="margin-top:2px"></i><div>Las puntas PH2 no tienen stock: se anota 1 anomalía a nombre de Ana.</div></div>' : "") +
+      (precio ? '<div class="aviso pino"><i class="i i-s" data-i="tags" style="margin-top:2px"></i><div>El martillo de 27 mm pasa a $32.000 desde hoy.</div></div>' : "") +
+      '<div class="rompe">Quién hizo qué va a decir que lo decidiste vos, hoy, uno por uno.</div>' +
+      '<button class="btn btn-accion grande" data-confirmar' + (dec ? "" : " disabled") + '><span>' + (dec ? "Confirmar " + dec + (dec === 1 ? " decisión" : " decisiones") : "Nada para confirmar") + '</span><span class="kbd" style="min-width:auto;white-space:nowrap">Ctrl ↵</span></button>';
+    var viejos = Array.prototype.map.call(panel.querySelectorAll(".imp .va"), function (v) { return v.textContent; });
+    panel.innerHTML = h; pintarIconos(panel);
+    panel.querySelectorAll(".imp .va").forEach(function (v, i) { if (viejos[i] !== v.textContent) A.anim(v, [{ transform: "translateY(8px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 200 }); });
+    document.querySelectorAll(".tile[data-de]").forEach(function (t) { t.classList.toggle("igual", estado[t.getAttribute("data-de")] !== "si" || !!hechos[t.getAttribute("data-de")]); });
+  }
+  function pendientes() { return ["v1", "v2", "a1", "m1", "c1"].filter(function (id) { return !hechos[id]; }); }
+  function contarSobres() {
+    var q = pendientes();
+    ["ana", "julian"].forEach(function (p) {
+      var n = q.filter(function (id) { return A.porId(id).quien === p; }).length;
+      var s = document.querySelector('[data-sobre="' + p + '"]');
+      if (!s) return;
+      if (!n) { A.anim(s, [{ opacity: 1 }, { opacity: 0, transform: "scale(.9)" }], { duration: 200, fill: "forwards" }).then(function () { s.hidden = true; }); return; }
+      s.hidden = false; A.rodar(s.querySelector(".n"), String(n), false);
+    });
+    A.marcarPendientes(q.length);
+  }
+  function confirmar() {
+    var dec = filas().filter(function (f) { return estado[f.getAttribute("data-id")] !== "dsp"; });
+    if (!dec.length) return;
+    var hermanos = filas(), base0 = base, ok = 0, no = 0;
+    dec.forEach(function (f) {
+      var id = f.getAttribute("data-id"), c = A.porId(id);
+      hechos[id] = estado[id];
+      if (estado[id] === "si") { ok++; if (c.monto) base += c.monto; } else no++;
+      A.sacar(f, estado[id] === "si" ? "arriba" : "izq", hermanos);
+      var nodo = tarde.querySelector('[data-n="' + id + '"]'); if (nodo) nodo.style.opacity = ".35";
+    });
+    A.vibrar([10, 40, 10]);
+    setTimeout(function () {
+      var resto = filas(); if (resto.length) elegirFila(resto[0].getAttribute("data-id"));
+      else tabla.innerHTML = '<div class="vacio"><span class="tilde"><i class="i i-xl" data-i="check"></i></span><b>' + (quien === "ana" ? "Lo de Ana" : "Lo de Julián") + ' ya está decidido</b><span>Queda en Quién hizo qué.</span></div>', pintarIconos(tabla);
+      calcular(); contarSobres();
+    }, 260);
+    A.tostada(dec.length + (dec.length === 1 ? " decisión guardada" : " decisiones guardadas") + " · " + ok + " aceptada" + (ok === 1 ? "" : "s") + ", " + no + " descartada" + (no === 1 ? "" : "s"), { icono: "circle-check" });
+  }
+  function verSobre(p) {
+    if (p === quien) return;
+    quien = p;
+    document.querySelectorAll("[data-sobre]").forEach(function (s) { s.classList.toggle("elegido", s.getAttribute("data-sobre") === p); });
+    tabla.innerHTML = "";
+    if (p === "ana") {
+      tarde.innerHTML = tardeAna;
+      filasAna.forEach(function (f) { if (!hechos[f.getAttribute("data-id")]) tabla.appendChild(f); });
+      toca.hidden = false;
+      Object.keys(hechos).forEach(function (id) { var nodo = tarde.querySelector('[data-n="' + id + '"]'); if (nodo) nodo.style.opacity = ".35"; });
+    } else {
+      tarde.innerHTML = tardeJulian;
+      if (!hechos.c1) tabla.appendChild(filaJulian);
+      toca.hidden = true;
+    }
+    pintarIconos(izq);
+    if (!filas().length) tabla.innerHTML = '<div class="vacio"><span class="tilde"><i class="i i-xl" data-i="check"></i></span><b>Ya está decidido</b></div>', pintarIconos(tabla);
+    else elegirFila(filas()[0].getAttribute("data-id"));
+    calcular();
+    A.fundido(izq);
+  }
+  tabla.addEventListener("click", function (e) {
+    var f = e.target.closest(".fila"); if (!f) return;
+    var sp = e.target.closest(".seg3 span");
+    if (sp) {
+      if (sp.getAttribute("aria-disabled") === "true") { A.sacudir(sp.parentNode); A.tostada("No se puede aceptar: el producto se unió con otro", { ambar: true, icono: "triangle-alert" }); return; }
+      poner(f, CLASE[Array.prototype.indexOf.call(sp.parentNode.children, sp)]);
+    }
+    elegirFila(f.getAttribute("data-id"));
+  });
+  tarde.addEventListener("click", function (e) { var n = e.target.closest("[data-n]"); if (n && tabla.querySelector('[data-id="' + n.getAttribute("data-n") + '"]')) elegirFila(n.getAttribute("data-n")); });
+  panel.addEventListener("click", function (e) { if (e.target.closest("[data-confirmar]")) confirmar(); });
+  document.addEventListener("keydown", function (e) { if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !A.hayAbierto()) { e.preventDefault(); confirmar(); } });
+  document.querySelector(".sobres").addEventListener("click", function (e) { var s = e.target.closest("[data-sobre]"); if (s) verSobre(s.getAttribute("data-sobre")); });
+  document.querySelector("[data-registro]").addEventListener("click", function () { A.abrirRegistro(); });
+  panel.querySelector(".btn-accion").setAttribute("data-confirmar", "");
+})(window.Anom);
+</script>
+</body>
+</html>

@@ -41,3 +41,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T030 [ajuste] El entorno de las sesiones en la nube pasa a tener acceso completo a internet (Carlos, 2026-10-19), anotado en la documentación de operación
 - [x] T031 [agente] Propuestas de diseño de todas las pantallas, en computadora y celular, hechas por el director de arte y guardadas en `docs/propuestas-de-diseno/` para que Carlos las revise; lo que rechaza se borra (Carlos, 2026-10-19)
 - [x] T032 [ajuste] El prompt del director de arte se guarda como la skill `/director-de-arte`, que corre solo cuando Carlos la pide (Carlos, 2026-10-19)
+- [x] T033 [ajuste] Las maquetas del director de arte se pueden navegar en el ambiente de pruebas, en /v2, /v3 y /v4, sin que la aplicación instalada las guarde (decisión 113)

@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventas de hoy · Se corrige como en el cuaderno (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../ventas.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .pantalla { display: grid; grid-template-columns: 344px minmax(0,1fr); gap: 20px; padding-top: 16px; }
+  /* ---- Columna del día ---- */
+  .dia { display: flex; flex-direction: column; min-height: 0; gap: 12px; }
+  .resu { padding: 14px 16px; }
+  .resu .fila1 { display: flex; align-items: baseline; justify-content: space-between; }
+  .resu .t-numero { font-size: 32px; }
+  .resu .comp { font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 2px; display: flex; gap: 8px; align-items: center; }
+  .resu .horas { height: 56px; margin-top: 10px; gap: 4px; }
+  .resu .horas .h span { display: none; }
+  .resu .horas .col b { border-radius: 4px 4px 2px 2px; }
+  .barra-medios { display: flex; height: 8px; border-radius: 99px; overflow: hidden; gap: 2px; margin-top: 12px; }
+  .barra-medios b { background: var(--c); }
+  .ley-medios { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; margin-top: 8px; font-size: 14px; font-weight: 600; color: var(--texto-2); }
+  .ley-medios span { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .ley-medios b { margin-left: auto; color: var(--tinta); font-weight: 800; }
+  .lista { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+  .lista::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(transparent, var(--fondo)); }
+  .lista .cab { display: flex; align-items: center; justify-content: space-between; margin: 2px 0 6px; }
+  .tl { display: grid; grid-template-columns: 44px 12px minmax(0,1fr) auto; gap: 10px; align-items: center; height: 48px; padding: 0 12px; border-radius: var(--r); font-size: 15px; position: relative; }
+  .tl .h { font-weight: 700; color: var(--texto-2); font-size: 14px; }
+  .tl .q { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tl .q small { display: block; font-weight: 500; font-size: 14px; color: var(--texto-2); line-height: 16px; }
+  .tl .v { font-weight: 800; }
+  .tl.elegida { background: var(--superficie); box-shadow: var(--sombra-2); border: 1px solid var(--pino); }
+  .tl.anulada .q, .tl.anulada .v { text-decoration: line-through; color: var(--texto-3); }
+  .tl::before { content: ""; position: absolute; left: 65px; top: -4px; bottom: -4px; width: 2px; background: var(--borde); z-index: -1; }
+
+  /* ---- La boleta, en modo corregir ---- */
+  .boleta { display: flex; flex-direction: column; min-height: 0; padding: 0; box-shadow: var(--sombra-2); overflow: hidden; }
+  .bcab { display: flex; align-items: center; gap: 12px; padding: 16px 20px 12px; }
+  .bcab .t { font-size: 20px; font-weight: 800; line-height: 26px; }
+  .bcab .d { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .verbos { margin-left: auto; }
+  .verbos > * { min-height: 36px; padding: 0 12px; }
+  .verbos .kbd { height: 20px; min-width: 20px; font-size: 14px; padding: 0 4px; }
+  .verbos .elegido { color: var(--pino); }
+  .modo { margin: 0 20px; display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: var(--r); background: var(--pino-suave); color: var(--pino-texto); font-size: 14px; font-weight: 650; }
+  .cuerpo { display: grid; grid-template-columns: minmax(0,1fr) 232px; gap: 20px; padding: 12px 20px 0; flex: 1; min-height: 0; }
+  .rcab, .rr { display: grid; grid-template-columns: 48px minmax(0,1fr) 92px 92px 88px; gap: 12px; align-items: center; }
+  .rcab { font-size: 14px; color: var(--texto-3); font-weight: 650; padding: 0 0 6px; border-bottom: 1px solid var(--borde); }
+  .rr { padding: 8px 0; border-bottom: 1px solid var(--borde); }
+  .rr .nom { font-weight: 700; line-height: 20px; }
+  .rr .det { font-size: 14px; color: var(--texto-2); }
+  .rr .der { text-align: right; }
+  .celda { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .celda .viejo { font-size: 14px; }
+  .edit { justify-self: start; display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 10px; border-radius: 10px; border: 1.5px solid var(--pino); background: #fff; font-weight: 800; box-shadow: 0 0 0 4px rgba(18,56,47,.10); }
+  .edit .u { font-weight: 600; color: var(--texto-2); font-size: 14px; }
+  .edit.hecho { border-color: var(--borde-fuerte); box-shadow: none; }
+  .tocado { font-size: 14px; color: var(--urgente-texto); font-weight: 650; }
+  .agregar { display: flex; align-items: center; gap: 8px; padding: 12px 0; color: var(--texto-2); font-weight: 650; font-size: 15px; }
+  .agregar .pastilla { margin-left: 4px; }
+
+  .cambia { background: var(--fondo); border-radius: var(--r-tarjeta); padding: 14px 16px; align-self: start; display: grid; gap: 8px; }
+  .cambia .t { font-size: 16px; font-weight: 800; }
+  .cambia .linea { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: var(--texto-2); font-weight: 600; gap: 8px; }
+  .cambia .linea b { color: var(--tinta); font-weight: 800; font-size: 15px; white-space: nowrap; }
+  .cambia .grande { font-size: 28px; font-weight: 800; letter-spacing: -.02em; color: var(--tinta); }
+  .cambia hr { border: 0; border-top: 1px solid var(--borde-fuerte); margin: 0; }
+  .hist { margin-top: 4px; padding: 12px 14px; border-radius: var(--r); border: 1px dashed var(--borde-fuerte); }
+  .hi { display: flex; gap: 10px; align-items: center; font-size: 14px; color: var(--texto-2); font-weight: 500; line-height: 26px; }
+  .hi b { color: var(--tinta); font-weight: 750; min-width: 40px; }
+  .hi .pt { width: 8px; height: 8px; border-radius: 99px; background: var(--borde-fuerte); }
+  .hi.ahora .pt { background: var(--pino); box-shadow: 0 0 0 4px var(--pino-suave); }
+  .hi.ahora { color: var(--pino-texto); font-weight: 650; }
+  .pie-b { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-top: 1px solid var(--borde); background: #fff; }
+  .pie-b .rastro { font-size: 14px; color: var(--texto-2); font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .pie-b .btn-accion { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item activo"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="vinculo" style="padding:12px;justify-content:center"><i class="i" data-i="smartphone"></i></div>
+      <span class="avatar" style="margin:0 auto">MR</span>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Ventas de hoy</div>
+      <div class="sub" style="align-self:flex-end;margin-bottom:4px">Lunes 19/10 · hasta las 17:40</div>
+      <div class="acciones">
+        <span class="pastilla logro"><span class="punto"></span>En línea</span>
+        <button class="btn chico"><i class="i i-s" data-i="calendar-days"></i>Otro día <span class="kbd">F</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Vender</a><a class="activa">Ventas de hoy</a></nav>
+
+    <section class="pantalla">
+      <!-- El día, angosto -->
+      <div class="dia">
+        <div class="tarjeta resu">
+          <div class="fila1"><span class="t-etiqueta">Total de hoy</span><span class="sube"><i class="i" data-i="arrow-up-right"></i>13 % vs. ayer</span></div>
+          <div class="t-numero num" style="margin-top:2px"><span class="peso">$</span>412.000</div>
+          <div class="comp">23 ventas · 41 productos · ticket $17.913</div>
+          <div class="horas">
+            <div class="h"><div class="col" style="--a:12%"><b style="--v:17%"></b></div><span>8</span></div>
+            <div class="h"><div class="col" style="--a:39%"><b style="--v:50%"></b></div><span>9</span></div>
+            <div class="h"><div class="col" style="--a:64%"><b style="--v:69%"></b></div><span>10</span></div>
+            <div class="h"><div class="col" style="--a:68%"><b style="--v:62%"></b></div><span>11</span></div>
+            <div class="h"><div class="col" style="--a:49%"><b style="--v:45%"></b></div><span>12</span></div>
+            <div class="h sin"><div class="col"><b></b></div><span>13</span></div>
+            <div class="h sin"><div class="col"><b></b></div><span>14</span></div>
+            <div class="h sin"><div class="col"><b></b></div><span>15</span></div>
+            <div class="h"><div class="col" style="--a:60%"><b style="--v:56%"></b></div><span>16</span></div>
+            <div class="h ahora"><div class="col" style="--a:64%"><b style="--v:100%"></b></div><span>17</span></div>
+            <div class="h fut"><div class="col"><b></b></div><span>18</span></div>
+            <div class="h fut"><div class="col"><b></b></div><span>19</span></div>
+          </div>
+          <div class="barra-medios"><b class="medio efectivo" style="flex:148"></b><b class="medio mp" style="flex:171"></b><b class="medio tarjeta" style="flex:38"></b><b class="medio cuenta" style="flex:55"></b></div>
+          <div class="ley-medios">
+            <span class="medio efectivo"><span class="punto-m"></span>Efectivo <b>$148.000</b></span>
+            <span class="medio mp"><span class="punto-m"></span>M. Pago <b>$171.000</b></span>
+            <span class="medio tarjeta"><span class="punto-m"></span>Tarjeta <b>$38.000</b></span>
+            <span class="medio cuenta"><span class="punto-m"></span>Cta. cte. <b>$55.000</b></span>
+          </div>
+        </div>
+        <div class="lista">
+          <div class="cab"><span class="t-seccion" style="font-size:18px">Ventas</span><span class="t-detalle">↑ ↓ eligen</span></div>
+          <div class="tl"><span class="h">17:36</span><span class="punto-m medio mp"></span><span class="q">1 × Juego de llaves combinadas</span><span class="v num">$78.000</span></div>
+          <div class="tl"><span class="h">17:22</span><span class="punto-m medio efectivo"></span><span class="q">2 productos</span><span class="v num">$21.000</span></div>
+          <div class="tl"><span class="h">17:05</span><span class="punto-m medio efectivo"></span><span class="q">Cambio de pinza</span><span class="v num">+$4.000</span></div>
+          <div class="tl elegida"><span class="h">16:48</span><span class="punto-m medio cuenta"></span><span class="q">3 productos<small>Constructora Martínez</small></span><span class="v num">$38.000</span></div>
+          <div class="tl anulada"><span class="h">16:30</span><span class="punto-m medio tarjeta"></span><span class="q">1 × Martillo carpintero</span><span class="v num">$24.000</span></div>
+          <div class="tl"><span class="h">16:15</span><span class="punto-m medio mp"></span><span class="q">4 × Lámpara LED 9 W</span><span class="v num">$20.000</span></div>
+          <div class="tl"><span class="h">12:51</span><span class="punto-m medio efectivo"></span><span class="q">2 productos</span><span class="v num">$15.000</span></div>
+        </div>
+      </div>
+
+      <!-- La venta elegida, corrigiéndose -->
+      <div class="tarjeta boleta">
+        <div class="bcab">
+          <span class="mico medio cuenta"><i class="i" data-i="notebook-pen"></i></span>
+          <div><div class="t">Constructora Martínez</div><div class="d">16:48 · Cuenta corriente · la cobró Mariela</div></div>
+          <div class="segmentos verbos">
+            <button>Ver</button>
+            <button class="elegido"><i class="i i-s" data-i="square-pen"></i>Corregir <span class="kbd">E</span></button>
+            <button><i class="i i-s" data-i="arrow-left-right"></i>Cambio <span class="kbd">C</span></button>
+            <button style="color:var(--error-texto)"><i class="i i-s" data-i="ban"></i>Anular</button>
+          </div>
+        </div>
+        <div class="cuerpo">
+          <div>
+            <div class="rcab"><span></span><span>Producto</span><span>Cantidad</span><span>Precio c/u</span><span class="der">Subtotal</span></div>
+            <div class="rr">
+              <span class="foto chica" style="width:48px;height:48px"><img src="../../../_comun/fotos/pintura.webp" alt=""></span>
+              <div><div class="nom">Látex interior mate blanco 4 L</div><div class="det">Alba · Cód. LX4B</div></div>
+              <span class="edit hecho">1 <span class="u">un.</span></span>
+              <span style="font-weight:700">$22.000</span>
+              <span class="der" style="font-weight:800">$22.000</span>
+            </div>
+            <div class="rr">
+              <span class="foto chica" style="width:48px;height:48px"><img src="../../../_comun/fotos/clavos.webp" alt=""></span>
+              <div><div class="nom">Clavos punta París 2"</div><div class="tocado">Cantidad corregida</div></div>
+              <span class="celda"><span class="viejo">1 kg</span><span class="edit">1,5 <span class="u">kg</span><span class="cursor" style="height:18px"></span></span></span>
+              <span style="font-weight:700">$8.000</span>
+              <span class="der celda" style="align-items:flex-end"><span class="viejo">$8.000</span><span class="nuevo">$12.000</span></span>
+            </div>
+            <div class="rr">
+              <span class="foto chica" style="width:48px;height:48px"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span>
+              <div><div class="nom">Tarugos nylon S8 con tope × 100</div><div class="tocado">Precio a mano</div></div>
+              <span class="edit hecho">1 <span class="u">un.</span></span>
+              <span class="celda"><span class="viejo">$8.000</span><span class="nuevo">$7.000</span></span>
+              <span class="der celda" style="align-items:flex-end"><span class="viejo">$8.000</span><span class="nuevo">$7.000</span></span>
+            </div>
+            <div class="agregar"><i class="i" data-i="plus"></i>Agregar lo que se llevó y no se cargó <span class="pastilla contorno">a confirmar</span></div>
+            <div class="hist">
+              <div class="t-etiqueta" style="margin-bottom:6px">La historia de esta venta</div>
+              <div class="hi"><span class="pt"></span><b>16:48</b> Mariela la cobró en el mostrador, en cuenta corriente</div>
+              <div class="hi"><span class="pt"></span><b>16:48</b> Sumó $38.000 a lo que debe Constructora Martínez</div>
+              <div class="hi ahora"><span class="pt"></span><b>17:41</b> Mariela la está corrigiendo</div>
+            </div>
+          </div>
+          <div class="cambia">
+            <div class="t">Lo que cambia</div>
+            <div class="linea">Total de la venta <b><span class="viejo">$38.000</span></b></div>
+            <div class="grande num"><span class="peso">$</span>41.000 <span class="pastilla urgente" style="vertical-align:middle">+$3.000</span></div>
+            <hr>
+            <div class="linea">Lo que debe el cliente <b>+$3.000</b></div>
+            <div class="linea">Stock de clavos <b>−0,5 kg</b></div>
+            <div class="linea">Total de hoy <b>$415.000</b></div>
+            <hr>
+            <div class="linea" style="align-items:flex-start"><i class="i i-s" data-i="history" style="margin-top:2px"></i><span style="flex:1">Queda en Quién hizo qué, con los valores de antes.</span></div>
+          </div>
+        </div>
+        <div class="pie-b">
+          <span class="rastro"><i class="i i-s" data-i="pencil"></i>Lo anterior queda tachado y guardado</span>
+          <button class="btn btn-fantasma chico">Descartar <span class="kbd">Esc</span></button>
+          <button class="btn btn-accion"><i class="i i-s" data-i="check"></i>Guardar corrección · +$3.000 <span class="kbd">Ctrl Enter</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+/* Computadora 2 · Se corrige como en el cuaderno: la venta es el objeto y los verbos son
+   pestañas (Ver · Corregir · Cambio · Anular). Al corregir se escribe encima y lo anterior queda
+   tachado; «Lo que cambia» se recalcula. Teclas: ↑ ↓, E, C, Supr, F, Esc, Ctrl Enter. */
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var plata = VH.plata, cant = VH.cant;
+  VH.marco();
+
+  // El día
+  VH.ligar($('.resu .t-numero'), function (d) { return plata(d.total); });
+  VH.ligar($('.resu .comp'), function (d) { return d.ventas + ' ventas · ' + d.productos + ' productos · ticket ' + VH.ticket(); });
+  var claves = ['efectivo', 'mp', 'tarjeta', 'cuenta'];
+  $$('.ley-medios > span').forEach(function (s, i) { VH.ligar($('b', s), function (d) { return plata(d.medios[claves[i]]); }); });
+  var pintarDia = VH.pintar;
+  VH.pintar = function () { pintarDia(); $$('.barra-medios b').forEach(function (b, i) { b.style.flex = String(VH.dia.medios[claves[i]] / 1000); }); };
+  VH.barras($('.resu .horas'));
+  VH.entrada($('.resu .t-numero'), $('.resu .horas'));
+
+  // La lista
+  var lista = $('.lista');
+  ['1736', '1722', '1705', '1648', '1630', '1615', '1251'].forEach(function (id, i) { $$('.tl', lista)[i].dataset.id = id; });
+  function tlHTML(v) {
+    var q = v.tipo === 'cambio' ? 'Cambio de ' + v.vuelve.nom.split(' ')[0].toLowerCase() : VH.titulo(v) === v.cliente ? v.items.length + ' productos<small>' + v.cliente + '</small>' : VH.titulo(v).replace(/ × \d+$/, '');
+    var pas = v.estado === 'corregida' ? ' <span class="pastilla urgente" style="height:22px;padding:0 8px;vertical-align:1px">corregida</span>' : '';
+    if (v.cliente && pas) q = v.items.length + ' productos' + pas + '<small>' + v.cliente + '</small>'; else q += pas;
+    return '<div class="tl' + (v.estado === 'anulada' ? ' anulada' : '') + '" data-id="' + v.id + '"><span class="h">' + v.hora + '</span><span class="punto-m medio ' + v.medio + '"></span><span class="q">' + q +
+      '</span><span class="v num">' + (v.tipo === 'cambio' && VH.total(v) > 0 ? '+' : '') + plata(VH.total(v)) + '</span></div>';
+  }
+  function repintarTl(v, efecto) {
+    var t = $('.tl[data-id="' + v.id + '"]', lista), el = t.classList.contains('elegida');
+    t.insertAdjacentHTML('afterend', tlHTML(v)); t.remove();
+    t = $('.tl[data-id="' + v.id + '"]', lista);
+    if (el) t.classList.add('elegida');
+    if (efecto === 'late') { var p = $('.pastilla', t); if (p) p.classList.add('vh-late'); }
+    if (efecto === 'tacha') { t.classList.add('vh-tachando'); setTimeout(function () { t.classList.remove('vh-tachando'); }, 800); }
+  }
+
+  // La boleta
+  var boleta = $('.boleta'), v, modo, st = {};
+  var AGREGABLES = [VH.it('Cinta aisladora 3M Temflex 20 m', '3M · Cód. 1700', null, 1, 3000), VH.it('Lija al agua grano 120', 'Norton · Cód. T401', null, 2, 2000), VH.it('Tornillos para madera 6 × 1 1/2" × 50', 'Fischer · Cód. M615', 'tornillos', 1, 5000)];
+  function raya(x, k, t) { x.r = x.r || {}; var ya = x.r[k]; x.r[k] = true; return ya ? '<span class="viejo">' + t + '</span>' : '<span class="vh-raya">' + t + '</span>'; }
+  function hist() {
+    var h = '<div class="hi"><span class="pt"></span><b>' + v.hora + '</b> ' + v.quien + (v.tipo === 'cambio' ? ' registró el cambio: volvió ' + v.vuelve.nom.split(' ').slice(0, 2).join(' ').toLowerCase() : ' la cobró en el mostrador, en ' + VH.MEDIOS[v.medio].nom.toLowerCase()) + '</div>';
+    if (v.medio === 'cuenta' && v.cliente) h += '<div class="hi"><span class="pt"></span><b>' + v.hora + '</b> Sumó ' + plata(v.inicial || (v.inicial = VH.totalOrig(v))) + ' a lo que debe ' + v.cliente + '</div>';
+    if (v.estado === 'corregida') h += '<div class="hi"><span class="pt"></span><b>' + v.corregidaA + '</b> ' + v.quien + ' la corrigió: ' + v.nota + '</div>';
+    if (v.estado === 'anulada') h += '<div class="hi"><span class="pt"></span><b>' + v.anuladaA + '</b> La anuló Mariela' + (v.motivo ? ': ' + v.motivo.toLowerCase() : '') + '</div>';
+    if (modo !== 'ver') h += '<div class="hi ahora"><span class="pt"></span><b>17:41</b> Mariela la está ' + (modo === 'corregir' ? 'corrigiendo' : modo === 'cambio' ? 'cambiando' : 'anulando') + '</div>';
+    return '<div class="hist"><div class="t-etiqueta" style="margin-bottom:6px">La historia de esta venta</div>' + h + '</div>';
+  }
+  function filaVer(x) {
+    return '<div class="rr">' + VH.foto(x.foto, 'chica').replace('class="foto chica"', 'class="foto chica" style="width:48px;height:48px"').replace('class="foto-icono chica"', 'class="foto-icono chica" style="width:48px;height:48px"') +
+      '<div><div class="nom">' + x.nom + '</div><div class="det">' + (x.vuelta ? 'Volvió · se había pagado' : x.det) + '</div></div><span style="font-weight:700">' + (x.vuelta ? '−' : '') + cant(x.cant) + ' ' + x.u + '</span>' +
+      '<span style="font-weight:700">' + plata(x.precio) + '</span><span class="der" style="font-weight:800">' + (x.vuelta ? '−' : '') + plata(x.cant * x.precio) + '</span></div>';
+  }
+  function filaEd(x, i) {
+    var cc = x.cant !== x.o.cant, cp = x.precio !== x.o.precio, fc = st.foco && st.foco[0] === i && st.foco[1] === 'cant', fp = st.foco && st.foco[0] === i && st.foco[1] === 'precio';
+    if (!cc && x.r) x.r.c = false; if (!cp && x.r) x.r.p = false; if (!cc && !cp && x.r) x.r.s = false;
+    var dentro = function (val, u, foco) {
+      if (foco && st.vivo) return '<input class="vh-in" data-vivo value="' + val + '" aria-label="' + (u ? 'Cantidad' : 'Precio') + '">' + (u ? ' <span class="u">' + u + '</span>' : '');
+      return val + (u ? ' <span class="u">' + u + '</span>' : '') + (foco ? '<span class="cursor" style="height:18px"></span>' : '');
+    };
+    var eC = '<span class="edit' + (fc ? '' : ' hecho') + '" data-ed="' + i + ':cant">' + dentro(cant(x.cant), x.u, fc) + '</span>';
+    var celC = x.o.cant === 0 ? eC : cc ? '<span class="celda">' + raya(x, 'c', cant(x.o.cant) + ' ' + x.u) + eC + '</span>' : eC;
+    var celP = fp ? '<span class="celda">' + (cp ? raya(x, 'p', plata(x.o.precio)) : '') + '<span class="edit" data-ed="' + i + ':precio">$' + dentro(VH.miles(x.precio), '', true) + '</span></span>'
+      : cp ? '<span class="celda" data-ed="' + i + ':precio">' + raya(x, 'p', plata(x.o.precio)) + '<span class="nuevo">' + plata(x.precio) + '</span></span>'
+        : '<span style="font-weight:700" data-ed="' + i + ':precio">' + plata(x.precio) + '</span>';
+    var sub = (cc || cp) && x.o.cant ? '<span class="der celda" style="align-items:flex-end">' + raya(x, 's', plata(x.o.cant * x.o.precio)) + '<span class="nuevo">' + plata(x.cant * x.precio) + '</span></span>'
+      : '<span class="der" style="font-weight:800">' + plata(x.cant * x.precio) + '</span>';
+    var det = x.o.cant === 0 ? '<div class="tocado">Se agrega ahora</div>' : cc ? '<div class="tocado">Cantidad corregida</div>' : cp ? '<div class="tocado">Precio a mano</div>' : '<div class="det">' + x.det + '</div>';
+    return '<div class="rr' + (x.recien ? ' vh-entra' : '') + '">' + VH.foto(x.foto, 'chica').replace('class="foto chica"', 'class="foto chica" style="width:48px;height:48px"').replace('class="foto-icono chica"', 'class="foto-icono chica" style="width:48px;height:48px"') +
+      '<div><div class="nom">' + x.nom + '</div>' + det + '</div>' + celC + celP + sub + '</div>';
+  }
+  var RCAB = '<div class="rcab"><span></span><span>Producto</span><span>Cantidad</span><span>Precio c/u</span><span class="der">Subtotal</span></div>';
+  function lineas(ls) { return ls.map(function (l) { return '<div class="linea">' + l[0] + ' <b>' + l[1] + '</b></div>'; }).join(''); }
+  var HQ = '<hr><div class="linea" style="align-items:flex-start"><i class="i i-s" data-i="history" style="margin-top:2px"></i><span style="flex:1">Queda en Quién hizo qué, con los valores de antes.</span></div>';
+
+  function pintar() {
+    var seg = function (m, ico, txt, kbd, estilo) {
+      return '<button data-modo="' + m + '"' + (modo === m ? ' class="elegido"' : '') + (estilo ? ' style="' + estilo + '"' : '') + (v.estado === 'anulada' && m !== 'ver' ? ' disabled' : '') + '>' + (ico ? '<i class="i i-s" data-i="' + ico + '"></i>' : '') + txt + (kbd ? ' <span class="kbd">' + kbd + '</span>' : '') + '</button>';
+    };
+    var esCambio = v.tipo === 'cambio';
+    var h = '<div class="bcab">' + VH.mico(v.medio) + '<div><div class="t">' + VH.titulo(v) + '</div><div class="d">' + v.hora + ' · ' + VH.MEDIOS[v.medio].nom + ' · la cobró ' + v.quien + '</div></div>' +
+      '<div class="segmentos verbos">' + seg('ver', '', 'Ver') + (esCambio ? '' : seg('corregir', 'square-pen', 'Corregir', modo === 'corregir' || modo === 'ver' ? 'E' : '')) + seg('cambio', 'arrow-left-right', 'Cambio', modo === 'corregir' ? 'C' : '') + seg('anular', 'ban', 'Anular', '', 'color:var(--error-texto)') + '</div></div>';
+    var izq = '', der = '', pie = '';
+    if (modo === 'ver') {
+      var filas = (v.vuelve ? [Object.assign({ vuelta: 1 }, v.vuelve)] : []).concat(v.items);
+      izq = RCAB + filas.map(filaVer).join('') + '<div style="height:12px"></div>' + hist();
+      der = '<div class="t">La venta</div><div class="grande num' + (v.estado === 'anulada' ? ' viejo' : '') + '">' + (esCambio && VH.total(v) > 0 ? '+' : '') + '<span class="peso">$</span>' + VH.miles(VH.total(v)) + '</div><hr>' +
+        lineas([['Medio', VH.MEDIOS[v.medio].nom], ['Cobró', v.quien + ' · ' + v.hora], ['Productos', String(v.items.length)]]) +
+        (v.estado === 'anulada' ? '<div class="aviso error"><i class="i i-s" data-i="ban" style="margin-top:2px"></i><span>Anulada a las ' + v.anuladaA + '. Queda tachada, a la vista.</span></div>' : '') + HQ;
+      pie = '<span class="rastro"><i class="i i-s" data-i="history"></i>' + (v.estado === 'anulada' ? 'Anulada · no se puede tocar' : v.estado === 'corregida' ? 'Corregida a las ' + v.corregidaA + ' · ' + v.nota : 'Se corrige hasta el cierre de hoy') + '</span>' +
+        (v.estado === 'anulada' || esCambio ? '' : '<button class="btn chico" data-modo="corregir" style="margin-left:auto"><i class="i i-s" data-i="square-pen"></i>Corregir <span class="kbd">E</span></button>');
+    } else if (modo === 'corregir') {
+      var dif = VH.difer(v), ls = VH.loQueCambia(v);
+      izq = RCAB + v.ed.map(filaEd).join('') +
+        (st.agregados < AGREGABLES.length ? '<div class="agregar" data-agregar><i class="i" data-i="plus"></i>Agregar lo que se llevó y no se cargó <span class="pastilla contorno">a confirmar</span></div>' : '<div style="height:12px"></div>') + hist();
+      der = '<div class="t">Lo que cambia</div><div class="linea">Total de la venta <b>' + (dif ? '<span class="viejo">' + plata(VH.totalOrig(v)) + '</span>' : plata(VH.totalOrig(v))) + '</b></div>' +
+        '<div class="grande num"><span class="peso">$</span>' + VH.miles(VH.total(v)) + (dif ? ' <span class="pastilla urgente' + (v._ud !== dif ? ' vh-rebota' : '') + '" style="vertical-align:middle">' + VH.signo(dif) + '</span>' : '') + '</div><hr>' +
+        lineas(ls) + HQ;
+      v._ud = dif;
+      pie = '<span class="rastro"><i class="i i-s" data-i="pencil"></i>Lo anterior queda tachado y guardado</span><button class="btn btn-fantasma chico" data-acc="descartar">Descartar <span class="kbd">Esc</span></button>' +
+        '<button class="btn btn-accion" data-acc="guardar"' + (dif || hayCambio() ? '' : ' disabled') + '><i class="i i-s" data-i="check"></i>Guardar corrección' + (dif ? ' · ' + VH.signo(dif) : '') + ' <span class="kbd">Ctrl Enter</span></button>';
+    } else if (modo === 'cambio') {
+      var vu = v.items[st.vuelve], ps = VH.SUGERIDOS, ll = ps[st.lleva], dc = ll.precio - vu.precio;
+      izq = '<div class="t-etiqueta" style="margin-bottom:6px">¿Qué vuelve?</div>' + v.items.map(function (x, i) {
+        return '<button class="vh-elige' + (i === st.vuelve ? ' elegido' : '') + '" data-vuelve="' + i + '">' + VH.foto(x.foto, 'chica') + '<span style="min-width:0"><span class="nom" style="display:block">' + x.nom + '</span><span class="det" style="display:block">Se pagó ' + plata(x.precio) + (x.u === 'kg' ? ' el kilo' : ' c/u') + '</span></span><span class="v num">−' + plata(x.precio) + '</span></button>';
+      }).join('') + '<div class="t-etiqueta" style="margin:14px 0 6px">Se lleva · escaneá o elegí</div>' + ps.slice(0, 3).map(function (x, i) {
+        return '<button class="vh-elige' + (i === st.lleva ? ' elegido' : '') + '" data-lleva="' + i + '">' + VH.foto(x.foto, 'chica') + '<span style="min-width:0"><span class="nom" style="display:block">' + x.nom + '</span><span class="det" style="display:block">' + x.det + '</span></span><span class="v num">+' + plata(x.precio) + '</span></button>';
+      }).join('');
+      der = '<div class="t">Lo que cambia</div>' + lineas([['Vuelve', '−' + plata(vu.precio)], ['Se lleva', '+' + plata(ll.precio)]]) + '<hr><div class="linea">' + (dc >= 0 ? 'Diferencia a cobrar' : 'Diferencia a devolver') + '</div><div class="grande num"><span class="peso">$</span>' + VH.miles(dc) + '</div>' +
+        '<div class="vh-medios">' + ['efectivo', 'mp', 'tarjeta'].map(function (m) { return '<button class="m medio ' + m + (m === st.medio ? ' elegido' : '') + '" data-medio="' + m + '">' + VH.mico(m) + (m === st.medio ? VH.MEDIOS[m].corto : '') + '</button>'; }).join('') + '</div><hr>' +
+        lineas([['Stock de ' + vu.nom.split(' ')[0].toLowerCase(), '+1 ' + vu.u], ['Stock de ' + ll.nom.split(' ')[0].toLowerCase(), '−1 un.'], ['Total de hoy', plata(VH.dia.total + dc)]]);
+      st.dc = dc; st.vu = vu; st.ll = ll;
+      pie = '<span class="rastro"><i class="i i-s" data-i="arrow-left-right"></i>La venta original no cambia: el cambio queda aparte</span><button class="btn btn-fantasma chico" data-acc="descartar">Volver <span class="kbd">Esc</span></button>' +
+        '<button class="btn btn-accion" data-acc="cambiar"><i class="i i-s" data-i="check"></i>' + (dc > 0 ? 'Cobrar ' + plata(dc) : dc < 0 ? 'Devolver ' + plata(-dc) : 'Registrar el cambio') + ' <span class="kbd">Ctrl Enter</span></button>';
+    } else if (modo === 'anular') {
+      var t = VH.total(v);
+      izq = '<div class="aviso error"><i class="i i-s" data-i="triangle-alert" style="margin-top:2px"></i><span>Anular devuelve el stock' + (v.medio === 'cuenta' ? ' y descuenta ' + plata(t) + ' de lo que debe ' + v.cliente : v.medio === 'efectivo' ? ' y saca ' + plata(t) + ' de la caja' : '; la devolución con ' + VH.MEDIOS[v.medio].nom + ' se hace aparte') + '. La venta no se borra: queda tachada.</span></div>' +
+        '<div class="t-etiqueta" style="margin:14px 0 8px">Por qué</div><div class="vh-chips">' + VH.MOTIVOS.map(function (m, i) { return '<button class="chip' + (i === st.motivo ? ' elegido' : '') + '" data-motivo="' + i + '">' + m + '</button>'; }).join('') + '</div>' +
+        '<div style="height:16px"></div>' + RCAB + v.items.map(filaVer).join('') + '<div style="height:12px"></div>' + hist();
+      der = '<div class="t">Lo que cambia</div><div class="linea">Total de la venta <b><span class="viejo">' + plata(t) + '</span></b></div><div class="grande num"><span class="peso">$</span>0 <span class="pastilla error" style="vertical-align:middle">' + VH.signo(-t) + '</span></div><hr>' +
+        lineas([[v.medio === 'cuenta' ? 'Lo que debe el cliente' : v.medio === 'efectivo' ? 'Sale de la caja' : 'Se devuelve con ' + VH.MEDIOS[v.medio].nom, VH.signo(-t)], ['Stock', '+' + v.items.length + (v.items.length === 1 ? ' producto' : ' productos')], ['Total de hoy', plata(VH.dia.total - t)]]) + HQ;
+      pie = '<span class="rastro"><i class="i i-s" data-i="ban"></i>Queda tachada, no se borra</span><button class="btn btn-fantasma chico" data-acc="descartar">Volver <span class="kbd">Esc</span></button>' +
+        '<button class="btn btn-peligro" data-acc="anular" style="margin-left:0"><i class="i i-s" data-i="ban"></i>Anular la venta · ' + VH.signo(-t) + ' <span class="kbd">Ctrl Enter</span></button>';
+    }
+    boleta.innerHTML = h + (modo === 'ver' || modo === 'corregir' || modo === 'cambio' || modo === 'anular' ? '' : '') +
+      '<div class="cuerpo"><div style="min-height:0;overflow:auto">' + izq + '</div><div class="cambia">' + der + '</div></div><div class="pie-b">' + pie + '</div>';
+    VH.iconos(boleta);
+    v.ed && v.ed.forEach(function (x) { x.recien = false; });
+    var vivo = $('[data-vivo]', boleta);
+    if (vivo) { vivo.focus(); vivo.select(); }
+  }
+  function hayCambio() { return v.ed && v.ed.some(function (x) { return x.cant !== x.o.cant || x.precio !== x.o.precio; }); }
+
+  function elegir(id, m, animar) {
+    if (v && v.ed) VH.descartar(v);
+    v = VH.buscar(id); modo = m || 'ver'; st = { agregados: 0, vuelve: 0, lleva: 0, medio: 'efectivo', motivo: 0 };
+    $$('.tl', lista).forEach(function (t) { t.classList.toggle('elegida', t.dataset.id === id); });
+    pintar();
+    if (animar && !VH.reducido()) { boleta.classList.remove('vh-fundir'); void boleta.offsetWidth; boleta.classList.add('vh-fundir'); }
+  }
+  function cambiarModo(m) {
+    if (v.estado === 'anulada' && m !== 'ver') return;
+    if (m === 'corregir' && v.tipo === 'cambio') return;
+    if (modo === 'corregir' && m !== 'corregir') VH.descartar(v);
+    if (m === 'corregir') { VH.empezar(v); st.foco = null; st.vivo = false; }
+    if (m === 'cambio') { st.vuelve = 0; st.lleva = 0; }
+    modo = m; pintar();
+  }
+
+  // Estado inicial: Constructora Martínez corrigiéndose (clavos 1 → 1,5 kg; tarugos $8.000 → $7.000)
+  v = VH.buscar('1648'); modo = 'corregir'; st = { agregados: 0, vuelve: 0, lleva: 0, medio: 'efectivo', motivo: 0, foco: [1, 'cant'] };
+  VH.empezar(v); v.ed[1].cant = 1.5; v.ed[2].precio = 7000;
+  v.ed[1].r = { c: true, s: true }; v.ed[2].r = { p: true, s: true }; v._ud = 3000;
+  pintar();
+
+  // Clics
+  lista.addEventListener('click', function (e) { var t = e.target.closest('.tl[data-id]'); if (t && t.dataset.id !== v.id) elegir(t.dataset.id, 'ver', true); });
+  boleta.addEventListener('click', function (e) {
+    var b;
+    if ((b = e.target.closest('[data-modo]'))) { if (!b.disabled) cambiarModo(b.dataset.modo); return; }
+    if ((b = e.target.closest('[data-ed]'))) {
+      if (e.target.tagName === 'INPUT') return;
+      var p = b.dataset.ed.split(':'); st.foco = [Number(p[0]), p[1]]; st.vivo = true; pintar(); return;
+    }
+    if (e.target.closest('[data-agregar]')) {
+      var x = Object.assign({}, AGREGABLES[st.agregados++]); x.o = { cant: 0, precio: x.precio }; x.recien = true;
+      v.ed.push(x); VH.vibrar(10); pintar();
+      var rr = $$('.rr', boleta).pop(); if (rr) rr.classList.add('vh-nuevo');
+      return;
+    }
+    if ((b = e.target.closest('[data-vuelve]'))) { st.vuelve = +b.dataset.vuelve; pintar(); return; }
+    if ((b = e.target.closest('[data-lleva]'))) { st.lleva = +b.dataset.lleva; pintar(); return; }
+    if ((b = e.target.closest('[data-medio]'))) { st.medio = b.dataset.medio; pintar(); return; }
+    if ((b = e.target.closest('[data-motivo]'))) { st.motivo = +b.dataset.motivo; pintar(); return; }
+    if ((b = e.target.closest('[data-acc]')) && !b.disabled) accion(b.dataset.acc);
+  });
+  function accion(a) {
+    if (a === 'descartar') { cambiarModo('ver'); return; }
+    if (a === 'guardar') {
+      var delta = VH.guardar(v); modo = 'ver'; pintar(); repintarTl(v, 'late');
+      VH.avisar('Corrección guardada' + (delta ? ' · ' + VH.signo(delta) : ''));
+    }
+    if (a === 'anular') {
+      var t = VH.total(v); v.motivo = VH.MOTIVOS[st.motivo];
+      VH.anular(v); VH.vibrar([10, 40, 10]); modo = 'ver'; pintar(); repintarTl(v, 'tacha');
+      VH.avisar('Venta de las ' + v.hora + ' anulada · ' + VH.signo(-t), 'ban');
+    }
+    if (a === 'cambiar') {
+      var c = { id: 'c' + Date.now(), hora: VH.hora(), medio: st.medio, quien: 'Mariela', tipo: 'cambio', vuelve: Object.assign({}, st.vu, { cant: 1 }), items: [Object.assign({}, st.ll)] };
+      VH.ventas.unshift(c);
+      if (st.dc) VH.mover(st.medio, st.dc, 0, 0);
+      VH.vibrar([10, 40, 10]);
+      $('.lista .cab').insertAdjacentHTML('afterend', tlHTML(c));
+      var tl = $('.tl[data-id="' + c.id + '"]', lista); tl.classList.add('vh-entra', 'vh-nuevo');
+      var dc = st.dc;
+      elegir(c.id, 'ver', true);
+      VH.avisar('Cambio registrado · ' + (dc ? VH.signo(dc) : 'sin diferencia'));
+    }
+  }
+  // Escribir encima: el campo que se corrige
+  function confirmarVivo(siguiente) {
+    var inp = $('[data-vivo]', boleta); if (!inp) return;
+    var x = v.ed[st.foco[0]], n = Number(inp.value.replace(/\./g, '').replace(',', '.'));
+    if (st.foco[1] === 'cant') { if (n > 0) x.cant = Math.round(n * 2) / 2; } else { n = Number(inp.value.replace(/\D/g, '')); if (n > 0) x.precio = n; }
+    if (siguiente) {
+      var orden = []; v.ed.forEach(function (y, i) { orden.push([i, 'cant'], [i, 'precio']); });
+      var k = orden.findIndex(function (o) { return o[0] === st.foco[0] && o[1] === st.foco[1]; });
+      st.foco = orden[(k + 1) % orden.length]; st.vivo = true;
+    } else { st.vivo = false; }
+    pintar();
+  }
+  boleta.addEventListener('keydown', function (e) {
+    if (!e.target.hasAttribute('data-vivo')) return;
+    if (e.key === 'Enter' && !e.ctrlKey) { e.preventDefault(); confirmarVivo(false); }
+    else if (e.key === 'Tab') { e.preventDefault(); confirmarVivo(true); }
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      var x = v.ed[st.foco[0]], paso = st.foco[1] === 'cant' ? (x.u === 'kg' ? 0.5 : 1) : 1000, s = e.key === 'ArrowUp' ? paso : -paso;
+      if (st.foco[1] === 'cant') x.cant = Math.max(paso, x.cant + s); else x.precio = Math.max(1000, x.precio + s);
+      pintar();
+    } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); st.vivo = false; pintar(); }
+  });
+  boleta.addEventListener('focusout', function (e) {
+    if (e.target.hasAttribute && e.target.hasAttribute('data-vivo')) setTimeout(function () { if ($('[data-vivo]', boleta) === e.target && document.activeElement !== e.target) confirmarVivo(false); }, 0);
+  });
+
+  // Cabecera
+  var sub = $('.cabecera .sub'), subHoy = sub.textContent, bDia = $('.cabecera .acciones .btn');
+  function otroDia() { VH.otroDia(function (x) { sub.textContent = x[0] === 'hoy' ? subHoy : x[1].replace(/^Ayer, /, '').replace(/^\w/, function (c) { return c.toUpperCase(); }) + ' · ' + x[2]; }); }
+  bDia.addEventListener('click', otroDia);
+
+  // Teclado
+  document.addEventListener('keydown', function (e) {
+    if (VH.abiertas() || e.target.tagName === 'INPUT') return;
+    if (e.key === 'Escape' && modo !== 'ver') { e.preventDefault(); cambiarModo('ver'); return; }
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { var p = $('.pie-b .btn-accion, .pie-b .btn-peligro', boleta); if (p && !p.disabled) { e.preventDefault(); p.click(); } return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      var ts = $$('.tl[data-id]', lista), i = ts.findIndex(function (t) { return t.dataset.id === v.id; });
+      var j = Math.max(0, Math.min(ts.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)));
+      if (ts[j].dataset.id !== v.id) elegir(ts[j].dataset.id, 'ver', true);
+    }
+    if (e.key === 'e' || e.key === 'E') { e.preventDefault(); cambiarModo('corregir'); }
+    if (e.key === 'c' || e.key === 'C') { e.preventDefault(); cambiarModo('cambio'); }
+    if (e.key === 'Delete') { e.preventDefault(); cambiarModo('anular'); }
+    if (e.key === 'f' || e.key === 'F') { e.preventDefault(); otroDia(); }
+  });
+})();
+</script>
+</body>
+</html>

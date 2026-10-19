@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anomalías · De a una (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pestanas a { display: flex; justify-content: center; align-items: center; gap: 6px; }
+  .celu-pestanas .pastilla { height: 24px; padding: 0 8px; }
+  .celu-pantalla { display: flex; flex-direction: column; }
+  .prog { display: flex; align-items: center; gap: 8px; margin: 2px 0 12px; }
+  .prog .tx { font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .prog .tx b { color: var(--tinta); }
+  .puntos { display: flex; gap: 4px; margin-left: auto; }
+  .puntos i { width: 22px; height: 6px; border-radius: 9px; background: var(--hundido-2); display: block; }
+  .puntos i.ok { background: var(--logro); } .puntos i.ya { background: var(--pino); }
+  .pila { position: relative; flex: 1; min-height: 0; }
+  .detras { position: absolute; left: 0; right: 0; top: 0; bottom: 0; border-radius: 22px; background: #fff; border: 1px solid var(--borde); }
+  .detras.d1 { transform: translateY(16px) scale(.92); opacity: .55; }
+  .detras.d2 { transform: translateY(8px) scale(.96); opacity: .85; }
+  .ticket { position: absolute; inset: 0 0 24px; border-radius: 22px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-3); padding: 18px 18px 14px; display: flex; flex-direction: column; transform: rotate(-2.2deg) translateX(-6px); }
+  .tk-cab { display: flex; align-items: center; gap: 10px; }
+  .tk-cab .avatar { width: 36px; height: 36px; background: var(--hundido-2); color: var(--texto-2); }
+  .tk-cab .nm { font-weight: 800; font-size: 16px; line-height: 20px; }
+  .tk-cab .medio-p { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 99px; background: var(--mp-suave); color: var(--mp); font-weight: 750; font-size: 14px; }
+  .tk-total { margin: 14px 0 2px; }
+  .tk-total .t-etiqueta { display: block; }
+  .corte { margin: 12px -18px; height: 0; border-top: 2px dashed var(--borde-fuerte); position: relative; }
+  .corte::before, .corte::after { content: ""; position: absolute; top: -11px; width: 20px; height: 20px; border-radius: 99px; background: var(--fondo); border: 1px solid var(--borde); }
+  .corte::before { left: -11px; } .corte::after { right: -11px; }
+  .p { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; }
+  .p .foto { width: 44px; height: 44px; border-radius: 10px; }
+  .p .n { font-weight: 700; font-size: 15px; line-height: 19px; }
+  .p .q { font-size: 14px; color: var(--texto-2); }
+  .p b { font-weight: 800; }
+  .tk-pie { margin-top: auto; padding-top: 10px; display: grid; gap: 4px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .tk-pie div { display: flex; gap: 8px; align-items: center; }
+  .tk-pie b { color: var(--tinta); }
+  .efecto { display: flex; gap: 8px; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--fondo); font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 600; }
+  .efecto .i { margin-top: 2px; color: var(--logro-texto); } .efecto b { color: var(--tinta); }
+  .sello { position: absolute; top: 74px; right: 18px; transform: rotate(12deg); border: 3px solid var(--logro); color: var(--logro); border-radius: 10px; padding: 2px 10px; font-weight: 800; font-size: 18px; letter-spacing: .04em; opacity: .55; }
+  .decidir { display: flex; align-items: flex-end; justify-content: center; gap: 20px; padding: 6px 0 12px; }
+  .redondo { display: grid; place-items: center; border-radius: 999px; border: 0; }
+  .redondo.no { width: 64px; height: 64px; background: #fff; color: var(--error); box-shadow: var(--sombra-2); border: 1px solid var(--borde); }
+  .redondo.si { width: 76px; height: 76px; background: var(--accion); color: #fff; box-shadow: var(--sombra-accion); }
+  .redondo.luego { width: 48px; height: 48px; background: #fff; color: var(--texto-2); box-shadow: var(--sombra-1); border: 1px solid var(--borde); }
+  .ticket { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+  .ticket img { pointer-events: none; }
+  .sello.no { border-color: var(--error); color: var(--error); transform: rotate(-12deg); right: auto; left: 18px; }
+  .puntos i.des { background: var(--error); }
+  .redondo[disabled] { opacity: .4; cursor: not-allowed; }
+  .rot { display: grid; justify-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Anomalías</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a class="activa" data-tab="revisar">Para revisar <span class="pastilla urgente" data-pendientes>4</span></a><a data-tab="anotadas">Anotadas</a></nav>
+
+  <div class="celu-pantalla">
+    <div data-vista="revisar" style="display:flex;flex-direction:column;flex:1;min-height:0">
+    <div class="prog"><span class="tx"><b>2 de 5</b> · deslizá para decidir</span><span class="puntos"><i class="ok"></i><i class="ya"></i><i></i><i></i><i></i></span></div>
+    <div class="pila">
+      <div class="detras d1"></div><div class="detras d2"></div>
+      <div class="ticket">
+        <div class="tk-cab"><span class="avatar">AG</span><div><div class="nm">Venta de Ana Gómez</div><div class="t-detalle">Desactivada · jue 18:40</div></div><span class="medio-p"><i class="i i-s" data-i="qr-code"></i>M. Pago</span></div>
+        <div class="tk-total"><span class="t-etiqueta">Cobró sin conexión</span><span class="t-total num"><span class="peso">$</span>43.000</span></div>
+        <span class="sello">ACEPTAR</span>
+        <div class="corte"></div>
+        <div class="p"><div class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></div><div><div class="n">Látex interior blanco 4 L</div><div class="q">1 un. · stock 9 → 8</div></div><b class="num">$38.000</b></div>
+        <div class="p"><div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div><div class="n">Puntas Phillips PH2 × 10</div><div class="q" style="color:var(--urgente-texto)">1 un. · no hay: anomalía</div></div><b class="num">$5.000</b></div>
+        <div class="efecto"><i class="i i-s" data-i="calendar"></i><span>Si la aceptás, entra en las ventas del <b>jueves 15/10</b> a nombre de Ana.</span></div>
+        <div class="tk-pie">
+          <div><i class="i i-s" data-i="smartphone"></i>Cobrada <b>jue 15/10 18:21</b></div>
+          <div><i class="i i-s" data-i="cloud-upload"></i>Llegó <b>hoy 09:14</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="decidir" data-tostada-sobre>
+      <div class="rot"><button class="redondo no" aria-label="Descartar"><i class="i i-xl" data-i="x"></i></button>Descartar</div>
+      <div class="rot"><button class="redondo luego" aria-label="Después"><i class="i" data-i="clock"></i></button>Después</div>
+      <div class="rot"><button class="redondo si" aria-label="Aceptar"><i class="i i-xl" data-i="check"></i></button>Aceptar</div>
+    </div>
+    </div>
+    <div data-vista="anotadas" hidden style="flex:1;min-height:0;overflow:auto"></div>
+  </div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-mas><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+(function (A) {
+  var BASE = "translateX(-6px) rotate(-2.2deg)";
+  var ORDEN = ["v1", "v2", "a1", "m1", "c1"];
+  var cola = ["v2", "a1", "m1", "c1"], hecho = { v1: "ok" };
+  var pila = document.querySelector(".pila"), dec = document.querySelector(".decidir");
+  var btnSi = dec.querySelector(".si"), btnNo = dec.querySelector(".no"), btnLuego = dec.querySelector(".luego");
+  A.pendientes = 4;
+  var ticket = function () { return pila.querySelector(".ticket:not(.sale)"); };
+  function htmlTicket(c) {
+    var per = A.PERSONAS[c.quien];
+    var de = { venta: "Venta", ajuste: "Ajuste", margen: "Margen", conteo: "Conteo" }[c.tipo];
+    var pill = c.medio ? '<span class="medio-p" style="background:var(--' + c.medio + '-suave);color:var(--' + c.medio + ')"><i class="i i-s" data-i="' + c.medioIco + '"></i>' + (c.medio === "mp" ? "M. Pago" : c.medioTxt) + "</span>"
+      : '<span class="medio-p" style="background:var(--' + (c.no ? "error" : "hundido") + (c.no ? "-suave" : "") + ');color:var(--' + (c.no ? "error-texto" : "texto-2") + ')"><i class="i i-s" data-i="' + c.icono + '"></i>' + c.etiqueta + "</span>";
+    var tot = { venta: ["Cobró sin conexión", A.pesos(c.monto || 0)], ajuste: ["Ajustó sin conexión", "−1,5 kg"], margen: ["Cambió el margen", "100 %"], conteo: ["Contó sin conexión", "6 un."] }[c.tipo];
+    var h = '<div class="tk-cab"><span class="avatar">' + per.ini + '</span><div><div class="nm">' + de + " de " + (c.quien === "julian" ? "Julián" : per.n) + '</div><div class="t-detalle">' + per.est + " · " + (c.quien === "ana" ? "jue 18:40" : "vie 19:00") + "</div></div>" + pill + "</div>";
+    h += '<div class="tk-total"><span class="t-etiqueta">' + tot[0] + '</span><span class="t-total num">' + tot[1] + "</span></div>";
+    h += '<span class="sello" style="opacity:0">ACEPTAR</span><div class="corte"></div>';
+    h += c.prods.map(function (p) {
+      var q = c.tipo === "venta" ? (p.falta ? "1 un. · no hay: anomalía" : "1 un. · stock " + p.st.replace(" un.", "")) : c.tipo === "ajuste" ? "Stock " + p.st : c.tipo === "margen" ? "Precio " + p.st : "Se unió con otra: no va";
+      var col = p.falta ? "urgente-texto" : c.no ? "error-texto" : "";
+      return '<div class="p">' + A.foto(p.f).replace('class="foto"', 'class="foto"') + '<div><div class="n">' + p.n.replace(" mate", "").replace(" por kilo", "") + '</div><div class="q"' + (col ? ' style="color:var(--' + col + ')"' : "") + ">" + q + '</div></div><b class="num">' + (c.tipo === "venta" ? "$" + A.miles(p.p) : "") + "</b></div>";
+    }).join("");
+    var ef = c.tipo === "venta" ? "Si la aceptás, entra en las ventas del <b>jueves 15/10</b> a nombre de Ana." : c.no ? "La lámpara se unió con otra después del conteo: <b>solo se puede descartar</b>." : c.efecto[1][1];
+    h += '<div class="efecto"><i class="i i-s" data-i="' + (c.no ? "git-merge" : "calendar") + '"' + (c.no ? ' style="color:var(--error-texto)"' : "") + "></i><span>" + ef + "</span></div>";
+    h += '<div class="tk-pie"><div><i class="i i-s" data-i="smartphone"></i>' + c.pasos[0][0] + " <b>" + c.pasos[0][1].replace(" · celular", "") + '</b></div><div><i class="i i-s" data-i="cloud-upload"></i>Llegó <b>hoy 09:14</b></div></div>';
+    return h;
+  }
+  function progreso() {
+    var hechos = Object.keys(hecho).length, total = ORDEN.length;
+    document.querySelector(".prog .tx").innerHTML = cola.length ? "<b>" + (hechos + 1) + " de " + total + "</b> · deslizá para decidir" : "<b>" + total + " de " + total + "</b> · listo";
+    var actual = cola[0];
+    document.querySelectorAll(".puntos i").forEach(function (d, i) { var id = ORDEN[i]; d.className = hecho[id] === "ok" ? "ok" : hecho[id] === "des" ? "des" : id === actual ? "ya" : ""; });
+    var d = pila.querySelectorAll(".detras");
+    d[0].hidden = cola.length < 3; d[1].hidden = cola.length < 2;
+    var c = cola[0] && A.porId(cola[0]);
+    btnSi.disabled = !!(c && c.no);
+    A.marcarPendientes(cola.length);
+  }
+  function siguiente() {
+    if (!cola.length) {
+      pila.querySelectorAll(".detras").forEach(function (d) { d.hidden = true; });
+      var v = document.createElement("div"); v.className = "vacio"; v.style.cssText = "position:absolute;inset:0";
+      v.innerHTML = '<span class="tilde"><i class="i i-xl" data-i="check"></i></span><b>Listo: revisaste los 5</b><span>Lo que decidiste queda en Quién hizo qué.</span>';
+      pila.appendChild(v); pintarIconos(v); A.entrar(v);
+      dec.style.visibility = "hidden";
+      return;
+    }
+    var t = document.createElement("div"); t.className = "ticket"; t.innerHTML = htmlTicket(A.porId(cola[0]));
+    pila.appendChild(t); pintarIconos(t);
+    A.anim(t, [{ transform: "translateY(10px) scale(.96)", opacity: .6 }, { transform: BASE, opacity: 1 }], { duration: 320, easing: A.REBOTE });
+  }
+  // dir: 1 acepta, -1 descarta, 0 después
+  function decidir(dir) {
+    var t = ticket(); if (!t || !cola.length) return;
+    var c = A.porId(cola[0]);
+    if (dir === 1 && c.no) { volver(t); A.sacudir(dec); A.tostada("No se puede aceptar: solo descartarlo", { ambar: true, icono: "triangle-alert" }); return; }
+    t.classList.add("sale");
+    var actual = getComputedStyle(t).transform;
+    var fin = dir === 0 ? "translateY(40px) scale(.94)" : "translateX(" + (dir * 480) + "px) rotate(" + (dir * 20) + "deg)";
+    var a = A.anim(t, [{ transform: actual === "none" ? BASE : actual, opacity: 1 }, { transform: fin, opacity: 0 }], { duration: 280, easing: A.SALIDA, fill: "forwards" });
+    a.then(function () { t.remove(); });
+    if (dir === 0) cola.push(cola.shift());
+    else { hecho[cola.shift()] = dir === 1 ? "ok" : "des"; }
+    if (dir === 1) A.vibrar([10, 40, 10]);
+    if (dir !== 0) A.tostada(dir === 1 ? c.ok.replace(" en el jue 15/10", "") : "Descartado · queda en Quién hizo qué", { icono: dir === 1 ? "circle-check" : "archive" });
+    setTimeout(function () { siguiente(); progreso(); }, 120);
+  }
+  function volver(t) {
+    var actual = getComputedStyle(t).transform;
+    t.style.transform = "";
+    var s = t.querySelector(".sello"); if (s) s.style.opacity = s === primerSello && !movido ? "" : "0";
+    A.anim(t, [{ transform: actual }, { transform: BASE }], { duration: 320, easing: A.REBOTE });
+  }
+  // Deslizar con el dedo (o el mouse)
+  var x0 = null, dx = 0, paso = false, primerSello = pila.querySelector(".sello"), movido = false;
+  pila.addEventListener("pointerdown", function (e) {
+    var t = e.target.closest(".ticket"); if (!t || t.classList.contains("sale")) return;
+    x0 = e.clientX; dx = 0; paso = false; movido = true;
+    try { t.setPointerCapture(e.pointerId); } catch (er) { /* nada */ }
+  });
+  pila.addEventListener("pointermove", function (e) {
+    if (x0 === null) return;
+    var t = ticket(); if (!t) return;
+    dx = e.clientX - x0;
+    var giro = Math.max(-8, Math.min(8, dx / 20));
+    t.style.transform = "translateX(" + (dx - 6) + "px) rotate(" + (-2.2 + giro) + "deg)";
+    var mitad = t.offsetWidth * 0.35, s = t.querySelector(".sello");
+    s.textContent = dx >= 0 ? "ACEPTAR" : "DESCARTAR"; s.classList.toggle("no", dx < 0);
+    s.style.opacity = Math.min(1, Math.abs(dx) / mitad);
+    if (!paso && Math.abs(dx) > mitad) { paso = true; A.vibrar(10); }
+    if (paso && Math.abs(dx) < mitad) paso = false;
+  });
+  function soltar() {
+    if (x0 === null) return;
+    x0 = null;
+    var t = ticket(); if (!t) return;
+    if (Math.abs(dx) > t.offsetWidth * 0.35) decidir(dx > 0 ? 1 : -1);
+    else if (Math.abs(dx) > 3) volver(t);
+    dx = 0;
+  }
+  pila.addEventListener("pointerup", soltar);
+  pila.addEventListener("pointercancel", soltar);
+  btnSi.addEventListener("click", function () { A.apretar(btnSi); decidir(1); });
+  btnNo.addEventListener("click", function () { A.apretar(btnNo); decidir(-1); });
+  btnLuego.addEventListener("click", function () { A.apretar(btnLuego); decidir(0); });
+  // Pestañas
+  var an = document.querySelector('[data-vista="anotadas"]'), armada = false;
+  document.querySelector(".celu-pestanas").addEventListener("click", function (e) {
+    var t = e.target.closest("[data-tab]"); if (!t) return;
+    var v = t.getAttribute("data-tab");
+    document.querySelectorAll(".celu-pestanas [data-tab]").forEach(function (x) { x.classList.toggle("activa", x === t); });
+    if (v === "anotadas" && !armada) { A.armarAnotadasCelu(an); armada = true; }
+    document.querySelectorAll("[data-vista]").forEach(function (x) { x.hidden = x.getAttribute("data-vista") !== v; });
+    A.fundido(document.querySelector('[data-vista="' + v + '"]'));
+  });
+})(window.Anom);
+</script>
+</body>
+</html>

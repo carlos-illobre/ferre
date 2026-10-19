@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · Dictale (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .cab { display: flex; align-items: center; gap: 10px; padding: 4px 16px 0; }
+  .cab .total { margin-left: auto; text-align: right; }
+  .cab .total .t-numero { font-size: 30px; line-height: 34px; }
+  .dicho { margin: 14px 16px 0; padding: 14px 16px; border-radius: 20px 20px 20px 6px; background: var(--pino); color: #fff; font-size: 18px; line-height: 27px; font-weight: 600; box-shadow: var(--sombra-2); }
+  .dicho .oido { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: rgba(255,255,255,.75); margin-bottom: 4px; }
+  .dicho mark { background: rgba(255,255,255,.16); color: #fff; border-radius: 6px; padding: 0 4px; font-weight: 800; }
+  .dicho .gris { color: rgba(255,255,255,.55); }
+  .entendi { display: flex; align-items: center; gap: 8px; margin: 14px 16px 8px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .renglones { padding: 0 16px; }
+  .r { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); }
+  .r + .r { margin-top: 8px; }
+  .r .n { font-weight: 750; font-size: 16px; line-height: 20px; }
+  .r .d { font-size: 14px; color: var(--texto-2); margin-top: 2px; }
+  .r .s { font-weight: 800; font-size: 18px; text-align: right; }
+  .r .s small { display: block; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .r.nuevo { border: 2px solid var(--logro); padding: 9px 11px; }
+  .r .q { display: inline-flex; align-items: center; justify-content: center; height: 24px; min-width: 28px; padding: 0 6px; border-radius: 7px; background: var(--hundido); font-size: 14px; font-weight: 800; margin-right: 4px; }
+  .r .duda { display: flex; gap: 6px; margin-top: 8px; }
+  .r .duda span { height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--borde-fuerte); display: inline-flex; align-items: center; font-weight: 700; font-size: 14px; background: #fff; }
+  .r .duda span.si { border: 2px solid var(--pino); background: var(--pino-suave); color: var(--pino); }
+  .previos { margin: 10px 16px 0; padding: 10px 14px; border-radius: 14px; background: var(--hundido); display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .previos .fotos { display: flex; }
+  .previos .fotos .foto { width: 32px; height: 32px; border-radius: 8px; border: 2px solid var(--hundido); margin-left: -6px; background: #fff; }
+  .previos .fotos .foto:first-child { margin-left: 0; }
+
+  .muelle { position: absolute; left: 0; right: 0; bottom: 0; height: 250px; background: linear-gradient(180deg, rgba(244,242,236,0), var(--fondo) 22%); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 30px; }
+  .frases { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; justify-content: center; padding: 0 12px; }
+  .frases span { height: 32px; padding: 0 12px; border-radius: 99px; background: #fff; border: 1px solid var(--borde); display: inline-flex; align-items: center; font-size: 14px; font-weight: 650; color: var(--texto-2); box-shadow: var(--sombra-1); }
+  .fila-mic { display: flex; align-items: center; gap: 28px; }
+  .lateral-b { width: 60px; height: 60px; border-radius: 99px; background: #fff; border: 1px solid var(--borde-fuerte); display: grid; place-items: center; box-shadow: var(--sombra-2); color: var(--tinta); }
+  .mic { position: relative; width: 104px; height: 104px; border-radius: 99px; background: var(--accion); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 12px rgba(232,84,28,.16), 0 0 0 26px rgba(232,84,28,.08), var(--sombra-accion); }
+  .onda { position: absolute; bottom: -32px; display: flex; gap: 3px; align-items: center; height: 20px; }
+  .onda b { width: 4px; border-radius: 4px; background: var(--accion); }
+  .bajo { margin-top: 44px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="cab">
+    <span class="btn btn-icono v-toca" style="border-radius:99px" data-menu role="button" aria-label="Menú"><i class="i" data-i="menu"></i></span>
+    <div><div class="t-seccion">Vender</div><div class="t-detalle" style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:9px;background:var(--logro)"></span>En espejo con la compu</div></div>
+    <div class="total"><div class="t-etiqueta">5 productos</div><div class="t-numero num"><span class="peso">$</span>45.500</div></div>
+  </div>
+
+  <div class="dicho">
+    <div class="oido"><i class="i i-s" data-i="mic"></i>Te escucho…</div>
+    «<mark>tres</mark> <mark>mechas de ocho</mark> y <mark>setecientos de clavos</mark> de dos pulgadas<span class="gris">, y unos tarugos del ocho</span>»
+  </div>
+
+  <div class="entendi"><i class="i i-s" data-i="sparkles" style="color:var(--accion)"></i>Entendí esto · tocá para corregir</div>
+  <div class="renglones">
+    <div class="r nuevo"><div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div><div class="n"><span class="q">3</span>Mecha HSS 8 mm</div><div class="d">Ezeta · $7.000 c/u</div></div><div class="s num">$21.000</div></div>
+    <div class="r nuevo"><div class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div><div class="n"><span class="q">0,7 kg</span>Clavos París 2"</div><div class="d">Acindar · $8.000 el kg</div></div><div class="s num">$6.000<small>de $5.600</small></div></div>
+    <div class="r" style="border-color:#F3C766;background:var(--urgente-suave)"><div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div><div class="n">¿Qué tarugos del 8?</div><div class="duda"><span class="si">Fischer</span><span>Genérico</span><span>Otro</span></div></div><div class="s"></div></div>
+  </div>
+
+  <div class="muelle">
+    <div class="frases"><span class="v-toca" data-frase="cobrar">«cobrá en efectivo»</span><span class="v-toca" data-frase="margen">«margen cien»</span><span class="v-toca" data-frase="sacar">«sacá los tarugos»</span></div>
+    <div class="fila-mic">
+      <span class="lateral-b v-toca" data-escanear role="button" aria-label="Escanear"><i class="i i-l" data-i="scan-barcode"></i></span>
+      <span class="mic v-toca" data-mic role="button" aria-label="Dictar"><i class="i i-xl" data-i="mic"></i>
+        <span class="onda"><b style="height:6px"></b><b style="height:12px"></b><b style="height:18px"></b><b style="height:10px"></b><b style="height:16px"></b><b style="height:8px"></b><b style="height:14px"></b><b style="height:6px"></b></span></span>
+      <span class="lateral-b v-toca" data-teclado role="button" aria-label="Buscar escribiendo"><i class="i i-l" data-i="keyboard"></i></span>
+    </div>
+    <div class="bajo">Soltá para agregar · deslizá arriba para cobrar</div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+// Celu 3 · Dictale: tocar el micrófono «escucha» una frase y sus renglones entran al terminar; la duda
+// se resuelve con un toque; las frases sugeridas hacen lo que dicen; deslizar el micrófono hacia arriba
+// cobra. El menú de arriba lleva a las demás pantallas.
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var cont = $('.renglones'), dicho = $('.dicho'), mic = $('[data-mic]'), muelle = $('.muelle');
+  var VOZ = { mecha: 'Mecha HSS 8 mm', clavos: 'Clavos París 2"', lampara: 'Lámpara LED 9 W', pinza: 'Pinza universal 8"', martillo: 'Martillo carpintero 27 mm', tornillos: 'Tornillos autoperforantes × 100', tarugos: 'Tarugos Fischer S8 × 100', 'tarugos-g': 'Tarugos genéricos 8 mm × 100', cinta: 'Cinta métrica 5 m', llave: 'Llave combinada 13 mm' };
+  function nuevo(id, cant) { return V.item(id, cant, { nombre: VOZ[id] || V.producto(id).nombre }); }
+  var duda = { k: 'duda', duda: true, nombre: '¿Qué tarugos del 8?', corto: 'los tarugos', foto: 'tarugos', cant: 1, unidad: 'un.', costo: null, margen: null, mano: null };
+  var items = [nuevo('cinta', 1), V.libre('Bolsa de arena × 25 kg', 1500), nuevo('mecha', 3), nuevo('clavos', .7), duda];
+  items[0].oculto = items[1].oculto = true;
+  var recientes = [items[2].k, items[3].k], medio = 'efectivo', cliente = null, conPrevios = false, escuchando = false, nFrase = 0;
+  V.ajustes.tostadaAbajo = 262;
+  var previos = document.createElement('div'); previos.className = 'previos v-toca'; previos.style.display = 'none'; cont.after(previos);
+  var FRASES = [
+    { w: [['dos', 1], ['lámparas LED', 1], ['de nueve', 1], ['y', 0], ['una', 1], ['pinza universal', 1]], suma: [['lampara', 2], ['pinza', 1]] },
+    { w: [['un', 1], ['martillo', 1], ['de carpintero', 1], ['y', 0], ['una caja de', 0], ['tornillos autoperforantes', 1]], suma: [['martillo', 1], ['tornillos', 1]] },
+    { w: [['cuatro', 1], ['mechas más', 1], ['de ocho', 1]], suma: [['mecha', 4]] }
+  ];
+
+  function fila(it) {
+    var foto = it.libre ? '<div class="foto-icono"><i class="i i-l" data-i="package-plus"></i></div>' : '<div class="foto"><img src="../../../_comun/fotos/' + it.foto + '.webp" alt=""></div>';
+    var ambar = ' style="border-color:#F3C766;background:var(--urgente-suave)"';
+    if (it.duda) return '<div class="r"' + ambar + ' data-k="' + it.k + '">' + foto + '<div><div class="n">¿Qué tarugos del 8?</div><div class="duda"><span class="si v-toca" data-d="tarugos">Fischer</span><span class="v-toca" data-d="tarugos-g">Genérico</span><span class="v-toca" data-d="otro">Otro</span></div></div><div class="s"></div></div>';
+    var p = V.precio(it), s = V.subtotal(it), q = '<span class="q">' + (it.unidad === 'kg' ? V.num(it.cant) + ' kg' : V.num(it.cant)) + '</span>';
+    if (p == null) return '<div class="r v-toca"' + ambar + ' data-k="' + it.k + '">' + foto + '<div><div class="n">' + q + V.html(it.nombre) + '</div><div class="duda">' + (it.libre ? '<span class="v-toca" data-mano>Poné el precio</span>' : V.MARGENES.map(function (m) { return '<span class="v-toca" data-m="' + m + '" style="padding:0 9px">' + m + '</span>'; }).join('')) + '</div></div><div class="s"></div></div>';
+    var d = it.libre ? 'Ítem libre · a mano' : it.marca + ' · ' + V.pesos(p) + (it.unidad === 'kg' ? ' el kg' : ' c/u');
+    return '<div class="r' + (recientes.indexOf(it.k) >= 0 ? ' nuevo' : '') + ' v-toca" data-k="' + it.k + '">' + foto + '<div><div class="n">' + q + V.html(it.nombre) + '</div><div class="d">' + d + '</div></div><div class="s num" data-rueda>' + V.pesos(s) + (V.subio(it) ? '<small>de ' + V.pesos(it.cant * p) + '</small>' : '') + '</div></div>';
+  }
+  function render(nuevos) {
+    var vis = items.filter(function (x) { return !x.oculto; }), pend = vis.filter(function (x) { return V.precio(x) == null; }).slice(0, 1);
+    var lugar = (conPrevios && items.length > 3 ? 2 : 3) - pend.length, otros = vis.filter(function (x) { return pend.indexOf(x) < 0; }).slice(lugar > 0 ? -lugar : vis.length);
+    // Lo que falta resolver (la duda, un precio) queda siempre a la vista; del resto, lo último.
+    var muestra = vis.filter(function (x) { return pend.indexOf(x) >= 0 || otros.indexOf(x) >= 0; }), resto = items.filter(function (x) { return muestra.indexOf(x) < 0; });
+    if (!items.length) cont.innerHTML = '<div class="t-detalle" style="padding:28px 8px;text-align:center">La venta está vacía. Tocá el micrófono y decí qué lleva.</div>';
+    else V.redibujar(cont, muestra.map(fila).join(''), nuevos);
+    if (conPrevios && resto.length) {
+      previos.style.display = '';
+      previos.innerHTML = '<span class="fotos">' + resto.slice(0, 3).map(function (x) { return x.libre ? '<span class="foto"><i class="i i-s" data-i="package-plus"></i></span>' : '<span class="foto"><img src="../../../_comun/fotos/' + x.foto + '.webp" alt=""></span>'; }).join('') + '</span>Y ' + resto.length + (resto.length === 1 ? ' más' : ' más') + ' en la venta · ' + V.pesos(V.total(resto)) + '<i class="i i-s" data-i="chevron-right" style="margin-left:auto"></i>';
+      V.pintar(previos);
+    } else previos.style.display = 'none';
+    var n = items.length;
+    $('.cab .total .t-etiqueta').textContent = n + (n === 1 ? ' producto' : ' productos');
+    V.poner($('.cab .total .t-numero'), V.pesosG(V.total(items)));
+  }
+  function decir(icono, rotulo, html) { dicho.innerHTML = '<div class="oido"><i class="i i-s" data-i="' + icono + '"></i>' + rotulo + '</div>' + html; V.pintar(dicho); V.animar(dicho, [{ opacity: .4 }, { opacity: 1 }], 200); }
+  function buscarItem(k) { for (var i = 0; i < items.length; i++) if (items[i].k === k) return items[i]; return null; }
+  function elDe(k) { return cont.querySelector('[data-k="' + k + '"]'); }
+  function cambio() { conPrevios = true; }
+  function escuchar(f) {
+    if (escuchando) return; escuchando = true; cambio();
+    f = f || FRASES[nFrase++ % FRASES.length];
+    mic.classList.add('v-escucha'); V.vibrar(10);
+    dicho.innerHTML = '<div class="oido"><i class="i i-s" data-i="mic"></i>Te escucho…</div><span data-f></span>'; V.pintar(dicho);
+    V.escribirFrase(dicho.querySelector('[data-f]'), f.w, function () {
+      mic.classList.remove('v-escucha'); escuchando = false;
+      dicho.querySelector('.oido').innerHTML = '<i class="i i-s" data-i="check"></i>Entendí'; V.pintar(dicho);
+      var ks = f.suma.map(function (s) { var it = V.sumar(items, s[0], s[1], { nombre: VOZ[s[0]] }); if (items.indexOf(it) !== items.length - 1) { items.splice(items.indexOf(it), 1); items.push(it); } return it.k; });
+      recientes = ks; render(ks); ks.forEach(function (k) { var el = elDe(k); if (el && !el.classList.contains('v-nuevo')) V.entra(el); });
+    }, 190);
+  }
+  function quitar(it) {
+    var i = items.indexOf(it); cambio();
+    V.sale([elDe(it.k)].filter(Boolean), function () {
+      items.splice(i, 1); render();
+      V.tostada('Saqué ' + it.corto, { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items.splice(i, 0, it); render([it.k]); } });
+    });
+  }
+  function resolver(it, id) { var n = nuevo(id, it.cant); items[items.indexOf(it)] = n; recientes = [n.k]; cambio(); render([n.k]); return n; }
+  function cobrar() {
+    var ok = V.puedeCobrar(items, medio, cliente, function (f) {
+      decir('triangle-alert', 'Antes de cobrar', 'Falta el precio de ' + f[0].corto + ': tocá una opción o decí <mark>«margen cien»</mark>.');
+      var el = elDe(f[0].k); if (el) V.sacudir(el); V.vibrar([10, 40, 10]);
+    });
+    if (ok === 'cliente') { V.elegirCliente(function (n) { cliente = n; if (n) cobrar(); }); return; }
+    if (!ok) return;
+    var total = V.total(items), n = items.length;
+    V.sale(cont.children, function () { items = []; conPrevios = false; render(); decir('mic', 'Listo para la próxima', '<span class="gris">Tocá el micrófono y decí qué lleva</span>'); });
+    V.listo({ total: total, medio: medio, cliente: cliente, cantidad: n });
+    cliente = null; medio = 'efectivo';
+  }
+  function frase(cual) {
+    if (cual === 'cobrar') { decir('mic', 'Te escucho…', '«<mark>cobrá</mark> en <mark>efectivo</mark>»'); medio = 'efectivo'; setTimeout(cobrar, V.mover ? 450 : 0); return; }
+    if (cual === 'margen') {
+      decir('mic', 'Te escucho…', '«<mark>margen cien</mark>»');
+      var f = V.faltan(items).filter(function (x) { return !x.libre; })[0];
+      if (!f) { V.tostada('No hay productos sin precio', { icono: 'info' }); return; }
+      if (f.duda) f = resolver(f, 'tarugos');
+      f.margen = 100; recientes = [f.k]; render(); V.entra(elDe(f.k)); return;
+    }
+    if (cual === 'sacar') {
+      decir('mic', 'Te escucho…', '«<mark>sacá</mark> los <mark>tarugos</mark>»');
+      var t = items.filter(function (x) { return x.duda || x.ref === 'tarugos' || x.ref === 'tarugos-g'; })[0];
+      if (!t) { V.tostada('No hay tarugos en la venta', { icono: 'info' }); return; }
+      quitar(t);
+    }
+  }
+  function verTodo() {
+    var html = '<div class="v-cab"><div><div class="t-seccion">Esta venta</div><div class="t-detalle">' + items.length + ' productos · ' + V.pesos(V.total(items)) + '</div></div><button class="btn btn-fantasma btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div><div class="v-lista">' + items.map(function (it) {
+      var s = V.subtotal(it);
+      return '<button class="v-r" data-k="' + it.k + '">' + (it.libre ? '<span class="v-icono"><i class="i" data-i="package-plus"></i></span>' : '<div class="foto chica"><img src="../../../_comun/fotos/' + it.foto + '.webp" alt=""></div>') + '<div><div class="n">' + V.html(it.nombre) + '</div><div class="d">' + V.cantTexto(it) + (it.unidad === 'kg' ? '' : ' un.') + '</div></div><div class="p num"' + (s == null ? ' style="color:var(--urgente-texto)"' : '') + '>' + (s == null ? 'Sin precio' : V.pesos(s)) + '</div></button>';
+    }).join('') + '</div>';
+    V.abrir({ tipo: 'hoja', html: html, alAbrir: function (caja, c) { caja.addEventListener('click', function (e) { var b = e.target.closest('[data-k]'); if (!b) return; var it = buscarItem(b.getAttribute('data-k')); c.cerrar('ok'); if (it && !it.duda) ficha(it); }); } });
+  }
+  function ficha(it) { V.margenHoja(it, { conCantidad: true, alCambiar: function () { cambio(); render(); }, alQuitar: function () { quitar(it); } }); }
+  function menu() {
+    var partes = [['vender', 'Vender', 'shopping-cart', 'Estás acá'], ['ventas-de-hoy', 'Ventas de hoy', 'receipt', '23 ventas · $412.000'], ['productos', 'Catálogo', 'tags', 'Productos, listas y duplicados'], ['stock', 'Depósito', 'package', 'Stock, compras y contar'], ['resumen', 'Negocio', 'chart-column', 'Resumen, usuarios y quién hizo qué']];
+    var fila2 = function (d, det) { return '<a class="v-r grande" data-ir="' + d[0] + '"><span class="v-icono"><i class="i i-l" data-i="' + d[2] + '"></i></span><div><div class="n">' + d[1] + '</div><div class="d">' + det + '</div></div><i class="i" data-i="chevron-right" style="color:var(--texto-3)"></i></a>'; };
+    V.abrir({ tipo: 'hoja', clase: 'alta', html: '<div class="t-seccion" style="margin:0 4px 12px">Ir a</div><div class="v-lista">' + partes.map(function (d) { return fila2(d, d[3]); }).join('') + '</div><div class="t-etiqueta" style="margin:20px 4px 8px">Más</div><div class="v-lista">' + V.MAS.map(function (m) { return fila2([m.ir, m.texto, m.icono], m.det); }).join('') + '</div>' });
+  }
+
+  cont.addEventListener('click', function (e) {
+    var r = e.target.closest('.r'); if (!r) return;
+    var it = buscarItem(r.getAttribute('data-k')); if (!it) return;
+    var d = e.target.closest('[data-d]');
+    if (d) { var id = d.getAttribute('data-d'); if (id === 'otro') V.buscarHoja(function (pid, t) { if (pid) resolver(it, pid); else { var l = V.libre(t, null); items[items.indexOf(it)] = l; cambio(); render([l.k]); } }, 'tarugos 8'); else { resolver(it, id); V.vibrar(10); } return; }
+    if (it.duda) return;
+    var m = e.target.closest('[data-m]'); if (m) { it.margen = +m.getAttribute('data-m'); it.mano = null; cambio(); recientes = [it.k]; render(); V.vibrar(10); return; }
+    if (e.target.closest('[data-mano]')) { V.precioAMano(it, function (n) { it.mano = n; cambio(); render(); }); return; }
+    ficha(it);
+  });
+  previos.addEventListener('click', verTodo);
+  mic.addEventListener('click', function () { escuchar(); });
+  document.querySelectorAll('[data-frase]').forEach(function (f) { f.addEventListener('click', function () { frase(f.getAttribute('data-frase')); }); });
+  $('[data-escanear]').addEventListener('click', function () { V.camara({ alLeer: function (id) { cambio(); var it = V.sumar(items, id, 1, { nombre: VOZ[id] }); recientes = [it.k]; render([it.k]); return it; } }); });
+  $('[data-teclado]').addEventListener('click', function () { V.buscarHoja(function (id, t) { cambio(); var it = id ? V.sumar(items, id, 1, { nombre: VOZ[id] }) : V.libre(t, null); if (!id) items.push(it); recientes = [it.k]; render([it.k]); if (!id) setTimeout(function () { V.precioAMano(it, function (n) { it.mano = n; render(); }); }, V.mover ? 340 : 0); }); });
+  $('[data-menu]').addEventListener('click', menu);
+  var filaMic = $('.fila-mic');
+  muelle.style.userSelect = 'none'; muelle.style.webkitUserSelect = 'none';
+  V.arrastre(muelle, { eje: 'y', desde: '.fila-mic, .bajo',
+    mover: function (dy) { filaMic.style.transform = 'translateY(' + Math.max(-70, Math.min(0, dy)) + 'px)'; },
+    soltar: function (dy) { V.animar(filaMic, [{ transform: filaMic.style.transform }, { transform: 'none' }], 320, 'cubic-bezier(.34,1.4,.64,1)'); filaMic.style.transform = ''; if (dy < -60) cobrar(); }
+  });
+  render([]);
+})();
+</script>
+</body>
+</html>

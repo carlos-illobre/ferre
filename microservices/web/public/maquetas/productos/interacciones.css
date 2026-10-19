@@ -1,0 +1,124 @@
+/* Interacciones de la maqueta de Productos: diálogos, hojas, menús, tostadas y la cámara simulada.
+   Con el lenguaje común (_comun/comun.css). Nada de esto se ve con la maqueta quieta. */
+
+/* Lo que se toca tiene la mano */
+[data-ir], [data-mq], .mq-panel button { cursor: pointer; }
+
+/* ---------- Capas ---------- */
+.mq-fondo { position: fixed; inset: 0; z-index: 50; background: rgba(26, 29, 27, .3); }
+.mq-fondo.claro { background: transparent; }
+.mq-panel { position: fixed; z-index: 51; background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-3); }
+.celu .mq-fondo, .celu .mq-panel, .celu .mq-tostadas { position: absolute; }
+
+.mq-dialogo { inset: 0; margin: auto; height: fit-content; width: 460px; max-width: calc(100% - 32px); max-height: calc(100% - 48px); overflow: auto; border-radius: var(--r-hoja); padding: 20px; }
+.mq-dialogo.ancho { width: 640px; }
+.mq-hoja { left: 0; right: 0; bottom: 0; max-height: 90%; overflow: auto; border-radius: 24px 24px 0 0; padding: 10px 16px 28px; background: var(--fondo); }
+.mq-hoja .mq-agarre { width: 44px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 12px; }
+.mq-menu { border-radius: var(--r-tarjeta); border: 1px solid var(--borde); padding: 6px; min-width: 248px; }
+.mq-pantalla { inset: 0; background: #0E1412; color: #fff; box-shadow: none; overflow: hidden; }
+
+.mq-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.mq-cab .t-seccion { flex: 1; min-width: 0; }
+.mq-pie { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+.mq-pie .btn-accion.ancha, .mq-hoja .mq-pie .btn { flex: 1; }
+
+.mq-menu button, .mq-opcion { display: flex; width: 100%; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--tinta); font-weight: 650; font-size: 15px; text-align: left; }
+.mq-menu button:hover, .mq-menu button:focus-visible { background: var(--hundido); outline: none; }
+.mq-menu button .i { color: var(--texto-2); }
+.mq-menu .mq-sep { height: 1px; background: var(--borde); margin: 6px 4px; }
+.mq-menu .mq-tit { font-size: 14px; font-weight: 650; color: var(--texto-2); padding: 6px 12px 4px; }
+
+/* Lista de tarjetas (Más en el celular, opciones de una hoja) */
+.mq-tarjetas { display: grid; gap: 8px; }
+.mq-tarjetas button { display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px; gap: 12px; align-items: center; min-height: 64px; padding: 10px 12px; border: 1px solid var(--borde); border-radius: var(--r-tarjeta); background: var(--superficie); box-shadow: var(--sombra-1); text-align: left; color: var(--tinta); }
+.mq-tarjetas .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--pino-suave); color: var(--pino-texto); }
+.mq-tarjetas b { display: block; font-size: 16px; line-height: 22px; font-weight: 700; }
+.mq-tarjetas small { display: block; font-size: 14px; line-height: 18px; color: var(--texto-2); font-weight: 500; }
+.mq-tarjetas .flecha { color: var(--texto-3); }
+
+/* ---------- Tostadas ---------- */
+.mq-tostadas { position: fixed; left: 0; right: 0; bottom: 28px; z-index: 70; display: flex; justify-content: center; pointer-events: none; }
+.celu .mq-tostadas { bottom: 92px; }
+.mq-tostadas .tostada { pointer-events: auto; max-width: calc(100% - 32px); position: static; transform: none; white-space: normal; }
+.mq-tostadas .tostada b { font-weight: 800; }
+.mq-deshacer { border: 0; background: transparent; color: #9FE3BF; font-weight: 750; font-size: 15px; padding: 0 0 0 8px; margin-left: 4px; }
+
+/* ---------- Brillo verde (un número que llegó bien) ---------- */
+.mq-brillo { box-shadow: 0 0 0 2px var(--logro), 0 0 0 7px rgba(30, 158, 98, .16); pointer-events: none; opacity: 0; z-index: 2; }
+
+/* ---------- Foto ampliada ---------- */
+.mq-foto-g { border-radius: var(--r-tarjeta); background: var(--hundido); display: grid; place-items: center; height: 400px; }
+.mq-foto-g img { height: 340px; width: auto; filter: drop-shadow(0 18px 20px rgba(26, 29, 27, .28)); }
+.celu .mq-foto-g { height: 320px; }
+.celu .mq-foto-g img { height: 270px; }
+
+/* ---------- Cámara simulada ---------- */
+.mq-vista { position: relative; overflow: hidden; background: radial-gradient(120% 80% at 50% 45%, #3A3F3B 0%, #1C211F 55%, #0E1412 100%); }
+.mq-vista .obj { position: absolute; left: 50%; top: 50%; width: 64%; transform: translate(-50%, -50%) rotate(-6deg); filter: drop-shadow(0 30px 30px rgba(0, 0, 0, .6)) brightness(.92); }
+.mq-vista .etq { position: absolute; left: 50%; top: 50%; width: 46%; margin: 10px 0 0 -23%; padding: 8px 10px 6px; background: #F5F3EE; border-radius: 6px; transform: rotate(-6deg); box-shadow: 0 6px 18px rgba(0, 0, 0, .4); }
+.mq-vista .etq svg { width: 100%; height: 40px; fill: #111; display: block; }
+.mq-vista .etq div { font-size: 14px; font-weight: 700; letter-spacing: .1em; text-align: center; color: #111; }
+.mq-marco { position: absolute; left: 50%; top: 50%; width: 62%; height: 32%; transform: translate(-50%, -38%); }
+.mq-marco i { position: absolute; width: 30px; height: 30px; border: 4px solid #fff; }
+.mq-marco i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 12px 0 0 0; }
+.mq-marco i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 12px 0 0; }
+.mq-marco i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 12px; }
+.mq-marco i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 12px 0; }
+.mq-marco b { position: absolute; left: 8px; right: 8px; top: 50%; height: 2px; border-radius: 2px; background: #FF7A45; box-shadow: 0 0 12px #FF7A45; animation: mq-barre 1.4s ease-in-out infinite alternate; }
+.mq-marco.leido i { border-color: #5BD69A; }
+.mq-marco.leido b { opacity: 0; }
+.mq-marco.foto { width: 78%; height: 56%; transform: translate(-50%, -50%); }
+.mq-marco.foto b { display: none; }
+@keyframes mq-barre { from { transform: translateY(-32px); } to { transform: translateY(32px); } }
+.mq-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.mq-cam-arriba { position: absolute; top: 52px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px; z-index: 2; }
+.mq-redondo { width: 48px; height: 48px; border-radius: 99px; border: 0; background: rgba(255, 255, 255, .14); color: #fff; display: grid; place-items: center; backdrop-filter: blur(10px); }
+.mq-cam-ley { position: absolute; left: 0; right: 0; top: 118px; text-align: center; color: rgba(255, 255, 255, .85); font-weight: 650; font-size: 15px; z-index: 2; }
+.mq-cam-abajo { position: absolute; left: 0; right: 0; bottom: 48px; display: grid; justify-items: center; gap: 10px; z-index: 2; color: rgba(255, 255, 255, .8); font-size: 14px; font-weight: 600; }
+.mq-disparo { width: 76px; height: 76px; border-radius: 99px; border: 4px solid #fff; background: rgba(255, 255, 255, .25); }
+.mq-disparo:active { transform: scale(.94); }
+.mq-leido { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 99px; background: #fff; color: var(--tinta); font-weight: 750; font-size: 15px; opacity: 0; }
+
+/* El celular dibujado en el diálogo de la computadora */
+.mq-tel { width: 220px; height: 300px; margin: 0 auto; border-radius: 28px; padding: 8px; background: #1A1D1B; box-shadow: var(--sombra-2); }
+.mq-tel .mq-vista { height: 100%; border-radius: 22px; }
+.mq-espera { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+.mq-espera .punto { width: 8px; height: 8px; border-radius: 99px; background: var(--logro); animation: mq-late 1s ease-in-out infinite alternate; }
+@keyframes mq-late { from { opacity: .3; } to { opacity: 1; } }
+
+/* ---------- Bloques de la ficha completa (diálogo y hoja) ---------- */
+.mq-ficha { display: grid; gap: 12px; }
+.mq-ficha .cab-f { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 14px; align-items: center; }
+.mq-ficha .cab-f .foto { width: 88px; height: 88px; border-radius: 14px; }
+.mq-ficha .nom-f { font-size: 20px; line-height: 25px; font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; }
+.mq-ficha .caja { border: 1px solid var(--borde); border-radius: 14px; padding: 10px 14px; background: var(--superficie); }
+.mq-ficha .caja h4 { margin: 0 0 6px; font-size: 14px; font-weight: 650; color: var(--texto-2); display: flex; justify-content: space-between; }
+.mq-ficha .paso-f { display: flex; justify-content: space-between; font-size: 14px; line-height: 24px; color: var(--texto-2); }
+.mq-ficha .paso-f b { color: var(--tinta); }
+.mq-ficha .paso-f.cobra { color: var(--logro-texto); font-weight: 700; border-top: 1px solid var(--borde); margin-top: 4px; padding-top: 4px; }
+.mq-ficha .paso-f.cobra b { color: var(--logro-texto); font-size: 16px; }
+.mq-ficha .prov-f { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 4px 0; }
+.mq-ficha .prov-f + .prov-f { border-top: 1px dashed var(--borde); }
+.mq-ficha .ini-f { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-weight: 800; font-size: 14px; background: var(--hundido); color: var(--texto-2); }
+.mq-ficha .ini-f.uso { background: var(--pino); color: #fff; }
+.mq-ficha .seg-f { display: flex; }
+.mq-ficha .seg-f > * { flex: 1; justify-content: center; padding: 0 4px; }
+.mq-ficha .cod-f { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--hundido); position: relative; }
+.mq-ficha .cod-f svg[data-ean] { width: 64px; height: 30px; fill: var(--tinta); flex: none; }
+.mq-ficha .cod-f b { font-size: 16px; letter-spacing: .05em; }
+.mq-ficha .dos-f { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.mq-ficha.una .dos-f { grid-template-columns: minmax(0, 1fr); }
+
+/* Tabla del historial */
+.mq-tabla { width: 100%; border-collapse: collapse; font-size: 15px; }
+.mq-tabla th { text-align: left; font-size: 14px; font-weight: 650; color: var(--texto-2); padding: 6px 4px; border-bottom: 1px solid var(--borde); }
+.mq-tabla td { padding: 8px 4px; border-bottom: 1px solid var(--borde); }
+.mq-tabla .der { text-align: right; }
+.mq-tabla tr:last-child td { border-bottom: 0; font-weight: 750; }
+
+/* Campo que se puede escribir (el buscador) */
+.mq-input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--tinta); font: inherit; font-weight: 600; padding: 0; height: 100%; }
+.mq-input::placeholder { color: var(--texto-3); font-weight: 500; opacity: 1; }
+.mq-campo-margen { display: flex; align-items: center; gap: 8px; }
+.mq-campo-margen input { width: 120px; height: 52px; border-radius: var(--r); border: 1px solid var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); padding: 0 14px; font-size: 22px; font-weight: 800; outline: 0; }
+.mq-vacio { padding: 24px 12px; text-align: center; color: var(--texto-2); font-size: 15px; font-weight: 600; }
