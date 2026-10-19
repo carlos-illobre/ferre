@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
+import { deslizarParaCobrar } from "../comun/cobrar";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
 const { psql } = stack("celular");
@@ -73,25 +74,23 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await busqueda.fill("e2e tornillo vender");
   await busqueda.press("Enter");
   const tornillo = page.getByTestId("item").filter({ hasText: "TORNILLO VENDER" });
-  await expect(tornillo).toContainText("elegí margen");
-  await page.getByTestId("cobrar").click();
+  await expect(tornillo).toContainText("Sin precio");
+  await deslizarParaCobrar(page);
   await expect(page.getByRole("alert")).toContainText("sin precio");
   await tornillo.getByRole("button", { name: "300 %", exact: true }).click(); // 10 × 4 × 1,21 = 48,4 → $1.000
   await expect(tornillo).toContainText("$1.000");
   await expect(page.getByTestId("total")).toContainText("$10.000");
   // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto. 1,5 kg × $1.000 =
   // $1.500: el renglón se redondea para arriba a $2.000 para no dar vuelto (RF-19).
-  await tornillo.getByTestId("mas-del-renglon").click();
-  await tornillo.getByRole("menuitem", { name: "Vender por metro, kilo o unidad" }).click();
   await tornillo.getByTestId("unidad").selectOption("kg");
   await tornillo.getByTestId("cantidad").fill("1.5");
   await expect(page.getByTestId("total")).toContainText("$11.000");
 
-  // Efectivo viene elegido (decisión 37); el total se lee fuera del botón Cobrar.
-  await expect(page.getByTestId("medio-efectivo")).toHaveAttribute("aria-checked", "true");
-  await expect(page.getByTestId("cobrar")).toHaveText("Cobrar");
-  await page.getByTestId("cobrar").click();
-  // Pantalla de éxito con el importe grande; "Nueva venta" vuelve a la búsqueda vacía.
+  // Efectivo viene elegido (decisión 37); se cobra deslizando el botón, que dice el total (decisión 119).
+  await expect(page.getByTestId("medio")).toHaveText("Efectivo");
+  await expect(page.getByTestId("cobrar")).toHaveText("Deslizá para cobrar $11.000");
+  await deslizarParaCobrar(page);
+  // La venta registrada, con el importe grande; «Seguir vendiendo» vuelve a la búsqueda vacía.
   await expect(page.getByTestId("exito")).toContainText("Venta registrada");
   await expect(page.getByTestId("exito")).toContainText("$11.000");
   await expect(page.getByTestId("exito")).toContainText("Efectivo");
@@ -109,26 +108,22 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect.poll(() => psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   await expect.poll(() => psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
-  // La pestaña Hoy de Vender muestra las ventas del día, con cada producto en su renglón y sin anular (decisión 72).
-  await page.getByRole("tab", { name: "Hoy" }).click();
-  // La más reciente primero (017): la que se acaba de cobrar, en un renglón que se abre.
+  // «Ventas de hoy» muestra las ventas del día y desde ahí se anula (decisión 120).
+  await page.getByRole("tab", { name: "Ventas de hoy" }).click();
+  // La más reciente primero (017): la que se acaba de cobrar, en un renglón que abre su hoja.
   const deHoy = page.getByTestId("ventas-de-hoy").getByTestId("venta-dia").first();
   await expect(deHoy).toContainText("2 productos");
   await expect(deHoy).toContainText("Efectivo");
   await expect(deHoy).toContainText("$11.000");
-  await deHoy.getByRole("button").first().click();
-  await expect(deHoy.getByTestId("detalle-venta")).toContainText("3 × MECHA VENDER");
-  await expect(deHoy.getByTestId("detalle-venta")).toContainText("1,5 × TORNILLO VENDER");
-  await expect(page.getByRole("button", { name: "Anular" })).toHaveCount(0);
-  // La pestaña Anular es para eso: anular la marca y devuelve el stock.
-  await page.getByRole("tab", { name: "Anular" }).click();
-  const venta = page.getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
-  // «Anular» abre la hoja para confirmar, con el motivo de la lista y un comentario (003-T005).
-  await venta.getByRole("button", { name: /Anular/ }).click();
+  await deHoy.getByRole("button").click();
+  await expect(page.getByTestId("detalle-venta")).toContainText("3 × MECHA VENDER");
+  await expect(page.getByTestId("detalle-venta")).toContainText("1,5 × TORNILLO VENDER");
+  // «Anular» pide confirmar, con el motivo de la lista y un comentario (decisión 110), y devuelve el stock.
+  await page.getByTestId("anular").click();
   await page.getByTestId("motivo-anular").selectOption("Se arrepintió");
   await page.getByTestId("comentario-anular").fill("cambió de idea");
   await page.getByTestId("confirmar-anular").click();
-  await expect(venta).toContainText(/anulada/i);
+  await expect(deHoy).toContainText(/anulada/i);
   await expect.poll(() => psql(`SELECT contenido->>'motivo' FROM evento WHERE tipo = 'venta.anulada' ORDER BY fecha DESC LIMIT 1`)).toBe("Se arrepintió: cambió de idea");
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
   // La anomalía se ve en Más > Anomalías.

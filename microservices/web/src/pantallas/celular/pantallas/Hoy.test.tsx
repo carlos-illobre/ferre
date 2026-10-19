@@ -57,8 +57,8 @@ describe("«Hoy» · celular", () => {
 
   it("017-E05: cada medio con su ícono, su color, el importe y cuántas ventas", async () => {
     await abrir();
-    expect(screen.getByTestId("medio-tarjeta").textContent).toBe("Tarjeta0 ventas$0");
-    expect(screen.getByTestId("medio-mercado_pago").textContent).toBe("Mercado Pago1 venta$223.000");
+    expect(screen.getByTestId("medio-tarjeta").textContent).toBe("$0Tarjeta · 0 ventas");
+    expect(screen.getByTestId("medio-mercado_pago").textContent).toBe("$223.000M. Pago · 1 venta");
     expect(screen.getByTestId("medio-efectivo").querySelector(".medio-icono.medio-efectivo")).not.toBeNull();
   });
 
@@ -74,7 +74,7 @@ describe("«Hoy» · celular", () => {
     expect(screen.getByTestId("sin-ventas").textContent).toBe("Todavía no hay ventas hoy.");
   });
 
-  it("017-E11 017-E12 017-E13 017-E14 017-E15: renglones cortos, de la más nueva a la más vieja; tocar abre el detalle", async () => {
+  it("017-E11 017-E12 017-E13 017-E14 017-E15: renglones cortos, de la más nueva a la más vieja; tocar abre su hoja", async () => {
     await abrir();
     const ventas = screen.getAllByTestId("venta-dia");
     expect(ventas.map((v) => v.querySelector("b")!.textContent)).toEqual(["3 × Lija al agua grano 220anulada", "3 productos", "1 × Taladro inalámbrico 18 V", "2 productos"]);
@@ -82,9 +82,9 @@ describe("«Hoy» · celular", () => {
     expect(ventas[1]!.textContent).toContain("11:05 · Cuenta corriente · Constructora Martínez");
     expect(within(ventas[1]!).getByRole("button").querySelector(".medio-cuenta_corriente")).not.toBeNull();
     fireEvent.click(within(ventas[1]!).getByRole("button"));
-    expect(within(ventas[1]!).getByTestId("detalle-venta").textContent).toBe("2,5 × Clavo punta París 2 pulgadas$25.0001 × Electrodo 2,5 mm$18.0003 × Disco de corte 115 mm$15.000");
-    fireEvent.click(within(ventas[1]!).getAllByRole("button")[0]!);
-    expect(within(ventas[1]!).queryByTestId("detalle-venta")).toBeNull();
+    expect(screen.getByTestId("detalle-venta").textContent).toBe("2,5 × Clavo punta París 2 pulgadas$10.000 c/u$25.0001 × Electrodo 2,5 mm$18.000 c/u$18.0003 × Disco de corte 115 mm$5.000 c/u$15.000");
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByTestId("detalle-venta")).toBeNull();
   });
 
   it("017-E16 017-E17 017-E18 017-E19: otro día, comparado entero con el suyo; «Volver a hoy»; hasta hoy", async () => {
@@ -133,12 +133,56 @@ describe("«Hoy» · celular", () => {
     expect(pastilla.querySelector("svg")).toBeNull();
   });
 
-  it("017-E13: se abren de a varias, como en la computadora", async () => {
+  it("017-E22 017-E25: «Buscar» esconde el resumen, deja las ventas con ese producto resaltado y dice cuántas y cuánto suman; «Listo» vuelve", async () => {
     await abrir();
+    fireEvent.click(screen.getByTestId("abrir-buscar"));
+    expect(screen.queryByTestId("resumen-hoy")).toBeNull();
+    expect(screen.getByTestId("cuantas-halladas").textContent).toContain("Escribí un producto");
+    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "electrodo" } });
     const ventas = screen.getAllByTestId("venta-dia");
-    fireEvent.click(within(ventas[1]!).getByRole("button"));
-    fireEvent.click(within(ventas[3]!).getByRole("button"));
-    expect(screen.getAllByTestId("detalle-venta")).toHaveLength(2);
+    expect(ventas).toHaveLength(1);
+    expect(ventas[0]!.querySelector("b")!.textContent).toBe("1 × Electrodo 2,5 mm y 2 más");
+    expect(ventas[0]!.querySelector("mark")!.textContent).toBe("Electrodo");
+    expect(screen.getByTestId("cuantas-halladas").textContent).toBe("1 de 4 ventassuman $58.000");
+    fireEvent.click(screen.getByTestId("salir-de-buscar"));
+    expect(screen.getByTestId("resumen-hoy")).toBeTruthy();
+    expect(screen.getAllByTestId("venta-dia")).toHaveLength(4);
+  });
+
+  it("017-E22 017-E23: busca sin tildes, por el importe y por el cliente", async () => {
+    await abrir();
+    fireEvent.click(screen.getByTestId("abrir-buscar"));
+    const campo = screen.getByTestId("buscar-venta");
+    fireEvent.change(campo, { target: { value: "inalambrico" } });
+    expect(screen.getAllByTestId("venta-dia").map((v) => v.textContent)).toEqual([expect.stringContaining("Taladro")]);
+    fireEvent.change(campo, { target: { value: "$223.000" } });
+    expect(screen.getAllByTestId("venta-dia")).toHaveLength(1);
+    fireEvent.change(campo, { target: { value: "martinez" } });
+    expect(screen.getAllByTestId("venta-dia").map((v) => v.textContent)).toEqual([expect.stringContaining("Constructora Martínez")]);
+  });
+
+  it("017-E24: sin resultados lo dice, y deja borrar la búsqueda o volver a todas", async () => {
+    await abrir();
+    fireEvent.click(screen.getByTestId("abrir-buscar"));
+    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "destornillador" } });
+    expect(screen.getByTestId("sin-resultados").textContent).toContain("Ninguna venta con «destornillador»");
+    fireEvent.click(screen.getByRole("button", { name: /Borrar la búsqueda/ }));
+    expect((screen.getByTestId("buscar-venta") as HTMLInputElement).value).toBe("");
+    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "destornillador" } });
+    fireEvent.click(screen.getByRole("button", { name: "Volver a todas las ventas" }));
+    expect(screen.getByTestId("resumen-hoy")).toBeTruthy();
+  });
+
+  it("017-E29: en otro día, solo quien anula ventas de cualquier día ve «Anular»", async () => {
+    render(<VentasDeHoy anulaHoy anulaCualquierDia={false} />);
+    await screen.findByTestId("total-de-hoy");
+    fireEvent.click(within(screen.getAllByTestId("venta-dia")[1]!).getByRole("button"));
+    expect(screen.getByTestId("anular")).toBeTruthy();
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.change(screen.getByTestId("dia"), { target: { value: "2026-10-16" } });
+    await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Viernes 16/10"));
+    fireEvent.click(within(screen.getAllByTestId("venta-dia")[0]!).getByRole("button"));
+    expect(screen.queryByTestId("anular")).toBeNull();
   });
 
   it("sin permiso de ver ventas el servidor lo dice y no hay resumen", async () => {

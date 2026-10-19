@@ -173,6 +173,7 @@ RF-13:
   estado: "Hecho (#47)"
   pruebas:
     - microservices/api/src/precios.test.ts
+    - microservices/web/src/pantallas/celular/Vender.test.tsx
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - tests/e2e/escritorio/02-listas.spec.ts
@@ -295,11 +296,11 @@ RF-23:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
     - microservices/web/src/pantallas/celular/Vender.test.tsx
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
     - microservices/web/src/pantallas/celular/Negocio.test.tsx
   defectos:
     - "No se puede corregir una venta: solo anularla y cargarla de nuevo"
     - "No se pueden ver las ventas de días anteriores: el servidor acepta la fecha, pero ninguna interfaz la pide"
-    - "Anular pide el motivo en un cuadro del navegador, que es una ventana de confirmación"
     - "Anular sin conexión no se guarda en el dispositivo y falla sin avisar"
     - "Las ventas del día no se ven sin conexión: se piden siempre al servidor"
     - "En el celular, las ventas del día dentro de la venta solo las ve quien administra; el resto las ve en otra sección"

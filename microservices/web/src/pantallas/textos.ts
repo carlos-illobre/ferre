@@ -76,6 +76,27 @@ export const TEXTOS = {
     faltaElCliente: igual("Cuenta corriente: elegí el cliente."),
     quienLleva: igual("¿Quién lleva a cuenta corriente?"),
     stockNoAlcanza: { largo: "no alcanza: se vende igual, el stock queda en 0 y se anota una anomalía", corto: "no alcanza: se vende igual y queda anotado" },
+    // Vender en el celular (decisión 119); la computadora los toma cuando se rediseñe.
+    sinStock: igual("Sin stock"),
+    ventaVacia: igual("La venta está vacía"),
+    comoEmpezar: { largo: "Buscá por nombre o código, escaneá con el lector o con el celular.", corto: "Buscá o escaneá un producto para empezar." },
+    vaciaste: igual("Vaciaste la venta"),
+    quitaste: igual("Quitaste"),
+    sumado: igual("sumado a la venta"),
+    noEstaEnElCatalogo: { largo: "No está en el catálogo: buscá el producto y elegilo para asociarle el código.", corto: "No está en el catálogo" },
+    clienteOpcional: igual("Cliente (opcional)"),
+    elegiElCliente: igual("Elegí el cliente"),
+    deslizaParaCobrar: igual("Deslizá para cobrar"),
+    comoSeCobra: igual("Deslizá el botón hasta el final para cobrar"),
+    redondeo: igual("Todo se redondea para arriba a múltiplos de $1.000, para no dar vuelto."),
+    ventaRegistrada: igual("Venta registrada"),
+    guardadaEnElCelular: igual("Guardada en este celular"),
+    seEnviaSola: igual("Sin conexión: se envía sola cuando vuelva internet. El stock se descuenta al enviarse."),
+    enEspejo: igual("En espejo"),
+    enEspejoConLaCompu: igual("En espejo con la computadora"),
+    queEsElEspejo: igual("Lo que vendés en este celular se ve en la computadora, y al revés."),
+    usarComoLector: igual("Usar como lector de la computadora"),
+    queHaceElLector: igual("Cada código que leas entra en la venta de la computadora, no en la de este celular."),
   },
   inventario: {
     faltaCuantasHay: { largo: "Escribí cuántas hay: un número, cero o más.", corto: "Escribí cuántas hay." },
@@ -148,6 +169,10 @@ export const TEXTOS = {
   },
   // «Hoy» renovada (specs/017).
   hoy: {
+    // El buscador de «Ventas de hoy» en el celular (017, historia 5).
+    buscarVenta: igual("Producto, importe o cliente"),
+    queSeBusca: igual("Escribí un producto («mecha»), un importe («24000») o un cliente."),
+    probaConOtra: igual("Probá con otra palabra del producto («mecha», «tarugos») o con el importe justo («24000»)."),
     hoy: igual("Hoy"),
     hasta: igual("Hasta las"),
     cambiarFecha: igual("Cambiar fecha"),

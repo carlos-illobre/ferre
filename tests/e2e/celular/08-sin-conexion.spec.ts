@@ -1,3 +1,4 @@
+import { deslizarParaCobrar } from "../comun/cobrar";
 import { test, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { archivosSinCachear } from "../comun/dispositivo";
@@ -57,7 +58,7 @@ test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y 
   await context.setOffline(true);
   await page.evaluate(() => window.dispatchEvent(new Event("offline")));
   await expect(page.getByTestId("conexion-celular")).toContainText("no se puede registrar nada");
-  await page.getByTestId("cobrar").click();
+  await deslizarParaCobrar(page);
   await expect(page.getByText(/habilitalo en Más → Configuración/)).toBeVisible();
   await expect(page.getByTestId("exito")).toHaveCount(0);
   await expect(page.getByTestId("item")).toHaveCount(1);
@@ -92,8 +93,8 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
   await expect(page.getByTestId("sugerencias")).toContainText("$2.000"); // 500 × 2 × 1,21 = 1210 → 2000
   await busqueda.press("Enter");
   await page.getByTestId("item").getByTestId("cantidad").fill("2");
-  await expect(page.getByTestId("medio-efectivo")).toHaveAttribute("aria-checked", "true"); // viene elegido
-  await page.getByTestId("cobrar").click();
+  await expect(page.getByTestId("medio")).toHaveText("Efectivo"); // viene elegido
+  await deslizarParaCobrar(page);
   await expect(page.getByTestId("exito")).toContainText("Sin conexión: se envía sola");
   await page.getByTestId("cerrar-exito").click();
   await expect(page.getByTestId("conexion-celular")).toContainText("1 por enviar");
@@ -102,7 +103,8 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
   await busqueda.fill("e2e destornillador offline");
   await busqueda.press("Enter");
   await page.getByTestId("item").getByTestId("margen").click();
-  await page.getByTestId("item").getByRole("button", { name: "50 %", exact: true }).click();
+  await page.getByTestId("hoja-renglon").getByRole("button", { name: "50 %", exact: true }).click();
+  await page.keyboard.press("Escape");
   await expect(page.getByTestId("item")).toContainText("$1.000"); // 500 × 1,5 × 1,21 = 907,5 → 1000
   await page.getByRole("button", { name: "No llevó" }).click();
   await expect(page.getByTestId("conexion-celular")).toContainText("3 por enviar");

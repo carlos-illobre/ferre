@@ -22,19 +22,19 @@ function armar(ventas: unknown = ventasVacias, sub: string | null = null) {
     producto({ id: "mecha", descripcion: "MECHA VENDER 8 MM", costo_neto: "1000", margen_elegido: 100 }),
     producto({ id: "tornillo", descripcion: "TORNILLO VENDER", costo_neto: "10" }),
   ]);
+  (falso.clientes as unknown as { id: string; nombre: string; deuda: string }[]).push({ id: "c1", nombre: "Constructora Martínez", deuda: "0" });
   catalogo.actual = falso;
   apiFalsa.mockImplementation(async (ruta: string) => (ruta.startsWith("/ventas") ? ventas : []));
   const { unmount } = render(<ParteVender sub={sub} />);
   const busqueda = screen.queryByTestId("busqueda")!;
   const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
   const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.includes(texto))!;
-  // La unidad se cambia desde el menú «⋮» del renglón (003-T001).
-  const unidad = (texto: string) => {
-    fireEvent.click(within(item(texto)).getByTestId("mas-del-renglon"));
-    fireEvent.click(within(item(texto)).getByRole("menuitem", { name: "Vender por metro, kilo o unidad" }));
-    return within(item(texto)).getByTestId("unidad");
-  };
-  return { falso, busqueda, agregar, item, unidad, unmount };
+  // La unidad está en una lista al lado de la cantidad (decisión 119).
+  const unidad = (texto: string) => within(item(texto)).getByTestId("unidad");
+  // Con el teclado, Enter sobre el círculo cobra (el dedo lo arrastra hasta el final).
+  const cobrar = () => fireEvent.keyDown(screen.getByTestId("cobrar-pulgar"), { key: "Enter" });
+  const medio = (valor: string) => { fireEvent.click(screen.getByTestId("medio")); fireEvent.click(screen.getByTestId(`medio-${valor}`)); };
+  return { falso, busqueda, agregar, item, unidad, cobrar, medio, unmount };
 }
 
 // Todo lo que pidió el dueño para Vender, sobre el rediseño: renglones como tarjetas,
@@ -76,133 +76,200 @@ describe("Vender", () => {
     expect(screen.getByTestId("total").textContent).toBe("$5.000");
     fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Más" }));
     expect(cantidad.value).toBe("2,1");
+    expect(item("MECHA").textContent).toContain("el kg");
   });
 
-  it("un producto sin margen abre el detalle y queda sin precio hasta elegirlo; el margen se guarda", () => {
+  it("un producto sin margen queda en ámbar con los márgenes a la vista hasta elegir uno; el margen se guarda", () => {
     const { agregar, item, falso } = armar();
     agregar("tornillo vender");
-    expect(within(item("TORNILLO")).getByTestId("margen").textContent).toContain("elegí margen");
+    expect(item("TORNILLO").className).toContain("falta");
+    expect(within(item("TORNILLO")).getByTestId("sin-precio").textContent).toContain("Sin precio");
+    expect(within(item("TORNILLO")).queryByTestId("cantidad")).toBeNull(); // el precio va antes que la cantidad
+    expect(screen.getByTestId("cobro").textContent).toContain("Falta el precio de TORNILLO VENDER");
     fireEvent.click(within(item("TORNILLO")).getByRole("button", { name: "300 %" }));
     expect(item("TORNILLO").textContent).toContain("$1.000"); // 10 × 4 × 1,21 = 48,4 → 1000
     expect(falso.actualizarProducto).toHaveBeenCalledWith("tornillo", { margen_elegido: 300 });
+    expect(screen.getByTestId("cobro").textContent).not.toContain("Falta el precio");
   });
 
-  it("el detalle del renglón se abre con el chip del margen y muestra el costo con explicación", () => {
+  it("003 escenario 19: tocar el precio explica cómo se calculó, con el costo, el margen, el IVA, el redondeo y la cantidad", () => {
     const { agregar, item } = armar();
     agregar("mecha vender");
-    expect(within(item("MECHA")).queryByRole("button", { name: "50 %" })).toBeNull();
-    fireEvent.click(within(item("MECHA")).getByTestId("margen"));
-    expect(within(item("MECHA")).getByRole("button", { name: "100 %" }).className).toContain("activo");
-    expect(item("MECHA").textContent).toContain("Costo $1.000,00");
-    fireEvent.click(within(item("MECHA")).getByRole("button", { name: /Costo \$1\.000,00/ }));
-    expect(screen.getByTestId("hoja-explicacion").textContent).toContain("según la lista");
+    fireEvent.change(within(item("MECHA")).getByTestId("cantidad"), { target: { value: "3" } });
+    expect(within(item("MECHA")).getByTestId("precio").textContent).toBe("$3.000cada uno?");
+    fireEvent.click(within(item("MECHA")).getByTestId("precio"));
+    const pasos = within(screen.getByTestId("hoja-explicacion")).getAllByRole("listitem").map((li) => li.textContent).join(" | ");
+    expect(pasos).toContain("Costo $1.000,00");
+    expect(pasos).toContain("+ 100 % de margen");
+    expect(pasos).toContain("+ IVA 21 %");
+    expect(pasos).toContain("Redondeado para arriba a $3.000,00");
+    expect(pasos).toContain("× 3 unidades = $9.000,00");
+    expect(pasos).toContain("Total del renglón: $9.000,00");
   });
 
-  it("'a mano' en el renglón es un precio absoluto solo para esta venta", () => {
+  it("tocar el renglón abre su hoja: los márgenes con su precio, el precio a mano solo para esta venta y quitar", () => {
     const { agregar, item, falso } = armar();
     agregar("mecha vender");
-    fireEvent.click(within(item("MECHA")).getByTestId("margen"));
-    fireEvent.change(within(item("MECHA")).getByTestId("precio-manual"), { target: { value: "2500" } });
+    fireEvent.click(within(item("MECHA")).getByTestId("abrir-renglon"));
+    const hoja = screen.getByTestId("hoja-renglon");
+    expect(within(hoja).getByRole("button", { name: "100 %" }).className).toContain("elegido");
+    expect(within(hoja).getByRole("button", { name: "50 %" }).textContent).toBe("50 %$2.000");
+    fireEvent.change(within(hoja).getByTestId("precio-manual"), { target: { value: "2500" } });
     // Un precio a mano que no es múltiplo de $1.000 también se redondea para arriba
     expect(screen.getByTestId("total").textContent).toBe("$3.000");
     expect(within(item("MECHA")).getByTestId("margen").textContent).toContain("a mano");
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
+    fireEvent.click(within(hoja).getByTestId("quitar"));
+    expect(screen.queryAllByTestId("item")).toHaveLength(0);
   });
 
-  it("el subtotal explica de dónde sale, incluida la cantidad", () => {
-    const { agregar, item } = armar();
+  it("decisión 119: el medio es una pastilla que abre la lista de los cuatro, con su ícono; arranca en Efectivo", () => {
+    const { agregar, medio } = armar();
     agregar("mecha vender");
-    fireEvent.change(within(item("MECHA")).getByTestId("cantidad"), { target: { value: "3" } });
-    fireEvent.click(within(item("MECHA")).getByRole("button", { name: "De dónde sale $9.000" }));
-    const pasos = within(screen.getByTestId("hoja-explicacion")).getAllByRole("listitem").map((li) => li.textContent);
-    expect(pasos.join(" | ")).toContain("+ 100 % de margen");
-    expect(pasos.at(-1)).toContain("× 3 unidades = $9.000,00");
-  });
-
-  it("Efectivo viene elegido; con cuenta corriente sin cliente avisa, y el aviso se va al corregir", () => {
-    const { agregar } = armar();
-    agregar("mecha vender");
-    expect(screen.getByTestId("medio-efectivo").getAttribute("aria-checked")).toBe("true");
-    // 017-E06: cada medio con su ícono y su color, el mismo que en «Hoy».
+    expect(screen.getByTestId("medio").textContent).toBe("Efectivo");
+    expect(screen.getByTestId("medio").querySelector(".medio-icono.medio-efectivo")).not.toBeNull();
+    fireEvent.click(screen.getByTestId("medio"));
+    const lista = screen.getByRole("listbox", { name: "Cómo paga" });
+    expect(within(lista).getAllByRole("option").map((o) => o.textContent)).toEqual(["Efectivo", "Mercado Pago", "Tarjeta", "Cuenta corriente"]);
+    expect(within(lista).getByRole("option", { name: "Efectivo" }).getAttribute("aria-selected")).toBe("true");
+    // 017-E06: cada medio con su ícono y su color, el mismo que en «Ventas de hoy».
     for (const m of ["efectivo", "mercado_pago", "tarjeta", "cuenta_corriente"]) expect(screen.getByTestId(`medio-${m}`).querySelector(`.medio-icono.medio-${m}`)).not.toBeNull();
-    fireEvent.click(screen.getByTestId("medio-cuenta_corriente"));
+    fireEvent.click(screen.getByTestId("medio-tarjeta"));
+    expect(screen.queryByRole("listbox")).toBeNull();
+    expect(screen.getByTestId("medio").textContent).toBe("Tarjeta");
+    medio("mercado_pago");
+    expect(screen.getByTestId("medio").textContent).toBe("M. Pago");
+  });
+
+  it("con cuenta corriente sin cliente pide elegirlo y avisa; el aviso se va al corregir", () => {
+    const { agregar, cobrar, medio } = armar();
+    agregar("mecha vender");
+    medio("cuenta_corriente");
     expect(screen.getByTestId("hoja-clientes")).toBeTruthy(); // sin cliente elegido, pide elegirlo
     fireEvent.keyDown(window, { key: "Escape" });
-    fireEvent.click(screen.getByTestId("cobrar"));
+    expect(screen.getByTestId("cliente").textContent).toBe("Elegí el cliente");
+    expect(screen.getByTestId("cliente").className).toContain("falta");
+    cobrar();
     expect(screen.getByRole("alert").textContent).toContain("elegí el cliente");
     fireEvent.keyDown(window, { key: "Escape" });
-    fireEvent.click(screen.getByTestId("medio-efectivo"));
+    medio("efectivo");
     expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByTestId("cliente").textContent).toBe("Cliente (opcional)");
   });
 
-  it("el total va fuera del botón Cobrar, y no hay atajos de lo último vendido en el celular", () => {
+  it("003 historia 4 escenario 8: el cliente es opcional con cualquier medio y va en la venta; después vuelve a quedar sin elegir", async () => {
+    const { agregar, cobrar } = armar();
+    agregar("mecha vender");
+    fireEvent.click(screen.getByTestId("cliente"));
+    fireEvent.click(within(screen.getByTestId("hoja-clientes")).getByRole("button", { name: /Constructora Martínez/ }));
+    expect(screen.getByTestId("cliente").textContent).toBe("Constructora Martínez");
+    cobrar();
+    const exito = await screen.findByTestId("exito");
+    expect(exito.textContent).toContain("Efectivo · Constructora Martínez");
+    const cuerpo = enviarOEncolar.mock.calls[0]![3] as { medio_pago: string; cliente_id: string | null };
+    expect(cuerpo).toMatchObject({ medio_pago: "efectivo", cliente_id: "c1" });
+    fireEvent.click(screen.getByTestId("cerrar-exito"));
+    expect(screen.getByTestId("cliente").textContent).toBe("Cliente (opcional)");
+  });
+
+  it("003 historia 4 escenario 9: se cobra deslizando hasta el final; un toque solo explica cómo, y sin productos está apagado", async () => {
     const { agregar } = armar();
-    expect(screen.queryByTestId("sugeridos-ultimos")).toBeNull();
+    expect(screen.getByTestId("cobrar").className).toContain("apagado");
+    expect((screen.getByTestId("cobrar-pulgar") as HTMLButtonElement).disabled).toBe(true);
     agregar("mecha vender");
-    expect(screen.getByTestId("cobrar").textContent).toBe("Cobrar");
-    expect(screen.getByTestId("cobrar").contains(screen.getByTestId("total"))).toBe(false);
-    expect(screen.getByTestId("titulo-venta").textContent).toContain("1 producto");
+    expect(screen.getByTestId("cobrar").textContent).toBe("Deslizá para cobrar $3.000");
+    const pulgar = screen.getByTestId("cobrar-pulgar");
+    fireEvent.click(pulgar, { detail: 1 });
+    expect(screen.getByTestId("mensaje").textContent).toContain("Deslizá el botón hasta el final para cobrar");
+    expect(enviarOEncolar).not.toHaveBeenCalled();
+    // El navegador de las pruebas no tiene eventos de puntero: se arman sobre los del mouse.
+    if (!("PointerEvent" in window)) (window as any).PointerEvent = class extends MouseEvent { pointerId: number; constructor(tipo: string, i: PointerEventInit = {}) { super(tipo, i); this.pointerId = i.pointerId ?? 1; } };
+    // Soltarlo antes del final lo devuelve sin cobrar (el ancho, en esta prueba, lo da el navegador falso: 0).
+    fireEvent.pointerDown(pulgar, { clientX: 10, pointerId: 1 });
+    fireEvent.pointerUp(pulgar, { clientX: 10, pointerId: 1 });
+    expect(enviarOEncolar).not.toHaveBeenCalled();
+    fireEvent.pointerDown(pulgar, { clientX: 10, pointerId: 1 });
+    fireEvent.pointerMove(pulgar, { clientX: 400, pointerId: 1 });
+    fireEvent.pointerUp(pulgar, { clientX: 400, pointerId: 1 });
+    await screen.findByTestId("exito");
+    expect(enviarOEncolar).toHaveBeenCalledTimes(1);
   });
 
-  it("cada renglón muestra el precio por unidad y su total; la unidad queda detrás del menú «⋮»", () => {
-    const { agregar, item } = armar();
-    agregar("mecha vender");
-    const mecha = within(item("MECHA"));
-    expect(mecha.queryByTestId("unidad")).toBeNull();
-    expect(item("MECHA").querySelector(".unitario")?.textContent).toContain("$3.000");
-    expect(item("MECHA").querySelector(".unitario")?.textContent).toContain("cada uno");
-    fireEvent.click(mecha.getByRole("button", { name: "Más" }));
-    expect(mecha.getByTestId("subtotal").textContent).toBe("$6.000");
-    fireEvent.click(mecha.getByTestId("mas-del-renglon"));
-    const menu = mecha.getByRole("menu");
-    expect(within(menu).getAllByRole("menuitem").map((b) => b.textContent)).toEqual(["Precio a mano", "Vender por metro, kilo o unidad", "Ver la ficha del producto", "Sacar foto"]);
-    fireEvent.click(within(menu).getByRole("menuitem", { name: "Precio a mano" }));
-    expect(mecha.queryByRole("menu")).toBeNull();
-    expect(mecha.getByTestId("precio-manual")).toBeTruthy();
-  });
-
-  it("Vaciar saca todos los productos, después de confirmar", () => {
+  it("003 escenario 20: Vaciar no pregunta: vacía la venta y Deshacer la devuelve igual", () => {
     const { agregar } = armar();
     agregar("mecha vender");
     agregar("tornillo vender");
-    const confirmar = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
+    const confirmar = vi.spyOn(window, "confirm");
     fireEvent.click(screen.getByTestId("vaciar-venta"));
-    expect(screen.getAllByTestId("item")).toHaveLength(2);
-    fireEvent.click(screen.getByTestId("vaciar-venta"));
-    expect(confirmar).toHaveBeenCalledWith("¿Vaciar la venta? Se sacan todos los productos.");
+    expect(confirmar).not.toHaveBeenCalled();
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
+    expect(screen.getByTestId("mensaje").textContent).toContain("Vaciaste la venta");
+    fireEvent.click(within(screen.getByTestId("mensaje")).getByRole("button", { name: "Deshacer" }));
+    expect(screen.getAllByTestId("item").map((i) => i.querySelector("b")?.textContent)).toEqual(["MECHA VENDER 8 MM", "TORNILLO VENDER"]);
     confirmar.mockRestore();
   });
 
-  it("la venta vacía muestra el dibujo y explica cómo se agrega, sin nada que tocar; con un producto se va", () => {
+  it("la venta vacía lo dice y explica cómo empezar; «No llevó» y «Vaciar» quedan apagados", () => {
     const { agregar } = armar();
-    expect(screen.getByText("Venta nueva")).toBeTruthy();
-    const como = screen.getByTestId("como-se-agrega");
-    expect(within(como).getAllByRole("listitem").map((li) => li.querySelector("b")?.textContent)).toEqual(["Escaneá", "Buscá", "Explorá"]);
-    expect(within(como).queryAllByRole("button")).toHaveLength(0);
-    expect(within(como).queryAllByRole("link")).toHaveLength(0);
+    expect(screen.getByTestId("venta-vacia").textContent).toBe("La venta está vacíaBuscá o escaneá un producto para empezar.");
+    expect((screen.getByTestId("no-llevo") as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByTestId("vaciar-venta") as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByTestId("titulo-venta").textContent).toContain("Esta venta0");
     agregar("mecha vender");
-    expect(screen.queryByTestId("como-se-agrega")).toBeNull();
+    expect(screen.queryByTestId("venta-vacia")).toBeNull();
+    expect(screen.getByTestId("titulo-venta").textContent).toContain("Esta venta1");
   });
 
-  it("quitar un producto es un botón con nombre, y la unidad litro se escribe L", () => {
+  it("«−» con 1 quita el renglón y deja deshacerlo; la unidad litro se escribe L", () => {
     const { agregar, item, unidad } = armar();
     agregar("mecha vender");
     expect(unidad("MECHA").textContent).toContain("L");
-    fireEvent.click(within(item("MECHA")).getByRole("button", { name: /Quitar MECHA VENDER 8 MM de la venta/ }));
+    fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Quitar" }));
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
+    expect(screen.getByTestId("mensaje").textContent).toContain("Quitaste MECHA VENDER 8 MM");
+    fireEvent.click(within(screen.getByTestId("mensaje")).getByRole("button", { name: "Deshacer" }));
+    expect(screen.getAllByTestId("item")).toHaveLength(1);
   });
 
-  it("cobrar en efectivo manda la venta con cantidad, precio, margen y explicación, y muestra el éxito", async () => {
-    const { agregar } = armar();
+  it("003 escenario 15: si lo que se lleva supera el stock, el renglón avisa cuánto hay", () => {
+    const { agregar, item, falso } = armar();
+    falso.stock.set("mecha", 2);
+    falso.stock.set("tornillo", 0);
+    agregar("mecha vender");
+    expect(within(item("MECHA")).queryByTestId("stock-no-alcanza")).toBeNull();
+    fireEvent.change(within(item("MECHA")).getByTestId("cantidad"), { target: { value: "4" } });
+    expect(within(item("MECHA")).getByTestId("stock-no-alcanza").textContent).toBe("Hay 2 un.: no alcanza para 4");
+    agregar("tornillo vender");
+    fireEvent.click(within(item("TORNILLO")).getByRole("button", { name: "300 %" }));
+    expect(within(item("TORNILLO")).getByTestId("stock-no-alcanza").textContent).toBe("Sin stock");
+  });
+
+  it("003 escenario 18: un código que no es de ningún producto se avisa, y elegido el producto queda asociado", () => {
+    const { busqueda, falso } = armar();
+    fireEvent.change(busqueda, { target: { value: "7790001112223" } });
+    fireEvent.keyDown(busqueda, { key: "Enter" });
+    expect(screen.getByTestId("codigo-desconocido").textContent).toContain("Código 7790001112223No está en el catálogo");
+    fireEvent.change(busqueda, { target: { value: "mecha vender" } });
+    fireEvent.keyDown(busqueda, { key: "Enter" });
+    expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { codigo_barras: "7790001112223" });
+    expect(screen.queryByTestId("codigo-desconocido")).toBeNull();
+    expect(screen.getAllByTestId("item")).toHaveLength(1);
+  });
+
+  it("cobrar en efectivo manda la venta con cantidad, precio, margen y explicación, y muestra la venta registrada", async () => {
+    const { agregar, cobrar } = armar();
     agregar("mecha vender");
     fireEvent.keyDown(window, { key: "F5" }); // efectivo
-    fireEvent.click(screen.getByTestId("cobrar"));
-    await waitFor(() => expect(screen.getByTestId("exito").textContent).toContain("Venta registrada"));
-    expect(screen.getByTestId("exito").textContent).toContain("$3.000");
-    expect(screen.getByTestId("exito").textContent).toContain("Efectivo");
-    const cuerpo = enviarOEncolar.mock.calls[0]![3] as { medio_pago: string; items: { cantidad: number; precio_unitario: number; margen_aplicado: number; explicacion: { pasos: string[] } }[] };
+    cobrar();
+    const exito = await screen.findByTestId("exito");
+    expect(within(exito).getByRole("heading", { name: "Venta registrada" })).toBeTruthy();
+    expect(within(exito).getByTestId("exito-total").textContent).toBe("$3.000");
+    expect(exito.textContent).toMatch(/Efectivo · 1 producto · \d\d:\d\d/);
+    expect(within(exito).getAllByRole("button").map((b) => b.textContent)).toEqual(["Ver en Ventas de hoy", "Seguir vendiendo"]);
+    expect(exito.textContent).not.toMatch(/Costo|margen|ganancia|comprobante/i);
+    const cuerpo = enviarOEncolar.mock.calls[0]![3] as { medio_pago: string; cliente_id: string | null; items: { cantidad: number; precio_unitario: number; margen_aplicado: number; explicacion: { pasos: string[] } }[] };
     expect(cuerpo.medio_pago).toBe("efectivo");
+    expect(cuerpo.cliente_id).toBeNull();
     expect(cuerpo.items[0]).toMatchObject({ cantidad: 1, precio_unitario: 3000, margen_aplicado: 100 });
     expect(cuerpo.items[0]!.explicacion.pasos.join(" ")).toContain("+ 100 % de margen");
     fireEvent.click(screen.getByTestId("cerrar-exito"));
@@ -210,108 +277,84 @@ describe("Vender", () => {
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
   });
 
-  it("el éxito muestra el total, el medio, el stock, la fecha, cuántos productos y lo vendido, con «Nueva venta» como único botón", async () => {
-    const { agregar } = armar();
+  it("«Ver en Ventas de hoy» lleva a la pestaña de las ventas del día", async () => {
+    const { agregar, cobrar } = armar();
     agregar("mecha vender");
-    fireEvent.click(within(screen.getByTestId("item")).getByRole("button", { name: "Más" }));
-    fireEvent.click(screen.getByTestId("cobrar"));
-    const exito = await screen.findByTestId("exito");
-    expect(within(exito).getByRole("heading", { name: "¡Venta registrada!" })).toBeTruthy();
-    expect(within(exito).getByTestId("exito-total").textContent).toBe("$6.000");
-    expect(exito.textContent).toContain("Total cobrado");
-    expect(exito.textContent).toContain("Efectivo");
-    expect(exito.textContent).toContain("El stock ya se descontó");
-    expect(exito.textContent).toMatch(/Fecha y hora\d\d\/\d\d\/\d{4} \d\d:\d\d/);
-    expect(within(exito).getByTestId("exito-cuantos").textContent).toBe("1");
-    const vendido = within(exito).getByTestId("vendido");
-    expect(vendido.textContent).toContain("MECHA VENDER 8 MM");
-    expect(vendido.textContent).toContain("2 un.");
-    expect(vendido.textContent).toContain("$6.000");
-    expect(within(exito).getAllByRole("button").map((b) => b.textContent)).toEqual(["Nueva venta"]);
-    expect(exito.textContent).not.toMatch(/Costo|margen|ganancia|comprobante/i);
-  });
-
-  it("sin conexión, el éxito dice que quedó guardada y que se envía sola, sin decir que bajó el stock", async () => {
-    enviarOEncolar.mockResolvedValueOnce({ encolado: true });
-    const { agregar } = armar();
-    agregar("mecha vender");
-    fireEvent.click(screen.getByTestId("cobrar"));
-    const exito = await screen.findByTestId("exito");
-    expect(within(exito).getByRole("heading", { name: "Guardada en este dispositivo" })).toBeTruthy();
-    expect(exito.textContent).toContain("Sin conexión: se envía sola cuando vuelva internet.");
-    expect(exito.textContent).not.toContain("El stock ya se descontó");
-  });
-
-  it("Vender tiene tres pestañas, cada una con su dirección; Vender ya no muestra las ventas del día", async () => {
-    armar();
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Hoy", "Anular"]);
-    expect(screen.queryByTestId("hoy")).toBeNull();
-    fireEvent.click(screen.getByRole("tab", { name: "Hoy" }));
+    cobrar();
+    fireEvent.click(await screen.findByTestId("ver-en-hoy"));
     expect(location.hash).toBe("#/vender/hoy");
-    fireEvent.click(screen.getByRole("tab", { name: "Anular" }));
-    expect(location.hash).toBe("#/vender/anular");
   });
 
-  it("Hoy muestra el total y cada venta del día, sin nada para anular", async () => {
-    armar({ total: 10500, totales: { efectivo: 10500 }, ventas: [
-      { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [
-        { descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }, { descripcion: "TORNILLO VENDER", cantidad: "1.5", precio_unitario: "1000" }] },
-      { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "anulada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "1", precio_unitario: "3000" }] },
-    ] }, "hoy");
-    expect((await screen.findByTestId("total-de-hoy")).textContent).toBe("$10.500");
-    const ventas = screen.getAllByTestId("venta-dia");
-    expect(ventas).toHaveLength(2);
-    // 017-E15: de la más reciente a la más vieja; 017-E12 017-E14: la anulada, tachada y marcada.
-    expect(ventas[0]!.textContent).toContain("1 × MECHA VENDER 8 MManulada");
-    // 017-E11 017-E13: la de dos productos dice cuántos, y al tocarla se ven.
-    expect(ventas[1]!.textContent).toContain("2 productos");
-    expect(ventas[1]!.textContent).toContain("Efectivo");
-    fireEvent.click(within(ventas[1]!).getByRole("button", { expanded: false }));
-    expect(within(ventas[1]!).getByTestId("detalle-venta").textContent).toContain("3 × MECHA VENDER 8 MM");
-    expect(within(ventas[1]!).getByTestId("detalle-venta").textContent).toContain("1,5 × TORNILLO VENDER");
-    expect(screen.queryByRole("button", { name: "Anular" })).toBeNull();
+  it("sin conexión, dice que quedó guardada en el celular y que se envía sola", async () => {
+    enviarOEncolar.mockResolvedValueOnce({ encolado: true });
+    const { agregar, cobrar } = armar();
+    agregar("mecha vender");
+    cobrar();
+    const exito = await screen.findByTestId("exito");
+    expect(within(exito).getByRole("heading", { name: "Guardada en este celular" })).toBeTruthy();
+    expect(exito.textContent).toContain("Sin conexión: se envía sola cuando vuelva internet.");
   });
 
-  it("Anular lista las ventas y anula la elegida; el día se elige solo con el permiso de cualquier día", async () => {
+  it("decisión 120: Vender tiene dos pestañas, Vender y Ventas de hoy; la vieja dirección de Anular abre Ventas de hoy", async () => {
+    const { unmount } = armar();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Ventas de hoy"]);
+    expect(screen.queryByTestId("hoy")).toBeNull();
+    fireEvent.click(screen.getByRole("tab", { name: "Ventas de hoy" }));
+    expect(location.hash).toBe("#/vender/hoy");
+    unmount();
+    armar(ventasVacias, "anular");
+    expect(await screen.findByTestId("hoy")).toBeTruthy();
+    expect(screen.getByRole("tab", { name: "Ventas de hoy" }).getAttribute("aria-selected")).toBe("true");
+  });
+
+  const DOS = { total: 10500, totales: { efectivo: 10500 }, ventas: [
+    { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [
+      { descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }, { descripcion: "TORNILLO VENDER", cantidad: "1.5", precio_unitario: "1000" }] },
+    { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "anulada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "1", precio_unitario: "3000" }] },
+  ] };
+
+  it("017 E26 E27 E28: tocar una venta abre su hoja con «Anular», que pide confirmar con el motivo de la lista y un comentario", async () => {
     conPermisos("ventas.registrar", "ventas.ver", "ventas.anular");
-    armar({ total: 10500, totales: { efectivo: 10500 }, ventas: [
-      { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [
-        { descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }, { descripcion: "TORNILLO VENDER", cantidad: "1.5", precio_unitario: "1000" }] },
-      { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "anulada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "1", precio_unitario: "3000" }] },
-    ] }, "anular");
+    armar(DOS, "hoy");
     const ventas = await screen.findAllByTestId("venta-dia");
-    expect(screen.queryByTestId("dia")).toBeNull();
-    expect(screen.queryByTestId("resumen-hoy")).toBeNull();
-    expect(within(ventas[1]!).queryByRole("button", { name: /Anular/ })).toBeNull();
-    expect(within(ventas[1]!).getByText("Anulada")).toBeTruthy();
-    // 003-T005: «Anular» abre la hoja para confirmar, con el motivo de la lista y un comentario.
-    fireEvent.click(within(ventas[0]!).getByRole("button", { name: /Anular la venta de \$10\.500/ }));
-    const hoja = screen.getByTestId("hoja-anular");
-    expect(hoja.textContent).toContain("¿Anular esta venta?");
-    expect(hoja.textContent).toContain("MECHA VENDER 8 MM");
-    expect([...(within(hoja).getByTestId("motivo-anular") as HTMLSelectElement).options].map((o) => o.value)).toEqual(["Sin motivo", "Se arrepintió", "Error al cobrar", "Producto equivocado", "Devolución", "Cobrada dos veces"]);
-    fireEvent.change(within(hoja).getByTestId("motivo-anular"), { target: { value: "Devolución" } });
-    fireEvent.change(within(hoja).getByTestId("comentario-anular"), { target: { value: "la mecha vino fallada" } });
-    fireEvent.click(within(hoja).getByTestId("confirmar-anular"));
+    // La anulada no ofrece anular.
+    fireEvent.click(within(ventas[0]!).getByRole("button"));
+    expect(screen.getByTestId("hoja-venta").textContent).toContain("Anulada");
+    expect(within(screen.getByTestId("hoja-venta")).queryByTestId("anular")).toBeNull();
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.click(within(ventas[1]!).getByRole("button"));
+    const hoja = screen.getByTestId("hoja-venta");
+    expect(within(hoja).getByTestId("detalle-venta").textContent).toContain("3 × MECHA VENDER 8 MM");
+    expect(within(hoja).getByTestId("detalle-venta").textContent).toContain("1,5 × TORNILLO VENDER");
+    fireEvent.click(within(hoja).getByTestId("anular"));
+    const confirmar = screen.getByTestId("hoja-anular");
+    expect(confirmar.textContent).toContain("¿Anular esta venta?");
+    expect([...(within(confirmar).getByTestId("motivo-anular") as HTMLSelectElement).options].map((o) => o.value)).toEqual(["Sin motivo", "Se arrepintió", "Error al cobrar", "Producto equivocado", "Devolución", "Cobrada dos veces"]);
+    expect(within(confirmar).getByTestId("confirmar-anular").textContent).toBe("Anular · −$10.500");
+    fireEvent.change(within(confirmar).getByTestId("motivo-anular"), { target: { value: "Devolución" } });
+    fireEvent.change(within(confirmar).getByTestId("comentario-anular"), { target: { value: "la mecha vino fallada" } });
+    fireEvent.click(within(confirmar).getByTestId("confirmar-anular"));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/ventas/v1/anular", { method: "POST", body: JSON.stringify({ motivo: "Devolución: la mecha vino fallada" }) }));
+    await waitFor(() => expect(screen.queryByTestId("hoja-venta")).toBeNull());
   });
 
-  it("003-T005 Anular busca por producto o importe y filtra por medio de pago", async () => {
+  it("017 E26: sin el permiso de anular, la hoja de la venta no tiene «Anular»", async () => {
+    conPermisos("ventas.registrar", "ventas.ver");
+    armar(DOS, "hoy");
+    const ventas = await screen.findAllByTestId("venta-dia");
+    fireEvent.click(within(ventas[1]!).getByRole("button"));
+    expect(within(screen.getByTestId("hoja-venta")).queryByTestId("anular")).toBeNull();
+  });
+
+  it("017 E30: sin conexión, anular dice que hace falta internet y la venta queda como estaba", async () => {
     conPermisos("ventas.registrar", "ventas.ver", "ventas.anular");
-    armar({ total: 13500, totales: { efectivo: 10500, tarjeta: 3000 }, ventas: [
-      { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3500" }] },
-      { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "confirmada", cliente: null, items: [{ descripcion: "TORNILLO VENDER", cantidad: "1", precio_unitario: "3000" }] },
-    ] }, "anular");
-    await screen.findAllByTestId("venta-dia");
-    expect(screen.getByTestId("cuantas-ventas").textContent).toBe("2 ventas");
-    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "tornillo" } });
-    expect(screen.getAllByTestId("venta-dia")).toHaveLength(1);
-    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "10.500" } });
-    expect(screen.getAllByTestId("venta-dia")[0]!.textContent).toContain("MECHA");
-    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "" } });
-    fireEvent.click(within(screen.getByRole("group", { name: "Medio de pago" })).getByRole("button", { name: "Tarjeta" }));
-    expect(screen.getAllByTestId("venta-dia")).toHaveLength(1);
-    expect(screen.getByTestId("cuantas-ventas").textContent).toBe("1 venta");
+    armar(DOS, "hoy");
+    const ventas = await screen.findAllByTestId("venta-dia");
+    apiFalsa.mockImplementation(async (ruta: string) => { if (ruta.endsWith("/anular")) throw new TypeError("Failed to fetch"); return DOS; });
+    fireEvent.click(within(ventas[1]!).getByRole("button"));
+    fireEvent.click(screen.getByTestId("anular"));
+    fireEvent.click(screen.getByTestId("confirmar-anular"));
+    expect((await within(screen.getByTestId("hoja-anular")).findByRole("alert")).textContent).toContain("para anular hace falta internet");
   });
 
   it("'No llevó' anota la consulta y vacía la venta", () => {
@@ -341,10 +384,10 @@ describe("Vender", () => {
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
   });
 
-  it("sin el permiso de anular no hay pestaña Anular; con solo vender, no hay pestañas", async () => {
-    conPermisos("ventas.registrar", "ventas.ver");
+  it("con solo ver las ventas o solo anular hay dos pestañas; con solo vender, no hay pestañas", async () => {
+    conPermisos("ventas.registrar", "ventas.anular");
     const uno = armar();
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Hoy"]);
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Ventas de hoy"]);
     uno.unmount();
     conPermisos("ventas.registrar");
     armar();
@@ -355,9 +398,10 @@ describe("Vender", () => {
     conPermisos("ventas.registrar");
     const { agregar, item } = armar();
     agregar("tornillo vender");
+    expect(item("TORNILLO").textContent).toContain("elegí margen");
     fireEvent.click(within(item("TORNILLO")).getByRole("button", { name: "300 %" }));
     expect(item("TORNILLO").textContent).toContain("$1.000");
-    expect(item("TORNILLO").textContent).not.toContain("Costo");
-    expect(within(item("TORNILLO")).getAllByTestId("sin-explicacion")).toHaveLength(2); // el precio por unidad y el total del renglón
+    expect(item("TORNILLO").textContent).not.toContain("costo");
+    expect(within(item("TORNILLO")).queryByTestId("precio")).toBeNull();
   });
 });

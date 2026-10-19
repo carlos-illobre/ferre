@@ -149,6 +149,8 @@ export function useVenta(opciones: OpcionesDeVenta) {
       setCodigoDesconocido(null);
     } else agregar(p);
   }
+  // El cliente de la venta, o ninguno ("").
+  const elegirCliente = (id: string) => setClienteId(id);
   function elegirMedio(valor: Medio) {
     setMedio(valor);
     if (valor === "cuenta_corriente" && !clienteId) opciones.alFaltarCliente?.();
@@ -167,7 +169,8 @@ export function useVenta(opciones: OpcionesDeVenta) {
       id,
       fecha: new Date().toISOString(),
       medio_pago: medio,
-      cliente_id: medio === "cuenta_corriente" ? clienteId : null,
+      // El cliente es opcional con cualquier medio (003, historia 4, escenario 8); con cuenta corriente, obligatorio.
+      cliente_id: clienteId || null,
       dispositivo_id: opciones.dispositivo(),
       items: items.map((it) => {
         const p = precioDe(it);
@@ -209,6 +212,8 @@ export function useVenta(opciones: OpcionesDeVenta) {
     items, medio, setMedio, clienteId, setClienteId, cliente, total, sinPrecio,
     mensaje, setMensaje, error, setError, ocupado, codigoDesconocido, setCodigoDesconocido,
     cobro, cerrarCobro: () => setCobro(null),
-    agregar, agregarPorCodigo, cambiarItem, cambiarUnidad, quitar, elegirMargen, subirFotoDe, elegirSugerencia, elegirMedio, cobrar, noLlevo, vaciar,
+    agregar, agregarPorCodigo, cambiarItem, cambiarUnidad, quitar, elegirMargen, subirFotoDe, elegirSugerencia, elegirMedio, elegirCliente, cobrar, noLlevo, vaciar,
+    // Volver a poner los renglones que se vaciaron o quitaron (Deshacer).
+    devolver: (renglones: Item[]) => setItems(renglones),
   };
 }

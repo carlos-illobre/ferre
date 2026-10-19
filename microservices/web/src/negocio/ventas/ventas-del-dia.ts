@@ -59,13 +59,14 @@ export function motivoDeAnulacion(elegido: string, comentario: string): string {
   return motivo && texto ? `${motivo}: ${texto}` : motivo || texto;
 }
 
-// Buscar una venta para anular, por un producto o por el importe, y filtrar por medio de pago
-// (003-T005). El importe se compara sin puntos ni signo: «58.000» encuentra la de $58.000.
-const plano = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+// Buscar una venta por un producto, el importe o el cliente, y filtrar por medio de pago
+// (003-T005, 017 E22–E23). El importe se compara sin puntos ni signo: «58.000» encuentra la de $58.000.
+export const plano = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 export function buscarVentas(ventas: VentaDelDia[], texto: string, medio: VentaDelDia["medio_pago"] | null): VentaDelDia[] {
   const buscado = plano(texto);
   const cifras = buscado.replace(/\D/g, "");
   return ventas.filter((v) => (!medio || v.medio_pago === medio) && (!buscado
     || v.items.some((i) => plano(i.descripcion).includes(buscado))
+    || plano(v.cliente ?? "").includes(buscado)
     || (cifras.length > 0 && cifras === buscado.replace(/[$.\s]/g, "") && String(Math.round(Number(v.total))).includes(cifras))));
 }

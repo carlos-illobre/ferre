@@ -1,21 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as EventoDePuntero, type ReactNode } from "react";
 import { irA } from "../../rutas";
-import { contarAlEspejo, useEspejar } from "../../espejo";
-import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
-import { SiVeCostos } from "../Costos";
+import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Cobro, type Item, type Medio, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { useVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
 import { IconoDeMedio } from "../IconoDeMedio";
-import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
+import { MARGENES, precioDeVenta } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { FotoProducto } from "./componentes/Foto";
-import { AvisoError, Buscador, Contador, Hoja, Icono, Toast, Lista } from "./componentes/base";
-import { Explicacion } from "./componentes/Explicacion";
-import { cantidadValida, enteras, UNIDADES, unidadDe, type Unidad } from "../../unidades";
-import { api, ErrorApi, subirFoto } from "../../api";
-import { guardar, borrarAnterioresA } from "../../almacen";
-import { alCambiarLaCola, enviarOEncolar, enviarPendientes, pendientes as pendientesEnCola } from "../../cola";
-import { traerPorCodigo, useCatalogo } from "../../catalogo";
+import { AvisoError, Buscador, Contador, Hoja, Icono, Pasos, Toast, Lista } from "./componentes/base";
+import { abreviarUnidad, enteras, UNIDADES, type Unidad } from "../../unidades";
+import { subirFoto } from "../../api";
+import { alCambiarLaCola, enviarPendientes, pendientes as pendientesEnCola } from "../../cola";
+import { useCatalogo } from "../../catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { pesos, pesosCortos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
@@ -23,30 +20,33 @@ import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../../puesto";
 import { VentasDeHoy } from "./pantallas/VentasDeHoy";
-import { AnularVentas } from "./pantallas/AnularVentas";
 import { Pestanas } from "./Pestanas";
 import { SinPermiso } from "../SinPermiso";
 import type { Producto } from "./pantallas/Productos";
-import { FichaProducto } from "./FichaProducto";
+import "./vender.css";
 
-// La venta (issue #15): el orden es el del mostrador (specs/003-ventas/research.md). Buscar →
-// precio → cantidad → cobro. Enter agrega; Esc descarta ("no llevó"); F2 cobra. Cada
-// renglón es una tarjeta; el margen se cambia ahí mismo y queda guardado en el producto.
-// Un dibujo por medio de pago, con su nombre chico debajo como en el menú de abajo: billete,
-// tarjeta y libreta. Mercado Pago lleva su propio isotipo.
+// La venta en el celular (decisión 119, maqueta specs/003-ventas/maquetas/celular-vender-v2-con-v3.png):
+// la v2 del director de arte («Mostrador») con, de la v3, el medio de pago en una pastilla que abre
+// la lista, cobrar deslizando y la cámara arriba, que empuja la venta hacia abajo. El orden es el
+// del mostrador (specs/003-ventas/research.md): buscar → precio → cantidad → cobro. Enter agrega;
+// Esc descarta ("no llevó"); F2 cobra.
 
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
+const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
-// Vender tiene tres pestañas (decisión 72): vender, ver lo vendido hoy y anular una venta.
-const SUB = [{ valor: "vender", nombre: "Vender", icono: "vender" }, { valor: "hoy", nombre: "Hoy", icono: "ventas" }, { valor: "anular", nombre: "Anular", icono: "deshacer" }] as const;
+// Vender tiene dos pestañas en el celular (decisión 120): armar la venta, y las ventas del día,
+// desde donde también se anula.
+const SUB = [{ valor: "vender", nombre: "Vender", icono: "vender" }, { valor: "hoy", nombre: "Ventas de hoy", icono: "ventas" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
-const PIDE: Record<Sub, Permiso[]> = { vender: ["ventas.registrar"], hoy: ["ventas.ver"], anular: ["ventas.anular", "ventas.anular_cualquiera"] };
+const PIDE: Record<Sub, Permiso[]> = { vender: ["ventas.registrar"], hoy: ["ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] };
 
 export function ParteVender({ sub }: { sub: string | null }) {
   const puedeEsto = usePuede();
   const permitidas = SUB.filter((s) => puedeEsto(...PIDE[s.valor]));
-  const actual: Sub = SUB.find((s) => s.valor === sub)?.valor ?? permitidas[0]?.valor ?? "vender";
+  // «vender/anular» era la pestaña de anular, que ahora está en «Ventas de hoy».
+  const pedida = sub === "anular" ? "hoy" : sub;
+  const actual: Sub = SUB.find((s) => s.valor === pedida)?.valor ?? permitidas[0]?.valor ?? "vender";
   // Con una sola pestaña a la vista no se dibujan.
   const pestanas = permitidas.length > 1 ? <Pestanas opciones={permitidas.map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.icono }))} actual={actual} alElegir={(v) => irA(v === "vender" ? "vender" : `vender/${v}`)} /> : null;
   if (!puedeEsto(...PIDE[actual])) return <SinPermiso falta={PIDE[actual]} />;
@@ -54,20 +54,23 @@ export function ParteVender({ sub }: { sub: string | null }) {
   return (
     <main className="contenido">
       <div className="encabezado"><h1 className="titulo">Vender</h1>{pestanas}</div>
-      {actual === "hoy" ? <VentasDeHoy /> : <AnularVentas cualquierDia={puedeEsto("ventas.anular_cualquiera")} />}
+      <VentasDeHoy anulaHoy={puedeEsto("ventas.anular", "ventas.anular_cualquiera")} anulaCualquierDia={puedeEsto("ventas.anular_cualquiera")} />
     </main>
   );
 }
 
+type Aviso = { texto: string; deshacer?: () => void };
+
 export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   const puedeEsto = usePuede();
   const fijaMargen = puedeEsto("catalogo.margenes");
-  const { catalogo, catalogoCompleto, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal, enElServidor } = useCatalogo();
+  const { catalogo, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
-  const [pendientes, setPendientes] = useState(0);
+  const [, setPendientes] = useState(0);
   const [escaneando, setEscaneando] = useState(false);
   const [ultimoEscaneo, setUltimoEscaneo] = useState<string | null>(null);
+  const [recien, setRecien] = useState<string | null>(null);
   const [puestoVinculado, setPuestoVinculado] = useState(false);
   // El celular emparejado con una computadora (decisión 58): Vender es su propia venta; para
   // leerle códigos a la computadora está el lector, que es un modo aparte (decisión 59).
@@ -77,7 +80,9 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar);
     return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar);
   }, []);
-  const [hoja, setHoja] = useState<"clientes" | null>(null);
+  const [hoja, setHoja] = useState<"clientes" | "espejo" | null>(null);
+  const [renglonAbierto, setRenglonAbierto] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<Aviso | null>(null);
   const caja = useRef<HTMLInputElement>(null);
 
   // La venta en sí (renglones, precios, cobrar, «no llevó») está una sola vez, en el negocio:
@@ -88,14 +93,24 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     textoDeRechazo: (m) => m,
     alCambiar: useCallback((motivo: MotivoDeCambio) => { if (motivo === "agregar") setConsulta(""); }, []),
     alFaltarCliente: () => setHoja("clientes"),
-    alCobrar: (c) => setMensaje(c.encolado ? `Venta guardada en este dispositivo (${pesos(c.total)}). Sin conexión: se envía sola cuando vuelva.` : `Venta registrada: ${pesos(c.total)} en ${(NOMBRE_DE_MEDIO[c.medio]).toLowerCase()}.`),
   });
-  const { items, medio, setMedio, clienteId, setClienteId, cliente, total, sinPrecio, mensaje, setMensaje, error, setError, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, quitar, elegirMargen, elegirSugerencia, elegirMedio, cobrar } = venta;
-  const [ficha, setFicha] = useState<string | null>(null);
-  const productoDeLaFicha = ficha ? (catalogo ?? []).find((p) => p.id === ficha) ?? items.find((i) => i.producto?.id === ficha)?.producto ?? null : null;
+  const { items, medio, clienteId, cliente, total, mensaje, setMensaje, error, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, elegirMargen, elegirSugerencia, elegirMedio, elegirCliente, cobrar } = venta;
+  const renglon = items.find((i) => i.clave === renglonAbierto) ?? null;
   // Un código que no es de ningún producto deja la búsqueda limpia, para elegir a cuál asociarlo.
   const agregarPorCodigo = useCallback((codigo: string) => { const conocido = venta.agregarPorCodigo(codigo); setConsulta(""); return conocido; }, [venta.agregarPorCodigo]);
-  const noLlevo = () => venta.noLlevo(TEXTOS.vender.noLlevo.corto);
+  const noLlevo = () => { if (items.length) { setAviso(null); venta.noLlevo(TEXTOS.vender.noLlevo.corto); } };
+  // Vaciar no pregunta: avisa y deja deshacer (003, historia 1, escenario 20).
+  const vaciar = () => {
+    if (!items.length) return;
+    const copia = items;
+    venta.vaciar();
+    setAviso({ texto: TEXTOS.vender.vaciaste.corto, deshacer: () => venta.devolver(copia) });
+  };
+  const quitar = (it: Item) => {
+    const copia = items;
+    venta.quitar(it.clave);
+    setAviso({ texto: `${TEXTOS.vender.quitaste.corto} ${it.descripcion}`, deshacer: () => venta.devolver(copia) });
+  };
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía media pantalla.
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
@@ -103,10 +118,10 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   useEffect(() => {
     const contar = () => pendientesEnCola().then((l) => setPendientes(l.length)).catch(() => undefined);
     void contar();
-    const quitar = alCambiarLaCola(contar);
+    const quitarOyente = alCambiarLaCola(contar);
     const reintentar = () => { enviarPendientes().then(setPendientes).catch(() => undefined); };
     window.addEventListener("online", reintentar);
-    return () => { quitar(); window.removeEventListener("online", reintentar); };
+    return () => { quitarOyente(); window.removeEventListener("online", reintentar); };
   }, []);
 
   const manejarCodigo = useRef(agregarPorCodigo);
@@ -121,11 +136,22 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   }, []);
   useEffect(() => () => (window as unknown as { __pararPuesto?: () => void }).__pararPuesto?.(), []);
 
-  // En el celular: lo escaneado se agrega acá y, si hay computadora vinculada, se le manda.
+  // La cámara sigue abierta arriba: cada código suma su producto, que se marca en la lista.
+  const catalogoRef = useRef(catalogo);
+  useEffect(() => { catalogoRef.current = catalogo; }, [catalogo]);
   const alDetectar = useCallback((codigo: string) => {
     const conocido = manejarCodigo.current(codigo);
-    setUltimoEscaneo(conocido ? `${codigo}: agregado` : `${codigo}: no está en el catálogo`);
+    const p = (catalogoRef.current ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
+    setRecien(p?.id ?? null);
+    setUltimoEscaneo(conocido ? `${p?.descripcion ?? codigo} · ${TEXTOS.vender.sumado.corto}` : null);
   }, []);
+  useEffect(() => {
+    if (!recien) return;
+    document.querySelector(`[data-producto="${recien}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [recien, items]);
+  const cerrarCamara = useCallback(() => { setEscaneando(false); setUltimoEscaneo(null); setRecien(null); }, []);
+  // «Asociar»: se cierra la cámara y se busca el producto; al elegirlo, el código queda en él.
+  const asociar = () => { cerrarCamara(); setTimeout(() => caja.current?.focus(), 0); };
 
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
@@ -152,36 +178,37 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     if (document.activeElement === caja.current) return;
     if (e.key === "ArrowDown" && resultados.length) { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
     else if (e.key === "ArrowUp" && resultados.length) { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
-    else if (e.key === "Escape") {  }
   }, [resultados.length]), caja.current);
 
-  const vacio = items.length === 0 && !consulta.trim() && !mensaje && !error && !codigoDesconocido;
+  const faltan = items.filter((it) => precioDe(it).unitario === null);
+  const veHoy = puedeEsto(...PIDE.hoy);
 
   return (
-    <main className="contenido vender-ancho">
+    <main className="contenido vender-ancho vm">
       <div className="encabezado">
-        <h1 className="titulo">Vender</h1>
+        <div className="vm-titulo">
+          <h1 className="titulo">Vender</h1>
+          {emparejado && <button type="button" className="vm-espejo" onClick={() => setHoja("espejo")} data-testid="en-espejo"><Icono nombre="dispositivos" tam={18} />{TEXTOS.vender.enEspejo.corto}</button>}
+        </div>
         {pestanas}
-        <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Buscar producto o código" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja}
-          alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
+        {escaneando
+          ? <Escaner className="vm-camara" seguido alDetectar={alDetectar} alCerrar={cerrarCamara} ultimo={ultimoEscaneo} />
+          : <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Producto, código o marca" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja}
+              alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />}
         {(!hayCamara() || window.innerWidth > 900) && <div className="solo-escritorio"><VincularCelular vinculado={puestoVinculado} alVincular={alVincular} /></div>}
-        {emparejado && (
-          <button type="button" className="chip emparejado" onClick={() => irA("lector")} data-testid="celular-vinculado-remoto">
-            Usar este celular como lector de la computadora
-          </button>
-        )}
       </div>
 
       <div className="columna">
-        <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
-        <AvisoError texto={error ?? errorCatalogo} />
+        <Toast texto={aviso?.texto ?? mensaje} alCerrar={() => { setAviso(null); setMensaje(null); }} accion={aviso?.deshacer ? { texto: "Deshacer", alTocar: () => { aviso.deshacer!(); setAviso(null); } } : undefined} />
+        <AvisoError texto={errorCatalogo} />
         {codigoDesconocido && (
-          <div className="aviso-suave" data-testid="codigo-desconocido">
-            El código <code>{codigoDesconocido}</code> no está en el catálogo. Buscá el producto y tocalo (o Enter) para asociarlo.
-            <button type="button" onClick={() => setCodigoDesconocido(null)}>Ignorar</button>
+          <div className="vm-desconocido" data-testid="codigo-desconocido">
+            <Icono nombre="alerta" tam={20} />
+            <span><b>Código {codigoDesconocido}</b><small>{TEXTOS.vender.noEstaEnElCatalogo.corto}</small></span>
+            {escaneando ? <button type="button" onClick={asociar} data-testid="asociar-codigo">Asociar</button>
+              : <button type="button" className="fantasma" onClick={() => setCodigoDesconocido(null)}>Ignorar</button>}
           </div>
         )}
-        {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} ultimo={ultimoEscaneo} />}
 
         {resultados.length > 0 && (
           <ul className="sugerencias" role="listbox" data-testid="sugerencias">
@@ -189,7 +216,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
               const precio = precioDelProducto(p).valor;
               return (
                 <li key={p.id} role="option" aria-selected={i === elegido}>
-                  <button type="button" className={`fila con-foto ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); if (codigoDesconocido) { actualizarProducto(p.id, { codigo_barras: codigoDesconocido } as never).catch(() => undefined); setCodigoDesconocido(null); agregar({ ...p, codigo_barras: codigoDesconocido }); } else agregar(p); }}>
+                  <button type="button" className={`fila con-foto ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); elegirSugerencia(p); }}>
                     <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : null}</span>
                     <span className="nombre">{p.descripcion}</span>
                     <strong className="derecha importe">{precio === null ? <small>sin precio</small> : pesosCortos(precio)}</strong>
@@ -209,223 +236,296 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </Lista>
         )}
 
-        {vacio && (
-          <div className="vacio venta-vacia">
-            <img className="dibujo" src="/ilustraciones/venta-nueva.png" alt="" />
-            <strong>Venta nueva</strong>
-            <p>Tocá la búsqueda y escribí el producto, o escaneá el código de barras.</p>
-            {/* Solo explican: no se tocan, porque repetirían la búsqueda, el escáner y el menú (003-T003). */}
-            <ul className="como-se-agrega" aria-label="Cómo se agrega un producto" data-testid="como-se-agrega">
-              <li><Icono nombre="barras" tam={30} grosor={1.9} /><b>Escaneá</b><span>Con la cámara o el lector</span></li>
-              <li><Icono nombre="buscar" tam={30} grosor={1.9} /><b>Buscá</b><span>Por nombre o código</span></li>
-              <li><Icono nombre="catalogo" tam={30} grosor={1.9} /><b>Explorá</b><span>En Catálogo, en el menú</span></li>
-            </ul>
-          </div>
-        )}
+        <div className="vm-cab-lista" data-testid="titulo-venta">
+          <h2>Esta venta</h2><span className="vm-cuenta" data-testid="cuantos-en-venta">{items.length}</span>
+          <button type="button" onClick={noLlevo} disabled={!items.length} data-testid="no-llevo"><Icono nombre="prohibido" tam={18} />No llevó</button>
+          <button type="button" onClick={vaciar} disabled={!items.length} data-testid="vaciar-venta"><Icono nombre="tacho" tam={18} />Vaciar</button>
+        </div>
 
-        {items.length > 0 && (
-          <div className="en-venta" data-testid="titulo-venta">
-            <h2>Productos en esta venta</h2>
-            <button type="button" className="vaciar" onClick={() => { if (window.confirm("¿Vaciar la venta? Se sacan todos los productos.")) venta.vaciar(); }} data-testid="vaciar-venta">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>Vaciar
-            </button>
-            <span>{items.length} {items.length === 1 ? "producto" : "productos"}</span>
+        {items.length === 0 ? (
+          <div className="vm-vacia" data-testid="venta-vacia">
+            <span className="vm-vacia-icono"><Icono nombre="carrito" tam={26} /></span>
+            <b>{TEXTOS.vender.ventaVacia.corto}</b>
+            <span>{TEXTOS.vender.comoEmpezar.corto}</span>
           </div>
-        )}
-        {items.map((it) => (
-          <ItemDeVenta key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined}
-            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it.clave)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
-            alVerFicha={it.producto ? () => setFicha(it.producto!.id) : undefined}
+        ) : items.map((it) => (
+          <Renglon key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined} recien={escaneando && Boolean(recien) && it.producto?.id === recien}
+            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
+            alAbrir={() => setRenglonAbierto(it.clave)}
             alSubirFoto={it.producto ? async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); } : undefined} />
         ))}
       </div>
 
-      {items.length > 0 && (
-        <div className="cobro" data-testid="cobro">
-          <div className="medios" role="radiogroup" aria-label="Cómo paga">
-            {MEDIOS.map((m) => (
-              <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} className={medio === m.valor ? "activo" : ""} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
-                <IconoDeMedio medio={m.valor} />
-                <span>{m.corto}</span>
-              </button>
-            ))}
-          </div>
-          {medio === "cuenta_corriente" && (
-            <button type="button" className={`cliente ${cliente ? "" : "falta"}`} onClick={() => setHoja("clientes")} data-testid="cliente">
-              <span>{cliente ? cliente.nombre : "Elegí el cliente"}</span><Icono nombre="derecha" tam={16} grosor={2.5} />
-            </button>
-          )}
-          <div className="acciones">
-            <button type="button" className="no-llevo" onClick={noLlevo} data-testid="no-llevo">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM5.700 5.700l12.600 12.600" /></svg>
-              <span>No llevó</span>
-            </button>
-            <div className="cobro-total"><span>Total</span><strong className="importe" data-testid="total">{pesosCortos(total)}</strong></div>
-            <button type="button" className="boton coral principal centrado" onClick={cobrar} disabled={ocupado} data-testid="cobrar">{ocupado ? "Cobrando…" : "Cobrar"}</button>
-          </div>
+      <div className="vm-cobro" data-testid="cobro">
+        {faltan.length > 0 && <div className="vm-falta"><Icono nombre="alerta" tam={18} />{faltan.length === 1 ? `Falta el precio de ${faltan[0]!.descripcion}` : `Faltan ${faltan.length} precios`}</div>}
+        <AvisoError texto={error} />
+        <div className="vm-pago">
+          <MedioDePago medio={medio} alElegir={elegirMedio} />
+          <button type="button" className={`vm-cliente ${cliente ? "elegido" : medio === "cuenta_corriente" ? "falta" : ""}`} onClick={() => setHoja("clientes")} data-testid="cliente">
+            <Icono nombre="persona" tam={18} /><span>{cliente ? cliente.nombre : medio === "cuenta_corriente" ? TEXTOS.vender.elegiElCliente.corto : TEXTOS.vender.clienteOpcional.corto}</span>
+          </button>
         </div>
-      )}
+        <Deslizar apagado={!items.length || ocupado} ocupado={ocupado} alCobrar={cobrar} alTocar={() => setAviso({ texto: TEXTOS.vender.comoSeCobra.corto })}>
+          {ocupado ? "Cobrando…" : <>{TEXTOS.vender.deslizaParaCobrar.corto} <span data-testid="total">{pesosCortos(total)}</span></>}
+        </Deslizar>
+      </div>
 
       {hoja === "clientes" && (
-        <Hoja titulo={TEXTOS.vender.quienLleva.corto} alCerrar={() => setHoja(null)} testId="hoja-clientes">
-          <Lista>
-            {clientes.length === 0 && <div className="fila"><span className="nombre">Todavía no hay clientes con cuenta corriente.</span></div>}
-            {clientes.map((c) => (
-              <button key={c.id} type="button" className={`fila ${clienteId === c.id ? "elegida" : ""}`} onClick={() => { setClienteId(c.id); setMedio("cuenta_corriente"); setHoja(null); }}>
-                <span className="nombre">{c.nombre}</span>
-                <small style={{ color: Number(c.deuda) > 0 ? "var(--coral-texto)" : undefined }}>{Number(c.deuda) > 0 ? `debe ${pesos(c.deuda)}` : "al día"}</small>
-              </button>
-            ))}
-          </Lista>
+        <Hoja titulo={medio === "cuenta_corriente" ? TEXTOS.vender.quienLleva.corto : "Cliente"} alCerrar={() => setHoja(null)} testId="hoja-clientes">
+          <ElegirCliente clientes={clientes} elegido={clienteId} alElegir={(id) => { elegirCliente(id); setHoja(null); }} />
         </Hoja>
       )}
-      {productoDeLaFicha && (
-        <FichaProducto producto={productoDeLaFicha as Producto} alCerrar={() => setFicha(null)}
-          quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== productoDeLaFicha.id && x.codigo_barras === codigo) as Producto | undefined}
-          alCambiar={(c) => { actualizarProducto(productoDeLaFicha.id, c as never).catch((e: Error) => setError(`No se pudo guardar: ${e.message}`)); }} />
+      {hoja === "espejo" && (
+        <Hoja titulo={TEXTOS.vender.enEspejoConLaCompu.corto} alCerrar={() => setHoja(null)} testId="hoja-espejo">
+          <p className="vm-hoja-detalle">{TEXTOS.vender.queEsElEspejo.corto}</p>
+          <button type="button" className="boton tinta vm-ancho" onClick={() => { setHoja(null); irA("lector"); }} data-testid="celular-vinculado-remoto"><Icono nombre="escanear" tam={20} />{TEXTOS.vender.usarComoLector.corto}</button>
+          <p className="vm-hoja-detalle">{TEXTOS.vender.queHaceElLector.corto}</p>
+        </Hoja>
       )}
-      {cobro && <VentaRegistrada cobro={cobro} alCerrar={() => { venta.cerrarCobro(); setMensaje(null); }} />}
+      {renglon && <HojaDelRenglon item={renglon} alCerrar={() => setRenglonAbierto(null)} alCambiar={(c) => cambiarItem(renglon.clave, c)} alElegirMargen={(m) => elegirMargen(renglon, m)}
+        alQuitar={() => { setRenglonAbierto(null); quitar(renglon); }} />}
+      {cobro && <VentaRegistrada cobro={cobro} veHoy={veHoy} alCerrar={() => { venta.cerrarCobro(); setMensaje(null); }} alVerHoy={() => { venta.cerrarCobro(); setMensaje(null); irA("vender/hoy"); }} />}
     </main>
   );
 }
 
-// Un renglón de la venta (003-T001, maqueta celular-venta-renglones.png): arriba la foto, el nombre y
-// el precio por unidad en una pastilla, con un menú «⋮»; abajo el tacho, la cantidad, el margen y el
-// total del renglón. La unidad se cambia desde el menú, porque se cambia poco.
-const POR_UNIDAD: Record<Unidad, string> = { unidad: "cada uno", kg: "el kg", m: "el m", l: "el L" };
-
-function ItemDeVenta({ item: it, stock, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto, alVerFicha }: {
-  item: Item; stock: number | undefined; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alSubirFoto?: (archivo: File) => Promise<void>; alVerFicha?: () => void;
-}) {
-  const p = precioDe(it);
-  const producto = it.producto;
-  const renglon = subtotalDe(it);
-  const subtotal = renglon?.valor ?? null;
-  const [menu, setMenu] = useState(false);
-  const [viendoUnidad, setViendoUnidad] = useState(false);
+// El medio de pago: una pastilla con el ícono y el color del medio que abre la lista de los cuatro
+// (decisión 119). Arranca en Efectivo y vuelve a Efectivo después de cada venta (decisión 37).
+function MedioDePago({ medio, alElegir }: { medio: Medio | null; alElegir: (m: Medio) => void }) {
+  const [abierta, setAbierta] = useState(false);
   const raiz = useRef<HTMLDivElement>(null);
-  const margenTexto = it.precioManual !== null ? "a mano" : p.margen === null ? "elegí margen" : `${p.margen} %${esMargenBoton(p.margen) ? "" : " a mano"}`;
-  const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
-  const elegir = (accion: () => void) => () => { setMenu(false); accion(); };
+  useEffect(() => {
+    if (!abierta) return;
+    const fuera = (e: MouseEvent) => { if (!raiz.current?.contains(e.target as Node)) setAbierta(false); };
+    const tecla = (e: globalThis.KeyboardEvent) => { if (e.key === "Escape") setAbierta(false); };
+    document.addEventListener("mousedown", fuera);
+    document.addEventListener("keydown", tecla);
+    return () => { document.removeEventListener("mousedown", fuera); document.removeEventListener("keydown", tecla); };
+  }, [abierta]);
+  const actual = MEDIOS.find((m) => m.valor === medio);
   return (
-    <div className="item" data-testid="item" ref={raiz}>
-      <div className="cabeza">
-        {producto ? <FotoProducto id={producto.id} url={producto.foto_url ?? null} descripcion={producto.descripcion} alSubir={alSubirFoto} /> : <span className="miniatura foto-chica" />}
-        {producto ? <span className="nombre">{it.descripcion}</span>
-          : <input className="linea-editable" value={it.descripcion} placeholder="¿Qué se lleva?" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
-        {p.unitario !== null ? (
-          <span className="unitario"><Explicacion conCosto valor={pesosCortos(p.unitario)} pasos={p.pasos} /><small>{POR_UNIDAD[it.unidad]}</small></span>
-        ) : producto ? (
-          <button type="button" className="unitario falta" onClick={() => alCambiar({ abierto: true })} data-testid="sin-precio">sin precio</button>
-        ) : (
-          <label className="campo falta importe-campo"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus value={it.precioManual ?? ""} onChange={precioAMano} data-testid="precio-manual" /></label>
-        )}
-        <button type="button" className="mas-del-renglon" onClick={() => setMenu(!menu)} aria-expanded={menu} aria-haspopup="menu" aria-label={`Más opciones de ${it.descripcion || "este renglón"}`} data-testid="mas-del-renglon">⋮</button>
-        <small className="detalle">{producto ? `${detalleDe(producto)}${stock !== undefined ? ` · stock ${num(stock)}${stock - it.cantidad < 0 ? ` (${TEXTOS.vender.stockNoAlcanza.corto})` : ""}` : ""}` : "Ítem libre"}</small>
-      </div>
-      {menu && (
-        <div className="menu-del-renglon" role="menu" data-testid="menu-del-renglon">
-          {producto && p.costo !== null && <button type="button" role="menuitem" onClick={elegir(() => alCambiar({ abierto: true }))}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6" /></svg>Precio a mano</button>}
-          <button type="button" role="menuitem" onClick={elegir(() => setViendoUnidad(true))}><Icono nombre="lista" tam={20} />Vender por metro, kilo o unidad</button>
-          {alVerFicha && <button type="button" role="menuitem" onClick={elegir(alVerFicha)}><Icono nombre="archivo" tam={20} />Ver la ficha del producto</button>}
-          {producto && alSubirFoto && <button type="button" role="menuitem" onClick={elegir(() => raiz.current?.querySelector<HTMLButtonElement>("[data-testid=foto-chica]")?.click())}><Icono nombre="camara" tam={20} />Sacar foto</button>}
-        </div>
-      )}
-      <div className="pie">
-        <button type="button" className="quitar" onClick={alQuitar} aria-label={`Quitar ${it.descripcion} de la venta`} title="Quitar de la venta" data-testid="quitar">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
-        </button>
-        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} />
-        {producto && p.costo !== null && (
-          <button type="button" className={`chip-margen ${p.margen === null && it.precioManual === null ? "falta" : ""}`} onClick={() => alCambiar({ abierto: !it.abierto })} aria-expanded={it.abierto} aria-label={`Margen: ${margenTexto}`} data-testid="margen">
-            {margenTexto}<Icono nombre={it.abierto ? "arriba" : "abajo"} tam={14} grosor={2.5} />
-          </button>
-        )}
-        <span className="total-del-renglon" data-testid="subtotal">{subtotal !== null && <Explicacion conCosto className="subtotal" valor={pesosCortos(subtotal)} pasos={[...p.pasos, ...(renglon?.pasos ?? [])]} />}</span>
-      </div>
-      {viendoUnidad && (
-        <div className="abierto unidad-del-renglon">
-          <div className="cabecera"><span>Se vende por</span><button type="button" className="enlace" onClick={() => setViendoUnidad(false)}>Listo</button></div>
-          <select className="selector-nativo unidad" value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
-            {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
-          </select>
-        </div>
-      )}
-      {it.abierto && producto && p.costo !== null && (
-        <div className="abierto">
-          <div className="cabecera">
-            <SiVeCostos><Explicacion className="enlace punteado" valor={`Costo ${pesos(p.costo)} · ${producto.proveedor ?? "sin proveedor"}`} pasos={producto.explicacion_costo?.length ? producto.explicacion_costo : [`Costo ${pesos(p.costo)} según la lista`]} /></SiVeCostos>
-            {p.unitario !== null && <span>{pesos(p.unitario)} c/u</span>}
-          </div>
-          <div className="cuadricula-5">
-            {MARGENES.map((m) => <button key={m} type="button" className={`boton ${p.margen === m ? "activo" : ""}`} onClick={() => alElegirMargen(m)}>{m} %</button>)}
-          </div>
-          <div className="fila-otro">
-            <span>Otro precio solo para esta venta</span>
-            <label className="campo"><span>$</span><input inputMode="numeric" placeholder="a mano" value={it.precioManual ?? ""} onChange={precioAMano} data-testid="precio-manual" /></label>
-          </div>
+    <div className="vm-medio" ref={raiz}>
+      <button type="button" className={`vm-medio-elegido medio-${medio ?? "efectivo"}`} onClick={() => setAbierta(!abierta)} aria-haspopup="listbox" aria-expanded={abierta} aria-label={`Cómo paga: ${actual?.nombre ?? "sin elegir"}`} data-testid="medio">
+        {medio && <IconoDeMedio medio={medio} tam={20} />}<span>{actual?.corto ?? "Cómo paga"}</span><Icono nombre="abajo" tam={16} grosor={2.4} />
+      </button>
+      {abierta && (
+        <div className="vm-medios" role="listbox" aria-label="Cómo paga">
+          {MEDIOS.map((m) => (
+            <button key={m.valor} type="button" role="option" aria-selected={medio === m.valor} className={`medio-${m.valor}`} onClick={() => { alElegir(m.valor); setAbierta(false); }} data-testid={`medio-${m.valor}`}>
+              <IconoDeMedio medio={m.valor} tam={20} conFondo />{m.nombre}{medio === m.valor && <Icono nombre="tilde" tam={18} grosor={2.6} className="vm-tilde-chica" />}
+            </button>
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-// El éxito de la venta (003-T004, maqueta celular-venta-registrada.png): el tilde con confeti, el
-// total cobrado con el medio y el stock, la fecha y cuántos productos, lo vendido y «Nueva venta».
-const CANTIDAD_EN: Record<Unidad, string> = { unidad: "un.", kg: "kg", m: "m", l: "L" };
-const CONFETI: [string, string, number, string][] = [
-  ["8%", "18%", -35, "#2fb37a"], ["20%", "54%", 40, "#f7c445"], ["4%", "82%", -50, "#f0b43a"], ["26%", "4%", 30, "#9fd8b8"], ["80%", "10%", -30, "#f7c445"],
-  ["88%", "48%", 40, "#2fb37a"], ["70%", "46%", -40, "#9fd8b8"], ["94%", "86%", 25, "#0f8a5f"], ["30%", "6%", 55, "#f7c445"], ["62%", "-4%", -60, "#2fb37a"],
-];
-const fotoDe = (url?: string | null) => (url ? (url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${url}` : url) : null);
+// Cobrar deslizando (decisión 119): se arrastra el círculo hasta el final; soltarlo antes lo
+// devuelve y un toque solo explica cómo se cobra. Con el teclado, Enter sobre el círculo cobra.
+function Deslizar({ apagado, ocupado, alCobrar, alTocar, children }: { apagado: boolean; ocupado: boolean; alCobrar: () => Promise<void> | void; alTocar: () => void; children: ReactNode }) {
+  const caja = useRef<HTMLDivElement>(null);
+  const pulgar = useRef<HTMLButtonElement>(null);
+  const [x, setX] = useState(0);
+  const [arrastrando, setArrastrando] = useState(false);
+  const inicio = useRef<{ x0: number; movio: boolean } | null>(null);
+  const xRef = useRef(0);
+  const max = () => Math.max(1, (caja.current?.clientWidth ?? 0) - (pulgar.current?.offsetWidth ?? 0) - 10);
+  const mover = (v: number) => { xRef.current = v; setX(v); };
+  // Cuando se termina de cobrar (o no se pudo), el círculo vuelve al principio.
+  useEffect(() => { if (!ocupado) mover(0); }, [ocupado]);
+  const cobrarYVolver = async () => { mover(max()); try { await alCobrar(); } finally { mover(0); } };
+  const bajar = (e: EventoDePuntero<HTMLButtonElement>) => {
+    if (apagado) return;
+    inicio.current = { x0: e.clientX, movio: false };
+    setArrastrando(true);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* sin captura, igual sigue */ }
+  };
+  const moverDedo = (e: EventoDePuntero<HTMLButtonElement>) => {
+    const i = inicio.current; if (!i) return;
+    const dx = e.clientX - i.x0;
+    if (Math.abs(dx) > 6) i.movio = true;
+    mover(Math.max(0, Math.min(max(), dx)));
+  };
+  const soltar = () => {
+    const i = inicio.current; inicio.current = null; setArrastrando(false);
+    if (!i) return;
+    if (xRef.current >= max() * 0.85) void cobrarYVolver();
+    else mover(0);
+  };
+  return (
+    <div ref={caja} className={`vm-deslizar ${apagado ? "apagado" : ""}`} data-testid="cobrar">
+      <button ref={pulgar} type="button" className="vm-pulgar" style={{ transform: `translateX(${x}px)`, transition: arrastrando ? "none" : undefined }} disabled={apagado}
+        aria-label="Cobrar: deslizá hasta el final" data-testid="cobrar-pulgar"
+        onPointerDown={bajar} onPointerMove={moverDedo} onPointerUp={soltar} onPointerCancel={soltar}
+        onClick={(e) => { if (e.detail > 0 && xRef.current === 0) alTocar(); }}
+        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void cobrarYVolver(); } }}>
+        <Icono nombre={ocupado ? "tilde" : "flecha"} tam={24} grosor={2.4} />
+      </button>
+      <span className="vm-deslizar-texto" style={{ opacity: 1 - x / max() }}>{children}</span>
+      <Icono nombre="derecha" tam={18} className="vm-flechita" />
+    </div>
+  );
+}
 
-function VentaRegistrada({ cobro, alCerrar }: { cobro: Cobro; alCerrar: () => void }) {
+// Un renglón de la venta (decisión 119): la foto, el nombre con su marca y stock y el precio por
+// unidad en una pastilla que explica cómo se calculó; abajo la cantidad, la unidad, el margen y el
+// total del renglón. Sin precio, los márgenes para elegir ahí mismo.
+const POR_UNIDAD: Record<Unidad, string> = { unidad: "cada uno", kg: "el kg", m: "el metro", l: "el litro" };
+
+function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto, alAbrir }: {
+  item: Item; stock: number | undefined; recien: boolean; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alSubirFoto?: (archivo: File) => Promise<void>; alAbrir: () => void;
+}) {
+  const p = precioDe(it);
+  const producto = it.producto;
+  const renglon = subtotalDe(it);
+  const veCostos = useVeCostos();
+  const [calculo, setCalculo] = useState(false);
+  const sinPrecio = p.unitario === null;
+  const noAlcanza = producto && stock !== undefined && it.cantidad > stock;
+  const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
+  const pasos = [...p.pasos, ...(renglon?.pasos ?? []), ...(renglon ? [`Total del renglón: ${pesos(renglon.valor)}`] : [])];
+  return (
+    <div className={`vm-renglon ${sinPrecio ? "falta" : ""} ${recien ? "recien" : ""}`} data-testid="item" data-producto={producto?.id}>
+      <div className="vm-arriba">
+        {producto ? <FotoProducto id={producto.id} url={producto.foto_url ?? null} descripcion={producto.descripcion} alSubir={alSubirFoto} /> : <span className="miniatura foto-chica vm-libre"><Icono nombre="caja" tam={22} /></span>}
+        {producto ? (
+          <button type="button" className="vm-nombre" onClick={alAbrir} data-testid="abrir-renglon">
+            <b>{it.descripcion}</b>
+            <small>{[producto.marca, stock !== undefined ? `${num(stock)} ${abreviarUnidad(it.unidad)}` : null].filter(Boolean).join(" · ")}</small>
+          </button>
+        ) : (
+          <span className="vm-nombre">
+            <input className="linea-editable" value={it.descripcion} placeholder="¿Qué se lleva?" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />
+            <small>Ítem libre</small>
+          </span>
+        )}
+        {!sinPrecio ? (
+          veCostos || it.precioManual !== null
+            ? <button type="button" className="vm-precio" onClick={() => setCalculo(true)} aria-label={`Cómo se calculó ${pesosCortos(p.unitario!)}`} data-testid="precio">
+                <b>{pesosCortos(p.unitario!)}</b><small>{it.precioManual !== null ? "a mano" : POR_UNIDAD[it.unidad]}<span className="vm-que" aria-hidden="true">?</span></small>
+              </button>
+            : <span className="vm-precio"><b>{pesosCortos(p.unitario!)}</b><small>{POR_UNIDAD[it.unidad]}</small></span>
+        ) : producto ? (
+          <span className="vm-precio falta" data-testid="sin-precio"><b>Sin precio</b><small>{veCostos && p.costo !== null ? `costo ${pesosCortos(p.costo)}` : "elegí margen"}</small></span>
+        ) : (
+          <label className="vm-precio-mano"><span>$</span><input inputMode="numeric" placeholder="precio" autoFocus value={it.precioManual ?? ""} onChange={precioAMano} data-testid="precio-manual" /></label>
+        )}
+      </div>
+      {sinPrecio && producto ? (
+        <div className="vm-margenes">
+          {p.costo !== null && MARGENES.map((m) => <button key={m} type="button" onClick={() => alElegirMargen(m)} aria-label={`${m} %`}>{m}</button>)}
+          <button type="button" onClick={alAbrir} aria-label="Precio a mano">$</button>
+        </div>
+      ) : (
+        <div className="vm-abajo">
+          <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} alQuitar={alQuitar} />
+          <label className="vm-unidad">
+            <select value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
+              {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
+            </select>
+            <Icono nombre="abajo" tam={14} grosor={2.6} />
+          </label>
+          {producto && p.costo !== null && (
+            <button type="button" className="vm-margen" onClick={alAbrir} aria-label={`Margen: ${it.precioManual !== null ? "a mano" : `${p.margen} %`}`} data-testid="margen">
+              {it.precioManual !== null ? "a mano" : `${p.margen} %`}<Icono nombre="abajo" tam={14} grosor={2.6} />
+            </button>
+          )}
+          <span className="vm-subtotal importe" data-testid="subtotal">{renglon ? pesosCortos(renglon.valor) : ""}</span>
+        </div>
+      )}
+      {noAlcanza && (
+        <div className="vm-stock" data-testid="stock-no-alcanza"><Icono nombre="alerta" tam={16} />
+          {stock! <= 0 ? TEXTOS.vender.sinStock.corto : `Hay ${num(stock!)} ${abreviarUnidad(it.unidad)}: no alcanza para ${num(it.cantidad)}`}
+        </div>
+      )}
+      {calculo && (
+        <Hoja titulo="Cómo se calculó" alCerrar={() => setCalculo(false)} testId="hoja-explicacion">
+          <p className="vm-hoja-detalle">{it.descripcion}{producto?.proveedor ? ` · ${producto.proveedor}` : ""}</p>
+          <Pasos pasos={pasos} />
+          <p className="vm-hoja-detalle">{TEXTOS.vender.redondeo.corto}</p>
+          <button type="button" className="boton tinta" onClick={() => setCalculo(false)}>Listo</button>
+        </Hoja>
+      )}
+    </div>
+  );
+}
+
+// La hoja de un renglón: el margen (cada uno con su precio), el precio a mano, la cantidad y
+// «Quitar de la venta».
+function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuitar }: { item: Item; alCerrar: () => void; alCambiar: (c: Partial<Item>) => void; alElegirMargen: (m: number) => void; alQuitar: () => void }) {
+  const p = precioDe(it);
+  const renglon = subtotalDe(it);
+  const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
+  return (
+    <Hoja titulo={it.descripcion} alCerrar={alCerrar} testId="hoja-renglon">
+      <p className="vm-hoja-detalle">{p.unitario === null ? "Sin precio: elegí el margen o ponelo a mano" : `${pesos(p.unitario)} ${POR_UNIDAD[it.unidad]}`}</p>
+      {p.costo !== null && (
+        <div className="vm-opciones">
+          {MARGENES.map((m) => (
+            <button key={m} type="button" className={it.precioManual === null && p.margen === m ? "elegido" : ""} onClick={() => alElegirMargen(m)} aria-label={`${m} %`}>
+              {m} %<small>{pesosCortos(precioDeVenta({ costoNeto: p.costo!, margen: m, iva: p.iva }).valor)}</small>
+            </button>
+          ))}
+        </div>
+      )}
+      <label className="vm-fila-mano"><span>Otro precio solo para esta venta</span>
+        <span className="vm-precio-mano"><span>$</span><input inputMode="numeric" placeholder="a mano" value={it.precioManual ?? ""} onChange={precioAMano} data-testid="precio-manual" /></span>
+      </label>
+      <div className="vm-fila-cantidad"><span>Cantidad</span>
+        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} testId="cantidad-hoja" />
+        <b className="importe">{renglon ? pesosCortos(renglon.valor) : ""}</b>
+      </div>
+      <button type="button" className="boton vm-quitar vm-ancho" onClick={alQuitar} data-testid="quitar"><Icono nombre="tacho" tam={20} />Quitar de la venta</button>
+      <button type="button" className="boton tinta vm-ancho" onClick={alCerrar}>Listo</button>
+    </Hoja>
+  );
+}
+
+// Elegir el cliente: con cualquier medio es opcional; con cuenta corriente, obligatorio.
+function ElegirCliente({ clientes, elegido, alElegir }: { clientes: { id: string; nombre: string; deuda: string | number }[]; elegido: string; alElegir: (id: string) => void }) {
+  const [texto, setTexto] = useState("");
+  const buscado = texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+  const lista = clientes.filter((c) => c.nombre.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().includes(buscado));
+  return (
+    <>
+      <Buscador valor={texto} alCambiar={setTexto} placeholder="Buscá por nombre" chico testId="buscar-cliente" />
+      <Lista>
+        {clientes.length === 0 && <div className="fila"><span className="nombre">Todavía no hay clientes.</span></div>}
+        {lista.map((c) => (
+          <button key={c.id} type="button" className={`fila ${elegido === c.id ? "elegida" : ""}`} onClick={() => alElegir(c.id)}>
+            <span className="nombre">{c.nombre}</span>
+            <small style={{ color: Number(c.deuda) > 0 ? "var(--coral-texto)" : undefined }}>{Number(c.deuda) > 0 ? `debe ${pesos(c.deuda)}` : "al día"}</small>
+          </button>
+        ))}
+      </Lista>
+      {elegido && <button type="button" className="boton vm-ancho" onClick={() => alElegir("")} data-testid="sin-cliente">Sin cliente</button>}
+    </>
+  );
+}
+
+// La venta registrada (decisión 119): una ventana con el tilde, el total, el medio, el cliente,
+// cuántos productos y la hora, «Ver en Ventas de hoy» y «Seguir vendiendo». Sin conexión dice que
+// quedó guardada en el celular y que se envía sola.
+function VentaRegistrada({ cobro, veHoy, alCerrar, alVerHoy }: { cobro: Cobro; veHoy: boolean; alCerrar: () => void; alVerHoy: () => void }) {
   const boton = useRef<HTMLButtonElement>(null);
   useEffect(() => { boton.current?.focus(); }, []);
-  const que = cobro.encolado ? "Guardada en este dispositivo" : "¡Venta registrada!";
-  const fecha = new Date(cobro.fecha);
-  const cuando = `${fecha.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })} ${fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })}`;
-  const icono = (d: string, tam = 22) => <svg width={tam} height={tam} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>;
+  const que = cobro.encolado ? TEXTOS.vender.guardadaEnElCelular.corto : TEXTOS.vender.ventaRegistrada.corto;
   return (
-    <div className="exito venta-registrada" role="dialog" aria-label={que} data-testid="exito">
-      <div className="arriba">
-        <span className="confeti" aria-hidden="true">{CONFETI.map(([x, y, giro, color], i) => <i key={i} style={{ left: x, top: y, background: color, ["--giro" as string]: `${giro}deg` }} />)}</span>
-        <div className="tilde-ok"><Icono nombre="tilde" tam={44} grosor={3} /></div>
-        <h1>{que}</h1>
-      </div>
-      <section className="cobrado">
-        <small>Total cobrado</small>
-        <div className="importe" data-testid="exito-total">{pesosCortos(cobro.total)}</div>
-        <div className="medio">
-          <IconoDeMedio medio={cobro.medio} tam={20} conFondo />
-          {NOMBRE_DE_MEDIO[cobro.medio]}{cobro.cliente ? ` · ${cobro.cliente}` : ""}
+    <div className="hoja-fondo vm-listo-fondo" role="presentation">
+      <div className="vm-listo" role="dialog" aria-label={que} data-testid="exito">
+        <span className={`vm-listo-tilde ${cobro.encolado ? "pendiente" : ""}`}><Icono nombre={cobro.encolado ? "subir" : "tilde"} tam={38} grosor={3} /></span>
+        <h2>{que}</h2>
+        <div className="vm-listo-total importe" data-testid="exito-total">{pesosCortos(cobro.total)}</div>
+        {cobro.encolado && <div className="vm-sin-red"><Icono nombre="alerta" tam={18} />{TEXTOS.vender.seEnviaSola.corto}</div>}
+        <p className="vm-listo-detalle">
+          <IconoDeMedio medio={cobro.medio} tam={18} />{NOMBRE_DE_MEDIO[cobro.medio]}{cobro.cliente ? ` · ${cobro.cliente}` : ""} · <span data-testid="exito-cuantos">{cobro.productos} {cobro.productos === 1 ? "producto" : "productos"}</span> · {hora(cobro.fecha)}
+        </p>
+        <div className="vm-listo-botones">
+          {veHoy && <button type="button" className="boton" onClick={alVerHoy} data-testid="ver-en-hoy"><Icono nombre="lista" tam={18} />Ver en Ventas de hoy</button>}
+          <button ref={boton} type="button" className="boton tinta" onClick={alCerrar} data-testid="cerrar-exito">Seguir vendiendo</button>
         </div>
-        {cobro.encolado
-          ? <div className="stock pendiente">{icono("M4 14a4 4 0 0 1 .5-8 6 6 0 0 1 11.3 1.5A3.5 3.5 0 0 1 19 14M8 18l4 3 4-3M12 11v10")}Sin conexión: se envía sola cuando vuelva internet.</div>
-          : <div className="stock">
-              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z" fill="#f7c445" stroke="#9a6b00" strokeWidth="1.6" strokeLinejoin="round" /><path d="M12 12l8-4.5v9L12 21z" fill="#e0a92c" /><path d="M4 7.5l8 4.5 8-4.5M12 12v9" fill="none" stroke="#9a6b00" strokeWidth="1.6" strokeLinejoin="round" /></svg>
-              El stock ya se descontó<span className="ok"><Icono nombre="tilde" tam={22} grosor={2.4} /></span>
-            </div>}
-      </section>
-      <div className="datos">
-        <div className="dato">{icono("M4 6h16v14H4zM4 10h16M8 3v4M16 3v4", 24)}<small>Fecha y hora</small><b>{cuando}</b></div>
-        <div className="dato">{icono("M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0", 24)}<small>Productos</small><b data-testid="exito-cuantos">{cobro.productos}</b></div>
       </div>
-      <section className="vendidos">
-        <h2>Productos vendidos</h2>
-        {cobro.items.map((it) => {
-          const foto = fotoDe(it.producto?.foto_url);
-          return (
-            <div key={it.clave} className="vendido" data-testid="vendido">
-              <span className="foto">{foto && <img src={foto} alt="" />}</span>
-              <span className="nombre"><b>{it.descripcion}</b>{it.producto && <small>{detalleDe(it.producto)}</small>}</span>
-              <span className="cantidad">{num(it.cantidad)} {CANTIDAD_EN[it.unidad]}</span>
-              <span className="total">{pesosCortos(subtotalDe(it)?.valor ?? 0)}</span>
-            </div>
-          );
-        })}
-      </section>
-      <button ref={boton} type="button" className="nueva" onClick={alCerrar} data-testid="cerrar-exito">{icono("M12 5v14M5 12h14")}Nueva venta</button>
     </div>
   );
 }

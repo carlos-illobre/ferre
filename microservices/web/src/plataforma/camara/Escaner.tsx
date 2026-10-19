@@ -4,19 +4,21 @@ import { useVolverCierra } from "../navegacion/volver";
 // Escaneo con la cámara del celular (issue #52). Detección nativa del navegador donde
 // existe (Chrome en Android); si no, una librería de decodificación cargada recién ahí.
 // También se puede tipear el código (y mandarlo con Enter): sirve cuando la cámara no lee o no hay.
-// Apenas se lee o se manda un código, el escáner se cierra.
+// Apenas se lee o se manda un código, el escáner se cierra; con `seguido`, sigue leyendo (Vender en
+// el celular, decisión 119: la cámara va arriba y la venta se sigue viendo debajo).
 type Detector = { detect(fuente: HTMLVideoElement): Promise<{ rawValue: string }[]> };
 declare global { interface Window { BarcodeDetector?: new (opciones?: { formats?: string[] }) => Detector } }
 
 export const hayCamara = () => typeof navigator !== "undefined" && Boolean(navigator.mediaDevices?.getUserMedia);
 
-export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo: string) => void; alCerrar: () => void; ultimo?: string | null }) {
+export function Escaner({ alDetectar, alCerrar, ultimo, seguido = false, className = "" }: { alDetectar: (codigo: string) => void; alCerrar: () => void; ultimo?: string | null; seguido?: boolean; className?: string }) {
   const video = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [manual, setManual] = useState("");
   const [activa, setActiva] = useState(false);
   const alCerrarRef = useRef(alCerrar);
   useEffect(() => { alCerrarRef.current = alCerrar; }, [alCerrar]);
+  const seguidoRef = useRef(seguido);
   // El botón de volver del celular cierra la cámara y deja la pantalla como estaba.
   useVolverCierra(alCerrar);
 
@@ -40,8 +42,8 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
           navigator.vibrate?.(60);
           alDetectar(codigo);
           // Leído un código, la cámara se cierra sola (pedido de Carlos del 2026-10-12): para
-          // leer otro se la vuelve a abrir.
-          alCerrarRef.current();
+          // leer otro se la vuelve a abrir. En Vender sigue abierta (decisión 119).
+          if (!seguidoRef.current) alCerrarRef.current();
         };
         if (window.BarcodeDetector) {
           const detector = new window.BarcodeDetector({ formats: ["ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e", "qr_code"] });
@@ -64,13 +66,13 @@ export function Escaner({ alDetectar, alCerrar, ultimo }: { alDetectar: (codigo:
   }, [alDetectar]);
 
   return (
-    <div className="escaner" role="dialog" aria-label="Escanear código de barras" data-testid="escaner">
+    <div className={`escaner ${className}`} role="dialog" aria-label="Escanear código de barras" data-testid="escaner">
       <video ref={video} muted playsInline className={activa ? "activa" : ""} />
       {activa && <div className="guia" aria-hidden="true" />}
       <div className="escaner-abajo">
         {error && <p className="error">{error}</p>}
         {ultimo && <p className="escaner-leido" role="status" data-testid="escaner-ultimo">{ultimo}</p>}
-        <form className="en-linea" onSubmit={(e) => { e.preventDefault(); if (manual.trim()) { alDetectar(manual.trim()); setManual(""); alCerrar(); } }}>
+        <form className="en-linea" onSubmit={(e) => { e.preventDefault(); if (manual.trim()) { alDetectar(manual.trim()); setManual(""); if (!seguido) alCerrar(); } }}>
           <input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="O tipeá el código y Enter" inputMode="numeric" enterKeyHint="send" aria-label="Tipear el código de barras" data-testid="codigo-manual" style={{ flex: 1 }} />
           <button type="button" className="grande" onClick={alCerrar}>Cerrar</button>
         </form>

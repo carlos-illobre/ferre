@@ -85,7 +85,9 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await enElCelular.getByTestId("cantidad").fill("3");
   await enElCelular.getByTestId("cantidad").blur();
   await expect(compu.getByTestId("item").filter({ hasText: "MECHA ESPEJO" }).getByTestId("cantidad")).toHaveValue("3");
-  await celular.getByRole("radio", { name: /Tarjeta/ }).click();
+  // En el celular el medio se elige en la lista que abre su pastilla (decisión 119).
+  await celular.getByTestId("medio").click();
+  await celular.getByTestId("medio-tarjeta").click();
   await expect(compu.getByRole("radio", { name: /Tarjeta/ })).toHaveAttribute("aria-checked", "true");
 
   // Se cobra en la computadora: la venta se vacía en los dos, y el celular se entera.

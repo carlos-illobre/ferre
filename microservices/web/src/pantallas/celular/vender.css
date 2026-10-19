@@ -1,0 +1,142 @@
+/* Vender en el celular (decisión 119): el lenguaje «Mostrador» (docs/lenguaje-mostrador/), con sus
+   colores con nombre, solo dentro de esta pantalla. El marco (la barra de abajo, el estado de la
+   conexión) es el de toda la aplicación. */
+.vm {
+  --m-fondo: #F4F2EC; --m-hundido: #ECE9E1; --m-superficie: #fff; --m-borde: #E6E2D8; --m-borde-fuerte: #CEC8BA;
+  --m-tinta: #1A1D1B; --m-texto-2: #545955; --m-texto-3: #6B706B;
+  --m-pino: #12382F; --m-pino-suave: #E3EEE8; --m-pino-texto: #17614E;
+  --m-accion: #E8541C; --m-accion-fuerte: #C8450F;
+  --m-urgente: #F0A20F; --m-urgente-suave: #FFF3D8; --m-urgente-texto: #845400;
+  --m-error-texto: #AE281D; --m-error-suave: #FCEAE7;
+  --m-logro: #1E9E62; --m-logro-suave: #E2F4EA; --m-logro-texto: #11764A;
+  --m-sombra-1: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03);
+  --m-sombra-accion: 0 6px 16px -6px rgba(232, 84, 28, .55);
+  color: var(--m-tinta);
+}
+.vm .titulo { color: var(--m-tinta); }
+.vm-titulo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.vm-espejo { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 99px; border: 1.5px solid var(--m-logro); background: var(--m-logro-suave); color: var(--m-logro-texto); font-weight: 700; font-size: 15px; }
+
+/* La búsqueda y la cámara, del mismo alto de arranque. */
+.vm .buscador .caja { background: var(--m-superficie); border: 1px solid var(--m-borde-fuerte); box-shadow: var(--m-sombra-1); border-radius: 14px; }
+.vm .buscador .escanear { background: var(--m-pino); border-radius: 14px; }
+
+/* La cámara arriba: empuja la venta hacia abajo, que se sigue viendo (decisión 119). */
+.escaner.vm-camara { position: relative; inset: auto; z-index: 1; height: 236px; margin: 0 -16px; border-radius: 0; overflow: hidden; background: #120f0d; animation: vm-camara-baja 0.32s cubic-bezier(.2, .9, .3, 1); }
+.escaner.vm-camara video { position: absolute; inset: 0; height: 100%; }
+.escaner.vm-camara .guia { left: 22%; right: 22%; top: 18%; height: 46%; border-color: rgba(255, 255, 255, .85); border-width: 3px; }
+.escaner.vm-camara .escaner-abajo { position: absolute; left: 0; right: 0; bottom: 0; background: none; padding: 10px 12px; border-radius: 0; gap: 6px; }
+.escaner.vm-camara .escaner-abajo .error { color: #fff; font-size: 14px; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
+.escaner.vm-camara .escaner-leido { background: rgba(255, 255, 255, .96); color: var(--m-tinta); font-size: 15px; box-shadow: 0 10px 28px rgba(0, 0, 0, .4); }
+.escaner.vm-camara .escaner-leido::before { content: "✓"; display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 8px; border-radius: 99px; background: var(--m-logro); color: #fff; font-size: 14px; }
+.escaner.vm-camara form input { height: 44px; border-radius: 12px; background: rgba(255, 255, 255, .92); padding: 0 12px; font-size: 16px; }
+.escaner.vm-camara form button { height: 44px; padding: 0 14px; border-radius: 12px; background: rgba(0, 0, 0, .55); color: #fff; font-weight: 700; }
+@keyframes vm-camara-baja { from { height: 0; } }
+
+/* Un código que no está en el catálogo. */
+.vm-desconocido { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); border: 1px solid #F3C766; }
+.vm-desconocido span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.vm-desconocido b { color: var(--m-tinta); font-size: 15px; }
+.vm-desconocido small { font-size: 14px; }
+.vm-desconocido button { height: 40px; padding: 0 14px; border-radius: 12px; background: var(--m-pino); color: #fff; font-weight: 700; }
+.vm-desconocido button.fantasma { background: none; color: var(--m-urgente-texto); }
+
+/* «Esta venta», cuántos, «No llevó» y «Vaciar». */
+.vm-cab-lista { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.vm-cab-lista h2 { margin: 0; font-size: 19px; font-weight: 800; }
+.vm-cuenta { min-width: 28px; height: 28px; padding: 0 8px; border-radius: 99px; background: var(--m-hundido); display: inline-grid; place-items: center; font-weight: 700; font-size: 15px; }
+.vm-cab-lista button { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 8px; border-radius: 10px; color: var(--m-texto-2); font-weight: 650; font-size: 15px; }
+.vm-cab-lista button:first-of-type { margin-left: auto; }
+.vm-cab-lista button:disabled { opacity: .45; }
+
+/* La venta vacía. */
+.vm-vacia { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 32px 20px; border-radius: 16px; background: var(--m-hundido); text-align: center; color: var(--m-texto-2); font-size: 15px; }
+.vm-vacia b { color: var(--m-tinta); font-size: 17px; margin-top: 6px; }
+.vm-vacia-icono { width: 52px; height: 52px; border-radius: 99px; background: var(--m-superficie); color: var(--m-pino); display: grid; place-items: center; }
+
+/* Cada renglón. */
+.vm-renglon { background: var(--m-superficie); border: 1px solid var(--m-borde); border-radius: 16px; box-shadow: var(--m-sombra-1); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.vm-renglon.falta { border-color: #F3C766; background: linear-gradient(180deg, var(--m-urgente-suave), #fff 70%); }
+.vm-renglon.recien { border: 2px solid var(--m-logro); padding: 11px; }
+.vm-arriba { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.vm-arriba .foto-chica, .vm-arriba .miniatura { width: 56px; height: 56px; border-radius: 12px; }
+.vm-libre { display: grid; place-items: center; background: var(--m-hundido); color: var(--m-texto-2); }
+.vm-nombre { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; color: var(--m-tinta); }
+.vm-nombre b { font-weight: 750; font-size: 16px; line-height: 21px; }
+.vm-nombre small { font-size: 14px; line-height: 19px; color: var(--m-texto-2); }
+.vm-precio { display: flex; flex-direction: column; align-items: center; padding: 4px 10px; border-radius: 10px; background: var(--m-logro-suave); color: var(--m-tinta); }
+.vm-precio b { font-size: 17px; font-weight: 800; color: var(--m-logro-texto); }
+.vm-precio small { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); }
+.vm-que { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 99px; background: #fff; color: var(--m-logro-texto); box-shadow: inset 0 0 0 1.5px currentColor; font-size: 14px; font-weight: 800; line-height: 1; }
+.vm-precio.falta { background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); }
+.vm-precio.falta b { color: var(--m-urgente-texto); font-size: 15px; }
+.vm-precio-mano { display: inline-flex; align-items: center; gap: 4px; height: 44px; padding: 0 10px; border-radius: 12px; background: #fff; border: 1.5px solid var(--m-urgente); font-weight: 700; }
+.vm-precio-mano input { width: 84px; font-size: 17px; font-weight: 700; }
+.vm-margenes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.vm-margenes button { height: 44px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); color: var(--m-urgente-texto); font-weight: 750; font-size: 15px; }
+.vm-abajo { display: flex; align-items: center; gap: 6px; }
+.vm .vm-abajo .contador { height: 40px; background: var(--m-hundido); border: 0; }
+.vm .vm-abajo .contador button { width: 36px; height: 40px; color: var(--m-tinta); }
+.vm .vm-abajo .contador input { width: 30px; font-size: 16px; }
+.vm-unidad { position: relative; display: inline-flex; align-items: center; height: 40px; border-radius: 12px; background: var(--m-hundido); }
+.vm-unidad select { appearance: none; -webkit-appearance: none; height: 40px; border: 0; background: none; font: inherit; font-weight: 750; font-size: 14px; color: var(--m-tinta); padding: 0 24px 0 10px; }
+.vm-unidad svg { position: absolute; right: 7px; pointer-events: none; }
+.vm-margen { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 8px; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
+.vm-subtotal { margin-left: auto; font-weight: 800; font-size: 18px; white-space: nowrap; }
+.vm-stock { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); font-size: 14px; font-weight: 700; }
+
+/* El cobro, fijo abajo: lo que falta, el medio y el cliente, y cobrar deslizando. */
+.vm-cobro { position: sticky; bottom: 12px; z-index: 5; margin: auto -16px 0; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; background: rgba(255, 255, 255, .94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--m-borde); box-shadow: 0 -8px 24px -12px rgba(26, 29, 27, .15); }
+.vm-falta { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--m-urgente-texto); }
+.vm-pago { display: flex; align-items: center; gap: 8px; }
+.vm-medio { position: relative; }
+.vm-medio-elegido { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 10px; border-radius: 99px; border: 2px solid var(--medio); background: var(--medio-suave); font-weight: 800; font-size: 15px; color: var(--m-tinta); white-space: nowrap; }
+.vm-medios { position: absolute; left: 0; bottom: 52px; z-index: 30; min-width: 240px; padding: 6px; border-radius: 16px; background: #fff; border: 1px solid var(--m-borde); box-shadow: 0 16px 40px -8px rgba(26, 29, 27, .35); display: grid; transform-origin: 20% 100%; animation: vm-abre 0.18s cubic-bezier(.2, .9, .3, 1); }
+.vm-medios button { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 10px; border-radius: 10px; font-weight: 700; font-size: 15px; color: var(--m-tinta); text-align: left; }
+.vm-medios button[aria-selected="true"] { background: var(--medio-suave); }
+.vm-tilde-chica { margin-left: auto; color: var(--medio); }
+@keyframes vm-abre { from { opacity: 0; transform: scale(.94) translateY(6px); } }
+.vm-cliente { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--m-borde-fuerte); background: #fff; color: var(--m-texto-2); font-weight: 650; font-size: 15px; }
+.vm-cliente span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vm-cliente svg { flex: none; }
+.vm-cliente.elegido { color: var(--m-tinta); font-weight: 750; border-color: var(--m-tinta); }
+.vm-cliente.falta { border: 2px solid var(--m-urgente); color: var(--m-urgente-texto); background: var(--m-urgente-suave); }
+.vm-deslizar { position: relative; height: 60px; border-radius: 99px; background: var(--m-accion); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px; box-shadow: var(--m-sombra-accion); user-select: none; -webkit-user-select: none; }
+.vm-deslizar.apagado { filter: saturate(.35); opacity: .55; box-shadow: none; }
+.vm-pulgar { position: absolute; left: 5px; top: 5px; width: 50px; height: 50px; border-radius: 99px; background: #fff; color: var(--m-accion); display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0, 0, 0, .2); touch-action: none; transition: transform 0.32s cubic-bezier(.34, 1.4, .64, 1); z-index: 1; }
+.vm-deslizar-texto { padding: 0 44px 0 56px; white-space: nowrap; transition: opacity 0.2s; }
+.vm-flechita { position: absolute; right: 18px; opacity: .6; }
+
+/* Las hojas de esta pantalla. */
+.vm-hoja-detalle { margin: -6px 2px 0; font-size: 15px; color: var(--m-texto-2); }
+.vm-ancho { width: 100%; justify-content: center; }
+.vm-opciones { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.vm-opciones button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border-radius: 12px; background: #fff; border: 1.5px solid var(--m-borde-fuerte); font-weight: 800; font-size: 15px; color: var(--m-tinta); }
+.vm-opciones button small { font-size: 13px; font-weight: 600; color: var(--m-texto-2); }
+.vm-opciones button.elegido { background: var(--m-pino); border-color: var(--m-pino); color: #fff; }
+.vm-opciones button.elegido small { color: rgba(255, 255, 255, .8); }
+.vm-fila-mano, .vm-fila-cantidad { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15px; color: var(--m-texto-2); }
+.vm-fila-mano .vm-precio-mano { border-color: var(--m-borde-fuerte); }
+.vm-fila-cantidad b { font-size: 20px; color: var(--m-tinta); }
+.boton.vm-quitar { color: var(--m-error-texto); background: var(--m-error-suave); border: 0; }
+
+/* La venta registrada. */
+.hoja-fondo.vm-listo-fondo { justify-content: center; align-items: center; padding: 20px; z-index: 50; }
+.vm-listo { width: 100%; max-width: 380px; padding: 28px 20px 20px; border-radius: 24px; background: #fff; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 24px 60px -12px rgba(0, 0, 0, .4); animation: vm-abre 0.25s cubic-bezier(.2, .9, .3, 1); }
+.vm-listo-tilde { width: 72px; height: 72px; border-radius: 99px; background: var(--m-logro); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 8px var(--m-logro-suave); margin-bottom: 8px; }
+.vm-listo-tilde.pendiente { background: var(--m-urgente); box-shadow: 0 0 0 8px var(--m-urgente-suave); }
+.vm-listo h2 { margin: 0; font-size: 20px; font-weight: 800; }
+.vm-listo-total { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
+.vm-sin-red { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); font-size: 14px; font-weight: 700; text-align: left; }
+.vm-sin-red svg { flex: none; margin-top: 1px; }
+.vm-listo-detalle { margin: 0; display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 4px; font-size: 15px; color: var(--m-texto-2); }
+.vm-listo-botones { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.vm-listo-botones .boton { width: 100%; justify-content: center; }
+
+@media (max-width: 899px) {
+  .vm-cobro { bottom: calc(var(--alto-nav) + 6px + env(safe-area-inset-bottom)); }
+}
+@media (min-width: 900px) {
+  .contenido.vender-ancho.vm > .vm-cobro { grid-column: 2; grid-row: 2; position: sticky; top: calc(var(--alto-barra) + 12px); bottom: auto; margin: 0; border-radius: 20px; border: 1px solid var(--m-borde); }
+  .escaner.vm-camara { margin: 0; border-radius: 16px; }
+}
