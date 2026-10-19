@@ -54,6 +54,25 @@ Vender (decisión 119):
   desplegable, el comentario y «Cancelar» / «Anular · −$20.000». Una anulada dice cuándo y por
   qué se anuló.
 
+## En la computadora, los cuatro cajones (decisión 122, historia 5)
+
+Maqueta aprobada por Carlos el 2026-10-19: `maquetas/compu-ventas-de-hoy-elegida.png` (la v4 del
+director de arte, dentro del menú). Las pestañas de Vender en la computadora son «Vender» y «Ventas de
+hoy», como en el celular (decisión 120):
+
+- Arriba a la derecha, «Buscar una venta» (Ctrl+K) y «Otro día» (F).
+- El día, el total, la comparación, ventas, productos y ticket promedio; a la derecha, lo vendido por
+  hora con cada barra apilada por medio de pago.
+- Debajo, cuatro columnas, una por medio de pago (los cajones de la caja), con su total y cuántas
+  ventas; cada venta en una tarjeta con el producto o «3 productos» (o el cliente, en cuenta
+  corriente), el importe, la hora y lo que lleva. Las anuladas, punteadas y tachadas.
+- ← → cambian de cajón, ↑ ↓ de venta, Enter la abre, A la anula. No se arrastra: el medio de una
+  venta no se cambia desde acá.
+- Abierta, una ventana con sus productos, el total y «Anular» (A), que pide confirmar con el motivo en
+  una lista y el comentario (Ctrl+Enter confirma, el botón dice cuánto se descuenta).
+- Buscando, el resumen se esconde y queda el campo, cuántas coinciden y cuánto suman; lo que
+  coincide se resalta. Esc borra y, vacío, sale.
+
 ## Colores de los medios de pago (decisión 108)
 
 Efectivo verde, Mercado Pago celeste, Tarjeta violeta, Cuenta corriente ámbar, con su versión

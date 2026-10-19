@@ -26,7 +26,6 @@ import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } fro
 import { Entrar } from "./base/pantallas/Entrar";
 import { Manual } from "./base/pantallas/Manual";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
-import { VentasDeHoy } from "./base/pantallas/VentasDeHoy";
 import { Hoy } from "./base/pantallas/Hoy";
 import { Productos } from "./base/pantallas/Productos";
 import { Listas } from "./base/pantallas/Listas";
@@ -92,22 +91,23 @@ const RUTAS_DE_ANOMALIAS = new Set(DE_ANOMALIAS.map((p) => p.ruta));
 const SIN_ATAJO = new Set([...RUTAS_DE_USUARIOS, ...RUTAS_DE_NEGOCIO, ...RUTAS_DE_ANOMALIAS]);
 const MENU: Parte[] = [
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
-  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }, { ruta: "hoy", icono: "ventas", nombre: "Hoy", pide: ["ventas.ver"] }, { ruta: "anular", icono: "deshacer", nombre: "Anular", pide: ["ventas.anular", "ventas.anular_cualquiera"] }] },
+  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }, { ruta: "hoy", icono: "ventas", nombre: "Ventas de hoy", pide: ["ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] }] },
   { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos"] }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }, { ruta: "pedidos", icono: "listas", nombre: "Pedidos", pide: ["deposito.pedidos", "deposito.ingresos"] }] },
   // Usuarios (decisión 88) y Cómo va el negocio (decisión 95) son opciones de Más con pestañas: en el menú cuentan sus pestañas.
   { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.flatMap((d) => (d.ruta === "usuarios" ? DE_USUARIOS : d.ruta === "resumen" ? DE_NEGOCIO : d.ruta === "anomalias" ? DE_ANOMALIAS : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
 ];
 // Pantallas que no están en el menú pero tienen dirección.
-const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }];
+// «anular» era la pestaña de anular, que ahora está en «Ventas de hoy» (decisión 120): lleva ahí.
+const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "anular", nombre: "Ventas de hoy", icono: "ventas" }];
 const TODAS = [...MENU.flatMap((m) => m.pestanas), ...FUERA_DEL_MENU];
 const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 // Las partes con el nombre que comparten el celular y la computadora en espejo (decisión 60).
 const A_PARTE_COMUN: Record<string, string> = {
-  productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy", anular: "vender/anular",
+  productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy",
   pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
   mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", "para-revisar": "mas/para-revisar", tickets: "mas/tickets", configuracion: "mas/configuracion", procesos: "mas/procesos",
 };
-const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos" };
+const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos", "vender/anular": "hoy" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
 const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
@@ -142,7 +142,7 @@ function Pantallas() {
   const paraRevisar = useParaRevisar(puede(usuario, "admin.usuarios")).datos?.apartados.length ?? 0;
   const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)).filter((r) => !SIN_ATAJO.has(r) || r === deUsuarios[0]?.ruta || r === deNegocio[0]?.ruta || r === deAnomalias[0]?.ruta), [menu, deUsuarios, deNegocio, deAnomalias]);
   const atajoDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
-  const actual = sinDireccion || !NOMBRES.has(ruta.nombre) ? "productos" : ruta.nombre;
+  const actual = sinDireccion || !NOMBRES.has(ruta.nombre) ? "productos" : ruta.nombre === "anular" ? "hoy" : ruta.nombre;
   const pideActual = RUTAS_DE_NEGOCIO.has(actual) && !puede(usuario, ...PIDE_EL_NEGOCIO) ? PIDE_EL_NEGOCIO : TODAS.find((p) => p.ruta === actual)?.pide;
   // Sin ninguno de los permisos de Cómo va el negocio se nombran todos, como en el celular (012-E05).
   const falta = usuario && !puede(usuario, ...(pideActual ?? [])) ? pideActual! : null;
@@ -193,7 +193,8 @@ function Pantallas() {
       if (e.key !== "ArrowLeft" || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       if (document.querySelector("dialog[open], [role='dialog'], [aria-modal='true']")) return;
       const foco = document.activeElement as HTMLElement | null;
-      if (foco?.closest(".lateral, .pestanas")) return;
+      // Una zona que recorre sus flechas por su cuenta (los cajones de Ventas de hoy) usa ← para ella.
+      if (foco?.closest(".lateral, .pestanas, [data-flechas-propias]")) return;
       if (foco instanceof HTMLInputElement || foco instanceof HTMLTextAreaElement) {
         const deTexto = foco instanceof HTMLTextAreaElement || ["text", "search", "", "tel", "url", "email", "password"].includes(foco.type);
         if (!deTexto || (foco.value !== "" && !(foco.selectionStart === 0 && foco.selectionEnd === 0))) return;
@@ -343,7 +344,7 @@ function Pantallas() {
           : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />
           : actual === "roles" ? <Roles />
           : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`compras?pedido=${id}`)} /></main>
-          : actual === "hoy" ? <Hoy /> : actual === "anular" ? <VentasDeHoy modo="anular" /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
+          : actual === "hoy" ? <Hoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />

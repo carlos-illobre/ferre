@@ -33,26 +33,67 @@ afterEach(() => { vi.useRealTimers(); });
 const abrir = async () => { render(<Hoy />); await screen.findByTestId("total-de-hoy"); await screen.findByTestId("comparacion"); };
 
 describe("«Hoy» · computadora", () => {
-  it("017-E01 017-E02 017-E05 017-E07 017-E08 017-E09: el resumen oscuro y los tres números", async () => {
+  it("017-E01 017-E02 017-E05 017-E07 017-E08 017-E09: la franja con el total, la comparación y los tres números", async () => {
     await abrir();
     expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Hoy, sábado 17/10");
     expect(screen.getByTestId("total-de-hoy").textContent).toBe("$293.000");
     expect(screen.getByTestId("comparacion").textContent).toBe("+17 %vs. ayer a esta hora ($250.000)");
-    expect(screen.getByTestId("medio-cuenta_corriente").textContent).toBe("Cuenta corriente1 venta$58.000");
-    expect(screen.getByTestId("numeros").textContent).toBe("3ventas6productos$97.667ticket promedio");
+    expect(screen.getByTestId("numeros").textContent).toBe("3 ventas6 productos$97.667 ticket promedio");
     expect(within(screen.getByTestId("grafico")).getAllByTestId("barra")).toHaveLength(4);
   });
 
-  it("017-E11 017-E13: la tabla con el medio en su color; ↑ ↓ eligen y Enter abre o cierra el detalle", async () => {
+  it("017-E11: un cajón por medio, con cuántas y cuánto; la anulada no suma", async () => {
     await abrir();
-    const filas = screen.getAllByTestId("venta-dia");
-    expect(filas[1]!.textContent).toContain("11:053 productosCuenta corrienteConstructora Martínez$58.000");
-    expect(filas[1]!.querySelector(".hoy-medio.medio-cuenta_corriente")).not.toBeNull();
-    fireEvent.keyDown(window, { key: "ArrowDown" });
-    fireEvent.keyDown(window, { key: "Enter" });
-    expect(within(filas[1]!).getAllByTestId("detalle-venta").map((f) => f.textContent)).toEqual(["2,5 × Clavo punta París 2 pulgadas · $10.000 c/u$25.000", "1 × Electrodo 2,5 mm · $18.000 c/u$18.000", "3 × Disco de corte 115 mm · $5.000 c/u$15.000"]);
-    fireEvent.keyDown(window, { key: "Enter" });
-    expect(within(filas[1]!).queryAllByTestId("detalle-venta")).toHaveLength(0);
+    const cc = screen.getByTestId("cajon-cuenta_corriente");
+    expect(cc.textContent).toContain("1 venta · a cobrar");
+    expect(cc.textContent).toContain("$58.000");
+    expect(within(cc).getByTestId("venta-dia").textContent).toContain("Constructora Martínez");
+    const tarjeta = screen.getByTestId("cajon-tarjeta");
+    expect(tarjeta.textContent).toContain("0 ventas");
+    expect(within(tarjeta).getByTestId("venta-dia").className).toContain("anulada");
+  });
+
+  it("017-E13: ← → cambian de cajón, ↑ ↓ de venta y la elegida se abre", async () => {
+    await abrir();
+    const lista = screen.getByTestId("ventas-de-hoy-lista");
+    fireEvent.keyDown(lista, { key: "ArrowRight" });
+    fireEvent.keyDown(lista, { key: "ArrowRight" });
+    fireEvent.keyDown(lista, { key: "ArrowRight" });
+    const elegida = () => lista.querySelector<HTMLButtonElement>("[data-elegida='si']")!;
+    expect(elegida().textContent).toContain("Constructora Martínez");
+    fireEvent.click(elegida());
+    const abierta = screen.getByTestId("venta-abierta");
+    expect(within(abierta).getByTestId("detalle-venta").textContent).toContain("2,5 × Clavo punta París 2 pulgadas");
+  });
+
+  it("017-E26 017-E27: A anula la venta elegida con motivo y comentario", async () => {
+    conPermisos("ventas.ver", "ventas.anular");
+    await abrir();
+    fireEvent.keyDown(window, { key: "a" });
+    const hoja = screen.getByTestId("hoja-anular");
+    expect(within(hoja).getByTestId("confirmar-anular").textContent).toContain("−$12.000");
+    fireEvent.change(within(hoja).getByTestId("comentario-anular"), { target: { value: "vino fallada" } });
+    apiFalsa.mockResolvedValueOnce({});
+    fireEvent.click(within(hoja).getByTestId("confirmar-anular"));
+    await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/ventas/v1/anular", expect.objectContaining({ method: "POST" })));
+    expect(String(apiFalsa.mock.calls.find((c) => c[0] === "/ventas/v1/anular")![1].body)).toContain("vino fallada");
+  });
+
+  it("017-E26: sin permiso de anular, la venta abierta no ofrece «Anular»", async () => {
+    await abrir();
+    fireEvent.click(screen.getAllByTestId("venta-dia")[0]!);
+    expect(screen.getByTestId("venta-abierta")).toBeTruthy();
+    expect(screen.queryByTestId("anular")).toBeNull();
+  });
+
+  it("017-E22 017-E23 017-E25: Ctrl+K busca por producto o cliente y dice cuántas halló", async () => {
+    await abrir();
+    fireEvent.keyDown(window, { key: "k", ctrlKey: true });
+    fireEvent.change(await screen.findByTestId("buscar-venta"), { target: { value: "constructora" } });
+    expect(screen.getByTestId("cuantas-halladas").textContent).toBe("1 de 4 ventas · suman $58.000");
+    expect(screen.getAllByTestId("venta-dia")).toHaveLength(1);
+    fireEvent.click(screen.getByTestId("salir-de-buscar"));
+    expect(screen.getAllByTestId("venta-dia")).toHaveLength(4);
   });
 
   it("017-E16 017-E18: F abre el calendario; otro día, y «Volver a hoy»", async () => {

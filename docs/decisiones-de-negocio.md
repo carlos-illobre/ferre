@@ -981,3 +981,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      devuelto se toma al precio que se pagó; si lo nuevo vale menos, se devuelve el dinero (cambia
      «no hay devoluciones de dinero» de RF-24). En la interfaz van en la hoja de cada venta de
      «Ventas de hoy», como en la v2 del director de arte. Queda abierto si hay un plazo para los cambios.
+125. **Vender en la computadora: correcciones sobre lo programado** (2026-10-19). Probándolo,
+     Carlos pidió: el panel de la derecha, oculto, deja una pestaña en el borde para volver a
+     abrirlo (además de F1); cada renglón no tiene menú «⋯»: el tacho lo quita y el precio a mano
+     tiene su botón a la vista, «Precio a mano», que habilita la caja (la explicación del precio ya
+     está en el panel «De dónde sale»); con un cliente elegido, el botón muestra sus iniciales en
+     vez del ícono de persona y ocupa todo el ancho que queda en la barra; y el total va dentro del
+     botón «Cobrar $X» (en la computadora cambia lo dicho en la decisión 37; el celular sigue igual).
+     En la barra, los medios van con su nombre corto («M. Pago», «Cta. cte.») y el largo al pasar el
+     mouse, porque los cuatro con su tecla no entran con el nombre largo.

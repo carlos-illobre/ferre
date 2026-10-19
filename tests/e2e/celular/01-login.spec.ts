@@ -154,7 +154,8 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   // La computadora le pide que haga de lector (decisión 59): al celular le aparece el aviso,
   // abre el lector y lo que lee llega a la venta de la computadora. (Sin cámara en la prueba: se tipea.)
   await compu.getByTestId("pedir-lector").click();
-  await expect(compu.getByTestId("lector-pedido")).toBeVisible();
+  // En Vender, el botón deja su lugar al aviso «El celular está escaneando» (decisión 122).
+  await expect(compu.getByTestId("celular-escaneando")).toBeVisible();
   await celular.getByTestId("abrir-el-lector").click();
   await celular.getByTestId("codigo-manual").fill("7790000000011");
   await celular.getByTestId("codigo-manual").press("Enter");

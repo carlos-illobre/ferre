@@ -102,26 +102,23 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect.poll(() => psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   await expect.poll(() => psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
-  // La pestaña Hoy de Vender la muestra, sin anular (decisión 72).
+  // «Ventas de hoy», al lado de Vender (decisión 123): la venta está en el cajón de su medio; se
+  // abre con un clic y desde ahí se anula, con motivo y comentario. Anular devuelve el stock.
   await page.getByTestId("pestana-hoy").click();
-  // La más reciente primero (017): la que se acaba de cobrar, en un renglón que se abre.
-  const hoy = page.getByTestId("ventas-de-hoy");
-  const ultima = hoy.getByTestId("venta-dia").first();
-  await expect(ultima).toContainText("2 productos");
-  await expect(ultima).toContainText("Efectivo");
-  await ultima.getByRole("button", { name: "Ver el detalle" }).click();
-  await expect(ultima.getByTestId("detalle-venta").filter({ hasText: "MECHA VENDER" })).toHaveCount(1);
-  await expect(ultima.getByTestId("detalle-venta").filter({ hasText: "TORNILLO VENDER" })).toHaveCount(1);
-  await expect(hoy.getByRole("button", { name: "Anular" })).toHaveCount(0);
-  // La pestaña Anular es para eso: anular la marca y devuelve el stock.
-  await page.getByTestId("pestana-anular").click();
-  const venta = page.getByTestId("anular-ventas").getByTestId("venta-dia").filter({ hasText: "MECHA VENDER" });
-  await expect(venta).toContainText("TORNILLO VENDER");
-  await venta.getByRole("button", { name: "Anular" }).click();
+  const efectivo = page.getByTestId("ventas-de-hoy").getByTestId("cajon-efectivo");
+  const ultima = efectivo.getByTestId("venta-dia").filter({ hasText: "2 productos" }).first();
+  await expect(ultima).toBeVisible();
+  await ultima.click();
+  const abierta = page.getByTestId("venta-abierta");
+  await expect(abierta.getByTestId("detalle-venta")).toContainText("MECHA VENDER");
+  await expect(abierta.getByTestId("detalle-venta")).toContainText("TORNILLO VENDER");
+  await abierta.getByTestId("anular").click();
+  await expect(page.getByTestId("confirmar-anular")).toContainText("−$11.000");
   await page.getByTestId("motivo-anular").selectOption("Se arrepintió");
   await page.getByTestId("comentario-anular").fill("cambió de idea");
   await page.getByTestId("confirmar-anular").click();
-  await expect(venta).toContainText(/anulada/i);
+  await expect(page.getByTestId("hoja-anular")).toHaveCount(0);
+  await expect(efectivo.getByTestId("venta-dia").filter({ hasText: "anulada" }).first()).toBeVisible();
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
 
   // La anomalía del tornillo se ve en Más > Anomalías.
@@ -234,10 +231,10 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await expect(page.getByTestId("pestana-productos")).toBeFocused();
   await page.keyboard.press("ArrowDown");
 
-  // ← lleva al menú; ahí ↑ ↓ lo recorren sin mover la lista de productos, hasta Vincular y Salir.
+  // ← lleva al menú; ahí ↑ ↓ lo recorren sin mover la lista de productos, hasta Vincular, Salir y el botón que achica el menú.
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
-  for (const destino of ["menu-vender", "menu-deposito", "menu-mas", "emparejar-celular", "salir", "menu-catalogo"]) {
+  for (const destino of ["menu-vender", "menu-deposito", "menu-mas", "emparejar-celular", "salir", "plegar-menu", "menu-catalogo"]) {
     await page.keyboard.press("ArrowDown");
     await expect(page.getByTestId(destino)).toBeFocused();
   }

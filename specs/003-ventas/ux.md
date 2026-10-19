@@ -110,6 +110,34 @@ el lenguaje «Mostrador»:
   cliente si hay, cuántos productos y la hora, «Ver en Ventas de hoy» y «Seguir vendiendo». Sin
   conexión dice «Guardada en este celular» y que se envía sola cuando vuelva internet.
 
+**Vender en la computadora** (decisiones 121 y 122, Carlos, 2026-10-19; maqueta aprobada
+`maquetas/compu-vender-elegida.png`: la v2 del director de arte con el panel de la v3 y la boleta de la v4).
+Sigue el lenguaje «Mostrador»:
+
+- Arriba, la búsqueda y, a su derecha, «Escanear con el celular» si hay uno vinculado; mientras el
+  celular lee, en su lugar va el aviso oscuro «El celular está escaneando · Lo que lea entra acá»
+  con «Detener». Debajo, las teclas que no están en ningún botón.
+- «Esta venta» con cuántos productos, y a la derecha «No llevó» (Esc, con la búsqueda vacía) y
+  «Vaciar» (con Deshacer).
+- Cada renglón, una tarjeta: la foto, el nombre con marca, proveedor y stock (o cuánto falta), la
+  cantidad con − y + y su unidad, el total del renglón con «3 × $7.000» y el tacho, que lo quita con
+  Deshacer (sin menú «⋯», decisión 125). Debajo, el costo (con «Ver costos»), los márgenes, el
+  precio por unidad y el botón «Precio a mano», que habilita la caja. Sin precio, en
+  ámbar. Con la búsqueda vacía, ↑ ↓ eligen el renglón, + y − cambian su cantidad y Supr lo quita.
+- A la derecha, un panel con dos pestañas: «De dónde sale» (la cuenta del renglón elegido: costo,
+  margen, IVA, redondeo, cantidad y total) y «Boleta» (la venta como un ticket). Se oculta y se
+  muestra con su botón o F1, y recuerda cómo quedó; oculto, la lista ocupa todo el ancho y en el
+  borde derecho queda una pestaña «De dónde sale · Boleta» que lo vuelve a abrir.
+- Abajo, fija, la barra del cobro: cuántos productos (o cuántos precios faltan), los cuatro medios
+  con su tecla (F5 a F8, con el nombre corto y el largo al pasar el mouse), el cliente (F9,
+  opcional con cualquier medio; elegido, con sus iniciales, y ocupa todo el ancho que queda) y
+  «Cobrar $X» (F2), con el total dentro del botón (decisión 125).
+- Con la venta vacía, «La venta está vacía» y, debajo, lo último que se vendió (decisión 38).
+- La venta registrada es una ventana como la del celular: el total, el medio, cuántos productos y la
+  hora, «Ver en Ventas de hoy» y «Seguir vendiendo» (Enter).
+- No van: «Ganás en esta venta», escribir la cantidad en la búsqueda, el margen con 1 a 5, la ayuda
+  «?», pedidos y presupuestos (decisión 122).
+
 **Estados:**
 
 - *Vacío:* la venta nueva dice que se escriba el nombre del producto o se escanee el código.

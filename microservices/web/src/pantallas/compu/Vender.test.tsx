@@ -34,8 +34,8 @@ describe("Vender (v2)", () => {
 
   it("la venta nueva dice qué hacer para empezar", () => {
     armar();
-    expect(screen.getByText("Venta nueva")).toBeTruthy();
-    expect(screen.queryByTestId("cobro")).toBeNull();
+    expect(screen.getByText("La venta está vacía")).toBeTruthy();
+    expect(screen.getByTestId("cobrar").hasAttribute("disabled")).toBe(true);
   });
 
   it("Enter agrega, el precio se redondea para arriba a $1.000 y el total suma", () => {
@@ -71,6 +71,8 @@ describe("Vender (v2)", () => {
   it("el precio a mano vale para esta venta y no cambia el producto", () => {
     const { agregar, item, falso } = armar();
     agregar("tornillo vender");
+    expect(within(item("TORNILLO")).queryByTestId("precio-manual")).toBeNull(); // la caja se habilita con su botón
+    fireEvent.click(within(item("TORNILLO")).getByTestId("habilitar-precio-manual"));
     fireEvent.change(within(item("TORNILLO")).getByTestId("precio-manual"), { target: { value: "2500" } });
     expect(screen.getByTestId("total").textContent).toBe("$3.000");
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
@@ -89,23 +91,60 @@ describe("Vender (v2)", () => {
     expect(screen.queryByTestId("error-cobro")).toBeNull();
   });
 
-  it("lo último que se vendió son tarjetas con foto que siguen a la vista con la venta empezada", async () => {
+  it("con la venta vacía, lo último que se vendió son tarjetas con foto; con la venta empezada, la lista ocupa su lugar", async () => {
     armar({ ventas: [{ fecha: "2026-10-11T12:00:00Z", estado: "confirmada", items: [{ descripcion: "MECHA VENDER 8 MM" }] }], totales: {}, total: 0 });
     const tarjetas = await screen.findByTestId("sugeridos-ultimos");
     expect(tarjetas.textContent).toContain("MECHA VENDER 8 MM");
     fireEvent.click(within(tarjetas).getByRole("button"));
     expect(screen.getAllByTestId("item")).toHaveLength(1);
-    expect(screen.getByTestId("sugeridos-ultimos")).toBeTruthy(); // no desaparecen al agregar
-    expect(screen.queryByTestId("sugeridos-mas-vendidos")).toBeNull();
+    expect(screen.queryByTestId("sugeridos-ultimos")).toBeNull();
   });
 
   it("dicen lo mismo que el celular: los medios de pago y los avisos salen de los textos compartidos", async () => {
     const { MEDIOS, TEXTOS } = await import("../textos");
     const { agregar } = armar();
     agregar("mecha vender");
-    for (const m of MEDIOS) expect(screen.getByTestId(`medio-${m.valor}`).textContent).toContain(m.nombre);
+    // En la barra va el nombre corto (no entra el largo); el largo lo dice al pasar el mouse y al lector.
+    for (const m of MEDIOS) {
+      expect(screen.getByTestId(`medio-${m.valor}`).textContent).toContain(m.corto);
+      expect(screen.getByTestId(`medio-${m.valor}`).getAttribute("title")).toBe(m.nombre);
+    }
     fireEvent.click(screen.getByTestId("no-llevo"));
     expect((await screen.findByTestId("mensaje")).textContent).toBe(TEXTOS.vender.noLlevo.largo);
+  });
+
+  it("el panel de la derecha se oculta con F1 o su botón, deja una pestaña para volver a abrirlo y lo recuerda", () => {
+    localStorage.removeItem("ferre.panel");
+    armar();
+    expect(screen.getByTestId("panel")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("ocultar-panel"));
+    expect(screen.queryByTestId("panel")).toBeNull();
+    expect(localStorage.getItem("ferre.panel")).toBe("oculto");
+    fireEvent.click(screen.getByTestId("abrir-panel"));
+    expect(screen.getByTestId("panel")).toBeTruthy();
+    fireEvent.keyDown(window, { key: "F1" });
+    expect(screen.queryByTestId("panel")).toBeNull();
+    fireEvent.keyDown(window, { key: "F1" });
+    expect(screen.getByTestId("panel")).toBeTruthy();
+  });
+
+  it("el tacho quita el renglón con Deshacer; el total va dentro de «Cobrar»", () => {
+    const { agregar, item } = armar();
+    agregar("mecha vender");
+    expect(screen.getByTestId("cobrar").textContent).toContain("$3.000");
+    fireEvent.click(within(item("MECHA")).getByTestId("quitar-renglon"));
+    expect(screen.queryAllByTestId("item")).toHaveLength(0);
+    fireEvent.click(within(screen.getByTestId("mensaje")).getByText("Deshacer"));
+    expect(screen.getAllByTestId("item")).toHaveLength(1);
+  });
+
+  it("el cliente es opcional con cualquier medio y, elegido, muestra sus iniciales en vez del ícono", () => {
+    const { agregar } = armar();
+    agregar("mecha vender");
+    fireEvent.keyDown(window, { key: "F9" });
+    fireEvent.click(within(screen.getByTestId("hoja-clientes")).getByTestId("cliente-opcion"));
+    expect(screen.getByTestId("medio-efectivo").getAttribute("aria-checked")).toBe("true");
+    expect(screen.getByTestId("cliente").textContent).toContain("CUConstructora Uno");
   });
 
   it("la cantidad sube y baja con las flechas del teclado", () => {

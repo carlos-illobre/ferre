@@ -1,0 +1,52 @@
+/* «Ventas de hoy» en la computadora (decisiones 120 y 122): la v4 del director de arte, los
+   cuatro cajones de la caja, dentro del menú de «Mostrador». */
+.vhc-pagina {
+  --m-hundido: #ECE9E1; --m-hundido-2: #E3DFD5; --m-borde: #E6E2D8; --m-borde-fuerte: #CEC8BA; --m-tinta: #1A1D1B; --m-texto-2: #545955; --m-texto-3: #6B706B;
+  --m-pino: #12382F; --m-pino-suave: #E3EEE8; --m-pino-texto: #17614E;
+  gap: var(--e3) !important;
+}
+body:has(.vhc-pagina), .cuerpo:has(.vhc-pagina) { background: #F4F2EC; }
+.vhc-franja { display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: var(--e8); align-items: end; }
+.vhc-dia { display: flex; align-items: baseline; gap: var(--e2); }
+.vhc-dia b { font-size: 1rem; }
+.vhc-dia small { color: var(--m-texto-2); }
+.vhc-monto { display: block; font-size: 3rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-top: 2px; }
+.vhc-pagina .hoy-compara { margin-top: 6px; color: var(--m-texto-2); }
+.vhc-numeros { display: flex; gap: var(--e5); margin-top: var(--e2); font-size: 0.875rem; color: var(--m-texto-2); font-weight: 600; }
+.vhc-numeros b { font-size: 1.0625rem; color: var(--m-tinta); font-weight: 800; }
+.vhc-pila { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 10px; align-items: end; height: 108px; }
+.vhc-hora { display: grid; grid-template-rows: 1fr auto; height: 100%; gap: 6px; text-align: center; }
+.vhc-columna { display: flex; flex-direction: column-reverse; gap: 2px; height: 100%; }
+.vhc-columna i { display: block; border-radius: 3px; background: var(--medio); min-height: 4px; }
+.vhc-columna i.vacia { height: 3px; min-height: 3px; background: var(--m-hundido-2); }
+.vhc-hora span { font-size: 0.875rem; font-weight: 600; color: var(--m-texto-3); }
+
+.vhc-buscar { display: flex; align-items: center; gap: var(--e3); }
+.vhc-buscar-caja { flex: 1; display: flex; align-items: center; gap: var(--e2); height: 48px; padding: 0 12px; border-radius: 12px; background: #fff; border: 2px solid var(--m-pino); color: var(--m-texto-2); }
+.vhc-buscar-caja input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 1rem; outline: none; color: var(--m-tinta); }
+.vhc-pagina mark { background: var(--m-pino-suave); color: var(--m-pino-texto); border-radius: 4px; padding: 0 2px; }
+
+.vhc-cajones { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.vhc-cajon { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 16px; background: var(--m-hundido); min-height: 200px; }
+.vhc-cajon-cab { display: flex; align-items: center; gap: 10px; padding: 2px 4px 6px; }
+.vhc-cajon-cab > span { display: flex; flex-direction: column; min-width: 0; }
+.vhc-cajon-cab b { font-weight: 800; font-size: 1rem; }
+.vhc-cajon-cab small { font-size: 0.875rem; color: var(--m-texto-2); font-weight: 600; }
+.vhc-cajon-cab strong { margin-left: auto; font-size: 1.25rem; font-weight: 800; }
+.vhc-vacio { text-align: center; padding: 14px 4px; }
+.vhc-venta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 10px 12px; border-radius: 12px; background: #fff; border: 1px solid var(--m-borde); box-shadow: 0 1px 2px rgba(26, 29, 27, .05); text-align: left; font: inherit; color: var(--m-tinta); cursor: pointer; }
+.vhc-venta .q { font-weight: 700; font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vhc-venta .v { font-weight: 800; text-align: right; }
+.vhc-venta .d { grid-column: 1 / -1; font-size: 0.875rem; color: var(--m-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vhc-venta[data-elegida="si"] { border: 2px solid var(--m-pino); padding: 9px 11px; box-shadow: 0 0 0 3px rgba(18, 56, 47, .10); }
+.vhc-venta:focus-visible { outline: 3px solid var(--m-pino); outline-offset: 1px; }
+.vhc-venta.anulada { background: transparent; box-shadow: none; border-style: dashed; border-color: var(--m-borde-fuerte); }
+.vhc-venta.anulada .q, .vhc-venta.anulada .v { text-decoration: line-through; color: var(--m-texto-3); }
+
+.vhc-detalle { list-style: none; margin: 0; padding: 0; }
+.vhc-detalle li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--m-borde); }
+.vhc-detalle li small { display: block; color: var(--m-texto-2); font-size: 0.875rem; }
+.vhc-detalle-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; font-weight: 700; color: var(--m-texto-2); }
+.vhc-detalle-total .importe { font-size: 1.625rem; color: var(--m-tinta); }
+.vhc-detalle-total .tachado { text-decoration: line-through; }
+.vhc-pagina .vhc-monto.importe { font-size: 3rem; }
