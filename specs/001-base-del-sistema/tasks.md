@@ -45,3 +45,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T034 [regla] El lenguaje «Mostrador» es el oficial: lo toma por defecto toda pantalla nueva o rediseñada, salvo que el director de arte proponga algo superador y Carlos lo elija (decisión 115)
 - [x] T035 [regla] El marco y el cartel del ambiente de prueba quedan como están con cualquier rediseño y solo en pruebas (decisión 116)
 - [x] T036 [cambio de regla] La navegación con el teclado se mantiene en todas las versiones: un gesto nuevo se suma y no la reemplaza (decisión 121)
+- [ ] T037 [interfaz] Computadora: el menú de la izquierda de «Mostrador», con el logotipo de la v1 y un botón (y Ctrl+B) que lo achica a íconos, en todas las pantallas (decisión 122; maqueta `specs/003-ventas/maquetas/compu-vender-elegida.png`, a aprobar)

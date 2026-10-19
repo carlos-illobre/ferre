@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventas de hoy · La elegida (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../ventas.css">
+<link rel="stylesheet" href="../../../vender/interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script>
+window.ICONOS["panel-left-close"] = '<rect width="18" height="18" x="3" y="3" rx="2" /> <path d="M9 3v18" /> <path d="m16 15-3-3 3-3" />';
+</script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  /* El menú: el mismo de Vender (logotipo de la v1, se achica con su botón o Ctrl+B). */
+  .marca { justify-content: space-between; padding: 2px 4px 14px 8px; }
+  .marca .logo-largo { height: 30px; width: auto; display: block; }
+  .marca .logo-corto { width: 36px; height: 36px; display: none; }
+  .plegar { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--texto-3); flex: none; }
+  .plegar:hover { background: var(--hundido); color: var(--tinta); }
+  .app.plegado .marca { flex-direction: column; gap: 10px; padding: 2px 0 12px; }
+  .app.plegado .marca .logo-largo { display: none; }
+  .app.plegado .marca .logo-corto { display: block; }
+  .app.plegado .plegar .i { transform: scaleX(-1); }
+  .nav-item .atajo { display: none; }
+  .con-alt .nav-item .atajo { display: inline-flex; margin-left: auto; height: 22px; min-width: 22px; padding: 0 5px; border-radius: 6px; background: var(--tinta); color: #fff; font-size: 14px; font-weight: 800; align-items: center; justify-content: center; }
+  .app.plegado .pie .vinculo div, .app.plegado .pie .estado-red span.txt, .app.plegado .usuario div { display: none; }
+  .app.plegado .pie .vinculo { padding: 10px; justify-content: center; }
+  .app.plegado .pie .estado-red { justify-self: center; padding: 0 10px; }
+
+  [hidden] { display: none !important; }
+  .pantalla { display: flex; flex-direction: column; gap: 14px; padding-top: 16px; }
+  /* El día en una franja (v4): el total, la comparación, los tres números y lo vendido por hora, apilado por medio. */
+  .franja { display: grid; grid-template-columns: 400px minmax(0,1fr); gap: 32px; align-items: end; }
+  .dia { display: flex; align-items: center; gap: 10px; }
+  .dia .t-etiqueta { white-space: nowrap; }
+  .franja .t-total { margin-top: 2px; }
+  .comp { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 6px; white-space: nowrap; }
+  .numeros { display: flex; gap: 18px; margin-top: 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .numeros b { font-size: 17px; color: var(--tinta); font-weight: 800; margin-right: 4px; }
+  .pila { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; align-items: end; height: 100px; }
+  .pila .h { display: grid; grid-template-rows: 1fr auto; height: 100%; text-align: center; gap: 6px; }
+  .pila .c { display: flex; flex-direction: column-reverse; gap: 2px; height: 100%; }
+  .pila .c b { display: block; border-radius: 3px; background: var(--c); }
+  .pila .c.vacia b { height: 3px; background: var(--hundido-2); }
+  .pila span { font-size: 14px; font-weight: 600; color: var(--texto-3); }
+  .pila .ahora span { color: var(--pino-texto); font-weight: 800; }
+
+  .barra-buscar { display: flex; align-items: center; gap: 12px; }
+  .barra-buscar .campo { flex: 1; height: 48px; }
+  .barra-buscar input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; outline: none; color: var(--tinta); }
+  .barra-buscar .cuantas { white-space: nowrap; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  mark { background: var(--pino-suave); color: var(--pino-texto); border-radius: 4px; padding: 0 2px; }
+
+  /* Los cuatro cajones (v4), uno por medio de pago; sin arrastrar: se elige con el mouse o el teclado. */
+  .cajones { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+  .cajon { display: flex; flex-direction: column; min-height: 0; border-radius: var(--r-tarjeta); background: var(--hundido); padding: 10px; gap: 8px; overflow: auto; }
+  .ccab { display: flex; align-items: center; gap: 10px; padding: 2px 4px 6px; }
+  .ccab .n { font-weight: 800; font-size: 16px; line-height: 20px; }
+  .ccab .s { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; }
+  .ccab .va { margin-left: auto; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+  .vt { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 2px 12px; padding: 10px 12px; border-radius: var(--r); background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); text-align: left; cursor: pointer; }
+  .vt .q { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vt .v { font-weight: 800; font-size: 16px; text-align: right; }
+  .vt .d { grid-column: 1 / -1; font-size: 14px; color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+  .vt .pastilla { height: 22px; padding: 0 8px; }
+  .vt.anulada { background: transparent; box-shadow: none; border-style: dashed; border-color: var(--borde-fuerte); }
+  .vt.anulada .q, .vt.anulada .v { text-decoration: line-through; color: var(--texto-3); }
+  .vt.foco { border: 2px solid var(--pino); padding: 9px 11px; box-shadow: 0 0 0 3px rgba(18,56,47,.10), var(--sombra-2); }
+  .vacio-cajon { font-size: 14px; color: var(--texto-3); text-align: center; padding: 14px 4px; }
+  .teclas { display: flex; gap: 16px; font-size: 14px; color: var(--texto-2); font-weight: 600; white-space: nowrap; }
+  .teclas span { display: inline-flex; gap: 6px; align-items: center; }
+
+  .v-venta .renglon-v { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 8px 0; border-bottom: 1px solid var(--borde); }
+  .v-venta .renglon-v small { grid-column: 1; font-size: 14px; color: var(--texto-2); }
+  .v-venta .total-v { display: flex; justify-content: space-between; align-items: baseline; padding-top: 12px; font-weight: 700; color: var(--texto-2); }
+  .v-venta .total-v b { font-size: 26px; color: var(--tinta); }
+  .v-campo-sel { width: 100%; height: 48px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: #fff; font: inherit; font-size: 16px; padding: 0 12px; }
+  .v-coment { width: 100%; min-height: 72px; margin-top: 10px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); padding: 10px 12px; font: inherit; font-size: 15px; resize: vertical; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <nav class="lateral">
+    <div class="marca">
+      <img class="logo-largo" src="../../../../logotipo-ferrebress.png" alt="Ferrebress">
+      <img class="logo-corto" src="isotipo.svg" alt="Ferrebress">
+      <button class="plegar" data-plegar title="Achicar el menú (Ctrl+B)" aria-label="Achicar el menú"><i class="i" data-i="panel-left-close"></i></button>
+    </div>
+    <a class="nav-item" data-ir="productos" title="Catálogo · Alt+1"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span><span class="atajo">1</span></a>
+    <a class="nav-item activo" data-ir="vender" title="Vender · Alt+4"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="atajo">4</span></a>
+    <a class="nav-item" data-ir="stock" title="Depósito · Alt+7"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="atajo">7</span></a>
+    <a class="nav-item" data-ir="resumen" title="Negocio"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" title="Más"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div>Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro estado-red" style="justify-self:start"><span class="punto"></span><span class="txt">En línea · todo enviado</span></div>
+      <div class="usuario"><span class="avatar">CI</span><div><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+
+  <main class="contenido">
+    <header class="cabecera"><div class="t-titulo">Vender</div>
+      <div class="acciones"><button class="btn chico" data-buscar><i class="i i-s" data-i="search"></i>Buscar una venta <span class="kbd">Ctrl K</span></button>
+        <button class="btn chico" data-otro-dia><i class="i i-s" data-i="calendar-days"></i>Otro día <span class="kbd">F</span></button></div></header>
+    <nav class="pestanas"><a data-ir="vender">Vender <span class="kbd">Alt 4</span></a><a class="activa" data-ir="ventas-de-hoy">Ventas de hoy <span class="pastilla mini">23</span> <span class="kbd">Alt 5</span></a></nav>
+
+    <section class="pantalla">
+      <section class="franja" data-franja>
+        <div>
+          <div class="dia"><span class="t-etiqueta" data-dia>Hoy, lunes 19/10 · hasta las 17:40</span></div>
+          <div class="t-total num" data-total></div>
+          <div class="comp"><span class="sube"><i class="i" data-i="arrow-up-right"></i>13 %</span>vs. ayer a esta hora ($364.000)</div>
+          <div class="numeros" data-numeros></div>
+        </div>
+        <div class="pila" id="pila"></div>
+      </section>
+      <div class="barra-buscar" data-barra hidden>
+        <label class="campo foco"><i class="i" data-i="search"></i><input data-texto placeholder="Producto, importe o cliente" aria-label="Buscar una venta"></label>
+        <span class="cuantas" data-cuantas></span>
+        <button class="btn btn-fantasma" data-listo>Listo <span class="kbd">Esc</span></button>
+      </div>
+      <div class="teclas"><span><span class="kbd">←</span><span class="kbd">→</span> cajón</span><span><span class="kbd">↑</span><span class="kbd">↓</span> venta</span><span><span class="kbd">Enter</span> la abre</span><span><span class="kbd">A</span> anula la elegida</span><span><span class="kbd">Ctrl K</span> buscar</span><span><span class="kbd">F</span> otro día</span></div>
+      <section class="cajones" data-cajones></section>
+    </section>
+  </main>
+</div>
+<script src="../../../vender/interacciones.js"></script>
+<script>
+// La elegida (Carlos, 2026-10-19): la v4 («Los cuatro cajones») dentro del menú de «Mostrador». Sin
+// arrastrar (cambiar el medio de una venta no es una regla) y sin Corregir ni Cambio (no existen
+// todavía). Una venta se abre con un clic o con Enter y se anula desde ahí (A), con el motivo en una
+// lista y un comentario (decisión 110). Todo con el teclado (decisión 121).
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var MEDIOS = [['efectivo', 'Efectivo', 'banknote'], ['mp', 'Mercado Pago', 'qr-code'], ['tarjeta', 'Tarjeta', 'credit-card'], ['cuenta', 'Cuenta corriente', 'notebook-pen']];
+  var P = function (c, n, p) { return { c: c, n: n, p: p }; };
+  var VENTAS = [
+    { id: 1, h: '17:36', m: 'mp', it: [P(1, 'Juego de llaves combinadas × 12', 78000)] },
+    { id: 2, h: '17:22', m: 'efectivo', it: [P(1, 'Cinta métrica PowerLock 5 m', 17000), P(1, 'Puntas Phillips PH2 × 10', 4000)] },
+    { id: 3, h: '16:48', m: 'cuenta', cli: 'Constructora Martínez', it: [P(2, 'Látex interior 4 L', 19000)] },
+    { id: 4, h: '16:30', m: 'tarjeta', anulada: true, motivo: 'se cobró dos veces', it: [P(1, 'Martillo carpintero 27 mm', 24000)] },
+    { id: 5, h: '16:15', m: 'mp', it: [P(4, 'Lámpara LED 9 W luz fría', 5000)] },
+    { id: 6, h: '12:51', m: 'efectivo', it: [P(2, 'Tornillos autoperforantes × 100', 5000), P(1, 'Tarugos nylon S8 × 100', 5000)] },
+    { id: 7, h: '12:30', m: 'mp', it: [P(3, 'Mecha acero rápido HSS 8 mm', 7000)] },
+    { id: 8, h: '12:10', m: 'efectivo', it: [P(1, 'Tornillos autoperforantes × 100', 10000)] },
+    { id: 9, h: '11:52', m: 'efectivo', it: [P(1, 'Clavos punta París 2" kg', 8000), P(2, 'Lija al agua 220', 2000), P(1, 'Cinta aisladora', 3000)] },
+    { id: 10, h: '11:20', m: 'cuenta', cli: 'Plomería Don Tito', it: [P(1, 'Llave de paso 1/2"', 12000)] },
+    { id: 11, h: '10:25', m: 'tarjeta', it: [P(1, 'Pinza universal 8" aislada', 14000)] },
+    { id: 12, h: '09:15', m: 'cuenta', cli: 'Electricidad Ojeda', it: [P(3, 'Cinta aisladora negra 20 m', 1700)] },
+  ];
+  VENTAS.forEach(function (v) { v.total = V.redondeo(v.it.reduce(function (s, x) { return s + x.c * x.p; }, 0)); });
+  var col = 0, fila = 0, texto = '', dia = 'Hoy, lunes 19/10 · hasta las 17:40';
+  var app = $('#app');
+  var plano = function (t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); };
+  function coincide(v) {
+    if (!texto.trim()) return true; var b = plano(texto.trim()), cif = b.replace(/[$.\s]/g, '');
+    return v.it.some(function (x) { return plano(x.n).indexOf(b) >= 0; }) || plano(v.cli || '').indexOf(b) >= 0 || (/^\d+$/.test(cif) && String(v.total).indexOf(cif) >= 0);
+  }
+  function resaltar(t) { var b = plano(texto.trim()), i = b ? plano(t).indexOf(b) : -1; return i < 0 ? V.html(t) : V.html(t.slice(0, i)) + '<mark>' + V.html(t.slice(i, i + b.length)) + '</mark>' + V.html(t.slice(i + b.length)); }
+  function deCajon(k) { return VENTAS.filter(function (v) { return v.m === k && coincide(v); }); }
+  function titulo(v) { var b = texto.trim() && v.it.filter(function (x) { return plano(x.n).indexOf(plano(texto.trim())) >= 0; })[0]; var u = b || (v.it.length === 1 ? v.it[0] : null);
+    return v.cli && !b ? resaltar(v.cli) : u ? u.c + ' × ' + resaltar(u.n) + (v.it.length > 1 ? ' y ' + (v.it.length - 1) + ' más' : '') : v.it.length + ' productos'; }
+  function detalle(v) { return v.h + ' · ' + (v.anulada ? '<span class="pastilla error">anulada</span>' : v.cli && texto.trim() ? resaltar(v.cli) : v.it.map(function (x) { return x.n.split(' ')[0]; }).join(', ')); }
+  function render() {
+    var conf = VENTAS.filter(function (v) { return !v.anulada; }), tot = conf.reduce(function (s, v) { return s + v.total; }, 0), prods = conf.reduce(function (s, v) { return s + v.it.length; }, 0);
+    $('[data-total]').innerHTML = V.pesosG(tot);
+    $('[data-numeros]').innerHTML = '<span><b>' + conf.length + '</b>ventas</span><span><b>' + prods + '</b>productos</span><span><b>' + V.pesos(Math.round(tot / Math.max(1, conf.length) / 100) * 100) + '</b>ticket promedio</span>';
+    $('[data-cajones]').innerHTML = MEDIOS.map(function (m, i) {
+      var vs = deCajon(m[0]), c = vs.filter(function (v) { return !v.anulada; }), s = c.reduce(function (a, v) { return a + v.total; }, 0);
+      return '<div class="cajon medio ' + m[0] + '"><div class="ccab"><span class="mico lleno"><i class="i" data-i="' + m[2] + '"></i></span><div><div class="n">' + m[1] + '</div><div class="s">' + c.length + (c.length === 1 ? ' venta' : ' ventas') + (m[0] === 'cuenta' ? ' · a cobrar' : '') + '</div></div><span class="va num">' + V.pesosG(s) + '</span></div>' +
+        (vs.length ? vs.map(function (v, j) { return '<button class="vt' + (v.anulada ? ' anulada' : '') + (i === col && j === fila ? ' foco' : '') + '" data-id="' + v.id + '"><span class="q">' + titulo(v) + '</span><span class="v num">' + V.pesos(v.total) + '</span><span class="d">' + detalle(v) + '</span></button>'; }).join('') : '<div class="vacio-cajon">' + (texto.trim() ? 'Nada con «' + V.html(texto.trim()) + '»' : 'Sin ventas') + '</div>') + '</div>';
+    }).join('');
+    V.pintar($('[data-cajones]'));
+    var hall = VENTAS.filter(coincide), sum = hall.filter(function (v) { return !v.anulada; }).reduce(function (s, v) { return s + v.total; }, 0);
+    $('[data-cuantas]').textContent = texto.trim() ? hall.length + ' de ' + VENTAS.length + ' ventas · suman ' + V.pesos(sum) : 'Escribí un producto, un importe o un cliente';
+  }
+  // Lo vendido por hora, apilado por medio de pago.
+  var pila = $('#pila'), horas = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+  pila.innerHTML = horas.map(function (h) {
+    var vs = VENTAS.filter(function (v) { return +v.h.slice(0, 2) === h && !v.anulada; });
+    var b = vs.map(function (v) { return '<b class="medio ' + v.m + '" style="height:' + Math.max(6, v.total / 1200) + 'px"></b>'; }).join('');
+    return '<div class="h' + (h === 17 ? ' ahora' : '') + '"><div class="c' + (vs.length ? '' : ' vacia') + '">' + (b || '<b></b>') + '</div><span>' + h + '</span></div>';
+  }).join('');
+
+  function elegida() { var vs = deCajon(MEDIOS[col][0]); return vs[Math.min(fila, vs.length - 1)] || null; }
+  function abrir(v) {
+    var m = MEDIOS.filter(function (x) { return x[0] === v.m; })[0];
+    var html = '<div class="v-cab"><div><div class="t-seccion">Venta de las ' + v.h + '</div><div class="t-detalle">' + m[1] + (v.cli ? ' · ' + v.cli : '') + (dia.indexOf('Hoy') ? ' · otro día' : '') + '</div></div><button class="btn btn-fantasma btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div>' +
+      v.it.map(function (x) { return '<div class="renglon-v"><b>' + x.c + ' × ' + V.html(x.n) + '</b><b class="num">' + V.pesos(x.c * x.p) + '</b><small>' + V.pesos(x.p) + ' c/u</small></div>'; }).join('') +
+      '<div class="total-v"><span>Total</span><b class="num"' + (v.anulada ? ' style="text-decoration:line-through"' : '') + '>' + V.pesos(v.total) + '</b></div>' +
+      (v.anulada ? '<div class="aviso error" style="margin-top:14px"><i class="i i-s" data-i="ban"></i><div>Anulada' + (v.motivo ? ' · ' + V.html(v.motivo) : '') + '. El stock volvió; la venta queda a la vista.</div></div><div class="v-pie"><button class="btn btn-oscuro" data-cerrar>Cerrar <span class="kbd">Esc</span></button></div>'
+        : '<div class="v-pie"><button class="btn btn-fantasma" data-cerrar>Cerrar <span class="kbd">Esc</span></button><button class="btn btn-peligro" data-anular><i class="i i-s" data-i="ban"></i>Anular <span class="kbd">A</span></button></div>');
+    var capa = V.abrir({ tipo: 'dialogo', clase: 'v-venta', html: html, alAbrir: function (caja, c) {
+      var b = caja.querySelector('[data-anular]'); if (b) b.addEventListener('click', function () { c.cerrar('ok'); confirmar(v); });
+      caja.addEventListener('keydown', function (e) { if ((e.key === 'a' || e.key === 'A') && b) { e.preventDefault(); c.cerrar('ok'); confirmar(v); } });
+      (b || caja.querySelector('[data-cerrar]')).focus();
+    } });
+    return capa;
+  }
+  function confirmar(v) {
+    var html = '<div class="v-cab"><div><div class="t-seccion">¿Anular esta venta?</div><div class="t-detalle">' + v.h + ' · ' + V.pesos(v.total) + '. Queda registrada como anulada, los productos vuelven al stock y no se puede deshacer.</div></div></div>' +
+      '<div class="v-et">Motivo</div><select class="v-campo-sel" data-motivo>' + ['Sin motivo', 'Se arrepintió', 'Error al cobrar', 'Producto equivocado', 'Devolución', 'Cobrada dos veces'].map(function (x) { return '<option>' + x + '</option>'; }).join('') + '</select>' +
+      '<textarea class="v-coment" placeholder="Agregá un comentario (opcional)" data-coment></textarea>' +
+      '<div class="v-pie"><button class="btn btn-fantasma" data-cerrar>Cancelar <span class="kbd">Esc</span></button><button class="btn btn-peligro" data-si><i class="i i-s" data-i="ban"></i>Anular · −' + V.pesos(v.total) + ' <span class="kbd">Ctrl Enter</span></button></div>';
+    V.abrir({ tipo: 'dialogo', html: html, alAbrir: function (caja, c) {
+      var si = function () { var mo = caja.querySelector('[data-motivo]').value, co = caja.querySelector('[data-coment]').value.trim(); v.anulada = true; v.motivo = [mo === 'Sin motivo' ? '' : mo, co].filter(Boolean).join(': '); c.cerrar('ok'); render(); V.tostada('Venta de las ' + v.h + ' anulada · −' + V.pesos(v.total), { icono: 'ban' }); };
+      caja.querySelector('[data-si]').addEventListener('click', si);
+      caja.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); si(); } });
+      caja.querySelector('[data-motivo]').focus();
+    } });
+  }
+  function buscar(si) {
+    $('[data-barra]').hidden = !si; $('[data-franja]').hidden = si;
+    if (si) $('[data-texto]').focus(); else { texto = ''; $('[data-texto]').value = ''; }
+    fila = 0; render();
+  }
+  function otroDia() {
+    var html = '<div class="v-cab"><div><div class="t-seccion">Otro día</div><div class="t-detalle">Las de otro día se anulan con «Anular ventas de cualquier día».</div></div></div><input type="date" class="v-campo-sel" data-fecha value="2026-10-19" max="2026-10-19"><div class="v-pie"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-oscuro" data-ver>Ver ese día <span class="kbd">Enter</span></button></div>';
+    V.abrir({ tipo: 'dialogo', html: html, alAbrir: function (caja, c) {
+      var ver = function () { var f = caja.querySelector('[data-fecha]').value.split('-'); dia = f[2] + '/' + f[1] === '19/10' ? 'Hoy, lunes 19/10 · hasta las 17:40' : 'Día ' + f[2] + '/' + f[1] + ' · completo'; $('[data-dia]').textContent = dia; c.cerrar('ok'); V.tostada(dia, { icono: 'calendar' }); };
+      caja.querySelector('[data-ver]').addEventListener('click', ver);
+      caja.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); ver(); } });
+      caja.querySelector('[data-fecha]').focus();
+    } });
+  }
+
+  $('[data-cajones]').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-id]'); if (!b) return;
+    var v = VENTAS.filter(function (x) { return x.id === +b.getAttribute('data-id'); })[0];
+    col = MEDIOS.map(function (m) { return m[0]; }).indexOf(v.m); fila = deCajon(v.m).indexOf(v); render(); abrir(v);
+  });
+  $('[data-texto]').addEventListener('input', function (e) { texto = e.target.value; fila = 0; render(); });
+  $('[data-texto]').addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); if (texto) { texto = ''; e.target.value = ''; render(); } else buscar(false); } if (e.key === 'ArrowDown') { e.preventDefault(); e.target.blur(); } });
+  $('[data-listo]').addEventListener('click', function () { buscar(false); });
+  $('[data-buscar]').addEventListener('click', function () { buscar(true); });
+  $('[data-otro-dia]').addEventListener('click', otroDia);
+  function plegar() { app.classList.toggle('plegado'); try { localStorage.setItem('ferre.menu', app.classList.contains('plegado') ? 'plegado' : 'abierto'); } catch (e) { /* nada */ } }
+  try { if (localStorage.getItem('ferre.menu') === 'plegado') app.classList.add('plegado'); } catch (e) { /* nada */ }
+  $('[data-plegar]').addEventListener('click', plegar);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Alt') document.body.classList.add('con-alt'); });
+  document.addEventListener('keyup', function (e) { if (e.key === 'Alt') document.body.classList.remove('con-alt'); });
+  document.addEventListener('keydown', function (e) {
+    if (V.abierta()) return;
+    if (e.ctrlKey && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); buscar(true); return; }
+    if (e.ctrlKey && (e.key === 'b' || e.key === 'B')) { e.preventDefault(); plegar(); return; }
+    if (e.altKey && /^[1-9]$/.test(e.key)) { e.preventDefault(); var d = { 1: 'productos', 4: 'vender', 5: 'ventas-de-hoy', 7: 'stock' }[e.key]; if (d && window.irAMaqueta) irAMaqueta(d); return; }
+    if (V.escribiendo(e)) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); col = (col + (e.key === 'ArrowRight' ? 1 : 3)) % 4; fila = Math.min(fila, Math.max(0, deCajon(MEDIOS[col][0]).length - 1)); render(); return; }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); var n = deCajon(MEDIOS[col][0]).length; fila = Math.max(0, Math.min(n - 1, fila + (e.key === 'ArrowDown' ? 1 : -1))); render(); var f = $('.vt.foco'); if (f) f.scrollIntoView({ block: 'nearest' }); return; }
+    if (e.key === 'Enter') { var v = elegida(); if (v) { e.preventDefault(); abrir(v); } return; }
+    if (e.key === 'a' || e.key === 'A') { var w = elegida(); if (w && !w.anulada) { e.preventDefault(); confirmar(w); } return; }
+    if (e.key === 'f' || e.key === 'F') { e.preventDefault(); otroDia(); return; }
+    if (e.key === '/') { e.preventDefault(); buscar(true); }
+  });
+  render();
+})();
+</script>
+</body>
+</html>

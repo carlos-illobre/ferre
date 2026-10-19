@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · La elegida (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script>
+// Íconos de Lucide que no están en _comun (para achicar el menú y ocultar el panel).
+window.ICONOS["panel-left-close"] = '<rect width="18" height="18" x="3" y="3" rx="2" /> <path d="M9 3v18" /> <path d="m16 15-3-3 3-3" />';
+window.ICONOS["panel-right-close"] = '<rect width="18" height="18" x="3" y="3" rx="2" /> <path d="M15 3v18" /> <path d="m8 9 3 3-3 3" />';
+window.ICONOS["panel-right-open"] = '<rect width="18" height="18" x="3" y="3" rx="2" /> <path d="M15 3v18" /> <path d="m10 15-3-3 3-3" />';
+</script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  /* El menú de «Mostrador» con el logotipo de la v1; se achica a solo íconos (como la v3) con su botón o Ctrl+B. */
+  .marca { justify-content: space-between; padding: 2px 4px 14px 8px; }
+  .marca .logo-largo { height: 30px; width: auto; display: block; }
+  .marca .logo-corto { width: 36px; height: 36px; display: none; }
+  .plegar { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--texto-3); flex: none; }
+  .plegar:hover { background: var(--hundido); color: var(--tinta); }
+  .app { transition: grid-template-columns 220ms cubic-bezier(.2,.9,.3,1); }
+  .app.plegado .marca { flex-direction: column; gap: 10px; padding: 2px 0 12px; }
+  .app.plegado .marca .logo-largo { display: none; }
+  .app.plegado .marca .logo-corto { display: block; }
+  .app.plegado .plegar .i { transform: scaleX(-1); }
+  .nav-item .atajo, .nav-item .txt + .atajo { display: none; }
+  .con-alt .nav-item .atajo { display: inline-flex; margin-left: auto; height: 22px; min-width: 22px; padding: 0 5px; border-radius: 6px; background: var(--tinta); color: #fff; font-size: 14px; font-weight: 800; align-items: center; justify-content: center; }
+  .app.plegado .con-alt .nav-item .atajo, .con-alt .app.plegado .nav-item .atajo { position: absolute; right: -6px; top: -4px; margin: 0; }
+  .app.plegado .pie .vinculo { padding: 10px; justify-content: center; }
+  .app.plegado .pie .vinculo div, .app.plegado .pie .estado-red span.txt, .app.plegado .usuario div { display: none; }
+  .app.plegado .pie .estado-red { justify-self: center; padding: 0 10px; }
+
+  .vender { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 24px; height: 100%; min-height: 0; }
+  .vender.sin-panel { grid-template-columns: minmax(0,1fr); }
+  .vender.sin-panel .panel { display: none; }
+  .pantalla { display: flex; flex-direction: column; padding-bottom: 0; }
+  .izq { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .busqueda { display: flex; gap: 12px; }
+  .busqueda .campo { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; height: 56px; font-size: 17px; }
+  .busqueda .campo .ayuda { margin-left: auto; display: flex; gap: 6px; align-items: center; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  /* «El celular está escaneando», de la v4: en lugar del botón, mientras el celular lee. */
+  .camara { position: relative; height: 56px; border-radius: 14px; overflow: hidden; background: #0E1512; color: #fff; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 10px; box-shadow: var(--sombra-2); white-space: nowrap; }
+  .camara .vivo { width: 40px; height: 40px; border-radius: 10px; background: radial-gradient(circle at 40% 40%, #3b4a44, #121a17); position: relative; overflow: hidden; flex: none; }
+  .camara .vivo::after { content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 2px; background: #FF6A33; box-shadow: 0 0 8px #FF6A33; animation: v-late 1.1s ease-in-out infinite; }
+  .camara .t { font-size: 14px; line-height: 18px; font-weight: 700; }
+  .camara .t small { display: block; font-weight: 500; color: rgba(255,255,255,.7); font-size: 14px; }
+  .camara .rec { width: 10px; height: 10px; border-radius: 99px; background: #FF6A33; box-shadow: 0 0 0 4px rgba(255,106,51,.25); animation: grabando 1.2s ease-in-out infinite; }
+  .camara .parar { margin-left: 4px; height: 36px; padding: 0 10px; border-radius: 10px; background: rgba(255,255,255,.12); color: #fff; font-weight: 700; font-size: 14px; }
+  @keyframes grabando { 50% { opacity: .35; } }
+  .teclas { display: flex; gap: 16px; margin: 10px 2px 0; font-size: 14px; color: var(--texto-2); font-weight: 600; white-space: nowrap; }
+  .teclas span { display: inline-flex; gap: 6px; align-items: center; }
+  .lista-cab { display: flex; align-items: center; gap: 8px; margin: 16px 0 10px; }
+  .lista-cab .t-seccion { font-size: 18px; }
+  .lista-cab .der { margin-left: auto; display: flex; gap: 4px; }
+  .lista { flex: 1; min-height: 0; overflow: hidden; position: relative; padding: 2px 4px 0 2px; margin: -2px -4px 0 -2px; }
+  .lista::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32px; background: linear-gradient(transparent, var(--fondo)); pointer-events: none; }
+
+  .item { display: grid; grid-template-columns: 56px 1fr auto 112px 28px; grid-template-rows: auto auto; column-gap: 16px; row-gap: 10px; align-items: center; padding: 12px 12px 12px 14px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); position: relative; }
+  .item + .item { margin-top: 8px; }
+  .item .foto { grid-row: 1 / span 2; align-self: start; }
+  .item .nombre { font-weight: 750; font-size: 16px; line-height: 22px; }
+  .item .det { font-size: 14px; color: var(--texto-2); line-height: 20px; display: flex; gap: 8px; align-items: center; }
+  .item .sub { text-align: right; font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+  .item .sub small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-3); letter-spacing: 0; }
+  .item .menu { color: var(--texto-3); }
+  .precio-fila { grid-column: 2 / 6; display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .precio-fila .valor { color: var(--tinta); font-weight: 800; font-size: 15px; }
+  .precio-fila .sep { width: 1px; height: 20px; background: var(--borde); }
+  .segmentos.margen > * { min-height: 30px; padding: 0 10px; }
+  .item.foco { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10), var(--sombra-2); }
+  .item.sinprecio { border-color: #F3C766; background: linear-gradient(90deg, var(--urgente-suave), #fff 40%); }
+  .item.sinprecio .segmentos.margen { background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); }
+  .item .marca-celu { position: absolute; top: -9px; left: 68px; }
+  .aviso-stock { color: var(--urgente-texto); font-weight: 700; }
+  .pastilla.mini { height: 24px; font-size: 14px; padding: 0 8px; }
+  .ultimos { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-top: 12px; }
+  .ultimo { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 10px; border-radius: 14px; background: #fff; border: 1px solid var(--borde); text-align: left; }
+  .ultimo .n { font-weight: 700; font-size: 14px; line-height: 18px; }
+  .ultimo .p { font-weight: 800; font-size: 15px; }
+
+  /* El panel de la derecha: «De dónde sale» (v3) o la boleta (v4), en pestañas; se oculta y se muestra. */
+  .panel { display: flex; flex-direction: column; min-height: 0; padding: 0; overflow: hidden; }
+  .panel-cab { display: flex; align-items: center; gap: 4px; padding: 10px 10px 0; border-bottom: 1px solid var(--borde); }
+  .panel-cab .pest { border: 0; background: none; border-radius: 0; height: 40px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; font-weight: 650; font-size: 14px; color: var(--texto-2); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  .panel-cab .pest.activa { color: var(--pino); border-bottom-color: var(--pino); font-weight: 800; }
+  .panel-cab .ocultar { border: 0; background: none; margin-left: auto; width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; color: var(--texto-3); }
+  .panel-cab .ocultar:hover { background: var(--hundido); color: var(--tinta); }
+  .panel-cuerpo { flex: 1; min-height: 0; overflow: auto; padding: 14px 18px 18px; }
+  .paso { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 8px 0; border-bottom: 1px dashed var(--borde-fuerte); font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .paso b { color: var(--tinta); font-weight: 800; font-size: 15px; }
+  .paso.final { border-bottom: 0; padding-top: 12px; }
+  .paso.final b { font-size: 22px; }
+  .boleta .cab { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 2px dashed var(--borde-fuerte); }
+  .linea { display: grid; grid-template-columns: 48px minmax(0,1fr) auto; gap: 8px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--borde); font-size: 15px; }
+  .linea .q { font-weight: 800; color: var(--texto-2); }
+  .linea .nm { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .linea .nm small { display: block; font-size: 14px; color: var(--texto-3); font-weight: 500; }
+  .linea .im { font-weight: 800; }
+  .linea.falta .nm small, .linea.falta .im { color: var(--urgente-texto); }
+  .boleta .tot { padding-top: 12px; margin-top: 4px; border-top: 2px dashed var(--borde-fuerte); display: flex; align-items: flex-end; justify-content: space-between; }
+  .mostrar-panel { display: none; }
+  .vender.sin-panel .mostrar-panel { display: inline-flex; }
+
+  /* El cobro, en la barra de abajo (como la v3). */
+  .pie-cobro { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; margin: 14px -32px 0; padding: 12px 32px; background: #fff; border-top: 1px solid var(--borde); box-shadow: 0 -10px 30px -18px rgba(26,29,27,.25); }
+  .pie-cobro .tot .et { font-size: 14px; font-weight: 700; color: var(--texto-2); white-space: nowrap; }
+  .pie-cobro .tot .t-numero { font-size: 34px; line-height: 38px; }
+  .medios-seg { display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; }
+  .ms { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; height: 46px; padding: 0 9px; border-radius: 12px; border: 1px solid var(--borde-fuerte); background: #fff; font-weight: 700; font-size: 14px; }
+  .ms .ic { width: 26px; height: 26px; border-radius: 99px; background: var(--cs); color: var(--c); display: grid; place-items: center; flex: none; }
+  .ms.elegido { border: 2px solid var(--c); background: var(--cs); padding: 0 8px; }
+  .ms.elegido .ic { background: var(--c); color: #fff; }
+  .cliente { height: 46px; font-size: 14px; width: 150px; flex: none; white-space: nowrap; overflow: hidden; }
+  .acc { display: flex; gap: 8px; align-items: center; }
+  .acc .btn-accion { height: 52px; padding: 0 16px 0 20px; font-size: 17px; }
+  .falta-precio { color: var(--urgente-texto); }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <nav class="lateral">
+    <div class="marca">
+      <img class="logo-largo" src="../../../../logotipo-ferrebress.png" alt="Ferrebress">
+      <img class="logo-corto" src="isotipo.svg" alt="Ferrebress">
+      <button class="plegar" data-plegar title="Achicar el menú (Ctrl+B)" aria-label="Achicar el menú"><i class="i" data-i="panel-left-close"></i></button>
+    </div>
+    <a class="nav-item" data-ir="productos" title="Catálogo · Alt+1"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span><span class="atajo">1</span></a>
+    <a class="nav-item activo" data-ir="vender" title="Vender · Alt+4"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span><span class="atajo">4</span></a>
+    <a class="nav-item" data-ir="stock" title="Depósito · Alt+7"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="atajo">7</span></a>
+    <a class="nav-item" data-ir="resumen" title="Negocio"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item v-toca" data-menu-mas title="Más"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente mini insignia" style="margin-left:auto">3</span></a>
+    <div class="pie">
+      <div class="vinculo" title="Celular en espejo"><i class="i" data-i="smartphone"></i><div>Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro estado-red" style="justify-self:start"><span class="punto"></span><span class="txt">En línea · todo enviado</span></div>
+      <div class="usuario v-toca" data-usuario><span class="avatar">CI</span><div><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Vender</div></div>
+      <div class="acciones"><span class="t-detalle">Lunes 19 de octubre · 10:42</span></div>
+    </header>
+    <nav class="pestanas"><a class="activa" data-ir="vender">Vender <span class="kbd">Alt 4</span></a><a data-ir="ventas-de-hoy">Ventas de hoy <span class="pastilla mini">23</span> <span class="kbd">Alt 5</span></a></nav>
+
+    <section class="pantalla">
+      <div class="vender" id="vender">
+        <div class="izq">
+          <div class="busqueda">
+            <div class="campo foco"><i class="i" data-i="search"></i><span>Buscá por nombre o código, o escaneá<span class="cursor"></span></span>
+              <span class="ayuda"><span class="kbd">Enter</span></span></div>
+            <button class="btn btn-oscuro" style="height:56px" data-escanear><i class="i" data-i="scan-barcode"></i>Escanear con el celular</button>
+          </div>
+          <div class="teclas"><span><span class="kbd">Enter</span> agrega</span><span><span class="kbd">↑</span><span class="kbd">↓</span> eligen el renglón</span><span><span class="kbd">+</span><span class="kbd">−</span> cantidad</span><span><span class="kbd">Supr</span> quita</span><span><span class="kbd">F1</span> panel</span></div>
+
+          <div class="lista-cab">
+            <span class="t-seccion">Esta venta</span><span class="pastilla" data-cuantos>5 productos</span>
+            <div class="der">
+              <button class="btn btn-fantasma chico mostrar-panel" data-mostrar><i class="i i-s" data-i="panel-right-open"></i>Mostrar el panel <span class="kbd">F1</span></button>
+              <button class="btn btn-fantasma chico" data-nollevo><i class="i i-s" data-i="ban"></i>No llevó <span class="kbd">Esc</span></button>
+              <button class="btn btn-fantasma chico" data-vaciar><i class="i i-s" data-i="trash-2"></i>Vaciar</button>
+            </div>
+          </div>
+          <div class="lista"></div>
+        </div>
+
+        <aside class="tarjeta panel" aria-label="Panel de la venta">
+          <div class="panel-cab" role="tablist">
+            <button class="pest activa" role="tab" data-pest="donde"><i class="i i-s" data-i="calculator"></i>De dónde sale</button>
+            <button class="pest" role="tab" data-pest="boleta"><i class="i i-s" data-i="receipt"></i>Boleta</button>
+            <button class="ocultar" data-ocultar title="Ocultar el panel (F1)" aria-label="Ocultar el panel"><i class="i" data-i="panel-right-close"></i></button>
+          </div>
+          <div class="panel-cuerpo" data-cuerpo></div>
+        </aside>
+      </div>
+
+      <div class="pie-cobro">
+        <div class="tot"><div class="et" data-tot-et>Total · falta 1 precio</div><div class="t-numero num" data-total><span class="peso">$</span>45.500</div></div>
+        <div class="medios-seg">
+          <button class="ms medio efectivo elegido"><span class="ic"><i class="i i-s" data-i="banknote"></i></span>Efectivo <span class="kbd">F5</span></button>
+          <button class="ms medio mp"><span class="ic"><i class="i i-s" data-i="qr-code"></i></span>M. Pago <span class="kbd">F6</span></button>
+          <button class="ms medio tarjeta"><span class="ic"><i class="i i-s" data-i="credit-card"></i></span>Tarjeta <span class="kbd">F7</span></button>
+          <button class="ms medio cuenta"><span class="ic"><i class="i i-s" data-i="notebook-pen"></i></span>Cta. cte. <span class="kbd">F8</span></button>
+          <div class="campo cliente v-toca" data-cliente><i class="i i-s" data-i="user-round"></i>Cliente <span class="kbd" style="margin-left:auto">F9</span></div>
+        </div>
+        <div class="acc">
+          <button class="btn btn-accion" data-cobrar>Cobrar <span class="kbd">F2</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+// La elegida (Carlos, 2026-10-19): la v2 («Mostrador») con el logotipo de la v1 y el menú que se
+// achica a íconos (como la v3); a la derecha, en pestañas, «De dónde sale» (v3) o la boleta (v4), que
+// se oculta y se muestra (F1); el cobro en la barra de abajo (v3); y «El celular está escaneando» (v4).
+// Todo con el teclado (decisión 121): Enter agrega, ↑ ↓ eligen el renglón, + − la cantidad, Supr quita,
+// F5–F8 el medio, F9 el cliente, F2 cobra, Esc «No llevó», F1 el panel, Ctrl+B el menú y Alt los atajos.
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var app = $('#app'), vender = $('#vender'), lista = $('.lista'), btnCobrar = $('[data-cobrar]'), cuerpo = $('[data-cuerpo]');
+  var items = [V.item('mecha', 3), V.item('cinta', 1, { celu: true }), V.item('tarugos', 1), V.item('clavos', .7), V.libre('Bolsa de arena × 25 kg', 1500)];
+  var focoK = items[0].k, medio = 'efectivo', cliente = null, pest = 'donde', escaneando = false, timer = null, escaneos = ['lampara', 'tornillos', 'martillo', 'mecha', 'pinza'], nEsc = 0;
+  V.sinBarras(lista);
+  try { if (localStorage.getItem('ferre.menu') === 'plegado') app.classList.add('plegado'); if (localStorage.getItem('ferre.panel') === 'oculto') vender.classList.add('sin-panel'); } catch (e) { /* sin almacenamiento */ }
+
+  function fila(it) {
+    var p = V.precio(it), s = V.subtotal(it), kg = it.unidad === 'kg', el = kg ? ' el kg' : '';
+    var h = '<article class="item' + (it.k === focoK ? ' foco' : '') + (p == null ? ' sinprecio' : '') + '" data-k="' + it.k + '">';
+    if (it.celu) h += '<span class="pastilla pino mini marca-celu"><i class="i i-s" data-i="smartphone"></i>Llegó del celular</span>';
+    h += it.libre ? '<div class="foto-icono"><i class="i i-l" data-i="package-plus"></i></div>' : '<div class="foto"><img src="../../../_comun/fotos/' + it.foto + '.webp" alt=""></div>';
+    var noAlcanza = !it.libre && it.stock != null && it.cant > it.stock;
+    var det = it.libre ? 'Ítem libre · no está en el catálogo' : it.marca + ' · ' + it.prov + ' · ' + (noAlcanza ? '<span class="aviso-stock">Hay ' + V.stockTexto(it) + ': no alcanza</span>' : '<span class="pastilla ' + V.stockClase(it) + ' mini">' + V.stockTexto(it) + '</span>');
+    h += '<div><div class="nombre">' + V.html(it.nombre) + '</div><div class="det">' + det + '</div></div>';
+    h += '<div class="cantidad"><button data-menos aria-label="Uno menos"><i class="i i-s" data-i="minus"></i></button><span class="n" data-rueda>' + V.num(it.cant) + (kg ? '<span class="u">kg</span>' : '') + '</span><button data-mas aria-label="Uno más"><i class="i i-s" data-i="plus"></i></button></div>';
+    if (s == null) h += '<div class="sub" style="color:var(--urgente-texto);font-size:16px">Sin precio<small>' + (it.libre ? 'poné el precio' : 'elegí el margen') + '</small></div>';
+    else h += '<div class="sub num" data-rueda><span class="peso">$</span>' + V.miles(s) + '<small>' + (it.mano != null && it.cant === 1 ? 'precio a mano' : V.num(it.cant) + ' × ' + V.pesos(p) + (V.subio(it) ? ' ↑' : '')) + '</small></div>';
+    h += '<i class="i menu" data-i="ellipsis"></i>';
+    var seg = '<span class="segmentos margen">' + V.MARGENES.map(function (m) { return '<button' + (it.mano == null && it.margen === m ? ' class="elegido"' : '') + ' data-m="' + m + '">' + m + '</button>'; }).join('') + '</span>';
+    var mano = '<button class="btn chico" style="min-height:32px" data-mano><i class="i i-s" data-i="pencil"></i>' + (it.mano != null ? 'A mano ' + V.pesos(it.mano) : 'Precio a mano') + '</button>';
+    if (!it.libre) {
+      if (p == null) h += '<div class="precio-fila">Costo <span class="valor">' + V.pesos(it.costo) + el + '</span><span class="sep"></span><span style="color:var(--urgente-texto);font-weight:750">Margen</span> ' + seg + ' <span class="sep"></span>' + mano + '</div>';
+      else h += '<div class="precio-fila">Costo <span class="valor">' + V.pesos(it.costo) + el + '</span><span class="sep"></span>Margen ' + seg + '%<span class="sep"></span>' + (it.mano != null ? mano : 'Precio <span class="valor" data-rueda>' + V.pesos(p) + el + '</span>') + '</div>';
+    } else if (p == null) h += '<div class="precio-fila">Ítem libre · sin costo<span class="sep"></span>' + mano + '</div>';
+    return h + '</article>';
+  }
+  // Vacía: lo explica y muestra lo último que se vendió (decisión 38: en la computadora sigue).
+  function vacia() {
+    var ult = ['clavos', 'lampara', 'pinza', 'martillo'].map(function (id) { var p = V.producto(id); return '<button class="ultimo v-toca" data-ult="' + id + '"><div class="foto"><img src="../../../_comun/fotos/' + p.foto + '.webp" alt=""></div><div><div class="n">' + p.nombre + '</div><div class="p num">' + V.pesos(V.precioMargen(p.costo, p.margen || 100)) + '</div></div></button>'; }).join('');
+    return V.vacia('La venta está vacía', 'Buscá por nombre o código, escaneá con el lector o con el celular.') + '<div class="t-seccion" style="margin-top:18px;font-size:16px">Lo último que se vendió</div><div class="ultimos">' + ult + '</div>';
+  }
+  function panel() {
+    var it = buscarItem(focoK);
+    if (pest === 'donde') {
+      if (!it) { cuerpo.innerHTML = '<div class="t-detalle">Elegí un renglón para ver de dónde sale su precio.</div>'; return; }
+      var p = V.precio(it), h = '<div class="t-detalle" style="margin-bottom:6px">' + V.html(it.nombre) + ', el renglón elegido</div>';
+      if (it.libre) h += '<div class="paso"><span>Ítem libre, precio a mano</span><b class="num">' + (p == null ? '—' : V.pesos(p)) + '</b></div>';
+      else if (p == null) h += '<div class="paso"><span>Costo · ' + it.prov + '</span><b class="num">' + V.pesos(it.costo) + '</b></div><div class="aviso urgente" style="margin-top:10px"><i class="i" data-i="triangle-alert"></i><div>Todavía no tiene margen: elegilo para que tenga precio.</div></div>';
+      else if (it.mano != null) h += '<div class="paso"><span>Precio a mano</span><b class="num">' + V.pesos(it.mano) + '</b></div><div class="paso"><span>Costo · ' + it.prov + '</span><b class="num">' + V.pesos(it.costo) + '</b></div><div class="paso"><span>Margen real, sin IVA</span><b class="num">' + String(Math.round((it.mano / 1.21 / it.costo - 1) * 1000) / 10).replace('.', ',') + ' %</b></div>';
+      else {
+        var cm = it.costo * (1 + it.margen / 100), ci = cm * 1.21;
+        h += '<div class="paso"><span>Costo · ' + it.prov + ', lista del 14/10</span><b class="num">' + V.pesos(it.costo) + ',00</b></div><div class="paso"><span>+ margen ' + it.margen + ' %</span><b class="num">' + V.pesos(Math.round(cm)) + '</b></div><div class="paso"><span>+ IVA 21 %</span><b class="num">' + V.pesos(Math.round(ci)) + '</b></div><div class="paso"><span>Precio, para arriba a $1.000</span><b class="num">' + V.pesos(p) + '</b></div>';
+      }
+      if (p != null && it.cant !== 1) h += '<div class="paso"><span>× ' + V.num(it.cant) + (it.unidad === 'kg' ? ' kg' : '') + '</span><b class="num">' + V.pesos(Math.round(it.cant * p)) + '</b></div>';
+      if (p != null) h += '<div class="paso final"><span>Total del renglón' + (V.subio(it) ? ', para arriba a $1.000' : '') + '</span><b class="num">' + V.pesos(V.subtotal(it)) + '</b></div>';
+      cuerpo.innerHTML = h;
+    } else {
+      var ls = items.map(function (x) { var p = V.precio(x), s = V.subtotal(x), q = x.unidad === 'kg' ? V.num(x.cant) + ' kg' : V.num(x.cant) + ' ×';
+        return '<div class="linea' + (p == null ? ' falta' : '') + '"><span class="q num">' + q + '</span><span class="nm">' + V.html(x.nombre) + '<small>' + (p == null ? 'Sin precio' : V.pesos(p) + (x.unidad === 'kg' ? ' el kg' : ' c/u') + (x.libre ? ' · a mano' : x.mano != null ? ' · a mano' : ' · margen ' + x.margen + ' %')) + '</small></span><span class="im num">' + (s == null ? '—' : V.pesos(s)) + '</span></div>'; }).join('');
+      cuerpo.innerHTML = '<div class="boleta"><div class="cab"><span class="t-renglon">Boleta de mostrador</span><span class="t-detalle">10:42 · Carlos</span></div>' + (ls || '<div class="t-detalle" style="padding:20px 0;text-align:center">La boleta está vacía.</div>') +
+        '<div class="tot"><div><div class="t-etiqueta">Total</div><div class="t-detalle">' + items.length + (items.length === 1 ? ' producto' : ' productos') + '</div></div><div class="t-total num">' + V.pesosG(V.total(items)) + '</div></div></div>';
+    }
+    V.pintar(cuerpo);
+  }
+  function render(nuevos) {
+    if (!items.length) { lista.innerHTML = vacia(); V.pintar(lista); }
+    else V.redibujar(lista, items.map(fila).join(''), nuevos);
+    var n = items.length, f = V.faltan(items), tot = V.total(items);
+    $('[data-cuantos]').textContent = n + (n === 1 ? ' producto' : ' productos');
+    var ins = $('.nav-item.activo .insignia'), antes = +ins.textContent; ins.textContent = n; ins.style.display = n ? '' : 'none'; if (n > antes) V.saltar(ins);
+    var et = $('[data-tot-et]'); et.textContent = 'Total' + (f.length ? ' · falta' + (f.length > 1 ? 'n ' + f.length + ' precios' : ' 1 precio') : ''); et.classList.toggle('falta-precio', !!f.length);
+    V.poner($('[data-total]'), V.pesosG(tot));
+    btnCobrar.disabled = !n;
+    panel();
+  }
+  function buscarItem(k) { for (var i = 0; i < items.length; i++) if (items[i].k === k) return items[i]; return null; }
+  function elDe(k) { return lista.querySelector('[data-k="' + k + '"]'); }
+  function agregar(id, extra) { var antes = items.length, it = V.sumar(items, id, 1, extra, true); focoK = it.k; render([it.k]); if (items.length === antes) V.entra(elDe(it.k)); lista.scrollTop = 0; return it; }
+  function quitar(it) {
+    var i = items.indexOf(it);
+    V.sale([elDe(it.k)], function () {
+      items.splice(i, 1); if (focoK === it.k && items.length) focoK = items[Math.min(i, items.length - 1)].k; render();
+      V.tostada('Quitaste ' + it.corto, { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items.splice(i, 0, it); focoK = it.k; render([it.k]); } });
+    });
+  }
+  function vaciar(texto) {
+    if (!items.length) { V.tostada('La venta ya está vacía', { icono: 'info' }); return; }
+    var copia = items.slice();
+    V.sale(lista.children, function () { items = []; render(); V.tostada(texto, { icono: 'check', accion: 'Deshacer', alAccion: function () { items = copia; focoK = items[0].k; render(copia.map(function (x) { return x.k; })); } }); });
+  }
+  function elegirMedio(k) { medio = k; document.querySelectorAll('.medios-seg .ms').forEach(function (b) { b.classList.toggle('elegido', b.classList.contains(k)); }); if (k === 'cuenta' && !cliente) V.elegirCliente(ponerCliente); }
+  function ponerCliente(n) {
+    cliente = n; var c = $('[data-cliente]');
+    c.innerHTML = '<i class="i i-s" data-i="user-round"></i>' + (n ? '<span style="color:var(--tinta);font-weight:700;overflow:hidden;text-overflow:ellipsis">' + V.html(n) + '</span>' : 'Cliente') + '<span class="kbd" style="margin-left:auto">F9</span>';
+    V.pintar(c);
+  }
+  function cobrar() {
+    var ok = V.puedeCobrar(items, medio, cliente, function (f) { focoK = f[0].k; render(); var el = elDe(f[0].k); el.scrollIntoView({ block: 'nearest' }); V.sacudir(el); });
+    if (ok === 'cliente') { V.elegirCliente(function (n) { ponerCliente(n); }); return; }
+    if (!ok) return;
+    var total = V.total(items), n = items.length, cli = cliente, med = medio;
+    V.sale(lista.children, function () { items = []; render(); ponerCliente(null); elegirMedio('efectivo'); });
+    V.listo({ total: total, medio: med, cliente: cli, cantidad: n, alCerrar: function () { buscador.activar(null, true); } });
+  }
+  // El celular escanea: mientras lee, en lugar del botón va «El celular está escaneando» (v4).
+  function escanear(si) {
+    escaneando = si; clearInterval(timer);
+    var lugar = $('[data-escanear]') || $('.camara');
+    var nuevo = document.createElement('div');
+    nuevo.innerHTML = si ? '<div class="camara" role="status"><span class="vivo"></span><div class="t">El celular está escaneando<small>Lo que lea entra acá</small></div><span class="rec"></span><button class="parar v-toca" data-parar title="Dejar de escanear">Detener</button></div>'
+      : '<button class="btn btn-oscuro" style="height:56px" data-escanear><i class="i" data-i="scan-barcode"></i>Escanear con el celular</button>';
+    nuevo = nuevo.firstChild; lugar.replaceWith(nuevo); V.pintar(nuevo);
+    if (si) {
+      nuevo.querySelector('[data-parar]').addEventListener('click', function () { escanear(false); });
+      timer = setInterval(function () { var it = agregar(escaneos[nEsc++ % escaneos.length], { celu: true }); it.celu = true; render(); setTimeout(function () { it.celu = false; render(); }, 2500); }, 3200);
+    } else nuevo.addEventListener('click', function () { escanear(true); });
+  }
+  function plegar() { app.classList.toggle('plegado'); try { localStorage.setItem('ferre.menu', app.classList.contains('plegado') ? 'plegado' : 'abierto'); } catch (e) { /* nada */ } }
+  function verPanel(si) { vender.classList.toggle('sin-panel', !si); try { localStorage.setItem('ferre.panel', si ? 'visible' : 'oculto'); } catch (e) { /* nada */ } }
+  function elegirPest(p) { pest = p; document.querySelectorAll('.panel-cab .pest').forEach(function (b) { b.classList.toggle('activa', b.getAttribute('data-pest') === p); }); panel(); }
+
+  var buscador = V.buscador($('.busqueda .campo'), {
+    alElegir: function (id) { agregar(id); },
+    alLibre: function (t) { var it = V.libre(t.charAt(0).toUpperCase() + t.slice(1), null); items.unshift(it); focoK = it.k; render([it.k]); lista.scrollTop = 0; }
+  });
+
+  lista.addEventListener('click', function (e) {
+    var u = e.target.closest('[data-ult]'); if (u) { agregar(u.getAttribute('data-ult')); return; }
+    var art = e.target.closest('.item'); if (!art) return;
+    var it = buscarItem(art.getAttribute('data-k')); if (!it) return;
+    var m = e.target.closest('[data-m]');
+    if (m) { it.margen = +m.getAttribute('data-m'); it.mano = null; focoK = it.k; render(); return; }
+    if (e.target.closest('[data-mas]')) { it.cant = Math.round((it.cant + V.paso(it)) * 10) / 10; focoK = it.k; render(); return; }
+    if (e.target.closest('[data-menos]')) { if (it.cant - V.paso(it) > .05) { it.cant = Math.round((it.cant - V.paso(it)) * 10) / 10; focoK = it.k; render(); } else quitar(it); return; }
+    if (e.target.closest('[data-mano]')) { V.precioAMano(it, function (n) { it.mano = n; render(); }); return; }
+    var men = e.target.closest('.menu');
+    if (men) {
+      focoK = it.k; render();
+      V.menu(elDe(it.k).querySelector('.menu'), [{ icono: 'pencil', texto: 'Precio a mano', fn: function () { V.precioAMano(it, function (n) { it.mano = n; render(); }); } }, '-', { icono: 'trash-2', texto: 'Quitar de la venta', kbd: 'Supr', peligro: true, fn: function () { quitar(it); } }], { lado: 'izquierda-abajo' });
+      return;
+    }
+    if (focoK !== it.k) { focoK = it.k; render(); }
+  });
+  document.querySelectorAll('.medios-seg .ms').forEach(function (b) { b.addEventListener('click', function () { elegirMedio(V.ORDEN_MEDIOS.filter(function (k) { return b.classList.contains(k); })[0]); }); });
+  document.querySelectorAll('.panel-cab .pest').forEach(function (b) { b.addEventListener('click', function () { elegirPest(b.getAttribute('data-pest')); }); });
+  $('[data-ocultar]').addEventListener('click', function () { verPanel(false); });
+  $('[data-mostrar]').addEventListener('click', function () { verPanel(true); });
+  $('[data-plegar]').addEventListener('click', plegar);
+  $('[data-cliente]').addEventListener('click', function () { V.elegirCliente(ponerCliente); });
+  btnCobrar.addEventListener('click', cobrar);
+  $('[data-escanear]').addEventListener('click', function () { escanear(true); });
+  $('[data-vaciar]').addEventListener('click', function () { vaciar('Vaciaste la venta'); });
+  $('[data-nollevo]').addEventListener('click', function () { var n = items.length; vaciar('Anotado: no lo llevó (' + n + (n === 1 ? ' producto)' : ' productos)')); });
+  $('[data-menu-mas]').addEventListener('click', function (e) { V.mas(e.currentTarget); });
+  $('[data-usuario]').addEventListener('click', function (e) { V.menuUsuario(e.currentTarget, 'derecha'); });
+
+  render([]);
+
+  // Alt apretado muestra el número de cada parte del menú (como en la v1); Alt+número la abre.
+  document.addEventListener('keydown', function (e) { if (e.key === 'Alt') document.body.classList.add('con-alt'); });
+  document.addEventListener('keyup', function (e) { if (e.key === 'Alt') document.body.classList.remove('con-alt'); });
+  window.addEventListener('blur', function () { document.body.classList.remove('con-alt'); });
+  document.addEventListener('keydown', function (e) {
+    if (V.abierta()) return;
+    if (e.ctrlKey && (e.key === 'b' || e.key === 'B')) { e.preventDefault(); plegar(); return; }
+    if (e.altKey && /^[1-9]$/.test(e.key)) { e.preventDefault(); var dest = { 1: 'productos', 4: 'vender', 5: 'ventas-de-hoy', 7: 'stock' }[e.key]; if (dest && window.irAMaqueta) irAMaqueta(dest); return; }
+    var escr = V.escribiendo(e), it = buscarItem(focoK);
+    var f = { F2: cobrar, F5: function () { elegirMedio('efectivo'); }, F6: function () { elegirMedio('mp'); }, F7: function () { elegirMedio('tarjeta'); }, F8: function () { elegirMedio('cuenta'); }, F9: function () { V.elegirCliente(ponerCliente); }, F1: function () { verPanel(vender.classList.contains('sin-panel')); } }[e.key];
+    if (f) { e.preventDefault(); f(); return; }
+    if (escr && !(e.key === 'Escape' && !e.target.value)) return;
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && items.length) { e.preventDefault(); var i = Math.max(0, items.indexOf(it)) + (e.key === 'ArrowDown' ? 1 : -1); focoK = items[Math.max(0, Math.min(items.length - 1, i))].k; render(); elDe(focoK).scrollIntoView({ block: 'nearest' }); return; }
+    if ((e.key === '+' || e.key === '-') && it) { e.preventDefault(); var c = Math.round((it.cant + (e.key === '+' ? 1 : -1) * V.paso(it)) * 10) / 10; if (c > .05) { it.cant = c; render(); } return; }
+    if (e.key === 'Delete' && it) { quitar(it); return; }
+    if (e.key === 'Escape' && items.length) { $('[data-nollevo]').click(); return; }
+    if (e.key === 'Enter') { e.preventDefault(); buscador.activar(); return; }
+    if (V.letra(e)) { e.preventDefault(); buscador.activar(e.key); }
+  });
+})();
+</script>
+</body>
+</html>

@@ -961,3 +961,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      opera con el teclado y el mouse nunca es la única forma (RNF-05), con las teclas de cada
      pantalla (Enter, flechas, F2, F5 a F8, Esc, Alt+número y las demás) a la vista. Un gesto nuevo
      (arrastrar, deslizar) se suma; nunca reemplaza al teclado.
+122. **El menú de la computadora: el de «Mostrador», que se achica** (2026-10-19). En todas las
+     pantallas de la computadora, el menú de la izquierda es el del lenguaje «Mostrador» con el
+     logotipo de la v1 y un botón (y Ctrl+B) que lo achica a solo íconos, como la v3 del director
+     de arte; recuerda cómo se dejó. Siguen Alt+número y las letras al apretar Alt. La barra de
+     arriba de la v4 («Ir a… Ctrl K») queda para más adelante. Para Vender en la computadora,
+     Carlos descartó de las propuestas: «Ganás en esta venta», escribir la cantidad en la búsqueda
+     («3 mecha 8», fuente de errores), elegir el margen con las teclas 1 a 5 (confunde), la ayuda
+     de teclas en «?» (ya está con Alt) y todo lo de la v4 salvo el aviso «El celular está
+     escaneando». Pedidos y presupuestos no entran en esta versión.
