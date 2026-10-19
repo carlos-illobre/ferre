@@ -39,8 +39,8 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 
 **Ventas del día (RF-23)**
 4. ~~Al anular una venta, ¿se pide confirmación? ¿Se pide el motivo, obligatorio u opcional?~~ Respondida el 2026-10-17 (decisión 110): pide confirmar; el motivo es opcional, de una lista que empieza en «Sin motivo», con comentario.
-5. ¿Hasta cuándo se puede corregir o anular una venta: solo las del día, las de los últimos N días, o cualquiera?
-6. Al corregir una venta, ¿solo se cambian cantidad y precio de sus renglones, o también agregar o quitar un renglón, cambiar el medio de pago o el cliente?
+5. ~~¿Hasta cuándo se puede corregir o anular una venta?~~ Respondida el 2026-10-19 (decisión 124): cualquier venta de cualquier día, con el permiso.
+6. ~~Al corregir una venta, ¿qué se puede cambiar?~~ Respondida el 2026-10-19 (decisión 124): todo, y cada cambio queda en Actividad.
 
 **Lo que pidieron y no se vendió (RF-25)**
 7. Los motivos, ¿son una lista cerrada (¿cuáles, además de «no había» y «precio»?) o texto libre?
@@ -48,8 +48,8 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 9. Cuando el cliente no lleva, ¿descartar la venta anota siempre la consulta, o hay dos acciones: descartar sin anotar y «No llevó», que anota?
 
 **Cambios (RF-24)**
-10. Si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que no se devuelve dinero?
-11. Para registrar un cambio, ¿hay que encontrar la venta original (y lo devuelto se toma al precio pagado) o alcanza con decir qué producto vuelve, al precio del día? ¿Hay plazo?
+10. ~~Si lo nuevo vale menos que lo devuelto, ¿qué pasa con la diferencia?~~ Respondida el 2026-10-19 (decisión 124): se devuelve el dinero.
+11. ~~Para un cambio, ¿hay que encontrar la venta original?~~ Respondida el 2026-10-19 (decisión 124): sí, y lo devuelto se toma al precio que se pagó. Sigue abierto si hay un plazo.
 
 **Pedidos de clientes sin stock (RF-26)**
 12. Cuando llega la mercadería, ¿qué hace el sistema: avisarle al Vendedor para que llame, armarle un WhatsApp para mandar, o mandarlo solo?

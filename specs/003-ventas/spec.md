@@ -261,9 +261,9 @@ comprueba el total de la venta, el total del día y el stock.
 5. **Given** una venta anulada, **When** se intenta corregirla, **Then** no se puede.
 6. **Given** una venta a cuenta corriente sin pagar, **When** se corrige, **Then** lo que debe el cliente refleja el total nuevo (RF-40).
 
-[NEEDS CLARIFICATION: ¿hasta cuándo se puede corregir o anular una venta: solo las del día, las de los últimos N días, o cualquiera? El pedido dice «una venta reciente» sin decir cuánto.]
-
-[NEEDS CLARIFICATION: al corregir una venta, ¿solo se cambian la cantidad y el precio de sus renglones, o también se puede agregar o quitar un renglón, cambiar el medio de pago o cambiar el cliente?]
+7. **Given** quien tiene el permiso de corregir, **When** elige una venta de cualquier día, **Then** la puede corregir: no hay plazo (Carlos, 2026-10-19, decisión 124).
+8. **Given** una venta, **When** se la corrige, **Then** se puede cambiar todo: la cantidad y el precio de cada renglón, agregar o quitar renglones, el medio de pago y el cliente (decisión 124).
+9. **Given** una venta corregida, **When** se mira Actividad, **Then** figura cada cambio, con quién, cuándo, lo que había antes y lo que quedó, para auditarlo (decisión 124).
 
 ---
 
@@ -295,9 +295,9 @@ consulta guardada con el producto y el precio ofrecido, y aparece en la vista de
 
 ### User Story 11 - Cambiar un producto por otro (Priority: P2)
 
-Un cliente vuelve con algo que compró y se lleva otra cosa. El Vendedor registra el cambio:
-lo devuelto vuelve al stock, lo nuevo sale y se cobra la diferencia (RF-24, CU-02). No hay
-devoluciones de dinero (RF-24b).
+Un cliente vuelve con algo que compró y se lleva otra cosa. El Vendedor busca la venta original y
+registra el cambio: lo devuelto vuelve al stock al precio que se pagó, lo nuevo sale y se cobra la
+diferencia; si lo nuevo vale menos, se le devuelve el dinero (RF-24, CU-02; decisión 124).
 
 **Why this priority**: es la única forma de deshacer una venta frente al cliente en esta
 etapa, y sin registrarla el stock queda mal.
@@ -311,9 +311,8 @@ stock de la primera sube 1, el de la segunda baja 1 y se cobran $2.000.
 2. **Given** un cambio registrado, **When** se miran las ventas del día, **Then** el cambio figura con lo devuelto, lo que salió y la diferencia cobrada, y la diferencia cuenta en el total del día y en el de su medio de pago.
 3. **Given** un cambio registrado, **When** el Administrador consulta quién hizo qué, **Then** figura con el usuario que lo hizo; la venta original no se borra ni se pisa (RNF-30).
 4. **Given** un cambio en el que lo nuevo vale lo mismo que lo devuelto, **When** se registra, **Then** el stock se mueve igual y no se cobra nada.
-5. **Given** un cambio en el que lo nuevo vale menos que lo devuelto, **When** el Vendedor lo registra, **Then** [NEEDS CLARIFICATION: si el producto nuevo vale menos que el devuelto, ¿qué pasa con la diferencia a favor del cliente, ya que en esta etapa no se devuelve dinero: se pierde, queda como saldo a favor, o el cambio solo se admite por algo de igual o mayor valor?]
-
-[NEEDS CLARIFICATION: para registrar un cambio, ¿hay que encontrar la venta original (y entonces lo devuelto se toma al precio que se pagó) o alcanza con decir qué producto vuelve (y se toma al precio del día)? ¿Hay un plazo para aceptar cambios?]
+5. **Given** un cambio en el que lo nuevo vale menos que lo devuelto, **When** el Vendedor lo registra, **Then** se le devuelve la diferencia al cliente, con el medio que se elija, y la devolución resta en el total del día y en el de ese medio (decisión 124).
+6. **Given** un cliente que vuelve con algo, **When** se registra el cambio, **Then** primero se encuentra la venta original y lo devuelto se toma al precio que se pagó en ella, no al del día (decisión 124).
 
 ---
 
@@ -536,7 +535,7 @@ comprueba que en la otra no existe ningún dato de la primera.
 - **RF-21**: Los medios de pago son cuatro: efectivo, Mercado Pago, tarjeta y cuenta corriente. Se eligen con un toque o una tecla. La cuenta corriente exige elegir el cliente, por nombre, y la venta queda a su nombre y sin pagar (RF-40). El sistema registra con qué se pagó; no cobra ni se conecta con Mercado Pago ni con la tarjeta. [NEEDS CLARIFICATION: si el Vendedor cobra sin elegir cómo paga el cliente, ¿la venta se registra igual (y con qué medio: efectivo por omisión, o «sin especificar») o se le exige elegir uno antes de cobrar?]
 - **RF-22**: El sistema DEBE permitir vender un producto que no está en ninguna lista como ítem libre, con descripción y precio tipeados, sin agregar más de 2 pasos a una venta normal; el ítem libre no mueve stock. En el mismo paso DEBE poder guardarse como producto nuevo, con familia y costo opcionales. Los ítems libres vendidos quedan listados para que el Administrador los revise después. [NEEDS CLARIFICATION: precio del producto nuevo en la venta siguiente, y qué puede hacer el Administrador con la lista de ítems libres; ver historia 6, escenarios 6 y 8.]
 - **RF-23**: El sistema DEBE mostrar las ventas del día, con el total del día, la cantidad de ventas y el total por medio de pago, y las de un día anterior eligiendo la fecha; cada venta muestra sus productos, uno por renglón. El día es el del local (hora de Buenos Aires). Una venta se DEBE poder anular: queda marcada, no se borra, su stock vuelve y deja de contar en los totales. Una venta reciente se DEBE poder corregir en cantidad o precio: ajusta el stock y el total del día, no pisa lo anterior (RNF-30) y queda en quién hizo qué (RF-71) con el usuario y qué cambió. Anular pide confirmar en una hoja con la venta; el motivo es opcional y se elige de una lista que empieza en «Sin motivo» («Se arrepintió», «Error al cobrar», «Producto equivocado», «Devolución», «Cobrada dos veces»), con un comentario opcional (decisión 110). [NEEDS CLARIFICATION: hasta cuándo una venta es «reciente»; y qué más se puede corregir además de cantidad y precio; ver historias 7, 8 y 9.]
-- **RF-24**: El sistema DEBE permitir registrar el cambio de un producto por otro: lo devuelto vuelve al stock, lo nuevo sale y se cobra la diferencia. No hay devolución de dinero. [NEEDS CLARIFICATION: qué pasa si lo nuevo vale menos; si hay que encontrar la venta original, a qué precio se toma lo devuelto y si hay plazo; ver historia 11.]
+- **RF-24**: El sistema DEBE permitir registrar el cambio de un producto por otro, partiendo de la venta original: lo devuelto vuelve al stock al precio que se pagó, lo nuevo sale y se cobra la diferencia; si lo nuevo vale menos, se devuelve el dinero (decisión 124). [NEEDS CLARIFICATION: ¿hay un plazo para aceptar un cambio?]
 - **RF-24b**: El sistema DEBE permitir registrar una devolución con reintegro de dinero o saldo a favor, a elección del cliente. Es de una etapa posterior: llega con la venta online (RF-31). [NEEDS CLARIFICATION: ¿cuál es el plazo para aceptar una devolución?]
 - **RF-25**: El sistema DEBE permitir anotar con un toque lo que un cliente pidió y no se vendió: producto o descripción, precio ofrecido y, de forma opcional, el motivo (no había, precio). Lo anotado DEBE poder consultarse después. [NEEDS CLARIFICATION: si los motivos son una lista cerrada o texto libre; quién consulta lo anotado y cómo; y si descartar una venta anota siempre la consulta; ver historia 10.]
 - **RF-26**: El sistema DEBE llevar los pedidos de clientes de lo que no hay en stock: qué hay que conseguir, para quién (nombre y teléfono) y qué día se le prometió. No se toma seña. Los pedidos aparecen en la lista de lo que hay que comprar (RF-54, RF-55). El sistema DEBE mejorar el procedimiento de decirle al cliente un día y esperarlo, por ejemplo avisándole cuando llega la mercadería. [NEEDS CLARIFICATION: cómo se avisa cuando llega la mercadería y cómo se cierra o se cancela un pedido; ver historia 12.]

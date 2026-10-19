@@ -974,3 +974,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      quede como la v2: vuelve el tacho de cada renglón (cambia lo dicho en la decisión 119), el
      aviso de «Vaciaste la venta» sale abajo, el fondo es el gris cálido de «Mostrador» (sin los
      tonos verdes), el botón de cobrar apagado es el de la v2, y el precio no se sale de la tarjeta.
+124. **Corregir y cambiar una venta** (2026-10-19). Carlos respondió las preguntas abiertas 5, 6, 10
+     y 11: con el permiso, se corrige cualquier venta de cualquier día; al corregir se puede
+     cambiar todo (cantidades, precios, renglones, medio de pago, cliente) y cada cambio queda en
+     Actividad para auditarlo; para un cambio de producto hay que encontrar la venta original y lo
+     devuelto se toma al precio que se pagó; si lo nuevo vale menos, se devuelve el dinero (cambia
+     «no hay devoluciones de dinero» de RF-24). En la interfaz van en la hoja de cada venta de
+     «Ventas de hoy», como en la v2 del director de arte. Queda abierto si hay un plazo para los cambios.
