@@ -1,0 +1,292 @@
+/* =========================================================================
+   Ferrebress · lenguaje visual común («Mostrador»)
+   Un solo archivo para todas las maquetas. Se enlaza con
+   <link rel="stylesheet" href="../../_comun/comun.css"> y los íconos con
+   <script src="../../_comun/iconos.js"></script>.
+   La guía de uso está en lenguaje.md. Los colores solo se usan por su nombre.
+   ========================================================================= */
+
+@font-face {
+  font-family: "Manrope";
+  src: url("fuentes/manrope-latin.woff2") format("woff2");
+  font-weight: 200 800; font-style: normal; font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191-2193, U+2212, U+2215;
+}
+@font-face {
+  font-family: "Manrope";
+  src: url("fuentes/manrope-latin-ext.woff2") format("woff2");
+  font-weight: 200 800; font-style: normal; font-display: block;
+  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  /* ---- Neutros cálidos: el 90 % de cada pantalla ---- */
+  --fondo: #F4F2EC;          /* fondo de la aplicación (papel cálido) */
+  --hundido: #ECE9E1;        /* rellenos: campos de solo lectura, segmentos, fotos */
+  --hundido-2: #E3DFD5;      /* hundido sobre hundido, separadores gruesos */
+  --superficie: #FFFFFF;     /* tarjetas, hojas, campos */
+  --borde: #E6E2D8;          /* borde de tarjeta y de renglón */
+  --borde-fuerte: #CEC8BA;   /* borde de campo y de botón común */
+  --tinta: #1A1D1B;          /* texto principal y números */
+  --texto-2: #545955;        /* detalle: marca, código, explicación */
+  --texto-3: #6B706B;        /* lo menos importante; nunca menos de 14 px */
+
+  /* ---- Pino: la marca. Dónde estoy, lo elegido, el botón oscuro ---- */
+  --pino: #12382F;
+  --pino-2: #1D4B40;         /* pino apretado / hover */
+  --pino-suave: #E3EEE8;
+  --pino-texto: #17614E;
+
+  /* ---- Acción: naranja. UNA acción principal por pantalla ---- */
+  --accion: #E8541C;
+  --accion-fuerte: #C8450F;  /* apretado */
+  --accion-suave: #FDEDE4;
+  --accion-texto: #B23E0E;
+
+  /* ---- Urgente: ámbar. Hay que mirarlo pronto, pero no está mal ---- */
+  --urgente: #F0A20F;
+  --urgente-suave: #FFF3D8;
+  --urgente-texto: #845400;
+
+  /* ---- Error: rojo. Algo está mal o falta y frena ---- */
+  --error: #D7372A;
+  --error-suave: #FCEAE7;
+  --error-texto: #AE281D;
+
+  /* ---- Logro: verde. Salió bien, hay stock, está al día ---- */
+  --logro: #1E9E62;
+  --logro-suave: #E2F4EA;
+  --logro-texto: #11764A;
+
+  /* ---- Medios de pago (decisión 108): siempre el mismo color ---- */
+  --efectivo: #23845A;   --efectivo-suave: #E3F2EA;
+  --mp: #0A72C2;         --mp-suave: #E3F0FA;
+  --tarjeta: #6A4BD1;    --tarjeta-suave: #EEE9FC;
+  --cuenta: #9A5B2E;     --cuenta-suave: #F6ECE3;
+
+  /* ---- Tipografía ---- */
+  --letra: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* ---- Espaciado: múltiplos de 4 ---- */
+  --e1: 4px; --e2: 8px; --e3: 12px; --e4: 16px; --e5: 20px; --e6: 24px; --e8: 32px; --e10: 40px; --e12: 48px;
+
+  /* ---- Radios ---- */
+  --r-chico: 8px;     /* kbd, foto chica, indicador */
+  --r: 12px;          /* botones, campos, renglones dentro de una tarjeta */
+  --r-tarjeta: 16px;  /* tarjetas */
+  --r-hoja: 24px;     /* hojas que suben, paneles flotantes */
+
+  /* ---- Relieve: tres niveles, nada más ---- */
+  --sombra-1: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03);
+  --sombra-2: 0 6px 20px -8px rgba(26, 29, 27, .14), 0 1px 3px rgba(26, 29, 27, .06);
+  --sombra-3: 0 24px 48px -16px rgba(18, 56, 47, .28), 0 4px 12px rgba(18, 56, 47, .08);
+  --sombra-accion: 0 8px 20px -8px rgba(232, 84, 28, .55);
+
+  /* ---- Movimiento ---- */
+  --curva: cubic-bezier(.2, .8, .2, 1);      /* todo lo que entra */
+  --curva-salida: cubic-bezier(.4, 0, 1, 1); /* lo que se va */
+  --rebote: cubic-bezier(.34, 1.4, .64, 1);  /* lo que se suma (un renglón, una insignia) */
+  --t-micro: 120ms; --t: 200ms; --t-nav: 320ms;
+}
+
+/* ---------------- Base ---------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--fondo); color: var(--tinta);
+  font: 500 16px/1.5 var(--letra);
+  font-feature-settings: "tnum" 1, "cv11" 1; -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+img { display: block; max-width: 100%; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ---------------- Íconos ---------------- */
+.i { width: 20px; height: 20px; flex: none; display: inline-block; vertical-align: middle; }
+.i-s { width: 16px; height: 16px; flex: none; }
+.i-l { width: 24px; height: 24px; flex: none; }
+.i-xl { width: 32px; height: 32px; flex: none; }
+
+/* ---------------- Tipografía ----------------
+   Escala única. Ningún texto de menos de 14 px. Los números van tabulares. */
+.t-total   { font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -.03em; }
+.t-numero  { font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -.02em; }
+.t-titulo  { font-size: 28px; line-height: 34px; font-weight: 800; letter-spacing: -.02em; }
+.t-seccion { font-size: 20px; line-height: 26px; font-weight: 750; letter-spacing: -.01em; }
+.t-renglon { font-size: 16px; line-height: 22px; font-weight: 700; }
+.t-cuerpo  { font-size: 16px; line-height: 24px; font-weight: 500; }
+.t-detalle { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--texto-2); }
+.t-etiqueta{ font-size: 14px; line-height: 18px; font-weight: 650; color: var(--texto-2); }
+.peso { font-size: .62em; font-weight: 700; vertical-align: .32em; margin-right: .08em; } /* el «$» chico */
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------------- Tarjeta y renglón (el molde) ---------------- */
+.tarjeta { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); }
+.tarjeta-2 { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-2); }
+
+/* Renglón: [foto] [título + detalle] [dato] [acción] [›] */
+.renglon { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: var(--e3) var(--e4); padding: var(--e3) var(--e4); background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); }
+.renglon + .renglon { margin-top: var(--e2); }
+.renglon .titulo { font-weight: 700; font-size: 16px; line-height: 22px; }
+.renglon .detalle { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+
+/* Foto de producto: siempre recortada, sobre el mismo azulejo hundido */
+.foto { width: 56px; height: 56px; border-radius: var(--r); background: var(--hundido); display: grid; place-items: center; overflow: hidden; flex: none; }
+.foto img { width: 86%; height: 86%; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(26, 29, 27, .18)); }
+.foto.chica { width: 40px; height: 40px; border-radius: var(--r-chico); }
+.foto.grande { width: 72px; height: 72px; }
+.foto-icono { width: 56px; height: 56px; border-radius: var(--r); background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; }
+
+/* Dato: etiqueta chica arriba, número abajo, en una caja teñida por su significado */
+.dato { display: grid; gap: 2px; padding: 6px 12px; border-radius: var(--r); background: var(--hundido); min-width: 88px; }
+.dato .et { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--texto-2); }
+.dato .va { font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; }
+.dato.logro { background: var(--logro-suave); } .dato.logro .va { color: var(--logro-texto); }
+.dato.urgente { background: var(--urgente-suave); } .dato.urgente .va { color: var(--urgente-texto); }
+.dato.error { background: var(--error-suave); } .dato.error .va { color: var(--error-texto); }
+
+/* Tarjeta de resumen (KPI): ícono teñido + etiqueta + número + (barra) */
+.resumen { display: flex; gap: var(--e3); align-items: center; padding: var(--e4); border-radius: var(--r-tarjeta); background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+.resumen .ico { width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; background: var(--pino-suave); color: var(--pino-texto); flex: none; }
+.resumen .et { font-size: 14px; line-height: 18px; color: var(--texto-2); font-weight: 600; }
+.resumen .va { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; }
+.resumen.logro { background: var(--logro-suave); border-color: transparent; } .resumen.logro .ico { background: #fff; color: var(--logro-texto); }
+.resumen.urgente { background: var(--urgente-suave); border-color: transparent; } .resumen.urgente .ico { background: #fff; color: var(--urgente-texto); } .resumen.urgente .va { color: var(--urgente-texto); }
+.resumen.error { background: var(--error-suave); border-color: transparent; } .resumen.error .ico { background: #fff; color: var(--error-texto); } .resumen.error .va { color: var(--error-texto); }
+.barra { height: 6px; border-radius: 99px; background: var(--hundido-2); overflow: hidden; margin-top: 6px; }
+.barra > b { display: block; height: 100%; border-radius: 99px; background: var(--logro); }
+
+/* ---------------- Botones ---------------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--e2); min-height: 44px; padding: 0 var(--e4); border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: var(--superficie); color: var(--tinta); font-weight: 700; font-size: 16px; box-shadow: var(--sombra-1); white-space: nowrap; transition: transform var(--t-micro) var(--curva), background var(--t-micro); }
+.btn:active { transform: scale(.97); }
+.btn.chico { min-height: 36px; padding: 0 var(--e3); font-size: 14px; border-radius: 10px; }
+.btn.grande { min-height: 56px; padding: 0 var(--e6); font-size: 18px; border-radius: 14px; }
+.btn-accion { background: var(--accion); border-color: var(--accion); color: #fff; box-shadow: var(--sombra-accion); }
+.btn-accion:active { background: var(--accion-fuerte); }
+.btn-oscuro { background: var(--pino); border-color: var(--pino); color: #fff; box-shadow: var(--sombra-2); }
+.btn-suave { background: var(--hundido); border-color: transparent; box-shadow: none; color: var(--tinta); }
+.btn-fantasma { background: transparent; border-color: transparent; box-shadow: none; color: var(--texto-2); }
+.btn-peligro { background: var(--error-suave); border-color: transparent; box-shadow: none; color: var(--error-texto); }
+.btn-icono { width: 44px; padding: 0; }
+.btn-icono.chico { width: 36px; }
+.btn[disabled] { opacity: .45; box-shadow: none; }
+
+/* Tecla: el atajo a la vista (computadora) */
+.kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--borde-fuerte); border-bottom-width: 2px; background: var(--superficie); color: var(--texto-2); font-size: 14px; line-height: 1; font-weight: 700; }
+.btn-accion .kbd, .btn-oscuro .kbd { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .35); color: #fff; }
+
+/* ---------------- Pastillas y chips ---------------- */
+.pastilla { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; font-size: 14px; font-weight: 650; background: var(--hundido); color: var(--texto-2); white-space: nowrap; }
+.pastilla .punto { width: 8px; height: 8px; border-radius: 99px; background: currentColor; }
+.pastilla.logro { background: var(--logro-suave); color: var(--logro-texto); }
+.pastilla.urgente { background: var(--urgente-suave); color: var(--urgente-texto); }
+.pastilla.error { background: var(--error-suave); color: var(--error-texto); }
+.pastilla.pino { background: var(--pino-suave); color: var(--pino-texto); }
+.pastilla.accion { background: var(--accion-suave); color: var(--accion-texto); }
+.pastilla.contorno { background: var(--superficie); border: 1px solid var(--borde); }
+.insignia { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: var(--accion); color: #fff; font-size: 14px; font-weight: 800; line-height: 1; }
+
+/* Chips de filtro (como en las referencias): elegido = pino lleno */
+.chips { display: flex; gap: var(--e2); flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: var(--e2); height: 40px; padding: 0 var(--e4); border-radius: 999px; border: 1px solid var(--borde-fuerte); background: var(--superficie); font-weight: 650; font-size: 15px; color: var(--tinta); }
+.chip.elegido { background: var(--pino); border-color: var(--pino); color: #fff; }
+
+/* Segmentos: elegir uno de pocos (margen, unidad, medio de pago) */
+.segmentos { display: inline-flex; padding: 3px; border-radius: var(--r); background: var(--hundido); gap: 2px; }
+.segmentos > * { min-height: 34px; padding: 0 var(--e3); border: 0; border-radius: 9px; background: transparent; font-weight: 700; font-size: 14px; color: var(--texto-2); display: inline-flex; align-items: center; gap: 6px; }
+.segmentos > .elegido { background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-1); }
+
+/* Cantidad: − n + */
+.cantidad { display: inline-flex; align-items: center; border: 1px solid var(--borde-fuerte); border-radius: var(--r); background: var(--superficie); height: 40px; overflow: hidden; }
+.cantidad button { width: 40px; height: 100%; border: 0; background: transparent; display: grid; place-items: center; color: var(--texto-2); }
+.cantidad .n { min-width: 44px; text-align: center; font-weight: 800; font-size: 16px; }
+.cantidad .u { font-size: 14px; font-weight: 600; color: var(--texto-2); margin-left: 2px; }
+
+/* ---------------- Campos ---------------- */
+.campo { display: flex; align-items: center; gap: var(--e3); height: 52px; padding: 0 var(--e4); border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: var(--superficie); box-shadow: var(--sombra-1); color: var(--texto-3); font-size: 16px; }
+.campo.foco { border-color: var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); color: var(--tinta); }
+.campo .escrito { color: var(--tinta); font-weight: 600; }
+.cursor { display: inline-block; width: 2px; height: 22px; background: var(--pino); vertical-align: middle; margin-left: 1px; animation: parpadeo 1s steps(1) infinite; }
+@keyframes parpadeo { 50% { opacity: 0; } }
+
+/* ---------------- Avisos ---------------- */
+.aviso { display: flex; gap: var(--e3); align-items: flex-start; padding: var(--e3) var(--e4); border-radius: var(--r); font-size: 14px; line-height: 20px; font-weight: 600; }
+.aviso.urgente { background: var(--urgente-suave); color: var(--urgente-texto); }
+.aviso.error { background: var(--error-suave); color: var(--error-texto); }
+.aviso.logro { background: var(--logro-suave); color: var(--logro-texto); }
+.aviso.pino { background: var(--pino-suave); color: var(--pino-texto); }
+.tostada { display: inline-flex; align-items: center; gap: var(--e3); padding: 10px 16px 10px 12px; border-radius: 14px; background: var(--pino); color: #fff; font-weight: 650; font-size: 15px; box-shadow: var(--sombra-3); }
+
+/* Medio de pago: punto o ícono en su color */
+.medio { --c: var(--efectivo); --cs: var(--efectivo-suave); }
+.medio.efectivo { --c: var(--efectivo); --cs: var(--efectivo-suave); }
+.medio.mp { --c: var(--mp); --cs: var(--mp-suave); }
+.medio.tarjeta { --c: var(--tarjeta); --cs: var(--tarjeta-suave); }
+.medio.cuenta { --c: var(--cuenta); --cs: var(--cuenta-suave); }
+
+/* =========================================================================
+   MARCO DE LA APLICACIÓN · COMPUTADORA (1366 × 768)
+   [lateral 232 px] [contenido: cabecera + pestañas + pantalla]
+   ========================================================================= */
+.app { display: grid; grid-template-columns: 232px 1fr; height: 100vh; min-height: 768px; }
+.lateral { background: var(--superficie); border-right: 1px solid var(--borde); display: flex; flex-direction: column; padding: var(--e4) var(--e3); gap: var(--e1); }
+.marca { display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px; }
+.marca .logo { width: 36px; height: 36px; border-radius: 10px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+.marca b { font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+.nav-item { display: flex; align-items: center; gap: var(--e3); height: 44px; padding: 0 var(--e3); border-radius: var(--r); color: var(--texto-2); font-weight: 650; font-size: 15px; position: relative; }
+.nav-item .insignia { margin-left: auto; }
+.nav-item.activo { background: var(--pino-suave); color: var(--pino); font-weight: 750; }
+.nav-item.activo::before { content: ""; position: absolute; left: -12px; top: 10px; bottom: 10px; width: 4px; border-radius: 0 4px 4px 0; background: var(--accion); }
+.nav-sub { display: grid; gap: 2px; margin: 2px 0 6px 32px; }
+.nav-sub a { display: flex; align-items: center; height: 32px; padding: 0 10px; border-radius: 8px; color: var(--texto-2); font-size: 14px; font-weight: 600; text-decoration: none; }
+.nav-sub a.activo { color: var(--pino); background: var(--hundido); font-weight: 750; }
+.lateral .pie { margin-top: auto; display: grid; gap: var(--e2); }
+.vinculo { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--logro-suave); color: var(--logro-texto); font-size: 14px; font-weight: 650; line-height: 18px; }
+.vinculo small { display: block; font-size: 14px; font-weight: 500; color: var(--texto-2); }
+.usuario { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--r); }
+.avatar { width: 36px; height: 36px; border-radius: 99px; background: var(--accion-suave); color: var(--accion-texto); display: grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; }
+
+.contenido { display: flex; flex-direction: column; min-width: 0; height: 100vh; overflow: hidden; }
+.cabecera { display: flex; align-items: center; gap: var(--e4); padding: var(--e5) var(--e8) 0; }
+.cabecera .sub { font-size: 15px; color: var(--texto-2); font-weight: 500; }
+.cabecera .acciones { margin-left: auto; display: flex; gap: var(--e2); align-items: center; }
+.pestanas { display: flex; gap: var(--e6); padding: 0 var(--e8); border-bottom: 1px solid var(--borde); margin-top: var(--e3); }
+.pestanas a { height: 44px; display: inline-flex; align-items: center; gap: 8px; font-weight: 650; font-size: 15px; color: var(--texto-2); text-decoration: none; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.pestanas a.activa { color: var(--pino); border-bottom-color: var(--pino); font-weight: 800; }
+.pantalla { flex: 1; min-height: 0; padding: var(--e5) var(--e8) var(--e6); }
+
+/* =========================================================================
+   MARCO DE LA APLICACIÓN · CELULAR (390 × 844)
+   [barra de estado] [cabecera: título + vínculo] [pestañas] [pantalla]
+   [barra de acción fija, si hay] [menú de abajo: 5 partes]
+   ========================================================================= */
+.celu { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--fondo); display: flex; flex-direction: column; }
+.barra-estado { height: 44px; padding: 0 24px 0 28px; display: flex; align-items: center; justify-content: space-between; font-weight: 700; font-size: 16px; flex: none; }
+.barra-estado .se { display: flex; gap: 6px; align-items: center; }
+.celu-cabecera { display: flex; align-items: center; gap: var(--e3); padding: 4px var(--e4) 0; }
+.celu-cabecera .t-titulo { flex: 1; }
+.celu-estado { padding: 0 var(--e4); font-size: 14px; color: var(--texto-2); font-weight: 600; display: flex; align-items: center; gap: 6px; height: 22px; }
+.celu-estado .punto { width: 8px; height: 8px; border-radius: 99px; background: var(--logro); }
+.btn-vinculo { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--logro); color: var(--logro-texto); background: var(--logro-suave); font-weight: 700; font-size: 14px; }
+.celu-pestanas { display: flex; margin: var(--e3) var(--e4) 0; padding: 3px; background: var(--hundido); border-radius: var(--r); }
+.celu-pestanas a { flex: 1; height: 44px; border-radius: 10px; display: grid; place-items: center; font-weight: 700; font-size: 15px; color: var(--texto-2); text-decoration: none; }
+.celu-pestanas a.activa { background: var(--superficie); color: var(--pino); box-shadow: var(--sombra-1); font-weight: 800; }
+.celu-pantalla { flex: 1; min-height: 0; overflow: hidden; padding: var(--e3) var(--e4) 0; }
+.barra-accion { padding: var(--e3) var(--e4); background: rgba(255, 255, 255, .92); backdrop-filter: blur(12px); border-top: 1px solid var(--borde); box-shadow: 0 -8px 24px -12px rgba(26, 29, 27, .15); }
+.nav-inferior { flex: none; height: 76px; padding: 0 8px 14px; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--superficie); border-top: 1px solid var(--borde); }
+.nav-inferior a { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; color: var(--texto-2); font-size: 14px; font-weight: 650; text-decoration: none; }
+.nav-inferior a .i { width: 26px; height: 26px; }
+.nav-inferior a.activo { color: var(--accion); font-weight: 800; }
+.nav-inferior a.activo::before { content: ""; position: absolute; top: 0; left: 18%; right: 18%; height: 4px; border-radius: 0 0 4px 4px; background: var(--accion); }
+.nav-inferior .insignia { position: absolute; top: 8px; left: 52%; border: 2px solid var(--superficie); height: 22px; }
+.home-ind { position: absolute; bottom: 6px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 99px; background: var(--tinta); opacity: .85; }
+
+/* Lateral plegado (Ctrl+B o pantallas que piden ancho): solo íconos, 72 px, con globo al pasar */
+.app.plegado { grid-template-columns: 72px 1fr; }
+.app.plegado .lateral { padding: 16px 12px; align-items: center; }
+.app.plegado .marca { padding: 4px 0 16px; }
+.app.plegado .marca b, .app.plegado .nav-sub, .app.plegado .nav-item .txt, .app.plegado .pie .txt { display: none; }
+.app.plegado .nav-item { width: 48px; height: 48px; padding: 0; justify-content: center; }
+.app.plegado .nav-item .insignia { position: absolute; top: 4px; right: 2px; margin: 0; }
+.app.plegado .nav-item.activo::before { left: -12px; }

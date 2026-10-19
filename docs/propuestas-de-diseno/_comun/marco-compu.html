@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marco de la aplicación · computadora</title>
+<!-- Plantilla: copiala a tu carpeta, cambiá las rutas a ../../_comun/ y reemplazá <section class="pantalla">. -->
+<link rel="stylesheet" href="comun.css">
+<script src="iconos.js"></script>
+<style>
+  .lugar { height: 100%; border: 2px dashed var(--borde-fuerte); border-radius: 16px; display: grid; place-items: center; color: var(--texto-3); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Catálogo</div>
+      <div class="acciones"><button class="btn chico"><i class="i i-s" data-i="scan-barcode"></i>Escanear con el celular</button><button class="btn btn-accion chico"><i class="i i-s" data-i="plus"></i>Acción principal <span class="kbd">Alt N</span></button></div>
+    </header>
+    <nav class="pestanas"><a class="activa">Productos</a><a>Listas de precios</a><a>Duplicados <span class="pastilla urgente" style="height:24px">12</span></a></nav>
+    <section class="pantalla"><div class="lugar">La pantalla va acá · 1.070 × 600 px útiles</div></section>
+  </main>
+</div>
+</body>
+</html>

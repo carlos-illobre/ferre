@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · Estante y boleta (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<style>
+  body { overflow: hidden; }
+  .tope { height: 56px; background: var(--pino); color: #fff; display: flex; align-items: center; gap: 16px; padding: 0 20px; }
+  .tope .logo { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+  .tope b { font-size: 17px; font-weight: 800; }
+  .ir { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,.10); color: rgba(255,255,255,.8); font-size: 14px; font-weight: 600; width: 300px; }
+  .ir .kbd { margin-left: auto; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #fff; }
+  .tope .der { margin-left: auto; display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 650; }
+  .tope .p { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 99px; background: rgba(255,255,255,.10); }
+  .tope .p .punto { width: 8px; height: 8px; border-radius: 9px; background: #5EE0A0; }
+
+  .cuerpo { display: grid; grid-template-columns: minmax(0,1fr) 440px; height: calc(100vh - 56px); }
+  .estante { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .fila-sup { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 14px; }
+  .buscar { height: 60px; font-size: 18px; }
+  .camara { position: relative; height: 60px; border-radius: 14px; overflow: hidden; background: #0E1512; color: #fff; display: flex; align-items: center; gap: 12px; padding: 0 14px; box-shadow: var(--sombra-2); }
+  .camara .vivo { width: 44px; height: 44px; border-radius: 10px; background: radial-gradient(circle at 40% 40%, #3b4a44, #121a17); position: relative; overflow: hidden; flex: none; }
+  .camara .vivo::after { content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 2px; background: #FF6A33; box-shadow: 0 0 8px #FF6A33; }
+  .camara .t { font-size: 14px; line-height: 18px; font-weight: 700; }
+  .camara .t small { display: block; font-weight: 500; color: rgba(255,255,255,.7); font-size: 14px; }
+  .camara .rec { margin-left: auto; width: 10px; height: 10px; border-radius: 99px; background: #FF6A33; box-shadow: 0 0 0 4px rgba(255,106,51,.25); }
+  .rotulo { display: flex; align-items: baseline; gap: 10px; }
+  .rotulo .t-seccion { font-size: 18px; }
+  .grilla { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+  .prod { position: relative; background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .prod .img { height: 132px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; }
+  .prod .img img { height: 108px; width: 92%; object-fit: contain; filter: drop-shadow(0 6px 6px rgba(26,29,27,.18)); }
+  .prod .n { font-weight: 700; font-size: 15px; line-height: 19px; height: 38px; overflow: hidden; }
+  .prod .pie { display: flex; align-items: center; justify-content: space-between; }
+  .prod .precio { font-weight: 800; font-size: 19px; }
+  .prod .tecla { position: absolute; top: 16px; left: 16px; }
+  .prod.en { border: 2px solid var(--accion); padding: 9px; box-shadow: 0 8px 20px -10px rgba(232,84,28,.5); }
+  .prod .cuantos { position: absolute; top: 14px; right: 14px; height: 28px; min-width: 28px; padding: 0 9px; border-radius: 99px; background: var(--accion); color: #fff; font-weight: 800; font-size: 14px; display: grid; place-items: center; }
+
+  .mostrador { background: var(--hundido); border-left: 1px solid var(--borde); padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+  .boleta { position: relative; background: #fff; border-radius: 16px 16px 0 0; box-shadow: var(--sombra-2); padding: 20px 20px 18px; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .boleta::after { content: ""; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px; background: linear-gradient(-45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x, linear-gradient(45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x; filter: drop-shadow(0 4px 3px rgba(26,29,27,.06)); }
+  .boleta .cab { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 2px dashed var(--borde-fuerte); }
+  .linea { display: grid; grid-template-columns: 52px minmax(0,1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--borde); font-size: 15px; }
+  .linea .q { font-weight: 800; color: var(--texto-2); }
+  .linea .nm { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .linea .nm small { display: block; font-size: 14px; color: var(--texto-3); font-weight: 500; }
+  .linea .im { font-weight: 800; font-size: 16px; }
+  .linea.falta { background: var(--urgente-suave); margin: 0 -10px; padding: 9px 10px; border-radius: 10px; border: 0; }
+  .mini-m { display: inline-flex; gap: 3px; margin-top: 6px; }
+  .mini-m b { height: 26px; padding: 0 7px; border-radius: 6px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); color: var(--urgente-texto); font-size: 14px; display: grid; place-items: center; }
+  .boleta .tot { margin-top: auto; padding-top: 12px; border-top: 2px dashed var(--borde-fuerte); display: flex; align-items: flex-end; justify-content: space-between; }
+  .medios4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+  .md { height: 64px; border-radius: 14px; border: 1px solid var(--borde-fuerte); background: #fff; display: grid; justify-items: center; align-content: center; gap: 2px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .md .i { color: var(--c); }
+  .md.elegido { background: var(--c); border-color: var(--c); color: #fff; }
+  .md.elegido .i { color: #fff; }
+  .cobrar-xl { height: 64px; border-radius: 16px; font-size: 20px; justify-content: space-between; padding: 0 20px 0 24px; }
+</style>
+</head>
+<body>
+<header class="tope">
+  <span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b>
+  <span class="ir"><i class="i i-s" data-i="command"></i>Ir a Catálogo, Stock, Hoy…<span class="kbd">Ctrl K</span></span>
+  <div class="der">
+    <span class="p"><span class="punto"></span>En línea</span>
+    <span class="p"><i class="i i-s" data-i="smartphone"></i>Celular en espejo</span>
+    <span class="p">Hoy <b class="num">$412.000</b> · 23 ventas</span>
+    <span class="avatar" style="width:32px;height:32px">CI</span>
+  </div>
+</header>
+
+<div class="cuerpo">
+  <section class="estante">
+    <div class="fila-sup">
+      <div class="campo foco buscar"><i class="i i-l" data-i="search"></i><span>Buscá o escaneá con el lector<span class="cursor"></span></span><span class="kbd" style="margin-left:auto">/</span></div>
+      <div class="camara"><span class="vivo"></span><div class="t">El celular está escaneando<small>Lo que lea entra a la boleta</small></div><span class="rec"></span></div>
+    </div>
+
+    <div class="rotulo"><span class="t-seccion">Lo que más sale a esta hora</span><span class="t-detalle">un clic o su número lo suma a la boleta</span></div>
+    <div class="grilla">
+      <div class="prod en"><span class="kbd tecla">1</span><span class="cuantos">× 3</span><div class="img"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div class="n">Mecha acero rápido HSS 8 mm</div><div class="pie"><span class="precio num">$7.000</span><span class="pastilla logro">14 un.</span></div></div>
+      <div class="prod en"><span class="kbd tecla">2</span><span class="cuantos">× 1</span><div class="img"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div class="n">Cinta métrica PowerLock 5 m</div><div class="pie"><span class="precio num">$17.000</span><span class="pastilla logro">6 un.</span></div></div>
+      <div class="prod en"><span class="kbd tecla">3</span><span class="cuantos">0,7 kg</span><div class="img"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div class="n">Clavos punta París 2" por kilo</div><div class="pie"><span class="precio num">$8.000<small class="t-detalle"> /kg</small></span><span class="pastilla logro">12,4 kg</span></div></div>
+      <div class="prod"><span class="kbd tecla">4</span><div class="img"><img src="../../../_comun/fotos/lampara.webp" alt=""></div><div class="n">Lámpara LED 9 W luz fría E27</div><div class="pie"><span class="precio num">$3.000</span><span class="pastilla logro">48 un.</span></div></div>
+      <div class="prod"><span class="kbd tecla">5</span><div class="img"><img src="../../../_comun/fotos/martillo.webp" alt=""></div><div class="n">Martillo carpintero 27 mm mango tubular</div><div class="pie"><span class="precio num">$24.000</span><span class="pastilla urgente">2 un.</span></div></div>
+      <div class="prod"><span class="kbd tecla">6</span><div class="img"><img src="../../../_comun/fotos/pinza.webp" alt=""></div><div class="n">Pinza universal 8" aislada</div><div class="pie"><span class="precio num">$19.000</span><span class="pastilla logro">7 un.</span></div></div>
+      <div class="prod"><span class="kbd tecla">7</span><div class="img"><img src="../../../_comun/fotos/pintura.webp" alt=""></div><div class="n">Látex interior mate blanco 4 L</div><div class="pie"><span class="precio num">$38.000</span><span class="pastilla logro">9 un.</span></div></div>
+      <div class="prod"><span class="kbd tecla">8</span><div class="img"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div class="n">Puntas Phillips PH2 × 25 mm × 10</div><div class="pie"><span class="precio num">$5.000</span><span class="pastilla">Sin stock</span></div></div>
+    </div>
+    <div class="otras" style="display:flex;gap:8px;margin-top:auto">
+      <button class="btn chico"><i class="i i-s" data-i="package-plus"></i>Ítem libre <span class="kbd">+</span></button>
+      <button class="btn chico"><i class="i i-s" data-i="undo-2"></i>No llevó <span class="kbd">Esc</span></button>
+      <button class="btn chico"><i class="i i-s" data-i="clock"></i>Pasar a pedido</button>
+      <button class="btn chico"><i class="i i-s" data-i="file-text"></i>Presupuesto</button>
+      <span class="t-detalle" style="margin-left:auto;align-self:center">Ganás en esta venta <b style="color:var(--pino-texto)">$21.200</b></span>
+    </div>
+  </section>
+
+  <aside class="mostrador">
+    <div class="boleta">
+      <div class="cab"><span class="t-renglon">Boleta de mostrador</span><span class="t-detalle">10:42 · Carlos</span></div>
+      <div class="linea"><span class="q num">3 ×</span><span class="nm">Mecha acero rápido HSS 8 mm<small>$7.000 c/u · margen 100 %</small></span><span class="im num">$21.000</span></div>
+      <div class="linea"><span class="q num">1 ×</span><span class="nm">Cinta métrica PowerLock 5 m<small>$17.000 · margen 50 % · <i class="i i-s" data-i="smartphone"></i> celular</small></span><span class="im num">$17.000</span></div>
+      <div class="linea"><span class="q num">0,7 kg</span><span class="nm">Clavos punta París 2"<small>$8.000 el kg · para arriba</small></span><span class="im num">$6.000</span></div>
+      <div class="linea falta"><span class="q num">1 ×</span><span class="nm">Tarugos nylon S8 × 100<small style="color:var(--urgente-texto)">Sin precio: elegí el margen</small><span class="mini-m"><b>300</b><b>200</b><b>100</b><b>50</b><b>25</b><b>$</b></span></span><span class="im" style="color:var(--urgente-texto)">—</span></div>
+      <div class="linea"><span class="q num">1 ×</span><span class="nm">Bolsa de arena × 25 kg<small style="color:var(--urgente-texto)">Ítem libre · no es múltiplo de $1.000</small></span><span class="im num">$1.500</span></div>
+      <div class="tot"><div><div class="t-etiqueta">Total</div><div class="t-detalle">5 productos</div></div><div class="t-total num"><span class="peso">$</span>45.500</div></div>
+    </div>
+    <div style="height:4px"></div>
+    <div class="medios4">
+      <button class="md medio efectivo elegido"><i class="i i-l" data-i="banknote"></i>Efectivo</button>
+      <button class="md medio mp"><i class="i i-l" data-i="qr-code"></i>M. Pago</button>
+      <button class="md medio tarjeta"><i class="i i-l" data-i="credit-card"></i>Tarjeta</button>
+      <button class="md medio cuenta"><i class="i i-l" data-i="notebook-pen"></i>Cta. cte.</button>
+    </div>
+    <button class="btn btn-accion cobrar-xl"><span>Cobrar <span class="num">$45.500</span> en efectivo</span><span class="kbd">F2</span></button>
+  </aside>
+</div>
+</body>
+</html>

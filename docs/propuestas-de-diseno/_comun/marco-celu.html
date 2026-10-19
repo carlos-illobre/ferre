@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marco de la aplicación · celular</title>
+<!-- Plantilla: copiala a tu carpeta, cambiá las rutas a ../../_comun/ y reemplazá .celu-pantalla. -->
+<link rel="stylesheet" href="comun.css">
+<script src="iconos.js"></script>
+<style>
+  body { width: 390px; }
+  .lugar { height: 100%; border: 2px dashed var(--borde-fuerte); border-radius: 16px; display: grid; place-items: center; color: var(--texto-3); font-weight: 700; text-align: center; padding: 16px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a class="activa">Productos</a><a>Listas</a><a>Duplicados</a></nav>
+  <div class="celu-pantalla" style="padding-bottom:12px"><div class="lugar">La pantalla va acá<br>358 px de ancho</div></div>
+  <div class="barra-accion"><button class="btn btn-accion grande" style="width:100%">Acción principal, si la hay</button></div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a class="activo"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>
