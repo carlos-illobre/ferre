@@ -231,6 +231,16 @@ describe("Vender", () => {
     expect(screen.getAllByTestId("item")).toHaveLength(1);
   });
 
+  it("el tacho de cada renglón lo quita y deja deshacerlo; el aviso sale abajo, sobre el cobro", () => {
+    const { agregar, item } = armar();
+    agregar("mecha vender");
+    fireEvent.click(within(item("MECHA")).getByTestId("quitar-renglon"));
+    expect(screen.queryAllByTestId("item")).toHaveLength(0);
+    expect(screen.getByTestId("cobro").contains(screen.getByTestId("mensaje"))).toBe(true);
+    fireEvent.click(within(screen.getByTestId("mensaje")).getByRole("button", { name: "Deshacer" }));
+    expect(screen.getAllByTestId("item")).toHaveLength(1);
+  });
+
   it("003 escenario 15: si lo que se lleva supera el stock, el renglón avisa cuánto hay", () => {
     const { agregar, item, falso } = armar();
     falso.stock.set("mecha", 2);

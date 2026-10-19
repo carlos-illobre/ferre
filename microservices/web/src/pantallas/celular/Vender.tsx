@@ -52,7 +52,7 @@ export function ParteVender({ sub }: { sub: string | null }) {
   if (!puedeEsto(...PIDE[actual])) return <SinPermiso falta={PIDE[actual]} />;
   if (actual === "vender") return <Vender pestanas={pestanas} />;
   return (
-    <main className="contenido">
+    <main className="contenido vm-hoy">
       <div className="encabezado"><h1 className="titulo">Vender</h1>{pestanas}</div>
       <VentasDeHoy anulaHoy={puedeEsto("ventas.anular", "ventas.anular_cualquiera")} anulaCualquierDia={puedeEsto("ventas.anular_cualquiera")} />
     </main>
@@ -84,6 +84,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   const [renglonAbierto, setRenglonAbierto] = useState<string | null>(null);
   const [aviso, setAviso] = useState<Aviso | null>(null);
   const caja = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 5000); return () => clearTimeout(t); }, [aviso]);
 
   // La venta en sí (renglones, precios, cobrar, «no llevó») está una sola vez, en el negocio:
   // acá va solo lo de esta interfaz: sus textos cortos y sus hojas.
@@ -199,7 +200,6 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
       </div>
 
       <div className="columna">
-        <Toast texto={aviso?.texto ?? mensaje} alCerrar={() => { setAviso(null); setMensaje(null); }} accion={aviso?.deshacer ? { texto: "Deshacer", alTocar: () => { aviso.deshacer!(); setAviso(null); } } : undefined} />
         <AvisoError texto={errorCatalogo} />
         {codigoDesconocido && (
           <div className="vm-desconocido" data-testid="codigo-desconocido">
@@ -257,6 +257,10 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
       </div>
 
       <div className="vm-cobro" data-testid="cobro">
+        {/* Los avisos salen abajo, sobre el cobro, como en la v2; se van solos. */}
+        <div className="vm-tostada">
+          <Toast texto={aviso?.texto ?? mensaje} alCerrar={() => { setAviso(null); setMensaje(null); }} accion={aviso?.deshacer ? { texto: "Deshacer", alTocar: () => { aviso.deshacer!(); setAviso(null); } } : undefined} />
+        </div>
         {faltan.length > 0 && <div className="vm-falta"><Icono nombre="alerta" tam={18} />{faltan.length === 1 ? `Falta el precio de ${faltan[0]!.descripcion}` : `Faltan ${faltan.length} precios`}</div>}
         <AvisoError texto={error} />
         <div className="vm-pago">
@@ -419,6 +423,7 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
         </div>
       ) : (
         <div className="vm-abajo">
+          <button type="button" className="vm-tacho" onClick={alQuitar} aria-label={`Quitar ${it.descripcion || "este renglón"} de la venta`} data-testid="quitar-renglon"><Icono nombre="tacho" tam={20} /></button>
           <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} alQuitar={alQuitar} />
           <label className="vm-unidad">
             <select value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">

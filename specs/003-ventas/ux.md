@@ -85,9 +85,13 @@ el lenguaje «Mostrador»:
   margen, el IVA, el redondeo, la cantidad y el total del renglón (con un precio a mano, el precio y
   el margen real). Tocar el resto del renglón abre su hoja: margen, precio a mano, cantidad y
   «Quitar de la venta».
-- Abajo, en una fila: la cantidad con − y + (con 1, «−» quita el renglón y ofrece Deshacer), la
-  unidad en una lista (un., kg, m, L) a su derecha, el margen (abre la lista de márgenes) y el
-  total del renglón.
+- Abajo, en una fila: el tacho para quitar el renglón (ofrece Deshacer), la cantidad con − y + (con
+  1, «−» también lo quita), la unidad en una lista (un., kg, m, L) a su derecha, el margen (abre la
+  lista de márgenes) y el total del renglón; si el total no entra, baja a su propio renglón, a la
+  derecha, y nunca se sale de la tarjeta.
+- El fondo es el gris cálido de «Mostrador», como la v2. Los avisos («Vaciaste la venta», con
+  Deshacer) salen abajo, sobre el cobro, y se van solos. Sin productos, el botón de cobrar se ve
+  apagado como en la v2: el mismo naranja, más claro.
 - Un producto sin precio va en ámbar, con los márgenes para elegir ahí mismo (300, 200, 100, 50,
   25 y «$» para el precio a mano). Si lo que se lleva supera el stock, el renglón avisa «Hay 3 un.:
   no alcanza para 4» o «Sin stock».

@@ -970,3 +970,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      («3 mecha 8», fuente de errores), elegir el margen con las teclas 1 a 5 (confunde), la ayuda
      de teclas en «?» (ya está con Alt) y todo lo de la v4 salvo el aviso «El celular está
      escaneando». Pedidos y presupuestos no entran en esta versión.
+123. **Vender en el celular: ajustes sobre lo programado** (2026-10-19). Probándolo, Carlos pidió que
+     quede como la v2: vuelve el tacho de cada renglón (cambia lo dicho en la decisión 119), el
+     aviso de «Vaciaste la venta» sale abajo, el fondo es el gris cálido de «Mostrador» (sin los
+     tonos verdes), el botón de cobrar apagado es el de la v2, y el precio no se sale de la tarjeta.

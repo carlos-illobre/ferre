@@ -1,6 +1,8 @@
 /* Vender en el celular (decisión 119): el lenguaje «Mostrador» (docs/lenguaje-mostrador/), con sus
    colores con nombre, solo dentro de esta pantalla. El marco (la barra de abajo, el estado de la
    conexión) es el de toda la aplicación. */
+/* El fondo de «Mostrador» (papel cálido, gris) en Vender y Ventas de hoy, como la v2. */
+body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm {
   --m-fondo: #F4F2EC; --m-hundido: #ECE9E1; --m-superficie: #fff; --m-borde: #E6E2D8; --m-borde-fuerte: #CEC8BA;
   --m-tinta: #1A1D1B; --m-texto-2: #545955; --m-texto-3: #6B706B;
@@ -74,15 +76,16 @@
 .vm-precio-mano input { width: 84px; font-size: 17px; font-weight: 700; }
 .vm-margenes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 .vm-margenes button { height: 44px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); color: var(--m-urgente-texto); font-weight: 750; font-size: 15px; }
-.vm-abajo { display: flex; align-items: center; gap: 6px; }
+.vm-abajo { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; row-gap: 6px; }
+.vm-tacho { width: 36px; height: 40px; display: grid; place-items: center; color: var(--m-texto-3); border-radius: 10px; flex: none; }
 .vm .vm-abajo .contador { height: 40px; background: var(--m-hundido); border: 0; }
 .vm .vm-abajo .contador button { width: 36px; height: 40px; color: var(--m-tinta); }
-.vm .vm-abajo .contador input { width: 30px; font-size: 16px; }
+.vm .vm-abajo .contador input { width: 28px; font-size: 16px; }
 .vm-unidad { position: relative; display: inline-flex; align-items: center; height: 40px; border-radius: 12px; background: var(--m-hundido); }
-.vm-unidad select { appearance: none; -webkit-appearance: none; height: 40px; border: 0; background: none; font: inherit; font-weight: 750; font-size: 14px; color: var(--m-tinta); padding: 0 24px 0 10px; }
-.vm-unidad svg { position: absolute; right: 7px; pointer-events: none; }
-.vm-margen { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 8px; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
-.vm-subtotal { margin-left: auto; font-weight: 800; font-size: 18px; white-space: nowrap; }
+.vm-unidad select { appearance: none; -webkit-appearance: none; height: 40px; border: 0; background: none; font: inherit; font-weight: 750; font-size: 14px; color: var(--m-tinta); padding: 0 20px 0 8px; }
+.vm-unidad svg { position: absolute; right: 5px; pointer-events: none; }
+.vm-margen { display: inline-flex; align-items: center; gap: 2px; height: 40px; padding: 0 6px; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
+.vm-subtotal { margin-left: auto; font-weight: 800; font-size: 17px; white-space: nowrap; }
 .vm-stock { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); font-size: 14px; font-weight: 700; }
 
 /* El cobro, fijo abajo: lo que falta, el medio y el cliente, y cobrar deslizando. */
@@ -102,7 +105,7 @@
 .vm-cliente.elegido { color: var(--m-tinta); font-weight: 750; border-color: var(--m-tinta); }
 .vm-cliente.falta { border: 2px solid var(--m-urgente); color: var(--m-urgente-texto); background: var(--m-urgente-suave); }
 .vm-deslizar { position: relative; height: 60px; border-radius: 99px; background: var(--m-accion); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px; box-shadow: var(--m-sombra-accion); user-select: none; -webkit-user-select: none; }
-.vm-deslizar.apagado { filter: saturate(.35); opacity: .55; box-shadow: none; }
+.vm-deslizar.apagado { opacity: .45; box-shadow: none; }
 .vm-pulgar { position: absolute; left: 5px; top: 5px; width: 50px; height: 50px; border-radius: 99px; background: #fff; color: var(--m-accion); display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0, 0, 0, .2); touch-action: none; transition: transform 0.32s cubic-bezier(.34, 1.4, .64, 1); z-index: 1; }
 .vm-deslizar-texto { padding: 0 44px 0 56px; white-space: nowrap; transition: opacity 0.2s; }
 .vm-flechita { position: absolute; right: 18px; opacity: .6; }
@@ -140,3 +143,7 @@
   .contenido.vender-ancho.vm > .vm-cobro { grid-column: 2; grid-row: 2; position: sticky; top: calc(var(--alto-barra) + 12px); bottom: auto; margin: 0; border-radius: 20px; border: 1px solid var(--m-borde); }
   .escaner.vm-camara { margin: 0; border-radius: 16px; }
 }
+
+/* Los avisos, abajo, sobre el cobro (como la v2). */
+.vm-tostada { position: absolute; left: 16px; right: 16px; bottom: calc(100% + 8px); pointer-events: none; }
+.vm-tostada .toast { pointer-events: auto; box-shadow: 0 12px 28px -8px rgba(0, 0, 0, .35); }
