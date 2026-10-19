@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { api, ErrorApi } from "../../../../api";
 import { useSesion } from "../../../../sesion";
 import QRCode from "qrcode";
@@ -6,7 +6,6 @@ import { dispositivoId, guardarPuestoLocal } from "../../../../puesto";
 import { entrarConHuella, hayHuella, huellaVinculadaAca } from "../../../../credenciales";
 import { describirDispositivo, esCelular } from "../dispositivo";
 import { marcarEntradaConGoogle } from "./OfrecerHuella";
-import { useEnLinea } from "./negocio-comun";
 import { Aviso, Boton, Icono, Marca, Progreso, type NombreDeIcono } from "../ui";
 import "../estilos/entrar.css";
 import "../estilos/entrar-con-celular.css";
@@ -15,6 +14,9 @@ import fondoDeLaEntrada from "../imagenes/entrar-fondo.jpg";
 import celularVendiendo from "../imagenes/entrar-celular.png";
 import { entrarConGoogle, useClienteDeGoogle } from "../../../../negocio/vinculo";
 import { irA } from "../rutas";
+import { urlApi } from "../../../../api";
+import { useResponde, type Disponibilidad } from "../../../../plataforma/servidor/useResponde";
+import { ISOTIPO_SOBRE_CLARO } from "../../../isotipo";
 import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
 
@@ -170,21 +172,37 @@ export const TEXTOS_DE_ENTRADA = {
   comoConHuella: "Acá no hay contraseñas. Entrás con la huella, si ya vinculaste este dispositivo, o con tu cuenta de Google.",
   comoSinHuella: "Acá no hay contraseñas. Entrás con tu cuenta de Google.",
   nota: "Solo entran las personas que un Administrador del negocio autorizó. Si es tu primera vez, pedile que agregue tu correo de Google.",
-  // Solo en la entrada de la computadora (decisión 93).
+  // Solo en la entrada de la computadora (decisiones 93 y 118).
   antetitulo: "El sistema del mostrador",
-  rapido: "Es rápido, seguro y sin contraseñas.",
+  masRapida: "La forma más rápida",
+  conTuUsuario: "Entra con tu usuario, sin contraseñas, en cuanto ponés tu huella.",
+  pasos: [
+    { titulo: "Apuntá el celular a este código", detalle: "Con la cámara o con «Escanear» en la entrada de Ferrebress." },
+    { titulo: "Poné la huella en el celular", detalle: "Si todavía no la vinculaste, entrás con Google ahí mismo." },
+  ],
+  cambiaEn: "Cambia en",
+  sirveUnaVez: "y sirve una vez",
+  estaComputadora: "Computadora del mostrador",
+  conexion: { "conectando": "Conectando…", "en-linea": "En línea", "sin-conexion": "Sin conexión" } satisfies Record<Disponibilidad, string>,
   protegidos: "Tus datos están protegidos",
   tutorial: "Ver tutorial",
   sinConexion: "Sin conexión. Para entrar se necesita internet: cuando vuelva, probá de nuevo.",
   googleNoResponde: "Google no responde. Revisá la conexión y reintentá.",
 };
 
-// Debajo de la tarjeta de la computadora (pedido de Carlos del 2026-10-17), cada uno en dos renglones.
+// Debajo de la tarjeta de la computadora, cada uno en dos renglones: las tres características
+// técnicas que más importan (decisión 118).
 export const SELLOS: { icono: NombreDeIcono; renglones: [string, string] }[] = [
-  { icono: "escudo", renglones: ["Seguro", "y confiable"] },
-  { icono: "nube", renglones: ["Siempre", "actualizado"] },
-  { icono: "dispositivos", renglones: ["Desde cualquier", "dispositivo"] },
+  { icono: "sin-internet", renglones: ["Ya adentro, sigue", "funcionando sin internet"] },
+  { icono: "escanear", renglones: ["Busca por código", "de barras"] },
+  { icono: "dispositivos", renglones: ["Maneja la computadora", "desde el celular"] },
 ];
+
+// El código para entrar lleva el isotipo en el centro (decisión 118). El isotipo tapa cerca del 5 % del
+// código; con la corrección de errores más alta, que recupera hasta el 30 %, queda margen para una
+// cámara real (reflejos, foco, la pantalla en ángulo). Entrar.qr.test.ts comprueba que el escáner de
+// la aplicación lo lee igual.
+export const QR_DE_ENTRADA = { nivel: "H", isotipo: 0.22 } as const;
 
 export const QUE_HACE: { icono: NombreDeIcono; texto: string }[] = [
   { icono: "vender", texto: "Buscás el producto, decís el precio y cobrás." },
@@ -234,12 +252,14 @@ function CintaMetrica() {
 // segundos se pregunta si ya lo aprobaron. Al vencer se pide otro. La clave que retira la
 // sesión no sale de acá: el QR solo lleva el código.
 const CADA_MS = 2000;
-function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: string | null } {
+function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: string | null; vence: number | null; duracion: number } {
   const { entrar } = useSesion();
   const [qr, setQr] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [vence, setVence] = useState<number | null>(null);
+  const [duracion, setDuracion] = useState(300);
   useEffect(() => {
-    if (!activo) { setQr(null); return; }
+    if (!activo) { setQr(null); setVence(null); return; }
     let vigente = true;
     let espera: ReturnType<typeof setTimeout> | null = null;
     const esperar = (ms: number, que: () => void) => { espera = setTimeout(que, ms); };
@@ -250,9 +270,10 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
         const enlace = `${location.origin}${location.pathname}#/entrar-compu?codigo=${encodeURIComponent(codigo)}`;
         // Para las pruebas automáticas: el enlace que el celular abriría.
         (window as unknown as { __enlaceParaEntrar?: string }).__enlaceParaEntrar = enlace;
-        setQr(await QRCode.toDataURL(enlace, { width: 440, margin: 0, color: { dark: "#17312b", light: "#ffffff" } }));
+        setQr(await QRCode.toDataURL(enlace, { errorCorrectionLevel: QR_DE_ENTRADA.nivel, width: 440, margin: 0, color: { dark: "#17312b", light: "#ffffff" } }));
         setError(null);
         const vence = Date.now() + expiraEnSegundos * 1000;
+        setVence(vence); setDuracion(expiraEnSegundos);
         const preguntar = async () => {
           if (!vigente) return;
           if (Date.now() > vence) return void pedir();
@@ -281,7 +302,7 @@ function useCodigoParaEntrar(activo: boolean): { qr: string | null; error: strin
     void pedir();
     return () => { vigente = false; if (espera) clearTimeout(espera); };
   }, [activo, entrar]);
-  return { qr, error };
+  return { qr, error, vence, duracion };
 }
 
 // La entrada de la computadora (decisión 93): copia la imagen de referencia de Carlos, armada con
@@ -300,7 +321,7 @@ function partirEnDos(texto: string): [string, string] {
   return [texto, ""];
 }
 
-function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
+function MarcoDeEntradaConCelular({ conexion, children }: { conexion: Disponibilidad; children: ReactNode }) {
   return (
     <main className="entrar-cc" data-testid="entrar">
       <div className="entrar-cc-escena">
@@ -317,6 +338,11 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
         <button type="button" className="entrar-cc-tutorial" onClick={() => irA("manual")} data-testid="ver-tutorial"><Icono nombre="reproducir" tam={22} />{TEXTOS_DE_ENTRADA.tutorial}</button>
         </section>
         <img className="entrar-cc-celular" src={celularVendiendo} alt="" aria-hidden="true" />
+        {/* Esta computadora y si llega al servidor (decisión 118): sin servidor no se puede entrar. */}
+        <p className="entrar-cc-estado">
+          <span><Icono nombre="computadora" tam={16} />{TEXTOS_DE_ENTRADA.estaComputadora}</span>
+          <span className={`entrar-cc-conexion ${conexion}`} role="status" data-testid="entrar-conexion" data-estado={conexion}>{TEXTOS_DE_ENTRADA.conexion[conexion]}</span>
+        </p>
         <div className="entrar-cc-derecha">
           <section className="entrar-cc-tarjeta">
             {children}
@@ -331,33 +357,54 @@ function MarcoDeEntradaConCelular({ children }: { children: ReactNode }) {
   );
 }
 
+// Cuánto falta para que el código cambie, de a un segundo, con un anillo que se vacía.
+function Cuenta({ vence, duracion }: { vence: number; duracion: number }) {
+  const [ahora, setAhora] = useState(() => Date.now());
+  useEffect(() => { const t = setInterval(() => setAhora(Date.now()), 1000); return () => clearInterval(t); }, []);
+  const quedan = Math.max(0, Math.round((vence - ahora) / 1000));
+  const parte = Math.min(1, quedan / Math.max(1, duracion));
+  return (
+    <p className="entrar-cc-cuenta" data-testid="entrar-cuenta">
+      <span><i className="anillo" style={{ "--parte": parte } as CSSProperties} aria-hidden="true" />{TEXTOS_DE_ENTRADA.cambiaEn} <b>{Math.floor(quedan / 60)}:{String(quedan % 60).padStart(2, "0")}</b></span>
+      <span>{TEXTOS_DE_ENTRADA.sirveUnaVez}</span>
+    </p>
+  );
+}
+
+const ISOTIPO = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(ISOTIPO_SOBRE_CLARO)}`;
+
 export function Entrar() {
-  const enLinea = useEnLinea();
+  const conexion = useResponde(urlApi("/health"));
+  const enLinea = conexion === "en-linea";
   const [cerrada] = useState(() => sesionCerradaPorElServidor);
   const conHuella = hayHuella() && huellaVinculadaAca();
-  const { qr, error: errorDeCodigo } = useCodigoParaEntrar(enLinea);
+  const { qr, error: errorDeCodigo, vence, duracion } = useCodigoParaEntrar(enLinea);
   return (
-    <MarcoDeEntradaConCelular>
+    <MarcoDeEntradaConCelular conexion={conexion}>
+      <span className="entrar-cc-pastilla"><Icono nombre="celular" tam={14} />{TEXTOS_DE_ENTRADA.masRapida}</span>
       <h2>{TEXTOS_DE_ENTRADA.conElCelular}</h2>
-      <p className="entrar-cc-rapido">{TEXTOS_DE_ENTRADA.rapido}</p>
+      <p className="entrar-cc-rapido">{TEXTOS_DE_ENTRADA.conTuUsuario}</p>
       {cerrada && <Aviso tipo="alerta" testId="sesion-cerrada"><strong className="entrar-error-titulo">Hay que iniciar sesión</strong>La sesión de este dispositivo se cerró o venció. Entrá de nuevo para seguir.</Aviso>}
-      {!enLinea && <Aviso tipo="alerta" testId="entrar-sin-conexion">{TEXTOS_DE_ENTRADA.sinConexion}</Aviso>}
-      {enLinea && (
-        <div className="entrar-codigo">
-          <div className="entrar-qr" data-testid="qr-entrar">
-            {qr ? <img src={qr} alt="Código para entrar con el celular" width={220} height={220} /> : <div className="esqueleto" aria-label="Generando el código" />}
+      <div className="entrar-codigo">
+        <div>
+          <div className={`entrar-qr${enLinea ? "" : " apagado"}`} data-testid="qr-entrar">
+            {enLinea && qr ? <img src={qr} alt="Código para entrar con el celular" width={220} height={220} /> : <div className="esqueleto" aria-label={enLinea ? "Generando el código" : "Sin conexión"} />}
+            {enLinea && qr && <span className="entrar-qr-isotipo" aria-hidden="true" style={{ width: `${QR_DE_ENTRADA.isotipo * 100}%`, backgroundImage: `url("${ISOTIPO}")` }} />}
           </div>
-          <ol className="entrar-pasos">
-            <li><span>{TEXTOS_DE_ENTRADA.pasoLeer}</span></li>
-            <li><span>{TEXTOS_DE_ENTRADA.pasoHuella}</span></li>
-          </ol>
+          {enLinea && qr && vence && <Cuenta vence={vence} duracion={duracion} />}
         </div>
-      )}
-      {enLinea && <p className="entrar-como entrar-cc-renueva"><Icono nombre="reloj" tam={26} /><span>{TEXTOS_DE_ENTRADA.codigoSeRenueva}</span></p>}
-      <Aviso tipo="error">{errorDeCodigo}</Aviso>
+        <ol className="entrar-pasos">
+          {TEXTOS_DE_ENTRADA.pasos.map((p) => <li key={p.titulo}><span><b>{p.titulo}</b>{p.detalle}</span></li>)}
+        </ol>
+      </div>
+      {conexion === "sin-conexion" && <Aviso tipo="alerta" testId="entrar-sin-conexion">{TEXTOS_DE_ENTRADA.sinConexion}</Aviso>}
+      <Aviso tipo="error">{enLinea ? errorDeCodigo : null}</Aviso>
       <div className="entrar-o" aria-hidden="true"><span>o</span></div>
-      {conHuella && <BotonHuella />}
-      <BotonGoogle estirar />
+      {/* Sin servidor tampoco se entra con Google ni con la huella: quedan apagados y no se pueden tocar (decisión 118). */}
+      <div className={`entrar-cc-otras${conexion === "sin-conexion" ? " apagado" : ""}`} data-testid="entrar-otras" aria-disabled={conexion === "sin-conexion"} {...(conexion === "sin-conexion" ? { inert: "" } : {})}>
+        {conHuella && <BotonHuella />}
+        <BotonGoogle estirar />
+      </div>
       <p className="entrar-nota">
         <Icono nombre="escudo" tam={18} />
         <span>{TEXTOS_DE_ENTRADA.nota}</span>

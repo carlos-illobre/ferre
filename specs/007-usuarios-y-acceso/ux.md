@@ -133,6 +133,29 @@ armar con la captura nueva sobre el celular de la capa, o con otro celular que p
 La separación de los textos de la izquierda (logotipo, antetítulo, título, bajada y las tres cosas
 que hace) y el tamaño de sus íconos se midieron sobre un recorte de la referencia que pasó Carlos
 el 2026-10-16: quedan a 2 o 3 píxeles de ella en una pantalla de 1536 × 1024.
+
+**La tarjeta de la derecha, rediseñada (decisión 118, Carlos, 2026-10-19):** la izquierda, la foto y
+el celular quedan como están; la tarjeta toma la de la propuesta v2 del director de arte, sin la
+palabra «compu». De arriba abajo: una pastilla verde «La forma más rápida»; «Entrá con tu celular»;
+«Entra con tu usuario, sin contraseñas, en cuanto ponés tu huella.»; el código (sin esquinas de
+color, con el isotipo de Ferrebress en el centro) al lado de dos pasos numerados en círculos verdes
+llenos, cada uno con su título y una línea («Apuntá el celular a este código» · «Con la cámara o con
+«Escanear» en la entrada de Ferrebress.»; «Poné la huella en el celular» · «Si todavía no la
+vinculaste, entrás con Google ahí mismo.»); debajo del código, del mismo ancho, «Cambia en m:ss» con
+un anillo que se vacía y «y sirve una vez»; una «o»; Google; la nota de siempre («Solo entran las
+personas que…») sin recuadro; y el pie «Tus datos están protegidos», que queda para el sello de
+protección de datos personales. Arriba a la derecha, fuera de la tarjeta, dos pastillas: «Computadora
+del mostrador» y el estado de la conexión con el servidor («En línea» en verde, «Conectando…» en gris,
+«Sin conexión» en ámbar; sin conexión, el código, Google y la huella se ven apagados y no se pueden
+tocar). La vista previa aprobada es
+`maquetas/entrar-compu-v1-con-tarjeta-v2.png`. Debajo de la tarjeta, las tres características técnicas, cada una en dos
+renglones: «Ya adentro, sigue / funcionando sin internet» (sin internet no se puede entrar, pero ya adentro se sigue trabajando), «Busca por código / de barras» y «Maneja la
+computadora / desde el celular».
+
+Las pastillas, el anillo y los colores nuevos siguen el lenguaje «Mostrador» (decisión 115).
+El texto «Computadora del mostrador» es fijo, igual en todas las computadoras: el navegador no deja
+saber el nombre de la computadora, y que Ferrebress le ponga un nombre a cada una sería un dato
+nuevo (queda como pregunta para Carlos).
 En un monitor más ancho que 16:9 (un ultra ancho de 2560 × 1080, por ejemplo) la escena no se
 estira, porque la foto se deformaba y quedaba un hueco en el medio: queda centrada, del ancho de un
 16:9, con las puntas redondeadas y un margen arriba y abajo, y a los dos costados va un verde casi negro, liso (elegido por

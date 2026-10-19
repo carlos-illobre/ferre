@@ -37,7 +37,7 @@ test("sin sesión se pide entrar", async ({ page }) => {
   // En la computadora se entra con el celular (RF-76): el código está sin pedirlo.
   await expect(page.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
   await expect(page.getByTestId("qr-entrar")).toBeVisible();
-  await expect(page.getByText(/No hay contraseñas/)).toBeVisible();
+  await expect(page.getByText(/sin contraseñas/)).toBeVisible();
 });
 
 test("012-E01 012-E04 012-E05 012-E12 012-E13 012-E14 «Ver tutorial» abre el manual en la misma pestaña y se vuelve a la entrada", async ({ page }) => {

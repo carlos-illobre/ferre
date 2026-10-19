@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { ConRutas } from "../rutas";
 import { Icono } from "../ui";
@@ -11,6 +11,9 @@ vi.mock("../../../../api", async (original) => ({ ...(await original<typeof impo
 vi.mock("qrcode", () => ({ default: { toDataURL: async (texto: string) => `data:image/png;base64,${btoa(texto)}` } }));
 import { Entrar, TEXTOS_DE_ENTRADA } from "./Entrar";
 
+// El servidor contesta (o no) a la pregunta de si está vivo: de eso depende «En línea» (decisión 118).
+const servidor = vi.hoisted(() => ({ responde: true }));
+
 // La entrada de la computadora copia la imagen de referencia de Carlos (decisión 93,
 // specs/007-usuarios-y-acceso/maquetas/entrar-compu-con-celular.html). En el celular no cambia.
 describe("la entrada de la computadora", () => {
@@ -19,7 +22,10 @@ describe("la entrada de la computadora", () => {
     apiFalsa.mockImplementation(async (ruta: string) => ruta === "/sesiones/vinculaciones"
       ? { id: "v1", codigo: "abc", clave: "k", expiraEnSegundos: 300 }
       : { estado: "pendiente" });
+    servidor.responde = true;
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => (String(url).endsWith("/health") && servidor.responde ? new Response("{}", { status: 200 }) : new Response("{}", { status: 503 }))));
   });
+  afterEach(() => { vi.unstubAllGlobals(); });
 
   it("tiene la marca a la izquierda, el celular con una venta en el medio y la tarjeta para entrar a la derecha", async () => {
     const { container } = render(<Entrar />);
@@ -44,11 +50,21 @@ describe("la entrada de la computadora", () => {
     const celular = container.querySelector(".entrar-cc-celular");
     expect(celular?.getAttribute("aria-hidden")).toBe("true");
     expect(celular?.getAttribute("src")).toMatch(/entrar-celular/);
-    // La tarjeta: título, «Es rápido…», el código, que se renueva, Google, quién entra y el pie.
+    // La tarjeta (decisión 118): la pastilla, el título, «Entra con tu usuario…», el código con el
+    // isotipo y cuánto falta para que cambie, los dos pasos, Google, quién entra y el pie.
+    expect(entrada.querySelector(".entrar-cc-pastilla")?.textContent).toBe(TEXTOS_DE_ENTRADA.masRapida);
     expect(screen.getByRole("heading", { name: TEXTOS_DE_ENTRADA.conElCelular })).toBeTruthy();
-    expect(screen.getByText(TEXTOS_DE_ENTRADA.rapido)).toBeTruthy();
+    expect(screen.getByText(TEXTOS_DE_ENTRADA.conTuUsuario)).toBeTruthy();
     await waitFor(() => expect(screen.getByTestId("qr-entrar").querySelector("img")).toBeTruthy());
-    expect(screen.getByText(TEXTOS_DE_ENTRADA.codigoSeRenueva)).toBeTruthy();
+    // El isotipo va encima del código sin ser otra imagen: la única imagen es el código.
+    expect(screen.getByTestId("qr-entrar").querySelector(".entrar-qr-isotipo")).toBeTruthy();
+    expect(screen.getByTestId("qr-entrar").querySelectorAll("img")).toHaveLength(1);
+    expect(screen.getByTestId("entrar-cuenta").textContent).toMatch(/^Cambia en [45]:\d\dy sirve una vez$/);
+    expect([...entrada.querySelectorAll(".entrar-pasos b")].map((b) => b.textContent)).toEqual(TEXTOS_DE_ENTRADA.pasos.map((p) => p.titulo));
+    expect(entrada.querySelector(".entrar-o")?.textContent).toBe("o");
+    // Arriba: esta computadora y el estado de la conexión con el servidor.
+    await waitFor(() => expect(screen.getByTestId("entrar-conexion").textContent).toBe("En línea"));
+    expect(entrada.querySelector(".entrar-cc-estado")?.textContent).toContain(TEXTOS_DE_ENTRADA.estaComputadora);
     expect(screen.getByText(TEXTOS_DE_ENTRADA.nota)).toBeTruthy();
     expect(screen.getByText(TEXTOS_DE_ENTRADA.protegidos)).toBeTruthy();
     // Sin «¿Necesitás ayuda?»: Carlos lo sacó.
@@ -69,19 +85,44 @@ describe("la entrada de la computadora", () => {
     } finally { vi.useRealTimers(); }
   });
 
-  it("C10: sin internet no hay código: dice que para entrar hace falta internet", async () => {
+  it("C10: sin internet no hay código: arriba dice «Sin conexión» y que para entrar hace falta internet", async () => {
     const onLine = Object.getOwnPropertyDescriptor(Navigator.prototype, "onLine")!;
     Object.defineProperty(navigator, "onLine", { value: false, configurable: true });
     try {
       render(<Entrar />);
+      await waitFor(() => expect(screen.getByTestId("entrar-conexion").dataset.estado).toBe("sin-conexion"));
+      expect(screen.getByTestId("entrar-conexion").textContent).toBe("Sin conexión");
       expect(screen.getByTestId("entrar-sin-conexion").textContent).toBe(TEXTOS_DE_ENTRADA.sinConexion);
-      expect(screen.queryByTestId("qr-entrar")).toBeNull();
+      expect(screen.getByTestId("qr-entrar").className).toContain("apagado");
+      expect(screen.getByTestId("qr-entrar").querySelector("img")).toBeNull();
       expect(apiFalsa).not.toHaveBeenCalledWith("/sesiones/vinculaciones", expect.anything());
-      // Cuando vuelve la conexión, aparece el código.
+      // Google y la huella tampoco se pueden usar: quedan apagados y fuera del alcance del teclado.
+      expect(screen.getByTestId("entrar-otras").getAttribute("aria-disabled")).toBe("true");
+      expect(screen.getByTestId("entrar-otras").hasAttribute("inert")).toBe(true);
+      // Cuando vuelve la conexión, aparece el código y Google vuelve.
       Object.defineProperty(navigator, "onLine", { value: true, configurable: true });
       act(() => { window.dispatchEvent(new Event("online")); });
       await waitFor(() => expect(screen.getByTestId("qr-entrar").querySelector("img")).toBeTruthy());
+      expect(screen.getByTestId("entrar-conexion").textContent).toBe("En línea");
+      expect(screen.getByTestId("entrar-otras").hasAttribute("inert")).toBe(false);
     } finally { delete (navigator as { onLine?: boolean }).onLine; Object.defineProperty(Navigator.prototype, "onLine", onLine); }
+  });
+
+  it("007 escenarios 9 y 11: con red pero sin servidor, dice «Sin conexión»; mientras pregunta, «Conectando…»; cuando contesta, «En línea» y el código", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "setInterval", "Date"] });
+    try {
+      servidor.responde = false;
+      render(<Entrar />);
+      expect(screen.getByTestId("entrar-conexion").textContent).toBe("Conectando…");
+      await act(async () => { await vi.advanceTimersByTimeAsync(10); });
+      expect(screen.getByTestId("entrar-conexion").textContent).toBe("Sin conexión");
+      expect(apiFalsa).not.toHaveBeenCalledWith("/sesiones/vinculaciones", expect.anything());
+      // Lo vuelve a preguntar cada 30 segundos, sin que nadie toque nada.
+      servidor.responde = true;
+      await act(async () => { await vi.advanceTimersByTimeAsync(30_000); });
+      expect(screen.getByTestId("entrar-conexion").textContent).toBe("En línea");
+      expect(apiFalsa).toHaveBeenCalledWith("/sesiones/vinculaciones", expect.anything());
+    } finally { vi.useRealTimers(); }
   });
 
   it("D4 a D6: si el servidor cerró la sesión (a distancia, vencida o el usuario desactivado), la entrada lo dice", () => {
@@ -90,10 +131,10 @@ describe("la entrada de la computadora", () => {
     expect(screen.getByTestId("sesion-cerrada").textContent).toContain("Hay que iniciar sesión");
   });
 
-  it("debajo de la tarjeta, tres sellos; el aviso de quién puede entrar lleva un escudo", async () => {
+  it("debajo de la tarjeta, las tres características técnicas (decisión 118); el aviso de quién puede entrar lleva un escudo", async () => {
     const { container } = render(<ConRutas><Entrar /></ConRutas>);
     const sellos = within(screen.getByTestId("sellos")).getAllByRole("listitem").map((li) => li.innerHTML.split("</svg>")[1]);
-    expect(sellos).toEqual(["<span>Seguro<br>y confiable</span>", "<span>Siempre<br>actualizado</span>", "<span>Desde cualquier<br>dispositivo</span>"]);
+    expect(sellos).toEqual(["<span>Ya adentro, sigue<br>funcionando sin internet</span>", "<span>Busca por código<br>de barras</span>", "<span>Maneja la computadora<br>desde el celular</span>"]);
     expect(container.querySelector(".entrar-cc-derecha > .entrar-cc-tarjeta + .entrar-cc-sellos")).toBeTruthy();
     const escudo = render(<Icono nombre="escudo" />).container.querySelector("path")?.getAttribute("d");
     expect(container.querySelector(".entrar-nota path")?.getAttribute("d")).toBe(escudo);

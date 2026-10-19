@@ -922,3 +922,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      director de arte, Carlos eligió para la entrada del celular la versión de hoy (v1). Solo
      cambia la línea bajo el logotipo (decisión 55): de «Tu ferretería, en orden» pasa a «Vendé,
      contá y cobrá desde el mostrador o el depósito.»
+118. **Entrada de la computadora: la v1 con la tarjeta de la v2** (2026-10-19). De las propuestas,
+     Carlos eligió para la entrada de la computadora la de hoy, con la tarjeta de la derecha como la
+     de la v2 y ajustes suyos: sin «compu»; el isotipo de Ferrebress en el centro del QR, sin
+     esquinas de color; los pasos con círculos verdes llenos; «Cambia en m:ss · y sirve una vez»
+     del ancho del QR; la «o» de siempre; la nota de siempre sin recuadro; el pie «Tus datos están
+     protegidos» (ahí va a ir el sello de protección de datos personales). Arriba, «Computadora del
+     mostrador» (fijo: el navegador no deja saber el nombre de la computadora) y el estado de la conexión con el servidor, que funciona de verdad: verde si
+     contesta, gris mientras pregunta, ámbar si no; sin conexión el QR se ve apagado. Abajo, tres
+     características técnicas: ya adentro sigue funcionando sin internet (sin internet no se entra), busca por código de barras y maneja
+     la computadora desde el celular. Detalle en `specs/007-usuarios-y-acceso/ux.md`.

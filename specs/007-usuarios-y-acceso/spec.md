@@ -228,7 +228,10 @@ aplicación con ese usuario, sin haber tocado nada en ella.
 6. **Given** un código que ya dejó entrar a una computadora, **When** otro celular lo lee, **Then** no sirve: dice que hay que leer el que la computadora muestra ahora.
 7. **Given** un usuario desactivado o un correo no autorizado, **When** intenta entrar desde el celular después de leer el código, **Then** no entra ni el celular ni la computadora (RF-70).
 8. **Given** una computadora que entró así, **When** se mira la lista de sesiones (RF-74) y «Quién hizo qué» (RF-71), **Then** figura la sesión de la computadora, y queda registrado que se abrió desde el celular y quién fue.
-9. **Given** la computadora sin conexión, **When** abre la entrada, **Then** no hay código: dice que entrar necesita internet.
+9. **Given** la computadora sin conexión con el servidor (sin internet, o con internet pero el servidor no contesta), **When** abre la entrada, **Then** arriba dice «Sin conexión» en ámbar, el código, «Continuar con Google» y la huella se ven apagados y no se pueden tocar, y dice que para entrar hace falta internet; cuando el servidor vuelve a contestar, el código se pide solo (decisión 118).
+11. **Given** la entrada de la computadora, **When** el servidor contesta, **Then** arriba dice «En línea» con un punto verde; mientras lo pregunta al abrir, dice «Conectando…». Lo vuelve a preguntar cada 30 segundos y cada vez que el navegador avisa que volvió la red (decisión 118).
+12. **Given** el código en pantalla, con el isotipo de Ferrebress en el centro, **When** el escáner de la aplicación lo lee desde el celular, **Then** lo lee igual que un código sin isotipo: el código se arma con la corrección de errores más alta, que tolera lo que tapa el isotipo (decisión 118).
+13. **Given** el código en pantalla, **When** pasa el tiempo, **Then** debajo del código se ve cuánto falta para que cambie (minutos y segundos) y que sirve una sola vez.
 10. **Given** una computadora en la que nadie vinculó una huella, **When** se abre la entrada, **Then** no ofrece «Entrar con la huella». Solo lo ofrece la computadora que fue vinculada (la que tiene lector o PIN propio).
 
 ---
