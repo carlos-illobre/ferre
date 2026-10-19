@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Procesos · Diagrama con la hoja de figuras (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../dibujo.js"></script>
+<script src="../../proceso.js"></script>
+<style>
+  body { width: 390px; }
+  .cab { display: flex; align-items: center; gap: 8px; padding: 2px 12px 0 8px; }
+  .cab .volver { width: 44px; height: 44px; border-radius: 99px; display: grid; place-items: center; color: var(--tinta); }
+  .cab .tit { flex: 1; min-width: 0; }
+  .cab .tit b { display: block; font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cab .tit span { display: flex; gap: 8px; align-items: center; font-size: 14px; font-weight: 650; color: var(--logro-texto); }
+  .cab .btn-icono { border-radius: 99px; }
+  .celu-pestanas a { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .lienzo { position: relative; flex: 1; min-height: 0; margin-top: 12px; overflow: hidden; background-color: var(--fondo); background-image: radial-gradient(#D8D3C7 1.1px, transparent 1.2px); background-size: 16px 16px; border-top: 1px solid var(--borde); }
+  .lienzo > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .controles { position: absolute; right: 12px; top: 12px; z-index: 4; display: grid; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-2); overflow: hidden; }
+  .controles button { width: 44px; height: 44px; border: 0; background: transparent; display: grid; place-items: center; color: var(--texto-2); }
+  .controles button + button { border-top: 1px solid var(--borde); }
+  .pad { position: absolute; z-index: 2; display: flex; gap: 4px; padding: 4px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-2); }
+  .pad button { width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; display: grid; place-items: center; color: var(--texto-2); }
+  .pad .peligro { color: var(--error-texto); }
+  .hoja { position: relative; z-index: 5; background: var(--superficie); border-radius: 24px 24px 0 0; box-shadow: 0 -12px 32px -12px rgba(18,56,47,.25); padding: 6px 16px 10px; border-top: 1px solid var(--borde); }
+  .agarre { width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 6px; }
+  .hoja-cab { display: flex; align-items: center; height: 36px; }
+  .hoja-cab b { font-size: 18px; font-weight: 800; flex: 1; }
+  .figs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 4px; }
+  .figs div { height: 58px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; align-content: center; gap: 2px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .figs div .i-l { color: var(--tinta); }
+  .figs div.alzada { background: var(--superficie); box-shadow: var(--sombra-3); border: 1.5px solid var(--pino); transform: translateY(-4px) scale(1.04); }
+  .ayuda { font-size: 14px; color: var(--texto-2); font-weight: 600; text-align: center; margin-top: 8px; }
+  .logo-bpmn { position: absolute; right: 12px; bottom: 8px; z-index: 6; font-size: 14px; font-weight: 700; color: var(--texto-3); background: rgba(255,255,255,.75); padding: 1px 8px; border-radius: 6px; }
+  .logo-bpmn b { color: var(--tinta); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="cab">
+    <span class="volver"><i class="i i-l" data-i="chevron-left"></i></span>
+    <div class="tit"><b>Venta en el mostrador</b><span><span class="pastilla urgente" style="height:24px;padding:0 8px"><span class="punto"></span>Borrador</span><i class="i i-s" data-i="check"></i>Guardado</span></div>
+    <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="undo-2"></i></button>
+    <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="ellipsis"></i></button>
+  </div>
+  <nav class="celu-pestanas"><a class="activa"><i class="i" data-i="workflow"></i>Diagrama</a><a><i class="i" data-i="list-ordered"></i>Pasos</a></nav>
+
+  <section class="lienzo" id="lienzo">
+    <svg id="dib"></svg>
+    <div class="controles"><button><i class="i" data-i="zoom-in"></i></button><button><i class="i" data-i="zoom-out"></i></button><button><i class="i" data-i="maximize"></i></button></div>
+    <div class="pad" id="pad"><button><i class="i" data-fig="tarea"></i></button><button><i class="i" data-i="arrow-right"></i></button><button><i class="i" data-i="pencil"></i></button><button class="peligro"><i class="i" data-i="trash-2"></i></button></div>
+    <div class="logo-bpmn">hecho con <b>bpmn.io</b></div>
+  </section>
+
+  <section class="hoja">
+    <div class="agarre"></div>
+    <div class="hoja-cab"><b>Agregar un paso</b><i class="i" data-i="chevron-down" style="color:var(--texto-2)"></i></div>
+    <div class="figs" id="figs"></div>
+    <div class="ayuda">Arrastrá un paso al dibujo.</div>
+  </section>
+
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>
+  document.getElementById('figs').innerHTML = FIGURAS.map(function (f) {
+    return '<div' + (f.id === 'persona' ? ' class="alzada"' : '') + ' aria-label="' + f.nombre + '">' + glifo(f.id, 'i i-l') + f.corto + '</div>';
+  }).join('');
+  pintarIconos(); pintarFiguras();
+  var m = JSON.parse(JSON.stringify(VENTA));
+  m.pasos = m.pasos.filter(function (p) { return p.id !== 'nota'; }); m.asociaciones = [];
+  m.pasos.forEach(function (p) { if (p.id === 'gm') p.carril = 'ven'; });
+  m.flechas = m.flechas.filter(function (f) { return f.de !== 'gm'; });
+  m.flechas.push({ de: 'gm', a: 'busca', s: 't', e: 't', via: [[720, 150], [376, 150]], et: 'Sí', etp: [560, 150] }, { de: 'gm', a: 'cobra' });
+  m.flechas.forEach(function (f) { if (f.de === 'suma') { f.s = 'r'; f.e = 'b'; } if (f.de === 'gp' && f.a === 'margen') f.etp = [512, 186]; if (f.de === 'gp' && f.a === 'suma') f.etp = [540, 360]; });
+  var pos = {
+    carriles: { cli: [0, 120], ven: [120, 290], sis: [290, 520] },
+    ini: [140, 60], pide: [250, 60], busca: [376, 210], gp: [486, 210], margen: [610, 210], suma: [610, 360],
+    gm: [720, 210], cobra: [840, 210], reg: [840, 360], espera: [720, 450], fin: [960, 360]
+  };
+  var L = document.getElementById('lienzo'), vx = 380, vy = 118;
+  dibujar(document.getElementById('dib'), m, pos, { tw: 120, th: 60, cab: 0, chipCarril: true, chipX: vx + 8, x0: 0, x1: 1100, sel: 'margen', vista: [vx, vy, L.clientWidth, L.clientHeight] });
+  var pad = document.getElementById('pad');
+  pad.style.left = (610 - vx - 92) + 'px'; pad.style.top = (210 + 30 + 12 - vy) + 'px';
+</script>
+</body>
+</html>

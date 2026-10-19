@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Procesos · Contalo y se dibuja (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../dibujo.js"></script>
+<script src="../../proceso.js"></script>
+<style>
+  body { overflow: hidden; }
+  .todo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; height: 100vh; }
+  .lienzo { position: relative; overflow: hidden; background-color: var(--fondo); background-image: radial-gradient(#D8D3C7 1.1px, transparent 1.2px); background-size: 16px 16px; }
+  .lienzo > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .flota { position: absolute; z-index: 3; background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-2); }
+  .barra-sup { left: 16px; top: 16px; display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; }
+  .barra-sup .volver { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--texto-2); background: var(--hundido); }
+  .barra-sup .nom { font-size: 20px; font-weight: 800; letter-spacing: -.01em; display: inline-flex; align-items: center; gap: 6px; }
+  .barra-sup .ok { display: inline-flex; gap: 4px; align-items: center; font-size: 14px; font-weight: 650; color: var(--logro-texto); }
+  .arriba-der { right: 16px; top: 16px; display: flex; align-items: center; gap: 8px; padding: 6px; }
+  .caras { display: flex; align-items: center; padding: 0 6px 0 4px; }
+  .caras .avatar { width: 32px; height: 32px; border: 2px solid #fff; font-size: 14px; }
+  .caras .avatar + .avatar { margin-left: -8px; }
+  .caras .avatar.otra { background: var(--pino-suave); color: var(--pino-texto); }
+  .caras small { font-size: 14px; font-weight: 600; color: var(--texto-2); margin-left: 8px; }
+  .dock { left: 16px; top: 88px; display: grid; gap: 2px; padding: 6px; }
+  .dock button { width: 44px; height: 40px; border: 0; border-radius: 10px; background: transparent; display: grid; place-items: center; color: var(--texto-2); }
+  .dock button.on { background: var(--pino); color: #fff; }
+  .dock hr { border: 0; height: 1px; background: var(--borde); margin: 3px 6px; }
+  .versiones { left: 50%; transform: translateX(-50%); bottom: 16px; display: flex; align-items: center; gap: 16px; padding: 10px 16px; width: 640px; }
+  .versiones .et { font-size: 14px; font-weight: 750; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+  .pista { position: relative; flex: 1; height: 44px; }
+  .pista .riel { position: absolute; left: 8px; right: 8px; top: 12px; height: 4px; border-radius: 4px; background: var(--hundido-2); }
+  .pista .lleno { position: absolute; left: 8px; width: 76%; top: 12px; height: 4px; border-radius: 4px; background: var(--pino); }
+  .tick { position: absolute; top: 6px; transform: translateX(-50%); display: grid; justify-items: center; gap: 4px; font-size: 14px; font-weight: 650; color: var(--texto-2); white-space: nowrap; }
+  .tick i { width: 16px; height: 16px; border-radius: 99px; background: var(--superficie); border: 2px solid var(--borde-fuerte); display: block; }
+  .tick.vig i { background: var(--logro); border-color: var(--logro); }
+  .tick.vig { color: var(--logro-texto); }
+  .tick.hoy i { width: 22px; height: 22px; margin-top: -3px; border: 3px solid var(--pino); box-shadow: var(--sombra-2); }
+  .tick.hoy { color: var(--tinta); font-weight: 800; top: 6px; }
+  .tick span { line-height: 16px; }
+  .zoom { right: 16px; bottom: 16px; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 12px; }
+  .zoom button { height: 36px; min-width: 36px; border: 0; border-radius: 8px; background: transparent; display: grid; place-items: center; color: var(--texto-2); }
+  .zoom .n { font-weight: 750; font-size: 14px; padding: 0 4px; }
+  .logo-bpmn { right: 16px; bottom: 68px; font-size: 14px; font-weight: 700; color: var(--texto-3); background: transparent; border: 0; box-shadow: none; }
+  .logo-bpmn b { color: var(--tinta); }
+
+  .contalo { background: var(--superficie); border-left: 1px solid var(--borde); display: flex; flex-direction: column; min-height: 0; }
+  .contalo .cab { padding: 18px 20px 12px; border-bottom: 1px solid var(--borde); }
+  .contalo .cab .t-seccion { display: flex; align-items: center; gap: 8px; }
+  .contalo .cab .t-seccion .i { color: var(--accion); }
+  .relato { flex: 1; min-height: 0; overflow: hidden; padding: 14px 20px 0; display: grid; align-content: start; gap: 12px; font-size: 15px; line-height: 23px; }
+  .relato p { margin: 0; color: var(--tinta); }
+  .n { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 6px; background: var(--hundido); color: var(--texto-2); font-size: 14px; font-weight: 800; line-height: 1; vertical-align: 1px; margin: 0 1px; }
+  .relato p.escribiendo { padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--pino); box-shadow: 0 0 0 4px rgba(18,56,47,.10); }
+  .relato p.escribiendo mark { background: var(--accion-suave); color: var(--accion-texto); border-radius: 4px; padding: 0 2px; font-weight: 650; }
+  .propuesta { border: 1.5px solid var(--accion); border-radius: 16px; padding: 12px 14px; background: #FFFBF8; box-shadow: var(--sombra-2); display: grid; gap: 8px; }
+  .propuesta .tit { font-size: 14px; font-weight: 750; color: var(--accion-texto); display: flex; gap: 6px; align-items: center; }
+  .propuesta .p { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 650; }
+  .propuesta .p .g { width: 32px; height: 32px; border-radius: 8px; background: var(--superficie); border: 1px dashed var(--accion); display: grid; place-items: center; color: var(--accion-texto); flex: none; }
+  .propuesta .p small { display: block; font-size: 14px; font-weight: 550; color: var(--texto-2); line-height: 18px; }
+  .propuesta .bot { display: flex; gap: 8px; margin-top: 2px; }
+  .entrada { padding: 12px 16px 16px; display: flex; gap: 8px; align-items: center; }
+  .entrada .campo { flex: 1; height: 48px; font-size: 15px; }
+  .mic { width: 48px; height: 48px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; box-shadow: var(--sombra-2); border: 0; }
+</style>
+</head>
+<body>
+<div class="todo">
+  <section class="lienzo" id="lienzo">
+    <svg id="dib"></svg>
+    <div class="flota barra-sup">
+      <span class="volver"><i class="i" data-i="arrow-left"></i></span>
+      <div>
+        <div class="nom">Venta en el mostrador <i class="i i-s" data-i="chevron-down"></i></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="pastilla urgente" style="height:24px"><span class="punto"></span>Borrador</span><span class="ok"><i class="i i-s" data-i="check"></i>Guardado</span></div>
+      </div>
+    </div>
+    <div class="flota arriba-der">
+      <span class="caras"><span class="avatar">CI</span><span class="avatar otra">LG</span><small>Lucía también lo mira</small></span>
+      <button class="btn chico btn-icono" title="Deshacer"><i class="i i-s" data-i="undo-2"></i></button>
+      <button class="btn chico btn-icono" title="Importar"><i class="i i-s" data-i="upload"></i></button>
+      <button class="btn chico btn-icono" title="Exportar"><i class="i i-s" data-i="download"></i></button>
+      <button class="btn chico"><i class="i i-s" data-i="circle-check"></i>Marcar vigente</button>
+    </div>
+    <div class="flota dock" id="dock"></div>
+    <div class="flota versiones">
+      <span class="et"><i class="i i-s" data-i="history"></i>Versiones</span>
+      <div class="pista"><span class="riel"></span><span class="lleno"></span>
+        <span class="tick" style="left:4%"><i></i><span>12 sep</span></span>
+        <span class="tick" style="left:30%"><i></i><span>3 oct</span></span>
+        <span class="tick vig" style="left:56%"><i></i><span>14 oct · vigente</span></span>
+        <span class="tick hoy" style="left:80%"><i></i><span>Hoy</span></span>
+      </div>
+      <button class="btn chico btn-oscuro"><i class="i i-s" data-i="play"></i>Recorrerlo</button>
+    </div>
+    <div class="flota logo-bpmn">hecho con <b>bpmn.io</b></div>
+    <div class="flota zoom"><button><i class="i i-s" data-i="zoom-out"></i></button><span class="n">100 %</span><button><i class="i i-s" data-i="zoom-in"></i></button><button><i class="i i-s" data-i="maximize"></i></button></div>
+  </section>
+
+  <aside class="contalo">
+    <div class="cab">
+      <div class="t-seccion"><i class="i" data-i="wand-sparkles"></i>Contalo</div>
+      <div class="t-detalle">Escribí cómo se hace, como se lo contarías a alguien nuevo. Lo dibujo yo; vos lo corregís en el dibujo.</div>
+    </div>
+    <div class="relato">
+      <p>Llega un cliente <span class="n">1</span> y pide lo que necesita <span class="n">2</span>.</p>
+      <p>El vendedor lo busca o lo escanea <span class="n">3</span>. Si no tiene precio <span class="n">4</span>, elige el margen <span class="n">5</span>.</p>
+      <p>Ferrebress lo suma a la venta <span class="n">6</span>; si lleva algo más <span class="n">7</span>, vuelve a buscar.</p>
+      <p>Cobra en el medio que elige el cliente <span class="n">8</span>, Ferrebress registra la venta <span class="n">9</span> y listo <span class="n">10</span>.</p>
+      <p class="escribiendo"><mark>Si paga con transferencia</mark>, <mark>espera que acredite</mark> antes de registrar<span class="cursor"></span></p>
+      <div class="propuesta">
+        <div class="tit"><i class="i i-s" data-i="sparkles"></i>Agrego 2 pasos entre el 8 y el 9</div>
+        <div class="p"><span class="g"><i class="i i-s" data-fig="decision"></i></span><div>¿Paga con transferencia?<small>Decisión · Sí espera, No registra</small></div></div>
+        <div class="p"><span class="g"><i class="i i-s" data-fig="espera"></i></span><div>Espera que acredite<small>Espera · Ferrebress</small></div></div>
+        <div class="bot"><button class="btn btn-accion chico" style="flex:1">Agregarlos <span class="kbd">Enter</span></button><button class="btn chico btn-fantasma">Así no <span class="kbd">Esc</span></button></div>
+      </div>
+      <div style="display:grid;gap:8px;margin-top:4px">
+        <span class="t-etiqueta">Le falta, según otros procesos</span>
+        <span class="chip" style="height:36px;font-size:14px;justify-self:start"><i class="i i-s" data-i="plus"></i>Si no hay stock, ¿qué pasa?</span>
+        <span class="chip" style="height:36px;font-size:14px;justify-self:start"><i class="i i-s" data-i="plus"></i>¿Quién entrega la factura?</span>
+      </div>
+    </div>
+    <div class="entrada">
+      <div class="campo"><i class="i" data-i="message-square-text"></i>Y después…</div>
+      <button class="mic" title="Dictar"><i class="i" data-i="mic"></i></button>
+    </div>
+  </aside>
+</div>
+<script>
+  var dock = document.getElementById('dock');
+  dock.innerHTML = '<button class="on" title="Elegir y mover"><i class="i i-s" data-i="mouse-pointer-2"></i></button><hr>' +
+    ['inicio', 'tarea', 'persona', 'sistema', 'decision', 'paralelo', 'espera', 'fin'].map(function (id) { return '<button title="' + id + '">' + glifo(id) + '</button>'; }).join('') +
+    '<hr><button title="Más figuras"><i class="i i-s" data-i="ellipsis"></i></button>';
+  pintarIconos();
+  var m = JSON.parse(JSON.stringify(VENTA));
+  m.pasos = m.pasos.filter(function (p) { return p.id !== 'nota'; });
+  m.asociaciones = [];
+  m.pasos.forEach(function (p) { if (p.id === 'gm') p.carril = 'ven'; if (p.id === 'espera') p.nombre = 'Espera que acredite'; });
+  m.pasos.push({ id: 'gt', tipo: 'decision', nombre: '¿Paga con transferencia?', carril: 'sis' });
+  m.flechas = m.flechas.filter(function (f) { return f.de !== 'gm' && f.de !== 'espera' && f.de !== 'cobra' && f.de !== 'reg'; });
+  m.flechas.forEach(function (f) { if (f.de === 'suma') { f.s = 'r'; f.e = 'b'; } });
+  m.flechas.push(
+    { de: 'gm', a: 'busca', s: 't', e: 't', via: [[644, 120], [300, 120]], et: 'Sí', etp: [420, 120] },
+    { de: 'gm', a: 'cobra', et: 'No', etp: [674, 160] },
+    { de: 'cobra', a: 'gt', s: 'b', e: 't' },
+    { de: 'gt', a: 'reg', s: 'b', e: 't', et: 'No', etp: [764, 428] },
+    { de: 'gt', a: 'espera', s: 'r', e: 't', et: 'Sí', etp: [830, 340] },
+    { de: 'espera', a: 'reg', s: 'l', e: 'r' },
+    { de: 'reg', a: 'fin', s: 'l', e: 'r' }
+  );
+  m.flechas.forEach(function (f) { if (f.de === 'gp' && f.a === 'margen') f.etp = [440, 160]; });
+  var pos = {
+    carriles: { cli: [0, 106], ven: [106, 266], sis: [266, 560] },
+    ini: [64, 64], pide: [176, 64], busca: [300, 190], gp: [412, 190], margen: [524, 190], gm: [644, 190], cobra: [764, 190],
+    suma: [524, 346], gt: [764, 340], espera: [870, 480], reg: [764, 480], fin: [624, 480]
+  };
+  var L = document.getElementById('lienzo');
+  dibujar(document.getElementById('dib'), m, pos, { tw: 128, th: 64, cab: 0, chipCarril: true, chipX: 8, x0: -100, x1: 1100, carrilOpacidad: .6,
+    fantasmas: ['gt', 'espera'], vista: [-84, -96, L.clientWidth, L.clientHeight] });
+</script>
+</body>
+</html>

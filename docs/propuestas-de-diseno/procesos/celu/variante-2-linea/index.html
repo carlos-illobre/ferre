@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Procesos · La línea del recorrido (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../dibujo.js"></script>
+<style>
+  body { width: 390px; }
+  .cab { display: flex; align-items: center; gap: 8px; padding: 2px 12px 0 8px; }
+  .cab .volver { width: 44px; height: 44px; border-radius: 99px; display: grid; place-items: center; color: var(--tinta); }
+  .cab .tit { flex: 1; min-width: 0; }
+  .cab .tit b { display: block; font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cab .tit span { display: flex; gap: 8px; align-items: center; font-size: 14px; font-weight: 650; color: var(--logro-texto); }
+  .celu-pestanas a { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .lista { position: relative; flex: 1; min-height: 0; overflow: hidden; padding: 8px 16px 0; }
+  .lista::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 48px; background: linear-gradient(rgba(244,242,236,0), var(--fondo)); pointer-events: none; z-index: 3; }
+  .encab { display: grid; grid-template-columns: 84px 1fr; align-items: center; height: 40px; }
+  .rieles { position: relative; height: 32px; }
+  .rieles span { position: absolute; top: 2px; width: 28px; height: 28px; margin-left: -14px; border-radius: 99px; background: var(--pino-suave); color: var(--pino-texto); display: grid; place-items: center; }
+  .encab .res { display: flex; gap: 8px; align-items: center; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .filas { position: relative; }
+  .filas > svg { position: absolute; left: 0; top: 0; width: 84px; height: 100%; overflow: visible; }
+  .f { margin-left: 84px; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; box-shadow: var(--sombra-1); margin-bottom: 6px; position: relative; }
+  .f .nom { flex: 1; min-width: 0; font-weight: 700; font-size: 15px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .f .det { font-size: 14px; font-weight: 600; color: var(--texto-3); white-space: nowrap; }
+  .f .asa { color: var(--borde-fuerte); }
+  .f.dec { background: transparent; box-shadow: none; border-style: dashed; border-color: var(--borde-fuerte); }
+  .f.rama { margin-left: 104px; }
+  .op { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 99px; border: 1px solid var(--borde-fuerte); font-size: 14px; font-weight: 750; color: var(--texto-2); background: var(--superficie); }
+  .hueco { margin-left: 84px; height: 44px; border-radius: 12px; border: 2px dashed var(--accion); background: var(--accion-suave); color: var(--accion-texto); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 750; margin-bottom: 6px; }
+  .alzada { position: absolute; left: 112px; right: 6px; z-index: 4; height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--superficie); border: 1.5px solid var(--pino); border-radius: 12px; box-shadow: var(--sombra-3); transform: rotate(-2deg); }
+  .alzada .nom { flex: 1; font-weight: 750; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dedo { position: absolute; z-index: 5; width: 44px; height: 44px; border-radius: 99px; background: rgba(18,56,47,.18); border: 2px solid rgba(255,255,255,.9); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="cab">
+    <span class="volver"><i class="i i-l" data-i="chevron-left"></i></span>
+    <div class="tit"><b>Venta en el mostrador</b><span><span class="pastilla urgente" style="height:24px;padding:0 8px"><span class="punto"></span>Borrador</span><i class="i i-s" data-i="check"></i>Guardado</span></div>
+    <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="undo-2"></i></button>
+    <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="ellipsis"></i></button>
+  </div>
+  <nav class="celu-pestanas"><a><i class="i" data-i="workflow"></i>Diagrama</a><a class="activa"><i class="i" data-i="list-ordered"></i>Pasos</a></nav>
+
+  <section class="lista">
+    <div class="encab">
+      <div class="rieles"><span style="left:16px"><i class="i i-s" data-i="user-round"></i></span><span style="left:42px"><i class="i i-s" data-i="user"></i></span><span style="left:68px"><i class="i i-s" data-i="monitor"></i></span></div>
+      <div class="res">Cliente · Vendedor · Ferrebress</div>
+    </div>
+    <div class="filas" id="filas"><svg id="g"></svg></div>
+  </section>
+
+  <div class="barra-accion"><button class="btn btn-accion grande" style="width:100%"><i class="i" data-i="circle-check"></i>Marcar vigente</button></div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>
+  var X = [16, 42, 68], H = 50; // carril → x del riel; alto de fila con su separación
+  var F = [
+    { c: 0, t: 'inicio', n: 'Llega un cliente' },
+    { c: 0, t: 'persona', n: 'Pide lo que necesita' },
+    { c: 1, t: 'persona', n: 'Busca o escanea el producto', d: 'Vender' },
+    { c: 1, t: 'decision', n: '¿Tiene precio?', d: 'Sí sigue', dec: 1 },
+    { c: 1, t: 'persona', n: 'Elige el margen', op: 'No', rama: 1 },
+    { c: 2, t: 'sistema', n: 'Suma el producto a la venta' },
+    { c: 1, t: 'decision', n: '¿Lleva algo más?', d: 'Sí, vuelve al 3', dec: 1 },
+    { c: 1, t: 'persona', n: 'Cobra en el medio que elige', d: 'Vender' },
+    { hueco: 1, c: 2 },
+    { c: 2, t: 'sistema', n: 'Registra la venta y baja el stock' },
+    { c: 2, t: 'fin', n: 'Venta registrada' }
+  ];
+  var cont = document.getElementById('filas'), html = '';
+  F.forEach(function (f) {
+    if (f.hueco) { html += '<div class="hueco">Soltalo acá, después de Cobra</div>'; return; }
+    html += '<div class="f' + (f.dec ? ' dec' : '') + (f.rama ? ' rama' : '') + '">' + (f.op ? '<span class="op">' + f.op + '</span>' : '') +
+      '<span class="nom">' + f.n + '</span>' + (f.d ? '<span class="det">' + f.d + '</span>' : '') + (f.dec ? '' : '<span class="asa"><i class="i i-s" data-i="grip-vertical"></i></span>') + '</div>';
+  });
+  cont.insertAdjacentHTML('beforeend', html);
+  cont.insertAdjacentHTML('beforeend', '<div class="alzada" style="top:' + (8 * H - 14) + 'px"><span style="color:var(--urgente-texto)">' + glifo('espera', 'i') + '</span><span class="nom">Espera que acredite la transf.</span><i class="i i-s" data-i="grip-vertical" style="color:var(--texto-3)"></i></div><span class="dedo" style="left:300px;top:' + (8 * H - 12) + 'px"></span>');
+  pintarIconos();
+
+  // La línea: un riel por carril, el recorrido en pino
+  var C = COLORES_DIBUJO, s = [];
+  var alto = F.length * H;
+  X.forEach(function (x) { s.push('<line x1="' + x + '" y1="0" x2="' + x + '" y2="' + alto + '" stroke="' + C.hundido + '" stroke-width="2"/>'); });
+  function cy(i) { return i * H + 22; }
+  var pts = [];
+  F.forEach(function (f, i) { if (!f.hueco) pts.push([f.rama ? X[1] + 18 : X[f.c], cy(i), f, i]); });
+  for (var i = 1; i < pts.length; i++) {
+    var a = pts[i - 1], b = pts[i];
+    var d = 'M' + a[0] + ' ' + a[1] + ' C' + a[0] + ' ' + (a[1] + 26) + ' ' + b[0] + ' ' + (b[1] - 26) + ' ' + b[0] + ' ' + b[1];
+    var hueco = b[3] - a[3] > 1;
+    s.push('<path d="' + d + '" fill="none" stroke="' + (hueco ? C.accion : C.pino) + '" stroke-width="3" stroke-linecap="round"' + (hueco ? ' stroke-dasharray="2 6"' : '') + '/>');
+  }
+  // el «Sí» de ¿Tiene precio? salta la rama
+  s.push('<path d="M' + X[1] + ' ' + cy(3) + ' C' + X[1] + ' ' + (cy(4)) + ' ' + X[2] + ' ' + cy(4) + ' ' + X[2] + ' ' + cy(5) + '" fill="none" stroke="' + C.pino + '" stroke-width="3" opacity=".35"/>');
+  // vuelta de ¿Lleva algo más? al 3
+  s.push('<path d="M' + X[1] + ' ' + cy(6) + ' C' + (X[1] - 40) + ' ' + cy(6) + ' ' + (X[1] - 40) + ' ' + cy(2) + ' ' + X[1] + ' ' + cy(2) + '" fill="none" stroke="' + C.t3 + '" stroke-width="2" stroke-dasharray="4 4"/>');
+  pts.forEach(function (p) {
+    var x = p[0], y = p[1], t = p[2].t;
+    if (t === 'decision') s.push('<path d="M' + x + ' ' + (y - 11) + ' L' + (x + 11) + ' ' + y + ' L' + x + ' ' + (y + 11) + ' L' + (x - 11) + ' ' + y + 'Z" fill="#fff" stroke="' + C.pino + '" stroke-width="2.5" stroke-linejoin="round"/>');
+    else if (t === 'inicio') s.push('<circle cx="' + x + '" cy="' + y + '" r="9" fill="#fff" stroke="' + C.pinoT + '" stroke-width="2.5"/>');
+    else if (t === 'fin') s.push('<circle cx="' + x + '" cy="' + y + '" r="9" fill="#fff" stroke="' + C.tinta + '" stroke-width="5"/>');
+    else s.push('<circle cx="' + x + '" cy="' + y + '" r="7" fill="' + (t === 'sistema' ? C.pino : '#fff') + '" stroke="' + C.pino + '" stroke-width="3"/>');
+  });
+  s.push('<circle cx="' + X[2] + '" cy="' + cy(8) + '" r="7" fill="' + C.accionS + '" stroke="' + C.accion + '" stroke-width="2.5" stroke-dasharray="3 3"/>');
+  var g = document.getElementById('g'); g.setAttribute('viewBox', '0 0 84 ' + alto); g.style.height = alto + 'px'; g.innerHTML = s.join('');
+</script>
+</body>
+</html>
