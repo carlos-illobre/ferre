@@ -48,10 +48,10 @@ export default defineConfig(({ command }) => {
           // Procesos (con bpmn-js, unos 600 KB) se baja solo al entrar a Procesos, no en cada
           // dispositivo al instalar (ADR-019).
           // El manual de uso (capturas y clips) tampoco: no ocupa lugar en cada dispositivo (012, E09).
-          // Las maquetas navegables (/v2, /v3, /v4, decisión 113) tampoco, y abrirlas no tiene que
+          // Las maquetas navegables (/v1 a /v4, decisión 113) tampoco, y abrirlas no tiene que
           // mostrar la aplicación en su lugar.
-          globIgnores: ["**/procesos-*.{js,css}", "**/manual/**", "**/maquetas/**", "**/v2/**", "**/v3/**", "**/v4/**"],
-          navigateFallbackDenylist: [/\/maquetas\//, /\/v[234](\/|$)/],
+          globIgnores: ["**/procesos-*.{js,css}", "**/manual/**", "**/maquetas/**", "**/v1/**", "**/v2/**", "**/v3/**", "**/v4/**"],
+          navigateFallbackDenylist: [/\/maquetas\//, /\/v[1234](\/|$)/],
           // Nada de la API ni de Google se cachea: siempre red.
           runtimeCaching: [],
         },

@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-// Las maquetas del director de arte, navegables en /v2, /v3 y /v4 del ambiente de pruebas
-// (decisión 113). Son temporales: esta prueba se borra con ellas.
+// Las maquetas del director de arte, navegables en /v2, /v3 y /v4 del ambiente de pruebas, y /v1, la
+// aplicación de hoy para comparar (decisión 113). Son temporales: esta prueba se borra con ellas.
 const RAIZ = resolve(__dirname, "../../../../../../..");
 const PUBLICO = resolve(RAIZ, "microservices/web/public");
 const leer = (ruta: string) => readFileSync(resolve(RAIZ, ruta), "utf8");
@@ -12,12 +12,12 @@ const PANTALLAS = ["entrar", "vender", "ventas-de-hoy", "productos", "listas", "
 describe("las maquetas navegables", () => {
   it("la aplicación instalada no las guarda ni las muestra en su lugar", () => {
     const config = leer("microservices/web/vite.config.ts");
-    expect(config).toMatch(/globIgnores:\s*\[[^\]]*"\*\*\/maquetas\/\*\*"[^\]]*"\*\*\/v2\/\*\*"[^\]]*"\*\*\/v3\/\*\*"[^\]]*"\*\*\/v4\/\*\*"/);
-    expect(config).toContain("navigateFallbackDenylist: [/\\/maquetas\\//, /\\/v[234](\\/|$)/]");
+    expect(config).toMatch(/globIgnores:\s*\[[^\]]*"\*\*\/maquetas\/\*\*"[^\]]*"\*\*\/v1\/\*\*"[^\]]*"\*\*\/v2\/\*\*"[^\]]*"\*\*\/v3\/\*\*"[^\]]*"\*\*\/v4\/\*\*"/);
+    expect(config).toContain("navigateFallbackDenylist: [/\\/maquetas\\//, /\\/v[1234](\\/|$)/]");
   });
 
   it("cada versión abre su navegador, y cada pantalla tiene su variante en computadora y en celular", () => {
-    for (const v of ["v2", "v3", "v4"]) expect(existsSync(resolve(PUBLICO, v, "index.html")), v).toBe(true);
+    for (const v of ["v1", "v2", "v3", "v4"]) expect(existsSync(resolve(PUBLICO, v, "index.html")), v).toBe(true);
     const mapa = JSON.parse(leer("microservices/web/public/maquetas/mapa.json")) as Record<string, Record<"compu" | "celu", string[]>>;
     expect(Object.keys(mapa).sort()).toEqual([...PANTALLAS].sort());
     for (const [pantalla, dispositivos] of Object.entries(mapa)) {

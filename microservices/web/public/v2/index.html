@@ -6,8 +6,8 @@
 <meta name="robots" content="noindex">
 <title>Maquetas de Ferrebress</title>
 <!-- El navegador de las maquetas del director de arte (decisión 113). El mismo archivo está en
-     /v2, /v3 y /v4: la versión sale de la dirección. v2 muestra la variante 1 de cada pantalla,
-     v3 la 2 y v4 la 3. #pantalla/dispositivo dice qué maqueta se ve. -->
+     /v1, /v2, /v3 y /v4: la versión sale de la dirección. v1 es la aplicación de hoy, v2 muestra la variante 1
+     de cada pantalla, v3 la 2 y v4 la 3. #pantalla/dispositivo dice qué maqueta se ve. -->
 <style>
   :root { --papel: #F4F2EC; --tinta: #1D2421; --suave: #5E6762; --linea: #E3DFD4; --pino: #12382F; --naranja: #E8541C; --blanco: #FFFFFF;
     --letra: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -84,8 +84,14 @@
   var NOMBRES = { "entrar": "Entrar", "vender": "Vender", "ventas-de-hoy": "Ventas de hoy", "productos": "Productos", "listas": "Listas de precios",
     "duplicados": "Duplicados", "stock": "Stock", "compras": "Compras", "contar": "Contar", "resumen": "Resumen", "usuarios": "Usuarios",
     "actividad": "Quién hizo qué", "anomalias": "Anomalías", "procesos": "Procesos", "mejoras-y-errores": "Mejoras y errores", "configuracion": "Configuración" };
-  var VERSIONES = { v2: "Evolución", v3: "Reinvención", v4: "Audaz" };
-  var version = (location.pathname.match(/\/(v[234])\/?/) || [, "v2"])[1];
+  var VERSIONES = { v1: "Hoy", v2: "Evolución", v3: "Reinvención", v4: "Audaz" };
+  // v1 es la aplicación de hoy, la del ambiente de pruebas, abierta en la pantalla que corresponde.
+  // Elige computadora o celular por el ancho, igual que en un dispositivo de verdad.
+  var DE_HOY = {
+    compu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "hoy", "productos": "productos", "listas": "listas", "duplicados": "duplicados", "stock": "stock", "compras": "compras", "contar": "contar", "resumen": "resumen", "usuarios": "usuarios", "actividad": "actividad", "anomalias": "anomalias", "procesos": "procesos", "mejoras-y-errores": "tickets", "configuracion": "configuracion" },
+    celu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "vender/hoy", "productos": "catalogo/productos", "listas": "catalogo/listas", "duplicados": "catalogo/duplicados", "stock": "deposito/stock", "compras": "deposito/compras", "contar": "deposito/contar", "resumen": "negocio", "usuarios": "mas/usuarios", "actividad": "mas/actividad", "anomalias": "mas/anomalias", "procesos": "mas/procesos", "mejoras-y-errores": "mas/tickets", "configuracion": "mas/configuracion" }
+  };
+  var version = (location.pathname.match(/\/(v[1234])\/?/) || [, "v2"])[1];
   var celular = matchMedia("(max-width: 699px)").matches;
   if (celular) document.body.classList.add("en-celular");
   var mapa = {};
@@ -112,7 +118,8 @@
     var e = estado(), variantes = (mapa[e.pantalla] || {})[e.dispositivo] || [];
     var n = { v2: 0, v3: 1, v4: 2 }[version];
     var variante = variantes[Math.min(n, variantes.length - 1)];
-    document.getElementById("maqueta").src = variante ? "../maquetas/" + e.pantalla + "/" + e.dispositivo + "/" + variante + "/index.html" : "about:blank";
+    document.getElementById("maqueta").src = version === "v1" ? "../#/" + DE_HOY[e.dispositivo][e.pantalla]
+      : variante ? "../maquetas/" + e.pantalla + "/" + e.dispositivo + "/" + variante + "/index.html" : "about:blank";
     document.title = NOMBRES[e.pantalla] + " · " + version + " · Maquetas";
     document.getElementById("pantalla").value = e.pantalla;
     document.querySelectorAll("[data-d]").forEach(function (b) { b.setAttribute("aria-current", String(b.dataset.d === e.dispositivo)); });

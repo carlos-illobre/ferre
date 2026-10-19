@@ -888,7 +888,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
 113. **Las maquetas del director de arte se navegan en el ambiente de pruebas, en /v2, /v3 y /v4**
      (2026-10-19). Para decidir qué tomar de las propuestas (`docs/propuestas-de-diseno/`),
      Carlos quiere recorrerlas, no mirar capturas: /v2 es la evolución de cada pantalla, /v3 la
-     reinvención y /v4 la audaz, con los enlaces y los botones que abren pantallas, diálogos o
+     reinvención y /v4 la audaz; /v1 muestra la aplicación de hoy en la misma pantalla, para
+     comparar (Carlos, 2026-10-19). Con los enlaces y los botones que abren pantallas, diálogos o
      agregan elementos ficticios funcionando. Se decide pantalla por pantalla. Es una excepción
      temporal a la decisión 83: las maquetas se borran cuando cada pantalla quede decidida y
      programada. No llevan datos reales, así que se pueden abrir sin entrar; la aplicación

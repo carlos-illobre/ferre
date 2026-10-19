@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Maquetas de Ferrebress</title>
+<!-- El navegador de las maquetas del director de arte (decisión 113). El mismo archivo está en
+     /v1, /v2, /v3 y /v4: la versión sale de la dirección. v1 es la aplicación de hoy, v2 muestra la variante 1
+     de cada pantalla, v3 la 2 y v4 la 3. #pantalla/dispositivo dice qué maqueta se ve. -->
+<style>
+  :root { --papel: #F4F2EC; --tinta: #1D2421; --suave: #5E6762; --linea: #E3DFD4; --pino: #12382F; --naranja: #E8541C; --blanco: #FFFFFF;
+    --letra: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  @font-face { font-family: "Manrope"; src: url("../maquetas/_comun/fuentes/manrope-latin.woff2") format("woff2"); font-weight: 200 800; }
+  * { box-sizing: border-box }
+  html, body { height: 100%; margin: 0 }
+  body { background: #DCD8CC; color: var(--tinta); font: 14px/1.4 var(--letra); display: grid; grid-template-rows: auto 1fr }
+  .barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: var(--pino); color: #fff;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) max(12px, env(safe-area-inset-right, 0px)) 8px max(12px, env(safe-area-inset-left, 0px)) }
+  .marca { font-weight: 800; letter-spacing: -0.01em; white-space: nowrap }
+  .grupo { display: inline-flex; background: rgba(255,255,255,0.12); border-radius: 999px; padding: 3px }
+  .grupo a, .grupo button { font: 600 14px var(--letra); color: #fff; text-decoration: none; border: 0; background: none; border-radius: 999px; padding: 6px 12px; cursor: pointer; white-space: nowrap }
+  .grupo [aria-current="true"] { background: #fff; color: var(--pino) }
+  select { font: 600 14px var(--letra); color: var(--pino); background: #fff; border: 0; border-radius: 999px; padding: 7px 12px; max-width: 100% }
+  .app { margin-left: auto; color: #fff; font-weight: 600; white-space: nowrap }
+  .escenario { position: relative; overflow: auto; display: grid; place-items: start center; padding: 16px }
+  .marco { transform-origin: top center; background: #fff; box-shadow: 0 12px 40px rgba(18,56,47,0.18) }
+  .marco.celu { border-radius: 36px; overflow: hidden; border: 8px solid #1D2421 }
+  iframe { display: block; border: 0; width: 100%; height: 100% }
+  /* En un celular, la maqueta del celular ocupa la pantalla entera. */
+  body.en-celular .escenario { padding: 0; place-items: stretch }
+  body.en-celular .marco.celu { border: 0; border-radius: 0; box-shadow: none; width: 100% !important; height: 100% !important; transform: none !important }
+  body.en-celular .barra .texto-largo, body.en-celular .marca, body.en-celular .app, body.en-celular [aria-label="Dispositivo"] { display: none }
+  body.en-celular .barra { flex-wrap: nowrap; gap: 8px; padding-top: calc(env(safe-area-inset-top, 0px) + 6px); padding-bottom: 6px }
+  body.en-celular .grupo a { padding: 5px 10px }
+  body.en-celular label { flex: 1; min-width: 0 } body.en-celular select { width: 100% }
+  @media (max-width: 699px) { .app { margin-left: 0 } }
+  /* Elegir: la versión que Carlos se queda de cada pantalla y dispositivo, guardada en este navegador. */
+  .elegir { font: 700 14px var(--letra); border: 0; border-radius: 999px; padding: 7px 14px; cursor: pointer; white-space: nowrap; background: var(--naranja); color: #fff }
+  .elegir.hecha { background: #fff; color: var(--pino) }
+  .mis { font: 600 14px var(--letra); color: #fff; background: rgba(255,255,255,0.12); border: 0; border-radius: 999px; padding: 7px 12px; cursor: pointer; white-space: nowrap }
+  .nota { position: fixed; z-index: 5; top: 64px; right: 16px; width: min(380px, calc(100vw - 32px)); background: #fff; color: var(--tinta); border-radius: 16px; padding: 16px; box-shadow: 0 16px 48px rgba(18,56,47,0.25); display: grid; gap: 10px }
+  .nota[hidden] { display: none }
+  .nota b { font-size: 15px } .nota p { margin: 0; color: var(--suave) }
+  .nota textarea, .panel textarea { font: 500 15px/1.4 var(--letra); border: 1px solid #CEC8BA; border-radius: 10px; padding: 10px; width: 100%; resize: vertical }
+  .fila { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap }
+  .fila button { font: 700 14px var(--letra); border-radius: 999px; padding: 8px 14px; cursor: pointer; border: 1px solid #CEC8BA; background: #fff; color: var(--tinta) }
+  .fila button.principal { background: var(--pino); border-color: var(--pino); color: #fff }
+  .panel { border: 0; border-radius: 20px; padding: 20px; width: min(560px, calc(100vw - 32px)); color: var(--tinta); font: 15px/1.4 var(--letra) }
+  .panel::backdrop { background: rgba(18,24,22,0.45) }
+  .panel h2 { margin: 0 0 4px; font-size: 20px } .panel > p { margin: 0 0 12px; color: var(--suave) }
+  .panel textarea { min-height: 280px; font-size: 14px }
+  body.en-celular .elegir, body.en-celular .mis { padding: 6px 10px }
+  body.en-celular .nota { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) }
+</style>
+</head>
+<body>
+<header class="barra">
+  <span class="marca">Maquetas</span>
+  <nav class="grupo" aria-label="Versión" id="versiones"></nav>
+  <div class="grupo" role="group" aria-label="Dispositivo">
+    <button type="button" data-d="compu">Compu<span class="texto-largo">tadora</span></button>
+    <button type="button" data-d="celu">Celular</button>
+  </div>
+  <label><span class="texto-largo" style="position:absolute;left:-9999px">Pantalla</span><select id="pantalla" aria-label="Pantalla"></select></label>
+  <button type="button" class="elegir" id="elegir">Me quedo con esta</button>
+  <button type="button" class="mis" id="mis">Mis<span class="texto-largo"> elecciones</span> <span id="cuenta">0/32</span></button>
+  <a class="app" href="../">Ir a la aplicación</a>
+</header>
+<main class="escenario" id="escenario"><div class="marco" id="marco"><iframe id="maqueta" title="Maqueta"></iframe></div></main>
+<div class="nota" id="nota" hidden>
+  <b id="nota-titulo"></b>
+  <p>¿Querés sumar algo de otra versión, o cambiar algo? Opcional.</p>
+  <textarea id="nota-texto" rows="3" placeholder="Por ejemplo: la cámara de v3, sin el mazo"></textarea>
+  <div class="fila"><button type="button" id="quitar">Ya no la elijo</button><button type="button" class="principal" id="listo">Listo</button></div>
+</div>
+<dialog class="panel" id="panel">
+  <h2>Mis elecciones</h2>
+  <p id="panel-resumen"></p>
+  <textarea id="panel-texto" readonly></textarea>
+  <div class="fila" style="margin-top:12px"><button type="button" id="cerrar-panel">Cerrar</button><button type="button" class="principal" id="copiar">Copiar para Claude</button></div>
+</dialog>
+<script>
+  var NOMBRES = { "entrar": "Entrar", "vender": "Vender", "ventas-de-hoy": "Ventas de hoy", "productos": "Productos", "listas": "Listas de precios",
+    "duplicados": "Duplicados", "stock": "Stock", "compras": "Compras", "contar": "Contar", "resumen": "Resumen", "usuarios": "Usuarios",
+    "actividad": "Quién hizo qué", "anomalias": "Anomalías", "procesos": "Procesos", "mejoras-y-errores": "Mejoras y errores", "configuracion": "Configuración" };
+  var VERSIONES = { v1: "Hoy", v2: "Evolución", v3: "Reinvención", v4: "Audaz" };
+  // v1 es la aplicación de hoy, la del ambiente de pruebas, abierta en la pantalla que corresponde.
+  // Elige computadora o celular por el ancho, igual que en un dispositivo de verdad.
+  var DE_HOY = {
+    compu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "hoy", "productos": "productos", "listas": "listas", "duplicados": "duplicados", "stock": "stock", "compras": "compras", "contar": "contar", "resumen": "resumen", "usuarios": "usuarios", "actividad": "actividad", "anomalias": "anomalias", "procesos": "procesos", "mejoras-y-errores": "tickets", "configuracion": "configuracion" },
+    celu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "vender/hoy", "productos": "catalogo/productos", "listas": "catalogo/listas", "duplicados": "catalogo/duplicados", "stock": "deposito/stock", "compras": "deposito/compras", "contar": "deposito/contar", "resumen": "negocio", "usuarios": "mas/usuarios", "actividad": "mas/actividad", "anomalias": "mas/anomalias", "procesos": "mas/procesos", "mejoras-y-errores": "mas/tickets", "configuracion": "mas/configuracion" }
+  };
+  var version = (location.pathname.match(/\/(v[1234])\/?/) || [, "v2"])[1];
+  var celular = matchMedia("(max-width: 699px)").matches;
+  if (celular) document.body.classList.add("en-celular");
+  var mapa = {};
+
+  function estado() {
+    var p = location.hash.replace(/^#\/?/, "").split("/");
+    return { pantalla: NOMBRES[p[0]] ? p[0] : "vender", dispositivo: p[1] === "compu" || p[1] === "celu" ? p[1] : (celular ? "celu" : "compu") };
+  }
+  function ir(pantalla, dispositivo) { location.hash = "#" + pantalla + "/" + dispositivo; }
+
+  function ajustar(dispositivo) {
+    var marco = document.getElementById("marco"), esc = document.getElementById("escenario");
+    var ancho = dispositivo === "celu" ? 390 : 1366, alto = dispositivo === "celu" ? 844 : 768;
+    var borde = dispositivo === "celu" ? 16 : 0;
+    marco.className = "marco " + dispositivo;
+    marco.style.width = (ancho + borde) + "px"; marco.style.height = (alto + borde) + "px";
+    var libreAncho = esc.clientWidth - 32, libreAlto = esc.clientHeight - 32;
+    var escala = Math.min(1, libreAncho / (ancho + borde), dispositivo === "celu" ? libreAlto / (alto + borde) : 1);
+    marco.style.transform = "scale(" + escala + ")";
+    marco.style.marginBottom = ((alto + borde) * (escala - 1)) + "px";
+  }
+
+  function mostrar() {
+    var e = estado(), variantes = (mapa[e.pantalla] || {})[e.dispositivo] || [];
+    var n = { v2: 0, v3: 1, v4: 2 }[version];
+    var variante = variantes[Math.min(n, variantes.length - 1)];
+    document.getElementById("maqueta").src = version === "v1" ? "../#/" + DE_HOY[e.dispositivo][e.pantalla]
+      : variante ? "../maquetas/" + e.pantalla + "/" + e.dispositivo + "/" + variante + "/index.html" : "about:blank";
+    document.title = NOMBRES[e.pantalla] + " · " + version + " · Maquetas";
+    document.getElementById("pantalla").value = e.pantalla;
+    document.querySelectorAll("[data-d]").forEach(function (b) { b.setAttribute("aria-current", String(b.dataset.d === e.dispositivo)); });
+    document.getElementById("versiones").innerHTML = Object.keys(VERSIONES).map(function (v) {
+      return '<a href="../' + v + '/#' + e.pantalla + "/" + e.dispositivo + '" aria-current="' + (v === version) + '">' + v + '<span class="texto-largo"> · ' + VERSIONES[v] + "</span></a>";
+    }).join("");
+    ajustar(e.dispositivo);
+  }
+
+  document.getElementById("pantalla").innerHTML = Object.keys(NOMBRES).map(function (k) { return '<option value="' + k + '">' + NOMBRES[k] + "</option>"; }).join("");
+  document.getElementById("pantalla").addEventListener("change", function (ev) { ir(ev.target.value, estado().dispositivo); });
+  document.querySelectorAll("[data-d]").forEach(function (b) { b.addEventListener("click", function () { ir(estado().pantalla, b.dataset.d); }); });
+  addEventListener("message", function (ev) { if (ev.data && ev.data.maqueta === "ir" && NOMBRES[ev.data.pantalla]) ir(ev.data.pantalla, estado().dispositivo); });
+  // Lo que se elige queda en este navegador; «Mis elecciones» lo junta en un texto para pegarle a Claude.
+  var CLAVE = "ferre.maquetas.elecciones";
+  function leer() { try { return JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) { return {}; } }
+  function guardar(el) { try { localStorage.setItem(CLAVE, JSON.stringify(el)); } catch (e) {} }
+  function eleccion(p, d) { var el = leer(); return el[p] && el[p][d]; }
+  function marcar() {
+    var e = estado(), el = leer(), actual = eleccion(e.pantalla, e.dispositivo), b = document.getElementById("elegir");
+    var esta = actual && actual.v === version;
+    b.classList.toggle("hecha", !!esta);
+    b.textContent = esta ? "✓ Elegida" : actual ? "Elegí " + actual.v + " · cambiar a " + version : "Me quedo con esta";
+    var n = 0; Object.keys(el).forEach(function (p) { ["compu", "celu"].forEach(function (d) { if (el[p][d]) n++; }); });
+    document.getElementById("cuenta").textContent = n + "/32";
+    document.querySelectorAll("#pantalla option").forEach(function (o) {
+      var c = (el[o.value] || {}).compu, m = (el[o.value] || {}).celu;
+      o.textContent = NOMBRES[o.value] + (c || m ? "  ·  compu " + (c ? c.v : "—") + " · celu " + (m ? m.v : "—") : "") + (navegables.indexOf(o.value) < 0 ? " (solo mirar)" : "");
+    });
+  }
+  function abrirNota() {
+    var e = estado(), a = eleccion(e.pantalla, e.dispositivo) || {};
+    document.getElementById("nota-titulo").textContent = NOMBRES[e.pantalla] + " en " + (e.dispositivo === "celu" ? "el celular" : "la computadora") + ": " + version + " · " + VERSIONES[version];
+    document.getElementById("nota-texto").value = a.nota || "";
+    document.getElementById("nota").hidden = false;
+    document.getElementById("nota-texto").focus();
+  }
+  document.getElementById("elegir").addEventListener("click", function () {
+    var e = estado(), el = leer(), a = (el[e.pantalla] || {})[e.dispositivo];
+    el[e.pantalla] = el[e.pantalla] || {};
+    el[e.pantalla][e.dispositivo] = { v: version, nota: a && a.v === version ? a.nota : "" };
+    guardar(el); marcar(); abrirNota();
+  });
+  document.getElementById("listo").addEventListener("click", function () {
+    var e = estado(), el = leer();
+    if (el[e.pantalla] && el[e.pantalla][e.dispositivo]) el[e.pantalla][e.dispositivo].nota = document.getElementById("nota-texto").value.trim();
+    guardar(el); document.getElementById("nota").hidden = true; marcar();
+  });
+  document.getElementById("quitar").addEventListener("click", function () {
+    var e = estado(), el = leer();
+    if (el[e.pantalla]) delete el[e.pantalla][e.dispositivo];
+    guardar(el); document.getElementById("nota").hidden = true; marcar();
+  });
+  function texto() {
+    var el = leer(), lineas = [], faltan = [];
+    Object.keys(NOMBRES).forEach(function (p) {
+      var partes = [];
+      ["compu", "celu"].forEach(function (d) {
+        var a = (el[p] || {})[d];
+        if (a) partes.push((d === "celu" ? "celu " : "compu ") + a.v + (a.nota ? " (" + a.nota + ")" : ""));
+        else faltan.push(NOMBRES[p] + " " + (d === "celu" ? "celu" : "compu"));
+      });
+      if (partes.length) lineas.push(NOMBRES[p] + ": " + partes.join(", "));
+    });
+    return { texto: "Mis elecciones de las maquetas:\n" + (lineas.join("\n") || "(ninguna todavía)") + (faltan.length ? "\n\nSin elegir: " + faltan.join(", ") : ""), elegidas: 32 - faltan.length };
+  }
+  document.getElementById("mis").addEventListener("click", function () {
+    var t = texto();
+    document.getElementById("panel-texto").value = t.texto;
+    document.getElementById("panel-resumen").textContent = "Elegiste " + t.elegidas + " de 32 (16 pantallas, en computadora y en celular). Copialo y pegáselo a Claude.";
+    document.getElementById("panel").showModal();
+  });
+  document.getElementById("cerrar-panel").addEventListener("click", function () { document.getElementById("panel").close(); });
+  document.getElementById("copiar").addEventListener("click", function () {
+    var ta = document.getElementById("panel-texto"), b = this;
+    var listo = function () { b.textContent = "¡Copiado!"; setTimeout(function () { b.textContent = "Copiar para Claude"; }, 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(listo, function () { ta.select(); document.execCommand("copy"); listo(); });
+    else { ta.select(); document.execCommand("copy"); listo(); }
+  });
+  addEventListener("keydown", function (ev) { if (ev.key === "Escape") document.getElementById("nota").hidden = true; });
+  var navegables = [];
+  addEventListener("hashchange", function () { document.getElementById("nota").hidden = true; mostrar(); marcar(); });
+  addEventListener("resize", function () { ajustar(estado().dispositivo); });
+  // Las pantallas que todavía no tienen botones se ven quietas: el selector las marca.
+  Promise.all([fetch("../maquetas/mapa.json").then(function (r) { return r.json(); }), fetch("../maquetas/navegables.json").then(function (r) { return r.json(); })])
+    .then(function (r) {
+      mapa = r[0];
+      navegables = r[1];
+      mostrar(); marcar();
+    });
+</script>
+</body>
+</html>
