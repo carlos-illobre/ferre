@@ -1,0 +1,37 @@
+/* Piezas propias de «Ventas de hoy», sobre ../_comun/comun.css. Solo variables de la paleta. */
+
+/* Ícono del medio de pago: círculo en su color suave, trazo en su color (decisión 108) */
+.mico { width: 36px; height: 36px; border-radius: 99px; background: var(--cs); color: var(--c); display: grid; place-items: center; flex: none; }
+.mico.chico { width: 28px; height: 28px; }
+.mico.chico .i { width: 16px; height: 16px; }
+.mico.lleno { background: var(--c); color: #fff; }
+.mpast { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 6px; border-radius: 99px; background: var(--cs); color: var(--c); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.mpast .i { width: 16px; height: 16px; }
+.punto-m { width: 10px; height: 10px; border-radius: 99px; background: var(--c); flex: none; display: inline-block; }
+
+/* Comparación con ayer */
+.sube { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px 0 8px; border-radius: 99px; background: var(--logro-suave); color: var(--logro-texto); font-weight: 800; font-size: 14px; }
+.sube .i { width: 16px; height: 16px; }
+
+/* Barras por hora: cada .h es una columna; --v alto en %, --a lo de ayer a esa hora */
+.horas { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; align-items: end; }
+.horas .h { display: grid; grid-template-rows: 1fr auto; gap: 6px; height: 100%; text-align: center; }
+.horas .col { position: relative; display: flex; align-items: flex-end; height: 100%; }
+.horas .col b { display: block; width: 100%; height: var(--v); min-height: 3px; border-radius: 6px 6px 3px 3px; background: var(--pino); opacity: .9; }
+.horas .col::after { content: ""; position: absolute; left: -2px; right: -2px; bottom: var(--a); height: 0; border-top: 2px dashed var(--borde-fuerte); }
+.horas .h.sin .col::after, .horas .h.fut .col::after { display: none; }
+.horas .h.sin .col b { background: var(--hundido-2); height: 3px; }
+.horas .h.fut .col b { background: transparent; border: 1.5px dashed var(--borde-fuerte); height: 22%; }
+.horas .h.ahora .col b { background: var(--pino-2); box-shadow: inset 0 0 0 2px var(--pino); }
+.horas .h span { font-size: 14px; color: var(--texto-3); font-weight: 600; line-height: 18px; }
+.horas .h.ahora span { color: var(--pino-texto); font-weight: 800; }
+.globo { position: absolute; bottom: calc(var(--v) + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--tinta); color: #fff; font-size: 14px; font-weight: 700; padding: 4px 8px; border-radius: 8px; box-shadow: var(--sombra-3); z-index: 2; }
+
+/* Venta anulada y venta corregida */
+.anulada .tacha { text-decoration: line-through; text-decoration-thickness: 1.5px; color: var(--texto-3); }
+.anulada .mico { filter: grayscale(1); opacity: .6; }
+.viejo { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--error); color: var(--texto-3); font-weight: 600; }
+.nuevo { color: var(--tinta); font-weight: 800; }
+
+/* «.medio.tarjeta» choca con la tarjeta del molde: el medio Tarjeta no es una tarjeta */
+.medio.tarjeta { border: 0; box-shadow: none; }
