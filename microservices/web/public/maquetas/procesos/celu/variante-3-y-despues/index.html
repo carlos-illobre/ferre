@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Procesos · ¿Y después? (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <script src="../../dibujo.js"></script>
 <script src="../../proceso.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .arriba { display: flex; align-items: center; gap: 8px; padding: 0 8px; height: 52px; }
@@ -52,6 +55,23 @@
   .asi b { display: block; font-size: 16px; font-weight: 800; }
   .asi .t-detalle { white-space: nowrap; }
   .asi svg { flex: 1; height: 68px; }
+  /* Al tocarla */
+  .arriba .b, .pie .lado, .mic span, .op, .gestos span:first-child, .gestos span:last-child, .asi { cursor: pointer; }
+  .pila { touch-action: pan-y; }
+  .paso { cursor: pointer; }
+  .op.vacia { cursor: default; box-shadow: none; background: transparent; border-style: dashed; }
+  @keyframes y-sube { from { opacity: 0; transform: translateY(48px); } }
+  @keyframes y-der { from { opacity: 0; transform: translateX(40px); } }
+  @keyframes y-izq { from { opacity: 0; transform: translateX(-40px); } }
+  .y-sube { animation: y-sube var(--t-nav) var(--curva) both; }
+  .y-der { animation: y-der var(--t-nav) var(--curva) both; }
+  .y-izq { animation: y-izq var(--t-nav) var(--curva) both; }
+  .onda { display: flex; gap: 5px; align-items: center; justify-content: center; height: 56px; margin: 8px 0; }
+  .onda i { width: 6px; height: 40px; border-radius: 3px; background: var(--accion); animation: pi-onda .9s var(--curva) infinite; }
+  .onda i:nth-child(2) { animation-delay: .1s; } .onda i:nth-child(3) { animation-delay: .2s; } .onda i:nth-child(4) { animation-delay: .3s; } .onda i:nth-child(5) { animation-delay: .4s; }
+  .dicho { font-size: 22px; line-height: 28px; font-weight: 750; text-align: center; min-height: 56px; margin: 4px 8px 0; }
+  .grande-svg { width: 100%; height: 300px; display: block; border-radius: 12px; background: var(--fondo); margin-top: 8px; }
+  @media (prefers-reduced-motion: reduce) { .y-sube, .y-der, .y-izq { animation: none; } .onda i { animation: none; } }
 </style>
 </head>
 <body>
@@ -107,6 +127,150 @@
     gm: [720, 210], cobra: [840, 210], reg: [840, 380], espera: [720, 460], fin: [960, 380] };
   dibujar(document.getElementById('mini'), m, pos, { tw: 112, th: 60, cab: 0, x0: 100, x1: 1000, rotulos: false, sel: 'cobra', flechaSel: false, carrilOpacidad: 0, vista: [100, 0, 900, 520] });
   document.querySelectorAll('#mini foreignObject').forEach(function (f) { f.remove(); });
+  /* ---------- Lo que se puede tocar ---------- */
+  (function () {
+    var M = JSON.parse(JSON.stringify(VENTA));
+    M.pasos = M.pasos.filter(function (p) { return p.id !== 'nota'; }); M.asociaciones = [];
+    M.pasos.forEach(function (p) { if (p.id === 'gm') p.carril = 'ven'; });
+    M.flechas = M.flechas.filter(function (f) { return f.de !== 'gm'; });
+    M.flechas.push({ de: 'gm', a: 'busca', s: 't', e: 't', via: [[720, 140], [376, 140]], et: 'Sí' }, { de: 'gm', a: 'cobra', et: 'No' });
+    M.flechas.forEach(function (f) { if (f.de === 'suma') { f.s = 'r'; f.e = 'b'; } if (f.de === 'cobra') { f.s = 'b'; f.e = 't'; } if (f.de === 'espera') { f.s = 'r'; f.e = 'l'; } if (f.de === 'reg') { f.s = 'r'; f.e = 'l'; } });
+    var P = JSON.parse(JSON.stringify(pos)), aca = 'cobra', X1 = 1000, titulo = 'Venta en el mostrador';
+    var pila = document.querySelector('.pila'), sub = document.querySelector('.arriba .t small'), avance = document.querySelector('.avance');
+    var despues = document.querySelector('.despues'), mini = document.getElementById('mini'), asiDet = document.querySelector('.asi .t-detalle');
+    var hist = PI.historial(function () { return { M: M, P: P, aca: aca, X1: X1 }; }, function (s) { M = s.M; P = s.P; aca = s.aca; X1 = s.X1; todo(); });
+    PI.INFO.cobra.como = 'F5 efectivo, F6 Mercado Pago, F7 tarjeta, F8 cuenta corriente.';
+
+    function orden() { return PI.orden(M); }
+    function carril(p) { return M.carriles.filter(function (c) { return c.id === p.carril; })[0] || M.carriles[0]; }
+    function corto(t) { return ({ persona: 'Persona', sistema: 'Sistema', decision: 'Pregunta', espera: 'Espera', fin: 'Termina', inicio: 'Empieza' })[t] || PI.nombreFigura(t); }
+    function tarjeta(anim) {
+      var o = orden(), i = o.indexOf(aca), p = PI.paso(M, aca), c = carril(p), inf = PI.info(aca), d = inf.donde && PI.DONDE[inf.donde];
+      var ant = o[i - 1] && PI.paso(M, o[i - 1]), fl = ant && M.flechas.filter(function (f) { return f.de === ant.id && f.a === aca; })[0];
+      pila.innerHTML = (ant ? '<div class="atras"><i class="i i-s" data-fig="' + ant.tipo + '"></i>' + i + ' · <b>' + PI.esc(ant.nombre) + '</b>' + (fl && fl.et ? '<span class="pastilla contorno" style="height:24px;margin-left:auto">' + fl.et + '</span>' : '') + '</div>' : '<div class="atras">Empieza acá</div>') +
+        '<article class="paso"><div class="sup"><span class="pastilla pino"><i class="i i-s" data-i="' + c.icono + '"></i>' + c.nombre + '</span><span class="tipo"><i class="i i-s" data-fig="' + p.tipo + '"></i>' + corto(p.tipo) + '</span></div>' +
+        '<h1>' + PI.esc(p.nombre) + '</h1><div class="dl"><span class="et">Dónde</span><span class="va">' + (d ? '<span class="pastilla pino" style="height:26px"><i class="i i-s" data-i="' + d.i + '"></i>' + inf.donde + '</span>' : '<span class="t-detalle">Fuera de Ferrebress</span>') + '</span>' +
+        '<span class="et">Cómo</span><span class="va">' + (inf.como ? PI.esc(inf.como) : '<span class="t-detalle">Tocá para contarlo</span>') + '</span></div></article>';
+      PI.pintar(pila);
+      if (anim) { PI.animar(pila.querySelector('.paso'), anim); PI.animar(pila.querySelector('.atras'), 'pi-fundido-lento'); }
+      sub.textContent = (i >= 0 ? 'Paso ' + (i + 1) + ' de ' + o.length : 'Fuera del recorrido') + (PI.esVigente() ? ' · vigente' : ' · borrador');
+      avance.innerHTML = o.map(function (x, k) { return '<i' + (k < i ? ' class="hecho"' : (k === i ? ' class="aca"' : '')) + '></i>'; }).join('');
+      var G = document.querySelectorAll('.gestos span');
+      G[0].innerHTML = i > 0 ? '<i class="i i-s" data-i="arrow-left"></i>El ' + i : '';
+      G[2].innerHTML = i < o.length - 1 ? 'El ' + (i + 2) + '<i class="i i-s" data-i="arrow-right"></i>' : '';
+      PI.pintar(document.querySelector('.gestos'));
+    }
+    function opciones() {
+      var o = orden(), i = o.indexOf(aca), sig = o[i + 1] && PI.paso(M, o[i + 1]), p = PI.paso(M, aca), sug = despues.querySelector('.op.sug, .op.vacia');
+      if (p.tipo === 'fin') sug.outerHTML = '<div class="op sug" data-acc="vigente"><span class="g"><i class="i" data-i="circle-check"></i></span><div class="tx">El proceso termina acá<small>Marcarlo vigente</small></div><i class="i flecha" data-i="chevron-right"></i></div>';
+      else if (sig) sug.outerHTML = '<div class="op sug" data-acc="siguiente"><span class="g"><i class="i" data-fig="' + sig.tipo + '"></i></span><div class="tx">' + PI.esc(sig.nombre) + '<small>' + carril(sig).nombre + ' · lo que sigue hoy</small></div><i class="i flecha" data-i="chevron-right"></i></div>';
+      else sug.outerHTML = '<div class="op vacia"><span class="g"><i class="i" data-i="plus"></i></span><div class="tx">Todavía no sigue nada<small>Elegí abajo o decilo</small></div></div>';
+      PI.pintar(despues);
+      var r = PI.resumen(M); asiDet.textContent = r.pasos + ' pasos · ' + r.carriles + ' carriles';
+    }
+    function dibujo() {
+      var d = JSON.parse(JSON.stringify(M)); d.flechas.forEach(function (f) { f.et = null; });
+      dibujar(mini, d, P, { tw: 112, th: 60, cab: 0, x0: 100, x1: X1, rotulos: false, sel: aca, flechaSel: false, carrilOpacidad: 0, vista: [100, 0, X1 - 100, 520] });
+      mini.querySelectorAll('foreignObject').forEach(function (f) { f.remove(); });
+    }
+    function todo(anim) { tarjeta(anim); opciones(); dibujo(); }
+    function ir(id, anim) { if (!PI.paso(M, id)) return; aca = id; todo(anim); }
+    function mover(d) { var o = orden(), i = o.indexOf(aca), j = i + d; if (j < 0 || j >= o.length) return; ir(o[j], d > 0 ? 'y-der' : 'y-izq'); PI.vibrar(5); }
+
+    /* Lo que sigue: una opción suma un paso después del actual y lo trae al frente */
+    function agregar(tipo, nombre) {
+      var p = PI.paso(M, aca);
+      if (p.tipo === 'fin') { PI.tostada('Después del fin no sigue nada', { i: 'info' }); return; }
+      hist.guardar();
+      var id, suelto = tipo === 'espera' && M.pasos.filter(function (x) { return x.tipo === 'espera' && orden().indexOf(x.id) < 0; })[0];
+      if (suelto) { id = suelto.id; M.flechas.push(Object.assign({ de: aca, a: id }, PI.puertos(P[aca], P[id]))); }
+      else {
+        id = PI.agregarPaso(M, P, { tipo: tipo, despuesDe: aca, nombre: nombre, lugar: { dx: 120, dy: 160, xmin: 120, xmax: 2000 } });
+        if (P[id][0] > X1 - 70) X1 = P[id][0] + 100;
+        if (tipo === 'decision') M.flechas.forEach(function (f) { if (f.de === id && !f.et) f.et = 'No'; });
+      }
+      ir(id, 'y-sube'); PI.vibrar(10); PI.cambio(); PI.halo(mini, id, '#E8541C');
+      PI.tostada('Sumaste «' + PI.esc(PI.paso(M, id).nombre) + '» como paso ' + (orden().indexOf(id) + 1), { accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    despues.addEventListener('click', function (e) {
+      var op = e.target.closest('.op'); if (!op) return;
+      var acc = op.getAttribute('data-acc'), tx = op.textContent.trim();
+      if (op.classList.contains('vacia')) return;
+      if (acc === 'vigente') { PI.marcarVigente(titulo); todo(); return; }
+      if (op.classList.contains('sug')) { var o = orden(); ir(o[o.indexOf(aca) + 1], 'y-sube'); return; }
+      if (op.closest('.asi')) return;
+      if (tx === 'Pregunta') agregar('decision', '¿Paga con transferencia?');
+      else if (tx === 'Espera') agregar('espera', 'Espera que acredite la transferencia');
+      else if (tx === 'Termina') agregar('fin', 'Termina acá');
+    });
+
+    /* Deslizar entre pasos; tocar la tarjeta abre el paso para cambiarlo */
+    var x0 = null, movio = false;
+    pila.addEventListener('pointerdown', function (e) { x0 = e.clientX; movio = false; });
+    pila.addEventListener('pointermove', function (e) { if (x0 != null && Math.abs(e.clientX - x0) > 8) movio = true; });
+    pila.addEventListener('pointerup', function (e) { if (x0 == null) return; var dx = e.clientX - x0; x0 = null; if (dx < -40) mover(1); else if (dx > 40) mover(-1); });
+    pila.addEventListener('click', function (e) {
+      if (movio) return;
+      if (e.target.closest('.atras')) { mover(-1); return; }
+      PI.hojaPaso({ m: M, id: aca,
+        alCambiar: function (fn, primero) { if (primero) hist.guardar(); fn(); todo(); PI.cambio(); },
+        alMoverCarril: function (pid, k) { P[pid] = PI.lugarLibre(M, P, [P[pid][0], PI.mitad(P, k)], { carril: k, xmin: 120, xmax: X1, dx: 110, dy: 160 }); },
+        alQuitar: function () {
+          var p = PI.paso(M, aca), o = orden(), i = o.indexOf(aca);
+          hist.guardar(); PI.quitarPaso(M, P, aca); aca = orden()[Math.max(0, i - 1)]; todo('y-izq'); PI.cambio();
+          PI.tostada('Quitaste «' + PI.esc(p.nombre) + '»', { i: 'trash-2', accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+        },
+        alSiguiente: function (n) { ir(n, 'y-der'); } });
+    });
+    var G = document.querySelectorAll('.gestos span');
+    G[0].addEventListener('click', function () { mover(-1); });
+    G[2].addEventListener('click', function () { mover(1); });
+    document.addEventListener('keydown', function (e) { if (PI.hayCapa() || e.target.isContentEditable) return; if (e.key === 'ArrowRight') mover(1); if (e.key === 'ArrowLeft') mover(-1); });
+
+    /* Escribirlo o decirlo */
+    function nombreDe(t) { t = t.trim().replace(/\.$/, ''); return t.charAt(0).toUpperCase() + t.slice(1); }
+    function tipoDe(t) { return /^si |\?$/i.test(t) ? 'decision' : (/^espera/i.test(t) ? 'espera' : (/ferrebress|registra|imprime|guarda|calcula/i.test(t) ? 'sistema' : 'persona')); }
+    var L2 = document.querySelectorAll('.pie .lado');
+    L2[0].addEventListener('click', function () {
+      var capa = PI.abrir({ tipo: 'hoja', titulo: '¿Y después?', html: '<div class="pi-cab"><b>¿Y después?</b><button class="pi-x" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div>' +
+        '<div class="t-detalle">Escribí qué se hace después de «' + PI.esc(PI.paso(M, aca).nombre) + '».</div>' +
+        '<div class="pi-f"><div class="campo"><span contenteditable="true" data-foco data-vacio="Por ejemplo, Le da el ticket al cliente"></span></div></div>' +
+        '<div class="pi-pie"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-accion" data-ok>Sumarlo</button></div>' });
+      var ed = capa.querySelector('[contenteditable]');
+      function ok() { var t = ed.textContent.trim() || 'Le da el ticket al cliente'; PI.cerrar(capa); agregar(tipoDe(t), nombreDe(t)); }
+      capa.querySelector('[data-ok]').addEventListener('click', ok);
+      ed.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); ok(); } });
+    });
+    document.querySelector('.mic span').addEventListener('click', function () {
+      var frase = 'Le da el ticket y lo despide', k = 0, reloj;
+      var capa = PI.abrir({ tipo: 'hoja', titulo: 'Decilo', alCerrar: function () { clearInterval(reloj); }, html: '<div class="pi-cab"><b>Te escucho…</b><button class="pi-x" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div>' +
+        '<div class="onda"><i></i><i></i><i></i><i></i><i></i></div><div class="dicho"></div><div class="t-detalle" style="text-align:center">Decí qué se hace después; lo sumo como paso.</div>' });
+      var dicho = capa.querySelector('.dicho');
+      reloj = setInterval(function () {
+        dicho.textContent = frase.slice(0, ++k);
+        if (k >= frase.length) { clearInterval(reloj); setTimeout(function () { if (!capa.isConnected || capa._cerrando) return; PI.cerrar(capa); agregar(tipoDe(frase), nombreDe(frase)); }, 600); }
+      }, 50);
+    });
+    /* Todos los pasos, en orden */
+    L2[1].addEventListener('click', function () {
+      var o = orden();
+      PI.menu(L2[1], [{ et: o.length + ' pasos, en orden' }].concat(o.map(function (id, i) { var p = PI.paso(M, id); return { t: (i + 1) + ' · ' + PI.esc(p.nombre), d: carril(p).nombre, fig: p.tipo, activo: id === aca, accion: function () { ir(id, 'y-sube'); } }; })), { titulo: 'Los pasos' });
+    });
+    /* El dibujo entero: «Así va» o el botón de arriba */
+    function verDibujo() {
+      var capa = PI.abrir({ tipo: 'hoja', titulo: 'Así va', html: '<div class="pi-cab"><b>Así va</b><button class="pi-x" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div><div class="t-detalle">Tocá un paso para ir a él.</div><svg class="grande-svg"></svg>' });
+      var sv = capa.querySelector('svg');
+      setTimeout(function () {
+        dibujar(sv, M, P, { tw: 112, th: 60, cab: 0, chipCarril: true, chipX: 108, x0: 100, x1: X1, sel: aca, fs: 14, vista: [100, 0, X1 - 100, 520] });
+      }, 0);
+      sv.addEventListener('click', function (e) { var g2 = e.target.closest('[data-paso]'); if (!g2) return; PI.cerrar(capa); ir(g2.getAttribute('data-paso'), 'y-sube'); });
+    }
+    document.querySelector('.asi').addEventListener('click', verDibujo);
+    var Bt = document.querySelectorAll('.arriba .b');
+    Bt[1].addEventListener('click', verDibujo);
+    Bt[0].addEventListener('click', function (e) { PI.menuMas(e.currentTarget); });
+    PI.estado({ pastillas: [], guardados: [] });
+  })();
 </script>
 </body>
 </html>

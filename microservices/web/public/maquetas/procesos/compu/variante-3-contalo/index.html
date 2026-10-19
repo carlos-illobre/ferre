@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Procesos · Contalo y se dibuja (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <script src="../../dibujo.js"></script>
 <script src="../../proceso.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { overflow: hidden; }
   .todo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; height: 100vh; }
@@ -65,6 +68,29 @@
   .entrada { padding: 12px 16px 16px; display: flex; gap: 8px; align-items: center; }
   .entrada .campo { flex: 1; height: 48px; font-size: 15px; }
   .mic { width: 48px; height: 48px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; box-shadow: var(--sombra-2); border: 0; }
+  /* Al tocarla */
+  .barra-sup .volver { cursor: pointer; }
+  .barra-sup .nom, .caras, .tick, .chip { cursor: pointer; }
+  .pi-paso { right: 16px; top: 72px; width: 300px; max-height: calc(100% - 168px); overflow: auto; padding: 12px 16px 16px; z-index: 4; }
+  .pi-paso .cabp { display: flex; align-items: center; gap: 10px; }
+  .pi-paso .cabp .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--accion-suave); color: var(--accion-texto); display: grid; place-items: center; flex: none; }
+  .pi-paso .cabp > div { flex: 1; min-width: 0; }
+  .pi-paso .pi-f .campo { height: 44px; font-size: 15px; gap: 8px; padding: 0 12px; }
+  .pi-paso .pi-f .campo.area { height: auto; }
+  .pi-paso .campo[data-acc] { cursor: pointer; }
+  .pi-paso .campo .flecha { margin-left: auto; color: var(--texto-3); }
+  .pi-paso .bots { display: flex; gap: 8px; margin-top: 14px; }
+  .pi-paso .bots .btn { flex: 1; }
+  .entrada .campo { cursor: text; }
+  .entrada .campo [contenteditable] { flex: 1; min-width: 0; color: var(--tinta); font-weight: 600; }
+  .mic { position: relative; }
+  .mic.escuchando { background: var(--accion); }
+  .mic.escuchando::after { content: ""; position: absolute; inset: 0; border-radius: 99px; border: 2px solid var(--accion); animation: pi-late 1s var(--curva) infinite; }
+  .bolita { transition: transform 380ms var(--curva); }
+  .tick.mirando i { border-color: var(--accion); box-shadow: 0 0 0 4px var(--accion-suave); }
+  .tick.mirando { color: var(--accion-texto); }
+  .pista .lleno { transition: width var(--t-nav) var(--curva); }
+  @media (prefers-reduced-motion: reduce) { .bolita, .pista .lleno { transition: none; } .mic.escuchando::after { animation: none; } }
 </style>
 </head>
 <body>
@@ -72,7 +98,7 @@
   <section class="lienzo" id="lienzo">
     <svg id="dib"></svg>
     <div class="flota barra-sup">
-      <span class="volver"><i class="i" data-i="arrow-left"></i></span>
+      <span class="volver" data-ir="vender" title="Volver a Ferrebress"><i class="i" data-i="arrow-left"></i></span>
       <div>
         <div class="nom">Venta en el mostrador <i class="i i-s" data-i="chevron-down"></i></div>
         <div style="display:flex;gap:10px;align-items:center"><span class="pastilla urgente" style="height:24px"><span class="punto"></span>Borrador</span><span class="ok"><i class="i i-s" data-i="check"></i>Guardado</span></div>
@@ -160,6 +186,262 @@
   var L = document.getElementById('lienzo');
   dibujar(document.getElementById('dib'), m, pos, { tw: 128, th: 64, cab: 0, chipCarril: true, chipX: 8, x0: -100, x1: 1100, carrilOpacidad: .6,
     fantasmas: ['gt', 'espera'], vista: [-84, -96, L.clientWidth, L.clientHeight] });
+  /* ---------- Lo que se puede tocar ---------- */
+  (function () {
+    var M = m, P = pos, fantasmas = ['gt', 'espera'], sel = null, prop = null, version = null, op0 = { tw: 128, th: 64, cab: 0, chipCarril: true, chipX: 8, x0: -100, x1: 1100, carrilOpacidad: .6 };
+    var dib = document.getElementById('dib'), relato = document.querySelector('.relato'), zoomN = document.querySelector('.zoom .n');
+    var cam = PI.camara(L, -84, -96, function () { render(); });
+    var hist = PI.historial(function () { return { M: M, P: P, fantasmas: fantasmas, sel: sel }; }, function (s) { M = s.M; P = s.P; fantasmas = s.fantasmas; sel = s.sel; if (!prop) fantasmas = []; else if (!fantasmas.length) cerrarPropuesta(); render(); panel(); numerar(); });
+    var ORDEN0 = ['ini', 'pide', 'busca', 'gp', 'margen', 'suma', 'gm', 'cobra', 'reg', 'fin'];
+    relato.querySelectorAll('.n').forEach(function (n) { n.setAttribute('data-id', ORDEN0[+n.textContent - 1]); });
+    function numerar() { var o = PI.orden(M); relato.querySelectorAll('.n[data-id]').forEach(function (n) { var i = o.indexOf(n.getAttribute('data-id')); n.textContent = i >= 0 ? i + 1 : '·'; }); }
+
+    function modelo() {
+      if (!version) return M;
+      var v = JSON.parse(JSON.stringify(M)), P2 = JSON.parse(JSON.stringify(P));
+      version.quitar.forEach(function (id) { if (PI.paso(v, id)) PI.quitarPaso(v, P2, id); });
+      return v;
+    }
+    function render() {
+      dibujar(dib, modelo(), P, Object.assign({}, op0, { fantasmas: version ? [] : fantasmas, sel: version ? null : sel, vista: cam.vista() }));
+      zoomN.textContent = Math.round(cam.escala() * 100) + ' %';
+    }
+
+    /* El panel del paso elegido, flotando sobre el dibujo */
+    var pan = document.createElement('div'); pan.className = 'flota pi-paso'; pan.style.display = 'none'; L.appendChild(pan);
+    function campo(l, html, acc, area) { return '<div class="pi-f"><label>' + l + '</label><div class="campo' + (area ? ' area' : '') + '"' + (acc ? ' data-acc="' + acc + '"' : '') + '>' + html + '</div></div>'; }
+    function panel() {
+      var p = sel && PI.paso(M, sel);
+      if (!p || version) { pan.style.display = 'none'; return; }
+      var o = PI.orden(M), n = o.indexOf(sel), inf = PI.info(sel), c = M.carriles.filter(function (x) { return x.id === p.carril; })[0] || M.carriles[0], d = inf.donde && PI.DONDE[inf.donde];
+      var sale = M.flechas.filter(function (f) { return f.de === sel && o.indexOf(f.a) > n; })[0], sp = sale && PI.paso(M, sale.a);
+      var nuevo = pan.style.display === 'none'; pan.style.display = '';
+      pan.innerHTML = '<div class="cabp pi-fundido"><span class="ico">' + glifo(p.tipo, 'i') + '</span><div><div class="t-renglon" data-eco>' + PI.esc(p.nombre) + '</div><div class="t-detalle">' + (n >= 0 ? 'Paso ' + (n + 1) + ' de ' + o.length : 'Fuera del recorrido') + (fantasmas.indexOf(sel) >= 0 ? ' · propuesto' : '') + '</div></div><button class="pi-x" data-acc="cerrar" aria-label="Cerrar"><i class="i" data-i="x"></i></button></div>' +
+        '<div class="pi-fundido">' + campo('Nombre', '<span contenteditable="true" data-campo="nombre" data-vacio="Cómo se llama el paso">' + PI.esc(p.nombre) + '</span>') +
+        campo('Tipo', glifo(p.tipo, 'i i-s') + PI.nombreFigura(p.tipo) + '<i class="i i-s flecha" data-i="chevron-down"></i>', 'tipo') +
+        campo('Quién lo hace', '<i class="i i-s" data-i="' + c.icono + '"></i>' + c.nombre + '<i class="i i-s flecha" data-i="chevron-down"></i>', 'quien') +
+        campo('Dónde, en Ferrebress', (d ? '<span class="pild"><i class="i i-s" data-i="' + d.i + '"></i>' + d.parte + '</span><span class="t-detalle">' + d.ruta.split(' › ').pop() + '</span>' : '<span class="t-detalle">Fuera de Ferrebress</span>') + '<i class="i i-s flecha" data-i="chevron-down"></i>', 'donde') +
+        campo('Cómo se hace', '<span contenteditable="true" data-campo="como" data-vacio="Contalo en una o dos líneas" style="flex:1">' + PI.esc(inf.como) + '</span>', null, true) +
+        campo('Con qué sigue', sp ? glifo(sp.tipo, 'i i-s') + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + PI.esc(sp.nombre) + '</span><i class="i i-s flecha" data-i="arrow-right"></i>' : '<span class="t-detalle">Con nada todavía</span>', sp ? 'sigue' : null) +
+        '<div class="bots"><button class="btn chico" data-acc="despues"><i class="i i-s" data-i="plus"></i>Uno después</button><button class="btn btn-peligro chico" data-acc="quitar"><i class="i i-s" data-i="trash-2"></i>Quitar</button></div></div>';
+      pan._sigue = sp && sp.id;
+      PI.pintar(pan);
+      if (nuevo) PI.animar(pan, 'pi-desliza');
+    }
+    function elegir(id) { sel = id; render(); panel(); }
+    function cerrarPanel() { sel = null; render(); panel(); }
+    pan.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-acc]'); if (!a) return;
+      var acc = a.getAttribute('data-acc'), p = PI.paso(M, sel);
+      if (acc === 'cerrar') cerrarPanel();
+      else if (acc === 'sigue') elegir(pan._sigue);
+      else if (acc === 'despues') agregar('persona', { despuesDe: sel, auto: true });
+      else if (acc === 'quitar') quitar();
+      else if (acc === 'tipo') PI.menuTipo(a, p.tipo, function (t) { hist.guardar(); p.tipo = t; cambio(); });
+      else if (acc === 'donde') PI.menuDonde(a, PI.info(sel).donde, function (k) { hist.guardar(); PI.info(sel).donde = k; cambio(); });
+      else if (acc === 'quien') PI.menuQuien(a, M, p.carril, function (k) { hist.guardar(); p.carril = k; P[sel] = PI.lugarLibre(M, P, [P[sel][0], PI.mitad(P, k)], { carril: k, xmin: 0, xmax: 1060 }); reunir(sel); cambio(); });
+    });
+    var escribiendo = false;
+    pan.addEventListener('input', function (e) {
+      var c = e.target.getAttribute('data-campo'); if (!c) return;
+      if (!escribiendo) { hist.guardar(); escribiendo = true; }
+      if (c === 'nombre') { PI.paso(M, sel).nombre = e.target.textContent; pan.querySelector('[data-eco]').textContent = e.target.textContent; render(); }
+      else PI.info(sel).como = e.target.textContent;
+      PI.cambio();
+    });
+    pan.addEventListener('focusout', function () { escribiendo = false; });
+    pan.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.getAttribute('data-campo') === 'nombre') { e.preventDefault(); e.target.blur(); } });
+    function reunir(id) { M.flechas.forEach(function (f) { if ((f.de === id || f.a === id)) { delete f.via; f.etp = null; Object.assign(f, PI.puertos(P[f.de], P[f.a])); } }); }
+    function cambio() { render(); panel(); numerar(); PI.cambio(); }
+
+    dib.addEventListener('click', function (e) {
+      if (L._recienPaneo) return;
+      var g = e.target.closest('[data-paso]');
+      if (g && !version) elegir(g.getAttribute('data-paso')); else if (!g && sel) cerrarPanel();
+    });
+
+    /* Agregar desde el dock (tocar o arrastrar) y quitar */
+    function agregar(tipo, o) {
+      if (version) volverAHoy();
+      hist.guardar();
+      if (tipo === 'carril') { if (!PI.agregarCarril(M, P)) { PI.tostada('Ya hay un carril «Proveedor»', { i: 'info' }); return; } render(); PI.cambio(); PI.tostada('Carril «Proveedor» agregado abajo'); return; }
+      if (o.auto) { var q = P[o.despuesDe]; tipo = q && PI.carrilDe(P, q[1]) === 'sis' ? 'sistema' : 'persona'; }
+      if (!o.en && !o.despuesDe) o.despuesDe = antesDelFin();
+      var id = PI.agregarPaso(M, P, Object.assign({ tipo: tipo, lugar: { dx: 120, dy: 140, xmin: 40, xmax: 1060 } }, o));
+      sel = id; render(); PI.caer(dib, id); panel(); numerar(); PI.cambio();
+      var nom = pan.querySelector('[data-campo="nombre"]'); if (nom) { nom.focus(); var r = document.createRange(); r.selectNodeContents(nom); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    }
+    function antesDelFin() { var fin = M.pasos.filter(function (p) { return p.tipo === 'fin'; })[0]; var f = fin && M.flechas.filter(function (x) { return x.a === fin.id; })[0]; return f ? f.de : (sel || M.pasos[0].id); }
+    function quitar() {
+      var p = PI.paso(M, sel); if (!p) return;
+      hist.guardar(); PI.quitarPaso(M, P, sel); fantasmas = fantasmas.filter(function (x) { return x !== sel; });
+      sel = null; render(); panel(); numerar(); PI.cambio();
+      PI.tostada('Quitaste «' + PI.esc(p.nombre) + '»', { i: 'trash-2', accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    var dockB = dock.querySelectorAll('button');
+    dockB.forEach(function (b, i) {
+      if (i === 0) { b.addEventListener('click', function () { PI.tostada('Tocá un paso para elegirlo; arrastrá el fondo para moverte', { i: 'mouse-pointer-2' }); }); return; }
+      if (i === dockB.length - 1) {
+        b.addEventListener('click', function () {
+          PI.menu(b, [{ et: 'Más figuras' }].concat(['subproceso', 'documento', 'nota', 'carril'].map(function (id) { return { t: PI.nombreFigura(id), fig: id, accion: function () { agregar(id, { despuesDe: sel || antesDelFin() }); } }; })), { lado: 'derecha' });
+        });
+        return;
+      }
+      var id = ['inicio', 'tarea', 'persona', 'sistema', 'decision', 'paralelo', 'espera', 'fin'][i - 1];
+      b.title = PI.nombreFigura(id);
+      PI.arrastrarFigura(b, function () { return id; }, L, dib, { alSoltar: function (pt, sinMover) {
+        if (sinMover) agregar(id, { despuesDe: sel || antesDelFin() });
+        else if (pt) agregar(id, { en: [pt[0], Math.max(P.carriles[PI.carrilDe(P, pt[1])][0] + 40, Math.min(P.carriles[PI.carrilDe(P, pt[1])][1] - 40, pt[1]))] });
+      } });
+    });
+
+    /* La propuesta: Enter la acepta, Esc la descarta */
+    var propEl = relato.querySelector('.propuesta'), escP = relato.querySelector('p.escribiendo');
+    prop = { ids: ['gt', 'espera'], p: escP, al: function () {
+      escP.innerHTML = 'Si paga con transferencia <span class="n" data-id="gt">9</span>, espera que acredite <span class="n" data-id="espera">10</span> antes de registrar.';
+    }, no: function () {
+      hist.guardar();
+      PI.quitarPaso(M, P, 'gt'); PI.quitarPaso(M, P, 'espera');
+      M.flechas.push({ de: 'cobra', a: 'reg', s: 'b', e: 't' });
+      escP.classList.remove('escribiendo'); escP.innerHTML = escP.textContent.replace(/\s*$/, '');
+    } };
+    function aceptar() {
+      if (!prop) return;
+      hist.guardar();
+      var ids = prop.ids; fantasmas = []; prop.p.classList.remove('escribiendo'); prop.al(); cerrarPropuesta();
+      render(); numerar(); ids.forEach(function (id) { PI.halo(dib, id, '#1E9E62'); }); PI.cambio();
+      PI.tostada(ids.length === 1 ? 'Agregué el paso al dibujo' : 'Agregué ' + ids.length + ' pasos al dibujo', { accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    function descartar() {
+      if (!prop) return;
+      if (prop.no) prop.no(); else { hist.guardar(); prop.ids.slice().reverse().forEach(function (id) { PI.quitarPaso(M, P, id); }); prop.p.remove(); }
+      if (prop.ids.indexOf(sel) >= 0) sel = null;
+      fantasmas = []; cerrarPropuesta(); render(); panel(); numerar(); PI.cambio();
+      PI.tostada('Lo dejé como estaba. Contalo de otra manera o dibujalo', { i: 'info' });
+    }
+    function cerrarPropuesta() { if (propEl) { propEl.remove(); propEl = null; } prop = null; }
+    function bindProp() {
+      var b = propEl.querySelectorAll('.bot button');
+      b[0].addEventListener('click', aceptar); b[1].addEventListener('click', descartar);
+    }
+    bindProp();
+    /* Proponer pasos a partir de una frase */
+    function proponer(texto) {
+      if (prop) descartar();
+      texto = texto.trim().replace(/^y despu[eé]s,?\s*/i, '').replace(/\.$/, ''); if (!texto) return;
+      hist.guardar();
+      var t = texto.charAt(0).toUpperCase() + texto.slice(1), pasos;
+      if (/^si /i.test(texto) || /\?$/.test(texto)) pasos = [{ tipo: 'decision', nombre: '¿' + t.replace(/^Si /i, '').replace(/[¿?]/g, '').replace(/^./, function (c) { return c.toUpperCase(); }) + '?', carril: 'ven' }];
+      else if (/espera/i.test(texto)) pasos = [{ tipo: 'espera', nombre: t }];
+      else pasos = [{ tipo: /ferrebress|registra|imprime|guarda|calcula/i.test(texto) ? 'sistema' : 'persona', nombre: t }];
+      var ante = sel && PI.paso(M, sel) && PI.paso(M, sel).tipo !== 'fin' ? sel : antesDelFin(), ids = [], o = PI.orden(M), nA = o.indexOf(ante) + 1;
+      pasos.forEach(function (p) { var id = PI.agregarPaso(M, P, { tipo: p.tipo, nombre: p.nombre, despuesDe: ids.length ? ids[ids.length - 1] : ante, lugar: { dx: 120, dy: 140, xmin: 40, xmax: 1060 } }); ids.push(id); });
+      fantasmas = ids.slice();
+      var par = document.createElement('p'); par.className = 'escribiendo pi-entra'; par.innerHTML = '<mark>' + PI.esc(texto) + '</mark>';
+      relato.insertBefore(par, relato.querySelector('.t-etiqueta') ? relato.querySelector('.t-etiqueta').parentNode : null);
+      propEl = document.createElement('div'); propEl.className = 'propuesta pi-entra';
+      var sig = PI.orden(M)[PI.orden(M).indexOf(ids[ids.length - 1]) + 1];
+      propEl.innerHTML = '<div class="tit"><i class="i i-s" data-i="sparkles"></i>Agrego ' + (ids.length === 1 ? '1 paso' : ids.length + ' pasos') + ' después del ' + nA + (sig ? '' : '') + '</div>' +
+        pasos.map(function (p) { return '<div class="p"><span class="g">' + glifo(p.tipo, 'i i-s') + '</span><div>' + PI.esc(p.nombre) + '<small>' + PI.nombreFigura(p.tipo) + ' · ' + (M.carriles.filter(function (c) { return c.id === PI.paso(M, ids[0]).carril; })[0] || {}).nombre + '</small></div></div>'; }).join('') +
+        '<div class="bot"><button class="btn btn-accion chico" style="flex:1">Agregarlo' + (ids.length > 1 ? 's' : '') + ' <span class="kbd">Enter</span></button><button class="btn chico btn-fantasma">Así no <span class="kbd">Esc</span></button></div>';
+      par.after(propEl); PI.pintar(propEl); bindProp();
+      prop = { ids: ids, p: par, al: function () { par.innerHTML = PI.esc(texto) + ' ' + ids.map(function (id) { return '<span class="n" data-id="' + id + '"></span>'; }).join(' ') + '.'; } };
+      relato.style.overflow = 'auto'; relato.scrollTop = relato.scrollHeight;
+      sel = null; render(); panel(); PI.cambio();
+    }
+    relato.addEventListener('click', function (e) {
+      var c = e.target.closest('.chip'); if (!c) return;
+      var t = c.textContent.trim();
+      c.remove();
+      proponer(/stock/i.test(t) ? '¿Hay stock?' : 'Entrega la factura al cliente');
+    });
+
+    /* «Y después…»: escribir o dictar */
+    var entrada = document.querySelector('.entrada .campo'), mic = document.querySelector('.mic'), ed = null;
+    function editable() {
+      if (ed) return ed;
+      entrada.lastChild.remove();
+      ed = document.createElement('span'); ed.contentEditable = 'true'; ed.setAttribute('data-vacio', 'Y después…');
+      entrada.appendChild(ed); entrada.classList.add('foco');
+      ed.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); var t = ed.textContent; ed.textContent = ''; proponer(t); } });
+      ed.addEventListener('blur', function () { entrada.classList.remove('foco'); });
+      ed.addEventListener('focus', function () { entrada.classList.add('foco'); });
+      return ed;
+    }
+    entrada.addEventListener('click', function () { editable().focus(); });
+    var dictando = null;
+    mic.addEventListener('click', function () {
+      if (dictando) { clearInterval(dictando); dictando = null; mic.classList.remove('escuchando'); return; }
+      var e = editable(), frase = 'Le da el ticket al cliente', i = 0; e.textContent = ''; mic.classList.add('escuchando'); entrada.classList.add('foco');
+      dictando = setInterval(function () {
+        e.textContent = frase.slice(0, ++i);
+        if (i >= frase.length) { clearInterval(dictando); dictando = null; setTimeout(function () { mic.classList.remove('escuchando'); e.textContent = ''; proponer(frase); }, 500); }
+      }, 45);
+    });
+
+    /* Versiones: tocar una marca la muestra; «Hoy» vuelve al borrador */
+    var ticks = document.querySelectorAll('.tick'), lleno = document.querySelector('.pista .lleno');
+    var VERS = [{ quitar: ['gt', 'espera', 'gp', 'margen'], cambio: ['busca', 'suma'] }, { quitar: ['gt', 'espera', 'gp', 'margen'], cambio: ['gm'] }, { quitar: ['gt', 'espera'], cambio: ['gp', 'margen'] }, null];
+    function volverAHoy() { version = null; ticks.forEach(function (t) { t.classList.remove('mirando'); }); lleno.style.width = '76%'; render(); panel(); }
+    ticks.forEach(function (t, i) {
+      t.addEventListener('click', function () {
+        ticks.forEach(function (o) { o.classList.remove('mirando'); });
+        lleno.style.width = 'calc(' + t.style.left + ' - 4px)';
+        if (!VERS[i]) { volverAHoy(); PI.animar(dib, 'pi-fundido-lento'); return; }
+        version = VERS[i]; t.classList.add('mirando'); render(); panel(); PI.animar(dib, 'pi-fundido-lento');
+        if (i < 3) VERS[i].cambio.forEach(function (id) { PI.halo(dib, id, '#F0A20F', 'pi-parpadea'); });
+        PI.tostada('Así era el ' + t.textContent.trim() + '. Solo para mirar', { i: 'history', accion: 'Volver a hoy', alHacer: function () { ticks[3].click(); }, dura: 6000 });
+      });
+    });
+
+    /* Recorrerlo: una bolita pasa por cada paso */
+    var rec = document.querySelector('.versiones .btn-oscuro'), reloj = null;
+    function pararRecorrido() { clearTimeout(reloj); reloj = null; var b = dib.querySelector('.bolita'); if (b) b.remove(); rec.innerHTML = '<i class="i i-s" data-i="play"></i>Recorrerlo'; PI.pintar(rec); }
+    rec.addEventListener('click', function () {
+      if (reloj) { pararRecorrido(); return; }
+      if (version) volverAHoy();
+      var o = PI.orden(M), i = 0, ns = 'http://www.w3.org/2000/svg';
+      rec.innerHTML = '<i class="i i-s" data-i="pause"></i>Pausar'; PI.pintar(rec);
+      function paso() {
+        if (i >= o.length) { pararRecorrido(); PI.tostada('Recorrido completo: ' + o.length + ' pasos'); return; }
+        var b = dib.querySelector('.bolita'), q = P[o[i]];
+        if (!b) { b = document.createElementNS(ns, 'circle'); b.setAttribute('r', 8); b.setAttribute('fill', '#E8541C'); b.setAttribute('class', 'bolita'); b.style.transform = 'translate(' + q[0] + 'px,' + q[1] + 'px)'; dib.appendChild(b); }
+        b.style.transform = 'translate(' + q[0] + 'px,' + q[1] + 'px)';
+        PI.halo(dib, o[i], '#E8541C');
+        i++; reloj = setTimeout(paso, 520);
+      }
+      paso();
+    });
+
+    /* Arriba: el proceso, las caras y las acciones */
+    var A = document.querySelectorAll('.arriba-der button'), nom = document.querySelector('.barra-sup .nom'), titulo = 'Venta en el mostrador';
+    PI.estado({ pastillas: [document.querySelector('.barra-sup .pastilla')], guardados: [document.querySelector('.barra-sup .ok')], botones: [A[3]] });
+    A[0].addEventListener('click', function () { hist.deshacer(); });
+    A[1].addEventListener('click', function () { PI.importar(); });
+    A[2].addEventListener('click', function () { PI.exportar(A[2], titulo); });
+    A[3].addEventListener('click', function () { if (prop) { PI.tostada('Primero aceptá o descartá los pasos propuestos', { i: 'info' }); return; } PI.marcarVigente(titulo); });
+    nom.addEventListener('click', function () { PI.menuProcesos(nom, titulo, function (t) { PI.tostada('Abrirías «' + t + '»', { i: 'workflow' }); }, function () { PI.nuevo(function (n) { PI.tostada('Borrador «' + PI.esc(n) + '» creado. Contalo a la derecha'); }); }); });
+    document.querySelector('.caras').addEventListener('click', function (e) {
+      PI.menu(e.currentTarget, [{ et: 'Mirando este borrador' }, { t: 'Carlos Illobre (vos)', d: 'Editando', i: 'user' }, { t: 'Lucía Gómez', d: 'Mirando desde la caja · hace 1 min', i: 'eye' }], { lado: 'abajo' });
+    });
+
+    /* Zoom */
+    var Z = document.querySelectorAll('.zoom button');
+    Z[0].addEventListener('click', function () { cam.zoom(1 / 1.25); });
+    Z[1].addEventListener('click', function () { cam.zoom(1.25); });
+    Z[2].addEventListener('click', function () { cam.encuadrar([-100, 0, 1200, P.carriles[M.carriles[M.carriles.length - 1].id][1]]); });
+
+    /* Teclado */
+    document.addEventListener('keydown', function (e) {
+      if (PI.hayCapa()) return;
+      var t = e.target, editando = t.isContentEditable, k = e.key.toLowerCase();
+      if (e.key === 'Escape') { if (dictando) { mic.click(); return; } if (prop) { e.preventDefault(); descartar(); return; } if (version) { ticks[3].click(); return; } if (sel) { cerrarPanel(); return; } }
+      if (editando) return;
+      if (e.key === 'Enter' && prop) { e.preventDefault(); aceptar(); }
+      else if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? hist.rehacer() : hist.deshacer(); }
+      else if (e.key === 'Delete' && sel) { e.preventDefault(); quitar(); }
+    });
+  })();
 </script>
 </body>
 </html>

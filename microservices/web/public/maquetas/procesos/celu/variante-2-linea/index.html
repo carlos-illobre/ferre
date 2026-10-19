@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Procesos · La línea del recorrido (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <script src="../../dibujo.js"></script>
+<script src="../../proceso.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .cab { display: flex; align-items: center; gap: 8px; padding: 2px 12px 0 8px; }
@@ -35,6 +39,21 @@
   .alzada { position: absolute; left: 112px; right: 6px; z-index: 4; height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--superficie); border: 1.5px solid var(--pino); border-radius: 12px; box-shadow: var(--sombra-3); transform: rotate(-2deg); }
   .alzada .nom { flex: 1; font-weight: 750; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .dedo { position: absolute; z-index: 5; width: 44px; height: 44px; border-radius: 99px; background: rgba(18,56,47,.18); border: 2px solid rgba(255,255,255,.9); }
+  /* Al tocarla */
+  .cab .volver, .f, .hueco, .alzada { cursor: pointer; }
+  .f .asa { touch-action: none; cursor: grab; padding: 8px 0 8px 6px; margin: -8px 0; }
+  .lista.viva { overflow-y: auto; padding-bottom: 56px; }
+  .f.elegida { border-color: var(--accion); box-shadow: 0 0 0 3px var(--accion-suave); }
+  .f.levantada { opacity: .35; }
+  .f.pi-entra { animation: pi-entra var(--t) var(--rebote) both; }
+  .filas .f, .filas .hueco { transition: transform var(--t) var(--curva); }
+  .agregar-paso { margin: 4px 0 0 84px; width: calc(100% - 84px); }
+  .diagrama { position: relative; flex: 1; min-height: 0; margin-top: 12px; overflow: hidden; background-color: var(--fondo); background-image: radial-gradient(#D8D3C7 1.1px, transparent 1.2px); background-size: 16px 16px; border-top: 1px solid var(--borde); display: none; }
+  .diagrama > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .diagrama .mas { position: absolute; right: 16px; bottom: 16px; z-index: 3; box-shadow: var(--sombra-3); }
+  .modo-diagrama .diagrama { display: block; }
+  .modo-diagrama .lista { display: none; }
+  @media (prefers-reduced-motion: reduce) { .filas .f, .filas .hueco { transition: none; } }
 </style>
 </head>
 <body>
@@ -46,7 +65,7 @@
     <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="undo-2"></i></button>
     <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="ellipsis"></i></button>
   </div>
-  <nav class="celu-pestanas"><a><i class="i" data-i="workflow"></i>Diagrama</a><a class="activa"><i class="i" data-i="list-ordered"></i>Pasos</a></nav>
+  <nav class="celu-pestanas"><a data-no-ir><i class="i" data-i="workflow"></i>Diagrama</a><a class="activa" data-no-ir><i class="i" data-i="list-ordered"></i>Pasos</a></nav>
 
   <section class="lista">
     <div class="encab">
@@ -55,6 +74,8 @@
     </div>
     <div class="filas" id="filas"><svg id="g"></svg></div>
   </section>
+
+  <section class="diagrama" id="diagrama"><svg id="dib"></svg><button class="btn btn-accion mas"><i class="i" data-i="plus"></i>Agregar un paso</button></section>
 
   <div class="barra-accion"><button class="btn btn-accion grande" style="width:100%"><i class="i" data-i="circle-check"></i>Marcar vigente</button></div>
   <nav class="nav-inferior">
@@ -117,6 +138,197 @@
   });
   s.push('<circle cx="' + X[2] + '" cy="' + cy(8) + '" r="7" fill="' + C.accionS + '" stroke="' + C.accion + '" stroke-width="2.5" stroke-dasharray="3 3"/>');
   var g = document.getElementById('g'); g.setAttribute('viewBox', '0 0 84 ' + alto); g.style.height = alto + 'px'; g.innerHTML = s.join('');
+  /* ---------- Lo que se puede tocar ---------- */
+  (function () {
+    var celu = document.querySelector('.celu'), lista = document.querySelector('.lista'), filas = cont, svgL = g;
+    var CI = { cli: 0, ven: 1, sis: 2 }, sel = null, arrastrando = 'espera', hueco = 'cobra', titulo = 'Venta en el mostrador';
+    /* El modelo: el de todas las variantes, con ¿Lleva algo más? en el carril del vendedor y su vuelta */
+    var m = JSON.parse(JSON.stringify(VENTA));
+    m.pasos = m.pasos.filter(function (p) { return p.id !== 'nota'; }); m.asociaciones = [];
+    m.pasos.forEach(function (p) { if (p.id === 'gm') p.carril = 'ven'; if (p.id === 'margen') { p.rama = 1; p.op = 'No'; } if (p.id === 'busca' || p.id === 'cobra') p.det = 'Vender'; if (p.id === 'espera') p.corto = 'Espera que acredite la transf.'; });
+    m.flechas = m.flechas.filter(function (f) { return f.de !== 'gm'; });
+    m.flechas.push({ de: 'gm', a: 'busca', s: 't', e: 't', via: [[720, 150], [376, 150]], et: 'Sí', etp: [560, 150] }, { de: 'gm', a: 'cobra' });
+    m.flechas.forEach(function (f) { if (f.de === 'suma') { f.s = 'r'; f.e = 'b'; } if (f.de === 'gp' && f.a === 'margen') f.etp = [512, 186]; if (f.de === 'gp' && f.a === 'suma') f.etp = [540, 360]; });
+    var pos = { carriles: { cli: [0, 120], ven: [120, 290], sis: [290, 520] }, ini: [140, 60], pide: [250, 60], busca: [376, 210], gp: [486, 210], margen: [610, 210], suma: [610, 360], gm: [720, 210], cobra: [840, 210], reg: [840, 360], espera: [720, 450], fin: [960, 360] };
+    var hist = PI.historial(function () { return { m: m, pos: pos, sel: sel, arrastrando: arrastrando, hueco: hueco }; }, function (s) { m = s.m; pos = s.pos; sel = s.sel; arrastrando = s.arrastrando; hueco = s.hueco; todo(); });
+
+    /* Dibujar la lista y la línea desde el modelo */
+    function filasDe() {
+      var o = PI.orden(m), out = [];
+      o.forEach(function (id) {
+        if (id === arrastrando) return;
+        var p = PI.paso(m, id), det = p.det || null;
+        if (/decision/.test(p.tipo)) {
+          var si = m.flechas.filter(function (f) { return f.de === id && f.et === 'Sí'; })[0], k = si && o.indexOf(si.a);
+          det = si ? (k < o.indexOf(id) ? 'Sí, vuelve al ' + (o.filter(function (x) { return x !== arrastrando; }).indexOf(si.a) + 1) : 'Sí sigue') : null;
+        }
+        out.push({ id: id, c: CI[p.carril] != null ? CI[p.carril] : 2, t: p.tipo, n: p.nombre, d: det, dec: /decision|paralelo/.test(p.tipo), rama: p.rama, op: p.op });
+        if (arrastrando && id === hueco) out.push({ hueco: 1, c: CI[PI.paso(m, arrastrando).carril] != null ? CI[PI.paso(m, arrastrando).carril] : 2 });
+      });
+      return out;
+    }
+    function lista2(nuevo) {
+      var F2 = filasDe(), html = '', iH = -1, ant = PI.paso(m, hueco);
+      F2.forEach(function (f, i) {
+        if (f.hueco) { iH = i; html += '<div class="hueco" data-hueco>Soltalo acá, después de ' + PI.esc((ant && ant.nombre.split(' ')[0]) || '') + '</div>'; return; }
+        html += '<div class="f' + (f.dec ? ' dec' : '') + (f.rama ? ' rama' : '') + (f.id === sel ? ' elegida' : '') + (f.id === nuevo ? ' pi-entra' : '') + '" data-id="' + f.id + '">' + (f.op ? '<span class="op">' + f.op + '</span>' : '') +
+          '<span class="nom">' + PI.esc(f.n) + '</span>' + (f.d ? '<span class="det">' + f.d + '</span>' : '') + (f.dec ? '' : '<span class="asa"><i class="i i-s" data-i="grip-vertical"></i></span>') + '</div>';
+      });
+      var fz = m.pasos.filter(function (p) { return p.id !== arrastrando && PI.orden(m).indexOf(p.id) < 0; });
+      if (fz.length) html += fz.map(function (p) { return '<div class="f" data-id="' + p.id + '" style="background:var(--urgente-suave);border-color:transparent"><span style="color:var(--urgente-texto)">' + glifo(p.tipo, 'i i-s') + '</span><span class="nom">' + PI.esc(p.nombre) + '</span><span class="det">suelto</span></div>'; }).join('');
+      html += '<button class="btn agregar-paso"><i class="i" data-i="plus"></i>Agregar un paso</button>';
+      filas.innerHTML = '<svg id="g"></svg>' + html;
+      svgL = filas.querySelector('svg');
+      if (arrastrando && iH >= 0) {
+        var p = PI.paso(m, arrastrando);
+        filas.insertAdjacentHTML('beforeend', '<div class="alzada" data-hueco style="top:' + (iH * H - 14) + 'px"><span style="color:var(--urgente-texto)">' + glifo(p.tipo, 'i') + '</span><span class="nom">' + PI.esc(p.corto || p.nombre) + '</span><i class="i i-s" data-i="grip-vertical" style="color:var(--texto-3)"></i></div><span class="dedo" data-hueco style="left:300px;top:' + (iH * H - 12) + 'px"></span>');
+      }
+      PI.pintar(filas);
+      linea(F2);
+      lista.classList.add('viva');
+    }
+    function linea(F2) {
+      var C = COLORES_DIBUJO, s = [], alto = F2.length * H, idx = {};
+      X.forEach(function (x) { s.push('<line x1="' + x + '" y1="0" x2="' + x + '" y2="' + alto + '" stroke="' + C.hundido + '" stroke-width="2"/>'); });
+      function cy(i) { return i * H + 22; }
+      var pts = [];
+      F2.forEach(function (f, i) { if (!f.hueco) { pts.push([f.rama ? X[f.c] + 18 : X[f.c], cy(i), f, i]); idx[f.id] = pts[pts.length - 1]; } });
+      for (var i = 1; i < pts.length; i++) {
+        var a = pts[i - 1], b = pts[i], hu = b[3] - a[3] > 1;
+        s.push('<path d="M' + a[0] + ' ' + a[1] + ' C' + a[0] + ' ' + (a[1] + 26) + ' ' + b[0] + ' ' + (b[1] - 26) + ' ' + b[0] + ' ' + b[1] + '" fill="none" stroke="' + (hu ? C.accion : C.pino) + '" stroke-width="3" stroke-linecap="round"' + (hu ? ' stroke-dasharray="2 6"' : '') + '/>');
+      }
+      m.flechas.forEach(function (fl) {
+        var a = idx[fl.de], b = idx[fl.a]; if (!a || !b || !a[2].dec || !fl.et) return;
+        if (b[3] > a[3] + 1 && !(b[3] === a[3] + 2 && F2[a[3] + 1].hueco)) { if (fl.et === 'Sí') s.push('<path d="M' + a[0] + ' ' + a[1] + ' C' + a[0] + ' ' + (a[1] + H) + ' ' + b[0] + ' ' + (b[1] - H) + ' ' + b[0] + ' ' + b[1] + '" fill="none" stroke="' + C.pino + '" stroke-width="3" opacity=".35"/>'); }
+        else if (b[3] < a[3]) s.push('<path d="M' + a[0] + ' ' + a[1] + ' C' + (a[0] - 40) + ' ' + a[1] + ' ' + (a[0] - 40) + ' ' + b[1] + ' ' + b[0] + ' ' + b[1] + '" fill="none" stroke="' + C.t3 + '" stroke-width="2" stroke-dasharray="4 4"/>');
+      });
+      pts.forEach(function (p) {
+        var x = p[0], y = p[1], t = p[2].t, el = p[2].id === sel;
+        var st = el ? C.accion : C.pino;
+        if (/decision|paralelo/.test(t)) s.push('<path d="M' + x + ' ' + (y - 11) + ' L' + (x + 11) + ' ' + y + ' L' + x + ' ' + (y + 11) + ' L' + (x - 11) + ' ' + y + 'Z" fill="#fff" stroke="' + st + '" stroke-width="2.5" stroke-linejoin="round"/>');
+        else if (t === 'inicio') s.push('<circle cx="' + x + '" cy="' + y + '" r="9" fill="#fff" stroke="' + (el ? C.accion : C.pinoT) + '" stroke-width="2.5"/>');
+        else if (t === 'fin') s.push('<circle cx="' + x + '" cy="' + y + '" r="9" fill="#fff" stroke="' + (el ? C.accion : C.tinta) + '" stroke-width="5"/>');
+        else s.push('<circle cx="' + x + '" cy="' + y + '" r="7" fill="' + (t === 'sistema' ? st : '#fff') + '" stroke="' + st + '" stroke-width="3"/>');
+      });
+      F2.forEach(function (f, i) { if (f.hueco) s.push('<circle cx="' + X[f.c] + '" cy="' + cy(i) + '" r="7" fill="' + C.accionS + '" stroke="' + C.accion + '" stroke-width="2.5" stroke-dasharray="3 3"/>'); });
+      svgL.setAttribute('viewBox', '0 0 84 ' + alto); svgL.style.height = alto + 'px'; svgL.innerHTML = s.join('');
+    }
+
+    /* El diagrama (la otra pestaña) */
+    var dg = document.getElementById('diagrama'), dib = document.getElementById('dib'), cam = PI.camara(dg, 100, 0, function () { diagrama(); });
+    function diagrama() { if (celu.classList.contains('modo-diagrama')) dibujar(dib, m, pos, { tw: 120, th: 60, cab: 0, chipCarril: true, chipX: Math.max(0, cam.x) + 8, x0: 0, x1: 1160, sel: sel, avisos: PI.avisos(m), vista: cam.vista() }); }
+    dib.addEventListener('click', function (e) { if (dg._recienPaneo) return; var gg = e.target.closest('[data-paso]'); if (gg) elegir(gg.getAttribute('data-paso')); });
+    function todo(nuevo) { lista2(nuevo); diagrama(); }
+
+    /* Mover pasos dentro del recorrido */
+    function sacar(id) {
+      var ent = m.flechas.filter(function (f) { return f.a === id; }), sal = m.flechas.filter(function (f) { return f.de === id; });
+      m.flechas = m.flechas.filter(function (f) { return f.de !== id && f.a !== id; });
+      if (ent.length === 1 && sal.length === 1) m.flechas.push(Object.assign({ de: ent[0].de, a: sal[0].a, et: ent[0].et }, PI.puertos(pos[ent[0].de], pos[sal[0].a])));
+    }
+    function meterDespues(id, ante) {
+      var o = PI.orden(m), sig = o[o.indexOf(ante) + 1];
+      var f0 = m.flechas.filter(function (f) { return f.de === ante && f.a === sig; })[0];
+      if (f0) { m.flechas.splice(m.flechas.indexOf(f0), 1); m.flechas.push(Object.assign({ de: id, a: sig }, PI.puertos(pos[id], pos[sig]))); }
+      m.flechas.push(Object.assign({ de: ante, a: id, et: f0 && f0.et }, PI.puertos(pos[ante], pos[id])));
+      var p = PI.paso(m, id), pa = PI.paso(m, ante); p.rama = pa.rama && !/decision/.test(pa.tipo) ? 1 : 0; if (!p.rama) delete p.op;
+    }
+    function soltar() {
+      if (!arrastrando) return;
+      hist.guardar();
+      var id = arrastrando; arrastrando = null;
+      m.flechas = m.flechas.filter(function (f) { return f.a !== id; });
+      var ya = m.flechas.filter(function (f) { return f.de === id; })[0];
+      if (ya) m.flechas.splice(m.flechas.indexOf(ya), 1);
+      meterDespues(id, hueco);
+      sel = id; todo(id); PI.vibrar(10); PI.cambio();
+      PI.tostada('«' + PI.esc(PI.paso(m, id).nombre) + '» quedó después de «' + PI.esc(PI.paso(m, hueco).nombre) + '»', { accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    /* Arrastrar por el asa: la tarjeta se levanta y la línea le abre el hueco */
+    filas.addEventListener('pointerdown', function (e) {
+      var asa = e.target.closest('.asa'); if (!asa || arrastrando) return;
+      e.preventDefault();
+      var f = asa.closest('.f'), id = f.getAttribute('data-id'), y0 = e.clientY, movio = false, fan = null, base = celu.getBoundingClientRect(), destino = null;
+      var todas = Array.prototype.slice.call(filas.querySelectorAll('.f[data-id]')), fi = todas.indexOf(f);
+      function mover(ev) {
+        if (!movio && Math.abs(ev.clientY - y0) < 6) return;
+        if (!movio) { movio = true; f.classList.add('levantada'); fan = f.cloneNode(true); fan.className = 'alzada'; fan.style.left = '112px'; var dt = fan.querySelector('.det'); if (dt) dt.remove(); celu.appendChild(fan); }
+        fan.style.top = (ev.clientY - base.top - 24) + 'px';
+        var di = -1;
+        todas.forEach(function (o, j) { if (j === fi) return; var r = o.getBoundingClientRect(); if (ev.clientY > r.top + r.height / 2) di = j; });
+        destino = di >= 0 ? todas[di] : null;
+        todas.forEach(function (o, j) { if (j === fi) return; o.style.transform = fi < j && j <= di ? 'translateY(-50px)' : (di < j && j < fi ? 'translateY(50px)' : ''); });
+      }
+      function fin() {
+        window.removeEventListener('pointermove', mover); window.removeEventListener('pointerup', fin);
+        if (fan) fan.remove(); f.classList.remove('levantada');
+        if (!movio) return;
+        var ante = destino && destino.getAttribute('data-id');
+        if (!ante || ante === id || PI.paso(m, id).tipo === 'inicio') { todo(); return; }
+        hist.guardar(); sacar(id); meterDespues(id, ante); sel = id; todo(id); PI.vibrar(10); PI.cambio();
+      }
+      window.addEventListener('pointermove', mover); window.addEventListener('pointerup', fin);
+    });
+
+    /* Elegir un paso abre su hoja */
+    function abrirPaso(id) {
+      PI.hojaPaso({ m: m, id: id,
+        alCambiar: function (fn, primero) { if (primero) hist.guardar(); fn(); todo(); PI.cambio(); },
+        alMoverCarril: function (pid, k) { pos[pid] = PI.lugarLibre(m, pos, [pos[pid][0], PI.mitad(pos, k)], { carril: k, xmin: 60, xmax: 1100, dx: 110, dy: 150 }); },
+        alQuitar: quitar, alSiguiente: function (n) { sel = n; todo(); },
+        alAgregarDespues: function () { PI.hojaFiguras(function (t) { agregar(t); }); } });
+    }
+    function elegir(id) { sel = id; todo(); abrirPaso(id); }
+    function agregar(tipo) {
+      hist.guardar();
+      if (tipo === 'carril') { if (!PI.agregarCarril(m, pos)) { PI.tostada('Ya hay un carril «Proveedor»', { i: 'info' }); return; } todo(); PI.tostada('Carril «Proveedor» agregado'); return; }
+      var ante = sel && PI.paso(m, sel) && PI.paso(m, sel).tipo !== 'fin' && PI.orden(m).indexOf(sel) >= 0 ? sel : PI.orden(m)[PI.orden(m).length - 2];
+      var id = PI.agregarPaso(m, pos, { tipo: tipo, despuesDe: ante, lugar: { dx: 120, dy: 150, xmin: 60, xmax: 2000 } });
+      var p = PI.paso(m, id), pa = PI.paso(m, ante); if (pa.rama && !/decision/.test(pa.tipo)) p.rama = 1;
+      sel = id; todo(id); PI.vibrar(10); PI.cambio();
+      var f = filas.querySelector('[data-id="' + id + '"]'); if (f) f.scrollIntoView({ block: 'nearest', behavior: PI.reducir() ? 'auto' : 'smooth' });
+      PI.tostada('Agregaste «' + PI.esc(p.nombre) + '»', { accion: 'Editar', alHacer: function () { abrirPaso(id); } });
+    }
+    function quitar() {
+      var p = PI.paso(m, sel); if (!p) return;
+      hist.guardar(); PI.quitarPaso(m, pos, sel); if (hueco === sel) hueco = PI.orden(m)[PI.orden(m).length - 2]; sel = null; todo(); PI.cambio();
+      PI.tostada('Quitaste «' + PI.esc(p.nombre) + '»', { i: 'trash-2', accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    filas.addEventListener('click', function (e) {
+      if (e.target.closest('[data-hueco]')) { soltar(); return; }
+      if (e.target.closest('.agregar-paso')) { PI.hojaFiguras(function (t) { agregar(t); }); return; }
+      if (e.target.closest('.asa')) return;
+      var f = e.target.closest('.f[data-id]'); if (f) elegir(f.getAttribute('data-id'));
+    });
+    dg.querySelector('.mas').addEventListener('click', function () { PI.hojaFiguras(function (t) { agregar(t); }); });
+
+    /* Diagrama | Pasos */
+    var T = document.querySelectorAll('.celu-pestanas a');
+    function pestana(d) {
+      celu.classList.toggle('modo-diagrama', d); T[0].classList.toggle('activa', d); T[1].classList.toggle('activa', !d);
+      if (d) { if (arrastrando) soltar(); diagrama(); PI.animar(dg, 'pi-fundido-lento'); } else PI.animar(lista, 'pi-fundido-lento');
+    }
+    T[0].addEventListener('click', function () { pestana(true); });
+    T[1].addEventListener('click', function () { pestana(false); });
+
+    /* La cabecera y «Marcar vigente» */
+    var A = document.querySelectorAll('.cab .btn'), tb = document.querySelector('.cab .tit b'), vig = document.querySelector('.barra-accion .btn');
+    PI.estado({ pastillas: [document.querySelector('.cab .pastilla')], botones: [vig] });
+    vig.addEventListener('click', function () { if (arrastrando) soltar(); PI.marcarVigente(titulo); });
+    A[0].addEventListener('click', function () { hist.deshacer(); });
+    A[1].addEventListener('click', function () {
+      PI.menuOpciones(A[1], { titulo: function () { return titulo; },
+        alElegirProceso: function (t) { titulo = t; tb.textContent = t; PI.tostada('Abrirías «' + t + '»', { i: 'workflow' }); },
+        alNuevo: function () { PI.nuevo(function (n) { titulo = n; tb.textContent = n; PI.tostada('Borrador «' + PI.esc(n) + '» creado'); }); },
+        alImportar: function () { PI.tostada('Importado como borrador: «Recibir una compra», 8 pasos', { i: 'upload' }); } });
+    });
+    document.querySelector('.cab .volver').addEventListener('click', function (e) { PI.menuMas(e.currentTarget); });
+    /* Las tarjetas de la maqueta quieta, con su paso */
+    var ids = ['ini', 'pide', 'busca', 'gp', 'margen', 'suma', 'gm', 'cobra', 'reg', 'fin'];
+    filas.querySelectorAll('.f').forEach(function (f, i) { f.setAttribute('data-id', ids[i]); });
+    filas.querySelectorAll('.alzada, .dedo, .hueco').forEach(function (x) { x.setAttribute('data-hueco', ''); });
+    PI.marco();
+  })();
 </script>
 </body>
 </html>

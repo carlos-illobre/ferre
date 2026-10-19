@@ -159,7 +159,7 @@
       var p = P[id], sel = o.sel === id, at = o.atenuar.indexOf(id) >= 0;
       var fa = o.fantasmas.indexOf(id) >= 0;
       var stroke = sel || fa ? C.accion : C.bordeF, sw = sel ? 2.5 : (fa ? 2 : 1.5);
-      var g = ['<g' + (at ? ' opacity=".35"' : '') + '>'];
+      var g = ['<g data-paso="' + id + '"' + (at ? ' opacity=".35"' : '') + '>'];
       var rot = function (dy, ancho) {
         if (!o.rotulos) return '';
         ancho = ancho || 136;

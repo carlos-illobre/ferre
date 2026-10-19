@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Procesos · El recorrido escrito (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <script src="../../dibujo.js"></script>
 <script src="../../proceso.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .cabecera { padding: 16px 24px 14px; border-bottom: 1px solid var(--borde); background: var(--superficie); gap: 12px; }
   .selector { display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 4px 8px 4px 4px; margin-left: -4px; border-radius: 12px; }
@@ -71,6 +74,23 @@
   .ver.bor .pt { background: var(--superficie); border: 2px dashed var(--urgente); }
   .ver b { font-weight: 750; }
   .ver span { color: var(--texto-2); font-weight: 550; }
+  /* Al tocarla */
+  .r { cursor: pointer; }
+  .r:not(.foco):not(.aviso):hover { background: var(--hundido); }
+  .r.pi-entra { animation: pi-entra var(--t) var(--rebote) both; }
+  .r .g { cursor: pointer; }
+  .ver { cursor: pointer; border-radius: 10px; padding: 4px 0; }
+  .ver.mirando b { color: var(--accion-texto); }
+  .ver.mirando .pt { box-shadow: 0 0 0 4px var(--accion-suave); border-color: var(--accion); }
+  .mini { cursor: default; }
+  .datos .va [contenteditable] { display: block; }
+  .datos .va .pastilla { cursor: pointer; }
+  .cuerpo.modo-dibujo { grid-template-columns: minmax(0, 1fr); }
+  .modo-dibujo .doc { display: none; }
+  .modo-dibujo .der-col { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto auto 1fr; align-content: start; }
+  .modo-dibujo .der-col > .card:first-child { grid-row: 1 / span 3; }
+  .modo-dibujo .mini { height: calc(100vh - 210px); }
+  .mirando-version .doc, .mirando-version .mini { opacity: .6; }
 </style>
 </head>
 <body>
@@ -105,11 +125,11 @@
 
     <div class="cuerpo">
       <section class="doc tarjeta">
-        <div class="doc-cab"><span class="t-seccion">El recorrido</span><span class="pastilla">10 pasos</span>
+        <div class="doc-cab"><span class="t-seccion">El recorrido</span><span class="pastilla" id="cuantos">10 pasos</span>
           <span class="der"><span class="t-detalle">Se escribe como se cuenta; el dibujo se arma solo</span></span></div>
         <div class="rows" id="rows"></div>
-        <div class="sinlugar">Fuera del recorrido</div>
-        <div class="r aviso"><span></span><span class="n"><i class="i i-s" data-i="triangle-alert"></i></span><span class="g"><i class="i i-s" data-fig="espera"></i></span><span class="nom">Espera que acredite la transferencia</span><span class="quien"><i class="i i-s" data-i="monitor"></i>Ferrebress</span><button class="btn chico" style="min-height:30px;font-size:14px">Ponerlo después del 8</button></div>
+        <div id="fuera" style="display:contents"><div class="sinlugar">Fuera del recorrido</div>
+        <div class="r aviso"><span></span><span class="n"><i class="i i-s" data-i="triangle-alert"></i></span><span class="g"><i class="i i-s" data-fig="espera"></i></span><span class="nom">Espera que acredite la transferencia</span><span class="quien"><i class="i i-s" data-i="monitor"></i>Ferrebress</span><button class="btn chico" style="min-height:30px;font-size:14px">Ponerlo después del 8</button></div></div>
         <div class="teclas">
           <span><span class="kbd">Enter</span>paso nuevo</span>
           <span><span class="kbd">Tab</span>a la rama</span>
@@ -124,7 +144,7 @@
           <div class="card-cab"><b>El dibujo</b><span class="t-detalle">se arma solo</span><span class="der"><button class="btn chico btn-suave"><i class="i i-s" data-i="maximize"></i>Abrirlo grande</button></span></div>
           <div class="mini"><svg id="mini"></svg></div>
         </section>
-        <section class="card tarjeta">
+        <section class="card tarjeta" id="paso">
           <div class="card-cab"><span class="pastilla accion" style="height:26px">Paso 5</span><b>Elige el margen</b><span class="der t-detalle">Tarea de una persona</span></div>
           <div class="datos">
             <span class="et">Dónde, en Ferrebress</span><span class="va"><span class="pastilla pino" style="height:26px"><i class="i i-s" data-i="shopping-cart"></i>Vender › Vender</span></span>
@@ -187,6 +207,225 @@
   dibujar(document.getElementById('mini'), m, pos, { tw: 48, th: 34, g: 30, r: 13, fs: 14, cab: 96, x1: 614, sel: 'margen', radio: 9, avisos: { espera: 1 }, vista: [0, 0, 614, 260] });
   // los números de las figuras redondas y rombos, adentro
   document.querySelectorAll('#mini foreignObject div').forEach(function (d) { d.style.fontWeight = '800'; });
+  /* ---------- Lo que se puede tocar ---------- */
+  (function () {
+    var M = JSON.parse(JSON.stringify(m)), P = JSON.parse(JSON.stringify(pos));
+    VENTA.pasos.forEach(function (v) { var p = PI.paso(M, v.id); if (p) p.nombre = v.nombre; });
+    PI.INFO.margen.como = 'Tocá un margen sobre el costo (300 a 25 %) o escribí el precio a mano.';
+    var X1 = 614, foco = 'margen', titulo = 'Venta en el mostrador', version = null;
+    var R = [{ id: 'ini' }, { id: 'pide' }, { id: 'busca' }, { id: 'gp' }, { id: 'margen', rama: true, opc: 'No' },
+      { salto: 'suma', et: 'Sí', rama: true }, { id: 'suma' }, { id: 'gm' }, { salto: 'busca', et: 'Sí', vuelve: true, rama: true },
+      { id: 'cobra' }, { id: 'reg' }, { id: 'fin' }];
+    var rows = document.getElementById('rows'), fuera = document.getElementById('fuera'), card = document.getElementById('paso');
+    var mini = document.getElementById('mini'), cuerpo = document.querySelector('.cuerpo'), cuantos = document.getElementById('cuantos');
+    var tit = document.querySelector('.selector .t-titulo');
+    var hist = PI.historial(function () { return { M: M, P: P, R: R, X1: X1, foco: foco, titulo: titulo }; },
+      function (s) { M = s.M; P = s.P; R = s.R; X1 = s.X1; foco = s.foco; ponerTitulo(s.titulo); todo(); });
+
+    function numeros() { var n = 0, num = {}; R.forEach(function (r) { if (r.id) num[r.id] = ++n; }); return num; }
+    function fuerza() { var ids = R.filter(function (r) { return r.id; }).map(function (r) { return r.id; }); return M.pasos.filter(function (p) { return p.tipo !== 'nota' && ids.indexOf(p.id) < 0; }); }
+
+    function lista(nuevoId) {
+      var num = numeros(), html = [];
+      R.forEach(function (r) {
+        if (r.salto) {
+          html.push(fila({ t: '<span class="opcion">' + r.et + '</span>' + (r.vuelve ? '<span class="salto-a"><i class="i i-s" data-i="corner-down-right" style="transform:scaleY(-1)"></i>vuelve al ' + num[r.salto] + '</span>' : 'sigue en el ' + num[r.salto]), c: (r.rama ? 'rama ' : '') + 'salto' }).replace('<div class="r', '<div data-k="s' + r.salto + '" data-ir-a="' + r.salto + '" class="r'));
+          return;
+        }
+        var p = PI.paso(M, r.id); if (!p) return;
+        var es = r.id === foco, d = PI.info(r.id).donde, dd = d && PI.DONDE[d];
+        var nom = (r.opc ? '<span class="opcion">' + r.opc + '</span>' : '') + (es ? '<span contenteditable="true" data-campo="nombre" data-vacio="Escribí el paso">' + PI.esc(p.nombre) + '</span><span class="cursor"></span>' : PI.esc(p.nombre));
+        html.push(fila({ n: num[r.id], f: p.tipo, t: nom, q: Q[p.carril] ? p.carril : null, d: dd ? d : null, di: dd && dd.i, c: (/decision|paralelo/.test(p.tipo) ? 'dec ' : '') + (r.rama ? 'rama ' : '') + (es ? 'foco' : '') + (r.id === nuevoId ? ' pi-entra' : '') })
+          .replace('<div class="r', '<div data-k="' + r.id + '" data-id="' + r.id + '" class="r'));
+        if (es) html.push(fila({ f: '', t: 'Escribí el paso siguiente, o / para elegir el tipo', c: (r.rama ? 'rama ' : '') + 'nuevo' }).replace('<div class="r', '<div data-nuevo class="r'));
+      });
+      rows.innerHTML = html.join('');
+      var fz = fuerza();
+      fuera.innerHTML = fz.length ? '<div class="sinlugar">Fuera del recorrido</div>' + fz.map(function (p) {
+        var c = M.carriles.filter(function (x) { return x.id === p.carril; })[0] || M.carriles[0], ant = antes(p.id);
+        return '<div class="r aviso' + (p.id === foco ? ' foco' : '') + '" data-id="' + p.id + '"><span></span><span class="n"><i class="i i-s" data-i="triangle-alert"></i></span><span class="g">' + glifo(p.tipo, 'i i-s') + '</span><span class="nom">' + PI.esc(p.nombre) + '</span><span class="quien"><i class="i i-s" data-i="' + c.icono + '"></i>' + c.nombre + '</span>' +
+          (ant ? '<button class="btn chico" style="min-height:30px;font-size:14px" data-poner="' + p.id + '">Ponerlo después del ' + num[ant] + '</button>' : '<span></span>') + '</div>';
+      }).join('') : '';
+      cuantos.textContent = R.filter(function (r) { return r.id; }).length + ' pasos';
+      PI.pintar(document.querySelector('.doc'));
+    }
+    /* El paso suelto va antes del que recibe su flecha: «Ponerlo después del 8» */
+    function antes(id) {
+      var sale = M.flechas.filter(function (f) { return f.de === id; })[0]; if (!sale) return null;
+      var otro = M.flechas.filter(function (f) { return f.a === sale.a && f.de !== id; })[0];
+      return otro && numeros()[otro.de] ? otro.de : null;
+    }
+    function dibujo(nuevoId) {
+      var num = numeros(), d = JSON.parse(JSON.stringify(M));
+      d.pasos.forEach(function (p) { p.nombre = String(num[p.id] || ''); });
+      dibujar(mini, d, P, { tw: 48, th: 34, g: 30, r: 13, fs: 14, cab: 96, x1: X1, sel: foco, radio: 9, avisos: PI.avisos(M), vista: [0, 0, X1, 260] });
+      mini.querySelectorAll('foreignObject div').forEach(function (el) { el.style.fontWeight = '800'; });
+      if (nuevoId) { var g = mini.querySelector('[data-paso="' + nuevoId + '"]'); if (g) PI.animar(g, 'pi-fundido-lento'); }
+    }
+    function tarjeta() {
+      var p = PI.paso(M, foco); if (!p) return;
+      var num = numeros(), inf = PI.info(foco), dd = inf.donde && PI.DONDE[inf.donde];
+      card.innerHTML = '<div class="card-cab pi-fundido">' + (num[foco] ? '<span class="pastilla accion" style="height:26px">Paso ' + num[foco] + '</span>' : '<span class="pastilla urgente" style="height:26px">Fuera del recorrido</span>') + '<b>' + PI.esc(p.nombre) + '</b><span class="der t-detalle">' + PI.nombreFigura(p.tipo) + '</span></div>' +
+        '<div class="datos pi-fundido"><span class="et">Dónde, en Ferrebress</span><span class="va">' + (dd ? '<span class="pastilla pino" style="height:26px" data-donde><i class="i i-s" data-i="' + dd.i + '"></i>' + dd.ruta + '</span>' : '<span class="pastilla" style="height:26px" data-donde><i class="i i-s" data-i="store"></i>Fuera de Ferrebress</span>') + '</span>' +
+        '<span class="et">Cómo se hace</span><span class="va"><span contenteditable="true" data-campo="como" data-vacio="Contalo en una o dos líneas">' + PI.esc(inf.como) + '</span></span></div>';
+      PI.pintar(card);
+    }
+    function todo(nuevoId) { lista(nuevoId); dibujo(nuevoId); tarjeta(); }
+    function elegir(id) { if (!PI.paso(M, id) || id === foco) return; foco = id; todo(); }
+
+    /* Agregar un paso después del que tiene el foco: entra en la lista y el dibujo le hace lugar */
+    function agregar() {
+      var ante = PI.paso(M, foco); if (!ante || ante.tipo === 'fin') { PI.tostada('Después del fin no sigue nada', { i: 'info' }); return; }
+      var i = R.map(function (r) { return r.id; }).indexOf(foco);
+      if (i < 0) { PI.tostada('Primero ponelo en el recorrido', { i: 'info' }); return; }
+      hist.guardar();
+      var q = P[foco], dx = 64;
+      Object.keys(P).forEach(function (k) { if (k !== 'carriles' && P[k] && P[k][0] > q[0]) P[k][0] += dx; });
+      M.flechas.forEach(function (f) { if (f.via) f.via.forEach(function (v) { if (v[0] > q[0]) v[0] += dx; }); });
+      X1 += dx;
+      var tipo = ante.carril === 'sis' ? 'sistema' : 'persona';
+      var id = PI.agregarPaso(M, P, { tipo: tipo, despuesDe: foco, en: [q[0] + dx, PI.mitad(P, ante.carril)], nombre: tipo === 'sistema' ? 'Imprime el ticket' : 'Avisa al cliente que está listo' });
+      var rama = R[i].rama && !/decision|paralelo/.test(ante.tipo);
+      R.splice(i + 1, 0, { id: id, rama: rama });
+      foco = id; todo(id); PI.cambio();
+      var nom = rows.querySelector('[data-campo="nombre"]'); if (nom) { nom.focus(); var rg = document.createRange(); rg.selectNodeContents(nom); var se = getSelection(); se.removeAllRanges(); se.addRange(rg); }
+    }
+    function quitarFoco() {
+      var p = PI.paso(M, foco); if (!p) return;
+      hist.guardar();
+      var ids = R.filter(function (r) { return r.id; }).map(function (r) { return r.id; }), i = ids.indexOf(foco);
+      PI.quitarPaso(M, P, foco);
+      R = R.filter(function (r) { return r.id !== foco && r.salto !== foco; });
+      foco = ids[i + 1] || ids[i - 1] || ids[0];
+      todo(); PI.cambio();
+      PI.tostada('Quitaste «' + PI.esc(p.nombre) + '»', { i: 'trash-2', accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    function poner(id) {
+      var ant = antes(id); if (!ant) return;
+      hist.guardar();
+      var sale = M.flechas.filter(function (f) { return f.de === id; })[0];
+      M.flechas = M.flechas.filter(function (f) { return !(f.de === ant && f.a === sale.a); });
+      M.flechas.push(Object.assign({ de: ant, a: id }, PI.puertos(P[ant], P[id])));
+      var i = R.map(function (r) { return r.id; }).indexOf(ant);
+      R.splice(i + 1, 0, { id: id });
+      foco = id; todo(id); PI.cambio();
+      PI.tostada('«' + PI.esc(PI.paso(M, id).nombre) + '» quedó como paso ' + numeros()[id], { accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    function cambiarTipo(ancla) { var p = PI.paso(M, foco); PI.menuTipo(ancla, p.tipo, function (t) { hist.guardar(); p.tipo = t; todo(); PI.cambio(); }); }
+    function cambiarQuien(ancla) {
+      var p = PI.paso(M, foco); PI.menuQuien(ancla, M, p.carril, function (k) { hist.guardar(); p.carril = k; P[foco] = [P[foco][0], PI.mitad(P, k)]; M.flechas.forEach(function (f) { if ((f.de === foco || f.a === foco) && !f.via) Object.assign(f, PI.puertos(P[f.de], P[f.a])); }); todo(); PI.cambio(); });
+    }
+    function mover(d) {
+      var ids = R.map(function (r, i) { return r.id ? i : -1; }).filter(function (i) { return i >= 0; });
+      var k = ids.map(function (i) { return R[i].id; }).indexOf(foco); if (k < 0) return;
+      var otro = ids[k + d]; if (otro == null) return;
+      foco = R[otro].id; todo();
+    }
+
+    rows.addEventListener('click', function (e) {
+      if (e.target.closest('[contenteditable]')) return;
+      var r = e.target.closest('.r'); if (!r) return;
+      if (r.hasAttribute('data-nuevo')) { agregar(); return; }
+      if (r.getAttribute('data-ir-a')) { elegir(r.getAttribute('data-ir-a')); return; }
+      var id = r.getAttribute('data-id');
+      if (id === foco && e.target.closest('.g')) { cambiarTipo(e.target.closest('.g')); return; }
+      if (id === foco && e.target.closest('.quien')) { cambiarQuien(e.target.closest('.quien')); return; }
+      elegir(id);
+    });
+    fuera.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-poner]'); if (b) { poner(b.getAttribute('data-poner')); return; }
+      var r = e.target.closest('.r'); if (r) elegir(r.getAttribute('data-id'));
+    });
+    mini.addEventListener('click', function (e) { var g = e.target.closest('[data-paso]'); if (g) elegir(g.getAttribute('data-paso')); });
+    var escribiendo = false;
+    document.addEventListener('input', function (e) {
+      var c = e.target.getAttribute && e.target.getAttribute('data-campo'); if (!c) return;
+      if (!escribiendo) { hist.guardar(); escribiendo = true; }
+      if (c === 'nombre') { PI.paso(M, foco).nombre = e.target.textContent; var b = card.querySelector('.card-cab b'); if (b) b.textContent = e.target.textContent; }
+      else PI.info(foco).como = e.target.textContent;
+      PI.cambio();
+    });
+    document.addEventListener('focusout', function () { escribiendo = false; });
+    card.addEventListener('click', function (e) {
+      var d = e.target.closest('[data-donde]'); if (!d) return;
+      PI.menuDonde(d, PI.info(foco).donde, function (k) { hist.guardar(); PI.info(foco).donde = k; todo(); PI.cambio(); });
+    });
+
+    /* Recorrido | Dibujo, y «Abrirlo grande» */
+    var seg = document.querySelectorAll('.vistas button'), grande = document.querySelector('.card-cab .der .btn');
+    function modo(dib) {
+      cuerpo.classList.toggle('modo-dibujo', dib);
+      seg[0].classList.toggle('elegido', !dib); seg[1].classList.toggle('elegido', dib);
+      grande.innerHTML = dib ? '<i class="i i-s" data-i="list-ordered"></i>Volver al recorrido' : '<i class="i i-s" data-i="maximize"></i>Abrirlo grande';
+      PI.pintar(grande); dibujo();
+      PI.animar(document.querySelector('.der-col > .card'), 'pi-fundido-lento');
+    }
+    seg[0].addEventListener('click', function () { modo(false); });
+    seg[1].addEventListener('click', function () { modo(true); });
+    grande.addEventListener('click', function () { modo(!cuerpo.classList.contains('modo-dibujo')); });
+
+    /* Versiones: tocar una la muestra, solo para mirar */
+    var vers = document.querySelectorAll('.linea-v .ver');
+    vers.forEach(function (v, i) {
+      v.addEventListener('click', function () {
+        vers.forEach(function (o) { o.classList.remove('mirando'); });
+        if (i === vers.length - 1) { cuerpo.classList.remove('mirando-version'); PI.tostada('Volviste al borrador', { i: 'pencil' }); return; }
+        v.classList.add('mirando'); cuerpo.classList.add('mirando-version');
+        PI.tostada('Mirás la versión del ' + v.querySelector('b').textContent + ' · solo para leer', { i: 'eye', accion: 'Volver al borrador', alHacer: function () { vers[vers.length - 1].click(); }, dura: 6000 });
+      });
+    });
+
+    /* La cabecera */
+    var A = document.querySelectorAll('.cabecera .acciones button');
+    PI.estado({ pastillas: [document.querySelector('.cabecera > .pastilla')], guardados: [document.querySelector('.miga > span')], botones: [A[4]] });
+    A[0].addEventListener('click', function () { hist.deshacer(); });
+    A[1].addEventListener('click', function () { hist.rehacer(); });
+    A[2].addEventListener('click', function () { PI.importar(function () { hist.guardar(); cargar('Recibir una compra'); PI.tostada('Importado como borrador: «Recibir una compra», 8 pasos', { i: 'upload' }); }); });
+    A[3].addEventListener('click', function () { PI.exportar(A[3], titulo); });
+    A[4].addEventListener('click', function () { PI.marcarVigente(titulo); });
+    function ponerTitulo(t) { titulo = t; tit.firstChild.nodeValue = t + ' '; }
+    var ORIG = JSON.stringify({ M: M, P: P, R: R, X1: X1 });
+    function cargar(t, def) {
+      if (t === 'Venta en el mostrador' && !def) { var o = JSON.parse(ORIG); M = o.M; P = o.P; R = o.R; X1 = o.X1; foco = 'margen'; }
+      else {
+        var r = PI.modeloLineal(def || PI.OTROS[t], { carriles: VENTA.carriles, pos: { cli: [0, 80], ven: [80, 168], sis: [168, 260] }, x0: 122, dx: 64 });
+        M = r.m; P = r.pos; X1 = Math.max(614, 122 + (M.pasos.length - 1) * 64 + 60); foco = 'p0';
+        R = M.pasos.map(function (p) { return { id: p.id }; });
+      }
+      ponerTitulo(t); todo();
+    }
+    var selector = document.querySelector('.selector');
+    selector.addEventListener('click', function () {
+      PI.menuProcesos(selector, titulo, function (t) { hist.guardar(); cargar(t); }, function () {
+        PI.nuevo(function (n) { hist.guardar(); cargar(n, [['inicio', 'Empieza', 'ven']]); PI.cambio(); PI.tostada('Borrador «' + PI.esc(n) + '» creado. Apretá Enter para el paso siguiente'); });
+      });
+    });
+
+    /* Teclado: Enter paso nuevo, Tab a la rama, / tipo, @ quién, ↑↓ elegir */
+    document.addEventListener('keydown', function (e) {
+      if (PI.hayCapa()) return;
+      var t = e.target, editando = t.isContentEditable, k = e.key.toLowerCase();
+      var enNombre = editando && t.getAttribute('data-campo') === 'nombre';
+      if (e.altKey && k === 'v') { e.preventDefault(); A[4].click(); return; }
+      if ((e.ctrlKey || e.metaKey) && k === 'z' && !editando) { e.preventDefault(); e.shiftKey ? hist.rehacer() : hist.deshacer(); return; }
+      if ((e.ctrlKey || e.metaKey) && k === 'y' && !editando) { e.preventDefault(); hist.rehacer(); return; }
+      if (editando && !enNombre) return;
+      var fila = rows.querySelector('.r.foco');
+      if (e.key === 'Enter') { e.preventDefault(); if (editando) t.blur(); agregar(); }
+      else if (e.key === 'Tab' && fila) {
+        e.preventDefault();
+        var r = R.filter(function (x) { return x.id === foco; })[0]; if (!r) return;
+        hist.guardar(); r.rama = !r.rama; lista(); if (enNombre) { var n = rows.querySelector('[data-campo="nombre"]'); n.focus(); PI.colocarAlFinal(n); }
+      }
+      else if (e.key === '/' && fila) { e.preventDefault(); cambiarTipo(fila.querySelector('.g')); }
+      else if (e.key === '@' && fila) { e.preventDefault(); cambiarQuien(fila.querySelector('.quien')); }
+      else if (editando) return;
+      else if (e.key === 'ArrowDown' && !e.altKey) { e.preventDefault(); mover(1); }
+      else if (e.key === 'ArrowUp' && !e.altKey) { e.preventDefault(); mover(-1); }
+      else if (e.key === 'Delete') { e.preventDefault(); quitarFoco(); }
+    });
+    PI.marco();
+  })();
 </script>
 </body>
 </html>

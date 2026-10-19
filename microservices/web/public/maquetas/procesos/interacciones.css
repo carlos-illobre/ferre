@@ -1,0 +1,114 @@
+/* Procesos · lo que se mueve al tocar la maqueta (hojas, diálogos, menús, tostadas).
+   Quieta, la maqueta no usa nada de esto: solo aparece cuando se toca algo. */
+
+[data-paso] { cursor: pointer; }
+.pi-uniendo [data-paso], .pi-armado { cursor: crosshair; }
+.pi-arrastrable { cursor: grab; touch-action: none; }
+.pi-panear { cursor: grab; touch-action: none; }
+[contenteditable] { outline: none; }
+[contenteditable]:empty::before { content: attr(data-vacio); color: var(--texto-3); font-weight: 550; }
+.campo:focus-within .cursor, .r:focus-within .cursor { display: none; }
+
+/* Capas: hoja que sube, diálogo, menú chico */
+.pi-capa { position: fixed; inset: 0; z-index: 50; }
+.pi-capa.pi-en-celu { position: absolute; }
+.pi-capa.cerrando { pointer-events: none; }
+.pi-velo { position: absolute; inset: 0; background: rgba(26, 29, 27, .3); opacity: 0; transition: opacity var(--t-nav) var(--curva); }
+.pi-menu .pi-velo { background: transparent; }
+.pi-capa.abierta .pi-velo { opacity: 1; }
+.pi-caja { position: absolute; background: var(--superficie); box-shadow: var(--sombra-3); opacity: 0; transition: transform var(--t-nav) var(--curva), opacity var(--t) var(--curva); }
+.pi-capa.cerrando .pi-caja, .pi-capa.cerrando .pi-velo { transition-duration: var(--t); transition-timing-function: var(--curva-salida); }
+.pi-capa.abierta .pi-caja { opacity: 1; transform: none; }
+
+.pi-hoja .pi-caja { left: 0; right: 0; bottom: 0; max-height: 88%; overflow: auto; border-radius: var(--r-hoja) var(--r-hoja) 0 0; padding: 6px 16px 30px; transform: translateY(100%); opacity: 1; }
+.pi-hoja.abierta .pi-caja { transform: none; }
+.pi-agarre { width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 4px; }
+.pi-cab { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.pi-cab b { flex: 1; font-size: 18px; line-height: 24px; font-weight: 800; letter-spacing: -.01em; }
+.pi-cab .t-detalle { display: block; }
+.pi-x { width: 40px; height: 40px; border-radius: 99px; border: 0; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; flex: none; }
+
+.pi-dialogo .pi-caja { left: 50%; top: 50%; width: 480px; max-width: calc(100% - 32px); border-radius: var(--r-tarjeta); padding: 20px 24px 20px; transform: translate(-50%, -47%) scale(.98); }
+.pi-dialogo.abierta .pi-caja { transform: translate(-50%, -50%); }
+.pi-dialogo .pi-cab b { font-size: 20px; line-height: 26px; }
+.pi-pie { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+.pi-en-celu .pi-pie .btn { flex: 1; }
+
+.pi-menu .pi-caja { min-width: 240px; max-height: calc(100vh - 16px); overflow: auto; padding: 6px; border-radius: var(--r); border: 1px solid var(--borde); transform: translateY(-4px); }
+.pi-et { display: block; font-size: 14px; font-weight: 650; color: var(--texto-2); padding: 8px 10px 4px; }
+.pi-item { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 15px; font-weight: 650; color: var(--tinta); text-align: left; cursor: pointer; }
+.pi-item:hover, .pi-item:focus-visible { background: var(--hundido); outline: none; }
+.pi-item .tx { flex: 1; min-width: 0; }
+.pi-item small { display: block; font-size: 14px; font-weight: 550; color: var(--texto-2); line-height: 18px; }
+.pi-item .i { color: var(--texto-2); }
+.pi-item.activo { background: var(--pino-suave); color: var(--pino); }
+.pi-item.activo .i { color: var(--pino); }
+.pi-item .kbd { margin-left: auto; }
+.pi-item .tilde { margin-left: auto; color: var(--pino); }
+.pi-hoja .pi-item { min-height: 56px; padding: 8px 10px; font-size: 16px; }
+.pi-linea { height: 1px; background: var(--borde); margin: 4px 6px; }
+.pi-ico { width: 40px; height: 40px; border-radius: 12px; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; flex: none; }
+.pi-item.activo .pi-ico { background: var(--superficie); color: var(--pino); }
+
+/* Formularios chicos */
+.pi-f { display: grid; gap: 6px; margin-top: 12px; }
+.pi-f > label { font-size: 14px; font-weight: 650; color: var(--texto-2); }
+.pi-f .campo { height: 48px; color: var(--tinta); font-weight: 600; }
+.pi-f .campo.area { height: auto; min-height: 72px; padding: 12px 16px; align-items: flex-start; font-weight: 500; line-height: 22px; }
+.pi-f .campo [contenteditable] { flex: 1; min-width: 0; }
+.pi-f .campo:focus-within { border-color: var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); }
+.pi-f .segmentos { display: flex; }
+.pi-f .segmentos > * { flex: 1; justify-content: center; min-height: 40px; }
+.pi-f .chips .chip { height: 36px; font-size: 14px; cursor: pointer; }
+.pi-soltar { display: grid; place-items: center; gap: 6px; height: 140px; border-radius: var(--r); border: 2px dashed var(--borde-fuerte); background: var(--hundido); color: var(--texto-2); font-weight: 650; font-size: 15px; text-align: center; margin-top: 12px; }
+.pi-archivo { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--r); border: 1px solid var(--borde); margin-top: 12px; }
+.pi-archivo .tx { flex: 1; font-weight: 700; font-size: 15px; }
+.pi-archivo small { display: block; font-size: 14px; font-weight: 500; color: var(--texto-2); }
+.pi-figs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+.pi-figs button { height: 64px; border: 0; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; align-content: center; gap: 2px; font: inherit; font-size: 14px; font-weight: 650; color: var(--texto-2); cursor: pointer; }
+.pi-figs button .i-l { color: var(--tinta); }
+
+/* Tostada */
+.pi-tostadas { position: fixed; left: 0; right: 0; bottom: 24px; z-index: 70; display: grid; justify-items: center; pointer-events: none; }
+.celu .pi-tostadas { position: absolute; bottom: 104px; }
+.pi-tostadas .tostada { pointer-events: auto; animation: pi-entra var(--t) var(--rebote) both; max-width: calc(100% - 32px); }
+.pi-tostadas .tostada.sale { animation: pi-sale var(--t) var(--curva-salida) both; }
+.pi-tostada-accion { height: 32px; padding: 0 10px; margin: -4px -6px -4px 4px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, .16); color: #fff; font: inherit; font-size: 14px; font-weight: 750; cursor: pointer; }
+.pi-pista { position: absolute; left: 50%; top: 12px; z-index: 6; transform: translateX(-50%); animation: pi-fundido var(--t) var(--curva) both; white-space: nowrap; }
+
+/* Botoncitos junto al paso (los usa la que no los traía) */
+.pi-pad { position: absolute; z-index: 4; display: flex; gap: 4px; padding: 4px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; box-shadow: var(--sombra-2); }
+.pi-pad button { width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; display: grid; place-items: center; color: var(--texto-2); cursor: pointer; }
+.pi-pad button:hover { background: var(--hundido); }
+.pi-pad .peligro { color: var(--error-texto); }
+
+/* Lo que se arrastra */
+.pi-fantasma { position: fixed; z-index: 80; pointer-events: none; transform: translate(-50%, -50%) scale(1.04); box-shadow: var(--sombra-3); border: 1.5px solid var(--pino); background: var(--superficie); border-radius: 12px; display: grid; place-items: center; }
+.celu .pi-fantasma { position: absolute; }
+
+/* Movimiento */
+@keyframes pi-entra { from { opacity: 0; transform: translateY(8px); } }
+@keyframes pi-sale { to { opacity: 0; transform: translateY(8px); } }
+@keyframes pi-cae { from { opacity: 0; transform: translateY(-8px); } }
+@keyframes pi-fundido { from { opacity: 0; } }
+@keyframes pi-desliza { from { opacity: 0; transform: translateX(24px); } }
+@keyframes pi-sube { from { opacity: 0; transform: translateY(40px); } }
+@keyframes pi-apaga { 0%, 55% { opacity: 1; } to { opacity: 0; } }
+@keyframes pi-parpadeo { 0%, 100% { opacity: 0; } 35% { opacity: 1; } }
+@keyframes pi-late { 0% { transform: scale(1); opacity: .55; } to { transform: scale(1.6); opacity: 0; } }
+@keyframes pi-onda { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+.pi-entra { animation: pi-entra var(--t) var(--rebote) both; }
+.pi-cae { animation: pi-cae var(--t-nav) var(--rebote) both; }
+.pi-fundido { animation: pi-fundido var(--t-micro) var(--curva) both; }
+.pi-fundido-lento { animation: pi-fundido var(--t-nav) var(--curva) both; }
+.pi-desliza { animation: pi-desliza var(--t-nav) var(--curva) both; }
+.pi-sube { animation: pi-sube var(--t-nav) var(--curva) both; }
+.pi-logro { position: relative; }
+.pi-logro::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; border: 2px solid var(--logro); pointer-events: none; animation: pi-apaga 1s var(--curva) forwards; }
+.pi-apaga { animation: pi-apaga 1s var(--curva) forwards; }
+.pi-parpadea { animation: pi-parpadeo .7s var(--curva) both; }
+.pi-svg-anim { transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: reduce) {
+  .pi-entra, .pi-cae, .pi-fundido, .pi-fundido-lento, .pi-desliza, .pi-sube, .pi-tostadas .tostada { animation: none !important; }
+  .pi-logro::after, .pi-apaga, .pi-parpadea { display: none !important; }
+}

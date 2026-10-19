@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Procesos · El tablero de dibujo (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <script src="../../dibujo.js"></script>
 <script src="../../proceso.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .cabecera { padding: 16px 24px 14px; border-bottom: 1px solid var(--borde); background: var(--superficie); gap: 12px; }
   .selector { display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 4px 8px 4px 4px; margin-left: -4px; border-radius: 12px; }
@@ -69,6 +72,31 @@
   .pasos-bar { grid-column: 2; background: var(--superficie); border-top: 1px solid var(--borde); display: flex; align-items: center; gap: 12px; padding: 0 16px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
   .pasos-bar b { color: var(--tinta); font-size: 15px; font-weight: 800; }
   .pasos-bar .der { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  /* Al tocarla */
+  .editor.figuras-abiertas { grid-template-columns: 208px minmax(0, 1fr) 300px; }
+  .editor.sin-panel { grid-template-columns: 64px minmax(0, 1fr) 0; }
+  .editor.figuras-abiertas.sin-panel { grid-template-columns: 208px minmax(0, 1fr) 0; }
+  .editor.sin-panel .elegido { display: none; }
+  .figuras-abiertas .paleta { align-items: stretch; }
+  .figuras-abiertas .paleta > .plegar { align-self: flex-end; }
+  .figuras-abiertas .fig { width: auto; grid-template-columns: 36px 1fr; justify-items: start; gap: 10px; padding: 0 8px 0 4px; }
+  .figuras-abiertas .grupo { width: auto; }
+  .elegido .f, .elegido .campo { min-width: 0; }
+  .elegido .campo:not(.area) > span:not(.pild) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .elegido .campo:focus-within { border-color: var(--pino); box-shadow: 0 0 0 4px rgba(18,56,47,.12); }
+  .pi-reabrir { right: 16px; top: 16px; }
+  .pasos-bar { cursor: pointer; }
+  .pi-lista { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; max-height: 64%; overflow: auto; background: var(--superficie); border-top: 1px solid var(--borde); box-shadow: var(--sombra-3); padding: 10px 12px 12px; border-radius: 16px 16px 0 0; }
+  .pi-lista-cab { display: flex; align-items: baseline; gap: 12px; padding: 0 8px 6px; }
+  .pi-lista-cab b { font-size: 16px; font-weight: 800; }
+  .pi-lista .fila { display: grid; grid-template-columns: 24px 32px minmax(0, 1fr) 130px 130px; gap: 10px; align-items: center; height: 40px; padding: 0 8px; border-radius: 10px; font-size: 15px; font-weight: 650; cursor: pointer; }
+  .pi-lista .fila:hover { background: var(--hundido); }
+  .pi-lista .fila.elegida { background: var(--accion-suave); }
+  .pi-lista .n { font-size: 14px; font-weight: 750; color: var(--texto-3); text-align: right; }
+  .pi-lista .g { width: 32px; height: 32px; border-radius: 8px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .pi-lista .nom { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pi-lista .quien { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--texto-2); }
+  .pi-lista .pild, .pi-lista .pastilla { justify-self: start; }
 </style>
 </head>
 <body>
@@ -154,18 +182,33 @@
 <script>
   var figs = document.getElementById('figs');
   var grupos = { inicio: 'Empieza y termina', tarea: 'Lo que se hace', decision: 'El camino', subproceso: 'Lo demás' };
-  FIGURAS.forEach(function (f) {
-    if (grupos[f.id]) figs.insertAdjacentHTML('beforeend', '<div class="grupo">' + grupos[f.id] + '</div>');
-    figs.insertAdjacentHTML('beforeend', '<div class="fig' + (f.id === 'persona' ? ' arrastrando' : '') + '"><span class="g">' + glifo(f.id) + '</span>' + f.nombre + '</div>');
-  });
-  // ordenar: inicio, fin, espera juntos
   var orden = ['inicio', 'fin', 'espera', 'tarea', 'persona', 'sistema', 'decision', 'paralelo', 'subproceso', 'carril', 'documento', 'nota'];
-  figs.innerHTML = '';
-  orden.forEach(function (id) {
-    var f = FIGURAS.filter(function (x) { return x.id === id; })[0];
-    if (grupos[id]) figs.insertAdjacentHTML('beforeend', '<div class="grupo"></div>');
-    figs.insertAdjacentHTML('beforeend', '<div class="fig' + (id === 'persona' ? ' arrastrando' : '') + '" title="' + f.nombre + '"><span class="g">' + glifo(id) + '</span></div>' + (id === 'persona' ? '<div class="tip" style="top:' + (figs.offsetTop + figs.scrollHeight - 30) + 'px">Tarea de una persona <span class="kbd">Insert</span></div>' : ''));
-  });
+  var TECLA = { persona: 'Insert' };
+  // Las figuras: plegadas a íconos (el nombre sale en un globo) o abiertas con su nombre (Alt F)
+  function paleta(abierta) {
+    figs.innerHTML = '';
+    orden.forEach(function (id) {
+      var f = FIGURAS.filter(function (x) { return x.id === id; })[0];
+      if (grupos[id]) figs.insertAdjacentHTML('beforeend', '<div class="grupo"></div>');
+      figs.insertAdjacentHTML('beforeend', '<div class="fig' + (id === 'persona' && !abierta ? ' arrastrando' : '') + '" data-fig-id="' + id + '" title="' + f.nombre + '"><span class="g">' + glifo(id) + '</span>' + (abierta ? '<span class="nom">' + f.nombre + '</span>' : '') + '</div>' + (id === 'persona' && !abierta ? '<div class="tip" style="top:' + (figs.offsetTop + figs.scrollHeight - 30) + 'px">Tarea de una persona <span class="kbd">Insert</span></div>' : ''));
+    });
+    figs.querySelectorAll('.fig').forEach(function (el) {
+      var id = el.getAttribute('data-fig-id');
+      el.addEventListener('mouseenter', function () {
+        var tip = figs.querySelector('.tip'); if (!tip) return;
+        tip.innerHTML = PI.nombreFigura(id) + (TECLA[id] ? ' <span class="kbd">' + TECLA[id] + '</span>' : '');
+        tip.style.top = (el.offsetTop + 12) + 'px';
+      });
+      PI.arrastrarFigura(el, function () { return id; }, L, dib, {
+        alSoltar: function (pt, sinMover) {
+          if (sinMover) agregar(id, { despuesDe: sel });
+          else if (pt) agregar(id, { en: pt });
+        }
+      });
+    });
+  }
+  var L = document.getElementById('lienzo'), dib = document.getElementById('dib'), mapa = document.getElementById('mapa');
+  paleta(false);
 
   var m = JSON.parse(JSON.stringify(VENTA));
   m.flechas.push({ de: 'gm', a: 'busca', s: 't', e: 't', via: [[720, 130], [376, 130]], et: 'Sí', etp: [460, 130] });
@@ -183,8 +226,249 @@
   m.pasos.forEach(function (p) { if (p.id === 'gm') p.carril = 'ven'; });
   m.flechas.forEach(function (f) { if (f.de === 'suma') { f.s = 'r'; f.e = 'b'; } });
   var op = { sel: 'margen', avisos: { espera: 'Ninguna flecha llega a este paso' }, x1: 960, tw: 128, cab: 96, th: 64 };
-  dibujar(document.getElementById('dib'), m, pos, Object.assign({ vista: [-12, -36, document.getElementById('lienzo').clientWidth, document.getElementById('lienzo').clientHeight] }, op));
-  dibujar(document.getElementById('mapa'), m, pos, Object.assign({}, op, { vista: [0, 0, 960, 550], rotulos: false, cab: 0, flechaSel: false }));
+
+  /* ---------- Lo que se puede tocar ---------- */
+  var sel = 'margen', titulo = 'Venta en el mostrador', uniendo = false, alto = 550;
+  var ORIGINAL = JSON.stringify({ m: m, pos: pos, x1: op.x1, alto: alto });
+  var ed = document.querySelector('.editor'), E = document.querySelector('.elegido'), pad = document.querySelector('.lienzo .pad');
+  var globo = document.querySelector('.flota.globo'), bar = document.querySelector('.pasos-bar'), zoomN = document.querySelector('.zoom .n');
+  var vistaMapa = document.querySelector('.mapa .vista'), tit = document.querySelector('.selector .t-titulo');
+  var cam = PI.camara(L, -12, -36, function () { render(); });
+  var hist = PI.historial(function () { return { m: m, pos: pos, sel: sel, x1: op.x1, alto: alto, titulo: titulo }; },
+    function (s) { m = s.m; pos = s.pos; sel = s.sel; op.x1 = s.x1; alto = s.alto; ponerTitulo(s.titulo); if (!PI.paso(m, sel)) sel = PI.orden(m)[0]; render(); panel(); });
+
+  function render() {
+    op.sel = sel; op.avisos = PI.avisos(m);
+    dibujar(dib, m, pos, Object.assign({ vista: cam.vista() }, op));
+    dibujar(mapa, m, pos, Object.assign({}, op, { vista: [0, 0, op.x1, alto], rotulos: false, cab: 0, flechaSel: false }));
+    if (!render.listo) { render.listo = true; return; } // quieta: todo queda donde lo dejó la maqueta
+    var v = cam.vista(), z = cam.escala(), p = PI.paso(m, sel), q = pos[sel];
+    if (p && q && p.tipo !== 'nota') {
+      var medio = PI.esTarea(p.tipo) ? op.th / 2 : (/decision|paralelo/.test(p.tipo) ? 24 : 18);
+      pad.style.display = ''; pad.style.left = ((q[0] - v[0]) * z - 64) + 'px'; pad.style.top = ((q[1] - medio - v[1]) * z - 44) + 'px';
+    } else pad.style.display = 'none';
+    var av = Object.keys(op.avisos)[0];
+    if (av && pos[av]) {
+      globo.style.display = ''; globo.lastChild.nodeValue = op.avisos[av];
+      globo.style.left = ((pos[av][0] - v[0]) * z - 280) + 'px'; globo.style.top = ((pos[av][1] - v[1]) * z - 10) + 'px';
+    } else globo.style.display = 'none';
+    zoomN.textContent = Math.round(z * 100) + ' %';
+    var s = 104 / alto < 192 / op.x1 ? 104 / alto : 192 / op.x1;
+    vistaMapa.style.left = (8 + Math.max(0, v[0]) * s) + 'px'; vistaMapa.style.top = (6 + Math.max(0, v[1]) * s) + 'px';
+    vistaMapa.style.width = Math.min(192, v[2] * s) + 'px'; vistaMapa.style.height = Math.min(106, v[3] * s) + 'px';
+    var r = PI.resumen(m);
+    bar.children[2].textContent = r.pasos + ' pasos · ' + r.carriles + ' carriles · ' + r.decisiones + (r.decisiones === 1 ? ' decisión' : ' decisiones');
+    var pa = bar.children[3]; pa.style.display = r.avisos ? '' : 'none';
+    pa.innerHTML = '<i class="i i-s" data-i="triangle-alert"></i>' + r.avisos + (r.avisos === 1 ? ' paso con aviso' : ' pasos con aviso'); PI.pintar(pa);
+    if (lista) armarLista();
+  }
+  render();
+
+  /* El panel del paso elegido */
+  function campo(label, html, acc, extra) { return '<div class="f"><label>' + label + '</label><div class="campo' + (extra || '') + '"' + (acc ? ' data-acc="' + acc + '" role="button" tabindex="0" style="cursor:pointer"' : '') + '>' + html + '</div></div>'; }
+  function panel(enfocar) {
+    var p = PI.paso(m, sel); if (!p) return;
+    var ord = PI.orden(m), n = ord.indexOf(sel), inf = PI.info(sel), c = m.carriles.filter(function (x) { return x.id === p.carril; })[0] || m.carriles[0];
+    var sale = m.flechas.filter(function (f) { return f.de === sel && ord.indexOf(f.a) > n; })[0] || m.flechas.filter(function (f) { return f.de === sel; })[0];
+    var sp = sale && PI.paso(m, sale.a), d = inf.donde && PI.DONDE[inf.donde];
+    E.innerHTML = '<div class="panel-cab" style="padding:0"><b>Paso elegido</b><span class="kbd">Alt E</span><span class="plegar" data-acc="plegar" role="button" title="Plegar el panel (Alt E)" style="cursor:pointer"><i class="i i-s" data-i="panel-right-close"></i></span></div>' +
+      '<div class="cab pi-fundido"><span class="ico">' + glifo(p.tipo, 'i i-l') + '</span><div><div class="t-renglon" data-eco>' + PI.esc(p.nombre) + '</div><div class="t-detalle">' + (n >= 0 ? 'Paso ' + (n + 1) + ' de ' + ord.length : 'Fuera del recorrido') + ' · carril ' + c.nombre + '</div></div></div>' +
+      '<div class="pi-fundido" style="display:grid;gap:10px">' +
+      campo('Nombre', '<span contenteditable="true" data-campo="nombre" data-vacio="Cómo se llama el paso" style="flex:1;min-width:0">' + PI.esc(p.nombre) + '</span>') +
+      campo('Tipo', glifo(p.tipo, 'i i-s') + PI.nombreFigura(p.tipo) + '<i class="i i-s flecha" data-i="chevron-down"></i>', 'tipo') +
+      campo('Quién lo hace', '<i class="i i-s" data-i="' + c.icono + '"></i>' + c.nombre + '<i class="i i-s flecha" data-i="chevron-down"></i>', 'quien') +
+      campo('Dónde, en Ferrebress', (d ? '<span class="pild"><i class="i i-s" data-i="' + d.i + '"></i>' + d.parte + '</span><span class="t-detalle">' + d.ruta + '</span>' : '<span class="t-detalle">Fuera de Ferrebress</span>') + '<i class="i i-s flecha" data-i="chevron-down"></i>', 'donde') +
+      campo('Cómo se hace', '<span contenteditable="true" data-campo="como" data-vacio="Contalo en una o dos líneas" style="flex:1">' + PI.esc(inf.como) + '</span>', null, ' area') +
+      campo('Con qué sigue', sp ? glifo(sp.tipo, 'i i-s') + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + PI.esc(sp.nombre) + '</span><i class="i i-s flecha" data-i="arrow-right"></i>' : '<span class="t-detalle">Con nada todavía: tocá para unirlo</span><i class="i i-s flecha" data-i="arrow-right"></i>', 'sigue') +
+      '</div><div class="pie"><button class="btn btn-peligro chico" style="flex:1" data-acc="quitar"><i class="i i-s" data-i="trash-2"></i>Quitar el paso <span class="kbd">Supr</span></button></div>';
+    E._sigue = sp && sp.id;
+    PI.pintar(E);
+    if (enfocar) { var nom = E.querySelector('[data-campo="nombre"]'); nom.focus(); var r = document.createRange(); r.selectNodeContents(nom); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  }
+  E.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-acc]'); if (!a) return;
+    var acc = a.getAttribute('data-acc'), p = PI.paso(m, sel);
+    if (acc === 'plegar') plegarPanel(true);
+    if (acc === 'quitar') quitar();
+    if (acc === 'sigue') { if (E._sigue) elegir(E._sigue); else empezarUnir(); }
+    if (acc === 'tipo') PI.menuTipo(a, p.tipo, function (t) { hist.guardar(); p.tipo = t; cambio(); });
+    if (acc === 'donde') PI.menuDonde(a, PI.info(sel).donde, function (k) { hist.guardar(); PI.info(sel).donde = k; cambio(); });
+    if (acc === 'quien') PI.menuQuien(a, m, p.carril, function (k) {
+      hist.guardar(); p.carril = k; var y = PI.mitad(pos, k);
+      var libre = !Object.keys(pos).some(function (o) { return o !== sel && o !== 'carriles' && pos[o] && Math.abs(pos[o][0] - pos[sel][0]) < 100 && Math.abs(pos[o][1] - y) < 70; });
+      pos[sel] = libre ? [pos[sel][0], y] : PI.lugarLibre(m, pos, [pos[sel][0], y], { carril: k, xmin: 170, xmax: op.x1 - 60 });
+      m.flechas.forEach(function (f) { if ((f.de === sel || f.a === sel) && !f.via) { Object.assign(f, PI.puertos(pos[f.de], pos[f.a])); f.etp = null; } });
+      cambio();
+    });
+  });
+  var escribiendo = false;
+  E.addEventListener('input', function (e) {
+    var c = e.target.getAttribute && e.target.getAttribute('data-campo'); if (!c) return;
+    if (!escribiendo) { hist.guardar(); escribiendo = true; }
+    if (c === 'nombre') { PI.paso(m, sel).nombre = e.target.textContent; E.querySelector('[data-eco]').textContent = e.target.textContent; render(); }
+    else PI.info(sel).como = e.target.textContent;
+    PI.cambio();
+  });
+  E.addEventListener('focusout', function () { escribiendo = false; });
+  E.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.getAttribute('data-campo') === 'nombre') { e.preventDefault(); e.target.blur(); } });
+  function cambio() { render(); panel(); PI.cambio(); }
+
+  function elegir(id) {
+    if (!PI.paso(m, id)) return;
+    sel = id; render(); panel();
+    if (ed.classList.contains('sin-panel')) return;
+  }
+  function plegarPanel(plegar) {
+    ed.classList.toggle('sin-panel', plegar);
+    reabrir.style.display = plegar ? '' : 'none';
+    if (!plegar) PI.animar(E, 'pi-desliza');
+    render();
+  }
+  var reabrir = document.createElement('button');
+  reabrir.className = 'flota btn chico pi-reabrir'; reabrir.style.display = 'none';
+  reabrir.innerHTML = '<i class="i i-s" data-i="panel-right-close" style="transform:scaleX(-1)"></i>Paso elegido <span class="kbd">Alt E</span>';
+  L.appendChild(reabrir); PI.pintar(reabrir);
+  reabrir.addEventListener('click', function () { plegarPanel(false); });
+
+  /* Agregar, unir, quitar */
+  function agregar(tipo, o) {
+    hist.guardar();
+    if (tipo === 'carril') {
+      if (!PI.agregarCarril(m, pos)) { PI.tostada('Ya hay un carril «Proveedor»', { i: 'info' }); return; }
+      alto = pos.carriles.prov[1]; render(); PI.cambio(); PI.tostada('Carril «Proveedor» agregado abajo'); return;
+    }
+    if (o.en) {
+      var k = PI.carrilDe(pos, o.en[1]), r = pos.carriles[k];
+      o.en = [Math.max(op.cab + 70, Math.round(o.en[0] / 8) * 8), Math.max(r[0] + 40, Math.min(r[1] - 40, o.en[1]))];
+    }
+    if (o.auto) { var q = pos[o.despuesDe]; tipo = q && PI.carrilDe(pos, q[1]) === 'sis' ? 'sistema' : 'persona'; }
+    var id = PI.agregarPaso(m, pos, Object.assign({ tipo: tipo, lugar: { dx: 150, dy: 150, xmin: op.cab + 70, xmax: 1800 } }, o));
+    if (pos[id][0] > op.x1 - 70) op.x1 = pos[id][0] + 100;
+    var v = cam.vista();
+    if (pos[id][0] + 80 > v[0] + v[2] || pos[id][0] - 80 < v[0]) { cam.x = pos[id][0] - v[2] / 2; }
+    sel = id;
+    if (ed.classList.contains('sin-panel')) plegarPanel(false);
+    render(); PI.caer(dib, id); panel(true); PI.cambio();
+  }
+  function quitar() {
+    var p = PI.paso(m, sel); if (!p) return;
+    hist.guardar();
+    var ord = PI.orden(m), i = ord.indexOf(sel);
+    PI.quitarPaso(m, pos, sel);
+    var nuevoOrden = PI.orden(m);
+    sel = ord[i + 1] && PI.paso(m, ord[i + 1]) ? ord[i + 1] : (nuevoOrden[Math.max(0, i - 1)] || (m.pasos[0] && m.pasos[0].id));
+    render(); panel(); PI.cambio();
+    PI.tostada('Quitaste «' + p.nombre + '»', { i: 'trash-2', accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+  }
+  var pista = null;
+  function empezarUnir() {
+    uniendo = true; L.classList.add('pi-uniendo');
+    if (!pista) { pista = document.createElement('div'); pista.className = 'tostada pi-pista'; }
+    pista.innerHTML = '<i class="i" data-i="arrow-right"></i>Tocá el paso con el que sigue <span class="kbd" style="background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.3)">Esc</span>';
+    L.appendChild(pista); PI.pintar(pista);
+  }
+  function terminarUnir() { uniendo = false; L.classList.remove('pi-uniendo'); if (pista) pista.remove(); }
+  dib.addEventListener('click', function (e) {
+    if (L._recienPaneo) return;
+    var g = e.target.closest('[data-paso]'); if (!g) return;
+    var id = g.getAttribute('data-paso');
+    if (uniendo) {
+      terminarUnir();
+      hist.guardar();
+      if (PI.unir(m, pos, sel, id)) { render(); panel(); PI.cambio(); PI.halo(dib, id, '#E8541C'); }
+      else PI.tostada('Esos dos pasos ya están unidos', { i: 'info' });
+      return;
+    }
+    elegir(id);
+  });
+  var B = pad.querySelectorAll('button');
+  B[0].addEventListener('click', function () { agregar('tarea', { despuesDe: sel, auto: true }); });
+  B[1].addEventListener('click', empezarUnir);
+  B[2].addEventListener('click', function () { var p = PI.paso(m, sel); PI.menuTipo(B[2], p.tipo, function (t) { hist.guardar(); p.tipo = t; cambio(); }); });
+  B[3].addEventListener('click', quitar);
+  globo.style.cursor = 'pointer';
+  globo.addEventListener('click', function () { var av = Object.keys(PI.avisos(m))[0]; if (av) elegir(av); });
+
+  /* Zoom, ver todo y el mapa */
+  var Z = document.querySelectorAll('.zoom button');
+  Z[0].addEventListener('click', function () { cam.zoom(1 / 1.25); });
+  Z[1].addEventListener('click', function () { cam.zoom(1.25); });
+  Z[2].addEventListener('click', function () { cam.encuadrar([0, 0, op.x1, alto]); });
+  document.querySelector('.mapa').addEventListener('click', function (e) {
+    var p = PI.punto(mapa, e), v = cam.vista(); cam.x = p[0] - v[2] / 2; cam.y = p[1] - v[3] / 2; render();
+  });
+  document.querySelector('.mapa').style.cursor = 'pointer';
+
+  /* Las figuras abiertas o plegadas */
+  var plegarFig = document.querySelector('.paleta .plegar');
+  plegarFig.style.cursor = 'pointer'; plegarFig.setAttribute('role', 'button');
+  function figurasAbiertas(abrir) { ed.classList.toggle('figuras-abiertas', abrir); plegarFig.title = abrir ? 'Plegar las figuras (Alt F)' : 'Abrir las figuras (Alt F)'; plegarFig.firstElementChild.style.transform = abrir ? '' : 'scaleX(-1)'; paleta(abrir); render(); }
+  plegarFig.addEventListener('click', function () { figurasAbiertas(!ed.classList.contains('figuras-abiertas')); });
+
+  /* «Los pasos, en orden»: la barra se abre hacia arriba con la lista */
+  var lista = null;
+  function armarLista() {
+    var ord = PI.orden(m), av = PI.avisos(m), fuera = m.pasos.filter(function (p) { return p.tipo !== 'nota' && ord.indexOf(p.id) < 0; }).map(function (p) { return p.id; });
+    lista.innerHTML = '<div class="pi-lista-cab"><b>Los pasos, en orden</b><span class="t-detalle">Tocá uno para elegirlo en el dibujo</span></div>' + ord.concat(fuera).map(function (id, i) {
+      var p = PI.paso(m, id), c = m.carriles.filter(function (x) { return x.id === p.carril; })[0] || {}, d = PI.info(id).donde && PI.DONDE[PI.info(id).donde];
+      return '<div class="fila' + (id === sel ? ' elegida' : '') + '" data-id="' + id + '"><span class="n">' + (i < ord.length ? i + 1 : '') + '</span><span class="g">' + glifo(p.tipo, 'i i-s') + '</span><span class="nom">' + PI.esc(p.nombre) + '</span>' +
+        '<span class="quien"><i class="i i-s" data-i="' + (c.icono || 'user') + '"></i>' + (c.nombre || '') + '</span>' +
+        (av[id] ? '<span class="pastilla urgente" style="height:26px"><i class="i i-s" data-i="triangle-alert"></i>' + (i < ord.length ? 'No sigue' : 'Suelto') + '</span>' : (d ? '<span class="pild"><i class="i i-s" data-i="' + d.i + '"></i>' + inf(d) + '</span>' : '<span></span>')) + '</div>';
+    }).join('');
+    PI.pintar(lista);
+  }
+  function inf(d) { return d.ruta.split(' › ').pop(); }
+  function abrirLista(abrir) {
+    var flecha = bar.querySelector('.der svg');
+    if (abrir && !lista) { lista = document.createElement('div'); lista.className = 'pi-lista pi-sube'; L.appendChild(lista); armarLista(); lista.addEventListener('click', function (e) { var f = e.target.closest('.fila'); if (f) elegir(f.getAttribute('data-id')); }); }
+    else if (!abrir && lista) { lista.remove(); lista = null; }
+    if (flecha) flecha.style.transform = abrir ? '' : 'rotate(180deg)';
+  }
+  bar.addEventListener('click', function (e) {
+    if (e.target.closest('.pastilla')) { var av = Object.keys(PI.avisos(m))[0]; if (av) elegir(av); return; }
+    abrirLista(!lista);
+  });
+  bar.children[3].style.cursor = 'pointer';
+
+  /* La cabecera */
+  var A = document.querySelectorAll('.cabecera .acciones button');
+  PI.estado({ pastillas: [document.querySelector('.estado .pastilla')], guardados: [document.querySelector('.miga > span')], botones: [A[5]] });
+  A[0].addEventListener('click', function () { hist.deshacer(); });
+  A[1].addEventListener('click', function () { hist.rehacer(); });
+  A[2].addEventListener('click', function () { PI.importar(function () { cargar('Recibir una compra'); PI.tostada('Importado como borrador: «Recibir una compra», 8 pasos', { i: 'upload' }); }); });
+  A[3].addEventListener('click', function () { PI.exportar(A[3], titulo); });
+  A[4].addEventListener('click', function () { PI.nuevo(function (n) { hist.guardar(); cargar(n, [['inicio', 'Empieza', 'ven']]); PI.cambio(); PI.tostada('Borrador «' + n + '» creado. Arrastrá las figuras para seguir'); }); });
+  A[5].addEventListener('click', function () { PI.marcarVigente(titulo); });
+  function ponerTitulo(t) { titulo = t; tit.firstChild.nodeValue = t + ' '; }
+  function cargar(t, def) {
+    if (t === 'Venta en el mostrador' && !def) { var o = JSON.parse(ORIGINAL); m = o.m; pos = o.pos; op.x1 = o.x1; alto = o.alto; sel = 'margen'; }
+    else {
+      var r = PI.modeloLineal(def || PI.OTROS[t], { carriles: VENTA.carriles, pos: { cli: [0, 120], ven: [120, 300], sis: [300, 545] }, x0: 170, dx: 150 });
+      m = r.m; pos = r.pos; alto = 545; op.x1 = Math.max(960, 170 + (m.pasos.length - 1) * 150 + 110); sel = 'p0';
+    }
+    ponerTitulo(t); cam.x = -12; cam.y = -36; cam.z = 1; render(); panel();
+    if (def || t !== 'Venta en el mostrador') cam.encuadrar([0, 0, op.x1, alto]);
+  }
+  var selector = document.querySelector('.selector');
+  selector.addEventListener('click', function () { PI.menuProcesos(selector, titulo, function (t) { hist.guardar(); cargar(t); }, function () { A[4].click(); }); });
+
+  /* Teclado */
+  document.addEventListener('keydown', function (e) {
+    var t = e.target, editando = t.isContentEditable;
+    if (PI.hayCapa()) return;
+    if (e.key === 'Escape' && uniendo) { terminarUnir(); return; }
+    if (editando) return;
+    var k = e.key.toLowerCase();
+    if (e.altKey && k === 'e') { e.preventDefault(); plegarPanel(!ed.classList.contains('sin-panel')); }
+    else if (e.altKey && k === 'p') { e.preventDefault(); abrirLista(!lista); }
+    else if (e.altKey && k === 'f') { e.preventDefault(); figurasAbiertas(!ed.classList.contains('figuras-abiertas')); }
+    else if (e.altKey && k === 'v') { e.preventDefault(); A[5].click(); }
+    else if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? hist.rehacer() : hist.deshacer(); }
+    else if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); hist.rehacer(); }
+    else if (e.key === 'Insert') { e.preventDefault(); agregar('tarea', { despuesDe: sel, auto: true }); }
+    else if (e.key === 'Delete') { e.preventDefault(); quitar(); }
+  });
+  PI.marco();
 </script>
 </body>
 </html>

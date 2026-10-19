@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Procesos · Diagrama con la hoja de figuras (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <script src="../../dibujo.js"></script>
 <script src="../../proceso.js"></script>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .cab { display: flex; align-items: center; gap: 8px; padding: 2px 12px 0 8px; }
@@ -37,6 +40,28 @@
   .ayuda { font-size: 14px; color: var(--texto-2); font-weight: 600; text-align: center; margin-top: 8px; }
   .logo-bpmn { position: absolute; right: 12px; bottom: 8px; z-index: 6; font-size: 14px; font-weight: 700; color: var(--texto-3); background: rgba(255,255,255,.75); padding: 1px 8px; border-radius: 6px; }
   .logo-bpmn b { color: var(--tinta); }
+  /* Al tocarla */
+  .cab .volver, .hoja-cab, .figs div { cursor: pointer; }
+  .hoja { transition: transform var(--t-nav) var(--curva); }
+  .hoja.baja .figs, .hoja.baja .ayuda { display: none; }
+  .figs div { transition: transform var(--t) var(--curva); touch-action: none; }
+  .hoja-cab .i { transition: transform var(--t) var(--curva); }
+  .hoja.baja .hoja-cab .i { transform: rotate(180deg); }
+  .pad { transition: opacity var(--t-micro) var(--curva); }
+  .pasos-celu { flex: 1; min-height: 0; overflow: auto; padding: 12px 16px 16px; display: none; }
+  .modo-pasos .pasos-celu { display: block; }
+  .modo-pasos .lienzo, .modo-pasos .hoja { display: none; }
+  .pasos-celu .res { font-size: 14px; font-weight: 650; color: var(--texto-2); margin: 0 4px 8px; }
+  .pasos-celu .fp { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 12px 6px 8px; margin-bottom: 6px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); cursor: pointer; }
+  .pasos-celu .fp.elegida { border-color: var(--accion); box-shadow: 0 0 0 3px var(--accion-suave); }
+  .pasos-celu .fp .n { width: 24px; text-align: right; font-size: 14px; font-weight: 750; color: var(--texto-3); flex: none; }
+  .pasos-celu .fp .g { width: 40px; height: 40px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); flex: none; }
+  .pasos-celu .fp .tx { flex: 1; min-width: 0; font-weight: 700; font-size: 15px; line-height: 20px; }
+  .pasos-celu .fp .tx small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-3); }
+  .pasos-celu .fp.aviso { background: var(--urgente-suave); border-color: transparent; }
+  .pasos-celu .sep { font-size: 14px; font-weight: 700; color: var(--texto-3); margin: 14px 4px 6px; }
+  .pasos-celu .agregar { width: 100%; margin-top: 8px; }
+  .pi-uniendo-celu [data-paso] { cursor: crosshair; }
 </style>
 </head>
 <body>
@@ -48,7 +73,7 @@
     <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="undo-2"></i></button>
     <button class="btn btn-icono btn-fantasma" style="color:var(--tinta)"><i class="i" data-i="ellipsis"></i></button>
   </div>
-  <nav class="celu-pestanas"><a class="activa"><i class="i" data-i="workflow"></i>Diagrama</a><a><i class="i" data-i="list-ordered"></i>Pasos</a></nav>
+  <nav class="celu-pestanas"><a class="activa" data-no-ir><i class="i" data-i="workflow"></i>Diagrama</a><a data-no-ir><i class="i" data-i="list-ordered"></i>Pasos</a></nav>
 
   <section class="lienzo" id="lienzo">
     <svg id="dib"></svg>
@@ -63,6 +88,8 @@
     <div class="figs" id="figs"></div>
     <div class="ayuda">Arrastrá un paso al dibujo.</div>
   </section>
+
+  <section class="pasos-celu" id="pasos"></section>
 
   <nav class="nav-inferior">
     <a><i class="i" data-i="shopping-cart"></i>Vender</a>
@@ -93,6 +120,131 @@
   dibujar(document.getElementById('dib'), m, pos, { tw: 120, th: 60, cab: 0, chipCarril: true, chipX: vx + 8, x0: 0, x1: 1100, sel: 'margen', vista: [vx, vy, L.clientWidth, L.clientHeight] });
   var pad = document.getElementById('pad');
   pad.style.left = (610 - vx - 92) + 'px'; pad.style.top = (210 + 30 + 12 - vy) + 'px';
+  /* ---------- Lo que se puede tocar ---------- */
+  (function () {
+    var celu = document.querySelector('.celu'), dib = document.getElementById('dib'), hoja = document.querySelector('.hoja'), lista = document.getElementById('pasos');
+    var sel = 'margen', uniendo = false, titulo = 'Venta en el mostrador', X1 = 1100, tb = document.querySelector('.cab .tit b');
+    var op = { tw: 120, th: 60, cab: 0, chipCarril: true, x0: 0 };
+    var cam = PI.camara(L, vx, vy, function () { render(); });
+    var hist = PI.historial(function () { return { m: m, pos: pos, sel: sel, X1: X1 }; }, function (s) { m = s.m; pos = s.pos; sel = s.sel; X1 = s.X1; render(); armarLista(); });
+
+    function render() {
+      var v = cam.vista(), z = cam.escala();
+      dibujar(dib, m, pos, Object.assign({}, op, { x1: X1, chipX: Math.max(0, v[0]) + 8, sel: sel, vista: v }));
+      var p = PI.paso(m, sel), q = pos[sel];
+      if (p && q) {
+        var medio = PI.esTarea(p.tipo) ? op.th / 2 : (/decision|paralelo/.test(p.tipo) ? 24 : 18);
+        pad.style.display = ''; pad.style.left = Math.max(4, Math.min(L.clientWidth - 188, (q[0] - v[0]) * z - 92)) + 'px'; pad.style.top = ((q[1] + medio - v[1]) * z + 12) + 'px';
+      } else pad.style.display = 'none';
+    }
+    function cambio() { render(); armarLista(); PI.cambio(); }
+    function centrar(id) { var q = pos[id], v = cam.vista(); if (!q) return; if (q[0] < v[0] + 40 || q[0] > v[0] + v[2] - 40 || q[1] < v[1] + 30 || q[1] > v[1] + v[3] - 90) { cam.x = q[0] - v[2] / 2; cam.y = q[1] - v[3] / 2 + 20; } }
+
+    /* Elegir un paso abre su hoja */
+    function abrirPaso(id) {
+      PI.hojaPaso({ m: m, id: id,
+        alCambiar: function (fn, primero) { if (primero) hist.guardar(); fn(); cambio(); },
+        alMoverCarril: function (pid, k) { pos[pid] = PI.lugarLibre(m, pos, [pos[pid][0], PI.mitad(pos, k)], { carril: k, xmin: 60, xmax: X1 - 60, dx: 110, dy: 150 }); m.flechas.forEach(function (f) { if ((f.de === pid || f.a === pid)) { delete f.via; f.etp = null; Object.assign(f, PI.puertos(pos[f.de], pos[f.a])); } }); },
+        alQuitar: quitar, alSiguiente: function (n) { sel = n; centrar(n); render(); },
+        alAgregarDespues: function () { agregar('tarea', { despuesDe: sel, auto: true }); } });
+    }
+    function elegir(id, abrir) { sel = id; centrar(id); render(); armarLista(); if (abrir) abrirPaso(id); }
+    dib.addEventListener('click', function (e) {
+      if (L._recienPaneo) return;
+      var g = e.target.closest('[data-paso]'); if (!g) return;
+      var id = g.getAttribute('data-paso');
+      if (uniendo) { terminarUnir(); hist.guardar(); if (PI.unir(m, pos, sel, id)) { cambio(); PI.halo(dib, id, '#E8541C'); PI.vibrar(10); } else PI.tostada('Esos dos pasos ya están unidos', { i: 'info' }); return; }
+      elegir(id, true);
+    });
+
+    /* Agregar: tocar una figura la suma después del elegido; arrastrarla la suelta donde cae */
+    function agregar(tipo, o) {
+      hist.guardar();
+      if (tipo === 'carril') { if (!PI.agregarCarril(m, pos)) { PI.tostada('Ya hay un carril «Proveedor»', { i: 'info' }); return; } cambio(); PI.tostada('Carril «Proveedor» agregado abajo'); return; }
+      if (o.auto) { var q = pos[o.despuesDe]; tipo = q && PI.carrilDe(pos, q[1]) === 'sis' ? 'sistema' : 'persona'; }
+      if (o.en) { var k = PI.carrilDe(pos, o.en[1]), r = pos.carriles[k]; o.en = [Math.max(60, Math.round(o.en[0] / 8) * 8), Math.max(r[0] + 40, Math.min(r[1] - 40, o.en[1]))]; }
+      var id = PI.agregarPaso(m, pos, Object.assign({ tipo: tipo, lugar: { dx: 120, dy: 150, xmin: 60, xmax: 2000 } }, o));
+      if (pos[id][0] > X1 - 70) X1 = pos[id][0] + 120;
+      sel = id; centrar(id); cambio(); PI.caer(dib, id); PI.vibrar(10);
+      PI.tostada('Agregaste «' + PI.esc(PI.paso(m, id).nombre) + '»', { accion: 'Editar', alHacer: function () { abrirPaso(id); } });
+    }
+    function quitar() {
+      var p = PI.paso(m, sel); if (!p) return;
+      hist.guardar(); var o = PI.orden(m), i = o.indexOf(sel);
+      PI.quitarPaso(m, pos, sel); sel = o[i + 1] && PI.paso(m, o[i + 1]) ? o[i + 1] : PI.orden(m)[Math.max(0, i - 1)];
+      cambio(); PI.tostada('Quitaste «' + PI.esc(p.nombre) + '»', { i: 'trash-2', accion: 'Deshacer', alHacer: function () { hist.deshacer(); } });
+    }
+    var figs = document.querySelectorAll('#figs > div');
+    figs.forEach(function (el, i) {
+      var id = FIGURAS[i].id;
+      PI.arrastrarFigura(el, function () { return id; }, L, dib, { ancho: 72, alto: 58,
+        alEmpezar: function () { figs.forEach(function (x) { x.classList.remove('alzada'); }); el.classList.add('alzada'); hoja.classList.add('baja'); },
+        alSoltar: function (pt, sinMover) {
+          hoja.classList.remove('baja'); el.classList.remove('alzada');
+          if (sinMover) agregar(id, { despuesDe: sel }); else if (pt) agregar(id, { en: pt });
+        } });
+    });
+    document.querySelector('.hoja-cab').addEventListener('click', function () { hoja.classList.toggle('baja'); });
+
+    /* Los botoncitos del paso */
+    var B = pad.querySelectorAll('button'), pista = null;
+    B[0].addEventListener('click', function () { agregar('tarea', { despuesDe: sel, auto: true }); });
+    B[1].addEventListener('click', function () {
+      uniendo = true; celu.classList.add('pi-uniendo-celu');
+      pista = document.createElement('div'); pista.className = 'tostada pi-pista'; pista.innerHTML = '<i class="i" data-i="arrow-right"></i>Tocá el paso con el que sigue';
+      L.appendChild(pista); PI.pintar(pista);
+    });
+    function terminarUnir() { uniendo = false; celu.classList.remove('pi-uniendo-celu'); if (pista) pista.remove(); }
+    B[2].addEventListener('click', function () { abrirPaso(sel); });
+    B[3].addEventListener('click', quitar);
+
+    /* Acercar, alejar, ver todo */
+    var Z = document.querySelectorAll('.controles button');
+    Z[0].addEventListener('click', function () { cam.zoom(1.25); });
+    Z[1].addEventListener('click', function () { cam.zoom(1 / 1.25); });
+    Z[2].addEventListener('click', function () { cam.encuadrar([0, 0, X1, pos.carriles[m.carriles[m.carriles.length - 1].id][1]]); });
+
+    /* Diagrama | Pasos */
+    var T = document.querySelectorAll('.celu-pestanas a');
+    function pestana(pasos) {
+      celu.classList.toggle('modo-pasos', pasos); T[0].classList.toggle('activa', !pasos); T[1].classList.toggle('activa', pasos);
+      if (pasos) { armarLista(); PI.animar(lista, 'pi-fundido-lento'); } else { render(); PI.animar(L, 'pi-fundido-lento'); }
+    }
+    T[0].addEventListener('click', function () { pestana(false); });
+    T[1].addEventListener('click', function () { pestana(true); });
+    function armarLista(nuevo) {
+      if (!celu.classList.contains('modo-pasos')) return;
+      var o = PI.orden(m), av = PI.avisos(m), r = PI.resumen(m), fuera = m.pasos.filter(function (p) { return o.indexOf(p.id) < 0; });
+      function fila(p, n) {
+        var c = m.carriles.filter(function (x) { return x.id === p.carril; })[0] || {}, d = PI.info(p.id).donde;
+        return '<div class="fp' + (p.id === sel ? ' elegida' : '') + (av[p.id] && n == null ? ' aviso' : '') + (p.id === nuevo ? ' pi-entra' : '') + '" data-id="' + p.id + '"><span class="n">' + (n != null ? n : '') + '</span><span class="g">' + glifo(p.tipo, 'i') + '</span><span class="tx">' + PI.esc(p.nombre) + '<small>' + (c.nombre || '') + (d ? ' · ' + d : '') + (av[p.id] ? ' · ' + av[p.id].toLowerCase() : '') + '</small></span><i class="i i-s" data-i="chevron-right" style="color:var(--texto-3)"></i></div>';
+      }
+      lista.innerHTML = '<div class="res">' + r.pasos + ' pasos · ' + r.carriles + ' carriles · ' + r.decisiones + ' decisiones</div>' +
+        o.map(function (id, i) { return fila(PI.paso(m, id), i + 1); }).join('') +
+        (fuera.length ? '<div class="sep">Fuera del recorrido</div>' + fuera.map(function (p) { return fila(p); }).join('') : '') +
+        '<button class="btn agregar"><i class="i" data-i="plus"></i>Agregar un paso</button>';
+      PI.pintar(lista);
+    }
+    lista.addEventListener('click', function (e) {
+      if (e.target.closest('.agregar')) { PI.hojaFiguras(function (id) { agregarEnLista(id); }); return; }
+      var f = e.target.closest('.fp'); if (f) { sel = f.getAttribute('data-id'); armarLista(); centrar(sel); abrirPaso(sel); }
+    });
+    function agregarEnLista(id) { agregar(id, { despuesDe: sel, auto: id === 'tarea' }); armarLista(sel); var f = lista.querySelector('.fp.elegida'); if (f) f.scrollIntoView({ block: 'nearest' }); }
+
+    /* La cabecera */
+    var A = document.querySelectorAll('.cab .btn');
+    PI.estado({ pastillas: [document.querySelector('.cab .pastilla')], guardados: [] });
+    A[0].addEventListener('click', function () { hist.deshacer(); });
+    A[1].addEventListener('click', function () {
+      PI.menuOpciones(A[1], { titulo: function () { return titulo; },
+        alElegirProceso: function (t) { titulo = t; tb.textContent = t; PI.tostada('Abrirías «' + t + '»', { i: 'workflow' }); },
+        alNuevo: function () { PI.nuevo(function (n) { titulo = n; tb.textContent = n; PI.tostada('Borrador «' + PI.esc(n) + '» creado'); }); },
+        alImportar: function () { PI.tostada('Importado como borrador: «Recibir una compra», 8 pasos', { i: 'upload' }); } });
+    });
+    document.querySelector('.cab .volver').addEventListener('click', function (e) { PI.menuMas(e.currentTarget); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && uniendo && !PI.hayCapa()) terminarUnir(); });
+    PI.marco();
+  })();
 </script>
 </body>
 </html>
