@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listas de precios · La planilla tal cual llegó (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/interaccion.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
 <style>
@@ -80,19 +81,19 @@
 <body>
 <div class="todo">
   <header class="barra">
-    <button class="btn btn-icono cerrar"><i class="i" data-i="x"></i></button>
+    <button class="btn btn-icono cerrar" data-ir="productos" aria-label="Volver al catálogo"><i class="i" data-i="x"></i></button>
     <div style="white-space:nowrap">
       <div class="nombre">Bulonera Centro · lista del 17/10/2026</div>
       <div class="ruta">bulonera-centro-octubre.xlsx, tal cual llegó · <span class="kbd">Esc</span> vuelve</div>
     </div>
     <div class="lecturas">
       <span class="pastilla logro"><i class="i i-s" data-i="check"></i>Reconocida sola</span>
-      <span class="pastilla urgente"><i class="i i-s" data-i="circle-help"></i>1 columna sin nombre</span>
+      <span class="pastilla urgente" data-lx="columna-g" id="lx-sin-nombre"><i class="i i-s" data-i="circle-help"></i>1 columna sin nombre</span>
     </div>
     <div class="der">
-      <span class="pastilla pino">876 cambian · +8,4 %</span>
-      <span class="pastilla accion">4 nuevos</span>
-      <span class="pastilla contorno">6 salteadas</span>
+      <span class="pastilla pino" data-filtro="cambia">876 cambian · +8,4 %</span>
+      <span class="pastilla accion" data-filtro="nuevo">4 nuevos</span>
+      <span class="pastilla contorno" data-filtro="salteada">6 salteadas</span>
     </div>
   </header>
 
@@ -105,19 +106,19 @@
       <span><span class="col"><i class="i i-s" data-i="check"></i>Rubro</span></span>
       <span><span class="col"><i class="i i-s" data-i="check"></i>Precio lista</span></span>
       <span><span class="col" style="padding:0 6px">− %</span></span>
-      <span><span class="col duda"><i class="i i-s" data-i="circle-help"></i>¿Qué es? <i class="i i-s" data-i="chevron-down"></i></span></span>
+      <span><span class="col duda" data-lx="columna-g" id="lx-col-g"><i class="i i-s" data-i="circle-help"></i>¿Qué es? <i class="i i-s" data-i="chevron-down"></i></span></span>
       <span></span>
       <span style="grid-column: span 3"><span class="col fb"><i class="i i-s" data-i="sparkles"></i>Lo que entendió Ferrebress</span></span>
     </div>
 
-    <div class="menu-col">
+    <div class="menu-col" id="lx-menu-col">
       <div class="q">La columna G tiene números de 13 cifras que empiezan con <b>779</b>. Parece el <b>código de barras</b>.</div>
-      <div class="op sug"><i class="i i-s" data-i="scan-barcode"></i>Código de barras <span class="kbd">Enter</span></div>
-      <div class="op"><i class="i i-s" data-i="boxes"></i>Bulto</div>
-      <div class="op"><i class="i i-s" data-i="ban"></i>No usar <small>· se pregunta 1 vez</small></div>
+      <div class="op sug" data-tipo="Código de barras"><i class="i i-s" data-i="scan-barcode"></i>Código de barras <span class="kbd">Enter</span></div>
+      <div class="op" data-tipo="Bulto"><i class="i i-s" data-i="boxes"></i>Bulto</div>
+      <div class="op" data-tipo="No usar"><i class="i i-s" data-i="ban"></i>No usar <small>· se pregunta 1 vez</small></div>
     </div>
 
-    <div class="marco-hoja">
+    <div class="marco-hoja" id="lx-planilla">
       <div class="fila letras"><span></span><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span class="gap"></span><span class="fb r">Costo</span><span class="fb r">Cambio</span><span class="fb r">En estantería</span></div>
       <div class="fila titulo"><span>1</span><span></span><span>BULONERA CENTRO · MAYORISTA DE BULONERIA Y FIJACIONES</span><span></span><span></span><span></span><span></span><span></span><span class="gap"></span><span class="fb"></span><span class="fb"></span><span class="fb"></span></div>
       <div class="fila titulo"><span>2</span><span></span><span>LISTA Nº 42 · VIGENCIA <span class="fecha">17/10/2026</span> · PRECIOS SIN IVA</span><span></span><span></span><span></span><span></span><span></span><span class="gap"></span><span class="fb"></span><span class="fb"></span><span class="fb"></span></div>
@@ -138,7 +139,7 @@
     </div>
   </div>
 
-  <footer class="pie">
+  <footer class="pie" id="lx-pie">
     <div class="explica">
       <span class="fn">Fila 5</span>
       <span class="paso"><small>E</small>$3.480</span><i class="i i-s" data-i="chevron-right"></i>
@@ -150,10 +151,15 @@
       <span class="paso fin">$7.000</span>
     </div>
     <div class="der">
-      <button class="btn btn-fantasma chico">Descartar <span class="kbd">Alt D</span></button>
-      <button class="btn btn-accion">Aplicar · 641 precios <span class="kbd">Ctrl Enter</span></button>
+      <button class="btn btn-fantasma chico" data-lx="descartar">Descartar <span class="kbd">Alt D</span></button>
+      <button class="btn btn-accion" data-lx="aplicar">Aplicar · 641 precios <span class="kbd">Ctrl Enter</span></button>
     </div>
   </footer>
 </div>
+<script src="../../_propio/interaccion.js"></script>
+<script src="../../_propio/datos.js"></script>
+<script src="../../_propio/dialogos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="interaccion.js"></script>
 </body>
 </html>

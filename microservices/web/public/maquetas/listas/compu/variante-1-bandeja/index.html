@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listas de precios · La bandeja y la revisión (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/interaccion.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
 <style>
@@ -98,80 +99,80 @@
 <div class="app plegado">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item activo" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-lx="mas"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
-      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="vinculo" data-lx="espejo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
-      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+      <div class="usuario" data-lx="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
     </div>
   </nav>
   <main class="contenido">
     <header class="cabecera">
       <div class="t-titulo">Catálogo</div>
       <div class="acciones">
-        <button class="btn chico"><i class="i i-s" data-i="building-2"></i>Agregar proveedor</button>
-        <button class="btn chico"><i class="i i-s" data-i="upload"></i>Subir lista <span class="kbd">Alt S</span></button>
+        <button class="btn chico" data-lx="agregar-prov"><i class="i i-s" data-i="building-2"></i>Agregar proveedor</button>
+        <button class="btn chico" data-lx="subir"><i class="i i-s" data-i="upload"></i>Subir lista <span class="kbd">Alt S</span></button>
       </div>
     </header>
-    <nav class="pestanas"><a>Productos</a><a class="activa">Listas de precios <span class="pastilla urgente" style="height:24px">2</span></a><a>Duplicados <span class="pastilla" style="height:24px">12</span></a></nav>
+    <nav class="pestanas"><a data-ir="productos">Productos</a><a class="activa" data-ir="listas">Listas de precios <span class="pastilla urgente" style="height:24px">2</span></a><a data-ir="duplicados">Duplicados <span class="pastilla" style="height:24px">12</span></a></nav>
 
     <section class="pantalla">
       <div class="listas">
         <!-- ============ Izquierda ============ -->
         <div class="izq">
-          <div class="soltar">
+          <div class="soltar" data-lx="subir">
             <span class="ico"><i class="i" data-i="file-up"></i></span>
             <div><b>Cargar una lista</b><span>Soltá el Excel o el PDF acá, o <span class="kbd">Alt S</span></span></div>
           </div>
 
-          <div>
+          <div id="lx-revisar">
             <div class="cab"><b>Para revisar</b><span class="pastilla urgente" style="height:24px">2</span></div>
-            <div class="fila elegida">
+            <div class="fila elegida" data-lista="bulonera">
               <span class="ic"><i class="i" data-i="mail"></i></span>
               <div style="min-width:0"><div class="n">Bulonera Centro</div><div class="d">17/10 · por correo, hoy 08:12</div></div>
               <span class="kbd">1</span>
             </div>
-            <div class="fila">
+            <div class="fila" data-lista="sur">
               <span class="ic"><i class="i" data-i="globe"></i></span>
               <div style="min-width:0"><div class="n">Ferretera del Sur</div><div class="d">18/10 · de su portal, anoche</div></div>
               <span class="kbd">2</span>
             </div>
-            <div class="fila" style="background:var(--urgente-suave);border-color:transparent;box-shadow:none">
+            <div class="fila" data-lx="adjunto" style="background:var(--urgente-suave);border-color:transparent;box-shadow:none">
               <span class="ic" style="background:#fff;color:var(--urgente-texto)"><i class="i" data-i="inbox"></i></span>
               <div style="min-width:0"><div class="n" style="color:var(--urgente-texto)">1 adjunto sin proveedor</div><div class="d">precios-oct-2026.pdf</div></div>
               <i class="i i-s" data-i="chevron-right" style="color:var(--urgente-texto)"></i>
             </div>
           </div>
 
-          <div>
-            <div class="cab"><b>Últimas cargas</b><span class="mas">Ver todas</span></div>
-            <div class="fila">
+          <div id="lx-ultimas">
+            <div class="cab"><b>Últimas cargas</b><span class="mas" data-lx="historial">Ver todas</span></div>
+            <div class="fila" data-lx="carga-oeste">
               <span class="ic"><i class="i" data-i="file-spreadsheet"></i></span>
               <div style="min-width:0"><div class="n">Distribuidora Oeste</div><div class="d">14/10 · 312 cambiados</div></div>
               <span class="pastilla logro">Aplicada</span>
             </div>
           </div>
 
-          <div class="tarjeta" style="padding:8px 12px">
-            <div class="cab" style="margin:2px 4px 2px"><b>Proveedores</b><span class="pastilla" style="height:24px">14</span><span class="mas">Buscar <span class="kbd">/</span></span></div>
-            <div class="prov"><span class="pt vieja"></span><b>Pinturas del Plata</b><span class="pastilla urgente" style="height:24px">Vieja · 41 días</span></div>
-            <div class="prov"><span class="pt vieja"></span><b>Acindar Clavos</b><span class="pastilla urgente" style="height:24px">Vieja · 33 días</span></div>
+          <div class="tarjeta" id="lx-prov" style="padding:8px 12px">
+            <div class="cab" style="margin:2px 4px 2px"><b>Proveedores</b><span class="pastilla" style="height:24px">14</span><span class="mas" data-lx="buscar-prov">Buscar <span class="kbd">/</span></span></div>
+            <div class="prov" data-prov="Pinturas del Plata"><span class="pt vieja"></span><b>Pinturas del Plata</b><span class="pastilla urgente" style="height:24px">Vieja · 41 días</span></div>
+            <div class="prov" data-prov="Acindar Clavos"><span class="pt vieja"></span><b>Acindar Clavos</b><span class="pastilla urgente" style="height:24px">Vieja · 33 días</span></div>
           </div>
         </div>
 
         <!-- ============ Derecha: revisar la lista ============ -->
-        <div class="tarjeta-2 rev">
+        <div class="tarjeta-2 rev" id="lx-rev">
           <div class="rev-cab">
             <span class="doc"><i class="i i-l" data-i="file-spreadsheet"></i></span>
             <div>
               <div class="t-seccion">Bulonera Centro · lista del 17/10/2026</div>
               <div class="t-detalle">bulonera-centro-octubre.xlsx · llegó por correo hoy 08:12 · reconocida sola</div>
             </div>
-            <div class="acc"><button class="btn chico btn-suave"><i class="i i-s" data-i="mail-open"></i>Ver el correo</button></div>
+            <div class="acc"><button class="btn chico btn-suave" data-lx="correo"><i class="i i-s" data-i="mail-open"></i>Ver el correo</button></div>
           </div>
 
           <div class="numeros">
@@ -186,14 +187,14 @@
             <b style="width:12.3%;background:var(--pino)"></b><b style="width:1.2%;background:var(--logro)"></b><b style="flex:1;background:var(--hundido-2)"></b><b style="width:.8%;background:var(--texto-3)"></b><b style="width:.6%;background:var(--urgente)"></b>
           </div>
 
-          <div class="aviso urgente"><i class="i" data-i="triangle-alert"></i><span>La planilla dice <b>6 % de contado</b> y Bulonera Centro tiene <b>5 %</b>: se calculó con 5 %.</span><button class="btn chico">Usar 6 %</button></div>
+          <div class="aviso urgente"><i class="i" data-i="triangle-alert"></i><span>La planilla dice <b>6 % de contado</b> y Bulonera Centro tiene <b>5 %</b>: se calculó con 5 %.</span><button class="btn chico" data-lx="usar6">Usar 6 %</button></div>
 
           <div class="filtros">
-            <span class="chip elegido">Cambian <span class="cta">876</span></span>
-            <span class="chip">Subas de más de 15 % <span class="cta">23</span></span>
-            <span class="chip">Nuevos <span class="cta">4</span></span>
-            <span class="chip">Ya no están <span class="cta">12</span></span>
-            <span class="chip">Salteadas <span class="cta">6</span></span>
+            <span class="chip elegido" data-filtro="cambian">Cambian <span class="cta">876</span></span>
+            <span class="chip" data-filtro="subas">Subas de más de 15 % <span class="cta">23</span></span>
+            <span class="chip" data-filtro="nuevos">Nuevos <span class="cta">4</span></span>
+            <span class="chip" data-filtro="noestan">Ya no están <span class="cta">12</span></span>
+            <span class="chip" data-filtro="salteadas">Salteadas <span class="cta">6</span></span>
           </div>
 
           <div class="tabla">
@@ -239,14 +240,19 @@
           </div>
 
           <div class="pie-rev">
-            <button class="btn btn-fantasma chico">Descartar <span class="kbd">Alt D</span></button>
+            <button class="btn btn-fantasma chico" data-lx="descartar">Descartar <span class="kbd">Alt D</span></button>
             <span class="nota"><i class="i i-s" data-i="lock"></i>Nada cambia hasta aplicar</span><span class="nota" style="color:var(--texto-3)"><span class="kbd">↑</span><span class="kbd">↓</span><span class="kbd">Espacio</span></span>
-            <button class="btn btn-accion">Aplicar · cambian 641 precios <span class="kbd">Ctrl Enter</span></button>
+            <button class="btn btn-accion" data-lx="aplicar">Aplicar · cambian 641 precios <span class="kbd">Ctrl Enter</span></button>
           </div>
         </div>
       </div>
     </section>
   </main>
 </div>
+<script src="../../_propio/interaccion.js"></script>
+<script src="../../_propio/datos.js"></script>
+<script src="../../_propio/dialogos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="interaccion.js"></script>
 </body>
 </html>

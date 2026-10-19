@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listas de precios · Remarcar caminando (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/interaccion.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
 <style>
@@ -55,12 +56,12 @@
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="top">
-    <span class="x"><i class="i" data-i="x"></i></span>
+    <span class="x" data-lx="salir" aria-label="Salir de remarcar"><i class="i" data-i="x"></i></span>
     <div class="t">Remarcar · lista de Bulonera Centro<b>Faltan 428 de 641</b></div>
-    <span class="x der"><i class="i" data-i="printer"></i></span>
+    <span class="x der" data-lx="imprimir-varias" aria-label="Imprimir etiquetas"><i class="i" data-i="printer"></i></span>
   </div>
 
-  <div class="pasillos">
+  <div class="pasillos" id="lx-pasillos">
     <div class="pas listo"><div class="barra"><b style="width:100%"></b></div><span>A <i class="i i-s" data-i="check"></i></span></div>
     <div class="pas ahora"><div class="barra"><b style="width:18%"></b></div><span>B <em style="font-style:normal">11/188</em></span></div>
     <div class="pas"><div class="barra"><b style="width:0"></b></div><span>C <em style="font-style:normal">141</em></span></div>
@@ -68,7 +69,7 @@
     <div class="pas"><div class="barra"><b style="width:0"></b></div><span>E <em style="font-style:normal">33</em></span></div>
   </div>
 
-  <div class="pila">
+  <div class="pila" id="lx-pila">
     <div class="carta atras"></div>
     <div class="carta">
       <div class="lugar"><span class="pastilla pino"><i class="i i-s" data-i="map-pin"></i>Est. B-03-12</span><span class="cuenta">la que sigue: B-03-14</span></div>
@@ -85,11 +86,17 @@
 
   <div class="pista">Deslizá a la izquierda para dejarlo para después</div>
   <div class="acciones">
-    <button class="btn btn-icono"><i class="i i-l" data-i="scan-barcode"></i></button>
-    <button class="btn btn-icono"><i class="i i-l" data-i="printer"></i></button>
-    <button class="btn btn-accion"><i class="i i-l" data-i="check"></i>Remarcado</button>
+    <button class="btn btn-icono" data-lx="escanear" aria-label="Escanear la etiqueta"><i class="i i-l" data-i="scan-barcode"></i></button>
+    <button class="btn btn-icono" data-lx="imprimir-una" aria-label="Imprimir esta etiqueta"><i class="i i-l" data-i="printer"></i></button>
+    <button class="btn btn-accion" data-lx="remarcado"><i class="i i-l" data-i="check"></i>Remarcado</button>
   </div>
   <span class="home-ind"></span>
 </div>
+<script src="../../_propio/interaccion.js"></script>
+<script src="../../_propio/datos.js"></script>
+<script src="../../_propio/dialogos.js"></script>
+<script src="../../_propio/celu.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="interaccion.js"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listas de precios · Qué pasa en el mostrador (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/interaccion.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
 <style>
@@ -85,57 +86,57 @@
 <div class="app plegado">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item activo" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-lx="mas"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
-      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="vinculo" data-lx="espejo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea</div>
-      <div class="usuario"><span class="avatar">CI</span><div class="txt"></div></div>
+      <div class="usuario" data-lx="usuario"><span class="avatar">CI</span><div class="txt"></div></div>
     </div>
   </nav>
   <main class="contenido">
     <header class="cabecera">
       <div class="t-titulo">Catálogo</div>
       <div class="acciones">
-        <button class="btn chico"><i class="i i-s" data-i="upload"></i>Subir una lista <span class="kbd">Alt S</span></button>
+        <button class="btn chico" data-lx="subir"><i class="i i-s" data-i="upload"></i>Subir una lista <span class="kbd">Alt S</span></button>
       </div>
     </header>
-    <nav class="pestanas"><a>Productos</a><a class="activa">Listas de precios <span class="pastilla urgente" style="height:24px">2</span></a><a>Duplicados <span class="pastilla" style="height:24px">12</span></a></nav>
+    <nav class="pestanas"><a data-ir="productos">Productos</a><a class="activa" data-ir="listas">Listas de precios <span class="pastilla urgente" style="height:24px">2</span></a><a data-ir="duplicados">Duplicados <span class="pastilla" style="height:24px">12</span></a></nav>
 
     <section class="pantalla">
       <!-- ============ Bandeja ============ -->
-      <aside class="bandeja">
+      <aside class="bandeja" id="lx-bandeja">
         <div class="grupo">Para revisar <span class="pastilla urgente">2</span><span style="margin-left:auto;font-weight:600;color:var(--texto-3)"><span class="kbd">J</span> <span class="kbd">K</span></span></div>
-        <div class="it elegido"><span class="ic"><i class="i i-s" data-i="mail"></i></span><div style="min-width:0"><div class="n">Bulonera Centro</div><div class="d">876 cambian · 4 nuevos</div></div><span class="h">08:12</span></div>
-        <div class="it"><span class="ic"><i class="i i-s" data-i="globe"></i></span><div style="min-width:0"><div class="n">Ferretera del Sur</div><div class="d">214 cambian · de su portal</div></div><span class="h">ayer</span></div>
+        <div class="it elegido" data-lista="bulonera"><span class="ic"><i class="i i-s" data-i="mail"></i></span><div style="min-width:0"><div class="n">Bulonera Centro</div><div class="d">876 cambian · 4 nuevos</div></div><span class="h">08:12</span></div>
+        <div class="it" data-lista="sur"><span class="ic"><i class="i i-s" data-i="globe"></i></span><div style="min-width:0"><div class="n">Ferretera del Sur</div><div class="d">214 cambian · de su portal</div></div><span class="h">ayer</span></div>
 
         <div class="grupo">¿De quién es? <span class="pastilla urgente">1</span></div>
-        <div class="it"><span class="ic" style="background:var(--urgente-suave);color:var(--urgente-texto)"><i class="i i-s" data-i="inbox"></i></span><div style="min-width:0"><div class="n">precios-oct-2026.pdf</div><div class="d">Llegó por correo · 1 vez y listo</div></div><span class="h">lun</span></div>
+        <div class="it" data-lx="adjunto"><span class="ic" style="background:var(--urgente-suave);color:var(--urgente-texto)"><i class="i i-s" data-i="inbox"></i></span><div style="min-width:0"><div class="n">precios-oct-2026.pdf</div><div class="d">Llegó por correo · 1 vez y listo</div></div><span class="h">lun</span></div>
 
         <div class="grupo">Lista vieja <span class="pastilla">2</span></div>
-        <div class="it"><span class="ic"><i class="i i-s" data-i="building-2"></i></span><div style="min-width:0"><div class="n">Pinturas del Plata</div><div class="d">La última es de hace 41 días</div></div><span class="pv"></span></div>
-        <div class="it"><span class="ic"><i class="i i-s" data-i="building-2"></i></span><div style="min-width:0"><div class="n">Acindar Clavos</div><div class="d">La última es de hace 33 días</div></div><span class="pv"></span></div>
+        <div class="it" data-prov="Pinturas del Plata"><span class="ic"><i class="i i-s" data-i="building-2"></i></span><div style="min-width:0"><div class="n">Pinturas del Plata</div><div class="d">La última es de hace 41 días</div></div><span class="pv"></span></div>
+        <div class="it" data-prov="Acindar Clavos"><span class="ic"><i class="i i-s" data-i="building-2"></i></span><div style="min-width:0"><div class="n">Acindar Clavos</div><div class="d">La última es de hace 33 días</div></div><span class="pv"></span></div>
 
         <div class="grupo">Al día <span class="pastilla">10</span></div>
-        <div class="it"><span class="ic"><i class="i i-s" data-i="file-check"></i></span><div style="min-width:0"><div class="n">Distribuidora Oeste</div><div class="d">Aplicada el 14/10 · 312 precios</div></div><span class="h">14/10</span></div>
+        <div class="it" data-lx="carga-oeste"><span class="ic"><i class="i i-s" data-i="file-check"></i></span><div style="min-width:0"><div class="n">Distribuidora Oeste</div><div class="d">Aplicada el 14/10 · 312 precios</div></div><span class="h">14/10</span></div>
 
-        <div class="estado-canales">
+        <div class="estado-canales" data-lx="canales">
           <div><i class="i i-s" data-i="mail"></i>Correo revisado hace 6 min</div>
           <div><i class="i i-s" data-i="globe"></i>3 portales · el próximo, esta noche</div>
         </div>
       </aside>
 
       <!-- ============ Qué pasa si aplicás ============ -->
-      <div class="centro">
+      <div class="centro" id="lx-centro">
         <div class="cab">
           <div>
             <div class="t-seccion">Bulonera Centro · lista del 17/10/2026</div>
             <div class="t-detalle">Llegó por correo hoy 08:12 · 7.096 productos leídos · 25 % de línea y 5 % de contado</div>
           </div>
-          <div class="segmentos"><button class="elegido">Qué pasa</button><button>Fila por fila</button><button>La planilla</button></div>
+          <div class="segmentos"><button class="elegido" data-vista="pasa">Qué pasa</button><button data-vista="filas">Fila por fila</button><button data-vista="planilla">La planilla</button></div>
         </div>
 
         <div class="tarjeta hero">
@@ -155,7 +156,7 @@
 
         <div class="tarjetas">
           <div class="tarjeta t nuevos">
-            <div class="t-cab"><span class="ico"><i class="i" data-i="package-plus"></i></span><span class="n">4</span><b>nuevos: elegí el margen</b><span class="ver">Ver</span></div>
+            <div class="t-cab"><span class="ico"><i class="i" data-i="package-plus"></i></span><span class="n">4</span><b>nuevos: elegí el margen</b><span class="ver" data-lx="ver-nuevos">Ver</span></div>
             <div class="nv">
               <div class="foto chica"><img src="../../../_comun/fotos/puntas.webp" alt=""></div>
               <div style="min-width:0"><div class="nm">Puntas Torx T25 × 50 mm × 2</div><div class="dt">Bremen · costo $1.920</div></div>
@@ -169,14 +170,14 @@
           </div>
 
           <div class="tarjeta t subas">
-            <div class="t-cab"><span class="ico"><i class="i" data-i="trending-up"></i></span><span class="n">23</span><b>suben + de 15 %</b><span class="ver">Ver</span></div>
+            <div class="t-cab"><span class="ico"><i class="i" data-i="trending-up"></i></span><span class="n">23</span><b>suben + de 15 %</b><span class="ver" data-lx="ver-subas">Ver</span></div>
             <div class="sb"><div class="nm">Tornillo autoperforante T2 8 × 1"</div><span class="pastilla urgente">+18,6 %</span><div class="dt">$10.000 → $11.000</div></div>
             <div class="sb"><div class="nm">Varilla roscada zincada 3/8 × 1 m</div><span class="pastilla urgente">+17,2 %</span><div class="dt">$6.000 → $7.000</div></div>
             <div class="sb"><div class="nm">Arandela grower M8 × 100</div><span class="pastilla urgente">+16,0 %</span><div class="dt">$3.000 → $4.000</div></div>
                       </div>
 
           <div class="tarjeta t">
-            <div class="t-cab"><span class="ico"><i class="i" data-i="circle-x"></i></span><span class="n">12</span><b>ya no están</b><span class="ver">Ver</span></div>
+            <div class="t-cab"><span class="ico"><i class="i" data-i="circle-x"></i></span><span class="n">12</span><b>ya no están</b><span class="ver" data-lx="ver-noestan">Ver</span></div>
             <div class="sb"><div class="nm">Tuerca mariposa M6 × 100</div><span class="pastilla urgente">8 un.</span><div class="dt">Solo lo traía Bulonera</div></div>
             <div class="sb"><div class="nm">Taco Fischer SX 6 × 100</div><span class="pastilla logro">Sigue</span><div class="dt">Lo trae otro proveedor</div></div>
             <div class="sb"><div class="nm">Y 10 más</div><span class="pastilla">Sin stock</span><div class="dt">Ninguno tiene stock</div></div>
@@ -185,13 +186,18 @@
 
         <div class="tarjeta-2 aplicar">
           <div class="resto"><span><b>6.216</b> sin cambio</span><span><b>6</b> salteadas</span></div>
-          <span class="check"><span class="cb"><i class="i i-s" data-i="check"></i></span>Imprimir las etiquetas</span>
-          <button class="btn btn-fantasma chico">Descartar <span class="kbd">D</span></button>
-          <button class="btn btn-accion">Aplicar y remarcar <span class="kbd">A</span></button>
+          <span class="check" data-lx="check"><span class="cb"><i class="i i-s" data-i="check"></i></span>Imprimir las etiquetas</span>
+          <button class="btn btn-fantasma chico" data-lx="descartar">Descartar <span class="kbd">D</span></button>
+          <button class="btn btn-accion" data-lx="aplicar">Aplicar y remarcar <span class="kbd">A</span></button>
         </div>
       </div>
     </section>
   </main>
 </div>
+<script src="../../_propio/interaccion.js"></script>
+<script src="../../_propio/datos.js"></script>
+<script src="../../_propio/dialogos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="interaccion.js"></script>
 </body>
 </html>

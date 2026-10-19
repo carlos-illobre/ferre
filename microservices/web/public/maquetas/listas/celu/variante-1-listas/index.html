@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listas de precios · Evolución (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/interaccion.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
 <style>
@@ -52,12 +53,12 @@
 <body>
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
-  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span><span class="btn-vinculo" data-lx="espejo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
-  <nav class="celu-pestanas"><a>Productos</a><a class="activa">Listas</a><a>Duplicados</a></nav>
+  <nav class="celu-pestanas"><a data-ir="productos">Productos</a><a class="activa" data-ir="listas">Listas</a><a data-ir="duplicados">Duplicados</a></nav>
 
   <div class="celu-pantalla">
-    <div class="pend">
+    <div class="pend" id="lx-pend">
       <div class="arr">
         <span class="ic"><i class="i i-l" data-i="mail"></i></span>
         <div style="min-width:0">
@@ -72,33 +73,33 @@
         <div class="cifra"><div class="va">12</div><div class="et2">no están</div></div>
       </div>
       <div class="franja"><b style="width:12%;background:var(--pino)"></b><b style="width:2%;background:var(--accion)"></b><b style="flex:1;background:var(--hundido-2)"></b></div>
-      <button class="btn btn-accion grande">Revisar y aplicar <i class="i" data-i="arrow-right"></i></button>
+      <button class="btn btn-accion grande" data-lx="revisar">Revisar y aplicar <i class="i" data-i="arrow-right"></i></button>
     </div>
-    <div class="mas-pend"><i class="i i-s" data-i="inbox"></i><span>Y <b>1 más</b>: Ferretera del Sur, de su portal</span><i class="i i-s" data-i="chevron-right"></i></div>
+    <div class="mas-pend" id="lx-mas-pend" data-lx="otra"><i class="i i-s" data-i="inbox"></i><span>Y <b>1 más</b>: Ferretera del Sur, de su portal</span><i class="i i-s" data-i="chevron-right"></i></div>
 
-    <div class="cargar">
+    <div class="cargar" data-lx="cargar">
       <span class="ic"><i class="i" data-i="file-up"></i></span>
       <div><b>Cargar una lista</b><span class="d">Excel o PDF del proveedor</span></div>
       <button class="btn chico">Subir lista</button>
     </div>
 
-    <div class="sec"><b>Últimas cargas</b><span class="ver">Ver todas</span></div>
-    <div class="grupo">
-      <div class="row">
+    <div class="sec" id="lx-ult-sec"><b>Últimas cargas</b><span class="ver" data-lx="historial">Ver todas</span></div>
+    <div class="grupo" id="lx-ultimas">
+      <div class="row" data-lx="carga-oeste">
         <span class="ic"><i class="i" data-i="file-spreadsheet"></i></span>
         <span class="n">Distribuidora Oeste</span><span class="pastilla logro"><i class="i i-s" data-i="check"></i>Aplicada</span>
         <span class="d">Lista del 14/10 · <b>312</b> cambiados</span>
       </div>
-      <div class="row">
+      <div class="row" data-lx="carga-belgrano">
         <span class="ic"><i class="i" data-i="file-text"></i></span>
         <span class="n">Eléctrica Belgrano</span><span class="pastilla">Descartada</span>
         <span class="d">Lista del 10/10 · PDF · <b>1.284</b> leídos</span>
       </div>
     </div>
 
-    <div class="sec"><b>Proveedores</b><span class="pastilla" style="height:24px">14</span><span class="ver"><i class="i i-s" data-i="search"></i></span></div>
+    <div class="sec"><b>Proveedores</b><span class="pastilla" style="height:24px">14</span><span class="ver" data-lx="buscar-prov" aria-label="Buscar proveedor"><i class="i i-s" data-i="search"></i></span></div>
     <div class="grupo">
-      <div class="row">
+      <div class="row" data-lx="ficha-prov" data-prov="Pinturas del Plata">
         <span class="ic"><i class="i" data-i="building-2"></i></span>
         <span class="n">Pinturas del Plata</span><span class="pastilla urgente">Vieja</span>
         <span class="d">Lista del 08/09 · hace <b>41 días</b></span>
@@ -107,13 +108,19 @@
   </div>
 
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a class="activo"><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a class="activo" data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-lx="mas"><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../_propio/interaccion.js"></script>
+<script src="../../_propio/datos.js"></script>
+<script src="../../_propio/dialogos.js"></script>
+<script src="../../_propio/celu.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="interaccion.js"></script>
 </body>
 </html>

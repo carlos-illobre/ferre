@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listas de precios · El impacto (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_propio/interaccion.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
 <style>
@@ -54,15 +55,15 @@
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="top">
-    <span class="volver"><i class="i i-l" data-i="chevron-left"></i>Listas</span>
-    <span class="der"><span class="btn chico btn-suave btn-icono"><i class="i i-s" data-i="mail-open"></i></span><span class="btn chico btn-suave btn-icono"><i class="i i-s" data-i="file-spreadsheet"></i></span></span>
+    <span class="volver" data-lx="listas"><i class="i i-l" data-i="chevron-left"></i>Listas</span>
+    <span class="der"><span class="btn chico btn-suave btn-icono" data-lx="origen" aria-label="Ver el correo"><i class="i i-s" data-i="mail-open"></i></span><span class="btn chico btn-suave btn-icono" data-lx="planilla" aria-label="Ver la planilla"><i class="i i-s" data-i="file-spreadsheet"></i></span></span>
   </div>
-  <div class="titulo">
+  <div class="titulo" id="lx-titulo">
     <div class="t-titulo">Bulonera Centro</div>
     <div class="t-detalle">Lista del 17/10/2026 · llegó por correo 08:12</div>
   </div>
 
-  <div class="celu-pantalla">
+  <div class="celu-pantalla" id="lx-pantalla">
     <div class="hero">
       <div class="et">Si aplicás, en la estantería cambian</div>
       <div class="num">641 <small>precios</small></div>
@@ -89,18 +90,24 @@
     </div>
   </div>
 
-  <div class="barra-accion">
+  <div class="barra-accion" id="lx-barra">
     <div class="deslizar"><span class="pulgar"><i class="i i-l" data-i="arrow-right"></i></span>Deslizá para aplicar<span class="flechas"><i class="i" data-i="chevron-right"></i></span></div>
-    <div class="bajo"><span>Nada cambia hasta aplicar</span><b style="color:var(--texto-2)">Descartar</b></div>
+    <div class="bajo"><span>Nada cambia hasta aplicar</span><b style="color:var(--texto-2)" data-lx="descartar">Descartar</b></div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a class="activo"><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a class="activo" data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-lx="mas"><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../_propio/interaccion.js"></script>
+<script src="../../_propio/datos.js"></script>
+<script src="../../_propio/dialogos.js"></script>
+<script src="../../_propio/celu.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="interaccion.js"></script>
 </body>
 </html>
