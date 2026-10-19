@@ -6,6 +6,7 @@
 <title>Compras · Bandeja de facturas (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
+<link rel="stylesheet" href="../../propio/interacciones.css">
 <style>
   .cabecera { padding-top: 16px; }
   .pantalla { padding: 16px 24px 16px; display: grid; grid-template-columns: 224px 336px minmax(0,1fr); gap: 16px; }
@@ -81,48 +82,48 @@
 <div class="app plegado">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="insignia">3</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="insignia">3</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
     <div class="pie">
       <div class="vinculo" style="padding:10px"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo</div></div>
-      <div class="usuario" style="padding:4px"><span class="avatar">MR</span><div class="txt">Marcelo</div></div>
+      <div class="usuario" data-persona style="padding:4px"><span class="avatar">MR</span><div class="txt">Marcelo</div></div>
     </div>
   </nav>
   <main class="contenido">
     <header class="cabecera">
       <div class="t-titulo">Depósito</div>
-      <nav class="pestanas" style="border:0;margin:0 0 0 16px;padding:0"><a>Stock</a><a class="activa">Compras <span class="insignia">3</span></a><a>Pedidos</a><a>Contar</a></nav>
+      <nav class="pestanas" style="border:0;margin:0 0 0 16px;padding:0"><a data-ir="stock">Stock</a><a class="activa" data-no-ir data-tab="compras">Compras <span class="insignia">3</span></a><a data-no-ir data-tab="pedidos">Pedidos</a><a data-ir="contar">Contar</a></nav>
       <div class="acciones">
         <span class="pastilla pino"><i class="i i-s" data-i="info"></i>Nada se guarda hasta registrar</span>
-        <button class="btn chico"><i class="i i-s" data-i="qr-code"></i>Foto con el celular <span class="kbd">Alt F</span></button>
+        <button class="btn chico" data-acc="foto"><i class="i i-s" data-i="qr-code"></i>Foto con el celular <span class="kbd">Alt F</span></button>
       </div>
     </header>
     <section class="pantalla" style="border-top:1px solid var(--borde);margin-top:12px">
       <!-- Bandeja de fotos -->
       <aside class="bandeja">
         <div class="t">Por registrar <span class="pastilla accion">3</span></div>
-        <div class="foto-item activo">
+        <div class="foto-item activo" data-b="bulonera">
           <div class="mini"><img src="../../propio/factura.webp" alt=""></div>
           <div><b>Bulonera Centro</b><span>Leída · 1 para revisar</span></div>
         </div>
-        <div class="foto-item">
+        <div class="foto-item" data-b="oeste">
           <div class="mini"><img src="../../propio/factura.webp" alt="" style="object-position:0 40%"></div>
           <div><b>Distribuidora Oeste</b><span>Remito · 9 de 9 leídos</span></div>
         </div>
-        <div class="foto-item">
+        <div class="foto-item" data-b="movida">
           <div class="mini" style="filter:blur(1.4px)"><img src="../../propio/factura.webp" alt="" style="object-position:0 70%"></div>
           <div><b>Foto de las 10:12</b><span class="err">No se pudo leer</span></div>
         </div>
         <div class="t otra">Registradas hoy</div>
-        <div class="foto-item hecho">
+        <div class="foto-item hecho" data-hecho="bulonera">
           <div class="mini"><img src="../../propio/factura.webp" alt="" style="opacity:.6"></div>
           <div><b>Bulonera Centro</b><span><span class="peso">$</span>184.300 · 09:40</span></div>
         </div>
         <div class="pie-b">
-          <div class="tarjeta deuda">
+          <div class="tarjeta deuda cp-click" data-acc="deudas">
             <div class="fila"><span>Se les debe</span><b><span class="peso">$</span>1.095.500</b></div>
             <div class="fila r"><span>Vencido</span><b><span class="peso">$</span>186.500</b></div>
             <div class="fila"><span>Por llegar</span><b>2 pedidos</b></div>
@@ -136,17 +137,17 @@
           <img src="../../propio/factura.webp" alt="Factura de Bulonera Centro">
           <span class="marca-c" style="left:5%;top:4.6%;width:42%;height:17%"></span>
           <span class="marca-c" style="left:64%;top:4.6%;width:31%;height:17%"></span>
-          <span class="marca-r" style="top:30.3%"></span>
-          <span class="marca-r foco" style="top:34.5%"></span>
-          <span class="marca-r" style="top:38.7%"></span>
-          <span class="marca-r" style="top:42.9%"></span>
-          <span class="marca-r dudosa" style="top:47.1%"></span>
+          <span class="marca-r" data-m="0" style="top:30.3%"></span>
+          <span class="marca-r foco" data-m="1" style="top:34.5%"></span>
+          <span class="marca-r" data-m="2" style="top:38.7%"></span>
+          <span class="marca-r" data-m="3" style="top:42.9%"></span>
+          <span class="marca-r dudosa" data-m="4" style="top:47.1%"></span>
         </div>
         <div class="aviso logro"><i class="i" data-i="circle-check"></i><span>Los renglones suman <b>$253.220</b>, igual que el subtotal de la factura.</span></div>
         <div class="herr">
           <span class="t-detalle">Foto 1 de 1</span>
-          <button class="btn btn-suave chico btn-icono" aria-label="Ampliar"><i class="i i-s" data-i="search"></i></button>
-          <button class="btn btn-suave chico"><i class="i i-s" data-i="plus"></i>Otra hoja</button>
+          <button class="btn btn-suave chico btn-icono" aria-label="Ampliar" data-acc="ampliar"><i class="i i-s" data-i="search"></i></button>
+          <button class="btn btn-suave chico" data-acc="otra"><i class="i i-s" data-i="plus"></i>Otra hoja</button>
         </div>
       </div>
 
@@ -157,62 +158,335 @@
           <div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Comprobante</div><div class="va">Factura A</div></div>
           <div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Fecha</div><div class="va">18/10/2026</div></div>
         </div>
-        <div class="pedido"><i class="i" data-i="link"></i><span>Es el <b>pedido del 14/10</b>: llegó todo, más arandelas sin pedir.</span><button class="btn btn-suave chico">Ver pedido</button></div>
+        <div class="pedido"><i class="i" data-i="link"></i><span>Es el <b>pedido del 14/10</b>: llegó todo, más arandelas sin pedir.</span><button class="btn btn-suave chico" data-acc="ver-pedido">Ver pedido</button></div>
 
         <div class="tabla">
           <div class="fil cab"><span></span><span>Producto</span><span class="n">Llegó</span><span class="n">Costo c/u</span><span class="n">Subtotal</span></div>
-          <div class="fil">
+          <div class="fil" data-r="0">
             <div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div>
             <div><div class="nom">Autoperforante T2 8 × 1" × 100</div><div class="cod">TA8-100 · Fischer</div></div>
             <div class="cant">20 un.<small>pedí 20</small></div>
             <div class="costo"><span class="peso">$</span>3.800<br><span class="dif igual">= lista</span></div>
             <div class="sub"><span class="peso">$</span>76.000</div>
           </div>
-          <div class="fil foco">
+          <div class="fil foco" data-r="1">
             <div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
             <div><div class="nom">Tarugos nylon S8 con tope × 100</div><div class="cod">TS8-100 · Fischer · lista $3.950</div></div>
             <div class="cant">15 un.<small>pedí 15</small></div>
             <div class="costo"><span class="peso">$</span>4.150<br><span class="dif sube">↑ +5 %</span></div>
             <div class="sub"><span class="peso">$</span>62.250</div>
           </div>
-          <div class="fil">
+          <div class="fil" data-r="2">
             <div class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
             <div><div class="nom">Mecha acero rápido HSS 8 mm</div><div class="cod">MHS-080 · Ezeta</div></div>
             <div class="cant">24 un.<small>pedí 24</small></div>
             <div class="costo"><span class="peso">$</span>2.480<br><span class="dif igual">= lista</span></div>
             <div class="sub"><span class="peso">$</span>59.520</div>
           </div>
-          <div class="fil">
+          <div class="fil" data-r="3">
             <div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div>
             <div><div class="nom">Clavos punta París 2" por kilo</div><div class="cod">CP2-KG · Acindar · lista $3.050</div></div>
             <div class="cant">12,5 kg<small>pedí 12,5</small></div>
             <div class="costo"><span class="peso">$</span>2.900<br><span class="dif baja">↓ −5 %</span></div>
             <div class="sub"><span class="peso">$</span>36.250</div>
           </div>
-          <div class="fil revisar">
+          <div class="fil revisar" data-r="4">
             <div class="foto-icono" style="width:40px;height:40px;background:#fff;color:var(--urgente-texto)"><i class="i" data-i="circle-help"></i></div>
             <div><div class="nom">ARANDELA GROWER 8MM CJ x1000</div><div class="cod">AG8-1M · así dice la factura</div></div>
             <div class="cant">2 un.<small>no pedida</small></div>
             <div class="costo"><span class="peso">$</span>9.600<br><span class="dif igual">sin lista</span></div>
             <div class="sub"><span class="peso">$</span>19.200</div>
-            <div class="acciones-r"><span>No está en el catálogo</span><button class="btn chico"><i class="i i-s" data-i="search"></i>Es un producto que tengo</button><button class="btn chico"><i class="i i-s" data-i="package-plus"></i>Crear como nuevo</button></div>
+            <div class="acciones-r"><span>No está en el catálogo</span><button class="btn chico" data-elegir><i class="i i-s" data-i="search"></i>Es un producto que tengo</button><button class="btn chico" data-crear><i class="i i-s" data-i="package-plus"></i>Crear como nuevo</button></div>
           </div>
         </div>
 
         <div class="tarjeta-2 cobro">
           <div>
             <div class="et">Cómo se paga</div>
-            <div class="segmentos"><button>Adelantado</button><button class="elegido">A 30 días</button><button>A 60 días</button></div>
+            <div class="segmentos" data-pago><button>Adelantado</button><button class="elegido">A 30 días</button><button>A 60 días</button></div>
           </div>
           <div class="tot">
             <div class="t-detalle">5 renglones · 1 nuevo</div>
             <div class="t-numero"><span class="peso">$</span>253.220</div>
           </div>
-          <button class="btn btn-accion grande">Registrar <span class="kbd">F2</span></button>
+          <button class="btn btn-accion grande cp-llenar" data-acc="registrar"><span data-txt>Registrar</span> <span class="kbd">F2</span></button>
         </div>
       </div>
     </section>
   </main>
 </div>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="../../propio/interacciones.js"></script>
+<script>
+// Compu 2 · La bandeja de facturas: lo que se puede tocar
+(function () {
+  var $ = CP.$, $$ = CP.$$, plata = CP.plata;
+  var pantalla = $(".pantalla"), bandeja = $(".bandeja"), papel = $(".papel"), leido = $(".leido");
+  var FOTOS = "../../../_comun/fotos/";
+  var deudaEl = $(".deuda .fila b"), vencidoEl = $(".deuda .fila.r b");
+
+  // Lo que hay en la bandeja. La primera es la factura de resumen.md.
+  var items = {
+    bulonera: { proveedor: "Bulonera Centro", comp: "Factura A", fecha: "18/10/2026", rs: CP.renglonesFactura(), pago: "A 30 días", nuevos: 0,
+      banda: 'Es el <b>pedido del 14/10</b>: llegó todo, más arandelas sin pedir.', marcas: true },
+    oeste: { proveedor: "Distribuidora Oeste", comp: "Remito", fecha: "19/10/2026", rs: CP.renglonesOeste().map(function (r) { r.pedi = String(r.cant).replace(".", ","); r.dif = "= lista"; r.tipo = "igual"; return r; }), pago: "A 30 días", nuevos: 0,
+      banda: 'Es el <b>pedido del 14/10</b>: llegaron los 9 renglones, justo lo pedido.', pos: "0 40%" },
+    movida: { proveedor: "Foto de las 10:12", movida: true }
+  };
+  var lumen = { proveedor: "Electro Lumen", comp: "Factura A", fecha: "19/10/2026", pago: "A 30 días", nuevos: 0, banda: "No hay pedido abierto con Electro Lumen: es una compra suelta.", pos: "0 60%",
+    rs: [{ foto: "lampara", nom: "Lámpara LED 9 W luz fría", cod: "LED9-F · Philips", cant: 20, u: "un.", costo: 1250, dif: "= lista", tipo: "igual", pedi: "—" },
+         { foto: "lampara", nom: "Lámpara LED 12 W luz cálida", cod: "LED12-C · Philips · lista $1.600", cant: 10, u: "un.", costo: 1680, dif: "↑ +5 %", tipo: "sube", pedi: "—" }] };
+  var actual = "bulonera", nLumen = 0;
+  var hechos = { bulonera: CP.COMPRAS.bulonera };
+
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".cp-capa")) return;
+    if (t.closest("[data-mas]")) return CP.mas(t.closest("[data-mas]"));
+    if (t.closest("[data-persona]")) return CP.persona(t.closest("[data-persona]"));
+    var tab = t.closest("[data-tab]"); if (tab) return pestana(tab.getAttribute("data-tab"));
+    var b = t.closest(".foto-item[data-b]"); if (b) return elegir(b.getAttribute("data-b"));
+    var h = t.closest("[data-hecho]"); if (h) return CP.detalle(hechos[h.getAttribute("data-hecho")]);
+    var seg = t.closest("[data-pago] > button"); if (seg) return elegirPago(seg);
+    if (t.closest("[data-elegir]")) return resolver(false);
+    if (t.closest("[data-crear]")) return resolver(true);
+    var llego = t.closest("[data-llego]"); if (llego) return recibir(llego);
+    var acc = t.closest("[data-acc]"); if (acc) return accion(acc.getAttribute("data-acc"), acc);
+  });
+  CP.tecla("Alt+F", function () { accion("foto"); });
+  CP.tecla("F2", function () { accion("registrar"); });
+
+  function accion(a, el) {
+    if (a === "foto") CP.esperarFoto(llegaFoto);
+    if (a === "ampliar") CP.verFoto(item().comp, item().proveedor + " · " + item().fecha);
+    if (a === "otra") CP.esperarFoto(function () {
+      var tx = $(".papel .herr .t-detalle"); CP.rodar(tx, "Foto 1 de 2", true);
+      CP.tostada("Se sumó la hoja 2: 0 renglones más");
+    }, { titulo: "Sacale foto a la hoja 2" });
+    if (a === "ver-pedido") verPedido();
+    if (a === "registrar") registrar();
+    if (a === "deudas") deudas();
+    if (a === "mano") CP.revision(CP.compraMano(), { alRegistrar: function (res) { aRegistradas(res); } });
+    if (a === "pedido") CP.pedido({}, function (p) { pedidoNuevo(p); });
+    if (a === "otra-foto") CP.esperarFoto(function () { reemplazarMovida(); });
+  }
+  function item() { return items[actual]; }
+
+  // --- la bandeja
+  function elegir(id) {
+    if (!items[id]) return;
+    pestana("compras");
+    actual = id;
+    $$(".foto-item[data-b]").forEach(function (x) { x.classList.toggle("activo", x.getAttribute("data-b") === id); });
+    pintarTodo(true);
+  }
+  function pintarTodo(animar) {
+    var it = item();
+    if (!it) return vacia();
+    if (it.movida) return pintarMovida();
+    papel.innerHTML = '<div class="hoja"><img src="../../propio/factura.webp" alt="Factura de ' + it.proveedor + '"' + (it.pos ? ' style="object-position:' + it.pos + '"' : "") + '>' +
+      '<span class="marca-c" style="left:5%;top:4.6%;width:42%;height:17%"></span><span class="marca-c" style="left:64%;top:4.6%;width:31%;height:17%"></span>' +
+      (it.marcas ? it.rs.map(function (r, i) { return '<span class="marca-r' + (r.dudoso ? " dudosa" : "") + '" data-m="' + i + '" style="top:' + r.marca + '%"></span>'; }).join("") : "") + "</div>" +
+      '<div class="aviso logro"><i class="i" data-i="circle-check"></i><span>Los renglones suman <b>$' + CP.miles(CP.suma(it.rs)) + "</b>, igual que el subtotal de la factura.</span></div>" +
+      '<div class="herr"><span class="t-detalle">Foto 1 de 1</span><button class="btn btn-suave chico btn-icono" aria-label="Ampliar" data-acc="ampliar"><i class="i i-s" data-i="search"></i></button><button class="btn btn-suave chico" data-acc="otra"><i class="i i-s" data-i="plus"></i>Otra hoja</button></div>';
+    var dud = it.rs.filter(function (r) { return r.dudoso; }).length;
+    leido.innerHTML = '<div class="datos"><div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Proveedor</div><div class="va">' + it.proveedor + '</div></div><div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Comprobante</div><div class="va">' + it.comp + '</div></div><div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Fecha</div><div class="va">' + it.fecha + "</div></div></div>" +
+      '<div class="pedido"><i class="i" data-i="link"></i><span>' + it.banda + "</span>" + (it === items.bulonera || it === items.oeste ? '<button class="btn btn-suave chico" data-acc="ver-pedido">Ver pedido</button>' : "") + "</div>" +
+      '<div class="tabla" style="overflow:auto;min-height:0"><div class="fil cab"><span></span><span>Producto</span><span class="n">Llegó</span><span class="n">Costo c/u</span><span class="n">Subtotal</span></div>' + it.rs.map(fil).join("") + "</div>" +
+      '<div class="tarjeta-2 cobro"><div><div class="et">Cómo se paga</div><div class="segmentos" data-pago>' + ["Adelantado", "A 30 días", "A 60 días"].map(function (p) { return "<button" + (p === it.pago ? ' class="elegido"' : "") + ">" + p + "</button>"; }).join("") + "</div></div>" +
+      '<div class="tot"><div class="t-detalle" data-cuenta>' + cuenta(it) + '</div><div class="t-numero" data-total>' + plata(CP.suma(it.rs)) + "</div></div>" +
+      '<button class="btn btn-accion grande cp-llenar" data-acc="registrar"><span data-txt>Registrar</span> <span class="kbd">F2</span></button></div>';
+    CP.pintar(papel); CP.pintar(leido);
+    if (animar) $$(".fil[data-r]", leido).forEach(function (f, i) { f.style.animationDelay = (i * 60) + "ms"; CP.entrar(f); });
+  }
+  function cuenta(it) {
+    var dud = it.rs.filter(function (r) { return r.dudoso; }).length;
+    return it.rs.length + " renglones" + (dud ? " · " + dud + " para revisar" : it.nuevos ? " · " + it.nuevos + " nuevo" : "");
+  }
+  function fil(r, i) {
+    var foto = r.foto ? '<div class="foto chica"><img src="' + FOTOS + r.foto + '.webp" alt=""></div>'
+      : r.dudoso ? '<div class="foto-icono" style="width:40px;height:40px;background:#fff;color:var(--urgente-texto)"><i class="i" data-i="circle-help"></i></div>'
+      : '<div class="foto-icono" style="width:40px;height:40px"><i class="i" data-i="package"></i></div>';
+    var cant = String(r.cant).replace(".", ",") + " " + r.u;
+    var pedi = r.pedi === "no pedida" ? "no pedida" : r.pedi === "—" ? "sin pedido" : "pedí " + r.pedi;
+    return '<div class="fil' + (r.dudoso ? " revisar" : "") + '" data-r="' + i + '">' + foto +
+      '<div><div class="nom">' + r.nom + '</div><div class="cod">' + r.cod + "</div></div>" +
+      '<div class="cant">' + cant + "<small>" + pedi + "</small></div>" +
+      '<div class="costo">' + plata(r.costo) + '<br><span class="dif ' + (r.tipo || "igual") + '">' + r.dif + "</span></div>" +
+      '<div class="sub">' + plata(CP.subtotal(r)) + "</div>" +
+      (r.dudoso ? '<div class="acciones-r"><span>No está en el catálogo</span><button class="btn chico" data-elegir><i class="i i-s" data-i="search"></i>Es un producto que tengo</button><button class="btn chico" data-crear><i class="i i-s" data-i="package-plus"></i>Crear como nuevo</button></div>' : "") + "</div>";
+  }
+  function pintarMovida() {
+    papel.innerHTML = '<div class="hoja"><img src="../../propio/factura.webp" alt="Foto movida" style="filter:blur(3px);object-position:0 70%"></div>' +
+      '<div class="aviso error"><i class="i" data-i="triangle-alert"></i><span>Salió movida: no se lee ningún renglón.</span></div>';
+    leido.innerHTML = '<div class="tarjeta" style="padding:24px;display:grid;gap:12px;justify-items:start"><span class="pastilla error"><i class="i i-s" data-i="triangle-alert"></i>No se pudo leer</span>' +
+      '<div class="t-seccion">La foto de las 10:12 salió movida</div><p class="t-cuerpo" style="margin:0;color:var(--texto-2)">Pedile al que la sacó que la repita con buena luz, o cargá la compra a mano mirando el papel.</p>' +
+      '<div style="display:flex;gap:8px"><button class="btn btn-oscuro" data-acc="otra-foto"><i class="i i-s" data-i="camera"></i>Sacar otra</button><button class="btn" data-acc="mano"><i class="i i-s" data-i="keyboard"></i>Cargar a mano</button><button class="btn btn-fantasma" data-acc="descartar">Descartar la foto</button></div></div>';
+    CP.pintar(papel); CP.pintar(leido);
+    leido.querySelector('[data-acc="descartar"]').addEventListener("click", function () { quitarDeBandeja("movida"); CP.tostada("Foto descartada", { icono: "trash-2" }); });
+  }
+  function vacia() {
+    papel.innerHTML = '<div class="aviso pino"><i class="i" data-i="circle-check"></i><span>No queda nada por registrar.</span></div>';
+    leido.innerHTML = '<div class="tarjeta" style="padding:32px;display:grid;gap:12px;justify-items:start"><div class="t-seccion">Bandeja vacía</div><p class="t-cuerpo" style="margin:0;color:var(--texto-2)">Cuando alguien saque una foto en el depósito, aparece acá para revisarla.</p><button class="btn btn-oscuro" data-acc="foto"><i class="i i-s" data-i="qr-code"></i>Foto con el celular</button></div>';
+    CP.pintar(papel); CP.pintar(leido);
+  }
+  function reemplazarMovida() {
+    nLumen++;
+    items.movida = null; delete items.movida;
+    items.lumen = Object.assign({}, lumen, { rs: lumen.rs.map(function (r) { return Object.assign({}, r); }) });
+    var it = $('.foto-item[data-b="movida"]');
+    it.setAttribute("data-b", "lumen");
+    it.querySelector(".mini").style.filter = "";
+    it.querySelector("b").textContent = "Electro Lumen";
+    var sp = it.querySelector("span"); sp.className = ""; sp.textContent = "Factura A · 2 de 2 leídos";
+    CP.entrar(it);
+    elegir("lumen");
+  }
+
+  // Una foto nueva llega desde el celular: entra a la bandeja y la insignia salta
+  function llegaFoto() {
+    var id = "lumen" + (++nLumen);
+    items[id] = Object.assign({}, lumen, { rs: lumen.rs.map(function (r) { return Object.assign({}, r); }) });
+    var el = document.createElement("div");
+    el.className = "foto-item"; el.setAttribute("data-b", id);
+    el.innerHTML = '<div class="mini"><img src="../../propio/factura.webp" alt="" style="object-position:0 60%"></div><div><b>Electro Lumen</b><span>Factura A · 2 de 2 leídos</span></div>';
+    var t = $(".bandeja .t");
+    t.parentNode.insertBefore(el, t.nextSibling);
+    CP.entrar(el);
+    contarBandeja(1);
+    CP.tostada("Llegó una foto del celular", { icono: "smartphone" });
+  }
+  function contarBandeja(d) {
+    var n = $$(".foto-item[data-b]").length;
+    [$(".bandeja .t .pastilla"), $('[data-tab="compras"] .insignia'), $(".nav-item.activo .insignia")].forEach(function (x) {
+      if (!x) return; x.textContent = n; x.style.visibility = n ? "" : "hidden"; CP.salta(x);
+    });
+  }
+  function quitarDeBandeja(id) {
+    var el = $('.foto-item[data-b="' + id + '"]');
+    delete items[id];
+    var sig = null;
+    if (el) { var todos = $$(".foto-item[data-b]"); var i = todos.indexOf(el); sig = todos[i + 1] || todos[i - 1]; }
+    if (el) CP.irse(el, function () { contarBandeja(-1); });
+    actual = sig ? sig.getAttribute("data-b") : null;
+    if (sig) setTimeout(function () { elegir(actual); }, 220); else pintarTodo(false);
+  }
+
+  // --- revisar
+  document.addEventListener("mouseover", function (e) {
+    var f = e.target.closest && e.target.closest(".leido .fil[data-r]");
+    if (!f) return;
+    var i = f.getAttribute("data-r");
+    $$(".leido .fil[data-r]").forEach(function (x) { x.classList.toggle("foco", x === f && !x.classList.contains("revisar")); });
+    $$(".papel .marca-r").forEach(function (m) { m.classList.toggle("foco", m.getAttribute("data-m") === i); });
+  });
+  function resolver(crear) {
+    var it = item(); if (!it || !it.rs) return;
+    var i = it.rs.findIndex(function (r) { return r.dudoso; }); if (i < 0) return;
+    var r = it.rs[i];
+    (crear ? CP.crearProducto : CP.elegirProducto)(r, function (p) {
+      it.rs[i] = Object.assign({}, r, { dudoso: false, nom: p.nom, cod: p.cod, foto: null, dif: p.nuevo ? "nuevo" : "sin lista", tipo: p.nuevo ? "sube" : "igual" });
+      if (p.nuevo) it.nuevos++;
+      var viejo = $('.leido .fil[data-r="' + i + '"]');
+      var tmp = document.createElement("div"); tmp.innerHTML = fil(it.rs[i], i); CP.pintar(tmp);
+      var nuevo = tmp.firstChild; viejo.replaceWith(nuevo); CP.entrar(nuevo);
+      var m = $('.papel .marca-r[data-m="' + i + '"]'); if (m) m.classList.remove("dudosa");
+      CP.rodar($("[data-cuenta]") || $(".cobro .tot .t-detalle"), cuenta(it), false);
+      var sp = $('.foto-item[data-b="' + actual + '"] span'); if (sp) CP.rodar(sp, "Leída · lista para registrar", false);
+    });
+  }
+  function elegirPago(seg) {
+    $$("button", seg.parentNode).forEach(function (b) { b.classList.toggle("elegido", b === seg); });
+    if (item()) item().pago = seg.textContent;
+  }
+  function registrar() {
+    var it = item();
+    if (!it || it.movida || $(".cp-capa")) return;
+    var btn = $('.cobro [data-acc="registrar"]');
+    if (!btn || btn.classList.contains("lleno")) return;
+    var dud = $(".leido .fil.revisar");
+    if (dud) { CP.salta(dud); CP.tostada("Falta un renglón: decí qué producto es", { icono: "circle-help" }); return; }
+    btn.classList.add("lleno");
+    btn.querySelector("[data-txt]").innerHTML = '<svg class="i cp-tilde" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:6px"><path d="M20 6 9 17l-5-5"/></svg>Registrada';
+    var res = { proveedor: it.proveedor, comprobante: it.comp, total: CP.suma(it.rs), pago: it.pago || "A 30 días", renglones: it.rs };
+    var id = actual;
+    setTimeout(function () { aRegistradas(res); quitarDeBandeja(id); }, CP.quieto() ? 100 : 600);
+  }
+  function aRegistradas(res) {
+    var id = "h" + Date.now();
+    hechos[id] = CP.desdeRegistro(res);
+    var el = document.createElement("div");
+    el.className = "foto-item hecho"; el.setAttribute("data-hecho", id);
+    el.innerHTML = (hechos[id].foto ? '<div class="mini"><img src="../../propio/factura.webp" alt="" style="opacity:.6"></div>' : '<div class="mini" style="display:grid;place-items:center;color:var(--texto-2)"><i class="i" data-i="notebook-pen"></i></div>') +
+      "<div><b>" + res.proveedor + "</b><span>" + plata(res.total) + " · " + CP.hora() + "</span></div>";
+    CP.pintar(el);
+    var t = $(".bandeja .t.otra");
+    t.parentNode.insertBefore(el, t.nextSibling);
+    CP.entrar(el);
+    if (res.pago !== "Adelantado") CP.sumarA(deudaEl, res.total);
+    CP.tostada("Compra de " + res.proveedor + " registrada · " + (res.pago === "Adelantado" ? "pagada" : CP.vence(res.pago).toLowerCase()));
+  }
+
+  function verPedido() {
+    var it = item();
+    var rs = (it === items.oeste ? CP.renglonesOeste() : CP.renglonesFactura().slice(0, 4).map(function (r) { return Object.assign({}, r, { costo: r.tipo === "sube" ? 3950 : r.tipo === "baja" ? 3050 : r.costo, dif: null }); }));
+    var html = CP.cab("Pedido del 14/10 · " + it.proveedor, "Mandado por WhatsApp · " + rs.length + " renglones") + '<div class="cp-cuerpo">' +
+      rs.map(function (r, i) { return CP.renglonHTML(r, i, { soloVer: true }); }).join("") +
+      '<div class="cp-linea" style="margin-top:12px"><span>Total pedido, a precio de lista</span><b>' + plata(CP.suma(rs)) + "</b></div></div>" +
+      '<div class="cp-pie"><span class="t-detalle">' + (it === items.oeste ? "Llegó todo lo pedido." : "Llegó todo, y además 2 cajas de arandelas que no estaban.") + '</span><div class="cp-der"><button class="btn" data-cerrar>Cerrar</button></div></div>';
+    CP.abrir(html, { clase: "medio" });
+  }
+
+  // --- lo que se les debe
+  var deudasLista = [
+    { id: "sur", titulo: "Ferretera del Sur", detalle: "Venció hace 5 días · 10/10", imp: 186500, rojo: true, icono: "triangle-alert" },
+    { id: "bul1", titulo: "Bulonera Centro", detalle: "Vence en 6 días · 25/10", imp: 412800, icono: "calendar" },
+    { id: "lum", titulo: "Electro Lumen", detalle: "Vence 14/11", imp: 311900, icono: "calendar" },
+    { id: "bul2", titulo: "Bulonera Centro", detalle: "Vence 18/11", imp: 184300, icono: "calendar" }
+  ];
+  function deudas() {
+    var d = CP.lista("Lo que se les debe", "Tocá una para marcarla pagada", [{ titulo: "Ordenado por vencimiento", filas: deudasLista }], function (id, fila) {
+      var x = deudasLista.find(function (q) { return q.id === id; });
+      CP.confirmar("¿Marcar pagado a " + x.titulo + "?", "Se registra el pago de " + plata(x.imp) + " con fecha de hoy.", "Marcar pagada", function () {
+        CP.irse(fila);
+        deudasLista = deudasLista.filter(function (q) { return q !== x; });
+        CP.sumarA(deudaEl, -x.imp);
+        if (x.rojo) CP.sumarA(vencidoEl, -x.imp);
+        CP.tostada("Pago a " + x.titulo + " registrado", { deshacer: function () { deudasLista.unshift(x); CP.sumarA(deudaEl, x.imp); if (x.rojo) CP.sumarA(vencidoEl, x.imp); } });
+      }, { clase: "btn-oscuro" });
+    });
+  }
+
+  // --- la pestaña Pedidos
+  var vistaPedidos = null;
+  function pestana(cual) {
+    $$("[data-tab]").forEach(function (a) { a.classList.toggle("activa", a.getAttribute("data-tab") === cual); });
+    var enPedidos = cual === "pedidos";
+    [bandeja, papel, leido].forEach(function (x) { x.style.display = enPedidos ? "none" : ""; });
+    if (enPedidos && !vistaPedidos) {
+      vistaPedidos = document.createElement("div");
+      vistaPedidos.style.cssText = "grid-column:1/-1;max-width:760px;display:grid;gap:8px;align-content:start";
+      vistaPedidos.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px"><span class="t-seccion">Pedidos</span><button class="btn btn-oscuro chico" data-acc="pedido" style="margin-left:auto"><i class="i i-s" data-i="send"></i>Armar pedido</button></div>' +
+        '<div class="cp-sec">Por llegar</div><div class="cp-lista" data-porllegar>' +
+        CP.filaHTML({ titulo: "Distribuidora Oeste", detalle: "Mandado por WhatsApp el 14/10 · 9 renglones", icono: "truck", boton: "Llegó" }).replace("<button", '<div data-llego="Distribuidora Oeste"').replace(/<\/button>$/, "</div>") +
+        CP.filaHTML({ titulo: "Acindar Distribución", detalle: "Llegó a medias · faltan alambre y clavos 3\"", icono: "truck", boton: "Llegó el resto" }).replace("<button", '<div data-llego="Acindar Distribución" data-resto').replace(/<\/button>$/, "</div>") +
+        '</div><div class="cp-sec">Borradores</div><div class="cp-lista">' + CP.filaHTML({ titulo: "Electro Lumen", detalle: "5 renglones · sin mandar", icono: "clipboard-list", imp: 88400 }).replace("<button", '<div data-acc="pedido"').replace(/<\/button>$/, "</div>") + "</div>";
+      pantalla.appendChild(vistaPedidos); CP.pintar(vistaPedidos);
+    }
+    if (vistaPedidos) { vistaPedidos.style.display = enPedidos ? "grid" : "none"; if (enPedidos) CP.entrar(vistaPedidos); }
+  }
+  function recibir(fila) {
+    var prov = fila.getAttribute("data-llego");
+    CP.revision(CP.compraPedido(prov, fila.hasAttribute("data-resto")), { alRegistrar: function (res) { CP.irse(fila); aRegistradas(res); } });
+  }
+  function pedidoNuevo(p) {
+    var cont = $("[data-porllegar]");
+    var tmp = document.createElement("div");
+    tmp.innerHTML = CP.filaHTML({ titulo: p.proveedor, detalle: "Mandado por WhatsApp hoy · " + p.n + " renglones", icono: "truck", boton: "Llegó" }).replace("<button", '<div data-llego="' + p.proveedor + '"').replace(/<\/button>$/, "</div>");
+    CP.pintar(tmp); var f = tmp.firstChild; cont.appendChild(f); CP.entrar(f);
+    CP.tostada("Pedido mandado por WhatsApp a " + p.proveedor, { icono: "send" });
+  }
+})();
+</script>
 </body>
 </html>

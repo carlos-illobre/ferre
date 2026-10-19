@@ -6,6 +6,7 @@
 <title>Compras · Resumen (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
+<link rel="stylesheet" href="../../propio/interacciones.css">
 <style>
   body { width: 390px; }
   .celu-pantalla { position: relative; }
@@ -41,55 +42,157 @@
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
-  <nav class="celu-pestanas"><a>Stock</a><a class="activa">Compras</a><a>Contar</a></nav>
+  <nav class="celu-pestanas"><a data-ir="stock">Stock</a><a class="activa" data-no-ir>Compras</a><a data-ir="contar">Contar</a></nav>
   <div class="celu-pantalla">
     <div class="kpis">
-      <div class="resumen"><div class="et">Esta semana</div><div class="va"><span class="peso">$</span>615.350</div>
+      <div class="resumen cp-click" data-acc="semana"><div class="et">Esta semana</div><div class="va"><span class="peso">$</span>615.350</div>
         <div class="barras"><b style="height:70%"></b><b style="height:30%"></b><b style="height:100%"></b><b style="height:20%"></b><b style="height:55%"></b><b style="height:10%"></b><b class="hoy" style="height:65%"></b></div></div>
-      <div class="resumen error"><div class="et">Se les debe</div><div class="va" style="color:var(--tinta)"><span class="peso">$</span>1.095.500</div><div class="sub">$186.500 vencido</div></div>
+      <div class="resumen error cp-click" data-acc="deudas"><div class="et">Se les debe</div><div class="va" style="color:var(--tinta)"><span class="peso">$</span>1.095.500</div><div class="sub">$186.500 vencido</div></div>
     </div>
 
-    <div class="sec"><span class="t-seccion">Por llegar</span><a>Pedidos (4)</a></div>
-    <div class="fila">
+    <div class="sec"><span class="t-seccion">Por llegar</span><a data-acc="pedidos">Pedidos (4)</a></div>
+    <div class="fila" data-pedido="Distribuidora Oeste">
       <span class="ic"><i class="i" data-i="truck"></i></span>
       <div><b>Distribuidora Oeste</b><span class="d">Hace 5 días · 9 renglones</span></div>
       <button class="btn btn-suave chico">Llegó</button>
     </div>
-    <div class="fila">
+    <div class="fila" data-pedido="Acindar Distribución" data-resto>
       <span class="ic"><i class="i" data-i="truck"></i></span>
       <div><b>Acindar Distribución</b><span class="d ambar">Llegó a medias · faltan 2</span></div>
       <button class="btn btn-suave chico">Llegó</button>
     </div>
 
-    <div class="sec"><span class="t-seccion">Recientes</span><a>Ver todas</a></div>
-    <div class="fila">
+    <div class="sec"><span class="t-seccion">Recientes</span><a data-acc="semana">Ver todas</a></div>
+    <div class="fila cp-click" data-c="bulonera">
       <span class="ic"><img src="../../propio/factura.webp" alt=""></span>
       <div><b>Bulonera Centro</b><span class="d">Hoy · Factura · a 30 días</span></div>
       <div class="imp"><span class="peso">$</span>184.300</div>
     </div>
-    <div class="fila">
+    <div class="fila cp-click" data-c="oeste">
       <span class="ic"><img src="../../propio/factura.webp" alt="" style="object-position:0 40%"></span>
       <div><b>Distribuidora Oeste</b><span class="d" style="color:var(--logro-texto)">Ayer · Remito · pagada</span></div>
       <div class="imp"><span class="peso">$</span>96.750</div>
     </div>
-    <div class="fila">
+    <div class="fila cp-click" data-c="sur">
       <span class="ic"><i class="i" data-i="notebook-pen"></i></span>
       <div><b>Ferretera del Sur</b><span class="d">Jueves · Sin comprobante</span></div>
       <div class="imp"><span class="peso">$</span>22.400</div>
     </div>
   </div>
   <div class="barra-accion">
-    <button class="btn btn-accion grande"><i class="i i-l" data-i="camera"></i><span>Sacale foto a la factura<small>La compra se arma sola</small></span></button>
-    <button class="btn grande btn-icono" style="width:56px" aria-label="Escanear productos"><i class="i i-l" data-i="scan-barcode"></i></button>
+    <button class="btn btn-accion grande" data-acc="foto"><i class="i i-l" data-i="camera"></i><span>Sacale foto a la factura<small>La compra se arma sola</small></span></button>
+    <button class="btn grande btn-icono" style="width:56px" aria-label="Escanear productos" data-acc="escanear"><i class="i i-l" data-i="scan-barcode"></i></button>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a class="activo"><i class="i" data-i="package"></i>Depósito</a>
-    <a><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo" data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="../../propio/interacciones.js"></script>
+<script>
+// Celu 1 · Resumen: lo que se puede tocar
+(function () {
+  var $ = CP.$, $$ = CP.$$, plata = CP.plata;
+  var kSemana = $('[data-acc="semana"] .va'), kDebe = $('[data-acc="deudas"] .va'), kVenc = $('[data-acc="deudas"] .sub');
+  var compras = Object.assign({}, CP.COMPRAS);
+  var vencido = 186500, n = 0;
+  var deudas = [
+    { id: "sur", titulo: "Ferretera del Sur", detalle: "Venció hace 5 días", imp: 186500, rojo: true, icono: "triangle-alert" },
+    { id: "bul1", titulo: "Bulonera Centro", detalle: "Vence en 6 días · 25/10", imp: 412800, icono: "calendar" },
+    { id: "lum", titulo: "Electro Lumen", detalle: "Vence 14/11", imp: 311900, icono: "calendar" },
+    { id: "bul2", titulo: "Bulonera Centro", detalle: "Vence 18/11", imp: 184300, icono: "calendar" }
+  ];
+
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".cp-capa")) return;
+    if (t.closest("[data-mas]")) return CP.mas(t.closest("[data-mas]"));
+    var llego = t.closest("[data-pedido] .btn"); if (llego) return recibir(llego.closest("[data-pedido]"));
+    var acc = t.closest("[data-acc]"); if (acc) return accion(acc.getAttribute("data-acc"));
+    var c = t.closest(".fila[data-c]"); if (c) return CP.detalle(compras[c.getAttribute("data-c")]);
+  });
+
+  function accion(a) {
+    if (a === "foto") CP.camara(function (r) {
+      if (r.sinPapel) CP.revision({ proveedor: "Ferretera del Sur", comprobante: "Sin comprobante", manual: true, renglones: [], pago: "Adelantado" }, { alRegistrar: agregar });
+      else CP.revision(CP.compraFactura(), { alRegistrar: agregar });
+    });
+    if (a === "escanear") CP.camara(function (lista) {
+      CP.revision({ proveedor: "Ferretera del Sur", comprobante: "Sin comprobante", manual: true, renglones: lista, pago: "Adelantado" }, { alRegistrar: agregar });
+    }, { modo: "codigos" });
+    if (a === "semana") semana();
+    if (a === "deudas") verDeudas();
+    if (a === "pedidos") pedidos();
+  }
+
+  // Registrar: la compra entra primera en Recientes y lo gastado rueda hacia arriba
+  function agregar(res) {
+    n++;
+    var id = "nueva" + n;
+    compras[id] = CP.desdeRegistro(res);
+    var f = document.createElement("div");
+    f.className = "fila cp-click"; f.setAttribute("data-c", id);
+    f.innerHTML = (compras[id].foto ? '<span class="ic"><img src="../../propio/factura.webp" alt=""></span>' : '<span class="ic"><i class="i" data-i="notebook-pen"></i></span>') +
+      "<div><b>" + res.proveedor + '</b><span class="d"' + (res.pago === "Adelantado" ? ' style="color:var(--logro-texto)"' : "") + ">Hoy · " + (res.comprobante === "Factura A" ? "Factura" : res.comprobante) + " · " + (res.pago === "Adelantado" ? "pagada" : res.pago.toLowerCase()) + '</span></div><div class="imp">' + plata(res.total) + "</div>";
+    CP.pintar(f);
+    var sec = $$(".sec")[1];
+    sec.after(f);
+    CP.entrar(f);
+    CP.sumarA(kSemana, res.total);
+    var hoy = $(".barras b.hoy"); hoy.style.height = "100%";
+    if (res.pago !== "Adelantado") CP.sumarA(kDebe, res.total);
+    CP.tostada("Compra registrada · " + plata(res.total).replace(/<[^>]+>/g, ""));
+  }
+  function recibir(fila) {
+    CP.revision(CP.compraPedido(fila.getAttribute("data-pedido"), fila.hasAttribute("data-resto")), {
+      alRegistrar: function (res) { CP.irse(fila); agregar(res); }
+    });
+  }
+  function semana() {
+    var filas = Object.keys(compras).filter(function (k) { return k !== "acindar"; }).reverse().map(function (k) {
+      var c = compras[k]; return { id: k, titulo: c.proveedor, detalle: c.cuando + " · " + c.comprobante, imp: c.total, chico: c.pagada ? "pagada" : (c.vence || ""), foto: c.foto, icono: "notebook-pen" };
+    });
+    CP.lista("Compras de la semana", "Gastado: $" + CP.miles(CP.leer(kSemana)), [{ filas: filas }, { titulo: "Anuladas (no suman)", filas: [{ id: "acindar", titulo: "Acindar Distribución", detalle: "Lunes 13 · Factura A", imp: 58000, chico: "anulada", foto: true, anulada: true }] }], function (id) { CP.detalle(compras[id]); });
+  }
+  function verDeudas() {
+    CP.lista("Lo que se les debe", "Tocá una para marcarla pagada", [{ filas: deudas }], function (id, fila) {
+      var x = deudas.find(function (q) { return q.id === id; });
+      CP.confirmar("¿Marcar pagado a " + x.titulo + "?", "Se registra el pago de " + plata(x.imp) + " con fecha de hoy.", "Marcar pagada", function () {
+        CP.irse(fila);
+        deudas = deudas.filter(function (q) { return q !== x; });
+        CP.sumarA(kDebe, -x.imp);
+        if (x.rojo) { vencido -= x.imp; CP.rodar(kVenc, vencido ? "$" + CP.miles(vencido) + " vencido" : "Nada vencido", false); }
+        CP.vibrar([10, 40, 10]);
+        CP.tostada("Pago a " + x.titulo + " registrado", { deshacer: function () {
+          deudas.unshift(x); CP.sumarA(kDebe, x.imp);
+          if (x.rojo) { vencido += x.imp; CP.rodar(kVenc, "$" + CP.miles(vencido) + " vencido", true); }
+        } });
+      }, { clase: "btn-oscuro" });
+    });
+  }
+  function pedidos() {
+    var por = $$("[data-pedido]").map(function (f) { return { id: "p:" + f.getAttribute("data-pedido"), titulo: f.getAttribute("data-pedido"), detalle: f.querySelector(".d").textContent, icono: "truck", boton: "Llegó" }; });
+    CP.lista("Pedidos", por.length + " por llegar · 2 borradores", [{ titulo: "Por llegar", filas: por }, { titulo: "Borradores", filas: [
+      { id: "b:Electro Lumen", titulo: "Electro Lumen", detalle: "5 renglones · sin mandar", imp: 88400, icono: "clipboard-list" },
+      { id: "b:Ferretera del Sur", titulo: "Ferretera del Sur", detalle: "4 productos bajo el mínimo", imp: 46300, icono: "clipboard-list" }] }],
+      function (id, el, hoja) {
+        var nom = id.slice(2);
+        if (id[0] === "p") { hoja.cerrar(); recibir($('[data-pedido="' + nom + '"]')); }
+        else CP.pedido({ proveedor: nom }, function (p) {
+          CP.irse(el);
+          var f = document.createElement("div"); f.className = "fila"; f.setAttribute("data-pedido", p.proveedor);
+          f.innerHTML = '<span class="ic"><i class="i" data-i="truck"></i></span><div><b>' + p.proveedor + '</b><span class="d">Hoy · ' + p.n + ' renglones</span></div><button class="btn btn-suave chico">Llegó</button>';
+          CP.pintar(f); var ult = $$("[data-pedido]").pop() || $$(".sec")[0]; ult.after(f); CP.entrar(f);
+          CP.tostada("Pedido mandado por WhatsApp", { icono: "send" });
+        });
+      });
+  }
+})();
+</script>
 </body>
 </html>

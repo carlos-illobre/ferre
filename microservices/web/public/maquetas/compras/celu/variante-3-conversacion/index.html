@@ -6,6 +6,7 @@
 <title>Compras · El proveedor como conversación (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
+<link rel="stylesheet" href="../../propio/interacciones.css">
 <style>
   body { width: 390px; }
   .cab { display: flex; align-items: center; gap: 10px; padding: 2px 12px 10px; }
@@ -52,16 +53,16 @@
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="provs">
-    <div class="prov activo"><span class="av">BC<span class="insignia">1</span></span>Bulonera</div>
-    <div class="prov"><span class="av">FS<span class="insignia roja">!</span></span>Ferretera Sur</div>
-    <div class="prov"><span class="av">DO</span>Distrib. Oeste</div>
-    <div class="prov"><span class="av">EL</span>Electro Lumen</div>
-    <div class="prov"><span class="av" style="background:transparent;border:1.5px dashed var(--borde-fuerte);box-shadow:none"><i class="i" data-i="plus"></i></span>Pedido</div>
+    <div class="prov activo cp-click" data-p="bulonera"><span class="av">BC<span class="insignia">1</span></span>Bulonera</div>
+    <div class="prov cp-click" data-p="sur"><span class="av">FS<span class="insignia roja">!</span></span>Ferretera Sur</div>
+    <div class="prov cp-click" data-p="oeste"><span class="av">DO</span>Distrib. Oeste</div>
+    <div class="prov cp-click" data-p="lumen"><span class="av">EL</span>Electro Lumen</div>
+    <div class="prov cp-click" data-acc="pedido-nuevo"><span class="av" style="background:transparent;border:1.5px dashed var(--borde-fuerte);box-shadow:none"><i class="i" data-i="plus"></i></span>Pedido</div>
   </div>
   <div class="cab" style="padding-top:10px">
-    <span class="redondo" style="background:var(--superficie);border:1px solid var(--borde)"><i class="i" data-i="arrow-left"></i></span>
+    <span class="redondo cp-click" data-acc="atras" role="button" aria-label="Volver" style="background:var(--superficie);border:1px solid var(--borde)"><i class="i" data-i="arrow-left"></i></span>
     <div class="t"><b>Bulonera Centro</b><span>Se le debe $597.100 · vence en 6 días</span></div>
-    <span class="redondo"><i class="i" data-i="ellipsis"></i></span>
+    <span class="redondo cp-click" data-acc="menu" role="button" aria-label="Más opciones"><i class="i" data-i="ellipsis"></i></span>
   </div>
 
   <div class="hilo">
@@ -71,26 +72,209 @@
     </div>
     <div class="dia">Hoy</div>
     <div class="burbuja suya" style="padding:6px">
-      <div class="foto-f"><img src="../../propio/factura.webp" alt="Foto de la factura"><span class="pastilla contorno"><i class="i i-s" data-i="camera"></i>Factura A</span></div>
+      <div class="foto-f cp-click" data-acc="ver-foto"><img src="../../propio/factura.webp" alt="Foto de la factura"><span class="pastilla contorno"><i class="i i-s" data-i="camera"></i>Factura A</span></div>
       <div class="meta" style="padding:0 4px">foto de Marcelo · 10:38</div>
     </div>
     <div class="sistema">
       <div class="t"><i class="i" data-i="sparkles"></i>La leí: coincide con tu pedido</div>
       <div class="grid">
         <div><small>Llegó</small><b>5 de 5</b></div>
-        <div class="urg"><small>Revisar</small><b>1</b></div>
+        <div class="urg cp-click" data-acc="revisar"><small>Revisar</small><b>1</b></div>
         <div><small>A 30 días</small><b>17/11</b></div>
       </div>
-      <button class="btn btn-accion grande"><span>Registrar</span><span><span class="peso">$</span>253.220</span></button>
+      <button class="btn btn-accion grande cp-llenar" data-acc="registrar"><span>Registrar</span><span><span class="peso">$</span>253.220</span></button>
     </div>
   </div>
 
-  <div class="chips-r"><span class="chip"><i class="i i-s" data-i="check"></i>Marcar pagado</span><span class="chip"><i class="i i-s" data-i="send"></i>Pedir lo de siempre</span><span class="chip">Ver compras</span></div>
+  <div class="chips-r"><span class="chip cp-click" data-acc="pagado"><i class="i i-s" data-i="check"></i>Marcar pagado</span><span class="chip cp-click" data-acc="siempre"><i class="i i-s" data-i="send"></i>Pedir lo de siempre</span><span class="chip cp-click" data-acc="ver-compras">Ver compras</span></div>
   <div class="compositor">
-    <span class="campo">Pedile algo a Bulonera…</span>
-    <span class="cam"><i class="i i-l" data-i="camera"></i></span>
+    <span class="campo cp-click" data-acc="escribir">Pedile algo a Bulonera…</span>
+    <span class="cam cp-click" data-acc="camara" role="button" aria-label="Sacar foto a una factura"><i class="i i-l" data-i="camera"></i></span>
   </div>
   <span class="home-ind"></span>
 </div>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="../../propio/interacciones.js"></script>
+<style>
+  .hecho-r { align-self: center; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 750; color: var(--logro-texto); background: var(--logro-suave); padding: 4px 12px; border-radius: 99px; }
+  .hecho-r.pago { color: var(--pino-texto); background: var(--pino-suave); }
+  .sistema .grid > div.cp-nuevo { animation-duration: 320ms, 0s; }
+  .chats .cp-fila .cp-ic { border-radius: 99px; background: var(--hundido-2); color: var(--tinta); font-weight: 800; font-size: 15px; }
+</style>
+<script>
+// Celu 3 · El proveedor es un chat: lo que se puede tocar
+(function () {
+  var $ = CP.$, $$ = CP.$$, plata = CP.plata;
+  var hilo = $(".hilo"), nombre = $(".cab .t b"), sub = $(".cab .t span"), campo = $(".compositor .campo");
+  var actual = "bulonera";
+  var datos = {
+    bulonera: { nombre: "Bulonera Centro", corto: "Bulonera", debe: 597100, nota: "vence en 6 días", deudas: [{ id: "b1", titulo: "Factura del 25/09", detalle: "Vence en 6 días · 25/10", imp: 412800, icono: "calendar" }, { id: "b2", titulo: "Factura de hoy 09:40", detalle: "Vence 18/11", imp: 184300, icono: "calendar" }] },
+    sur: { nombre: "Ferretera del Sur", corto: "Ferretera Sur", debe: 186500, nota: "venció hace 5 días", rojo: true, deudas: [{ id: "s1", titulo: "Factura del 10/09", detalle: "Venció hace 5 días", imp: 186500, rojo: true, icono: "triangle-alert" }] },
+    oeste: { nombre: "Distribuidora Oeste", corto: "Distrib. Oeste", debe: 0, nota: "1 pedido por llegar", deudas: [] },
+    lumen: { nombre: "Electro Lumen", corto: "Electro Lumen", debe: 311900, nota: "vence el 14/11", deudas: [{ id: "l1", titulo: "Factura del 15/10", detalle: "Vence 14/11", imp: 311900, icono: "calendar" }] }
+  };
+  var meta = function (t) { return '<div class="meta">' + t + "</div>"; };
+  var hilos = {
+    sur: '<div class="hecho-r"><i class="i i-s" data-i="circle-check"></i>Compra registrada · $186.500 · 10/09</div><div class="dia">Hoy</div>' +
+      '<div class="sistema" data-s="deuda"><div class="t" style="color:var(--error-texto)"><i class="i" data-i="triangle-alert" style="color:var(--error-texto)"></i>Venció hace 5 días</div><div class="grid"><div><small>Factura</small><b>10/09</b></div><div><small>A 30 días</small><b>14/10</b></div><div class="urg"><small>Atraso</small><b>5 días</b></div></div><button class="btn btn-oscuro grande" data-acc="pagar-sur" style="justify-content:space-between"><span>Marcar pagado</span><span>' + plata(186500) + "</span></button></div>",
+    oeste: '<div class="burbuja mia"><div class="tit"><i class="i i-s" data-i="clipboard-list"></i>Pedido del 14/10 · 9 renglones</div>' + meta('por WhatsApp · 14/10 <i class="i i-s" data-i="check"></i>') + "</div>" +
+      '<div class="burbuja suya">Sale mañana con el reparto de la tarde.' + meta("Distribuidora Oeste · 15/10") + "</div><div class=\"dia\">Hoy</div>" +
+      '<div class="sistema"><div class="t"><i class="i" data-i="truck"></i>¿Llegó el pedido?</div><div class="t-detalle">Si llegó, lo armo como compra con lo pedido: corregís lo que falte.</div><button class="btn btn-accion grande" data-acc="llego-oeste" style="justify-content:space-between"><span>Llegó</span><span>' + plata(142600) + "</span></button></div>",
+    lumen: '<div class="dia">Miércoles 15</div><div class="hecho-r"><i class="i i-s" data-i="circle-check"></i>Compra registrada · $311.900 · Factura A</div>' +
+      '<div class="burbuja suya">Ya tenemos de vuelta las LED 12 W cálidas, por si querés.' + meta("Electro Lumen · ayer") + "</div>"
+  };
+
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.closest(".cp-capa")) return;
+    var p = t.closest(".prov[data-p]"); if (p) return cambiar(p.getAttribute("data-p"));
+    var acc = t.closest("[data-acc]"); if (acc) return accion(acc.getAttribute("data-acc"), acc);
+  });
+
+  function accion(a, el) {
+    var d = datos[actual];
+    switch (a) {
+      case "ver-foto": return CP.verFoto("Factura A 0004-00012345", "Foto de Marcelo · hoy 10:38");
+      case "registrar": return registrar(el.closest(".sistema"));
+      case "revisar": var s = el.closest(".sistema"); return CP.revision(CP.compraFactura(), { alRegistrar: function (res) { registrada(s, res.total, false, CP.desdeRegistro(res)); } });
+      case "pagado": return pagado();
+      case "siempre": return CP.pedido({ proveedor: d.nombre, titulo: "Lo de siempre a " + d.corto }, function (p) {
+        burbuja('<div class="burbuja mia"><div class="tit"><i class="i i-s" data-i="clipboard-list"></i>Pedido · ' + p.n + " renglones · " + plata(p.total) + "</div>" + meta('por WhatsApp · ahora <i class="i i-s" data-i="check"></i>') + "</div>");
+      });
+      case "ver-compras": return verCompras();
+      case "escribir": return escribir();
+      case "camara": return CP.camara(llegaFoto);
+      case "atras": return chats();
+      case "menu": return menu();
+      case "pedido-nuevo": return CP.pedido({ titulo: "Pedido nuevo" }, function (p) {
+        var id = Object.keys(datos).find(function (k) { return datos[k].nombre === p.proveedor; }) || "bulonera";
+        cambiar(id);
+        burbuja('<div class="burbuja mia"><div class="tit"><i class="i i-s" data-i="clipboard-list"></i>Pedido · ' + p.n + " renglones · " + plata(p.total) + "</div>" + meta('por WhatsApp · ahora <i class="i i-s" data-i="check"></i>') + "</div>");
+      });
+      case "pagar-sur": return pagar(datos.sur.deudas[0], el.closest(".sistema"));
+      case "llego-oeste": var s2 = el.closest(".sistema"); return CP.revision(CP.compraPedido("Distribuidora Oeste"), { alRegistrar: function (res) { registrada(s2, res.total, true, CP.desdeRegistro(res)); } });
+      case "registrar-2": return registrada(el.closest(".sistema"), 48600);
+    }
+  }
+
+  function burbuja(html) {
+    var t = document.createElement("div"); t.innerHTML = html; CP.pintar(t);
+    var b = t.firstChild; hilo.appendChild(b); CP.entrar(b);
+    // el hilo muestra lo último; lo viejo se va por arriba
+    while (hilo.scrollHeight > hilo.clientHeight + 4 && hilo.children.length > 2) hilo.removeChild(hilo.firstChild);
+    return b;
+  }
+  function cabecera() {
+    var d = datos[actual];
+    nombre.textContent = d.nombre;
+    CP.rodar(sub, d.debe ? "Se le debe $" + CP.miles(d.debe) + " · " + d.nota : "Al día · " + d.nota, false);
+    sub.style.color = d.rojo ? "var(--error-texto)" : d.debe ? "" : "var(--logro-texto)";
+    campo.textContent = "Pedile algo a " + d.corto.split(" ")[0] + "…";
+  }
+  function cambiar(id) {
+    if (id === actual) return;
+    hilos[actual] = hilo.innerHTML;
+    actual = id;
+    $$(".prov[data-p]").forEach(function (p) { p.classList.toggle("activo", p.getAttribute("data-p") === id); });
+    hilo.innerHTML = hilos[id]; CP.pintar(hilo);
+    if (!CP.quieto() && hilo.animate) hilo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+    cabecera();
+  }
+  function insignia(id) { var i = $('.prov[data-p="' + id + '"] .insignia'); if (i) CP.irse(i); }
+
+  // Registrar: la respuesta del sistema se convierte en un renglón chico
+  function registrar(sis) {
+    var r = CP.renglonesFactura()[4];
+    CP.elegirProducto(r, function () { registrada(sis, 253220); });
+  }
+  // Las compras que se registran en esta visita, por proveedor, para «Ver compras»
+  var nuevas = { bulonera: [], sur: [], oeste: [], lumen: [] }, vistas = {};
+  function anotar(det) {
+    var id = "n" + Date.now();
+    vistas[id] = det;
+    nuevas[actual].unshift({ id: id, titulo: det.cuando + " · " + det.comprobante, detalle: det.n + " renglones · " + (det.pagada ? "pagada" : det.vence.toLowerCase()), imp: det.total, foto: det.foto, icono: "notebook-pen" });
+  }
+  function registrada(sis, total, esPedido, det) {
+    anotar(det || { proveedor: datos[actual].nombre, cuando: "Hoy " + CP.hora(), comprobante: total === 48600 ? "Remito" : "Factura A", n: total === 48600 ? 3 : 5, total: total, pago: "A 30 días", vence: "Vence 18/11", foto: true,
+      muestra: total === 48600 ? CP.renglonesOeste().slice(0, 3) : CP.renglonesFactura().slice(0, 3) });
+    var btn = sis.querySelector(".btn-accion, [data-acc]");
+    var fila = document.createElement("div");
+    fila.className = "hecho-r";
+    fila.innerHTML = '<i class="i i-s" data-i="circle-check"></i>Compra registrada · ' + plata(total).replace(/<[^>]+>/g, "");
+    CP.pintar(fila);
+    CP.vibrar([10, 40, 10]);
+    CP.irse(sis, function () { hilo.appendChild(fila); CP.entrar(fila); });
+    var d = datos[actual];
+    d.debe += total; d.nota = esPedido ? "vence el 18/11" : d.nota;
+    d.deudas.push({ id: "n" + Date.now(), titulo: "Compra de hoy", detalle: "Vence 18/11", imp: total, icono: "calendar" });
+    cabecera();
+    insignia(actual);
+    CP.tostada("Compra registrada · " + plata(total).replace(/<[^>]+>/g, ""));
+  }
+  function pagado() {
+    var d = datos[actual];
+    if (!d.deudas.length) return CP.tostada("A " + d.nombre + " no se le debe nada", { icono: "circle-check" });
+    CP.lista("Marcar pagado a " + d.corto, "Elegí qué pagaste", [{ filas: d.deudas }], function (id, f, hoja) {
+      hoja.cerrar(); pagar(d.deudas.find(function (x) { return x.id === id; }));
+    });
+  }
+  function pagar(x, sis) {
+    var d = datos[actual];
+    d.deudas = d.deudas.filter(function (q) { return q !== x; });
+    d.debe -= x.imp; if (!d.debe) { d.rojo = false; d.nota = "todo pagado"; } else if (d.rojo) { d.rojo = false; d.nota = "vence en 6 días"; }
+    if (sis) CP.irse(sis);
+    var b = burbuja('<div class="hecho-r pago"><i class="i i-s" data-i="hand-coins"></i>Pagado · ' + plata(x.imp).replace(/<[^>]+>/g, "") + " · hoy</div>");
+    cabecera();
+    if (actual === "sur") insignia("sur");
+    CP.vibrar([10, 40, 10]);
+    CP.tostada("Pago registrado", { deshacer: function () { b.remove(); d.deudas.unshift(x); d.debe += x.imp; d.nota = x.rojo ? "venció hace 5 días" : d.nota; d.rojo = !!x.rojo; cabecera(); } });
+  }
+  function verCompras() {
+    var d = datos[actual];
+    var filas = actual === "bulonera" ? [{ id: "bulonera", titulo: "Hoy 09:40 · Factura A", detalle: "7 renglones · vence 18/11", imp: 184300, foto: true }]
+      : actual === "sur" ? [{ id: "sur", titulo: "Jueves · Sin comprobante", detalle: "3 renglones · pagada", imp: 22400, icono: "notebook-pen" }]
+      : actual === "oeste" ? [{ id: "oeste", titulo: "Ayer · Remito", detalle: "4 renglones · pagada", imp: 96750, foto: true, pos: "0 40%" }]
+      : [{ id: "lumen", titulo: "Miércoles 15 · Factura A", detalle: "12 renglones · vence 14/11", imp: 311900, foto: true }];
+    CP.lista("Compras a " + d.corto, "Las de este mes", [{ filas: nuevas[actual].concat(filas) }], function (id) { CP.detalle(vistas[id] || CP.COMPRAS[id]); });
+  }
+  function escribir() {
+    var d = datos[actual];
+    var frases = ["¿Tienen arandelas grower 8 mm?", "¿Cuándo llega lo que falta?", "Mandame la factura por mail, por favor"];
+    var m = CP.menu(null, frases.map(function (f) { return { texto: f, icono: "message-circle", accion: function () {
+      burbuja('<div class="burbuja mia">' + f + meta('ahora <i class="i i-s" data-i="check"></i>') + "</div>");
+      setTimeout(function () { burbuja('<div class="burbuja suya">' + (f.indexOf("arandelas") >= 0 ? "Sí, te las mando con lo próximo." : f.indexOf("mail") >= 0 ? "Listo, ya te la mandé." : "Mañana a la tarde sale.") + meta(d.nombre + " · ahora") + "</div>"); }, CP.quieto() ? 50 : 1200);
+    } }; }), { titulo: "Escribile a " + d.corto });
+    return m;
+  }
+  // La foto que sacás en el hilo: entra la foto y después la respuesta del sistema, con sus datos de a uno
+  function llegaFoto(r) {
+    if (r && r.sinPapel) return CP.revision({ proveedor: datos[actual].nombre, comprobante: "Sin comprobante", manual: true, renglones: [] }, { alRegistrar: function (res) { anotar(CP.desdeRegistro(res)); burbuja('<div class="hecho-r"><i class="i i-s" data-i="circle-check"></i>Compra registrada · ' + plata(res.total).replace(/<[^>]+>/g, "") + "</div>"); } });
+    burbuja('<div class="burbuja suya" style="padding:6px"><div class="foto-f cp-click" data-acc="ver-foto"><img src="../../propio/factura.webp" alt="Foto del remito" style="object-position:0 40%"><span class="pastilla contorno"><i class="i i-s" data-i="camera"></i>Remito</span></div>' + meta("foto tuya · ahora") + "</div>");
+    setTimeout(function () {
+      var s = burbuja('<div class="sistema"><div class="t"><i class="i" data-i="sparkles"></i>La leí: es un remito sin pedido</div><div class="grid"><div><small>Llegó</small><b>3 renglones</b></div><div><small>Revisar</small><b>0</b></div><div><small>A 30 días</small><b>18/11</b></div></div><button class="btn btn-accion grande" data-acc="registrar-2" style="justify-content:space-between"><span>Registrar</span><span>' + plata(48600) + "</span></button></div>");
+      $$(".grid > div", s).forEach(function (g, i) { g.style.opacity = 0; setTimeout(function () { g.style.opacity = ""; CP.entrar(g); }, CP.quieto() ? 0 : 200 + i * 160); });
+    }, CP.quieto() ? 50 : 700);
+  }
+  function chats() {
+    var ult = { bulonera: "La leí: coincide con tu pedido", sur: "Venció hace 5 días · $186.500", oeste: "Sale mañana con el reparto", lumen: "Ya tenemos de vuelta las LED 12 W" };
+    var filas = Object.keys(datos).map(function (k) {
+      return '<button class="cp-fila" data-chat="' + k + '"><span class="cp-ic">' + $('.prov[data-p="' + k + '"] .av').firstChild.textContent + '</span><span style="min-width:0"><b>' + datos[k].nombre + '</b><span class="cp-d' + (datos[k].rojo ? " rojo" : "") + '">' + ult[k] + "</span></span>" + CP.ico("chevron-right") + "</button>";
+    }).join("");
+    var d = CP.abrir(CP.cab("Compras", "Una conversación por proveedor") + '<div class="cp-cuerpo chats"><div class="cp-lista">' + filas + "</div></div>", { clase: "alta" });
+    d.el.addEventListener("click", function (e) { var f = e.target.closest("[data-chat]"); if (f) { d.cerrar(); cambiar(f.getAttribute("data-chat")); } });
+  }
+  function menu() {
+    var d = datos[actual];
+    CP.menu(null, [
+      { texto: "Ver compras a " + d.corto, icono: "receipt", accion: verCompras },
+      { texto: "Marcar pagado", icono: "hand-coins", accion: pagado },
+      { sep: true }, { rotulo: "Ir a otra pantalla" },
+      { texto: "Vender", icono: "shopping-cart", ir: "vender" }, { texto: "Catálogo", icono: "tags", ir: "productos" },
+      { texto: "Stock", icono: "package", ir: "stock" }, { texto: "Contar", icono: "clipboard-list", ir: "contar" },
+      { texto: "Negocio", icono: "chart-column", ir: "resumen" }
+    ].concat(CP.MAS), { titulo: d.nombre });
+  }
+})();
+</script>
 </body>
 </html>
