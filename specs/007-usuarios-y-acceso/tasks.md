@@ -57,3 +57,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T046 [ajuste] En la entrada del celular queda la versión de hoy (v1 de las maquetas) y la frase bajo el logotipo pasa a «Vendé, contá y cobrá desde el mostrador o el depósito.» (decisión 117)
 - [x] T047 [interfaz] Entrada de la computadora: la tarjeta de la derecha como la v2, con el isotipo en el QR, el estado real de la conexión arriba y las tres características técnicas abajo (decisión 118)
 - [x] T048 [ajuste] Entrada de la computadora: las tres características de abajo se ven claras sobre la foto oscura y oscuras sobre lo claro
+- [x] T049 [ajuste] Entrada de la computadora: los dos pasos van centrados al alto del código

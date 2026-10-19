@@ -81,7 +81,7 @@
 .entrar-cc-tarjeta h2 { margin: 0 0 0 calc(8 * var(--u)); font-size: max(26px, calc(36 * var(--u))); font-weight: 800; letter-spacing: -0.01em; line-height: 1.1; }
 .entrar-cc-rapido { margin: calc(-14 * var(--u)) 0 calc(8 * var(--u)) calc(8 * var(--u)); font-size: max(15px, calc(19 * var(--u))); color: var(--p-texto-2, #4a5451); }
 .entrar-cc-pastilla { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin: 0 0 calc(-8 * var(--u)) calc(8 * var(--u)); padding: 4px 12px; border-radius: 999px; background: #e3eee8; color: #17614e; font-size: 14px; font-weight: 700; }
-.entrar-cc-tarjeta .entrar-codigo { align-items: flex-start; gap: calc(30 * var(--u)); margin-left: calc(8 * var(--u)); }
+.entrar-cc-tarjeta .entrar-codigo { align-items: center; gap: calc(30 * var(--u)); margin-left: calc(8 * var(--u)); }
 .entrar-cc-tarjeta .entrar-qr { position: relative; width: calc(200 * var(--u)); height: calc(200 * var(--u)); padding: calc(12 * var(--u)); border: 0; border-radius: 16px; box-shadow: 0 4px 16px rgb(0 0 0 / 0.08), 0 0 0 1px #e3e8e4; transition: opacity 0.3s; }
 /* El isotipo en el centro del código (decisión 118), con un recuadro blanco que lo separa. */
 .entrar-cc-tarjeta .entrar-qr .entrar-qr-isotipo { position: absolute; height: auto; background-color: #fff; background-repeat: no-repeat; background-position: center; background-size: contain; background-origin: content-box; left: 50%; top: 50%; translate: -50% -50%; aspect-ratio: 1; box-sizing: content-box; padding: 3px; border-radius: 8px; background: #fff; }
