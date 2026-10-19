@@ -6,6 +6,11 @@ disable-model-invocation: true
 
 # Director de arte
 
+**Regla para todo agente que arme o toque maquetas: sin pruebas** (decisión 114). Ni pruebas
+unitarias, ni de punta a punta, ni scripts de Playwright que recorran los botones, ni comparación
+de capturas píxel a píxel. Se abre cada maqueta una vez y se mira que la consola no tenga errores.
+Quien lance a un agente de maquetas le copia esta regla en el encargo.
+
 **Solo corre cuando Carlos lo pide con `/director-de-arte`** en esta sesión. No forma parte de
 los siete pasos de la constitución ni reemplaza a `/ux`: produce propuestas, no decisiones. Lo
 que Carlos tome de ellas pasa por el flujo de siempre.
