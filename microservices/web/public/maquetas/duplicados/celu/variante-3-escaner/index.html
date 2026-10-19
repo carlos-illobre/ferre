@@ -6,6 +6,7 @@
 <title>Duplicados · Escaneá el estante (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <link rel="stylesheet" href="../../duplicados.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <style>
@@ -96,5 +97,166 @@
   </div>
   <span class="home-ind"></span>
 </div>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script>
+/* Recorrida: tildar y destildar, deslizar para unir, «Son distintos», y el escaneo siguiente
+   (se toca la cámara cuando la hoja está abajo). La × vuelve al catálogo. */
+(function () {
+  var D = Dup, F = D.FOTOS;
+  function f(n, prov, c, fecha, fuera) { return { n: n, prov: prov, c: c, fecha: fecha, fuera: !!fuera }; }
+  var escaneos = [
+    { foto: "tarugos", cod: "7 791245 008123", filas: [f("Tarugos nylon S8 con tope × 100", "Fischer Argentina", 4150, "16/10"), f("TARUGO FISCHER S8 C/TOPE X100", "Bulonera Centro", 4390, "14/10"), f("Tarugo S8 sin tope × 100", "Distribuidora Oeste", 3900, "02/10", true)] },
+    { foto: "pinza", cod: "7 311518 104546", filas: [f("Pinza universal 8\" aislada 1000 V", "Distribuidora Oeste", 15800, "14/10"), f("PINZA UNIV. 8 PULG AISLADA VDE", "Bulonera Centro", 17350, "30/09")] },
+    { foto: "martillo", cod: "7 311518 220734", solo: "Martillo carpintero 27 mm mango tubular" },
+    { foto: "lampara", cod: "7 798123 900094", filas: [f("Lámpara LED 9 W luz fría E27", "Eléctrica Moreno", 1890, "10/10"), f("LAMPARA LED 9W FRIA E27", "Distribuidora Oeste", 1950, "03/10"), f("LAMP. LED 9W E27 6500K MACROLED", "Ferretera del Sur", 2080, "08/10")] },
+    { foto: "llave-combinada", cod: "7 311518 501109", filas: [f("Llave combinada 10 mm", "Ferretera del Sur", 6900, "05/10"), f("LLAVE COMB. 10MM BAHCO 111M", "Distribuidora Oeste", 7150, "28/09")] }
+  ];
+  var actual = 0, unidosAca = 3, recientes = [["mecha", "Mecha acero rápido HSS 8 mm", "Ezeta · 2 proveedores · recién"], ["cinta-metrica", "Cinta métrica PowerLock 5 m", "Stanley · 3 proveedores · recién"], ["lampara", "Lámpara LED 12 W luz cálida E27", "Macroled · 2 proveedores · recién"]];
+  var celu = document.querySelector(".celu"), camara = celu.querySelector(".camara"), hoja = celu.querySelector(".hoja");
+  var lista = hoja.querySelector(".lista"), titulo = hoja.querySelector(".titulo .t-seccion"), aviso = hoja.querySelector(".aviso");
+  var desl = hoja.querySelector(".deslizar"), pulgar = desl.querySelector(".pulgar"), visor = camara.querySelector(".visor"), leido = camara.querySelector(".leido");
+  var prodImg = camara.querySelector("img.prod"), recorrida = hoja.querySelector(".recorrida"), pie = hoja.querySelector(".pie-hoja");
+  var rotPie = pie.querySelector(":scope > span"), distintos = pie.querySelector(".btn");
+  var botones = celu.querySelectorAll(".cab-cam .r");
+  botones[0].setAttribute("data-ir", "productos"); botones[0].setAttribute("role", "button"); botones[0].setAttribute("aria-label", "Salir");
+  // El texto del deslizador va en su propio <span> para poder cambiarlo (se ve igual).
+  var rotDesl = (function () { var n = Array.prototype.find.call(desl.childNodes, function (x) { return x.nodeType === 3 && x.nodeValue.trim(); }); var s = document.createElement("span"); n.parentNode.replaceChild(s, n); s.appendChild(n); return s; })();
+  var luz = D.crear('<div style="position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 45%,rgba(255,250,230,.35),transparent 70%);opacity:0;pointer-events:none"></div>');
+  camara.insertBefore(luz, visor);
+  var hojaArriba = true;
+
+  function g() { return escaneos[actual]; }
+  function dentro() { return g().filas.filter(function (x) { return !x.fuera; }); }
+  function pintarHoja(entrar) {
+    var e = g(), d = dentro(), mejor = d.reduce(function (m, x) { return !m || x.c < m.c ? x : m; }, null), queda = d[0];
+    titulo.innerHTML = "Este código lo tienen " + e.filas.length + "<small>Destildá el que no es este artículo</small>";
+    lista.innerHTML = e.filas.map(function (x, i) {
+      var det = x.fuera ? x.prov + " · otro artículo" : x === queda ? x.prov + ' · <b style="color:var(--pino-texto)">se conserva</b>' : x.prov;
+      return '<div class="fila' + (x === queda ? " queda" : "") + (x === mejor ? " mejor" : "") + '" data-i="' + i + '"' + (x.fuera ? ' style="opacity:.55"' : "") + '><span class="chk' + (x.fuera ? " no" : "") + '">' + (x.fuera ? "" : '<i class="i i-s" data-i="check"></i>') + '</span><div><div class="n"' + (x.fuera ? ' style="text-decoration:line-through"' : "") + ">" + x.n + '</div><div class="d">' + det + '</div></div><div class="c"' + (x.fuera ? ' style="color:var(--texto-3)"' : "") + ">" + D.pesos(x.c) + "<small>" + x.fecha + "</small></div></div>";
+    }).join("");
+    D.pintar(lista);
+    var provs = d.map(function (x) { return x.prov.split(" ")[0]; });
+    aviso.innerHTML = '<i class="i i-s" data-i="git-merge" style="margin-top:2px"></i><span>' + (d.length >= 2 ? "Queda <b>uno solo</b> con " + provs.slice(0, -1).join(", ") + " y " + provs[provs.length - 1] + ". Costo: <b>" + D.pesos(mejor.c) + "</b>, el más barato." : "Tildá al menos <b>2</b> para unirlos.") + "</span>";
+    D.pintar(aviso);
+    rotDesl.textContent = d.length >= 2 ? "Deslizá para unir " + d.length : "Tildá al menos 2";
+    desl.style.opacity = d.length >= 2 ? "" : ".5";
+    if (entrar) Array.prototype.forEach.call(lista.children, function (c, i) { D.anim(c, [{ transform: "translateY(8px)", opacity: 0 }, { transform: "none", opacity: c.style.opacity || 1 }], { duration: 240, delay: 120 + i * 40, easing: D.REBOTE, fill: "backwards" }); });
+  }
+  function bajarHoja() {
+    hojaArriba = false;
+    return D.anim(hoja, [{ transform: "none" }, { transform: "translateY(100%)" }], { duration: 320, easing: D.SALIDA, fill: "forwards" }).then(function () { hoja.style.visibility = "hidden"; });
+  }
+  function subirHoja() {
+    hoja.getAnimations().forEach(function (a) { a.cancel(); });
+    hoja.style.visibility = ""; hojaArriba = true;
+    return D.anim(hoja, [{ transform: "translateY(100%)" }, { transform: "none" }], { duration: 320 });
+  }
+  function escanear() {
+    if (hojaArriba || escaneando) return;
+    escaneando = true;
+    actual = (actual + 1) % escaneos.length;
+    var e = g();
+    D.anim(prodImg, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-40px)" }], { duration: 200, easing: D.SALIDA, fill: "forwards" }).then(function () {
+      prodImg.src = F + e.foto + ".webp";
+      prodImg.getAnimations().forEach(function (a) { a.cancel(); });
+      return D.anim(prodImg, [{ opacity: 0, transform: "translateX(40px)" }, { opacity: 1, transform: "none" }], { duration: 320 });
+    }).then(function () {
+      return D.anim(visor, [{ transform: "none" }, { transform: "scale(.82)" }, { transform: "none" }], { duration: 320 });
+    }).then(function () {
+      leido.innerHTML = '<i class="i i-s" data-i="circle-check"></i>' + e.cod + " · leído"; D.pintar(leido);
+      D.anim(leido, [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+      if (e.solo) {
+        D.vibrar(10);
+        D.tostada("Este código lo tiene uno solo: «" + e.solo + "». Sin repetidos.", { icono: "circle-check", abajo: 40, ms: 2200 });
+        escaneando = false;
+        setTimeout(function () { if (!hojaArriba) escanear(); }, D.reducir ? 0 : 2400);
+        return;
+      }
+      D.vibrar([10, 40, 10]);
+
+      pintarHoja(true); subirHoja(); escaneando = false;
+    });
+  }
+  var escaneando = false;
+
+  lista.addEventListener("click", function (e) {
+    var fila = e.target.closest(".fila"); if (!fila) return;
+    var x = g().filas[+fila.getAttribute("data-i")], antes = dentro().reduce(function (m, y) { return !m || y.c < m.c ? y : m; }, null);
+    x.fuera = !x.fuera; pintarHoja();
+    var nueva = lista.querySelector('[data-i="' + fila.getAttribute("data-i") + '"]');
+    D.anim(nueva, [{ opacity: x.fuera ? 1 : .55 }, { opacity: x.fuera ? .55 : 1 }], { duration: 200 });
+    var desp = dentro().reduce(function (m, y) { return !m || y.c < m.c ? y : m; }, null);
+    if (desp && antes !== desp) { var c = lista.querySelector(".fila.mejor .c"); if (c) D.anim(c, [{ transform: "translateY(60%)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 200 }); }
+  });
+  Array.prototype.forEach.call(lista.children, function (c, i) { c.setAttribute("data-i", i); });
+
+  // Deslizá para unir: el pulgar sigue al dedo; pasado el 75 % se une.
+  var arr = null;
+  function largo() { return desl.offsetWidth - pulgar.offsetWidth - 12; }
+  pulgar.style.touchAction = "none"; desl.style.touchAction = "none";
+  desl.addEventListener("pointerdown", function (e) {
+    if (dentro().length < 2) { D.anim(desl, [{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "none" }], { duration: 240 }); return; }
+    arr = { x: e.clientX, dx: 0 };
+    try { desl.setPointerCapture(e.pointerId); } catch (er) { /* sin captura */ }
+  });
+  desl.addEventListener("pointermove", function (e) {
+    if (!arr) return;
+    arr.dx = Math.max(0, Math.min(largo(), e.clientX - arr.x));
+    pulgar.style.transform = "translateX(" + arr.dx + "px)";
+    rotDesl.style.opacity = String(1 - arr.dx / largo());
+  });
+  function soltar() {
+    if (!arr) return;
+    var a = arr; arr = null;
+    if (a.dx > largo() * .75) { unir(); return; }
+    if (a.dx < 4) { D.anim(pulgar, [{ transform: "none" }, { transform: "translateX(14px)" }, { transform: "none" }], { duration: 320, easing: D.REBOTE }); return; }
+    D.anim(pulgar, [{ transform: pulgar.style.transform }, { transform: "none" }], { duration: 200, easing: D.REBOTE });
+    pulgar.style.transform = ""; rotDesl.style.opacity = "";
+  }
+  desl.addEventListener("pointerup", soltar); desl.addEventListener("pointercancel", soltar);
+
+  function unir() {
+    var e = g(), d = dentro(), queda = d[0];
+    pulgar.style.transform = "translateX(" + largo() + "px)";
+    D.vibrar([10, 40, 10]);
+    recientes.unshift([e.foto, queda.n, queda.prov.split(" ")[0] + " · " + d.length + " proveedores · recién"]);
+    unidosAca++;
+    var nueva = D.crear('<span class="foto"><img src="' + F + e.foto + '.webp" alt=""></span>');
+    recorrida.appendChild(nueva);
+    if (recorrida.children.length > 4) recorrida.firstElementChild.remove();
+    rotPie.textContent = unidosAca + " unidos acá";
+    D.anim(nueva, [{ transform: "scale(.4)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 320, easing: D.REBOTE });
+    D.esperar(260).then(bajarHoja).then(function () {
+      pulgar.style.transform = ""; rotDesl.style.opacity = "";
+      D.tostada("Unidos: " + queda.n + ". Tocá la cámara para seguir.", { abajo: 40, deshacer: function () {
+        unidosAca--; recientes.shift(); nueva.remove(); rotPie.textContent = unidosAca + " unidos acá";
+        actual = escaneos.indexOf(e); escaneando = false; pintarHoja(true); subirHoja();
+      } });
+      setTimeout(function () { if (!hojaArriba) escanear(); }, D.reducir ? 0 : 1800);
+    });
+  }
+  distintos.addEventListener("click", function () {
+    bajarHoja().then(function () {
+      D.tostada("Quedan separados: no se vuelven a sugerir.", { icono: "x", abajo: 40, ms: 2000 });
+      setTimeout(function () { if (!hojaArriba) escanear(); }, D.reducir ? 0 : 1600);
+    });
+  });
+  recorrida.addEventListener("click", function () { D.abrirUnidos({ total: 38 + unidosAca - 3, recientes: recientes }); });
+  rotPie.addEventListener("click", function () { recorrida.click(); });
+  hoja.querySelector(".asa").addEventListener("click", function () { bajarHoja(); });
+  hoja.querySelector(".asa").style.cursor = "pointer";
+  camara.addEventListener("click", function () { if (!hojaArriba) escanear(); else bajarHoja(); });
+  botones[1].addEventListener("click", function (e) {
+    e.stopPropagation(); var on = botones[1].getAttribute("aria-pressed") !== "true";
+    botones[1].setAttribute("aria-pressed", on); botones[1].style.background = on ? "rgba(255,255,255,.34)" : "";
+    D.anim(luz, [{ opacity: on ? 0 : 1 }, { opacity: on ? 1 : 0 }], { duration: 200, fill: "forwards" });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (D.hayCapa()) return;
+    if (e.key === "Escape") { if (hojaArriba) bajarHoja(); else window.irAMaqueta && window.irAMaqueta("productos"); }
+  });
+})();
+</script>
 </body>
 </html>

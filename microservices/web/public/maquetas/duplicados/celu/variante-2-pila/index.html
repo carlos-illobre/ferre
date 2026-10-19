@@ -6,6 +6,7 @@
 <title>Duplicados · Pila (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <link rel="stylesheet" href="../../duplicados.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <style>
@@ -83,5 +84,175 @@
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script>
+/* La pila: la carta se desliza con el dedo (derecha = es el mismo, izquierda = son distintos);
+   tocar un producto lo conserva; los botones de abajo hacen lo mismo y el del medio deshace. */
+(function () {
+  var D = Dup, F = D.FOTOS;
+  D.conectarMarco();
+  var porId = {}; D.SUGERENCIAS.forEach(function (s) { porId[s.id] = s; });
+  var pend = ["cinta", "martillo", "tarugos", "pinza", "esmalte", "tornillos", "puntas", "llave", "widia"];
+  var hechas = [{ id: "mecha", mismo: true }, { id: "lampara", mismo: true }, { id: "clavos", mismo: true }];
+  var cons = {}, total = 38, recientes = [];
+  var pila = document.querySelector(".pila"), carta = pila.querySelector(".carta"), atras = pila.querySelector(".atras");
+  var cuenta = document.querySelector(".cuenta"), etq = cuenta.querySelector(".t-etiqueta"), barra = cuenta.querySelector(".barra b"), nUni = D.envolver(cuenta.querySelector(".pastilla"));
+  var gestos = document.querySelectorAll(".gestos > div"), mas = cuenta.querySelector(".btn");
+  carta.querySelectorAll(".prod").forEach(function (p, i) { p.setAttribute("data-lado", i ? "b" : "a"); });
+
+  function lado(s) { return cons[s.id] || (s.a.ventas >= s.b.ventas ? "a" : "b"); }
+  function dia(L) { return L.lista.slice(0, 5); }
+  function prod(s, k) {
+    var L = s[k], o = s[k === "a" ? "b" : "a"], si = lado(s) === k, barato = L.costo < o.costo;
+    return '<div class="prod' + (si ? " si" : "") + '" data-lado="' + k + '"><span class="foto"><img src="' + F + s.foto + '.webp" alt=""></span><div><div class="n">' + L.n + '</div>' +
+      '<div class="meta"><div class="fila-icono"><i class="i i-s" data-i="truck"></i>' + L.prov + " · " + dia(L) + "</div></div>" +
+      '<div class="costo"><span' + (barato ? ' style="color:var(--logro-texto)"' : "") + ">" + D.pesos(L.costo) + "</span>" + (si ? '<span class="tag"><i class="i i-s" data-i="circle-check"></i>Se conserva</span>' : barato ? '<span class="barato">el más barato</span>' : "") + "</div></div></div>";
+  }
+  function cartaHtml(s) {
+    var bar = s.a.costo <= s.b.costo ? s.a : s.b, iguales = [];
+    if (s.a.marca === s.b.marca) iguales.push(s.a.marca);
+    iguales.push(s.a.cod === s.b.cod ? "Código" : "Texto parecido");
+    return '<span class="sello" style="opacity:0">ES EL MISMO</span><div class="cab"><span class="motivo ' + s.motivo + '"><i class="i i-s" data-i="' + (s.motivo === "codigo" ? "barcode" : "type") + '"></i>' + (s.motivo === "codigo" ? "Mismo código" : "Descripción parecida") + "</span></div>" +
+      prod(s, "a") + '<div class="igual-fila"><span class="l"></span><span class="c">' + iguales.map(function (t) { return '<span class="pastilla logro" style="height:24px"><i class="i i-s" data-i="check"></i>' + t + "</span>"; }).join("") + '</span><span class="l"></span></div>' + prod(s, "b") +
+      '<div class="aviso pino" style="margin-top:auto"><i class="i i-s" data-i="git-merge" style="margin-top:2px"></i><span>Queda <b>uno solo</b>, con los 2 proveedores y ' + (s.a.stock + s.b.stock) + " un. Costo: <b>" + D.pesos(bar.costo) + "</b>, el más barato.</span></div>";
+  }
+  function pintar(entra, desde) {
+    carta.getAnimations().forEach(function (a) { a.cancel(); });
+    carta.style.transition = ""; carta.style.transform = "none";
+    var l = pila.querySelector(".dup-listo");
+    if (!pend.length) {
+      carta.style.display = "none"; atras.style.display = "none";
+      if (!l) { l = D.crear('<div class="dup-listo tarjeta" style="position:absolute;inset:0 0 18px"><span class="tilde"><i class="i" data-i="check"></i></span><div class="t-seccion">No queda nada por revisar</div><div class="t-detalle">Uniste ' + hechas.filter(function (h) { return h.mismo; }).length + " de 12. Las nuevas llegan con cada lista.</div></div>"); pila.appendChild(l); D.entra(l); }
+      return;
+    }
+    if (l) l.remove(); carta.style.display = ""; atras.style.display = pend.length > 1 ? "" : "none";
+    carta.innerHTML = cartaHtml(porId[pend[0]]); D.pintar(carta);
+    if (entra === "atras") D.anim(carta, [{ transform: "translateY(10px) scale(.96)", opacity: .6 }, { transform: "none", opacity: 1 }], { duration: 320 });
+    else if (entra === "vuelve") D.anim(carta, [{ transform: "translateX(" + (desde || 1) * 420 + "px) rotate(" + (desde || 1) * 14 + "deg)" }, { transform: "none" }], { duration: 320 });
+  }
+  function contar() {
+    var n = hechas.length;
+    etq.textContent = pend.length ? Math.min(12, n + 1) + " de 12" : "12 de 12";
+    barra.style.width = Math.round(n / 12 * 100) + "%";
+    D.numero(nUni, hechas.filter(function (h) { return h.mismo; }).length);
+  }
+  function sello(dx) {
+    var s = carta.querySelector(".sello"), w = carta.offsetWidth, si = dx >= 0;
+    s.textContent = si ? "ES EL MISMO" : "SON DISTINTOS";
+    s.style.borderColor = si ? "var(--logro)" : "var(--texto-3)"; s.style.color = si ? "var(--logro-texto)" : "var(--texto-2)";
+    s.style.left = si ? "18px" : "auto"; s.style.right = si ? "auto" : "18px";
+    s.style.transform = si ? "rotate(-12deg)" : "rotate(12deg)";
+    s.style.opacity = Math.min(1, Math.abs(dx) / (w * .4));
+  }
+  function poner(dx) {
+    var w = carta.offsetWidth, giro = Math.max(-6, Math.min(6, dx / w * 6 / .4));
+    carta.style.transform = "translateX(" + dx + "px) rotate(" + giro + "deg)"; sello(dx);
+    atras.style.transform = "translateY(" + (10 - Math.min(1, Math.abs(dx) / (w * .4)) * 6) + "px) scale(" + (.96 + Math.min(1, Math.abs(dx) / (w * .4)) * .02) + ")";
+  }
+
+  var ocupado = false;
+  function decidir(mismo, dx0) {
+    if (ocupado || !pend.length) return; ocupado = true;
+    var s = porId[pend[0]], k = lado(s), dir = mismo ? 1 : -1, w = carta.offsetWidth;
+    if (mismo) D.vibrar(10);
+    var desde = dx0 != null ? dx0 : 0;
+    if (dx0 == null) { sello(dir * w); }
+    var g = function (dx) { return "translateX(" + dx + "px) rotate(" + Math.max(-6, Math.min(6, dx / w * 15)) * (Math.abs(dx) > w ? 3 : 1) + "deg)"; };
+    D.anim(carta, [{ transform: g(desde) }, { transform: "translateX(" + dir * w * 1.5 + "px) rotate(" + dir * 18 + "deg)", opacity: .9 }], { duration: 320, easing: D.SALIDA, fill: "forwards" }).then(function () {
+      atras.style.transform = "";
+      pend.shift(); hechas.push({ id: s.id, mismo: mismo });
+      if (mismo) { total++; recientes.unshift([s.foto, s[k].n, s[k].marca + " · 2 proveedores · recién"]); }
+      contar(); pintar("atras"); ocupado = false;
+    });
+  }
+  function deshacer() {
+    if (ocupado || !hechas.length) return;
+    var h = hechas.pop(), s = porId[h.id];
+    if (h.mismo) { total--; recientes = recientes.filter(function (r) { return r[1] !== s[lado(s)].n; }); }
+    pend.unshift(h.id); contar(); pintar("vuelve", h.mismo ? 1 : -1);
+    D.tostada("Volvió: " + s.a.n.split(" ").slice(0, 3).join(" ") + ".", { icono: "undo-2" });
+  }
+
+  // Arrastrar con el dedo (o el mouse).
+  var ini = null;
+  carta.addEventListener("pointerdown", function (e) {
+    if (ocupado || !pend.length) return;
+    ini = { x: e.clientX, y: e.clientY, dx: 0, mueve: false, id: e.pointerId, prod: e.target.closest(".prod") };
+    try { carta.setPointerCapture(e.pointerId); } catch (er) { /* sin captura */ }
+  });
+  carta.addEventListener("pointermove", function (e) {
+    if (!ini) return;
+    var dx = e.clientX - ini.x;
+    if (!ini.mueve && Math.abs(dx) < 8) return;
+    ini.mueve = true; ini.dx = dx; poner(dx);
+  });
+  function soltar(e) {
+    if (!ini) return;
+    var i = ini; ini = null;
+    if (!i.mueve) {
+      var p = i.prod;
+      if (p && e.type === "pointerup") conservar(p.getAttribute("data-lado"));
+      return;
+    }
+    if (Math.abs(i.dx) > carta.offsetWidth * .4) { decidir(i.dx > 0, i.dx); return; }
+    var w = carta.offsetWidth;
+    D.anim(carta, [{ transform: carta.style.transform }, { transform: "none" }], { duration: 200, easing: D.REBOTE });
+    carta.style.transform = "none"; atras.style.transform = "";
+    var s = carta.querySelector(".sello"); D.anim(s, [{ opacity: s.style.opacity }, { opacity: 0 }], { duration: 120 }); s.style.opacity = 0;
+  }
+  carta.addEventListener("pointerup", soltar);
+  carta.addEventListener("pointercancel", soltar);
+  carta.style.touchAction = "pan-y";
+
+  function conservar(k) {
+    var s = porId[pend[0]]; if (!s || lado(s) === k) return;
+    cons[s.id] = k; pintar();
+    var p = carta.querySelector('.prod[data-lado="' + k + '"]');
+    D.anim(p, [{ transform: "scale(.97)" }, { transform: "none" }], { duration: 200, easing: D.REBOTE }); D.vibrar(10);
+  }
+
+  gestos[0].addEventListener("click", function () { decidir(false); });
+  gestos[2].addEventListener("click", function () { decidir(true); });
+  gestos[1].addEventListener("click", deshacer);
+
+  mas.addEventListener("click", function () {
+    D.abrir({ tipo: "hoja", html: '<div class="dup-cab"><span class="t-seccion">Duplicados</span><button class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button></div>' +
+      '<a class="renglon" data-op="buscar" style="margin:0"><span class="foto-icono"><i class="i i-l" data-i="search"></i></span><div><div class="titulo">Buscar en todo el catálogo</div><div class="detalle">Encuentra los que nadie sugirió</div></div><i class="i" data-i="chevron-right" style="color:var(--texto-3)"></i></a>' +
+      '<a class="renglon" data-op="unir" style="margin:0"><span class="foto-icono"><i class="i i-l" data-i="git-merge"></i></span><div><div class="titulo">Unir dos a mano</div><div class="detalle">Elegís los dos productos</div></div><i class="i" data-i="chevron-right" style="color:var(--texto-3)"></i></a>' +
+      '<a class="renglon" data-op="unidos" style="margin:0"><span class="foto-icono"><i class="i i-l" data-i="split"></i></span><div><div class="titulo">Productos unidos</div><div class="detalle">' + total + ' · se pueden separar</div></div><i class="i" data-i="chevron-right" style="color:var(--texto-3)"></i></a>',
+      alAbrir: function (caja, api) {
+        caja.addEventListener("click", function (e) {
+          var r = e.target.closest("[data-op]"); if (!r) return;
+          var op = r.getAttribute("data-op");
+          api.cerrar().then(function () {
+            if (op === "unidos") D.abrirUnidos({ total: total, recientes: recientes, alSeparar: function (d) { total += d; } });
+            else if (op === "unir") D.abrirUnirAMano(function (p) { total++; recientes.unshift([p.foto, p.nombre, "Bahco · 2 proveedores · recién"]); D.tostada("Unidos a mano: " + p.nombre + ".", { abajo: 128 }); });
+            else buscar();
+          });
+        });
+      } });
+  });
+  function buscar() {
+    var h = D.abrir({ tipo: "hoja", html: '<div class="dup-cab"><span class="t-seccion">Buscando en todo el catálogo<small class="dup-cuenta">0 de 104.500 productos</small></span></div><div class="barra" style="margin:0"><b class="dup-b" style="width:100%;transform-origin:left;transform:scaleX(0)"></b></div><button class="btn btn-fantasma" data-cerrar>Seguir en segundo plano</button>' });
+    var paso = 0, t = setInterval(function () {
+      paso++;
+      var b = h.el.querySelector(".dup-b"), c = h.el.querySelector(".dup-cuenta");
+      b.style.transform = "scaleX(" + paso / 12 + ")"; c.textContent = D.miles(Math.round(104500 * paso / 12 / 10) * 10) + " de 104.500 productos";
+      if (paso >= 12) {
+        clearInterval(t);
+        setTimeout(function () {
+          h.cerrar();
+          if (pend.indexOf("s6") < 0 && !porId.s6) {
+            porId.s6 = { id: "s6", motivo: "texto", foto: "tarugos", seguro: 82, a: { n: "Tarugos nylon S6 sin tope × 100", marca: "Fischer", cod: "7 791245 006129", prov: "Fischer Argentina", costo: 2950, lista: "16/10/2026", stock: 9, ventas: 26 }, b: { n: "TARUGO S6 X100 FISCHER", marca: "Fischer", cod: "7 791245 006136", prov: "Ferretera del Sur", costo: 3100, lista: "08/10/2026", stock: 4, ventas: 0 } };
+            pend.push("s6"); if (pend.length === 1) pintar("atras");
+            D.tostada("Encontré 1 sugerencia nueva: queda al final.", { icono: "search" });
+          } else D.tostada("No hay sugerencias nuevas.", { icono: "search" });
+        }, D.reducir ? 0 : 300);
+      }
+    }, D.reducir ? 0 : 160);
+  }
+})();
+</script>
 </body>
 </html>

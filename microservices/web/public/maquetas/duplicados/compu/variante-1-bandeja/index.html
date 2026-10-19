@@ -6,6 +6,7 @@
 <title>Duplicados · Bandeja (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <link rel="stylesheet" href="../../duplicados.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <style>
@@ -146,5 +147,203 @@
     </section>
   </main>
 </div>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script>
+/* La bandeja: E es el mismo, D son distintos, J saltar, K volver, ← → conservar, Z deshacer. */
+(function () {
+  var D = Dup, F = D.FOTOS;
+  D.conectarMarco();
+  var todas = D.SUGERENCIAS.slice();
+  var pend = todas.map(function (s) { return s.id; });
+  var porId = {}; todas.forEach(function (s) { porId[s.id] = s; });
+  var cons = {}, filtro = "todas", actualId = "mecha", unidos = 38, recientes = [];
+  var cola = document.querySelector(".cola"), comp = document.querySelector(".comparar");
+  var tabla = comp.querySelector(".tabla"), queda = comp.querySelector(".queda");
+  var kp = document.querySelectorAll(".kpis .resumen .va");
+  var nRev = D.envolver(kp[0]), nCod = D.envolver(kp[1]), nTex = D.envolver(kp[2]), nUni = D.envolver(kp[3]);
+  var nTab = document.querySelector(".pestanas .activa .pastilla");
+  var chips = document.querySelectorAll(".bandeja .chip");
+  var nav = comp.querySelector(".comp-cab .nav");
+  tabla.style.position = "relative"; tabla.style.isolation = "isolate";
+  // Lo que ya está en la página se marca para reconocerlo (no cambia cómo se ve).
+  Array.prototype.forEach.call(cola.children, function (c, i) { c.setAttribute("data-id", pend[i]); });
+  tabla.querySelectorAll(".cel.h").forEach(function (c, i) { c.setAttribute("data-lado", i ? "b" : "a"); });
+  nav.querySelectorAll(".kbd").forEach(function (k, i) { k.setAttribute("data-toca", i ? "k" : "j"); });
+
+  function visibles() { return pend.filter(function (id) { return filtro === "todas" || porId[id].motivo === filtro; }); }
+  function lado(s) { return cons[s.id] || "a"; }
+  function sugHtml(s) {
+    return '<div class="sug" data-id="' + s.id + '"><span class="foto chica"><img src="' + F + s.foto + '.webp" alt=""></span><div class="n elipsis">' + s.a.n + '</div><span class="pv">' + s.cuando + '</span><div class="d"><i class="i ic" data-i="' + (s.motivo === "codigo" ? "barcode" : "type") + '"></i>' + s.a.corto + " · " + s.b.corto + "</div></div>";
+  }
+  function pintarCola(nuevos) {
+    var v = visibles();
+    D.acomodar(cola, function () {
+      var hay = {}; Array.prototype.forEach.call(cola.children, function (c) { hay[c.getAttribute("data-id")] = c; });
+      v.forEach(function (id) { var el = hay[id] || D.crear(sugHtml(porId[id])); el.setAttribute("data-id", id); cola.appendChild(el); delete hay[id]; });
+      Object.keys(hay).forEach(function (k) { hay[k].remove(); });
+    });
+    Array.prototype.forEach.call(cola.children, function (c, i) {
+      c.classList.toggle("foco", c.getAttribute("data-id") === actualId);
+      if (nuevos && nuevos.indexOf(c.getAttribute("data-id")) >= 0) { D.entra(c, i * 60); D.marcarNuevo(c); }
+    });
+  }
+  function contar() {
+    var cod = pend.filter(function (id) { return porId[id].motivo === "codigo"; }).length, tex = pend.length - cod;
+    D.numero(nRev, pend.length); D.numero(nCod, cod); D.numero(nTex, tex); D.numero(nUni, unidos);
+    nTab.textContent = pend.length;
+    if (actualId) pintarNav();
+    chips[0].textContent = "Todas (" + pend.length + ")"; chips[1].textContent = "Código (" + cod + ")"; chips[2].textContent = "Texto (" + tex + ")";
+  }
+  function dif(x, y, v) { return x !== y ? '<span class="difiere">' + v + "</span>" : v + ' <span class="ok"><i class="i i-s" data-i="check"></i></span>'; }
+  function cabeza(s, k) {
+    var si = lado(s) === k;
+    return '<div class="cel h' + (si ? " elegida" : "") + '" data-lado="' + k + '"><span class="cons' + (si ? " si" : "") + '"><span class="radio"></span>Conservar este <span class="kbd" style="height:20px' + (si ? ";background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.35)" : "") + '">' + (k === "a" ? "←" : "→") + '</span></span><div class="prod"><span class="foto"><img src="' + F + s.foto + '.webp" alt=""></span><div class="n">' + (k === "b" && s.a.n !== s.b.n ? '<span class="difiere">' + s.b.n + "</span>" : s[k].n) + "</div></div></div>";
+  }
+  function hace(L) { return L.lista + " · hace " + L.hace + " días"; }
+  function pintarTabla(s) {
+    var A = s.a, B = s.b, k = lado(s), e = function (x) { return x === k ? " elegida" : ""; };
+    var barato = A.costo <= B.costo ? "a" : "b", caro = barato === "a" ? B : A, bar = s[barato];
+    var costo = function (x) { var L = s[x]; return '<span class="costo"><span class="peso">$</span>' + D.miles(L.costo) + "</span>" + (x === barato ? '<span class="barato"><i class="i i-s" data-i="check"></i>El más barato</span>' : '<span class="t-detalle">+' + Math.round((caro.costo / bar.costo - 1) * 100) + " %</span>"); };
+    tabla.innerHTML = '<div class="r h">Producto</div>' + cabeza(s, "a") + cabeza(s, "b") +
+      '<div class="r">Marca</div><div class="cel' + e("a") + '">' + A.marca + '</div><div class="cel' + e("b") + '">' + dif(A.marca, B.marca, B.marca) + "</div>" +
+      '<div class="r">Cód. barras</div><div class="cel' + e("a") + '">' + A.cod + '</div><div class="cel' + e("b") + '">' + dif(A.cod, B.cod, B.cod) + "</div>" +
+      '<div class="r">Proveedor</div><div class="cel' + e("a") + '">' + A.prov + " · " + A.pc + '</div><div class="cel' + e("b") + '">' + B.prov + " · " + B.pc + "</div>" +
+      '<div class="r">Costo</div><div class="cel' + e("a") + '">' + costo("a") + '</div><div class="cel' + e("b") + '">' + costo("b") + "</div>" +
+      '<div class="r">Lista</div><div class="cel' + e("a") + '">' + hace(A) + '</div><div class="cel' + e("b") + '">' + (A.lista !== B.lista ? '<span class="difiere">' + hace(B) + "</span>" : hace(B)) + "</div>";
+    D.pintar(tabla);
+    pintarQueda(s);
+  }
+  function pintarQueda(s) {
+    var bar = s.a.costo <= s.b.costo ? s.a : s.b;
+    queda.innerHTML = '<i class="i" data-i="git-merge"></i><span>Queda <b>«' + s[lado(s)].n + "»</b> con 2 proveedores, <b>" + (s.a.stock + s.b.stock) + " un.</b> y las " + (s.a.ventas + s.b.ventas) + " ventas. El costo sale de <b>" + bar.prov + " ($" + D.miles(bar.costo) + ")</b>.</span>";
+    D.pintar(queda);
+  }
+  function pintarNav() {
+    var v = visibles(), i = v.indexOf(actualId);
+    nav.innerHTML = '<span class="kbd" data-toca="j">J</span><span class="kbd" data-toca="k">K</span> ' + (i + 1) + " de " + v.length;
+  }
+  function listo(si) {
+    var l = comp.querySelector(".dup-listo");
+    Array.prototype.forEach.call(comp.children, function (c) { if (c !== l) c.style.display = si ? "none" : ""; });
+    if (si && !l) {
+      l = D.crear('<div class="dup-listo"><span class="tilde"><i class="i" data-i="check"></i></span><div class="t-seccion">No queda nada por revisar</div><div class="t-detalle">Cuando llegue otra lista, las sugerencias nuevas aparecen acá.<br>También podés buscar en todo el catálogo.</div></div>');
+      comp.appendChild(l); D.anim(l.querySelector(".tilde"), [{ transform: "scale(.6)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 300, easing: D.REBOTE });
+    }
+    if (!si && l) l.remove();
+  }
+  function mostrar(id, entrar) {
+    var v = visibles();
+    if (!v.length) { actualId = null; listo(true); pintarCola(); return; }
+    listo(false);
+    actualId = v.indexOf(id) >= 0 ? id : v[0];
+    var s = porId[actualId];
+    var m = comp.querySelector(".comp-cab .motivo");
+    m.className = "motivo " + s.motivo;
+    m.innerHTML = '<i class="i i-s" data-i="' + (s.motivo === "codigo" ? "barcode" : "type") + '"></i>' + (s.motivo === "codigo" ? "Mismo código de barras" : "Descripción parecida");
+    D.pintar(m);
+    pintarTabla(s); pintarNav(); pintarCola();
+    if (entrar) { D.entra(tabla); D.entra(queda, 40); }
+  }
+  function siguienteDe(id) { var v = visibles(), i = v.indexOf(id); return v[i + 1] || v[i - 1]; }
+
+  var ocupado = false;
+  function decidir(mismo) {
+    if (ocupado || !actualId) return;
+    ocupado = true;
+    var s = porId[actualId], pos = pend.indexOf(s.id), sig = siguienteDe(s.id), conserva = s[lado(s)].n;
+    var sale;
+    if (mismo) {
+      var w = tabla.getBoundingClientRect().width;
+      var colA = [], colB = [];
+      Array.prototype.forEach.call(tabla.children, function (c, i) { if (i % 3 === 1) colA.push(c); if (i % 3 === 2) colB.push(c); });
+      var d = (w - 116) / 4;
+      colA.forEach(function (c) { D.anim(c, [{ transform: "none" }, { transform: "translateX(" + d + "px)" }], { duration: 200, fill: "forwards" }); });
+      colB.forEach(function (c) { D.anim(c, [{ transform: "none", opacity: 1 }, { transform: "translateX(" + (-d) + "px)", opacity: 0 }], { duration: 200, fill: "forwards" }); });
+      sale = D.esperar(200).then(function () { return D.anim(tabla, [{ transform: "scale(1)" }, { transform: "scale(1.015)" }, { transform: "scale(1)" }], { duration: 200, easing: D.REBOTE }); });
+      unidos++; recientes.unshift([s.foto, conserva, s.a.marca + " · 2 proveedores · recién"]);
+    } else {
+      sale = Promise.all([D.anim(tabla, [{ transform: "none", opacity: 1 }, { transform: "translateX(-24px)", opacity: 0 }], { duration: 200, easing: D.SALIDA, fill: "forwards" }),
+        D.anim(queda, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: D.SALIDA, fill: "forwards" })]);
+    }
+    sale.then(function () {
+      tabla.getAnimations && tabla.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
+      queda.getAnimations && queda.getAnimations().forEach(function (a) { a.cancel(); });
+      pend.splice(pos, 1); contar(); mostrar(sig, true); ocupado = false;
+      D.tostada(mismo ? "Unidos: " + conserva + ". Se pueden separar." : "Quedan separados: no se vuelven a sugerir.", { icono: mismo ? "circle-check" : "x", tecla: "Z", deshacer: function () {
+        pend.splice(pos, 0, s.id); if (mismo) { unidos--; recientes.shift(); }
+        contar(); mostrar(s.id, true);
+      } });
+    });
+  }
+  function conservar(k) {
+    if (!actualId || ocupado) return;
+    var s = porId[actualId]; if (lado(s) === k) return;
+    var antes = tabla.querySelector('.cel.h[data-lado="' + lado(s) + '"]').getBoundingClientRect();
+    var despues = tabla.querySelector('.cel.h[data-lado="' + k + '"]').getBoundingClientRect(), t = tabla.getBoundingClientRect();
+    cons[s.id] = k;
+    var mancha = D.crear('<span style="position:absolute;z-index:-1;top:0;bottom:0;background:var(--pino-suave);pointer-events:none"></span>');
+    mancha.style.left = (antes.left - t.left - 1) + "px"; mancha.style.width = antes.width + "px";
+    tabla.querySelectorAll(".elegida").forEach(function (c) { c.classList.remove("elegida"); });
+    tabla.appendChild(mancha);
+    D.anim(mancha, [{ transform: "none" }, { transform: "translateX(" + (despues.left - antes.left) + "px)" }], { duration: 200, fill: "forwards" }).then(function () {
+      mancha.remove(); pintarTabla(s);
+      D.anim(queda.querySelector("span"), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+    });
+  }
+  function mover(paso) {
+    var v = visibles(), i = v.indexOf(actualId); if (i < 0) return;
+    var n = v[(i + paso + v.length) % v.length]; if (n !== actualId) mostrar(n, true);
+  }
+
+  cola.addEventListener("click", function (e) { var s = e.target.closest(".sug"); if (s && s.getAttribute("data-id") !== actualId) mostrar(s.getAttribute("data-id"), true); });
+  chips.forEach(function (c, i) {
+    c.addEventListener("click", function () {
+      filtro = ["todas", "codigo", "texto"][i];
+      chips.forEach(function (x) { x.classList.toggle("elegido", x === c); });
+      mostrar(actualId, true);
+    });
+  });
+  tabla.addEventListener("click", function (e) { var h = e.target.closest(".cel.h"); if (h && e.target.closest(".cons")) conservar(h.getAttribute("data-lado")); });
+  var acc = comp.querySelectorAll(".acciones-comp .btn");
+  acc[0].addEventListener("click", function () { decidir(true); });
+  acc[1].addEventListener("click", function () { decidir(false); });
+  acc[2].addEventListener("click", function () { mover(1); });
+  nav.addEventListener("click", function (e) { var t = e.target.closest("[data-toca]"); if (t) mover(t.getAttribute("data-toca") === "j" ? 1 : -1); });
+
+  var cab = document.querySelectorAll(".cabecera .acciones .btn");
+  function buscar() {
+    D.buscarTodo(cab[0], { alTerminar: function () {
+      var nuevas = [
+        { id: "s6", motivo: "texto", cuando: "ahora", foto: "tarugos", a: { n: "Tarugos nylon S6 sin tope × 100", marca: "Fischer", cod: "7 791245 006129", prov: "Fischer Argentina", corto: "Fischer Arg.", pc: "S6-100", costo: 2950, lista: "16/10/2026", hace: 3, stock: 9, ventas: 26 }, b: { n: "TARUGO S6 X100 FISCHER", marca: "Fischer", cod: "7 791245 006136", prov: "Ferretera del Sur", corto: "Ferretera del Sur", pc: "TF-S6", costo: 3100, lista: "08/10/2026", hace: 11, stock: 4, ventas: 0 } },
+        { id: "punta", motivo: "codigo", cuando: "ahora", foto: "pinza", a: { n: "Pinza de punta 6\" aislada 1000 V", marca: "Bahco", cod: "7 311518 104720", prov: "Distribuidora Oeste", corto: "Distrib. Oeste", pc: "PP6-1000", costo: 14200, lista: "14/10/2026", hace: 5, stock: 3, ventas: 6 }, b: { n: "PINZA PUNTA 6 PULG AISL. BAHCO", marca: "Bahco", cod: "7 311518 104720", prov: "Bulonera Centro", corto: "Bulonera Centro", pc: "2430V-160", costo: 15100, lista: "30/09/2026", hace: 19, stock: 1, ventas: 0 } }
+      ];
+      nuevas.forEach(function (s) { if (!porId[s.id]) { porId[s.id] = s; pend.unshift(s.id); } });
+      contar();
+      if (!actualId) mostrar(nuevas[0].id, true); else pintarCola(nuevas.map(function (s) { return s.id; }));
+      D.tostada("Encontré 2 sugerencias nuevas en 104.500 productos.", { icono: "search" });
+    } });
+  }
+  function aMano() {
+    D.abrirUnirAMano(function (p) {
+      unidos++; contar(); recientes.unshift([p.foto, p.nombre, p.detalle]);
+      D.tostada("Unidos: " + p.nombre + ". Se pueden separar.", { tecla: "Z", deshacer: function () { unidos--; recientes.shift(); contar(); } });
+    });
+  }
+  function verUnidos() { D.abrirUnidos({ total: unidos, recientes: recientes, alSeparar: function (d) { unidos += d; contar(); } }); }
+  cab[0].addEventListener("click", buscar); cab[1].addEventListener("click", aMano); cab[2].addEventListener("click", verUnidos);
+
+  document.addEventListener("keydown", function (e) {
+    if (D.hayCapa() || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    var k = e.key.toLowerCase();
+    if (e.altKey) { if (k === "b") buscar(); else if (k === "u") aMano(); else if (k === "s") verUnidos(); else return; e.preventDefault(); return; }
+    if (e.ctrlKey || e.metaKey) return;
+    if (k === "e") decidir(true); else if (k === "d") decidir(false); else if (k === "j") mover(1); else if (k === "k") mover(-1);
+    else if (e.key === "ArrowLeft") conservar("a"); else if (e.key === "ArrowRight") conservar("b");
+    else if (k === "z") { var t = D.tostadaVigente(); if (t) t.deshacer(); } else return;
+    e.preventDefault();
+  });
+})();
+</script>
 </body>
 </html>

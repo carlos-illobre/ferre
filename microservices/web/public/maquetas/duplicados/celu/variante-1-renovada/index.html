@@ -6,6 +6,7 @@
 <title>Duplicados · Renovada (celular)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <link rel="stylesheet" href="../../duplicados.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <style>
@@ -97,5 +98,137 @@
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script>
+/* Renovada: tocar un lado lo conserva; «Es el mismo» y «Son distintos» pasan a la siguiente;
+   Buscar, Unir y Separar abren su hoja; «Separar» en un unido lo parte y deja deshacer. */
+(function () {
+  var D = Dup, F = D.FOTOS;
+  D.conectarMarco();
+  var porId = {}; D.SUGERENCIAS.forEach(function (s) { porId[s.id] = s; });
+  var pend = D.SUGERENCIAS.map(function (s) { return s.id; });
+  var cons = {}, actual = 0, total = 38;
+  var recientes = [["llave-combinada", "Llave combinada 13 mm", "Bahco · 3 proveedores · 18/10"], ["puntas", "Puntas Phillips PH2 × 25", "Stanley · 2 proveedores · 15/10"],
+    ["pintura", "Látex interior mate blanco 4 L", "Alba · 2 proveedores · 12/10"], ["tornillos", "Tornillo autoperforante 8 × 1\"", "Fixser · 2 proveedores · 09/10"]];
+  var pantalla = document.querySelector(".celu-pantalla"), sug = pantalla.querySelector(".sug");
+  var cabs = pantalla.querySelectorAll(".cab-sec"), nPend = cabs[0].querySelector(".pastilla"), cuenta = cabs[0].querySelector(".t-detalle");
+  var nUni = cabs[1].querySelector(".pastilla"), verTodo = cabs[1].querySelector(".t-detalle");
+  var unidaCaja = cabs[1].parentNode;
+  var botones = pantalla.querySelectorAll(".tres .btn"), caps = pantalla.querySelectorAll(".tres .cap");
+  var decide = document.querySelectorAll(".barra-accion .decide .btn");
+  sug.querySelectorAll(".lado").forEach(function (l, i) { l.setAttribute("data-lado", i ? "b" : "a"); });
+  cuenta.setAttribute("data-toca", ""); verTodo.setAttribute("data-toca", "");
+
+  function lado(s) { return cons[s.id] || "a"; }
+  function ladoHtml(s, k) {
+    var L = s[k], o = s[k === "a" ? "b" : "a"], si = lado(s) === k, b = k === "b";
+    var dif = function (x, y, v) { return b && x !== y ? '<span class="difiere">' + v + "</span>" : v; };
+    return '<div class="lado' + (si ? " si" : "") + '" data-lado="' + k + '"><span class="foto"><img src="' + F + s.foto + '.webp" alt=""></span>' +
+      '<div class="n">' + dif(o.n, L.n, L.n) + '</div><div class="fila-icono"><i class="i i-s" data-i="tags"></i>' + dif(o.marca, L.marca, L.marca) + "</div>" +
+      '<div class="fila-icono"><i class="i i-s" data-i="truck"></i><span class="elipsis">' + L.corto + '</span></div><div class="fila-icono"><i class="i i-s" data-i="calendar-days"></i>' + dif(o.lista, L.lista, L.lista) + "</div>" +
+      '<div class="costo"><span>' + D.pesos(L.costo) + "</span>" + (L.costo < o.costo ? '<span class="barato" style="padding:0 6px"><i class="i i-s" data-i="check"></i>barato</span>' : "") + "</div>" +
+      '<span class="cons' + (si ? " si" : "") + '"><span class="radio"></span>' + (si ? "Se conserva" : "Conservar") + "</span></div>";
+  }
+  function pintarSug(entrar) {
+    var l = pantalla.querySelector(".dup-listo");
+    if (!pend.length) {
+      sug.style.display = "none"; decide.forEach(function (b) { b.disabled = true; });
+      if (!l) { l = D.crear('<div class="dup-listo tarjeta" style="flex:none;padding:20px"><span class="tilde"><i class="i" data-i="check"></i></span><div class="t-renglon">No queda nada por revisar</div><div class="t-detalle">Las sugerencias nuevas llegan con cada lista.</div></div>'); sug.after(l); D.entra(l); }
+      return;
+    }
+    if (l) l.remove(); sug.style.display = ""; decide.forEach(function (b) { b.disabled = false; });
+    var s = porId[pend[actual]];
+    sug.innerHTML = '<span class="motivo ' + s.motivo + '" style="justify-self:start"><i class="i i-s" data-i="' + (s.motivo === "codigo" ? "barcode" : "type") + '"></i>' + (s.motivo === "codigo" ? "Mismo código de barras" : "Descripción parecida") + '</span><div class="par">' + ladoHtml(s, "a") + ladoHtml(s, "b") + '<span class="vs">=</span></div>';
+    D.pintar(sug);
+    if (entrar) D.entra(sug);
+  }
+  function contar() {
+    D.numero(nPend, pend.length); D.numero(nUni, total);
+    cuenta.textContent = pend.length ? (actual + 1) + " de " + pend.length + " ›" : "";
+  }
+  function pintarUnida(entrar) {
+    var r = recientes[0], vieja = unidaCaja.querySelector(".unida");
+    var nueva = r ? D.crear('<div class="unida" style="border-top:0"><span class="foto"><img src="' + F + r[0] + '.webp" alt=""></span><div class="n elipsis">' + r[1] + '</div><button class="btn btn-suave chico" style="grid-row:1 / span 2;color:var(--pino-texto);background:var(--pino-suave)"><i class="i i-s" data-i="split"></i>Separar</button><div class="t-detalle elipsis">' + r[2] + "</div></div>") : D.crear('<div class="unida dup-vacio" style="border-top:0;display:block">Todavía no uniste nada.</div>');
+    if (vieja) vieja.replaceWith(nueva); else unidaCaja.appendChild(nueva);
+    if (entrar) { D.entra(nueva); D.marcarNuevo(nueva); }
+  }
+
+  var ocupado = false;
+  function decidir(mismo) {
+    if (ocupado || !pend.length) return; ocupado = true;
+    var s = porId[pend[actual]], k = lado(s), pos = actual, sale;
+    var lados = sug.querySelectorAll(".lado");
+    if (mismo) {
+      var d = lados[1].getBoundingClientRect().left - lados[0].getBoundingClientRect().left;
+      var queda = k === "a" ? lados[0] : lados[1], va = k === "a" ? lados[1] : lados[0];
+      D.vibrar(10);
+      D.anim(sug.querySelector(".vs"), [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" });
+      D.anim(lados[0], [{ transform: "none" }, { transform: "translateX(" + d / 2 + "px)" }], { duration: 200, fill: "forwards" });
+      D.anim(va, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: "forwards" });
+      sale = D.anim(lados[1], [{ transform: "none" }, { transform: "translateX(" + (-d / 2) + "px)" }], { duration: 200, fill: "forwards" }).then(function () {
+        var x = (k === "a" ? d / 2 : -d / 2);
+        return D.anim(queda, [{ transform: "translateX(" + x + "px) scale(1)" }, { transform: "translateX(" + x + "px) scale(1.06)" }, { transform: "translateX(" + x + "px) scale(1)" }], { duration: 240, easing: D.REBOTE, fill: "forwards" });
+      });
+    } else {
+      sale = D.anim(sug, [{ transform: "none", opacity: 1 }, { transform: "translateX(-48px)", opacity: 0 }], { duration: 200, easing: D.SALIDA, fill: "forwards" });
+    }
+    sale.then(function () {
+      sug.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
+      pend.splice(pos, 1); if (actual >= pend.length) actual = 0;
+      if (mismo) { total++; recientes.unshift([s.foto, s[k].n, s[k].marca + " · 2 proveedores · recién"]); pintarUnida(true); }
+      contar(); pintarSug(true); ocupado = false;
+      D.tostada(mismo ? "Unidos. Queda uno solo con los 2 proveedores." : "Quedan separados: no se vuelven a sugerir.", { icono: mismo ? "circle-check" : "x", deshacer: function () {
+        pend.splice(pos, 0, s.id); actual = pos;
+        if (mismo) { total--; recientes.shift(); pintarUnida(); }
+        contar(); pintarSug(true);
+      } });
+    });
+  }
+
+  sug.addEventListener("click", function (e) {
+    var l = e.target.closest(".lado"); if (!l || ocupado || !pend.length) return;
+    var s = porId[pend[actual]], k = l.getAttribute("data-lado"); if (lado(s) === k) return;
+    cons[s.id] = k; pintarSug();
+    var nuevo = sug.querySelector('.lado[data-lado="' + k + '"]');
+    D.anim(nuevo, [{ transform: "scale(.97)" }, { transform: "none" }], { duration: 200, easing: D.REBOTE });
+    D.vibrar(10);
+  });
+  decide[0].addEventListener("click", function () { decidir(true); });
+  decide[1].addEventListener("click", function () { decidir(false); });
+  cuenta.addEventListener("click", function () { if (pend.length > 1) { actual = (actual + 1) % pend.length; contar(); pintarSug(true); } });
+  function verUnidos() {
+    D.abrirUnidos({ total: total, recientes: recientes.filter(function (r) { return /recién/.test(r[2]); }), alSeparar: function (d) { total += d; D.numero(nUni, total); } });
+  }
+  verTodo.addEventListener("click", verUnidos);
+  botones[2].addEventListener("click", verUnidos);
+  botones[1].addEventListener("click", function () {
+    D.abrirUnirAMano(function (p) {
+      total++; recientes.unshift([p.foto, p.nombre, "Bahco · 2 proveedores · recién"]); pintarUnida(true); contar();
+      D.tostada("Unidos a mano: " + p.nombre + ".", { deshacer: function () { total--; recientes.shift(); pintarUnida(); contar(); } });
+    });
+  });
+  botones[0].addEventListener("click", function () {
+    D.buscarTodo(botones[0], { rotulo: caps[0], corto: true, alTerminar: function () {
+      var nuevas = ["s6", "punta"].filter(function (id) { return pend.indexOf(id) < 0 && !porId[id]; });
+      if (!nuevas.length) { D.tostada("No hay sugerencias nuevas.", { icono: "search" }); return; }
+      porId.s6 = { id: "s6", motivo: "texto", cuando: "ahora", foto: "tarugos", a: { n: "Tarugos nylon S6 sin tope × 100", marca: "Fischer", corto: "Fischer Arg.", costo: 2950, lista: "16/10/2026" }, b: { n: "TARUGO S6 X100 FISCHER", marca: "Fischer", corto: "Ferretera del Sur", costo: 3100, lista: "08/10/2026" } };
+      porId.punta = { id: "punta", motivo: "codigo", cuando: "ahora", foto: "pinza", a: { n: "Pinza de punta 6\" aislada 1000 V", marca: "Bahco", corto: "Distrib. Oeste", costo: 14200, lista: "14/10/2026" }, b: { n: "PINZA PUNTA 6 PULG AISL. BAHCO", marca: "Bahco", corto: "Bulonera Centro", costo: 15100, lista: "30/09/2026" } };
+      pend = pend.concat(nuevas); contar(); if (pend.length === nuevas.length) pintarSug(true);
+      D.anim(nPend, [{ transform: "scale(1)" }, { transform: "scale(1.25)" }, { transform: "scale(1)" }], { duration: 320, easing: D.REBOTE });
+      D.vibrar(10);
+      D.tostada("Encontré 2 sugerencias nuevas: quedan al final.", { icono: "search" });
+    } });
+  });
+  unidaCaja.addEventListener("click", function (e) {
+    var b = e.target.closest(".unida .btn"); if (!b) return;
+    var fila = b.closest(".unida"), r = recientes[0];
+    D.partir(fila).then(function () {
+      total--; recientes.shift(); pintarUnida(true); contar();
+      D.tostada("Separado: " + r[1] + ". Vuelven a ser 2 productos.", { icono: "split", deshacer: function () { total++; recientes.unshift(r); pintarUnida(true); contar(); } });
+    });
+  });
+})();
+</script>
 </body>
 </html>

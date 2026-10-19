@@ -6,6 +6,7 @@
 <title>Duplicados · Así queda (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <link rel="stylesheet" href="../../duplicados.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <style>
@@ -141,5 +142,215 @@
     </section>
   </main>
 </div>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script>
+/* Así queda: grupos con sus proveedores; destildar, unir, son distintos, unir los 7 de una vez,
+   separar a la derecha, buscar un unido, unir a mano y buscar en todo el catálogo. Z deshace. */
+(function () {
+  var D = Dup, F = D.FOTOS;
+  D.conectarMarco();
+  function g(id, n, marca, motivo, foto, stock, provs) { return { id: id, n: n, marca: marca, motivo: motivo, foto: foto, stock: stock, provs: provs.map(function (p) { return { q: p[0], c: p[1], fuera: !!p[2] }; }) }; }
+  var grupos = [
+    g("cinta", "Cinta métrica PowerLock 5 m", "Stanley", "codigo", "cinta-metrica", 22, [["Ferretera del Sur", 9120], ["Distribuidora Oeste", 9350], ["Bulonera Centro", 10600]]),
+    g("tarugos", "Tarugos nylon S8 con tope × 100", "Fischer", "texto", "tarugos", 3, [["Fischer Argentina", 4150], ["Bulonera Centro", 4390]]),
+    g("pinza", "Pinza universal 8\" aislada 1000 V", "Bahco", "codigo", "pinza", 6, [["Distribuidora Oeste", 15800], ["Ferretera del Sur", 13200, true], ["Bulonera Centro", 17350]]),
+    g("lampara", "Lámpara LED 9 W luz fría E27", "Macroled", "codigo", "lampara", 48, [["Eléctrica Moreno", 1890], ["Distribuidora Oeste", 1950], ["Ferretera del Sur", 2080]]),
+    g("martillo", "Martillo carpintero 27 mm mango tubular", "Bahco", "codigo", "martillo", 6, [["Bahco Argentina", 18900], ["Ferretera del Sur", 19750]]),
+    g("esmalte", "Esmalte sintético blanco brillante 1 L", "Alba", "texto", "pintura", 6, [["Pinturería del Centro", 12400], ["Distribuidora Oeste", 12950]]),
+    g("clavos", "Clavos punta París 2\" × 1 kg", "Acindar", "codigo", "clavos", 11, [["Ferretera del Sur", 3050], ["Bulonera Centro", 3200]]),
+    g("tornillos", "Tornillo autoperforante 8 × 1\" × 100", "Fixser", "codigo", "tornillos", 12, [["Distribuidora Oeste", 5480], ["Bulonera Centro", 5600], ["Ferretera del Sur", 5900]]),
+    g("llave", "Llave combinada 10 mm", "Bahco", "codigo", "llave-combinada", 9, [["Ferretera del Sur", 6900], ["Distribuidora Oeste", 7150]])
+  ];
+  var porId = {}; grupos.forEach(function (x) { porId[x.id] = x; });
+  var pend = grupos.map(function (x) { return x.id; });
+  var resueltos = 3, total = 38;
+  var unidos = [
+    ["mecha", "Mecha acero rápido HSS 8 mm", "recién · 2 prov.", true],
+    ["llave-combinada", "Llave combinada 13 mm", "ayer · 3 prov."],
+    ["puntas", "Puntas Phillips PH2 × 25", "15/10 · 2 prov."],
+    ["pintura", "Látex interior mate blanco 4 L", "12/10 · 2 prov."],
+    ["tornillos", "Tornillo autoperforante 8 × 1\"", "09/10 · 2 prov."],
+    ["clavos", "Clavos punta París 2\" × 1 kg", "06/10 · 2 prov."],
+    ["martillo", "Martillo de goma 450 g mango madera", "03/10 · 2 prov."],
+    ["cinta-metrica", "Cinta métrica 3 m traba automática", "29/09 · 3 prov."]
+  ];
+  var filtroUnidos = "";
+
+  var rejilla = document.querySelector(".grupos"), agregar = rejilla.querySelector(".agregar");
+  var linea = document.querySelector(".linea"), nTot = document.querySelector(".der .cab .pastilla");
+  var nTab = document.querySelector(".pestanas .activa .pastilla");
+  var franja = document.querySelector(".franja .txt"), aro = document.querySelectorAll(".anillo circle")[1];
+  var botonSiete = document.querySelectorAll(".cabecera .acciones .btn")[1], botonBuscar = document.querySelectorAll(".cabecera .acciones .btn")[0];
+  Array.prototype.forEach.call(rejilla.querySelectorAll(".grupo"), function (c, i) {
+    c.setAttribute("data-id", pend[i]);
+    c.querySelectorAll(".prov").forEach(function (p, j) { p.setAttribute("data-p", j); });
+    var b = c.querySelectorAll(".g-pie .btn"); b[0].classList.add("dup-unir"); b[1].classList.add("dup-distintos");
+  });
+  Array.prototype.forEach.call(linea.children, function (c, i) { c.setAttribute("data-k", unidos[i][1]); });
+
+  function visibles() { return pend.slice(0, 3); }
+  function cuantos(x) { return x.provs.filter(function (p) { return !p.fuera; }).length; }
+  function tarjeta(x) {
+    var max = Math.max.apply(null, x.provs.map(function (p) { return p.c; }));
+    var dentro = x.provs.filter(function (p) { return !p.fuera; }), mejor = dentro.reduce(function (m, p) { return !m || p.c < m.c ? p : m; }, null);
+    var aparte = x.provs.length - dentro.length;
+    return '<div class="grupo tarjeta" data-id="' + x.id + '"><div class="g-cab"><span class="foto"><img src="' + F + x.foto + '.webp" alt=""></span><div><div class="n">' + x.n + '</div><div class="d">' + x.marca + ' <span class="motivo ' + x.motivo + '" style="height:24px"><i class="i i-s" data-i="' + (x.motivo === "codigo" ? "barcode" : "type") + '"></i>' + (x.motivo === "codigo" ? "Mismo código" : "Misma descripción") + "</span></div></div></div>" +
+      '<div class="provs">' + x.provs.map(function (p, i) {
+        return '<div class="prov' + (p === mejor ? " mejor" : "") + (p.fuera ? " fuera" : "") + '" data-p="' + i + '"><span class="chk' + (p.fuera ? " no" : "") + '">' + (p.fuera ? "" : '<i class="i i-s" data-i="check"></i>') + '</span><span class="q">' + p.q + '</span><span class="bar"><b style="width:' + Math.round(p.c / max * 100) + '%"></b></span><span class="c"><span class="peso">$</span>' + D.miles(p.c) + "</span></div>";
+      }).join("") + "</div>" +
+      '<div class="g-pie"><button class="btn chico dup-unir"' + (dentro.length < 2 ? " disabled" : "") + '><i class="i i-s" data-i="git-merge"></i>' + (dentro.length < 2 ? "Elegí 2 o más" : "Unir " + dentro.length + " en uno") + '</button><button class="btn chico btn-fantasma dup-distintos">Son distintos</button><span class="t-detalle">' + (aparte ? aparte + (aparte > 1 ? " quedan aparte" : " queda aparte") : x.stock + " un.") + "</span></div></div>";
+  }
+  function pintarGrupos(entran) {
+    var v = visibles(), hay = {};
+    Array.prototype.forEach.call(rejilla.querySelectorAll(".grupo"), function (c) { hay[c.getAttribute("data-id")] = c; });
+    D.acomodar(rejilla, function () {
+      v.forEach(function (id) {
+        var el = hay[id]; delete hay[id];
+        if (!el) { el = D.crear(tarjeta(porId[id])); el.classList.add("dup-nueva"); }
+        rejilla.insertBefore(el, agregar);
+      });
+      Object.keys(hay).forEach(function (k) { hay[k].remove(); });
+    });
+    rejilla.querySelectorAll(".dup-nueva").forEach(function (el, i) { el.classList.remove("dup-nueva"); D.entra(el, (entran || 0) + i * 60); });
+  }
+  function repintar(x) { var c = rejilla.querySelector('[data-id="' + x.id + '"]'); if (c) { var n = D.crear(tarjeta(x)); c.replaceWith(n); return n; } }
+  function contar() {
+    var cod = pend.filter(function (id) { return porId[id].motivo === "codigo"; }).length;
+    nTab.textContent = pend.length;
+    D.numero(nTot, total);
+    franja.innerHTML = pend.length ? "<b>" + pend.length + (pend.length === 1 ? " artículo</b> aparece" : " artículos</b> aparecen") + " más de una vez: " + resueltos + " de 12 resueltos hoy.<br>Cada tarjeta muestra <b>cómo queda</b> al unir; destildá el proveedor que no corresponde." : "<b>No queda nada por revisar.</b> " + resueltos + " de 12 resueltos hoy.<br>Cuando llegue otra lista, los grupos nuevos aparecen acá.";
+    var largo = 113.1 * Math.min(resueltos, 12) / 12;
+    aro.setAttribute("stroke-dasharray", largo.toFixed(1) + " 113.1");
+    botonSiete.disabled = cod === 0;
+    botonSiete.innerHTML = '<i class="i i-s" data-i="git-merge"></i>' + (cod ? "Unir los " + cod + " de mismo código" : "Ninguno de mismo código") + ' <span class="kbd">Alt U</span>';
+    D.pintar(botonSiete);
+  }
+  function filaUnido(u) {
+    return '<div class="ev' + (u[3] ? " recien" : "") + '" data-k="' + u[1] + '"><span class="foto"><img src="' + F + u[0] + '.webp" alt=""></span><div class="n">' + u[1] + '</div><div class="d">' + u[2] + ' <button class="btn btn-suave chico"><i class="i i-s" data-i="split"></i>Separar</button></div></div>';
+  }
+  function pintarUnidos(nuevos) {
+    var q = filtroUnidos, lista = unidos.filter(function (u) { return !q || sinTilde(u[1]).indexOf(q) >= 0; }).slice(0, 5), hay = {};
+    Array.prototype.forEach.call(linea.children, function (c) { hay[c.getAttribute("data-k")] = c; });
+    D.acomodar(linea, function () {
+      lista.forEach(function (u) { var el = hay[u[1]]; delete hay[u[1]]; if (!el) el = D.crear(filaUnido(u)); el.classList.toggle("recien", !!u[3]); linea.appendChild(el); });
+      Object.keys(hay).forEach(function (k) { hay[k].remove(); });
+      if (!lista.length) linea.appendChild(D.crear('<div class="dup-vacio" data-k="-">Ningún unido con «' + q + "»</div>"));
+    });
+    (nuevos || []).forEach(function (k, i) { var el = linea.querySelector('[data-k="' + k.replace(/"/g, '\\"') + '"]'); if (el) D.entra(el, i * 60); });
+  }
+  function sinTilde(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function sumarUnido(x, cuando) {
+    unidos.forEach(function (u) { u[3] = false; });
+    var k = x.n; unidos.unshift([x.foto, k, (cuando || "recién") + " · " + cuantos(x) + " prov.", true]); total++;
+    return k;
+  }
+  function guardar() { return JSON.stringify({ pend: pend, resueltos: resueltos, total: total, unidos: unidos, provs: grupos.map(function (x) { return x.provs; }) }); }
+  function volver(foto) {
+    var e = JSON.parse(foto); pend = e.pend; resueltos = e.resueltos; total = e.total; unidos = e.unidos;
+    grupos.forEach(function (x, i) { x.provs = e.provs[i]; });
+    Array.prototype.forEach.call(rejilla.querySelectorAll(".grupo"), function (c) { var id = c.getAttribute("data-id"); if (pend.indexOf(id) < 0) c.remove(); else repintar(porId[id]); });
+    contar(); pintarGrupos(); pintarUnidos(unidos.slice(0, 1).map(function (u) { return u[1]; }));
+  }
+
+  var ocupado = false;
+  function resolver(id, unir) {
+    if (ocupado) return; ocupado = true;
+    var x = porId[id], card = rejilla.querySelector('[data-id="' + id + '"]'), antes = guardar();
+    var sale = unir ? [{ transform: "none", opacity: 1 }, { transform: "scale(1.03)", opacity: 1, offset: .35 }, { transform: "scale(.9)", opacity: 0 }] : [{ transform: "none", opacity: 1 }, { transform: "translateX(-24px)", opacity: 0 }];
+    D.anim(card, sale, { duration: unir ? 240 : 200, easing: unir ? D.CURVA : D.SALIDA, fill: "forwards" }).then(function () {
+      pend.splice(pend.indexOf(id), 1); resueltos++;
+      var k = unir ? sumarUnido(x) : null;
+      card.remove(); contar(); pintarGrupos(); if (unir) pintarUnidos([k]);
+      ocupado = false;
+      D.tostada(unir ? "Unidos: " + x.n + ", con " + cuantos(x) + " proveedores." : "Quedan separados: no se vuelven a sugerir.", { icono: unir ? "circle-check" : "x", tecla: "Z", deshacer: function () { volver(antes); } });
+    });
+  }
+  function unirSiete() {
+    if (ocupado) return;
+    var cods = pend.filter(function (id) { return porId[id].motivo === "codigo"; }); if (!cods.length) return;
+    ocupado = true;
+    var antes = guardar(), cards = Array.prototype.filter.call(rejilla.querySelectorAll(".grupo"), function (c) { return porId[c.getAttribute("data-id")].motivo === "codigo"; });
+    var ps = cards.map(function (c, i) { return D.anim(c, [{ transform: "none", opacity: 1 }, { transform: "scaleY(.2) translateY(-40%)", opacity: 0 }], { duration: 200, delay: i * 60, easing: D.SALIDA, fill: "forwards" }); });
+    var paso = 0, aroTick = setInterval(function () {
+      paso++; resueltos++; aro.setAttribute("stroke-dasharray", (113.1 * Math.min(resueltos, 12) / 12).toFixed(1) + " 113.1");
+      if (paso >= cods.length) clearInterval(aroTick);
+    }, D.reducir ? 0 : 60);
+    Promise.all(ps).then(function () { return D.esperar(cods.length * 60); }).then(function () {
+      clearInterval(aroTick); resueltos = JSON.parse(antes).resueltos + cods.length;
+      var nuevos = [];
+      cods.slice().reverse().forEach(function (id) { nuevos.unshift(sumarUnido(porId[id])); });
+      pend = pend.filter(function (id) { return cods.indexOf(id) < 0; });
+      cards.forEach(function (c) { c.remove(); });
+      contar(); pintarGrupos(); pintarUnidos(nuevos.slice(0, 5));
+      ocupado = false;
+      D.tostada("Unidos los " + cods.length + " de mismo código. Se pueden separar uno por uno.", { tecla: "Z", deshacer: function () { volver(antes); } });
+    });
+  }
+
+  rejilla.addEventListener("click", function (e) {
+    var card = e.target.closest(".grupo"); if (!card) return;
+    var x = porId[card.getAttribute("data-id")];
+    var prov = e.target.closest(".prov");
+    if (prov) {
+      var p = x.provs[+prov.getAttribute("data-p")]; p.fuera = !p.fuera;
+      var viejo = card.querySelector(".prov.mejor .c");
+      var n = repintar(x), fila = n.querySelector('[data-p="' + prov.getAttribute("data-p") + '"]');
+      D.anim(fila, [{ opacity: p.fuera ? 1 : .55 }, { opacity: p.fuera ? .55 : 1 }], { duration: 200 });
+      var nuevo = n.querySelector(".prov.mejor .c"); if (nuevo && viejo && nuevo.textContent !== viejo.textContent) D.anim(nuevo, [{ transform: "translateY(60%)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 200 });
+      return;
+    }
+    if (e.target.closest(".dup-unir")) resolver(x.id, true);
+    else if (e.target.closest(".dup-distintos")) resolver(x.id, false);
+  });
+  linea.addEventListener("click", function (e) {
+    var b = e.target.closest(".btn"); if (!b) return;
+    var fila = b.closest(".ev"), k = fila.getAttribute("data-k"), antes = guardar();
+    D.quitarFila(fila).then(function () {
+      unidos = unidos.filter(function (u) { return u[1] !== k; }); total--;
+      contar(); pintarUnidos();
+      D.tostada("Separado: " + k + ". Vuelven a ser productos aparte.", { icono: "split", tecla: "Z", deshacer: function () { volver(antes); } });
+    });
+  });
+  var campo = document.querySelector(".buscar-mini");
+  campo.addEventListener("click", function () {
+    if (campo.querySelector("input")) return;
+    campo.classList.add("dup-buscar");
+    campo.innerHTML = '<i class="i i-s" data-i="search"></i><input type="search" spellcheck="false" placeholder="Buscar un unido…" aria-label="Buscar un unido" style="font-size:14px">';
+    D.pintar(campo);
+    var inp = campo.querySelector("input"); inp.focus();
+    inp.addEventListener("input", function () { filtroUnidos = sinTilde(inp.value.trim()); pintarUnidos(); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Escape") { inp.value = ""; filtroUnidos = ""; pintarUnidos(); inp.blur(); } });
+  });
+  function aMano() {
+    D.abrirUnirAMano(function (p) {
+      var antes = guardar();
+      unidos.forEach(function (u) { u[3] = false; }); unidos.unshift([p.foto, p.nombre, "recién · 2 prov.", true]); total++;
+      contar(); pintarUnidos([p.nombre]);
+      D.tostada("Unidos a mano: " + p.nombre + ".", { tecla: "Z", deshacer: function () { volver(antes); } });
+    });
+  }
+  agregar.querySelector(".btn").addEventListener("click", aMano);
+  function buscar() {
+    D.buscarTodo(botonBuscar, { alTerminar: function () {
+      if (porId.s6) { D.tostada("No hay sugerencias nuevas: el catálogo está al día.", { icono: "search" }); return; }
+      var x = g("s6", "Tarugos nylon S6 sin tope × 100", "Fischer", "texto", "tarugos", 13, [["Fischer Argentina", 2950], ["Ferretera del Sur", 3100]]);
+      grupos.push(x); porId.s6 = x; pend.unshift("s6");
+      contar(); pintarGrupos();
+      var c = rejilla.querySelector('[data-id="s6"]'); if (c) D.marcarNuevo(c);
+      D.tostada("Encontré 1 artículo repetido nuevo en 104.500 productos.", { icono: "search" });
+    } });
+  }
+  botonBuscar.addEventListener("click", buscar);
+  botonSiete.addEventListener("click", unirSiete);
+
+  document.addEventListener("keydown", function (e) {
+    if (D.hayCapa() || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    var k = e.key.toLowerCase();
+    if (e.altKey) { if (k === "b") buscar(); else if (k === "u") unirSiete(); else if (k === "m") aMano(); else return; e.preventDefault(); return; }
+    if (k === "z" && !e.ctrlKey && !e.metaKey) { var t = D.tostadaVigente(); if (t) { t.deshacer(); e.preventDefault(); } }
+  });
+})();
+</script>
 </body>
 </html>

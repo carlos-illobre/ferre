@@ -6,6 +6,7 @@
 <title>Duplicados · De a uno (computadora)</title>
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <link rel="stylesheet" href="../../duplicados.css">
+<link rel="stylesheet" href="../../interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
 <style>
@@ -124,5 +125,153 @@
     <div class="tecla-g"><span class="kbd">Esc</span>Salir</div>
   </div>
 </div>
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<script>
+/* De a uno: E es el mismo, D son distintos, J después, ← → conservar, Z deshacer, Esc salir. */
+(function () {
+  var D = Dup, F = D.FOTOS;
+  var porId = {}; D.SUGERENCIAS.forEach(function (s) { porId[s.id] = s; });
+  var pend = ["cinta", "martillo", "tarugos", "pinza", "esmalte", "tornillos", "puntas", "llave", "widia"];
+  var hechas = [{ id: "mecha", mismo: true }, { id: "lampara", mismo: true }, { id: "clavos", mismo: true }];
+  var cons = {}, total = 38, recientes = [];
+  var ring = document.querySelector(".ring"), cartas = ring.querySelectorAll(".carta"), medio = ring.querySelector(".medio-col");
+  var prog = document.querySelector(".progreso"), etq = prog.querySelector(".t-etiqueta"), barra = prog.querySelector(".barra b"), nUni = D.envolver(prog.querySelector(".pastilla.logro"));
+  var tost = document.querySelector(".arriba .tostada"), tostTxt;
+  var botonUnidos = document.querySelector(".arriba .der > .btn"), nTot = D.envolver(botonUnidos);
+  var teclas = document.querySelectorAll(".teclas .tecla-g");
+  var salir = document.querySelector('.arriba .btn[title="Salir"]');
+  salir.setAttribute("data-ir", "productos"); teclas[3].setAttribute("data-ir", "productos");
+  cartas[0].setAttribute("data-lado", "a"); cartas[1].setAttribute("data-lado", "b");
+  // La tostada que ya está: su texto se envuelve para poder cambiarlo (se ve igual).
+  (function () { var n = Array.prototype.find.call(tost.childNodes, function (x) { return x.nodeType === 3 && x.nodeValue.trim(); }); tostTxt = document.createElement("span"); n.parentNode.replaceChild(tostTxt, n); tostTxt.appendChild(n); })();
+
+  function lado(s) { return cons[s.id] || (s.a.ventas >= s.b.ventas ? "a" : "b"); }
+  function corto(n) {
+    n = n.replace(/ acero rápido| mango tubular| con tope| aislada 1000 V| sintético| brillante/g, "");
+    return n.length > 30 ? n.slice(0, 30).replace(/\s+\S*$/, "") + "…" : n;
+  }
+  function spark(costo, k) {
+    var hs = [8, 10, 13, 16, 20, 24].map(function (h, i) { return Math.max(4, h - ((costo / 37 + i * (k === "b" ? 3 : 2)) % 4)); });
+    hs[5] = k === "b" ? 23 : 24;
+    return '<svg class="spark" viewBox="0 0 110 24" width="110" height="24">' + hs.map(function (h, i) { return '<rect x="' + i * 19 + '" y="' + (24 - h) + '" width="14" height="' + h + '" rx="3" fill="' + (i === 5 ? "var(--pino)" : "var(--borde-fuerte)") + '"/>'; }).join("") + "</svg>";
+  }
+  function carta(s, k) {
+    var L = s[k], si = lado(s) === k, otro = s[k === "a" ? "b" : "a"], barato = L.costo < otro.costo;
+    var hist = L.ventas ? '<span class="pastilla" style="margin-left:auto">desde ' + L.desde + " · " + L.ventas + " ventas</span>" : "";
+    var c = '<span class="cons' + (si ? " si" : "") + '"><span class="radio"></span>' + (si ? "Se conserva" : "Conservar este") + "</span>";
+    var tope = k === "a" ? '<span class="kbd">←</span>' + c + hist : c + hist + '<span class="kbd"' + (hist ? "" : ' style="margin-left:auto"') + ">→</span>";
+    return '<div class="tope">' + tope + '</div><div class="foto-g"><img src="' + F + s.foto + '.webp" alt=""' + (k === "b" ? ' style="transform:scaleX(-1)"' : "") + '></div><div class="nom">' + L.n + "</div>" +
+      '<div class="datos"><div class="fila-icono"><i class="i i-s" data-i="tags"></i><b>' + L.marca + '</b></div><div class="fila-icono"><i class="i i-s" data-i="barcode"></i>' + L.cod + '</div><div class="fila-icono"><i class="i i-s" data-i="truck"></i>' + L.prov + '</div><div class="fila-icono"><i class="i i-s" data-i="calendar-days"></i>Lista ' + L.lista + "</div></div>" +
+      '<div class="tres"><div class="dato"><span class="et">Stock</span><span class="va">' + L.stock + ' un.</span></div><div class="dato"><span class="et">Ventas 90 d</span><span class="va">' + (L.ventas || "—") + '</span></div><div class="dato"><span class="et">Costo, 6 listas</span>' + spark(L.costo, k) + "</div></div>" +
+      '<div class="costo"><span class="lbl">Costo</span>' + (barato ? '<span class="barato"><i class="i i-s" data-i="check"></i>El más barato</span><span class="t-numero" style="color:var(--logro-texto)">' : '<span class="t-numero">') + D.pesos(L.costo) + "</span></div>";
+  }
+  function palabras(a, b) {
+    var n = function (x) { return x.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(/[^a-z0-9]+/).filter(function (w) { return w.length > 1; }); };
+    var B = n(b); return n(a).filter(function (w) { return B.indexOf(w) >= 0; }).length;
+  }
+  function pintarMedio(s) {
+    var dif = s.b.costo - s.a.costo, p = palabras(s.a.n, s.b.n);
+    medio.innerHTML = '<div class="seguro"><b>' + s.seguro + ' %</b>seguro que es el mismo</div><div class="igual">=</div><div class="coinc">' +
+      (s.a.cod === s.b.cod ? '<div class="c"><i class="i i-s" data-i="check"></i>Código de barras</div>' : '<div class="c no"><i class="i i-s" data-i="info"></i>Código distinto</div>') +
+      (s.a.marca === s.b.marca ? '<div class="c"><i class="i i-s" data-i="check"></i>Marca</div>' : "") +
+      '<div class="c' + (p >= 2 ? "" : " no") + '"><i class="i i-s" data-i="' + (p >= 2 ? "check" : "info") + '"></i>' + p + (p === 1 ? " palabra igual" : " palabras iguales") + "</div>" +
+      '<div class="c no"><i class="i i-s" data-i="info"></i>Costo $' + D.miles(Math.abs(dif)) + (dif < 0 ? " menos" : " más") + "</div></div>";
+    D.pintar(medio);
+  }
+  function pintar(s, entrar) {
+    ["a", "b"].forEach(function (k, i) { cartas[i].className = "carta" + (lado(s) === k ? " conservada" : ""); cartas[i].innerHTML = carta(s, k); D.pintar(cartas[i]); });
+    pintarMedio(s);
+    teclas[2].innerHTML = '<span class="kbd">E</span>Es el mismo · queda con 2 proveedores';
+    if (entrar) { D.entra(cartas[0]); D.entra(medio, 40); D.entra(cartas[1], 80); }
+  }
+  function contar() {
+    var n = hechas.length, unidos = hechas.filter(function (h) { return h.mismo; }).length;
+    etq.textContent = pend.length ? Math.min(12, n + 1) + " de 12" : "12 de 12";
+    barra.style.width = Math.round(n / 12 * 100) + "%";
+    D.numero(nUni, unidos);
+    D.numero(nTot, total);
+  }
+  function listo(si) {
+    var l = document.querySelector(".dup-listo");
+    ring.style.display = si ? "none" : "";
+    teclas[0].style.visibility = teclas[1].style.visibility = teclas[2].style.visibility = si ? "hidden" : "";
+    if (si && !l) {
+      l = D.crear('<div class="dup-listo"><span class="tilde"><i class="i" data-i="check"></i></span><div class="t-titulo">Listo: no queda nada por revisar</div><div class="t-cuerpo">Uniste ' + hechas.filter(function (h) { return h.mismo; }).length + " y separaste " + hechas.filter(function (h) { return !h.mismo; }).length + ' hoy. Esc vuelve al catálogo.</div></div>');
+      ring.parentNode.insertBefore(l, ring); D.anim(l.querySelector(".tilde"), [{ transform: "scale(.6)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 300, easing: D.REBOTE });
+    }
+    if (!si && l) l.remove();
+  }
+  function mostrarTostada(texto, icono) {
+    tostTxt.textContent = texto;
+    var ic = tost.querySelector("svg"); if (ic && icono) { var n = D.crear('<i class="i i-s" data-i="' + icono + '"></i>'); ic.replaceWith(n); }
+    tost.style.visibility = "";
+    D.anim(tost, [{ transform: "translateY(-8px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 320 });
+    clearTimeout(mostrarTostada.t); mostrarTostada.t = setTimeout(function () { D.anim(tost, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: D.SALIDA }).then(function () { tost.style.visibility = "hidden"; }); }, 6000);
+  }
+
+  var ocupado = false;
+  function decidir(que) {
+    if (ocupado || !pend.length) return; ocupado = true;
+    var s = porId[pend[0]], k = lado(s), sale;
+    if (que === "mismo") {
+      var d = (ring.getBoundingClientRect().width - 64) / 2 - (cartas[0].getBoundingClientRect().width / 2) + 24;
+      var queda = k === "a" ? cartas[0] : cartas[1], va = k === "a" ? cartas[1] : cartas[0];
+      D.anim(medio, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" });
+      D.anim(cartas[0], [{ transform: "none" }, { transform: "translateX(" + d + "px)" }], { duration: 200, fill: "forwards" });
+      sale = D.anim(cartas[1], [{ transform: "none" }, { transform: "translateX(" + (-d) + "px)" }], { duration: 200, fill: "forwards" }).then(function () {
+        D.anim(va, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" });
+        return D.anim(queda, [{ transform: "translateX(" + (k === "a" ? d : -d) + "px) scale(1)" }, { transform: "translateX(" + (k === "a" ? d : -d) + "px) scale(1.04)" }, { transform: "translateX(" + (k === "a" ? d : -d) + "px) scale(1)" }], { duration: 240, easing: D.REBOTE, fill: "forwards" });
+      }).then(function () { return D.anim(queda, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: "forwards" }); });
+    } else {
+      var dx = que === "distintos" ? -40 : 40;
+      sale = Promise.all([cartas[0], medio, cartas[1]].map(function (c) { return D.anim(c, [{ transform: "none", opacity: 1 }, { transform: "translateX(" + dx + "px)", opacity: 0 }], { duration: 200, easing: D.SALIDA, fill: "forwards" }); }));
+    }
+    sale.then(function () {
+      [cartas[0], cartas[1], medio].forEach(function (c) { c.getAnimations().forEach(function (a) { a.cancel(); }); });
+      pend.shift();
+      if (que === "despues") pend.push(s.id);
+      else {
+        hechas.push({ id: s.id, mismo: que === "mismo" });
+        if (que === "mismo") { total++; recientes.unshift([s.foto, s[k].n, s[k].marca + " · 2 proveedores · recién"]); }
+      }
+      contar();
+      if (pend.length) pintar(porId[pend[0]], true); else listo(true);
+      if (que === "mismo") mostrarTostada("Unidos: " + corto(s[k].n) + ". Se pueden separar.", "circle-check");
+      else if (que === "distintos") mostrarTostada("Separados: " + corto(s.a.n) + " no se vuelve a sugerir.", "x");
+      ocupado = false;
+    });
+  }
+  function deshacer() {
+    if (ocupado || !hechas.length) return;
+    var h = hechas.pop(), s = porId[h.id];
+    if (h.mismo) { total--; recientes = recientes.filter(function (r) { return r[1] !== s[lado(s)].n; }); }
+    pend.unshift(h.id); listo(false); contar(); pintar(s, true);
+    clearTimeout(mostrarTostada.t); tost.style.visibility = "hidden";
+  }
+  function conservar(k) {
+    if (ocupado || !pend.length) return;
+    var s = porId[pend[0]]; if (lado(s) === k) return;
+    cons[s.id] = k; pintar(s);
+    var c = k === "a" ? cartas[0] : cartas[1];
+    D.anim(c, [{ transform: "scale(.98)" }, { transform: "none" }], { duration: 200, easing: D.REBOTE });
+  }
+
+  teclas[0].addEventListener("click", function () { decidir("distintos"); });
+  teclas[1].addEventListener("click", function () { decidir("despues"); });
+  teclas[2].addEventListener("click", function () { decidir("mismo"); });
+  tost.querySelector(".btn").addEventListener("click", deshacer);
+  ring.addEventListener("click", function (e) { var c = e.target.closest(".carta"); if (c) conservar(c.getAttribute("data-lado")); });
+  botonUnidos.addEventListener("click", function () { D.abrirUnidos({ total: total, recientes: recientes, alSeparar: function (d) { total += d; D.numero(nTot, total); } }); });
+  document.addEventListener("keydown", function (e) {
+    if (D.hayCapa() || /INPUT|TEXTAREA/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key.toLowerCase();
+    if (k === "e") decidir("mismo"); else if (k === "d") decidir("distintos"); else if (k === "j") decidir("despues");
+    else if (e.key === "ArrowLeft") conservar("a"); else if (e.key === "ArrowRight") conservar("b");
+    else if (k === "z") deshacer(); else if (e.key === "Escape") window.irAMaqueta && window.irAMaqueta("productos"); else return;
+    e.preventDefault();
+  });
+})();
+</script>
 </body>
 </html>

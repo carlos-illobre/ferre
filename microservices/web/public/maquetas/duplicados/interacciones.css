@@ -1,0 +1,63 @@
+/* Piezas que solo aparecen al tocar la maqueta (hojas, diálogos, paneles, tostadas). Quieta, la
+   página se ve igual: nada de esto está en pantalla hasta que se abre. Solo variables comunes. */
+[data-ir], [data-mas], [data-toca] { cursor: pointer; }
+.btn, .chip, .sug, .cons, .prov .chk, .fila .chk, .tecla-g, .redondo, .lado, .prod { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.btn:active, .chip:active, .tecla-g:active, .redondo:active { transform: scale(.97); }
+
+.dup-capa { position: fixed; inset: 0; z-index: 50; }
+.celu .dup-capa { position: absolute; }
+.dup-velo { position: absolute; inset: 0; background: rgba(26, 29, 27, .3); }
+.dup-capa.es-menu .dup-velo { background: transparent; }
+.dup-capa.es-dialogo { display: grid; place-items: center; }
+
+.dup-hoja { position: absolute; left: 0; right: 0; bottom: 0; max-height: calc(100% - 72px); overflow: auto; background: var(--fondo); border-radius: var(--r-hoja) var(--r-hoja) 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 12px; }
+.dup-hoja .asa { width: 40px; height: 5px; border-radius: 99px; background: var(--hundido-2); margin: 0 auto 2px; flex: none; }
+.dup-dialogo { position: relative; width: 600px; max-width: calc(100% - 64px); background: var(--fondo); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+.dup-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 420px; background: var(--fondo); border-radius: var(--r-hoja) 0 0 var(--r-hoja); box-shadow: var(--sombra-3); padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+.dup-menu { position: absolute; width: 272px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-3); padding: 6px; display: grid; gap: 2px; }
+.dup-menu a { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 10px; font-weight: 700; font-size: 15px; color: var(--tinta); }
+.dup-menu a:hover, .dup-menu a:focus-visible { background: var(--hundido); outline: none; }
+.dup-menu a .i { color: var(--texto-2); }
+.dup-menu a .pastilla { margin-left: auto; height: 24px; }
+
+.dup-cab { display: flex; align-items: center; gap: 12px; }
+.dup-cab .t-seccion { flex: 1; }
+.dup-cab .t-seccion small { display: block; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--texto-2); letter-spacing: 0; }
+.dup-pie { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+.celu .dup-pie .btn { flex: 1; }
+
+.dup-lista { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); overflow: hidden; }
+.dup-fila { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--borde); background: var(--superficie); }
+.dup-fila:first-child { border-top: 0; }
+.dup-fila .foto { width: 44px; height: 44px; grid-row: 1 / span 2; }
+.dup-fila .n { font-weight: 750; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dup-fila .d { font-size: 14px; line-height: 19px; color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dup-fila > .btn { grid-row: 1 / span 2; grid-column: 3; }
+.dup-fila.elegible { cursor: pointer; }
+.dup-fila.elegible.si { background: linear-gradient(90deg, var(--pino-suave), #fff 70%); }
+.dup-fila .radio { width: 20px; height: 20px; border-radius: 99px; border: 2px solid var(--borde-fuerte); grid-row: 1 / span 2; grid-column: 3; }
+.dup-fila.si .radio { border-color: var(--pino); background: radial-gradient(circle, var(--pino) 0 4px, transparent 5px); }
+.dup-vacio { padding: 20px 12px; text-align: center; color: var(--texto-3); font-size: 14px; font-weight: 600; }
+.dup-buscar { height: 44px; font-size: 15px; }
+.dup-buscar input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-weight: 600; color: var(--tinta); }
+.dup-buscar input::placeholder { color: var(--texto-3); font-weight: 500; }
+.dup-mitad { position: absolute; top: 0; bottom: 0; overflow: hidden; pointer-events: none; }
+.dup-mitad > * { position: absolute; top: 0; bottom: 0; margin: 0 !important; }
+.dup-corte { position: absolute; top: 4px; bottom: 4px; width: 2px; margin-left: -1px; border-radius: 2px; background: var(--pino); pointer-events: none; }
+
+.dup-tostadas { position: fixed; left: 0; right: 0; top: 18px; z-index: 60; display: flex; justify-content: flex-end; padding: 0 32px; pointer-events: none; }
+.celu .dup-tostadas { position: absolute; top: auto; bottom: 168px; justify-content: center; padding: 0 16px; }
+.dup-tostadas .tostada { pointer-events: auto; padding: 6px 8px 6px 12px; font-size: 14px; max-width: 100%; }
+.dup-tostadas .tostada > span { min-width: 0; }
+.dup-tostadas .tostada .btn, .tostada .dup-deshacer { min-height: 32px; height: 32px; background: rgba(255, 255, 255, .14); border-color: transparent; color: #fff; box-shadow: none; padding: 0 10px; font-size: 14px; }
+.dup-tostadas .tostada.sin-boton { padding-right: 16px; }
+
+.dup-avance { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--pino); transform-origin: left center; transform: scaleX(0); pointer-events: none; }
+.btn.dup-buscando { position: relative; overflow: hidden; }
+.dup-entra { will-change: transform, opacity; }
+.dup-listo { display: grid; place-items: center; align-content: center; gap: 10px; text-align: center; flex: 1; padding: 24px; color: var(--texto-2); }
+.dup-listo .tilde { width: 64px; height: 64px; border-radius: 99px; background: var(--logro-suave); color: var(--logro-texto); display: grid; place-items: center; margin: 0 auto; }
+.dup-listo .tilde svg { width: 32px; height: 32px; }
+.dup-candidato { display: grid; gap: 6px; }
+.dup-candidato .lbl { display: flex; align-items: center; gap: 8px; }
+.deslizar, .pila .carta, .gestos, .redondo { user-select: none; -webkit-user-select: none; }
