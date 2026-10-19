@@ -136,7 +136,7 @@ el 2026-10-16: quedan a 2 o 3 píxeles de ella en una pantalla de 1536 × 1024.
 
 **La tarjeta de la derecha, rediseñada (decisión 118, Carlos, 2026-10-19):** la izquierda, la foto y
 el celular quedan como están; la tarjeta toma la de la propuesta v2 del director de arte, sin la
-palabra «compu». De arriba abajo: una pastilla verde «La forma más rápida»; «Entrá con tu celular»;
+palabra «compu». De arriba abajo: «Entrá con tu celular» con la pastilla verde «La forma más rápida» a su derecha;
 «Entra con tu usuario, sin contraseñas, en cuanto ponés tu huella.»; el código (sin esquinas de
 color, con el isotipo de Ferrebress en el centro) al lado de dos pasos, centrados a su alto, numerados en círculos verdes
 llenos, cada uno con su título y una línea («Apuntá el celular a este código» · «Con la cámara o con

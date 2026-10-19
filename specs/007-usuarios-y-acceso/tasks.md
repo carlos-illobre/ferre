@@ -58,3 +58,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T047 [interfaz] Entrada de la computadora: la tarjeta de la derecha como la v2, con el isotipo en el QR, el estado real de la conexión arriba y las tres características técnicas abajo (decisión 118)
 - [x] T048 [ajuste] Entrada de la computadora: las tres características de abajo se ven claras sobre la foto oscura y oscuras sobre lo claro
 - [x] T049 [ajuste] Entrada de la computadora: los dos pasos van centrados al alto del código
+- [x] T050 [ajuste] Entrada de la computadora: «La forma más rápida» a la derecha del título

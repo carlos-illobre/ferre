@@ -381,8 +381,10 @@ export function Entrar() {
   const { qr, error: errorDeCodigo, vence, duracion } = useCodigoParaEntrar(enLinea);
   return (
     <MarcoDeEntradaConCelular conexion={conexion}>
-      <span className="entrar-cc-pastilla"><Icono nombre="celular" tam={14} />{TEXTOS_DE_ENTRADA.masRapida}</span>
-      <h2>{TEXTOS_DE_ENTRADA.conElCelular}</h2>
+      <div className="entrar-cc-titulo">
+        <h2>{TEXTOS_DE_ENTRADA.conElCelular}</h2>
+        <span className="entrar-cc-pastilla"><Icono nombre="celular" tam={14} />{TEXTOS_DE_ENTRADA.masRapida}</span>
+      </div>
       <p className="entrar-cc-rapido">{TEXTOS_DE_ENTRADA.conTuUsuario}</p>
       {cerrada && <Aviso tipo="alerta" testId="sesion-cerrada"><strong className="entrar-error-titulo">Hay que iniciar sesión</strong>La sesión de este dispositivo se cerró o venció. Entrá de nuevo para seguir.</Aviso>}
       <div className="entrar-codigo">
