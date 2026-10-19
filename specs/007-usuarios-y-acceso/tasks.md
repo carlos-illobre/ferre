@@ -60,3 +60,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T049 [ajuste] Entrada de la computadora: los dos pasos van centrados al alto del código
 - [x] T050 [ajuste] Entrada de la computadora: «La forma más rápida» a la derecha del título
 - [x] T051 [ajuste] Entrada de la computadora: «Una vez dentro, resiste cortes de internet» y «Busca productos por código de barras», con el ícono arriba para que entren
+- [x] T052 [ajuste] Entrada de la computadora: «La forma más rápida» va contra el borde derecho de la tarjeta, separada del título
