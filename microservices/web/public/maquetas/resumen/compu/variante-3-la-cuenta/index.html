@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { height: 768px; overflow: hidden; }
   .top { height: 60px; display: flex; align-items: center; gap: 16px; padding: 0 32px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
@@ -79,35 +80,35 @@
 </head>
 <body>
   <header class="top">
-    <span class="logo"><i class="i i-s" data-i="store"></i></span>
-    <div class="migas">Ferrebress <i class="i i-s" data-i="chevron-right"></i> Negocio <i class="i i-s" data-i="chevron-right"></i> <b>La cuenta del mes</b></div>
-    <div class="segmentos" style="margin-left:24px"><button>Hoy</button><button>Semana</button><button class="elegido">Mes</button><button>Año</button></div>
-    <div class="ir"><i class="i i-s" data-i="search"></i>Ir a… o preguntá algo<span class="kbd">Ctrl K</span></div>
-    <span class="avatar">CI</span>
+    <span class="logo" data-ir="vender" data-toca title="Ir a Vender"><i class="i i-s" data-i="store"></i></span>
+    <div class="migas"><span data-ir="vender" data-toca>Ferrebress</span> <i class="i i-s" data-i="chevron-right"></i> <span data-ir="resumen" data-toca>Negocio</span> <i class="i i-s" data-i="chevron-right"></i> <b id="miga">La cuenta del mes</b></div>
+    <div class="segmentos" style="margin-left:24px" id="vistas"><button data-vista="hoy">Hoy</button><button data-vista="semana">Semana</button><button class="elegido" data-vista="mes">Mes</button><button data-vista="anio">Año</button></div>
+    <div class="ir" id="ir" data-toca role="button" tabindex="0"><i class="i i-s" data-i="search"></i>Ir a… o preguntá algo<span class="kbd">Ctrl K</span></div>
+    <span class="avatar" id="avatar" data-toca role="button" tabindex="0">CI</span>
   </header>
 
   <div class="cuerpo">
     <div class="izq">
       <div class="meses" id="meses"></div>
 
-      <div class="titulo"><h1>En septiembre te quedaron <span class="verde">+$1.360.000</span></h1></div>
-      <div class="bajada">Vendiste <b>$11.640.000</b> en 1.012 ventas. Después de pagar la mercadería que salió (<b>$7.330.000</b>, al costo de cada venta) y los gastos del local (<b>$2.950.000</b>), esto es lo que ganó el negocio: el <b>12 %</b> de lo vendido, a favor.</div>
+      <div class="titulo" id="titulo"><h1>En septiembre te quedaron <span class="verde">+$1.360.000</span></h1></div>
+      <div class="bajada" id="bajada">Vendiste <b>$11.640.000</b> en 1.012 ventas. Después de pagar la mercadería que salió (<b>$7.330.000</b>, al costo de cada venta) y los gastos del local (<b>$2.950.000</b>), esto es lo que ganó el negocio: el <b>12 %</b> de lo vendido, a favor.</div>
 
-      <div class="tarjeta cascada">
+      <div class="tarjeta cascada" id="caja-cascada">
         <div class="cab"><span class="t-seccion" style="font-size:18px">De dónde sale</span><span class="der">Tocá una barra y ves las ventas o los gastos que la forman</span></div>
         <div class="barras" id="cascada"></div>
       </div>
 
-      <div class="tarjeta equilibrio">
+      <div class="tarjeta equilibrio" id="equilibrio">
         <div class="q"><b class="num">$306.000 por día</b>hay que vender para cubrir los gastos</div>
-        <div class="regla"><div class="pista"></div><div class="piso" style="left:51%"><span>piso $306.000</span></div><div class="yo" style="left:74.6%"><span>septiembre: $448.000 por día</span></div></div>
+        <div class="regla"><div class="pista"></div><div class="piso" style="left:51%"><span>piso $306.000</span></div><div class="yo" style="left:74.6%" id="yo"><span>septiembre: $448.000 por día</span></div></div>
       </div>
     </div>
 
     <aside class="tarjeta-2 panel">
       <h2><i class="i" data-i="shield-check"></i>Quién ve cada número</h2>
       <p>Lo que un rol no puede ver no le aparece ni le llega. Tocá un cuadro para cambiarlo.</p>
-      <div class="matriz">
+      <div class="matriz" id="matriz">
         <span></span>
         <div class="rh"><span class="avatar" style="background:var(--pino-suave);color:var(--pino-texto)">Ad</span>Admin.</div>
         <div class="rh"><span class="avatar">Ve</span>Vende</div>
@@ -153,6 +154,152 @@
       C.appendChild(d);});
     window.pintarIconos && pintarIconos();
   });
+</script>
+<script src="../../_extra/interacciones.js"></script>
+<style>
+  .bc { transition: opacity 200ms var(--curva); cursor: pointer; }
+  .bc.apagada { opacity: .15; }
+  .mes { cursor: pointer; }
+  .tg { cursor: pointer; transition: transform 120ms var(--curva); }
+  .tg:active { transform: scale(.92); }
+  .rh { cursor: pointer; }
+  .rh.mirando .avatar { box-shadow: 0 0 0 2px var(--pino); }
+  .r-ir-lista a { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 10px; color: var(--tinta); text-decoration: none; font-weight: 650; font-size: 15px; }
+  .r-ir-lista a small { margin-left: auto; color: var(--texto-3); font-weight: 600; font-size: 14px; }
+  .r-ir-lista a.primero, .r-ir-lista a:hover { background: var(--hundido); }
+</style>
+<script>
+(function () {
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  const NOM = ['noviembre', 'diciembre', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre'];
+  const RES_M = [980, 1840, 620, -140, 410, 760, 890, 540, 1120, 1010, 1360, 820];
+  const G = [1200000, 1400000, 210000, 140000]; // alquiler, sueldos, servicios, impuestos
+  function mes(i) {
+    if (i == 10) return { v: 11640000, costo: 7330000, gastos: G, n: 1012, dias: 26 };
+    if (i == 11) return { v: 7684000, costo: 4840900, gastos: [1200000, 653000, 105000, 65000], n: 441, dias: 16, curso: true };
+    const r = RES_M[i] * 1000, bruta = r + 2950000, v = Math.round(bruta / 0.37 / 10000) * 10000;
+    return { v, costo: v - bruta, gastos: G, n: Math.round(v / 11500), dias: i == 1 ? 25 : 26 };
+  }
+  const VISTAS = {
+    hoy: { v: 412000, costo: 260600, gastos: [46200, 53800, 8100, 5400], n: 23, dias: 1, quien: 'Hoy', miga: 'La cuenta de hoy', piso: 'hoy' },
+    semana: { v: 2316000, costo: 1459100, gastos: [277000, 323100, 48500, 32400], n: 131, dias: 6, quien: 'En la semana', miga: 'La cuenta de la semana', piso: 'la semana' },
+    anio: (() => { let v = 0, c = 0, n = 0; for (let i = 0; i < 12; i++) { const m = mes(i); v += m.v; c += m.costo; n += m.n; } return { v, costo: c, gastos: [14400000, 16153000, 2415000, 1605000], n, dias: 301, quien: 'En los últimos 12 meses', miga: 'La cuenta del año', piso: 'el año' }; })(),
+  };
+  let vista = 'mes', sel = 10;
+  function datos() { if (vista != 'mes') return VISTAS[vista]; const m = mes(sel); return Object.assign({ quien: (m.curso ? 'En octubre, hasta hoy,' : 'En ' + NOM[sel]), miga: 'La cuenta del mes', piso: NOM[sel] }, m); }
+  const fmt = n => (n < 0 ? '−' : '') + '$' + RES.miles(Math.abs(n));
+
+  function pintar(animar) {
+    const d = datos(), bruta = d.v - d.costo, gs = d.gastos.reduce((a, b) => a + b, 0), r = bruta - gs, pos = r >= 0;
+    const verbo = d.curso ? (pos ? 'van' : 'faltan') : (vista == 'hoy' ? (pos ? 'quedaron' : 'faltaron') : (pos ? 'quedaron' : 'faltaron'));
+    const titulo = `<h1>${d.quien} te ${verbo} <span class="verde" style="${pos ? '' : 'color:var(--error-texto)'}">${pos ? '+' : ''}${fmt(r)}</span></h1>`;
+    const bajada = `Vendiste <b>${fmt(d.v)}</b> en ${RES.miles(d.n)} ventas. Después de pagar la mercadería que salió (<b>${fmt(d.costo)}</b>, al costo de cada venta) y los gastos del local (<b>${fmt(gs)}</b>${vista == 'hoy' || vista == 'semana' ? ', la parte de estos días' : ''}), esto es lo que ${pos ? 'ganó' : 'perdió'} el negocio: el <b>${Math.abs(Math.round(r / d.v * 100))} %</b> de lo vendido, ${pos ? 'a favor' : 'en contra'}.`;
+    $('#miga').textContent = d.miga;
+    if (animar) { RES.fundir($('#titulo'), titulo); RES.fundir($('#bajada'), bajada); } else { $('#titulo').innerHTML = titulo; $('#bajada').innerHTML = bajada; }
+    cascada(d, animar);
+    const porDia = Math.round(d.v / d.dias / 1000) * 1000, left = Math.max(4, Math.min(96, porDia / 600000 * 100));
+    $('#yo').style.left = left + '%'; $('#yo span').textContent = `${d.piso}: ${fmt(porDia)} por día`;
+    $('#yo').style.background = porDia >= 306000 ? '' : 'var(--error)';
+    if (animar) RES.anim($('#yo'), [{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'none' }], { duration: 320 });
+    $$('.mes').forEach((m, i) => m.classList.toggle('sel', vista == 'mes' && i == sel));
+  }
+  let ultimo = null;
+  function cascada(d, animar) {
+    const bruta = d.v - d.costo, [al, su, se, im] = d.gastos, r = bruta - al - su - se - im;
+    const pasos = [['Vendido', RES.miles(d.n) + ' ventas', 0, d.v, 'total'], ['Costo', 'de lo vendido', bruta, d.v, 'resta'], ['Ganancia bruta', Math.round(bruta / d.v * 100) + ' %', 0, bruta, 'sub'],
+      ['Alquiler', '', bruta - al, bruta, 'gasto'], ['Sueldos', '', bruta - al - su, bruta - al, 'gasto'], ['Servicios', '', bruta - al - su - se, bruta - al - su, 'gasto'], ['Impuestos', '', r, r + im, 'gasto'], [r >= 0 ? 'Te quedó' : 'Te faltó', r >= 0 ? 'a favor' : 'en contra', Math.min(0, r), Math.max(0, r), r >= 0 ? 'fin' : 'gasto']];
+    ultimo = pasos;
+    const C = $('#cascada'); C.innerHTML = '';
+    const H = C.clientHeight - 44 - 26, k = H / d.v, base = 44;
+    const col = { total: 'var(--pino)', resta: 'var(--hundido-2)', sub: 'var(--pino-2)', gasto: 'var(--error-suave)', fin: 'var(--logro)' };
+    const brd = { resta: '1.5px dashed var(--borde-fuerte)', gasto: '1.5px solid #F2B8B1' };
+    pasos.forEach((x, i) => {
+      const el = document.createElement('div'); el.className = 'bc'; el.dataset.i = i;
+      const b0 = base + Math.max(0, x[2]) * k - (x[2] < 0 ? Math.min(-x[2] * k, 40) : 0), h = Math.max((x[3] - x[2]) * k, 4), val = x[3] - x[2];
+      const s = (x[4] == 'resta' || x[4] == 'gasto') && i < 7 ? '−' : (i == 7 ? (r >= 0 ? '+' : '−') : '');
+      el.innerHTML = `<span class="b" style="bottom:${b0}px;height:${h}px;background:${col[x[4]]};${brd[x[4]] ? 'border:' + brd[x[4]] : ''}${i == 7 ? ';box-shadow:0 0 0 4px var(--' + (r >= 0 ? 'logro' : 'error') + '-suave)' : ''}"></span><span class="v" style="bottom:${b0 + h + 4}px;color:${x[4] == 'gasto' ? 'var(--error-texto)' : (x[4] == 'fin' ? 'var(--logro-texto)' : 'var(--tinta)')}">${s}${fmt(val)}</span><span class="n">${x[0]}${x[1] ? '<small>' + x[1] + '</small>' : ''}</span>`;
+      C.appendChild(el);
+      // al elegir otro período, las barras caen en orden como fichas (40 ms cada una)
+      if (animar) RES.anim(el, [{ opacity: 0, transform: 'translateY(-16px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: i * 40, easing: 'cubic-bezier(.34,1.4,.64,1)' });
+    });
+  }
+  // Las barras originales no tienen data-i: se las pone apenas están.
+  requestAnimationFrame(() => requestAnimationFrame(() => { $$('#cascada .bc').forEach((b, i) => b.dataset.i = i); }));
+
+  $('#vistas').addEventListener('click', e => { const b = e.target.closest('[data-vista]'); if (!b || !RES.segmento(b)) return; vista = b.dataset.vista; if (vista == 'mes') sel = 10; pintar(true); });
+  $('#meses').addEventListener('click', e => {
+    const m = e.target.closest('.mes'); if (!m) return; const i = $$('.mes').indexOf(m);
+    sel = i; if (vista != 'mes') RES.segmento($('[data-vista=mes]')); vista = 'mes'; pintar(true);
+  });
+
+  // Tocar una barra: las ventas o los gastos que la forman
+  $('#cascada').addEventListener('click', e => {
+    const b = e.target.closest('.bc'); if (!b) return; const d = datos(), i = +b.dataset.i;
+    const pasos = ultimo || [['Vendido', '1.012 ventas', 0, 11640000], ['Costo', '', 4310000, 11640000], ['Ganancia bruta', '', 0, 4310000], ['Alquiler', '', 0, 1200000], ['Sueldos', '', 0, 1400000], ['Servicios', '', 0, 210000], ['Impuestos', '', 0, 140000], ['Te quedó', '', 0, 1360000]];
+    const x = pasos[i], val = x[3] - x[2], bruta = d.v - d.costo, gs = d.gastos.reduce((a, b) => a + b, 0);
+    const per = vista == 'mes' ? NOM[sel] : { hoy: 'hoy', semana: 'la semana', anio: 'el año' }[vista];
+    let cuerpo, sub;
+    if (i == 0) { sub = RES.miles(d.n) + ' ventas'; const m = [0.45, 0.29, 0.16]; const v = m.map(f => Math.round(d.v * f / 1000) * 1000); cuerpo = RES.cuenta([['Efectivo', fmt(v[0]), 'suma'], ['Mercado Pago', fmt(v[1]), 'suma'], ['Tarjeta', fmt(v[2]), 'suma'], ['Cuenta corriente', fmt(d.v - v[0] - v[1] - v[2]), 'suma'], ['Vendido', fmt(d.v), 'total']]); }
+    else if (i == 1) { sub = 'Lo que costó la mercadería que salió'; cuerpo = RES.cuenta([['Pinturería', fmt(Math.round(d.costo * .31 / 1000) * 1000), 'suma'], ['Herramientas', fmt(Math.round(d.costo * .27 / 1000) * 1000), 'suma'], ['Bulonería', fmt(Math.round(d.costo * .22 / 1000) * 1000), 'suma'], ['Electricidad y otros', fmt(d.costo - Math.round(d.costo * .31 / 1000) * 1000 - Math.round(d.costo * .27 / 1000) * 1000 - Math.round(d.costo * .22 / 1000) * 1000), 'suma'], ['Costo', fmt(d.costo), 'total']]) + '<div class="r-nota">Al costo que tenía cada producto el día que se vendió.</div>'; }
+    else if (i == 2) { sub = 'Vendido menos lo que costó'; cuerpo = RES.cuenta([['Vendido', fmt(d.v), 'suma'], ['Costo de lo vendido', '−' + fmt(d.costo), 'resta'], ['Ganancia bruta', fmt(bruta), 'total logro', Math.round(bruta / d.v * 100) + ' % de lo vendido']]); }
+    else if (i < 7) {
+      const det = { 3: [['Local Av. San Martín 1450', val, 'contrato hasta 03/2027']], 4: [['Mariela Gómez', Math.round(val * .5 / 1000) * 1000, 'vendedora'], ['Jorge Paz', Math.round(val * .35 / 1000) * 1000, 'depósito'], ['Cargas sociales', val - Math.round(val * .5 / 1000) * 1000 - Math.round(val * .35 / 1000) * 1000, '']], 5: [['Luz', Math.round(val * .52 / 100) * 100, 'Edenor'], ['Internet y teléfono', Math.round(val * .24 / 100) * 100, ''], ['Agua y gas', val - Math.round(val * .52 / 100) * 100 - Math.round(val * .24 / 100) * 100, '']], 6: [['Ingresos brutos', Math.round(val * .64 / 100) * 100, 'ARBA'], ['Tasa municipal', val - Math.round(val * .64 / 100) * 100, '']] }[i];
+      sub = 'Gasto del local · ' + (vista == 'hoy' || vista == 'semana' ? 'la parte de estos días' : 'del período'); cuerpo = RES.cuenta(det.map(z => [z[0], '−' + fmt(z[1]), 'resta', z[2]]).concat([[x[0], '−' + fmt(val), 'total']]));
+    } else { sub = 'Lo que le queda al negocio'; cuerpo = RES.cuenta([['Ganancia bruta', fmt(bruta), 'suma'], ['Gastos del local', '−' + fmt(gs), 'resta'], [x[0], (bruta - gs >= 0 ? '+' : '') + fmt(bruta - gs), 'total ' + (bruta - gs >= 0 ? 'logro' : 'resta')]]); }
+    RES.abrir({ origen: b, titulo: x[0] + ' · ' + per, sub, cuerpo: `<div class="r-grande num">${i > 2 && i < 7 ? '−' : ''}${RES.pesosH(Math.abs(val))}</div>` + cuerpo,
+      pie: i == 0 ? '<a class="btn" data-ir="ventas-de-hoy"><i class="i i-s" data-i="receipt"></i>Ver las ventas</a>' : (i > 2 && i < 7 ? '<a class="btn" data-ir="compras"><i class="i i-s" data-i="truck"></i>Ver en Compras</a>' : '') });
+  });
+  $('#equilibrio').setAttribute('data-toca', '');
+  $('#equilibrio').addEventListener('click', () => RES.abrir({ origen: $('#equilibrio'), titulo: 'El piso por día', sub: 'Lo que hay que vender por día para cubrir los gastos del local', cuerpo: `<div class="r-grande num">${RES.pesosH(306000)}</div>` + RES.cuenta([['Gastos del local de septiembre', '$2.950.000', ''], ['Días abiertos', '÷ 26', ''], ['Gasto por día', '$113.500', ''], ['Ganancia bruta', '÷ 37 %', ''], ['Piso por día', '$306.000', 'total']]) + '<div class="r-nota">Vendiendo eso, la ganancia de lo vendido paga justo los gastos. Lo que se vende arriba del piso es lo que queda.</div>' }));
+
+  // ---- Quién ve cada número ----
+  const ROLES = ['Administrador', 'Vendedor', 'Depósito'], BLOQ = $$('.matriz .bl').map(b => b.firstChild.textContent.trim());
+  const celdas = r => { const out = []; let el = $$('.matriz .bl')[r].nextElementSibling; for (let j = 0; j < 3; j++) { out.push(el.querySelector('.tg')); el = el.nextElementSibling; } return out; };
+  const ve = (rol, b) => celdas(b)[rol].classList.contains('si');
+  $('#matriz').addEventListener('click', e => {
+    const tg = e.target.closest('.tg'); if (!tg) return;
+    let r = -1, j = -1; BLOQ.forEach((_, b) => { const k = celdas(b).indexOf(tg); if (k >= 0) { r = b; j = k; } });
+    if (j == 0) { RES.tostada('El Administrador ve todo, siempre', 'shield-check'); return; }
+    const si = !tg.classList.contains('si'); tg.classList.toggle('si', si); tg.classList.toggle('no', !si);
+    tg.innerHTML = `<i class="i i-s" data-i="${si ? 'eye' : 'eye-off'}"></i>`; pintarIconos(tg);
+    RES.anim(tg, [{ transform: 'scale(.8)' }, { transform: 'none' }], { duration: 200, easing: 'cubic-bezier(.34,1.4,.64,1)' });
+    RES.tostada(`${ROLES[j]}: ${si ? 'ahora ve' : 'ya no ve'} ${BLOQ[r].toLowerCase()}`, si ? 'eye' : 'eye-off');
+    if (mirando >= 0) mirar(mirando);
+  });
+  // Pasar el mouse por un rol: lo que no ve se apaga, con un candado al centro
+  let mirando = -1;
+  const LADO = [['#titulo', 4], ['#bajada', 4], ['#equilibrio', 4], ['#meses', 4]];
+  const BARRA = [0, 1, 1, 2, 2, 2, 2, 4]; // qué bloque de la matriz es cada barra
+  function mirar(j) {
+    mirando = j; $$('.rh').forEach((h, k) => h.classList.toggle('mirando', k == j));
+    LADO.forEach(([s, b]) => RES.bloquear($(s), j > 0 && !ve(j, b), 'Un ' + (ROLES[j] || '').toLowerCase() + ' no lo ve'));
+    $$('#cascada .bc').forEach((el, i) => el.classList.toggle('apagada', j > 0 && !ve(j, BARRA[i])));
+  }
+  $$('.rh').forEach((h, j) => { h.addEventListener('mouseenter', () => mirar(j)); h.addEventListener('click', () => mirar(mirando == j ? -1 : j)); });
+  $('#matriz').addEventListener('mouseleave', () => mirar(-1));
+
+  // ---- Ir a… (Ctrl K) ----
+  const PANT = [['Vender', 'vender', 'shopping-cart', 'Vender'], ['Ventas de hoy', 'ventas-de-hoy', 'receipt', 'Vender'], ['Productos', 'productos', 'tags', 'Catálogo'], ['Listas de precios', 'listas', 'file-text', 'Catálogo'], ['Duplicados', 'duplicados', 'copy', 'Catálogo'],
+    ['Stock', 'stock', 'package', 'Depósito'], ['Compras', 'compras', 'truck', 'Depósito'], ['Contar', 'contar', 'list-checks', 'Depósito'], ['Resumen', 'resumen', 'chart-column', 'Negocio'], ['Usuarios', 'usuarios', 'users', 'Negocio'], ['Quién hizo qué', 'actividad', 'history', 'Negocio'],
+    ['Anomalías', 'anomalias', 'triangle-alert', 'Más'], ['Procesos', 'procesos', 'workflow', 'Más'], ['Mejoras y errores', 'mejoras-y-errores', 'bug', 'Más'], ['Configuración', 'configuracion', 'settings', 'Más']];
+  function abrirIr() {
+    const capa = RES.abrir({ tipo: 'dialogo', titulo: 'Ir a…', sub: 'Escribí el nombre de una pantalla, o preguntá algo', cuerpo: '<input class="r-campo" id="ir-q" placeholder="Por ejemplo: compras, o ¿cuánto vendí de mechas?" autocomplete="off"><div class="r-ir-lista" id="ir-lista" style="margin-top:8px"></div>' });
+    const q = capa.querySelector('#ir-q'), L = capa.querySelector('#ir-lista');
+    const pintarL = () => {
+      const t = q.value.trim().toLowerCase(), f = PANT.filter(p => !t || p[0].toLowerCase().includes(t) || p[3].toLowerCase().includes(t));
+      L.innerHTML = f.length ? f.map((p, i) => `<a data-ir="${p[1]}" class="${i ? '' : 'primero'}"><i class="i" data-i="${p[2]}"></i>${p[0]}<small>${p[3]}</small></a>`).join('') :
+        `<div class="aviso pino"><i class="i i-s" data-i="sparkles"></i><span>«${q.value}»: en septiembre se vendieron 112 mechas, por $784.000. (La respuesta es de mentira: así se vería.)</span></div>`;
+      pintarIconos(L);
+    };
+    pintarL(); q.addEventListener('input', pintarL);
+    q.addEventListener('keydown', e => { if (e.key == 'Enter') { const a = L.querySelector('a'); if (a) { RES.cerrar(true); window.irAMaqueta && irAMaqueta(a.dataset.ir); } } });
+    setTimeout(() => q.focus(), 30);
+  }
+  $('#ir').addEventListener('click', abrirIr);
+  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() == 'k') { e.preventDefault(); abrirIr(); } });
+  $('#avatar').addEventListener('click', e => RES.menu(e.currentTarget, [{ texto: 'Carlos Illobre', icono: 'user-round', det: 'Administrador' }, { sep: true }, { texto: 'Configuración', icono: 'settings', ir: 'configuracion' }, { texto: 'Mejoras y errores', icono: 'bug', ir: 'mejoras-y-errores' }, { texto: 'Cerrar sesión', icono: 'log-out', ir: 'entrar' }]));
+  RES.entrada('.meses, .titulo, .bajada, .cascada, .equilibrio, .panel');
+})();
 </script>
 </body>
 </html>

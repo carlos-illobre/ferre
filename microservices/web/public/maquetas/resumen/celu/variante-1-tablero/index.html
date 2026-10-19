@@ -7,9 +7,11 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
-  .celu-pantalla { display: flex; flex-direction: column; gap: 12px; position: relative; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 12px; position: relative; overflow-y: auto; scrollbar-width: none; padding-bottom: 24px; }
+  .celu-pantalla > * { flex: none; }
   .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(transparent, var(--fondo)); }
   .secciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .sec { display: grid; justify-items: center; gap: 2px; padding: 8px 0 6px; border-radius: 14px; color: var(--texto-2); font-size: 14px; font-weight: 700; border: 1px solid transparent; }
@@ -52,39 +54,40 @@
 <body>
 <div class="celu">
   <div class="barra-estado"><span>19:12</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
-  <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo" data-toca id="vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · actualizado 19:12</div>
-  <nav class="celu-pestanas"><a class="activa">Resumen</a><a>Usuarios</a><a>Quién hizo</a></nav>
+  <nav class="celu-pestanas"><a class="activa" data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a data-ir="actividad">Quién hizo</a></nav>
   <div class="celu-pantalla">
-    <div class="secciones">
-      <a class="sec elegida"><i class="i" data-i="chart-column"></i>Ventas</a>
-      <a class="sec"><i class="i" data-i="truck"></i>Compras</a>
-      <a class="sec"><i class="i" data-i="boxes"></i>Inventario</a>
-      <a class="sec"><i class="i" data-i="scale"></i>Resultado</a>
+    <div class="secciones" id="secciones">
+      <a class="sec elegida" data-sec="ventas"><i class="i" data-i="chart-column"></i>Ventas</a>
+      <a class="sec" data-sec="compras" data-no-ir><i class="i" data-i="truck"></i>Compras</a>
+      <a class="sec" data-sec="inventario"><i class="i" data-i="boxes"></i>Inventario</a>
+      <a class="sec" data-sec="resultado"><i class="i" data-i="scale"></i>Resultado</a>
     </div>
     <div class="periodo">
-      <div class="segmentos"><button class="elegido">Hoy</button><button>Semana</button><button>Mes</button></div>
-      <div class="fecha"><b>Lun 19/10</b><br>contra lun 12/10</div>
+      <div class="segmentos" id="periodos"><button class="elegido" data-per="hoy">Hoy</button><button data-per="semana">Semana</button><button data-per="mes">Mes</button></div>
+      <div class="fecha" id="fecha"><b>Lun 19/10</b><br>contra lun 12/10</div>
     </div>
 
-    <div class="tarjeta heroe">
-      <div class="et"><span class="t-etiqueta">Vendido hoy</span><span style="margin-left:auto;color:var(--texto-3)"><i class="i i-s" data-i="info"></i></span></div>
-      <div class="t-total num"><span class="peso">$</span>412.000</div>
-      <div class="comp"><span class="delta"><i class="i i-s" data-i="arrow-up-right"></i>16 %</span>$56.000 más · lun 12: $356.000</div>
+    <div id="sec-ventas" style="display:contents">
+    <div class="tarjeta heroe" data-toca data-cuenta="vendido">
+      <div class="et"><span class="t-etiqueta" id="heroe-et">Vendido hoy</span><span style="margin-left:auto;color:var(--texto-3)"><i class="i i-s" data-i="info"></i></span></div>
+      <div class="t-total num" id="heroe-va"><span class="peso">$</span>412.000</div>
+      <div class="comp" id="heroe-comp"><span class="delta"><i class="i i-s" data-i="arrow-up-right"></i>16 %</span>$56.000 más · lun 12: $356.000</div>
       <div class="horas" id="horas"></div>
-      <div class="horas-lb"><span>8 h</span><span>13 h</span><span>siesta</span><span>19 h</span></div>
+      <div class="horas-lb" id="horas-lb"><span>8 h</span><span>13 h</span><span>siesta</span><span>19 h</span></div>
     </div>
 
     <div class="grilla">
-      <div class="tarjeta chico"><span class="t-etiqueta">Ganancia · 37 %</span><span class="va num"><span class="peso">$</span>151.400</span><span class="d"><i class="i i-s" data-i="arrow-up-right"></i>17 % más</span></div>
-      <div class="tarjeta chico"><span class="t-etiqueta">Ventas</span><span class="va num">23</span><span class="d"><i class="i i-s" data-i="arrow-up-right"></i>3 más · antes 20</span></div>
-      <div class="tarjeta chico"><span class="t-etiqueta">Ticket promedio</span><span class="va num"><span class="peso">$</span>17.913</span><span class="d gris">igual que el lun 12</span></div>
-      <div class="tarjeta chico urgente"><span class="t-etiqueta" style="color:var(--urgente-texto)">Caja · 19:05</span><span class="va num">−<span class="peso">$</span>2.000</span><span class="d">de menos · Mariela</span></div>
+      <div class="tarjeta chico" data-toca data-cuenta="ganancia"><span class="t-etiqueta">Ganancia · 37 %</span><span class="va num"><span class="peso">$</span>151.400</span><span class="d"><i class="i i-s" data-i="arrow-up-right"></i>17 % más</span></div>
+      <div class="tarjeta chico" data-toca data-cuenta="ventas"><span class="t-etiqueta">Ventas</span><span class="va num">23</span><span class="d"><i class="i i-s" data-i="arrow-up-right"></i>3 más · antes 20</span></div>
+      <div class="tarjeta chico" data-toca data-cuenta="ticket"><span class="t-etiqueta">Ticket promedio</span><span class="va num"><span class="peso">$</span>17.913</span><span class="d gris">igual que el lun 12</span></div>
+      <div class="tarjeta chico urgente" data-toca id="caja"><span class="t-etiqueta" style="color:var(--urgente-texto)">Caja · 19:05</span><span class="va num">−<span class="peso">$</span>2.000</span><span class="d">de menos · Mariela</span></div>
     </div>
 
-    <div class="tarjeta medios">
-      <div style="display:flex;align-items:center"><span class="t-renglon">Cómo pagaron</span><span class="t-detalle" style="margin-left:auto">23 ventas</span></div>
-      <div class="stack"><b style="flex:186;background:var(--efectivo)"></b><b style="flex:121;background:var(--mp)"></b><b style="flex:68;background:var(--tarjeta)"></b><b style="flex:37;background:var(--cuenta)"></b></div>
+    <div class="tarjeta medios" data-toca id="medios">
+      <div style="display:flex;align-items:center"><span class="t-renglon">Cómo pagaron</span><span class="t-detalle" style="margin-left:auto" id="medios-n">23 ventas</span></div>
+      <div class="stack" id="stack"><b style="flex:186;background:var(--efectivo)"></b><b style="flex:121;background:var(--mp)"></b><b style="flex:68;background:var(--tarjeta)"></b><b style="flex:37;background:var(--cuenta)"></b></div>
       <div class="ml">
         <span><i style="background:var(--efectivo)"></i>Efectivo<b class="num">$186.000</b></span>
         <span><i style="background:var(--mp)"></i>M. Pago<b class="num">$121.000</b></span>
@@ -92,20 +95,144 @@
         <span><i style="background:var(--cuenta)"></i>Cta. cte.<b class="num">$37.000</b></span>
       </div>
     </div>
-    <div class="tarjeta" style="padding:14px;display:flex;align-items:center;gap:10px"><span class="t-renglon">Lo más vendido hoy</span><i class="i i-s" data-i="chevron-right" style="margin-left:auto"></i></div>
+    <div class="tarjeta" style="padding:14px;display:flex;align-items:center;gap:10px" data-toca id="ver-top"><span class="t-renglon" id="top-tit">Lo más vendido hoy</span><i class="i i-s" data-i="chevron-right" style="margin-left:auto"></i></div>
+    </div>
+    <div id="sec-otra" style="display:none;flex-direction:column;gap:12px"></div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo" data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
 <script>
   const hoy=[12,38,54,61,47,9,0,0,44,63,58,26], H=document.getElementById('horas');
   hoy.forEach((v,i)=>{const s=document.createElement('span'); if(!v) s.className='c'; if(i==11) s.className='ahora'; s.style.height=(v/63*40)+'px'; H.appendChild(s);});
+</script>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  function mesSerie(primero, total, parcial) {
+    const base = [0, 380, 330, 340, 320, 410, 530], v = [];
+    for (let d = 0; d < 19; d++) v.push(base[(primero + d) % 7]);
+    if (parcial) v[18] = 0; const suma = v.reduce((a, b) => a + b, 0), resto = total - (parcial || 0);
+    const r = v.map(x => Math.round(x * resto / suma)); if (parcial) r[18] = parcial; return r;
+  }
+  const P = {
+    hoy: { fecha: '<b>Lun 19/10</b><br>contra lun 12/10', et: 'Vendido hoy', ant: 'lun 12', de: 'hoy', vendido: 412000, vAnt: 356000, ventas: 23, nAnt: 20, gan: 151400, gAnt: 129800, tAnt: 17800,
+      medios: { efectivo: [11, 186000], mp: [7, 121000], tarjeta: [3, 68000], cuenta: [2, 37000] }, horas: [12,38,54,61,47,9,0,0,44,63,58,26], lb: ['8 h', '13 h', 'siesta', '19 h'],
+      caja: ['Caja · 19:05', -2000, 'de menos · Mariela'] },
+    semana: { fecha: '<b>13 al 19/10</b><br>contra 6 al 12/10', et: 'Vendido en 7 días', ant: 'antes', de: 'en 7 días', vendido: 2316000, vAnt: 2144000, ventas: 131, nAnt: 122, gan: 856900, gAnt: 793300, tAnt: 17574,
+      medios: { efectivo: [61, 1042000], mp: [40, 683000], tarjeta: [21, 384000], cuenta: [9, 207000] }, horas: [318,342,296,401,547,0,412], lb: ['mar', 'jue', 'sáb', 'lun'],
+      caja: ['Cajas · 6 cierres', -2000, '5 justas · 1 de menos'] },
+    mes: { fecha: '<b>Octubre al 19</b><br>contra sep. al 19', et: 'Vendido en octubre', ant: 'sep.', de: 'en octubre', vendido: 7684000, vAnt: 7115000, ventas: 441, nAnt: 412, gan: 2843100, gAnt: 2632600, tAnt: 17269,
+      medios: { efectivo: [198, 3458000], mp: [136, 2382000], tarjeta: [70, 1229000], cuenta: [37, 615000] }, horas: mesSerie(4, 7684, 412), lb: ['1', '7', '13', '19'],
+      caja: ['Cajas · 16 cierres', -3500, '14 justas · 2 de menos'] },
+  };
+  let per = 'hoy', sec = 'ventas', anotado = null;
+  const pct = (a, b) => Math.round((a - b) / b * 100);
+  const flecha = d => `<i class="i i-s" data-i="${d >= 0 ? 'arrow-up-right' : 'arrow-down-right'}"></i>`;
+  function pintar(animar) {
+    const p = P[per], t = Math.round(p.vendido / p.ventas), dv = pct(p.vendido, p.vAnt);
+    $('#fecha').innerHTML = p.fecha; $('#heroe-et').textContent = p.et;
+    animar ? RES.rodar($('#heroe-va'), RES.pesosH(p.vendido)) : $('#heroe-va').innerHTML = RES.pesosH(p.vendido);
+    $('#heroe-comp').innerHTML = `<span class="delta">${flecha(dv)}${Math.abs(dv)} %</span>${RES.pesos(p.vendido - p.vAnt)} más · ${p.ant}: ${RES.pesos(p.vAnt)}`;
+    horas(p, animar);
+    const c = k => $(`[data-cuenta=${k}]`);
+    c('ganancia').querySelector('.t-etiqueta').textContent = 'Ganancia · ' + Math.round(p.gan / p.vendido * 100) + ' %';
+    RES.rodar(c('ganancia').querySelector('.va'), RES.pesosH(p.gan)); c('ganancia').querySelector('.d').innerHTML = flecha(1) + pct(p.gan, p.gAnt) + ' % más';
+    RES.rodar(c('ventas').querySelector('.va'), RES.miles(p.ventas)); c('ventas').querySelector('.d').innerHTML = flecha(1) + (p.ventas - p.nAnt) + ' más · antes ' + p.nAnt;
+    RES.rodar(c('ticket').querySelector('.va'), RES.pesosH(t)); c('ticket').querySelector('.d').textContent = Math.abs(pct(t, p.tAnt)) <= 1 ? 'igual que ' + (per == 'hoy' ? 'el lun 12' : 'antes') : pct(t, p.tAnt) + ' %';
+    const cj = $('#caja'); cj.querySelector('.t-etiqueta').textContent = p.caja[0]; RES.rodar(cj.querySelector('.va'), '−' + RES.pesosH(-p.caja[1])); cj.querySelector('.d').textContent = per == 'hoy' && anotado ? 'anotado: ' + anotado.toLowerCase() : p.caja[2];
+    const ks = ['efectivo', 'mp', 'tarjeta', 'cuenta'];
+    $$('#stack b').forEach((b, i) => b.style.flex = p.medios[ks[i]][1] / 1000);
+    $$('#medios .ml b').forEach((b, i) => RES.rodar(b, RES.pesos(p.medios[ks[i]][1])));
+    $('#medios-n').textContent = p.ventas + ' ventas';
+    $('#top-tit').textContent = 'Lo más vendido ' + p.de;
+    pintarIconos(document.querySelector('.celu-pantalla'));
+  }
+  function horas(p, animar) {
+    const H = $('#horas'), n = p.horas.length, max = Math.max(...p.horas);
+    H.style.gridTemplateColumns = `repeat(${n}, 1fr)`; H.innerHTML = '';
+    p.horas.forEach((v, i) => { const s = document.createElement('span'); if (!v) s.className = 'c'; if (i == n - 1) s.className = 'ahora'; s.style.height = (v / max * 40) + 'px'; H.appendChild(s);
+      if (animar && v) { s.style.transformOrigin = 'bottom'; RES.anim(s, [{ transform: 'scaleY(0)' }, { transform: 'none' }], { duration: 320, delay: i * 12 }); } });
+    $('#horas-lb').innerHTML = p.lb.map(x => `<span>${x}</span>`).join('');
+  }
+  $('#periodos').addEventListener('click', e => { const b = e.target.closest('[data-per]'); if (!b || !RES.segmento(b)) return; per = b.dataset.per; if (sec == 'ventas') pintar(true); else otra(); });
+
+  // ---- Secciones ----
+  const chico = (et, va, d, cl) => `<div class="tarjeta chico${cl ? ' ' + cl : ''}"><span class="t-etiqueta"${cl == 'urgente' ? ' style="color:var(--urgente-texto)"' : ''}>${et}</span><span class="va num">${va}</span><span class="d${cl == 'gris' ? ' gris' : ''}">${d}</span></div>`;
+  const heroe = (et, va, comp) => `<div class="tarjeta heroe"><div class="et"><span class="t-etiqueta">${et}</span></div><div class="t-total num">${va}</div><div class="comp">${comp}</div></div>`;
+  const lista = (tit, rs, ir, irTxt) => `<div class="tarjeta" style="padding:14px"><div style="display:flex;align-items:center"><span class="t-renglon">${tit}</span>${ir ? `<a data-ir="${ir}" style="margin-left:auto;color:var(--pino-texto);font-weight:750;font-size:14px">${irTxt}</a>` : ''}</div>${RES.renglones(rs)}</div>`;
+  const COMPRAS = { hoy: [184000, 1, 'una compra, 10:20'], semana: [1284000, 8, '8 compras · 4 proveedores'], mes: [3916000, 21, '21 compras · 6 proveedores'] };
+  function otra() {
+    let h = '';
+    if (sec == 'compras') { const c = COMPRAS[per];
+      h = heroe('Gastado en compras ' + P[per].de, RES.pesosH(c[0]), c[2]) + `<div class="grilla">${chico('Pedidos sin entregar', '3', 'el más viejo, 12/10', 'gris')}${chico('Por pagar', RES.pesosH(318000), 'vence vie 23', 'urgente')}</div>` +
+        lista('A quién le compraste', (per == 'hoy' ? [['Bulonera Centro', 184000, '1 compra · 10:20']] : [['Bulonera Centro', 512000, '3 compras'], ['Distribuidora Ezeta', 398000, '2 compras'], ['Alba Pinturas', 236000, '2 compras'], ['Mayorista Oeste', 138000, '1 compra']].map(x => per == 'mes' ? [x[0], Math.round(x[1] * 3.05 / 1000) * 1000, x[2].replace(/\d/, d => d * 2 + 1)] : x)).map(x => ({ icono: 'truck', titulo: x[0], detalle: x[2], valor: RES.pesos(x[1]) })), 'compras', 'Abrir Compras');
+    } else if (sec == 'inventario') {
+      h = heroe('Dinero invertido en stock', RES.pesosH(23480000), 'por su costo, sin IVA · es el de ahora') + `<div class="grilla">${chico('Stock bajo', '28', 'debajo del mínimo', 'urgente')}${chico('Sin venderse', RES.pesosH(312000), '17 productos · 90 días', 'gris')}</div>` +
+        lista('Para pedir', [{ foto: RES.PRODUCTOS.lampara.foto, titulo: 'Lámpara LED 12 W luz fría', detalle: 'Mínimo 10', valor: '3 un.' }, { foto: RES.PRODUCTOS.cinta.foto, titulo: 'Cinta métrica PowerLock 5 m', detalle: 'Mínimo 4', valor: '5 un.' }, { icono: 'package', titulo: 'Disco de corte 115 mm', detalle: 'Mínimo 20', valor: '0 un.' }], 'stock', 'Ver los 28');
+    } else {
+      h = heroe('Te quedó en septiembre', '<span style="color:var(--logro-texto)">+' + RES.pesosH(1360000) + '</span>', '<span class="delta"><i class="i i-s" data-i="arrow-up-right"></i>35 %</span>agosto: +$1.010.000') +
+        `<div class="tarjeta" style="padding:14px"><span class="t-renglon">De dónde sale</span>${RES.cuenta([['Vendido', '$11.640.000', 'suma'], ['Costo de lo vendido', '−$7.330.000', 'resta'], ['Gastos del local', '−$2.950.000', 'resta', 'alquiler, sueldos, servicios, impuestos'], ['Te quedó', '+$1.360.000', 'total logro']])}</div>` +
+        `<div class="grilla">${chico('Piso por día', RES.pesosH(306000), 'para cubrir gastos', 'gris')}${chico('Vendido por día', RES.pesosH(448000), '<i class="i i-s" data-i="arrow-up-right"></i>46 % arriba')}</div>`;
+    }
+    RES.fundir($('#sec-otra'), h); RES.entrada('#sec-otra > .tarjeta, #sec-otra .grilla > .tarjeta');
+  }
+  $('#secciones').addEventListener('click', e => {
+    const b = e.target.closest('[data-sec]'); if (!b) return; e.preventDefault();
+    if (b.classList.contains('elegida')) return;
+    $$('.sec').forEach(x => x.classList.toggle('elegida', x === b)); sec = b.dataset.sec;
+    $('#sec-ventas').style.display = sec == 'ventas' ? 'contents' : 'none'; $('#sec-otra').style.display = sec == 'ventas' ? 'none' : 'flex';
+    const fijo = sec == 'inventario' || sec == 'resultado'; $('#periodos').style.opacity = fijo ? .45 : ''; $('#periodos').style.pointerEvents = fijo ? 'none' : '';
+    $('#fecha').innerHTML = sec == 'inventario' ? '<b>Es el de ahora</b><br>no depende del período' : sec == 'resultado' ? '<b>Septiembre</b><br>contra agosto' : P[per].fecha;
+    if (sec == 'ventas') RES.entrada('#sec-ventas .tarjeta'); else otra();
+    RES.anim(b, [{ transform: 'scale(.96)' }, { transform: 'none' }], { duration: 120 });
+  });
+
+  // ---- Tocar un número ----
+  const ks = ['efectivo', 'mp', 'tarjeta', 'cuenta'];
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-cuenta]');
+    if (t) {
+      const p = P[per], k = t.dataset.cuenta, tk = Math.round(p.vendido / p.ventas);
+      const tit = { vendido: p.et, ganancia: 'Ganancia ' + p.de, ventas: 'Ventas ' + p.de, ticket: 'Ticket promedio ' + p.de }[k];
+      const filas = { vendido: ks.map(m => [RES.MEDIO[m][0], RES.pesos(p.medios[m][1]), 'suma', p.medios[m][0] + ' ventas']).concat([['Vendido', RES.pesos(p.vendido), 'total']]),
+        ganancia: [['Vendido', RES.pesos(p.vendido), 'suma'], ['Costo de lo vendido', '−' + RES.pesos(p.vendido - p.gan), 'resta', 'al costo del día de la venta'], ['Ganancia', RES.pesos(p.gan), 'total logro', Math.round(p.gan / p.vendido * 100) + ' % de lo vendido']],
+        ventas: ks.map(m => [RES.MEDIO[m][0], p.medios[m][0], 'suma']).concat([['Ventas', p.ventas, 'total', 'sin las anuladas']]),
+        ticket: [['Vendido', RES.pesos(p.vendido), ''], ['Dividido por las ventas', '÷ ' + p.ventas, ''], ['Ticket promedio', RES.pesos(tk), 'total']] }[k];
+      const big = { vendido: RES.pesosH(p.vendido), ganancia: RES.pesosH(p.gan), ventas: p.ventas, ticket: RES.pesosH(tk) }[k];
+      RES.abrir({ origen: t, titulo: tit, sub: p.fecha.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), cuerpo: `<div class="r-grande num">${big}</div>` + RES.cuenta(filas), pie: '<a class="btn" data-ir="ventas-de-hoy"><i class="i i-s" data-i="receipt"></i>Ver las ventas</a>' });
+      return;
+    }
+    if (e.target.closest('#caja')) { RES.caja($('#caja'), m => { anotado = m; if (per == 'hoy') { $('#caja .d').textContent = 'anotado: ' + m.toLowerCase(); RES.nuevo($('#caja')); } }, anotado); return; }
+    if (e.target.closest('#medios')) {
+      const p = P[per]; const capa = RES.abrir({ origen: $('#medios'), titulo: 'Cómo pagaron ' + p.de, sub: p.ventas + ' ventas · ' + RES.pesos(p.vendido), cuerpo: RES.renglones(ks.map(m => ({ icono: RES.MEDIO[m][1], color: m, titulo: RES.MEDIO[m][0], detalle: p.medios[m][0] + ' ventas · ' + Math.round(p.medios[m][1] / p.vendido * 100) + ' %', valor: RES.pesos(p.medios[m][1]), attr: ` data-toca data-medio="${m}"` }))) + '<div class="r-nota">Tocá un medio para ver sus ventas.</div>' });
+      capa.addEventListener('click', ev => { const r = ev.target.closest('[data-medio]'); if (!r) return; const m = r.dataset.medio, [n, tot] = p.medios[m], mu = Math.min(n, 10), parcial = n <= 10 ? tot : Math.round(tot * mu / n / 1000) * 1000;
+        RES.abrir({ titulo: RES.MEDIO[m][0] + ' ' + p.de, sub: n + ' ventas · ' + RES.pesos(tot), cuerpo: RES.renglones(RES.ventas(mu, parcial, m, n)) + (n > 10 ? `<div class="r-nota">Y ${n - 10} más, por ${RES.pesos(tot - parcial)}.</div>` : ''), pie: '<a class="btn" data-ir="ventas-de-hoy"><i class="i i-s" data-i="receipt"></i>Abrir Ventas de hoy</a>' }); });
+      return;
+    }
+    if (e.target.closest('#ver-top')) {
+      const f = { hoy: 1, semana: 4.7, mes: 14 }[per], lista = [['latex', 3], ['mecha', 8], ['cinta', 2], ['pinza', 1], ['martillo', 1], ['tarugos', 3]];
+      const capa = RES.abrir({ origen: $('#ver-top'), titulo: 'Lo más vendido ' + P[per].de, sub: 'Por dinero · los primeros 6 de 40', cuerpo: RES.renglones(lista.map(([k, n], i) => { const x = RES.PRODUCTOS[k], c = Math.max(1, Math.round(n * f)); return { foto: x.foto, titulo: (i + 1) + '. ' + x.nombre, detalle: x.marca + ' · ' + c + ' un.', valor: RES.pesos(c * x.precio), attr: ` data-toca data-prod="${k}" data-cant="${c}"` }; })) });
+      capa.addEventListener('click', ev => { const r = ev.target.closest('[data-prod]'); if (!r) return; const x = RES.PRODUCTOS[r.dataset.prod], c = +r.dataset.cant; RES.producto(null, Object.assign({}, x, { vendido: c * x.precio, cant: c + ' un.' }), P[per].de); });
+      return;
+    }
+    if (e.target.closest('#vinculo')) espejo();
+  });
+  function espejo() {
+    RES.abrir({ titulo: 'En espejo con la computadora', sub: 'Lo que hacés acá se ve allá, y al revés', cuerpo: RES.renglones([{ icono: 'monitor', color: 'logro', titulo: 'Mostrador · Lenovo ThinkCentre', detalle: 'Vinculado hoy a las 8:02', valor: '<span class="pastilla logro"><span class="punto"></span>Juntos</span>' }]) + '<div class="r-nota">Si cambiás de pantalla en la computadora, este celular la sigue. Para dejar de seguirla, desvinculá.</div>',
+      pie: '<button class="btn btn-peligro" id="desvincular"><i class="i i-s" data-i="unlink"></i>Desvincular</button>', alAbrir: c => c.querySelector('#desvincular').addEventListener('click', () => {
+        RES.cerrar(); const v = $('#vinculo'); v.style.borderColor = 'var(--borde-fuerte)'; v.style.background = 'var(--hundido)'; v.style.color = 'var(--texto-2)'; v.innerHTML = '<i class="i i-s" data-i="monitor"></i>Desconectado'; pintarIconos(v); RES.tostada('Desvinculado de la computadora', 'unlink'); }) });
+  }
+  window.espejoResumen = espejo;
+  RES.entrada('.celu-pantalla .tarjeta');
+})();
 </script>
 </body>
 </html>

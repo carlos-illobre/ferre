@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
   .dia-nav { display: inline-flex; align-items: center; gap: 4px; padding: 3px; border-radius: var(--r); background: var(--hundido); }
@@ -90,11 +91,11 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
@@ -105,62 +106,62 @@
     <header class="cabecera">
       <div class="t-titulo">Negocio</div>
       <div class="acciones">
-        <div class="dia-nav"><button class="btn btn-icono chico"><i class="i" data-i="chevron-left"></i></button><span class="hoy"><i class="i i-s" data-i="calendar-days"></i>Hoy, lunes 19/10</span><button class="btn btn-icono chico" disabled><i class="i" data-i="chevron-right"></i></button></div>
-        <button class="btn chico ver-como"><i class="i i-s" data-i="eye"></i>Ver como <span class="rol">Administrador</span><i class="i i-s" data-i="chevron-down"></i></button>
-        <button class="btn chico btn-icono" title="Actualizar"><i class="i i-s" data-i="refresh-cw"></i></button>
+        <div class="dia-nav"><button class="btn btn-icono chico" id="dia-ant" aria-label="Día anterior"><i class="i" data-i="chevron-left"></i></button><span class="hoy" id="dia"><i class="i i-s" data-i="calendar-days"></i>Hoy, lunes 19/10</span><button class="btn btn-icono chico" id="dia-sig" aria-label="Día siguiente" disabled><i class="i" data-i="chevron-right"></i></button></div>
+        <button class="btn chico ver-como" id="ver-como"><i class="i i-s" data-i="eye"></i>Ver como <span class="rol">Administrador</span><i class="i i-s" data-i="chevron-down"></i></button>
+        <button class="btn chico btn-icono" title="Actualizar" id="actualizar"><i class="i i-s" data-i="refresh-cw"></i></button>
       </div>
     </header>
-    <nav class="pestanas"><a class="activa">Resumen</a><a>Usuarios</a><a>Quién hizo qué</a></nav>
+    <nav class="pestanas"><a class="activa" data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a data-ir="actividad">Quién hizo qué</a></nav>
     <section class="pantalla">
-      <div class="tarjeta titular">
-        <div class="frase">Hoy se vendieron <b class="num">$412.000</b> en <b>23 ventas</b>, <span class="sube">16 % más</span> que el lunes pasado a esta hora. Ganaste <b class="num">$151.400</b>. La caja cerró con <span class="ojo">$2.000 de menos</span>.</div>
-        <div class="anillo">
+      <div class="tarjeta titular" data-bloque="ventas">
+        <div class="frase" id="frase">Hoy se vendieron <b class="num">$412.000</b> en <b>23 ventas</b>, <span class="sube">16 % más</span> que el lunes pasado a esta hora. Ganaste <b class="num">$151.400</b>. La caja cerró con <span class="ojo">$2.000 de menos</span>.</div>
+        <div class="anillo" id="anillo" data-bloque="resultado" data-toca>
           <svg viewBox="0 0 92 92" width="92" height="92"><circle cx="46" cy="46" r="38" fill="none" stroke="var(--hundido-2)" stroke-width="10"/><circle cx="46" cy="46" r="38" fill="none" stroke="var(--logro)" stroke-width="10" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="0" transform="rotate(-90 46 46)"/><circle cx="46" cy="46" r="38" fill="none" stroke="var(--logro-texto)" stroke-width="10" stroke-linecap="round" stroke-dasharray="83 300" transform="rotate(-90 46 46)"/></svg>
           <div class="c"><div><b>135 %</b>del piso</div></div>
         </div>
-        <div class="mirar">
-                    <span class="pastilla urgente"><i class="i i-s" data-i="wallet"></i>Caja: $2.000 de menos<i class="i i-s" data-i="chevron-right"></i></span>
-          <span class="pastilla urgente"><i class="i i-s" data-i="triangle-alert"></i>28 con stock bajo<i class="i i-s" data-i="chevron-right"></i></span>
-          <span class="pastilla contorno"><i class="i i-s" data-i="clipboard-list"></i>3 pedidos sin entregar<i class="i i-s" data-i="chevron-right"></i></span>
-          <span class="pastilla contorno"><i class="i i-s" data-i="file-text"></i>2 listas sin aplicar<i class="i i-s" data-i="chevron-right"></i></span>
+        <div class="mirar" id="mirar">
+                    <span class="pastilla urgente" data-toca id="mirar-caja"><i class="i i-s" data-i="wallet"></i>Caja: $2.000 de menos<i class="i i-s" data-i="chevron-right"></i></span>
+          <span class="pastilla urgente" data-ir="stock" data-toca><i class="i i-s" data-i="triangle-alert"></i>28 con stock bajo<i class="i i-s" data-i="chevron-right"></i></span>
+          <span class="pastilla contorno" data-ir="compras" data-toca><i class="i i-s" data-i="clipboard-list"></i>3 pedidos sin entregar<i class="i i-s" data-i="chevron-right"></i></span>
+          <span class="pastilla contorno" data-ir="listas" data-toca><i class="i i-s" data-i="file-text"></i>2 listas sin aplicar<i class="i i-s" data-i="chevron-right"></i></span>
         </div>
       </div>
 
       <div class="bento">
-        <div class="tarjeta card">
+        <div class="tarjeta card" data-bloque="ventas">
           <div class="card-cab"><span class="t-seccion">Ventas</span><div class="der">contra el mismo tramo anterior</div></div>
           <div class="periodos">
-            <div class="per elegido"><div class="et">Hoy</div><div class="va num">$412.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>16 %<span>23 ventas</span></div></div>
-            <div class="per"><div class="et">7 días</div><div class="va num">$2.316.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>8 %<span>131 ventas</span></div></div>
-            <div class="per"><div class="et">Octubre</div><div class="va num">$7.684.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>8 %<span>441 ventas</span></div></div>
+            <div class="per elegido" data-toca data-per="hoy"><div class="et" id="per-hoy-et">Hoy</div><div class="va num" id="per-hoy-va">$412.000</div><div class="d" id="per-hoy-d"><i class="i i-s" data-i="arrow-up-right"></i>16 %<span>23 ventas</span></div></div>
+            <div class="per" data-toca data-per="semana"><div class="et">7 días</div><div class="va num">$2.316.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>8 %<span>131 ventas</span></div></div>
+            <div class="per" data-toca data-per="mes"><div class="et">Octubre</div><div class="va num">$7.684.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>8 %<span>441 ventas</span></div></div>
           </div>
           <div class="semana" id="semana"></div>
           <div class="ley"><span><i style="background:var(--pino)"></i>Vendido</span><span><i style="background:rgba(18,56,47,.22)"></i>de eso, ganancia</span><span><i style="border-top:2px dashed var(--borde-fuerte);height:0;border-radius:0"></i>la semana anterior</span></div>
         </div>
 
-        <div class="tarjeta card">
+        <div class="tarjeta card" data-bloque="ventas">
           <div class="card-cab"><span class="t-seccion">Lo que más sale</span><div class="der">7 días</div></div>
-          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="nm">Látex interior mate blanco 4 L<small>14 un. · <b style="color:var(--tinta)">$322.000</b></small></div><div class="barrita"><b style="width:100%"></b></div></div></div>
-          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="nm">Mecha acero rápido HSS 8 mm<small>38 un. · <b style="color:var(--tinta)">$266.000</b></small></div><div class="barrita"><b style="width:83%"></b></div></div></div>
-          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="nm">Cinta métrica PowerLock 5 m<small>12 un. · <b style="color:var(--tinta)">$204.000</b></small></div><div class="barrita"><b style="width:63%"></b></div></div></div>
-          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><div class="nm">Clavos punta París 2"<small>18,5 kg · <b style="color:var(--tinta)">$148.000</b></small></div><div class="barrita"><b style="width:46%"></b></div></div></div>
-          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div><div class="nm">Lámpara LED 12 W luz fría<small>34 un. · <b style="color:var(--tinta)">$119.000</b></small></div><div class="barrita"><b style="width:37%"></b></div></div></div>
-          <div class="parado"><i class="i" data-i="hourglass"></i><div><b class="num">$312.000 parados</b>17 productos sin venderse hace 90 días</div><i class="i i-s" data-i="chevron-right" style="margin-left:auto"></i></div>
+          <div class="trow" data-toca data-prod="latex" data-cant="14"><span class="foto chica"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="nm">Látex interior mate blanco 4 L<small>14 un. · <b style="color:var(--tinta)">$322.000</b></small></div><div class="barrita"><b style="width:100%"></b></div></div></div>
+          <div class="trow" data-toca data-prod="mecha" data-cant="38"><span class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="nm">Mecha acero rápido HSS 8 mm<small>38 un. · <b style="color:var(--tinta)">$266.000</b></small></div><div class="barrita"><b style="width:83%"></b></div></div></div>
+          <div class="trow" data-toca data-prod="cinta" data-cant="12"><span class="foto chica"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="nm">Cinta métrica PowerLock 5 m<small>12 un. · <b style="color:var(--tinta)">$204.000</b></small></div><div class="barrita"><b style="width:63%"></b></div></div></div>
+          <div class="trow" data-toca data-prod="clavos" data-cant="18,5"><span class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><div class="nm">Clavos punta París 2"<small>18,5 kg · <b style="color:var(--tinta)">$148.000</b></small></div><div class="barrita"><b style="width:46%"></b></div></div></div>
+          <div class="trow" data-toca data-prod="lampara" data-cant="34"><span class="foto chica"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div><div class="nm">Lámpara LED 12 W luz fría<small>34 un. · <b style="color:var(--tinta)">$119.000</b></small></div><div class="barrita"><b style="width:37%"></b></div></div></div>
+          <div class="parado" data-toca id="parado"><i class="i" data-i="hourglass"></i><div><b class="num">$312.000 parados</b>17 productos sin venderse hace 90 días</div><i class="i i-s" data-i="chevron-right" style="margin-left:auto"></i></div>
         </div>
 
         <div class="dinero">
-          <div class="tarjeta mini">
+          <div class="tarjeta mini" data-toca data-mini="gastos" data-bloque="gastos">
             <div class="cab"><i class="i i-s" data-i="truck"></i>Gastos de la semana</div>
             <div class="va num">$1.284.000<small>del 13 al 19/10</small></div>
             <div class="segs"><b style="flex:512"></b><b style="flex:398;opacity:.7"></b><b style="flex:236;opacity:.45"></b><b style="flex:138;opacity:.25"></b></div>
             <div class="prov"><b>Bulonera Centro</b> $512.000 y 3 más</div>
           </div>
-          <div class="tarjeta mini">
+          <div class="tarjeta mini" data-toca data-mini="invertido" data-bloque="invertido">
             <div class="cab"><i class="i i-s" data-i="boxes"></i>Dinero invertido en stock</div>
             <div class="va num">$23.480.000</div>
             <div class="prov">Por su costo vigente, sin IVA</div>
           </div>
-          <div class="tarjeta mini" style="flex:1">
+          <div class="tarjeta mini" style="flex:1" data-toca data-mini="resultado" data-bloque="resultado">
             <div class="cab"><i class="i i-s" data-i="scale"></i>Resultado de septiembre</div>
             <div class="va num" style="color:var(--logro-texto)">+$1.360.000<small>a favor</small></div>
             <div class="meses" id="meses"></div>
@@ -177,6 +178,137 @@
     c.innerHTML=`<span class="v">${d[1]?(d[1]+' mil'):'Cerrado'}</span><span class="b" style="height:${d[1]?d[1]*k:18}px"><span class="gan" style="height:${d[2]*k}px"></span></span><span class="n">${d[0]}</span>`+(d[3]?`<span class="tick" style="bottom:${26+d[3]*k}px"></span>`:'');sem.appendChild(c);});
   const r=[980,1840,620,-140,410,760,890,540,1120,1010,1360,820], m=document.getElementById('meses');
   r.forEach((v,i)=>{const s=document.createElement('span');s.style.height=Math.max(5,Math.abs(v)/1840*30)+'px';if(v<0)s.className='neg';if(i==11)s.className='curso';if(i==10)s.className='ult';m.appendChild(s);});
+</script>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  // Los días de la semana: [nombre, fecha, vendido, ganancia, ventas, el mismo día de la semana anterior]
+  const D = [['martes', '13/10', 318000, 118000, 18, 296000], ['miércoles', '14/10', 342000, 125000, 19, 311000], ['jueves', '15/10', 296000, 108000, 17, 288000],
+    ['viernes', '16/10', 401000, 147000, 23, 379000], ['sábado', '17/10', 547000, 203000, 31, 498000], ['domingo', '18/10', 0, 0, 0, 0], ['lunes', '19/10', 412000, 151400, 23, 356000]];
+  const PISO = 306000;
+  let dia = 6, rol = 'Administrador';
+  const pct = (a, b) => Math.round((a - b) / b * 100);
+
+  function frase(i) {
+    const d = D[i], hoy = i == 6, p = pct(d[2], d[5]), gan = rol == 'Administrador';
+    const cuando = hoy ? 'Hoy' : `El ${d[0]} ${d[1].slice(0, 2)}`;
+    const comp = `<span class="sube">${Math.abs(p)} % ${p >= 0 ? 'más' : 'menos'}</span> que el ${hoy ? 'lunes pasado a esta hora' : d[0] + ' anterior'}`;
+    const caja = hoy ? (anotado ? `La caja cerró con $2.000 de menos (${anotado.toLowerCase()}).` : 'La caja cerró con <span class="ojo">$2.000 de menos</span>.') : 'La caja cerró justa.';
+    return `${cuando} se ${hoy ? 'vendieron' : 'vendieron'} <b class="num">${RES.pesos(d[2])}</b> en <b>${d[4]} ventas</b>, ${comp}.${gan ? ` Ganaste <b class="num">${RES.pesos(d[3])}</b>.` : ''} ${caja}`;
+  }
+  function anillo(i) {
+    const v = D[i][2], p = Math.round(v / PISO * 100), C = 238.8;
+    const arco = p >= 100 ? `<circle cx="46" cy="46" r="38" fill="none" stroke="var(--logro)" stroke-width="10" stroke-linecap="round" stroke-dasharray="238.8" transform="rotate(-90 46 46)"/><circle cx="46" cy="46" r="38" fill="none" stroke="var(--logro-texto)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${Math.min(C, (p - 100) / 100 * C).toFixed(0)} 300" transform="rotate(-90 46 46)"/>`
+      : `<circle cx="46" cy="46" r="38" fill="none" stroke="var(--urgente)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(p / 100 * C).toFixed(0)} 300" transform="rotate(-90 46 46)"/>`;
+    $('#anillo svg').innerHTML = `<circle cx="46" cy="46" r="38" fill="none" stroke="var(--hundido-2)" stroke-width="10"/>` + arco;
+    $('#anillo .c').innerHTML = `<div><b>${p} %</b>del piso</div>`;
+  }
+  const mirarHoy = $('#mirar').innerHTML;
+  function pintarDia(animar) {
+    const d = D[dia], hoy = dia == 6, p = pct(d[2], d[5]);
+    $('#dia').innerHTML = `<i class="i i-s" data-i="calendar-days"></i>${hoy ? 'Hoy, lunes 19/10' : d[0][0].toUpperCase() + d[0].slice(1) + ' ' + d[1]}`;
+    $('#dia-sig').disabled = hoy; $('#dia-ant').disabled = dia == 0;
+    animar ? RES.fundir($('#frase'), frase(dia)) : ($('#frase').innerHTML = frase(dia));
+    anillo(dia);
+    $('#mirar').innerHTML = hoy ? mirarHoy : `<span class="et">Ese día</span><span class="pastilla logro"><i class="i i-s" data-i="circle-check"></i>Caja: cerró justa</span><span class="pastilla contorno" data-toca data-ir="compras"><i class="i i-s" data-i="truck"></i>${dia % 2 ? 2 : 1} compras cargadas<i class="i i-s" data-i="chevron-right"></i></span><span class="pastilla contorno" data-toca data-ir="actividad"><i class="i i-s" data-i="history"></i>Quién hizo qué ese día<i class="i i-s" data-i="chevron-right"></i></span>`;
+    if (hoy && anotado) { const c = $('#mirar-caja'); c.className = 'pastilla logro'; c.innerHTML = '<i class="i i-s" data-i="circle-check"></i>Caja: anotado<i class="i i-s" data-i="chevron-right"></i>'; }
+    $('#per-hoy-et').textContent = hoy ? 'Hoy' : d[0][0].toUpperCase() + d[0].slice(1, 3) + ' ' + d[1].slice(0, 2);
+    RES.rodar($('#per-hoy-va'), RES.pesos(d[2]));
+    $('#per-hoy-d').innerHTML = `<i class="i i-s" data-i="${p >= 0 ? 'arrow-up-right' : 'arrow-down-right'}"></i>${Math.abs(p)} %<span>${d[4]} ventas</span>`;
+    $$('#semana .dcol').forEach((c, i) => c.classList.toggle('hoy', i == dia));
+    pintarIconos(document.querySelector('.pantalla'));
+    if (animar) RES.anim($('#mirar'), [{ opacity: 0 }, { opacity: 1 }]);
+  }
+  function irDia(i) { if (i < 0 || i > 6) return; if (!D[i][2]) i += i < dia ? -1 : 1; if (i < 0 || i > 6) return; dia = i; pintarDia(true); }
+  $('#dia-ant').addEventListener('click', () => irDia(dia - 1));
+  $('#dia-sig').addEventListener('click', () => irDia(dia + 1));
+  $('#semana').addEventListener('click', e => {
+    const c = e.target.closest('.dcol'); if (!c) return; const i = $$('#semana .dcol').indexOf(c);
+    if (!D[i][2]) { RES.tostada('El domingo el local está cerrado', 'moon'); return; }
+    dia = i; pintarDia(true);
+  });
+  $$('#semana .dcol').forEach(c => c.setAttribute('data-toca', ''));
+
+  // ---- Ver como un rol ----
+  const VE = { Administrador: ['ventas', 'resultado', 'gastos', 'invertido'], Vendedor: ['ventas'], 'Depósito': ['gastos'] };
+  function verComo(r) {
+    rol = r; $('#ver-como .rol').textContent = r;
+    $$('[data-bloque]').forEach(el => RES.bloquear(el, !VE[r].includes(el.dataset.bloque), 'Un ' + r.toLowerCase() + ' no lo ve'));
+    RES.fundir($('#frase'), frase(dia));
+    if (r != 'Administrador') RES.tostada('Así ve Negocio un ' + r.toLowerCase() + ': lo que no puede ver, apagado', 'eye');
+  }
+  $('#ver-como').addEventListener('click', e => RES.menu(e.currentTarget, [
+    { texto: 'Administrador', icono: 'shield-check', det: 've todo', elegido: rol == 'Administrador', accion: () => verComo('Administrador') },
+    { texto: 'Vendedor', icono: 'user', det: 'solo las ventas', elegido: rol == 'Vendedor', accion: () => verComo('Vendedor') },
+    { texto: 'Depósito', icono: 'package', det: 'solo los gastos', elegido: rol == 'Depósito', accion: () => verComo('Depósito') },
+    { sep: true }, { texto: 'Cambiar qué ve cada rol', icono: 'user-cog', ir: 'usuarios' }]));
+
+  // ---- Tocar un número: de dónde sale ----
+  const PER = {
+    hoy: () => { const d = D[dia]; return { tit: dia == 6 ? 'Vendido hoy' : 'Vendido el ' + d[0] + ' ' + d[1], v: d[2], g: d[3], n: d[4], ant: d[5], medios: dia == 6 ? [186000, 121000, 68000, 37000] : [0.45, 0.29, 0.17, 0.09].map(x => Math.round(d[2] * x / 1000) * 1000) }; },
+    semana: () => ({ tit: 'Vendido en 7 días', v: 2316000, g: 856900, n: 131, ant: 2144000, medios: [1042000, 683000, 384000, 207000] }),
+    mes: () => ({ tit: 'Vendido en octubre', v: 7684000, g: 2843100, n: 441, ant: 7115000, medios: [3458000, 2382000, 1229000, 615000] }),
+  };
+  document.addEventListener('click', e => {
+    if (e.target.closest('.r-bloq')) { e.stopImmediatePropagation(); e.preventDefault(); RES.tostada('Un ' + rol.toLowerCase() + ' no ve esto', 'lock-keyhole'); return; }
+    const t = e.target.closest('[data-per]');
+    if (t) {
+      $$('.per').forEach(x => x.classList.toggle('elegido', x === t));
+      const p = PER[t.dataset.per](); const m = p.medios; m[3] = p.v - m[0] - m[1] - m[2];
+      const ganancia = rol == 'Administrador' ? R2([['Costo de lo vendido', '−' + RES.pesos(p.v - p.g), 'resta'], ['Ganancia', RES.pesos(p.g), 'total logro', Math.round(p.g / p.v * 100) + ' % de lo vendido']]) : '';
+      RES.abrir({ origen: t, titulo: p.tit, sub: p.n + ' ventas · contra ' + RES.pesos(p.ant) + ' del mismo tramo anterior', cuerpo: `<div class="r-grande num">${RES.pesosH(p.v)}</div>` + RES.cuenta([['Efectivo', RES.pesos(m[0]), 'suma'], ['Mercado Pago', RES.pesos(m[1]), 'suma'], ['Tarjeta', RES.pesos(m[2]), 'suma'], ['Cuenta corriente', RES.pesos(m[3]), 'suma'], ['Vendido', RES.pesos(p.v), 'total']]) + (ganancia ? '<div class="r-titulo-lista">Lo que se ganó</div>' + ganancia : ''),
+        pie: '<a class="btn" data-ir="ventas-de-hoy"><i class="i i-s" data-i="receipt"></i>Ver las ventas</a>' });
+      return;
+    }
+    const pr = e.target.closest('[data-prod]');
+    if (pr) { const x = RES.PRODUCTOS[pr.dataset.prod], c = parseFloat(pr.dataset.cant.replace(',', '.')); RES.producto(pr, Object.assign({}, x, { vendido: Math.round(c * x.precio / 1000) * 1000, cant: pr.dataset.cant + (pr.dataset.prod == 'clavos' ? ' kg' : ' un.') }), 'en 7 días'); return; }
+    if (e.target.closest('#parado')) {
+      RES.abrir({ origen: $('#parado'), titulo: '$312.000 parados', sub: '17 productos sin venderse hace 90 días, por su costo', cuerpo: RES.renglones([
+        ['Sierra copa bimetal 68 mm', 'Última venta 02/06 · 2 un.', 58000], ['Esmalte sintético verde inglés 1 L', 'Última venta 14/05 · 3 un.', 41000], ['Candado bronce 50 mm', 'Última venta 28/06 · 4 un.', 36000],
+        ['Llave de paso esférica 3/4"', 'Última venta 11/06 · 5 un.', 29000], ['Pinceleta n.º 30 cerda blanca', 'Última venta 20/05 · 6 un.', 24000], ['Cadena galvanizada 4 mm × m', 'Última venta 07/07 · 12 m', 21000]].map(x => ({ icono: 'hourglass', titulo: x[0], detalle: x[1], valor: RES.pesos(x[2]) }))) + '<div class="r-nota">Y 11 más, por $103.000. Se puede hacer una oferta o dejar de comprarlos.</div>',
+        pie: '<a class="btn" data-ir="stock"><i class="i i-s" data-i="package"></i>Ver en Stock</a><a class="btn" data-ir="listas"><i class="i i-s" data-i="percent"></i>Hacer una oferta</a>' });
+      return;
+    }
+    const mi = e.target.closest('[data-mini]');
+    if (mi && !mi.classList.contains('r-bloq')) {
+      const k = mi.dataset.mini;
+      if (k == 'gastos') RES.abrir({ origen: mi, titulo: 'Gastos de la semana', sub: '8 compras a proveedores, del 13 al 19/10', cuerpo: `<div class="r-grande num">${RES.pesosH(1284000)}</div>` + RES.cuenta([['Bulonera Centro', '$512.000', 'suma', '3 compras'], ['Distribuidora Ezeta', '$398.000', 'suma', '2 compras'], ['Alba Pinturas', '$236.000', 'suma', '2 compras'], ['Mayorista Oeste', '$138.000', 'suma', '1 compra'], ['Gastado', '$1.284.000', 'total']]), pie: '<a class="btn" data-ir="compras"><i class="i i-s" data-i="truck"></i>Abrir Compras</a>' });
+      if (k == 'invertido') RES.abrir({ origen: mi, titulo: 'Dinero invertido en stock', sub: 'Por su costo vigente, sin IVA', cuerpo: `<div class="r-grande num">${RES.pesosH(23480000)}</div>` + RES.cuenta([['Pinturería', '$6.120.000', 'suma', '312 productos'], ['Herramientas', '$5.480.000', 'suma', '584 productos'], ['Bulonería', '$3.960.000', 'suma', '702 productos'], ['Electricidad', '$3.410.000', 'suma', '296 productos'], ['Otros', '$4.510.000', 'suma', '246 productos'], ['Invertido', '$23.480.000', 'total']]), pie: '<a class="btn" data-ir="stock"><i class="i i-s" data-i="package"></i>Abrir Stock</a>' });
+      if (k == 'resultado') RES.abrir({ origen: mi, titulo: 'Resultado de septiembre', sub: '1.012 ventas · el último mes cerrado', cuerpo: `<div class="r-grande num" style="color:var(--logro-texto)">+${RES.pesosH(1360000)}</div>` + RES.cuenta([['Vendido', '$11.640.000', 'suma'], ['Costo de lo vendido', '−$7.330.000', 'resta'], ['Alquiler', '−$1.200.000', 'resta'], ['Sueldos', '−$1.400.000', 'resta'], ['Servicios', '−$210.000', 'resta'], ['Impuestos', '−$140.000', 'resta'], ['Te quedó', '+$1.360.000', 'total logro']]) + '<div class="r-nota">Piso por día: $306.000. En septiembre se vendieron $448.000 por día.</div>' });
+      return;
+    }
+    if (e.target.closest('#anillo') && rol == 'Administrador') {
+      const v = D[dia][2];
+      RES.abrir({ origen: $('#anillo'), titulo: 'El piso del día', sub: 'Lo que hay que vender por día para cubrir los gastos del local', cuerpo: `<div class="r-grande num">${Math.round(v / PISO * 100)} %</div>` + RES.cuenta([['Gastos del local, septiembre', '$2.950.000', ''], ['Dividido por 26 días abiertos', '$113.500 por día', ''], ['Con el 37 % de ganancia, hay que vender', '$306.000', 'total'], ['Vendido ' + (dia == 6 ? 'hoy' : 'ese día'), RES.pesos(v), v >= PISO ? 'logro' : 'urgente']]) });
+      return;
+    }
+    if (e.target.closest('#mirar-caja')) RES.caja($('#mirar-caja'), m => { anotado = m; pintarDia(true); }, anotado);
+  });
+  const R2 = RES.cuenta;
+  let anotado = null;
+
+  // ---- Actualizar: llega una venta ----
+  let llego = 0;
+  $('#actualizar').addEventListener('click', () => {
+    if (llego++) { RES.tostada('Ya está todo al día', 'refresh-cw'); return; }
+    D[6][2] += 9000; D[6][3] += 3300; D[6][4] += 1;
+    RES.tostada('Entró una venta: $9.000 con Mercado Pago', 'receipt');
+    if (dia == 6) { pintarDia(false); RES.nuevo($('#per-hoy-va').closest('.per')); }
+    const b = $$('#semana .dcol')[6].querySelector('.b'); b.style.height = (parseFloat(b.style.height) + 9 * 168 / 547) + 'px'; b.style.transformOrigin = 'bottom';
+    RES.anim(b, [{ transform: 'scaleY(.9)' }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.34,1.4,.64,1)' });
+    $$('#semana .dcol')[6].querySelector('.v').textContent = '421 mil';
+    const s = $$('.per')[1].querySelector('.va'), m = $$('.per')[2].querySelector('.va');
+    RES.rodar(s, '$2.325.000'); RES.rodar(m, '$7.693.000');
+  });
+  document.addEventListener('keydown', e => {
+    if (RES.capa() || e.ctrlKey || e.metaKey) return;
+    if (e.key == 'F5') { e.preventDefault(); $('#actualizar').click(); }
+    if (e.key == 'ArrowLeft' && e.altKey) irDia(dia - 1);
+    if (e.key == 'ArrowRight' && e.altKey) irDia(dia + 1);
+  });
+  RES.entrada('.titular, .bento > .tarjeta, .dinero > .tarjeta');
+})();
 </script>
 </body>
 </html>

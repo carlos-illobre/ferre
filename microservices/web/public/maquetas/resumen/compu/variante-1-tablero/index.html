@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
   .barra-sup { display: flex; align-items: center; gap: 12px; }
@@ -85,11 +86,11 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
@@ -99,46 +100,47 @@
   <main class="contenido">
     <header class="cabecera">
       <div class="t-titulo">Negocio</div>
-      <div class="acciones"><span class="t-detalle" style="font-weight:600">Actualizado 19:12</span><button class="btn chico"><i class="i i-s" data-i="refresh-cw"></i>Actualizar <span class="kbd">F5</span></button></div>
+      <div class="acciones"><span class="t-detalle" style="font-weight:600" id="actualizado">Actualizado 19:12</span><button class="btn chico" id="actualizar"><i class="i i-s" data-i="refresh-cw"></i>Actualizar <span class="kbd">F5</span></button></div>
     </header>
-    <nav class="pestanas"><a class="activa">Resumen</a><a>Usuarios</a><a>Quién hizo qué</a></nav>
+    <nav class="pestanas"><a class="activa" data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a data-ir="actividad">Quién hizo qué</a></nav>
     <section class="pantalla">
       <div class="barra-sup">
-        <div class="segmentos">
-          <button class="elegido"><i class="i i-s" data-i="chart-column"></i>Ventas</button>
-          <button><i class="i i-s" data-i="truck"></i>Compras</button>
-          <button><i class="i i-s" data-i="boxes"></i>Inventario</button>
-          <button><i class="i i-s" data-i="scale"></i>Resultado</button>
+        <div class="segmentos" id="secciones">
+          <button class="elegido" data-sec="ventas"><i class="i i-s" data-i="chart-column"></i>Ventas</button>
+          <button data-sec="compras" data-no-ir><i class="i i-s" data-i="truck"></i>Compras</button>
+          <button data-sec="inventario"><i class="i i-s" data-i="boxes"></i>Inventario</button>
+          <button data-sec="resultado"><i class="i i-s" data-i="scale"></i>Resultado</button>
         </div>
         <div class="periodo">
-          <div class="compara">Lunes 19/10, hasta las 19:12<br>contra el lunes 12/10, a la misma hora</div>
-          <div class="segmentos">
-            <button class="elegido">Hoy <span class="seg-kbd">D</span></button>
-            <button>Semana <span class="seg-kbd">S</span></button>
-            <button>Mes <span class="seg-kbd">M</span></button>
+          <div class="compara" id="compara">Lunes 19/10, hasta las 19:12<br>contra el lunes 12/10, a la misma hora</div>
+          <div class="segmentos" id="periodos">
+            <button class="elegido" data-per="hoy">Hoy <span class="seg-kbd">D</span></button>
+            <button data-per="semana">Semana <span class="seg-kbd">S</span></button>
+            <button data-per="mes">Mes <span class="seg-kbd">M</span></button>
           </div>
         </div>
       </div>
 
+      <div id="sec-ventas" style="display:contents">
       <div class="kpis">
-        <div class="tarjeta kpi principal">
+        <div class="tarjeta kpi principal" data-toca data-cuenta="vendido">
           <div class="cab"><span class="ico"><i class="i i-s" data-i="banknote"></i></span><span class="t-etiqueta">Vendido</span></div>
           <i class="i i-s explica" data-i="info"></i>
           <div class="va num"><span class="peso">$</span>412.000</div>
           <div class="comp"><span class="delta sube"><i class="i i-s" data-i="arrow-up-right"></i>16 %</span>+$56.000 · lun 12: $356.000</div>
         </div>
-        <div class="tarjeta kpi principal">
+        <div class="tarjeta kpi principal" data-toca data-cuenta="ganancia">
           <div class="cab"><span class="ico"><i class="i i-s" data-i="trending-up"></i></span><span class="t-etiqueta">Ganancia</span></div>
           <i class="i i-s explica" data-i="info"></i>
           <div class="va num"><span class="peso">$</span>151.400<small>37 %</small></div>
           <div class="comp"><span class="delta sube"><i class="i i-s" data-i="arrow-up-right"></i>17 %</span>+$21.600 · lun 12: $129.800</div>
         </div>
-        <div class="tarjeta kpi">
+        <div class="tarjeta kpi" data-toca data-cuenta="ventas">
           <div class="cab"><span class="ico"><i class="i i-s" data-i="receipt"></i></span><span class="t-etiqueta">Ventas</span></div>
           <div class="va num">23</div>
           <div class="comp"><span class="delta sube"><i class="i i-s" data-i="arrow-up-right"></i>15 %</span>+3 · lun 12: 20</div>
         </div>
-        <div class="tarjeta kpi">
+        <div class="tarjeta kpi" data-toca data-cuenta="ticket">
           <div class="cab"><span class="ico"><i class="i i-s" data-i="shopping-bag"></i></span><span class="t-etiqueta">Ticket promedio</span></div>
           <div class="va num"><span class="peso">$</span>17.913</div>
           <div class="comp"><span class="delta igual">1 %</span>+$113 · lun 12: $17.800</div>
@@ -147,34 +149,34 @@
 
       <div class="fila-c">
         <div class="tarjeta card">
-          <div class="card-cab"><span class="t-seccion">Vendido por hora</span>
-            <div class="der" style="margin-left:16px"><span class="ley"><i style="background:var(--pino)"></i>Hoy</span><span class="ley"><i style="border:1.5px dashed var(--borde-fuerte)"></i>Lunes 12</span></div></div>
+          <div class="card-cab"><span class="t-seccion" id="graf-tit">Vendido por hora</span>
+            <div class="der" style="margin-left:16px"><span class="ley"><i style="background:var(--pino)"></i>Hoy</span><span class="ley"><i style="border:1.5px dashed var(--borde-fuerte)"></i><span id="graf-ley">Lunes 12</span></span></div></div>
           <div class="grafico">
-            <div class="eje"><span>60 mil</span><span>40 mil</span><span>20 mil</span><span>0</span></div>
+            <div class="eje" id="eje"><span>60 mil</span><span>40 mil</span><span>20 mil</span><span>0</span></div>
             <div class="area"><div class="lineas"><span></span><span></span><span></span><span></span></div><div class="barras" id="barras"></div></div>
           </div>
         </div>
         <div class="tarjeta card">
           <div class="card-cab"><span class="t-seccion">Cómo pagaron</span><div class="der">ventas · importe</div></div>
-          <div class="stack"><b style="flex:186;background:var(--efectivo)"></b><b style="flex:121;background:var(--mp)"></b><b style="flex:68;background:var(--tarjeta)"></b><b style="flex:37;background:var(--cuenta)"></b></div>
+          <div class="stack" id="stack"><b style="flex:186;background:var(--efectivo)"></b><b style="flex:121;background:var(--mp)"></b><b style="flex:68;background:var(--tarjeta)"></b><b style="flex:37;background:var(--cuenta)"></b></div>
           <div class="medios">
-            <div class="mrow" style="--c:var(--efectivo);--cs:var(--efectivo-suave)"><span class="ic"><i class="i i-s" data-i="banknote"></i></span><span class="n">Efectivo <span class="c">· 11</span></span><span class="v num">$186.000</span></div>
-            <div class="mrow" style="--c:var(--mp);--cs:var(--mp-suave)"><span class="ic"><i class="i i-s" data-i="qr-code"></i></span><span class="n">Mercado Pago <span class="c">· 7</span></span><span class="v num">$121.000</span></div>
-            <div class="mrow" style="--c:var(--tarjeta);--cs:var(--tarjeta-suave)"><span class="ic"><i class="i i-s" data-i="credit-card"></i></span><span class="n">Tarjeta <span class="c">· 3</span></span><span class="v num">$68.000</span></div>
-            <div class="mrow" style="--c:var(--cuenta);--cs:var(--cuenta-suave)"><span class="ic"><i class="i i-s" data-i="notebook-pen"></i></span><span class="n">Cuenta corriente <span class="c">· 2</span></span><span class="v num">$37.000</span></div>
+            <div class="mrow" data-toca data-medio="efectivo" style="--c:var(--efectivo);--cs:var(--efectivo-suave)"><span class="ic"><i class="i i-s" data-i="banknote"></i></span><span class="n">Efectivo <span class="c">· 11</span></span><span class="v num">$186.000</span></div>
+            <div class="mrow" data-toca data-medio="mp" style="--c:var(--mp);--cs:var(--mp-suave)"><span class="ic"><i class="i i-s" data-i="qr-code"></i></span><span class="n">Mercado Pago <span class="c">· 7</span></span><span class="v num">$121.000</span></div>
+            <div class="mrow" data-toca data-medio="tarjeta" style="--c:var(--tarjeta);--cs:var(--tarjeta-suave)"><span class="ic"><i class="i i-s" data-i="credit-card"></i></span><span class="n">Tarjeta <span class="c">· 3</span></span><span class="v num">$68.000</span></div>
+            <div class="mrow" data-toca data-medio="cuenta" style="--c:var(--cuenta);--cs:var(--cuenta-suave)"><span class="ic"><i class="i i-s" data-i="notebook-pen"></i></span><span class="n">Cuenta corriente <span class="c">· 2</span></span><span class="v num">$37.000</span></div>
           </div>
         </div>
       </div>
 
       <div class="fila-d">
         <div class="tarjeta card">
-          <div class="card-cab"><span class="t-seccion">Lo más vendido hoy</span><div class="der">por dinero · <a style="color:var(--pino-texto);font-weight:750">Ver los 40</a></div></div>
-          <div class="top">
-            <div class="trow"><span class="pos">1</span><span class="foto chica"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><span class="nm">Látex interior mate blanco 4 L<small>Alba · 3 un.</small></span><span class="v num">$69.000</span></div>
-            <div class="trow"><span class="pos">2</span><span class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><span class="nm">Mecha acero rápido HSS 8 mm<small>Ezeta · 8 un.</small></span><span class="v num">$56.000</span></div>
+          <div class="card-cab"><span class="t-seccion" id="top-tit">Lo más vendido hoy</span><div class="der">por dinero · <a style="color:var(--pino-texto);font-weight:750" data-toca id="ver-top">Ver los 40</a></div></div>
+          <div class="top" id="top">
+            <div class="trow" data-toca data-prod="latex" data-cant="3"><span class="pos">1</span><span class="foto chica"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><span class="nm">Látex interior mate blanco 4 L<small>Alba · 3 un.</small></span><span class="v num">$69.000</span></div>
+            <div class="trow" data-toca data-prod="mecha" data-cant="8"><span class="pos">2</span><span class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><span class="nm">Mecha acero rápido HSS 8 mm<small>Ezeta · 8 un.</small></span><span class="v num">$56.000</span></div>
           </div>
         </div>
-        <div class="tarjeta card">
+        <div class="tarjeta card" data-toca id="no-llevaron">
           <div class="card-cab"><span class="t-seccion">No llevaron</span><span class="pastilla urgente" style="height:24px">4</span></div>
           <div class="lista-simple">
             <div class="lrow"><i class="i i-s" data-i="package"></i>Disco de corte 115 mm<span class="pastilla x" style="height:24px">× 3</span></div>
@@ -182,12 +184,14 @@
             <div class="lrow" style="color:var(--texto-2)"><i class="i i-s" data-i="package"></i>Lija al agua grano 180<span class="pastilla x" style="height:24px">× 1</span></div>
           </div>
         </div>
-        <div class="tarjeta card">
+        <div class="tarjeta card" data-toca id="caja">
           <div class="card-cab"><span class="t-seccion">Cierre de caja</span><span class="t-detalle" style="margin-left:auto">19:05 · Mariela</span></div>
           <div class="caja-dif"><span class="va num">−<span class="peso">$</span>2.000</span><span class="pastilla urgente" style="height:24px">de menos</span></div>
           <div class="cuenta-caja"><span>Contado</span><b class="num">$184.000</b><span>Esperado en efectivo</span><b class="num">$186.000</b></div>
         </div>
       </div>
+      </div>
+      <div id="sec-otra" style="display:none;flex-direction:column;gap:12px"></div>
     </section>
   </main>
 </div>
@@ -201,6 +205,212 @@
     el.appendChild(c);
   });
   const s=document.createElement('div'); s.className='siesta'; s.style.left='50%'; s.style.width='16.6%'; s.style.transform='translateX(0)'; s.innerHTML='<span style="padding-bottom:6px">Cerrado</span>'; el.appendChild(s);
+</script>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  const hs = ['8','9','10','11','12','13','14','15','16','17','18','19'];
+  // Octubre al 19 y septiembre al 19: por día, los domingos cerrado.
+  function mesSerie(primero, total, ultimoParcial) {
+    const base = [0, 380, 330, 340, 320, 410, 530]; // dom..sáb
+    const v = []; for (let d = 0; d < 19; d++) v.push(base[(primero + d) % 7]);
+    if (ultimoParcial) v[18] = 0;
+    const suma = v.reduce((a, b) => a + b, 0), resto = total - (ultimoParcial || 0);
+    const r = v.map(x => Math.round(x * resto / suma)); if (ultimoParcial) r[18] = ultimoParcial;
+    return r;
+  }
+  const P = {
+    hoy: { compara: 'Lunes 19/10, hasta las 19:12<br>contra el lunes 12/10, a la misma hora', ant: 'lun 12', de: 'hoy',
+      vendido: 412000, vAnt: 356000, ventas: 23, nAnt: 20, gan: 151400, gAnt: 129800, tAnt: 17800,
+      medios: { efectivo: [11, 186000], mp: [7, 121000], tarjeta: [3, 68000], cuenta: [2, 37000] },
+      g: { tit: 'Vendido por hora', ley: 'Lunes 12', tope: 60, hoy: [12,38,54,61,47,9,0,0,44,63,58,26], ant: [10,30,49,52,41,6,0,0,38,55,51,24], lb: hs, siesta: true },
+      top: [['latex', 3], ['mecha', 8]], no: [3, 1, 1],
+      caja: null },
+    semana: { compara: 'Del martes 13 al lunes 19/10, hasta las 19:12<br>contra del martes 6 al lunes 12/10', ant: 'sem. ant.', de: 'en la semana',
+      vendido: 2316000, vAnt: 2144000, ventas: 131, nAnt: 122, gan: 856900, gAnt: 793300, tAnt: 17574,
+      medios: { efectivo: [61, 1042000], mp: [40, 683000], tarjeta: [21, 384000], cuenta: [9, 207000] },
+      g: { tit: 'Vendido por día', ley: 'Semana anterior', tope: 600, hoy: [318,342,296,401,547,0,412], ant: [296,311,288,379,514,0,356], lb: ['mar','mié','jue','vie','sáb','dom','lun'] },
+      top: [['latex', 14], ['mecha', 38]], no: [9, 4, 3],
+      caja: ['6 cierres · 5 justos', -2000, 1040000, 1042000] },
+    mes: { compara: 'Octubre, del 1 al 19 hasta las 19:12<br>contra septiembre, del 1 al 19', ant: 'sep.', de: 'en el mes',
+      vendido: 7684000, vAnt: 7115000, ventas: 441, nAnt: 412, gan: 2843100, gAnt: 2632600, tAnt: 17269,
+      medios: { efectivo: [198, 3458000], mp: [136, 2382000], tarjeta: [70, 1229000], cuenta: [37, 615000] },
+      g: { tit: 'Vendido por día', ley: 'Septiembre', tope: 600, hoy: mesSerie(4, 7684, 412), ant: mesSerie(2, 7115), lb: Array.from({ length: 19 }, (_, i) => String(i + 1)) },
+      top: [['latex', 41], ['mecha', 112]], no: [21, 9, 7],
+      caja: ['16 cierres · 14 justos', -3500, 3454500, 3458000] },
+  };
+  let per = 'hoy', sec = 'ventas';
+  const pct = (a, b) => Math.round((a - b) / b * 100);
+  function delta(a, b) {
+    const d = pct(a, b), cl = Math.abs(d) <= 1 ? 'igual' : (d > 0 ? 'sube' : 'baja');
+    return `<span class="delta ${cl}">${cl == 'igual' ? '' : `<i class="i i-s" data-i="${d > 0 ? 'arrow-up-right' : 'arrow-down-right'}"></i>`}${Math.abs(d)} %</span>`;
+  }
+  const signo = n => (n >= 0 ? '+' : '−');
+  function pintarVentas(animar) {
+    const p = P[per], t = Math.round(p.vendido / p.ventas);
+    const set = (k, va, comp) => { const c = $(`[data-cuenta=${k}]`); animar ? RES.rodar(c.querySelector('.va'), va) : c.querySelector('.va').innerHTML = va; c.querySelector('.comp').innerHTML = comp; };
+    set('vendido', RES.pesosH(p.vendido), delta(p.vendido, p.vAnt) + `${signo(p.vendido - p.vAnt)}${RES.pesos(Math.abs(p.vendido - p.vAnt))} · ${p.ant}: ${RES.pesos(p.vAnt)}`);
+    set('ganancia', RES.pesosH(p.gan) + `<small>${Math.round(p.gan / p.vendido * 100)} %</small>`, delta(p.gan, p.gAnt) + `${signo(p.gan - p.gAnt)}${RES.pesos(Math.abs(p.gan - p.gAnt))} · ${p.ant}: ${RES.pesos(p.gAnt)}`);
+    set('ventas', RES.miles(p.ventas), delta(p.ventas, p.nAnt) + `${signo(p.ventas - p.nAnt)}${p.ventas - p.nAnt} · ${p.ant}: ${p.nAnt}`);
+    set('ticket', RES.pesosH(t), delta(t, p.tAnt) + `${signo(t - p.tAnt)}${RES.pesos(Math.abs(t - p.tAnt))} · ${p.ant}: ${RES.pesos(p.tAnt)}`);
+    $('#compara').innerHTML = p.compara;
+    // medios
+    const ks = ['efectivo', 'mp', 'tarjeta', 'cuenta'];
+    $$('#stack b').forEach((b, i) => b.style.flex = p.medios[ks[i]][1] / 1000);
+    ks.forEach(k => { const r = $(`[data-medio=${k}]`); r.querySelector('.c').textContent = '· ' + p.medios[k][0]; animar ? RES.rodar(r.querySelector('.v'), RES.pesos(p.medios[k][1])) : r.querySelector('.v').textContent = RES.pesos(p.medios[k][1]); });
+    // gráfico
+    $('#graf-tit').textContent = p.g.tit; $('#graf-ley').textContent = p.g.ley;
+    $('#eje').innerHTML = [3, 2, 1, 0].map(i => `<span>${i ? (p.g.tope / 3 * i) + ' mil' : '0'}</span>`).join('');
+    barras(p.g, animar);
+    // lo más vendido
+    $('#top-tit').textContent = 'Lo más vendido ' + p.de;
+    $('#top').innerHTML = p.top.map(([k, n], i) => { const x = RES.PRODUCTOS[k]; return `<div class="trow" data-toca data-prod="${k}" data-cant="${n}"><span class="pos">${i + 1}</span><span class="foto chica"><img src="${x.foto}" alt=""></span><span class="nm">${x.nombre}<small>${x.marca} · ${n} un.</small></span><span class="v num">${RES.pesos(n * x.precio)}</span></div>`; }).join('');
+    $$('#no-llevaron .lrow .x').forEach((x, i) => x.textContent = '× ' + p.no[i]);
+    // caja
+    const c = $('#caja');
+    if (!c.dataset.orig) c.dataset.orig = c.innerHTML;
+    if (!p.caja) { c.innerHTML = c.dataset.orig; if (anotado && c.querySelector('.t-detalle')) c.querySelector('.t-detalle').textContent = '19:05 · Mariela · ' + anotado.toLowerCase(); }
+    else c.innerHTML = `<div class="card-cab"><span class="t-seccion">Cierres de caja</span><span class="t-detalle" style="margin-left:auto">${p.caja[0]}</span></div><div class="caja-dif"><span class="va num">−<span class="peso">$</span>${RES.miles(-p.caja[1])}</span><span class="pastilla urgente" style="height:24px">de menos</span></div><div class="cuenta-caja"><span>Contado</span><b class="num">${RES.pesos(p.caja[2])}</b><span>Esperado en efectivo</span><b class="num">${RES.pesos(p.caja[3])}</b></div>`;
+    pintarIconos(document.querySelector('.pantalla'));
+  }
+  function barras(g, animar) {
+    const el = $('#barras'), k = 114 / g.tope, n = g.hoy.length;
+    el.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+    let pico = 0; g.hoy.forEach((v, i) => { if (v > g.hoy[pico]) pico = i; });
+    el.innerHTML = '';
+    g.hoy.forEach((v, i) => {
+      const c = document.createElement('div'); c.className = 'col' + (i == pico ? ' pico' : '') + (i == n - 1 ? ' ahora' : ''); c.dataset.toca = ''; c.dataset.i = i;
+      c.innerHTML = (g.ant[i] ? `<span class="ant" style="height:${g.ant[i] * k}px;${n > 12 ? 'width:22px' : ''}"></span>` : '') + (v ? `<span class="hoy" style="height:${v * k}px;${n > 12 ? 'width:16px' : ''}">${i == pico ? globo(g, i) : ''}</span>` : '') + `<span class="h">${g.lb[i]}</span>`;
+      el.appendChild(c);
+    });
+    if (g.siesta) { const s = document.createElement('div'); s.className = 'siesta'; s.style.left = '50%'; s.style.width = '16.6%'; s.innerHTML = '<span style="padding-bottom:6px">Cerrado</span>'; el.appendChild(s); }
+    if (animar) $$('#barras .hoy').forEach((b, i) => { b.style.transformOrigin = 'bottom'; RES.anim(b, [{ transform: 'scaleY(0)' }, { transform: 'none' }], { duration: 320, delay: i * 15 }); });
+    if (animar) $$('#barras .ant').forEach(b => RES.anim(b, [{ opacity: 0 }, { opacity: 1 }], { duration: 320 }));
+  }
+  const globo = (g, i) => `<span class="globo">${RES.pesos(g.hoy[i] * 1000)}</span>`;
+  // tocar una barra: el globo pasa a esa hora o día
+  $('#barras').addEventListener('click', e => {
+    const c = e.target.closest('.col'); if (!c) return; const g = P[per].g, i = +c.dataset.i;
+    if (!g.hoy[i]) { RES.tostada(per == 'hoy' ? 'A esa hora el local está cerrado' : 'Ese día el local estuvo cerrado', 'moon'); return; }
+    $$('#barras .globo').forEach(x => x.remove()); $$('#barras .col').forEach(x => x.classList.remove('pico'));
+    c.classList.add('pico'); const gl = document.createElement('span'); gl.className = 'globo'; gl.textContent = RES.pesos(g.hoy[i] * 1000) + (g.ant[i] ? ' · antes ' + RES.pesos(g.ant[i] * 1000) : '');
+    c.querySelector('.hoy').appendChild(gl); RES.anim(gl, [{ opacity: 0 }, { opacity: 1 }]);
+  });
+
+  // ---- Secciones: Ventas, Compras, Inventario, Resultado ----
+  const kpi = (ico, et, va, comp, extra) => `<div class="tarjeta kpi${extra || ''}"><div class="cab"><span class="ico"><i class="i i-s" data-i="${ico}"></i></span><span class="t-etiqueta">${et}</span></div><div class="va num">${va}</div><div class="comp">${comp}</div></div>`;
+  const barra = (n, w, v, d) => `<div style="display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;font-size:15px;font-weight:700"><span>${n}${d ? ` <span style="font-weight:600;color:var(--texto-3);font-size:14px">· ${d}</span>` : ''}</span><b class="num">${v}</b><span style="grid-column:1/-1;height:6px;border-radius:9px;background:var(--hundido-2);overflow:hidden"><b style="display:block;height:100%;width:${w}%;background:var(--pino);border-radius:9px"></b></span></div>`;
+  const card = (tit, der, cuerpo, attr) => `<div class="tarjeta card"${attr || ''}><div class="card-cab"><span class="t-seccion">${tit}</span>${der ? `<div class="der">${der}</div>` : ''}</div>${cuerpo}</div>`;
+  const COMPRAS = { hoy: [184000, 1, 1, [['Bulonera Centro', 184000, 1]]], semana: [1284000, 8, 4, [['Bulonera Centro', 512000, 3], ['Distribuidora Ezeta', 398000, 2], ['Alba Pinturas', 236000, 2], ['Mayorista Oeste', 138000, 1]]],
+    mes: [3916000, 21, 6, [['Bulonera Centro', 1468000, 7], ['Distribuidora Ezeta', 1102000, 5], ['Alba Pinturas', 694000, 4], ['Mayorista Oeste', 352000, 3], ['Bahco Argentina', 214000, 1], ['Eléctrica Norte', 86000, 1]]] };
+  function otra() {
+    const o = $('#sec-otra'); let h = '';
+    if (sec == 'compras') {
+      const c = COMPRAS[per], max = c[3][0][1];
+      h = `<div class="kpis">${kpi('truck', 'Gastado en compras', RES.pesosH(c[0]), per == 'hoy' ? 'una compra, a las 10:20' : `${c[1]} compras · ${per == 'semana' ? 'del 13 al 19/10' : 'octubre al 19'}`, ' principal')}${kpi('receipt', 'Compras', c[1], 'a ' + c[2] + (c[2] > 1 ? ' proveedores' : ' proveedor'))}${kpi('clipboard-list', 'Pedidos sin entregar', '3', 'el más viejo, del 12/10')}${kpi('wallet', 'Por pagar', RES.pesosH(318000), 'vence el viernes 23')}</div>
+      <div class="fila-d" style="grid-template-columns:1.45fr 1fr">${card('A quién le compraste', 'por dinero', `<div style="display:grid;gap:12px">${c[3].slice(0, 4).map(x => barra(x[0], x[1] / max * 100, RES.pesos(x[1]), x[2] + (x[2] > 1 ? ' compras' : ' compra'))).join('')}</div>`)}
+      ${card('Pedidos sin entregar', '<a data-ir="compras" style="color:var(--pino-texto);font-weight:750">Abrir Compras</a>', RES.renglones([{ icono: 'truck', titulo: 'Distribuidora Ezeta', detalle: 'Pedido del 12/10 · llega mié 21', valor: '$214.000' }, { icono: 'truck', titulo: 'Alba Pinturas', detalle: 'Pedido del 15/10 · sin fecha', valor: '$386.000' }, { icono: 'truck', titulo: 'Mayorista Oeste', detalle: 'Pedido del 17/10 · llega jue 22', valor: '$96.000' }]))}</div>`;
+    } else if (sec == 'inventario') {
+      h = `<div class="kpis">${kpi('boxes', 'Dinero invertido en stock', RES.pesosH(23480000), 'por su costo vigente, sin IVA', ' principal')}${kpi('package', 'Productos con stock', '2.140', 'de 2.312 en el catálogo')}${kpi('triangle-alert', 'Stock bajo', '28', 'debajo de su mínimo')}${kpi('hourglass', 'Sin venderse 90 días', RES.pesosH(312000), '17 productos parados')}</div>
+      <div class="fila-d">${card('Dónde está la plata', 'por rubro', `<div style="display:grid;gap:12px">${[['Pinturería', 6120000], ['Herramientas', 5480000], ['Bulonería', 3960000], ['Electricidad', 3410000], ['Otros', 4510000]].map(x => barra(x[0], x[1] / 6120000 * 100, RES.pesos(x[1]))).join('')}</div>`)}
+      ${card('Stock bajo', '<a data-ir="stock" style="color:var(--pino-texto);font-weight:750">Ver los 28</a>', RES.renglones([{ foto: RES.PRODUCTOS.lampara.foto, titulo: 'Lámpara LED 12 W luz fría', detalle: 'Mínimo 10', valor: '3 un.' }, { foto: RES.PRODUCTOS.cinta.foto, titulo: 'Cinta métrica PowerLock 5 m', detalle: 'Mínimo 4', valor: '5 un.' }, { icono: 'package', titulo: 'Disco de corte 115 mm', detalle: 'Mínimo 20', valor: '0 un.' }]))}
+      ${card('Parados hace 90 días', '17 · $312.000', RES.renglones([{ icono: 'hourglass', titulo: 'Sierra copa bimetal 68 mm', detalle: 'Última venta 02/06', valor: '$58.000' }, { icono: 'hourglass', titulo: 'Esmalte sintético verde inglés 1 L', detalle: 'Última venta 14/05', valor: '$41.000' }, { icono: 'hourglass', titulo: 'Candado bronce 50 mm', detalle: 'Última venta 28/06', valor: '$36.000' }]))}</div>`;
+    } else if (sec == 'resultado') {
+      h = `<div class="kpis">${kpi('banknote', 'Vendido en septiembre', RES.pesosH(11640000), '1.012 ventas', ' principal')}${kpi('trending-up', 'Ganancia bruta', RES.pesosH(4310000) + '<small>37 %</small>', 'vendido menos el costo', ' principal')}${kpi('receipt', 'Gastos del local', RES.pesosH(2950000), 'alquiler, sueldos y más')}${kpi('scale', 'Te quedó', '<span style="color:var(--logro-texto)">+' + RES.pesosH(1360000) + '</span>', '<span class="delta sube"><i class="i i-s" data-i="arrow-up-right"></i>35 %</span>agosto: +$1.010.000')}</div>
+      <div class="fila-d">${card('De dónde sale', 'septiembre', RES.cuenta([['Vendido', '$11.640.000', 'suma'], ['Costo de lo vendido', '−$7.330.000', 'resta'], ['Gastos del local', '−$2.950.000', 'resta'], ['Te quedó', '+$1.360.000', 'total logro']]))}
+      ${card('Gastos del local', '', `<div style="display:grid;gap:12px">${[['Sueldos', 1400000], ['Alquiler', 1200000], ['Servicios', 210000], ['Impuestos', 140000]].map(x => barra(x[0], x[1] / 1400000 * 100, RES.pesos(x[1]))).join('')}</div>`)}
+      ${card('Piso por día', '', `<div class="t-numero num">${RES.pesosH(306000)}</div><div class="t-detalle">hay que vender por día para cubrir los gastos</div><div class="aviso logro" style="margin-top:12px"><i class="i i-s" data-i="circle-check"></i>En septiembre se vendieron $448.000 por día: 46 % arriba del piso.</div>`)}</div>`;
+    }
+    RES.fundir(o, h);
+    RES.entrada('#sec-otra .tarjeta');
+  }
+  function mostrarSeccion() {
+    const v = sec == 'ventas', fijo = sec == 'inventario' || sec == 'resultado';
+    $('#sec-ventas').style.display = v ? 'contents' : 'none';
+    $('#sec-otra').style.display = v ? 'none' : 'flex';
+    const ps = $('#periodos'); ps.style.opacity = fijo ? .45 : ''; ps.style.pointerEvents = fijo ? 'none' : '';
+    if (fijo) $('#compara').innerHTML = sec == 'inventario' ? 'El inventario es el de ahora<br>no depende del período' : 'Septiembre, el último mes cerrado<br>contra agosto';
+    else if (sec == 'compras') $('#compara').innerHTML = { hoy: 'Lunes 19/10, hasta las 19:12<br>compras cargadas hoy', semana: 'Del martes 13 al lunes 19/10<br>compras cargadas en la semana', mes: 'Octubre, del 1 al 19<br>compras cargadas en el mes' }[per];
+    else $('#compara').innerHTML = P[per].compara;
+    if (v) RES.entrada('#sec-ventas .tarjeta'); else otra();
+  }
+  $('#secciones').addEventListener('click', e => { const b = e.target.closest('[data-sec]'); if (!b || !RES.segmento(b)) return; sec = b.dataset.sec; mostrarSeccion(); });
+  function cambiarPeriodo(p) {
+    const b = $(`[data-per=${p}]`); if (!RES.segmento(b)) return; per = p;
+    if (sec == 'ventas') pintarVentas(true); else if (sec == 'compras') { mostrarSeccion(); }
+  }
+  $('#periodos').addEventListener('click', e => { const b = e.target.closest('[data-per]'); if (b) cambiarPeriodo(b.dataset.per); });
+
+  // ---- Tocar un número: de dónde sale ----
+  const ks = ['efectivo', 'mp', 'tarjeta', 'cuenta'];
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-cuenta]');
+    if (t) {
+      const p = P[per], k = t.dataset.cuenta, costo = p.vendido - p.gan, tk = Math.round(p.vendido / p.ventas);
+      const titulos = { vendido: 'Vendido ' + p.de, ganancia: 'Ganancia ' + p.de, ventas: 'Ventas ' + p.de, ticket: 'Ticket promedio ' + p.de };
+      const filas = {
+        vendido: ks.map(m => [RES.MEDIO[m][0], RES.pesos(p.medios[m][1]), 'suma', p.medios[m][0] + ' ventas']).concat([['Vendido', RES.pesos(p.vendido), 'total']]),
+        ganancia: [['Vendido', RES.pesos(p.vendido), 'suma', p.ventas + ' ventas'], ['Costo de lo vendido', '−' + RES.pesos(costo), 'resta', 'al costo de cada producto el día que se vendió'], ['Ganancia', RES.pesos(p.gan), 'total logro', Math.round(p.gan / p.vendido * 100) + ' % de lo vendido']],
+        ventas: ks.map(m => [RES.MEDIO[m][0], p.medios[m][0], 'suma']).concat([['Ventas', p.ventas, 'total', 'sin contar las anuladas']]),
+        ticket: [['Vendido', RES.pesos(p.vendido), ''], ['Dividido por las ventas', '÷ ' + p.ventas, ''], ['Ticket promedio', RES.pesos(tk), 'total']],
+      }[k];
+      const ant = { vendido: RES.pesos(p.vAnt), ganancia: RES.pesos(p.gAnt), ventas: p.nAnt, ticket: RES.pesos(p.tAnt) }[k];
+      RES.abrir({ origen: t, titulo: titulos[k], sub: p.compara.replace('<br>', ' '), cuerpo: `<div class="r-grande num">${t.querySelector('.va').innerHTML.replace(/<small>.*<\/small>/, '')}</div>` + RES.cuenta(filas) + `<div class="r-nota">Para comparar: ${p.ant}, ${ant}. Se cuenta hasta la misma hora, para no comparar un día a medias con uno entero.</div>`,
+        pie: '<a class="btn" data-ir="ventas-de-hoy"><i class="i i-s" data-i="receipt"></i>Ver las ventas</a>' });
+      return;
+    }
+    const m = e.target.closest('[data-medio]');
+    if (m) {
+      const p = P[per], k = m.dataset.medio, [n, tot] = p.medios[k], muestra = Math.min(n, 10), parcial = n <= 10 ? tot : Math.round(tot * muestra / n / 1000) * 1000;
+      RES.abrir({ origen: m, titulo: RES.MEDIO[k][0] + ' ' + p.de, sub: n + ' ventas · ' + RES.pesos(tot), cuerpo: (n > 10 ? '<div class="r-titulo-lista" style="margin-top:0">Las últimas 10</div>' : '') + RES.renglones(RES.ventas(muestra, parcial, k, n)) + (n > 10 ? `<div class="r-nota">Y ${n - 10} más, por ${RES.pesos(tot - parcial)}.</div>` : ''), pie: '<a class="btn" data-ir="ventas-de-hoy"><i class="i i-s" data-i="receipt"></i>Abrir Ventas de hoy</a>' });
+      return;
+    }
+    const pr = e.target.closest('[data-prod]');
+    if (pr) { const x = RES.PRODUCTOS[pr.dataset.prod], n = +pr.dataset.cant; RES.producto(pr, Object.assign({}, x, { vendido: n * x.precio, cant: n + ' un.' }), P[per].de.replace('en ', 'en ')); return; }
+    if (e.target.closest('#ver-top')) {
+      const p = P[per], f = { hoy: 1, semana: 4.7, mes: 14 }[per];
+      const lista = [['latex', 3], ['mecha', 8], ['cinta', 2], ['pinza', 1], ['martillo', 1], ['tarugos', 3], ['clavos', 2], ['lampara', 4]];
+      const rs = lista.map(([k, n], i) => { const x = RES.PRODUCTOS[k], c = i < 2 ? p.top[i][1] : Math.max(1, Math.round(n * f)); return { foto: x.foto, titulo: (i + 1) + '. ' + x.nombre, detalle: x.marca + ' · ' + c + (k == 'clavos' ? ' kg' : ' un.'), valor: RES.pesos(c * x.precio), attr: ` data-toca data-prod="${k}" data-cant="${c}"` }; });
+      RES.abrir({ origen: e.target.closest('.tarjeta'), titulo: 'Lo más vendido ' + p.de, sub: 'Ordenado por dinero · los primeros 8 de 40', cuerpo: RES.renglones(rs), pie: '<a class="btn" data-ir="productos"><i class="i i-s" data-i="tags"></i>Abrir el catálogo</a>' });
+      return;
+    }
+    const no = e.target.closest('#no-llevaron');
+    if (no) {
+      const p = P[per], nombres = ['Disco de corte 115 mm', 'Silicona transparente', 'Lija al agua grano 180', 'Cinta de teflón 3/4"'];
+      const cuentas = p.no.concat([per == 'hoy' ? 1 : 2]);
+      const capa = RES.abrir({ origen: no, titulo: 'Lo que pidieron y no había', sub: 'Lo anota el vendedor con «No llevó» · ' + p.de, cuerpo: RES.renglones(nombres.map((n, i) => ({ icono: 'package', titulo: n, detalle: 'Lo pidieron ' + cuentas[i] + (cuentas[i] > 1 ? ' veces' : ' vez'), extra: `<button class="btn chico" data-sumar="${n}" style="margin-left:8px"><i class="i i-s" data-i="plus"></i>Al pedido</button>` }))) + '<div class="r-nota">Se suma al próximo pedido a su proveedor; se manda desde Compras.</div>', pie: '<a class="btn" data-ir="compras"><i class="i i-s" data-i="truck"></i>Abrir Compras</a>' });
+      capa.addEventListener('click', ev => { const b = ev.target.closest('[data-sumar]'); if (!b || b.disabled) return; b.disabled = true; b.innerHTML = '<i class="i i-s" data-i="check"></i>En el pedido'; pintarIconos(b); RES.tostada(b.dataset.sumar + ': al pedido de Bulonera Centro'); });
+      return;
+    }
+    const cj = e.target.closest('#caja');
+    if (cj) RES.caja(cj, motivo => { anotado = motivo; if (per == 'hoy') { const d = cj.querySelector('.t-detalle'); d.textContent = '19:05 · Mariela · ' + motivo.toLowerCase(); RES.nuevo(cj); } }, anotado);
+  });
+  let anotado = null;
+
+  // ---- Actualizar (F5): llega una venta con la pantalla abierta ----
+  const llegan = [['mp', 9000, 3300, '19:14'], ['tarjeta', 14000, 5200, '19:16']]; let llego = 0;
+  function actualizar() {
+    if (llego >= llegan.length) { RES.tostada('Ya está todo al día', 'refresh-cw'); return; }
+    const [m, v, g, h] = llegan[llego++];
+    ['hoy', 'semana', 'mes'].forEach(k => { const p = P[k]; p.vendido += v; p.ventas += 1; p.gan += g; p.medios[m][0] += 1; p.medios[m][1] += v; p.g.hoy[p.g.hoy.length - 1] += v / 1000; });
+    $('#actualizado').textContent = 'Actualizado ' + h;
+    RES.tostada('Entró una venta: ' + RES.pesos(v) + ' con ' + RES.MEDIO[m][0], 'receipt');
+    if (sec != 'ventas') return;
+    pintarVentas(false);
+    const last = $$('#barras .col'); const b = last[last.length - 1].querySelector('.hoy');
+    if (b) { b.style.transformOrigin = 'bottom'; RES.anim(b, [{ transform: 'scaleY(.8)' }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.34,1.4,.64,1)' }); RES.nuevo(b); }
+    ['vendido', 'ventas', 'ganancia', 'ticket'].forEach(k => RES.anim($(`[data-cuenta=${k}] .va`), [{ transform: 'translateY(40%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 200 }));
+    RES.nuevo($(`[data-medio=${m}]`));
+  }
+  $('#actualizar').addEventListener('click', actualizar);
+  document.addEventListener('keydown', e => {
+    if (e.key == 'F5') { e.preventDefault(); actualizar(); return; }
+    if (RES.capa() || e.ctrlKey || e.metaKey || e.altKey) return;
+    const k = { d: 'hoy', s: 'semana', m: 'mes' }[e.key.toLowerCase()]; if (k && $('#periodos').style.pointerEvents != 'none') cambiarPeriodo(k);
+  });
+  RES.entrada('.kpis .tarjeta, .fila-c .tarjeta, .fila-d .tarjeta');
+})();
 </script>
 </body>
 </html>

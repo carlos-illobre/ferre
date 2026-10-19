@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .cab { display: flex; align-items: center; gap: 12px; padding: 4px 16px 10px; border-bottom: 1px solid var(--borde); background: var(--superficie); }
@@ -15,7 +16,7 @@
   .cab .nm { font-weight: 800; font-size: 17px; line-height: 22px; }
   .cab .st { font-size: 14px; color: var(--logro-texto); font-weight: 650; display: flex; align-items: center; gap: 6px; }
   .cab .st i { width: 8px; height: 8px; border-radius: 99px; background: var(--logro); }
-  .hilo { flex: 1; min-height: 0; overflow: hidden; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .hilo { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-width: none; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; position: relative; }
   .cuando { align-self: center; font-size: 14px; font-weight: 700; color: var(--texto-3); background: var(--hundido); padding: 2px 10px; border-radius: 99px; }
   .msj { max-width: 330px; padding: 12px 14px; border-radius: 18px 18px 18px 6px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); font-size: 16px; line-height: 23px; font-weight: 550; color: var(--texto-2); }
   .msj b { color: var(--tinta); font-weight: 800; }
@@ -49,34 +50,167 @@
 <div class="celu">
   <div class="barra-estado"><span>19:12</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="cab">
-    <span style="color:var(--texto-2);display:flex"><i class="i i-l" data-i="chevron-left"></i></span>
+    <span style="color:var(--texto-2);display:flex" data-ir="vender" data-toca aria-label="Volver"><i class="i i-l" data-i="chevron-left"></i></span>
     <span class="logo"><i class="i" data-i="store"></i></span>
     <div><div class="nm">Tu negocio</div><div class="st"><i></i>Al día · 19:12</div></div>
-    <span style="margin-left:auto;color:var(--texto-2);display:flex"><i class="i i-l" data-i="calendar-days"></i></span>
+    <span style="margin-left:auto;color:var(--texto-2);display:flex" data-toca id="calendario" aria-label="Elegir un día"><i class="i i-l" data-i="calendar-days"></i></span>
   </div>
-  <div class="hilo">
+  <div class="hilo" id="hilo">
     <span class="cuando">Hoy, lunes 19 · 19:10</span>
-    <div class="msj">Hoy vendiste <b class="num">$412.000</b> en 23 ventas, <span class="verde">16 % más</span> que el lunes pasado.
-      <div class="nums"><div><span class="et">Ganancia</span><span class="va num">$151.400</span></div><div><span class="et">Ticket</span><span class="va num">$17.913</span></div><div><span class="et">Efectivo</span><span class="va num">$186.000</span></div></div>
+    <div class="msj">Hoy vendiste <b class="num" data-toca data-cuenta="vendido">$412.000</b> en 23 ventas, <span class="verde">16 % más</span> que el lunes pasado.
+      <div class="nums"><div data-toca data-cuenta="ganancia"><span class="et">Ganancia</span><span class="va num">$151.400</span></div><div data-toca data-cuenta="ticket"><span class="et">Ticket</span><span class="va num">$17.913</span></div><div data-toca data-cuenta="efectivo"><span class="et">Efectivo</span><span class="va num">$186.000</span></div></div>
     </div>
-    <div class="msj urg"><div class="marca-urg"><i class="i i-s" data-i="triangle-alert"></i>Para mirar</div>La caja cerró con <b>$2.000 de menos</b>: Mariela contó $184.000 y las 11 ventas en efectivo suman $186.000.
-      <div class="acc"><button class="btn chico">Ver las 11 ventas</button><button class="btn chico btn-suave">Ya lo sé</button></div>
+    <div class="msj urg" id="msj-caja"><div class="marca-urg"><i class="i i-s" data-i="triangle-alert"></i>Para mirar</div>La caja cerró con <b>$2.000 de menos</b>: Mariela contó $184.000 y las 11 ventas en efectivo suman $186.000.
+      <div class="acc"><button class="btn chico" id="ver-11">Ver las 11 ventas</button><button class="btn chico btn-suave" id="ya-lo-se">Ya lo sé</button></div>
     </div>
     <div class="yo">¿Y la semana?</div>
     <div class="msj">En 7 días, <b class="num">$2.316.000</b> (<span class="verde">8 % más</span>). El mejor fue el sábado: <b>$547.000</b>.
-      <div class="dias" id="dias"></div>
+      <div class="dias" id="dias" data-toca></div>
       <div class="dlb"><span>m</span><span>m</span><span>j</span><span>v</span><span style="color:var(--pino-texto);font-weight:800">s</span><span>d</span><span>l</span></div>
     </div>
   </div>
   <div class="abajo">
-    <div class="rapidas"><span class="chip"><i class="i i-s" data-i="hourglass"></i>¿Qué no se vende?</span><span class="chip"><i class="i i-s" data-i="truck"></i>Gastos</span><span class="chip"><i class="i i-s" data-i="scale"></i>El mes</span></div>
-    <div class="entrada"><div class="campo">Preguntale a tu negocio…</div><span class="mic"><i class="i" data-i="mic"></i></span></div>
+    <div class="rapidas" id="rapidas"><span class="chip"><i class="i i-s" data-i="hourglass"></i>¿Qué no se vende?</span><span class="chip"><i class="i i-s" data-i="truck"></i>Gastos</span><span class="chip"><i class="i i-s" data-i="scale"></i>El mes</span></div>
+    <div class="entrada"><div class="campo" id="campo" data-toca>Preguntale a tu negocio…</div><span class="mic" id="mic" data-toca role="button" aria-label="Preguntar con la voz"><i class="i" data-i="mic"></i></span></div>
   </div>
   <span class="home-ind"></span>
 </div>
 <script>
   const d=[318,342,296,401,547,0,412], D=document.getElementById('dias');
   d.forEach((v,i)=>{const s=document.createElement('span'); s.style.height=(v?v/547*56:4)+'px'; if(i==4)s.className='top'; if(i==6)s.style.boxShadow='inset 0 0 0 2px #12382F'; if(!v)s.className='c'; D.appendChild(s);});
+</script>
+<script src="../../_extra/interacciones.js"></script>
+<style>
+  .rapidas .chip { cursor: pointer; }
+  .campo input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: 600 16px var(--letra); color: var(--tinta); }
+  .mic.oyendo { background: var(--accion); }
+  .lista-msj { display: grid; gap: 6px; margin-top: 10px; }
+  .lista-msj div { display: flex; gap: 8px; align-items: center; font-size: 15px; line-height: 20px; }
+  .lista-msj b { margin-left: auto; }
+  .msj.visto .marca-urg { color: var(--texto-3); }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+  .cal .dn { font-size: 14px; font-weight: 700; color: var(--texto-3); }
+  .cal button { height: 44px; border-radius: 12px; border: 1px solid var(--borde); background: var(--superficie); font-weight: 750; font-size: 16px; color: var(--tinta); }
+  .cal button.hoy { background: var(--pino); border-color: var(--pino); color: #fff; }
+  .cal button:disabled { background: var(--hundido); border-color: transparent; color: var(--texto-3); font-weight: 600; cursor: default; }
+</style>
+<script>
+(function () {
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  const hilo = $('#hilo');
+  const abajo = () => hilo.scrollTo({ top: hilo.scrollHeight, behavior: RES.quieto() ? 'auto' : 'smooth' });
+  const entra = el => RES.anim(el, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 260 });
+  let ocupado = false, anotado = null;
+  $('#msj-caja').setAttribute('data-toca', '');
+  // Pregunta del dueño → «escribiendo» 400 ms → respuesta del negocio
+  function preguntar(texto, respuesta) {
+    if (ocupado) return; ocupado = true;
+    const yo = document.createElement('div'); yo.className = 'yo'; yo.textContent = texto; hilo.appendChild(yo); entra(yo); abajo();
+    const esc = document.createElement('div'); esc.className = 'escribiendo'; esc.innerHTML = '<b></b><b></b><b></b>';
+    setTimeout(() => {
+      hilo.appendChild(esc); entra(esc); abajo();
+      esc.querySelectorAll('b').forEach((b, i) => RES.anim(b, [{ opacity: .3 }, { opacity: 1 }, { opacity: .3 }], { duration: 600, delay: i * 120, iterations: 3, fill: 'none' }));
+      setTimeout(() => {
+        esc.remove(); const m = document.createElement('div'); m.className = 'msj'; m.innerHTML = respuesta; hilo.appendChild(m); pintarIconos(m); entra(m); abajo();
+        ocupado = false; RES.vibrar(10);
+      }, RES.quieto() ? 0 : 700);
+    }, RES.quieto() ? 0 : 250);
+  }
+  const R = {
+    '¿Qué no se vende?': ['hourglass', `Hay <b class="num">$312.000</b> parados en <b>17 productos</b> que no se venden hace 90 días. Los que más plata tienen:<div class="lista-msj"><div>Sierra copa bimetal 68 mm<b class="num">$58.000</b></div><div>Esmalte sintético verde 1 L<b class="num">$41.000</b></div><div>Candado bronce 50 mm<b class="num">$36.000</b></div></div><div class="acc"><button class="btn chico" data-ir="stock">Ver los 17</button></div>`],
+    'Gastos': ['truck', `En la semana gastaste <b class="num">$1.284.000</b> en 8 compras. La más grande, a <b>Bulonera Centro</b>: $512.000 en 3 compras.<div class="acc"><button class="btn chico" data-ir="compras">Abrir Compras</button></div>`],
+    'El mes': ['scale', `Septiembre cerró <span class="verde">+$1.360.000</span> a favor: vendiste <b class="num">$11.640.000</b> y, después de la mercadería y los gastos del local, quedó el 12 %. Octubre va <b class="num">$7.684.000</b> (<span class="verde">8 % más</span>).<div class="nums"><div data-toca data-cuenta="resultado"><span class="et">Te quedó</span><span class="va num">$1.360.000</span></div><div><span class="et">Piso/día</span><span class="va num">$306.000</span></div><div><span class="et">Por día</span><span class="va num">$448.000</span></div></div>`],
+    '¿Cómo pagaron?': ['credit-card', `Hoy: efectivo <b class="num">$186.000</b>, Mercado Pago <b class="num">$121.000</b>, tarjeta <b class="num">$68.000</b> y cuenta corriente <b class="num">$37.000</b>.`],
+    'Lo más vendido': ['tags', `Hoy lo que más plata dejó fue el <b>Látex interior mate 4 L</b> (3 un., $69.000), después la <b>Mecha HSS 8 mm</b> (8 un., $56.000).<div class="acc"><button class="btn chico" data-ir="productos">Abrir el catálogo</button></div>`],
+    '¿Qué falta pedir?': ['triangle-alert', `Hay <b>28 productos</b> con stock bajo. El que más piden: <b>Disco de corte 115 mm</b>, sin stock y lo pidieron 3 veces hoy.<div class="acc"><button class="btn chico" data-ir="stock">Ver los 28</button><button class="btn chico btn-suave" data-sumar>Sumar al pedido</button></div>`],
+  };
+  let pool = ['¿Cómo pagaron?', 'Lo más vendido', '¿Qué falta pedir?'];
+  function chips(lista) {
+    const C = $('#rapidas'); C.innerHTML = lista.map(t => `<span class="chip" data-q="${t}"><i class="i i-s" data-i="${R[t][0]}"></i>${t}</span>`).join(''); pintarIconos(C);
+    $$('#rapidas .chip').forEach((c, i) => RES.anim(c, [{ opacity: 0, transform: 'translateX(12px)' }, { opacity: 1, transform: 'none' }], { duration: 220, delay: i * 40 }));
+  }
+  $$('#rapidas .chip').forEach(c => c.dataset.q = c.textContent.trim());
+  $('#rapidas').addEventListener('click', e => {
+    const c = e.target.closest('[data-q]'); if (!c || ocupado) return; const q = c.dataset.q;
+    preguntar(q == 'Gastos' ? '¿Cuánto gasté?' : q == 'El mes' ? '¿Y el mes?' : q, R[q][1]);
+    const vis = $$('#rapidas [data-q]').map(x => x.dataset.q).filter(x => x != q);
+    pool.push(q); const nuevo = pool.shift(); chips([nuevo].concat(vis));
+  });
+
+  // Escribir o hablar
+  function enviar(t) {
+    t = t.trim(); if (!t) return;
+    const r = /mecha/i.test(t) ? 'En septiembre vendiste <b>112 mechas</b> por <b class="num">$784.000</b>. La que más sale es la <b>HSS 8 mm</b>: 38 en la última semana.'
+      : /hoy|vend/i.test(t) ? 'Hoy van <b class="num">$412.000</b> en 23 ventas, <span class="verde">16 % más</span> que el lunes pasado a esta hora.'
+      : 'Eso todavía no lo sé contestar. Probá con «¿cuánto vendí de mechas en septiembre?» o con los botones de arriba.';
+    preguntar(t, r);
+  }
+  $('#campo').addEventListener('click', () => {
+    const c = $('#campo'); if (c.querySelector('input')) return;
+    c.classList.add('foco'); c.innerHTML = '<input id="q" placeholder="Preguntale a tu negocio…" autocomplete="off">';
+    const q = c.querySelector('input'); q.focus();
+    q.addEventListener('keydown', e => { if (e.key == 'Enter') { enviar(q.value); q.value = ''; } });
+    q.addEventListener('blur', () => { if (!q.value) { c.classList.remove('foco'); c.textContent = 'Preguntale a tu negocio…'; } });
+  });
+  $('#mic').addEventListener('click', () => {
+    const q = $('#q'); if (q && q.value) { enviar(q.value); q.value = ''; return; }
+    const m = $('#mic'), c = $('#campo'); if (m.classList.contains('oyendo') || ocupado) return;
+    m.classList.add('oyendo'); c.classList.add('foco'); c.innerHTML = '<span class="escrito">Escuchando…</span>';
+    const a = RES.anim(m, [{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 600, iterations: 2, fill: 'none' });
+    setTimeout(() => { c.innerHTML = '<span class="escrito">¿Cuánto vendí de mechas en septiembre?</span>'; }, 700);
+    setTimeout(() => { m.classList.remove('oyendo'); c.classList.remove('foco'); c.textContent = 'Preguntale a tu negocio…'; enviar('¿Cuánto vendí de mechas en septiembre?'); }, 1300);
+  });
+
+  // Aviso de la caja: ver las ventas o darlo por sabido
+  $('#ver-11').addEventListener('click', () => RES.abrir({ titulo: 'Las 11 ventas en efectivo', sub: 'Hoy · suman $186.000 · Mariela contó $184.000', cuerpo: RES.renglones(RES.ventas(11, 186000, 'efectivo', 11)), pie: '<a class="btn" data-ir="ventas-de-hoy"><i class="i i-s" data-i="receipt"></i>Abrir Ventas de hoy</a>' }));
+  $('#ya-lo-se').addEventListener('click', () => {
+    const m = $('#msj-caja'); m.classList.add('visto'); m.style.borderColor = 'var(--borde)';
+    m.querySelector('.marca-urg').innerHTML = '<i class="i i-s" data-i="check"></i>Visto · 19:13'; m.querySelector('.acc').remove(); pintarIconos(m);
+    RES.anim(m, [{ opacity: .6 }, { opacity: 1 }]); RES.tostada('Listo: no te lo vuelvo a avisar');
+  });
+
+  // Tocar un número
+  hilo.addEventListener('click', e => {
+    if (e.target.closest('[data-sumar]')) { const b = e.target.closest('[data-sumar]'); b.disabled = true; b.textContent = 'En el pedido'; RES.tostada('Disco de corte 115 mm: 50 un. al pedido de Bulonera Centro'); return; }
+    // Tocar el aviso de la caja (fuera de sus botones): el diálogo del cierre
+    const cj = e.target.closest('#msj-caja');
+    if (cj && !e.target.closest('button')) {
+      RES.caja(cj, m => {
+        anotado = m; cj.classList.add('visto'); cj.style.borderColor = 'var(--borde)';
+        cj.querySelector('.marca-urg').innerHTML = '<i class="i i-s" data-i="check"></i>Anotado: ' + m.toLowerCase(); pintarIconos(cj); RES.nuevo(cj);
+      }, anotado);
+      return;
+    }
+    const t = e.target.closest('[data-cuenta]');
+    if (t) {
+      const k = t.dataset.cuenta;
+      const o = { vendido: ['Vendido hoy', RES.pesosH(412000), [['Efectivo', '$186.000', 'suma', '11 ventas'], ['Mercado Pago', '$121.000', 'suma', '7 ventas'], ['Tarjeta', '$68.000', 'suma', '3 ventas'], ['Cuenta corriente', '$37.000', 'suma', '2 ventas'], ['Vendido', '$412.000', 'total']]],
+        ganancia: ['Ganancia de hoy', RES.pesosH(151400), [['Vendido', '$412.000', 'suma'], ['Costo de lo vendido', '−$260.600', 'resta'], ['Ganancia', '$151.400', 'total logro', '37 % de lo vendido']]],
+        ticket: ['Ticket promedio de hoy', RES.pesosH(17913), [['Vendido', '$412.000', ''], ['Dividido por las ventas', '÷ 23', ''], ['Ticket promedio', '$17.913', 'total']]],
+        efectivo: ['Efectivo de hoy', RES.pesosH(186000), [['11 ventas en efectivo', '$186.000', 'suma'], ['Esperado en la caja', '$186.000', 'total'], ['Contado por Mariela', '$184.000', ''], ['Diferencia', '−$2.000', 'urgente']]],
+        resultado: ['Resultado de septiembre', '+' + RES.pesosH(1360000), [['Vendido', '$11.640.000', 'suma'], ['Costo de lo vendido', '−$7.330.000', 'resta'], ['Gastos del local', '−$2.950.000', 'resta'], ['Te quedó', '+$1.360.000', 'total logro']]] }[k];
+      RES.abrir({ origen: t, titulo: o[0], sub: k == 'resultado' ? 'El último mes cerrado' : 'Hoy, lunes 19/10, hasta las 19:12', cuerpo: `<div class="r-grande num">${o[1]}</div>` + RES.cuenta(o[2]) });
+      return;
+    }
+    if (e.target.closest('#dias')) RES.abrir({ titulo: 'Los últimos 7 días', sub: 'Del 13 al 19/10 · contra del 6 al 12/10', cuerpo: `<div class="r-grande num">${RES.pesosH(2316000)}</div>` + RES.cuenta([['Martes 13', '$318.000', 'suma'], ['Miércoles 14', '$342.000', 'suma'], ['Jueves 15', '$296.000', 'suma'], ['Viernes 16', '$401.000', 'suma'], ['Sábado 17', '$547.000', 'suma', 'el mejor'], ['Domingo 18', 'cerrado', ''], ['Lunes 19', '$412.000', 'suma', 'hasta las 19:12'], ['En 7 días', '$2.316.000', 'total', '131 ventas · 8 % más']]) });
+  });
+
+  // Calendario: elegir otro día y el negocio cuenta ese día
+  const D = { 13: [318000, 18, 7], 14: [342000, 19, 10], 15: [296000, 17, 3], 16: [401000, 23, 6], 17: [547000, 31, 10] };
+  const NOMB = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  $('#calendario').addEventListener('click', () => {
+    let h = '<div class="cal">' + ['l', 'm', 'm', 'j', 'v', 's', 'd'].map(x => `<span class="dn">${x}</span>`).join('') + '<span></span><span></span><span></span>';
+    for (let d = 1; d <= 31; d++) { const wd = (d + 3) % 7; h += `<button data-dia="${d}" class="${d == 19 ? 'hoy' : ''}" ${d > 19 || wd == 0 ? 'disabled' : ''}>${d}</button>`; }
+    h += '</div><div class="r-nota">Los domingos el local está cerrado.</div>';
+    const capa = RES.abrir({ titulo: 'Octubre', sub: 'Elegí un día y te cuento cómo fue', cuerpo: h });
+    capa.addEventListener('click', e => {
+      const b = e.target.closest('[data-dia]'); if (!b || b.disabled) return; const d = +b.dataset.dia; RES.cerrar();
+      if (d == 19) { preguntar('¿Y hoy?', 'Hoy van <b class="num">$412.000</b> en 23 ventas, <span class="verde">16 % más</span> que el lunes pasado a esta hora.'); return; }
+      const wd = NOMB[(d + 3) % 7], x = D[d] || [Math.round((280 + (d * 37) % 200) * 1000 / 1000) * 1000, 15 + d % 9, d % 4];
+      preguntar(`¿Y el ${wd} ${d}?`, `El ${wd} ${d} vendiste <b class="num">${RES.pesos(x[0])}</b> en ${x[1]} ventas, <span class="verde">${x[2]} % más</span> que el ${wd} anterior. La caja cerró justa.`);
+    });
+  });
+})();
 </script>
 </body>
 </html>
