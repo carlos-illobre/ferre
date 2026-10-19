@@ -37,12 +37,14 @@ La lista vigente es la de la sección siguiente; cuando Carlos agrega uno, se an
 
 Se crea una vez, con **Add cloud environment**.
 
-- **Acceso a internet:** personalizado: la lista por defecto (npm, PyPI, GitHub, Docker Hub)
-  más `cdn.playwright.dev`, de donde Playwright baja el navegador de las pruebas, y sus dos
-  espejos, `playwright.download.prss.microsoft.com` y `playwright.azureedge.net`. Con solo
-  Trusted, el script de preparación falla con `ENOTFOUND cdn.playwright.dev`.
-  También `ghcr.io` y `pkg-containers.githubusercontent.com`: la imagen de
-  `listas-de-proveedores` parte de `ghcr.io/astral-sh/uv`, y sin esos dos no se construye.
+- **Acceso a internet:** completo, desde el 2026-10-19 (Carlos lo cambió para que el diseño
+  pueda usar tipografías, imágenes y referencias de afuera). Antes era personalizado, y lo
+  mínimo que necesita el proyecto sigue siendo esto: la lista por defecto (npm, PyPI, GitHub,
+  Docker Hub) más `cdn.playwright.dev`, de donde Playwright baja el navegador de las
+  pruebas, y sus dos espejos, `playwright.download.prss.microsoft.com` y
+  `playwright.azureedge.net` (con solo Trusted, el script de preparación falla con
+  `ENOTFOUND cdn.playwright.dev`); y `ghcr.io` y `pkg-containers.githubusercontent.com`,
+  porque la imagen de `listas-de-proveedores` parte de `ghcr.io/astral-sh/uv`.
 - **Variables de entorno:** ninguna. Las pruebas de punta a punta levantan su propia base
   con Docker, dentro de la máquina.
 - **Script de preparación:** prepara la máquina, no el proyecto. Corre antes de que exista
