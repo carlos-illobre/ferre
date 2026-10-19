@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compras · Escritorio (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<style>
+  .kpis { display: grid; grid-template-columns: 1.35fr 1fr 1fr 1fr; gap: 12px; }
+  .kpis .resumen { padding: 12px 16px; height: 88px; } .kpis .resumen > div { min-width: 0; }
+  .kpis .resumen .sub { white-space: nowrap; font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; }
+  .resumen.error .sub { color: var(--error-texto); }
+  .semana { display: flex; gap: 16px; align-items: center; }
+  .barras { margin-left: auto; display: flex; align-items: flex-end; gap: 6px; height: 56px; }
+  .barras span { display: grid; justify-items: center; gap: 2px; font-size: 14px; font-weight: 650; color: var(--texto-3); line-height: 14px; }
+  .barras b { display: block; width: 14px; border-radius: 4px; background: var(--hundido-2); }
+  .barras .hoy b { background: var(--pino); } .barras .hoy { color: var(--pino); font-weight: 800; }
+  .cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 356px; gap: 20px; margin-top: 20px; height: calc(100% - 108px); min-height: 0; }
+  .col { min-height: 0; display: flex; flex-direction: column; }
+  .cab-sec { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .cab-sec .chips { margin-left: auto; }
+  .cab-sec .chip { height: 36px; font-size: 14px; padding: 0 14px; }
+  .lista { min-height: 0; overflow: hidden; position: relative; padding: 2px; margin: -2px; }
+  .lista::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(transparent, var(--fondo)); }
+  .compra .detalle { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .compra { grid-template-columns: 56px minmax(0,1fr) 128px 132px 20px; padding: 10px 14px; }
+  .compra .foto img.factura { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: none; }
+  .compra .foto { border: 1px solid var(--borde); }
+  .compra .total { text-align: right; font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+  .compra .total small { display: block; font-size: 14px; color: var(--texto-3); font-weight: 600; letter-spacing: 0; }
+  .compra .estado { justify-self: start; }
+  .compra.anulada { background: var(--hundido); box-shadow: none; }
+  .compra.anulada .total b { text-decoration: line-through; color: var(--texto-3); }
+  .compra.foco { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10), var(--sombra-2); }
+  .flecha { color: var(--texto-3); }
+  .derecha { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .recibir { padding: 14px; display: grid; grid-template-columns: 96px 1fr; gap: 10px 14px; }
+  .recibir .qr { width: 96px; height: 96px; padding: 6px; border-radius: 12px; background: #fff; border: 1px solid var(--borde); position: relative; }
+  .recibir .qr::after { content: ""; position: absolute; inset: -4px; border-radius: 14px; border: 2px solid var(--pino); opacity: .5; }
+  .recibir h3 { margin: 0; font-size: 16px; line-height: 22px; font-weight: 800; }
+  .recibir p { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .recibir .vence { display: inline-flex; gap: 6px; align-items: center; margin-top: 4px; font-size: 14px; font-weight: 650; color: var(--texto-3); }
+  .recibir .otras { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .recibir .otras .btn { font-size: 14px; }
+  .mini { padding: 10px 14px 4px; }
+  .mini .t { display: flex; align-items: center; gap: 8px; font-weight: 750; font-size: 15px; margin-bottom: 4px; }
+  .mini .t .btn { margin-left: auto; }
+  .fila { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid var(--borde); }
+  .fila .ic { width: 36px; height: 36px; border-radius: 10px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .fila b { font-size: 15px; font-weight: 750; display: block; line-height: 20px; }
+  .fila span.d { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .fila .imp { text-align: right; font-weight: 800; font-size: 15px; }
+  .fila .imp small { display: block; font-size: 14px; font-weight: 650; }
+  .rojo { color: var(--error-texto); } .ambar { color: var(--urgente-texto); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de depósito</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">MR</span><div class="txt"><div style="font-weight:750;font-size:15px">Marcelo Ríos</div><div class="t-detalle">Comprador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="send"></i>Armar pedido <span class="kbd">Alt P</span></button>
+        <button class="btn btn-accion chico"><i class="i i-s" data-i="camera"></i>Registrar compra <span class="kbd">Alt N</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Stock</a><a class="activa">Compras</a><a>Contar</a></nav>
+    <section class="pantalla">
+      <div class="kpis">
+        <div class="resumen semana">
+          <div><div class="et">Esta semana</div><div class="va"><span class="peso">$</span>615.350</div><div class="sub">4 compras · 1 anulada</div></div>
+          <div class="barras" title="Por día">
+            <span><b style="height:30px"></b>L</span><span><b style="height:12px"></b>M</span><span><b style="height:40px"></b>M</span><span><b style="height:8px"></b>J</span><span><b style="height:22px"></b>V</span><span><b style="height:4px"></b>S</span><span class="hoy"><b style="height:26px"></b>D</span>
+          </div>
+        </div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="truck"></i></span><div><div class="et">Pedidos por llegar</div><div class="va">2</div><div class="sub">1 llegó a medias</div></div></div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="landmark"></i></span><div><div class="et">Se les debe</div><div class="va"><span class="peso">$</span>1.095.500</div><div class="sub">a 3 proveedores</div></div></div>
+        <div class="resumen error"><span class="ico"><i class="i" data-i="triangle-alert"></i></span><div><div class="et">Vencido</div><div class="va"><span class="peso">$</span>186.500</div><div class="sub">venció hace 5 días</div></div></div>
+      </div>
+
+      <div class="cuerpo">
+        <div class="col">
+          <div class="cab-sec">
+            <span class="t-seccion">Compras recientes</span>
+            <div class="chips"><span class="chip elegido">Esta semana (5)</span><span class="chip">Sin pagar (2)</span><span class="chip">Anuladas (1)</span></div>
+          </div>
+          <div class="lista">
+            <div class="renglon compra foco">
+              <div class="foto"><img class="factura" src="../../propio/factura.webp" alt=""></div>
+              <div><div class="titulo">Bulonera Centro</div><div class="detalle">Hoy 09:40 · Factura A · 7 renglones</div></div>
+              <div class="total"><b><span class="peso">$</span>184.300</b><small>sin IVA</small></div>
+              <span class="pastilla estado"><i class="i i-s" data-i="calendar"></i>Vence 18/11</span>
+              <i class="i flecha" data-i="chevron-right"></i>
+            </div>
+            <div class="renglon compra">
+              <div class="foto"><img class="factura" src="../../propio/factura.webp" alt="" style="object-position: 0 30%"></div>
+              <div><div class="titulo">Distribuidora Oeste</div><div class="detalle">Ayer · Remito · 4 renglones</div></div>
+              <div class="total"><b><span class="peso">$</span>96.750</b><small>por adelantado</small></div>
+              <span class="pastilla logro estado"><i class="i i-s" data-i="check"></i>Pagada</span>
+              <i class="i flecha" data-i="chevron-right"></i>
+            </div>
+            <div class="renglon compra">
+              <div class="foto-icono"><i class="i i-l" data-i="notebook-pen"></i></div>
+              <div><div class="titulo">Ferretera del Sur</div><div class="detalle">Jueves · Sin comprobante · 3 renglones</div></div>
+              <div class="total"><b><span class="peso">$</span>22.400</b><small>sin IVA</small></div>
+              <span class="pastilla logro estado"><i class="i i-s" data-i="check"></i>Pagada</span>
+              <i class="i flecha" data-i="chevron-right"></i>
+            </div>
+            <div class="renglon compra">
+              <div class="foto"><img class="factura" src="../../propio/factura.webp" alt="" style="object-position: 0 60%"></div>
+              <div><div class="titulo">Electro Lumen</div><div class="detalle">Miércoles 15 · Factura A · 12 renglones</div></div>
+              <div class="total"><b><span class="peso">$</span>311.900</b><small>sin IVA</small></div>
+              <span class="pastilla estado"><i class="i i-s" data-i="calendar"></i>Vence 14/11</span>
+              <i class="i flecha" data-i="chevron-right"></i>
+            </div>
+            <div class="renglon compra anulada">
+              <div class="foto"><img class="factura" src="../../propio/factura.webp" alt="" style="opacity:.5"></div>
+              <div><div class="titulo">Acindar Distribución</div><div class="detalle">Lunes 13 · Factura A · 2 renglones</div></div>
+              <div class="total"><b><span class="peso">$</span>58.000</b><small>no suma</small></div>
+              <span class="pastilla error estado"><i class="i i-s" data-i="ban"></i>Anulada</span>
+              <i class="i flecha" data-i="chevron-right"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="derecha">
+          <div class="tarjeta-2 recibir">
+            <div class="qr"><img src="../../propio/qr.svg" alt="Código QR"></div>
+            <div>
+              <h3>Sacale una foto a la factura</h3>
+              <p>Apuntá el celular al código: la compra se arma sola.</p>
+              <span class="vence"><i class="i i-s" data-i="clock"></i>Vale 9 minutos más</span>
+            </div>
+            <div class="otras">
+              <button class="btn chico"><i class="i i-s" data-i="image"></i>Elegir archivo</button>
+              <button class="btn chico"><i class="i i-s" data-i="keyboard"></i>Cargar a mano</button>
+            </div>
+          </div>
+
+          <div class="tarjeta mini">
+            <div class="t"><i class="i" data-i="truck"></i>Por llegar</div>
+            <div class="fila"><span class="ic"><i class="i" data-i="clipboard-list"></i></span><div><b>Distribuidora Oeste</b><span class="d">Enviado el 14/10 · 9 renglones</span></div><button class="btn btn-suave chico">Llegó</button></div>
+            <div class="fila"><span class="ic"><i class="i" data-i="clipboard-list"></i></span><div><b>Bulonera Centro</b><span class="d ambar">Llegó a medias · faltan 3</span></div><button class="btn btn-suave chico">Llegó</button></div>
+          </div>
+
+          <div class="tarjeta mini">
+            <div class="t"><i class="i" data-i="landmark"></i>Vence primero</div>
+            <div class="fila"><span class="ic" style="background:var(--error-suave);color:var(--error-texto)"><i class="i" data-i="triangle-alert"></i></span><div><b>Ferretera del Sur</b><span class="d rojo">Venció hace 5 días</span></div><div class="imp"><span class="peso">$</span>186.500</div></div>
+            <div class="fila"><span class="ic"><i class="i" data-i="calendar"></i></span><div><b>Bulonera Centro</b><span class="d">Vence en 6 días · 25/10</span></div><div class="imp"><span class="peso">$</span>412.800</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

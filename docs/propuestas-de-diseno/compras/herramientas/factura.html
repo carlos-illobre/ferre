@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  @font-face { font-family: M; src: url("../../_comun/fuentes/manrope-latin.woff2"); font-weight: 200 800; }
+  body { margin: 0; background: transparent; }
+  .hoja { width: 600px; height: 800px; box-sizing: border-box; padding: 34px 34px; background: #FCFBF7; font: 500 12px/1.35 "Courier New", monospace; color: #2a2a2a; position: relative; overflow: hidden;
+    background-image: linear-gradient(100deg, rgba(0,0,0,.025), transparent 30%, rgba(0,0,0,.02) 70%, rgba(0,0,0,.04)); }
+  .cab { display: grid; grid-template-columns: 1fr 70px 1fr; border: 1.5px solid #333; }
+  .cab > div { padding: 10px 12px; }
+  .emisor b { font: 800 19px/1.1 M, sans-serif; letter-spacing: -.02em; display: block; margin-bottom: 4px; }
+  .letra { border-left: 1.5px solid #333; border-right: 1.5px solid #333; text-align: center; padding: 6px 0 !important; }
+  .letra b { font: 800 40px/1 M, sans-serif; display: block; }
+  .tipo b { font: 800 18px/1.1 M, sans-serif; display: block; margin-bottom: 6px; }
+  .cli { border: 1.5px solid #333; border-top: 0; padding: 8px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 20px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  th { text-align: left; border-bottom: 1.5px solid #333; padding: 6px 4px; font-weight: 700; }
+  td { padding: 8px 4px; border-bottom: 1px dashed #bbb; vertical-align: top; }
+  .n { text-align: right; white-space: nowrap; }
+  .tot { position: absolute; right: 34px; bottom: 120px; width: 260px; border: 1.5px solid #333; }
+  .tot div { display: flex; justify-content: space-between; padding: 6px 10px; }
+  .tot .g { font-weight: 800; font-size: 15px; border-top: 1.5px solid #333; }
+  .cae { position: absolute; left: 34px; bottom: 40px; display: flex; gap: 14px; align-items: center; }
+  .cae .qr { width: 64px; height: 64px; background: repeating-conic-gradient(#333 0 25%, #fff 0 50%) 0 0/12px 12px; border: 4px solid #333; }
+  .sello { position: absolute; right: 70px; bottom: 30px; transform: rotate(-8deg); border: 3px solid rgba(40,80,170,.55); color: rgba(40,80,170,.6); border-radius: 8px; padding: 6px 12px; font: 800 18px M, sans-serif; letter-spacing: .06em; }
+</style></head><body>
+<div class="hoja">
+  <div class="cab">
+    <div class="emisor"><b>BULONERA CENTRO S.R.L.</b>Av. Hipólito Yrigoyen 4120<br>Lanús Oeste · Bs. As.<br>IVA Responsable Inscripto</div>
+    <div class="letra"><b>A</b>Cód. 01</div>
+    <div class="tipo"><b>FACTURA</b>N° 0004-00012345<br>Fecha: 18/10/2026<br>CUIT: 30-71482230-6</div>
+  </div>
+  <div class="cli"><span>Señor/es: FERREBRESS</span><span>Cond. venta: Cta. cte. 30 días</span><span>Domicilio: Av. Mitre 1855</span><span>Remito N° 0004-00008817</span></div>
+  <table>
+    <tr><th>Código</th><th>Descripción</th><th class="n">Cant.</th><th class="n">P. unit.</th><th class="n">Importe</th></tr>
+    <tr><td>TA8-100</td><td>TORNILLO AUTOPERF. T2 8x1" x100</td><td class="n">20</td><td class="n">3.800,00</td><td class="n">76.000,00</td></tr>
+    <tr><td>TS8-100</td><td>TARUGO NYLON S8 C/TOPE x100 FISCHER</td><td class="n">15</td><td class="n">4.150,00</td><td class="n">62.250,00</td></tr>
+    <tr><td>MHS-080</td><td>MECHA ACERO RAP. HSS 8MM EZETA</td><td class="n">24</td><td class="n">2.480,00</td><td class="n">59.520,00</td></tr>
+    <tr><td>CP2-KG</td><td>CLAVO PARIS 2" (KG) ACINDAR</td><td class="n">12,5</td><td class="n">2.900,00</td><td class="n">36.250,00</td></tr>
+    <tr><td>AG8-1M</td><td>ARANDELA GROWER 8MM CJ x1000</td><td class="n">2</td><td class="n">9.600,00</td><td class="n">19.200,00</td></tr>
+  </table>
+  <div class="tot"><div><span>Subtotal</span><span>253.220,00</span></div><div><span>IVA 21%</span><span>53.176,20</span></div><div class="g"><span>TOTAL $</span><span>306.396,20</span></div></div>
+  <div class="cae"><div class="qr"></div><div>CAE 74418823019925<br>Vto. CAE 28/10/2026</div></div>
+  <div class="sello">RECIBIDO</div>
+</div>
+</body></html>

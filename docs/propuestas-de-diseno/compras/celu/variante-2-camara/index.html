@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compras · La cámara lee (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<style>
+  body { width: 390px; }
+  .celu { background: radial-gradient(120% 70% at 50% 20%, #4a4036 0%, #2a241f 55%, #151311 100%); }
+  .barra-estado { color: #fff; }
+  .barra-estado svg rect { stroke: #fff; } .barra-estado svg rect + rect { fill: #fff; }
+  .arriba { display: flex; align-items: center; gap: 8px; padding: 4px 16px 0; }
+  .redondo { width: 44px; height: 44px; border-radius: 99px; display: grid; place-items: center; background: rgba(255,255,255,.14); color: #fff; backdrop-filter: blur(10px); flex: none; }
+  .modos { flex: 1; display: flex; padding: 3px; border-radius: 99px; background: rgba(0,0,0,.35); backdrop-filter: blur(10px); }
+  .modos span { flex: 1; height: 38px; border-radius: 99px; display: grid; place-items: center; color: rgba(255,255,255,.75); font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .modos span.elegido { background: #fff; color: var(--tinta); }
+  .visor { position: relative; height: 300px; display: grid; place-items: center; perspective: 900px; }
+  .papel { position: relative; width: 210px; transform: rotateX(14deg) rotateZ(-4deg); box-shadow: 0 30px 50px -10px rgba(0,0,0,.6); border-radius: 3px; }
+  .papel img { width: 100%; display: block; border-radius: 3px; }
+  .marca-r { position: absolute; left: 4.5%; right: 4.5%; height: 4.4%; border-radius: 3px; background: rgba(30,158,98,.28); border: 1.5px solid #39C484; }
+  .marca-r.dudosa { background: rgba(240,162,15,.35); border-color: var(--urgente); }
+  .esquina { position: absolute; width: 28px; height: 28px; border: 4px solid #39C484; }
+  .esquina.a { left: -10px; top: -10px; border-right: 0; border-bottom: 0; border-radius: 10px 0 0 0; }
+  .esquina.b { right: -10px; top: -10px; border-left: 0; border-bottom: 0; border-radius: 0 10px 0 0; }
+  .esquina.c { left: -10px; bottom: -10px; border-right: 0; border-top: 0; border-radius: 0 0 0 10px; }
+  .esquina.d { right: -10px; bottom: -10px; border-left: 0; border-top: 0; border-radius: 0 0 10px 0; }
+  .leida { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 99px; background: rgba(30,158,98,.95); color: #fff; font-weight: 750; font-size: 14px; white-space: nowrap; box-shadow: var(--sombra-3); }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; top: 368px; background: var(--fondo); border-radius: 24px 24px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.35); padding: 8px 16px 0; display: flex; flex-direction: column; }
+  .asa { width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 10px; }
+  .cab { display: flex; align-items: flex-start; gap: 12px; }
+  .cab .t { flex: 1; min-width: 0; }
+  .cab .t b { display: block; font-size: 20px; font-weight: 800; line-height: 26px; letter-spacing: -.01em; }
+  .cab .t span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .cab .tot { text-align: right; font-size: 22px; font-weight: 800; line-height: 26px; }
+  .cab .tot small { display: block; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .pedido { margin: 8px 0; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; background: var(--pino-suave); color: var(--pino-texto); font-size: 14px; font-weight: 700; }
+  .lin { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 6px 10px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; }
+  .lin + .lin { margin-top: 6px; }
+  .lin .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .lin b { display: block; font-size: 15px; font-weight: 750; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lin span { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .lin .sub { text-align: right; font-weight: 800; font-size: 15px; line-height: 20px; }
+  .lin .sub small { display: block; font-size: 14px; font-weight: 750; }
+  .sube { color: var(--urgente-texto); } .baja { color: var(--logro-texto); }
+  .lin.revisar { background: var(--urgente-suave); border-color: #F3C766; }
+  .lin.revisar span { color: var(--urgente-texto); font-weight: 650; }
+  .mas { text-align: center; font-size: 14px; font-weight: 650; color: var(--texto-2); padding: 6px 0 0; }
+  .pie { margin-top: auto; padding: 10px 0 30px; display: grid; gap: 8px; }
+  .pie .segmentos { display: flex; } .pie .segmentos > * { flex: 1; justify-content: center; }
+  .pie .btn-accion { justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi" style="color:#fff"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#fff" opacity=".5"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#fff"/></svg></span></div>
+  <div class="arriba">
+    <span class="redondo"><i class="i" data-i="x"></i></span>
+    <div class="modos"><span class="elegido">Factura</span><span>Remito</span><span>Sin papel</span></div>
+    <span class="redondo"><i class="i" data-i="flashlight"></i></span>
+  </div>
+  <div class="visor">
+    <div class="papel">
+      <img src="../../propio/factura.webp" alt="Factura">
+      <span class="marca-r" style="top:30.3%"></span><span class="marca-r" style="top:34.5%"></span><span class="marca-r" style="top:38.7%"></span><span class="marca-r" style="top:42.9%"></span><span class="marca-r dudosa" style="top:47.1%"></span>
+      <span class="esquina a"></span><span class="esquina b"></span><span class="esquina c"></span><span class="esquina d"></span>
+    </div>
+    <span class="leida"><i class="i i-s" data-i="circle-check"></i>Leída · 5 renglones</span>
+  </div>
+
+  <div class="hoja">
+    <div class="asa"></div>
+    <div class="cab">
+      <div class="t"><b>Bulonera Centro</b><span>Factura A · 18/10/2026</span></div>
+      <div class="tot"><span class="peso">$</span>253.220<small>sin IVA</small></div>
+    </div>
+    <div class="pedido"><i class="i i-s" data-i="link"></i>Es el pedido del 14/10: llegó todo</div>
+    <div class="lin">
+      <div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+      <div><b>Tarugos nylon S8 × 100</b><span>15 un. × $4.150</span></div>
+      <div class="sub"><span class="peso">$</span>62.250<small class="sube">↑ 5 %</small></div>
+    </div>
+    <div class="lin">
+      <div class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></div>
+      <div><b>Clavos París 2" por kilo</b><span>12,5 kg × $2.900</span></div>
+      <div class="sub"><span class="peso">$</span>36.250<small class="baja">↓ 5 %</small></div>
+    </div>
+    <div class="lin revisar">
+      <div class="foto-icono" style="width:40px;height:40px;border-radius:8px;background:#fff;color:var(--urgente-texto)"><i class="i" data-i="circle-help"></i></div>
+      <div><b>Arandela grower 8 mm</b><span>No la tengo: tocá para elegir</span></div>
+      <i class="i" data-i="chevron-right" style="color:var(--urgente-texto)"></i>
+    </div>
+    <div class="mas">y 2 más iguales a la lista</div>
+    <div class="pie">
+      <div class="segmentos"><button>Adelantado</button><button class="elegido">A 30 días</button><button>A 60 días</button></div>
+      <button class="btn btn-accion grande"><span>Registrar compra</span><span style="font-size:15px;opacity:.9">1 para revisar</span></button>
+    </div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

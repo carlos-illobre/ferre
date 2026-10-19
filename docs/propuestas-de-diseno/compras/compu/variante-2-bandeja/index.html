@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compras · Bandeja de facturas (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<style>
+  .cabecera { padding-top: 16px; }
+  .pantalla { padding: 16px 24px 16px; display: grid; grid-template-columns: 224px 336px minmax(0,1fr); gap: 16px; }
+  /* Bandeja */
+  .bandeja { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .bandeja .t { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; margin: 2px 4px 2px; }
+  .bandeja .t .pastilla { height: 24px; margin-left: auto; }
+  .bandeja .t.otra { margin-top: 10px; color: var(--texto-2); }
+  .foto-item { display: grid; grid-template-columns: 44px minmax(0,1fr); gap: 10px; align-items: center; padding: 8px 10px; border-radius: 14px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .foto-item .mini { width: 44px; height: 56px; border-radius: 6px; overflow: hidden; border: 1px solid var(--borde); background: #fff; }
+  .foto-item .mini img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .foto-item b { display: block; font-size: 15px; line-height: 20px; font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .foto-item span { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+  .foto-item.activo { border-color: var(--pino); background: var(--pino-suave); box-shadow: 0 0 0 3px rgba(18,56,47,.10); }
+  .foto-item.activo span { color: var(--pino-texto); }
+  .foto-item .err { color: var(--error-texto); font-weight: 650; }
+  .foto-item.hecho { box-shadow: none; background: transparent; border-style: dashed; }
+  .bandeja .pie-b { margin-top: auto; display: grid; gap: 8px; }
+  .deuda { padding: 10px 12px; }
+  .deuda .fila { display: flex; justify-content: space-between; font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 22px; }
+  .deuda .fila b { color: var(--tinta); font-size: 15px; }
+  .deuda .fila.r b, .deuda .fila.r { color: var(--error-texto); }
+
+  /* La foto */
+  .papel { position: relative; border-radius: 16px; background: var(--hundido); padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .papel .hoja { position: relative; border-radius: 6px; overflow: hidden; box-shadow: var(--sombra-2); transform: rotate(-.6deg); }
+  .papel .hoja img { width: 100%; display: block; }
+  .marca-r { position: absolute; left: 4.5%; right: 4.5%; height: 4.4%; border-radius: 4px; border: 2px solid var(--logro); background: rgba(30,158,98,.10); }
+  .marca-r.dudosa { border-color: var(--urgente); background: rgba(240,162,15,.18); }
+  .marca-r.foco { border-color: var(--pino); background: rgba(18,56,47,.12); box-shadow: 0 0 0 3px rgba(18,56,47,.15); }
+  .marca-c { position: absolute; border-radius: 4px; border: 2px solid var(--logro); background: rgba(30,158,98,.08); }
+  .papel .herr { display: flex; gap: 8px; align-items: center; }
+  .papel .herr .t-detalle { margin-right: auto; }
+
+  /* Lo leído */
+  .leido { display: flex; flex-direction: column; min-height: 0; gap: 12px; }
+  .datos { display: grid; grid-template-columns: 1.3fr 1fr .8fr; gap: 8px; }
+  .campo-l { padding: 8px 12px; border-radius: 12px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .campo-l .et { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; display: flex; gap: 6px; align-items: center; }
+  .campo-l .va { font-weight: 800; font-size: 16px; line-height: 22px; white-space: nowrap; }
+  .campo-l .et .i-s { color: var(--logro); }
+  .pedido { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: var(--pino-suave); color: var(--pino-texto); font-size: 14px; font-weight: 650; }
+  .pedido b { color: var(--pino); }
+  .pedido .btn { margin-left: auto; }
+  .tabla { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); overflow: hidden; }
+  .fil { display: grid; grid-template-columns: 40px minmax(0,1fr) 76px 112px 92px; gap: 12px; align-items: center; padding: 8px 14px; border-top: 1px solid var(--borde); }
+  .fil.cab { border-top: 0; padding: 8px 14px; font-size: 14px; font-weight: 650; color: var(--texto-3); background: var(--fondo); }
+  .fil .n { text-align: right; }
+  .fil .nom { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fil .cod { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fil .cant { font-weight: 800; font-size: 15px; text-align: right; }
+  .fil .cant small { display: block; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .fil .costo { text-align: right; font-weight: 750; font-size: 15px; line-height: 20px; }
+  .dif { display: inline-flex; align-items: center; gap: 2px; font-size: 14px; font-weight: 750; line-height: 18px; }
+  .dif.sube { color: var(--urgente-texto); } .dif.baja { color: var(--logro-texto); } .dif.igual { color: var(--texto-3); font-weight: 600; }
+  .fil .sub { text-align: right; font-weight: 800; font-size: 16px; }
+  .fil.foco { background: var(--pino-suave); box-shadow: inset 4px 0 0 var(--pino); }
+  .fil.revisar { background: var(--urgente-suave); grid-template-rows: auto auto; }
+  .fil.revisar .acciones-r { grid-column: 2 / -1; display: flex; gap: 8px; align-items: center; }
+  .fil.revisar .acciones-r span { font-size: 14px; font-weight: 650; color: var(--urgente-texto); margin-right: auto; }
+  .fil .foto.chica { width: 40px; height: 40px; }
+  .cobro { margin-top: auto; display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 12px 12px 12px 16px; }
+  .cobro .et { font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; margin-bottom: 4px; }
+  .cobro .tot { text-align: right; }
+  .cobro .tot .t-numero { font-size: 30px; }
+  .cobro .tot .t-detalle { line-height: 18px; white-space: nowrap; }
+  .cobro .btn-accion { padding: 0 16px; }
+  .cobro .segmentos > * { white-space: nowrap; padding: 0 10px; }
+  .cobro .derecha { display: flex; gap: 16px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="insignia">3</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="vinculo" style="padding:10px"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo</div></div>
+      <div class="usuario" style="padding:4px"><span class="avatar">MR</span><div class="txt">Marcelo</div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <nav class="pestanas" style="border:0;margin:0 0 0 16px;padding:0"><a>Stock</a><a class="activa">Compras <span class="insignia">3</span></a><a>Pedidos</a><a>Contar</a></nav>
+      <div class="acciones">
+        <span class="pastilla pino"><i class="i i-s" data-i="info"></i>Nada se guarda hasta registrar</span>
+        <button class="btn chico"><i class="i i-s" data-i="qr-code"></i>Foto con el celular <span class="kbd">Alt F</span></button>
+      </div>
+    </header>
+    <section class="pantalla" style="border-top:1px solid var(--borde);margin-top:12px">
+      <!-- Bandeja de fotos -->
+      <aside class="bandeja">
+        <div class="t">Por registrar <span class="pastilla accion">3</span></div>
+        <div class="foto-item activo">
+          <div class="mini"><img src="../../propio/factura.webp" alt=""></div>
+          <div><b>Bulonera Centro</b><span>Leída · 1 para revisar</span></div>
+        </div>
+        <div class="foto-item">
+          <div class="mini"><img src="../../propio/factura.webp" alt="" style="object-position:0 40%"></div>
+          <div><b>Distribuidora Oeste</b><span>Remito · 9 de 9 leídos</span></div>
+        </div>
+        <div class="foto-item">
+          <div class="mini" style="filter:blur(1.4px)"><img src="../../propio/factura.webp" alt="" style="object-position:0 70%"></div>
+          <div><b>Foto de las 10:12</b><span class="err">No se pudo leer</span></div>
+        </div>
+        <div class="t otra">Registradas hoy</div>
+        <div class="foto-item hecho">
+          <div class="mini"><img src="../../propio/factura.webp" alt="" style="opacity:.6"></div>
+          <div><b>Bulonera Centro</b><span><span class="peso">$</span>184.300 · 09:40</span></div>
+        </div>
+        <div class="pie-b">
+          <div class="tarjeta deuda">
+            <div class="fila"><span>Se les debe</span><b><span class="peso">$</span>1.095.500</b></div>
+            <div class="fila r"><span>Vencido</span><b><span class="peso">$</span>186.500</b></div>
+            <div class="fila"><span>Por llegar</span><b>2 pedidos</b></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- La foto, con lo leído marcado -->
+      <div class="papel">
+        <div class="hoja">
+          <img src="../../propio/factura.webp" alt="Factura de Bulonera Centro">
+          <span class="marca-c" style="left:5%;top:4.6%;width:42%;height:17%"></span>
+          <span class="marca-c" style="left:64%;top:4.6%;width:31%;height:17%"></span>
+          <span class="marca-r" style="top:30.3%"></span>
+          <span class="marca-r foco" style="top:34.5%"></span>
+          <span class="marca-r" style="top:38.7%"></span>
+          <span class="marca-r" style="top:42.9%"></span>
+          <span class="marca-r dudosa" style="top:47.1%"></span>
+        </div>
+        <div class="aviso logro"><i class="i" data-i="circle-check"></i><span>Los renglones suman <b>$253.220</b>, igual que el subtotal de la factura.</span></div>
+        <div class="herr">
+          <span class="t-detalle">Foto 1 de 1</span>
+          <button class="btn btn-suave chico btn-icono" aria-label="Ampliar"><i class="i i-s" data-i="search"></i></button>
+          <button class="btn btn-suave chico"><i class="i i-s" data-i="plus"></i>Otra hoja</button>
+        </div>
+      </div>
+
+      <!-- Lo leído, para revisar -->
+      <div class="leido">
+        <div class="datos">
+          <div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Proveedor</div><div class="va">Bulonera Centro</div></div>
+          <div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Comprobante</div><div class="va">Factura A</div></div>
+          <div class="campo-l"><div class="et"><i class="i i-s" data-i="circle-check"></i>Fecha</div><div class="va">18/10/2026</div></div>
+        </div>
+        <div class="pedido"><i class="i" data-i="link"></i><span>Es el <b>pedido del 14/10</b>: llegó todo, más arandelas sin pedir.</span><button class="btn btn-suave chico">Ver pedido</button></div>
+
+        <div class="tabla">
+          <div class="fil cab"><span></span><span>Producto</span><span class="n">Llegó</span><span class="n">Costo c/u</span><span class="n">Subtotal</span></div>
+          <div class="fil">
+            <div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div>
+            <div><div class="nom">Autoperforante T2 8 × 1" × 100</div><div class="cod">TA8-100 · Fischer</div></div>
+            <div class="cant">20 un.<small>pedí 20</small></div>
+            <div class="costo"><span class="peso">$</span>3.800<br><span class="dif igual">= lista</span></div>
+            <div class="sub"><span class="peso">$</span>76.000</div>
+          </div>
+          <div class="fil foco">
+            <div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+            <div><div class="nom">Tarugos nylon S8 con tope × 100</div><div class="cod">TS8-100 · Fischer · lista $3.950</div></div>
+            <div class="cant">15 un.<small>pedí 15</small></div>
+            <div class="costo"><span class="peso">$</span>4.150<br><span class="dif sube">↑ +5 %</span></div>
+            <div class="sub"><span class="peso">$</span>62.250</div>
+          </div>
+          <div class="fil">
+            <div class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+            <div><div class="nom">Mecha acero rápido HSS 8 mm</div><div class="cod">MHS-080 · Ezeta</div></div>
+            <div class="cant">24 un.<small>pedí 24</small></div>
+            <div class="costo"><span class="peso">$</span>2.480<br><span class="dif igual">= lista</span></div>
+            <div class="sub"><span class="peso">$</span>59.520</div>
+          </div>
+          <div class="fil">
+            <div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div>
+            <div><div class="nom">Clavos punta París 2" por kilo</div><div class="cod">CP2-KG · Acindar · lista $3.050</div></div>
+            <div class="cant">12,5 kg<small>pedí 12,5</small></div>
+            <div class="costo"><span class="peso">$</span>2.900<br><span class="dif baja">↓ −5 %</span></div>
+            <div class="sub"><span class="peso">$</span>36.250</div>
+          </div>
+          <div class="fil revisar">
+            <div class="foto-icono" style="width:40px;height:40px;background:#fff;color:var(--urgente-texto)"><i class="i" data-i="circle-help"></i></div>
+            <div><div class="nom">ARANDELA GROWER 8MM CJ x1000</div><div class="cod">AG8-1M · así dice la factura</div></div>
+            <div class="cant">2 un.<small>no pedida</small></div>
+            <div class="costo"><span class="peso">$</span>9.600<br><span class="dif igual">sin lista</span></div>
+            <div class="sub"><span class="peso">$</span>19.200</div>
+            <div class="acciones-r"><span>No está en el catálogo</span><button class="btn chico"><i class="i i-s" data-i="search"></i>Es un producto que tengo</button><button class="btn chico"><i class="i i-s" data-i="package-plus"></i>Crear como nuevo</button></div>
+          </div>
+        </div>
+
+        <div class="tarjeta-2 cobro">
+          <div>
+            <div class="et">Cómo se paga</div>
+            <div class="segmentos"><button>Adelantado</button><button class="elegido">A 30 días</button><button>A 60 días</button></div>
+          </div>
+          <div class="tot">
+            <div class="t-detalle">5 renglones · 1 nuevo</div>
+            <div class="t-numero"><span class="peso">$</span>253.220</div>
+          </div>
+          <button class="btn btn-accion grande">Registrar <span class="kbd">F2</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

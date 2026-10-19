@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compras · Resumen (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { position: relative; }
+  .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(transparent, var(--fondo)); }
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpis .resumen { padding: 12px; display: block; }
+  .kpis .resumen .va { font-size: 22px; line-height: 28px; }
+  .kpis .resumen .sub { font-size: 14px; font-weight: 650; line-height: 18px; color: var(--texto-2); }
+  .kpis .resumen.error .sub { color: var(--error-texto); }
+  .barras { display: flex; align-items: flex-end; gap: 4px; height: 20px; margin-top: 6px; }
+  .barras b { flex: 1; border-radius: 3px; background: var(--hundido-2); }
+  .barras b.hoy { background: var(--pino); }
+  .sec { display: flex; align-items: center; justify-content: space-between; margin: 16px 2px 8px; }
+  .sec .t-seccion { font-size: 18px; }
+  .sec a { font-size: 14px; font-weight: 700; color: var(--pino-texto); }
+  .fila { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .fila + .fila { margin-top: 8px; }
+  .fila .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); overflow: hidden; }
+  .fila .ic img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .fila b { display: block; font-size: 16px; font-weight: 750; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila span.d { display: block; font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila .imp { text-align: right; font-weight: 800; font-size: 17px; }
+  .fila .imp small { display: block; font-size: 14px; font-weight: 650; color: var(--texto-3); }
+  .ambar { color: var(--urgente-texto) !important; }
+  .barra-accion { display: grid; grid-template-columns: 1fr 56px; gap: 8px; }
+  .barra-accion .btn-accion { justify-content: flex-start; gap: 12px; }
+  .barra-accion .btn-accion small { display: block; font-size: 14px; font-weight: 600; opacity: .85; line-height: 16px; }
+  .barra-accion .btn-accion span { text-align: left; line-height: 22px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Stock</a><a class="activa">Compras</a><a>Contar</a></nav>
+  <div class="celu-pantalla">
+    <div class="kpis">
+      <div class="resumen"><div class="et">Esta semana</div><div class="va"><span class="peso">$</span>615.350</div>
+        <div class="barras"><b style="height:70%"></b><b style="height:30%"></b><b style="height:100%"></b><b style="height:20%"></b><b style="height:55%"></b><b style="height:10%"></b><b class="hoy" style="height:65%"></b></div></div>
+      <div class="resumen error"><div class="et">Se les debe</div><div class="va" style="color:var(--tinta)"><span class="peso">$</span>1.095.500</div><div class="sub">$186.500 vencido</div></div>
+    </div>
+
+    <div class="sec"><span class="t-seccion">Por llegar</span><a>Pedidos (4)</a></div>
+    <div class="fila">
+      <span class="ic"><i class="i" data-i="truck"></i></span>
+      <div><b>Distribuidora Oeste</b><span class="d">Hace 5 días · 9 renglones</span></div>
+      <button class="btn btn-suave chico">Llegó</button>
+    </div>
+    <div class="fila">
+      <span class="ic"><i class="i" data-i="truck"></i></span>
+      <div><b>Acindar Distribución</b><span class="d ambar">Llegó a medias · faltan 2</span></div>
+      <button class="btn btn-suave chico">Llegó</button>
+    </div>
+
+    <div class="sec"><span class="t-seccion">Recientes</span><a>Ver todas</a></div>
+    <div class="fila">
+      <span class="ic"><img src="../../propio/factura.webp" alt=""></span>
+      <div><b>Bulonera Centro</b><span class="d">Hoy · Factura · a 30 días</span></div>
+      <div class="imp"><span class="peso">$</span>184.300</div>
+    </div>
+    <div class="fila">
+      <span class="ic"><img src="../../propio/factura.webp" alt="" style="object-position:0 40%"></span>
+      <div><b>Distribuidora Oeste</b><span class="d" style="color:var(--logro-texto)">Ayer · Remito · pagada</span></div>
+      <div class="imp"><span class="peso">$</span>96.750</div>
+    </div>
+    <div class="fila">
+      <span class="ic"><i class="i" data-i="notebook-pen"></i></span>
+      <div><b>Ferretera del Sur</b><span class="d">Jueves · Sin comprobante</span></div>
+      <div class="imp"><span class="peso">$</span>22.400</div>
+    </div>
+  </div>
+  <div class="barra-accion">
+    <button class="btn btn-accion grande"><i class="i i-l" data-i="camera"></i><span>Sacale foto a la factura<small>La compra se arma sola</small></span></button>
+    <button class="btn grande btn-icono" style="width:56px" aria-label="Escanear productos"><i class="i i-l" data-i="scan-barcode"></i></button>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo"><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

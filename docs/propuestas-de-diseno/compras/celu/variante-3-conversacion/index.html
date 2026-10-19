@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compras · El proveedor como conversación (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<style>
+  body { width: 390px; }
+  .cab { display: flex; align-items: center; gap: 10px; padding: 2px 12px 10px; }
+  .redondo { width: 44px; height: 44px; border-radius: 99px; display: grid; place-items: center; flex: none; }
+  .av { width: 44px; height: 44px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; flex: none; position: relative; }
+  .cab .t { flex: 1; min-width: 0; }
+  .cab .t b { display: block; font-size: 18px; font-weight: 800; line-height: 24px; }
+  .cab .t span { font-size: 14px; font-weight: 650; color: var(--urgente-texto); }
+  .provs { display: flex; gap: 12px; padding: 0 16px 10px; border-bottom: 1px solid var(--borde); }
+  .prov { display: grid; justify-items: center; gap: 4px; width: 64px; font-size: 14px; font-weight: 650; color: var(--texto-2); text-align: center; line-height: 16px; }
+  .prov .av { width: 52px; height: 52px; background: var(--hundido-2); color: var(--tinta); box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--borde-fuerte); }
+  .prov.activo .av { background: var(--pino); color: #fff; box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--accion); }
+  .prov.activo { color: var(--tinta); font-weight: 800; }
+  .prov .av .insignia { position: absolute; top: -4px; right: -6px; border: 2px solid var(--fondo); height: 22px; }
+  .prov .av .insignia.roja { background: var(--error); }
+  .hilo { flex: 1; min-height: 0; overflow: hidden; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; justify-content: flex-end; }
+  .dia { align-self: center; font-size: 14px; font-weight: 700; color: var(--texto-2); background: var(--hundido); padding: 2px 12px; border-radius: 99px; }
+  .burbuja { max-width: 300px; padding: 10px 12px; border-radius: 18px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); font-size: 15px; line-height: 20px; }
+  .burbuja.mia { align-self: flex-end; background: var(--pino-suave); border-color: transparent; border-bottom-right-radius: 6px; }
+  .burbuja.suya { align-self: flex-start; border-bottom-left-radius: 6px; }
+  .burbuja .meta { display: flex; justify-content: flex-end; gap: 4px; align-items: center; font-size: 14px; color: var(--texto-3); font-weight: 600; margin-top: 4px; }
+  .burbuja .meta .i-s { color: var(--mp); }
+  .burbuja .tit { display: flex; align-items: center; gap: 6px; font-weight: 800; }
+  .foto-f { width: 168px; height: 138px; border-radius: 12px; overflow: hidden; position: relative; }
+  .foto-f img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .foto-f .pastilla { position: absolute; left: 8px; bottom: 8px; height: 26px; }
+  .sistema { align-self: stretch; border-radius: 18px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-2); padding: 12px; display: grid; gap: 10px; }
+  .sistema .t { display: flex; gap: 8px; align-items: center; font-weight: 800; font-size: 15px; }
+  .sistema .t .i { color: var(--pino-texto); }
+  .sistema .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .sistema .grid div { background: var(--hundido); border-radius: 10px; padding: 6px 8px; }
+  .sistema .grid small { display: block; font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; }
+  .sistema .grid b { font-size: 16px; font-weight: 800; }
+  .sistema .grid .urg { background: var(--urgente-suave); } .sistema .grid .urg b { color: var(--urgente-texto); }
+  .sistema .btn-accion { justify-content: space-between; }
+  .chips-r { display: flex; gap: 8px; overflow: hidden; padding: 10px 16px 0; }
+  .chips-r .chip { height: 36px; font-size: 14px; flex: none; padding: 0 12px; }
+  .compositor { display: flex; align-items: center; gap: 8px; padding: 10px 12px 30px; }
+  .compositor .campo { flex: 1; height: 48px; border-radius: 99px; font-size: 15px; }
+  .compositor .cam { width: 56px; height: 56px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; box-shadow: var(--sombra-2); flex: none; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="provs">
+    <div class="prov activo"><span class="av">BC<span class="insignia">1</span></span>Bulonera</div>
+    <div class="prov"><span class="av">FS<span class="insignia roja">!</span></span>Ferretera Sur</div>
+    <div class="prov"><span class="av">DO</span>Distrib. Oeste</div>
+    <div class="prov"><span class="av">EL</span>Electro Lumen</div>
+    <div class="prov"><span class="av" style="background:transparent;border:1.5px dashed var(--borde-fuerte);box-shadow:none"><i class="i" data-i="plus"></i></span>Pedido</div>
+  </div>
+  <div class="cab" style="padding-top:10px">
+    <span class="redondo" style="background:var(--superficie);border:1px solid var(--borde)"><i class="i" data-i="arrow-left"></i></span>
+    <div class="t"><b>Bulonera Centro</b><span>Se le debe $597.100 · vence en 6 días</span></div>
+    <span class="redondo"><i class="i" data-i="ellipsis"></i></span>
+  </div>
+
+  <div class="hilo">
+    <div class="burbuja mia">
+      <div class="tit"><i class="i i-s" data-i="clipboard-list"></i>Pedido del martes · 5 renglones</div>
+      <div class="meta">por WhatsApp · 14/10 <i class="i i-s" data-i="check"></i></div>
+    </div>
+    <div class="dia">Hoy</div>
+    <div class="burbuja suya" style="padding:6px">
+      <div class="foto-f"><img src="../../propio/factura.webp" alt="Foto de la factura"><span class="pastilla contorno"><i class="i i-s" data-i="camera"></i>Factura A</span></div>
+      <div class="meta" style="padding:0 4px">foto de Marcelo · 10:38</div>
+    </div>
+    <div class="sistema">
+      <div class="t"><i class="i" data-i="sparkles"></i>La leí: coincide con tu pedido</div>
+      <div class="grid">
+        <div><small>Llegó</small><b>5 de 5</b></div>
+        <div class="urg"><small>Revisar</small><b>1</b></div>
+        <div><small>A 30 días</small><b>17/11</b></div>
+      </div>
+      <button class="btn btn-accion grande"><span>Registrar</span><span><span class="peso">$</span>253.220</span></button>
+    </div>
+  </div>
+
+  <div class="chips-r"><span class="chip"><i class="i i-s" data-i="check"></i>Marcar pagado</span><span class="chip"><i class="i i-s" data-i="send"></i>Pedir lo de siempre</span><span class="chip">Ver compras</span></div>
+  <div class="compositor">
+    <span class="campo">Pedile algo a Bulonera…</span>
+    <span class="cam"><i class="i i-l" data-i="camera"></i></span>
+  </div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

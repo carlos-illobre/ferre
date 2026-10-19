@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compras · El camino de la mercadería (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<style>
+  body { height: 768px; overflow: hidden; }
+  .tope { height: 56px; background: var(--pino); color: #fff; display: flex; align-items: center; gap: 16px; padding: 0 24px; }
+  .tope .logo { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+  .tope b { font-size: 17px; font-weight: 800; }
+  .tope .migas { display: flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 650; color: rgba(255,255,255,.7); }
+  .tope .migas strong { color: #fff; }
+  .tope .ir { margin-left: 16px; display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px 0 12px; border-radius: 10px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.75); font-size: 14px; font-weight: 600; width: 340px; white-space: nowrap; }
+  .tope .ir .kbd { margin-left: auto; background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); color: #fff; }
+  .tope .der { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 650; }
+  .tope .der .p { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 99px; background: rgba(255,255,255,.1); }
+  .tope .der .p .punto { width: 8px; height: 8px; border-radius: 99px; background: #5BD69A; }
+  .tope .avatar { width: 32px; height: 32px; }
+
+  .titulo { display: flex; align-items: center; gap: 20px; padding: 16px 32px 12px; }
+  .flujo { display: flex; align-items: center; gap: 6px; margin-left: 8px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .flujo .i-s { color: var(--texto-3); }
+  .titulo .acciones { margin-left: auto; display: flex; gap: 8px; }
+
+  .tablero { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; padding: 0 32px; height: calc(768px - 56px - 72px - 16px); }
+  .col { background: var(--hundido); border-radius: 18px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow: hidden; position: relative; }
+  .col.angosta { background: transparent; border: 1.5px dashed var(--borde-fuerte); }
+  .col .cab { display: flex; align-items: center; gap: 8px; padding: 4px 6px 6px; }
+  .col .cab .n { width: 26px; height: 26px; border-radius: 99px; background: var(--superficie); display: grid; place-items: center; font-size: 14px; font-weight: 800; color: var(--texto-2); }
+  .col .cab b { font-size: 15px; font-weight: 800; line-height: 18px; }
+  .col .cab small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-2); line-height: 18px; }
+  .col .cab .suma { margin-left: auto; text-align: right; font-weight: 800; font-size: 15px; }
+  .col .cab .suma small { color: var(--error-texto); font-weight: 700; }
+
+  .carta { min-width: 0; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); padding: 12px; display: grid; gap: 8px; }
+  .carta .arriba { display: flex; align-items: center; gap: 8px; }
+  .carta > *, .carta .arriba > * { min-width: 0; }
+  .carta .prov { font-weight: 800; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .carta .arriba .pastilla { margin-left: auto; height: 26px; }
+  .carta .monto { font-size: 22px; font-weight: 800; letter-spacing: -.02em; line-height: 26px; }
+  .carta .det { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .carta .fotos { display: flex; align-items: center; }
+  .carta .fotos .foto { width: 32px; height: 32px; border-radius: 8px; border: 2px solid #fff; margin-right: -8px; }
+  .carta .fotos span { margin-left: 16px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .carta .btn { width: 100%; }
+  .carta.principal { border-color: var(--accion); box-shadow: 0 0 0 3px rgba(232,84,28,.12), var(--sombra-2); }
+  .carta .factura { display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; }
+  .carta .factura .hoja { width: 56px; height: 72px; border-radius: 6px; overflow: hidden; border: 1px solid var(--borde); box-shadow: var(--sombra-1); transform: rotate(-2deg); }
+  .carta .factura .hoja img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .carta.vencida { border-color: #F2B7B0; box-shadow: inset 4px 0 0 var(--error), var(--sombra-1); }
+  .carta.pronto { box-shadow: inset 4px 0 0 var(--urgente), var(--sombra-1); }
+  .carta.fantasma { background: transparent; box-shadow: none; border-style: dashed; }
+  .linea { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .linea b { color: var(--tinta); font-size: 15px; }
+  .rojo { color: var(--error-texto) !important; } .ambar { color: var(--urgente-texto) !important; }
+  .pista { margin-top: auto; display: flex; gap: 10px; align-items: center; padding: 12px; border-radius: 12px; border: 1.5px dashed var(--borde-fuerte); color: var(--texto-2); font-size: 14px; font-weight: 600; line-height: 18px; }
+  .semanas { margin-top: auto; background: var(--superficie); border-radius: 14px; padding: 12px; display: grid; gap: 6px; }
+  .apilada { display: flex; height: 10px; border-radius: 99px; overflow: hidden; gap: 2px; margin-bottom: 4px; }
+  .ley { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--texto-2); line-height: 20px; }
+  .ley span { display: inline-flex; align-items: center; gap: 6px; } .ley i { width: 8px; height: 8px; border-radius: 2px; }
+  .ley b { color: var(--tinta); }
+  .flecha-col { position: absolute; right: -10px; top: 18px; }
+  .arrastre { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); }
+</style>
+</head>
+<body>
+  <header class="tope">
+    <span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b>
+    <span class="migas">Depósito <i class="i i-s" data-i="chevron-right"></i><strong>Compras</strong></span>
+    <span class="ir"><i class="i i-s" data-i="search"></i>Ir a un proveedor, pedido o compra…<span class="kbd">Ctrl K</span></span>
+    <span class="der"><span class="p"><i class="i i-s" data-i="smartphone"></i>Celular en espejo</span><span class="p"><span class="punto"></span>En línea</span><span class="avatar">MR</span></span>
+  </header>
+
+  <div class="titulo">
+    <span class="t-titulo">El camino de la mercadería</span>
+    <span class="flujo">Pedir <i class="i i-s" data-i="arrow-right"></i> Por llegar <i class="i i-s" data-i="arrow-right"></i> Llegó <i class="i i-s" data-i="arrow-right"></i> A pagar <i class="i i-s" data-i="arrow-right"></i> Pagado</span>
+    <div class="acciones">
+      <button class="btn chico"><i class="i i-s" data-i="history"></i>Compras de la semana</button>
+      <button class="btn btn-oscuro chico"><i class="i i-s" data-i="camera"></i>Foto de una factura <span class="kbd">Alt F</span></button>
+    </div>
+  </div>
+
+  <div class="tablero">
+    <!-- 1 Pedir -->
+    <section class="col">
+      <div class="cab"><span class="n">2</span><div><b>Para pedir</b><small>qué falta y borradores</small></div></div>
+      <div class="carta">
+        <div class="arriba"><span class="prov">Electro Lumen</span><span class="pastilla">Borrador</span></div>
+        <div class="monto"><span class="peso">$</span>88.400</div>
+        <div class="fotos"><span class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><span>5 renglones</span></div>
+        <button class="btn btn-suave chico"><i class="i i-s" data-i="send"></i>Mandar por WhatsApp</button>
+      </div>
+      <div class="carta">
+        <div class="arriba"><span class="prov">Ferretera del Sur</span></div>
+        <div class="monto"><span class="peso">$</span>46.300</div>
+        <div class="det">4 productos bajo el mínimo: pinzas, cinta métrica y 2 más.</div>
+        <button class="btn btn-suave chico"><i class="i i-s" data-i="clipboard-list"></i>Armar pedido</button>
+      </div>
+      <button class="btn btn-fantasma" style="border:1.5px dashed var(--borde-fuerte);justify-content:center"><i class="i" data-i="plus"></i>Pedido nuevo <span class="kbd">Alt P</span></button>
+    </section>
+
+    <!-- 2 Por llegar -->
+    <section class="col">
+      <div class="cab"><span class="n">2</span><div><b>Por llegar</b><small>mandados al proveedor</small></div></div>
+      <div class="carta">
+        <div class="arriba"><span class="prov">Distribuidora Oeste</span></div>
+        <div class="monto"><span class="peso">$</span>142.600</div>
+        <div class="det">9 renglones · por WhatsApp el 14/10, hace 5 días</div>
+        <button class="btn btn-suave chico"><i class="i i-s" data-i="package"></i>Llegó</button>
+      </div>
+      <div class="carta">
+        <div class="arriba"><span class="prov">Acindar Distribución</span><span class="pastilla urgente">A medias</span></div>
+        <div class="linea"><span>Llegaron</span><b>4 de 6</b></div>
+        <div class="barra"><b style="width:66%"></b></div>
+        <div class="det">Faltan alambre y clavos 3"</div>
+        <div style="display:flex;gap:6px"><button class="btn btn-suave chico" style="flex:1">Llegó el resto</button><button class="btn btn-fantasma chico">Cerrar</button></div>
+      </div>
+      <div class="pista"><i class="i" data-i="package"></i>Cuando llega, «Llegó» arma la compra con lo pedido.</div>
+    </section>
+
+    <!-- 3 Llegó: registrar -->
+    <section class="col">
+      <div class="cab"><span class="n" style="background:var(--accion);color:#fff">2</span><div><b>Llegó: registrar</b><small>fotos de hoy</small></div></div>
+      <div class="carta principal">
+        <div class="factura">
+          <div class="hoja"><img src="../../propio/factura.webp" alt=""></div>
+          <div><div class="prov">Bulonera Centro</div><div class="det">Factura A · leída</div><div class="monto" style="margin-top:2px"><span class="peso">$</span>253.220</div></div>
+        </div>
+        <div class="aviso pino" style="padding:8px 10px"><i class="i i-s" data-i="link"></i><span>Es el pedido del 14/10: llegó todo</span></div>
+        <div class="linea"><span>Para revisar</span><b class="ambar">1 de 5 renglones</b></div>
+        <button class="btn btn-accion chico" style="min-height:44px;font-size:15px">Revisar y registrar <span class="kbd">↵</span></button>
+      </div>
+      <div class="carta">
+        <div class="factura">
+          <div class="hoja" style="filter:blur(1.5px)"><img src="../../propio/factura.webp" alt="" style="object-position:0 60%"></div>
+          <div><div class="prov">Foto de las 10:12</div><div class="det rojo">Salió movida: no se pudo leer</div></div>
+        </div>
+        <div style="display:flex;gap:6px"><button class="btn btn-suave chico" style="flex:1">Sacar otra</button><button class="btn btn-fantasma chico">A mano</button></div>
+      </div>
+      <div class="pista"><i class="i" data-i="cloud-upload"></i>Soltá acá una foto o un PDF de factura.</div>
+    </section>
+
+    <!-- 4 A pagar -->
+    <section class="col">
+      <div class="cab"><span class="n">4</span><div><b>A pagar</b><small>4 compras</small></div><div class="suma"><span class="peso">$</span>1.095.500</div></div>
+      <div class="carta vencida">
+        <div class="arriba"><span class="prov">Ferretera del Sur</span></div>
+        <div class="linea"><span class="rojo">Venció hace 5 días</span><b><span class="peso">$</span>186.500</b></div>
+        <button class="btn btn-suave chico"><i class="i i-s" data-i="check"></i>Marcar pagada</button>
+      </div>
+      <div class="carta pronto">
+        <div class="arriba"><span class="prov">Bulonera Centro</span></div>
+        <div class="linea"><span class="ambar">Vence en 6 días</span><b><span class="peso">$</span>412.800</b></div>
+      </div>
+      <div class="carta">
+        <div class="arriba"><span class="prov">Electro Lumen</span></div>
+        <div class="linea"><span>Vence en 26 días</span><b><span class="peso">$</span>311.900</b></div>
+      </div>
+      <div class="carta">
+        <div class="arriba"><span class="prov">Bulonera Centro</span></div>
+        <div class="linea"><span>Vence en 30 días</span><b><span class="peso">$</span>184.300</b></div>
+      </div>
+      <div class="semanas">
+        <div class="apilada"><b style="width:17%;background:var(--error)"></b><b style="width:38%;background:var(--urgente)"></b><b style="width:45%;background:var(--borde-fuerte)"></b></div>
+        <div class="ley"><span><i style="background:var(--error)"></i>Vencido</span><b><span class="peso">$</span>186.500</b></div>
+        <div class="ley"><span><i style="background:var(--urgente)"></i>Próximos 7 días</span><b><span class="peso">$</span>412.800</b></div>
+        <div class="ley"><span><i style="background:var(--borde-fuerte)"></i>Después</span><b><span class="peso">$</span>496.200</b></div>
+      </div>
+    </section>
+
+    <!-- 5 Pagado -->
+    <section class="col angosta">
+      <div class="cab"><span class="n">2</span><div><b>Pagado</b><small>esta semana</small></div></div>
+      <div class="carta fantasma">
+        <div class="arriba"><span class="prov">Distribuidora Oeste</span></div>
+        <div class="linea"><span>Por adelantado</span><b><span class="peso">$</span>96.750</b></div>
+      </div>
+      <div class="carta fantasma">
+        <div class="arriba"><span class="prov">Ferretera del Sur</span></div>
+        <div class="linea"><span>Al recibir</span><b><span class="peso">$</span>22.400</b></div>
+      </div>
+      <div class="det" style="padding:4px 6px;font-size:14px;color:var(--texto-3)">Las anuladas no pasan por acá: se ven en «Compras de la semana».</div>
+    </section>
+  </div>
+</body>
+</html>
