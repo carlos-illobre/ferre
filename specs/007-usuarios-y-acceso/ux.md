@@ -152,7 +152,10 @@ tocar). La vista previa aprobada es
 renglones: «Ya adentro, sigue / funcionando sin internet» (sin internet no se puede entrar, pero ya adentro se sigue trabajando), «Busca por código / de barras» y «Maneja la
 computadora / desde el celular».
 
-Las pastillas, el anillo y los colores nuevos siguen el lenguaje «Mostrador» (decisión 115).
+Las pastillas, el anillo y los colores nuevos siguen el lenguaje «Mostrador» (decisión 115). Las tres
+características de abajo se pintan «por diferencia» con el fondo: donde en una pantalla ancha la curva
+oscura de la foto llega debajo de ellas, esa parte del ícono o de la letra se ve clara, y sobre lo
+claro, oscura (Carlos, 2026-10-19).
 El texto «Computadora del mostrador» es fijo, igual en todas las computadoras: el navegador no deja
 saber el nombre de la computadora, y que Ferrebress le ponga un nombre a cada una sería un dato
 nuevo (queda como pregunta para Carlos).

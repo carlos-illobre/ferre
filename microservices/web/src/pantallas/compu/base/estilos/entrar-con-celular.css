@@ -53,9 +53,12 @@
 .entrar-cc-tutorial:hover { background: var(--ambar-fuerte); transform: translateY(-1px); box-shadow: 0 16px 32px rgb(217 64 15 / 0.45), 0 2px 0 rgb(0 0 0 / 0.12); }
 .entrar-cc-tutorial:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
-/* A la derecha sobre lo claro: la tarjeta para entrar y, debajo, los sellos centrados respecto de ella. */
-.entrar-cc-derecha { position: absolute; right: calc(46 / 1536 * 100%); top: calc(100 * var(--u)); width: max(530px, calc(650 * var(--u))); display: flex; flex-direction: column; align-items: center; gap: calc(22 * var(--u)); z-index: 1; }
-.entrar-cc-sellos { display: flex; margin: 0; padding: 0; list-style: none; color: #1d3a32; font-size: 14px; line-height: 1.2; }
+/* A la derecha sobre lo claro: la tarjeta para entrar y, debajo, los sellos centrados respecto de ella.
+   Los sellos se pintan en blanco con «diferencia» (pedido de Carlos del 2026-10-19): donde pasan
+   sobre lo claro se ven casi negros, y donde la curva oscura de la foto llega abajo, claros, píxel a
+   píxel. Por eso este bloque no lleva z-index: si lo llevara, quedarían aislados de la foto. */
+.entrar-cc-derecha { position: absolute; right: calc(46 / 1536 * 100%); top: calc(100 * var(--u)); width: max(530px, calc(650 * var(--u))); display: flex; flex-direction: column; align-items: center; gap: calc(22 * var(--u)); }
+.entrar-cc-sellos { display: flex; margin: 0; padding: 0; list-style: none; color: #fff; mix-blend-mode: difference; font-size: 14px; line-height: 1.2; }
 .entrar-cc-sellos li { display: flex; align-items: center; white-space: nowrap; gap: calc(10 * var(--u)); padding: 0 calc(16 * var(--u)); }
 .entrar-cc-sellos li + li { border-left: 1px solid #c9d6d0; }
 .entrar-cc-sellos li:first-child { padding-left: 0; }
@@ -73,7 +76,7 @@
 @keyframes entrar-late { 50% { opacity: 0.25; } }
 
 /* La tarjeta para entrar */
-.entrar-cc-tarjeta { position: relative; align-self: stretch; display: flex; flex-direction: column; gap: calc(20 * var(--u));
+.entrar-cc-tarjeta { position: relative; z-index: 1; align-self: stretch; display: flex; flex-direction: column; gap: calc(20 * var(--u));
   padding: calc(36 * var(--u)) calc(51 * var(--u)) 0; border-radius: 18px; background: rgb(255 255 255 / 0.96); box-shadow: 0 30px 70px rgb(23 49 43 / 0.14), 0 0 0 1px rgb(223 229 224 / 0.8); overflow: hidden; }
 .entrar-cc-tarjeta h2 { margin: 0 0 0 calc(8 * var(--u)); font-size: max(26px, calc(36 * var(--u))); font-weight: 800; letter-spacing: -0.01em; line-height: 1.1; }
 .entrar-cc-rapido { margin: calc(-14 * var(--u)) 0 calc(8 * var(--u)) calc(8 * var(--u)); font-size: max(15px, calc(19 * var(--u))); color: var(--p-texto-2, #4a5451); }
