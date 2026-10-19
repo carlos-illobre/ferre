@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mejoras y errores · Sacudí y marcá (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mye.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; background: var(--pino); }
+  .celu { background: radial-gradient(120% 70% at 50% 25%, var(--pino-2) 0%, var(--pino) 60%, #0B1F1A 100%); color: #fff; }
+  .barra-estado { color: #fff; }
+  .tope { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; padding: 4px 16px 0; }
+  .redondo { width: 44px; height: 44px; border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); display: grid; place-items: center; color: #fff; }
+  .tope .t { text-align: center; font-weight: 800; font-size: 17px; line-height: 22px; }
+  .tope .s { text-align: center; font-size: 14px; color: rgba(255,255,255,.75); font-weight: 600; }
+  .lienzo { position: relative; margin: 16px auto 0; width: 232px; height: 324px; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 48px rgba(0,0,0,.45), 0 0 0 6px rgba(255,255,255,.08); transform: rotate(-2deg); }
+  .lienzo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+  .trazo { position: absolute; color: var(--accion); left: 124px; top: 140px; width: 108px; height: 56px; }
+  .tapado { position: absolute; left: 8px; top: 4px; width: 0; }
+  .herram { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+  .herram span { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.16); font-weight: 700; font-size: 14px; color: rgba(255,255,255,.9); }
+  .herram span.si { background: #fff; color: var(--tinta); }
+  .herram .color { width: 14px; height: 14px; border-radius: 99px; background: var(--accion); }
+
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; background: var(--fondo); color: var(--tinta); border-radius: 28px 28px 0 0; padding: 8px 16px 28px; box-shadow: 0 -16px 40px rgba(0,0,0,.35); display: grid; gap: 12px; }
+  .agarre { width: 40px; height: 5px; border-radius: 9px; background: var(--hundido-2); margin: 0 auto; }
+  .eleccion > * { min-height: 48px; padding: 0 12px; gap: 8px; font-size: 15px; }
+  .dicho { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; padding: 12px 14px; font-size: 17px; line-height: 25px; font-weight: 600; box-shadow: var(--sombra-1); }
+  .dicho .gris { color: var(--texto-3); }
+  .dicho .et { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--logro-texto); margin-bottom: 4px; }
+  .onda { display: inline-flex; gap: 3px; align-items: center; height: 14px; }
+  .onda b { width: 3px; border-radius: 3px; background: var(--logro); }
+  .va { display: flex; gap: 8px; flex-wrap: wrap; }
+  .acc { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; }
+  .mic { width: 64px; height: 64px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 8px var(--pino-suave), var(--sombra-2); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="16" height="9" rx="2" fill="currentColor"/></svg></span></div>
+  <div class="tope">
+    <span class="redondo"><i class="i" data-i="x"></i></span>
+    <div><div class="t">Avisar sobre Vender</div><div class="s">Sacudiste el celular · 10:42</div></div>
+    <span class="redondo"><i class="i" data-i="undo-2"></i></span>
+  </div>
+
+  <div class="lienzo">
+    <img src="../../imagenes/cap-vender-celu.webp" alt="">
+    <svg class="trazo" viewBox="0 0 236 70" preserveAspectRatio="none" fill="none"><path d="M18 40 C 10 12, 120 2, 200 10 C 236 16, 232 52, 196 62 C 140 74, 30 70, 12 50 C 4 40, 18 26, 40 20" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>
+  </div>
+  <div class="herram">
+    <span class="si"><span class="color"></span>Marcar</span>
+    <span><i class="i i-s" data-i="eye"></i>Tapar</span>
+    <span><i class="i i-s" data-i="image-plus"></i>Otra</span>
+  </div>
+
+  <div class="hoja">
+    <span class="agarre"></span>
+    <div class="eleccion">
+      <button><i class="i" data-i="lightbulb"></i>Una idea</button>
+      <button class="elegida"><i class="i" data-i="bug"></i>Un error</button>
+    </div>
+    <div class="dicho">
+      <div class="et"><span class="onda"><b style="height:6px"></b><b style="height:12px"></b><b style="height:8px"></b><b style="height:14px"></b><b style="height:5px"></b></span>Te escucho</div>
+      «Los tarugos me salen sin precio y la lista <span class="gris">de Fischer llegó ayer»</span>
+    </div>
+    <div class="va"><span class="pastilla contorno"><i class="i i-s" data-i="image"></i>1 captura marcada</span><span class="pastilla contorno"><i class="i i-s" data-i="smartphone"></i>Samsung A15 · 5.3.2</span></div>
+    <div class="acc">
+      <span class="mic"><i class="i i-xl" data-i="mic"></i></span>
+      <button class="btn btn-accion grande"><i class="i" data-i="send"></i>Enviar error</button>
+    </div>
+  </div>
+  <span class="home-ind" style="background:var(--tinta)"></span>
+</div>
+</body>
+</html>

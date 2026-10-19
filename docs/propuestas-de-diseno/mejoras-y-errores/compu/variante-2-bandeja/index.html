@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mejoras y errores · La bandeja (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mye.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .cabecera { padding-bottom: 0; }
+  .migas { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .pantalla { display: grid; grid-template-columns: 404px 1fr; gap: 20px; padding-top: 16px; }
+
+  /* Lista */
+  .col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .col .campo { height: 44px; }
+  .col .segmentos { display: flex; } .col .segmentos > * { flex: 1; justify-content: center; min-height: 36px; }
+  .lista { flex: 1; min-height: 0; overflow: hidden; -webkit-mask-image: linear-gradient(#000 86%, transparent); }
+  .tk { padding: 12px; grid-template-columns: 40px minmax(0, 1fr); }
+  .tk .texto { font-size: 15px; line-height: 21px; }
+  .tk .pie { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .tk .pie .t-detalle { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cuenta { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .teclas { display: flex; gap: 12px; align-items: center; color: var(--texto-3); font-size: 14px; font-weight: 600; }
+
+  /* Detalle */
+  .detalle { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  .d-cab { padding: 20px 24px 0; display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; align-items: start; }
+  .d-cab h2 { margin: 2px 0 6px; font-size: 22px; line-height: 30px; font-weight: 750; letter-spacing: -.01em; }
+  .metas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .d-cuerpo { padding: 16px 24px; display: grid; grid-template-columns: 1fr 260px; gap: 20px; flex: 1; min-height: 0; }
+  .galeria { display: grid; grid-template-rows: 1fr auto; gap: 8px; min-height: 0; }
+  .grande { position: relative; border-radius: 12px; background: var(--hundido); overflow: hidden; border: 1px solid var(--borde); display: grid; place-items: center; }
+  .grande img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .grande .ampliar { position: absolute; right: 10px; bottom: 10px; }
+  .grande .marca-roja { position: absolute; left: 52%; top: 44%; width: 200px; height: 84px; border: 3px solid var(--error); border-radius: 50%; transform: rotate(-4deg); }
+  .tira { display: flex; gap: 8px; }
+  .tira .mini { width: 72px; height: 54px; }
+  .tira .mini.sel { outline: 3px solid var(--pino); outline-offset: 1px; }
+  .hilo { display: flex; flex-direction: column; gap: 12px; }
+  .ev { display: grid; grid-template-columns: 28px 1fr; gap: 10px; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .ev b { color: var(--tinta); font-weight: 700; }
+  .ev .burbuja { margin-top: 4px; padding: 8px 12px; border-radius: 4px 12px 12px 12px; background: var(--hundido); color: var(--tinta); font-size: 15px; line-height: 22px; font-weight: 500; }
+  .tambien { display: flex; align-items: center; gap: 8px; }
+  .resolver { border-top: 1px solid var(--borde); padding: 14px 24px; display: flex; gap: 12px; align-items: center; background: var(--superficie); }
+  .resolver .campo { flex: 1; height: 48px; box-shadow: none; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="vinculo" style="padding:12px;justify-content:center"><i class="i" data-i="smartphone"></i><div class="txt">x</div></div>
+      <div class="usuario" style="padding:0;justify-content:center"><span class="avatar">CI</span><div class="txt">x</div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div>
+        <div class="migas">Más <i class="i i-s" data-i="chevron-right"></i></div>
+        <div class="t-titulo">Mejoras y errores</div>
+      </div>
+      <div class="acciones">
+        <span class="t-detalle" style="margin-right:8px">Desde cualquier pantalla <span class="kbd">F1</span> avisa con la captura puesta</span>
+        <button class="btn chico"><i class="i i-s" data-i="square-pen"></i>Nuevo <span class="kbd">N</span></button>
+      </div>
+    </header>
+
+    <section class="pantalla">
+      <!-- ============ Bandeja ============ -->
+      <div class="col">
+        <div class="campo"><i class="i" data-i="search"></i>Buscar en los tickets <span class="kbd" style="margin-left:auto">/</span></div>
+        <div class="segmentos"><button class="elegido">Abiertos 7</button><button>Resueltos 23</button><button>Míos 3</button></div>
+        <div class="lista">
+          <div class="tk elegido">
+            <span class="tipo error"><i class="i" data-i="bug"></i></span>
+            <div><div class="texto">Los tarugos nylon S8 me salen sin precio aunque Fischer mandó la lista nueva ayer</div>
+              <div class="pie"><span class="av">RB</span><span class="t-detalle">Rosa · hace 12 min</span><span class="cuenta"><i class="i i-s" data-i="image"></i>2</span><span class="cuenta"><i class="i i-s" data-i="thumbs-up"></i>2</span></div></div>
+          </div>
+          <div class="tk">
+            <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
+            <div><div class="texto">Al cobrar con Mercado Pago, que el QR salga grande para girar el monitor hacia el cliente</div>
+              <div class="pie"><span class="av">MG</span><span class="t-detalle">Martín · hoy 9:40</span><span class="cuenta"><i class="i i-s" data-i="image"></i>1</span></div></div>
+          </div>
+          <div class="tk">
+            <span class="tipo error"><i class="i" data-i="bug"></i></span>
+            <div><div class="texto">En el celular, el botón Cobrar queda tapado por el teclado cuando busco un producto</div>
+              <div class="pie"><span class="av c">CI</span><span class="t-detalle">Vos · ayer 18:05</span><span class="cuenta"><i class="i i-s" data-i="image"></i>3</span><span class="cuenta"><i class="i i-s" data-i="thumbs-up"></i>1</span></div></div>
+          </div>
+          <div class="tk">
+            <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
+            <div><div class="texto">Poder vender por metro la cadena y la soga, no solo por unidad</div>
+              <div class="pie"><span class="av">JF</span><span class="t-detalle">Julián · ayer 11:20</span></div></div>
+          </div>
+          <div class="tk">
+            <span class="tipo error"><i class="i" data-i="bug"></i></span>
+            <div><div class="texto">Al contar el depósito, la balanza no toma los kilos de los clavos</div>
+              <div class="pie"><span class="av">RB</span><span class="t-detalle">Rosa · lunes</span></div></div>
+          </div>
+        </div>
+        <div class="teclas"><span><span class="kbd">J</span> <span class="kbd">K</span> pasar</span><span><span class="kbd">E</span> resolver</span><span><span class="kbd">Espacio</span> ver foto</span></div>
+      </div>
+
+      <!-- ============ Detalle ============ -->
+      <div class="tarjeta-2 detalle">
+        <div class="d-cab">
+          <span class="tipo error grande"><i class="i i-l" data-i="bug"></i></span>
+          <div>
+            <h2>Los tarugos nylon S8 me salen sin precio aunque Fischer mandó la lista nueva ayer</h2>
+            <div class="metas">
+              <span class="pastilla contorno"><span class="av" style="width:20px;height:20px">R</span>Rosa Benítez</span>
+              <span class="pastilla contorno"><i class="i i-s" data-i="clock"></i>Hoy 10:30</span>
+              <span class="pastilla contorno"><i class="i i-s" data-i="smartphone"></i>Samsung A15 · 5.3.2</span>
+              <span class="pastilla contorno"><i class="i i-s" data-i="shopping-cart"></i>Estaba en Vender</span>
+            </div>
+          </div>
+          <span class="pastilla pino"><span class="punto"></span>Abierto</span>
+        </div>
+        <div class="d-cuerpo">
+          <div class="galeria">
+            <div class="grande"><img src="../../imagenes/cap-vender-celu.webp" alt="" style="object-position:50% 54%"><span class="marca-roja"></span><span class="pastilla" style="position:absolute;left:12px;top:12px;background:var(--superficie);box-shadow:var(--sombra-1)"><i class="i i-s" data-i="pen-line"></i>Marcada por Rosa</span><span class="btn chico ampliar"><i class="i i-s" data-i="maximize-2"></i>Ver en grande <span class="kbd">Espacio</span></span></div>
+            <div class="tira">
+              <div class="mini sel"><img src="../../imagenes/cap-vender-celu.webp" alt="" style="object-position:0 50%"></div>
+              <div class="mini producto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+            </div>
+          </div>
+          <div class="hilo">
+            <div class="t-etiqueta">Lo que pasó</div>
+            <div class="ev"><span class="av">RB</span><div><b>Rosa</b> lo abrió desde el celular<div class="burbuja">La caja dice $4.150 de costo. Saqué foto de la etiqueta.</div></div></div>
+            <div class="ev"><span class="av">MG</span><div><b>Martín</b> · 10:52<div class="burbuja">Me pasó lo mismo con los S10.</div></div></div>
+            <div class="tambien"><span class="av">JF</span><span class="t-detalle"><b style="color:var(--tinta)">Julián</b> también lo vio</span></div>
+            <button class="btn chico btn-suave" style="justify-self:start;align-self:flex-start"><i class="i i-s" data-i="thumbs-up"></i>A mí también</button>
+          </div>
+        </div>
+        <div class="resolver">
+          <div class="campo foco"><i class="i" data-i="message-square"></i><span class="t-etiqueta" style="white-space:nowrap">Nota:</span><span class="escrito" style="white-space:nowrap">cargué la lista de Fischer del 18/10</span><span class="cursor"></span></div>
+          <button class="btn btn-accion"><i class="i" data-i="check"></i>Marcar resuelto <span class="kbd">E</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

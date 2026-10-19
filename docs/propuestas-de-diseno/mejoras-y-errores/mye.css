@@ -1,0 +1,47 @@
+/* Mejoras y errores: piezas propias de la pantalla, sobre _comun/comun.css.
+   Todas las variantes usan el mismo molde de ticket, la misma elección «idea / error»
+   y las mismas miniaturas, para que se compare la idea y no el estilo. */
+
+/* Elección idea / error: la elegida en verde suave (pedido de Carlos del 2026-10-15) */
+.eleccion { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e2); }
+.eleccion > * { display: flex; align-items: center; gap: var(--e3); min-height: 56px; padding: 0 var(--e4); border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: var(--superficie); font-weight: 700; font-size: 16px; color: var(--texto-2); text-align: left; box-shadow: var(--sombra-1); }
+.eleccion > * .i { color: var(--texto-3); }
+.eleccion > .elegida { background: var(--logro-suave); border-color: var(--logro); color: var(--logro-texto); box-shadow: 0 0 0 3px rgba(30, 158, 98, .12); }
+.eleccion > .elegida .i { color: var(--logro-texto); }
+.eleccion small { display: block; font-size: 14px; font-weight: 500; color: var(--texto-2); line-height: 18px; }
+
+/* Caja de texto */
+.caja { border: 1px solid var(--borde-fuerte); border-radius: var(--r); background: var(--superficie); padding: var(--e3) var(--e4); font-size: 16px; line-height: 24px; color: var(--tinta); }
+.caja.foco { border-color: var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); }
+.caja .ayuda { color: var(--texto-3); }
+
+/* Tipo del ticket: el ícono en su azulejo */
+.tipo { width: 40px; height: 40px; border-radius: var(--r); display: grid; place-items: center; flex: none; }
+.tipo.idea { background: var(--pino-suave); color: var(--pino-texto); }
+.tipo.error { background: var(--error-suave); color: var(--error-texto); }
+.tipo.grande { width: 48px; height: 48px; }
+
+/* Miniaturas de fotos y capturas */
+.minis { display: flex; gap: var(--e2); flex-wrap: wrap; }
+.mini { position: relative; width: 64px; height: 64px; border-radius: var(--r-chico); overflow: hidden; border: 1px solid var(--borde); background: var(--hundido); flex: none; box-shadow: var(--sombra-1); }
+.mini img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.mini.producto img { object-fit: contain; padding: 6px; filter: drop-shadow(0 3px 4px rgba(26, 29, 27, .18)); }
+.mini .quitar { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 99px; background: rgba(26, 29, 27, .72); color: #fff; display: grid; place-items: center; }
+.mini .quitar .i { width: 14px; height: 14px; }
+.mini.mas { display: grid; place-items: center; font-weight: 800; font-size: 15px; color: var(--texto-2); }
+.mini.chica { width: 48px; height: 48px; }
+.agregar { width: 64px; height: 64px; border-radius: var(--r-chico); border: 1.5px dashed var(--borde-fuerte); display: grid; place-items: center; align-content: center; gap: 2px; color: var(--texto-2); font-size: 14px; font-weight: 650; background: transparent; flex: none; }
+
+/* El molde de ticket: [tipo] [texto + quién · cuándo · dónde] [fotos] [estado] [›] */
+.tk { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: var(--e3); align-items: start; padding: var(--e3) var(--e4); background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); }
+.tk + .tk { margin-top: var(--e2); }
+.tk .texto { font-weight: 650; font-size: 16px; line-height: 22px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tk .quien { font-size: 14px; line-height: 20px; color: var(--texto-2); margin-top: 2px; }
+.tk .lado { display: grid; justify-items: end; gap: var(--e2); }
+.tk.porenviar { background: var(--urgente-suave); border-color: transparent; }
+.tk.elegido { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .1); }
+
+/* Avatar chico */
+.av { width: 28px; height: 28px; border-radius: 99px; display: inline-grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; background: var(--hundido-2); color: var(--texto-2); }
+.av.c { background: var(--accion-suave); color: var(--accion-texto); }
+/* los demás, neutros: el color queda para el que sos vos */

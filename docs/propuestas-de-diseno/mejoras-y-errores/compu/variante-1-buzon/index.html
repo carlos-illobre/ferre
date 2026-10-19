@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mejoras y errores · El buzón (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mye.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .migas { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .cabecera { padding-bottom: 0; }
+  .pantalla { display: grid; grid-template-columns: 452px 1fr; gap: 24px; padding-top: 16px; }
+
+  /* Izquierda: escribir */
+  .escribir { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .escribir .eleccion > * { padding: 0 12px; gap: 10px; }
+  .caja.foco { height: 156px; }
+  .escribir .mini, .escribir .agregar { width: 88px; height: 72px; }
+  .fotos-cab { display: flex; align-items: baseline; justify-content: space-between; }
+  .via { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .via .btn { justify-content: flex-start; }
+  .va-con { display: flex; flex-wrap: wrap; gap: 6px; }
+  .enviar { display: flex; align-items: center; gap: 12px; margin-top: auto; }
+  .enviar .btn-accion { flex: 1; }
+
+  /* Derecha: seguir */
+  .seguir { min-width: 0; display: flex; flex-direction: column; min-height: 0; gap: 16px; }
+  .resumenes { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
+  .resumen { padding: 12px 14px; min-width: 0; gap: 10px; } .resumen .et { white-space: nowrap; }
+  .barras { display: flex; align-items: flex-end; gap: 4px; height: 36px; margin-left: auto; }
+  .barras b { width: 6px; border-radius: 3px; background: var(--hundido-2); }
+  .barras b.r { background: var(--logro); opacity: .75; }
+  .filtros { display: flex; align-items: center; gap: 8px; }
+  .filtros .segmentos > * { min-height: 36px; }
+  .filtros .chip { height: 36px; font-size: 14px; }
+  .lista { flex: 1; min-height: 0; overflow: hidden; -webkit-mask-image: linear-gradient(#000 88%, transparent); }
+  .tk { grid-template-columns: 40px minmax(0, 1fr) auto 16px; align-items: center; }
+  .tk .chev { color: var(--texto-3); }
+  .apilado { gap: 4px; } .apilado .mini { width: 56px; height: 56px; }
+  .apilado { display: flex; }
+  
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div>
+        <div class="migas">Más <i class="i i-s" data-i="chevron-right"></i></div>
+        <div class="t-titulo">Mejoras y errores</div>
+      </div>
+      <div class="acciones"><span class="t-detalle">Lo que se escribe acá lo ven todos los de la ferretería</span></div>
+    </header>
+
+    <section class="pantalla">
+      <!-- ============ Escribir ============ -->
+      <div class="tarjeta-2 escribir">
+        <div class="eleccion">
+          <button class="elegida"><i class="i i-l" data-i="lightbulb"></i><span>Tengo una idea<small>Algo que falta</small></span></button>
+          <button><i class="i i-l" data-i="bug"></i><span>Encontré un error<small>Algo que no anda</small></span></button>
+        </div>
+        <div class="caja foco">Que el cuaderno de Vender entienda «media docena» y «una docena» como 6 y 12 unidades<span class="cursor"></span></div>
+        <div>
+          <div class="fotos-cab"><span class="t-etiqueta">Fotos o capturas</span><span class="t-detalle">2 de 5 · Ctrl V pega</span></div>
+          <div class="minis" style="margin-top:8px">
+            <div class="mini"><img src="../../imagenes/cap-compu-cuaderno.webp" alt=""><span class="quitar"><i class="i" data-i="x"></i></span></div>
+            <div class="mini"><img src="../../imagenes/cap-compu-cobro.webp" alt=""><span class="quitar"><i class="i" data-i="x"></i></span></div>
+            <div class="agregar"><i class="i" data-i="clipboard-paste"></i>Pegar</div>
+          </div>
+        </div>
+        <div class="via">
+          <button class="btn chico"><i class="i i-s" data-i="paperclip"></i>Elegir archivos <span class="kbd">Alt F</span></button>
+          <button class="btn chico"><i class="i i-s" data-i="smartphone"></i>Sacar con el celular</button>
+        </div>
+        <div>
+          <div class="t-etiqueta" style="margin-bottom:6px">Va con</div>
+          <div class="va-con">
+            <span class="pastilla contorno"><span class="av c" style="width:20px;height:20px;font-size:14px">C</span>Carlos Illobre</span>
+            <span class="pastilla contorno"><i class="i i-s" data-i="monitor"></i>Compu del mostrador</span>
+            <span class="pastilla contorno">Versión 5.3.2</span>
+          </div>
+        </div>
+        <div class="enviar">
+          <button class="btn btn-accion grande"><i class="i" data-i="send"></i>Enviar idea <span class="kbd">Ctrl Enter</span></button>
+        </div>
+      </div>
+
+      <!-- ============ Seguir ============ -->
+      <div class="seguir">
+        <div class="resumenes">
+          <div class="resumen">
+            <span class="ico"><i class="i" data-i="inbox"></i></span>
+            <div><div class="et">Abiertos</div><div class="va">7</div></div>
+            <div class="barras" title="Creados y resueltos por semana">
+              <b style="height:40%"></b><b class="r" style="height:30%"></b>
+              <b style="height:70%"></b><b class="r" style="height:55%"></b>
+              <b style="height:100%"></b><b class="r" style="height:80%"></b>
+              <b style="height:60%"></b><b class="r" style="height:70%"></b>
+            </div>
+          </div>
+          <div class="resumen urgente"><span class="ico"><i class="i" data-i="hourglass"></i></span><div><div class="et">Esperan +7 días</div><div class="va">2</div></div></div>
+          <div class="resumen logro"><span class="ico"><i class="i" data-i="circle-check"></i></span><div><div class="et">Resueltos en oct.</div><div class="va">23</div></div></div>
+        </div>
+
+        <div class="filtros">
+          <div class="segmentos"><button class="elegido">Abiertos 7</button><button>Resueltos 23</button></div>
+          <span style="flex:1"></span>
+          <div class="chips"><span class="chip elegido">Todos</span><span class="chip"><i class="i i-s" data-i="lightbulb"></i>Ideas 4</span><span class="chip"><i class="i i-s" data-i="bug"></i>Errores 3</span></div>
+        </div>
+
+        <div class="lista">
+          <div class="tk">
+            <span class="tipo error"><i class="i" data-i="bug"></i></span>
+            <div><div class="texto">Los tarugos nylon S8 me salen sin precio aunque Fischer mandó la lista nueva ayer</div><div class="quien">Rosa Benítez · hace 12 min · Samsung A15</div></div>
+            <div class="lado"><div class="apilado"><div class="mini chica"><img src="../../imagenes/cap-celu-tarugos.webp" alt=""></div><div class="mini chica producto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div></div></div>
+            <i class="i chev" data-i="chevron-right"></i>
+          </div>
+          <div class="tk">
+            <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
+            <div><div class="texto">Al cobrar con Mercado Pago, que el QR salga grande para girar el monitor hacia el cliente</div><div class="quien">Martín Godoy · hoy 9:40 · Compu del mostrador</div></div>
+            <div class="lado"><div class="apilado"><div class="mini chica"><img src="../../imagenes/cap-compu-cobro.webp" alt=""></div></div></div>
+            <i class="i chev" data-i="chevron-right"></i>
+          </div>
+          <div class="tk">
+            <span class="tipo error"><i class="i" data-i="bug"></i></span>
+            <div><div class="texto">En el celular, el botón Cobrar queda tapado por el teclado cuando busco un producto</div><div class="quien">Carlos Illobre · ayer 18:05 · Moto G54</div></div>
+            <div class="lado"><div class="apilado"><div class="mini chica"><img src="../../imagenes/cap-vender-celu.webp" alt=""></div><div class="mini chica"><img src="../../imagenes/cap-celu-cobrar.webp" alt=""></div><div class="mini chica mas">+1</div></div></div>
+            <i class="i chev" data-i="chevron-right"></i>
+          </div>
+          <div class="tk">
+            <span class="tipo idea"><i class="i" data-i="lightbulb"></i></span>
+            <div><div class="texto">Poder vender por metro la cadena y la soga, no solo por unidad</div><div class="quien">Julián Ferraro · ayer 11:20 · Compu del depósito</div></div>
+            <div class="lado"></div>
+            <i class="i chev" data-i="chevron-right"></i>
+          </div>
+          <div class="tk">
+            <span class="tipo error"><i class="i" data-i="bug"></i></span>
+            <div><div class="texto">Al contar el depósito, la balanza no toma los kilos de los clavos</div><div class="quien">Rosa Benítez · lunes 16:10 · Samsung A15 · hace 8 días</div></div>
+            <div class="lado"><span class="pastilla urgente"><i class="i i-s" data-i="hourglass"></i>8 días</span></div>
+            <i class="i chev" data-i="chevron-right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

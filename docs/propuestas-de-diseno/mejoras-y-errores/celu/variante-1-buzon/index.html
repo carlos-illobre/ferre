@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mejoras y errores · El buzón (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mye.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .volver { display: inline-flex; align-items: center; gap: 2px; padding: 0 12px 0 8px; height: 22px; font-size: 15px; font-weight: 700; color: var(--pino-texto); }
+  .celu-pantalla { overflow: hidden; -webkit-mask-image: linear-gradient(#000 90%, transparent); }
+  .escribir { padding: 12px; display: grid; gap: 12px; }
+  .eleccion > * { min-height: 52px; padding: 0 12px; gap: 8px; font-size: 15px; }
+  .caja.foco { height: 100px; padding: 10px 14px; }
+  .fotos { display: flex; gap: 8px; align-items: center; }
+  .fotos .mini, .fotos .tomar { width: 60px; height: 60px; }
+  .tomar { border-radius: var(--r-chico); display: grid; place-items: center; flex: none; }
+  .tomar.cam { background: var(--pino); color: #fff; box-shadow: var(--sombra-2); }
+  .tomar.gal { background: var(--hundido); color: var(--texto-2); }
+  .fotos .cuantas { margin-left: auto; font-size: 14px; font-weight: 650; color: var(--texto-3); }
+  .sec { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 8px; }
+  .sec .segmentos > * { min-height: 32px; }
+  .tk { padding: 10px 12px; grid-template-columns: 40px minmax(0,1fr) auto; }
+  .tk .texto { font-size: 15px; line-height: 21px; }
+  .barra-accion { display: grid; grid-template-columns: 1fr; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="currentColor"/></svg></span></div>
+  <span class="volver"><i class="i i-s" data-i="chevron-left"></i>Más</span>
+  <div class="celu-cabecera"><span class="t-titulo">Mejoras y errores</span></div>
+  <div class="celu-estado" style="color:var(--urgente-texto)"><span class="punto" style="background:var(--urgente)"></span>Sin conexión · 1 por enviar</div>
+
+  <div class="celu-pantalla">
+    <div class="tarjeta-2 escribir">
+      <div class="eleccion">
+        <button class="elegida"><i class="i" data-i="lightbulb"></i>Una idea</button>
+        <button><i class="i" data-i="bug"></i>Un error</button>
+      </div>
+      <div class="caja foco">Que en Contar se pueda dictar la cantidad<span class="cursor"></span></div>
+      <div class="fotos">
+        <span class="tomar cam"><i class="i i-l" data-i="camera"></i></span>
+        <span class="tomar gal"><i class="i i-l" data-i="image-plus"></i></span>
+        <div class="mini"><img src="../../imagenes/cap-celu-camara.webp" alt="" style="object-position:50% 30%"><span class="quitar"><i class="i" data-i="x"></i></span></div>
+        <div class="mini producto"><img src="../../../_comun/fotos/clavos.webp" alt=""><span class="quitar"><i class="i" data-i="x"></i></span></div>
+        <span class="cuantas">2/5</span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="t-seccion">Tickets</span>
+      <div class="segmentos"><button class="elegido">Abiertos 7</button><button>Resueltos 23</button></div>
+    </div>
+    <div class="tk porenviar">
+      <span class="tipo idea" style="background:var(--superficie)"><i class="i" data-i="lightbulb"></i></span>
+      <div><div class="texto">Que «llave» muestre primero las combinadas</div><div class="quien" style="color:var(--urgente-texto);font-weight:650">Por enviar · sale al volver la señal</div></div>
+      <i class="i" data-i="cloud-upload" style="color:var(--urgente-texto);margin-top:2px"></i>
+    </div>
+    <div class="aviso pino" style="margin-top:8px"><i class="i" data-i="wifi-off"></i><span>Los tickets enviados se ven cuando vuelva la conexión. Lo tuyo sale solo, una vez.</span></div>
+  </div>
+
+  <div class="barra-accion"><button class="btn btn-accion grande"><i class="i" data-i="send"></i>Enviar idea</button></div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mejoras y errores · Sobre la pantalla (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mye.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { overflow: hidden; }
+  .escena { position: relative; width: 1366px; height: 768px; background: var(--fondo); overflow: hidden; }
+  /* La pantalla donde estaba, congelada y oscurecida */
+  .congelada { position: absolute; inset: 0; background: url(../../imagenes/cap-vender-compu.webp) top left / 1366px auto no-repeat; filter: blur(2px) saturate(.8); transform: scale(1.02); }
+  .velo { position: absolute; inset: 0; background: rgba(18, 56, 47, .48); }
+
+  /* El lienzo: la captura que se va a mandar, para marcar encima */
+  .lienzo { position: absolute; left: 40px; top: 96px; width: 864px; height: 486px; border-radius: 16px; overflow: hidden; box-shadow: var(--sombra-3), 0 0 0 1px rgba(255,255,255,.5); background: url(../../imagenes/cap-vender-compu.webp) top left / 864px auto no-repeat; }
+  .trazo { color: var(--error); position: absolute; left: 488px; top: 318px; width: 160px; height: 60px; }
+  .tapado { position: absolute; left: 636px; top: 156px; width: 196px; height: 28px; border-radius: 6px; background: var(--tinta); }
+  .tapado::after { content: "Tapado"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 14px; font-weight: 700; }
+  .nota { position: absolute; left: 404px; top: 270px; padding: 8px 12px; border-radius: 12px 12px 12px 4px; background: var(--urgente); color: var(--tinta); font-weight: 750; font-size: 15px; box-shadow: var(--sombra-2); transform: rotate(-2deg); }
+
+  .herramientas { position: absolute; left: 40px; top: 28px; width: 864px; display: flex; align-items: center; gap: 12px; color: #fff; }
+  .herramientas .grupo { display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: rgba(10, 30, 25, .72); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.14); }
+  .herramientas button { height: 40px; padding: 0 12px; border-radius: 10px; border: 0; background: transparent; color: rgba(255,255,255,.86); font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+  .herramientas button.si { background: #fff; color: var(--tinta); }
+  .herramientas .kbd { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); color: #fff; }
+  .herramientas .si .kbd { background: var(--superficie); border-color: var(--borde-fuerte); color: var(--texto-2); }
+  .donde { margin-left: auto; font-weight: 700; font-size: 15px; display: inline-flex; gap: 8px; align-items: center; }
+
+  .pista { position: absolute; left: 40px; top: 600px; width: 864px; color: rgba(255,255,255,.92); font-size: 15px; font-weight: 600; display: flex; gap: 20px; }
+  .pista .kbd { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); color: #fff; }
+
+  /* La hoja de la derecha */
+  .hoja { position: absolute; right: 24px; top: 24px; bottom: 24px; width: 412px; background: var(--superficie); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); display: flex; flex-direction: column; padding: 20px; gap: 14px; }
+  .hoja-cab { display: flex; align-items: center; gap: 12px; }
+  .hoja-cab .t-seccion { flex: 1; }
+  .eleccion > * { min-height: 48px; padding: 0 12px; gap: 8px; font-size: 15px; }
+  .caja.foco { min-height: 120px; }
+  .adj { display: flex; gap: 8px; align-items: center; }
+  .adj .mini { width: 104px; height: 64px; }
+  .contexto { background: var(--hundido); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; }
+  .contexto .f { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 600; }
+  .contexto .f b { color: var(--tinta); font-weight: 700; margin-left: auto; text-align: right; }
+  .parecido { border: 1px solid var(--borde); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; }
+  .parecido .t-etiqueta { display: flex; gap: 6px; align-items: center; }
+  .pr { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; }
+  .acc { margin-top: auto; display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="escena">
+  <div class="congelada"></div>
+  <div class="velo"></div>
+
+  <div class="herramientas">
+    <div class="grupo">
+      <button class="si"><i class="i i-s" data-i="highlighter"></i>Marcar <span class="kbd">M</span></button>
+      <button><i class="i i-s" data-i="mouse-pointer-2"></i>Flecha <span class="kbd">F</span></button>
+      <button><i class="i i-s" data-i="sticky-note"></i>Nota <span class="kbd">T</span></button>
+      <button><i class="i i-s" data-i="eye"></i>Tapar <span class="kbd">B</span></button>
+      <button><i class="i i-s" data-i="undo-2"></i></button>
+    </div>
+    <span class="donde"><i class="i i-s" data-i="shopping-cart"></i>Vender · 10:42</span>
+  </div>
+
+  <div class="lienzo">
+    <svg class="trazo" viewBox="0 0 236 70" preserveAspectRatio="none" fill="none"><path d="M18 40 C 10 12, 120 2, 200 10 C 236 16, 232 52, 196 62 C 140 74, 30 70, 12 50 C 4 40, 18 26, 40 20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+    <div class="nota">¡Sin precio y la lista llegó ayer!</div>
+    <div class="tapado" title="La ganancia no se manda"></div>
+  </div>
+
+  <div class="pista"><span><span class="kbd">F1</span> en cualquier pantalla abre esto con la captura ya puesta</span><span><span class="kbd">Esc</span> volver sin mandar</span></div>
+
+  <aside class="hoja">
+    <div class="hoja-cab"><span class="t-seccion">Avisar sobre esta pantalla</span><button class="btn btn-icono chico btn-fantasma"><i class="i" data-i="x"></i></button></div>
+    <div class="eleccion">
+      <button><i class="i" data-i="lightbulb"></i>Tengo una idea</button>
+      <button class="elegida"><i class="i" data-i="bug"></i>Encontré un error</button>
+    </div>
+    <div class="caja foco">Los tarugos nylon S8 de Fischer salen sin precio, y la lista nueva llegó ayer<span class="cursor"></span></div>
+    <div>
+      <div class="t-etiqueta" style="margin-bottom:8px">Va con la captura marcada · 1 de 5</div>
+      <div class="adj">
+        <div class="mini"><img src="../../imagenes/cap-vender-compu.webp" alt=""></div>
+        <div class="agregar" style="width:64px"><i class="i" data-i="image-plus"></i>Otra</div>
+        <span class="t-detalle">Ctrl V pega · el celular también saca</span>
+      </div>
+    </div>
+    <div class="contexto">
+      <div class="f"><i class="i i-s" data-i="layout-grid"></i>Pantalla<b>Vender, venta de 5 productos</b></div>
+      <div class="f"><i class="i i-s" data-i="monitor"></i>Desde<b>Compu del mostrador · 5.3.2</b></div>
+      <div class="f"><i class="i i-s" data-i="user"></i>Lo firma<b>Carlos Illobre</b></div>
+      <div class="f"><i class="i i-s" data-i="eye"></i>Lo ven<b>Todos los de la ferretería</b></div>
+    </div>
+    <div class="parecido">
+      <div class="t-etiqueta"><i class="i i-s" data-i="sparkles"></i> ¿Es el mismo que avisó Rosa?</div>
+      <div class="pr"><span class="tipo error" style="width:36px;height:36px"><i class="i i-s" data-i="bug"></i></span><div><div style="font-weight:700;font-size:15px;line-height:20px">Tarugos nylon S8 sin precio</div><div class="t-detalle">hace 12 min · 2 fotos</div></div><button class="btn chico">Sumarme</button></div>
+    </div>
+    <div class="acc">
+      <button class="btn btn-fantasma grande" style="padding:0 12px">Esc</button>
+      <button class="btn btn-accion grande"><i class="i" data-i="send"></i>Enviar error <span class="kbd">Ctrl Enter</span></button>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

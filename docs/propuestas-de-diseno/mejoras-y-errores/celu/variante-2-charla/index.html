@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mejoras y errores · La charla (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mye.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .cab { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 8px; padding: 0 16px 8px; border-bottom: 1px solid var(--borde); background: var(--superficie); }
+  .cab .t { font-size: 20px; font-weight: 800; letter-spacing: -.01em; line-height: 24px; }
+  .cab .s { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .barra-estado { background: var(--superficie); }
+  .filtro { display: flex; gap: 8px; padding: 10px 16px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
+  .filtro .chip { height: 36px; font-size: 14px; padding: 0 12px; white-space: nowrap; }
+  .feed { flex: 1; min-height: 0; overflow: hidden; padding: 12px 12px 12px; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; -webkit-mask-image: linear-gradient(transparent 0, #000 56px); }
+  .dia { align-self: center; font-size: 14px; font-weight: 700; color: var(--texto-2); background: var(--hundido); padding: 2px 12px; border-radius: 99px; }
+  .msj { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: end; max-width: 336px; }
+  .burbuja { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px 16px 16px 4px; padding: 10px 12px; box-shadow: var(--sombra-1); }
+  .burbuja .de { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 750; margin-bottom: 4px; }
+  .burbuja .de .pastilla { height: 24px; padding: 0 8px; }
+  .burbuja .tx { font-size: 15px; line-height: 21px; font-weight: 550; }
+  .burbuja .pie { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .burbuja .pie .sumar { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border-radius: 99px; background: var(--hundido); color: var(--texto-2); font-weight: 700; }
+  .fotos2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 8px; border-radius: 10px; overflow: hidden; }
+  .fotos2 > div { height: 84px; background: var(--hundido); }
+  .fotos2 img { width: 100%; height: 100%; object-fit: cover; }
+  .fotos2 .prod img { object-fit: contain; padding: 8px; filter: drop-shadow(0 3px 4px rgba(26,29,27,.18)); }
+  .resuelto { align-self: center; display: flex; gap: 8px; align-items: flex-start; max-width: 340px; padding: 8px 12px; border-radius: 14px; background: var(--logro-suave); color: var(--logro-texto); font-size: 14px; line-height: 20px; font-weight: 600; }
+  .resuelto b { font-weight: 800; }
+  .resuelto u { text-decoration: none; font-weight: 800; color: var(--pino-texto); white-space: nowrap; }
+  .mio { align-self: flex-end; max-width: 300px; }
+  .mio .burbuja { background: var(--pino); border-color: var(--pino); color: #fff; border-radius: 16px 16px 4px 16px; }
+  .mio .burbuja .pie { color: rgba(255,255,255,.8); justify-content: flex-end; }
+  .mio .burbuja .pie .pastilla { height: 24px; background: var(--urgente-suave); color: var(--urgente-texto); }
+  .componer { background: rgba(255,255,255,.94); border-top: 1px solid var(--borde); padding: 10px 12px 10px; display: grid; gap: 8px; }
+  .tipos { display: flex; gap: 8px; }
+  .tipos span { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--borde-fuerte); font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .tipos span.si { background: var(--logro-suave); border-color: var(--logro); color: var(--logro-texto); }
+  .linea { display: grid; grid-template-columns: 44px 1fr 48px; gap: 8px; align-items: center; }
+  .linea .entrada { height: 48px; border-radius: 24px; border: 1px solid var(--pino); box-shadow: 0 0 0 4px rgba(18,56,47,.1); background: var(--superficie); display: flex; align-items: center; padding: 0 16px; font-size: 16px; color: var(--texto-3); }
+  .linea .cam { width: 44px; height: 44px; border-radius: 99px; background: var(--hundido); display: grid; place-items: center; color: var(--tinta); }
+  .linea .ir { width: 48px; height: 48px; border-radius: 99px; background: var(--accion); color: #fff; display: grid; place-items: center; box-shadow: var(--sombra-accion); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="currentColor"/></svg></span></div>
+  <div class="cab">
+    <span class="btn btn-icono chico btn-fantasma" style="color:var(--pino-texto)"><i class="i i-l" data-i="chevron-left"></i></span>
+    <div><div class="t">Mejoras y errores</div><div class="s">Toda la ferretería · 7 abiertos</div></div>
+    <span class="btn btn-icono chico btn-suave"><i class="i" data-i="search"></i></span>
+  </div>
+  <div class="filtro"><span class="chip elegido">Todo</span><span class="chip">Abiertos 7</span><span class="chip">Resueltos 23</span><span class="chip">Míos</span></div>
+
+  <div class="feed">
+    <div class="msj">
+      <span class="av">JF</span>
+      <div class="burbuja">
+        <div class="de">Julián <span class="pastilla pino"><i class="i i-s" data-i="lightbulb"></i>Idea</span><span style="margin-left:auto;color:var(--texto-3);font-weight:600">ayer</span></div>
+        <div class="tx">Vender por metro la cadena y la soga</div>
+      </div>
+    </div>
+    <span class="dia">Hoy · 10:30</span>
+    <div class="resuelto"><i class="i i-s" data-i="circle-check" style="margin-top:2px"></i><span><b>Carlos resolvió</b> «El total no rodaba con 0,7 kg»: arreglado en la 5.3.1. <u>Reabrir</u></span></div>
+    <div class="msj">
+      <span class="av">RB</span>
+      <div class="burbuja">
+        <div class="de">Rosa <span class="pastilla error"><i class="i i-s" data-i="bug"></i>Error</span></div>
+        <div class="tx">Los tarugos S8 salen sin precio y la lista de Fischer llegó ayer</div>
+        <div class="fotos2"><div><img src="../../imagenes/cap-vender-celu.webp" alt="" style="object-position:50% 54%"></div><div class="prod"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div></div>
+        <div class="pie">10:30 · A15<span class="sumar"><i class="i i-s" data-i="thumbs-up"></i>A mí también · 2</span></div>
+      </div>
+    </div>
+    <div class="mio">
+      <div class="burbuja">
+        <div class="tx">Que «llave» muestre primero las combinadas</div>
+        <div class="pie">Enviado · recién <i class="i i-s" data-i="check"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="componer">
+    <div class="tipos"><span class="si"><i class="i i-s" data-i="lightbulb"></i>Una idea</span><span><i class="i i-s" data-i="bug"></i>Un error</span><span style="border:0;margin-left:auto;color:var(--texto-3)">hasta 5 fotos</span></div>
+    <div class="linea">
+      <span class="cam"><i class="i i-l" data-i="camera"></i></span>
+      <span class="entrada">Contá qué pasó o qué falta<span class="cursor" style="margin-left:4px"></span></span>
+      <span class="ir"><i class="i i-l" data-i="arrow-up"></i></span>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>
