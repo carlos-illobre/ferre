@@ -14,3 +14,26 @@ su capacidad.
 
 **Lo que Carlos rechaza se borra** de esta carpeta; lo que queda está todavía en revisión.
 El prompt con que se hicieron está en `director-de-arte.md`.
+
+## Las pantallas
+
+| Parte | Pantalla | Carpeta |
+|---|---|---|
+| — | Entrar | [entrar](entrar/resumen.md) |
+| Vender | Vender | [vender](vender/resumen.md) |
+| Vender | Ventas de hoy | [ventas-de-hoy](ventas-de-hoy/resumen.md) |
+| Catálogo | Productos y su ficha | [productos](productos/resumen.md) |
+| Catálogo | Listas de precios | [listas](listas/resumen.md) |
+| Catálogo | Duplicados | [duplicados](duplicados/resumen.md) |
+| Depósito | Stock | [stock](stock/resumen.md) |
+| Depósito | Compras | [compras](compras/resumen.md) |
+| Depósito | Contar | [contar](contar/resumen.md) |
+| Negocio | Resumen | [resumen](resumen/resumen.md) |
+| Negocio | Usuarios | [usuarios](usuarios/resumen.md) |
+| Negocio | Quién hizo qué | [actividad](actividad/resumen.md) |
+| Más | Anomalías | [anomalias](anomalias/resumen.md) |
+| Más | Procesos | [procesos](procesos/resumen.md) |
+| Más | Mejoras y errores | [mejoras-y-errores](mejoras-y-errores/resumen.md) |
+| Más | Configuración | [configuracion](configuracion/resumen.md) |
+
+El manual de uso quedó afuera a propósito.
