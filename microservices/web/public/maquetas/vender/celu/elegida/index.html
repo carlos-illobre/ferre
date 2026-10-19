@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vender · La elegida (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .buscar { display: flex; gap: 8px; }
+  .buscar .campo { flex: 1; height: 52px; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .buscar .btn { width: 52px; height: 52px; padding: 0; border-radius: 12px; }
+  .cab-lista { display: flex; align-items: center; gap: 8px; margin: 14px 0 8px; }
+  .cab-lista b { font-size: 18px; font-weight: 800; }
+  .cab-lista .btn { margin-left: auto; }
+  .lista { overflow: hidden; height: 380px; -webkit-mask-image: linear-gradient(#000 80%, transparent 96%); margin: 0 -16px; padding: 0 16px; }
+  .card { background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 12px; }
+  .card + .card { margin-top: 8px; }
+  .arriba { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; gap: 12px; align-items: start; }
+  .arriba .n { font-weight: 750; font-size: 16px; line-height: 21px; }
+  .arriba .d { font-size: 14px; line-height: 19px; color: var(--texto-2); margin-top: 2px; }
+  .precio-p { text-align: center; padding: 4px 10px; border-radius: 10px; background: var(--logro-suave); }
+  .precio-p b { display: block; font-size: 17px; font-weight: 800; color: var(--logro-texto); }
+  .precio-p span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .abajo { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .abajo .tacho { width: 56px; display: grid; place-items: center; color: var(--texto-3); }
+  .abajo .cantidad { height: 40px; }
+  .abajo .cantidad button { width: 40px; }
+  .margen-p { white-space: nowrap; height: 40px; padding: 0 10px; border-radius: 12px; background: var(--hundido); font-weight: 750; font-size: 14px; display: inline-flex; align-items: center; gap: 4px; }
+  .abajo .sub { margin-left: auto; font-weight: 800; font-size: 19px; }
+  .card.falta { border-color: #F3C766; background: linear-gradient(180deg, var(--urgente-suave), #fff 70%); }
+  .margenes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 10px; }
+  .margenes b { height: 40px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); color: var(--urgente-texto); display: grid; place-items: center; font-size: 15px; }
+  /* El medio de pago: una pastilla que abre la lista (de la v3), con los íconos de la aplicación de hoy. */
+  .pago { position: relative; display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .elige { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 10px; border-radius: 99px; border: 2px solid var(--c); background: var(--cs); font-weight: 800; font-size: 15px; color: var(--tinta); }
+  .ic-medio { display: inline-grid; place-items: center; color: var(--c); }
+  .ic-medio svg { display: block; }
+  .lista-medios { position: absolute; left: 0; bottom: 52px; z-index: 30; min-width: 230px; padding: 6px; border-radius: 16px; background: #fff; border: 1px solid var(--borde); box-shadow: 0 16px 40px -8px rgba(26,29,27,.35); display: none; transform-origin: 20% 100%; }
+  .lista-medios.abierta { display: grid; animation: v-abre 180ms cubic-bezier(.2,.9,.3,1) both; }
+  @keyframes v-abre { from { opacity: 0; transform: scale(.94) translateY(6px); } }
+  .lista-medios button { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 10px; border: 0; border-radius: 10px; background: none; font: inherit; font-weight: 700; font-size: 15px; color: var(--tinta); text-align: left; }
+  .lista-medios button .ic-medio { width: 34px; height: 34px; border-radius: 10px; background: var(--cs); }
+  .lista-medios button.elegido { background: var(--cs); }
+  .lista-medios button .tilde { margin-left: auto; color: var(--c); visibility: hidden; }
+  .lista-medios button.elegido .tilde { visibility: visible; }
+  /* Cobrar deslizando (de la v3). */
+  .deslizar { height: 60px; border-radius: 99px; background: var(--accion); position: relative; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 17px; box-shadow: var(--sombra-accion); touch-action: none; user-select: none; }
+  .deslizar .pulgar { position: absolute; left: 5px; top: 5px; width: 50px; height: 50px; border-radius: 99px; background: #fff; color: var(--accion); display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+  .deslizar .flechas { position: absolute; right: 18px; opacity: .6; display: flex; }
+  .deslizar.apagado { filter: saturate(.35); opacity: .55; }
+  /* Escanear: la cámara entra arriba y empuja la venta hacia abajo, que se sigue viendo. */
+  .camara-arriba { position: relative; height: 0; margin: 0 -16px; overflow: hidden; background: radial-gradient(120% 80% at 50% 45%, #4a4038 0%, #2a2420 45%, #120f0d 100%); transition: height 320ms cubic-bezier(.2,.9,.3,1), margin 320ms cubic-bezier(.2,.9,.3,1); }
+  .celu.escaneando .camara-arriba { height: 236px; margin-bottom: 4px; }
+  .camara-arriba .objeto { position: absolute; left: 50%; top: 52px; width: 190px; margin-left: -95px; transform: rotate(-8deg); filter: drop-shadow(0 18px 18px rgba(0,0,0,.55)) saturate(.9); transition: opacity 200ms; }
+  .camara-arriba .marco { position: absolute; left: 90px; right: 90px; top: 44px; height: 110px; transition: transform 200ms cubic-bezier(.34,1.4,.64,1); }
+  .camara-arriba .marco.cierra { transform: scale(.9); }
+  .camara-arriba .marco i { position: absolute; width: 28px; height: 28px; border: 4px solid #fff; }
+  .camara-arriba .marco .a { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 12px 0 0 0; }
+  .camara-arriba .marco .b { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 12px 0 0; }
+  .camara-arriba .marco .c { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 12px; }
+  .camara-arriba .marco .d { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 12px 0; }
+  .camara-arriba .cerrar { position: absolute; top: 10px; right: 12px; width: 44px; height: 44px; border-radius: 99px; background: rgba(0,0,0,.45); color: #fff; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.2); }
+  .camara-arriba .ayuda { position: absolute; left: 16px; top: 18px; font-size: 14px; font-weight: 700; color: rgba(255,255,255,.85); }
+  .camara-arriba .leido { position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 14px; background: rgba(255,255,255,.96); box-shadow: 0 10px 28px rgba(0,0,0,.4); }
+  .camara-arriba .leido:empty { display: none; }
+  .camara-arriba .leido .ok { width: 30px; height: 30px; border-radius: 99px; background: var(--logro); color: #fff; display: grid; place-items: center; flex: none; }
+  .camara-arriba .leido .n { font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .camara-arriba .leido .mas { margin-left: auto; white-space: nowrap; font-weight: 800; font-size: 15px; }
+  .celu.escaneando .buscar { display: none; }
+  .celu.escaneando .cab-lista { margin-top: 8px; }
+  .celu.escaneando .lista { height: 214px; }
+  .card.recien { border: 2px solid var(--logro); padding: 11px; }
+  .aviso-c { display: flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 700; color: var(--urgente-texto); margin: -2px 0 8px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Vender</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a class="activa" data-ir="vender">Vender</a><a data-ir="ventas-de-hoy">Ventas de hoy</a></nav>
+
+  <div class="celu-pantalla">
+    <div class="camara-arriba v-toca" data-visor>
+      <img class="objeto" src="../../../_comun/fotos/lampara.webp" alt="">
+      <div class="marco"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><span class="v-laser"></span></div>
+      <span class="ayuda">Apuntá al código · tocá para leer</span>
+      <span class="cerrar v-toca" data-cerrar-cam role="button" aria-label="Cerrar la cámara"><i class="i" data-i="x"></i></span>
+      <div class="leido"></div>
+    </div>
+    <div class="buscar">
+      <div class="campo v-toca" data-buscar role="button"><i class="i" data-i="search"></i>Producto, código o marca</div>
+      <button class="btn btn-oscuro" data-escanear aria-label="Escanear"><i class="i i-l" data-i="scan-barcode"></i></button>
+    </div>
+    <div class="cab-lista"><b>Esta venta</b><span class="pastilla">5</span><button class="btn btn-fantasma chico" data-vaciar><i class="i i-s" data-i="trash-2"></i>Vaciar</button></div>
+
+    <div class="lista">
+      <div class="card">
+        <div class="arriba"><div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div><div class="n">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · 14 un.</div></div><div class="precio-p"><b class="num">$7.000</b><span>cada una</span></div></div>
+        <div class="abajo"><span class="tacho"><i class="i" data-i="trash-2"></i></span><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">3</span><button><i class="i i-s" data-i="plus"></i></button></span><span class="margen-p">100 %<i class="i i-s" data-i="chevron-down"></i></span><span class="sub num">$21.000</span></div>
+      </div>
+      <div class="card falta">
+        <div class="arriba"><div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · 3 un.</div></div><div class="precio-p" style="background:#fff;box-shadow:inset 0 0 0 1.5px var(--urgente)"><b style="color:var(--urgente-texto);font-size:15px">Sin precio</b><span>costo $4.150</span></div></div>
+        <div class="margenes"><b>300</b><b>200</b><b>100</b><b>50</b><b>25</b><b>$</b></div>
+      </div>
+      <div class="card">
+        <div class="arriba"><div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div><div class="n">Cinta métrica PowerLock 5 m</div><div class="d">Stanley · 6 un. · <i class="i i-s" data-i="monitor"></i> de la compu</div></div><div class="precio-p"><b class="num">$17.000</b><span>cada una</span></div></div>
+        <div class="abajo"><span class="tacho"><i class="i" data-i="trash-2"></i></span><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1</span><button><i class="i i-s" data-i="plus"></i></button></span><span class="margen-p">50 %<i class="i i-s" data-i="chevron-down"></i></span><span class="sub num">$17.000</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="barra-accion">
+    <div class="aviso-c"><i class="i i-s" data-i="triangle-alert"></i>Falta el precio de los tarugos</div>
+    <div class="pago">
+      <span class="elige medio efectivo v-toca" data-medio role="button" aria-haspopup="listbox"><span class="ic-medio"></span><span data-nombre>Efectivo</span><i class="i i-s" data-i="chevron-down"></i></span>
+      <span class="t-detalle">Cómo paga</span>
+      <div class="lista-medios" role="listbox"></div>
+    </div>
+    <div class="deslizar" data-cobrar><span class="pulgar"><i class="i i-l" data-i="arrow-right"></i></span><span class="txt">Deslizá para cobrar <span class="num">$45.500</span></span><span class="flechas"><i class="i" data-i="chevron-right"></i></span></div>
+  </div>
+  <nav class="nav-inferior">
+    <a class="activo" data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="v-toca" data-menu-mas><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script src="../../interacciones.js"></script>
+<script>
+// La elegida (Carlos, 2026-10-19): la v2 (Mostrador) con tres cosas de la v3 (Cámara primero): el
+// medio de pago es una pastilla que abre la lista, con los íconos de la aplicación de hoy; se cobra
+// deslizando el botón hasta el final; y Escanear abre la cámara arriba, empujando la venta hacia
+// abajo para que se sigan viendo los productos que entran.
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var lista = $('.lista'), desl = $('[data-cobrar]'), pulgar = $('.deslizar .pulgar'), txtEl = $('.deslizar .txt'), avisoC = $('.aviso-c'), celu = $('.celu');
+  var items = [V.item('mecha', 3), V.item('tarugos', 1), V.item('cinta', 1, { compu: true }), V.item('clavos', .7), V.libre('Bolsa de arena × 25 kg', 1500)];
+  var medio = 'efectivo', cliente = null;
+  V.ajustes.tostadaAbajo = celu.getBoundingClientRect().bottom - $('.barra-accion').getBoundingClientRect().top + 10;
+  // Se vuelve desplazable después del primer dibujo, para que quieta se vea idéntica.
+  var primerDibujo = true;
+
+  function cada(it) { return it.unidad === 'kg' ? 'el kg' : /^(la|las) /.test(it.corto || '') ? 'cada una' : 'cada uno'; }
+  function card(it) {
+    var p = V.precio(it), s = V.subtotal(it);
+    var foto = it.libre ? '<div class="foto-icono"><i class="i i-l" data-i="package-plus"></i></div>' : '<div class="foto"><img src="../../../_comun/fotos/' + it.foto + '.webp" alt=""></div>';
+    var d = it.libre ? 'Ítem libre · ' + (p == null ? 'sin precio' : 'a mano') : it.marca + ' · ' + V.stockTexto(it) + (it.compu ? ' · <i class="i i-s" data-i="monitor"></i> de la compu' : '');
+    var arriba = '<div class="arriba v-toca" data-ficha>' + foto + '<div><div class="n">' + V.html(it.nombre) + '</div><div class="d">' + d + '</div></div>';
+    if (p == null) {
+      var mm = it.libre ? '<b style="grid-column:1/-1" data-mano>Poné el precio a mano</b>' : V.MARGENES.map(function (m) { return '<b data-m="' + m + '">' + m + '</b>'; }).join('') + '<b data-mano>$</b>';
+      return '<div class="card falta" data-k="' + it.k + '">' + arriba + '<div class="precio-p" style="background:#fff;box-shadow:inset 0 0 0 1.5px var(--urgente)"><b style="color:var(--urgente-texto);font-size:15px">Sin precio</b><span>' + (it.libre ? 'ítem libre' : 'costo ' + V.pesos(it.costo)) + '</span></div></div><div class="margenes">' + mm + '</div></div>';
+    }
+    arriba += '<div class="precio-p"><b class="num" data-rueda>' + V.pesos(p) + '</b><span>' + (it.mano != null ? 'a mano' : cada(it)) + '</span></div></div>';
+    var mp = it.libre ? '<span class="margen-p v-toca" data-margen>$ a mano</span>' : '<span class="margen-p v-toca" data-margen>' + (it.mano != null ? 'a mano' : it.margen + ' %') + '<i class="i i-s" data-i="chevron-down"></i></span>';
+    return '<div class="card" data-k="' + it.k + '">' + arriba + '<div class="abajo"><span class="tacho v-toca" data-quitar><i class="i" data-i="trash-2"></i></span><span class="cantidad"><button data-menos aria-label="Uno menos"><i class="i i-s" data-i="minus"></i></button><span class="n" data-rueda>' + V.num(it.cant) + (it.unidad === 'kg' ? '<span class="u">kg</span>' : '') + '</span><button data-mas aria-label="Uno más"><i class="i i-s" data-i="plus"></i></button></span>' + mp + '<span class="sub num" data-rueda>' + V.pesos(s) + '</span></div></div>';
+  }
+  function render(nuevos) {
+    if (!primerDibujo) V.sinBarras(lista); primerDibujo = false;
+    if (!items.length) { lista.innerHTML = V.vacia('La venta está vacía', 'Buscá o escaneá un producto para empezar.'); V.pintar(lista); }
+    else V.redibujar(lista, items.map(card).join(''), nuevos);
+    var n = items.length, f = V.faltan(items), tot = V.total(items);
+    $('.cab-lista .pastilla').textContent = n;
+    var ins = $('.nav-inferior .insignia'), antes = +ins.textContent; ins.textContent = n; ins.style.display = n ? '' : 'none'; if (n > antes) V.saltar(ins);
+    if (f.length) { avisoC.style.display = ''; avisoC.lastChild.textContent = f.length === 1 ? 'Falta el precio de ' + f[0].corto : 'Faltan ' + f.length + ' precios: ' + f.map(function (x) { return x.corto; }).join(' y '); }
+    else avisoC.style.display = 'none';
+    V.poner($('.deslizar .num'), V.pesos(tot));
+    desl.classList.toggle('apagado', !n);
+  }
+  function buscarItem(k) { for (var i = 0; i < items.length; i++) if (items[i].k === k) return items[i]; return null; }
+  function elDe(k) { return lista.querySelector('[data-k="' + k + '"]'); }
+  function agregar(id) {
+    var antes = items.length, it = V.sumar(items, id, 1, null, true);
+    render([it.k]); if (items.length === antes) V.entra(elDe(it.k));
+    lista.querySelectorAll('.recien').forEach(function (c) { c.classList.remove('recien'); });
+    if (escaneando) { elDe(it.k).classList.add('recien'); lista.scrollTop = 0; }
+    elDe(it.k).scrollIntoView({ block: 'nearest' }); $('.celu-pantalla').scrollTop = 0; V.vibrar(10);
+    return it;
+  }
+  function quitar(it) {
+    var i = items.indexOf(it);
+    V.sale([elDe(it.k)], function () {
+      items.splice(i, 1); render();
+      V.tostada('Quitaste ' + it.corto, { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items.splice(i, 0, it); render([it.k]); } });
+    });
+  }
+  // Los íconos de los medios, los mismos de la aplicación de hoy (billete, isotipo de Mercado Pago, tarjeta, libreta).
+  var DIBUJO = { efectivo: 'M3 7h18v10H3ZM12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM6 10v4M18 10v4', tarjeta: 'M3 6h18v12H3ZM3 10h18M7 15h4', cuenta: 'M6 3h12v18H6ZM9 8h6M9 12h6M9 16h3' };
+  var ISOTIPO_MP = 'M11.115 16.479a.93.927 0 0 1-.939-.886c-.002-.042-.006-.155-.103-.155-.04 0-.074.023-.113.059-.112.103-.254.206-.46.206a.816.814 0 0 1-.305-.066c-.535-.214-.542-.578-.521-.725.006-.038.007-.08-.02-.11l-.032-.03h-.034c-.027 0-.055.012-.093.039a.788.786 0 0 1-.454.16.7.699 0 0 1-.253-.05c-.708-.27-.65-.928-.617-1.126.005-.041-.005-.072-.03-.092l-.05-.04-.047.043a.728.726 0 0 1-.505.203.73.728 0 0 1-.732-.725c0-.4.328-.722.732-.722.364 0 .675.27.721.63l.026.195.11-.165c.01-.018.307-.46.852-.46.102 0 .21.016.316.05.434.13.508.52.519.68.008.094.075.1.09.1.037 0 .064-.024.083-.045a.746.744 0 0 1 .54-.225c.128 0 .263.03.402.09.69.293.379 1.158.374 1.167-.058.144-.061.207-.005.244l.027.013h.02c.03 0 .07-.014.134-.035.093-.032.235-.08.367-.08a.944.942 0 0 1 .94.93.936.934 0 0 1-.94.928zm7.302-4.171c-1.138-.98-3.768-3.24-4.481-3.77-.406-.302-.685-.462-.928-.533a1.559 1.554 0 0 0-.456-.07c-.182 0-.376.032-.58.095-.46.145-.918.505-1.362.854l-.023.018c-.414.324-.84.66-1.164.73a1.986 1.98 0 0 1-.43.049c-.362 0-.687-.104-.81-.258-.02-.025-.007-.066.04-.125l.008-.008 1-1.067c.783-.774 1.525-1.506 3.23-1.545h.085c1.062 0 2.12.469 2.24.524a7.03 7.03 0 0 0 3.056.724c1.076 0 2.188-.263 3.354-.795a9.135 9.11 0 0 0-.405-.317c-1.025.44-2.003.66-2.946.66-.962 0-1.925-.229-2.858-.68-.05-.022-1.22-.567-2.44-.57-.032 0-.065 0-.096.002-1.434.033-2.24.536-2.782.976-.528.013-.982.138-1.388.25-.361.1-.673.186-.979.185-.125 0-.35-.01-.37-.012-.35-.01-2.115-.437-3.518-.962-.143.1-.28.203-.415.31 1.466.593 3.25 1.053 3.812 1.089.157.01.323.027.491.027.372 0 .744-.103 1.104-.203.213-.059.446-.123.692-.17l-.196.194-1.017 1.087c-.08.08-.254.294-.14.557a.705.703 0 0 0 .268.292c.243.162.677.27 1.08.271.152 0 .297-.015.43-.044.427-.095.874-.448 1.349-.82.377-.296.913-.672 1.323-.782a1.494 1.49 0 0 1 .37-.05.611.61 0 0 1 .095.005c.27.034.533.125 1.003.472.835.62 4.531 3.815 4.566 3.846.002.002.238.203.22.537-.007.186-.11.352-.294.466a.902.9 0 0 1-.484.15.804.802 0 0 1-.428-.124c-.014-.01-1.28-1.157-1.746-1.543-.074-.06-.146-.115-.22-.115a.122.122 0 0 0-.096.045c-.073.09.01.212.105.294l1.48 1.47c.002 0 .184.17.204.395.012.244-.106.447-.35.606a.957.955 0 0 1-.526.171.766.764 0 0 1-.42-.127l-.214-.206a21.035 20.978 0 0 0-1.08-1.009c-.072-.058-.148-.112-.221-.112a.127.127 0 0 0-.094.038c-.033.037-.056.103.028.212a.698.696 0 0 0 .075.083l1.078 1.198c.01.01.222.26.024.511l-.038.048a1.18 1.178 0 0 1-.1.096c-.184.15-.43.164-.527.164a.8.798 0 0 1-.147-.012c-.106-.018-.178-.048-.212-.089l-.013-.013c-.06-.06-.602-.609-1.054-.98-.059-.05-.133-.11-.21-.11a.128.128 0 0 0-.096.042c-.09.096.044.24.1.293l.92 1.003a.204.204 0 0 1-.033.062c-.033.044-.144.155-.479.196a.91.907 0 0 1-.122.007c-.345 0-.712-.164-.902-.264a1.343 1.34 0 0 0 .13-.576 1.368 1.365 0 0 0-1.42-1.357c.024-.342-.025-.99-.697-1.274a1.455 1.452 0 0 0-.575-.125c-.146 0-.287.025-.42.075a1.153 1.15 0 0 0-.671-.564 1.52 1.515 0 0 0-.494-.085c-.28 0-.537.08-.767.242a1.168 1.165 0 0 0-.903-.43 1.173 1.17 0 0 0-.82.335c-.287-.217-1.425-.93-4.467-1.613a17.39 17.344 0 0 1-.692-.189 4.822 4.82 0 0 0-.077.494l.67.157c3.108.682 4.136 1.391 4.309 1.525a1.145 1.142 0 0 0-.09.442 1.16 1.158 0 0 0 1.378 1.132c.096.467.406.821.879 1.003a1.165 1.162 0 0 0 .415.08c.09 0 .179-.012.266-.034.086.22.282.493.722.668a1.233 1.23 0 0 0 .457.094c.122 0 .241-.022.355-.063a1.373 1.37 0 0 0 1.269.841c.37.002.726-.147.985-.41.221.121.688.341 1.163.341.06 0 .118-.002.175-.01.47-.059.689-.24.789-.382a.571.57 0 0 0 .048-.078c.11.032.234.058.373.058.255 0 .501-.086.75-.265.244-.174.418-.424.444-.637v-.01c.083.017.167.026.251.026.265 0 .527-.082.773-.242.48-.31.562-.715.554-.98a1.28 1.279 0 0 0 .978-.194 1.04 1.04 0 0 0 .502-.808 1.088 1.085 0 0 0-.16-.653c.804-.342 2.636-1.003 4.795-1.483a4.734 4.721 0 0 0-.067-.492 27.742 27.667 0 0 0-5.049 1.62zm5.123-.763c0 4.027-5.166 7.293-11.537 7.293-6.372 0-11.538-3.266-11.538-7.293 0-4.028 5.165-7.293 11.539-7.293 6.371 0 11.537 3.265 11.537 7.293zm.46.004c0-4.272-5.374-7.755-12-7.755S.002 7.277.002 11.55L0 12.004c0 4.533 4.695 8.203 11.999 8.203 7.347 0 12-3.67 12-8.204z';
+  function icono(k, t) {
+    return k === 'mp' ? '<svg width="' + (t + 6) + '" height="' + (t + 6) + '" viewBox="0 0 24 24" fill="currentColor"><path d="' + ISOTIPO_MP + '"/></svg>'
+      : '<svg width="' + t + '" height="' + t + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + DIBUJO[k] + '"/></svg>';
+  }
+  var pill = $('[data-medio]'), menu = $('.lista-medios');
+  menu.innerHTML = V.ORDEN_MEDIOS.map(function (k) { return '<button class="medio ' + k + '" role="option" data-m="' + k + '"><span class="ic-medio">' + icono(k, 20) + '</span>' + V.MEDIOS[k].nombre + '<i class="i i-s tilde" data-i="check"></i></button>'; }).join('');
+  function elegirMedio(k) {
+    medio = k; V.ORDEN_MEDIOS.forEach(function (x) { pill.classList.toggle(x, x === k); });
+    pill.querySelector('.ic-medio').innerHTML = icono(k, 20); pill.querySelector('[data-nombre]').textContent = V.MEDIOS[k].nombre;
+    menu.querySelectorAll('[data-m]').forEach(function (b) { b.classList.toggle('elegido', b.getAttribute('data-m') === k); b.setAttribute('aria-selected', b.getAttribute('data-m') === k); });
+  }
+  function abrirMedios(si) { menu.classList.toggle('abierta', si); }
+  pill.addEventListener('click', function (e) { e.stopPropagation(); abrirMedios(!menu.classList.contains('abierta')); });
+  menu.addEventListener('click', function (e) { var b = e.target.closest('[data-m]'); if (!b) return; e.stopPropagation(); elegirMedio(b.getAttribute('data-m')); abrirMedios(false); V.vibrar(10); });
+  document.addEventListener('click', function (e) { if (!e.target.closest('.pago')) abrirMedios(false); });
+  // Cobrar deslizando: hasta el 85 % cobra; antes, el pulgar vuelve.
+  var max = function () { return desl.clientWidth - pulgar.offsetWidth - 10; };
+  function volverPulgar() { V.animar(pulgar, [{ transform: pulgar.style.transform || 'none' }, { transform: 'none' }], 320, 'cubic-bezier(.34,1.4,.64,1)'); pulgar.style.transform = ''; txtEl.style.opacity = ''; }
+  V.arrastre(desl, {
+    desde: '.pulgar',
+    mover: function (dx) { if (!items.length) return; var x = Math.max(0, Math.min(max(), dx)); pulgar.style.transform = 'translateX(' + x + 'px)'; txtEl.style.opacity = String(1 - x / max()); },
+    soltar: function (dx) { if (items.length && dx >= max() * .85) { pulgar.style.transform = 'translateX(' + max() + 'px)'; V.vibrar(10); setTimeout(cobrar, 120); } else volverPulgar(); }
+  });
+  desl.addEventListener('click', function () { if (!items.length) return; V.animar(pulgar, [{ transform: 'none' }, { transform: 'translateX(28px)' }, { transform: 'none' }], 420, 'cubic-bezier(.34,1.4,.64,1)'); V.tostada('Deslizá el botón hasta el final para cobrar', { icono: 'arrow-right' }); });
+  // Escanear: la cámara arriba; cada lectura suma el producto, que se ve entrar en la lista de abajo.
+  var escaneando = false, orden = ['lampara', 'tornillos', 'martillo', 'mecha', 'pinza', 'cinta'], nEsc = 0, leido = $('.camara-arriba .leido'), marco = $('.camara-arriba .marco'), objeto = $('.camara-arriba .objeto');
+  function escanear(si) { escaneando = si; celu.classList.toggle('escaneando', si); if (!si) { leido.innerHTML = ''; lista.querySelectorAll('.recien').forEach(function (c) { c.classList.remove('recien'); }); } }
+  function leer() {
+    var id = orden[nEsc++ % orden.length], it = agregar(id), p = V.precio(it);
+    marco.classList.add('cierra'); setTimeout(function () { marco.classList.remove('cierra'); }, 220);
+    leido.innerHTML = '<span class="ok"><i class="i i-s" data-i="check"></i></span><div class="n">' + V.html(it.nombre) + '</div><span class="mas num">' + (p == null ? 'Sin precio' : '+ ' + V.pesos(p)) + '</span>';
+    V.pintar(leido); V.animar(leido, [{ transform: 'translateY(10px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 280, 'cubic-bezier(.34,1.4,.64,1)');
+    setTimeout(function () { objeto.src = '../../../_comun/fotos/' + V.producto(orden[nEsc % orden.length]).foto + '.webp'; }, 200);
+  }
+  $('[data-visor]').addEventListener('click', function (e) { if (e.target.closest('[data-cerrar-cam]')) { e.stopPropagation(); escanear(false); return; } leer(); });
+  function cobrar() {
+    var ok = V.puedeCobrar(items, medio, cliente, function (f) { volverPulgar(); var el = elDe(f[0].k); el.scrollIntoView({ block: 'nearest' }); V.sacudir(el); V.sacudir(avisoC); V.vibrar([10, 40, 10]); });
+    if (ok === 'cliente') { volverPulgar(); V.elegirCliente(function (n) { cliente = n; if (n) cobrar(); }); return; }
+    if (!ok) return;
+    pulgar.innerHTML = '<i class="i i-l" data-i="check"></i>'; V.pintar(pulgar);
+    var total = V.total(items), n = items.length, cli = cliente, med = medio;
+    escanear(false);
+    V.sale(lista.children, function () { items = []; cliente = null; render(); elegirMedio('efectivo'); setTimeout(function () { pulgar.innerHTML = '<i class="i i-l" data-i="arrow-right"></i>'; V.pintar(pulgar); volverPulgar(); }, 400); });
+    V.listo({ total: total, medio: med, cliente: cli, cantidad: n });
+  }
+  function ficha(it) { V.margenHoja(it, { conCantidad: true, alCambiar: function () { render(); }, alQuitar: function () { quitar(it); } }); }
+
+  lista.addEventListener('click', function (e) {
+    var c = e.target.closest('.card'); if (!c) return;
+    var it = buscarItem(c.getAttribute('data-k')); if (!it) return;
+    var m = e.target.closest('[data-m]');
+    if (m) { it.margen = +m.getAttribute('data-m'); it.mano = null; V.vibrar(10); render(); return; }
+    if (e.target.closest('[data-mano]')) { V.precioAMano(it, function (n) { it.mano = n; render(); }); return; }
+    if (e.target.closest('[data-mas]')) { it.cant = Math.round((it.cant + V.paso(it)) * 10) / 10; render(); return; }
+    if (e.target.closest('[data-menos]')) { if (it.cant - V.paso(it) > .05) { it.cant = Math.round((it.cant - V.paso(it)) * 10) / 10; render(); } else quitar(it); return; }
+    if (e.target.closest('[data-quitar]')) { quitar(it); return; }
+    if (e.target.closest('[data-margen]')) { if (it.libre) V.precioAMano(it, function (n) { it.mano = n; render(); }); else V.margenHoja(it, { alCambiar: function () { render(); } }); return; }
+    if (e.target.closest('[data-ficha]')) ficha(it);
+  });
+  $('[data-buscar]').addEventListener('click', function () {
+    V.buscarHoja(function (id, texto) {
+      if (id) { agregar(id); return; }
+      var it = V.libre(texto.charAt(0).toUpperCase() + texto.slice(1), null); items.unshift(it); render([it.k]); lista.scrollTop = 0;
+      setTimeout(function () { V.precioAMano(it, function (n) { it.mano = n; render(); }); }, V.mover ? 340 : 0);
+    });
+  });
+  $('[data-escanear]').addEventListener('click', function () { escanear(true); setTimeout(leer, V.mover ? 900 : 0); });
+  $('[data-vaciar]').addEventListener('click', function () {
+    if (!items.length) { V.tostada('La venta ya está vacía', { icono: 'info' }); return; }
+    var copia = items.slice();
+    V.sale(lista.children, function () { items = []; render(); V.tostada('Vaciaste la venta', { icono: 'trash-2', accion: 'Deshacer', alAccion: function () { items = copia; render(copia.map(function (x) { return x.k; })); } }); });
+  });
+  $('[data-menu-mas]').addEventListener('click', function () { V.mas(); });
+  elegirMedio('efectivo');
+  render([]);
+})();
+</script>
+</body>
+</html>
