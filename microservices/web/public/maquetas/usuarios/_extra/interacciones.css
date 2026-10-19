@@ -1,0 +1,136 @@
+/* Interacciones de las maquetas de Usuarios: capas (diálogo, panel, hoja, menú), tostada y movimiento.
+   Solo variables de comun.css. Quieta, la maqueta no cambia: todo esto aparece al tocar. */
+
+[data-ir], [data-mas], [data-accion], .fila, .contacto, .per .top, .casilla, .perm, .lr, .chip, .gc { cursor: pointer; }
+.casilla.bloq { cursor: not-allowed; }
+
+/* Velo */
+.u-velo { position: fixed; inset: 0; z-index: 50; background: rgba(26, 29, 27, .30); opacity: 0; transition: opacity var(--t-nav) var(--curva); }
+.u-velo.transparente { background: transparent; }
+.u-velo.abierto { opacity: 1; }
+.celu .u-velo { position: absolute; }
+
+/* Diálogo centrado (computadora y celular) */
+.u-dialogo { position: fixed; z-index: 51; left: 50%; top: 50%; width: 460px; max-width: calc(100% - 32px); max-height: calc(100% - 48px); overflow: auto;
+  background: var(--superficie); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); padding: 20px; display: flex; flex-direction: column; gap: 14px;
+  opacity: 0; transform: translate(-50%, -48%) scale(.98); transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+.u-dialogo.abierto { opacity: 1; transform: translate(-50%, -50%); }
+.celu .u-dialogo { position: absolute; width: 358px; padding: 18px; }
+
+/* Panel que entra desde la derecha (computadora) */
+.u-panel { position: fixed; z-index: 51; top: 16px; right: 16px; bottom: 16px; width: 360px; overflow: auto; background: var(--superficie);
+  border: 1px solid var(--borde); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); padding: 16px 18px; display: flex; flex-direction: column; gap: 12px;
+  opacity: 0; transform: translateX(24px); transition: opacity var(--t-nav) var(--curva), transform var(--t-nav) var(--curva); }
+.u-panel.abierto { opacity: 1; transform: none; }
+
+/* Hoja que sube (celular) */
+.u-hoja { position: absolute; z-index: 51; left: 0; right: 0; bottom: 0; max-height: 780px; overflow: auto; background: var(--fondo);
+  border-radius: 24px 24px 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 28px; display: flex; flex-direction: column; gap: 12px;
+  transform: translateY(100%); transition: transform var(--t-nav) var(--curva); }
+.u-hoja.abierto { transform: none; }
+.u-hoja.arrastrando { transition: none; }
+.u-hoja .asa, .u-asa { width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 4px; flex: none; }
+
+/* Menú chico */
+.u-menu { position: fixed; z-index: 51; min-width: 240px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta);
+  box-shadow: var(--sombra-3); padding: 6px; display: grid; gap: 2px;
+  opacity: 0; transform: translateY(-4px) scale(.98); transform-origin: top left; transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+.u-menu.abierto { opacity: 1; transform: none; }
+.celu .u-menu { position: absolute; }
+.u-op { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent;
+  font: inherit; font-size: 15px; font-weight: 650; color: var(--tinta); text-align: left; cursor: pointer; width: 100%; }
+.u-op:hover, .u-op:focus-visible { background: var(--hundido); outline: none; }
+.u-op .i { color: var(--texto-2); }
+.u-op .pastilla { margin-left: auto; height: 24px; }
+.u-op.elegida { color: var(--pino); }
+.u-op.elegida .i { color: var(--pino); }
+.u-op.peligro { color: var(--error-texto); }
+.u-op.peligro .i { color: var(--error-texto); }
+
+/* Cabecera y pie de una capa */
+.u-cab { display: flex; align-items: center; gap: 12px; }
+.u-cab .t-seccion { flex: 1; }
+.u-pie { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+.u-pie .btn { min-width: 112px; }
+.celu .u-pie .btn { flex: 1; }
+.u-et { font-size: 14px; font-weight: 700; color: var(--texto-2); margin-bottom: 6px; display: block; }
+.u-input { width: 100%; height: 48px; padding: 0 14px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: var(--superficie);
+  font: inherit; font-size: 16px; font-weight: 600; color: var(--tinta); outline: none; }
+.u-input:focus { border-color: var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); }
+.u-input.mal { border-color: var(--error); box-shadow: 0 0 0 4px rgba(215, 55, 42, .10); }
+.u-error { font-size: 14px; font-weight: 650; color: var(--error-texto); margin-top: 6px; display: flex; gap: 6px; align-items: center; }
+.u-lista-roles { display: grid; gap: 8px; }
+.u-rolfila { display: grid; grid-template-columns: 22px 36px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--borde);
+  border-radius: var(--r); background: var(--superficie); cursor: pointer; }
+.u-rolfila .ico { width: 36px; height: 36px; border-radius: 10px; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; }
+.u-rolfila.si { border-color: var(--pino); background: var(--pino-suave); }
+.u-rolfila.si .ico { background: #fff; color: var(--pino); }
+.u-rolfila.bloq { cursor: not-allowed; }
+.u-rolfila .n { font-weight: 700; font-size: 15px; line-height: 20px; }
+.u-rolfila .d { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+
+/* Ficha de una persona dentro de un panel (las mismas piezas que la ficha fija de la compu 1) */
+.u-panel .quien { display: flex; gap: 14px; align-items: center; }
+.u-panel .quien .nombre { font-size: 20px; font-weight: 800; letter-spacing: -.01em; line-height: 26px; }
+.u-panel h3 { margin: 0; font-size: 14px; font-weight: 750; color: var(--texto-2); display: flex; justify-content: space-between; align-items: center; }
+.u-panel .puede { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+.u-panel .disp { padding: 8px 10px; }
+.u-panel .pie-ficha { margin-top: auto; display: flex; gap: 8px; }
+
+/* Tostada flotante */
+.u-tostadas { position: fixed; z-index: 70; left: 50%; bottom: 28px; transform: translateX(-50%); display: grid; gap: 8px; justify-items: center; pointer-events: none; }
+.celu .u-tostadas { position: absolute; bottom: 104px; width: calc(100% - 32px); }
+.u-tostadas .tostada { pointer-events: auto; opacity: 0; transform: translateY(12px); transition: opacity var(--t) var(--curva), transform var(--t) var(--rebote); max-width: 100%; }
+.u-tostadas .tostada.abierto { opacity: 1; transform: none; }
+.tostada .deshacer { margin-left: 4px; border: 1px solid rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .14); color: #fff; border-radius: 8px;
+  height: 28px; padding: 0 10px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.tostada.mal { background: var(--error-texto); }
+
+/* Movimiento */
+@keyframes u-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes u-baja { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+@keyframes u-sube { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+@keyframes u-pop { 0% { transform: scale(.6); } 100% { transform: scale(1); } }
+@keyframes u-salta { 0%, 100% { transform: none; } 40% { transform: translateY(-5px) scale(1.15); } }
+@keyframes u-funde { from { opacity: .2; } to { opacity: 1; } }
+@keyframes u-no { 0%, 100% { transform: none; } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@keyframes u-gira { to { transform: rotate(360deg); } }
+@keyframes u-rueda-sube { from { opacity: 0; transform: translateY(60%); } to { opacity: 1; transform: none; } }
+@keyframes u-rueda-baja { from { opacity: 0; transform: translateY(-60%); } to { opacity: 1; transform: none; } }
+.u-nuevo { animation: u-entra var(--t-nav) var(--rebote) both; }
+.u-nuevo-arriba { animation: u-baja var(--t-nav) var(--rebote) both; }
+.u-sube { animation: u-sube var(--t-nav) var(--rebote) both; }
+.u-logro { border-color: var(--logro) !important; }
+.u-pop { animation: u-pop var(--t) var(--rebote) both; }
+.u-salta { animation: u-salta 360ms var(--rebote); }
+.u-funde { animation: u-funde var(--t) var(--curva) both; }
+.u-no { animation: u-no 240ms var(--curva); }
+.u-rueda-sube { display: inline-block; animation: u-rueda-sube var(--t) var(--curva); }
+.u-rueda-baja { display: inline-block; animation: u-rueda-baja var(--t) var(--curva); }
+.u-sale { opacity: 0 !important; transform: scale(.96) !important; transition: opacity var(--t) var(--curva-salida), transform var(--t) var(--curva-salida) !important; }
+.u-sale-izq { opacity: 0 !important; transform: translateX(-100%) !important; transition: opacity var(--t) var(--curva-salida), transform var(--t) var(--curva-salida) !important; }
+.u-oculto { display: none !important; }
+.u-chev { transition: transform var(--t-nav) var(--curva); }
+.u-chev.girado { transform: rotate(180deg); }
+
+/* Tilde que se dibuja */
+.u-tilde path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: u-dibuja 300ms var(--curva) forwards; }
+@keyframes u-dibuja { to { stroke-dashoffset: 0; } }
+
+/* Arrastre (compu 3) */
+.u-fantasma { position: fixed; z-index: 80; pointer-events: none; box-shadow: var(--sombra-3); border: 2px solid #fff; transform: rotate(-6deg); }
+
+/* Sin movimiento */
+.u-quieto *, .u-quieto *::before, .u-quieto *::after { transition: none !important; animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* La llave de prender y apagar: el círculo se desliza con transform (misma posición que usuarios.css) */
+.llave::after { transition: transform var(--t) var(--curva); }
+.llave.si::after { left: 3px; transform: translateX(18px); }
+.llave { transition: background-color var(--t) var(--curva); }
+
+/* El sensor de huella late mientras espera */
+@keyframes u-latido { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: .75; } }
+.u-latido { animation: u-latido 900ms var(--curva) infinite; }

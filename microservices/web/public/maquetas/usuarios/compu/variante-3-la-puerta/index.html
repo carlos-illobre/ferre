@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../_extra/usuarios.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_extra/interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .cabecera { padding-top: 20px; }
   .pantalla { display: grid; grid-template-columns: 372px minmax(0,1fr) 316px; gap: 20px; padding-top: 16px; min-height: 0; }
@@ -48,11 +50,11 @@
 <div class="app plegado">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i></a>
-    <a class="nav-item"><i class="i" data-i="package"></i></a>
-    <a class="nav-item activo"><i class="i" data-i="chart-column"></i></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i></a>
+    <a class="nav-item" data-ir="vender" aria-label="Vender"><i class="i" data-i="shopping-cart"></i></a>
+    <a class="nav-item" data-ir="productos" aria-label="Catálogo"><i class="i" data-i="tags"></i></a>
+    <a class="nav-item" data-ir="stock" aria-label="Depósito"><i class="i" data-i="package"></i></a>
+    <a class="nav-item activo" data-ir="resumen" aria-label="Negocio"><i class="i" data-i="chart-column"></i></a>
+    <a class="nav-item" data-mas aria-label="Más"><i class="i" data-i="ellipsis"></i></a>
     <div class="pie" style="justify-items:center">
       <div class="vinculo" style="padding:10px"><i class="i" data-i="smartphone"></i></div>
       <span class="avatar">CI</span>
@@ -63,7 +65,7 @@
       <div><div class="t-titulo">Quién entra</div><div class="sub">La puerta, lo que está abierto ahora y las llaves de cada uno</div></div>
       <div class="acciones">
         <span class="pastilla logro"><span class="punto"></span>4 personas trabajando ahora</span>
-        <button class="btn chico"><i class="i i-s" data-i="history"></i>Quién hizo qué <span class="kbd">Alt Q</span></button>
+        <button class="btn chico" data-ir="actividad"><i class="i i-s" data-i="history"></i>Quién hizo qué <span class="kbd">Alt Q</span></button>
       </div>
     </header>
     <section class="pantalla" style="margin-top:4px">
@@ -118,5 +120,287 @@
     </section>
   </main>
 </div>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+/* Compu 3 · la puerta: dejar entrar a quien espera (con un rol y Enter) lo suma a su llave; el QR
+   simula que alguien escanea; Cerrar saca una sesión; arrastrar a una persona sobre una llave le da ese
+   rol; tocar una llave muestra quién la tiene y deja quitarla; tocar a alguien abre su ficha. */
+(function () {
+  var $ = U.$, $$ = U.$$;
+  var cols = $$('.pantalla > .col'), colPuerta = cols[0], colVivo = cols[1], colLlaves = cols[2];
+  var insignia = $('.col-t .insignia', colPuerta), qr = $('.qr', colPuerta);
+  var ROL_DE = ['vendedor', 'comprador', 'recepcion', 'gerente', 'admin'];
+  var llaves = $$('.llave-rol', colLlaves);
+  llaves.forEach(function (l, i) { l.setAttribute('data-rol', ROL_DE[i]); });
+  var panico = $('.panico', colLlaves);
+
+  /* ---- En la puerta ---- */
+  var puerta = [
+    { x: U.NUEVOS[0], cuando: 'Quiso entrar hoy 9:41 · Moto E13', rol: 'vendedor' },
+    { x: U.NUEVOS[1], cuando: 'Quiso entrar ayer 18:02', rol: 'vendedor' }
+  ];
+  var rechazados = [];
+  var CHIPS = [['vendedor', 'Vendedor'], ['recepcion', 'Recepción'], ['comprador', 'Comprador'], ['gerente', 'Gerente'], ['admin', 'Admin.']];
+  function grande(q) {
+    return '<div class="tarjeta pedido" data-mail="' + q.x.mail + '"><div class="quien">' + '<span class="av l ' + q.x.t + '">' + q.x.ini + '</span><div class="grow"><div class="t-renglon">' + q.x.n + '</div><div class="t-detalle ellipsis">' + q.x.mail + '</div><div class="t-detalle">' + q.cuando + '</div></div></div>' +
+      '<div class="t-etiqueta">¿Qué va a hacer?</div><div class="elegir">' + CHIPS.map(function (c) { return '<span class="chip' + (q.rol === c[0] ? ' elegido' : '') + '" data-rol="' + c[0] + '"><i data-i="' + U.ROLES[c[0]].i + '"></i>' + c[1] + '</span>'; }).join('') + '</div>' +
+      '<div class="lineal"><button class="btn btn-accion" style="flex:1" data-entrar><i class="i" data-i="user-check"></i>Dejarlo entrar <span class="kbd">Enter</span></button><button class="btn btn-fantasma" data-noes>No es de acá</button></div></div>';
+  }
+  function chica(q) {
+    return '<div class="tarjeta pedido-2" data-mail="' + q.x.mail + '"><span class="av ' + q.x.t + '">' + q.x.ini + '</span><div class="grow"><div class="t-renglon ellipsis">' + q.x.mail + '</div><div class="t-detalle">' + q.cuando + '</div></div><button class="btn chico" data-ver>Ver</button></div>';
+  }
+  function pintarPuerta(animarPrimera) {
+    $$('.pedido, .pedido-2, .u-vacia', colPuerta).forEach(function (e) { e.remove(); });
+    var html = puerta.length ? grande(puerta[0]) + puerta.slice(1).map(chica).join('') :
+      '<div class="tarjeta u-vacia" style="padding:16px;display:flex;gap:12px;align-items:center"><span class="foto-icono" style="width:44px;height:44px"><i class="i" data-i="door-open"></i></span><div class="t-detalle">Nadie esperando. Si alguien sin permiso quiere entrar, aparece acá.</div></div>';
+    qr.insertAdjacentHTML('beforebegin', html);
+    U.iconos(colPuerta);
+    if (animarPrimera) U.animar($('.pedido', colPuerta), 'u-nuevo-arriba', 500);
+    U.rodar(insignia, puerta.length); insignia.style.visibility = puerta.length ? '' : 'hidden';
+  }
+  // Las tarjetas que ya están dibujadas se conectan sin redibujarlas.
+  $('.pedido', colPuerta).setAttribute('data-mail', puerta[0].x.mail);
+  $$('.pedido .chip', colPuerta).forEach(function (c, i) { c.setAttribute('data-rol', CHIPS[i][0]); });
+  $('.pedido .btn-accion', colPuerta).setAttribute('data-entrar', '');
+  $('.pedido .btn-fantasma', colPuerta).setAttribute('data-noes', '');
+  $('.pedido-2 .btn', colPuerta).setAttribute('data-ver', '');
+
+  colPuerta.addEventListener('click', function (e) {
+    var ch = e.target.closest('.pedido .chip');
+    if (ch) { puerta[0].rol = ch.getAttribute('data-rol'); $$('.pedido .chip', colPuerta).forEach(function (c) { c.classList.toggle('elegido', c === ch); }); return; }
+    if (e.target.closest('[data-entrar]')) return dejarEntrar();
+    if (e.target.closest('[data-noes]')) return noEsDeAca();
+    var v = e.target.closest('[data-ver]');
+    if (v) { var m = v.closest('[data-mail]').getAttribute('data-mail'), i = puerta.map(function (q) { return q.x.mail; }).indexOf(m); puerta.unshift(puerta.splice(i, 1)[0]); pintarPuerta(true); return; }
+    if (e.target.closest('.qr')) abrirQR();
+  });
+  function dejarEntrar() {
+    if (!puerta.length) return;
+    var q = puerta[0], card = $('.pedido', colPuerta), dest = $('.llave-rol[data-rol="' + q.rol + '"]', colLlaves);
+    var a = card.getBoundingClientRect(), b = dest.getBoundingClientRect();
+    card.style.transition = 'transform 420ms var(--curva), opacity 420ms var(--curva)';
+    card.style.transformOrigin = 'top left';
+    card.style.transform = 'translate(' + (b.left - a.left) + 'px,' + (b.top - a.top) + 'px) scale(.3)';
+    card.style.opacity = '0';
+    setTimeout(function () {
+      var p = U.agregarPersona(q.x, [q.rol]);
+      p.nuevo = false; p.vivo = true; p.desde = 'Desde hoy';
+      p.sesiones = [{ n: q.x.aparato, i: 'smartphone', d: 'App · ahora', vivo: true }];
+      puerta.shift(); pintarPuerta(puerta.length > 0);
+      pintarPilas(q.rol, p.id);
+      agregarSesion(p, 'Recién entró', q.x.aparato);
+      U.tostada(U.primerNombre(p) + ' ya puede entrar como ' + U.ROLES[q.rol].n + '. Le avisamos en su ' + q.x.aparato + '.');
+    }, U.quieto ? 0 : 420);
+  }
+  function noEsDeAca() {
+    var q = puerta.shift(), card = $('.pedido', colPuerta);
+    rechazados.push(q.x.mail);
+    U.sacar(card, function () {
+      pintarPuerta(false);
+      U.tostada(q.x.n + ' no va a poder entrar.', { deshacer: function () { rechazados.splice(rechazados.indexOf(q.x.mail), 1); puerta.unshift(q); pintarPuerta(true); } });
+    });
+  }
+  // El QR: se abre grande y, a los segundos, alguien lo escanea y aparece en la puerta.
+  function abrirQR() {
+    var seg = 252, tic, llega;
+    var x = U.NUEVOS.filter(function (n) { return !U.persona(n.id) && rechazados.indexOf(n.mail) < 0 && !puerta.some(function (q) { return q.x.mail === n.mail; }); })[0];
+    var c = U.capa({ tipo: 'dialogo', html: '<div class="u-cab"><div class="t-seccion">Sumá a alguien sin tipear</div><button class="btn btn-suave btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i i-s" data-i="x"></i></button></div>' +
+      '<div style="display:grid;justify-items:center;gap:10px;text-align:center"><img data-qr src="../../_extra/qr.svg" alt="Código para entrar" style="width:240px;height:240px;transition:transform var(--t-nav) var(--curva),opacity var(--t-nav) var(--curva)">' +
+      '<div class="t-renglon" data-estado>Que lo escanee con su celular y entre con su Google</div><div class="t-detalle lineal" style="justify-content:center"><i class="i i-s" data-i="clock"></i><span data-reloj>Se renueva en 4:12</span> · sirve una vez</div></div>',
+      alCerrar: function () { clearInterval(tic); clearTimeout(llega); } });
+    tic = setInterval(function () { seg--; var r = $('[data-reloj]', c.el); if (r) r.textContent = 'Se renueva en ' + Math.floor(seg / 60) + ':' + ('0' + seg % 60).slice(-2); }, 1000);
+    if (!x) return;
+    llega = setTimeout(function () {
+      var img = $('[data-qr]', c.el); img.style.transform = 'scale(.6)'; img.style.opacity = '.3';
+      $('[data-estado]', c.el).innerHTML = '<span style="color:var(--logro-texto)">' + x.n + ' escaneó el código</span>';
+      setTimeout(function () {
+        c.cerrar();
+        puerta.unshift({ x: x, cuando: 'Escaneó el código recién · ' + x.aparato, rol: 'vendedor' });
+        pintarPuerta(true); U.animar(insignia, 'u-salta', 400);
+      }, U.quieto ? 300 : 900);
+    }, 2500);
+  }
+
+  /* ---- Abierto ahora ---- */
+  var vivoL = $('.vivo-l', colVivo), cabVivo = $('.col-t .t-detalle', colVivo);
+  var MAPA = [['lf', 'Mostrador'], ['ms', 'Compu del depósito'], ['no', 'Moto G32'], ['lf', 'Galaxy A15'], ['ms', 'Samsung A34'], ['gb', 'Notebook de casa']];
+  $$('.ses', vivoL).forEach(function (s, i) { s.setAttribute('data-p', MAPA[i][0]); s.setAttribute('data-n', MAPA[i][1]); });
+  function contar() {
+    var s = U.PERSONAS.reduce(function (t, p) { return t + p.sesiones.length; }, 0), h = U.PERSONAS.reduce(function (t, p) { return t + p.huellas.length; }, 0);
+    cabVivo.textContent = s + ' sesiones · ' + h + ' celulares con huella';
+    $$('.tramo', vivoL).forEach(function (t) {
+      var n = t.nextElementSibling, hay = false;
+      while (n && !n.classList.contains('tramo')) { if (n.classList.contains('ses')) hay = true; n = n.nextElementSibling; }
+      t.classList.toggle('u-oculto', !hay);
+    });
+  }
+  function agregarSesion(p, que, aparato) {
+    var r = document.createElement('div');
+    r.className = 'ses'; r.setAttribute('data-p', p.id); r.setAttribute('data-n', aparato);
+    r.innerHTML = '<span class="av ' + p.t + '">' + p.ini + '<span class="vivo"></span></span><div><div class="n">' + p.n + '</div><div class="d">' + que + '</div></div><span class="dev"><i class="i i-s" data-i="smartphone"></i>' + aparato + '</span><span class="pulso"></span>';
+    U.iconos(r);
+    var t = $$('.tramo', vivoL)[1];
+    vivoL.insertBefore(r, t); U.nuevo(r); contar();
+  }
+  function sacarSesion(id, n) {
+    $$('.ses[data-p="' + id + '"]' + (n ? '[data-n="' + n + '"]' : ''), vivoL).forEach(function (r) { U.sacar(r, contar); });
+  }
+  vivoL.addEventListener('click', function (e) {
+    var s = e.target.closest('.ses'); if (!s) return;
+    var p = U.persona(s.getAttribute('data-p')), n = s.getAttribute('data-n');
+    if (e.target.closest('.btn')) {
+      var k = p.sesiones.map(function (x) { return x.n; }).indexOf(n), ses = p.sesiones[k];
+      if (k >= 0) p.sesiones.splice(k, 1);
+      U.sacar(s, function () { contar(); U.tostada('Cerraste la sesión de ' + U.primerNombre(p) + ' en ' + n + '. Ahí vuelve a la entrada.', { deshacer: function () { if (ses) p.sesiones.splice(k, 0, ses); s.classList.remove('u-sale'); vivoL.insertBefore(s, $$('.tramo', vivoL)[ses && ses.viejo ? 2 : 1].nextSibling); contar(); U.nuevo(s); } }); });
+      return;
+    }
+    if (!arrastrado) abrirFicha(p.id);
+  });
+
+  /* ---- Las llaves ---- */
+  function pintarPilas(soloRol, nuevoId) {
+    llaves.forEach(function (l) {
+      var r = l.getAttribute('data-rol'); if (soloRol && r !== soloRol) return;
+      var pila = $('.pila', l);
+      pila.innerHTML = U.PERSONAS.filter(function (p) { return !p.inactivo && p.roles.indexOf(r) >= 0; }).map(function (p) { return '<span class="av s ' + p.t + '" data-id="' + p.id + '">' + p.ini + '</span>'; }).join('');
+      if (nuevoId) U.animar($('[data-id="' + nuevoId + '"]', pila), 'u-pop', 300);
+      var d = $('.t-detalle', l);
+      if (r !== 'admin') { d.textContent = U.cuantosPermisos(r) + ' permisos'; d.style.color = ''; }
+    });
+  }
+  var demo = $('.llave-rol.soltar', colLlaves);
+  function terminarDemo(dar) {
+    if (!demo) return;
+    var flota = demo.querySelector('span.av[style*="absolute"]');
+    if (flota) U.sacar(flota);
+    demo.classList.remove('soltar');
+    var d = demo; demo = null;
+    if (dar) darRol(U.persona('no'), 'comprador');
+    else pintarPilas('comprador');
+    void d;
+  }
+  $$('.pila .av', colLlaves).forEach(function (a) {
+    var t = a.textContent.trim(), p = U.PERSONAS.filter(function (x) { return x.ini === t; })[0]; if (p) a.setAttribute('data-id', p.id);
+  });
+  function darRol(p, r) {
+    if (p.inactivo) { U.tostada(U.primerNombre(p) + ' está inactivo: reactivalo desde su ficha.', { mal: true }); return; }
+    if (p.roles.indexOf(r) >= 0) { U.tostada(U.primerNombre(p) + ' ya es ' + U.ROLES[r].n + '.', { icono: 'info' }); return; }
+    p.roles.push(r); delete p.puedeFijo;
+    pintarPilas(r, p.id);
+    U.tostada(U.primerNombre(p) + ' ahora también es ' + U.ROLES[r].n + '.', { deshacer: function () { p.roles.splice(p.roles.indexOf(r), 1); pintarPilas(r); } });
+  }
+  function quitarRol(p, r, alListo) {
+    if (r === 'admin' && p.yo) { U.tostada('Tu Administrador no te lo podés quitar vos.', { mal: true }); return; }
+    if (r === 'admin' && U.PERSONAS.filter(function (x) { return !x.inactivo && x.roles.indexOf('admin') >= 0; }).length < 2) { U.tostada('Tiene que quedar alguien que administre.', { mal: true }); return; }
+    p.roles.splice(p.roles.indexOf(r), 1);
+    pintarPilas(r); if (alListo) alListo();
+    U.tostada(U.primerNombre(p) + ' ya no es ' + U.ROLES[r].n + '.', { deshacer: function () { p.roles.push(r); pintarPilas(r); } });
+  }
+  // Tocar una llave: quién la tiene, con Quitar, y qué permisos da.
+  function abrirLlave(r) {
+    var c = U.capa({ tipo: 'dialogo', html: '' });
+    function pintar() {
+      var R = U.ROLES[r], quien = U.PERSONAS.filter(function (p) { return !p.inactivo && p.roles.indexOf(r) >= 0; });
+      c.el.innerHTML = '<div class="u-cab"><span class="foto-icono" style="width:44px;height:44px;' + (r === 'admin' ? 'background:var(--pino-suave);color:var(--pino)' : '') + '"><i class="i" data-i="' + R.i + '"></i></span><div class="t-seccion">' + R.n + '</div><button class="btn btn-suave btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i i-s" data-i="x"></i></button></div>' +
+        '<div><span class="u-et">Quién la tiene (' + quien.length + ')</span><div class="u-lista-roles">' + (quien.length ? quien.map(function (p) {
+          return '<div class="u-rolfila" style="grid-template-columns:40px 1fr auto;cursor:default">' + U.avHTML(p) + '<div><div class="n">' + p.n + (p.yo ? ' <span class="yo">Vos</span>' : '') + '</div><div class="d">' + p.mail + '</div></div><button class="btn chico btn-peligro" data-quitar="' + p.id + '">Quitar</button></div>';
+        }).join('') : '<div class="t-detalle">Nadie. Arrastrá a una persona encima de la llave para dársela.</div>') + '</div></div>' +
+        '<div style="display:grid;gap:10px">' + U.permisosHTML(function (x) { return x.r.indexOf(r) >= 0; }) + '</div>';
+      U.iconos(c.el);
+    }
+    pintar();
+    c.el.addEventListener('click', function (e) { var b = e.target.closest('[data-quitar]'); if (b) quitarRol(U.persona(b.getAttribute('data-quitar')), r, pintar); });
+  }
+
+  // Arrastrar a una persona (de una pila o de Abierto ahora) sobre una llave.
+  var arr = null, arrastrado = false;
+  document.addEventListener('pointerdown', function (e) {
+    var a = e.target.closest('.pila .av[data-id], .ses .av'); if (!a || e.button) return;
+    var id = a.getAttribute('data-id') || a.closest('.ses').getAttribute('data-p');
+    arr = { id: id, a: a, x: e.clientX, y: e.clientY, g: null, sobre: null };
+    arrastrado = false;
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!arr) return;
+    if (!arr.g) {
+      if (Math.abs(e.clientX - arr.x) + Math.abs(e.clientY - arr.y) < 6) return;
+      terminarDemo(false);
+      var p = U.persona(arr.id), r = arr.a.getBoundingClientRect();
+      arr.g = document.createElement('span'); arr.g.className = 'av u-fantasma ' + p.t; arr.g.textContent = p.ini;
+      arr.g.style.left = (r.left + r.width / 2 - 20) + 'px'; arr.g.style.top = (r.top + r.height / 2 - 20) + 'px';
+      document.body.appendChild(arr.g); arr.ox = r.left + r.width / 2 - 20; arr.oy = r.top + r.height / 2 - 20;
+      document.body.style.userSelect = 'none'; arrastrado = true;
+    }
+    arr.g.style.transform = 'translate(' + (e.clientX - arr.x) + 'px,' + (e.clientY - arr.y) + 'px) rotate(-6deg)';
+    var bajo = document.elementFromPoint(e.clientX, e.clientY), l = bajo && bajo.closest('.llave-rol');
+    if (l !== arr.sobre) {
+      if (arr.sobre) { arr.sobre.classList.remove('soltar'); pintarPilas(arr.sobre.getAttribute('data-rol')); }
+      arr.sobre = l;
+      if (l) { l.classList.add('soltar'); var d = $('.t-detalle', l); d.textContent = 'Soltá para darle a ' + U.primerNombre(U.persona(arr.id)); d.style.color = 'var(--pino-texto)'; }
+    }
+  });
+  document.addEventListener('pointerup', function () {
+    if (!arr) return;
+    var a = arr; arr = null; document.body.style.userSelect = '';
+    if (!a.g) return;
+    a.g.remove();
+    if (a.sobre) { a.sobre.classList.remove('soltar'); var r = a.sobre.getAttribute('data-rol'); pintarPilas(r); darRol(U.persona(a.id), r); }
+    setTimeout(function () { arrastrado = false; }, 0);
+  });
+  colLlaves.addEventListener('click', function (e) {
+    if (arrastrado) return;
+    var av = e.target.closest('.pila .av[data-id]');
+    var l = e.target.closest('.llave-rol');
+    if (l && l === demo) { terminarDemo(true); return; }
+    if (av) { abrirFicha(av.getAttribute('data-id')); return; }
+    if (l) { abrirLlave(l.getAttribute('data-rol')); return; }
+    if (e.target.closest('.panico')) perdido();
+  });
+
+  // ¿Se perdió un celular? Elegís a la persona y se cierra todo lo suyo.
+  function perdido() {
+    var c = U.capa({ tipo: 'dialogo', html: '' }), elegido = null;
+    function pintar() {
+      var con = U.PERSONAS.filter(function (p) { return !p.yo && (p.sesiones.length || p.huellas.length); });
+      var p = elegido && U.persona(elegido);
+      c.el.innerHTML = '<div class="u-cab"><div class="t-seccion">¿De quién es el celular?</div><button class="btn btn-suave btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i i-s" data-i="x"></i></button></div>' +
+        '<div class="t-detalle">Se cierran todas sus sesiones y se le quita la huella. Vuelve a entrar con su Google desde otro aparato.</div>' +
+        '<div class="u-lista-roles">' + con.map(function (x) { return '<div class="u-rolfila' + (x.id === elegido ? ' si' : '') + '" data-elegir="' + x.id + '" style="grid-template-columns:40px 1fr auto">' + U.avHTML(x) + '<div><div class="n">' + x.n + '</div><div class="d">' + x.sesiones.map(function (s) { return s.n; }).join(' · ') + '</div></div><span class="t-detalle">' + x.sesiones.length + ' abiertas</span></div>'; }).join('') + '</div>' +
+        '<div class="u-pie"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-peligro" data-todo' + (p ? '' : ' disabled') + '><i class="i i-s" data-i="power"></i>' + (p ? 'Cerrar todo lo de ' + U.primerNombre(p) : 'Elegí a alguien') + '</button></div>';
+      U.iconos(c.el);
+    }
+    pintar();
+    c.el.addEventListener('click', function (e) {
+      var f = e.target.closest('[data-elegir]'); if (f) { elegido = f.getAttribute('data-elegir'); pintar(); return; }
+      if (e.target.closest('[data-todo]') && elegido) {
+        var p = U.persona(elegido), n = p.sesiones.length;
+        p.sesiones = []; p.huellas = []; p.vivo = false; c.cerrar();
+        sacarSesion(p.id); contar();
+        U.tostada('Se cerraron las ' + n + ' sesiones de ' + U.primerNombre(p) + ' y se quitó su huella.');
+      }
+    });
+  }
+
+  // La ficha de una persona, en un panel desde la derecha.
+  function abrirFicha(id) {
+    var p = U.persona(id);
+    var c = U.capa({ tipo: 'panel', html: U.fichaHTML(p, true) });
+    U.accionesFicha(c.el, function () { return p; }, { cambio: function (p2, que, dato) {
+      c.el.innerHTML = U.fichaHTML(p, true); U.iconos(c.el);
+      if (que === 'roles') { pintarPilas(); U.tostada(U.primerNombre(p) + ' ahora es ' + (p.roles.map(function (r) { return U.ROLES[r].n; }).join(' y ') || 'sin roles') + '.'); }
+      if (que === 'sesion') sacarSesion(p.id, dato.n);
+      if (que === 'estado') { pintarPilas(); if (p.inactivo) sacarSesion(p.id); }
+      contar();
+    } });
+  }
+  $('.lateral .avatar').style.cursor = 'pointer';
+  $('.lateral .avatar').addEventListener('click', function () { abrirFicha('ci'); });
+
+  document.addEventListener('keydown', function (e) {
+    if (U.hayCapa() || /INPUT|TEXTAREA|BUTTON/.test(e.target.tagName)) return;
+    if (e.key === 'Enter') { e.preventDefault(); dejarEntrar(); }
+  });
+})();
+</script>
 </body>
 </html>

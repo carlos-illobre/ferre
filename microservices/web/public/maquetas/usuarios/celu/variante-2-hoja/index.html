@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../_extra/usuarios.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_extra/interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .lista { display: flex; flex-direction: column; }
@@ -38,7 +40,7 @@
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
-  <nav class="celu-pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Actividad</a></nav>
+  <nav class="celu-pestanas"><a data-ir="resumen">Resumen</a><a class="activa" data-ir="usuarios">Usuarios</a><a data-ir="actividad">Actividad</a></nav>
   <div class="celu-pantalla">
     <div class="grupo-t">Usando la app ahora · 3</div>
     <div class="lista">
@@ -46,7 +48,7 @@
     </div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a><a><i class="i" data-i="tags"></i>Catálogo</a><a><i class="i" data-i="package"></i>Depósito</a><a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a><a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a><a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a><a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a><a class="activo" data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a><a data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
 
   <div class="velo"></div>
@@ -70,10 +72,199 @@
 
     <div class="lineal" style="margin-top:auto;gap:8px">
       <button class="btn btn-peligro" style="flex:1"><i class="i" data-i="user-x"></i>Desactivar</button>
-      <button class="btn" style="flex:1"><i class="i" data-i="history"></i>Qué hizo hoy</button>
+      <button class="btn" style="flex:1" data-ir="actividad"><i class="i" data-i="history"></i>Qué hizo hoy</button>
     </div>
   </div>
   <span class="home-ind"></span>
 </div>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+/* Celu 2 · la hoja de la persona: la hoja se cierra con la ×, tocando afuera, con Escape o bajándola;
+   tocar a alguien de la lista la abre con sus datos; las llaves dan o quitan un rol de un toque; un
+   aparato se cierra deslizándolo (o tocando el rojo); abajo, «Autorizar a alguien» suma a la lista. */
+(function () {
+  var $ = U.$, $$ = U.$$;
+  var celu = $('.celu'), hoja = $('.hoja'), velo = $('.velo'), pant = $('.celu-pantalla'), actual = 'ms', abierta = true;
+  var ORDEN = ['vendedor', 'comprador', 'recepcion', 'gerente', 'admin'];
+  pant.style.overflowY = 'auto'; pant.style.scrollbarWidth = 'none';
+
+  /* ---- La lista (queda tapada por la hoja hasta cerrarla) ---- */
+  var ACT = { ms: 'En la compu del depósito', lf: 'Vendiendo en el mostrador', no: 'Contando la estantería B' };
+  function contactoHTML(p, primero, ultimo) {
+    var d = p.inactivo ? '<span class="pastilla contorno" style="height:24px">Inactivo</span>' : (p.nuevo && !p.sesiones.length) ? '<span class="pastilla urgente" style="height:24px">No entró aún</span>' :
+      '<span class="t-detalle">' + (ACT[p.id] && p.vivo ? ACT[p.id] : U.rolesOrdenados(p).map(function (r) { return U.ROLES[r].n; }).join(' · ')) + '</span>';
+    return '<div class="contacto" data-id="' + p.id + '" style="' + (primero ? 'border-radius:16px 16px 0 0;' : '') + (ultimo ? 'border-radius:' + (primero ? '16px' : '0 0 16px 16px') + ';border-bottom:0' : '') + '">' + U.avHTML(p) +
+      '<div style="min-width:0"><div class="n">' + U.esc(p.n) + (p.yo ? ' <span class="yo">Vos</span>' : '') + '</div>' + d + '</div><i class="i" data-i="chevron-right"></i></div>';
+  }
+  function pintarLista() {
+    var ahora = ['ms', 'lf', 'no'].map(U.persona), resto = U.PERSONAS.filter(function (p) { return ahora.indexOf(p) < 0; });
+    pant.innerHTML = '<div class="grupo-t">Usando la app ahora · ' + ahora.length + '</div><div class="lista">' + ahora.map(function (p, i) { return contactoHTML(p, i === 0, i === ahora.length - 1); }).join('') + '</div>' +
+      '<div class="grupo-t" style="margin-top:16px">Los demás · ' + resto.length + '</div><div class="lista">' + resto.map(function (p, i) { return contactoHTML(p, i === 0, i === resto.length - 1); }).join('') + '</div><div style="height:12px"></div>';
+    U.iconos(pant);
+  }
+  // Abajo, la acción principal de la lista (tapada por la hoja mientras está abierta).
+  var barra = document.createElement('div'); barra.className = 'barra-accion';
+  barra.innerHTML = '<button class="btn btn-accion grande" style="width:100%"><i class="i i-l" data-i="user-plus"></i>Autorizar a alguien</button>';
+  celu.insertBefore(barra, $('.nav-inferior')); U.iconos(barra);
+  // Se arma recién al primer cierre: así, quieta, la maqueta queda como estaba.
+  var listaLista = false;
+  pant.addEventListener('click', function (e) { var c = e.target.closest('.contacto'); if (c) abrir(c.getAttribute('data-id') || 'ms'); });
+  barra.addEventListener('click', function () {
+    U.dialogoAutorizar(function (p) {
+      pintarLista();
+      var c = $('.contacto[data-id="' + p.id + '"]', pant); c.scrollIntoView({ block: 'nearest' }); U.nuevo(c);
+      U.tostada(U.primerNombre(p) + ' ya puede entrar con su Google.');
+    });
+  });
+
+  /* ---- La hoja ---- */
+  function estadoLinea(p) {
+    var v = p.sesiones.filter(function (s) { return s.vivo; })[0];
+    if (p.inactivo) return '<div class="t-detalle" style="font-weight:650">Inactivo: no puede entrar</div>';
+    if (p.nuevo && !p.sesiones.length) return '<div class="t-detalle" style="color:var(--urgente-texto);font-weight:650">Todavía no entró</div>';
+    if (v) return '<div class="t-detalle" style="color:var(--logro-texto);font-weight:650">' + (/^Compu/.test(v.n) ? 'En la ' + v.n.charAt(0).toLowerCase() + v.n.slice(1) : 'En ' + v.n) + ', ahora</div>';
+    var s = p.sesiones[0];
+    return '<div class="t-detalle" style="font-weight:650">' + (s ? 'Entró ' + (s.d.split(' · ')[1] || '') : 'Sin sesiones abiertas') + '</div>';
+  }
+  function aparatos(p) {
+    var l = p.sesiones.map(function (s) { return { n: s.n, i: s.i, s: s, h: p.huellas.some(function (h) { return h.n === s.n; }) }; });
+    return l;
+  }
+  function dispHTML(a) {
+    var t = a.s.vivo ? (a.s.d.split(' · ')[0] + ' · ahora') : (a.s.d.split(' · ')[1] || a.s.d);
+    t = t.charAt(0).toUpperCase() + t.slice(1);
+    return '<div class="swipe" data-n="' + a.n + '" style="background:transparent"><div class="detras" style="opacity:0"><span class="lineal" style="gap:6px"><i class="i" data-i="log-out"></i>Cerrar</span></div>' +
+      '<div class="disp' + (a.s.viejo ? ' viejo' : '') + '" style="right:0;border:1px solid var(--borde);border-radius:14px"><span class="ico"><i class="i" data-i="' + a.i + '"></i>' + (a.s.vivo ? '<span class="vivo"></span>' : '') + '</span><div><div class="n">' + a.n + '</div><div class="d' + (a.h ? ' lineal" style="gap:4px' : '') + '">' + t + (a.h ? ' · <i class="i i-s" data-i="fingerprint"></i>huella' : '') + '</div></div><span></span></div></div>';
+  }
+  function hojaHTML(p) {
+    var ap = aparatos(p), off = p.inactivo;
+    return '<div class="asa"></div>' +
+      '<div class="h-cab">' + U.avHTML(p, 'l') + '<div style="min-width:0"><div class="t-seccion">' + U.esc(p.n) + (p.yo ? ' <span class="yo" style="vertical-align:3px">Vos</span>' : '') + '</div><div class="t-detalle ellipsis">' + U.esc(p.mail) + '</div>' + estadoLinea(p) + '</div><button class="btn btn-suave btn-icono chico" data-x aria-label="Cerrar"><i class="i i-s" data-i="x"></i></button></div>' +
+      '<div class="sec"><span>Sus llaves</span><span style="font-weight:600">' + (off ? 'reactivalo para cambiarlas' : 'tocá para dar o quitar') + '</span></div>' +
+      '<div class="llaves"' + (off ? ' style="opacity:.55"' : '') + '>' + ORDEN.map(function (r) {
+        var R = U.ROLES[r], si = p.roles.indexOf(r) >= 0;
+        return '<div class="lr' + (si ? ' si' : '') + '" data-rol="' + r + '"' + (r === 'admin' ? ' style="grid-column: span 2"' : '') + '><div><div class="n"><i data-i="' + R.i + '"></i>' + R.n + '</div><div class="d">' + R.corto + '</div></div><span class="llave' + (si ? ' si' : '') + '"></span></div>';
+      }).join('') + '</div>' +
+      '<div class="aviso pino" data-cuales style="padding:10px 12px;cursor:pointer"><i class="i i-s" data-i="key-round" style="margin-top:2px"></i><span class="grow">Puede <span data-puede>' + U.puedeN(p) + '</span> de 21 cosas. <b>Ver cuáles</b></span><i class="i i-s" data-i="chevron-right" style="margin-top:2px"></i></div>' +
+      '<div class="sec"><span>Dónde entró · <span data-cuantos>' + ap.length + '</span></span><span style="font-weight:600">' + (ap.length ? 'deslizá para cerrar' : '') + '</span></div>' +
+      (ap.length ? ap.map(dispHTML).join('') : '<div class="t-detalle" style="padding:0 4px">' + (p.nuevo ? 'Todavía no entró en ningún aparato.' : 'No tiene sesiones abiertas.') + '</div>') +
+      '<div class="lineal" style="margin-top:auto;gap:8px">' + (off ? '<button class="btn" style="flex:1" data-reactivar><i class="i" data-i="user-check"></i>Reactivar</button>' : '<button class="btn btn-peligro" style="flex:1" data-desactivar><i class="i" data-i="user-x"></i>Desactivar</button>') +
+      '<button class="btn" style="flex:1" data-ir="actividad"><i class="i" data-i="history"></i>Qué hizo hoy</button></div>';
+  }
+  function pintarHoja(p) { hoja.innerHTML = hojaHTML(p); U.iconos(hoja); prepararAsa(); }
+  // La hoja de Martín ya está dibujada: se conecta sin redibujarla.
+  (function () {
+    $('.h-cab .btn', hoja).setAttribute('data-x', '');
+    $$('.lr', hoja).forEach(function (l, i) { l.setAttribute('data-rol', ORDEN[i]); });
+    var av = $('.aviso', hoja); av.setAttribute('data-cuales', ''); av.style.cursor = 'pointer';
+    var g = av.querySelector('.grow'); g.innerHTML = 'Puede <span data-puede>8</span> de 21 cosas. <b>Ver cuáles</b>';
+    $$('.sec', hoja)[1].firstElementChild.innerHTML = 'Dónde entró · <span data-cuantos>2</span>';
+    $('.btn-peligro', hoja).setAttribute('data-desactivar', '');
+    // El primer aparato se envuelve igual que el segundo para poder deslizarlo; quieto se ve igual.
+    var d0 = $('.hoja > .disp');
+    var w = document.createElement('div'); w.className = 'swipe'; w.setAttribute('data-n', 'Compu del depósito'); w.style.background = 'transparent';
+    w.innerHTML = '<div class="detras" style="opacity:0"><span class="lineal" style="gap:6px"><i class="i" data-i="log-out"></i>Cerrar</span></div>';
+    d0.parentNode.insertBefore(w, d0); w.appendChild(d0);
+    d0.style.cssText = 'right:0;border:1px solid var(--borde);border-radius:14px';
+    U.iconos(w);
+    var s1 = $$('.hoja .swipe')[1]; s1.setAttribute('data-n', 'Samsung A34'); s1.classList.add('revelado');
+  })();
+
+  function abrir(id) {
+    actual = id; pintarHoja(U.persona(id));
+    hoja.style.display = ''; velo.style.display = '';
+    hoja.style.transition = 'none'; hoja.style.transform = 'translateY(100%)'; velo.style.opacity = '0';
+    void hoja.offsetWidth;
+    hoja.style.transition = 'transform var(--t-nav) var(--curva)'; velo.style.transition = 'opacity var(--t-nav) var(--curva)';
+    hoja.style.transform = ''; velo.style.opacity = '1'; abierta = true;
+  }
+  function cerrar() {
+    if (!abierta) return; abierta = false;
+    if (!listaLista) { listaLista = true; pintarLista(); }
+    hoja.style.transition = 'transform var(--t-nav) var(--curva)'; velo.style.transition = 'opacity var(--t-nav) var(--curva)';
+    hoja.style.transform = 'translateY(100%)'; velo.style.opacity = '0';
+    setTimeout(function () { if (!abierta) { hoja.style.display = 'none'; velo.style.display = 'none'; } }, U.quieto ? 0 : 330);
+  }
+  velo.addEventListener('click', cerrar);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !e.defaultPrevented && !U.hayCapa() && abierta) cerrar(); });
+  function prepararAsa() {
+    var asa = $('.asa', hoja), y0 = null, dy = 0;
+    asa.style.touchAction = 'none'; asa.style.cursor = 'grab';
+    asa.addEventListener('pointerdown', function (e) { y0 = e.clientY; dy = 0; hoja.style.transition = 'none'; asa.setPointerCapture(e.pointerId); });
+    asa.addEventListener('pointermove', function (e) { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); hoja.style.transform = 'translateY(' + dy + 'px)'; });
+    function fin() { if (y0 === null) return; y0 = null; hoja.style.transition = 'transform var(--t-nav) var(--curva)'; if (dy > 100) cerrar(); else hoja.style.transform = ''; }
+    asa.addEventListener('pointerup', fin); asa.addEventListener('pointercancel', fin);
+  }
+  prepararAsa();
+
+  hoja.addEventListener('click', function (e) {
+    var p = U.persona(actual);
+    if (e.target.closest('[data-x]')) return cerrar();
+    var lr = e.target.closest('.lr');
+    if (lr) return llave(p, lr);
+    if (e.target.closest('[data-cuales]')) return U.dialogoPuede(p);
+    if (e.target.closest('[data-desactivar]')) return U.desactivar(p, function () { pintarHoja(p); if (listaLista) pintarLista(); });
+    if (e.target.closest('[data-reactivar]')) { p.inactivo = false; p.t = p.tAntes || 't4'; p.desde = 'Reactivado hoy'; pintarHoja(p); if (listaLista) pintarLista(); U.tostada(U.primerNombre(p) + ' puede volver a entrar.'); return; }
+    var det = e.target.closest('.swipe.revelado .detras');
+    if (det) return ejecutar(p, det.parentNode);
+  });
+
+  // Una llave: se prende o se apaga, y «Puede N de 21» rueda.
+  function llave(p, lr) {
+    var r = lr.getAttribute('data-rol'), i = p.roles.indexOf(r);
+    if (p.inactivo) { U.animar(lr, 'u-no', 260); return U.tostada(U.primerNombre(p) + ' está inactivo: reactivalo primero.', { mal: true }); }
+    if (r === 'admin' && i >= 0 && p.yo) { U.animar(lr, 'u-no', 260); U.vibrar([10, 40, 10]); return U.tostada('Tu Administrador no te lo podés quitar vos.', { mal: true }); }
+    if (r === 'admin' && i >= 0 && U.PERSONAS.filter(function (x) { return !x.inactivo && x.roles.indexOf('admin') >= 0; }).length < 2) { U.animar(lr, 'u-no', 260); return U.tostada('Tiene que quedar alguien que administre.', { mal: true }); }
+    if (i >= 0) p.roles.splice(i, 1); else p.roles.push(r);
+    delete p.puedeFijo;
+    lr.classList.toggle('si', i < 0); $('.llave', lr).classList.toggle('si', i < 0);
+    U.vibrar(10);
+    U.rodar($('[data-puede]', hoja), U.puedeN(p));
+    if (listaLista) pintarLista();
+  }
+
+  // Deslizar un aparato para cerrar su sesión.
+  var ar = null;
+  hoja.addEventListener('pointerdown', function (e) {
+    var sw = e.target.closest('.swipe'); if (!sw || e.target.closest('.detras')) return;
+    var d = $('.disp', sw);
+    ar = { sw: sw, d: d, x: e.clientX, base: sw.classList.contains('revelado') ? -112 : 0, dx: 0, mov: false };
+  });
+  hoja.addEventListener('pointermove', function (e) {
+    if (!ar) return;
+    ar.dx = e.clientX - ar.x;
+    if (!ar.mov) { if (Math.abs(ar.dx) < 6) return; ar.mov = true; ar.sw.style.background = ''; $('.detras', ar.sw).style.opacity = '1'; ar.d.style.right = '0'; ar.d.style.borderRadius = '14px'; ar.d.style.transition = 'none'; try { ar.sw.setPointerCapture(e.pointerId); } catch (x) { /* nada */ } }
+    ar.d.style.transform = 'translateX(' + Math.min(0, ar.base + ar.dx) + 'px)';
+  });
+  function soltar() {
+    if (!ar) return;
+    var a = ar; ar = null;
+    if (!a.mov) return;
+    var t = a.base + a.dx;
+    a.d.style.transition = 'transform var(--t) var(--curva)';
+    if (t < -200) return ejecutar(U.persona(actual), a.sw);
+    if (t < -56) { a.d.style.transform = ''; a.d.style.transition = 'none'; a.d.style.right = '112px'; a.d.style.borderRadius = '14px 0 0 14px'; a.d.style.border = '0'; a.sw.classList.add('revelado'); return; }
+    a.d.style.transform = 'translateX(0)';
+    setTimeout(function () { a.sw.classList.remove('revelado'); a.sw.style.background = 'transparent'; $('.detras', a.sw).style.opacity = '0'; a.d.style.border = '1px solid var(--borde)'; a.d.style.borderRadius = '14px'; }, U.quieto ? 0 : 200);
+  }
+  hoja.addEventListener('pointerup', soltar); hoja.addEventListener('pointercancel', soltar);
+  function ejecutar(p, sw) {
+    var n = sw.getAttribute('data-n'), k = p.sesiones.map(function (s) { return s.n; }).indexOf(n), s = p.sesiones[k];
+    if (s && s.esta) { pintarHoja(p); return U.tostada('Es la compu donde estás: para salir, usá Salir.', { mal: true, icono: 'info' }); }
+    var d = $('.disp', sw);
+    d.style.transition = 'transform var(--t) var(--curva-salida)'; d.style.right = '0'; d.style.transform = 'translateX(-100%)';
+    U.vibrar([10, 40, 10]);
+    setTimeout(function () {
+      U.sacar(sw, function () {
+        if (k >= 0) p.sesiones.splice(k, 1);
+        if (!p.sesiones.some(function (x) { return x.vivo; })) p.vivo = false;
+        U.rodar($('[data-cuantos]', hoja), p.sesiones.length);
+        if (listaLista) pintarLista();
+        U.tostada('Cerraste la sesión en ' + n + '. Allá vuelve a la entrada.', { deshacer: function () { p.sesiones.splice(k, 0, s); if (s.vivo) p.vivo = true; pintarHoja(p); if (listaLista) pintarLista(); } });
+      });
+    }, U.quieto ? 0 : 200);
+  }
+})();
+</script>
 </body>
 </html>

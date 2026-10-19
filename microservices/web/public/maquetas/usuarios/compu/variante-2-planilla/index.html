@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../_extra/usuarios.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_extra/interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: grid; grid-template-columns: 1fr 372px; min-height: 0; gap: 20px; padding-top: 16px; }
   .matriz { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
@@ -43,15 +45,15 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
-      <div class="usuario"><span class="avatar">CI</span><div class="txt" style="flex:1"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div><i class="i txt" data-i="log-out" style="color:var(--texto-3)"></i></div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt" style="flex:1"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div><i class="i txt" data-i="log-out" style="color:var(--texto-3)" data-ir="entrar" aria-label="Salir"></i></div>
     </div>
   </nav>
   <main class="contenido">
@@ -62,7 +64,7 @@
         <button class="btn chico"><i class="i i-s" data-i="monitor"></i>Sesiones (9) <span class="kbd">Alt S</span></button><button class="btn btn-accion chico"><i class="i i-s" data-i="user-plus"></i>Autorizar <span class="kbd">Alt N</span></button>
       </div>
     </header>
-    <nav class="pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Quién hizo qué</a></nav>
+    <nav class="pestanas"><a data-ir="resumen">Resumen</a><a class="activa" data-ir="usuarios">Usuarios</a><a data-ir="actividad">Quién hizo qué</a></nav>
     <section class="pantalla">
       <div class="tarjeta matriz">
         <div class="m-fila m-cab">
@@ -102,5 +104,241 @@
     </section>
   </main>
 </div>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+/* Compu 2 · la planilla de llaves: una casilla da o quita el rol (Ctrl Z deshace); la fila naranja
+   autoriza a alguien; el título de una columna muestra los permisos del rol a la derecha; el nombre
+   abre la ficha de la persona; Sesiones lista y cierra las sesiones abiertas. */
+(function () {
+  var $ = U.$, $$ = U.$$;
+  var COLS = ['vendedor', 'comprador', 'recepcion', 'admin', 'gerente'];
+  var matriz = $('.matriz'), nueva = $('.m-fila.nueva'), panel = $('.rolpanel'), tWrap = $('.matriz .tostada').parentNode, tEl = $('.matriz .tostada');
+  matriz.style.cssText = 'overflow-y:auto;scrollbar-width:none';
+  var ids = ['ci', 'gb', 'ms', 'lf', 'no', 'sa', 'dp'], colSel = 'recepcion', deshacer = null, timer = null;
+  function filas() { return $$('.m-fila:not(.m-cab):not(.nueva)', matriz); }
+  filas().forEach(function (f, i) { f.setAttribute('data-id', ids[i]); });
+  $$('.m-cab .col', matriz).forEach(function (c, i) { if (COLS[i]) c.setAttribute('data-col', COLS[i]); });
+  function prepararCeldas(f) { $$('.celda', f).forEach(function (c, i) { c.setAttribute('data-col', COLS[i]); var k = c.querySelector('.casilla'); if (k) { k.tabIndex = 0; k.setAttribute('role', 'checkbox'); } }); }
+  filas().concat([nueva]).forEach(prepararCeldas);
+
+  // La tostada de abajo: la misma pieza que ya está dibujada, con su Ctrl Z.
+  function avisar(texto, alDeshacer) {
+    clearTimeout(timer);
+    tEl.innerHTML = '<i class="i" data-i="circle-check"></i>' + texto + (alDeshacer ? '<span class="kbd" data-deshacer style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3);cursor:pointer">Ctrl Z</span>' : '');
+    U.iconos(tEl);
+    tEl.style.opacity = '1'; U.animar(tEl, 'u-sube', 400);
+    deshacer = alDeshacer || null;
+    timer = setTimeout(function () { tEl.style.transition = 'opacity var(--t) var(--curva-salida)'; tEl.style.opacity = '0'; deshacer = null; }, 4000);
+  }
+  // La que ya está a la vista al abrir: deshace que Martín sea Comprador.
+  deshacer = function () { cambiar(U.persona('ms'), 'comprador', true); };
+  tEl.addEventListener('click', function (e) { if (e.target.closest('[data-deshacer], .kbd') && deshacer) { var d = deshacer; deshacer = null; d(); } });
+  $('.kbd', tEl).setAttribute('data-deshacer', '');
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && deshacer && !U.hayCapa()) { e.preventDefault(); var d = deshacer; deshacer = null; d(); }
+  });
+
+  function fila(id) { return $('.m-fila[data-id="' + id + '"]', matriz); }
+  function cuenta(p) { var c = $('.cuenta', fila(p.id)); U.rodar(c, p.inactivo ? '—' : U.puedeN(p) + ' de 21'); }
+  function pintarCasillas(p) {
+    var f = fila(p.id); if (!f) return;
+    $$('.celda', f).forEach(function (c) { var k = c.querySelector('.casilla'); k.classList.toggle('si', p.roles.indexOf(c.getAttribute('data-col')) >= 0); });
+    f.classList.toggle('inactiva', !!p.inactivo);
+    var d = $('.per .d', f);
+    if (p.inactivo) { if (!d) { d = document.createElement('div'); d.className = 'd'; $('.per .ellipsis', f).appendChild(d); } d.textContent = 'Inactivo'; d.style.color = ''; }
+    else if (d && d.textContent === 'Inactivo') d.remove();
+    $('.per .av', f).className = 'av s ' + (p.inactivo ? 'apagado' : p.t);
+    cuenta(p);
+  }
+  function nombres(lista) { return lista.length > 1 ? lista.slice(0, -1).join(', ') + ' y ' + lista[lista.length - 1] : (lista[0] || 'nadie'); }
+  function quienTiene(r) { return U.PERSONAS.filter(function (p) { return !p.inactivo && p.roles.indexOf(r) >= 0; }).map(U.primerNombre); }
+
+  // Dar o quitar un rol con un clic.
+  function cambiar(p, r, silencio) {
+    var i = p.roles.indexOf(r), da = i < 0;
+    if (da) p.roles.push(r); else p.roles.splice(i, 1);
+    delete p.puedeFijo;
+    var k = $('.celda[data-col="' + r + '"] .casilla', fila(p.id));
+    k.classList.toggle('si', da); if (da) U.animar(k, 'u-pop', 260);
+    cuenta(p);
+    if (r === colSel) pintarPanel(false);
+    if (!silencio) avisar(U.primerNombre(p) + (da ? ' ahora también es ' : ' ya no es ') + U.ROLES[r].n, function () { cambiar(p, r, true); avisar('Listo, quedó como estaba'); });
+  }
+  matriz.addEventListener('click', function (e) {
+    var k = e.target.closest('.casilla'), f = e.target.closest('.m-fila');
+    if (k && f && !f.classList.contains('m-cab') && !f.classList.contains('nueva')) {
+      var p = U.persona(f.getAttribute('data-id')), r = k.parentNode.getAttribute('data-col');
+      if (k.classList.contains('bloq')) { U.animar(k, 'u-no', 260); U.animar($('.m-pie', matriz), 'u-salta', 400); avisar('Tu Administrador no te lo podés quitar vos'); return; }
+      if (p.inactivo) { U.animar(k, 'u-no', 260); avisar(U.primerNombre(p) + ' está inactivo: reactivalo desde su ficha'); return; }
+      if (r === 'admin' && p.roles.indexOf('admin') >= 0 && quienTiene('admin').length < 2) { U.animar(k, 'u-no', 260); avisar('Tiene que quedar alguien que administre'); return; }
+      cambiar(p, r);
+      return;
+    }
+    if (k && f && f.classList.contains('nueva')) { k.classList.toggle('si'); if (k.classList.contains('si')) U.animar(k, 'u-pop', 260); return; }
+    var col = e.target.closest('.m-cab .col[data-col]');
+    if (col) { elegirCol(col.getAttribute('data-col')); return; }
+    var per = e.target.closest('.per');
+    if (per && f && f.getAttribute('data-id')) abrirFicha(f.getAttribute('data-id'));
+  });
+  matriz.addEventListener('keydown', function (e) { if ((e.key === ' ' || e.key === 'Enter') && e.target.classList.contains('casilla')) { e.preventDefault(); e.target.click(); } });
+  $$('.per', matriz).forEach(function (x) { x.style.cursor = 'pointer'; });
+
+  // Elegir la columna de un rol: la columna se marca y el panel muestra sus permisos.
+  function elegirCol(r) {
+    colSel = r;
+    $$('.colsel', matriz).forEach(function (c) { c.classList.remove('colsel'); });
+    $$('.m-cab .col', matriz).forEach(function (c) { c.classList.toggle('elegida', c.getAttribute('data-col') === r); });
+    $('.m-cab .col[data-col="' + r + '"]', matriz).classList.add('colsel');
+    $$('.celda[data-col="' + r + '"]', matriz).forEach(function (c) { if (!c.closest('.nueva')) c.classList.add('colsel'); });
+    foco = null; abiertos = {};
+    pintarPanel(true);
+  }
+  var foco = 'Encargar compras', abiertos = {}, nombresRol = {};
+  function pintarPanel(fundido) {
+    var r = colSel, R = U.ROLES[r], quien = quienTiene(r), mios = U.permisosDe(r);
+    var h = '<div class="rp-cab"><span class="ico"><i class="i" data-i="' + R.i + '"></i></span><div class="grow"><div class="t-seccion">' + (nombresRol[r] || R.n) + '</div><div class="t-detalle">' + nombres(quien) + ' · <span data-cuantos>' + mios.length + '</span> permisos</div></div><button class="btn btn-suave chico btn-icono" data-renombrar aria-label="Cambiar el nombre"><i class="i i-s" data-i="pencil"></i></button></div>';
+    U.GRUPOS.forEach(function (g) {
+      var ps = U.PERMISOS.filter(function (x) { return x.g === g; }), si = ps.filter(function (x) { return x.r.indexOf(r) >= 0; });
+      if (!si.length && !abiertos[g]) { h += '<div class="grupo" data-abrir="' + g + '" style="cursor:pointer"><div class="g">' + g + ' <span style="font-weight:600">ninguno de ' + ps.length + '</span></div></div>'; return; }
+      var muestra = ps, resto = 0;
+      if (g === 'Negocio' && !abiertos[g]) { muestra = ps.filter(function (x) { return x.r.indexOf(r) >= 0 || x.n === foco; }); if (muestra.length < 2) muestra = muestra.concat(ps.filter(function (x) { return muestra.indexOf(x) < 0; }).slice(0, 2 - muestra.length)); resto = ps.length - muestra.length; }
+      h += '<div class="grupo"><div class="g">' + g + '</div><div class="permisos">' + muestra.map(function (x) {
+        var s = x.r.indexOf(r) >= 0;
+        return '<span class="perm' + (s ? ' si' : '') + (x.n === foco ? ' foco' : '') + '" data-perm="' + x.n + '">' + (s ? '<i data-i="check"></i>' : '') + x.n + '</span>';
+      }).join('') + (resto ? '<span class="perm" data-abrir="' + g + '">+' + resto + '</span>' : '') + '</div></div>';
+      if (foco && muestra.some(function (x) { return x.n === foco; })) {
+        var x = U.PERMISOS.filter(function (y) { return y.n === foco; })[0], s = x.r.indexOf(r) >= 0;
+        var bloq = r === 'admin';
+        h += '<div class="explica"><b style="color:var(--tinta)">' + x.n + ':</b> ' + x.e + ' ' + (bloq ? 'Los de Administrador no se cambian.' : (quien.length ? (s ? 'Si lo sacás, lo pierde' + (quien.length > 1 ? 'n ' : ' ') : 'Si lo sumás, lo gana' + (quien.length > 1 ? 'n ' : ' ')) + (quien.length === 2 ? 'los dos' : quien.length > 2 ? 'los ' + quien.length : nombres(quien)) + ' enseguida.' : 'Nadie tiene este rol todavía.')) +
+          (bloq ? '' : '<div style="margin-top:8px"><button class="btn chico ' + (s ? 'btn-suave' : 'btn-oscuro') + '" data-alternar="' + x.n + '">' + (s ? 'Sacarlo' : 'Sumarlo') + '</button></div>') + '</div>';
+      }
+    });
+    panel.innerHTML = h; U.iconos(panel);
+    if (fundido) U.animar(panel, 'u-funde', 260);
+  }
+  function alternar(nombre) {
+    var r = colSel, x = U.PERMISOS.filter(function (y) { return y.n === nombre; })[0], i = x.r.indexOf(r);
+    if (r === 'admin') { avisar('Los permisos de Administrador no se cambian'); return; }
+    if (i >= 0) x.r.splice(i, 1); else x.r.push(r);
+    foco = nombre; pintarPanel(false);
+    var pm = $('[data-perm="' + nombre + '"]', panel); if (pm && i < 0) U.animar(pm, 'u-pop', 260);
+    U.animar($('[data-cuantos]', panel), i < 0 ? 'u-rueda-sube' : 'u-rueda-baja', 260);
+    U.PERSONAS.forEach(function (p) { if (p.roles.indexOf(r) >= 0 && fila(p.id)) cuenta(p); });
+    avisar((U.ROLES[r].n) + (i < 0 ? ' ahora puede ' : ' ya no puede ') + nombre.toLowerCase(), function () { alternar(nombre); });
+  }
+  panel.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-alternar]'); if (a) { alternar(a.getAttribute('data-alternar')); return; }
+    var ab = e.target.closest('[data-abrir]'); if (ab) { abiertos[ab.getAttribute('data-abrir')] = true; pintarPanel(false); return; }
+    var pm = e.target.closest('[data-perm]');
+    if (pm) { var n = pm.getAttribute('data-perm'); if (foco === n) alternar(n); else { foco = n; pintarPanel(false); } return; }
+    if (e.target.closest('[data-renombrar]')) renombrar();
+  });
+  function renombrar() {
+    var r = colSel;
+    var c = U.capa({ tipo: 'dialogo', html: '<div class="u-cab"><div class="t-seccion">Nombre del rol</div><button class="btn btn-suave btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i i-s" data-i="x"></i></button></div>' +
+      '<label><span class="u-et">Cómo se llama</span><input class="u-input" autofocus value="' + (nombresRol[r] || U.ROLES[r].n) + '"></label><div class="t-detalle">Quien lo tiene lo ve con el nombre nuevo enseguida.</div>' +
+      '<div class="u-pie"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-accion" data-ok>Guardar</button></div>' });
+    function ok() { var v = $('input', c.el).value.trim(); if (!v) return; nombresRol[r] = v; c.cerrar(); pintarPanel(false); var col = $('.m-cab .col[data-col="' + r + '"]', matriz); col.lastChild.textContent = v.length > 10 ? v.slice(0, 9) + '.' : v; avisar('El rol ahora se llama ' + v); }
+    $('[data-ok]', c.el).addEventListener('click', ok);
+    $('input', c.el).addEventListener('keydown', function (e) { if (e.key === 'Enter') ok(); });
+  }
+  // El panel ya está dibujado: se conecta sin redibujarlo.
+  $$('.perm', panel).forEach(function (x) { var t = x.textContent.trim(); if (/^\+\d/.test(t)) x.setAttribute('data-abrir', 'Negocio'); else x.setAttribute('data-perm', t); });
+  $$('.grupo', panel)[0].setAttribute('data-abrir', 'Vender'); $$('.grupo', panel)[0].style.cursor = 'pointer';
+  $('.rp-cab .btn', panel).setAttribute('data-renombrar', '');
+
+  // La ficha de una persona, en un panel desde la derecha.
+  function abrirFicha(id) {
+    var p = U.persona(id);
+    var c = U.capa({ tipo: 'panel', html: U.fichaHTML(p, true) });
+    U.accionesFicha(c.el, function () { return p; }, { cambio: function (p2, que, antes) {
+      c.el.innerHTML = U.fichaHTML(p, true); U.iconos(c.el); pintarCasillas(p); sesionesBtn();
+      if (que === 'roles') avisar(U.primerNombre(p) + ' ahora es ' + (p.roles.map(function (r) { return U.ROLES[r].n; }).join(' y ') || 'sin roles'), function () { p.roles = antes; pintarCasillas(p); });
+    } });
+  }
+
+  // Sesiones (9): todas las abiertas, con Cerrar.
+  var btnSes = $$('.cabecera .acciones .btn')[0], btnAut = $$('.cabecera .acciones .btn')[1];
+  function totalSes() { return U.PERSONAS.reduce(function (s, p) { return s + p.sesiones.length; }, 0); }
+  function sesionesBtn() { btnSes.innerHTML = '<i class="i i-s" data-i="monitor"></i>Sesiones (' + totalSes() + ') <span class="kbd">Alt S</span>'; U.iconos(btnSes); }
+  function abrirSesiones() {
+    var c = U.capa({ tipo: 'panel', html: '' });
+    function pintar() {
+      c.el.innerHTML = '<div class="u-cab"><div class="t-seccion">Sesiones abiertas (' + totalSes() + ')</div><button class="btn btn-suave btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i i-s" data-i="x"></i></button></div>' +
+        '<div class="t-detalle">Cerrar una sesión saca a la persona de ese aparato: la próxima vez entra de nuevo con su Google.</div>' +
+        U.PERSONAS.filter(function (p) { return p.sesiones.length; }).map(function (p) {
+          return '<div><h3 style="justify-content:flex-start;gap:8px">' + U.avHTML(p, 's') + U.esc(p.n) + '</h3><div style="margin-top:8px">' + p.sesiones.map(function (s, k) {
+            return '<div class="disp' + (s.viejo ? ' viejo' : '') + '"><span class="ico"><i class="i" data-i="' + s.i + '"></i>' + (s.vivo ? '<span class="vivo"></span>' : '') + '</span><div><div class="n">' + s.n + '</div><div class="d">' + s.d + '</div></div><button class="btn chico btn-suave" data-p="' + p.id + '" data-k="' + k + '">Cerrar</button></div>';
+          }).join('') + '</div></div>';
+        }).join('');
+      U.iconos(c.el);
+    }
+    pintar();
+    c.el.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-p]'); if (!b) return;
+      var p = U.persona(b.getAttribute('data-p')), k = +b.getAttribute('data-k'), s = p.sesiones[k];
+      if (s.esta) { U.tostada('Es esta compu: para salir, usá Salir abajo a la izquierda.', { mal: true, icono: 'info' }); return; }
+      U.sacar(b.closest('.disp'), function () { p.sesiones.splice(k, 1); pintar(); sesionesBtn(); U.tostada('Cerraste la sesión de ' + U.primerNombre(p) + ' en ' + s.n + '.'); });
+    });
+  }
+  btnSes.addEventListener('click', abrirSesiones);
+
+  // La fila naranja: escribir el correo, elegir las casillas y Enter.
+  var campo = $('.campo', nueva), input = null, sug = null;
+  function abrirCampo() {
+    if (!input) {
+      campo.innerHTML = '';
+      input = document.createElement('input'); input.value = 'ramiro.g';
+      input.style.cssText = 'flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-weight:600;color:var(--tinta)';
+      campo.appendChild(input);
+      input.addEventListener('input', sugerir);
+      input.addEventListener('blur', function () { setTimeout(function () { if (sug) { sug.cerrar(); sug = null; } }, 150); });
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); autorizar(); } });
+    }
+    input.focus(); input.setSelectionRange(input.value.length, input.value.length); sugerir();
+  }
+  function sugerir() {
+    if (sug) { sug.cerrar(); sug = null; }
+    var v = input.value.trim().toLowerCase(), x = U.siguienteNuevo();
+    if (!v || x.mail.indexOf(v) !== 0 || x.mail === v) return;
+    sug = U.capa({ tipo: 'menu', velo: false, ancla: campo, html: '<button class="u-op" data-sug style="min-height:56px">' + U.avHTML(x, 's') + '<span><span style="display:block">' + x.mail + '</span><span class="t-detalle">' + x.n + ' · quiso entrar hoy 9:41 · ' + x.aparato + '</span></span></button>' });
+    sug.el.style.left = campo.getBoundingClientRect().left + 'px';
+    sug.el.querySelector('[data-sug]').addEventListener('mousedown', function (e) { e.preventDefault(); input.value = x.mail; sug.cerrar(); sug = null; input.focus(); });
+  }
+  campo.addEventListener('click', abrirCampo);
+  $('.kbd', nueva).style.cursor = 'pointer';
+  $('.kbd', nueva).addEventListener('click', function () { if (!input) abrirCampo(); autorizar(); });
+  function autorizar() {
+    if (sug) { sug.cerrar(); sug = null; }
+    var v = input.value.trim().toLowerCase(), x = U.siguienteNuevo();
+    if (v && x.mail.indexOf(v) === 0) v = x.mail;
+    var roles = $$('.celda', nueva).filter(function (c) { return c.querySelector('.casilla.si'); }).map(function (c) { return c.getAttribute('data-col'); });
+    var ya = U.PERSONAS.filter(function (p) { return p.mail === v; })[0];
+    var mal = !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/.test(v) ? 'Escribí el correo completo' : ya ? 'Ese correo ya es de ' + ya.n : !roles.length ? 'Tildá al menos un rol' : '';
+    if (mal) { campo.style.borderColor = 'var(--error)'; U.animar(campo, 'u-no', 260); avisar(mal); input.focus(); return; }
+    campo.style.borderColor = '';
+    var datos = v === x.mail ? x : { id: 'p' + Date.now(), n: v.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); }), t: 't3', mail: v };
+    datos.ini = datos.ini || datos.n.split(' ').map(function (s) { return s.charAt(0); }).join('').slice(0, 2).toUpperCase();
+    var p = U.agregarPersona(datos, roles);
+    var f = document.createElement('div'); f.className = 'm-fila'; f.setAttribute('data-id', p.id);
+    f.innerHTML = '<div class="per" style="cursor:pointer"><span class="av s ' + p.t + '">' + p.ini + '</span><div class="ellipsis"><div class="n">' + U.esc(p.n) + '</div><div class="d" style="color:var(--urgente-texto)">Todavía no entró</div></div></div>' +
+      COLS.map(function (r) { return '<span class="celda' + (r === colSel ? ' colsel' : '') + '" data-col="' + r + '"><span class="casilla' + (roles.indexOf(r) >= 0 ? ' si' : '') + '" tabindex="0" role="checkbox"></span></span>'; }).join('') + '<span class="cuenta">' + U.puedeN(p) + ' de 21</span>';
+    matriz.insertBefore(f, nueva); U.nuevo(f);
+    var tit = $('.m-cab .t-seccion', matriz); tit.firstChild.textContent = U.PERSONAS.length + ' personas ';
+    input.value = ''; $$('.casilla', nueva).forEach(function (k, i) { k.classList.toggle('si', i === 0); });
+    if (roles.indexOf(colSel) >= 0) pintarPanel(false);
+    avisar(U.primerNombre(p) + ' autorizado como ' + roles.map(function (r) { return U.ROLES[r].n; }).join(' y '), function () { U.PERSONAS.splice(U.PERSONAS.indexOf(p), 1); U.sacar(f); tit.firstChild.textContent = U.PERSONAS.length + ' personas '; });
+    nueva.scrollIntoView({ block: 'nearest' });
+  }
+  btnAut.addEventListener('click', function () { nueva.scrollIntoView({ block: 'nearest' }); abrirCampo(); U.animar(nueva, 'u-salta', 400); });
+
+  document.addEventListener('keydown', function (e) {
+    if (U.hayCapa() && !sug) return;
+    if (e.altKey && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); btnAut.click(); }
+    else if (e.altKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); abrirSesiones(); }
+    else if (e.key === 'Escape' && sug) { sug.cerrar(); sug = null; }
+  });
+})();
+</script>
 </body>
 </html>

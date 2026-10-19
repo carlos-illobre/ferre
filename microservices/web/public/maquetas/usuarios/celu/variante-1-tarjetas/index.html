@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../_extra/usuarios.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_extra/interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .celu-pantalla { display: flex; flex-direction: column; gap: 8px; padding-bottom: 0; }
@@ -36,7 +38,7 @@
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
-  <nav class="celu-pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Actividad</a></nav>
+  <nav class="celu-pestanas"><a data-ir="resumen">Resumen</a><a class="activa" data-ir="usuarios">Usuarios</a><a data-ir="actividad">Actividad</a></nav>
   <div class="celu-pantalla">
     <button class="alta"><span class="ico"><i class="i" data-i="user-plus"></i></span><span class="grow"><b>Autorizar otro correo de Google</b><small>Invitá a alguien de tu negocio</small></span><i class="i" data-i="chevron-right"></i></button>
     <div class="buscar"><div class="campo"><i class="i" data-i="search"></i>Nombre o correo</div><button class="btn"><i class="i" data-i="list-filter"></i>Filtros</button></div>
@@ -61,13 +63,199 @@
     </div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo" data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+/* Celu 1 · tarjetas: tocar a alguien abre su tarjeta (Información, Roles, Acceso por aparato); el botón
+   naranja autoriza a alguien y suma su tarjeta; buscar, Filtros y Ordenar cambian la lista. */
+(function () {
+  var $ = U.$, $$ = U.$$;
+  var pant = $('.celu-pantalla'), conteo = $('.conteo'), abierta = 'ms', pest = 'acceso', orden = 'correo', texto = '', fEstado = 'todos', fRoles = [];
+  pant.style.overflowY = 'auto'; pant.style.scrollbarWidth = 'none';
+  var ids = ['ci', 'ms', 'lf'];
+  $$('.per', pant).forEach(function (c, i) { c.setAttribute('data-id', ids[i]); });
+  // Las que no entran en la pantalla siguen abajo, con el mismo molde.
+  var fin = document.createElement('div'); fin.style.cssText = 'height:12px;flex:none'; pant.appendChild(fin);
+  ['no', 'gb', 'sa', 'dp'].forEach(function (id) { var c = document.createElement('div'); c.className = 'per'; c.setAttribute('data-id', id); pant.insertBefore(c, fin); pintar(U.persona(id)); });
+
+  function aparatos(p) {
+    var lista = p.sesiones.map(function (s, k) { return { n: s.n, i: s.i, s: s, k: k, h: p.huellas.map(function (h) { return h.n; }).indexOf(s.n) }; });
+    p.huellas.forEach(function (h, k) { if (!p.sesiones.some(function (s) { return s.n === h.n; })) lista.push({ n: h.n, i: 'smartphone', s: null, h: k }); });
+    return lista;
+  }
+  function cuando(s) { var t = s.d.split(' · ')[1] || s.d; return t.charAt(0).toUpperCase() + t.slice(1); }
+  function accesoHTML(p) {
+    if (p.inactivo) return '<div class="t-detalle" style="padding:0 4px 4px">Inactivo: no tiene sesiones ni huella.</div>';
+    if (p.nuevo && !p.sesiones.length) return '<div class="aviso urgente"><i class="i i-s" data-i="hourglass" style="margin-top:2px"></i><span>Todavía no entró. Que abra la app con ' + U.esc(p.mail) + '.</span></div>';
+    var l = aparatos(p);
+    if (!l.length) return '<div class="t-detalle" style="padding:0 4px 4px">No tiene sesiones abiertas.</div>';
+    return l.map(function (a, j) {
+      var d = a.s ? (a.s.vivo ? 'Usándola ahora' : cuando(a.s)) : 'Sin sesión';
+      var conH = a.h >= 0;
+      return '<div class="disp' + (a.s && a.s.viejo ? ' viejo' : '') + '"><span class="ico"><i class="i" data-i="' + a.i + '"></i>' + (a.s && a.s.vivo ? '<span class="vivo"></span>' : '') + '</span><div><div class="n">' + a.n + '</div><div class="d' + (conH ? ' lineal" style="gap:4px' : '') + '">' + d + (conH ? ' · <i class="i i-s" data-i="fingerprint"></i>con huella' : '') + '</div></div>' +
+        (conH ? '<button class="btn chico btn-suave btn-icono" data-menu="' + j + '" aria-label="Opciones"><i class="i i-s" data-i="ellipsis"></i></button>' : '<button class="btn chico btn-suave" data-cerrar-ses="' + j + '">Cerrar</button>') + '</div>';
+    }).join('');
+  }
+  function infoHTML(p) {
+    return '<div class="t-detalle" style="display:grid;gap:6px;padding:0 4px 10px"><span class="lineal"><i class="i i-s" data-i="mail"></i>' + U.esc(p.mail) + '</span><span class="lineal"><i class="i i-s" data-i="calendar"></i>' + p.desde + '</span>' +
+      (p.ultimo ? '<span class="lineal"><i class="i i-s" data-i="history"></i>Último: ' + p.ultimo + '</span>' : '') + '</div>' +
+      '<div class="lineal">' + (p.inactivo ? '<button class="btn chico" style="flex:1" data-reactivar><i class="i i-s" data-i="user-check"></i>Reactivar</button>' : '<button class="btn chico btn-peligro" style="flex:1" data-desactivar><i class="i i-s" data-i="user-x"></i>Desactivar</button>') +
+      '<button class="btn chico" style="flex:1" data-ir="actividad"><i class="i i-s" data-i="history"></i>Qué hizo hoy</button></div>';
+  }
+  function rolesHTML(p) {
+    return '<div class="t-detalle" style="padding:0 4px 10px">' + (p.inactivo ? 'Inactivo: no puede entrar.' : U.puedeTexto(p)) + '</div>' +
+      '<div class="lineal"><button class="btn chico" style="flex:1" data-cambiar' + (p.inactivo ? ' disabled' : '') + '><i class="i i-s" data-i="pencil"></i>Cambiar roles</button><button class="btn chico btn-suave" style="flex:1" data-cuales><i class="i i-s" data-i="key-round"></i>Puede ' + U.puedeN(p) + ' de 21</button></div>';
+  }
+  function perHTML(p) {
+    var ab = p.id === abierta, n = aparatos(p).length;
+    var est = p.inactivo ? '<span class="pastilla contorno" style="height:28px">Inactivo</span>' : (p.nuevo && !p.sesiones.length) ? '<span class="pastilla urgente" style="height:28px">No entró aún</span>' : '';
+    var h = '<div class="top">' + U.avHTML(p) + '<div style="min-width:0"><div class="n">' + U.esc(p.n) + (p.yo ? ' <span class="yo">Vos</span>' : '') + '</div><div class="m ellipsis">' + U.esc(p.mail) + '</div></div><i class="i" data-i="chevron-' + (ab ? 'up' : 'down') + '" style="color:var(' + (ab ? '--pino' : '--texto-3') + ')"></i></div>' +
+      '<div class="roles">' + U.rolesOrdenados(p).map(U.rolHTML).join('') + est + '</div>';
+    if (ab) h += '<div class="u-abierto"><div class="tabs"><a data-tab="info"' + (pest === 'info' ? ' class="activa"' : '') + '>Información</a><a data-tab="roles"' + (pest === 'roles' ? ' class="activa"' : '') + '>Roles</a><a data-tab="acceso"' + (pest === 'acceso' ? ' class="activa"' : '') + '>Acceso (' + n + ')</a></div>' +
+      '<div data-cont>' + (pest === 'info' ? infoHTML(p) : pest === 'roles' ? rolesHTML(p) : accesoHTML(p)) + '</div></div>';
+    return h;
+  }
+  function card(id) { return $('.per[data-id="' + id + '"]', pant); }
+  function pintar(p, anim) {
+    var c = card(p.id); if (!c) return;
+    c.innerHTML = perHTML(p); c.classList.toggle('abierta', p.id === abierta);
+    c.style.opacity = p.inactivo ? '.7' : '';
+    U.iconos(c);
+    if (anim) U.animar($('.u-abierto', c), anim, 400);
+  }
+  function conteoTxt() { var act = U.PERSONAS.filter(function (p) { return !p.inactivo; }).length; conteo.firstElementChild.textContent = U.PERSONAS.length + ' usuarios · ' + act + ' activos'; }
+
+  // Las tarjetas a la vista se conectan sin redibujarlas.
+  var m = card('ms');
+  $$('.tabs a', m).forEach(function (a, i) { a.setAttribute('data-tab', ['info', 'roles', 'acceso'][i]); });
+  var cont = document.createElement('div'); cont.setAttribute('data-cont', '');
+  $$('.disp', m).forEach(function (d) { cont.appendChild(d); });
+  var envol = document.createElement('div'); envol.className = 'u-abierto';
+  m.insertBefore(envol, $('.tabs', m)); envol.appendChild($('.tabs', m)); envol.appendChild(cont);
+  $('.disp .btn', cont).setAttribute('data-cerrar-ses', '0');
+  $$('.disp .btn', cont)[1].setAttribute('data-menu', '1');
+
+  pant.addEventListener('click', function (e) {
+    var c = e.target.closest('.per'); if (!c) return;
+    var p = U.persona(c.getAttribute('data-id'));
+    if (e.target.closest('.top')) {
+      var antes = abierta; abierta = abierta === p.id ? null : p.id; pest = 'acceso';
+      if (antes && card(antes)) pintar(U.persona(antes));
+      pintar(p, abierta ? 'u-nuevo' : null);
+      return;
+    }
+    var t = e.target.closest('[data-tab]');
+    if (t) { pest = t.getAttribute('data-tab'); pintar(p); U.animar($('[data-cont]', c), 'u-funde', 260); return; }
+    var lista = aparatos(p);
+    var cs = e.target.closest('[data-cerrar-ses]');
+    if (cs) return cerrarSes(p, lista[+cs.getAttribute('data-cerrar-ses')], cs.closest('.disp'));
+    var mb = e.target.closest('[data-menu]');
+    if (mb) return menuAparato(p, lista[+mb.getAttribute('data-menu')], mb);
+    if (e.target.closest('[data-cambiar]')) return U.dialogoRoles(p, function (sel) { var a = p.roles.slice(); p.roles = sel; delete p.puedeFijo; pintar(p); U.tostada(U.primerNombre(p) + ' ahora es ' + (sel.map(function (r) { return U.ROLES[r].n; }).join(' y ') || 'sin roles') + '.', { deshacer: function () { p.roles = a; pintar(p); } }); });
+    if (e.target.closest('[data-cuales]')) return U.dialogoPuede(p);
+    if (e.target.closest('[data-desactivar]')) return U.desactivar(p, function () { pintar(p); conteoTxt(); });
+    if (e.target.closest('[data-reactivar]')) { p.inactivo = false; p.t = p.tAntes || 't4'; p.desde = 'Reactivado hoy'; pintar(p); conteoTxt(); U.tostada(U.primerNombre(p) + ' puede volver a entrar.'); }
+  });
+  function cerrarSes(p, a, el) {
+    if (a.s && a.s.esta) return U.tostada('Es este celular: para salir, usá Salir en Más.', { mal: true, icono: 'info' });
+    var k = p.sesiones.indexOf(a.s);
+    U.sacar(el, function () {
+      if (k >= 0) p.sesiones.splice(k, 1);
+      if (!p.sesiones.some(function (s) { return s.vivo; })) p.vivo = false;
+      pintar(p); U.vibrar([10, 40, 10]);
+      U.tostada('Cerraste la sesión en ' + a.n + '.', { deshacer: function () { p.sesiones.splice(k, 0, a.s); if (a.s.vivo) p.vivo = true; pintar(p); } });
+    });
+  }
+  function menuAparato(p, a, ancla) {
+    var mm = U.capa({ tipo: 'menu', ancla: ancla, html: (a.s ? '<button class="u-op" data-o="ses"><i class="i" data-i="log-out"></i>Cerrar la sesión</button>' : '') +
+      '<button class="u-op" data-o="huella"><i class="i" data-i="fingerprint"></i>Quitar la huella</button>' + (a.s ? '<button class="u-op peligro" data-o="todo"><i class="i" data-i="power"></i>Las dos cosas</button>' : '') });
+    mm.el.addEventListener('click', function (e) {
+      var o = e.target.closest('[data-o]'); if (!o) return; o = o.getAttribute('data-o'); mm.cerrar();
+      var el = $$('.disp', card(p.id))[aparatos(p).map(function (x) { return x.n; }).indexOf(a.n)];
+      if (o === 'ses') return cerrarSes(p, a, el);
+      var h = p.huellas[a.h], ks = p.sesiones.indexOf(a.s);
+      U.sacar(el, function () {
+        p.huellas.splice(a.h, 1); if (o === 'todo' && ks >= 0) p.sesiones.splice(ks, 1);
+        pintar(p); U.vibrar([10, 40, 10]);
+        U.tostada(o === 'todo' ? 'El ' + a.n + ' quedó afuera: sin sesión y sin huella.' : 'El ' + a.n + ' ya no entra con huella.', { deshacer: function () { p.huellas.splice(a.h, 0, h); if (o === 'todo' && ks >= 0) p.sesiones.splice(ks, 0, a.s); pintar(p); } });
+      });
+    });
+  }
+
+  // Autorizar otro correo: sube la hoja; al confirmar, la tarjeta nueva aparece arriba de la lista.
+  $('.alta').addEventListener('click', function () {
+    U.dialogoAutorizar(function (p) {
+      var c = document.createElement('div'); c.className = 'per'; c.setAttribute('data-id', p.id);
+      conteo.parentNode.insertBefore(c, conteo.nextSibling); pintar(p); conteoTxt();
+      pant.scrollTop = 0; U.nuevo(c, true);
+      U.tostada(U.primerNombre(p) + ' ya puede entrar con su Google.');
+    });
+  });
+
+  // Buscar, Filtros y Ordenar.
+  var campo = $('.buscar .campo'), input = null;
+  campo.style.cursor = 'text';
+  campo.addEventListener('click', function () {
+    if (!input) {
+      var nodo = Array.prototype.filter.call(campo.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); })[0];
+      input = document.createElement('input'); input.placeholder = 'Nombre o correo';
+      input.style.cssText = 'flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;color:var(--tinta)';
+      campo.replaceChild(input, nodo);
+      input.addEventListener('input', function () { texto = input.value.trim().toLowerCase(); filtrar(); });
+    }
+    input.focus();
+  });
+  function pasa(p) {
+    return (!texto || (p.n + ' ' + p.mail).toLowerCase().indexOf(texto) >= 0) &&
+      (fEstado === 'todos' || (fEstado === 'activos' && !p.inactivo) || (fEstado === 'inactivos' && p.inactivo) || (fEstado === 'nuevos' && p.nuevo && !p.sesiones.length)) &&
+      (!fRoles.length || fRoles.some(function (r) { return p.roles.indexOf(r) >= 0; }));
+  }
+  function filtrar() {
+    var n = 0;
+    $$('.per', pant).forEach(function (c) { var ok = pasa(U.persona(c.getAttribute('data-id'))); c.classList.toggle('u-oculto', !ok); if (ok) n++; });
+    var v = $('.u-vacio', pant);
+    if (!n && !v) { v = document.createElement('div'); v.className = 'u-vacio t-detalle'; v.style.padding = '12px 4px'; v.textContent = 'Nadie coincide con la búsqueda o los filtros.'; pant.insertBefore(v, fin); }
+    if (n && v) v.remove();
+    var fb = $('.buscar .btn'), k = (fEstado !== 'todos' ? 1 : 0) + fRoles.length;
+    fb.innerHTML = '<i class="i" data-i="list-filter"></i>Filtros' + (k ? ' <span class="insignia">' + k + '</span>' : ''); U.iconos(fb);
+  }
+  $('.buscar .btn').addEventListener('click', function () {
+    var est = fEstado, rs = fRoles.slice();
+    var c = U.capa({ tipo: 'hoja', html: '' });
+    function pintarF() {
+      var n = U.PERSONAS.filter(function (p) { var a = fEstado, b = fRoles; fEstado = est; fRoles = rs; var ok = pasa(p); fEstado = a; fRoles = b; return ok; }).length;
+      c.el.innerHTML = '<div class="asa"></div><div class="u-cab"><div class="t-seccion">Filtros</div><button class="btn btn-fantasma chico" data-limpiar>Limpiar</button></div>' +
+        '<div><span class="u-et">Estado</span><div class="chips">' + [['todos', 'Todos'], ['activos', 'Activos'], ['nuevos', 'No entraron'], ['inactivos', 'Inactivos']].map(function (x) { return '<span class="chip' + (est === x[0] ? ' elegido' : '') + '" data-est="' + x[0] + '">' + x[1] + '</span>'; }).join('') + '</div></div>' +
+        '<div><span class="u-et">Rol</span><div class="chips">' + U.ORDEN_ROLES.map(function (r) { return '<span class="chip' + (rs.indexOf(r) >= 0 ? ' elegido' : '') + '" data-rolf="' + r + '"><i class="i i-s" data-i="' + U.ROLES[r].i + '"></i>' + U.ROLES[r].n + '</span>'; }).join('') + '</div></div>' +
+        '<button class="btn btn-accion grande" data-ver>Ver ' + n + (n === 1 ? ' persona' : ' personas') + '</button>';
+      U.iconos(c.el);
+    }
+    pintarF();
+    c.el.addEventListener('click', function (e) {
+      var x = e.target.closest('[data-est]'); if (x) { est = x.getAttribute('data-est'); pintarF(); return; }
+      var r = e.target.closest('[data-rolf]'); if (r) { r = r.getAttribute('data-rolf'); var i = rs.indexOf(r); if (i >= 0) rs.splice(i, 1); else rs.push(r); pintarF(); return; }
+      if (e.target.closest('[data-limpiar]')) { est = 'todos'; rs = []; pintarF(); return; }
+      if (e.target.closest('[data-ver]')) { fEstado = est; fRoles = rs; c.cerrar(); filtrar(); }
+    });
+  });
+  var ord = conteo.lastElementChild; ord.style.cursor = 'pointer';
+  ord.addEventListener('click', function () {
+    var mm = U.capa({ tipo: 'menu', ancla: ord, html: [['nombre', 'Nombre'], ['correo', 'Correo'], ['uso', 'Último uso']].map(function (x) { return '<button class="u-op' + (orden === x[0] ? ' elegida' : '') + '" data-ord="' + x[0] + '">' + (orden === x[0] ? '<i class="i" data-i="check"></i>' : '<span style="width:20px"></span>') + x[1] + '</button>'; }).join('') });
+    mm.el.addEventListener('click', function (e) {
+      var o = e.target.closest('[data-ord]'); if (!o) return; orden = o.getAttribute('data-ord'); mm.cerrar();
+      ord.innerHTML = '<i class="i i-s" data-i="arrow-up-down"></i>Ordenar: ' + { nombre: 'nombre', correo: 'correo', uso: 'último uso' }[orden]; U.iconos(ord);
+      var cs = $$('.per', pant), clave = function (c) { var p = U.persona(c.getAttribute('data-id')); return orden === 'nombre' ? p.n : orden === 'correo' ? p.mail : (p.vivo ? '0' : p.sesiones.length ? '1' : p.inactivo ? '3' : '2') + p.n; };
+      cs.sort(function (a, b) { return clave(a).localeCompare(clave(b)); }).forEach(function (c) { pant.insertBefore(c, fin); U.animar(c, 'u-funde', 260); });
+    });
+  });
+})();
+</script>
 </body>
 </html>

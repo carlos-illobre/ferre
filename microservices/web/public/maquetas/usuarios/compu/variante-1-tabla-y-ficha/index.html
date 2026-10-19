@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="../../_extra/usuarios.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_extra/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_extra/interacciones.css">
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: grid; grid-template-columns: 1fr 344px; gap: 20px; padding-top: 16px; }
   .izq { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
@@ -48,15 +50,15 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
-      <div class="usuario"><span class="avatar">CI</span><div class="txt" style="flex:1"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div><i class="i txt" data-i="log-out" style="color:var(--texto-3)"></i></div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt" style="flex:1"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div><i class="i txt" data-i="log-out" style="color:var(--texto-3)" data-ir="entrar" aria-label="Salir"></i></div>
     </div>
   </nav>
   <main class="contenido">
@@ -67,7 +69,7 @@
         <button class="btn btn-accion chico"><i class="i i-s" data-i="user-plus"></i>Autorizar a alguien <span class="kbd">Alt N</span></button>
       </div>
     </header>
-    <nav class="pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Quién hizo qué</a></nav>
+    <nav class="pestanas"><a data-ir="resumen">Resumen</a><a class="activa" data-ir="usuarios">Usuarios</a><a data-ir="actividad">Quién hizo qué</a></nav>
     <section class="pantalla">
       <div class="izq">
         <div class="kpis">
@@ -114,10 +116,173 @@
           <div style="margin-top:8px"><div class="disp"><span class="ico"><i class="i" data-i="fingerprint"></i></span><div><div class="n">Samsung A34</div><div class="d">Entró hoy 7:58</div></div><button class="btn chico btn-suave">Quitar</button></div></div>
         </div>
         <div class="t-detalle" style="display:flex;gap:8px;align-items:center"><i class="i i-s" data-i="history"></i>Último: registró el ingreso de Fischer · hoy 9:12</div>
-        <div class="pie-ficha"><button class="btn btn-peligro chico" style="flex:1"><i class="i i-s" data-i="user-x"></i>Desactivar</button><button class="btn btn-fantasma chico">Todo lo que hizo</button></div>
+        <div class="pie-ficha"><button class="btn btn-peligro chico" style="flex:1"><i class="i i-s" data-i="user-x"></i>Desactivar</button><button class="btn btn-fantasma chico" data-ir="actividad">Todo lo que hizo</button></div>
       </aside>
     </section>
   </main>
 </div>
+<script src="../../_extra/interacciones.js"></script>
+<script>
+/* Compu 1 · tabla y ficha: elegir a alguien cambia la ficha; autorizar suma un renglón; Cambiar da o
+   quita roles; Cerrar y Quitar sacan el aparato; Desactivar pide confirmación; buscar y filtrar. */
+(function () {
+  var $ = U.$, $$ = U.$$;
+  var izq = $('.izq'), tabla = $('.tabla'), ficha = $('.ficha');
+  izq.style.cssText = 'overflow-y:auto;scrollbar-width:none;min-height:0;margin:-4px;padding:4px';
+  var ids = ['ci', 'gb', 'ms', 'lf', 'no', 'sa', 'dp'], elegido = 'ms';
+  $$('.fila', tabla).forEach(function (f, i) { f.setAttribute('data-id', ids[i]); f.tabIndex = 0; });
+  var base = { ses: 9 - suma('sesiones'), hu: 5 - suma('huellas') };
+  function suma(k) { return U.PERSONAS.reduce(function (s, p) { return s + p[k].length; }, 0); }
+  var kpi = $$('.kpis .resumen');
+
+  function rolesFila(p) {
+    var r = U.rolesOrdenados(p);
+    if (!r.length) return '<span class="t-detalle">Sin roles</span>';
+    if (r[0] === 'admin' && r.length > 1) return U.rolHTML('admin') + '<span class="rol mas">+' + (r.length - 1) + '</span>';
+    return r.slice(0, 2).map(U.rolHTML).join('') + (r.length > 2 ? '<span class="rol mas">+' + (r.length - 2) + '</span>' : '');
+  }
+  function accFila(p) {
+    if (p.inactivo) return '<span class="pastilla contorno" style="height:26px">Inactivo</span>';
+    if (p.nuevo && !p.sesiones.length) return '<span class="pastilla urgente" style="height:26px">No entró aún</span>';
+    return '<i class="i i-s" data-i="monitor"></i>' + p.sesiones.length + ' · <i class="i i-s" data-i="fingerprint"></i>' + p.huellas.length +
+      (p.sesiones.some(function (s) { return s.viejo; }) ? ' <i class="i i-s urg" data-i="hourglass"></i>' : '');
+  }
+  function filaHTML(p) {
+    return U.avHTML(p) + '<div class="grow"><div class="nom">' + U.esc(p.n) + (p.yo ? ' <span class="yo">Vos</span>' : '') + '</div><div class="mail ellipsis">' + U.esc(p.mail) + '</div></div>' +
+      '<div class="roles">' + rolesFila(p) + '</div><div class="acc">' + accFila(p) + '</div><i class="i chev" data-i="chevron-right"' + (p.id === elegido ? ' style="color:var(--pino)"' : '') + '></i>';
+  }
+  function fila(id) { return $('.fila[data-id="' + id + '"]', tabla); }
+  function repintarFila(p) {
+    var f = fila(p.id); if (!f) return;
+    f.innerHTML = filaHTML(p); U.iconos(f);
+    f.classList.toggle('inactiva', !!p.inactivo);
+  }
+  function kpis() {
+    var act = U.PERSONAS.filter(function (p) { return !p.inactivo; }).length;
+    var viejas = U.PERSONAS.reduce(function (s, p) { return s + p.sesiones.filter(function (x) { return x.viejo; }).length; }, 0);
+    U.rodar($('.va', kpi[0]), act); $('.et', kpi[0]).textContent = 'activos de ' + U.PERSONAS.length;
+    U.rodar($('.va', kpi[1]), base.ses + suma('sesiones'));
+    U.rodar($('.va', kpi[2]), base.hu + suma('huellas'));
+    U.rodar($('.va', kpi[3]), viejas);
+    chips[0].textContent = 'Todos (' + U.PERSONAS.length + ')';
+    chips[1].textContent = 'Activos (' + act + ')';
+  }
+  function elegir(id, sinFundido) {
+    elegido = id;
+    $$('.fila', tabla).forEach(function (f) {
+      var si = f.getAttribute('data-id') === id;
+      f.classList.toggle('elegida', si);
+      var ch = f.querySelector('.chev'); if (ch) ch.style.color = si ? 'var(--pino)' : '';
+    });
+    ficha.innerHTML = U.fichaHTML(U.persona(id)); U.iconos(ficha);
+    if (!sinFundido) U.animar(ficha, 'u-funde', 260);
+  }
+  tabla.addEventListener('click', function (e) { var f = e.target.closest('.fila'); if (f) elegir(f.getAttribute('data-id')); });
+
+  U.accionesFicha(ficha, function () { return U.persona(elegido); }, {
+    cambio: function (p, que, antes) {
+      repintarFila(p); kpis();
+      if (que === 'roles') {
+        elegir(p.id, true);
+        U.tostada(U.primerNombre(p) + ' ahora es ' + p.roles.map(function (r) { return U.ROLES[r].n; }).join(' y ') + '.', { deshacer: function () { p.roles = antes; repintarFila(p); elegir(p.id, true); } });
+      } else if (que === 'estado' || /vuelve/.test(que)) elegir(p.id, true);
+      else elegir(p.id, true);
+      filtrar();
+    }
+  });
+
+  // Autorizar a alguien: un renglón nuevo, elegido, y los números de arriba cambian.
+  function autorizar() {
+    U.dialogoAutorizar(function (p) {
+      var f = document.createElement('div');
+      f.className = 'fila'; f.setAttribute('data-id', p.id); f.tabIndex = 0;
+      var dp = fila('dp'); tabla.insertBefore(f, dp);
+      repintarFila(p); elegir(p.id); kpis(); filtrar();
+      U.nuevo(f); f.scrollIntoView({ block: 'nearest' });
+      U.tostada(U.primerNombre(p) + ' ya puede entrar con su Google.');
+    });
+  }
+  var btns = $$('.cabecera .acciones .btn');
+  btns[0].addEventListener('click', U.dialogoRolesYPermisos);
+  btns[1].addEventListener('click', autorizar);
+
+  // Lo que sin usar hace 30 días: lleva a quien tiene esa sesión.
+  kpi[3].style.cursor = 'pointer';
+  kpi[3].addEventListener('click', function () {
+    var p = U.PERSONAS.filter(function (x) { return x.sesiones.some(function (s) { return s.viejo; }); })[0];
+    if (!p) return U.tostada('No queda ninguna sesión sin usar hace más de 30 días.');
+    elegir(p.id); fila(p.id).scrollIntoView({ block: 'nearest' });
+    var d = $('.disp.viejo', ficha); if (d) { d.classList.add('u-logro'); U.animar(d, 'u-salta', 400); setTimeout(function () { d.classList.remove('u-logro'); }, 1000); }
+  });
+
+  // Buscar, Todos / Activos y Rol.
+  var campo = $('.barra-h .campo'), chips = $$('.barra-h .chip'), btnRol = $('.barra-h .btn'), texto = '', soloActivos = false, roles = [];
+  var input = null;
+  function abrirBusqueda() {
+    if (!input) {
+      var nodo = Array.prototype.filter.call(campo.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); })[0];
+      input = document.createElement('input');
+      input.placeholder = 'Buscá nombre o correo';
+      input.style.cssText = 'flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;color:var(--tinta)';
+      campo.replaceChild(input, nodo);
+      input.addEventListener('input', function () { texto = input.value.trim().toLowerCase(); filtrar(); });
+      input.addEventListener('focus', function () { campo.classList.add('foco'); });
+      input.addEventListener('blur', function () { campo.classList.remove('foco'); });
+    }
+    input.focus();
+  }
+  campo.style.cursor = 'text';
+  campo.addEventListener('click', abrirBusqueda);
+  chips.forEach(function (c, i) { c.addEventListener('click', function () { soloActivos = i === 1; chips[0].classList.toggle('elegido', !soloActivos); chips[1].classList.toggle('elegido', soloActivos); filtrar(); }); });
+  btnRol.addEventListener('click', function () {
+    var m = U.capa({ tipo: 'menu', ancla: btnRol, html: U.ORDEN_ROLES.map(function (r) {
+      return '<button class="u-op" data-r="' + r + '"><span class="casilla' + (roles.indexOf(r) >= 0 ? ' si' : '') + '"></span><i class="i" data-i="' + U.ROLES[r].i + '"></i>' + U.ROLES[r].n + '</button>';
+    }).join('') + '<div class="sep" style="margin:4px 0"></div><button class="u-op" data-r="">Todos los roles</button>' });
+    m.el.addEventListener('click', function (e) {
+      var o = e.target.closest('[data-r]'); if (!o) return;
+      var r = o.getAttribute('data-r');
+      if (!r) { roles = []; m.cerrar(); }
+      else { var i = roles.indexOf(r); if (i >= 0) roles.splice(i, 1); else roles.push(r); o.querySelector('.casilla').classList.toggle('si', i < 0); }
+      btnRol.innerHTML = '<i class="i i-s" data-i="list-filter"></i>Rol' + (roles.length ? ' · ' + roles.length : ''); U.iconos(btnRol);
+      btnRol.classList.toggle('btn-oscuro', roles.length > 0);
+      filtrar();
+    });
+  });
+  function filtrar() {
+    var vis = 0;
+    $$('.fila', tabla).forEach(function (f) {
+      var p = U.persona(f.getAttribute('data-id'));
+      var ok = (!texto || (p.n + ' ' + p.mail).toLowerCase().indexOf(texto) >= 0) && (!soloActivos || !p.inactivo) &&
+        (!roles.length || roles.some(function (r) { return p.roles.indexOf(r) >= 0; }));
+      f.classList.toggle('u-oculto', !ok); if (ok) vis++;
+    });
+    var v = $('.u-vacio', tabla);
+    if (!vis && !v) { v = document.createElement('div'); v.className = 'u-vacio t-detalle'; v.style.padding = '16px'; v.textContent = 'Nadie coincide. Probá con otro nombre o sacá el filtro de rol.'; tabla.appendChild(v); }
+    if (vis && v) v.remove();
+  }
+
+  // Teclado: Alt N, Alt R, R, / y flechas.
+  document.addEventListener('keydown', function (e) {
+    if (U.hayCapa()) return;
+    var escribiendo = /INPUT|TEXTAREA/.test(e.target.tagName);
+    if (e.altKey && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); autorizar(); }
+    else if (e.altKey && (e.key === 'r' || e.key === 'R')) { e.preventDefault(); U.dialogoRolesYPermisos(); }
+    else if (escribiendo) { if (e.key === 'Escape') e.target.blur(); }
+    else if (e.key === '/') { e.preventDefault(); abrirBusqueda(); }
+    else if (e.key === 'r' || e.key === 'R') { var b = $('[data-accion="cambiar"]', ficha); if (b) b.click(); }
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      var vis = $$('.fila:not(.u-oculto)', tabla), i = vis.indexOf(fila(elegido)) + (e.key === 'ArrowDown' ? 1 : -1);
+      if (vis[i]) { e.preventDefault(); elegir(vis[i].getAttribute('data-id')); vis[i].scrollIntoView({ block: 'nearest' }); }
+    }
+  });
+  // La ficha de Martín ya está dibujada: se conecta sin redibujarla.
+  ficha.querySelectorAll('.disp .btn').forEach(function (b, i) {
+    if (i < 2) { b.setAttribute('data-accion', 'cerrar-sesion'); b.setAttribute('data-k', i); }
+    else { b.setAttribute('data-accion', 'quitar-huella'); b.setAttribute('data-k', 0); }
+  });
+  $('.ficha h3 .btn').setAttribute('data-accion', 'cambiar');
+  $('.ficha .btn-peligro').setAttribute('data-accion', 'desactivar');
+})();
+</script>
 </body>
 </html>
