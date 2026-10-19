@@ -9,3 +9,4 @@
 - [x] T007 Una prueba por escenario, anotada en `proyecto/estado.yml`; e2e solo de lo que no prueban las unitarias (depende de T005 y T006)
 - [x] T008 Comparar con las maquetas aprobadas mediante capturas y mostrarle a Carlos las diferencias (depende de T005 y T006)
 - [x] T009 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T007)
+- [ ] T010 [interfaz] En el celular, «Ventas de hoy» con «Anular» adentro (decisión 120): las pestañas «Vender» y «Ventas de hoy», el resumen en tarjeta clara, el buscador por producto, importe o cliente, la hoja de cada venta con «Anular» y la confirmación con el motivo en lista y el comentario (E22–E30; maqueta `specs/003-ventas/maquetas/celular-ventas-de-hoy-v2.png`, aprobada por Carlos el 2026-10-19)

@@ -81,7 +81,7 @@ productos · Cuenta corriente · $58.000») y tocarla para ver los tres.
 
 1. **E11** **Given** una venta de 3 productos en cuenta corriente a Constructora Martínez, **When** se mira la lista, **Then** su renglón dice la hora, «3 productos», el medio con su ícono, el cliente y el importe.
 2. **E12** **Given** una venta de un solo producto, **When** se mira la lista, **Then** el renglón dice el producto («1 × Taladro inalámbrico 18 V») en lugar de «1 producto».
-3. **E13** **Given** el renglón de una venta, **When** se lo toca, **Then** se ven sus productos, uno por renglón, con cantidad y total; en la computadora, también el precio por unidad, y se abre también con Enter.
+3. **E13** **Given** el renglón de una venta, **When** se lo toca, **Then** se ven sus productos, uno por renglón, con cantidad y total; en la computadora, también el precio por unidad, y se abre también con Enter; en el celular se abren en una hoja que sube, con «Anular» (historia 5).
 4. **E14** **Given** una venta anulada, **When** se mira la lista, **Then** sigue en su hora, tachada y con «anulada», y no suma en el total, los medios ni los tres números.
 5. **E15** **Given** la lista, **When** se mira, **Then** está ordenada de la más reciente a la más vieja.
 
@@ -106,6 +106,29 @@ comparación con anteayer; volver a hoy.
 4. **E19** **Given** «Cambiar fecha», **When** se elige una fecha futura, **Then** no se puede: el calendario llega hasta hoy.
 5. **E20** **Given** un día sin ventas, **When** se lo elige, **Then** dice «No hubo ventas ese día» y los números en 0.
 6. **E21** **Given** sin conexión, **When** se elige otro día, **Then** dice que hace falta internet para ver otro día; hoy se sigue viendo con lo que el dispositivo tiene, como ahora.
+
+### User Story 5 - Buscar una venta y anularla desde Ventas de hoy, en el celular (Priority: P1)
+
+En el celular, «Ventas de hoy» y «Anular» son una sola pestaña (decisión 120): se busca la venta
+por un producto, el importe o el cliente, se la toca y se la anula desde su hoja.
+
+**Why this priority**: Anular es buscar una venta de la lista del día; tenerlo en dos pestañas
+obligaba a buscar dos veces.
+
+**Independent Test**: Con ocho ventas en el día, escribir «mecha» en el buscador, ver solo la
+venta que la tiene con lo que suma, tocarla, anularla con un motivo y verla tachada en la lista.
+
+**Acceptance Scenarios**:
+
+1. **E22** **Given** la lista del día, **When** se toca «Buscar» y se escribe «mecha», **Then** quedan solo las ventas que tienen ese producto (sin importar tildes ni mayúsculas), con lo que coincide resaltado, y arriba «1 de 8 ventas · suman $21.000»; el resumen del día se esconde mientras se busca.
+2. **E23** **Given** el buscador, **When** se escribe un importe («24000», «$24.000» o «24.000»), **Then** quedan las ventas de ese importe; **When** se escribe el nombre de un cliente, **Then** quedan las suyas.
+3. **E24** **Given** una búsqueda sin resultados, **When** se mira, **Then** dice «Ninguna venta con «…»» con «Borrar la búsqueda» y «Volver a todas las ventas».
+4. **E25** **Given** el buscador abierto, **When** se toca «Listo», **Then** se cierra, se borra lo escrito y vuelve el resumen del día.
+5. **E26** **Given** una venta confirmada de hoy y el permiso «Anular ventas del día», **When** se la toca, **Then** su hoja muestra sus productos y «Anular»; sin ese permiso, la hoja no tiene «Anular».
+6. **E27** **Given** la hoja de una venta, **When** se toca «Anular», **Then** pide confirmar con el motivo en una lista desplegable que empieza en «Sin motivo» y un comentario opcional (decisión 110), y el botón dice el importe que se descuenta («Anular · −$20.000»).
+7. **E28** **Given** la confirmación, **When** se anula, **Then** la venta queda en la lista tachada y con «anulada», los totales bajan y los productos vuelven al stock; una anulada no ofrece «Anular».
+8. **E29** **Given** otro día elegido, **When** se toca una venta de ese día, **Then** solo quien tiene «Anular ventas de cualquier día» ve «Anular».
+9. **E30** **Given** sin conexión, **When** se intenta anular, **Then** dice que para anular hace falta internet y la venta queda como estaba.
 
 ### Edge Cases
 

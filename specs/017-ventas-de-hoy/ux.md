@@ -34,6 +34,26 @@ B quedan como referencia descartada.
   «Volver a hoy». Sin ventas ese día: «No hubo ventas ese día». Sin conexión, otro día dice que
   hace falta internet.
 
+## En el celular, con Anular adentro (decisión 120, historia 5)
+
+Maqueta aprobada por Carlos el 2026-10-19: `specs/003-ventas/maquetas/celular-ventas-de-hoy-v2.png`
+(la v2 del director de arte, con el buscador que agregó). Sigue el lenguaje «Mostrador», como
+Vender (decisión 119):
+
+- Las pestañas de arriba son «Vender» y «Ventas de hoy»; la de «Anular» ya no está.
+- El día y «Otro día»; el resumen va en una tarjeta clara (ya no oscura): «Total de ventas», el
+  total grande, la comparación, el gráfico por hora y los cuatro medios en dos columnas (ícono en
+  su color, importe y cuántas); debajo, ventas, productos y ticket promedio.
+- «Ventas» con «Buscar» a su derecha, a mano del pulgar. Al tocarlo se esconden el día y el
+  resumen y queda arriba un campo con la lupa, «×» para borrar y «Listo» para salir; debajo,
+  cuántas coinciden y cuánto suman. Lo que coincide se resalta; si coincide un producto de una
+  venta de varios, el renglón lo muestra («3 × Mecha… y 1 más»). Sin resultados: una lupa tachada,
+  «Ninguna venta con «…»», un ejemplo y las dos salidas.
+- Tocar una venta abre su hoja: la hora, el medio y el cliente, los productos con cantidad,
+  precio y total, y «Anular» (rojo) si se puede. «Anular» pasa a confirmar: el motivo en una lista
+  desplegable, el comentario y «Cancelar» / «Anular · −$20.000». Una anulada dice cuándo y por
+  qué se anuló.
+
 ## Colores de los medios de pago (decisión 108)
 
 Efectivo verde, Mercado Pago celeste, Tarjeta violeta, Cuenta corriente ámbar, con su versión

@@ -932,3 +932,25 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      contesta, gris mientras pregunta, ámbar si no; sin conexión el QR se ve apagado. Abajo, tres
      características técnicas: una vez dentro resiste cortes de internet (sin internet no se entra), busca productos por código de barras y maneja
      la computadora desde el celular. Detalle en `specs/007-usuarios-y-acceso/ux.md`.
+119. **Vender en el celular: la v2 con tres cosas de la v3** (2026-10-19). De las propuestas del
+     director de arte, Carlos eligió para Vender en el celular la v2 («Mostrador») con, de la v3: el
+     medio de pago en una pastilla que abre la lista de los cuatro (con los íconos de hoy; arranca y
+     vuelve a Efectivo, decisión 37); cobrar deslizando el botón hasta el final; y «Escanear» abre la
+     cámara arriba y empuja la venta hacia abajo, que se sigue viendo. Además: «No llevó» al lado de
+     «Vaciar»; la unidad en una lista a la derecha de la cantidad (el renglón pierde el tacho: «−»
+     con 1 lo quita, con Deshacer); un (?) en el precio que abre cómo se calculó, porque en la v1 no
+     se notaba; el aviso de stock que no alcanza; el código que no está en el catálogo, que se asocia
+     a un producto; «Usar como lector de la computadora» desde «En espejo»; el cliente opcional al
+     lado del medio, con cualquier medio de pago (de la v2 de la computadora); la venta vacía y la
+     venta registrada de la v2 (reemplazan las de 003-T003 y 003-T004), con el caso sin conexión.
+     Maqueta `specs/003-ventas/maquetas/celular-vender-v2-con-v3.png`. Por ahora solo el celular: la
+     computadora se ve después.
+120. **Ventas de hoy y Anular, una sola pestaña en el celular** (2026-10-19). En el celular, Vender
+     queda con dos pestañas, «Vender» y «Ventas de hoy» (cambia la decisión 72, que tenía tres). Se
+     anula desde «Ventas de hoy», como en la v2 del director de arte: tocar una venta abre su hoja y
+     ahí está «Anular», que pide confirmar con el motivo en una lista desplegable y el comentario
+     (decisión 110). El director de arte agregó un buscador por producto, importe o cliente. Las ventas
+     de otro día se anulan con el permiso «Anular ventas de cualquier día», como antes. «Corregir» y
+     «Cambio» de la maqueta no se hacen todavía (003, historias 9 y 11). Maqueta
+     `specs/003-ventas/maquetas/celular-ventas-de-hoy-v2.png`. La computadora sigue con sus tres
+     pestañas hasta que se vea.

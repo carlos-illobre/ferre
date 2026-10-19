@@ -52,6 +52,9 @@ elige efectivo y se cobra; la venta queda confirmada y el stock baja.
 15. **Given** un producto con stock 2, **When** el Vendedor pone cantidad 5, **Then** la venta no se impide: el renglón avisa que no alcanza, se puede cobrar igual, el stock queda en 0 y no baja más, y por las 3 que faltaban queda anotada una anomalía (RF-59 de compras y stock).
 16. **Given** una venta que llega al servidor sin renglones, con una cantidad que no es mayor que cero, con un precio negativo o con un renglón sin descripción, **When** se intenta registrar, **Then** el servidor la rechaza y dice qué está mal; el aviso aparece en el lugar y la venta queda armada para corregirla.
 17. **Given** una venta ya guardada, **When** el dispositivo la reenvía con el mismo identificador (reintento o vuelta de la conexión), **Then** el servidor responde con la venta guardada y no la duplica.
+18. **Given** un código de barras que no es de ningún producto, **When** se lo escanea, **Then** se avisa que no está en el catálogo y se ofrece asociarlo: elegido el producto, se agrega a la venta y el código le queda guardado para la próxima vez.
+19. **Given** un renglón con precio, **When** se toca su precio, **Then** se explica de dónde sale: el costo y su proveedor, el margen, el IVA, el redondeo para arriba, la cantidad y el total del renglón; con un precio a mano, ese precio y el margen real (RF-13; en el celular, con un «?» a la vista, decisión 119).
+20. **Given** una venta con productos, **When** el Vendedor la vacía, **Then** queda vacía sin preguntar y puede deshacerlo: «Deshacer» la devuelve igual que estaba (decisión 119).
 
 ---
 
@@ -126,6 +129,8 @@ guardada con el suyo; la de cuenta corriente, con su cliente.
 5. **Given** una venta con cuenta corriente y un cliente elegido, **When** cobra, **Then** la venta se registra a nombre de ese cliente y sin pagar, y en las ventas del día figura su nombre al lado del medio de pago.
 6. **Given** una venta que llega al servidor con un medio de pago que no es efectivo, Mercado Pago, tarjeta ni cuenta corriente, **When** se intenta registrar, **Then** el servidor la rechaza y dice cuáles son los medios de pago.
 7. **Given** una venta recién empezada, **When** el Vendedor todavía no tocó ningún medio de pago, **Then** ya está elegido Efectivo, que es lo más común: si cobra así, la venta se registra en efectivo, y después de cada venta el medio vuelve a Efectivo (respondido por Carlos el 2026-10-11).
+8. **Given** una venta en efectivo, Mercado Pago o tarjeta con un cliente elegido, **When** cobra, **Then** se registra a nombre de ese cliente, que figura en las ventas del día, y no suma a lo que debe: la deuda es solo lo de cuenta corriente (decisión 119). Después de cada venta el cliente vuelve a quedar sin elegir.
+9. **Given** una venta armada en el celular, **When** el Vendedor arrastra el botón de cobrar hasta el final, **Then** se cobra; si lo suelta antes, vuelve y no pasa nada, y un toque solo explica cómo se cobra (decisión 119).
 
 ---
 

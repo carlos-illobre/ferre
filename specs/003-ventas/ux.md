@@ -70,45 +70,47 @@ renglón sin soltar el teclado. Con la venta armada, el Enter final la cierra.
 a la cámara al lado de la búsqueda lee el código de barras y agrega el producto. Cobrar y
 el total quedan al alcance del pulgar.
 
-**La lista de la venta en el celular** (Carlos, 2026-10-17; maqueta aprobada
-`maquetas/celular-venta-renglones.png`, sobre su referencia `maquetas/celular-venta-referencia-de-carlos.png`):
+**Vender en el celular** (decisión 119, Carlos, 2026-10-19; maqueta aprobada
+`maquetas/celular-vender-v2-con-v3.png`, la v2 del director de arte con tres cosas de la v3). Sigue
+el lenguaje «Mostrador»:
 
-- Arriba, «Productos en esta venta», con «Vaciar» (pregunta antes) y cuántos productos hay.
-- Cada renglón, en una tarjeta compacta: la foto, el nombre y debajo marca, proveedor y stock; a
-  la derecha, el precio por unidad en una pastilla verde suave, con la unidad debajo («cada uno»,
-  «el m», «el kg»); y un menú «⋮».
-- Abajo, en una sola fila: el tacho para quitar (debajo de la foto), la cantidad con − y +, el
-  margen y, a la derecha, el total del renglón (precio por cantidad).
-- El menú «⋮» tiene «Precio a mano», «Vender por metro, kilo o unidad» (ahí se cambia la unidad,
-  que no está a la vista porque se cambia poco), «Ver la ficha del producto» y «Sacar foto».
-  Un ítem libre (sin producto) tiene solo «Precio a mano» y la unidad.
-
-**El éxito de la venta en el celular** (Carlos, 2026-10-17; maqueta aprobada
-`maquetas/celular-venta-registrada.png`):
-
-- Fondo claro; arriba, el tilde en un círculo verde con confeti verde y amarillo alrededor (cae
-  una sola vez, en menos de un segundo, y queda quieto) y «¡Venta registrada!» grande.
-- Un panel verde con «Total cobrado», el importe grande, el medio de pago con su ícono y una franja
-  «El stock ya se descontó» con una caja amarilla y un tilde.
-- Dos tarjetas: la fecha y hora, y cuántos productos.
-- «Productos vendidos»: cada uno con su foto, el nombre, marca y proveedor, la cantidad con su
-  unidad y su total. Si son muchos, la pantalla se desliza.
-- «Nueva venta», oscuro y fijo abajo, es el único botón.
-- No tiene número de comprobante (las ventas no tienen número), ni el detalle de costos y
-  ganancia, ni comprobante, compartir o ticket (el comprobante es la historia 14, pendiente).
-- Sin conexión dice «Guardada en este dispositivo» y, en lugar del stock, que se envía sola
-  cuando vuelva internet.
-- El éxito de Depósito («Ingreso registrado») queda como estaba.
+- Arriba, «Vender», el estado de la conexión y, si el celular está en espejo con la computadora, la
+  pastilla «En espejo»: tocarla abre una hoja con «Usar como lector de la computadora» (lo que se
+  escanee entra en la venta de la computadora) y «Desvincular». Debajo, las pestañas «Vender» y
+  «Ventas de hoy» (decisión 120), y la búsqueda con el botón de la cámara a su derecha.
+- «Esta venta» con cuántos productos hay y, a la derecha, «No llevó» (anota lo que se preguntó) y «Vaciar»; los dos avisan abajo, y «Vaciar» ofrece Deshacer en lugar de preguntar antes.
+- Cada renglón, en una tarjeta: la foto, el nombre y debajo marca y stock; a la derecha, el precio
+  por unidad en una pastilla verde suave, con la unidad debajo («cada uno», «el metro», «el kg») y
+  un (?) chico: tocar la pastilla abre una hoja «Cómo se calculó» con el costo y su proveedor, el
+  margen, el IVA, el redondeo, la cantidad y el total del renglón (con un precio a mano, el precio y
+  el margen real). Tocar el resto del renglón abre su hoja: margen, precio a mano, cantidad y
+  «Quitar de la venta».
+- Abajo, en una fila: la cantidad con − y + (con 1, «−» quita el renglón y ofrece Deshacer), la
+  unidad en una lista (un., kg, m, L) a su derecha, el margen (abre la lista de márgenes) y el
+  total del renglón.
+- Un producto sin precio va en ámbar, con los márgenes para elegir ahí mismo (300, 200, 100, 50,
+  25 y «$» para el precio a mano). Si lo que se lleva supera el stock, el renglón avisa «Hay 3 un.:
+  no alcanza para 4» o «Sin stock».
+- Abajo, fijo: si falta algún precio, un aviso ámbar que dice cuál; el medio de pago en una
+  pastilla con su ícono y su color, que al tocarla abre la lista de los cuatro; a su lado,
+  «Cliente (opcional)», que abre la lista de clientes (con cuenta corriente pasa a ámbar y dice
+  «Elegí el cliente»); y el botón naranja «Deslizá para cobrar $45.500»: se cobra arrastrando el
+  círculo hasta el final; soltarlo antes lo devuelve, y tocarlo solo explica cómo se usa. Sin
+  productos, está apagado.
+- **Escanear:** la cámara se abre arriba, en el lugar de la búsqueda, y empuja la venta hacia
+  abajo: cada código leído suma el producto, que entra a la lista con un borde verde, y un aviso en
+  la cámara dice qué se sumó. Un código que no está en el catálogo se avisa ahí («No está en el
+  catálogo») con «Asociar»: se busca el producto y el código le queda guardado. La X cierra la
+  cámara.
+- **Venta registrada:** una ventana con el tilde, «Venta registrada», el total, el medio, el
+  cliente si hay, cuántos productos y la hora, «Ver en Ventas de hoy» y «Seguir vendiendo». Sin
+  conexión dice «Guardada en este celular» y que se envía sola cuando vuelva internet.
 
 **Estados:**
 
 - *Vacío:* la venta nueva dice que se escriba el nombre del producto o se escanee el código.
-  En el celular (Carlos, 2026-10-17; maqueta aprobada `maquetas/celular-venta-vacia.png`): el
-  dibujo de un carrito con productos de ferretería sobre semicírculos verde claro, «Venta nueva»
-  grande y debajo tres explicaciones en un panel verde clarito: «Escaneá» (con la cámara o el
-  lector), «Buscá» (por nombre o código) y «Explorá» (en Catálogo, en el menú). Las tres solo
-  explican: no se tocan, porque repetirían la búsqueda, el escáner y el menú de abajo. No hay
-  atajos, subtítulo ni consejos.
+  En el celular (decisión 119): un recuadro con el carrito, «La venta está vacía» y «Buscá o
+  escaneá un producto para empezar».
 - *Cargando:* mientras el catálogo baja por primera vez, la búsqueda lo dice y muestra el
   avance.
 - *Error:* si el servidor no acepta la venta, el aviso dice qué está mal y la venta queda
@@ -264,16 +266,9 @@ cada venta con sus productos; ver los totales; elegir otra fecha.
   «Los productos vuelven al stock solos»; y «Cancelar» y «Anular venta». En la computadora,
   todo con el teclado.
 
-**La pestaña Anular en el celular** (Carlos, 2026-10-17, sobre dos referencias suyas; maquetas
-aprobadas `maquetas/celular-anular-renovada*.png`): arriba, el aviso «Importante» con ícono en
-naranja suave («La venta anulada queda registrada, sus productos vuelven al stock y no se puede
-deshacer»); un buscador por producto o importe y, a su lado, para quien puede anular ventas de
-cualquier día, el día en un botón («Hoy» o la fecha) que abre el calendario; los medios de pago
-en pastillas para filtrar; «Ventas de hoy» (o del día elegido) con cuántas son; y cada venta en
-su tarjeta: la hora, el total grande, el medio de pago con su ícono y cuántos productos, el
-cliente si lo hay, «Anular» como botón naranja de 36 px, y cada producto con su foto,
-«cantidad × precio» y subtotal. Las anuladas, atenuadas, con el total tachado y la pastilla
-«Anulada».
+**En el celular se anula desde «Ventas de hoy»** (decisión 120; detalle en
+`specs/017-ventas-de-hoy/ux.md`): tocar la venta abre su hoja con «Anular», que pide confirmar con
+el motivo en una lista desplegable y el comentario. La pestaña «Anular» del celular ya no está.
 
 ## Historia 9: corregir una venta (Administrador)
 
