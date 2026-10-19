@@ -34,5 +34,6 @@
         ]
       }
     ]
-  }
+  },
+  "permissions": { "allow": ["mcp__Figma"] }
 }
