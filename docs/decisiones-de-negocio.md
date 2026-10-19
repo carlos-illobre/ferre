@@ -954,3 +954,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      «Cambio» de la maqueta no se hacen todavía (003, historias 9 y 11). Maqueta
      `specs/003-ventas/maquetas/celular-ventas-de-hoy-v2.png`. La computadora sigue con sus tres
      pestañas hasta que se vea.
+121. **La navegación con el teclado se mantiene en todas las versiones** (2026-10-19). Carlos: «muy
+     importante, hay que mantener siempre lo especificado sobre la navegación con el teclado en
+     todas las versiones». Toda pantalla nueva o rediseñada, y toda propuesta del director de arte
+     que se elija, conserva lo que la especificación dice del teclado: en la computadora todo se
+     opera con el teclado y el mouse nunca es la única forma (RNF-05), con las teclas de cada
+     pantalla (Enter, flechas, F2, F5 a F8, Esc, Alt+número y las demás) a la vista. Un gesto nuevo
+     (arrastrar, deslizar) se suma; nunca reemplaza al teclado.

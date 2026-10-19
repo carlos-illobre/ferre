@@ -61,7 +61,9 @@ Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec
   (RNF-01).
 - El orden de la pantalla es el del mostrador: buscar, precio, cantidad, cobro. Nada es
   obligatorio que el cuaderno no tenga (constitución, principio II).
-- En la computadora todo se opera con teclado; el mouse nunca es la única forma (RNF-05).
+- En la computadora todo se opera con teclado; el mouse nunca es la única forma (RNF-05). Un rediseño
+  nunca saca lo especificado del teclado: un gesto nuevo (arrastrar, deslizar) se suma, no lo
+  reemplaza (decisión 121).
 - En el celular todo se alcanza con una mano y ninguna pantalla se desplaza hacia el
   costado: cada elemento de una lista entra entero en el ancho de la pantalla (RNF-04).
 - El celular se parece lo más posible a una app nativa de Android (RNF-04).

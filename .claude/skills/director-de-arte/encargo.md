@@ -30,6 +30,8 @@
   botones quedan quietos: se hacen andar después, solo en la variante que Carlos elija.
 - **Sin pruebas** (decisión 114): no escribas pruebas ni compares capturas píxel a píxel; la
   captura de cada variante es para mostrarla, no para probarla.
+- **Teclado** (decisión 121): toda variante conserva lo que la especificación dice del teclado (en la
+  computadora, todo con el teclado y las teclas a la vista). Un gesto nuevo se suma, no lo reemplaza.
 - **Peso:** fotos recortadas y comprimidas (menos de 150 KB cada una), sin videos.
 - **`<pantalla>/resumen.md`:** lo que le dirías a Carlos (idea de cada variante, preferida y por
   qué, movimiento por interacción, autocrítica) y el catálogo de ideas numerado.
