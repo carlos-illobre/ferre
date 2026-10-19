@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuración · Ajustes (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../config.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { padding-bottom: 24px; }
+  /* Resumen: lo que hoy ocupa este celular, contra el tope de 150 KB */
+  .ocupa { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; padding: 14px 16px; }
+  .ocupa .ico { width: 48px; height: 48px; border-radius: 14px; background: var(--logro-suave); color: var(--logro-texto); display: grid; place-items: center; }
+  .ocupa .va { font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; }
+  .ocupa .va small { font-size: 14px; font-weight: 650; color: var(--texto-2); letter-spacing: 0; }
+  .ocupa .barra { margin-top: 8px; }
+  .ocupa .pie { display: flex; justify-content: space-between; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 6px; }
+  .explica { font-size: 14px; line-height: 20px; color: var(--texto-2); margin: 0 4px 10px; }
+  .version { padding: 14px 16px; }
+  .version .fila { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; }
+  .version .cuatro { margin-top: 12px; }
+  .cel { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; }
+  .cel + .cel { border-top: 1px solid var(--borde); }
+  .cel .tt { font-weight: 750; } .cel .dd { font-size: 14px; color: var(--texto-2); }
+  .vinc { padding: 16px; display: grid; gap: 12px; }
+  .vinc .par { display: flex; align-items: center; gap: 10px; }
+  .vinc .disp { width: 44px; height: 44px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .vinc .linea { flex: 1; height: 2px; background: repeating-linear-gradient(90deg, var(--logro) 0 6px, transparent 6px 10px); }
+  .vinc .botones { display: flex; gap: 8px; }
+  .vinc .botones .btn { flex: 1; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <a class="volver"><i class="i" data-i="chevron-left"></i>Más</a>
+  <div class="celu-cabecera"><span class="t-titulo">Configuración</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+
+  <div class="celu-pantalla">
+    <div class="grupo ocupa">
+      <span class="ico"><i class="i i-l" data-i="hard-drive"></i></span>
+      <div>
+        <div class="t-etiqueta">Guardado en este celular</div>
+        <div class="va num">38 KB <small>de 150 KB · nada del negocio</small></div>
+        <div class="barra"><b style="width:25%"></b></div>
+      </div>
+    </div>
+
+    <div class="titulo-grupo">Este celular</div>
+    <div class="grupo">
+      <div class="ajuste">
+        <span class="ico"><i class="i" data-i="sparkles"></i></span>
+        <div><div class="tt">Animaciones</div><div class="dd">Las pantallas se deslizan al navegar.</div></div>
+        <span class="llave si"></span>
+      </div>
+      <div class="ajuste">
+        <span class="ico gris"><i class="i" data-i="wifi-off"></i></span>
+        <div><div class="tt">Trabajar sin conexión</div><div class="dd">Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.</div></div>
+        <span class="llave"></span>
+      </div>
+    </div>
+
+    <div class="titulo-grupo">Cómo buscar productos</div>
+    <p class="explica">Como este celular no guarda el catálogo, hay dos formas de buscar. Elegí la que te resulte mejor.</p>
+    <div class="opcion elegida">
+      <span class="radio"></span>
+      <div>
+        <div class="tt">Bajar el catálogo al abrir</div>
+        <div class="pro"><i class="i i-s" data-i="circle-plus"></i>Buscar y escanear responde en el acto.</div>
+        <div class="contra"><i class="i i-s" data-i="circle-minus"></i>Abrir tarda unos segundos más y gasta datos cada vez.</div>
+      </div>
+    </div>
+    <div class="opcion">
+      <span class="radio"></span>
+      <div>
+        <div class="tt">Buscar en el servidor</div>
+        <div class="pro"><i class="i i-s" data-i="circle-plus"></i>Abre enseguida y casi no gasta datos.</div>
+        <div class="contra"><i class="i i-s" data-i="circle-minus"></i>Cada búsqueda y cada código esperan a la red.</div>
+      </div>
+    </div>
+
+    <div class="titulo-grupo">Versión nueva</div>
+    <div class="grupo version">
+      <div class="fila">
+        <span class="ico" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--pino-suave);color:var(--pino-texto)"><i class="i" data-i="refresh-cw"></i></span>
+        <div><div style="font-weight:750">Buscar versión nueva</div><div class="t-detalle">Cada cuánto, con la app abierta. Más seguido gasta un poco más de datos.</div></div>
+        <span class="llave si"></span>
+      </div>
+      <div class="cuatro"><b>5 min</b><b class="elegido">15 min</b><b>1 hora</b><b>24 horas</b></div>
+    </div>
+
+    <div class="titulo-grupo">Mis celulares con huella <span class="pastilla">2</span></div>
+    <div class="grupo">
+      <div class="cel"><span class="ico" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--logro-suave);color:var(--logro-texto)"><i class="i" data-i="fingerprint"></i></span><div><div class="tt">Moto G54 <span class="pastilla logro" style="height:24px;margin-left:4px">Este</span></div><div class="dd">Vinculado el 02/10</div></div><button class="btn btn-fantasma chico">Quitar</button></div>
+      <div class="cel"><span class="ico" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--hundido);color:var(--texto-2)"><i class="i" data-i="smartphone"></i></span><div><div class="tt">Samsung A15</div><div class="dd">Última vez hace 9 días</div></div><button class="btn btn-fantasma chico">Quitar</button></div>
+    </div>
+
+    <div class="titulo-grupo">Vínculo con la computadora</div>
+    <div class="grupo vinc">
+      <div class="par"><span class="disp"><i class="i" data-i="smartphone"></i></span><span class="linea"></span><span class="pastilla logro"><span class="punto"></span>En espejo</span><span class="linea"></span><span class="disp"><i class="i" data-i="monitor"></i></span></div>
+      <div><div style="font-weight:750">Compu del mostrador</div><div class="t-detalle">Vinculados hasta el 16/11</div></div>
+      <div class="botones"><button class="btn">Desconectar</button><button class="btn btn-peligro">Desvincular</button></div>
+    </div>
+  </div>
+
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>if (location.search.includes('entera')) document.body.classList.add('entera');</script>
+</body>
+</html>

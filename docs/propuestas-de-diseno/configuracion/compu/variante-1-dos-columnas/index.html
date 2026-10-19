@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuración · Dos columnas (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../config.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .resumenes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .resumen .va { font-size: 20px; line-height: 26px; }
+  .cols { display: grid; grid-template-columns: 1fr 420px; gap: 24px; margin-top: 4px; }
+  .titulo-grupo { font-size: 16px; color: var(--tinta); font-weight: 750; margin: 0 2px 10px; }
+  .pref { padding: 20px 24px; }
+  .pref + .pref { border-top: 1px solid var(--borde); }
+  .pref .cab { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 14px; align-items: start; }
+  .pref .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--pino-suave); color: var(--pino-texto); }
+  .pref .tt { font-weight: 750; font-size: 16px; line-height: 22px; }
+  .pref .dd { font-size: 14px; line-height: 20px; color: var(--texto-2); margin-top: 2px; max-width: 470px; }
+  .pref .kbd { margin-top: 4px; }
+  .pref .llave { margin-top: 4px; }
+  .pref .cuatro { margin: 14px 0 0 54px; max-width: 420px; }
+  .pref .cuatro .kbd { margin: 0 0 0 6px; height: 22px; min-width: 22px; }
+  .vista { margin: 14px 0 0 54px; display: flex; gap: 12px; align-items: center; }
+  .ventanita { width: 120px; height: 64px; border-radius: 10px; background: var(--hundido); position: relative; overflow: hidden; flex: none; }
+  .ventanita b { position: absolute; left: 22px; right: 22px; top: 12px; height: 40px; border-radius: 8px; background: #fff; box-shadow: var(--sombra-3); animation: ventana 2.6s var(--curva) -1.6s infinite; }
+  .ventanita i { position: absolute; right: 8px; bottom: 8px; width: 40px; height: 12px; border-radius: 5px; background: var(--pino); animation: tostada 2.6s var(--curva) -1.6s infinite; }
+  @keyframes ventana { 0%, 15% { opacity: 0; transform: translateY(10px) scale(.96); } 40%, 100% { opacity: 1; transform: none; } }
+  @keyframes tostada { 0%, 40% { opacity: 0; transform: translateY(8px); } 60%, 100% { opacity: 1; transform: none; } }
+  .guarda { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 20px; margin-top: 12px; border-radius: 16px; background: var(--hundido); }
+  .guarda .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: #fff; color: var(--texto-2); }
+  .guarda b { font-weight: 750; }
+  .guarda p { margin: 2px 0 0; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .cel { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; }
+  .cel + .cel { border-top: 1px solid var(--borde); }
+  .cel .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--logro-suave); color: var(--logro-texto); }
+  .cel .tt { font-weight: 750; } .cel .dd { font-size: 14px; color: var(--texto-2); }
+  .nota { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--borde); font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .nota svg { margin-top: 2px; color: var(--texto-3); }
+  .vinc { padding: 20px; margin-top: 16px; }
+  .par { display: flex; align-items: center; gap: 10px; }
+  .disp { width: 44px; height: 44px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .linea { flex: 1; height: 2px; background: repeating-linear-gradient(90deg, var(--logro) 0 6px, transparent 6px 10px); }
+  .vinc .botones { display: flex; gap: 8px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="nav-sub"><a>Anomalías</a><a>Procesos</a><a>Mejoras y errores</a><a class="activo">Configuración</a></div>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Configuración</div><div class="cabecera sub" style="padding:0">Lo que decidís para vos, en esta computadora. No cambia nada de los demás.</div></div>
+    </header>
+    <section class="pantalla" style="padding-top:16px">
+      <div class="cols">
+        <div>
+          <div class="titulo-grupo">Esta computadora</div>
+          <div class="grupo">
+            <div class="pref">
+              <div class="cab">
+                <span class="ico"><i class="i" data-i="sparkles"></i></span>
+                <div><div class="tt">Animaciones</div><div class="dd">Las ventanas y los avisos aparecen con un movimiento corto. Si las apagás, todo aparece en el acto. En el celular, además, las pantallas se deslizan.</div></div>
+                <span class="kbd">Alt A</span><span class="llave si"></span>
+              </div>
+              <div class="vista"><div class="ventanita"><b></b><i></i></div><span class="t-detalle">Así se mueve: la ventana sube y se aclara; el aviso entra desde abajo.</span></div>
+            </div>
+            <div class="pref">
+              <div class="cab">
+                <span class="ico"><i class="i" data-i="refresh-cw"></i></span>
+                <div><div class="tt">Buscar versión nueva</div><div class="dd">Mientras la aplicación está a la vista, cada cuánto se fija si hay una versión nueva. También se fija al abrirla y cada vez que se vuelve a ella. Más seguido se entera antes y gasta un poco más de datos.</div></div>
+                <span class="kbd">Alt B</span><span class="llave si"></span>
+              </div>
+              <div class="cuatro"><b>5 min</b><b class="elegido">15 min</b><b>1 hora</b><b>24 horas</b></div>
+            </div>
+          </div>
+          <div class="guarda">
+            <span class="ico"><i class="i" data-i="hard-drive"></i></span>
+            <div><b>Esta computadora siempre guarda para trabajar sin conexión</b><p>Tiene el catálogo, el stock y lo que falta enviar: 23,4 MB. En el celular, cada uno elige si guarda.</p></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="titulo-grupo">Tu cuenta</div>
+          <div class="grupo">
+            <div class="cel"><span class="ico"><i class="i" data-i="fingerprint"></i></span><div><div class="tt">Moto G54</div><div class="dd">Con huella desde el 02/10 · en espejo</div></div><button class="btn btn-fantasma chico">Quitar</button></div>
+            <div class="cel"><span class="ico"><i class="i" data-i="fingerprint"></i></span><div><div class="tt">Samsung A15</div><div class="dd">Entró hace 9 días</div></div><button class="btn btn-fantasma chico">Quitar</button></div>
+            <div class="nota"><i class="i i-s" data-i="info"></i>Para sumar un celular, entrá con Google desde él: te ofrece la huella solo.</div>
+          </div>
+
+          <div class="grupo vinc">
+            <div class="par"><span class="disp"><i class="i" data-i="smartphone"></i></span><span class="linea"></span><span class="pastilla logro"><span class="punto"></span>Trabajando juntos</span><span class="linea"></span><span class="disp"><i class="i" data-i="monitor"></i></span></div>
+            <div style="margin-top:12px;font-weight:750">Vinculada con Moto G54</div>
+            <div class="t-detalle">Hasta el 16/11. Se renueva cada vez que entrás escaneando con el celular.</div>
+            <div class="botones"><button class="btn chico">Desconectar <span class="kbd">Alt O</span></button><button class="btn btn-peligro chico">Desvincular <span class="kbd">Alt U</span></button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

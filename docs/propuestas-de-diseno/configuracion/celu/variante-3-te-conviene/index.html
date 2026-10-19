@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuración · Te conviene (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../config.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .arriba { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+  .arriba .btn { width: 44px; border-radius: 99px; padding: 0; }
+  .arriba .t { flex: 1; }
+  .arriba .t b { display: block; font-size: 22px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; }
+  .arriba .t span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .cuerpo { flex: 1; padding: 16px 16px 0; overflow: hidden; display: flex; flex-direction: column; gap: 12px; }
+  /* Tres medidas del celular, como resúmenes */
+  .medidas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .medida { padding: 12px; border-radius: 16px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .medida svg { color: var(--pino-texto); }
+  .medida .et { font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 6px; line-height: 18px; }
+  .medida .va { font-size: 20px; font-weight: 800; letter-spacing: -.01em; line-height: 26px; }
+  .medida.urgente { background: var(--urgente-suave); border-color: transparent; } .medida.urgente svg, .medida.urgente .va { color: var(--urgente-texto); }
+  /* Cortes de internet en la semana */
+  .semana { padding: 14px 16px 12px; }
+  .semana .cab { display: flex; justify-content: space-between; align-items: baseline; }
+  .semana .cab b { font-weight: 750; }
+  .barras { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; align-items: end; height: 56px; margin-top: 10px; }
+  .barras i { display: block; border-radius: 5px 5px 2px 2px; background: var(--hundido); height: 100%; position: relative; }
+  .barras i.corte { background: linear-gradient(0deg, var(--urgente) 0 var(--h), var(--hundido) var(--h)); }
+  .dias { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; font-size: 14px; color: var(--texto-3); font-weight: 650; margin-top: 4px; }
+  .dias .hoy { color: var(--pino-texto); font-weight: 800; }
+  /* La recomendación: la única acción de la pantalla */
+  .conviene { padding: 16px; border-radius: 20px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-2); }
+  .conviene .et { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 750; color: var(--accion-texto); }
+  .conviene .tt { font-size: 22px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 4px; }
+  .conviene p { margin: 0; font-size: 15px; line-height: 22px; color: var(--texto-2); }
+  .conviene p b { color: var(--tinta); }
+  .conviene .btns { display: flex; gap: 8px; margin-top: 14px; }
+  .conviene .btns .btn-accion { flex: 1; }
+  .lo-demas { display: flex; gap: 8px; overflow: hidden; margin: 0 -16px; padding: 0 16px; }
+  .lo-demas .chip { flex: none; height: 44px; }
+  .lo-demas .chip svg { color: var(--pino-texto); }
+  .lo-demas .chip .llave { width: 40px; height: 24px; }
+  .lo-demas .chip .llave::after { width: 18px; height: 18px; }
+  .lo-demas .chip .llave.si::after { transform: translateX(16px); }
+  .probar { display: flex; align-items: center; justify-content: center; gap: 8px; height: 48px; border-radius: 14px; border: 1.5px dashed var(--borde-fuerte); color: var(--texto-2); font-weight: 700; }
+  .ahora { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 10px 16px; }
+  .ahora .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .ahora b { font-weight: 750; display: block; } .ahora span { font-size: 14px; color: var(--texto-2); }
+  .abajo { padding: 12px 16px 28px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="arriba">
+    <button class="btn"><i class="i" data-i="x"></i></button>
+    <div class="t"><b>Tu celular y la red</b><span>Moto G54 · Configuración</span></div>
+  </div>
+
+  <div class="cuerpo">
+    <div class="medidas">
+      <div class="medida"><i class="i" data-i="signal"></i><div class="et">Internet acá</div><div class="va">Buena</div></div>
+      <div class="medida"><i class="i" data-i="hard-drive"></i><div class="et">Lugar libre</div><div class="va num">1,2 GB</div></div>
+      <div class="medida urgente"><i class="i" data-i="wifi-off"></i><div class="et">Cortes</div><div class="va num">2</div></div>
+    </div>
+
+    <div class="grupo semana">
+      <div class="cab"><b>Sin internet esta semana</b><span class="t-detalle num">14 min en total</span></div>
+      <div class="barras">
+        <i></i><i class="corte" style="--h:62%"></i><i></i><i></i><i class="corte" style="--h:24%"></i><i></i><i></i>
+      </div>
+      <div class="dias"><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span><span class="hoy">Hoy</span></div>
+    </div>
+
+    <div class="grupo ahora">
+      <span class="ico"><i class="i" data-i="cloud-download"></i></span>
+      <div><b>Hoy: no guarda nada</b><span>Baja el catálogo al abrir</span></div>
+      <button class="btn btn-suave chico">Cambiar</button>
+    </div>
+
+    <div class="conviene">
+      <div class="et"><i class="i i-s" data-i="wand-sparkles"></i>Te conviene</div>
+      <div class="tt">Trabajar sin conexión</div>
+      <p>Se cortó 2 veces y no pudiste anotar <b>3 ventas</b>. Guardar todo ocupa <b>12 MB</b> de tu 1,2 GB libre.</p>
+      <div class="btns"><button class="btn btn-accion grande">Usar esto</button><button class="btn btn-fantasma grande">Ahora no</button></div>
+    </div>
+
+    <div class="probar"><i class="i" data-i="plane"></i>Probá cómo anda sin internet</div>
+  </div>
+
+  <div class="abajo">
+    <div class="titulo-grupo" style="margin:0 4px 8px">Lo demás</div>
+    <div class="lo-demas">
+      <span class="chip"><i class="i i-s" data-i="sparkles"></i>Animaciones <span class="llave si"></span></span>
+      <span class="chip"><i class="i i-s" data-i="refresh-cw"></i>Versión · 15 min</span>
+      <span class="chip"><i class="i i-s" data-i="fingerprint"></i>Huella · 2</span>
+    </div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+<script>if (location.search.includes('entera')) document.body.classList.add('entera');</script>
+</body>
+</html>

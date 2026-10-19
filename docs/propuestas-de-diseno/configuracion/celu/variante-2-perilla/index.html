@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuración · Una sola perilla (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../config.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { padding-bottom: 24px; }
+  .pregunta { font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; margin: 4px 4px 4px; }
+  .sub { font-size: 14px; line-height: 20px; color: var(--texto-2); margin: 0 4px 12px; }
+  /* La perilla: tres escalones de «cuánto guarda», en una sola tarjeta */
+  .perilla { position: relative; }
+  .escalon { position: relative; display: grid; grid-template-columns: 28px 1fr auto; gap: 4px 12px; padding: 14px 16px 14px 14px; border: 1px solid var(--borde); background: var(--superficie); }
+  .escalon:first-child { border-radius: 16px 16px 0 0; }
+  .escalon:last-child { border-radius: 0 0 16px 16px; }
+  .escalon + .escalon { border-top: 0; }
+  .escalon.elegido { border: 2px solid var(--pino); border-radius: 14px; margin: -1px 0; z-index: 1; background: linear-gradient(180deg, var(--pino-suave), #fff 75%); box-shadow: var(--sombra-2); padding: 13px 15px 13px 13px; }
+  .escalon .nivel { grid-row: span 2; display: grid; place-items: start center; padding-top: 2px; }
+  .escalon .nivel span { display: grid; gap: 2px; padding: 3px; border: 1.5px solid var(--borde-fuerte); border-radius: 6px; }
+  .escalon .nivel i { display: block; width: 16px; height: 5px; border-radius: 3px; background: var(--hundido-2); }
+  .escalon .nivel i.on { background: var(--pino); }
+  .escalon .tt { font-weight: 800; font-size: 16px; line-height: 22px; }
+  .escalon .dd { font-size: 14px; line-height: 20px; color: var(--texto-2); grid-column: 2 / 4; }
+  .escalon .peso { font-size: 14px; }
+  .escalon .mb { font-weight: 800; font-size: 15px; color: var(--texto-2); align-self: start; }
+  .escalon.elegido .nivel span { border-color: var(--pino); }
+  .escalon.elegido .mb { color: var(--pino-texto); }
+  .trio { grid-column: 2 / 4; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .trio span { display: flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px; border-radius: 8px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .trio .bien { background: var(--logro-suave); color: var(--logro-texto); }
+  .trio .medio { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .trio .mal { background: var(--hundido); color: var(--texto-2); }
+  .leyenda { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 6px 56px; font-size: 14px; color: var(--texto-3); font-weight: 600; padding-right: 17px; text-align: center; }
+  /* Animaciones con vista previa en vivo */
+  .anim { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; }
+  .mini { width: 64px; height: 56px; border-radius: 10px; background: var(--hundido); position: relative; overflow: hidden; }
+  .mini b { position: absolute; top: 8px; bottom: 8px; width: 34px; border-radius: 6px; background: #fff; box-shadow: var(--sombra-1); }
+  .mini b:first-child { left: -14px; opacity: .55; }
+  .mini b:last-child { left: 26px; box-shadow: var(--sombra-2); animation: entra 2.4s var(--curva) -1.4s infinite; }
+  @keyframes entra { 0%, 20% { transform: translateX(40px); } 45%, 100% { transform: none; } }
+  .fila { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 12px; align-items: center; padding: 12px 16px; }
+  .fila + .fila { border-top: 1px solid var(--borde); }
+  .fila .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--pino-suave); color: var(--pino-texto); }
+  .fila .tt { font-weight: 750; } .fila .dd { font-size: 14px; color: var(--texto-2); }
+  .fila .va { font-weight: 700; color: var(--texto-2); font-size: 15px; }
+  .fila svg.ch { color: var(--texto-3); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <a class="volver"><i class="i" data-i="chevron-left"></i>Más</a>
+  <div class="celu-cabecera"><span class="t-titulo">Configuración</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+
+  <div class="celu-pantalla">
+    <div class="pregunta">¿Cuánto guarda este celular?</div>
+    <p class="sub">Una sola elección: cuánto lugar ocupa, cuánto tarda en abrir y qué pasa si se corta internet.</p>
+
+    <div class="leyenda"><span>Abrir</span><span>Buscar</span><span>Sin internet</span></div>
+    <div class="perilla">
+      <div class="escalon">
+        <div class="nivel"><span><i></i><i></i><i class="on"></i></span></div>
+        <div class="tt">Nada · busca en el servidor</div>
+        <div class="mb num">38 KB</div>
+        <div class="trio"><span class="bien"><i class="i i-s" data-i="zap"></i>Abre ya</span><span class="medio"><i class="i i-s" data-i="hourglass"></i>Espera</span><span class="mal"><i class="i i-s" data-i="ban"></i>No anota</span></div>
+      </div>
+      <div class="escalon elegido">
+        <div class="nivel"><span><i></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="tt">El catálogo, al abrir</div>
+        <div class="mb num">38 KB</div>
+        <div class="dd">Lo baja cada vez que abrís (4,2 MB) y lo suelta al cerrar.</div>
+        <div class="trio"><span class="medio"><i class="i i-s" data-i="hourglass"></i>4 s</span><span class="bien"><i class="i i-s" data-i="zap"></i>Al toque</span><span class="mal"><i class="i i-s" data-i="ban"></i>No anota</span></div>
+      </div>
+      <div class="escalon">
+        <div class="nivel"><span><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="tt">Todo · trabajar sin conexión</div>
+        <div class="mb num">12 MB</div>
+        <div class="trio"><span class="bien"><i class="i i-s" data-i="zap"></i>Abre ya</span><span class="bien"><i class="i i-s" data-i="zap"></i>Al toque</span><span class="bien"><i class="i i-s" data-i="check"></i>Anota</span></div>
+      </div>
+    </div>
+
+    <div class="titulo-grupo" style="margin-top:20px">Este celular</div>
+    <div class="grupo">
+      <div class="anim">
+        <div class="mini"><b></b><b></b></div>
+        <div><div style="font-weight:750">Animaciones</div><div class="t-detalle">Las pantallas se deslizan.</div></div>
+        <span class="llave si"></span>
+      </div>
+      <div class="fila" style="border-top:1px solid var(--borde)">
+        <span class="ico"><i class="i" data-i="refresh-cw"></i></span>
+        <div><div class="tt">Versión nueva</div><div class="dd">Se fija con la app abierta</div></div>
+        <span class="va">15 min</span><i class="i ch" data-i="chevron-right"></i>
+      </div>
+    </div>
+
+    <div class="titulo-grupo">Lo tuyo</div>
+    <div class="grupo">
+      <div class="fila">
+        <span class="ico" style="background:var(--logro-suave);color:var(--logro-texto)"><i class="i" data-i="fingerprint"></i></span>
+        <div><div class="tt">Celulares con huella</div><div class="dd">Este y Samsung A15</div></div>
+        <span class="va">2</span><i class="i ch" data-i="chevron-right"></i>
+      </div>
+      <div class="fila">
+        <span class="ico" style="background:var(--logro-suave);color:var(--logro-texto)"><i class="i" data-i="monitor"></i></span>
+        <div><div class="tt">Compu del mostrador</div><div class="dd">En espejo · hasta el 16/11</div></div>
+        <span></span><i class="i ch" data-i="chevron-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>if (location.search.includes('entera')) document.body.classList.add('entera');</script>
+</body>
+</html>

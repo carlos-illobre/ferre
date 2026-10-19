@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuración · Al vuelo (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../config.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { overflow: hidden; }
+  /* Lo que había en pantalla sigue ahí, atenuado: la configuración se abre encima, sin ir a ningún lado */
+  .detras { position: fixed; inset: 0; width: 1366px; height: 768px; border: 0; pointer-events: none; }
+  .velo { position: fixed; inset: 0; background: rgba(26, 29, 27, .32); backdrop-filter: blur(2px); }
+  .paleta { position: fixed; left: 50%; top: 64px; width: 960px; margin-left: -480px; background: var(--superficie); border-radius: 24px; box-shadow: var(--sombra-3); overflow: hidden; display: grid; grid-template-columns: 1fr 300px; }
+  .izq { border-right: 1px solid var(--borde); }
+  .buscar { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--borde); font-size: 18px; }
+  .buscar svg { color: var(--texto-3); }
+  .buscar .escrito { font-weight: 650; }
+  .buscar .kbd { margin-left: auto; }
+  .seccion { font-size: 14px; font-weight: 700; color: var(--texto-3); padding: 14px 20px 6px; }
+  .item { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; min-height: 56px; padding: 8px 12px; margin: 0 8px; border-radius: 12px; }
+  .item .ico { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .item .tt { font-weight: 700; } .item .dd { font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .item.foco { background: var(--pino-suave); box-shadow: inset 3px 0 0 var(--accion); }
+  .item.foco .ico { background: #fff; color: var(--pino-texto); }
+  .item .der { display: flex; align-items: center; gap: 8px; }
+  .valor { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 6px; border-radius: 10px; background: var(--hundido); font-weight: 750; font-size: 14px; }
+  .valor svg { color: var(--texto-3); }
+  .valor b { min-width: 56px; text-align: center; }
+  .pie-p { display: flex; gap: 16px; align-items: center; padding: 12px 20px; border-top: 1px solid var(--borde); background: var(--fondo); font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 8px; }
+  .pie-p span { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  /* La vista previa: muestra el efecto del ítem enfocado */
+  .der-p { padding: 20px; background: var(--fondo); display: flex; flex-direction: column; gap: 12px; }
+  .der-p .et { font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .escena { height: 190px; border-radius: 16px; background: var(--hundido); position: relative; overflow: hidden; border: 1px solid var(--borde); }
+  .escena .lat { position: absolute; left: 0; top: 0; bottom: 0; width: 48px; background: #fff; border-right: 1px solid var(--borde); }
+  .escena .lat i { display: block; width: 24px; height: 8px; border-radius: 4px; background: var(--hundido-2); margin: 14px 12px 0; }
+  .escena .lat i.on { background: var(--pino); }
+  .escena .vent { position: absolute; left: 76px; right: 24px; top: 34px; height: 92px; border-radius: 12px; background: #fff; box-shadow: var(--sombra-3); padding: 12px; animation: vent 3s var(--curva) -2s infinite; }
+  .escena .vent b { display: block; height: 10px; width: 70%; border-radius: 5px; background: var(--hundido-2); }
+  .escena .vent b + b { margin-top: 8px; width: 45%; }
+  .escena .vent u { display: block; position: absolute; right: 12px; bottom: 12px; width: 64px; height: 22px; border-radius: 7px; background: var(--accion); }
+  .escena .tost { position: absolute; left: 76px; bottom: 14px; height: 28px; width: 132px; border-radius: 9px; background: var(--pino); animation: tost 3s var(--curva) -2s infinite; }
+  @keyframes vent { 0%, 10% { opacity: 0; transform: translateY(14px) scale(.96); } 35%, 100% { opacity: 1; transform: none; } }
+  @keyframes tost { 0%, 40% { opacity: 0; transform: translateY(12px); } 60%, 100% { opacity: 1; transform: none; } }
+  .der-p p { margin: 0; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .der-p .aviso { margin-top: auto; }
+  .lanzador { position: fixed; right: 32px; bottom: 24px; }
+</style>
+</head>
+<body>
+<iframe class="detras" src="../../../vender/compu/variante-1-mostrador/index.html" tabindex="-1" aria-hidden="true"></iframe>
+<div class="velo"></div>
+
+<div class="paleta" role="dialog" aria-label="Configuración">
+  <div class="izq">
+    <div class="buscar"><i class="i i-l" data-i="settings"></i><span class="escrito">Configuración</span><span style="color:var(--texto-3)">· escribí para filtrar</span><span class="cursor"></span><span class="kbd">Ctrl ,</span></div>
+
+    <div class="seccion">Esta computadora</div>
+    <div class="item foco">
+      <span class="ico"><i class="i" data-i="sparkles"></i></span>
+      <div><div class="tt">Animaciones</div><div class="dd">Ventanas y avisos con movimiento corto</div></div>
+      <div class="der"><span class="llave si"></span><span class="kbd">A</span></div>
+    </div>
+    <div class="item">
+      <span class="ico"><i class="i" data-i="refresh-cw"></i></span>
+      <div><div class="tt">Buscar versión nueva</div><div class="dd">Con la aplicación a la vista</div></div>
+      <div class="der"><span class="valor"><i class="i i-s" data-i="chevron-left"></i><b>15 min</b><i class="i i-s" data-i="chevron-right"></i></span><span class="llave si"></span><span class="kbd">B</span></div>
+    </div>
+
+    <div class="seccion">Tu cuenta</div>
+    <div class="item">
+      <span class="ico" style="background:var(--logro-suave);color:var(--logro-texto)"><i class="i" data-i="smartphone"></i></span>
+      <div><div class="tt">Moto G54 · en espejo</div><div class="dd">Vinculados hasta el 16/11</div></div>
+      <div class="der"><button class="btn chico">Desconectar <span class="kbd">O</span></button><button class="btn btn-peligro chico">Desvincular <span class="kbd">U</span></button></div>
+    </div>
+    <div class="item">
+      <span class="ico"><i class="i" data-i="fingerprint"></i></span>
+      <div><div class="tt">Celulares con huella</div><div class="dd">Moto G54 y Samsung A15</div></div>
+      <div class="der"><span class="pastilla">2</span><i class="i" data-i="chevron-right" style="color:var(--texto-3)"></i></div>
+    </div>
+
+    <div class="pie-p"><span><span class="kbd">↑</span><span class="kbd">↓</span> elegir</span><span><span class="kbd">←</span><span class="kbd">→</span> cambiar valor</span><span><span class="kbd">Espacio</span> prender</span><span style="margin-left:auto"><span class="kbd">Esc</span> volver</span></div>
+  </div>
+
+  <div class="der-p">
+    <div class="et">Así se ve, en vivo</div>
+    <div class="escena"><div class="lat"><i class="on"></i><i></i><i></i><i></i></div><div class="vent"><b></b><b></b><u></u></div><div class="tost"></div></div>
+    <p>La ventana sube y se aclara en 200 ms; el aviso entra desde abajo. Apagadas, aparecen en el acto.</p>
+    <div class="aviso pino"><i class="i i-s" data-i="zap"></i>Vale ya, sin recargar, y solo en esta computadora.</div>
+  </div>
+</div>
+</body>
+</html>

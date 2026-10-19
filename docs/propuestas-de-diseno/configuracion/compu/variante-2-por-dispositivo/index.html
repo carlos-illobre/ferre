@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuración · Por dispositivo (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../config.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .split { display: grid; grid-template-columns: 300px 1fr; gap: 20px; height: 100%; }
+  .lista-d .et { font-size: 14px; font-weight: 700; color: var(--texto-2); margin: 0 4px 8px; }
+  .disp { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .disp + .disp { margin-top: 8px; }
+  .disp .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .disp .tt { font-weight: 750; } .disp .dd { font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .disp.elegido { border: 2px solid var(--pino); padding: 11px 13px; background: var(--pino-suave); }
+  .disp.elegido .ico { background: #fff; color: var(--pino-texto); }
+  .disp svg.ch { color: var(--texto-3); }
+  .sumar { margin-top: 12px; padding: 12px 14px; border-radius: 14px; border: 1.5px dashed var(--borde-fuerte); font-size: 14px; color: var(--texto-2); line-height: 20px; display: flex; gap: 10px; }
+  .sumar svg { flex: none; margin-top: 2px; }
+  .teclas { margin-top: 12px; font-size: 14px; color: var(--texto-3); display: flex; gap: 6px; align-items: center; }
+
+  .panel { background: #fff; border: 1px solid var(--borde); border-radius: 20px; box-shadow: var(--sombra-2); display: flex; flex-direction: column; overflow: hidden; }
+  .p-cab { display: grid; grid-template-columns: 64px 1fr 260px; gap: 16px; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--borde); }
+  .telefono { width: 44px; height: 64px; margin: 0 auto; border-radius: 10px; border: 3px solid var(--tinta); background: linear-gradient(160deg, var(--pino-suave), #fff); position: relative; }
+  .telefono::after { content: ""; position: absolute; top: 4px; left: 50%; width: 10px; height: 3px; margin-left: -5px; border-radius: 3px; background: var(--tinta); }
+  .p-cab .nombre { font-size: 22px; font-weight: 800; letter-spacing: -.02em; display: flex; gap: 8px; align-items: center; }
+  .p-cab .nombre .pastilla { letter-spacing: 0; }
+  .ocupa .t-etiqueta { display: flex; justify-content: space-between; }
+  .ocupa .t-etiqueta b { color: var(--tinta); }
+  .p-cuerpo { padding: 16px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; flex: 1; }
+  .fila { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+  .fila .tt { font-weight: 750; display: flex; align-items: center; gap: 8px; }
+  .fila .dd { font-size: 14px; line-height: 20px; color: var(--texto-2); margin-top: 2px; }
+  .ancho { grid-column: 1 / 3; }
+  .opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  .opcion + .opcion { margin-top: 0; }
+  .sep { grid-column: 1 / 3; height: 1px; background: var(--borde); }
+  .cuatro { margin-top: 10px; }
+  .p-pie { display: flex; align-items: center; gap: 8px; padding: 14px 24px; border-top: 1px solid var(--borde); background: var(--fondo); }
+  .p-pie .t-detalle { margin-right: auto; white-space: nowrap; display: flex; gap: 8px; align-items: center; }
+  .p-pie .t-detalle svg { color: var(--logro); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="nav-sub"><a>Anomalías</a><a>Procesos</a><a>Mejoras y errores</a><a class="activo">Configuración</a></div>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Configuración</div>
+      <span class="sub">Tus dispositivos y cómo trabaja cada uno</span>
+    </header>
+    <section class="pantalla" style="padding-top:20px">
+      <div class="split">
+        <div class="lista-d">
+          <div class="et">Tus dispositivos</div>
+          <div class="disp"><span class="ico"><i class="i" data-i="monitor"></i></span><div><div class="tt">Esta computadora</div><div class="dd">Mostrador · guarda todo</div></div><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="disp elegido"><span class="ico"><i class="i" data-i="smartphone"></i></span><div><div class="tt">Moto G54</div><div class="dd">En espejo · con huella</div></div><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="disp"><span class="ico"><i class="i" data-i="smartphone"></i></span><div><div class="tt">Samsung A15</div><div class="dd">Con huella · hace 9 días</div></div><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="sumar"><i class="i" data-i="circle-plus"></i>Para sumar un celular, entrá con Google desde él: te ofrece la huella solo.</div>
+          <div class="teclas"><span class="kbd">↑</span><span class="kbd">↓</span> elegir dispositivo</div>
+        </div>
+
+        <div class="panel">
+          <div class="p-cab">
+            <div class="telefono"></div>
+            <div>
+              <div class="nombre">Moto G54 <span class="pastilla logro"><span class="punto"></span>En espejo</span><span class="pastilla pino"><i class="i i-s" data-i="fingerprint"></i>Huella</span></div>
+              <div class="t-detalle">Vinculado con esta computadora hasta el 16/11</div>
+            </div>
+            <div class="ocupa">
+              <div class="t-etiqueta"><span>Guarda</span><b class="num">38 KB de 150 KB</b></div>
+              <div class="barra"><b style="width:25%"></b></div>
+            </div>
+          </div>
+          <div class="p-cuerpo">
+            <div class="fila ancho">
+              <div><div class="tt"><i class="i" data-i="wifi-off"></i>Trabajar sin conexión</div><div class="dd">Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.</div></div>
+              <span class="llave"></span>
+            </div>
+            <div class="ancho">
+              <div class="tt" style="font-weight:750">Cómo buscar productos</div>
+              <div class="opciones">
+                <div class="opcion elegida"><span class="radio"></span><div><div class="tt">Bajar el catálogo al abrir</div><div class="pro"><i class="i i-s" data-i="circle-plus"></i>La búsqueda es instantánea y escanear responde en el acto.</div><div class="contra"><i class="i i-s" data-i="circle-minus"></i>Abrir tarda unos segundos más y gasta datos cada vez.</div></div></div>
+                <div class="opcion"><span class="radio"></span><div><div class="tt">Buscar en el servidor</div><div class="pro"><i class="i i-s" data-i="circle-plus"></i>No baja el catálogo: abre enseguida y casi no gasta datos.</div><div class="contra"><i class="i i-s" data-i="circle-minus"></i>Cada búsqueda y cada código escaneado espera a la red.</div></div></div>
+              </div>
+            </div>
+            <div class="sep"></div>
+            <div class="fila">
+              <div><div class="tt"><i class="i" data-i="sparkles"></i>Animaciones</div><div class="dd">Las pantallas se deslizan al navegar.</div></div>
+              <span class="llave si"></span>
+            </div>
+            <div class="fila">
+              <div style="min-width:0"><div class="tt"><i class="i" data-i="refresh-cw"></i>Buscar versión nueva</div>
+                <div class="cuatro"><b>5 min</b><b class="elegido">15 min</b><b>1 hora</b><b>24 horas</b></div></div>
+              <span class="llave si"></span>
+            </div>
+          </div>
+          <div class="p-pie">
+            <span class="t-detalle"><i class="i i-s" data-i="zap"></i>Llega al celular al instante</span>
+            <button class="btn chico">Desconectar <span class="kbd">Alt O</span></button>
+            <button class="btn btn-peligro chico">Desvincular <span class="kbd">Alt U</span></button>
+            <button class="btn btn-fantasma chico">Quitar huella <span class="kbd">Alt Q</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
