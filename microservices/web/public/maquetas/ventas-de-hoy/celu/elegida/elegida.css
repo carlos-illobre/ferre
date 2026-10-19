@@ -1,0 +1,86 @@
+/* «Ventas de hoy», celular elegido: el buscador de la lista y la hoja de anular con motivo.
+   Solo variables de la paleta «Mostrador». Movimiento solo con transform y opacity. */
+
+/* ---- La cabecera de la lista: «Ventas» y, a la derecha, el botón Buscar ---- */
+.ventas-cab { align-items: center; }
+.ventas-cab .btn-bus { min-height: 36px; padding: 0 12px 0 10px; font-size: 14px; gap: 6px; }
+.ventas-cab .btn-bus .i { color: var(--texto-2); }
+
+/* ---- El buscador: reemplaza la cabecera y queda pegado arriba al bajar ---- */
+.buscador { position: sticky; top: -12px; z-index: 5; margin: 6px -16px 8px; padding: 8px 16px 8px; background: var(--fondo); display: none; }
+.buscador.abierto { display: block; animation: bus-entra var(--t) var(--curva) both; }
+.buscador .fila-b { display: flex; align-items: center; gap: 4px; }
+.bus-campo { flex: 1; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 6px 0 14px; border-radius: var(--r); border: 1.5px solid var(--pino);
+  background: var(--superficie); box-shadow: 0 0 0 4px rgba(18, 56, 47, .10); }
+.bus-campo > .i { color: var(--pino); flex: none; }
+.bus-campo input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 16px; font-weight: 650; color: var(--tinta); }
+.bus-campo input::placeholder { color: var(--texto-3); font-weight: 500; }
+.bus-campo input::-webkit-search-cancel-button { display: none; }
+.bus-campo .limpiar { width: 36px; height: 36px; border-radius: 99px; border: 0; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; flex: none;
+  transition: transform var(--t-micro) var(--curva), opacity var(--t-micro); }
+.bus-campo .limpiar[hidden] { display: grid; opacity: 0; transform: scale(.6); pointer-events: none; }
+.buscador .salir { min-height: 44px; padding: 0 8px 0 10px; font-size: 15px; color: var(--pino-texto); font-weight: 750; }
+.bus-res { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; min-height: 20px; }
+.bus-res b { color: var(--tinta); font-weight: 800; }
+.bus-res .que { display: inline-flex; gap: 6px; }
+.bus-res .que .pastilla { height: 24px; padding: 0 8px; font-size: 14px; }
+/* Buscando, la pantalla es solo la lista: el resumen se pliega y vuelve con «Listo» */
+.celu-pantalla.buscando > .dia-linea, .celu-pantalla.buscando > .resu, .celu-pantalla.buscando > .tres { display: none; }
+.celu-pantalla.buscando .buscador { margin-top: -12px; padding-top: 12px; }
+
+/* Sugerencias mientras el campo está vacío */
+.bus-sug { display: flex; gap: 8px; margin-top: 8px; flex-wrap: nowrap; overflow: hidden; }
+.bus-sug .chip { height: 36px; font-size: 14px; padding: 0 12px; flex: none; gap: 6px; }
+.bus-sug .chip .i { color: var(--texto-2); }
+
+/* La coincidencia: el pedacito que encontró, en pino suave */
+mark.coin { background: var(--pino-suave); color: var(--pino-texto); font-weight: 800; border-radius: 5px; padding: 0 2px; margin: 0 -2px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.vr .v mark.coin { padding: 1px 4px; margin: 0 -4px; }
+.vr.coincide { animation: bus-fila var(--t) var(--curva) both; }
+.vr.oculta { display: none; }
+.vr .d .donde { color: var(--texto-3); }
+
+/* Sin resultados */
+.bus-vacio { display: none; text-align: center; padding: 28px 16px 8px; }
+.bus-vacio.visible { display: block; animation: bus-entra var(--t) var(--curva) both; }
+.bus-vacio .ilu { width: 72px; height: 72px; border-radius: 99px; background: var(--hundido); color: var(--texto-3); display: grid; place-items: center; margin: 0 auto 14px; position: relative; }
+.bus-vacio .ilu .i { width: 32px; height: 32px; }
+.bus-vacio .ilu::after { content: ""; position: absolute; width: 36px; height: 3px; border-radius: 3px; background: var(--texto-3); transform: rotate(-45deg); opacity: .55; }
+.bus-vacio .t { font-size: 18px; font-weight: 800; line-height: 24px; color: var(--tinta); }
+.bus-vacio .d { font-size: 14px; color: var(--texto-2); font-weight: 500; line-height: 20px; margin-top: 4px; }
+.bus-vacio .acc { display: flex; flex-direction: column; gap: 8px; align-items: center; margin-top: 16px; }
+.bus-vacio .acc .btn { min-width: 220px; }
+
+@keyframes bus-entra { from { opacity: 0; transform: translateY(6px); } }
+@keyframes bus-fila { from { opacity: .3; transform: translateY(4px); } }
+
+/* ---- Hoja de anular: el motivo es una lista desplegable con el aspecto del lenguaje ---- */
+.vh-sel { position: relative; }
+.vh-sel > button { width: 100%; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 14px; border-radius: var(--r); border: 1px solid var(--borde-fuerte);
+  background: var(--superficie); box-shadow: var(--sombra-1); font-size: 16px; font-weight: 650; color: var(--tinta); text-align: left; }
+.vh-sel > button .val { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vh-sel > button .val.vacio { color: var(--texto-2); font-weight: 500; }
+.vh-sel > button > .i:last-child { color: var(--texto-2); transition: transform var(--t) var(--curva); }
+.vh-sel.abierto > button { border: 1.5px solid var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .10); }
+.vh-sel.abierto > button > .i:last-child { transform: rotate(180deg); }
+.vh-sel-lista { position: absolute; z-index: 45; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta);
+  box-shadow: var(--sombra-3); padding: 6px; display: none; transform-origin: 50% 100%; }
+.vh-sel-lista.abierta { display: block; animation: sel-abre var(--t) var(--curva) both; }
+.vh-sel-lista .vh-op { min-height: 48px; font-size: 16px; }
+.vh-sel-lista .vh-op .chk { margin-left: auto; color: var(--pino); }
+.vh-sel-lista .vh-op.elegido .i:first-child { color: var(--pino); }
+.vh-sel-lista .sep { height: 1px; background: var(--borde); margin: 4px 8px; }
+.vh-coment { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 14px; margin-top: 8px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); background: var(--superficie); }
+.vh-coment .i { color: var(--texto-3); flex: none; }
+.vh-coment input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 16px; font-weight: 600; color: var(--tinta); }
+.vh-coment input::placeholder { color: var(--texto-3); font-weight: 500; }
+.vh-coment:focus-within { border: 1.5px solid var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .10); }
+.vh-permiso { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--pino-texto); }
+.vh-permiso .i { flex: none; }
+
+@keyframes sel-abre { from { opacity: 0; transform: translateY(6px) scale(.98); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .buscador.abierto, .vr.coincide, .bus-vacio.visible, .vh-sel-lista.abierta { animation: none !important; }
+  .vh-sel > button > .i:last-child, .bus-campo .limpiar { transition: none; }
+}

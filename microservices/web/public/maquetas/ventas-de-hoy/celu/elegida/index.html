@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventas de hoy · Elegida (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../ventas.css">
+<link rel="stylesheet" href="../../interacciones.css">
+<link rel="stylesheet" href="elegida.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { overflow: hidden; position: relative; }
+  .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32px; background: linear-gradient(transparent, var(--fondo)); }
+  .dia-linea { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .dia-linea .q { font-weight: 750; font-size: 16px; }
+  .dia-linea .btn { min-height: 36px; padding: 0 12px; font-size: 14px; }
+  .resu { padding: 14px 16px 12px; }
+  .resu .comp { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 4px; }
+  .resu .horas { height: 72px; margin-top: 12px; gap: 4px; }
+  .resu .horas .h span { font-size: 14px; }
+  .resu .horas .h:nth-child(even) span { visibility: hidden; }
+  .medios { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 12px; border-top: 1px solid var(--borde); padding-top: 4px; }
+  .mc { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+  .mc .n { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; white-space: nowrap; }
+  .mc .va { font-size: 17px; font-weight: 800; line-height: 22px; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 8px; padding: 10px 0; }
+  .tres > div { text-align: center; }
+  .tres > div + div { border-left: 1px solid var(--borde); }
+  .tres .va { font-size: 18px; font-weight: 800; line-height: 22px; }
+  .tres .et { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .ventas-cab { display: flex; align-items: baseline; justify-content: space-between; margin: 14px 2px 8px; }
+  .vr { display: grid; grid-template-columns: 36px minmax(0,1fr) auto 16px; gap: 10px; align-items: center; padding: 10px 12px; }
+  .vr + .vr { margin-top: 8px; }
+  .vr .q { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vr .d { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vr .v { font-weight: 800; font-size: 16px; }
+  .vr .fl { color: var(--texto-3); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>17:40</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Vender</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Vender</a><a class="activa">Ventas de hoy</a></nav>
+  <div class="celu-pantalla">
+    <div class="dia-linea"><span class="q">Hoy, lunes 19/10 <span class="t-detalle">· 17:40</span></span><button class="btn"><i class="i i-s" data-i="calendar-days"></i>Otro día</button></div>
+    <div class="tarjeta resu">
+      <div class="t-etiqueta">Total de ventas</div>
+      <div class="t-total num"><span class="peso">$</span>412.000</div>
+      <div class="comp"><span class="sube"><i class="i" data-i="arrow-up-right"></i>13 %</span>vs. ayer a esta hora</div>
+      <div class="horas">
+        <div class="h"><div class="col" style="--a:12%"><b style="--v:17%"></b></div><span>8</span></div>
+        <div class="h"><div class="col" style="--a:39%"><b style="--v:50%"></b></div><span>9</span></div>
+        <div class="h"><div class="col" style="--a:64%"><b style="--v:69%"></b></div><span>10</span></div>
+        <div class="h"><div class="col" style="--a:68%"><b style="--v:62%"></b></div><span>11</span></div>
+        <div class="h"><div class="col" style="--a:49%"><b style="--v:45%"></b></div><span>12</span></div>
+        <div class="h sin"><div class="col"><b></b></div><span>13</span></div>
+        <div class="h sin"><div class="col"><b></b></div><span>14</span></div>
+        <div class="h sin"><div class="col"><b></b></div><span>15</span></div>
+        <div class="h"><div class="col" style="--a:60%"><b style="--v:56%"></b></div><span>16</span></div>
+        <div class="h ahora"><div class="col" style="--a:64%"><b style="--v:100%"></b></div><span>17</span></div>
+        <div class="h fut"><div class="col"><b></b></div><span>18</span></div>
+        <div class="h fut"><div class="col"><b></b></div><span>19</span></div>
+      </div>
+      <div class="medios">
+        <div class="mc medio efectivo"><span class="mico chico"><i class="i" data-i="banknote"></i></span><div><div class="va num"><span class="peso">$</span>148.000</div><div class="n">Efectivo · 11</div></div></div>
+        <div class="mc medio mp"><span class="mico chico"><i class="i" data-i="qr-code"></i></span><div><div class="va num"><span class="peso">$</span>171.000</div><div class="n">M. Pago · 7</div></div></div>
+        <div class="mc medio tarjeta"><span class="mico chico"><i class="i" data-i="credit-card"></i></span><div><div class="va num"><span class="peso">$</span>38.000</div><div class="n">Tarjeta · 2</div></div></div>
+        <div class="mc medio cuenta"><span class="mico chico"><i class="i" data-i="notebook-pen"></i></span><div><div class="va num"><span class="peso">$</span>55.000</div><div class="n">Cta. cte. · 3</div></div></div>
+      </div>
+    </div>
+    <div class="tarjeta tres">
+      <div><div class="va">23</div><div class="et">ventas</div></div>
+      <div><div class="va">41</div><div class="et">productos</div></div>
+      <div><div class="va num"><span class="peso">$</span>17.913</div><div class="et">ticket prom.</div></div>
+    </div>
+    <div class="ventas-cab"><span class="t-seccion">Ventas</span><button class="btn chico btn-bus" data-buscar aria-label="Buscar una venta"><i class="i i-s" data-i="search"></i>Buscar</button></div>
+    <div class="tarjeta vr"><span class="mico medio mp"><i class="i i-s" data-i="qr-code"></i></span><div style="min-width:0"><div class="q">1 × Juego de llaves combinadas × 12</div><div class="d">17:36 · Mercado Pago</div></div><span class="v num">$78.000</span><i class="i i-s fl" data-i="chevron-right"></i></div>
+    <div class="tarjeta vr"><span class="mico medio efectivo"><i class="i i-s" data-i="banknote"></i></span><div style="min-width:0"><div class="q">2 productos</div><div class="d">17:22 · Efectivo</div></div><span class="v num">$21.000</span><i class="i i-s fl" data-i="chevron-right"></i></div>
+  </div>
+  <nav class="nav-inferior">
+    <a class="activo"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script src="../../interacciones.js"></script>
+<script src="elegida.js"></script>
+<script>
+/* Celular 1 · El día: tocar una venta sube su hoja (Corregir · Cambio · Anular); arrastrar el dedo
+   por las barras muestra cada hora. La lista sigue debajo: se desliza con el dedo. */
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  VH.marco();
+
+  VH.ligar($('.resu .t-total'), function (d) { return VH.plata(d.total); });
+  var claves = ['efectivo', 'mp', 'tarjeta', 'cuenta'];
+  $$('.medios .mc').forEach(function (mc, i) {
+    var m = claves[i];
+    VH.ligar($('.va', mc), function (d) { return VH.plata(d.medios[m]); });
+    VH.ligar($('.n', mc), function (d) { return VH.MEDIOS[m].corto + ' · ' + d.cuantas[m]; });
+  });
+  var tres = $$('.tres .va');
+  VH.ligar(tres[0], function (d) { return String(d.ventas); });
+  VH.ligar(tres[1], function (d) { return String(d.productos); });
+  VH.ligar(tres[2], VH.ticket);
+  VH.barras($('.resu .horas'));
+  VH.entrada($('.resu .t-total'), $('.resu .horas'));
+
+  // La lista: las dos que se ven y, debajo, el resto del día
+  var pantalla = $('.celu-pantalla');
+  pantalla.style.overflowY = 'auto'; pantalla.style.scrollbarWidth = 'none'; pantalla.style.paddingBottom = '24px';
+  function vrHTML(v) {
+    var an = v.estado === 'anulada', t = an ? ' tacha' : '';
+    var q = v.tipo === 'cambio' ? 'Cambio de ' + v.vuelve.nom.split(' ')[0].toLowerCase() : v.cliente || VH.titulo(v);
+    var d = v.hora + ' · ' + (an ? '<span class="pastilla error" style="height:22px;padding:0 8px">anulada</span>' : v.estado === 'corregida' ? '<span class="pastilla urgente" style="height:22px;padding:0 8px">corregida</span>' : VH.MEDIOS[v.medio].nom);
+    return '<div class="tarjeta vr' + (an ? ' anulada' : '') + '" data-id="' + v.id + '">' + VH.mico(v.medio).replace('<i class="i"', '<i class="i i-s"') + '<div style="min-width:0"><div class="q' + t + '">' + q + '</div><div class="d">' + d + '</div></div><span class="v num' + t + '">' +
+      (v.tipo === 'cambio' && VH.total(v) > 0 ? '+' : '') + VH.plata(VH.total(v)) + '</span><i class="i i-s fl" data-i="chevron-right"></i></div>';
+  }
+  var filas = $$('.vr', pantalla);
+  filas[0].dataset.id = '1736'; filas[1].dataset.id = '1722';
+  ['1705', '1648', '1630', '1615', '1251', '1230'].forEach(function (id) { pantalla.insertAdjacentHTML('beforeend', vrHTML(VH.buscar(id))); });
+  VH.iconos(pantalla);
+  function repintar(v, efecto) {
+    var f = $('.vr[data-id="' + v.id + '"]', pantalla);
+    f.insertAdjacentHTML('afterend', vrHTML(v)); f.remove();
+    f = $('.vr[data-id="' + v.id + '"]', pantalla); VH.iconos(f);
+    if (efecto === 'late') { var p = $('.pastilla', f); if (p) p.classList.add('vh-late'); }
+    if (efecto === 'tacha') { f.classList.add('vh-tachando'); setTimeout(function () { f.classList.remove('vh-tachando'); }, 800); }
+  }
+  var ganchos = {
+    guardado: function (v) { repintar(v, 'late'); },
+    anulada: function (v) { repintar(v, 'tacha'); },
+    cambioHecho: function (c) {
+      $('.ventas-cab', pantalla).insertAdjacentHTML('afterend', vrHTML(c));
+      var f = $('.vr[data-id="' + c.id + '"]', pantalla); VH.iconos(f); f.classList.add('vh-entra', 'vh-nuevo');
+      VH.vibrar(10);
+    },
+  };
+  pantalla.addEventListener('click', function (e) {
+    var f = e.target.closest('.vr[data-id]');
+    if (f) VH.hojaVenta(VH.buscar(f.dataset.id), { ganchos: ganchos });
+  });
+
+  /* Buscador: «Buscar» en la cabecera de la lista se vuelve un campo pegado arriba; la parte de
+     arriba (resumen y barras) se va hacia arriba y queda solo la lista. Busca por producto
+     (sin importar tildes ni mayúsculas) o por importe (con o sin «$» y puntos). */
+  var cab = $('.ventas-cab', pantalla);
+  cab.insertAdjacentHTML('afterend',
+    '<div class="buscador" role="search"><div class="fila-b"><label class="bus-campo"><i class="i" data-i="search"></i>' +
+    '<input type="search" placeholder="Producto o importe" aria-label="Buscar una venta por producto o importe" autocomplete="off" enterkeyhint="search">' +
+    '<button class="limpiar" data-limpiar aria-label="Borrar lo escrito" hidden><i class="i i-s" data-i="x"></i></button></label>' +
+    '<button class="btn btn-fantasma salir" data-salir>Listo</button></div>' +
+    '<div class="bus-res" aria-live="polite"></div>' +
+    '<div class="bus-sug"><button class="chip" data-sug="mecha"><i class="i i-s" data-i="search"></i>mecha</button><button class="chip" data-sug="pinza"><i class="i i-s" data-i="search"></i>pinza</button><button class="chip" data-sug="24000"><i class="i i-s" data-i="search"></i>$24.000</button></div></div>');
+  pantalla.insertAdjacentHTML('beforeend',
+    '<div class="bus-vacio" role="status"><div class="ilu"><i class="i" data-i="search"></i></div><div class="t"></div>' +
+    '<div class="d">Probá con otra palabra del producto («mecha», «tarugos») o con el importe justo («24000»).</div>' +
+    '<div class="acc"><button class="btn" data-limpiar><i class="i i-s" data-i="x"></i>Borrar la búsqueda</button><button class="btn btn-fantasma" data-salir>Volver a todas las ventas</button></div></div>' +
+    '');
+  VH.iconos(pantalla);
+  var bus = $('.buscador', pantalla), inp = $('input', bus), res = $('.bus-res', bus), sug = $('.bus-sug', bus);
+  var vacio = $('.bus-vacio', pantalla), buscando = false;
+
+  function norm(s) { return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // Marca la coincidencia dentro del texto original (las tildes no corren las posiciones: NFD letra por letra)
+  function marcar(texto, qn) {
+    var n = '', mapa = [];
+    for (var i = 0; i < texto.length; i++) { var c = norm(texto[i]); for (var k = 0; k < c.length; k++) { n += c[k]; mapa.push(i); } }
+    var p = n.indexOf(qn);
+    if (p < 0 || !qn) return esc(texto);
+    var a = mapa[p], b = mapa[p + qn.length - 1] + 1;
+    return esc(texto.slice(0, a)) + '<mark class="coin">' + esc(texto.slice(a, b)) + '</mark>' + esc(texto.slice(b));
+  }
+  function digitos(s) { return String(s).replace(/[^\d]/g, ''); }
+  function esImporte(t) { return /^\s*\$?\s*[\d.]+\s*$/.test(t) && digitos(t).length >= 3; }
+  /* Qué encontró en una venta: { cual: renglón que coincide, tipo: 'producto' | 'cliente' | 'importe' } o null */
+  function coincide(v, t) {
+    if (esImporte(t)) {
+      var dt = digitos(VH.total(v)), dq = digitos(t);
+      return dt.indexOf(dq) === 0 && (dq.length >= 4 || dq === dt) ? { tipo: 'importe' } : null;
+    }
+    var qn = norm(t.trim());
+    if (qn.length < 2) return null;
+    var todos = (v.vuelve ? [v.vuelve] : []).concat(v.items);
+    for (var i = 0; i < todos.length; i++) if (norm(todos[i].nom).indexOf(qn) >= 0) return { tipo: 'producto', cual: todos[i], vuelta: todos[i] === v.vuelve, cuantos: todos.length };
+    if (v.cliente && norm(v.cliente).indexOf(qn) >= 0) return { tipo: 'cliente' };
+    return null;
+  }
+  function estadoD(v) {
+    return v.estado === 'anulada' ? '<span class="pastilla error" style="height:22px;padding:0 8px">anulada</span>'
+      : v.estado === 'corregida' ? '<span class="pastilla urgente" style="height:22px;padding:0 8px">corregida</span>' : VH.MEDIOS[v.medio].nom;
+  }
+  function filtrar(animar) {
+    var t = inp.value, filas = $$('.vr[data-id]', pantalla), hay = 0, suma = 0, qn = norm(t.trim());
+    $('[data-limpiar]', bus).hidden = !t;
+    sug.style.display = t ? 'none' : '';
+    filas.forEach(function (f) {
+      var v = VH.buscar(f.dataset.id);
+      if (!v) return;
+      var nueva = document.createElement('div'); nueva.innerHTML = vrHTML(v); nueva = nueva.firstChild;
+      var c = t.trim() ? coincide(v, t) : { tipo: 'todo' };
+      if (!c) { nueva.classList.add('oculta'); }
+      else {
+        hay++; if (v.estado !== 'anulada') suma += VH.total(v);
+        if (c.tipo === 'importe') { var vv = $('.v', nueva); vv.innerHTML = '<mark class="coin">' + vv.innerHTML + '</mark>'; }
+        if (c.tipo === 'cliente') $('.q', nueva).innerHTML = marcar(v.cliente, qn);
+        if (c.tipo === 'producto') {
+          // El título muestra el producto que coincide; el detalle dice de qué venta es
+          $('.q', nueva).innerHTML = (c.vuelta ? 'Volvió: ' : VH.cant(c.cual.cant) + ' × ') + marcar(c.cual.nom, qn);
+          $('.d', nueva).innerHTML = v.hora + ' · ' + (v.cliente ? esc(v.cliente) + ' · ' : '') + estadoD(v) +
+            (c.cuantos > 1 ? ' <span class="donde">· y ' + (c.cuantos - 1) + ' más</span>' : '');
+        }
+        if (animar && t.trim()) nueva.classList.add('coincide');
+      }
+      f.replaceWith(nueva);
+    });
+    VH.iconos(pantalla);
+    var total = filas.length;
+    if (!t.trim()) res.innerHTML = '<span>Las <b>' + total + '</b> ventas de ' + (VH.diaActual === 'hoy' ? 'hoy' : 'ese día') + '</span>';
+    else if (hay) res.innerHTML = '<span><b>' + hay + '</b> de ' + total + ' ventas</span><span class="que">' + (esImporte(t) ? '<span class="pastilla contorno">importe</span>' : '') + (suma ? 'suman <b>' + VH.plata(suma) + '</b>' : '') + '</span>';
+    else res.innerHTML = '<span>Ninguna de las ' + total + ' ventas</span>';
+    vacio.classList.toggle('visible', !!t.trim() && !hay);
+    $('.t', vacio).textContent = 'Ninguna venta con «' + t.trim() + '»';
+  }
+  function irArriba() { pantalla.scrollTop = 0; }
+  function abrirBuscador() {
+    if (buscando) { inp.focus(); return; }
+    buscando = true;
+    cab.style.display = 'none'; bus.classList.add('abierto'); pantalla.classList.add('buscando');
+    filtrar(false);
+    irArriba();
+    inp.focus({ preventScroll: true });
+  }
+  function salirBuscador() {
+    buscando = false; inp.value = '';
+    bus.classList.remove('abierto'); cab.style.display = ''; pantalla.classList.remove('buscando');
+    filtrar(false);
+    vacio.classList.remove('visible');
+    pantalla.scrollTop = 0;
+    inp.blur();
+  }
+  var espera;
+  inp.addEventListener('input', function () { clearTimeout(espera); espera = setTimeout(function () { filtrar(true); }, 90); });
+  inp.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !VH.abiertas()) { e.preventDefault(); if (inp.value) { inp.value = ''; filtrar(false); } else salirBuscador(); }
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+  });
+  pantalla.addEventListener('click', function (e) {
+    if (e.target.closest('[data-buscar]')) { abrirBuscador(); return; }
+    if (e.target.closest('[data-salir]')) { salirBuscador(); return; }
+    if (e.target.closest('[data-limpiar]')) { inp.value = ''; filtrar(false); inp.focus({ preventScroll: true }); irArriba(); return; }
+    var s = e.target.closest('[data-sug]');
+    if (s) { inp.value = s.dataset.sug; filtrar(true); irArriba(); }
+  });
+  // Lo que cambia una venta (corregir, anular, cambio) vuelve a pasar por el filtro
+  Object.keys(ganchos).forEach(function (k) {
+    var g = ganchos[k];
+    ganchos[k] = function (x) { g(x); if (buscando) filtrar(false); };
+  });
+
+  // Otro día
+  var q = $('.dia-linea .q'), qHoy = q.innerHTML;
+  $('.dia-linea .btn').addEventListener('click', function () {
+    VH.otroDia(function (x) { q.innerHTML = x[0] === 'hoy' ? qHoy : x[1].replace(/^Ayer, /, '') + ' <span class="t-detalle">· pasado</span>'; });
+  });
+})();
+</script>
+</body>
+</html>
