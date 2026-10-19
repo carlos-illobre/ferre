@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listas de precios · Evolución (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { overflow: hidden; -webkit-mask-image: linear-gradient(#000 88%, transparent 100%); }
+  .pend { padding: 16px; border-radius: 20px; background: #fff; box-shadow: var(--sombra-2); border: 1px solid var(--borde); }
+  .pend .arr { display: flex; align-items: center; gap: 12px; }
+  .pend .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--urgente-suave); color: var(--urgente-texto); display: grid; place-items: center; flex: none; }
+  .pend .et { font-size: 14px; font-weight: 700; color: var(--urgente-texto); line-height: 18px; }
+  .pend .nom { font-size: 18px; font-weight: 800; line-height: 24px; }
+  .pend .d { font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .cifras { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .cifra { padding: 8px 10px; border-radius: 12px; background: var(--hundido); }
+  .cifra .va { font-size: 20px; font-weight: 800; line-height: 26px; letter-spacing: -.01em; }
+  .cifra .va small { font-size: 14px; font-weight: 750; color: var(--pino-texto); margin-left: 2px; }
+  .cifra .et2 { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; }
+  .cifra.pino { background: var(--pino-suave); }
+  .franja { display: flex; height: 6px; gap: 2px; margin-top: 12px; border-radius: 9px; overflow: hidden; }
+  .franja b { height: 100%; }
+  .pend .btn { width: 100%; margin-top: 14px; justify-content: space-between; padding: 0 16px 0 20px; }
+  .mas-pend { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 0 4px; font-size: 14px; color: var(--texto-2); font-weight: 650; }
+  .mas-pend b { color: var(--tinta); }
+  .mas-pend .i-s { margin-left: auto; }
+
+  .cargar { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px 12px 12px 14px; border-radius: 16px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .cargar .ic { width: 40px; height: 40px; border-radius: 12px; background: var(--pino-suave); color: var(--pino-texto); display: grid; place-items: center; flex: none; }
+  .cargar b { display: block; font-size: 16px; line-height: 20px; }
+  .cargar span.d { font-size: 14px; color: var(--texto-2); }
+  .cargar .btn { margin-left: auto; }
+
+  .sec { display: flex; align-items: center; gap: 8px; margin: 20px 4px 8px; }
+  .sec b { font-size: 18px; font-weight: 800; }
+  .sec .ver { margin-left: auto; font-size: 14px; font-weight: 750; color: var(--pino-texto); }
+  .grupo { background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); overflow: hidden; }
+  .row { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--borde); }
+  .row:last-child { border-bottom: 0; }
+  .row .ic { width: 40px; height: 40px; border-radius: 12px; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; grid-row: span 2; }
+  .row .n { font-weight: 800; font-size: 16px; line-height: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .d { font-size: 14px; color: var(--texto-2); line-height: 19px; grid-column: 2 / 4; }
+  .row .d b { color: var(--tinta); }
+  .row .pastilla { height: 26px; padding: 0 9px; }
+  .row .pastilla .i-s { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Productos</a><a class="activa">Listas</a><a>Duplicados</a></nav>
+
+  <div class="celu-pantalla">
+    <div class="pend">
+      <div class="arr">
+        <span class="ic"><i class="i i-l" data-i="mail"></i></span>
+        <div style="min-width:0">
+          <div class="et">Llegó por correo · para revisar</div>
+          <div class="nom">Bulonera Centro</div>
+          <div class="d">Lista del 17/10/2026 · hoy 08:12</div>
+        </div>
+      </div>
+      <div class="cifras">
+        <div class="cifra pino"><div class="va">876<small>+8,4 %</small></div><div class="et2">cambian</div></div>
+        <div class="cifra"><div class="va">4</div><div class="et2">nuevos</div></div>
+        <div class="cifra"><div class="va">12</div><div class="et2">no están</div></div>
+      </div>
+      <div class="franja"><b style="width:12%;background:var(--pino)"></b><b style="width:2%;background:var(--accion)"></b><b style="flex:1;background:var(--hundido-2)"></b></div>
+      <button class="btn btn-accion grande">Revisar y aplicar <i class="i" data-i="arrow-right"></i></button>
+    </div>
+    <div class="mas-pend"><i class="i i-s" data-i="inbox"></i><span>Y <b>1 más</b>: Ferretera del Sur, de su portal</span><i class="i i-s" data-i="chevron-right"></i></div>
+
+    <div class="cargar">
+      <span class="ic"><i class="i" data-i="file-up"></i></span>
+      <div><b>Cargar una lista</b><span class="d">Excel o PDF del proveedor</span></div>
+      <button class="btn chico">Subir lista</button>
+    </div>
+
+    <div class="sec"><b>Últimas cargas</b><span class="ver">Ver todas</span></div>
+    <div class="grupo">
+      <div class="row">
+        <span class="ic"><i class="i" data-i="file-spreadsheet"></i></span>
+        <span class="n">Distribuidora Oeste</span><span class="pastilla logro"><i class="i i-s" data-i="check"></i>Aplicada</span>
+        <span class="d">Lista del 14/10 · <b>312</b> cambiados</span>
+      </div>
+      <div class="row">
+        <span class="ic"><i class="i" data-i="file-text"></i></span>
+        <span class="n">Eléctrica Belgrano</span><span class="pastilla">Descartada</span>
+        <span class="d">Lista del 10/10 · PDF · <b>1.284</b> leídos</span>
+      </div>
+    </div>
+
+    <div class="sec"><b>Proveedores</b><span class="pastilla" style="height:24px">14</span><span class="ver"><i class="i i-s" data-i="search"></i></span></div>
+    <div class="grupo">
+      <div class="row">
+        <span class="ic"><i class="i" data-i="building-2"></i></span>
+        <span class="n">Pinturas del Plata</span><span class="pastilla urgente">Vieja</span>
+        <span class="d">Lista del 08/09 · hace <b>41 días</b></span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a class="activo"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

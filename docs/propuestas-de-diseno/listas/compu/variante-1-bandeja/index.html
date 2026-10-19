@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listas de precios · La bandeja y la revisión (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  .pantalla { padding-top: 16px; padding-bottom: 16px; }
+  .app.plegado .pie .pastilla.logro { width: 12px; height: 12px; padding: 0; font-size: 0; justify-self: center !important; background: var(--logro); }
+  .app.plegado .vinculo { padding: 12px; justify-content: center; }
+  .app.plegado .nav-item .pastilla { position: absolute; top: 2px; right: -2px; height: 22px !important; padding: 0 7px; }
+  .app.plegado .usuario { padding: 0; justify-content: center; }
+  .listas { display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 24px; height: 100%; }
+
+  /* ---- Columna izquierda: cargar, para revisar, últimas, proveedores ---- */
+  .izq { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+  .soltar { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--r-tarjeta); border: 1.5px dashed var(--borde-fuerte); background: rgba(255,255,255,.55); }
+  .soltar .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--pino-suave); color: var(--pino-texto); display: grid; place-items: center; flex: none; }
+  .soltar b { display: block; font-size: 15px; line-height: 20px; }
+  .soltar span { font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .cab { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .cab b { font-size: 16px; font-weight: 800; }
+  .cab .mas { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--pino-texto); }
+  .fila { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; background: #fff; border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .fila + .fila { margin-top: 6px; }
+  .fila .ic { width: 36px; height: 36px; border-radius: 10px; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; }
+  .fila .n { font-weight: 750; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila .d { font-size: 14px; line-height: 19px; color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila.elegida { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10), var(--sombra-2); }
+  .fila.elegida .ic { background: var(--pino); color: #fff; }
+  .fila .pastilla { height: 24px; padding: 0 8px; }
+  .fila .pastilla .i-s { width: 14px; height: 14px; }
+  .prov { display: grid; grid-template-columns: 10px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 8px 4px; border-bottom: 1px solid var(--borde); font-size: 14px; }
+  .prov:last-child { border: 0; }
+  .prov .pt { width: 8px; height: 8px; border-radius: 9px; background: var(--logro); }
+  .prov .pt.vieja { background: var(--urgente); }
+  .prov b { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prov span.d { color: var(--texto-2); }
+
+  /* ---- Panel derecho: la revisión ---- */
+  .rev { display: flex; flex-direction: column; min-height: 0; padding: 16px 20px 16px; gap: 12px; }
+  .rev-cab { display: flex; align-items: center; gap: 12px; }
+  .rev-cab .doc { width: 44px; height: 44px; border-radius: 12px; background: var(--hundido); color: var(--pino-texto); display: grid; place-items: center; flex: none; }
+  .rev-cab .t-seccion { line-height: 24px; }
+  .rev-cab .acc { margin-left: auto; display: flex; gap: 8px; }
+  .numeros { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); border: 1px solid var(--borde); border-radius: 14px; overflow: hidden; }
+  .nro { padding: 10px 12px; border-right: 1px solid var(--borde); }
+  .nro:last-child { border-right: 0; }
+  .nro .et { font-size: 14px; color: var(--texto-2); font-weight: 650; line-height: 18px; white-space: nowrap; }
+  .nro .va { font-size: 22px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; }
+  .nro .va small { font-size: 14px; font-weight: 750; margin-left: 4px; letter-spacing: 0; }
+  .nro.cambian { background: var(--pino-suave); } .nro.cambian .va small { color: var(--pino-texto); }
+  .nro.saltea .va { color: var(--urgente-texto); }
+  .franja { display: flex; height: 8px; border-radius: 99px; overflow: hidden; gap: 2px; margin-top: -4px; }
+  .franja b { display: block; height: 100%; }
+  .aviso { align-items: center; padding: 8px 8px 8px 14px; }
+  .aviso .btn { margin-left: auto; background: #fff; }
+
+  .filtros { display: flex; gap: 8px; align-items: center; }
+  .filtros .chip { height: 36px; font-size: 14px; padding: 0 12px; }
+  .filtros .chip .cta { font-weight: 800; }
+  .filtros .ayuda { margin-left: auto; font-size: 14px; color: var(--texto-3); font-weight: 600; display: flex; gap: 6px; align-items: center; }
+
+  .tabla { flex: 1; min-height: 0; overflow: hidden; border: 1px solid var(--borde); border-radius: 14px; position: relative; }
+  .tabla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; background: linear-gradient(transparent, #fff); }
+  .tr { display: grid; grid-template-columns: 40px minmax(0,1fr) 92px 100px 72px 150px; gap: 12px; align-items: center; padding: 5px 14px; border-bottom: 1px solid var(--borde); font-size: 15px; }
+  .th { background: var(--hundido); font-size: 14px; font-weight: 700; color: var(--texto-2); padding: 7px 14px; }
+  .der { text-align: right; justify-self: end; }
+  .tr .n { font-weight: 700; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tr .d { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .antes { color: var(--texto-3); font-weight: 600; }
+  .nuevo { font-weight: 800; border-bottom: 1.5px dotted var(--borde-fuerte); }
+  .var { display: inline-flex; align-items: center; height: 26px; padding: 0 8px; border-radius: 99px; font-size: 14px; font-weight: 750; background: var(--hundido); color: var(--texto-2); }
+  .var.grande { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .var.baja { background: var(--logro-suave); color: var(--logro-texto); }
+  .estante { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
+  .estante s { color: var(--texto-3); font-weight: 600; text-decoration-thickness: 1.5px; }
+  .estante .i-s { color: var(--texto-3); }
+  .estante.igual { color: var(--texto-2); font-weight: 650; }
+  .tr.foco { background: var(--pino-suave); box-shadow: inset 3px 0 0 var(--pino); border-bottom: 0; }
+  .explica { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; padding: 4px 14px 10px 66px; background: var(--pino-suave); border-bottom: 1px solid var(--borde); box-shadow: inset 3px 0 0 var(--pino); font-size: 14px; color: var(--texto-2); font-weight: 600; white-space: nowrap; }
+  .paso { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 8px; border-radius: 8px; background: #fff; border: 1px solid var(--borde); color: var(--tinta); font-weight: 700; }
+  .paso small { color: var(--texto-2); font-size: 14px; font-weight: 600; }
+  .paso.fin { background: var(--pino); color: #fff; border-color: var(--pino); }
+  .paso.fin small { color: rgba(255,255,255,.8); }
+  .explica .i-s { color: var(--texto-3); }
+  .sinprecio { color: var(--urgente-texto); font-weight: 750; }
+
+  .pie-rev { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+  .pie-rev .nota { font-size: 14px; color: var(--texto-2); font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .pie-rev .btn-accion { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Catálogo</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="building-2"></i>Agregar proveedor</button>
+        <button class="btn chico"><i class="i i-s" data-i="upload"></i>Subir lista <span class="kbd">Alt S</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Productos</a><a class="activa">Listas de precios <span class="pastilla urgente" style="height:24px">2</span></a><a>Duplicados <span class="pastilla" style="height:24px">12</span></a></nav>
+
+    <section class="pantalla">
+      <div class="listas">
+        <!-- ============ Izquierda ============ -->
+        <div class="izq">
+          <div class="soltar">
+            <span class="ico"><i class="i" data-i="file-up"></i></span>
+            <div><b>Cargar una lista</b><span>Soltá el Excel o el PDF acá, o <span class="kbd">Alt S</span></span></div>
+          </div>
+
+          <div>
+            <div class="cab"><b>Para revisar</b><span class="pastilla urgente" style="height:24px">2</span></div>
+            <div class="fila elegida">
+              <span class="ic"><i class="i" data-i="mail"></i></span>
+              <div style="min-width:0"><div class="n">Bulonera Centro</div><div class="d">17/10 · por correo, hoy 08:12</div></div>
+              <span class="kbd">1</span>
+            </div>
+            <div class="fila">
+              <span class="ic"><i class="i" data-i="globe"></i></span>
+              <div style="min-width:0"><div class="n">Ferretera del Sur</div><div class="d">18/10 · de su portal, anoche</div></div>
+              <span class="kbd">2</span>
+            </div>
+            <div class="fila" style="background:var(--urgente-suave);border-color:transparent;box-shadow:none">
+              <span class="ic" style="background:#fff;color:var(--urgente-texto)"><i class="i" data-i="inbox"></i></span>
+              <div style="min-width:0"><div class="n" style="color:var(--urgente-texto)">1 adjunto sin proveedor</div><div class="d">precios-oct-2026.pdf</div></div>
+              <i class="i i-s" data-i="chevron-right" style="color:var(--urgente-texto)"></i>
+            </div>
+          </div>
+
+          <div>
+            <div class="cab"><b>Últimas cargas</b><span class="mas">Ver todas</span></div>
+            <div class="fila">
+              <span class="ic"><i class="i" data-i="file-spreadsheet"></i></span>
+              <div style="min-width:0"><div class="n">Distribuidora Oeste</div><div class="d">14/10 · 312 cambiados</div></div>
+              <span class="pastilla logro">Aplicada</span>
+            </div>
+          </div>
+
+          <div class="tarjeta" style="padding:8px 12px">
+            <div class="cab" style="margin:2px 4px 2px"><b>Proveedores</b><span class="pastilla" style="height:24px">14</span><span class="mas">Buscar <span class="kbd">/</span></span></div>
+            <div class="prov"><span class="pt vieja"></span><b>Pinturas del Plata</b><span class="pastilla urgente" style="height:24px">Vieja · 41 días</span></div>
+            <div class="prov"><span class="pt vieja"></span><b>Acindar Clavos</b><span class="pastilla urgente" style="height:24px">Vieja · 33 días</span></div>
+          </div>
+        </div>
+
+        <!-- ============ Derecha: revisar la lista ============ -->
+        <div class="tarjeta-2 rev">
+          <div class="rev-cab">
+            <span class="doc"><i class="i i-l" data-i="file-spreadsheet"></i></span>
+            <div>
+              <div class="t-seccion">Bulonera Centro · lista del 17/10/2026</div>
+              <div class="t-detalle">bulonera-centro-octubre.xlsx · llegó por correo hoy 08:12 · reconocida sola</div>
+            </div>
+            <div class="acc"><button class="btn chico btn-suave"><i class="i i-s" data-i="mail-open"></i>Ver el correo</button></div>
+          </div>
+
+          <div class="numeros">
+            <div class="nro"><div class="et">Leídos</div><div class="va">7.096</div></div>
+            <div class="nro cambian"><div class="et">Cambian</div><div class="va">876<small>+8,4 %</small></div></div>
+            <div class="nro"><div class="et">Nuevos</div><div class="va">4</div></div>
+            <div class="nro"><div class="et">Sin cambio</div><div class="va">6.216</div></div>
+            <div class="nro"><div class="et">Ya no están</div><div class="va">12</div></div>
+            <div class="nro saltea"><div class="et">Salteadas</div><div class="va">6</div></div>
+          </div>
+          <div class="franja" style="display:none">
+            <b style="width:12.3%;background:var(--pino)"></b><b style="width:1.2%;background:var(--logro)"></b><b style="flex:1;background:var(--hundido-2)"></b><b style="width:.8%;background:var(--texto-3)"></b><b style="width:.6%;background:var(--urgente)"></b>
+          </div>
+
+          <div class="aviso urgente"><i class="i" data-i="triangle-alert"></i><span>La planilla dice <b>6 % de contado</b> y Bulonera Centro tiene <b>5 %</b>: se calculó con 5 %.</span><button class="btn chico">Usar 6 %</button></div>
+
+          <div class="filtros">
+            <span class="chip elegido">Cambian <span class="cta">876</span></span>
+            <span class="chip">Subas de más de 15 % <span class="cta">23</span></span>
+            <span class="chip">Nuevos <span class="cta">4</span></span>
+            <span class="chip">Ya no están <span class="cta">12</span></span>
+            <span class="chip">Salteadas <span class="cta">6</span></span>
+          </div>
+
+          <div class="tabla">
+            <div class="tr th"><span></span><span>Producto</span><span class="der">Costo antes</span><span class="der">Costo nuevo</span><span class="der">Cambio</span><span class="der">Precio en estantería</span></div>
+            <div class="tr">
+              <div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div>
+              <div style="min-width:0"><div class="n">Tornillo autoperforante T2 8 × 1" × 100</div><div class="d">Bulonera · TA8-1</div></div>
+              <span class="der antes">$5.100</span><span class="der nuevo">$6.050</span><span class="der"><span class="var grande">+18,6 %</span></span>
+              <span class="der estante"><s>$10.000</s><i class="i i-s" data-i="arrow-right"></i>$11.000</span>
+            </div>
+            <div class="tr foco">
+              <div class="foto chica" style="background:#fff"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+              <div style="min-width:0"><div class="n">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · ME080</div></div>
+              <span class="der antes">$2.290</span><span class="der nuevo">$2.479,50</span><span class="der"><span class="var">+8,3 %</span></span>
+              <span class="der estante"><s>$6.000</s><i class="i i-s" data-i="arrow-right"></i>$7.000</span>
+            </div>
+            <div class="explica">
+              <span class="paso"><small>lista</small>$3.480</span><i class="i i-s" data-i="chevron-right"></i>
+              <span class="paso"><small>línea</small>− 25 %</span><i class="i i-s" data-i="chevron-right"></i>
+              <span class="paso"><small>contado</small>− 5 %</span><i class="i i-s" data-i="chevron-right"></i>
+                            <span class="paso"><small>margen</small>100 %</span><i class="i i-s" data-i="chevron-right"></i>
+              <span class="paso"><small>IVA</small>21 %</span><i class="i i-s" data-i="chevron-right"></i>
+              <span class="paso fin">$7.000 <small>redondeado</small></span>
+            </div>
+            <div class="tr">
+              <div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div>
+              <div style="min-width:0"><div class="n">Clavos punta París 2" por kilo</div><div class="d">Acindar · CP2-KG</div></div>
+              <span class="der antes">$2.640</span><span class="der nuevo">$2.900</span><span class="der"><span class="var">+9,8 %</span></span>
+              <span class="der estante"><s>$7.000</s><i class="i i-s" data-i="arrow-right"></i>$8.000</span>
+            </div>
+            <div class="tr">
+              <div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+              <div style="min-width:0"><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · TS8-100</div></div>
+              <span class="der antes">$3.820</span><span class="der nuevo">$4.150</span><span class="der"><span class="var">+8,6 %</span></span>
+              <span class="der sinprecio">Sin precio</span>
+            </div>
+            <div class="tr">
+              <div class="foto chica"><img src="../../../_comun/fotos/lampara.webp" alt=""></div>
+              <div style="min-width:0"><div class="n">Lámpara LED 9 W luz fría E27</div><div class="d">Philips · LED9F</div></div>
+              <span class="der antes">$1.290</span><span class="der nuevo">$1.240</span><span class="der"><span class="var baja">−3,9 %</span></span>
+              <span class="der estante igual">$4.000 · queda igual</span>
+            </div>
+          </div>
+
+          <div class="pie-rev">
+            <button class="btn btn-fantasma chico">Descartar <span class="kbd">Alt D</span></button>
+            <span class="nota"><i class="i i-s" data-i="lock"></i>Nada cambia hasta aplicar</span><span class="nota" style="color:var(--texto-3)"><span class="kbd">↑</span><span class="kbd">↓</span><span class="kbd">Espacio</span></span>
+            <button class="btn btn-accion">Aplicar · cambian 641 precios <span class="kbd">Ctrl Enter</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

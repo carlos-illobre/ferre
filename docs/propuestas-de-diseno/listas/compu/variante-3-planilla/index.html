@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listas de precios · La planilla tal cual llegó (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  body { height: 768px; overflow: hidden; }
+  .todo { display: flex; flex-direction: column; height: 768px; }
+
+  /* ---- Barra de arriba: sin lateral ---- */
+  .barra { display: flex; align-items: center; gap: 12px; height: 68px; padding: 0 24px; background: #fff; border-bottom: 1px solid var(--borde); flex: none; }
+  .barra .cerrar { width: 40px; height: 40px; }
+  .barra .ruta { font-size: 14px; color: var(--texto-2); font-weight: 650; line-height: 18px; }
+  .barra .nombre { font-size: 20px; font-weight: 800; letter-spacing: -.01em; line-height: 26px; }
+  .barra .lecturas { display: flex; gap: 8px; margin-left: 16px; }
+  .barra .lecturas .pastilla .i-s { width: 14px; height: 14px; }
+  .barra .der { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  /* ---- La planilla ---- */
+  .hoja { flex: 1; min-height: 0; padding: 12px 24px 0; position: relative; }
+  .mapa, .fila { display: grid; grid-template-columns: 40px 88px 300px 100px 112px 104px 56px 136px 12px 104px 92px 172px; }
+  .mapa { height: 44px; align-items: center; }
+  .mapa > span { padding: 0 4px; }
+  .col { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 8px; border-radius: 8px; background: var(--pino-suave); color: var(--pino-texto); font-size: 14px; font-weight: 750; white-space: nowrap; }
+  .col .i-s { width: 14px; height: 14px; }
+  .col.duda { background: var(--urgente); color: #3B2600; box-shadow: 0 0 0 3px rgba(240,162,15,.25); }
+  .col.fb { background: transparent; color: var(--texto-2); padding: 0; }
+  .marco-hoja { border: 1px solid var(--borde-fuerte); border-radius: 12px; overflow: hidden; background: #fff; box-shadow: var(--sombra-2); position: relative; }
+  .fila { height: 33px; font-size: 14px; }
+  .fila > span { display: flex; align-items: center; padding: 0 8px; border-right: 1px solid #EEEBE3; border-bottom: 1px solid #EEEBE3; white-space: nowrap; overflow: hidden; color: #3A3E3B; font-weight: 500; }
+  .fila > span.r { justify-content: flex-end; }
+  .fila > span:nth-child(1) { background: var(--hundido); color: var(--texto-3); justify-content: center; font-weight: 650; border-right-color: var(--borde); }
+  .fila > span.gap { background: var(--fondo); border: 0; padding: 0; border-left: 1px solid var(--borde-fuerte); border-right: 1px solid var(--borde-fuerte); }
+  .fila > span.fb { background: #FCFBF8; color: var(--tinta); font-weight: 700; border-right-color: var(--borde); }
+  .fila.letras > span { background: var(--hundido); color: var(--texto-2); font-weight: 700; justify-content: center; height: 30px; }
+  .fila.letras > span.fb { background: var(--pino); color: #fff; justify-content: flex-start; }
+  .fila.letras > span.fb.r { justify-content: flex-end; }
+  .fila.titulo > span:nth-child(3) { font-weight: 800; color: var(--tinta); overflow: visible; }
+  .fecha { background: var(--logro-suave); color: var(--logro-texto); border-radius: 6px; padding: 0 6px; margin: 0 2px; font-weight: 750; outline: 1.5px solid var(--logro); }
+  .fila.enc > span { background: var(--pino-suave); color: var(--pino-texto); font-weight: 800; }
+  .fila.enc > span:nth-child(1) { background: var(--pino); color: #fff; }
+  .fila.enc > span.fb, .fila.enc > span.gap { background: #FCFBF8; }
+  .fila.salteada > span:not(:nth-child(1)):not(.gap) { background: repeating-linear-gradient(-45deg, #fff, #fff 6px, #F7F5EF 6px, #F7F5EF 12px); color: var(--texto-3); }
+  .fila.salteada .motivo { color: var(--urgente-texto) !important; font-weight: 750 !important; }
+  .fila.foco > span { background: #F2F7F4; }
+  .fila.foco > span:nth-child(1) { background: var(--pino); color: #fff; }
+  .fila.foco > span.fb { background: var(--pino-suave); }
+  .fila.foco { position: relative; }
+  .fila.foco::after { content: ""; position: absolute; inset: -1px 0 0 0; border: 2px solid var(--pino); pointer-events: none; border-radius: 2px; }
+  .var { display: inline-flex; align-items: center; height: 22px; padding: 0 6px; border-radius: 99px; font-size: 14px; font-weight: 750; background: var(--hundido); color: var(--texto-2); }
+  .var.grande { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .var.nuevo { background: var(--accion-suave); color: var(--accion-texto); }
+  s { color: var(--texto-3); font-weight: 600; margin-right: 6px; }
+  .falta { color: var(--urgente-texto); font-weight: 750; }
+
+  /* Menú de la columna sin nombre */
+  .menu-col { position: absolute; top: 52px; left: 692px; width: 268px; padding: 8px; border-radius: 16px; background: #fff; box-shadow: var(--sombra-3); border: 1px solid var(--borde); z-index: 3; }
+  .menu-col .q { padding: 6px 8px 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 20px; }
+  .menu-col .q b { color: var(--tinta); }
+  .op { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 10px; font-weight: 700; font-size: 15px; }
+  .op.sug { background: var(--pino-suave); color: var(--pino-texto); }
+  .op .kbd { margin-left: auto; }
+  .op small { font-size: 14px; color: var(--texto-3); font-weight: 600; }
+
+  /* ---- Pie: la explicación de la fila y aplicar ---- */
+  .pie { flex: none; display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: #fff; border-top: 1px solid var(--borde); box-shadow: 0 -8px 24px -16px rgba(26,29,27,.2); }
+  .explica { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--texto-2); font-weight: 650; white-space: nowrap; }
+  .explica .fn { font-weight: 800; color: var(--tinta); margin-right: 4px; }
+  .paso { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 8px; border-radius: 8px; background: var(--hundido); color: var(--tinta); font-weight: 750; }
+  .paso small { color: var(--texto-2); font-size: 14px; font-weight: 600; }
+  .paso.fin { background: var(--pino); color: #fff; }
+  .explica .i-s { color: var(--texto-3); }
+  .pie .der { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="todo">
+  <header class="barra">
+    <button class="btn btn-icono cerrar"><i class="i" data-i="x"></i></button>
+    <div style="white-space:nowrap">
+      <div class="nombre">Bulonera Centro · lista del 17/10/2026</div>
+      <div class="ruta">bulonera-centro-octubre.xlsx, tal cual llegó · <span class="kbd">Esc</span> vuelve</div>
+    </div>
+    <div class="lecturas">
+      <span class="pastilla logro"><i class="i i-s" data-i="check"></i>Reconocida sola</span>
+      <span class="pastilla urgente"><i class="i i-s" data-i="circle-help"></i>1 columna sin nombre</span>
+    </div>
+    <div class="der">
+      <span class="pastilla pino">876 cambian · +8,4 %</span>
+      <span class="pastilla accion">4 nuevos</span>
+      <span class="pastilla contorno">6 salteadas</span>
+    </div>
+  </header>
+
+  <div class="hoja">
+    <div class="mapa">
+      <span></span>
+      <span><span class="col"><i class="i i-s" data-i="check"></i>Código</span></span>
+      <span><span class="col"><i class="i i-s" data-i="check"></i>Descripción</span></span>
+      <span><span class="col"><i class="i i-s" data-i="check"></i>Marca</span></span>
+      <span><span class="col"><i class="i i-s" data-i="check"></i>Rubro</span></span>
+      <span><span class="col"><i class="i i-s" data-i="check"></i>Precio lista</span></span>
+      <span><span class="col" style="padding:0 6px">− %</span></span>
+      <span><span class="col duda"><i class="i i-s" data-i="circle-help"></i>¿Qué es? <i class="i i-s" data-i="chevron-down"></i></span></span>
+      <span></span>
+      <span style="grid-column: span 3"><span class="col fb"><i class="i i-s" data-i="sparkles"></i>Lo que entendió Ferrebress</span></span>
+    </div>
+
+    <div class="menu-col">
+      <div class="q">La columna G tiene números de 13 cifras que empiezan con <b>779</b>. Parece el <b>código de barras</b>.</div>
+      <div class="op sug"><i class="i i-s" data-i="scan-barcode"></i>Código de barras <span class="kbd">Enter</span></div>
+      <div class="op"><i class="i i-s" data-i="boxes"></i>Bulto</div>
+      <div class="op"><i class="i i-s" data-i="ban"></i>No usar <small>· se pregunta 1 vez</small></div>
+    </div>
+
+    <div class="marco-hoja">
+      <div class="fila letras"><span></span><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span class="gap"></span><span class="fb r">Costo</span><span class="fb r">Cambio</span><span class="fb r">En estantería</span></div>
+      <div class="fila titulo"><span>1</span><span></span><span>BULONERA CENTRO · MAYORISTA DE BULONERIA Y FIJACIONES</span><span></span><span></span><span></span><span></span><span></span><span class="gap"></span><span class="fb"></span><span class="fb"></span><span class="fb"></span></div>
+      <div class="fila titulo"><span>2</span><span></span><span>LISTA Nº 42 · VIGENCIA <span class="fecha">17/10/2026</span> · PRECIOS SIN IVA</span><span></span><span></span><span></span><span></span><span></span><span class="gap"></span><span class="fb"></span><span class="fb"></span><span class="fb"></span></div>
+      <div class="fila"><span>3</span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="gap"></span><span class="fb"></span><span class="fb"></span><span class="fb"></span></div>
+      <div class="fila enc"><span>4</span><span>COD.</span><span>DESCRIPCION</span><span>MARCA</span><span>RUBRO</span><span class="r">P. LISTA</span><span class="r">DTO</span><span></span><span class="gap"></span><span class="fb"></span><span class="fb"></span><span class="fb"></span></div>
+      <div class="fila foco"><span>5</span><span>ME080</span><span>MECHA ACERO RAPIDO HSS 8MM</span><span>EZETA</span><span>MECHAS</span><span class="r">3.480,00</span><span class="r">25</span><span>7798123450081</span><span class="gap"></span><span class="fb r">$2.479,50</span><span class="fb r"><span class="var">+8,3 %</span></span><span class="fb r"><s>$6.000</s>$7.000</span></div>
+      <div class="fila"><span>6</span><span>TA8-1</span><span>TORN.AUTOPERF. T2 8X1" X100</span><span>BULONERA</span><span>TORNILLERIA</span><span class="r">8.491,23</span><span class="r">25</span><span>7790555012345</span><span class="gap"></span><span class="fb r">$6.050</span><span class="fb r"><span class="var grande">+18,6 %</span></span><span class="fb r"><s>$10.000</s>$11.000</span></div>
+      <div class="fila"><span>7</span><span>TS8-100</span><span>TARUGO NYLON S8 C/TOPE X100</span><span>FISCHER</span><span>FIJACIONES</span><span class="r">5.824,56</span><span class="r">25</span><span>7791234560088</span><span class="gap"></span><span class="fb r">$4.150</span><span class="fb r"><span class="var">+8,6 %</span></span><span class="fb r falta">Sin precio</span></div>
+      <div class="fila"><span>8</span><span>CP2-KG</span><span>CLAVO P/PARIS 2" X KG</span><span>ACINDAR</span><span>CLAVOS</span><span class="r">4.070,18</span><span class="r">25</span><span>7790311002024</span><span class="gap"></span><span class="fb r">$2.900</span><span class="fb r"><span class="var">+9,8 %</span></span><span class="fb r"><s>$7.000</s>$8.000</span></div>
+      <div class="fila"><span>9</span><span>VR38-1</span><span>VARILLA ROSCADA ZINC. 3/8 X 1M</span><span>BULONERA</span><span>TORNILLERIA</span><span class="r">3.705,26</span><span class="r">25</span><span>7790555038376</span><span class="gap"></span><span class="fb r">$2.640</span><span class="fb r"><span class="var grande">+17,2 %</span></span><span class="fb r"><s>$6.000</s>$7.000</span></div>
+      <div class="fila salteada"><span>10</span><span>TM6-100</span><span>TUERCA MARIPOSA M6 X100</span><span>BULONERA</span><span>TORNILLERIA</span><span class="r">CONSULTAR</span><span class="r">25</span><span>7790555060063</span><span class="gap"></span><span class="fb motivo" style="grid-column: span 3">Salteada: no tiene precio</span></div>
+      <div class="fila"><span>11</span><span>AG8-100</span><span>ARANDELA GROWER M8 X100</span><span>BULONERA</span><span>TORNILLERIA</span><span class="r">1.740,35</span><span class="r">25</span><span>7790555080085</span><span class="gap"></span><span class="fb r">$1.240</span><span class="fb r"><span class="var grande">+16,0 %</span></span><span class="fb r"><s>$3.000</s>$4.000</span></div>
+      <div class="fila"><span>12</span><span>BH14-2</span><span>BULON HEX. 1/4 X 2" X50</span><span>BULONERA</span><span>TORNILLERIA</span><span class="r">6.147,37</span><span class="r">25</span><span>7790555014281</span><span class="gap"></span><span class="fb r">$4.380</span><span class="fb r"><span class="var nuevo">Nuevo</span></span><span class="fb r falta">Sin precio</span></div>
+      <div class="fila"><span>13</span><span>PT25-2</span><span>PUNTA TORX T25 X 50MM X2</span><span>BREMEN</span><span>PUNTAS</span><span class="r">2.694,74</span><span class="r">25</span><span>7798066102551</span><span class="gap"></span><span class="fb r">$1.920</span><span class="fb r"><span class="var nuevo">Nuevo</span></span><span class="fb r falta">Sin precio</span></div>
+      <div class="fila"><span>14</span><span>LLC13</span><span>LLAVE COMB. 13MM</span><span>BAHCO</span><span>HERRAMIENTAS</span><span class="r">10.357,89</span><span class="r">25</span><span>7314150123135</span><span class="gap"></span><span class="fb r">$7.380</span><span class="fb r"><span class="var">+7,0 %</span></span><span class="fb r"><s>$13.000</s>$14.000</span></div>
+      <div class="fila titulo"><span>15</span><span></span><span>OFERTAS DEL MES · HASTA 31/10</span><span></span><span></span><span></span><span></span><span></span><span class="gap"></span><span class="fb" style="grid-column: span 3;color:var(--pino-texto)">Ofertas: van aparte, con su fecha de fin</span></div>
+      <div class="fila"><span>16</span><span>DS6-100</span><span>DISCO CORTE 115 X 1MM X10 (OFERTA)</span><span>TYROLIT</span><span>ABRASIVOS</span><span class="r">9.600,00</span><span class="r">30</span><span>9010915123011</span><span class="gap"></span><span class="fb r">$6.384</span><span class="fb r"><span class="var" style="background:var(--logro-suave);color:var(--logro-texto)">−6,7 %</span></span><span class="fb r"><s>$13.000</s>$12.000</span></div>
+    </div>
+  </div>
+
+  <footer class="pie">
+    <div class="explica">
+      <span class="fn">Fila 5</span>
+      <span class="paso"><small>E</small>$3.480</span><i class="i i-s" data-i="chevron-right"></i>
+      <span class="paso"><small>F</small>− 25 %</span><i class="i i-s" data-i="chevron-right"></i>
+      <span class="paso"><small>contado</small>− 5 %</span><i class="i i-s" data-i="chevron-right"></i>
+      <span class="paso"><small>costo</small>$2.479,50</span><i class="i i-s" data-i="chevron-right"></i>
+      <span class="paso"><small>margen</small>100 %</span><i class="i i-s" data-i="chevron-right"></i>
+      <span class="paso"><small>IVA</small>21 %</span><i class="i i-s" data-i="chevron-right"></i>
+      <span class="paso fin">$7.000</span>
+    </div>
+    <div class="der">
+      <button class="btn btn-fantasma chico">Descartar <span class="kbd">Alt D</span></button>
+      <button class="btn btn-accion">Aplicar · 641 precios <span class="kbd">Ctrl Enter</span></button>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

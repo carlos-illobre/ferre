@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listas de precios · Remarcar caminando (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .top { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+  .top .x { width: 44px; height: 44px; border-radius: 99px; background: #fff; border: 1px solid var(--borde); display: grid; place-items: center; box-shadow: var(--sombra-1); flex: none; }
+  .top .t { font-size: 14px; font-weight: 700; color: var(--texto-2); line-height: 18px; }
+  .top .t b { display: block; font-size: 18px; color: var(--tinta); font-weight: 800; line-height: 24px; }
+  .top .x.der { margin-left: auto; }
+
+  .pasillos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 14px 16px 0; }
+  .pas { display: grid; gap: 6px; }
+  .pas .barra { margin: 0; height: 6px; }
+  .pas .barra > b { background: var(--pino); }
+  .pas span { font-size: 14px; font-weight: 750; color: var(--texto-3); display: flex; justify-content: space-between; }
+  .pas.ahora span { color: var(--pino-texto); }
+  .pas.ahora .barra { background: var(--pino-suave); }
+  .pas.listo .barra > b { background: var(--logro); }
+  .pas.listo span { color: var(--logro-texto); }
+
+  .pila { position: relative; margin: 16px 16px 0; height: 540px; }
+  .carta { position: absolute; inset: 0 0 auto 0; height: 520px; border-radius: 28px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-3); padding: 16px; display: flex; flex-direction: column; }
+  .carta.atras { transform: translateY(20px) scale(.93); box-shadow: var(--sombra-1); opacity: .9; }
+  .lugar { display: flex; align-items: center; justify-content: space-between; }
+  .lugar .pastilla { height: 36px; font-size: 16px; padding: 0 14px; font-weight: 800; }
+  .lugar .cuenta { font-size: 14px; font-weight: 700; color: var(--texto-3); }
+  .foto-g { margin: 12px 0 0; height: 176px; border-radius: 20px; background: var(--hundido); display: grid; place-items: center; }
+  .foto-g img { height: 160px; width: auto; filter: drop-shadow(0 10px 12px rgba(26,29,27,.22)); transform: rotate(-38deg); }
+  .nom { margin-top: 14px; font-size: 22px; font-weight: 800; line-height: 28px; letter-spacing: -.01em; }
+  .det { font-size: 15px; color: var(--texto-2); font-weight: 550; margin-top: 2px; }
+  .hechos { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .precio { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 12px; border-top: 1px dashed var(--borde-fuerte); }
+  .precio .antes { font-size: 15px; font-weight: 650; color: var(--texto-2); }
+  .precio .antes s { display: block; font-size: 24px; font-weight: 750; color: var(--texto-3); text-decoration-thickness: 2px; }
+  .precio .nuevo { text-align: right; }
+  .precio .nuevo .et { font-size: 15px; font-weight: 700; color: var(--pino-texto); }
+  .precio .nuevo .v { font-size: 64px; line-height: 64px; font-weight: 800; letter-spacing: -.04em; }
+  .precio .nuevo .pastilla { margin-top: 4px; }
+
+  .acciones { position: absolute; left: 16px; right: 16px; bottom: 30px; display: grid; grid-template-columns: 64px 64px 1fr; gap: 10px; }
+  .acciones .btn { height: 64px; border-radius: 18px; }
+  .acciones .btn-icono { width: 64px; }
+  .acciones .btn-accion { font-size: 19px; }
+  .pista { position: absolute; left: 0; right: 0; bottom: 104px; text-align: center; font-size: 14px; color: var(--texto-3); font-weight: 650; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="top">
+    <span class="x"><i class="i" data-i="x"></i></span>
+    <div class="t">Remarcar · lista de Bulonera Centro<b>Faltan 428 de 641</b></div>
+    <span class="x der"><i class="i" data-i="printer"></i></span>
+  </div>
+
+  <div class="pasillos">
+    <div class="pas listo"><div class="barra"><b style="width:100%"></b></div><span>A <i class="i i-s" data-i="check"></i></span></div>
+    <div class="pas ahora"><div class="barra"><b style="width:18%"></b></div><span>B <em style="font-style:normal">11/188</em></span></div>
+    <div class="pas"><div class="barra"><b style="width:0"></b></div><span>C <em style="font-style:normal">141</em></span></div>
+    <div class="pas"><div class="barra"><b style="width:0"></b></div><span>D <em style="font-style:normal">77</em></span></div>
+    <div class="pas"><div class="barra"><b style="width:0"></b></div><span>E <em style="font-style:normal">33</em></span></div>
+  </div>
+
+  <div class="pila">
+    <div class="carta atras"></div>
+    <div class="carta">
+      <div class="lugar"><span class="pastilla pino"><i class="i i-s" data-i="map-pin"></i>Est. B-03-12</span><span class="cuenta">la que sigue: B-03-14</span></div>
+      <div class="foto-g"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+      <div class="nom">Mecha acero rápido HSS 8 mm</div>
+      <div class="det">Ezeta · ME080 · margen 100 %</div>
+      <div class="hechos"><span class="pastilla">Costo +8,3 %</span><span class="pastilla logro">Stock 14 un.</span></div>
+      <div class="precio">
+        <div class="antes">Decía<s>$6.000</s></div>
+        <div class="nuevo"><div class="et">Ahora</div><div class="v num"><span class="peso">$</span>7.000</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pista">Deslizá a la izquierda para dejarlo para después</div>
+  <div class="acciones">
+    <button class="btn btn-icono"><i class="i i-l" data-i="scan-barcode"></i></button>
+    <button class="btn btn-icono"><i class="i i-l" data-i="printer"></i></button>
+    <button class="btn btn-accion"><i class="i i-l" data-i="check"></i>Remarcado</button>
+  </div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

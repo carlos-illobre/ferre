@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listas de precios · El impacto (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .top { display: flex; align-items: center; gap: 8px; padding: 0 16px 0 8px; height: 44px; }
+  .top .volver { display: inline-flex; align-items: center; gap: 2px; color: var(--pino-texto); font-weight: 750; font-size: 16px; }
+  .top .der { margin-left: auto; display: flex; gap: 8px; }
+  .titulo { padding: 0 16px; }
+  .titulo .t-titulo { line-height: 32px; }
+  .celu-pantalla { padding-top: 12px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 90%, transparent 100%); }
+  .hero { padding: 14px 16px; border-radius: 20px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-2); }
+  .hero .et { font-size: 15px; font-weight: 700; color: var(--texto-2); }
+  .hero .num { font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -.03em; }
+  .hero .num small { font-size: 20px; color: var(--texto-2); font-weight: 750; letter-spacing: -.01em; }
+  .hero .sube { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 750; color: var(--pino-texto); }
+  .fams { display: grid; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--borde); }
+  .fam { display: grid; grid-template-columns: 112px minmax(0,1fr) 58px; gap: 10px; align-items: center; font-size: 14px; font-weight: 650; }
+  .fam .bar { height: 8px; border-radius: 9px; background: var(--hundido); }
+  .fam .bar b { display: block; height: 100%; border-radius: 9px; background: var(--pino); }
+  .fam .pc { text-align: right; font-weight: 800; }
+
+  .sec { margin: 16px 4px 8px; font-size: 14px; font-weight: 750; color: var(--texto-2); }
+  .nuevo { padding: 14px; border-radius: 16px; background: #fff; border: 1.5px solid #F3C766; box-shadow: var(--sombra-1); }
+  .nuevo .arr { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; gap: 12px; align-items: center; }
+  .nuevo .n { font-weight: 800; font-size: 16px; line-height: 21px; }
+  .nuevo .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
+  .nuevo .cual { font-size: 14px; font-weight: 750; color: var(--urgente-texto); text-align: right; line-height: 18px; }
+  .margenes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 12px; }
+  .margenes b { height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 16px; font-weight: 800; background: #fff; box-shadow: inset 0 0 0 1.5px var(--urgente); color: var(--urgente-texto); }
+  .lista { margin-top: 8px; background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); overflow: hidden; }
+  .li { display: grid; grid-template-columns: 40px minmax(0,1fr) auto 16px; gap: 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--borde); }
+  .li:last-child { border: 0; }
+  .li .ic { width: 40px; height: 40px; border-radius: 99px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .li .n { font-weight: 800; font-size: 16px; line-height: 21px; }
+  .li .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
+  .li > .i-s { color: var(--texto-3); }
+
+  .barra-accion { display: grid; gap: 8px; }
+  .deslizar { position: relative; height: 60px; border-radius: 999px; background: var(--accion); box-shadow: var(--sombra-accion); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px; }
+  .deslizar .pulgar { position: absolute; left: 6px; top: 6px; width: 48px; height: 48px; border-radius: 99px; background: #fff; color: var(--accion); display: grid; place-items: center; }
+  .deslizar .flechas { position: absolute; right: 18px; opacity: .6; display: flex; }
+  .bajo { display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--texto-2); font-weight: 650; padding: 0 4px; }
+  .bajo b { color: var(--tinta); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="top">
+    <span class="volver"><i class="i i-l" data-i="chevron-left"></i>Listas</span>
+    <span class="der"><span class="btn chico btn-suave btn-icono"><i class="i i-s" data-i="mail-open"></i></span><span class="btn chico btn-suave btn-icono"><i class="i i-s" data-i="file-spreadsheet"></i></span></span>
+  </div>
+  <div class="titulo">
+    <div class="t-titulo">Bulonera Centro</div>
+    <div class="t-detalle">Lista del 17/10/2026 · llegó por correo 08:12</div>
+  </div>
+
+  <div class="celu-pantalla">
+    <div class="hero">
+      <div class="et">Si aplicás, en la estantería cambian</div>
+      <div class="num">641 <small>precios</small></div>
+      <div class="sube"><i class="i i-s" data-i="trending-up"></i>El costo sube 8,4 % en promedio</div>
+      <div class="fams">
+        <div class="fam"><span>Tornillería</span><span class="bar"><b style="width:86%"></b></span><span class="pc">+12,1 %</span></div>
+        <div class="fam"><span>Fijaciones</span><span class="bar"><b style="width:64%"></b></span><span class="pc">+8,9 %</span></div>
+      </div>
+    </div>
+
+    <div class="sec">Antes de aplicar · 1 de 4 nuevos</div>
+    <div class="nuevo">
+      <div class="arr">
+        <div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div>
+        <div><div class="n">Puntas Torx T25 × 2</div><div class="d">Bremen · costo $1.920</div></div>
+        <div class="cual">Nuevo<br>sin precio</div>
+      </div>
+      <div class="margenes"><b>300</b><b>200</b><b>100</b><b>50</b><b>25</b></div>
+    </div>
+
+    <div class="lista">
+      <div class="li"><span class="ic" style="background:var(--urgente-suave);color:var(--urgente-texto)"><i class="i" data-i="trending-up"></i></span><div><div class="n">23 suben más de 15 %</div><div class="d">El que más sube: +18,6 %</div></div><span></span><i class="i i-s" data-i="chevron-right"></i></div>
+      <div class="li"><span class="ic"><i class="i" data-i="circle-x"></i></span><div><div class="n">12 ya no están</div><div class="d">1 tiene stock: tuerca mariposa M6</div></div><span></span><i class="i i-s" data-i="chevron-right"></i></div>
+    </div>
+  </div>
+
+  <div class="barra-accion">
+    <div class="deslizar"><span class="pulgar"><i class="i i-l" data-i="arrow-right"></i></span>Deslizá para aplicar<span class="flechas"><i class="i" data-i="chevron-right"></i></span></div>
+    <div class="bajo"><span>Nada cambia hasta aplicar</span><b style="color:var(--texto-2)">Descartar</b></div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a class="activo"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

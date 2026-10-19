@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listas de precios · Qué pasa en el mostrador (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_propio/iconos-extra.js"></script>
+<style>
+  .app.plegado .pie .pastilla.logro { width: 12px; height: 12px; padding: 0; font-size: 0; justify-self: center !important; background: var(--logro); }
+  .app.plegado .vinculo { padding: 12px; justify-content: center; }
+  .app.plegado .nav-item .pastilla { position: absolute; top: 2px; right: -2px; height: 22px !important; padding: 0 7px; }
+  .app.plegado .usuario { padding: 0; justify-content: center; }
+  .pantalla { padding: 0; display: grid; grid-template-columns: 300px minmax(0,1fr); min-height: 0; }
+
+  /* ---- Bandeja (Linear) ---- */
+  .bandeja { border-right: 1px solid var(--borde); background: rgba(255,255,255,.5); display: flex; flex-direction: column; min-height: 0; padding: 16px 12px 12px 24px; gap: 4px; }
+  .grupo { display: flex; align-items: center; gap: 8px; margin: 12px 0 4px 8px; font-size: 14px; font-weight: 750; color: var(--texto-2); }
+  .grupo:first-of-type { margin-top: 0; }
+  .grupo .pastilla { height: 22px; padding: 0 7px; }
+  .it { display: grid; grid-template-columns: 32px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 8px; border-radius: 12px; }
+  .it .ic { width: 32px; height: 32px; border-radius: 9px; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; }
+  .it .n { font-weight: 750; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .it .d { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .it .h { font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .it.elegido { background: #fff; box-shadow: var(--sombra-2); outline: 1.5px solid var(--pino); }
+  .it.elegido .ic { background: var(--pino); color: #fff; }
+  .it .pv { width: 10px; height: 10px; border-radius: 9px; background: var(--urgente); justify-self: center; }
+  .estado-canales { margin-top: auto; padding: 12px; border-radius: 12px; background: var(--hundido); font-size: 14px; color: var(--texto-2); line-height: 20px; display: grid; gap: 4px; }
+  .estado-canales div { display: flex; align-items: center; gap: 8px; }
+  .estado-canales .i-s { color: var(--logro-texto); }
+
+  /* ---- Lo que pasa ---- */
+  .centro { display: flex; flex-direction: column; min-height: 0; padding: 16px 32px 16px 28px; gap: 14px; }
+  .cab { display: flex; align-items: center; gap: 12px; }
+  .cab .segmentos { margin-left: auto; flex: none; } .segmentos > * { white-space: nowrap; }
+  .hero { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 24px; padding: 14px 24px; align-items: center; }
+  .hero .et { font-size: 15px; font-weight: 700; color: var(--texto-2); }
+  .hero .grande { font-size: 56px; line-height: 60px; font-weight: 800; letter-spacing: -.03em; }
+  .hero .grande small { font-size: 20px; font-weight: 750; letter-spacing: -.01em; color: var(--texto-2); }
+  .hero .sube { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 750; font-size: 15px; color: var(--pino-texto); }
+  .familias { display: grid; gap: 4px; }
+  .fam { display: grid; grid-template-columns: 172px minmax(0,1fr) 64px 46px; gap: 12px; align-items: center; font-size: 14px; }
+  .fam .nom { font-weight: 650; white-space: nowrap; }
+  .fam .bar { height: 10px; border-radius: 99px; background: var(--hundido); position: relative; }
+  .fam .bar b { position: absolute; top: 0; bottom: 0; left: 24%; border-radius: 99px; background: var(--pino); }
+  .fam .bar b.baja { background: var(--logro); left: auto; right: 76%; }
+  .fam .bar::before { content: ""; position: absolute; left: 24%; top: -3px; bottom: -3px; width: 2px; background: var(--borde-fuerte); }
+  .fam .pc { font-weight: 800; text-align: right; }
+  .fam .ct { color: var(--texto-3); font-weight: 600; text-align: right; }
+
+  .tarjetas { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 16px; flex: 1; min-height: 0; }
+  .t { padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .t-cab { display: flex; align-items: center; gap: 10px; }
+  .t-cab .ico { width: 36px; height: 36px; border-radius: 99px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); flex: none; }
+  .t-cab b { font-size: 16px; font-weight: 800; line-height: 22px; white-space: nowrap; }
+  .t-cab .ver { margin-left: auto; font-size: 14px; font-weight: 750; color: var(--pino-texto); white-space: nowrap; }
+  .t-cab .n { font-size: 28px; font-weight: 800; letter-spacing: -.02em; margin-right: 2px; }
+  .t.nuevos .ico { background: var(--accion-suave); color: var(--accion-texto); }
+  .t.subas .ico { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .t .exp { font-size: 14px; color: var(--texto-2); line-height: 20px; margin-top: -4px; }
+  .nv { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 4px 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--borde); }
+  .nv .nm { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nv .dt { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .nv .fila-m { grid-column: 2; display: flex; align-items: center; gap: 8px; }
+  .nv .segmentos > * { min-height: 28px; padding: 0 7px; }
+  .nv .precio { margin-left: auto; font-weight: 800; font-size: 15px; white-space: nowrap; }
+  .nv .precio.falta { color: var(--urgente-texto); font-weight: 750; }
+  .sb { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 2px 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--borde); }
+  .sb .nm { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sb .dt { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .sb .pastilla { grid-row: span 2; }
+  .t .ver { margin-top: auto; align-self: flex-start; }
+
+  .aplicar { display: flex; align-items: center; gap: 16px; padding: 12px 12px 12px 20px; }
+  .aplicar .resto { font-size: 14px; color: var(--texto-2); font-weight: 600; display: flex; gap: 16px; white-space: nowrap; }
+  .aplicar { white-space: nowrap; }
+  .aplicar .resto b { color: var(--tinta); }
+  .check { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; margin-left: auto; }
+  .check .cb { width: 22px; height: 22px; border-radius: 6px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Catálogo</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="upload"></i>Subir una lista <span class="kbd">Alt S</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Productos</a><a class="activa">Listas de precios <span class="pastilla urgente" style="height:24px">2</span></a><a>Duplicados <span class="pastilla" style="height:24px">12</span></a></nav>
+
+    <section class="pantalla">
+      <!-- ============ Bandeja ============ -->
+      <aside class="bandeja">
+        <div class="grupo">Para revisar <span class="pastilla urgente">2</span><span style="margin-left:auto;font-weight:600;color:var(--texto-3)"><span class="kbd">J</span> <span class="kbd">K</span></span></div>
+        <div class="it elegido"><span class="ic"><i class="i i-s" data-i="mail"></i></span><div style="min-width:0"><div class="n">Bulonera Centro</div><div class="d">876 cambian · 4 nuevos</div></div><span class="h">08:12</span></div>
+        <div class="it"><span class="ic"><i class="i i-s" data-i="globe"></i></span><div style="min-width:0"><div class="n">Ferretera del Sur</div><div class="d">214 cambian · de su portal</div></div><span class="h">ayer</span></div>
+
+        <div class="grupo">¿De quién es? <span class="pastilla urgente">1</span></div>
+        <div class="it"><span class="ic" style="background:var(--urgente-suave);color:var(--urgente-texto)"><i class="i i-s" data-i="inbox"></i></span><div style="min-width:0"><div class="n">precios-oct-2026.pdf</div><div class="d">Llegó por correo · 1 vez y listo</div></div><span class="h">lun</span></div>
+
+        <div class="grupo">Lista vieja <span class="pastilla">2</span></div>
+        <div class="it"><span class="ic"><i class="i i-s" data-i="building-2"></i></span><div style="min-width:0"><div class="n">Pinturas del Plata</div><div class="d">La última es de hace 41 días</div></div><span class="pv"></span></div>
+        <div class="it"><span class="ic"><i class="i i-s" data-i="building-2"></i></span><div style="min-width:0"><div class="n">Acindar Clavos</div><div class="d">La última es de hace 33 días</div></div><span class="pv"></span></div>
+
+        <div class="grupo">Al día <span class="pastilla">10</span></div>
+        <div class="it"><span class="ic"><i class="i i-s" data-i="file-check"></i></span><div style="min-width:0"><div class="n">Distribuidora Oeste</div><div class="d">Aplicada el 14/10 · 312 precios</div></div><span class="h">14/10</span></div>
+
+        <div class="estado-canales">
+          <div><i class="i i-s" data-i="mail"></i>Correo revisado hace 6 min</div>
+          <div><i class="i i-s" data-i="globe"></i>3 portales · el próximo, esta noche</div>
+        </div>
+      </aside>
+
+      <!-- ============ Qué pasa si aplicás ============ -->
+      <div class="centro">
+        <div class="cab">
+          <div>
+            <div class="t-seccion">Bulonera Centro · lista del 17/10/2026</div>
+            <div class="t-detalle">Llegó por correo hoy 08:12 · 7.096 productos leídos · 25 % de línea y 5 % de contado</div>
+          </div>
+          <div class="segmentos"><button class="elegido">Qué pasa</button><button>Fila por fila</button><button>La planilla</button></div>
+        </div>
+
+        <div class="tarjeta hero">
+          <div>
+            <div class="et">Si aplicás, en la estantería cambian</div>
+            <div class="grande num">641 <small>precios</small></div>
+            <div class="sube"><i class="i i-s" data-i="trending-up"></i>El costo sube 8,4 % en promedio</div>
+            <div class="t-detalle" style="margin-top:2px">Otros 235 cambian de costo y no de precio</div>
+          </div>
+          <div class="familias">
+            <div class="fam"><span class="nom">Tornillería y bulones</span><span class="bar"><b style="width:60%"></b></span><span class="pc">+12,1 %</span><span class="ct">212</span></div>
+            <div class="fam"><span class="nom">Fijaciones y tarugos</span><span class="bar"><b style="width:44%"></b></span><span class="pc">+8,9 %</span><span class="ct">171</span></div>
+            <div class="fam"><span class="nom">Herramientas de mano</span><span class="bar"><b style="width:31%"></b></span><span class="pc">+6,3 %</span><span class="ct">148</span></div>
+                        <div class="fam"><span class="nom">Electricidad</span><span class="bar"><b class="baja" style="width:9%"></b></span><span class="pc" style="color:var(--logro-texto)">−1,8 %</span><span class="ct">46</span></div>
+          </div>
+        </div>
+
+        <div class="tarjetas">
+          <div class="tarjeta t nuevos">
+            <div class="t-cab"><span class="ico"><i class="i" data-i="package-plus"></i></span><span class="n">4</span><b>nuevos: elegí el margen</b><span class="ver">Ver</span></div>
+            <div class="nv">
+              <div class="foto chica"><img src="../../../_comun/fotos/puntas.webp" alt=""></div>
+              <div style="min-width:0"><div class="nm">Puntas Torx T25 × 50 mm × 2</div><div class="dt">Bremen · costo $1.920</div></div>
+              <div class="fila-m"><span class="segmentos"><button>300</button><button>200</button><button class="elegido">100</button><button>50</button><button>25</button></span><span class="precio">$5.000</span></div>
+            </div>
+            <div class="nv">
+              <div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div>
+              <div style="min-width:0"><div class="nm">Bulón hexagonal 1/4 × 2" × 50</div><div class="dt">Bulonera · costo $4.380</div></div>
+              <div class="fila-m"><span class="segmentos"><button>300</button><button>200</button><button>100</button><button>50</button><button>25</button></span><span class="precio falta">Sin precio</span></div>
+            </div>
+          </div>
+
+          <div class="tarjeta t subas">
+            <div class="t-cab"><span class="ico"><i class="i" data-i="trending-up"></i></span><span class="n">23</span><b>suben + de 15 %</b><span class="ver">Ver</span></div>
+            <div class="sb"><div class="nm">Tornillo autoperforante T2 8 × 1"</div><span class="pastilla urgente">+18,6 %</span><div class="dt">$10.000 → $11.000</div></div>
+            <div class="sb"><div class="nm">Varilla roscada zincada 3/8 × 1 m</div><span class="pastilla urgente">+17,2 %</span><div class="dt">$6.000 → $7.000</div></div>
+            <div class="sb"><div class="nm">Arandela grower M8 × 100</div><span class="pastilla urgente">+16,0 %</span><div class="dt">$3.000 → $4.000</div></div>
+                      </div>
+
+          <div class="tarjeta t">
+            <div class="t-cab"><span class="ico"><i class="i" data-i="circle-x"></i></span><span class="n">12</span><b>ya no están</b><span class="ver">Ver</span></div>
+            <div class="sb"><div class="nm">Tuerca mariposa M6 × 100</div><span class="pastilla urgente">8 un.</span><div class="dt">Solo lo traía Bulonera</div></div>
+            <div class="sb"><div class="nm">Taco Fischer SX 6 × 100</div><span class="pastilla logro">Sigue</span><div class="dt">Lo trae otro proveedor</div></div>
+            <div class="sb"><div class="nm">Y 10 más</div><span class="pastilla">Sin stock</span><div class="dt">Ninguno tiene stock</div></div>
+          </div>
+        </div>
+
+        <div class="tarjeta-2 aplicar">
+          <div class="resto"><span><b>6.216</b> sin cambio</span><span><b>6</b> salteadas</span></div>
+          <span class="check"><span class="cb"><i class="i i-s" data-i="check"></i></span>Imprimir las etiquetas</span>
+          <button class="btn btn-fantasma chico">Descartar <span class="kbd">D</span></button>
+          <button class="btn btn-accion">Aplicar y remarcar <span class="kbd">A</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
