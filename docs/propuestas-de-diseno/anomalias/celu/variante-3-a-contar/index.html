@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anomalías · Sobres y a contar (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { padding-top: 12px; }
+  .sec { display: flex; white-space: nowrap; align-items: baseline; gap: 8px; margin: 0 0 8px; }
+  .sec b { font-size: 18px; font-weight: 800; }
+  .sec span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .sobre-pila { position: relative; padding-bottom: 12px; }
+  .sobre-pila::before, .sobre-pila::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 6px; height: 20px; border-radius: 0 0 16px 16px; background: #fff; border: 1px solid var(--borde); border-top: 0; }
+  .sobre-pila::after { left: 24px; right: 24px; bottom: 0; opacity: .7; }
+  .sobre { position: relative; z-index: 1; background: #fff; border: 1px solid var(--borde); border-radius: 18px; box-shadow: var(--sombra-2); padding: 14px; }
+  .sobre .top { display: flex; align-items: center; gap: 10px; }
+  .sobre .avatar { width: 40px; height: 40px; background: var(--hundido-2); color: var(--texto-2); }
+  .sobre .nm { font-weight: 800; font-size: 16px; line-height: 20px; }
+  .sobre .n { margin-left: auto; min-width: 32px; height: 32px; border-radius: 99px; background: var(--urgente); color: #3A2500; display: grid; place-items: center; font-weight: 800; font-size: 16px; }
+  .sobre .iconos { display: flex; gap: 6px; margin-top: 12px; }
+  .sobre .iconos span { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 10px; background: var(--hundido); font-size: 14px; font-weight: 700; }
+  .sobre .ver { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--borde); font-weight: 750; color: var(--pino-texto); font-size: 15px; }
+  .sobre .ver .fin { margin-left: auto; }
+  .otro { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 14px; border-radius: 14px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-1); margin-top: 4px; font-weight: 700; font-size: 15px; }
+  .otro .avatar { width: 30px; height: 30px; background: var(--hundido-2); color: var(--texto-2); font-size: 14px; }
+  .otro .pastilla { margin-left: auto; height: 26px; }
+  .faltas { display: flex; align-items: center; gap: 14px; margin: 18px 0 10px; }
+  .anillo { width: 56px; height: 56px; flex: none; }
+  .faltas .tt { font-size: 18px; font-weight: 800; line-height: 22px; }
+  .faltas .dd { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 19px; }
+  .grilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .gt { position: relative; background: #fff; border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); padding: 6px 6px 8px; text-align: center; }
+  .gt .foto { width: 100%; height: 62px; border-radius: 10px; }
+  .gt .q { margin-top: 6px; font-size: 15px; font-weight: 800; color: var(--error-texto); }
+  .gt .nn { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gt.ok { opacity: .7; } .gt.ok .q { color: var(--logro-texto); }
+  .gt .tilde { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 99px; background: var(--logro); color: #fff; display: grid; place-items: center; border: 2px solid var(--fondo); }
+  .barra-accion .btn { width: 100%; justify-content: space-between; }
+  .barra-accion .izq { display: inline-flex; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Anomalías</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+
+  <div class="celu-pantalla">
+    <div class="sec"><b>Quedó sin mandar</b><span>no cuenta todavía</span></div>
+    <div class="sobre-pila">
+      <div class="sobre">
+        <div class="top"><span class="avatar">AG</span><div><div class="nm">Ana Gómez</div><div class="t-detalle">Desactivada jue · Samsung A15</div></div><span class="n">4</span></div>
+        <div class="iconos"><span><i class="i i-s" data-i="receipt"></i>2 ventas · $68.000</span><span><i class="i i-s" data-i="scale"></i>1</span><span><i class="i i-s" data-i="percent"></i>1</span></div>
+        <div class="ver"><i class="i i-s" data-i="mail-open"></i>Abrir y decidir de a una<i class="i i-s fin" data-i="chevron-right"></i></div>
+      </div>
+    </div>
+    <div class="otro"><span class="avatar">JP</span>Julián Pereyra<span class="pastilla error"><i class="i i-s" data-i="git-merge"></i>1 no se puede</span></div>
+
+    <div class="faltas">
+      <svg class="anillo" viewBox="0 0 56 56"><circle cx="28" cy="28" r="23" fill="none" stroke="#E3DFD5" stroke-width="7"/><circle cx="28" cy="28" r="23" fill="none" stroke="#1E9E62" stroke-width="7" stroke-linecap="round" stroke-dasharray="48.2 144.5" transform="rotate(-90 28 28)"/><text x="28" y="33" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="15" fill="#1A1D1B">2/6</text></svg>
+      <div><div class="tt">Faltó stock: 14 un.</div><div class="dd">Se vendió lo que el sistema no tenía. Contá estos 4 y quedan al día.</div></div>
+    </div>
+    <div class="grilla">
+      <div class="gt"><div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div class="q">−6 un.</div><div class="nn">Mecha 8</div></div>
+      <div class="gt"><div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div class="q">−5 un.</div><div class="nn">PH2 × 10</div></div>
+      <div class="gt"><div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div class="q">−1 un.</div><div class="nn">Tarugo 8</div></div>
+      <div class="gt"><div class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></div><div class="q">−1 un.</div><div class="nn">LED 9 W</div></div>
+    </div>
+    <div class="otro" style="margin-top:12px"><i class="i" data-i="lock"></i><div style="line-height:19px">Registro de lo vendido sin stock<div class="t-detalle">38 anotadas · última hoy 10:31</div></div><i class="i i-s" data-i="chevron-right" style="margin-left:auto;color:var(--texto-3)"></i></div>
+  </div>
+  <div class="barra-accion"><button class="btn btn-accion grande"><span class="izq"><i class="i i-l" data-i="scan-barcode"></i>Contar estos 4</span><span style="font-size:15px;opacity:.9">Est. A, B, C, D</span></button></div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

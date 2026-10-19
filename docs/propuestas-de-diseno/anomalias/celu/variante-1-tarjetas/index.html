@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anomalías · Tarjetas (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pestanas a { display: flex; justify-content: center; align-items: center; gap: 6px; }
+  .celu-pestanas .pastilla { height: 24px; padding: 0 8px; }
+  .lista { height: 100%; overflow: hidden; -webkit-mask-image: linear-gradient(#000 93%, transparent 100%); margin: 0 -16px; padding: 0 16px; }
+  .resumen-l { display: flex; white-space: nowrap; align-items: center; gap: 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-bottom: 12px; }
+  .resumen-l b { color: var(--tinta); font-weight: 800; }
+  .persona { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
+  .persona .avatar { width: 32px; height: 32px; background: var(--hundido-2); color: var(--texto-2); }
+  .persona .nm { font-weight: 800; font-size: 16px; line-height: 20px; }
+  .persona .t-detalle { line-height: 18px; }
+  .persona .pastilla { margin-left: auto; height: 26px; }
+  .card { background: #fff; border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 12px; }
+  .card + .card { margin-top: 8px; }
+  .fila { display: grid; grid-template-columns: 40px 1fr auto 16px; gap: 12px; align-items: center; }
+  .fila .ico { width: 40px; height: 40px; border-radius: 10px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .fila .t { font-weight: 750; font-size: 16px; line-height: 21px; }
+  .fila .d { font-size: 14px; line-height: 19px; color: var(--texto-2); }
+  .fila .m { font-weight: 800; font-size: 17px; }
+  .fila .ch { color: var(--texto-3); }
+  .card.abierta { box-shadow: var(--sombra-2); border-color: var(--borde-fuerte); }
+  .card.abierta .ico { background: var(--pino); color: #fff; }
+  .prods { margin: 12px 0 0; border-top: 1px solid var(--borde); }
+  .p { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--borde); }
+  .p .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .p .n { font-weight: 700; font-size: 15px; line-height: 19px; }
+  .p .q { font-size: 14px; color: var(--texto-2); }
+  .p b { font-weight: 800; font-size: 15px; }
+  .hor { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .hor .pastilla { height: 28px; }
+  .aviso { margin-top: 10px; padding: 8px 12px; }
+  .botones { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; margin-top: 12px; }
+  .botones .btn { min-height: 48px; }
+  .medio-p { display: inline-flex; align-items: center; gap: 6px; color: var(--mp); background: var(--mp-suave); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Anomalías</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a class="activa">Para revisar <span class="pastilla urgente">5</span></a><a>Anotadas</a></nav>
+
+  <div class="celu-pantalla">
+    <div class="lista">
+      <div class="resumen-l" style="margin-top:2px"><i class="i i-s" data-i="info"></i><span>No cuentan hasta que los aceptás</span></div>
+      <div class="persona"><span class="avatar">AG</span><div><div class="nm">Ana Gómez</div><div class="t-detalle">Samsung A15 del local</div></div><span class="pastilla error">Desactivada</span></div>
+
+      <div class="card"><div class="fila"><span class="ico"><i class="i" data-i="receipt"></i></span><div><div class="t">Venta · Efectivo</div><div class="d">jue 17:52 · 2 productos</div></div><span class="m"><span class="peso">$</span>25.000</span><i class="i i-s ch" data-i="chevron-down"></i></div></div>
+
+      <div class="card abierta">
+        <div class="fila"><span class="ico"><i class="i" data-i="receipt"></i></span><div><div class="t">Venta · Mercado Pago</div><div class="d">jue 18:21 · 2 productos</div></div><span class="m"><span class="peso">$</span>43.000</span><span></span></div>
+        <div class="prods">
+          <div class="p"><div class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></div><div><div class="n">Látex interior blanco 4 L</div><div class="q">1 un. · queda 8</div></div><b class="num">$38.000</b></div>
+          <div class="p"><div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div><div class="n">Puntas Phillips PH2 × 10</div><div class="q" style="color:var(--urgente-texto)">1 un. · no hay</div></div><b class="num">$5.000</b></div>
+        </div>
+        <div class="hor"><span class="pastilla contorno"><i class="i i-s" data-i="smartphone"></i>Cobrada jue 18:21</span><span class="pastilla contorno"><i class="i i-s" data-i="cloud-upload"></i>Llegó hoy 09:14</span></div>
+        <div class="aviso urgente"><i class="i i-s" data-i="triangle-alert" style="margin-top:2px"></i><div>Sin stock de puntas: se anota 1 anomalía.</div></div>
+        <div class="botones"><button class="btn btn-peligro"><i class="i i-s" data-i="x"></i>Descartar</button><button class="btn btn-accion"><i class="i i-s" data-i="check"></i>Aceptar venta</button></div>
+      </div>
+
+      <div class="card"><div class="fila"><span class="ico"><i class="i" data-i="scale"></i></span><div><div class="t">Ajuste de stock</div><div class="d">Clavos 2" · −1,5 kg</div></div><span class="m t-detalle">18:30</span><i class="i i-s ch" data-i="chevron-down"></i></div></div>
+      <div class="card"><div class="fila"><span class="ico"><i class="i" data-i="percent"></i></span><div><div class="t">Margen · Martillo 27 mm</div><div class="d">de 50 % a 100 %</div></div><span class="m t-detalle">18:35</span><i class="i i-s ch" data-i="chevron-down"></i></div></div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>
