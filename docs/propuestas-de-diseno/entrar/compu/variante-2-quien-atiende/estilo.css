@@ -1,0 +1,42 @@
+body { width: 1366px; height: 768px; overflow: hidden; background: var(--fondo); }
+.pagina { height: 768px; display: grid; grid-template-rows: auto auto 1fr auto; padding: 24px 48px; }
+.arriba { display: flex; align-items: center; gap: 16px; }
+.logo { height: 36px; }
+.arriba .der { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.reloj { font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+.titular { text-align: center; margin-top: 40px; }
+.titular h1 { margin: 0; font-size: 44px; line-height: 52px; font-weight: 800; letter-spacing: -.03em; }
+.titular p { margin: 8px 0 0; color: var(--texto-2); font-size: 18px; line-height: 26px; }
+.gente { align-self: center; margin-bottom: 16px; display: flex; justify-content: center; gap: 20px; margin-top: -8px; }
+.persona { width: 228px; display: grid; justify-items: center; gap: 4px; padding: 32px 16px 24px; border-radius: 24px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); position: relative; text-align: center; }
+.persona .cara { width: 112px; height: 112px; font-size: 38px; margin-bottom: 12px; }
+.persona b { font-size: 18px; line-height: 24px; font-weight: 800; }
+.persona .rol { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+.persona .cel { white-space: nowrap; margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; color: var(--texto-2); height: 28px; padding: 0 10px; border-radius: 99px; background: var(--hundido); }
+.persona .kbd { position: absolute; top: 12px; left: 12px; }
+.persona.foco { border: 2px solid var(--pino); box-shadow: 0 0 0 6px rgba(18,56,47,.10), var(--sombra-2); transform: translateY(-4px); }
+.persona.foco .cel { background: var(--accion-suave); color: var(--accion-texto); }
+.persona.ultimo::after { content: "Último en esta caja"; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); white-space: nowrap; height: 28px; padding: 0 10px; border-radius: 99px; background: var(--pino); color: #fff; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; }
+.persona.otro { background: transparent; border: 2px dashed var(--borde-fuerte); box-shadow: none; }
+.persona.otro .qr { width: 112px; height: 112px; padding: 10px; border-radius: 14px; margin-bottom: 12px; box-shadow: var(--sombra-1); }
+.pie { display: flex; align-items: center; gap: 16px; padding-top: 16px; border-top: 1px solid var(--borde); }
+.pie .ayuda { display: flex; gap: 20px; color: var(--texto-2); font-size: 14px; font-weight: 600; align-items: center; }
+.pie .ayuda span { display: inline-flex; align-items: center; gap: 8px; }
+.pie .g-btn { margin-left: auto; }
+/* Estado: esperando la huella en el celular */
+.espera { align-self: center; justify-self: center; display: grid; grid-template-columns: 300px 420px; gap: 56px; align-items: center; padding: 40px 56px; border-radius: 28px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-2); }
+.espera h2 { margin: 16px 0 8px; font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.02em; }
+.espera p { margin: 0; color: var(--texto-2); font-size: 16px; line-height: 24px; }
+.espera .botones { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+.mini-celu { width: 260px; height: 420px; border-radius: 40px; background: #1A1D1B; padding: 10px; box-shadow: var(--sombra-3); justify-self: center; }
+.mini-celu .pant { height: 100%; border-radius: 32px; background: linear-gradient(180deg, #24443B, #12382F); position: relative; overflow: hidden; color: #fff; }
+.mini-celu .hora { text-align: center; font-size: 56px; font-weight: 800; letter-spacing: -.03em; margin-top: 44px; line-height: 1; }
+.mini-celu .fecha { text-align: center; font-size: 14px; font-weight: 600; opacity: .8; margin-top: 6px; }
+.noti { position: absolute; left: 10px; right: 10px; top: 128px; padding: 12px; border-radius: 20px; background: rgba(255,255,255,.94); color: var(--tinta); display: grid; grid-template-columns: 36px 1fr; gap: 10px; box-shadow: var(--sombra-3); }
+.noti img { width: 36px; height: 36px; border-radius: 9px; background: #fff; padding: 4px; border: 1px solid var(--borde); }
+.noti b { font-size: 14px; line-height: 18px; display: block; }
+.noti span { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+.noti .acc { grid-column: 1 / -1; display: flex; gap: 6px; }
+.noti .acc em { flex: 1; font-style: normal; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 14px; font-weight: 750; background: var(--hundido); }
+.noti .acc em.si { background: var(--accion); color: #fff; }
+.mini-celu .dedo { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); width: 64px; height: 64px; border-radius: 99px; display: grid; place-items: center; color: #fff; background: rgba(255,255,255,.12); box-shadow: 0 0 0 10px rgba(232,84,28,.25), 0 0 0 22px rgba(232,84,28,.10); }

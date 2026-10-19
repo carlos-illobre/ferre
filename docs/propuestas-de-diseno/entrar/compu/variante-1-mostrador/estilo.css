@@ -1,0 +1,28 @@
+body { width: 1366px; height: 768px; overflow: hidden; background: var(--fondo); }
+.pagina { height: 768px; display: grid; grid-template-rows: auto 1fr auto; padding: 24px 40px 24px; position: relative; }
+/* Un arco de papel apenas más oscuro detrás de la caja: profundidad sin color */
+.pagina::before { content: ""; position: absolute; left: 50%; top: 96px; width: 1200px; height: 620px; transform: translateX(-50%); border-radius: 48px; background: radial-gradient(ellipse at 50% 30%, #fff 0%, rgba(255,255,255,0) 70%); pointer-events: none; }
+.arriba { display: flex; align-items: center; position: relative; }
+.logo { height: 40px; width: auto; }
+.arriba .der { margin-left: auto; display: flex; gap: 8px; }
+.caja { position: relative; align-self: center; justify-self: center; width: 980px; display: grid; grid-template-columns: 400px 1fr; gap: 0; padding: 0; overflow: hidden; border-radius: 24px; }
+.col-qr { background: var(--hundido); display: grid; justify-items: center; align-content: center; gap: 20px; padding: 40px; border-right: 1px solid var(--borde); }
+.qr.grande { width: 288px; height: 288px; }
+.col-texto { padding: 40px 48px; display: grid; gap: 16px; align-content: center; }
+.col-texto .pastilla { justify-self: start; }
+.col-texto h1 { margin: 0; font-size: 34px; line-height: 40px; }
+.bajada { margin: -8px 0 4px; color: var(--texto-2); }
+.quien { margin-top: 4px; }
+.quien svg { flex: none; }
+.pie { display: flex; align-items: center; gap: 24px; justify-content: center; position: relative; }
+.sello { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--texto-2); }
+.sello svg { color: var(--pino-texto); }
+.tuto { margin-left: 8px; color: var(--accion-texto); }
+/* Estado: sin permiso */
+.rechazo { display: grid; grid-template-columns: 40px 1fr; gap: 12px; padding: 16px; border-radius: 16px; background: var(--error-suave); color: var(--error-texto); }
+.rechazo .ic { width: 40px; height: 40px; border-radius: 99px; background: #fff; display: grid; place-items: center; }
+.rechazo b { display: block; font-size: 16px; line-height: 22px; color: var(--tinta); font-weight: 750; }
+.rechazo .correo { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; margin: 6px 0; border-radius: 99px; background: #fff; color: var(--tinta); font-size: 14px; font-weight: 650; }
+.rechazo p { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; }
+.acciones { display: flex; gap: 8px; }
+.acciones .g-btn { flex: 1; justify-content: center; }

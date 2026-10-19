@@ -1,0 +1,56 @@
+.puerta { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 16px 28px; text-align: center; }
+.puerta .iso { height: 44px; margin-top: 28px; }
+.saludo { margin-top: 64px; display: grid; justify-items: center; gap: 8px; }
+.saludo .cara { width: 64px; height: 64px; font-size: 22px; }
+.saludo h1 { margin: 8px 0 0; font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.02em; }
+.saludo p { margin: 0; color: var(--texto-2); font-size: 16px; }
+.dedo { margin-top: auto; display: grid; justify-items: center; gap: 20px; }
+.dedo .pulso { margin-bottom: 32px; }
+.dedo .pulso { width: 120px; height: 120px; background: var(--superficie); color: var(--accion); box-shadow: var(--sombra-2); }
+.dedo .pulso::before { inset: -18px; border-width: 3px; opacity: .35; }
+.dedo .pulso::after { inset: -40px; opacity: .14; }
+.dedo b { font-size: 18px; font-weight: 750; }
+.dedo span.t-detalle { margin-top: -14px; }
+.otras { margin-top: 48px; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.otras .btn { height: 52px; border-radius: 14px; font-size: 15px; }
+.otras .btn .g svg { width: 18px; height: 18px; }
+.otras .btn .g { display: inline-grid; }
+/* Celular nuevo: Google primero */
+.nuevo .titulo-g { margin-top: auto; font-size: 30px; line-height: 36px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px; }
+.nuevo p { margin: 0 0 28px; color: var(--texto-2); font-size: 16px; line-height: 24px; max-width: 300px; }
+.nuevo .g-btn { width: 100%; height: 56px; justify-content: center; position: relative; font-size: 17px; }
+.nuevo .g-btn .g { position: absolute; left: 6px; top: 6px; width: 44px; height: 44px; }
+.nuevo .link { margin-top: 12px; width: 100%; }
+.nuevo .ilus { margin-top: 72px; width: 260px; height: 170px; position: relative; }
+.ilus .tel { position: absolute; left: 8px; top: 10px; width: 92px; height: 150px; border-radius: 18px; background: var(--superficie); border: 3px solid var(--pino); box-shadow: var(--sombra-2); display: grid; place-items: center; color: var(--accion); }
+.ilus .comp { position: absolute; right: 0; top: 40px; width: 130px; height: 88px; border-radius: 10px; background: var(--superficie); border: 3px solid var(--pino); box-shadow: var(--sombra-1); display: grid; place-items: center; }
+.ilus .comp::after { content: ""; position: absolute; bottom: -20px; left: 50%; width: 60px; height: 8px; margin-left: -30px; border-radius: 4px; background: var(--pino); }
+.ilus .comp img { width: 46px; }
+.ilus .lazo { position: absolute; left: 106px; top: 84px; width: 20px; border-top: 3px dashed var(--accion); }
+/* Oferta a pantalla completa */
+.oferta { flex: 1; display: flex; flex-direction: column; padding: 0 20px 28px; }
+.oferta .ok { margin-top: 24px; align-self: flex-start; }
+.oferta .grande-dedo { margin: 72px auto 40px; width: 168px; height: 168px; border-radius: 48px; background: var(--accion-suave); color: var(--accion); display: grid; place-items: center; position: relative; }
+.oferta .grande-dedo svg { width: 96px; height: 96px; stroke-width: 1.6; }
+.oferta h1 { margin: 0; font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.02em; }
+.oferta p { margin: 12px 0 0; color: var(--texto-2); font-size: 17px; line-height: 26px; }
+.oferta .cuenta { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.oferta .cuenta div { padding: 12px; border-radius: 14px; background: var(--superficie); border: 1px solid var(--borde); }
+.oferta .cuenta b { display: block; font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+.oferta .cuenta span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+.oferta .cuenta .mejor { background: var(--logro-suave); border-color: transparent; }
+.oferta .cuenta .mejor b { color: var(--logro-texto); }
+.oferta .botones { margin-top: auto; display: grid; gap: 8px; }
+/* Sin permiso con código para pedir el alta */
+.sinp { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 20px 28px; }
+.sinp .ic { margin-top: 40px; width: 72px; height: 72px; border-radius: 99px; background: var(--error-suave); color: var(--error-texto); display: grid; place-items: center; }
+.sinp h1 { margin: 16px 0 8px; font-size: 26px; line-height: 32px; font-weight: 800; letter-spacing: -.02em; }
+.sinp .correo { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); font-size: 14px; font-weight: 650; }
+.sinp .correo .g svg { width: 16px; height: 16px; }
+.sinp .alta { margin-top: 24px; width: 100%; padding: 20px; display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: center; text-align: left; }
+.sinp .alta .qr { width: 112px; height: 112px; padding: 8px; border-radius: 12px; box-shadow: none; }
+.sinp .alta b { display: block; font-size: 16px; line-height: 22px; font-weight: 750; }
+.sinp .alta span { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+.sinp .botones { margin-top: auto; width: 100%; display: grid; gap: 8px; }
+.sinp .g-btn { width: 100%; justify-content: center; position: relative; height: 52px; }
+.sinp .g-btn .g { position: absolute; left: 4px; top: 4px; width: 44px; height: 44px; }
