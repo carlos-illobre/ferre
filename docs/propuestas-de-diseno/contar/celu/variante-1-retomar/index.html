@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · Seguí donde quedaste (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 12px; padding-bottom: 12px; }
+  .seguir { padding: 14px; display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; }
+  .anillo { position: relative; width: 64px; height: 64px; }
+  .anillo svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+  .anillo .c { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 17px; }
+  .seguir .et { font-size: 14px; font-weight: 700; color: var(--accion-texto); display: flex; align-items: center; gap: 6px; }
+  .seguir .n { font-weight: 800; font-size: 18px; line-height: 23px; }
+  .seguir .d { font-size: 14px; color: var(--texto-2); }
+  .hoy { padding: 12px 14px; display: grid; gap: 8px; }
+  .hoy .fila { display: flex; align-items: center; gap: 8px; }
+  .hoy .fila .t-renglon { flex: 1; }
+  .abc { display: flex; height: 8px; border-radius: 99px; overflow: hidden; gap: 2px; }
+  .abc b { display: block; height: 100%; }
+  .abc .a { background: var(--pino); } .abc .b { background: #5E8C7E; } .abc .c { background: #B9CEC6; }
+  .abc-ley { display: flex; gap: 14px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .abc-ley i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; }
+  .sec-tit { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+  .sec-tit .t-seccion { flex: 1; font-size: 18px; }
+  .sec { display: grid; grid-template-columns: 44px minmax(0,1fr) auto 16px; gap: 12px; align-items: center; padding: 10px 12px; background: #fff; border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .sec + .sec { margin-top: 8px; }
+  .sec .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .sec .n { font-weight: 700; font-size: 16px; line-height: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sec .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
+  .sec.nunca .ico { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .sec.curso .ico { background: var(--accion-suave); color: var(--accion-texto); }
+  .sec .flecha { color: var(--texto-3); }
+  .lista { overflow: hidden; -webkit-mask-image: linear-gradient(#000 78%, transparent); flex: 1; min-height: 0; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Stock</a><a>Compras</a><a class="activa">Contar</a></nav>
+  <div class="celu-pantalla">
+    <div class="tarjeta-2 seguir">
+      <div class="anillo"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#ECE9E1" stroke-width="4.5"/><circle cx="18" cy="18" r="15" fill="none" stroke="#E8541C" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="35.3 94.2"/></svg><div class="c num">37%</div></div>
+      <div><div class="et"><i class="i i-s" data-i="pause"></i>Seguí donde quedaste</div><div class="n">Pared de tornillería</div><div class="d">Faltan 40 · lo dejaste ayer 17:22</div></div>
+    </div>
+
+    <div class="tarjeta hoy">
+      <div class="fila"><i class="i" data-i="calendar-check" style="color:var(--pino-texto)"></i><span class="t-renglon">Hoy toca contar 31</span><span class="pastilla" style="background:var(--pino);color:#fff;height:26px">12 A</span></div>
+      <div class="abc"><b class="a" style="width:39%"></b><b class="b" style="width:48%"></b><b class="c" style="width:13%"></b></div>
+      <div class="abc-ley"><span><i style="background:var(--pino)"></i>A 12</span><span><i style="background:#5E8C7E"></i>B 15</span><span><i style="background:#B9CEC6"></i>C 4</span><span style="margin-left:auto;color:var(--pino-texto);font-weight:750">Ver cuáles</span></div>
+    </div>
+
+    <div class="sec-tit"><span class="t-seccion">Sectores</span><span class="t-detalle">9 de 14 contados</span><button class="btn btn-icono chico btn-suave"><i class="i" data-i="plus"></i></button></div>
+    <div class="lista">
+      <div class="sec curso"><span class="ico"><i class="i" data-i="pause"></i></span><div style="min-width:0"><div class="n">Exhibidor de mechas</div><div class="d"><b style="color:var(--accion-texto)">En curso</b> · 8 de 46</div></div><span></span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">Pared de electricidad</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 37</div></div><span class="pastilla" style="background:var(--pino);color:#fff;height:26px">9 A</span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">Cajones de bulones</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 120</div></div><span class="pastilla" style="background:var(--pino);color:#fff;height:26px">3 A</span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec"><span class="ico"><i class="i" data-i="check"></i></span><div style="min-width:0"><div class="n">Herramientas manuales</div><div class="d">Contado el 12/10 · 41</div></div><span></span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+      <div class="sec"><span class="ico"><i class="i" data-i="check"></i></span><div style="min-width:0"><div class="n">Adhesivos y selladores</div><div class="d">Contado el 05/10 · 29</div></div><span></span><i class="i i-s flecha" data-i="chevron-right"></i></div>
+    </div>
+  </div>
+  <div class="barra-accion" style="display:flex;gap:8px"><button class="btn btn-oscuro grande btn-icono" style="width:56px"><i class="i i-l" data-i="scan-barcode"></i></button><button class="btn btn-accion grande" style="flex:1">Seguir contando<i class="i" data-i="arrow-right"></i></button></div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo"><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · La planilla ciega (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .cabecera .miga { display: flex; align-items: center; gap: 8px; color: var(--texto-2); font-weight: 650; font-size: 15px; }
+  .pantalla { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) 328px; gap: 16px; padding-top: 16px; padding-bottom: 16px; }
+  .hoja { display: grid; grid-template-rows: auto minmax(0,1fr) auto; min-height: 0; overflow: hidden; }
+  .hoja-cab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--borde); }
+  .hoja-cab .buscar { margin-left: auto; height: 40px; width: 280px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  thead th { position: sticky; top: 0; background: var(--hundido); text-align: left; font-size: 14px; font-weight: 700; color: var(--texto-2); height: 36px; padding: 0 12px; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+  tbody td { height: 37px; padding: 0 12px; border-bottom: 1px solid #EFECE5; white-space: nowrap; }
+  td.nro { color: var(--texto-3); font-weight: 650; width: 44px; text-align: right; }
+  td.prod { font-weight: 650; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+  td.cod { color: var(--texto-2); font-size: 14px; }
+  td.uni { color: var(--texto-2); font-size: 14px; }
+  td.cont { width: 128px; }
+  .celda { display: flex; align-items: center; justify-content: flex-end; gap: 4px; height: 30px; padding: 0 10px; border-radius: 8px; font-weight: 800; font-size: 16px; }
+  .celda.vacia { background: var(--hundido); color: transparent; }
+  .celda.llena { background: transparent; }
+  .celda.foco { background: #fff; border: 2px solid var(--pino); box-shadow: 0 0 0 4px rgba(18,56,47,.12); }
+  .celda small { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  td.sis { color: var(--texto-3); font-size: 14px; }
+  td.quien { color: var(--texto-2); font-size: 14px; }
+  tr.activa td { background: var(--pino-suave); }
+  tr.activa td.prod { color: var(--pino); }
+  tr.lista td.nro { color: var(--logro-texto); }
+  .ayuda { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--borde); background: #FBFAF7; font-size: 14px; color: var(--texto-2); font-weight: 600; flex-wrap: nowrap; }
+  .ayuda span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+  .panel { display: grid; gap: 12px; align-content: start; }
+  .ciego { padding: 14px 16px; display: grid; gap: 8px; }
+  .ciego .tit { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; }
+  .avance-n { display: flex; align-items: baseline; gap: 6px; }
+  .opciones { display: grid; gap: 8px; }
+  .op { display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--borde-fuerte); background: #fff; }
+  .op .rad { width: 20px; height: 20px; border-radius: 99px; border: 2px solid var(--borde-fuerte); margin-top: 2px; }
+  .op.si { border: 2px solid var(--pino); padding: 9px 11px; }
+  .op.si .rad { border: 6px solid var(--pino); }
+  .op b { font-size: 15px; font-weight: 750; display: block; line-height: 20px; }
+  .op span { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .dupla { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--hundido); font-size: 14px; font-weight: 600; color: var(--texto-2); line-height: 18px; }
+  .avatares { display: flex; }
+  .avatares .avatar { width: 32px; height: 32px; border: 2px solid var(--hundido); }
+  .avatares .avatar + .avatar { margin-left: -8px; background: var(--pino-suave); color: var(--pino-texto); }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="usuario" style="padding:0"><span class="avatar">CI</span></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="miga"><span>Depósito</span><i class="i i-s" data-i="chevron-right"></i><span>Contar</span><i class="i i-s" data-i="chevron-right"></i></div><div class="t-titulo">Cajones de bulones</div></div>
+      <span class="pastilla urgente" style="align-self:flex-end;margin-bottom:4px">Nunca contado</span>
+      <div class="acciones"><button class="btn chico"><i class="i i-s" data-i="arrow-left"></i>Volver <span class="kbd">Esc</span></button><button class="btn chico"><i class="i i-s" data-i="printer"></i>Imprimir la planilla <span class="kbd">Ctrl P</span></button></div>
+    </header>
+    <section class="pantalla">
+      <div class="tarjeta hoja">
+        <div class="hoja-cab">
+          <span class="segmentos"><span class="elegido">En el orden del cajón</span><span>A–Z</span><span>Sin contar (79)</span></span>
+          <div class="campo buscar"><i class="i i-s" data-i="search"></i>Ir a uno o escanear<span style="flex:1"></span><span class="kbd">/</span></div>
+        </div>
+        <div style="overflow:hidden;min-height:0">
+        <table>
+          <thead><tr><th style="text-align:right">#</th><th>Producto</th><th>Código</th><th>Se cuenta en</th><th style="text-align:right;padding-right:22px">Contado</th><th><i class="i i-s" data-i="eye-off"></i> Sistema</th><th>Quién</th></tr></thead>
+          <tbody>
+            <tr class="lista"><td class="nro">1</td><td class="prod">Bulón cabeza hexagonal zincado 1/4 × 1"</td><td class="cod">BH-1410</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">37 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">2</td><td class="prod">Bulón cabeza hexagonal zincado 1/4 × 1 1/2"</td><td class="cod">BH-1415</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">52 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">3</td><td class="prod">Bulón cabeza hexagonal zincado 1/4 × 2"</td><td class="cod">BH-1420</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">18 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">4</td><td class="prod">Bulón cabeza hexagonal zincado 5/16 × 1"</td><td class="cod">BH-5610</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">44 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">5</td><td class="prod">Bulón cabeza hexagonal zincado 5/16 × 2"</td><td class="cod">BH-5620</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">0 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Lucas</td></tr>
+            <tr class="lista"><td class="nro">6</td><td class="prod">Bulón carrocero cabeza redonda 1/4 × 2"</td><td class="cod">BC-1420</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">61 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">7</td><td class="prod">Bulón carrocero cabeza redonda 5/16 × 3"</td><td class="cod">BC-5630</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">25 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">8</td><td class="prod">Tuerca hexagonal zincada 1/4"</td><td class="cod">TH-14</td><td class="uni">kg, a granel</td><td class="cont"><div class="celda llena num">1,4 <small>kg</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">9</td><td class="prod">Tuerca hexagonal zincada 5/16"</td><td class="cod">TH-516</td><td class="uni">kg, a granel</td><td class="cont"><div class="celda llena num">0,9 <small>kg</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="lista"><td class="nro">10</td><td class="prod">Tuerca autofrenante con nylon 1/4"</td><td class="cod">TA-14</td><td class="uni">unidades</td><td class="cont"><div class="celda llena num">33 <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr class="activa"><td class="nro">11</td><td class="prod">Arandela grower zincada 1/4"</td><td class="cod">AG-14</td><td class="uni">unidades</td><td class="cont"><div class="celda foco num">8<span class="cursor" style="height:18px"></span> <small>un.</small></div></td><td class="sis">oculto</td><td class="quien">Carlos</td></tr>
+            <tr><td class="nro">12</td><td class="prod">Arandela grower zincada 5/16"</td><td class="cod">AG-516</td><td class="uni">unidades</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+            <tr><td class="nro">13</td><td class="prod">Arandela plana zincada 1/4"</td><td class="cod">AP-14</td><td class="uni">kg, a granel</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+            <tr><td class="nro">14</td><td class="prod">Varilla roscada zincada 1/4" × 1 m</td><td class="cod">VR-14</td><td class="uni">unidades</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+            <tr><td class="nro">15</td><td class="prod">Varilla roscada zincada 5/16" × 1 m</td><td class="cod">VR-516</td><td class="uni">unidades</td><td class="cont"><div class="celda vacia">–</div></td><td class="sis">oculto</td><td class="quien"></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="ayuda"><span><span class="kbd">0–9</span>el número</span><span><span class="kbd">Enter</span>baja al siguiente</span><span><span class="kbd">↑</span><span class="kbd">↓</span>moverse</span><span><span class="kbd">Supr</span>borrar lo contado</span><span style="margin-left:auto"><i class="i i-s" data-i="cloud-upload"></i>Guardado 10:41</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="tarjeta ciego">
+          <div class="tit"><i class="i" data-i="eye-off"></i>Conteo a ciegas</div>
+          <div class="t-detalle">No mostramos cuánto dice el sistema hasta cerrar: así nadie cuenta «para que dé».</div>
+          <div class="avance-n"><span class="t-numero num">41</span><span class="t-detalle">de 120 contados</span></div>
+          <div class="barra" style="margin-top:0;height:8px"><b style="width:34%;background:var(--pino)"></b></div>
+          <div class="dupla"><div class="avatares"><span class="avatar">LM</span><span class="avatar">CI</span></div><div>Lucas cuenta en voz alta, Carlos tipea. Queda anotado quién cargó cada uno.</div></div>
+        </div>
+        <div class="tarjeta ciego">
+          <div class="tit">Al cerrar, los 79 sin contar…</div>
+          <div class="opciones">
+            <div class="op si"><span class="rad"></span><div><b>Quedan como están</b><span>Sirve si hoy no terminás el cajón</span></div></div>
+            <div class="op"><span class="rad"></span><div><b>Se ponen en cero</b><span>Si no los contaste es que no hay</span></div></div>
+          </div>
+          <button class="btn btn-accion grande" style="width:100%;margin-top:4px">Cerrar y ver diferencias <span class="kbd">Alt C</span></button>
+          <div class="t-detalle" style="text-align:center">Antes de ajustar te mostramos cada diferencia</div>
+        </div>
+        <div class="aviso pino"><i class="i" data-i="shopping-cart"></i><div>Se vendieron 4 bulones 1/4 × 1" después de contarlos: al cerrar se descuentan solos.</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

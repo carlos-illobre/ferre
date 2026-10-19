@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · Una por una (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .arriba { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+  .arriba .tit { flex: 1; min-width: 0; }
+  .arriba .tit b { display: block; font-size: 18px; font-weight: 800; line-height: 22px; }
+  .arriba .tit span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .estantes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 12px 16px 0; }
+  .estantes b { height: 6px; border-radius: 9px; background: var(--hundido-2); overflow: hidden; display: block; }
+  .estantes b i { display: block; height: 100%; background: var(--pino); }
+  .donde { display: flex; justify-content: space-between; padding: 8px 16px 0; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .donde b { color: var(--pino-texto); }
+  .mazo { position: relative; margin: 14px 16px 0; height: 540px; }
+  .carta { position: absolute; inset: 0; border-radius: 28px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-3); padding: 16px; display: flex; flex-direction: column; }
+  .carta.atras { transform: translateY(32px) scale(.94); opacity: .7; box-shadow: var(--sombra-1); }
+  .carta.atras2 { transform: translateY(60px) scale(.88); opacity: .4; box-shadow: none; }
+  .carta .foto-g { height: 188px; border-radius: 20px; background: var(--hundido); display: grid; place-items: center; position: relative; }
+  .carta .foto-g img { height: 160px; filter: drop-shadow(0 10px 12px rgba(26,29,27,.22)); transform: rotate(-30deg); }
+  .carta .foto-g .pastilla { position: absolute; top: 12px; left: 12px; background: var(--pino); color: #fff; }
+  .carta .foto-g .pastilla.lugar { left: auto; right: 12px; background: #fff; color: var(--texto-2); }
+  .carta .n { font-size: 22px; line-height: 28px; font-weight: 800; letter-spacing: -.01em; margin-top: 14px; }
+  .carta .d { font-size: 15px; color: var(--texto-2); }
+  .pregunta { margin-top: auto; text-align: center; font-size: 15px; font-weight: 700; color: var(--texto-2); }
+  .rueda { isolation: isolate; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; height: 96px; position: relative; }
+  .rueda span { width: 52px; text-align: center; font-weight: 800; color: var(--texto-3); font-size: 26px; }
+  .rueda span.l2 { opacity: .35; font-size: 22px; }
+  .rueda span.l1 { opacity: .7; }
+  .rueda span.c { width: 96px; font-size: 64px; line-height: 80px; color: var(--tinta); letter-spacing: -.04em; }
+  .rueda::before { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; width: 104px; margin-left: -52px; border-radius: 18px; background: var(--pino-suave); z-index: -1; }
+  .tocar { text-align: center; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .rueda .u { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font-size: 14px; font-weight: 700; color: var(--pino-texto); width: auto; }
+  .gesto { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; font-weight: 650; color: var(--texto-3); }
+  .gesto span { display: inline-flex; align-items: center; gap: 4px; }
+  .abajo { position: absolute; left: 0; right: 0; bottom: 30px; display: grid; grid-template-columns: 1fr 76px 1fr; gap: 12px; align-items: center; padding: 0 16px; }
+  .mic { width: 76px; height: 76px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; box-shadow: var(--sombra-2); }
+  .abajo .btn { height: 60px; border-radius: 18px; font-size: 17px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi-off"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="arriba">
+    <span class="btn btn-icono" style="border-radius:99px"><i class="i" data-i="x"></i></span>
+    <div class="tit"><b>Exhibidor de mechas</b><span>26 de 46 · sin señal, se guarda acá</span></div>
+    <span class="btn btn-icono" style="border-radius:99px"><i class="i" data-i="scan-barcode"></i></span>
+  </div>
+  <div class="estantes"><b><i style="width:100%"></i></b><b><i style="width:100%"></i></b><b><i style="width:40%"></i></b><b></b><b></b></div>
+  <div class="donde"><span>Estante <b>3 de 5</b> · de izquierda a derecha</span><span>9 en este</span></div>
+
+  <div class="mazo">
+    <div class="carta atras2"></div>
+    <div class="carta atras"></div>
+    <div class="carta">
+      <div class="foto-g"><span class="pastilla">A</span><span class="pastilla lugar"><i class="i i-s" data-i="map-pin"></i>Gancho 14</span><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+      <div class="n">Mecha acero rápido HSS 8 mm</div>
+      <div class="d">Ezeta · Cód. ME080 · blíster de 1</div>
+      <div class="aviso pino" style="margin-top:14px;align-items:center"><i class="i" data-i="sparkles"></i><div>Arranca en lo que dice el sistema. Si coincide, deslizá y listo.</div></div>
+      <div class="pregunta">¿Cuántas hay? <span style="color:var(--pino-texto)">un.</span></div>
+      <div class="rueda num"><span class="l2">12</span><span class="l1">13</span><span class="c">14</span><span class="l1">15</span><span class="l2">16</span></div>
+      <div class="tocar">Girá la rueda o tocá el número para tipearlo</div>
+      <div class="gesto"><span><i class="i i-s" data-i="arrow-left"></i>No hay ninguno</span><span>Listo<i class="i i-s" data-i="arrow-right"></i></span></div>
+    </div>
+  </div>
+
+  <div class="abajo">
+    <button class="btn">No hay</button>
+    <span class="mic"><i class="i i-xl" data-i="mic"></i></span>
+    <button class="btn btn-accion">Listo</button>
+  </div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

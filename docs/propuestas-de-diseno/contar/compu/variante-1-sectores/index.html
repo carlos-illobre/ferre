@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contar · Sectores y conteo (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .pantalla { min-width: 0; display: grid; grid-template-rows: auto 1fr; gap: 16px; padding-top: 16px; padding-bottom: 20px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+  .kpis .resumen { padding: 10px 14px; }
+  .kpis .va small { font-size: 15px; font-weight: 650; color: var(--texto-2); letter-spacing: 0; }
+  .abc { display: flex; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 6px; gap: 2px; }
+  .abc b { display: block; height: 100%; }
+  .abc .a { background: var(--pino); } .abc .b { background: #5E8C7E; } .abc .c { background: #B9CEC6; }
+
+  .cuerpo { display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 16px; min-height: 0; }
+  .col-titulo { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .col-titulo .t-seccion { font-size: 18px; }
+  .col-titulo .btn { margin-left: auto; }
+  .sectores { display: grid; gap: 6px; align-content: start; }
+  .sec { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 8px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; box-shadow: var(--sombra-1); }
+  .sec .ico { width: 36px; height: 36px; border-radius: 10px; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; }
+  .sec .n { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sec .d { font-size: 14px; line-height: 18px; color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sec .pastilla { height: 26px; padding: 0 9px; }
+  .sec.elegido { border: 2px solid var(--pino); padding: 7px 11px; background: var(--pino-suave); }
+  .sec.elegido .ico { background: var(--pino); color: #fff; }
+  .sec.curso .ico { background: var(--accion-suave); color: var(--accion-texto); }
+  .sec.nunca .ico { background: var(--urgente-suave); color: var(--urgente-texto); }
+
+  .conteo { min-width: 0; display: grid; grid-template-rows: auto auto minmax(0,1fr); gap: 12px; padding: 16px; min-height: 0; }
+  .conteo-cab { display: flex; align-items: center; gap: 16px; }
+  .conteo-cab .t-seccion { font-size: 22px; line-height: 28px; }
+  .avance { margin-left: auto; min-width: 210px; }
+  .avance .fila { display: flex; justify-content: space-between; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .avance .fila b { color: var(--tinta); font-weight: 800; }
+  .carga { display: grid; gap: 8px; }
+  .elegido-box { display: grid; grid-template-columns: 56px minmax(0,1fr) auto auto; gap: 12px; align-items: center; padding: 8px 8px 8px 12px; border-radius: 14px; background: var(--pino-suave); border: 1px solid #C9DDD3; }
+  .elegido-box .n { font-weight: 800; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .elegido-box .d { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .elegido-box .antes { font-size: 14px; font-weight: 700; color: var(--pino-texto); }
+  .cuantas { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 10px 0 14px; border-radius: 12px; border: 2px solid var(--pino); background: #fff; box-shadow: 0 0 0 4px rgba(18,56,47,.12); }
+  .cuantas .q { font-size: 26px; font-weight: 800; letter-spacing: -.02em; min-width: 40px; text-align: right; }
+  .cuantas .u { font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .listas { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; min-height: 0; }
+  .lista { min-height: 0; overflow: hidden; -webkit-mask-image: linear-gradient(#000 84%, transparent); }
+  .lista-cab { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 750; font-size: 16px; }
+  .lista-cab .t-detalle { margin-left: auto; }
+  .r { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 6px 10px 6px 6px; border-radius: 12px; border: 1px solid var(--borde); background: #fff; }
+  .r + .r { margin-top: 6px; }
+  .r .n { font-weight: 700; font-size: 14px; line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .r .d { font-size: 14px; line-height: 18px; color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .r .dif { display: grid; justify-items: end; line-height: 18px; }
+  .r .dif b { font-size: 16px; font-weight: 800; }
+  .r .dif span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .r.nuevo { border: 2px solid var(--logro); padding: 5px 9px 5px 5px; }
+  .ig { color: var(--logro-texto); } .mas { color: var(--pino-texto); } .menos { color: var(--urgente-texto); }
+  .r .ir { color: var(--texto-3); }
+  .r.sin .foto { opacity: .9; }
+  .cerrar-pie { display: flex; gap: 8px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 del depósito</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">LM</span><div class="txt"><div style="font-weight:750;font-size:15px">Lucas Medina</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <div class="acciones"><button class="btn chico"><i class="i i-s" data-i="scan-barcode"></i>Escanear con el celular <span class="kbd">Alt E</span></button><button class="btn btn-accion chico"><i class="i i-s" data-i="square-check-big"></i>Cerrar el sector <span class="kbd">Alt C</span></button></div>
+    </header>
+    <nav class="pestanas"><a>Stock</a><a>Compras</a><a class="activa">Contar <span class="pastilla pino" style="height:24px">2 en curso</span></a></nav>
+    <section class="pantalla">
+      <div class="kpis">
+        <div class="resumen"><span class="ico"><i class="i" data-i="layers-3"></i></span><div style="flex:1"><div class="et">Stock cargado</div><div class="va num">9 <small>de 14 sectores</small></div><div class="barra"><b style="width:64%"></b></div></div></div>
+        <div class="resumen urgente"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div><div class="et">Nunca contados</div><div class="va num">3 <small>sectores</small></div></div></div>
+        <div class="resumen"><span class="ico" style="background:var(--accion-suave);color:var(--accion-texto)"><i class="i" data-i="pause"></i></span><div><div class="et">Conteos en curso</div><div class="va num">2</div></div></div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="calendar-check"></i></span><div style="flex:1"><div class="et">Hoy toca · A 12 · B 15 · C 4</div><div class="va num">31 <small>productos</small></div><div class="abc"><b class="a" style="width:39%"></b><b class="b" style="width:48%"></b><b class="c" style="width:13%"></b></div></div></div>
+      </div>
+
+      <div class="cuerpo">
+        <div style="min-height:0;display:flex;flex-direction:column">
+          <div class="col-titulo"><span class="t-seccion">Sectores</span><span class="pastilla" style="height:24px">14</span><button class="btn chico btn-suave"><i class="i i-s" data-i="plus"></i>Nuevo</button></div>
+          <div class="sectores">
+            <div class="sec elegido curso"><span class="ico"><i class="i" data-i="hash"></i></span><div style="min-width:0"><div class="n">Pared de tornillería</div><div class="d"><b style="color:var(--accion-texto)">En curso</b> · 24 de 64</div></div><span class="t-detalle">hoy</span></div>
+            <div class="sec curso"><span class="ico"><i class="i" data-i="hash"></i></span><div style="min-width:0"><div class="n">Exhibidor de mechas y puntas</div><div class="d"><b style="color:var(--accion-texto)">En curso</b> · 8 de 46</div></div><span class="t-detalle">jue.</span></div>
+            <div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">Pared de electricidad</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 37</div></div><span class="pastilla" style="background:var(--pino);color:#fff;height:24px">9 A</span></div>
+            <div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">Cajones de bulones</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 120</div></div><span class="pastilla" style="background:var(--pino);color:#fff;height:24px">3 A</span></div>
+            <div class="sec nunca"><span class="ico"><i class="i" data-i="circle-dashed"></i></span><div style="min-width:0"><div class="n">Jardín y riego</div><div class="d"><b style="color:var(--urgente-texto)">Nunca contado</b> · 33</div></div><span></span></div>
+            <div class="sec"><span class="ico"><i class="i" data-i="check"></i></span><div style="min-width:0"><div class="n">Herramientas manuales</div><div class="d">Contado el 12/10 · 41</div></div><span></span></div>
+            <div class="sec"><span class="ico"><i class="i" data-i="check"></i></span><div style="min-width:0"><div class="n">Adhesivos y selladores</div><div class="d">Contado el 05/10 · 29</div></div><span></span></div>
+            <div class="sec"><span class="ico"><i class="i" data-i="check"></i></span><div style="min-width:0"><div class="n">Góndola de pinturas</div><div class="d">Contado el 02/10 · 58</div></div><span></span></div>
+          </div>
+        </div>
+
+        <div class="tarjeta-2 conteo">
+          <div class="conteo-cab">
+            <div><div class="t-seccion">Pared de tornillería</div><div class="t-detalle">Lo abrió Lucas ayer a las 17:10 · lo seguís desde acá o desde el celular</div></div>
+            <div class="avance"><div class="fila"><span>Contados</span><span><b class="num">24</b> de 64</span></div><div class="barra" style="height:8px"><b style="width:37.5%;background:var(--pino)"></b></div></div>
+          </div>
+          <div class="carga">
+            <div class="campo" style="height:48px"><i class="i" data-i="search"></i><span class="escrito">tarugos s8</span><span style="flex:1"></span><span class="t-detalle">Enter cuenta y vuelve acá · lector o celular también</span><span class="kbd">/</span></div>
+            <div class="elegido-box">
+              <div class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
+              <div style="min-width:0"><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · Cód. 7780-S8</div><div style="display:flex;gap:6px;margin-top:4px"><span class="pastilla pino" style="height:26px"><i class="i i-s" data-i="history"></i>Antes 8 un.</span><span class="pastilla contorno" style="height:26px"><i class="i i-s" data-i="map-pin"></i>De Electricidad</span></div></div>
+              <div class="cuantas"><span class="t-etiqueta" style="white-space:nowrap">¿Cuántas hay?</span><span class="q num">9</span><span class="cursor"></span><span class="u">un.</span></div>
+              <button class="btn btn-oscuro" style="height:52px">Siguiente <span class="kbd">Enter</span></button>
+            </div>
+            
+          </div>
+          <div class="listas">
+            <div class="lista">
+              <div class="lista-cab">Contados <span class="pastilla" style="height:24px">24</span><span class="t-detalle">el último arriba</span></div>
+              <div class="r nuevo"><div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div style="min-width:0"><div class="n">Tornillo autoperforante T2 8 × 1/2" × 100</div><div class="d">Contaste 12 un. · había 14</div></div><div class="dif"><b class="menos num">−2</b><span>ajusta</span></div></div>
+              <div class="r"><div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div style="min-width:0"><div class="n">Clavos punta París 2" a granel</div><div class="d">Contaste 7,2 kg · había 6,5</div></div><div class="dif"><b class="mas num">+0,7</b><span>kg</span></div></div>
+              <div class="r"><div class="foto-icono" style="width:40px;height:40px;border-radius:8px"><i class="i" data-i="hash"></i></div><div style="min-width:0"><div class="n">Arandela plana zincada 1/4" × 100</div><div class="d">Contaste 6 un. · había 6</div></div><div class="dif"><b class="ig">=</b><span>igual</span></div></div>
+              <div class="r"><div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div style="min-width:0"><div class="n">Tornillo fixer 8 mm con tarugo × 50</div><div class="d">Contaste 0 un. · había 3</div></div><div class="dif"><b class="menos num">−3</b><span>ajusta</span></div></div>
+              <div class="r"><div class="foto-icono" style="width:40px;height:40px;border-radius:8px"><i class="i" data-i="hash"></i></div><div style="min-width:0"><div class="n">Bulón cabeza hexagonal 1/4 × 2" × 50</div><div class="d">Contaste 4 un. · había 4</div></div><div class="dif"><b class="ig">=</b><span>igual</span></div></div>
+            </div>
+            <div class="lista">
+              <div class="lista-cab">Sin contar <span class="pastilla urgente" style="height:24px">40</span><span class="t-detalle">tocá uno para contarlo</span></div>
+              <div class="r sin"><div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div style="min-width:0"><div class="n">Tornillo madera fresada 4 × 40 × 100</div><div class="d">Bulonera Centro · Cód. TF440</div></div><i class="i ir" data-i="chevron-right"></i></div>
+              <div class="r sin"><div class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div><div style="min-width:0"><div class="n">Tarugos nylon S6 con tope × 100</div><div class="d">Fischer · Cód. 7780-S6</div></div><i class="i ir" data-i="chevron-right"></i></div>
+              <div class="r sin"><div class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div style="min-width:0"><div class="n">Clavos punta París 2 1/2" a granel</div><div class="d">Acindar · se cuenta en kg</div></div><i class="i ir" data-i="chevron-right"></i></div>
+              <div class="r sin"><div class="foto-icono" style="width:40px;height:40px;border-radius:8px"><i class="i" data-i="hash"></i></div><div style="min-width:0"><div class="n">Tuerca hexagonal zincada 1/4" × 100</div><div class="d">Bulonera Centro · Cód. TH14</div></div><i class="i ir" data-i="chevron-right"></i></div>
+              <div class="r sin"><div class="foto chica"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div style="min-width:0"><div class="n">Tornillo autoperforante T2 8 × 1" × 100</div><div class="d">Bulonera Centro · Cód. T281</div></div><i class="i ir" data-i="chevron-right"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
