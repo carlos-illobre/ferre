@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Resumen · La cuenta del mes (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  body { height: 768px; overflow: hidden; }
+  .top { height: 60px; display: flex; align-items: center; gap: 16px; padding: 0 32px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
+  .top .logo { width: 32px; height: 32px; border-radius: 9px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+  .migas { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; color: var(--texto-2); }
+  .migas b { color: var(--tinta); font-weight: 800; }
+  .ir { white-space: nowrap; margin-left: auto; display: flex; align-items: center; gap: 10px; height: 40px; width: 320px; padding: 0 8px 0 14px; border-radius: var(--r); background: var(--hundido); color: var(--texto-3); font-weight: 600; font-size: 15px; }
+  .ir .kbd { margin-left: auto; }
+  .top .vistas { display: flex; gap: 4px; }
+
+  .cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 372px; gap: 24px; padding: 20px 32px 24px; height: calc(768px - 60px); }
+  .izq { display: flex; flex-direction: column; min-height: 0; }
+
+  .meses { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; height: 104px; }
+  .mes { position: relative; border-radius: 12px; display: grid; grid-template-rows: 1fr 1fr auto; padding: 6px 4px 4px; text-align: center; }
+  .mes .pos, .mes .neg { display: flex; justify-content: center; }
+  .mes .pos { align-items: flex-end; border-bottom: 1px solid var(--borde-fuerte); }
+  .mes .neg { align-items: flex-start; }
+  .mes b { display: block; width: 22px; border-radius: 4px 4px 0 0; background: var(--logro); opacity: .55; }
+  .mes .neg b { background: var(--error); border-radius: 0 0 4px 4px; opacity: .8; }
+  .mes .lb { font-size: 14px; font-weight: 700; color: var(--texto-3); line-height: 18px; }
+  .mes.sel { background: var(--superficie); box-shadow: inset 0 0 0 2px var(--pino), var(--sombra-1); }
+  .mes.sel b { opacity: 1; background: var(--logro-texto); }
+  .mes.sel .lb { color: var(--pino); font-weight: 800; }
+  .mes.curso b { background: repeating-linear-gradient(135deg, var(--logro) 0 3px, transparent 3px 6px); border: 1.5px solid var(--logro); opacity: .8; }
+
+  .titulo { margin-top: 18px; display: flex; align-items: flex-end; gap: 20px; }
+  .titulo h1 { margin: 0; white-space: nowrap; font-size: 40px; line-height: 48px; font-weight: 800; letter-spacing: -.035em; }
+  .titulo h1 .verde { color: var(--logro-texto); }
+  .titulo .pastilla { margin-bottom: 8px; height: 32px; }
+  .bajada { font-size: 17px; line-height: 26px; color: var(--texto-2); font-weight: 550; margin-top: 4px; max-width: 860px; }
+  .bajada b { color: var(--tinta); font-weight: 750; }
+
+  .cascada { margin-top: 16px; flex: 1; min-height: 0; padding: 16px 20px 12px; display: flex; flex-direction: column; }
+  .cascada .cab { display: flex; align-items: center; gap: 10px; }
+  .cascada .cab .der { margin-left: auto; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .barras { flex: 1; display: grid; grid-template-columns: 1.3fr 1.3fr 1.3fr 1fr 1fr 1fr 1fr 1.3fr; gap: 12px; position: relative; margin-top: 8px; }
+  .bc { position: relative; }
+  .bc .b { position: absolute; left: 8%; right: 8%; border-radius: 6px; }
+  .bc .v { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; font-size: 15px; white-space: nowrap; }
+  .bc .n { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; }
+  .bc .n small { display: block; color: var(--texto-3); font-weight: 600; font-size: 14px; }
+  .conector { position: absolute; border-top: 1.5px dashed var(--borde-fuerte); }
+
+  .equilibrio { margin-top: 12px; padding: 14px 20px; display: grid; grid-template-columns: auto 1fr; gap: 6px 20px; align-items: center; }
+  .equilibrio .q { font-size: 15px; font-weight: 650; color: var(--texto-2); line-height: 20px; }
+  .equilibrio .q b { color: var(--tinta); font-size: 20px; font-weight: 800; display: block; line-height: 26px; }
+  .regla { position: relative; height: 40px; margin-top: 14px; }
+  .regla .pista { position: absolute; left: 0; right: 0; top: 10px; height: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--error-suave) 0 51%, var(--logro-suave) 51% 100%); }
+  .regla .piso { position: absolute; top: 2px; width: 2px; height: 26px; background: var(--tinta); }
+  .regla .piso span { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: 700; color: var(--texto-2); white-space: nowrap; }
+  .regla .yo { position: absolute; top: 4px; width: 22px; height: 22px; margin-left: -11px; border-radius: 99px; background: var(--logro-texto); border: 3px solid #fff; box-shadow: var(--sombra-2); }
+  .regla .yo span { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: 800; color: var(--logro-texto); white-space: nowrap; }
+
+  .panel { padding: 18px; display: flex; flex-direction: column; min-height: 0; }
+  .panel h2 { margin: 0; font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
+  .panel p { margin: 4px 0 12px; font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 550; }
+  .matriz { display: grid; grid-template-columns: 1fr 56px 56px 56px; align-items: center; row-gap: 2px; }
+  .matriz .rh { white-space: nowrap; font-size: 14px; font-weight: 700; color: var(--texto-2); text-align: center; line-height: 16px; padding-bottom: 8px; }
+  .matriz .rh .avatar { width: 32px; height: 32px; margin: 0 auto 4px; font-size: 14px; }
+  .matriz .bl { font-size: 15px; font-weight: 700; line-height: 20px; padding: 8px 0; border-top: 1px solid var(--borde); }
+  .matriz .bl small { display: block; font-size: 14px; font-weight: 550; color: var(--texto-3); }
+  .matriz .c { display: grid; place-items: center; height: 100%; border-top: 1px solid var(--borde); }
+  .tg { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; }
+  .tg.si { background: var(--logro-suave); color: var(--logro-texto); }
+  .tg.no { background: var(--hundido); color: var(--texto-3); }
+  .matriz .fila-sel { background: var(--pino-suave); }
+  .nota { margin-top: auto; display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 600; padding: 10px 12px; background: var(--hundido); border-radius: var(--r); }
+</style>
+</head>
+<body>
+  <header class="top">
+    <span class="logo"><i class="i i-s" data-i="store"></i></span>
+    <div class="migas">Ferrebress <i class="i i-s" data-i="chevron-right"></i> Negocio <i class="i i-s" data-i="chevron-right"></i> <b>La cuenta del mes</b></div>
+    <div class="segmentos" style="margin-left:24px"><button>Hoy</button><button>Semana</button><button class="elegido">Mes</button><button>Año</button></div>
+    <div class="ir"><i class="i i-s" data-i="search"></i>Ir a… o preguntá algo<span class="kbd">Ctrl K</span></div>
+    <span class="avatar">CI</span>
+  </header>
+
+  <div class="cuerpo">
+    <div class="izq">
+      <div class="meses" id="meses"></div>
+
+      <div class="titulo"><h1>En septiembre te quedaron <span class="verde">+$1.360.000</span></h1></div>
+      <div class="bajada">Vendiste <b>$11.640.000</b> en 1.012 ventas. Después de pagar la mercadería que salió (<b>$7.330.000</b>, al costo de cada venta) y los gastos del local (<b>$2.950.000</b>), esto es lo que ganó el negocio: el <b>12 %</b> de lo vendido, a favor.</div>
+
+      <div class="tarjeta cascada">
+        <div class="cab"><span class="t-seccion" style="font-size:18px">De dónde sale</span><span class="der">Tocá una barra y ves las ventas o los gastos que la forman</span></div>
+        <div class="barras" id="cascada"></div>
+      </div>
+
+      <div class="tarjeta equilibrio">
+        <div class="q"><b class="num">$306.000 por día</b>hay que vender para cubrir los gastos</div>
+        <div class="regla"><div class="pista"></div><div class="piso" style="left:51%"><span>piso $306.000</span></div><div class="yo" style="left:74.6%"><span>septiembre: $448.000 por día</span></div></div>
+      </div>
+    </div>
+
+    <aside class="tarjeta-2 panel">
+      <h2><i class="i" data-i="shield-check"></i>Quién ve cada número</h2>
+      <p>Lo que un rol no puede ver no le aparece ni le llega. Tocá un cuadro para cambiarlo.</p>
+      <div class="matriz">
+        <span></span>
+        <div class="rh"><span class="avatar" style="background:var(--pino-suave);color:var(--pino-texto)">Ad</span>Admin.</div>
+        <div class="rh"><span class="avatar">Ve</span>Vende</div>
+        <div class="rh"><span class="avatar" style="background:var(--hundido);color:var(--texto-2)">De</span>Depósito</div>
+
+        <div class="bl">Ventas<small>lo vendido, medios de pago</small></div>
+        <div class="c"><span class="tg si"><i class="i i-s" data-i="eye"></i></span></div><div class="c"><span class="tg si"><i class="i i-s" data-i="eye"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div>
+
+        <div class="bl">Ganancia y costo<small>lo que se gana en cada venta</small></div>
+        <div class="c"><span class="tg si"><i class="i i-s" data-i="eye"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div>
+
+        <div class="bl">Gastos de la semana<small>compras a proveedores</small></div>
+        <div class="c"><span class="tg si"><i class="i i-s" data-i="eye"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div><div class="c"><span class="tg si"><i class="i i-s" data-i="eye"></i></span></div>
+
+        <div class="bl">Dinero invertido<small>el stock por su costo</small></div>
+        <div class="c"><span class="tg si"><i class="i i-s" data-i="eye"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div>
+
+        <div class="bl">Resultado del mes<small>gastos del local y lo que queda</small></div>
+        <div class="c"><span class="tg si"><i class="i i-s" data-i="eye"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div><div class="c"><span class="tg no"><i class="i i-s" data-i="eye-off"></i></span></div>
+      </div>
+      <div class="nota"><i class="i i-s" data-i="eye"></i><span>Pasá el mouse por un rol para ver esta pantalla como la ve él: lo que no puede ver se apaga.</span></div>
+    </aside>
+  </div>
+<script>
+  const ms=[['nov',980],['dic',1840],['ene',620],['feb',-140],['mar',410],['abr',760],['may',890],['jun',540],['jul',1120],['ago',1010],['sep',1360],['oct',820]];
+  const M=document.getElementById('meses');
+  ms.forEach((m,i)=>{const d=document.createElement('div');d.className='mes'+(i==10?' sel':'')+(i==11?' curso':'');
+    const h=Math.abs(m[1])/1840*34;
+    d.innerHTML=`<div class="pos">${m[1]>0?`<b style="height:${h}px"></b>`:''}</div><div class="neg">${m[1]<0?`<b style="height:${Math.max(h,6)}px"></b>`:''}</div><div class="lb">${m[0]}${i==11?' …':''}<br><span style="font-weight:650">${m[1]<0?'−':''}${Math.abs(m[1])>=1000?(Math.abs(m[1])/1000).toFixed(1).replace('.',',')+' M':Math.abs(m[1])+' mil'}</span></div>`;
+    M.appendChild(d);});
+  // cascada: [nombre, detalle, desde, hasta, tipo]
+  const c=[['Vendido','1.012 ventas',0,11640,'total'],['Costo','de lo vendido',4310,11640,'resta'],['Ganancia bruta','37 %',0,4310,'sub'],['Alquiler','',3110,4310,'gasto'],['Sueldos','',1710,3110,'gasto'],['Servicios','',1500,1710,'gasto'],['Impuestos','',1360,1500,'gasto'],['Te quedó','a favor',0,1360,'fin']];
+  const C=document.getElementById('cascada');
+  requestAnimationFrame(()=>{
+    const H=C.clientHeight-44-26, k=H/11640, base=44;
+    const col={total:'var(--pino)',resta:'var(--hundido-2)',sub:'var(--pino-2)',gasto:'var(--error-suave)',fin:'var(--logro)'};
+    const brd={resta:'1.5px dashed var(--borde-fuerte)',gasto:'1.5px solid #F2B8B1'};
+    c.forEach((x,i)=>{const d=document.createElement('div');d.className='bc';
+      const top=base+(x[3]>=0?0:0), b0=base+x[2]*k, h=Math.max((x[3]-x[2])*k,4);
+      const val=(x[3]-x[2]); const signo=(x[4]=='resta'||x[4]=='gasto')?'−':(x[4]=='fin'?'+':'');
+      const txt=signo+'$'+val.toLocaleString('es-AR')+'.000';
+      d.innerHTML=`<span class="b" style="bottom:${b0}px;height:${h}px;background:${col[x[4]]};${brd[x[4]]?'border:'+brd[x[4]]:''}${i==7?';box-shadow:0 0 0 4px var(--logro-suave)':''}"></span><span class="v" style="bottom:${b0+h+4}px;color:${x[4]=='gasto'?'var(--error-texto)':(x[4]=='fin'?'var(--logro-texto)':'var(--tinta)')}">${txt}</span><span class="n">${x[0]}${x[1]?'<small>'+x[1]+'</small>':''}</span>`;
+      C.appendChild(d);});
+    window.pintarIconos && pintarIconos();
+  });
+</script>
+</body>
+</html>

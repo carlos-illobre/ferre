@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Resumen · Tablero (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 12px; position: relative; }
+  .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(transparent, var(--fondo)); }
+  .secciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .sec { display: grid; justify-items: center; gap: 2px; padding: 8px 0 6px; border-radius: 14px; color: var(--texto-2); font-size: 14px; font-weight: 700; border: 1px solid transparent; }
+  .sec .i { width: 22px; height: 22px; }
+  .sec.elegida { background: var(--superficie); color: var(--pino); border-color: var(--borde); box-shadow: var(--sombra-1); font-weight: 800; }
+  .periodo { display: flex; align-items: center; gap: 10px; }
+  .periodo .segmentos { flex: none; }
+  .periodo .segmentos > * { min-height: 36px; padding: 0 12px; font-size: 15px; }
+  .periodo .fecha { font-size: 14px; line-height: 18px; color: var(--texto-2); font-weight: 600; }
+  .periodo .fecha b { color: var(--tinta); font-weight: 750; }
+
+  .heroe { padding: 14px 16px; }
+  .heroe .et { display: flex; align-items: center; gap: 8px; }
+  .heroe .t-total { margin-top: 2px; }
+  .heroe .comp { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--texto-2); margin-top: 4px; }
+  .delta { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px; border-radius: 99px; font-size: 14px; font-weight: 800; background: var(--logro-suave); color: var(--logro-texto); white-space: nowrap; }
+  .horas { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; align-items: end; height: 40px; margin-top: 12px; }
+  .horas span { display: block; border-radius: 4px 4px 2px 2px; background: var(--pino); }
+  .horas span.c { background: var(--hundido-2); height: 3px !important; }
+  .horas span.ahora { opacity: .45; }
+  .horas-lb { display: flex; justify-content: space-between; font-size: 14px; color: var(--texto-3); font-weight: 600; margin-top: 4px; }
+
+  .grilla { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .chico { padding: 12px 14px; display: grid; gap: 0; }
+  .chico .va { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; }
+  .chico .d { font-size: 14px; font-weight: 750; color: var(--logro-texto); display: flex; align-items: center; gap: 2px; }
+  .chico .d.gris { color: var(--texto-3); font-weight: 600; }
+  .chico.urgente { background: var(--urgente-suave); border-color: transparent; }
+  .chico.urgente .va { color: var(--urgente-texto); }
+  .chico.urgente .d { color: var(--urgente-texto); font-weight: 650; }
+
+  .medios { padding: 14px; }
+  .stack { display: flex; height: 12px; border-radius: 99px; overflow: hidden; gap: 2px; margin: 8px 0 10px; }
+  .ml { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 14px; font-weight: 650; }
+  .ml span { display: flex; align-items: center; gap: 6px; }
+  .ml i { width: 10px; height: 10px; border-radius: 99px; display: inline-block; }
+  .ml b { margin-left: auto; font-weight: 800; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>19:12</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · actualizado 19:12</div>
+  <nav class="celu-pestanas"><a class="activa">Resumen</a><a>Usuarios</a><a>Quién hizo</a></nav>
+  <div class="celu-pantalla">
+    <div class="secciones">
+      <a class="sec elegida"><i class="i" data-i="chart-column"></i>Ventas</a>
+      <a class="sec"><i class="i" data-i="truck"></i>Compras</a>
+      <a class="sec"><i class="i" data-i="boxes"></i>Inventario</a>
+      <a class="sec"><i class="i" data-i="scale"></i>Resultado</a>
+    </div>
+    <div class="periodo">
+      <div class="segmentos"><button class="elegido">Hoy</button><button>Semana</button><button>Mes</button></div>
+      <div class="fecha"><b>Lun 19/10</b><br>contra lun 12/10</div>
+    </div>
+
+    <div class="tarjeta heroe">
+      <div class="et"><span class="t-etiqueta">Vendido hoy</span><span style="margin-left:auto;color:var(--texto-3)"><i class="i i-s" data-i="info"></i></span></div>
+      <div class="t-total num"><span class="peso">$</span>412.000</div>
+      <div class="comp"><span class="delta"><i class="i i-s" data-i="arrow-up-right"></i>16 %</span>$56.000 más · lun 12: $356.000</div>
+      <div class="horas" id="horas"></div>
+      <div class="horas-lb"><span>8 h</span><span>13 h</span><span>siesta</span><span>19 h</span></div>
+    </div>
+
+    <div class="grilla">
+      <div class="tarjeta chico"><span class="t-etiqueta">Ganancia · 37 %</span><span class="va num"><span class="peso">$</span>151.400</span><span class="d"><i class="i i-s" data-i="arrow-up-right"></i>17 % más</span></div>
+      <div class="tarjeta chico"><span class="t-etiqueta">Ventas</span><span class="va num">23</span><span class="d"><i class="i i-s" data-i="arrow-up-right"></i>3 más · antes 20</span></div>
+      <div class="tarjeta chico"><span class="t-etiqueta">Ticket promedio</span><span class="va num"><span class="peso">$</span>17.913</span><span class="d gris">igual que el lun 12</span></div>
+      <div class="tarjeta chico urgente"><span class="t-etiqueta" style="color:var(--urgente-texto)">Caja · 19:05</span><span class="va num">−<span class="peso">$</span>2.000</span><span class="d">de menos · Mariela</span></div>
+    </div>
+
+    <div class="tarjeta medios">
+      <div style="display:flex;align-items:center"><span class="t-renglon">Cómo pagaron</span><span class="t-detalle" style="margin-left:auto">23 ventas</span></div>
+      <div class="stack"><b style="flex:186;background:var(--efectivo)"></b><b style="flex:121;background:var(--mp)"></b><b style="flex:68;background:var(--tarjeta)"></b><b style="flex:37;background:var(--cuenta)"></b></div>
+      <div class="ml">
+        <span><i style="background:var(--efectivo)"></i>Efectivo<b class="num">$186.000</b></span>
+        <span><i style="background:var(--mp)"></i>M. Pago<b class="num">$121.000</b></span>
+        <span><i style="background:var(--tarjeta)"></i>Tarjeta<b class="num">$68.000</b></span>
+        <span><i style="background:var(--cuenta)"></i>Cta. cte.<b class="num">$37.000</b></span>
+      </div>
+    </div>
+    <div class="tarjeta" style="padding:14px;display:flex;align-items:center;gap:10px"><span class="t-renglon">Lo más vendido hoy</span><i class="i i-s" data-i="chevron-right" style="margin-left:auto"></i></div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>
+  const hoy=[12,38,54,61,47,9,0,0,44,63,58,26], H=document.getElementById('horas');
+  hoy.forEach((v,i)=>{const s=document.createElement('span'); if(!v) s.className='c'; if(i==11) s.className='ahora'; s.style.height=(v/63*40)+'px'; H.appendChild(s);});
+</script>
+</body>
+</html>

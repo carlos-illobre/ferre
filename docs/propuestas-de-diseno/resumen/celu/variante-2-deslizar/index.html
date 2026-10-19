@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Resumen · Deslizá el período (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { padding: 12px 0 0; display: flex; flex-direction: column; gap: 12px; position: relative; }
+  .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(transparent, var(--fondo)); }
+  .carrusel { flex: none; display: flex; gap: 10px; padding: 0 16px; overflow: hidden; }
+  .heroe { flex: none; width: 334px; padding: 14px 16px 12px; }
+  .heroe.fantasma { opacity: .9; }
+  .heroe .arriba { display: flex; align-items: center; gap: 8px; }
+  .puntos { display: flex; gap: 6px; margin-left: auto; align-items: center; }
+  .puntos b { width: 6px; height: 6px; border-radius: 99px; background: var(--hundido-2); }
+  .puntos b.on { width: 18px; background: var(--pino); }
+  .heroe .t-total { margin-top: 2px; }
+  .heroe .sub { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .delta { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px; border-radius: 99px; font-size: 14px; font-weight: 800; background: var(--logro-suave); color: var(--logro-texto); white-space: nowrap; }
+  .curva { margin-top: 8px; }
+  .curva .lb { display: flex; justify-content: space-between; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .pie-heroe { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--borde); }
+  .pie-heroe div { display: grid; }
+  .pie-heroe div + div { padding-left: 12px; border-left: 1px solid var(--borde); }
+  .pie-heroe .et { font-size: 14px; color: var(--texto-2); font-weight: 650; }
+  .pie-heroe .va { font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -.01em; }
+
+  .feed-cab { flex: none; display: flex; align-items: center; padding: 4px 16px 0; }
+  .feed-cab .t-seccion { font-size: 18px; }
+  .feed-cab .t-detalle { margin-left: auto; }
+  .feed { padding: 0 16px; display: grid; gap: 8px; }
+  .nov { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; }
+  .nov .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .nov .ic.urg { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .nov .ic img { width: 86%; height: 86%; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(26,29,27,.18)); }
+  .nov .tt { font-weight: 750; font-size: 15px; line-height: 20px; }
+  .nov .dd { font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .nov .dato { min-width: 0; padding: 4px 10px; }
+  .nov .dato .va { font-size: 17px; line-height: 22px; }
+  .nov .dato .et { font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>19:12</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · actualizado 19:12</div>
+  <nav class="celu-pestanas"><a class="activa">Resumen</a><a>Usuarios</a><a>Quién hizo</a></nav>
+  <div class="celu-pantalla">
+    <div class="carrusel">
+      <div class="tarjeta-2 heroe">
+        <div class="arriba"><span class="t-etiqueta" style="color:var(--tinta)">Hoy, lunes 19</span><div class="puntos"><b class="on"></b><b></b><b></b></div></div>
+        <div class="t-total num"><span class="peso">$</span>412.000</div>
+        <div class="sub"><span class="delta"><i class="i i-s" data-i="arrow-up-right"></i>16 %</span>contra el lunes 12 a esta hora</div>
+        <div class="curva">
+          <svg viewBox="0 0 302 72" width="302" height="72" id="curva"></svg>
+          <div class="lb"><span>8 h</span><span>siesta</span><span><span style="color:var(--texto-3)">- - lun 12</span> · ahora</span></div>
+        </div>
+        <div class="pie-heroe">
+          <div><span class="et">Ganancia</span><span class="va num">$151.400</span></div>
+          <div><span class="et">Ventas</span><span class="va num">23</span></div>
+          <div><span class="et">Ticket</span><span class="va num">$17.913</span></div>
+        </div>
+      </div>
+      <div class="tarjeta heroe fantasma">
+        <div class="arriba"><span class="t-etiqueta">Últimos 7 días</span></div>
+        <div class="t-total num"><span class="peso">$</span>2.316.000</div>
+      </div>
+    </div>
+
+    <div class="feed-cab"><span class="t-seccion">Lo que pasó hoy</span><span class="t-detalle">4 novedades</span></div>
+    <div class="feed">
+      <div class="tarjeta nov"><span class="ic urg"><i class="i" data-i="wallet"></i></span><div><div class="tt">La caja cerró con menos</div><div class="dd">Mariela · 19:05</div></div><div class="dato urgente"><span class="va num">−$2.000</span></div></div>
+      <div class="tarjeta nov"><span class="ic urg"><i class="i" data-i="hand"></i></span><div><div class="tt">Disco de corte 115 mm</div><div class="dd">Lo pidieron y no había</div></div><div class="dato urgente"><span class="va">3 veces</span></div></div>
+      <div class="tarjeta nov"><span class="ic"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="tt">Látex interior mate 4 L</div><div class="dd">Lo más vendido · 3 un.</div></div><div class="dato"><span class="va num">$69.000</span></div></div>
+      <div class="tarjeta nov"><span class="ic"><i class="i" data-i="truck"></i></span><div><div class="tt">Bulonera Centro</div><div class="dd">Compra · 10:20</div></div><div class="dato"><span class="va num">$184.000</span></div></div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>
+  const a=[0,12,50,104,165,212,221,221,221,265,328,386,412], b=[0,10,40,89,141,182,188,188,188,226,281,332,356];
+  const W=302,H=70, x=i=>i*W/12, y=v=>H-v/412*(H-6)+2;
+  const pa=a.map((v,i)=>`${x(i)},${y(v)}`).join(' L'), pb=b.map((v,i)=>`${x(i)},${y(v)}`).join(' L');
+  document.getElementById('curva').innerHTML=`
+   <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12382F" stop-opacity=".16"/><stop offset="1" stop-color="#12382F" stop-opacity="0"/></linearGradient></defs>
+   <rect x="${x(6)}" y="0" width="${x(2)}" height="${H}" fill="#ECE9E1" rx="4"/>
+   <path d="M${pa} L${W},${H} L0,${H}Z" fill="url(#g)"/>
+   <path d="M${pb}" fill="none" stroke="#CEC8BA" stroke-width="2" stroke-dasharray="4 4"/>
+   <path d="M${pa}" fill="none" stroke="#12382F" stroke-width="2.5" stroke-linejoin="round"/>
+   <circle cx="${W-4}" cy="${y(412)}" r="5" fill="#12382F" stroke="#fff" stroke-width="2"/>
+`;
+</script>
+</body>
+</html>

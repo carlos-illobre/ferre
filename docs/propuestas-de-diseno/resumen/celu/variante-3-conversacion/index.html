@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Resumen · El negocio te cuenta (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .cab { display: flex; align-items: center; gap: 12px; padding: 4px 16px 10px; border-bottom: 1px solid var(--borde); background: var(--superficie); }
+  .barra-estado { background: var(--superficie); }
+  .cab .logo { width: 40px; height: 40px; border-radius: 12px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+  .cab .nm { font-weight: 800; font-size: 17px; line-height: 22px; }
+  .cab .st { font-size: 14px; color: var(--logro-texto); font-weight: 650; display: flex; align-items: center; gap: 6px; }
+  .cab .st i { width: 8px; height: 8px; border-radius: 99px; background: var(--logro); }
+  .hilo { flex: 1; min-height: 0; overflow: hidden; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .cuando { align-self: center; font-size: 14px; font-weight: 700; color: var(--texto-3); background: var(--hundido); padding: 2px 10px; border-radius: 99px; }
+  .msj { max-width: 330px; padding: 12px 14px; border-radius: 18px 18px 18px 6px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); font-size: 16px; line-height: 23px; font-weight: 550; color: var(--texto-2); }
+  .msj b { color: var(--tinta); font-weight: 800; }
+  .msj .verde { color: var(--logro-texto); font-weight: 800; }
+  .msj.urg { border-color: #F5D58E; }
+  .msj.urg .marca-urg { display: flex; align-items: center; gap: 6px; color: var(--urgente-texto); font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+  .yo { align-self: flex-end; padding: 10px 14px; border-radius: 18px 18px 6px 18px; background: var(--pino); color: #fff; font-weight: 700; font-size: 16px; }
+  .nums { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
+  .nums div { background: var(--hundido); border-radius: 10px; padding: 6px 10px; display: grid; }
+  .nums .et { font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; }
+  .nums .va { font-size: 17px; font-weight: 800; color: var(--tinta); line-height: 22px; }
+  .acc { display: flex; gap: 6px; margin-top: 10px; }
+  .acc .btn { min-height: 36px; font-size: 14px; padding: 0 12px; }
+  .dias { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; align-items: end; height: 56px; margin-top: 10px; }
+  .dias span { display: block; border-radius: 5px 5px 2px 2px; background: var(--pino-suave); }
+  .dias span.top { background: var(--pino); }
+  .dias span.c { background: var(--hundido-2); }
+  .dlb { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: 14px; color: var(--texto-3); font-weight: 650; margin-top: 2px; }
+  .escribiendo { display: inline-flex; gap: 4px; padding: 12px 14px; border-radius: 18px 18px 18px 6px; background: var(--superficie); border: 1px solid var(--borde); align-self: flex-start; }
+  .escribiendo b { width: 7px; height: 7px; border-radius: 99px; background: var(--texto-3); opacity: .5; }
+
+  .abajo { flex: none; padding: 10px 16px 30px; background: rgba(255,255,255,.94); border-top: 1px solid var(--borde); }
+  .rapidas { display: flex; gap: 8px; overflow: hidden; }
+  .rapidas .chip { height: 36px; padding: 0 12px; font-size: 14px; flex: none; }
+  .entrada { display: flex; gap: 8px; margin-top: 10px; }
+  .entrada .campo { flex: 1; height: 48px; border-radius: 99px; }
+  .entrada .mic { width: 48px; height: 48px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; box-shadow: var(--sombra-2); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>19:12</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="cab">
+    <span style="color:var(--texto-2);display:flex"><i class="i i-l" data-i="chevron-left"></i></span>
+    <span class="logo"><i class="i" data-i="store"></i></span>
+    <div><div class="nm">Tu negocio</div><div class="st"><i></i>Al día · 19:12</div></div>
+    <span style="margin-left:auto;color:var(--texto-2);display:flex"><i class="i i-l" data-i="calendar-days"></i></span>
+  </div>
+  <div class="hilo">
+    <span class="cuando">Hoy, lunes 19 · 19:10</span>
+    <div class="msj">Hoy vendiste <b class="num">$412.000</b> en 23 ventas, <span class="verde">16 % más</span> que el lunes pasado.
+      <div class="nums"><div><span class="et">Ganancia</span><span class="va num">$151.400</span></div><div><span class="et">Ticket</span><span class="va num">$17.913</span></div><div><span class="et">Efectivo</span><span class="va num">$186.000</span></div></div>
+    </div>
+    <div class="msj urg"><div class="marca-urg"><i class="i i-s" data-i="triangle-alert"></i>Para mirar</div>La caja cerró con <b>$2.000 de menos</b>: Mariela contó $184.000 y las 11 ventas en efectivo suman $186.000.
+      <div class="acc"><button class="btn chico">Ver las 11 ventas</button><button class="btn chico btn-suave">Ya lo sé</button></div>
+    </div>
+    <div class="yo">¿Y la semana?</div>
+    <div class="msj">En 7 días, <b class="num">$2.316.000</b> (<span class="verde">8 % más</span>). El mejor fue el sábado: <b>$547.000</b>.
+      <div class="dias" id="dias"></div>
+      <div class="dlb"><span>m</span><span>m</span><span>j</span><span>v</span><span style="color:var(--pino-texto);font-weight:800">s</span><span>d</span><span>l</span></div>
+    </div>
+  </div>
+  <div class="abajo">
+    <div class="rapidas"><span class="chip"><i class="i i-s" data-i="hourglass"></i>¿Qué no se vende?</span><span class="chip"><i class="i i-s" data-i="truck"></i>Gastos</span><span class="chip"><i class="i i-s" data-i="scale"></i>El mes</span></div>
+    <div class="entrada"><div class="campo">Preguntale a tu negocio…</div><span class="mic"><i class="i" data-i="mic"></i></span></div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+<script>
+  const d=[318,342,296,401,547,0,412], D=document.getElementById('dias');
+  d.forEach((v,i)=>{const s=document.createElement('span'); s.style.height=(v?v/547*56:4)+'px'; if(i==4)s.className='top'; if(i==6)s.style.boxShadow='inset 0 0 0 2px #12382F'; if(!v)s.className='c'; D.appendChild(s);});
+</script>
+</body>
+</html>

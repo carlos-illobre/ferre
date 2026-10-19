@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Resumen · Tablero (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  .pantalla { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
+  .barra-sup { display: flex; align-items: center; gap: 12px; }
+  .barra-sup .segmentos > * { min-height: 38px; font-size: 15px; padding: 0 14px; }
+  .barra-sup .periodo { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .barra-sup .compara { font-size: 14px; color: var(--texto-2); font-weight: 600; text-align: right; line-height: 18px; }
+  .barra-sup .compara b { color: var(--tinta); font-weight: 750; }
+  .seg-kbd { font-size: 14px; color: var(--texto-3); font-weight: 700; margin-left: 2px; }
+
+  .kpis { display: grid; grid-template-columns: 1.25fr 1.25fr 1fr 1fr; gap: 12px; }
+  .kpi { padding: 12px 16px; display: grid; gap: 2px; position: relative; }
+  .kpi .cab { display: flex; align-items: center; gap: 8px; }
+  .kpi .cab .ico { width: 28px; height: 28px; border-radius: 99px; background: var(--pino-suave); color: var(--pino-texto); display: grid; place-items: center; }
+  .kpi .va { font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; }
+  .kpi .va small { font-size: 16px; font-weight: 700; color: var(--texto-2); letter-spacing: 0; margin-left: 6px; }
+  .kpi .comp { white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .delta { white-space: nowrap; flex: none; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 99px; font-size: 14px; font-weight: 750; }
+  .delta.sube { background: var(--logro-suave); color: var(--logro-texto); }
+  .delta.baja { background: var(--error-suave); color: var(--error-texto); }
+  .delta.igual { background: var(--hundido); color: var(--texto-2); }
+  .kpi .explica { position: absolute; top: 14px; right: 14px; color: var(--texto-3); }
+  .kpi.principal { border-color: var(--pino-suave); }
+
+  .medio-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; min-height: 0; }
+  .fila-c { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; }
+  .card { padding: 16px; }
+  .card-cab { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .card-cab .t-seccion { font-size: 18px; line-height: 24px; }
+  .card-cab .der { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .ley { display: inline-flex; align-items: center; gap: 6px; }
+  .ley i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  .grafico { position: relative; height: 158px; display: grid; grid-template-columns: 56px 1fr; }
+  .eje { white-space: nowrap; display: flex; flex-direction: column; justify-content: space-between; font-size: 14px; color: var(--texto-3); font-weight: 600; padding-bottom: 26px; text-align: right; padding-right: 8px; }
+  .area { position: relative; }
+  .area .lineas { position: absolute; inset: 0 0 26px 0; display: flex; flex-direction: column; justify-content: space-between; }
+  .area .lineas span { border-top: 1px dashed var(--borde); }
+  .barras { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); align-items: end; padding-bottom: 26px; }
+  .col { position: relative; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+  .col .ant { position: absolute; bottom: 0; width: 28px; border-radius: 6px 6px 0 0; border: 1.5px dashed var(--borde-fuerte); border-bottom: 0; }
+  .col .hoy { position: relative; width: 20px; border-radius: 6px 6px 0 0; background: var(--pino); }
+  .col.cerrado .hoy { background: none; }
+  .col .h { position: absolute; bottom: -26px; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .col.pico .hoy { background: var(--pino); }
+  .col.pico .globo { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); background: var(--tinta); color: #fff; font-size: 14px; font-weight: 750; padding: 3px 8px; border-radius: 8px; white-space: nowrap; }
+  .col.ahora .hoy { background: repeating-linear-gradient(135deg, var(--pino) 0 6px, var(--pino-2) 6px 12px); opacity: .55; }
+  .siesta { position: absolute; bottom: 26px; height: 100%; display: grid; place-items: end center; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+
+  .stack { display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 2px; margin: 2px 0 10px; }
+  .stack b { display: block; }
+  .medios { display: grid; gap: 2px; }
+  .mrow { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 10px; height: 36px; white-space: nowrap; }
+  .mrow .ic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--cs); color: var(--c); }
+  .mrow .n { font-weight: 700; font-size: 15px; }
+  .mrow .c { font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .mrow .v { font-weight: 800; font-size: 16px; min-width: 88px; text-align: right; }
+
+  .fila-d { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 12px; }
+  .top { display: grid; gap: 6px; }
+  .trow { display: grid; grid-template-columns: 22px 40px 1fr auto; gap: 10px; align-items: center; }
+  .trow .pos { font-weight: 800; color: var(--texto-3); font-size: 14px; text-align: center; }
+  .trow .nm { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .trow .nm small { display: block; font-weight: 500; font-size: 14px; color: var(--texto-2); }
+  .trow .v { font-weight: 800; font-size: 15px; text-align: right; }
+  .trow .v small { display: block; font-weight: 600; font-size: 14px; color: var(--texto-3); }
+  .lista-simple { display: grid; gap: 8px; }
+  .lrow { white-space: nowrap; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 650; }
+  .lrow .x { margin-left: auto; }
+  .caja-dif { display: flex; align-items: baseline; gap: 8px; }
+  .caja-dif .va { font-size: 28px; font-weight: 800; letter-spacing: -.02em; color: var(--urgente-texto); }
+  .cuenta-caja { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 8px; }
+  .cuenta-caja b { color: var(--tinta); font-weight: 750; text-align: right; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Negocio</div>
+      <div class="acciones"><span class="t-detalle" style="font-weight:600">Actualizado 19:12</span><button class="btn chico"><i class="i i-s" data-i="refresh-cw"></i>Actualizar <span class="kbd">F5</span></button></div>
+    </header>
+    <nav class="pestanas"><a class="activa">Resumen</a><a>Usuarios</a><a>Quién hizo qué</a></nav>
+    <section class="pantalla">
+      <div class="barra-sup">
+        <div class="segmentos">
+          <button class="elegido"><i class="i i-s" data-i="chart-column"></i>Ventas</button>
+          <button><i class="i i-s" data-i="truck"></i>Compras</button>
+          <button><i class="i i-s" data-i="boxes"></i>Inventario</button>
+          <button><i class="i i-s" data-i="scale"></i>Resultado</button>
+        </div>
+        <div class="periodo">
+          <div class="compara">Lunes 19/10, hasta las 19:12<br>contra el lunes 12/10, a la misma hora</div>
+          <div class="segmentos">
+            <button class="elegido">Hoy <span class="seg-kbd">D</span></button>
+            <button>Semana <span class="seg-kbd">S</span></button>
+            <button>Mes <span class="seg-kbd">M</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="tarjeta kpi principal">
+          <div class="cab"><span class="ico"><i class="i i-s" data-i="banknote"></i></span><span class="t-etiqueta">Vendido</span></div>
+          <i class="i i-s explica" data-i="info"></i>
+          <div class="va num"><span class="peso">$</span>412.000</div>
+          <div class="comp"><span class="delta sube"><i class="i i-s" data-i="arrow-up-right"></i>16 %</span>+$56.000 · lun 12: $356.000</div>
+        </div>
+        <div class="tarjeta kpi principal">
+          <div class="cab"><span class="ico"><i class="i i-s" data-i="trending-up"></i></span><span class="t-etiqueta">Ganancia</span></div>
+          <i class="i i-s explica" data-i="info"></i>
+          <div class="va num"><span class="peso">$</span>151.400<small>37 %</small></div>
+          <div class="comp"><span class="delta sube"><i class="i i-s" data-i="arrow-up-right"></i>17 %</span>+$21.600 · lun 12: $129.800</div>
+        </div>
+        <div class="tarjeta kpi">
+          <div class="cab"><span class="ico"><i class="i i-s" data-i="receipt"></i></span><span class="t-etiqueta">Ventas</span></div>
+          <div class="va num">23</div>
+          <div class="comp"><span class="delta sube"><i class="i i-s" data-i="arrow-up-right"></i>15 %</span>+3 · lun 12: 20</div>
+        </div>
+        <div class="tarjeta kpi">
+          <div class="cab"><span class="ico"><i class="i i-s" data-i="shopping-bag"></i></span><span class="t-etiqueta">Ticket promedio</span></div>
+          <div class="va num"><span class="peso">$</span>17.913</div>
+          <div class="comp"><span class="delta igual">1 %</span>+$113 · lun 12: $17.800</div>
+        </div>
+      </div>
+
+      <div class="fila-c">
+        <div class="tarjeta card">
+          <div class="card-cab"><span class="t-seccion">Vendido por hora</span>
+            <div class="der" style="margin-left:16px"><span class="ley"><i style="background:var(--pino)"></i>Hoy</span><span class="ley"><i style="border:1.5px dashed var(--borde-fuerte)"></i>Lunes 12</span></div></div>
+          <div class="grafico">
+            <div class="eje"><span>60 mil</span><span>40 mil</span><span>20 mil</span><span>0</span></div>
+            <div class="area"><div class="lineas"><span></span><span></span><span></span><span></span></div><div class="barras" id="barras"></div></div>
+          </div>
+        </div>
+        <div class="tarjeta card">
+          <div class="card-cab"><span class="t-seccion">Cómo pagaron</span><div class="der">ventas · importe</div></div>
+          <div class="stack"><b style="flex:186;background:var(--efectivo)"></b><b style="flex:121;background:var(--mp)"></b><b style="flex:68;background:var(--tarjeta)"></b><b style="flex:37;background:var(--cuenta)"></b></div>
+          <div class="medios">
+            <div class="mrow" style="--c:var(--efectivo);--cs:var(--efectivo-suave)"><span class="ic"><i class="i i-s" data-i="banknote"></i></span><span class="n">Efectivo <span class="c">· 11</span></span><span class="v num">$186.000</span></div>
+            <div class="mrow" style="--c:var(--mp);--cs:var(--mp-suave)"><span class="ic"><i class="i i-s" data-i="qr-code"></i></span><span class="n">Mercado Pago <span class="c">· 7</span></span><span class="v num">$121.000</span></div>
+            <div class="mrow" style="--c:var(--tarjeta);--cs:var(--tarjeta-suave)"><span class="ic"><i class="i i-s" data-i="credit-card"></i></span><span class="n">Tarjeta <span class="c">· 3</span></span><span class="v num">$68.000</span></div>
+            <div class="mrow" style="--c:var(--cuenta);--cs:var(--cuenta-suave)"><span class="ic"><i class="i i-s" data-i="notebook-pen"></i></span><span class="n">Cuenta corriente <span class="c">· 2</span></span><span class="v num">$37.000</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fila-d">
+        <div class="tarjeta card">
+          <div class="card-cab"><span class="t-seccion">Lo más vendido hoy</span><div class="der">por dinero · <a style="color:var(--pino-texto);font-weight:750">Ver los 40</a></div></div>
+          <div class="top">
+            <div class="trow"><span class="pos">1</span><span class="foto chica"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><span class="nm">Látex interior mate blanco 4 L<small>Alba · 3 un.</small></span><span class="v num">$69.000</span></div>
+            <div class="trow"><span class="pos">2</span><span class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><span class="nm">Mecha acero rápido HSS 8 mm<small>Ezeta · 8 un.</small></span><span class="v num">$56.000</span></div>
+          </div>
+        </div>
+        <div class="tarjeta card">
+          <div class="card-cab"><span class="t-seccion">No llevaron</span><span class="pastilla urgente" style="height:24px">4</span></div>
+          <div class="lista-simple">
+            <div class="lrow"><i class="i i-s" data-i="package"></i>Disco de corte 115 mm<span class="pastilla x" style="height:24px">× 3</span></div>
+            <div class="lrow"><i class="i i-s" data-i="package"></i>Silicona transparente<span class="pastilla x" style="height:24px">× 1</span></div>
+            <div class="lrow" style="color:var(--texto-2)"><i class="i i-s" data-i="package"></i>Lija al agua grano 180<span class="pastilla x" style="height:24px">× 1</span></div>
+          </div>
+        </div>
+        <div class="tarjeta card">
+          <div class="card-cab"><span class="t-seccion">Cierre de caja</span><span class="t-detalle" style="margin-left:auto">19:05 · Mariela</span></div>
+          <div class="caja-dif"><span class="va num">−<span class="peso">$</span>2.000</span><span class="pastilla urgente" style="height:24px">de menos</span></div>
+          <div class="cuenta-caja"><span>Contado</span><b class="num">$184.000</b><span>Esperado en efectivo</span><b class="num">$186.000</b></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  const hoy = [12,38,54,61,47,9,0,0,44,63,58,26], ant=[10,30,49,52,41,6,0,0,38,55,51,24];
+  const hs = ['8','9','10','11','12','13','14','15','16','17','18','19'];
+  const k = 120/63; const el = document.getElementById('barras');
+  hoy.forEach((v,i)=>{
+    const c=document.createElement('div'); c.className='col'+(i==9?' pico':'')+(i==11?' ahora':'');
+    c.innerHTML = (ant[i]?`<span class="ant" style="height:${ant[i]*k}px"></span>`:'')+(v?`<span class="hoy" style="height:${v*k}px">${i==9?'<span class="globo">$63.000</span>':''}</span>`:'')+`<span class="h">${hs[i]}</span>`;
+    el.appendChild(c);
+  });
+  const s=document.createElement('div'); s.className='siesta'; s.style.left='50%'; s.style.width='16.6%'; s.style.transform='translateX(0)'; s.innerHTML='<span style="padding-bottom:6px">Cerrado</span>'; el.appendChild(s);
+</script>
+</body>
+</html>

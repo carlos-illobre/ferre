@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Resumen · El día contado (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  .pantalla { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
+  .dia-nav { display: inline-flex; align-items: center; gap: 4px; padding: 3px; border-radius: var(--r); background: var(--hundido); }
+  .dia-nav .btn { min-height: 34px; height: 34px; box-shadow: none; border: 0; background: transparent; }
+  .dia-nav .hoy { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: 9px; background: var(--superficie); box-shadow: var(--sombra-1); font-weight: 750; font-size: 15px; }
+  .ver-como { display: inline-flex; align-items: center; gap: 8px; }
+  .ver-como .rol { font-weight: 750; color: var(--tinta); }
+
+  .titular { padding: 18px 20px 16px; display: grid; grid-template-columns: 1fr auto; gap: 12px 24px; align-items: center; }
+  .frase { font-size: 23px; line-height: 32px; font-weight: 650; letter-spacing: -.01em; color: var(--texto-2); }
+  .frase b { color: var(--tinta); font-weight: 800; }
+  .frase .sube { color: var(--logro-texto); font-weight: 800; }
+  .frase .ojo { color: var(--urgente-texto); font-weight: 800; background: var(--urgente-suave); padding: 0 6px; border-radius: 6px; }
+  .mirar { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
+  .mirar .et { font-size: 14px; font-weight: 700; color: var(--texto-3); margin-right: 4px; }
+  .mirar .pastilla { height: 32px; padding: 0 12px; }
+  .mirar .pastilla .i-s { margin-left: 2px; }
+  .anillo { width: 92px; height: 92px; position: relative; grid-row: 1; grid-column: 2; }
+  .anillo .c { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font-size: 14px; line-height: 16px; font-weight: 700; color: var(--texto-2); }
+  .anillo .c b { display: block; font-size: 20px; line-height: 22px; color: var(--tinta); font-weight: 800; }
+
+  .bento { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0,1.6fr) minmax(0,1fr) minmax(0,.9fr); gap: 12px; }
+  .card { padding: 16px; display: flex; flex-direction: column; min-height: 0; }
+  .card-cab { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .card-cab .t-seccion { font-size: 18px; line-height: 24px; }
+  .card-cab .der { margin-left: auto; font-size: 14px; color: var(--texto-2); font-weight: 600; display: flex; gap: 8px; align-items: center; }
+
+  .periodos { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  .per { padding: 10px 12px; border-radius: var(--r); background: var(--hundido); display: grid; gap: 0; }
+  .per.elegido { background: var(--superficie); box-shadow: inset 0 0 0 2px var(--pino); }
+  .per .et { font-size: 14px; font-weight: 700; color: var(--texto-2); display: flex; justify-content: space-between; }
+  .per .va { white-space: nowrap; font-size: 21px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; }
+  .per .d { font-size: 14px; font-weight: 750; color: var(--logro-texto); display: flex; align-items: center; gap: 2px; white-space: nowrap; }
+  .per .d span { color: var(--texto-3); font-weight: 600; margin-left: 4px; }
+  .per .g { font-size: 14px; font-weight: 600; color: var(--texto-2); white-space: nowrap; }
+
+  .semana { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); align-items: end; gap: 10px; margin-top: 14px; padding: 0 4px; position: relative; min-height: 0; }
+  .dcol { display: grid; justify-items: center; gap: 6px; height: 100%; align-content: end; position: relative; }
+  .dcol .b { width: 100%; max-width: 44px; border-radius: 8px 8px 4px 4px; background: var(--pino-suave); position: relative; }
+  .dcol .b .gan { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 0 0 4px 4px; background: rgba(18,56,47,.22); }
+  .dcol.hoy .b { background: var(--pino); }
+  .dcol.hoy .b .gan { background: rgba(255,255,255,.22); }
+  .dcol .v { white-space: nowrap; font-size: 14px; font-weight: 750; color: var(--texto-2); }
+  .dcol.hoy .v { color: var(--tinta); }
+  .dcol .n { font-size: 14px; font-weight: 650; color: var(--texto-3); }
+  .dcol.hoy .n { color: var(--pino-texto); font-weight: 800; }
+  .dcol .tick { position: absolute; left: 50%; width: 52px; margin-left: -26px; border-top: 2px dashed var(--borde-fuerte); }
+  .dcol.cerr .b { background: repeating-linear-gradient(135deg, var(--hundido) 0 6px, var(--hundido-2) 6px 12px); }
+  .ley { display: flex; gap: 14px; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 10px; }
+  .ley i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  .trow { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 10px; align-items: center; padding: 5px 0; }
+  .trow + .trow { border-top: 1px solid var(--borde); }
+  .trow .nm { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .trow .nm small { display: block; font-weight: 500; font-size: 14px; color: var(--texto-2); }
+  .trow .v { font-weight: 800; font-size: 15px; text-align: right; }
+  .trow .barrita { height: 4px; border-radius: 9px; background: var(--hundido-2); margin-top: 4px; overflow: hidden; }
+  .trow .barrita b { display: block; height: 100%; background: var(--pino); border-radius: 9px; }
+  .parado { margin-top: auto; padding: 10px 12px; border-radius: var(--r); background: var(--urgente-suave); display: flex; align-items: center; gap: 10px; color: var(--urgente-texto); font-weight: 650; font-size: 14px; line-height: 18px; }
+  .parado b { font-size: 16px; color: var(--urgente-texto); font-weight: 800; display: block; }
+
+  .dinero { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .mini { padding: 14px 16px; }
+  .mini .cab { white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .mini .cab .der { margin-left: auto; color: var(--texto-3); font-weight: 600; }
+  .mini .va { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; }
+  .mini .va small { white-space: nowrap; font-size: 14px; font-weight: 700; color: var(--texto-2); letter-spacing: 0; margin-left: 6px; }
+  .segs { display: flex; gap: 2px; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 8px; }
+  .segs b { display: block; background: var(--pino); }
+  .prov { font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prov b { color: var(--tinta); font-weight: 750; }
+  .meses { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; align-items: center; height: 64px; margin-top: 6px; position: relative; }
+  .meses::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--borde-fuerte); }
+  .meses span { display: block; border-radius: 3px; background: var(--logro); align-self: end; margin-bottom: 32px; }
+  .meses span.neg { background: var(--error); align-self: start; margin-top: 32px; margin-bottom: 0; }
+  .meses span.curso { background: repeating-linear-gradient(135deg, var(--logro) 0 3px, var(--logro-suave) 3px 6px); }
+  .meses span.ult { background: var(--logro-texto); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Negocio</div>
+      <div class="acciones">
+        <div class="dia-nav"><button class="btn btn-icono chico"><i class="i" data-i="chevron-left"></i></button><span class="hoy"><i class="i i-s" data-i="calendar-days"></i>Hoy, lunes 19/10</span><button class="btn btn-icono chico" disabled><i class="i" data-i="chevron-right"></i></button></div>
+        <button class="btn chico ver-como"><i class="i i-s" data-i="eye"></i>Ver como <span class="rol">Administrador</span><i class="i i-s" data-i="chevron-down"></i></button>
+        <button class="btn chico btn-icono" title="Actualizar"><i class="i i-s" data-i="refresh-cw"></i></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a class="activa">Resumen</a><a>Usuarios</a><a>Quién hizo qué</a></nav>
+    <section class="pantalla">
+      <div class="tarjeta titular">
+        <div class="frase">Hoy se vendieron <b class="num">$412.000</b> en <b>23 ventas</b>, <span class="sube">16 % más</span> que el lunes pasado a esta hora. Ganaste <b class="num">$151.400</b>. La caja cerró con <span class="ojo">$2.000 de menos</span>.</div>
+        <div class="anillo">
+          <svg viewBox="0 0 92 92" width="92" height="92"><circle cx="46" cy="46" r="38" fill="none" stroke="var(--hundido-2)" stroke-width="10"/><circle cx="46" cy="46" r="38" fill="none" stroke="var(--logro)" stroke-width="10" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="0" transform="rotate(-90 46 46)"/><circle cx="46" cy="46" r="38" fill="none" stroke="var(--logro-texto)" stroke-width="10" stroke-linecap="round" stroke-dasharray="83 300" transform="rotate(-90 46 46)"/></svg>
+          <div class="c"><div><b>135 %</b>del piso</div></div>
+        </div>
+        <div class="mirar">
+                    <span class="pastilla urgente"><i class="i i-s" data-i="wallet"></i>Caja: $2.000 de menos<i class="i i-s" data-i="chevron-right"></i></span>
+          <span class="pastilla urgente"><i class="i i-s" data-i="triangle-alert"></i>28 con stock bajo<i class="i i-s" data-i="chevron-right"></i></span>
+          <span class="pastilla contorno"><i class="i i-s" data-i="clipboard-list"></i>3 pedidos sin entregar<i class="i i-s" data-i="chevron-right"></i></span>
+          <span class="pastilla contorno"><i class="i i-s" data-i="file-text"></i>2 listas sin aplicar<i class="i i-s" data-i="chevron-right"></i></span>
+        </div>
+      </div>
+
+      <div class="bento">
+        <div class="tarjeta card">
+          <div class="card-cab"><span class="t-seccion">Ventas</span><div class="der">contra el mismo tramo anterior</div></div>
+          <div class="periodos">
+            <div class="per elegido"><div class="et">Hoy</div><div class="va num">$412.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>16 %<span>23 ventas</span></div></div>
+            <div class="per"><div class="et">7 días</div><div class="va num">$2.316.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>8 %<span>131 ventas</span></div></div>
+            <div class="per"><div class="et">Octubre</div><div class="va num">$7.684.000</div><div class="d"><i class="i i-s" data-i="arrow-up-right"></i>8 %<span>441 ventas</span></div></div>
+          </div>
+          <div class="semana" id="semana"></div>
+          <div class="ley"><span><i style="background:var(--pino)"></i>Vendido</span><span><i style="background:rgba(18,56,47,.22)"></i>de eso, ganancia</span><span><i style="border-top:2px dashed var(--borde-fuerte);height:0;border-radius:0"></i>la semana anterior</span></div>
+        </div>
+
+        <div class="tarjeta card">
+          <div class="card-cab"><span class="t-seccion">Lo que más sale</span><div class="der">7 días</div></div>
+          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="nm">Látex interior mate blanco 4 L<small>14 un. · <b style="color:var(--tinta)">$322.000</b></small></div><div class="barrita"><b style="width:100%"></b></div></div></div>
+          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="nm">Mecha acero rápido HSS 8 mm<small>38 un. · <b style="color:var(--tinta)">$266.000</b></small></div><div class="barrita"><b style="width:83%"></b></div></div></div>
+          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="nm">Cinta métrica PowerLock 5 m<small>12 un. · <b style="color:var(--tinta)">$204.000</b></small></div><div class="barrita"><b style="width:63%"></b></div></div></div>
+          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><div class="nm">Clavos punta París 2"<small>18,5 kg · <b style="color:var(--tinta)">$148.000</b></small></div><div class="barrita"><b style="width:46%"></b></div></div></div>
+          <div class="trow"><span class="foto chica"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div><div class="nm">Lámpara LED 12 W luz fría<small>34 un. · <b style="color:var(--tinta)">$119.000</b></small></div><div class="barrita"><b style="width:37%"></b></div></div></div>
+          <div class="parado"><i class="i" data-i="hourglass"></i><div><b class="num">$312.000 parados</b>17 productos sin venderse hace 90 días</div><i class="i i-s" data-i="chevron-right" style="margin-left:auto"></i></div>
+        </div>
+
+        <div class="dinero">
+          <div class="tarjeta mini">
+            <div class="cab"><i class="i i-s" data-i="truck"></i>Gastos de la semana</div>
+            <div class="va num">$1.284.000<small>del 13 al 19/10</small></div>
+            <div class="segs"><b style="flex:512"></b><b style="flex:398;opacity:.7"></b><b style="flex:236;opacity:.45"></b><b style="flex:138;opacity:.25"></b></div>
+            <div class="prov"><b>Bulonera Centro</b> $512.000 y 3 más</div>
+          </div>
+          <div class="tarjeta mini">
+            <div class="cab"><i class="i i-s" data-i="boxes"></i>Dinero invertido en stock</div>
+            <div class="va num">$23.480.000</div>
+            <div class="prov">Por su costo vigente, sin IVA</div>
+          </div>
+          <div class="tarjeta mini" style="flex:1">
+            <div class="cab"><i class="i i-s" data-i="scale"></i>Resultado de septiembre</div>
+            <div class="va num" style="color:var(--logro-texto)">+$1.360.000<small>a favor</small></div>
+            <div class="meses" id="meses"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  const dias=[['Mar',318,118,296],['Mié',342,125,311],['Jue',296,108,288],['Vie',401,147,379],['Sáb',547,203,498],['Dom',0,0,0],['Lun',412,151,356]];
+  const k=168/547, sem=document.getElementById('semana');
+  dias.forEach((d,i)=>{const c=document.createElement('div');c.className='dcol'+(i==6?' hoy':'')+(d[1]==0?' cerr':'');
+    c.innerHTML=`<span class="v">${d[1]?(d[1]+' mil'):'Cerrado'}</span><span class="b" style="height:${d[1]?d[1]*k:18}px"><span class="gan" style="height:${d[2]*k}px"></span></span><span class="n">${d[0]}</span>`+(d[3]?`<span class="tick" style="bottom:${26+d[3]*k}px"></span>`:'');sem.appendChild(c);});
+  const r=[980,1840,620,-140,410,760,890,540,1120,1010,1360,820], m=document.getElementById('meses');
+  r.forEach((v,i)=>{const s=document.createElement('span');s.style.height=Math.max(5,Math.abs(v)/1840*30)+'px';if(v<0)s.className='neg';if(i==11)s.className='curso';if(i==10)s.className='ult';m.appendChild(s);});
+</script>
+</body>
+</html>
