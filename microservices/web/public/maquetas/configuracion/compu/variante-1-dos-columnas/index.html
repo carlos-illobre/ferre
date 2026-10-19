@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../config.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interaccion.css">
+<script src="../../interaccion.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .resumenes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .resumen .va { font-size: 20px; line-height: 26px; }
@@ -50,16 +53,16 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
-    <div class="nav-sub"><a>Anomalías</a><a>Procesos</a><a>Mejoras y errores</a><a class="activo">Configuración</a></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="nav-sub"><a data-ir="anomalias">Anomalías</a><a data-ir="procesos">Procesos</a><a data-ir="mejoras-y-errores">Mejoras y errores</a><a class="activo" data-ir="configuracion">Configuración</a></div>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
-      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+      <div class="usuario" data-usuario><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
     </div>
   </nav>
   <main class="contenido">
@@ -74,18 +77,18 @@
             <div class="pref">
               <div class="cab">
                 <span class="ico"><i class="i" data-i="sparkles"></i></span>
-                <div><div class="tt">Animaciones</div><div class="dd">Las ventanas y los avisos aparecen con un movimiento corto. Si las apagás, todo aparece en el acto. En el celular, además, las pantallas se deslizan.</div></div>
-                <span class="kbd">Alt A</span><span class="llave si"></span>
+                <div><div class="tt">Animaciones</div><div class="dd" id="cf-dd-anim">Las ventanas y los avisos aparecen con un movimiento corto. Si las apagás, todo aparece en el acto. En el celular, además, las pantallas se deslizan.</div></div>
+                <span class="kbd">Alt A</span><span class="llave si" id="cf-ll-anim"></span>
               </div>
-              <div class="vista"><div class="ventanita"><b></b><i></i></div><span class="t-detalle">Así se mueve: la ventana sube y se aclara; el aviso entra desde abajo.</span></div>
+              <div class="vista"><div class="ventanita"><b></b><i></i></div><span class="t-detalle" id="cf-vista-txt">Así se mueve: la ventana sube y se aclara; el aviso entra desde abajo.</span></div>
             </div>
             <div class="pref">
               <div class="cab">
                 <span class="ico"><i class="i" data-i="refresh-cw"></i></span>
-                <div><div class="tt">Buscar versión nueva</div><div class="dd">Mientras la aplicación está a la vista, cada cuánto se fija si hay una versión nueva. También se fija al abrirla y cada vez que se vuelve a ella. Más seguido se entera antes y gasta un poco más de datos.</div></div>
-                <span class="kbd">Alt B</span><span class="llave si"></span>
+                <div><div class="tt">Buscar versión nueva</div><div class="dd" id="cf-dd-ver">Mientras la aplicación está a la vista, cada cuánto se fija si hay una versión nueva. También se fija al abrirla y cada vez que se vuelve a ella. Más seguido se entera antes y gasta un poco más de datos.</div></div>
+                <span class="kbd">Alt B</span><span class="llave si" id="cf-ll-ver"></span>
               </div>
-              <div class="cuatro"><b>5 min</b><b class="elegido">15 min</b><b>1 hora</b><b>24 horas</b></div>
+              <div class="cuatro" id="cf-cuatro"><b>5 min</b><b class="elegido">15 min</b><b>1 hora</b><b>24 horas</b></div>
             </div>
           </div>
           <div class="guarda">
@@ -102,16 +105,131 @@
             <div class="nota"><i class="i i-s" data-i="info"></i>Para sumar un celular, entrá con Google desde él: te ofrece la huella solo.</div>
           </div>
 
-          <div class="grupo vinc">
+          <div class="grupo vinc" id="cf-vinc">
             <div class="par"><span class="disp"><i class="i" data-i="smartphone"></i></span><span class="linea"></span><span class="pastilla logro"><span class="punto"></span>Trabajando juntos</span><span class="linea"></span><span class="disp"><i class="i" data-i="monitor"></i></span></div>
             <div style="margin-top:12px;font-weight:750">Vinculada con Moto G54</div>
             <div class="t-detalle">Hasta el 16/11. Se renueva cada vez que entrás escaneando con el celular.</div>
-            <div class="botones"><button class="btn chico">Desconectar <span class="kbd">Alt O</span></button><button class="btn btn-peligro chico">Desvincular <span class="kbd">Alt U</span></button></div>
+            <div class="botones"><button class="btn chico" data-desc>Desconectar <span class="kbd">Alt O</span></button><button class="btn btn-peligro chico" data-desv>Desvincular <span class="kbd">Alt U</span></button></div>
           </div>
         </div>
       </div>
     </section>
   </main>
 </div>
+<script>
+// Interacciones de la maqueta (Configuración · computadora 1 · Dos columnas)
+document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
+  CF.prepararLlaves();
+
+  // Más: pliega y despliega su lista en el lateral; Configuración es esta pantalla
+  var mas = $('[data-mas]'), sub = $('.nav-sub');
+  if (mas) mas.addEventListener('click', function (e) { e.preventDefault(); if (sub.hidden) CF.desplegar(sub); else CF.plegar(sub); });
+  CF.noSalir($('.nav-sub a.activo'));
+  // La persona: menú chico con Cerrar sesión
+  var usuario = $('[data-usuario]');
+  if (usuario) usuario.addEventListener('click', function () {
+    CF.abrir({ tipo: 'menu', ancla: usuario, etiqueta: 'Tu sesión', html:
+      '<div class="cf-op" style="cursor:default;color:var(--texto-2);font-weight:600">carlos.illobre@gmail.com</div>' +
+      '<div class="cf-op" data-cerrar><i class="i" data-i="settings"></i>Configuración</div>' +
+      '<div class="cf-op" data-ir="entrar"><i class="i" data-i="log-out"></i>Cerrar sesión</div>' });
+  });
+  // El espejo del lateral sigue al vínculo
+  var espejo = $('.lateral .vinculo');
+  function pintarEspejo(estado) {
+    if (!espejo) return;
+    CF.fundir(espejo, function () {
+      espejo.innerHTML = { espejo: '<i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div>',
+        desconectado: '<i class="i" data-i="smartphone"></i><div class="txt">Celular desconectado<small>Moto G54</small></div>',
+        sin: '<i class="i" data-i="qr-code"></i><div class="txt">Vincular celular<small>Escaneá con el celular</small></div>' }[estado];
+      espejo.setAttribute('style', estado === 'espejo' ? '' : estado === 'desconectado' ? 'background:var(--hundido);color:var(--texto-2)' : 'background:var(--superficie);color:var(--tinta);border:1px solid var(--borde)');
+      CF.pintar(espejo);
+    });
+  }
+
+  // Animaciones (Alt A): la vista previa se congela en su estado final
+  var llAnim = $('#cf-ll-anim'), ddAnim = $('#cf-dd-anim'), vistaTxt = $('#cf-vista-txt');
+  function animaciones() {
+    var si = CF.llave(llAnim);
+    CF.texto(ddAnim, si ? 'Las ventanas y los avisos aparecen con un movimiento corto. Si las apagás, todo aparece en el acto. En el celular, además, las pantallas se deslizan.'
+                        : 'Apagadas: las ventanas y los avisos aparecen en el acto, sin moverse. En el celular, las pantallas cambian sin deslizarse.');
+    CF.texto(vistaTxt, si ? 'Así se mueve: la ventana sube y se aclara; el aviso entra desde abajo.' : 'Así queda: la ventana y el aviso ya están, sin movimiento.');
+    if (si) document.body.classList.remove('sin-animaciones');
+    else setTimeout(function () { document.body.classList.add('sin-animaciones'); }, 200);
+  }
+  CF.alTocar(llAnim, animaciones);
+
+  // Buscar versión nueva (Alt B) y los cuatro botones
+  var llVer = $('#cf-ll-ver'), ddVer = $('#cf-dd-ver'), cuatro = $('#cf-cuatro');
+  var BASE = 'Mientras la aplicación está a la vista, cada cuánto se fija si hay una versión nueva. También se fija al abrirla y cada vez que se vuelve a ella. ';
+  var EXPLICA = { '5 min': BASE + 'Cada 5 minutos se entera enseguida y gasta un poco más de datos.', '15 min': BASE + 'Más seguido se entera antes y gasta un poco más de datos.',
+    '1 hora': BASE + 'Cada una hora gasta menos datos y se entera un rato después.', '24 horas': BASE + 'Una vez por día casi no gasta datos.' };
+  CF.cuatro(cuatro, function (t) { CF.texto(ddVer, EXPLICA[t]); });
+  function version() {
+    var si = CF.llave(llVer);
+    if (si) { CF.desplegar(cuatro); CF.texto(ddVer, EXPLICA[$('b.elegido', cuatro).textContent.trim()]); }
+    else { CF.plegar(cuatro); CF.texto(ddVer, 'No busca sola: se fija solo al abrir la aplicación y cada vez que se vuelve a ella.'); }
+  }
+  CF.alTocar(llVer, version);
+
+  // Celulares con huella: Quitar pregunta; el renglón se colapsa y se puede deshacer
+  $$('.cel').forEach(function (cel) {
+    var nombre = $('.tt', cel).textContent.trim();
+    $('button', cel).addEventListener('click', function () {
+      CF.confirmar({ titulo: '¿Quitar la huella del ' + nombre + '?', texto: 'Desde ese celular ya no se va a poder entrar con la huella: va a tener que entrar con Google. Se la vuelve a ofrecer la próxima vez que entre.', si: 'Quitar huella', peligro: true,
+        alSi: function () { CF.colapsar(cel); CF.tostada('Quitaste la huella del ' + nombre, { deshacer: function () { cel.hidden = false; CF.entrar(cel); } }); } });
+    });
+  });
+
+  // Vínculo: Desconectar (Alt O) y Desvincular (Alt U)
+  var vinc = $('#cf-vinc'), original = vinc.innerHTML, estado = 'espejo';
+  function pintarVinculo() {
+    CF.fundir(vinc, function () {
+      if (estado === 'sin') {
+        vinc.innerHTML = '<div class="par"><span class="disp"><i class="i" data-i="smartphone"></i></span><span class="linea" style="background:var(--borde)"></span><span class="pastilla"><i class="i i-s" data-i="unlink"></i>Sin vincular</span><span class="linea" style="background:var(--borde)"></span><span class="disp"><i class="i" data-i="monitor"></i></span></div>' +
+          '<div style="margin-top:12px;font-weight:750">Sin celular vinculado</div><div class="t-detalle">Para trabajar en espejo, escaneá con el celular el código de esta computadora.</div>' +
+          '<div class="botones"><button class="btn chico" data-vincular><i class="i i-s" data-i="qr-code"></i>Mostrar el código</button></div>';
+      } else {
+        vinc.innerHTML = original;
+        if (estado === 'desconectado') {
+          $('.pastilla', vinc).outerHTML = '<span class="pastilla"><span class="punto"></span>Desconectados</span>';
+          $$('.linea', vinc).forEach(function (l) { l.style.background = 'repeating-linear-gradient(90deg, var(--borde-fuerte) 0 6px, transparent 6px 10px)'; });
+          $('.t-detalle', vinc).textContent = 'Cada uno trabaja por su lado. El vínculo sigue hasta el 16/11.';
+          $('[data-desc]', vinc).firstChild.textContent = 'Conectar ';
+        }
+      }
+      CF.pintar(vinc); conectarVinculo();
+    });
+    pintarEspejo(estado);
+  }
+  function desconectar() {
+    if (estado === 'sin') return;
+    estado = estado === 'espejo' ? 'desconectado' : 'espejo'; pintarVinculo();
+    CF.tostada(estado === 'espejo' ? 'De nuevo en espejo con el Moto G54' : 'Desconectada del Moto G54', { icono: estado === 'espejo' ? 'link' : 'unlink' });
+  }
+  function desvincular() {
+    if (estado === 'sin') return;
+    CF.confirmar({ titulo: '¿Desvincular del Moto G54?', texto: 'Dejan de trabajar en espejo. Para volver a unirlos, escaneá con el celular el código de esta computadora.', si: 'Desvincular', peligro: true,
+      alSi: function () { var antes = estado; estado = 'sin'; pintarVinculo(); CF.tostada('Desvinculaste el Moto G54', { icono: 'unlink', deshacer: function () { estado = antes; pintarVinculo(); } }); } });
+  }
+  function vincular() { CF.escanearVinculo(function () { estado = 'espejo'; pintarVinculo(); CF.tostada('Vinculada con el Moto G54', { tilde: true }); }); }
+  function conectarVinculo() {
+    var d = $('[data-desc]', vinc), u = $('[data-desv]', vinc), v = $('[data-vincular]', vinc);
+    if (d) d.addEventListener('click', desconectar);
+    if (u) u.addEventListener('click', desvincular);
+    if (v) v.addEventListener('click', vincular);
+  }
+  conectarVinculo();
+  espejo.addEventListener('click', function () { if (estado === 'sin') vincular(); else { vinc.scrollIntoView({ block: 'nearest' }); CF.entrar(vinc); } });
+
+  // Teclado: Alt + letra (decisión 80)
+  document.addEventListener('keydown', function (e) {
+    if (!e.altKey || CF.abiertas()) return;
+    var k = { KeyA: animaciones, KeyB: version, KeyO: desconectar, KeyU: desvincular }[e.code];
+    if (k) { e.preventDefault(); k(); }
+  });
+});
+</script>
 </body>
 </html>

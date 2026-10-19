@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../config.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interaccion.css">
+<script src="../../interaccion.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .celu-pantalla { padding-bottom: 24px; }
@@ -36,17 +39,17 @@
 <body>
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
-  <a class="volver"><i class="i" data-i="chevron-left"></i>Más</a>
-  <div class="celu-cabecera"><span class="t-titulo">Configuración</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <a class="volver" data-mas><i class="i" data-i="chevron-left"></i>Más</a>
+  <div class="celu-cabecera"><span class="t-titulo">Configuración</span><span class="btn-vinculo" id="cf-btn-vinculo" role="button" tabindex="0"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
 
   <div class="celu-pantalla">
     <div class="grupo ocupa">
-      <span class="ico"><i class="i i-l" data-i="hard-drive"></i></span>
+      <span class="ico" id="cf-ico-ocupa"><i class="i i-l" data-i="hard-drive"></i></span>
       <div>
         <div class="t-etiqueta">Guardado en este celular</div>
-        <div class="va num">38 KB <small>de 150 KB · nada del negocio</small></div>
-        <div class="barra"><b style="width:25%"></b></div>
+        <div class="va num"><span id="cf-num">38 KB</span> <small id="cf-sub">de 150 KB · nada del negocio</small></div>
+        <div class="barra"><b id="cf-barra" style="width:25%"></b></div>
       </div>
     </div>
 
@@ -54,19 +57,19 @@
     <div class="grupo">
       <div class="ajuste">
         <span class="ico"><i class="i" data-i="sparkles"></i></span>
-        <div><div class="tt">Animaciones</div><div class="dd">Las pantallas se deslizan al navegar.</div></div>
-        <span class="llave si"></span>
+        <div><div class="tt">Animaciones</div><div class="dd" id="cf-dd-anim">Las pantallas se deslizan al navegar.</div></div>
+        <span class="llave si" id="cf-ll-anim"></span>
       </div>
       <div class="ajuste">
-        <span class="ico gris"><i class="i" data-i="wifi-off"></i></span>
-        <div><div class="tt">Trabajar sin conexión</div><div class="dd">Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.</div></div>
-        <span class="llave"></span>
+        <span class="ico gris" id="cf-ico-sin"><i class="i" data-i="wifi-off"></i></span>
+        <div><div class="tt">Trabajar sin conexión</div><div class="dd" id="cf-dd-sin">Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.</div></div>
+        <span class="llave" id="cf-ll-sin"></span>
       </div>
     </div>
 
-    <div class="titulo-grupo">Cómo buscar productos</div>
-    <p class="explica">Como este celular no guarda el catálogo, hay dos formas de buscar. Elegí la que te resulte mejor.</p>
-    <div class="opcion elegida">
+    <div class="titulo-grupo cf-buscar">Cómo buscar productos</div>
+    <p class="explica cf-buscar">Como este celular no guarda el catálogo, hay dos formas de buscar. Elegí la que te resulte mejor.</p>
+    <div class="opcion elegida cf-buscar">
       <span class="radio"></span>
       <div>
         <div class="tt">Bajar el catálogo al abrir</div>
@@ -74,7 +77,7 @@
         <div class="contra"><i class="i i-s" data-i="circle-minus"></i>Abrir tarda unos segundos más y gasta datos cada vez.</div>
       </div>
     </div>
-    <div class="opcion">
+    <div class="opcion cf-buscar">
       <span class="radio"></span>
       <div>
         <div class="tt">Buscar en el servidor</div>
@@ -87,35 +90,192 @@
     <div class="grupo version">
       <div class="fila">
         <span class="ico" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--pino-suave);color:var(--pino-texto)"><i class="i" data-i="refresh-cw"></i></span>
-        <div><div style="font-weight:750">Buscar versión nueva</div><div class="t-detalle">Cada cuánto, con la app abierta. Más seguido gasta un poco más de datos.</div></div>
-        <span class="llave si"></span>
+        <div><div style="font-weight:750">Buscar versión nueva</div><div class="t-detalle" id="cf-dd-ver">Cada cuánto, con la app abierta. Más seguido gasta un poco más de datos.</div></div>
+        <span class="llave si" id="cf-ll-ver"></span>
       </div>
-      <div class="cuatro"><b>5 min</b><b class="elegido">15 min</b><b>1 hora</b><b>24 horas</b></div>
+      <div class="cuatro" id="cf-cuatro"><b>5 min</b><b class="elegido">15 min</b><b>1 hora</b><b>24 horas</b></div>
     </div>
 
-    <div class="titulo-grupo">Mis celulares con huella <span class="pastilla">2</span></div>
+    <div class="titulo-grupo">Mis celulares con huella <span class="pastilla" id="cf-cuenta-huellas">2</span></div>
     <div class="grupo">
       <div class="cel"><span class="ico" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--logro-suave);color:var(--logro-texto)"><i class="i" data-i="fingerprint"></i></span><div><div class="tt">Moto G54 <span class="pastilla logro" style="height:24px;margin-left:4px">Este</span></div><div class="dd">Vinculado el 02/10</div></div><button class="btn btn-fantasma chico">Quitar</button></div>
       <div class="cel"><span class="ico" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--hundido);color:var(--texto-2)"><i class="i" data-i="smartphone"></i></span><div><div class="tt">Samsung A15</div><div class="dd">Última vez hace 9 días</div></div><button class="btn btn-fantasma chico">Quitar</button></div>
     </div>
 
     <div class="titulo-grupo">Vínculo con la computadora</div>
-    <div class="grupo vinc">
+    <div class="grupo vinc" id="cf-vinc">
       <div class="par"><span class="disp"><i class="i" data-i="smartphone"></i></span><span class="linea"></span><span class="pastilla logro"><span class="punto"></span>En espejo</span><span class="linea"></span><span class="disp"><i class="i" data-i="monitor"></i></span></div>
       <div><div style="font-weight:750">Compu del mostrador</div><div class="t-detalle">Vinculados hasta el 16/11</div></div>
-      <div class="botones"><button class="btn">Desconectar</button><button class="btn btn-peligro">Desvincular</button></div>
+      <div class="botones"><button class="btn" data-cf-desc>Desconectar</button><button class="btn btn-peligro" data-cf-desv>Desvincular</button></div>
     </div>
   </div>
 
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
 <script>if (location.search.includes('entera')) document.body.classList.add('entera');</script>
+<script>
+// Interacciones de la maqueta (Configuración · celular 1 · Ajustes)
+document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
+  CF.prepararLlaves();
+
+  // Más (abajo y «‹ Más» arriba): la hoja con las cuatro de Más
+  $$('[data-mas]').forEach(function (el) { el.addEventListener('click', function (e) { e.preventDefault(); CF.abrirMas(); }); });
+
+  // El botón del espejo lleva al bloque del vínculo
+  var vinc = $('#cf-vinc'), btnVinc = $('#cf-btn-vinculo');
+  btnVinc.addEventListener('click', function () { vinc.scrollIntoView({ behavior: CF.quieto() ? 'auto' : 'smooth', block: 'center' }); });
+
+  // Animaciones: la llave es lo último que se mueve
+  var llAnim = $('#cf-ll-anim'), ddAnim = $('#cf-dd-anim');
+  CF.alTocar(llAnim, function () {
+    var si = CF.llave(llAnim);
+    CF.vibrar(10);
+    CF.texto(ddAnim, si ? 'Las pantallas se deslizan al navegar.' : 'Apagadas: las pantallas aparecen en el acto, sin moverse.');
+    if (si) document.body.classList.remove('sin-animaciones');
+    else setTimeout(function () { document.body.classList.add('sin-animaciones'); }, 200);
+  });
+
+  // Trabajar sin conexión: llena «Guardado», pliega «Cómo buscar»; apagarla pregunta
+  var llSin = $('#cf-ll-sin'), ddSin = $('#cf-dd-sin'), icoSin = $('#cf-ico-sin');
+  var num = $('#cf-num'), sub = $('#cf-sub'), barra = $('#cf-barra'), icoOcupa = $('#cf-ico-ocupa');
+  var buscar = $$('.cf-buscar');
+  var NO = 'Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.';
+  var SI = 'Este celular guarda el catálogo, el stock y lo que falta enviar, para seguir trabajando si se corta internet. Ocupa varios megas.';
+  var ocupado = false;
+  CF.alTocar(llSin, function () {
+    if (ocupado) return;
+    if (!llSin.classList.contains('si')) return prender();
+    CF.confirmar({
+      titulo: '¿Dejar de guardar en este celular?',
+      texto: 'Se va a borrar de este celular el catálogo y lo demás que estaba guardado. ¿Seguir?',
+      extra: '<div class="aviso error cf-pierde"><i class="i i-s" data-i="triangle-alert"></i>3 ventas sin enviar se pierden.</div>',
+      si: 'Borrar y seguir', peligro: true, alSi: apagar
+    });
+  });
+  function prender() {
+    ocupado = true;
+    CF.llave(llSin, true); CF.vibrar(10);
+    icoSin.classList.remove('gris'); icoSin.classList.add('logro');
+    CF.texto(ddSin, SI);
+    CF.plegar(buscar);
+    sub.textContent = 'bajando el catálogo…';
+    CF.barra(barra, 25, 100, 1400);
+    CF.contar(num, ['1,1 MB', '2,6 MB', '4,2 MB', '5,9 MB', '7,4 MB', '8,8 MB', '10,1 MB', '11,3 MB', '12 MB'], 1400, function () {
+      CF.rodar(sub, '· catálogo, stock y por enviar', true);
+      CF.tostada('Listo: este celular trabaja sin conexión', { tilde: true });
+      CF.vibrar([10, 40, 10]);
+      ocupado = false;
+    });
+  }
+  function apagar() {
+    ocupado = true;
+    CF.llave(llSin, false); CF.vibrar(10);
+    icoSin.classList.remove('logro'); icoSin.classList.add('gris');
+    CF.texto(ddSin, NO);
+    CF.barra(barra, 100, 25, 600);
+    CF.contar(num, ['8,1 MB', '4,0 MB', '1,2 MB', '38 KB'], 600, function () {
+      CF.rodar(sub, 'de 150 KB · nada del negocio', false);
+      CF.desplegar(buscar);
+      CF.tostada('Se borró lo guardado en este celular', { icono: 'trash-2' });
+      ocupado = false;
+    });
+  }
+
+  // Cómo buscar productos: el borde pino salta a la elegida
+  $$('.opcion').forEach(function (op) {
+    op.setAttribute('role', 'radio'); op.setAttribute('tabindex', '0');
+    CF.alTocar(op, function () {
+      if (op.classList.contains('elegida')) return;
+      $$('.opcion').forEach(function (o) { o.classList.remove('elegida'); });
+      op.classList.add('elegida'); CF.entrar(op); CF.vibrar(10);
+    });
+  });
+
+  // Versión nueva: la llave pliega los cuatro botones; cada botón cambia lo que se explica
+  var llVer = $('#cf-ll-ver'), ddVer = $('#cf-dd-ver'), cuatro = $('#cf-cuatro');
+  var EXPLICA = {
+    '5 min': 'Cada 5 minutos, con la app abierta. Te enterás enseguida y gasta un poco más de datos.',
+    '15 min': 'Cada cuánto, con la app abierta. Más seguido gasta un poco más de datos.',
+    '1 hora': 'Cada una hora, con la app abierta. Gasta menos datos y te enterás un rato después.',
+    '24 horas': 'Una vez por día, y siempre al abrirla. Casi no gasta datos.'
+  };
+  CF.cuatro(cuatro, function (t) { CF.texto(ddVer, EXPLICA[t]); CF.vibrar(10); });
+  CF.alTocar(llVer, function () {
+    var si = CF.llave(llVer); CF.vibrar(10);
+    if (si) { CF.desplegar(cuatro); CF.texto(ddVer, EXPLICA[$('b.elegido', cuatro).textContent]); }
+    else { CF.plegar(cuatro); CF.texto(ddVer, 'No busca sola: se fija solo al abrir la app y al volver a ella.'); }
+  });
+
+  // Mis celulares con huella: Quitar pregunta; el renglón se colapsa y se puede deshacer
+  var cuenta = $('#cf-cuenta-huellas');
+  function contar() { return $$('.cel').filter(function (c) { return !c.hidden; }).length; }
+  $$('.cel').forEach(function (cel) {
+    var nombre = $('.tt', cel).firstChild.textContent.trim(), este = !!$('.pastilla', cel);
+    $('button', cel).addEventListener('click', function () {
+      CF.confirmar({
+        titulo: este ? '¿Quitar la huella de este celular?' : '¿Quitar la huella del ' + nombre + '?',
+        texto: este ? 'La próxima vez vas a entrar con Google. Podés volver a ponerla al entrar.' : 'Desde ese celular ya no se va a poder entrar con la huella: va a tener que entrar con Google.',
+        si: 'Quitar', peligro: true,
+        alSi: function () {
+          CF.vibrar(10);
+          CF.colapsar(cel, function () { CF.rodar(cuenta, String(contar()), false); });
+          CF.tostada('Quitaste la huella del ' + (este ? 'Moto G54' : nombre), { deshacer: function () { cel.hidden = false; CF.entrar(cel); CF.rodar(cuenta, String(contar()), true); } });
+        }
+      });
+    });
+  });
+
+  // Vínculo: Desconectar y volver a conectar; Desvincular pregunta y se puede deshacer
+  var original = vinc.innerHTML;
+  function conectarVinculo() {
+    var desc = $('[data-cf-desc]', vinc), desv = $('[data-cf-desv]', vinc);
+    desc.addEventListener('click', function () {
+      var ahora = desc.textContent.trim() === 'Desconectar';
+      CF.vibrar(10);
+      CF.fundir(vinc, function () {
+        $('.pastilla', vinc).outerHTML = ahora ? '<span class="pastilla"><span class="punto"></span>Desconectado</span>' : '<span class="pastilla logro"><span class="punto"></span>En espejo</span>';
+        $$('.linea', vinc).forEach(function (l) { l.style.background = ahora ? 'repeating-linear-gradient(90deg, var(--borde-fuerte) 0 6px, transparent 6px 10px)' : ''; });
+        $('.t-detalle', vinc).textContent = ahora ? 'Desconectados · el vínculo sigue hasta el 16/11' : 'Vinculados hasta el 16/11';
+        desc.textContent = ahora ? 'Conectar' : 'Desconectar';
+      });
+      CF.botonVinculo(btnVinc, ahora ? 'desconectado' : 'espejo');
+      CF.tostada(ahora ? 'Desconectado de la Compu del mostrador' : 'De nuevo en espejo con la Compu del mostrador', { icono: ahora ? 'unlink' : 'link' });
+    });
+    desv.addEventListener('click', function () {
+      CF.confirmar({
+        titulo: '¿Desvincular de la Compu del mostrador?',
+        texto: 'Dejan de trabajar en espejo. Para volver a unirlos, escaneá con este celular el código que muestra la computadora.',
+        si: 'Desvincular', peligro: true,
+        alSi: function () {
+          CF.vibrar(10);
+          CF.fundir(vinc, function () {
+            vinc.innerHTML = '<div class="par"><span class="disp"><i class="i" data-i="smartphone"></i></span><span class="linea" style="background:var(--borde)"></span><span class="pastilla"><i class="i i-s" data-i="unlink"></i>Sin vincular</span><span class="linea" style="background:var(--borde)"></span><span class="disp"><i class="i" data-i="monitor"></i></span></div>' +
+              '<div><div style="font-weight:750">Sin computadora vinculada</div><div class="t-detalle">Para trabajar en espejo, escaneá el código que muestra la computadora.</div></div>' +
+              '<div class="botones"><button class="btn" data-cf-vincular><i class="i" data-i="qr-code"></i>Vincular</button></div>';
+            CF.pintar(vinc);
+            $('[data-cf-vincular]', vinc).addEventListener('click', function () { CF.escanearVinculo(function () { volver(); CF.tostada('Vinculado con la Compu del mostrador', { tilde: true }); }); });
+          });
+          CF.botonVinculo(btnVinc, 'vincular');
+          CF.tostada('Desvinculaste la Compu del mostrador', { icono: 'unlink', deshacer: volver });
+        }
+      });
+    });
+  }
+  function volver() {
+    CF.fundir(vinc, function () { vinc.innerHTML = original; CF.pintar(vinc); conectarVinculo(); });
+    CF.botonVinculo(btnVinc, 'espejo');
+  }
+  conectarVinculo();
+});
+</script>
 </body>
 </html>

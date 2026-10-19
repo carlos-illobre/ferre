@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../config.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interaccion.css">
+<script src="../../interaccion.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .arriba { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
@@ -51,14 +54,16 @@
   .ahora .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
   .ahora b { font-weight: 750; display: block; } .ahora span { font-size: 14px; color: var(--texto-2); }
   .abajo { padding: 12px 16px 28px; }
+  .lo-demas { overflow-x: auto; scrollbar-width: none; }
+  .lo-demas::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
   <div class="arriba">
-    <button class="btn"><i class="i" data-i="x"></i></button>
-    <div class="t"><b>Tu celular y la red</b><span>Moto G54 · Configuración</span></div>
+    <button class="btn" data-ir="vender" aria-label="Cerrar"><i class="i" data-i="x"></i></button>
+    <div class="t"><b>Tu celular y la red</b><span id="cf-linea">Moto G54 · Configuración</span></div>
   </div>
 
   <div class="cuerpo">
@@ -76,32 +81,150 @@
       <div class="dias"><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span><span class="hoy">Hoy</span></div>
     </div>
 
-    <div class="grupo ahora">
+    <div class="grupo ahora" id="cf-ahora">
       <span class="ico"><i class="i" data-i="cloud-download"></i></span>
-      <div><b>Hoy: no guarda nada</b><span>Baja el catálogo al abrir</span></div>
-      <button class="btn btn-suave chico">Cambiar</button>
+      <div id="cf-ahora-txt"><b>Hoy: no guarda nada</b><span>Baja el catálogo al abrir</span></div>
+      <button class="btn btn-suave chico" id="cf-cambiar">Cambiar</button>
     </div>
 
-    <div class="conviene">
+    <div class="conviene" id="cf-conviene">
       <div class="et"><i class="i i-s" data-i="wand-sparkles"></i>Te conviene</div>
       <div class="tt">Trabajar sin conexión</div>
       <p>Se cortó 2 veces y no pudiste anotar <b>3 ventas</b>. Guardar todo ocupa <b>12 MB</b> de tu 1,2 GB libre.</p>
-      <div class="btns"><button class="btn btn-accion grande">Usar esto</button><button class="btn btn-fantasma grande">Ahora no</button></div>
+      <div class="btns"><button class="btn btn-accion grande" data-usar>Usar esto</button><button class="btn btn-fantasma grande" data-no>Ahora no</button></div>
     </div>
 
-    <div class="probar"><i class="i" data-i="plane"></i>Probá cómo anda sin internet</div>
+    <div class="probar" id="cf-probar" role="button" tabindex="0"><i class="i" data-i="plane"></i>Probá cómo anda sin internet</div>
   </div>
 
   <div class="abajo">
     <div class="titulo-grupo" style="margin:0 4px 8px">Lo demás</div>
     <div class="lo-demas">
-      <span class="chip"><i class="i i-s" data-i="sparkles"></i>Animaciones <span class="llave si"></span></span>
-      <span class="chip"><i class="i i-s" data-i="refresh-cw"></i>Versión · 15 min</span>
-      <span class="chip"><i class="i i-s" data-i="fingerprint"></i>Huella · 2</span>
+      <span class="chip" id="cf-chip-anim" role="button" tabindex="0"><i class="i i-s" data-i="sparkles"></i>Animaciones <span class="llave si"></span></span>
+      <span class="chip" id="cf-chip-ver" role="button" tabindex="0"><i class="i i-s" data-i="refresh-cw"></i>Versión · 15 min</span>
+      <span class="chip" id="cf-chip-huella" role="button" tabindex="0"><i class="i i-s" data-i="fingerprint"></i>Huella · 2</span>
     </div>
   </div>
   <span class="home-ind"></span>
 </div>
 <script>if (location.search.includes('entera')) document.body.classList.add('entera');</script>
+<script>
+// Interacciones de la maqueta (Configuración · celular 3 · Te conviene)
+document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
+  CF.prepararLlaves();
+
+  // «Hoy»: el estado actual, en una línea. Tres formas posibles.
+  var FORMAS = [
+    { t: 'Hoy: no guarda nada', d: 'Baja el catálogo al abrir', i: 'cloud-download', c: '' },
+    { t: 'Hoy: no guarda nada', d: 'Busca en el servidor', i: 'server', c: '' },
+    { t: 'Hoy: guarda todo · 12 MB', d: 'Trabaja sin conexión', i: 'hard-drive', c: 'logro' }
+  ];
+  var forma = 0, ahora = $('#cf-ahora'), icoAhora = $('.ico', ahora), txtAhora = $('#cf-ahora-txt');
+  function pintarAhora() {
+    var f = FORMAS[forma];
+    CF.fundir(ahora, function () {
+      txtAhora.innerHTML = '<b>' + f.t + '</b><span>' + f.d + '</span>';
+      icoAhora.innerHTML = '<i class="i" data-i="' + f.i + '"></i>'; CF.pintar(icoAhora);
+      icoAhora.style.background = f.c ? 'var(--logro-suave)' : ''; icoAhora.style.color = f.c ? 'var(--logro-texto)' : '';
+    });
+  }
+  var PIERDE = { titulo: '¿Dejar de guardar en este celular?', texto: 'Se va a borrar de este celular el catálogo y lo demás que estaba guardado. ¿Seguir?',
+    extra: '<div class="aviso error cf-pierde"><i class="i i-s" data-i="triangle-alert"></i>3 ventas sin enviar se pierden.</div>', si: 'Borrar y seguir', peligro: true };
+  function cambiarA(n) {
+    if (n === forma) return;
+    if (forma === 2) {
+      CF.confirmar(Object.assign({}, PIERDE, { alSi: function () { forma = n; pintarAhora(); conviene(false); CF.tostada('Se borró lo guardado en este celular', { icono: 'trash-2' }); } }));
+      return;
+    }
+    forma = n; pintarAhora(); CF.vibrar(10);
+    if (n === 2) { conviene(true); CF.tostada('Listo: este celular trabaja sin conexión', { tilde: true }); CF.vibrar([10, 40, 10]); }
+  }
+  $('#cf-cambiar').addEventListener('click', function () {
+    var h = CF.abrir({ etiqueta: 'Cómo trabaja este celular', html: CF.cab('Cómo trabaja este celular') + '<div class="cf-lista">' + FORMAS.map(function (f, i) {
+      return '<div class="cf-renglon' + (i === forma ? ' elegido' : '') + '" data-forma="' + i + '"><span class="ico ' + (f.c || 'gris') + '"><i class="i" data-i="' + f.i + '"></i></span><div><div class="tt">' + f.d + '</div><div class="dd">' +
+        ['Abre en 4 s y busca al toque; sin internet no anota', 'Abre ya; cada búsqueda espera a la red', 'Ocupa 12 MB; si se corta, seguís anotando'][i] + '</div></div>' + (i === forma ? '<i class="i" data-i="check" style="color:var(--pino)"></i>' : (i === 2 ? '<span class="pastilla accion" style="height:24px">Te conviene</span>' : '<span></span>')) + '</div>';
+    }).join('') + '</div>' });
+    $$('[data-forma]', h.el).forEach(function (r) { r.addEventListener('click', function () { h.cerrar('elegido'); cambiarA(+r.getAttribute('data-forma')); }); });
+  });
+
+  // «Te conviene»: Usar esto llena el botón mientras baja; Ahora no la pliega
+  var tarjeta = $('#cf-conviene'), original = tarjeta.innerHTML;
+  function conviene(listo) {
+    CF.fundir(tarjeta, function () {
+      tarjeta.innerHTML = listo
+        ? '<div class="et" style="color:var(--logro-texto)"><i class="i i-s" data-i="circle-check"></i>Listo</div><div class="tt">Ya trabaja sin conexión</div><p>Si se corta internet, seguís anotando: <b>se envía solo</b> cuando vuelve.</p>'
+        : original;
+      CF.pintar(tarjeta); conectarConviene();
+    });
+  }
+  function conectarConviene() {
+    var usar = $('[data-usar]', tarjeta), no = $('[data-no]', tarjeta);
+    if (!usar) return;
+    usar.addEventListener('click', function () {
+      if (usar.classList.contains('cf-llenando')) return;
+      usar.style.setProperty('--cf-dura', CF.ms(1400) + 'ms');
+      usar.classList.add('cf-llenando'); usar.textContent = 'Bajando el catálogo…'; CF.vibrar(10);
+      CF.luego(1400, function () { cambiarA(2); });
+    });
+    no.addEventListener('click', function () {
+      CF.colapsar(tarjeta);
+      CF.tostada('Te lo vuelvo a sugerir si se corta otra vez', { icono: 'wand-sparkles', deshacer: function () { tarjeta.hidden = false; CF.entrar(tarjeta); } });
+    });
+  }
+  conectarConviene();
+
+  // Probá cómo anda sin internet: un minuto de prueba, la línea pasa a ámbar
+  var probar = $('#cf-probar'), linea = $('#cf-linea'), lineaOriginal = linea.innerHTML, probarOriginal = probar.innerHTML, reloj = null, quedan = 0;
+  function salirPrueba() {
+    clearInterval(reloj); reloj = null;
+    CF.texto(linea, lineaOriginal); CF.texto(probar, probarOriginal);
+    probar.style.borderColor = ''; probar.style.color = '';
+    CF.tostada('Volvió internet: la prueba terminó', { icono: 'wifi' });
+  }
+  function pintarPrueba() {
+    var s = '0:' + String(quedan).padStart(2, '0');
+    linea.innerHTML = '<span style="color:var(--urgente-texto);display:inline-flex;align-items:center;gap:6px"><span class="punto" style="display:inline-block;width:8px;height:8px;border-radius:99px;background:var(--urgente)"></span>Modo prueba · sin internet · ' + s + '</span>';
+    probar.innerHTML = '<i class="i" data-i="x"></i>Salir de la prueba · ' + s; CF.pintar(probar);
+  }
+  CF.alTocar(probar, function () {
+    if (reloj) return salirPrueba();
+    quedan = 59; CF.vibrar(10);
+    CF.fundir(linea, pintarPrueba);
+    probar.style.borderColor = 'var(--urgente)'; probar.style.color = 'var(--urgente-texto)';
+    reloj = setInterval(function () { quedan--; if (quedan <= 0) salirPrueba(); else pintarPrueba(); }, 1000);
+    CF.tostada(forma === 2 ? 'Sin internet: seguís anotando, se envía al volver' : 'Sin internet: con esta forma no se puede registrar nada', { icono: 'plane' });
+  });
+
+  // Lo demás: chips que se deslizan de costado
+  var chipAnim = $('#cf-chip-anim'), llAnim = $('.llave', chipAnim);
+  CF.alTocar(chipAnim, function () {
+    var si = CF.llave(llAnim); CF.vibrar(10);
+    CF.tostada(si ? 'Animaciones prendidas' : 'Animaciones apagadas: todo aparece en el acto', { icono: 'sparkles', dura: 2500 });
+    if (si) document.body.classList.remove('sin-animaciones');
+    else setTimeout(function () { document.body.classList.add('sin-animaciones'); }, 200);
+  });
+  var cada = '15 min', chipVer = $('#cf-chip-ver');
+  CF.alTocar(chipVer, function () {
+    var h = CF.abrir({ etiqueta: 'Versión nueva', html: CF.cab('Buscar versión nueva') + '<p class="cf-texto">Cada cuánto se fija, con la app abierta. Más seguido gasta un poco más de datos.</p><div class="cuatro">' + CF.cuatroHtml(cada) + '</div>' });
+    CF.cuatro($('.cuatro', h.el), function (t) { cada = t; CF.vibrar(10); CF.fundir(chipVer, function () { chipVer.innerHTML = '<i class="i i-s" data-i="refresh-cw"></i>Versión · ' + t; CF.pintar(chipVer); }); });
+  });
+  var huellas = [{ n: 'Moto G54', d: 'Este celular · desde el 02/10', este: true, ok: true }, { n: 'Samsung A15', d: 'Última vez hace 9 días', ok: true }], chipHu = $('#cf-chip-huella');
+  function pintarChipHu() { var n = huellas.filter(function (x) { return x.ok; }).length; CF.fundir(chipHu, function () { chipHu.innerHTML = '<i class="i i-s" data-i="fingerprint"></i>Huella · ' + n; CF.pintar(chipHu); }); }
+  CF.alTocar(chipHu, function () {
+    var h = CF.abrir({ etiqueta: 'Celulares con huella', html: CF.cab('Celulares con huella') + '<div class="cf-lista">' + huellas.map(function (x, i) {
+      return x.ok ? '<div class="cf-renglon" style="cursor:default"><span class="ico ' + (x.este ? 'logro' : 'gris') + '"><i class="i" data-i="' + (x.este ? 'fingerprint' : 'smartphone') + '"></i></span><div><div class="tt">' + x.n + '</div><div class="dd">' + x.d + '</div></div><button class="btn btn-fantasma chico" data-quitar="' + i + '">Quitar</button></div>' : '';
+    }).join('') + '</div>' });
+    $$('[data-quitar]', h.el).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var x = huellas[+b.getAttribute('data-quitar')]; h.cerrar('boton');
+        CF.confirmar({ titulo: x.este ? '¿Quitar la huella de este celular?' : '¿Quitar la huella del ' + x.n + '?', texto: x.este ? 'La próxima vez vas a entrar con Google.' : 'Desde ese celular ya no se va a poder entrar con la huella.', si: 'Quitar', peligro: true,
+          alSi: function () { x.ok = false; CF.vibrar(10); pintarChipHu(); CF.tostada('Quitaste la huella del ' + x.n, { deshacer: function () { x.ok = true; pintarChipHu(); } }); } });
+      });
+    });
+  });
+});
+</script>
 </body>
 </html>

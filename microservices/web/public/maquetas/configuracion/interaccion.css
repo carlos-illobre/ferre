@@ -1,0 +1,121 @@
+/* Lo que hace navegable la maqueta de Configuración: hojas, diálogos, tostadas y movimiento.
+   Quieta, no cambia nada de lo que se ve. Solo variables del lenguaje común; solo transform y opacity. */
+
+/* El celular se recorre con el dedo, sin barra de desplazamiento a la vista */
+.celu-pantalla { overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
+.celu-pantalla::-webkit-scrollbar { display: none; }
+body.entera .celu-pantalla { overflow: visible; }
+
+/* Lo que se toca */
+.llave, .cuatro > b, .opcion, .escalon, .fila, .disp, .item, .chip, .probar, .volver, .nav-item, .nav-inferior a, .btn-vinculo, .usuario, .vinculo, .nav-sub a { cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+.btn:active, .chip:active, .probar:active { transform: scale(.97); }
+.llave:focus-visible, .opcion:focus-visible, .escalon:focus-visible { outline: 3px solid var(--pino-suave); outline-offset: 2px; }
+
+/* El segmento blanco que se desliza entre 5 min · 15 min · 1 hora · 24 horas */
+.cuatro { position: relative; }
+.cuatro > b { position: relative; z-index: 1; }
+.cuatro.moviendo > b.elegido { background: transparent; box-shadow: none; }
+.cuatro .cf-segmento { position: absolute; z-index: 0; border-radius: 9px; background: #fff; box-shadow: var(--sombra-1); transition: transform var(--t) var(--curva); }
+
+/* Plegar y desplegar (hacia arriba) */
+.cf-plegando { transition: opacity var(--t) var(--curva-salida), transform var(--t) var(--curva-salida); opacity: 0; transform: translateY(-8px); }
+.cf-despliega { animation: cf-despliega var(--t) var(--curva) both; }
+@keyframes cf-despliega { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.cf-fundido { transition: opacity 100ms var(--curva); }
+.cf-fundido.fuera { opacity: 0; }
+.cf-entra { animation: cf-entra var(--t) var(--rebote) both; }
+@keyframes cf-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.cf-rueda-arriba { animation: cf-rueda-arriba var(--t) var(--curva) both; }
+.cf-rueda-abajo { animation: cf-rueda-abajo var(--t) var(--curva) both; }
+@keyframes cf-rueda-arriba { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes cf-rueda-abajo { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.cf-colapsa { transition: opacity var(--t) var(--curva-salida), transform var(--t) var(--curva-salida); opacity: 0; transform: scaleY(.6); transform-origin: top; }
+.cf-elige { animation: cf-elige var(--t) var(--curva) both; }
+@keyframes cf-elige { from { opacity: .55; } to { opacity: 1; } }
+.cf-enciende { animation: cf-enciende var(--t) var(--curva) both; }
+@keyframes cf-enciende { from { opacity: 0; transform: scaleX(.4); } to { opacity: 1; transform: none; } }
+
+/* Barra que se llena o se vacía */
+.barra > b { transform-origin: left center; }
+
+/* Capas: hoja (celular), diálogo (computadora) y menú chico */
+.cf-capa { position: fixed; inset: 0; z-index: 50; }
+.celu .cf-capa { position: absolute; }
+.cf-velo { position: absolute; inset: 0; background: rgba(26, 29, 27, .3); opacity: 0; transition: opacity var(--t-nav) var(--curva); }
+.cf-capa.abierta .cf-velo { opacity: 1; }
+.cf-panel { position: absolute; background: var(--superficie); box-shadow: var(--sombra-3); outline: none; }
+
+.cf-hoja .cf-panel { left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; scrollbar-width: none; border-radius: var(--r-hoja) var(--r-hoja) 0 0; padding: 8px 16px 32px; transform: translateY(100%); transition: transform var(--t-nav) var(--curva); }
+.cf-hoja .cf-panel::before { content: ""; display: block; width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 12px; }
+.cf-hoja.abierta .cf-panel { transform: none; }
+.cf-capa.cerrando .cf-panel { transition-timing-function: var(--curva-salida); }
+
+.cf-dialogo .cf-panel { left: 50%; top: 50%; width: 440px; margin-left: -220px; border-radius: var(--r-hoja); padding: 24px; opacity: 0; transform: translateY(calc(-50% + 8px)) scale(.98); transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+.cf-dialogo.abierta .cf-panel { opacity: 1; transform: translateY(-50%); }
+
+.cf-menu .cf-velo { background: transparent; }
+.cf-menu .cf-panel { width: 240px; border-radius: 16px; border: 1px solid var(--borde); padding: 6px; opacity: 0; transform: translateY(8px); transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+.cf-menu.abierta .cf-panel { opacity: 1; transform: none; }
+.cf-menu .cf-op { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 10px; font-weight: 650; cursor: pointer; }
+.cf-menu .cf-op:hover { background: var(--hundido); }
+
+/* Contenido de las capas */
+.cf-cab { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.cf-cab .cf-tt { flex: 1; font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; }
+.cf-cab .cf-x { width: 36px; min-height: 36px; padding: 0; border-radius: 99px; flex: none; }
+.cf-texto { font-size: 15px; line-height: 22px; color: var(--texto-2); margin: 0 0 12px; }
+.cf-texto b { color: var(--tinta); }
+.cf-botones { display: flex; gap: 8px; margin-top: 16px; }
+.cf-botones .btn { flex: 1; }
+.cf-dialogo .cf-botones { justify-content: flex-end; }
+.cf-dialogo .cf-botones .btn { flex: none; }
+.cf-pierde { margin-top: 4px; }
+.cf-lista { display: grid; gap: 0; }
+.cf-renglon { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; min-height: 60px; padding: 8px 4px; cursor: pointer; }
+.cf-renglon + .cf-renglon { border-top: 1px solid var(--borde); }
+.cf-renglon .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--pino-suave); color: var(--pino-texto); }
+.cf-renglon .ico.gris { background: var(--hundido); color: var(--texto-2); }
+.cf-renglon .ico.logro { background: var(--logro-suave); color: var(--logro-texto); }
+.cf-renglon .ico.urgente { background: var(--urgente-suave); color: var(--urgente-texto); }
+.cf-renglon .tt { font-weight: 750; } .cf-renglon .dd { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+.cf-renglon .ch { color: var(--texto-3); }
+.cf-renglon.elegido .tt { color: var(--pino); }
+
+/* Tostada con Deshacer */
+.cf-tostadas { position: fixed; left: 0; right: 0; bottom: 24px; z-index: 45; display: grid; justify-items: center; pointer-events: none; }
+.celu .cf-tostadas { position: absolute; bottom: 92px; }
+.cf-tostadas .tostada { pointer-events: auto; animation: cf-entra var(--t) var(--rebote) both; max-width: 358px; }
+.cf-tostadas .tostada.sale { animation: none; transition: opacity var(--t) var(--curva-salida), transform var(--t) var(--curva-salida); opacity: 0; transform: translateY(8px); }
+.tostada .cf-deshacer { margin-left: 8px; padding: 0 8px; height: 32px; border-radius: 8px; background: rgba(255, 255, 255, .14); color: #fff; font-weight: 750; border: 0; font: inherit; font-weight: 750; cursor: pointer; }
+
+/* Tilde que se dibuja */
+.cf-tilde path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: cf-tilde 300ms var(--curva) forwards; }
+@keyframes cf-tilde { to { stroke-dashoffset: 0; } }
+
+/* Botón que se llena de izquierda a derecha mientras baja algo */
+.cf-llenando { position: relative; overflow: hidden; }
+.cf-llenando::after { content: ""; position: absolute; inset: 0; background: rgba(255, 255, 255, .28); transform-origin: left; transform: scaleX(0); animation: cf-llenar var(--cf-dura, 1400ms) linear forwards; }
+@keyframes cf-llenar { to { transform: scaleX(1); } }
+
+/* Animaciones apagadas (la llave de esta pantalla) o «reducir movimiento»: nada se mueve */
+body.sin-animaciones *, body.sin-animaciones *::before, body.sin-animaciones *::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .cf-velo, .cf-panel, .cf-plegando, .cf-colapsa { transition: none !important; }
+  .cf-tilde path { stroke-dashoffset: 0; }
+}
+body.sin-animaciones .cf-tilde path { stroke-dashoffset: 0; }
+
+/* Cámara simulada para vincular (celular) y código para escanear (computadora) */
+.cf-camara { position: relative; height: 240px; border-radius: 16px; background: radial-gradient(circle at 50% 45%, #2b3a35, #0d1512 70%); overflow: hidden; margin-bottom: 12px; }
+.cf-camara .cf-mira { position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 16px; box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 0 0 999px rgba(0,0,0,.35); }
+.cf-camara .cf-barre { position: absolute; left: 50%; top: 50%; width: 130px; height: 2px; margin: -65px 0 0 -65px; background: var(--accion); box-shadow: 0 0 12px var(--accion); animation: cf-barre 1.2s var(--curva) infinite alternate; }
+@keyframes cf-barre { from { transform: translateY(0); } to { transform: translateY(130px); } }
+.cf-qr { height: 200px; border-radius: 16px; background: var(--hundido); display: grid; place-items: center; color: var(--tinta); margin-bottom: 12px; }
+.cf-qr svg { width: 120px; height: 120px; stroke-width: 1.5; }
+/* Lo plegado no ocupa lugar, aunque su clase diga display */
+[hidden] { display: none !important; }
+/* Bloque del vínculo dentro de una hoja o un diálogo */
+.cf-par { display: flex; align-items: center; gap: 10px; margin: 4px 0 14px; }
+.cf-par .cf-disp { width: 44px; height: 44px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+.cf-par .cf-linea { flex: 1; height: 2px; background: repeating-linear-gradient(90deg, var(--logro) 0 6px, transparent 6px 10px); }
+.cf-par.gris .cf-linea { background: repeating-linear-gradient(90deg, var(--borde-fuerte) 0 6px, transparent 6px 10px); }

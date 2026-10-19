@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../config.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interaccion.css">
+<script src="../../interaccion.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .split { display: grid; grid-template-columns: 300px 1fr; gap: 20px; height: 100%; }
   .lista-d .et { font-size: 14px; font-weight: 700; color: var(--texto-2); margin: 0 4px 8px; }
@@ -48,16 +51,16 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
-    <div class="nav-sub"><a>Anomalías</a><a>Procesos</a><a>Mejoras y errores</a><a class="activo">Configuración</a></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="nav-sub"><a data-ir="anomalias">Anomalías</a><a data-ir="procesos">Procesos</a><a data-ir="mejoras-y-errores">Mejoras y errores</a><a class="activo" data-ir="configuracion">Configuración</a></div>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
-      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+      <div class="usuario" data-usuario><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
     </div>
   </nav>
   <main class="contenido">
@@ -122,5 +125,195 @@
     </section>
   </main>
 </div>
+<script>
+// Interacciones de la maqueta (Configuración · computadora 2 · Por dispositivo)
+document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
+
+  // Más: pliega y despliega su lista en el lateral; Configuración es esta pantalla
+  var mas = $('[data-mas]'), sub = $('.nav-sub');
+  if (mas) mas.addEventListener('click', function (e) { e.preventDefault(); if (sub.hidden) CF.desplegar(sub); else CF.plegar(sub); });
+  CF.noSalir($('.nav-sub a.activo'));
+  // La persona: menú chico con Cerrar sesión
+  var usuario = $('[data-usuario]');
+  if (usuario) usuario.addEventListener('click', function () {
+    CF.abrir({ tipo: 'menu', ancla: usuario, etiqueta: 'Tu sesión', html:
+      '<div class="cf-op" style="cursor:default;color:var(--texto-2);font-weight:600">carlos.illobre@gmail.com</div>' +
+      '<div class="cf-op" data-cerrar><i class="i" data-i="settings"></i>Configuración</div>' +
+      '<div class="cf-op" data-ir="entrar"><i class="i" data-i="log-out"></i>Cerrar sesión</div>' });
+  });
+  // El espejo del lateral sigue al vínculo
+  var espejo = $('.lateral .vinculo');
+  function pintarEspejo(estado) {
+    if (!espejo) return;
+    CF.fundir(espejo, function () {
+      espejo.innerHTML = { espejo: '<i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div>',
+        desconectado: '<i class="i" data-i="smartphone"></i><div class="txt">Celular desconectado<small>Moto G54</small></div>',
+        sin: '<i class="i" data-i="qr-code"></i><div class="txt">Vincular celular<small>Escaneá con el celular</small></div>' }[estado];
+      espejo.setAttribute('style', estado === 'espejo' ? '' : estado === 'desconectado' ? 'background:var(--hundido);color:var(--texto-2)' : 'background:var(--superficie);color:var(--tinta);border:1px solid var(--borde)');
+      CF.pintar(espejo);
+    });
+  }
+
+  // Tres paneles, uno por dispositivo: el del Moto G54 es el de la maqueta; los otros dos salen de él
+  var moto = $('.panel'), disps = $$('.lista-d .disp');
+  moto.setAttribute('data-panel', 'moto');
+  var compu = moto.cloneNode(true), samsung = moto.cloneNode(true);
+  compu.setAttribute('data-panel', 'compu'); samsung.setAttribute('data-panel', 'samsung');
+  compu.hidden = samsung.hidden = true;
+  moto.after(compu, samsung);
+
+  // Esta computadora: siempre guarda, no tiene «Trabajar sin conexión» ni «Cómo buscar» (E13)
+  $('.telefono', compu).setAttribute('style', 'width:60px;height:42px;border-radius:8px');
+  $('.nombre', compu).innerHTML = 'Esta computadora <span class="pastilla logro"><span class="punto"></span>En espejo</span>';
+  $('.p-cuerpo', compu).style.alignContent = 'start';
+  $('.p-cab .t-detalle', compu).textContent = 'Mostrador · en espejo con el Moto G54';
+  $('.ocupa', compu).innerHTML = '<div class="t-etiqueta"><span>Guarda</span><b class="num">23,4 MB · todo</b></div><div class="barra"><b style="width:100%"></b></div>';
+  var cuerpo = $('.p-cuerpo', compu);
+  cuerpo.children[0].outerHTML = '<div class="fila ancho"><div><div class="tt"><i class="i" data-i="hard-drive"></i>Siempre guarda para trabajar sin conexión</div><div class="dd">Tiene el catálogo, el stock y lo que falta enviar. Si se corta internet, seguís vendiendo y se envía al volver.</div></div><span class="pastilla logro">Siempre</span></div>';
+  cuerpo.children[1].remove();
+  $('.p-pie', compu).innerHTML = '<span class="t-detalle"><i class="i i-s" data-i="zap"></i>Vale ya, solo en esta computadora</span>';
+
+  // Samsung A15: con huella, sin espejo; lo que cambies le llega cuando vuelva a entrar
+  $('.nombre', samsung).innerHTML = 'Samsung A15 <span class="pastilla pino"><i class="i i-s" data-i="fingerprint"></i>Huella</span>';
+  $('.p-cab .t-detalle', samsung).textContent = 'No está en espejo · entró hace 9 días';
+  $('.p-pie', samsung).innerHTML = '<span class="t-detalle"><i class="i i-s" data-i="clock" style="color:var(--urgente)"></i>Le llega cuando vuelva a entrar</span><button class="btn btn-fantasma chico" data-quitar>Quitar huella <span class="kbd">Alt Q</span></button>';
+  [compu, samsung].forEach(CF.pintar);
+  CF.prepararLlaves();
+
+  var paneles = { compu: compu, moto: moto, samsung: samsung }, CLAVES = ['compu', 'moto', 'samsung'], actual = 'moto';
+  var NOMBRE = { compu: 'esta computadora', moto: 'Moto G54', samsung: 'Samsung A15' };
+  function elegir(k) {
+    if (k === actual || !paneles[k] || disps[CLAVES.indexOf(k)].hidden) return;
+    disps.forEach(function (d, i) { d.classList.toggle('elegido', CLAVES[i] === k); });
+    paneles[actual].hidden = true; paneles[k].hidden = false; CF.entrar(paneles[k]);
+    actual = k;
+  }
+  disps.forEach(function (d, i) { d.setAttribute('role', 'button'); d.setAttribute('tabindex', '0'); CF.alTocar(d, function () { elegir(CLAVES[i]); }); });
+
+  function avisoCambio(k, que) {
+    if (k === 'compu') return;
+    CF.tostada(que + (k === 'moto' ? ': le llega al Moto G54 al instante' : ': le llega al Samsung A15 cuando entre'), { icono: k === 'moto' ? 'zap' : 'clock', dura: 2500 });
+  }
+
+  // Lo que se toca dentro de cada panel
+  CLAVES.forEach(function (k) {
+    var p = paneles[k], filas = $$('.p-cuerpo > .fila', p);
+    // Trabajar sin conexión (solo en los celulares)
+    var llSin = k === 'compu' ? null : $('.fila.ancho .llave', p);
+    if (llSin) {
+      var ddSin = $('.fila.ancho .dd', p), buscar = $('.p-cuerpo > .ancho:not(.fila)', p), guarda = $('.ocupa b.num', p), barra = $('.ocupa .barra > b', p);
+      CF.alTocar(llSin, function () {
+        if (!llSin.classList.contains('si')) {
+          CF.llave(llSin, true); CF.plegar(buscar);
+          CF.texto(ddSin, 'Este celular guarda el catálogo, el stock y lo que falta enviar, para seguir trabajando si se corta internet. Ocupa varios megas.');
+          CF.barra(barra, 25, 100, 1400);
+          CF.contar(guarda, ['1,6 MB', '4,2 MB', '7,0 MB', '9,8 MB', '12 MB · todo'], 1400, function () { avisoCambio(k, 'Trabaja sin conexión'); });
+        } else {
+          CF.confirmar({ titulo: '¿Dejar de guardar en el ' + NOMBRE[k] + '?', texto: 'Se va a borrar de ese celular el catálogo y lo demás que estaba guardado. ¿Seguir?',
+            extra: '<div class="aviso error cf-pierde"><i class="i i-s" data-i="triangle-alert"></i>3 ventas sin enviar se pierden.</div>', si: 'Borrar y seguir', peligro: true,
+            alSi: function () {
+              CF.llave(llSin, false); CF.desplegar(buscar);
+              CF.texto(ddSin, 'Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.');
+              CF.barra(barra, 100, 25, 600); CF.contar(guarda, ['4,0 MB', '38 KB de 150 KB'], 600);
+              avisoCambio(k, 'Dejó de guardar');
+            } });
+        }
+      });
+      $$('.opcion', p).forEach(function (op) {
+        op.setAttribute('role', 'radio'); op.setAttribute('tabindex', '0');
+        CF.alTocar(op, function () {
+          if (op.classList.contains('elegida')) return;
+          $$('.opcion', p).forEach(function (o) { o.classList.remove('elegida'); }); op.classList.add('elegida'); CF.entrar(op);
+          avisoCambio(k, $('.tt', op).textContent);
+        });
+      });
+    }
+    // Animaciones: en esta computadora vale ya; en un celular, le llega
+    var fAnim = filas.filter(function (f) { return /Animaciones/.test(f.textContent); })[0], llAnim = $('.llave', fAnim), ddAnim = $('.dd', fAnim);
+    CF.alTocar(llAnim, function () {
+      var si = CF.llave(llAnim);
+      CF.texto(ddAnim, si ? (k === 'compu' ? 'Las ventanas y los avisos aparecen con un movimiento corto.' : 'Las pantallas se deslizan al navegar.') : 'Apagadas: todo aparece en el acto.');
+      if (k === 'compu') { if (si) document.body.classList.remove('sin-animaciones'); else setTimeout(function () { document.body.classList.add('sin-animaciones'); }, 200); }
+      else avisoCambio(k, si ? 'Animaciones prendidas' : 'Animaciones apagadas');
+    });
+    if (k === 'compu') ddAnim.textContent = 'Las ventanas y los avisos aparecen con un movimiento corto.';
+    // Versión nueva
+    var fVer = filas.filter(function (f) { return /versión/.test(f.textContent); })[0], llVer = $('.llave', fVer), cuatro = $('.cuatro', fVer);
+    CF.cuatro(cuatro, function (t) { avisoCambio(k, 'Versión nueva cada ' + t); });
+    CF.alTocar(llVer, function () {
+      var si = CF.llave(llVer);
+      if (si) CF.desplegar(cuatro); else CF.plegar(cuatro);
+      var no = $('[data-no-busca]', fVer);
+      if (!si && !no) { no = document.createElement('div'); no.className = 'dd'; no.setAttribute('data-no-busca', ''); no.style.marginTop = '2px'; no.textContent = 'No busca sola: se fija al abrir la aplicación y al volver a ella.'; cuatro.after(no); CF.entrar(no); }
+      if (si && no) no.remove();
+      avisoCambio(k, si ? 'Busca versión nueva' : 'No busca versión nueva');
+    });
+  });
+
+  // Moto G54: Desconectar (Alt O), Desvincular (Alt U), Quitar huella (Alt Q)
+  var vinculo = 'espejo', huellaMoto = true;
+  var bDesc = $$('.p-pie .btn', moto)[0], bDesv = $$('.p-pie .btn', moto)[1], bHuella = $$('.p-pie .btn', moto)[2];
+  function pintarMoto() {
+    var nombre = $('.nombre', moto), pie = $('.p-pie .t-detalle', moto);
+    CF.fundir(nombre, function () {
+      nombre.innerHTML = 'Moto G54 ' + ({ espejo: '<span class="pastilla logro"><span class="punto"></span>En espejo</span>', desconectado: '<span class="pastilla"><span class="punto"></span>Desconectado</span>', sin: '<span class="pastilla"><i class="i i-s" data-i="unlink"></i>Sin vincular</span>' }[vinculo]) +
+        (huellaMoto ? '<span class="pastilla pino"><i class="i i-s" data-i="fingerprint"></i>Huella</span>' : '');
+      CF.pintar(nombre);
+    });
+    $('.p-cab .t-detalle', moto).textContent = { espejo: 'Vinculado con esta computadora hasta el 16/11', desconectado: 'Desconectado · el vínculo sigue hasta el 16/11', sin: 'Sin vincular: lo que cambies le llega cuando vuelva a entrar' }[vinculo];
+    pie.innerHTML = vinculo === 'espejo' ? '<i class="i i-s" data-i="zap"></i>Llega al celular al instante' : '<i class="i i-s" data-i="clock" style="color:var(--urgente)"></i>Le llega cuando vuelva a conectarse'; CF.pintar(pie);
+    bDesc.innerHTML = (vinculo === 'desconectado' ? 'Conectar' : 'Desconectar') + ' <span class="kbd">Alt O</span>';
+    bDesc.hidden = bDesv.hidden = vinculo === 'sin';
+    bHuella.hidden = !huellaMoto;
+    var dd = $('.dd', disps[1]);
+    CF.texto(dd, [{ espejo: 'En espejo', desconectado: 'Desconectado', sin: 'Sin vincular' }[vinculo], huellaMoto ? 'con huella' : 'sin huella'].join(' · '));
+    var pc = $('.nombre .pastilla', compu);
+    if (pc) { pc.outerHTML = vinculo === 'espejo' ? '<span class="pastilla logro"><span class="punto"></span>En espejo</span>' : '<span class="pastilla">Sin espejo</span>'; }
+    pintarEspejo(vinculo);
+  }
+  function desconectar() {
+    if (actual !== 'moto' || vinculo === 'sin') return;
+    vinculo = vinculo === 'espejo' ? 'desconectado' : 'espejo'; pintarMoto();
+    CF.tostada(vinculo === 'espejo' ? 'De nuevo en espejo con el Moto G54' : 'Desconectada del Moto G54', { icono: vinculo === 'espejo' ? 'link' : 'unlink' });
+  }
+  function desvincular() {
+    if (actual !== 'moto' || vinculo === 'sin') return;
+    CF.confirmar({ titulo: '¿Desvincular del Moto G54?', texto: 'Dejan de trabajar en espejo. Para volver a unirlos, escaneá con el celular el código de esta computadora.', si: 'Desvincular', peligro: true,
+      alSi: function () { var antes = vinculo; vinculo = 'sin'; pintarMoto(); CF.tostada('Desvinculaste el Moto G54', { icono: 'unlink', deshacer: function () { vinculo = antes; pintarMoto(); } }); } });
+  }
+  function quitarHuella() {
+    if (actual === 'moto' && huellaMoto) {
+      CF.confirmar({ titulo: '¿Quitar la huella del Moto G54?', texto: 'Desde ese celular ya no se va a poder entrar con la huella: va a tener que entrar con Google.', si: 'Quitar huella', peligro: true,
+        alSi: function () { huellaMoto = false; pintarMoto(); CF.tostada('Quitaste la huella del Moto G54', { deshacer: function () { huellaMoto = true; pintarMoto(); } }); } });
+    } else if (actual === 'samsung') {
+      CF.confirmar({ titulo: '¿Quitar la huella del Samsung A15?', texto: 'Desde ese celular ya no se va a poder entrar con la huella. Sale de tu lista de dispositivos.', si: 'Quitar huella', peligro: true,
+        alSi: function () {
+          var d = disps[2]; elegir('moto'); CF.colapsar(d);
+          CF.tostada('Quitaste la huella del Samsung A15', { deshacer: function () { d.hidden = false; CF.entrar(d); } });
+        } });
+    }
+  }
+  bDesc.addEventListener('click', desconectar); bDesv.addEventListener('click', desvincular); bHuella.addEventListener('click', quitarHuella);
+  $('[data-quitar]', samsung).addEventListener('click', quitarHuella);
+  espejo.addEventListener('click', function () { if (vinculo === 'sin') CF.escanearVinculo(function () { vinculo = 'espejo'; pintarMoto(); CF.tostada('Vinculada con el Moto G54', { tilde: true }); }); else elegir('moto'); });
+
+  // Teclado: ↑ ↓ elige dispositivo; Alt O · Alt U · Alt Q
+  document.addEventListener('keydown', function (e) {
+    if (CF.abiertas()) return;
+    if (e.altKey) {
+      var k = { KeyO: desconectar, KeyU: desvincular, KeyQ: quitarHuella }[e.code];
+      if (k) { e.preventDefault(); k(); }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      var vis = CLAVES.filter(function (c, i) { return !disps[i].hidden; }), i = vis.indexOf(actual);
+      var j = Math.max(0, Math.min(vis.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)));
+      e.preventDefault(); elegir(vis[j]); disps[CLAVES.indexOf(vis[j])].focus({ preventScroll: true });
+    }
+  });
+});
+</script>
 </body>
 </html>

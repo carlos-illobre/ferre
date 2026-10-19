@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../config.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interaccion.css">
+<script src="../../interaccion.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { overflow: hidden; }
   /* Lo que había en pantalla sigue ahí, atenuado: la configuración se abre encima, sin ir a ningún lado */
@@ -92,5 +95,216 @@
     <div class="aviso pino"><i class="i i-s" data-i="zap"></i>Vale ya, sin recargar, y solo en esta computadora.</div>
   </div>
 </div>
+<script>
+// Interacciones de la maqueta (Configuración · computadora 3 · Al vuelo)
+document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
+  CF.prepararLlaves();
+  var paleta = $('.paleta'), velo = $('.velo'), detras = $('.detras'), abierta = true, lanzador = null;
+  var items = $$('.item'), foco = 0;
+  var llAnim = $('.llave', items[0]), llVer = $('.llave', items[1]), valor = $('.valor b', items[1]);
+  var CADA = ['5 min', '15 min', '1 hora', '24 horas'];
+
+  // Abrir y cerrar la paleta: aparece desde 8 px arriba con fundido; Esc la cierra hacia arriba
+  paleta.style.transition = velo.style.transition = 'opacity var(--t) var(--curva), transform var(--t) var(--curva)';
+  function cerrar() {
+    if (!abierta) return; abierta = false;
+    paleta.style.opacity = '0'; paleta.style.transform = 'translateY(-8px)'; velo.style.opacity = '0';
+    CF.luego(200, function () { paleta.hidden = velo.hidden = true; });
+    detras.style.pointerEvents = 'auto'; detras.removeAttribute('tabindex');
+    if (!lanzador) {
+      lanzador = document.createElement('button');
+      lanzador.className = 'btn lanzador';
+      lanzador.innerHTML = '<i class="i" data-i="settings"></i>Configuración <span class="kbd">Ctrl ,</span>';
+      CF.pintar(lanzador); document.body.appendChild(lanzador);
+      lanzador.addEventListener('click', abrir);
+    }
+    lanzador.hidden = false; CF.entrar(lanzador);
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  }
+  function abrir() {
+    if (abierta) return; abierta = true;
+    paleta.hidden = velo.hidden = false;
+    paleta.style.opacity = '0'; paleta.style.transform = 'translateY(-8px)'; velo.style.opacity = '0';
+    paleta.offsetWidth;
+    paleta.style.opacity = '1'; paleta.style.transform = 'none'; velo.style.opacity = '1';
+    detras.style.pointerEvents = 'none';
+    if (lanzador) lanzador.hidden = true;
+    paleta.focus();
+  }
+  paleta.setAttribute('tabindex', '-1'); paleta.style.outline = 'none';
+  velo.addEventListener('click', cerrar);
+  // Lo de atrás (Vender) navega como siempre: sus pedidos de ir a otra pantalla pasan por acá
+  window.addEventListener('message', function (e) {
+    if (e.source === detras.contentWindow && e.data && e.data.maqueta === 'ir' && window.irAMaqueta) window.irAMaqueta(e.data.pantalla);
+  });
+
+  // La vista previa: muestra el efecto del ítem enfocado
+  var etPrev = $('.der-p .et'), txtPrev = $('.der-p p'), escena = $('.escena');
+  function textoPrevia(i) {
+    if (i === 0) return llAnim.classList.contains('si') ? 'La ventana sube y se aclara en 200 ms; el aviso entra desde abajo. Apagadas, aparecen en el acto.' : 'Apagadas: la ventana y el aviso aparecen en el acto, sin moverse.';
+    if (i === 1) return llVer.classList.contains('si') ? 'Mientras la aplicación está a la vista se fija cada ' + valor.textContent + ' si hay una versión nueva; si la hay, lo avisa abajo. También al abrirla y al volver a ella.' : 'No busca sola: se fija al abrir la aplicación y al volver a ella.';
+    if (i === 2) return estadoMoto === 'sin' ? 'Sin celular vinculado. Para trabajar en espejo, escaneá con el celular el código de esta computadora.' : 'Lo que escaneás con el Moto G54 aparece acá. Desconectar los separa un rato; Desvincular los separa del todo.';
+    return 'Celulares que entran con tu huella en vez de Google. Para sumar uno, entrá con Google desde él.';
+  }
+  function enfocar(i, sinPrevia) {
+    if (i < 0 || i >= items.length) return;
+    items[foco].classList.remove('foco'); foco = i; items[i].classList.add('foco');
+    if (sinPrevia) return;
+    CF.texto(etPrev, i < 2 ? 'Así se ve, en vivo' : 'Qué hace');
+    CF.texto(txtPrev, textoPrevia(i));
+    escena.style.opacity = i < 2 ? '' : '.45';
+  }
+  items.forEach(function (it, i) { it.addEventListener('mousemove', function () { if (foco !== i) enfocar(i); }); });
+
+  // Animaciones (A): la escena se congela en su estado final
+  function animaciones() {
+    enfocar(0, foco === 0);
+    var si = CF.llave(llAnim);
+    CF.texto($('.dd', items[0]), si ? 'Ventanas y avisos con movimiento corto' : 'Apagadas: todo aparece en el acto');
+    CF.texto(txtPrev, textoPrevia(0));
+    if (si) document.body.classList.remove('sin-animaciones');
+    else setTimeout(function () { document.body.classList.add('sin-animaciones'); }, 200);
+  }
+  // Buscar versión nueva (B) y su valor con ← →
+  function version(prender) {
+    enfocar(1, foco === 1);
+    var si = CF.llave(llVer, prender);
+    $('.valor', items[1]).style.opacity = si ? '' : '.45';
+    CF.texto($('.dd', items[1]), si ? 'Con la aplicación a la vista' : 'No busca sola: al abrir y al volver');
+    CF.texto(txtPrev, textoPrevia(1));
+  }
+  function cambiarValor(d) {
+    if (!llVer.classList.contains('si')) return version(true);
+    var i = Math.max(0, Math.min(3, CADA.indexOf(valor.textContent) + d));
+    if (CADA[i] === valor.textContent) return;
+    CF.rodar(valor, CADA[i], d > 0);
+    CF.texto(txtPrev, textoPrevia(1));
+  }
+  CF.alTocar(llAnim, function (e) { e.stopPropagation(); animaciones(); });
+  CF.alTocar(llVer, function (e) { e.stopPropagation(); version(); });
+  var flechas = $$('.valor svg', items[1]);
+  flechas[0].addEventListener('click', function (e) { e.stopPropagation(); enfocar(1); cambiarValor(-1); });
+  flechas[1].addEventListener('click', function (e) { e.stopPropagation(); enfocar(1); cambiarValor(1); });
+  flechas.forEach(function (f) { f.style.cursor = 'pointer'; });
+  items[0].addEventListener('click', function () { enfocar(0); });
+  items[1].addEventListener('click', function () { enfocar(1); });
+
+  // Moto G54: Desconectar (O) y Desvincular (U)
+  var estadoMoto = 'espejo', moto = items[2], htmlMoto = $('.der', moto).innerHTML;
+  function pintarMoto() {
+    var ico = $('.ico', moto);
+    ico.style.background = estadoMoto === 'espejo' ? 'var(--logro-suave)' : 'var(--hundido)';
+    ico.style.color = estadoMoto === 'espejo' ? 'var(--logro-texto)' : 'var(--texto-2)';
+    CF.texto($('.tt', moto), 'Moto G54 · ' + { espejo: 'en espejo', desconectado: 'desconectado', sin: 'sin vincular' }[estadoMoto]);
+    CF.texto($('.dd', moto), estadoMoto === 'sin' ? 'Escaneá el código desde el celular' : estadoMoto === 'espejo' ? 'Vinculados hasta el 16/11' : 'El vínculo sigue hasta el 16/11');
+    var der = $('.der', moto);
+    der.innerHTML = estadoMoto === 'sin' ? '<button class="btn chico" data-vincular><i class="i i-s" data-i="qr-code"></i>Mostrar el código</button>' : htmlMoto;
+    if (estadoMoto === 'desconectado') $('.btn', der).firstChild.textContent = 'Conectar ';
+    CF.pintar(der); conectarMoto();
+    if (foco === 2) CF.texto(txtPrev, textoPrevia(2));
+  }
+  function desconectar() {
+    if (estadoMoto === 'sin') return; enfocar(2, foco === 2);
+    estadoMoto = estadoMoto === 'espejo' ? 'desconectado' : 'espejo'; pintarMoto();
+    CF.tostada(estadoMoto === 'espejo' ? 'De nuevo en espejo con el Moto G54' : 'Desconectada del Moto G54', { icono: estadoMoto === 'espejo' ? 'link' : 'unlink' });
+  }
+  function desvincular() {
+    if (estadoMoto === 'sin') return; enfocar(2, foco === 2);
+    CF.confirmar({ titulo: '¿Desvincular del Moto G54?', texto: 'Dejan de trabajar en espejo. Para volver a unirlos, escaneá con el celular el código de esta computadora.', si: 'Desvincular', peligro: true,
+      alSi: function () { var antes = estadoMoto; estadoMoto = 'sin'; pintarMoto(); CF.tostada('Desvinculaste el Moto G54', { icono: 'unlink', deshacer: function () { estadoMoto = antes; pintarMoto(); } }); } });
+  }
+  function conectarMoto() {
+    var b = $$('.der .btn', moto);
+    if (estadoMoto === 'sin') { b[0].addEventListener('click', function (e) { e.stopPropagation(); CF.escanearVinculo(function () { estadoMoto = 'espejo'; pintarMoto(); CF.tostada('Vinculada con el Moto G54', { tilde: true }); }); }); return; }
+    b[0].addEventListener('click', function (e) { e.stopPropagation(); desconectar(); });
+    b[1].addEventListener('click', function (e) { e.stopPropagation(); desvincular(); });
+  }
+  conectarMoto();
+  moto.addEventListener('click', function () { enfocar(2); });
+
+  // Celulares con huella ›: la lista, con Quitar
+  var huellas = [{ n: 'Moto G54', d: 'En espejo · desde el 02/10', ok: true }, { n: 'Samsung A15', d: 'Entró hace 9 días', ok: true }];
+  function pintarHuellas() {
+    var quedan = huellas.filter(function (x) { return x.ok; });
+    CF.rodar($('.pastilla', items[3]), String(quedan.length), false);
+    CF.texto($('.dd', items[3]), quedan.length ? quedan.map(function (x) { return x.n; }).join(' y ') : 'Ninguno: entrás con Google');
+  }
+  function abrirHuellas() {
+    enfocar(3, foco === 3);
+    var h = CF.abrir({ tipo: 'dialogo', etiqueta: 'Celulares con huella', html: CF.cab('Celulares con huella') + '<div class="cf-lista">' + huellas.map(function (x, i) {
+      return x.ok ? '<div class="cf-renglon" style="cursor:default"><span class="ico"><i class="i" data-i="fingerprint"></i></span><div><div class="tt">' + x.n + '</div><div class="dd">' + x.d + '</div></div><button class="btn btn-fantasma chico" data-quitar="' + i + '">Quitar</button></div>' : '';
+    }).join('') + '</div><p class="cf-texto" style="margin-top:12px">Para sumar un celular, entrá con Google desde él: te ofrece la huella solo.</p>' });
+    $$('[data-quitar]', h.el).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var x = huellas[+b.getAttribute('data-quitar')]; h.cerrar('boton');
+        CF.confirmar({ titulo: '¿Quitar la huella del ' + x.n + '?', texto: 'Desde ese celular ya no se va a poder entrar con la huella: va a tener que entrar con Google.', si: 'Quitar huella', peligro: true,
+          alSi: function () { x.ok = false; pintarHuellas(); CF.tostada('Quitaste la huella del ' + x.n, { deshacer: function () { x.ok = true; pintarHuellas(); } }); } });
+      });
+    });
+  }
+  items[3].addEventListener('click', abrirHuellas);
+
+  // Escribir filtra («anim»); Retroceso borra
+  var filtro = '', escrito = $('.buscar .escrito'), pista = escrito.nextElementSibling, secciones = $$('.seccion');
+  function sinTilde(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function filtrar() {
+    escrito.textContent = filtro || 'Configuración';
+    escrito.style.color = filtro ? '' : '';
+    pista.hidden = !!filtro;
+    var f = sinTilde(filtro), visibles = [];
+    items.forEach(function (it, i) { var ok = !f || sinTilde(it.textContent).indexOf(f) >= 0; it.hidden = !ok; if (ok) visibles.push(i); });
+    secciones.forEach(function (s) {
+      var sig = [], n = s.nextElementSibling;
+      while (n && n.classList.contains('item')) { sig.push(n); n = n.nextElementSibling; }
+      s.hidden = sig.every(function (x) { return x.hidden; });
+    });
+    var nada = $('[data-nada]', paleta);
+    if (!visibles.length && !nada) { nada = document.createElement('div'); nada.setAttribute('data-nada', ''); nada.className = 'seccion'; nada.textContent = 'Nada se llama así. Probá con «anim», «versión» o «huella».'; $('.pie-p', paleta).before(nada); }
+    if (visibles.length && nada) nada.remove();
+    if (visibles.length && visibles.indexOf(foco) < 0) enfocar(visibles[0]);
+  }
+  var escribiendo = false, cursor = $('.buscar .cursor');
+  function escribir(si) { escribiendo = si; if (cursor) cursor.style.opacity = si ? '1' : ''; }
+  $('.buscar').style.cursor = 'text';
+  $('.buscar').addEventListener('click', function () { escribir(true); });
+  function mover(d) {
+    var vis = items.map(function (x, i) { return i; }).filter(function (i) { return !items[i].hidden; });
+    var j = vis.indexOf(foco); if (j < 0) return;
+    var k = vis[Math.max(0, Math.min(vis.length - 1, j + d))];
+    if (k !== foco) enfocar(k);
+  }
+
+  function ctrlComa(e) { if (e.ctrlKey && (e.key === ',' || e.code === 'Comma')) { e.preventDefault(); abierta ? cerrar() : abrir(); return true; } }
+  // Con la paleta cerrada se puede usar Vender de atrás; Ctrl , la vuelve a abrir desde ahí también
+  detras.addEventListener('load', function () { try { detras.contentWindow.document.addEventListener('keydown', ctrlComa); } catch (e) { /* otro origen: queda el lanzador */ } });
+  try { if (detras.contentDocument && detras.contentDocument.readyState === 'complete') detras.contentDocument.addEventListener('keydown', ctrlComa); } catch (e) { /* nada */ }
+  document.addEventListener('keydown', function (e) {
+    if (ctrlComa(e)) return;
+    if (!abierta || CF.abiertas()) return;
+    if (e.key === 'Escape') { e.preventDefault(); if (filtro || escribiendo) { filtro = ''; escribir(false); filtrar(); } else cerrar(); return; }
+    // A · B · O · U cambian al toque (también con Alt); cualquier otra letra, o tocar arriba, escribe en el filtro
+    var atajo = { KeyA: animaciones, KeyB: function () { version(); }, KeyO: desconectar, KeyU: desvincular }[e.code];
+    if (atajo && (e.altKey || (!escribiendo && !e.ctrlKey && !e.metaKey))) { e.preventDefault(); atajo(); return; }
+    if (e.altKey) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); escribir(false); mover(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); mover(-1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      var d = e.key === 'ArrowRight' ? 1 : -1;
+      if (foco === 0) { if (llAnim.classList.contains('si') !== (d > 0)) animaciones(); }
+      else if (foco === 1) cambiarValor(d);
+    }
+    else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (foco === 0) animaciones(); else if (foco === 1) version(); else if (foco === 2) desconectar(); else abrirHuellas();
+    }
+    else if (e.key === 'Backspace') { e.preventDefault(); filtro = filtro.slice(0, -1); if (!filtro) escribir(false); filtrar(); }
+    else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); escribir(true); filtro += e.key; filtrar(); }
+  });
+  paleta.focus();
+});
+</script>
 </body>
 </html>
