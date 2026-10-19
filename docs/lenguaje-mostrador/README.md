@@ -11,6 +11,10 @@ En esta carpeta: `comun.css` (las variables y las piezas, la fuente de verdad de
 aplicación). Las maquetas de las propuestas, con los íconos, las fuentes y las fotos, están en
 `microservices/web/public/maquetas/_comun/` mientras duren (decisión 113).
 
+**Lo que no sigue este lenguaje:** el marco magenta y el cartel del ambiente de pruebas quedan
+como están, sean cuales sean las pantallas elegidas, y solo aparecen en pruebas (decisiones 33
+y 116).
+
 La aplicación de hoy todavía usa la paleta anterior (`docs/sistema-visual.md`, «Paleta»): pasa a
 este lenguaje pantalla por pantalla, a medida que se programan las propuestas elegidas.
 

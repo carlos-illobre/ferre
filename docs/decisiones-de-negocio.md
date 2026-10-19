@@ -911,3 +911,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      Reemplaza la paleta anterior (coral, tinta y niebla) y los colores de los medios de pago de
      la decisión 108, que pasan a ser los de esa guía; la regla de la 108 (un color por
      significado, siempre el mismo) sigue.
+116. **El marco del ambiente de prueba no cambia con el rediseño** (2026-10-19). Elija Carlos la
+     versión que elija de cada pantalla, el marco magenta que aparece y desaparece y el cartel
+     «Ambiente de prueba · nada de esto es real» (decisión 33) quedan exactamente como están hoy.
+     No forman parte del lenguaje «Mostrador» ni se adaptan a él, y solo aparecen en el ambiente
+     de pruebas: producción no lleva nada.

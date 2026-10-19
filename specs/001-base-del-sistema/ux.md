@@ -235,7 +235,8 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
   «L» (decisiones 28, 31 y 39).
 - **El ambiente de prueba no se puede confundir con producción:** un marco de un color que
   no se usa en ningún otro lado, que aparece y desaparece, y un cartel fijo. Producción no
-  lleva nada (decisión 33).
+  lleva nada (decisión 33). Ese marco y ese cartel quedan como están con cualquier rediseño: no
+  siguen el lenguaje «Mostrador» ni cambian con la versión elegida de cada pantalla (decisión 116).
 - **Lo que está elegido se sigue leyendo** al pasarle el mouse o al tocarlo.
 - **Quitar algo es un botón con un tacho,** nunca una «×» suelta. La «×» queda solo para
   borrar lo escrito en una búsqueda.
