@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicados · Pila (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../duplicados.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 10px; overflow: visible; }
+  .cuenta { display: flex; align-items: center; gap: 10px; }
+  .cuenta .barra { flex: 1; margin: 0; }
+  .cuenta .barra > b { background: var(--pino); }
+  .pila { position: relative; flex: 1; min-height: 0; }
+  .atras { position: absolute; inset: 14px 14px 0; border-radius: 24px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); transform: translateY(10px) scale(.96); }
+  .carta { position: absolute; inset: 0 0 18px; border-radius: 24px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-3); padding: 14px; display: flex; flex-direction: column; gap: 10px; transform: translateX(6px) rotate(1.6deg); transform-origin: 50% 120%; }
+  .sello { position: absolute; top: 18px; left: 18px; transform: rotate(-12deg); padding: 4px 12px; border: 3px solid var(--logro); color: var(--logro-texto); border-radius: 10px; font-weight: 800; font-size: 20px; letter-spacing: .02em; background: rgba(255,255,255,.9); z-index: 2; }
+  .carta .cab { display: flex; justify-content: flex-end; }
+  .prod { display: grid; grid-template-columns: 68px minmax(0,1fr); gap: 12px; align-items: center; padding: 10px; border-radius: 16px; border: 1px solid var(--borde); }
+  .prod.si { border: 2px solid var(--pino); padding: 9px; background: linear-gradient(90deg, var(--pino-suave), #fff 60%); }
+  .prod .foto { width: 68px; height: 68px; }
+  .prod .n { font-weight: 800; font-size: 15px; line-height: 20px; }
+  .prod .meta { display: grid; gap: 2px; margin-top: 4px; }
+  .prod .costo { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-weight: 800; font-size: 22px; }
+  .prod .tag { font-size: 14px; font-weight: 700; color: var(--pino-texto); display: inline-flex; gap: 4px; align-items: center; }
+  .igual-fila { display: flex; align-items: center; gap: 8px; margin: -4px 0; }
+  .igual-fila .l { flex: 1; height: 1px; background: var(--borde); }
+  .igual-fila .c { display: flex; gap: 6px; }
+  .ayuda-tocar { text-align: center; font-size: 14px; color: var(--texto-3); font-weight: 600; }
+  .gestos { display: grid; grid-template-columns: 1fr 64px 1fr; align-items: center; gap: 12px; padding: 4px 4px 2px; }
+  .redondo { height: 64px; border-radius: 99px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; font-size: 16px; border: 1px solid var(--borde-fuerte); background: var(--superficie); box-shadow: var(--sombra-2); }
+  .redondo.si { background: var(--accion); color: #fff; border-color: var(--accion); box-shadow: var(--sombra-accion); }
+  .redondo.chico { width: 52px; height: 52px; justify-self: center; box-shadow: var(--sombra-1); color: var(--texto-2); }
+  .flecha { font-size: 14px; color: var(--texto-3); font-weight: 650; display: flex; justify-content: space-between; padding: 0 8px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <nav class="celu-pestanas"><a>Productos</a><a>Listas</a><a class="activa">Duplicados</a></nav>
+  <div class="celu-pantalla">
+    <div class="cuenta"><span class="t-etiqueta">4 de 12</span><div class="barra"><b style="width:30%"></b></div><span class="pastilla logro" style="height:28px"><i class="i i-s" data-i="git-merge"></i>3</span><button class="btn btn-suave btn-icono chico" title="Más"><i class="i i-s" data-i="ellipsis"></i></button></div>
+    <div class="pila">
+      <div class="atras"></div>
+      <div class="carta">
+        <span class="sello">ES EL MISMO</span>
+        <div class="cab"><span class="motivo codigo"><i class="i i-s" data-i="barcode"></i>Mismo código</span></div>
+        <div class="prod si">
+          <span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span>
+          <div><div class="n">Cinta métrica PowerLock 5 m</div>
+            <div class="meta"><div class="fila-icono"><i class="i i-s" data-i="truck"></i>Distribuidora Oeste · 14/10</div></div>
+            <div class="costo"><span><span class="peso">$</span>9.350</span><span class="tag"><i class="i i-s" data-i="circle-check"></i>Se conserva</span></div></div>
+        </div>
+        <div class="igual-fila"><span class="l"></span><span class="c"><span class="pastilla logro" style="height:24px"><i class="i i-s" data-i="check"></i>Stanley</span><span class="pastilla logro" style="height:24px"><i class="i i-s" data-i="check"></i>Código</span></span><span class="l"></span></div>
+        <div class="prod">
+          <span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span>
+          <div><div class="n">CINTA METRICA STANLEY POWERLOCK 5MTS</div>
+            <div class="meta"><div class="fila-icono"><i class="i i-s" data-i="truck"></i>Ferretera del Sur · 08/10</div></div>
+            <div class="costo"><span style="color:var(--logro-texto)"><span class="peso">$</span>9.120</span><span class="barato">el más barato</span></div></div>
+        </div>
+        <div class="aviso pino" style="margin-top:auto"><i class="i i-s" data-i="git-merge" style="margin-top:2px"></i><span>Queda <b>uno solo</b>, con los 2 proveedores y 22 un. El costo sale de Ferretera del Sur: <b>$9.120</b>.</span></div>
+      </div>
+    </div>
+    <div class="flecha"><span>‹ distintos</span><span>tocá el que queda</span><span>es el mismo ›</span></div>
+  </div>
+  <div class="barra-accion" style="padding-top:10px;padding-bottom:10px">
+    <div class="gestos">
+      <div class="redondo"><i class="i" data-i="x"></i>Distintos</div>
+      <div class="redondo chico"><i class="i" data-i="undo-2"></i></div>
+      <div class="redondo si"><i class="i" data-i="git-merge"></i>Es el mismo</div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a class="activo"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

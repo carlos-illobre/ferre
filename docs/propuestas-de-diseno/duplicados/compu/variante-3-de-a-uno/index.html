@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicados · De a uno (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../duplicados.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { height: 768px; overflow: hidden; }
+  .modo { height: 768px; display: grid; grid-template-rows: 64px 1fr 76px; }
+  .arriba { display: flex; align-items: center; gap: 16px; padding: 0 32px; }
+  .arriba .t-seccion { font-size: 20px; }
+  .progreso { flex: 1; max-width: 420px; display: flex; align-items: center; gap: 12px; margin-left: 24px; }
+  .progreso .barra { flex: 1; height: 8px; margin: 0; }
+  .progreso .barra > b { background: var(--pino); }
+  .arriba .der { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  .ring { display: grid; grid-template-columns: 1fr 248px 1fr; gap: 0; padding: 4px 32px 0; align-items: stretch; min-height: 0; }
+  .carta { background: var(--superficie); border: 1px solid var(--borde); border-radius: 24px; box-shadow: var(--sombra-2); padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; position: relative; }
+  .carta.conservada { border: 2px solid var(--pino); box-shadow: 0 0 0 6px rgba(18,56,47,.08), var(--sombra-3); }
+  .carta .tope { display: flex; align-items: center; gap: 8px; }
+  .carta .tope .kbd { width: 32px; height: 32px; font-size: 16px; }
+  .carta .foto-g { height: 220px; border-radius: 16px; background: var(--hundido); display: grid; place-items: center; }
+  .carta .foto-g img { height: 196px; width: auto; filter: drop-shadow(0 8px 10px rgba(26,29,27,.2)); }
+  .carta .nom { font-size: 22px; line-height: 28px; font-weight: 800; letter-spacing: -.01em; }
+  .carta .datos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .carta .datos .fila-icono { font-size: 15px; }
+  .carta .costo { display: flex; align-items: baseline; gap: 10px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--borde); }
+  .carta .costo .t-numero { font-size: 36px; line-height: 40px; }
+  .carta .costo .lbl { margin-right: auto; }
+
+  .medio-col { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 0 16px; text-align: center; }
+  .igual { width: 96px; height: 96px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-3); display: grid; place-items: center; font-size: 48px; font-weight: 800; color: var(--pino); line-height: 1; }
+  .coinc { display: grid; gap: 6px; width: 100%; }
+  .coinc .c { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 10px; font-size: 14px; font-weight: 700; background: var(--logro-suave); color: var(--logro-texto); }
+  .coinc .c.no { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .seguro { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .seguro b { font-size: 28px; color: var(--tinta); display: block; line-height: 32px; font-weight: 800; }
+
+  .teclas { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 32px 8px; }
+  .tecla-g { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px 0 8px; border-radius: 14px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); font-weight: 750; font-size: 16px; }
+  .tecla-g .kbd { width: 36px; height: 36px; font-size: 16px; }
+  .tecla-g.si { background: var(--accion); border-color: var(--accion); color: #fff; box-shadow: var(--sombra-accion); }
+  .tecla-g.si .kbd { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.35); color: #fff; }
+  .rastro { position: absolute; right: 32px; top: 76px; display: none; }
+  .tostada { padding: 6px 8px 6px 12px; font-size: 14px; }
+  .tostada .btn { min-height: 32px; height: 32px; background: rgba(255,255,255,.14); border-color: transparent; color: #fff; box-shadow: none; padding: 0 10px; font-size: 14px; }
+  .tres { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; }
+  .tres .dato { min-width: 0; }
+  .tres .va { font-size: 18px; line-height: 24px; }
+  .spark { display: flex; align-items: flex-end; gap: 4px; height: 24px; }
+  .spark b { flex: 1; align-self: flex-end; border-radius: 3px; background: var(--borde-fuerte); }
+  .spark b:last-child { background: var(--pino); }
+</style>
+</head>
+<body>
+<div class="modo">
+  <div class="arriba">
+    <button class="btn btn-fantasma btn-icono" title="Salir"><i class="i" data-i="x"></i></button>
+    <span class="t-seccion">Duplicados</span>
+    <div class="progreso"><span class="t-etiqueta" style="white-space:nowrap">4 de 12</span><div class="barra"><b style="width:30%"></b></div><span class="pastilla logro"><i class="i i-s" data-i="git-merge"></i>3 unidos</span></div>
+    <div class="der">
+      <div class="tostada"><i class="i i-s" data-i="circle-check"></i>Unidos: Mecha HSS 8 mm. Se pueden separar.<button class="btn">Deshacer <span class="kbd" style="height:20px;background:transparent;color:#fff;border-color:rgba(255,255,255,.4)">Z</span></button></div>
+      <button class="btn chico"><i class="i i-s" data-i="split"></i>Unidos (38)</button>
+    </div>
+  </div>
+
+  <div class="ring">
+    <div class="carta conservada">
+      <div class="tope"><span class="kbd">←</span><span class="cons si"><span class="radio"></span>Se conserva</span><span class="pastilla" style="margin-left:auto">desde 2019 · 41 ventas</span></div>
+      <div class="foto-g"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div>
+      <div class="nom">Cinta métrica PowerLock 5 m</div>
+      <div class="datos">
+        <div class="fila-icono"><i class="i i-s" data-i="tags"></i><b>Stanley</b></div>
+        <div class="fila-icono"><i class="i i-s" data-i="barcode"></i>7 790123 450016</div>
+        <div class="fila-icono"><i class="i i-s" data-i="truck"></i>Distribuidora Oeste</div>
+        <div class="fila-icono"><i class="i i-s" data-i="calendar-days"></i>Lista 14/10/2026</div>
+      </div>
+      <div class="tres">
+        <div class="dato"><span class="et">Stock</span><span class="va">14 un.</span></div>
+        <div class="dato"><span class="et">Ventas 90 d</span><span class="va">41</span></div>
+        <div class="dato"><span class="et">Costo, 6 listas</span><svg class="spark" viewBox="0 0 110 24" width="110" height="24"><rect x="0" y="16" width="14" height="8" rx="3" fill="var(--borde-fuerte)"/><rect x="19" y="14" width="14" height="10" rx="3" fill="var(--borde-fuerte)"/><rect x="38" y="11" width="14" height="13" rx="3" fill="var(--borde-fuerte)"/><rect x="57" y="8" width="14" height="16" rx="3" fill="var(--borde-fuerte)"/><rect x="76" y="4" width="14" height="20" rx="3" fill="var(--borde-fuerte)"/><rect x="95" y="0" width="14" height="24" rx="3" fill="var(--pino)"/></svg></div>
+      </div>
+      <div class="costo"><span class="lbl">Costo</span><span class="t-numero"><span class="peso">$</span>9.350</span></div>
+    </div>
+
+    <div class="medio-col">
+      <div class="seguro"><b>96 %</b>seguro que es el mismo</div>
+      <div class="igual">=</div>
+      <div class="coinc">
+        <div class="c"><i class="i i-s" data-i="check"></i>Código de barras</div>
+        <div class="c"><i class="i i-s" data-i="check"></i>Marca</div>
+        <div class="c"><i class="i i-s" data-i="check"></i>3 palabras iguales</div>
+        <div class="c no"><i class="i i-s" data-i="info"></i>Costo $230 menos</div>
+      </div>
+    </div>
+
+    <div class="carta">
+      <div class="tope"><span class="cons"><span class="radio"></span>Conservar este</span><span class="kbd" style="margin-left:auto">→</span></div>
+      <div class="foto-g"><img src="../../../_comun/fotos/cinta-metrica.webp" alt="" style="transform:scaleX(-1)"></div>
+      <div class="nom">CINTA METRICA STANLEY POWERLOCK 5MTS 30-696</div>
+      <div class="datos">
+        <div class="fila-icono"><i class="i i-s" data-i="tags"></i><b>Stanley</b></div>
+        <div class="fila-icono"><i class="i i-s" data-i="barcode"></i>7 790123 450016</div>
+        <div class="fila-icono"><i class="i i-s" data-i="truck"></i>Ferretera del Sur</div>
+        <div class="fila-icono"><i class="i i-s" data-i="calendar-days"></i>Lista 08/10/2026</div>
+      </div>
+      <div class="tres">
+        <div class="dato"><span class="et">Stock</span><span class="va">8 un.</span></div>
+        <div class="dato"><span class="et">Ventas 90 d</span><span class="va">—</span></div>
+        <div class="dato"><span class="et">Costo, 6 listas</span><svg class="spark" viewBox="0 0 110 24" width="110" height="24"><rect x="0" y="18" width="14" height="6" rx="3" fill="var(--borde-fuerte)"/><rect x="19" y="16" width="14" height="8" rx="3" fill="var(--borde-fuerte)"/><rect x="38" y="16" width="14" height="8" rx="3" fill="var(--borde-fuerte)"/><rect x="57" y="11" width="14" height="13" rx="3" fill="var(--borde-fuerte)"/><rect x="76" y="7" width="14" height="17" rx="3" fill="var(--borde-fuerte)"/><rect x="95" y="1" width="14" height="23" rx="3" fill="var(--pino)"/></svg></div>
+      </div>
+      <div class="costo"><span class="lbl">Costo</span><span class="barato"><i class="i i-s" data-i="check"></i>El más barato</span><span class="t-numero" style="color:var(--logro-texto)"><span class="peso">$</span>9.120</span></div>
+    </div>
+  </div>
+
+  <div class="teclas">
+    <div class="tecla-g"><span class="kbd">D</span>Son distintos</div>
+    <div class="tecla-g"><span class="kbd">J</span>Después</div>
+    <div class="tecla-g si"><span class="kbd">E</span>Es el mismo · queda con 2 proveedores</div>
+    <div class="tecla-g"><span class="kbd">Esc</span>Salir</div>
+  </div>
+</div>
+</body>
+</html>

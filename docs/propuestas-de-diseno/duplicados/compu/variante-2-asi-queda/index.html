@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicados · Así queda (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../duplicados.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .pantalla { display: grid; grid-template-columns: minmax(0,1fr) 292px; gap: 20px; padding-top: 16px; }
+  .izq { display: flex; flex-direction: column; min-height: 0; gap: 12px; }
+  .franja { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 14px; }
+  .franja .txt { font-size: 15px; line-height: 20px; color: var(--texto-2); font-weight: 550; }
+  .franja .txt b { color: var(--tinta); }
+  .franja .btn { margin-left: auto; }
+  .anillo { width: 44px; height: 44px; flex: none; }
+  .grupos { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; min-height: 0; overflow: hidden; }
+  .grupo { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .g-cab { display: grid; grid-template-columns: 48px minmax(0,1fr); gap: 12px; align-items: center; }
+  .g-cab .foto { width: 48px; height: 48px; }
+  .g-cab .n { font-weight: 800; font-size: 16px; line-height: 21px; }
+  .g-cab .n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .g-cab .d { font-size: 14px; color: var(--texto-2); line-height: 19px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .provs { display: grid; gap: 4px; }
+  .prov { display: grid; grid-template-columns: 20px minmax(0,1fr) 48px 76px; gap: 10px; align-items: center; height: 34px; padding: 0 8px; border-radius: 10px; font-size: 14px; }
+  .prov .chk { width: 18px; height: 18px; border-radius: 5px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+  .prov .chk.no { background: #fff; border: 2px solid var(--borde-fuerte); }
+  .prov .q { font-weight: 700; color: var(--tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prov .q small { font-weight: 550; color: var(--texto-3); font-size: 14px; }
+  .prov .bar { height: 8px; border-radius: 99px; background: var(--hundido); overflow: hidden; }
+  .prov .bar b { display: block; height: 100%; border-radius: 99px; background: var(--borde-fuerte); }
+  .prov .c { text-align: right; font-weight: 800; font-size: 15px; }
+  .prov.mejor { background: var(--logro-suave); }
+  .prov.mejor .bar { background: #fff; }
+  .prov.mejor .bar b { background: var(--logro); }
+  .prov.mejor .c { color: var(--logro-texto); }
+  .prov.fuera { opacity: .55; }
+  .prov.fuera .q { text-decoration: line-through; }
+  .g-pie { display: flex; align-items: center; gap: 4px; margin-top: auto; } .g-pie .btn-fantasma { padding: 0 8px; }
+  .g-pie .t-detalle { margin-left: auto; white-space: nowrap; }
+  .agregar { border: 1.5px dashed var(--borde-fuerte); border-radius: var(--r-tarjeta); display: grid; place-items: center; text-align: center; color: var(--texto-2); padding: 16px; gap: 8px; align-content: center; }
+  .agregar .i-xl { color: var(--texto-3); margin: 0 auto; }
+
+  .der { display: flex; flex-direction: column; min-height: 0; }
+  .der .tarjeta { padding: 14px 16px; display: flex; flex-direction: column; min-height: 0; flex: 1; }
+  .der .cab { display: flex; align-items: center; gap: 8px; }
+  .buscar-mini { margin-top: 10px; height: 40px; font-size: 14px; }
+  .linea { margin-top: 12px; display: grid; gap: 0; position: relative; }
+  .ev { display: grid; grid-template-columns: 40px 1fr; gap: 4px 10px; padding: 10px 0; border-top: 1px solid var(--borde); }
+  .ev:first-child { border-top: 0; }
+  .ev .foto { grid-row: 1 / span 2; width: 40px; height: 40px; border-radius: 8px; }
+  .ev .n { font-weight: 750; font-size: 14px; line-height: 19px; }
+  .ev .d { font-size: 14px; color: var(--texto-3); line-height: 19px; display: flex; align-items: center; gap: 6px; }
+  .ev .d .btn { margin-left: auto; min-height: 30px; height: 30px; padding: 0 10px; } .ev .d { white-space: nowrap; }
+  .ev.recien { background: linear-gradient(90deg, var(--logro-suave), transparent 85%); margin: 0 -16px; padding-left: 16px; padding-right: 16px; border-top-color: transparent; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Catálogo</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="search"></i>Buscar en todo el catálogo <span class="kbd">Alt B</span></button>
+        <button class="btn btn-accion chico"><i class="i i-s" data-i="git-merge"></i>Unir los 7 de mismo código <span class="kbd">Alt U</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Productos</a><a>Listas de precios</a><a class="activa">Duplicados <span class="pastilla urgente" style="height:24px">9</span></a></nav>
+    <section class="pantalla">
+      <div class="izq">
+        <div class="franja tarjeta">
+          <svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--hundido-2)" stroke-width="6"/><circle cx="22" cy="22" r="18" fill="none" stroke="var(--logro)" stroke-width="6" stroke-linecap="round" stroke-dasharray="33.9 113.1" transform="rotate(-90 22 22)"/></svg>
+          <div class="txt"><b>9 artículos</b> aparecen más de una vez: 3 de 12 resueltos hoy.<br>Cada tarjeta muestra <b>cómo queda</b> al unir; destildá el proveedor que no corresponde.</div>
+        </div>
+        <div class="grupos">
+          <div class="grupo tarjeta">
+            <div class="g-cab"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="n">Cinta métrica PowerLock 5 m</div><div class="d">Stanley <span class="motivo codigo" style="height:24px"><i class="i i-s" data-i="barcode"></i>Mismo código</span></div></div></div>
+            <div class="provs">
+              <div class="prov mejor"><span class="chk"><i class="i i-s" data-i="check"></i></span><span class="q">Ferretera del Sur</span><span class="bar"><b style="width:86%"></b></span><span class="c"><span class="peso">$</span>9.120</span></div>
+              <div class="prov"><span class="chk"><i class="i i-s" data-i="check"></i></span><span class="q">Distribuidora Oeste</span><span class="bar"><b style="width:88%"></b></span><span class="c"><span class="peso">$</span>9.350</span></div>
+              <div class="prov"><span class="chk"><i class="i i-s" data-i="check"></i></span><span class="q">Bulonera Centro</span><span class="bar"><b style="width:100%"></b></span><span class="c"><span class="peso">$</span>10.600</span></div>
+            </div>
+            <div class="g-pie"><button class="btn chico"><i class="i i-s" data-i="git-merge"></i>Unir 3 en uno</button><button class="btn chico btn-fantasma">Son distintos</button><span class="t-detalle">22 un.</span></div>
+          </div>
+
+          <div class="grupo tarjeta">
+            <div class="g-cab"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer <span class="motivo texto" style="height:24px"><i class="i i-s" data-i="type"></i>Misma descripción</span></div></div></div>
+            <div class="provs">
+              <div class="prov mejor"><span class="chk"><i class="i i-s" data-i="check"></i></span><span class="q">Fischer Argentina</span><span class="bar"><b style="width:94%"></b></span><span class="c"><span class="peso">$</span>4.150</span></div>
+              <div class="prov"><span class="chk"><i class="i i-s" data-i="check"></i></span><span class="q">Bulonera Centro</span><span class="bar"><b style="width:100%"></b></span><span class="c"><span class="peso">$</span>4.390</span></div>
+            </div>
+            <div class="g-pie"><button class="btn chico"><i class="i i-s" data-i="git-merge"></i>Unir 2 en uno</button><button class="btn chico btn-fantasma">Son distintos</button><span class="t-detalle">3 un.</span></div>
+          </div>
+
+          <div class="grupo tarjeta">
+            <div class="g-cab"><span class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></span><div><div class="n">Pinza universal 8" aislada 1000 V</div><div class="d">Bahco <span class="motivo codigo" style="height:24px"><i class="i i-s" data-i="barcode"></i>Mismo código</span></div></div></div>
+            <div class="provs">
+              <div class="prov mejor"><span class="chk"><i class="i i-s" data-i="check"></i></span><span class="q">Distribuidora Oeste</span><span class="bar"><b style="width:91%"></b></span><span class="c"><span class="peso">$</span>15.800</span></div>
+              <div class="prov fuera"><span class="chk no"></span><span class="q">Ferretera del Sur</span><span class="bar"><b style="width:76%"></b></span><span class="c"><span class="peso">$</span>13.200</span></div>
+              <div class="prov"><span class="chk"><i class="i i-s" data-i="check"></i></span><span class="q">Bulonera Centro</span><span class="bar"><b style="width:100%"></b></span><span class="c"><span class="peso">$</span>17.350</span></div>
+            </div>
+            <div class="g-pie"><button class="btn chico"><i class="i i-s" data-i="git-merge"></i>Unir 2 en uno</button><button class="btn chico btn-fantasma">Son distintos</button><span class="t-detalle">1 queda aparte</span></div>
+          </div>
+
+          <div class="agregar">
+            <i class="i i-xl" data-i="combine"></i>
+            <div class="t-renglon">¿Viste dos iguales que no están acá?</div>
+            <div class="t-detalle">Arrastrá un producto desde Productos o<br>escribí dos nombres para unirlos a mano.</div>
+            <button class="btn chico" style="justify-self:center"><i class="i i-s" data-i="plus"></i>Unir a mano <span class="kbd">Alt M</span></button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="der">
+        <div class="tarjeta">
+          <div class="cab"><span class="t-seccion" style="font-size:18px">Unidos</span><span class="pastilla">38</span><span class="t-detalle" style="margin-left:auto">se pueden separar</span></div>
+          <div class="campo buscar-mini"><i class="i i-s" data-i="search"></i>Buscar un unido…</div>
+          <div class="linea">
+            <div class="ev recien"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div class="n">Mecha acero rápido HSS 8 mm</div><div class="d">recién · 2 prov. <button class="btn btn-suave chico"><i class="i i-s" data-i="split"></i>Separar</button></div></div>
+            <div class="ev"><span class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></span><div class="n">Llave combinada 13 mm</div><div class="d">ayer · 3 prov. <button class="btn btn-suave chico"><i class="i i-s" data-i="split"></i>Separar</button></div></div>
+            <div class="ev"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div class="n">Puntas Phillips PH2 × 25</div><div class="d">15/10 · 2 prov. <button class="btn btn-suave chico"><i class="i i-s" data-i="split"></i>Separar</button></div></div>
+            <div class="ev"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div class="n">Látex interior mate blanco 4 L</div><div class="d">12/10 · 2 prov. <button class="btn btn-suave chico"><i class="i i-s" data-i="split"></i>Separar</button></div></div>
+            <div class="ev"><span class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></span><div class="n">Tornillo autoperforante 8 × 1"</div><div class="d">09/10 · 2 prov. <button class="btn btn-suave chico"><i class="i i-s" data-i="split"></i>Separar</button></div></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+</div>
+</body>
+</html>

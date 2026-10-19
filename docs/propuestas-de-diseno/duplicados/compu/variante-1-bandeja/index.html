@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicados · Bandeja (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../duplicados.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .pantalla { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
+  .kpis { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 12px; }
+  .kpis .resumen { padding: 10px 16px; }
+  .kpis .resumen .va { font-size: 22px; line-height: 26px; }
+  .kpis .mini-barras { display: flex; gap: 3px; align-items: flex-end; height: 26px; margin-left: auto; }
+  .kpis .mini-barras b { width: 8px; border-radius: 3px; background: var(--urgente); opacity: .85; }
+  .kpis .mini-barras b.v { background: var(--hundido-2); }
+
+  .cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: 330px 1fr; gap: 16px; }
+
+  /* Bandeja */
+  .bandeja { display: flex; flex-direction: column; min-height: 0; }
+  .bandeja .chips { margin-bottom: 10px; flex-wrap: nowrap; }
+  .bandeja .chip { height: 36px; padding: 0 12px; font-size: 14px; white-space: nowrap; }
+  .cola { display: grid; gap: 6px; overflow: hidden; position: relative; }
+  .cola::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(transparent, var(--fondo)); }
+  .sug { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; grid-template-areas: "f n p" "f d p"; gap: 4px 12px; align-items: center; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .sug .foto { grid-area: f; } .sug .n { grid-area: n; } .sug .d { grid-area: d; white-space: nowrap; overflow: hidden; }
+  .sug .n { font-weight: 750; font-size: 15px; line-height: 20px; }
+  .sug .d { font-size: 14px; line-height: 18px; color: var(--texto-2); display: flex; gap: 6px; align-items: center; }
+  .sug .pv { grid-area: p; align-self: start; font-size: 14px; color: var(--texto-3); font-weight: 650; text-align: right; }
+  .sug.foco { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10), var(--sombra-2); position: relative; }
+  .sug.foco::before { content: ""; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--pino); }
+  .sug .ic { width: 16px; height: 16px; }
+
+  /* Comparación */
+  .comparar { display: flex; flex-direction: column; min-height: 0; padding: 16px 20px; }
+  .comp-cab { display: flex; align-items: center; gap: 12px; }
+  .comp-cab .t-seccion { font-size: 18px; }
+  .comp-cab .nav { margin-left: auto; display: flex; gap: 6px; align-items: center; color: var(--texto-3); font-size: 14px; font-weight: 650; }
+  .tabla { margin-top: 12px; display: grid; grid-template-columns: 116px 1fr 1fr; border: 1px solid var(--borde); border-radius: 14px; overflow: hidden; }
+  .tabla > div { padding: 6px 14px; border-top: 1px solid var(--borde); font-size: 15px; line-height: 22px; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .tabla > .h { border-top: 0; padding: 12px 14px; }
+  .tabla > .r { color: var(--texto-3); font-size: 14px; font-weight: 650; background: #FBFAF7; }
+  .tabla > .cel + .cel { border-left: 1px solid var(--borde); }
+  .tabla .prod { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; width: 100%; }
+  .tabla .prod .n { font-weight: 750; font-size: 15px; line-height: 20px; }
+  .tabla .elegida { background: linear-gradient(var(--pino-suave), var(--pino-suave)); }
+  .tabla .costo { font-weight: 800; font-size: 18px; } .tabla .foto { width: 48px; height: 48px; } .tabla .h { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .ok { color: var(--logro-texto); display: inline-flex; }
+  .queda { margin-top: 12px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--hundido); font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .queda b { color: var(--tinta); }
+  .queda .i { color: var(--pino-texto); }
+  .acciones-comp { margin-top: auto; padding-top: 12px; display: flex; gap: 8px; align-items: center; }
+  .acciones-comp .ayuda { margin-left: auto; font-size: 14px; color: var(--texto-3); font-weight: 600; display: flex; gap: 6px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Catálogo</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="search"></i>Buscar en todo el catálogo <span class="kbd">Alt B</span></button>
+        <button class="btn chico"><i class="i i-s" data-i="git-merge"></i>Unir a mano <span class="kbd">Alt U</span></button>
+        <button class="btn chico"><i class="i i-s" data-i="split"></i>Unidos y separar <span class="kbd">Alt S</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Productos</a><a>Listas de precios</a><a class="activa">Duplicados <span class="pastilla urgente" style="height:24px">12</span></a></nav>
+    <section class="pantalla">
+      <div class="kpis">
+        <div class="resumen urgente"><span class="ico"><i class="i" data-i="layers"></i></span><div><div class="et">Por revisar</div><div class="va">12 <span style="font-size:15px;font-weight:700">sugerencias</span></div></div>
+          <div class="mini-barras" title="Llegaron por lista, últimos 7 días"><b style="height:30%"></b><b class="v" style="height:15%"></b><b style="height:55%"></b><b class="v" style="height:15%"></b><b style="height:40%"></b><b style="height:100%"></b><b style="height:70%"></b></div></div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="barcode"></i></span><div><div class="et">Mismo código</div><div class="va">7</div></div></div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="type"></i></span><div><div class="et">Descripción parecida</div><div class="va">5</div></div></div>
+        <div class="resumen logro"><span class="ico"><i class="i" data-i="git-merge"></i></span><div><div class="et">Unidos hasta hoy</div><div class="va">38 <span style="font-size:15px;font-weight:700">productos</span></div></div></div>
+      </div>
+
+      <div class="cuerpo">
+        <div class="bandeja">
+          <div class="chips"><span class="chip elegido">Todas (12)</span><span class="chip">Código (7)</span><span class="chip">Texto (5)</span></div>
+          <div class="cola">
+            <div class="sug foco"><span class="foto chica"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div class="n elipsis">Mecha acero rápido HSS 8 mm</div><span class="pv">hoy</span><div class="d"><i class="i ic" data-i="barcode"></i>Bulonera Centro · Distrib. Oeste</div></div>
+            <div class="sug"><span class="foto chica"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div class="n elipsis">Cinta métrica PowerLock 5 m</div><span class="pv">hoy</span><div class="d"><i class="i ic" data-i="barcode"></i>Distrib. Oeste · Ferretera del Sur</div></div>
+            <div class="sug"><span class="foto chica"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div class="n elipsis">Tarugos nylon S8 con tope × 100</div><span class="pv">hoy</span><div class="d"><i class="i ic" data-i="type"></i>Fischer Arg. · Bulonera Centro</div></div>
+            <div class="sug"><span class="foto chica"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div class="n elipsis">Martillo carpintero 27 mm mango tubular</div><span class="pv">14/10</span><div class="d"><i class="i ic" data-i="barcode"></i>Bahco Arg. · Ferretera del Sur</div></div>
+            <div class="sug"><span class="foto chica"><img src="../../../_comun/fotos/pinza.webp" alt=""></span><div class="n elipsis">Pinza universal 8" aislada 1000 V</div><span class="pv">14/10</span><div class="d"><i class="i ic" data-i="type"></i>Distrib. Oeste · Bulonera Centro</div></div>
+            <div class="sug"><span class="foto chica"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div class="n elipsis">Lámpara LED 9 W luz fría E27</div><span class="pv">10/10</span><div class="d"><i class="i ic" data-i="barcode"></i>Eléctrica Moreno · Distrib. Oeste</div></div>
+          </div>
+        </div>
+
+        <div class="comparar tarjeta-2">
+          <div class="comp-cab">
+            <span class="t-seccion">¿Es el mismo artículo?</span>
+            <span class="motivo codigo"><i class="i i-s" data-i="barcode"></i>Mismo código de barras</span>
+            <span class="nav"><span class="kbd">J</span><span class="kbd">K</span> 1 de 12</span>
+          </div>
+          <div class="tabla">
+            <div class="r h">Producto</div>
+<div class="cel h elegida"><span class="cons si"><span class="radio"></span>Conservar este <span class="kbd" style="height:20px;background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.35)">←</span></span><div class="prod"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div class="n">Mecha acero rápido HSS 8 mm</div></div></div>
+            <div class="cel h"><span class="cons"><span class="radio"></span>Conservar este <span class="kbd" style="height:20px">→</span></span><div class="prod"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div class="n"><span class="difiere">MECHA HSS 8MM P/METAL</span></div></div></div>
+
+            <div class="r">Marca</div>
+            <div class="cel elegida">Ezeta</div>
+            <div class="cel">Ezeta <span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+
+            <div class="r">Cód. barras</div>
+            <div class="cel elegida">7 791234 005081</div>
+            <div class="cel">7 791234 005081 <span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+
+            <div class="r">Proveedor</div>
+            <div class="cel elegida">Bulonera Centro · ME080</div>
+            <div class="cel">Distribuidora Oeste · 40-HSS08</div>
+
+            <div class="r">Costo</div>
+            <div class="cel elegida"><span class="costo"><span class="peso">$</span>2.480</span><span class="barato"><i class="i i-s" data-i="check"></i>El más barato</span></div>
+            <div class="cel"><span class="costo"><span class="peso">$</span>2.610</span><span class="t-detalle">+5 %</span></div>
+
+            <div class="r">Lista</div>
+            <div class="cel elegida">14/10/2026 · hace 5 días</div>
+            <div class="cel"><span class="difiere">02/10/2026 · hace 17 días</span></div>
+          </div>
+          <div class="queda"><i class="i" data-i="git-merge"></i><span>Queda <b>un solo producto</b> con 2 proveedores, <b>16 un.</b> y las 35 ventas. El costo sale de <b>Bulonera Centro ($2.480)</b>. Si te equivocás, lo separás en Unidos.</span></div>
+          <div class="acciones-comp">
+            <button class="btn btn-accion"><i class="i" data-i="git-merge"></i>Es el mismo <span class="kbd">E</span></button>
+            <button class="btn"><i class="i" data-i="x"></i>Son distintos <span class="kbd">D</span></button>
+            <button class="btn btn-fantasma">Saltar <span class="kbd">J</span></button>
+            <span class="ayuda"><span class="difiere" style="margin:0">ámbar</span> = lo que cambia</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

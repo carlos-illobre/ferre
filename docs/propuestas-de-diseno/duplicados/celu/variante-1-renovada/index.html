@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicados · Renovada (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../duplicados.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 20px; background: linear-gradient(transparent, var(--fondo)); pointer-events: none; }
+  .nota { display: flex; gap: 10px; padding: 2px 0 2px 12px; border-left: 3px solid var(--logro); font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 550; }
+  .nota .i { color: var(--logro-texto); margin-top: 1px; }
+  .nota b { color: var(--tinta); }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tres .btn { width: 100%; justify-content: flex-start; padding: 0 10px; font-size: 15px; gap: 6px; }
+  .tres .cap { font-size: 14px; line-height: 18px; color: var(--texto-3); font-weight: 550; margin-top: 4px; }
+  .cab-sec { display: flex; align-items: center; gap: 8px; }
+  .cab-sec .t-seccion { font-size: 18px; }
+  .cab-sec .t-detalle { margin-left: auto; }
+  .sug { padding: 10px; display: grid; gap: 8px; }
+  .par { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; position: relative; }
+  .lado { border: 1px solid var(--borde); border-radius: 14px; padding: 10px; display: grid; gap: 6px; align-content: start; }
+  .lado.si { border: 2px solid var(--pino); background: linear-gradient(var(--pino-suave), #fff 70px); padding: 9px; }
+  .lado { min-width: 0; overflow: hidden; grid-template-columns: minmax(0,1fr); } .lado .foto { width: auto; height: 60px; }
+  .lado .foto img { width: auto; height: 54px; }
+  .lado .n { font-weight: 750; font-size: 14px; line-height: 19px; height: 38px; overflow: hidden; }
+  .lado .fila-icono { gap: 6px; }
+  .lado .costo { font-weight: 800; font-size: 20px; line-height: 24px; display: flex; align-items: center; gap: 6px; }
+  .lado .cons { width: 100%; justify-content: center; height: 36px; }
+  .vs { position: absolute; left: 50%; top: 40px; width: 28px; height: 28px; margin-left: -14px; border-radius: 99px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-1); display: grid; place-items: center; font-weight: 800; font-size: 14px; color: var(--texto-2); }
+  .decide { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; }
+  .decide .btn { width: 100%; }
+  .unida { display: grid; grid-template-columns: 44px 1fr auto; gap: 2px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--borde); }
+  .unida .foto { width: 44px; height: 44px; grid-row: 1 / span 2; }
+  .unida .n { font-weight: 750; font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Productos</a><a>Listas</a><a class="activa">Duplicados</a></nav>
+  <div class="celu-pantalla">
+    <div class="nota"><i class="i i-s" data-i="git-merge"></i><span>El mismo artículo puede estar en varias listas. <b>Al unirlos queda uno solo</b>, con todos sus proveedores y el precio del más barato.</span></div>
+    <div class="tres">
+      <div><button class="btn btn-oscuro"><i class="i i-s" data-i="search"></i>Buscar</button><div class="cap">Todo el catálogo</div></div>
+      <div><button class="btn"><i class="i i-s" data-i="git-merge"></i>Unir</button><div class="cap">Dos, a mano</div></div>
+      <div><button class="btn"><i class="i i-s" data-i="split"></i>Separar</button><div class="cap">Una unión</div></div>
+    </div>
+
+    <div class="cab-sec"><span class="t-seccion">Por revisar</span><span class="pastilla urgente">12</span><span class="t-detalle">1 de 12 ›</span></div>
+    <div class="sug tarjeta-2">
+      <span class="motivo codigo" style="justify-self:start"><i class="i i-s" data-i="barcode"></i>Mismo código de barras</span>
+      <div class="par">
+        <div class="lado si">
+          <span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span>
+          <div class="n">Mecha acero rápido HSS 8 mm</div>
+          <div class="fila-icono"><i class="i i-s" data-i="tags"></i>Ezeta</div>
+          <div class="fila-icono elipsis"><i class="i i-s" data-i="truck"></i><span class="elipsis">Bulonera Centro</span></div>
+          <div class="fila-icono"><i class="i i-s" data-i="calendar-days"></i>14/10/2026</div>
+          <div class="costo"><span><span class="peso">$</span>2.480</span><span class="barato" style="padding:0 6px"><i class="i i-s" data-i="check"></i>barato</span></div>
+          <span class="cons si"><span class="radio"></span>Se conserva</span>
+        </div>
+        <div class="lado">
+          <span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span>
+          <div class="n"><span class="difiere">MECHA HSS 8MM P/METAL</span></div>
+          <div class="fila-icono"><i class="i i-s" data-i="tags"></i>Ezeta</div>
+          <div class="fila-icono"><i class="i i-s" data-i="truck"></i><span class="elipsis">Distrib. Oeste</span></div>
+          <div class="fila-icono"><i class="i i-s" data-i="calendar-days"></i><span class="difiere">02/10/2026</span></div>
+          <div class="costo"><span><span class="peso">$</span>2.610</span></div>
+          <span class="cons"><span class="radio"></span>Conservar</span>
+        </div>
+        <span class="vs">=</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="cab-sec"><span class="t-seccion">Productos unidos</span><span class="pastilla logro">38</span><span class="t-detalle" style="color:var(--pino-texto);font-weight:700">Ver todo</span></div>
+      <div class="unida" style="border-top:0"><span class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></span><div class="n">Llave combinada 13 mm</div><button class="btn btn-suave chico" style="grid-row:1 / span 2;color:var(--pino-texto);background:var(--pino-suave)"><i class="i i-s" data-i="split"></i>Separar</button><div class="t-detalle">Bahco · 3 proveedores · 18/10</div></div>
+    </div>
+  </div>
+  <div class="barra-accion"><div class="decide">
+        <button class="btn btn-accion"><i class="i" data-i="git-merge"></i>Es el mismo</button>
+        <button class="btn"><i class="i" data-i="x"></i>Son distintos</button>
+      </div></div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a class="activo"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

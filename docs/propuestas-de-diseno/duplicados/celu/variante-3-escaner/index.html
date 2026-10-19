@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplicados · Escaneá el estante (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../duplicados.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu { background: #141714; }
+  .camara { position: absolute; inset: 0 0 auto; height: 400px; background: radial-gradient(120% 80% at 50% 40%, #3a3a33 0%, #1c1e1b 60%, #111311 100%); overflow: hidden; }
+  .camara .estante { position: absolute; left: -10px; right: -10px; top: 318px; height: 18px; background: linear-gradient(#6b5a43, #3d3226); box-shadow: 0 8px 18px rgba(0,0,0,.5); }
+  .camara img.prod { position: absolute; left: 92px; top: 108px; width: 210px; filter: drop-shadow(0 18px 18px rgba(0,0,0,.55)) brightness(.95); }
+  .camara img.prod2 { position: absolute; left: -36px; top: 188px; width: 140px; opacity: .55; filter: blur(1.5px) brightness(.7); }
+  .camara img.prod3 { position: absolute; right: -40px; top: 176px; width: 150px; opacity: .5; filter: blur(1.5px) brightness(.7); transform: scaleX(-1); }
+  .visor { position: absolute; left: 70px; right: 70px; top: 150px; height: 120px; }
+  .visor b { position: absolute; width: 34px; height: 34px; border: 4px solid #fff; }
+  .visor b:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 12px 0 0 0; }
+  .visor b:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 12px 0 0; }
+  .visor b:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 12px; }
+  .visor b:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 12px 0; }
+  .visor .laser { position: absolute; left: 14px; right: 14px; top: 58px; height: 3px; border-radius: 3px; background: var(--accion); box-shadow: 0 0 12px var(--accion); }
+  .cab-cam { position: absolute; top: 48px; left: 16px; right: 16px; display: flex; align-items: center; gap: 10px; color: #fff; }
+  .cab-cam .r { width: 44px; height: 44px; border-radius: 99px; background: rgba(255,255,255,.14); backdrop-filter: blur(10px); display: grid; place-items: center; }
+  .cab-cam .tit { flex: 1; font-weight: 800; font-size: 17px; line-height: 21px; }
+  .cab-cam .tit small { display: block; font-weight: 600; font-size: 14px; opacity: .75; }
+  .leido { position: absolute; left: 50%; top: 286px; transform: translateX(-50%); display: inline-flex; gap: 8px; align-items: center; padding: 6px 12px; border-radius: 99px; background: rgba(255,255,255,.92); font-weight: 750; font-size: 14px; white-space: nowrap; }
+  .leido .i-s { color: var(--logro-texto); }
+  .barra-estado { position: relative; z-index: 2; color: #fff; }
+
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; top: 340px; background: var(--fondo); border-radius: 24px 24px 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+  .asa { width: 40px; height: 5px; border-radius: 99px; background: var(--hundido-2); margin: 0 auto 2px; }
+  .hoja .titulo { display: flex; align-items: center; gap: 10px; }
+  .hoja .titulo .t-seccion { flex: 1; font-size: 19px; line-height: 24px; }
+  .hoja .titulo .t-seccion small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-2); letter-spacing: 0; }
+  .lista { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); overflow: hidden; }
+  .fila { display: grid; grid-template-columns: 24px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--borde); }
+  .fila:first-child { border-top: 0; }
+  .fila .chk { width: 22px; height: 22px; border-radius: 7px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+  .fila .chk.no { background: #fff; border: 2px solid var(--borde-fuerte); }
+  .fila .n { font-weight: 750; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
+  .fila .c { text-align: right; font-weight: 800; font-size: 17px; }
+  .fila .c small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-3); }
+  .fila.mejor .c { color: var(--logro-texto); }
+  .fila.mejor .c small { color: var(--logro-texto); }
+  .fila.queda { background: linear-gradient(90deg, var(--pino-suave), #fff 70%); }
+  .deslizar { position: relative; height: 60px; border-radius: 99px; background: var(--accion); box-shadow: var(--sombra-accion); color: #fff; display: flex; align-items: center; padding-left: 72px; font-weight: 800; font-size: 17px; }
+  .deslizar .pulgar { position: absolute; left: 6px; top: 6px; width: 48px; height: 48px; border-radius: 99px; background: #fff; color: var(--accion); display: grid; place-items: center; }
+  .deslizar .flechas { margin-left: auto; margin-right: 18px; opacity: .7; }
+  .pie-hoja { padding-bottom: 28px; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .pie-hoja .btn { margin-left: auto; }
+  .recorrida { display: flex; gap: 6px; align-items: center; }
+  .pie-hoja > span { white-space: nowrap; } .recorrida .foto { width: 36px; height: 36px; border-radius: 99px; border: 2px solid var(--superficie); margin-left: -12px; box-shadow: var(--sombra-1); }
+  .recorrida .foto:first-child { margin-left: 0; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="camara">
+    <img class="prod2" src="../../../_comun/fotos/pintura.webp" alt="">
+    <img class="prod3" src="../../../_comun/fotos/martillo.webp" alt="">
+    <div class="estante"></div>
+    <img class="prod" src="../../../_comun/fotos/tarugos.webp" alt="">
+    <div class="visor"><b></b><b></b><b></b><b></b><span class="laser"></span></div>
+    <span class="leido"><i class="i i-s" data-i="circle-check"></i>7 791245 008123 · leído</span>
+  </div>
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#fff" opacity=".5"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#fff"/></svg></span></div>
+  <div class="cab-cam">
+    <span class="r"><i class="i" data-i="x"></i></span>
+    <div class="tit">Recorrida de duplicados<small>Apuntá a cada artículo del estante</small></div>
+    <span class="r"><i class="i" data-i="flashlight"></i></span>
+  </div>
+
+  <div class="hoja">
+    <span class="asa"></span>
+    <div class="titulo">
+      <div class="t-seccion">Este código lo tienen 3<small>Destildá el que no es este artículo</small></div>
+      <span class="motivo codigo"><i class="i i-s" data-i="barcode"></i>Código</span>
+    </div>
+    <div class="lista">
+      <div class="fila queda mejor"><span class="chk"><i class="i i-s" data-i="check"></i></span><div><div class="n">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer Argentina · <b style="color:var(--pino-texto)">se conserva</b></div></div><div class="c"><span class="peso">$</span>4.150<small>16/10</small></div></div>
+      <div class="fila"><span class="chk"><i class="i i-s" data-i="check"></i></span><div><div class="n">TARUGO FISCHER S8 C/TOPE X100</div><div class="d">Bulonera Centro</div></div><div class="c"><span class="peso">$</span>4.390<small>14/10</small></div></div>
+      <div class="fila"><span class="chk no"></span><div><div class="n">Tarugo S8 sin tope × 100</div><div class="d">Distribuidora Oeste · otro artículo</div></div><div class="c" style="color:var(--texto-3)"><span class="peso">$</span>3.900<small>02/10</small></div></div>
+    </div>
+    <div class="aviso pino"><i class="i i-s" data-i="git-merge" style="margin-top:2px"></i><span>Queda <b>uno solo</b> con Fischer y Bulonera. Costo: <b>$4.150</b>, el más barato.</span></div>
+    <div class="deslizar"><span class="pulgar"><i class="i i-l" data-i="git-merge"></i></span>Deslizá para unir 2<span class="flechas"><i class="i" data-i="chevrons-right"></i></span></div>
+    <div class="pie-hoja">
+      <div class="recorrida"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></span></div>
+      <span>3 unidos acá</span>
+      <button class="btn btn-fantasma chico" style="padding:0 4px">Son distintos</button>
+    </div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>
