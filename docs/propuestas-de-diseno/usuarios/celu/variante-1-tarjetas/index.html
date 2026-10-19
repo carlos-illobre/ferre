@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usuarios · tarjetas (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_extra/usuarios.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 8px; padding-bottom: 0; }
+  .alta { display: flex; align-items: center; gap: 12px; min-height: 56px; width: 100%; padding: 0 14px; border: 0; border-radius: 14px; background: var(--accion); color: #fff; box-shadow: var(--sombra-accion); text-align: left; }
+  .alta .ico { width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,.18); display: grid; place-items: center; }
+  .alta b { font-size: 16px; display: block; line-height: 20px; }
+  .alta small { font-size: 14px; opacity: .9; font-weight: 600; }
+  .buscar { display: flex; gap: 8px; }
+  .buscar .campo { height: 44px; flex: 1; box-shadow: none; }
+  .conteo { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 650; color: var(--texto-2); padding: 0 4px; }
+  .per { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 12px 12px 12px 14px; }
+  .per .top { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 12px; align-items: center; }
+  .per .n { font-weight: 750; font-size: 16px; line-height: 20px; display: flex; gap: 6px; align-items: center; }
+  .per .m { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+  .per .roles { margin: 8px 0 0 52px; flex-wrap: nowrap; overflow: hidden; }
+  .per.abierta { border: 1.5px solid var(--pino); box-shadow: var(--sombra-2); }
+  .tabs { display: flex; margin: 12px 0 10px; padding: 3px; background: var(--hundido); border-radius: 12px; }
+  .tabs a { flex: 1; height: 38px; display: grid; place-items: center; border-radius: 9px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .tabs a.activa { background: #fff; color: var(--pino); box-shadow: var(--sombra-1); }
+  .disp { padding: 8px 10px; }
+  .disp .n { font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Actividad</a></nav>
+  <div class="celu-pantalla">
+    <button class="alta"><span class="ico"><i class="i" data-i="user-plus"></i></span><span class="grow"><b>Autorizar otro correo de Google</b><small>Invitá a alguien de tu negocio</small></span><i class="i" data-i="chevron-right"></i></button>
+    <div class="buscar"><div class="campo"><i class="i" data-i="search"></i>Nombre o correo</div><button class="btn"><i class="i" data-i="list-filter"></i>Filtros</button></div>
+    <div class="conteo"><span>7 usuarios · 6 activos</span><span class="lineal" style="gap:4px"><i class="i i-s" data-i="arrow-up-down"></i>Ordenar: correo</span></div>
+
+    <div class="per">
+      <div class="top"><span class="av t1">CI</span><div style="min-width:0"><div class="n">Carlos Illobre <span class="yo">Vos</span></div><div class="m ellipsis">carlos.ferrebress@gmail.com</div></div><i class="i" data-i="chevron-down" style="color:var(--texto-3)"></i></div>
+      <div class="roles"><span class="rol admin"><i data-i="shield-check"></i>Administrador</span><span class="rol"><i data-i="chart-column"></i>Gerente</span></div>
+    </div>
+
+    <div class="per abierta">
+      <div class="top"><span class="av t2">MS<span class="vivo"></span></span><div style="min-width:0"><div class="n">Martín Sosa</div><div class="m ellipsis">martin.sosa.deposito@gmail.com</div></div><i class="i" data-i="chevron-up" style="color:var(--pino)"></i></div>
+      <div class="roles"><span class="rol"><i data-i="package"></i>Recepción</span><span class="rol"><i data-i="truck"></i>Comprador</span></div>
+      <div class="tabs"><a>Información</a><a>Roles</a><a class="activa">Acceso (2)</a></div>
+      <div class="disp"><span class="ico"><i class="i" data-i="monitor"></i><span class="vivo"></span></span><div><div class="n">Compu del depósito</div><div class="d">Usándola ahora</div></div><button class="btn chico btn-suave">Cerrar</button></div>
+      <div class="disp"><span class="ico"><i class="i" data-i="smartphone"></i></span><div><div class="n">Samsung A34</div><div class="d lineal" style="gap:4px">Hace 2 h · <i class="i i-s" data-i="fingerprint"></i>con huella</div></div><button class="btn chico btn-suave btn-icono"><i class="i i-s" data-i="ellipsis"></i></button></div>
+          </div>
+
+    <div class="per">
+      <div class="top"><span class="av t3">LF<span class="vivo"></span></span><div style="min-width:0"><div class="n">Lucía Fernández</div><div class="m ellipsis">lucia.fernandez.mostrador@gmail.com</div></div><i class="i" data-i="chevron-down" style="color:var(--texto-3)"></i></div>
+      <div class="roles"><span class="rol"><i data-i="shopping-cart"></i>Vendedor</span></div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a><i class="i" data-i="tags"></i>Catálogo</a>
+    <a><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usuarios · la hoja de la persona (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_extra/usuarios.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .lista { display: flex; flex-direction: column; }
+  .grupo-t { font-size: 14px; font-weight: 750; color: var(--texto-2); margin: 8px 4px 6px; }
+  .contacto { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; background: #fff; border-bottom: 1px solid var(--borde); }
+  .contacto:first-of-type { border-radius: 16px 16px 0 0; }
+  .contacto .n { font-weight: 700; font-size: 16px; line-height: 20px; }
+  .velo { position: absolute; inset: 0; background: rgba(26,29,27,.30); }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; height: 676px; background: var(--fondo); border-radius: 24px 24px 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .asa { width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 0 auto 4px; }
+  .h-cab { display: grid; grid-template-columns: 56px 1fr 36px; gap: 12px; align-items: center; }
+  .sec { font-size: 14px; font-weight: 750; color: var(--texto-2); display: flex; justify-content: space-between; margin: 2px 4px -4px; }
+  .llaves { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .lr { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px; padding: 10px 10px 10px 12px; background: #fff; border: 1px solid var(--borde); border-radius: 14px; min-height: 60px; }
+  .lr .n { font-weight: 700; font-size: 15px; line-height: 18px; display: flex; align-items: center; gap: 6px; }
+  .lr .n svg { width: 16px; height: 16px; color: var(--texto-2); }
+  .lr .d { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .lr.si { border-color: var(--pino); background: var(--pino-suave); }
+  .lr.si .n svg { color: var(--pino); }
+  .swipe { position: relative; border-radius: 14px; overflow: hidden; background: var(--error); height: 62px; }
+  .swipe .detras { position: absolute; right: 0; top: 0; bottom: 0; width: 112px; display: grid; place-items: center; color: #fff; font-weight: 750; font-size: 15px; }
+  .swipe .disp { position: absolute; inset: 0; right: 112px; border-radius: 14px 0 0 14px; margin: 0; border: 0; height: 62px; }
+  .hoja .disp { height: 62px; border-radius: 14px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Actividad</a></nav>
+  <div class="celu-pantalla">
+    <div class="grupo-t">Usando la app ahora · 3</div>
+    <div class="lista">
+      <div class="contacto"><span class="av t2">MS<span class="vivo"></span></span><div class="n">Martín Sosa</div><i class="i" data-i="chevron-right"></i></div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a><i class="i" data-i="shopping-cart"></i>Vender</a><a><i class="i" data-i="tags"></i>Catálogo</a><a><i class="i" data-i="package"></i>Depósito</a><a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a><a><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+
+  <div class="velo"></div>
+  <div class="hoja">
+    <div class="asa"></div>
+    <div class="h-cab"><span class="av l t2">MS<span class="vivo"></span></span><div style="min-width:0"><div class="t-seccion">Martín Sosa</div><div class="t-detalle ellipsis">martin.sosa.deposito@gmail.com</div><div class="t-detalle" style="color:var(--logro-texto);font-weight:650">En la compu del depósito, ahora</div></div><button class="btn btn-suave btn-icono chico"><i class="i i-s" data-i="x"></i></button></div>
+
+    <div class="sec"><span>Sus llaves</span><span style="font-weight:600">tocá para dar o quitar</span></div>
+    <div class="llaves">
+      <div class="lr"><div><div class="n"><i data-i="shopping-cart"></i>Vendedor</div><div class="d">Vende y anula</div></div><span class="llave"></span></div>
+      <div class="lr si"><div><div class="n"><i data-i="truck"></i>Comprador</div><div class="d">Pide, listas</div></div><span class="llave si"></span></div>
+      <div class="lr si"><div><div class="n"><i data-i="package"></i>Recepción</div><div class="d">Recibe, cuenta</div></div><span class="llave si"></span></div>
+      <div class="lr"><div><div class="n"><i data-i="chart-column"></i>Gerente</div><div class="d">Ve los números</div></div><span class="llave"></span></div>
+      <div class="lr" style="grid-column: span 2"><div><div class="n"><i data-i="shield-check"></i>Administrador</div><div class="d">Autoriza personas y arma roles</div></div><span class="llave"></span></div>
+    </div>
+
+    <div class="aviso pino" style="padding:10px 12px"><i class="i i-s" data-i="key-round" style="margin-top:2px"></i><span class="grow">Puede 8 de 21 cosas. <b>Ver cuáles</b></span><i class="i i-s" data-i="chevron-right" style="margin-top:2px"></i></div>
+    <div class="sec"><span>Dónde entró · 2</span><span style="font-weight:600">deslizá para cerrar</span></div>
+    <div class="disp"><span class="ico"><i class="i" data-i="monitor"></i><span class="vivo"></span></span><div><div class="n">Compu del depósito</div><div class="d">Chrome · ahora</div></div><span></span></div>
+    <div class="swipe"><div class="detras"><span class="lineal" style="gap:6px"><i class="i" data-i="log-out"></i>Cerrar</span></div><div class="disp" style="transform:none"><span class="ico"><i class="i" data-i="smartphone"></i></span><div><div class="n">Samsung A34</div><div class="d lineal" style="gap:4px">Hace 2 h · <i class="i i-s" data-i="fingerprint"></i>huella</div></div><span></span></div></div>
+
+    <div class="lineal" style="margin-top:auto;gap:8px">
+      <button class="btn btn-peligro" style="flex:1"><i class="i" data-i="user-x"></i>Desactivar</button>
+      <button class="btn" style="flex:1"><i class="i" data-i="history"></i>Qué hizo hoy</button>
+    </div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

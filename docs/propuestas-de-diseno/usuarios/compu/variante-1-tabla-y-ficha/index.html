@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usuarios · tabla y ficha</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_extra/usuarios.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  .pantalla { display: grid; grid-template-columns: 1fr 344px; gap: 20px; padding-top: 16px; }
+  .izq { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .kpis .resumen { padding: 10px 12px; gap: 10px; }
+  .kpis .resumen > div { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: baseline; gap: 8px; }
+  .kpis .resumen .et { line-height: 18px; white-space: nowrap; }
+  .kpis .resumen .ico { width: 36px; height: 36px; }
+  .kpis .resumen .va { font-size: 22px; line-height: 26px; }
+  .kpis .resumen .va small { font-size: 14px; color: var(--texto-2); font-weight: 650; }
+  .barra-h { display: flex; gap: 8px; align-items: center; }
+  .barra-h .campo { height: 40px; flex: 1; box-shadow: none; }
+  .barra-h .chip { height: 36px; font-size: 14px; padding: 0 12px; }
+  .tabla { display: flex; flex-direction: column; gap: 6px; }
+  .cab, .fila { display: grid; grid-template-columns: 40px minmax(0, 1fr) 236px 104px 16px; gap: 12px; align-items: center; }
+  .cab { padding: 0 16px; font-size: 14px; font-weight: 650; color: var(--texto-3); }
+  .fila { padding: 7px 16px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .fila .nom { font-weight: 700; font-size: 15px; line-height: 20px; display: flex; gap: 6px; align-items: center; }
+  .fila .mail { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+  .fila.elegida { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .10); }
+  .fila.inactiva { background: transparent; box-shadow: none; border-style: dashed; }
+  .fila.inactiva .nom, .fila.inactiva .mail { color: var(--texto-3); }
+  .acc { font-size: 14px; font-weight: 650; color: var(--texto-2); display: flex; gap: 6px; align-items: center; }
+  .acc .urg { color: var(--urgente-texto); }
+  .fila .rol { height: 26px; }
+  .chev { color: var(--texto-3); }
+
+  .ficha { display: flex; flex-direction: column; padding: 16px 18px; gap: 12px; overflow: hidden; }
+  .ficha h3 { margin: 0; font-size: 14px; font-weight: 750; color: var(--texto-2); display: flex; justify-content: space-between; align-items: center; }
+  .quien { display: flex; gap: 14px; align-items: center; }
+  .quien .nombre { font-size: 20px; font-weight: 800; letter-spacing: -.01em; line-height: 26px; }
+  .puede { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .disp { padding: 8px 10px; }
+  .pie-ficha { margin-top: auto; display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt" style="flex:1"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div><i class="i txt" data-i="log-out" style="color:var(--texto-3)"></i></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Negocio</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="shield-check"></i>Roles y permisos <span class="kbd">Alt R</span></button>
+        <button class="btn btn-accion chico"><i class="i i-s" data-i="user-plus"></i>Autorizar a alguien <span class="kbd">Alt N</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Quién hizo qué</a></nav>
+    <section class="pantalla">
+      <div class="izq">
+        <div class="kpis">
+          <div class="resumen"><span class="ico"><i class="i" data-i="users"></i></span><div class="grow"><div class="et">activos de 7</div><div class="va">6</div></div></div>
+          <div class="resumen"><span class="ico"><i class="i" data-i="monitor"></i></span><div><div class="et">sesiones</div><div class="va">9</div></div></div>
+          <div class="resumen"><span class="ico"><i class="i" data-i="fingerprint"></i></span><div><div class="et">con huella</div><div class="va">5</div></div></div>
+          <div class="resumen urgente"><span class="ico"><i class="i" data-i="hourglass"></i></span><div><div class="et" style="color:var(--urgente-texto)">sin usar 30 días</div><div class="va">1</div></div></div>
+        </div>
+        <div class="barra-h">
+          <div class="campo"><i class="i" data-i="search"></i>Buscá nombre o correo<span class="kbd" style="margin-left:auto">/</span></div>
+          <span class="chip elegido">Todos (7)</span><span class="chip">Activos (6)</span>
+          <button class="btn chico"><i class="i i-s" data-i="list-filter"></i>Rol</button>
+        </div>
+        <div class="tabla">
+          <div class="cab"><span></span><span>Persona</span><span>Roles</span><span>Acceso</span><span></span></div>
+          <div class="fila"><span class="av t1">CI</span><div class="grow"><div class="nom">Carlos Illobre <span class="yo">Vos</span></div><div class="mail ellipsis">carlos.ferrebress@gmail.com</div></div><div class="roles"><span class="rol admin"><i data-i="shield-check"></i>Administrador</span><span class="rol mas">+1</span></div><div class="acc"><i class="i i-s" data-i="monitor"></i>1 · <i class="i i-s" data-i="fingerprint"></i>1</div><i class="i chev" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="av t5">GB</span><div class="grow"><div class="nom">Graciela Benítez</div><div class="mail ellipsis">graciela.benitez.ferre@gmail.com</div></div><div class="roles"><span class="rol admin"><i data-i="shield-check"></i>Administrador</span><span class="rol mas">+1</span></div><div class="acc"><i class="i i-s" data-i="monitor"></i>2 · <i class="i i-s" data-i="fingerprint"></i>1 <i class="i i-s urg" data-i="hourglass"></i></div><i class="i chev" data-i="chevron-right"></i></div>
+          <div class="fila elegida"><span class="av t2">MS<span class="vivo"></span></span><div class="grow"><div class="nom">Martín Sosa</div><div class="mail ellipsis">martin.sosa.deposito@gmail.com</div></div><div class="roles"><span class="rol"><i data-i="package"></i>Recepción</span><span class="rol"><i data-i="truck"></i>Comprador</span></div><div class="acc"><i class="i i-s" data-i="monitor"></i>2 · <i class="i i-s" data-i="fingerprint"></i>1</div><i class="i chev" data-i="chevron-right" style="color:var(--pino)"></i></div>
+          <div class="fila"><span class="av t3">LF<span class="vivo"></span></span><div class="grow"><div class="nom">Lucía Fernández</div><div class="mail ellipsis">lucia.fernandez.mostrador@gmail.com</div></div><div class="roles"><span class="rol"><i data-i="shopping-cart"></i>Vendedor</span></div><div class="acc"><i class="i i-s" data-i="monitor"></i>2 · <i class="i i-s" data-i="fingerprint"></i>1</div><i class="i chev" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="av t4">NO</span><div class="grow"><div class="nom">Nahuel Ortiz</div><div class="mail ellipsis">nahuel.ortiz.95@gmail.com</div></div><div class="roles"><span class="rol"><i data-i="shopping-cart"></i>Vendedor</span><span class="rol"><i data-i="package"></i>Recepción</span></div><div class="acc"><i class="i i-s" data-i="monitor"></i>1 · <i class="i i-s" data-i="fingerprint"></i>1</div><i class="i chev" data-i="chevron-right"></i></div>
+          <div class="fila"><span class="av t1">SA</span><div class="grow"><div class="nom">Sofía Acosta</div><div class="mail ellipsis">sofi.acosta.ventas@gmail.com</div></div><div class="roles"><span class="rol"><i data-i="shopping-cart"></i>Vendedor</span></div><div class="acc"><span class="pastilla urgente" style="height:26px">No entró aún</span></div><i class="i chev" data-i="chevron-right"></i></div>
+          <div class="fila inactiva"><span class="av apagado">DP</span><div class="grow"><div class="nom">Diego Pereyra</div><div class="mail ellipsis">dpereyra.mostrador@gmail.com</div></div><div class="roles"><span class="rol"><i data-i="shopping-cart"></i>Vendedor</span></div><div class="acc"><span class="pastilla contorno" style="height:26px">Inactivo</span></div><i class="i chev" data-i="chevron-right"></i></div>
+        </div>
+      </div>
+
+      <aside class="tarjeta-2 ficha">
+        <div class="quien"><span class="av l t2">MS<span class="vivo"></span></span><div class="grow"><div class="nombre">Martín Sosa</div><div class="t-detalle ellipsis">martin.sosa.deposito@gmail.com</div><div class="t-detalle">Desde el 03/08/2026</div></div></div>
+        <div class="sep"></div>
+        <div>
+          <h3>Roles <button class="btn btn-suave chico" style="min-height:32px"><i class="i i-s" data-i="pencil"></i>Cambiar <span class="kbd">R</span></button></h3>
+          <div class="roles" style="margin-top:8px"><span class="rol"><i data-i="package"></i>Recepción</span><span class="rol"><i data-i="truck"></i>Comprador</span></div>
+          <div class="puede" style="margin-top:8px">Recibe mercadería, cuenta stock, encarga compras y ve costos. <b style="color:var(--tinta)">No vende.</b></div>
+        </div>
+        <div class="sep"></div>
+        <div>
+          <h3>Sesiones abiertas (2)</h3>
+          <div style="margin-top:8px">
+            <div class="disp"><span class="ico"><i class="i" data-i="monitor"></i><span class="vivo"></span></span><div><div class="n">Compu del depósito</div><div class="d">Chrome · ahora</div></div><button class="btn chico btn-suave">Cerrar</button></div>
+            <div class="disp"><span class="ico"><i class="i" data-i="smartphone"></i></span><div><div class="n">Samsung A34</div><div class="d">App · hace 2 h</div></div><button class="btn chico btn-suave">Cerrar</button></div>
+          </div>
+        </div>
+        <div>
+          <h3>Celular con huella (1)</h3>
+          <div style="margin-top:8px"><div class="disp"><span class="ico"><i class="i" data-i="fingerprint"></i></span><div><div class="n">Samsung A34</div><div class="d">Entró hoy 7:58</div></div><button class="btn chico btn-suave">Quitar</button></div></div>
+        </div>
+        <div class="t-detalle" style="display:flex;gap:8px;align-items:center"><i class="i i-s" data-i="history"></i>Último: registró el ingreso de Fischer · hoy 9:12</div>
+        <div class="pie-ficha"><button class="btn btn-peligro chico" style="flex:1"><i class="i i-s" data-i="user-x"></i>Desactivar</button><button class="btn btn-fantasma chico">Todo lo que hizo</button></div>
+      </aside>
+    </section>
+  </main>
+</div>
+</body>
+</html>

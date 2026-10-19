@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usuarios · la puerta</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_extra/usuarios.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  .cabecera { padding-top: 20px; }
+  .pantalla { display: grid; grid-template-columns: 372px minmax(0,1fr) 316px; gap: 20px; padding-top: 16px; min-height: 0; }
+  .col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .col-t { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 750; letter-spacing: -.01em; }
+  .col-t .t-detalle { margin-left: auto; }
+  .pedido { padding: 16px; display: flex; flex-direction: column; gap: 12px; border-color: var(--accion); box-shadow: var(--sombra-2), 0 0 0 3px rgba(232,84,28,.10); }
+  .pedido .quien { display: flex; gap: 12px; align-items: center; }
+  .elegir { display: flex; flex-wrap: wrap; gap: 6px; }
+  .elegir .chip { height: 36px; font-size: 14px; padding: 0 12px; }
+  .elegir .chip svg { width: 16px; height: 16px; }
+  .pedido-2 { padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
+  .qr { padding: 14px; display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; }
+  .qr .cod { width: 96px; height: 96px; border-radius: 12px; background: var(--superficie); border: 1px solid var(--borde); display: grid; place-items: center; }
+
+  .vivo-l { display: flex; flex-direction: column; gap: 6px; }
+  .tramo { font-size: 14px; font-weight: 750; color: var(--texto-2); margin: 6px 0 0; display: flex; align-items: center; gap: 8px; }
+  .tramo::after { content: ""; flex: 1; height: 1px; background: var(--borde); }
+  .ses { display: grid; grid-template-columns: 40px minmax(0,1fr) auto auto; gap: 12px; align-items: center; padding: 8px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .ses .n { font-weight: 700; font-size: 15px; line-height: 20px; }
+  .ses .d { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+  .ses .dev { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; color: var(--texto-2); height: 28px; padding: 0 10px; border-radius: 99px; background: var(--hundido); }
+  .ses.viejo { border-color: var(--urgente); background: var(--urgente-suave); }
+  .ses.viejo .dev { background: #fff; }
+  .pulso { width: 10px; height: 10px; border-radius: 99px; background: var(--logro); box-shadow: 0 0 0 4px rgba(30,158,98,.18); }
+
+  .llave-rol { padding: 12px 14px; display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; }
+  .llave-rol .ico { width: 36px; height: 36px; border-radius: 10px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .llave-rol.admin .ico { background: var(--pino-suave); color: var(--pino); }
+  .pila { display: flex; }
+  .pila .av { border: 2px solid var(--superficie); margin-left: -6px; }
+  .pila .av:first-child { margin-left: 0; }
+  .soltar { border: 2px dashed var(--pino); background: var(--pino-suave); }
+  .panico { margin-top: auto; padding: 14px; display: flex; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i></a>
+    <a class="nav-item"><i class="i" data-i="package"></i></a>
+    <a class="nav-item activo"><i class="i" data-i="chart-column"></i></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i></a>
+    <div class="pie" style="justify-items:center">
+      <div class="vinculo" style="padding:10px"><i class="i" data-i="smartphone"></i></div>
+      <span class="avatar">CI</span>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Quién entra</div><div class="sub">La puerta, lo que está abierto ahora y las llaves de cada uno</div></div>
+      <div class="acciones">
+        <span class="pastilla logro"><span class="punto"></span>4 personas trabajando ahora</span>
+        <button class="btn chico"><i class="i i-s" data-i="history"></i>Quién hizo qué <span class="kbd">Alt Q</span></button>
+      </div>
+    </header>
+    <section class="pantalla" style="margin-top:4px">
+      <!-- 1. La puerta -->
+      <div class="col">
+        <div class="col-t"><i class="i" data-i="door-open"></i>En la puerta <span class="insignia">2</span></div>
+        <div class="tarjeta pedido">
+          <div class="quien"><span class="av l t3">RG</span><div class="grow"><div class="t-renglon">Ramiro Giménez</div><div class="t-detalle ellipsis">ramiro.gimenez.ferre@gmail.com</div><div class="t-detalle">Quiso entrar hoy 9:41 · Moto E13</div></div></div>
+          <div class="t-etiqueta">¿Qué va a hacer?</div>
+          <div class="elegir">
+            <span class="chip elegido"><i data-i="shopping-cart"></i>Vendedor</span><span class="chip"><i data-i="package"></i>Recepción</span><span class="chip"><i data-i="truck"></i>Comprador</span><span class="chip"><i data-i="chart-column"></i>Gerente</span><span class="chip"><i data-i="shield-check"></i>Admin.</span>
+          </div>
+          <div class="lineal"><button class="btn btn-accion" style="flex:1"><i class="i" data-i="user-check"></i>Dejarlo entrar <span class="kbd">Enter</span></button><button class="btn btn-fantasma">No es de acá</button></div>
+        </div>
+        <div class="tarjeta pedido-2"><span class="av t4">JR</span><div class="grow"><div class="t-renglon ellipsis">juli.romero.arq@gmail.com</div><div class="t-detalle">Quiso entrar ayer 18:02</div></div><button class="btn chico">Ver</button></div>
+        <div class="tarjeta qr" style="margin-top:auto">
+          <div class="cod"><img src="../../_extra/qr.svg" style="width:80px;height:80px" alt=""></div>
+          <div><div class="t-renglon">Sumá a alguien sin tipear</div><div class="t-detalle">Que escanee este código con su celular y entre con su Google: aparece acá arriba.</div></div>
+        </div>
+      </div>
+
+      <!-- 2. Abierto ahora -->
+      <div class="col">
+        <div class="col-t"><i class="i" data-i="radio"></i>Abierto ahora <span class="t-detalle">9 sesiones · 5 celulares con huella</span></div>
+        <div class="vivo-l">
+          <div class="tramo">Usando la app</div>
+          <div class="ses"><span class="av t3">LF<span class="vivo"></span></span><div><div class="n">Lucía Fernández</div><div class="d">Vendiendo · 3 renglones</div></div><span class="dev"><i class="i i-s" data-i="monitor"></i>Mostrador</span><span class="pulso"></span></div>
+          <div class="ses"><span class="av t2">MS<span class="vivo"></span></span><div><div class="n">Martín Sosa</div><div class="d">Recibiendo de Fischer</div></div><span class="dev"><i class="i i-s" data-i="monitor"></i>Depósito</span><span class="pulso"></span></div>
+          <div class="ses"><span class="av t4">NO<span class="vivo"></span></span><div><div class="n">Nahuel Ortiz</div><div class="d">Contando la estantería B</div></div><span class="dev"><i class="i i-s" data-i="fingerprint"></i>Moto G32</span><span class="pulso"></span></div>
+          <div class="tramo">Hoy, sin usar ahora</div>
+          <div class="ses"><span class="av t3">LF</span><div><div class="n">Lucía Fernández</div><div class="d">Hace 3 h</div></div><span class="dev"><i class="i i-s" data-i="fingerprint"></i>Galaxy A15</span><button class="btn btn-suave chico">Cerrar</button></div>
+          <div class="ses"><span class="av t2">MS</span><div><div class="n">Martín Sosa</div><div class="d">Hace 2 h</div></div><span class="dev"><i class="i i-s" data-i="fingerprint"></i>Samsung A34</span><button class="btn btn-suave chico">Cerrar</button></div>
+          <div class="tramo" style="color:var(--urgente-texto)">Hace mucho</div>
+          <div class="ses viejo"><span class="av t5">GB</span><div><div class="n">Graciela Benítez</div><div class="d" style="color:var(--urgente-texto)">Sin usar hace 41 días</div></div><span class="dev"><i class="i i-s" data-i="laptop"></i>Notebook de casa</span><button class="btn chico">Cerrar</button></div>
+        </div>
+      </div>
+
+      <!-- 3. Las llaves -->
+      <div class="col">
+        <div class="col-t"><i class="i" data-i="key-round"></i>Las llaves <span class="t-detalle">arrastrá a una persona</span></div>
+        <div class="tarjeta llave-rol"><span class="ico"><i class="i" data-i="shopping-cart"></i></span><div><div class="t-renglon">Vendedor</div><div class="t-detalle">3 permisos</div></div><div class="pila"><span class="av s t3">LF</span><span class="av s t4">NO</span><span class="av s t1">SA</span></div></div>
+        <div class="tarjeta llave-rol soltar" style="position:relative"><span class="av t4" style="position:absolute;left:-18px;top:22px;z-index:2;box-shadow:var(--sombra-3);transform:rotate(-6deg);border:2px solid #fff">NO</span><span class="ico"><i class="i" data-i="truck"></i></span><div><div class="t-renglon">Comprador</div><div class="t-detalle" style="color:var(--pino-texto)">Soltá para darle a Nahuel</div></div><div class="pila"><span class="av s t2">MS</span><span class="av s t4" style="opacity:.55">NO</span></div></div>
+        <div class="tarjeta llave-rol"><span class="ico"><i class="i" data-i="package"></i></span><div><div class="t-renglon">Recepción</div><div class="t-detalle">5 permisos</div></div><div class="pila"><span class="av s t2">MS</span><span class="av s t4">NO</span></div></div>
+        <div class="tarjeta llave-rol"><span class="ico"><i class="i" data-i="chart-column"></i></span><div><div class="t-renglon">Gerente</div><div class="t-detalle">13 permisos</div></div><div class="pila"><span class="av s t1">CI</span><span class="av s t5">GB</span></div></div>
+        <div class="tarjeta llave-rol admin"><span class="ico"><i class="i" data-i="shield-check"></i></span><div><div class="t-renglon">Administrador</div><div class="t-detalle">Nunca queda sin nadie</div></div><div class="pila"><span class="av s t1">CI</span><span class="av s t5">GB</span></div></div>
+        <div class="tarjeta panico">
+          <span class="foto-icono" style="width:44px;height:44px;background:var(--error-suave);color:var(--error-texto)"><i class="i" data-i="smartphone"></i></span>
+          <div class="grow"><div class="t-renglon">¿Se perdió un celular?</div><div class="t-detalle">Cerrá todo lo de una persona de un toque</div></div>
+          <i class="i" data-i="chevron-right" style="color:var(--texto-3)"></i>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

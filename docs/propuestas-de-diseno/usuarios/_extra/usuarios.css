@@ -1,0 +1,50 @@
+/* Piezas que suma la pantalla Usuarios al lenguaje común. Solo usa variables de comun.css. */
+
+/* Avatar con iniciales: cinco tonos apagados, siempre el mismo por persona */
+.av { width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; letter-spacing: .02em; position: relative; }
+.av.l { width: 56px; height: 56px; font-size: 18px; }
+.av.xl { width: 72px; height: 72px; font-size: 24px; }
+.av.s { width: 32px; height: 32px; font-size: 14px; }
+.av.t1 { background: #DDEBE4; color: #1D5543; }
+.av.t2 { background: #F6E3D6; color: #8E4220; }
+.av.t3 { background: #E4E6EF; color: #3E4767; }
+.av.t4 { background: #EFE6D2; color: #6E5418; }
+.av.t5 { background: #EDE2EA; color: #6B3A5E; }
+.av.apagado { background: var(--hundido); color: var(--texto-3); }
+.av .vivo { position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 99px; background: var(--logro); border: 2px solid var(--superficie); }
+.av.l .vivo { width: 14px; height: 14px; }
+
+/* Rol: pastilla neutra con su ícono; Administrador en pino */
+.rol { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 8px; border-radius: 999px; background: var(--hundido); color: var(--texto-2); font-size: 14px; font-weight: 650; white-space: nowrap; }
+.rol svg { width: 16px; height: 16px; }
+.rol.admin { background: var(--pino-suave); color: var(--pino-texto); }
+.rol.mas { padding: 0 10px; background: transparent; border: 1px solid var(--borde); }
+.roles { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Casilla y llave */
+.casilla { width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--borde-fuerte); background: var(--superficie); display: inline-grid; place-items: center; flex: none; color: #fff; }
+.casilla.si { background: var(--pino); border-color: var(--pino); }
+.casilla.si::after { content: ""; width: 10px; height: 6px; border-left: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: translateY(-1px) rotate(-45deg); }
+.casilla.bloq { background: var(--hundido-2); border-color: var(--hundido-2); }
+.casilla.bloq.si { background: var(--pino-2); opacity: .55; }
+.llave { width: 44px; height: 26px; border-radius: 99px; background: var(--hundido-2); position: relative; flex: none; }
+.llave::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 99px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.llave.si { background: var(--pino); }
+.llave.si::after { left: 21px; }
+
+/* Dispositivo: ícono en azulejo + nombre + último uso + acción */
+.disp { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--r); background: var(--superficie); border: 1px solid var(--borde); }
+.disp + .disp { margin-top: 8px; }
+.disp .ico { width: 40px; height: 40px; border-radius: 10px; background: var(--hundido); color: var(--texto-2); display: grid; place-items: center; position: relative; }
+.disp .ico .vivo { position: absolute; right: -2px; top: -2px; width: 12px; height: 12px; border-radius: 99px; background: var(--logro); border: 2px solid var(--superficie); }
+.disp .n { font-weight: 700; font-size: 15px; line-height: 20px; }
+.disp .d { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+.disp.viejo .ico { background: var(--urgente-suave); color: var(--urgente-texto); }
+
+.sep { height: 1px; background: var(--borde); }
+.yo { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: var(--accion-suave); color: var(--accion-texto); font-size: 14px; font-weight: 750; }
+.estado-in { color: var(--texto-3); }
+.lineal { display: flex; align-items: center; gap: 8px; }
+.grow { flex: 1; min-width: 0; }
+.ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mute { color: var(--texto-2); }

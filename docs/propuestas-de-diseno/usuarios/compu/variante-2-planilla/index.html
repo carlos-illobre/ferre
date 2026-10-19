@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usuarios · la planilla de llaves</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_extra/usuarios.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_extra/iconos-extra.js"></script>
+<style>
+  .pantalla { display: grid; grid-template-columns: 1fr 372px; min-height: 0; gap: 20px; padding-top: 16px; }
+  .matriz { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .m-fila { display: grid; column-gap: 0; grid-template-columns: minmax(0,1fr) repeat(5, 80px) 60px; align-items: center; min-height: 52px; padding: 0 12px 0 16px; border-top: 1px solid var(--borde); }
+  .m-cab { min-height: 76px; border-top: 0; align-items: end; padding-bottom: 10px; }
+  .m-cab .col { display: grid; justify-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: var(--texto-2); text-align: center; line-height: 16px; border-radius: 10px; padding: 8px 0 0; }
+  .m-cab .col.elegida { color: var(--pino); }
+  .celda { display: grid; place-items: center; height: 100%; }
+  .colsel { background: rgba(18, 56, 47, .045); }
+  .m-cab .colsel { background: var(--pino-suave); border-radius: 12px 12px 0 0; height: calc(100% + 10px); margin-bottom: -10px; align-content: end; padding-bottom: 10px; }
+  .per { display: flex; gap: 10px; align-items: center; min-width: 0; }
+  .per .n { font-weight: 700; font-size: 15px; line-height: 20px; }
+  .per .d { font-size: 14px; line-height: 18px; color: var(--texto-2); }
+  .cuenta { font-size: 14px; font-weight: 700; color: var(--texto-2); text-align: right; }
+  .m-fila.inactiva .per, .m-fila.inactiva .celda { opacity: .5; }
+  .m-fila.nueva { background: var(--accion-suave); border-top: 1px dashed var(--accion); min-height: 64px; }
+  .m-fila.nueva .campo { height: 36px; font-size: 14px; padding: 0 10px; box-shadow: none; }
+  .m-pie { margin-top: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--borde); background: var(--superficie); font-size: 14px; color: var(--texto-2); font-weight: 600; }
+
+  .rolpanel { display: flex; flex-direction: column; padding: 16px; gap: 10px; overflow: hidden; }
+  .rp-cab { display: flex; gap: 12px; align-items: center; }
+  .rp-cab .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--pino-suave); color: var(--pino); display: grid; place-items: center; }
+  .grupo .g { font-size: 14px; font-weight: 750; color: var(--texto-2); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .permisos { display: flex; flex-wrap: wrap; gap: 6px; }
+  .perm { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 9px; border-radius: 9px; border: 1px solid var(--borde-fuerte); background: var(--superficie); font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .perm.si { background: var(--pino-suave); border-color: transparent; color: var(--pino-texto); }
+  .perm.si svg { width: 16px; height: 16px; }
+  .perm.foco { box-shadow: 0 0 0 3px rgba(18,56,47,.18); border-color: var(--pino); }
+  .explica { font-size: 14px; line-height: 20px; color: var(--texto-2); padding: 10px 12px; border-radius: 12px; background: var(--hundido); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt" style="flex:1"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div><i class="i txt" data-i="log-out" style="color:var(--texto-3)"></i></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Negocio</div></div>
+      <div class="acciones">
+        <span class="t-detalle">Un clic en una casilla da o quita el rol · <span class="kbd">Espacio</span></span>
+        <button class="btn chico"><i class="i i-s" data-i="monitor"></i>Sesiones (9) <span class="kbd">Alt S</span></button><button class="btn btn-accion chico"><i class="i i-s" data-i="user-plus"></i>Autorizar <span class="kbd">Alt N</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a>Resumen</a><a class="activa">Usuarios</a><a>Quién hizo qué</a></nav>
+    <section class="pantalla">
+      <div class="tarjeta matriz">
+        <div class="m-fila m-cab">
+          <div class="t-seccion" style="align-self:center">7 personas <span class="t-detalle">· 5 roles</span></div>
+          <div class="col"><i class="i" data-i="shopping-cart"></i>Vendedor</div>
+          <div class="col"><i class="i" data-i="truck"></i>Comprador</div>
+          <div class="col elegida colsel"><i class="i" data-i="package"></i>Recepción</div>
+          <div class="col"><i class="i" data-i="shield-check"></i>Admin.</div>
+          <div class="col"><i class="i" data-i="chart-column"></i>Gerente</div>
+          <div class="col" style="color:var(--texto-3)"><i class="i" data-i="key-round"></i>Puede</div>
+        </div>
+        <div class="m-fila"><div class="per"><span class="av s t1">CI</span><div class="ellipsis"><div class="n">Carlos Illobre <span class="yo">Vos</span></div></div></div><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda colsel"><span class="casilla"></span></span><span class="celda"><span class="casilla si bloq" title="No te lo podés quitar vos"></span></span><span class="celda"><span class="casilla si"></span></span><span class="cuenta">15 de 21</span></div>
+        <div class="m-fila"><div class="per"><span class="av s t5">GB</span><div class="ellipsis"><div class="n">Graciela Benítez</div></div></div><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda colsel"><span class="casilla"></span></span><span class="celda"><span class="casilla si"></span></span><span class="celda"><span class="casilla si"></span></span><span class="cuenta">15 de 21</span></div>
+        <div class="m-fila"><div class="per"><span class="av s t2">MS</span><div class="ellipsis"><div class="n">Martín Sosa</div></div></div><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla si"></span></span><span class="celda colsel"><span class="casilla si"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="cuenta">8 de 21</span></div>
+        <div class="m-fila"><div class="per"><span class="av s t3">LF</span><div class="ellipsis"><div class="n">Lucía Fernández</div></div></div><span class="celda"><span class="casilla si"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda colsel"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="cuenta">3 de 21</span></div>
+        <div class="m-fila"><div class="per"><span class="av s t4">NO</span><div class="ellipsis"><div class="n">Nahuel Ortiz</div></div></div><span class="celda"><span class="casilla si"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda colsel"><span class="casilla si"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="cuenta">8 de 21</span></div>
+        <div class="m-fila"><div class="per"><span class="av s t1">SA</span><div class="ellipsis"><div class="n">Sofía Acosta</div><div class="d" style="color:var(--urgente-texto)">Todavía no entró</div></div></div><span class="celda"><span class="casilla si"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda colsel"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="cuenta">3 de 21</span></div>
+        <div class="m-fila inactiva"><div class="per"><span class="av s apagado">DP</span><div class="ellipsis"><div class="n">Diego Pereyra</div><div class="d">Inactivo</div></div></div><span class="celda"><span class="casilla si"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda colsel"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="cuenta">—</span></div>
+        <div class="m-fila nueva" style="grid-template-columns: minmax(0,1fr) repeat(5, 80px) 60px">
+          <div class="lineal" style="gap:6px;padding-right:8px"><div class="campo foco" style="flex:1;min-width:0"><span class="escrito">ramiro.g</span><span class="cursor"></span></div></div>
+          <span class="celda"><span class="casilla si"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span><span class="celda"><span class="casilla"></span></span>
+          <span class="celda"><span class="kbd">Enter</span></span>
+        </div>
+                <div style="padding:12px 16px 0"><span class="tostada"><i class="i" data-i="circle-check"></i>Martín ahora también es Comprador<span class="kbd" style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">Ctrl Z</span></span></div>
+        <div class="m-pie"><i class="i i-s" data-i="lock-keyhole"></i>Administran Graciela y vos: nunca queda sin nadie, y la tuya no se destilda.</div>
+      </div>
+
+      <aside class="tarjeta-2 rolpanel">
+        <div class="rp-cab"><span class="ico"><i class="i" data-i="package"></i></span><div class="grow"><div class="t-seccion">Recepción</div><div class="t-detalle">Martín y Nahuel · 5 permisos</div></div><button class="btn btn-suave chico btn-icono"><i class="i i-s" data-i="pencil"></i></button></div>
+        <div class="grupo"><div class="g">Vender <span style="font-weight:600">ninguno de 4</span></div></div>
+        <div class="grupo"><div class="g">Catálogo</div><div class="permisos"><span class="perm si"><i data-i="check"></i>Ver costos</span><span class="perm">Fijar márgenes</span><span class="perm">Cargar listas</span><span class="perm">Unir duplicados</span></div></div>
+        <div class="grupo"><div class="g">Depósito</div><div class="permisos"><span class="perm si"><i data-i="check"></i>Registrar ingresos</span><span class="perm si"><i data-i="check"></i>Ver las compras</span><span class="perm si"><i data-i="check"></i>Contar y corregir stock</span><span class="perm foco">Encargar compras</span></div></div>
+        <div class="explica"><b style="color:var(--tinta)">Encargar compras:</b> armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos. Si lo sumás, lo ganan los dos enseguida.</div>
+        <div class="grupo"><div class="g">Negocio</div><div class="permisos"><span class="perm si"><i data-i="check"></i>Ver las anomalías</span><span class="perm">Ventas del negocio</span><span class="perm">+5</span></div></div>
+        
+      </aside>
+    </section>
+  </main>
+</div>
+</body>
+</html>
