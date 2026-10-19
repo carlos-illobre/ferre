@@ -302,7 +302,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
 55. **La entrada del celular sigue la disposición de una referencia de Carlos** (2026-10-12).
     Pasó una imagen y dijo que le interesaban la disposición y la posición de los elementos,
     con el logotipo y la paleta de siempre. Reemplaza la entrada mínima de la decisión 47.
-    - Fondo claro. Arriba y al centro, el logotipo y la línea «Tu ferretería, en orden».
+    - Fondo claro. Arriba y al centro, el logotipo y la línea «Tu ferretería, en orden» (desde la decisión 117,
+      «Vendé, contá y cobrá desde el mostrador o el depósito.»).
     - Las dos formas de entrar como tarjetas: primero Google, una «o», y la huella con
       «Rápido y seguro». Debajo, «Sin contraseñas. Entrá de forma simple y segura.»
     - Tres cosas que hace la aplicación, con su ícono: vendé más rápido, controlá tu stock,
@@ -891,8 +892,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      reinvención y /v4 la audaz; /v1 muestra la aplicación de hoy en la misma pantalla, para
      comparar (Carlos, 2026-10-19). Con los enlaces y los botones que abren pantallas, diálogos o
      agregan elementos ficticios funcionando. Se decide pantalla por pantalla. Es una excepción
-     temporal a la decisión 83: las maquetas se borran cuando cada pantalla quede decidida y
-     programada. No llevan datos reales, así que se pueden abrir sin entrar; la aplicación
+     temporal a la decisión 83: las maquetas se borran solo cuando Carlos lo pida; mientras
+     tanto no se modifican ni se borran, aunque una pantalla ya esté elegida y programada,
+     porque puede cambiar de idea (2026-10-19). No llevan datos reales, así que se pueden abrir sin entrar; la aplicación
      instalada no las guarda ni las descarga. Antes de pasar a producción con las maquetas
      adentro, se le avisa a Carlos.
 114. **Las maquetas no llevan pruebas** (2026-10-19). Las maquetas existen para no gastar tiempo en
@@ -916,3 +918,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      «Ambiente de prueba · nada de esto es real» (decisión 33) quedan exactamente como están hoy.
      No forman parte del lenguaje «Mostrador» ni se adaptan a él, y solo aparecen en el ambiente
      de pruebas: producción no lleva nada.
+117. **Entrada del celular: queda la de hoy, con otra frase** (2026-10-19). De las propuestas del
+     director de arte, Carlos eligió para la entrada del celular la versión de hoy (v1). Solo
+     cambia la línea bajo el logotipo (decisión 55): de «Tu ferretería, en orden» pasa a «Vendé,
+     contá y cobrá desde el mostrador o el depósito.»

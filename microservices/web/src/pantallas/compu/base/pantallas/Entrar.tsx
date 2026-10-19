@@ -160,7 +160,7 @@ export function BotonHuella() {
 // aplicación y se tiene que notar desde la primera pantalla.
 export const TEXTOS_DE_ENTRADA = {
   titulo: "Precios al día, ventas y stock de la ferretería.",
-  lema: "Tu ferretería, en orden", // la versión corta, para la entrada del celular
+  lema: "Vendé, contá y cobrá desde el mostrador o el depósito.", // la versión corta, para la entrada del celular (decisión 117)
   bajada: "Ferrebress es el sistema del mostrador: se usa desde el celular y desde la computadora, con los mismos datos.",
   entrar: "Entrar",
   conElCelular: "Entrá con tu celular",

@@ -34,6 +34,7 @@ reglas. No fija un diseño: cualquier disposición que cumpla esto y la constitu
 
 | Dónde | Texto |
 |---|---|
+| Entrada del celular, bajo el logotipo | «Vendé, contá y cobrá desde el mostrador o el depósito.» (decisión 117) |
 | Entrada, acción de la huella | «Entrar con la huella» |
 | Oferta de huella | «¿Entrar con la huella?» |
 | Vincular a mano | «Vincular este celular con mi huella» |

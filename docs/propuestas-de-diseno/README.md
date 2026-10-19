@@ -17,7 +17,8 @@ mirar»). Las navegables están en `maquetas/navegables.json`.
   (`index.html`) y tiene su `captura.png`; `comparacion-compu.png` y `comparacion-celu.png`
   las ponen lado a lado, y `resumen.md` explica cada variante y numera sus ideas.
 
-**Lo que Carlos rechaza se borra** de esta carpeta; lo que queda está todavía en revisión.
+**No se modifican ni se borran** hasta que Carlos lo pida, aunque una pantalla ya esté elegida y
+programada: puede cambiar de idea (decisión 113).
 Se hicieron con la skill `/director-de-arte` (`.claude/skills/director-de-arte/`), que corre solo cuando Carlos la pide.
 
 ## Las pantallas
