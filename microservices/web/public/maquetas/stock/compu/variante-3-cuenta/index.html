@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { height: 768px; overflow: hidden; }
   .barra-sup { height: 56px; display: flex; align-items: center; gap: 16px; padding: 0 24px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
@@ -66,30 +69,33 @@
   .conciliar .tres .et { font-size: 14px; color: var(--texto-2); font-weight: 600; }
   .conciliar .tres .va { font-size: 20px; line-height: 26px; font-weight: 800; }
   .conciliar .tres .campo-n { outline: 2px solid var(--pino); }
+  .linea.gen > div, .cta.activa > div { min-width: 0; }
+  .linea.resaltada { background: var(--pino-suave); box-shadow: -8px 0 0 var(--pino-suave), 8px 0 0 var(--pino-suave); }
+  .campo-n .va button { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--borde-fuerte); background: var(--superficie); display: inline-grid; place-items: center; vertical-align: middle; margin: 0 6px; }
 </style>
 </head>
 <body>
 <header class="barra-sup">
-  <span class="logo"><i class="i i-s" data-i="store"></i></span>
-  <div class="migas">Depósito <i class="i i-s" data-i="chevron-right"></i> Stock <i class="i i-s" data-i="chevron-right"></i> <b>Mecha acero rápido HSS 8 mm</b></div>
-  <div class="ir"><i class="i i-s" data-i="search"></i>Otro producto, o escaneá<span class="kbd">Ctrl</span><span class="kbd">K</span></div>
-  <div class="der"><span class="pastilla logro"><span class="punto"></span>En línea</span><span class="pastilla contorno"><i class="i i-s" data-i="smartphone"></i>En espejo</span><span class="avatar">CI</span></div>
+  <span class="logo" data-menu-ir data-tocable aria-label="Ir a otra parte"><i class="i i-s" data-i="store"></i></span>
+  <div class="migas"><span data-ir="stock" data-tocable>Depósito</span> <i class="i i-s" data-i="chevron-right"></i> <span data-ir="stock" data-tocable>Stock</span> <i class="i i-s" data-i="chevron-right"></i> <b data-miga>Mecha acero rápido HSS 8 mm</b></div>
+  <div class="ir" data-paleta data-tocable><i class="i i-s" data-i="search"></i>Otro producto, o escaneá<span class="kbd">Ctrl</span><span class="kbd">K</span></div>
+  <div class="der"><span class="pastilla logro"><span class="punto"></span>En línea</span><span class="pastilla contorno" data-espejo data-tocable><i class="i i-s" data-i="smartphone"></i>En espejo</span><span class="avatar" data-avatar data-tocable>CI</span></div>
 </header>
 <div class="lienzo">
-  <aside class="cuentas">
+  <aside class="cuentas" data-cuentas>
     <div class="t-etiqueta"><span>Las que se mueven hoy</span><span>stock</span></div>
-    <div class="cta activa"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha HSS 8 mm</div><div class="s">bajo el mínimo</div></div><span class="n u">14</span></div>
-    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm</div><div class="s">bajo el mínimo</div></div><span class="n u">9</span></div>
-    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 10</div><div class="s">negativo</div></div><span class="n e">−1</span></div>
-    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="t">Cinta métrica PowerLock 5 m</div><div class="s">bien</div></div><span class="n">6</span></div>
-    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div><div class="t">Lámpara LED 9 W fría E27</div><div class="s">bien</div></div><span class="n">48</span></div>
-    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><div class="t">Clavos punta París 2"</div><div class="s">por kilo</div></div><span class="n u">4,5</span></div>
-    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></span><div><div class="t">Pinza universal 8" aislada</div><div class="s">bien</div></div><span class="n">7</span></div>
-    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 × 100</div><div class="s">bajo el mínimo</div></div><span class="n u">3</span></div>
+    <div class="cta activa" data-k="mecha"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha HSS 8 mm</div><div class="s">bajo el mínimo</div></div><span class="n u">14</span></div>
+    <div class="cta" data-k="martillo"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm</div><div class="s">bajo el mínimo</div></div><span class="n u">9</span></div>
+    <div class="cta" data-k="puntas"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 10</div><div class="s">negativo</div></div><span class="n e">−1</span></div>
+    <div class="cta" data-k="cinta"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="t">Cinta métrica PowerLock 5 m</div><div class="s">bien</div></div><span class="n">6</span></div>
+    <div class="cta" data-k="lampara"><span class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div><div class="t">Lámpara LED 9 W fría E27</div><div class="s">bien</div></div><span class="n">48</span></div>
+    <div class="cta" data-k="clavos"><span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><div class="t">Clavos punta París 2"</div><div class="s">por kilo</div></div><span class="n u">4,5</span></div>
+    <div class="cta" data-k="pinza"><span class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></span><div><div class="t">Pinza universal 8" aislada</div><div class="s">bien</div></div><span class="n">7</span></div>
+    <div class="cta" data-k="tarugos"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 × 100</div><div class="s">bajo el mínimo</div></div><span class="n u">3</span></div>
   </aside>
 
-  <section class="centro">
-    <div class="heroe">
+  <section class="centro" data-centro>
+    <div class="heroe" data-heroe>
       <span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span>
       <div><h1>Mecha acero rápido HSS 8 mm</h1><div class="t-detalle">Ezeta · ME080 · Est. B-02-04 · Bulonera Centro</div><div style="margin-top:8px;display:flex;gap:6px"><span class="pastilla urgente">Bajo el mínimo de 20</span><span class="pastilla contorno"><i class="i i-s" data-i="barcode"></i>Código de fábrica</span></div></div>
       <div><div class="saldo-et">Hay en el local</div><div class="saldo-g">14<small>un.</small></div></div>
@@ -99,14 +105,14 @@
         <div class="ley"><span><i class="sw" style="background:var(--pino)"></i>Stock</span><span><i class="sw" style="background:var(--urgente)"></i>Mínimo</span><span><i class="sw" style="background:var(--texto-3)"></i>Si sigue así</span></div></div>
       <svg class="serie" id="serie" viewBox="0 0 640 345"></svg>
     </div>
-    <div class="consejo tarjeta">
+    <div class="consejo tarjeta" data-consejo>
       <span class="ico"><i class="i i-l" data-i="calendar-clock"></i></span>
       <div><div class="t">A este ritmo alcanza hasta el 6/11</div><div class="t-detalle">Vende 5 por semana. Pedí 24 a Bulonera Centro, tarda 3 días <i class="i i-s" data-i="info"></i></div></div>
-      <button class="btn btn-accion"><i class="i i-s" data-i="truck"></i>Pedir 24 <span class="kbd">P</span></button>
+      <button class="btn btn-accion" data-pedir><i class="i i-s" data-i="truck"></i>Pedir 24 <span class="kbd">P</span></button>
     </div>
   </section>
 
-  <aside class="extracto tarjeta-2">
+  <aside class="extracto tarjeta-2" data-extracto>
     <div class="cab"><span class="t-seccion" style="font-size:17px">Extracto</span><span class="t-detalle">movim. · saldo</span></div>
     <div class="linea"><div><span class="tt">Venta 4821</span><span class="nn">hoy 10:12 · Carlos</span></div><span class="q">−3</span><span class="s">14</span></div>
     <div class="linea"><div><span class="tt">Venta 4790</span><span class="nn">sáb 18/10 · Laura</span></div><span class="q">−2</span><span class="s">17</span></div>
@@ -115,40 +121,252 @@
     <div class="linea"><div><span class="tt">Venta 4680</span><span class="nn">vie 10/10 · se quedó sin stock</span></div><span class="q">−2</span><span class="s cero">0</span></div>
     <div class="linea ajuste"><div><span class="tt">Ajuste · rotura</span><span class="nn">«había 3, hay 2: rotura» · Mati</span></div><span class="q">−1</span><span class="s">2</span></div>
     <div class="linea"><div><span class="tt">Venta 4655</span><span class="nn">vie 03/10 · Laura</span></div><span class="q">−4</span><span class="s">3</span></div>
-    <div class="linea" style="border:0"><div><span class="tt" style="color:var(--pino-texto)">Ver los 20 anteriores</span></div><span></span><span class="s">↓</span></div>
-    <div class="conciliar">
+    <div class="linea" style="border:0" data-ver-ant data-tocable><div><span class="tt" style="color:var(--pino-texto)">Ver los 20 anteriores</span></div><span></span><span class="s">↓</span></div>
+    <div class="conciliar" data-conciliar>
       <div style="font-weight:800">¿Cuántas hay en la estantería?</div>
-      <div class="tres"><div><div class="et">Sistema</div><div class="va">14</div></div><div class="campo-n"><div class="et">Contaste</div><div class="va">12</div></div><div><div class="et">Diferencia</div><div class="va" style="color:var(--error-texto)">−2</div></div></div>
-      <div class="chips"><span class="chip elegido" style="height:32px;font-size:14px;padding:0 12px">Conté la estantería</span><span class="chip" style="height:32px;font-size:14px;padding:0 12px">Rotura</span></div>
-      <button class="btn btn-oscuro chico">Guardar «había 14, hay 12» <span class="kbd">Enter</span></button>
+      <div class="tres"><div><div class="et">Sistema</div><div class="va" data-sis>14</div></div><div class="campo-n" data-contaste data-tocable tabindex="0"><div class="et">Contaste</div><div class="va">12</div></div><div><div class="et">Diferencia</div><div class="va" data-dif style="color:var(--error-texto)">−2</div></div></div>
+      <div class="chips" data-motivos><span class="chip elegido" style="height:32px;font-size:14px;padding:0 12px">Conté la estantería</span><span class="chip" style="height:32px;font-size:14px;padding:0 12px">Rotura</span></div>
+      <button class="btn btn-oscuro chico" data-guardar>Guardar «había 14, hay 12» <span class="kbd">Enter</span></button>
     </div>
   </aside>
 </div>
 <script>
 (function(){
-  // [día, stock]; día 0 = 21/07, 90 = hoy 19/10, hasta 110 = pronóstico
-  var s=[[0,18],[5,15],[12,12],[18,9],[24,6],[28,30],[35,27],[41,24],[47,21],[53,17],[58,13],[62,10],[67,7],[74,3],[78,2],[81,0],[84,24],[87,19],[89,17],[90,14]];
-  var W=640,H=345,L=28,R=8,T=12,B=28,X=function(d){return L+(W-L-R)*d/110},Y=function(v){return T+(H-T-B)*(1-v/32)};
+  // [día, stock]; día 0 = 21/07, 90 = hoy 19/10, hasta 110 = pronóstico.
+  // dibujarSerie la usa también el script de interacciones para cada producto.
+  window.dibujarSerie = function (svg, s, o) {
+  o = o || {};
+  var tope=o.tope||32, rejas=o.rejas||[0,10,20,30], min=o.min===undefined?20:o.min, fin=o.fin===undefined?108:o.fin, hoyV=s[s.length-1][1];
+  var W=640,H=345,L=28,R=8,T=12,B=28,X=function(d){return L+(W-L-R)*d/110},Y=function(v){return T+(H-T-B)*(1-v/tope)};
   var p='M'+X(0)+' '+Y(s[0][1]);
   for(var i=1;i<s.length;i++){p+=' H'+X(s[i][0])+' V'+Y(s[i][1]);}
   var area=p+' H'+X(90)+' V'+Y(0)+' H'+X(0)+' Z';
   var g='';
   g+='<rect x="'+X(90)+'" y="'+T+'" width="'+(X(110)-X(90))+'" height="'+(H-T-B)+'" fill="#ECE9E1" opacity=".6" rx="6"/>';
-  [0,10,20,30].forEach(function(v){g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#E6E2D8"/><text x="'+(L-8)+'" y="'+(Y(v)+5)+'" text-anchor="end" font-size="14" fill="#6B706B" font-weight="600">'+v+'</text>';});
-  g+='<rect x="'+X(81)+'" y="'+T+'" width="'+(X(84)-X(81))+'" height="'+(H-T-B)+'" fill="#FCEAE7"/>';
+  rejas.forEach(function(v){g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#E6E2D8"/><text x="'+(L-8)+'" y="'+(Y(v)+5)+'" text-anchor="end" font-size="14" fill="#6B706B" font-weight="600">'+v+'</text>';});
+  var sin=o.sin===undefined?[[81,84]]:o.sin;
+  sin.forEach(function(t){g+='<rect x="'+X(t[0])+'" y="'+T+'" width="'+(X(t[1])-X(t[0]))+'" height="'+(H-T-B)+'" fill="#FCEAE7"/>';});
   g+='<path d="'+area+'" fill="rgba(18,56,47,.07)"/>';
-  g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(20)+'" y2="'+Y(20)+'" stroke="#F0A20F" stroke-width="2" stroke-dasharray="6 5"/>';
+  g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(min)+'" y2="'+Y(min)+'" stroke="#F0A20F" stroke-width="2" stroke-dasharray="6 5"/>';
   g+='<path d="'+p+'" fill="none" stroke="#12382F" stroke-width="2.5" stroke-linejoin="round"/>';
-  g+='<path d="M'+X(90)+' '+Y(14)+' L'+X(108)+' '+Y(0)+'" stroke="#6B706B" stroke-width="2" stroke-dasharray="3 5" fill="none"/>';
-  [[28,30],[84,24]].forEach(function(c){g+='<circle cx="'+X(c[0])+'" cy="'+Y(c[1])+'" r="6" fill="#1E9E62" stroke="#fff" stroke-width="2"/>';});
-  g+='<circle cx="'+X(78)+'" cy="'+Y(2)+'" r="6" fill="#F0A20F" stroke="#fff" stroke-width="2"/>';
-  g+='<circle cx="'+X(90)+'" cy="'+Y(14)+'" r="7" fill="#12382F" stroke="#fff" stroke-width="3"/>';
-  g+='<circle cx="'+X(108)+'" cy="'+Y(0)+'" r="6" fill="#fff" stroke="#6B706B" stroke-width="2"/>';
+  if(fin)g+='<path class="pronostico" d="M'+X(90)+' '+Y(hoyV)+' L'+X(fin)+' '+Y(0)+'" stroke="#6B706B" stroke-width="2" stroke-dasharray="3 5" fill="none"/>';
+  (o.compras||[[28,30],[84,24]]).forEach(function(c){g+='<circle cx="'+X(c[0])+'" cy="'+Y(c[1])+'" r="6" fill="#1E9E62" stroke="#fff" stroke-width="2"/>';});
+  (o.ajustes||[[78,2]]).forEach(function(c){g+='<circle cx="'+X(c[0])+'" cy="'+Y(c[1])+'" r="6" fill="#F0A20F" stroke="#fff" stroke-width="2"/>';});
+  g+='<circle cx="'+X(90)+'" cy="'+Y(hoyV)+'" r="7" fill="#12382F" stroke="#fff" stroke-width="3"/>';
+  if(fin)g+='<circle class="pronostico" cx="'+X(fin)+'" cy="'+Y(0)+'" r="6" fill="#fff" stroke="#6B706B" stroke-width="2"/>';
   var lab=function(d,t,a){return '<text x="'+X(d)+'" y="'+(H-6)+'" text-anchor="'+(a||'middle')+'" font-size="14" fill="#545955" font-weight="600">'+t+'</text>';};
-  g+=lab(2,'21 jul','start')+lab(28,'18 ago')+lab(58,'17 sep')+lab(90,'hoy')+lab(108,'6 nov');
-  g+='<text x="'+(X(82.5))+'" y="'+(T+16)+'" text-anchor="middle" font-size="14" fill="#AE281D" font-weight="700">sin stock</text>';
-  document.getElementById('serie').innerHTML=g;
+  g+=lab(2,'21 jul','start')+lab(28,'18 ago')+lab(58,'17 sep')+lab(90,'hoy')+(fin?lab(fin,o.finTexto||'6 nov',o.finAncla):'');
+  sin.forEach(function(t){g+='<text x="'+(X((t[0]+t[1])/2))+'" y="'+(T+16)+'" text-anchor="middle" font-size="14" fill="#AE281D" font-weight="700">sin stock</text>';});
+  svg.innerHTML=g;
+  return {X:X,Y:Y,T:T,H:H,B:B};
+  };
+  window.SERIE_MECHA=[[0,18],[5,15],[12,12],[18,9],[24,6],[28,30],[35,27],[41,24],[47,21],[53,17],[58,13],[62,10],[67,7],[74,3],[78,2],[81,0],[84,24],[87,19],[89,17],[90,14]];
+  window.dibujarSerie(document.getElementById('serie'), window.SERIE_MECHA);
 })();
 </script>
+<script>
+// Interacciones de la maqueta (no es la aplicación): cambiar de cuenta, conciliar, pedir.
+document.addEventListener('DOMContentLoaded', function () {
+  var P = St.P, $ = function (q, r) { return (r || document).querySelector(q); }, $$ = function (q, r) { return Array.prototype.slice.call((r || document).querySelectorAll(q)); };
+  var actual = P.mecha, contaste = 12, motivo = 'Conté la estantería', svg = $('#serie');
+  var pedidos = {};
+
+  // Navegar: el logo y la persona abren su menú (esta maqueta no tiene lateral).
+  $('[data-menu-ir]').addEventListener('click', function (e) { St.menuIrA(e.currentTarget); });
+  $('[data-avatar]').addEventListener('click', function (e) {
+    St.abrir({ tipo: 'menu', ancla: e.currentTarget, html: '<div class="t-etiqueta">Carlos Illobre · Administrador</div><a data-ir="usuarios"><i class="i" data-i="users"></i>Usuarios</a><a data-ir="actividad"><i class="i" data-i="history"></i>Quién hizo qué</a><div class="sep"></div><a data-ir="entrar"><i class="i" data-i="log-out"></i>Salir</a>' });
+    var m = $$('.st-menu').pop(); m.style.left = 'auto'; m.style.right = '24px';
+  });
+
+  // Fechas de los movimientos → día del gráfico (0 = 21/07, 90 = hoy 19/10).
+  function dia(t) {
+    if (/hoy/.test(t)) return 90;
+    var m = t.match(/(\d\d)\/(\d\d)/); if (!m) return 80;
+    var f = new Date(2026, +m[2] - 1, +m[1]), h = new Date(2026, 9, 19);
+    return Math.max(1, 90 - Math.round((h - f) / 864e5));
+  }
+  function fechaDe(d) { var f = new Date(2026, 9, 19 + d - 90); return f.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][f.getMonth()]; }
+  function serieDe(p) {
+    var ms = St.conSaldo(p).slice().reverse(), ini = ms.length ? Math.round((ms[0].s - ms[0].q) * 10) / 10 : p.stock;
+    var s = [[0, ini]], compras = [], ajustes = [], sin = [];
+    // Antes del primer movimiento que se muestra: lo que había, bajando de a poco (historia anterior).
+    if (ini <= 0 && ms.length) { var d0 = dia(ms[0].t + ' ' + ms[0].n), alto = Math.max(4, Math.round(p.min * 1.1)); s = [[0, alto]]; for (var k = 1; k <= 4; k++) s.push([Math.round(d0 * k / 5), Math.max(1, Math.round(alto * (1 - k / 5)))]); }
+    ms.forEach(function (m) { var d = dia(m.t + ' ' + m.n); s.push([d, m.s]); if (m.tipo === 'compra') compras.push([d, m.s]); if (m.tipo === 'ajuste') ajustes.push([d, m.s]); });
+    if (s[s.length - 1][0] !== 90) s.push([90, p.stock]);
+    for (var i = 0; i < s.length - 1; i++) if (s[i][1] <= 0 && s[i + 1][0] - s[i][0] >= 2) sin.push([s[i][0], s[i + 1][0]]);
+    return { s: s, compras: compras, ajustes: ajustes, sin: sin, ms: ms };
+  }
+  function ritmo(p) {
+    var n = p.porque && +p.porque.match(/(\d+) vendidas/)[1];
+    if (!n) n = p.movs.filter(function (m) { return m[0] === 'venta'; }).reduce(function (a, m) { return a - m[3]; }, 0) * 2.2;
+    return Math.max(1, Math.round(n / 90 * 7));
+  }
+  function diasQueAlcanza(p) { return p.stock > 0 ? Math.round(p.stock / ritmo(p) * 7) : 0; }
+  function dibujar(p, animar) {
+    var o, s;
+    if (p === P.mecha && !p.cambiado) { s = window.SERIE_MECHA; o = {}; }
+    else {
+      var r = serieDe(p); s = r.s;
+      var max = Math.max.apply(null, s.map(function (x) { return x[1]; }).concat([p.min])) * 1.15, paso = max > 60 ? 20 : max > 30 ? 10 : max > 12 ? 5 : 2;
+      var tope = Math.ceil(max / paso) * paso, rejas = []; for (var v = 0; v <= tope; v += paso) rejas.push(v);
+      var alcanza = diasQueAlcanza(p), fin = alcanza ? Math.min(108, 90 + alcanza) : 0;
+      if (p === P.mecha) { s = window.SERIE_MECHA.concat([[90, p.stock]]); r.compras = [[28, 30], [84, 24]]; r.ajustes = [[78, 2], [90, p.stock]]; r.sin = [[81, 84]]; }
+      o = { tope: tope, rejas: rejas, min: p.min, fin: fin, finTexto: alcanza ? fechaDe(90 + alcanza) : '', finAncla: alcanza >= 17 ? 'end' : undefined, compras: r.compras, ajustes: r.ajustes, sin: r.sin };
+    }
+    var g = window.dibujarSerie(svg, s, o);
+    // pasar por un escalón resalta su renglón del extracto
+    var ms = St.conSaldo(p), cajas = '';
+    ms.slice(0, 7).forEach(function (m, i) {
+      var d0 = dia(m.t + ' ' + m.n), d1 = i === 0 ? 90.5 : dia(ms[i - 1].t + ' ' + ms[i - 1].n);
+      cajas += '<rect data-esc="' + i + '" x="' + (g.X(d0) - 4) + '" y="' + g.T + '" width="' + Math.max(10, g.X(d1) - g.X(d0) + 4) + '" height="' + (g.H - g.T - g.B) + '" fill="transparent"/>';
+    });
+    svg.insertAdjacentHTML('beforeend', cajas);
+    if (animar && !St.reducir && svg.animate) {
+      svg.insertAdjacentHTML('beforeend', '<rect class="tapa" x="' + g.X(0) + '" y="0" width="' + (g.X(110) - g.X(0)) + '" height="' + (g.H - 24) + '" fill="#fff" style="transform-box:fill-box;transform-origin:right"/>');
+      var tapa = svg.querySelector('.tapa');
+      tapa.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }).onfinish = function () { tapa.remove(); };
+      $$('.pronostico', svg).forEach(function (el) { el.animate([{ opacity: 0 }, { opacity: 0, offset: .6 }, { opacity: 1 }], { duration: 650 }); });
+    }
+  }
+  svg.addEventListener('mouseover', function (e) {
+    var r = e.target.closest('[data-esc]');
+    $$('.linea.resaltada').forEach(function (l) { l.classList.remove('resaltada'); });
+    if (r) { var l = $$('[data-extracto] .linea')[+r.getAttribute('data-esc')]; if (l) l.classList.add('resaltada'); }
+  });
+  svg.addEventListener('mouseleave', function () { $$('.linea.resaltada').forEach(function (l) { l.classList.remove('resaltada'); }); });
+  dibujar(P.mecha, false);
+
+  // Extracto
+  function pintarExtracto(nuevo) {
+    var ms = St.conSaldo(actual), html = ms.slice(0, 7).map(function (m) {
+      var partes = m.t.split(' · '), quien = m.n.split(' · ').pop();
+      return '<div class="linea gen' + (m.tipo === 'ajuste' ? ' ajuste' : '') + '"><div><span class="tt">' + partes[0] + '</span><span class="nn">' + (m.tipo === 'ajuste' ? m.n : (partes[1] || '') + ' · ' + quien) + '</span></div><span class="q' + (m.q > 0 ? ' mas' : '') + '">' + St.signo(m.q) + '</span><span class="s' + (m.s <= 0 ? ' cero' : '') + '">' + St.num(m.s) + '</span></div>';
+    }).join('');
+    var resto = (actual === P.mecha ? 20 + ms.length - 9 : ms.length - 7);
+    if (resto > 0) html += '<div class="linea" style="border:0" data-ver-ant data-tocable><div><span class="tt" style="color:var(--pino-texto)">Ver los ' + resto + ' anteriores</span></div><span></span><span class="s">↓</span></div>';
+    $$('[data-extracto] .linea').forEach(function (l) { l.remove(); });
+    $('[data-extracto] .cab').insertAdjacentHTML('afterend', html);
+    if (nuevo) St.entrar($('[data-extracto] .linea'));
+  }
+  $('[data-extracto]').addEventListener('click', function (e) { if (e.target.closest('[data-ver-ant]')) St.dialogoMovs(actual); });
+
+  // Conciliar: Sistema · Contaste · Diferencia
+  function pintarConciliar() {
+    var d = Math.round((contaste - actual.stock) * 10) / 10;
+    $('[data-sis]').textContent = St.num(actual.stock);
+    var va = $('[data-contaste] .va');
+    if (va.querySelector('[data-n]')) va.querySelector('[data-n]').textContent = St.num(contaste); else va.textContent = St.num(contaste);
+    var dif = $('[data-dif]');
+    dif.textContent = d === 0 ? '0' : St.signo(d);
+    dif.style.color = d < 0 ? 'var(--error-texto)' : d > 0 ? 'var(--logro-texto)' : 'var(--texto-2)';
+    $('[data-guardar]').innerHTML = d === 0 ? 'Coincide: anotar que lo contaste <span class="kbd">Enter</span>' : 'Guardar «había ' + St.num(actual.stock) + ', hay ' + St.num(contaste) + '» <span class="kbd">Enter</span>';
+  }
+  function ponerContaste(n) {
+    var sube = n > contaste; contaste = Math.max(-99, Math.round(n * 10) / 10);
+    activarContaste();
+    St.rodar($('[data-contaste] [data-n]'), St.num(contaste), sube);
+    pintarConciliar();
+  }
+  function activarContaste() {
+    var va = $('[data-contaste] .va');
+    if (va.querySelector('[data-n]')) return;
+    va.innerHTML = '<button data-c-menos aria-label="Una menos">−</button><span data-n>' + St.num(contaste) + '</span><button data-c-mas aria-label="Una más">+</button>';
+  }
+  $('[data-contaste]').addEventListener('click', function (e) {
+    if (e.target.closest('[data-c-menos]')) ponerContaste(contaste - 1);
+    else if (e.target.closest('[data-c-mas]')) ponerContaste(contaste + 1);
+    else activarContaste();
+  });
+  $('[data-contaste]').addEventListener('keydown', function (e) {
+    if (/^\d$/.test(e.key)) { e.preventDefault(); ponerContaste(+e.key); }
+  });
+  St.chipsUno($('[data-motivos]'), function (c) { motivo = c.textContent; });
+  function guardar() {
+    var sube = contaste > actual.stock;
+    if (contaste === actual.stock) { St.tostada('Coincide: quedó anotado que contaste ' + actual.corto); return; }
+    St.ajustar(actual, contaste, motivo); actual.cambiado = true;
+    St.rodar($('.saldo-g'), St.num(actual.stock) + '<small>' + actual.unidad + '</small>', sube);
+    pintarExtracto(true); pintarConciliar(); pintarHeroe(); dibujar(actual, false);
+    var c = $('.cta[data-k="' + actual.id + '"]');
+    if (c) { var n = c.querySelector('.n'); n.className = 'n ' + ({ urgente: 'u', error: 'e', logro: '', '': '' })[St.estado(actual)]; St.rodar(n, St.num(actual.stock), sube); c.querySelector('.s').textContent = St.estadoTexto(actual); }
+    St.tostada('Conciliado: ' + actual.corto + ' queda en ' + St.num(actual.stock) + ' ' + actual.unidad);
+  }
+  $('[data-guardar]').addEventListener('click', guardar);
+
+  // Héroe y consejo
+  function pintarHeroe() {
+    var p = actual, h = $('[data-heroe]');
+    h.querySelector('.foto img').src = St.FOTOS + p.foto + '.webp';
+    h.querySelector('h1').textContent = p.nombre.length > 32 ? p.corto : p.nombre;
+    h.querySelector('.t-detalle').textContent = p.marca + ' · ' + (p.codigo || 'sin código') + ' · Est. ' + p.est + ' · ' + p.prov;
+    var est = p.stock < 0 ? '<span class="pastilla error">Stock negativo</span>' : p.stock === 0 ? '<span class="pastilla contorno">Sin stock</span>' : p.stock < p.min ? '<span class="pastilla urgente">Bajo el mínimo de ' + St.num(p.min) + '</span>' : '<span class="pastilla logro">Bien · mínimo ' + St.num(p.min) + '</span>';
+    h.querySelector('h1 + .t-detalle + div').innerHTML = est + '<span class="pastilla contorno"><i class="i i-s" data-i="barcode"></i>' + (p.codigo ? 'Código de fábrica' : 'Sin código') + '</span>';
+    window.pintarIconos(h);
+    var porSemana = ritmo(p), fin = diasQueAlcanza(p), k = $('[data-consejo]');
+    if (p === P.mecha && !p.cambiado) return;
+    k.querySelector('.t').textContent = p.stock <= 0 ? (p.stock < 0 ? 'Negativo: contalo antes de pedir' : 'No hay: cada día sin stock es una venta perdida') : 'A este ritmo alcanza hasta el ' + fechaDe(90 + fin).replace(/ (\w+)$/, function (_, m) { return '/' + (['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'].indexOf(m) + 1); });
+    k.querySelector('.t-detalle').innerHTML = 'Vende ' + porSemana + ' por semana. Pedí ' + p.sug + ' a ' + p.prov + ', tarda 3 días <i class="i i-s" data-i="info"></i>';
+    var b = $('[data-pedir]');
+    b.className = pedidos[p.id] ? 'btn' : 'btn btn-accion';
+    b.innerHTML = pedidos[p.id] ? '<i class="i i-s" data-i="check"></i>En el pedido' : '<i class="i i-s" data-i="truck"></i>Pedir ' + p.sug + ' <span class="kbd">P</span>';
+    window.pintarIconos(k);
+  }
+
+  // Cambiar de cuenta
+  function cargar(p) {
+    if (!p) return;
+    var antes = actual.stock; actual = p;
+    contaste = p.stock;
+    $$('.cta').forEach(function (c) { c.classList.toggle('activa', c.getAttribute('data-k') === p.id); });
+    $('[data-miga]').textContent = p.nombre;
+    St.rodar($('.saldo-g'), St.num(p.stock) + '<small>' + p.unidad + '</small>', p.stock > antes);
+    pintarHeroe(); pintarExtracto(false); 
+    var va = $('[data-contaste] .va'); va.textContent = St.num(contaste);
+    pintarConciliar(); dibujar(p, true);
+    St.fundir($('[data-centro]')); St.fundir($('[data-extracto]'));
+  }
+  $('[data-cuentas]').addEventListener('click', function (e) { var c = e.target.closest('.cta'); if (c) cargar(P[c.getAttribute('data-k')]); });
+  $('[data-paleta]').addEventListener('click', function () { St.paleta(cargar); });
+  $('[data-espejo]').addEventListener('click', function () { St.esperarCelular(cargar); });
+
+  // Pedir: suma el renglón al pedido del proveedor
+  function pedir() {
+    var p = actual;
+    if (pedidos[p.id]) { St.tostada('Ya está en el pedido a ' + p.prov, 'check'); return; }
+    var base = p.prov === 'Bulonera Centro' ? [['Tarugos nylon S8 con tope × 100', 12, 49800], ['Tornillo T2 8 × 1/2" × 100', 10, 27400]] : [['Llave combinada 13 mm cromada', 4, 20800]];
+    var tot0 = base.reduce(function (a, l) { return a + l[2]; }, 0);
+    var d = St.abrir({ tipo: 'dialogo', html: St.cabecera('Pedido a ' + p.prov, 'Borrador · se manda desde Compras') +
+      '<div class="st-lista" data-lineas>' + base.map(function (l) { return '<div class="st-ren" style="grid-template-columns:1fr auto auto"><span class="tt">' + l[0] + '</span><span class="pastilla contorno" style="height:24px">' + l[1] + '</span><span class="der">' + St.pesos(l[2]) + '</span></div>'; }).join('') + '</div>' +
+      '<div class="st-total"><span class="t-etiqueta">Costo estimado, sin IVA</span><span class="t-numero" data-tot>' + St.pesos(tot0) + '</span></div>' +
+      '<div class="st-pie"><button class="btn" data-cerrar>Seguir con el stock</button><button class="btn btn-accion" data-ir="compras"><i class="i" data-i="truck"></i>Ver en Compras</button></div>' });
+    setTimeout(function () {
+      var r = document.createElement('div'); r.className = 'st-ren'; r.style.gridTemplateColumns = '1fr auto auto';
+      r.innerHTML = '<span class="tt">' + p.nombre + '</span><span class="pastilla contorno" style="height:24px">' + p.sug + '</span><span class="der">' + St.pesos(p.costo * p.sug) + '</span>';
+      d.el.querySelector('[data-lineas]').appendChild(r); St.entrar(r);
+      St.rodar(d.el.querySelector('[data-tot]'), St.pesos(tot0 + p.costo * p.sug), true);
+    }, St.reducir ? 0 : 260);
+    pedidos[p.id] = true;
+    var b = $('[data-pedir]'); b.className = 'btn'; b.innerHTML = '<i class="i i-s" data-i="check"></i>En el pedido'; window.pintarIconos(b);
+  }
+  $('[data-consejo]').addEventListener('click', function (e) {
+    if (e.target.closest('[data-pedir]')) pedir();
+    else if (e.target.closest('.t-detalle svg')) St.pop(e.target.closest('.t-detalle svg'), 'Sale de las ventas de los últimos 90 días y de lo que tarda <b>' + actual.prov + '</b> en entregar. La cantidad cubre 4 semanas.');
+  });
+
+  // Teclado
+  document.addEventListener('keydown', function (e) {
+    if (St.hayCapa() || e.target.matches('input')) return;
+    var k = e.key.toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && k === 'k') { e.preventDefault(); St.paleta(cargar); }
+    else if (e.ctrlKey || e.altKey || e.metaKey) return;
+    else if (k === 'p') pedir();
+    else if (e.key === 'Enter' && !e.target.matches('button')) { e.preventDefault(); guardar(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); ponerContaste(contaste + 1); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); ponerContaste(contaste - 1); }
+    else if (k === 'j' || k === 'k') { var cs = $$('.cta'), i = cs.indexOf($('.cta.activa')); var n = cs[Math.max(0, Math.min(cs.length - 1, i + (k === 'j' ? 1 : -1)))]; cargar(P[n.getAttribute('data-k')]); }
+  });
+});
+</script>
+
 </body>
 </html>

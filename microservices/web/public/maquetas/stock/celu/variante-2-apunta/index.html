@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; background: #0B110F; }
   .celu { background: #0B110F; }
@@ -53,45 +56,150 @@
   .tira .m + .m { border-left: 1px solid var(--borde); }
   .tira .q { font-weight: 800; font-size: 17px; line-height: 22px; color: var(--tinta); }
   .tira .q.mas { color: var(--logro-texto); } .tira .q.aj { color: var(--urgente-texto); }
+  .visor { cursor: pointer; }
+  .visor .luz { position: absolute; inset: 0; background: radial-gradient(70% 50% at 50% 50%, rgba(255,250,235,.55), transparent 70%); opacity: 0; transition: opacity var(--t) var(--curva); pointer-events: none; }
+  .visor.con-luz .luz { opacity: 1; }
+  .redondo.prendida { background: #fff; color: var(--tinta); }
+  .marco { transition: transform var(--t) var(--curva); }
+  .marco.leyendo { transform: scale(.86); }
+  .hoja { transition: transform var(--t-nav) var(--curva); }
+  .hoja.abajo { transform: translateY(105%); transition-timing-function: var(--curva-salida); }
+  .apunta { position: absolute; left: 0; right: 0; top: 560px; display: grid; justify-items: center; gap: 8px; color: #fff; font-weight: 700; text-align: center; opacity: 0; transition: opacity var(--t) var(--curva); pointer-events: none; }
+  .apunta.ver { opacity: 1; }
+  .apunta .pastilla { background: rgba(255,255,255,.14); color: #fff; border: 1px solid rgba(255,255,255,.25); }
+  .modo span { cursor: pointer; }
+  .redondo { cursor: pointer; }
+  .chip.escuchando { background: var(--error-suave); color: var(--error-texto); border-color: transparent; }
 </style>
 </head>
 <body>
 <div class="celu">
-  <div class="visor">
+  <div class="visor" data-visor><div class="luz"></div>
     <div class="estante"></div>
-    <img class="objeto" src="../../../_comun/fotos/martillo.webp" alt="">
-    <div class="etq"><div class="bar"></div><div class="tx">MARTILLO CARP. 27 MM · $24.000</div></div>
+    <img class="objeto" data-objeto src="../../../_comun/fotos/martillo.webp" alt="">
+    <div class="etq"><div class="bar"></div><div class="tx" data-etq>MARTILLO CARP. 27 MM · $24.000</div></div>
     <div class="grano"></div>
-    <div class="marco"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+    <div class="marco" data-marco><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
   </div>
   <div class="barra-estado" style="position:relative;color:#fff"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#fff" opacity=".5"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#fff"/></svg></span></div>
   <div class="tope">
-    <span class="redondo"><i class="i" data-i="x"></i></span>
-    <div class="modo"><span class="si"><i class="i i-s" data-i="scan-barcode"></i>Escanear</span><span><i class="i i-s" data-i="search"></i>Buscar</span></div>
-    <span class="redondo"><i class="i" data-i="flashlight"></i></span>
+    <span class="redondo" data-salir aria-label="Salir de escanear"><i class="i" data-i="x"></i></span>
+    <div class="modo" data-modo><span class="si" data-m="escanear"><i class="i i-s" data-i="scan-barcode"></i>Escanear</span><span data-m="buscar"><i class="i i-s" data-i="search"></i>Buscar</span></div>
+    <span class="redondo" data-linterna aria-label="Linterna"><i class="i" data-i="flashlight"></i></span>
   </div>
-  <span class="lugar"><i class="i i-s" data-i="map-pin"></i>Estantería A-03 · 12 de 31 vistos</span>
+  <span class="lugar"><i class="i i-s" data-i="map-pin"></i><span data-lugar>Estantería A-03 · 12 de 31 vistos</span></span>
+  <div class="apunta" data-apunta><span class="pastilla"><i class="i i-s" data-i="scan-barcode"></i>Apuntá a la próxima etiqueta</span></div>
 
-  <div class="hoja">
+  <div class="hoja" data-hoja>
     <div class="agarre"></div>
     <div class="prod">
-      <span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span>
-      <div><div class="t">Martillo carpintero 27 mm</div><div class="t-detalle">Bahco · A-03-12 · mín. 10</div></div>
-      <div class="sist"><div class="t-etiqueta">Sistema</div><div class="va">9</div></div>
+      <span class="foto"><img data-foto src="../../../_comun/fotos/martillo.webp" alt=""></span>
+      <div><div class="t" data-nombre>Martillo carpintero 27 mm</div><div class="t-detalle" data-det>Bahco · A-03-12 · mín. 10</div></div>
+      <div class="sist"><div class="t-etiqueta">Sistema</div><div class="va" data-sis>9</div></div>
     </div>
     <div class="pregunta">¿Cuántas hay?</div>
     <div class="contador">
-      <button><i class="i i-xl" data-i="minus"></i></button>
-      <div class="n">8<small>un.</small></div>
-      <button><i class="i i-xl" data-i="plus"></i></button>
+      <button data-menos aria-label="Una menos"><i class="i i-xl" data-i="minus"></i></button>
+      <div class="n" data-hay>8<small>un.</small></div>
+      <button data-mas aria-label="Una más"><i class="i i-xl" data-i="plus"></i></button>
     </div>
-    <div class="dif">había 9, hay 8 · una menos</div>
-    <div class="motivos"><span class="chip elegido">Conté</span><span class="chip">Rotura</span><span class="chip">Pérdida</span><span class="chip" style="width:44px;padding:0;justify-content:center"><i class="i" data-i="mic"></i></span></div>
-    <div class="tira"><div class="m"><span class="q">−3</span><span>venta<br>hoy</span></div><div class="m"><span class="q mas">+4</span><span>compra<br>sáb 18</span></div><div class="m"><span class="q aj">−1</span><span>rotura<br>mié 15</span></div><div class="m"><span class="q">−1</span><span>venta<br>sáb 11</span></div></div>
-    <button class="btn btn-accion grande"><i class="i" data-i="check"></i>Guardar y seguir escaneando</button>
-    <div class="pie"><span>Si coincide, guardá igual</span><a style="white-space:nowrap">Sus 6 movimientos <i class="i i-s" data-i="chevron-right"></i></a></div>
+    <div class="dif" data-dif>había 9, hay 8 · una menos</div>
+    <div class="motivos" data-motivos><span class="chip elegido">Conté</span><span class="chip">Rotura</span><span class="chip">Pérdida</span><span class="chip" data-mic aria-label="Decir el motivo" style="width:44px;padding:0;justify-content:center"><i class="i" data-i="mic"></i></span></div>
+    <div class="tira" data-tira><div class="m"><span class="q">−3</span><span>venta<br>hoy</span></div><div class="m"><span class="q mas">+4</span><span>compra<br>sáb 18</span></div><div class="m"><span class="q aj">−1</span><span>rotura<br>mié 15</span></div><div class="m"><span class="q">−1</span><span>venta<br>sáb 11</span></div></div>
+    <button class="btn btn-accion grande" data-guardar><i class="i" data-i="check"></i>Guardar y seguir escaneando</button>
+    <div class="pie"><span>Si coincide, guardá igual</span><a style="white-space:nowrap" data-movs data-tocable><span data-n-movs>Sus 6 movimientos</span> <i class="i i-s" data-i="chevron-right"></i></a></div>
   </div>
   <span class="home-ind"></span>
 </div>
+<script>
+// Interacciones de la maqueta (no es la aplicación): apuntar, corregir, guardar y seguir.
+document.addEventListener('DOMContentLoaded', function () {
+  var P = St.P, $ = function (q, r) { return (r || document).querySelector(q); }, $$ = function (q, r) { return Array.prototype.slice.call((r || document).querySelectorAll(q)); };
+  var fila = [P.martillo, P.cinta, P.pinza, P.llave, P.tarugos], i = 0, actual = P.martillo, hay = 8, motivo = 'Conté', vistos = 12, abierta = true;
+  var ETQ = { martillo: 'MARTILLO CARP. 27 MM · $24.000', cinta: 'CINTA MÉTRICA 5 M · $17.000', pinza: 'PINZA UNIV. 8" · $19.000', llave: 'LLAVE COMB. 13 MM · $9.000', tarugos: 'TARUGOS S8 × 100 · $7.000' };
+
+  $('[data-salir]').addEventListener('click', function () { St.menuIrA(null, 'Salir de escanear'); });
+  $('[data-linterna]').addEventListener('click', function () { var v = $('[data-visor]').classList.toggle('con-luz'); $('[data-linterna]').classList.toggle('prendida', v); });
+
+  // Buscar en vez de escanear
+  $('[data-modo]').addEventListener('click', function (e) {
+    var m = e.target.closest('[data-m]'); if (!m || m.getAttribute('data-m') !== 'buscar') return;
+    poner('buscar');
+    var d = St.paleta(function (p) { poner('escanear'); mostrar(p); }, { escanear: false });
+    var cerrarOrig = d.cerrar; d.cerrar = function (x) { poner('escanear'); cerrarOrig(x); };
+  });
+  function poner(modo) { $$('[data-m]').forEach(function (s) { s.classList.toggle('si', s.getAttribute('data-m') === modo); }); }
+
+  // La hoja del producto
+  function tira(p) {
+    return St.conSaldo(p).slice(0, 4).map(function (m) {
+      var cuando = /hoy/.test(m.t) ? 'hoy' : ((m.t.match(/(lun|mar|mié|jue|vie|sáb|dom) (\d\d)/) || [''])[0]);
+      var que = m.tipo === 'ajuste' ? (/rotura/.test(m.n) ? 'rotura' : 'ajuste') : m.tipo;
+      return '<div class="m"><span class="q' + (m.tipo === 'compra' ? ' mas' : m.tipo === 'ajuste' ? ' aj' : '') + '">' + St.signo(m.q) + '</span><span>' + que + '<br>' + cuando + '</span></div>';
+    }).join('');
+  }
+  function pintarDif() {
+    var d = Math.round((hay - actual.stock) * 10) / 10, el = $('[data-dif]');
+    el.textContent = d === 0 ? 'coincide con el sistema' : 'había ' + St.num(actual.stock) + ', hay ' + St.num(hay) + ' · ' + St.difTexto(actual.stock, hay);
+    el.style.color = d < 0 ? 'var(--error-texto)' : d > 0 ? 'var(--logro-texto)' : 'var(--texto-2)';
+  }
+  function mostrar(p) {
+    actual = p; hay = p.stock;
+    $('[data-foto]').src = St.FOTOS + p.foto + '.webp';
+    $('[data-objeto]').src = St.FOTOS + p.foto + '.webp';
+    $('[data-etq]').textContent = ETQ[p.id] || p.corto.toUpperCase();
+    $('[data-nombre]').textContent = p.corto;
+    $('[data-det]').textContent = p.marca + ' · ' + p.est + ' · mín. ' + St.num(p.min);
+    $('[data-sis]').textContent = St.num(p.stock);
+    $('[data-hay]').innerHTML = St.num(hay) + '<small>' + p.unidad + '</small>';
+    $('[data-tira]').innerHTML = tira(p);
+    $('[data-n-movs]').textContent = 'Sus ' + p.movs.length + ' movimientos';
+    pintarDif();
+    subir();
+  }
+  function bajar() { abierta = false; $('[data-hoja]').classList.add('abajo'); $('[data-apunta]').classList.add('ver'); }
+  function subir() { abierta = true; $('[data-hoja]').classList.remove('abajo'); $('[data-apunta]').classList.remove('ver'); }
+
+  // Apuntar a una etiqueta: el marco se cierra, vibra y sube la hoja con el producto.
+  $('[data-visor]').addEventListener('click', function () {
+    var m = $('[data-marco]');
+    m.classList.add('leyendo'); St.vibrar(10);
+    setTimeout(function () {
+      m.classList.remove('leyendo');
+      if (abierta) { bajar(); setTimeout(function () { i = (i + 1) % fila.length; mostrar(fila[i]); }, St.reducir ? 0 : 240); }
+      else { i = (i + 1) % fila.length; mostrar(fila[i]); }
+    }, St.reducir ? 0 : 220);
+  });
+
+  // Contar
+  function contar(n) {
+    var sube = n > hay; hay = Math.max(-99, Math.round(n * 10) / 10);
+    St.rodar($('[data-hay]'), St.num(hay) + '<small>' + actual.unidad + '</small>', sube);
+    pintarDif(); St.vibrar(10);
+  }
+  $('[data-menos]').addEventListener('click', function () { contar(hay - 1); });
+  $('[data-mas]').addEventListener('click', function () { contar(hay + 1); });
+  St.chipsUno($('[data-motivos]'), function (c) {
+    if (c.hasAttribute('data-mic')) {
+      c.classList.add('escuchando'); c.innerHTML = '<i class="i" data-i="mic"></i>'; window.pintarIconos(c);
+      setTimeout(function () { c.classList.remove('escuchando'); c.style.cssText = 'padding:0 14px'; c.textContent = '«se cayó»'; motivo = 'Se cayó del estante'; St.tostada('Motivo: «se cayó del estante»', 'mic'); }, 1400);
+      return;
+    }
+    motivo = c.textContent.replace(/[«»]/g, '');
+  });
+  $('[data-movs]').addEventListener('click', function () { St.dialogoMovs(actual); });
+
+  // Guardar y seguir: la hoja baja, el avance suma uno y la cámara queda mirando.
+  $('[data-guardar]').addEventListener('click', function () {
+    var habia = actual.stock;
+    if (hay !== habia) St.ajustar(actual, hay, motivo === 'Conté' ? 'Conté la estantería' : motivo);
+    vistos++;
+    St.rodar($('[data-lugar]'), 'Estantería A-03 · ' + vistos + ' de 31 vistos', true);
+    St.vibrar([10, 40, 10]);
+    bajar();
+    St.tostada(hay === habia ? actual.corto + ': coincide, quedó contado' : 'Guardado: había ' + St.num(habia) + ', hay ' + St.num(hay), 'circle-check');
+  });
+});
+</script>
 </body>
 </html>

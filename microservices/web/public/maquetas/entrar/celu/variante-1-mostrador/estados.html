@@ -7,9 +7,11 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <link rel="stylesheet" href="../../_recursos/entrar.css">
 <link rel="stylesheet" href="estilo.css">
+<link rel="stylesheet" href="../../_recursos/interacciones.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_recursos/iconos-extra.js"></script>
 <script src="../../_recursos/entrar.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 </head>
 <body style="margin:0">
 <div class="fila-celus">
@@ -18,7 +20,7 @@
 <div class="celu">
   <div class="barra-estado"><span>8:46</span><span class="se"><i class="i i-s" data-i="wifi"></i></span></div>
   <div class="celu-cabecera"><span class="t-titulo">Catálogo</span></div>
-  <nav class="celu-pestanas"><a class="activa">Productos</a><a>Listas</a><a>Duplicados</a></nav>
+  <nav class="celu-pestanas"><a class="activa" data-ir="productos">Productos</a><a data-ir="listas">Listas</a><a data-ir="duplicados">Duplicados</a></nav>
   <div class="celu-pantalla"><div class="renglon"><span class="foto"><img src="../../../_comun/fotos/martillo.webp"></span><div><div class="titulo">Martillo carpintero 27 mm</div><div class="detalle">Bahco · MC27</div></div></div><div class="renglon"><span class="foto"><img src="../../../_comun/fotos/mecha.webp"></span><div><div class="titulo">Mecha acero rápido HSS 8 mm</div><div class="detalle">Ezeta · ME080</div></div></div></div>
   <div class="velo"></div>
   <div class="hoja">
@@ -76,5 +78,7 @@
 </div></figure>
 
 </div>
+<script src="../../_recursos/interacciones.js"></script>
+<script>Entrar.iniciar("celu-1");</script>
 </body>
 </html>

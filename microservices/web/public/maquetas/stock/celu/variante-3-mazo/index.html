@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .tope { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
@@ -53,24 +56,32 @@
   .gesto.medio .b { width: 56px; height: 56px; background: var(--pino); color: #fff; border-color: var(--pino); }
   .gesto.si .b { width: 80px; height: 80px; background: var(--accion); color: #fff; border-color: var(--accion); box-shadow: var(--sombra-accion); }
   .gesto.si { color: var(--accion-texto); }
+  /* Al tocar (no cambia cómo se ve quieta) */
+  .carta.c1 { touch-action: none; cursor: grab; }
+  .carta.c1.vuelve { transition: transform var(--t) var(--curva); }
+  .sello.no { left: auto; right: 14px; transform: rotate(12deg); border-color: var(--texto-3); color: var(--texto-2); }
+  .gesto, .redondo, .prov { cursor: pointer; }
+  .gesto .b { transition: transform var(--t-micro) var(--curva); }
+  .gesto:active .b, .redondo:active { transform: scale(.94); }
+  .fin { margin: auto; display: grid; justify-items: center; gap: 10px; text-align: center; padding: 0 12px; }
 </style>
 </head>
 <body>
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="tope">
-    <span class="redondo"><i class="i" data-i="x"></i></span>
-    <div class="tt"><b>Reponer</b><span>7 de 28 · lo urgente primero</span></div>
-    <span class="redondo"><i class="i" data-i="undo-2"></i></span>
+    <span class="redondo" data-salir role="button" aria-label="Salir"><i class="i" data-i="x"></i></span>
+    <div class="tt"><b>Reponer</b><span data-van>7 de 28 · lo urgente primero</span></div>
+    <span class="redondo" data-deshacer role="button" aria-label="Deshacer"><i class="i" data-i="undo-2"></i></span>
   </div>
-  <div class="avance"><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="prov"><span class="ini">BC</span><div><div class="t">Pedido a Bulonera Centro</div><div class="t-detalle">5 productos, el más barato</div></div><div class="c"><span class="peso">$</span>109.320<small>estimado</small></div></div>
+  <div class="avance" data-avance><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="prov" data-prov role="button"><span class="ini" data-p-ini>BC</span><div><div class="t" data-p-nom>Pedido a Bulonera Centro</div><div class="t-detalle" data-p-n>5 productos, el más barato</div></div><div class="c"><span data-p-tot><span class="peso">$</span>109.320</span><small>estimado</small></div></div>
 
-  <div class="mazo">
+  <div class="mazo" data-mazo>
     <div class="carta c3"></div>
     <div class="carta c2"></div>
     <div class="carta c1">
-      <div class="imagen"><img src="../../../_comun/fotos/tarugos.webp" alt=""><span class="sello">AL PEDIDO +12</span></div>
+      <div class="imagen"><img src="../../../_comun/fotos/tarugos.webp" alt=""><span class="sello" data-sello>AL PEDIDO +12</span></div>
       <div class="nombre">Tarugos nylon S8 con tope × 100</div>
       <div class="det">Fischer · B-04-02 · $4.150 en Bulonera</div>
       <div class="medidor">
@@ -78,16 +89,205 @@
         <div class="b"><i></i><em></em></div>
         <div class="why">Vende 7 por semana: se acaba el sábado <i class="i i-s" data-i="info"></i></div>
       </div>
-      <div class="pedir"><div class="et">Pedí 12 cajas<b>cubre 2 semanas</b></div><span class="cantidad"><button><i class="i" data-i="minus"></i></button><span class="n">12</span><button><i class="i" data-i="plus"></i></button></span></div>
+      <div class="pedir"><div class="et">Pedí <span data-q>12</span> cajas<b>cubre 2 semanas</b></div><span class="cantidad"><button data-menos aria-label="Una menos"><i class="i" data-i="minus"></i></button><span class="n" data-n>12</span><button data-mas aria-label="Una más"><i class="i" data-i="plus"></i></button></span></div>
     </div>
   </div>
 
   <div class="gestos">
-    <div class="gesto"><span class="b"><i class="i i-l" data-i="arrow-left"></i></span>Ahora no</div>
-    <div class="gesto medio"><span class="b"><i class="i i-l" data-i="square-pen"></i></span>Hay otra cantidad</div>
-    <div class="gesto si"><span class="b"><i class="i i-xl" data-i="arrow-right"></i></span>Al pedido</div>
+    <div class="gesto" data-no role="button"><span class="b"><i class="i i-l" data-i="arrow-left"></i></span>Ahora no</div>
+    <div class="gesto medio" data-otra role="button"><span class="b"><i class="i i-l" data-i="square-pen"></i></span>Hay otra cantidad</div>
+    <div class="gesto si" data-si role="button"><span class="b"><i class="i i-xl" data-i="arrow-right"></i></span>Al pedido</div>
   </div>
   <span class="home-ind"></span>
 </div>
+<script>
+// Interacciones de la maqueta (no es la aplicación): deslizar las cartas, sumar al pedido, deshacer.
+document.addEventListener('DOMContentLoaded', function () {
+  var P = St.P, $ = function (q, r) { return (r || document).querySelector(q); }, $$ = function (q, r) { return Array.prototype.slice.call((r || document).querySelectorAll(q)); };
+  var TOTAL = 28, hechos = 7;
+  // Lo urgente primero; lo que se ve quieto es la primera carta.
+  var MAZO = [
+    { p: P.tarugos, q: 12, u: 'cajas', cubre: 'cubre 2 semanas', why: 'Vende 7 por semana: se acaba el sábado' },
+    { p: P.mecha, q: 24, u: 'un.', cubre: 'cubre 5 semanas', why: 'Vende 5 por semana: alcanza hasta el jueves 30' },
+    { p: P.clavos, q: 15, u: 'kg', cubre: 'cubre 3 semanas', why: 'Vende 5 kg por semana: se acaba el viernes' },
+    { p: P.puntas, q: 10, u: 'cajas', cubre: 'cubre 4 semanas', why: 'Negativo: se anuló una compra con 3 ya vendidas' },
+    { p: P.martillo, q: 6, u: 'un.', cubre: 'cubre 3 semanas', why: 'Vende 2 por semana: 31 en 90 días' },
+    { p: P.llave, q: 6, u: 'un.', cubre: 'cubre 6 semanas', why: 'Se vendió sin stock cargado: contala' },
+    { p: P.latex, q: 2, u: 'baldes', cubre: 'y uno para Rosa', why: 'La espera Rosa, jue 22' }
+  ];
+  var PROV_ID = { 'Bulonera Centro': 'BC', 'Distribuidora Oeste': 'DO', 'Bremen Herramientas': 'BR', 'Pinturerías Alba': 'AL' };
+  var PED = {
+    BC: { nombre: 'Bulonera Centro', lineas: [['Tornillo T2 8 × 1/2" × 100', 10, 27400], ['Arandela plana 8 mm × 100', 5, 15900], ['Bulón hexagonal 8 × 50 mm × 50', 4, 25800], ['Tuerca hexagonal 8 mm × 100', 6, 14220], ['Varilla roscada 8 mm × 1 m', 20, 26000]] },
+    DO: { nombre: 'Distribuidora Oeste', lineas: [['Cinta métrica PowerLock 5 m', 4, 39200]] },
+    BR: { nombre: 'Bremen Herramientas', lineas: [] },
+    AL: { nombre: 'Pinturerías Alba', lineas: [] }
+  };
+  var i = 0, hist = [], provVisto = 'BC';
+  var mazo = $('[data-mazo]'), c1 = $('.carta.c1', mazo);
+  function idProv(p) { return PROV_ID[p.prov] || 'BC'; }
+  function total(k) { return PED[k].lineas.reduce(function (a, l) { return a + l[2]; }, 0); }
+
+  // ---- La tarjeta del pedido de arriba ----
+  function pintarProv(k, sube) {
+    var pd = PED[k], n = pd.lineas.length, cambia = k !== provVisto;
+    provVisto = k;
+    $('[data-p-ini]').textContent = k;
+    $('[data-p-nom]').textContent = 'Pedido a ' + pd.nombre;
+    $('[data-p-n]').textContent = n ? n + ' producto' + (n === 1 ? '' : 's') + ', el más barato' : 'Todavía vacío';
+    if (sube === undefined) $('[data-p-tot]').innerHTML = St.pesos(total(k));
+    else St.rodar($('[data-p-tot]'), St.pesos(total(k)), sube);
+    if (cambia) St.fundir($('[data-prov]'));
+  }
+  $('[data-prov]').addEventListener('click', function () {
+    var pd = PED[provVisto];
+    St.abrir({ tipo: 'hoja', html: St.cabecera('Pedido a ' + pd.nombre, 'Borrador · se manda desde Compras') +
+      '<div class="st-lista">' + (pd.lineas.length ? pd.lineas.map(function (l) { return '<div class="st-ren" style="grid-template-columns:1fr auto auto"><span class="tt">' + l[0] + '</span><span class="pastilla contorno" style="height:24px">' + St.num(l[1]) + '</span><span class="der">' + St.pesos(l[2]) + '</span></div>'; }).join('') : '<div class="t-detalle" style="padding:8px 0">Todavía nada. Deslizá a la derecha lo que quieras pedir.</div>') + '</div>' +
+      '<div class="st-total"><span class="t-etiqueta">Costo estimado, sin IVA</span><span class="t-numero">' + St.pesos(total(provVisto)) + '</span></div>' +
+      '<div class="st-pie"><button class="btn btn-accion grande" data-ir="compras"><i class="i" data-i="truck"></i>Seguir en Compras</button><button class="btn btn-fantasma" data-cerrar>Cerrar</button></div>' });
+  });
+
+  // ---- Avance ----
+  function pintarAvance() {
+    var segs = $$('[data-avance] i'), llenos = Math.round(hechos / TOTAL * segs.length);
+    segs.forEach(function (s, n) { s.classList.toggle('si', n < llenos); });
+    $('[data-van]').textContent = hechos + ' de ' + TOTAL + ' · lo urgente primero';
+  }
+
+  // ---- La carta ----
+  function color(p) { return p.stock < 0 ? 'error' : p.stock === 0 ? 'error' : 'urgente'; }
+  function cartaHtml(c) {
+    var p = c.p, col = color(p), ancho = Math.max(0, Math.min(100, p.stock / p.min * 100));
+    return '<div class="imagen"><img src="' + St.FOTOS + p.foto + '.webp" alt=""><span class="sello" data-sello style="opacity:0">AL PEDIDO +' + St.num(c.q) + '</span></div>' +
+      '<div class="nombre">' + p.nombre + '</div>' +
+      '<div class="det">' + p.marca + ' · ' + p.est + ' · $' + St.num(p.costo) + ' en ' + p.prov.split(' ')[0] + '</div>' +
+      '<div class="medidor"><span class="va" style="color:var(--' + col + '-texto)">' + St.num(p.stock) + '<small> de ' + St.num(p.min) + '</small></span><div class="b"><i style="width:' + ancho + '%;background:var(--' + col + ')"></i><em></em></div><div class="why">' + c.why + ' <i class="i i-s" data-i="info"></i></div></div>' +
+      '<div class="pedir"><div class="et">Pedí <span data-q>' + St.num(c.q) + '</span> ' + c.u + '<b>' + c.cubre + '</b></div><span class="cantidad"><button data-menos aria-label="Una menos"><i class="i" data-i="minus"></i></button><span class="n" data-n>' + St.num(c.q) + '</span><button data-mas aria-label="Una más"><i class="i" data-i="plus"></i></button></span></div>';
+  }
+  function finHtml() {
+    return '<div class="fin"><span class="st-listo" style="padding:0"><span class="tilde"><i class="i i-xl" data-i="check"></i></span></span><div class="t-seccion">Lo urgente, listo</div><div class="t-detalle">Revisaste ' + hechos + ' de ' + TOTAL + '. Los pedidos quedaron como borrador en Compras.</div><button class="btn btn-accion grande" data-ir="compras"><i class="i" data-i="truck"></i>Ver los pedidos</button></div>';
+  }
+  function pintarResto() {
+    var quedan = MAZO.length - i - 1;
+    $('.carta.c2', mazo).style.display = quedan >= 1 ? '' : 'none';
+    $('.carta.c3', mazo).style.display = quedan >= 2 ? '' : 'none';
+  }
+  // de: 'atras' (sube desde el mazo) o un número (vuelve desde ese costado, al deshacer)
+  function mostrar(de) {
+    c1.style.transform = ''; c1.classList.remove('vuelve');
+    if (i >= MAZO.length) { c1.innerHTML = finHtml(); c1.style.cursor = 'default'; }
+    else { c1.innerHTML = cartaHtml(MAZO[i]); c1.style.cursor = ''; }
+    window.pintarIconos(c1); pintarResto();
+    if (i < MAZO.length && idProv(MAZO[i].p) !== provVisto) { var sig = idProv(MAZO[i].p); setTimeout(function () { pintarProv(sig); }, St.reducir ? 0 : 500); }
+    if (St.reducir || !c1.animate) return;
+    var desde = de === 'atras' ? { transform: 'translateY(10px) scale(.95)', opacity: 1 } : { transform: 'translateX(' + de + 'px) rotate(' + (de > 0 ? 16 : -16) + 'deg)', opacity: 0 };
+    c1.animate([desde, { transform: 'translateX(18px) rotate(3deg)', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  }
+
+  // ---- Cantidad en la carta ----
+  function ponerQ(n) {
+    var c = MAZO[i]; if (!c) return;
+    var paso = c.u === 'kg' ? 0.5 : 1, sube = n > c.q;
+    c.q = Math.max(paso, Math.round(n / paso) * paso);
+    St.rodar($('[data-n]', c1), St.num(c.q), sube);
+    $('[data-q]', c1).textContent = St.num(c.q);
+    $('[data-sello]', c1).textContent = 'AL PEDIDO +' + St.num(c.q);
+    St.vibrar(10);
+  }
+  c1.addEventListener('click', function (e) {
+    var c = MAZO[i];
+    if (e.target.closest('[data-menos]')) ponerQ(c.q - (c.u === 'kg' ? 0.5 : 1));
+    else if (e.target.closest('[data-mas]')) ponerQ(c.q + (c.u === 'kg' ? 0.5 : 1));
+    else if (e.target.closest('.why svg')) St.pop(e.target.closest('.why svg'), 'Sale de las ventas de los últimos 90 días. La cantidad sugerida cubre hasta la próxima entrega de <b>' + c.p.prov + '</b>, que tarda 3 días.');
+  });
+
+  // ---- Decidir: derecha al pedido, izquierda ahora no ----
+  function sello(dx) {
+    var s = $('[data-sello]', c1); if (!s) return;
+    var si = dx >= 0, c = MAZO[i];
+    s.classList.toggle('no', !si);
+    s.textContent = si ? 'AL PEDIDO +' + St.num(c.q) : 'AHORA NO';
+    s.style.opacity = Math.min(1, Math.abs(dx) / 90);
+  }
+  function decidir(si) {
+    var c = MAZO[i]; if (!c || ocupado) return;
+    ocupado = true;
+    var k = idProv(c.p), lado = si ? 1 : -1;
+    sello(si ? 120 : -120);
+    hist.push({ i: i, si: si, k: k });
+    if (si) { PED[k].lineas.push([c.p.corto, c.q, c.p.costo * c.q]); pintarProv(k, true); St.entrar($('[data-prov]')); }
+    St.vibrar(si ? [10, 40, 10] : 10);
+    var fin = function () { i++; hechos++; pintarAvance(); mostrar('atras'); ocupado = false; };
+    if (St.reducir || !c1.animate) { fin(); return; }
+    var desde = c1.style.transform || 'translateX(18px) rotate(3deg)';
+    c1.classList.remove('vuelve');
+    c1.animate([{ transform: desde, opacity: 1 }, { transform: 'translateX(' + (lado * 460) + 'px) rotate(' + (lado * 20) + 'deg)', opacity: 0 }], { duration: 240, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' }).onfinish = function (ev) { ev.target.cancel(); fin(); };
+  }
+  var ocupado = false;
+  $('[data-si]').addEventListener('click', function () { decidir(true); });
+  $('[data-no]').addEventListener('click', function () { decidir(false); });
+
+  // Arrastrar: la carta sigue al dedo y gira hasta 8°.
+  var arr = null;
+  c1.addEventListener('pointerdown', function (e) {
+    if (ocupado || i >= MAZO.length || e.target.closest('button, svg')) return;
+    arr = { x0: e.clientX, dx: 0 };
+    c1.classList.remove('vuelve');
+    try { c1.setPointerCapture(e.pointerId); } catch (x) {}
+  });
+  c1.addEventListener('pointermove', function (e) {
+    if (!arr) return;
+    arr.dx = e.clientX - arr.x0;
+    var rot = Math.max(-8, Math.min(8, 3 + arr.dx / 18));
+    c1.style.transform = 'translateX(' + (18 + arr.dx) + 'px) rotate(' + rot + 'deg)';
+    sello(arr.dx);
+  });
+  function soltar() {
+    if (!arr) return;
+    var dx = arr.dx; arr = null;
+    if (dx > 110) decidir(true);
+    else if (dx < -110) decidir(false);
+    else { c1.classList.add('vuelve'); c1.style.transform = ''; if (Math.abs(dx) > 4) sello(0); }
+  }
+  c1.addEventListener('pointerup', soltar);
+  c1.addEventListener('pointercancel', soltar);
+
+  // ---- Hay otra cantidad: corregir el stock sin salir del mazo ----
+  $('[data-otra]').addEventListener('click', function () {
+    var c = MAZO[i]; if (!c) return;
+    St.fichaProducto(c.p, { corregir: true, alGuardar: function (p) {
+      setTimeout(function () {
+        var va = $('.medidor .va', c1), col = color(p), b = $('.medidor .b i', c1);
+        va.style.color = 'var(--' + col + '-texto)';
+        St.rodar(va, St.num(p.stock) + '<small> de ' + St.num(p.min) + '</small>', true);
+        b.style.width = Math.max(0, Math.min(100, p.stock / p.min * 100)) + '%'; b.style.background = 'var(--' + col + ')';
+        St.tostada('Guardado: ' + p.corto + ' queda en ' + St.num(p.stock) + ' ' + p.unidad);
+      }, St.reducir ? 0 : 500);
+    } });
+  });
+
+  // ---- Deshacer: la última carta vuelve ----
+  $('[data-deshacer]').addEventListener('click', function () {
+    if (ocupado) return;
+    var h = hist.pop();
+    if (!h) { St.tostada('No hay nada para deshacer', 'undo-2'); return; }
+    if (h.si) { PED[h.k].lineas.pop(); pintarProv(h.k, false); }
+    else if (h.k !== provVisto) pintarProv(h.k);
+    i = h.i; hechos--; pintarAvance();
+    mostrar(h.si ? 460 : -460);
+    St.tostada(h.si ? 'Se sacó del pedido: ' + MAZO[i].p.corto : 'Volvió: ' + MAZO[i].p.corto, 'undo-2');
+  });
+
+  // ---- Salir ----
+  $('[data-salir]').addEventListener('click', function () { St.menuIrA(null, 'Salir de reponer'); });
+
+  // Teclado, para recorrerla en la compu: → al pedido, ← ahora no, Z deshace.
+  document.addEventListener('keydown', function (e) {
+    if (St.hayCapa()) return;
+    if (e.key === 'ArrowRight') decidir(true);
+    else if (e.key === 'ArrowLeft') decidir(false);
+    else if (e.key === 'z' || e.key === 'Z') $('[data-deshacer]').click();
+  });
+});
+</script>
 </body>
 </html>

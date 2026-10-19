@@ -1,0 +1,148 @@
+/* Lo que se mueve en las maquetas de Entrar: hojas, diálogos, la cámara, el lector de huella y los
+   avisos. Se carga después del estilo de cada variante. Solo transform y opacity; con «reducir
+   movimiento» _comun/comun.css apaga todas las transiciones y animaciones. */
+
+/* Capas: dentro del celular van en absoluto (el .celu recorta); en la compu, fijas a la ventana. */
+.e-velo { position: fixed; inset: 0; z-index: 40; background: rgba(26, 29, 27, .30); opacity: 0; transition: opacity var(--t-nav) var(--curva); }
+.celu > .e-velo { position: absolute; z-index: 40; }
+.e-velo.claro { background: transparent; }
+.e-velo.abierta { opacity: 1; }
+
+.e-hoja, .celu > .e-hoja { position: absolute; left: 0; right: 0; bottom: 0; z-index: 41; background: var(--superficie); color: var(--tinta); border-radius: 28px 28px 0 0; padding: 12px 20px 36px; box-shadow: var(--sombra-3); display: grid; gap: 16px; justify-items: center; text-align: center; transform: translateY(105%); transition: transform var(--t-nav) var(--curva); }
+.e-hoja.abierta { transform: translateY(0); }
+.e-hoja .asa { width: 40px; height: 5px; border-radius: 99px; background: var(--hundido-2); }
+
+.e-dialogo { position: fixed; left: 50%; top: 50%; z-index: 41; width: 440px; background: var(--superficie); color: var(--tinta); border-radius: 24px; padding: 28px; box-shadow: var(--sombra-3); display: grid; gap: 16px; opacity: 0; transform: translate(-50%, -48%) scale(.96); transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+.e-dialogo.abierta { opacity: 1; transform: translate(-50%, -50%); }
+.e-dialogo h2 { margin: 0; font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; }
+.e-dialogo p { margin: 0; color: var(--texto-2); font-size: 16px; line-height: 24px; }
+.e-dialogo .e-x { position: absolute; right: 12px; top: 12px; }
+
+.e-pantalla, .celu > .e-pantalla { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; background: var(--fondo); color: var(--tinta); opacity: 0; transition: opacity var(--t) var(--curva); }
+.e-pantalla.abierta { opacity: 1; }
+.celu > .e-pantalla.bloqueo { color: #fff; background: var(--pino); }
+.e-pantalla.bloqueo > * { position: relative; }
+.e-pantalla.bloqueo > img.fondo { position: absolute; }
+
+/* Avisos chicos (tostada) */
+.e-tostada { position: fixed; left: 50%; bottom: 32px; z-index: 60; opacity: 0; transform: translate(-50%, 8px); transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); pointer-events: none; }
+.celu > .e-tostada { position: absolute; bottom: 104px; }
+.e-tostada.abierta { opacity: 1; transform: translate(-50%, 0); }
+.e-tostada .tostada { white-space: nowrap; }
+
+/* Algo que aparece en su lugar; el temblor del rechazo; el tilde del éxito */
+@keyframes e-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes e-crece { from { opacity: 0; transform: translateY(4px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes e-temblor { 0%, 100% { transform: none; } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+@keyframes e-tilde { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes e-latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@keyframes e-punto { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+.e-entra { animation: e-entra var(--t) var(--curva) both; }
+.e-crece { animation: e-crece var(--t-nav) var(--curva) both; }
+.e-tiembla { animation: e-temblor 320ms ease-in-out 1; }
+.e-tilde { pointer-events: none; position: absolute; inset: 0; z-index: 2; border-radius: 999px; background: var(--logro); color: #fff; display: grid; place-items: center; animation: e-tilde 300ms var(--rebote, var(--curva)) both; }
+.e-tilde svg { width: 52%; height: 52%; stroke-width: 3; }
+.latiendo::before, .latiendo::after { animation: e-latido 1.6s ease-in-out infinite; }
+.e-puntos i { animation: e-punto 1.2s ease-in-out infinite; }
+.e-puntos i:nth-child(2) { animation-delay: .2s; } .e-puntos i:nth-child(3) { animation-delay: .4s; }
+html.e-saliendo body { opacity: 0; transition: opacity var(--t) var(--curva-salida); }
+
+/* Lo que se toca y no parecía tocable */
+[data-e-toca] { cursor: pointer; }
+
+/* El código QR que se apaga al leerlo y el que se cambia solo */
+.qr > img { transition: opacity 300ms var(--curva), transform 300ms var(--curva); }
+.qr.e-apagado > img, .qr.e-apagado > .centro { opacity: 0; transform: scale(.9); }
+.qr.e-apagado > .centro { transform: translate(-50%, -50%) scale(.6); transition: opacity 300ms var(--curva), transform 300ms var(--curva); }
+.qr.e-sale > img { opacity: 0; transition-duration: 200ms; }
+.qr.e-renueva > img { opacity: 0; transform: translateY(8px); transition: none; }
+
+/* La cara de quien leyó el código (compu 1 y el código de «Otra persona») */
+.e-qr-leido { position: absolute; inset: 0; z-index: 3; border-radius: inherit; background: rgba(255, 255, 255, .97); display: grid; place-items: center; align-content: center; gap: 12px; text-align: center; padding: 16px; cursor: pointer; }
+.e-qr-leido .cara { width: 88px; height: 88px; font-size: 30px; box-shadow: 0 0 0 8px var(--accion-suave); position: relative; }
+.e-qr-leido b { font-size: 20px; line-height: 26px; font-weight: 800; }
+.e-qr-leido span.t { color: var(--texto-2); font-size: 15px; line-height: 21px; max-width: 220px; }
+.e-puntos { display: flex; gap: 8px; }
+.e-puntos i { width: 10px; height: 10px; border-radius: 99px; background: var(--accion); opacity: .3; }
+
+/* Elegir la cuenta de Google (la pantalla es de Google; acá va en el lenguaje común) */
+.e-google { display: grid; gap: 4px; justify-items: center; text-align: center; width: 100%; }
+.e-google > .g { width: 40px; height: 40px; display: grid; place-items: center; margin-top: 8px; }
+.e-google > .g svg { width: 32px; height: 32px; }
+.e-google h2 { margin: 8px 0 0; font-size: 22px; line-height: 28px; font-weight: 800; letter-spacing: -.01em; }
+.e-google > p { margin: 0 0 12px; color: var(--texto-2); font-size: 15px; }
+.e-cuentas { display: grid; gap: 8px; width: 100%; text-align: left; }
+.e-cuenta { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--borde); background: var(--superficie); color: var(--tinta); font: inherit; text-align: left; cursor: pointer; transition: transform var(--t-micro) var(--curva); }
+.e-cuenta:active { transform: scale(.98); }
+.e-cuenta:hover { background: var(--hundido); }
+.e-cuenta .cara { width: 40px; height: 40px; font-size: 15px; }
+.e-cuenta b { display: block; font-size: 16px; line-height: 22px; font-weight: 750; }
+.e-cuenta small { display: block; font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 550; }
+.e-cuenta > svg:last-child { margin-left: auto; color: var(--texto-3); }
+.e-letra { margin-top: 8px; font-size: 14px; color: var(--texto-3); font-weight: 550; }
+
+/* El lector de huella del sistema (celular) */
+.e-lector { display: grid; justify-items: center; gap: 8px; width: 100%; }
+.e-lector .marca { display: inline-flex; align-items: center; gap: 8px; font-weight: 750; font-size: 15px; color: var(--texto-2); margin-top: 8px; }
+.e-lector .marca img { width: 24px; height: 24px; }
+.e-lector h2 { margin: 0; font-size: 22px; line-height: 28px; font-weight: 800; }
+.e-lector p { margin: 0; color: var(--texto-2); font-size: 15px; }
+.e-sensor { position: relative; width: 88px; height: 88px; margin: 28px 0 20px; border: 0; border-radius: 999px; background: var(--accion-suave); color: var(--accion); display: grid; place-items: center; cursor: pointer; }
+.e-sensor::before, .e-sensor::after { content: ""; position: absolute; inset: -12px; border-radius: inherit; border: 2px solid var(--accion); opacity: .25; }
+.e-sensor::after { inset: -26px; opacity: .1; }
+.e-sensor > svg { width: 48px; height: 48px; }
+.e-lector small { font-size: 14px; color: var(--texto-3); font-weight: 600; }
+.e-lector .btn-fantasma { width: 100%; }
+
+/* La cámara del celular leyendo el código de la compu (igual a la del estado de celu 1) */
+.e-cam { background: #0F1513 !important; overflow: hidden; }
+.e-cam .pantalla-compu { position: absolute; left: 30px; right: 30px; top: 130px; height: 300px; border-radius: 14px; background: #F4F2EC; box-shadow: 0 0 0 10px #222, 0 30px 60px rgba(0,0,0,.6); transform: perspective(700px) rotateX(10deg) rotateZ(-3deg); display: grid; place-items: center; filter: blur(.4px) brightness(.9); }
+.e-cam .pantalla-compu .qr { width: 170px; height: 170px; padding: 10px; border-radius: 10px; }
+.e-cam .marco-lectura { position: absolute; left: 95px; top: 180px; width: 200px; height: 200px; transition: transform var(--t) var(--curva); }
+.e-cam.leido .marco-lectura { transform: scale(.94); }
+.e-cam .marco-lectura b { position: absolute; width: 36px; height: 36px; border: 5px solid #fff; }
+.e-cam.leido .marco-lectura b { border-color: #3DDC97; }
+.e-cam .marco-lectura b:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 16px 0 0 0; }
+.e-cam .marco-lectura b:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 16px 0 0; }
+.e-cam .marco-lectura b:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 16px; }
+.e-cam .marco-lectura b:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 16px 0; }
+.e-cam .cerrar { position: absolute; left: 16px; top: 56px; width: 44px; height: 44px; border: 0; border-radius: 99px; background: rgba(255,255,255,.14); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.e-cam .leyenda { pointer-events: none; position: absolute; top: 64px; left: 0; right: 0; text-align: center; color: #fff; font-weight: 700; font-size: 16px; }
+
+/* La hoja de «código de la compu leído» */
+.e-compu-leida { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; }
+.e-compu-leida .ic { width: 48px; height: 48px; border-radius: 12px; background: var(--pino-suave); color: var(--pino-texto); display: grid; place-items: center; flex: none; }
+.e-compu-leida b { display: block; font-size: 16px; line-height: 22px; font-weight: 750; }
+.e-compu-leida span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+.e-dedo { position: relative; width: 80px; height: 80px; margin: 24px 0 8px; border: 0; border-radius: 999px; background: var(--accion-suave); color: var(--accion); display: grid; place-items: center; cursor: pointer; }
+.e-dedo::before, .e-dedo::after { content: ""; position: absolute; inset: -12px; border-radius: inherit; border: 2px solid var(--accion); opacity: .25; }
+.e-dedo::after { inset: -26px; opacity: .1; }
+.e-dedo > svg { width: 44px; height: 44px; }
+.e-hoja .titulo-dedo { font-size: 18px; font-weight: 750; }
+.e-hoja .btn-fantasma { width: 100%; }
+
+/* El rechazo de «sin permiso» en las compus que no lo tenían dibujado (2 y 3) */
+.e-rechazo { display: grid; grid-template-columns: 40px 1fr; gap: 12px; padding: 16px; border-radius: 16px; background: var(--error-suave); color: var(--error-texto); text-align: left; }
+.e-rechazo .ic { width: 40px; height: 40px; border-radius: 99px; background: #fff; display: grid; place-items: center; }
+.e-rechazo b { display: block; font-size: 16px; line-height: 22px; color: var(--tinta); font-weight: 750; }
+.e-rechazo .correo { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; margin: 6px 0; border-radius: 99px; background: #fff; color: var(--tinta); font-size: 14px; font-weight: 650; }
+.e-rechazo .correo .g { display: inline-grid; width: 16px; height: 16px; }
+.e-rechazo .correo .g svg { width: 16px; height: 16px; }
+.e-rechazo p { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; }
+
+/* Código grande en un diálogo o una hoja */
+.e-qr-grande { position: relative; justify-self: center; width: 260px; height: 260px; }
+
+/* Compu 2: las tarjetas se mueven al elegir con el teclado */
+.gente .persona { cursor: pointer; transition: transform var(--t) var(--curva); }
+.noti .acc em, .mini-celu .dedo { cursor: pointer; }
+
+/* Celu 3: el interruptor apagado y la linterna */
+.widget .interruptor { cursor: pointer; }
+.widget .interruptor::after { transition: transform var(--t) var(--curva); }
+.widget .interruptor.apagado { background: rgba(255, 255, 255, .28); }
+.widget .interruptor.apagado::after { transform: translateX(-20px); }
+.cam .redondo.e-prendida { background: #fff; color: var(--tinta); }
+.cam .chip-leido.e-oculto { opacity: 0; transform: translateY(8px); }
+.cam .chip-leido { cursor: pointer; transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+.equipos span.e-entra:nth-child(2) { animation-delay: 160ms; }

@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 20px; padding-top: 16px; min-height: 0; }
   .izq { display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
@@ -61,11 +64,11 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="pastilla urgente" style="margin-left:auto;height:24px">34</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span data-lat-n class="pastilla urgente" style="margin-left:auto;height:24px">34</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-menu-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
@@ -76,36 +79,36 @@
     <header class="cabecera">
       <div class="t-titulo">Depósito</div>
       <div class="sub">Lo que pide atención hoy. El resto está bien.</div>
-      <div class="acciones"><button class="btn chico"><i class="i i-s" data-i="file-spreadsheet"></i>Excel</button><button class="btn chico"><i class="i i-s" data-i="package"></i>Todo el stock <span class="kbd">Alt T</span></button></div>
+      <div class="acciones"><button class="btn chico" data-excel><i class="i i-s" data-i="file-spreadsheet"></i>Excel</button><button class="btn chico" data-todo><i class="i i-s" data-i="package"></i>Todo el stock <span class="kbd">Alt T</span></button></div>
     </header>
-    <nav class="pestanas"><a class="activa">Stock</a><a>Compras</a><a>Contar <span class="pastilla pino" style="height:24px">14 hoy</span></a></nav>
+    <nav class="pestanas"><a class="activa" data-ir="stock">Stock</a><a data-ir="compras">Compras</a><a data-ir="contar">Contar <span class="pastilla pino" style="height:24px">14 hoy</span></a></nav>
     <section class="pantalla">
       <div class="izq">
-        <div class="ir"><i class="i" data-i="search"></i>Buscá cualquier producto, o escaneá con el celular, para ver su stock<span class="kbd">Ctrl</span><span class="kbd">K</span></div>
-        <div class="avance"><span class="t-seccion">46 para revisar</span><div class="barra"><b style="width:26%"></b></div><span class="t-detalle">12 resueltos hoy</span></div>
+        <div class="ir" data-paleta data-tocable><i class="i" data-i="search"></i>Buscá cualquier producto, o escaneá con el celular, para ver su stock<span class="kbd">Ctrl</span><span class="kbd">K</span></div>
+        <div class="avance"><span class="t-seccion" data-faltan>46 para revisar</span><div class="barra"><b data-barra style="width:26%"></b></div><span class="t-detalle" data-hechos>12 resueltos hoy</span></div>
         <div class="bandeja">
           <div class="grupo">
             <div class="g-cab"><span class="punto-g" style="background:var(--error)"></span><span class="t">Stock negativo</span><span class="t-detalle">no puede ser: contalos</span><div class="acc"><span class="pastilla error mini">6</span></div></div>
-            <div class="item foco"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Est. B-02-01 · se anuló la compra del 14/10 con 3 ya vendidas</div></div><span class="pastilla error">−1 un.</span><div class="acciones-i"><button class="btn chico btn-oscuro"><i class="i i-s" data-i="square-pen"></i>Corregir <span class="kbd">C</span></button></div></div>
-            <div class="item"><span class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></span><div><div class="t">Llave combinada 13 mm cromada</div><div class="d">Est. A-01-07 · vendida 2 veces sin stock cargado</div></div><span class="pastilla error">−2 un.</span><div class="acciones-i"><button class="btn chico">Corregir <span class="kbd">C</span></button></div></div>
+            <div class="item foco" data-k="puntas"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Est. B-02-01 · se anuló la compra del 14/10 con 3 ya vendidas</div></div><span class="pastilla error">−1 un.</span><div class="acciones-i"><button class="btn chico btn-oscuro" data-corregir><i class="i i-s" data-i="square-pen"></i>Corregir <span class="kbd">C</span></button></div></div>
+            <div class="item" data-k="llave"><span class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></span><div><div class="t">Llave combinada 13 mm cromada</div><div class="d">Est. A-01-07 · vendida 2 veces sin stock cargado</div></div><span class="pastilla error">−2 un.</span><div class="acciones-i"><button class="btn chico" data-corregir>Corregir <span class="kbd">C</span></button></div></div>
           </div>
           <div class="grupo">
             <div class="g-cab"><span class="punto-g" style="background:var(--accion)"></span><span class="t">Lo espera un cliente</span><span class="t-detalle">no hay y se prometió</span><div class="acc"><span class="pastilla accion mini">3</span></div></div>
-            <div class="item"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L · 2 un.</div><div class="d">Para <b>Rosa Benítez</b>, prometido el <b>jueves 22</b> · Alba lo trae el martes</div></div><span class="pastilla">0 un.</span><div class="acciones-i"><button class="btn chico">Al pedido <span class="kbd">P</span></button></div></div>
+            <div class="item" data-k="latex"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L · 2 un.</div><div class="d">Para <b>Rosa Benítez</b>, prometido el <b>jueves 22</b> · Alba lo trae el martes</div></div><span class="pastilla">0 un.</span><div class="acciones-i"><button class="btn chico" data-al-pedido>Al pedido <span class="kbd">P</span></button></div></div>
           </div>
           <div class="grupo">
-            <div class="g-cab"><span class="punto-g" style="background:var(--urgente)"></span><span class="t">Bajo el mínimo</span><span class="t-detalle">por el más barato</span><div class="acc"><button class="btn chico btn-suave">Bulonera Centro · 9</button><button class="btn chico btn-fantasma">Distribuidora Oeste · 7</button><button class="btn chico btn-fantasma">+4</button></div></div>
-            <div class="item"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha acero rápido HSS 8 mm</div><div class="d">Pedí <b>24 un.</b> · 41 vendidas en 90 días · Ezeta</div></div><div class="barrita"><span class="b"><i style="width:70%"></i></span><span><span class="n">14</span> / 20</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>
-            <div class="item"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d">Pedí <b>12 un.</b> · más barato que Fischer directo por $310</div></div><div class="barrita"><span class="b"><i style="width:30%"></i></span><span><span class="n">3</span> / 10</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>
-          </div>
-          <div class="grupo">
-            <div class="g-cab"><span class="punto-g" style="background:var(--pino)"></span><span class="t">Etiquetas viejas</span><span class="t-detalle">cambiaron de precio desde que se imprimieron</span><div class="acc"><button class="btn chico"><i class="i i-s" data-i="printer"></i>Imprimir 37 <span class="kbd">E</span></button></div></div>
+            <div class="g-cab"><span class="punto-g" style="background:var(--urgente)"></span><span class="t">Bajo el mínimo</span><span class="t-detalle">por el más barato</span><div class="acc" data-provs><button class="btn chico btn-suave" data-prov="BC">Bulonera Centro · 9</button><button class="btn chico btn-fantasma" data-prov="DO">Distribuidora Oeste · 7</button><button class="btn chico btn-fantasma" data-mas-provs>+4</button></div></div><div data-bajo>
+            <div class="item" data-k="mecha"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha acero rápido HSS 8 mm</div><div class="d">Pedí <b>24 un.</b> · 41 vendidas en 90 días · Ezeta</div></div><div class="barrita"><span class="b"><i style="width:70%"></i></span><span><span class="n">14</span> / 20</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>
+            <div class="item" data-k="tarugos"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d">Pedí <b>12 un.</b> · más barato que Fischer directo por $310</div></div><div class="barrita"><span class="b"><i style="width:30%"></i></span><span><span class="n">3</span> / 10</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>
+          </div></div>
+          <div class="grupo" data-grupo-etiquetas>
+            <div class="g-cab"><span class="punto-g" style="background:var(--pino)"></span><span class="t">Etiquetas viejas</span><span class="t-detalle">cambiaron de precio desde que se imprimieron</span><div class="acc"><button class="btn chico" data-imprimir><i class="i i-s" data-i="printer"></i>Imprimir 37 <span class="kbd">E</span></button></div></div>
           </div>
         </div>
       </div>
 
       <div class="der">
-        <div class="pedido tarjeta-2">
+        <div class="pedido tarjeta-2" data-pedido>
           <div class="cab"><span class="prov">BC</span><div><div style="font-weight:800;font-size:16px">Pedido a Bulonera Centro</div><div class="t-detalle">Borrador · se arma solo desde la bandeja</div></div></div>
           <div>
             <div class="pr"><span class="t">Mecha acero rápido HSS 8 mm</span><span class="q">24</span><span class="c">$59.520</span></div>
@@ -114,10 +117,10 @@
             <div class="pr" style="border:0;color:var(--texto-2)"><span>y 6 productos más</span><span></span><span class="c">$115.280</span></div>
           </div>
           <div class="total"><span class="t-etiqueta">Costo estimado, sin IVA</span><span class="t-numero"><span class="peso">$</span>252.000</span></div>
-          <button class="btn btn-accion grande" style="width:100%"><i class="i" data-i="send"></i>Mandar por WhatsApp <span class="kbd">Alt W</span></button>
-          <button class="btn btn-fantasma chico"><i class="i i-s" data-i="copy"></i>Copiar el texto</button>
+          <button class="btn btn-accion grande" style="width:100%" data-whatsapp><i class="i" data-i="send"></i>Mandar por WhatsApp <span class="kbd">Alt W</span></button>
+          <button class="btn btn-fantasma chico" data-copiar><i class="i i-s" data-i="copy"></i>Copiar el texto</button>
         </div>
-        <div class="otros">
+        <div class="otros" data-otros>
           <div class="otro tarjeta"><span class="prov">DO</span><div><div class="t">Distribuidora Oeste</div><div class="t-detalle">7 productos</div></div><span class="c"><span class="peso">$</span>118.000</span></div>
           <div class="otro tarjeta"><span class="prov">AL</span><div><div class="t">Pinturerías Alba</div><div class="t-detalle">1 producto · para Rosa</div></div><span class="c"><span class="peso">$</span>41.000</span></div>
         </div>
@@ -126,5 +129,157 @@
     </section>
   </main>
 </div>
+<script>
+// Interacciones de la maqueta (no es la aplicación): resolver la bandeja y armar el pedido.
+document.addEventListener('DOMContentLoaded', function () {
+  var P = St.P, $ = function (q, r) { return (r || document).querySelector(q); }, $$ = function (q, r) { return Array.prototype.slice.call((r || document).querySelectorAll(q)); };
+  var faltan = 46, hechos = 12, lat = 34;
+  $('[data-menu-mas]').addEventListener('click', function (e) { St.menuMas(e.currentTarget); });
+
+  // Pedidos por proveedor (borradores que se arman solos).
+  var PED = {
+    BC: { nombre: 'Bulonera Centro', n: 9, lineas: [['Mecha acero rápido HSS 8 mm', 24, 59520], ['Tarugos nylon S8 con tope × 100', 12, 49800], ['Tornillo T2 8 × 1/2" × 100', 10, 27400]], resto: [6, 115280] },
+    DO: { nombre: 'Distribuidora Oeste', n: 7, lineas: [['Martillo carpintero 27 mm', 6, 81000], ['Llave combinada 13 mm cromada', 4, 20800]], resto: [5, 16200] },
+    AL: { nombre: 'Pinturerías Alba', n: 1, lineas: [], resto: null, para: 'para Rosa' }
+  };
+  var NOMBRE_CORTO = { AL: 'Pinturerías Alba' };
+  var actual = 'BC';
+  function total(k) { var t = PED[k].lineas.reduce(function (a, l) { return a + l[2]; }, 0); return t + (PED[k].resto ? PED[k].resto[1] : 0); }
+  function pintarPedido(k, nueva) {
+    actual = k;
+    var pd = PED[k], card = $('[data-pedido]');
+    card.querySelector('.cab').innerHTML = '<span class="prov">' + k + '</span><div><div style="font-weight:800;font-size:16px">Pedido a ' + pd.nombre + '</div><div class="t-detalle">' + (pd.mandado ? 'Mandado por WhatsApp a las ' + pd.mandado : 'Borrador · se arma solo desde la bandeja') + '</div></div>';
+    card.querySelector('.cab + div').innerHTML = (pd.lineas.length ? pd.lineas.map(function (l) { return '<div class="pr"><span class="t">' + l[0] + '</span><span class="q">' + l[1] + '</span><span class="c">' + St.pesos(l[2]).replace('<span class="peso">$</span>', '$') + '</span></div>'; }).join('') : '<div class="t-detalle" style="padding:6px 0">Todavía vacío. Mandá algo con «Al pedido» (P).</div>') +
+      (pd.resto ? '<div class="pr" style="border:0;color:var(--texto-2)"><span>y ' + pd.resto[0] + ' productos más</span><span></span><span class="c">$' + St.num(pd.resto[1]) + '</span></div>' : '');
+    $('.total .t-numero', card).innerHTML = St.pesos(total(k));
+    var b = $('[data-whatsapp]');
+    b.innerHTML = pd.mandado ? '<i class="i" data-i="check"></i>Mandado a las ' + pd.mandado : '<i class="i" data-i="send"></i>Mandar por WhatsApp <span class="kbd">Alt W</span>';
+    b.className = pd.mandado ? 'btn grande' : 'btn btn-accion grande';
+    // los otros proveedores
+    $('[data-otros]').innerHTML = ['BC', 'DO', 'AL'].filter(function (x) { return x !== k; }).map(function (x) {
+      var o = PED[x];
+      return '<div class="otro tarjeta" data-otro="' + x + '" data-tocable><span class="prov">' + x + '</span><div><div class="t">' + o.nombre + '</div><div class="t-detalle">' + o.n + ' producto' + (o.n === 1 ? '' : 's') + (o.para ? ' · ' + o.para : '') + '</div></div><span class="c"><span class="peso">$</span>' + St.num(x === 'AL' ? 41000 : total(x)) + '</span></div>';
+    }).join('');
+    window.pintarIconos(card);
+    St.fundir(card);
+    if (nueva) { var r = $$('.pr', card)[pd.lineas.length - 1]; St.entrar(r); }
+    // los botones del grupo «Bajo el mínimo»
+    $$('[data-prov]').forEach(function (bt) { bt.className = 'btn chico ' + (bt.getAttribute('data-prov') === k ? 'btn-suave' : 'btn-fantasma'); });
+  }
+  $('[data-otros]').setAttribute('data-tocable', '');
+  $$('.otro').forEach(function (o, i) { o.setAttribute('data-otro', ['DO', 'AL'][i]); o.setAttribute('data-tocable', ''); });
+  $('[data-otros]').addEventListener('click', function (e) { var o = e.target.closest('[data-otro]'); if (o) pintarPedido(o.getAttribute('data-otro')); });
+
+  // Bajo el mínimo: por proveedor
+  var BAJO = {
+    DO: '<div class="item" data-k="martillo"><span class="foto"><img src="' + St.FOTOS + 'martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm mango tubular</div><div class="d">Pedí <b>6 un.</b> · 31 vendidas en 90 días · Bahco</div></div><div class="barrita"><span class="b"><i style="width:90%"></i></span><span><span class="n">9</span> / 10</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>' +
+        '<div class="item" data-k="cinta"><span class="foto"><img src="' + St.FOTOS + 'cinta-metrica.webp" alt=""></span><div><div class="t">Cinta métrica PowerLock 5 m</div><div class="d">y 5 más, todos ya en el pedido · Stanley</div></div><div class="barrita"><span class="b"><i style="width:100%;background:var(--logro)"></i></span><span><span class="n" style="color:var(--logro-texto)">6</span> / 4</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>'
+  };
+  BAJO.BC = $('[data-bajo]').innerHTML;
+  $('[data-provs]').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-prov]');
+    if (b) { var k = b.getAttribute('data-prov'); $('[data-bajo]').innerHTML = BAJO[k]; window.pintarIconos($('[data-bajo]')); St.fundir($('[data-bajo]')); pintarPedido(k); return; }
+    if (e.target.closest('[data-mas-provs]')) {
+      var m = St.abrir({ tipo: 'menu', ancla: e.target.closest('[data-mas-provs]'), html: '<div class="t-etiqueta">Otros proveedores con algo bajo el mínimo</div>' + [['Bremen Herramientas', 6], ['Pinturerías Alba', 1], ['Fischer Argentina', 3], ['Herramientas Delta', 2]].map(function (x) { return '<button class="op" data-cerrar>' + x[0] + '<span class="pastilla contorno" style="margin-left:auto;height:24px">' + x[1] + '</span></button>'; }).join('') });
+    }
+  });
+
+  // Elegir un ítem (J/K o clic) y resolverlo (C, P).
+  $('.bandeja').addEventListener('click', function (e) {
+    var it = e.target.closest('.item'); if (!it) return;
+    enfocar(it);
+    if (e.target.closest('[data-corregir]')) corregir(it);
+    else if (e.target.closest('[data-al-pedido]')) alPedido(it);
+  });
+  function enfocar(it) {
+    $$('.item.foco').forEach(function (x) { x.classList.remove('foco'); });
+    if (it) it.classList.add('foco');
+  }
+  function resuelto(it) {
+    var grupo = it.closest('.grupo'), sig = it.nextElementSibling || (grupo.nextElementSibling && grupo.nextElementSibling.querySelector('.item'));
+    faltan--; hechos++; lat--;
+    St.rodar($('[data-faltan]'), faltan + ' para revisar', false);
+    $('[data-hechos]').textContent = hechos + ' resueltos hoy';
+    $('[data-barra]').style.width = Math.round(hechos / (hechos + faltan) * 100) + '%';
+    St.rodar($('[data-lat-n]'), String(lat), false);
+    var pas = grupo.querySelector('.g-cab .pastilla');
+    var n = parseInt(pas.textContent, 10) - 1;
+    St.rodar(pas, String(n), false);
+    St.plegar(it, function () {
+      it.remove();
+      if (!grupo.querySelector('.item')) { St.plegar(grupo); }
+      if (sig && sig.isConnected) enfocar(sig);
+    });
+  }
+  function corregir(it) {
+    var p = P[it.getAttribute('data-k')];
+    if (!it.querySelector('[data-corregir]')) { St.fichaProducto(p); return; }
+    St.fichaProducto(p, { corregir: true, alGuardar: function (pp) {
+      St.tostada('Guardado: ' + pp.corto + ' queda en ' + St.num(pp.stock) + ' ' + pp.unidad);
+      setTimeout(function () { resuelto(it); }, 700);
+    } });
+  }
+  function alPedido(it) {
+    if (!it.querySelector('[data-al-pedido]')) { St.tostada('Ya está en el pedido', 'check'); return; }
+    PED.AL.lineas.push(['Látex interior mate blanco 4 L', 2, 41000]);
+    pintarPedido('AL', true);
+    St.tostada('2 un. de látex al pedido a Pinturerías Alba · para Rosa', 'truck');
+    resuelto(it);
+  }
+
+  // Imprimir las etiquetas viejas
+  function imprimir() {
+    St.dialogoEtiquetas([['Las 37 que cambiaron de precio', 'Desde la última vez que se imprimieron', '37'], ['Solo las de la estantería A-03', 'Las 9 de ese sector', '9']], function () {
+      var g = $('[data-grupo-etiquetas]'), b = g.querySelector('[data-imprimir]');
+      b.outerHTML = '<span class="pastilla logro"><i class="i i-s" data-i="check"></i>Impresas</span>';
+      window.pintarIconos(g); St.entrar(g);
+    });
+  }
+  $('.bandeja').addEventListener('click', function (e) { if (e.target.closest('[data-imprimir]')) imprimir(); });
+
+  // Mandar por WhatsApp y copiar
+  function textoPedido() {
+    var pd = PED[actual];
+    return 'Hola, ¿cómo andan? Les paso el pedido de Ferrebress:\n' + pd.lineas.map(function (l) { return '• ' + l[1] + ' × ' + l[0]; }).join('\n') + (pd.resto ? '\n• y ' + pd.resto[0] + ' productos más (va la lista completa)' : '') + '\nGracias. Carlos';
+  }
+  function whatsapp() {
+    var pd = PED[actual];
+    if (pd.mandado) { St.tostada('Ya se mandó a las ' + pd.mandado, 'check'); return; }
+    var d = St.abrir({ tipo: 'dialogo', html: St.cabecera('Mandar por WhatsApp', pd.nombre + ' · ' + (pd.nombre === 'Bulonera Centro' ? 'Marcelo, 11 4521-8890' : pd.nombre === 'Pinturerías Alba' ? 'Silvia, 11 4602-1170' : 'Javier, 11 4733-0955')) +
+      '<div class="st-burbuja">' + textoPedido() + '</div><div class="st-total"><span class="t-etiqueta">Costo estimado, sin IVA</span><span class="t-numero">' + St.pesos(total(actual)) + '</span></div>' +
+      '<div class="st-pie"><button class="btn btn-accion" data-mandar><i class="i" data-i="send"></i>Mandar</button><button class="btn btn-fantasma" data-cerrar>Cancelar <span class="kbd">Esc</span></button></div>' });
+    d.el.querySelector('[data-mandar]').addEventListener('click', function () {
+      pd.mandado = St.hora();
+      d.el.innerHTML = '<div class="st-listo"><span class="tilde"><i class="i i-xl" data-i="check"></i></span><div class="t-seccion">Pedido mandado a ' + pd.nombre + '</div><div class="t-detalle">Queda en Compras como «pedido», para recibirlo cuando llegue</div></div><div class="st-pie"><button class="btn" data-cerrar>Listo</button></div>';
+      window.pintarIconos(d.el); pintarPedido(actual);
+    });
+  }
+  $('[data-pedido]').addEventListener('click', function (e) {
+    if (e.target.closest('[data-whatsapp]')) whatsapp();
+    if (e.target.closest('[data-copiar]')) St.tostada('Texto del pedido copiado', 'copy');
+  });
+
+  // Buscar cualquier producto
+  function paleta() { St.paleta(function (p) { St.fichaProducto(p, { alGuardar: function (pp) { var it = $('.item[data-k="' + pp.id + '"]'); St.tostada('Guardado: ' + pp.corto + ' queda en ' + St.num(pp.stock) + ' ' + pp.unidad); if (it && it.querySelector('[data-corregir]')) setTimeout(function () { resuelto(it); }, 700); } }); }); }
+  $('[data-paleta]').addEventListener('click', paleta);
+  $('[data-todo]').addEventListener('click', paleta);
+  $('[data-excel]').addEventListener('click', function () { St.tostada('Se bajó bandeja-19-10-2026.xlsx · 46 productos', 'file-spreadsheet'); });
+
+  // Teclado
+  document.addEventListener('keydown', function (e) {
+    if (St.hayCapa() || e.target.matches('input')) return;
+    var k = e.key.toLowerCase(), items = $$('.bandeja .item'), i = items.indexOf($('.item.foco'));
+    if ((e.ctrlKey || e.metaKey) && k === 'k') { e.preventDefault(); paleta(); }
+    else if (e.altKey && k === 't') { e.preventDefault(); paleta(); }
+    else if (e.altKey && k === 'w') { e.preventDefault(); whatsapp(); }
+    else if (e.ctrlKey || e.altKey || e.metaKey) return;
+    else if (k === 'j') enfocar(items[Math.min(items.length - 1, i + 1)]);
+    else if (k === 'k') enfocar(items[Math.max(0, i - 1)]);
+    else if (k === 'c' && i >= 0) corregir(items[i]);
+    else if (k === 'p' && i >= 0) alPedido(items[i]);
+    else if (k === 'e') imprimir();
+  });
+});
+</script>
 </body>
 </html>

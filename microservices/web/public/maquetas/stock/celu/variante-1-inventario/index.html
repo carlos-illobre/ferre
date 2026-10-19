@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .resumenes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -40,47 +43,179 @@
   .detras .eti { color: var(--texto-2); }
   .detras .cor { background: var(--pino); color: #fff; }
   .r.corrido { transform: translateX(-168px); position: relative; box-shadow: var(--sombra-2); }
+  .lista .r { touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: pointer; }
+  .lista .r.vuelve { transition: transform var(--t) var(--curva); }
+  .detras span { cursor: pointer; }
 </style>
 </head>
 <body>
 <div class="celu">
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
-  <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo" data-vinculo data-tocable><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
-  <nav class="celu-pestanas"><a class="activa">Stock</a><a>Compras</a><a>Contar</a></nav>
+  <nav class="celu-pestanas"><a class="activa" data-ir="stock">Stock</a><a data-ir="compras">Compras</a><a data-ir="contar">Contar</a></nav>
   <div class="celu-pantalla">
     <div class="resumenes">
-      <div class="res u"><span class="et"><i class="i i-s" data-i="trending-down"></i>Bajo</span><span class="va">28</span></div>
-      <div class="res n"><span class="et"><i class="i i-s" data-i="package-minus"></i>Sin stock</span><span class="va">12</span></div>
-      <div class="res e"><span class="et"><i class="i i-s" data-i="circle-alert"></i>Negativo</span><span class="va">6</span></div>
+      <div class="res u" data-res-bajo><span class="et"><i class="i i-s" data-i="trending-down"></i>Bajo</span><span class="va">28</span></div>
+      <div class="res n" data-res-sin><span class="et"><i class="i i-s" data-i="package-minus"></i>Sin stock</span><span class="va">12</span></div>
+      <div class="res e" data-res-neg><span class="et"><i class="i i-s" data-i="circle-alert"></i>Negativo</span><span class="va">6</span></div>
     </div>
     <div class="buscar">
-      <div class="campo"><i class="i" data-i="search"></i>Producto, código o estante</div>
-      <button class="btn btn-oscuro"><i class="i i-l" data-i="scan-barcode"></i></button>
+      <div class="campo" data-buscar data-tocable><i class="i" data-i="search"></i>Producto, código o estante</div>
+      <button class="btn btn-oscuro" data-escanear aria-label="Escanear"><i class="i i-l" data-i="scan-barcode"></i></button>
     </div>
-    <div class="chips">
-      <span class="chip elegido">Para revisar 46</span>
-      <span class="chip">Todos 23.842</span>
-      <span class="chip"><i class="i i-s" data-i="barcode"></i>Sin código 214</span>
+    <div class="chips" data-filtros>
+      <span class="chip elegido" data-f="revisar">Para revisar 46</span>
+      <span class="chip" data-f="todos">Todos 23.842</span>
+      <span class="chip" data-f="sincod"><i class="i i-s" data-i="barcode"></i>Sin código 214</span>
     </div>
-    <div class="lista">
-      <div class="r"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d"><i class="i i-s" data-i="map-pin"></i>B-02-01 · Bremen</div></div><div class="dato error"><span class="et">Stock</span><span class="va">−1 un.</span></div></div>
-      <div class="r"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L</div><div class="d" style="color:var(--accion-texto);font-weight:700"><i class="i i-s" data-i="user-round"></i>Rosa lo espera el jue 22</div></div><div class="dato"><span class="et">Stock</span><span class="va">0 un.</span></div></div>
-      <div class="desliz"><div class="detras"><span class="eti"><i class="i" data-i="printer"></i>Etiqueta</span><span class="cor"><i class="i" data-i="square-pen"></i>Corregir</span></div><div class="r corrido"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm mango tubular</div><div class="d"><i class="i i-s" data-i="map-pin"></i>A-03-12 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">9 un.</span></div></div></div>
-      <div class="r"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d"><i class="i i-s" data-i="map-pin"></i>B-04-02 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">3 un.</span></div></div>
+    <div class="lista" data-lista>
+      <div class="r" data-k="puntas" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d"><i class="i i-s" data-i="map-pin"></i>B-02-01 · Bremen</div></div><div class="dato error"><span class="et">Stock</span><span class="va">−1 un.</span></div></div>
+      <div class="r" data-k="latex" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L</div><div class="d" style="color:var(--accion-texto);font-weight:700"><i class="i i-s" data-i="user-round"></i>Rosa lo espera el jue 22</div></div><div class="dato"><span class="et">Stock</span><span class="va">0 un.</span></div></div>
+      <div class="desliz"><div class="detras"><span class="eti" data-etiqueta><i class="i" data-i="printer"></i>Etiqueta</span><span class="cor" data-corregir><i class="i" data-i="square-pen"></i>Corregir</span></div><div class="r corrido" data-k="martillo" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm mango tubular</div><div class="d"><i class="i i-s" data-i="map-pin"></i>A-03-12 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">9 un.</span></div></div></div>
+      <div class="r" data-k="tarugos" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d"><i class="i i-s" data-i="map-pin"></i>B-04-02 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">3 un.</span></div></div>
     </div>
   </div>
   <div class="barra-accion">
-    <div class="aviso-pedir"><div class="txt"><b>28 para pedir</b>a 4 proveedores</div><button class="btn btn-accion grande" style="padding:0 20px"><i class="i" data-i="truck"></i>Qué pedir</button></div>
+    <div class="aviso-pedir"><div class="txt"><b>28 para pedir</b>a 4 proveedores</div><button class="btn btn-accion grande" style="padding:0 20px" data-pedir><i class="i" data-i="truck"></i>Qué pedir</button></div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a class="activo"><i class="i" data-i="package"></i>Depósito</a>
-    <a><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo" data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-menu-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script>
+// Interacciones de la maqueta (no es la aplicación): deslizar, corregir, filtrar, escanear, pedir.
+document.addEventListener('DOMContentLoaded', function () {
+  var P = St.P, $ = function (q, r) { return (r || document).querySelector(q); }, $$ = function (q, r) { return Array.prototype.slice.call((r || document).querySelectorAll(q)); };
+  var lista = $('[data-lista]');
+  $('[data-menu-mas]').addEventListener('click', function () { St.menuMas(); });
+
+  // Más productos para «Todos» y «Sin código» (ocultos de entrada).
+  ['tornillo', 'cinta', 'lampara'].forEach(function (k) {
+    var p = P[k];
+    lista.insertAdjacentHTML('beforeend', '<div class="r" data-k="' + k + '" data-g="todos' + (p.sinCodigo ? ' sincod' : '') + '" style="display:none;margin-top:8px"><span class="foto"><img src="' + St.FOTOS + p.foto + '.webp" alt=""></span><div><div class="t">' + p.nombre + '</div><div class="d"><i class="i i-s" data-i="map-pin"></i>' + p.est + ' · ' + (p.sinCodigo ? 'sin código' : 'mín. ' + p.min) + '</div></div><div class="dato ' + St.estadoDato(p) + '"><span class="et">Stock</span><span class="va">' + St.num(p.stock) + ' ' + p.unidad + '</span></div></div>');
+  });
+  window.pintarIconos(lista);
+
+  // Abrir el producto: sus movimientos y la corrección
+  var cuentas = { neg: 6, sin: 12, bajo: 28 };
+  function cat(n, p) { return n < 0 ? 'neg' : n === 0 ? 'sin' : n < p.min ? 'bajo' : 'bien'; }
+  function abrir(p, corregir) {
+    var antes = cat(p.stock, p);
+    St.fichaProducto(p, { corregir: corregir, alGuardar: function (pp, q) {
+      var r = $('.r[data-k="' + pp.id + '"]');
+      if (r) {
+        var d = r.querySelector('.dato'); d.className = 'dato ' + St.estadoDato(pp);
+        St.rodar(d.querySelector('.va'), St.num(pp.stock) + ' ' + pp.unidad, q > 0);
+        setTimeout(function () { St.entrar(r); }, 400);
+      }
+      var ahora = cat(pp.stock, pp), mapa = { neg: '[data-res-neg] .va', sin: '[data-res-sin] .va', bajo: '[data-res-bajo] .va' };
+      if (antes !== ahora) {
+        if (mapa[antes]) { cuentas[antes]--; St.rodar($(mapa[antes]), String(cuentas[antes]), false); }
+        if (mapa[ahora]) { cuentas[ahora]++; St.rodar($(mapa[ahora]), String(cuentas[ahora]), true); }
+      }
+      setTimeout(function () { St.tostada('Guardado: ' + pp.corto + ' queda en ' + St.num(pp.stock) + ' ' + pp.unidad); }, 400);
+    } });
+  }
+
+  // Deslizar un renglón: sigue al dedo; a 80 px «Etiqueta», a 160 px «Corregir»; más allá abre la corrección.
+  function envolver(r) {
+    if (r.parentNode.classList.contains('desliz')) return r.parentNode;
+    var w = document.createElement('div'); w.className = 'desliz';
+    w.style.marginTop = getComputedStyle(r).marginTop; r.style.marginTop = '0';
+    w.innerHTML = '<div class="detras"><span class="eti" data-etiqueta><i class="i" data-i="printer"></i>Etiqueta</span><span class="cor" data-corregir><i class="i" data-i="square-pen"></i>Corregir</span></div>';
+    r.parentNode.insertBefore(w, r); w.appendChild(r); window.pintarIconos(w);
+    return w;
+  }
+  function posicion(r) { if (r.classList.contains('corrido')) return -168; var m = (r.style.transform || '').match(/-?\d+(\.\d+)?/); return m ? +m[0] : 0; }
+  function mover(r, x, suave) {
+    r.classList.remove('corrido');
+    r.classList.toggle('vuelve', !!suave);
+    r.style.position = 'relative';
+    r.style.transform = x ? 'translateX(' + x + 'px)' : '';
+    r.style.boxShadow = x ? 'var(--sombra-2)' : '';
+  }
+  function cerrarOtros(menos) { $$('.lista .r').forEach(function (o) { if (o !== menos && posicion(o) !== 0) mover(o, 0, true); }); }
+  var arr = null;
+  lista.addEventListener('pointerdown', function (e) {
+    var r = e.target.closest('.r'); if (!r) return;
+    arr = { r: r, x0: e.clientX, y0: e.clientY, base: posicion(r), dx: 0, movio: false };
+  });
+  lista.addEventListener('pointermove', function (e) {
+    if (!arr) return;
+    var dx = e.clientX - arr.x0;
+    if (!arr.movio && Math.abs(dx) < 6) return;
+    if (!arr.movio) { arr.movio = true; envolver(arr.r); cerrarOtros(arr.r); try { arr.r.setPointerCapture(e.pointerId); } catch (x) {} }
+    arr.dx = dx; mover(arr.r, Math.min(0, Math.max(-260, arr.base + dx)), false);
+  });
+  function soltar() {
+    if (!arr) return;
+    var a = arr; arr = null;
+    if (!a.movio) return;
+    var x = a.base + a.dx;
+    if (x < -200) { mover(a.r, 0, true); St.vibrar(10); abrir(P[a.r.getAttribute('data-k')], true); }
+    else if (x < -80) mover(a.r, -168, true);
+    else mover(a.r, 0, true);
+    a.r.dataset.recienMovido = '1'; setTimeout(function () { delete a.r.dataset.recienMovido; }, 50);
+  }
+  lista.addEventListener('pointerup', soltar);
+  lista.addEventListener('pointercancel', soltar);
+  lista.addEventListener('click', function (e) {
+    var w = e.target.closest('.desliz');
+    if (e.target.closest('[data-etiqueta]')) { var r0 = w.querySelector('.r'); mover(r0, 0, true); St.tostada('Etiqueta de «' + P[r0.getAttribute('data-k')].corto + '» a la impresora', 'printer'); return; }
+    if (e.target.closest('[data-corregir]')) { var r1 = w.querySelector('.r'); mover(r1, 0, true); abrir(P[r1.getAttribute('data-k')], true); return; }
+    var r = e.target.closest('.r'); if (!r || r.dataset.recienMovido) return;
+    if (posicion(r) !== 0) { envolver(r); mover(r, 0, true); return; }
+    cerrarOtros(); abrir(P[r.getAttribute('data-k')], false);
+  });
+
+  // Filtros y búsqueda
+  var filtro = 'revisar';
+  function filtrar() {
+    var i = $('[data-buscar] input'), q = i ? i.value.trim().toLowerCase() : '';
+    $$('.lista .r').forEach(function (r) {
+      var p = P[r.getAttribute('data-k')], ok = q ? (p.nombre + ' ' + p.est + ' ' + p.marca + ' ' + p.codigo).toLowerCase().indexOf(q) >= 0 : r.getAttribute('data-g').split(' ').indexOf(filtro) >= 0;
+      (r.parentNode.classList.contains('desliz') ? r.parentNode : r).style.display = ok ? '' : 'none';
+    });
+    // el primero que se ve no lleva margen arriba
+    var vis = Array.prototype.filter.call(lista.children, function (x) { return x.style.display !== 'none'; });
+    vis.forEach(function (x, n) { x.style.marginTop = n ? '8px' : '0'; });
+    St.fundir(lista);
+  }
+  St.chipsUno($('[data-filtros]'), function (c) { filtro = c.getAttribute('data-f'); var i = $('[data-buscar] input'); if (i) i.value = ''; filtrar(); });
+  $('[data-buscar]').addEventListener('click', function () {
+    var c = $('[data-buscar]'), i = c.querySelector('input');
+    if (!i) {
+      Array.prototype.slice.call(c.childNodes).forEach(function (n) { if (n.nodeType === 3) n.remove(); });
+      i = document.createElement('input'); i.className = 'st-escribir'; i.placeholder = 'Producto, código o estante';
+      c.appendChild(i); i.addEventListener('input', filtrar);
+      i.addEventListener('focus', function () { c.classList.add('foco'); });
+      i.addEventListener('blur', function () { c.classList.remove('foco'); });
+    }
+    i.focus();
+  });
+
+  // Escanear: la cámara a pantalla completa lee el código y abre la corrección
+  $('[data-escanear]').addEventListener('click', function () { St.camaraCelu(function (p) { St.vibrar(10); abrir(p, true); }, P.cinta); });
+
+  // Qué pedir y el espejo
+  $('[data-pedir]').addEventListener('click', St.quePedir);
+  var vinculado = true;
+  $('[data-vinculo]').addEventListener('click', function () {
+    var b = $('[data-vinculo]');
+    var d = St.abrir({ tipo: 'hoja', html: St.cabecera(vinculado ? 'En espejo' : 'Vincular', vinculado ? 'Con la compu del mostrador · desde las 8:05' : 'Escaneá el código que muestra la compu') +
+      (vinculado ? '<div class="t-cuerpo">Lo que escanees acá aparece en la compu, y lo que elijas allá se ve acá.</div><div class="st-pie"><button class="btn btn-peligro" data-desvincular><i class="i" data-i="unlink"></i>Desvincular</button><button class="btn btn-fantasma" data-cerrar>Cerrar</button></div>'
+        : '<div class="st-pie"><button class="btn btn-oscuro" data-vincular><i class="i" data-i="qr-code"></i>Escanear el código</button><button class="btn btn-fantasma" data-cerrar>Cerrar</button></div>') });
+    var x = d.el.querySelector('[data-desvincular]'), y = d.el.querySelector('[data-vincular]');
+    if (x) x.addEventListener('click', function () { vinculado = false; b.style.cssText = 'border-color:var(--borde-fuerte);background:var(--superficie);color:var(--texto-2)'; b.innerHTML = '<i class="i i-s" data-i="link"></i>Vincular'; window.pintarIconos(b); d.cerrar(); St.tostada('Desvinculado de la compu', 'unlink'); });
+    if (y) y.addEventListener('click', function () { vinculado = true; b.style.cssText = ''; b.innerHTML = '<i class="i i-s" data-i="monitor"></i>En espejo'; window.pintarIconos(b); d.cerrar(); St.vibrar([10, 40, 10]); St.tostada('En espejo con la compu del mostrador', 'monitor'); });
+  });
+});
+</script>
 </body>
 </html>

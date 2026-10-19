@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="../../../_comun/comun.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../iconos-extra.js"></script>
+<link rel="stylesheet" href="../../interacciones.css">
+<script src="../../interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
   .resumenes { display: grid; grid-template-columns: repeat(4, 1fr) 1.5fr; gap: 12px; }
@@ -76,11 +79,11 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="pastilla urgente" style="margin-left:auto;height:24px">28</span></a>
-    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="pastilla urgente" style="margin-left:auto;height:24px">28</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-menu-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
@@ -91,69 +94,241 @@
     <header class="cabecera">
       <div class="t-titulo">Depósito</div>
       <div class="acciones">
-        <button class="btn chico"><i class="i i-s" data-i="file-spreadsheet"></i>Exportar a Excel</button>
-        <button class="btn chico"><i class="i i-s" data-i="printer"></i>Etiquetas <span class="kbd">Alt E</span></button>
-        <button class="btn btn-accion chico"><i class="i i-s" data-i="truck"></i>Qué pedir · 28 <span class="kbd">Alt P</span></button>
+        <button class="btn chico" data-excel><i class="i i-s" data-i="file-spreadsheet"></i>Exportar a Excel</button>
+        <button class="btn chico" data-etiquetas><i class="i i-s" data-i="printer"></i>Etiquetas <span class="kbd">Alt E</span></button>
+        <button class="btn btn-accion chico" data-pedir><i class="i i-s" data-i="truck"></i>Qué pedir · 28 <span class="kbd">Alt P</span></button>
       </div>
     </header>
-    <nav class="pestanas"><a class="activa">Stock</a><a>Compras</a><a>Contar <span class="pastilla pino" style="height:24px">14 hoy</span></a></nav>
+    <nav class="pestanas"><a class="activa" data-ir="stock">Stock</a><a data-ir="compras">Compras</a><a data-ir="contar">Contar <span class="pastilla pino" style="height:24px">14 hoy</span></a></nav>
     <section class="pantalla">
       <div class="resumenes">
-        <div class="resumen logro"><span class="ico"><i class="i" data-i="package-check"></i></span><div><div class="et">Con stock</div><div class="va">21.904</div></div></div>
-        <div class="resumen urgente"><span class="ico"><i class="i" data-i="trending-down"></i></span><div><div class="et">Bajo el mínimo</div><div class="va">28</div></div></div>
-        <div class="resumen"><span class="ico" style="background:var(--hundido);color:var(--texto-2)"><i class="i" data-i="package-minus"></i></span><div><div class="et">Sin stock</div><div class="va">12</div></div></div>
-        <div class="resumen error"><span class="ico"><i class="i" data-i="circle-alert"></i></span><div><div class="et">Stock negativo</div><div class="va">6</div></div></div>
-        <div class="resumen dinero"><span class="ico"><i class="i" data-i="coins"></i></span><div><div class="et">Dinero invertido · costo sin IVA</div><div class="va"><span class="peso">$</span>48.296.000</div></div><i class="i i-s candado" data-i="lock"></i></div>
+        <div class="resumen logro" data-res-con><span class="ico"><i class="i" data-i="package-check"></i></span><div><div class="et">Con stock</div><div class="va">21.904</div></div></div>
+        <div class="resumen urgente" data-res-bajo><span class="ico"><i class="i" data-i="trending-down"></i></span><div><div class="et">Bajo el mínimo</div><div class="va">28</div></div></div>
+        <div class="resumen" data-res-sin><span class="ico" style="background:var(--hundido);color:var(--texto-2)"><i class="i" data-i="package-minus"></i></span><div><div class="et">Sin stock</div><div class="va">12</div></div></div>
+        <div class="resumen error" data-res-neg data-tocable><span class="ico"><i class="i" data-i="circle-alert"></i></span><div><div class="et">Stock negativo</div><div class="va">6</div></div></div>
+        <div class="resumen dinero"><span class="ico"><i class="i" data-i="coins"></i></span><div><div class="et">Dinero invertido · costo sin IVA</div><div class="va"><span class="peso">$</span>48.296.000</div></div><i class="i i-s candado" data-i="lock" data-candado></i></div>
       </div>
 
       <div class="cuerpo">
         <div class="izq">
           <div class="buscar">
-            <div class="campo"><i class="i" data-i="search"></i>Buscá por nombre, código o estantería<span class="kbd">/</span></div>
-            <button class="btn btn-oscuro" style="height:48px"><i class="i" data-i="scan-barcode"></i>Con el celular</button>
+            <div class="campo" data-buscar data-tocable><i class="i" data-i="search"></i>Buscá por nombre, código o estantería<span class="kbd">/</span></div>
+            <button class="btn btn-oscuro" style="height:48px" data-celular><i class="i" data-i="scan-barcode"></i>Con el celular</button>
           </div>
-          <div class="chips">
-            <span class="chip">Todos <span class="n">23.842</span></span>
-            <span class="chip elegido"><span class="punto" style="background:var(--urgente)"></span>Para revisar <span class="n">46</span></span>
-            <span class="chip"><span class="punto" style="background:var(--error)"></span>Negativo <span class="n">6</span></span>
-            <span class="chip"><i class="i i-s" data-i="barcode"></i>Sin código <span class="n">214</span></span>
+          <div class="chips" data-filtros>
+            <span class="chip" data-f="todos">Todos <span class="n">23.842</span></span>
+            <span class="chip elegido" data-f="revisar"><span class="punto" style="background:var(--urgente)"></span>Para revisar <span class="n">46</span></span>
+            <span class="chip" data-f="neg"><span class="punto" style="background:var(--error)"></span>Negativo <span class="n">6</span></span>
+            <span class="chip" data-f="sincod"><i class="i i-s" data-i="barcode"></i>Sin código <span class="n">214</span></span>
                       </div>
-          <div class="lista">
-            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Bremen · PH2-25 · Est. B-02-01 <span class="pastilla error mini">Revisar</span></div></div><div class="dato error"><span class="et">Stock</span><span class="va">−1 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
-            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L</div><div class="d">Alba · LX4B · Est. C-01-05 <span class="pastilla accion mini"><i class="i i-s" data-i="user-round"></i>La espera Rosa, jue 22</span></div></div><div class="dato"><span class="et">Stock</span><span class="va">0 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
-            <div class="fila foco"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm mango tubular</div><div class="d">Bahco · MC27 · Est. A-03-12 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">9 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
-            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · S8T100 · Est. B-04-02 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">3 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
-            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · ME080 · Est. B-02-04 · mín. 20</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">14 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
-            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></span><div><div class="t">Tornillo autoperforante T2 8 × 1/2" × 100</div><div class="d">Genérico · sin código <span class="pastilla mini"><i class="i i-s" data-i="barcode"></i>Generar código</span></div></div><div class="dato logro"><span class="et">Stock</span><span class="va">23 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+          <div class="lista" data-lista>
+            <div class="fila" data-k="puntas" data-g="revisar neg todos"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Bremen · PH2-25 · Est. B-02-01 <span class="pastilla error mini">Revisar</span></div></div><div class="dato error"><span class="et">Stock</span><span class="va">−1 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila" data-k="latex" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L</div><div class="d">Alba · LX4B · Est. C-01-05 <span class="pastilla accion mini"><i class="i i-s" data-i="user-round"></i>La espera Rosa, jue 22</span></div></div><div class="dato"><span class="et">Stock</span><span class="va">0 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila foco" data-k="martillo" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm mango tubular</div><div class="d">Bahco · MC27 · Est. A-03-12 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">9 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila" data-k="tarugos" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · S8T100 · Est. B-04-02 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">3 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila" data-k="mecha" data-g="revisar todos"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · ME080 · Est. B-02-04 · mín. 20</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">14 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila" data-k="tornillo" data-g="revisar sincod todos"><span class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></span><div><div class="t">Tornillo autoperforante T2 8 × 1/2" × 100</div><div class="d">Genérico · sin código <span class="pastilla mini" data-generar data-tocable><i class="i i-s" data-i="barcode"></i>Generar código</span></div></div><div class="dato logro"><span class="et">Stock</span><span class="va">23 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
           </div>
         </div>
 
-        <aside class="panel tarjeta-2">
-          <div class="p-cab">
+        <aside class="panel tarjeta-2" data-panel>
+          <div class="p-cab" data-p-cab>
             <span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span>
             <div><div class="t">Martillo carpintero 27 mm</div><div class="t-detalle">Bahco · Distribuidora Oeste</div></div>
-            <button class="btn chico btn-suave btn-icono"><i class="i i-s" data-i="printer"></i></button>
+            <button class="btn chico btn-suave btn-icono" data-etiqueta-uno aria-label="Imprimir su etiqueta"><i class="i i-s" data-i="printer"></i></button>
           </div>
-          <div class="saldo">
+          <div class="saldo" data-p-saldo>
             <div class="t-total">9<small>un.</small></div>
             <div class="cuenta">Es la suma de sus <b>6 movimientos</b><br>Mínimo <b>10</b>: 31 vendidas en 90 días <i class="i i-s" data-i="info"></i></div>
           </div>
           <div class="movs-cab"><span class="t-etiqueta">Movimientos</span><span class="t-detalle">queda</span></div>
-          <div class="movs">
+          <div class="movs" data-p-movs>
             <div class="mov"><span class="ic"><i class="i i-s" data-i="shopping-cart"></i></span><div><span class="tt">Venta 4821 · hoy 10:12</span><span class="nn">Mostrador · Carlos</span></div><span class="q">−3</span><span class="s">9</span></div>
             <div class="mov"><span class="ic compra"><i class="i i-s" data-i="truck"></i></span><div><span class="tt">Compra · sáb 18/10</span><span class="nn">Remito R-0012-0388 · Distribuidora Oeste</span></div><span class="q mas">+4</span><span class="s">12</span></div>
             <div class="mov"><span class="ic ajuste"><i class="i i-s" data-i="square-pen"></i></span><div><span class="tt">Ajuste · mié 15/10</span><span class="nn">«había 9, hay 8: rotura, mango partido» · Mati</span></div><span class="q">−1</span><span class="s">8</span></div>
             <div class="mov"><span class="ic"><i class="i i-s" data-i="history"></i></span><div><span class="tt mas-movs">Ver 3 más, hasta el 02/10</span></div><span class="q"></span><span class="s">↓</span></div>
           </div>
-          <div class="corregir">
-            <div class="fila-c"><span class="t-etiqueta">¿Cuántas hay?</span><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">8</span><button><i class="i i-s" data-i="plus"></i></button></span><span class="vista">había <b>9</b>, hay <b>8</b></span></div>
-            <div class="motivos"><span class="chip elegido">Conté la estantería</span><span class="chip">Rotura</span><span class="chip">Pérdida</span><span class="chip">Otro…</span></div>
-            <div class="fila-c"><button class="btn btn-oscuro chico" style="flex:1">Guardar corrección <span class="kbd">Enter</span></button><button class="btn btn-fantasma chico">Cancelar <span class="kbd">Esc</span></button></div>
+          <div class="corregir" data-corr>
+            <div class="fila-c"><span class="t-etiqueta">¿Cuántas hay?</span><span class="cantidad"><button data-menos aria-label="Una menos"><i class="i i-s" data-i="minus"></i></button><span class="n" data-hay>8</span><button data-mas aria-label="Una más"><i class="i i-s" data-i="plus"></i></button></span><span class="vista" data-vista>había <b>9</b>, hay <b>8</b></span></div>
+            <div class="motivos" data-motivos><span class="chip elegido">Conté la estantería</span><span class="chip">Rotura</span><span class="chip">Pérdida</span><span class="chip">Otro…</span></div>
+            <div class="fila-c"><button class="btn btn-oscuro chico" style="flex:1" data-guardar>Guardar corrección <span class="kbd">Enter</span></button><button class="btn btn-fantasma chico" data-cancelar>Cancelar <span class="kbd">Esc</span></button></div>
           </div>
         </aside>
       </div>
     </section>
   </main>
 </div>
+<script>
+// Interacciones de la maqueta (no es la aplicación): elegir, corregir, filtrar, buscar, pedir.
+document.addEventListener('DOMContentLoaded', function () {
+  var P = St.P, $ = function (q, r) { return (r || document).querySelector(q); }, $$ = function (q, r) { return Array.prototype.slice.call((r || document).querySelectorAll(q)); };
+  var actual = P.martillo, hay = 8, motivo = 'Conté la estantería';
+  var lista = $('[data-lista]'), panel = $('[data-panel]');
+
+  // Más productos para «Todos» (ocultos de entrada: quieta se ve igual).
+  function filaHtml(p) {
+    return '<div class="fila" data-k="' + p.id + '" data-g="todos"><span class="foto"><img src="' + St.FOTOS + p.foto + '.webp" alt=""></span><div><div class="t">' + p.nombre + '</div><div class="d">' + p.marca + ' · ' + (p.codigo || 'sin código') + ' · Est. ' + p.est + ' · mín. ' + St.num(p.min) + '</div></div><div class="dato ' + St.estadoDato(p) + '"><span class="et">Stock</span><span class="va">' + St.num(p.stock) + ' ' + p.unidad + '</span></div><i class="i flecha" data-i="chevron-right"></i></div>';
+  }
+  ['cinta', 'lampara', 'pinza', 'clavos'].forEach(function (k) {
+    lista.insertAdjacentHTML('beforeend', filaHtml(P[k]));
+    lista.lastElementChild.style.display = 'none';
+  });
+  window.pintarIconos(lista);
+
+  // Más
+  $("[data-menu-mas]").addEventListener("click", function (e) { St.menuMas(e.currentTarget); });
+
+  // Elegir un producto: el renglón toma el borde pino y el panel cambia con un fundido.
+  function pintarMovs() {
+    var ms = St.conSaldo(actual), resto = ms.length - 3;
+    $('[data-p-movs]').innerHTML = ms.slice(0, 3).map(function (m) {
+      return '<div class="mov"><span class="ic ' + (m.tipo === 'venta' ? '' : m.tipo) + '"><i class="i i-s" data-i="' + St.ICONO_MOV[m.tipo] + '"></i></span><div><span class="tt">' + m.t + '</span><span class="nn">' + m.n + '</span></div><span class="q' + (m.q > 0 ? ' mas' : '') + '">' + St.signo(m.q) + '</span><span class="s">' + St.num(m.s) + '</span></div>';
+    }).join('') + (resto > 0 ? '<div class="mov" data-ver-mas data-tocable><span class="ic"><i class="i i-s" data-i="history"></i></span><div><span class="tt mas-movs">Ver ' + resto + ' más, hasta el ' + (ms[ms.length - 1].t.match(/\d\d\/\d\d/) || [''])[0] + '</span></div><span class="q"></span><span class="s">↓</span></div>' : '');
+    window.pintarIconos($('[data-p-movs]'));
+  }
+  function pintarSaldo(sube) {
+    var cuenta = 'Es la suma de sus <b>' + actual.movs.length + ' movimientos</b><br>Mínimo <b>' + St.num(actual.min) + '</b>' + (actual.porque ? ': ' + actual.porque : '') + ' <i class="i i-s" data-i="info"></i>';
+    var tot = $('[data-p-saldo] .t-total');
+    if (sube === undefined) tot.innerHTML = St.num(actual.stock) + '<small>' + actual.unidad + '</small>';
+    else St.rodar(tot, St.num(actual.stock) + '<small>' + actual.unidad + '</small>', sube);
+    $('[data-p-saldo] .cuenta').innerHTML = cuenta;
+    window.pintarIconos($('[data-p-saldo]'));
+  }
+  function ponerHay(n, animar) {
+    var sube = n > hay; hay = Math.round(n * 10) / 10;
+    if (animar) St.rodar($('[data-hay]'), St.num(hay), sube); else $('[data-hay]').textContent = St.num(hay);
+    $('[data-vista]').innerHTML = hay === actual.stock ? 'coincide con el sistema' : 'había <b>' + St.num(actual.stock) + '</b>, hay <b>' + St.num(hay) + '</b>';
+  }
+  function elegir(p) {
+    if (!p) return;
+    var antes = actual.stock;
+    actual = p;
+    $$('.fila', lista).forEach(function (f) { f.classList.toggle('foco', f.getAttribute('data-k') === p.id); });
+    var cab = $('[data-p-cab]');
+    cab.querySelector('.foto img').src = St.FOTOS + p.foto + '.webp';
+    cab.querySelector('.t').textContent = p.corto;
+    cab.querySelector('.t-detalle').textContent = p.marca + ' · ' + p.prov;
+    pintarSaldo(p.stock > antes);
+    pintarMovs();
+    ponerHay(p.stock, false);
+    St.fundir(panel);
+  }
+  lista.addEventListener('click', function (e) {
+    var g = e.target.closest('[data-generar]');
+    if (g) {
+      e.stopPropagation();
+      g.className = 'pastilla logro mini'; g.innerHTML = '<i class="i i-s" data-i="check"></i>2000000' + '01245';
+      window.pintarIconos(g); St.pulsar(g);
+      St.tostada('Código interno generado. Ya podés imprimir su etiqueta.', 'barcode');
+      return;
+    }
+    var f = e.target.closest('.fila'); if (f) elegir(P[f.getAttribute('data-k')]);
+  });
+
+  // Movimientos completos, el porqué del mínimo, el candado, la etiqueta.
+  panel.addEventListener('click', function (e) {
+    if (e.target.closest('[data-ver-mas]')) St.dialogoMovs(actual);
+    else if (e.target.closest('.cuenta svg')) St.pop(e.target.closest('.cuenta svg'), 'El mínimo es lo que se vende en <b>3 semanas</b>: ' + (actual.porque || 'según las ventas de 90 días') + '. Lo podés cambiar en la ficha del producto.');
+  });
+  $('[data-etiqueta-uno]').addEventListener('click', function () { St.tostada('Etiqueta de «' + actual.corto + '» a la impresora', 'printer'); });
+  $('.candado').addEventListener('click', function (e) { St.pop(e.currentTarget, 'Lo ve solo quien tiene el permiso <b>«Ver el dinero invertido»</b> (decisión 96). Es el costo sin IVA de todo lo que hay.'); });
+  $('.candado').setAttribute('data-tocable', '');
+
+  // Corregir: ± ruedan, «había N, hay M» en vivo; guardar suma el ajuste arriba.
+  $('[data-menos]').addEventListener('click', function () { ponerHay(hay - 1, true); });
+  $('[data-mas]').addEventListener('click', function () { ponerHay(hay + 1, true); });
+  St.chipsUno($('[data-motivos]'), function (c) { motivo = c.textContent.replace('…', ''); });
+  var cuentas = { neg: 6, sin: 12, bajo: 28, con: 21904, revisar: 46 };
+  function cat(n, p) { return n < 0 ? 'neg' : n === 0 ? 'sin' : n < p.min ? 'bajo' : 'bien'; }
+  function guardar() {
+    if (hay === actual.stock) { St.tostada('Coincide con el sistema: quedó anotado que lo contaste', 'circle-check'); return; }
+    var antes = cat(actual.stock, actual), sube = hay > actual.stock;
+    St.ajustar(actual, hay, motivo);
+    var ahora = cat(actual.stock, actual);
+    pintarSaldo(sube); pintarMovs();
+    St.entrar($('[data-p-movs] .mov'));
+    ponerHay(actual.stock, false);
+    var fila = $('.fila[data-k="' + actual.id + '"]');
+    if (fila) {
+      var d = fila.querySelector('.dato'); d.className = 'dato ' + St.estadoDato(actual);
+      St.rodar(d.querySelector('.va'), St.num(actual.stock) + ' ' + actual.unidad, sube);
+      St.entrar(fila);
+    }
+    if (antes !== ahora) {
+      var mapa = { neg: '[data-res-neg] .va', sin: '[data-res-sin] .va', bajo: '[data-res-bajo] .va' };
+      if (mapa[antes]) { cuentas[antes]--; St.rodar($(mapa[antes]), St.num(cuentas[antes]), false); }
+      if (mapa[ahora]) { cuentas[ahora]++; St.rodar($(mapa[ahora]), St.num(cuentas[ahora]), true); }
+      if (antes === 'neg' || ahora === 'neg') $('[data-f="neg"] .n').textContent = cuentas.neg;
+    }
+    St.tostada('Guardado: había ' + St.num(St.conSaldo(actual)[0].s - St.conSaldo(actual)[0].q) + ', hay ' + St.num(actual.stock) + ' · ' + motivo.toLowerCase());
+  }
+  $('[data-guardar]').addEventListener('click', guardar);
+  function cancelar() { ponerHay(actual.stock, true); }
+  $('[data-cancelar]').addEventListener('click', cancelar);
+
+  // Filtros
+  var filtro = 'revisar';
+  function filtrar() {
+    var q = ($('[data-buscar] input') || {}).value || '';
+    q = q.trim().toLowerCase();
+    $$('.fila', lista).forEach(function (f) {
+      var p = P[f.getAttribute('data-k')];
+      var ok = q ? (p.nombre + ' ' + p.codigo + ' ' + p.est + ' ' + p.marca).toLowerCase().indexOf(q) >= 0 : (f.getAttribute('data-g') || '').split(' ').indexOf(filtro) >= 0;
+      f.style.display = ok ? '' : 'none';
+    });
+    St.fundir(lista);
+  }
+  St.chipsUno($('[data-filtros]'), function (c) { filtro = c.getAttribute('data-f'); var i = $('[data-buscar] input'); if (i) i.value = ''; filtrar(); });
+  $('[data-res-neg]').addEventListener('click', function () { $('[data-f="neg"]').click(); });
+
+  // Buscar: el campo se vuelve escribible (se ve igual) y filtra la lista.
+  function abrirBusqueda() {
+    var c = $('[data-buscar]'), i = c.querySelector('input');
+    if (!i) {
+      var kbd = c.querySelector('.kbd');
+      Array.prototype.slice.call(c.childNodes).forEach(function (n) { if (n.nodeType === 3) n.remove(); });
+      i = document.createElement('input'); i.className = 'st-escribir'; i.placeholder = 'Buscá por nombre, código o estantería';
+      c.insertBefore(i, kbd); c.classList.add('foco');
+      i.addEventListener('input', filtrar);
+      i.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { var f = $$('.fila', lista).filter(function (x) { return x.style.display !== 'none'; })[0]; if (f) { elegir(P[f.getAttribute('data-k')]); i.blur(); } }
+        if (e.key === 'Escape') { i.value = ''; filtrar(); i.blur(); e.stopPropagation(); }
+      });
+      i.addEventListener('blur', function () { c.classList.remove('foco'); });
+      i.addEventListener('focus', function () { c.classList.add('foco'); });
+    }
+    i.focus();
+  }
+  $('[data-buscar]').addEventListener('click', abrirBusqueda);
+
+  // Con el celular: el celular en espejo lee el código y el producto queda elegido.
+  function leido(p) {
+    var f = $('.fila[data-k="' + p.id + '"]');
+    if (f) { f.style.display = ''; lista.insertBefore(f, lista.firstChild); St.entrar(f); }
+    elegir(p);
+  }
+  $('[data-celular]').addEventListener('click', function () { St.esperarCelular(leido); });
+
+  // Cabecera
+  $('[data-excel]').addEventListener('click', function () { St.tostada('Se bajó stock-19-10-2026.xlsx · 23.842 productos', 'file-spreadsheet'); });
+  function etiquetas() { St.dialogoEtiquetas([['Las que cambiaron de precio', 'Desde la última vez que se imprimieron', '37'], ['Las del filtro «Para revisar»', 'Lo que se ve en la lista', '46'], ['Solo ' + actual.corto, 'El producto elegido', '1']], function () { St.tostada('Etiquetas a la impresora del mostrador', 'printer'); }); }
+  $('[data-etiquetas]').addEventListener('click', etiquetas);
+  $('[data-pedir]').addEventListener('click', St.quePedir);
+
+  // Teclado: / busca, ↑↓ recorre, C corrige, Enter guarda, Esc cancela, Alt E, Alt P.
+  document.addEventListener('keydown', function (e) {
+    if (St.hayCapa() || e.target.matches('input')) return;
+    var vis = $$('.fila', lista).filter(function (x) { return x.style.display !== 'none'; });
+    var i = vis.indexOf($('.fila.foco'));
+    if (e.key === '/') { e.preventDefault(); abrirBusqueda(); }
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); var n = vis[Math.max(0, Math.min(vis.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))]; if (n) elegir(P[n.getAttribute('data-k')]); }
+    else if (e.key === 'c' || e.key === 'C') { St.pulsar($('[data-corr] .cantidad')); }
+    else if (e.key === 'Enter' && !e.target.matches('button')) { e.preventDefault(); guardar(); }
+    else if (e.key === 'Escape') cancelar();
+    else if (e.altKey && (e.key === 'e' || e.key === 'E')) { e.preventDefault(); etiquetas(); }
+    else if (e.altKey && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); St.quePedir(); }
+  });
+});
+</script>
 </body>
 </html>
