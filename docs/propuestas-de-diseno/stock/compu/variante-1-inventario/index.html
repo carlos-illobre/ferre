@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock · Inventario (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .pantalla { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
+  .resumenes { display: grid; grid-template-columns: repeat(4, 1fr) 1.5fr; gap: 12px; }
+  .resumen .et { white-space: nowrap; }
+  .resumen { padding: 12px 14px; }
+  .resumen .va { font-size: 22px; line-height: 28px; }
+  .resumen.dinero .va small { font-size: 14px; font-weight: 600; color: var(--texto-3); margin-left: 4px; }
+  .resumen.dinero .candado { margin-left: auto; color: var(--texto-3); align-self: flex-start; }
+  .cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) 432px; gap: 20px; }
+  .izq { display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
+  .buscar { display: flex; gap: 10px; }
+  .buscar .campo { flex: 1; height: 48px; }
+  .buscar .campo .kbd { margin-left: auto; }
+  .chips .chip { height: 36px; font-size: 14px; padding: 0 14px; }
+  .chip .n { color: var(--texto-3); font-weight: 700; }
+  .chip.elegido .n { color: rgba(255,255,255,.7); }
+  .chip .punto { width: 8px; height: 8px; border-radius: 9px; }
+  .lista { flex: 1; min-height: 0; overflow: hidden; position: relative; padding: 3px; margin: -3px; }
+  .lista::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(transparent, var(--fondo)); }
+  .fila { display: grid; grid-template-columns: 48px 1fr 92px 20px; gap: 14px; align-items: center; padding: 8px 12px 8px 8px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .fila + .fila { margin-top: 8px; }
+  .fila .foto { width: 48px; height: 48px; }
+  .fila .t { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila .d { font-size: 14px; color: var(--texto-2); line-height: 20px; display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+  .fila .dato { min-width: 0; padding: 4px 10px; }
+  .fila .dato .va { font-size: 18px; line-height: 22px; }
+  .fila .dato .et { font-size: 14px; }
+  .fila .flecha { color: var(--texto-3); }
+  .fila.foco { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.12), var(--sombra-2); }
+  .pastilla.mini { height: 24px; font-size: 14px; padding: 0 8px; }
+
+  /* Panel del producto elegido */
+  .panel { display: flex; flex-direction: column; min-height: 0; padding: 14px 16px; gap: 10px; }
+  .p-cab { display: flex; gap: 12px; align-items: center; }
+  .p-cab .t { font-weight: 800; font-size: 17px; line-height: 22px; }
+  .p-cab .foto { width: 48px; height: 48px; }
+  .mas-movs { font-size: 14px; font-weight: 700; color: var(--pino-texto); }
+  .p-cab .btn { margin-left: auto; }
+  .saldo { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center; padding: 10px 14px; border-radius: 14px; background: var(--hundido); }
+  .saldo .t-total { font-size: 40px; line-height: 42px; }
+  .saldo .t-total small { font-size: 18px; font-weight: 700; color: var(--texto-2); margin-left: 4px; letter-spacing: 0; }
+  .saldo .cuenta { font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 20px; }
+  .saldo .cuenta b { color: var(--tinta); }
+  .movs-cab { display: flex; align-items: center; justify-content: space-between; }
+  .movs-cab .t-etiqueta { color: var(--tinta); font-size: 15px; font-weight: 750; }
+  .movs { display: grid; gap: 0; }
+  .mov { display: grid; grid-template-columns: 28px 1fr auto 44px; gap: 10px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--borde); font-size: 14px; line-height: 18px; }
+  .mov:last-child { border-bottom: 0; }
+  .mov .ic { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .mov .ic.compra { background: var(--logro-suave); color: var(--logro-texto); }
+  .mov .ic.ajuste { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .mov .q { font-weight: 800; font-size: 15px; text-align: right; }
+  .mov .q.mas { color: var(--logro-texto); }
+  .mov .s { text-align: right; color: var(--texto-3); font-weight: 700; }
+  .mov .tt { font-weight: 700; color: var(--tinta); }
+  .mov .nn { color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; display: block; }
+  .corregir { margin-top: auto; border-top: 1px dashed var(--borde-fuerte); padding-top: 10px; display: grid; gap: 8px; }
+  .corregir .fila-c { display: flex; align-items: center; gap: 10px; }
+  .corregir .fila-c .t-etiqueta { color: var(--tinta); }
+  .motivos { display: flex; gap: 6px; flex-wrap: nowrap; }
+  .motivos .chip { height: 32px; font-size: 14px; padding: 0 12px; }
+  .vista { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .vista b { color: var(--tinta); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="pastilla urgente" style="margin-left:auto;height:24px">28</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="file-spreadsheet"></i>Exportar a Excel</button>
+        <button class="btn chico"><i class="i i-s" data-i="printer"></i>Etiquetas <span class="kbd">Alt E</span></button>
+        <button class="btn btn-accion chico"><i class="i i-s" data-i="truck"></i>Qué pedir · 28 <span class="kbd">Alt P</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a class="activa">Stock</a><a>Compras</a><a>Contar <span class="pastilla pino" style="height:24px">14 hoy</span></a></nav>
+    <section class="pantalla">
+      <div class="resumenes">
+        <div class="resumen logro"><span class="ico"><i class="i" data-i="package-check"></i></span><div><div class="et">Con stock</div><div class="va">21.904</div></div></div>
+        <div class="resumen urgente"><span class="ico"><i class="i" data-i="trending-down"></i></span><div><div class="et">Bajo el mínimo</div><div class="va">28</div></div></div>
+        <div class="resumen"><span class="ico" style="background:var(--hundido);color:var(--texto-2)"><i class="i" data-i="package-minus"></i></span><div><div class="et">Sin stock</div><div class="va">12</div></div></div>
+        <div class="resumen error"><span class="ico"><i class="i" data-i="circle-alert"></i></span><div><div class="et">Stock negativo</div><div class="va">6</div></div></div>
+        <div class="resumen dinero"><span class="ico"><i class="i" data-i="coins"></i></span><div><div class="et">Dinero invertido · costo sin IVA</div><div class="va"><span class="peso">$</span>48.296.000</div></div><i class="i i-s candado" data-i="lock"></i></div>
+      </div>
+
+      <div class="cuerpo">
+        <div class="izq">
+          <div class="buscar">
+            <div class="campo"><i class="i" data-i="search"></i>Buscá por nombre, código o estantería<span class="kbd">/</span></div>
+            <button class="btn btn-oscuro" style="height:48px"><i class="i" data-i="scan-barcode"></i>Con el celular</button>
+          </div>
+          <div class="chips">
+            <span class="chip">Todos <span class="n">23.842</span></span>
+            <span class="chip elegido"><span class="punto" style="background:var(--urgente)"></span>Para revisar <span class="n">46</span></span>
+            <span class="chip"><span class="punto" style="background:var(--error)"></span>Negativo <span class="n">6</span></span>
+            <span class="chip"><i class="i i-s" data-i="barcode"></i>Sin código <span class="n">214</span></span>
+                      </div>
+          <div class="lista">
+            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Bremen · PH2-25 · Est. B-02-01 <span class="pastilla error mini">Revisar</span></div></div><div class="dato error"><span class="et">Stock</span><span class="va">−1 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L</div><div class="d">Alba · LX4B · Est. C-01-05 <span class="pastilla accion mini"><i class="i i-s" data-i="user-round"></i>La espera Rosa, jue 22</span></div></div><div class="dato"><span class="et">Stock</span><span class="va">0 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila foco"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm mango tubular</div><div class="d">Bahco · MC27 · Est. A-03-12 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">9 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d">Fischer · S8T100 · Est. B-04-02 · mín. 10</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">3 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · ME080 · Est. B-02-04 · mín. 20</div></div><div class="dato urgente"><span class="et">Stock</span><span class="va">14 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+            <div class="fila"><span class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></span><div><div class="t">Tornillo autoperforante T2 8 × 1/2" × 100</div><div class="d">Genérico · sin código <span class="pastilla mini"><i class="i i-s" data-i="barcode"></i>Generar código</span></div></div><div class="dato logro"><span class="et">Stock</span><span class="va">23 un.</span></div><i class="i flecha" data-i="chevron-right"></i></div>
+          </div>
+        </div>
+
+        <aside class="panel tarjeta-2">
+          <div class="p-cab">
+            <span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span>
+            <div><div class="t">Martillo carpintero 27 mm</div><div class="t-detalle">Bahco · Distribuidora Oeste</div></div>
+            <button class="btn chico btn-suave btn-icono"><i class="i i-s" data-i="printer"></i></button>
+          </div>
+          <div class="saldo">
+            <div class="t-total">9<small>un.</small></div>
+            <div class="cuenta">Es la suma de sus <b>6 movimientos</b><br>Mínimo <b>10</b>: 31 vendidas en 90 días <i class="i i-s" data-i="info"></i></div>
+          </div>
+          <div class="movs-cab"><span class="t-etiqueta">Movimientos</span><span class="t-detalle">queda</span></div>
+          <div class="movs">
+            <div class="mov"><span class="ic"><i class="i i-s" data-i="shopping-cart"></i></span><div><span class="tt">Venta 4821 · hoy 10:12</span><span class="nn">Mostrador · Carlos</span></div><span class="q">−3</span><span class="s">9</span></div>
+            <div class="mov"><span class="ic compra"><i class="i i-s" data-i="truck"></i></span><div><span class="tt">Compra · sáb 18/10</span><span class="nn">Remito R-0012-0388 · Distribuidora Oeste</span></div><span class="q mas">+4</span><span class="s">12</span></div>
+            <div class="mov"><span class="ic ajuste"><i class="i i-s" data-i="square-pen"></i></span><div><span class="tt">Ajuste · mié 15/10</span><span class="nn">«había 9, hay 8: rotura, mango partido» · Mati</span></div><span class="q">−1</span><span class="s">8</span></div>
+            <div class="mov"><span class="ic"><i class="i i-s" data-i="history"></i></span><div><span class="tt mas-movs">Ver 3 más, hasta el 02/10</span></div><span class="q"></span><span class="s">↓</span></div>
+          </div>
+          <div class="corregir">
+            <div class="fila-c"><span class="t-etiqueta">¿Cuántas hay?</span><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">8</span><button><i class="i i-s" data-i="plus"></i></button></span><span class="vista">había <b>9</b>, hay <b>8</b></span></div>
+            <div class="motivos"><span class="chip elegido">Conté la estantería</span><span class="chip">Rotura</span><span class="chip">Pérdida</span><span class="chip">Otro…</span></div>
+            <div class="fila-c"><button class="btn btn-oscuro chico" style="flex:1">Guardar corrección <span class="kbd">Enter</span></button><button class="btn btn-fantasma chico">Cancelar <span class="kbd">Esc</span></button></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

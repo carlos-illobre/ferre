@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock · Bandeja (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  .pantalla { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 20px; padding-top: 16px; min-height: 0; }
+  .izq { display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
+  .ir { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 8px 0 16px; border-radius: 12px; background: var(--superficie); border: 1px solid var(--borde-fuerte); box-shadow: var(--sombra-1); color: var(--texto-3); }
+  .ir .kbd:first-of-type { margin-left: auto; }
+  .avance { display: flex; align-items: center; gap: 16px; }
+  .avance .t-seccion { white-space: nowrap; }
+  .avance .barra { flex: 1; height: 8px; margin: 0; }
+  .avance .t-detalle { white-space: nowrap; }
+  .bandeja { flex: 1; min-height: 0; overflow: hidden; position: relative; display: flex; flex-direction: column; gap: 10px; padding: 3px; margin: -3px; }
+
+  .grupo { flex: none; background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); overflow: hidden; }
+  .g-cab { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--borde); }
+  .g-cab .t { font-weight: 800; font-size: 15px; white-space: nowrap; }
+  .g-cab .t-detalle { white-space: nowrap; }
+  .g-cab .t-detalle { margin-left: 2px; }
+  .g-cab .acc { margin-left: auto; display: flex; gap: 6px; }
+  .punto-g { width: 10px; height: 10px; border-radius: 9px; }
+  .item { display: grid; grid-template-columns: 40px minmax(0,1fr) auto auto; gap: 12px; align-items: center; padding: 8px 14px; }
+  .item + .item { border-top: 1px solid var(--borde); }
+  .item .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .item .t { font-weight: 700; font-size: 15px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .d { font-size: 14px; color: var(--texto-2); line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .d b { color: var(--tinta); }
+  .barrita { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .barrita .b { width: 64px; height: 6px; border-radius: 9px; background: var(--hundido-2); overflow: hidden; }
+  .barrita .b i { display: block; height: 100%; background: var(--urgente); border-radius: 9px; }
+  .barrita .n { color: var(--urgente-texto); font-weight: 800; }
+  .item.foco { background: var(--pino-suave); box-shadow: inset 4px 0 0 var(--pino); }
+  .acciones-i { display: flex; gap: 6px; }
+  .pastilla.mini { height: 24px; font-size: 14px; padding: 0 8px; }
+
+  .der { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .pedido { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .pedido .cab { display: flex; align-items: center; gap: 10px; }
+  .prov { width: 40px; height: 40px; border-radius: 10px; background: var(--hundido); display: grid; place-items: center; font-weight: 800; color: var(--texto-2); }
+  .pr { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--borde); }
+  .pr .t { font-weight: 700; color: var(--tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pr .q { font-weight: 800; background: var(--hundido); border-radius: 8px; padding: 2px 8px; }
+  .pr .c { font-weight: 700; color: var(--texto-2); min-width: 72px; text-align: right; }
+  .total { display: flex; align-items: baseline; justify-content: space-between; padding-top: 4px; }
+  .total .t-numero { font-size: 28px; }
+  .otros { display: grid; gap: 8px; }
+  .otro { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+  .otro .t { font-weight: 700; font-size: 15px; }
+  .otro .c { margin-left: auto; font-weight: 800; }
+  .teclas { display: flex; gap: 14px; flex-wrap: wrap; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .teclas span { display: inline-flex; gap: 6px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="pastilla urgente" style="margin-left:auto;height:24px">34</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <div class="sub">Lo que pide atención hoy. El resto está bien.</div>
+      <div class="acciones"><button class="btn chico"><i class="i i-s" data-i="file-spreadsheet"></i>Excel</button><button class="btn chico"><i class="i i-s" data-i="package"></i>Todo el stock <span class="kbd">Alt T</span></button></div>
+    </header>
+    <nav class="pestanas"><a class="activa">Stock</a><a>Compras</a><a>Contar <span class="pastilla pino" style="height:24px">14 hoy</span></a></nav>
+    <section class="pantalla">
+      <div class="izq">
+        <div class="ir"><i class="i" data-i="search"></i>Buscá cualquier producto, o escaneá con el celular, para ver su stock<span class="kbd">Ctrl</span><span class="kbd">K</span></div>
+        <div class="avance"><span class="t-seccion">46 para revisar</span><div class="barra"><b style="width:26%"></b></div><span class="t-detalle">12 resueltos hoy</span></div>
+        <div class="bandeja">
+          <div class="grupo">
+            <div class="g-cab"><span class="punto-g" style="background:var(--error)"></span><span class="t">Stock negativo</span><span class="t-detalle">no puede ser: contalos</span><div class="acc"><span class="pastilla error mini">6</span></div></div>
+            <div class="item foco"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 25 mm × 10</div><div class="d">Est. B-02-01 · se anuló la compra del 14/10 con 3 ya vendidas</div></div><span class="pastilla error">−1 un.</span><div class="acciones-i"><button class="btn chico btn-oscuro"><i class="i i-s" data-i="square-pen"></i>Corregir <span class="kbd">C</span></button></div></div>
+            <div class="item"><span class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></span><div><div class="t">Llave combinada 13 mm cromada</div><div class="d">Est. A-01-07 · vendida 2 veces sin stock cargado</div></div><span class="pastilla error">−2 un.</span><div class="acciones-i"><button class="btn chico">Corregir <span class="kbd">C</span></button></div></div>
+          </div>
+          <div class="grupo">
+            <div class="g-cab"><span class="punto-g" style="background:var(--accion)"></span><span class="t">Lo espera un cliente</span><span class="t-detalle">no hay y se prometió</span><div class="acc"><span class="pastilla accion mini">3</span></div></div>
+            <div class="item"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="t">Látex interior mate blanco 4 L · 2 un.</div><div class="d">Para <b>Rosa Benítez</b>, prometido el <b>jueves 22</b> · Alba lo trae el martes</div></div><span class="pastilla">0 un.</span><div class="acciones-i"><button class="btn chico">Al pedido <span class="kbd">P</span></button></div></div>
+          </div>
+          <div class="grupo">
+            <div class="g-cab"><span class="punto-g" style="background:var(--urgente)"></span><span class="t">Bajo el mínimo</span><span class="t-detalle">por el más barato</span><div class="acc"><button class="btn chico btn-suave">Bulonera Centro · 9</button><button class="btn chico btn-fantasma">Distribuidora Oeste · 7</button><button class="btn chico btn-fantasma">+4</button></div></div>
+            <div class="item"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha acero rápido HSS 8 mm</div><div class="d">Pedí <b>24 un.</b> · 41 vendidas en 90 días · Ezeta</div></div><div class="barrita"><span class="b"><i style="width:70%"></i></span><span><span class="n">14</span> / 20</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>
+            <div class="item"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 con tope × 100</div><div class="d">Pedí <b>12 un.</b> · más barato que Fischer directo por $310</div></div><div class="barrita"><span class="b"><i style="width:30%"></i></span><span><span class="n">3</span> / 10</span></div><div class="acciones-i"><span class="pastilla logro"><i class="i i-s" data-i="check"></i>En el pedido</span></div></div>
+          </div>
+          <div class="grupo">
+            <div class="g-cab"><span class="punto-g" style="background:var(--pino)"></span><span class="t">Etiquetas viejas</span><span class="t-detalle">cambiaron de precio desde que se imprimieron</span><div class="acc"><button class="btn chico"><i class="i i-s" data-i="printer"></i>Imprimir 37 <span class="kbd">E</span></button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="der">
+        <div class="pedido tarjeta-2">
+          <div class="cab"><span class="prov">BC</span><div><div style="font-weight:800;font-size:16px">Pedido a Bulonera Centro</div><div class="t-detalle">Borrador · se arma solo desde la bandeja</div></div></div>
+          <div>
+            <div class="pr"><span class="t">Mecha acero rápido HSS 8 mm</span><span class="q">24</span><span class="c">$59.520</span></div>
+            <div class="pr"><span class="t">Tarugos nylon S8 con tope × 100</span><span class="q">12</span><span class="c">$49.800</span></div>
+            <div class="pr"><span class="t">Tornillo T2 8 × 1/2" × 100</span><span class="q">10</span><span class="c">$27.400</span></div>
+            <div class="pr" style="border:0;color:var(--texto-2)"><span>y 6 productos más</span><span></span><span class="c">$115.280</span></div>
+          </div>
+          <div class="total"><span class="t-etiqueta">Costo estimado, sin IVA</span><span class="t-numero"><span class="peso">$</span>252.000</span></div>
+          <button class="btn btn-accion grande" style="width:100%"><i class="i" data-i="send"></i>Mandar por WhatsApp <span class="kbd">Alt W</span></button>
+          <button class="btn btn-fantasma chico"><i class="i i-s" data-i="copy"></i>Copiar el texto</button>
+        </div>
+        <div class="otros">
+          <div class="otro tarjeta"><span class="prov">DO</span><div><div class="t">Distribuidora Oeste</div><div class="t-detalle">7 productos</div></div><span class="c"><span class="peso">$</span>118.000</span></div>
+          <div class="otro tarjeta"><span class="prov">AL</span><div><div class="t">Pinturerías Alba</div><div class="t-detalle">1 producto · para Rosa</div></div><span class="c"><span class="peso">$</span>41.000</span></div>
+        </div>
+        <div class="teclas"><span><span class="kbd">J</span><span class="kbd">K</span>moverse</span><span><span class="kbd">C</span>corregir</span><span><span class="kbd">P</span>pedir</span></div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

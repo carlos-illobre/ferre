@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock · La cuenta del producto (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { height: 768px; overflow: hidden; }
+  .barra-sup { height: 56px; display: flex; align-items: center; gap: 16px; padding: 0 24px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
+  .barra-sup .logo { width: 32px; height: 32px; border-radius: 9px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+  .migas { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; color: var(--texto-2); }
+  .migas b { color: var(--tinta); }
+  .ir { flex: 1; max-width: 420px; margin-left: 16px; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 8px 0 14px; border-radius: 10px; background: var(--hundido); color: var(--texto-3); font-size: 15px; }
+  .ir .kbd:first-of-type { margin-left: auto; }
+  .barra-sup .der { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .avatar { width: 32px; height: 32px; }
+
+  .lienzo { display: grid; grid-template-columns: 272px minmax(0,1fr) 360px; gap: 20px; padding: 20px 24px; height: calc(768px - 56px); }
+  /* Columna 1: los productos como cuentas */
+  .cuentas { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+  .cuentas .t-etiqueta { margin: 0 4px 4px; display: flex; justify-content: space-between; }
+  .cta { display: grid; grid-template-columns: 40px 1fr 36px; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px; }
+  .cta .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .cta .t { font-weight: 700; font-size: 14px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cta .s { font-size: 14px; color: var(--texto-2); }
+  .cta .n { font-weight: 800; font-size: 15px; text-align: right; }
+  .cta.activa { background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-2); }
+  .cta .n.u { color: var(--urgente-texto); } .cta .n.e { color: var(--error-texto); } .cta .n.l { color: var(--logro-texto); }
+
+  /* Columna 2: saldo y gráfico */
+  .centro { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .heroe { display: grid; grid-template-columns: 96px 1fr auto; gap: 20px; align-items: center; }
+  .heroe .foto { width: 96px; height: 96px; border-radius: 20px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .heroe h1 { margin: 0; font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; }
+  .saldo-g { font-size: 72px; line-height: 72px; font-weight: 800; letter-spacing: -.04em; }
+  .saldo-g small { font-size: 22px; letter-spacing: 0; color: var(--texto-2); margin-left: 6px; }
+  .saldo-et { font-size: 14px; color: var(--texto-2); font-weight: 650; text-align: right; }
+  .grafico { padding: 16px 16px 8px; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .grafico .cab { display: flex; align-items: center; gap: 12px; }
+  .grafico .ley { display: flex; gap: 14px; margin-left: auto; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .grafico .ley span { display: inline-flex; align-items: center; gap: 6px; }
+  .grafico .ley i.sw { width: 14px; height: 3px; border-radius: 3px; display: inline-block; }
+  svg.serie { width: 100%; flex: 1; min-height: 0; }
+  .consejo { display: flex; gap: 14px; align-items: center; padding: 14px 16px; }
+  .consejo .ico { width: 44px; height: 44px; border-radius: 99px; background: var(--urgente-suave); color: var(--urgente-texto); display: grid; place-items: center; flex: none; }
+  .consejo .t { font-weight: 800; font-size: 16px; line-height: 22px; }
+  .consejo .btn { margin-left: auto; }
+
+  /* Columna 3: extracto y conciliar */
+  .extracto { display: flex; flex-direction: column; min-height: 0; padding: 16px; gap: 6px; }
+  .extracto .cab { display: flex; align-items: baseline; justify-content: space-between; }
+  .linea { display: grid; grid-template-columns: 1fr 48px 40px; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--borde); font-size: 14px; line-height: 18px; }
+  .linea .tt { font-weight: 700; display: block; }
+  .linea .nn { color: var(--texto-2); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .linea .q { text-align: right; font-weight: 800; font-size: 15px; }
+  .linea .q.mas { color: var(--logro-texto); }
+  .linea .s { text-align: right; font-weight: 700; color: var(--texto-3); }
+  .linea .s.cero { color: var(--error-texto); }
+  .linea.ajuste .tt { color: var(--urgente-texto); }
+  .conciliar { margin-top: auto; padding: 12px; border-radius: 14px; background: var(--hundido); display: grid; gap: 8px; }
+  .conciliar .tres { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
+  .conciliar .tres > div { background: var(--superficie); border-radius: 10px; padding: 4px; }
+  .conciliar .tres .et { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .conciliar .tres .va { font-size: 20px; line-height: 26px; font-weight: 800; }
+  .conciliar .tres .campo-n { outline: 2px solid var(--pino); }
+</style>
+</head>
+<body>
+<header class="barra-sup">
+  <span class="logo"><i class="i i-s" data-i="store"></i></span>
+  <div class="migas">Depósito <i class="i i-s" data-i="chevron-right"></i> Stock <i class="i i-s" data-i="chevron-right"></i> <b>Mecha acero rápido HSS 8 mm</b></div>
+  <div class="ir"><i class="i i-s" data-i="search"></i>Otro producto, o escaneá<span class="kbd">Ctrl</span><span class="kbd">K</span></div>
+  <div class="der"><span class="pastilla logro"><span class="punto"></span>En línea</span><span class="pastilla contorno"><i class="i i-s" data-i="smartphone"></i>En espejo</span><span class="avatar">CI</span></div>
+</header>
+<div class="lienzo">
+  <aside class="cuentas">
+    <div class="t-etiqueta"><span>Las que se mueven hoy</span><span>stock</span></div>
+    <div class="cta activa"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="t">Mecha HSS 8 mm</div><div class="s">bajo el mínimo</div></div><span class="n u">14</span></div>
+    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="t">Martillo carpintero 27 mm</div><div class="s">bajo el mínimo</div></div><span class="n u">9</span></div>
+    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="t">Puntas Phillips PH2 × 10</div><div class="s">negativo</div></div><span class="n e">−1</span></div>
+    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="t">Cinta métrica PowerLock 5 m</div><div class="s">bien</div></div><span class="n">6</span></div>
+    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div><div class="t">Lámpara LED 9 W fría E27</div><div class="s">bien</div></div><span class="n">48</span></div>
+    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><div class="t">Clavos punta París 2"</div><div class="s">por kilo</div></div><span class="n u">4,5</span></div>
+    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></span><div><div class="t">Pinza universal 8" aislada</div><div class="s">bien</div></div><span class="n">7</span></div>
+    <div class="cta"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="t">Tarugos nylon S8 × 100</div><div class="s">bajo el mínimo</div></div><span class="n u">3</span></div>
+  </aside>
+
+  <section class="centro">
+    <div class="heroe">
+      <span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span>
+      <div><h1>Mecha acero rápido HSS 8 mm</h1><div class="t-detalle">Ezeta · ME080 · Est. B-02-04 · Bulonera Centro</div><div style="margin-top:8px;display:flex;gap:6px"><span class="pastilla urgente">Bajo el mínimo de 20</span><span class="pastilla contorno"><i class="i i-s" data-i="barcode"></i>Código de fábrica</span></div></div>
+      <div><div class="saldo-et">Hay en el local</div><div class="saldo-g">14<small>un.</small></div></div>
+    </div>
+    <div class="grafico tarjeta">
+      <div class="cab"><span class="t-seccion" style="font-size:17px">Últimos 90 días y lo que viene</span>
+        <div class="ley"><span><i class="sw" style="background:var(--pino)"></i>Stock</span><span><i class="sw" style="background:var(--urgente)"></i>Mínimo</span><span><i class="sw" style="background:var(--texto-3)"></i>Si sigue así</span></div></div>
+      <svg class="serie" id="serie" viewBox="0 0 640 345"></svg>
+    </div>
+    <div class="consejo tarjeta">
+      <span class="ico"><i class="i i-l" data-i="calendar-clock"></i></span>
+      <div><div class="t">A este ritmo alcanza hasta el 6/11</div><div class="t-detalle">Vende 5 por semana. Pedí 24 a Bulonera Centro, tarda 3 días <i class="i i-s" data-i="info"></i></div></div>
+      <button class="btn btn-accion"><i class="i i-s" data-i="truck"></i>Pedir 24 <span class="kbd">P</span></button>
+    </div>
+  </section>
+
+  <aside class="extracto tarjeta-2">
+    <div class="cab"><span class="t-seccion" style="font-size:17px">Extracto</span><span class="t-detalle">movim. · saldo</span></div>
+    <div class="linea"><div><span class="tt">Venta 4821</span><span class="nn">hoy 10:12 · Carlos</span></div><span class="q">−3</span><span class="s">14</span></div>
+    <div class="linea"><div><span class="tt">Venta 4790</span><span class="nn">sáb 18/10 · Laura</span></div><span class="q">−2</span><span class="s">17</span></div>
+    <div class="linea"><div><span class="tt">Venta 4744</span><span class="nn">jue 16/10 · Carlos</span></div><span class="q">−5</span><span class="s">19</span></div>
+    <div class="linea"><div><span class="tt">Compra · Bulonera Centro</span><span class="nn">lun 13/10 · Factura A-0007-55120</span></div><span class="q mas">+24</span><span class="s">24</span></div>
+    <div class="linea"><div><span class="tt">Venta 4680</span><span class="nn">vie 10/10 · se quedó sin stock</span></div><span class="q">−2</span><span class="s cero">0</span></div>
+    <div class="linea ajuste"><div><span class="tt">Ajuste · rotura</span><span class="nn">«había 3, hay 2: rotura» · Mati</span></div><span class="q">−1</span><span class="s">2</span></div>
+    <div class="linea"><div><span class="tt">Venta 4655</span><span class="nn">vie 03/10 · Laura</span></div><span class="q">−4</span><span class="s">3</span></div>
+    <div class="linea" style="border:0"><div><span class="tt" style="color:var(--pino-texto)">Ver los 20 anteriores</span></div><span></span><span class="s">↓</span></div>
+    <div class="conciliar">
+      <div style="font-weight:800">¿Cuántas hay en la estantería?</div>
+      <div class="tres"><div><div class="et">Sistema</div><div class="va">14</div></div><div class="campo-n"><div class="et">Contaste</div><div class="va">12</div></div><div><div class="et">Diferencia</div><div class="va" style="color:var(--error-texto)">−2</div></div></div>
+      <div class="chips"><span class="chip elegido" style="height:32px;font-size:14px;padding:0 12px">Conté la estantería</span><span class="chip" style="height:32px;font-size:14px;padding:0 12px">Rotura</span></div>
+      <button class="btn btn-oscuro chico">Guardar «había 14, hay 12» <span class="kbd">Enter</span></button>
+    </div>
+  </aside>
+</div>
+<script>
+(function(){
+  // [día, stock]; día 0 = 21/07, 90 = hoy 19/10, hasta 110 = pronóstico
+  var s=[[0,18],[5,15],[12,12],[18,9],[24,6],[28,30],[35,27],[41,24],[47,21],[53,17],[58,13],[62,10],[67,7],[74,3],[78,2],[81,0],[84,24],[87,19],[89,17],[90,14]];
+  var W=640,H=345,L=28,R=8,T=12,B=28,X=function(d){return L+(W-L-R)*d/110},Y=function(v){return T+(H-T-B)*(1-v/32)};
+  var p='M'+X(0)+' '+Y(s[0][1]);
+  for(var i=1;i<s.length;i++){p+=' H'+X(s[i][0])+' V'+Y(s[i][1]);}
+  var area=p+' H'+X(90)+' V'+Y(0)+' H'+X(0)+' Z';
+  var g='';
+  g+='<rect x="'+X(90)+'" y="'+T+'" width="'+(X(110)-X(90))+'" height="'+(H-T-B)+'" fill="#ECE9E1" opacity=".6" rx="6"/>';
+  [0,10,20,30].forEach(function(v){g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#E6E2D8"/><text x="'+(L-8)+'" y="'+(Y(v)+5)+'" text-anchor="end" font-size="14" fill="#6B706B" font-weight="600">'+v+'</text>';});
+  g+='<rect x="'+X(81)+'" y="'+T+'" width="'+(X(84)-X(81))+'" height="'+(H-T-B)+'" fill="#FCEAE7"/>';
+  g+='<path d="'+area+'" fill="rgba(18,56,47,.07)"/>';
+  g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(20)+'" y2="'+Y(20)+'" stroke="#F0A20F" stroke-width="2" stroke-dasharray="6 5"/>';
+  g+='<path d="'+p+'" fill="none" stroke="#12382F" stroke-width="2.5" stroke-linejoin="round"/>';
+  g+='<path d="M'+X(90)+' '+Y(14)+' L'+X(108)+' '+Y(0)+'" stroke="#6B706B" stroke-width="2" stroke-dasharray="3 5" fill="none"/>';
+  [[28,30],[84,24]].forEach(function(c){g+='<circle cx="'+X(c[0])+'" cy="'+Y(c[1])+'" r="6" fill="#1E9E62" stroke="#fff" stroke-width="2"/>';});
+  g+='<circle cx="'+X(78)+'" cy="'+Y(2)+'" r="6" fill="#F0A20F" stroke="#fff" stroke-width="2"/>';
+  g+='<circle cx="'+X(90)+'" cy="'+Y(14)+'" r="7" fill="#12382F" stroke="#fff" stroke-width="3"/>';
+  g+='<circle cx="'+X(108)+'" cy="'+Y(0)+'" r="6" fill="#fff" stroke="#6B706B" stroke-width="2"/>';
+  var lab=function(d,t,a){return '<text x="'+X(d)+'" y="'+(H-6)+'" text-anchor="'+(a||'middle')+'" font-size="14" fill="#545955" font-weight="600">'+t+'</text>';};
+  g+=lab(2,'21 jul','start')+lab(28,'18 ago')+lab(58,'17 sep')+lab(90,'hoy')+lab(108,'6 nov');
+  g+='<text x="'+(X(82.5))+'" y="'+(T+16)+'" text-anchor="middle" font-size="14" fill="#AE281D" font-weight="700">sin stock</text>';
+  document.getElementById('serie').innerHTML=g;
+})();
+</script>
+</body>
+</html>

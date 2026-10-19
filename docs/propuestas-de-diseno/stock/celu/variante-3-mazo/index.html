@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock · El mazo de reponer (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<style>
+  body { width: 390px; }
+  .tope { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+  .redondo { width: 48px; height: 48px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); display: grid; place-items: center; flex: none; }
+  .tope .tt { flex: 1; }
+  .tope .tt b { display: block; font-size: 20px; line-height: 26px; font-weight: 800; }
+  .tope .tt span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .avance { display: flex; gap: 4px; padding: 12px 16px 0; }
+  .avance i { flex: 1; height: 4px; border-radius: 4px; background: var(--hundido-2); }
+  .avance i.si { background: var(--pino); }
+  .prov { margin: 12px 16px 0; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--superficie); border: 1px solid var(--borde); }
+  .prov .ini { width: 36px; height: 36px; border-radius: 10px; background: var(--hundido); display: grid; place-items: center; font-weight: 800; color: var(--texto-2); font-size: 14px; }
+  .prov .t { font-weight: 750; font-size: 15px; line-height: 19px; }
+  .prov .c { margin-left: auto; text-align: right; font-weight: 800; }
+  .prov .c small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-2); }
+
+  .mazo { position: relative; height: 452px; margin: 16px 16px 0; }
+  .carta { position: absolute; inset: 0; background: var(--superficie); border: 1px solid var(--borde); border-radius: 28px; box-shadow: var(--sombra-2); }
+  .carta.c3 { transform: translateY(20px) scale(.9); opacity: .6; }
+  .carta.c2 { transform: translateY(10px) scale(.95); }
+  .carta.c1 { transform: translateX(18px) rotate(3deg); box-shadow: var(--sombra-3); padding: 12px; display: flex; flex-direction: column; }
+  .carta .imagen { height: 160px; border-radius: 20px; background: var(--hundido); display: grid; place-items: center; position: relative; }
+  .carta .imagen img { height: 150px; filter: drop-shadow(0 10px 12px rgba(26,29,27,.22)); }
+  .sello { position: absolute; top: 16px; left: 14px; transform: rotate(-12deg); border: 3px solid var(--logro); color: var(--logro-texto); background: rgba(255,255,255,.9); font-weight: 800; font-size: 18px; padding: 4px 12px; border-radius: 10px; letter-spacing: .02em; }
+  .carta .nombre { font-weight: 800; font-size: 20px; line-height: 26px; margin: 12px 4px 0; }
+  .carta .det { font-size: 14px; color: var(--texto-2); margin: 2px 4px 0; }
+  .medidor { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; margin: 12px 4px 0; }
+  .medidor .va { font-size: 40px; line-height: 40px; font-weight: 800; letter-spacing: -.03em; color: var(--urgente-texto); }
+  .medidor .va small { font-size: 16px; color: var(--texto-2); letter-spacing: 0; }
+  .medidor .b { height: 10px; border-radius: 9px; background: var(--hundido-2); position: relative; }
+  .medidor .b i { position: absolute; left: 0; top: 0; bottom: 0; width: 30%; border-radius: 9px; background: var(--urgente); }
+  .medidor .b em { position: absolute; left: 100%; top: -6px; bottom: -6px; width: 2px; background: var(--tinta); }
+  .medidor .why { grid-column: 1 / -1; font-size: 14px; color: var(--texto-2); font-weight: 600; margin-top: -4px; }
+  .pedir { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 18px; background: var(--hundido); }
+  .pedir .et { font-size: 14px; color: var(--texto-2); font-weight: 650; line-height: 18px; }
+  .pedir .et b { display: block; color: var(--tinta); font-size: 16px; font-weight: 800; }
+  .pedir .cantidad { margin-left: auto; height: 48px; }
+  .pedir .cantidad button { width: 44px; }
+  .pedir .cantidad .n { font-size: 20px; }
+
+  .gestos { position: absolute; left: 0; right: 0; bottom: 26px; display: flex; justify-content: center; align-items: flex-end; gap: 20px; }
+  .gesto { display: grid; justify-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .gesto .b { width: 64px; height: 64px; border-radius: 99px; display: grid; place-items: center; background: var(--superficie); border: 1px solid var(--borde-fuerte); box-shadow: var(--sombra-2); }
+  .gesto.medio .b { width: 56px; height: 56px; background: var(--pino); color: #fff; border-color: var(--pino); }
+  .gesto.si .b { width: 80px; height: 80px; background: var(--accion); color: #fff; border-color: var(--accion); box-shadow: var(--sombra-accion); }
+  .gesto.si { color: var(--accion-texto); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="tope">
+    <span class="redondo"><i class="i" data-i="x"></i></span>
+    <div class="tt"><b>Reponer</b><span>7 de 28 · lo urgente primero</span></div>
+    <span class="redondo"><i class="i" data-i="undo-2"></i></span>
+  </div>
+  <div class="avance"><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i class="si"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="prov"><span class="ini">BC</span><div><div class="t">Pedido a Bulonera Centro</div><div class="t-detalle">5 productos, el más barato</div></div><div class="c"><span class="peso">$</span>109.320<small>estimado</small></div></div>
+
+  <div class="mazo">
+    <div class="carta c3"></div>
+    <div class="carta c2"></div>
+    <div class="carta c1">
+      <div class="imagen"><img src="../../../_comun/fotos/tarugos.webp" alt=""><span class="sello">AL PEDIDO +12</span></div>
+      <div class="nombre">Tarugos nylon S8 con tope × 100</div>
+      <div class="det">Fischer · B-04-02 · $4.150 en Bulonera</div>
+      <div class="medidor">
+        <span class="va">3<small> de 10</small></span>
+        <div class="b"><i></i><em></em></div>
+        <div class="why">Vende 7 por semana: se acaba el sábado <i class="i i-s" data-i="info"></i></div>
+      </div>
+      <div class="pedir"><div class="et">Pedí 12 cajas<b>cubre 2 semanas</b></div><span class="cantidad"><button><i class="i" data-i="minus"></i></button><span class="n">12</span><button><i class="i" data-i="plus"></i></button></span></div>
+    </div>
+  </div>
+
+  <div class="gestos">
+    <div class="gesto"><span class="b"><i class="i i-l" data-i="arrow-left"></i></span>Ahora no</div>
+    <div class="gesto medio"><span class="b"><i class="i i-l" data-i="square-pen"></i></span>Hay otra cantidad</div>
+    <div class="gesto si"><span class="b"><i class="i i-xl" data-i="arrow-right"></i></span>Al pedido</div>
+  </div>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>
