@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../_propio/actividad.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_propio/interacciones.css">
+<script src="../../_propio/interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { height: 768px; overflow: hidden; }
   .top { height: 60px; display: flex; align-items: center; gap: 24px; padding: 0 32px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
@@ -44,13 +47,24 @@
   .alerta .acc .av { width: 24px; height: 24px; font-size: 14px; }
   .sug { margin-top: 16px; }
   .sug .chips { gap: 6px; margin-top: 8px; }
-  .sug .chip { height: 36px; font-size: 14px; padding: 0 12px; }
+  .sug .chip { height: 36px; font-size: 14px; padding: 0 12px; cursor: pointer; }
+  .top nav a, .hito, .alerta .btn { cursor: pointer; }
+  .hito:hover { background: var(--hundido); border-radius: 10px; }
+  .pregunta { cursor: text; }
+  .pregunta .escrito { outline: none; white-space: nowrap; overflow: hidden; }
+  .pregunta .escrito[contenteditable="true"] .cursor { display: none; }
+  .resp { overflow: hidden; }
+  .graf .tapa { transform-box: fill-box; transform-origin: right center; animation: graf-tapa 400ms var(--curva) both; }
+  @keyframes graf-tapa { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+  .graf .late { transform-box: fill-box; transform-origin: center; animation: act-late 420ms var(--rebote) 400ms both; }
+  .resp-cab .av.xl { width: 72px; height: 72px; font-size: 24px; }
+  .lista-pie { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
 </style>
 </head>
 <body>
 <header class="top">
   <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-  <nav><a>Vender</a><a>Catálogo</a><a>Depósito</a><a class="activo">Negocio · Quién hizo qué</a><a>Más</a></nav>
+  <nav><a data-ir="vender">Vender</a><a data-ir="productos">Catálogo</a><a data-ir="stock">Depósito</a><a class="activo" data-parte>Negocio · Quién hizo qué</a><a data-mas>Más</a></nav>
   <div class="der"><span class="pastilla logro"><span class="punto"></span>En línea</span><span class="avatar">CI</span></div>
 </header>
 <div class="cuerpo">
@@ -86,7 +100,7 @@
         <div class="dato"><span class="et">Margen</span><span class="va">100 %</span></div>
         <div class="dato urgente"><span class="et">Precio</span><span class="va">$9.000</span></div>
         <div class="dato logro"><span class="et">Stock</span><span class="va">3 un.</span></div>
-        <button class="btn chico" style="margin-left:auto">Abrir la ficha<i class="i i-s" data-i="arrow-up-right"></i></button>
+        <button class="btn chico" style="margin-left:auto" data-ir="productos">Abrir la ficha<i class="i i-s" data-i="arrow-up-right"></i></button>
       </div>
     </div>
   </section>
@@ -103,5 +117,210 @@
     </div>
   </aside>
 </div>
+<script>
+/* Lo que se puede tocar: escribir una pregunta y Enter, las preguntas sugeridas (se escriben solas),
+   los hitos y los «Ver» de «Para mirar» (abren el detalle), «Ver la lista entera» (diálogo de a 10),
+   «Abrir la ficha», «Negocio» (menú con sus pestañas) y «Más». */
+(function () {
+  var A = ACT, $ = A.$, $$ = A.$$, HOY = A.HOY;
+  var hoy = A.dia(HOY), sab = A.dia("2026-10-17"), mie = A.dia("2026-10-14");
+  var preg = $(".pregunta"), escrito = $(".pregunta .escrito"), entendido = $(".entendido"), resp = $(".resp");
+  var inicialEnt = entendido.innerHTML, inicialResp = resp.innerHTML;
+  function hallar(L, f) { for (var i = 0; i < L.length; i++) if (f(L[i])) return L[i]; }
+  // Las 4 ventas de tarugos de la semana (para el tercer hito)
+  var ventasTarugos = A.registrar([["2026-10-17", "17:10", "0377", 1, 7000], ["2026-10-16", "11:32", "0341", 1, 7000], ["2026-10-15", "16:05", "0296", 1, 7000], ["2026-10-13", "10:48", "0204", 3, 6000]].map(function (v) {
+    return A.hace.venta(v[0], v[1], "mb", v[2], [["Tarugos nylon S8 con tope × 100", v[4], v[3]]], "efectivo");
+  }));
+  function marcarInicial() {
+    var hs = $$(".hito", resp);
+    if (hs[0]) hs[0].setAttribute("data-id", hoy[1].id);
+    var fis = hallar(mie, function (a) { return a.tipo === "lista"; }); if (hs[1] && fis) hs[1].setAttribute("data-id", fis.id);
+    if (hs[2]) hs[2].setAttribute("data-lista", "tarugos");
+  }
+  marcarInicial();
+  var alertas = $$(".alerta");
+  var lampara = hallar(sab, function (a) { return a.tipo === "precio" && a.quien === "lf"; });
+  [hoy[2], lampara, hoy[3]].forEach(function (a, i) { if (a && alertas[i]) alertas[i].setAttribute("data-id", a.id); });
+
+  // ---- escribir la pregunta
+  var escribiendo = null;
+  function editar() {
+    if (escrito.getAttribute("contenteditable") === "true") return;
+    escrito.setAttribute("contenteditable", "true");
+    escrito.focus();
+    var r = document.createRange(); r.selectNodeContents(escrito); r.collapse(false);
+    var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  }
+  preg.addEventListener("click", function (e) { if (e.target.closest("button")) return; editar(); });
+  escrito.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); preguntar(escrito.textContent); }
+  });
+  function escribir(txt) {
+    clearInterval(escribiendo);
+    escrito.setAttribute("contenteditable", "false");
+    var i = 0;
+    escrito.innerHTML = '<span class="cursor"></span>';
+    if (A.reducido()) { escrito.innerHTML = A.esc(txt) + '<span class="cursor"></span>'; preguntar(txt); return; }
+    escribiendo = setInterval(function () {
+      i++;
+      escrito.innerHTML = A.esc(txt.slice(0, i)) + '<span class="cursor"></span>';
+      if (i >= txt.length) { clearInterval(escribiendo); setTimeout(function () { preguntar(txt); }, 180); }
+    }, 22);
+  }
+  $$(".sug .chip").forEach(function (c) { c.setAttribute("role", "button"); c.tabIndex = 0; c.addEventListener("click", function () { escribir(c.textContent.trim()); }); });
+
+  // ---- entender y responder
+  function pastillas(ps, cuenta) {
+    entendido.innerHTML = '<span class="t-detalle">Entendí:</span>' + ps.map(function (p) {
+      return '<span class="pastilla ' + (p[2] || "pino") + '">' + (p[0] ? A.ico(p[0]) : "") + p[1] + "</span>";
+    }).join("") + '<span class="t-detalle" style="margin-left:auto">' + cuenta + "</span>";
+    A.pintar(entendido);
+    $$(".pastilla", entendido).forEach(function (p, i) { p.style.setProperty("--d", i * 40 + "ms"); p.classList.add("act-entra"); });
+  }
+  function hitoHtml(a, etiqueta) {
+    var t = A.TIPOS[a.tipo];
+    return '<div class="hito" data-id="' + a.id + '"><span class="cu">' + A.diaCorto(a.fecha) + " " + a.hora + "</span>" + A.av(a.quien) + '<span class="q">' + A.PERS[a.quien].nombre + " · " + t.que.toLowerCase() +
+      "<small>" + a.det.replace(/<\/?b>/g, "") + '</small></span><span class="pastilla ' + (t.tono || "") + '">' + (etiqueta || t.que.split(" ")[0]) + "</span></div>";
+  }
+  function grafHoras(L) {
+    var horas = []; for (var h = 8; h <= 19; h++) horas.push(h);
+    var c = horas.map(function (h) { return L.filter(function (a) { return Math.floor(a.min / 60) === h; }); });
+    var max = Math.max.apply(null, c.map(function (x) { return x.length; }).concat([1]));
+    var bars = c.map(function (x, i) {
+      var alto = Math.max(3, Math.round(x.length / max * 84)), xx = 64 + i * 66, rojo = x.some(function (a) { return a.tipo === "anulada"; });
+      return '<rect x="' + xx + '" y="' + (96 - alto) + '" width="40" height="' + alto + '" rx="6" fill="' + (rojo ? "#D7372A" : "#12382F") + '" opacity="' + (rojo ? 1 : .8) + '"/>' +
+        '<text x="' + (xx + 20) + '" y="116" text-anchor="middle">' + horas[i] + " h</text>";
+    }).join("");
+    return '<svg viewBox="0 0 844 122" style="height:122px"><g stroke="#E6E2D8"><line x1="56" x2="844" y1="96" y2="96"/></g><g font-family="Manrope" font-size="14" font-weight="650" fill="#6B706B"><text x="0" y="21">' + max + '</text><text x="0" y="100">0</text>' + bars + '</g><rect class="tapa" x="56" y="0" width="788" height="122" fill="#fff"/></svg>';
+  }
+  function grafEntradas(L) {
+    var dias = []; for (var i = 6; i >= 0; i--) dias.push(A.sumar(HOY, -i));
+    var X = [60, 180, 310, 440, 570, 700, 806], color = { mb: "#17614E", ci: "#E8541C", lf: "#6B706B" };
+    var y = function (m) { return 96 - (m - 480) / 720 * 80; };
+    var temprana = L.reduce(function (a, b) { return !a || b.min < a.min ? b : a; }, null);
+    var puntos = L.map(function (a) {
+      var x = X[dias.indexOf(a.fecha)]; if (x == null) return "";
+      return '<circle cx="' + x + '" cy="' + y(a.min).toFixed(1) + '" r="' + (a === temprana ? 8 : 6) + '" fill="' + color[a.quien] + '" stroke="#fff" stroke-width="2"' + (a === temprana ? ' class="late"' : "") + "/>";
+    }).join("");
+    var etiquetas = dias.map(function (k, i) { return '<text x="' + X[i] + '" y="116" text-anchor="middle"' + (k === HOY ? ' fill="#B23E0E"' : "") + ">" + (k === HOY ? "Hoy" : A.diaCorto(k)) + "</text>"; }).join("");
+    return '<svg viewBox="0 0 844 122" style="height:122px"><rect x="56" y="16" width="788" height="80" fill="#12382F" opacity=".06"/><g stroke="#E6E2D8"><line x1="56" x2="844" y1="16" y2="16"/><line x1="56" x2="844" y1="56" y2="56"/><line x1="56" x2="844" y1="96" y2="96"/></g>' +
+      '<g font-family="Manrope" font-size="14" font-weight="650" fill="#6B706B"><text x="0" y="21">20 h</text><text x="0" y="61">14 h</text><text x="0" y="100">8 h</text>' + etiquetas + "</g>" + puntos + '<rect class="tapa" x="56" y="0" width="788" height="122" fill="#fff"/></svg>';
+  }
+  function datos(ds, boton) {
+    return '<div style="display:flex;gap:8px;align-items:center;border-top:1px solid var(--borde);padding-top:14px"><span class="t-etiqueta" style="margin-right:4px">' + ds[0] + "</span>" +
+      ds[1].map(function (d) { return '<div class="dato ' + (d[2] || "") + '"><span class="et">' + d[0] + '</span><span class="va">' + d[1] + "</span></div>"; }).join("") + boton + "</div>";
+  }
+  function responder(r) {
+    resp.innerHTML = '<div class="resp-cab">' + r.cara + '<div class="frase">' + r.frase + "</div>" + (r.pastilla ? '<span class="pastilla ' + (r.tono || "") + '" style="align-self:start">' + r.pastilla + "</span>" : "<span></span>") + "</div>" +
+      (r.graf ? '<div class="graf">' + r.graf + "</div>" : "") + '<div class="hitos">' + r.hitos + "</div>" + r.pie;
+    A.pintar(resp);
+    A.$$(":scope > *", resp).forEach(function (h, i) { h.style.setProperty("--d", 80 + i * 40 + "ms"); h.classList.add("act-entra"); });
+  }
+  var listas = {};
+  function preguntar(txt) {
+    escrito.setAttribute("contenteditable", "false");
+    escrito.innerHTML = A.esc(txt.trim()) + '<span class="cursor"></span>';
+    var t = txt.toLowerCase();
+    if (/tarugo/.test(t)) {
+      entendido.innerHTML = inicialEnt; A.pintar(entendido);
+      $$(".pastilla", entendido).forEach(function (p, i) { p.style.setProperty("--d", i * 40 + "ms"); p.classList.add("act-entra"); });
+      resp.innerHTML = inicialResp; marcarInicial(); A.pintar(resp);
+      var svg = resp.querySelector(".graf svg");
+      if (svg) { svg.insertAdjacentHTML("beforeend", '<rect class="tapa" x="56" y="0" width="788" height="122" fill="#fff"/>'); var dot = svg.querySelector('circle[fill="#E8541C"]'); if (dot) dot.classList.add("late"); }
+      A.$$(":scope > *", resp).forEach(function (h, i) { h.style.setProperty("--d", 80 + i * 40 + "ms"); h.classList.add("act-entra"); });
+      return;
+    }
+    if (/fuera de horario|horario|temprano|tarde/.test(t)) {
+      var ent = A.rango(A.sumar(HOY, -6), HOY).filter(function (a) { return a.tipo === "entrada"; });
+      var fuera = ent.filter(function (a) { return a.min < 480 || a.min > 1200; });
+      var orden = ent.slice().sort(function (a, b) { return a.min - b.min; });
+      var tem = orden[0], tar = orden[orden.length - 1];
+      pastillas([["users", "Todos"], ["calendar-days", "Mar 13 a hoy"], ["log-in", "Entradas"], ["clock", "Fuera de 8 a 20 h", "urgente"]], ent.length + " entradas");
+      listas.r = ent;
+      responder({
+        cara: '<span class="foto grande" style="color:var(--pino)">' + A.ico("clock", "i-xl") + "</span>",
+        frase: fuera.length ? fuera.length + " entradas fuera de horario." : "Nadie entró fuera de horario esta semana. <em>La más temprana fue de " + A.PERS[tem.quien].nombre + ", " + (tem.fecha === HOY ? "hoy" : "el " + A.diaLargo(tem.fecha).split(" de ")[0]) + " a las " + tem.hora + "</em>.",
+        pastilla: "0 fuera", tono: "logro",
+        graf: grafEntradas(ent),
+        hitos: hitoHtml(tem, "La primera") + hitoHtml(tar, "La última"),
+        pie: datos(["La semana", [["Entradas", ent.length], ["Con huella", ent.filter(function (a) { return /huella/i.test(a.det); }).length], ["Fuera de hora", 0, "logro"]]], '<button class="btn chico" style="margin-left:auto" data-lista="r">Ver las ' + ent.length + "<i class=\"i i-s\" data-i=\"chevron-right\"></i></button>")
+      });
+      return;
+    }
+    // Persona, día y tipo, por palabras
+    var q = /marcos/.test(t) ? "mb" : /carlos/.test(t) ? "ci" : /luc[ií]a/.test(t) ? "lf" : null;
+    var k = /ayer/.test(t) ? A.sumar(HOY, -1) : /s[áa]bado/.test(t) ? "2026-10-17" : /viernes/.test(t) ? "2026-10-16" : /semana/.test(t) ? "semana" : HOY;
+    var g = /anul/.test(t) ? "anulada" : /precio|margen/.test(t) ? "precios" : /stock/.test(t) ? "stock" : /vent|vend/.test(t) ? "venta" : /entr[óo]|entrada/.test(t) ? "entrada" : "todo";
+    var cerrado = k !== "semana" && A.cerrado(k);
+    var diaReal = cerrado ? A.sumar(k, -1) : k;
+    var L = A.filtrar(diaReal === "semana" ? A.rango(A.sumar(HOY, -6), HOY) : A.dia(diaReal), { quien: q || "todos", grupo: g });
+    var nombreDia = diaReal === "semana" ? "Mar 13 a hoy" : diaReal === HOY ? "Hoy" : A.diaCorto(diaReal);
+    pastillas([["users", q ? A.PERS[q].nombre : "Todos"], ["calendar-days", (cerrado ? "Ayer, cerrado → " : "") + nombreDia], g === "todo" ? [null, "Todo tipo", "contorno"] : ["list-filter", { anulada: "Anulaciones", precios: "Precios", stock: "Stock", venta: "Ventas", entrada: "Entradas" }[g]]], L.length + " acciones");
+    listas.r = L;
+    var ventas = L.filter(function (a) { return a.tipo === "venta"; }), suma = ventas.reduce(function (s, a) { return s + a.venta.total; }, 0);
+    var anul = L.filter(function (a) { return a.tipo === "anulada"; });
+    var raros = L.filter(function (a) { return A.TIPOS[a.tipo].tono; }).slice(0, 3);
+    var hitos = (raros.length ? raros : L.slice(0, 3)).map(function (a) { return hitoHtml(a); }).join("");
+    var quien = q ? A.PERS[q].nombre : "Entre todos";
+    var frase = !L.length ? "No encontré acciones con eso. Probá con otra persona o con otro día."
+      : (cerrado ? "Ayer el local estuvo cerrado. El sábado 17, " : diaReal === "semana" ? "En la semana, " : diaReal === HOY ? "Hoy, " : "El " + A.diaLargo(diaReal).split(" de ")[0] + ", ") +
+        (q ? A.PERS[q].nombre : "entre todos") + " hizo " + L.length + " acciones" + (ventas.length ? ": <em>vendió " + A.pesos(suma) + " en " + ventas.length + " ventas</em>" : "") + (anul.length ? " y anuló " + (anul.length === 1 ? "una" : anul.length) + "." : ".");
+    responder({
+      cara: q ? A.av(q, "xl") : '<span class="foto grande" style="color:var(--pino)">' + A.ico("users", "i-xl") + "</span>",
+      frase: frase.charAt(0).toUpperCase() + frase.slice(1),
+      pastilla: nombreDia, tono: "pino",
+      graf: L.length ? grafHoras(L) : "",
+      hitos: hitos,
+      pie: datos([quien === "Entre todos" ? "Ese día" : "Lo de " + quien, [["Acciones", L.length], ["Vendió", A.pesos(suma)], ["Anuladas", anul.length, anul.length ? "error" : ""]]], L.length ? '<button class="btn chico" style="margin-left:auto" data-lista="r">Ver las ' + L.length + '<i class="i i-s" data-i="chevron-right"></i></button>' : "")
+    });
+  }
+
+  // ---- lista entera, de a 10
+  function abrirLista(L, titulo) {
+    var pag = 1, np = Math.max(1, Math.ceil(L.length / 10));
+    var capa = A.abrir({ tipo: "dialogo", clase: "ancho", titulo: titulo, html:
+      '<div class="capa-tit"><span class="t-seccion">' + titulo + '</span><span class="t-detalle" data-cuenta></span><button class="btn chico btn-fantasma btn-icono" data-cerrar aria-label="Cerrar">' + A.ico("x", "i") + "</button></div>" +
+      '<div class="lista-acc"><div class="la cab"><span>Hora</span><span>Quién</span><span>Qué</span><span>Detalle</span></div><div data-filas></div></div>' +
+      '<div class="lista-pie"><span class="t-detalle" data-rango></span><div class="paginador"><button class="btn chico btn-icono" data-p="-1" aria-label="Anterior">' + A.ico("chevron-left") + '</button><span data-n style="font-weight:750;font-size:14px;padding:0 8px;white-space:nowrap">1 de 1</span><button class="btn chico" data-p="1">Siguiente' + A.ico("chevron-right") + "</button></div></div>" });
+    var filas = capa.el.querySelector("[data-filas]");
+    function pintar(dir) {
+      var html = L.slice((pag - 1) * 10, pag * 10).map(A.filaLista).join("") || '<div class="la"><span></span><span class="d" style="grid-column:2/-1">No hay acciones.</span></div>';
+      if (dir) A.pasarPagina(filas, html, dir > 0); else A.cambiarLista(filas, html);
+      capa.el.querySelector("[data-n]").textContent = pag + " de " + np;
+      capa.el.querySelector("[data-rango]").textContent = L.length ? ((pag - 1) * 10 + 1) + " a " + Math.min(L.length, pag * 10) + " de " + L.length : "";
+      capa.el.querySelector('[data-p="-1"]').disabled = pag === 1;
+      capa.el.querySelector('[data-p="1"]').disabled = pag === np;
+    }
+    capa.el.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-p]");
+      if (b && !b.disabled) { pag += +b.getAttribute("data-p"); pintar(+b.getAttribute("data-p")); return; }
+      var f = e.target.closest(".la[data-id]"); if (f) A.abrirDetalle(A.buscar(f.getAttribute("data-id")));
+    });
+    capa.el.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" && pag < np) { pag++; pintar(1); } else if (e.key === "ArrowLeft" && pag > 1) { pag--; pintar(-1); }
+    });
+    pintar();
+  }
+  $(".pregunta .btn").addEventListener("click", function () { abrirLista(hoy, "Todo lo de hoy, de la más nueva a la más vieja"); });
+
+  // ---- hitos, alertas, botones de la respuesta
+  document.addEventListener("click", function (e) {
+    if (e.target.closest(".capa")) return;
+    var l = e.target.closest("[data-lista]");
+    if (l) { var c = l.getAttribute("data-lista"); abrirLista(c === "tarugos" ? ventasTarugos : listas[c] || hoy, c === "tarugos" ? "Las 4 ventas de tarugos de la semana" : "Lo que encontré"); return; }
+    var h = e.target.closest(".hito[data-id], .alerta[data-id] .btn");
+    if (h) { var el = h.closest("[data-id]"); var a = A.buscar(el.getAttribute("data-id")); if (a) A.abrirDetalle(a); }
+  });
+  $("[data-parte]").addEventListener("click", function (e) {
+    var capa = A.abrir({ tipo: "menu", ancla: e.currentTarget, titulo: "Negocio", html:
+      '<a class="op" data-ir="resumen" data-cerrar tabindex="0">' + A.ico("chart-column", "i") + 'Resumen</a><a class="op" data-ir="usuarios" data-cerrar tabindex="0">' + A.ico("users", "i") + 'Usuarios</a><button class="op elegida" data-cerrar>' + A.ico("history", "i") + "Quién hizo qué<span class=\"fin\">" + A.ico("check") + "</span></button>" });
+    return capa;
+  });
+  $("[data-mas]").addEventListener("click", function (e) { A.menuMas(e.currentTarget); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && !A.hayCapa() && escrito.getAttribute("contenteditable") !== "true") { e.preventDefault(); escrito.textContent = ""; editar(); }
+  });
+})();
+</script>
 </body>
 </html>

@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../_propio/actividad.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_propio/interacciones.css">
+<script src="../../_propio/interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .celu-pestanas a { font-size: 14px; }
@@ -29,6 +32,12 @@
   .ac.rojo { box-shadow: inset 4px 0 0 var(--error), var(--sombra-1); border-color: #F0B8B1; }
   .pager { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
   .pager .t { text-align: center; font-weight: 750; font-size: 15px; }
+  .celu-pantalla { overflow-y: auto; scrollbar-width: none; padding-bottom: 12px; }
+  .celu-pantalla::-webkit-scrollbar { display: none; }
+  .res .resumen, .filtros .chip, .ac { cursor: pointer; }
+  .res .resumen.puesto { box-shadow: inset 0 0 0 2px var(--pino); }
+  .ac .h { text-align: right; }
+  .act-vacio { margin-top: 4px; }
   .pager .t small { display: block; font-size: 14px; color: var(--texto-2); font-weight: 600; }
 </style>
 </head>
@@ -37,7 +46,7 @@
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
-  <nav class="celu-pestanas"><a>Resumen</a><a>Usuarios</a><a class="activa">Quién hizo qué</a></nav>
+  <nav class="celu-pestanas"><a data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a class="activa">Quién hizo qué</a></nav>
   <div class="celu-pantalla">
     <div class="res">
       <div class="resumen"><div class="et">Hoy</div><div class="va">38</div></div>
@@ -61,13 +70,160 @@
     <div class="pager"><button class="btn" disabled><i class="i i-s" data-i="chevron-left"></i>Nuevas</button><span class="t">1 de 4<small>1 a 10</small></span><button class="btn">Anteriores<i class="i i-s" data-i="chevron-right"></i></button></div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo" data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script>
+/* Lo que se puede tocar: los tres números (filtran), los chips de día, quién y tipo (abren una hoja),
+   cada tarjeta (abre su detalle en una hoja), «Nuevas» y «Anteriores» (o deslizar la lista),
+   las pestañas, la barra de abajo y «Más». */
+(function () {
+  var A = ACT, $ = A.$, $$ = A.$$, HOY = A.HOY, POR_PAG = 10;
+  var est = { dia: "hoy", desde: A.sumar(HOY, -7), hasta: HOY, quien: "todos", grupo: "todo", pag: 1 };
+  var pantalla = $(".celu-pantalla"), hoy = A.dia(HOY);
+  var lista = document.createElement("div"); lista.className = "lista";
+  $$(".ac", pantalla).forEach(function (c, i) { c.setAttribute("data-id", hoy[i].id); lista.appendChild(c); });
+  pantalla.appendChild(lista);
+  var inicial = lista.innerHTML;
+  var tiles = $$(".res .resumen"), chips = $$(".filtros .chip"), totalB = $(".total b"), totalTxt = $(".total .t-detalle");
+  totalB.innerHTML = '<span class="num-t">38</span> acciones';
+  var pager = $(".pager"), bAnt = pager.querySelectorAll(".btn")[0], bSig = pager.querySelectorAll(".btn")[1], pagT = pager.querySelector(".t");
+
+  function delDia() {
+    if (est.dia === "hoy") return A.dia(HOY);
+    if (est.dia === "ayer") return A.dia(A.sumar(HOY, -1));
+    if (est.dia === "semana") return A.rango(A.sumar(HOY, -6), HOY);
+    return A.rango(est.desde, est.hasta);
+  }
+  function varios() { return est.dia === "semana" || (est.dia === "rango" && est.desde !== est.hasta); }
+  function lista_() { return A.filtrar(delDia(), { quien: est.quien, grupo: est.grupo }); }
+  function esInicial() { return est.dia === "hoy" && est.quien === "todos" && est.grupo === "todo" && est.pag === 1; }
+  function tarjeta(a) {
+    var t = A.TIPOS[a.tipo], p = A.PERS[a.quien];
+    var h = varios() ? A.diaCorto(a.fecha) + "<br>" + a.hora : a.hora;
+    return '<div class="ac' + (a.tipo === "anulada" ? " rojo" : "") + '" data-id="' + a.id + '"><span class="tipo-ico ' + t.tono + '">' + A.ico(t.ico, "i") + '</span><div style="min-width:0"><div class="q">' + a.corto +
+      '</div><div class="d">' + A.av(a.quien, "", true) + " " + p.nombre + " · " + a.sub + '</div></div><span class="h">' + h + "</span></div>";
+  }
+  function vacio() {
+    var tit, txt, boton = "";
+    if (est.dia === "ayer" && !delDia().length) { tit = "Ayer, domingo 18, estuvo cerrado"; txt = "No hubo ninguna acción."; boton = '<button class="btn chico" data-ver-dia="2026-10-17">Ver el sábado 17</button>'; }
+    else if (est.quien === "lf") { tit = "Lucía no hizo nada"; txt = "La desactivaron hoy a las 09:48. Su última acción fue el sábado 17 a las 18:52."; boton = '<button class="btn chico" data-ver-dia="2026-10-17">Ver su sábado</button>'; }
+    else if (est.quien === "si") { tit = "El sistema no hizo nada"; txt = "Aparece solo cuando hace algo que nadie hizo a mano."; }
+    else { tit = "No hay acciones con estos filtros"; txt = "Probá con otro día o con otra persona."; boton = '<button class="btn chico" data-limpiar>Sacar los filtros</button>'; }
+    return '<div class="act-vacio"><span class="foto-icono">' + A.ico("history", "i") + "</span><b>" + tit + "</b><span>" + txt + "</span>" + boton + "</div>";
+  }
+  var ultimo = 38;
+  function pintar(modo) {
+    var L = lista_(), np = Math.max(1, Math.ceil(L.length / POR_PAG));
+    if (est.pag > np) est.pag = np;
+    var pag = L.slice((est.pag - 1) * POR_PAG, est.pag * POR_PAG);
+    var html = esInicial() ? inicial : (pag.length ? pag.map(tarjeta).join("") : vacio());
+    if (modo === "sig" || modo === "ant") A.pasarPagina(lista, html, modo === "sig"); else A.cambiarLista(lista, html);
+    pantalla.scrollTop = 0;
+    A.rodar(totalB.querySelector(".num-t"), A.miles(L.length), L.length >= ultimo); ultimo = L.length;
+    totalTxt.textContent = varios() ? "por día, la más nueva primero" : "la más nueva primero";
+    bAnt.disabled = est.pag === 1; bSig.disabled = est.pag >= np;
+    pagT.innerHTML = est.pag + " de " + np + "<small>" + (L.length ? ((est.pag - 1) * POR_PAG + 1) + " a " + Math.min(L.length, est.pag * POR_PAG) : "nada") + "</small>";
+    if (modo === "filtro") A.fundir(pagT);
+    pintarArriba();
+  }
+  function pintarArriba() {
+    var d = A.filtrar(delDia(), { quien: est.quien });
+    var rot = { hoy: "Hoy", ayer: "Ayer", semana: "Semana", rango: "Días" }[est.dia];
+    tiles[0].querySelector(".et").textContent = rot;
+    A.rodar(tiles[0].querySelector(".va"), String(d.length), true);
+    A.rodar(tiles[1].querySelector(".va"), String(A.contar(d, "anulada")), true);
+    A.rodar(tiles[2].querySelector(".va"), String(A.contar(d, "revisar")), true);
+    tiles[1].classList.toggle("puesto", est.grupo === "anulada");
+    tiles[2].classList.toggle("puesto", est.grupo === "revisar");
+    var etDia = { hoy: "Hoy", ayer: "Ayer", semana: "Semana", rango: A.dmy(est.desde) + (est.desde !== est.hasta ? "–" + A.dmy(est.hasta) : "") }[est.dia];
+    chips[0].innerHTML = A.ico("calendar-days") + etDia + A.ico("chevron-down");
+    chips[1].innerHTML = A.ico("users") + (est.quien === "todos" ? "Todos" : A.PERS[est.quien].nombre) + A.ico("chevron-down");
+    chips[1].classList.toggle("elegido", est.quien !== "todos");
+    chips[2].innerHTML = A.ico("list-filter") + (est.grupo === "todo" ? "Todo tipo" : NOMBRE_G[est.grupo]) + A.ico("chevron-down");
+    chips[2].classList.toggle("elegido", est.grupo !== "todo");
+    chips.forEach(function (c) { A.pintar(c); });
+  }
+  var NOMBRE_G = { venta: "Ventas", anulada: "Anuladas", revisar: "A revisar", precios: "Precios", stock: "Stock", compra: "Compras", lista: "Listas", usuario: "Usuarios", entrada: "Entradas" };
+  function cambiar(c) { for (var k in c) est[k] = c[k]; est.pag = 1; pintar("filtro"); }
+
+  tiles.forEach(function (t, i) {
+    t.setAttribute("role", "button"); t.tabIndex = 0;
+    t.addEventListener("click", function () {
+      var g = ["todo", "anulada", "revisar"][i];
+      cambiar({ grupo: est.grupo === g ? "todo" : g }); A.rebotar(t); A.vibrar(10);
+    });
+  });
+  chips[0].addEventListener("click", function () {
+    A.elegir(chips[0], "Día", [
+      { v: "hoy", html: A.ico("calendar-days", "i") + "Hoy", fin: "lun 19" },
+      { v: "ayer", html: A.ico("calendar-days", "i") + "Ayer", fin: "dom 18 · cerrado" },
+      { v: "semana", html: A.ico("calendar-range", "i") + "Esta semana", fin: "13 al 19" },
+      { v: "rango", html: A.ico("calendar-range", "i") + "Elegir fechas…" }
+    ], est.dia, function (v) {
+      if (v !== "rango") { cambiar({ dia: v }); return; }
+      setTimeout(function () {
+        var capa = A.abrir({ tipo: "hoja", titulo: "Elegir fechas", html: '<div class="capa-tit"><span class="t-seccion">Elegir fechas</span></div><div class="rango">' +
+          '<label>Desde<input type="date" value="' + est.desde + '" max="' + HOY + '" data-desde></label><label>Hasta<input type="date" value="' + est.hasta + '" max="' + HOY + '" data-hasta></label></div>' +
+          '<div class="capa-pie"><button class="btn btn-fantasma" data-cerrar>Cancelar</button><button class="btn btn-oscuro" data-aplicar>Aplicar</button></div>' });
+        capa.el.querySelector("[data-aplicar]").addEventListener("click", function () {
+          var d = capa.el.querySelector("[data-desde]").value || est.desde, h = capa.el.querySelector("[data-hasta]").value || est.hasta;
+          capa.cerrar(); cambiar({ dia: "rango", desde: d < h ? d : h, hasta: d < h ? h : d });
+        });
+      }, 120);
+    });
+  });
+  chips[1].addEventListener("click", function () {
+    var d = delDia(), n = function (q) { return d.filter(function (a) { return a.quien === q; }).length + ""; };
+    A.elegir(chips[1], "Quién", [
+      { v: "todos", html: A.ico("users", "i") + "Todos", fin: d.length + "" },
+      { v: "mb", html: A.av("mb") + "Marcos Benítez", fin: n("mb") },
+      { v: "ci", html: A.av("ci") + "Carlos Illobre", fin: n("ci") },
+      { v: "lf", html: A.av("lf") + "Lucía Ferreyra", fin: '<span class="pastilla" style="height:24px">Desactivada</span>', apagada: true },
+      { v: "si", html: A.av("si") + "El sistema", apagada: true }
+    ], est.quien, function (v) { cambiar({ quien: v }); });
+  });
+  chips[2].addEventListener("click", function () {
+    var d = A.filtrar(delDia(), { quien: est.quien });
+    A.elegir(chips[2], "Tipo", [["todo", "Todo tipo", "list-filter"], ["venta", "Ventas cobradas", "shopping-cart"], ["anulada", "Ventas anuladas", "ban"], ["precios", "Precios y márgenes", "percent"], ["stock", "Ajustes de stock", "package"], ["compra", "Compras", "truck"], ["lista", "Listas", "file-text"], ["usuario", "Usuarios", "user-x"], ["entrada", "Entradas", "log-in"]].map(function (g) {
+      return { v: g[0], html: A.ico(g[2], "i") + g[1], fin: (g[0] === "todo" ? d.length : A.contar(d, g[0])) + "" };
+    }), est.grupo, function (v) { cambiar({ grupo: v }); });
+  });
+  lista.addEventListener("click", function (e) {
+    var v = e.target.closest("[data-ver-dia]");
+    if (v) { var k = v.getAttribute("data-ver-dia"); cambiar({ dia: "rango", desde: k, hasta: k }); return; }
+    if (e.target.closest("[data-limpiar]")) { cambiar({ dia: "hoy", quien: "todos", grupo: "todo" }); return; }
+    var c = e.target.closest(".ac[data-id]"); if (!c) return;
+    var a = A.buscar(c.getAttribute("data-id")), p = A.PERS[a.quien];
+    var capa = A.abrirDetalle(a, '<button class="btn chico btn-suave" data-persona="' + a.quien + '" data-fecha="' + a.fecha + '" data-cerrar>Lo de ' + p.nombre + (a.fecha === HOY ? " hoy" : " ese día") + "</button>");
+    capa.el.addEventListener("click", function (e2) {
+      var b = e2.target.closest("[data-persona]"); if (!b) return;
+      var k = b.getAttribute("data-fecha");
+      cambiar(k === HOY ? { quien: a.quien, dia: "hoy", grupo: "todo" } : { quien: a.quien, dia: "rango", desde: k, hasta: k, grupo: "todo" });
+    });
+  });
+  function ir(d) {
+    var np = Math.max(1, Math.ceil(lista_().length / POR_PAG)), p = est.pag + d;
+    if (p < 1 || p > np) return;
+    est.pag = p; A.vibrar(10); pintar(d > 0 ? "sig" : "ant");
+  }
+  bAnt.addEventListener("click", function () { ir(-1); });
+  bSig.addEventListener("click", function () { ir(1); });
+  // Deslizar la lista a los costados también pasa de página
+  var x0 = null, y0 = null;
+  pantalla.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  pantalla.addEventListener("touchend", function (e) {
+    if (x0 == null) return;
+    var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) ir(dx < 0 ? 1 : -1);
+  });
+  $("[data-mas]").addEventListener("click", function (e) { e.preventDefault(); A.menuMas(e.currentTarget); });
+})();
+</script>
 </body>
 </html>

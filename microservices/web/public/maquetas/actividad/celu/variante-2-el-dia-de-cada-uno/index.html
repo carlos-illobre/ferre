@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../_propio/actividad.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_propio/interacciones.css">
+<script src="../../_propio/interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .celu-pestanas a { font-size: 14px; }
@@ -38,6 +41,19 @@
   .it .d { font-size: 14px; color: var(--texto-2); line-height: 19px; }
   .it .m { font-weight: 800; font-size: 15px; white-space: nowrap; }
   .it.paq { background: var(--hundido); border-style: dashed; border-color: var(--borde-fuerte); box-shadow: none; }
+  .celu-pantalla { overflow-y: auto; scrollbar-width: none; padding-bottom: 16px; touch-action: pan-y; }
+  .celu-pantalla::-webkit-scrollbar { display: none; }
+  .p, .dias span, .it { cursor: pointer; }
+  .dias span.cer { cursor: default; }
+  .p .av { transition: box-shadow 0s; }
+  .p.elegido .av::after { content: ""; position: absolute; inset: -5px; border-radius: 99px; border: 2px solid var(--pino); animation: anillo 200ms var(--curva) both; pointer-events: none; }
+  .p.elegido .av { box-shadow: 0 0 0 3px var(--fondo); }
+  @keyframes anillo { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+  .p .av .n { z-index: 1; }
+  .it.hijo { margin-left: 14px; }
+  .it .d .av { width: 20px; height: 20px; font-size: 14px; vertical-align: -5px; margin-right: 2px; }
+  .linea .act-vacio { margin-left: -58px; }
+  .linea.vacia::before { display: none; }
 </style>
 </head>
 <body>
@@ -45,7 +61,7 @@
   <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
   <div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
   <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
-  <nav class="celu-pestanas"><a>Resumen</a><a>Usuarios</a><a class="activa">Quién hizo qué</a></nav>
+  <nav class="celu-pestanas"><a data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a class="activa">Quién hizo qué</a></nav>
   <div class="celu-pantalla">
     <div class="gente">
       <div class="p"><span class="av si"><i class="i i-l" data-i="users"></i><span class="n">38</span></span>Todos</div>
@@ -65,13 +81,177 @@
     </div>
   </div>
   <nav class="nav-inferior">
-    <a><i class="i" data-i="shopping-cart"></i>Vender</a>
-    <a><i class="i" data-i="tags"></i>Catálogo</a>
-    <a><i class="i" data-i="package"></i>Depósito</a>
-    <a class="activo"><i class="i" data-i="chart-column"></i>Negocio</a>
-    <a><i class="i" data-i="menu"></i>Más</a>
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a class="activo" data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-mas><i class="i" data-i="menu"></i>Más</a>
   </nav>
   <span class="home-ind"></span>
 </div>
+<script>
+/* Lo que se puede tocar: las caras (cambia de persona), los días (o deslizar la línea de tiempo a los
+   costados), lo que dice la frase del día («vendió…», «anuló…», «cambió… precios»: deja solo ese tipo;
+   la pastilla con × lo saca), el paquete de ventas (se abre), cada acción (abre su detalle en una hoja),
+   «Más viejas» y «Más nuevas» al pie (de a 10), las pestañas, la barra de abajo y «Más». */
+(function () {
+  var A = ACT, $ = A.$, $$ = A.$$, HOY = A.HOY;
+  var est = { quien: "mb", dia: HOY, grupo: "todo", pag: 1 }, POR_PAG = 10;
+  var gente = $$(".gente .p"), QUIENES = ["todos", "mb", "ci", "lf", "si"];
+  var diasEl = $$(".dias span"), DIAS = ["2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", HOY];
+  var frase = $(".frase"), linea = $(".linea"), pantalla = $(".celu-pantalla");
+  var hoy = A.dia(HOY), paqs = {}, nPaq = 0;
+  // Lo ya dibujado apunta a sus datos
+  var mapa = { "10:41": hoy[0], "10:30": hoy[2], "10:22": hoy[3], "09:31": hoy[7] };
+  $$(".it", linea).forEach(function (it) {
+    var h = it.querySelector(".h").textContent;
+    if (it.classList.contains("paq")) {
+      paqs.p0 = A.registrar(A.ventasSueltas("c2-mb", HOY, "mb", 20, 9 * 60 + 12, 10 * 60 + 20, 318000, { efectivo: 12, mp: 6, tarjeta: 2 }, 407));
+      it.setAttribute("data-paq", "p0"); it.setAttribute("aria-expanded", "false");
+    } else if (mapa[h]) it.setAttribute("data-id", mapa[h].id);
+  });
+  var bs = $$("b", frase); if (bs[1]) bs[1].setAttribute("data-filtro-tipo", "venta"); if (bs[2]) bs[2].setAttribute("data-filtro-tipo", "anulada");
+  var inicialLinea = linea.innerHTML, inicialFrase = frase.innerHTML;
+  // El filtro de tipo puesto (arriba de la línea) y las páginas (al pie)
+  var filtroEl = document.createElement("div"); filtroEl.className = "act-filtro"; filtroEl.style.display = "none";
+  linea.parentNode.insertBefore(filtroEl, linea);
+  var pagerEl = document.createElement("div"); pagerEl.className = "act-pager"; pagerEl.style.display = "none";
+  pagerEl.innerHTML = '<button class="btn chico" data-p="-1">' + A.ico("chevron-left") + 'Más nuevas</button><span class="t"></span><button class="btn chico" data-p="1">Más viejas' + A.ico("chevron-right") + "</button>";
+  linea.parentNode.insertBefore(pagerEl, linea.nextSibling); A.pintar(pagerEl);
+  var NOMBRE_G = { venta: "Solo ventas", anulada: "Solo anuladas", precios: "Solo precios y márgenes", stock: "Solo stock" };
+  gente.forEach(function (p, i) { p.setAttribute("role", "button"); p.tabIndex = 0; p.setAttribute("data-q", QUIENES[i]); });
+  diasEl.forEach(function (d, i) { d.setAttribute("data-dia", DIAS[i]); if (!d.classList.contains("cer")) { d.setAttribute("role", "button"); d.tabIndex = 0; } });
+
+  function delDiaTodo() { var L = A.dia(est.dia); return est.quien === "todos" ? L : L.filter(function (a) { return a.quien === est.quien; }); }
+  function delDia() { return A.filtrar(delDiaTodo(), { grupo: est.grupo }); }
+  function itHtml(x, hijo) {
+    if (x.paquete) {
+      var k = "p" + (++nPaq); paqs[k] = x.items;
+      return '<div class="it paq" data-paq="' + k + '" aria-expanded="false"><span class="h">' + x.hasta + '</span><div><div class="q">' + x.q + '</div><div class="d">desde las ' + x.desde + '</div></div><span class="m">' + x.monto + "</span></div>";
+    }
+    var t = A.TIPOS[x.tipo], rojo = x.tipo === "anulada";
+    var cls = rojo ? " rojo" : t.tono === "urgente" ? " amb" : "";
+    var quien = est.quien === "todos" ? A.av(x.quien, "", true) + " " : "";
+    return '<div class="it' + cls + (hijo ? " hijo" : "") + '" data-id="' + x.id + '"' + (rojo ? ' style="border-color:#F0B8B1"' : "") + '><span class="h">' + x.hora + '</span><div style="min-width:0"><div class="q"' + (rojo ? ' style="color:var(--error-texto)"' : "") + ">" + x.c2q +
+      '</div><div class="d">' + quien + x.d2 + '</div></div><span class="m"' + (rojo ? ' style="color:var(--error-texto)"' : "") + ">" + x.monto + "</span></div>";
+  }
+  function fraseHtml(L) {
+    var ventas = L.filter(function (a) { return a.tipo === "venta"; }), suma = ventas.reduce(function (s, a) { return s + a.venta.total; }, 0);
+    var anul = L.filter(function (a) { return a.tipo === "anulada"; }).length, cambios = L.filter(function (a) { return a.tipo === "margen" || a.tipo === "precio"; }).length;
+    var ent = L.filter(function (a) { return a.tipo === "entrada"; }), primera = ent.length ? ent[ent.length - 1].hora : L[L.length - 1].hora;
+    var cuando = est.dia === HOY ? "" : " el " + A.diaLargo(est.dia).split(" de ")[0] + ",";
+    if (est.quien === "todos") return "<b>Entre todos</b>" + cuando + " hicieron " + L.length + ' acciones: <b data-filtro-tipo="venta">vendieron ' + A.pesos(suma) + "</b>" + (anul ? ' y <b data-filtro-tipo="anulada" style="color:var(--error-texto)">anularon ' + (anul === 1 ? "una" : anul) + "</b>." : ".");
+    var partes = ["<b>" + A.PERS[est.quien].nombre + "</b>" + cuando + " entró a las " + primera];
+    if (ventas.length) partes.push('<b data-filtro-tipo="venta">vendió ' + A.pesos(suma) + "</b> en " + ventas.length + " ventas");
+    if (cambios) partes.push('<span data-filtro-tipo="precios">cambió ' + cambios + (cambios === 1 ? " precio" : " precios") + "</span>");
+    var txt = partes.join(", ");
+    return txt + (anul ? ' y <b data-filtro-tipo="anulada" style="color:var(--error-texto)">anuló ' + (anul === 1 ? "una" : anul) + "</b>." : ".");
+  }
+  function vacio() {
+    var tit, txt, boton = "";
+    if (A.cerrado(est.dia)) { tit = "El domingo estuvo cerrado"; txt = "No hubo ninguna acción. Deslizá para ver otro día."; }
+    else if (est.quien === "lf") { tit = "Lucía no hizo nada " + (est.dia === HOY ? "hoy" : "este día"); txt = est.dia >= HOY ? "La desactivó Carlos hoy a las 09:48. Su última acción fue el sábado 17 a las 18:52." : "No trabajó este día."; if (est.dia !== "2026-10-17") boton = '<button class="btn chico" data-ver-dia="2026-10-17">Ver su sábado</button>'; }
+    else if (est.quien === "si") { tit = "El sistema no hizo nada"; txt = "Aparece solo cuando hace algo que nadie hizo a mano, como el alta del primer Administrador."; }
+    else { tit = A.PERS[est.quien].nombre + " no trabajó este día"; txt = "Elegí otro día o a otra persona."; }
+    return '<div class="act-vacio"><span class="foto-icono">' + A.ico("history", "i") + "</span><b>" + tit + "</b><span>" + txt + "</span>" + boton + "</div>";
+  }
+  function pintarGente() {
+    var L = A.dia(est.dia);
+    gente.forEach(function (p, i) {
+      var q = QUIENES[i], n = q === "todos" ? L.length : L.filter(function (a) { return a.quien === q; }).length;
+      var av = p.querySelector(".av"), badge = av.querySelector(".n");
+      if (n && !badge) { badge = document.createElement("span"); badge.className = "n"; av.appendChild(badge); }
+      if (badge) { if (n) badge.textContent = n; else badge.remove(); }
+      p.classList.toggle("apagado", !n && q !== "todos");
+      p.classList.toggle("elegido", q === est.quien);
+    });
+    diasEl.forEach(function (d) { d.classList.toggle("el", d.getAttribute("data-dia") === est.dia); });
+  }
+  function pagina(L) {
+    var X = A.agrupar(L), np = Math.max(1, Math.ceil(X.length / POR_PAG));
+    if (est.pag > np) est.pag = np;
+    pagerEl.style.display = np > 1 ? "" : "none";
+    pagerEl.querySelector(".t").innerHTML = est.pag + " de " + np + "<small>" + X.length + " en la línea</small>";
+    pagerEl.querySelector('[data-p="-1"]').disabled = est.pag === 1;
+    pagerEl.querySelector('[data-p="1"]').disabled = est.pag >= np;
+    return X.slice((est.pag - 1) * POR_PAG, est.pag * POR_PAG).map(function (x) { return itHtml(x); }).join("");
+  }
+  function pintarFiltro() {
+    filtroEl.style.display = est.grupo === "todo" ? "none" : "";
+    if (est.grupo !== "todo") { filtroEl.innerHTML = '<span class="chip elegido" role="button" tabindex="0" data-sacar>' + A.ico("list-filter") + NOMBRE_G[est.grupo] + A.ico("x") + "</span>"; A.pintar(filtroEl); A.rebotar(filtroEl.firstChild); }
+  }
+  function pintar(dir) {
+    var html, fr, sinNada = false;
+    if (est.quien === "mb" && est.dia === HOY && est.grupo === "todo") { html = inicialLinea; fr = inicialFrase; pagerEl.style.display = "none"; }
+    else {
+      var T = delDiaTodo(), L = delDia();
+      html = L.length ? pagina(L) : (T.length ? '<div class="act-vacio"><span class="foto-icono">' + A.ico("list-filter", "i") + "</span><b>Nada de este tipo</b><span>Ese día no hubo de esto.</span></div>" : vacio());
+      if (!L.length) { pagerEl.style.display = "none"; sinNada = true; }
+      fr = T.length ? fraseHtml(T) : "";
+    }
+    linea.classList.toggle("vacia", !fr || sinNada);
+    frase.innerHTML = fr; frase.style.display = fr ? "" : "none"; A.fundir(frase);
+    if (dir) A.pasarPagina(linea, html, dir > 0); else A.cambiarLista(linea, html);
+    pantalla.scrollTop = 0;
+    pintarGente();
+  }
+  function irDia(k, dir) {
+    if (!k || k === est.dia) return;
+    est.dia = k; est.pag = 1; pintar(dir);
+    var d = $('.dias [data-dia="' + k + '"]'); if (d) A.rebotar(d);
+  }
+  gente.forEach(function (p) {
+    p.addEventListener("click", function () {
+      var q = p.getAttribute("data-q"); if (q === est.quien) return;
+      est.quien = q; est.pag = 1; A.vibrar(10); pintar();
+    });
+  });
+  diasEl.forEach(function (d) {
+    d.addEventListener("click", function () {
+      var k = d.getAttribute("data-dia"), dir = DIAS.indexOf(k) > DIAS.indexOf(est.dia) ? 1 : -1;
+      irDia(k, dir);
+    });
+  });
+  function ponerTipo(g) { est.grupo = est.grupo === g ? "todo" : g; est.pag = 1; A.vibrar(10); pintarFiltro(); pintar(); }
+  frase.addEventListener("click", function (e) { var t = e.target.closest("[data-filtro-tipo]"); if (t) ponerTipo(t.getAttribute("data-filtro-tipo")); });
+  filtroEl.addEventListener("click", function (e) { if (e.target.closest("[data-sacar]")) ponerTipo("todo"); });
+  pagerEl.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-p]"); if (!b || b.disabled) return;
+    est.pag += +b.getAttribute("data-p"); A.vibrar(10);
+    var L = delDia(); A.pasarPagina(linea, pagina(L), +b.getAttribute("data-p") > 0); pantalla.scrollTop = 0;
+  });
+  linea.addEventListener("click", function (e) {
+    var v = e.target.closest("[data-ver-dia]");
+    if (v) { irDia(v.getAttribute("data-ver-dia"), -1); return; }
+    var p = e.target.closest(".it.paq");
+    if (p) {
+      var abierto = p.getAttribute("aria-expanded") === "true";
+      if (abierto) { var n = p.nextElementSibling; while (n && n.classList.contains("hijo")) { var x = n.nextElementSibling; n.remove(); n = x; } }
+      else {
+        var tmp = document.createElement("div");
+        tmp.innerHTML = paqs[p.getAttribute("data-paq")].map(function (a) { return itHtml(a, true); }).join("");
+        A.pintar(tmp);
+        var ref = p.nextSibling, i = 0;
+        while (tmp.firstChild) { var h = tmp.firstChild; h.style.setProperty("--d", Math.min(i++, 20) * 20 + "ms"); h.classList.add("act-estira"); linea.insertBefore(h, ref); }
+      }
+      p.setAttribute("aria-expanded", String(!abierto)); A.vibrar(10);
+      return;
+    }
+    var it = e.target.closest(".it[data-id]");
+    if (it) A.abrirDetalle(A.buscar(it.getAttribute("data-id")));
+  });
+  // Deslizar la línea de tiempo cambia de día
+  var x0 = null, y0 = null;
+  pantalla.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  pantalla.addEventListener("touchend", function (e) {
+    if (x0 == null) return;
+    var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    var i = DIAS.indexOf(est.dia) + (dx < 0 ? 1 : -1);
+    if (i >= 0 && i < DIAS.length) irDia(DIAS[i], dx < 0 ? 1 : -1);
+  });
+  $("[data-mas]").addEventListener("click", function (e) { e.preventDefault(); A.menuMas(e.currentTarget); });
+})();
+</script>
 </body>
 </html>

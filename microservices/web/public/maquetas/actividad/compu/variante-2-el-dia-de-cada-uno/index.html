@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../_propio/actividad.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_propio/interacciones.css">
+<script src="../../_propio/interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
   .semana { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)) 44px; gap: 8px; }
@@ -49,17 +52,32 @@
   .vacio + .vacio { margin-top: 12px; }
   .respuesta { padding: 14px 16px; border-radius: 16px; background: var(--pino-suave); color: var(--pino-texto); font-size: 15px; font-weight: 600; line-height: 22px; margin-top: 12px; }
   .respuesta b { color: var(--pino); }
+  .carril { overflow-y: auto; scrollbar-width: none; padding: 0 3px 4px; margin: 0 -3px; }
+  .dia, .chip, .ev { cursor: pointer; }
+  .dia.cerrado { cursor: default; }
+  .ev:not(.paquete):hover { border-color: var(--borde-fuerte); }
+  .ev.hijo { margin-left: 20px; }
+  .ev .mn .gira { color: var(--texto-3); }
+  .semana .flechas { display: grid; gap: 4px; }
+  .semana .flechas .btn { min-height: 0; height: 100%; }
+  .carriles .lista-acc { grid-column: 1 / -1; background: var(--superficie); box-shadow: var(--sombra-1); overflow-y: auto; scrollbar-width: none; }
+  .carriles > .act-vacio { grid-column: 1 / -1; align-self: start; }
+  .carril-cab[data-persona], .vacio[data-persona] { cursor: pointer; border-radius: 12px; }
+  .carril-cab[data-persona]:hover .t-renglon { color: var(--pino); }
+  .carril.solo { grid-column: 1 / span 2; }
+  .carriles .lista-wrap { grid-column: 1 / -1; display: flex; flex-direction: column; min-height: 0; }
+  .lista-acc .la .p { cursor: pointer; }
 </style>
 </head>
 <body>
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
@@ -71,7 +89,7 @@
       <div class="t-titulo">Negocio</div>
       <div class="acciones"><button class="btn chico btn-fantasma"><i class="i i-s" data-i="list-filter"></i>Ver como lista <span class="kbd">L</span></button><button class="btn chico"><i class="i i-s" data-i="calendar-range"></i>Otro rango <span class="kbd">F</span></button></div>
     </header>
-    <nav class="pestanas"><a>Resumen</a><a>Usuarios</a><a class="activa">Quién hizo qué</a></nav>
+    <nav class="pestanas"><a data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a class="activa">Quién hizo qué</a></nav>
     <section class="pantalla">
       <div class="semana">
         <div class="dia"><span class="d">Mar 13</span><span class="n">41</span><span class="mini"><b class="c" style="height:9px"></b><b class="m" style="height:20px"></b></span></div>
@@ -81,7 +99,7 @@
         <div class="dia"><span class="d">Sáb 17<span class="rojo"></span></span><span class="n">58</span><span class="mini"><b class="c" style="height:6px"></b><b class="m" style="height:26px"></b></span></div>
         <div class="dia cerrado"><span class="d">Dom 18</span><span class="n">Cerrado</span></div>
         <div class="dia elegido"><span class="d">Hoy<span class="rojo"></span></span><span class="n">38</span><span class="mini"><b class="c" style="height:10px"></b><b class="m" style="height:22px"></b></span></div>
-        <button class="btn btn-icono" style="height:100%;flex-direction:column;gap:2px"><i class="i i-s" data-i="chevron-left"></i><span class="kbd">←</span></button>
+        <button class="btn btn-icono" style="height:100%;flex-direction:column;gap:2px" data-semana="-1" aria-label="Semana anterior"><i class="i i-s" data-i="chevron-left"></i><span class="kbd">←</span></button>
       </div>
       <div class="barra-tipos">
         <span class="chip elegido">Todo <span class="c">38</span></span>
@@ -115,12 +133,296 @@
 
         <div class="carril">
           <div class="carril-cab"><span class="t-etiqueta" style="padding:10px 0 4px">Sin acciones hoy</span></div>
-          <div class="vacio"><div style="display:flex;gap:10px;align-items:center"><span class="av l lf">LF</span><div><div class="t-renglon" style="color:var(--texto-2)">Lucía Ferreyra</div><span class="pastilla" style="height:24px">Desactivada hoy</span></div></div><span class="t-detalle">Última acción: sáb 17, 18:52</span><button class="btn chico btn-suave">Ver su sábado</button></div>
+          <div class="vacio"><div style="display:flex;gap:10px;align-items:center"><span class="av l lf">LF</span><div><div class="t-renglon" style="color:var(--texto-2)">Lucía Ferreyra</div><span class="pastilla" style="height:24px">Desactivada hoy</span></div></div><span class="t-detalle">Última acción: sáb 17, 18:52</span><button class="btn chico btn-suave" data-ver-dia="2026-10-17">Ver su sábado</button></div>
           <div class="vacio"><div style="display:flex;gap:10px;align-items:center"><span class="av l si"><i class="i" data-i="user-cog"></i></span><div class="t-renglon" style="color:var(--texto-2)">El sistema</div></div><span class="t-detalle">Lo que nadie hizo a mano: el alta del primer Administrador.</span></div>
         </div>
       </div>
     </section>
   </main>
 </div>
+<script>
+/* Lo que se puede tocar: los días de la semana (y ← → para la semana anterior), los chips de tipo,
+   la cabecera de cada persona (deja solo su día; «Ver a todos» vuelve), los paquetes (se abren),
+   cada acción (abre su detalle), «Ver como lista» (de a 10, con páginas; tocar a alguien lo filtra),
+   «Otro rango», «Ver su sábado», «Más» y el teclado (← → días, o páginas en la lista; L lista, F rango). */
+(function () {
+  var A = ACT, $ = A.$, $$ = A.$$, HOY = A.HOY;
+  var est = { semana: 0, dia: HOY, grupo: "todo", vista: "carriles", quien: "todos", pag: 1 }, POR_PAG = 10;
+  var semanaEl = $(".semana"), carriles = $(".carriles"), chips = $$(".barra-tipos .chip");
+  var GRUPO_CHIP = ["todo", "venta", "precios2", "stockcompras", "anulada", "gente"];
+  var bLista = $$(".cabecera .acciones .btn")[0], bRango = $$(".cabecera .acciones .btn")[1];
+  var hoy = A.dia(HOY), paqs = {}, nPaq = 0;
+
+  // Lo que ya está dibujado: cada acción y cada paquete apuntan a sus datos.
+  function buscarHoy(q, h) { for (var i = 0; i < hoy.length; i++) if (hoy[i].quien === q && hoy[i].hora === h) return hoy[i]; }
+  $$(".carril", carriles).forEach(function (c, ci) {
+    var q = ci === 0 ? "mb" : "ci";
+    var cab = c.querySelector(".carril-cab"); if (cab && ci < 2) marcarCab(cab, q);
+    $$(".ev", c).forEach(function (ev) {
+      var h = ev.querySelector(".h").innerHTML.split("<br>");
+      if (ev.classList.contains("paquete")) {
+        var k = "p" + (++nPaq), items;
+        if (q === "mb") items = A.registrar(A.ventasSueltas("c2-mb", HOY, "mb", 20, 9 * 60 + 12, 10 * 60 + 20, 318000, { efectivo: 12, mp: 6, tarjeta: 2 }, 407));
+        else if (/márgenes/.test(ev.textContent)) items = hoy.filter(function (a) { return a.quien === "ci" && a.tipo === "margen" && a !== hoy[1]; });
+        else items = hoy.filter(function (a) { return a.quien === "ci" && (a.tipo === "entrada" || a.tipo === "venta"); });
+        paqs[k] = items; ev.setAttribute("data-paq", k); ev.setAttribute("role", "button"); ev.setAttribute("aria-expanded", "false");
+        var chev = ev.querySelector(".mn svg, .mn i[data-i]"); if (chev) chev.classList.add("gira");
+      } else {
+        var a = buscarHoy(q, h[0]); if (a) ev.setAttribute("data-id", a.id);
+      }
+    });
+  });
+  var inicial = carriles.innerHTML;
+  function marcarCab(cab, q) { cab.setAttribute("data-persona", q); cab.setAttribute("role", "button"); cab.tabIndex = 0; cab.title = "Ver solo a " + A.PERS[q].nombre; }
+
+  function esInicial() { return est.dia === HOY && est.grupo === "todo" && est.vista === "carriles" && est.quien === "todos"; }
+  function delDia() { return A.filtrar(A.dia(est.dia), { grupo: est.grupo, quien: est.quien }); }
+  function diasSemana() { var fin = A.sumar(HOY, 7 * est.semana), L = []; for (var i = 6; i >= 0; i--) L.push(A.sumar(fin, -i)); return L; }
+
+  // ---- la semana
+  function pintarSemana() {
+    var html = diasSemana().map(function (k) {
+      var L = A.dia(k), m = L.filter(function (a) { return a.quien === "mb"; }).length, c = L.length - m;
+      var rojo = L.some(function (a) { return a.tipo === "anulada"; }) ? '<span class="rojo"></span>' : "";
+      if (A.cerrado(k)) return '<div class="dia cerrado" data-dia="' + k + '"><span class="d">' + A.diaCorto(k) + '</span><span class="n">Cerrado</span></div>';
+      return '<div class="dia' + (k === est.dia ? " elegido" : "") + '" data-dia="' + k + '" role="button" tabindex="0"><span class="d">' + A.diaCorto(k) + rojo + '</span><span class="n">' + L.length +
+        '</span><span class="mini"><b class="c" style="height:' + Math.max(4, Math.round(c / 1.5)) + 'px"></b><b class="m" style="height:' + Math.min(26, Math.max(4, Math.round(m / 1.5))) + 'px"></b></span></div>';
+    }).join("");
+    var flechas = est.semana < 0
+      ? '<div class="flechas"><button class="btn btn-icono" data-semana="-1" aria-label="Semana anterior">' + A.ico("chevron-left") + '</button><button class="btn btn-icono" data-semana="1" aria-label="Semana siguiente">' + A.ico("chevron-right") + "</button></div>"
+      : '<button class="btn btn-icono" style="height:100%;flex-direction:column;gap:2px" data-semana="-1" aria-label="Semana anterior">' + A.ico("chevron-left") + '<span class="kbd">←</span></button>';
+    semanaEl.innerHTML = html + flechas;
+    A.pintar(semanaEl);
+  }
+  function marcarDia() { $$(".dia", semanaEl).forEach(function (d) { d.classList.toggle("elegido", d.getAttribute("data-dia") === est.dia); }); }
+
+  // ---- chips de tipo
+  var barraTipos = $(".barra-tipos"), chipQuien = null;
+  function pintarChips() {
+    var L = A.filtrar(A.dia(est.dia), { quien: est.quien });
+    if (est.quien !== "todos") {
+      if (!chipQuien) { chipQuien = document.createElement("span"); chipQuien.className = "chip elegido act-entra"; chipQuien.setAttribute("role", "button"); chipQuien.tabIndex = 0; chipQuien.setAttribute("data-todos", ""); chipQuien.style.marginLeft = "auto"; barraTipos.appendChild(chipQuien); }
+      chipQuien.innerHTML = A.av(est.quien).replace('class="av', 'style="width:24px;height:24px;font-size:12px" class="av') + "Solo " + A.PERS[est.quien].nombre + A.ico("x");
+      A.pintar(chipQuien);
+    } else if (chipQuien) { chipQuien.remove(); chipQuien = null; }
+    chips.forEach(function (c, i) {
+      var g = GRUPO_CHIP[i], n = g === "todo" ? L.length : A.contar(L, g);
+      c.querySelector(".c").textContent = n;
+      c.classList.toggle("elegido", est.grupo === g);
+    });
+  }
+
+  // ---- los carriles
+  function evHtml(x, hijo) {
+    if (x.paquete) {
+      var k = "p" + (++nPaq); paqs[k] = x.items;
+      var t = A.TIPOS[x.tipo];
+      return '<div class="ev paquete" data-paq="' + k + '" role="button" aria-expanded="false"><span class="h">' + x.hasta + "<br>" + x.desde + '</span><span class="tipo-ico ' + t.tono + '">' + A.ico(t.ico) + '</span><div><div class="q">' + x.q + '</div><div class="dt">' + x.d +
+        '</div></div><span class="mn">' + x.monto + ' <i class="i i-s gira" data-i="chevron-down"></i></span></div>';
+    }
+    var t2 = A.TIPOS[x.tipo];
+    return '<div class="ev' + (x.tipo === "anulada" ? " rojo" : "") + (hijo ? " hijo" : "") + '" data-id="' + x.id + '"><span class="h">' + x.hora + '</span><span class="tipo-ico ' + t2.tono + '">' + A.ico(x.icoEntrada || t2.ico) +
+      '</span><div><div class="q">' + x.q2 + '</div><div class="dt">' + x.d2 + '</div></div><span class="mn"' + (x.montoTono ? ' style="color:var(--error-texto)"' : "") + ">" + x.monto + "</span></div>";
+  }
+  function reparto(L) {
+    var n = L.length || 1, v = 0, u = 0, r = 0;
+    L.forEach(function (a) { if (a.tipo === "venta") v++; else if (A.TIPOS[a.tipo].tono === "urgente") u++; else if (a.tipo === "anulada") r++; });
+    return '<span class="reparto"><i style="width:' + Math.round(v / n * 100) + '%;background:var(--texto-3)"></i><i style="width:' + Math.round(u / n * 100) + '%;background:var(--urgente)"></i><i style="width:' + Math.round(r / n * 100) + '%;background:var(--error)"></i></span>';
+  }
+  function frase(k, porPersona) {
+    var partes = Object.keys(porPersona).map(function (q) {
+      var L = porPersona[q], v = 0, s = 0, extra = [];
+      L.forEach(function (a) { if (a.tipo === "venta") { v++; s += a.venta.total; } });
+      var c = function (t) { return L.filter(function (a) { return a.tipo === t; }).length; };
+      if (c("anulada")) extra.push("anuló " + (c("anulada") === 1 ? "una venta" : c("anulada") + " ventas"));
+      if (c("margen")) extra.push("cambió " + c("margen") + (c("margen") === 1 ? " margen" : " márgenes"));
+      if (c("precio")) extra.push("cambió " + c("precio") + (c("precio") === 1 ? " precio" : " precios"));
+      if (c("lista")) extra.push("aplicó una lista");
+      if (c("stock")) extra.push("ajustó stock");
+      var base = v ? A.PERS[q].nombre + " vendió " + A.pesos(s) : A.PERS[q].nombre;
+      return extra.length ? base + (v ? " y " : " ") + extra.join(", ") : base + (v ? "" : " solo entró");
+    });
+    var dia = k === HOY ? "Hoy" : A.diaCorto(k);
+    return '<div class="respuesta"><b>' + dia + ", en una línea:</b> " + partes.join("; ") + ".</div>";
+  }
+  function vacios(k, activos) {
+    var html = "";
+    ["lf", "ci", "mb"].forEach(function (q) {
+      if (activos.indexOf(q) >= 0) return;
+      var p = A.PERS[q], extra = "";
+      if (q === "lf") extra = (k >= HOY ? '<span class="pastilla" style="height:24px">Desactivada hoy</span>' : "") ;
+      var ultima = q === "lf" ? "Última acción: sáb 17, 18:52" : "No trabajó este día";
+      html += '<div class="vacio"><div style="display:flex;gap:10px;align-items:center">' + A.av(q, "l") + '<div><div class="t-renglon" style="color:var(--texto-2)">' + p.completo + "</div>" + extra + '</div></div><span class="t-detalle">' + ultima + "</span>" +
+        (q === "lf" && k !== "2026-10-17" ? '<button class="btn chico btn-suave" data-ver-dia="2026-10-17">Ver su sábado</button>' : "") + "</div>";
+    });
+    html += '<div class="vacio"><div style="display:flex;gap:10px;align-items:center"><span class="av l si">' + A.ico("user-cog", "i") + '</span><div class="t-renglon" style="color:var(--texto-2)">El sistema</div></div><span class="t-detalle">Lo que nadie hizo a mano: el alta del primer Administrador.</span></div>';
+    return '<div class="carril"><div class="carril-cab"><span class="t-etiqueta" style="padding:10px 0 4px">Sin acciones ' + (k === HOY ? "hoy" : "este día") + "</span></div>" + html + "</div>";
+  }
+  function carrilesHtml() {
+    var k = est.dia;
+    if (A.cerrado(k)) return '<div class="act-vacio"><span class="foto-icono">' + A.ico("store", "i") + "</span><b>El " + A.diaLargo(k) + " el local estuvo cerrado</b><span>No hubo ninguna acción. Elegí otro día de la semana.</span></div>";
+    if (A.futuro(k)) return '<div class="act-vacio"><span class="foto-icono">' + A.ico("calendar", "i") + "</span><b>Ese día todavía no llegó</b></div>";
+    var todo = A.dia(k), L = delDia(), por = {}, orden = [];
+    todo.forEach(function (a) { if (!por[a.quien]) { por[a.quien] = []; orden.push(a.quien); } });
+    L.forEach(function (a) { por[a.quien].push(a); });
+    orden.sort(function (a, b) { return todo.filter(function (x) { return x.quien === b; }).length - todo.filter(function (x) { return x.quien === a; }).length; });
+    if (est.vista === "lista") {
+      return '<div class="lista-wrap"><div class="lista-acc"><div class="la cab"><span>Hora</span><span>Quién</span><span>Qué</span><span>Detalle</span></div><div data-filas>' + filasHtml(L) + "</div></div>" +
+        '<div class="lista-pie"><span class="t-detalle" data-rango></span><div class="paginador"><button class="btn chico btn-icono" data-p="-1" aria-label="Página anterior">' + A.ico("chevron-left") +
+        '</button><span data-n style="font-weight:750;font-size:14px;padding:0 8px;white-space:nowrap"></span><button class="btn chico" data-p="1">Siguiente' + A.ico("chevron-right") + '<span class="kbd">→</span></button></div></div></div>';
+    }
+    var porTodo = {}; todo.forEach(function (a) { (porTodo[a.quien] = porTodo[a.quien] || []).push(a); });
+    if (est.quien !== "todos") return soloHtml(k, todo, porTodo);
+    var cols = orden.slice(0, 3).map(function (q, i) {
+      var Lq = por[q], tq = porTodo[q], p = A.PERS[q];
+      var cuerpo = Lq.length ? A.agrupar(Lq).map(function (x) { return evHtml(x); }).join("") : '<div class="vacio"><span class="t-detalle">Nada de este tipo.</span></div>';
+      if (i === Math.min(orden.length, 2) - 1) cuerpo += frase(k, porTodo);
+      return '<div class="carril"><div class="carril-cab" data-persona="' + q + '" role="button" tabindex="0" title="Ver solo a ' + p.nombre + '">' + A.av(q, "l") + '<div><div class="t-renglon">' + p.completo + '</div><div class="t-detalle">' + tq.length + " acciones · desde las " + tq[tq.length - 1].hora + "</div></div>" + reparto(tq) + "</div>" + cuerpo + "</div>";
+    });
+    if (cols.length < 3) cols.push(vacios(k, orden));
+    if (cols.length < 3) cols.splice(1, 0, '<div class="carril"></div>');
+    return cols.join("");
+  }
+  // ---- una sola persona: su día ancho, y al costado los demás para pasar a otro
+  function soloHtml(k, todo, porTodo) {
+    var q = est.quien, p = A.PERS[q], Lq = A.filtrar(todo, { quien: q, grupo: est.grupo }), tq = porTodo[q] || [];
+    var todos = '<button class="btn chico btn-suave" style="margin-left:auto" data-todos>' + A.ico("users") + "Ver a todos</button>";
+    var cuerpo;
+    if (!tq.length) cuerpo = '<div class="vacio"><span class="t-detalle">' + (q === "lf" ? "Lucía no hizo nada este día. La desactivó Carlos hoy a las 09:48; su última acción fue el sábado 17 a las 18:52." : p.nombre + " no hizo nada este día.") + "</span>" +
+      (q === "lf" && k !== "2026-10-17" ? '<button class="btn chico btn-suave" data-ver-dia="2026-10-17">Ver su sábado</button>' : "") + "</div>";
+    else cuerpo = (Lq.length ? A.agrupar(Lq).map(function (x) { return evHtml(x); }).join("") : '<div class="vacio"><span class="t-detalle">Nada de este tipo.</span></div>') + frase(k, (function () { var o = {}; o[q] = tq; return o; })());
+    var cab = '<div class="carril-cab">' + A.av(q, "l") + '<div><div class="t-renglon">' + p.completo + '</div><div class="t-detalle">' + (tq.length ? tq.length + " acciones · desde las " + tq[tq.length - 1].hora : "Sin acciones " + (k === HOY ? "hoy" : "este día")) + "</div></div>" + (tq.length ? reparto(tq) : "") + todos + "</div>";
+    var otros = ["mb", "ci", "lf"].filter(function (x) { return x !== q; }).map(function (x) {
+      var n = (porTodo[x] || []).length;
+      return '<div class="vacio" data-persona="' + x + '" role="button" tabindex="0"><div style="display:flex;gap:10px;align-items:center">' + A.av(x, "l") + '<div><div class="t-renglon">' + A.PERS[x].completo + '</div><span class="t-detalle">' + (n ? n + " acciones" : "Sin acciones") + "</span></div></div></div>";
+    }).join("");
+    return '<div class="carril solo">' + cab + cuerpo + '</div><div class="carril"><div class="carril-cab"><span class="t-etiqueta" style="padding:10px 0 4px">Los demás ' + (k === HOY ? "hoy" : "ese día") + "</span></div>" + otros + "</div>";
+  }
+  // ---- la lista, de a 10
+  function filasHtml(L) {
+    var pag = L.slice((est.pag - 1) * POR_PAG, est.pag * POR_PAG);
+    return pag.length ? pag.map(A.filaLista).join("") : '<div class="la"><span></span><span class="d" style="grid-column:2/-1">No hay acciones con estos filtros.</span></div>';
+  }
+  function pintarPie(L) {
+    var w = $(".lista-wrap", carriles); if (!w) return;
+    var np = Math.max(1, Math.ceil(L.length / POR_PAG));
+    w.querySelector("[data-n]").textContent = est.pag + " de " + np;
+    w.querySelector("[data-rango]").textContent = L.length ? ((est.pag - 1) * POR_PAG + 1) + " a " + Math.min(L.length, est.pag * POR_PAG) + " de " + L.length + " · tocá a alguien para ver solo lo suyo" : "Nada para mostrar";
+    w.querySelector('[data-p="-1"]').disabled = est.pag === 1;
+    w.querySelector('[data-p="1"]').disabled = est.pag >= np;
+  }
+  function irPagina(d) {
+    var L = delDia(), np = Math.max(1, Math.ceil(L.length / POR_PAG)), p = est.pag + d;
+    if (p < 1 || p > np) return;
+    est.pag = p;
+    A.pasarPagina($("[data-filas]", carriles), filasHtml(L), d > 0);
+    pintarPie(L);
+  }
+  function pintar() {
+    est.pag = 1;
+    var html = esInicial() ? inicial : carrilesHtml();
+    A.cambiarLista(carriles, html);
+    if (est.vista === "lista") pintarPie(delDia());
+    $$(".carril", carriles).forEach(function (c) { c.classList.remove("act-entra"); A.fundir(c); c.scrollTop = 0; });
+    pintarChips(); marcarDia();
+    bLista.innerHTML = A.ico("list-filter") + (est.vista === "lista" ? "Ver por persona" : "Ver como lista") + ' <span class="kbd">L</span>';
+    A.pintar(bLista);
+  }
+  function irDia(k) {
+    if (A.futuro(k)) return;
+    var dias = diasSemana();
+    if (dias.indexOf(k) < 0) { est.semana = -Math.floor(Math.round((A.fecha(HOY) - A.fecha(k)) / 864e5) / 7); pintarSemana(); }
+    est.dia = k; pintar();
+    var d = semanaEl.querySelector('[data-dia="' + k + '"]'); if (d) A.rebotar(d);
+  }
+
+  // ---- eventos
+  semanaEl.addEventListener("click", function (e) {
+    var s = e.target.closest("[data-semana]");
+    if (s) {
+      est.semana = Math.min(0, est.semana + +s.getAttribute("data-semana"));
+      pintarSemana();
+      var dias = diasSemana(), ult = dias[6]; if (A.cerrado(ult)) ult = dias[5];
+      est.dia = ult; pintar(); return;
+    }
+    var d = e.target.closest(".dia[data-dia]");
+    if (d) { est.dia = d.getAttribute("data-dia"); pintar(); A.rebotar(d); }
+  });
+  chips.forEach(function (c, i) {
+    c.setAttribute("role", "button"); c.tabIndex = 0;
+    c.addEventListener("click", function () { var g = GRUPO_CHIP[i]; est.grupo = est.grupo === g && g !== "todo" ? "todo" : g; pintar(); A.rebotar(c); });
+  });
+  function elegirPersona(q) { est.quien = est.quien === q ? "todos" : q; pintar(); }
+  barraTipos.addEventListener("click", function (e) { if (e.target.closest("[data-todos]")) elegirPersona("todos"); });
+  carriles.addEventListener("click", function (e) {
+    var v = e.target.closest("[data-ver-dia]");
+    if (v) { irDia(v.getAttribute("data-ver-dia")); return; }
+    if (e.target.closest("[data-todos]")) { elegirPersona("todos"); return; }
+    var pg = e.target.closest("[data-p]");
+    if (pg) { if (!pg.disabled) irPagina(+pg.getAttribute("data-p")); return; }
+    var fp = e.target.closest(".la[data-id] .p");
+    if (fp) { var ap = A.buscar(fp.closest(".la").getAttribute("data-id")); if (ap) elegirPersona(ap.quien); return; }
+    var per = e.target.closest("[data-persona]");
+    if (per) { elegirPersona(per.getAttribute("data-persona")); return; }
+    var p = e.target.closest(".ev.paquete");
+    if (p) {
+      var abierto = p.getAttribute("aria-expanded") === "true";
+      var chev = p.querySelector(".gira");
+      if (abierto) {
+        var n = p.nextElementSibling;
+        while (n && n.classList.contains("hijo")) { var x = n.nextElementSibling; n.remove(); n = x; }
+      } else {
+        var tmp = document.createElement("div");
+        tmp.innerHTML = paqs[p.getAttribute("data-paq")].map(function (a) { return evHtml(a, true); }).join("");
+        A.pintar(tmp);
+        var ref = p.nextSibling, i = 0;
+        while (tmp.firstChild) {
+          var h = tmp.firstChild;
+          if (h.nodeType === 1) { h.style.setProperty("--d", Math.min(i++, 20) * 20 + "ms"); h.classList.add("act-estira"); }
+          p.parentNode.insertBefore(h, ref);
+        }
+      }
+      p.setAttribute("aria-expanded", String(!abierto));
+      if (chev) chev.classList.toggle("abierta", !abierto);
+      return;
+    }
+    var ev = e.target.closest("[data-id]");
+    if (ev) { var a = A.buscar(ev.getAttribute("data-id")); if (a) A.abrirDetalle(a); }
+  });
+  function alternarLista() { est.vista = est.vista === "lista" ? "carriles" : "lista"; pintar(); }
+  bLista.addEventListener("click", alternarLista);
+  function otroRango() {
+    var ops = [0, -1, -2, -3].map(function (w) {
+      var fin = A.sumar(HOY, 7 * w), ini = A.sumar(fin, -6);
+      var t = w === 0 ? "Estos 7 días" : w === -1 ? "Los 7 de antes" : "Hace " + -w + " semanas";
+      return { v: String(w), html: A.ico("calendar-range", "i") + t, fin: A.dmy(ini) + " al " + A.dmy(fin) };
+    });
+    A.elegir(bRango, "Otro rango", ops, String(est.semana), function (v) {
+      est.semana = +v; pintarSemana();
+      var d = diasSemana(), ult = A.cerrado(d[6]) ? d[5] : d[6];
+      est.dia = ult; pintar();
+    }, "abajo-der");
+  }
+  bRango.addEventListener("click", otroRango);
+  document.addEventListener("keydown", function (e) {
+    if (A.hayCapa() || /INPUT|TEXTAREA/.test(document.activeElement.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "l" || e.key === "L") { e.preventDefault(); alternarLista(); }
+    else if (e.key === "f" || e.key === "F") { e.preventDefault(); otroRango(); }
+    else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && est.vista === "lista") { e.preventDefault(); irPagina(e.key === "ArrowLeft" ? -1 : 1); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      var k = A.sumar(est.dia, e.key === "ArrowLeft" ? -1 : 1);
+      if (A.cerrado(k)) k = A.sumar(k, e.key === "ArrowLeft" ? -1 : 1);
+      if (A.futuro(k)) return;
+      if (diasSemana().indexOf(k) < 0) { est.semana += e.key === "ArrowLeft" ? -1 : 1; pintarSemana(); }
+      est.dia = k; pintar();
+    } else if (e.key === "Enter" && document.activeElement.matches(".dia, .chip, [data-persona]")) { e.preventDefault(); document.activeElement.click(); }
+  });
+  $("[data-mas]").addEventListener("click", function (e) { e.preventDefault(); A.menuMas(e.currentTarget); });
+
+  // Los días ya dibujados apuntan a su fecha (sin redibujar: quieta se ve igual).
+  $$(".dia", semanaEl).forEach(function (d, i) { d.setAttribute("data-dia", diasSemana()[i]); if (!d.classList.contains("cerrado")) { d.setAttribute("role", "button"); d.tabIndex = 0; } });
+})();
+</script>
 </body>
 </html>

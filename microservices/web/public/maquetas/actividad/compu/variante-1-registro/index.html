@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../_propio/actividad.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_propio/interacciones.css">
+<script src="../../_propio/interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   .pantalla { display: grid; grid-template-columns: minmax(0,1fr) 312px; gap: 20px; padding-top: 16px; }
   .izq { display: flex; flex-direction: column; min-width: 0; }
@@ -48,6 +51,18 @@
   .kv { display: grid; grid-template-columns: 92px 1fr; gap: 6px 10px; margin-top: 14px; font-size: 14px; }
   .kv dt { color: var(--texto-2); font-weight: 600; }
   .kv dd { margin: 0; font-weight: 650; }
+  .filas .fila:first-child { border-top: 1px solid var(--borde); }
+  .tabla .fila:not(.cab) { cursor: pointer; }
+  .tabla .fila:not(.cab):not(.elegida):hover { background: var(--hundido); }
+  .tabla .act-vacio { margin: 16px; }
+  .paginador .pag { cursor: pointer; }
+  .b { cursor: pointer; }
+  .b:hover { background: var(--hundido); }
+  .b.puesto { background: var(--pino-suave); color: var(--pino); }
+  .b.puesto .track i { background: var(--pino); }
+  .b.apagada { opacity: .45; }
+  .selector { cursor: pointer; }
+  .segmentos > button { cursor: pointer; white-space: nowrap; }
   .cita { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--hundido); font-size: 14px; font-weight: 600; color: var(--texto-2); }
 </style>
 </head>
@@ -55,11 +70,11 @@
 <div class="app">
   <nav class="lateral">
     <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
-    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
-    <a class="nav-item"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
-    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
-    <a class="nav-item activo"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
-    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item activo" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
     <div class="pie">
       <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
       <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
@@ -71,7 +86,7 @@
       <div class="t-titulo">Negocio</div>
       <div class="acciones"><span class="t-detalle">Lunes 19 de octubre · 10:42</span><button class="btn chico"><i class="i i-s" data-i="file-down"></i>Bajar en planilla</button></div>
     </header>
-    <nav class="pestanas"><a>Resumen</a><a>Usuarios</a><a class="activa">Quién hizo qué</a></nav>
+    <nav class="pestanas"><a data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a class="activa">Quién hizo qué</a></nav>
     <section class="pantalla">
       <div class="izq">
         <div class="filtros">
@@ -122,11 +137,233 @@
             <dt>Total</dt><dd><span class="pastilla medio efectivo" style="background:var(--efectivo-suave);color:var(--efectivo);height:24px">Efectivo</span> $17.000</dd>
           </dl>
           <div class="cita">«El cliente se arrepintió»</div>
-          <div style="display:flex;gap:8px;margin-top:12px"><button class="btn chico btn-suave">Ver la venta<i class="i i-s" data-i="arrow-up-right"></i></button><button class="btn chico btn-suave">Lo de Marcos hoy</button></div>
+          <div style="display:flex;gap:8px;margin-top:12px"><button class="btn chico btn-suave" data-ir="ventas-de-hoy">Ver la venta<i class="i i-s" data-i="arrow-up-right"></i></button><button class="btn chico btn-suave" data-persona="mb">Lo de Marcos hoy</button></div>
         </div>
       </aside>
     </section>
   </main>
 </div>
+<script>
+/* Lo que se puede tocar: filtros (quién, día, qué), barras de «Qué pasó hoy», filas, paginador,
+   teclado (↑ ↓ Enter ← →), «Desde… hasta», «Bajar en planilla», «Más» y los atajos del detalle. */
+(function () {
+  var A = ACT, $ = A.$, $$ = A.$$;
+  var HOY = A.HOY, POR_PAG = 10;
+  var est = { quien: "todos", dia: "hoy", desde: A.sumar(HOY, -7), hasta: HOY, grupo: "todo", pag: 1, elegida: null };
+  var tabla = $(".tabla"), cab = tabla.querySelector(".fila.cab");
+  var filas = document.createElement("div"); filas.className = "filas";
+  $$(".fila:not(.cab)", tabla).forEach(function (f) { filas.appendChild(f); });
+  tabla.appendChild(filas);
+  var hoy = A.dia(HOY);
+  $$(".fila", filas).forEach(function (f, i) { f.setAttribute("data-id", hoy[i].id); if (f.classList.contains("elegida")) est.elegida = hoy[i].id; });
+  var inicial = filas.innerHTML;
+  var panel = $(".der .tarjeta-2");
+  var selQuien = $$(".filtros .selector")[0], selQue = $$(".filtros .selector")[1];
+  var segs = $$(".filtros .segmentos button");
+  var linea = $(".linea-total"), totalB = linea.querySelector("b"), totalTxt = linea.querySelectorAll(".t-detalle")[0], pagTxt = linea.querySelectorAll(".t-detalle")[1].querySelector("b");
+  totalB.innerHTML = '<span class="num-t">38</span> acciones';
+  var pieTxt = $(".pie-tabla .t-detalle");
+  pieTxt.firstChild.textContent = "";
+  var rangoTxt = document.createElement("span"); rangoTxt.textContent = "1 a 10 de 38 · "; pieTxt.insertBefore(rangoTxt, pieTxt.firstChild);
+  var paginador = $(".paginador");
+  var barras = $$(".barras .b"), GRUPO_BARRA = ["venta", "entrada", "precios", "stock", "anulada", "otros"];
+  var caja = $(".caja h3");
+
+  var NOMBRES_Q = { todos: "Todos", mb: "Marcos", ci: "Carlos", lf: "Lucía", si: "El sistema" };
+  var GRUPOS_Q = [["todo", "Todo"], ["venta", "Ventas cobradas"], ["anulada", "Ventas anuladas"], ["precios", "Precios y márgenes"], ["stock", "Ajustes de stock"], ["compra", "Compras"], ["lista", "Listas"], ["usuario", "Usuarios"], ["entrada", "Entradas"], ["otros", "Compras, listas, usuarios"]];
+  var CORTO = { venta: "Ventas", anulada: "Anuladas", precios: "Precios", stock: "Stock", compra: "Compras", lista: "Listas", usuario: "Usuarios", entrada: "Entradas", otros: "Compras y otros" };
+  function nombreGrupo(g) { for (var i = 0; i < GRUPOS_Q.length; i++) if (GRUPOS_Q[i][0] === g) return GRUPOS_Q[i][1]; return g; }
+
+  function delDia() {
+    if (est.dia === "hoy") return A.dia(HOY);
+    if (est.dia === "ayer") return A.dia(A.sumar(HOY, -1));
+    if (est.dia === "semana") return A.rango(A.sumar(HOY, -6), HOY);
+    return A.rango(est.desde, est.hasta);
+  }
+  function varios() { return est.dia === "semana" || (est.dia === "rango" && est.desde !== est.hasta); }
+  function cuandoTxt() {
+    if (est.dia === "hoy") return "hoy";
+    if (est.dia === "ayer") return "ayer";
+    if (est.dia === "semana") return "del martes 13 a hoy";
+    if (est.desde === est.hasta) return "el " + A.diaLargo(est.desde);
+    return "del " + A.diaLargo(est.desde < est.hasta ? est.desde : est.hasta) + " al " + A.diaLargo(est.desde < est.hasta ? est.hasta : est.desde);
+  }
+  function lista() { return A.filtrar(delDia(), { quien: est.quien, grupo: est.grupo }); }
+  function esInicial() { return est.dia === "hoy" && est.quien === "todos" && est.grupo === "todo" && est.pag === 1; }
+
+  function fila(a) {
+    var t = A.TIPOS[a.tipo], p = A.PERS[a.quien];
+    var dia = varios() ? "<b>" + A.diaCorto(a.fecha) + "</b> · " : "";
+    return '<div class="fila' + (a.id === est.elegida ? " elegida" : "") + '" data-id="' + a.id + '"><span class="hora">' + a.hora + '</span><span class="quien">' + A.av(a.quien) + p.nombre +
+      '</span><span class="que"><span class="tipo-ico ' + t.tono + '">' + A.ico(a.icoEntrada === "fingerprint" ? "log-in" : t.ico) + "</span>" + t.que + '</span><span class="det">' + dia + a.det + '</span><i class="i i-s mas" data-i="chevron-right"></i></div>';
+  }
+  function vacio() {
+    var d = delDia(), boton = "", tit, txt;
+    if (est.dia === "ayer" && !d.length) { tit = "Ayer, domingo 18, el local estuvo cerrado"; txt = "No hubo ninguna acción."; boton = '<button class="btn chico" data-ver-dia="2026-10-17">Ver el sábado 17</button>'; }
+    else if (est.quien === "lf") { tit = "Lucía no hizo nada " + cuandoTxt(); txt = "La desactivó Carlos hoy a las 09:48. Su última acción fue el sábado 17 a las 18:52."; boton = '<button class="btn chico" data-ver-dia="2026-10-17">Ver su sábado</button>'; }
+    else if (est.quien === "si") { tit = "El sistema no hizo nada " + cuandoTxt(); txt = "Aparece solo cuando hace algo que nadie hizo a mano, como el alta del primer Administrador."; }
+    else { tit = "No hay acciones con estos filtros"; txt = "Probá con otro día o con otra persona."; boton = '<button class="btn chico" data-limpiar>Sacar los filtros</button>'; }
+    return '<div class="act-vacio"><span class="foto-icono">' + A.ico("history", "i") + "</span><b>" + tit + "</b><span>" + txt + "</span>" + boton + "</div>";
+  }
+  function paginas(n) { return Math.max(1, Math.ceil(n / POR_PAG)); }
+  function pintarPaginador(total) {
+    var np = paginas(total), p = est.pag, nums = [];
+    if (np <= 5) for (var i = 1; i <= np; i++) nums.push(i);
+    else { nums = [1]; if (p > 3) nums.push("…"); for (var j = Math.max(2, p - 1); j <= Math.min(np - 1, p + 1); j++) nums.push(j); if (p < np - 2) nums.push("…"); nums.push(np); }
+    paginador.innerHTML = '<button class="btn chico btn-icono" data-pag="ant"' + (p === 1 ? " disabled" : "") + ' aria-label="Página anterior">' + A.ico("chevron-left") + "</button>" +
+      nums.map(function (n) { return n === "…" ? '<span class="pag" style="cursor:default">…</span>' : '<span class="pag' + (n === p ? " actual" : "") + '" data-pag="' + n + '">' + n + "</span>"; }).join("") +
+      '<button class="btn chico" data-pag="sig"' + (p >= np ? " disabled" : "") + "><span>Siguiente</span>" + A.ico("chevron-right") + '<span class="kbd">→</span></button>';
+    A.pintar(paginador);
+  }
+  function pintarTotales(L, previo) {
+    var n = L.length, np = paginas(n);
+    A.rodar(totalB.querySelector(".num-t"), A.miles(n), n >= previo);
+    totalTxt.textContent = cuandoTxt() + ", de la más nueva a la más vieja";
+    pagTxt.textContent = est.pag + " de " + np;
+    rangoTxt.textContent = n ? ((est.pag - 1) * POR_PAG + 1) + " a " + Math.min(n, est.pag * POR_PAG) + " de " + A.miles(n) + " · " : "Nada para mostrar · ";
+    pintarPaginador(n);
+  }
+  function pintarBarras() {
+    var d = A.filtrar(delDia(), { quien: est.quien }), cs = GRUPO_BARRA.map(function (g) { return A.contar(d, g); });
+    var max = Math.max.apply(null, cs.concat([1]));
+    barras.forEach(function (b, i) {
+      b.querySelector(".n").textContent = cs[i];
+      b.querySelector(".track i").style.width = Math.max(4, Math.round(cs[i] / max * 100)) + "%";
+      b.classList.toggle("puesto", est.grupo === GRUPO_BARRA[i]);
+      b.classList.toggle("apagada", est.grupo !== "todo" && est.grupo !== GRUPO_BARRA[i]);
+    });
+    caja.firstChild.textContent = (est.dia === "hoy" ? "Qué pasó hoy" : est.dia === "ayer" ? "Qué pasó ayer" : est.dia === "semana" ? "En la semana" : "En esos días") + " ";
+  }
+  function pintarSelectores() {
+    var q = est.quien !== "todos", g = est.grupo !== "todo";
+    selQuien.classList.toggle("puesto", q);
+    selQuien.innerHTML = '<span class="et">Quién</span>' + NOMBRES_Q[est.quien] + (q ? '<span class="quitar" data-quitar="quien" aria-label="Sacar">' + A.ico("x") + "</span>" : A.ico("chevron-down"));
+    selQue.classList.toggle("puesto", g);
+    selQue.innerHTML = '<span class="et">Qué</span>' + (g ? CORTO[est.grupo] : "Todo") + (g ? '<span class="quitar" data-quitar="grupo" aria-label="Sacar">' + A.ico("x") + "</span>" : A.ico("chevron-down"));
+    A.pintar(selQuien); A.pintar(selQue);
+    var cual = { hoy: 0, ayer: 1, semana: 2, rango: 3 }[est.dia];
+    segs.forEach(function (s, i) { s.classList.toggle("elegido", i === cual); });
+  }
+  function pintarPanel(a, fundir) {
+    if (!a) return;
+    var p = A.PERS[a.quien];
+    var esHoy = a.fecha === HOY;
+    panel.innerHTML = A.detalleHtml(a) + '<div style="display:flex;gap:8px;margin-top:12px">' + A.atajosHtml(a) +
+      '<button class="btn chico btn-suave" data-persona="' + a.quien + '" data-fecha="' + a.fecha + '">Lo de ' + p.nombre + (esHoy ? " hoy" : " ese día") + "</button></div>";
+    A.pintar(panel);
+    if (fundir) A.fundir(panel);
+  }
+  var ultimoTotal = 38;
+  function pintar(modo) {
+    var L = lista(), np = paginas(L.length);
+    if (est.pag > np) est.pag = np;
+    var pagina = L.slice((est.pag - 1) * POR_PAG, est.pag * POR_PAG);
+    if (pagina.length && !pagina.some(function (a) { return a.id === est.elegida; })) { est.elegida = pagina[0].id; pintarPanel(pagina[0], true); }
+    var html = esInicial() && est.elegida === hoy[2].id ? inicial : (pagina.length ? pagina.map(fila).join("") : vacio());
+    if (modo === "sig" || modo === "ant") A.pasarPagina(filas, html, modo === "sig");
+    else A.cambiarLista(filas, html);
+    pintarTotales(L, ultimoTotal); ultimoTotal = L.length;
+    pintarBarras(); pintarSelectores();
+    if (modo === "filtro") { var act = paginador.querySelector(".actual"); if (act) act.classList.add("act-entra-izq"); }
+  }
+  function elegir(id, fundir) {
+    var a = A.buscar(id); if (!a) return;
+    est.elegida = id;
+    $$(".fila", filas).forEach(function (f) { f.classList.toggle("elegida", f.getAttribute("data-id") === id); });
+    pintarPanel(a, fundir !== false);
+  }
+  function cambiar(cambios) { for (var k in cambios) est[k] = cambios[k]; est.pag = 1; pintar("filtro"); }
+
+  // ---- filtros
+  selQuien.addEventListener("click", function (e) {
+    if (e.target.closest("[data-quitar]")) { cambiar({ quien: "todos" }); return; }
+    var d = delDia();
+    var cant = function (q) { var n = d.filter(function (a) { return a.quien === q; }).length; return n ? n + "" : ""; };
+    A.elegir(selQuien, "Quién", [
+      { v: "todos", html: A.ico("users", "i") + "Todos", fin: d.length + "" },
+      { sep: true },
+      { v: "mb", html: A.av("mb") + "Marcos Benítez", fin: cant("mb") },
+      { v: "ci", html: A.av("ci") + "Carlos Illobre", fin: cant("ci") },
+      { v: "lf", html: A.av("lf") + "Lucía Ferreyra", fin: '<span class="pastilla" style="height:24px">Desactivada</span>' + cant("lf"), apagada: true },
+      { v: "si", html: A.av("si") + "El sistema", fin: cant("si"), apagada: true }
+    ], est.quien, function (v) { cambiar({ quien: v }); A.rebotar(selQuien); });
+  });
+  selQue.addEventListener("click", function (e) {
+    if (e.target.closest("[data-quitar]")) { cambiar({ grupo: "todo" }); return; }
+    var d = A.filtrar(delDia(), { quien: est.quien });
+    A.elegir(selQue, "Qué", GRUPOS_Q.slice(0, 9).map(function (g) {
+      return { v: g[0], html: g[1], fin: (g[0] === "todo" ? d.length : A.contar(d, g[0])) + "" };
+    }), est.grupo, function (v) { cambiar({ grupo: v }); A.rebotar(selQue); });
+  });
+  segs.forEach(function (s, i) {
+    s.addEventListener("click", function () {
+      if (i < 3) { cambiar({ dia: ["hoy", "ayer", "semana"][i] }); return; }
+      var capa = A.abrir({ tipo: "menu", ancla: s, titulo: "Desde… hasta", html:
+        '<div style="padding:10px;width:320px"><div class="t-renglon" style="margin-bottom:12px">Elegí los días</div><div class="rango">' +
+        '<label>Desde<input type="date" value="' + est.desde + '" min="2026-09-01" max="' + HOY + '" data-desde></label>' +
+        '<label>Hasta<input type="date" value="' + est.hasta + '" min="2026-09-01" max="' + HOY + '" data-hasta></label></div>' +
+        '<div class="capa-pie"><button class="btn chico btn-fantasma" data-cerrar>Cancelar</button><button class="btn chico btn-oscuro der" data-aplicar>Aplicar</button></div></div>' });
+      capa.el.querySelector("[data-aplicar]").addEventListener("click", function () {
+        var d = capa.el.querySelector("[data-desde]").value || est.desde, h = capa.el.querySelector("[data-hasta]").value || est.hasta;
+        capa.cerrar(); cambiar({ dia: "rango", desde: d < h ? d : h, hasta: d < h ? h : d });
+      });
+    });
+  });
+  // ---- barras de «Qué pasó hoy»
+  barras.forEach(function (b, i) {
+    b.setAttribute("role", "button"); b.tabIndex = 0;
+    b.addEventListener("click", function () {
+      var g = GRUPO_BARRA[i];
+      cambiar({ grupo: est.grupo === g ? "todo" : g });
+      A.rebotar(selQue);
+    });
+  });
+  // ---- filas, vacíos, paginador
+  filas.addEventListener("click", function (e) {
+    var v = e.target.closest("[data-ver-dia]");
+    if (v) { var k = v.getAttribute("data-ver-dia"); cambiar({ dia: "rango", desde: k, hasta: k }); return; }
+    if (e.target.closest("[data-limpiar]")) { cambiar({ quien: "todos", grupo: "todo", dia: "hoy" }); return; }
+    var f = e.target.closest(".fila[data-id]");
+    if (f) elegir(f.getAttribute("data-id"));
+  });
+  filas.addEventListener("dblclick", function (e) { var f = e.target.closest(".fila[data-id]"); if (f) A.abrirDetalle(A.buscar(f.getAttribute("data-id"))); });
+  function ir(p) {
+    var np = paginas(lista().length), antes = est.pag;
+    if (p === "sig") p = est.pag + 1; else if (p === "ant") p = est.pag - 1;
+    p = Math.max(1, Math.min(np, +p));
+    if (p === antes) return;
+    est.pag = p; pintar(p > antes ? "sig" : "ant");
+  }
+  paginador.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-pag]"); if (!b || b.disabled) return;
+    ir(b.getAttribute("data-pag"));
+  });
+  panel.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-persona]"); if (!b) return;
+    var k = b.getAttribute("data-fecha") || HOY;
+    if (k === HOY) cambiar({ quien: b.getAttribute("data-persona"), dia: "hoy", grupo: "todo" });
+    else cambiar({ quien: b.getAttribute("data-persona"), dia: "rango", desde: k, hasta: k, grupo: "todo" });
+  });
+  // ---- teclado: ↑ ↓ recorren, Enter abre, ← → pasan de página
+  document.addEventListener("keydown", function (e) {
+    if (A.hayCapa() || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    var fs = $$(".fila[data-id]", filas), i = fs.findIndex(function (f) { return f.classList.contains("elegida"); });
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault(); if (!fs.length) return;
+      var n = Math.max(0, Math.min(fs.length - 1, i + (e.key === "ArrowDown" ? 1 : -1)));
+      elegir(fs[n].getAttribute("data-id"));
+    } else if (e.key === "Enter" && i >= 0 && !document.activeElement.closest("button, [role=button]")) {
+      e.preventDefault(); A.abrirDetalle(A.buscar(fs[i].getAttribute("data-id")));
+    } else if (e.key === "ArrowRight") { e.preventDefault(); ir("sig"); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); ir("ant"); }
+  });
+  // ---- cabecera y marco
+  $(".cabecera .acciones .btn").addEventListener("click", function () {
+    A.tostada("Se bajó «quien-hizo-que-" + A.dmy(HOY).replace("/", "-") + ".xlsx» · " + A.miles(lista().length) + " acciones", "file-down");
+  });
+  $("[data-mas]").addEventListener("click", function (e) { e.preventDefault(); A.menuMas(e.currentTarget); });
+  pintarPaginador(hoy.length);
+})();
+</script>
 </body>
 </html>

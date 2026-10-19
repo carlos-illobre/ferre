@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../../_propio/actividad.css">
 <script src="../../../_comun/iconos.js"></script>
 <script src="../../_propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../_propio/interacciones.css">
+<script src="../../_propio/interacciones.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
 <style>
   body { width: 390px; }
   .celu { background: #0E1412; }
@@ -40,6 +43,32 @@
   .t-ev .h { font-size: 14px; font-weight: 700; color: var(--texto-2); text-align: right; line-height: 19px; }
   .lista { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); padding: 2px 12px; }
   .pie { position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 8px; }
+  .redondo, .t-ev { cursor: pointer; }
+  .redondo.prendida { background: #fff; color: var(--pino); }
+  .luz { position: absolute; inset: 0; background: radial-gradient(60% 45% at 50% 48%, rgba(255,250,230,.35), transparent 70%); opacity: 0; transition: opacity var(--t) var(--curva); pointer-events: none; }
+  .luz.prendida { opacity: 1; }
+  .hoja { transition: transform var(--t-nav) var(--curva); }
+  .hoja.baja { transform: translateY(105%); transition-timing-function: var(--curva-salida); transition-duration: 240ms; }
+  .hoja.chica { transform: translateY(232px); }
+  .pie { transition: opacity var(--t) var(--curva); }
+  .pie.oculto { opacity: 0; pointer-events: none; }
+  .leido { transition: opacity var(--t) var(--curva); }
+  .leido.oculto { opacity: 0; }
+  .leido:not(.oculto) .tostada { animation: act-entra var(--t) var(--rebote) both; }
+  .enfoque { transition: opacity var(--t) var(--curva), transform var(--t-nav) var(--curva); }
+  .enfoque.cambia { opacity: 0; transform: translateX(-24px); }
+  .marco-scan.buscando { animation: buscar 900ms var(--curva) infinite alternate; }
+  .marco-scan.cierra { animation: cierra 240ms var(--rebote) both; }
+  @keyframes buscar { from { transform: scale(1); } to { transform: scale(1.06); } }
+  @keyframes cierra { from { transform: scale(1.06); } to { transform: scale(.94); } }
+  .lista-9 .t-ev:first-child { border-top: 0; }
+  .filtros-todas { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; }
+  .filtros-todas .chip { height: 36px; font-size: 14px; flex: none; cursor: pointer; }
+  .marco-qhq { position: absolute; inset: 0; z-index: 40; background: var(--fondo); display: flex; flex-direction: column; opacity: 0; transition: opacity var(--t) var(--curva); }
+  .marco-qhq.abierto { opacity: 1; }
+  .marco-qhq .entrada { padding: 20px 16px; display: grid; justify-items: center; gap: 10px; text-align: center; }
+  .marco-qhq .entrada .foto-icono { width: 64px; height: 64px; background: var(--pino-suave); color: var(--pino); }
+  .marco-qhq .renglon { cursor: pointer; }
 </style>
 </head>
 <body>
@@ -55,7 +84,8 @@
     </div>
     <div class="enfoque"><img src="../../../_comun/fotos/tarugos.webp" alt=""></div>
     <div class="marco-scan"><i></i><i></i><i></i><i></i></div>
-    <div class="arriba"><span class="redondo"><i class="i" data-i="x"></i></span><div class="t">¿Quién tocó esto?<small>Apuntá a un producto o su código</small></div><span class="redondo"><i class="i" data-i="flashlight"></i></span></div>
+    <div class="luz"></div>
+    <div class="arriba"><span class="redondo" role="button" tabindex="0" aria-label="Cerrar la cámara" data-cerrar-camara><i class="i" data-i="x"></i></span><div class="t">¿Quién tocó esto?<small>Apuntá a un producto o su código</small></div><span class="redondo" role="button" tabindex="0" aria-label="Linterna" data-linterna><i class="i" data-i="flashlight"></i></span></div>
     <div class="leido"><span class="tostada" style="font-size:14px"><i class="i i-s" data-i="check"></i>Leído · 7790123004512</span></div>
   </div>
 
@@ -73,8 +103,162 @@
       <div class="t-ev"><span class="av ci">CI</span><div><div class="q">Lista de Fischer</div><div class="d">Carlos · costo $3.700 → $4.150</div></div><span class="h">Mié<br>16:20</span></div>
     </div>
   </div>
-  <div class="pie"><button class="btn grande" style="flex:1">Las 9 acciones<i class="i i-s" data-i="chevron-right"></i></button><button class="btn btn-oscuro grande btn-icono" style="width:56px"><i class="i i-l" data-i="scan-line"></i></button></div>
+  <div class="pie"><button class="btn grande" style="flex:1" data-todas>Las 9 acciones<i class="i i-s" data-i="chevron-right"></i></button><button class="btn btn-oscuro grande btn-icono" style="width:56px" data-escanear aria-label="Escanear otro"><i class="i i-l" data-i="scan-line"></i></button></div>
   <span class="home-ind"></span>
 </div>
+<script>
+/* Lo que se puede tocar: escanear otro producto (la hoja baja, el marco busca, «Leído» y sube la hoja
+   nueva), la linterna, «Las N acciones» (hoja con todas, que se filtran por quién, tipo y cuándo),
+   cada acción (su detalle), el asa de la hoja
+   (la achica), y la × (cierra la cámara y muestra la entrada a «Quién hizo qué», con el marco). */
+(function () {
+  var A = ACT, $ = A.$, $$ = A.$$, H = A.hace, HOY = A.HOY;
+  var S = "2026-10-17", V = "2026-10-16", J = "2026-10-15", MI = "2026-10-14", MA = "2026-10-13", L12 = "2026-10-12", V9 = "2026-10-09";
+  var tar = "Tarugos nylon S8 con tope × 100", mar = "Martillo carpintero Bahco 500 g", cin = "Cinta métrica PowerLock 5 m", lam = "Lámpara LED 9 W luz fría E27";
+  function ev(a, q, d) { a.tq = q; a.td = d; return a; }
+  var PRODS = [
+    { foto: "tarugos", nombre: tar, marca: "Fischer", codigo: "7790123004512", datos: [["Precio", "$9.000", "urgente"], ["Costo", "$4.150", ""], ["Stock", "3 un.", "logro"]], acc: [
+      ev(H.margen(HOY, "10:37", "ci", tar, 50, 100, 7000, 9000, 4150), 'Margen <span class="cambio"><s>50 %</s><span class="flecha">→</span>100 %</span>', "Carlos · precio $7.000 → $9.000"),
+      ev(H.venta(S, "17:10", "mb", "0377", [[tar, 7000, 2]], "efectivo"), "Vendió 2 un.", "Marcos · venta 0377 · $14.000"),
+      ev(H.lista(MI, "16:20", "ci", "Fischer Argentina", 642, 118), "Lista de Fischer", "Carlos · costo $3.700 → $4.150"),
+      ev(H.venta(V, "11:32", "mb", "0341", [[tar, 7000, 1]], "mp"), "Vendió 1 un.", "Marcos · venta 0341 · $7.000"),
+      ev(H.venta(J, "16:05", "mb", "0296", [[tar, 7000, 1]], "efectivo"), "Vendió 1 un.", "Marcos · venta 0296 · $7.000"),
+      ev(H.venta(MA, "10:48", "lf", "0204", [[tar, 6000, 3]], "efectivo"), "Vendió 3 un.", "Lucía · venta 0204 · $18.000"),
+      ev(H.stock(L12, "19:40", "mb", tar, 10, 9, "un.", "una caja abierta"), "Stock 10 → 9 un.", "Marcos · «una caja abierta»"),
+      ev(H.venta(L12, "12:15", "mb", "0161", [[tar, 6000, 1]], "efectivo"), "Vendió 1 un.", "Marcos · venta 0161 · $6.000"),
+      ev(H.compra(V9, "09:20", "mb", "Fischer Argentina", "A-0002-88341", 12, 214000), "Compra recibida", "Marcos · entraron 10 un.")
+    ] },
+    { foto: "martillo", nombre: mar, marca: "Bahco", codigo: "7311518001234", datos: [["Precio", "$28.000", ""], ["Costo", "$13.800", ""], ["Stock", "7 un.", "logro"]], acc: [
+      ev(H.lista(HOY, "10:15", "ci", "Bulonera Centro", 1284, 312), "Lista de Bulonera Centro", "Carlos · costo $13.200 → $13.800"),
+      ev(H.venta(HOY, "08:31", "mb", "0396", [[mar, 28000, 1]], "tarjeta"), "Vendió 1 un.", "Marcos · venta 0396 · $28.000"),
+      ev(H.compra(J, "10:02", "mb", "Bulonera Centro", "A-0007-55102", 9, 186000), "Compra recibida", "Marcos · entraron 6 un."),
+      ev(H.venta(V9, "17:45", "lf", "0122", [[mar, 27000, 1]], "efectivo"), "Vendió 1 un.", "Lucía · venta 0122 · $27.000")
+    ] },
+    { foto: "cinta-metrica", nombre: cin, marca: "Stanley", codigo: "3253561337580", datos: [["Precio", "$17.000", ""], ["Costo", "$8.400", ""], ["Stock", "2 un.", "urgente"]], acc: [
+      ev(H.anulada(HOY, "10:30", "mb", "0409", "10:12", [[cin, 17000, 1]], "efectivo", "el cliente se arrepintió"), '<span style="color:var(--error-texto)">Anuló la venta 0409</span>', "Marcos · «el cliente se arrepintió»"),
+      ev(H.venta(HOY, "10:12", "mb", "0409", [[cin, 17000, 1]], "efectivo"), "Vendió 1 un.", "Marcos · venta 0409 · $17.000"),
+      ev(H.venta(S, "11:20", "mb", "0349", [[cin, 17000, 1]], "mp"), "Vendió 1 un.", "Marcos · venta 0349 · $17.000"),
+      ev(H.stock(V, "18:30", "mb", cin, 4, 3, "un.", "vino fallada"), "Stock 4 → 3 un.", "Marcos · «vino fallada»"),
+      ev(H.margen(MI, "12:05", "ci", cin, 80, 100, 15000, 17000, 8400), 'Margen <span class="cambio"><s>80 %</s><span class="flecha">→</span>100 %</span>', "Carlos · precio $15.000 → $17.000"),
+      ev(H.venta(MA, "09:40", "lf", "0198", [[cin, 15000, 1]], "efectivo"), "Vendió 1 un.", "Lucía · venta 0198 · $15.000")
+    ] },
+    { foto: "lampara", nombre: lam, marca: "Genérica", codigo: "7798062541125", datos: [["Precio", "$2.000", "error"], ["Costo", "$2.350", ""], ["Stock", "46 un.", "logro"]], acc: [
+      ev(H.venta(S, "19:05", "mb", "0384", [[lam, 2000, 10]], "efectivo"), "Vendió 10 un.", "Marcos · venta 0384 · $20.000"),
+      ev(H.precio(S, "18:52", "lf", lam, 3000, 2000, 2350, "para que salgan"), 'Precio <span class="cambio"><s>$3.000</s><span class="flecha">→</span>$2.000</span>', "Lucía · bajo el costo ($2.350)"),
+      ev(H.venta(V, "15:10", "mb", "0335", [[lam, 3000, 4]], "mp"), "Vendió 4 un.", "Marcos · venta 0335 · $12.000"),
+      ev(H.compra(MI, "09:30", "ci", "Distribuidora Oeste", "A-0004-12210", 22, 318000), "Compra recibida", "Carlos · entraron 50 un."),
+      ev(H.venta(L12, "11:05", "mb", "0158", [[lam, 3000, 2]], "efectivo"), "Vendió 2 un.", "Marcos · venta 0158 · $6.000")
+    ] }
+  ];
+  PRODS.forEach(function (p) { A.registrar(p.acc); });
+  var actual = 0, hoja = $(".hoja"), pie = $(".pie"), leido = $(".leido"), enfoque = $(".enfoque img"), marco = $(".marco-scan"), bTodas = $("[data-todas]");
+  var celu = $(".celu");
+  function cuando(a) { return (a.fecha === HOY ? "Hoy" : A.diaCorto(a.fecha).split(" ")[0]) + "<br>" + a.hora; }
+  function evHtml(a) { return '<div class="t-ev" data-id="' + a.id + '">' + A.av(a.quien) + '<div><div class="q">' + a.tq + '</div><div class="d">' + a.td + '</div></div><span class="h">' + cuando(a) + "</span></div>"; }
+  // Lo ya dibujado apunta a los datos del primer producto
+  $$(".lista .t-ev", hoja).forEach(function (t, i) { t.setAttribute("data-id", PRODS[0].acc[i].id); });
+  function pintarHoja(p) {
+    $(".prod", hoja).innerHTML = '<div class="foto"><img src="../../../_comun/fotos/' + p.foto + '.webp" alt=""></div><div><div class="t-renglon">' + p.nombre + '</div><div class="t-detalle">' + p.marca + " · " + p.acc.length + " acciones en 30 días</div></div>";
+    $(".datos", hoja).innerHTML = p.datos.map(function (d) { return '<div class="dato ' + d[2] + '"><span class="et">' + d[0] + '</span><span class="va">' + d[1] + "</span></div>"; }).join("");
+    $(".lista", hoja).innerHTML = p.acc.slice(0, 3).map(evHtml).join("");
+    A.pintar(hoja);
+    bTodas.innerHTML = "Las " + p.acc.length + " acciones" + A.ico("chevron-right"); A.pintar(bTodas);
+    leido.querySelector(".tostada").innerHTML = A.ico("check") + "Leído · " + p.codigo; A.pintar(leido);
+  }
+  // ---- escanear otro
+  var ocupado = false;
+  function escanear(i) {
+    if (ocupado) return; ocupado = true;
+    actual = i == null ? (actual + 1) % PRODS.length : i;
+    var p = PRODS[actual], rapido = A.reducido();
+    hoja.classList.remove("chica"); hoja.classList.add("baja"); pie.classList.add("oculto"); leido.classList.add("oculto");
+    $(".enfoque").classList.add("cambia");
+    setTimeout(function () {
+      enfoque.src = "../../../_comun/fotos/" + p.foto + ".webp";
+      $(".enfoque").classList.remove("cambia");
+      marco.classList.add("buscando");
+    }, rapido ? 0 : 260);
+    setTimeout(function () {
+      marco.classList.remove("buscando"); marco.classList.add("cierra");
+      pintarHoja(p);
+      leido.classList.remove("oculto"); A.vibrar([10, 40, 10]);
+      setTimeout(function () { hoja.classList.remove("baja"); pie.classList.remove("oculto"); marco.classList.remove("cierra"); ocupado = false; }, rapido ? 0 : 260);
+    }, rapido ? 0 : 1300);
+  }
+  $("[data-escanear]").addEventListener("click", function () { escanear(); });
+  // ---- linterna
+  $("[data-linterna]").addEventListener("click", function (e) {
+    var b = e.currentTarget, on = !b.classList.contains("prendida");
+    b.classList.toggle("prendida", on); $(".luz").classList.toggle("prendida", on); A.vibrar(10);
+  });
+  // ---- la hoja: el asa la achica o la vuelve a subir; las acciones abren su detalle
+  hoja.addEventListener("click", function (e) {
+    if (e.target.closest(".asa")) { hoja.classList.toggle("chica"); pie.classList.toggle("oculto", hoja.classList.contains("chica")); return; }
+    var t = e.target.closest(".t-ev[data-id]"); if (t) A.abrirDetalle(A.buscar(t.getAttribute("data-id")));
+  });
+  $(".camara").addEventListener("click", function (e) {
+    if (e.target.closest(".redondo")) return;
+    if (hoja.classList.contains("chica")) { hoja.classList.remove("chica"); pie.classList.remove("oculto"); }
+  });
+  bTodas.addEventListener("click", function () {
+    var p = PRODS[actual];
+    var capa = A.abrir({ tipo: "hoja", titulo: "Las acciones de " + p.nombre, html:
+      '<div class="prod" style="display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;margin-bottom:12px"><div class="foto"><img src="../../../_comun/fotos/' + p.foto + '.webp" alt=""></div><div><div class="t-renglon">' + p.nombre + '</div><div class="t-detalle">Las ' + p.acc.length + " acciones de los últimos 30 días</div></div></div>" +
+      filtrosHtml(p) + '<div class="lista lista-9" data-todas-lista>' + p.acc.map(evHtml).join("") + "</div>" });
+    var f = { quien: "todos", tipo: "todo", cuando: "30" }, listaEl = capa.el.querySelector("[data-todas-lista]");
+    capa.el.addEventListener("click", function (e) {
+      var c = e.target.closest("[data-f]");
+      if (c) {
+        f[c.getAttribute("data-f")] = c.getAttribute("data-v");
+        $$('[data-f="' + c.getAttribute("data-f") + '"]', capa.el).forEach(function (x) { x.classList.toggle("elegido", x === c); });
+        A.rebotar(c); A.vibrar(10);
+        var L = p.acc.filter(function (a) {
+          if (f.quien !== "todos" && a.quien !== f.quien) return false;
+          if (f.tipo !== "todo" && TIPO_F[f.tipo].indexOf(a.tipo) < 0) return false;
+          if (f.cuando === "hoy" && a.fecha !== HOY) return false;
+          if (f.cuando === "semana" && a.fecha < A.sumar(HOY, -6)) return false;
+          return true;
+        });
+        A.cambiarLista(listaEl, L.length ? L.map(evHtml).join("") : '<div class="act-vacio" style="margin-top:8px"><b>Nada con estos filtros</b><span>Probá con otra persona o con más días.</span></div>');
+        return;
+      }
+      var t = e.target.closest(".t-ev[data-id]"); if (t) A.abrirDetalle(A.buscar(t.getAttribute("data-id")));
+    });
+  });
+  var TIPO_F = { venta: ["venta", "anulada"], precio: ["margen", "precio", "lista"], stock: ["stock", "compra"] };
+  function filtrosHtml(p) {
+    var hay = function (q) { return p.acc.some(function (a) { return a.quien === q; }); };
+    var chip = function (k, v, html, el) { return '<span class="chip' + (el ? " elegido" : "") + '" role="button" tabindex="0" data-f="' + k + '" data-v="' + v + '">' + html + "</span>"; };
+    var fila = function (h) { return '<div class="filtros-todas">' + h + "</div>"; };
+    return fila(chip("quien", "todos", "Todos", true) + ["mb", "ci", "lf"].filter(hay).map(function (q) { return chip("quien", q, A.PERS[q].nombre); }).join("")) +
+      fila(chip("tipo", "todo", "Todo tipo", true) + chip("tipo", "venta", "Ventas") + chip("tipo", "precio", "Precios") + chip("tipo", "stock", "Stock y compras")) +
+      fila(chip("cuando", "30", "30 días", true) + chip("cuando", "semana", "Esta semana") + chip("cuando", "hoy", "Hoy"));
+  }
+  // ---- la ×: sale de la cámara a la entrada de «Quién hizo qué», con el marco de la aplicación
+  var vistos = [0];
+  function cerrarCamara() {
+    if (vistos.indexOf(actual) < 0) vistos.unshift(actual);
+    var m = document.createElement("div");
+    m.className = "marco-qhq";
+    m.innerHTML = '<div class="barra-estado"><span>10:42</span><span class="se">' + A.ico("wifi") + '</span></div><div class="celu-cabecera"><span class="t-titulo">Negocio</span><span class="btn-vinculo">' + A.ico("monitor") + 'En espejo</span></div><div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>' +
+      '<nav class="celu-pestanas"><a data-ir="resumen">Resumen</a><a data-ir="usuarios">Usuarios</a><a class="activa">Quién hizo qué</a></nav>' +
+      '<div class="celu-pantalla"><div class="tarjeta entrada"><span class="foto-icono">' + A.ico("scan-line", "i-xl") + '</span><div class="t-seccion">¿Quién tocó esto?</div><div class="t-detalle">Apuntá la cámara a un producto o a su código y mirá quién le cambió el precio, lo vendió o le ajustó el stock.</div><button class="btn btn-oscuro grande" style="width:100%" data-abrir-camara>' + A.ico("camera", "i") + "Abrir la cámara</button></div>" +
+      '<div class="t-etiqueta" style="margin:20px 2px 8px">Los últimos que miraste</div>' +
+      vistos.map(function (i) { var p = PRODS[i]; return '<div class="renglon" data-producto="' + i + '"><div class="foto"><img src="../../../_comun/fotos/' + p.foto + '.webp" alt=""></div><div><div class="titulo">' + p.nombre + '</div><div class="detalle">' + p.acc.length + " acciones · " + p.datos[0][1] + "</div></div>" + A.ico("chevron-right", "i") + "</div>"; }).join("") +
+      '</div><nav class="nav-inferior"><a data-ir="vender">' + A.ico("shopping-cart", "i") + 'Vender</a><a data-ir="productos">' + A.ico("tags", "i") + 'Catálogo</a><a data-ir="stock">' + A.ico("package", "i") + 'Depósito</a><a class="activo" data-ir="resumen">' + A.ico("chart-column", "i") + 'Negocio</a><a data-mas>' + A.ico("menu", "i") + "Más</a></nav>";
+    celu.appendChild(m); A.pintar(m);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { m.classList.add("abierto"); }); });
+    m.addEventListener("click", function (e) {
+      if (e.target.closest("[data-mas]")) { A.menuMas(e.target.closest("[data-mas]")); return; }
+      var r = e.target.closest("[data-producto]"), c = e.target.closest("[data-abrir-camara]");
+      if (!r && !c) return;
+      m.classList.remove("abierto"); setTimeout(function () { m.remove(); }, A.reducido() ? 0 : 220);
+      if (r) escanear(+r.getAttribute("data-producto")); else escanear();
+    });
+  }
+  $("[data-cerrar-camara]").addEventListener("click", cerrarCamara);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !A.hayCapa() && !$(".marco-qhq")) cerrarCamara(); });
+})();
+</script>
 </body>
 </html>
