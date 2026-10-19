@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productos · bandeja de lo que hay que atender</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../ean.js"></script>
+<style>
+  .pantalla { display: grid; grid-template-rows: auto minmax(0,1fr); gap: 16px; padding-top: 16px; padding-bottom: 16px; }
+  .colas { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+  .cola { display: grid; grid-template-columns: 36px minmax(0,1fr); gap: 2px 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--superficie); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .cola .ico { grid-row: span 2; width: 36px; height: 36px; border-radius: 99px; display: grid; place-items: center; background: var(--hundido); color: var(--texto-2); }
+  .cola .et { font-size: 14px; line-height: 18px; color: var(--texto-2); font-weight: 650; white-space: nowrap; }
+  .cola .va { font-size: 22px; line-height: 26px; font-weight: 800; letter-spacing: -.02em; display: flex; align-items: baseline; gap: 6px; }
+  .cola .va small { font-size: 14px; font-weight: 600; color: var(--texto-2); letter-spacing: 0; }
+  .cola.elegida { background: var(--pino); border-color: var(--pino); color: #fff; box-shadow: var(--sombra-2); }
+  .cola.elegida .et, .cola.elegida .va small { color: rgba(255,255,255,.78); }
+  .cola.elegida .ico { background: rgba(255,255,255,.14); color: #fff; }
+  .cola.urgente .ico { background: var(--urgente-suave); color: var(--urgente-texto); }
+  .cola.urgente .va { color: var(--urgente-texto); }
+
+  .trabajo { display: grid; grid-template-columns: 400px minmax(0,1fr); gap: 16px; min-height: 0; }
+  .bandeja { background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra-1); display: flex; flex-direction: column; overflow: hidden; }
+  .bandeja-cab { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--borde); }
+  .bandeja-cab b { font-size: 16px; }
+  .bandeja-cab .barra { flex: 1; margin: 0 4px; height: 6px; }
+  .item { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 9px 14px; border-bottom: 1px solid var(--borde); position: relative; }
+  .item .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .item .n { font-size: 15px; line-height: 20px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .d { font-size: 14px; line-height: 18px; color: var(--texto-2); white-space: nowrap; }
+  .item .p { text-align: right; font-size: 14px; line-height: 18px; color: var(--texto-3); white-space: nowrap; }
+  .item .p b { display: block; font-size: 16px; line-height: 22px; color: var(--tinta); font-weight: 800; }
+  .item .p s { color: var(--texto-3); }
+  .item.elegido { background: var(--pino-suave); }
+  .item.elegido::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 0 4px 4px 0; background: var(--pino); }
+  .item.hecho { opacity: .5; }
+  .item.hecho .n { text-decoration: line-through; text-decoration-color: var(--texto-3); }
+  .kbd { white-space: nowrap; }
+  .tilde { width: 20px; height: 20px; border-radius: 99px; background: var(--logro); color: #fff; display: grid; place-items: center; }
+
+  .ficha { background: var(--superficie); border: 1px solid var(--borde); border-radius: 20px; box-shadow: var(--sombra-2); display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+  .porque { display: flex; gap: 12px; align-items: center; margin: 14px 16px 0; padding: 10px 14px; border-radius: 12px; background: var(--accion-suave); color: var(--accion-texto); font-weight: 650; font-size: 15px; line-height: 20px; }
+  .porque .i { flex: none; }
+  .ficha-cuerpo { padding: 14px 16px 12px; display: grid; grid-template-columns: minmax(0,1fr) 260px; gap: 14px 18px; flex: 1; min-height: 0; align-content: start; }
+  .cabeza { display: grid; grid-template-columns: 76px minmax(0,1fr); gap: 14px; align-items: center; }
+  .cabeza .foto { width: 76px; height: 76px; border-radius: 14px; }
+  .nombre { font-size: 20px; line-height: 25px; font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; }
+  .salto { display: flex; align-items: center; gap: 14px; }
+  .salto .antes { font-size: 22px; font-weight: 750; color: var(--texto-3); text-decoration: line-through; text-decoration-thickness: 2px; }
+  .salto .t-numero { font-size: 40px; line-height: 44px; }
+  .grafico { border: 1px solid var(--borde); border-radius: 14px; padding: 12px 14px 8px; }
+  .grafico .tit { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--texto-2); font-weight: 650; }
+  .ley { display: inline-flex; align-items: center; gap: 6px; }
+  .ley i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+  .lado { display: grid; gap: 10px; align-content: start; }
+  .mini { border: 1px solid var(--borde); border-radius: 14px; padding: 10px 12px; }
+  .mini h4 { margin: 0 0 6px; font-size: 14px; color: var(--texto-2); font-weight: 650; display: flex; justify-content: space-between; }
+  .pbar { display: grid; grid-template-columns: 74px minmax(0,1fr) 58px; gap: 8px; align-items: center; font-size: 14px; line-height: 24px; }
+  .pbar .b { height: 10px; border-radius: 99px; background: var(--hundido); overflow: hidden; }
+  .pbar .b i { display: block; height: 100%; border-radius: 99px; background: var(--borde-fuerte); }
+  .pbar.uso .b i { background: var(--pino); }
+  .pbar.uso { font-weight: 750; }
+  .pbar span:last-child { text-align: right; font-weight: 700; }
+  .ean { width: 100%; height: 28px; fill: var(--tinta); display: block; margin: 2px 0 4px; }
+  .acciones-ficha { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--borde); background: #FCFBF8; }
+  .acciones-ficha .teclas { margin-right: auto; display: flex; gap: 12px; font-size: 14px; color: var(--texto-2); align-items: center; }
+  .acciones-ficha .teclas span { display: inline-flex; gap: 6px; align-items: center; }
+  .mini .segmentos > * { flex: 1; justify-content: center; padding: 0; }
+  .salto .chip-ok { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">3</span></a>
+    <a class="nav-item activo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="insignia" style="background:var(--urgente);color:var(--tinta)">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de Carlos</small></div></div>
+      <div class="vinculo" style="background:transparent;justify-content:center;padding:6px"><span style="width:10px;height:10px;border-radius:99px;background:var(--logro)"></span></div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Catálogo</div>
+      <div class="acciones">
+        <div class="campo" style="height:40px;width:340px"><i class="i" data-i="search"></i><span style="white-space:nowrap">Buscar productos, códigos o marcas…</span></div>
+        <button class="btn chico"><i class="i i-s" data-i="scan-barcode"></i>Escanear</button>
+      </div>
+    </header>
+    <nav class="pestanas"><a class="activa">Productos</a><a>Listas de precios</a><a>Duplicados <span class="pastilla urgente" style="height:24px">12</span></a></nav>
+    <section class="pantalla">
+      <div class="colas">
+        <div class="cola elegida"><span class="ico"><i class="i" data-i="trending-up"></i></span><span class="et">Para remarcar</span><span class="va">46 <small>lista del 06/10</small></span></div>
+        <div class="cola urgente"><span class="ico"><i class="i" data-i="triangle-alert"></i></span><span class="et">Sin precio</span><span class="va">28 <small>nuevos</small></span></div>
+        <div class="cola"><span class="ico"><i class="i" data-i="clock"></i></span><span class="et">Costo viejo</span><span class="va">9 <small>+60 días</small></span></div>
+        <div class="cola"><span class="ico"><i class="i" data-i="scan-barcode"></i></span><span class="et">Sin código</span><span class="va">1.204</span></div>
+        <div class="cola"><span class="ico"><i class="i" data-i="layers"></i></span><span class="et">Todos</span><span class="va">11.240</span></div>
+      </div>
+
+      <div class="trabajo">
+        <div class="bandeja">
+          <div class="bandeja-cab"><b>18 de 46</b><div class="barra"><b style="width:39%"></b></div><span class="t-detalle">J K para moverse</span></div>
+          <div class="item hecho"><div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div><div class="n">Mecha acero rápido HSS 8 mm</div><div class="d">Ezeta · Dist. Oeste +8 %</div></div><span class="tilde"><i class="i i-s" data-i="check"></i></span></div>
+          <div class="item hecho"><div class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></div><div><div class="n">Tornillo autoperforante 8 × 1" × 100</div><div class="d">Fixser · Dist. Oeste +11 %</div></div><span class="tilde"><i class="i i-s" data-i="check"></i></span></div>
+          <div class="item elegido"><div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div><div class="n">Cinta métrica PowerLock 5 m</div><div class="d">Stanley · Dist. Oeste +11 %</div></div><div class="p"><s>$16.000</s><b>$17.000</b></div></div>
+          <div class="item"><div class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div><div><div class="n">Llave combinada 13 mm cromada</div><div class="d">Bahco · Dist. Oeste +9 %</div></div><div class="p"><s>$11.000</s><b>$12.000</b></div></div>
+          <div class="item"><div class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></div><div><div class="n">Pinza universal 8" aislada 1000 V</div><div class="d">Bremen · Dist. Oeste +14 %</div></div><div class="p"><s>$17.000</s><b>$19.000</b></div></div>
+          <div class="item"><div class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></div><div><div class="n">Látex interior mate blanco 4 L</div><div class="d">Alba · Dist. Oeste +22 %</div></div><div class="p"><s>$32.000</s><b style="color:var(--urgente-texto)">$38.000</b></div></div>
+          <div class="item"><div class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></div><div><div class="n">Clavos punta París 2" por kilo</div><div class="d">Acindar · Dist. Oeste +6 %</div></div><div class="p"><s>$7.000</s><b>$8.000</b></div></div>
+          <div class="item"><div class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></div><div><div class="n">Martillo carpintero 27 mm</div><div class="d">Bahco · Dist. Oeste +4 %</div></div><div class="p"><s>$23.000</s><b>$24.000</b></div></div>
+        </div>
+
+        <article class="ficha">
+          <div class="porque"><i class="i" data-i="trending-up"></i><span>Está acá porque la lista de Distribuidora Oeste del 06/10 subió el costo 11 %: el precio pasa de $16.000 a $17.000. Remarcá la góndola y seguí.</span></div>
+          <div class="ficha-cuerpo">
+            <div style="display:grid;gap:12px;align-content:start;min-width:0">
+              <div class="cabeza">
+                <div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div>
+                <div style="min-width:0">
+                  <div class="nombre">Cinta métrica PowerLock 5 m</div>
+                  <div class="t-detalle">Stanley · Cód. 33-158 · <span style="color:var(--logro-texto);font-weight:700">6 un. en stock</span> · Est. B-02-07</div><div class="t-detalle" style="display:flex;align-items:center;gap:6px"><i class="i i-s" data-i="scan-barcode"></i>7897065211580 <i class="i i-s" data-i="copy"></i> · leído el 13/10 a las 10:24</div>
+                </div>
+              </div>
+              <div class="salto">
+                <span class="antes"><span class="peso">$</span>16.000</span><i class="i i-l" data-i="arrow-right" style="color:var(--texto-3)"></i>
+                <span class="t-numero"><span class="peso">$</span>17.000</span>
+                <span class="pastilla contorno chip-ok">margen 50 %, sin cambios</span>
+              </div>
+              <div class="grafico">
+                <div class="tit">Cómo cambió<span class="ley" style="margin-left:auto"><i style="background:var(--tinta)"></i>Precio</span><span class="ley"><i style="background:var(--pino)"></i>Costo Oeste</span><span class="ley"><i style="background:var(--borde-fuerte)"></i>Bulonera</span></div>
+                <svg viewBox="0 0 520 132" width="100%" height="176" style="display:block;overflow:visible">
+                  <g stroke="var(--borde)" stroke-width="1"><line x1="0" y1="20" x2="520" y2="20"/><line x1="0" y1="64" x2="520" y2="64"/><line x1="0" y1="108" x2="520" y2="108"/></g>
+                  <g font-size="14" fill="var(--texto-3)" font-family="Manrope" font-weight="600"><text x="0" y="128">jun.</text><text x="120" y="128">jul.</text><text x="240" y="128">ago.</text><text x="360" y="128">sep.</text><text x="478" y="128">oct.</text></g>
+                  <polyline points="0,40 120,28 240,28 360,16 500,16" fill="none" stroke="var(--tinta)" stroke-width="2.5" stroke-linejoin="round" />
+                  <polyline points="0,100 120,88 240,88 360,76 500,66" fill="none" stroke="var(--pino)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                  <polyline points="0,96 120,92 240,84 360,74 500,60" fill="none" stroke="var(--borde-fuerte)" stroke-width="2" stroke-dasharray="5 5"/>
+                  <circle cx="500" cy="16" r="5" fill="var(--tinta)"/><circle cx="500" cy="66" r="5" fill="var(--pino)"/>
+                  <g font-family="Manrope" font-size="14" font-weight="800"><text x="408" y="10" fill="var(--tinta)">$17.000</text><text x="416" y="56" fill="var(--pino-texto)">$9.350</text></g>
+                </svg>
+              </div>
+            </div>
+            <div class="lado">
+              <div class="mini">
+                <h4>Así se calcula <span>F1</span></h4>
+                <div class="segmentos" style="display:flex;margin:0 0 8px"><span>300</span><span>200</span><span>100</span><span class="elegido">50</span><span>25</span></div>
+                <div class="pbar" style="grid-template-columns:1fr auto;line-height:22px"><span>Costo de compra</span><span>$9.350,85</span></div>
+                <div class="pbar" style="grid-template-columns:1fr auto;line-height:22px"><span>+ 50 % margen</span><span>$14.026,28</span></div>
+                <div class="pbar" style="grid-template-columns:1fr auto;line-height:22px"><span>+ IVA 21 %</span><span>$16.971,79</span></div>
+                <div class="pbar" style="grid-template-columns:1fr auto;line-height:26px;color:var(--logro-texto)"><span>Se cobra</span><span>$17.000</span></div>
+              </div>
+              <div class="mini">
+                <h4>Proveedores <span>costo</span></h4>
+                <div class="pbar uso"><span>Oeste ★</span><span class="b"><i style="width:78%"></i></span><span>$9.350</span></div>
+                <div class="pbar"><span>Bulonera</span><span class="b"><i style="width:84%"></i></span><span>$9.980</span></div>
+                <div class="pbar"><span>Del Sur</span><span class="b"><i style="width:88%"></i></span><span>$10.420</span></div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--borde);font-size:14px;color:var(--texto-2)"><i class="i i-s" data-i="file-spreadsheet" style="color:var(--logro-texto)"></i><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Lista_Oeste_Oct2026.xlsx</span><i class="i i-s" data-i="download"></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="acciones-ficha">
+            <div class="teclas"><span><span class="kbd">Mayús</span><span class="kbd">1–5</span>margen</span><span><span class="kbd">P</span>etiqueta</span></div>
+            <button class="btn chico"><i class="i i-s" data-i="shopping-cart"></i>Agregar a la venta <span class="kbd">+</span></button>
+            <button class="btn btn-accion"><i class="i" data-i="check"></i>Remarcado, siguiente <span class="kbd">E</span></button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
