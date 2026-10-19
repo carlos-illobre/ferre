@@ -44,7 +44,8 @@ export function useAtajos(activos: boolean, opciones?: { alFinal?: string }): vo
     if (!activos) return;
     let capa: HTMLDivElement | null = null;
     let porLetra = new Map<string, HTMLElement>();
-    const ocultar = () => { capa?.remove(); capa = null; porLetra = new Map(); };
+    // Con Alt apretado, la página lleva `con-alt`: así se ven también los números de Alt + número.
+    const ocultar = () => { capa?.remove(); capa = null; porLetra = new Map(); document.documentElement.classList.remove("con-alt"); };
     const mostrar = () => {
       ocultar();
       const botones = botonesALaVista();
@@ -67,6 +68,7 @@ export function useAtajos(activos: boolean, opciones?: { alFinal?: string }): vo
         capa!.appendChild(marca);
       });
       document.body.appendChild(capa);
+      document.documentElement.classList.add("con-alt");
     };
     const alApretar = (e: KeyboardEvent) => {
       if (e.key === "Alt") { if (!e.repeat) mostrar(); return; }

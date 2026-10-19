@@ -238,8 +238,11 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
 
         <div className="vm-cab-lista" data-testid="titulo-venta">
           <h2>Esta venta</h2><span className="vm-cuenta" data-testid="cuantos-en-venta">{items.length}</span>
-          <button type="button" onClick={noLlevo} disabled={!items.length} data-testid="no-llevo"><Icono nombre="prohibido" tam={18} />No llevó</button>
-          <button type="button" onClick={vaciar} disabled={!items.length} data-testid="vaciar-venta"><Icono nombre="tacho" tam={18} />Vaciar</button>
+          {/* Con la venta vacía no se muestran (decisión 126). */}
+          {items.length > 0 && <>
+            <button type="button" onClick={noLlevo} data-testid="no-llevo"><Icono nombre="prohibido" tam={18} />No llevó</button>
+            <button type="button" onClick={vaciar} data-testid="vaciar-venta"><Icono nombre="tacho" tam={18} />Vaciar</button>
+          </>}
         </div>
 
         {items.length === 0 ? (

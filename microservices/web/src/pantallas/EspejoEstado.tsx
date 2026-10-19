@@ -22,7 +22,9 @@ export function EspejoEstado({ sinBoton = false }: { sinBoton?: boolean } = {}) 
     : `Conectado con ${otro}`;
   return (
     <div className={`espejo ${e.enEspejo ? "activo" : ""}`} role="status" data-testid="espejo">
-      <span className="espejo-texto" data-testid="espejo-estado"><span className="espejo-punto" aria-hidden="true" />{texto}</span>
+      <span className="espejo-texto" data-testid="espejo-estado"><span className="espejo-punto" aria-hidden="true" />
+        {/* En el menú de la computadora, en lugar del punto va el celular, como la v2 (decisión 126). */}
+        <svg className="espejo-icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" /><path d="M12 18h.01" /></svg>{texto}</span>
       {aviso && <span className="espejo-aviso" data-testid="espejo-aviso">{aviso}</span>}
       {!sinBoton && e.conectado && (
         <span className="espejo-botones">

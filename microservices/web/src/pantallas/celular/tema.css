@@ -22,9 +22,6 @@
 }
 .pill-prueba { background: var(--p-amarillo) !important; color: var(--p-verde) !important; }
 
-/* Lo último que se vendió y lo que más se vende, para que la venta nueva no arranque vacía. */
-.sugeridos { display: flex; flex-direction: column; gap: 8px; }
-.sugeridos h2 { margin: 6px 4px 0; font-size: 15px; font-weight: 700; color: var(--gris); }
 
 /* El margen elegido se sigue leyendo al tocarlo o pasarle el mouse. */
 .cuadricula-5 .boton.activo:hover, .cuadricula-5 .boton.activo:active { background: var(--tinta); color: #fff; }

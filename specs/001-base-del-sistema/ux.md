@@ -65,6 +65,13 @@ Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec
   logotipo de Ferrebress; la parte abierta va en pino suave con una raya naranja. Un botón arriba
   (y Ctrl+B) lo achica a solo íconos, con el isotipo, y lo vuelve a agrandar; recuerda cómo quedó.
   Achicado, cada ícono dice su nombre al pasar el mouse y todo sigue con el teclado.
+  Se ve como la v2 de la maqueta (decisión 126): sin los Alt+número a la vista (salen al apretar
+  Alt), sin texto de ayuda, el celular en espejo en un recuadro verde, la conexión en una pastilla
+  y abajo el usuario con sus iniciales, su nombre y su rol: al tocarlo (o Enter) abre un menú con
+  el nombre y el rol arriba y «Cerrar sesión»; Esc lo cierra. Las pestañas de cada parte
+  son texto subrayado, con su Alt+número chico al lado. El botón que achica el menú usa el ícono de
+  la maqueta (el panel con la flecha); las teclas a la vista, la letra de siempre con fondo blanco y
+  borde suave.
 - En la computadora todo se opera con teclado; el mouse nunca es la única forma (RNF-05). Un rediseño
   nunca saca lo especificado del teclado: un gesto nuevo (arrastrar, deslizar) se suma, no lo
   reemplaza (decisión 121).

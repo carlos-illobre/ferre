@@ -25,7 +25,6 @@ import { irA } from "./base/rutas";
 import { Aviso, Boton, Buscador, Contador, Exito, Explicado, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Progreso, Toast, Vacio, hora, numero, pesosCortos } from "./base/ui";
 import "./base/estilos/vender.css";
 import "./base/estilos/vender-mostrador.css";
-import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
 
 // La venta, en el orden del mostrador: buscar → costo, margen y precio → cantidad → cobro.
@@ -68,7 +67,6 @@ export function Vender() {
     medio: NOMBRE_DE_MEDIO[cobro.medio] + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
     detalle: cobro.encolado ? "Sin conexión: quedó guardada en este dispositivo y se envía sola cuando vuelva internet." : `${cobro.productos} ${cobro.productos === 1 ? "producto" : "productos"} a las ${hora(cobro.fecha)}. El stock ya se descontó.`,
   }, [cobro]);
-  const sugeridos = useSugeridos(catalogo, exito);
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
@@ -193,30 +191,34 @@ export function Vender() {
                   placeholder={!catalogo ? "Bajando el catálogo…" : "Buscá por nombre o código, o escaneá"}
                   etiqueta="Buscar un producto para agregarlo a la venta" controla="vender-sugerencias" activo={resultados[elegido] ? `sug-${resultados[elegido]!.id}` : undefined} />
                 {resultados.length > 0 && (
-                  <ul className="lista vender-sugerencias" id="vender-sugerencias" role="listbox" aria-label="Productos encontrados" data-testid="sugerencias">
-                    {resultados.map((p, i) => {
-                      const precio = precioDeLista(p);
-                      const stock = stockPorId.get(p.id);
-                      return (
-                        <li key={p.id} id={`sug-${p.id}`} role="option" aria-selected={i === elegido} className="renglon con-foto elegible" onMouseDown={(e) => { e.preventDefault(); elegirSugerencia(p); }} onMouseEnter={() => setElegido(i)}>
-                          <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
-                          <span className="nombre">{p.descripcion}</span>
-                          <span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "sin precio" : pesosCortos(precio)}</span>
-                          <span className="detalle">{detalleDe(p)}{stock !== undefined ? `${detalleDe(p) ? " · " : ""}stock ${numero(stock)}` : ""}</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                  // El desplegable de la v2 (decisión 126): la foto, el nombre con marca y proveedor, el stock
+                  // en su pastilla y el precio; abajo, las teclas y cuántos encontró.
+                  <div className="vmc-sug" data-testid="sugerencias">
+                    <ul className="vender-sugerencias" id="vender-sugerencias" role="listbox" aria-label="Productos encontrados">
+                      {resultados.map((p, i) => {
+                        const precio = precioDeLista(p);
+                        const stock = stockPorId.get(p.id);
+                        return (
+                          <li key={p.id} id={`sug-${p.id}`} role="option" aria-selected={i === elegido} className="vmc-sug-r" onMouseDown={(e) => { e.preventDefault(); elegirSugerencia(p); }} onMouseEnter={() => setElegido(i)}>
+                            <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
+                            <span className="vmc-sug-txt"><span className="nombre">{p.descripcion}</span><span className="detalle">{detalleDe(p) || "\u00a0"}</span></span>
+                            {stock !== undefined ? <Pastilla tipo={stock > 0 ? "ok" : "alerta"} sinPunto>{stock > 0 ? `${numero(stock)} ${abreviarUnidad(p.unidad ?? "unidad")}` : "sin stock"}</Pastilla> : <span />}
+                            <span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div className="vmc-sug-pie" aria-hidden="true">
+                      <span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> elegir</span><span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">Esc</kbd> cierra</span>
+                      <span className="crece" /><span>{resultados.length} {resultados.length === 1 ? "encontrado" : "encontrados"}</span>
+                    </div>
+                  </div>
                 )}
               </div>
               {puestoVinculado && (escaneandoCelular
                 ? <div className="vmc-camara" role="status" data-testid="celular-escaneando"><span className="vivo" aria-hidden="true" /><span className="t">El celular está escaneando<small>Lo que lea entra acá</small></span><span className="rec" aria-hidden="true" /><button type="button" onClick={() => setEscaneandoCelular(false)} data-testid="dejar-de-escanear">Detener</button></div>
-                : <VincularParaEscanear vinculado alVincular={alVincular} alPedir={() => setEscaneandoCelular(true)} />)}
+                : <VincularParaEscanear vinculado alVincular={alVincular} alPedir={() => setEscaneandoCelular(true)} comoV2 />)}
             </div>
-            <p className="vender-teclas detalle" data-testid="teclas">
-              <span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen</span>
-              <span><kbd className="tecla">+</kbd><kbd className="tecla">−</kbd> cantidad</span><span><kbd className="tecla">Supr</kbd> quita</span><span><kbd className="tecla">F1</kbd> panel</span>
-            </p>
             {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo por primera vez. Después se busca al instante, también sin internet." />}
             <Aviso tipo="error">{errorCatalogo}</Aviso>
             {codigoDesconocido && (
@@ -235,36 +237,15 @@ export function Vender() {
             <div className="vmc-cab" data-testid="titulo-venta">
               <h2>Esta venta</h2><span className="vmc-cuenta">{items.length} {items.length === 1 ? "producto" : "productos"}</span>
               <span className="crece" />
-              <Boton tam="chico" onClick={noLlevo} disabled={!items.length} aria-keyshortcuts="Escape" data-testid="no-llevo">No llevó <kbd className="tecla">Esc</kbd></Boton>
-              <Boton tam="chico" icono="basura" onClick={vaciar} disabled={!items.length} data-testid="vaciar-venta">Vaciar</Boton>
+              {/* Con la venta vacía no hay nada que anotar ni vaciar: no se muestran (decisión 126). */}
+              {items.length > 0 && <>
+                <Boton tam="chico" onClick={noLlevo} aria-keyshortcuts="Escape" data-testid="no-llevo">No llevó <kbd className="tecla">Esc</kbd></Boton>
+                <Boton tam="chico" icono="basura" onClick={vaciar} data-testid="vaciar-venta">Vaciar</Boton>
+              </>}
             </div>
             {items.length === 0 ? (
               <>
                 {!consulta.trim() && <Vacio icono="vender" titulo="La venta está vacía">Buscá por nombre o código, escaneá con el lector o con el celular.</Vacio>}
-                {vacio && sugeridos.hay && (
-                  <div className="sugeridos">
-                    {[["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
-                      <section key={clave} aria-label={titulo} data-testid={`sugeridos-${clave}`}>
-                        <h2 className="seccion-titulo">{titulo}</h2>
-                        <ul className="sugeridos-grilla" data-sin-flechas>
-                          {lista.map((p) => {
-                            const precio = precioSugerido(p);
-                            return (
-                              <li key={p.id}>
-                                <button type="button" className="tarjeta sugeridos-tarjeta" onClick={() => agregar(p)}>
-                                  <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
-                                  <span className="nombre">{p.descripcion}</span>
-                                  <span className="detalle">{detalleDe(p) || "Agregar a la venta"}</span>
-                                  <span className={precio === null ? "falta-texto" : "importe chico"}>{precio === null ? "sin precio" : pesosCortos(precio)}</span>
-                                </button>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </section>
-                    ))}
-                  </div>
-                )}
               </>
             ) : (
               <ul className="lista vmc-items" ref={lista} data-testid="venta">
@@ -354,13 +335,6 @@ export function Vender() {
       </div>
       {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo por primera vez. Después se busca al instante, también sin internet." />}
 
-      {!esCelular && (
-        <p className="vender-teclas detalle" data-testid="teclas">
-          <span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen</span>
-          <span><kbd className="tecla">F5</kbd> a <kbd className="tecla">F8</kbd> cómo paga</span><span><kbd className="tecla">F2</kbd> cobra</span><span><kbd className="tecla">Esc</kbd> borra la búsqueda</span>
-        </p>
-      )}
-
       <Aviso tipo="error">{errorCatalogo}</Aviso>
       {codigoDesconocido && (
         <Aviso tipo="alerta" testId="codigo-desconocido" accion={<Boton tam="chico" onClick={() => setCodigoDesconocido(null)}>Ignorar</Boton>}>
@@ -376,38 +350,13 @@ export function Vender() {
         </div>
       )}
 
-      {vacio && !sugeridos.hay && (
+      {vacio && (
         <Vacio icono="vender" titulo="Venta nueva">
           {esCelular ? "Escribí el nombre del producto o escaneá el código de barras." : "Escribí el nombre del producto o el código y apretá Enter. También podés escanear con el celular vinculado."}
         </Vacio>
       )}
 
       {/* Siguen a la vista con la venta empezada, para sumar otro producto de un clic. */}
-      {sugeridos.hay && !consulta.trim() && !codigoDesconocido && (
-        <div className="sugeridos">
-          {[["Lo último que se vendió", sugeridos.ultimos, "ultimos"] as const, ["Lo que más se vende", items.length ? [] : sugeridos.masVendidos, "mas-vendidos"] as const].map(([titulo, lista, clave]) => lista.length > 0 && (
-            <section key={clave} aria-label={titulo} data-testid={`sugeridos-${clave}`}>
-              <h2 className="seccion-titulo">{titulo}</h2>
-              <ul className="sugeridos-grilla" data-sin-flechas>
-                {lista.map((p) => {
-                  const precio = precioSugerido(p);
-                  return (
-                    <li key={p.id}>
-                      <button type="button" className="tarjeta sugeridos-tarjeta" onClick={() => agregar(p)}>
-                        <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
-                        <span className="nombre">{p.descripcion}</span>
-                        <span className="detalle">{detalleDe(p) || "Agregar a la venta"}</span>
-                        <span className={precio === null ? "falta-texto" : "importe chico"}>{precio === null ? "sin precio" : pesosCortos(precio)}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))}
-          {vacio && <p className="detalle">Un clic agrega el producto a la venta. También podés escribir en la búsqueda o escanear con el celular vinculado.</p>}
-        </div>
-      )}
 
       {items.length > 0 && <ul className="vender-items" data-testid="venta">{filas.map((f) => <TarjetaDeVenta key={f.item.clave} {...f} />)}</ul>}
 
@@ -494,12 +443,13 @@ function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
       </div>
       <Boton icono="basura" tam="chico" title="Quitar de la venta" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} data-testid="quitar-renglon" />
       <div className="vmc-fila2">
-        {producto && p.costo !== null && <SiVeCostos><span>Costo <Explicado className="vmc-valor" valor={pesos(p.costo)} pasos={pasosDeCosto(producto, p.costo)} etiqueta={`Costo ${pesos(p.costo)}`} /></span><span className="vmc-sep" /></SiVeCostos>}
-        {producto && p.costo !== null && <><span className={sinPrecio ? "falta-texto" : ""}>Margen</span><Margenes compacto elegido={it.precioManual === null ? p.margen : null} alElegir={alElegirMargen} etiqueta={`Margen de ${it.descripcion}`} /><span>%</span><span className="vmc-sep" /></>}
-        {!sinPrecio && <span>Precio <Explicado conCosto className="vmc-valor" valor={pesosCortos(p.unitario!)} pasos={p.pasos} etiqueta={`Precio ${pesosCortos(p.unitario!)}`} /></span>}
+        {producto && p.costo !== null && <SiVeCostos><span>Costo <b className="vmc-valor">{pesos(p.costo)}</b></span><span className="vmc-sep" /></SiVeCostos>}
+        {producto && p.costo !== null && <><span className={sinPrecio ? "falta-texto" : ""}>Margen</span><Margenes compacto sinSigno elegido={it.precioManual === null ? p.margen : null} alElegir={alElegirMargen} etiqueta={`Margen de ${it.descripcion}`} /><span>%</span><span className="vmc-sep" /></>}
+        {/* La cuenta del costo y del precio está en «De dónde sale», a la derecha: acá van solos. */}
+        {!sinPrecio && <span>Precio <b className="vmc-valor">{pesosCortos(p.unitario!)}</b></span>}
         {aMano || it.precioManual !== null || !producto
           ? <PrecioAMano item={it} alCambiar={alCambiar} falta={sinPrecio} enfocar={aMano && it.precioManual === null} />
-          : <Boton tam="chico" icono="editar" onClick={() => setAMano(true)} data-testid="habilitar-precio-manual">Precio a mano</Boton>}
+          : <Boton tam="chico" icono="editar" onClick={() => setAMano(true)} aria-label="Precio a mano" title="Precio a mano" data-testid="habilitar-precio-manual"><span className="txt">Precio a mano</span></Boton>}
       </div>
     </li>
   );
@@ -641,7 +591,8 @@ function ElegirCliente({ clientes, elegido, alElegir, alCerrar, soloCuentaCorrie
 
 // En la computadora: un QR que el celular lee con su cámara. Queda vinculado 12 horas y lo
 // que escanea aparece en esta venta.
-export function VincularParaEscanear({ vinculado, alVincular, alPedir }: { vinculado: boolean; alVincular: (puestoId: string) => void; alPedir?: () => void }) {
+// `comoV2`: en Vender, el botón verde oscuro de la v2, del alto de la búsqueda y con el ícono de escanear.
+export function VincularParaEscanear({ vinculado, alVincular, alPedir, comoV2 = false }: { vinculado: boolean; alVincular: (puestoId: string) => void; alPedir?: () => void; comoV2?: boolean }) {
   const [abierta, setAbierta] = useState(false);
   const codigo = useCodigoParaVincular((id) => { setAbierta(false); alVincular(id); }, { ancho: 260, oscuro: "#0f1e36" });
   const { qr, vencido, error } = codigo;
@@ -655,7 +606,7 @@ export function VincularParaEscanear({ vinculado, alVincular, alPedir }: { vincu
   if (vinculado) {
     return (
       <span className="fila" data-testid="celular-vinculado">
-        <Boton icono="celular" onClick={() => void pedir()} data-testid="pedir-lector">Escanear con el celular</Boton>
+        <Boton icono={comoV2 ? "escanear" : "celular"} className={comoV2 ? "vmc-escanear" : undefined} onClick={() => void pedir()} data-testid="pedir-lector">Escanear con el celular</Boton>
         {pedido === "si" && <Pastilla tipo="ok"><span data-testid="lector-pedido">Abrí Ferrebress en el celular y tocá «Abrir el lector»</span></Pastilla>}
         {pedido === "no" && <Pastilla tipo="alerta">No se pudo avisar al celular</Pastilla>}
       </span>

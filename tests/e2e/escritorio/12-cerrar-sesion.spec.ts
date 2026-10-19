@@ -43,6 +43,8 @@ test("007-T037 en la tarjeta de la persona se cierra la sesión de otro disposit
 test("Salir vuelve al login", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/vender");
+  // «Cerrar sesión» está en el menú del usuario, abajo del menú (decisión 126).
+  await page.getByTestId("cuenta").click();
   await page.getByTestId("salir").click();
   await expect(page.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
   await expect.poll(() => psql(`SELECT count(*) FROM sesion WHERE dispositivo = 'esta computadora' AND revocada_en IS NOT NULL`)).toBe("1");

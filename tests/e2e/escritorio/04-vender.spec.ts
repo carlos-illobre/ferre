@@ -231,10 +231,10 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await expect(page.getByTestId("pestana-productos")).toBeFocused();
   await page.keyboard.press("ArrowDown");
 
-  // ← lleva al menú; ahí ↑ ↓ lo recorren sin mover la lista de productos, hasta Vincular, Salir y el botón que achica el menú.
+  // ← lleva al menú; ahí ↑ ↓ lo recorren sin mover la lista de productos, hasta Vincular, la cuenta (con «Cerrar sesión» adentro) y el botón que achica el menú.
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
-  for (const destino of ["menu-vender", "menu-deposito", "menu-mas", "emparejar-celular", "salir", "plegar-menu", "menu-catalogo"]) {
+  for (const destino of ["menu-vender", "menu-deposito", "menu-mas", "emparejar-celular", "cuenta", "plegar-menu", "menu-catalogo"]) {
     await page.keyboard.press("ArrowDown");
     await expect(page.getByTestId(destino)).toBeFocused();
   }

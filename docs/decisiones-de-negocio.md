@@ -990,3 +990,25 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      botón «Cobrar $X» (en la computadora cambia lo dicho en la decisión 37; el celular sigue igual).
      En la barra, los medios van con su nombre corto («M. Pago», «Cta. cte.») y el largo al pasar el
      mouse, porque los cuatro con su tecla no entran con el nombre largo.
+126. **La computadora como la v2: el menú, las pestañas, Vender** (2026-10-19). Probándolo, Carlos
+     pidió que se parezca más a la v2 del director de arte (la maqueta aprobada
+     `specs/001-base-del-sistema/maquetas/compu-menu-mostrador.png`): el menú de la izquierda sin los
+     Alt+número a la vista (salen al apretar Alt), sin el texto de ayuda del teclado, con el celular
+     en espejo en un recuadro verde, la conexión en una pastilla y el usuario con sus iniciales, su
+     nombre y su rol; de la v1 queda solo «Salir». Las pestañas de cada parte, como texto subrayado.
+     En Vender: «Escanear con el celular» es el botón verde oscuro de la v2, del alto de la
+     búsqueda; el desplegable de la búsqueda es el de la v2 (foto, nombre con marca y proveedor, el
+     stock en su pastilla, el precio, y abajo las teclas y cuántos encontró); cada renglón se parece
+     al de la v2 (la cantidad en una sola pastilla con − y + y la unidad, sin rayas; el margen en un
+     selector segmentado sin el «%» en cada uno; la fila de abajo en una línea con «Precio a mano» a
+     la derecha; la cuenta del costo y del precio, en «De dónde sale»). Se saca «Lo último que se
+     vendió» («no es útil»; cambia la decisión 38: ya no está en ningún lado). «No llevó» y «Vaciar»
+     solo se muestran con productos en la venta, en la computadora y en el celular. Debajo de la
+     búsqueda no va la línea de teclas («Enter agrega, ↑ ↓ eligen…»): «no hace falta». Las teclas
+     a la vista llevan el aspecto de la maqueta (la letra de siempre, fondo blanco y borde suave), y
+     el botón que achica el menú usa el ícono de la maqueta (el panel con la flecha).
+     Después, mirando la v2, Carlos eligió también su bloque del usuario: las iniciales, el nombre y
+     el rol abren un menú con el nombre y el rol arriba y «Cerrar sesión» (reemplaza al «Salir» de
+     la v1); el celular en espejo lleva el ícono del celular. «Mis datos», que también está en la
+     v2, no existe todavía: queda como pregunta abierta. Y el margen, del tamaño de la v2; si la
+     tarjeta es angosta, «Precio a mano» queda en su lápiz (con el nombre al pasar el mouse).

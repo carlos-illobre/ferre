@@ -65,5 +65,5 @@ test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) =>
   // En la venta se ve el stock del producto.
   await page.goto("/#/vender");
   await page.getByTestId("busqueda").fill("e2e candado stock");
-  await expect(page.getByTestId("sugerencias")).toContainText("stock 15");
+  await expect(page.getByTestId("sugerencias")).toContainText("15 un.") // el stock en su pastilla, como la v2 (decisión 126);
 });

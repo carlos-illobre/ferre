@@ -91,13 +91,14 @@ describe("Vender (v2)", () => {
     expect(screen.queryByTestId("error-cobro")).toBeNull();
   });
 
-  it("con la venta vacía, lo último que se vendió son tarjetas con foto; con la venta empezada, la lista ocupa su lugar", async () => {
-    armar({ ventas: [{ fecha: "2026-10-11T12:00:00Z", estado: "confirmada", items: [{ descripcion: "MECHA VENDER 8 MM" }] }], totales: {}, total: 0 });
-    const tarjetas = await screen.findByTestId("sugeridos-ultimos");
-    expect(tarjetas.textContent).toContain("MECHA VENDER 8 MM");
-    fireEvent.click(within(tarjetas).getByRole("button"));
-    expect(screen.getAllByTestId("item")).toHaveLength(1);
-    expect(screen.queryByTestId("sugeridos-ultimos")).toBeNull();
+  it("la venta vacía no muestra lo último que se vendió ni «No llevó» y «Vaciar» (decisión 126)", async () => {
+    const { agregar } = armar({ ventas: [{ fecha: "2026-10-11T12:00:00Z", estado: "confirmada", items: [{ descripcion: "MECHA VENDER 8 MM" }] }], totales: {}, total: 0 });
+    expect(screen.queryByText("Lo último que se vendió")).toBeNull();
+    expect(screen.queryByTestId("no-llevo")).toBeNull();
+    expect(screen.queryByTestId("vaciar-venta")).toBeNull();
+    agregar("mecha vender");
+    expect(screen.getByTestId("no-llevo")).toBeTruthy();
+    expect(screen.getByTestId("vaciar-venta")).toBeTruthy();
   });
 
   it("dicen lo mismo que el celular: los medios de pago y los avisos salen de los textos compartidos", async () => {

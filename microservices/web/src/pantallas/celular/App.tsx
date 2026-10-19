@@ -45,7 +45,7 @@ import "./estilos.css";
 import "./tema.css";
 
 // La interfaz de celular (una cosa por vez, tarjetas y hojas), con la
-// paleta de la v5, la venta con sugeridos y sin que la búsqueda tome el foco sola. El menú es
+// paleta de la v5, sin que la búsqueda tome el foco sola. El menú es
 // el mismo que en la computadora: Catálogo, Vender, Depósito y Más, con sus pestañas adentro.
 export function App() {
   return (

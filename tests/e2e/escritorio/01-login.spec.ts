@@ -103,7 +103,8 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await expect.poll(() => psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
 
   // Salir y entrar con la huella: sin Google.
-  await page.getByRole("button", { name: "Salir" }).click();
+  await page.getByTestId("cuenta").click(); // «Cerrar sesión» está en el menú del usuario (decisión 126)
+  await page.getByTestId("salir").click();
   await expect(page.getByTestId("entrar-huella")).toBeVisible();
   await page.getByTestId("entrar-huella").click();
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
@@ -113,7 +114,8 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await page.goto("/#/configuracion");
   await page.getByTestId("celular").getByRole("button", { name: /Quitar/ }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
-  await page.getByRole("button", { name: "Salir" }).click();
+  await page.getByTestId("cuenta").click(); // «Cerrar sesión» está en el menú del usuario (decisión 126)
+  await page.getByTestId("salir").click();
   await page.getByTestId("entrar-huella").click();
   await expect(page.getByTestId("error-huella")).toContainText("no está vinculado");
 });

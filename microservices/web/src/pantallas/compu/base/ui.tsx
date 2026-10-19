@@ -34,6 +34,9 @@ const TRAZOS = {
   tilde: "m5 12.500 4.500 4.500L19 7.500",
   derecha: "m9 6 6 6-6 6",
   izquierda: "m15 6-6 6 6 6",
+  // El de la maqueta para achicar y agrandar el menú: el panel con la flecha adentro.
+  "achicar-menu": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M16 15l-3-3 3-3",
+  "agrandar-menu": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M14 9l3 3-3 3",
   abajo: "m6 9 6 6 6-6",
   arriba: "m6 15 6-6 6 6",
   subir: "M12 16V4M7 9l5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2",
@@ -242,7 +245,7 @@ export function Segmentos<T extends string>({ opciones, actual, alElegir, etique
 // Los cinco márgenes de un toque. Es un grupo de opciones: Tab entra una vez y las flechas
 // izquierda y derecha pasan de un margen a otro y lo eligen.
 // Con `flechasDeAfuera`, las flechas no eligen: las maneja quien lo contiene, y se elige con Enter.
-export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", atajos, compacto, flechasDeAfuera }: { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; atajos?: boolean; compacto?: boolean; flechasDeAfuera?: boolean }) {
+export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", atajos, compacto, flechasDeAfuera, sinSigno }: { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; atajos?: boolean; compacto?: boolean; flechasDeAfuera?: boolean; sinSigno?: boolean }) {
   const conFoco = MARGENES.includes(elegido as never) ? elegido : MARGENES[0];
   function flechas(e: React.KeyboardEvent<HTMLDivElement>) {
     if (flechasDeAfuera || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
@@ -256,7 +259,7 @@ export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", ata
     <div className={`margenes ${compacto ? "compacto" : ""}`} role="radiogroup" aria-label={etiqueta} onKeyDown={flechas}>
       {MARGENES.map((m, i) => (
         <button key={m} type="button" role="radio" aria-checked={elegido === m} tabIndex={m === conFoco ? 0 : -1} disabled={disabled} title={atajos ? `Mayúsculas + ${i + 1}` : undefined}
-          onClick={(e) => { e.stopPropagation(); alElegir(m); }} data-testid={`margen-${m}`}>{m}{compacto ? "" : " "}%</button>
+          onClick={(e) => { e.stopPropagation(); alElegir(m); }} aria-label={sinSigno ? `${m} %` : undefined} data-testid={`margen-${m}`}>{m}{sinSigno ? "" : `${compacto ? "" : " "}%`}</button>
       ))}
     </div>
   );

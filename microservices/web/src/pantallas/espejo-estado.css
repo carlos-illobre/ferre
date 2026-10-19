@@ -24,3 +24,5 @@
   .lateral .espejo button { flex: 1 1 auto; min-height: 32px; padding: 0 10px; font-size: 0.8125rem; white-space: nowrap; }
 }
 .espejo-aviso { flex: 1 1 100%; padding: 6px 10px; border-radius: 10px; background: var(--p-amarillo-suave, #fff7d6); color: var(--p-amarillo-texto, #6b4a00); font-weight: 700; }
+.espejo-icono { display: none; flex: none; }
+@media (min-width: 900px) { .lateral .espejo-icono { display: block; } .lateral .espejo-punto { display: none; } }

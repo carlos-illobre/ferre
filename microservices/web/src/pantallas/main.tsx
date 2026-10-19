@@ -8,7 +8,7 @@ import "../preferencias"; // aplica al abrir lo que la persona eligió en Config
 import { respetarElGuardado } from "../almacen";
 
 // Ferrebress tiene dos juegos de pantallas: en el celular, una cosa por vez, con tarjetas y
-// hojas; en la computadora, menú lateral, tablas y teclado. Comparten paleta, el menú «Más» y la venta con sugeridos.
+// hojas; en la computadora, menú lateral, tablas y teclado. Comparten paleta y el menú «Más».
 // Se elige por el ancho al abrir; cada una trae solo sus estilos, así que si la ventana
 // cruza el límite se recarga. Cada import() va en su propia sentencia a propósito: en un
 // mismo ternario Vite les asigna a los dos la precarga de uno solo.

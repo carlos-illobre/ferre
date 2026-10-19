@@ -209,11 +209,11 @@ describe("Vender", () => {
     confirmar.mockRestore();
   });
 
-  it("la venta vacía lo dice y explica cómo empezar; «No llevó» y «Vaciar» quedan apagados", () => {
+  it("la venta vacía lo dice y explica cómo empezar; «No llevó» y «Vaciar» no se muestran", () => {
     const { agregar } = armar();
     expect(screen.getByTestId("venta-vacia").textContent).toBe("La venta está vacíaBuscá o escaneá un producto para empezar.");
-    expect((screen.getByTestId("no-llevo") as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByTestId("vaciar-venta") as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByTestId("no-llevo")).toBeNull();
+    expect(screen.queryByTestId("vaciar-venta")).toBeNull();
     expect(screen.getByTestId("titulo-venta").textContent).toContain("Esta venta0");
     agregar("mecha vender");
     expect(screen.queryByTestId("venta-vacia")).toBeNull();

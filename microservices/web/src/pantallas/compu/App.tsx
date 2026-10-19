@@ -1,4 +1,5 @@
-import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo, useRef, useState } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
 import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
 import { Pedidos } from "../Pedidos";
@@ -61,7 +62,7 @@ import { Isotipo, Logotipo } from "../Logotipo";
 import { LUGAR_AL_LADO_DE_LAS_PESTANAS } from "../AlLadoDeLasPestanas";
 
 // La interfaz de computadora (menú lateral, tablas, todo con teclado), con
-// la paleta de la v5, la venta con sugeridos y el menú reducido a lo de todos los días: lo
+// la paleta de la v5 y el menú reducido a lo de todos los días: lo
 // que se usa poco va en «Más». Alt + número abre cada pantalla.
 export function App() {
   return (
@@ -99,6 +100,36 @@ const MENU: Parte[] = [
 // Pantallas que no están en el menú pero tienen dirección.
 // «anular» era la pestaña de anular, que ahora está en «Ventas de hoy» (decisión 120): lleva ahí.
 const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "anular", nombre: "Ventas de hoy", icono: "ventas" }];
+const inicialesDe = (nombre: string) => nombre.trim().split(/\s+/).map((p) => p[0] ?? "").slice(0, 2).join("").toUpperCase();
+// El usuario abajo del menú, como la v2 (decisión 126): las iniciales, el nombre y el rol; al tocarlo,
+// un menú con el nombre y el rol arriba y «Cerrar sesión». Esc lo cierra.
+function CuentaDelUsuario({ nombre, rol, detalle, alSalir }: { nombre: string; rol: string; detalle: string; alSalir: () => void }) {
+  const [abierto, setAbierto] = useState(false);
+  const raiz = useRef<HTMLDivElement>(null);
+  const menuDeCuenta = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!abierto) return;
+    menuDeCuenta.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const fuera = (e: MouseEvent) => { if (!raiz.current?.contains(e.target as Node) && !menuDeCuenta.current?.contains(e.target as Node)) setAbierto(false); };
+    document.addEventListener("mousedown", fuera);
+    return () => document.removeEventListener("mousedown", fuera);
+  }, [abierto]);
+  return (
+    <div className="quien" ref={raiz} onKeyDown={(e) => { if (e.key === "Escape" && abierto) { e.preventDefault(); e.stopPropagation(); setAbierto(false); raiz.current?.querySelector<HTMLButtonElement>(".quien-boton")?.focus(); } }}>
+      <button type="button" className="quien-boton" aria-haspopup="menu" aria-expanded={abierto} onClick={() => setAbierto((a) => !a)} title={detalle} aria-label={`${nombre}${rol ? `, ${rol}` : ""}: opciones de la cuenta`} data-testid="cuenta">
+        <span className="avatar" aria-hidden="true">{inicialesDe(nombre)}</span>
+        <span className="quien-nombre"><b data-testid="usuario">{nombre}</b>{rol ? <small>{rol}</small> : null}</span>
+      </button>
+      {/* Se dibuja en el cuerpo de la página: dentro del menú lateral lo tapaba la barra del cobro. */}
+      {abierto && createPortal(
+        <div className="cuenta-menu" role="menu" aria-label="La cuenta" ref={menuDeCuenta} onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); setAbierto(false); raiz.current?.querySelector<HTMLButtonElement>(".quien-boton")?.focus(); } }}>
+          <p className="cuenta-menu-cab">{nombre}{rol ? ` · ${rol}` : ""}</p>
+          <button type="button" role="menuitem" onClick={alSalir} data-testid="salir"><Icono nombre="salir" tam={20} />Cerrar sesión</button>
+        </div>, document.body,
+      )}
+    </div>
+  );
+}
 const TODAS = [...MENU.flatMap((m) => m.pestanas), ...FUERA_DEL_MENU];
 const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 // Las partes con el nombre que comparten el celular y la computadora en espejo (decisión 60).
@@ -296,7 +327,7 @@ function Pantallas() {
           <span className="marca-larga"><Logotipo sobre="claro" /></span>
           <span className="marca-corta"><Isotipo sobre="claro" lado={34} /></span>
           <button type="button" className="plegar" onClick={plegar} aria-label={plegado ? "Agrandar el menú" : "Achicar el menú"} title={`${plegado ? "Agrandar" : "Achicar"} el menú (Ctrl+B)`} aria-keyshortcuts="Control+B" aria-expanded={!plegado} data-testid="plegar-menu">
-            <Icono nombre={plegado ? "derecha" : "izquierda"} tam={18} grosor={2.2} />
+            <Icono nombre={plegado ? "agrandar-menu" : "achicar-menu"} tam={20} grosor={1.9} />
           </button>
         </div>
         <nav aria-label="Menú">
@@ -312,16 +343,11 @@ function Pantallas() {
             );
           })}
         </nav>
-        <p className="lateral-ayuda">Con el teclado: ↑ ↓ recorren el menú y las listas, ← → las pestañas, Tab pasa de un campo a otro, Enter acciona y Esc cierra. Alt + número abre cada pantalla; con Alt apretado, cada botón muestra su letra. Ctrl+B achica el menú.</p>
-        <EspejoEstado />
-        {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
         <div className="lateral-pie">
+          <EspejoEstado />
+          {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
           <EstadoDeConexion />
-          <div className="quien">
-            <span data-testid="usuario" title={sesion.usuario.email}>{sesion.usuario.nombre}</span>
-            <Boton variante="sobre-marino" tam="chico" icono="salir" onClick={salir} data-testid="salir">Salir</Boton>
-          </div>
-          <small className="version" title="Versión de la app">{import.meta.env.VITE_VERSION ?? "local"}</small>
+          <CuentaDelUsuario nombre={sesion.usuario.nombre} rol={sesion.usuario.roles?.join(", ") ?? ""} detalle={`${sesion.usuario.email} · versión ${import.meta.env.VITE_VERSION ?? "local"}`} alSalir={salir} />
         </div>
       </aside>
       <div className={`cuerpo ${pestanas ? "con-pestanas" : ""}`}>

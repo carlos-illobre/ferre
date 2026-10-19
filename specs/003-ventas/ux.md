@@ -114,15 +114,21 @@ el lenguaje «Mostrador»:
 `maquetas/compu-vender-elegida.png`: la v2 del director de arte con el panel de la v3 y la boleta de la v4).
 Sigue el lenguaje «Mostrador»:
 
-- Arriba, la búsqueda y, a su derecha, «Escanear con el celular» si hay uno vinculado; mientras el
+- Arriba, la búsqueda y, a su derecha, «Escanear con el celular» si hay uno vinculado (el botón
+  verde oscuro de la v2, del alto de la búsqueda, decisión 126); mientras el
   celular lee, en su lugar va el aviso oscuro «El celular está escaneando · Lo que lea entra acá»
-  con «Detener». Debajo, las teclas que no están en ningún botón.
+  con «Detener». Sin una línea de teclas debajo (decisión 126).
+- El desplegable de la búsqueda, como la v2: cada producto con su foto, el nombre con marca y
+  proveedor, el stock en su pastilla y el precio; abajo, las teclas (↑ ↓, Enter, Esc) y cuántos
+  encontró.
 - «Esta venta» con cuántos productos, y a la derecha «No llevó» (Esc, con la búsqueda vacía) y
-  «Vaciar» (con Deshacer).
+  «Vaciar» (con Deshacer); los dos, solo con productos en la venta (decisión 126).
 - Cada renglón, una tarjeta: la foto, el nombre con marca, proveedor y stock (o cuánto falta), la
-  cantidad con − y + y su unidad, el total del renglón con «3 × $7.000» y el tacho, que lo quita con
-  Deshacer (sin menú «⋯», decisión 125). Debajo, el costo (con «Ver costos»), los márgenes, el
-  precio por unidad y el botón «Precio a mano», que habilita la caja. Sin precio, en
+  cantidad en una sola pastilla con − y + y su unidad, el total del renglón con «3 × $7.000» y el
+  tacho, que lo quita con Deshacer (sin menú «⋯», decisión 125). Debajo, en una línea que usa todo
+  el ancho de la tarjeta: el costo (con «Ver costos»), los márgenes en un selector segmentado (300,
+  200, 100, 50, 25 y un solo «%»), el precio por unidad y, a la derecha, el botón «Precio a mano»,
+  que habilita la caja. La cuenta del costo y del precio está en «De dónde sale» (decisión 126). Sin precio, en
   ámbar. Con la búsqueda vacía, ↑ ↓ eligen el renglón, + y − cambian su cantidad y Supr lo quita.
 - A la derecha, un panel con dos pestañas: «De dónde sale» (la cuenta del renglón elegido: costo,
   margen, IVA, redondeo, cantidad y total) y «Boleta» (la venta como un ticket). Se oculta y se
@@ -132,7 +138,7 @@ Sigue el lenguaje «Mostrador»:
   con su tecla (F5 a F8, con el nombre corto y el largo al pasar el mouse), el cliente (F9,
   opcional con cualquier medio; elegido, con sus iniciales, y ocupa todo el ancho que queda) y
   «Cobrar $X» (F2), con el total dentro del botón (decisión 125).
-- Con la venta vacía, «La venta está vacía» y, debajo, lo último que se vendió (decisión 38).
+- Con la venta vacía, «La venta está vacía»; sin «Lo último que se vendió» (decisión 126).
 - La venta registrada es una ventana como la del celular: el total, el medio, cuántos productos y la
   hora, «Ver en Ventas de hoy» y «Seguir vendiendo» (Enter).
 - No van: «Ganás en esta venta», escribir la cantidad en la búsqueda, el margen con 1 a 5, la ayuda

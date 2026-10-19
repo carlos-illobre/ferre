@@ -43,4 +43,90 @@
   .app.plegado .lateral-pie .conexion { font-size: 0; gap: 0; }
   .app.plegado .lateral-pie .quien { justify-content: center; }
   .app.plegado .lateral-pie .quien .boton { font-size: 0; gap: 0; padding: 0 10px; }
+
+  /* Como la v2 de la maqueta aprobada (specs/001, maquetas/compu-menu-mostrador.png; decisión 126):
+     sin los Alt+número a la vista (salen con Alt apretado), el espejo en un recuadro verde, la
+     conexión en una pastilla y el usuario con sus iniciales y su rol; «Salir» queda de la v1. */
+  :root { --lateral: 232px; }
+  .lateral { padding: 0 var(--e3); }
+  .lateral-marca { padding: var(--e4) 0 var(--e4) var(--e2); }
+  .lateral nav { padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .lateral nav button { min-height: 44px; gap: 12px; padding: 0 12px; font-size: 15px; }
+  .lateral nav button .atajo { display: none; }
+  html.con-alt .lateral nav button .atajo { display: grid; margin-left: auto; }
+  .lateral nav button .cuenta-menu { margin-left: auto; min-width: 22px; height: 22px; }
+  .lateral-ayuda { display: none; }
+  .lateral-pie { gap: var(--e2); padding: var(--e3) 0 var(--e4); border-top: 0; }
+  .lateral .espejo { margin: 0; padding: 10px 12px; border-radius: 12px; background: #E3F3EA; color: #0F6B52; font-size: 14px; font-weight: 650; }
+  .lateral .espejo.activo { background: #E3F3EA; }
+  .lateral .espejo.activo .espejo-punto { background: #0F8A5F; }
+  .lateral .espejo button:focus-visible { outline-color: var(--m-pino); }
+  .lateral-vincular { padding: 0; }
+  .lateral-pie .conexion { align-self: flex-start; padding: 4px 10px; border-radius: 99px; background: #E3F3EA; color: #0F6B52; font-size: 14px; font-weight: 650; }
+  .lateral-pie .conexion.pendiente { background: #FFF4D6; color: #6B4A00; }
+  .lateral-pie .conexion.sin-conexion, .lateral-pie .conexion.atrasado { background: #FDE7E2; color: #A3301A; }
+  .lateral-pie .quien { justify-content: flex-start; gap: 10px; padding: 4px 0 0; }
+  .lateral .avatar { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: #FDE9DF; color: #B4400F; font-weight: 800; font-size: 14px; }
+  .lateral .quien-nombre { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+  .lateral .quien-nombre b { font-size: 15px; font-weight: 750; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lateral .quien-nombre small { color: var(--m-texto-3); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lateral-pie .quien .boton { flex: none; }
+  .app.plegado .lateral { padding: 0 var(--e3); align-items: center; }
+  .app.plegado .lateral-marca { padding-left: 0; }
+  .app.plegado .lateral .quien { flex-direction: column; padding: 0; }
+  .app.plegado .lateral .quien-nombre, .app.plegado .lateral-pie .conexion { font-size: 0; padding: 6px; gap: 0; }
+  .app.plegado .lateral .quien-nombre { display: none; }
+  .app.plegado .lateral .espejo { padding: 10px; }
+
+  /* Las pestañas de cada parte, como la v2: texto subrayado sobre una línea, sin ícono; el Alt+número, chico al lado. */
+  .pestanas-fila { border-bottom: 1px solid var(--m-borde, #E6E2D8); margin: 0 var(--e5); }
+  .pestanas { gap: var(--e6); padding: var(--e4) 0 0; }
+  .pestanas-acciones { padding: var(--e3) 0 var(--e2); }
+  .pestanas button { min-height: 44px; padding: 0 2px; gap: 8px; border: 0; border-bottom: 3px solid transparent; border-radius: 0; margin-bottom: -1px; background: none; color: #545955; font-size: 15px; font-weight: 650; }
+  .pestanas button > svg { display: none; }
+  .pestanas button:hover { color: #1A1D1B; border-bottom-color: #CEC8BA; }
+  .pestanas button[aria-current="page"] { background: none; color: #12382F; border-bottom-color: #12382F; font-weight: 800; }
+  .pestanas button:focus-visible { outline: 3px solid #12382F; outline-offset: 2px; border-radius: 6px; }
+}
+/* Las teclas, como en la maqueta de la v2 (decisión 126): la letra de siempre (no la de máquina),
+   fondo blanco, borde suave más grueso abajo. Sobre un botón oscuro o de color, transparentes. */
+@media (min-width: 900px) {
+  kbd.tecla, .tecla { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid #CEC8BA; border-bottom-width: 2px; background: #fff; color: #545955; font-family: inherit; font-size: 14px; font-weight: 700; line-height: 1; opacity: 1; }
+  .boton.principal .tecla, .boton.marino .tecla, .boton.peligro .tecla { background: rgb(255 255 255 / .16); border-color: rgb(255 255 255 / .35); color: inherit; }
+  .lateral nav button .atajo { font-family: inherit; }
+}
+/* El usuario, como la v2 (decisión 126): un botón con las iniciales, el nombre y el rol que abre su menú. */
+@media (min-width: 900px) {
+  .lateral-pie .quien { position: relative; display: block; padding: 0; }
+  .lateral .quien-boton { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border: 0; border-radius: 12px; background: none; color: var(--m-tinta); text-align: left; font: inherit; cursor: pointer; }
+  .lateral .quien-boton:hover, .lateral .quien-boton[aria-expanded="true"] { background: var(--m-hundido); }
+  .lateral .quien-boton:focus-visible { outline: 3px solid var(--m-pino); outline-offset: 1px; }
+  .cuenta-menu { position: fixed; left: calc(var(--lateral) + 8px); bottom: 16px; z-index: 60; min-width: 300px; padding: 8px; border-radius: 16px; background: #fff; border: 1px solid var(--m-borde); box-shadow: 0 12px 32px rgb(26 29 27 / .16), 0 2px 6px rgb(26 29 27 / .08); }
+  .cuenta-menu-cab { margin: 0; padding: 10px 12px 12px; border-bottom: 1px solid var(--m-borde); color: var(--m-texto-2); font-size: 15px; font-weight: 700; }
+  .cuenta-menu button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 12px; border: 0; border-radius: 10px; background: none; color: var(--m-tinta); font: inherit; font-size: 16px; font-weight: 600; text-align: left; cursor: pointer; }
+  .cuenta-menu button:hover, .cuenta-menu button:focus-visible { background: var(--m-hundido); outline: 0; }
+  .lateral .espejo-texto { gap: 10px; align-items: center; }
+  .app.plegado .lateral .quien-boton { justify-content: center; padding: 6px 0; }
+  .app.plegado .lateral .quien-nombre { display: none; }
+  /* El margen, del tamaño de la v2: más grande y con aire; si no entra, «Precio a mano» baja. */
+  .vmc-fila2 { font-size: 15px; column-gap: 12px; }
+  .vmc-fila2 .vmc-valor { font-size: 16px; }
+  .vmc-fila2 .margenes.compacto { padding: 4px; border-radius: 12px; gap: 2px; }
+  .vmc-fila2 .margenes.compacto button { min-width: 48px; height: 34px; padding: 0 10px; font-size: 15px; border-radius: 9px; }
+}
+@media (min-width: 900px) {
+  .cuenta-menu { z-index: 200; max-width: 340px; }
+  .cuenta-menu-cab { white-space: normal; }
+  /* Si la tarjeta es angosta (el panel abierto en una pantalla chica), «Precio a mano» queda en su lápiz. */
+  .vmc-item { container-type: inline-size; }
+  @container (max-width: 820px) {
+    .vmc-fila2 > [data-testid="habilitar-precio-manual"] .txt { display: none; }
+    .vmc-fila2 > [data-testid="habilitar-precio-manual"] { width: 36px; padding: 0; justify-content: center; }
+  }
+}
+@media (min-width: 900px) {
+  .cuenta-menu { border-color: #E6E2D8; color: #1A1D1B; font-family: "Manrope Variable", system-ui, sans-serif; }
+  .cuenta-menu-cab { color: #545955; border-bottom: 1px solid #E6E2D8; }
+  .cuenta-menu button { color: #1A1D1B; }
+  .cuenta-menu button:hover, .cuenta-menu button:focus-visible { background: #ECE9E1; }
 }
