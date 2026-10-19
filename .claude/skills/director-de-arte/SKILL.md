@@ -34,4 +34,11 @@ dice, los dos). Ejemplo: `/director-de-arte depósito > stock, celu`.
 4. **A Carlos:** las comparaciones con `SendUserFile` y, por pantalla, la idea de cada variante,
    la preferida del agente y lo que contradice una decisión o queda fuera de la especificación.
 
+## Hacer navegable una variante
+
+Cuando Carlos pide «hacé navegable la variante X de tal pantalla» (o las tres, si duda), un
+subagente sigue `.claude/skills/director-de-arte/navegable.md` sobre esa carpeta. Al terminar, la
+pantalla se suma a `maquetas/navegables.json` y se sube; un cambio solo en maquetas no lleva
+pruebas (decisión 114). Se ven en el ambiente de pruebas en `/v2`, `/v3` y `/v4` (decisión 113).
+
 Lo que Carlos rechaza se borra de `microservices/web/public/maquetas/` y se sube.

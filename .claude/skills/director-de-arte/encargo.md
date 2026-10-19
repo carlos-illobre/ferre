@@ -22,6 +22,12 @@
   celular con device_scale_factor 2. Cada variante con su `captura.png`; además
   `comparacion-compu.png` y `comparacion-celu.png` con las variantes lado a lado. Los scripts van
   en `<pantalla>/herramientas/`.
+- **Enlaces entre pantallas, desde el principio:** cada variante carga
+  `<script src="../../../_comun/navegar.js" defer></script>` y marca con `data-ir="<pantalla>"` el
+  menú, la barra de abajo y las pestañas que llevan a otra pantalla (leé `navegar.js`). Los demás
+  botones quedan quietos: se hacen andar después, solo en la variante que Carlos elija.
+- **Sin pruebas** (decisión 114): no escribas pruebas ni compares capturas píxel a píxel; la
+  captura de cada variante es para mostrarla, no para probarla.
 - **Peso:** fotos recortadas y comprimidas (menos de 150 KB cada una), sin videos.
 - **`<pantalla>/resumen.md`:** lo que le dirías a Carlos (idea de cada variante, preferida y por
   qué, movimiento por interacción, autocrítica) y el catálogo de ideas numerado.

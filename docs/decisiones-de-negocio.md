@@ -894,3 +894,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      programada. No llevan datos reales, así que se pueden abrir sin entrar; la aplicación
      instalada no las guarda ni las descarga. Antes de pasar a producción con las maquetas
      adentro, se le avisa a Carlos.
+114. **Las maquetas no llevan pruebas** (2026-10-19). Las maquetas existen para no gastar tiempo en
+     desarrollo; si no hay desarrollo, no hay nada que probar. Un cambio solo en las maquetas se
+     sube sin pruebas unitarias ni de punta a punta, y los agentes que las arman o les agregan
+     botones no escriben pruebas con Playwright ni comparan capturas: alcanza con abrirlas una vez
+     y mirar que no haya errores en la consola. Las pruebas siguen valiendo para lo que toca la
+     aplicación de verdad.

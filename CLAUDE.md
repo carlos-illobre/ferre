@@ -84,7 +84,9 @@ fallaron. Una que falla se corre sola (`tests/e2e.sh --solo "<nombre>"`) para ve
 cambio; si no lo es, se dice cuál, por qué y que se repitió sola. Un cambio que solo toca
 documentación no las necesita, ni uno solo estético (estilos, imágenes, colores, separaciones:
 nada de lógica ni de qué hay en la pantalla), que se sube con las unitarias y una captura
-(Carlos, 2026-10-16).
+(Carlos, 2026-10-16). **Las maquetas no llevan pruebas** (decisión 114): un cambio solo en
+`microservices/web/public/maquetas/` se sube sin unitarias ni e2e, y los agentes que las arman
+tampoco escriben pruebas.
 
 **Si hace falta un sitio de internet que no está permitido, se le pide permiso a Carlos.**
 Vale para cualquier acceso: leer una página o documentación, buscar en la web, bajar un
