@@ -159,6 +159,26 @@ test("sin mouse: el catálogo que termina de bajar no le saca el foco al menú",
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
 });
 
+// El menú se achica a solo íconos con su botón o Ctrl+B y recuerda cómo quedó (decisión 122);
+// achicado, sigue andando con el teclado (decisión 121).
+test("el menú se achica con su botón o con Ctrl+B, recuerda cómo quedó y sigue andando con el teclado", async ({ page }) => {
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.goto("/#/vender");
+  const app = page.locator(".app");
+  await expect(page.getByTestId("menu-vender")).toContainText("Vender");
+  await page.getByTestId("plegar-menu").click();
+  await expect(app).toHaveClass(/plegado/);
+  await expect(page.getByTestId("menu-vender")).toHaveAccessibleName("Vender");
+  await expect(page.getByTestId("menu-vender").locator(".txt")).toBeHidden();
+  await page.reload();
+  await expect(app).toHaveClass(/plegado/);
+  await page.keyboard.press("Alt+1");
+  await expect(page).toHaveURL(/#\/productos/);
+  await page.keyboard.press("Control+b");
+  await expect(app).not.toHaveClass(/plegado/);
+  await expect(page.getByTestId("menu-catalogo")).toContainText("Catálogo");
+});
+
 // Todo con el teclado (decisión 61, RNF-05): el menú, las pestañas y una venta completa, sin mouse.
 test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una venta con Tab y los atajos", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);

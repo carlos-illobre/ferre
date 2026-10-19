@@ -61,6 +61,10 @@ Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec
   (RNF-01).
 - El orden de la pantalla es el del mostrador: buscar, precio, cantidad, cobro. Nada es
   obligatorio que el cuaderno no tenga (constitución, principio II).
+- **El menú de la computadora** (decisión 122): el del lenguaje «Mostrador», claro, con el
+  logotipo de Ferrebress; la parte abierta va en pino suave con una raya naranja. Un botón arriba
+  (y Ctrl+B) lo achica a solo íconos, con el isotipo, y lo vuelve a agrandar; recuerda cómo quedó.
+  Achicado, cada ícono dice su nombre al pasar el mouse y todo sigue con el teclado.
 - En la computadora todo se opera con teclado; el mouse nunca es la única forma (RNF-05). Un rediseño
   nunca saca lo especificado del teclado: un gesto nuevo (arrastrar, deslizar) se suma, no lo
   reemplaza (decisión 121).

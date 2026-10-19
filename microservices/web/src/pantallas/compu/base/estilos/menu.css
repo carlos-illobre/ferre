@@ -1,0 +1,46 @@
+/* El menú de la computadora (decisión 122): el de «Mostrador» (docs/lenguaje-mostrador/), claro,
+   con el logotipo de la v1; se achica a solo íconos con su botón o Ctrl+B, como la v3 del
+   director de arte. Va después de base.css y tema.css: pisa el menú verde oscuro de antes. */
+@media (min-width: 900px) {
+  .lateral {
+    --m-superficie: #fff; --m-borde: #E6E2D8; --m-hundido: #ECE9E1; --m-tinta: #1A1D1B; --m-texto-2: #545955; --m-texto-3: #6B706B;
+    --m-pino: #12382F; --m-pino-suave: #E3EEE8; --m-accion: #E8541C;
+    background: var(--m-superficie); color: var(--m-tinta); border-right: 1px solid var(--m-borde);
+  }
+  .app { transition: grid-template-columns 0.22s cubic-bezier(.2, .9, .3, 1); }
+  .lateral-marca { flex-direction: row; align-items: center; justify-content: space-between; padding: var(--e4) var(--e3) var(--e3) var(--e4); }
+  .lateral-marca .marca-larga { font-size: 24px; color: var(--m-tinta); }
+  .lateral-marca .marca-corta { display: none; }
+  .lateral .plegar { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--m-texto-3); }
+  .lateral .plegar:hover { background: var(--m-hundido); color: var(--m-tinta); }
+  .lateral nav button { position: relative; color: var(--m-texto-2); font-weight: 650; border-radius: 12px; }
+  .lateral nav button:hover { background: var(--m-hundido); color: var(--m-tinta); }
+  .lateral nav button[aria-current="page"] { background: var(--m-pino-suave); color: var(--m-pino); font-weight: 750; }
+  .lateral nav button[aria-current="page"]::before { content: ""; position: absolute; left: -12px; top: 10px; bottom: 10px; width: 4px; border-radius: 0 4px 4px 0; background: var(--m-accion); }
+  .lateral nav button .atajo { border-color: var(--m-borde); color: var(--m-texto-3); opacity: 1; }
+  .lateral nav button[aria-current="page"] .atajo { border-color: currentColor; color: var(--m-pino); }
+  .lateral nav button .cuenta-menu { background: var(--m-accion); }
+  .lateral-ayuda { color: var(--m-texto-3); }
+  .lateral-pie { border-top-color: var(--m-borde); }
+  .lateral-pie .version { color: var(--m-texto-3); }
+  .lateral .boton.sobre-marino { background: var(--m-superficie); color: var(--m-tinta); border: 1px solid #CEC8BA; }
+  .lateral button:focus-visible, .lateral a:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--m-pino); }
+  .lateral nav button:focus-visible { outline: 3px solid var(--m-pino); outline-offset: 1px; }
+
+  /* Achicado: 72 px, solo los íconos (el nombre sale al pasar el mouse); lo de abajo, en íconos. */
+  .app.plegado { --lateral: 72px; }
+  .app.plegado .lateral-marca { flex-direction: column; gap: var(--e2); padding: var(--e4) 0 var(--e3); }
+  .app.plegado .lateral-marca .marca-larga { display: none; }
+  .app.plegado .lateral-marca .marca-corta { display: block; }
+  .app.plegado .lateral nav { padding: 0 var(--e3); }
+  .app.plegado .lateral nav button { justify-content: center; width: 48px; padding: 0; }
+  .app.plegado .lateral nav button .txt, .app.plegado .lateral nav button .atajo { display: none; }
+  .app.plegado .lateral nav button .cuenta-menu { position: absolute; top: 2px; right: 0; margin: 0; }
+  .app.plegado .lateral-ayuda, .app.plegado .lateral-vincular, .app.plegado .lateral-pie .quien > span, .app.plegado .lateral-pie .version, .app.plegado .espejo-botones, .app.plegado .espejo-aviso { display: none; }
+  .app.plegado .espejo { justify-content: center; padding: 8px; }
+  .app.plegado .espejo-texto { font-size: 0; gap: 0; }
+  .app.plegado .lateral-pie { align-items: center; padding-inline: var(--e2); }
+  .app.plegado .lateral-pie .conexion { font-size: 0; gap: 0; }
+  .app.plegado .lateral-pie .quien { justify-content: center; }
+  .app.plegado .lateral-pie .quien .boton { font-size: 0; gap: 0; padding: 0 10px; }
+}

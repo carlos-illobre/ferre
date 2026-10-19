@@ -1,4 +1,4 @@
-import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo } from "react";
+import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo, useState } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
 import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
 import { Pedidos } from "../Pedidos";
@@ -57,6 +57,8 @@ import { useParaRevisar } from "../../negocio/apartados";
 import "./base/estilos/base.css";
 import "./base/estilos/entrar.css";
 import "./tema.css";
+import "./base/estilos/menu.css";
+import { Isotipo, Logotipo } from "../Logotipo";
 import { LUGAR_AL_LADO_DE_LAS_PESTANAS } from "../AlLadoDeLasPestanas";
 
 // La interfaz de computadora (menú lateral, tablas, todo con teclado), con
@@ -157,6 +159,16 @@ function Pantallas() {
     if (!destino) return;
     if (destino !== actual || (consulta ?? "") !== (pedidoDeLaRuta ? `pedido=${pedidoDeLaRuta}` : "")) irA(consulta ? `${destino}?${consulta}` : destino);
   }, parteEnEspejo !== null);
+
+  // El menú se achica a solo íconos con su botón o Ctrl+B, y recuerda cómo se dejó (decisión 122).
+  const [plegado, setPlegado] = useState(() => { try { return localStorage.getItem("ferre.menu") === "plegado"; } catch { return false; } });
+  const plegar = () => setPlegado((p) => { try { localStorage.setItem("ferre.menu", p ? "abierto" : "plegado"); } catch { /* sin almacenamiento: dura lo que la pestaña */ } return !p; });
+  useEffect(() => {
+    if (!conSesion) return;
+    const tecla = (e: KeyboardEvent) => { if (e.ctrlKey && !e.altKey && !e.metaKey && (e.key === "b" || e.key === "B")) { e.preventDefault(); plegar(); } };
+    window.addEventListener("keydown", tecla);
+    return () => window.removeEventListener("keydown", tecla);
+  }, [conSesion]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [actual]);
   useEffect(() => { document.title = conSesion ? `${NOMBRES.get(actual)} · Ferrebress` : "Ferrebress"; }, [actual, conSesion]);
@@ -276,18 +288,22 @@ function Pantallas() {
   const prueba = esAmbienteDePrueba();
 
   return (
-    <div className="app">
+    <div className={`app ${plegado ? "plegado" : ""}`}>
       <a className="saltar" href="#contenido" onClick={(e) => { e.preventDefault(); document.getElementById("contenido")?.focus(); }}>Ir al contenido</a>
       <aside className="lateral" onKeyDown={teclasDelMenu}>
         <div className="lateral-marca">
-          <Marca />
+          <span className="marca-larga"><Logotipo sobre="claro" /></span>
+          <span className="marca-corta"><Isotipo sobre="claro" lado={34} /></span>
+          <button type="button" className="plegar" onClick={plegar} aria-label={plegado ? "Agrandar el menú" : "Achicar el menú"} title={`${plegado ? "Agrandar" : "Achicar"} el menú (Ctrl+B)`} aria-keyshortcuts="Control+B" aria-expanded={!plegado} data-testid="plegar-menu">
+            <Icono nombre={plegado ? "derecha" : "izquierda"} tam={18} grosor={2.2} />
+          </button>
         </div>
         <nav aria-label="Menú">
           {menu.map((m) => {
             const destino = m.clave === "mas" ? "mas" : m.pestanas[0]!.ruta;
             return (
-              <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} aria-keyshortcuts={atajoDe(destino) ? `Alt+${atajoDe(destino)}` : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`}>
-                <Icono nombre={m.icono} tam={19} grosor={parte === m.clave ? 2.3 : 1.9} />{m.nombre}
+              <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} aria-keyshortcuts={atajoDe(destino) ? `Alt+${atajoDe(destino)}` : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`} aria-label={plegado ? m.nombre : undefined} title={plegado ? m.nombre : undefined}>
+                <Icono nombre={m.icono} tam={20} grosor={parte === m.clave ? 2.3 : 1.9} /><span className="txt">{m.nombre}</span>
                 {/* El número que, con Alt, abre la primera pantalla de esta parte. */}
                 {atajoDe(m.pestanas[0]!.ruta) && <span className="atajo" aria-hidden="true">Alt+{atajoDe(m.pestanas[0]!.ruta)}</span>}
                 {m.pestanas.some((p) => p.ruta === "vender") && enLaVenta > 0 && <b className="cuenta-menu" aria-label={`${enLaVenta} en la venta`} data-testid="cuenta-venta">{enLaVenta}</b>}
@@ -295,7 +311,7 @@ function Pantallas() {
             );
           })}
         </nav>
-        <p className="lateral-ayuda">Con el teclado: ↑ ↓ recorren el menú y las listas, ← → las pestañas, Tab pasa de un campo a otro, Enter acciona y Esc cierra. Alt + número abre cada pantalla; con Alt apretado, cada botón muestra su letra.</p>
+        <p className="lateral-ayuda">Con el teclado: ↑ ↓ recorren el menú y las listas, ← → las pestañas, Tab pasa de un campo a otro, Enter acciona y Esc cierra. Alt + número abre cada pantalla; con Alt apretado, cada botón muestra su letra. Ctrl+B achica el menú.</p>
         <EspejoEstado />
         {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
         <div className="lateral-pie">
