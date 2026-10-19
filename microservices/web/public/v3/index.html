@@ -35,6 +35,23 @@
   body.en-celular .grupo a { padding: 5px 10px }
   body.en-celular label { flex: 1; min-width: 0 } body.en-celular select { width: 100% }
   @media (max-width: 699px) { .app { margin-left: 0 } }
+  /* Elegir: la versión que Carlos se queda de cada pantalla y dispositivo, guardada en este navegador. */
+  .elegir { font: 700 14px var(--letra); border: 0; border-radius: 999px; padding: 7px 14px; cursor: pointer; white-space: nowrap; background: var(--naranja); color: #fff }
+  .elegir.hecha { background: #fff; color: var(--pino) }
+  .mis { font: 600 14px var(--letra); color: #fff; background: rgba(255,255,255,0.12); border: 0; border-radius: 999px; padding: 7px 12px; cursor: pointer; white-space: nowrap }
+  .nota { position: fixed; z-index: 5; top: 64px; right: 16px; width: min(380px, calc(100vw - 32px)); background: #fff; color: var(--tinta); border-radius: 16px; padding: 16px; box-shadow: 0 16px 48px rgba(18,56,47,0.25); display: grid; gap: 10px }
+  .nota[hidden] { display: none }
+  .nota b { font-size: 15px } .nota p { margin: 0; color: var(--suave) }
+  .nota textarea, .panel textarea { font: 500 15px/1.4 var(--letra); border: 1px solid #CEC8BA; border-radius: 10px; padding: 10px; width: 100%; resize: vertical }
+  .fila { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap }
+  .fila button { font: 700 14px var(--letra); border-radius: 999px; padding: 8px 14px; cursor: pointer; border: 1px solid #CEC8BA; background: #fff; color: var(--tinta) }
+  .fila button.principal { background: var(--pino); border-color: var(--pino); color: #fff }
+  .panel { border: 0; border-radius: 20px; padding: 20px; width: min(560px, calc(100vw - 32px)); color: var(--tinta); font: 15px/1.4 var(--letra) }
+  .panel::backdrop { background: rgba(18,24,22,0.45) }
+  .panel h2 { margin: 0 0 4px; font-size: 20px } .panel > p { margin: 0 0 12px; color: var(--suave) }
+  .panel textarea { min-height: 280px; font-size: 14px }
+  body.en-celular .elegir, body.en-celular .mis { padding: 6px 10px }
+  body.en-celular .nota { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) }
 </style>
 </head>
 <body>
@@ -46,9 +63,23 @@
     <button type="button" data-d="celu">Celular</button>
   </div>
   <label><span class="texto-largo" style="position:absolute;left:-9999px">Pantalla</span><select id="pantalla" aria-label="Pantalla"></select></label>
+  <button type="button" class="elegir" id="elegir">Me quedo con esta</button>
+  <button type="button" class="mis" id="mis">Mis<span class="texto-largo"> elecciones</span> <span id="cuenta">0/32</span></button>
   <a class="app" href="../">Ir a la aplicación</a>
 </header>
 <main class="escenario" id="escenario"><div class="marco" id="marco"><iframe id="maqueta" title="Maqueta"></iframe></div></main>
+<div class="nota" id="nota" hidden>
+  <b id="nota-titulo"></b>
+  <p>¿Querés sumar algo de otra versión, o cambiar algo? Opcional.</p>
+  <textarea id="nota-texto" rows="3" placeholder="Por ejemplo: la cámara de v3, sin el mazo"></textarea>
+  <div class="fila"><button type="button" id="quitar">Ya no la elijo</button><button type="button" class="principal" id="listo">Listo</button></div>
+</div>
+<dialog class="panel" id="panel">
+  <h2>Mis elecciones</h2>
+  <p id="panel-resumen"></p>
+  <textarea id="panel-texto" readonly></textarea>
+  <div class="fila" style="margin-top:12px"><button type="button" id="cerrar-panel">Cerrar</button><button type="button" class="principal" id="copiar">Copiar para Claude</button></div>
+</dialog>
 <script>
   var NOMBRES = { "entrar": "Entrar", "vender": "Vender", "ventas-de-hoy": "Ventas de hoy", "productos": "Productos", "listas": "Listas de precios",
     "duplicados": "Duplicados", "stock": "Stock", "compras": "Compras", "contar": "Contar", "resumen": "Resumen", "usuarios": "Usuarios",
@@ -95,14 +126,82 @@
   document.getElementById("pantalla").addEventListener("change", function (ev) { ir(ev.target.value, estado().dispositivo); });
   document.querySelectorAll("[data-d]").forEach(function (b) { b.addEventListener("click", function () { ir(estado().pantalla, b.dataset.d); }); });
   addEventListener("message", function (ev) { if (ev.data && ev.data.maqueta === "ir" && NOMBRES[ev.data.pantalla]) ir(ev.data.pantalla, estado().dispositivo); });
-  addEventListener("hashchange", mostrar);
+  // Lo que se elige queda en este navegador; «Mis elecciones» lo junta en un texto para pegarle a Claude.
+  var CLAVE = "ferre.maquetas.elecciones";
+  function leer() { try { return JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) { return {}; } }
+  function guardar(el) { try { localStorage.setItem(CLAVE, JSON.stringify(el)); } catch (e) {} }
+  function eleccion(p, d) { var el = leer(); return el[p] && el[p][d]; }
+  function marcar() {
+    var e = estado(), el = leer(), actual = eleccion(e.pantalla, e.dispositivo), b = document.getElementById("elegir");
+    var esta = actual && actual.v === version;
+    b.classList.toggle("hecha", !!esta);
+    b.textContent = esta ? "✓ Elegida" : actual ? "Elegí " + actual.v + " · cambiar a " + version : "Me quedo con esta";
+    var n = 0; Object.keys(el).forEach(function (p) { ["compu", "celu"].forEach(function (d) { if (el[p][d]) n++; }); });
+    document.getElementById("cuenta").textContent = n + "/32";
+    document.querySelectorAll("#pantalla option").forEach(function (o) {
+      var c = (el[o.value] || {}).compu, m = (el[o.value] || {}).celu;
+      o.textContent = NOMBRES[o.value] + (c || m ? "  ·  compu " + (c ? c.v : "—") + " · celu " + (m ? m.v : "—") : "") + (navegables.indexOf(o.value) < 0 ? " (solo mirar)" : "");
+    });
+  }
+  function abrirNota() {
+    var e = estado(), a = eleccion(e.pantalla, e.dispositivo) || {};
+    document.getElementById("nota-titulo").textContent = NOMBRES[e.pantalla] + " en " + (e.dispositivo === "celu" ? "el celular" : "la computadora") + ": " + version + " · " + VERSIONES[version];
+    document.getElementById("nota-texto").value = a.nota || "";
+    document.getElementById("nota").hidden = false;
+    document.getElementById("nota-texto").focus();
+  }
+  document.getElementById("elegir").addEventListener("click", function () {
+    var e = estado(), el = leer(), a = (el[e.pantalla] || {})[e.dispositivo];
+    el[e.pantalla] = el[e.pantalla] || {};
+    el[e.pantalla][e.dispositivo] = { v: version, nota: a && a.v === version ? a.nota : "" };
+    guardar(el); marcar(); abrirNota();
+  });
+  document.getElementById("listo").addEventListener("click", function () {
+    var e = estado(), el = leer();
+    if (el[e.pantalla] && el[e.pantalla][e.dispositivo]) el[e.pantalla][e.dispositivo].nota = document.getElementById("nota-texto").value.trim();
+    guardar(el); document.getElementById("nota").hidden = true; marcar();
+  });
+  document.getElementById("quitar").addEventListener("click", function () {
+    var e = estado(), el = leer();
+    if (el[e.pantalla]) delete el[e.pantalla][e.dispositivo];
+    guardar(el); document.getElementById("nota").hidden = true; marcar();
+  });
+  function texto() {
+    var el = leer(), lineas = [], faltan = [];
+    Object.keys(NOMBRES).forEach(function (p) {
+      var partes = [];
+      ["compu", "celu"].forEach(function (d) {
+        var a = (el[p] || {})[d];
+        if (a) partes.push((d === "celu" ? "celu " : "compu ") + a.v + (a.nota ? " (" + a.nota + ")" : ""));
+        else faltan.push(NOMBRES[p] + " " + (d === "celu" ? "celu" : "compu"));
+      });
+      if (partes.length) lineas.push(NOMBRES[p] + ": " + partes.join(", "));
+    });
+    return { texto: "Mis elecciones de las maquetas:\n" + (lineas.join("\n") || "(ninguna todavía)") + (faltan.length ? "\n\nSin elegir: " + faltan.join(", ") : ""), elegidas: 32 - faltan.length };
+  }
+  document.getElementById("mis").addEventListener("click", function () {
+    var t = texto();
+    document.getElementById("panel-texto").value = t.texto;
+    document.getElementById("panel-resumen").textContent = "Elegiste " + t.elegidas + " de 32 (16 pantallas, en computadora y en celular). Copialo y pegáselo a Claude.";
+    document.getElementById("panel").showModal();
+  });
+  document.getElementById("cerrar-panel").addEventListener("click", function () { document.getElementById("panel").close(); });
+  document.getElementById("copiar").addEventListener("click", function () {
+    var ta = document.getElementById("panel-texto"), b = this;
+    var listo = function () { b.textContent = "¡Copiado!"; setTimeout(function () { b.textContent = "Copiar para Claude"; }, 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(listo, function () { ta.select(); document.execCommand("copy"); listo(); });
+    else { ta.select(); document.execCommand("copy"); listo(); }
+  });
+  addEventListener("keydown", function (ev) { if (ev.key === "Escape") document.getElementById("nota").hidden = true; });
+  var navegables = [];
+  addEventListener("hashchange", function () { document.getElementById("nota").hidden = true; mostrar(); marcar(); });
   addEventListener("resize", function () { ajustar(estado().dispositivo); });
   // Las pantallas que todavía no tienen botones se ven quietas: el selector las marca.
   Promise.all([fetch("../maquetas/mapa.json").then(function (r) { return r.json(); }), fetch("../maquetas/navegables.json").then(function (r) { return r.json(); })])
     .then(function (r) {
       mapa = r[0];
-      document.querySelectorAll("#pantalla option").forEach(function (o) { if (r[1].indexOf(o.value) < 0) o.textContent += " (solo mirar)"; });
-      mostrar();
+      navegables = r[1];
+      mostrar(); marcar();
     });
 </script>
 </body>
