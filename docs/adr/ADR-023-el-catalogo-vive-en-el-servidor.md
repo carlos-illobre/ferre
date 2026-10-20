@@ -41,12 +41,15 @@ internet se pierde la búsqueda y se conserva registrar ventas.
 
 ## Decisión
 
-- La base lleva una secuencia de revisiones y la tabla `cambio_de_producto`; triggers por
-  sentencia la mantienen y avisan por `pg_notify`. El servidor escucha con una conexión propia.
-- El servidor tiene en memoria los productos (tal como los arma la consulta del catálogo) y los
-  clientes, y contesta búsquedas, códigos, identificadores, marcas y páginas desde ahí. El stock
+- La base lleva la tabla `cambio_de_producto` (producto y transacción que lo cambió); triggers por
+  sentencia la mantienen y avisan por `pg_notify`. El servidor escucha con una conexión propia y
+  lee desde el «xmin» de la foto de su lectura anterior, así no pierde el cambio de una
+  transacción que confirma tarde (con un contador simple se perdería).
+- El servidor tiene en memoria los productos (tal como los arma la consulta del catálogo) y
+  contesta búsquedas, códigos, identificadores, marcas y páginas desde ahí. El stock
   se lee de la base, solo el de la página.
-- La copia se guarda en el volumen de datos con su revisión y su versión de formato.
+- La copia se guarda en el volumen de datos con su marca y su versión de formato.
+- Los clientes no van en la copia: llevan su deuda, que cambia con cada venta a cuenta corriente.
 - La salud del servidor no consulta la base; el pool conserva las conexiones 10 minutos.
 - Los dispositivos no guardan catálogo, stock ni clientes; guardan la venta en curso y la cola de
   lo que falta mandar (ADR-005 sigue valiendo para eso).

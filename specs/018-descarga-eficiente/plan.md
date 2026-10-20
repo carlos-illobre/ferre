@@ -9,17 +9,20 @@ catálogo en el dispositivo.
 
 - **La salud no toca la base (RF-125).** `/health` contesta que el proceso anda y su versión. Las
   conexiones del pool viven 10 minutos sin uso en vez de 10 segundos.
-- **La base avisa qué cambió (RF-124).** Una migración agrega una secuencia de revisiones y una
-  tabla `cambio_de_producto (producto_id, revision)`. Triggers por sentencia sobre `producto`,
+- **La base avisa qué cambió (RF-124).** Una migración agrega la tabla
+  `cambio_de_producto (producto_id, transaccion)`. Triggers por sentencia sobre `producto`,
   `precio_proveedor` (alta, cambio y baja, con el producto viejo y el nuevo) y `proveedor`
-  (cambio de nombre) anotan la revisión de cada producto tocado y hacen `pg_notify('catalogo')`.
-  Uno sobre `cliente` hace `pg_notify('clientes')`. Así se entera de todo cambio, venga del camino
+  (cambio de nombre) anotan cada producto tocado, con su transacción, y hacen
+  `pg_notify('catalogo')`. Así se entera de todo cambio, venga del camino
   que venga (listas, márgenes, duplicados, ingresos, a mano), sin tocar el código de cada uno.
 - **La copia del servidor (RF-124).** Un módulo del servidor (`catalogo/`) tiene en memoria cada
-  producto como lo arma hoy la consulta del catálogo, ordenado, y los clientes. Escucha `catalogo`
-  y `clientes` por una conexión propia, larga y quieta; al aviso, y al reconectarse, lee solo los
-  productos con revisión mayor a la que tiene (también los dados de baja o unidos, para sacarlos).
-  Guarda la copia en el volumen de datos (junto a las listas y las fotos) con su revisión; al
+  producto como lo arma hoy la consulta del catálogo, ordenado. Escucha `catalogo` por una
+  conexión propia, larga y quieta; al aviso, y al reconectarse, lee solo los productos anotados
+  desde su marca (también los dados de baja o unidos, para sacarlos). La marca es el «xmin» de la
+  foto de la lectura anterior: un cambio de una transacción que confirma tarde no se pierde.
+  Los clientes no van en la copia: llevan su deuda, que cambia con cada venta a cuenta corriente;
+  el dispositivo los pide al abrir Vender y Clientes, no en cada pantalla.
+  Guarda la copia en el volumen de datos (junto a las listas y las fotos) con su marca; al
   arrancar parte de ahí y lee lo que falte. Sin copia guardada, o con otra versión del formato, la
   lee entera de a 1.000.
 - **Buscar en la copia (RF-122).** La búsqueda (las mismas reglas de hoy: cada palabra es el
@@ -79,7 +82,7 @@ catálogo en el dispositivo.
 
 ### Source Code (repository root)
 
-- Servidor: migración de revisiones y avisos; módulo `catalogo/` (copia, búsqueda, puesta al día,
+- Servidor: migración de cambios y avisos; la copia en `productos/` (copia, búsqueda, puesta al día,
   guardado); rutas de productos; salud y pool.
 - Cliente: el catálogo compartido, las listas de Catálogo y Productos, Configuración, el guardado
   del dispositivo y los textos.

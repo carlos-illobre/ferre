@@ -65,12 +65,3 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 CREATE TRIGGER proveedor_cambio_avisa AFTER UPDATE ON proveedor REFERENCING NEW TABLE AS nuevos OLD TABLE AS viejos FOR EACH STATEMENT EXECUTE FUNCTION cambio_en_proveedor();
-
--- cliente: son pocos; el aviso alcanza para que el servidor los vuelva a leer.
-CREATE FUNCTION cambio_en_cliente() RETURNS trigger AS $$
-BEGIN
-  PERFORM pg_notify('clientes', '');
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-CREATE TRIGGER cliente_avisa AFTER INSERT OR UPDATE OR DELETE ON cliente FOR EACH STATEMENT EXECUTE FUNCTION cambio_en_cliente();

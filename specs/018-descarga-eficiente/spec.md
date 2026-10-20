@@ -89,7 +89,7 @@ hace falta conexión.
 
 ### User Story 3 - El servidor tiene a mano lo que cambia poco (Priority: P1)
 
-Los productos con sus precios y proveedores, y los clientes, se leen todo el tiempo y cambian
+Los productos con sus precios y proveedores se leen todo el tiempo y cambian
 solo por una acción puntual (aplicar una lista, cambiar un margen, unir duplicados). El
 servidor los tiene en una copia propia y responde desde ahí. Cuando la base cambia, por el
 camino que sea, la copia se pone al día leyendo de la base solo lo que cambió. Lo que varía
@@ -105,7 +105,7 @@ consulta de productos; aplicar una lista y ver los precios nuevos en la próxima
 
 1. **E14** **Given** el servidor andando con su copia al día, **When** se busca, se escanea, se filtra o se pide un producto, **Then** la respuesta sale de la copia; de la base solo se lee el stock de los productos de esa página.
 2. **E15** **Given** se aplica una lista de precios, **When** termina, **Then** la copia lee de la base solo los productos que cambiaron, y la próxima búsqueda de cualquier dispositivo trae los precios nuevos.
-3. **E16** **Given** se cambia el margen, el código, la foto, la unidad o el proveedor de un producto, se unen o se separan duplicados, se cambia un proveedor o un cliente, **When** la base lo guarda, **Then** en menos de 5 segundos la copia lo tiene.
+3. **E16** **Given** se cambia el margen, el código, la foto, la unidad o el proveedor de un producto, se unen o se separan duplicados o se cambia el nombre de un proveedor, **When** la base lo guarda, **Then** en menos de 5 segundos la copia lo tiene.
 4. **E17** **Given** un cambio que la base rechaza o que falla a la mitad, **When** termina con error, **Then** la copia queda como estaba: nunca tiene algo que la base no tiene.
 5. **E18** **Given** el servidor arranca (por ejemplo, al subir una versión), **When** arma su copia, **Then** parte de la que guardó en su disco y lee de la base solo lo que cambió desde entonces; la primera vez, o si la guardada no sirve, la lee entera, de a páginas.
 6. **E19** **Given** la conexión con la base se corta y vuelve, **When** vuelve, **Then** la copia lee lo que cambió mientras tanto.
@@ -165,7 +165,7 @@ Como ningún dispositivo guarda el catálogo, «Trabajar sin conexión» y «Có
   confirma. Los dispositivos guardan solo la venta en curso y lo que falta mandar (decisión 129;
   reemplaza RF-84 y RF-85).
 - **RF-124**: El servidor tiene en una copia propia los productos con sus precios y proveedores, y
-  los clientes, y responde desde ahí. La copia se pone al día sola cuando la base cambia, leyendo
+  responde desde ahí. La copia se pone al día sola cuando la base cambia, leyendo
   solo lo que cambió, y al arrancar parte de la que guardó en su disco. Las ventas, el stock y lo
   demás que varía se leen de la base.
 - **RF-125**: Ver si el servidor anda no consulta la base. Nada de lo que corre solo, a ritmo
@@ -179,7 +179,7 @@ Como ningún dispositivo guarda el catálogo, «Trabajar sin conexión» y «Có
 
 ### Key Entities
 
-- **Copia del servidor**: los productos con sus precios y proveedores, y los clientes, tal como
+- **Copia del servidor**: los productos con sus precios y proveedores, tal como
   están en la base, con la marca de hasta qué cambio tiene. No es un dato nuevo del negocio.
 
 ## Success Criteria *(mandatory)*
@@ -195,6 +195,8 @@ Como ningún dispositivo guarda el catálogo, «Trabajar sin conexión» y «Có
   Si algún día hay dos, cada uno se pone al día solo por el mismo camino.
 - El ambiente de pruebas se reinicia con cada subida, muchas veces por día: por eso la copia se
   guarda en el disco y al arrancar se lee solo lo que cambió.
+- Los clientes no van en la copia: cada uno lleva su deuda, que cambia con cada venta a cuenta
+  corriente. Son pocos; se piden al abrir Vender y Clientes, no en cada pantalla.
 - Las otras lecturas (ventas del día, listas, auditoría, pedidos) ya vienen por día, por
   identificador o de a páginas, y no cambian.
 - Sin el chequeo de salud, la base de pruebas puede pasar 7 días sin consultas si nadie la usa, y

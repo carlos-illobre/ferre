@@ -204,7 +204,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-121 | «Cambiar fecha» muestra lo mismo para un día anterior (completa RF-23) | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
 | RF-122 | Ningún dispositivo baja el catálogo: cada pantalla pide al servidor solo los productos de su consulta, de a 50 | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
 | RF-123 | Sin internet no se busca; se sigue registrando la venta en curso. Los dispositivos guardan solo la venta en curso y lo que falta mandar | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
-| RF-124 | El servidor tiene una copia de los productos y los clientes, que la base mantiene al día, y responde desde ahí | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
+| RF-124 | El servidor tiene una copia de los productos con sus precios, que la base mantiene al día, y responde desde ahí | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
 | RF-125 | Ver si el servidor anda no consulta la base | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
 
 ## Requerimientos no funcionales
