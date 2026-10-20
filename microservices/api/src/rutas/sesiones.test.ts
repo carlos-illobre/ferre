@@ -3,7 +3,7 @@ import { baseFalsa, pedir, usuarios } from "../pruebas/base-falsa.js";
 import { hashear } from "../acceso/sesiones.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));
+vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 // Entrar a la computadora con el celular (RF-76, decisión 57): volvió el 2026-10-12, sin paso

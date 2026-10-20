@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { VERSION_DE_PRECIOS } from "./precios.js";
 import { config } from "./config.js";
-import { baseResponde } from "./db.js";
 import { sesiones } from "./rutas/sesiones.js";
 import { usuarios } from "./rutas/usuarios.js";
 import { auditoria } from "./rutas/auditoria.js";
@@ -31,13 +30,10 @@ export const app = new Hono();
 // El cliente web vive en otro origen (ADR-010): solo ese origen puede llamar desde el navegador.
 app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders: ["Authorization", "Content-Type"] }));
 
-app.get("/health", async (c) => {
-  const db = await baseResponde();
-  return c.json(
-    { ok: db, db: db ? "ok" : "sin-respuesta", version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_DE_PRECIOS },
-    db ? 200 : 503,
-  );
-});
+// Dice que el proceso anda y su versión, sin consultar la base (specs/018, RF-125): el compose lo
+// pregunta cada 10 segundos y cada consulta así llenaba los registros de la base. El arranque
+// ya espera a la base y aplica las migraciones antes de escuchar.
+app.get("/health", (c) => c.json({ ok: true, version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_DE_PRECIOS }));
 
 app.route("/sesiones", sesiones);
 app.route("/usuarios", usuarios);

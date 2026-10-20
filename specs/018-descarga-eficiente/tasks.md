@@ -7,7 +7,7 @@ necesita, de a páginas, y que no genere registros que nadie usa (aviso de Supab
 ## Tareas
 
 - [x] T001 Especificación, para que Carlos la apruebe
-- [ ] T002 La salud del servidor no consulta la base y el pool conserva las conexiones (RF-125; E20, E21, E22)
+- [x] T002 La salud del servidor no consulta la base y el pool conserva las conexiones (RF-125; E20, E21, E22)
 - [ ] T003 La base anota qué productos cambiaron y avisa: revisiones, tabla de cambios, triggers y avisos (RF-124) (depende de T002)
 - [ ] T004 La copia del servidor: carga de a páginas, puesta al día con los avisos y al reconectar, guardado en el disco (RF-124; E14 a E19) (depende de T003)
 - [ ] T005 Buscar, código, identificadores, marcas, filtros y páginas desde la copia, con el stock de la página leído de la base (RF-122; E01 a E06, E14) (depende de T004)

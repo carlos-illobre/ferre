@@ -5,7 +5,7 @@ import { horaDeLectura } from "../productos/reglas.js";
 // Lo que la ficha del producto renovada pide al servidor (specs/016): la última lectura del
 // código de barras y el archivo de origen del costo.
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));
+vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 describe("la última lectura del código (RF-112)", () => {

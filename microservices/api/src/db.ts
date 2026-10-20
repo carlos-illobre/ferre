@@ -1,15 +1,6 @@
 import pg from "pg";
 import { config } from "./config.js";
 
-export const pool = new pg.Pool({ connectionString: config.databaseUrl });
-
-// Distingue "no pude preguntar" de "está bien": el health lo reporta y el compose no da
-// por sano al contenedor hasta que la base responda.
-export async function baseResponde(): Promise<boolean> {
-  try {
-    await pool.query("SELECT 1");
-    return true;
-  } catch {
-    return false;
-  }
-}
+// Cada conexión nueva deja registros en la base (specs/018, RF-125): las que se abren para
+// atender se conservan diez minutos sin uso, en vez de los diez segundos de arranque de `pg`.
+export const pool = new pg.Pool({ connectionString: config.databaseUrl, idleTimeoutMillis: 10 * 60_000, keepAlive: true });

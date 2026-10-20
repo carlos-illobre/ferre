@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));
+vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 const conFoto = (tipo = "image/jpeg") => { const f = new FormData(); f.append("foto", new File(["bytes de la foto"], "foto.jpg", { type: tipo })); return f; };

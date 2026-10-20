@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; }, baseResponde: async () => true }));
+vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
 // Google de mentira (RF-70): la credencial «google:<correo>» la confirma Google con ese correo;
 // «sin-verificar:<correo>» trae un correo que Google no verificó; cualquier otra no la reconoce.
 // Lo que se prueba es qué hace Ferrebress con lo que Google confirma, no la pantalla de Google.
