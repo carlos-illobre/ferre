@@ -13,3 +13,12 @@ export async function deslizarParaCobrar(page: Page): Promise<void> {
   await page.mouse.move(caja.x + caja.width - 4, y, { steps: 12 });
   await page.mouse.up();
 }
+
+// Buscar en Vender del celular: la búsqueda está en una hoja, como la v2 (decisión 140); tocar la
+// caja la abre. Devuelve la caja de la hoja, con lo escrito.
+export async function buscarEnVender(page: Page, texto: string) {
+  const caja = page.getByTestId("busqueda");
+  if (!(await caja.isVisible())) await page.getByTestId("abrir-busqueda").click();
+  await caja.fill(texto);
+  return caja;
+}

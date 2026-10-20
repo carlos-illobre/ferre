@@ -75,20 +75,21 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-precio-mano input { width: 84px; font-size: 17px; font-weight: 700; }
 .vm-margenes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 .vm-margenes button { height: 44px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); color: var(--m-urgente-texto); font-weight: 750; font-size: 15px; }
-.vm-abajo { display: flex; align-items: center; gap: 6px; }
+.vm-abajo { display: flex; align-items: center; gap: 6px; min-width: 0; }
 /* El tacho debajo de la foto; la cantidad en blanco con la unidad adentro, como la v2 (decisión 140). */
-.vm-tacho { width: 50px; height: 40px; display: grid; place-items: center; color: var(--m-texto-3); border-radius: 10px; flex: none; margin: 0 -6px 0 -4px; }
+.vm-tacho { width: 40px; height: 40px; display: grid; place-items: center; color: var(--m-texto-3); border-radius: 10px; flex: none; margin: 0 -4px 0 -4px; }
 .vm .vm-abajo .contador { height: 40px; background: #fff; border: 1px solid var(--m-borde-fuerte); border-radius: 12px; overflow: hidden; flex: none; }
-.vm .vm-abajo .contador button { width: 34px; height: 38px; color: var(--m-texto-2); border-radius: 0; }
-.vm .vm-abajo .contador input { width: 28px; font-size: 16px; font-weight: 800; color: var(--m-tinta); }
+.vm .vm-abajo .contador button { width: 32px; height: 38px; color: var(--m-texto-2); border-radius: 0; }
+.vm .vm-abajo .contador input { width: 30px; text-align: right; padding-right: 3px; font-size: 16px; font-weight: 800; color: var(--m-tinta); }
 .vm .vm-abajo .contador { display: inline-flex; }
 .vm .vm-abajo .contador > button:last-of-type { order: 3; }
-.vm-u { order: 2; margin: 0 2px 0 -6px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); }
+.vm-u { order: 2; position: relative; display: inline-flex; align-items: center; height: 38px; padding: 0 2px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); text-decoration: underline dotted; text-underline-offset: 3px; }
+.vm-u select { position: absolute; inset: 0; width: 100%; opacity: 0; font-size: 16px; }
 .vm-unidad { position: relative; display: inline-flex; align-items: center; height: 40px; border-radius: 12px; background: var(--m-hundido); margin-left: auto; }
 .vm-unidad select { appearance: none; -webkit-appearance: none; height: 40px; border: 0; background: none; font: inherit; font-weight: 750; font-size: 14px; color: var(--m-tinta); padding: 0 20px 0 8px; }
 .vm-unidad svg { position: absolute; right: 5px; pointer-events: none; }
-.vm-margen { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
-.vm-subtotal { margin-left: auto; font-weight: 800; font-size: 19px; white-space: nowrap; }
+.vm-margen { display: inline-flex; align-items: center; gap: 2px; height: 40px; padding: 0 8px; flex: none; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
+.vm-subtotal { margin-left: auto; font-weight: 800; font-size: 18px; white-space: nowrap; }
 .vm-stock { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); font-size: 14px; font-weight: 700; }
 
 /* El cobro, fijo abajo: lo que falta, el medio y el cliente, y cobrar deslizando. */
@@ -156,3 +157,25 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm .estado-chico, .vm-hoy .estado-chico { margin-top: -6px; font-size: 14px; font-weight: 600; color: #545955; }
 .vm .estado-chico i, .vm-hoy .estado-chico i { width: 8px; height: 8px; }
 .app:has(.vm, .vm-hoy) .linea-de-arriba .estado-chico { display: none; }
+
+/* La búsqueda en su hoja, como la v2 (decisión 140). */
+.vm-abrir-busqueda { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; color: #6B706B; font-size: 16px; cursor: text; }
+.vm-abrir-busqueda span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hoja.vm-busca { min-height: 92dvh; background: #F4F2EC; display: flex; flex-direction: column; gap: 10px; }
+.vm-busca-cab { display: flex; align-items: center; gap: 8px; }
+.vm-busca-cab .buscador { flex: 1; min-width: 0; }
+.vm-busca-cab .caja { background: #fff; border: 1.5px solid #12382F; box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); border-radius: 12px; }
+.vm-cancelar { height: 44px; padding: 0 6px; font-weight: 700; font-size: 16px; color: #545955; }
+.vm-busca-rotulo { margin: 2px 2px 0; font-size: 14px; font-weight: 650; color: #545955; }
+.vm-busca-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; overflow: auto; }
+.vm-r { width: 100%; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid #E6E2D8; background: #fff; box-shadow: 0 1px 2px rgba(26, 29, 27, .05); text-align: left; color: #1A1D1B; }
+.vm-r.elegida { border-color: #12382F; box-shadow: 0 0 0 3px rgba(18, 56, 47, .10); }
+.vm-r .miniatura { width: 56px; height: 56px; border-radius: 12px; background: #ECE9E1; display: grid; place-items: center; overflow: hidden; color: #545955; }
+.vm-r .miniatura img { width: 100%; height: 100%; object-fit: cover; }
+.vm-r-texto { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.vm-r-texto b { font-size: 16px; font-weight: 750; line-height: 21px; }
+.vm-r-texto small { font-size: 14px; color: #545955; }
+.vm-r-texto .hay { color: #11764A; font-weight: 700; }
+.vm-r-texto .no-hay { color: #845400; font-weight: 700; }
+.vm-r strong { font-size: 17px; font-weight: 800; white-space: nowrap; }
+.vm-r strong.sin { font-size: 14px; color: #845400; }

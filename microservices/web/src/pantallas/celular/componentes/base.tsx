@@ -86,7 +86,7 @@ function useTrabarLoDeAtras() {
     return () => { if (--trabas === 0) document.documentElement.classList.remove("con-hoja"); };
   }, []);
 }
-export function Hoja({ titulo, extra, alCerrar, children, testId }: { titulo?: ReactNode; extra?: ReactNode; alCerrar: () => void; children: ReactNode; testId?: string }) {
+export function Hoja({ titulo, extra, alCerrar, children, testId, clase }: { titulo?: ReactNode; extra?: ReactNode; alCerrar: () => void; children: ReactNode; testId?: string; clase?: string }) {
   // El botón de volver del celular cierra la hoja y deja la pantalla de abajo como estaba.
   useVolverCierra(alCerrar);
   useTrabarLoDeAtras();
@@ -99,7 +99,7 @@ export function Hoja({ titulo, extra, alCerrar, children, testId }: { titulo?: R
   }, [alCerrar]);
   return (
     <div className="hoja-fondo" onClick={alCerrar} role="presentation">
-      <div className="hoja" role="dialog" aria-label={typeof titulo === "string" ? titulo : undefined} onClick={(e) => e.stopPropagation()} data-testid={testId}>
+      <div className={`hoja ${clase ?? ""}`} role="dialog" aria-label={typeof titulo === "string" ? titulo : undefined} onClick={(e) => e.stopPropagation()} data-testid={testId}>
         <div className="manija" aria-hidden="true" />
         {titulo !== undefined && <div className="titulo-hoja"><span>{titulo}</span>{extra}</div>}
         {children}

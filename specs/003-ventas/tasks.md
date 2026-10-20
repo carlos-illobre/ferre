@@ -28,3 +28,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T017 [ajuste] Computadora: el aviso de «Quitaste…» centrado sobre la barra del cobro (decisión 133)
 - [x] T018 [ajuste] Computadora: el aviso de «No llevó» (y los demás de Vender) como el de «Quitaste…», centrado, con un tilde (decisión 133)
 - [x] T019 [interfaz] Celular: Vender igual a la v2 salvo cobrar deslizando y el medio desplegable; los íconos del menú de abajo de la v2; las pestañas de adentro con la elegida en blanco (decisión 140; maqueta `maquetas/celular-vender-v2-referencia.png`)
+- [x] T020 [interfaz] Celular: la búsqueda de Vender en una hoja como la de la v2: la caja con «Cancelar», lo último que se vendió con la caja vacía, los resultados en tarjetas con la foto, la marca, el stock y el precio, y «Agregar «…»» como ítem libre (decisión 140)

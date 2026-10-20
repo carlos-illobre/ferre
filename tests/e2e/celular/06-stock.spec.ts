@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { buscarEnVender } from "../comun/cobrar";
 import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
@@ -65,6 +66,7 @@ test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) =>
 
   // En la venta se ve el stock del producto.
   await page.goto("/#/vender");
-  await page.getByTestId("busqueda").fill("e2e candado stock");
-  await expect(page.getByTestId("sugerencias")).toContainText("stock 15");
+  // La búsqueda de Vender, en su hoja (decisión 140): cada producto con su stock.
+  await buscarEnVender(page, "e2e candado stock");
+  await expect(page.getByTestId("sugerencias")).toContainText("15 un.");
 });

@@ -62,7 +62,7 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
 
   // El celular manda un código conocido: la laptop lo agrega a la venta.
   await celular.getByRole("button", { name: "Ir a vender" }).click();
-  await expect(celular.getByTestId("busqueda")).toBeEnabled();
+  await expect(celular.getByTestId("abrir-busqueda")).toBeVisible();
   // Se manda el código por la misma API que usa el escáner del celular.
   const puestoRemoto = await celular.evaluate(() => JSON.parse(localStorage.getItem("ferre.puesto-remoto") ?? "null") as { id: string } | null);
   expect(puestoRemoto).not.toBeNull();

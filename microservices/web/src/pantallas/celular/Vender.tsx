@@ -16,6 +16,7 @@ import { busquedaAlDia, esperarBusqueda, traerPorCodigo, useCatalogo } from "../
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { nombreDeProducto, pesos, pesosCortos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
+import { useSugeridos } from "../sugeridos";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../../puesto";
@@ -84,6 +85,9 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   const [hoja, setHoja] = useState<"clientes" | "espejo" | null>(null);
   const [renglonAbierto, setRenglonAbierto] = useState<string | null>(null);
   const [aviso, setAviso] = useState<Aviso | null>(null);
+  // La búsqueda, en una hoja como la de la v2 (decisión 140): tocar la caja la abre.
+  const [buscando, setBuscando] = useState(false);
+  const cerrarBusqueda = useCallback(() => { setBuscando(false); setConsulta(""); }, []);
   const caja = useRef<HTMLInputElement>(null);
   useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 5000); return () => clearTimeout(t); }, [aviso]);
 
@@ -93,13 +97,13 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     lado: "celular", dispositivo: describirDispositivo, fijaMargen,
     textoDe: (motivo) => TEXTOS.vender[motivo === "sin-precio" ? "sinPrecio" : motivo === "sin-medio" ? "elegiComoPaga" : "faltaElCliente"].corto,
     textoDeRechazo: (m) => m,
-    alCambiar: useCallback((motivo: MotivoDeCambio) => { if (motivo === "agregar") setConsulta(""); }, []),
+    alCambiar: useCallback((motivo: MotivoDeCambio) => { if (motivo === "agregar") { setConsulta(""); setBuscando(false); } }, []),
     alFaltarCliente: () => setHoja("clientes"),
   });
   const { items, medio, clienteId, cliente, total, mensaje, setMensaje, error, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, elegirMargen, elegirSugerencia, elegirMedio, elegirCliente, cobrar } = venta;
   const renglon = items.find((i) => i.clave === renglonAbierto) ?? null;
   // Un código que no es de ningún producto deja la búsqueda limpia, para elegir a cuál asociarlo.
-  const agregarPorCodigo = useCallback((codigo: string) => { const conocido = venta.agregarPorCodigo(codigo); setConsulta(""); return conocido; }, [venta.agregarPorCodigo]);
+  const agregarPorCodigo = useCallback((codigo: string) => { const conocido = venta.agregarPorCodigo(codigo); setConsulta(""); setBuscando(false); return conocido; }, [venta.agregarPorCodigo]);
   const noLlevo = () => { if (items.length) { setAviso(null); venta.noLlevo(TEXTOS.vender.noLlevo.corto); } };
   // Vaciar no pregunta: avisa y deja deshacer (003, historia 1, escenario 20).
   const vaciar = () => {
@@ -154,7 +158,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   }, [recien, items]);
   const cerrarCamara = useCallback(() => { setEscaneando(false); setUltimoEscaneo(null); setRecien(null); }, []);
   // «Asociar»: se cierra la cámara y se busca el producto; al elegirlo, el código queda en él.
-  const asociar = () => { cerrarCamara(); setTimeout(() => caja.current?.focus(), 0); };
+  const asociar = () => { cerrarCamara(); setBuscando(true); };
 
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
@@ -171,7 +175,6 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
       // Si el servidor todavía no contestó lo escrito, Enter espera esa respuesta (specs/018).
       if (busquedaAlDia(texto)) alEnter(resultados, elegido); else void esperarBusqueda(texto).then((r) => alEnter(r, 0));
     }
-    else if (e.key === "Escape") { if (consulta) setConsulta(""); else noLlevo(); }
   }
   useEffect(() => {
     const global = (e: globalThis.KeyboardEvent) => {
@@ -189,6 +192,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   }, [resultados.length]), caja.current);
 
   const faltan = items.filter((it) => precioDe(it).unitario === null);
+  const { ultimos } = useSugeridos(catalogo, items.length === 0);
   const veHoy = puedeEsto(...PIDE.hoy);
 
   return (
@@ -203,13 +207,20 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         {pestanas}
         {escaneando
           ? <Escaner className="vm-camara" seguido alDetectar={alDetectar} alCerrar={cerrarCamara} ultimo={ultimoEscaneo} />
-          : <Buscador valor={consulta} alCambiar={setConsulta} placeholder={"Producto, código o marca"} onKeyDown={teclasBusqueda} cajaRef={caja}
-              alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />}
+          : (
+            <div className="buscador">
+              <button type="button" className="caja vm-abrir-busqueda" onClick={() => setBuscando(true)} data-testid="abrir-busqueda">
+                <Icono nombre="buscar" tam={20} grosor={2.2} className="lupa" /><span>Producto, código o marca</span>
+              </button>
+              {hayCamara() && <button type="button" className="escanear" aria-label="Escanear" onClick={() => setEscaneando(true)} data-testid="escanear"><Icono nombre="escanear" tam={22} /></button>}
+            </div>
+          )}
         {(!hayCamara() || window.innerWidth > 900) && <div className="solo-escritorio"><VincularCelular vinculado={puestoVinculado} alVincular={alVincular} /></div>}
       </div>
 
       <div className="columna">
-        <AvisoError texto={errorCatalogo} />
+        {/* Con la hoja de buscar abierta, el aviso va en la hoja. */}
+        <AvisoError texto={buscando ? null : errorCatalogo} />
         {codigoDesconocido && (
           <div className="vm-desconocido" data-testid="codigo-desconocido">
             <Icono nombre="alerta" tam={20} />
@@ -217,32 +228,6 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
             {escaneando ? <button type="button" onClick={asociar} data-testid="asociar-codigo">Asociar</button>
               : <button type="button" className="fantasma" onClick={() => setCodigoDesconocido(null)}>Ignorar</button>}
           </div>
-        )}
-
-        {resultados.length > 0 && (
-          <ul className="sugerencias" role="listbox" data-testid="sugerencias">
-            {resultados.map((p, i) => {
-              const precio = precioDelProducto(p).valor;
-              return (
-                <li key={p.id} role="option" aria-selected={i === elegido}>
-                  <button type="button" className={`fila con-foto ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); elegirSugerencia(p); }}>
-                    <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : null}</span>
-                    <span className="nombre">{nombreDeProducto(p.descripcion)}</span>
-                    <strong className="derecha importe">{precio === null ? <small>sin precio</small> : pesosCortos(precio)}</strong>
-                    <span className="detalle">{detalleDe(p)}{stockPorId.has(p.id) ? ` · stock ${num(stockPorId.get(p.id)!)}` : ""}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        {consulta.trim() && resultados.length === 0 && !buscandoEnElServidor && !errorCatalogo && (
-          <Lista>
-            <button type="button" className="fila" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
-              <span className="nombre">Agregar “{consulta.trim()}” como ítem libre</span><span />
-              <span className="detalle">No está en ninguna lista. Le ponés el precio a mano.</span>
-            </button>
-          </Lista>
         )}
 
         <div className="vm-cab-lista" data-testid="titulo-venta">
@@ -262,7 +247,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </div>
         ) : items.map((it) => (
           <Renglon key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined} recien={escaneando && Boolean(recien) && it.producto?.id === recien}
-            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it)} alElegirMargen={(m) => elegirMargen(it, m)}
+            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
             alAbrir={() => setRenglonAbierto(it.clave)}
             alSubirFoto={it.producto ? async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); } : undefined} />
         ))}
@@ -286,6 +271,10 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         </Deslizar>
       </div>
 
+      {buscando && (
+        <BuscarProducto consulta={consulta} alCambiar={setConsulta} onKeyDown={teclasBusqueda} cajaRef={caja} resultados={resultados} elegido={elegido} ultimos={ultimos}
+          stock={stockPorId} buscandoEnElServidor={buscandoEnElServidor} error={errorCatalogo} alElegir={elegirSugerencia} alLibre={(t) => agregar(null, t)} alCerrar={cerrarBusqueda} />
+      )}
       {hoja === "clientes" && (
         <Hoja titulo={medio === "cuenta_corriente" ? TEXTOS.vender.quienLleva.corto : "Cliente"} alCerrar={() => setHoja(null)} testId="hoja-clientes">
           <ElegirCliente clientes={clientes} elegido={clienteId} alElegir={(id) => { elegirCliente(id); setHoja(null); }} />
@@ -299,9 +288,58 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         </Hoja>
       )}
       {renglon && <HojaDelRenglon item={renglon} alCerrar={() => setRenglonAbierto(null)} alCambiar={(c) => cambiarItem(renglon.clave, c)} alElegirMargen={(m) => elegirMargen(renglon, m)}
-        alCambiarUnidad={(u) => cambiarUnidad(renglon, u)} alQuitar={() => { setRenglonAbierto(null); quitar(renglon); }} />}
+        alQuitar={() => { setRenglonAbierto(null); quitar(renglon); }} />}
       {cobro && <VentaRegistrada cobro={cobro} veHoy={veHoy} alCerrar={() => { venta.cerrarCobro(); setMensaje(null); }} alVerHoy={() => { venta.cerrarCobro(); setMensaje(null); irA("vender/hoy"); }} />}
     </main>
+  );
+}
+
+// La búsqueda, como la hoja de la v2 (decisión 140): la caja con «Cancelar»; vacía, lo último que se
+// vendió; escribiendo, cuántos y cada producto en una tarjeta con su foto, marca, stock y precio, y al
+// final «Agregar «…»» como ítem libre. Tocar uno lo suma y cierra la hoja.
+function BuscarProducto({ consulta, alCambiar, onKeyDown, cajaRef, resultados, elegido, ultimos, stock, buscandoEnElServidor, error, alElegir, alLibre, alCerrar }: {
+  consulta: string; alCambiar: (v: string) => void; onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void; cajaRef: React.RefObject<HTMLInputElement>; resultados: Producto[]; elegido: number;
+  ultimos: Producto[]; stock: Map<string, number>; buscandoEnElServidor: boolean; error: string | null; alElegir: (p: Producto) => void; alLibre: (texto: string) => void; alCerrar: () => void;
+}) {
+  const texto = consulta.trim();
+  const lista = texto ? resultados : ultimos;
+  const rotulo = texto ? (resultados.length ? `${resultados.length} ${resultados.length === 1 ? "producto" : "productos"}` : buscandoEnElServidor ? "Buscando…" : "No está en el catálogo") : ultimos.length ? "Lo último que se vendió" : "";
+  return (
+    <Hoja alCerrar={alCerrar} testId="hoja-buscar" clase="vm-busca">
+      <div className="vm-busca-cab">
+        <Buscador valor={consulta} alCambiar={alCambiar} placeholder="Producto, código o marca" onKeyDown={onKeyDown} cajaRef={cajaRef} autoFoco />
+        <button type="button" className="vm-cancelar" onClick={alCerrar} data-testid="cancelar-busqueda">Cancelar</button>
+      </div>
+      <AvisoError texto={error} />
+      {rotulo && <p className="vm-busca-rotulo" data-testid="busqueda-rotulo">{rotulo}</p>}
+      <ul className="vm-busca-lista" role="listbox" aria-label="Productos" data-testid="sugerencias">
+        {lista.map((p, i) => {
+          const precio = precioDelProducto(p).valor;
+          const hay = stock.get(p.id);
+          return (
+            <li key={p.id} role="option" aria-selected={Boolean(texto) && i === elegido}>
+              <button type="button" className={`vm-r ${texto && i === elegido ? "elegida" : ""}`} onClick={() => alElegir(p)}>
+                <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : <Icono nombre="caja" tam={22} />}</span>
+                <span className="vm-r-texto">
+                  <b>{nombreDeProducto(p.descripcion)}</b>
+                  <small>{p.marca}{p.marca && hay !== undefined ? " · " : ""}{hay !== undefined && <span className={hay > 0 ? "hay" : "no-hay"}>{hay > 0 ? `${num(hay)} ${abreviarUnidad(p.unidad as Unidad)}` : "sin stock"}</span>}</small>
+                </span>
+                <strong className={`importe ${precio === null ? "sin" : ""}`}>{precio === null ? "Sin precio" : pesosCortos(precio)}</strong>
+              </button>
+            </li>
+          );
+        })}
+        {texto && !buscandoEnElServidor && (
+          <li>
+            <button type="button" className="vm-r" onClick={() => alLibre(texto)} data-testid="agregar-libre">
+              <span className="miniatura"><Icono nombre="caja" tam={22} /></span>
+              <span className="vm-r-texto"><b>Agregar «{texto}»</b><small>Como ítem libre, con precio a mano</small></span>
+              <Icono nombre="mas" tam={20} />
+            </button>
+          </li>
+        )}
+      </ul>
+    </Hoja>
   );
 }
 
@@ -389,8 +427,8 @@ function Deslizar({ apagado, ocupado, alCobrar, alTocar, children }: { apagado: 
 // total del renglón. Sin precio, los márgenes para elegir ahí mismo.
 const POR_UNIDAD: Record<Unidad, string> = { unidad: "cada uno", kg: "el kg", m: "el metro", l: "el litro" };
 
-function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen, alSubirFoto, alAbrir }: {
-  item: Item; stock: number | undefined; recien: boolean; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alSubirFoto?: (archivo: File) => Promise<void>; alAbrir: () => void;
+function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto, alAbrir }: {
+  item: Item; stock: number | undefined; recien: boolean; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alSubirFoto?: (archivo: File) => Promise<void>; alAbrir: () => void;
 }) {
   const p = precioDe(it);
   const producto = it.producto;
@@ -436,9 +474,14 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
       ) : (
         <div className="vm-abajo">
           <button type="button" className="vm-tacho" onClick={alQuitar} aria-label={`Quitar ${it.descripcion || "este renglón"} de la venta`} data-testid="quitar-renglon"><Icono nombre="tacho" tam={20} /></button>
-          {/* La unidad adentro de la cantidad, como en la v2, solo si no son unidades; se cambia en la hoja del renglón (decisión 140). */}
+          {/* La unidad adentro de la cantidad, como en la v2, y siempre a la vista: se toca para cambiarla (decisión 140). */}
           <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} alQuitar={alQuitar}>
-            {it.unidad !== "unidad" && <span className="vm-u" data-testid="unidad-renglon">{abreviarUnidad(it.unidad)}</span>}
+            <label className="vm-u">
+              <span aria-hidden="true" data-testid="unidad-renglon">{abreviarUnidad(it.unidad)}</span>
+              <select value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
+                {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
+              </select>
+            </label>
           </Contador>
           {producto && p.costo !== null && (
             <button type="button" className="vm-margen" onClick={alAbrir} aria-label={`Margen: ${it.precioManual !== null ? "a mano" : `${p.margen} %`}`} data-testid="margen">
@@ -465,9 +508,9 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
   );
 }
 
-// La hoja de un renglón: el margen (cada uno con su precio), el precio a mano, la cantidad con su
-// unidad y «Quitar de la venta».
-function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alCambiarUnidad, alQuitar }: { item: Item; alCerrar: () => void; alCambiar: (c: Partial<Item>) => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alQuitar: () => void }) {
+// La hoja de un renglón: el margen (cada uno con su precio), el precio a mano, la cantidad y
+// «Quitar de la venta».
+function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuitar }: { item: Item; alCerrar: () => void; alCambiar: (c: Partial<Item>) => void; alElegirMargen: (m: number) => void; alQuitar: () => void }) {
   const p = precioDe(it);
   const renglon = subtotalDe(it);
   const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
@@ -488,12 +531,6 @@ function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alCambi
       </label>
       <div className="vm-fila-cantidad"><span>Cantidad</span>
         <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} testId="cantidad-hoja" />
-        <label className="vm-unidad">
-          <select value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
-            {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
-          </select>
-          <Icono nombre="abajo" tam={14} grosor={2.6} />
-        </label>
         <b className="importe">{renglon ? pesosCortos(renglon.valor) : ""}</b>
       </div>
       <button type="button" className="boton vm-quitar vm-ancho" onClick={alQuitar} data-testid="quitar"><Icono nombre="tacho" tam={20} />Quitar de la venta</button>

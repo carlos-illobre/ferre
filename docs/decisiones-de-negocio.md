@@ -1137,9 +1137,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      total a la derecha) con el círculo que se desliza; el medio, la pastilla que abre la lista
      (decisión 119), con el cliente al lado. Como en la v2: el estado de la conexión debajo del
      título («En línea · todo enviado», también en la computadora), las pestañas con la elegida en blanco, el renglón con el tacho debajo de la foto, la
-     cantidad en blanco con la unidad adentro solo si no es «unidades» (la unidad se cambia en la
-     hoja del renglón), el precio sin el «?» a la vista (tocarlo sigue explicando cómo se calculó),
+     cantidad en blanco con la unidad adentro, siempre a la vista y tocándola se cambia (Carlos:
+     «ajustá los tamaños para poder incluir las unidades»), el precio sin el «?» a la vista (tocarlo sigue explicando cómo se calculó),
      y el menú de abajo con el carrito, la etiqueta, la caja y las tres rayas. Las pestañas de
      adentro de las demás partes toman el mismo aspecto, para que no haya dos estilos; las de dos
      van sin ícono, como en la v2, y las de tres o más lo conservan, porque apiladas lo necesitan
-     para reconocerse. «No llevó», al lado de «Vaciar», y el cliente siguen (decisión 119).
+     para reconocerse. «No llevó», al lado de «Vaciar», y el cliente siguen (decisión 119). La
+     búsqueda también, como la de la v2: una hoja con la caja y «Cancelar»; vacía, lo último que se
+     vendió (la v2 decía «lo que más sale a esta hora», que no se calcula); con texto, las tarjetas
+     de los productos y el ítem libre.

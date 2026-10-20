@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
-import { deslizarParaCobrar } from "../comun/cobrar";
+import { deslizarParaCobrar, buscarEnVender } from "../comun/cobrar";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
 const { psql } = stack("celular");
@@ -45,19 +45,17 @@ test.beforeAll(() => {
 test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/vender");
-  const busqueda = page.getByTestId("busqueda");
-  await expect(busqueda).toBeEnabled();
-  // En el celular la búsqueda no toma el foco sola.
-  await expect(busqueda).not.toBeFocused();
+  await expect(page.getByTestId("abrir-busqueda")).toBeVisible();
+  // En el celular la búsqueda no se abre sola: es una hoja que se abre al tocar la caja (decisión 140).
+  await expect(page.getByTestId("hoja-buscar")).toHaveCount(0);
 
   // Producto con margen guardado: Enter lo agrega ya con precio (1000 × 2 × 1,21 = 2420 → $3.000).
-  await busqueda.fill("e2e mecha vender");
+  const busqueda = await buscarEnVender(page, "e2e mecha vender");
   await expect(page.getByTestId("sugerencias")).toContainText("$3.000");
   await busqueda.press("Enter");
   const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
   await expect(mecha).toBeVisible();
-  await expect(busqueda).toHaveValue("");
-  await expect(busqueda).toBeFocused();
+  await expect(page.getByTestId("hoja-buscar")).toHaveCount(0);
   await expect(page.getByTestId("total")).toContainText("$3.000");
 
   // Cantidad 3; la flechita suma de a 1 (enteras, sin decimales); 2,7 por unidad es 2.
@@ -71,8 +69,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(page.getByTestId("total")).toContainText("$9.000");
 
   // Producto sin margen: queda en rojo hasta elegirlo en la fila; cualquier margen sobre $10 redondea a $1.000.
-  await busqueda.fill("e2e tornillo vender");
-  await busqueda.press("Enter");
+  await (await buscarEnVender(page, "e2e tornillo vender")).press("Enter");
   const tornillo = page.getByTestId("item").filter({ hasText: "TORNILLO VENDER" });
   await expect(tornillo).toContainText("Sin precio");
   await deslizarParaCobrar(page);
@@ -82,11 +79,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(page.getByTestId("total")).toContainText("$10.000");
   // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto. 1,5 kg × $1.000 =
   // $1.500: el renglón se redondea para arriba a $2.000 para no dar vuelto (RF-19).
-  // La unidad se cambia en la hoja del renglón y se ve adentro de la cantidad (decisión 140).
-  await tornillo.getByTestId("abrir-renglon").click();
-  await page.getByTestId("hoja-renglon").getByTestId("unidad").selectOption("kg");
-  await page.keyboard.press("Escape");
-  await expect(page.getByTestId("hoja-renglon")).toHaveCount(0);
+  // La unidad está adentro de la cantidad y se toca para cambiarla (decisión 140).
+  await tornillo.getByTestId("unidad").selectOption("kg");
   await expect(tornillo.getByTestId("unidad-renglon")).toHaveText("kg");
   await tornillo.getByTestId("cantidad").fill("1.5");
   await expect(page.getByTestId("total")).toContainText("$11.000");
@@ -140,8 +134,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.getByRole("button", { name: "Vender" }).click();
 
   // "No llevó": la consulta queda registrada.
-  await busqueda.fill("e2e mecha vender");
-  await busqueda.press("Enter");
+  await (await buscarEnVender(page, "e2e mecha vender")).press("Enter");
   await page.getByRole("button", { name: "No llevó" }).click();
   await expect(page.getByTestId("mensaje")).toContainText("Anotado como «No llevó»");
   await expect.poll(() => psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_MECHA}'`)).toBe("1");

@@ -79,16 +79,23 @@ el lenguaje «Mostrador». Desde el 2026-10-20 (decisión 140) se ve **igual a l
   pastilla «En espejo»: tocarla abre una hoja con «Usar como lector de la computadora» (lo que se
   escanee entra en la venta de la computadora) y «Desvincular». Debajo, las pestañas «Vender» y
   «Ventas de hoy» (decisión 120), sin ícono y con la elegida en blanco, y la búsqueda con el botón de la cámara a su derecha.
+- **Buscar** (como la v2, decisión 140): tocar la caja abre una hoja casi a pantalla completa con
+  la caja (el teclado se abre solo) y «Cancelar». Vacía, dice «Lo último que se vendió» y muestra
+  esos productos; escribiendo, cuántos encontró y cada uno en una tarjeta con la foto, el nombre,
+  la marca y el stock (en verde si hay; «sin stock» si no) y el precio a la derecha («Sin precio»
+  en ámbar si falta), y al final «Agregar «…»» como ítem libre con precio a mano. Tocar uno lo
+  suma a la venta y cierra la hoja; Enter suma el marcado (↑ ↓ lo mueven) y un código leído con
+  un lector se busca igual. Esc o «Cancelar» la cierran.
 - «Esta venta» con cuántos productos hay y, a la derecha, «No llevó» (anota lo que se preguntó) y «Vaciar»; los dos avisan abajo, y «Vaciar» ofrece Deshacer en lugar de preguntar antes.
 - Cada renglón, en una tarjeta: la foto, el nombre y debajo marca y stock; a la derecha, el precio
   por unidad en una pastilla verde suave, con la unidad debajo («cada uno», «el metro», «el kg»):
   tocar la pastilla abre una hoja «Cómo se calculó» con el costo y su proveedor, el
   margen, el IVA, el redondeo, la cantidad y el total del renglón (con un precio a mano, el precio y
   el margen real). Tocar el resto del renglón abre su hoja: margen, precio a mano, cantidad y
-  «Quitar de la venta», con la lista de la unidad (un., kg, m, L) al lado de la cantidad.
+  «Quitar de la venta».
 - Abajo, en una fila: el tacho debajo de la foto para quitar el renglón (ofrece Deshacer), la
-  cantidad en blanco con − y + (con 1, «−» también lo quita) y la unidad adentro si no son
-  unidades («1,5 kg»), el margen (abre la lista de márgenes) y el total del renglón, sin salirse de
+  cantidad en blanco con − y + (con 1, «−» también lo quita) y la unidad adentro («1 un.»,
+  «1,5 kg»), que se toca para elegir otra (un., kg, m, L), el margen (abre la lista de márgenes) y el total del renglón, sin salirse de
   la tarjeta.
 - El fondo es el gris cálido de «Mostrador», como la v2. El menú de abajo lleva los íconos de la v2:
   la etiqueta (Catálogo), el carrito (Vender), la caja (Depósito) y las tres rayas (Más). Los avisos («Vaciaste la venta», con

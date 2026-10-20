@@ -26,12 +26,13 @@ function armar(ventas: unknown = ventasVacias, sub: string | null = null) {
   catalogo.actual = falso;
   apiFalsa.mockImplementation(async (ruta: string) => (ruta.startsWith("/ventas") ? ventas : []));
   const { unmount } = render(<ParteVender sub={sub} />);
-  const busqueda = screen.queryByTestId("busqueda")!;
-  const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
+  // La búsqueda está en una hoja, como la v2 (decisión 140): tocar la caja la abre.
+  const busqueda = () => { if (!screen.queryByTestId("busqueda")) fireEvent.click(screen.getByTestId("abrir-busqueda")); return screen.getByTestId("busqueda"); };
+  const agregar = (texto: string) => { const b = busqueda(); fireEvent.change(b, { target: { value: texto } }); fireEvent.keyDown(b, { key: "Enter" }); };
   // Los nombres se muestran como frase (decisión 127): se buscan sin importar mayúsculas.
   const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.toLowerCase().includes(texto.toLowerCase()))!;
-  // La unidad se elige en la hoja del renglón; en el renglón se ve adentro de la cantidad si no son unidades (decisión 140).
-  const unidad = (texto: string) => { fireEvent.click(within(item(texto)).getByTestId("abrir-renglon")); return within(screen.getByTestId("hoja-renglon")).getByTestId("unidad"); };
+  // La unidad está adentro de la cantidad, como en la v2, y se toca para cambiarla (decisión 140).
+  const unidad = (texto: string) => within(item(texto)).getByTestId("unidad");
   // Con el teclado, Enter sobre el círculo cobra (el dedo lo arrastra hasta el final).
   const cobrar = () => fireEvent.keyDown(screen.getByTestId("cobrar-pulgar"), { key: "Enter" });
   const medio = (valor: string) => { fireEvent.click(screen.getByTestId("medio")); fireEvent.click(screen.getByTestId(`medio-${valor}`)); };
@@ -70,7 +71,6 @@ describe("Vender", () => {
     agregar("mecha vender");
     fireEvent.change(unidad("MECHA"), { target: { value: "kg" } });
     expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { unidad: "kg" });
-    fireEvent.keyDown(screen.getByTestId("hoja-renglon"), { key: "Escape" });
     expect(within(item("MECHA")).getByTestId("unidad-renglon").textContent).toBe("kg");
     const cantidad = within(item("MECHA")).getByTestId("cantidad") as HTMLInputElement;
     fireEvent.change(cantidad, { target: { value: "1.55" } });
@@ -258,13 +258,11 @@ describe("Vender", () => {
   });
 
   it("003 escenario 18: un código que no es de ningún producto se avisa, y elegido el producto queda asociado", async () => {
-    const { busqueda, falso } = armar();
-    fireEvent.change(busqueda, { target: { value: "7790001112223" } });
-    fireEvent.keyDown(busqueda, { key: "Enter" });
+    const { agregar, falso } = armar();
+    agregar("7790001112223");
     // El código se le pregunta al servidor (specs/018): la respuesta llega un instante después.
     expect((await screen.findByTestId("codigo-desconocido")).textContent).toContain("Código 7790001112223No está en el catálogo");
-    fireEvent.change(busqueda, { target: { value: "mecha vender" } });
-    fireEvent.keyDown(busqueda, { key: "Enter" });
+    agregar("mecha vender");
     expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { codigo_barras: "7790001112223" });
     expect(screen.queryByTestId("codigo-desconocido")).toBeNull();
     expect(screen.getAllByTestId("item")).toHaveLength(1);
@@ -426,5 +424,23 @@ describe("Vender", () => {
     expect(item("TORNILLO").textContent).toContain("$1.000");
     expect(item("TORNILLO").textContent).not.toContain("costo");
     expect(within(item("TORNILLO")).queryByTestId("precio")).toBeNull();
+  });
+});
+
+describe("la búsqueda de Vender en el celular, como la v2 (003-T020)", () => {
+  it("tocar la caja abre la hoja; escribiendo dice cuántos y ofrece el ítem libre; elegir uno lo suma y la cierra; Cancelar la cierra", () => {
+    const { busqueda } = armar();
+    const caja = busqueda();
+    expect(screen.getByTestId("hoja-buscar")).toBeTruthy();
+    fireEvent.change(caja, { target: { value: "mecha vender" } });
+    expect(screen.getByTestId("busqueda-rotulo").textContent).toBe("1 producto");
+    expect(screen.getByTestId("agregar-libre").textContent).toContain("Agregar «mecha vender»");
+    fireEvent.click(within(screen.getByTestId("sugerencias")).getAllByRole("button")[0]!);
+    expect(screen.queryByTestId("hoja-buscar")).toBeNull();
+    expect(screen.getAllByTestId("item")).toHaveLength(1);
+    busqueda();
+    fireEvent.click(screen.getByTestId("cancelar-busqueda"));
+    expect(screen.queryByTestId("hoja-buscar")).toBeNull();
+    expect(screen.getAllByTestId("item")).toHaveLength(1);
   });
 });
