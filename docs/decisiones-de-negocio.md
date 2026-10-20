@@ -1003,8 +1003,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      selector segmentado sin el «%» en cada uno; la fila de abajo en una línea con «Precio a mano» a
      la derecha; la cuenta del costo y del precio, en «De dónde sale»). Se saca «Lo último que se
      vendió» («no es útil»; cambia la decisión 38: ya no está en ningún lado). «No llevó» y «Vaciar»
-     solo se muestran con productos en la venta, en la computadora y en el celular. Debajo de la
-     búsqueda no va la línea de teclas («Enter agrega, ↑ ↓ eligen…»): «no hace falta». Las teclas
+     solo se muestran con productos en la venta, en la computadora y en el celular. La línea de teclas
+     («← → cajón, ↑ ↓ eligen una venta…») se saca de «Ventas de hoy» («no hace falta»); la de
+     Vender queda, con el aspecto de la v2. Las teclas
      a la vista llevan el aspecto de la maqueta (la letra de siempre, fondo blanco y borde suave), y
      el botón que achica el menú usa el ícono de la maqueta (el panel con la flecha).
      Después, mirando la v2, Carlos eligió también su bloque del usuario: las iniciales, el nombre y
@@ -1012,3 +1013,35 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      la v1); el celular en espejo lleva el ícono del celular. «Mis datos», que también está en la
      v2, no existe todavía: queda como pregunta abierta. Y el margen, del tamaño de la v2; si la
      tarjeta es angosta, «Precio a mano» queda en su lápiz (con el nombre al pasar el mouse).
+127. **El renglón de Vender en la computadora, exactamente como la v2** (2026-10-20). Carlos marcó la
+     tarjeta de la v2 como la que va: la foto, el nombre con marca, proveedor y stock; el tacho a la
+     izquierda de la cantidad (como en el celular, cambia lo de la decisión 125 que lo ponía a la
+     derecha); la cantidad en una pastilla; el total del renglón con «3 × $7.000» debajo, sin «?»;
+     y abajo, alineados con el nombre, «Costo», «Margen» (300 a 25, un solo «%») y «Precio», el
+     precio por unidad. El precio aparece una sola vez: «a mano» va al lado del precio por unidad
+     y lo cambia por la caja (con una × para volver al margen). «Falta 1 precio» va arriba, al lado
+     de cuántos productos tiene la venta, y no en la barra del cobro, que queda con los medios, el
+     cliente y «Cobrar».
+     «No llevó» y «Vaciar» van sin borde, con su ícono; la tecla de «No llevó» pasa a ser F4 (en la línea
+     de teclas, no en el botón): Esc se usa para cerrar el desplegable de la
+     búsqueda. El foco de un renglón es su borde verde sobre la tarjeta blanca (como la maqueta); el
+     fondo ámbar es solo del renglón sin precio, que muestra «Precio a mano» en lugar del precio. Un
+     producto sin movimientos de stock dice «sin stock», en la búsqueda y en la tarjeta. Entre
+     tarjeta y tarjeta se ve el fondo gris cálido, y la zona de la pantalla no muestra el borde del
+     foco. La línea de teclas de Vender queda (Enter, ↑ ↓, + −, Supr, F1).
+     «Precio a mano» es un botón sin borde con el lápiz, al lado del precio por unidad; abre una
+     ventana como la maqueta (el producto, la caja con «$», «Cancelar» y «Poner el precio», Enter).
+     Puesto, el lugar del precio muestra «✎ A mano $34.434» (el margen queda sin elegir; tocarlo
+     vuelve a abrir la ventana, y elegir un margen vuelve al precio del margen). La ventana no dice
+     «se cobra igual» como la maqueta: el renglón se redondea para arriba a $1.000 (RF-19). El
+     margen no cambia al pasar el mouse. Lo que llega del celular (como lector o en espejo) se marca
+     «Llegó del celular» unos segundos. Los nombres de los productos ya no van en mayúsculas: las
+     listas los traen así y se muestran como frase («Prensa sargento tipo F 120x400mm /
+     (Workpro)»), con las siglas (HSS, PVC, LED) y los códigos cortos en mayúsculas, en Vender del
+     celular y de la computadora. En pantallas de hasta 1400 px el panel de la derecha se angosta.
+     «De dónde sale» va en filas como la maqueta: cada paso con su importe a la derecha y una línea
+     punteada entre ellas (costo con proveedor y fecha de la lista, + margen, + IVA, el precio para
+     arriba a $1.000, × la cantidad y, si hace falta, para arriba a $1.000 el renglón), y el total
+     del renglón grande abajo. El botón para ocultar el panel usa el ícono de la maqueta. La boleta termina en el borde dentado del ticket, como la maqueta. En la computadora, y solo ahí, al entrar a
+     Vender (por el menú, la pestaña, Alt+número o con las flechas) el cursor queda en la búsqueda:
+     cambia, para Vender, la regla de dejar la marca en la pestaña (decisión 82).

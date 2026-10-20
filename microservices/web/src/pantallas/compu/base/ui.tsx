@@ -31,11 +31,14 @@ const TRAZOS = {
   buscar: "M11 18.500a7.500 7.500 0 1 0 0-15 7.500 7.500 0 0 0 0 15ZM20.500 20.500l-4.200-4.200",
   escanear: "M3 8V6a2 2 0 0 1 2-2h2M17 4h2a2 2 0 0 1 2 2v2M21 16v2a2 2 0 0 1-2 2h-2M7 20H5a2 2 0 0 1-2-2v-2M7 9v6M11 9v6M14 9v6M17 9v6",
   cerrar: "M18 6 6 18M6 6l12 12",
+  prohibido: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM5.6 5.6l12.8 12.8",
   tilde: "m5 12.500 4.500 4.500L19 7.500",
   derecha: "m9 6 6 6-6 6",
   izquierda: "m15 6-6 6 6 6",
   // El de la maqueta para achicar y agrandar el menú: el panel con la flecha adentro.
   "achicar-menu": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M16 15l-3-3 3-3",
+  // El de la maqueta para ocultar el panel de la derecha: el panel con la flecha hacia afuera.
+  "ocultar-panel": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM15 3v18M8 9l3 3-3 3",
   "agrandar-menu": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M14 9l3 3-3 3",
   abajo: "m6 9 6 6 6-6",
   arriba: "m6 15 6-6 6 6",

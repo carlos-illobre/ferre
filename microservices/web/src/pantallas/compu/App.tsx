@@ -249,7 +249,9 @@ function Pantallas() {
     const cancelar = () => { cancelado = true; };
     window.addEventListener("keydown", cancelar, { once: true, capture: true });
     window.addEventListener("mousedown", cancelar, { once: true, capture: true });
-    for (const espera of [60, 150, 350, 600]) setTimeout(() => { if (!cancelado) buscar()?.focus(); }, espera);
+    // En Vender el cursor va siempre a la búsqueda, se llegue como se llegue (Carlos, 2026-10-20; decisión 127).
+    const destino = () => document.querySelector<HTMLInputElement>('.vmc-pagina [data-testid="busqueda"]:not(:disabled)') ?? buscar();
+    for (const espera of [60, 150, 350, 600]) setTimeout(() => { if (!cancelado) destino()?.focus(); }, espera);
   }
   const pestanaActual = () => document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button");
   // En el menú lateral: ↑ ↓ recorren todo lo que tiene (las partes y, debajo, los botones del

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useCatalogo } from "../../catalogo";
-import { useEspejar } from "../../espejo";
+import { useEspejar, useEspejo } from "../../espejo";
+import { marcarLoQueEntro } from "./llegados-del-celular";
 import type { MedioDePago } from "@servidor/ventas";
 import { cambiarVenta, useVentaEnCurso, ventaActual } from "./venta-en-curso";
 import type { Producto } from "../../producto";
@@ -40,7 +41,12 @@ export function renglonesDelEspejo<T extends Renglon>(venta: VentaEnEspejo, cata
 export function useVentaEnEspejo(): void {
   const { catalogo, catalogoCompleto } = useCatalogo();
   const { items, medio, clienteId } = useVentaEnCurso();
+  const { lado } = useEspejo();
   useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
-    cambiarVenta({ items: renglonesDelEspejo(v, catalogo ?? [], ventaActual().items), medio: v.medio as MedioDePago | null, clienteId: v.clienteId });
+    const antes = ventaActual().items;
+    const despues = renglonesDelEspejo(v, catalogo ?? [], antes);
+    // En la computadora, lo que agregó el celular se marca «Llegó del celular» un momento.
+    if (lado === "computadora") marcarLoQueEntro(antes, despues);
+    cambiarVenta({ items: despues, medio: v.medio as MedioDePago | null, clienteId: v.clienteId });
   }, catalogo !== null && catalogoCompleto !== false); // con el catálogo a medio cargar no se reconocerían los productos
 }

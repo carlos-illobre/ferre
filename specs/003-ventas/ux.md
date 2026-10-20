@@ -114,27 +114,37 @@ el lenguaje «Mostrador»:
 `maquetas/compu-vender-elegida.png`: la v2 del director de arte con el panel de la v3 y la boleta de la v4).
 Sigue el lenguaje «Mostrador»:
 
+- Al entrar a Vender, se llegue como se llegue, el cursor queda en la búsqueda (decisión 127).
 - Arriba, la búsqueda y, a su derecha, «Escanear con el celular» si hay uno vinculado (el botón
   verde oscuro de la v2, del alto de la búsqueda, decisión 126); mientras el
   celular lee, en su lugar va el aviso oscuro «El celular está escaneando · Lo que lea entra acá»
-  con «Detener». Sin una línea de teclas debajo (decisión 126).
+  con «Detener». Debajo, las teclas que no están en ningún botón (Enter agrega, ↑ ↓ eligen el
+  renglón, + − cantidad, Supr quita, F1 panel), con el aspecto de la v2 (decisión 126).
 - El desplegable de la búsqueda, como la v2: cada producto con su foto, el nombre con marca y
   proveedor, el stock en su pastilla y el precio; abajo, las teclas (↑ ↓, Enter, Esc) y cuántos
   encontró.
-- «Esta venta» con cuántos productos, y a la derecha «No llevó» (Esc, con la búsqueda vacía) y
+- «Esta venta» con cuántos productos, y a la derecha «No llevó» (con su ícono, sin borde, y F4, que figura en la línea de teclas; Esc cierra el desplegable de la búsqueda, decisión 127) y
   «Vaciar» (con Deshacer); los dos, solo con productos en la venta (decisión 126).
-- Cada renglón, una tarjeta: la foto, el nombre con marca, proveedor y stock (o cuánto falta), la
-  cantidad en una sola pastilla con − y + y su unidad, el total del renglón con «3 × $7.000» y el
-  tacho, que lo quita con Deshacer (sin menú «⋯», decisión 125). Debajo, en una línea que usa todo
-  el ancho de la tarjeta: el costo (con «Ver costos»), los márgenes en un selector segmentado (300,
-  200, 100, 50, 25 y un solo «%»), el precio por unidad y, a la derecha, el botón «Precio a mano»,
-  que habilita la caja. La cuenta del costo y del precio está en «De dónde sale» (decisión 126). Sin precio, en
-  ámbar. Con la búsqueda vacía, ↑ ↓ eligen el renglón, + y − cambian su cantidad y Supr lo quita.
-- A la derecha, un panel con dos pestañas: «De dónde sale» (la cuenta del renglón elegido: costo,
-  margen, IVA, redondeo, cantidad y total) y «Boleta» (la venta como un ticket). Se oculta y se
+- Cada renglón, una tarjeta como la de la v2 (decisión 127): la foto, el nombre con marca,
+  proveedor y stock (o cuánto falta), el tacho a la izquierda de la cantidad (lo quita con
+  Deshacer), la cantidad en una pastilla con − y + y su unidad, y el total del renglón con
+  «3 × $7.000» debajo. Abajo, alineados con el nombre: el costo (con «Ver costos»), los márgenes en
+  un selector segmentado (300, 200, 100, 50, 25 y un solo «%») y el precio por unidad con «a mano»
+  al lado, sin borde y con el lápiz, que abre la ventana «Precio a mano» (el producto, la caja con
+  «$», «Cancelar» y «Poner el precio», Enter); puesto, ese lugar dice «✎ A mano $X» y elegir un
+  margen vuelve al precio del margen: el precio aparece una sola vez. El margen no cambia al pasar
+  el mouse. Lo que llega del celular se marca «Llegó del celular» unos segundos. Los nombres, como
+  frase y no en mayúsculas (decisión 127). La
+  cuenta del costo y del precio está en «De dónde sale». Sin precio, en ámbar. Con la búsqueda
+  vacía, ↑ ↓ eligen el renglón, + y − cambian su cantidad y Supr lo quita.
+- A la derecha, un panel con dos pestañas: «De dónde sale» (la cuenta del renglón elegido en
+  filas, cada paso con su importe a la derecha y una línea punteada entre ellas: el costo con su
+  proveedor y la fecha de la lista, + margen, + IVA, el precio para arriba a $1.000, × la cantidad;
+  abajo, grande, el total del renglón; decisión 127) y «Boleta» (la venta como un ticket, que termina en el borde dentado del papel). Se oculta y se
   muestra con su botón o F1, y recuerda cómo quedó; oculto, la lista ocupa todo el ancho y en el
   borde derecho queda una pestaña «De dónde sale · Boleta» que lo vuelve a abrir.
-- Abajo, fija, la barra del cobro: cuántos productos (o cuántos precios faltan), los cuatro medios
+- «Falta 1 precio» (o cuántos), al lado de cuántos productos tiene la venta (decisión 127).
+- Abajo, fija, la barra del cobro: los cuatro medios
   con su tecla (F5 a F8, con el nombre corto y el largo al pasar el mouse), el cliente (F9,
   opcional con cualquier medio; elegido, con sus iniciales, y ocupa todo el ancho que queda) y
   «Cobrar $X» (F2), con el total dentro del botón (decisión 125).

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
@@ -25,7 +25,8 @@ function armar(ventas: unknown = { ventas: [], totales: {}, total: 0 }) {
   render(<Vender />);
   const busqueda = screen.getByTestId("busqueda");
   const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
-  const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.includes(texto))!;
+  // Los nombres se muestran como frase (decisión 127): se buscan sin importar mayúsculas.
+  const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.toLowerCase().includes(texto.toLowerCase()))!;
   return { falso, busqueda, agregar, item };
 }
 
@@ -62,7 +63,10 @@ describe("Vender (v2)", () => {
     const { agregar, item, falso } = armar();
     agregar("tornillo vender");
     expect(within(item("TORNILLO")).getByTestId("sin-precio")).toBeTruthy();
+    expect(screen.getByTestId("faltan-precios").textContent).toBe("Falta 1 precio"); // arriba, al lado de la cuenta
+    expect(within(screen.getByTestId("cobro")).queryByText(/Falta/)).toBeNull();
     fireEvent.click(within(item("TORNILLO")).getByTestId("margen-300"));
+    expect(screen.queryByTestId("faltan-precios")).toBeNull();
     expect(falso.actualizarProducto).toHaveBeenCalledWith("tornillo", { margen_elegido: 300 });
     expect(within(item("TORNILLO")).queryByTestId("sin-precio")).toBeNull();
     expect(screen.getByTestId("total").textContent).toBe("$1.000");
@@ -73,7 +77,8 @@ describe("Vender (v2)", () => {
     agregar("tornillo vender");
     expect(within(item("TORNILLO")).queryByTestId("precio-manual")).toBeNull(); // la caja se habilita con su botón
     fireEvent.click(within(item("TORNILLO")).getByTestId("habilitar-precio-manual"));
-    fireEvent.change(within(item("TORNILLO")).getByTestId("precio-manual"), { target: { value: "2500" } });
+    fireEvent.change(screen.getByTestId("precio-manual"), { target: { value: "2500" } }); // en la ventana «Precio a mano»
+    fireEvent.click(screen.getByTestId("poner-precio"));
     expect(screen.getByTestId("total").textContent).toBe("$3.000");
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
   });
@@ -146,6 +151,50 @@ describe("Vender (v2)", () => {
     fireEvent.click(within(screen.getByTestId("hoja-clientes")).getByTestId("cliente-opcion"));
     expect(screen.getByTestId("medio-efectivo").getAttribute("aria-checked")).toBe("true");
     expect(screen.getByTestId("cliente").textContent).toContain("CUConstructora Uno");
+  });
+
+  it("el tacho va a la izquierda de la cantidad; el precio por unidad sale una vez y «Precio a mano» abre su ventana", () => {
+    const { agregar, item, falso } = armar();
+    agregar("mecha vender");
+    const renglon = item("MECHA");
+    const tacho = within(renglon).getByTestId("quitar-renglon");
+    const cantidad = within(renglon).getByTestId("cantidad");
+    expect(tacho.compareDocumentPosition(cantidad) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // «Precio a mano» abre su ventana; puesto, el lugar del precio dice «A mano $5.000» y el de antes no se repite.
+    fireEvent.click(within(renglon).getByTestId("habilitar-precio-manual"));
+    fireEvent.change(screen.getByTestId("precio-manual"), { target: { value: "5000" } });
+    fireEvent.click(screen.getByTestId("poner-precio"));
+    expect(within(renglon).getByTestId("habilitar-precio-manual").textContent).toBe("A mano $5.000");
+    expect(within(renglon).queryByText("Precio")).toBeNull();
+    expect(screen.getByTestId("total").textContent).toBe("$5.000");
+    expect(falso.actualizarProducto).not.toHaveBeenCalled();
+    // Elegir un margen vuelve al precio del margen.
+    fireEvent.click(within(renglon).getByTestId("margen-100"));
+    expect(screen.getByTestId("total").textContent).toBe("$3.000");
+  });
+
+  it("«De dónde sale» muestra la cuenta en filas, cada paso con su importe, y el total del renglón", () => {
+    const { agregar, item } = armar();
+    agregar("mecha vender");
+    fireEvent.change(within(item("MECHA")).getByTestId("cantidad"), { target: { value: "4" } });
+    const filas = [...screen.getByTestId("de-donde-sale").querySelectorAll("dl > div")].map((f) => f.textContent);
+    expect(filas).toEqual(["Costo · Proveedor uno, lista del 11/08$1.000,00", "+ margen 100 %$2.000", "+ IVA 21 %$2.420", "Precio, para arriba a $1.000$3.000", "× 4$12.000"]);
+    expect(screen.getByTestId("de-donde-sale").textContent).toContain("Total del renglón$12.000");
+  });
+
+  it("F4 es «No llevó» (Esc queda para la búsqueda)", async () => {
+    const { agregar } = armar();
+    agregar("mecha vender");
+    fireEvent.keyDown(window, { key: "F4" });
+    expect((await screen.findByTestId("mensaje")).textContent).toContain("No llevó");
+  });
+
+  it("lo que agrega el celular se marca «Llegó del celular» un momento", async () => {
+    const { marcarLlegado } = await import("../../negocio/ventas/llegados-del-celular");
+    const { agregar, item } = armar();
+    agregar("mecha vender");
+    act(() => marcarLlegado(item("MECHA").dataset.clave!));
+    expect(within(item("MECHA")).getByTestId("llego-del-celular").textContent).toBe("Llegó del celular");
   });
 
   it("la cantidad sube y baja con las flechas del teclado", () => {

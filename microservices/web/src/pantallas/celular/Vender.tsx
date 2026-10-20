@@ -14,7 +14,7 @@ import { subirFoto } from "../../api";
 import { alCambiarLaCola, enviarPendientes, pendientes as pendientesEnCola } from "../../cola";
 import { useCatalogo } from "../../catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
-import { pesos, pesosCortos } from "../../formato";
+import { nombreDeProducto, pesos, pesosCortos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
@@ -110,7 +110,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   const quitar = (it: Item) => {
     const copia = items;
     venta.quitar(it.clave);
-    setAviso({ texto: `${TEXTOS.vender.quitaste.corto} ${it.descripcion}`, deshacer: () => venta.devolver(copia) });
+    setAviso({ texto: `${TEXTOS.vender.quitaste.corto} ${nombreDeProducto(it.descripcion)}`, deshacer: () => venta.devolver(copia) });
   };
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía media pantalla.
 
@@ -218,7 +218,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
                 <li key={p.id} role="option" aria-selected={i === elegido}>
                   <button type="button" className={`fila con-foto ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); elegirSugerencia(p); }}>
                     <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : null}</span>
-                    <span className="nombre">{p.descripcion}</span>
+                    <span className="nombre">{nombreDeProducto(p.descripcion)}</span>
                     <strong className="derecha importe">{precio === null ? <small>sin precio</small> : pesosCortos(precio)}</strong>
                     <span className="detalle">{detalleDe(p)}{stockPorId.has(p.id) ? ` · stock ${num(stockPorId.get(p.id)!)}` : ""}</span>
                   </button>
@@ -398,7 +398,7 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
         {producto ? <FotoProducto id={producto.id} url={producto.foto_url ?? null} descripcion={producto.descripcion} alSubir={alSubirFoto} /> : <span className="miniatura foto-chica vm-libre"><Icono nombre="caja" tam={22} /></span>}
         {producto ? (
           <button type="button" className="vm-nombre" onClick={alAbrir} data-testid="abrir-renglon">
-            <b>{it.descripcion}</b>
+            <b>{nombreDeProducto(it.descripcion)}</b>
             <small>{[producto.marca, stock !== undefined ? `${num(stock)} ${abreviarUnidad(it.unidad)}` : null].filter(Boolean).join(" · ")}</small>
           </button>
         ) : (
@@ -449,7 +449,7 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
       )}
       {calculo && (
         <Hoja titulo="Cómo se calculó" alCerrar={() => setCalculo(false)} testId="hoja-explicacion">
-          <p className="vm-hoja-detalle">{it.descripcion}{producto?.proveedor ? ` · ${producto.proveedor}` : ""}</p>
+          <p className="vm-hoja-detalle">{nombreDeProducto(it.descripcion)}{producto?.proveedor ? ` · ${producto.proveedor}` : ""}</p>
           <Pasos pasos={pasos} />
           <p className="vm-hoja-detalle">{TEXTOS.vender.redondeo.corto}</p>
           <button type="button" className="boton tinta" onClick={() => setCalculo(false)}>Listo</button>
@@ -466,7 +466,7 @@ function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuita
   const renglon = subtotalDe(it);
   const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
   return (
-    <Hoja titulo={it.descripcion} alCerrar={alCerrar} testId="hoja-renglon">
+    <Hoja titulo={nombreDeProducto(it.descripcion)} alCerrar={alCerrar} testId="hoja-renglon">
       <p className="vm-hoja-detalle">{p.unitario === null ? "Sin precio: elegí el margen o ponelo a mano" : `${pesos(p.unitario)} ${POR_UNIDAD[it.unidad]}`}</p>
       {p.costo !== null && (
         <div className="vm-opciones">

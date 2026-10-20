@@ -28,7 +28,8 @@ function armar(ventas: unknown = ventasVacias, sub: string | null = null) {
   const { unmount } = render(<ParteVender sub={sub} />);
   const busqueda = screen.queryByTestId("busqueda")!;
   const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
-  const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.includes(texto))!;
+  // Los nombres se muestran como frase (decisión 127): se buscan sin importar mayúsculas.
+  const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.toLowerCase().includes(texto.toLowerCase()))!;
   // La unidad está en una lista al lado de la cantidad (decisión 119).
   const unidad = (texto: string) => within(item(texto)).getByTestId("unidad");
   // Con el teclado, Enter sobre el círculo cobra (el dedo lo arrastra hasta el final).
@@ -205,7 +206,7 @@ describe("Vender", () => {
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
     expect(screen.getByTestId("mensaje").textContent).toContain("Vaciaste la venta");
     fireEvent.click(within(screen.getByTestId("mensaje")).getByRole("button", { name: "Deshacer" }));
-    expect(screen.getAllByTestId("item").map((i) => i.querySelector("b")?.textContent)).toEqual(["MECHA VENDER 8 MM", "TORNILLO VENDER"]);
+    expect(screen.getAllByTestId("item").map((i) => i.querySelector("b")?.textContent)).toEqual(["Mecha vender 8 mm", "Tornillo vender"]); // como frase (decisión 127)
     confirmar.mockRestore();
   });
 
@@ -226,7 +227,7 @@ describe("Vender", () => {
     expect(unidad("MECHA").textContent).toContain("L");
     fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Quitar" }));
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
-    expect(screen.getByTestId("mensaje").textContent).toContain("Quitaste MECHA VENDER 8 MM");
+    expect(screen.getByTestId("mensaje").textContent).toContain("Quitaste Mecha vender 8 mm");
     fireEvent.click(within(screen.getByTestId("mensaje")).getByRole("button", { name: "Deshacer" }));
     expect(screen.getAllByTestId("item")).toHaveLength(1);
   });

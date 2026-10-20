@@ -45,6 +45,31 @@ export function subtotalDe(item: Item) {
   return unitario === null ? null : subtotalDeRenglon({ precioUnitario: unitario, cantidad: item.cantidad, unidad: item.unidad });
 }
 
+// «De dónde sale» en filas, como la maqueta de la v2 (decisión 127): cada paso con su importe,
+// del costo al total del renglón. Sin permiso para ver costos, desde el precio.
+export type FilaDeLaCuenta = { texto: string; valor: string };
+export function cuentaDelRenglon(item: Item, veCostos: boolean): { filas: FilaDeLaCuenta[]; total: number } | null {
+  const p = precioDe(item);
+  const renglon = subtotalDe(item);
+  if (p.unitario === null || !renglon) return null;
+  const filas: FilaDeLaCuenta[] = [];
+  const prod = item.producto;
+  if (item.precioManual !== null) filas.push({ texto: "Precio a mano, solo esta venta", valor: pesosCortos(p.unitario) });
+  else if (veCostos && p.costo !== null && p.margen !== null) {
+    const origen = [prod?.proveedor, prod?.fecha_lista ? `lista del ${fechaCorta(prod.fecha_lista)}` : null].filter(Boolean).join(", ");
+    const conMargen = p.costo * (1 + p.margen / 100);
+    filas.push({ texto: `Costo${origen ? ` · ${origen}` : ""}`, valor: pesos(p.costo) });
+    filas.push({ texto: `+ margen ${p.margen} %`, valor: pesosCortos(conMargen) });
+    filas.push({ texto: `+ IVA ${Math.round(p.iva * 100)} %`, valor: pesosCortos(conMargen * (1 + p.iva)) });
+    filas.push({ texto: "Precio, para arriba a $1.000", valor: pesosCortos(p.unitario) });
+  } else filas.push({ texto: "Precio", valor: pesosCortos(p.unitario) });
+  const bruto = Math.round(p.unitario * item.cantidad * 100) / 100;
+  if (item.cantidad !== 1) filas.push({ texto: `× ${String(item.cantidad).replace(".", ",")}${item.unidad === "unidad" ? "" : ` ${item.unidad}`}`, valor: pesosCortos(bruto) });
+  if (renglon.valor !== bruto) filas.push({ texto: "Para arriba a $1.000, para no dar vuelto", valor: pesosCortos(renglon.valor) });
+  return { filas, total: renglon.valor };
+}
+const fechaCorta = (iso: string) => { const [, m, d] = iso.slice(0, 10).split("-"); return `${d}/${m}`; };
+
 // Lo que quedó de una venta recién cobrada, para que cada pantalla lo cuente con sus palabras.
 // `items` son los renglones tal como se cobraron, para mostrarlos en el éxito.
 export type Cobro = { total: number; encolado: boolean; medio: Medio; cliente: string | null; productos: number; fecha: string; items: Item[] };

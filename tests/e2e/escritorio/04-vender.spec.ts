@@ -305,20 +305,13 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
 
-  // Vender también tiene pestañas (decisión 72): → entra a ellas. A la caja de búsqueda no se va con
-  // las flechas sino con Tab (decisión 77). La venta entera, con el teclado.
+  // Al entrar a Vender, se llegue como se llegue, el cursor queda en la búsqueda (Carlos, 2026-10-20;
+  // decisión 127): la venta entera, con el teclado.
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByTestId("pestana-vender")).toBeFocused();
-  // Con la venta vacía no hay filas: ↓ no pierde la marca, que se queda en la pestaña.
-  await page.keyboard.press("ArrowDown");
-  await expect(page.getByTestId("pestana-vender")).toBeFocused();
-  await expect(page.locator("[data-flecha]")).toHaveCount(0);
-  const enfocado = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
-  for (let i = 0; i < 12 && (await enfocado()) !== "busqueda"; i++) await page.keyboard.press("Tab");
   await expect(page.getByTestId("busqueda")).toBeFocused();
   await page.keyboard.type("e2e mecha vender");
-  await expect(page.getByTestId("sugerencias")).toContainText("MECHA VENDER");
+  await expect(page.getByTestId("sugerencias")).toContainText("MECHA VENDER", { ignoreCase: true }); // el nombre, como frase (decisión 127)
   await page.keyboard.press("Enter");
   const mecha = page.getByTestId("item").filter({ hasText: "MECHA VENDER 8 MM" });
   await expect(mecha).toBeVisible();

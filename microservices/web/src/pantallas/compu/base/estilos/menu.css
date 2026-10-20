@@ -108,21 +108,11 @@
   .lateral .espejo-texto { gap: 10px; align-items: center; }
   .app.plegado .lateral .quien-boton { justify-content: center; padding: 6px 0; }
   .app.plegado .lateral .quien-nombre { display: none; }
-  /* El margen, del tamaño de la v2: más grande y con aire; si no entra, «Precio a mano» baja. */
-  .vmc-fila2 { font-size: 15px; column-gap: 12px; }
-  .vmc-fila2 .vmc-valor { font-size: 16px; }
-  .vmc-fila2 .margenes.compacto { padding: 4px; border-radius: 12px; gap: 2px; }
-  .vmc-fila2 .margenes.compacto button { min-width: 48px; height: 34px; padding: 0 10px; font-size: 15px; border-radius: 9px; }
+
 }
 @media (min-width: 900px) {
   .cuenta-menu { z-index: 200; max-width: 340px; }
   .cuenta-menu-cab { white-space: normal; }
-  /* Si la tarjeta es angosta (el panel abierto en una pantalla chica), «Precio a mano» queda en su lápiz. */
-  .vmc-item { container-type: inline-size; }
-  @container (max-width: 820px) {
-    .vmc-fila2 > [data-testid="habilitar-precio-manual"] .txt { display: none; }
-    .vmc-fila2 > [data-testid="habilitar-precio-manual"] { width: 36px; padding: 0; justify-content: center; }
-  }
 }
 @media (min-width: 900px) {
   .cuenta-menu { border-color: #E6E2D8; color: #1A1D1B; font-family: "Manrope Variable", system-ui, sans-serif; }
@@ -130,3 +120,6 @@
   .cuenta-menu button { color: #1A1D1B; }
   .cuenta-menu button:hover, .cuenta-menu button:focus-visible { background: #ECE9E1; }
 }
+/* La zona de la pantalla recibe el foco solo para que el teclado arranque ahí: no lleva el borde
+   del foco (se veía como una raya verde debajo de las pestañas). */
+main[tabindex="-1"]:focus, main[tabindex="-1"]:focus-visible { outline: 0; box-shadow: none; }

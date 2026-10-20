@@ -67,7 +67,7 @@ hoy», como en el celular (decisión 120):
   ventas; cada venta en una tarjeta con el producto o «3 productos» (o el cliente, en cuenta
   corriente), el importe, la hora y lo que lleva. Las anuladas, punteadas y tachadas.
 - ← → cambian de cajón, ↑ ↓ de venta, Enter la abre, A la anula. No se arrastra: el medio de una
-  venta no se cambia desde acá.
+  venta no se cambia desde acá. Esas teclas no se explican en una línea en la pantalla (decisión 126).
 - Abierta, una ventana con sus productos, el total y «Anular» (A), que pide confirmar con el motivo en
   una lista y el comentario (Ctrl+Enter confirma, el botón dice cuánto se descuenta).
 - Buscando, el resumen se esconde y queda el campo, cuántas coinciden y cuánto suman; lo que

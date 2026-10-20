@@ -113,10 +113,6 @@ export function Hoy() {
             <BarrasPorMedio ventas={todas} horas={r.barras.map((b) => b.hora)} />
           </section>
         )}
-        <p className="hoy-teclas detalle">
-          <span><kbd className="tecla">←</kbd><kbd className="tecla">→</kbd> cajón</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> {t.teclaElegir.largo}</span>
-          <span><kbd className="tecla">Enter</kbd> la abre</span>{anula && <span><kbd className="tecla">A</kbd> la anula</span>}
-        </p>
         {todas.length === 0 ? (
           <div data-testid="sin-ventas"><Vacio icono="ventas" titulo={r.esHoy ? t.sinVentasHoy.largo : t.sinVentasDia.largo}
             accion={r.esHoy ? <Boton variante="principal" icono="vender" onClick={() => irA("vender")}>{t.irAVender.largo}</Boton> : undefined} /></div>

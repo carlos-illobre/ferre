@@ -135,7 +135,7 @@ test("con el trabajo sin conexión habilitado, la app abre sin red gracias al se
   await page.reload();
   await expect(page.getByTestId("busqueda")).toBeEnabled({ timeout: 15000 });
   await page.getByTestId("busqueda").fill("e2e destornillador offline");
-  await expect(page.getByTestId("sugerencias")).toContainText("DESTORNILLADOR OFFLINE");
+  await expect(page.getByTestId("sugerencias")).toContainText("DESTORNILLADOR OFFLINE", { ignoreCase: true }); // el nombre, como frase (decisión 127)
   await context.setOffline(false);
 });
 
@@ -151,7 +151,7 @@ test("en el celular, buscando en el servidor no se baja el catálogo y se busca,
 
   // Buscar por nombre (E17): el producto no está en memoria; llega del servidor y se agrega.
   await busqueda.fill("e2e destornillador offline");
-  await expect(page.getByText(/DESTORNILLADOR OFFLINE/).first()).toBeVisible();
+  await expect(page.getByText(/DESTORNILLADOR OFFLINE/i).first()).toBeVisible();
   await busqueda.press("Enter");
   await expect(page.getByTestId("item").filter({ hasText: "DESTORNILLADOR OFFLINE" })).toBeVisible();
   await expect.poll(() => pedidos.some((q) => q.startsWith("?buscar="))).toBe(true);

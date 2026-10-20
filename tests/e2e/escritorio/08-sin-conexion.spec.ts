@@ -94,6 +94,6 @@ test("la app abre sin red gracias al service worker", async ({ page, context }) 
   await page.reload();
   await expect(page.getByTestId("busqueda")).toBeEnabled({ timeout: 15000 });
   await page.getByTestId("busqueda").fill("e2e destornillador offline");
-  await expect(page.getByTestId("sugerencias")).toContainText("DESTORNILLADOR OFFLINE");
+  await expect(page.getByTestId("sugerencias")).toContainText("DESTORNILLADOR OFFLINE", { ignoreCase: true }); // el nombre, como frase (decisión 127)
   await context.setOffline(false);
 });

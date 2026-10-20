@@ -30,23 +30,45 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
 .vmc-cab h2 { font-size: 1.125rem; font-weight: 800; }
 .vmc-cuenta { padding: 2px 10px; border-radius: 99px; background: var(--m-hundido); font-weight: 650; font-size: 0.875rem; }
 
-/* Cada renglón, una tarjeta. */
-.vmc-items { display: flex; flex-direction: column; gap: var(--e2); }
-.vmc-item { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto 120px auto; grid-template-rows: auto auto; gap: 10px 16px; align-items: center; padding: 12px 12px 12px 14px; background: #fff; border: 1px solid var(--m-borde); border-radius: 16px; box-shadow: var(--m-sombra-1); }
+/* Cada renglón, una tarjeta como la de la v2 (decisión 126; las medidas son las de su maqueta):
+   arriba la foto, el nombre, el tacho a la izquierda de la cantidad (como en el celular) y el total
+   del renglón; abajo, debajo del nombre, el costo, el margen y el precio por unidad con «a mano». */
+.vmc-items { display: flex; flex-direction: column; gap: 8px; }
+.vmc-item { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto auto 112px; grid-template-rows: auto auto; column-gap: 16px; row-gap: 10px; align-items: center; padding: 12px 14px 12px 14px; background: #fff; border: 1px solid var(--m-borde); border-radius: 16px; box-shadow: var(--m-sombra-1); }
 .vmc-item.elegido, .vmc-item[data-flecha] { border-color: var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .10), var(--m-sombra-1); }
-.vmc-item.sin-precio { border-color: #F3C766; background: linear-gradient(90deg, var(--m-urgente-suave), #fff 45%); }
+.vmc-item.sin-precio { border-color: #F3C766; background: linear-gradient(90deg, var(--m-urgente-suave), #fff 40%); }
 .vmc-item.marcada { border-color: var(--rojo); }
 .vmc-foto { grid-row: 1 / span 2; align-self: start; }
-.vmc-foto .miniatura, .vmc-foto button { width: 56px; height: 56px; border-radius: 12px; }
+.vmc-foto .miniatura, .vmc-foto button { width: 56px; height: 56px; border-radius: 12px; background: #ECE9E1; }
 .vmc-nombre { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.vmc-nombre .nombre { border: 0; background: none; padding: 0; text-align: left; font: inherit; font-weight: 750; font-size: 1rem; color: var(--m-tinta); cursor: pointer; }
-.vmc-nombre .detalle { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.vmc-nombre .nombre { border: 0; background: none; padding: 0; text-align: left; font: inherit; font-weight: 750; font-size: 16px; line-height: 22px; color: var(--m-tinta); cursor: pointer; }
+.vmc-nombre .detalle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; line-height: 20px; color: var(--m-texto-2); }
+.vmc-tacho { width: 40px; height: 40px; border: 0; border-radius: 12px; background: none; color: var(--m-texto-3); display: grid; place-items: center; cursor: pointer; }
+.vmc-tacho:hover { background: #FDE7E2; color: #A3301A; }
+.vmc-tacho:focus-visible { outline: 3px solid var(--m-pino); outline-offset: 1px; }
+.vmc-item .contador { display: inline-flex; align-items: center; height: 40px; border: 1px solid #CEC8BA; border-radius: 12px; background: #fff; overflow: hidden; }
+.vmc-item .contador button { width: 40px; height: 100%; border: 0; border-radius: 0; background: none; color: var(--m-texto-2); display: grid; place-items: center; }
+.vmc-item .contador button:hover { background: #ECE9E1; color: var(--m-tinta); }
+.vmc-item .contador input { width: 44px; height: 100%; border: 0; border-radius: 0; background: none; text-align: center; font-size: 16px; font-weight: 800; padding: 0; }
+.vmc-item .contador select { height: 100%; border: 0; border-radius: 0; background-color: transparent; padding: 0 22px 0 4px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); }
+.vmc-item .contador:focus-within { border-color: var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .12); }
+.vmc-item .contador :focus-visible { box-shadow: none; outline: 0; background: #ECE9E1; }
 .vmc-sub { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
-.vmc-sub .importe { font-size: 1.25rem; font-weight: 800; }
-.vmc-sub small { font-size: 0.875rem; color: var(--m-texto-3); font-weight: 600; }
-.vmc-fila2 { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 0.875rem; color: var(--m-texto-2); font-weight: 600; }
-.vmc-fila2 .vmc-valor { color: var(--m-tinta); font-weight: 800; }
-.vmc-sep { width: 1px; height: 20px; background: var(--m-borde); }
+.vmc-sub .importe { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+.vmc-sub small { font-size: 14px; color: var(--m-texto-3); font-weight: 600; }
+.vmc-fila2 { grid-column: 2 / -1; display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--m-texto-2); font-weight: 600; white-space: nowrap; }
+.vmc-fila2 .vmc-valor { color: var(--m-tinta); font-weight: 800; font-size: 15px; }
+.vmc-sep { width: 1px; height: 20px; background: var(--m-borde); flex: none; }
+.vmc-fila2 .margenes.compacto { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: #ECE9E1; }
+.vmc-fila2 .margenes.compacto button { min-width: 0; min-height: 30px; height: 30px; padding: 0 10px; border: 0; border-radius: 9px; background: none; color: var(--m-texto-2); font-weight: 700; font-size: 14px; box-shadow: none; }
+.vmc-fila2 .margenes.compacto button:hover { color: var(--m-tinta); }
+.vmc-fila2 .margenes.compacto button[aria-checked="true"] { background: #fff; color: var(--m-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .12), 0 1px 1px rgb(26 29 27 / .06); }
+.vmc-item.sin-precio .margenes.compacto { background: #fff; box-shadow: inset 0 0 0 1.5px #E5A12B; }
+/* El precio por unidad, y a su lado «a mano», que lo cambia por la caja para escribirlo. */
+.vmc-precio { display: inline-flex; align-items: center; gap: 8px; }
+.vmc-a-mano { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 8px; border: 1px solid #CEC8BA; border-radius: 8px; background: #fff; color: var(--m-texto-2); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.vmc-a-mano:hover { color: var(--m-tinta); border-color: var(--m-tinta); }
+.vmc-a-mano:focus-visible { outline: 3px solid var(--m-pino); outline-offset: 1px; }
 .vmc-fila2 .vender-a-mano { min-height: 32px; }
 .vmc-fila2 .vender-a-mano input { height: 30px; }
 
@@ -113,27 +135,6 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
 .vmc-pagina .boton.vmc-escanear { min-height: 52px; padding: 0 var(--e5); border: 0; border-radius: 12px; background: #12382F; color: #fff; font-size: 16px; font-weight: 750; gap: 10px; box-shadow: 0 1px 2px rgb(18 56 47 / 0.25); }
 .vmc-pagina .boton.vmc-escanear:hover { background: #0C2A23; color: #fff; }
 .vmc-pagina .boton.vmc-escanear:focus-visible { outline: 3px solid #E8541C; outline-offset: 2px; }
-/* El renglón, como la v2 (decisión 126): la foto sobre gris cálido, la cantidad en una sola pastilla
-   con − y +, el margen como un selector segmentado (el elegido, blanco y en relieve) y «Precio a mano»
-   en la misma fila, a la derecha. */
-.vmc-item { grid-template-columns: 56px minmax(0, 1fr) auto 128px auto; padding: 14px 14px 14px 16px; }
-.vmc-foto .miniatura, .vmc-foto button { background: #ECE9E1; }
-.vmc-nombre .nombre { font-size: 17px; }
-.vmc-item .contador { display: inline-flex; align-items: center; height: 40px; border: 1px solid #CEC8BA; border-radius: 12px; background: #fff; overflow: hidden; }
-.vmc-item .contador button { width: 38px; height: 100%; border: 0; border-radius: 0; background: none; color: var(--m-texto-2); display: grid; place-items: center; }
-.vmc-item .contador button:hover { background: #ECE9E1; color: var(--m-tinta); }
-.vmc-item .contador input { width: 44px; height: 100%; border: 0; border-radius: 0; background: none; text-align: center; font-size: 17px; font-weight: 750; padding: 0; }
-.vmc-item .contador select { height: 100%; border: 0; border-left: 1px solid #E6E2D8; border-radius: 0; background-color: #F6F4EF; padding: 0 22px 0 8px; font-size: 14px; color: var(--m-texto-2); }
-.vmc-item .contador :focus-visible { outline: 2px solid var(--m-pino); outline-offset: -2px; }
-.vmc-sub .importe { font-size: 1.375rem; }
-.vmc-fila2 { gap: 12px; }
-.vmc-fila2 .margenes.compacto { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: #ECE9E1; }
-.vmc-fila2 .margenes.compacto button { min-width: 44px; height: 30px; padding: 0 8px; border: 0; border-radius: 8px; background: none; color: var(--m-texto-2); font-weight: 650; font-size: 14px; box-shadow: none; }
-.vmc-fila2 .margenes.compacto button:hover { color: var(--m-tinta); }
-.vmc-fila2 .margenes.compacto button[aria-checked="true"] { background: #fff; color: var(--m-pino); font-weight: 800; box-shadow: 0 1px 2px rgb(26 29 27 / .12), 0 1px 1px rgb(26 29 27 / .06); }
-.vmc-item.sin-precio .margenes.compacto { background: #fff; box-shadow: inset 0 0 0 1.5px #E5A12B; }
-.vmc-fila2 > [data-testid="habilitar-precio-manual"], .vmc-fila2 > .vender-a-mano { margin-left: auto; }
-.vmc-fila2 > [data-testid="habilitar-precio-manual"] { min-height: 34px; border-radius: 10px; }
 /* El desplegable de la búsqueda, como la v2 (decisión 126). */
 .vmc-sug { position: absolute; inset: calc(100% + 8px) 0 auto 0; z-index: var(--z-desplegado); padding: 6px; border-radius: 16px; background: #fff; border: 1px solid var(--m-borde); box-shadow: 0 12px 32px rgb(26 29 27 / .16), 0 2px 6px rgb(26 29 27 / .08); }
 .vmc-sug .vender-sugerencias { position: static; margin: 0; padding: 0; list-style: none; max-height: min(55dvh, 460px); overflow-y: auto; box-shadow: none; border: 0; background: none; }
@@ -149,23 +150,59 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
 .vmc-sug-pie { display: flex; align-items: center; gap: 16px; padding: 8px 10px 4px; margin-top: 4px; border-top: 1px solid var(--m-borde); font-size: 14px; color: var(--m-texto-2); font-weight: 600; white-space: nowrap; }
 .vmc-sug-pie > span { display: inline-flex; align-items: center; gap: 6px; }
 .vmc-sug-pie .crece { flex: 1; }
-/* La pastilla de la cantidad es una sola, sin rayas entre −, el número, + y la unidad (como la v2). */
-.vmc-item .contador input, .vmc-item .contador select { border: 0; }
-.vmc-item .contador select { background-color: transparent; }
-.vmc-item .contador:focus-within { border-color: var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .12); }
-.vmc-item .contador :focus-visible { box-shadow: none; outline: 0; background: #ECE9E1; }
-/* Sin el signo en cada margen (va un solo «%» después), y la fila entra en una línea. */
-.vmc-fila2 { flex-wrap: nowrap; gap: 10px; }
-.vmc-fila2 .margenes.compacto button { min-width: 40px; padding: 0 6px; }
-.vmc-fila2 > [data-testid="habilitar-precio-manual"] { flex: none; }
-/* «Precio a mano» va arriba, al lado del tacho (donde la v2 tiene su «⋯»); la fila de abajo, en una línea. */
-.vmc-acciones { display: inline-flex; align-items: center; gap: 8px; }
-.vmc-acciones .boton { min-height: 36px; border-radius: 10px; }
-.vmc-fila2 > span { white-space: nowrap; }
-/* La fila de abajo usa todo el ancho de la tarjeta (debajo de la foto) para que entre en una línea. */
-.vmc-foto { grid-row: 1; align-self: center; }
-.vmc-fila2 { grid-column: 1 / -1; flex-wrap: wrap; row-gap: 8px; padding-top: 10px; border-top: 1px solid #EFECE5; }
-.vmc-fila2 .margenes.compacto button { min-width: 38px; }
-.vmc-fila2 > [data-testid="habilitar-precio-manual"], .vmc-fila2 > .vender-a-mano { margin-left: auto; }
+.vmc-item { min-width: 0; }
+.vmc-item > * { min-width: 0; }
+.vmc-fila2 { flex-wrap: wrap; row-gap: 6px; }
+.vmc-fila2 .vender-a-mano { width: 104px; }
+.vmc-fila2 .vender-a-mano input { width: 100%; min-width: 0; }
+.vmc-a-mano.solo-icono { width: 28px; padding: 0; justify-content: center; }
+.vmc-item { column-gap: 14px; padding: 12px; }
 .vmc-fila2 { column-gap: 8px; }
-.vmc-fila2 .margenes.compacto button { min-width: 36px; padding: 0 4px; }
+.vmc-fila2 .margenes.compacto button { padding: 0 8px; }
+.vmc-precio { gap: 6px; }
+.vmc-a-mano { padding: 0 6px; }
+.vmc-cuenta.falta { background: #FFF1D6; color: #8A5A00; }
+.vmc-cobro { grid-template-columns: minmax(0, 1fr) auto; }
+/* La lista de renglones no es una caja: entre tarjeta y tarjeta se ve el fondo gris cálido, como la v2. */
+.vmc-pagina .lista.vmc-items { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; overflow: visible; }
+/* El foco del renglón es el borde verde, sobre la tarjeta blanca; el ámbar es solo del que no tiene precio. */
+.vmc-pagina .vmc-item[data-flecha] { border-color: var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .10), var(--m-sombra-1); }
+.vmc-pagina .vmc-item.sin-precio[data-flecha] { background: linear-gradient(90deg, var(--m-urgente-suave), #fff 40%); }
+.vmc-item.sin-precio .vmc-fila2 .falta-texto { color: #8A5A00; }
+.vmc-a-mano.grande { height: 36px; padding: 0 14px; gap: 8px; border-radius: 10px; font-size: 15px; color: var(--m-tinta); }
+/* La marca de las flechas (flechas.css la pinta de amarillo con !important) acá es el borde verde de la maqueta. */
+.vmc-pagina .vmc-item[data-flecha] { outline: 0; background: #fff !important; }
+.vmc-pagina .vmc-item.sin-precio[data-flecha] { background: linear-gradient(90deg, var(--m-urgente-suave), #fff 40%) !important; }
+/* «No llevó» y «Vaciar», como la maqueta: sin borde ni fondo, con su ícono. */
+.vmc-pagina .boton.vmc-fantasma { border-color: transparent; background: none; box-shadow: none; color: #545955; font-weight: 700; gap: 8px; }
+.vmc-pagina .boton.vmc-fantasma:hover { background: #ECE9E1; color: #1A1D1B; }
+/* «Precio a mano» al lado del precio por unidad: sin borde, con el lápiz (como la maqueta). */
+.vmc-a-mano.fantasma { height: 32px; padding: 0 8px; gap: 8px; border-color: transparent; background: none; color: #1A1D1B; font-size: 15px; font-weight: 600; }
+.vmc-a-mano.fantasma:hover { background: #ECE9E1; }
+.vmc-precio-grande { display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 18px; border: 1.5px solid #12382F; border-radius: 14px; box-shadow: 0 0 0 4px rgba(18, 56, 47, .10); background: #fff; font-size: 22px; font-weight: 800; }
+.vmc-precio-grande input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; }
+/* «Llegó del celular»: una etiqueta sobre el borde de arriba del renglón, unos segundos (decisión 127). */
+.vmc-item { position: relative; }
+.vmc-llego { position: absolute; top: -11px; left: 84px; z-index: 1; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 8px; background: #E3F3EA; color: #0F6B52; font-size: 14px; font-weight: 700; animation: vmc-asoma .2s ease-out both; }
+@keyframes vmc-asoma { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .vmc-llego { animation: none; } }
+/* El margen no cambia al pasar el mouse: solo el elegido se ve distinto (decisión 127). */
+.vmc-fila2 .margenes.compacto button:hover:not([aria-checked="true"]) { background: none; color: var(--m-texto-2); }
+.vmc-fila2 .margenes.compacto button[aria-checked="true"]:hover { background: #fff; color: var(--m-tinta); }
+/* En una pantalla de 1366 px el panel se angosta un poco para que el renglón entre en dos líneas. */
+@media (max-width: 1400px) {
+  .vmc { grid-template-columns: minmax(0, 1fr) 290px; gap: var(--e4); }
+  .vmc-fila2 { column-gap: 8px; }
+  .vmc-a-mano.fantasma { padding: 0 6px; gap: 6px; font-size: 14px; }
+}
+/* «De dónde sale» como la maqueta (decisión 127): filas con el importe a la derecha, línea punteada entre ellas. */
+.vmc-cuenta-filas { margin: 8px 0 0; }
+.vmc-cuenta-filas > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px dashed #CEC8BA; }
+.vmc-cuenta-filas dt { color: #545955; font-size: 15px; line-height: 1.35; }
+.vmc-cuenta-filas dd { margin: 0; color: #1A1D1B; font-size: 16px; font-weight: 800; white-space: nowrap; }
+.vmc-pagina .vmc-donde-total { padding-top: 16px; border-top: 0; color: #545955; font-size: 15px; font-weight: 600; }
+.vmc-pagina .vmc-donde-total .importe { font-size: 28px; font-weight: 800; }
+/* Con la boleta a la vista, el panel termina en el borde dentado del ticket, como la maqueta (decisión 127). */
+.vmc-panel.con-boleta { overflow: visible; border-bottom: 0; border-radius: 16px 16px 0 0; margin-bottom: 10px; }
+.vmc-panel.con-boleta::after { content: ""; position: absolute; left: -1px; right: -1px; bottom: -10px; height: 10px; background: linear-gradient(-45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x, linear-gradient(45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x; filter: drop-shadow(0 4px 3px rgba(26, 29, 27, .06)); }
+.vmc-panel.con-boleta .vmc-panel-cuerpo { border-radius: 0; }
