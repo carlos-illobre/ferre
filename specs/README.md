@@ -202,6 +202,10 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-119 | «Hoy» muestra las ventas realizadas, los productos vendidos y el ticket promedio | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
 | RF-120 | Cada venta del día es un renglón corto que se abre para ver sus productos | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
 | RF-121 | «Cambiar fecha» muestra lo mismo para un día anterior (completa RF-23) | [017-ventas-de-hoy](017-ventas-de-hoy/spec.md) |
+| RF-122 | Ningún dispositivo baja el catálogo: cada pantalla pide al servidor solo los productos de su consulta, de a 50 | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
+| RF-123 | Sin internet no se busca; se sigue registrando la venta en curso. Los dispositivos guardan solo la venta en curso y lo que falta mandar | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
+| RF-124 | El servidor tiene una copia de los productos y los clientes, que la base mantiene al día, y responde desde ahí | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
+| RF-125 | Ver si el servidor anda no consulta la base | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
 
 ## Requerimientos no funcionales
 
@@ -269,6 +273,7 @@ Los que son reglas generales están además en la constitución.
 | RNF-56 | Cada decisión técnica queda escrita con su porqué (un ADR) y la documentación se mantiene al día con el código | [001-base-del-sistema](001-base-del-sistema/spec.md) |
 | RNF-60 | El código se organiza en servicios, y en capas: tecnología reutilizable, negocio una sola vez y pantallas; el cálculo de precios vive en el servidor | [010-reordenamiento-del-codigo](010-reordenamiento-del-codigo/spec.md) |
 | RNF-61 | Procesos se puede llevar a otro proyecto: su regla, sus datos y sus pantallas están aparte y no usan nada propio de Ferrebress; usa la misma base de datos con tablas propias y guarda en BPMN 2.0 | [011-procesos](011-procesos/spec.md) |
+| RNF-62 | Los dos ambientes juntos usan menos de la mitad del plan gratuito de la base por mes: menos de 2,5 GB de datos que salen y menos de 0,5 GB de registros | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
 
 ## De dónde vino cada cosa
 

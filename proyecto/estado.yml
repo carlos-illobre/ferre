@@ -1402,3 +1402,28 @@ RNF-61:
     - microservices/procesos/web/.dependency-cruiser.cjs
     - microservices/procesos/servidor/src/datos.test.ts
   defectos: []
+
+RF-122:
+  estado: "Pendiente (018-T005, 018-T006)"
+  pruebas: []
+  defectos: []
+
+RF-123:
+  estado: "Pendiente (018-T006, 018-T007)"
+  pruebas: []
+  defectos: []
+
+RF-124:
+  estado: "Pendiente (018-T003, 018-T004)"
+  pruebas: []
+  defectos: []
+
+RF-125:
+  estado: "Pendiente (018-T002)"
+  pruebas: []
+  defectos: []
+
+RNF-62:
+  estado: "Pendiente (018-T009): lo mide Carlos en el panel de Supabase un mes después de subirlo"
+  pruebas: []
+  defectos: []

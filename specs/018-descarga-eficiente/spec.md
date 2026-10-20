@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-20
 
-**Status**: Borrador, para que Carlos la apruebe
+**Status**: Aprobada (Carlos, 2026-10-20)
 
 **Maquetas**: No lleva pantallas nuevas: las listas de productos cargan de a páginas al bajar y
 Configuración pierde dos opciones (historia 5).
@@ -38,7 +38,7 @@ ventas».
 - Q: ¿Se descarga todo o solo lo necesario? → A: Solo lo necesario y siempre de a páginas.
 - Q: ¿Los márgenes, costos y proveedores de todos los productos? → A: No: se traen recién al buscar, y solo los de los productos que encontró esa búsqueda.
 - Q: ¿El servidor consulta la base en cada pedido? → A: No: lo que se lee seguido y cambia poco y de forma controlada (los productos con sus precios, las listas) vive en una copia del servidor, que se pone al día cuando la base cambia. Lo que varía (las ventas, el stock) se lee de la base.
-- Q: ¿Qué pasa sin internet? → A: Se pierde la búsqueda; se conserva registrar ventas (decisión 120). Cambia el principio IV de la constitución y RNF-10.
+- Q: ¿Qué pasa sin internet? → A: Se pierde la búsqueda; se conserva registrar ventas (decisión 129). Cambia el principio IV de la constitución y RNF-10.
 - Q: ¿Hacen falta los registros de la base? → A: No: el sistema no genera registros que nadie usa.
 - Q: ¿El chequeo de salud tiene que mirar la base? → A: No: dice si el servidor anda, sin consultar la base.
 
@@ -64,14 +64,14 @@ hasta el final y ver que llegan los siguientes; medir que no llegó ningún otro
 4. **E04** **Given** un código de barras escaneado o tipeado, **When** se lo busca, **Then** llega solo el producto de ese código, o «no existe» si no hay ninguno.
 5. **E05** **Given** los filtros del Catálogo (con stock, sin stock, marca), **When** se elige uno, **Then** el servidor filtra y devuelve la primera página; la lista de marcas para elegir también viene del servidor.
 6. **E06** **Given** una pantalla que necesita productos puntuales (los de un pedido, los de la venta del celular vinculado, los que tienen stock en Inventario), **When** se abre, **Then** pide esos productos por su identificador, de a páginas, y no el resto.
-7. **E07** **Given** quien no tiene «Ver costos», **When** llegan productos, **Then** llegan sin costos, sin proveedores con sus costos y sin la cuenta del precio, como hoy en pantalla; el precio sí.
+7. **E07** **Given** cualquier usuario, **When** llegan productos, **Then** llegan con los mismos datos que hoy, y lo que cada pantalla oculta según los permisos sigue oculto.
 8. **E08** **Given** se cambió un margen, un código o una foto desde este dispositivo, **When** se vuelve a mirar el producto, **Then** se ve con el cambio.
 
 ---
 
 ### User Story 2 - Sin internet se registran ventas; no se busca (Priority: P1)
 
-**Why this priority**: Lo que no se puede perder es la venta (decisión 120).
+**Why this priority**: Lo que no se puede perder es la venta (decisión 129).
 
 **Independent Test**: Con productos ya agregados a la venta, cortar internet, cobrar y ver la
 venta en la cola; volver la conexión y verla en el servidor. Sin internet, buscar dice que
@@ -159,10 +159,10 @@ Como ningún dispositivo guarda el catálogo, «Trabajar sin conexión» y «Có
   servidor y recibe solo los productos de esa consulta (búsqueda por nombre, marca o código,
   código exacto, filtros, o productos puntuales por identificador), de a 50, y los siguientes al
   llegar al final de la lista. Cada producto llega con lo que se muestra de él (precio, margen,
-  stock y, con «Ver costos», costos y proveedores).
+  stock, costos y proveedores, como hoy).
 - **RF-123**: Sin internet no se busca ni se escanea: se dice que hace falta conexión. Se sigue
   registrando la venta en curso y todo cambio queda en el dispositivo hasta que el servidor lo
-  confirma. Los dispositivos guardan solo la venta en curso y lo que falta mandar (decisión 120;
+  confirma. Los dispositivos guardan solo la venta en curso y lo que falta mandar (decisión 129;
   reemplaza RF-84 y RF-85).
 - **RF-124**: El servidor tiene en una copia propia los productos con sus precios y proveedores, y
   los clientes, y responde desde ahí. La copia se pone al día sola cuando la base cambia, leyendo

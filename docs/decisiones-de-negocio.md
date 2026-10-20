@@ -1051,3 +1051,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      cobrar), pero el código lo redondeaba, en el dispositivo y en el servidor: se corrigió en los
      dos (un renglón que llega sin margen aplicado es de precio a mano). En la boleta no va el nombre
      de quien vende. El menú del usuario no lleva «Mis datos» (T133).
+129. **El catálogo vive en el servidor; sin internet se registran ventas, no se busca** (2026-10-20).
+     Tras el aviso de Supabase (pasó el tope del plan gratuito), Carlos: «que descargue solo lo
+     que necesita, siempre paginado»; los márgenes se traen recién al buscar, solo los de esa
+     búsqueda; lo que cambia poco (productos, listas) se guarda en el servidor y lo que varía
+     (ventas) se lee de la base; «cuando no hay internet se pierde la capacidad de búsqueda, lo
+     que se conserva es la capacidad de registrar ventas». El chequeo de salud no consulta la
+     base y no hacen falta los registros de la base. Cambia el principio IV de la constitución,
+     RNF-10 y RNF-11, y reemplaza RF-84 y RF-85 (specs/018, ADR-023).
