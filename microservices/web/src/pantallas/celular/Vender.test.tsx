@@ -135,7 +135,7 @@ describe("Vender", () => {
     const lista = screen.getByRole("listbox", { name: "Cómo paga" });
     expect(within(lista).getAllByRole("option").map((o) => o.textContent)).toEqual(["Efectivo", "Mercado Pago", "Tarjeta", "Cuenta corriente"]);
     expect(within(lista).getByRole("option", { name: "Efectivo" }).getAttribute("aria-selected")).toBe("true");
-    // 017-E06: cada medio con su ícono y su color, el mismo que en «Ventas de hoy».
+    // 017-E06: cada medio con su ícono y su color, el mismo que en «Ventas del día».
     for (const m of ["efectivo", "mercado_pago", "tarjeta", "cuenta_corriente"]) expect(screen.getByTestId(`medio-${m}`).querySelector(`.medio-icono.medio-${m}`)).not.toBeNull();
     fireEvent.click(screen.getByTestId("medio-tarjeta"));
     expect(screen.queryByRole("listbox")).toBeNull();
@@ -277,7 +277,7 @@ describe("Vender", () => {
     expect(within(exito).getByRole("heading", { name: "Venta registrada" })).toBeTruthy();
     expect(within(exito).getByTestId("exito-total").textContent).toBe("$3.000");
     expect(exito.textContent).toMatch(/Efectivo · 1 producto · \d\d:\d\d/);
-    expect(within(exito).getAllByRole("button").map((b) => b.textContent)).toEqual(["Ver en Ventas de hoy", "Seguir vendiendo"]);
+    expect(within(exito).getAllByRole("button").map((b) => b.textContent)).toEqual(["Ver en Ventas del día", "Seguir vendiendo"]);
     expect(exito.textContent).not.toMatch(/Costo|margen|ganancia|comprobante/i);
     const cuerpo = enviarOEncolar.mock.calls[0]![3] as { medio_pago: string; cliente_id: string | null; items: { cantidad: number; precio_unitario: number; margen_aplicado: number; explicacion: { pasos: string[] } }[] };
     expect(cuerpo.medio_pago).toBe("efectivo");
@@ -289,7 +289,7 @@ describe("Vender", () => {
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
   });
 
-  it("«Ver en Ventas de hoy» lleva a la pestaña de las ventas del día", async () => {
+  it("«Ver en Ventas del día» lleva a la pestaña de las ventas del día", async () => {
     const { agregar, cobrar } = armar();
     agregar("mecha vender");
     cobrar();
@@ -307,16 +307,16 @@ describe("Vender", () => {
     expect(exito.textContent).toContain("Sin conexión: se envía sola cuando vuelva internet.");
   });
 
-  it("decisión 120: Vender tiene dos pestañas, Vender y Ventas de hoy; la vieja dirección de Anular abre Ventas de hoy", async () => {
+  it("decisión 120: Vender tiene dos pestañas, Vender y Ventas del día; la vieja dirección de Anular abre Ventas del día", async () => {
     const { unmount } = armar();
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Ventas de hoy"]);
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Ventas del día"]);
     expect(screen.queryByTestId("hoy")).toBeNull();
-    fireEvent.click(screen.getByRole("tab", { name: "Ventas de hoy" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Ventas del día" }));
     expect(location.hash).toBe("#/vender/hoy");
     unmount();
     armar(ventasVacias, "anular");
     expect(await screen.findByTestId("hoy")).toBeTruthy();
-    expect(screen.getByRole("tab", { name: "Ventas de hoy" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("tab", { name: "Ventas del día" }).getAttribute("aria-selected")).toBe("true");
   });
 
   const DOS = { total: 10500, totales: { efectivo: 10500 }, ventas: [
@@ -408,7 +408,7 @@ describe("Vender", () => {
   it("con solo ver las ventas o solo anular hay dos pestañas; con solo vender, no hay pestañas", async () => {
     conPermisos("ventas.registrar", "ventas.anular");
     const uno = armar();
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Ventas de hoy"]);
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Vender", "Ventas del día"]);
     uno.unmount();
     conPermisos("ventas.registrar");
     armar();

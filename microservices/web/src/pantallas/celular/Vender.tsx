@@ -39,7 +39,7 @@ const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: 
 
 // Vender tiene dos pestañas en el celular (decisión 120): armar la venta, y las ventas del día,
 // desde donde también se anula.
-const SUB = [{ valor: "vender", nombre: "Vender", icono: "vender" }, { valor: "hoy", nombre: "Ventas de hoy", icono: "ventas" }] as const;
+const SUB = [{ valor: "vender", nombre: "Vender", icono: "vender" }, { valor: "hoy", nombre: "Ventas del día", icono: "ventas" }] as const;
 type Sub = (typeof SUB)[number]["valor"];
 const PIDE: Record<Sub, Permiso[]> = { vender: ["ventas.registrar"], hoy: ["ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] };
 
@@ -562,7 +562,7 @@ function ElegirCliente({ clientes, elegido, alElegir }: { clientes: { id: string
 }
 
 // La venta registrada (decisión 119): una ventana con el tilde, el total, el medio, el cliente,
-// cuántos productos y la hora, «Ver en Ventas de hoy» y «Seguir vendiendo». Sin conexión dice que
+// cuántos productos y la hora, «Ver en Ventas del día» y «Seguir vendiendo». Sin conexión dice que
 // quedó guardada en el celular y que se envía sola.
 function VentaRegistrada({ cobro, veHoy, alCerrar, alVerHoy }: { cobro: Cobro; veHoy: boolean; alCerrar: () => void; alVerHoy: () => void }) {
   const boton = useRef<HTMLButtonElement>(null);
@@ -579,7 +579,7 @@ function VentaRegistrada({ cobro, veHoy, alCerrar, alVerHoy }: { cobro: Cobro; v
           <IconoDeMedio medio={cobro.medio} tam={18} />{NOMBRE_DE_MEDIO[cobro.medio]}{cobro.cliente ? ` · ${cobro.cliente}` : ""} · <span data-testid="exito-cuantos">{cobro.productos} {cobro.productos === 1 ? "producto" : "productos"}</span> · {hora(cobro.fecha)}
         </p>
         <div className="vm-listo-botones">
-          {veHoy && <button type="button" className="boton" onClick={alVerHoy} data-testid="ver-en-hoy"><Icono nombre="lista" tam={18} />Ver en Ventas de hoy</button>}
+          {veHoy && <button type="button" className="boton" onClick={alVerHoy} data-testid="ver-en-hoy"><Icono nombre="lista" tam={18} />Ver en Ventas del día</button>}
           <button ref={boton} type="button" className="boton tinta" onClick={alCerrar} data-testid="cerrar-exito">Seguir vendiendo</button>
         </div>
       </div>

@@ -92,3 +92,15 @@
 .hoy-hoja-total b { font-size: 26px; color: var(--p-tinta); }
 .hoy-hoja-anulada { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--p-naranja-suave); color: var(--p-naranja-texto); font-size: 14px; font-weight: 700; }
 .boton.hoy-anular { background: #FCEAE7; color: #AE281D; border: 0; }
+
+/* «Otro día» (decisión 141): los días como opciones, el que se mira en verde suave con su tilde. */
+.hoy-fecha b small { font-size: 14px; font-weight: 600; color: var(--p-texto-2); }
+.hoy-dias { display: grid; gap: 2px; }
+.hoy-dia { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent; color: #1A1D1B; font-size: 16px; font-weight: 650; text-align: left; }
+.hoy-dia > svg:first-child { flex: none; color: #545955; }
+.hoy-dia span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.hoy-dia small { font-size: 14px; font-weight: 500; color: #545955; }
+.hoy-dia.elegido { background: #E3EEE8; color: #12382F; font-weight: 750; }
+.hoy-dia.elegido > svg { color: #12382F; }
+.hoy-dia-calendario { margin-top: 4px; border-top: 1px solid #E6E2D8; border-radius: 0; }
+.hoy-fecha b small { display: inline; }

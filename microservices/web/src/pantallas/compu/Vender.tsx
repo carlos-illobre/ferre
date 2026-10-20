@@ -589,12 +589,12 @@ function Boleta({ items, total }: { items: Item[]; total: number }) {
 }
 
 // La venta registrada (como en el celular): el total, el medio, cuántos productos y la hora;
-// «Seguir vendiendo» (Enter) y «Ver en Ventas de hoy». Sin conexión, que se envía sola.
+// «Seguir vendiendo» (Enter) y «Ver en Ventas del día». Sin conexión, que se envía sola.
 function VentaRegistrada({ cobro, alCerrar, alVerHoy }: { cobro: Cobro; alCerrar: () => void; alVerHoy: () => void }) {
   const que = cobro.encolado ? "Guardada en este dispositivo" : "Venta registrada";
   return (
     <Hoja titulo={que} alCerrar={alCerrar} testId="exito"
-      pie={<><Boton icono="ventas" onClick={alVerHoy} data-testid="ver-en-hoy">Ver en Ventas de hoy</Boton><Boton variante="marino" autoFocus onClick={alCerrar} data-testid="cerrar-exito">Seguir vendiendo</Boton></>}>
+      pie={<><Boton icono="ventas" onClick={alVerHoy} data-testid="ver-en-hoy">Ver en Ventas del día</Boton><Boton variante="marino" autoFocus onClick={alCerrar} data-testid="cerrar-exito">Seguir vendiendo</Boton></>}>
       <div className="vmc-listo">
         <span className={`vmc-listo-tilde ${cobro.encolado ? "pendiente" : ""}`}><Icono nombre={cobro.encolado ? "nube" : "tilde"} tam={34} grosor={3} /></span>
         <strong className="importe vmc-listo-total" data-testid="exito-total">{pesosCortos(cobro.total)}</strong>

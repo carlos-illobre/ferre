@@ -1146,3 +1146,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      búsqueda también, como la de la v2: una hoja con la caja y «Cancelar»; vacía, lo último que se
      vendió (la v2 decía «lo que más sale a esta hora», que no se calcula); con texto, las tarjetas
      de los productos y el ítem libre.
+141. **«Ventas del día», «Otro día» y el calendario propio** (2026-10-20). Carlos: la pestaña
+     «Ventas de hoy» se llama «Ventas del día», en el celular y en la computadora. En el celular,
+     «Cambiar fecha» pasa a ser «Otro día», como la v2: abre un panel con hoy y los seis días
+     anteriores, cada uno con lo vendido y cuántas ventas, el elegido con un tilde; y, como opción en
+     ese panel, «Elegir en el calendario», un calendario propio con los estilos de «Mostrador» (no el
+     del sistema), que llega hasta hoy. «Buscar» abre un panel igual, en lugar de cambiar la
+     pantalla: la caja, cuántas coinciden y cuánto suman, y las ventas, que se tocan para abrir su
+     hoja. Lo que dice «hoy» de verdad (en «Cómo va el negocio», las ventas de hoy) sigue diciendo hoy.

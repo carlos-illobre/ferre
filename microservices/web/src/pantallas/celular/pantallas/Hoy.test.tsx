@@ -32,11 +32,19 @@ beforeEach(() => {
 });
 afterEach(() => { vi.useRealTimers(); });
 const abrir = async () => { render(<VentasDeHoy />); await screen.findByTestId("total-de-hoy"); await screen.findByTestId("comparacion"); };
+// «Otro día» abre el panel con los últimos siete días; uno más viejo, con el calendario (decisión 141).
+const elegirDia = (d: string) => {
+  fireEvent.click(screen.getByTestId("cambiar-fecha"));
+  const enLaLista = screen.queryByTestId(`otro-dia-${d}`);
+  if (enLaLista) { fireEvent.click(enLaLista); return; }
+  fireEvent.click(screen.getByTestId("elegir-en-calendario"));
+  fireEvent.click(screen.getByTestId(`dia-${d}`));
+};
 
 describe("«Hoy» · celular", () => {
   it("017-E01 017-E02: el total sin las anuladas y la comparación con ayer hasta la misma hora", async () => {
     await abrir();
-    expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Hoy, sábado 17/10");
+    expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Hoy, sábado 17/10 · 12:00");
     expect(screen.getByTestId("total-de-hoy").textContent).toBe("$293.000");
     expect(screen.getByTestId("comparacion").textContent).toBe("+17 %vs. ayer a esta hora ($250.000)"); // ayer hasta las 12: 50.000 + 200.000
   });
@@ -95,32 +103,48 @@ describe("«Hoy» · celular", () => {
 
   it("017-E16 017-E17 017-E18 017-E19: otro día, comparado entero con el suyo; «Volver a hoy»; hasta hoy", async () => {
     await abrir();
-    const calendario = screen.getByTestId("dia") as HTMLInputElement;
-    expect(calendario.max).toBe("2026-10-17");
-    fireEvent.change(calendario, { target: { value: "2026-10-16" } });
+    elegirDia("2026-10-16");
     await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Viernes 16/10"));
     expect(screen.getByTestId("total-de-hoy").textContent).toBe("$1.150.000");
     await waitFor(() => expect(screen.getByTestId("comparacion").textContent).toBe("+3733 %vs. el jueves 15/10 ($30.000)"));
     fireEvent.click(screen.getByTestId("volver-a-hoy"));
-    await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Hoy, sábado 17/10"));
+    await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Hoy, sábado 17/10 · 12:00"));
   });
 
   it("017-E21: sin conexión, otro día dice que hace falta internet", async () => {
     await abrir();
     apiFalsa.mockImplementation(async (ruta: string) => { if (ruta.includes("2026-10-14") || ruta.includes("2026-10-13")) throw new TypeError("Failed to fetch"); return dia("x", []); });
-    fireEvent.change(screen.getByTestId("dia"), { target: { value: "2026-10-14" } });
+    elegirDia("2026-10-14");
     expect((await screen.findByTestId("sin-conexion")).textContent).toBe("Sin conexión: para ver otro día hace falta internet.");
   });
 
-  it("017-E19: una fecha futura escrita a mano no se toma", async () => {
+  it("017-E19: el calendario llega hasta hoy: los días que vienen no se pueden elegir", async () => {
     await abrir();
-    fireEvent.change(screen.getByTestId("dia"), { target: { value: "2026-10-20" } });
-    expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Hoy, sábado 17/10");
+    fireEvent.click(screen.getByTestId("cambiar-fecha"));
+    fireEvent.click(screen.getByTestId("elegir-en-calendario"));
+    expect(screen.getByTestId("mes").textContent).toBe("octubre 2026");
+    expect((screen.getByTestId("dia-2026-10-20") as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByTestId("mes-siguiente") as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByTestId("dia-2026-10-17").getAttribute("aria-current")).toBe("date");
+    fireEvent.click(screen.getByTestId("mes-anterior"));
+    fireEvent.click(screen.getByTestId("dia-2026-09-30"));
+    await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Miércoles 30/09"));
+  });
+
+  it("017-T013: «Otro día» muestra hoy y los seis días anteriores, con lo vendido y cuántas ventas, y el que se mira con su tilde", async () => {
+    await abrir();
+    fireEvent.click(screen.getByTestId("cambiar-fecha"));
+    const panel = screen.getByTestId("hoja-otro-dia");
+    expect(within(panel).getAllByRole("button", { pressed: false }).length + within(panel).getAllByRole("button", { pressed: true }).length).toBeGreaterThanOrEqual(7);
+    await waitFor(() => expect(screen.getByTestId("otro-dia-2026-10-16").textContent).toBe("Ayer, viernes 16/10$1.150.000 · 3 ventas"));
+    expect(screen.getByTestId("otro-dia-2026-10-17").getAttribute("aria-pressed")).toBe("true");
+    await waitFor(() => expect(screen.getByTestId("otro-dia-2026-10-14").textContent).toBe("Miércoles 14/10Sin ventas"));
+    expect(screen.getByTestId("otro-dia-2026-10-11")).toBeTruthy();
   });
 
   it("017-E20: otro día sin ventas lo dice", async () => {
     await abrir();
-    fireEvent.change(screen.getByTestId("dia"), { target: { value: "2026-10-14" } });
+    elegirDia("2026-10-14");
     expect((await screen.findByTestId("sin-ventas")).textContent).toBe("No hubo ventas ese día.");
   });
 
@@ -139,19 +163,19 @@ describe("«Hoy» · celular", () => {
     expect(pastilla.querySelector("svg")).toBeNull();
   });
 
-  it("017-E22 017-E25: «Buscar» esconde el resumen, deja las ventas con ese producto resaltado y dice cuántas y cuánto suman; «Listo» vuelve", async () => {
+  it("017-E22 017-E25: «Buscar» abre un panel (decisión 141) con las ventas de ese producto resaltado y cuántas y cuánto suman; «Listo» lo cierra", async () => {
     await abrir();
     fireEvent.click(screen.getByTestId("abrir-buscar"));
-    expect(screen.queryByTestId("resumen-hoy")).toBeNull();
+    expect(screen.getByTestId("hoja-buscar-venta")).toBeTruthy();
     expect(screen.getByTestId("cuantas-halladas").textContent).toContain("Escribí un producto");
     fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "electrodo" } });
-    const ventas = screen.getAllByTestId("venta-dia");
+    const ventas = within(screen.getByTestId("hoja-buscar-venta")).getAllByTestId("venta-dia");
     expect(ventas).toHaveLength(1);
     expect(ventas[0]!.querySelector("b")!.textContent).toBe("1 × Electrodo 2,5 mm y 2 más");
     expect(ventas[0]!.querySelector("mark")!.textContent).toBe("Electrodo");
     expect(screen.getByTestId("cuantas-halladas").textContent).toBe("1 de 4 ventassuman $58.000");
     fireEvent.click(screen.getByTestId("salir-de-buscar"));
-    expect(screen.getByTestId("resumen-hoy")).toBeTruthy();
+    expect(screen.queryByTestId("hoja-buscar-venta")).toBeNull();
     expect(screen.getAllByTestId("venta-dia")).toHaveLength(4);
   });
 
@@ -159,23 +183,24 @@ describe("«Hoy» · celular", () => {
     await abrir();
     fireEvent.click(screen.getByTestId("abrir-buscar"));
     const campo = screen.getByTestId("buscar-venta");
+    const halladas = () => within(screen.getByTestId("hoja-buscar-venta")).getAllByTestId("venta-dia");
     fireEvent.change(campo, { target: { value: "inalambrico" } });
-    expect(screen.getAllByTestId("venta-dia").map((v) => v.textContent)).toEqual([expect.stringContaining("Taladro")]);
+    expect(halladas().map((v) => v.textContent)).toEqual([expect.stringContaining("Taladro")]);
     fireEvent.change(campo, { target: { value: "$223.000" } });
-    expect(screen.getAllByTestId("venta-dia")).toHaveLength(1);
+    expect(halladas()).toHaveLength(1);
     fireEvent.change(campo, { target: { value: "martinez" } });
-    expect(screen.getAllByTestId("venta-dia").map((v) => v.textContent)).toEqual([expect.stringContaining("Constructora Martínez")]);
+    expect(halladas().map((v) => v.textContent)).toEqual([expect.stringContaining("Constructora Martínez")]);
   });
 
-  it("017-E24: sin resultados lo dice, y deja borrar la búsqueda o volver a todas", async () => {
+  it("017-E24: sin resultados lo dice, y deja borrar la búsqueda o cerrar el panel", async () => {
     await abrir();
     fireEvent.click(screen.getByTestId("abrir-buscar"));
     fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "destornillador" } });
     expect(screen.getByTestId("sin-resultados").textContent).toContain("Ninguna venta con «destornillador»");
     fireEvent.click(screen.getByRole("button", { name: /Borrar la búsqueda/ }));
     expect((screen.getByTestId("buscar-venta") as HTMLInputElement).value).toBe("");
-    fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "destornillador" } });
-    fireEvent.click(screen.getByRole("button", { name: "Volver a todas las ventas" }));
+    fireEvent.click(screen.getByTestId("salir-de-buscar"));
+    expect(screen.queryByTestId("hoja-buscar-venta")).toBeNull();
     expect(screen.getByTestId("resumen-hoy")).toBeTruthy();
   });
 
@@ -185,7 +210,7 @@ describe("«Hoy» · celular", () => {
     fireEvent.click(within(screen.getAllByTestId("venta-dia")[1]!).getByRole("button"));
     expect(screen.getByTestId("anular")).toBeTruthy();
     fireEvent.keyDown(window, { key: "Escape" });
-    fireEvent.change(screen.getByTestId("dia"), { target: { value: "2026-10-16" } });
+    elegirDia("2026-10-16");
     await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Viernes 16/10"));
     fireEvent.click(within(screen.getAllByTestId("venta-dia")[0]!).getByRole("button"));
     expect(screen.queryByTestId("anular")).toBeNull();

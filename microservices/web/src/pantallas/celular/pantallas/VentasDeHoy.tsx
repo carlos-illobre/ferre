@@ -4,13 +4,14 @@ import { Rodar } from "../../../plataforma/animacion/Rodar";
 import { conMovimiento } from "../../../plataforma/animacion/animacion";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { MEDIOS as MEDIOS_DE_TEXTOS, TEXTOS } from "../../textos";
-import { nombreDelDia, useResumenDelDia, type Comparacion } from "../../../negocio/ventas/resumen-del-dia";
+import { diaAnterior, nombreDelDia, resumenDelDia, useResumenDelDia, type Comparacion } from "../../../negocio/ventas/resumen-del-dia";
+import { Calendario } from "../componentes/Calendario";
 import "./hoy.css";
 import { pesosCortos } from "../../../formato";
 import { urlDeFoto } from "../../../api";
 const numero = (n: number) => n.toLocaleString("es-AR");
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../negocio/ventas/venta";
-import { buscarVentas, confirmadas, fueSinConexion, hoyLocal, MOTIVOS_DE_ANULACION, motivoDeAnulacion, plano, SIN_MOTIVO, useAnularVenta, type VentaDelDia } from "../../../negocio/ventas/ventas-del-dia";
+import { buscarVentas, confirmadas, fueSinConexion, hoyLocal, useVentasDelDia, MOTIVOS_DE_ANULACION, motivoDeAnulacion, plano, SIN_MOTIVO, useAnularVenta, type VentaDelDia } from "../../../negocio/ventas/ventas-del-dia";
 
 // «Ventas de hoy» en el celular (specs/017; decisión 120, maqueta
 // specs/003-ventas/maquetas/celular-ventas-de-hoy-v2.png): el día y «Cambiar fecha»; el resumen en
@@ -27,92 +28,116 @@ export function VentasDeHoy({ anulaHoy = false, anulaCualquierDia = false }: { a
   const [dia, setDia] = useState<string | null>(null);
   const r = useResumenDelDia(dia);
   const t = TEXTOS.hoy;
-  const calendario = useRef<HTMLInputElement>(null);
-  const [buscando, setBuscando] = useState(false);
+  // «Otro día» y «Buscar» abren un panel desde abajo, como en la v2 (decisión 141).
+  const [panel, setPanel] = useState<"otro-dia" | "buscar" | null>(null);
   const [texto, setTexto] = useState("");
   const [abierta, setAbierta] = useState<string | null>(null);
   const ahora = new Date();
-  const abrirCalendario = () => { const c = calendario.current; if (!c) return; try { c.showPicker(); } catch { c.focus(); c.click(); } };
   const todas = r.ventas ?? [];
-  const halladas = buscando ? buscarVentas(todas, texto, null) : todas;
+  const halladas = buscarVentas(todas, texto, null);
   const venta = todas.find((v) => v.id === abierta) ?? null;
   // Anular: las de hoy con «Anular ventas del día»; las de otro día, solo con «de cualquier día».
   const anula = r.esHoy ? anulaHoy : anulaCualquierDia;
-  const salirDeBuscar = () => { setBuscando(false); setTexto(""); };
+  const cerrarBusqueda = () => { setPanel(null); setTexto(""); };
   return (
     <div className="hoy" data-testid="hoy">
-      {!buscando && (
-        <div className="hoy-fecha">
-          <div>
-            <b data-testid="dia-que-se-mira">{r.esHoy ? `${t.hoy.corto}, ${nombreDelDia(r.dia)}` : mayuscula(nombreDelDia(r.dia))}</b>
-            {r.esHoy ? <small>{t.hasta.corto} {hora(ahora.toISOString())}</small>
-              : <button type="button" className="enlace" onClick={() => setDia(null)} data-testid="volver-a-hoy">{t.volverAHoy.corto}</button>}
-          </div>
-          <button type="button" className="hoy-boton" onClick={abrirCalendario} data-testid="cambiar-fecha"><Icono nombre="calendario" tam={18} />{t.cambiarFecha.corto}</button>
-          <input ref={calendario} type="date" className="hoy-calendario" value={r.dia} max={hoyLocal()} aria-label={t.cambiarFecha.corto}
-            onChange={(e) => { const v = e.target.value; if (v && v <= hoyLocal()) setDia(v === hoyLocal() ? null : v); }} data-testid="dia" />
+      <div className="hoy-fecha">
+        <div>
+          <b data-testid="dia-que-se-mira">{r.esHoy ? `${t.hoy.corto}, ${nombreDelDia(r.dia)}` : mayuscula(nombreDelDia(r.dia))}{r.esHoy && <small> · {hora(ahora.toISOString())}</small>}</b>
+          {!r.esHoy && <button type="button" className="enlace" onClick={() => setDia(null)} data-testid="volver-a-hoy">{t.volverAHoy.corto}</button>}
         </div>
-      )}
+        <button type="button" className="hoy-boton chico" onClick={() => setPanel("otro-dia")} data-testid="cambiar-fecha"><Icono nombre="calendario" tam={18} />{t.otroDia.corto}</button>
+      </div>
       {!r.resumen ? (
         r.error && fueSinConexion(r.error) ? <div className="aviso-suave" data-testid="sin-conexion">{r.esHoy ? t.sinConexionHoy.corto : t.sinConexionOtroDia.corto}</div> : r.error ? <div className="aviso-suave">{(r.error as Error).message}</div> : <div className="aviso-suave" aria-busy="true">{t.buscando.corto}…</div>
       ) : <>
-        {!buscando && <>
-          <section className="tarjeta hoy-total" data-testid="resumen-hoy">
-            <small>{t.totalDeVentas.corto}</small>
-            <span className="hoy-monto importe" data-testid="total-de-hoy"><Rodar texto={pesosCortos(r.resumen.total)} escalon={30} alAparecer /></span>
-            <ComparacionDelDia comparacion={r.comparacion} esHoy={r.esHoy} diaAnterior={r.diaAnterior} />
-            <Barras barras={r.barras} anterior={r.anteriorPorHora} />
-            <ul className="hoy-medios">
-              {MEDIOS.map((m) => (
-                <li key={m} data-testid={`medio-${m}`}>
-                  <IconoDeMedio medio={m} tam={18} conFondo />
-                  <span><b className="importe"><Rodar texto={pesosCortos(r.resumen!.medios[m].total)} /></b>
-                    <small><span className="hoy-medio-nombre">{MEDIOS_CORTOS[m]}</span> · {r.resumen!.medios[m].cuantas} {r.resumen!.medios[m].cuantas === 1 ? t.venta.corto : t.ventas.corto}</small></span>
-                </li>
-              ))}
-            </ul>
-          </section>
-          <div className="hoy-numeros" data-testid="numeros">
-            <div><b data-testid="cuantas-ventas"><Rodar texto={String(r.resumen.ventas)} /></b><small>{t.ventas.corto}</small></div>
-            <div><b data-testid="cuantos-productos"><Rodar texto={String(r.resumen.productos)} /></b><small>{t.productos.corto}</small></div>
-            <div><b data-testid="ticket"><Rodar texto={r.resumen.ticket === null ? "—" : pesosCortos(r.resumen.ticket)} /></b><small>{t.ticket.corto}</small></div>
-          </div>
-        </>}
-        {buscando ? (
-          <div className="hoy-buscar">
-            <div className="hoy-buscar-fila">
-              <label className="hoy-buscar-caja"><Icono nombre="buscar" tam={20} />
-                <input type="search" value={texto} onChange={(e) => setTexto(e.target.value)} autoFocus placeholder={t.buscarVenta.corto} aria-label={t.buscarVenta.corto}
-                  onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); if (texto) setTexto(""); else salirDeBuscar(); } }} data-testid="buscar-venta" />
-                {texto && <button type="button" aria-label="Borrar" onClick={() => setTexto("")}><Icono nombre="cerrar" tam={16} grosor={2.6} /></button>}
-              </label>
-              <button type="button" className="enlace hoy-listo" onClick={salirDeBuscar} data-testid="salir-de-buscar">Listo</button>
-            </div>
-            <div className="hoy-cuantas" data-testid="cuantas-halladas">
-              {texto.trim() ? <><span>{halladas.length} de {todas.length} {todas.length === 1 ? t.venta.corto : t.ventas.corto}</span>{halladas.length > 0 && <span>suman {pesosCortos(confirmadas(halladas).reduce((s, v) => s + Number(v.total), 0))}</span>}</>
-                : <span>{t.queSeBusca.corto}</span>}
-            </div>
-          </div>
-        ) : (
-          <div className="hoy-titulo-fila">
-            <h2 className="hoy-titulo">{t.titulo.corto}</h2>
-            {todas.length > 0 && <button type="button" className="hoy-boton chico" onClick={() => setBuscando(true)} data-testid="abrir-buscar"><Icono nombre="buscar" tam={18} />Buscar</button>}
-          </div>
-        )}
-        {buscando && texto.trim() && halladas.length === 0 ? (
-          <div className="hoy-sin-resultados" data-testid="sin-resultados">
-            <span className="hoy-sin-icono"><Icono nombre="buscar" tam={26} /></span>
-            <b>Ninguna venta con «{texto.trim()}»</b>
-            <small>{t.probaConOtra.corto}</small>
-            <button type="button" className="hoy-boton" onClick={() => setTexto("")}><Icono nombre="cerrar" tam={16} />Borrar la búsqueda</button>
-            <button type="button" className="enlace" onClick={salirDeBuscar}>Volver a todas las ventas</button>
-          </div>
-        ) : (
-          <VentasCortas ventas={halladas} buscado={buscando ? texto : ""} alAbrir={(v) => setAbierta(v.id)} sinVentas={r.esHoy ? t.sinVentasHoy.corto : t.sinVentasDia.corto} />
-        )}
+        <section className="tarjeta hoy-total" data-testid="resumen-hoy">
+          <small>{t.totalDeVentas.corto}</small>
+          <span className="hoy-monto importe" data-testid="total-de-hoy"><Rodar texto={pesosCortos(r.resumen.total)} escalon={30} alAparecer /></span>
+          <ComparacionDelDia comparacion={r.comparacion} esHoy={r.esHoy} diaAnterior={r.diaAnterior} />
+          <Barras barras={r.barras} anterior={r.anteriorPorHora} />
+          <ul className="hoy-medios">
+            {MEDIOS.map((m) => (
+              <li key={m} data-testid={`medio-${m}`}>
+                <IconoDeMedio medio={m} tam={18} conFondo />
+                <span><b className="importe"><Rodar texto={pesosCortos(r.resumen!.medios[m].total)} /></b>
+                  <small><span className="hoy-medio-nombre">{MEDIOS_CORTOS[m]}</span> · {r.resumen!.medios[m].cuantas} {r.resumen!.medios[m].cuantas === 1 ? t.venta.corto : t.ventas.corto}</small></span>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <div className="hoy-numeros" data-testid="numeros">
+          <div><b data-testid="cuantas-ventas"><Rodar texto={String(r.resumen.ventas)} /></b><small>{t.ventas.corto}</small></div>
+          <div><b data-testid="cuantos-productos"><Rodar texto={String(r.resumen.productos)} /></b><small>{t.productos.corto}</small></div>
+          <div><b data-testid="ticket"><Rodar texto={r.resumen.ticket === null ? "—" : pesosCortos(r.resumen.ticket)} /></b><small>{t.ticket.corto}</small></div>
+        </div>
+        <div className="hoy-titulo-fila">
+          <h2 className="hoy-titulo">{t.titulo.corto}</h2>
+          {todas.length > 0 && <button type="button" className="hoy-boton chico" onClick={() => setPanel("buscar")} data-testid="abrir-buscar"><Icono nombre="buscar" tam={18} />Buscar</button>}
+        </div>
+        <VentasCortas ventas={todas} buscado="" alAbrir={(v) => setAbierta(v.id)} sinVentas={r.esHoy ? t.sinVentasHoy.corto : t.sinVentasDia.corto} />
       </>}
+      {panel === "otro-dia" && <OtroDia dia={r.dia} alElegir={(d) => { setDia(d === hoyLocal() ? null : d); setPanel(null); }} alCerrar={() => setPanel(null)} />}
+      {panel === "buscar" && (
+        <Hoja titulo={t.buscarUnaVenta.corto} alCerrar={cerrarBusqueda} testId="hoja-buscar-venta">
+          <div className="hoy-buscar-fila">
+            <label className="hoy-buscar-caja"><Icono nombre="buscar" tam={20} />
+              <input type="search" value={texto} onChange={(e) => setTexto(e.target.value)} autoFocus placeholder={t.buscarVenta.corto} aria-label={t.buscarVenta.corto} data-testid="buscar-venta" />
+              {texto && <button type="button" aria-label="Borrar" onClick={() => setTexto("")}><Icono nombre="cerrar" tam={16} grosor={2.6} /></button>}
+            </label>
+            <button type="button" className="enlace hoy-listo" onClick={cerrarBusqueda} data-testid="salir-de-buscar">Listo</button>
+          </div>
+          <div className="hoy-cuantas" data-testid="cuantas-halladas">
+            {texto.trim() ? <><span>{halladas.length} de {todas.length} {todas.length === 1 ? t.venta.corto : t.ventas.corto}</span>{halladas.length > 0 && <span>suman {pesosCortos(confirmadas(halladas).reduce((s, v) => s + Number(v.total), 0))}</span>}</>
+              : <span>{t.queSeBusca.corto}</span>}
+          </div>
+          {texto.trim() && (halladas.length === 0 ? (
+            <div className="hoy-sin-resultados" data-testid="sin-resultados">
+              <span className="hoy-sin-icono"><Icono nombre="buscar" tam={26} /></span>
+              <b>Ninguna venta con «{texto.trim()}»</b>
+              <small>{t.probaConOtra.corto}</small>
+              <button type="button" className="hoy-boton" onClick={() => setTexto("")}><Icono nombre="cerrar" tam={16} />Borrar la búsqueda</button>
+            </div>
+          ) : <VentasCortas ventas={halladas} buscado={texto} alAbrir={(v) => setAbierta(v.id)} sinVentas="" />)}
+        </Hoja>
+      )}
       {venta && <HojaDeLaVenta venta={venta} anula={anula} esHoy={r.esHoy} alCerrar={() => setAbierta(null)} />}
     </div>
+  );
+}
+
+// «Otro día», como la v2 (decisión 141): hoy y los seis días anteriores, cada uno con lo vendido y
+// cuántas ventas, el que se mira con un tilde; al final, el calendario propio para ir más atrás.
+function OtroDia({ dia, alElegir, alCerrar }: { dia: string; alElegir: (dia: string) => void; alCerrar: () => void }) {
+  const t = TEXTOS.hoy;
+  const [conCalendario, setConCalendario] = useState(false);
+  const hoy = hoyLocal();
+  const dias = [hoy];
+  while (dias.length < 7) dias.push(diaAnterior(dias[dias.length - 1]!));
+  return (
+    <Hoja titulo={t.otroDia.corto} alCerrar={alCerrar} testId="hoja-otro-dia">
+      <p className="hoy-hoja-detalle">{t.queDiaMirar.corto}</p>
+      {conCalendario ? <Calendario elegido={dia} hasta={hoy} hoy={hoy} alElegir={alElegir} /> : <>
+        <div className="hoy-dias">{dias.map((d, i) => <DiaParaElegir key={d} dia={d} hoy={i === 0} ayer={i === 1} elegido={d === dia} alElegir={() => alElegir(d)} />)}</div>
+        <button type="button" className="hoy-dia hoy-dia-calendario" onClick={() => setConCalendario(true)} data-testid="elegir-en-calendario">
+          <Icono nombre="calendario" tam={20} /><span>{t.elegirEnElCalendario.corto}<small>{t.masAtras.corto}</small></span><Icono nombre="derecha" tam={18} />
+        </button>
+      </>}
+    </Hoja>
+  );
+}
+
+// Un día de la lista de «Otro día»: su nombre y, cuando llega, lo vendido y cuántas ventas.
+function DiaParaElegir({ dia, hoy, ayer, elegido, alElegir }: { dia: string; hoy: boolean; ayer: boolean; elegido: boolean; alElegir: () => void }) {
+  const t = TEXTOS.hoy;
+  const { datos } = useVentasDelDia(hoy ? null : dia);
+  const resumen = datos ? resumenDelDia(datos.ventas) : null;
+  const nombre = hoy ? `${t.hoy.corto}, ${nombreDelDia(dia)}` : ayer ? `${t.ayer.corto}, ${nombreDelDia(dia)}` : mayuscula(nombreDelDia(dia));
+  const detalle = !resumen ? "…" : resumen.ventas === 0 ? t.sinVentas.corto : `${pesosCortos(resumen.total)} · ${resumen.ventas} ${resumen.ventas === 1 ? t.venta.corto : t.ventas.corto}${hoy ? ` ${t.hasta.corto.toLowerCase()} ${hora(new Date().toISOString())}` : ""}`;
+  return (
+    <button type="button" className={`hoy-dia ${elegido ? "elegido" : ""}`} aria-pressed={elegido} onClick={alElegir} data-testid={`otro-dia-${dia}`}>
+      <Icono nombre="calendario" tam={20} /><span>{nombre}<small>{detalle}</small></span>{elegido && <Icono nombre="tilde" tam={18} grosor={2.6} />}
+    </button>
   );
 }
 

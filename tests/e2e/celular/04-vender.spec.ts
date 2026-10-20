@@ -8,7 +8,7 @@ const { psql } = stack("celular");
 
 // Happy path "buscar un producto y registrar una venta" (issue #15): el empleado busca,
 // agrega con Enter, cambia la cantidad, elige cómo paga y cobra. La venta queda con el
-// stock descontado, aparece en "Ventas de hoy" y se puede anular. Sesión sembrada.
+// stock descontado, aparece en "Ventas del día" y se puede anular. Sesión sembrada.
 const TOKEN = "token-e2e-vender";
 const EMAIL = "e2e-vender@ferre.test";
 const PROVEEDOR = "Proveedor vender (e2e)";
@@ -107,8 +107,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect.poll(() => psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   await expect.poll(() => psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
-  // «Ventas de hoy» muestra las ventas del día y desde ahí se anula (decisión 120).
-  await page.getByRole("tab", { name: "Ventas de hoy" }).click();
+  // «Ventas del día» muestra las ventas del día y desde ahí se anula (decisión 120).
+  await page.getByRole("tab", { name: "Ventas del día" }).click();
   // La más reciente primero (017): la que se acaba de cobrar, en un renglón que abre su hoja.
   const deHoy = page.getByTestId("ventas-de-hoy").getByTestId("venta-dia").first();
   await expect(deHoy).toContainText("2 productos");

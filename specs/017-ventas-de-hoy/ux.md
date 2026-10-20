@@ -40,13 +40,19 @@ Maqueta aprobada por Carlos el 2026-10-19: `specs/003-ventas/maquetas/celular-ve
 (la v2 del director de arte, con el buscador que agregó). Sigue el lenguaje «Mostrador», como
 Vender (decisión 119):
 
-- Las pestañas de arriba son «Vender» y «Ventas de hoy»; la de «Anular» ya no está.
-- El día y «Otro día»; el resumen va en una tarjeta clara (ya no oscura): «Total de ventas», el
+- Las pestañas de arriba son «Vender» y «Ventas del día» (decisión 141); la de «Anular» ya no está.
+- El día («Hoy, martes 20/10 · 17:40») y «Otro día» (decisión 141): abre un panel desde abajo con
+  hoy y los seis días anteriores, cada uno con lo vendido y cuántas ventas («Sin ventas» si no
+  hubo) y el que se está mirando con un tilde; al final, «Elegir en el calendario», que muestra en
+  el mismo panel un calendario propio con los colores de «Mostrador»: el mes con ‹ ›, los días en
+  una grilla de lunes a domingo, hoy marcado, el elegido en verde oscuro y los días que vienen
+  apagados. Tocar un día lo muestra y cierra el panel; mirando otro día, «Volver a hoy».
+- El resumen va en una tarjeta clara (ya no oscura): «Total de ventas», el
   total grande, la comparación, el gráfico por hora y los cuatro medios en dos columnas (ícono en
   su color, importe y cuántas); debajo, ventas, productos y ticket promedio.
-- «Ventas» con «Buscar» a su derecha, a mano del pulgar. Al tocarlo se esconden el día y el
-  resumen y queda arriba un campo con la lupa, «×» para borrar y «Listo» para salir; debajo,
-  cuántas coinciden y cuánto suman. Lo que coincide se resalta; si coincide un producto de una
+- «Ventas» con «Buscar» a su derecha, a mano del pulgar. Al tocarlo se abre un panel desde abajo
+  (decisión 141), como «Otro día»: el campo con la lupa y «×» para borrar, cuántas coinciden y
+  cuánto suman, y las ventas que coinciden; tocar una abre su hoja. Lo que coincide se resalta; si coincide un producto de una
   venta de varios, el renglón lo muestra («3 × Mecha… y 1 más»). Sin resultados: una lupa tachada,
   «Ninguna venta con «…»», un ejemplo y las dos salidas.
 - Tocar una venta abre su hoja: la hora, el medio y el cliente, los productos con cantidad,
@@ -65,6 +71,8 @@ se tacha con una raya que se dibuja de izquierda a derecha y queda a la vista, a
 mueve transform y opacity, y nada se mueve para quien pidió menos movimiento en su sistema.
 
 ## En la computadora, «El día y la venta» (decisión 135)
+
+La pestaña se llama «Ventas del día» (decisión 141).
 
 Reemplaza a los cuatro cajones (decisión 122): Carlos eligió la v2 del director de arte, variante «El
 día y la venta» (maqueta «ventas-de-hoy · compu · variante-1-el-dia»), sin

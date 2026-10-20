@@ -12,7 +12,7 @@ export type Grupo = { clave: string; nombre: string; icono: NombreDeIcono; panta
 export const GRUPOS: Grupo[] = [
   { clave: "mostrador", nombre: "Vender", icono: "vender", pantallas: [
     { ruta: "vender", nombre: "Vender", icono: "vender" },
-    { ruta: "ventas", nombre: "Ventas de hoy", icono: "ventas" },
+    { ruta: "ventas", nombre: "Ventas del día", icono: "ventas" },
   ] },
   { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pantallas: [
     { ruta: "productos", nombre: "Productos", icono: "productos" },

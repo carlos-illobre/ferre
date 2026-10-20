@@ -15,7 +15,7 @@ const Modulo = lazy(async () => {
 // Las pantallas de Ferrebress que se pueden nombrar en un paso, en el orden del menú.
 export const PANTALLAS_DE_FERREBRESS = [
   "Catálogo → Productos", "Catálogo → Listas", "Catálogo → Duplicados",
-  "Vender", "Vender → Cobrar", "Vender → Ventas de hoy", "Vender → Anular",
+  "Vender", "Vender → Cobrar", "Vender → Ventas del día", "Vender → Anular",
   "Depósito → Pedidos", "Depósito → Ingreso", "Depósito → Inventario", "Depósito → Estanterías",
   "Más → Cómo va el negocio", "Más → Usuarios", "Más → Usuarios → Quién hizo qué", "Más → Anomalías", "Más → Mejoras y errores",
 ];

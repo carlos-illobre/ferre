@@ -199,7 +199,7 @@ export const TEXTOS = {
     teclaElegir: igual("eligen una venta"),
     teclaAbrir: igual("abre o cierra su detalle"),
     teclaFecha: igual("cambia la fecha"),
-    tituloHoy: igual("Ventas de hoy"),
+    tituloHoy: igual("Ventas del día"),
     tituloDia: igual("Ventas del"),
     columnaHora: igual("Hora"),
     columnaProductos: igual("Productos"),
@@ -212,6 +212,13 @@ export const TEXTOS = {
     // «Ventas de hoy» como la v2 y «Corregir» (specs/019).
     porHora: igual("Por hora"),
     ayer: igual("Ayer"),
+    // «Otro día» y «Buscar» en un panel (decisión 141).
+    otroDia: igual("Otro día"),
+    queDiaMirar: igual("Elegí qué día mirar."),
+    elegirEnElCalendario: igual("Elegir en el calendario"),
+    masAtras: igual("Para ir más atrás"),
+    sinVentas: igual("Sin ventas"),
+    buscarUnaVenta: igual("Buscar una venta"),
     todas: igual("Todas"),
     ctaCte: igual("Cta. cte."),
     anuladas: igual("Anuladas"),
