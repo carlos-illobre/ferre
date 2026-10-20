@@ -1167,3 +1167,5 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      los grises cálidos de «Mostrador» (decisión 115), en las dos interfaces, y las hojas del celular
      son blancas, con «×» para cerrar arriba a la derecha, como la v2. El botón de cobrar de Vender en
      el celular, redondeado como la v4: una píldora con el círculo blanco que se desliza.
+     El botón del vínculo con la computadora nunca es gris: verde con el espejo andando y blanco con el
+     borde verde cuando está desconectado un rato.

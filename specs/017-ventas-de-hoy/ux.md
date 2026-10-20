@@ -57,7 +57,12 @@ Vender (decisión 119):
   venta de varios, el renglón lo muestra («3 × Mecha… y 1 más»). Sin resultados: una lupa tachada,
   «Ninguna venta con «…»», un ejemplo y las dos salidas.
 - Tocar una venta abre su hoja: la hora, el medio y el cliente, los productos con cantidad,
-  precio y total, y «Anular» (rojo) si se puede. «Anular» pasa a confirmar: el motivo en una lista
+  precio y total y, como la v2, «Corregir · Cambio · Anular» (specs/019). «Corregir» edita la venta
+  en la misma hoja (− +, el precio, el tacho, agregar un producto, el medio y el cliente; lo de
+  antes tachado, la diferencia y con qué se cobra; «Guardar · +$4.000»). «Cambio» abre su hoja: se
+  marca lo que vuelve (cuánto, y si está fallado), se suma lo que se lleva y el botón dice «Cobrar
+  $4.000», «Devolver $4.000» o «Registrar el cambio»; sin nada que se lleve es una devolución.
+  «Cambio», arriba de la lista, registra uno buscando la venta por el producto que vuelve. «Anular» «Anular» pasa a confirmar: el motivo en una lista
   desplegable, el comentario y «Cancelar» / «Anular · −$20.000». Una anulada dice cuándo y por
   qué se anuló.
 

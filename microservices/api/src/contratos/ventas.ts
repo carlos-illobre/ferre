@@ -2,7 +2,7 @@
 // compilar (ADR-018), así que acá no va código ni nombres de tablas. Lo que manda el front sale
 // de la validación del servidor (decisión 89).
 import type { z } from "zod";
-import type { anulacionDeVenta, consultaNueva, correccionDeVenta, MEDIOS, ventaNueva } from "../ventas/esquemas.js";
+import type { anulacionDeVenta, cambioDeVenta, consultaNueva, correccionDeVenta, MEDIOS, ventaNueva } from "../ventas/esquemas.js";
 
 export type MedioDePago = (typeof MEDIOS)[number];
 export type EstadoDeVenta = "confirmada" | "anulada";
@@ -18,6 +18,15 @@ export type VentaDelDia = { id: string; fecha: string; medio_pago: MedioDePago; 
 // POST /ventas/:id/corregir (019)
 export type CorreccionEntrada = z.input<typeof correccionDeVenta>;
 export type VentaCorregida = { id: string; total: number; diferencia: number; resuelta: "cobrada" | "devuelta" | "cuenta_corriente" | "sin_diferencia"; version: string };
+
+// GET /ventas/para-cambio?q=… (019, E11): las ventas confirmadas de los últimos 15 días que tienen un
+// producto que coincide, de la más nueva a la más vieja, de a 20; cada renglón con lo que queda por
+// devolver (`por_devolver`) y el precio por unidad que se pagó (`pagado`).
+export type RenglonParaCambio = { id: string; producto_id: string | null; descripcion: string; cantidad: string; por_devolver: number; pagado: number; foto_url: string | null };
+export type VentaParaCambio = { id: string; fecha: string; medio_pago: MedioDePago; cliente: string | null; total: string; items: RenglonParaCambio[] };
+// POST /ventas/:id/cambio (019)
+export type CambioEntrada = z.input<typeof cambioDeVenta>;
+export type CambioRegistrado = { id: string; venta_id: string; vuelve: number; se_lleva: number; diferencia: number; resuelto: "cobrado" | "devuelto" | "cuenta_corriente" | "sin_diferencia" };
 
 // GET /ventas[?dia=AAAA-MM-DD]
 // `movimientos`: lo cobrado (+) y lo devuelto (−) ese día por correcciones y cambios (019). `suma`: si

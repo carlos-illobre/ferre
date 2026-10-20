@@ -104,7 +104,8 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 /* El botón del vínculo, la pastilla de la v2 (decisión 140): verde con el vínculo, blanca sin él. */
 .vincular-boton { position: absolute; top: 10px; right: 20px; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #CEC8BA; background: #fff; color: #12382F; font-size: 15px; font-weight: 700; }
 .vincular-boton.vinculado { border-color: #1E9E62; color: #11764A; background: #E2F4EA; }
-.vincular-boton.apagado { color: var(--p-texto-2, #56635e); background: var(--p-relleno, #dfe5e0); }
+/* Desconectado un rato o con la computadora cerrada: blanco con el borde verde, nunca gris (decisión 143). */
+.vincular-boton.apagado { border-color: #1E9E62; color: #11764A; background: #fff; }
 .vincular-error { margin: 60px 20px 0; }
 /* Dentro de una pantalla de Más: arriba, el botón que vuelve al menú de Más */
 .volver-a-mas { width: 100%; max-width: 760px; margin: 0 auto; padding: 10px 12px 0; }

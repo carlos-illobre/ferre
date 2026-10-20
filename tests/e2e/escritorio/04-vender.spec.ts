@@ -16,6 +16,8 @@ const ID_MECHA = "00000000-0000-0000-0000-00000000e2e6";
 const ID_TORNILLO = "00000000-0000-0000-0000-00000000e2e7";
 
 test.beforeAll(() => {
+  // Los cambios de una corrida anterior (019): su plata, sus renglones y ellos, antes que los renglones de la venta.
+  psql(`WITH c AS (SELECT DISTINCT cambio_id FROM cambio_renglon WHERE producto_id IN ('${ID_MECHA}', '${ID_TORNILLO}')), m AS (DELETE FROM movimiento_dinero WHERE cambio_id IN (SELECT cambio_id FROM c)), r AS (DELETE FROM cambio_renglon WHERE cambio_id IN (SELECT cambio_id FROM c)) DELETE FROM cambio WHERE id IN (SELECT cambio_id FROM c)`);
   psql(`DELETE FROM anomalia WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   // La prueba del atajo abre «Vincular el celular», que deja un código pedido por esa sesión: se borra antes que ella.
   psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);

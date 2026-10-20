@@ -52,3 +52,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T041 [arreglo] Dos focos: con el cursor en una caja de texto, las flechas mueven la marca del teclado por el menú y las pestañas sin sacar el cursor (decisión 137)
 - [x] T042 [ajuste] Con el menú lateral plegado, el puntito de conexión queda centrado
 - [x] T043 [ajuste] Los neutros de la paleta compartida, los grises cálidos de «Mostrador» (sin fondos verdosos); las hojas del celular blancas con «×»; el día elegido del calendario centrado (decisión 143)
+- [x] T044 [ajuste] Celular: el botón del vínculo con la computadora nunca es gris: verde en espejo y blanco con el borde verde desconectado (decisión 143)

@@ -91,8 +91,8 @@ el lenguaje «Mostrador». Desde el 2026-10-20 (decisión 140) se ve **igual a l
   por unidad en una pastilla verde suave, con la unidad debajo («cada uno», «el metro», «el kg»):
   tocar la pastilla abre una hoja «Cómo se calculó» con el costo y su proveedor, el
   margen, el IVA, el redondeo, la cantidad y el total del renglón (con un precio a mano, el precio y
-  el margen real). Tocar el resto del renglón abre su hoja: margen, precio a mano, cantidad y
-  «Quitar de la venta».
+  el margen real). Tocar el resto del renglón abre su hoja: margen, precio a mano, cantidad con
+  su unidad adentro (se toca para cambiarla) y «Quitar de la venta».
 - Abajo, en una fila: el tacho debajo de la foto para quitar el renglón (ofrece Deshacer), la
   cantidad en blanco con − y + (con 1, «−» también lo quita) y la unidad adentro («1 un.»,
   «1,5 kg»), que se toca para elegir otra (un., kg, m, L) en una lista blanca redondeada con la

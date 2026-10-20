@@ -6,6 +6,11 @@ import { IconoDeMedio } from "../../IconoDeMedio";
 import { MEDIOS as MEDIOS_DE_TEXTOS, TEXTOS } from "../../textos";
 import { diaAnterior, nombreDelDia, resumenDelDia, useResumenDelDia, type Comparacion } from "../../../negocio/ventas/resumen-del-dia";
 import { Calendario } from "../componentes/Calendario";
+import { CorregirEnLaHoja, HojaDeCambio } from "./CorregirYCambio";
+import { Icono as IconoC } from "../../compu/base/ui";
+import { empezarCorreccion, type Correccion } from "../../../negocio/ventas/correccion";
+import { sePuedeCambiar } from "../../../negocio/ventas/cambio";
+import { pedirClientes } from "../../../catalogo";
 import "./hoy.css";
 import { pesosCortos } from "../../../formato";
 import { urlDeFoto } from "../../../api";
@@ -39,6 +44,11 @@ export function VentasDeHoy({ anulaHoy = false, anulaCualquierDia = false }: { a
   // Anular: las de hoy con «Anular ventas del día»; las de otro día, solo con «de cualquier día».
   const anula = r.esHoy ? anulaHoy : anulaCualquierDia;
   const cerrarBusqueda = () => { setPanel(null); setTexto(""); };
+  // El cambio (o la devolución) lo registra quien anula las ventas del día, para cualquier venta de 15 días (decisión 135).
+  const cambia = anulaHoy || anulaCualquierDia;
+  const [cambio, setCambio] = useState<{ venta: VentaDelDia | null } | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
+  useEffect(() => { if (!aviso) return; const x = setTimeout(() => setAviso(null), 5000); return () => clearTimeout(x); }, [aviso]);
   return (
     <div className="hoy" data-testid="hoy">
       <div className="hoy-fecha">
@@ -73,7 +83,10 @@ export function VentasDeHoy({ anulaHoy = false, anulaCualquierDia = false }: { a
         </div>
         <div className="hoy-titulo-fila">
           <h2 className="hoy-titulo">{t.titulo.corto}</h2>
-          {todas.length > 0 && <button type="button" className="hoy-boton chico" onClick={() => setPanel("buscar")} data-testid="abrir-buscar"><Icono nombre="buscar" tam={18} />Buscar</button>}
+          <span className="hoy-acciones">
+            {cambia && <button type="button" className="hoy-boton chico" onClick={() => setCambio({ venta: null })} data-testid="registrar-cambio"><IconoC nombre="repetir" tam={18} />{t.registrarCambio.corto}</button>}
+            {todas.length > 0 && <button type="button" className="hoy-boton chico" onClick={() => setPanel("buscar")} data-testid="abrir-buscar"><Icono nombre="buscar" tam={18} />Buscar</button>}
+          </span>
         </div>
         <VentasCortas ventas={todas} buscado="" alAbrir={(v) => setAbierta(v.id)} sinVentas={r.esHoy ? t.sinVentasHoy.corto : t.sinVentasDia.corto} />
       </>}
@@ -101,7 +114,10 @@ export function VentasDeHoy({ anulaHoy = false, anulaCualquierDia = false }: { a
           ) : <VentasCortas ventas={halladas} buscado={texto} alAbrir={(v) => setAbierta(v.id)} sinVentas="" />)}
         </Hoja>
       )}
-      {venta && <HojaDeLaVenta venta={venta} anula={anula} esHoy={r.esHoy} alCerrar={() => setAbierta(null)} />}
+      {venta && <HojaDeLaVenta venta={venta} anula={anula} cambia={cambia} esHoy={r.esHoy} alCerrar={() => setAbierta(null)} alAviso={setAviso}
+        alCambio={() => { setCambio({ venta }); setAbierta(null); }} />}
+      {cambio && <HojaDeCambio venta={cambio.venta} alCerrar={() => setCambio(null)} alListo={(m) => { setCambio(null); setAviso(m); }} />}
+      {aviso && <div className="toast hoy-aviso" role="status" data-testid="mensaje"><Icono nombre="tilde" tam={20} /><span>{aviso}</span></div>}
     </div>
   );
 }
@@ -252,25 +268,39 @@ function useRecienAnuladas(ventas: VentaDelDia[]): Set<string> {
 }
 
 // La hoja de una venta: la hora, el medio y el cliente, sus productos y «Anular» si se puede.
-function HojaDeLaVenta({ venta: v, anula, esHoy, alCerrar }: { venta: VentaDelDia; anula: boolean; esHoy: boolean; alCerrar: () => void }) {
+function HojaDeLaVenta({ venta: v, anula, cambia, esHoy, alCerrar, alCambio, alAviso }: { venta: VentaDelDia; anula: boolean; cambia: boolean; esHoy: boolean; alCerrar: () => void; alCambio: () => void; alAviso: (texto: string) => void }) {
   const [confirmando, setConfirmando] = useState(false);
+  const [correccion, setCorreccion] = useState<Correccion | null>(null);
   const anulada = v.estado === "anulada";
+  const t = TEXTOS.hoy;
+  // Corregir y anular piden el permiso según el día de la venta; el cambio, el de anular las del día, hasta 15 días (decisión 135).
+  const enPlazo = sePuedeCambiar(v.fecha);
   return (
     <Hoja titulo={`Venta de las ${hora(v.fecha)}`} alCerrar={alCerrar} testId="hoja-venta">
-      <p className="hoy-hoja-detalle"><IconoDeMedio medio={v.medio_pago} tam={18} />{NOMBRE_DE_MEDIO[v.medio_pago] ?? v.medio_pago}{v.cliente ? ` · ${v.cliente}` : ""}{esHoy ? "" : " · otro día"}</p>
-      <div className="an-items" data-testid="detalle-venta">
-        {v.items.map((i, n) => (
-          <div key={n} className="an-item">
-            <span className="an-foto">{urlDeFoto(i.foto_url) ? <img src={urlDeFoto(i.foto_url)!} alt="" /> : <Icono nombre="imagen" tam={18} />}</span>
-            <span><b>{cantidad(i.cantidad)} × {i.descripcion}</b><small>{pesosCortos(i.precio_unitario)} c/u</small></span>
-            <span className="an-subtotal">{pesosCortos(subtotal(i))}</span>
-          </div>
-        ))}
-      </div>
-      <div className="hoy-hoja-total"><span>Total</span><b className="importe" style={{ textDecoration: anulada ? "line-through" : undefined }}>{pesosCortos(v.total)}</b></div>
-      {anulada ? <div className="hoy-hoja-anulada"><Icono nombre="prohibido" tam={18} />Anulada. El stock volvió; la venta queda a la vista.</div>
-        : anula && <button type="button" className="boton hoy-anular" onClick={() => setConfirmando(true)} data-testid="anular"><Icono nombre="prohibido" tam={20} />Anular</button>}
-      <button type="button" className="boton tinta" onClick={alCerrar}>Listo</button>
+      <p className="hoy-hoja-detalle"><IconoDeMedio medio={v.medio_pago} tam={18} />{NOMBRE_DE_MEDIO[v.medio_pago] ?? v.medio_pago}{v.cliente ? ` · ${v.cliente}` : ""}{esHoy ? "" : " · otro día"}{(v.correcciones ?? 0) > 0 ? " · corregida" : ""}</p>
+      {/* Los tres verbos de la v2: Corregir · Cambio · Anular (specs/019). */}
+      {!anulada && (anula || cambia) && (
+        <div className="segmentos cc-verbos" role="group" aria-label="Qué hacer con la venta">
+          {anula && <button type="button" className={correccion ? "activo" : ""} aria-pressed={Boolean(correccion)} onClick={() => { pedirClientes(); setCorreccion(correccion ?? empezarCorreccion(v)); }} data-testid="corregir">{t.corregir.corto}</button>}
+          {cambia && <button type="button" disabled={!enPlazo} title={enPlazo ? undefined : t.pasoElPlazo.corto} onClick={() => { setCorreccion(null); alCambio(); }} data-testid="cambio">{t.cambio.corto}</button>}
+          {anula && <button type="button" className="cc-anular" onClick={() => setConfirmando(true)} data-testid="anular">{t.anular.corto}</button>}
+        </div>
+      )}
+      {cambia && !anulada && !enPlazo && <p className="hoy-hoja-detalle" data-testid="paso-el-plazo">{t.pasoElPlazo.corto}</p>}
+      {correccion ? <CorregirEnLaHoja venta={v} c={correccion} alCambiar={setCorreccion} alDescartar={() => setCorreccion(null)} alGuardar={(m) => { setCorreccion(null); alAviso(m); alCerrar(); }} /> : <>
+        <div className="an-items" data-testid="detalle-venta">
+          {v.items.map((i, n) => (
+            <div key={n} className="an-item">
+              <span className="an-foto">{urlDeFoto(i.foto_url) ? <img src={urlDeFoto(i.foto_url)!} alt="" /> : <Icono nombre="imagen" tam={18} />}</span>
+              <span><b>{cantidad(i.cantidad)} × {i.descripcion}</b><small>{pesosCortos(i.precio_unitario)} c/u{Number(i.devuelto ?? 0) > 0 ? ` · volvieron ${cantidad(i.devuelto!)}` : ""}</small></span>
+              <span className="an-subtotal">{pesosCortos(subtotal(i))}</span>
+            </div>
+          ))}
+        </div>
+        <div className="hoy-hoja-total"><span>Total</span><b className="importe" style={{ textDecoration: anulada ? "line-through" : undefined }}>{pesosCortos(v.total)}</b></div>
+        {anulada && <div className="hoy-hoja-anulada"><Icono nombre="prohibido" tam={18} />Anulada. El stock volvió; la venta queda a la vista.</div>}
+        <button type="button" className="boton tinta" onClick={alCerrar}>Listo</button>
+      </>}
       {confirmando && <ConfirmarAnulacion venta={v} alCerrar={() => setConfirmando(false)} alAnular={() => { setConfirmando(false); alCerrar(); }} />}
     </Hoja>
   );

@@ -15,7 +15,24 @@ ventas.forEach((v) => {
   v.items.forEach((i) => { i.id ??= uuid(++renglones); i.producto_id ??= PRODUCTOS[i.descripcion] ?? null; i.devuelto ??= "0"; i.margen_aplicado ??= null; i.foto_url ??= null; });
 });
 
+const plata = (i) => (i.margen_aplicado == null ? Number(i.precio_unitario) * Number(i.cantidad) : Math.ceil((Number(i.precio_unitario) * Number(i.cantidad)) / 1000 - 1e-9) * 1000);
 export default {
+  "GET /ventas/para-cambio": ({ query }) => {
+    const q = String(query?.get?.("q") ?? "").toLowerCase();
+    return ventas.filter((v) => v.estado === "confirmada" && v.items.some((i) => i.descripcion.toLowerCase().includes(q))).map((v) => ({
+      id: v.id, fecha: v.fecha, medio_pago: v.medio_pago, cliente: v.cliente, total: v.total,
+      items: v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, cantidad: i.cantidad, foto_url: null, por_devolver: Number(i.cantidad) - Number(i.devuelto), pagado: plata(i) / Number(i.cantidad) })),
+    }));
+  },
+  "POST /ventas/:id/cambio": ({ params, body }) => {
+    const v = ventas.find((x) => x.id === params.id);
+    if (!v) return [404, { error: "No existe la venta" }];
+    let vuelve = 0;
+    for (const x of body.vuelve) { const i = v.items.find((y) => y.id === x.item_id); vuelve += (plata(i) / Number(i.cantidad)) * x.cantidad; i.devuelto = String(Number(i.devuelto) + x.cantidad); }
+    const lleva = (body.se_lleva ?? []).reduce((s, i) => s + plata(i), 0);
+    const diferencia = lleva - vuelve;
+    return [201, { id: `c-${Date.now()}`, venta_id: v.id, vuelve, se_lleva: lleva, diferencia, resuelto: v.medio_pago === "cuenta_corriente" ? "cuenta_corriente" : diferencia > 0 ? "cobrado" : diferencia < 0 ? "devuelto" : "sin_diferencia" }];
+  },
   "POST /ventas/:id/corregir": ({ params, body }) => {
     const v = ventas.find((x) => x.id === params.id);
     if (!v) return [404, { error: "No existe la venta" }];

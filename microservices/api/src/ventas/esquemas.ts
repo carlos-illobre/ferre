@@ -60,6 +60,30 @@ export const correccionDeVenta = z.object({
   if (v.medio_pago === "cuenta_corriente" && !v.cliente_id) ctx.addIssue({ code: "custom", path: ["cliente_id"], message: "Una venta a cuenta corriente necesita el cliente" });
 });
 
+// POST /ventas/:id/cambio (019, RF-129 y RF-130): lo que vuelve (renglón de la venta, cuánto y si está
+// fallado) y lo que se lleva (renglones como en una venta; sin nada, es una devolución, E18).
+// `medio_diferencia`: con qué se cobra si lo nuevo vale más.
+const vuelveMal = "Marcá qué vuelve: un renglón de la venta y cuánto";
+export const cambioDeVenta = z.object({
+  dispositivo_id: z.string("El dispositivo no es válido").nullable().optional(),
+  medio_diferencia: z.enum(["efectivo", "mercado_pago", "tarjeta"], "La diferencia se cobra en efectivo, Mercado Pago o tarjeta").optional(),
+  vuelve: z.array(z.object({
+    item_id: z.string(vuelveMal).regex(UUID, vuelveMal),
+    cantidad: z.number(vuelveMal).positive(vuelveMal),
+    fallado: z.boolean("Decí si lo que vuelve está fallado"),
+  }), vuelveMal).min(1, vuelveMal),
+  se_lleva: z.array(z.object({
+    producto_id: z.string("El producto no es válido").nullable().optional(),
+    descripcion: z.string(sinDescripcion).trim().min(1, sinDescripcion),
+    cantidad: z.number(cantidad).positive(cantidad),
+    precio_unitario: z.number(precio).min(0, precio),
+    costo_neto: z.number("El costo no es válido").nullable().optional(),
+    margen_aplicado: z.number("El margen no es válido").nullable().optional(),
+    explicacion: z.unknown().optional(),
+    precio_proveedor_id: z.string("El precio del proveedor no es válido").nullable().optional(),
+  }, sinDescripcion)).default([]),
+});
+
 // POST /ventas/:id/anular
 export const anulacionDeVenta = z.object({ motivo: z.string("El motivo es un texto").optional() });
 

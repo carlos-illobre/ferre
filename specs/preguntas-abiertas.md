@@ -69,6 +69,9 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 20. Las ventas cargadas del cuaderno, ¿descuentan stock y cuentan en los totales, o son solo para comparar precios?
 21. El cuaderno no anota el medio de pago y sus precios no son múltiplos de $1.000: ¿se guardan con el precio tal cual, y con qué medio de pago?
 
+**Corregir y cambiar (019)**
+26. Una venta que ya tuvo un cambio o una devolución, ¿se puede anular? Por ahora no (019-E32): lo que volvió ya volvió al stock y la plata de la diferencia ya se movió; lo que queda se devuelve con otro cambio.
+
 **Etapas posteriores**
 22. **RF-24b.** ¿Cuál es el plazo para aceptar una devolución?
 23. **RF-30.** Factura electrónica: ¿se factura cada venta o solo cuando el cliente la pide? ¿Qué tipos de comprobante y con qué CUIT y punto de venta?

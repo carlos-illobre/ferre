@@ -291,7 +291,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         </Hoja>
       )}
       {renglon && <HojaDelRenglon item={renglon} alCerrar={() => setRenglonAbierto(null)} alCambiar={(c) => cambiarItem(renglon.clave, c)} alElegirMargen={(m) => elegirMargen(renglon, m)}
-        alQuitar={() => { setRenglonAbierto(null); quitar(renglon); }} />}
+        alCambiarUnidad={(u) => cambiarUnidad(renglon, u)} alQuitar={() => { setRenglonAbierto(null); quitar(renglon); }} />}
       {cobro && <VentaRegistrada cobro={cobro} veHoy={veHoy} alCerrar={() => { venta.cerrarCobro(); setMensaje(null); }} alVerHoy={() => { venta.cerrarCobro(); setMensaje(null); irA("vender/hoy"); }} />}
     </main>
   );
@@ -463,12 +463,7 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
           <button type="button" className="vm-tacho" onClick={alQuitar} aria-label={`Quitar ${it.descripcion || "este renglón"} de la venta`} data-testid="quitar-renglon"><Icono nombre="tacho" tam={20} /></button>
           {/* La unidad adentro de la cantidad, como en la v2, y siempre a la vista: se toca para cambiarla (decisión 140). */}
           <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} alQuitar={alQuitar}>
-            <label className="vm-u">
-              <span aria-hidden="true" data-testid="unidad-renglon">{abreviarUnidad(it.unidad)}</span>
-              <select value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
-                {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
-              </select>
-            </label>
+            <UnidadDelRenglon unidad={it.unidad} alCambiar={alCambiarUnidad} />
           </Contador>
           {producto && p.costo !== null && (
             <button type="button" className="vm-margen" onClick={alAbrir} aria-label={`Margen: ${it.precioManual !== null ? "a mano" : `${p.margen} %`}`} data-testid="margen">
@@ -495,9 +490,21 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
   );
 }
 
+// La unidad adentro de la cantidad, que se toca para elegir otra (decisión 140): en el renglón y en su hoja.
+function UnidadDelRenglon({ unidad, alCambiar, testId = "unidad" }: { unidad: Unidad; alCambiar: (u: Unidad) => void; testId?: string }) {
+  return (
+    <label className="vm-u">
+      <span aria-hidden="true" data-testid={`${testId}-renglon`}>{abreviarUnidad(unidad)}</span>
+      <select value={unidad} onChange={(e) => alCambiar(e.target.value as Unidad)} aria-label="Unidad" data-testid={testId}>
+        {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
+      </select>
+    </label>
+  );
+}
+
 // La hoja de un renglón: el margen (cada uno con su precio), el precio a mano, la cantidad y
 // «Quitar de la venta».
-function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuitar }: { item: Item; alCerrar: () => void; alCambiar: (c: Partial<Item>) => void; alElegirMargen: (m: number) => void; alQuitar: () => void }) {
+function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alCambiarUnidad, alQuitar }: { item: Item; alCerrar: () => void; alCambiar: (c: Partial<Item>) => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alQuitar: () => void }) {
   const p = precioDe(it);
   const renglon = subtotalDe(it);
   const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
@@ -517,7 +524,9 @@ function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuita
         <span className="vm-precio-mano"><span>$</span><input inputMode="numeric" placeholder="a mano" value={it.precioManual ?? ""} onChange={precioAMano} data-testid="precio-manual" /></span>
       </label>
       <div className="vm-fila-cantidad"><span>Cantidad</span>
-        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} testId="cantidad-hoja" />
+        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} testId="cantidad-hoja">
+          <UnidadDelRenglon unidad={it.unidad} alCambiar={alCambiarUnidad} testId="unidad-hoja" />
+        </Contador>
         <b className="importe">{renglon ? pesosCortos(renglon.valor) : ""}</b>
       </div>
       <button type="button" className="boton vm-quitar vm-ancho" onClick={alQuitar} data-testid="quitar"><Icono nombre="tacho" tam={20} />Quitar de la venta</button>
@@ -527,7 +536,7 @@ function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuita
 }
 
 // Elegir el cliente: con cualquier medio es opcional; con cuenta corriente, obligatorio.
-function ElegirCliente({ clientes, elegido, alElegir }: { clientes: { id: string; nombre: string; deuda: string | number }[]; elegido: string; alElegir: (id: string) => void }) {
+export function ElegirCliente({ clientes, elegido, alElegir }: { clientes: { id: string; nombre: string; deuda: string | number }[]; elegido: string; alElegir: (id: string) => void }) {
   const [texto, setTexto] = useState("");
   const buscado = texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
   const lista = clientes.filter((c) => c.nombre.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().includes(buscado));

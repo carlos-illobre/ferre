@@ -122,6 +122,7 @@ coinciden con lo cobrado y lo devuelto.
 - **E29** Un precio puesto a mano al corregir se respeta tal cual, como en la venta (RF-19).
 - **E31** Un pedido de corrección o de cambio que manda un total o una diferencia que no coincide con sus renglones: el servidor hace la cuenta de nuevo con los renglones, usa la suya y lo que guarda es lo que corresponde.
 - **E30** El producto que vuelve ya no está en el catálogo (se absorbió o se dio de baja): se acepta igual al precio pagado; si no está fallado vuelve al stock del producto que lo reemplazó, si hay uno.
+- **E32** Una venta que ya tuvo un cambio o una devolución no se anula: lo que volvió ya volvió al stock y la diferencia ya se movió; lo que queda se devuelve con otro cambio. (Supuesto del agente, 2026-10-20, a confirmar con Carlos.)
 
 ## Requirements *(mandatory)*
 

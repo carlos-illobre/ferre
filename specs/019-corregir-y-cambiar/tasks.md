@@ -20,13 +20,13 @@ Cada tarea se nombra con su carpeta (019-T003) y va en el commit. Las dependenci
 
 - [x] T005 [US1] Servidor: `POST /ventas/:id/corregir` con el permiso según el día de la venta, la versión, la foto de antes y después, el stock por la diferencia, el movimiento de dinero o la deuda, y el evento en Actividad; 403, 409 (anulada, versión vieja, sin renglones) y la cuenta rehecha en el servidor (RF-126 a RF-128; E01 a E10, E22, E24, E25, E27 a E29, E31) (depende de T003)
 - [x] T006 [US1] Computadora: «Ventas de hoy» como la v2 (el día arriba, la lista con filtros y la venta elegida a la derecha con «Corregir» E, «Cambio» C y «Anular»); el modo corregir en el panel, con lo anterior tachado, la diferencia y «Guardar corrección» (Ctrl+Enter) / «Descartar» (Esc) (RF-132; E01 a E10). «Cambio» (C) y «Registrar un cambio» se suman con T009 (depende de T004, T005)
-- [ ] T007 [US1] Celular: en la hoja de la venta de la v2, «Corregir» con los − + y el precio editables, lo viejo tachado y el botón que dice cómo queda (RF-132; E01 a E10) (depende de T004, T005)
+- [x] T007 [US1] Celular: en la hoja de la venta de la v2, «Corregir» con los − + y el precio editables, lo viejo tachado y el botón que dice cómo queda (RF-132; E01 a E10) (depende de T004, T005)
 
 ### Historia 2 · Cambio (P1)
 
-- [ ] T008 [US2] Servidor: `GET /ventas/para-cambio` (15 días, por producto, de a 20) y `POST /ventas/:id/cambio` con el permiso de anular del día, lo que queda por devolver, el precio pagado, lo fallado como anomalía, el stock, el movimiento de dinero o la deuda y el evento (RF-129, RF-130; E11 a E18, E23, E24, E26, E30, E31) (depende de T003)
+- [x] T008 [US2] Servidor: `GET /ventas/para-cambio` (15 días, por producto, de a 20) y `POST /ventas/:id/cambio` con el permiso de anular del día, lo que queda por devolver, el precio pagado, lo fallado como anomalía, el stock, el movimiento de dinero o la deuda y el evento (RF-129, RF-130; E11 a E18, E23, E24, E26, E30, E31) (depende de T003)
 - [ ] T009 [US2] Computadora: «Registrar un cambio» (Alt+C) y «Cambio» (C): buscar la venta por producto, marcar lo que vuelve y si está fallado, agregar lo que se lleva como en Vender, ver la diferencia y cobrarla o devolverla, con la cuenta del cambio en el negocio de ventas (RF-130, RF-132; E11 a E18) (depende de T004, T006, T008)
-- [ ] T010 [US2] Celular: «Cambio» desde la hoja de la venta y «Registrar un cambio», con el mismo recorrido (RF-132; E11 a E18) (depende de T004, T007, T008)
+- [x] T010 [US2] Celular: «Cambio» desde la hoja de la venta y «Registrar un cambio», con el mismo recorrido (RF-132; E11 a E18) (depende de T004, T007, T008)
 
 ### Historia 3 · Ver lo corregido y lo cambiado (P2)
 

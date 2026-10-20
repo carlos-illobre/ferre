@@ -4,7 +4,7 @@ import { stack } from "../comun/stack";
 import { deslizarParaCobrar, buscarEnVender } from "../comun/cobrar";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("celular");
+const { API, psql } = stack("celular");
 
 // Happy path "buscar un producto y registrar una venta" (issue #15): el empleado busca,
 // agrega con Enter, cambia la cantidad, elige cómo paga y cobra. La venta queda con el
@@ -17,6 +17,8 @@ const ID_MECHA = "00000000-0000-0000-0000-00000000e2e6";
 const ID_TORNILLO = "00000000-0000-0000-0000-00000000e2e7";
 
 test.beforeAll(() => {
+  // Los cambios de una corrida anterior (019): su plata, sus renglones y ellos, antes que los renglones de la venta.
+  psql(`WITH c AS (SELECT DISTINCT cambio_id FROM cambio_renglon WHERE producto_id IN ('${ID_MECHA}', '${ID_TORNILLO}')), m AS (DELETE FROM movimiento_dinero WHERE cambio_id IN (SELECT cambio_id FROM c)), r AS (DELETE FROM cambio_renglon WHERE cambio_id IN (SELECT cambio_id FROM c)) DELETE FROM cambio WHERE id IN (SELECT cambio_id FROM c)`);
   psql(`DELETE FROM anomalia WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   // La prueba del atajo abre «Vincular el celular», que deja un código pedido por esa sesión: se borra antes que ella.
   psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
@@ -138,4 +140,34 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.getByRole("button", { name: "No llevó" }).click();
   await expect(page.getByTestId("mensaje")).toContainText("Anotado como «No llevó»");
   await expect.poll(() => psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_MECHA}'`)).toBe("1");
+});
+
+// 019-E12 019-E18: una devolución desde «Ventas del día»: se vende una mecha, se abre la venta, «Cambio»,
+// vuelve la mecha (no fallada) y no se lleva nada: se devuelve en efectivo y la mecha vuelve al stock.
+test("devolver un producto desde la hoja de la venta", async ({ page }) => {
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.goto("/#/vender");
+  const antes = Number(psql(`SELECT COALESCE(sum(cantidad), 0) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`));
+  await (await buscarEnVender(page, "e2e mecha vender")).press("Enter");
+  await expect(page.getByTestId("item")).toHaveCount(1);
+  await deslizarParaCobrar(page);
+  await page.getByTestId("cerrar-exito").click();
+  await expect.poll(() => Number(psql(`SELECT COALESCE(sum(cantidad), 0) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`))).toBe(antes - 1);
+
+  // 019-E11: la venta aparece al buscar el producto entre las de los últimos 15 días.
+  const halladas = await page.request.get(`${API}/ventas/para-cambio?q=${encodeURIComponent("mécha vender")}`, { headers: { Authorization: `Bearer ${TOKEN}` } });
+  expect(halladas.status()).toBe(200);
+  expect(JSON.stringify(await halladas.json())).toContain("MECHA VENDER");
+
+  await page.getByRole("tab", { name: "Ventas del día" }).click();
+  await page.getByTestId("ventas-de-hoy").getByTestId("venta-dia").first().getByRole("button").click();
+  await page.getByTestId("hoja-venta").getByTestId("cambio").click();
+  const cambio = page.getByTestId("hoja-cambio");
+  await cambio.getByTestId("marcar-vuelve").first().click();
+  await expect(cambio.getByTestId("confirmar-cambio")).toHaveText(/Devolver \$3\.000/);
+  await cambio.getByTestId("confirmar-cambio").click();
+  await expect(page.getByTestId("mensaje")).toContainText("Devolución registrada");
+  await expect.poll(() => psql(`SELECT count(*) FROM cambio_renglon WHERE producto_id = '${ID_MECHA}' AND lado = 'vuelve'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT importe FROM movimiento_dinero m JOIN cambio_renglon r ON r.cambio_id = m.cambio_id WHERE r.producto_id = '${ID_MECHA}'`)).toBe("-3000.00");
+  await expect.poll(() => Number(psql(`SELECT COALESCE(sum(cantidad), 0) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`))).toBe(antes);
 });

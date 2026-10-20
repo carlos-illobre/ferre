@@ -1428,8 +1428,9 @@ RF-125:
   defectos: []
 
 RF-126:
-  estado: "Hecho en parte: corregir en la computadora y en el servidor (019-T005, T006); falta el celular (T007)"
+  estado: "Hecho en parte: corregir en la computadora, en el celular y en el servidor (019-T005 a T007); falta mostrar lo de antes en la venta guardada (T011)"
   pruebas:
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
     - microservices/web/src/negocio/ventas/correccion.test.ts
     - microservices/api/src/rutas/ventas-corregir.test.ts
@@ -1437,8 +1438,9 @@ RF-126:
   defectos: []
 
 RF-127:
-  estado: "Hecho en parte: la diferencia y cómo se resuelve en la computadora y en el servidor (019-T004 a T006); falta el celular (T007)"
+  estado: "Hecho: la diferencia y cómo se resuelve, en las dos interfaces y en el servidor (019-T004 a T007)"
   pruebas:
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
     - microservices/web/src/negocio/ventas/correccion.test.ts
     - microservices/api/src/rutas/ventas-corregir.test.ts
@@ -1453,13 +1455,20 @@ RF-128:
   defectos: []
 
 RF-129:
-  estado: "Nuevo (019, especificación aprobada)"
-  pruebas: []
+  estado: "Hecho en parte: el cambio y la devolución en el servidor y en el celular (019-T008, T010); falta la computadora (T009)"
+  pruebas:
+    - microservices/api/src/rutas/ventas-cambio.test.ts
+    - microservices/web/src/negocio/ventas/cambio.test.ts
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
+    - tests/e2e/celular/04-vender.spec.ts
   defectos: []
 
 RF-130:
-  estado: "Nuevo (019, especificación aprobada)"
-  pruebas: []
+  estado: "Hecho en parte: la diferencia del cambio se cobra, se devuelve o cambia la deuda, en el servidor y en el celular (019-T008, T010); falta la computadora (T009)"
+  pruebas:
+    - microservices/api/src/rutas/ventas-cambio.test.ts
+    - microservices/web/src/negocio/ventas/cambio.test.ts
+    - tests/e2e/celular/04-vender.spec.ts
   defectos: []
 
 RF-131:
@@ -1468,8 +1477,9 @@ RF-131:
   defectos: []
 
 RF-132:
-  estado: "Hecho en parte: «Ventas de hoy» en la computadora como la v2, con «Corregir» y «Anular» (019-T006); faltan «Cambio» y «Registrar un cambio» (T009) y el celular (T007, T010)"
+  estado: "Hecho en parte: en la computadora «Ventas del día» como la v2 con Corregir y Anular (019-T006); en el celular la hoja con Corregir · Cambio · Anular y «Cambio» arriba de la lista (T007, T010); falta el cambio en la computadora (T009)"
   pruebas:
+    - microservices/web/src/pantallas/celular/pantallas/Hoy.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []

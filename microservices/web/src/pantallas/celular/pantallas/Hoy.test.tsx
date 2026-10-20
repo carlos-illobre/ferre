@@ -28,7 +28,7 @@ beforeEach(() => {
   vi.useFakeTimers({ now: new Date("2026-10-17T12:00:00"), toFake: ["Date"] });
   consultas.clear(); apiFalsa.mockReset(); conPermisos("ventas.ver");
   dias = { "2026-10-17": HOY, "2026-10-16": AYER, "2026-10-15": [venta("j1", a("2026-10-15", 10), "tarjeta", 30000, [renglon("w", "1", 30000)])], "2026-10-14": [] };
-  apiFalsa.mockImplementation(async (ruta: string) => { const d = ruta.match(/dia=(.*)$/)?.[1] ?? "2026-10-17"; return dia(d, dias[d] ?? []); });
+  apiFalsa.mockImplementation(async (ruta: string) => { if (ruta === "/clientes") return []; const d = ruta.match(/dia=(.*)$/)?.[1] ?? "2026-10-17"; return dia(d, dias[d] ?? []); });
 });
 afterEach(() => { vi.useRealTimers(); });
 const abrir = async () => { render(<VentasDeHoy />); await screen.findByTestId("total-de-hoy"); await screen.findByTestId("comparacion"); };
@@ -237,5 +237,71 @@ describe("«Hoy» · celular", () => {
     render(<VentasDeHoy />);
     expect((await screen.findByText("No tenés permiso para esto")).textContent).toBeTruthy();
     expect(screen.queryByTestId("resumen-hoy")).toBeNull();
+  });
+});
+
+describe("corregir y cambio en el celular (019, T007 y T010)", () => {
+  // Los renglones con su id y lo que ya volvió, como los manda el servidor.
+  const conIds = () => HOY.forEach((v: any) => v.items.forEach((i: any, n: number) => { i.id ??= `${v.id}-${n}`; i.producto_id ??= `p-${v.id}-${n}`; i.devuelto ??= "0"; v.version ??= v.fecha; }));
+  const abrirVenta = async (n: number) => {
+    conIds();
+    render(<VentasDeHoy anulaHoy />);
+    await screen.findByTestId("total-de-hoy");
+    fireEvent.click(within(screen.getAllByTestId("venta-dia")[n]!).getByRole("button"));
+    return screen.getByTestId("hoja-venta");
+  };
+
+  it("019-E01 019-E02 019-E03: la hoja de la venta tiene Corregir · Cambio · Anular; corregir una más dice la diferencia y se cobra con el medio elegido", async () => {
+    const hoja = await abrirVenta(3); // la de efectivo: 2 mechas y 2 cintas
+    expect(within(hoja).getAllByRole("button").map((b) => b.textContent).filter((x) => ["Corregir", "Cambio", "Anular"].includes(x!))).toEqual(["Corregir", "Cambio", "Anular"]);
+    fireEvent.click(within(hoja).getByTestId("corregir"));
+    fireEvent.click(within(hoja).getAllByTestId("mas")[0]!);
+    expect(within(hoja).getByTestId("total-corregido").textContent).toBe("$16.000");
+    expect(within(hoja).getByTestId("diferencia").textContent).toBe("+$4.000");
+    fireEvent.click(within(hoja).getByTestId("dif-tarjeta"));
+    apiFalsa.mockResolvedValueOnce({ id: "v1", total: 16000, diferencia: 4000, resuelta: "cobrada", version: "x" });
+    fireEvent.click(within(hoja).getByTestId("guardar-correccion"));
+    await waitFor(() => expect(screen.getByTestId("mensaje").textContent).toBe("Corrección guardada · +$4.000"));
+    const cuerpo = JSON.parse(String(apiFalsa.mock.calls.find((c) => String(c[0]).endsWith("/corregir"))![1].body));
+    expect(cuerpo).toMatchObject({ medio_pago: "efectivo", medio_diferencia: "tarjeta", items: [{ cantidad: 3 }, { cantidad: 2 }] });
+  });
+
+  it("019-E12 019-E13 019-E18: «Cambio» desde la venta: lo que vuelve al precio pagado, fallado; sin nada que se lleve es una devolución", async () => {
+    const hoja = await abrirVenta(3);
+    fireEvent.click(within(hoja).getByTestId("cambio"));
+    const cambio = screen.getByTestId("hoja-cambio");
+    fireEvent.click(within(cambio).getAllByTestId("marcar-vuelve")[0]!);
+    fireEvent.click(within(cambio).getByTestId("fallado"));
+    expect(within(cambio).getByTestId("diferencia-cambio").textContent).toContain("$4.000");
+    expect(within(cambio).getByTestId("confirmar-cambio").textContent).toBe("Devolver $4.000");
+    apiFalsa.mockResolvedValueOnce({ id: "c1", venta_id: "v1", vuelve: 4000, se_lleva: 0, diferencia: -4000, resuelto: "devuelto" });
+    fireEvent.click(within(cambio).getByTestId("confirmar-cambio"));
+    await waitFor(() => expect(screen.getByTestId("mensaje").textContent).toBe("Devolución registrada · $4.000 devueltos"));
+    const llamada = apiFalsa.mock.calls.find((c) => String(c[0]).endsWith("/cambio"))!;
+    expect(llamada[0]).toBe("/ventas/v1/cambio");
+    expect(JSON.parse(String(llamada[1].body))).toEqual({ vuelve: [{ item_id: "v1-0", cantidad: 1, fallado: true }], se_lleva: [] });
+  });
+
+  it("019-E11: «Cambio» arriba de la lista busca la venta por el producto que vuelve", async () => {
+    conIds();
+    render(<VentasDeHoy anulaHoy />);
+    await screen.findByTestId("total-de-hoy");
+    apiFalsa.mockImplementation(async (ruta: string) => ruta.startsWith("/ventas/para-cambio")
+      ? [{ id: "v2", fecha: a("2026-10-17", 10, 40), medio_pago: "mercado_pago", cliente: null, total: "223000", items: [{ id: "v2-0", producto_id: "p", descripcion: "Taladro inalámbrico 18 V", cantidad: "1", foto_url: null, por_devolver: 1, pagado: 223000 }] }]
+      : dia("2026-10-17", HOY));
+    fireEvent.click(screen.getByTestId("registrar-cambio"));
+    fireEvent.change(screen.getByTestId("buscar-venta-cambio"), { target: { value: "taladro" } });
+    fireEvent.click(await screen.findByTestId("venta-para-cambio"));
+    expect(within(screen.getByTestId("hoja-cambio")).getByTestId("renglon-que-vuelve").textContent).toContain("Se pagó $223.000 c/u");
+  });
+
+  it("019-E24: sin permiso no hay Corregir ni Cambio", async () => {
+    conIds();
+    render(<VentasDeHoy />);
+    await screen.findByTestId("total-de-hoy");
+    expect(screen.queryByTestId("registrar-cambio")).toBeNull();
+    fireEvent.click(within(screen.getAllByTestId("venta-dia")[0]!).getByRole("button"));
+    expect(screen.queryByTestId("corregir")).toBeNull();
+    expect(screen.queryByTestId("cambio")).toBeNull();
   });
 });

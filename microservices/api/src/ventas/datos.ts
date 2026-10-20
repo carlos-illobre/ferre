@@ -145,3 +145,34 @@ export const anotarDevueltoFallado = (e: Ejecutor, a: { producto_id: string; usu
 
 export const insertarMovimientoDeDinero = (e: Ejecutor, m: { tipo: "cobro_diferencia" | "devolucion"; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; cliente_id: string | null; importe: number; venta_id: string; correccion_id?: string; cambio_id?: string; usuario_id: string }) =>
   e.insertInto("movimiento_dinero").values({ id: randomUUID(), fecha: sql<Date>`now()`, ...m, importe: m.importe.toFixed(2), correccion_id: m.correccion_id ?? null, cambio_id: m.cambio_id ?? null }).execute();
+
+// Las ventas de los últimos 15 días con un producto que coincide con lo buscado (019, E11): sin
+// distinguir mayúsculas ni tildes, las más nuevas primero, de a 20.
+const sinTildes = (x: unknown) => sql<string>`translate(lower(${x}), 'áéíóúüñ', 'aeiouun')`;
+export function ventasParaCambio(e: Ejecutor, buscado: string, dias: number) {
+  const patron = `%${buscado.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}%`;
+  return e.selectFrom("venta as v")
+    .leftJoin("cliente as cl", "cl.id", "v.cliente_id")
+    .innerJoin("item_venta as i", (j) => j.onRef("i.venta_id", "=", "v.id").on("i.quitado_por", "is", null))
+    .leftJoin("producto as p", "p.id", "i.producto_id")
+    .select(["v.id", "v.fecha", "v.medio_pago", "v.total", "cl.nombre as cliente"])
+    .select(sql<{ id: string; producto_id: string | null; descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: number | null; devuelto: string; foto_url: string | null }[]>`json_agg(json_build_object('id', i.id, 'producto_id', i.producto_id, 'descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'devuelto', i.devuelto, 'foto_url', p.foto_url) ORDER BY i.orden)`.as("items"))
+    .where("v.estado", "=", "confirmada")
+    .where("v.fecha", ">=", sql<Date>`now() - make_interval(days => ${dias})`)
+    .where((w) => w.exists(w.selectFrom("item_venta as b").select("b.id").whereRef("b.venta_id", "=", "v.id").where("b.quitado_por", "is", null)
+      .where(sinTildes(sql.ref("b.descripcion")), "like", patron)))
+    .groupBy(["v.id", "cl.nombre"])
+    .orderBy("v.fecha", "desc").limit(20).execute();
+}
+
+export const insertarCambio = (e: Ejecutor, c: { id: string; venta_id: string; usuario_id: string; dispositivo_id: string | null; diferencia: number; resuelto: "cobrado" | "devuelto" | "cuenta_corriente" | "sin_diferencia" }) =>
+  e.insertInto("cambio").values({ ...c, fecha: sql<Date>`now()`, diferencia: c.diferencia.toFixed(2) }).execute();
+
+export const insertarRenglonDeCambio = (e: Ejecutor, r: { cambio_id: string; lado: "vuelve" | "se_lleva"; item_venta_id: string | null; producto_id: string | null; descripcion: string; cantidad: number; precio_unitario: number; margen_aplicado: number | null; fallado: boolean }) =>
+  e.insertInto("cambio_renglon").values({ id: randomUUID(), ...r, precio_unitario: r.precio_unitario.toFixed(2) }).execute();
+
+export const sumarDevuelto = (e: Ejecutor, itemId: string, cantidad: number) =>
+  e.updateTable("item_venta").set({ devuelto: sql`devuelto + ${cantidad}` }).where("id", "=", itemId).execute();
+
+export const tieneCambios = async (e: Ejecutor, ventaId: string): Promise<boolean> =>
+  Boolean(await e.selectFrom("cambio").select("id").where("venta_id", "=", ventaId).executeTakeFirst());

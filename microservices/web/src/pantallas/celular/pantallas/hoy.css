@@ -105,3 +105,76 @@
 .hoy-dia-calendario { margin-top: 4px; border-top: 1px solid #E6E2D8; border-radius: 0; }
 .hoy-fecha b small { display: inline; }
 .hoy-buscar-fila .hoy-listo { color: #545955; }
+
+/* Corregir y cambio en el celular (specs/019), como la v2. */
+.hoy-acciones { display: flex; gap: 8px; }
+.cc-verbos button[data-testid="anular"], .cc-verbos .cc-anular { color: #AE281D; }
+.cc-verbos button:disabled { opacity: .45; }
+.cc-corregir { display: flex; flex-direction: column; gap: 10px; }
+.cc-renglon { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid #E6E2D8; background: none; text-align: left; color: #1A1D1B; font: inherit; }
+.cc-renglon.quitado { opacity: .7; }
+.cc-renglon.quitado s { color: #6B706B; }
+.cc-foto { width: 44px; height: 44px; border-radius: 10px; background: #ECE9E1; display: grid; place-items: center; overflow: hidden; color: #545955; align-self: start; }
+.cc-foto img { width: 100%; height: 100%; object-fit: cover; }
+.cc-nom { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cc-nom > b, .cc-nom > s { font-size: 15px; font-weight: 700; line-height: 20px; }
+.cc-nom > small { font-size: 14px; color: #545955; }
+.cc-ed { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.cc-sub { display: flex; flex-direction: column; align-items: flex-end; font-size: 16px; font-weight: 800; align-self: start; padding-top: 2px; }
+.cc-viejo { position: relative; color: #6B706B; font-size: 14px; font-weight: 600; text-decoration: none; }
+.cc-viejo::after { content: ""; position: absolute; left: -1px; right: -1px; top: 52%; height: 2px; border-radius: 2px; background: #D7372A; transform-origin: left center; animation: hoy-raya 240ms cubic-bezier(.2, .8, .2, 1) both; }
+.cc-cantidad { height: 40px; }
+.cc-cantidad button { width: 36px; }
+.cc-fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cc-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 6px; border-top: 1px solid #CEC8BA; font-size: 15px; color: #545955; }
+.cc-total > span:last-child { display: flex; align-items: baseline; gap: 8px; }
+.cc-total b { font-size: 26px; color: #1A1D1B; }
+.cc-resuelve { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 15px; font-weight: 650; color: #545955; }
+.cc-resuelve b { color: #1A1D1B; }
+.cc-botones { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.boton.cc-principal { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 52px; background: #E8541C; border-color: #E8541C; color: #fff; font-weight: 800; }
+.boton.cc-principal:disabled { opacity: .5; }
+.cc-dif { padding: 2px 10px; border-radius: 99px; background: rgb(255 255 255 / .2); }
+.cc-titulo { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 14px; font-weight: 700; color: #545955; }
+.cc-titulo .enlace { margin-left: auto; min-height: 32px; font-size: 14px; font-weight: 700; color: #545955; background: none; border: 0; }
+.cc-vuelve { grid-template-columns: 32px 44px minmax(0, 1fr) auto; }
+.cc-vuelve.elegido { background: #F8F7F3; }
+.cc-marca { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid #CEC8BA; background: #fff; display: grid; place-items: center; color: #fff; align-self: start; margin-top: 8px; }
+.cc-vuelve.elegido .cc-marca { background: #12382F; border-color: #12382F; }
+.cc-fallado { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid #CEC8BA; font-size: 14px; font-weight: 650; color: #1A1D1B; }
+.cc-fallado:has(input:checked) { border-color: #D7372A; background: #FCEAE7; color: #AE281D; }
+.cc-fallado input { width: 18px; height: 18px; accent-color: #D7372A; }
+.cc-sumar { display: flex; flex-direction: column; gap: 6px; }
+.cc-hallado:disabled { opacity: .5; }
+.cc-venta { grid-template-columns: 40px minmax(0, 1fr) auto; }
+.cc-difer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 10px; border-top: 1px solid #CEC8BA; }
+.cc-difer > div:first-child { display: flex; flex-direction: column; }
+.cc-difer small { font-size: 14px; font-weight: 650; color: #545955; }
+.cc-difer b { font-size: 28px; font-weight: 800; color: #1A1D1B; }
+.hoy-aviso { position: fixed; left: 16px; right: 16px; bottom: calc(var(--alto-nav, 64px) + 16px); z-index: 60; }
+@media (prefers-reduced-motion: reduce) { .cc-viejo::after { animation: none; } }
+/* Los controles de corregir y del cambio, con los estilos de «Mostrador» (los mismos que en la computadora). */
+.hoy-hoja-cc, .cc-corregir, .hoja { --cc-borde: #CEC8BA; }
+.cc-ed .vhc-cantidad { display: inline-flex; align-items: center; height: 40px; border: 1px solid #CEC8BA; border-radius: 12px; background: #fff; overflow: hidden; }
+.cc-ed .vhc-cantidad button { width: 38px; height: 100%; border: 0; background: transparent; display: grid; place-items: center; color: #545955; }
+.cc-ed .vhc-cantidad button:disabled { opacity: .35; }
+.cc-ed .vhc-cantidad .n { min-width: 34px; text-align: center; font-weight: 800; font-size: 16px; color: #1A1D1B; }
+.cc-ed .vhc-precio { display: inline-flex; align-items: center; height: 40px; padding: 0 10px; border-radius: 12px; border: 1px solid #CEC8BA; background: #fff; font: inherit; font-weight: 750; font-size: 15px; color: #1A1D1B; }
+.cc-ed .vhc-precio.cambio, .cc-ed .vhc-precio.editando, .cc-ed .vhc-cantidad:has(+ *) { }
+.cc-ed .vhc-precio.cambio, .cc-ed .vhc-precio.editando { border: 1.5px solid #12382F; box-shadow: 0 0 0 3px rgba(18, 56, 47, .10); }
+.cc-ed .vhc-precio input { width: 8ch; border: 0; outline: 0; background: transparent; font: inherit; font-weight: 800; padding: 0; }
+.cc-ed .vhc-tacho { margin-left: auto; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 12px; background: transparent; color: #6B706B; }
+.cc-ed .vhc-tacho:disabled { opacity: .35; }
+.cc-corregir .vhc-agregar { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border: 1px dashed #CEC8BA; border-radius: 12px; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: #17614E; }
+.cc-sumar .hoy-buscar-caja { height: 48px; }
+/* Al corregir, en lo que vuelve y en lo que se lleva: el nombre, el detalle y, debajo, los controles a
+   todo el ancho (no empujan el subtotal). */
+.hoja .cc-renglon:has(.cc-ed), .hoja .cc-renglon.cc-vuelve { grid-template-areas: "foto nom sub" "foto det sub" "foto ed ed"; row-gap: 2px; }
+.hoja .cc-renglon.cc-vuelve { grid-template-columns: 32px 44px minmax(0, 1fr) auto; grid-template-areas: "marca foto nom sub" "marca foto det sub" "marca foto ed ed"; }
+.hoja .cc-renglon:has(.cc-ed) > .cc-nom, .hoja .cc-renglon.cc-vuelve > .cc-nom { display: contents; }
+.hoja .cc-renglon > .cc-foto { grid-area: foto; }
+.hoja .cc-renglon > .cc-marca { grid-area: marca; }
+.hoja .cc-renglon > .cc-nom > b { grid-area: nom; }
+.hoja .cc-renglon > .cc-nom > small { grid-area: det; }
+.hoja .cc-renglon > .cc-sub { grid-area: sub; }
+.hoja .cc-renglon .cc-ed { grid-area: ed; margin-top: 4px; flex-wrap: nowrap; }

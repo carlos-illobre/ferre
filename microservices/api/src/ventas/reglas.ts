@@ -5,8 +5,8 @@ import { subtotalDeRenglon } from "../precios.js";
 import type { VentaDelDia, VentasDelDia } from "../contratos/ventas.js";
 import * as datos from "./datos.js";
 import type { z } from "zod";
-import type { Consulta, VentaRegistrada } from "../contratos/ventas.js";
-import type { consultaNueva, correccionDeVenta, ventaNueva } from "./esquemas.js";
+import type { CambioRegistrado, Consulta, VentaParaCambio, VentaRegistrada } from "../contratos/ventas.js";
+import type { cambioDeVenta, consultaNueva, correccionDeVenta, ventaNueva } from "./esquemas.js";
 import type { Ejecutor } from "../base.js";
 import type { Enviable } from "../enviable.js";
 
@@ -74,9 +74,12 @@ export async function delDia(dia: string | null): Promise<VentasDelDia> {
 // Anular: la venta queda marcada (no se borra) y vuelve al stock lo que descontó de verdad.
 // Las de hoy las anula quien puede anular ventas del día; las de otro día, solo quien puede
 // anular las de cualquier día (decisión 53).
-export async function anular(id: string, motivo: string | undefined, usuarioId: string, cualquierDia: boolean): Promise<"anulada" | "no-es-de-hoy" | "no-se-puede"> {
+// Una venta que ya tuvo un cambio o una devolución no se anula (019): lo que volvió ya volvió al stock
+// y la plata de la diferencia ya se movió; lo que queda se devuelve con otro cambio.
+export async function anular(id: string, motivo: string | undefined, usuarioId: string, cualquierDia: boolean): Promise<"anulada" | "no-es-de-hoy" | "no-se-puede" | "tiene-cambios"> {
   return base.transaction().execute(async (trx) => {
     if (!cualquierDia && (await datos.esDeHoy(trx, id)) === false) return "no-es-de-hoy";
+    if (await datos.tieneCambios(trx, id)) return "tiene-cambios";
     if (!(await datos.marcarAnulada(trx, id))) return "no-se-puede";
     await datos.devolverStock(trx, id);
     await anotarEvento(trx, { tipo: "venta.anulada", usuarioId, contenido: { id, motivo: motivo?.trim() || null } });
@@ -187,5 +190,80 @@ export async function corregir(id: string, c: CorreccionEntrada, usuarioId: stri
     await anotarEvento(trx, { tipo: "venta.corregida", usuarioId, dispositivoId: c.dispositivo_id ?? null, contenido: { id, correccion: correccionId, antes, despues, diferencia, resuelta, medio_diferencia: resuelta === "cobrada" ? c.medio_diferencia ?? "efectivo" : null } });
     const ahora = await datos.ventaParaCorregir(trx, id);
     return { id, total, diferencia, resuelta, version: new Date(ahora!.modificado_en).toISOString() };
+  });
+}
+
+// --- Cambio de producto (019, RF-129 y RF-130, ADR-024) ---
+
+export type CambioEntrada = z.output<typeof cambioDeVenta>;
+export type Cambiado = CambioRegistrado;
+export type NoSeCambia = "no-existe" | "anulada" | "vencida" | "devuelve-de-mas";
+// Un cambio se acepta hasta 15 días después de la venta (decisión 135).
+export const DIAS_PARA_CAMBIAR = 15;
+
+// Las ventas con un producto que coincide, para encontrar la original (E11). Cada renglón dice
+// cuánto queda por devolver y el precio por unidad que se pagó (el del renglón como se cobró).
+export async function paraCambio(buscado: string): Promise<VentaParaCambio[]> {
+  if (buscado.trim().length < 2) return [];
+  const filas = await datos.ventasParaCambio(base, buscado.trim(), DIAS_PARA_CAMBIAR);
+  return filas.map((v) => ({
+    id: v.id, fecha: new Date(v.fecha).toISOString(), medio_pago: v.medio_pago, cliente: v.cliente, total: v.total,
+    items: v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, cantidad: i.cantidad, foto_url: i.foto_url,
+      por_devolver: Math.round((Number(i.cantidad) - Number(i.devuelto)) * 1000) / 1000, pagado: pagadoPorUnidad(i) })),
+  }));
+}
+// Lo que se pagó por unidad: el subtotal como se cobró (con su redondeo) dividido la cantidad.
+const pagadoPorUnidad = (i: { cantidad: string | number; precio_unitario: string | number; margen_aplicado: number | string | null }) =>
+  Math.round((subtotalDeRenglon({ precioUnitario: Number(i.precio_unitario), cantidad: Number(i.cantidad), aMano: i.margen_aplicado == null }).valor / Number(i.cantidad)) * 100) / 100;
+
+// Registra un cambio: lo que vuelve (al precio que se pagó; fallado no vuelve al stock y queda
+// anotado), lo que se lleva (sale del stock como en una venta) y la diferencia: se cobra con el
+// medio elegido, se devuelve en efectivo o, si la venta fue a cuenta corriente, cambia la deuda.
+// Sin nada que se lleve es una devolución (E18). La venta original no cambia: queda unida al cambio.
+export async function cambiar(id: string, c: CambioEntrada, usuarioId: string): Promise<Cambiado | NoSeCambia> {
+  return base.transaction().execute(async (trx) => {
+    const venta = await datos.ventaParaCorregir(trx, id);
+    if (!venta) return "no-existe";
+    if (venta.estado !== "confirmada") return "anulada";
+    if (Date.now() - new Date(venta.fecha).getTime() > DIAS_PARA_CAMBIAR * 86_400_000) return "vencida";
+    const vigentes = new Map((await datos.renglonesVigentes(trx, id)).map((r) => [r.id, r]));
+    // Lo que vuelve de un mismo renglón se suma: no puede pasar lo que queda por devolver (E26).
+    const pedido = new Map<string, number>();
+    for (const v of c.vuelve) {
+      const r = vigentes.get(v.item_id);
+      if (!r) return "no-existe";
+      pedido.set(r.id, (pedido.get(r.id) ?? 0) + v.cantidad);
+      if (pedido.get(r.id)! > Number(r.cantidad) - Number(r.devuelto) + 1e-9) return "devuelve-de-mas";
+    }
+    const valorVuelve = Math.round(c.vuelve.reduce((s, v) => s + pagadoPorUnidad(vigentes.get(v.item_id)!) * v.cantidad, 0) * 100) / 100;
+    const valorLleva = c.se_lleva.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: it.precio_unitario, cantidad: it.cantidad, aMano: it.margen_aplicado == null }).valor, 0);
+    const diferencia = Math.round((valorLleva - valorVuelve) * 100) / 100;
+    const resuelto = venta.medio_pago === "cuenta_corriente" ? "cuenta_corriente" : diferencia > 0 ? "cobrado" : diferencia < 0 ? "devuelto" : "sin_diferencia";
+
+    const cambioId = randomUUID();
+    await datos.insertarCambio(trx, { id: cambioId, venta_id: id, usuario_id: usuarioId, dispositivo_id: c.dispositivo_id ?? null, diferencia, resuelto });
+    for (const v of c.vuelve) {
+      const r = vigentes.get(v.item_id)!;
+      await datos.insertarRenglonDeCambio(trx, { cambio_id: cambioId, lado: "vuelve", item_venta_id: r.id, producto_id: r.producto_id, descripcion: r.descripcion, cantidad: v.cantidad, precio_unitario: pagadoPorUnidad(r), margen_aplicado: null, fallado: v.fallado });
+      await datos.sumarDevuelto(trx, r.id, v.cantidad);
+      if (!r.producto_id) continue;
+      if (v.fallado) await datos.anotarDevueltoFallado(trx, { producto_id: r.producto_id, usuario_id: usuarioId, venta_id: id, cantidad: v.cantidad, detalle: `Volvió fallado: ${coma(v.cantidad)} de ${r.descripcion}; no vuelve al stock` });
+      else await datos.moverStock(trx, { producto_id: r.producto_id, cantidad: v.cantidad, tipo: "cambio", venta_id: id, nota: "cambio de producto: vuelve" });
+    }
+    for (const it of c.se_lleva) {
+      await datos.insertarRenglonDeCambio(trx, { cambio_id: cambioId, lado: "se_lleva", item_venta_id: null, producto_id: it.producto_id ?? null, descripcion: it.descripcion.trim(), cantidad: it.cantidad, precio_unitario: it.precio_unitario, margen_aplicado: it.margen_aplicado ?? null, fallado: false });
+      if (it.producto_id) await sacarDelStock(trx, it.producto_id, it.cantidad, id, usuarioId, "cambio");
+    }
+    if (diferencia !== 0) {
+      const tipo = diferencia > 0 ? "cobro_diferencia" : "devolucion";
+      const medio = resuelto === "cuenta_corriente" ? "cuenta_corriente" : resuelto === "cobrado" ? c.medio_diferencia ?? "efectivo" : "efectivo";
+      await datos.insertarMovimientoDeDinero(trx, { tipo, medio_pago: medio, cliente_id: medio === "cuenta_corriente" ? venta.cliente_id : null, importe: diferencia, venta_id: id, cambio_id: cambioId, usuario_id: usuarioId });
+    }
+    await anotarEvento(trx, { tipo: "venta.cambio", usuarioId, dispositivoId: c.dispositivo_id ?? null, contenido: {
+      venta: id, cambio: cambioId, diferencia, resuelto, medio_diferencia: resuelto === "cobrado" ? c.medio_diferencia ?? "efectivo" : null,
+      vuelve: c.vuelve.map((v) => ({ descripcion: vigentes.get(v.item_id)!.descripcion, cantidad: v.cantidad, fallado: v.fallado })),
+      se_lleva: c.se_lleva.map((it) => ({ descripcion: it.descripcion, cantidad: it.cantidad, precio_unitario: it.precio_unitario })),
+    } });
+    return { id: cambioId, venta_id: id, vuelve: valorVuelve, se_lleva: valorLleva, diferencia, resuelto };
   });
 }

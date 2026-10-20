@@ -212,3 +212,7 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-deslizar { height: 60px; border-radius: 99px; }
 .vm-pulgar { width: 50px; height: 50px; border-radius: 99px; }
 .vm-deslizar-texto { padding: 0 22px 0 68px; }
+
+/* En la hoja del renglón, la cantidad con su unidad, como en el renglón (decisión 140). */
+.vm-fila-cantidad .contador { display: inline-flex; }
+.vm-fila-cantidad .contador > button:last-of-type { order: 3; }

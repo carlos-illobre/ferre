@@ -31,3 +31,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T020 [interfaz] Celular: la búsqueda de Vender en una hoja como la de la v2: la caja con «Cancelar», lo último que se vendió con la caja vacía, los resultados en tarjetas con la foto, la marca, el stock y el precio, y «Agregar «…»» como ítem libre (decisión 140)
 - [x] T021 [ajuste] Celular: la lista de la unidad del renglón con el estilo de la pantalla, como en la computadora
 - [x] T022 [interfaz] Celular: el medio de pago de Vender como la v4 de «Ventas de hoy», las cuatro pastillas con la elegida con su nombre, y el cliente al final de la fila (decisión 142)
+- [x] T023 [ajuste] Celular: en la hoja del renglón, la cantidad con su unidad adentro, que se toca para cambiarla, como en el renglón (pedido de Carlos del 2026-10-20)
