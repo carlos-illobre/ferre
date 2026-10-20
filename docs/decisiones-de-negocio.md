@@ -1059,3 +1059,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      que se conserva es la capacidad de registrar ventas». El chequeo de salud no consulta la
      base y no hacen falta los registros de la base. Cambia el principio IV de la constitución,
      RNF-10 y RNF-11, y reemplaza RF-84 y RF-85 (specs/018, ADR-023).
+130. **Las flechas nunca sacan el cursor de la caja de texto** (2026-10-20). Carlos: «son dos focos
+     distintos, el foco del cursor y el foco del teclado son independientes». En la computadora,
+     ↑ desde la primera fila saca la marca de la lista; si el cursor está en una caja de texto (la
+     búsqueda), se queda ahí y no pasa a la pestaña. A las pestañas y al menú se llega con ← (con la
+     búsqueda vacía) o sin el cursor en una caja. Vale en todas las pantallas (decisión 82).

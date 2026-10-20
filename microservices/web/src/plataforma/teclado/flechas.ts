@@ -11,7 +11,8 @@ import "./flechas.css";
 //       ↓      desde las pestañas o desde la búsqueda marca la primera fila; si la lista está
 //              vacía, la marca no baja.
 //       ↓ ↑    con una fila marcada, marcan la siguiente o la anterior, entera; ↑ desde la
-//              primera vuelve a las pestañas.
+//              primera saca la marca de la lista y, si el cursor no está en una caja de texto,
+//              vuelve a las pestañas (con el cursor en la búsqueda, el cursor no se mueve).
 //       Enter  abre la fila marcada: su acción principal.
 // Vale igual en todas las pantallas. No cuentan como lista: lo que la aplicación diga que se
 // recorre de otra forma (su menú, sus pestañas), los resultados que despliega una búsqueda (los
@@ -128,10 +129,12 @@ function manejar(e: KeyboardEvent): void {
     e.preventDefault();
     marcar(filas[i - 1]!);
   } else if (i === 0) {
-    // Arriba de la primera fila están las pestañas de la parte, si tiene.
+    // Arriba de la primera fila están las pestañas de la parte, si tiene. Con el cursor en una caja
+    // de texto, la marca se va de la lista y el cursor se queda donde está: son dos focos distintos.
     e.preventDefault();
     marcar(null);
-    if (!foco.closest("dialog[open], [role='dialog'], [aria-modal='true']")) disposicion.arribaDeLaLista?.()?.focus();
+    const escribiendo = foco instanceof HTMLTextAreaElement || (foco instanceof HTMLInputElement && !["checkbox", "radio", "button", "submit"].includes(foco.type));
+    if (!escribiendo && !foco.closest("dialog[open], [role='dialog'], [aria-modal='true']")) disposicion.arribaDeLaLista?.()?.focus();
   }
 }
 

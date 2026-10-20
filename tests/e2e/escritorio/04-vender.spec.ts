@@ -277,7 +277,7 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-mas")).toBeFocused();
   // Dos focos (decisión 82): en Inventario, ↓ desde la pestaña marca la primera fila entera y el
-  // cursor de escritura queda en la búsqueda; ↑ ↓ mueven la marca; ↑ desde la primera vuelve a la pestaña.
+  // cursor de escritura queda en la búsqueda; ↑ ↓ mueven la marca; ↑ desde la primera la saca de la lista.
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
   await page.keyboard.press("ArrowRight");
@@ -295,9 +295,10 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
     await page.keyboard.press("ArrowUp");
     await expect(filasDeStock.nth(0)).toHaveAttribute("data-flecha", "");
   }
+  // ↑ desde la primera saca la marca de la lista; el cursor sigue en la búsqueda (son dos focos distintos).
   await page.keyboard.press("ArrowUp");
   await expect(page.locator("[data-flecha]")).toHaveCount(0);
-  await expect(page.getByTestId("pestana-stock")).toBeFocused();
+  await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
   await page.keyboard.press("ArrowUp");
@@ -318,6 +319,10 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   // Desde la búsqueda, ↓ marca la fila del producto, entera, y el cursor sigue en la búsqueda (decisión 82).
   await page.keyboard.press("ArrowDown");
   await expect(page.locator('[data-testid="venta"] [data-flecha]')).toHaveCount(1);
+  await expect(page.getByTestId("busqueda")).toBeFocused();
+  // ↑ desde el primer renglón saca la marca y el cursor no se va de la búsqueda (Carlos, 2026-10-20).
+  await page.keyboard.press("ArrowUp");
+  await expect(page.locator('[data-testid="venta"] [data-flecha]')).toHaveCount(0);
   await expect(page.getByTestId("busqueda")).toBeFocused();
   // A la cantidad se llega con Tab; ahí ↑ suma, como en cualquier campo de cantidad. F2 cobra.
   const conElFoco = () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? "");
