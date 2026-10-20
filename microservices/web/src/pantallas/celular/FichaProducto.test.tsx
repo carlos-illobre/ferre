@@ -35,7 +35,7 @@ describe("ficha del producto · celular", () => {
     const { ficha } = armar(CINTA, 40);
     expect(within(ficha).getByTestId("stock").textContent).toBe("40 un. en stock");
     expect(within(ficha).getByRole("heading", { level: 2 }).textContent).toBe("Cinta aisladora negra 20 m"); // en mayúsculas por estilo
-    expect(ficha.textContent).toContain("3M · Código CO-60127");
+    expect(ficha.textContent).toContain("3M · Cód. CO-60127");
     expect(within(ficha).getByTestId("cambiar-foto").textContent).toBe("Cambiar foto");
   });
 
@@ -59,9 +59,9 @@ describe("ficha del producto · celular", () => {
   it("016-E14 016-E15 016-E17: el proveedor en uso, con su inicial, la estrella, la fecha y el costo; con uno solo, sin flecha", () => {
     const { ficha } = armar();
     const enUso = within(ficha).getByTestId("proveedor-en-uso");
-    expect(enUso.textContent).toBe("CComodo★Proveedor principalÚltima lista: 05/09/2026Costo de compra$420,00");
-    expect((enUso as HTMLButtonElement).disabled).toBe(true);
-    expect(enUso.querySelector(".ficha-flecha")).toBeNull();
+    // Como la v2: la inicial, el nombre con la estrella, «Proveedor principal · fecha» y el costo.
+    expect(enUso.textContent).toBe("CComodoel más baratoProveedor principal · 05/09$420,00");
+    expect(within(ficha).queryByTestId("ver-proveedores")).toBeNull();
   });
 
   it("016-E20: sin costo, el precio y «Así se calcula» dicen qué falta", () => {

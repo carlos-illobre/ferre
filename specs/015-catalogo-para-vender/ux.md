@@ -12,15 +12,15 @@ celular y en la computadora.
 
 - Cada producto dice su stock con la unidad en que se vende («120 m», «9 un.», «12,5 kg») o
   «Sin stock». Los dos se distinguen a la vista: el que hay, en verde; el que no, en naranja.
-- En el celular, el stock va como etiqueta chica arriba del nombre («9 un. en stock»); en la
-  computadora, en la columna Stock, que ya existía.
+- En el celular, el stock va arriba del nombre («9 un. en stock»); en la computadora, al lado de la
+  marca. Desde la v2 (decisión 145) es texto en color, no una etiqueta: verde si hay, rojo si no.
 - «Stock bajo» no aparece hasta que exista el stock mínimo (RF-54).
 
 ## Agregar a la venta (historia 2)
 
 - «Agregar», con un carrito, en cada producto: en el celular debajo del precio; en la
-  computadora debajo del precio de venta. Es un botón secundario: borde suave y fondo claro,
-  al menos 36 px de alto (decisión 104).
+  computadora, desde la v2 (decisión 145), un botón cuadrado de ícono al final de la fila. Es un
+  botón secundario: borde suave y fondo blanco, al menos 36 px de alto (decisión 104).
 - En la computadora, con el teclado: la tecla «+» agrega el producto elegido, también con el foco
   en el buscador; con Ctrl, Cmd o Alt no hace nada. La línea de atajos lo dice.
 - Al agregar se sigue en el Catálogo, con la misma búsqueda y en el mismo lugar; un aviso breve
@@ -53,8 +53,10 @@ celular y en la computadora.
   pestañas del celular son las mismas y miden lo mismo.
 - Buscador: «Producto, código o marca» en el celular; «Buscar productos, códigos o marcas…» en
   la computadora.
-- En el celular, cada producto es una tarjeta suelta, con 1 px de separación entre una y otra;
-  el elegido, en amarillo. El nombre va en negrita y en mayúsculas; el margen, debajo del
+- Cada producto es una tarjeta blanca suelta, separada de la siguiente. Desde la v2 (decisión 145)
+  el elegido con el teclado va en verde: en la computadora, verde suave con una raya verde a la
+  izquierda; en el celular, solo si hay teclado, con el borde verde (con el dedo no hay elegido que
+  marcar). El amarillo de antes no va. El nombre va en negrita y en mayúsculas; el margen, debajo del
   precio, en verde (pedidos de Carlos al aprobar la maqueta).
 
 ## Chequeo contra los principios de interfaz

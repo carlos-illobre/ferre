@@ -36,6 +36,8 @@ function armar(productos = [
 }
 const fila = (texto: string) => screen.getAllByTestId("producto").find((f) => f.textContent?.includes(texto))!;
 const ficha = () => screen.getByTestId("ficha-producto");
+// Los márgenes están dentro de «Así se calcula», plegado al abrir la ficha (la v2, decisión 145).
+const abrirMargenes = () => fireEvent.click(within(ficha()).getByTestId("abrir-calculo"));
 
 describe("Catálogo · Productos", () => {
   beforeEach(() => { vi.useRealTimers(); descargar.mockClear(); });
@@ -46,8 +48,10 @@ describe("Catálogo · Productos", () => {
     expect(screen.getAllByTestId("producto")).toHaveLength(2); // todavía no pasaron los 300 ms: sigue la lista entera
     act(() => { vi.advanceTimersByTime(350); });
     expect(screen.getAllByTestId("producto")).toHaveLength(1);
-    expect(fila("MECHA").textContent).toContain("sin margen");
+    expect(fila("MECHA").textContent).toContain("Sin precio");
+    expect(fila("MECHA").textContent).toContain("elegí un margen");
     fireEvent.click(fila("MECHA"));
+    abrirMargenes();
     fireEvent.click(within(ficha()).getByRole("button", { name: "100 %" }));
     expect(within(ficha()).getByRole("button", { name: "100 %" }).className).toContain("activo");
     expect(within(ficha()).getByTestId("precio-de-venta").textContent).toBe("$4.000"); // 1500 × 2 × 1,21 = 3630 → 4000
@@ -55,6 +59,7 @@ describe("Catálogo · Productos", () => {
     expect(fila("MECHA").textContent).toContain("$4.000");
     buscar("taladro");
     fireEvent.click(fila("TALADRO"));
+    abrirMargenes();
     fireEvent.click(within(ficha()).getByRole("button", { name: "25 %" }));
     expect(within(ficha()).getByTestId("precio-de-venta").textContent).toBe("$182.000"); // 181.500 → 182.000
   });
@@ -63,6 +68,7 @@ describe("Catálogo · Productos", () => {
     const { buscar, falso } = armar();
     buscar("mecha");
     fireEvent.click(fila("MECHA"));
+    abrirMargenes();
     fireEvent.click(within(ficha()).getByRole("button", { name: "50 %" }));
     expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { margen_elegido: 50 });
   });
@@ -71,6 +77,8 @@ describe("Catálogo · Productos", () => {
     const { buscar, falso } = armar();
     buscar("mecha");
     fireEvent.click(fila("MECHA"));
+    abrirMargenes();
+    fireEvent.click(within(ficha()).getByTestId("margen-otro"));
     const caja = within(ficha()).getByTestId("otro-margen");
     fireEvent.change(caja, { target: { value: "20" } });
     fireEvent.keyDown(caja, { key: "Enter" });
@@ -84,16 +92,17 @@ describe("Catálogo · Productos", () => {
     const { buscar } = armar();
     buscar("mecha");
     fireEvent.click(fila("MECHA"));
-    fireEvent.click(within(ficha()).getByRole("button", { name: "100 %" }));
     expect(within(ficha()).queryByTestId("cuenta")).toBeNull(); // plegado al abrir
-    fireEvent.click(within(ficha()).getByTestId("abrir-calculo"));
+    abrirMargenes();
+    fireEvent.click(within(ficha()).getByRole("button", { name: "100 %" }));
+    // Como la v2: cada paso dice cuánto va dando la cuenta.
     const cuenta = within(ficha()).getByTestId("cuenta").textContent!;
     expect(cuenta).toContain("− 25 % (linea) = 1500"); // de dónde sale el costo
-    expect(cuenta).toContain("+ Margen 100 %$1.500,00");
-    expect(cuenta).toContain("+ IVA 21 %$630,00");
-    expect(cuenta).toContain("= Precio con IVA$3.630,00");
+    expect(cuenta).toContain("Costo de compra$1.500,00");
+    expect(cuenta).toContain("+ 100 % de margen$3.000,00");
+    expect(cuenta).toContain("+ IVA 21 %$3.630,00");
+    expect(cuenta).toContain("Se cobra (a $1.000)");
     expect(within(ficha()).getByTestId("se-cobra").textContent).toBe("$4.000");
-    expect(cuenta).toContain("Se redondea hacia arriba a $1.000");
     fireEvent.click(within(ficha()).getByRole("button", { name: "50 %" })); // 1500 × 1,5 × 1,21 = 2722,5 → 3000
     expect(within(ficha()).getByTestId("se-cobra").textContent).toBe("$3.000");
     fireEvent.click(within(ficha()).getByTestId("abrir-calculo"));
@@ -143,15 +152,15 @@ describe("Catálogo · Productos", () => {
     ] })]);
     buscar("silicona");
     fireEvent.click(fila("SILICONA"));
-    // 016-E14 016-E15 016-E16: primero el que está en uso, con la estrella si es el más barato; la flecha muestra los demás.
+    // 016-E14 016-E15 016-E16: primero el que está en uso, con la estrella si es el más barato; «+1 más» muestra los demás.
     const enUso = within(ficha()).getByTestId("proveedor-en-uso");
-    expect(enUso.textContent).toContain("Barato★Proveedor principal");
-    expect(enUso.textContent).toContain("Costo de compra$2.400,00");
+    expect(enUso.textContent).toContain("Baratoel más baratoProveedor principal · 11/08");
+    expect(enUso.textContent).toContain("$2.400,00");
     expect(within(ficha()).queryByTestId("otros-proveedores")).toBeNull();
-    fireEvent.click(enUso);
+    fireEvent.click(within(ficha()).getByTestId("ver-proveedores"));
     const otros = within(ficha()).getByTestId("otros-proveedores");
     expect(otros.textContent).toContain("Caro");
-    expect(otros.textContent).toContain("$3.000,00");
+    expect(otros.textContent).toContain("$3.000,00 · +25 %");
     fireEvent.click(within(otros).getByTestId("proveedor-de-producto"));
     expect(falso.actualizarProducto).toHaveBeenCalledWith("sil", { proveedor_preferido_id: "c" });
   });
@@ -170,8 +179,9 @@ describe("Catálogo · Productos", () => {
     expect(screen.queryByRole("tab", { name: "Duplicados" })).toBeNull();
     fireEvent.keyDown(document.body, { code: "Digit1", key: "!", shiftKey: true });
     fireEvent.click(fila("MECHA"));
-    expect(within(ficha()).queryByRole("radiogroup")).toBeNull();
-    expect(screen.queryByTestId("otro-margen")).toBeNull();
+    expect(within(ficha()).queryByTestId("abrir-calculo")).toBeNull(); // sin márgenes ni costos, no hay nada que desplegar
+    expect(within(ficha()).queryByTestId("segmentos-de-margen")).toBeNull();
+    expect(screen.queryByTestId("margen-otro")).toBeNull();
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
   });
 
@@ -213,6 +223,9 @@ describe("Catálogo · Productos", () => {
     expect(ficha().textContent).not.toContain("1.500");
     expect(within(ficha()).queryByTestId("otros-proveedores")).toBeNull();
     expect(within(ficha()).queryByTestId("bajar-lista")).toBeNull();
-    expect(within(ficha()).getByRole("radiogroup")).toBeTruthy(); // fijar el margen es otro permiso
+    abrirMargenes();
+    expect(within(ficha()).queryByTestId("asi-se-calcula")).toBeNull();
+    expect(within(ficha()).getByTestId("segmentos-de-margen")).toBeTruthy(); // fijar el margen es otro permiso
+    expect(within(ficha()).queryByTestId("cuenta")).toBeNull();
   });
 });

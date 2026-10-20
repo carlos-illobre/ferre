@@ -58,6 +58,38 @@ atajos de margen funcionan sobre el resultado elegido sin sacar el foco de la b�
 tocar un resultado abre su ficha. Al lado de la caja, el botón de escanear y el de los filtros tienen el
 mismo tamaño y el mismo redondeo (Carlos, 2026-10-17).
 
+**La pantalla Productos, como la v2** (Carlos, 2026-10-20, decisión 145; maquetas de referencia
+`maquetas/compu-productos-v2-referencia.png`, `maquetas/celular-productos-v2-referencia.png` y
+`maquetas/celular-ficha-v2-referencia.png`), con el lenguaje «Mostrador»: fondos blancos y grises,
+el verde solo para lo elegido.
+
+- **Arriba**, junto a las pestañas: cuántos productos hay y, si los hay, cuántos están «sin precio»
+  (pastilla ámbar con el triángulo); en la computadora, además, «Escanear con el celular» (con el
+  celular vinculado) y «Cargar lista» (que lleva a Listas, a quien puede cargarlas). En el
+  celular, los «sin precio» van como pastilla arriba de la lista.
+- **Cada producto de la lista**, una tarjeta blanca: la foto, el nombre en negrita y mayúsculas, la
+  marca y el stock con su unidad (verde si hay, rojo «Sin stock»), y a la derecha el precio con el
+  margen debajo, en verde; sin precio, «Sin precio» en ámbar y debajo qué falta. En la
+  computadora, el carrito es un botón cuadrado de ícono al final de la fila; en el celular, el
+  stock va arriba del nombre («6 un. en stock»), debajo la marca y el código del proveedor, y
+  «Agregar» debajo del precio.
+- **Computadora: la lista a la izquierda y la ficha del elegido siempre abierta a la derecha.**
+  Tocar un producto o moverse con ↑ ↓ cambia la ficha, sin abrir ni cerrar nada. El elegido se
+  marca en verde suave con una raya verde a la izquierda. Debajo de la lista, las teclas: «+»
+  agrega, Mayús + 1–5 el margen, Alt F los filtros. La ficha (ver specs/016) tiene arriba la foto,
+  el stock, el nombre, la marca y el código, el precio grande y los márgenes como segmentos (300,
+  200, 100, 50, 25, Otro); después el código de barras; «Proveedores» con todos a la vista (el en
+  uso con su inicial en verde, la estrella en el más barato, «Usar» en los demás) al lado de «Así
+  se calcula» (abierto; F1 lo pliega); el archivo de origen; y al pie las teclas, «Listo» (vuelve a
+  la búsqueda) y «Agregar a la venta» en naranja. Enter lleva el foco a la ficha y Esc lo devuelve
+  a la búsqueda. En una ventana de menos de 900 px la ficha vuelve a abrirse encima.
+- **Celular: la ficha ocupa la pantalla**, con «‹ Productos» arriba para volver y el menú de abajo a
+  la vista: la foto grande con el stock encima y «Cambiar foto»; el nombre y la marca con el
+  código; el precio de venta grande con «margen N %» y «Así se calcula», que despliega los márgenes
+  y la cuenta; el código de barras; el proveedor en uso con su costo y «+N más», que despliega los
+  demás; y fijos abajo «Listo» y «Agregar a la venta» en naranja. En la búsqueda, el botón de
+  filtros va antes que el de escanear, que es el oscuro.
+
 **Estados:**
 
 | Estado | Qué tiene que pasar |

@@ -1,4 +1,39 @@
-/* La ficha del producto en el celular (specs/016, maqueta A aprobada el 2026-10-17). */
+/* La ficha del producto en el celular (specs/016), con el aspecto de la v2 (decisión 145): a
+   pantalla entera, sobre el fondo gris, con el menú de abajo a la vista. */
+.hoja-fondo:has(> .hoja-pantalla) { z-index: 25; bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom)); background: var(--p-fondo); animation: none; }
+.hoja.hoja-pantalla { height: 100%; max-height: none; border-radius: 0; background: var(--p-fondo); padding: 0 16px; gap: 12px; animation: ficha-entra 0.32s cubic-bezier(0.32, 0.72, 0, 1); }
+.hoja.hoja-pantalla .manija { display: none; }
+@keyframes ficha-entra { from { transform: translateX(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .hoja.hoja-pantalla { animation: none; } }
+.fp-arriba { position: sticky; top: 0; z-index: 2; margin: 0 -16px; padding: calc(4px + env(safe-area-inset-top)) 12px 4px 8px; background: var(--p-fondo); display: flex; align-items: center; }
+.fp-volver { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 8px; border: 0; background: none; color: var(--p-verde); font-size: 17px; font-weight: 700; }
+/* La foto grande, con el stock arriba a la izquierda y «Cambiar foto» abajo a la derecha. */
+.ficha-foto.fp-hero { width: 100%; height: 180px; border-radius: 20px; background: var(--p-relleno); }
+.ficha-foto.fp-hero .foto-chica, .ficha-foto.fp-hero.sin button.foto-chica:empty { width: 100%; height: 100%; border-radius: 20px; border: 0; background: var(--p-relleno); }
+.ficha-foto.fp-hero .foto-chica img { object-fit: contain; padding: 12px; }
+.fp-stock { position: absolute; z-index: 1; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgb(26 29 27 / .12); font-size: 15px; font-weight: 700; white-space: nowrap; }
+.fp-stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.fp-stock.hay { color: var(--p-verde-texto); }
+.fp-stock.no { color: var(--p-rojo, #ae281d); }
+.ficha-foto.fp-hero .ficha-cambiar-foto { left: auto; right: 12px; bottom: 12px; min-height: 36px; padding: 0 12px; border: 1px solid var(--p-borde); background: #fff; font-size: 15px; }
+.hoja-pantalla .ficha-titulo { gap: 2px; }
+.hoja-pantalla .ficha-nombre { font-size: 22px; line-height: 27px; }
+/* El precio, sin bajar: grande, con el margen y «Así se calcula» a la derecha. */
+.fp-precio { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; padding: 12px 14px; border-radius: 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.fp-precio > div { display: flex; flex-direction: column; }
+.fp-precio .ficha-precio { font-size: 36px; line-height: 40px; }
+.fp-precio .ficha-sin-precio { font-size: 26px; line-height: 40px; font-weight: 800; color: var(--p-amarillo-texto); }
+.fp-margen { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-height: 44px; border: 0; background: none; text-align: right; font-size: 14px; color: var(--p-texto-2); }
+.fp-margen b { font-size: 16px; color: var(--p-verde-texto); }
+.fp-margen b.falta { color: var(--p-amarillo-texto); }
+.fp-margen span { display: inline-flex; align-items: center; gap: 4px; }
+.fp-calculo .ficha-tarjeta-titulo { display: flex; justify-content: space-between; align-items: baseline; color: var(--p-tinta); font-size: 16px; }
+.fp-segmentos { display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--p-relleno); }
+.fp-segmentos > button, .fp-otro-caja { flex: 1; min-width: 0; min-height: 40px; padding: 0 4px; border: 0; border-radius: 9px; background: none; color: var(--p-texto-medio); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fp-segmentos > button.activo { background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .14); }
+.fp-segmentos > button:disabled { opacity: .45; }
+.fp-otro-caja { flex: 1.4; display: inline-flex; align-items: center; gap: 2px; background: var(--p-superficie); }
+.fp-otro-caja input { width: 100%; min-width: 0; height: 36px; border: 0; outline: 0; background: none; font: inherit; text-align: right; color: var(--p-tinta); }
 .hoja[data-testid="ficha-producto"] { gap: 12px; padding-left: 16px; padding-right: 16px; }
 .ficha-cabeza { align-items: flex-start; }
 .ficha-foto { position: relative; flex: none; width: 128px; height: 128px; }
@@ -19,10 +54,16 @@
 
 .ficha-proveedor { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 6px 10px 12px; border: 1px solid var(--p-borde-suave); border-radius: 14px; background: #fff; text-align: left; color: inherit; }
 .ficha-proveedor:disabled { opacity: 1; cursor: default; }
-.ficha-inicial { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--p-naranja-suave); color: var(--p-naranja-texto); font-weight: 800; font-size: 20px; display: grid; place-items: center; }
+.ficha-inicial { flex: none; width: 40px; height: 40px; border-radius: 10px; background: var(--p-verde); color: #fff; font-weight: 800; font-size: 18px; display: grid; place-items: center; }
+.ficha-inicial.otro { background: var(--p-relleno); color: var(--p-texto-2); }
+.fp-prov { display: flex; align-items: center; gap: 12px; }
+.fp-prov-der { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.fp-prov-der strong { font-size: 18px; font-weight: 800; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+.fp-mas { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; margin: -4px -4px -6px 0; padding: 0 4px; border: 0; background: none; font-size: 14px; color: var(--p-texto-2); }
 .ficha-proveedor-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .ficha-proveedor-nombre { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-weight: 700; font-size: 16px; color: var(--p-tinta); }
-.ficha-estrella { color: #e0a800; }
+.ficha-estrella { display: inline-flex; color: #c98a00; }
+.ficha-estrella svg { fill: currentColor; }
 .ficha-detalle { font-size: 14px; color: var(--p-texto-2); margin: 0; }
 .ficha-chip { white-space: nowrap; font-size: 12.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--p-verde-suave); color: var(--p-verde-texto); }
 .ficha-costo { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 4px; font-size: 14px; color: var(--p-texto-2); }
@@ -43,9 +84,10 @@
 .ficha-calculo-cabeza span { flex: 1; }
 .ficha-cuenta { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 0 14px 12px; font-size: 15px; color: var(--p-texto-medio); font-variant-numeric: tabular-nums; }
 .ficha-cuenta b { text-align: right; color: var(--p-tinta); }
-.ficha-cuenta .ficha-cuenta-detalle { grid-column: 1 / -1; margin-top: -2px; font-size: 13px; color: var(--p-texto-2); }
+.ficha-cuenta .ficha-cuenta-detalle { grid-column: 1 / -1; margin-top: -2px; font-size: 14px; color: var(--p-texto-2); }
 .ficha-cuenta .total { border-top: 1px solid var(--p-naranja-borde); padding-top: 6px; font-weight: 700; color: var(--p-tinta); }
-.ficha-cuenta .cobra { color: var(--p-verde); font-weight: 800; font-size: 17px; }
+.ficha-cuenta .cobra { grid-column: 1 / -1; display: flex; justify-content: space-between; margin: 6px -8px 0; padding: 4px 8px; border-radius: 8px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-weight: 650; }
+.ficha-cuenta .cobra b { font-size: 17px; color: var(--p-verde-texto); }
 .ficha-cuenta p, .ficha-calculo-falta { grid-column: 1 / -1; margin: 2px 0 0; font-size: 13.5px; color: var(--p-texto-2); }
 .ficha-calculo-falta { padding: 0 14px 12px; }
 
@@ -55,7 +97,8 @@
 .ficha-descargar { width: 100%; height: 40px; border-width: 1px; border-color: var(--p-borde); }
 
 /* «Listo» y «Agregar a la venta», fijos abajo mientras la ficha baja. */
-.ficha-pie { position: sticky; bottom: calc(-24px - env(safe-area-inset-bottom)); margin: 4px -16px calc(-24px - env(safe-area-inset-bottom)); padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); background: var(--niebla); border-top: 1px solid var(--p-borde-suave); display: flex; gap: 10px; z-index: 1; }
-.ficha-pie .boton { height: 48px; padding: 0 22px; font-size: 16px; font-weight: 700; }
-.ficha-pie .boton.tinta { flex: 1; }
-.ficha-pie .boton:only-child { flex: 1; }
+.ficha-pie { position: sticky; bottom: 0; margin: auto -16px 0; padding: 10px 16px 12px; background: var(--p-fondo); border-top: 1px solid var(--p-borde); display: grid; grid-template-columns: 112px 1fr; gap: 8px; z-index: 1; }
+.ficha-pie .boton { height: 52px; padding: 0 16px; font-size: 17px; font-weight: 700; border-radius: 14px; }
+.ficha-pie .boton.coral { justify-content: center; gap: 8px; }
+.ficha-pie .boton:only-child { grid-column: 1 / -1; }
+.solo-lectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

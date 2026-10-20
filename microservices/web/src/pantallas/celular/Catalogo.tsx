@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SiVeCostos } from "../Costos";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
@@ -9,7 +8,9 @@ import { Pestanas } from "./Pestanas";
 import { esperarBusqueda, quienTieneElCodigo, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas } from "../../catalogo";
 import { useDebounce } from "../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
-import { pesos, pesosCortos } from "../../formato";
+import { pesosCortos } from "../../formato";
+import { api } from "../../api";
+import type { ResumenDelCatalogo } from "@servidor/productos";
 import { irA } from "../../rutas";
 import { Listas } from "./pantallas/Listas";
 import { Duplicados } from "./pantallas/Duplicados";
@@ -44,8 +45,6 @@ export function Catalogo({ sub }: { sub: string | null }) {
   );
 }
 
-const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
-
 // La búsqueda le pregunta al servidor y trae de a 50 (specs/018); cada producto abre su ficha en una hoja, donde
 // está el margen (botones o tipeado), los proveedores, la foto y la lista de origen.
 // Teclado: flechas eligen, Enter abre, Shift+1..5 fijan el margen del elegido, Esc limpia.
@@ -78,6 +77,9 @@ export function Productos() {
   }, []);
   const caja = useRef<HTMLInputElement>(null);
   const centinela = useRef<HTMLDivElement>(null);
+  // Cuántos productos están sin precio, arriba de la lista (la v2, decisión 145): los cuenta el servidor.
+  const [resumen, setResumen] = useState<ResumenDelCatalogo | null>(null);
+  useEffect(() => { api<ResumenDelCatalogo>("/productos/resumen").then(setResumen).catch(() => undefined); }, []);
 
   // En el celular la búsqueda no toma el foco sola: abriría el teclado y taparía el menú.
   // Lo encontrado llega del servidor de a 50, ya filtrado; al llegar al final de la lista, los
@@ -126,6 +128,9 @@ export function Productos() {
         extra={<button type="button" className="boton-filtros" aria-label={conFiltros ? `${TEXTOS.catalogo.filtros.corto}: ${cuantosFiltros(filtros)}` : TEXTOS.catalogo.filtros.corto} onClick={() => setViendoFiltros(true)} data-testid="filtros">
           <Icono nombre="filtros" tam={22} />{conFiltros && <b data-testid="cuantos-filtros">{cuantosFiltros(filtros)}</b>}
         </button>} />
+      {resumen && resumen.sin_margen > 0 && !conFiltros && (
+        <div className="avisos-catalogo"><span className="pastilla-sin-precio" data-testid="cuantos-sin-precio"><Icono nombre="alerta" tam={16} />{resumen.sin_margen.toLocaleString("es-AR")} {TEXTOS.catalogo.sinPrecio.corto}</span></div>
+      )}
       {conFiltros && (
         <p className="con-filtros" data-testid="con-filtros">{cuantosProductos(lista.total)} {TEXTOS.catalogo.conFiltros.corto}
           <button type="button" onClick={() => setFiltros(SIN_FILTROS)} data-testid="sacar-filtros">{TEXTOS.catalogo.sacarFiltros.corto}</button></p>
@@ -149,25 +154,27 @@ export function Productos() {
   );
 }
 
-// Cada producto, una tarjeta (maqueta B de 015): el stock arriba del nombre, el precio con su
-// margen y, debajo, «Agregar» a la venta. «Agregar» va al lado del botón que abre la ficha, no
-// adentro: un botón no puede tener otro adentro.
+// Cada producto, una tarjeta blanca como la v2 (decisión 145): la foto; el stock en color arriba
+// del nombre; la marca y el código del proveedor; el precio con su margen y, debajo, «Agregar» a
+// la venta. «Agregar» va al lado del botón que abre la ficha, no adentro: un botón no puede tener
+// otro adentro.
 function FilaProducto({ producto: p, stock, elegida, alAbrir, alAgregar }: { producto: Producto; stock: { hay: boolean; texto: string }; elegida: boolean; alAbrir: () => void; alAgregar?: () => void }) {
+  const fijaMargen = usePuede()("catalogo.margenes");
   const { costo, valor: precio } = precioDelProducto(p);
   return (
     <div className={`tarjeta-producto ${alAgregar ? "con-agregar" : ""}`}>
     <button type="button" className={`fila con-foto ${elegida ? "elegida" : ""}`} onClick={alAbrir} data-testid="producto" aria-selected={elegida}>
-      <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : null}</span>
-      <span className="nombre"><span className={`etiqueta-stock ${stock.hay ? "hay" : "no"}`} data-testid="stock">{stock.hay ? `${stock.texto} ${TEXTOS.catalogo.enStock.corto}` : stock.texto}</span>{p.descripcion}</span>
+      <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : <Icono nombre="catalogo" tam={22} grosor={1.6} />}</span>
+      <span className="nombre"><span className={`stock-texto ${stock.hay ? "hay" : "no"}`} data-testid="stock">{stock.hay ? `${stock.texto} ${TEXTOS.catalogo.enStock.corto}` : stock.texto}</span>{p.descripcion}</span>
       <span className="derecha">
-        <strong className="importe">{precio === null ? "—" : pesosCortos(precio)}</strong>
-        <small style={{ color: p.margen_elegido === null ? "var(--coral-texto)" : undefined, fontWeight: 600 }}>{p.margen_elegido === null ? (costo === null ? "sin costo" : "sin margen") : `${p.margen_elegido} %${esMargenBoton(p.margen_elegido) ? "" : " a mano"}${costo === null ? " · sin costo" : ""}`}</small>
+        {precio === null ? <strong className="sin-precio">{TEXTOS.catalogo.sinPrecioTitulo.corto}</strong> : <strong className="importe">{pesosCortos(precio)}</strong>}
+        <small className={p.margen_elegido === null ? "falta" : ""}>{p.margen_elegido === null ? (costo === null ? TEXTOS.ficha.sinCosto.corto : fijaMargen ? TEXTOS.ficha.eligeMargen.corto : TEXTOS.ficha.sinMargen.corto) : `${p.margen_elegido} %${esMargenBoton(p.margen_elegido) ? "" : ` ${TEXTOS.ficha.aMano.corto}`}${costo === null ? ` · ${TEXTOS.ficha.sinCosto.corto}` : ""}`}</small>
       </span>
-      <span className="detalle">{detalleDe(p)}{costo !== null && <SiVeCostos>{` · costo ${pesos(costo)}`}</SiVeCostos>}</span>
+      <span className="detalle">{[p.marca, p.codigo_proveedor].filter(Boolean).join(" · ")}</span>
     </button>
     {alAgregar && (
       <button type="button" className="agregar-a-la-venta" onClick={alAgregar} aria-label={`${TEXTOS.catalogo.agregarALaVenta.corto}: ${p.descripcion}`} data-testid="agregar">
-        <Icono nombre="carrito" tam={20} grosor={1.8} />{TEXTOS.catalogo.agregar.corto}
+        <Icono nombre="carrito" tam={18} grosor={1.9} />{TEXTOS.catalogo.agregar.corto}
       </button>
     )}
     </div>

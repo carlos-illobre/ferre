@@ -30,5 +30,8 @@ services:
   listas-de-proveedores:
     build: { context: ./microservices/listas, dockerfile: $T/listas.Dockerfile, additional_contexts: { cert: $T/cert } }
 EOF
+# Las copias de los Dockerfiles están fuera del repositorio: el `docker buildx bake` con que construye
+# compose pide permiso para leerlas («--allow=fs.read=…») y, sin quién lo dé, se frena (2026-10-20).
+export BUILDX_BAKE_ENTITLEMENTS_FS=0
 docker compose -f docker-compose.yml -f "$T/override.yml" build
 echo "Imágenes listas. Ahora: tests/e2e.sh"

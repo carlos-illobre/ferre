@@ -70,6 +70,12 @@ export const TEXTOS = {
     // «12 productos con filtros», «Ver 12 productos»: la cantidad, con `cuantosProductos`.
     conFiltros: igual("con filtros"),
     ver: igual("Ver"),
+    // La v2 de Productos (decisión 145).
+    sinPrecio: igual("sin precio"),
+    sinPrecioTitulo: igual("Sin precio"),
+    cargarLista: igual("Cargar lista"),
+    precioYMargen: igual("Precio · margen"),
+    elegiUnProducto: igual("Elegí un producto de la lista para ver su ficha."),
   },
   vender: {
     noLlevo: { largo: "Anotado como «No llevó»: qué pidió y a cuánto se le ofreció.", corto: "Anotado como «No llevó»." },
@@ -308,6 +314,21 @@ export const TEXTOS = {
     sinMargen: igual("sin margen"),
     subiendo: igual("Subiendo…"),
     noSubio: igual("No se pudo subir la foto"),
+    // La v2 de la ficha (decisión 145).
+    proveedores: igual("Proveedores"),
+    elCostoSaleDe: igual("el costo sale de"),
+    enUso: igual("en uso"),
+    principalCorto: igual("Principal"),
+    lista: igual("Lista"),
+    otro: igual("Otro"),
+    deMargen: igual("de margen"),
+    seCobraRedondeado: igual("Se cobra (a $1.000)"),
+    volver: { largo: "Volver a la búsqueda", corto: "Productos" },
+    otroProducto: igual("otro producto"),
+    vuelveABuscar: igual("buscar"),
+    pliega: igual("pliega"),
+    menos: igual("menos"),
+    mas: igual("más"),
   },
 } satisfies Record<string, Record<string, Texto>>;
 

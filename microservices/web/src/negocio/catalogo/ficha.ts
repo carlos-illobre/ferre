@@ -55,3 +55,13 @@ export function useOrigenDeLista(listaId: string | null | undefined, puedeVerlo:
   return origen;
 }
 export const olvidarOrigenes = () => memoria.clear(); // para las pruebas
+
+// Cuánto más caro (o más barato) es el costo de otro proveedor que el que está en uso, en
+// porcentaje con un decimal: «+6,7 %», «−3 %» (la ficha de la v2, decisión 145). Sin costo en uso, nada.
+export function diferenciaDeCosto(costo: string | number, enUso: number | null): string | null {
+  if (enUso === null || enUso <= 0) return null;
+  const pct = (Number(costo) / enUso - 1) * 100;
+  if (!Number.isFinite(pct)) return null;
+  const texto = Math.abs(pct).toLocaleString("es-AR", { maximumFractionDigits: 1 });
+  return texto === "0" ? "mismo costo" : `${pct > 0 ? "+" : "−"}${texto} %`;
+}

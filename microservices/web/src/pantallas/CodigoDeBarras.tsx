@@ -6,6 +6,7 @@ import { Escaner, hayCamara } from "../plataforma/camara/Escaner";
 import { copiarTexto } from "../plataforma/portapapeles/copiar";
 import { ultimaLectura } from "../negocio/catalogo/ficha";
 import { TEXTOS } from "./textos";
+import { BarrasEan } from "./BarrasEan";
 import "./codigo-de-barras.css";
 
 // El código de barras de un producto, en su ficha (RF-08): se ve el que tiene y se le carga
@@ -15,10 +16,15 @@ import "./codigo-de-barras.css";
 // Guarda la pantalla que lo contiene (`alGuardar`), que es la que tiene el catálogo; `quienLoTiene`
 // dice si otro producto ya tiene ese código. En la ficha renovada (specs/016) el código se copia
 // con un toque y, después de cargarlo, dice «Código actualizado» con la hora de la lectura.
-export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienLoTiene }: {
-  producto: Producto; celular?: boolean; alGuardar: (codigo: string) => void | Promise<unknown>; quienLoTiene: (codigo: string) => Promise<Producto | undefined>;
+// `alCargar` avisa cuando se abre o se cierra el panel para cargar el código: mientras está abierto,
+// lo que escanea el celular vinculado es para este producto, y la pantalla de atrás no lo busca.
+export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienLoTiene, alCargar }: {
+  producto: Producto; celular?: boolean; alGuardar: (codigo: string) => void | Promise<unknown>; quienLoTiene: (codigo: string) => Promise<Producto | undefined>; alCargar?: (abierto: boolean) => void;
 }) {
   const [abierto, setAbierto] = useState(false);
+  const avisar = useRef(alCargar);
+  avisar.current = alCargar;
+  useEffect(() => { avisar.current?.(abierto); }, [abierto]);
   const [tipeado, setTipeado] = useState("");
   const [aviso, setAviso] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -64,31 +70,42 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
   useEffect(() => { if (puestoId) return escucharPuesto(puestoId, (codigo) => void alLlegar.current(codigo), undefined, true); }, [puestoId]);
 
   const etiqueta = conCamara ? texto(t.escanear) : puesto ? t.escanear.largo : p.codigo_barras ? t.cambiar.largo : t.cargar.largo;
+  // Como la v2 (decisión 145): la caja lleva las barras dibujadas, el número y copiar; «Escanear»
+  // es el botón oscuro. En la computadora la última lectura va adentro de la caja y el botón al
+  // lado; en el celular, la lectura y el botón van en el renglón de abajo.
+  const recienCargado = recien !== null && recien === p.codigo_barras;
+  const lecturaTexto = !recienCargado && lectura ? <span className="cb-lectura" data-testid="ultima-lectura"><Reloj />{t.ultimaLectura.largo}: {lectura}</span> : null;
+  const botonEscanear = !abierto && (
+    <button type="button" className="cb-boton oscuro" onClick={() => { setAbierto(true); setAviso(null); setError(null); }} data-testid="escanear-codigo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8V6a2 2 0 0 1 2-2h2M17 4h2a2 2 0 0 1 2 2v2M21 16v2a2 2 0 0 1-2 2h-2M7 20H5a2 2 0 0 1-2-2v-2M7 9v6M11 9v6M14 9v6M17 9v6" /></svg>
+      {etiqueta}
+    </button>
+  );
   return (
-    <section className="cb" aria-label={t.codigo.largo} data-testid="codigo-de-barras">
+    <section className={`cb ${celular ? "cb-celular" : "cb-compu"}`} aria-label={t.codigo.largo} data-testid="codigo-de-barras">
       <h3 className="cb-titulo">{t.codigo.largo}</h3>
       <div className="cb-fila">
         <div className="cb-caja">
-          {p.codigo_barras ? <code ref={caja} data-testid="codigo-actual">{p.codigo_barras}</code> : <span className="cb-sin" data-testid="codigo-actual">{t.sinCodigo.largo}</span>}
+          {p.codigo_barras && <BarrasEan codigo={p.codigo_barras} className="cb-barras" />}
+          <span className="cb-texto">
+            {p.codigo_barras ? <code ref={caja} data-testid="codigo-actual">{p.codigo_barras}</code> : <span className="cb-sin" data-testid="codigo-actual">{t.sinCodigo.largo}</span>}
+            {!celular && lecturaTexto}
+          </span>
           {p.codigo_barras && (
             <button type="button" className="cb-copiar" onClick={() => void copiar(p.codigo_barras!)} aria-label={t.copiar.largo} title={t.copiar.largo} data-testid="copiar-codigo">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
             </button>
           )}
         </div>
-        {!abierto && (
-          <button type="button" className="cb-boton" onClick={() => { setAbierto(true); setAviso(null); setError(null); }} data-testid="escanear-codigo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8V6a2 2 0 0 1 2-2h2M17 4h2a2 2 0 0 1 2 2v2M21 16v2a2 2 0 0 1-2 2h-2M7 20H5a2 2 0 0 1-2-2v-2M7 9v6M11 9v6M14 9v6M17 9v6" /></svg>
-            {etiqueta}
-          </button>
-        )}
+        {!celular && botonEscanear}
       </div>
-      {recien && recien === p.codigo_barras ? (
+      {celular && (lecturaTexto || botonEscanear) && <div className="cb-abajo">{lecturaTexto ?? <span />}{botonEscanear}</div>}
+      {recienCargado && (
         <div className="cb-ok" role="status" data-testid="codigo-guardado">
           <i aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg></i>
           <span><b>{t.actualizado.largo}</b>{lectura && <span data-testid="ultima-lectura">{t.ultimaLectura.largo}: {lectura}</span>}</span>
         </div>
-      ) : lectura && <p className="cb-lectura" data-testid="ultima-lectura">{t.ultimaLectura.largo}: {lectura}</p>}
+      )}
       {aviso && <p className="cb-aviso" role="status" data-testid="codigo-en-otro">{aviso}</p>}
       {copiado && <p className="cb-copiado" role="status" data-testid="codigo-copiado">{copiado}</p>}
       {error && !abierto && <p className="cb-error" role="alert">{error}</p>}
@@ -113,4 +130,8 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
       )}
     </section>
   );
+}
+
+function Reloj() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l4 2" /></svg>;
 }

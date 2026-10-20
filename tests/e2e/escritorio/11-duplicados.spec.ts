@@ -58,20 +58,22 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await expect.poll(() => psql(`SELECT proveedor_preferido_id FROM producto WHERE id = '${ID_A}'`)).toBe(ID_PROV_B);
   await expect.poll(() => psql(`SELECT count(DISTINCT proveedor_id) FROM precio_proveedor WHERE producto_id = '${ID_A}'`)).toBe("2");
 
-  // En Productos: un solo producto, dos proveedores, el barato con estrella y el precio sobre su costo.
+  // En Productos: un solo producto; en su ficha, al lado de la lista (la v2, decisión 145), los dos
+  // proveedores, el barato con estrella y el precio sobre su costo.
   await page.goto("/#/productos");
   await page.getByTestId("busqueda").fill("e2e silicona duplicada");
   await expect(page.getByTestId("producto")).toHaveCount(1);
-  const fila = page.getByTestId("producto").first();
-  const otros = fila.getByTestId("otros-proveedores");
+  const ficha = page.getByTestId("ficha-producto");
+  await expect(ficha).toContainText("SILICONA DUPLICADA");
+  const otros = ficha.getByTestId("otros-proveedores");
   await expect(otros.getByRole("listitem").filter({ hasText: "Proveedor barato (e2e)" })).toContainText("$2.400,00");
   await expect(otros.getByRole("listitem").filter({ hasText: "Proveedor barato (e2e)" })).toContainText("el más barato");
   await expect(otros.getByRole("listitem").filter({ hasText: "Proveedor caro (e2e)" })).toContainText("$3.000,00");
-  await expect(fila.getByTestId("explicacion").last()).toContainText("$6.000"); // 2400 × 2 × 1,21 = 5808 → 6000
+  await expect(ficha.getByTestId("precio-de-venta")).toHaveText("$6.000"); // 2400 × 2 × 1,21 = 5808 → 6000
 
   // Elegir el caro a mano: el precio sigue a ese costo.
   await otros.getByRole("button", { name: "Usar el costo de Proveedor caro (e2e)" }).click();
-  await expect(fila.getByTestId("explicacion").last()).toContainText("$8.000", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
+  await expect(ficha.getByTestId("precio-de-venta")).toHaveText("$8.000", { timeout: 10000 }); // 3000 × 2 × 1,21 = 7260 → 8000
 
   // Separar: el absorbido vuelve a existir con sus precios y su venta.
   await page.goto("/#/duplicados");

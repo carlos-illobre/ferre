@@ -58,6 +58,29 @@ computadora (`maquetas/compu-ficha.html`). Las variantes B y C quedan como refer
   ← → recorren los márgenes y ↑ ↓ las partes de la ficha, como hoy. En una ventana de menos de
   900 px, una sola columna y sin la línea de teclas.
 
+## Desde la v2 (Carlos, 2026-10-20, decisión 145)
+
+Cambia el aspecto, no lo que la ficha muestra ni sus reglas (detalle en
+`specs/002-catalogo-y-precios/ux.md`, «La pantalla Productos, como la v2»):
+
+- **Computadora:** la ficha ya no se abre encima: es la del producto elegido, siempre a la
+  derecha de la lista. Arriba la foto (120 px) con «Cambiar foto», el stock, el nombre, la marca y
+  el código, el precio grande y los márgenes como segmentos (el último, «Otro», abre la caja del
+  porcentaje a mano). Debajo el código de barras con sus barras dibujadas, «Última lectura»
+  adentro de la caja, copiar como botón de ícono y «Escanear con el celular» oscuro al lado.
+  Después, en dos columnas, «Proveedores» (todos a la vista) y «Así se calcula» (abierto; F1 lo
+  pliega), y el archivo de origen. Al pie: Esc (vuelve a la búsqueda), ↑ ↓ (otro producto),
+  «Listo» y «Agregar a la venta» en naranja con su tecla «+». Con el foco en la ficha, ← →
+  recorren los márgenes y Enter elige, como antes. En una ventana de menos de 900 px sigue
+  abriéndose encima.
+- **Celular:** a pantalla entera, con «‹ Productos» para volver. La foto grande arriba, con la
+  pastilla del stock y «Cambiar foto» encima; el nombre; la marca, el código. El precio de venta
+  grande, sin bajar, con «margen N %» y «Así se calcula»: tocarlo despliega debajo los márgenes
+  (300, 200, 100, 50, 25 y «Otro») y la cuenta. El código de barras con «Escanear» oscuro al lado
+  de la última lectura. El proveedor en uso, con su inicial en verde, la estrella, «Proveedor
+  principal · fecha», su costo y «+N más», que despliega los demás con «Usar». El archivo de
+  origen. Fijos abajo, «Listo» y «Agregar a la venta» en naranja.
+
 ## Chequeo contra los principios de interfaz
 
 - Las palabras del negocio: «Proveedor principal», «Costo de compra», «Se cobra». Cumple.

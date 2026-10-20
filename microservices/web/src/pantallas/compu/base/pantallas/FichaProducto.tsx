@@ -69,7 +69,7 @@ export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }
   );
 }
 
-function FotoDeLaFicha({ producto: p, alSubir, alError }: { producto: Producto; alSubir: (archivo: File) => Promise<void>; alError: (m: string) => void }) {
+export function FotoDeLaFicha({ producto: p, alSubir, alError }: { producto: Producto; alSubir: (archivo: File) => Promise<void>; alError: (m: string) => void }) {
   const archivo = useRef<HTMLInputElement>(null);
   const [subiendo, setSubiendo] = useState(false);
   async function elegida(e: React.ChangeEvent<HTMLInputElement>) {
@@ -216,7 +216,7 @@ function TarjetaArchivo({ producto: p, alError }: { producto: Producto; alError:
 // Teclado en la ficha: ← → recorren los márgenes sin elegir (Enter elige el que tiene el
 // foco); ↑ ↓ recorren las partes de la ficha (Enter usa la que tiene el foco); ↑ desde la
 // primera vuelve a los márgenes. En una caja de texto, ← → mueven el cursor.
-function teclasDeLaFicha(e: React.KeyboardEvent<HTMLDialogElement>) {
+export function teclasDeLaFicha(e: React.KeyboardEvent<HTMLElement>) {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
   const ficha = e.currentTarget;
   const foco = document.activeElement as HTMLElement | null;

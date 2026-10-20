@@ -64,11 +64,11 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await expect(page.getByTestId("producto")).toHaveCount(1);
   await page.getByTestId("producto").first().click();
   const ficha = page.getByTestId("ficha-producto");
-  // Primero el proveedor en uso, el barato, con la estrella; la flecha muestra el otro (specs/016).
-  await expect(ficha.getByTestId("proveedor-en-uso")).toContainText("Proveedor barato (e2e)★");
+  // Primero el proveedor en uso, el barato, con la estrella; «+1 más» muestra el otro (specs/016, la v2).
+  await expect(ficha.getByTestId("proveedor-en-uso")).toContainText("Proveedor barato (e2e)el más barato");
   await expect(ficha.getByTestId("proveedor-en-uso")).toContainText("$2.400,00");
   await expect(ficha).toContainText("$6.000"); // 2400 × 2 × 1,21 = 5808 → 6000
-  await ficha.getByTestId("proveedor-en-uso").click();
+  await ficha.getByTestId("ver-proveedores").click();
   await expect(ficha.getByTestId("otros-proveedores")).toContainText("Proveedor caro (e2e)");
   await expect(ficha.getByTestId("otros-proveedores")).toContainText("$3.000,00");
 

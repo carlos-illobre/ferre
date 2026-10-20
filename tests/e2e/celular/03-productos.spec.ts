@@ -55,19 +55,19 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   const fila = page.getByTestId("producto").filter({ hasText: "MECHA PARA MADERA DE 6 MM (E2E)" });
   await expect(fila).toBeVisible();
   await expect(page.getByTestId("producto")).toHaveCount(1);
-  await expect(fila).toContainText("sin margen");
+  await expect(fila).toContainText("Sin precio");
 
-  // La ficha se abre con Enter. Ahí, margen 100 %, precio calculado y «Así se calcula» con el
-  // costo explicado (specs/016).
+  // La ficha se abre con Enter. Ahí, «Así se calcula» despliega los márgenes y la cuenta con el
+  // costo explicado (specs/016; la v2, decisión 145): margen 100 % y el precio calculado.
   await busqueda.press("Enter");
   const ficha = page.getByTestId("ficha-producto");
   await expect(ficha).toContainText("MECHA PARA MADERA DE 6 MM (E2E)");
-  await ficha.getByRole("button", { name: "100 %" }).click();
-  await expect(ficha.getByRole("button", { name: "100 %" })).toHaveClass(/activo/);
-  await expect(ficha).toContainText("$4.000"); // 1500 × 2 × 1,21 = 3630 → para arriba a 4000
   await ficha.getByTestId("abrir-calculo").click();
+  await ficha.getByRole("button", { name: "100 %", exact: true }).click();
+  await expect(ficha.getByRole("button", { name: "100 %", exact: true })).toHaveClass(/activo/);
+  await expect(ficha).toContainText("$4.000"); // 1500 × 2 × 1,21 = 3630 → para arriba a 4000
   await expect(ficha.getByTestId("cuenta")).toContainText("− 25 % (linea)");
-  await expect(ficha.getByTestId("cuenta")).toContainText("+ Margen 100 %");
+  await expect(ficha.getByTestId("cuenta")).toContainText("+ 100 % de margen");
   await expect(ficha.getByTestId("se-cobra")).toHaveText("$4.000");
 
   // Queda guardado aunque se recargue con el pedido en vuelo: el cambio se anota en el
@@ -75,15 +75,16 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   await page.route("**/productos/*", async (ruta) => { await new Promise((r) => setTimeout(r, 5000)); await ruta.continue().catch(() => undefined); });
   // El celular sin el guardado habilitado no tiene cola: manda el cambio directo. Que salga antes de recargar.
   const enviado = page.waitForRequest((r) => r.method() === "PATCH" && r.url().includes("/productos/"));
-  await ficha.getByRole("button", { name: "50 %" }).click();
-  await expect(ficha.getByRole("button", { name: "50 %" })).toHaveClass(/activo/);
+  await ficha.getByRole("button", { name: "50 %", exact: true }).click();
+  await expect(ficha.getByRole("button", { name: "50 %", exact: true })).toHaveClass(/activo/);
   await enviado;
   await page.unroute("**/productos/*");
   await page.reload();
   await page.getByTestId("busqueda").fill("me6");
   await expect(page.getByTestId("producto").first()).toContainText("50 %");
   await page.getByTestId("producto").first().click();
-  await page.getByTestId("ficha-producto").getByRole("button", { name: "100 %" }).click();
+  await page.getByTestId("ficha-producto").getByTestId("abrir-calculo").click();
+  await page.getByTestId("ficha-producto").getByRole("button", { name: "100 %", exact: true }).click();
   await expect(page.getByTestId("ficha-producto")).toContainText("$4.000");
   // Que llegue al servidor antes de recargar.
   await expect.poll(() => psql(`SELECT margen_elegido FROM producto WHERE id = '00000000-0000-0000-0000-00000000e2e2'`)).toBe("100");
@@ -94,11 +95,13 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   // Otro margen a mano, en porcentaje: 20 % → 1500 × 1,2 × 1,21 = 2178 → $3.000.
   await page.getByTestId("producto").first().click();
   const ficha2 = page.getByTestId("ficha-producto");
+  await ficha2.getByTestId("abrir-calculo").click();
+  await ficha2.getByTestId("margen-otro").click();
   await ficha2.getByTestId("otro-margen").fill("20");
   await ficha2.getByTestId("otro-margen").press("Enter");
   await expect(ficha2).toContainText("$3.000");
   await expect(ficha2).toContainText("20 % a mano");
-  await expect(ficha2.getByRole("button", { name: "100 %" })).not.toHaveClass(/activo/);
+  await expect(ficha2.getByRole("button", { name: "100 %", exact: true })).not.toHaveClass(/activo/);
   await page.keyboard.press("Escape");
   await expect(page.getByTestId("producto").first()).toContainText("20 % a mano");
 

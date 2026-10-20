@@ -1185,3 +1185,14 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
        calendario».
      - **Siempre que haya una cantidad, va con su unidad** («3 un.», «1,5 kg», «2 m»), en el
        celular y en la computadora, en todas las pantallas (amplía la decisión 106).
+145. **Catálogo → Productos como la v2, en el celular y en la computadora** (2026-10-20). Carlos:
+     «modificá la pantalla de Catálogo > Productos para que se vea igual a la de v2, tanto para el
+     celular como para la computadora». La v2 es la evolución de cada pantalla (decisión 113): en la
+     computadora, «Lista y ficha lado a lado»; en el celular, «Lista y ficha» (maquetas de
+     referencia en `specs/002-catalogo-y-precios/maquetas/*-v2-referencia.png`). En la computadora
+     la ficha deja de abrirse encima: la del producto elegido queda siempre a la derecha de la
+     lista y ↑ ↓ cambian de producto. En el celular, la ficha ocupa la pantalla, con «‹ Productos»
+     para volver, y los márgenes van dentro de «Así se calcula». Lo de la v2 que necesita algo que
+     todavía no existe no va, hasta que Carlos lo pida: «para remarcar» (RF-15), el historial del
+     costo (RF-14), la estantería del producto (no se guarda), «Lleva 2» en lo ya agregado,
+     «Deshacer» en el aviso de agregado y filtrar tocando las pastillas de arriba.

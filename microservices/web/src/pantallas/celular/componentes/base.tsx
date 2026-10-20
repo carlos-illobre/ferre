@@ -65,6 +65,8 @@ const TRAZOS: Record<string, string> = {
   tacho: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
   flecha: "M5 12h14M13 6l6 6-6 6",
   dispositivos: "M4 5h12v9H4zM8 18h4M10 14v4M17 9h4v11h-4z",
+  // La estrella del proveedor más barato, en la ficha (decisión 145).
+  estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
 };
 export function Icono({ nombre, tam = 20, grosor = 2, className }: { nombre: keyof typeof TRAZOS | string; tam?: number; grosor?: number; className?: string }) {
   return (

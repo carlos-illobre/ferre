@@ -107,6 +107,9 @@ cada Dockerfile que agrega ese certificado, con el nombre que espera `docker-com
   construye el CI, que no pasa por el proxy, con los Dockerfiles del repositorio.
 - Las imágenes que publica el CI no sirven en la nube: son para ARM (el servidor) y la
   máquina de la nube es x86.
+- `docker compose build` construye con `docker buildx bake`, que pide permiso para leer las copias
+  de los Dockerfiles porque están fuera del repositorio («additional privileges requested:
+  pass --allow=fs.read=…»). El script lo da con `BUILDX_BAKE_ENTITLEMENTS_FS=0` (2026-10-20).
 
 Lo hace `.claude/scripts/imagenes-nube.sh`: copia los tres Dockerfiles a una carpeta temporal
 con el certificado agregado en la etapa que baja dependencias, crea el `.env` desde

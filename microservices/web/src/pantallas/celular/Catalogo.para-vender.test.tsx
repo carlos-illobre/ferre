@@ -65,6 +65,7 @@ describe("Catálogo para vender · celular", () => {
 
   it("015-E10 015-E11 015-E13: sin precio o sin stock entra igual, y agregar no necesita internet", () => {
     armar();
+    apiFalsa.mockClear(); // al abrir, la pantalla pide cuántos hay sin precio; agregar no pide nada
     fireEvent.click(within(tarjeta("papel")).getByTestId("agregar")); // sin margen: sin precio
     fireEvent.click(within(tarjeta("aisladora")).getByTestId("agregar")); // sin stock
     expect(ventaActual().items.map((it) => it.descripcion)).toEqual(["Cinta de papel 24 mm", "Cinta aisladora negra 20 m"]);

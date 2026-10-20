@@ -29,6 +29,15 @@ aprueba: la documentación no lleva código (010-E01, lo controla `tests/itest.s
   que se le pasan, para ver lo que ve cada rol:
   `python tests/capturas/capturar.py vender --permisos ventas.registrar`.
 
+## Al lado de la maqueta
+
+`lado-a-lado.py` arma una sola imagen con varias capturas, cada una con su título, para mostrarle
+a Carlos la pantalla al lado de su maqueta (o el antes y el después):
+
+```bash
+python tests/capturas/lado-a-lado.py salida/productos-celu.png "Maqueta" maqueta.png "Aplicación" salida/productos-celu.png --ancho 780
+```
+
 ## La API de mentira
 
 Procesos arranca con tres procesos de ejemplo; `PUT /mentira/procesos` con `{ "vacio": true }` deja la
