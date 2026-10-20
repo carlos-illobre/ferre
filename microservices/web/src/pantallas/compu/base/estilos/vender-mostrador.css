@@ -261,3 +261,5 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
   .vmc-sug, .vmc-aviso, .vmc-vacia, .vmc-ultimos { animation: none; }
   .vmc-pagina .boton:active, .vmc-medio:active, .vmc-cliente:active, .vmc-ultimo:active, .vmc-a-mano:active, .vmc-tacho:active, .vmc-item .contador button:active { transform: none; }
 }
+/* El aviso, centrado sobre la barra del cobro (decisión 133). Sin transform, que usa la animación al subir. */
+.vmc-aviso { left: 0; right: 0; margin: 0 auto; width: fit-content; max-width: min(640px, calc(100% - 48px)); }
