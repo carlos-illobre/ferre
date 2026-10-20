@@ -60,6 +60,32 @@ crea desde el contenedor; los siguientes usuarios, desde la app:
 docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre"
 ```
 
+## Monitor
+
+Una tarea programada en GitHub (`.github/workflows/monitor.yml`, RNF-12, T091) mira los dos
+ambientes una vez por día, a las 08:47 de Buenos Aires: que el servidor conteste en `/health`,
+que la base responda y que no pase los 350 MB. Si algo falla, la tarea queda en rojo y GitHub
+manda un correo. También se corre a mano: Actions → Monitor → «Run workflow».
+
+La salud del servidor no consulta la base (specs/018, para no llenar sus registros); la base la
+mantiene despierta el propio servidor, con una consulta por día. El monitor la consulta por su
+cuenta, así se entera aunque el servidor ande y la base no.
+
+**Lo que tiene que hacer Carlos una sola vez:**
+
+1. **Los secretos.** En GitHub, Settings → Secrets and variables → Actions → «New repository
+   secret»: `BASE_PRODUCCION` y `BASE_PRUEBAS`, cada uno con la cadena de conexión de su base
+   (en Supabase: Connect → Session pooler; la misma que está como `DATABASE_URL` en el `.env` de
+   cada ambiente en Oracle). Más seguro: un usuario que solo puede conectarse, creado en el SQL
+   Editor de Supabase de cada proyecto con
+   `CREATE ROLE monitor LOGIN PASSWORD '<una clave larga>'; GRANT CONNECT ON DATABASE postgres TO monitor;`
+   y usarlo en esa cadena (en el «Session pooler» el usuario se escribe `monitor.<id del proyecto>`).
+2. **Que el correo le llegue a él.** GitHub avisa de una tarea programada que falla a quien
+   cambió por última vez su horario. En GitHub, editar `.github/workflows/monitor.yml` y mover un
+   minuto el horario (`47 11` → `46 11`), con el botón «Commit changes». Y en Settings →
+   Notifications → System → Actions, que esté «Email».
+3. **Probarlo.** Actions → Monitor → «Run workflow»: los dos ambientes en verde.
+
 ## Respaldo y recuperación
 
 - Volcado horario de la base a Oracle Object Storage, retención 30 días.

@@ -98,7 +98,9 @@ Las reglas no van acá: van en `specs/`.
 - [x] T077 [agente] Teclado en la computadora: el menú no mueve la lista, baja hasta Desvincular y Salir, y la derecha entra a las pestañas (estimación 2h) (#77)
 - [x] T082 [agente] Celular, Más: botón Volver en cada pantalla para regresar al menú de Más (estimación 1h) (#82)
 - [x] T088 [agente] Celular, Más: «Salir» con el mismo aspecto que las demás opciones (#88)
-- [ ] T091 [definir] Monitor externo que consulte la API y la base a diario y avise si dejan de responder (estimación 1h) (#91)
+- [x] T091 [agente] Monitor externo que consulte la API y la base a diario y avise si dejan de responder (estimación 1h) (#91)
+  Hecho con 001-T040: tarea programada en GitHub, una vez por día, aviso por correo de GitHub
+  (Carlos, 2026-10-20). Falta que Carlos cargue los secretos (docs/operacion/DEPLOYMENT.md, «Monitor»).
   Requerimiento RNF-12, especificado en specs/001-base-del-sistema (historia 6); ADR-002. Sale
   de T019. Hoy no existe ningún monitor.
   Además de avisar, la consulta diaria evita que la base gratuita de Supabase se pause a los 7

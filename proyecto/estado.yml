@@ -1023,12 +1023,13 @@ RNF-11:
     - "Sin prueba: abrir la app y vender con el servidor apagado"
 
 RNF-12:
-  estado: "Pendiente (#91)"
-  pruebas: []
+  estado: "A validar (001-T040, #91): la tarea programada en GitHub mira los dos ambientes una vez por día; falta que Carlos cargue los secretos BASE_PRODUCCION y BASE_PRUEBAS y la corra una vez"
+  pruebas:
+    - .github/workflows/monitor.yml
   defectos:
-    - "Sin construir: no hay monitor externo ni aviso a los Administradores cuando la API o la base dejan de responder (contra ADR-002)"
-    - "Sin la consulta diaria del monitor, la base gratuita se pausa a los 7 días sin consultas"
-    - "Sin construir: no hay alerta cuando la base supera los 350 MB (contra ADR-002)"
+    - "El aviso es el correo de GitHub al dueño del repositorio: les llega a los Administradores solo si alguno es ese dueño"
+    - "Avisa con hasta un día de demora (lo eligió Carlos)"
+    - "Cómo se avisa si falla una copia de respaldo se decide con T092"
 
 RNF-13:
   estado: "Hecho en parte: se aparta de la regla en 1 punto"

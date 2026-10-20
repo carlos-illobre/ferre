@@ -1,0 +1,65 @@
+name: Monitor
+
+# El monitor externo (RNF-12, specs/001-base-del-sistema historia 6; T091): una vez por día mira
+# los dos ambientes desde afuera de la máquina de Oracle. Si el servidor no responde, si la base no
+# responde o si la base pasa los 350 MB (de los 500 del plan gratuito, ADR-002), la tarea falla y
+# GitHub le manda un correo al dueño del repositorio. También corre a mano («Run workflow»).
+#
+# La salud del servidor ya no consulta la base (specs/018), así que la base se consulta acá, con su
+# propia cadena de conexión. Hacen falta dos secretos del repositorio (Settings → Secrets and
+# variables → Actions), cómo crearlos está en docs/operacion/DEPLOYMENT.md, «Monitor»:
+#   BASE_PRODUCCION y BASE_PRUEBAS: la cadena de conexión de cada base («Session pooler»).
+on:
+  schedule:
+    - cron: "47 11 * * *" # 08:47 en Buenos Aires
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ambiente:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nombre: producción
+            api: https://ferre-api.duckdns.org
+            secreto: BASE_PRODUCCION
+          - nombre: pruebas
+            api: https://ferre-api-pruebas.duckdns.org
+            secreto: BASE_PRUEBAS
+    name: ${{ matrix.nombre }}
+    steps:
+      - name: El servidor responde
+        env:
+          AMBIENTE: ${{ matrix.nombre }}
+          API: ${{ matrix.api }}
+        run: |
+          if ! respuesta=$(curl -fsS --max-time 30 --retry 2 --retry-delay 20 "$API/health"); then
+            echo "::error::El servidor de $AMBIENTE no responde ($API/health)."; exit 1
+          fi
+          echo "$respuesta" | grep -q '"ok":true' || { echo "::error::El servidor de $AMBIENTE contesta, pero no dice que anda: $respuesta"; exit 1; }
+          echo "El servidor de $AMBIENTE anda: $respuesta"
+
+      - name: La base responde y su tamaño
+        # Corre aunque el servidor no responda: la base se mira por separado.
+        if: ${{ !cancelled() }}
+        env:
+          AMBIENTE: ${{ matrix.nombre }}
+          SECRETO: ${{ matrix.secreto }}
+          DATABASE_URL: ${{ secrets[matrix.secreto] }}
+          TOPE_MB: 350
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Falta el secreto $SECRETO del repositorio: sin él no se puede mirar la base de $AMBIENTE (docs/operacion/DEPLOYMENT.md, «Monitor»)."; exit 1
+          fi
+          if ! mb=$(PGCONNECT_TIMEOUT=30 psql "$DATABASE_URL" -tAc "SELECT pg_database_size(current_database()) / 1048576" 2>&1); then
+            echo "::error::La base de $AMBIENTE no responde."; echo "$mb" | sed -E 's#postgres(ql)?://[^ ]+#(cadena oculta)#g'; exit 1
+          fi
+          mb=$(echo "$mb" | tr -d '[:space:]')
+          echo "La base de $AMBIENTE ocupa $mb MB (tope del aviso: $TOPE_MB MB)."
+          if [ "$mb" -gt "$TOPE_MB" ]; then
+            echo "::error::La base de $AMBIENTE ocupa $mb MB: pasó los $TOPE_MB MB (el plan gratuito permite 500)."; exit 1
+          fi
