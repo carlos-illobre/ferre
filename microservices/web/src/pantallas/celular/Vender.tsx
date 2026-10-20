@@ -33,6 +33,7 @@ import "./vender.css";
 // del mostrador (specs/003-ventas/research.md): buscar → precio → cantidad → cobro. Enter agrega;
 // Esc descarta ("no llevó"); F2 cobra.
 
+const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join("");
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
 const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
@@ -262,8 +263,10 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         <AvisoError texto={error} />
         <div className="vm-pago">
           <MedioDePago medio={medio} alElegir={elegirMedio} />
-          <button type="button" className={`vm-cliente ${cliente ? "elegido" : medio === "cuenta_corriente" ? "falta" : ""}`} onClick={() => setHoja("clientes")} data-testid="cliente">
-            <Icono nombre="persona" tam={18} /><span>{cliente ? cliente.nombre : medio === "cuenta_corriente" ? TEXTOS.vender.elegiElCliente.corto : TEXTOS.vender.clienteOpcional.corto}</span>
+          {/* El cliente, al final de la fila: la persona, o sus iniciales si se eligió (decisión 142). */}
+          <button type="button" className={`vm-cliente ${cliente ? "elegido" : medio === "cuenta_corriente" ? "falta" : ""}`} onClick={() => setHoja("clientes")} data-testid="cliente"
+            aria-label={cliente ? `Cliente: ${cliente.nombre}` : medio === "cuenta_corriente" ? TEXTOS.vender.elegiElCliente.corto : TEXTOS.vender.clienteOpcional.corto} title={cliente?.nombre}>
+            {cliente ? <b>{iniciales(cliente.nombre)}</b> : <Icono nombre="persona" tam={20} />}
           </button>
         </div>
         <Deslizar apagado={!items.length || ocupado} ocupado={ocupado} alCobrar={cobrar} alTocar={() => setAviso({ texto: TEXTOS.vender.comoSeCobra.corto })}>
@@ -343,34 +346,18 @@ function BuscarProducto({ consulta, alCambiar, onKeyDown, cajaRef, resultados, e
   );
 }
 
-// El medio de pago: una pastilla con el ícono y el color del medio que abre la lista de los cuatro
-// (decisión 119). Arranca en Efectivo y vuelve a Efectivo después de cada venta (decisión 37).
+// El medio de pago, como la v4 de «Ventas de hoy» (decisión 142): los cuatro en una fila de
+// pastillas; el elegido con su color, el ícono en un círculo lleno y su nombre; los demás, solo el
+// ícono. Arranca en Efectivo y vuelve a Efectivo después de cada venta (decisión 37).
 function MedioDePago({ medio, alElegir }: { medio: Medio | null; alElegir: (m: Medio) => void }) {
-  const [abierta, setAbierta] = useState(false);
-  const raiz = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!abierta) return;
-    const fuera = (e: MouseEvent) => { if (!raiz.current?.contains(e.target as Node)) setAbierta(false); };
-    const tecla = (e: globalThis.KeyboardEvent) => { if (e.key === "Escape") setAbierta(false); };
-    document.addEventListener("mousedown", fuera);
-    document.addEventListener("keydown", tecla);
-    return () => { document.removeEventListener("mousedown", fuera); document.removeEventListener("keydown", tecla); };
-  }, [abierta]);
-  const actual = MEDIOS.find((m) => m.valor === medio);
   return (
-    <div className="vm-medio" ref={raiz}>
-      <button type="button" className={`vm-medio-elegido medio-${medio ?? "efectivo"}`} onClick={() => setAbierta(!abierta)} aria-haspopup="listbox" aria-expanded={abierta} aria-label={`Cómo paga: ${actual?.nombre ?? "sin elegir"}`} data-testid="medio">
-        {medio && <IconoDeMedio medio={medio} tam={20} />}<span>{actual?.corto ?? "Cómo paga"}</span><Icono nombre="abajo" tam={16} grosor={2.4} />
-      </button>
-      {abierta && (
-        <div className="vm-medios" role="listbox" aria-label="Cómo paga">
-          {MEDIOS.map((m) => (
-            <button key={m.valor} type="button" role="option" aria-selected={medio === m.valor} className={`medio-${m.valor}`} onClick={() => { alElegir(m.valor); setAbierta(false); }} data-testid={`medio-${m.valor}`}>
-              <IconoDeMedio medio={m.valor} tam={20} conFondo />{m.nombre}{medio === m.valor && <Icono nombre="tilde" tam={18} grosor={2.6} className="vm-tilde-chica" />}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="vm-medios-fila" role="radiogroup" aria-label="Cómo paga" data-testid="medio">
+      {MEDIOS.map((m) => (
+        <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} aria-label={m.nombre} title={m.nombre}
+          className={`vm-mp medio-${m.valor} ${medio === m.valor ? "elegido" : ""}`} onClick={() => alElegir(m.valor)} data-testid={`medio-${m.valor}`}>
+          <IconoDeMedio medio={m.valor} tam={18} />{medio === m.valor && <span>{m.corto}</span>}
+        </button>
+      ))}
     </div>
   );
 }

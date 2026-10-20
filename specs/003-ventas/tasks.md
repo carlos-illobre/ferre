@@ -30,3 +30,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T019 [interfaz] Celular: Vender igual a la v2 salvo cobrar deslizando y el medio desplegable; los íconos del menú de abajo de la v2; las pestañas de adentro con la elegida en blanco (decisión 140; maqueta `maquetas/celular-vender-v2-referencia.png`)
 - [x] T020 [interfaz] Celular: la búsqueda de Vender en una hoja como la de la v2: la caja con «Cancelar», lo último que se vendió con la caja vacía, los resultados en tarjetas con la foto, la marca, el stock y el precio, y «Agregar «…»» como ítem libre (decisión 140)
 - [x] T021 [ajuste] Celular: la lista de la unidad del renglón con el estilo de la pantalla, como en la computadora
+- [x] T022 [interfaz] Celular: el medio de pago de Vender como la v4 de «Ventas de hoy», las cuatro pastillas con la elegida con su nombre, y el cliente al final de la fila (decisión 142)

@@ -35,7 +35,7 @@ function armar(ventas: unknown = ventasVacias, sub: string | null = null) {
   const unidad = (texto: string) => within(item(texto)).getByTestId("unidad");
   // Con el teclado, Enter sobre el círculo cobra (el dedo lo arrastra hasta el final).
   const cobrar = () => fireEvent.keyDown(screen.getByTestId("cobrar-pulgar"), { key: "Enter" });
-  const medio = (valor: string) => { fireEvent.click(screen.getByTestId("medio")); fireEvent.click(screen.getByTestId(`medio-${valor}`)); };
+  const medio = (valor: string) => fireEvent.click(screen.getByTestId(`medio-${valor}`));
   return { falso, busqueda, agregar, item, unidad, cobrar, medio, unmount };
 }
 
@@ -126,20 +126,18 @@ describe("Vender", () => {
     expect(screen.queryAllByTestId("item")).toHaveLength(0);
   });
 
-  it("decisión 119: el medio es una pastilla que abre la lista de los cuatro, con su ícono; arranca en Efectivo", () => {
+  it("decisión 142: los cuatro medios en una fila; el elegido dice su nombre y los demás solo el ícono; arranca en Efectivo", () => {
     const { agregar, medio } = armar();
     agregar("mecha vender");
     expect(screen.getByTestId("medio").textContent).toBe("Efectivo");
-    expect(screen.getByTestId("medio").querySelector(".medio-icono.medio-efectivo")).not.toBeNull();
-    fireEvent.click(screen.getByTestId("medio"));
-    const lista = screen.getByRole("listbox", { name: "Cómo paga" });
-    expect(within(lista).getAllByRole("option").map((o) => o.textContent)).toEqual(["Efectivo", "Mercado Pago", "Tarjeta", "Cuenta corriente"]);
-    expect(within(lista).getByRole("option", { name: "Efectivo" }).getAttribute("aria-selected")).toBe("true");
+    const fila = screen.getByRole("radiogroup", { name: "Cómo paga" });
+    expect(within(fila).getAllByRole("radio").map((o) => o.getAttribute("aria-label"))).toEqual(["Efectivo", "Mercado Pago", "Tarjeta", "Cuenta corriente"]);
+    expect(within(fila).getByRole("radio", { name: "Efectivo" }).getAttribute("aria-checked")).toBe("true");
     // 017-E06: cada medio con su ícono y su color, el mismo que en «Ventas del día».
     for (const m of ["efectivo", "mercado_pago", "tarjeta", "cuenta_corriente"]) expect(screen.getByTestId(`medio-${m}`).querySelector(`.medio-icono.medio-${m}`)).not.toBeNull();
     fireEvent.click(screen.getByTestId("medio-tarjeta"));
-    expect(screen.queryByRole("listbox")).toBeNull();
     expect(screen.getByTestId("medio").textContent).toBe("Tarjeta");
+    expect(screen.getByTestId("medio-tarjeta").className).toContain("elegido");
     medio("mercado_pago");
     expect(screen.getByTestId("medio").textContent).toBe("M. Pago");
   });
@@ -150,14 +148,14 @@ describe("Vender", () => {
     medio("cuenta_corriente");
     expect(screen.getByTestId("hoja-clientes")).toBeTruthy(); // sin cliente elegido, pide elegirlo
     fireEvent.keyDown(window, { key: "Escape" });
-    expect(screen.getByTestId("cliente").textContent).toBe("Elegí el cliente");
+    expect(screen.getByTestId("cliente").getAttribute("aria-label")).toBe("Elegí el cliente");
     expect(screen.getByTestId("cliente").className).toContain("falta");
     cobrar();
     expect(screen.getByRole("alert").textContent).toContain("elegí el cliente");
     fireEvent.keyDown(window, { key: "Escape" });
     medio("efectivo");
     expect(screen.queryByRole("alert")).toBeNull();
-    expect(screen.getByTestId("cliente").textContent).toBe("Cliente (opcional)");
+    expect(screen.getByTestId("cliente").getAttribute("aria-label")).toBe("Cliente (opcional)");
   });
 
   it("003 historia 4 escenario 8: el cliente es opcional con cualquier medio y va en la venta; después vuelve a quedar sin elegir", async () => {
@@ -165,14 +163,15 @@ describe("Vender", () => {
     agregar("mecha vender");
     fireEvent.click(screen.getByTestId("cliente"));
     fireEvent.click(within(screen.getByTestId("hoja-clientes")).getByRole("button", { name: /Constructora Martínez/ }));
-    expect(screen.getByTestId("cliente").textContent).toBe("Constructora Martínez");
+    expect(screen.getByTestId("cliente").getAttribute("aria-label")).toBe("Cliente: Constructora Martínez");
+    expect(screen.getByTestId("cliente").textContent).toBe("CM");
     cobrar();
     const exito = await screen.findByTestId("exito");
     expect(exito.textContent).toContain("Efectivo · Constructora Martínez");
     const cuerpo = enviarOEncolar.mock.calls[0]![3] as { medio_pago: string; cliente_id: string | null };
     expect(cuerpo).toMatchObject({ medio_pago: "efectivo", cliente_id: "c1" });
     fireEvent.click(screen.getByTestId("cerrar-exito"));
-    expect(screen.getByTestId("cliente").textContent).toBe("Cliente (opcional)");
+    expect(screen.getByTestId("cliente").getAttribute("aria-label")).toBe("Cliente (opcional)");
   });
 
   it("003 historia 4 escenario 9: se cobra deslizando hasta el final; un toque solo explica cómo, y sin productos está apagado", async () => {

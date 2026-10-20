@@ -105,10 +105,11 @@ el lenguaje «Mostrador». Desde el 2026-10-20 (decisión 140) se ve **igual a l
 - Un producto sin precio va en ámbar, con los márgenes para elegir ahí mismo (300, 200, 100, 50,
   25 y «$» para el precio a mano). Si lo que se lleva supera el stock, el renglón avisa «Hay 3 un.:
   no alcanza para 4» o «Sin stock».
-- Abajo, fijo: si falta algún precio, un aviso ámbar que dice cuál; el medio de pago en una
-  pastilla con su ícono y su color, que al tocarla abre la lista de los cuatro; a su lado,
-  «Cliente (opcional)», que abre la lista de clientes (con cuenta corriente pasa a ámbar y dice
-  «Elegí el cliente»); y el botón naranja de la v2, «Cobrar» a la izquierda y «$45.500» a la
+- Abajo, fijo: si falta algún precio, un aviso ámbar que dice cuál; los cuatro medios en una fila
+  de pastillas redondas (decisión 142): el elegido con su color, el ícono en un círculo lleno y
+  el nombre; los demás, solo el ícono sobre su color suave; al final de la fila, el cliente, un
+  botón redondo con la persona (sus iniciales si se eligió; en ámbar si falta en cuenta corriente),
+  que abre la lista de clientes; y el botón naranja de la v2, «Cobrar» a la izquierda y «$45.500» a la
   derecha, con un cuadrado blanco con la flecha: se cobra arrastrándolo hasta el final; soltarlo antes lo devuelve, y tocarlo solo explica cómo se usa. Sin
   productos, está apagado.
 - **Escanear:** la cámara se abre arriba, en el lugar de la búsqueda, y empuja la venta hacia

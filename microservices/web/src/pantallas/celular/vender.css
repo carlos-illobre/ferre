@@ -193,3 +193,17 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
   .vm-u option:hover, .vm-u option:focus-visible { background: #ECE9E1; outline: 0; }
   .vm-u option:checked { background: #E3EEE8; color: #12382F; font-weight: 800; }
 }
+
+/* El medio de pago como la v4 de «Ventas de hoy» (decisión 142): pastillas; la elegida con su
+   nombre y el ícono en un círculo lleno. El cliente, un botón redondo al final de la fila. */
+.vm-pago { justify-content: space-between; }
+.vm-medios-fila { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.vm-mp { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 5px; border-radius: 99px; border: 1px solid var(--m-borde-fuerte); background: #fff; font-weight: 700; font-size: 15px; color: var(--m-tinta); white-space: nowrap; transition: background-color 160ms, border-color 160ms; }
+.vm-mp .medio-icono { width: 32px; height: 32px; border-radius: 99px; background: var(--medio-suave); color: var(--medio); display: grid; place-items: center; transition: background-color 160ms, color 160ms; }
+.vm-mp.elegido { padding: 0 14px 0 5px; border: 2px solid var(--medio); background: var(--medio-suave); }
+.vm-mp.elegido .medio-icono { background: var(--medio); color: #fff; }
+.vm-mp.elegido span { animation: anim-asoma 160ms cubic-bezier(.2, .8, .2, 1) both; }
+.vm-pago .vm-cliente { flex: none; width: 44px; padding: 0; justify-content: center; border-radius: 99px; }
+.vm-pago .vm-cliente b { font-size: 15px; font-weight: 800; }
+@media (prefers-reduced-motion: reduce) { .vm-mp, .vm-mp .medio-icono { transition: none; } .vm-mp.elegido span { animation: none; } }
+.vm-mp.elegido > .medio-icono.medio-icono.medio-icono { color: #fff; }

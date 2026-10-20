@@ -85,8 +85,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await enElCelular.getByTestId("cantidad").fill("3");
   await enElCelular.getByTestId("cantidad").blur();
   await expect(compu.getByTestId("item").filter({ hasText: "MECHA ESPEJO" }).getByTestId("cantidad")).toHaveValue("3");
-  // En el celular el medio se elige en la lista que abre su pastilla (decisión 119).
-  await celular.getByTestId("medio").click();
+  // En el celular el medio se toca en la fila de pastillas (decisión 142).
   await celular.getByTestId("medio-tarjeta").click();
   await expect(compu.getByRole("radio", { name: /Tarjeta/ })).toHaveAttribute("aria-checked", "true");
 

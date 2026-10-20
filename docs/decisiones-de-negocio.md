@@ -1154,3 +1154,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      del sistema), que llega hasta hoy. «Buscar» abre un panel igual, en lugar de cambiar la
      pantalla: la caja, cuántas coinciden y cuánto suman, y las ventas, que se tocan para abrir su
      hoja. Lo que dice «hoy» de verdad (en «Cómo va el negocio», las ventas de hoy) sigue diciendo hoy.
+142. **El medio de pago de Vender en el celular, como la v4 de «Ventas de hoy»** (2026-10-20). Carlos
+     prefiere la forma de la v4 a la lista desplegable (cambia lo dicho en las decisiones 119 y 140):
+     los cuatro medios en una fila de pastillas redondas; el elegido, con su color, el ícono en un
+     círculo lleno y el nombre; los demás, solo el ícono sobre su color suave. Con los íconos de la
+     aplicación (los de la v4 son genéricos) y con Cuenta corriente, que la v4 no tenía, en su color
+     de siempre (decisión 108). El cliente queda al final de la fila, como un botón redondo con la
+     persona (con sus iniciales si se eligió uno; en ámbar si falta en cuenta corriente).
