@@ -117,7 +117,7 @@ describe("Vender", () => {
     expect(within(hoja).getByRole("button", { name: "50 %" }).textContent).toBe("50 %$2.000");
     fireEvent.change(within(hoja).getByTestId("precio-manual"), { target: { value: "2500" } });
     // Un precio a mano que no es múltiplo de $1.000 también se redondea para arriba
-    expect(screen.getByTestId("total").textContent).toBe("$3.000");
+    expect(screen.getByTestId("total").textContent).toBe("$2.500"); // a mano, tal cual (decisión 128)
     expect(within(item("MECHA")).getByTestId("margen").textContent).toContain("a mano");
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
     fireEvent.click(within(hoja).getByTestId("quitar"));
@@ -382,7 +382,8 @@ describe("Vender", () => {
     const libre = screen.getByTestId("item");
     expect(within(libre).getByTestId("descripcion-libre")).toHaveProperty("value", "bolsa de arena");
     fireEvent.change(within(libre).getByTestId("precio-manual"), { target: { value: "1500" } });
-    expect(screen.getByTestId("total").textContent).toBe("$2.000");
+    expect(screen.getByTestId("total").textContent).toBe("$1.500"); // el ítem libre es precio a mano: tal cual (decisión 128)
+    expect(screen.getByTestId("no-multiplo").textContent).toBe("No es múltiplo de $1.000");
   });
 
   // RF-72: el margen elegido en la venta queda en el producto solo con «Fijar márgenes».

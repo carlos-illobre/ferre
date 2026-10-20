@@ -39,10 +39,15 @@ export function precioDe(item: Item): { unitario: number | null; pasos: string[]
   return { unitario: null, pasos: [], margen: null, costo, iva };
 }
 
+// Un renglón con precio a mano (tipeado, o un ítem libre) se cobra tal cual (decisión 128).
+export const esAMano = (item: Item) => item.precioManual !== null || !item.producto;
+// Un precio a mano que no es múltiplo de $1.000 se avisa, pero se cobra igual (RF-19).
+export const noEsMultiploDeMil = (item: Item) => esAMano(item) && item.precioManual !== null && (item.precioManual * item.cantidad) % 1000 !== 0;
+
 // El subtotal de un renglón (precio × cantidad, redondeado como se cobra), con sus pasos; sin precio, ninguno.
 export function subtotalDe(item: Item) {
   const unitario = precioDe(item).unitario;
-  return unitario === null ? null : subtotalDeRenglon({ precioUnitario: unitario, cantidad: item.cantidad, unidad: item.unidad });
+  return unitario === null ? null : subtotalDeRenglon({ precioUnitario: unitario, cantidad: item.cantidad, unidad: item.unidad, aMano: esAMano(item) });
 }
 
 // «De dónde sale» en filas, como la maqueta de la v2 (decisión 127): cada paso con su importe,
@@ -115,7 +120,7 @@ export function useVenta(opciones: OpcionesDeVenta) {
   }, []);
 
   // Cada renglón se redondea para arriba a $1.000: toda venta es múltiplo de $1.000.
-  const total = items.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: precioDe(it).unitario ?? 0, cantidad: it.cantidad }).valor, 0);
+  const total = items.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: precioDe(it).unitario ?? 0, cantidad: it.cantidad, aMano: esAMano(it) }).valor, 0);
   const sinPrecio = items.some((it) => precioDe(it).unitario === null);
   const cliente = clientes.find((c) => c.id === clienteId);
 

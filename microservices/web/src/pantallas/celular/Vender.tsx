@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as EventoDePuntero, type ReactNode } from "react";
 import { irA } from "../../rutas";
-import { NOMBRE_DE_MEDIO, precioDe, subtotalDe, useVenta, type Cobro, type Item, type Medio, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { NOMBRE_DE_MEDIO, noEsMultiploDeMil, precioDe, subtotalDe, useVenta, type Cobro, type Item, type Medio, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { useVeCostos } from "../Costos";
 import { usePuede, type Permiso } from "../permisos";
 import { MEDIOS, TEXTOS } from "../textos";
@@ -442,6 +442,7 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
           <span className="vm-subtotal importe" data-testid="subtotal">{renglon ? pesosCortos(renglon.valor) : ""}</span>
         </div>
       )}
+      {noEsMultiploDeMil(it) && <div className="vm-stock" data-testid="no-multiplo"><Icono nombre="alerta" tam={16} />{TEXTOS.vender.noMultiplo.corto}</div>}
       {noAlcanza && (
         <div className="vm-stock" data-testid="stock-no-alcanza"><Icono nombre="alerta" tam={16} />
           {stock! <= 0 ? TEXTOS.vender.sinStock.corto : `Hay ${num(stock!)} ${abreviarUnidad(it.unidad)}: no alcanza para ${num(it.cantidad)}`}

@@ -206,3 +206,4 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
 .vmc-panel.con-boleta { overflow: visible; border-bottom: 0; border-radius: 16px 16px 0 0; margin-bottom: 10px; }
 .vmc-panel.con-boleta::after { content: ""; position: absolute; left: -1px; right: -1px; bottom: -10px; height: 10px; background: linear-gradient(-45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x, linear-gradient(45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x; filter: drop-shadow(0 4px 3px rgba(26, 29, 27, .06)); }
 .vmc-panel.con-boleta .vmc-panel-cuerpo { border-radius: 0; }
+.vmc-no-multiplo { color: #8A5A00; font-weight: 700; }

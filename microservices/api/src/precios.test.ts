@@ -65,7 +65,9 @@ describe("subtotalDeRenglon", () => {
     expect(subtotalDeRenglon({ precioUnitario: 10000, cantidad: 0.3, unidad: "m" }).valor).toBe(3000);
     expect(subtotalDeRenglon({ precioUnitario: 7000, cantidad: 1.1, unidad: "l" }).valor).toBe(8000);
   });
-  it("un precio tipeado a mano que no es múltiplo de $1.000 también se redondea", () => {
-    expect(subtotalDeRenglon({ precioUnitario: 1500, cantidad: 1 }).valor).toBe(2000);
+  it("el precio puesto a mano se cobra tal cual, aunque no sea múltiplo de $1.000 (RF-19, decisión 128)", () => {
+    expect(subtotalDeRenglon({ precioUnitario: 1500, cantidad: 1, aMano: true })).toEqual({ valor: 1500, pasos: [] });
+    expect(subtotalDeRenglon({ precioUnitario: 2500, cantidad: 0.5, unidad: "kg", aMano: true }).valor).toBe(1250);
+    expect(subtotalDeRenglon({ precioUnitario: 1500, cantidad: 1 }).valor).toBe(2000); // el calculado sí se redondea
   });
 });

@@ -24,8 +24,9 @@ export type Registrada = VentaRegistrada;
 export async function registrar(v: VentaEntrada, usuarioId: string): Promise<Registrada> {
   const id = v.id ?? randomUUID();
   const fecha = v.fecha ?? new Date().toISOString();
-  // Cada renglón se redondea para arriba a $1.000 (RF-19): toda venta es múltiplo de $1.000.
-  const total = v.items.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: it.precio_unitario, cantidad: it.cantidad }).valor, 0);
+  // Cada renglón calculado se redondea para arriba a $1.000; el de precio a mano (llega sin margen
+  // aplicado: un ítem libre o un precio tipeado) se cobra tal cual (RF-19, decisión 128).
+  const total = v.items.reduce((s, it) => s + subtotalDeRenglon({ precioUnitario: it.precio_unitario, cantidad: it.cantidad, aMano: it.margen_aplicado == null }).valor, 0);
   return base.transaction().execute(async (trx) => {
     const previa = await datos.ventaPorId(trx, id);
     if (previa) return { id, total: Number(previa.total), estado: previa.estado, repetida: true as const };
@@ -59,7 +60,7 @@ export async function delDia(dia: string | null): Promise<VentasDelDia> {
   const filas = await datos.ventasDelDia(base, dia);
   const ventas: VentaDelDia[] = filas.map((v) => ({
     ...v, fecha: new Date(v.fecha).toISOString(), pagada_en: v.pagada_en ? new Date(v.pagada_en).toISOString() : null,
-    items: v.items.map((i) => ({ ...i, subtotal: subtotalDeRenglon({ precioUnitario: Number(i.precio_unitario), cantidad: Number(i.cantidad) }).valor })),
+    items: v.items.map((i) => ({ ...i, subtotal: subtotalDeRenglon({ precioUnitario: Number(i.precio_unitario), cantidad: Number(i.cantidad), aMano: i.margen_aplicado == null }).valor })),
   }));
   const totales: VentasDelDia["totales"] = {};
   for (const v of ventas) if (v.estado === "confirmada") totales[v.medio_pago] = (totales[v.medio_pago] ?? 0) + Number(v.total);

@@ -7,7 +7,7 @@ import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { ventaActual } from "../../negocio/ventas/venta-en-curso";
 import { marcarLoQueEntro, useLlegadosDelCelular } from "../../negocio/ventas/llegados-del-celular";
-import { NOMBRE_DE_MEDIO, cuentaDelRenglon, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { NOMBRE_DE_MEDIO, cuentaDelRenglon, noEsMultiploDeMil, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { esMargenBoton } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { useCodigoParaVincular } from "../../negocio/vinculo";
@@ -446,7 +446,7 @@ function HojaPrecioAMano({ item, alPoner, alCerrar }: { item: Item; alPoner: (v:
             onChange={(e) => setValor(soloDigitos(e.target.value))} data-testid="precio-manual" />
         </label>
       </form>
-      <p className="detalle">Vale solo para esta venta: no cambia el margen guardado. El renglón se redondea para arriba a $1.000, como siempre.</p>
+      <p className="detalle">Vale solo para esta venta: no cambia el margen guardado. Si no es múltiplo de $1.000 se avisa, pero se cobra igual.</p>
     </Hoja>
   );
 }
@@ -477,6 +477,7 @@ function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
       <div className="vmc-sub" data-testid="subtotal">
         {renglon ? <span className="importe">{pesosCortos(renglon.valor)}</span> : <span className="falta-texto" data-testid="sin-precio">Sin precio</span>}
         <small>{sinPrecio ? (producto && p.costo !== null ? "elegí el margen" : "poné el precio") : `${numero(it.cantidad)} × ${pesosCortos(p.unitario!)}`}</small>
+        {noEsMultiploDeMil(it) && <small className="vmc-no-multiplo" data-testid="no-multiplo">{TEXTOS.vender.noMultiplo.largo}</small>}
       </div>
       <div className="vmc-fila2">
         {producto && p.costo !== null && <SiVeCostos><span>Costo <b className="vmc-valor">{pesos(p.costo)}</b></span><span className="vmc-sep" /></SiVeCostos>}

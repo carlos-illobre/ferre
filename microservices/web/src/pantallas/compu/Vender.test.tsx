@@ -79,7 +79,9 @@ describe("Vender (v2)", () => {
     fireEvent.click(within(item("TORNILLO")).getByTestId("habilitar-precio-manual"));
     fireEvent.change(screen.getByTestId("precio-manual"), { target: { value: "2500" } }); // en la ventana «Precio a mano»
     fireEvent.click(screen.getByTestId("poner-precio"));
-    expect(screen.getByTestId("total").textContent).toBe("$3.000");
+    // Se cobra tal cual y avisa que no es múltiplo de $1.000, sin impedir cobrar (003 historia 1, escenario 2; decisión 128).
+    expect(screen.getByTestId("total").textContent).toBe("$2.500");
+    expect(within(item("TORNILLO")).getByTestId("no-multiplo").textContent).toBe("No es múltiplo de $1.000: se cobra igual");
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
   });
 

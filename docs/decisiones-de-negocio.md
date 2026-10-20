@@ -1011,7 +1011,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      Después, mirando la v2, Carlos eligió también su bloque del usuario: las iniciales, el nombre y
      el rol abren un menú con el nombre y el rol arriba y «Cerrar sesión» (reemplaza al «Salir» de
      la v1); el celular en espejo lleva el ícono del celular. «Mis datos», que también está en la
-     v2, no existe todavía: queda como pregunta abierta. Y el margen, del tamaño de la v2; si la
+     v2, no va (decisión 128). Y el margen, del tamaño de la v2; si la
      tarjeta es angosta, «Precio a mano» queda en su lápiz (con el nombre al pasar el mouse).
 127. **El renglón de Vender en la computadora, exactamente como la v2** (2026-10-20). Carlos marcó la
      tarjeta de la v2 como la que va: la foto, el nombre con marca, proveedor y stock; el tacho a la
@@ -1032,8 +1032,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      «Precio a mano» es un botón sin borde con el lápiz, al lado del precio por unidad; abre una
      ventana como la maqueta (el producto, la caja con «$», «Cancelar» y «Poner el precio», Enter).
      Puesto, el lugar del precio muestra «✎ A mano $34.434» (el margen queda sin elegir; tocarlo
-     vuelve a abrir la ventana, y elegir un margen vuelve al precio del margen). La ventana no dice
-     «se cobra igual» como la maqueta: el renglón se redondea para arriba a $1.000 (RF-19). El
+     vuelve a abrir la ventana, y elegir un margen vuelve al precio del margen). La ventana dice, como
+     la maqueta, que si no es múltiplo de $1.000 se avisa pero se cobra igual (RF-19; ver decisión 128). El
      margen no cambia al pasar el mouse. Lo que llega del celular (como lector o en espejo) se marca
      «Llegó del celular» unos segundos. Los nombres de los productos ya no van en mayúsculas: las
      listas los traen así y se muestran como frase («Prensa sargento tipo F 120x400mm /
@@ -1045,3 +1045,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      del renglón grande abajo. El botón para ocultar el panel usa el ícono de la maqueta. La boleta termina en el borde dentado del ticket, como la maqueta. En la computadora, y solo ahí, al entrar a
      Vender (por el menú, la pestaña, Alt+número o con las flechas) el cursor queda en la búsqueda:
      cambia, para Vender, la regla de dejar la marca en la pestaña (decisión 82).
+128. **El precio a mano se cobra tal cual; sin «Mis datos»** (2026-10-20). Carlos: «quiero que se cobre
+     tal cual». Era la regla desde la decisión 16 (RF-19: el precio puesto a mano, también el del
+     ítem libre, no se redondea y, si no es múltiplo de $1.000, la venta lo avisa sin impedir
+     cobrar), pero el código lo redondeaba, en el dispositivo y en el servidor: se corrigió en los
+     dos (un renglón que llega sin margen aplicado es de precio a mano). En la boleta no va el nombre
+     de quien vende. El menú del usuario no lleva «Mis datos» (T133).

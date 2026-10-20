@@ -91,15 +91,15 @@ describe("POST /ventas", () => {
     expect((await pedir(app, "POST", `/ventas/${venta.id}/anular`, { rol: "soloVende", cuerpo: {} })).status).toBe(403);
   });
 
-  it("cada renglón se redondea para arriba a $1.000: toda venta es múltiplo de $1.000 (RF-19)", async () => {
+  it("003 historia 1, escenario 3: el servidor redondea los renglones calculados y respeta el del precio a mano (RF-19, decisión 128)", async () => {
     const items = [
-      { ...venta.items[0], cantidad: 0.5, precio_unitario: 3000 }, // $1.500 → $2.000
-      { ...venta.items[0], producto_id: null, descripcion: "A MANO", cantidad: 1, precio_unitario: 1500 }, // $1.500 → $2.000
-      { ...venta.items[0], producto_id: null, descripcion: "JUSTO", cantidad: 0.3, precio_unitario: 10000 }, // $3.000 justo: no sube
+      { ...venta.items[0], cantidad: 0.5, precio_unitario: 3000, margen_aplicado: 100 }, // $1.500 → $2.000
+      { ...venta.items[0], producto_id: null, descripcion: "A MANO", cantidad: 1, precio_unitario: 1500, margen_aplicado: null }, // a mano: $1.500 tal cual
+      { ...venta.items[0], cantidad: 0.3, precio_unitario: 10000, margen_aplicado: 100 }, // $3.000 justo: no sube
     ];
     const r = await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: { ...venta, items } });
-    expect(await r.json()).toMatchObject({ total: 7000 });
-    expect(base.actual.sqlDe(/insert into "venta" \(/)[0]!.params[4]).toBe("7000.00");
+    expect(await r.json()).toMatchObject({ total: 6500 });
+    expect(base.actual.sqlDe(/insert into "venta" \(/)[0]!.params[4]).toBe("6500.00");
     // El precio por unidad y la cantidad se guardan tal cual: el redondeo es del renglón.
     expect(base.actual.sqlDe(/insert into "item_venta"/)[0]!.params).toEqual(expect.arrayContaining([0.5, "3000.00"]));
   });
@@ -117,10 +117,11 @@ describe("GET /ventas", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
   it("cada renglón llega con su subtotal calculado en el servidor, redondeado como se cobró (010-E06)", async () => {
-    base.actual.programar(/from "venta" as "v"/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "3000", estado: "confirmada", pagada_en: null, cliente: null, items: [{ descripcion: "CABLE", cantidad: "1.5", precio_unitario: "1500", margen_aplicado: null, explicacion: null }] }] });
+    base.actual.programar(/from "venta" as "v"/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "3000", estado: "confirmada", pagada_en: null, cliente: null, items: [{ descripcion: "CABLE", cantidad: "1.5", precio_unitario: "1500", margen_aplicado: 50, explicacion: null }, { descripcion: "A MANO", cantidad: "1", precio_unitario: "1500", margen_aplicado: null, explicacion: null }] }] });
     const r = await pedir(app, "GET", "/ventas");
     const cuerpo = await r.json();
     expect(cuerpo.ventas[0].items[0].subtotal).toBe(3000);
+    expect(cuerpo.ventas[0].items[1].subtotal).toBe(1500); // el precio a mano, tal cual (decisión 128)
     expect(cuerpo.totales).toEqual({ efectivo: 3000 });
   });
 
