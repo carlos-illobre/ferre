@@ -95,7 +95,8 @@ el lenguaje «Mostrador». Desde el 2026-10-20 (decisión 140) se ve **igual a l
   «Quitar de la venta».
 - Abajo, en una fila: el tacho debajo de la foto para quitar el renglón (ofrece Deshacer), la
   cantidad en blanco con − y + (con 1, «−» también lo quita) y la unidad adentro («1 un.»,
-  «1,5 kg»), que se toca para elegir otra (un., kg, m, L), el margen (abre la lista de márgenes) y el total del renglón, sin salirse de
+  «1,5 kg»), que se toca para elegir otra (un., kg, m, L) en una lista blanca redondeada con la
+  elegida en verde suave, como en la computadora, el margen (abre la lista de márgenes) y el total del renglón, sin salirse de
   la tarjeta.
 - El fondo es el gris cálido de «Mostrador», como la v2. El menú de abajo lleva los íconos de la v2:
   la etiqueta (Catálogo), el carrito (Vender), la caja (Depósito) y las tres rayas (Más). Los avisos («Vaciaste la venta», con

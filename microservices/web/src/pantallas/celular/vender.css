@@ -179,3 +179,17 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-r-texto .no-hay { color: #845400; font-weight: 700; }
 .vm-r strong { font-size: 17px; font-weight: 800; white-space: nowrap; }
 .vm-r strong.sin { font-size: 14px; color: #845400; }
+
+/* La lista de la unidad, con el estilo de la pantalla, como en la computadora (los navegadores que no
+   lo admiten muestran el de siempre, con la unidad escrita encima). */
+@supports (appearance: base-select) {
+  .vm-u > span { display: none; }
+  .vm-u select, .vm-u select::picker(select) { appearance: base-select; }
+  .vm-u select { position: static; opacity: 1; display: flex; align-items: center; height: 38px; padding: 0 2px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; color: #545955; text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer; }
+  .vm-u select::picker-icon { display: none; }
+  .vm-u select::picker(select) { margin-top: 6px; padding: 6px; min-width: 88px; border: 1px solid #E6E2D8; border-radius: 12px; background: #fff; box-shadow: 0 12px 32px rgb(26 29 27 / .16), 0 2px 6px rgb(26 29 27 / .08); }
+  .vm-u option { display: flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 8px; color: #1A1D1B; font-size: 16px; font-weight: 600; background: none; }
+  .vm-u option::checkmark { display: none; }
+  .vm-u option:hover, .vm-u option:focus-visible { background: #ECE9E1; outline: 0; }
+  .vm-u option:checked { background: #E3EEE8; color: #12382F; font-weight: 800; }
+}
