@@ -6,187 +6,170 @@
 
 **Status**: Borrador, para que Carlos la apruebe
 
+**Maquetas**: No lleva pantallas nuevas: las listas de productos cargan de a páginas al bajar y
+Configuración pierde dos opciones (historia 5).
+
 **Input**: Carlos, el 2026-10-20, después del aviso de Supabase del 18/10 (la organización pasó
 el tope del plan gratuito: 6,45 de 5 GB de datos que salen de la base y 1,51 de 1 GB de
 registros; desde el 18/11 puede restringir la base): «hacé que sea eficiente, no tiene por qué
-descargar todo de la base, que descargue solo lo que necesita, siempre paginado».
+descargar todo de la base, que descargue solo lo que necesita, siempre paginado». Y después:
+«solamente necesito saber los márgenes cuando hago la búsqueda […] ahí hay una consulta
+puntual y recién ahí se traen los márgenes de los productos de esa consulta»; «todos aquellos
+datos que no cambien frecuentemente tienen que cachearse en el server»; «cuando no hay
+internet se pierde la capacidad de búsqueda, lo que se conserva es la capacidad de registrar
+ventas».
 
-**Lo que pasa hoy** (medido en el código el 2026-10-20):
+**Lo que pasa hoy** (medido en el código y en el panel de Supabase el 2026-10-20):
 
-- Cada dispositivo vuelve a pedir el catálogo entero (unos once mil productos, cada uno con sus
-  proveedores y costos: alrededor de 10 MB) cada vez que se abre una pantalla con productos y
-  pasó un minuto, aunque no haya cambiado nada.
-- El celular que no guarda datos, con la opción de arranque «Bajar el catálogo al abrir»,
-  baja el catálogo entero cada vez que se abre la aplicación.
+- Cada dispositivo baja el catálogo entero, unos once mil productos cada uno con sus
+  proveedores, costos y la cuenta del precio (alrededor de 10 MB), y lo vuelve a pedir cada vez
+  que se abre una pantalla con productos y pasó un minuto, aunque no haya cambiado nada. El
+  servidor arma cada una de esas respuestas leyendo la base entera.
 - El stock de todos los productos y todos los clientes se piden en cada pantalla.
-- El chequeo de salud del servidor consulta la base cada 10 segundos y, como la conexión se
-  cierra a los 10 segundos sin uso, casi siempre abre una nueva: cada conexión deja varios
-  registros en la base. Se suma en los dos ambientes, pruebas y producción.
-
-**Lo que muestra el panel de Supabase** (capturas de Carlos, 2026-10-20):
-
-- Datos que salen de la base: casi nada del 6 al 9/10; picos los días de mucho uso (2,6 GB el
-  11/10, unos 900 MB el 13/10, 750 MB el 17/10, 600 MB el 19/10) y unos 100 MB los días
-  tranquilos. Sigue al uso de la aplicación, no a un reloj: es el catálogo que se vuelve a bajar.
-- Registros: parejos, unos 105 MB por día todos los días, también los días sin uso. Es algo que
-  corre solo a ritmo fijo: el chequeo de salud con su conexión nueva cada 10 segundos.
+- Los datos que salen de la base siguen al uso: casi nada del 6 al 9/10, 2,6 GB el 11/10, unos
+  900 MB el 13/10, 750 MB el 17/10, 600 MB el 19/10.
+- Los registros son parejos, unos 105 MB por día también sin uso: el chequeo de salud consulta la
+  base cada 10 segundos y casi siempre abre una conexión nueva, en los dos ambientes.
 
 ## Clarifications
 
 ### Session 2026-10-20
 
-- Q: ¿Se descarga todo o solo lo necesario? → A: Solo lo necesario y siempre de a páginas (Carlos).
-- Q: ¿Hacen falta los registros de la base? → A: No (Carlos): el sistema no tiene que generar registros que nadie usa.
-- Q: ¿El chequeo de salud tiene que mirar la base? → A: No (Carlos): dice si el servidor anda, sin consultar la base.
-- Q: ¿El servidor consulta la base cada vez? → A: No (Carlos): lo que se lee seguido y cambia poco y de forma controlada (los productos, las listas de precios) se guarda en una copia en el servidor, que se actualiza junto con la base cuando cambia; lo que varía (las ventas) se consulta directo en la base.
-- Q: El celular que no guarda datos, ¿cómo busca de arranque? → A: [NEEDS CLARIFICATION: hoy arranca en «Bajar el catálogo al abrir», que baja todo en cada apertura. ¿Pasa a arrancar en «Buscar en el servidor», se saca la opción de bajar todo, o queda como está?]
+- Q: ¿Se descarga todo o solo lo necesario? → A: Solo lo necesario y siempre de a páginas.
+- Q: ¿Los márgenes, costos y proveedores de todos los productos? → A: No: se traen recién al buscar, y solo los de los productos que encontró esa búsqueda.
+- Q: ¿El servidor consulta la base en cada pedido? → A: No: lo que se lee seguido y cambia poco y de forma controlada (los productos con sus precios, las listas) vive en una copia del servidor, que se pone al día cuando la base cambia. Lo que varía (las ventas, el stock) se lee de la base.
+- Q: ¿Qué pasa sin internet? → A: Se pierde la búsqueda; se conserva registrar ventas (decisión 120). Cambia el principio IV de la constitución y RNF-10.
+- Q: ¿Hacen falta los registros de la base? → A: No: el sistema no genera registros que nadie usa.
+- Q: ¿El chequeo de salud tiene que mirar la base? → A: No: dice si el servidor anda, sin consultar la base.
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - El catálogo se actualiza con lo que cambió (Priority: P1)
+### User Story 1 - Buscar trae solo lo encontrado, de a páginas (Priority: P1)
 
-La computadora, y el celular que guarda datos, tienen el catálogo entero para vender sin
-conexión (RNF-10). Lo bajan entero una sola vez, de a páginas; después piden solo lo que
-cambió desde la última vez.
+En cualquier pantalla con productos (Catálogo, Vender, Ingreso, Pedidos, Contar, Inventario,
+Depósito, Duplicados), en el celular y en la computadora, el dispositivo le pregunta al
+servidor y recibe solo los productos de esa consulta, de a páginas, cada uno con lo que la
+pantalla muestra: precio, margen, costos, proveedores y stock. Nada se baja por adelantado.
 
 **Why this priority**: Es casi todo el consumo de hoy.
 
-**Independent Test**: Con el catálogo ya bajado, abrir pantallas durante una hora sin que
-nadie cambie nada y medir que lo que llega del servidor es mínimo; cambiar el margen de un
-producto en otro dispositivo y ver que llega solo ese.
+**Independent Test**: Buscar «tornillo», ver los primeros 50 con su precio y su stock, bajar
+hasta el final y ver que llegan los siguientes; medir que no llegó ningún otro producto.
 
 **Acceptance Scenarios**:
 
-1. **E01** **Given** un dispositivo con el catálogo ya bajado y nada cambiado en el servidor, **When** se abre una pantalla con productos y pasó el minuto, **Then** pregunta qué cambió y no llega ningún producto; la respuesta pesa menos de 2 KB.
-2. **E02** **Given** otro dispositivo cambió el margen, el código o la foto de un producto, **When** se actualiza, **Then** llega solo ese producto y se ve con el cambio.
-3. **E03** **Given** se aplicó una lista de precios que cambió el costo de 3.000 productos, **When** se actualiza, **Then** llegan esos 3.000, de a páginas, y no los demás.
-4. **E04** **Given** un producto se unió a otro (duplicados), se separó o se dio de baja, **When** se actualiza, **Then** el dispositivo lo saca, lo devuelve o lo cambia como en el servidor, sin bajar el resto.
-5. **E05** **Given** un proveedor cambió de nombre, **When** se actualiza, **Then** llegan los productos que lo muestran, con el nombre nuevo.
-6. **E06** **Given** un dispositivo sin nada guardado (primera vez, o después de borrar lo guardado), **When** se abre, **Then** baja el catálogo de a páginas: los primeros enseguida y el resto atrás, como hoy.
-7. **E07** **Given** la primera bajada se corta a la mitad (sin conexión, se cierra la aplicación), **When** vuelve, **Then** sigue desde la página donde quedó, sin volver a empezar.
-8. **E08** **Given** una versión nueva cambia la forma de calcular los precios, **When** el dispositivo se actualiza, **Then** vuelve a bajar todo una vez, de a páginas, para que ningún precio quede calculado a la vieja.
+1. **E01** **Given** una pantalla con productos recién abierta, **When** se mira, **Then** llegan los primeros 50 en orden alfabético, con su precio, su margen, su stock y sus proveedores; no llega ningún otro producto.
+2. **E02** **Given** los primeros 50 a la vista, **When** se llega al final de la lista, **Then** llegan los 50 siguientes, con «Cargando más…» mientras tanto; al final, ninguno más.
+3. **E03** **Given** una búsqueda por nombre, marca o código de proveedor con 300 resultados, **When** se escribe, **Then** se consulta una vez cuando se deja de escribir y llegan los primeros 50, en el mismo orden que hoy (primero las descripciones más cortas).
+4. **E04** **Given** un código de barras escaneado o tipeado, **When** se lo busca, **Then** llega solo el producto de ese código, o «no existe» si no hay ninguno.
+5. **E05** **Given** los filtros del Catálogo (con stock, sin stock, marca), **When** se elige uno, **Then** el servidor filtra y devuelve la primera página; la lista de marcas para elegir también viene del servidor.
+6. **E06** **Given** una pantalla que necesita productos puntuales (los de un pedido, los de la venta del celular vinculado, los que tienen stock en Inventario), **When** se abre, **Then** pide esos productos por su identificador, de a páginas, y no el resto.
+7. **E07** **Given** quien no tiene «Ver costos», **When** llegan productos, **Then** llegan sin costos, sin proveedores con sus costos y sin la cuenta del precio, como hoy en pantalla; el precio sí.
+8. **E08** **Given** se cambió un margen, un código o una foto desde este dispositivo, **When** se vuelve a mirar el producto, **Then** se ve con el cambio.
 
 ---
 
-### User Story 2 - El stock y los clientes, también solo lo que cambió (Priority: P1)
+### User Story 2 - Sin internet se registran ventas; no se busca (Priority: P1)
 
-**Why this priority**: Hoy se piden enteros en cada pantalla.
+**Why this priority**: Lo que no se puede perder es la venta (decisión 120).
 
-**Independent Test**: Vender un producto y ver que al actualizarse llega el stock de ese
-producto y no el de los once mil.
+**Independent Test**: Con productos ya agregados a la venta, cortar internet, cobrar y ver la
+venta en la cola; volver la conexión y verla en el servidor. Sin internet, buscar dice que
+hace falta conexión.
 
 **Acceptance Scenarios**:
 
-1. **E09** **Given** el stock ya bajado, **When** se vende, se ingresa mercadería, se ajusta o se cuenta un producto en cualquier dispositivo y otro se actualiza, **Then** a ese otro le llega solo el stock de los productos que se movieron.
-2. **E10** **Given** nada se movió, **When** se abre una pantalla, **Then** no llega ningún stock ni ningún cliente.
-3. **E11** **Given** se da de alta, se cambia o se da de baja un cliente, **When** se actualiza otro dispositivo, **Then** le llega solo ese cliente.
-4. **E12** **Given** quien no tiene «Ver el dinero invertido», **When** le llega el stock, **Then** llegan las cantidades sin el valor, como hoy (RF-99).
+1. **E09** **Given** una venta en curso con productos ya agregados, **When** se corta internet y se cobra, **Then** la venta queda registrada en el dispositivo, cuenta en «por enviar» y se manda sola al volver la conexión, una sola vez y en orden (RNF-20).
+2. **E10** **Given** sin internet, **When** se busca o se escanea un producto, **Then** dice «Sin conexión: para buscar productos hace falta internet» y la venta en curso sigue como estaba.
+3. **E11** **Given** sin internet, **When** se agrega un renglón a mano (descripción y precio), **Then** se puede, como hoy, y se cobra.
+4. **E12** **Given** un cambio de margen o de código hecho sin internet, **When** vuelve la conexión, **Then** se manda solo, como hoy.
+5. **E13** **Given** cualquier dispositivo, celular o computadora, **When** se usa, **Then** guarda solo la venta en curso y lo que falta mandar: ni el catálogo, ni el stock, ni los clientes.
 
 ---
 
-### User Story 3 - Buscar en el servidor, de a páginas (Priority: P2)
+### User Story 3 - El servidor tiene a mano lo que cambia poco (Priority: P1)
 
-El celular que no guarda datos y busca en el servidor recibe los resultados de a páginas: los
-primeros enseguida y los siguientes al llegar al final de la lista.
+Los productos con sus precios y proveedores, y los clientes, se leen todo el tiempo y cambian
+solo por una acción puntual (aplicar una lista, cambiar un margen, unir duplicados). El
+servidor los tiene en una copia propia y responde desde ahí. Cuando la base cambia, por el
+camino que sea, la copia se pone al día leyendo de la base solo lo que cambió. Lo que varía
+todo el día (ventas, stock, movimientos) se lee siempre de la base.
 
-**Why this priority**: Hoy trae como mucho 60 y no deja ver más; con páginas trae lo que se
-mira.
+**Why this priority**: Aunque el dispositivo pida 50 productos, sin la copia el servidor tendría
+que leerlos de la base en cada búsqueda.
 
-**Independent Test**: Buscar «tornillo» (cientos de resultados), ver los primeros, bajar hasta
-el final y ver que llegan los siguientes.
+**Independent Test**: Buscar productos muchas veces y ver que la base no recibió ninguna
+consulta de productos; aplicar una lista y ver los precios nuevos en la próxima búsqueda.
 
 **Acceptance Scenarios**:
 
-1. **E13** **Given** una búsqueda con 300 resultados, **When** se busca, **Then** llegan los primeros 50, en el mismo orden que hoy.
-2. **E14** **Given** los primeros 50 a la vista, **When** se llega al final de la lista, **Then** llegan los 50 siguientes, con «Cargando más…» mientras tanto; al final, ninguno más.
-3. **E15** **Given** un código escaneado, **When** se lo busca en el servidor, **Then** llega solo el producto de ese código, como hoy.
-4. **E16** **Given** sin conexión a mitad de la lista, **When** se llega al final, **Then** dice que hace falta internet para ver más y deja reintentar; lo ya traído se sigue viendo.
+1. **E14** **Given** el servidor andando con su copia al día, **When** se busca, se escanea, se filtra o se pide un producto, **Then** la respuesta sale de la copia; de la base solo se lee el stock de los productos de esa página.
+2. **E15** **Given** se aplica una lista de precios, **When** termina, **Then** la copia lee de la base solo los productos que cambiaron, y la próxima búsqueda de cualquier dispositivo trae los precios nuevos.
+3. **E16** **Given** se cambia el margen, el código, la foto, la unidad o el proveedor de un producto, se unen o se separan duplicados, se cambia un proveedor o un cliente, **When** la base lo guarda, **Then** en menos de 5 segundos la copia lo tiene.
+4. **E17** **Given** un cambio que la base rechaza o que falla a la mitad, **When** termina con error, **Then** la copia queda como estaba: nunca tiene algo que la base no tiene.
+5. **E18** **Given** el servidor arranca (por ejemplo, al subir una versión), **When** arma su copia, **Then** parte de la que guardó en su disco y lee de la base solo lo que cambió desde entonces; la primera vez, o si la guardada no sirve, la lee entera, de a páginas.
+6. **E19** **Given** la conexión con la base se corta y vuelve, **When** vuelve, **Then** la copia lee lo que cambió mientras tanto.
 
 ---
 
-### User Story 4 - Comprobar que el servidor anda no llena de registros la base (Priority: P1)
+### User Story 4 - Comprobar que el servidor anda no toca la base (Priority: P1)
 
-Los registros de la base no se usan (Carlos, 2026-10-20). Lo que corre solo, a ritmo fijo, no
-abre conexiones nuevas a cada rato ni hace que la base anote algo cada pocos segundos.
+Los registros de la base no se usan. Nada de lo que corre solo, a ritmo fijo, consulta la base
+ni abre conexiones nuevas.
 
 **Why this priority**: Los registros pasan el tope todos los días, haya uso o no.
 
-**Independent Test**: Con el servidor quieto una hora, contar cuántas conexiones nuevas a la
-base se abrieron.
+**Independent Test**: Con el servidor quieto una hora, ver que no hizo ninguna consulta a la base.
 
 **Acceptance Scenarios**:
 
-1. **E17** **Given** el servidor andando y sin uso, **When** pasa una hora, **Then** no hizo ninguna consulta a la base ni abrió ninguna conexión nueva.
-2. **E18** **Given** el servidor andando, **When** se mira su salud, **Then** dice que anda y qué versión es, sin consultar la base; el despliegue sigue volviendo a la versión anterior si la nueva no arranca (RNF-13).
-3. **E19** **Given** la base no responde, **When** alguien usa la aplicación, **Then** el pedido falla con el aviso de siempre y el mostrador sigue sin conexión (RNF-11); la salud del servidor no lo dice.
+1. **E20** **Given** el servidor andando y sin uso, **When** pasa una hora, **Then** no hizo ninguna consulta a la base ni abrió ninguna conexión nueva.
+2. **E21** **Given** el servidor andando, **When** se mira su salud, **Then** dice que anda y qué versión es, sin consultar la base; el despliegue sigue volviendo a la versión anterior si la nueva no arranca (RNF-13).
+3. **E22** **Given** la base no responde, **When** alguien usa la aplicación, **Then** el pedido falla con el aviso de siempre; la salud del servidor no lo dice.
 
-### User Story 5 - El servidor tiene a mano lo que cambia poco (Priority: P1)
+---
 
-Lo que se lee todo el tiempo y cambia solo por una acción puntual (aplicar una lista de
-precios, cambiar un margen) lo tiene el servidor en una copia propia. Cada vez que cambia, se
-escribe en la base y en la copia a la vez; para leerlo, el servidor no consulta la base. Lo
-que varía todo el día, como las ventas y el stock, se lee siempre de la base.
+### User Story 5 - Configuración sin las opciones del catálogo guardado (Priority: P2)
 
-**Why this priority**: Aunque los dispositivos pidan solo lo que cambió, el servidor arma cada
-respuesta leyendo la base; con la copia, leer productos no gasta la base.
-
-**Independent Test**: Con el servidor andando, pedir el catálogo y buscar productos muchas veces
-y ver que la base no recibió ninguna consulta de productos; aplicar una lista y ver los
-precios nuevos enseguida.
+Como ningún dispositivo guarda el catálogo, «Trabajar sin conexión» y «Cómo buscar productos»
+(RF-84, RF-85) dejan de tener sentido y se sacan de Configuración.
 
 **Acceptance Scenarios**:
 
-1. **E20** **Given** el servidor andando con su copia cargada, **When** se piden productos, se busca en el servidor o se abre la ficha de un producto, **Then** la respuesta sale de la copia y la base no recibe ninguna consulta de productos.
-2. **E21** **Given** se aplica una lista de precios, **When** termina, **Then** la base y la copia tienen los costos nuevos, y el próximo pedido de cualquier dispositivo los ve.
-3. **E22** **Given** se cambia el margen, el código, la foto, la unidad o el proveedor de un producto, o se unen o separan duplicados, **When** el servidor lo confirma, **Then** la copia ya lo tiene.
-4. **E23** **Given** un cambio que la base rechaza o que falla a la mitad, **When** termina con error, **Then** la copia queda como estaba: nunca tiene algo que la base no tiene.
-5. **E24** **Given** el servidor arranca (por ejemplo, después de subir una versión), **When** carga su copia, **Then** parte de la que guardó en su disco y le pide a la base solo lo que cambió desde entonces; la primera vez, o si la guardada no sirve, la carga entera de a páginas.
-6. **E25** **Given** una venta, un ingreso, un ajuste o un conteo, **When** se pide el stock o las ventas, **Then** se leen de la base, como hoy.
-
-**Qué va en la copia y qué no** (para que Carlos lo confirme):
-
-| Va en la copia: se lee seguido, cambia poco y por una acción puntual | Se lee de la base: varía todo el día |
-|---|---|
-| Productos, con sus costos, márgenes, códigos y fotos | Ventas, cobros y anulaciones |
-| Listas de precios y su historial | Stock y sus movimientos |
-| Proveedores | Ingresos de mercadería y pedidos a proveedores |
-| Clientes | Conteos y ajustes |
-| Sectores y estanterías | Productos apartados |
-| Roles, permisos y usuarios | Sesiones y vínculos de dispositivos |
-| | Auditoría y avisos para revisar |
+1. **E23** **Given** Configuración abierta, en el celular o en la computadora, **When** se mira, **Then** no están «Trabajar sin conexión» ni «Cómo buscar productos»; el resto sigue igual.
+2. **E24** **Given** un dispositivo que tenía el catálogo, el stock o los clientes guardados, **When** se actualiza a esta versión, **Then** se borran del dispositivo; la venta en curso y lo que faltaba mandar se conservan y se mandan.
 
 ### Edge Cases
 
-- Dos cambios del mismo producto entre dos actualizaciones: llega una vez, con el último.
-- Un cambio hecho en este dispositivo que todavía no se mandó: sigue encima de lo que llega,
-  como hoy, hasta que el servidor lo confirma.
-- Un dispositivo que estuvo días sin abrirse: pide lo que cambió desde la última vez, aunque
-  sean miles, de a páginas; no hace falta volver a bajar todo.
-- El reloj del dispositivo está mal: no importa, la marca de «hasta dónde tengo» la da el
-  servidor, no el dispositivo.
-- Un dispositivo de una versión vieja que todavía pide el catálogo entero: el servidor se lo
-  sigue dando, de a páginas, hasta que se actualiza.
+- Una búsqueda que llega tarde (se escribió otra cosa mientras tanto): se descarta; se ve la
+  última.
+- Un producto que se unió a otro o se dio de baja mientras estaba en una lista a la vista: al
+  agregarlo a la venta, el servidor lo dice como hoy.
+- Dos dispositivos: un margen cambiado en uno se ve en el otro en su próxima búsqueda.
+- Un dispositivo de una versión vieja que todavía pide el catálogo entero: el servidor se lo da
+  desde la copia, de a páginas, hasta que se actualiza.
+- La lista de marcas para el filtro sale de la copia; el filtro de stock lee de la base solo qué
+  productos tienen stock.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **RF-122**: El dispositivo que guarda el catálogo lo baja entero una sola vez, de a páginas, y
-  si se corta sigue donde quedó. Después pide solo lo que cambió desde su última actualización
-  (productos cambiados, nuevos, unidos, separados o dados de baja), de a páginas. Cuándo se
-  pregunta no cambia: al abrir una pantalla si pasó un minuto, o enseguida si algo lo cambió en
-  el servidor (enmienda del 2026-10-12 de 009).
-- **RF-123**: El stock y los clientes se actualizan igual: solo los que cambiaron.
-- **RF-124**: Buscar en el servidor (RF-85) trae de a 50 resultados y los siguientes al llegar al
-  final de la lista.
-- **RF-126**: El servidor guarda en una copia propia lo que se lee seguido y cambia poco (la
-  tabla de la historia 5) y lo lee de ahí, sin consultar la base. Cada cambio se escribe en la
-  base y, recién cuando la base lo confirma, en la copia. Lo que varía (ventas, stock y lo demás
-  de la tabla) se lee de la base. Al arrancar, la copia parte de la guardada en el disco del
-  servidor y pide a la base solo lo que cambió.
-- **RF-125**: Ver si el servidor anda no consulta la base (Carlos, 2026-10-20). Nada de lo que corre
-  solo, a ritmo fijo, consulta la base ni abre conexiones nuevas; las que se abren para atender
-  pedidos se reutilizan.
+- **RF-122**: Ningún dispositivo baja el catálogo. Cada pantalla con productos consulta al
+  servidor y recibe solo los productos de esa consulta (búsqueda por nombre, marca o código,
+  código exacto, filtros, o productos puntuales por identificador), de a 50, y los siguientes al
+  llegar al final de la lista. Cada producto llega con lo que se muestra de él (precio, margen,
+  stock y, con «Ver costos», costos y proveedores).
+- **RF-123**: Sin internet no se busca ni se escanea: se dice que hace falta conexión. Se sigue
+  registrando la venta en curso y todo cambio queda en el dispositivo hasta que el servidor lo
+  confirma. Los dispositivos guardan solo la venta en curso y lo que falta mandar (decisión 120;
+  reemplaza RF-84 y RF-85).
+- **RF-124**: El servidor tiene en una copia propia los productos con sus precios y proveedores, y
+  los clientes, y responde desde ahí. La copia se pone al día sola cuando la base cambia, leyendo
+  solo lo que cambió, y al arrancar parte de la que guardó en su disco. Las ventas, el stock y lo
+  demás que varía se leen de la base.
+- **RF-125**: Ver si el servidor anda no consulta la base. Nada de lo que corre solo, a ritmo
+  fijo, consulta la base ni abre conexiones nuevas.
 
 ### Non-Functional Requirements
 
@@ -196,33 +179,26 @@ precios nuevos enseguida.
 
 ### Key Entities
 
-- **Marca de actualización**: hasta qué cambio del servidor tiene cada dispositivo, por catálogo,
-  stock y clientes. La da el servidor y la guarda el dispositivo. No es un dato del negocio.
+- **Copia del servidor**: los productos con sus precios y proveedores, y los clientes, tal como
+  están en la base, con la marca de hasta qué cambio tiene. No es un dato nuevo del negocio.
 
 ## Success Criteria *(mandatory)*
 
-- **SC-001**: Una actualización sin cambios pesa menos de 2 KB (hoy, unos 10 MB).
-- **SC-002**: Después del cambio de un producto, llega un producto.
+- **SC-001**: Abrir una pantalla con productos trae como mucho 50 productos (hoy, once mil).
+- **SC-002**: Una búsqueda no lee productos de la base; solo el stock de los que devuelve.
 - **SC-003**: El consumo mensual queda bajo RNF-62.
-- **SC-004**: Vender, buscar y escanear siguen igual de rápidos, con y sin conexión.
+- **SC-004**: Buscar y escanear responden en menos de un segundo con buena conexión.
 
 ## Assumptions
 
-- Cada ambiente tiene un solo proceso del servidor que atiende a la aplicación: la copia es una
-  sola y no hay otra que se desactualice. Si algún día hay dos, este requerimiento se revisa.
-- Un cambio hecho a mano en la base, por fuera del servidor, no llega a la copia hasta que el
-  servidor se reinicia. No se hace en la operación normal.
+- Cada ambiente tiene un solo proceso del servidor que atiende a la aplicación: la copia es una.
+  Si algún día hay dos, cada uno se pone al día solo por el mismo camino.
 - El ambiente de pruebas se reinicia con cada subida, muchas veces por día: por eso la copia se
-  guarda en el disco y al arrancar se pide solo lo que cambió, en vez de leer todo otra vez.
-
-- La computadora y el celular que guarda datos siguen teniendo el catálogo entero en el
-  dispositivo: lo exige vender sin conexión (RNF-10, RNF-11). «Solo lo necesario» es, para
-  ellos, bajar una vez y después solo lo que cambia.
-- Las páginas son de 500 productos para bajar y actualizar, y de 50 resultados para buscar.
-- Los demás pedidos (ventas del día, listas, auditoría) ya vienen por día o de a páginas y no
-  cambian.
-- Sin el chequeo, la base de pruebas puede pasar 7 días sin consultas si nadie la usa, y Supabase
-  la pausa. Lo resuelve el monitor diario que ya está en el plan (RNF-12, T091), no el chequeo.
-- Supabase no deja apagar sus registros en el plan gratuito; se bajan dejando de generarlos.
-  Si después de subirlo siguen parejos y altos, Carlos mira en el panel qué registro se repite
-  y se anota aparte.
+  guarda en el disco y al arrancar se lee solo lo que cambió.
+- Las otras lecturas (ventas del día, listas, auditoría, pedidos) ya vienen por día, por
+  identificador o de a páginas, y no cambian.
+- Sin el chequeo de salud, la base de pruebas puede pasar 7 días sin consultas si nadie la usa, y
+  Supabase la pausa. Lo resuelve el monitor diario que ya está en el plan (RNF-12, T091).
+- Supabase no deja apagar sus registros en el plan gratuito; se bajan dejando de generarlos. Si
+  después de subirlo siguen parejos y altos, Carlos mira en el panel qué registro se repite y se
+  anota aparte.
