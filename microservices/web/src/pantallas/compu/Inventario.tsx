@@ -31,7 +31,7 @@ export function Inventario() {
   const veInvertido = puedeEsto("negocio.invertido");
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, buscandoEnElServidor, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const { datos, porId, delDispositivo, error: fallo, recargar: cargar } = useStock();
   const error = !fallo ? null : fallo instanceof ErrorApi ? `No se pudo traer el stock: ${fallo.message}` : "Sin conexión con el servidor y sin stock guardado en este dispositivo. Revisá internet y tocá «Reintentar».";
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -58,7 +58,6 @@ export function Inventario() {
   }, [datos]);
 
   const { filas, hayMas } = useMemo(() => {
-    if (!catalogo) return { filas: [] as Producto[], hayMas: false };
     let base = consulta.trim() ? buscarProductos(consulta, TOPE) : productosConStock(catalogo, porId);
     if (filtro === "con") base = base.filter((p) => cantidadDe(p.id) > 0);
     if (filtro === "sin") base = base.filter((p) => cantidadDe(p.id) <= 0);
@@ -99,7 +98,7 @@ export function Inventario() {
 
   const productoAbierto = abierto ? (catalogo?.find((p) => p.id === abierto.id) ?? null) : null;
   const sinNada = datos !== null && datos.productos.length === 0 && !consulta.trim();
-  const esperando = (datos === null || catalogo === null) && !error && !errorCatalogo;
+  const esperando = datos === null && !error && !errorCatalogo;
 
   return (
     <Pagina titulo="Inventario" testId="pantalla-stock" bajada="Cuánto hay de cada producto. El stock de cada producto es la suma de sus compras, ventas, ajustes y conteos. Lo que todavía no se cargó figura en cero.">
@@ -108,7 +107,7 @@ export function Inventario() {
       <Aviso tipo="alerta" testId="sin-conexion">{!enLinea || delDispositivo ? "Sin conexión: ves el último stock que bajó este dispositivo. Si corregís un stock queda guardado acá y se manda solo al volver internet." : null}</Aviso>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
 
-      {esperando && <Progreso texto={datos === null ? "Trayendo el stock…" : "Bajando el catálogo de productos…"} />}
+      {esperando && <Progreso texto="Trayendo el stock…" />}
 
       {datos && !sinNada && (
         <div className="indicadores stock-indicadores" data-testid="valorizacion">
@@ -138,11 +137,11 @@ export function Inventario() {
       {datos && !sinNada && (
         <>
           <div className="stock-herramientas">
-            <Buscador valor={consulta} alCambiar={setConsulta} placeholder={!catalogo ? "Bajando el catálogo…" : esCelular ? "Buscar un producto" : "Buscar un producto para ver o corregir su stock"} etiqueta="Buscar un producto" disabled={!catalogo} onKeyDown={teclas} cajaRef={caja} autoFoco={!esCelular} />
+            <Buscador valor={consulta} alCambiar={setConsulta} placeholder={esCelular ? "Buscar un producto" : "Buscar un producto para ver o corregir su stock"} etiqueta="Buscar un producto" onKeyDown={teclas} cajaRef={caja} autoFoco={!esCelular} />
             <div className="stock-filtro"><Segmentos opciones={FILTROS} actual={filtro} alElegir={setFiltro} etiqueta="Qué productos mostrar" /></div>
           </div>
 
-          {catalogo && filas.length === 0 && (
+          {filas.length === 0 && !buscandoEnElServidor && (
             <Vacio icono="buscar" titulo={consulta.trim() ? `Nada con «${consulta.trim()}»` : filtro === "sin" ? "Ningún producto en cero o negativo" : "Ningún producto con stock"}
               accion={(consulta.trim() || filtro !== "todos") ? <Boton onClick={() => { setConsulta(""); setFiltro("todos"); caja.current?.focus(); }}>Ver todos</Boton> : undefined}>
               {consulta.trim() ? "Probá con otra palabra, con la marca o con el código del proveedor." : "Con este filtro no queda ningún producto."}

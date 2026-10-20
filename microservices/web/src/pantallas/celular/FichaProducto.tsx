@@ -22,7 +22,7 @@ const t = TEXTOS.ficha;
 // La ficha del producto en el celular (specs/016, maqueta A): la foto, el stock y el nombre
 // arriba; después una tarjeta por tema (código, proveedor, precio con «Así se calcula», archivo
 // de origen) y, fijos abajo, «Listo» y «Agregar a la venta».
-export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; alCerrar: () => void; quienLoTiene: (codigo: string) => Producto | undefined; alCambiar: (c: Cambios) => void }) {
+export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; alCerrar: () => void; quienLoTiene: (codigo: string) => Promise<Producto | undefined>; alCambiar: (c: Cambios) => void }) {
   const { stock } = useCatalogo();
   const puede = usePuede();
   const veCostos = useVeCostos();

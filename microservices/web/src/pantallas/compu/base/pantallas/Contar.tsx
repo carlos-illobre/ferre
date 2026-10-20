@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { abrirConteo, crearSector, ordenarSectores, useConteo, useSectores, type Cierre, type Contado, type Conteo, type Sector } from "../../../../negocio/deposito/conteo";
 import { cantidadContada } from "../../../../negocio/deposito/inventario";
-import { useCatalogo } from "../../../../catalogo";
+import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../../../catalogo";
 import { fecha } from "../../../../formato";
 import { enteras, unidadDe } from "../../../../unidades";
 import { Escaner, hayCamara } from "../../../../plataforma/camara/Escaner";
@@ -178,15 +178,19 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     const previo = contadoPorId.get(p.id);
     setProducto(p); setCantidad(previo ? String(Number(previo.cantidad_contada)).replace(".", ",") : ""); setConsulta(""); setError(null); setErrorCantidad(null);
   }, [contadoPorId]);
+  // El producto se pide al servidor si este dispositivo todavía no lo trajo (specs/018).
   const elegirPorId = (productoId: string, descripcion: string) => {
-    const p = catalogo?.find((x) => x.id === productoId);
-    if (p) elegir(p); else setError(`«${descripcion}» no está en el catálogo de este dispositivo. Buscalo por su nombre cuando termine de bajar.`);
+    void traerPorIds([productoId]).then(() => {
+      const p = productoEnMemoria(productoId);
+      if (p) elegir(p); else setError(`No se pudo traer «${descripcion}»: hace falta internet.`);
+    });
   };
   const alDetectar = useCallback((codigo: string) => {
     setEscaneando(false);
-    const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-    if (p) elegir(p); else setError(`El código ${codigo} no está en el catálogo. Buscá el producto por su nombre.`);
-  }, [catalogo, elegir]);
+    void traerPorCodigo(codigo).then((p) => {
+      if (p) elegir(p); else setError(`El código ${codigo} no está en el catálogo. Buscá el producto por su nombre.`);
+    }).catch((e: Error) => setError(e.message));
+  }, [elegir]);
 
   const unidad = unidadDe(producto);
   const leida = producto ? cantidadContada(cantidad, producto) : NaN;
@@ -292,9 +296,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           ) : (
             <>
               <BuscadorDeProducto consulta={consulta} alCambiar={(v) => { setConsulta(v); setError(null); }} resultados={resultados} alElegir={elegir} cajaRef={caja}
-                placeholder={!catalogo ? "Bajando el catálogo…" : esCelular ? (hayCamara() ? "Buscá o escaneá" : "Buscá el producto") : hayCamara() ? "Buscá o escaneá el producto" : "Buscá el producto"} disabled={!catalogo} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined}
+                placeholder={esCelular ? (hayCamara() ? "Buscá o escaneá" : "Buscá el producto") : hayCamara() ? "Buscá o escaneá el producto" : "Buscá el producto"} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined}
                 aLaDerecha={(p) => (contadoPorId.has(p.id) ? <Pastilla tipo="ok">Ya contado: {numero(Number(contadoPorId.get(p.id)!.cantidad_contada))}</Pastilla> : null)} />
-              {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo de productos…" />}
               <Aviso tipo="error" testId="error-conteo">{error}</Aviso>
               <p className="detalle solo-compu">Flechas y Enter para elegir; después la cantidad y Enter otra vez. Escape limpia.</p>
               {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}

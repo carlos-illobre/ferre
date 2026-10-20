@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import { leerTodo } from "../almacen";
+import { traerPorIds } from "../catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
 import { precioDelProducto } from "../negocio/catalogo/precio";
 import type { UltimosProductos } from "@servidor/ventas";
@@ -25,7 +26,10 @@ export function useSugeridos(catalogo: Producto[] | null, clave?: unknown): Suge
         .sort((a, b) => (a.fecha < b.fecha ? 1 : -1))
         .flatMap((v) => (v.items ?? []).map((i) => i.producto_id))
         .filter((id): id is string => Boolean(id));
-      if (vigente) setIds([...new Set(lista)]);
+      const unicos = [...new Set(lista)];
+      // Los productos se piden al servidor si este dispositivo todavía no los trajo (specs/018).
+      await traerPorIds(unicos.slice(0, 20));
+      if (vigente) setIds(unicos);
     })();
     return () => { vigente = false; };
   }, [clave]);

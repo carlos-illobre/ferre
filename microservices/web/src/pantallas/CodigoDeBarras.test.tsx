@@ -20,7 +20,7 @@ function armar(celular: boolean, extra: Parameters<typeof producto>[0][] = [], b
   // La pantalla que lo contiene: tiene el catálogo y guarda en él.
   function Ficha() {
     const { catalogo: c } = falso.useCatalogoFalso();
-    return <CodigoDeBarras producto={c.find((p) => p.id === "mecha")!} celular={celular} alGuardar={(codigo) => falso.actualizarProducto("mecha", { codigo_barras: codigo })} quienLoTiene={(codigo) => c.find((x) => x.id !== "mecha" && x.codigo_barras === codigo)} />;
+    return <CodigoDeBarras producto={c.find((p) => p.id === "mecha")!} celular={celular} alGuardar={(codigo) => falso.actualizarProducto("mecha", { codigo_barras: codigo })} quienLoTiene={async (codigo) => c.find((x) => x.id !== "mecha" && x.codigo_barras === codigo)} />;
   }
   render(<Ficha />);
   return falso;

@@ -20,7 +20,7 @@ const CATALOGO = [
   ...Array.from({ length: 120 }, (_, i) => ({ id: ID(100 + i), descripcion: `Tuerca ${String(i).padStart(3, "0")}`, marca: "Genérica", codigo_barras: null, codigos: [] })),
 ];
 const productosDeLaBase = () => base.actual.sqlDe(/FROM producto|precio_proveedor/);
-type Pagina = { productos: { id: string; descripcion: string; precio: number | null }[]; stock: Record<string, string>; hay_mas: boolean };
+type Pagina = { productos: { id: string; descripcion: string; precio: number | null }[]; stock: Record<string, string>; hay_mas: boolean; total: number };
 const pagina = async (consulta: string, rol: "mostrador" | null = "mostrador") => (await pedir(app, "GET", `/productos/pagina${consulta}`, { rol })).json() as Promise<Pagina>;
 
 describe("GET /productos/pagina", () => {
@@ -37,6 +37,7 @@ describe("GET /productos/pagina", () => {
     expect(r.productos.some((p) => p.id === ID(5))).toBe(false);
     expect(r.stock).toEqual({ [ID(2)]: "12" });
     expect(r.hay_mas).toBe(true);
+    expect(r.total).toBe(124);
     expect(productosDeLaBase()).toHaveLength(0);
     const stock = base.actual.sqlDe(/movimiento_stock/);
     expect(stock).toHaveLength(1);
@@ -77,6 +78,9 @@ describe("GET /productos/pagina", () => {
     expect((await pagina("?disponibilidad=con-stock")).productos.map((p) => p.id)).toEqual([ID(2)]);
     expect((await pagina("?disponibilidad=sin-stock&buscar=mecha")).productos.map((p) => p.id)).toEqual([ID(3)]);
     expect(await (await pedir(app, "GET", "/productos/marcas", { rol: "mostrador" })).json()).toEqual(["bosch", "Fischer", "Genérica"]); // como se escribió en el primero, por descripción
+    // 015-E29: con una búsqueda, las marcas de lo encontrado; el total cuenta con los filtros.
+    expect(await (await pedir(app, "GET", "/productos/marcas?buscar=mecha", { rol: "mostrador" })).json()).toEqual(["Bosch"]);
+    expect((await pagina("?marca=bosch&limite=1")).total).toBe(2);
   });
 
   it("018-E06: productos puntuales por identificador; los que no tienen forma de identificador se ignoran; una lista vacía no trae nada", async () => {
@@ -84,8 +88,14 @@ describe("GET /productos/pagina", () => {
     expect((await pagina("?ids=")).productos).toEqual([]);
   });
 
+  it("el resumen: cuántos productos hay y cuántos tienen costo sin margen", async () => {
+    cargarParaPrueba([{ id: "a", descripcion: "A", costo_neto: "10", margen_elegido: null }, { id: "b", descripcion: "B", costo_neto: "10", margen_elegido: 50 }, { id: "c", descripcion: "C", costo_neto: null, margen_elegido: null }]);
+    expect(await (await pedir(app, "GET", "/productos/resumen", { rol: "mostrador" })).json()).toEqual({ productos: 3, sin_margen: 1 });
+  });
+
   it("sin sesión, 401", async () => {
     expect((await pedir(app, "GET", "/productos/pagina", { rol: null })).status).toBe(401);
+    expect((await pedir(app, "GET", "/productos/resumen", { rol: null })).status).toBe(401);
     expect((await pedir(app, "GET", "/productos/marcas", { rol: null })).status).toBe(401);
   });
 });

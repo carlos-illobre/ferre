@@ -718,10 +718,10 @@ RF-84:
 RF-85:
   estado: "Hecho (009-T003): con el guardado deshabilitado se elige en Configuración entre bajar el catálogo al abrir o buscar en el servidor"
   pruebas:
-    - microservices/web/src/buscar-en-el-servidor.test.tsx
     - microservices/api/src/rutas/productos.test.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
   defectos:
+    - "Con specs/018 el catálogo se busca siempre en el servidor: la opción se ve pero no cambia nada, hasta que Carlos decida la descarga a mano (018, historia 5)"
     - "Buscando en el servidor, Inventario muestra sin buscar solo los primeros 150 productos con stock; el resto aparece al buscarlo"
     - "Buscando en el servidor, Duplicados y las listas que recorren el catálogo entero ven solo lo que ya se trajo"
     - "La búsqueda del servidor trae hasta 60 productos por consulta, las descripciones más cortas primero: en una búsqueda muy amplia el orden puede no ser idéntico al del catálogo bajado"

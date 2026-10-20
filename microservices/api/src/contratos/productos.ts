@@ -25,10 +25,13 @@ export type ProductoDelCatalogo = {
 
 // GET /productos/pagina?buscar=&codigo=&ids=&marca=&disponibilidad=&desde=&limite= (specs/018): solo
 // los productos de esa consulta, de a 50, con el stock de cada uno (los que nunca tuvieron
-// movimientos no vienen) y si hay más.
-export type PaginaDeProductos = { productos: ProductoDelCatalogo[]; stock: Record<string, string>; hay_mas: boolean };
+// movimientos no vienen), si hay más y cuántos son en total.
+export type PaginaDeProductos = { productos: ProductoDelCatalogo[]; stock: Record<string, string>; hay_mas: boolean; total: number };
 
-// GET /productos/marcas: las marcas del catálogo, sin repetir y en orden alfabético.
+// GET /productos/resumen: cuántos productos hay y cuántos tienen costo pero no margen elegido.
+export type ResumenDelCatalogo = { productos: number; sin_margen: number };
+
+// GET /productos/marcas?buscar=: las marcas del catálogo (o de lo encontrado), sin repetir y en orden alfabético.
 export type MarcasDelCatalogo = string[];
 
 // PATCH /productos/:id: lo único que se cambia de un producto desde la aplicación. La forma

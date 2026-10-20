@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api, ErrorApi } from "../../api";
-import { leerTodo } from "../../almacen";
 import { traerPorIds, type StockFila } from "../../catalogo";
 import type { AjusteDeStock, Movimiento, Stock } from "@servidor/stock";
 import { enviarOEncolar } from "../../cola";
@@ -18,18 +17,9 @@ export type { Movimiento };
 const CLAVE = ["stock"] as const;
 type Traido = Stock & { delDispositivo: boolean };
 
-// Lo guardado en el dispositivo trae las filas pero no los totales: se rearman acá.
-function armar(filas: StockFila[]): Stock {
-  const por_proveedor: Stock["por_proveedor"] = {};
-  for (const f of filas) {
-    const g = (por_proveedor[f.proveedor ?? "Sin proveedor"] ??= { unidades: 0, valor: 0, productos: 0 });
-    g.unidades += Math.max(0, Number(f.stock)); g.valor += Number(f.valor); g.productos += 1;
-  }
-  return { productos: filas, valor_total: filas.reduce((s, f) => s + Number(f.valor), 0), por_proveedor };
-}
-
-// Sin conexión se muestra lo último que se vio o lo que bajó este dispositivo; si el servidor
-// contesta que no, o no hay nada guardado, es un error (sin `estado` cuando fue la conexión).
+// Sin conexión se muestra lo último que se vio en esta sesión; si el servidor contesta que no, o no
+// se vio nada, es un error (sin `estado` cuando fue la conexión). El stock no se guarda en el
+// dispositivo (specs/018).
 async function traerStock(): Promise<Traido> {
   try {
     return { ...(await api<Stock>("/stock")), delDispositivo: false };
@@ -37,9 +27,7 @@ async function traerStock(): Promise<Traido> {
     if (e instanceof ErrorApi) throw e;
     const visto = consultas.getQueryData<Traido>(CLAVE);
     if (visto) return { ...visto, delDispositivo: true };
-    const guardado = await leerTodo<StockFila>("stock").catch(() => [] as StockFila[]);
-    if (guardado.length === 0) throw e;
-    return { ...armar(guardado), delDispositivo: true };
+    throw e;
   }
 }
 
@@ -49,8 +37,8 @@ export function useStock() {
   const consulta = useQuery({ queryKey: CLAVE, queryFn: traerStock }, consultas);
   const datos = consulta.data ?? null;
   const porId = useMemo(() => new Map((datos?.productos ?? []).map((s) => [s.id, s])), [datos]);
-  // Buscando en el servidor (RF-85) no está el catálogo en memoria: se traen los primeros productos con stock.
-  useEffect(() => { if (datos) void traerPorIds(datos.productos.slice(0, 150).map((s) => s.id)); }, [datos]);
+  // El catálogo está en el servidor (specs/018): se traen los productos que tienen movimientos, de a 200.
+  useEffect(() => { if (datos) void traerPorIds(datos.productos.map((s) => s.id)); }, [datos]);
   const { refetch } = consulta;
   const recargar = useCallback(() => { void refetch({ cancelRefetch: false }); }, [refetch]);
   return { datos, porId, delDispositivo: datos?.delDispositivo ?? false, error: consulta.error, recargar };

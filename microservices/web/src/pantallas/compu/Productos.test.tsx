@@ -4,7 +4,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso() }));
+vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 const descargar = vi.hoisted(() => vi.fn(async () => undefined));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar }));
 
@@ -20,7 +20,7 @@ function armar() {
   catalogo.actual = falso;
   vi.useFakeTimers();
   render(<Productos />);
-  const buscar = (texto: string) => { fireEvent.change(screen.getByTestId("busqueda"), { target: { value: texto } }); act(() => { vi.advanceTimersByTime(200); }); };
+  const buscar = (texto: string) => { fireEvent.change(screen.getByTestId("busqueda"), { target: { value: texto } }); act(() => { vi.advanceTimersByTime(350); }); };
   const fila = (texto: string) => screen.getAllByTestId("producto").find((f) => f.textContent?.includes(texto))!;
   return { falso, buscar, fila };
 }
@@ -50,6 +50,8 @@ describe("Productos (v2)", () => {
 
   it("Mayúsculas + 3 fija el 100 % del producto elegido con las flechas, aun sin el cursor en la búsqueda", () => {
     const { falso } = armar();
+    // La lista llega en orden alfabético: MECHA, SIN COSTO, TORNILLO.
+    fireEvent.keyDown(window, { key: "ArrowDown" });
     fireEvent.keyDown(window, { key: "ArrowDown" });
     fireEvent.keyDown(window, { key: "#", code: "Digit3", shiftKey: true });
     expect(falso.actualizarProducto).toHaveBeenCalledWith("tornillo", { margen_elegido: 100 });

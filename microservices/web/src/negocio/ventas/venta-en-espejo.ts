@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useCatalogo } from "../../catalogo";
+import { productoEnMemoria, traerPorIds, useCatalogo } from "../../catalogo";
 import { useEspejar, useEspejo } from "../../espejo";
 import { marcarLoQueEntro } from "./llegados-del-celular";
 import type { MedioDePago } from "@servidor/ventas";
@@ -36,10 +36,18 @@ export function renglonesDelEspejo<T extends Renglon>(venta: VentaEnEspejo, cata
   });
 }
 
+// Los renglones con el producto que recién llegó del servidor, conservando el margen de la venta.
+function completarConLoTraido<T extends Renglon>(items: T[]): T[] {
+  return items.map((it) => {
+    const traido = it.producto && productoEnMemoria(it.producto.id);
+    return traido && it.producto!.costo_neto === null ? { ...it, producto: { ...traido, margen_elegido: it.producto!.margen_elegido } } : it;
+  });
+}
+
 // En espejo con el otro dispositivo (decisión 60): la venta es una sola, la arme quien la arme y
 // desde la pantalla que sea. Se engancha una vez, desde la aplicación, no desde Vender (ADR-022).
 export function useVentaEnEspejo(): void {
-  const { catalogo, catalogoCompleto } = useCatalogo();
+  const { catalogo } = useCatalogo();
   const { items, medio, clienteId } = useVentaEnCurso();
   const { lado } = useEspejo();
   useEspejar<VentaEnEspejo>("venta", useMemo(() => ventaParaElEspejo(items, medio, clienteId), [items, medio, clienteId]), (v) => {
@@ -48,5 +56,8 @@ export function useVentaEnEspejo(): void {
     // En la computadora, lo que agregó el celular se marca «Llegó del celular» un momento.
     if (lado === "computadora") marcarLoQueEntro(antes, despues);
     cambiarVenta({ items: despues, medio: v.medio as MedioDePago | null, clienteId: v.clienteId });
-  }, catalogo !== null && catalogoCompleto !== false); // con el catálogo a medio cargar no se reconocerían los productos
+    // Los productos que este lado todavía no trajo se piden al servidor y se completan (specs/018).
+    const faltan = despues.filter((it) => it.producto && !productoEnMemoria(it.producto.id)).map((it) => it.producto!.id);
+    if (faltan.length) void traerPorIds(faltan).then(() => cambiarVenta({ items: completarConLoTraido(ventaActual().items) }));
+  }, true);
 }

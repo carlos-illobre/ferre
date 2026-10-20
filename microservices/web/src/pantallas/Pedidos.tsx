@@ -211,7 +211,7 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
       </header>
       {error && <p className="pd-error" role="alert">{error}</p>}
       <div className="pd-buscar">
-        <input ref={caja} type="search" value={consulta} onChange={(e) => { setConsulta(e.target.value); setError(null); }} placeholder={catalogo ? (celular && hayCamara() ? "Buscá lo que hay que pedir, o escanealo" : "Buscá lo que hay que pedir") : "Bajando el catálogo…"} disabled={!catalogo}
+        <input ref={caja} type="search" value={consulta} onChange={(e) => { setConsulta(e.target.value); setError(null); }} placeholder={(celular && hayCamara() ? "Buscá lo que hay que pedir, o escanealo" : "Buscá lo que hay que pedir")}
           autoFocus={!celular} autoComplete="off" aria-label="Buscar un producto para agregar al pedido" data-testid="buscar-para-pedir"
           onKeyDown={(e) => { if (e.key === "Enter" && resultados[0]) { e.preventDefault(); agregar(resultados[0]); } else if (e.key === "Escape") setConsulta(""); }} />
         {celular && hayCamara() && <button type="button" className="pd-boton" onClick={() => setEscaneando(true)} aria-label="Escanear" data-testid="escanear-para-pedir">Escanear</button>}

@@ -20,7 +20,8 @@ productos.get("/pagina", async (c) => {
   const { limite, desde, buscar, codigo, ids, marca, disponibilidad } = c.req.query();
   return c.json(await reglas.pagina({ limite, desde, buscar, codigo, ids, marca, disponibilidad }));
 });
-productos.get("/marcas", (c) => c.json(reglas.marcas()));
+productos.get("/resumen", (c) => c.json(reglas.resumen()));
+productos.get("/marcas", (c) => c.json(reglas.marcas({ buscar: c.req.query("buscar") })));
 
 productos.patch("/:id", async (c) => {
   const cuerpo = await leerCuerpo(c, cambiosDeProducto);

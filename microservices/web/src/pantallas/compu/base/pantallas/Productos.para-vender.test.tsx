@@ -7,7 +7,7 @@ import { catalogoFalso, producto } from "../../../../pruebas/catalogo-falso";
 // El Catálogo para vender en la computadora (specs/015-catalogo-para-vender): la columna Stock,
 // «Agregar» debajo del precio, la tecla «+», el buscador largo y el panel de filtros con Esc.
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: async () => null, traerPorIds: async () => undefined }));
+vi.mock("../../../../catalogo", async () => (await import("../../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 vi.mock("../../../../api", async (original) => ({ ...(await original<typeof import("../../../../api")>()), api: async () => [] }));
 import { Productos } from "./Productos";
 import { ventaActual } from "../../../../negocio/ventas/venta-en-curso";
@@ -44,9 +44,9 @@ describe("Catálogo para vender · computadora", () => {
   it("015-E27: «+» agrega el elegido; la línea de atajos lo dice", () => {
     armar();
     expect(document.body.textContent).toContain("agrega el elegido a la venta");
-    fireEvent.keyDown(window, { key: "ArrowDown" });
+    fireEvent.keyDown(window, { key: "ArrowDown" }); // la lista llega en orden alfabético: Cinta, Mecha
     fireEvent.keyDown(window, { key: "+" });
-    expect(ventaActual().items.map((it) => it.descripcion)).toEqual(["Cinta aisladora negra 20 m"]);
+    expect(ventaActual().items.map((it) => it.descripcion)).toEqual(["Mecha para madera 6 mm"]);
   });
 
   it("015-E27: «+» no agrega con Ctrl, Cmd o Alt (Ctrl y «+» agranda la página)", () => {
@@ -61,7 +61,7 @@ describe("Catálogo para vender · computadora", () => {
     const caja = screen.getByTestId("busqueda");
     caja.focus();
     fireEvent.keyDown(caja, { key: "+" });
-    expect(ventaActual().items.map((it) => it.descripcion)).toEqual(["Cinta aisladora negra 20 m"]);
+    expect(ventaActual().items.map((it) => it.descripcion)).toEqual(["Mecha para madera 6 mm"]);
   });
 
   it("015-E07 015-E11 015-E14: agregar otra vez suma 1; sin stock entra igual; se sigue en el Catálogo con la búsqueda", async () => {

@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SiVeCostos, useVeCostos } from "../../../Costos";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
 import { usePuede } from "../../../permisos";
 import { MARGENES } from "../../../../negocio/precios/vista-previa";
-import { useCatalogo } from "../../../../catalogo";
+import { quienTieneElCodigo, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas } from "../../../../catalogo";
 import { useDebounce } from "../../../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
-import { descargar, subirFoto, urlDeFoto } from "../../../../api";
+import { api, descargar, subirFoto, urlDeFoto } from "../../../../api";
 import { fecha, pesos } from "../../../../formato";
 import type { Producto } from "../../../celular/pantallas/Productos";
 import { useEsCelular } from "../vista";
@@ -15,16 +15,16 @@ import { Aviso, Boton, Buscador, Explicado, FotoProducto, Icono, Margenes, Pagin
 import { FichaProducto } from "./FichaProducto";
 import "../estilos/productos.css";
 import { margenAMano, otroMargen, precioDelProducto } from "../../../../negocio/catalogo/precio";
-import { cuantosFiltros, filtrar, marcasDe, SIN_FILTROS, stockDe, type Disponibilidad, type Filtros } from "../../../../negocio/catalogo/stock-y-filtros";
+import { cuantosFiltros, SIN_FILTROS, stockDe, type Disponibilidad, type Filtros } from "../../../../negocio/catalogo/stock-y-filtros";
+import type { ResumenDelCatalogo } from "@servidor/productos";
 import { agregarALaVenta } from "../../../../negocio/ventas/venta-en-curso";
 import { cuantosProductos, TEXTOS } from "../../../textos";
 
-// Productos: búsqueda al instante sobre el catálogo guardado en el dispositivo, y el margen
+// Productos: la búsqueda le pregunta al servidor y trae de a 50 (specs/018), y el margen
 // de cada uno. En la computadora todo se cambia en la fila; en el celular, cada producto
 // abre su ficha. Teclado: flechas eligen, Mayúsculas + 1 a 5 fijan el margen, Enter abre la
 // ficha, Esc borra la búsqueda.
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "foto_url" | "codigo_barras">> & { proveedor_preferido_id?: string };
-const PASO = 30;
 
 function calcular(p: Producto) {
   const { costo, calculo: precio } = precioDelProducto(p);
@@ -35,7 +35,7 @@ const codigosDe = (p: Producto) => [p.marca, p.codigo_proveedor, p.codigo_barras
 
 export function Productos() {
   const fijaMargen = usePuede()("catalogo.margenes");
-  const { catalogo, stock, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, stock, actualizarProducto } = useCatalogo();
   // Agregar a la venta desde acá (RF-108), con el botón o la tecla «+»: solo quien puede vender.
   const puedeVender = usePuede()("ventas.registrar");
   const [agregado, setAgregado] = useState<string | null>(null);
@@ -48,9 +48,8 @@ export function Productos() {
   const esCelular = useEsCelular();
   const [error, setError] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
-  const consultaEstable = useDebounce(consulta, 150);
+  const consultaEstable = useDebounce(consulta, 300);
   const [elegido, setElegido] = useState(0);
-  const [limite, setLimite] = useState(PASO);
   const [abiertoId, setAbiertoId] = useState<string | null>(null);
   const caja = useRef<HTMLInputElement>(null);
   const centinela = useRef<HTMLDivElement>(null);
@@ -61,33 +60,33 @@ export function Productos() {
   const alEscanear = useRef<(codigo: string) => void>(() => undefined);
   useEffect(() => {
     alEscanear.current = (codigo) => {
-      const p = (catalogo ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-      if (p) { setConsulta(""); setAbiertoId(p.id); } else setConsulta(codigo);
+      void traerPorCodigo(codigo).then((p) => { if (p) { setConsulta(""); setAbiertoId(p.id); } else setConsulta(codigo); }).catch((e: Error) => setError(e.message));
     };
-  }, [catalogo]);
+  }, []);
   const [emparejado, setEmparejado] = useState(() => puestoLocal()?.id ?? null);
   useEffect(() => { const mirar = () => setEmparejado(puestoLocal()?.id ?? null); window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar); return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); }, []);
   useEffect(() => {
     if (!emparejado || abiertoId) return;
     return escucharPuesto(emparejado, (codigo) => alEscanear.current(codigo), undefined, true);
   }, [abiertoId, emparejado]);
-  // Con filtros se filtra todo lo encontrado y después se muestra de a tramos, para no perder
-  // productos. Lo encontrado entero se arma solo con filtros o con los filtros abiertos: sin eso se
-  // busca de a tramos, como siempre. Las marcas para elegir son las de lo encontrado (015-E29).
-  const encontrados = useMemo(() => (conFiltros || viendoFiltros ? (consultaEstable.trim() ? buscarProductos(consultaEstable, Number.MAX_SAFE_INTEGER) : catalogo ?? []) : []), [conFiltros, viendoFiltros, consultaEstable, buscarProductos, catalogo]);
-  const filtrados = useMemo(() => (conFiltros ? filtrar(encontrados, stock, filtros) : null), [conFiltros, encontrados, stock, filtros]);
-  const resultados = useMemo(() => (filtrados ? filtrados.slice(0, limite) : consultaEstable.trim() ? buscarProductos(consultaEstable, limite) : (catalogo ?? []).slice(0, limite)), [filtrados, limite, consultaEstable, buscarProductos, catalogo]);
-  const marcas = useMemo(() => marcasDe(encontrados), [encontrados]);
-  const hayMas = resultados.length === limite;
-  useEffect(() => { setElegido(0); setLimite(PASO); }, [consultaEstable, filtros]);
+  // Lo encontrado llega del servidor de a 50, ya filtrado; al llegar al final, los siguientes
+  // (specs/018). Las marcas para elegir son las de lo encontrado (015-E29).
+  const lista = useListaDeProductos({ buscar: consultaEstable, marca: filtros.marca, disponibilidad: filtros.disponibilidad });
+  const resultados = lista.productos;
+  const marcas = useMarcas(consultaEstable, viendoFiltros);
+  const { hayMas, cargarMas } = lista;
+  useEffect(() => { setElegido(0); }, [consultaEstable, filtros]);
   // Trae más resultados al llegar al final de los que están a la vista.
   useEffect(() => {
     const el = centinela.current;
     if (!el || !hayMas) return;
-    const obs = new IntersectionObserver((entradas) => { if (entradas.some((e) => e.isIntersecting)) setLimite((l) => l + PASO); }, { rootMargin: "300px" });
+    const obs = new IntersectionObserver((entradas) => { if (entradas.some((e) => e.isIntersecting)) cargarMas(); }, { rootMargin: "300px" });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [hayMas, resultados.length]);
+  }, [hayMas, cargarMas, resultados.length]);
+  // Cuántos productos hay y cuántos sin margen: los cuenta el servidor.
+  const [resumen, setResumen] = useState<ResumenDelCatalogo | null>(null);
+  useEffect(() => { api<ResumenDelCatalogo>("/productos/resumen").then(setResumen).catch(() => undefined); }, []);
   // El elegido con las flechas queda siempre a la vista.
   useEffect(() => { document.querySelector(".productos [aria-selected='true']")?.scrollIntoView?.({ block: "nearest" }); }, [elegido]);
 
@@ -106,10 +105,9 @@ export function Productos() {
       else setElegido((i) => Math.max(i - 1, 0));
     }
     else if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "BUTTON") {
-      // Si la lista todavía no alcanzó a lo que se escribió (se filtra un instante después de
-      // tipear), Enter abre el primer resultado de lo escrito, no la fila de la lista vieja.
-      const alDia = consulta === consultaEstable;
-      const p = alDia ? resultados[elegido] : (consulta.trim() ? buscarProductos(consulta, 1)[0] : undefined);
+      // Si la lista todavía no alcanzó a lo que se escribió (llega un instante después de tipear),
+      // Enter espera a que llegue: no abre la fila de la lista vieja.
+      const p = consulta === consultaEstable && !lista.cargando ? resultados[elegido] : undefined;
       if (p) { e.preventDefault(); setAbiertoId(p.id); }
     }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
@@ -121,24 +119,25 @@ export function Productos() {
       const p = resultados[elegido];
       if (p && p.costo_neto !== null) actualizar(p.id, { margen_elegido: MARGENES[Number(e.code.slice(5)) - 1]! });
     }
-  }, [resultados, elegido, actualizar, abiertoId, consulta, consultaEstable, buscarProductos, viendoFiltros, puedeVender, agregar, fijaMargen]);
+  }, [resultados, elegido, actualizar, abiertoId, consulta, consultaEstable, lista.cargando, viendoFiltros, puedeVender, agregar, fijaMargen]);
   useTeclasGlobales(teclas, caja.current);
 
-  const abierto = abiertoId ? (catalogo ?? []).find((p) => p.id === abiertoId) ?? null : null;
-  const sinMargen = useMemo(() => (catalogo ?? []).filter((p) => p.margen_elegido === null && p.costo_neto !== null).length, [catalogo]);
+  const abierto = abiertoId ? catalogo.find((p) => p.id === abiertoId) ?? null : null;
+  const listo = !lista.cargando || resultados.length > 0;
+  const catalogoVacio = listo && !lista.error && resultados.length === 0 && !consultaEstable.trim() && !conFiltros;
 
   return (
     <Pagina titulo="Productos" testId="productos" className="productos"
-      acciones={catalogo && catalogo.length > 0 ? (
+      acciones={resumen && resumen.productos > 0 ? (
         <div className="fila envuelve">
-          <Pastilla sinPunto>{numero(catalogo.length)} productos</Pastilla>
-          {sinMargen > 0 && <Pastilla tipo="alerta">{numero(sinMargen)} sin margen</Pastilla>}
+          <Pastilla sinPunto>{numero(resumen.productos)} productos</Pastilla>
+          {resumen.sin_margen > 0 && <Pastilla tipo="alerta">{numero(resumen.sin_margen)} sin margen</Pastilla>}
         </div>
       ) : undefined}>
-      <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} disabled={!catalogo} autoFoco
-        placeholder={!catalogo ? "Bajando el catálogo…" : esCelular ? TEXTOS.catalogo.buscar.corto : TEXTOS.catalogo.buscar.largo} etiqueta="Buscar productos"
+      <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco
+        placeholder={esCelular ? TEXTOS.catalogo.buscar.corto : TEXTOS.catalogo.buscar.largo} etiqueta="Buscar productos"
         extra={<div className="filtros-lugar">
-          <Boton icono="filtros" onClick={() => setViendoFiltros((v) => !v)} disabled={!catalogo} aria-expanded={viendoFiltros} aria-label={conFiltros ? `${TEXTOS.catalogo.filtros.largo}: ${cuantosFiltros(filtros)}` : undefined} data-testid="filtros">
+          <Boton icono="filtros" onClick={() => setViendoFiltros((v) => !v)} aria-expanded={viendoFiltros} aria-label={conFiltros ? `${TEXTOS.catalogo.filtros.largo}: ${cuantosFiltros(filtros)}` : undefined} data-testid="filtros">
             {TEXTOS.catalogo.filtros.largo}{conFiltros && <b className="cuenta-filtros" data-testid="cuantos-filtros">{cuantosFiltros(filtros)}</b>}
           </Boton>
           {viendoFiltros && <PanelDeFiltros filtros={filtros} marcas={marcas} alCambiar={setFiltros} alCerrar={() => { setViendoFiltros(false); caja.current?.focus(); }} />}
@@ -151,21 +150,21 @@ export function Productos() {
           {puedeVender && <span><kbd className="tecla">+</kbd> {TEXTOS.catalogo.teclaAgregar.largo}</span>}
         </p>
       )}
-      {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo por primera vez. Después se busca al instante, también sin internet." />}
-      <Aviso tipo="error">{error ?? errorCatalogo}</Aviso>
+      {!listo && <Progreso texto="Buscando…" />}
+      <Aviso tipo="error">{error ?? lista.error}</Aviso>
 
-      {catalogo && catalogo.length === 0 && (
+      {catalogoVacio && (
         <Vacio icono="productos" titulo="Todavía no hay productos" accion={<Boton variante="principal" icono="listas" onClick={() => irA("listas")}>Cargar una lista de precios</Boton>}>
           Los productos entran solos al cargar la lista de precios de un proveedor.
         </Vacio>
       )}
       {conFiltros && (
-        <p className="con-filtros detalle" data-testid="con-filtros">{cuantosProductos(filtrados?.length ?? 0)} {TEXTOS.catalogo.conFiltros.largo}
+        <p className="con-filtros detalle" data-testid="con-filtros">{cuantosProductos(lista.total)} {TEXTOS.catalogo.conFiltros.largo}
           <button type="button" className="enlace" onClick={() => setFiltros(SIN_FILTROS)} data-testid="sacar-filtros">{TEXTOS.catalogo.sacarFiltros.largo}</button></p>
       )}
-      {conFiltros && resultados.length === 0 && catalogo && catalogo.length > 0 ? (
+      {listo && !lista.error && conFiltros && resultados.length === 0 ? (
         <div data-testid="sin-resultados"><Vacio icono="buscar" titulo={TEXTOS.catalogo.sinProductosConFiltros.largo} accion={<Boton onClick={() => setFiltros(SIN_FILTROS)}>{TEXTOS.catalogo.sacarFiltros.largo}</Boton>}>{consultaEstable.trim() ? `Lo que se buscó, «${consultaEstable}», no tiene productos con esos filtros.` : "Ningún producto del catálogo cumple esos filtros."}</Vacio></div>
-      ) : consultaEstable.trim() && resultados.length === 0 && catalogo && catalogo.length > 0 && (
+      ) : listo && !lista.error && consultaEstable.trim() && resultados.length === 0 && (
         <div data-testid="sin-resultados"><Vacio icono="buscar" titulo={`Nada con «${consultaEstable}»`}>Probá con menos palabras, o con el código del proveedor.</Vacio></div>
       )}
 
@@ -198,7 +197,7 @@ export function Productos() {
       {hayMas && <div ref={centinela} className="detalle productos-mas" data-testid="cargar-mas">Trayendo más productos…</div>}
 
       {agregado && <div className="aviso-agregado" role="status" data-testid="agregado"><Icono nombre="tilde" tam={20} grosor={2.6} />{agregado}</div>}
-      {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => (catalogo ?? []).find((x) => x.id !== abierto.id && x.codigo_barras === codigo)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
+      {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => quienTieneElCodigo(codigo, abierto.id)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}
     </Pagina>
   );
 }

@@ -23,7 +23,7 @@ const t = TEXTOS.ficha;
 // derecha el precio con «Así se calcula»; abajo las teclas, «Listo» y «Agregar a la venta».
 // Teclado: ← → recorren los márgenes y Enter elige; ↑ ↓ las partes de la ficha; Mayús + 1 a 5
 // fijan el margen; «+» agrega a la venta; Esc cierra.
-export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; alCerrar: () => void; quienLoTiene: (codigo: string) => Producto | undefined; alCambiar: (c: Cambios) => void }) {
+export function FichaProducto({ producto: p, alCerrar, alCambiar, quienLoTiene }: { producto: Producto; alCerrar: () => void; quienLoTiene: (codigo: string) => Promise<Producto | undefined>; alCambiar: (c: Cambios) => void }) {
   const { stock } = useCatalogo();
   const puede = usePuede();
   const veCostos = useVeCostos();

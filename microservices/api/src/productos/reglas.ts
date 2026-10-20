@@ -6,7 +6,7 @@ import { preciosDeUnProducto } from "../precios.js";
 import * as copia from "./copia.js";
 import * as datos from "./datos.js";
 import type { z } from "zod";
-import type { FotoSubida, PaginaDeProductos, ProductoDelCatalogo } from "../contratos/productos.js";
+import type { FotoSubida, PaginaDeProductos, ProductoDelCatalogo, ResumenDelCatalogo } from "../contratos/productos.js";
 import type { cambiosDeProducto } from "./esquemas.js";
 
 export { normalizarBusqueda, type ProductoCatalogo } from "./datos.js";
@@ -52,11 +52,18 @@ export async function pagina(q: ConsultaDelCatalogo): Promise<PaginaDeProductos>
   const limite = Math.max(1, entero(q.limite, 50, 200));
   const desde = entero(q.desde, 0, 10_000_000);
   const productos = filas.slice(desde, desde + limite);
-  return { productos: productos.map(comoProducto), stock: await stockDeProductos(base, productos.map((p) => p.id)), hay_mas: desde + limite < filas.length };
+  return { productos: productos.map(comoProducto), stock: await stockDeProductos(base, productos.map((p) => p.id)), hay_mas: desde + limite < filas.length, total: filas.length };
 }
 
-// GET /productos/marcas: las marcas para el filtro del Catálogo, sin repetir y en orden.
-export const marcas = (): readonly string[] => copia.marcas();
+// GET /productos/resumen: cuántos productos hay y cuántos tienen costo pero no margen.
+export function resumen(): ResumenDelCatalogo {
+  const todos = copia.buscar({});
+  return { productos: todos.length, sin_margen: todos.filter((p) => p.margen_elegido === null && p.costo_neto !== null).length };
+}
+
+// GET /productos/marcas: las marcas para el filtro del Catálogo, sin repetir y en orden; con una
+// búsqueda, las de lo encontrado (015-E29).
+export const marcas = (q: { buscar?: string }): readonly string[] => (q.buscar?.trim() ? copia.marcasDe(copia.buscar({ buscar: q.buscar })) : copia.marcas());
 
 export type CambiosValidados = z.output<typeof cambiosDeProducto>;
 

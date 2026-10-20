@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-20
 
-**Status**: Aprobada (Carlos, 2026-10-20)
+**Status**: Aprobada (Carlos, 2026-10-20); la historia 5 cambió y falta aclararla
 
 **Maquetas**: No lleva pantallas nuevas: las listas de productos cargan de a páginas al bajar y
 Configuración pierde dos opciones (historia 5).
@@ -39,6 +39,7 @@ ventas».
 - Q: ¿Los márgenes, costos y proveedores de todos los productos? → A: No: se traen recién al buscar, y solo los de los productos que encontró esa búsqueda.
 - Q: ¿El servidor consulta la base en cada pedido? → A: No: lo que se lee seguido y cambia poco y de forma controlada (los productos con sus precios, las listas) vive en una copia del servidor, que se pone al día cuando la base cambia. Lo que varía (las ventas, el stock) se lee de la base.
 - Q: ¿Qué pasa sin internet? → A: Se pierde la búsqueda; se conserva registrar ventas (decisión 129). Cambia el principio IV de la constitución y RNF-10.
+- Q: ¿Se sacan «Trabajar sin conexión» y «Cómo buscar productos» de Configuración? → A: No: Configuración queda como está; se agrega un botón que, solo al tocarlo, baja una vez todo lo necesario para trabajar sin conexión.
 - Q: ¿Hacen falta los registros de la base? → A: No: el sistema no genera registros que nadie usa.
 - Q: ¿El chequeo de salud tiene que mirar la base? → A: No: dice si el servidor anda, sin consultar la base.
 
@@ -83,7 +84,7 @@ hace falta conexión.
 2. **E10** **Given** sin internet, **When** se busca o se escanea un producto, **Then** dice «Sin conexión: para buscar productos hace falta internet» y la venta en curso sigue como estaba.
 3. **E11** **Given** sin internet, **When** se agrega un renglón a mano (descripción y precio), **Then** se puede, como hoy, y se cobra.
 4. **E12** **Given** un cambio de margen o de código hecho sin internet, **When** vuelve la conexión, **Then** se manda solo, como hoy.
-5. **E13** **Given** cualquier dispositivo, celular o computadora, **When** se usa, **Then** guarda solo la venta en curso y lo que falta mandar: ni el catálogo, ni el stock, ni los clientes.
+5. **E13** **Given** cualquier dispositivo, celular o computadora, **When** se usa, **Then** sin la descarga a mano (historia 5) no guarda el catálogo, el stock ni los clientes; lo que falta mandar se guarda según «Trabajar sin conexión» (RF-84).
 
 ---
 
@@ -129,15 +130,14 @@ ni abre conexiones nuevas.
 
 ---
 
-### User Story 5 - Configuración sin las opciones del catálogo guardado (Priority: P2)
+### User Story 5 - Descargar todo para trabajar sin conexión, a mano (Priority: P2)
 
-Como ningún dispositivo guarda el catálogo, «Trabajar sin conexión» y «Cómo buscar productos»
-(RF-84, RF-85) dejan de tener sentido y se sacan de Configuración.
+Configuración queda como está (Carlos, 2026-10-20: «configuración dejalo como está»). Se agrega
+un botón que, solo cuando se lo toca, baja una vez el catálogo entero y todo lo que hace falta
+para trabajar sin conexión. Nada se baja solo.
 
-**Acceptance Scenarios**:
-
-1. **E23** **Given** Configuración abierta, en el celular o en la computadora, **When** se mira, **Then** no están «Trabajar sin conexión» ni «Cómo buscar productos»; el resto sigue igual.
-2. **E24** **Given** un dispositivo que tenía el catálogo, el stock o los clientes guardados, **When** se actualiza a esta versión, **Then** se borran del dispositivo; la venta en curso y lo que faltaba mandar se conservan y se mandan.
+[NEEDS CLARIFICATION: dónde va el botón, qué baja exactamente, cuándo se usa lo bajado y cómo se
+pone al día; preguntado a Carlos el 2026-10-20]
 
 ### Edge Cases
 
@@ -160,10 +160,10 @@ Como ningún dispositivo guarda el catálogo, «Trabajar sin conexión» y «Có
   código exacto, filtros, o productos puntuales por identificador), de a 50, y los siguientes al
   llegar al final de la lista. Cada producto llega con lo que se muestra de él (precio, margen,
   stock, costos y proveedores, como hoy).
-- **RF-123**: Sin internet no se busca ni se escanea: se dice que hace falta conexión. Se sigue
-  registrando la venta en curso y todo cambio queda en el dispositivo hasta que el servidor lo
-  confirma. Los dispositivos guardan solo la venta en curso y lo que falta mandar (decisión 129;
-  reemplaza RF-84 y RF-85).
+- **RF-123**: Sin internet no se busca ni se escanea (salvo con lo descargado a mano, historia 5):
+  se dice que hace falta conexión. Se sigue registrando la venta en curso y todo cambio queda en
+  el dispositivo hasta que el servidor lo confirma, según «Trabajar sin conexión» (RF-84), que
+  sigue como está (decisión 129).
 - **RF-124**: El servidor tiene en una copia propia los productos con sus precios y proveedores, y
   responde desde ahí. La copia se pone al día sola cuando la base cambia, leyendo
   solo lo que cambió, y al arrancar parte de la que guardó en su disco. Las ventas, el stock y lo

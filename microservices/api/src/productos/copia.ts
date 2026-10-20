@@ -38,11 +38,16 @@ function entrada(fila: FilaDeLaCopia): Entrada {
   return { fila: f, texto: ` ${datos.normalizarBusqueda(`${f.descripcion} ${f.marca ?? ""}`).join(" ")}`, codigos };
 }
 
+// Las marcas de unos productos, sin repetir (como se escribió en el primero) y en orden.
+export function marcasDe(filas: readonly { marca: string | null }[]): string[] {
+  const porClave = new Map<string, string>();
+  for (const f of filas) { const m = f.marca?.trim(); if (m && !porClave.has(claveDeMarca(m))) porClave.set(claveDeMarca(m), m); }
+  return [...porClave.values()].sort((a, b) => a.localeCompare(b, "es-AR", { sensitivity: "base" }));
+}
+
 function rearmar() {
   vigentes = [...porId.values()].filter((e) => e.fila.vigente).sort((a, b) => comparar(a.fila.descripcion, b.fila.descripcion));
-  const porClave = new Map<string, string>();
-  for (const e of vigentes) { const m = e.fila.marca?.trim(); if (m && !porClave.has(claveDeMarca(m))) porClave.set(claveDeMarca(m), m); }
-  marcasOrdenadas = [...porClave.values()].sort((a, b) => a.localeCompare(b, "es-AR", { sensitivity: "base" }));
+  marcasOrdenadas = marcasDe(vigentes.map((e) => e.fila));
 }
 
 function aplicar(lectura: LecturaDeLaCopia, entera: boolean) {

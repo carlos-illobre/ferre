@@ -193,9 +193,8 @@ export function Ingreso() {
         </div>
 
         <BuscadorDeProducto consulta={consulta} alCambiar={(v) => { setConsulta(v); setErrorCodigo(null); }} resultados={resultados} alElegir={(p) => agregar(p)} alCrear={(d) => agregar(null, d)} cajaRef={caja}
-          placeholder={!catalogo ? "Bajando el catálogo…" : esCelular ? "Producto que llegó" : "Escribí el producto que llegó"} disabled={!catalogo} alEscanear={esCelular && hayCamara() ? () => { setUltimoEscaneado(null); setEscaneando(true); } : undefined}
+          placeholder={esCelular ? "Producto que llegó" : "Escribí el producto que llegó"} alEscanear={esCelular && hayCamara() ? () => { setUltimoEscaneado(null); setEscaneando(true); } : undefined}
           aLaDerecha={(p) => <span className="importe chico">{p.costo_neto === null ? "sin costo" : pesos(p.costo_neto)}</span>} />
-        {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo de productos…" />}
         <Aviso tipo="error" testId="codigo-desconocido">{errorCodigo}</Aviso>
         {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} ultimo={ultimoEscaneado} />}
 

@@ -5,7 +5,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: (c: string) => catalogo.actual.traerPorCodigo(c), traerPorIds: async () => undefined }));
+vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 vi.mock("../../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
 vi.mock("./componentes/VincularCelular", () => ({ VincularCelular: () => null }));
 vi.mock("../../puesto", async (original) => ({ ...(await original<typeof import("../../puesto")>()), enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
@@ -255,11 +255,12 @@ describe("Vender", () => {
     expect(within(item("TORNILLO")).getByTestId("stock-no-alcanza").textContent).toBe("Sin stock");
   });
 
-  it("003 escenario 18: un código que no es de ningún producto se avisa, y elegido el producto queda asociado", () => {
+  it("003 escenario 18: un código que no es de ningún producto se avisa, y elegido el producto queda asociado", async () => {
     const { busqueda, falso } = armar();
     fireEvent.change(busqueda, { target: { value: "7790001112223" } });
     fireEvent.keyDown(busqueda, { key: "Enter" });
-    expect(screen.getByTestId("codigo-desconocido").textContent).toContain("Código 7790001112223No está en el catálogo");
+    // El código se le pregunta al servidor (specs/018): la respuesta llega un instante después.
+    expect((await screen.findByTestId("codigo-desconocido")).textContent).toContain("Código 7790001112223No está en el catálogo");
     fireEvent.change(busqueda, { target: { value: "mecha vender" } });
     fireEvent.keyDown(busqueda, { key: "Enter" });
     expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { codigo_barras: "7790001112223" });

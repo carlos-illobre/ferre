@@ -12,7 +12,7 @@ import { AvisoError, Buscador, Contador, Hoja, Icono, Pasos, Toast, Lista } from
 import { abreviarUnidad, enteras, UNIDADES, type Unidad } from "../../unidades";
 import { subirFoto } from "../../api";
 import { alCambiarLaCola, enviarPendientes, pendientes as pendientesEnCola } from "../../cola";
-import { useCatalogo } from "../../catalogo";
+import { traerPorCodigo, useCatalogo } from "../../catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { nombreDeProducto, pesos, pesosCortos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
@@ -64,7 +64,7 @@ type Aviso = { texto: string; deshacer?: () => void };
 export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   const puedeEsto = usePuede();
   const fijaMargen = puedeEsto("catalogo.margenes");
-  const { catalogo, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, buscandoEnElServidor, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
   const [, setPendientes] = useState(0);
@@ -142,9 +142,10 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   useEffect(() => { catalogoRef.current = catalogo; }, [catalogo]);
   const alDetectar = useCallback((codigo: string) => {
     const conocido = manejarCodigo.current(codigo);
-    const p = (catalogoRef.current ?? []).find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
-    setRecien(p?.id ?? null);
-    setUltimoEscaneo(conocido ? `${p?.descripcion ?? codigo} · ${TEXTOS.vender.sumado.corto}` : null);
+    const p = catalogoRef.current.find((x) => x.codigo_barras === codigo || x.codigo_proveedor === codigo);
+    const mostrar = (q: Producto | null | undefined) => { setRecien(q?.id ?? null); setUltimoEscaneo(conocido && q !== null ? `${q?.descripcion ?? codigo} · ${TEXTOS.vender.sumado.corto}` : null); };
+    // Un código que este dispositivo todavía no vio se le pregunta al servidor (specs/018).
+    if (p) mostrar(p); else void traerPorCodigo(codigo).then(mostrar, () => mostrar(undefined));
   }, []);
   useEffect(() => {
     if (!recien) return;
@@ -194,7 +195,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         {pestanas}
         {escaneando
           ? <Escaner className="vm-camara" seguido alDetectar={alDetectar} alCerrar={cerrarCamara} ultimo={ultimoEscaneo} />
-          : <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Producto, código o marca" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja}
+          : <Buscador valor={consulta} alCambiar={setConsulta} placeholder={"Producto, código o marca"} onKeyDown={teclasBusqueda} cajaRef={caja}
               alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />}
         {(!hayCamara() || window.innerWidth > 900) && <div className="solo-escritorio"><VincularCelular vinculado={puestoVinculado} alVincular={alVincular} /></div>}
       </div>
@@ -227,7 +228,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
             })}
           </ul>
         )}
-        {consulta.trim() && resultados.length === 0 && catalogo && (
+        {consulta.trim() && resultados.length === 0 && !buscandoEnElServidor && !errorCatalogo && (
           <Lista>
             <button type="button" className="fila" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
               <span className="nombre">Agregar “{consulta.trim()}” como ítem libre</span><span />

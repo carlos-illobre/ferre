@@ -7,8 +7,6 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
 vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a) }));
-const guardado = vi.hoisted(() => ({ stock: [] as unknown[] }));
-vi.mock("../../almacen", () => ({ leerTodo: async () => guardado.stock }));
 vi.mock("../../catalogo", () => ({ traerPorIds: async () => undefined }));
 
 import { ErrorApi } from "../../api";
@@ -20,7 +18,7 @@ const cable = producto({ id: "cable", descripcion: "CABLE", unidad: "m" });
 const fila = (id: string, stock: string) => ({ id, stock, costo_neto: "1000", proveedor: "Tresge", valor: String(Number(stock) * 1000), ultimo_movimiento: null });
 const STOCK = { productos: [fila("cinta", "17")], valor_total: 17000, por_proveedor: {} };
 
-beforeEach(() => { apiFalsa.mockReset().mockResolvedValue(STOCK); enviarOEncolar.mockClear(); guardado.stock = []; });
+beforeEach(() => { apiFalsa.mockReset().mockResolvedValue(STOCK); enviarOEncolar.mockClear(); });
 
 describe("el inventario (010-E05)", () => {
   it("trae el stock del servidor y lo deja a mano por producto", async () => {
@@ -31,24 +29,13 @@ describe("el inventario (010-E05)", () => {
     expect(productosConStock([cable, cinta], result.current.porId).map((p) => p.id)).toEqual(["cinta"]);
   });
 
-  it("sin conexión muestra lo que bajó este dispositivo, con sus totales rearmados", async () => {
-    apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
-    guardado.stock = [fila("cinta", "3"), fila("cable", "-1")];
-    const { result } = renderHook(() => useStock());
-    await waitFor(() => expect(result.current.datos).not.toBeNull());
-    expect(result.current.delDispositivo).toBe(true);
-    expect(result.current.datos).toMatchObject({ valor_total: 2000, por_proveedor: { Tresge: { unidades: 3, productos: 2 } } });
-    expect(result.current.error).toBeNull();
-  });
-
-  it("sin conexión y sin nada guardado es un error de conexión; si el servidor dice que no, es su mensaje", async () => {
+  it("sin conexión es un error de conexión (el stock no se guarda en el dispositivo, specs/018); si el servidor dice que no, es su mensaje", async () => {
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     const sin = renderHook(() => useStock());
     await waitFor(() => expect(sin.result.current.error).not.toBeNull());
     expect(sin.result.current.error).not.toBeInstanceOf(ErrorApi);
     sin.unmount();
     apiFalsa.mockRejectedValue(new ErrorApi(403, "Hace falta: Contar y corregir stock"));
-    guardado.stock = [fila("cinta", "3")];
     const { result } = renderHook(() => useStock());
     act(() => result.current.recargar());
     await waitFor(() => expect(result.current.error).toBeInstanceOf(ErrorApi));

@@ -4,7 +4,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: (c: string) => catalogo.actual.traerPorCodigo(c) }));
+vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
@@ -144,7 +144,8 @@ describe("el ingreso de mercadería (010-E05)", () => {
     ] };
     expect(renglonesDelPedido(pedido, [cinta], conComa)[0]).toMatchObject({ descripcion: "CINTA AISLADORA", cantidad: 6, costo: 2480.5, costoLista: 2480.5, costoTexto: "2480,5" });
     const { result } = armar({ pedido });
-    expect(result.current.proveedorId).toBe("pv-tresge");
+    // Los productos del pedido se piden al servidor antes de armar los renglones (specs/018).
+    await waitFor(() => expect(result.current.proveedorId).toBe("pv-tresge"));
     expect(result.current.renglones).toHaveLength(1);
     act(() => result.current.cambiarCosto(result.current.renglones[0]!.clave, "2500"));
     await act(async () => { expect((await result.current.registrar())?.dePedido).toBe(true); });

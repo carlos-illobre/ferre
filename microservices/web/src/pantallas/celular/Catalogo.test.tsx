@@ -6,7 +6,7 @@ import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 import { ObservadorFalso } from "../../pruebas/preparar";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: (c: string) => catalogo.actual.traerPorCodigo(c), traerPorIds: async () => undefined }));
+vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 const descargar = vi.fn<(...a: any[]) => Promise<void>>(async () => undefined);
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar: (...a: unknown[]) => descargar(...a), api: (...a: unknown[]) => apiFalsa(...a) }));
@@ -30,7 +30,7 @@ function armar(productos = [
   const r = render(<Catalogo sub={sub} />);
   const buscar = (texto: string) => {
     fireEvent.change(screen.getByTestId("busqueda"), { target: { value: texto } });
-    act(() => { vi.advanceTimersByTime(200); }); // debounce
+    act(() => { vi.advanceTimersByTime(350); }); // debounce
   };
   return { ...r, falso, buscar };
 }
@@ -43,8 +43,8 @@ describe("Catálogo · Productos", () => {
   it("busca con debounce, muestra el precio redondeado para arriba a $1.000 y abre la ficha", () => {
     const { buscar } = armar();
     fireEvent.change(screen.getByTestId("busqueda"), { target: { value: "mecha" } });
-    expect(screen.getAllByTestId("producto")).toHaveLength(2); // todavía no pasaron los 150 ms: sigue la lista entera
-    act(() => { vi.advanceTimersByTime(200); });
+    expect(screen.getAllByTestId("producto")).toHaveLength(2); // todavía no pasaron los 300 ms: sigue la lista entera
+    act(() => { vi.advanceTimersByTime(350); });
     expect(screen.getAllByTestId("producto")).toHaveLength(1);
     expect(fila("MECHA").textContent).toContain("sin margen");
     fireEvent.click(fila("MECHA"));
@@ -117,14 +117,14 @@ describe("Catálogo · Productos", () => {
     expect((screen.getByTestId("busqueda") as HTMLInputElement).value).toBe("");
   });
 
-  it("carga de a 30 y trae 30 más al llegar al final", () => {
-    const muchos = Array.from({ length: 40 }, (_, i) => producto({ id: `t${i}`, descripcion: `TUERCA SCROLL ${i + 1}` }));
+  it("018-E01 018-E02: trae de a 50 y los siguientes al llegar al final", () => {
+    const muchos = Array.from({ length: 60 }, (_, i) => producto({ id: `t${i}`, descripcion: `TUERCA SCROLL ${i + 1}` }));
     const { buscar } = armar(muchos);
     buscar("tuerca");
-    expect(screen.getAllByTestId("producto")).toHaveLength(30);
+    expect(screen.getAllByTestId("producto")).toHaveLength(50);
     expect(screen.getByTestId("cargar-mas")).toBeTruthy();
     act(() => { ObservadorFalso.ultimo!.cruzar(); });
-    expect(screen.getAllByTestId("producto")).toHaveLength(40);
+    expect(screen.getAllByTestId("producto")).toHaveLength(60);
     expect(screen.queryByTestId("cargar-mas")).toBeNull();
   });
 

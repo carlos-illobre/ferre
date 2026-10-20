@@ -6,7 +6,7 @@ import { catalogoFalso, producto } from "../../../../pruebas/catalogo-falso";
 
 // La ficha del producto renovada en la computadora (specs/016): la maqueta A en dos columnas.
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: async () => null, traerPorIds: async () => undefined }));
+vi.mock("../../../../catalogo", async () => (await import("../../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const subir = vi.hoisted(() => vi.fn(async () => "/fotos/nueva.jpg"));
 const descargar = vi.hoisted(() => vi.fn(async () => undefined));
@@ -24,7 +24,7 @@ function armar(p = CINTA, stock?: number) {
   if (stock !== undefined) falso.stock.set(p.id, stock);
   catalogo.actual = falso;
   const alCambiar = vi.fn();
-  render(<FichaProducto producto={falso.catalogo[0]!} alCerrar={() => undefined} alCambiar={alCambiar} quienLoTiene={() => undefined} />);
+  render(<FichaProducto producto={falso.catalogo[0]!} alCerrar={() => undefined} alCambiar={alCambiar} quienLoTiene={async () => undefined} />);
   return { alCambiar, ficha: screen.getByTestId("ficha-producto") };
 }
 

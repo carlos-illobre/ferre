@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, ErrorApi } from "../../api";
-import { traerPorCodigo, useCatalogo } from "../../catalogo";
+import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { hoyLocal } from "../../formato";
 import type { Producto } from "../../producto";
@@ -61,7 +61,7 @@ export function renglonesDelPedido(pedido: PedidoAIngresar, catalogo: Producto[]
 
 export function useIngreso(opciones: OpcionesDeIngreso) {
   const { costoATexto, pedido } = opciones;
-  const { catalogo, catalogoCompleto, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const [borrador] = useState(() => leerBorrador(opciones.borrador));
   const proveedores = useProveedoresActivos();
   const [proveedorId, setProveedorId] = useState(borrador?.proveedorId ?? "");
@@ -78,16 +78,21 @@ export function useIngreso(opciones: OpcionesDeIngreso) {
   // En espejo (decisión 60): el ingreso es uno solo, lo cargue quien lo cargue.
   useEspejar<IngresoEnEspejo>("ingreso", useMemo(() => ingresoParaElEspejo(proveedorId, comprobante, foto, fechaCompra, renglones), [proveedorId, comprobante, foto, fechaCompra, renglones]), (v) => {
     setProveedorId(v.proveedorId); setComprobante(v.comprobante as Comprobante); setFoto(v.foto); setFechaCompra(v.fecha);
-    setRenglones((previos) => renglonesDeIngresoDelEspejo(v, catalogo ?? [], previos, costoATexto));
-  }, catalogo !== null && catalogoCompleto !== false);
+    setRenglones((previos) => renglonesDeIngresoDelEspejo(v, catalogo, previos, costoATexto));
+  }, true);
 
-  const hayCatalogo = catalogo !== null;
+  // Los productos del pedido se piden al servidor antes de armar los renglones (specs/018).
   useEffect(() => {
-    if (!pedido || !catalogo) return;
-    setProveedorId(pedido.proveedor_id);
-    setRenglones(renglonesDelPedido(pedido, catalogo, costoATexto));
+    if (!pedido) return;
+    let vigente = true;
+    void traerPorIds(pedido.items.map((i) => i.producto_id)).then(() => {
+      if (!vigente) return;
+      setProveedorId(pedido.proveedor_id);
+      setRenglones(renglonesDelPedido(pedido, pedido.items.map((i) => productoEnMemoria(i.producto_id)).filter((p): p is Producto => Boolean(p)), costoATexto));
+    });
+    return () => { vigente = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pedido, hayCatalogo]);
+  }, [pedido]);
 
   const claveDelBorrador = opciones.borrador;
   useEffect(() => {

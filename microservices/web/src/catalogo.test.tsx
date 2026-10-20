@@ -1,82 +1,141 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, render, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 
+// El catálogo vive en el servidor (specs/018, RF-122, RF-123): el dispositivo pide solo lo que
+// muestra, de a 50, y lo que llega queda en memoria mientras la aplicación está abierta.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.unmock("./catalogo");
+const enCola = vi.hoisted(() => ({ cambios: new Map<string, Record<string, unknown>>() }));
+const enviar = vi.hoisted(() => vi.fn(async () => ({ encolado: false })));
 vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("./cola", () => ({ cambiosDeProductosPendientes: async () => enCola.cambios, enviarOEncolar: (...a: unknown[]) => (enviar as any)(...a) }));
+import { ErrorApi } from "./api";
+import { olvidarTodo, pedirClientes, SIN_CONEXION_PARA_BUSCAR, traerPorCodigo, traerPorIds, useCatalogo, useListaDeProductos } from "./catalogo";
 
-const producto = (n: number, extra: Record<string, unknown> = {}) => ({ id: `p-${String(n).padStart(4, "0")}`, descripcion: `PRODUCTO ${String(n).padStart(4, "0")}`, marca: null, codigo_barras: null, unidad: "unidad", margen_elegido: 100, proveedor: "Uno", codigo_proveedor: `C${n}`, costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-01", explicacion_costo: [], ...extra });
-const TODOS = Array.from({ length: 150 }, (_, i) => producto(i));
+const prod = (id: string, descripcion: string, extra: any = {}) => ({ id, descripcion, marca: "MARCA", codigo_barras: null, unidad: "unidad", margen_elegido: null, proveedor: "P", codigo_proveedor: null, costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-11", lista_importada_id: "l", explicacion_costo: [], ...extra });
+const pagina = (productos: any[], extra: any = {}) => ({ productos, stock: {}, hay_mas: false, total: productos.length, ...extra });
+const pedidos = () => apiFalsa.mock.calls.map((c) => String(c[0]));
+const parametros = (ruta: string) => Object.fromEntries(new URL(ruta, "http://x").searchParams);
+const sinRed = () => new TypeError("Failed to fetch");
 
-// El catálogo se carga una vez para toda la app, muestra los primeros al instante y sigue de fondo (#69).
-describe("carga del catálogo", () => {
-  let vistos: (number | null)[];
-  let catalogos: unknown[];
-  async function montar() {
-    const { useCatalogo } = await import("./catalogo");
-    function Pantalla() { const { catalogo } = useCatalogo(); vistos.push(catalogo ? catalogo.length : null); catalogos.push(catalogo); return <p data-testid="cuantos">{catalogo?.length ?? "nada"}</p>; }
-    return { ...render(<Pantalla />), Pantalla };
-  }
-  async function guardarEnElDispositivo(lista = TODOS) {
-    const almacen = await import("./almacen");
-    await almacen.reemplazarTodo("catalogo", lista);
-    await almacen.guardarMeta("catalogo_primeros", lista.slice(0, 60));
-  }
-  beforeEach(async () => {
-    vi.resetModules(); apiFalsa.mockReset(); vistos = []; catalogos = [];
-    const almacen = await import("./almacen");
-    for (const a of ["catalogo", "stock", "clientes", "meta", "cola"] as const) await almacen.reemplazarTodo(a, []);
+beforeEach(() => { olvidarTodo(); apiFalsa.mockReset(); enviar.mockClear(); enCola.cambios = new Map(); });
+afterEach(() => { vi.useRealTimers(); });
+
+describe("buscar le pregunta al servidor", () => {
+  it("018-E01 018-E03: una consulta cuando se deja de escribir; trae de a 50, en el orden del servidor, con su stock", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    apiFalsa.mockResolvedValue(pagina([prod("m2", "MECHA 8 MM"), prod("m1", "MECHA 10 MM")], { stock: { m2: "4" } }));
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("mec");
+    result.current.buscarProductos("mecha");
+    expect(apiFalsa).not.toHaveBeenCalled();
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(pedidos()).toEqual(["/productos/pagina?buscar=mecha&limite=50"]);
+    expect(result.current.buscarProductos("mecha").map((p) => p.id)).toEqual(["m2", "m1"]);
+    expect(result.current.stock.get("m2")).toBe(4);
+    expect(result.current.stock.get("m1")).toBe(0); // sin movimientos: sin stock
+    expect(pedidos()).toHaveLength(1); // la misma búsqueda, recién hecha, no se vuelve a pedir
   });
 
-  it("con el catálogo guardado: primero se ven los 60 primeros, después todos, sin esperar al servidor", async () => {
-    await guardarEnElDispositivo();
-    let soltar!: (v: unknown) => void;
-    apiFalsa.mockImplementation((ruta: string) => (ruta === "/productos" ? new Promise((r) => { soltar = r; }) : Promise.resolve(ruta === "/stock" ? { productos: [] } : [])));
-    const { getByTestId } = await montar();
-    await waitFor(() => expect(getByTestId("cuantos").textContent).toBe("150"));
-    expect(vistos.filter((v, i) => v !== vistos[i - 1])).toEqual([null, 60, 150]);
-    // El servidor contesta lo mismo: la pantalla no se vuelve a dibujar con otro catálogo.
-    const antes = catalogos.at(-1);
-    await act(async () => { soltar(TODOS.map((p) => ({ ...p }))); await new Promise((r) => setTimeout(r, 30)); });
-    expect(catalogos.at(-1)).toBe(antes);
+  it("018-E10: sin conexión, buscar dice que hace falta internet", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    apiFalsa.mockRejectedValue(sinRed());
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("tornillo");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.error).toBe(SIN_CONEXION_PARA_BUSCAR);
+    expect(SIN_CONEXION_PARA_BUSCAR).toBe("Sin conexión: para buscar productos hace falta internet.");
   });
 
-  it("si el servidor trae un cambio, se ve; y lo que no cambió sigue siendo el mismo producto en memoria", async () => {
-    await guardarEnElDispositivo();
-    apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/productos" ? TODOS.map((p, i) => (i === 3 ? { ...p, costo_neto: "250" } : { ...p })) : ruta === "/stock" ? { productos: [] } : []));
-    await montar();
-    await waitFor(() => expect((catalogos.at(-1) as any[])?.[3]?.costo_neto).toBe("250"));
-    const completo = catalogos.find((c) => (c as any[] | null)?.length === 150 && (c as any[])[3].costo_neto === "100") as any[];
-    expect((catalogos.at(-1) as any[])[10]).toBe(completo[10]);
-    const { leerTodo } = await import("./almacen");
-    await waitFor(async () => expect((await leerTodo<any>("catalogo")).find((p) => p.id === "p-0003").costo_neto).toBe("250"));
+  it("018-E04: un código exacto trae solo ese producto, o ninguno; sin conexión lo dice", async () => {
+    apiFalsa.mockResolvedValueOnce(pagina([prod("t", "TALADRO", { codigo_barras: "779" })])).mockResolvedValueOnce(pagina([]));
+    expect((await traerPorCodigo("779"))?.id).toBe("t");
+    expect(parametros(pedidos()[0]!)).toEqual({ codigo: "779", limite: "1" });
+    expect(await traerPorCodigo("000")).toBeNull();
+    apiFalsa.mockRejectedValueOnce(sinRed());
+    await expect(traerPorCodigo("111")).rejects.toThrow(SIN_CONEXION_PARA_BUSCAR);
+    apiFalsa.mockRejectedValueOnce(new ErrorApi(401, "Tu sesión venció"));
+    await expect(traerPorCodigo("111")).rejects.toThrow("Tu sesión venció");
   });
 
-  it("otra pantalla que se abre enseguida usa lo ya cargado: no vuelve a pedir el catálogo", async () => {
-    await guardarEnElDispositivo();
-    apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/productos" ? TODOS : ruta === "/stock" ? { productos: [] } : []));
-    const { Pantalla, getByTestId } = await montar();
-    await waitFor(() => expect(getByTestId("cuantos").textContent).toBe("150"));
-    await waitFor(() => expect(apiFalsa.mock.calls.filter((c) => c[0] === "/productos")).toHaveLength(1));
-    await act(async () => { await new Promise((r) => setTimeout(r, 30)); });
-    vistos = [];
-    render(<Pantalla />);
-    expect(vistos[0]).toBe(150); // ya está: ni «Bajando el catálogo»
-    await act(async () => { await new Promise((r) => setTimeout(r, 30)); });
-    expect(apiFalsa.mock.calls.filter((c) => c[0] === "/productos")).toHaveLength(1);
+  it("018-E06: productos puntuales por identificador, solo los que faltan, de a 200", async () => {
+    const ids = Array.from({ length: 250 }, (_, i) => `p${i}`);
+    apiFalsa.mockImplementation(async (ruta: string) => pagina(parametros(ruta).ids!.split(",").map((id) => prod(id, id))));
+    await traerPorIds(ids);
+    expect(pedidos().map((r) => parametros(r).ids!.split(",").length)).toEqual([200, 50]);
+    apiFalsa.mockClear();
+    await traerPorIds(["p1", "p2", "nuevo"]);
+    expect(pedidos().map((r) => parametros(r).ids)).toEqual(["nuevo"]);
   });
 
-  it("la primera vez en un dispositivo baja de a tandas y muestra la primera enseguida", async () => {
-    apiFalsa.mockImplementation(async (ruta: string) => {
-      if (ruta === "/productos?limite=60") return TODOS.slice(0, 60);
-      if (ruta.startsWith("/productos?limite=5000&desde=60")) return TODOS.slice(60);
-      return ruta === "/stock" ? { productos: [] } : [];
-    });
-    const { getByTestId } = await montar();
-    await waitFor(() => expect(getByTestId("cuantos").textContent).toBe("150"));
-    expect(vistos).toContain(60);
-    const { leerMeta } = await import("./almacen");
-    await waitFor(async () => expect((await leerMeta<any[]>("catalogo_primeros"))?.length).toBe(60));
+  it("018-E08 018-E12: lo que falta mandar va encima de lo que llega del servidor", async () => {
+    enCola.cambios = new Map([["a", { margen_elegido: 50 }]]);
+    apiFalsa.mockResolvedValue(pagina([prod("a", "ARANDELA", { margen_elegido: 100 })]));
+    await traerPorIds(["a"]);
+    const { result } = renderHook(() => useCatalogo());
+    expect(result.current.catalogo.find((p) => p.id === "a")?.margen_elegido).toBe(50);
+  });
+
+  it("018-E08: un margen cambiado acá se ve enseguida y sale por la cola", async () => {
+    apiFalsa.mockResolvedValue(pagina([prod("a", "ARANDELA")]));
+    await traerPorIds(["a"]);
+    const { result } = renderHook(() => useCatalogo());
+    await act(async () => { await result.current.actualizarProducto("a", { margen_elegido: 200 }); });
+    expect(result.current.catalogo.find((p) => p.id === "a")?.margen_elegido).toBe(200);
+    expect(enviar).toHaveBeenCalledWith("producto.cambio", "PATCH", "/productos/a", { margen_elegido: 200 });
+  });
+});
+
+describe("la lista de Catálogo y Productos, de a páginas", () => {
+  const cincuenta = (desde: number) => Array.from({ length: 50 }, (_, i) => prod(`p${desde + i}`, `PRODUCTO ${desde + i}`));
+
+  it("018-E01 018-E02: los primeros 50 y los siguientes al pedir más; al final, ninguno más", async () => {
+    apiFalsa.mockImplementation(async (ruta: string) => (parametros(ruta).desde === "50" ? pagina(cincuenta(50).slice(0, 10), { total: 60 }) : pagina(cincuenta(0), { hay_mas: true, total: 60 })));
+    const { result } = renderHook(() => useListaDeProductos({ buscar: "", marca: null, disponibilidad: "todos" }));
+    await waitFor(() => expect(result.current.productos).toHaveLength(50));
+    expect(result.current).toMatchObject({ hayMas: true, total: 60 });
+    act(() => result.current.cargarMas());
+    await waitFor(() => expect(result.current.productos).toHaveLength(60));
+    expect(result.current.hayMas).toBe(false);
+    expect(pedidos().map(parametros)).toEqual([{ desde: "0", limite: "50" }, { desde: "50", limite: "50" }]);
+  });
+
+  it("018-E05: la búsqueda, la marca y el stock van al servidor; una consulta nueva empieza de cero", async () => {
+    apiFalsa.mockResolvedValue(pagina([prod("b", "BULÓN")]));
+    const { result, rerender } = renderHook((c: any) => useListaDeProductos(c), { initialProps: { buscar: "bulon", marca: "Bosch", disponibilidad: "con-stock" } as any });
+    await waitFor(() => expect(result.current.productos).toHaveLength(1));
+    expect(parametros(pedidos()[0]!)).toEqual({ buscar: "bulon", marca: "Bosch", disponibilidad: "con-stock", desde: "0", limite: "50" });
+    apiFalsa.mockResolvedValue(pagina([]));
+    rerender({ buscar: "clavo", marca: null, disponibilidad: "todos" });
+    await waitFor(() => expect(result.current.productos).toHaveLength(0));
+    expect(parametros(pedidos()[1]!)).toEqual({ buscar: "clavo", desde: "0", limite: "50" });
+  });
+
+  it("una respuesta que llega tarde, de una consulta vieja, se descarta", async () => {
+    let soltarVieja: (v: unknown) => void = () => undefined;
+    apiFalsa.mockImplementationOnce(() => new Promise((r) => { soltarVieja = r; })).mockResolvedValueOnce(pagina([prod("n", "NUEVA")]));
+    const { result, rerender } = renderHook((c: any) => useListaDeProductos(c), { initialProps: { buscar: "vieja", marca: null, disponibilidad: "todos" } as any });
+    rerender({ buscar: "nueva", marca: null, disponibilidad: "todos" });
+    await waitFor(() => expect(result.current.productos.map((p) => p.id)).toEqual(["n"]));
+    await act(async () => { soltarVieja(pagina([prod("v", "VIEJA")])); });
+    expect(result.current.productos.map((p) => p.id)).toEqual(["n"]);
+  });
+
+  it("018-E10: sin conexión lo dice y deja reintentar", async () => {
+    apiFalsa.mockRejectedValueOnce(sinRed()).mockResolvedValueOnce(pagina([prod("a", "ARANDELA")]));
+    const { result } = renderHook(() => useListaDeProductos({ buscar: "", marca: null, disponibilidad: "todos" }));
+    await waitFor(() => expect(result.current.error).toBe(SIN_CONEXION_PARA_BUSCAR));
+    act(() => result.current.reintentar());
+    await waitFor(() => expect(result.current.productos).toHaveLength(1));
+  });
+});
+
+describe("los clientes", () => {
+  it("se piden al abrir Vender y no otra vez en el mismo minuto", async () => {
+    apiFalsa.mockResolvedValue([{ id: "c1", nombre: "Constructora" }]);
+    pedirClientes(); pedirClientes();
+    const { result } = renderHook(() => useCatalogo());
+    await waitFor(() => expect(result.current.clientes).toHaveLength(1));
+    expect(pedidos()).toEqual(["/clientes"]);
   });
 });

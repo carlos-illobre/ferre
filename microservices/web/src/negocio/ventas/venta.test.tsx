@@ -4,7 +4,7 @@ import { act, renderHook } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: (c: string) => catalogo.actual.traerPorCodigo(c) }));
+vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
 vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: async () => 0 }));
 
@@ -79,14 +79,12 @@ describe("la venta", () => {
     expect(result.current.ocupado).toBe(false);
   });
 
-  it("un código de barras conocido agrega el producto; uno desconocido se puede asociar al producto que se elija", () => {
+  it("un código de barras conocido agrega el producto; uno desconocido se puede asociar al producto que se elija", async () => {
     const { result, falso } = armar();
-    let conocido = false;
-    act(() => { conocido = result.current.agregarPorCodigo("7790001112223"); });
-    expect(conocido).toBe(true);
+    act(() => { result.current.agregarPorCodigo("7790001112223"); });
     expect(result.current.items[0]!.producto?.id).toBe("mecha");
-    act(() => { conocido = result.current.agregarPorCodigo("7799999999999"); });
-    expect(conocido).toBe(false);
+    // Uno que este dispositivo no conoce se le pregunta al servidor (specs/018): no es de nadie.
+    await act(async () => { result.current.agregarPorCodigo("7799999999999"); });
     expect(result.current.codigoDesconocido).toBe("7799999999999");
     act(() => { result.current.elegirSugerencia(tornillo); });
     expect(falso.actualizarProducto).toHaveBeenCalledWith("tornillo", { codigo_barras: "7799999999999" });

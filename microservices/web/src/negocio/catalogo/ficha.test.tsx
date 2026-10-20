@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 
 // Lo que la ficha del producto (specs/016) toma del negocio: la cuenta del precio, la última
 // lectura del código, el archivo de origen y la hora de la lectura que viaja con el código.
@@ -59,11 +59,12 @@ describe("un código que el servidor rechaza (E12)", () => {
     const VIEJA = "2026-10-01T10:00:00.000Z";
     const P = { id: "p-9", descripcion: "MECHA 6 MM", marca: null, codigo_barras: "7790000000001", codigo_leido_en: VIEJA, unidad: "unidad", margen_elegido: 100, proveedor: "Uno", codigo_proveedor: "C9", costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-01", explicacion_costo: [] };
     apiFalsa.mockReset();
-    apiFalsa.mockImplementation(async (ruta: string) => (String(ruta).startsWith("/productos") ? [P] : []));
+    apiFalsa.mockImplementation(async (ruta: string) => (String(ruta).startsWith("/productos/pagina") ? { productos: [P], stock: {}, hay_mas: false, total: 1 } : []));
     vi.resetModules();
-    const { useCatalogo } = await import("../../catalogo");
+    const { traerPorIds, useCatalogo } = await import("../../catalogo");
     const { result } = renderHook(() => useCatalogo());
-    await waitFor(() => expect(result.current.catalogo?.find((p) => p.id === "p-9")).toBeTruthy());
+    await act(async () => { await traerPorIds(["p-9"]); });
+    expect(result.current.catalogo.find((p) => p.id === "p-9")).toBeTruthy();
     enviar.mockRejectedValueOnce(new ErrorApi(400, "El código de barras tiene que tener entre 4 y 32 letras o números"));
     await result.current.actualizarProducto("p-9", { codigo_barras: "7799999999999" }).catch(() => undefined);
     await waitFor(() => expect(result.current.catalogo?.find((p) => p.id === "p-9")).toMatchObject({ codigo_barras: "7790000000001", codigo_leido_en: VIEJA }));

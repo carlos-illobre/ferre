@@ -16,7 +16,7 @@ import "./codigo-de-barras.css";
 // dice si otro producto ya tiene ese código. En la ficha renovada (specs/016) el código se copia
 // con un toque y, después de cargarlo, dice «Código actualizado» con la hora de la lectura.
 export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienLoTiene }: {
-  producto: Producto; celular?: boolean; alGuardar: (codigo: string) => void | Promise<unknown>; quienLoTiene: (codigo: string) => Producto | undefined;
+  producto: Producto; celular?: boolean; alGuardar: (codigo: string) => void | Promise<unknown>; quienLoTiene: (codigo: string) => Promise<Producto | undefined>;
 }) {
   const [abierto, setAbierto] = useState(false);
   const [tipeado, setTipeado] = useState("");
@@ -47,7 +47,7 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
     if (!codigo) { setError("Escribí el código que figura debajo de las barras."); return; }
     setError(null);
     try {
-      const otro = quienLoTiene(codigo);
+      const otro = await quienLoTiene(codigo);
       await alGuardar(codigo);
       setRecien(codigo);
       setAviso(otro ? `También lo tiene «${otro.descripcion}»: si son el mismo artículo, unilos en Duplicados.` : null);

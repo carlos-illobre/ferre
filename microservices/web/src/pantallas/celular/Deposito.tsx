@@ -10,7 +10,7 @@ import { COMPROBANTES, MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { ErrorApi } from "../../api";
-import { traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
+import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
 import { abreviarUnidad, cantidadValida, enteras, unidadDe } from "../../unidades";
@@ -52,7 +52,7 @@ export function Deposito({ sub }: { sub: string | null }) {
 // Inventario: cuánto hay de cada producto, explicado con sus movimientos. El dinero invertido,
 // en total y por producto, solo con «Ver el dinero invertido» (decisión 96).
 function Stock() {
-  const { catalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const { catalogo, buscandoEnElServidor, buscarProductos, actualizarProducto } = useCatalogo();
   const { datos, porId, error: fallo } = useStock();
   const veInvertido = usePuede()("negocio.invertido");
   // El aviso se puede cerrar; vuelve si el próximo pedido falla de nuevo.
@@ -64,7 +64,6 @@ function Stock() {
   const [escaneando, setEscaneando] = useState(false);
 
   const filas = useMemo(() => {
-    if (!catalogo) return [];
     return consulta.trim() ? buscarProductos(consulta, 100) : productosConStock(catalogo, porId).slice(0, 100);
   }, [catalogo, consulta, buscarProductos, porId]);
 
@@ -88,7 +87,7 @@ function Stock() {
       <Lista data-testid="tabla-stock">
         {filas.map((p) => <FilaStock key={p.id} veInvertido={veInvertido} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={setMensaje} />)}
       </Lista>
-      {consulta.trim() && filas.length === 0 && catalogo && <div className="aviso-suave">Nada con "{consulta}".</div>}
+      {consulta.trim() && filas.length === 0 && !buscandoEnElServidor && <div className="aviso-suave">Nada con "{consulta}".</div>}
       </div>
       </div>
     </>
@@ -180,6 +179,7 @@ function Ingreso() {
   const ingreso = useIngreso({ lado: "celular", costoATexto: String, pedido, textoSinConexion: "Sin conexión con el servidor. Registrar una compra necesita internet." });
   const { catalogo, errorCatalogo, proveedor, proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra, consulta, setConsulta, resultados, renglones, agregar, cambiar, cambiarCosto, cambiarFoto, quitar, total, ocupado } = ingreso;
   const proveedores = ingreso.proveedores ?? [];
+  const { buscandoEnElServidor } = useCatalogo();
   const [elegido, setElegido] = useState(0);
   // Lo que falta para registrar se dice al intentarlo y se va al corregir lo cargado.
   const [aviso, setAviso] = useState<string | null>(null);
@@ -234,7 +234,7 @@ function Ingreso() {
       </div>
       </div>
       <div className="columna">
-      <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Producto que llegó" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclas} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
+      <Buscador chico valor={consulta} alCambiar={setConsulta} placeholder={"Producto que llegó"} onKeyDown={teclas} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
       {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
       {consulta.trim() && (
         <Lista data-testid="sugerencias">
@@ -245,7 +245,7 @@ function Ingreso() {
               <span className="detalle">{detalleDe(p)}</span>
             </button>
           ))}
-          {resultados.length === 0 && catalogo && (
+          {resultados.length === 0 && !buscandoEnElServidor && (
             <button type="button" className="fila" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-nuevo">
               <span className="nombre">Agregar “{consulta.trim()}” como producto nuevo</span><span /><span className="detalle">Le ponés el costo de la factura.</span>
             </button>
@@ -445,7 +445,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
         </div>
       ) : (
         <>
-          <Buscador valor={consulta} alCambiar={setConsulta} placeholder={catalogo ? "Buscá o escaneá el producto" : "Bajando el catálogo…"} disabled={!catalogo} onKeyDown={teclasBusqueda} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
+          <Buscador valor={consulta} alCambiar={setConsulta} placeholder={"Buscá o escaneá el producto"} onKeyDown={teclasBusqueda} cajaRef={caja} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
           {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
           {resultados.length > 0 && (
             <Lista data-testid="sugerencias">
@@ -468,7 +468,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
           {conteo.renglones.map((r) => {
             const dif = Number(r.cantidad_contada) - Number(r.stock_teorico);
             return (
-              <button key={r.producto_id} type="button" className="fila" role="row" aria-label={r.descripcion} onClick={() => { const p = catalogo?.find((x) => x.id === r.producto_id); if (p) elegirProducto(p); }}>
+              <button key={r.producto_id} type="button" className="fila" role="row" aria-label={r.descripcion} onClick={() => { void traerPorIds([r.producto_id]).then(() => { const p = productoEnMemoria(r.producto_id); if (p) elegirProducto(p); }); }}>
                 <span className="nombre">{r.descripcion}</span>
                 <span className="derecha" style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}><strong className="importe" style={{ fontSize: 22 }}>{Number(r.cantidad_contada)}</strong><small style={{ fontWeight: 700, color: dif === 0 ? undefined : "var(--coral-texto)", minWidth: 24, textAlign: "right" }}>{dif === 0 ? "=" : dif > 0 ? `+${dif}` : dif}</small></span>
                 <span className="detalle">{r.marca ?? ""}{r.marca ? " · " : ""}teórico {Number(r.stock_teorico)}</span>

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { margenReal, precioDeVenta, subtotalDeRenglon } from "../precios/vista-previa";
 import { ErrorApi, subirFoto } from "../../api";
 import { borrarAnterioresA, guardar } from "../../almacen";
-import { traerPorCodigo, useCatalogo } from "../../catalogo";
+import { pedirClientes, traerPorCodigo, useCatalogo } from "../../catalogo";
 import { enviarOEncolar, enviarPendientes } from "../../cola";
 import { contarAlEspejo } from "../../espejo";
 import { pesos, pesosCortos } from "../../formato";
@@ -97,7 +97,9 @@ export type OpcionesDeVenta = {
 };
 
 export function useVenta(opciones: OpcionesDeVenta) {
-  const { catalogo, clientes, actualizarProducto, ajustarStockLocal, enElServidor } = useCatalogo();
+  const { catalogo, clientes, actualizarProducto, ajustarStockLocal } = useCatalogo();
+  // Los clientes se piden al abrir Vender, no en cada pantalla (specs/018).
+  useEffect(() => { pedirClientes(); }, []);
   // La venta en curso no es de esta pantalla (ADR-022): la comparte la aplicación entera.
   const { items, medio, clienteId } = useVentaEnCurso();
   const setItems = ponerItems, setMedio = ponerMedio, setClienteId = ponerCliente;
@@ -136,14 +138,10 @@ export function useVenta(opciones: OpcionesDeVenta) {
     const c = codigo.trim();
     const exacto = (catalogo ?? []).find((p) => p.codigo_barras === c || p.codigo_proveedor === c);
     if (exacto) { agregar(exacto); setCodigoDesconocido(null); return true; }
-    // Buscando en el servidor (RF-85), el producto puede no estar en memoria: se lo pide por su código.
-    if (enElServidor) {
-      void traerPorCodigo(c).then((p) => { if (p) { agregar(p); setCodigoDesconocido(null); } else setCodigoDesconocido(c); }).catch((e: Error) => setError(e.message));
-      return true;
-    }
-    setCodigoDesconocido(c);
-    return false;
-  }, [catalogo, agregar, enElServidor]);
+    // El catálogo está en el servidor (specs/018): lo que no está en memoria se pide por su código.
+    void traerPorCodigo(c).then((p) => { if (p) { agregar(p); setCodigoDesconocido(null); } else setCodigoDesconocido(c); }).catch((e: Error) => setError(e.message));
+    return true;
+  }, [catalogo, agregar]);
 
   function cambiarItem(clave: string, cambios: Partial<Item>) {
     setItems((lista) => lista.map((it) => (it.clave === clave ? { ...it, ...cambios } : it)));

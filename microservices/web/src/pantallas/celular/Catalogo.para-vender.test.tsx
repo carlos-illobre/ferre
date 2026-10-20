@@ -8,7 +8,7 @@ import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 // El Catálogo para vender en el celular (specs/015-catalogo-para-vender, maqueta B): el stock de
 // cada producto, «Agregar» a la venta, el aviso, el número en Vender y los filtros.
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", () => ({ useCatalogo: () => catalogo.actual.useCatalogoFalso(), traerPorCodigo: (c: string) => catalogo.actual.traerPorCodigo(c), traerPorIds: async () => undefined }));
+vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
 vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { Catalogo } from "./Catalogo";
@@ -85,7 +85,7 @@ describe("Catálogo para vender · celular", () => {
     fireEvent.click(screen.getByTestId("disponibilidad-con-stock"));
     expect(screen.getByTestId("ver-productos").textContent).toBe("Ver 2 productos");
     fireEvent.click(screen.getByTestId("ver-productos"));
-    expect(screen.getAllByTestId("producto").map((f) => f.textContent?.toLowerCase())).toEqual([expect.stringContaining("mecha"), expect.stringContaining("clavo")]);
+    expect(screen.getAllByTestId("producto").map((f) => f.textContent?.toLowerCase())).toEqual([expect.stringContaining("clavo"), expect.stringContaining("mecha")]); // en orden alfabético, como llegan del servidor
     expect(screen.getByTestId("cuantos-filtros").textContent).toBe("1");
     expect(screen.getByTestId("con-filtros").textContent).toContain("2 productos con filtros");
     fireEvent.click(screen.getByTestId("sacar-filtros")); // de un toque
@@ -135,7 +135,7 @@ describe("Catálogo para vender · celular", () => {
     expect(screen.getByTestId("ver-productos").textContent).toBe("Ver 45 productos");
     fireEvent.click(screen.getByTestId("ver-productos"));
     expect(screen.getByTestId("con-filtros").textContent).toContain("45 productos con filtros");
-    expect(screen.getAllByTestId("producto")).toHaveLength(30); // se muestran de a tramos
+    expect(screen.getAllByTestId("producto")).toHaveLength(45); // llegan de a 50 (specs/018)
   });
 
   it("015-E08: lo agregado desde el Catálogo está en Vender, con su precio", () => {

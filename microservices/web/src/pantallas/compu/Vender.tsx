@@ -42,7 +42,7 @@ const soloDigitos = (v: string) => (v === "" ? null : Number(v.replace(/[^\d]/g,
 
 export function Vender() {
   const puedeEsto = usePuede();
-  const { catalogo, catalogoCompleto, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
+  const { catalogo, buscandoEnElServidor, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
   const esCelular = useEsCelular();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
@@ -209,8 +209,8 @@ export function Vender() {
           <div className="vmc-izq">
             <div className="vmc-busqueda">
               <div className="vender-busqueda">
-                <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco disabled={!catalogo} onKeyDown={teclasBusqueda}
-                  placeholder={!catalogo ? "Bajando el catálogo…" : "Buscá por nombre o código, o escaneá"}
+                <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco onKeyDown={teclasBusqueda}
+                  placeholder={"Buscá por nombre o código, o escaneá"}
                   etiqueta="Buscar un producto para agregarlo a la venta" controla="vender-sugerencias" activo={resultados[elegido] ? `sug-${resultados[elegido]!.id}` : undefined} />
                 {resultados.length > 0 && (
                   // El desplegable de la v2 (decisión 126): la foto, el nombre con marca y proveedor, el stock
@@ -247,14 +247,13 @@ export function Vender() {
               <span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen el renglón</span>
               <span><kbd className="tecla">+</kbd><kbd className="tecla">−</kbd> cantidad</span><span><kbd className="tecla">Supr</kbd> quita</span><span><kbd className="tecla">F1</kbd> panel</span>
             </p>
-            {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo por primera vez. Después se busca al instante, también sin internet." />}
             <Aviso tipo="error">{errorCatalogo}</Aviso>
             {codigoDesconocido && (
               <Aviso tipo="alerta" testId="codigo-desconocido" accion={<Boton tam="chico" onClick={() => setCodigoDesconocido(null)}>Ignorar</Boton>}>
                 El código <code>{codigoDesconocido}</code> no está en el catálogo. Buscá el producto y elegilo: el código le queda asociado.
               </Aviso>
             )}
-            {consulta.trim() && resultados.length === 0 && catalogo && (
+            {consulta.trim() && resultados.length === 0 && !buscandoEnElServidor && !errorCatalogo && (
               <div className="lista" data-sin-flechas>
                 <button type="button" className="renglon" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
                   <span className="nombre">Agregar «{consulta.trim()}» como ítem libre</span><Icono nombre="mas" />
@@ -366,8 +365,8 @@ export function Vender() {
         </div>
       </AlLadoDeLasPestanas>}>
       <div className="vender-busqueda">
-        <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco disabled={!catalogo} onKeyDown={teclasBusqueda}
-          placeholder={!catalogo ? "Bajando el catálogo…" : esCelular ? "Buscar producto o código" : "Escribí el nombre del producto o el código"}
+        <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco onKeyDown={teclasBusqueda}
+          placeholder={esCelular ? "Buscar producto o código" : "Escribí el nombre del producto o el código"}
           etiqueta="Buscar un producto para agregarlo a la venta" controla="vender-sugerencias" activo={resultados[elegido] ? `sug-${resultados[elegido]!.id}` : undefined}
           alEscanear={esCelular && hayCamara() ? () => setEscaneando(true) : undefined} />
         {resultados.length > 0 && (
@@ -387,7 +386,6 @@ export function Vender() {
           </ul>
         )}
       </div>
-      {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo por primera vez. Después se busca al instante, también sin internet." />}
 
       <Aviso tipo="error">{errorCatalogo}</Aviso>
       {codigoDesconocido && (
@@ -395,7 +393,7 @@ export function Vender() {
           El código <code>{codigoDesconocido}</code> no está en el catálogo. Buscá el producto y elegilo: el código le queda asociado.
         </Aviso>
       )}
-      {consulta.trim() && resultados.length === 0 && catalogo && (
+      {consulta.trim() && resultados.length === 0 && !buscandoEnElServidor && !errorCatalogo && (
         <div className="lista" data-sin-flechas>
           <button type="button" className="renglon" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
             <span className="nombre">Agregar «{consulta.trim()}» como ítem libre</span><Icono nombre="mas" />
