@@ -54,6 +54,16 @@ Vender (decisión 119):
   desplegable, el comentario y «Cancelar» / «Anular · −$20.000». Una anulada dice cuándo y por
   qué se anuló.
 
+**Cómo se mueve en el celular** (las animaciones de la v2, pedido de Carlos del 2026-10-20): al
+abrir, el total rueda sus dígitos desde abajo, escalonados, y las barras crecen de abajo hacia
+arriba una después de otra; la raya punteada de lo de ayer a esa hora aparece después, en
+fundido. Tocar una barra (o arrastrar el dedo sobre ellas) saca el globo con «10 h · $71.000»
+hacia arriba y baja las demás a menos de la mitad; al pasar de una hora a otra vibra apenas; al
+soltar, el globo se va en un momento. Cuando cambia un número del día (el total, los medios,
+ventas, productos, ticket) rueda hacia arriba si sube y hacia abajo si baja. Al anular, la venta
+se tacha con una raya que se dibuja de izquierda a derecha y queda a la vista, anulada. Solo se
+mueve transform y opacity, y nada se mueve para quien pidió menos movimiento en su sistema.
+
 ## En la computadora, «El día y la venta» (decisión 135)
 
 Reemplaza a los cuatro cajones (decisión 122): Carlos eligió la v2 del director de arte, variante «El

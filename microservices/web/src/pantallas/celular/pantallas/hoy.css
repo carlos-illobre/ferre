@@ -17,11 +17,28 @@
 .hoy-pastilla.igual { background: var(--p-relleno); color: var(--p-tinta) !important; }
 .hoy-pastilla.baja { background: var(--p-naranja); }
 .hoy-grafico { margin: 6px 0 4px; }
-.hoy-dato { min-height: 18px; font-size: 13px; text-align: right; opacity: .9; }
-.hoy-barras { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: end; gap: 4px; height: 64px; }
-.hoy-barras button { display: block; width: 100%; padding: 0; border: 0; border-radius: 4px 4px 0 0; background: var(--p-verde-3); min-height: 3px; }
-.hoy-barras button.vacia { background: var(--p-relleno); }
-.hoy-barras button.elegida { background: var(--p-ok); }
+.hoy-barras { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: end; gap: 4px; height: 64px; margin-top: 30px; }
+.hoy-col { position: relative; display: flex; align-items: flex-end; height: 100%; transition: opacity 120ms; }
+.hoy-col button { display: block; width: 100%; padding: 0; border: 0; border-radius: 4px 4px 0 0; background: var(--p-verde-3); min-height: 3px; transform-origin: 50% 100%; animation: hoy-crece 400ms cubic-bezier(.2, .8, .2, 1) both; }
+.hoy-col button.vacia { background: var(--p-relleno); }
+.hoy-col.elegida button { background: var(--p-ok); }
+/* Señalada una barra, las demás bajan (como la v2). */
+.hoy-barras.con-elegida .hoy-col:not(.elegida) { opacity: .4; }
+/* Lo de ayer a esa hora: una raya punteada que aparece después de las barras. */
+.hoy-ayer { position: absolute; left: -2px; right: -2px; height: 0; border-top: 2px dashed #CEC8BA; pointer-events: none; animation: hoy-fundido 240ms 380ms cubic-bezier(.2, .8, .2, 1) both; }
+.hoy-globo { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 8px; border-radius: 8px; background: #1A1D1B; color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 8px 20px rgb(26 29 27 / .25); z-index: 2; pointer-events: none; animation: hoy-globo 120ms cubic-bezier(.2, .8, .2, 1) both; }
+.hoy-col:first-child .hoy-globo { left: 0; transform: none; animation-name: hoy-globo-izq; }
+.hoy-col:last-child .hoy-globo { left: auto; right: 0; transform: none; animation-name: hoy-globo-izq; }
+@keyframes hoy-crece { from { transform: scaleY(0); } }
+@keyframes hoy-fundido { from { opacity: 0; } }
+@keyframes hoy-globo { from { opacity: 0; transform: translate(-50%, 6px); } }
+@keyframes hoy-globo-izq { from { opacity: 0; transform: translateY(6px); } }
+/* La venta recién anulada: una raya que se dibuja de izquierda a derecha y se va (la venta queda tachada). */
+.hoy-ventas li.tachando { position: relative; }
+.hoy-ventas li.tachando::before { content: ""; position: absolute; left: 14px; right: 14px; top: 50%; height: 2px; border-radius: 2px; background: var(--p-texto-2); transform-origin: left center; pointer-events: none; z-index: 1; animation: hoy-raya 320ms cubic-bezier(.2, .8, .2, 1) both, hoy-se-va 200ms 500ms cubic-bezier(.4, 0, 1, 1) forwards; }
+@keyframes hoy-raya { from { transform: scaleX(0); } }
+@keyframes hoy-se-va { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hoy-col button, .hoy-ayer, .hoy-globo, .hoy-ventas li.tachando::before { animation: none; } .hoy-col { transition: none; } }
 .hoy-horas { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; font-size: 12px; text-align: center; opacity: .8; margin-top: 4px; }
 .hoy-medios { list-style: none; margin: 4px 0 0; padding: 12px 0 0; border-top: 1px solid var(--p-borde-suave); display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
 .hoy-medios li { display: flex; align-items: center; gap: 10px; min-width: 0; }

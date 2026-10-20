@@ -52,7 +52,13 @@ describe("«Hoy» · celular", () => {
     const barras = within(screen.getByTestId("grafico")).getAllByTestId("barra");
     expect(barras.map((b) => b.getAttribute("aria-label"))).toEqual(["9 h: $12.000", "10 h: $223.000", "11 h: $58.000", "12 h: $0"]);
     fireEvent.click(barras[1]!);
-    expect(screen.getByTestId("grafico").textContent).toContain("10 h · $223.000");
+    expect(screen.getByTestId("globo").textContent).toBe("10 h · $223.000");
+    // Como la v2 (017-T012): la elegida queda y las demás bajan; lo de ayer a cada hora, marcado.
+    expect(screen.getByTestId("grafico").querySelector(".hoy-barras")!.className).toContain("con-elegida");
+    expect(barras[1]!.parentElement!.className).toContain("elegida");
+    expect(within(screen.getByTestId("grafico")).getAllByTestId("marca-ayer")).toHaveLength(2);
+    fireEvent.click(barras[1]!);
+    expect(screen.queryByTestId("globo")).toBeNull();
   });
 
   it("017-E05: cada medio con su ícono, su color, el importe y cuántas ventas", async () => {

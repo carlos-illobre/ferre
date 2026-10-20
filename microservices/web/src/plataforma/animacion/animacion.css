@@ -5,3 +5,10 @@
 @keyframes anim-asoma { from { opacity: 0; transform: translateY(-4px); } }
 @keyframes anim-sube { from { opacity: 0; transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { [data-anim-nuevo]::after { animation: none; opacity: 0; } }
+/* Un número que rueda letra por letra (Rodar.tsx). */
+.anim-rueda { white-space: nowrap; }
+.anim-d { display: inline-block; animation: anim-d-sube 260ms cubic-bezier(.2, .8, .2, 1) both; }
+.anim-d.baja { animation-name: anim-d-baja; }
+@keyframes anim-d-sube { from { opacity: 0; transform: translateY(.45em); } }
+@keyframes anim-d-baja { from { opacity: 0; transform: translateY(-.45em); } }
+@media (prefers-reduced-motion: reduce) { .anim-d { animation: none; } }

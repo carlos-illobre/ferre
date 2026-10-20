@@ -1,5 +1,7 @@
 import { AvisoError, Hoja, Icono } from "../componentes/base";
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Rodar } from "../../../plataforma/animacion/Rodar";
+import { conMovimiento } from "../../../plataforma/animacion/animacion";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { MEDIOS as MEDIOS_DE_TEXTOS, TEXTOS } from "../../textos";
 import { nombreDelDia, useResumenDelDia, type Comparacion } from "../../../negocio/ventas/resumen-del-dia";
@@ -57,23 +59,23 @@ export function VentasDeHoy({ anulaHoy = false, anulaCualquierDia = false }: { a
         {!buscando && <>
           <section className="tarjeta hoy-total" data-testid="resumen-hoy">
             <small>{t.totalDeVentas.corto}</small>
-            <span className="hoy-monto importe" data-testid="total-de-hoy">{pesosCortos(r.resumen.total)}</span>
+            <span className="hoy-monto importe" data-testid="total-de-hoy"><Rodar texto={pesosCortos(r.resumen.total)} escalon={30} alAparecer /></span>
             <ComparacionDelDia comparacion={r.comparacion} esHoy={r.esHoy} diaAnterior={r.diaAnterior} />
-            <Barras barras={r.barras} />
+            <Barras barras={r.barras} anterior={r.anteriorPorHora} />
             <ul className="hoy-medios">
               {MEDIOS.map((m) => (
                 <li key={m} data-testid={`medio-${m}`}>
                   <IconoDeMedio medio={m} tam={18} conFondo />
-                  <span><b className="importe">{pesosCortos(r.resumen!.medios[m].total)}</b>
+                  <span><b className="importe"><Rodar texto={pesosCortos(r.resumen!.medios[m].total)} /></b>
                     <small><span className="hoy-medio-nombre">{MEDIOS_CORTOS[m]}</span> · {r.resumen!.medios[m].cuantas} {r.resumen!.medios[m].cuantas === 1 ? t.venta.corto : t.ventas.corto}</small></span>
                 </li>
               ))}
             </ul>
           </section>
           <div className="hoy-numeros" data-testid="numeros">
-            <div><b data-testid="cuantas-ventas">{r.resumen.ventas}</b><small>{t.ventas.corto}</small></div>
-            <div><b data-testid="cuantos-productos">{r.resumen.productos}</b><small>{t.productos.corto}</small></div>
-            <div><b data-testid="ticket">{r.resumen.ticket === null ? "—" : pesosCortos(r.resumen.ticket)}</b><small>{t.ticket.corto}</small></div>
+            <div><b data-testid="cuantas-ventas"><Rodar texto={String(r.resumen.ventas)} /></b><small>{t.ventas.corto}</small></div>
+            <div><b data-testid="cuantos-productos"><Rodar texto={String(r.resumen.productos)} /></b><small>{t.productos.corto}</small></div>
+            <div><b data-testid="ticket"><Rodar texto={r.resumen.ticket === null ? "—" : pesosCortos(r.resumen.ticket)} /></b><small>{t.ticket.corto}</small></div>
           </div>
         </>}
         {buscando ? (
@@ -129,20 +131,41 @@ function ComparacionDelDia({ comparacion: c, esHoy, diaAnterior }: { comparacion
   );
 }
 
-// Lo vendido por hora; tocar una barra dice su importe.
-function Barras({ barras }: { barras: { hora: number; total: number }[] }) {
+// Lo vendido por hora, como la v2: cada barra con una raya punteada en lo de ayer a esa hora. Tocar
+// una barra (o arrastrar el dedo por ellas) saca el globo con su hora y su importe y baja las demás;
+// al pasar de una hora a otra vibra apenas, y al soltar el globo se va solo. Al abrir, las barras
+// crecen una después de otra y la marca de ayer aparece después. Con el teclado, Enter elige la barra
+// (el toque ya la eligió al apoyar el dedo).
+function Barras({ barras, anterior }: { barras: { hora: number; total: number }[]; anterior: Map<number, number> }) {
   const [elegida, setElegida] = useState<number | null>(null);
+  const tocando = useRef(false);
+  const espera = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (espera.current) clearTimeout(espera.current); }, []);
   if (barras.length === 0) return null;
-  const max = Math.max(...barras.map((b) => b.total), 1);
-  const b = barras.find((x) => x.hora === elegida);
+  const max = Math.max(...barras.map((b) => b.total), ...barras.map((b) => anterior.get(b.hora) ?? 0), 1);
+  const alto = (v: number) => `${Math.max(4, (v / max) * 100)}%`;
+  const senalar = (x: number, y: number) => {
+    const hora = Number((document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>("[data-hora]")?.dataset.hora);
+    if (!Number.isFinite(hora)) return;
+    setElegida((antes) => { if (antes !== hora && conMovimiento()) navigator.vibrate?.(10); return hora; });
+  };
+  const soltar = () => { tocando.current = false; if (espera.current) clearTimeout(espera.current); espera.current = setTimeout(() => setElegida(null), 1500); };
   return (
     <div className="hoy-grafico" data-testid="grafico">
-      <div className="hoy-dato" aria-live="polite">{b ? `${b.hora} h · ${pesosCortos(b.total)}` : ""}</div>
-      <div className="hoy-barras">
-        {barras.map((x) => (
-          <button key={x.hora} type="button" className={`${x.total === 0 ? "vacia" : ""} ${x.hora === elegida ? "elegida" : ""}`} style={{ height: `${Math.max(4, (x.total / max) * 100)}%` }}
-            onClick={() => setElegida(x.hora === elegida ? null : x.hora)} aria-label={`${x.hora} h: ${pesosCortos(x.total)}`} data-testid="barra" />
-        ))}
+      <div className={`hoy-barras ${elegida !== null ? "con-elegida" : ""}`} style={{ touchAction: "none" }}
+        onPointerDown={(e) => { tocando.current = true; if (espera.current) clearTimeout(espera.current); senalar(e.clientX, e.clientY); }}
+        onPointerMove={(e) => { if (tocando.current) senalar(e.clientX, e.clientY); }} onPointerUp={soltar} onPointerCancel={soltar}>
+        {barras.map((x, i) => {
+          const ayer = anterior.get(x.hora) ?? 0;
+          return (
+            <div key={x.hora} className={`hoy-col ${x.hora === elegida ? "elegida" : ""}`} data-hora={x.hora}>
+              <button type="button" className={x.total === 0 ? "vacia" : ""} style={{ height: alto(x.total), animationDelay: `${i * 20}ms` }}
+                onClick={(e) => { if (e.detail === 0) setElegida(x.hora === elegida ? null : x.hora); }} aria-label={`${x.hora} h: ${pesosCortos(x.total)}`} data-testid="barra" />
+              {ayer > 0 && <i className="hoy-ayer" style={{ bottom: `${(ayer / max) * 100}%` }} aria-hidden="true" data-testid="marca-ayer" />}
+              {x.hora === elegida && <span className="hoy-globo" role="status" style={{ bottom: `calc(${alto(x.total)} + 6px)` }} data-testid="globo">{x.hora} h · {pesosCortos(x.total)}</span>}
+            </div>
+          );
+        })}
       </div>
       <div className="hoy-horas" aria-hidden="true">{barras.map((x) => <span key={x.hora}>{x.hora}</span>)}</div>
     </div>
@@ -161,6 +184,7 @@ function Resaltar({ texto, buscado }: { texto: string; buscado: string }): React
 // coincide («3 × Mecha… y 1 más»).
 function VentasCortas({ ventas, buscado, alAbrir, sinVentas }: { ventas: VentaDelDia[]; buscado: string; alAbrir: (v: VentaDelDia) => void; sinVentas: string }) {
   const t = TEXTOS.hoy;
+  const tachando = useRecienAnuladas(ventas);
   if (ventas.length === 0) return <div className="aviso-suave" data-testid="sin-ventas">{sinVentas}</div>;
   return (
     <ul className="hoy-ventas" data-testid="ventas-de-hoy">
@@ -170,7 +194,7 @@ function VentasCortas({ ventas, buscado, alAbrir, sinVentas }: { ventas: VentaDe
         const una = coincide ?? (v.items.length === 1 ? v.items[0]! : null);
         const resto = una && v.items.length > 1 ? ` y ${v.items.length - 1} más` : "";
         return (
-          <li key={v.id} className={anulada ? "anulada" : ""} data-testid="venta-dia">
+          <li key={v.id} className={`${anulada ? "anulada" : ""} ${tachando.has(v.id) ? "tachando" : ""}`} data-testid="venta-dia">
             <button type="button" className="hoy-venta" onClick={() => alAbrir(v)}>
               <IconoDeMedio medio={v.medio_pago} tam={20} conFondo />
               <span className="hoy-venta-texto">
@@ -185,6 +209,21 @@ function VentasCortas({ ventas, buscado, alAbrir, sinVentas }: { ventas: VentaDe
       })}
     </ul>
   );
+}
+
+// Las ventas que se acaban de anular, un momento, para que se tachen con una raya que se dibuja.
+function useRecienAnuladas(ventas: VentaDelDia[]): Set<string> {
+  const antes = useRef(new Map(ventas.map((v) => [v.id, v.estado])));
+  const [recien, setRecien] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const nuevas = ventas.filter((v) => v.estado === "anulada" && antes.current.get(v.id) === "confirmada").map((v) => v.id);
+    antes.current = new Map(ventas.map((v) => [v.id, v.estado]));
+    if (!nuevas.length || !conMovimiento()) return;
+    setRecien(new Set(nuevas));
+    const t = setTimeout(() => setRecien(new Set()), 900);
+    return () => clearTimeout(t);
+  }, [ventas]);
+  return recien;
 }
 
 // La hoja de una venta: la hora, el medio y el cliente, sus productos y «Anular» si se puede.
