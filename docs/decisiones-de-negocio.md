@@ -1103,3 +1103,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      la venta a la derecha con «Corregir» E, «Cambio» C y «Anular»; «Registrar un cambio» Alt+C; en el
      celular, la hoja de la venta). Especificación en `specs/019-corregir-y-cambiar/`. «Ventas de hoy»
      en la computadora pasa a ser la v2 («El día y la venta»), sin sumarle nada de las otras.
+136. **Los datos para trabajar sin conexión se bajan a mano; «Trabajar sin conexión» también en la
+     computadora** (2026-10-20). Carlos: Configuración queda como está; se agrega un botón que, solo
+     cuando se lo toca, baja lo que usan quien vende y quien compra (no lo del administrador:
+     Procesos, «Cómo va el negocio»); la vez siguiente trae solo lo nuevo, con la marca que da el
+     servidor; lo bajado se usa solo sin conexión; «Cómo buscar productos» queda como está por el
+     momento. «Trabajar sin conexión» va también en la computadora (arranca habilitada, como
+     trabaja hoy). Aprobó la maqueta (specs/018, historia 5).
+

@@ -45,9 +45,10 @@ puede romper el otro: se verifica con capturas de los dos, antes y después.
 
 ### IV. Sin internet no se nota y no se pierde nada
 
-Buscar y vender funcionan igual sin conexión. Todo cambio del mostrador vive en el
-dispositivo hasta que el servidor lo confirma. Una caída del servidor no frena el mostrador
-(ADR-001, ADR-002, ADR-005).
+Vender funciona igual sin conexión. Todo cambio del mostrador vive en el dispositivo hasta
+que el servidor lo confirma. Buscar sin conexión usa lo que se bajó a mano para trabajar sin
+conexión; sin eso, buscar pide internet y lo dice (decisión 129, ADR-023). Una caída del
+servidor no frena el mostrador (ADR-001, ADR-002, ADR-005).
 
 ### V. Nada se borra y todo número se explica
 

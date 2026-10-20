@@ -1,6 +1,7 @@
 # ADR-005: IndexedDB directo con un wrapper propio, sin Dexie
 
 **Estado:** Aceptado
+**Precisado por:** ADR-023 (2026-10-20): el catálogo, el stock y los clientes ya no se bajan solos; se guardan solo si se bajan a mano para trabajar sin conexión.
 **Fecha:** 2026-09-13
 
 ---

@@ -157,3 +157,11 @@ librerías; donde no existen, la pantalla cambia sin animar. La computadora no a
 - Un solo estilo de botón principal por pantalla; el resto, secundarios.
 - Funciona en Chrome y Firefox de la laptop antigua y en el navegador del celular. Se prueba
   en la laptop real antes del piloto.
+
+## Botón en una fila de Configuración (specs/018)
+
+Donde una preferencia es una acción y no una llave («Datos para trabajar sin conexión»), va un
+botón en el lugar de la llave: 44 px de alto, 12 px de radio, principal en el verde de las llaves
+(`--p-ok`) cuando es lo primero que hay que hacer, secundario con borde (`--p-borde-fuerte`) cuando
+repite algo hecho. El avance, una barra de 8 px en `--p-ok` sobre `--p-relleno`.
+

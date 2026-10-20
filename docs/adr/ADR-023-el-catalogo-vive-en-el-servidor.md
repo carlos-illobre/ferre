@@ -51,12 +51,16 @@ internet se pierde la búsqueda y se conserva registrar ventas.
 - La copia se guarda en el volumen de datos con su marca y su versión de formato.
 - Los clientes no van en la copia: llevan su deuda, que cambia con cada venta a cuenta corriente.
 - La salud del servidor no consulta la base; el pool conserva las conexiones 10 minutos.
-- Los dispositivos no guardan catálogo, stock ni clientes; guardan la venta en curso y la cola de
-  lo que falta mandar (ADR-005 sigue valiendo para eso).
+- Los dispositivos no bajan el catálogo, el stock ni los clientes solos. Con «Trabajar sin
+  conexión» habilitado (en el celular y, desde ahora, también en la computadora), un botón los
+  baja a mano; la vez siguiente trae solo lo que cambió desde la marca que dio el servidor (no el
+  reloj del dispositivo: un reloj corrido o un cambio que confirma tarde harían perder datos).
+  Lo bajado se usa solo sin conexión. El stock lleva la transacción de cada movimiento para eso.
 
 ## Consecuencias
 
-- Sin conexión no se busca ni se escanea; la venta en curso se cobra y queda en la cola.
+- Sin conexión se busca y se escanea solo si se bajaron los datos a mano; la venta en curso se
+  cobra y queda en la cola.
 - Un solo proceso del servidor por ambiente: si hubiera más, cada uno escucha y se pone al día
   igual.
 - Si la conexión de escucha se corta, la copia puede quedar atrás hasta que reconecta; al

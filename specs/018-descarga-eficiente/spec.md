@@ -4,10 +4,9 @@
 
 **Created**: 2026-10-20
 
-**Status**: Aprobada (Carlos, 2026-10-20); la historia 5 se aclaró el 2026-10-20 y espera la aprobación de la maqueta
+**Status**: Aprobada (Carlos, 2026-10-20), también la historia 5
 
-**Maquetas**: No lleva pantallas nuevas: las listas de productos cargan de a páginas al bajar y
-Configuración pierde dos opciones (historia 5).
+**Maquetas**: Aprobadas (Carlos, 2026-10-20): `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html`, la fila «Datos para trabajar sin conexión» en Configuración (historia 5).
 
 **Input**: Carlos, el 2026-10-20, después del aviso de Supabase del 18/10 (la organización pasó
 el tope del plan gratuito: 6,45 de 5 GB de datos que salen de la base y 1,51 de 1 GB de
@@ -158,7 +157,7 @@ y ver que llega solo ese producto.
 7. **E29** **Given** la llave «Trabajar sin conexión» apagada, **When** se apaga, **Then** se borra lo bajado, como hoy se borra lo guardado (RF-84).
 8. **E30** **Given** la computadora, **When** se abre Configuración por primera vez, **Then** «Trabajar sin conexión» aparece habilitada (como trabaja hoy, que guarda siempre lo que falta enviar); en el celular, deshabilitada, como hoy.
 
-Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html` (para aprobar).
+Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html`, aprobadas por Carlos el 2026-10-20.
 
 ### Edge Cases
 

@@ -138,9 +138,9 @@ Maqueta: `maquetas/version-nueva.html`, aprobada por Carlos el 2026-10-16 junto 
 
 - **RF-83**: Más tiene la opción «Configuración», que abre una pantalla con las preferencias de la aplicación. La ve cualquier usuario con sesión. Cada preferencia dice en una línea qué cambia. La primera es «Animaciones»: habilitar o deshabilitar el movimiento al navegar (decisión 78). Se guarda en el dispositivo, vale en el momento y arranca habilitada.
 
-- **RF-85**: Con el guardado deshabilitado (RF-84), la persona elige en Configuración cómo se buscan los productos: bajando el catálogo a la memoria cada vez que abre la aplicación (de arranque), o consultando al servidor en cada búsqueda y en cada código escaneado. Cada opción dice su ventaja y su desventaja. El resultado de buscar es el mismo en las dos. Qué es un celular lo decide el aparato (teléfono o tableta con Android o iOS), no el ancho de la ventana.
+- **RF-85** (desde specs/018 el catálogo se busca siempre en el servidor y esta opción no cambia nada; queda a la vista hasta que Carlos decida): Con el guardado deshabilitado (RF-84), la persona elige en Configuración cómo se buscan los productos: bajando el catálogo a la memoria cada vez que abre la aplicación (de arranque), o consultando al servidor en cada búsqueda y en cada código escaneado. Cada opción dice su ventaja y su desventaja. El resultado de buscar es el mismo en las dos. Qué es un celular lo decide el aparato (teléfono o tableta con Android o iOS), no el ancho de la ventana.
 
-- **RF-84**: En el celular, guardar datos del negocio en el dispositivo para trabajar sin conexión es una preferencia de cada persona (RF-83), que arranca deshabilitada. Deshabilitada, el celular guarda solo lo mínimo para mantener la sesión y el vínculo (menos de 150 KB, sin contar los archivos de la aplicación), y sin conexión no registra ni guarda nada. Habilitada, guarda y trabaja sin conexión como la computadora. No aplica a la computadora.
+- **RF-84**: Guardar datos del negocio en el dispositivo para trabajar sin conexión es una preferencia de cada persona (RF-83), en el celular (arranca deshabilitada) y en la computadora (arranca habilitada; specs/018, decisión 133). Deshabilitada, el celular guarda solo lo mínimo para mantener la sesión y el vínculo (menos de 150 KB, sin contar los archivos de la aplicación), y sin conexión no registra ni guarda nada. Habilitada, guarda lo que falta enviar y deja bajar a mano los datos para buscar sin conexión (specs/018, historia 5); el catálogo ya no se guarda solo.
 
 - **RF-96**: En Configuración, cada persona elige en su dispositivo cada cuánto se busca una versión nueva mientras la aplicación está a la vista: 5 min, 15 min (de arranque), 1 hora o 24 horas. Con su llave apagada la aplicación no busca versiones nuevas mientras está abierta (ni con el timer, ni al volver a ella, ni al volver la conexión); la toma al cerrarla y volver a abrirla. Al abrir y al volver a la aplicación se busca siempre, elija lo que elija (decisión 91, ADR-020). Está en el celular y en la computadora.
 
@@ -159,3 +159,11 @@ Maqueta: `maquetas/version-nueva.html`, aprobada por Carlos el 2026-10-16 junto 
 
 - El deslizamiento entre pantallas existe solo en el celular; en la computadora la opción apaga el movimiento de ventanas y avisos.
 - Otras opciones (por ejemplo, el guardado para trabajar sin conexión en el celular) se sumarán a esta pantalla con su propia especificación.
+
+## Enmienda del 2026-10-20: el catálogo vive en el servidor (specs/018)
+
+Reemplaza la enmienda del 2026-10-12. Ningún dispositivo baja el catálogo solo: cada pantalla le
+pide al servidor lo que muestra, de a 50 (RF-122). «Trabajar sin conexión» está también en la
+computadora y, habilitada, suma la fila «Datos para trabajar sin conexión», que baja a mano lo que
+hace falta para buscar sin internet (specs/018, historia 5). Ver ADR-023.
+

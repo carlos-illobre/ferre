@@ -107,8 +107,10 @@ Las reglas no van acá: van en `specs/`.
   cada 5 minutos, con aviso al celular; la cuenta la tiene que crear Carlos. (2) Tarea
   programada en GitHub que consulte una vez por día y avise por correo si falla; la puede hacer
   un agente, sin cuenta nueva, y avisa con hasta un día de demora.
-  Direcciones a consultar (ya verifican la base): https://ferre-api.duckdns.org/health y
-  https://ferre-api-pruebas.duckdns.org/health
+  Direcciones a consultar: https://ferre-api.duckdns.org/health y
+  https://ferre-api-pruebas.duckdns.org/health. Desde specs/018 la salud no consulta la base
+  (para no llenar sus registros): el monitor tiene que consultar la base por su cuenta, una vez
+  por día, también para que Supabase no la pause.
 - [ ] T092 [agente] [definir] Copias de seguridad de la base: cada hora, semanal fuera del servidor y prueba mensual de restauración (estimación 2d) (#92)
   Requerimientos RNF-21, RNF-22 y RNF-23, especificados en specs/001-base-del-sistema (historia
   5); ADR-002. Sale de T019.

@@ -703,7 +703,7 @@ RF-83:
     - "Revisión, sin corregir: con «reducir movimiento» pedido en el teléfono, las hojas y los avisos del celular se siguen animando; solo se apaga el deslizamiento entre pantallas"
 
 RF-84:
-  estado: "Hecho (009-T002): en el celular el guardado para trabajar sin conexión arranca deshabilitado y se habilita en Configuración"
+  estado: "Hecho (009-T002, 018-T007): el guardado para trabajar sin conexión se elige en Configuración, en el celular (arranca deshabilitado) y en la computadora (arranca habilitado)"
   pruebas:
     - microservices/web/src/guardado.test.tsx
     - tests/e2e/celular/08-sin-conexion.spec.ts
@@ -1404,23 +1404,33 @@ RNF-61:
   defectos: []
 
 RF-122:
-  estado: "Pendiente (018-T005, 018-T006)"
-  pruebas: []
+  estado: "A validar (018): cada pantalla pide al servidor lo que muestra, de a 50; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/api/src/rutas/productos.test.ts
+    - microservices/web/src/catalogo.test.tsx
+    - microservices/web/src/pantallas/celular/Catalogo.test.tsx
   defectos: []
 
 RF-123:
-  estado: "Pendiente (018-T006, 018-T007)"
-  pruebas: []
+  estado: "A validar (018): sin conexión se busca con lo bajado a mano; sin eso, lo dice"
+  pruebas:
+    - microservices/web/src/catalogo.test.tsx
+    - microservices/web/src/descarga.test.tsx
+    - microservices/web/src/guardado.test.tsx
   defectos: []
 
 RF-124:
-  estado: "Pendiente (018-T003, 018-T004)"
-  pruebas: []
+  estado: "A validar (018): la copia del catálogo en el servidor, al día con los avisos de la base; medido en una base real con 2.500 productos"
+  pruebas:
+    - microservices/api/src/productos/copia.test.ts
+    - microservices/api/src/productos/al-dia.test.ts
+    - tests/integration/avisos-del-catalogo.sh
   defectos: []
 
 RF-125:
-  estado: "Pendiente (018-T002)"
-  pruebas: []
+  estado: "Hecho (018-T002): la salud del servidor no consulta la base"
+  pruebas:
+    - microservices/api/src/salud.test.ts
   defectos: []
 
 RF-126:
