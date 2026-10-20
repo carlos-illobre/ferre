@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-20
 
-**Status**: Aprobada (Carlos, 2026-10-20); la historia 5 cambió y falta aclararla
+**Status**: Aprobada (Carlos, 2026-10-20); la historia 5 se aclaró el 2026-10-20 y espera la aprobación de la maqueta
 
 **Maquetas**: No lleva pantallas nuevas: las listas de productos cargan de a páginas al bajar y
 Configuración pierde dos opciones (historia 5).
@@ -40,6 +40,9 @@ ventas».
 - Q: ¿El servidor consulta la base en cada pedido? → A: No: lo que se lee seguido y cambia poco y de forma controlada (los productos con sus precios, las listas) vive en una copia del servidor, que se pone al día cuando la base cambia. Lo que varía (las ventas, el stock) se lee de la base.
 - Q: ¿Qué pasa sin internet? → A: Se pierde la búsqueda; se conserva registrar ventas (decisión 129). Cambia el principio IV de la constitución y RNF-10.
 - Q: ¿Se sacan «Trabajar sin conexión» y «Cómo buscar productos» de Configuración? → A: No: Configuración queda como está; se agrega un botón que, solo al tocarlo, baja una vez todo lo necesario para trabajar sin conexión.
+- Q: ¿Dónde va el botón, qué baja y cuándo se usa? → A: En el celular y en la computadora, solo con «Trabajar sin conexión» habilitado; lo que necesita el empleado (quien vende y quien compra) para el día a día, no lo del administrador (Procesos, «Cómo va el negocio»); se usa solo sin conexión. «Cómo buscar productos» queda como está por ahora.
+- Q: ¿Cómo se sabe qué es nuevo al volver a tocarlo? → A: Con la marca que da el servidor en cada descarga (no la fecha y hora del dispositivo): trae solo lo que cambió desde entonces.
+- Q: ¿«Trabajar sin conexión» en la computadora? → A: Sí, también (Carlos).
 - Q: ¿Hacen falta los registros de la base? → A: No: el sistema no genera registros que nadie usa.
 - Q: ¿El chequeo de salud tiene que mirar la base? → A: No: dice si el servidor anda, sin consultar la base.
 
@@ -130,14 +133,32 @@ ni abre conexiones nuevas.
 
 ---
 
-### User Story 5 - Descargar todo para trabajar sin conexión, a mano (Priority: P2)
+### User Story 5 - Descargar a mano los datos para trabajar sin conexión (Priority: P2)
 
-Configuración queda como está (Carlos, 2026-10-20: «configuración dejalo como está»). Se agrega
-un botón que, solo cuando se lo toca, baja una vez el catálogo entero y todo lo que hace falta
-para trabajar sin conexión. Nada se baja solo.
+Configuración queda como está, y suma dos cosas (Carlos, 2026-10-20): «Trabajar sin conexión»
+también en la computadora, y una fila «Datos para trabajar sin conexión» con un botón que, solo
+cuando se lo toca, baja lo que el empleado (quien vende y quien compra) necesita para el día a
+día sin internet. Nada se baja solo. Lo de quien administra (Procesos, «Cómo va el negocio») no
+va. Lo bajado se usa solo sin conexión; con internet se sigue buscando en el servidor.
 
-[NEEDS CLARIFICATION: dónde va el botón, qué baja exactamente, cuándo se usa lo bajado y cómo se
-pone al día; preguntado a Carlos el 2026-10-20]
+**Why this priority**: Sin esto, sin internet no se puede buscar ni escanear.
+
+**Independent Test**: Tocar «Descargar», cortar internet, buscar y escanear un producto y venderlo
+a cuenta corriente; volver la conexión, cambiar un margen en otro dispositivo, tocar «Actualizar»
+y ver que llega solo ese producto.
+
+**Acceptance Scenarios**:
+
+1. **E23** **Given** «Trabajar sin conexión» habilitado, en el celular o en la computadora, **When** se abre Configuración, **Then** debajo está «Datos para trabajar sin conexión» con «Descargar» y «Todavía no se bajaron…»; con la llave apagada, la fila no está.
+2. **E24** **Given** «Descargar», **When** se toca con conexión, **Then** baja, de a páginas, los productos con su precio, costos y proveedores, el stock y los clientes; mientras tanto se ve cuánto lleva («Bajando… 4.500 de 11.240 productos») y se puede seguir usando la aplicación; al terminar dice cuándo se bajaron y cuántos productos, y el botón pasa a «Actualizar».
+3. **E25** **Given** datos ya bajados, **When** se toca «Actualizar», **Then** baja solo lo que cambió desde la descarga anterior (productos nuevos, cambiados o dados de baja, el stock que se movió) y los clientes. Qué cambió lo dice la marca que dio el servidor en la descarga anterior, no el reloj del dispositivo.
+4. **E26** **Given** datos bajados y sin conexión, **When** se busca o se escanea un producto, en cualquier pantalla del día a día, **Then** se encuentra con lo bajado, con su precio, su stock y los clientes para cobrar a cuenta corriente.
+5. **E27** **Given** datos bajados y con conexión, **When** se busca, **Then** se busca en el servidor, como si no hubiera nada bajado.
+6. **E28** **Given** sin conexión, **When** se toca «Descargar» o «Actualizar», **Then** dice «Sin conexión: para bajar los datos hace falta internet.» y lo bajado antes sigue.
+7. **E29** **Given** la llave «Trabajar sin conexión» apagada, **When** se apaga, **Then** se borra lo bajado, como hoy se borra lo guardado (RF-84).
+8. **E30** **Given** la computadora, **When** se abre Configuración por primera vez, **Then** «Trabajar sin conexión» aparece habilitada (como trabaja hoy, que guarda siempre lo que falta enviar); en el celular, deshabilitada, como hoy.
+
+Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html` (para aprobar).
 
 ### Edge Cases
 
