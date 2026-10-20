@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { VERSION_DE_PRECIOS } from "./precios.js";
 import { config } from "./config.js";
+import { iniciada as copiaIniciada, ponerAlDia } from "./productos/copia.js";
 import { sesiones } from "./rutas/sesiones.js";
 import { usuarios } from "./rutas/usuarios.js";
 import { auditoria } from "./rutas/auditoria.js";
@@ -34,6 +35,16 @@ app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders:
 // pregunta cada 10 segundos y cada consulta así llenaba los registros de la base. El arranque
 // ya espera a la base y aplica las migraciones antes de escuchar.
 app.get("/health", (c) => c.json({ ok: true, version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_DE_PRECIOS }));
+
+// Quien cambia el catálogo lo ve en su pedido siguiente (specs/018, RF-124): antes de contestar, la
+// copia del servidor lee lo que cambió. Los demás lo ven cuando llega el aviso de la base.
+const CAMBIA_EL_CATALOGO = /^\/(productos|equivalencias|listas|compras|proveedores|sectores|apartados)(\/|$)/;
+app.use("/*", async (c, next) => {
+  await next();
+  if (c.req.method !== "GET" && c.res.status < 400 && CAMBIA_EL_CATALOGO.test(c.req.path) && copiaIniciada()) {
+    await ponerAlDia().catch((e: unknown) => console.error("no se pudo poner al día la copia del catálogo", e));
+  }
+});
 
 app.route("/sesiones", sesiones);
 app.route("/usuarios", usuarios);

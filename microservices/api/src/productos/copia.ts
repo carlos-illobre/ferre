@@ -135,6 +135,8 @@ async function escuchar() {
   } catch { reconectar(); }
 }
 
+export const iniciada = () => escuchando;
+
 // Al arrancar el servidor: la copia del disco, o la base entera si no hay; después, lo que cambió,
 // y a escuchar. Antes de esto el servidor no atiende.
 export async function iniciar(): Promise<void> {

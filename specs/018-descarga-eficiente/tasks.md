@@ -16,3 +16,4 @@ necesita, de a páginas, y que no genere registros que nadie usa (aviso de Supab
 - [ ] T008 Documentación: constitución (principio IV), RNF-10, RNF-11, 009 (RF-84, RF-85), ADR-005, estado y decisión 129 (depende de T007)
 - [ ] T009 Pruebas de punta a punta de los caminos principales con el catálogo en el servidor, y medida del consumo (SC-001, SC-002) (depende de T008)
 - [ ] T010 Revisión independiente (depende de T009)
+- [x] T011 Quien cambia el catálogo lo ve en su pedido siguiente: el servidor pone la copia al día antes de contestar (RF-124; E08, E16) (depende de T005)
