@@ -37,6 +37,7 @@ descargar todo de la base, que descargue solo lo que necesita, siempre paginado�
 
 - Q: ¿Se descarga todo o solo lo necesario? → A: Solo lo necesario y siempre de a páginas (Carlos).
 - Q: ¿Hacen falta los registros de la base? → A: No (Carlos): el sistema no tiene que generar registros que nadie usa.
+- Q: ¿El chequeo de salud tiene que mirar la base? → A: No (Carlos): dice si el servidor anda, sin consultar la base.
 - Q: El celular que no guarda datos, ¿cómo busca de arranque? → A: [NEEDS CLARIFICATION: hoy arranca en «Bajar el catálogo al abrir», que baja todo en cada apertura. ¿Pasa a arrancar en «Buscar en el servidor», se saca la opción de bajar todo, o queda como está?]
 
 ## User Scenarios & Testing *(mandatory)*
@@ -114,8 +115,9 @@ base se abrieron.
 
 **Acceptance Scenarios**:
 
-1. **E17** **Given** el servidor andando y sin uso, **When** pasa una hora, **Then** abre como mucho unas pocas conexiones a la base (las reutiliza) y consulta la base para el chequeo de salud no más de una vez por minuto.
-2. **E18** **Given** la base deja de responder, **When** se mira la salud del servidor, **Then** lo dice en menos de dos minutos, y el despliegue sigue pudiendo volver a la versión anterior si la nueva no queda sana (RNF-13).
+1. **E17** **Given** el servidor andando y sin uso, **When** pasa una hora, **Then** no hizo ninguna consulta a la base ni abrió ninguna conexión nueva.
+2. **E18** **Given** el servidor andando, **When** se mira su salud, **Then** dice que anda y qué versión es, sin consultar la base; el despliegue sigue volviendo a la versión anterior si la nueva no arranca (RNF-13).
+3. **E19** **Given** la base no responde, **When** alguien usa la aplicación, **Then** el pedido falla con el aviso de siempre y el mostrador sigue sin conexión (RNF-11); la salud del servidor no lo dice.
 
 ### Edge Cases
 
@@ -141,8 +143,9 @@ base se abrieron.
 - **RF-123**: El stock y los clientes se actualizan igual: solo los que cambiaron.
 - **RF-124**: Buscar en el servidor (RF-85) trae de a 50 resultados y los siguientes al llegar al
   final de la lista.
-- **RF-125**: Ver si el servidor anda reutiliza la conexión a la base y la consulta como mucho una
-  vez por minuto. Nada de lo que corre solo abre una conexión nueva a la base cada vez.
+- **RF-125**: Ver si el servidor anda no consulta la base (Carlos, 2026-10-20). Nada de lo que corre
+  solo, a ritmo fijo, consulta la base ni abre conexiones nuevas; las que se abren para atender
+  pedidos se reutilizan.
 
 ### Non-Functional Requirements
 
@@ -170,6 +173,8 @@ base se abrieron.
 - Las páginas son de 500 productos para bajar y actualizar, y de 50 resultados para buscar.
 - Los demás pedidos (ventas del día, listas, auditoría) ya vienen por día o de a páginas y no
   cambian.
+- Sin el chequeo, la base de pruebas puede pasar 7 días sin consultas si nadie la usa, y Supabase
+  la pausa. Lo resuelve el monitor diario que ya está en el plan (RNF-12, T091), no el chequeo.
 - Supabase no deja apagar sus registros en el plan gratuito; se bajan dejando de generarlos.
   Si después de subirlo siguen parejos y altos, Carlos mira en el panel qué registro se repite
   y se anota aparte.
