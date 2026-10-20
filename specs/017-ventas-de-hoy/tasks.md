@@ -13,3 +13,4 @@
 - [x] T011 [interfaz] Computadora: «Ventas de hoy» como la v4 (los cuatro cajones, uno por medio), dentro del menú; sin arrastrar; la venta se abre con un clic o Enter y se anula con A, con el motivo en lista y el comentario; buscar con Ctrl K y otro día con F (decisiones 110, 121 y 122; maqueta `maquetas/compu-ventas-de-hoy-elegida.png`, aprobada por Carlos el 2026-10-19)
 - [x] T012 [ajuste] Celular: las animaciones de la v2 en «Ventas de hoy» (el total que rueda, las barras que crecen, la marca de ayer, el globo de la barra señalada, los números que ruedan y la venta anulada que se tacha)
 - [x] T013 [interfaz] «Ventas del día» en lugar de «Ventas de hoy»; en el celular, «Otro día» con el panel de la v2 (los últimos siete días y el calendario propio) y «Buscar» en un panel (decisión 141)
+- [x] T014 [ajuste] Celular: en el calendario, tocar el mes muestra los meses del año, con ‹ › para pasar de año (pedido de Carlos del 2026-10-20)

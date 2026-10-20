@@ -1,8 +1,6 @@
 /* El calendario propio (decisión 141), con los colores de «Mostrador». */
 .calendario { display: flex; flex-direction: column; gap: 8px; }
 .calendario-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.calendario-cab b { font-size: 17px; font-weight: 800; color: #1A1D1B; }
-.calendario-cab b::first-letter { text-transform: uppercase; }
 .calendario-cab button { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; border: 1px solid #CEC8BA; background: #fff; color: #1A1D1B; }
 .calendario-cab button:disabled { opacity: .35; }
 .calendario-grilla { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -13,3 +11,9 @@
 .calendario-grilla button.elegido { background: #12382F; color: #fff; font-weight: 800; box-shadow: none; }
 .calendario-grilla button:disabled { color: #CEC8BA; }
 @media (prefers-reduced-motion: reduce) { .calendario-grilla button { transition: none; } }
+.calendario-cab .calendario-titulo { width: auto; padding: 0 12px; border: 0; background: transparent; display: inline-flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 800; color: #1A1D1B; }
+.calendario-titulo::first-letter { text-transform: uppercase; }
+.calendario-meses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.calendario-meses button { height: 52px; border-radius: 12px; border: 1px solid #E6E2D8; background: #fff; font-size: 16px; font-weight: 700; color: #1A1D1B; text-transform: capitalize; }
+.calendario-meses button.elegido { background: #12382F; border-color: #12382F; color: #fff; }
+.calendario-meses button:disabled { color: #CEC8BA; }

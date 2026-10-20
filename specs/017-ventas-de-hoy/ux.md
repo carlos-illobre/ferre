@@ -46,7 +46,8 @@ Vender (decisión 119):
   hubo) y el que se está mirando con un tilde; al final, «Elegir en el calendario», que muestra en
   el mismo panel un calendario propio con los colores de «Mostrador»: el mes con ‹ ›, los días en
   una grilla de lunes a domingo, hoy marcado, el elegido en verde oscuro y los días que vienen
-  apagados. Tocar un día lo muestra y cierra el panel; mirando otro día, «Volver a hoy».
+  apagados. Tocar el mes muestra los doce meses del año, con ‹ › para pasar de año; elegir uno
+  vuelve a sus días. Tocar un día lo muestra y cierra el panel; mirando otro día, «Volver a hoy».
 - El resumen va en una tarjeta clara (ya no oscura): «Total de ventas», el
   total grande, la comparación, el gráfico por hora y los cuatro medios en dos columnas (ícono en
   su color, importe y cuántas); debajo, ventas, productos y ticket promedio.

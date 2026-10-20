@@ -131,6 +131,22 @@ describe("«Hoy» · celular", () => {
     await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Miércoles 30/09"));
   });
 
+  it("017-T014: tocando el mes se elige otro año y otro mes; los que vienen, apagados", async () => {
+    await abrir();
+    fireEvent.click(screen.getByTestId("cambiar-fecha"));
+    fireEvent.click(screen.getByTestId("elegir-en-calendario"));
+    fireEvent.click(screen.getByTestId("mes"));
+    expect(screen.getByTestId("mes").textContent).toBe("2026");
+    expect((screen.getByTestId("mes-11") as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByTestId("mes-siguiente") as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByTestId("mes-anterior"));
+    expect(screen.getByTestId("mes").textContent).toBe("2025");
+    fireEvent.click(screen.getByTestId("mes-3"));
+    expect(screen.getByTestId("mes").textContent).toBe("marzo 2025");
+    fireEvent.click(screen.getByTestId("dia-2025-03-14"));
+    await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Viernes 14/03"));
+  });
+
   it("017-T013: «Otro día» muestra hoy y los seis días anteriores, con lo vendido y cuántas ventas, y el que se mira con su tilde", async () => {
     await abrir();
     fireEvent.click(screen.getByTestId("cambiar-fecha"));
