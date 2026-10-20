@@ -2,7 +2,7 @@
 // compilar (ADR-018), así que acá no va código ni nombres de tablas. Lo que manda el front sale
 // de la validación del servidor (decisión 89).
 import type { z } from "zod";
-import type { anulacionDeVenta, consultaNueva, MEDIOS, ventaNueva } from "../ventas/esquemas.js";
+import type { anulacionDeVenta, consultaNueva, correccionDeVenta, MEDIOS, ventaNueva } from "../ventas/esquemas.js";
 
 export type MedioDePago = (typeof MEDIOS)[number];
 export type EstadoDeVenta = "confirmada" | "anulada";
@@ -10,11 +10,20 @@ export type EstadoDeVenta = "confirmada" | "anulada";
 // Los importes y las cantidades salen de la base como texto, con sus decimales.
 // El subtotal del renglón lo calcula el servidor (precio × cantidad, redondeado como se cobró).
 // La foto es la del producto, si el renglón tiene producto y el producto tiene foto.
-export type ItemDeVenta = { descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: string | null; explicacion: string | null; foto_url: string | null; subtotal: number };
-export type VentaDelDia = { id: string; fecha: string; medio_pago: MedioDePago; total: string; estado: EstadoDeVenta; pagada_en: string | null; cliente: string | null; items: ItemDeVenta[] };
+// Para corregir y cambiar (019): el `id` y el producto del renglón, cuánto ya volvió por cambios
+// (`devuelto`), el cliente, la `version` de la venta (la marca de modificación) y cuántas correcciones tuvo.
+export type ItemDeVenta = { id?: string; producto_id?: string | null; devuelto?: string; descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: string | null; explicacion: string | null; foto_url: string | null; subtotal: number };
+export type VentaDelDia = { id: string; fecha: string; medio_pago: MedioDePago; total: string; estado: EstadoDeVenta; pagada_en: string | null; cliente: string | null; cliente_id?: string | null; version?: string; correcciones?: number; items: ItemDeVenta[] };
+
+// POST /ventas/:id/corregir (019)
+export type CorreccionEntrada = z.input<typeof correccionDeVenta>;
+export type VentaCorregida = { id: string; total: number; diferencia: number; resuelta: "cobrada" | "devuelta" | "cuenta_corriente" | "sin_diferencia"; version: string };
 
 // GET /ventas[?dia=AAAA-MM-DD]
-export type VentasDelDia = { dia: string; ventas: VentaDelDia[]; totales: Partial<Record<MedioDePago, number>>; total: number };
+// `movimientos`: lo cobrado (+) y lo devuelto (−) ese día por correcciones y cambios (019). `suma`: si
+// entra en los totales (una corrección del mismo día ya está en el total corregido de la venta).
+export type MovimientoDeDinero = { id: string; fecha: string; tipo: "cobro_diferencia" | "devolucion"; medio_pago: MedioDePago; importe: number; venta_id: string; correccion_id: string | null; cambio_id: string | null; suma: boolean };
+export type VentasDelDia = { dia: string; ventas: VentaDelDia[]; totales: Partial<Record<MedioDePago, number>>; total: number; movimientos?: MovimientoDeDinero[] };
 
 // POST /ventas. El id lo genera el cliente: una venta hecha sin conexión se reenvía y no se
 // duplica (si ya estaba, responde la registrada con `repetida`). Cada renglón lleva lo que se

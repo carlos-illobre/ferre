@@ -329,6 +329,16 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowDown");
   await expect(page.locator('[data-testid="venta"] [data-flecha]')).toHaveCount(1);
   await expect(page.getByTestId("busqueda")).toBeFocused();
+  // Dos focos (decisión 137): con el cursor en la búsqueda vacía, ← lleva la marca al menú y ↑ ↓ lo
+  // recorren sin sacar el cursor de la búsqueda; Esc la devuelve a la pantalla.
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("menu-vender")).toHaveAttribute("data-marca", "");
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("menu-catalogo")).toHaveAttribute("data-marca", "");
+  await expect(page.getByTestId("busqueda")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("[data-marca]")).toHaveCount(0);
+  await page.keyboard.press("ArrowDown");
   // ↑ desde el primer renglón saca la marca y el cursor no se va de la búsqueda (Carlos, 2026-10-20).
   await page.keyboard.press("ArrowUp");
   await expect(page.locator('[data-testid="venta"] [data-flecha]')).toHaveCount(0);

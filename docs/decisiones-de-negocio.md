@@ -1112,3 +1112,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      servidor; lo bajado se usa solo sin conexión; «Cómo buscar productos» queda como está por el
      momento. «Trabajar sin conexión» va también en la computadora (arranca habilitada, como
      trabaja hoy). Aprobó la maqueta (specs/018, historia 5).
+137. **Dos focos: el cursor queda en la caja y la marca del teclado recorre el menú y las pestañas**
+     (2026-10-20). Carlos: «no están funcionando las flechas para navegar»; el cursor tiene que
+     quedarse en la caja de texto y las flechas tienen que seguir navegando. En la computadora, con
+     el cursor en una caja de texto, ← (con la caja vacía o el cursor al principio) lleva la marca
+     del teclado al menú, sin sacar el cursor; ↑ ↓ lo recorren; Enter o → abre la parte y la marca
+     pasa a sus pestañas; ← → las recorren (← desde la primera vuelve al menú); Enter abre la
+     pestaña y el cursor va a la caja de texto de la pantalla nueva, si tiene; ↓ o Esc devuelven la
+     marca a la pantalla. Escribir, Tab o el mouse sacan la marca. La marca se ve con el borde verde.
+     Completa la decisión 130 (que había dejado ← sin efecto dentro de una caja).

@@ -201,6 +201,7 @@ function Pantallas() {
   }, parteEnEspejo !== null);
 
   // El menú se achica a solo íconos con su botón o Ctrl+B, y recuerda cómo se dejó (decisión 122).
+  const porLaMarca = useRef(false);
   const [plegado, setPlegado] = useState(() => { try { return localStorage.getItem("ferre.menu") === "plegado"; } catch { return false; } });
   const plegar = () => setPlegado((p) => { try { localStorage.setItem("ferre.menu", p ? "abierto" : "plegado"); } catch { /* sin almacenamiento: dura lo que la pestaña */ } return !p; });
   useEffect(() => {
@@ -224,8 +225,8 @@ function Pantallas() {
   }, [conSesion, conAtajo]);
   // Flechas entre el menú y la pantalla: ← lleva el foco al menú, ↑ ↓ lo recorren, y → (o
   // Enter) abre lo elegido y devuelve el foco a la pantalla, donde ↑ ↓ vuelven a elegir sus
-  // renglones. Con el cursor en un campo, ← es del campo y nunca lo saca de ahí (decisión 130):
-  // al menú se llega desde la pestaña, con Alt + número o con Mayúsculas+Tab.
+  // renglones. Con el cursor en un campo, ← no lo saca de ahí (decisión 130): mueve la marca del
+  // teclado (ver más abajo, «Dos focos independientes»).
   useEffect(() => {
     if (!conSesion) return;
     const tecla = (e: KeyboardEvent) => {
@@ -244,6 +245,72 @@ function Pantallas() {
     window.addEventListener("keydown", tecla);
     return () => window.removeEventListener("keydown", tecla);
   }, [conSesion]);
+  // Dos focos independientes (decisiones 82 y 137): con el cursor en una caja de texto, las flechas
+  // mueven la marca del teclado por el menú y las pestañas sin sacar el cursor de la caja. ← (con la
+  // caja vacía o el cursor al principio) lleva la marca al menú; ahí ↑ ↓ lo recorren y Enter o → abre
+  // la parte y pasa la marca a sus pestañas; en las pestañas, ← → las recorren (← desde la primera
+  // vuelve al menú), Enter abre la pestaña, y ↓ o Esc devuelven la marca a la pantalla. Escribir algo,
+  // Tab o el mouse la sacan.
+  useEffect(() => {
+    if (!conSesion) return;
+    let marca: { zona: "menu" | "pestanas"; i: number } | null = null;
+    const menu = () => [...document.querySelectorAll<HTMLButtonElement>(".lateral nav button")];
+    const pestanas = () => [...document.querySelectorAll<HTMLButtonElement>(".cuerpo .pestanas button")];
+    const actualDe = (bs: HTMLButtonElement[]) => Math.max(0, bs.findIndex((b) => b.getAttribute("aria-current") === "page"));
+    const pintar = () => {
+      document.querySelectorAll("[data-marca]").forEach((b) => b.removeAttribute("data-marca"));
+      if (!marca) return;
+      const b = (marca.zona === "menu" ? menu() : pestanas())[marca.i];
+      if (b) { b.setAttribute("data-marca", ""); b.scrollIntoView?.({ block: "nearest" }); } else marca = null;
+    };
+    const sacar = () => { if (marca) { marca = null; pintar(); } };
+    // Después de abrir algo, la marca va a las pestañas de lo que quedó abierto (se espera a que se dibuje).
+    const aLasPestanas = (ruta: string) => {
+      let intentos = 0;
+      const mirar = () => {
+        const ps = pestanas();
+        if (ps.length && !ps.some((b) => b.getAttribute("aria-current") === "page" && b.dataset.testid === `pestana-${ruta}`) && ruta && intentos++ < 10) { setTimeout(mirar, 40); return; }
+        marca = ps.length > 1 ? { zona: "pestanas", i: actualDe(ps) } : null; pintar();
+      };
+      setTimeout(mirar, 40);
+    };
+    // Al abrir algo con la marca, el cursor sigue en una caja de texto: la de la pantalla nueva, si tiene.
+    const abrirConLaMarca = (b: HTMLButtonElement | undefined) => { if (!b) return; porLaMarca.current = true; b.click(); setTimeout(() => { porLaMarca.current = false; }, 700); };
+    const tecla = (e: KeyboardEvent) => {
+      const foco = document.activeElement;
+      const enCaja = foco instanceof HTMLTextAreaElement || (foco instanceof HTMLInputElement && ["text", "search", "", "tel", "url", "email", "password", "number"].includes(foco.type));
+      if (!enCaja || e.altKey || e.ctrlKey || e.metaKey || document.querySelector("dialog[open], [role='dialog'], [aria-modal='true']")) { sacar(); return; }
+      const campo = foco as HTMLInputElement | HTMLTextAreaElement;
+      const usar = () => { e.preventDefault(); e.stopImmediatePropagation(); };
+      if (!marca) {
+        const alPrincipio = campo.value === "" || (campo.selectionStart === 0 && campo.selectionEnd === 0);
+        if (e.key === "ArrowLeft" && !e.shiftKey && alPrincipio && !foco!.closest("[data-flechas-propias]")) {
+          usar(); marca = { zona: "menu", i: actualDe(menu()) }; pintar();
+          document.querySelectorAll("[data-flecha]").forEach((f) => f.removeAttribute("data-flecha")); // la marca es una sola
+        }
+        return;
+      }
+      if (marca.zona === "menu") {
+        const bs = menu();
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") { usar(); marca.i = (marca.i + (e.key === "ArrowDown" ? 1 : bs.length - 1)) % bs.length; pintar(); }
+        else if (e.key === "Enter" || e.key === "ArrowRight") { usar(); const b = bs[marca.i]; sacar(); abrirConLaMarca(b); aLasPestanas(""); }
+        else if (e.key === "ArrowLeft") usar();
+        else if (e.key === "Escape") { usar(); sacar(); }
+        else sacar();
+        return;
+      }
+      const ps = pestanas();
+      if (e.key === "ArrowLeft") { usar(); if (marca.i > 0) marca.i--; else marca = { zona: "menu", i: actualDe(menu()) }; pintar(); }
+      else if (e.key === "ArrowRight") { usar(); if (marca.i < ps.length - 1) marca.i++; pintar(); }
+      else if (e.key === "Enter") { usar(); const b = ps[marca.i]; abrirConLaMarca(b); aLasPestanas(b?.dataset.testid?.replace("pestana-", "") ?? ""); }
+      else if (e.key === "ArrowUp") usar();
+      else if (e.key === "Escape") { usar(); sacar(); }
+      else sacar(); // ↓ vuelve a la pantalla (y sigue: marca la primera fila), escribir saca la marca
+    };
+    window.addEventListener("keydown", tecla, { capture: true });
+    window.addEventListener("mousedown", sacar, { capture: true });
+    return () => { window.removeEventListener("keydown", tecla, { capture: true }); window.removeEventListener("mousedown", sacar, { capture: true }); sacar(); };
+  }, [conSesion]);
   // Poner el foco en la pantalla: primero la búsqueda (u otro campo); si no tiene, su primer botón.
   // Entrar a la pantalla con el teclado: la marca de las flechas va a la primera fila de su
   // lista y el cursor de escritura queda en su caja de texto. Con la lista vacía no hace nada,
@@ -257,7 +324,9 @@ function Pantallas() {
     window.addEventListener("keydown", cancelar, { once: true, capture: true });
     window.addEventListener("mousedown", cancelar, { once: true, capture: true });
     // En Vender el cursor va siempre a la búsqueda, se llegue como se llegue (Carlos, 2026-10-20; decisión 127).
-    const destino = () => document.querySelector<HTMLInputElement>('.vmc-pagina [data-testid="busqueda"]:not(:disabled)') ?? buscar();
+    // Y si se abrió con la marca del teclado, el cursor va a la caja de texto de la pantalla nueva, si tiene (decisión 137).
+    const caja = () => porLaMarca.current ? document.querySelector<HTMLInputElement>(".cuerpo input[type='search']:not(:disabled), .cuerpo input[type='text']:not(:disabled)") : null;
+    const destino = () => document.querySelector<HTMLInputElement>('.vmc-pagina [data-testid="busqueda"]:not(:disabled)') ?? caja() ?? buscar();
     for (const espera of [60, 150, 350, 600]) setTimeout(() => { if (!cancelado) destino()?.focus(); }, espera);
   }
   const pestanaActual = () => document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button");

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { exigirPermiso, exigirSesion, puede } from "../autenticacion.js";
 import * as reglas from "../ventas/reglas.js";
-import { anulacionDeVenta, ventaNueva } from "../ventas/esquemas.js";
+import { anulacionDeVenta, correccionDeVenta, ventaNueva } from "../ventas/esquemas.js";
 import { leerCuerpo } from "../validar.js";
 
 // Ventas: la ruta solo traduce el pedido y la respuesta (ADR-018, etapa 5). Las reglas están en
@@ -35,6 +35,22 @@ ventas.post("/:id/anular", exigirPermiso("ventas.anular", "ventas.anular_cualqui
   if (r === "no-es-de-hoy") return c.json({ error: "Esa venta no es de hoy. Hace falta: Anular ventas de cualquier día", permiso: "ventas.anular_cualquiera" }, 403);
   if (r === "no-se-puede") return c.json({ error: "La venta no existe o ya está anulada" }, 409);
   return c.body(null, 204);
+});
+
+// Corregir una venta (019, RF-126 a RF-128): con el permiso de anular las del día (si es de hoy) o
+// las de cualquier día. El servidor rehace la cuenta y resuelve la diferencia.
+ventas.post("/:id/corregir", exigirPermiso("ventas.anular", "ventas.anular_cualquiera"), async (c) => {
+  const cuerpo = await leerCuerpo(c, correccionDeVenta);
+  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
+  const usuario = c.get("sesion").usuario;
+  const r = await reglas.corregir(c.req.param("id"), cuerpo.datos, usuario.id, puede(usuario, "ventas.anular_cualquiera"));
+  if (r === "no-existe") return c.json({ error: "La venta o uno de sus renglones no existe" }, 404);
+  if (r === "anulada") return c.json({ error: "La venta está anulada: no se corrige" }, 409);
+  if (r === "no-es-de-hoy") return c.json({ error: "Esa venta no es de hoy. Hace falta: Anular ventas de cualquier día", permiso: "ventas.anular_cualquiera" }, 403);
+  if (r === "cambio") return c.json({ error: "Alguien cambió esta venta mientras la corregías: volvé a abrirla" }, 409);
+  if (r === "devuelve-de-mas") return c.json({ error: "Un renglón no puede quedar por debajo de lo que ya volvió por un cambio" }, 409);
+  if (r === "cliente") return c.json({ error: "El cliente no existe o no tiene cuenta corriente" }, 400);
+  return c.json(r);
 });
 
 ventas.post("/:id/pagar", exigirPermiso("ventas.registrar"), async (c) => {

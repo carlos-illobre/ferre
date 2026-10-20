@@ -31,20 +31,34 @@ export const descontarStock = (e: Ejecutor, m: { producto_id: string; cantidad: 
 export const anotarFaltante = (e: Ejecutor, a: { producto_id: string; usuario_id: string; venta_id: string; cantidad: number; detalle: string }) =>
   e.insertInto("anomalia").values({ id: randomUUID(), producto_id: a.producto_id, usuario_id: a.usuario_id, venta_id: a.venta_id, cantidad: a.cantidad, detalle: a.detalle, tipo: "venta_sin_stock" }).execute();
 
-export type FilaDelDia = { id: string; fecha: Date; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; total: string; estado: "confirmada" | "anulada"; pagada_en: Date | null; cliente: string | null; items: Omit<ItemDeVenta, "subtotal">[] };
+export type FilaDelDia = { id: string; fecha: Date; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; total: string; estado: "confirmada" | "anulada"; pagada_en: Date | null; cliente: string | null; cliente_id: string | null; version: Date; correcciones: number; items: Omit<ItemDeVenta, "subtotal">[] };
 
 // Las ventas de un día (sin día, hoy), las más nuevas primero, cada una con sus renglones en orden.
 export function ventasDelDia(e: Ejecutor, dia: string | null): Promise<FilaDelDia[]> {
   return e.selectFrom("venta as v")
     .leftJoin("cliente as cl", "cl.id", "v.cliente_id")
-    .leftJoin("item_venta as i", "i.venta_id", "v.id")
+    // Un renglón quitado por una corrección no cuenta (019): sigue en la base, en la foto de la corrección.
+    .leftJoin("item_venta as i", (j) => j.onRef("i.venta_id", "=", "v.id").on("i.quitado_por", "is", null))
     .leftJoin("producto as p", "p.id", "i.producto_id")
-    .select(["v.id", "v.fecha", "v.medio_pago", "v.total", "v.estado", "v.pagada_en", "cl.nombre as cliente"])
-    .select(sql<Omit<ItemDeVenta, "subtotal">[]>`COALESCE(json_agg(json_build_object('descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'explicacion', i.explicacion, 'foto_url', p.foto_url) ORDER BY i.orden) FILTER (WHERE i.id IS NOT NULL), '[]')`.as("items"))
+    .select(["v.id", "v.fecha", "v.medio_pago", "v.total", "v.estado", "v.pagada_en", "cl.nombre as cliente", "v.cliente_id", "v.modificado_en as version"])
+    // Cuántas veces se corrigió (019): la lista la marca «corregida».
+    .select(sql<number>`(SELECT COUNT(*) FROM correccion_venta k WHERE k.venta_id = v.id)::int`.as("correcciones"))
+    .select(sql<Omit<ItemDeVenta, "subtotal">[]>`COALESCE(json_agg(json_build_object('id', i.id, 'producto_id', i.producto_id, 'devuelto', i.devuelto, 'descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'explicacion', i.explicacion, 'foto_url', p.foto_url) ORDER BY i.orden) FILTER (WHERE i.id IS NOT NULL), '[]')`.as("items"))
     .where(delDiaDelLocal("v.fecha"), "=", sql<string>`COALESCE(${dia}::date, ${hoyDelLocal})`)
     .groupBy(["v.id", "cl.nombre"])
     .orderBy("v.fecha", "desc")
     .execute();
+}
+
+// La plata que entró o salió en un día por correcciones y cambios (019, ADR-024). `suma` dice si va a
+// los totales del día: una corrección hecha el mismo día de la venta ya está en el total de la venta
+// (que quedó corregido); una de otro día, o un cambio (que no toca la venta original), se suma aparte.
+export function movimientosDelDia(e: Ejecutor, dia: string | null) {
+  return e.selectFrom("movimiento_dinero as m").innerJoin("venta as v", "v.id", "m.venta_id")
+    .select(["m.id", "m.fecha", "m.tipo", "m.medio_pago", "m.importe", "m.venta_id", "m.correccion_id", "m.cambio_id",
+      sql<boolean>`(m.cambio_id IS NOT NULL OR ${delDiaDelLocal("v.fecha")} <> ${delDiaDelLocal("m.fecha")})`.as("suma")])
+    .where(delDiaDelLocal("m.fecha"), "=", sql<string>`COALESCE(${dia}::date, ${hoyDelLocal})`)
+    .orderBy("m.fecha", "desc").execute();
 }
 
 // Los productos de las últimas ventas confirmadas, del más reciente al más viejo, sin repetir:
@@ -74,7 +88,8 @@ export const devolverStock = (e: Ejecutor, ventaId: string) =>
     .columns(["id", "producto_id", "tipo", "cantidad", "referencia_tipo", "referencia_id", "fecha", "nota"])
     .expression((eb) => eb.selectFrom("movimiento_stock")
       .select([sql<string>`gen_random_uuid()`.as("id"), "producto_id", sql<"ajuste">`'ajuste'`.as("tipo"), sql<string>`-cantidad`.as("cantidad"), sql<string>`'venta'`.as("referencia_tipo"), sql<string>`${ventaId}::uuid`.as("referencia_id"), sql<Date>`now()`.as("fecha"), sql<string>`'anulación de venta'`.as("nota")])
-      .where("referencia_tipo", "=", "venta").where("referencia_id", "=", ventaId).where("tipo", "=", "venta"))
+      // Lo de la venta y lo de sus correcciones (019); lo de un cambio ya volvió o salió aparte.
+      .where("referencia_tipo", "=", "venta").where("referencia_id", "=", ventaId).where("tipo", "in", ["venta", "correccion"]))
     .execute();
 
 // Cuenta corriente: marca pagada una venta confirmada a cuenta corriente que no se pagó; dice si había.
@@ -90,3 +105,43 @@ export const anotarConsulta = (e: Ejecutor, c: { producto_id: string | null; des
 
 export const ultimasConsultas = (e: Ejecutor) =>
   e.selectFrom("consulta").select(["id", "fecha", "descripcion", "precio_ofrecido", "motivo"]).orderBy("fecha", "desc").limit(200).execute();
+
+// --- Corregir y cambiar (019, ADR-024) ---
+
+// La venta a corregir, bloqueada hasta el final de la transacción (dos personas a la vez no se pisan).
+export const ventaParaCorregir = (e: Ejecutor, id: string) =>
+  e.selectFrom("venta").select(["id", "fecha", "estado", "total", "medio_pago", "cliente_id", "pagada_en", "modificado_en",
+    sql<boolean>`${delDiaDelLocal("fecha")} = ${hoyDelLocal}`.as("de_hoy")]).where("id", "=", id).forUpdate().executeTakeFirst();
+
+// Los renglones que cuentan (no quitados por una corrección), en orden.
+export const renglonesVigentes = (e: Ejecutor, ventaId: string) =>
+  e.selectFrom("item_venta").select(["id", "orden", "producto_id", "descripcion", "cantidad", "precio_unitario", "margen_aplicado", "devuelto"])
+    .where("venta_id", "=", ventaId).where("quitado_por", "is", null).orderBy("orden").execute();
+
+export const ultimoOrden = async (e: Ejecutor, ventaId: string): Promise<number> =>
+  Number((await e.selectFrom("item_venta").select(sql<number>`COALESCE(MAX(orden), 0)`.as("n")).where("venta_id", "=", ventaId).executeTakeFirstOrThrow()).n);
+
+export const clienteConCuentaCorriente = async (e: Ejecutor, id: string): Promise<boolean> =>
+  Boolean(await e.selectFrom("cliente").select("id").where("id", "=", id).where("cuenta_corriente", "=", true).where("activo", "=", true).executeTakeFirst());
+
+export const insertarCorreccion = (e: Ejecutor, c: { id: string; venta_id: string; usuario_id: string; dispositivo_id: string | null; antes: unknown; despues: unknown; diferencia: number; resuelta: "cobrada" | "devuelta" | "cuenta_corriente" | "sin_diferencia" }) =>
+  e.insertInto("correccion_venta").values({ ...c, fecha: sql<Date>`now()`, antes: JSON.stringify(c.antes), despues: JSON.stringify(c.despues), diferencia: c.diferencia.toFixed(2) }).execute();
+
+export const actualizarRenglon = (e: Ejecutor, id: string, r: { cantidad: number; precio_unitario: number; margen_aplicado: number | null }) =>
+  e.updateTable("item_venta").set({ cantidad: r.cantidad, precio_unitario: r.precio_unitario.toFixed(2), margen_aplicado: r.margen_aplicado }).where("id", "=", id).execute();
+
+export const quitarRenglon = (e: Ejecutor, id: string, correccionId: string) =>
+  e.updateTable("item_venta").set({ quitado_por: correccionId }).where("id", "=", id).execute();
+
+export const actualizarVenta = (e: Ejecutor, id: string, v: { total: number; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; cliente_id: string | null }) =>
+  e.updateTable("venta").set({ total: v.total.toFixed(2), medio_pago: v.medio_pago, cliente_id: v.cliente_id }).where("id", "=", id).execute();
+
+// Un movimiento de stock por una corrección o un cambio: positivo vuelve, negativo sale.
+export const moverStock = (e: Ejecutor, m: { producto_id: string; cantidad: number; tipo: "correccion" | "cambio"; venta_id: string; nota: string }) =>
+  e.insertInto("movimiento_stock").values({ id: randomUUID(), producto_id: m.producto_id, tipo: m.tipo, cantidad: m.cantidad, referencia_tipo: "venta", referencia_id: m.venta_id, fecha: sql<Date>`now()`, nota: m.nota }).execute();
+
+export const anotarDevueltoFallado = (e: Ejecutor, a: { producto_id: string; usuario_id: string; venta_id: string; cantidad: number; detalle: string }) =>
+  e.insertInto("anomalia").values({ id: randomUUID(), tipo: "devuelto_fallado", ...a }).execute();
+
+export const insertarMovimientoDeDinero = (e: Ejecutor, m: { tipo: "cobro_diferencia" | "devolucion"; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; cliente_id: string | null; importe: number; venta_id: string; correccion_id?: string; cambio_id?: string; usuario_id: string }) =>
+  e.insertInto("movimiento_dinero").values({ id: randomUUID(), fecha: sql<Date>`now()`, ...m, importe: m.importe.toFixed(2), correccion_id: m.correccion_id ?? null, cambio_id: m.cambio_id ?? null }).execute();

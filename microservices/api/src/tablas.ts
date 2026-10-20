@@ -18,13 +18,32 @@ export interface Base {
     id: string; venta_id: string; orden: number; producto_id: string | null; descripcion: string; cantidad: Numero;
     costo_neto: ColumnType<string | null, number | string | null, number | string | null>; precio_proveedor_id: string | null;
     margen_aplicado: number | null; precio_unitario: Numero; explicacion: ColumnType<unknown, string, string>; creado_en: Generated<Date>;
+    // Corregir y cambiar (019, ADR-024): quitado por una corrección (no se borra) y cuánto ya volvió por cambios.
+    quitado_por: ColumnType<string | null, string | null | undefined, string | null>; devuelto: ColumnType<string, number | string | undefined, number | string>;
+  };
+  correccion_venta: {
+    id: string; venta_id: string; usuario_id: string | null; dispositivo_id: string | null; fecha: Momento;
+    antes: ColumnType<unknown, string, string>; despues: ColumnType<unknown, string, string>; diferencia: Numero;
+    resuelta: "cobrada" | "devuelta" | "cuenta_corriente" | "sin_diferencia"; creado_en: Generated<Date>;
+  };
+  cambio: {
+    id: string; venta_id: string; usuario_id: string | null; dispositivo_id: string | null; fecha: Momento; diferencia: Numero;
+    resuelto: "cobrado" | "devuelto" | "cuenta_corriente" | "sin_diferencia"; creado_en: Generated<Date>;
+  };
+  cambio_renglon: {
+    id: string; cambio_id: string; lado: "vuelve" | "se_lleva"; item_venta_id: string | null; producto_id: string | null; descripcion: string;
+    cantidad: Numero; precio_unitario: Numero; margen_aplicado: number | null; fallado: ConValor<boolean>;
+  };
+  movimiento_dinero: {
+    id: string; fecha: Momento; tipo: "cobro_diferencia" | "devolucion"; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente";
+    cliente_id: string | null; importe: Numero; venta_id: string; correccion_id: string | null; cambio_id: string | null; usuario_id: string | null; creado_en: Generated<Date>;
   };
   movimiento_stock: {
-    id: string; producto_id: string; tipo: "venta" | "compra" | "ajuste"; cantidad: Numero; referencia_tipo: string | null;
+    id: string; producto_id: string; tipo: "venta" | "compra" | "ajuste" | "correccion" | "cambio"; cantidad: Numero; referencia_tipo: string | null;
     referencia_id: string | null; fecha: Momento; nota: string | null; creado_en: Generated<Date>; transaccion: Generated<string>;
   };
   anomalia: {
-    id: string; tipo: "venta_sin_stock"; producto_id: string; usuario_id: string | null; venta_id: string | null; cantidad: Numero; detalle: string; creado_en: Generated<Date>;
+    id: string; tipo: "venta_sin_stock" | "devuelto_fallado"; producto_id: string; usuario_id: string | null; venta_id: string | null; cantidad: Numero; detalle: string; creado_en: Generated<Date>;
   };
   evento: {
     id: string; tipo: string; version: ConValor<number>; fecha: Momento; dispositivo_id: string | null; usuario_id: string | null;

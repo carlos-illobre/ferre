@@ -123,3 +123,8 @@
 /* La zona de la pantalla recibe el foco solo para que el teclado arranque ahí: no lleva el borde
    del foco (se veía como una raya verde debajo de las pestañas). */
 main[tabindex="-1"]:focus, main[tabindex="-1"]:focus-visible { outline: 0; box-shadow: none; }
+/* La marca del teclado en el menú y en las pestañas mientras el cursor sigue en la caja de texto (decisión 137). */
+@media (min-width: 900px) {
+  .lateral nav button[data-marca], .pestanas button[data-marca] { outline: 3px solid #12382F; outline-offset: 1px; }
+  .lateral nav button[data-marca] { background: var(--m-hundido, #ECE9E1); }
+}

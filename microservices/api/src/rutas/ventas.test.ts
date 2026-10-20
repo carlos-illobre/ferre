@@ -124,6 +124,19 @@ describe("GET /ventas", () => {
     expect(base.actual.sqlDe(/max\(v.fecha\)/)[0]!.sql).toMatch(/"v"."estado" = \$1.*limit \$\d/s);
   });
 
+  it("019-E21: los totales del día suman lo cobrado y restan lo devuelto por correcciones y cambios de ese día", async () => {
+    base.actual.programar(/from "venta" as "v"/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "10000", estado: "confirmada", pagada_en: null, cliente: null, items: [] }] });
+    base.actual.programar(/from "movimiento_dinero" as "m"/, { rows: [
+      { id: "m1", fecha: "2026-10-13T15:00:00Z", tipo: "cobro_diferencia", medio_pago: "mercado_pago", importe: "4000.00", venta_id: "v0", correccion_id: null, cambio_id: "c1", suma: true },
+      { id: "m2", fecha: "2026-10-13T16:00:00Z", tipo: "devolucion", medio_pago: "efectivo", importe: "-3000.00", venta_id: "v9", correccion_id: "k1", cambio_id: null, suma: true },
+      { id: "m3", fecha: "2026-10-13T17:00:00Z", tipo: "devolucion", medio_pago: "efectivo", importe: "-1000.00", venta_id: "v1", correccion_id: "k2", cambio_id: null, suma: false }, // ya está en el total corregido de v1
+    ] });
+    const cuerpo = await (await pedir(app, "GET", "/ventas")).json();
+    expect(cuerpo.totales).toEqual({ efectivo: 7000, mercado_pago: 4000 });
+    expect(cuerpo.total).toBe(11000);
+    expect(cuerpo.movimientos).toHaveLength(3);
+  });
+
   it("cada renglón llega con su subtotal calculado en el servidor, redondeado como se cobró (010-E06)", async () => {
     base.actual.programar(/from "venta" as "v"/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "3000", estado: "confirmada", pagada_en: null, cliente: null, items: [{ descripcion: "CABLE", cantidad: "1.5", precio_unitario: "1500", margen_aplicado: 50, explicacion: null }, { descripcion: "A MANO", cantidad: "1", precio_unitario: "1500", margen_aplicado: null, explicacion: null }] }] });
     const r = await pedir(app, "GET", "/ventas");
