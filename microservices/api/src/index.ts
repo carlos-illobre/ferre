@@ -1,7 +1,7 @@
 import { serve } from "@hono/node-server";
 import { app } from "./app.js";
 import { config } from "./config.js";
-import { pool } from "./db.js";
+import { mantenerLaBaseDespierta, pool } from "./db.js";
 import { aplicarMigraciones } from "./migraciones.js";
 import { iniciar as iniciarCopiaDelCatalogo } from "./productos/copia.js";
 
@@ -29,6 +29,7 @@ if (aplicadas.length) console.log(`migraciones aplicadas: ${aplicadas.join(", ")
 // La copia del catálogo (specs/018): del disco y lo que cambió, o la base entera la primera vez.
 await iniciarCopiaDelCatalogo();
 console.log("copia del catálogo lista");
+mantenerLaBaseDespierta();
 
 serve({ fetch: app.fetch, port: config.port }, (info) => {
   console.log(`gestion-del-local escuchando en :${info.port}`);

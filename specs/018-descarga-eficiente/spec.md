@@ -44,6 +44,7 @@ ventas».
 - Q: ¿«Trabajar sin conexión» en la computadora? → A: Sí, también (Carlos).
 - Q: ¿Hacen falta los registros de la base? → A: No: el sistema no genera registros que nadie usa.
 - Q: ¿El chequeo de salud tiene que mirar la base? → A: No: dice si el servidor anda, sin consultar la base.
+- Q: ¿Y que Supabase no pause la base? → A: Un chequeo que consulta la base para evitarlo (Carlos: «cada 7 días»; va una vez por día, con el porqué en los supuestos).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -129,6 +130,7 @@ ni abre conexiones nuevas.
 1. **E20** **Given** el servidor andando y sin uso, **When** pasa una hora, **Then** no hizo ninguna consulta a la base ni abrió ninguna conexión nueva.
 2. **E21** **Given** el servidor andando, **When** se mira su salud, **Then** dice que anda y qué versión es, sin consultar la base; el despliegue sigue volviendo a la versión anterior si la nueva no arranca (RNF-13).
 3. **E22** **Given** la base no responde, **When** alguien usa la aplicación, **Then** el pedido falla con el aviso de siempre; la salud del servidor no lo dice.
+4. **E31** **Given** el servidor andando y nadie usando la aplicación, **When** pasan días, **Then** consulta la base una vez por día, para que Supabase no la pause a los 7 días sin uso; arrancar también cuenta como una consulta.
 
 ---
 
@@ -189,7 +191,8 @@ Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html`, apr
   solo lo que cambió, y al arrancar parte de la que guardó en su disco. Las ventas, el stock y lo
   demás que varía se leen de la base.
 - **RF-125**: Ver si el servidor anda no consulta la base. Nada de lo que corre solo, a ritmo
-  fijo, consulta la base ni abre conexiones nuevas.
+  fijo, consulta la base ni abre conexiones nuevas, salvo una consulta por día para que Supabase no
+  pause la base por falta de uso (Carlos, 2026-10-20).
 
 ### Non-Functional Requirements
 
@@ -219,8 +222,9 @@ Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html`, apr
   corriente. Son pocos; se piden al abrir Vender y Clientes, no en cada pantalla.
 - Las otras lecturas (ventas del día, listas, auditoría, pedidos) ya vienen por día, por
   identificador o de a páginas, y no cambian.
-- Sin el chequeo de salud, la base de pruebas puede pasar 7 días sin consultas si nadie la usa, y
-  Supabase la pausa. Lo resuelve el monitor diario que ya está en el plan (RNF-12, T091).
+- Supabase pausa la base del plan gratuito a los 7 días sin uso. Carlos pidió un chequeo que lo
+  evite (2026-10-20): una consulta por día, y no cada 7 días, porque una cada 7 días justos puede
+  llegar tarde y el reloj del servidor vuelve a empezar con cada subida.
 - Supabase no deja apagar sus registros en el plan gratuito; se bajan dejando de generarlos. Si
   después de subirlo siguen parejos y altos, Carlos mira en el panel qué registro se repite y se
   anota aparte.
