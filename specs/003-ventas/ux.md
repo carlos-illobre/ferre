@@ -148,7 +148,9 @@ Sigue el lenguaje «Mostrador»:
   con su tecla (F5 a F8, con el nombre corto y el largo al pasar el mouse), el cliente (F9,
   opcional con cualquier medio; elegido, con sus iniciales, y ocupa todo el ancho que queda) y
   «Cobrar $X» (F2), con el total dentro del botón (decisión 125).
-- Con la venta vacía, «La venta está vacía»; sin «Lo último que se vendió» (decisión 126).
+- Con la venta vacía, un recuadro gris con el carrito, «La venta está vacía» y cómo empezar; debajo,
+  «Lo último que se vendió»: los cuatro últimos productos vendidos, en tarjetas con foto, nombre y
+  precio, que se agregan con un clic (decisión 131).
 - La venta registrada es una ventana como la del celular: el total, el medio, cuántos productos y la
   hora, «Ver en Ventas de hoy» y «Seguir vendiendo» (Enter).
 - No van: «Ganás en esta venta», escribir la cantidad en la búsqueda, el margen con 1 a 5, la ayuda

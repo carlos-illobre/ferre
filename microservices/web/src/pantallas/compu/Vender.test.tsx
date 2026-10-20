@@ -98,14 +98,17 @@ describe("Vender (v2)", () => {
     expect(screen.queryByTestId("error-cobro")).toBeNull();
   });
 
-  it("la venta vacía no muestra lo último que se vendió ni «No llevó» y «Vaciar» (decisión 126)", async () => {
-    const { agregar } = armar({ ventas: [{ fecha: "2026-10-11T12:00:00Z", estado: "confirmada", items: [{ descripcion: "MECHA VENDER 8 MM" }] }], totales: {}, total: 0 });
-    expect(screen.queryByText("Lo último que se vendió")).toBeNull();
+  it("la venta vacía muestra los últimos productos vendidos, que se agregan con un clic; sin «No llevó» ni «Vaciar» (decisiones 126 y 131)", async () => {
+    armar({ ventas: [{ fecha: "2026-10-11T12:00:00Z", estado: "confirmada", items: [{ descripcion: "MECHA VENDER 8 MM" }] }], totales: {}, total: 0 });
+    expect(screen.getByTestId("venta-vacia").textContent).toContain("La venta está vacía");
     expect(screen.queryByTestId("no-llevo")).toBeNull();
     expect(screen.queryByTestId("vaciar-venta")).toBeNull();
-    agregar("mecha vender");
+    const ultimos = await screen.findByTestId("sugeridos-ultimos");
+    expect(ultimos.textContent).toContain("Mecha vender 8 mm$3.000");
+    fireEvent.click(within(ultimos).getByRole("button"));
+    expect(screen.getAllByTestId("item")).toHaveLength(1);
+    expect(screen.queryByTestId("sugeridos-ultimos")).toBeNull(); // con la venta empezada, la lista ocupa su lugar
     expect(screen.getByTestId("no-llevo")).toBeTruthy();
-    expect(screen.getByTestId("vaciar-venta")).toBeTruthy();
   });
 
   it("dicen lo mismo que el celular: los medios de pago y los avisos salen de los textos compartidos", async () => {

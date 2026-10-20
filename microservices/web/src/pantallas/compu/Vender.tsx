@@ -6,6 +6,7 @@ import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { ventaActual } from "../../negocio/ventas/venta-en-curso";
+import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 import { marcarLoQueEntro, useLlegadosDelCelular } from "../../negocio/ventas/llegados-del-celular";
 import { NOMBRE_DE_MEDIO, cuentaDelRenglon, noEsMultiploDeMil, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { esMargenBoton } from "../../negocio/precios/vista-previa";
@@ -133,6 +134,8 @@ export function Vender() {
     else if (e.key === "Escape") { caja.current?.focus(); }
   }, [resultados.length, hayVentana]), caja.current);
 
+  // Los cuatro últimos productos vendidos, para la venta vacía (decisión 131); se recalculan al cobrar.
+  const sugeridos = useSugeridos(catalogo, cobro);
   const vacio = items.length === 0 && !consulta.trim() && !codigoDesconocido;
   // La computadora (decisión 122): el renglón elegido, el panel de la derecha y sus pestañas,
   // el celular que escanea y el aviso con Deshacer.
@@ -258,7 +261,31 @@ export function Vender() {
             </div>
             {items.length === 0 ? (
               <>
-                {!consulta.trim() && <Vacio icono="vender" titulo="La venta está vacía">Buscá por nombre o código, escaneá con el lector o con el celular.</Vacio>}
+                {/* La venta vacía, como la maqueta (decisión 131): el recuadro gris con el carrito y,
+                    debajo, los cuatro últimos productos vendidos, que se agregan con un clic. */}
+                <div className="vmc-vacia" data-testid="venta-vacia">
+                  <span className="vmc-vacia-icono" aria-hidden="true"><Icono nombre="vender" tam={26} /></span>
+                  <b>La venta está vacía</b>
+                  <span>Buscá por nombre o código, escaneá con el lector o con el celular.</span>
+                </div>
+                {sugeridos.ultimos.length > 0 && (
+                  <section className="vmc-ultimos" aria-label="Lo último que se vendió" data-testid="sugeridos-ultimos">
+                    <h2>Lo último que se vendió</h2>
+                    <ul data-sin-flechas>
+                      {sugeridos.ultimos.map((p) => {
+                        const precio = precioSugerido(p);
+                        return (
+                          <li key={p.id}>
+                            <button type="button" className="vmc-ultimo" onClick={() => agregar(p)}>
+                              <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={20} grosor={1.6} />}</span>
+                              <span className="vmc-ultimo-txt"><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span></span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                )}
               </>
             ) : (
               <ul className="lista vmc-items" ref={lista} data-testid="venta">

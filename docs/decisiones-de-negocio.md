@@ -1064,3 +1064,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      ↑ desde la primera fila saca la marca de la lista; si el cursor está en una caja de texto (la
      búsqueda), se queda ahí y no pasa a la pestaña. A las pestañas y al menú se llega con ← (con la
      búsqueda vacía) o sin el cursor en una caja. Vale en todas las pantallas (decisión 82).
+131. **Vuelven los cuatro últimos productos vendidos a la venta vacía** (2026-10-20). Carlos marcó
+     cómo queda Vender sin productos en la computadora: el recuadro gris con el carrito, «La venta
+     está vacía» y cómo empezar, y debajo «Lo último que se vendió», cuatro tarjetas en fila con la
+     foto, el nombre y el precio, que agregan el producto con un clic. Cambia lo de la decisión 126
+     (que la había sacado). Salen de las ventas guardadas en este dispositivo y de las de hoy; con
+     el catálogo en el servidor (018), los productos de esas tarjetas se tendrán que traer de ahí.
