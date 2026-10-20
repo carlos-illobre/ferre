@@ -50,7 +50,7 @@ describe("POST /ventas", () => {
     expect(base.actual.sqlDe(/insert into "movimiento_stock"/)).toHaveLength(0);
     const anomalia = base.actual.sqlDe(/insert into "anomalia"/)[0]!;
     expect(anomalia.params.slice(1, 5)).toEqual(["p1", "u-mostrador", venta.id, 3]);
-    expect(String(anomalia.params[5])).toContain("faltaban 3");
+    expect(String(anomalia.params[5])).toContain("faltaban 3 un.");
     expect(JSON.stringify(base.actual.sqlDe(/insert into "evento"/)[0]?.params ?? "")).toContain("anomalias");
   });
 

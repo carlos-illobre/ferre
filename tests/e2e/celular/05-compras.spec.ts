@@ -98,9 +98,9 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   // La compra se despliega y muestra sus dos renglones.
   const compra = recientes.getByTestId("compra-reciente").filter({ hasText: PROVEEDOR }).first();
   await compra.getByRole("button").first().click();
-  await expect(compra).toContainText("10 ×");
+  await expect(compra).toContainText("10 un.");
   await expect(compra).toContainText("CINTA AISLADORA");
-  await expect(compra).toContainText("5 ×");
+  await expect(compra).toContainText("5 un.");
   await expect(compra).toContainText("PINCEL NUEVO");
   // La foto de la factura queda con la compra y se abre en grande para leerla.
   await compra.getByTestId("ver-comprobante").click();

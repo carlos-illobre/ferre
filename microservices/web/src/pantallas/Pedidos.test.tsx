@@ -36,7 +36,7 @@ describe("Pedidos a proveedores", () => {
 
   it("el mensaje para el proveedor lleva código, descripción y cantidad, y ningún costo", () => {
     const texto = textoDelPedido([{ descripcion: "MECHA 6 MM", codigo: "TR-60124", cantidad: 24, unidad: "unidad" }, { descripcion: "CLAVO PUNTA PARIS", codigo: null, cantidad: 7.5, unidad: "kg" }], new Date(2026, 9, 11));
-    expect(texto).toBe("Ferrebress · pedido del 11/10/2026\n\n24 × MECHA 6 MM (TR-60124)\n7,5 kg × CLAVO PUNTA PARIS\n\n2 renglones. Gracias.");
+    expect(texto).toBe("Ferrebress · pedido del 11/10/2026\n\n24 un. × MECHA 6 MM (TR-60124)\n7,5 kg × CLAVO PUNTA PARIS\n\n2 renglones. Gracias.");
     expect(texto).not.toContain("$");
   });
 
@@ -96,7 +96,7 @@ describe("Pedidos a proveedores", () => {
 
     fireEvent.click(screen.getByTestId("revisar-y-mandar"));
     const hoja = await screen.findByTestId("hoja-mandar");
-    expect(within(hoja).getByTestId("mensaje-pedido").textContent).toContain("24 × MECHA 6 MM (TR-60124)");
+    expect(within(hoja).getByTestId("mensaje-pedido").textContent).toContain("24 un. × MECHA 6 MM (TR-60124)");
     expect(within(hoja).getByTestId("mensaje-pedido").textContent).toContain("1,5 kg × CLAVO PUNTA PARIS (TR-60129)");
     expect(within(hoja).getByTestId("mensaje-pedido").textContent).not.toContain("$");
     const abrir = vi.spyOn(window, "open").mockReturnValue(null);

@@ -31,13 +31,13 @@ export async function cabecera(e: Ejecutor, id: string): Promise<Cabecera | null
   return rows[0] ?? null;
 }
 
-export const contados = (e: Ejecutor, conteoId: string) => sql<{ producto_id: string; cantidad_contada: string; contado_en: Date; descripcion: string; marca: string | null; stock_teorico: string }>`
-  SELECT r.producto_id, r.cantidad_contada, r.contado_en, p.descripcion, p.marca, ${stockTeorico("r.producto_id")} AS stock_teorico
+export const contados = (e: Ejecutor, conteoId: string) => sql<{ producto_id: string; cantidad_contada: string; contado_en: Date; descripcion: string; marca: string | null; unidad: string; stock_teorico: string }>`
+  SELECT r.producto_id, r.cantidad_contada, r.contado_en, p.descripcion, p.marca, p.unidad, ${stockTeorico("r.producto_id")} AS stock_teorico
     FROM renglon_conteo r JOIN producto p ON p.id = r.producto_id WHERE r.conteo_id = ${conteoId} ORDER BY r.contado_en DESC`.execute(e).then((r) => r.rows);
 
 // Productos del sector todavía no contados en este conteo.
-export const sinContar = (e: Ejecutor, conteoId: string, sectorId: string) => sql<{ producto_id: string; descripcion: string; marca: string | null; stock_teorico: string }>`
-  SELECT p.id AS producto_id, p.descripcion, p.marca, ${stockTeorico("p.id")} AS stock_teorico
+export const sinContar = (e: Ejecutor, conteoId: string, sectorId: string) => sql<{ producto_id: string; descripcion: string; marca: string | null; unidad: string; stock_teorico: string }>`
+  SELECT p.id AS producto_id, p.descripcion, p.marca, p.unidad, ${stockTeorico("p.id")} AS stock_teorico
     FROM producto p WHERE p.sector_id = ${sectorId} AND p.activo AND p.id NOT IN (SELECT producto_id FROM renglon_conteo WHERE conteo_id = ${conteoId})
    ORDER BY p.descripcion`.execute(e).then((r) => r.rows);
 

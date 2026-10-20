@@ -19,14 +19,14 @@ export type CompraRepetida = { id: string; total: number; repetida: true };
 // GET /compras: las últimas 50.
 export type CompraReciente = {
   id: string; fecha: string; comprobante_tipo: string; comprobante_numero: string | null; total: string; estado: string; nota: string | null; creado_en: string;
-  proveedor: string; foto: string | null; renglones: string; items: { descripcion: string; cantidad: string; costo_unitario: string }[];
+  proveedor: string; foto: string | null; renglones: string; items: { descripcion: string; cantidad: string; unidad?: string; costo_unitario: string }[];
 };
 
 // GET /compras/semana: lo gastado en los últimos 7 días, por proveedor.
 export type GastosDeLaSemana = { desde: string; por_proveedor: { proveedor: string; compras: string; total: string }[]; total: number };
 
 // GET /compras/:id: los renglones.
-export type RenglonDeCompra = { orden: number; cantidad: string; costo_unitario: string; descripcion: string; marca: string | null };
+export type RenglonDeCompra = { orden: number; cantidad: string; costo_unitario: string; descripcion: string; marca: string | null; unidad?: string };
 
 // POST /compras/:id/anular
 export type AnulacionDeCompra = z.input<typeof anulacionDeCompra>;

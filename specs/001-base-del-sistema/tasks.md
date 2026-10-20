@@ -54,4 +54,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T043 [ajuste] Los neutros de la paleta compartida, los grises cálidos de «Mostrador» (sin fondos verdosos); las hojas del celular blancas con «×»; el día elegido del calendario centrado (decisión 143)
 - [x] T044 [ajuste] Celular: el botón del vínculo con la computadora nunca es gris: verde en espejo y blanco con el borde verde desconectado (decisión 143)
 - [x] T045 [ajuste] Cuenta corriente en rojo en toda la aplicación, con su fondo suave (decisión 144)
-- [ ] T046 [regla] Toda cantidad va con su unidad, en el celular y en la computadora (decisión 144)
+- [x] T046 [regla] Toda cantidad va con su unidad, en el celular y en la computadora (decisión 144)

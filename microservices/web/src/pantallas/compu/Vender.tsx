@@ -13,7 +13,7 @@ import { NOMBRE_DE_MEDIO, cuentaDelRenglon, precioDe, subtotalDe, useVenta, type
 import { esMargenBoton } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { useCodigoParaVincular } from "../../negocio/vinculo";
-import { abreviarUnidad, cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
+import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../unidades";
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
 import { guardar, borrarAnterioresA } from "../../almacen";
 import { enviarOEncolar, enviarPendientes } from "../../cola";
@@ -384,7 +384,7 @@ export function Vender() {
                   <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
                   <span className="nombre">{nombreDeProducto(p.descripcion)}</span>
                   <span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "sin precio" : pesosCortos(precio)}</span>
-                  <span className="detalle">{detalleDe(p)}{stock !== undefined ? `${detalleDe(p) ? " · " : ""}stock ${numero(stock)}` : ""}</span>
+                  <span className="detalle">{detalleDe(p)}{stock !== undefined ? `${detalleDe(p) ? " · " : ""}stock ${conUnidad(stock, p.unidad)}` : ""}</span>
                 </li>
               );
             })}
@@ -460,8 +460,8 @@ function useRenglon(it: Item) {
   const margenTexto = it.precioManual !== null ? "precio a mano" : p.margen === null ? "elegí el margen" : `margen ${p.margen} %${esMargenBoton(p.margen) ? "" : " a mano"}`;
   return { p, renglon, margenTexto };
 }
-const StockDeRenglon = ({ stock, cantidad }: { stock: number | undefined; cantidad: number }) => (stock === undefined ? null : (
-  <>stock {numero(stock)}{stock - cantidad < 0 && <> <Pastilla tipo="alerta" sinPunto>{TEXTOS.vender.stockNoAlcanza.largo}</Pastilla></>}</>
+const StockDeRenglon = ({ stock, cantidad, unidad }: { stock: number | undefined; cantidad: number; unidad: string }) => (stock === undefined ? null : (
+  <>stock {conUnidad(stock, unidad)}{stock - cantidad < 0 && <> <Pastilla tipo="alerta" sinPunto>{TEXTOS.vender.stockNoAlcanza.largo}</Pastilla></>}</>
 ));
 function PrecioAMano({ item, alCambiar, falta, id, enfocar }: { item: Item; alCambiar: (c: Partial<Item>) => void; falta?: boolean; id?: string; enfocar?: boolean }) {
   return (
@@ -524,7 +524,7 @@ function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
       <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} etiqueta={`Cantidad de ${it.descripcion}`} />
       <div className="vmc-sub" data-testid="subtotal">
         {renglon ? <span className="importe vmc-rueda" ref={rueda}>{pesosCortos(renglon.valor)}</span> : <span className="falta-texto" data-testid="sin-precio">Sin precio</span>}
-        <small>{sinPrecio ? (producto && p.costo !== null ? "elegí el margen" : "poné el precio") : `${numero(it.cantidad)} × ${pesosCortos(p.unitario!)}`}</small>
+        <small>{sinPrecio ? (producto && p.costo !== null ? "elegí el margen" : "poné el precio") : `${conUnidad(it.cantidad, it.unidad)} × ${pesosCortos(p.unitario!)}`}</small>
       </div>
       {/* El tacho, a la derecha del precio (Carlos, 2026-10-20; decisión 132). */}
       <button type="button" className="vmc-tacho" title="Quitar de la venta" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} data-testid="quitar-renglon"><Icono nombre="basura" tam={20} /></button>
@@ -577,7 +577,7 @@ function Boleta({ items, total }: { items: Item[]; total: number }) {
         const p = precioDe(it); const r = subtotalDe(it);
         return (
           <div key={it.clave} className={`vmc-linea ${p.unitario === null ? "falta" : ""}`}>
-            <span className="q">{numero(it.cantidad)}{it.unidad === "unidad" ? " ×" : ` ${abreviarUnidad(it.unidad)}`}</span>
+            <span className="q">{conUnidad(it.cantidad, it.unidad)}</span>
             <span className="nm">{nombreDeProducto(it.descripcion)}<small>{p.unitario === null ? "Sin precio" : `${pesosCortos(p.unitario)} ${it.unidad === "unidad" ? "c/u" : `el ${abreviarUnidad(it.unidad)}`}${it.precioManual !== null ? " · a mano" : p.margen !== null ? ` · margen ${p.margen} %` : ""}`}</small></span>
             <span className="im">{r ? pesosCortos(r.valor) : "—"}</span>
           </div>
@@ -618,7 +618,7 @@ function TarjetaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
         <div className="crece pila junta">
           {producto ? <span className="nombre">{nombreDeProducto(it.descripcion)}</span>
             : <input className="entrada" value={it.descripcion} placeholder="¿Qué se lleva?" aria-label="Descripción del ítem libre" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
-          <span className="detalle">{producto ? <>{detalleDe(producto)}{detalleDe(producto) && stock !== undefined ? " · " : ""}<StockDeRenglon stock={stock} cantidad={it.cantidad} /></> : "Ítem libre"}</span>
+          <span className="detalle">{producto ? <>{detalleDe(producto)}{detalleDe(producto) && stock !== undefined ? " · " : ""}<StockDeRenglon stock={stock} cantidad={it.cantidad} unidad={it.unidad} /></> : "Ítem libre"}</span>
         </div>
         <span data-testid="subtotal">{renglon ? <Explicado conCosto className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : !producto ? <PrecioAMano item={it} alCambiar={alCambiar} falta /> : <span className="falta-texto" data-testid="sin-precio">sin precio</span>}</span>
       </div>

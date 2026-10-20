@@ -1,6 +1,8 @@
 import { api } from "../api";
 import { consultas } from "../consultas";
 import { pesosCortos } from "../formato";
+import { productoEnMemoria } from "../catalogo";
+import { conUnidad } from "../unidades";
 import { useDelServidor } from "./del-servidor";
 import { NOMBRE_DE_MEDIO } from "./ventas/venta";
 import type { CambioApartado, CambiosParaRevisar } from "@servidor/apartados";
@@ -38,18 +40,21 @@ export function porPersona(lista: CambioApartado[]): DeUnaPersona[] {
 
 // Un cambio contado con las palabras del negocio: qué es, lo principal y su detalle.
 export type Descripcion = { titulo: string; resumen: string | null; renglones: string[]; cuando: string };
-const numero = (n: unknown) => Number(n).toLocaleString("es-AR", { maximumFractionDigits: 3 });
 const dosCifras = (n: number) => String(n).padStart(2, "0");
 export const diaYHora = (iso: string) => { const d = new Date(iso); return `${dosCifras(d.getDate())}/${dosCifras(d.getMonth() + 1)} a las ${dosCifras(d.getHours())}:${dosCifras(d.getMinutes())}`; };
 const hora = (iso: string) => { const d = new Date(iso); return `${dosCifras(d.getHours())}:${dosCifras(d.getMinutes())}`; };
 const mismoDia = (a: string, b: string) => new Date(a).toDateString() === new Date(b).toDateString();
 
-type Venta = { medio_pago?: string; items?: { descripcion?: string; cantidad?: number; precio_unitario?: number }[] };
+type Venta = { medio_pago?: string; items?: { producto_id?: string | null; descripcion?: string; cantidad?: number; precio_unitario?: number }[] };
 type NoLlevo = { items?: { descripcion?: string; precio_ofrecido?: number | null }[]; motivo?: string };
 type Ajuste = { cantidad_real?: number; motivo?: string };
 type CambioDeProducto = { margen_elegido?: number | null; unidad?: string; codigo_barras?: string | null; proveedor_preferido_id?: string | null; foto_url?: string | null };
 
-export function describir(c: CambioApartado): Descripcion {
+// La unidad del producto, del catálogo bajado; sin producto o sin catálogo, «un.» (decisión 144).
+const unidadDelProducto = (id?: string | null) => (id ? productoEnMemoria(id)?.unidad : undefined);
+
+export function describir(c: CambioApartado, unidadDe: (productoId?: string | null) => string | undefined = unidadDelProducto): Descripcion {
+  const delRecurso = unidadDe(c.ruta.split("/").pop());
   const llego = mismoDia(c.hecho_en, c.llegado_en) ? `llegó a las ${hora(c.llegado_en)}` : `llegó el ${diaYHora(c.llegado_en)}`;
   const cuando = (verbo: string | null) => `${verbo ? `${verbo} el` : "El"} ${diaYHora(c.hecho_en)} · ${llego}`;
   const producto = c.producto ?? "un producto que ya no está";
@@ -60,7 +65,7 @@ export function describir(c: CambioApartado): Descripcion {
     const medio = v.medio_pago ? NOMBRE_DE_MEDIO[v.medio_pago as keyof typeof NOMBRE_DE_MEDIO] ?? v.medio_pago : null;
     return {
       titulo: "Venta", resumen: [pesosCortos(total), medio].filter(Boolean).join(" · "),
-      renglones: items.map((i) => `${numero(i.cantidad)} × ${i.descripcion ?? "sin descripción"} — ${pesosCortos(Number(i.cantidad ?? 0) * Number(i.precio_unitario ?? 0))}`),
+      renglones: items.map((i) => `${conUnidad(i.cantidad ?? 0, unidadDe(i.producto_id))} ${i.descripcion ?? "sin descripción"} — ${pesosCortos(Number(i.cantidad ?? 0) * Number(i.precio_unitario ?? 0))}`),
       cuando: cuando("Cobrada"),
     };
   }
@@ -70,7 +75,7 @@ export function describir(c: CambioApartado): Descripcion {
   }
   if (c.tipo === "stock.ajuste") {
     const a = (c.cuerpo ?? {}) as Ajuste;
-    return { titulo: "Ajuste de stock", resumen: producto, renglones: [[`Hay ${numero(a.cantidad_real)}`, a.motivo ? `«${a.motivo}»` : null].filter(Boolean).join(" · ")], cuando: cuando(null) };
+    return { titulo: "Ajuste de stock", resumen: producto, renglones: [[`Hay ${conUnidad(a.cantidad_real ?? 0, delRecurso)}`, a.motivo ? `«${a.motivo}»` : null].filter(Boolean).join(" · ")], cuando: cuando(null) };
   }
   if (c.tipo === "producto.cambio") {
     const p = (c.cuerpo ?? {}) as CambioDeProducto;
@@ -85,7 +90,7 @@ export function describir(c: CambioApartado): Descripcion {
   }
   if (c.tipo === "conteo.renglon") {
     const r = (c.cuerpo ?? {}) as { cantidad?: number };
-    return { titulo: "Conteo", resumen: producto, renglones: [c.metodo === "DELETE" ? "Sacó el renglón del conteo" : `Contó ${numero(r.cantidad)}`], cuando: cuando(null) };
+    return { titulo: "Conteo", resumen: producto, renglones: [c.metodo === "DELETE" ? "Sacó el renglón del conteo" : `Contó ${conUnidad(r.cantidad ?? 0, delRecurso)}`], cuando: cuando(null) };
   }
   return { titulo: c.tipo, resumen: null, renglones: [], cuando: cuando(null) };
 }

@@ -3,7 +3,7 @@ import { abrirConteo, crearSector, ordenarSectores, useConteo, useSectores, type
 import { cantidadContada } from "../../../../negocio/deposito/inventario";
 import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../../../catalogo";
 import { fecha } from "../../../../formato";
-import { enteras, unidadDe } from "../../../../unidades";
+import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../../../unidades";
 import { Escaner, hayCamara } from "../../../../plataforma/camara/Escaner";
 import { irA } from "../rutas";
 import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Toast, Vacio, numero } from "../ui";
@@ -243,8 +243,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
                 return (
                   <li key={r.producto_id} className="renglon">
                     <span className="nombre">{r.descripcion}</span>
-                    <span className={`deposito-dif ${claseDif(dif)}`}>{conSigno(dif)}</span>
-                    <span className="detalle">Había {numero(Number(r.stock_teorico))}, hay {numero(Number(r.cantidad_contada))}</span>
+                    <span className={`deposito-dif ${claseDif(dif)}`}>{conSigno(dif)} {abreviarUnidad(r.unidad || "unidad")}</span>
+                    <span className="detalle">Había {conUnidad(r.stock_teorico, r.unidad)}, hay {conUnidad(r.cantidad_contada, r.unidad)}</span>
                   </li>
                 );
               })}
@@ -276,7 +276,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
                 <h2>{producto.descripcion}</h2>
                 <p className="detalle">{[producto.marca, producto.codigo_proveedor].filter(Boolean).join(" · ") || detalleDe(producto) || "Sin marca"}</p>
               </div>
-              {previo && <p className="contar-previo" data-testid="ya-contado"><Icono nombre="info" tam={18} />Ya lo contaste: pusiste {numero(Number(previo.cantidad_contada))}. Lo que pongas ahora lo reemplaza.</p>}
+              {previo && <p className="contar-previo" data-testid="ya-contado"><Icono nombre="info" tam={18} />Ya lo contaste: pusiste {conUnidad(previo.cantidad_contada, previo.unidad)}. Lo que pongas ahora lo reemplaza.</p>}
               <label className="contar-cuantas" htmlFor={`${id}-cantidad`}>¿Cuántas hay?{!enteras(unidad) && <span className="detalle"> En {nombreUnidad(unidad)}, con un decimal.</span>}</label>
               <div className="contar-numero">
                 <button type="button" aria-label="Una menos" onClick={() => mover(-1)}><Icono nombre="menos" tam={22} grosor={2.4} /></button>
@@ -297,7 +297,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
             <>
               <BuscadorDeProducto consulta={consulta} alCambiar={(v) => { setConsulta(v); setError(null); }} resultados={resultados} alElegir={elegir} cajaRef={caja}
                 placeholder={esCelular ? (hayCamara() ? "Buscá o escaneá" : "Buscá el producto") : hayCamara() ? "Buscá o escaneá el producto" : "Buscá el producto"} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined}
-                aLaDerecha={(p) => (contadoPorId.has(p.id) ? <Pastilla tipo="ok">Ya contado: {numero(Number(contadoPorId.get(p.id)!.cantidad_contada))}</Pastilla> : null)} />
+                aLaDerecha={(p) => (contadoPorId.has(p.id) ? <Pastilla tipo="ok">Ya contado: {conUnidad(contadoPorId.get(p.id)!.cantidad_contada, p.unidad)}</Pastilla> : null)} />
               <Aviso tipo="error" testId="error-conteo">{error}</Aviso>
               <p className="detalle solo-compu">Flechas y Enter para elegir; después la cantidad y Enter otra vez. Escape limpia.</p>
               {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
@@ -316,10 +316,10 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
                   const dif = Number(r.cantidad_contada) - Number(r.stock_teorico);
                   return (
                     <li key={r.producto_id}>
-                      <button type="button" className="renglon" onClick={() => elegirPorId(r.producto_id, r.descripcion)} aria-label={`${r.descripcion}: hay ${numero(Number(r.cantidad_contada))}. Corregir`}>
+                      <button type="button" className="renglon" onClick={() => elegirPorId(r.producto_id, r.descripcion)} aria-label={`${r.descripcion}: hay ${conUnidad(r.cantidad_contada, r.unidad)}. Corregir`}>
                         <span className="nombre">{r.descripcion}</span>
-                        <span className="contar-contado"><span className="importe">{numero(Number(r.cantidad_contada))}</span><span className={`deposito-dif ${claseDif(dif)}`}>{conSigno(dif)}</span></span>
-                        <span className="detalle">{dif === 0 ? `Coincide con el sistema${r.marca ? ` · ${r.marca}` : ""}` : `Había ${numero(Number(r.stock_teorico))}, hay ${numero(Number(r.cantidad_contada))}${r.marca ? ` · ${r.marca}` : ""}`}{enElDispositivo.has(r.producto_id) && <> <Pastilla tipo="alerta">Se manda al volver internet</Pastilla></>}</span>
+                        <span className="contar-contado"><span className="importe">{conUnidad(r.cantidad_contada, r.unidad)}</span><span className={`deposito-dif ${claseDif(dif)}`}>{conSigno(dif)} {abreviarUnidad(r.unidad || "unidad")}</span></span>
+                        <span className="detalle">{dif === 0 ? `Coincide con el sistema${r.marca ? ` · ${r.marca}` : ""}` : `Había ${conUnidad(r.stock_teorico, r.unidad)}, hay ${conUnidad(r.cantidad_contada, r.unidad)}${r.marca ? ` · ${r.marca}` : ""}`}{enElDispositivo.has(r.producto_id) && <> <Pastilla tipo="alerta">Se manda al volver internet</Pastilla></>}</span>
                       </button>
                     </li>
                   );
@@ -335,10 +335,10 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
                       return (
                         <tr key={r.producto_id} data-testid="contado">
                           <td><span className="nombre">{r.descripcion}</span>{r.marca && <span className="detalle"> · {r.marca}</span>}{enElDispositivo.has(r.producto_id) && <div><Pastilla tipo="alerta">Se manda al volver internet</Pastilla></div>}</td>
-                          <td className="num"><span className="importe chico">{numero(Number(r.cantidad_contada))}</span></td>
-                          <td className="num">{numero(Number(r.stock_teorico))}</td>
+                          <td className="num"><span className="importe chico">{conUnidad(r.cantidad_contada, r.unidad)}</span></td>
+                          <td className="num">{conUnidad(r.stock_teorico, r.unidad)}</td>
                           <td className="num">{dif === 0 ? <span className="deposito-dif igual" title="Coincide con el sistema">=</span> : (
-                            <Explicado className={`deposito-dif ${claseDif(dif)}`} valor={conSigno(dif)} titulo={`Diferencia de ${r.descripcion}`} pasos={[`Según el sistema había ${numero(Number(r.stock_teorico))}.`, `Contaste ${numero(Number(r.cantidad_contada))}.`, `Diferencia: ${conSigno(dif)}. Al cerrar el sector se aplica al stock como un ajuste.`]} />
+                            <Explicado className={`deposito-dif ${claseDif(dif)}`} valor={conSigno(dif)} titulo={`Diferencia de ${r.descripcion}`} pasos={[`Según el sistema había ${conUnidad(r.stock_teorico, r.unidad)}.`, `Contaste ${conUnidad(r.cantidad_contada, r.unidad)}.`, `Diferencia: ${conSigno(dif)}. Al cerrar el sector se aplica al stock como un ajuste.`]} />
                           )}</td>
                           <td className="angosta"><Boton tam="chico" icono="editar" onClick={() => elegirPorId(r.producto_id, r.descripcion)} aria-label={`Corregir lo contado de ${r.descripcion}`}>Corregir</Boton></td>
                         </tr>
@@ -358,7 +358,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
                     <button type="button" className="renglon" onClick={() => elegirPorId(p.producto_id, p.descripcion)} aria-label={`Contar ${p.descripcion}`}>
                       <span className="nombre">{p.descripcion}</span>
                       <span className="contar-tocar">Contar<Icono nombre="derecha" tam={16} grosor={2.4} /></span>
-                      <span className="detalle">{[p.marca, `el sistema dice ${numero(Number(p.stock_teorico))}`].filter(Boolean).join(" · ")}</span>
+                      <span className="detalle">{[p.marca, `el sistema dice ${conUnidad(p.stock_teorico, p.unidad)}`].filter(Boolean).join(" · ")}</span>
                     </button>
                   </li>
                 ))}

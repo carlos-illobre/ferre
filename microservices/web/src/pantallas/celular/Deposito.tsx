@@ -13,7 +13,7 @@ import { ErrorApi } from "../../api";
 import { busquedaAlDia, esperarBusqueda, productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
-import { abreviarUnidad, cantidadValida, enteras, unidadDe } from "../../unidades";
+import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe } from "../../unidades";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
@@ -115,7 +115,7 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto, veI
       const { hay } = await corregir(real, motivo);
       setCorrigiendo(false); setError(null);
       const dif = hay - cantidad;
-      alAjustar(dif === 0 ? "Sin diferencia: el stock ya decía eso." : `Stock corregido a ${num(hay)} (${dif > 0 ? "+" : ""}${num(dif)}).`);
+      alAjustar(dif === 0 ? "Sin diferencia: el stock ya decía eso." : `Stock corregido a ${num(hay)} ${unidad} (${dif > 0 ? "+" : ""}${num(dif)} ${unidad}).`);
     } catch (e) { setError((e as Error).message); }
   }
   const nombreTipo = nombreDeMovimiento;
@@ -136,11 +136,11 @@ function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto, veI
       </div>
       {abierto && (
         <div className="detalle-stock" style={{ display: "flex", flexDirection: "column", gap: 10, animation: "aparecer .2s" }} data-testid="detalle-stock">
-          <small>Stock {num(cantidad)} = suma de estos movimientos</small>
+          <small>Stock {num(cantidad)} {unidad} = suma de estos movimientos</small>
           {movimientos === null ? <small>Cargando…</small> : movimientos.length === 0 ? <small>Sin movimientos.</small> : (
             <div className="movimientos" data-testid="movimientos">
               {movimientos.map((m) => (
-                <div key={m.id}><span style={{ color: "var(--gris)" }}>{fecha(m.fecha.slice(0, 10))}</span><span>{nombreTipo(m)}{m.nota ? ` · ${m.nota}` : ""}</span><strong className="importe" style={{ fontSize: 16, color: Number(m.cantidad) < 0 ? "var(--coral-texto)" : undefined }}>{Number(m.cantidad) > 0 ? "+" : ""}{num(Number(m.cantidad))}</strong></div>
+                <div key={m.id}><span style={{ color: "var(--gris)" }}>{fecha(m.fecha.slice(0, 10))}</span><span>{nombreTipo(m)}{m.nota ? ` · ${m.nota}` : ""}</span><strong className="importe" style={{ fontSize: 16, color: Number(m.cantidad) < 0 ? "var(--coral-texto)" : undefined }}>{Number(m.cantidad) > 0 ? "+" : ""}{num(Number(m.cantidad))} {unidad}</strong></div>
               ))}
             </div>
           )}
@@ -434,7 +434,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
       <div className="columna al-costado">
       {producto ? (
         <div className="contando" data-testid="contando">
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}><span style={{ fontSize: 18, fontWeight: 600 }}>{producto.descripcion}</span><small>{[producto.marca, producto.codigo_proveedor].filter(Boolean).join(" · ")}{contadoPorId.get(producto.id) ? ` · teórico ${Number(contadoPorId.get(producto.id)!.stock_teorico)}` : ""}</small></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}><span style={{ fontSize: 18, fontWeight: 600 }}>{producto.descripcion}</span><small>{[producto.marca, producto.codigo_proveedor].filter(Boolean).join(" · ")}{contadoPorId.get(producto.id) ? ` · teórico ${conUnidad(contadoPorId.get(producto.id)!.stock_teorico, producto.unidad)}` : ""}</small></div>
           <label className="cuantas">¿Cuántas hay?
             <input ref={cajaCantidad} inputMode="numeric" value={cantidad} onChange={(e) => setCantidad(e.target.value.replace(/[^\d]/g, ""))} placeholder="0"
               onKeyDown={(e) => { if (e.key === "Enter") void guardar(); if (e.key === "Escape") setProducto(null); }} data-testid="cantidad" />
@@ -453,7 +453,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
               {resultados.map((p, i) => (
                 <button key={p.id} type="button" className={`fila ${i === elegido ? "elegida" : ""}`} onMouseDown={(e) => { e.preventDefault(); elegirProducto(p); }}>
                   <span className="nombre">{p.descripcion}</span>
-                  <small className="derecha" style={{ color: "var(--coral-texto)", fontWeight: 600 }}>{contadoPorId.has(p.id) ? `ya: ${Number(contadoPorId.get(p.id)!.cantidad_contada)}` : ""}</small>
+                  <small className="derecha" style={{ color: "var(--coral-texto)", fontWeight: 600 }}>{contadoPorId.has(p.id) ? `ya: ${conUnidad(contadoPorId.get(p.id)!.cantidad_contada, p.unidad)}` : ""}</small>
                   <span className="detalle">{detalleDe(p)}</span>
                 </button>
               ))}
@@ -471,8 +471,8 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
             return (
               <button key={r.producto_id} type="button" className="fila" role="row" aria-label={r.descripcion} onClick={() => { void traerPorIds([r.producto_id]).then(() => { const p = productoEnMemoria(r.producto_id); if (p) elegirProducto(p); }); }}>
                 <span className="nombre">{r.descripcion}</span>
-                <span className="derecha" style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}><strong className="importe" style={{ fontSize: 22 }}>{Number(r.cantidad_contada)}</strong><small style={{ fontWeight: 700, color: dif === 0 ? undefined : "var(--coral-texto)", minWidth: 24, textAlign: "right" }}>{dif === 0 ? "=" : dif > 0 ? `+${dif}` : dif}</small></span>
-                <span className="detalle">{r.marca ?? ""}{r.marca ? " · " : ""}teórico {Number(r.stock_teorico)}</span>
+                <span className="derecha" style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}><strong className="importe" style={{ fontSize: 22 }}>{conUnidad(r.cantidad_contada, r.unidad)}</strong><small style={{ fontWeight: 700, color: dif === 0 ? undefined : "var(--coral-texto)", minWidth: 24, textAlign: "right" }}>{dif === 0 ? "=" : dif > 0 ? `+${dif}` : dif}</small></span>
+                <span className="detalle">{r.marca ?? ""}{r.marca ? " · " : ""}teórico {conUnidad(r.stock_teorico, r.unidad)}</span>
               </button>
             );
           })}
@@ -481,7 +481,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
       {conteo.sin_contar.length > 0 && (
         <>
           <h2 className="seccion">Del sector, sin contar todavía</h2>
-          <Lista>{conteo.sin_contar.map((p) => <div key={p.producto_id} className="fila"><span className="nombre">{p.descripcion}</span><small className="derecha">teórico {Number(p.stock_teorico)}</small></div>)}</Lista>
+          <Lista>{conteo.sin_contar.map((p) => <div key={p.producto_id} className="fila"><span className="nombre">{p.descripcion}</span><small className="derecha">teórico {conUnidad(p.stock_teorico, p.unidad)}</small></div>)}</Lista>
         </>
       )}
       {conteo.renglones.length > 0 && !cerrando && <button type="button" className="boton tinta principal centrado" onClick={() => setCerrando(true)} data-testid="cerrar">Cerrar {conteo.sector}</button>}

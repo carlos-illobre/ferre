@@ -69,7 +69,7 @@ test("armar un pedido, mandarlo, recibirlo en parte desde el ingreso y cerrarlo 
   // Mandar: el mensaje lleva código, descripción y cantidad, sin costos; el WhatsApp queda guardado.
   await page.getByTestId("revisar-y-mandar").click();
   const hoja = page.getByTestId("hoja-mandar");
-  await expect(hoja.getByTestId("mensaje-pedido")).toContainText("10 × MECHA PEDIDOS 6 MM (E2E) (PE-MECHA)");
+  await expect(hoja.getByTestId("mensaje-pedido")).toContainText("10 un. × MECHA PEDIDOS 6 MM (E2E) (PE-MECHA)");
   await expect(hoja.getByTestId("mensaje-pedido")).not.toContainText("$");
   await hoja.getByTestId("whatsapp-proveedor").fill("54 9 11 5555-0101");
   await hoja.getByTestId("mandar-whatsapp").click();

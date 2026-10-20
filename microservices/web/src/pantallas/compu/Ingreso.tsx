@@ -6,7 +6,7 @@ import { usePuede } from "../permisos";
 import { COMPROBANTES } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { hoyLocal, pesos, porcentaje } from "../../formato";
-import { cantidadValida, enteras, unidadDe, type Unidad } from "../../unidades";
+import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../unidades";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { Aviso, Boton, Contador, Exito, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Segmentos, Toast, Vacio, numero as cifra, pesosCortos } from "./base/ui";
 import { useEsCelular } from "./base/vista";
@@ -110,7 +110,7 @@ export function Ingreso() {
   function descartar() { setDescartado(ingreso.descartar()); setIntento(false); caja.current?.focus(); }
 
   const pasosDelTotal = [
-    ...renglones.slice(0, 12).map((r) => `${r.descripcion || "Producto nuevo"}: ${cifra(r.cantidad)} × ${r.costo === null ? "sin costo" : pesos(r.costo)} = ${pesos((r.costo ?? 0) * r.cantidad)}`),
+    ...renglones.slice(0, 12).map((r) => `${r.descripcion || "Producto nuevo"}: ${conUnidad(r.cantidad, unidadDe(r.producto))} × ${r.costo === null ? "sin costo" : pesos(r.costo)} = ${pesos((r.costo ?? 0) * r.cantidad)}`),
     ...(renglones.length > 12 ? [`…y ${renglones.length - 12} renglones más.`] : []),
     `Total sin IVA: ${pesos(total)}`,
   ];
@@ -122,7 +122,7 @@ export function Ingreso() {
         {enteras(unidad)
           ? <Contador valor={r.cantidad} entera sinBotones={!esCelular} alCambiar={(v) => cambiar(r.clave, { cantidad: Math.floor(v) })} etiqueta={`Cantidad de ${r.descripcion || "producto nuevo"}`} />
           : <CantidadAGranel valor={r.cantidad} unidad={unidad} conBotones={esCelular} alCambiar={(v) => cambiar(r.clave, { cantidad: v })} etiqueta={`Cantidad de ${r.descripcion}, en ${unidad}`} />}
-        {!enteras(unidad) && <span className="detalle">{unidad === "l" ? "L" : unidad}</span>}
+        <span className="detalle" data-testid="unidad-ingreso">{abreviarUnidad(unidad)}</span>
       </span>
     );
   };

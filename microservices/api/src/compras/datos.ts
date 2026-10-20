@@ -70,7 +70,7 @@ export const estadoDelPedido = (e: Ejecutor, pedidoId: string, estado: string) =
 export const recientes = (e: Ejecutor) => sql<Reciente>`SELECT co.id, co.fecha::text, co.comprobante_tipo, co.comprobante_numero, co.total, co.estado, co.nota, co.creado_en, pr.nombre AS proveedor,
         (SELECT '/compras/fotos/' || f.archivo FROM foto_comprobante f WHERE f.compra_id = co.id ORDER BY f.creado_en LIMIT 1) AS foto,
         (SELECT count(*) FROM item_compra i WHERE i.compra_id = co.id) AS renglones,
-        COALESCE((SELECT json_agg(json_build_object('descripcion', p.descripcion, 'cantidad', i.cantidad, 'costo_unitario', i.costo_unitario) ORDER BY i.orden)
+        COALESCE((SELECT json_agg(json_build_object('descripcion', p.descripcion, 'cantidad', i.cantidad, 'unidad', p.unidad, 'costo_unitario', i.costo_unitario) ORDER BY i.orden)
                     FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = co.id), '[]'::json) AS items
    FROM compra co JOIN proveedor pr ON pr.id = co.proveedor_id
   ORDER BY co.fecha DESC, co.creado_en DESC LIMIT 50`.execute(e).then((r) => r.rows);
@@ -81,7 +81,7 @@ export const gastosDeLaSemana = (e: Ejecutor) => sql<{ proveedor: string; total:
   GROUP BY pr.nombre ORDER BY SUM(co.total) DESC`.execute(e).then((r) => r.rows);
 
 export const renglonesDe = (e: Ejecutor, compraId: string) =>
-  sql<Renglon>`SELECT i.orden, i.cantidad, i.costo_unitario, p.descripcion, p.marca FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = ${compraId} ORDER BY i.orden`.execute(e).then((r) => r.rows);
+  sql<Renglon>`SELECT i.orden, i.cantidad, i.costo_unitario, p.descripcion, p.marca, p.unidad FROM item_compra i JOIN producto p ON p.id = i.producto_id WHERE i.compra_id = ${compraId} ORDER BY i.orden`.execute(e).then((r) => r.rows);
 
 export async function marcarAnulada(e: Ejecutor, id: string): Promise<boolean> {
   return Number((await sql`UPDATE compra SET estado = 'anulada' WHERE id = ${id} AND estado = 'confirmada'`.execute(e)).numAffectedRows ?? 0n) > 0;

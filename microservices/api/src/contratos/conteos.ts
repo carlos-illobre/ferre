@@ -15,8 +15,8 @@ export type ConteoNuevo = z.input<typeof conteoNuevo>;
 export type ConteoAbierto = { id: string; retomado: boolean };
 
 // GET /conteos/:id. Las cantidades llegan como texto.
-export type Contado = { producto_id: string; cantidad_contada: string; contado_en: string; descripcion: string; marca: string | null; stock_teorico: string };
-export type SinContar = { producto_id: string; descripcion: string; marca: string | null; stock_teorico: string };
+export type Contado = { producto_id: string; cantidad_contada: string; contado_en: string; descripcion: string; marca: string | null; unidad?: string; stock_teorico: string };
+export type SinContar = { producto_id: string; descripcion: string; marca: string | null; unidad?: string; stock_teorico: string };
 export type Conteo = { id: string; estado: string; abierto_en: string; cerrado_en: string | null; resumen: unknown; sector_id: string; sector: string; renglones: Contado[]; sin_contar: SinContar[] };
 
 // PUT /conteos/:id/renglones/:productoId

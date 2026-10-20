@@ -18,6 +18,8 @@ import type { Enviable } from "../enviable.js";
 export type VentaEntrada = z.output<typeof ventaNueva>;
 // Los números del detalle de una anomalía, con coma decimal.
 const coma = (n: number) => String(n).replace(".", ",");
+// Una cantidad con su unidad, abreviada como en las pantallas: «3 un.», «1,5 kg» (decisión 144).
+const conUnidad = (n: number, u: string) => `${coma(n)} ${u === "unidad" ? "un." : u === "l" ? "L" : u}`;
 
 export type Registrada = VentaRegistrada;
 
@@ -46,7 +48,8 @@ export async function registrar(v: VentaEntrada, usuarioId: string): Promise<Reg
       if (descuenta > 0) await datos.descontarStock(trx, { producto_id: it.producto_id, cantidad: descuenta, venta_id: id, fecha });
       const falta = Math.round((it.cantidad - descuenta) * 1000) / 1000;
       if (falta > 0) {
-        const detalle = `${it.cantidad === 1 ? "Se vendió 1" : `Se vendieron ${coma(it.cantidad)}`} y el sistema tenía ${coma(enStock)} en stock: ${falta === 1 ? "faltaba 1" : `faltaban ${coma(falta)}`}`;
+        const u = await datos.unidadDe(trx, it.producto_id);
+        const detalle = `${it.cantidad === 1 && u === "unidad" ? "Se vendió 1 un." : `Se vendieron ${conUnidad(it.cantidad, u)}`} y el sistema tenía ${conUnidad(enStock, u)} en stock: ${falta === 1 && u === "unidad" ? "faltaba 1 un." : `faltaban ${conUnidad(falta, u)}`}`;
         await datos.anotarFaltante(trx, { producto_id: it.producto_id, usuario_id: usuarioId, venta_id: id, cantidad: falta, detalle });
         anomalias++;
       }
@@ -120,7 +123,10 @@ async function sacarDelStock(trx: Ejecutor, productoId: string, cantidad: number
   const sale = Math.min(cantidad, enStock);
   if (sale > 0) await datos.moverStock(trx, { producto_id: productoId, cantidad: -sale, tipo, venta_id: ventaId, nota: tipo === "correccion" ? "corrección de venta" : "cambio de producto" });
   const falta = Math.round((cantidad - sale) * 1000) / 1000;
-  if (falta > 0) await datos.anotarFaltante(trx, { producto_id: productoId, usuario_id: usuarioId, venta_id: ventaId, cantidad: falta, detalle: `Se sumaron ${coma(cantidad)} y el sistema tenía ${coma(enStock)} en stock: faltaba ${coma(falta)}` });
+  if (falta > 0) {
+    const u = await datos.unidadDe(trx, productoId);
+    await datos.anotarFaltante(trx, { producto_id: productoId, usuario_id: usuarioId, venta_id: ventaId, cantidad: falta, detalle: `Se sumaron ${conUnidad(cantidad, u)} y el sistema tenía ${conUnidad(enStock, u)} en stock: faltaba ${conUnidad(falta, u)}` });
+  }
 }
 
 export async function corregir(id: string, c: CorreccionEntrada, usuarioId: string, cualquierDia: boolean): Promise<Corregida | NoSeCorrige> {
@@ -247,7 +253,7 @@ export async function cambiar(id: string, c: CambioEntrada, usuarioId: string): 
       await datos.insertarRenglonDeCambio(trx, { cambio_id: cambioId, lado: "vuelve", item_venta_id: r.id, producto_id: r.producto_id, descripcion: r.descripcion, cantidad: v.cantidad, precio_unitario: pagadoPorUnidad(r), margen_aplicado: null, fallado: v.fallado });
       await datos.sumarDevuelto(trx, r.id, v.cantidad);
       if (!r.producto_id) continue;
-      if (v.fallado) await datos.anotarDevueltoFallado(trx, { producto_id: r.producto_id, usuario_id: usuarioId, venta_id: id, cantidad: v.cantidad, detalle: `Volvió fallado: ${coma(v.cantidad)} de ${r.descripcion}; no vuelve al stock` });
+      if (v.fallado) await datos.anotarDevueltoFallado(trx, { producto_id: r.producto_id, usuario_id: usuarioId, venta_id: id, cantidad: v.cantidad, detalle: `Volvió fallado: ${conUnidad(v.cantidad, await datos.unidadDe(trx, r.producto_id))} de ${r.descripcion}; no vuelve al stock` });
       else await datos.moverStock(trx, { producto_id: r.producto_id, cantidad: v.cantidad, tipo: "cambio", venta_id: id, nota: "cambio de producto: vuelve" });
     }
     for (const it of c.se_lleva) {

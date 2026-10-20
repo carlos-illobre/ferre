@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { conUnidad } from "../../unidades";
 import { usePuede } from "../permisos";
 import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
@@ -80,8 +81,8 @@ export function Inventario() {
   function corregido(p: Producto, habia: number, hay: number, encolado: boolean) {
     setAbierto(null);
     const dif = hay - habia;
-    if (encolado) { setPorEnviar((m) => new Map(m).set(p.id, hay)); setMensaje(`${p.descripcion}: quedó en ${numero(hay)}. Guardado en este dispositivo, se manda al volver internet.`); return; }
-    setMensaje(dif === 0 ? `${p.descripcion}: sin diferencia, el stock ya decía ${numero(hay)}.` : `${p.descripcion}: había ${numero(habia)}, hay ${numero(hay)} (${conSigno(dif)}).`);
+    if (encolado) { setPorEnviar((m) => new Map(m).set(p.id, hay)); setMensaje(`${p.descripcion}: quedó en ${conUnidad(hay, p.unidad)}. Guardado en este dispositivo, se manda al volver internet.`); return; }
+    setMensaje(dif === 0 ? `${p.descripcion}: sin diferencia, el stock ya decía ${conUnidad(hay, p.unidad)}.` : `${p.descripcion}: había ${conUnidad(habia, p.unidad)}, hay ${conUnidad(hay, p.unidad)} (${conSigno(dif)} ${nombreUnidad(p.unidad)}).`);
   }
 
   const ordenar = (columna: Columna) => setOrden((o) => (o?.columna === columna ? (o.sube === (columna === "producto") ? { columna, sube: !o.sube } : null) : { columna, sube: columna === "producto" }));
@@ -273,7 +274,7 @@ function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnv
           </label>
           {falta.real && <p className="stock-falta" id={`${id}-falta-real`} role="alert">{falta.real}</p>}
           <p className="detalle" id={`${id}-cuenta`}>
-            {!valida ? `El sistema dice ${numero(cantidad)}.` : hay === cantidad ? `El sistema ya dice ${numero(cantidad)}: no se registra ningún ajuste.` : `Había ${numero(cantidad)}, hay ${numero(hay)}: se registra un ajuste de ${conSigno(hay - cantidad)}.`}
+            {!valida ? `El sistema dice ${numero(cantidad)} ${rotulo}.` : hay === cantidad ? `El sistema ya dice ${numero(cantidad)} ${rotulo}: no se registra ningún ajuste.` : `Había ${numero(cantidad)} ${rotulo}, hay ${numero(hay)} ${rotulo}: se registra un ajuste de ${conSigno(hay - cantidad)} ${rotulo}.`}
           </p>
 
           <div className="campo">
@@ -310,7 +311,7 @@ function DetalleDeStock({ producto: p, fila, cantidad, corregirDeEntrada, porEnv
                   <li key={m.id}>
                     <span className="detalle">{fecha(m.fecha)}</span>
                     <span><strong>{nombreTipo(m)}</strong>{m.nota && <span className="detalle"> · {m.nota}</span>}</span>
-                    <span className={`deposito-dif ${c < 0 ? "" : "sobra"}`}>{conSigno(c)}</span>
+                    <span className={`deposito-dif ${c < 0 ? "" : "sobra"}`}>{conSigno(c)} {rotulo}</span>
                   </li>
                 );
               })}

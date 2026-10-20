@@ -221,6 +221,7 @@ qué disposición y con qué estilo) lo decide el diseño.
 7. **Given** una funcionalidad con pantalla, **When** se la busca en el celular y en la computadora, **Then** está completa en los dos; ninguno es una versión recortada del otro.
 8. **Given** un cambio pensado para la computadora, **When** se comparan capturas de todas las pantallas del celular de antes y de después, **Then** son iguales; y lo mismo al revés.
 9. **Given** una ventana de la computadora que se achica, o una tablet que se gira, **When** cambia el ancho, **Then** la app se sigue pudiendo usar completa en el ancho nuevo.
+10. **Given** cualquier pantalla, en el celular o en la computadora, **When** muestra una cantidad (de una venta, un cambio, el stock, un conteo, una compra o un pedido), **Then** va con su unidad abreviada como en todas partes: «3 un.», «1,5 kg», «2 m», «0,5 L» (decisiones 106 y 144).
 
 ---
 

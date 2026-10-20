@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
+import { conUnidad } from "../../unidades";
 import { usePuede } from "../permisos";
 import { anularCompra, useComprasRecientes, type CompraFila } from "../../negocio/compras";
 import { fecha, pesos } from "../../formato";
@@ -71,7 +72,7 @@ function Lista({ version, enLinea, esCelular, alAnular }: { version: number; enL
                     <div className="compras-abierta">
                       <ul className="compras-items">
                         {c.items.map((i, n) => (
-                          <li key={n}><span>{cifra(Number(i.cantidad))} × {i.descripcion}<span className="detalle"> · {pesos(i.costo_unitario)} c/u</span></span><strong>{pesosCortos(Number(i.cantidad) * Number(i.costo_unitario))}</strong></li>
+                          <li key={n}><span>{conUnidad(i.cantidad, i.unidad)} {i.descripcion}<span className="detalle"> · {pesos(i.costo_unitario)} c/u</span></span><strong>{pesosCortos(Number(i.cantidad) * Number(i.costo_unitario))}</strong></li>
                         ))}
                       </ul>
                       {!anulada && anula && <Boton variante="peligro" icono="basura" onClick={() => setAnulando(c)} data-testid="anular">Anular esta compra</Boton>}
@@ -107,7 +108,7 @@ function Lista({ version, enLinea, esCelular, alAnular }: { version: number; enL
                     {abierta && c.items.map((i, n) => (
                       <tr key={n} className="hija">
                         <td />
-                        <td colSpan={3}>{cifra(Number(i.cantidad))} × {i.descripcion}</td>
+                        <td colSpan={3}>{conUnidad(i.cantidad, i.unidad)} {i.descripcion}</td>
                         <td className="num detalle">{pesos(i.costo_unitario)} c/u</td>
                         <td className="num">{pesosCortos(Number(i.cantidad) * Number(i.costo_unitario))}</td>
                         <td />

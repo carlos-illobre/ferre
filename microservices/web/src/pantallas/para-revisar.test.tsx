@@ -43,10 +43,10 @@ describe("Para revisar", () => {
     expect(ana.textContent).toContain("sesión cerrada el 17/10 a las 09:12 · desde «celular del mostrador»");
     const [venta, ajuste] = within(ana).getAllByTestId("apartado");
     expect(venta!.textContent).toContain("Venta · $27.000 · Efectivo");
-    expect(venta!.textContent).toContain("2 × Candado bronce 40 mm — $22.000");
+    expect(venta!.textContent).toContain("2 un. Candado bronce 40 mm — $22.000");
     expect(venta!.textContent).toContain("Cobrada el 17/10 a las 08:47 · llegó a las 10:05");
     expect(ajuste!.textContent).toContain("Ajuste de stock · Thinner sello de oro");
-    expect(ajuste!.textContent).toContain("Hay 6 · «conté la estantería»");
+    expect(ajuste!.textContent).toContain("Hay 6 un. · «conté la estantería»");
     expect(screen.getByRole("region", { name: "Beto" })).toBeTruthy();
   });
 
@@ -102,7 +102,7 @@ describe("Para revisar", () => {
   it("cada tipo de cambio se cuenta con las palabras del negocio", () => {
     const base = { ...de, id: "x", hecho_en: "2026-10-17T08:00:00", error: null };
     expect(describir({ ...base, tipo: "producto.cambio", metodo: "PATCH", ruta: "/productos/p1", producto: "Mecha 6 mm", cuerpo: { margen_elegido: 50 } } as never)).toMatchObject({ titulo: "Cambio de producto", resumen: "Mecha 6 mm", renglones: ["Margen 50 %"] });
-    expect(describir({ ...base, tipo: "conteo.renglon", metodo: "PUT", ruta: "/conteos/c/renglones/p1", producto: "Mecha 6 mm", cuerpo: { cantidad: 4 } } as never)).toMatchObject({ titulo: "Conteo", renglones: ["Contó 4"] });
+    expect(describir({ ...base, tipo: "conteo.renglon", metodo: "PUT", ruta: "/conteos/c/renglones/p1", producto: "Mecha 6 mm", cuerpo: { cantidad: 4 } } as never)).toMatchObject({ titulo: "Conteo", renglones: ["Contó 4 un."] });
     expect(describir({ ...base, tipo: "consulta", metodo: "POST", ruta: "/consultas", cuerpo: { items: [{ descripcion: "Disco 115", precio_ofrecido: 3200 }] } } as never)).toMatchObject({ titulo: "No llevó", renglones: ["Disco 115 · ofrecido a $3.200"] });
   });
 });

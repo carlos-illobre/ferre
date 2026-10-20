@@ -183,7 +183,7 @@ describe("Vender (v2)", () => {
     agregar("mecha vender");
     fireEvent.change(within(item("MECHA")).getByTestId("cantidad"), { target: { value: "4" } });
     const filas = [...screen.getByTestId("de-donde-sale").querySelectorAll("dl > div")].map((f) => f.textContent);
-    expect(filas).toEqual(["Costo · Proveedor uno, lista del 11/08$1.000,00", "+ margen 100 %$2.000", "+ IVA 21 %$2.420", "Precio, para arriba a $1.000$3.000", "× 4$12.000"]);
+    expect(filas).toEqual(["Costo · Proveedor uno, lista del 11/08$1.000,00", "+ margen 100 %$2.000", "+ IVA 21 %$2.420", "Precio, para arriba a $1.000$3.000", "× 4 un.$12.000"]);
     expect(screen.getByTestId("de-donde-sale").textContent).toContain("Total del renglón$12.000");
   });
 

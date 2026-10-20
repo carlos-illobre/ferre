@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { abreviarUnidad, conUnidad } from "../unidades";
 import { api } from "../api";
 import { busquedaAlDia, esperarBusqueda, traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
@@ -26,7 +27,7 @@ const pesos = (n: number) => "$" + Math.round(n).toString().replace(/\B(?=(\d{3}
 const dia = (iso: string) => new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 const mensajeDe = (e: unknown, quehacer: string) => ((e as { estado?: number }).estado ? `${(e as Error).message}.` : `Sin conexión: ${quehacer} necesita internet.`);
 const granel = (unidad: string) => unidad !== "unidad";
-export const cantidadConUnidad = (cantidad: number, unidad: string) => `${String(cantidad).replace(".", ",")}${granel(unidad) ? ` ${unidad === "l" ? "L" : unidad}` : ""}`;
+export const cantidadConUnidad = (cantidad: number, unidad: string) => conUnidad(cantidad, unidad);
 const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
 
 // El mensaje que recibe el proveedor: el negocio, la fecha y, por renglón, cantidad,
@@ -268,7 +269,7 @@ function Cantidad({ valor, unidad, nombre, alCambiar }: { valor: number; unidad:
       <button type="button" onClick={() => alCambiar(Math.max(paso, Math.round((valor - paso) * 10) / 10))} aria-label={`Una menos de ${nombre}`}>−</button>
       <input inputMode="decimal" value={texto} onChange={(e) => setTexto(e.target.value)} onBlur={(e) => fijar(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
         aria-label={`Cantidad de ${nombre}${granel(unidad) ? `, en ${unidad}` : ""}`} data-testid="cantidad-pedido" />
-      {granel(unidad) && <span className="pd-unidad">{unidad === "l" ? "L" : unidad}</span>}
+      <span className="pd-unidad">{abreviarUnidad(unidad)}</span>
       <button type="button" onClick={() => alCambiar(Math.round((valor + paso) * 10) / 10)} aria-label={`Una más de ${nombre}`}>+</button>
     </span>
   );

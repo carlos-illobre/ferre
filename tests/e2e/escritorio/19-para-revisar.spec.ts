@@ -89,7 +89,7 @@ test("014-E01 014-E06 014-E14 una venta sin mandar de Ana, desactivada, sube apa
   await expect(pestanas).toHaveText(["Para revisar1", "Anotadas"]);
   const tarjeta = page.getByRole("region", { name: "Ana apartados E2E" }).getByTestId("apartado");
   await expect(tarjeta).toContainText("Venta · $22.000 · Efectivo");
-  await expect(tarjeta).toContainText("2 × Candado apartado (E2E)");
+  await expect(tarjeta).toContainText("2 un. Candado apartado (E2E)");
   await tarjeta.getByTestId("aceptar-apartado").click();
   await expect(page.getByTestId("nada-para-revisar")).toBeVisible();
 

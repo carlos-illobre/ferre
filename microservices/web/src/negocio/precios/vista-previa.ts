@@ -52,7 +52,7 @@ export function subtotalDeRenglon(entrada: { precioUnitario: number; cantidad: n
   const { precioUnitario, cantidad } = entrada;
   const bruto = Math.round(precioUnitario * cantidad * 100) / 100;
   const valor = entrada.aMano ? bruto : redondear(bruto);
-  const cuanto = `${String(cantidad).replace(".", ",")}${entrada.unidad ? ` ${entrada.unidad === "unidad" ? "unidades" : entrada.unidad}` : ""}`;
+  const cuanto = `${String(cantidad).replace(".", ",")}${entrada.unidad ? ` ${entrada.unidad === "unidad" ? "un." : entrada.unidad === "l" ? "L" : entrada.unidad}` : ""}`;
   const pasos: string[] = [];
   if (cantidad !== 1) pasos.push(`× ${cuanto} = ${pesos(bruto)}`);
   if (valor !== bruto) pasos.push(`Redondeado para arriba a ${pesos(valor)} (múltiplo de ${pesos(PASO_DE_REDONDEO)}) para no dar vuelto`);

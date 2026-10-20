@@ -11,7 +11,7 @@ import { enviarOEncolar, enviarPendientes } from "../../cola";
 import { contarAlEspejo } from "../../espejo";
 import { pesos, pesosCortos } from "../../formato";
 import type { Producto } from "../../producto";
-import { cantidadValida, type Unidad } from "../../unidades";
+import { cantidadValida, conUnidad, type Unidad } from "../../unidades";
 import { agregarALaVenta, ponerCliente, ponerItems, ponerMedio, useVentaEnCurso, vaciarVenta, type Item } from "./venta-en-curso";
 export type { Item };
 
@@ -67,7 +67,7 @@ export function cuentaDelRenglon(item: Item, veCostos: boolean): { filas: FilaDe
     filas.push({ texto: "Precio, para arriba a $1.000", valor: pesosCortos(p.unitario) });
   } else filas.push({ texto: "Precio", valor: pesosCortos(p.unitario) });
   const bruto = Math.round(p.unitario * item.cantidad * 100) / 100;
-  if (item.cantidad !== 1) filas.push({ texto: `× ${String(item.cantidad).replace(".", ",")}${item.unidad === "unidad" ? "" : ` ${item.unidad}`}`, valor: pesosCortos(bruto) });
+  if (item.cantidad !== 1) filas.push({ texto: `× ${conUnidad(item.cantidad, item.unidad)}`, valor: pesosCortos(bruto) });
   if (renglon.valor !== bruto) filas.push({ texto: "Para arriba a $1.000, para no dar vuelto", valor: pesosCortos(renglon.valor) });
   return { filas, total: renglon.valor };
 }

@@ -52,7 +52,7 @@ test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) =>
   await expect(movimientos).toContainText("Compra");
   await expect(movimientos).toContainText("+20");
   await expect(movimientos).toContainText("-3");
-  await expect(page.getByText("Stock 17 = suma de estos movimientos")).toBeVisible();
+  await expect(page.getByText("Stock 17 un. = suma de estos movimientos")).toBeVisible();
 
   // Corregir: "hay 15", con motivo. Queda un ajuste de −2 explicado.
   await fila.getByRole("button", { name: "Corregir" }).click();

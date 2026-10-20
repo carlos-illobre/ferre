@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { conUnidad } from "../../unidades";
 import { usePuede } from "../permisos";
 import { VerComprobante } from "../FotoDeFactura";
 import { anularCompra, nombreDelComprobante, useComprasRecientes, type CompraFila } from "../../negocio/compras";
@@ -39,7 +40,7 @@ export function ComprasRecientes({ soloVer = false }: { soloVer?: boolean } = {}
                 <div style={{ padding: "0 16px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
                   {c.foto && <div style={{ display: "flex", alignItems: "center", gap: 12 }}><VerComprobante ruta={c.foto} /><small>Tocá la foto para leer el número o cualquier otro dato del comprobante.</small></div>}
                   <div className="movimientos">
-                    {c.items.map((i, n) => <div key={n}><span>{Number(i.cantidad)} ×</span><span>{i.descripcion}</span><strong className="importe" style={{ fontSize: 16 }}>{pesos(Number(i.cantidad) * Number(i.costo_unitario))}</strong></div>)}
+                    {c.items.map((i, n) => <div key={n}><span>{conUnidad(i.cantidad, i.unidad)}</span><span>{i.descripcion}</span><strong className="importe" style={{ fontSize: 16 }}>{pesos(Number(i.cantidad) * Number(i.costo_unitario))}</strong></div>)}
                   </div>
                   {!anulada && anula && <button type="button" className="boton texto" onClick={() => anular(c)}>Anular esta compra</button>}
                 </div>

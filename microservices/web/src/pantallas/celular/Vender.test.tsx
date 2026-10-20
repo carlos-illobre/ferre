@@ -106,7 +106,7 @@ describe("Vender", () => {
     expect(pasos).toContain("+ 100 % de margen");
     expect(pasos).toContain("+ IVA 21 %");
     expect(pasos).toContain("Redondeado para arriba a $3.000,00");
-    expect(pasos).toContain("× 3 unidades = $9.000,00");
+    expect(pasos).toContain("× 3 un. = $9.000,00");
     expect(pasos).toContain("Total del renglón: $9.000,00");
   });
 

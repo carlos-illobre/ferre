@@ -148,6 +148,10 @@ export const actualizarVenta = (e: Ejecutor, id: string, v: { total: number; med
   e.updateTable("venta").set({ total: v.total.toFixed(2), medio_pago: v.medio_pago, cliente_id: v.cliente_id }).where("id", "=", id).execute();
 
 // Un movimiento de stock por una corrección o un cambio: positivo vuelve, negativo sale.
+// La unidad en que se vende un producto («unidad», «kg», «m», «l»), para los textos de las anomalías.
+export const unidadDe = async (e: Ejecutor, productoId: string): Promise<string> =>
+  (await e.selectFrom("producto").select("unidad").where("id", "=", productoId).executeTakeFirst())?.unidad ?? "unidad";
+
 export const moverStock = (e: Ejecutor, m: { producto_id: string; cantidad: number; tipo: "correccion" | "cambio"; venta_id: string; nota: string }) =>
   e.insertInto("movimiento_stock").values({ id: randomUUID(), producto_id: m.producto_id, tipo: m.tipo, cantidad: m.cantidad, referencia_tipo: "venta", referencia_id: m.venta_id, fecha: sql<Date>`now()`, nota: m.nota }).execute();
 

@@ -91,7 +91,7 @@ describe("Depósito · Ingreso", () => {
     const compra = await screen.findByTestId("compra-reciente");
     expect(compra.textContent).not.toContain("CINTA AISLADORA");
     fireEvent.click(within(compra).getAllByRole("button")[0]!);
-    expect(compra.textContent).toContain("10 ×");
+    expect(compra.textContent).toContain("10 un.");
     expect(compra.textContent).toContain("CINTA AISLADORA");
     expect(compra.textContent).toContain("$12.000,00");
     expect(compra.textContent).toContain("PINCEL NUEVO");
@@ -118,7 +118,7 @@ describe("Depósito · Stock", () => {
     expect(within(fila).getByTestId("stock").textContent).toContain("17 un.");
     fireEvent.click(within(fila).getByTestId("stock"));
     await screen.findByTestId("movimientos");
-    expect(fila.textContent).toContain("Stock 17 = suma de estos movimientos");
+    expect(fila.textContent).toContain("Stock 17 un. = suma de estos movimientos");
     expect(screen.getByTestId("movimientos").textContent).toContain("+20");
     fireEvent.click(within(fila).getByTestId("corregir"));
     fireEvent.change(within(fila).getByTestId("cantidad-real"), { target: { value: "15" } });
