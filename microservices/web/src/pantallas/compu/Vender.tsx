@@ -649,7 +649,7 @@ function TarjetaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
 }
 
 // Cuenta corriente: el cliente se busca escribiendo; cada uno dice cuánto debe.
-function ElegirCliente({ clientes, elegido, alElegir, alCerrar, soloCuentaCorriente = true }: { clientes: Cliente[]; elegido: string; alElegir: (id: string) => void; alCerrar: () => void; soloCuentaCorriente?: boolean }) {
+export function ElegirCliente({ clientes, elegido, alElegir, alCerrar, soloCuentaCorriente = true }: { clientes: Cliente[]; elegido: string; alElegir: (id: string) => void; alCerrar: () => void; soloCuentaCorriente?: boolean }) {
   const [filtro, setFiltro] = useState("");
   const [marcado, setMarcado] = useState(0);
   const f = filtro.trim().toLowerCase();

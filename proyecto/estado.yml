@@ -1439,18 +1439,28 @@ RF-125:
   defectos: []
 
 RF-126:
-  estado: "Nuevo (019, especificación aprobada)"
-  pruebas: []
+  estado: "Hecho en parte: corregir en la computadora y en el servidor (019-T005, T006); falta el celular (T007)"
+  pruebas:
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
+    - microservices/web/src/negocio/ventas/correccion.test.ts
+    - microservices/api/src/rutas/ventas-corregir.test.ts
+    - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []
 
 RF-127:
-  estado: "Nuevo (019, especificación aprobada)"
-  pruebas: []
+  estado: "Hecho en parte: la diferencia y cómo se resuelve en la computadora y en el servidor (019-T004 a T006); falta el celular (T007)"
+  pruebas:
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
+    - microservices/web/src/negocio/ventas/correccion.test.ts
+    - microservices/api/src/rutas/ventas-corregir.test.ts
+    - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []
 
 RF-128:
-  estado: "Nuevo (019, especificación aprobada)"
-  pruebas: []
+  estado: "Hecho en parte: el servidor guarda lo de antes y lo de ahora y lo anota en Actividad, y la venta se ve «corregida»; falta mostrar lo anterior tachado en la venta guardada (019-T011)"
+  pruebas:
+    - microservices/api/src/rutas/ventas-corregir.test.ts
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
   defectos: []
 
 RF-129:
@@ -1469,8 +1479,10 @@ RF-131:
   defectos: []
 
 RF-132:
-  estado: "Nuevo (019, especificación aprobada)"
-  pruebas: []
+  estado: "Hecho en parte: «Ventas de hoy» en la computadora como la v2, con «Corregir» y «Anular» (019-T006); faltan «Cambio» y «Registrar un cambio» (T009) y el celular (T007, T010)"
+  pruebas:
+    - microservices/web/src/pantallas/compu/base/pantallas/Hoy.test.tsx
+    - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []
 
 RNF-62:

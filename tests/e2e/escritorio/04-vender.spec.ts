@@ -41,7 +41,7 @@ test.beforeAll(() => {
   psql(`INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, fecha, nota) VALUES (gen_random_uuid(), '${ID_MECHA}', 'ajuste', 10, 'conteo', now(), 'stock inicial e2e')`);
 });
 
-test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", async ({ page }) => {
+test("buscar, agregar, cobrar en efectivo, ver la venta del día, corregirla y anularla", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
@@ -102,23 +102,33 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect.poll(() => psql(`SELECT unidad FROM producto WHERE id = '${ID_TORNILLO}'`)).toBe("kg");
   await expect.poll(() => psql(`SELECT explicacion->'pasos'->>1 FROM item_venta WHERE producto_id = '${ID_MECHA}' ORDER BY creado_en DESC LIMIT 1`)).toContain("+ 100 % de margen");
 
-  // «Ventas de hoy», al lado de Vender (decisión 123): la venta está en el cajón de su medio; se
-  // abre con un clic y desde ahí se anula, con motivo y comentario. Anular devuelve el stock.
+  // «Ventas de hoy», al lado de Vender, como la v2 (decisión 135): la venta se elige en la tabla y
+  // se ve a la derecha. Se corrige ahí mismo (019): una mecha más, la diferencia se cobra en
+  // efectivo y el stock baja. Después se anula, con motivo y comentario, y el stock vuelve.
   await page.getByTestId("pestana-hoy").click();
-  const efectivo = page.getByTestId("ventas-de-hoy").getByTestId("cajon-efectivo");
-  const ultima = efectivo.getByTestId("venta-dia").filter({ hasText: "2 productos" }).first();
+  const lista = page.getByTestId("ventas-de-hoy-lista");
+  const ultima = lista.getByTestId("venta-dia").filter({ hasText: "2 productos" }).first();
   await expect(ultima).toBeVisible();
   await ultima.click();
-  const abierta = page.getByTestId("venta-abierta");
-  await expect(abierta.getByTestId("detalle-venta")).toContainText("MECHA VENDER");
-  await expect(abierta.getByTestId("detalle-venta")).toContainText("TORNILLO VENDER");
-  await abierta.getByTestId("anular").click();
-  await expect(page.getByTestId("confirmar-anular")).toContainText("−$11.000");
+  const panel = page.getByTestId("venta-elegida");
+  await expect(panel.getByTestId("detalle-venta")).toContainText(/mecha vender/i);
+  await expect(panel.getByTestId("detalle-venta")).toContainText(/tornillo vender/i);
+  await page.keyboard.press("e");
+  await panel.getByTestId("renglon-corregido").filter({ hasText: /mecha vender/i }).getByTestId("mas").click();
+  await expect(panel.getByTestId("diferencia")).toContainText("+$");
+  await page.keyboard.press("Control+Enter");
+  await expect(page.getByTestId("mensaje")).toContainText("Corrección guardada");
+  await expect(ultima).toContainText("corregida");
+  await expect.poll(() => psql(`SELECT count(*) FROM correccion_venta`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM movimiento_dinero WHERE tipo = 'cobro_diferencia' AND medio_pago = 'efectivo'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("6.000");
+  await panel.getByTestId("anular").click();
+  await expect(page.getByTestId("confirmar-anular")).toContainText("−$");
   await page.getByTestId("motivo-anular").selectOption("Se arrepintió");
   await page.getByTestId("comentario-anular").fill("cambió de idea");
   await page.getByTestId("confirmar-anular").click();
   await expect(page.getByTestId("hoja-anular")).toHaveCount(0);
-  await expect(efectivo.getByTestId("venta-dia").filter({ hasText: "anulada" }).first()).toBeVisible();
+  await expect(lista.getByTestId("venta-dia").filter({ hasText: "anulada" }).first()).toBeVisible();
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
 
   // La anomalía del tornillo se ve en Más > Anomalías.

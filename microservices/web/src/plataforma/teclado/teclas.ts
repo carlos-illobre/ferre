@@ -9,7 +9,7 @@ import { useEffect } from "react";
 // primero lo propio de la pantalla y, si la pantalla no usó la tecla, lo general de la
 // aplicación (`usarTeclasPorDefecto`: moverse con las flechas por lo que hay en pantalla).
 // Zonas que recorren las flechas por su cuenta (un menú, unas pestañas): con el foco ahí, las
-// teclas no llegan a la pantalla. Las dice cada aplicación.
+// teclas de moverse no llegan a la pantalla. Las dice cada aplicación.
 let zonasPropias: string | null = null;
 export function zonasConTeclasPropias(selector: string | null): void { zonasPropias = selector; }
 
@@ -20,9 +20,11 @@ let escuchando = false;
 
 function alTeclear(e: KeyboardEvent) {
   const objetivo = e.target as HTMLElement | null;
-  // Con el foco en el menú o en las pestañas, las flechas son para recorrerlos: no mueven
-  // también la lista de la pantalla.
-  if (e.defaultPrevented || (zonasPropias && objetivo?.closest?.(zonasPropias))) return;
+  // Con el foco en el menú o en las pestañas, las flechas (y Enter, Esc, Tab, espacio) son para
+  // recorrerlos: no mueven también la lista de la pantalla. Las letras sí llegan a la pantalla: al
+  // tocar una pestaña el foco queda en ella, y la E de «Corregir» tiene que andar igual.
+  const deLaZona = /^(Arrow|Enter$|Escape$|Tab$| $|Home$|End$)/.test(e.key);
+  if (e.defaultPrevented || (deLaZona && zonasPropias && objetivo?.closest?.(zonasPropias))) return;
   const enCampo = Boolean(objetivo && (objetivo.tagName === "INPUT" || objetivo.tagName === "SELECT" || objetivo.tagName === "TEXTAREA" || objetivo.isContentEditable));
   for (const m of [...deLasPantallas]) { if (!enCampo || objetivo === m.excepto) m.manejar(e); }
   if (!e.defaultPrevented) porDefecto?.(e);

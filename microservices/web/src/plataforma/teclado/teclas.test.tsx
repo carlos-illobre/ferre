@@ -33,4 +33,16 @@ describe("useTeclasGlobales", () => {
     fireEvent.keyDown(getByText("b"), { key: "ArrowDown" });
     expect(manejar).toHaveBeenCalledTimes(1);
   });
+
+  it("019-E01: con el foco en una pestaña (recién tocada), las letras sí llegan a la pantalla: la E corrige", () => {
+    zonasConTeclasPropias(".lateral, .pestanas");
+    const manejar = vi.fn();
+    const { getByText } = render(<><nav className="pestanas"><button>Ventas de hoy</button></nav><Prueba manejar={manejar} exceptoBusqueda={true} /></>);
+    fireEvent.keyDown(getByText("Ventas de hoy"), { key: "e" });
+    fireEvent.keyDown(getByText("Ventas de hoy"), { key: "Delete" });
+    expect(manejar).toHaveBeenCalledTimes(2);
+    fireEvent.keyDown(getByText("Ventas de hoy"), { key: "Enter" });
+    fireEvent.keyDown(getByText("Ventas de hoy"), { key: "ArrowLeft" });
+    expect(manejar).toHaveBeenCalledTimes(2);
+  });
 });

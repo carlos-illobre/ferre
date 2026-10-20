@@ -74,7 +74,9 @@ export function useResumenDelDia(dia: string | null, ahora: Date = new Date()) {
   const resumen = ventas ? resumenDelDia(ventas) : null;
   const barras = ventas ? porHora(ventas, esHoy ? ahora.getHours() : null) : [];
   const comparacion = resumen && anterior.datos ? comparar(resumen.total, totalHasta(anterior.datos.ventas, minuto)) : null;
+  // Lo del día anterior en cada hora, para marcarlo en la barra (la raya punteada de la v2).
+  const anteriorPorHora = new Map((anterior.datos ? porHora(anterior.datos.ventas) : []).map((b) => [b.hora, b.total]));
   // De la más reciente a la más vieja.
   const lista = ventas ? [...ventas].sort((a, b) => b.fecha.localeCompare(a.fecha)) : null;
-  return { esHoy, dia: elegido ?? hoyLocal(), diaAnterior: diaAnterior(elegido ?? hoyLocal()), ventas: lista, resumen, barras, comparacion, error: delDia.error, cargando: delDia.cargando };
+  return { esHoy, dia: elegido ?? hoyLocal(), diaAnterior: diaAnterior(elegido ?? hoyLocal()), ventas: lista, resumen, barras, anteriorPorHora, comparacion, error: delDia.error, cargando: delDia.cargando };
 }

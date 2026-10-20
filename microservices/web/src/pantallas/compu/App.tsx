@@ -233,7 +233,7 @@ function Pantallas() {
       if (e.key !== "ArrowLeft" || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       if (document.querySelector("dialog[open], [role='dialog'], [aria-modal='true']")) return;
       const foco = document.activeElement as HTMLElement | null;
-      // Una zona que recorre sus flechas por su cuenta (los cajones de Ventas de hoy) usa ← para ella.
+      // Una zona que recorre sus flechas por su cuenta (la tabla de Ventas de hoy) usa ← para ella.
       if (foco?.closest(".lateral, .pestanas, [data-flechas-propias]")) return;
       // Con el cursor en un campo, ← es del campo: las flechas nunca sacan el cursor (decisión 130).
       if (foco instanceof HTMLInputElement || foco instanceof HTMLTextAreaElement || foco instanceof HTMLSelectElement) return;

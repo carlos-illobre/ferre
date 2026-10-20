@@ -54,24 +54,41 @@ Vender (decisión 119):
   desplegable, el comentario y «Cancelar» / «Anular · −$20.000». Una anulada dice cuándo y por
   qué se anuló.
 
-## En la computadora, los cuatro cajones (decisión 122, historia 5)
+## En la computadora, «El día y la venta» (decisión 135)
 
-Maqueta aprobada por Carlos el 2026-10-19: `maquetas/compu-ventas-de-hoy-elegida.png` (la v4 del
-director de arte, dentro del menú). Las pestañas de Vender en la computadora son «Vender» y «Ventas de
-hoy», como en el celular (decisión 120):
+Reemplaza a los cuatro cajones (decisión 122): Carlos eligió la v2 del director de arte, variante «El
+día y la venta» (maqueta «ventas-de-hoy · compu · variante-1-el-dia»), sin
+sumarle nada de las otras. Las pestañas siguen siendo «Vender» y «Ventas de hoy» (decisión 120):
 
-- Arriba a la derecha, «Buscar una venta» (Ctrl+K) y «Otro día» (F).
-- El día, el total, la comparación, ventas, productos y ticket promedio; a la derecha, lo vendido por
-  hora con cada barra apilada por medio de pago.
-- Debajo, cuatro columnas, una por medio de pago (los cajones de la caja), con su total y cuántas
-  ventas; cada venta en una tarjeta con el producto o «3 productos» (o el cliente, en cuenta
-  corriente), el importe, la hora y lo que lleva. Las anuladas, punteadas y tachadas.
-- ← → cambian de cajón, ↑ ↓ de venta, Enter la abre, A la anula. No se arrastra: el medio de una
-  venta no se cambia desde acá. Esas teclas no se explican en una línea en la pantalla (decisión 126).
-- Abierta, una ventana con sus productos, el total y «Anular» (A), que pide confirmar con el motivo en
-  una lista y el comentario (Ctrl+Enter confirma, el botón dice cuánto se descuenta).
-- Buscando, el resumen se esconde y queda el campo, cuántas coinciden y cuánto suman; lo que
-  coincide se resalta. Esc borra y, vacío, sale.
+- Arriba a la derecha, «Cambiar fecha» (F) y, cuando esté el cambio de producto (019), «Registrar
+  un cambio» (Alt+C).
+- Una tarjeta con el día en tres partes: el total, la comparación y ventas, productos y ticket
+  promedio; lo vendido por hora, con una raya punteada en cada barra que marca lo de ayer a esa
+  hora y la hora actual resaltada con su importe en un globo (señalar otra barra muestra el
+  suyo); y los cuatro medios de pago, cada uno con su ícono, cuántas ventas y cuánto.
+- Debajo, a la izquierda, los filtros «Todas», «Cta. cte.» y «Anuladas» con cuántas hay (y
+  «Cambios», con el cambio de producto) y el buscador por producto, importe o cliente (/ o Ctrl+K);
+  lo que coincide se resalta. Esc borra y, vacío, sale. Debajo, la tabla del día: hora, el ícono del
+  medio, qué se llevó («1 × Martillo…» o «3 productos» con los primeros nombres), quién o cómo
+  (el cliente, o el medio) y el total. La anulada, tachada con «anulada»; la corregida, con
+  «corregida».
+- A la derecha, la venta elegida: el medio, el cliente o lo que se llevó, la hora; «debe» si es a
+  cuenta corriente sin pagar; sus productos con foto, cantidad, precio y subtotal; el total; y
+  «Corregir» (E) y «Anular» (Supr; también A, como antes), con la tecla en el botón (y «Cambio»
+  (C) con el cambio de producto). Debajo, si tuvo correcciones. La anulada no tiene botones: dice
+  que se anuló y que el stock volvió.
+- «Corregir» edita la venta en el mismo panel (019, historia 1): cada renglón con − + y su precio,
+  que se toca para escribir otro, y el tacho para quitarlo; «Agregar un producto»; el medio de pago
+  y, en cuenta corriente, el cliente. Lo que cambió queda con el valor anterior tachado; el total
+  nuevo con el anterior tachado y la diferencia en una pastilla («+$3.000»); debajo, cómo se
+  resuelve: con qué medio se cobra (Efectivo elegido), que se devuelve en efectivo o que cambia
+  la deuda. «Descartar» (Esc) y «Guardar corrección · +$3.000» (Ctrl+Enter).
+- ↑ ↓ eligen la venta, sin dejar el buscador. E, Supr, F y / andan apenas se abre la pantalla,
+  aunque el foco haya quedado en la pestaña recién tocada (en el menú y las pestañas solo las
+  flechas, Enter, Esc y Tab son de ellos). Las teclas no se explican en una línea en la pantalla
+  (decisión 126): están en sus botones.
+- Anular sigue igual: confirma con el motivo en una lista y el comentario (Ctrl+Enter confirma, el
+  botón dice cuánto se descuenta).
 
 ## Colores de los medios de pago (decisión 108)
 
@@ -85,6 +102,6 @@ toda la aplicación. Igual que ayer, la comparación dice «0 %» sin flecha y s
 
 - Las palabras del negocio: «ticket promedio», «Cuenta corriente», «vs. ayer a esta hora». Cumple.
 - Lo mismo en el celular y en la computadora, con textos compartidos (decisión 47). Cumple.
-- Todo con el teclado en la computadora. Cumple: flechas, Enter y «F».
+- Todo con el teclado en la computadora. Cumple: ↑ ↓, E, Supr, F, / y Ctrl+Enter.
 - Funciona sin conexión: hoy, con lo último que se bajó; otro día lo dice. Cumple.
 - Colores: solo en elementos puntuales con significado, iguales en toda la aplicación (decisión 108). Cumple.
