@@ -9,6 +9,21 @@ export async function stockDe(e: Ejecutor, productoId: string): Promise<number> 
   return Number(fila?.stock ?? 0);
 }
 
+// El stock de unos productos puntuales: los de una página de la búsqueda (specs/018). Los que
+// nunca tuvieron movimientos no vienen.
+export async function stockDeProductos(e: Ejecutor, ids: readonly string[]): Promise<Record<string, string>> {
+  if (ids.length === 0) return {};
+  const filas = await e.selectFrom("movimiento_stock").select(["producto_id", sql<string>`SUM(cantidad)::text`.as("stock")])
+    .where("producto_id", "in", ids).groupBy("producto_id").execute();
+  return Object.fromEntries(filas.map((f) => [f.producto_id, f.stock]));
+}
+
+// Qué productos tienen stock, para el filtro «con stock» / «sin stock» del Catálogo (specs/018).
+export async function productosConStock(e: Ejecutor): Promise<Set<string>> {
+  const filas = await e.selectFrom("movimiento_stock").select("producto_id").groupBy("producto_id").having(sql`SUM(cantidad)`, ">", 0).execute();
+  return new Set(filas.map((f) => f.producto_id));
+}
+
 export type FilaDeStock = { id: string; stock: string; costo_neto: string | null; proveedor: string | null; valor: string; ultimo_movimiento: Date | null };
 
 // Cada producto activo con movimientos: su stock, su costo vigente (el del proveedor preferido,

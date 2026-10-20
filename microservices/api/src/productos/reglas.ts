@@ -1,9 +1,12 @@
+import { base } from "../base.js";
 import { pool } from "../db.js";
+import { productosConStock, stockDeProductos } from "../deposito/datos.js";
 import { registrarEvento } from "../eventos.js";
 import { preciosDeUnProducto } from "../precios.js";
+import * as copia from "./copia.js";
 import * as datos from "./datos.js";
 import type { z } from "zod";
-import type { FotoSubida, ProductoDelCatalogo } from "../contratos/productos.js";
+import type { FotoSubida, PaginaDeProductos, ProductoDelCatalogo } from "../contratos/productos.js";
 import type { cambiosDeProducto } from "./esquemas.js";
 
 export { normalizarBusqueda, type ProductoCatalogo } from "./datos.js";
@@ -20,7 +23,40 @@ export function conPrecio<T extends { costo_neto: string | null; iva: string | n
   return { ...p, precio: precio?.valor ?? null, explicacion_precio: precio?.pasos ?? [], margen_del_precio: precio ? p.margen_elegido : null, precios: porMargen };
 }
 
-export const catalogo = async (q: datos.FiltrosDelCatalogo): Promise<ProductoDelCatalogo[]> => (await datos.catalogo(q)).map(conPrecio);
+// Lo que el dispositivo recibe de una fila de la copia: sin lo que la copia usa para buscar.
+const comoProducto = ({ vigente: _v, codigos: _c, ...p }: datos.FilaDeLaCopia): ProductoDelCatalogo => conPrecio(p);
+
+// Los valores que llegan en la consulta, recortados como siempre: hasta 300 identificadores con
+// forma de UUID; `desde` desde cero; `limite` hasta su tope.
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const idsDe = (ids: string | undefined) => (ids === undefined ? undefined : ids.split(",").map((x) => x.trim()).filter((x) => UUID.test(x)).slice(0, 300));
+const entero = (texto: string | undefined, si: number, tope: number) => { const n = Math.floor(Number(texto)); return Number.isFinite(n) && n >= 0 ? Math.min(n, tope) : si; };
+
+export type ConsultaDelCatalogo = { limite?: string; desde?: string; buscar?: string; codigo?: string; ids?: string; marca?: string; disponibilidad?: string };
+
+// GET /productos: lo de siempre, para la aplicación de la versión anterior mientras se actualiza
+// (specs/018): todo, o de a tandas, desde la copia.
+export function catalogo(q: ConsultaDelCatalogo): ProductoDelCatalogo[] {
+  const filas = copia.buscar({ buscar: q.buscar, codigo: q.codigo, ids: idsDe(q.ids) });
+  const limite = entero(q.limite, 0, 20_000);
+  const desde = entero(q.desde, 0, 10_000_000);
+  return (limite > 0 ? filas.slice(desde, desde + limite) : filas).map(comoProducto);
+}
+
+// GET /productos/pagina (specs/018, RF-122): solo lo encontrado, de a 50 (hasta 200), con el stock
+// de esa página, lo único que se lee de la base. El filtro de stock lee qué productos tienen.
+export async function pagina(q: ConsultaDelCatalogo): Promise<PaginaDeProductos> {
+  const disponibilidad = q.disponibilidad === "con-stock" || q.disponibilidad === "sin-stock" ? q.disponibilidad : null;
+  const stock = disponibilidad ? { hay: disponibilidad === "con-stock", conStock: await productosConStock(base) } : null;
+  const filas = copia.buscar({ buscar: q.buscar, codigo: q.codigo, ids: idsDe(q.ids), marca: q.marca?.trim() || null, stock });
+  const limite = Math.max(1, entero(q.limite, 50, 200));
+  const desde = entero(q.desde, 0, 10_000_000);
+  const productos = filas.slice(desde, desde + limite);
+  return { productos: productos.map(comoProducto), stock: await stockDeProductos(base, productos.map((p) => p.id)), hay_mas: desde + limite < filas.length };
+}
+
+// GET /productos/marcas: las marcas para el filtro del Catálogo, sin repetir y en orden.
+export const marcas = (): readonly string[] => copia.marcas();
 
 export type CambiosValidados = z.output<typeof cambiosDeProducto>;
 

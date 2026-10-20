@@ -42,7 +42,9 @@ describe("la última lectura del código (RF-112)", () => {
   });
 
   it("016-E10: el catálogo trae la última lectura de cada producto", async () => {
-    await pedir(app, "GET", "/productos?limite=10", { rol: "mostrador" });
+    const { leerCatalogoEntero } = await import("../productos/datos.js");
+    base.actual.programar(/pg_snapshot_xmin/, { rows: [{ marca: "10", tope: "12" }] });
+    await leerCatalogoEntero();
     expect(base.actual.sqlDe(/FROM producto p/).at(-1)!.sql).toMatch(/p\.codigo_leido_en/);
   });
 });

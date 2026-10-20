@@ -23,6 +23,14 @@ export type ProductoDelCatalogo = {
   precio: number | null; explicacion_precio: string[]; margen_del_precio: number | null; precios: Record<string, number> | null;
 };
 
+// GET /productos/pagina?buscar=&codigo=&ids=&marca=&disponibilidad=&desde=&limite= (specs/018): solo
+// los productos de esa consulta, de a 50, con el stock de cada uno (los que nunca tuvieron
+// movimientos no vienen) y si hay más.
+export type PaginaDeProductos = { productos: ProductoDelCatalogo[]; stock: Record<string, string>; hay_mas: boolean };
+
+// GET /productos/marcas: las marcas del catálogo, sin repetir y en orden alfabético.
+export type MarcasDelCatalogo = string[];
+
 // PATCH /productos/:id: lo único que se cambia de un producto desde la aplicación. La forma
 // sale de la validación del servidor (decisión 89).
 export type CambiosDeProducto = z.input<typeof cambiosDeProducto>;

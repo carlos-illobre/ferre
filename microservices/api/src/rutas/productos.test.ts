@@ -7,21 +7,98 @@ const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof im
 vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
-describe("GET /productos", () => {
-  beforeEach(() => { base.actual = baseFalsa(); });
+// El catálogo sale de la copia del servidor (specs/018, RF-122, RF-124): ninguna búsqueda lee
+// productos de la base; de la base se lee solo el stock de la página.
+const { cargarParaPrueba } = await import("../productos/copia.js");
+const ID = (n: number) => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+const CATALOGO = [
+  { id: ID(1), descripcion: "Tornillo autoperforante 8 x 1", marca: "Fischer", codigo_barras: "7790000000011", codigos: ["TA-81"] },
+  { id: ID(2), descripcion: "Mecha 8 mm madera", marca: "Bosch", codigo_barras: null, codigos: ["VIEJO8", "M8"] },
+  { id: ID(3), descripcion: "Mecha 8 mm acero rápido HSS", marca: "bosch", codigo_barras: "7790000000035", codigos: [] },
+  { id: ID(4), descripcion: "Cinta métrica 5 m", marca: null, codigo_barras: null, codigos: [] },
+  { id: ID(5), descripcion: "Taladro (dado de baja)", marca: "Bosch", vigente: false },
+  ...Array.from({ length: 120 }, (_, i) => ({ id: ID(100 + i), descripcion: `Tuerca ${String(i).padStart(3, "0")}`, marca: "Genérica", codigo_barras: null, codigos: [] })),
+];
+const productosDeLaBase = () => base.actual.sqlDe(/FROM producto|precio_proveedor/);
+type Pagina = { productos: { id: string; descripcion: string; precio: number | null }[]; stock: Record<string, string>; hay_mas: boolean };
+const pagina = async (consulta: string, rol: "mostrador" | null = "mostrador") => (await pedir(app, "GET", `/productos/pagina${consulta}`, { rol })).json() as Promise<Pagina>;
 
-  it("sin `limite` pide el catálogo entero; con `limite` y `desde`, solo esa tanda y en orden estable", async () => {
-    await pedir(app, "GET", "/productos");
-    await pedir(app, "GET", "/productos?limite=60&desde=120");
-    const [entero, tanda] = base.actual.consultas.filter((q) => /FROM producto p/.test(q.sql));
-    expect(entero!.sql).not.toMatch(/OFFSET/);
-    expect(tanda!.sql).toMatch(/ORDER BY p\.descripcion, p\.id LIMIT \$1 OFFSET \$2/);
-    expect(tanda!.params).toEqual([60, 120]);
+describe("GET /productos/pagina", () => {
+  beforeEach(() => {
+    base.actual = baseFalsa();
+    cargarParaPrueba(CATALOGO);
+    base.actual.programar(/from "movimiento_stock".*group by "producto_id"$/i, { rows: [{ producto_id: ID(2), stock: "12" }] });
   });
 
-  it("un `limite` que no es un número se ignora", async () => {
-    await pedir(app, "GET", "/productos?limite=abc");
-    expect(base.actual.consultas.find((q) => /FROM producto p/.test(q.sql))!.sql).not.toMatch(/OFFSET/);
+  it("018-E01 018-E14: los primeros 50 en orden alfabético, con el stock de esa página; ningún producto se lee de la base", async () => {
+    const r = await pagina("");
+    expect(r.productos).toHaveLength(50);
+    expect(r.productos.slice(0, 3).map((p) => p.descripcion)).toEqual(["Cinta métrica 5 m", "Mecha 8 mm acero rápido HSS", "Mecha 8 mm madera"]);
+    expect(r.productos.some((p) => p.id === ID(5))).toBe(false);
+    expect(r.stock).toEqual({ [ID(2)]: "12" });
+    expect(r.hay_mas).toBe(true);
+    expect(productosDeLaBase()).toHaveLength(0);
+    const stock = base.actual.sqlDe(/movimiento_stock/);
+    expect(stock).toHaveLength(1);
+    expect(stock[0]!.params).toHaveLength(50);
+  });
+
+  it("018-E02: los siguientes desde donde quedó; al final, ninguno más", async () => {
+    const segunda = await pagina("?desde=50");
+    expect(segunda.productos[0]!.descripcion).toBe("Tuerca 046");
+    const ultima = await pagina("?desde=100");
+    expect(ultima.productos).toHaveLength(24);
+    expect(ultima.hay_mas).toBe(false);
+    expect((await pagina("?limite=5000")).productos).toHaveLength(124); // hasta 200 por página
+    expect((await pagina("?limite=abc")).productos).toHaveLength(50);
+  });
+
+  it("018-E03: cada palabra es el comienzo de una palabra o de un código; sin acentos ni mayúsculas; las más cortas primero", async () => {
+    expect((await pagina("?buscar=mecha%208")).productos.map((p) => p.id)).toEqual([ID(2), ID(3)]);
+    expect((await pagina("?buscar=METRICA")).productos.map((p) => p.id)).toEqual([ID(4)]);
+    expect((await pagina("?buscar=bosch%20acero")).productos.map((p) => p.id)).toEqual([ID(3)]);
+    expect((await pagina("?buscar=viejo8")).productos.map((p) => p.id)).toEqual([ID(2)]); // un código de una lista vieja
+    expect((await pagina("?buscar=779000000001")).productos.map((p) => p.id)).toEqual([ID(1)]);
+    expect((await pagina("?buscar=echa")).productos).toEqual([]);
+    const raro = await pedir(app, "GET", "/productos/pagina?buscar=" + encodeURIComponent("Mechá 8mm'; DROP TABLE producto;--"), { rol: "mostrador" });
+    expect(raro.status).toBe(200);
+    expect(base.actual.consultas.some((c) => /DROP/i.test(c.sql))).toBe(false);
+  });
+
+  it("018-E04: un código exacto, de barras o de proveedor; si no existe, nada", async () => {
+    expect((await pagina("?codigo=7790000000035")).productos.map((p) => p.id)).toEqual([ID(3)]);
+    expect((await pagina("?codigo=TA-81")).productos.map((p) => p.id)).toEqual([ID(1)]);
+    expect((await pagina("?codigo=no-existe")).productos).toEqual([]);
+  });
+
+  it("018-E05: filtrar por marca (sin importar mayúsculas) y por stock; las marcas, sin repetir", async () => {
+    expect((await pagina("?marca=BOSCH")).productos.map((p) => p.id)).toEqual([ID(3), ID(2)]);
+    base.actual.programar(/having/i, { rows: [{ producto_id: ID(2) }] });
+    expect((await pagina("?disponibilidad=con-stock")).productos.map((p) => p.id)).toEqual([ID(2)]);
+    expect((await pagina("?disponibilidad=sin-stock&buscar=mecha")).productos.map((p) => p.id)).toEqual([ID(3)]);
+    expect(await (await pedir(app, "GET", "/productos/marcas", { rol: "mostrador" })).json()).toEqual(["bosch", "Fischer", "Genérica"]); // como se escribió en el primero, por descripción
+  });
+
+  it("018-E06: productos puntuales por identificador; los que no tienen forma de identificador se ignoran; una lista vacía no trae nada", async () => {
+    expect((await pagina(`?ids=${ID(4)},no-es-un-id,${ID(1)}`)).productos.map((p) => p.id)).toEqual([ID(4), ID(1)]);
+    expect((await pagina("?ids=")).productos).toEqual([]);
+  });
+
+  it("sin sesión, 401", async () => {
+    expect((await pedir(app, "GET", "/productos/pagina", { rol: null })).status).toBe(401);
+    expect((await pedir(app, "GET", "/productos/marcas", { rol: null })).status).toBe(401);
+  });
+});
+
+describe("GET /productos (la aplicación de la versión anterior)", () => {
+  beforeEach(() => { base.actual = baseFalsa(); cargarParaPrueba(CATALOGO); });
+
+  it("sin `limite`, todo; con `limite` y `desde`, esa tanda; desde la copia", async () => {
+    expect(await (await pedir(app, "GET", "/productos")).json()).toHaveLength(124);
+    const tanda = await (await pedir(app, "GET", "/productos?limite=2&desde=1")).json() as { id: string }[];
+    expect(tanda.map((p) => p.id)).toEqual([ID(3), ID(2)]);
+    expect(await (await pedir(app, "GET", "/productos?limite=abc")).json()).toHaveLength(124);
+    expect(productosDeLaBase()).toHaveLength(0);
   });
 });
 
@@ -41,39 +118,17 @@ describe("el precio que manda el servidor (010-E06)", () => {
   });
   it("la ruta los agrega a cada producto del catálogo", async () => {
     base.actual = baseFalsa();
-    base.actual.programar(/FROM producto p/, { rows: [{ id: "a", costo_neto: "1000", iva: "0.21", margen_elegido: 50 }] });
-    const r = await pedir(app, "GET", "/productos");
-    expect((await r.json())[0]).toMatchObject({ id: "a", precio: 2000, margen_del_precio: 50 });
+    cargarParaPrueba([{ id: "a", descripcion: "A", costo_neto: "1000", iva: "0.21", margen_elegido: 50 }]);
+    const r = await pedir(app, "GET", "/productos/pagina");
+    const p = ((await r.json()) as Pagina).productos[0]!;
+    expect(p).toMatchObject({ id: "a", precio: 2000, margen_del_precio: 50 });
+    expect(p).not.toHaveProperty("codigos");
+    expect(p).not.toHaveProperty("vigente");
   });
 });
 
 describe("PATCH /productos/:id", () => {
   beforeEach(() => { base.actual = baseFalsa(); base.actual.programar(/UPDATE producto SET/, { rowCount: 1 }); });
-
-  it("buscar, traer por código y traer por lista de productos: filtros que van como parámetros (RF-85)", async () => {
-    await pedir(app, "GET", "/productos?buscar=" + encodeURIComponent("Mechá 8mm'; DROP TABLE producto;--") + "&limite=60", { rol: "mostrador" });
-    const busqueda = base.actual.sqlDe(/FROM producto p/).at(-1)!;
-    // Cada palabra, normalizada, es un parámetro; nada del texto queda pegado en la consulta.
-    expect(busqueda.params).toEqual(["mecha", "8mm", "drop", "table", "producto", 60, 0]);
-    expect(busqueda.sql).not.toMatch(/DROP TABLE/i);
-    expect(busqueda.sql).toMatch(/LIKE '% ' \|\| \$1 \|\| '%'/);
-    expect(busqueda.sql).toMatch(/ORDER BY length\(p\.descripcion\), p\.descripcion, p\.id LIMIT \$6 OFFSET \$7/);
-
-    await pedir(app, "GET", "/productos?codigo=7790250000358", { rol: "mostrador" });
-    const porCodigo = base.actual.sqlDe(/FROM producto p/).at(-1)!;
-    expect(porCodigo.params).toEqual(["7790250000358"]);
-    expect(porCodigo.sql).toMatch(/p\.codigo_barras = \$1 OR EXISTS/);
-
-    const id = "00000000-0000-0000-0000-0000000e5e02";
-    await pedir(app, "GET", `/productos?ids=${id},no-es-un-id`, { rol: "mostrador" });
-    const porIds = base.actual.sqlDe(/FROM producto p/).at(-1)!;
-    expect(porIds.params).toEqual([[id]]);
-    expect(porIds.sql).toMatch(/p\.id = ANY\(\$1::uuid\[\]\)/);
-    // Una lista vacía no trae el catálogo entero: no trae nada.
-    await pedir(app, "GET", "/productos?ids=", { rol: "mostrador" });
-    expect(base.actual.sqlDe(/FROM producto p/).at(-1)!.params).toEqual([[]]);
-    expect((await pedir(app, "GET", "/productos?buscar=mecha", { rol: null })).status).toBe(401);
-  });
 
   it("sin sesión, 401", async () => {
     expect((await pedir(app, "PATCH", "/productos/p1", { rol: null, cuerpo: { margen_elegido: 100 } })).status).toBe(401);

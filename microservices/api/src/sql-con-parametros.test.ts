@@ -8,13 +8,12 @@ import { describe, expect, it } from "vitest";
 // en un parámetro). Lo único que se puede pegar son estas constantes del propio código y los
 // números de los parámetros: cualquier otra cosa hace fallar la prueba.
 const SE_PUEDE_PEGAR = new Set([
-  "ROLES_Y_PERMISOS", "VIGENTE", "NORMALIZAR", "soloNuevos", "TEXTO_NORMALIZADO", // fragmentos fijos de SQL
+  "ROLES_Y_PERMISOS", "VIGENTE", "NORMALIZAR", "soloNuevos", "CONSULTA_DEL_CATALOGO", // fragmentos fijos de SQL
   "tabla", // de listas fijas (TABLAS_MOVIBLES, y «producto» o «precio_proveedor» en las listas)
   'columnas.join(", ")', // columnas fijas de las listas
   'sets.join(", ")', // columnas de producto que pasan por COLUMNAS_QUE_SE_CAMBIAN
-  "donde", "orden", "tanda", // armados acá con fragmentos fijos y números de parámetro
   "valores", // solo números de parámetro ($1, $2…)
-  "n", "parametros.length", "parametros.length - 1", "j * 4 + 1", "j * 4 + 2", "j * 4 + 3", "j * 4 + 4", "valores.length", "i * columnas.length + j + 1",
+  "j * 4 + 1", "j * 4 + 2", "j * 4 + 3", "j * 4 + 4", "valores.length", "i * columnas.length + j + 1",
 ]);
 
 function archivos(dir: string): string[] {

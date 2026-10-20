@@ -3,6 +3,7 @@ import { app } from "./app.js";
 import { config } from "./config.js";
 import { pool } from "./db.js";
 import { aplicarMigraciones } from "./migraciones.js";
+import { iniciar as iniciarCopiaDelCatalogo } from "./productos/copia.js";
 
 // La base puede tardar más que este proceso en aceptar conexiones (arranque en frío del
 // compose, reinicio de Supabase): se espera con reintentos en vez de morir al primer
@@ -25,6 +26,9 @@ async function esperarBase(intentos = 30, esperaMs = 2000): Promise<void> {
 await esperarBase();
 const aplicadas = await aplicarMigraciones(pool);
 if (aplicadas.length) console.log(`migraciones aplicadas: ${aplicadas.join(", ")}`);
+// La copia del catálogo (specs/018): del disco y lo que cambió, o la base entera la primera vez.
+await iniciarCopiaDelCatalogo();
+console.log("copia del catálogo lista");
 
 serve({ fetch: app.fetch, port: config.port }, (info) => {
   console.log(`gestion-del-local escuchando en :${info.port}`);

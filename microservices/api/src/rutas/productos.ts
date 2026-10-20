@@ -11,10 +11,16 @@ export { conPrecio, normalizarBusqueda, type ProductoCatalogo } from "../product
 export const productos = new Hono();
 productos.use("/*", exigirSesion);
 
-productos.get("/", async (c) => {
+// Desde la copia del catálogo en el servidor (specs/018): ninguna lee productos de la base.
+productos.get("/", (c) => {
   const { limite, desde, buscar, codigo, ids } = c.req.query();
-  return c.json(await reglas.catalogo({ limite, desde, buscar, codigo, ids }));
+  return c.json(reglas.catalogo({ limite, desde, buscar, codigo, ids }));
 });
+productos.get("/pagina", async (c) => {
+  const { limite, desde, buscar, codigo, ids, marca, disponibilidad } = c.req.query();
+  return c.json(await reglas.pagina({ limite, desde, buscar, codigo, ids, marca, disponibilidad }));
+});
+productos.get("/marcas", (c) => c.json(reglas.marcas()));
 
 productos.patch("/:id", async (c) => {
   const cuerpo = await leerCuerpo(c, cambiosDeProducto);
