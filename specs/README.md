@@ -206,6 +206,13 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-123 | Sin internet no se busca; se sigue registrando la venta en curso. Los dispositivos guardan solo la venta en curso y lo que falta mandar | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
 | RF-124 | El servidor tiene una copia de los productos con sus precios, que la base mantiene al día, y responde desde ahí | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
 | RF-125 | Ver si el servidor anda no consulta la base | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
+| RF-126 | Quien puede anular una venta puede corregirla: cantidades, precios, renglones, medio de pago y cliente; una anulada no se corrige | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
+| RF-127 | Antes de guardar una corrección se ve el total y la diferencia: en cuenta corriente cambia la deuda; si no, la diferencia se cobra o se devuelve en efectivo; el stock se mueve por la diferencia | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
+| RF-128 | Nada se borra: la venta corregida guarda lo anterior y cada cambio queda en Actividad | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
+| RF-129 | Un cambio parte de una venta de hasta 15 días, buscada por producto; lo que vuelve se toma al precio pagado; si está fallado no vuelve al stock y queda anotado | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
+| RF-130 | La diferencia de un cambio se cobra si lo nuevo vale más y se devuelve en efectivo (o baja la deuda) si vale menos; cambia RF-24 | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
+| RF-131 | Los totales del día suman lo cobrado y restan lo devuelto por correcciones y cambios | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
+| RF-132 | «Ventas de hoy» como la v2, con «Corregir», «Cambio» y «Anular» en la venta, en el celular y en la computadora | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
 
 ## Requerimientos no funcionales
 

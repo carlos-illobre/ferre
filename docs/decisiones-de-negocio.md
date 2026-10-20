@@ -1094,3 +1094,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      salta al sumar; el renglón sin precio se sacude al intentar cobrar; el aviso y la venta vacía
      suben al aparecer, y los botones se hunden un poco al apretarlos. Solo se mueve transform y
      opacity, y nada se mueve para quien pidió menos movimiento en su sistema.
+135. **Corregir y cambiar una venta: las reglas** (2026-10-20). Carlos respondió para la T132: el
+     cambio se acepta hasta 15 días después de la venta; corregir y cambiar piden el mismo permiso
+     que anular; si el total sube, la diferencia se cobra en el momento con el medio que se elija;
+     si baja, se devuelve en efectivo o baja la deuda de cuenta corriente; lo que vuelve se pregunta
+     si está fallado; una venta anulada no se corrige ni se cambia; si el cliente no sabe cuándo
+     compró, se busca por producto en los últimos días. Las pantallas, como la v2 (en la computadora,
+     la venta a la derecha con «Corregir» E, «Cambio» C y «Anular»; «Registrar un cambio» Alt+C; en el
+     celular, la hoja de la venta). Especificación en `specs/019-corregir-y-cambiar/`. «Ventas de hoy»
+     en la computadora pasa a ser la v2 («El día y la venta»), sin sumarle nada de las otras.

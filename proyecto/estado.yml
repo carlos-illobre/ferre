@@ -1423,6 +1423,41 @@ RF-125:
   pruebas: []
   defectos: []
 
+RF-126:
+  estado: "Nuevo (019, especificación para aprobar)"
+  pruebas: []
+  defectos: []
+
+RF-127:
+  estado: "Nuevo (019, especificación para aprobar)"
+  pruebas: []
+  defectos: []
+
+RF-128:
+  estado: "Nuevo (019, especificación para aprobar)"
+  pruebas: []
+  defectos: []
+
+RF-129:
+  estado: "Nuevo (019, especificación para aprobar)"
+  pruebas: []
+  defectos: []
+
+RF-130:
+  estado: "Nuevo (019, especificación para aprobar)"
+  pruebas: []
+  defectos: []
+
+RF-131:
+  estado: "Nuevo (019, especificación para aprobar)"
+  pruebas: []
+  defectos: []
+
+RF-132:
+  estado: "Nuevo (019, especificación para aprobar)"
+  pruebas: []
+  defectos: []
+
 RNF-62:
   estado: "Pendiente (018-T009): lo mide Carlos en el panel de Supabase un mes después de subirlo"
   pruebas: []
