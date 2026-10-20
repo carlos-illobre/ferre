@@ -95,3 +95,7 @@ export async function anotarConsultas(c: z.output<typeof consultaNueva>): Promis
   }
 }
 export const consultas = (): Promise<Enviable<Consulta>[]> => datos.ultimasConsultas(base);
+
+// Los cuatro productos de las últimas ventas, para que la venta vacía los ofrezca (decisión 133).
+export const ULTIMOS_PRODUCTOS = 4;
+export const ultimosProductos = () => datos.ultimosProductosVendidos(base, ULTIMOS_PRODUCTOS);

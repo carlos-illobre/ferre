@@ -75,8 +75,10 @@ Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec
 - En la computadora todo se opera con teclado; el mouse nunca es la única forma (RNF-05). Un rediseño
   nunca saca lo especificado del teclado: un gesto nuevo (arrastrar, deslizar) se suma, no lo
   reemplaza (decisión 121).
-- Las flechas nunca sacan el cursor de la caja de texto (decisión 130): ↑ desde la primera fila
-  saca la marca de la lista y, con el cursor en la búsqueda, el cursor se queda ahí.
+- Las flechas nunca sacan el cursor de la caja de texto (decisiones 130 y 133): ↑ desde la primera
+  fila saca la marca de la lista y, con el cursor en la búsqueda, el cursor se queda ahí; ← y →
+  dentro de un campo son del campo. Al menú se llega desde la pestaña, con Alt + número o con
+  Mayúsculas+Tab.
 - En el celular todo se alcanza con una mano y ninguna pantalla se desplaza hacia el
   costado: cada elemento de una lista entra entero en el ancho de la pantalla (RNF-04).
 - El celular se parece lo más posible a una app nativa de Android (RNF-04).

@@ -1075,3 +1075,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      saca en el celular y en la computadora (cambia RF-19 y la decisión 16: se cobra tal cual, sin
      aviso). En el renglón de la computadora el tacho va a la derecha del precio (cambia lo de la
      decisión 127), y el desplegable de la unidad tiene el estilo de la pantalla.
+133. **Los últimos productos vendidos, del servidor; el panel hasta abajo; ← no saca el cursor**
+     (2026-10-20). Carlos: en la venta vacía, los productos de las últimas cuatro ventas, y «De dónde
+     sale» hasta abajo. Los da el servidor con una consulta corta (`GET /ventas/ultimos-productos`),
+     que puede pedir quien vende aunque no pueda ver las ventas; sin conexión salen de las ventas
+     guardadas en el dispositivo. El panel de la derecha llega hasta la barra del cobro. «No llevó»
+     lleva su F4 al lado del botón y no en la línea de teclas («no hace falta que esté dos veces»).
+     Y, como en la decisión 130, ← tampoco saca el cursor de una caja de texto: con el cursor en un
+     campo, ← y → son del campo; al menú se llega desde la pestaña, con Alt + número o con
+     Mayúsculas+Tab. El aviso de «Quitaste…» y «Vaciaste…» es el de la maqueta: verde oscuro, con el tacho y
+     «Deshacer», sin la ×; se va solo.

@@ -116,6 +116,14 @@ describe("POST /ventas", () => {
 describe("GET /ventas", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
+  it("los productos de las últimas ventas los pide quien vende, aunque no vea las ventas (decisión 133)", async () => {
+    base.actual.programar(/max\(v.fecha\)/, { rows: [{ producto_id: "p2", ultima: new Date() }, { producto_id: "p1", ultima: new Date() }] });
+    const r = await pedir(app, "GET", "/ventas/ultimos-productos", { rol: "mostrador" });
+    expect(r.status).toBe(200);
+    expect(await r.json()).toEqual({ productos: ["p2", "p1"] });
+    expect(base.actual.sqlDe(/max\(v.fecha\)/)[0]!.sql).toMatch(/"v"."estado" = \$1.*limit \$\d/s);
+  });
+
   it("cada renglón llega con su subtotal calculado en el servidor, redondeado como se cobró (010-E06)", async () => {
     base.actual.programar(/from "venta" as "v"/, { rows: [{ id: "v1", fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "3000", estado: "confirmada", pagada_en: null, cliente: null, items: [{ descripcion: "CABLE", cantidad: "1.5", precio_unitario: "1500", margen_aplicado: 50, explicacion: null }, { descripcion: "A MANO", cantidad: "1", precio_unitario: "1500", margen_aplicado: null, explicacion: null }] }] });
     const r = await pedir(app, "GET", "/ventas");

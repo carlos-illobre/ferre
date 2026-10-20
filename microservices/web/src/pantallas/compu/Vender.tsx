@@ -231,7 +231,7 @@ export function Vender() {
             {/* Las teclas que no están en ningún botón, con el aspecto de la v2. */}
             <p className="vender-teclas detalle" data-testid="teclas">
               <span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen el renglón</span>
-              <span><kbd className="tecla">+</kbd><kbd className="tecla">−</kbd> cantidad</span><span><kbd className="tecla">Supr</kbd> quita</span><span><kbd className="tecla">F1</kbd> panel</span><span><kbd className="tecla">F4</kbd> no llevó</span>
+              <span><kbd className="tecla">+</kbd><kbd className="tecla">−</kbd> cantidad</span><span><kbd className="tecla">Supr</kbd> quita</span><span><kbd className="tecla">F1</kbd> panel</span>
             </p>
             {!catalogo && !errorCatalogo && <Progreso texto="Bajando el catálogo por primera vez. Después se busca al instante, también sin internet." />}
             <Aviso tipo="error">{errorCatalogo}</Aviso>
@@ -255,7 +255,7 @@ export function Vender() {
               <span className="crece" />
               {/* Con la venta vacía no hay nada que anotar ni vaciar: no se muestran (decisión 126). */}
               {items.length > 0 && <>
-                <Boton tam="chico" icono="prohibido" className="vmc-fantasma" onClick={noLlevo} aria-keyshortcuts="F4" data-testid="no-llevo">No llevó</Boton>
+                <Boton tam="chico" icono="prohibido" className="vmc-fantasma" onClick={noLlevo} aria-keyshortcuts="F4" data-testid="no-llevo">No llevó <kbd className="tecla">F4</kbd></Boton>
                 <Boton tam="chico" icono="basura" className="vmc-fantasma" onClick={vaciar} data-testid="vaciar-venta">Vaciar</Boton>
               </>}
             </div>
@@ -314,10 +314,11 @@ export function Vender() {
 
         <section className="vmc-cobro" aria-label="Cobro" data-testid="cobro">
           {aviso && (
-            <div className="toast vmc-aviso" role="status" data-testid="mensaje">
+            // Como la maqueta (decisión 133): verde oscuro, con el tacho si se quitó algo, y «Deshacer». Se va solo.
+            <div className="vmc-aviso" role="status" data-testid="mensaje">
+              <Icono nombre={aviso.deshacer ? "basura" : "prohibido"} tam={20} />
               <span>{aviso.texto}</span>
-              {aviso.deshacer && <button type="button" className="toast-accion" onClick={() => { aviso.deshacer!(); setAviso(null); }}>Deshacer</button>}
-              <button type="button" onClick={() => setAviso(null)} aria-label="Cerrar aviso">×</button>
+              {aviso.deshacer && <button type="button" onClick={() => { aviso.deshacer!(); setAviso(null); }}>Deshacer</button>}
             </div>
           )}
           {error && <div className="vender-cobro-aviso"><Aviso tipo="error" testId="error-cobro">{error}</Aviso></div>}
@@ -414,7 +415,7 @@ export function Vender() {
             <Boton variante="sobre-marino" className={`vender-cliente ${cliente ? "" : "falta"}`} icono="usuarios" onClick={() => setEligiendoCliente(true)} data-testid="cliente">{cliente ? cliente.nombre : "Elegí el cliente"}</Boton>
           )}
           <div className="vender-acciones">
-            <Boton variante="sobre-marino" onClick={noLlevo} data-testid="no-llevo">No llevó</Boton>
+            <Boton variante="sobre-marino" onClick={noLlevo} data-testid="no-llevo">No llevó <kbd className="tecla">F4</kbd></Boton>
             <Boton variante="principal" tam="grande" disabled={ocupado} onClick={() => void cobrar()} tecla="F2" data-testid="cobrar">{ocupado ? "Cobrando…" : esCelular ? `Cobrar ${pesosCortos(total)}` : "Cobrar"}</Boton>
           </div>
         </section>

@@ -14,14 +14,14 @@ vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncol
 
 import { Vender } from "./Vender";
 
-function armar(ventas: unknown = { ventas: [], totales: {}, total: 0 }) {
+function armar(ventas: unknown = { ventas: [], totales: {}, total: 0 }, ultimos: string[] = []) {
   const falso = catalogoFalso([
     producto({ id: "mecha", descripcion: "MECHA VENDER 8 MM", costo_neto: "1000", margen_elegido: 100 }),
     producto({ id: "tornillo", descripcion: "TORNILLO VENDER", costo_neto: "10" }),
   ]);
   (falso as unknown as { clientes: unknown[] }).clientes = [{ id: "c1", nombre: "Constructora Uno", telefono: null, cuenta_corriente: true, deuda: "5000" }];
   catalogo.actual = { useCatalogoFalso: () => ({ ...(falso.useCatalogoFalso() as object), clientes: (falso as unknown as { clientes: unknown[] }).clientes }) };
-  apiFalsa.mockImplementation(async (ruta: string) => (ruta.startsWith("/ventas") ? ventas : []));
+  apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/ventas/ultimos-productos" ? { productos: ultimos } : ruta.startsWith("/ventas") ? ventas : []));
   render(<Vender />);
   const busqueda = screen.getByTestId("busqueda");
   const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
@@ -99,7 +99,7 @@ describe("Vender (v2)", () => {
   });
 
   it("la venta vacía muestra los últimos productos vendidos, que se agregan con un clic; sin «No llevó» ni «Vaciar» (decisiones 126 y 131)", async () => {
-    armar({ ventas: [{ fecha: "2026-10-11T12:00:00Z", estado: "confirmada", items: [{ descripcion: "MECHA VENDER 8 MM" }] }], totales: {}, total: 0 });
+    armar(undefined, ["mecha"]); // los productos de las últimas ventas, del servidor (decisión 133)
     expect(screen.getByTestId("venta-vacia").textContent).toContain("La venta está vacía");
     expect(screen.queryByTestId("no-llevo")).toBeNull();
     expect(screen.queryByTestId("vaciar-venta")).toBeNull();

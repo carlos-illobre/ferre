@@ -29,3 +29,6 @@ export type AnulacionDeVenta = z.input<typeof anulacionDeVenta>;
 export type ConsultaEntrada = z.input<typeof consultaNueva>;
 // GET /consultas: las últimas 200. El precio ofrecido llega como texto.
 export type Consulta = { id: string; fecha: string; descripcion: string; precio_ofrecido: string | null; motivo: string | null };
+
+// GET /ventas/ultimos-productos: los productos de las últimas ventas, del más reciente al más viejo (decisión 133).
+export type UltimosProductos = { productos: string[] };

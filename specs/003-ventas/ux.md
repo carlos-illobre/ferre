@@ -123,7 +123,7 @@ Sigue el lenguaje «Mostrador»:
 - El desplegable de la búsqueda, como la v2: cada producto con su foto, el nombre con marca y
   proveedor, el stock en su pastilla y el precio; abajo, las teclas (↑ ↓, Enter, Esc) y cuántos
   encontró.
-- «Esta venta» con cuántos productos, y a la derecha «No llevó» (con su ícono, sin borde, y F4, que figura en la línea de teclas; Esc cierra el desplegable de la búsqueda, decisión 127) y
+- «Esta venta» con cuántos productos, y a la derecha «No llevó» (con su ícono, sin borde y con su tecla F4 al lado; Esc cierra el desplegable de la búsqueda, decisiones 127 y 133) y
   «Vaciar» (con Deshacer); los dos, solo con productos en la venta (decisión 126).
 - Cada renglón, una tarjeta como la de la v2 (decisión 127): la foto, el nombre con marca,
   proveedor y stock (o cuánto falta), la cantidad en una pastilla con − y + y su unidad (un
@@ -140,7 +140,7 @@ Sigue el lenguaje «Mostrador»:
 - A la derecha, un panel con dos pestañas: «De dónde sale» (la cuenta del renglón elegido en
   filas, cada paso con su importe a la derecha y una línea punteada entre ellas: el costo con su
   proveedor y la fecha de la lista, + margen, + IVA, el precio para arriba a $1.000, × la cantidad;
-  abajo, grande, el total del renglón; decisión 127) y «Boleta» (la venta como un ticket, que termina en el borde dentado del papel). Se oculta y se
+  abajo, grande, el total del renglón; decisión 127) y «Boleta» (la venta como un ticket, que termina en el borde dentado del papel). El panel llega hasta la barra del cobro (decisión 133). Se oculta y se
   muestra con su botón o F1, y recuerda cómo quedó; oculto, la lista ocupa todo el ancho y en el
   borde derecho queda una pestaña «De dónde sale · Boleta» que lo vuelve a abrir.
 - «Falta 1 precio» (o cuántos), al lado de cuántos productos tiene la venta (decisión 127).
@@ -149,8 +149,9 @@ Sigue el lenguaje «Mostrador»:
   opcional con cualquier medio; elegido, con sus iniciales, y ocupa todo el ancho que queda) y
   «Cobrar $X» (F2), con el total dentro del botón (decisión 125).
 - Con la venta vacía, un recuadro gris con el carrito, «La venta está vacía» y cómo empezar; debajo,
-  «Lo último que se vendió»: los cuatro últimos productos vendidos, en tarjetas con foto, nombre y
-  precio, que se agregan con un clic (decisión 131).
+  «Lo último que se vendió»: los productos de las últimas cuatro ventas (los da el servidor; sin
+  conexión, las ventas del dispositivo), en tarjetas con foto, nombre y precio, que se agregan con
+  un clic (decisiones 131 y 133).
 - La venta registrada es una ventana como la del celular: el total, el medio, cuántos productos y la
   hora, «Ver en Ventas de hoy» y «Seguir vendiendo» (Enter).
 - No van: «Ganás en esta venta», escribir la cantidad en la búsqueda, el margen con 1 a 5, la ayuda

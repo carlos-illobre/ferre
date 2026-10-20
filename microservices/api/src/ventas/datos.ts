@@ -47,6 +47,16 @@ export function ventasDelDia(e: Ejecutor, dia: string | null): Promise<FilaDelDi
     .execute();
 }
 
+// Los productos de las últimas ventas confirmadas, del más reciente al más viejo, sin repetir:
+// para la venta vacía (decisión 133). Una sola consulta corta: no recorre días.
+export async function ultimosProductosVendidos(e: Ejecutor, cuantos: number): Promise<string[]> {
+  const filas = await e.selectFrom("item_venta as i").innerJoin("venta as v", "v.id", "i.venta_id")
+    .select(["i.producto_id", sql<Date>`max(v.fecha)`.as("ultima")])
+    .where("v.estado", "=", "confirmada").where("i.producto_id", "is not", null)
+    .groupBy("i.producto_id").orderBy("ultima", "desc").limit(cuantos).execute();
+  return filas.map((f) => f.producto_id!);
+}
+
 export async function esDeHoy(e: Ejecutor, id: string): Promise<boolean | null> {
   const fila = await e.selectFrom("venta").select(sql<boolean>`${delDiaDelLocal("fecha")} = ${hoyDelLocal}`.as("de_hoy")).where("id", "=", id).executeTakeFirst();
   return fila ? fila.de_hoy : null;

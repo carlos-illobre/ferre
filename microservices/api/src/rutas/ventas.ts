@@ -16,6 +16,10 @@ ventas.post("/", exigirPermiso("ventas.registrar"), async (c) => {
   return r.repetida ? c.json(r) : c.json(r, 201);
 });
 
+// Los productos de las últimas ventas, para la venta vacía (decisión 133): los pide quien vende,
+// aunque no pueda ver las ventas. Va antes de «/:id».
+ventas.get("/ultimos-productos", exigirPermiso("ventas.registrar"), async (c) => c.json({ productos: await reglas.ultimosProductos() }));
+
 // El día, en AAAA-MM-DD; uno mal escrito no llega a la base (specs/017, «Cambiar fecha»).
 ventas.get("/", exigirPermiso("ventas.ver", "negocio.ventas"), async (c) => {
   const dia = c.req.query("dia") || null;

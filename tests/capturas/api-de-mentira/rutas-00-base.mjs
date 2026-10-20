@@ -30,6 +30,8 @@ export default {
   "PATCH /productos/:id": () => ({}),
   "GET /stock": () => ({ productos: productos.slice(0, 12).map((p, i) => ({ id: p.id, stock: String([14, 3, 0, 22, 40, 2, 12.5, 180, 950, 4, -2, 1][i]), costo_neto: p.costo_neto, proveedor: p.proveedor, valor: String(Number(p.costo_neto) * Math.max(0, [14, 3, 0, 22, 40, 2, 12.5, 180, 950, 4, -2, 1][i])), ultimo_movimiento: a(8, i) })), total: "1284500" }),
   "GET /clientes": () => clientes,
+  // Los productos de las últimas ventas, para la venta vacía (decisión 133).
+  "GET /ventas/ultimos-productos": () => ({ productos: ["p-6", "p-16", "p-15", "p-5"] }),
   "GET /ventas": () => ({ ventas, totales: { efectivo: 12000, mercado_pago: 223000, cuenta_corriente: 58000 }, total: 293000 }),
   "POST /ventas": () => [201, { ok: true }],
   "POST /ventas/:id/anular": () => ({}),

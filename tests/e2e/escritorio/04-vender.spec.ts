@@ -231,8 +231,12 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await expect(page.getByTestId("pestana-productos")).toBeFocused();
   await page.keyboard.press("ArrowDown");
 
-  // ← lleva al menú; ahí ↑ ↓ lo recorren sin mover la lista de productos, hasta Vincular, la cuenta (con «Cerrar sesión» adentro) y el botón que achica el menú.
+  // Con el cursor en la búsqueda, ← es de la búsqueda: no lo saca de ahí (decisión 133). Al menú se
+  // llega desde la pestaña (Mayúsculas+Tab hasta ella y ←); ahí ↑ ↓ lo recorren sin mover la lista de
+  // productos, hasta Vincular, la cuenta (con «Cerrar sesión» adentro) y el botón que achica el menú.
   await page.keyboard.press("ArrowLeft");
+  await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
+  await hastaElMenu(page);
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
   for (const destino of ["menu-vender", "menu-deposito", "menu-mas", "emparejar-celular", "cuenta", "plegar-menu", "menu-catalogo"]) {
     await page.keyboard.press("ArrowDown");
@@ -299,7 +303,7 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await page.keyboard.press("ArrowUp");
   await expect(page.locator("[data-flecha]")).toHaveCount(0);
   await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
-  await page.keyboard.press("ArrowLeft");
+  await hastaElMenu(page);
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("menu-vender")).toBeFocused();
@@ -347,3 +351,11 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await expect(page.locator(".atajo-letra")).toHaveCount(0);
   await expect(page.getByTestId("qr-vincular")).toBeVisible();
 });
+
+// Desde la caja de texto, al menú sin el mouse: Mayúsculas+Tab hasta las pestañas y ← hasta salir de
+// ellas (las flechas no sacan el cursor de la caja, decisión 133).
+async function hastaElMenu(page: import("@playwright/test").Page) {
+  const dentro = (sel: string) => page.evaluate((s) => (document.activeElement as HTMLElement | null)?.closest(s) !== null, sel);
+  for (let i = 0; i < 15 && !(await dentro(".pestanas")); i++) await page.keyboard.press("Shift+Tab");
+  for (let i = 0; i < 6 && !(await dentro(".lateral")); i++) await page.keyboard.press("ArrowLeft");
+}

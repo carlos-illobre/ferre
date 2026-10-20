@@ -215,9 +215,8 @@ function Pantallas() {
   }, [conSesion, conAtajo]);
   // Flechas entre el menú y la pantalla: ← lleva el foco al menú, ↑ ↓ lo recorren, y → (o
   // Enter) abre lo elegido y devuelve el foco a la pantalla, donde ↑ ↓ vuelven a elegir sus
-  // renglones. Mientras se escribe, ← sigue moviendo el cursor: solo salta al menú con la
-  // caja vacía o con el cursor al principio. En una lista desplegable las opciones se
-  // cambian con ↑ ↓, así que ← también lleva al menú.
+  // renglones. Con el cursor en un campo, ← es del campo y nunca lo saca de ahí (decisión 130):
+  // al menú se llega desde la pestaña, con Alt + número o con Mayúsculas+Tab.
   useEffect(() => {
     if (!conSesion) return;
     const tecla = (e: KeyboardEvent) => {
@@ -226,10 +225,9 @@ function Pantallas() {
       const foco = document.activeElement as HTMLElement | null;
       // Una zona que recorre sus flechas por su cuenta (los cajones de Ventas de hoy) usa ← para ella.
       if (foco?.closest(".lateral, .pestanas, [data-flechas-propias]")) return;
-      if (foco instanceof HTMLInputElement || foco instanceof HTMLTextAreaElement) {
-        const deTexto = foco instanceof HTMLTextAreaElement || ["text", "search", "", "tel", "url", "email", "password"].includes(foco.type);
-        if (!deTexto || (foco.value !== "" && !(foco.selectionStart === 0 && foco.selectionEnd === 0))) return;
-      } else if (foco && (foco.isContentEditable || ["radio", "tab", "slider", "option", "menuitem"].includes(foco.getAttribute("role") ?? ""))) return;
+      // Con el cursor en un campo, ← es del campo: las flechas nunca sacan el cursor (decisión 130).
+      if (foco instanceof HTMLInputElement || foco instanceof HTMLTextAreaElement || foco instanceof HTMLSelectElement) return;
+      else if (foco && (foco.isContentEditable || ["radio", "tab", "slider", "option", "menuitem"].includes(foco.getAttribute("role") ?? ""))) return;
       const botones = [...document.querySelectorAll<HTMLButtonElement>(".lateral nav button")];
       const destino = botones.find((b) => b.getAttribute("aria-current") === "page") ?? botones[0];
       if (destino) { e.preventDefault(); destino.focus(); }

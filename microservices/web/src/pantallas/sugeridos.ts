@@ -3,52 +3,36 @@ import { api } from "../api";
 import { leerTodo } from "../almacen";
 import type { Producto } from "./celular/pantallas/Productos";
 import { precioDelProducto } from "../negocio/catalogo/precio";
-import type { VentasDelDia } from "@servidor/ventas";
+import type { UltimosProductos } from "@servidor/ventas";
 
-// Para que la venta nueva no arranque vacía: lo último que se vendió y lo que más se vende,
-// a un toque. Sale de las ventas guardadas en este dispositivo (los últimos 7 días) y de
-// las ventas de hoy del servidor; sin conexión alcanza con lo del dispositivo.
-type VentaLocal = { fecha: string; items: { producto_id: string | null; descripcion: string }[] };
-type VentaDelDia = { fecha: string; estado: string; items: { descripcion: string }[] };
-export type Sugeridos = { ultimos: Producto[]; masVendidos: Producto[]; hay: boolean };
+// Para que la venta nueva no arranque vacía (decisión 133): los productos de las últimas cuatro
+// ventas, del más reciente al más viejo. Los da el servidor (aunque quien vende no pueda ver las
+// ventas); sin conexión, salen de las ventas guardadas en este dispositivo.
+type VentaLocal = { fecha: string; items: { producto_id: string | null }[] };
+export type Sugeridos = { ultimos: Producto[] };
 const CUANTOS = 4;
 
 export const precioDe = (p: Producto): number | null => precioDelProducto(p).valor;
 
-// `clave` vuelve a calcular cuando cambia (después de cobrar).
+// `clave` vuelve a pedirlos cuando cambia (después de cobrar).
 export function useSugeridos(catalogo: Producto[] | null, clave?: unknown): Sugeridos {
-  const [renglones, setRenglones] = useState<{ fecha: string; id: string | null; descripcion: string }[]>([]);
+  const [ids, setIds] = useState<string[]>([]);
   useEffect(() => {
     let vigente = true;
     (async () => {
-      const locales = await leerTodo<VentaLocal>("ventas").catch(() => [] as VentaLocal[]);
-      const deHoy = await (async () => (await api<VentasDelDia>("/ventas")).ventas.filter((v) => v.estado !== "anulada"))().catch(() => [] as VentaDelDia[]);
-      if (!vigente) return;
-      setRenglones([
-        ...locales.flatMap((v) => (v.items ?? []).map((i) => ({ fecha: v.fecha, id: i.producto_id, descripcion: i.descripcion }))),
-        ...deHoy.flatMap((v) => v.items.map((i) => ({ fecha: v.fecha, id: null, descripcion: i.descripcion }))),
-      ]);
+      const delServidor = await api<UltimosProductos>("/ventas/ultimos-productos").then((r) => (Array.isArray(r?.productos) ? r.productos : null)).catch(() => null);
+      const lista = delServidor ?? (await leerTodo<VentaLocal>("ventas").catch(() => [] as VentaLocal[]))
+        .sort((a, b) => (a.fecha < b.fecha ? 1 : -1))
+        .flatMap((v) => (v.items ?? []).map((i) => i.producto_id))
+        .filter((id): id is string => Boolean(id));
+      if (vigente) setIds([...new Set(lista)]);
     })();
     return () => { vigente = false; };
   }, [clave]);
 
   return useMemo(() => {
-    if (!catalogo || renglones.length === 0) return { ultimos: [], masVendidos: [], hay: false };
+    if (!catalogo) return { ultimos: [] };
     const porId = new Map(catalogo.map((p) => [p.id, p]));
-    const porNombre = new Map(catalogo.map((p) => [p.descripcion, p]));
-    const veces = new Map<string, number>();
-    const ultimaVez = new Map<string, string>();
-    for (const r of renglones) {
-      const p = (r.id ? porId.get(r.id) : undefined) ?? porNombre.get(r.descripcion);
-      if (!p) continue;
-      veces.set(p.id, (veces.get(p.id) ?? 0) + 1);
-      if ((ultimaVez.get(p.id) ?? "") < r.fecha) ultimaVez.set(p.id, r.fecha);
-    }
-    const ordenar = (m: Map<string, number | string>) => [...m.entries()].sort((a, b) => (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0)).slice(0, CUANTOS).map(([id]) => porId.get(id)!);
-    const ultimos = ordenar(ultimaVez);
-    // Con pocas ventas las dos listas salen iguales: ahí alcanza con la primera.
-    const ranking = ordenar(veces);
-    const masVendidos = ranking.every((p) => ultimos.includes(p)) ? [] : ranking;
-    return { ultimos, masVendidos, hay: ultimos.length > 0 };
-  }, [catalogo, renglones]);
+    return { ultimos: ids.map((id) => porId.get(id)).filter((p): p is Producto => Boolean(p)).slice(0, CUANTOS) };
+  }, [catalogo, ids]);
 }
