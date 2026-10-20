@@ -8,7 +8,7 @@ B quedan como referencia descartada.
 ## Cómo va el día (historias 1 y 2)
 
 - Arriba, el día que se mira: «Hoy, sábado 17/10» con «Hasta las 11:52» (la hora en que se
-  miró), o «Jueves 15/10» para otro día; al lado, «Cambiar fecha».
+  miró), o «Jueves 15/10» para otro día; al lado, «Otro día».
 - Una tarjeta oscura con todo el resumen: «Total de ventas», el total grande, la comparación
   («+17 %» en una pastilla verde, o el porcentaje que baja en una pastilla del color de lo que
   falta, y «vs. ayer a esta hora ($250.000)»; para otro día, «vs. el miércoles 14/10»), el gráfico
@@ -26,12 +26,13 @@ B quedan como referencia descartada.
 - La anulada, tachada, con «anulada» en una pastilla. Se abren de a varias.
 - Computadora: la tabla Hora · Productos · Cómo pagó (una pastilla con el ícono y el color del
   medio, el cliente debajo) · Total; ↑ ↓ eligen una venta, Enter abre o cierra su detalle, «F»
-  abre «Cambiar fecha». El resumen oscuro, a la izquierda.
+  abre «Otro día». El resumen oscuro, a la izquierda.
 
 ## Otro día (historia 4)
 
-- «Cambiar fecha» abre el calendario del sistema, hasta hoy. Con otro día elegido, aparece
-  «Volver a hoy». Sin ventas ese día: «No hubo ventas ese día». Sin conexión, otro día dice que
+- «Otro día» (F en la computadora) abre el panel de los últimos siete días y, en él, «Elegir en el
+  calendario», el calendario propio, hasta hoy; igual en el celular y en la computadora (decisión
+  144). Con otro día elegido, aparece «Volver a hoy». Sin ventas ese día: «No hubo ventas ese día». Sin conexión, otro día dice que
   hace falta internet.
 
 ## En el celular, con Anular adentro (decisión 120, historia 5)
@@ -84,7 +85,8 @@ Reemplaza a los cuatro cajones (decisión 122): Carlos eligió la v2 del directo
 día y la venta» (maqueta «ventas-de-hoy · compu · variante-1-el-dia»), sin
 sumarle nada de las otras. Las pestañas siguen siendo «Vender» y «Ventas de hoy» (decisión 120):
 
-- Arriba a la derecha, «Cambiar fecha» (F) y, cuando esté el cambio de producto (019), «Registrar
+- Arriba a la derecha, «Otro día» (F), que abre, en un panel, los últimos siete días con lo vendido
+  y «Elegir en el calendario», como en el celular (decisión 144); y, cuando esté el cambio de producto (019), «Registrar
   un cambio» (Alt+C).
 - Una tarjeta con el día en tres partes: el total, la comparación y ventas, productos y ticket
   promedio; lo vendido por hora, con una raya punteada en cada barra que marca lo de ayer a esa
@@ -116,7 +118,7 @@ sumarle nada de las otras. Las pestañas siguen siendo «Vender» y «Ventas de 
 
 ## Colores de los medios de pago (decisión 108)
 
-Efectivo verde, Mercado Pago celeste, Tarjeta violeta, Cuenta corriente ámbar, con su versión
+Efectivo verde, Mercado Pago celeste, Tarjeta violeta, Cuenta corriente rojo (decisión 144), con su versión
 suave de fondo. Los íconos son los del cobro de Vender (el billete, el isotipo de Mercado Pago, la
 tarjeta y la libreta de la cuenta corriente), no los de la maqueta, para que sean los mismos en
 toda la aplicación. Igual que ayer, la comparación dice «0 %» sin flecha y sin color. Están en la paleta compartida y se usan en el ícono de cada medio donde aparezca:

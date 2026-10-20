@@ -115,7 +115,8 @@ body:has(.vhc-pagina), .cuerpo:has(.vhc-pagina) { background: #F4F2EC; }
 .vhc-cantidad { display: inline-flex; align-items: center; height: 34px; border: 1px solid var(--m-borde-fuerte); border-radius: 10px; background: #fff; overflow: hidden; }
 .vhc-cantidad button { width: 30px; height: 100%; border: 0; background: transparent; display: grid; place-items: center; color: var(--m-texto-2); cursor: pointer; }
 .vhc-cantidad button:disabled { opacity: .35; cursor: default; }
-.vhc-cantidad .n { min-width: 32px; text-align: center; font-weight: 800; font-size: 15px; color: var(--m-tinta); }
+.vhc-cantidad .n { min-width: 22px; text-align: right; font-weight: 800; font-size: 15px; color: var(--m-tinta); }
+.vhc-cantidad .u { min-width: 22px; padding-left: 3px; font-size: 12px; font-weight: 650; color: var(--m-texto-2); }
 .vhc-cantidad.cambio, .vhc-precio.cambio, .vhc-precio.editando { border: 1.5px solid var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .10); }
 .vhc-precio { display: inline-flex; align-items: center; gap: 2px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--m-borde-fuerte); background: #fff; font: inherit; font-weight: 750; font-size: 15px; color: var(--m-tinta); cursor: pointer; }
 .vhc-precio input { width: 8ch; border: 0; outline: 0; background: transparent; font: inherit; font-weight: 800; color: var(--m-tinta); padding: 0; }
@@ -153,3 +154,16 @@ body:has(.vhc-pagina), .cuerpo:has(.vhc-pagina) { background: #F4F2EC; }
 @media (prefers-reduced-motion: reduce) { .vhc-horas .col b, .vhc-venta, .vhc-venta .viejo::after, .vhc-aviso { animation: none; } }
 .vhc-fantasma.boton { background: transparent; border-color: transparent; box-shadow: none; }
 .vhc-venta .boton.peligro .tecla { background: transparent; border-color: currentColor; }
+
+/* «Otro día» (decisión 144): los últimos siete días y el calendario propio, como en el celular. */
+[data-testid="hoja-otro-dia"] { width: min(440px, calc(100vw - 32px)); }
+.vhc-otro-detalle { margin: 0 0 8px; color: var(--p-texto-2); font-size: 14px; }
+.vhc-dias { display: grid; gap: 2px; }
+.vhc-dia { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--p-tinta); font: inherit; font-size: 15px; font-weight: 650; text-align: left; cursor: pointer; }
+.vhc-dia:hover { background: var(--p-fondo-2); }
+.vhc-dia > svg:first-child { flex: none; color: var(--p-texto-2); }
+.vhc-dia span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.vhc-dia small { font-size: 13px; font-weight: 500; color: var(--p-texto-2); }
+.vhc-dia.elegido { background: #E3EEE8; color: #12382F; font-weight: 750; }
+.vhc-dia.elegido > svg { color: #12382F; }
+.vhc-dia-calendario { margin-top: 4px; border-top: 1px solid var(--p-borde); border-radius: 0; }

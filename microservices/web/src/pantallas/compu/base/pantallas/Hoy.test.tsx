@@ -18,7 +18,7 @@ const venta = (id: string, fecha: string, medio: string, total: number, items: a
 const HOY = () => [
   venta("v1", a("2026-10-17", 9, 12), "efectivo", 12000, [renglon("Mecha 6 mm madera", "2", 4000), renglon("Cinta aisladora negra 20 m", "2", 2000)]),
   venta("v2", a("2026-10-17", 10, 40), "mercado_pago", 223000, [renglon("Taladro inalámbrico 18 V", "1", 223000)]),
-  venta("v3", a("2026-10-17", 11, 5), "cuenta_corriente", 58000, [renglon("Clavo punta París 2 pulgadas", "2.5", 10000), renglon("Electrodo 2,5 mm", "1", 18000), renglon("Disco de corte 115 mm", "3", 5000)], { cliente: "Constructora Martínez", cliente_id: "c1" }),
+  venta("v3", a("2026-10-17", 11, 5), "cuenta_corriente", 58000, [{ ...renglon("Clavo punta París 2 pulgadas", "2.5", 10000), unidad: "kg" }, renglon("Electrodo 2,5 mm", "1", 18000), renglon("Disco de corte 115 mm", "3", 5000)], { cliente: "Constructora Martínez", cliente_id: "c1" }),
   venta("v4", a("2026-10-17", 11, 48), "tarjeta", 6000, [renglon("Lija al agua grano 220", "3", 2000)], { estado: "anulada" }),
 ];
 const AYER = [venta("y1", a("2026-10-16", 9), "efectivo", 50000, [renglon("x", "1", 50000)]), venta("y2", a("2026-10-16", 11, 30), "efectivo", 200000, [renglon("y", "1", 200000)]), venta("y3", a("2026-10-16", 17), "efectivo", 900000, [renglon("z", "1", 900000)])];
@@ -63,9 +63,9 @@ describe("«Ventas de hoy» · computadora", () => {
     expect(cc.textContent).toContain("$58.000");
     expect(screen.getByTestId("medio-tarjeta").textContent).toContain("0 ventas");
     expect(filas().map((f) => f.textContent)).toEqual([
-      "11:483 × Lija al agua grano 220anulada$6.000",
+      "11:483 un. Lija al agua grano 220anulada$6.000",
       "11:053 productos Clavo, Electrodo, DiscoConstructora Martínez$58.000",
-      "10:401 × Taladro inalámbrico 18 VMercado Pago$223.000",
+      "10:401 un. Taladro inalámbrico 18 VMercado Pago$223.000",
       "09:122 productos Mecha, CintaEfectivo$12.000",
     ]);
     expect(filas()[0]!.className).toContain("anulada");
@@ -84,7 +84,7 @@ describe("«Ventas de hoy» · computadora", () => {
 
   it("017-E13: arranca elegida la última que no está anulada; ↑ ↓ eligen y la venta se ve a la derecha", async () => {
     await abrir();
-    expect(within(elegida()).getByTestId("detalle-venta").textContent).toContain("2,5 × $10.000");
+    expect(within(elegida()).getByTestId("detalle-venta").textContent).toContain("2,5 kg × $10.000");
     fireEvent.keyDown(window, { key: "ArrowDown" });
     expect(elegida().textContent).toContain("Taladro inalámbrico 18 V");
     fireEvent.click(filas()[3]!);
@@ -126,18 +126,28 @@ describe("«Ventas de hoy» · computadora", () => {
     expect(filas()).toHaveLength(4);
   });
 
-  it("017-E16 017-E18: F abre el calendario; otro día, y «Volver a hoy»", async () => {
+  it("017-E16 017-E18: F abre «Otro día» con los últimos siete días; otro día, y «Volver a hoy»", async () => {
     await abrir();
-    const calendario = screen.getByTestId("dia") as HTMLInputElement;
-    const abrirCalendario = vi.fn();
-    (calendario as any).showPicker = abrirCalendario;
     fireEvent.keyDown(window, { key: "f" });
-    expect(abrirCalendario).toHaveBeenCalled();
-    fireEvent.change(calendario, { target: { value: "2026-10-15" } });
+    const panel = screen.getByTestId("hoja-otro-dia");
+    expect(panel.querySelectorAll("[data-testid^='otro-dia-']")).toHaveLength(7);
+    expect(screen.getByTestId("otro-dia-2026-10-17").getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByTestId("otro-dia-2026-10-15"));
     await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Jueves 15/10"));
     await waitFor(() => expect(screen.getByTestId("comparacion").textContent).toBe("El día anterior no hubo ventas"));
     fireEvent.click(screen.getByTestId("volver-a-hoy"));
     await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Sábado 17/10 · hasta las 12:00"));
+  });
+
+  it("017-E16: en «Otro día», el calendario propio llega hasta hoy y elige un día de antes", async () => {
+    await abrir();
+    fireEvent.click(screen.getByTestId("cambiar-fecha"));
+    fireEvent.click(screen.getByTestId("elegir-en-calendario"));
+    expect((screen.getByTestId("dia-2026-10-18") as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByTestId("mes-anterior"));
+    fireEvent.click(screen.getByTestId("dia-2026-09-30"));
+    await waitFor(() => expect(screen.getByTestId("dia-que-se-mira").textContent).toBe("Miércoles 30/09"));
+    expect(screen.queryByTestId("hoja-otro-dia")).toBeNull();
   });
 
   it("017-E20: un día sin ventas lo dice", async () => {
@@ -209,7 +219,7 @@ describe("«Corregir» en la computadora (019, historia 1)", () => {
     fireEvent.click(within(panel).getAllByTestId("mas")[0]!);
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.queryByTestId("corrigiendo")).toBeNull();
-    expect(within(elegida()).getByTestId("detalle-venta").textContent).toContain("2 × $4.000");
+    expect(within(elegida()).getByTestId("detalle-venta").textContent).toContain("2 un. × $4.000");
     expect(apiFalsa.mock.calls.some((c) => String(c[0]).endsWith("/corregir"))).toBe(false);
   });
 
@@ -241,7 +251,7 @@ describe("«Corregir» en la computadora (019, historia 1)", () => {
     fireEvent.click(within(panel).getByTestId("guardar-correccion"));
     await waitFor(() => expect(screen.getByTestId("mensaje").textContent).toBe("La venta cambió mientras la corregías: se volvió a cargar. Corregila de nuevo."));
     expect(screen.queryByTestId("corrigiendo")).toBeNull();
-    await waitFor(() => expect(within(elegida()).getByTestId("detalle-venta").textContent).toContain("5 × $4.000"));
+    await waitFor(() => expect(within(elegida()).getByTestId("detalle-venta").textContent).toContain("5 un. × $4.000"));
   });
 
   it("019-E27: sin conexión, dice que hace falta internet y la corrección sigue abierta", async () => {

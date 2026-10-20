@@ -2,14 +2,16 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { IconoDeMedio } from "../../../IconoDeMedio";
 import { TEXTOS } from "../../../textos";
 import { MEDIOS, NOMBRE_DE_MEDIO, type Medio } from "../../../../negocio/ventas/venta";
-import { buscarVentas, fueSinConexion, hoyLocal, ventasCambiaron, MOTIVOS_DE_ANULACION, motivoDeAnulacion, plano, SIN_MOTIVO, useAnularVenta, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
+import { buscarVentas, fueSinConexion, hoyLocal, useVentasDelDia, ventasCambiaron, MOTIVOS_DE_ANULACION, motivoDeAnulacion, plano, SIN_MOTIVO, useAnularVenta, type VentaDelDia } from "../../../../negocio/ventas/ventas-del-dia";
 import { aEntrada, conCantidad, conPrecio, diferenciaDe, empezarCorreccion, porQueNoSeGuarda, quitar, resolucionDe, subtotalCorregido, totalCorregido, useCorregirVenta, type Correccion, type RenglonCorregido } from "../../../../negocio/ventas/correccion";
 import { precioDelProducto } from "../../../../negocio/catalogo/precio";
 import { useCatalogo, pedirClientes } from "../../../../catalogo";
 import { usePuede } from "../../../permisos";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 import { ElegirCliente } from "../../Vender";
-import { nombreDelDia, useResumenDelDia, type Comparacion } from "../../../../negocio/ventas/resumen-del-dia";
+import { diaAnterior, nombreDelDia, resumenDelDia, useResumenDelDia, type Comparacion } from "../../../../negocio/ventas/resumen-del-dia";
+import { Calendario } from "../../../Calendario";
+import { abreviarUnidad, conUnidad } from "../../../../unidades";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { nombreDeProducto } from "../../../../formato";
 import { urlDeFoto } from "../../../../api";
@@ -41,7 +43,7 @@ export function Hoy() {
   const [porAnular, setPorAnular] = useState<VentaDelDia | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [hojaAbierta, setHojaAbierta] = useState(false);
-  const calendario = useRef<HTMLInputElement>(null);
+  const [otroDia, setOtroDia] = useState(false);
   const [campo, setCampo] = useState<HTMLInputElement | null>(null);
   const tabla = useRef<HTMLDivElement>(null);
   const todas = r.ventas ?? [];
@@ -58,7 +60,6 @@ export function Hoy() {
   useEffect(() => { if (tabla.current?.contains(document.activeElement)) tabla.current.querySelector<HTMLButtonElement>("[data-elegida='si']")?.focus({ preventScroll: true }); }, [elegida?.id]);
   useEffect(() => { tabla.current?.querySelector("[data-elegida='si']")?.scrollIntoView?.({ block: "nearest" }); }, [elegida?.id]);
 
-  const abrirCalendario = () => { const c = calendario.current; if (!c) return; try { c.showPicker(); } catch { c.focus(); c.click(); } };
   const elegir = (v: VentaDelDia) => { if (correccion && correccion.ventaId !== v.id) setCorreccion(null); setElegidaId(v.id); };
   const mover = (paso: number) => {
     if (!visibles.length) return;
@@ -69,7 +70,7 @@ export function Hoy() {
   const guardarRef = useRef<() => void>(() => undefined);
 
   const teclas = useCallback((e: KeyboardEvent) => {
-    if (porAnular || hojaAbierta) return;
+    if (porAnular || hojaAbierta || otroDia) return;
     const enCampo = (e.target as HTMLElement | null)?.tagName === "INPUT";
     if (corrigiendo) {
       if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); guardarRef.current(); }
@@ -81,10 +82,10 @@ export function Hoy() {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); mover(e.key === "ArrowDown" ? 1 : -1); return; }
     if (enCampo) return;
     if (e.key === "/") { e.preventDefault(); campo?.focus(); }
-    else if (e.key === "f" || e.key === "F") { e.preventDefault(); abrirCalendario(); }
+    else if (e.key === "f" || e.key === "F") { e.preventDefault(); setOtroDia(true); }
     else if (e.key === "e" || e.key === "E") { if (elegida && anula && elegida.estado === "confirmada") { e.preventDefault(); empezar(); } }
     else if (e.key === "Delete" || e.key === "a" || e.key === "A") { if (elegida && anula && elegida.estado === "confirmada") { e.preventDefault(); setPorAnular(elegida); } }
-  }, [porAnular, hojaAbierta, corrigiendo, campo, elegida, anula, visibles]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [porAnular, hojaAbierta, otroDia, corrigiendo, campo, elegida, anula, visibles]); // eslint-disable-line react-hooks/exhaustive-deps
   useTeclasGlobales(teclas, campo);
 
   const error = !r.resumen && r.error && (fueSinConexion(r.error) ? (r.esHoy ? t.sinConexionHoy.largo : t.sinConexionOtroDia.largo) : r.error.message);
@@ -94,11 +95,7 @@ export function Hoy() {
       acciones={<AlLadoDeLasPestanas><div className="fila">
         <span className="vhc-fecha" data-testid="dia-que-se-mira">{mayuscula(nombreDelDia(r.dia))}{r.esHoy ? ` · ${t.hasta.largo.toLowerCase()} ${hora(new Date().toISOString())}` : ""}</span>
         {!r.esHoy && <button type="button" className="enlace" onClick={() => setDia(null)} data-testid="volver-a-hoy">{t.volverAHoy.largo}</button>}
-        <span className="hoy-fecha-boton">
-          <Boton icono="calendario" onClick={abrirCalendario} aria-keyshortcuts="F" data-testid="cambiar-fecha">{t.cambiarFecha.largo} <kbd className="tecla">F</kbd></Boton>
-          <input ref={calendario} type="date" className="hoy-calendario" value={r.dia} max={hoyLocal()} aria-label={t.cambiarFecha.largo} tabIndex={-1}
-            onChange={(e) => { const v = e.target.value; if (v && v <= hoyLocal()) setDia(v === hoyLocal() ? null : v); }} data-testid="dia" />
-        </span>
+        <Boton icono="calendario" onClick={() => setOtroDia(true)} aria-keyshortcuts="F" data-testid="cambiar-fecha">{t.otroDia.largo} <kbd className="tecla">F</kbd></Boton>
       </div></AlLadoDeLasPestanas>}>
       <Aviso tipo="error">{error}</Aviso>
       {!r.resumen && !error && <div className="esqueleto ventas-esqueleto" aria-busy="true" aria-label={t.buscando.largo} />}
@@ -158,6 +155,7 @@ export function Hoy() {
           </div>
         )}
       </>}
+      {otroDia && <OtroDia dia={r.dia} alElegir={(d) => { setDia(d === hoyLocal() ? null : d); setOtroDia(false); }} alCerrar={() => setOtroDia(false)} />}
       {porAnular && <AnularVenta venta={porAnular} alCerrar={() => setPorAnular(null)} alAnular={() => { setPorAnular(null); setMensaje(`Venta de ${pesosCortos(porAnular.total)} anulada. El stock volvió.`); }} />}
       {mensaje && <div className="vhc-aviso" role="status" data-testid="mensaje"><Icono nombre="tilde" tam={20} /><span>{mensaje}</span></div>}
     </Pagina>
@@ -178,7 +176,7 @@ function FilaDeVenta({ venta: v, buscado, elegida, alElegir }: { venta: VentaDel
   const coincide = buscado.trim() ? v.items.find((i) => plano(i.descripcion).includes(plano(buscado))) : undefined;
   const una = coincide ?? (v.items.length === 1 ? v.items[0]! : null);
   const que = una
-    ? <>{numero(Number(una.cantidad))} × <Resaltar texto={nombreDeProducto(una.descripcion)} buscado={buscado} />{v.items.length > 1 ? <small> y {v.items.length - 1} más</small> : null}</>
+    ? <>{conUnidad(una.cantidad, una.unidad)} <Resaltar texto={nombreDeProducto(una.descripcion)} buscado={buscado} />{v.items.length > 1 ? <small> y {v.items.length - 1} más</small> : null}</>
     : <>{v.items.length} {t.productos.largo} <small>{v.items.map((i) => nombreDeProducto(i.descripcion).split(" ")[0]).join(", ")}</small></>;
   return (
     <button type="button" className={`vhc-fila ${anulada ? "anulada" : ""}`} data-elegida={elegida ? "si" : "no"} aria-pressed={elegida} tabIndex={elegida ? 0 : -1} onClick={alElegir} data-testid="venta-dia">
@@ -220,7 +218,7 @@ function PanelDeVenta({ venta: v, anula, correccion: c, alCorregir, alAnular, al
           {v.items.map((i, n) => (
             <li key={i.id ?? n} className="rv">
               <Miniatura url={i.foto_url} />
-              <span className="nom-det"><b>{nombreDeProducto(i.descripcion)}</b><small>{numero(Number(i.cantidad))} × {pesosCortos(i.precio_unitario)}</small></span>
+              <span className="nom-det"><b>{nombreDeProducto(i.descripcion)}</b><small>{conUnidad(i.cantidad, i.unidad)} × {pesosCortos(i.precio_unitario)}</small></span>
               <span className="st importe">{pesosCortos(i.subtotal)}</span>
             </li>
           ))}
@@ -290,7 +288,7 @@ function Corrigiendo({ venta: v, c, alCambiar, alDescartar, alGuardar, alHoja, g
                 <span className="editar">
                   <span className={`vhc-cantidad ${cambioCantidad ? "cambio" : ""}`}>
                     <button type="button" aria-label={`Uno menos de ${r.descripcion}`} disabled={r.cantidad - paso < Math.max(r.devuelto, paso) - 1e-9} onClick={() => renglon(i, conCantidad(r, r.cantidad - paso))} data-testid="menos"><Icono nombre="menos" tam={16} /></button>
-                    <span className="n" data-testid="cantidad">{numero(r.cantidad)}</span>
+                    <span className="n" data-testid="cantidad">{numero(r.cantidad)}</span><span className="u" data-testid="unidad-cantidad">{abreviarUnidad(r.unidad || "unidad")}</span>
                     <button type="button" aria-label={`Uno más de ${r.descripcion}`} onClick={() => renglon(i, conCantidad(r, r.cantidad + paso))} data-testid="mas"><Icono nombre="mas" tam={16} /></button>
                   </span>
                   ×
@@ -303,7 +301,7 @@ function Corrigiendo({ venta: v, c, alCambiar, alDescartar, alGuardar, alHoja, g
         {c.quitados.map((r) => (
           <li key={`q${r.id}`} className="rv quitado" data-testid="renglon-quitado">
             <Miniatura url={r.foto_url} />
-            <span className="nom-det"><s>{nombreDeProducto(r.descripcion)}</s><small>{numero(r.antes!.cantidad)} × {pesosCortos(r.antes!.precio_unitario)} · quitado</small></span>
+            <span className="nom-det"><s>{nombreDeProducto(r.descripcion)}</s><small>{conUnidad(r.antes!.cantidad, r.unidad)} × {pesosCortos(r.antes!.precio_unitario)} · quitado</small></span>
             <button type="button" className="enlace" onClick={() => alCambiar({ ...c, quitados: c.quitados.filter((x) => x !== r), renglones: [...c.renglones, r] })}>Volver a poner</button>
           </li>
         ))}
@@ -377,7 +375,7 @@ function AgregarProducto({ alAgregar, alCerrar }: { alAgregar: (r: RenglonCorreg
     if (!p) return;
     const precio = precioDelProducto(p);
     if (precio.valor === null) return;
-    alAgregar({ producto_id: p.id, descripcion: p.descripcion, foto_url: p.foto_url ?? null, cantidad: 1, precio_unitario: precio.valor, margen_aplicado: p.margen_elegido, costo_neto: precio.costo, devuelto: 0, antes: null });
+    alAgregar({ producto_id: p.id, descripcion: p.descripcion, foto_url: p.foto_url ?? null, unidad: p.unidad, cantidad: 1, precio_unitario: precio.valor, margen_aplicado: p.margen_elegido, costo_neto: precio.costo, devuelto: 0, antes: null });
   };
   return (
     <div className="vhc-agregando">
@@ -432,6 +430,40 @@ function PorHora({ barras, anterior, esHoy }: { barras: { hora: number; total: n
         })}
       </div>
     </div>
+  );
+}
+
+// «Otro día», como la v2 y el celular (decisiones 141 y 144): hoy y los seis días anteriores, cada uno
+// con lo vendido y cuántas ventas, el que se mira con un tilde; al final, el calendario propio.
+function OtroDia({ dia, alElegir, alCerrar }: { dia: string; alElegir: (dia: string) => void; alCerrar: () => void }) {
+  const t = TEXTOS.hoy;
+  const [conCalendario, setConCalendario] = useState(false);
+  const hoy = hoyLocal();
+  const dias = [hoy];
+  while (dias.length < 7) dias.push(diaAnterior(dias[dias.length - 1]!));
+  return (
+    <Hoja titulo={t.otroDia.largo} alCerrar={alCerrar} testId="hoja-otro-dia">
+      <p className="vhc-otro-detalle">{t.queDiaMirar.largo}</p>
+      {conCalendario ? <Calendario elegido={dia} hasta={hoy} hoy={hoy} alElegir={alElegir} /> : <>
+        <div className="vhc-dias">{dias.map((d, i) => <DiaParaElegir key={d} dia={d} hoy={i === 0} ayer={i === 1} elegido={d === dia} alElegir={() => alElegir(d)} />)}</div>
+        <button type="button" className="vhc-dia vhc-dia-calendario" onClick={() => setConCalendario(true)} data-testid="elegir-en-calendario">
+          <Icono nombre="calendario" /><span>{t.elegirEnElCalendario.largo}<small>{t.masAtras.largo}</small></span><Icono nombre="derecha" />
+        </button>
+      </>}
+    </Hoja>
+  );
+}
+
+function DiaParaElegir({ dia, hoy, ayer, elegido, alElegir }: { dia: string; hoy: boolean; ayer: boolean; elegido: boolean; alElegir: () => void }) {
+  const t = TEXTOS.hoy;
+  const { datos } = useVentasDelDia(hoy ? null : dia);
+  const resumen = datos ? resumenDelDia(datos.ventas) : null;
+  const nombre = hoy ? `${t.hoy.largo}, ${nombreDelDia(dia)}` : ayer ? `${t.ayer.largo}, ${nombreDelDia(dia)}` : mayuscula(nombreDelDia(dia));
+  const detalle = !resumen ? "…" : resumen.ventas === 0 ? t.sinVentas.largo : `${pesosCortos(resumen.total)} · ${resumen.ventas} ${resumen.ventas === 1 ? t.venta.largo : t.ventas.largo}${hoy ? ` ${t.hasta.largo.toLowerCase()} ${hora(new Date().toISOString())}` : ""}`;
+  return (
+    <button type="button" className={`vhc-dia ${elegido ? "elegido" : ""}`} aria-pressed={elegido} onClick={alElegir} data-testid={`otro-dia-${dia}`}>
+      <Icono nombre="calendario" /><span>{nombre}<small>{detalle}</small></span>{elegido && <Icono nombre="tilde" />}
+    </button>
   );
 }
 

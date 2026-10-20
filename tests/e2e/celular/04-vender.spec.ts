@@ -89,7 +89,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
 
   // Efectivo viene elegido (decisión 37); se cobra deslizando el botón de la v2, que dice el total (decisiones 119 y 140).
   await expect(page.getByTestId("medio")).toHaveText("Efectivo");
-  await expect(page.getByTestId("cobrar")).toHaveText("Cobrar$11.000");
+  await expect(page.getByTestId("cobrar")).toHaveText("Deslizá para cobrar$11.000");
   await deslizarParaCobrar(page);
   // La venta registrada, con el importe grande; «Seguir vendiendo» vuelve a la búsqueda vacía.
   await expect(page.getByTestId("exito")).toContainText("Venta registrada");
@@ -117,8 +117,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(deHoy).toContainText("Efectivo");
   await expect(deHoy).toContainText("$11.000");
   await deHoy.getByRole("button").click();
-  await expect(page.getByTestId("detalle-venta")).toContainText("3 × MECHA VENDER");
-  await expect(page.getByTestId("detalle-venta")).toContainText("1,5 × TORNILLO VENDER");
+  await expect(page.getByTestId("detalle-venta")).toContainText("3 un. MECHA VENDER");
+  await expect(page.getByTestId("detalle-venta")).toContainText("1,5 kg TORNILLO VENDER");
   // «Anular» pide confirmar, con el motivo de la lista y un comentario (decisión 110), y devuelve el stock.
   await page.getByTestId("anular").click();
   await page.getByTestId("motivo-anular").selectOption("Se arrepintió");
@@ -170,4 +170,11 @@ test("devolver un producto desde la hoja de la venta", async ({ page }) => {
   await expect.poll(() => psql(`SELECT count(*) FROM cambio_renglon WHERE producto_id = '${ID_MECHA}' AND lado = 'vuelve'`)).toBe("1");
   await expect.poll(() => psql(`SELECT importe FROM movimiento_dinero m JOIN cambio_renglon r ON r.cambio_id = m.cambio_id WHERE r.producto_id = '${ID_MECHA}'`)).toBe("-3000.00");
   await expect.poll(() => Number(psql(`SELECT COALESCE(sum(cantidad), 0) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`))).toBe(antes);
+
+  // 019-E32: la venta con la devolución se anula igual; lo que ya volvió no se suma otra vez al stock.
+  const ventaId = psql(`SELECT c.venta_id FROM cambio c JOIN cambio_renglon r ON r.cambio_id = c.id WHERE r.producto_id = '${ID_MECHA}' LIMIT 1`);
+  const anulada = await page.request.post(`${API}/ventas/${ventaId}/anular`, { headers: { Authorization: `Bearer ${TOKEN}` }, data: {} });
+  expect(anulada.status()).toBeLessThan(300);
+  expect(psql(`SELECT estado FROM venta WHERE id = '${ventaId}'`)).toBe("anulada");
+  expect(Number(psql(`SELECT COALESCE(sum(cantidad), 0) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`))).toBe(antes);
 });

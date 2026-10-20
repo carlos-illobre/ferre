@@ -32,3 +32,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T021 [ajuste] Celular: la lista de la unidad del renglón con el estilo de la pantalla, como en la computadora
 - [x] T022 [interfaz] Celular: el medio de pago de Vender como la v4 de «Ventas de hoy», las cuatro pastillas con la elegida con su nombre, y el cliente al final de la fila (decisión 142)
 - [x] T023 [ajuste] Celular: en la hoja del renglón, la cantidad con su unidad adentro, que se toca para cambiarla, como en el renglón (pedido de Carlos del 2026-10-20)
+- [x] T024 [ajuste] Celular: el botón de cobrar dice «Deslizá para cobrar», con el total a la derecha (decisión 144)

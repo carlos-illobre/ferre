@@ -270,7 +270,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </button>
         </div>
         <Deslizar apagado={!items.length || ocupado} ocupado={ocupado} alCobrar={cobrar} alTocar={() => setAviso({ texto: TEXTOS.vender.comoSeCobra.corto })}>
-          {ocupado ? <span>Cobrando…</span> : <><span>{TEXTOS.vender.cobrar.corto}</span><span className="importe" data-testid="total">{pesosCortos(total)}</span></>}
+          {ocupado ? <span>Cobrando…</span> : <><span>{TEXTOS.vender.deslizaParaCobrar.corto}</span><span className="importe" data-testid="total">{pesosCortos(total)}</span></>}
         </Deslizar>
       </div>
 

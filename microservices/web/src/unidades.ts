@@ -21,3 +21,8 @@ export function cantidadValida(texto: string, unidad: Unidad): number {
   if (!Number.isFinite(n) || n <= 0) return 0;
   return enteras(unidad) ? Math.floor(n) : Math.round(n * 10) / 10;
 }
+
+// Una cantidad con su unidad («3 un.», «1,5 kg»): siempre que se muestra una cantidad, va con su
+// unidad, en el celular y en la computadora (decisión 144). Sin unidad conocida, «un.».
+export const conUnidad = (n: number | string, u?: string | null): string =>
+  `${Number(n).toLocaleString("es-AR", { maximumFractionDigits: 3 })} ${abreviarUnidad(u || "unidad")}`;

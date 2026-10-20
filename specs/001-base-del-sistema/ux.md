@@ -54,6 +54,10 @@ Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec
 - El lenguaje visual oficial es «Mostrador» (`docs/lenguaje-mostrador/`): paleta, letra, íconos,
   piezas, movimiento y marco. Toda pantalla nueva o rediseñada lo toma por defecto; solo se cambia
   si el director de arte propone algo superador y Carlos lo elige (decisión 115).
+- Siempre que se muestra una cantidad, va con su unidad, abreviada igual en todas partes: «3 un.»,
+  «1,5 kg», «2 m», «0,5 L»; en el celular y en la computadora, en todas las pantallas (decisiones
+  106 y 144). Un renglón dice «3 un. Mecha 8 mm» y, con el precio, «3 un. × $4.000».
+- Cuenta corriente va en rojo, con su fondo suave, en todas partes (decisión 144).
 
 **Aprender y operar**
 

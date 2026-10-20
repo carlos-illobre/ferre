@@ -17,7 +17,7 @@ const venta = (id: string, fecha: string, medio: string, total: number, items: a
 const HOY = [
   venta("v1", a("2026-10-17", 9, 12), "efectivo", 12000, [renglon("Mecha 6 mm madera", "2", 4000), renglon("Cinta aisladora negra 20 m", "2", 2000)]),
   venta("v2", a("2026-10-17", 10, 40), "mercado_pago", 223000, [renglon("Taladro inalámbrico 18 V", "1", 223000)]),
-  venta("v3", a("2026-10-17", 11, 5), "cuenta_corriente", 58000, [renglon("Clavo punta París 2 pulgadas", "2.5", 10000), renglon("Electrodo 2,5 mm", "1", 18000), renglon("Disco de corte 115 mm", "3", 5000)], { cliente: "Constructora Martínez" }),
+  venta("v3", a("2026-10-17", 11, 5), "cuenta_corriente", 58000, [{ ...renglon("Clavo punta París 2 pulgadas", "2.5", 10000), unidad: "kg" }, renglon("Electrodo 2,5 mm", "1", 18000), renglon("Disco de corte 115 mm", "3", 5000)], { cliente: "Constructora Martínez" }),
   venta("v4", a("2026-10-17", 11, 48), "tarjeta", 6000, [renglon("Lija al agua grano 220", "3", 2000)], { estado: "anulada" }),
 ];
 const AYER = [venta("y1", a("2026-10-16", 9), "efectivo", 50000, [renglon("x", "1", 50000)]), venta("y2", a("2026-10-16", 11, 30), "efectivo", 200000, [renglon("y", "1", 200000)]), venta("y3", a("2026-10-16", 17), "efectivo", 900000, [renglon("z", "1", 900000)])];
@@ -91,12 +91,12 @@ describe("«Hoy» · celular", () => {
   it("017-E11 017-E12 017-E13 017-E14 017-E15: renglones cortos, de la más nueva a la más vieja; tocar abre su hoja", async () => {
     await abrir();
     const ventas = screen.getAllByTestId("venta-dia");
-    expect(ventas.map((v) => v.querySelector("b")!.textContent)).toEqual(["3 × Lija al agua grano 220anulada", "3 productos", "1 × Taladro inalámbrico 18 V", "2 productos"]);
+    expect(ventas.map((v) => v.querySelector("b")!.textContent)).toEqual(["3 un. Lija al agua grano 220anulada", "3 productos", "1 un. Taladro inalámbrico 18 V", "2 productos"]);
     expect(ventas[0]!.className).toContain("anulada");
     expect(ventas[1]!.textContent).toContain("11:05 · Cuenta corriente · Constructora Martínez");
     expect(within(ventas[1]!).getByRole("button").querySelector(".medio-cuenta_corriente")).not.toBeNull();
     fireEvent.click(within(ventas[1]!).getByRole("button"));
-    expect(screen.getByTestId("detalle-venta").textContent).toBe("2,5 × Clavo punta París 2 pulgadas$10.000 c/u$25.0001 × Electrodo 2,5 mm$18.000 c/u$18.0003 × Disco de corte 115 mm$5.000 c/u$15.000");
+    expect(screen.getByTestId("detalle-venta").textContent).toBe("2,5 kg Clavo punta París 2 pulgadas$10.000 c/u$25.0001 un. Electrodo 2,5 mm$18.000 c/u$18.0003 un. Disco de corte 115 mm$5.000 c/u$15.000");
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.queryByTestId("detalle-venta")).toBeNull();
   });
@@ -187,7 +187,7 @@ describe("«Hoy» · celular", () => {
     fireEvent.change(screen.getByTestId("buscar-venta"), { target: { value: "electrodo" } });
     const ventas = within(screen.getByTestId("hoja-buscar-venta")).getAllByTestId("venta-dia");
     expect(ventas).toHaveLength(1);
-    expect(ventas[0]!.querySelector("b")!.textContent).toBe("1 × Electrodo 2,5 mm y 2 más");
+    expect(ventas[0]!.querySelector("b")!.textContent).toBe("1 un. Electrodo 2,5 mm y 2 más");
     expect(ventas[0]!.querySelector("mark")!.textContent).toBe("Electrodo");
     expect(screen.getByTestId("cuantas-halladas").textContent).toBe("1 de 4 ventassuman $58.000");
     fireEvent.click(screen.getByTestId("salir-de-buscar"));

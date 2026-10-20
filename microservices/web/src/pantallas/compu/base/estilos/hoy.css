@@ -26,8 +26,6 @@
 .hoy-fecha b { display: block; font-size: 18px; }
 .hoy-fecha small { display: block; color: var(--p-texto-2); }
 .hoy-fecha .enlace { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--p-naranja-texto); cursor: pointer; }
-.hoy-fecha-boton { position: relative; }
-.hoy-calendario { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .hoy-numeros { background: var(--superficie); border: 1px solid var(--p-borde); border-radius: 16px; display: grid; grid-template-columns: repeat(3, 1fr); }
 .hoy-numeros div { padding: 10px 8px; text-align: center; } .hoy-numeros div + div { border-left: 1px solid var(--p-borde-suave); }
 .hoy-numeros b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; } .hoy-numeros small { color: var(--p-texto-2); }

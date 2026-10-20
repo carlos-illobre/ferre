@@ -33,7 +33,7 @@ Toda función nueva con pantalla se hace en las dos.
   pantallas donde aparece ese elemento, en el celular y en la computadora. Nunca una pantalla
   entera, un fondo o un panel con colores propios. Los medios de pago (017): efectivo verde
   `#0f6b52` sobre `#e3f3ea`, Mercado Pago celeste `#0a6aa8` sobre `#e2f0fa`, tarjeta violeta
-  `#5b3fb5` sobre `#ece8fb`, cuenta corriente ámbar `#9a5a00` sobre `#fff0d6`.
+  `#5b3fb5` sobre `#ece8fb`, cuenta corriente rojo `#AE281D` sobre `#FCEAE7` (decisión 144).
 
 ## Textos: mínimos en el celular, que explican en la computadora
 

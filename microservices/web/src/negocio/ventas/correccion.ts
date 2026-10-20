@@ -15,6 +15,7 @@ export type RenglonCorregido = {
   producto_id: string | null;
   descripcion: string;
   foto_url: string | null;
+  unidad?: string; // la del producto, para mostrarla al lado de la cantidad
   cantidad: number;
   precio_unitario: number;
   margen_aplicado: number | null;
@@ -28,7 +29,7 @@ export type Resolucion = "cobrada" | "devuelta" | "cuenta_corriente" | "sin_dife
 export function empezarCorreccion(v: VentaDelDia): Correccion {
   return {
     renglones: v.items.map((i) => ({
-      id: i.id, producto_id: i.producto_id ?? null, descripcion: i.descripcion, foto_url: i.foto_url, cantidad: Number(i.cantidad), precio_unitario: Number(i.precio_unitario),
+      id: i.id, producto_id: i.producto_id ?? null, descripcion: i.descripcion, foto_url: i.foto_url, unidad: i.unidad, cantidad: Number(i.cantidad), precio_unitario: Number(i.precio_unitario),
       margen_aplicado: i.margen_aplicado === null ? null : Number(i.margen_aplicado), devuelto: Number(i.devuelto ?? 0), antes: { cantidad: Number(i.cantidad), precio_unitario: Number(i.precio_unitario) },
     })),
     quitados: [],

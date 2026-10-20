@@ -1169,3 +1169,19 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      el celular, redondeado como la v4: una píldora con el círculo blanco que se desliza.
      El botón del vínculo con la computadora nunca es gris: verde con el espejo andando y blanco con el
      borde verde cuando está desconectado un rato.
+144. **Respuestas de Carlos sobre la venta con cambio, la cuenta corriente, el cobro y «Otro día»**
+     (2026-10-20).
+     - Una venta que ya tuvo un cambio o una devolución **se puede anular** (019-E32, pregunta
+       abierta 26): la anulación deshace todo, como si la venta no hubiera existido. Vuelve al stock
+       lo que todavía tiene el cliente (lo que quedó de la venta y lo que se llevó en los cambios);
+       lo que volvió sano ya está en el stock y no se suma de nuevo; lo que volvió fallado sigue
+       afuera. La plata de los cambios y las correcciones (lo cobrado, lo devuelto y lo que movió la
+       cuenta corriente) deja de contar, igual que el total de la venta.
+     - **Cuenta corriente va en rojo** en todas partes, con su fondo suave (cambia el ámbar de la
+       decisión 108): el rojo de error de «Mostrador».
+     - El botón de cobrar del celular dice **«Deslizá para cobrar»**, con el total a la derecha.
+     - **«Otro día» y el calendario propio también van en la computadora**, como en el celular
+       (decisión 141): «Otro día» (F) abre un panel con los últimos siete días y «Elegir en el
+       calendario».
+     - **Siempre que haya una cantidad, va con su unidad** («3 un.», «1,5 kg», «2 m»), en el
+       celular y en la computadora, en todas las pantallas (amplía la decisión 106).

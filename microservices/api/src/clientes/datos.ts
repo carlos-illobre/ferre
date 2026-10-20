@@ -10,7 +10,7 @@ export const activosConDeuda = (e: Ejecutor) =>
     .select(["cl.id", "cl.nombre", "cl.telefono", "cl.cuenta_corriente",
       sql<string>`COALESCE(SUM(v.total) FILTER (WHERE v.medio_pago = 'cuenta_corriente' AND v.estado = 'confirmada' AND v.pagada_en IS NULL), 0)
         + COALESCE((SELECT SUM(m.importe) FROM movimiento_dinero m JOIN venta mv ON mv.id = m.venta_id
-                    WHERE m.cliente_id = cl.id AND m.medio_pago = 'cuenta_corriente' AND mv.pagada_en IS NULL), 0)`.as("deuda")])
+                    WHERE m.cliente_id = cl.id AND m.medio_pago = 'cuenta_corriente' AND mv.estado = 'confirmada' AND mv.pagada_en IS NULL), 0)`.as("deuda")])
     .where("cl.activo", "=", true).groupBy("cl.id").orderBy("cl.nombre").execute();
 
 export async function insertar(e: Ejecutor, c: { nombre: string; telefono: string | null; cuenta_corriente: boolean }): Promise<string> {

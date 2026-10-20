@@ -179,7 +179,7 @@ describe("Vender", () => {
     expect(screen.getByTestId("cobrar").className).toContain("apagado");
     expect((screen.getByTestId("cobrar-pulgar") as HTMLButtonElement).disabled).toBe(true);
     agregar("mecha vender");
-    expect(screen.getByTestId("cobrar").textContent).toBe("Cobrar$3.000");
+    expect(screen.getByTestId("cobrar").textContent).toBe("Deslizá para cobrar$3.000");
     const pulgar = screen.getByTestId("cobrar-pulgar");
     fireEvent.click(pulgar, { detail: 1 });
     expect(screen.getByTestId("mensaje").textContent).toContain("Deslizá el botón hasta el final para cobrar");
@@ -320,7 +320,7 @@ describe("Vender", () => {
 
   const DOS = { total: 10500, totales: { efectivo: 10500 }, ventas: [
     { id: "v1", fecha: "2026-09-14T12:00:00Z", medio_pago: "efectivo", total: "10500", estado: "confirmada", cliente: null, items: [
-      { descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }, { descripcion: "TORNILLO VENDER", cantidad: "1.5", precio_unitario: "1000" }] },
+      { descripcion: "MECHA VENDER 8 MM", cantidad: "3", precio_unitario: "3000" }, { descripcion: "TORNILLO VENDER", cantidad: "1.5", precio_unitario: "1000", unidad: "kg" }] },
     { id: "v2", fecha: "2026-09-14T12:30:00Z", medio_pago: "tarjeta", total: "3000", estado: "anulada", cliente: null, items: [{ descripcion: "MECHA VENDER 8 MM", cantidad: "1", precio_unitario: "3000" }] },
   ] };
 
@@ -335,8 +335,8 @@ describe("Vender", () => {
     fireEvent.keyDown(window, { key: "Escape" });
     fireEvent.click(within(ventas[1]!).getByRole("button"));
     const hoja = screen.getByTestId("hoja-venta");
-    expect(within(hoja).getByTestId("detalle-venta").textContent).toContain("3 × MECHA VENDER 8 MM");
-    expect(within(hoja).getByTestId("detalle-venta").textContent).toContain("1,5 × TORNILLO VENDER");
+    expect(within(hoja).getByTestId("detalle-venta").textContent).toContain("3 un. MECHA VENDER 8 MM");
+    expect(within(hoja).getByTestId("detalle-venta").textContent).toContain("1,5 kg TORNILLO VENDER");
     fireEvent.click(within(hoja).getByTestId("anular"));
     const confirmar = screen.getByTestId("hoja-anular");
     expect(confirmar.textContent).toContain("¿Anular esta venta?");

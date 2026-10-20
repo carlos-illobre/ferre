@@ -12,6 +12,7 @@ import { precioDelProducto } from "../../../negocio/catalogo/precio";
 import { pedirClientes, useCatalogo } from "../../../catalogo";
 import { nombreDeProducto, pesosCortos } from "../../../formato";
 import { urlDeFoto } from "../../../api";
+import { abreviarUnidad, conUnidad } from "../../../unidades";
 
 // Corregir y cambiar una venta en el celular (specs/019, decisiones 124 y 135), como la v2: corregir
 // edita la venta en su hoja, con lo de antes tachado; el cambio (o la devolución, si no se lleva
@@ -57,7 +58,7 @@ function SumarProducto({ alSumar, etiqueta }: { alSumar: (p: SeLleva) => void; e
         const precio = precioDelProducto(p);
         return (
           <button key={p.id} type="button" className="cc-renglon cc-hallado" disabled={precio.valor === null} data-testid="producto-para-sumar"
-            onClick={() => { alSumar({ producto_id: p.id, descripcion: p.descripcion, foto_url: p.foto_url ?? null, cantidad: 1, precio_unitario: precio.valor!, margen_aplicado: p.margen_elegido, costo_neto: precio.costo }); setTexto(""); }}>
+            onClick={() => { alSumar({ producto_id: p.id, descripcion: p.descripcion, foto_url: p.foto_url ?? null, unidad: p.unidad, cantidad: 1, precio_unitario: precio.valor!, margen_aplicado: p.margen_elegido, costo_neto: precio.costo }); setTexto(""); }}>
             <Foto url={p.foto_url ?? null} /><span className="cc-nom"><b>{nombreDeProducto(p.descripcion)}</b><small>{p.marca ?? ""}</small></span>
             <strong className="importe">{precio.valor === null ? "Sin precio" : `+${pesosCortos(precio.valor)}`}</strong>
           </button>
@@ -68,12 +69,12 @@ function SumarProducto({ alSumar, etiqueta }: { alSumar: (p: SeLleva) => void; e
 }
 
 // − cantidad +, con un paso de 1 (o de 0,5 si es a granel) y un mínimo.
-function MasMenos({ valor, min, max, alCambiar, etiqueta }: { valor: number; min: number; max?: number; alCambiar: (v: number) => void; etiqueta: string }) {
+function MasMenos({ valor, unidad, min, max, alCambiar, etiqueta }: { valor: number; unidad?: string; min: number; max?: number; alCambiar: (v: number) => void; etiqueta: string }) {
   const paso = Number.isInteger(valor) && Number.isInteger(max ?? 1) ? 1 : 0.5;
   return (
     <span className="vhc-cantidad cc-cantidad">
       <button type="button" aria-label={`Menos ${etiqueta}`} disabled={valor - paso < min - 1e-9} onClick={() => alCambiar(Math.round((valor - paso) * 1000) / 1000)} data-testid="menos"><IconoC nombre="menos" tam={16} /></button>
-      <span className="n" data-testid="cantidad">{numero(valor)}</span>
+      <span className="n" data-testid="cantidad">{numero(valor)}</span><span className="u" data-testid="unidad-cantidad">{abreviarUnidad(unidad || "unidad")}</span>
       <button type="button" aria-label={`Más ${etiqueta}`} disabled={max !== undefined && valor + paso > max + 1e-9} onClick={() => alCambiar(Math.round((valor + paso) * 1000) / 1000)} data-testid="mas"><IconoC nombre="mas" tam={16} /></button>
     </span>
   );
@@ -116,7 +117,7 @@ export function CorregirEnLaHoja({ venta: v, c, alCambiar, alGuardar, alDescarta
             <Foto url={r.foto_url} />
             <span className="cc-nom"><b>{nombreDeProducto(r.descripcion)}</b>
               <span className="cc-ed">
-                <MasMenos valor={r.cantidad} min={Math.max(r.devuelto, Number.isInteger(r.cantidad) ? 1 : 0.5)} alCambiar={(n) => renglon(i, conCantidad(r, n))} etiqueta={r.descripcion} />
+                <MasMenos valor={r.cantidad} min={Math.max(r.devuelto, Number.isInteger(r.cantidad) ? 1 : 0.5)} alCambiar={(n) => renglon(i, conCantidad(r, n))} unidad={r.unidad} etiqueta={r.descripcion} />
                 <PrecioTocable valor={r.precio_unitario} cambio={Boolean(cambioPrecio)} alCambiar={(p) => renglon(i, conPrecio(r, p))} etiqueta={`Precio de ${r.descripcion}`} />
                 <button type="button" className="vhc-tacho" aria-label={`Quitar ${r.descripcion}`} disabled={r.devuelto > 0} onClick={() => alCambiar(quitar(c, i))} data-testid="quitar"><IconoC nombre="basura" tam={18} /></button>
               </span>
@@ -232,9 +233,9 @@ export function HojaDeCambio({ venta, alCerrar, alListo }: { venta: VentaDelDia 
               </button>
               <Foto url={r.foto_url} />
               <span className="cc-nom"><b>{nombreDeProducto(r.descripcion)}</b>
-                <small>{nada ? "Ya volvió todo" : `Se pagó ${pesosCortos(r.pagado)} c/u${r.porDevolver < r.vendido ? ` · quedan ${numero(r.porDevolver)}` : ""}`}</small>
+                <small>{nada ? "Ya volvió todo" : `Se pagó ${pesosCortos(r.pagado)} c/u${r.porDevolver < r.vendido ? ` · quedan ${conUnidad(r.porDevolver, r.unidad)}` : ""}`}</small>
                 {m && <span className="cc-ed">
-                  <MasMenos valor={m.cantidad} min={Number.isInteger(m.cantidad) ? 1 : 0.5} max={r.porDevolver} alCambiar={(n) => cambiarVuelve(r, { cantidad: n })} etiqueta={r.descripcion} />
+                  <MasMenos valor={m.cantidad} min={Number.isInteger(m.cantidad) ? 1 : 0.5} max={r.porDevolver} unidad={r.unidad} alCambiar={(n) => cambiarVuelve(r, { cantidad: n })} etiqueta={r.descripcion} />
                   <label className="cc-fallado"><input type="checkbox" checked={m.fallado} onChange={(e) => cambiarVuelve(r, { fallado: e.target.checked })} data-testid="fallado" />{t.estaFallado.corto}</label>
                 </span>}
               </span>
@@ -247,7 +248,7 @@ export function HojaDeCambio({ venta, alCerrar, alListo }: { venta: VentaDelDia 
           <div key={i} className="cc-renglon" data-testid="renglon-que-se-lleva">
             <Foto url={l.foto_url} />
             <span className="cc-nom"><b>{nombreDeProducto(l.descripcion)}</b>
-              <span className="cc-ed"><MasMenos valor={l.cantidad} min={Number.isInteger(l.cantidad) ? 1 : 0.5} alCambiar={(n) => setLleva(lleva.map((x, j) => (j === i ? { ...x, cantidad: n } : x)))} etiqueta={l.descripcion} />
+              <span className="cc-ed"><MasMenos valor={l.cantidad} min={Number.isInteger(l.cantidad) ? 1 : 0.5} alCambiar={(n) => setLleva(lleva.map((x, j) => (j === i ? { ...x, cantidad: n } : x)))} unidad={l.unidad} etiqueta={l.descripcion} />
                 <button type="button" className="vhc-tacho" aria-label={`Sacar ${l.descripcion}`} onClick={() => setLleva(lleva.filter((_, j) => j !== i))}><IconoC nombre="basura" tam={18} /></button></span>
             </span>
             <strong className="importe cc-sub">+{pesosCortos(valorDe(l))}</strong>

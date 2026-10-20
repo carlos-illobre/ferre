@@ -74,14 +74,14 @@ export async function delDia(dia: string | null): Promise<VentasDelDia> {
 // Anular: la venta queda marcada (no se borra) y vuelve al stock lo que descontó de verdad.
 // Las de hoy las anula quien puede anular ventas del día; las de otro día, solo quien puede
 // anular las de cualquier día (decisión 53).
-// Una venta que ya tuvo un cambio o una devolución no se anula (019): lo que volvió ya volvió al stock
-// y la plata de la diferencia ya se movió; lo que queda se devuelve con otro cambio.
-export async function anular(id: string, motivo: string | undefined, usuarioId: string, cualquierDia: boolean): Promise<"anulada" | "no-es-de-hoy" | "no-se-puede" | "tiene-cambios"> {
+// Una venta con cambios o correcciones también se anula y se deshace todo (019, E32): vuelve el stock
+// que el cliente tiene, lo fallado sigue afuera y la plata de sus cambios deja de contar.
+export async function anular(id: string, motivo: string | undefined, usuarioId: string, cualquierDia: boolean): Promise<"anulada" | "no-es-de-hoy" | "no-se-puede"> {
   return base.transaction().execute(async (trx) => {
     if (!cualquierDia && (await datos.esDeHoy(trx, id)) === false) return "no-es-de-hoy";
-    if (await datos.tieneCambios(trx, id)) return "tiene-cambios";
     if (!(await datos.marcarAnulada(trx, id))) return "no-se-puede";
     await datos.devolverStock(trx, id);
+    await datos.dejarAfueraLoFallado(trx, id);
     await anotarEvento(trx, { tipo: "venta.anulada", usuarioId, contenido: { id, motivo: motivo?.trim() || null } });
     return "anulada";
   });
@@ -208,7 +208,7 @@ export async function paraCambio(buscado: string): Promise<VentaParaCambio[]> {
   const filas = await datos.ventasParaCambio(base, buscado.trim(), DIAS_PARA_CAMBIAR);
   return filas.map((v) => ({
     id: v.id, fecha: new Date(v.fecha).toISOString(), medio_pago: v.medio_pago, cliente: v.cliente, total: v.total,
-    items: v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, cantidad: i.cantidad, foto_url: i.foto_url,
+    items: v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, cantidad: i.cantidad, foto_url: i.foto_url, unidad: i.unidad,
       por_devolver: Math.round((Number(i.cantidad) - Number(i.devuelto)) * 1000) / 1000, pagado: pagadoPorUnidad(i) })),
   }));
 }

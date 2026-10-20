@@ -11,7 +11,7 @@
 **Input**: Carlos, el 2026-10-17, sobre una imagen de referencia de «Ventas de hoy»: que entren la
 comparación con ayer, un gráfico de lo vendido por hora, cada medio de pago en su tarjeta con su
 color y cuántas ventas, tres números (ventas realizadas, productos vendidos, ticket promedio),
-cada venta como un renglón corto que se toca para ver el detalle, y «Cambiar fecha» para ver
+cada venta como un renglón corto que se toca para ver el detalle, y «Otro día» para ver
 otro día. No entran: un número de venta correlativo, el «Tip», «Ver todas», imprimir
 comprobantes. Los colores de los medios de pago siguen la decisión 108 (colores por significado).
 
@@ -89,21 +89,21 @@ productos · Cuenta corriente · $58.000») y tocarla para ver los tres.
 
 ### User Story 4 - Ver otro día (Priority: P2)
 
-Quien puede ve las ventas de un día anterior con «Cambiar fecha»: lo mismo que «Hoy», para ese
+Quien puede ve las ventas de un día anterior con «Otro día»: lo mismo que «Hoy», para ese
 día, comparado con el día anterior a ese.
 
 **Why this priority**: Es lo que falta de RF-23 (días anteriores): revisar un día que no cerró,
 o comparar.
 
-**Independent Test**: Elegir ayer con «Cambiar fecha» y ver sus ventas, su total y su
+**Independent Test**: Elegir ayer con «Otro día» y ver sus ventas, su total y su
 comparación con anteayer; volver a hoy.
 
 **Acceptance Scenarios**:
 
-1. **E16** **Given** «Hoy» abierto, **When** se toca «Cambiar fecha» y se elige el 15/10/2026, **Then** el título dice «Jueves 15/10» y todo (total, comparación, gráfico, medios, números y lista) es de ese día.
+1. **E16** **Given** «Hoy» abierto, **When** se toca «Otro día» y se elige el 15/10/2026 (en la lista de los últimos siete días o en el calendario), **Then** el título dice «Jueves 15/10» y todo (total, comparación, gráfico, medios, números y lista) es de ese día.
 2. **E17** **Given** otro día elegido, **When** se mira la comparación, **Then** es el día entero contra el día anterior a ese, entero.
 3. **E18** **Given** otro día elegido, **When** se toca «Volver a hoy», **Then** se ve hoy otra vez.
-4. **E19** **Given** «Cambiar fecha», **When** se elige una fecha futura, **Then** no se puede: el calendario llega hasta hoy.
+4. **E19** **Given** «Otro día», **When** se elige una fecha futura, **Then** no se puede: el calendario llega hasta hoy.
 5. **E20** **Given** un día sin ventas, **When** se lo elige, **Then** dice «No hubo ventas ese día» y los números en 0.
 6. **E21** **Given** sin conexión, **When** se elige otro día, **Then** dice que hace falta internet para ver otro día; hoy se sigue viendo con lo que el dispositivo tiene, como ahora.
 
@@ -146,7 +146,7 @@ venta que la tiene con lo que suma, tocarla, anularla con un motivo y verla tach
 - **RF-118**: Cada medio de pago se muestra con su ícono y su color, el importe y cuántas ventas; el color de cada medio es el mismo en toda la aplicación (decisión 108).
 - **RF-119**: «Hoy» muestra las ventas realizadas, los productos vendidos (renglones) y el ticket promedio del día, sin las anuladas.
 - **RF-120**: Cada venta del día es un renglón corto (hora, cuántos productos o el único producto, medio de pago con ícono, cliente si hay, importe) que se abre para ver sus productos.
-- **RF-121**: «Cambiar fecha» muestra lo mismo para un día anterior, comparado con su día anterior (completa RF-23, días anteriores).
+- **RF-121**: «Otro día» muestra lo mismo para un día anterior, comparado con su día anterior (completa RF-23, días anteriores).
 
 ### Key Entities *(include if feature involves data)*
 

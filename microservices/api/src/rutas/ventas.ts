@@ -38,7 +38,6 @@ ventas.post("/:id/anular", exigirPermiso("ventas.anular", "ventas.anular_cualqui
   const r = await reglas.anular(c.req.param("id"), cuerpo.datos.motivo, usuario.id, puede(usuario, "ventas.anular_cualquiera"));
   if (r === "no-es-de-hoy") return c.json({ error: "Esa venta no es de hoy. Hace falta: Anular ventas de cualquier día", permiso: "ventas.anular_cualquiera" }, 403);
   if (r === "no-se-puede") return c.json({ error: "La venta no existe o ya está anulada" }, 409);
-  if (r === "tiene-cambios") return c.json({ error: "La venta ya tuvo un cambio o una devolución: no se anula. Lo que queda se devuelve con otro cambio" }, 409);
   return c.body(null, 204);
 });
 
@@ -75,3 +74,4 @@ ventas.post("/:id/pagar", exigirPermiso("ventas.registrar"), async (c) => {
   if (!(await reglas.pagar(c.req.param("id"), c.get("sesion").usuario.id))) return c.json({ error: "La venta no es a cuenta corriente, está anulada o ya se pagó" }, 409);
   return c.body(null, 204);
 });
+

@@ -9,10 +9,10 @@ export type EstadoDeVenta = "confirmada" | "anulada";
 
 // Los importes y las cantidades salen de la base como texto, con sus decimales.
 // El subtotal del renglón lo calcula el servidor (precio × cantidad, redondeado como se cobró).
-// La foto es la del producto, si el renglón tiene producto y el producto tiene foto.
+// La foto y la unidad son las del producto, si el renglón tiene producto (sin producto, «unidad»).
 // Para corregir y cambiar (019): el `id` y el producto del renglón, cuánto ya volvió por cambios
 // (`devuelto`), el cliente, la `version` de la venta (la marca de modificación) y cuántas correcciones tuvo.
-export type ItemDeVenta = { id?: string; producto_id?: string | null; devuelto?: string; descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: string | null; explicacion: string | null; foto_url: string | null; subtotal: number };
+export type ItemDeVenta = { id?: string; producto_id?: string | null; devuelto?: string; descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: string | null; explicacion: string | null; foto_url: string | null; unidad?: string; subtotal: number };
 export type VentaDelDia = { id: string; fecha: string; medio_pago: MedioDePago; total: string; estado: EstadoDeVenta; pagada_en: string | null; cliente: string | null; cliente_id?: string | null; version?: string; correcciones?: number; items: ItemDeVenta[] };
 
 // POST /ventas/:id/corregir (019)
@@ -22,7 +22,7 @@ export type VentaCorregida = { id: string; total: number; diferencia: number; re
 // GET /ventas/para-cambio?q=… (019, E11): las ventas confirmadas de los últimos 15 días que tienen un
 // producto que coincide, de la más nueva a la más vieja, de a 20; cada renglón con lo que queda por
 // devolver (`por_devolver`) y el precio por unidad que se pagó (`pagado`).
-export type RenglonParaCambio = { id: string; producto_id: string | null; descripcion: string; cantidad: string; por_devolver: number; pagado: number; foto_url: string | null };
+export type RenglonParaCambio = { id: string; producto_id: string | null; descripcion: string; cantidad: string; por_devolver: number; pagado: number; foto_url: string | null; unidad?: string };
 export type VentaParaCambio = { id: string; fecha: string; medio_pago: MedioDePago; cliente: string | null; total: string; items: RenglonParaCambio[] };
 // POST /ventas/:id/cambio (019)
 export type CambioEntrada = z.input<typeof cambioDeVenta>;

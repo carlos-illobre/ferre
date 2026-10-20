@@ -5,7 +5,7 @@ import { conMovimiento } from "../../../plataforma/animacion/animacion";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { MEDIOS as MEDIOS_DE_TEXTOS, TEXTOS } from "../../textos";
 import { diaAnterior, nombreDelDia, resumenDelDia, useResumenDelDia, type Comparacion } from "../../../negocio/ventas/resumen-del-dia";
-import { Calendario } from "../componentes/Calendario";
+import { Calendario } from "../../Calendario";
 import { CorregirEnLaHoja, HojaDeCambio } from "./CorregirYCambio";
 import { Icono as IconoC } from "../../compu/base/ui";
 import { empezarCorreccion, type Correccion } from "../../../negocio/ventas/correccion";
@@ -14,6 +14,7 @@ import { pedirClientes } from "../../../catalogo";
 import "./hoy.css";
 import { pesosCortos } from "../../../formato";
 import { urlDeFoto } from "../../../api";
+import { conUnidad } from "../../../unidades";
 const numero = (n: number) => n.toLocaleString("es-AR");
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../negocio/ventas/venta";
 import { buscarVentas, confirmadas, fueSinConexion, hoyLocal, useVentasDelDia, MOTIVOS_DE_ANULACION, motivoDeAnulacion, plano, SIN_MOTIVO, useAnularVenta, type VentaDelDia } from "../../../negocio/ventas/ventas-del-dia";
@@ -26,7 +27,6 @@ import { buscarVentas, confirmadas, fueSinConexion, hoyLocal, useVentasDelDia, M
 
 const MEDIOS_CORTOS = Object.fromEntries(MEDIOS_DE_TEXTOS.map((m) => [m.valor, m.corto])) as Record<string, string>;
 const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
-const cantidad = (n: string) => Number(n).toLocaleString("es-AR", { maximumFractionDigits: 3 });
 const subtotal = (i: VentaDelDia["items"][number]) => i.subtotal ?? Number(i.cantidad) * Number(i.precio_unitario);
 
 export function VentasDeHoy({ anulaHoy = false, anulaCualquierDia = false }: { anulaHoy?: boolean; anulaCualquierDia?: boolean }) {
@@ -239,7 +239,7 @@ function VentasCortas({ ventas, buscado, alAbrir, sinVentas }: { ventas: VentaDe
             <button type="button" className="hoy-venta" onClick={() => alAbrir(v)}>
               <IconoDeMedio medio={v.medio_pago} tam={20} conFondo />
               <span className="hoy-venta-texto">
-                <b>{una ? <>{numero(Number(una.cantidad))} × <Resaltar texto={una.descripcion} buscado={buscado} />{resto}</> : `${v.items.length} ${t.productos.corto}`}{anulada && <span className="hoy-anulada">{t.anulada.corto}</span>}</b>
+                <b>{una ? <>{conUnidad(una.cantidad, una.unidad)} <Resaltar texto={una.descripcion} buscado={buscado} />{resto}</> : `${v.items.length} ${t.productos.corto}`}{anulada && <span className="hoy-anulada">{t.anulada.corto}</span>}</b>
                 <small>{hora(v.fecha)} · {NOMBRE_DE_MEDIO[v.medio_pago as keyof typeof NOMBRE_DE_MEDIO] ?? v.medio_pago}{v.cliente ? <> · <Resaltar texto={v.cliente} buscado={buscado} /></> : ""}</small>
               </span>
               <strong className="importe">{pesosCortos(v.total)}</strong>
@@ -292,7 +292,7 @@ function HojaDeLaVenta({ venta: v, anula, cambia, esHoy, alCerrar, alCambio, alA
           {v.items.map((i, n) => (
             <div key={n} className="an-item">
               <span className="an-foto">{urlDeFoto(i.foto_url) ? <img src={urlDeFoto(i.foto_url)!} alt="" /> : <Icono nombre="imagen" tam={18} />}</span>
-              <span><b>{cantidad(i.cantidad)} × {i.descripcion}</b><small>{pesosCortos(i.precio_unitario)} c/u{Number(i.devuelto ?? 0) > 0 ? ` · volvieron ${cantidad(i.devuelto!)}` : ""}</small></span>
+              <span><b>{conUnidad(i.cantidad, i.unidad)} {i.descripcion}</b><small>{pesosCortos(i.precio_unitario)} c/u{Number(i.devuelto ?? 0) > 0 ? ` · volvieron ${conUnidad(i.devuelto!, i.unidad)}` : ""}</small></span>
               <span className="an-subtotal">{pesosCortos(subtotal(i))}</span>
             </div>
           ))}

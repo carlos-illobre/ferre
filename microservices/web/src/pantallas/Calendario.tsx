@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icono } from "./base";
+import { Icono } from "./celular/componentes/base";
 import "./calendario.css";
 
 // Un calendario propio, con los colores de «Mostrador» (decisión 141), en lugar del del sistema: el

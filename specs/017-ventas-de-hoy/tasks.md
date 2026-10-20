@@ -14,3 +14,4 @@
 - [x] T012 [ajuste] Celular: las animaciones de la v2 en «Ventas de hoy» (el total que rueda, las barras que crecen, la marca de ayer, el globo de la barra señalada, los números que ruedan y la venta anulada que se tacha)
 - [x] T013 [interfaz] «Ventas del día» en lugar de «Ventas de hoy»; en el celular, «Otro día» con el panel de la v2 (los últimos siete días y el calendario propio) y «Buscar» en un panel (decisión 141)
 - [x] T014 [ajuste] Celular: en el calendario, tocar el mes muestra los meses del año, con ‹ › para pasar de año (pedido de Carlos del 2026-10-20)
+- [x] T015 [interfaz] Computadora: «Otro día» (F) abre el panel con los últimos siete días y «Elegir en el calendario», con el calendario propio (decisión 144)

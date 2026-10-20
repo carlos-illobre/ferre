@@ -116,11 +116,22 @@ describe("GET /ventas/para-cambio", () => {
 describe("POST /ventas/:id/anular después de un cambio", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
-  it("019-E32: una venta que ya tuvo un cambio o una devolución no se anula", async () => {
-    base.actual.programar(/from "cambio" where "venta_id" = \$1/, { rows: [{ id: "c1" }] });
+  it("019-E32: una venta que ya tuvo un cambio se anula y se deshace todo: vuelve lo de la venta, sus correcciones y sus cambios, y lo fallado sigue afuera", async () => {
+    base.actual.programar(/update "venta" set "estado"/, { rows: [], rowCount: 1 });
     const r = await pedir(app, "POST", `/ventas/${ID}/anular`, { rol: "dueño", cuerpo: {} });
-    expect(r.status).toBe(409);
-    expect((await r.json()).error).toContain("otro cambio");
-    expect(base.actual.sqlDe(/update "venta" set "estado"/)).toHaveLength(0);
+    expect(r.status).toBe(204);
+    const stock = base.actual.sqlDe(/insert into "movimiento_stock"/);
+    expect(stock).toHaveLength(2);
+    expect(stock[0]!.sql).toMatch(/"tipo" in \(\$\d+, \$\d+, \$\d+\)/);
+    expect(stock[0]!.params).toEqual(expect.arrayContaining(["venta", "correccion", "cambio"]));
+    expect(stock[1]!.sql).toMatch(/from "cambio_renglon"/);
+    expect(stock[1]!.params).toEqual(expect.arrayContaining(["vuelve", true]));
+  });
+
+  it("019-E32: la plata de los cambios de una venta anulada deja de contar en el día y en la deuda", async () => {
+    await pedir(app, "GET", "/ventas", { rol: "dueño" });
+    expect(base.actual.sqlDe(/from "movimiento_dinero" as "m"/)[0]!.sql).toMatch(/"v"\."estado" = \$/);
+    await pedir(app, "GET", "/clientes", { rol: "dueño" });
+    expect(base.actual.sqlDe(/FROM movimiento_dinero m/)[0]!.sql).toMatch(/mv\.estado = 'confirmada'/);
   });
 });

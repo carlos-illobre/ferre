@@ -38,6 +38,7 @@ Cada tarea se nombra con su carpeta (019-T003) y va en el commit. Las dependenci
 - [ ] T013 Comparar con las maquetas de la v2 mediante capturas de computadora y de celular y mostrarle a Carlos las diferencias (depende de T012)
 - [ ] T014 Revisión independiente: `revision.md`, con lo que encontró y qué se hizo con cada punto (depende de T013)
 - [ ] T015 Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de 003 (RF-24 deja de decir «no hay devoluciones de dinero») y de 017, y marcar T132 en `proyecto/tasks.md` (depende de T014)
+- [x] T016 [regla] Una venta con cambios o correcciones se anula y la anulación deshace todo: el stock que el cliente tiene vuelve, lo fallado no, y la plata de sus cambios y correcciones deja de contar (E32, decisión 144)
 
 ## Orden
 

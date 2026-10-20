@@ -12,7 +12,7 @@ let renglones = 0;
 ventas.forEach((v) => {
   v.version ??= v.fecha; v.correcciones ??= 0;
   if (v.cliente === "Constructora Martínez") v.cliente_id = "c-1";
-  v.items.forEach((i) => { i.id ??= uuid(++renglones); i.producto_id ??= PRODUCTOS[i.descripcion] ?? null; i.devuelto ??= "0"; i.margen_aplicado ??= null; i.foto_url ??= null; });
+  v.items.forEach((i) => { i.id ??= uuid(++renglones); i.producto_id ??= PRODUCTOS[i.descripcion] ?? null; i.devuelto ??= "0"; i.margen_aplicado ??= null; i.foto_url ??= null; i.unidad ??= /Clavo/.test(i.descripcion) ? "kg" : /Cinta|Cable/.test(i.descripcion) ? "m" : "unidad"; });
 });
 
 const plata = (i) => (i.margen_aplicado == null ? Number(i.precio_unitario) * Number(i.cantidad) : Math.ceil((Number(i.precio_unitario) * Number(i.cantidad)) / 1000 - 1e-9) * 1000);
@@ -21,7 +21,7 @@ export default {
     const q = String(query?.get?.("q") ?? "").toLowerCase();
     return ventas.filter((v) => v.estado === "confirmada" && v.items.some((i) => i.descripcion.toLowerCase().includes(q))).map((v) => ({
       id: v.id, fecha: v.fecha, medio_pago: v.medio_pago, cliente: v.cliente, total: v.total,
-      items: v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, cantidad: i.cantidad, foto_url: null, por_devolver: Number(i.cantidad) - Number(i.devuelto), pagado: plata(i) / Number(i.cantidad) })),
+      items: v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, cantidad: i.cantidad, foto_url: null, unidad: i.unidad, por_devolver: Number(i.cantidad) - Number(i.devuelto), pagado: plata(i) / Number(i.cantidad) })),
     }));
   },
   "POST /ventas/:id/cambio": ({ params, body }) => {

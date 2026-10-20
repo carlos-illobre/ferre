@@ -43,7 +43,7 @@ export function ventasDelDia(e: Ejecutor, dia: string | null): Promise<FilaDelDi
     .select(["v.id", "v.fecha", "v.medio_pago", "v.total", "v.estado", "v.pagada_en", "cl.nombre as cliente", "v.cliente_id", "v.modificado_en as version"])
     // Cuántas veces se corrigió (019): la lista la marca «corregida».
     .select(sql<number>`(SELECT COUNT(*) FROM correccion_venta k WHERE k.venta_id = v.id)::int`.as("correcciones"))
-    .select(sql<Omit<ItemDeVenta, "subtotal">[]>`COALESCE(json_agg(json_build_object('id', i.id, 'producto_id', i.producto_id, 'devuelto', i.devuelto, 'descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'explicacion', i.explicacion, 'foto_url', p.foto_url) ORDER BY i.orden) FILTER (WHERE i.id IS NOT NULL), '[]')`.as("items"))
+    .select(sql<Omit<ItemDeVenta, "subtotal">[]>`COALESCE(json_agg(json_build_object('id', i.id, 'producto_id', i.producto_id, 'devuelto', i.devuelto, 'descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'explicacion', i.explicacion, 'foto_url', p.foto_url, 'unidad', COALESCE(p.unidad, 'unidad')) ORDER BY i.orden) FILTER (WHERE i.id IS NOT NULL), '[]')`.as("items"))
     .where(delDiaDelLocal("v.fecha"), "=", sql<string>`COALESCE(${dia}::date, ${hoyDelLocal})`)
     .groupBy(["v.id", "cl.nombre"])
     .orderBy("v.fecha", "desc")
@@ -57,6 +57,8 @@ export function movimientosDelDia(e: Ejecutor, dia: string | null) {
   return e.selectFrom("movimiento_dinero as m").innerJoin("venta as v", "v.id", "m.venta_id")
     .select(["m.id", "m.fecha", "m.tipo", "m.medio_pago", "m.importe", "m.venta_id", "m.correccion_id", "m.cambio_id",
       sql<boolean>`(m.cambio_id IS NOT NULL OR ${delDiaDelLocal("v.fecha")} <> ${delDiaDelLocal("m.fecha")})`.as("suma")])
+    // La plata de una venta anulada deja de contar, también la de sus cambios y correcciones (E32).
+    .where("v.estado", "=", "confirmada")
     .where(delDiaDelLocal("m.fecha"), "=", sql<string>`COALESCE(${dia}::date, ${hoyDelLocal})`)
     .orderBy("m.fecha", "desc").execute();
 }
@@ -88,8 +90,17 @@ export const devolverStock = (e: Ejecutor, ventaId: string) =>
     .columns(["id", "producto_id", "tipo", "cantidad", "referencia_tipo", "referencia_id", "fecha", "nota"])
     .expression((eb) => eb.selectFrom("movimiento_stock")
       .select([sql<string>`gen_random_uuid()`.as("id"), "producto_id", sql<"ajuste">`'ajuste'`.as("tipo"), sql<string>`-cantidad`.as("cantidad"), sql<string>`'venta'`.as("referencia_tipo"), sql<string>`${ventaId}::uuid`.as("referencia_id"), sql<Date>`now()`.as("fecha"), sql<string>`'anulación de venta'`.as("nota")])
-      // Lo de la venta y lo de sus correcciones (019); lo de un cambio ya volvió o salió aparte.
-      .where("referencia_tipo", "=", "venta").where("referencia_id", "=", ventaId).where("tipo", "in", ["venta", "correccion"]))
+      // Lo de la venta, sus correcciones y sus cambios (019, E32): queda como si no hubiera existido.
+      .where("referencia_tipo", "=", "venta").where("referencia_id", "=", ventaId).where("tipo", "in", ["venta", "correccion", "cambio"]))
+    .execute();
+
+// Lo que volvió fallado en un cambio no vuelve al stock al anular: se descuenta de lo que devuelve la anulación.
+export const dejarAfueraLoFallado = (e: Ejecutor, ventaId: string) =>
+  e.insertInto("movimiento_stock")
+    .columns(["id", "producto_id", "tipo", "cantidad", "referencia_tipo", "referencia_id", "fecha", "nota"])
+    .expression((eb) => eb.selectFrom("cambio_renglon as r").innerJoin("cambio as c", "c.id", "r.cambio_id")
+      .select([sql<string>`gen_random_uuid()`.as("id"), "r.producto_id", sql<"ajuste">`'ajuste'`.as("tipo"), sql<string>`-r.cantidad`.as("cantidad"), sql<string>`'venta'`.as("referencia_tipo"), sql<string>`${ventaId}::uuid`.as("referencia_id"), sql<Date>`now()`.as("fecha"), sql<string>`'anulación de venta: lo fallado no vuelve'`.as("nota")])
+      .where("c.venta_id", "=", ventaId).where("r.lado", "=", "vuelve").where("r.fallado", "=", true).where("r.producto_id", "is not", null))
     .execute();
 
 // Cuenta corriente: marca pagada una venta confirmada a cuenta corriente que no se pagó; dice si había.
@@ -156,7 +167,7 @@ export function ventasParaCambio(e: Ejecutor, buscado: string, dias: number) {
     .innerJoin("item_venta as i", (j) => j.onRef("i.venta_id", "=", "v.id").on("i.quitado_por", "is", null))
     .leftJoin("producto as p", "p.id", "i.producto_id")
     .select(["v.id", "v.fecha", "v.medio_pago", "v.total", "cl.nombre as cliente"])
-    .select(sql<{ id: string; producto_id: string | null; descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: number | null; devuelto: string; foto_url: string | null }[]>`json_agg(json_build_object('id', i.id, 'producto_id', i.producto_id, 'descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'devuelto', i.devuelto, 'foto_url', p.foto_url) ORDER BY i.orden)`.as("items"))
+    .select(sql<{ id: string; producto_id: string | null; descripcion: string; cantidad: string; precio_unitario: string; margen_aplicado: number | null; devuelto: string; foto_url: string | null; unidad: string }[]>`json_agg(json_build_object('id', i.id, 'producto_id', i.producto_id, 'descripcion', i.descripcion, 'cantidad', i.cantidad, 'precio_unitario', i.precio_unitario, 'margen_aplicado', i.margen_aplicado, 'devuelto', i.devuelto, 'foto_url', p.foto_url, 'unidad', COALESCE(p.unidad, 'unidad')) ORDER BY i.orden)`.as("items"))
     .where("v.estado", "=", "confirmada")
     .where("v.fecha", ">=", sql<Date>`now() - make_interval(days => ${dias})`)
     .where((w) => w.exists(w.selectFrom("item_venta as b").select("b.id").whereRef("b.venta_id", "=", "v.id").where("b.quitado_por", "is", null)
@@ -173,6 +184,3 @@ export const insertarRenglonDeCambio = (e: Ejecutor, r: { cambio_id: string; lad
 
 export const sumarDevuelto = (e: Ejecutor, itemId: string, cantidad: number) =>
   e.updateTable("item_venta").set({ devuelto: sql`devuelto + ${cantidad}` }).where("id", "=", itemId).execute();
-
-export const tieneCambios = async (e: Ejecutor, ventaId: string): Promise<boolean> =>
-  Boolean(await e.selectFrom("cambio").select("id").where("venta_id", "=", ventaId).executeTakeFirst());

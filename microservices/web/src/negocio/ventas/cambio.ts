@@ -15,22 +15,22 @@ export type { VentaParaCambio };
 export const DIAS_PARA_CAMBIAR = 15;
 
 // Un renglón de la venta original que puede volver.
-export type ParaVolver = { id: string; producto_id: string | null; descripcion: string; foto_url: string | null; vendido: number; porDevolver: number; pagado: number };
+export type ParaVolver = { id: string; producto_id: string | null; descripcion: string; foto_url: string | null; unidad?: string; vendido: number; porDevolver: number; pagado: number };
 export type Vuelve = { renglon: ParaVolver; cantidad: number; fallado: boolean };
-export type SeLleva = { producto_id: string | null; descripcion: string; foto_url: string | null; cantidad: number; precio_unitario: number; margen_aplicado: number | null; costo_neto: number | null };
+export type SeLleva = { producto_id: string | null; descripcion: string; foto_url: string | null; unidad?: string; cantidad: number; precio_unitario: number; margen_aplicado: number | null; costo_neto: number | null };
 export type Resolucion = "cobrado" | "devuelto" | "cuenta_corriente" | "sin_diferencia";
 
 // Los renglones de una venta del día, con lo que queda por devolver y el precio pagado por unidad.
 export function paraVolver(v: VentaDelDia): ParaVolver[] {
   return v.items.filter((i) => i.id).map((i) => {
     const vendido = Number(i.cantidad);
-    return { id: i.id!, producto_id: i.producto_id ?? null, descripcion: i.descripcion, foto_url: i.foto_url, vendido,
+    return { id: i.id!, producto_id: i.producto_id ?? null, descripcion: i.descripcion, foto_url: i.foto_url, unidad: i.unidad, vendido,
       porDevolver: Math.round((vendido - Number(i.devuelto ?? 0)) * 1000) / 1000, pagado: Math.round((i.subtotal / vendido) * 100) / 100 };
   });
 }
 // Los de una venta encontrada al buscar (GET /ventas/para-cambio).
 export const paraVolverDeLaBusqueda = (v: VentaParaCambio): ParaVolver[] =>
-  v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, foto_url: i.foto_url, vendido: Number(i.cantidad), porDevolver: i.por_devolver, pagado: i.pagado }));
+  v.items.map((i) => ({ id: i.id, producto_id: i.producto_id, descripcion: i.descripcion, foto_url: i.foto_url, unidad: i.unidad, vendido: Number(i.cantidad), porDevolver: i.por_devolver, pagado: i.pagado }));
 
 export const valorQueVuelve = (vuelve: Vuelve[]): number => Math.round(vuelve.reduce((s, v) => s + v.renglon.pagado * v.cantidad, 0) * 100) / 100;
 export const valorQueSeLleva = (lleva: SeLleva[]): number =>

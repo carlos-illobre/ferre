@@ -27,6 +27,7 @@ computadora.
 ### Session 2026-10-20
 
 - Q: ¿Hay un plazo para el cambio? → A: 15 días desde la venta.
+- Q: ¿Una venta que ya tuvo un cambio se puede anular? → A: Sí; la anulación deshace todo: el stock que el cliente todavía tiene vuelve, lo fallado sigue afuera y la plata de los cambios y las correcciones deja de contar (decisión 144, E32).
 - Q: ¿Qué permiso hace falta? → A: El mismo que para anular: para corregir, «Anular ventas del día» para las de hoy y «Anular ventas de cualquier día» para las de otro día.
 - Q: Si el total sube, ¿se cobra la diferencia? → A: Sí, en ese momento y con el medio que se elija.
 - Q: Si baja, ¿cómo se devuelve? → A: En efectivo o, si la venta fue a cuenta corriente, bajando la deuda.
@@ -122,7 +123,7 @@ coinciden con lo cobrado y lo devuelto.
 - **E29** Un precio puesto a mano al corregir se respeta tal cual, como en la venta (RF-19).
 - **E31** Un pedido de corrección o de cambio que manda un total o una diferencia que no coincide con sus renglones: el servidor hace la cuenta de nuevo con los renglones, usa la suya y lo que guarda es lo que corresponde.
 - **E30** El producto que vuelve ya no está en el catálogo (se absorbió o se dio de baja): se acepta igual al precio pagado; si no está fallado vuelve al stock del producto que lo reemplazó, si hay uno.
-- **E32** Una venta que ya tuvo un cambio o una devolución no se anula: lo que volvió ya volvió al stock y la diferencia ya se movió; lo que queda se devuelve con otro cambio. (Supuesto del agente, 2026-10-20, a confirmar con Carlos.)
+- **E32** Una venta que ya tuvo un cambio o una devolución se puede anular, y la anulación deshace todo (decisión 144): vuelve al stock lo que el cliente todavía tiene (lo que quedó de la venta y lo que se llevó en los cambios), lo que volvió sano no se suma de nuevo y lo fallado sigue afuera; lo cobrado, lo devuelto y lo que movió la cuenta corriente en sus cambios y correcciones deja de contar, como el total de la venta.
 
 ## Requirements *(mandatory)*
 
