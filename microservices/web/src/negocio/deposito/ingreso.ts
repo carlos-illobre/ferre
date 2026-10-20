@@ -107,10 +107,11 @@ export function useIngreso(opciones: OpcionesDeIngreso) {
 
   const proveedor = proveedores?.find((p) => p.id === proveedorId) ?? null;
 
-  // Primero los productos del proveedor elegido; después el resto.
+  // Primero los productos del proveedor elegido; después el resto. El servidor ya los ordena así
+  // sobre todo lo encontrado; acá se ordena lo que llegó.
   const resultados = useMemo(() => {
     if (!consulta.trim()) return [];
-    const todos = buscarProductos(consulta, 16);
+    const todos = buscarProductos(consulta, 16, proveedor?.id);
     return proveedor ? [...todos.filter((p) => p.proveedor === proveedor.nombre), ...todos.filter((p) => p.proveedor !== proveedor.nombre)].slice(0, 8) : todos.slice(0, 8);
   }, [buscarProductos, consulta, proveedor]);
 

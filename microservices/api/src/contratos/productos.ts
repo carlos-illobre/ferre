@@ -23,7 +23,7 @@ export type ProductoDelCatalogo = {
   precio: number | null; explicacion_precio: string[]; margen_del_precio: number | null; precios: Record<string, number> | null;
 };
 
-// GET /productos/pagina?buscar=&codigo=&ids=&marca=&disponibilidad=&desde=&limite= (specs/018): solo
+// GET /productos/pagina?buscar=&codigo=&ids=&marca=&disponibilidad=&primero=&desde=&limite= (specs/018): solo
 // los productos de esa consulta, de a 50, con el stock de cada uno (los que nunca tuvieron
 // movimientos no vienen), si hay más y cuántos son en total.
 export type PaginaDeProductos = { productos: ProductoDelCatalogo[]; stock: Record<string, string>; hay_mas: boolean; total: number };
@@ -32,7 +32,9 @@ export type PaginaDeProductos = { productos: ProductoDelCatalogo[]; stock: Recor
 // trabajar sin conexión, de a 500. Sin marca, todo; con la marca de la descarga anterior, lo que
 // cambió desde entonces y los que hay que borrar. `siguiente` va como `desde` de la próxima página;
 // `marca` se guarda para la próxima descarga.
-export type DescargaDeProductos = { productos: ProductoDelCatalogo[]; quitados: string[]; hay_mas: boolean; siguiente: string | null; marca: string };
+// Cada producto lleva todos sus códigos de proveedor (para escanear sin conexión) y la respuesta, la
+// versión del cálculo del precio: si cambió desde la descarga anterior, se vuelve a bajar todo.
+export type DescargaDeProductos = { productos: (ProductoDelCatalogo & { codigos: string[] })[]; quitados: string[]; hay_mas: boolean; siguiente: string | null; marca: string; calculo: string };
 
 // GET /productos/resumen: cuántos productos hay y cuántos tienen costo pero no margen elegido.
 export type ResumenDelCatalogo = { productos: number; sin_margen: number };

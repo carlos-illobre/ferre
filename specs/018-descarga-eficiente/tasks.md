@@ -15,6 +15,7 @@ necesita, de a páginas, y que no genere registros que nadie usa (aviso de Supab
 - [x] T007 En Configuración, un botón que solo al tocarlo baja una vez todo lo necesario para trabajar sin conexión; Configuración no pierde nada (historia 5, por aclarar con Carlos) (depende de T006)
 - [x] T008 Documentación: constitución (principio IV), RNF-10, RNF-11, 009 (RF-84, RF-85), ADR-005, estado y decisión 129 (depende de T007)
 - [x] T009 Pruebas de punta a punta de los caminos principales con el catálogo en el servidor, y medida del consumo (SC-001, SC-002) (depende de T008)
-- [ ] T010 Revisión independiente (depende de T009)
+- [x] T010 Revisión independiente (depende de T009)
 - [x] T011 Quien cambia el catálogo lo ve en su pedido siguiente: el servidor pone la copia al día antes de contestar (RF-124; E08, E16) (depende de T005)
 - [x] T012 [regla] Una consulta a la base por día para que Supabase no la pause por falta de uso (RF-125, E31; pedido de Carlos del 2026-10-20)
+- [x] T013 Corregir lo que encontró la revisión independiente: el stock movido al unir duplicados, Inventario y Depósito sin conexión, los códigos de proveedor sin conexión, `/stock` sin leer productos de la base, el error que no es de red, «Cargando más…», la marca enorme, el archivo de otra base, la reconexión de LISTEN, los productos borrados, la versión del precio, primero los del proveedor, el plan y los contratos (depende de T010)

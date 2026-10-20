@@ -7,6 +7,11 @@ export class ErrorDelServidor extends Error {
   }
 }
 
+// Que el pedido no llegó al servidor: sin red, fetch falla con un TypeError. Cualquier otro
+// error (el servidor contestó con un error, una respuesta que no se entiende) no es falta de red.
+export const esFaltaDeRed = (e: unknown): boolean =>
+  e instanceof TypeError || (typeof navigator !== "undefined" && navigator.onLine === false && !(e instanceof ErrorDelServidor));
+
 export type OpcionesDeCliente = {
   origen: string;
   // La clave bajo la que el token de sesión vive en este dispositivo. Sin conexión, sigue valiendo.

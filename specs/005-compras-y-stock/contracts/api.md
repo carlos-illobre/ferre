@@ -40,7 +40,8 @@ renglón del pedido con ese producto; el pedido queda `recibido` si a ningún re
 
 | Método | Ruta | Exige | Para qué sirve |
 |---|---|---|---|
-| GET | `/stock` | Cualquiera con sesión | Stock, costo vigente y valor de cada producto activo con movimientos; `valor_total` y `por_proveedor` (unidades, valor, productos) |
+| GET | `/stock` | Cualquiera con sesión | Stock, costo vigente y valor de cada producto activo con movimientos; `valor_total` y `por_proveedor` (unidades, valor, productos). Sin el permiso de ver el dinero invertido, sin costo ni valor. De la base lee solo la suma de los movimientos; el costo y el proveedor salen de la copia del catálogo (specs/018) |
+| GET | `/stock/cambios` | Cualquiera con sesión | Para trabajar sin conexión (specs/018, historia 5): `{ marca, stock }`, el stock de cada producto con movimientos. Con `marca` (la de la vez anterior, un entero de hasta 2⁶⁴−1; otra cosa se ignora), solo el de los productos con un movimiento escrito o cambiado desde entonces |
 | GET | `/stock/:productoId/movimientos` | Cualquiera con sesión | Los movimientos que explican el stock de un producto, del más nuevo al más viejo (hasta 200) |
 | POST | `/stock/:productoId/ajustes` | Cualquiera con sesión | Corregir el stock a mano. Cuerpo: `cantidad_real` (≥ 0), `motivo` (opcional). Registra la diferencia como ajuste con la nota «había N, hay M: motivo». Devuelve `stock` y `diferencia`; sin diferencia no registra nada. 400 si la cantidad no es válida |
 

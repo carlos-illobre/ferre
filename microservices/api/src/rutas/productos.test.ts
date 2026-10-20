@@ -129,11 +129,48 @@ describe("GET /productos/descarga (specs/018, historia 5)", () => {
     expect(d.productos.map((p) => p.id)).toEqual([ID(3)]);
     expect(d.quitados).toEqual([ID(4)]);
     expect((await bajar("?marca=no-es-una-marca")).productos).toHaveLength(3); // una marca rara vale como ninguna: todo
+    expect((await bajar("?marca=99999999999999999999")).productos).toHaveLength(3); // y una que no entra en un xid8, también
+  });
+
+  it("018-E26: cada producto con todos sus códigos de proveedor, y la versión del cálculo del precio", async () => {
+    cargarParaPrueba([{ id: ID(1), descripcion: "Mecha", codigos: ["VIEJO", "NUEVO"] }]);
+    const d = (await bajar("")) as Descarga & { productos: { codigos: string[] }[]; calculo: string };
+    expect(d.productos[0]!.codigos).toEqual(["VIEJO", "NUEVO"]);
+    expect(d.calculo).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  it("sin sesión, 401", async () => {
+    cargarParaPrueba(CATALOGO);
+    expect((await pedir(app, "GET", "/productos/descarga", { rol: null })).status).toBe(401);
+  });
+});
+
+describe("primero los del proveedor elegido (Pedidos e Ingreso)", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+  it("con `primero`, los que tienen un costo de ese proveedor van adelante, sobre todo lo encontrado", async () => {
+    const PROV = "00000000-0000-0000-0000-0000000000aa";
+    cargarParaPrueba([
+      ...Array.from({ length: 60 }, (_, i) => ({ id: ID(200 + i), descripcion: `Tornillo ${String(i).padStart(2, "0")}` })),
+      { id: ID(300), descripcion: "Tornillo del proveedor elegido", proveedores: [{ proveedor_id: PROV, proveedor: "P", costo_neto: "1", fecha_lista: "2026-01-01", codigo_proveedor: "X" }] },
+    ]);
+    const r = await pagina(`?buscar=tornillo&primero=${PROV}`);
+    expect(r.productos[0]!.id).toBe(ID(300));
+    expect((await pagina("?buscar=tornillo&primero=no-es-un-id")).productos.some((p) => p.id === ID(300))).toBe(false); // sin primero, quedaba en el puesto 61
   });
 });
 
 describe("GET /productos (la aplicación de la versión anterior)", () => {
   beforeEach(() => { base.actual = baseFalsa(); cargarParaPrueba(CATALOGO); });
+
+  it("018-E07: un producto llega con los mismos datos por página, por código y como antes, para cualquier sesión", async () => {
+    const antes = (await (await pedir(app, "GET", "/productos")).json() as { id: string }[]).find((p) => p.id === ID(1));
+    for (const rol of ["mostrador", "dueño"] as const) {
+      const porIds = (await (await pedir(app, "GET", `/productos/pagina?ids=${ID(1)}`, { rol })).json() as Pagina).productos[0];
+      const porCodigo = (await (await pedir(app, "GET", "/productos/pagina?codigo=TA-81", { rol })).json() as Pagina).productos[0];
+      expect(porIds).toEqual(antes);
+      expect(porCodigo).toEqual(antes);
+    }
+  });
 
   it("sin `limite`, todo; con `limite` y `desde`, esa tanda; desde la copia", async () => {
     expect(await (await pedir(app, "GET", "/productos")).json()).toHaveLength(124);

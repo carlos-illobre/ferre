@@ -50,6 +50,8 @@ export const TEXTOS = {
   catalogo: {
     // Catálogo para vender (015): el buscador dice qué busca; resumido en el celular (decisión 47).
     buscar: { largo: "Buscar productos, códigos o marcas…", corto: "Producto, código o marca" },
+    // La lista trae de a 50: al llegar al final pide los siguientes (specs/018, E02).
+    cargandoMas: igual("Cargando más…"),
     agregar: igual("Agregar"),
     agregarALaVenta: igual("Agregar a la venta"),
     agregado: igual("Agregado a la venta"),

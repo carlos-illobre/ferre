@@ -195,7 +195,7 @@ export function Productos() {
           </table>
         </div>
       ))}
-      {hayMas && <div ref={centinela} className="detalle productos-mas" data-testid="cargar-mas">Trayendo más productos…</div>}
+      {hayMas && <div ref={centinela} className="detalle productos-mas" data-testid="cargar-mas">{TEXTOS.catalogo.cargandoMas.largo}</div>}
 
       {agregado && <div className="aviso-agregado" role="status" data-testid="agregado"><Icono nombre="tilde" tam={20} grosor={2.6} />{agregado}</div>}
       {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => quienTieneElCodigo(codigo, abierto.id)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}

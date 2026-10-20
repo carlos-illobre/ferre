@@ -60,6 +60,8 @@ export function Productos() {
   const [viendoFiltros, setViendoFiltros] = useState(false);
   const conFiltros = cuantosFiltros(filtros) > 0;
   const [error, setError] = useState<string | null>(null);
+  // El error de la lista también se cierra; si llega otro distinto, se muestra.
+  const [errorDeListaCerrado, setErrorDeListaCerrado] = useState<string | null>(null);
   const [consulta, setConsulta] = useState("");
   const consultaEstable = useDebounce(consulta, 300);
   const [elegido, setElegido] = useState(0);
@@ -130,7 +132,7 @@ export function Productos() {
       )}
       {escaneando && <Escaner alDetectar={alEscanear} alCerrar={() => setEscaneando(false)} />}
       <small className="solo-escritorio">Flechas para elegir · Enter abre{fijaMargen ? " · Shift+1 a Shift+5 fijan el margen (300, 200, 100, 50, 25 %)" : ""} · Esc limpia</small>
-      <AvisoError texto={error ?? lista.error} alCerrar={() => setError(null)} />
+      <AvisoError texto={error ?? (errorDeListaCerrado === lista.error ? null : lista.error)} alCerrar={() => { if (error) setError(null); else setErrorDeListaCerrado(lista.error); }} />
       {listo && !lista.error && resultados.length === 0 && (conFiltros ? <div className="aviso-suave" data-testid="sin-resultados">{TEXTOS.catalogo.sinProductosConFiltros.corto} <button type="button" className="enlace" onClick={() => setFiltros(SIN_FILTROS)}>{TEXTOS.catalogo.sacarFiltros.corto}</button></div>
         : consultaEstable.trim() ? <div className="aviso-suave" data-testid="sin-resultados">Nada con "{consultaEstable}". Probá con menos palabras.</div>
         : <div className="aviso-suave">Todavía no hay productos: cargá una lista de precios primero.</div>)}
@@ -139,7 +141,7 @@ export function Productos() {
           {resultados.map((p, i) => <FilaProducto key={p.id} producto={p} stock={stockDe(p, stock)} elegida={i === elegido} alAbrir={() => { setElegido(i); setAbiertoId(p.id); }} alAgregar={puedeVender ? () => agregar(p) : undefined} />)}
         </Lista>
       )}
-      {hayMas && <div ref={centinela} className="aviso-suave" data-testid="cargar-mas">Cargando más…</div>}
+      {hayMas && <div ref={centinela} className="aviso-suave" data-testid="cargar-mas">{TEXTOS.catalogo.cargandoMas.corto}</div>}
       {agregado && <div className="aviso-agregado"><Toast texto={agregado} alCerrar={() => setAgregado(null)} testId="agregado" /></div>}
       {viendoFiltros && <HojaDeFiltros filtros={filtros} marcas={marcas} cuantos={lista.total} alCambiar={setFiltros} alCerrar={() => setViendoFiltros(false)} />}
       {abierto && <FichaProducto producto={abierto} quienLoTiene={(codigo) => quienTieneElCodigo(codigo, abierto.id)} alCerrar={() => setAbiertoId(null)} alCambiar={(c) => actualizar(abierto.id, c)} />}

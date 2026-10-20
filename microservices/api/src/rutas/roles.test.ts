@@ -5,6 +5,7 @@ import { PERMISOS } from "../permisos.js";
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
 vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
+const { cargarParaPrueba } = await import("../productos/copia.js");
 
 const ROL = "0b0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c11";
 const administran = (...ids: string[]) => base.actual.programar(/FROM usuario u\s+WHERE u\.activo AND \(SELECT count\(DISTINCT rp\.permiso\)/, { rows: ids.map((id) => ({ id })) });
@@ -107,7 +108,8 @@ describe("permisos por operación", () => {
     }
   });
   it("el inventario no lleva dinero para quien no ve el dinero invertido", async () => {
-    base.actual.programar(/WITH movimientos AS/, { rows: [{ id: "p1", stock: "17", costo_neto: "1000", proveedor: "Comodo", valor: "17000", ultimo_movimiento: null }] });
+    base.actual.programar(/FROM movimiento_stock GROUP BY producto_id/, { rows: [{ id: "p1", stock: "17", ultimo_movimiento: null }] });
+    cargarParaPrueba([{ id: "p1", descripcion: "P1", costo_neto: "1000", proveedor: "Comodo" }]); // el costo, de la copia (specs/018)
     const sin = (await (await pedir(app, "GET", "/stock", { rol: "soloVende" })).json()) as { productos: { stock: string; costo_neto: unknown; valor: string }[]; valor_total: number; por_proveedor: object };
     expect(sin.productos[0]).toMatchObject({ stock: "17", costo_neto: null, valor: "0" });
     expect(sin.valor_total).toBe(0);

@@ -8,8 +8,11 @@ vi.mock("../../api", async (original) => ({ ...(await original<typeof import("..
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
 vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a) }));
 vi.mock("../../catalogo", () => ({ traerPorIds: async () => undefined }));
+const bajado = vi.hoisted(() => ({ actual: null as any }));
+vi.mock("../../descarga", () => ({ loBajado: async () => bajado.actual }));
 
 import { ErrorApi } from "../../api";
+import { consultas } from "../../consultas";
 import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStock, useMovimientos, useStock } from "./inventario";
 
 // El inventario, probado una sola vez y sin pantalla (010-E05).
@@ -18,7 +21,7 @@ const cable = producto({ id: "cable", descripcion: "CABLE", unidad: "m" });
 const fila = (id: string, stock: string) => ({ id, stock, costo_neto: "1000", proveedor: "Tresge", valor: String(Number(stock) * 1000), ultimo_movimiento: null });
 const STOCK = { productos: [fila("cinta", "17")], valor_total: 17000, por_proveedor: {} };
 
-beforeEach(() => { apiFalsa.mockReset().mockResolvedValue(STOCK); enviarOEncolar.mockClear(); });
+beforeEach(() => { bajado.actual = null; consultas.clear(); apiFalsa.mockReset().mockResolvedValue(STOCK); enviarOEncolar.mockClear(); });
 
 describe("el inventario (010-E05)", () => {
   it("trae el stock del servidor y lo deja a mano por producto", async () => {
@@ -39,6 +42,15 @@ describe("el inventario (010-E05)", () => {
     const { result } = renderHook(() => useStock());
     act(() => result.current.recargar());
     await waitFor(() => expect(result.current.error).toBeInstanceOf(ErrorApi));
+  });
+
+  it("018-E26: sin conexión y sin haberlo visto en la sesión, sale de lo bajado a mano, sin su valor", async () => {
+    apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
+    bajado.actual = { productos: [{ ...cinta, proveedor: "Tresge" }], stock: new Map([["cinta", 5], ["borrado", 2]]), clientes: [] };
+    const { result } = renderHook(() => useStock());
+    await waitFor(() => expect(result.current.datos).not.toBeNull());
+    expect(result.current.delDispositivo).toBe(true);
+    expect(result.current.datos?.productos).toEqual([{ id: "cinta", stock: "5", proveedor: "Tresge", costo_neto: null, valor: "0", ultimo_movimiento: null }]);
   });
 
   it("los movimientos se piden recién al abrir el producto", async () => {

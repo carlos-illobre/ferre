@@ -53,6 +53,19 @@ describe("buscar le pregunta al servidor", () => {
     expect(result.current.stock.get("c")).toBe(15);
   });
 
+  it("018-E03: en Pedidos e Ingreso el servidor pone primero los del proveedor elegido; se recuerda aparte", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    apiFalsa.mockImplementation(async (ruta: string) => pagina(parametros(ruta).primero ? [prod("b", "MECHA LARGA"), prod("a", "MECHA")] : [prod("a", "MECHA"), prod("b", "MECHA LARGA")]));
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("mecha", 50, "prov-1");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(parametros(pedidos()[0]!)).toEqual({ buscar: "mecha", primero: "prov-1", limite: "50" });
+    expect(result.current.buscarProductos("mecha", 50, "prov-1").map((p) => p.id)).toEqual(["b", "a"]);
+    result.current.buscarProductos("mecha");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.buscarProductos("mecha").map((p) => p.id)).toEqual(["a", "b"]);
+  });
+
   it("018-E10: sin conexión, buscar dice que hace falta internet", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     apiFalsa.mockRejectedValue(sinRed());
@@ -188,6 +201,38 @@ describe("sin conexión, con lo bajado a mano (historia 5)", () => {
     pedirClientes();
     const { result: cat } = renderHook(() => useCatalogo());
     await waitFor(() => expect(cat.current.clientes).toHaveLength(1));
+  });
+
+  it("018-E26: sin conexión se encuentra por el código de cualquiera de sus proveedores", async () => {
+    loBajado.actual!.productos.push(prod("a", "ARANDELA", { codigo_proveedor: "A-1", codigos: ["A-1", "OTRO-77"] }));
+    expect((await traerPorCodigo("OTRO-77"))?.id).toBe("a");
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("otro");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.buscarProductos("otro").map((p) => p.id)).toEqual(["a"]);
+  });
+
+  it("018-E03: sin conexión, la misma regla y el mismo orden que el servidor: primero las descripciones más cortas", async () => {
+    loBajado.actual!.productos.push(prod("ml", "MECHA 8 MM LARGA"), prod("m6", "MECHA 6"));
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("mécha");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.buscarProductos("mécha").map((p) => p.id)).toEqual(["m6", "m", "ml"]);
+    result.current.buscarProductos("ech");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.buscarProductos("ech")).toEqual([]); // el comienzo de una palabra, no el medio
+  });
+
+  it("un error del servidor no es falta de conexión: se dice tal cual y no se busca en lo bajado", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    apiFalsa.mockRejectedValue(new ErrorApi(500, "La base no responde"));
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("mecha");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.error).toBe("La base no responde");
+    expect(result.current.buscarProductos("mecha")).toEqual([]);
   });
 
   it("018-E27: con conexión se busca en el servidor aunque haya algo bajado", async () => {

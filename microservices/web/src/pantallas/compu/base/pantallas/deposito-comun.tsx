@@ -32,10 +32,11 @@ export function useEnLinea(): boolean {
 
 // Busca mientras se escribe. Flechas recorren, Enter elige, Escape limpia. En la computadora
 // los resultados flotan debajo de la caja; en el celular empujan lo que sigue.
-export function BuscadorDeProducto({ consulta, alCambiar, resultados, alElegir, alCrear, alEscanear, aLaDerecha, cajaRef, placeholder, disabled, autoFoco }: {
+export function BuscadorDeProducto({ consulta, alCambiar, resultados, alElegir, alCrear, alEscanear, aLaDerecha, cajaRef, placeholder, disabled, autoFoco, primero }: {
   consulta: string; alCambiar: (v: string) => void; resultados: Producto[]; alElegir: (p: Producto) => void;
   alCrear?: (descripcion: string) => void; alEscanear?: () => void; aLaDerecha?: (p: Producto) => ReactNode;
   cajaRef?: RefObject<HTMLInputElement>; placeholder: string; disabled?: boolean; autoFoco?: boolean;
+  primero?: string | null; // el proveedor cuyos productos van primero (Ingreso)
 }) {
   const [marcado, setMarcado] = useState(0);
   const id = useId();
@@ -52,8 +53,8 @@ export function BuscadorDeProducto({ consulta, alCambiar, resultados, alElegir, 
     else if (e.key === "Enter") {
       e.preventDefault();
       // Si el servidor todavía no contestó lo escrito, Enter espera esa respuesta (specs/018).
-      if (busquedaAlDia(texto)) { const p = resultados[marcado]; if (p) alElegir(p); else if (ofreceCrear) alCrear?.(texto); }
-      else void esperarBusqueda(texto).then((r) => { if (r[0]) alElegir(r[0]); else if (alCrear && !disabled) alCrear(texto); });
+      if (busquedaAlDia(texto, primero)) { const p = resultados[marcado]; if (p) alElegir(p); else if (ofreceCrear) alCrear?.(texto); }
+      else void esperarBusqueda(texto, 16, primero).then((r) => { if (r[0]) alElegir(r[0]); else if (alCrear && !disabled) alCrear(texto); });
     } else if (e.key === "Escape" && consulta) { e.preventDefault(); alCambiar(""); }
   }
 

@@ -171,7 +171,7 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
 
   const resultados = useMemo(() => {
     if (!consulta.trim()) return [];
-    const todos = buscarProductos(consulta, 16) as Producto[];
+    const todos = buscarProductos(consulta, 16, proveedor.id) as Producto[];
     const suyos = todos.filter((p) => segunProveedor(p, proveedor).costo !== null);
     return [...suyos, ...todos.filter((p) => !suyos.includes(p))].slice(0, 8);
   }, [buscarProductos, consulta, proveedor]);
@@ -213,7 +213,7 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
       <div className="pd-buscar">
         <input ref={caja} type="search" value={consulta} onChange={(e) => { setConsulta(e.target.value); setError(null); }} placeholder={(celular && hayCamara() ? "Buscá lo que hay que pedir, o escanealo" : "Buscá lo que hay que pedir")}
           autoFocus={!celular} autoComplete="off" aria-label="Buscar un producto para agregar al pedido" data-testid="buscar-para-pedir"
-          onKeyDown={(e) => { if (e.key === "Enter" && !busquedaAlDia(consulta)) { e.preventDefault(); void esperarBusqueda(consulta).then((r) => { if (r[0]) agregar(r[0]); }); } else if (e.key === "Enter" && resultados[0]) { e.preventDefault(); agregar(resultados[0]); } else if (e.key === "Escape") setConsulta(""); }} />
+          onKeyDown={(e) => { if (e.key === "Enter" && !busquedaAlDia(consulta, proveedor.id)) { e.preventDefault(); void esperarBusqueda(consulta, 16, proveedor.id).then((r) => { if (r[0]) agregar(r[0]); }); } else if (e.key === "Enter" && resultados[0]) { e.preventDefault(); agregar(resultados[0]); } else if (e.key === "Escape") setConsulta(""); }} />
         {celular && hayCamara() && <button type="button" className="pd-boton" onClick={() => setEscaneando(true)} aria-label="Escanear" data-testid="escanear-para-pedir">Escanear</button>}
       </div>
       {escaneando && <Escaner alDetectar={alEscanear} alCerrar={() => setEscaneando(false)} />}

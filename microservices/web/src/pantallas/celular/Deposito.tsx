@@ -203,7 +203,7 @@ function Ingreso() {
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
-    else if (e.key === "Enter") { e.preventDefault(); const texto = consulta.trim(); if (!busquedaAlDia(texto)) { void esperarBusqueda(texto).then((r) => (r[0] ? agregar(r[0]) : agregar(null, texto))); return; } if (resultados[elegido]) agregar(resultados[elegido]); else if (texto) agregar(null, texto); }
+    else if (e.key === "Enter") { e.preventDefault(); const texto = consulta.trim(); if (!busquedaAlDia(texto, proveedor?.id)) { void esperarBusqueda(texto, 16, proveedor?.id).then((r) => (r[0] ? agregar(r[0]) : agregar(null, texto))); return; } if (resultados[elegido]) agregar(resultados[elegido]); else if (texto) agregar(null, texto); }
     else if (e.key === "Escape") setConsulta("");
   }
 

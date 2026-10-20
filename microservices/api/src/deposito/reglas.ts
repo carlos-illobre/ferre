@@ -1,6 +1,9 @@
 import { base } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
+import type { FilaDeStock } from "./datos.js";
+import * as copia from "../productos/copia.js";
+import { marcaValida } from "../productos/reglas.js";
 import type { Movimiento, Stock, StockAjustado, StockQueCambio } from "../contratos/stock.js";
 import type { Enviable } from "../enviable.js";
 
@@ -8,7 +11,15 @@ import type { Enviable } from "../enviable.js";
 // El dinero invertido es de quien tiene «Ver el dinero invertido» (RF-53, RF-99): a los demás
 // les llegan las cantidades, sin costos ni valores.
 export async function stockConValor(veElDineroInvertido: boolean): Promise<Enviable<Stock>> {
-  const filas = await datos.stockDeTodos(base);
+  // El stock, de la base; el costo vigente y el proveedor, de la copia del catálogo (specs/018).
+  // Los productos que ya no están a la venta (dados de baja o unidos a otro) no van.
+  const filas: FilaDeStock[] = [];
+  for (const m of await datos.movimientosPorProducto(base)) {
+    const p = copia.fila(m.id);
+    if (!p?.vigente) continue;
+    const costo = p.costo_neto === null ? null : Number(p.costo_neto);
+    filas.push({ id: m.id, stock: m.stock, costo_neto: p.costo_neto, proveedor: p.proveedor, valor: (Math.round(Number(m.stock) * (costo ?? 0) * 100) / 100).toFixed(2), ultimo_movimiento: m.ultimo_movimiento });
+  }
   if (!veElDineroInvertido) return { productos: filas.map((r) => ({ id: r.id, stock: r.stock, proveedor: r.proveedor, ultimo_movimiento: r.ultimo_movimiento, costo_neto: null, valor: "0" })), valor_total: 0, por_proveedor: {} };
   const porProveedor: Record<string, { unidades: number; valor: number; productos: number }> = {};
   let total = 0;
@@ -23,7 +34,7 @@ export async function stockConValor(veElDineroInvertido: boolean): Promise<Envia
 }
 
 // GET /stock/cambios?marca= (specs/018, historia 5): el stock que cambió desde la descarga anterior.
-export const stockQueCambio = (marca: string | undefined): Promise<StockQueCambio> => datos.stockQueCambio(marca && /^\d{1,20}$/.test(marca) ? marca : null);
+export const stockQueCambio = (marca: string | undefined): Promise<StockQueCambio> => datos.stockQueCambio(marcaValida(marca));
 
 export const movimientos = (productoId: string): Promise<Enviable<Movimiento>[]> => datos.movimientosDe(base, productoId);
 

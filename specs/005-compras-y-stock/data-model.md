@@ -90,8 +90,9 @@ Cada entrada o salida. El stock de un producto no se guarda: es la suma de `cant
 | `fecha` | timestamptz, obligatorio | |
 | `nota` | text | La explicación del ajuste |
 | `creado_en` | timestamptz | |
+| `transaccion` | xid8, por omisión la actual | La transacción que escribió el movimiento, o la última que lo cambió (al unir duplicados pasa al producto que queda). Con ella la descarga para trabajar sin conexión trae solo el stock que se movió (specs/018) |
 
-Índice por `(producto_id, fecha)`. Quién escribe qué en esta capacidad:
+Índices por `(producto_id, fecha)` y por `transaccion`. Quién escribe qué en esta capacidad:
 
 | Origen | `tipo` | `referencia_tipo` / `referencia_id` | `nota` |
 |---|---|---|---|

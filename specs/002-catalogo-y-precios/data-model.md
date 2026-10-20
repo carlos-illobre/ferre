@@ -99,6 +99,21 @@ proveedor para ese artículo (RF-05).
 | `cantidad_bulto`, `precio_bulto` | integer, numeric(14,4), opcionales | |
 | `fecha_lista` | date | |
 
+## cambio_de_producto
+
+Qué productos cambiaron, para que la copia del catálogo del servidor y la descarga para trabajar
+sin conexión lean solo eso (specs/018, RF-124). No es un dato del negocio.
+
+| Campo | Tipo | Qué es |
+|---|---|---|
+| `producto_id` | uuid, PK | El producto tocado (no lleva clave foránea: un producto borrado se anota igual) |
+| `transaccion` | xid8 | La transacción del último cambio |
+
+La escriben triggers por sentencia sobre `producto` (alta, cambio, baja), `precio_proveedor`
+(alta, cambio y baja, con el producto viejo y el nuevo) y `proveedor` (cambio de nombre: el de
+todos sus productos). Cada sentencia que anota algo avisa con `pg_notify('catalogo')`, sin
+contenido. Se lee con la marca: el «xmin» de la foto de la lectura anterior.
+
 ## equivalencia_sugerida
 
 Posibles duplicados entre proveedores.

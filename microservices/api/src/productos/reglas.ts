@@ -2,7 +2,7 @@ import { base } from "../base.js";
 import { pool } from "../db.js";
 import { productosConStock, stockDeProductos } from "../deposito/datos.js";
 import { registrarEvento } from "../eventos.js";
-import { preciosDeUnProducto } from "../precios.js";
+import { preciosDeUnProducto, VERSION_DE_PRECIOS } from "../precios.js";
 import * as copia from "./copia.js";
 import * as datos from "./datos.js";
 import type { z } from "zod";
@@ -32,7 +32,10 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const idsDe = (ids: string | undefined) => (ids === undefined ? undefined : ids.split(",").map((x) => x.trim()).filter((x) => UUID.test(x)).slice(0, 300));
 const entero = (texto: string | undefined, si: number, tope: number) => { const n = Math.floor(Number(texto)); return Number.isFinite(n) && n >= 0 ? Math.min(n, tope) : si; };
 
-export type ConsultaDelCatalogo = { limite?: string; desde?: string; buscar?: string; codigo?: string; ids?: string; marca?: string; disponibilidad?: string };
+export type ConsultaDelCatalogo = { limite?: string; desde?: string; buscar?: string; codigo?: string; ids?: string; marca?: string; disponibilidad?: string; primero?: string };
+
+// Una marca de descarga: hasta 20 dígitos y que entre en un xid8 (2^64 - 1); otra cosa no vale como marca.
+export const marcaValida = (m: string | undefined): string | null => (m && /^\d{1,20}$/.test(m) && BigInt(m) <= 18446744073709551615n ? m : null);
 
 // GET /productos: lo de siempre, para la aplicación de la versión anterior mientras se actualiza
 // (specs/018): todo, o de a tandas, desde la copia.
@@ -48,7 +51,7 @@ export function catalogo(q: ConsultaDelCatalogo): ProductoDelCatalogo[] {
 export async function pagina(q: ConsultaDelCatalogo): Promise<PaginaDeProductos> {
   const disponibilidad = q.disponibilidad === "con-stock" || q.disponibilidad === "sin-stock" ? q.disponibilidad : null;
   const stock = disponibilidad ? { hay: disponibilidad === "con-stock", conStock: await productosConStock(base) } : null;
-  const filas = copia.buscar({ buscar: q.buscar, codigo: q.codigo, ids: idsDe(q.ids), marca: q.marca?.trim() || null, stock });
+  const filas = copia.buscar({ buscar: q.buscar, codigo: q.codigo, ids: idsDe(q.ids), marca: q.marca?.trim() || null, stock, primeroDe: q.primero && UUID.test(q.primero) ? q.primero : null });
   const limite = Math.max(1, entero(q.limite, 50, 200));
   const desde = entero(q.desde, 0, 10_000_000);
   const productos = filas.slice(desde, desde + limite);
@@ -58,10 +61,13 @@ export async function pagina(q: ConsultaDelCatalogo): Promise<PaginaDeProductos>
 // GET /productos/descarga?marca=&desde=&limite= (specs/018, historia 5): para trabajar sin
 // conexión. Sale de la copia: no lee la base.
 export function descarga(q: { marca?: string; desde?: string; limite?: string }): DescargaDeProductos {
-  const marca = q.marca && /^\d{1,20}$/.test(q.marca) ? q.marca : null;
+  const marca = marcaValida(q.marca);
   const desde = q.desde && UUID.test(q.desde) ? q.desde : "";
   const d = copia.descarga({ marca, desde, limite: Math.max(1, entero(q.limite, 500, 1000)) });
-  return { productos: d.filas.map(comoProducto), quitados: d.quitados, hay_mas: d.hayMas, siguiente: d.ultimo, marca: d.marca };
+  // Con todos sus códigos de proveedor, también los de listas viejas: sin conexión se escanean igual
+  // que con conexión (revisión 1.3). Y la versión del cálculo del precio: si cambió, el dispositivo
+  // vuelve a bajar todo (revisión 3.4).
+  return { productos: d.filas.map((f) => ({ ...comoProducto(f), codigos: f.codigos ?? [] })), quitados: d.quitados, hay_mas: d.hayMas, siguiente: d.ultimo, marca: d.marca, calculo: VERSION_DE_PRECIOS };
 }
 
 // GET /productos/resumen: cuántos productos hay y cuántos tienen costo pero no margen.

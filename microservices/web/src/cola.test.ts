@@ -27,7 +27,7 @@ describe("cola de cambios", () => {
     expect(await pendientes()).toHaveLength(0);
   });
 
-  it("sin red queda anotado y se reenvía en orden al volver", async () => {
+  it("018-E09: sin red queda anotado y se reenvía en orden al volver", async () => {
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     const { enviarOEncolar, pendientes, enviarPendientes } = await import("./cola");
     expect((await enviarOEncolar("venta", "POST", "/ventas", { id: "v1" })).encolado).toBe(true);

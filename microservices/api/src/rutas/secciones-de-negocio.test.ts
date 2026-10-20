@@ -5,13 +5,15 @@ import { PERMISOS } from "../permisos.js";
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
 vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
+const { cargarParaPrueba } = await import("../productos/copia.js");
 
 // Cómo va el negocio en tres secciones, cada una con su permiso de lectura (decisión 95): el
 // servidor no entrega lo que el permiso no deja ver.
 describe("secciones de Cómo va el negocio", () => {
   beforeEach(() => {
     base.actual = baseFalsa();
-    base.actual.programar(/WITH movimientos AS/, { rows: [{ id: "p1", stock: "4", costo_neto: "1000", proveedor: "Tresge", valor: "4000", ultimo_movimiento: null }] });
+    base.actual.programar(/FROM movimiento_stock GROUP BY producto_id/, { rows: [{ id: "p1", stock: "4", ultimo_movimiento: null }] });
+    cargarParaPrueba([{ id: "p1", descripcion: "P1", costo_neto: "1000", proveedor: "Tresge" }]); // el costo, de la copia (specs/018)
   });
 
   it("013-E06 cada dato de la pantalla pide el permiso de su sección", async () => {

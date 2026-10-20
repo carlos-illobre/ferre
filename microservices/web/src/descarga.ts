@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
-import { api, ErrorApi } from "./api";
+import { api, esFaltaDeRed } from "./api";
 import { guardarMeta, guardarVarios, leerMeta, leerTodo, reemplazarTodo } from "./almacen";
 import { guardaEnElDispositivo } from "./guardado";
 import type { Producto } from "./producto";
@@ -12,7 +12,9 @@ import type { Cliente } from "@servidor/clientes";
 // productos con su precio, costos y proveedores, el stock y los clientes) y lo guarda en el
 // dispositivo. «Actualizar» baja solo lo que cambió desde la descarga anterior: lo dice la marca
 // que dio el servidor, no el reloj de este dispositivo. Lo bajado se usa solo sin conexión.
-export type Descarga = { productos: string; stock: string; cuando: string; cuantos: number };
+// `calculo` es la versión de la cuenta del precio con la que se bajaron: si el servidor la cambió,
+// los precios guardados están hechos con la cuenta vieja y se baja todo de nuevo.
+export type Descarga = { productos: string; stock: string; cuando: string; cuantos: number; calculo?: string };
 export const SIN_CONEXION_PARA_BAJAR = "Sin conexión: para bajar los datos hace falta internet.";
 const POR_PAGINA = 500;
 
@@ -40,11 +42,20 @@ export function descargar(): Promise<void> {
       // La primera vez, cuántos son, para decir cuánto lleva.
       const total = anterior ? 0 : (await api<ResumenDelCatalogo>("/productos/resumen")).productos;
       poner({ avance: { hechos: 0, total } });
-      let hechos = 0, marca = "", desde = "";
-      if (!anterior) await reemplazarTodo("catalogo", []);
+      let hechos = 0, marca = "", desde = "", calculo = "";
+      let desdeLaMarca = anterior?.productos ?? null;
+      if (!desdeLaMarca) await reemplazarTodo("catalogo", []);
       for (;;) {
-        const q = new URLSearchParams({ limite: String(POR_PAGINA), ...(anterior ? { marca: anterior.productos } : {}), ...(desde ? { desde } : {}) });
+        const q = new URLSearchParams({ limite: String(POR_PAGINA), ...(desdeLaMarca ? { marca: desdeLaMarca } : {}), ...(desde ? { desde } : {}) });
         const d = await api<DescargaDeProductos>(`/productos/descarga?${q}`);
+        // Cambió la cuenta del precio (o lo guardado no dice con cuál se hizo): no sirve, se baja
+        // todo desde el principio.
+        if (desdeLaMarca && d.calculo !== anterior?.calculo) {
+          desdeLaMarca = null; hechos = 0; marca = "";
+          await reemplazarTodo("catalogo", []);
+          continue;
+        }
+        calculo ||= d.calculo;
         // La marca de la primera página: lo que cambie mientras se baja el resto llega la próxima vez.
         marca ||= d.marca;
         await guardarVarios("catalogo", d.productos, d.quitados);
@@ -58,12 +69,12 @@ export function descargar(): Promise<void> {
       if (anterior) await guardarVarios("stock", filas); else await reemplazarTodo("stock", filas);
       await reemplazarTodo("clientes", await api<Cliente[]>("/clientes"));
       const cuantos = (await leerTodo<{ id: string }>("catalogo")).length;
-      const nueva: Descarga = { productos: marca, stock: stock.marca, cuando: new Date().toISOString(), cuantos };
+      const nueva: Descarga = { productos: marca, stock: stock.marca, cuando: new Date().toISOString(), cuantos, calculo };
       await guardarMeta("descarga", nueva);
       bajado = null;
       poner({ descarga: nueva, avance: null });
     } catch (e) {
-      poner({ avance: null, error: e instanceof ErrorApi ? e.message : SIN_CONEXION_PARA_BAJAR });
+      poner({ avance: null, error: esFaltaDeRed(e) ? SIN_CONEXION_PARA_BAJAR : (e as Error).message });
     } finally { enCurso = null; }
   })();
   return enCurso;
@@ -82,6 +93,8 @@ export type Bajado = { productos: Producto[]; stock: Map<string, number>; client
 let bajado: Promise<Bajado | null> | null = null;
 // Lo bajado, leído una vez del dispositivo; null si no se bajó nada.
 export function loBajado(): Promise<Bajado | null> {
+  // Con la llave apagada lo bajado ya se borró (E29): no se usa lo que quedó leído en memoria.
+  if (!guardaEnElDispositivo()) { bajado = null; return Promise.resolve(null); }
   bajado ??= (async () => {
     if (!(await leerDescarga())) return null;
     const [productos, stock, clientes] = await Promise.all([leerTodo<Producto>("catalogo"), leerTodo<{ id: string; stock: string }>("stock"), leerTodo<Cliente>("clientes")]);

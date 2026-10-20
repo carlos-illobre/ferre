@@ -15,7 +15,10 @@ import type { FilaDeLaCopia, LecturaDeLaCopia } from "./datos.js";
 // catálogo entero en cada arranque gastaría la base que se quiere cuidar.
 
 // Sube cuando cambia la forma de la fila: una copia guardada con otra forma no se usa.
-const FORMATO = 2;
+const FORMATO = 3;
+// De qué base es la copia guardada: el servidor, el puerto y el nombre de la base (sin usuario ni
+// clave). Una copia de otra base (un volumen copiado entre ambientes) no se usa.
+const BASE = () => { try { const u = new URL(config.databaseUrl); return `${u.hostname}:${u.port}${u.pathname}`; } catch { return "?"; } };
 const ARCHIVO = () => path.join(config.carpetaListas, "copia", "catalogo.json");
 
 // Lo que la búsqueda compara de cada producto, armado una vez: el texto normalizado (con un
@@ -23,6 +26,9 @@ const ARCHIVO = () => path.join(config.carpetaListas, "copia", "catalogo.json");
 type Entrada = { fila: FilaDeLaCopia; texto: string; codigos: string[] };
 
 let porId = new Map<string, Entrada>();
+// Los productos que la base borró de verdad, con la marca de cuando se supo: la descarga los manda
+// como quitados (revisión 3.3; hoy el código no borra productos).
+let borrados = new Map<string, string>();
 let vigentes: Entrada[] = [];
 let marca: string | null = null;
 let marcasOrdenadas: string[] = [];
@@ -51,9 +57,9 @@ function rearmar() {
 }
 
 function aplicar(lectura: LecturaDeLaCopia, entera: boolean) {
-  if (entera) porId = new Map();
-  for (const f of lectura.filas) porId.set(f.id, entrada(f));
-  for (const id of lectura.quitados) porId.delete(id);
+  if (entera) { porId = new Map(); borrados = new Map(); }
+  for (const f of lectura.filas) { porId.set(f.id, entrada(f)); borrados.delete(f.id); }
+  for (const id of lectura.quitados) { porId.delete(id); borrados.set(id, lectura.marca); }
   marca = lectura.marca;
   rearmar();
 }
@@ -91,14 +97,17 @@ async function guardar() {
   const archivo = ARCHIVO();
   await mkdir(path.dirname(archivo), { recursive: true });
   // Se escribe al lado y se renombra: un corte a mitad no deja un archivo roto.
-  await writeFile(`${archivo}.nuevo`, JSON.stringify({ formato: FORMATO, marca, filas: [...porId.values()].map((e) => e.fila) }));
+  await writeFile(`${archivo}.nuevo`, JSON.stringify({ formato: FORMATO, base: BASE(), marca, filas: [...porId.values()].map((e) => e.fila), borrados: [...borrados] }));
   await rename(`${archivo}.nuevo`, archivo);
 }
 async function leerDelDisco(): Promise<boolean> {
   try {
-    const guardada = JSON.parse(await readFile(ARCHIVO(), "utf8")) as { formato?: unknown; marca?: unknown; filas?: unknown };
-    if (guardada.formato !== FORMATO || typeof guardada.marca !== "string" || !/^\d+$/.test(guardada.marca) || !Array.isArray(guardada.filas)) return false;
+    const guardada = JSON.parse(await readFile(ARCHIVO(), "utf8")) as { formato?: unknown; base?: unknown; marca?: unknown; filas?: unknown; borrados?: unknown };
+    if (guardada.formato !== FORMATO || guardada.base !== BASE() || typeof guardada.marca !== "string" || !/^\d+$/.test(guardada.marca) || !Array.isArray(guardada.filas)) return false;
+    // Cada fila tiene que tener, al menos, su identificador y su descripción.
+    if (!guardada.filas.every((f) => f && typeof f.id === "string" && typeof f.descripcion === "string")) return false;
     aplicar({ marca: guardada.marca, filas: guardada.filas as FilaDeLaCopia[], quitados: [] }, true);
+    if (Array.isArray(guardada.borrados)) borrados = new Map((guardada.borrados as [string, string][]).filter((b) => Array.isArray(b) && typeof b[0] === "string" && typeof b[1] === "string"));
     return true;
   } catch { return false; }
 }
@@ -113,31 +122,45 @@ let espera = 1000;
 let reconexion: ReturnType<typeof setTimeout> | null = null;
 let aviso: ReturnType<typeof setTimeout> | null = null;
 
-function alAviso() {
-  // Una lista aplicada avisa una vez por transacción; varios avisos juntos, una sola lectura.
+// Una lista aplicada avisa una vez por transacción; varios avisos juntos, una sola lectura. Si la
+// lectura falla (la base no responde), se vuelve a intentar a los 30 segundos: la copia no queda
+// atrás esperando el próximo aviso.
+function alAviso(demora = 200) {
   if (aviso) return;
-  aviso = setTimeout(() => { aviso = null; void ponerAlDia().catch((e: unknown) => console.error("no se pudo poner al día la copia del catálogo", e)); }, 200);
+  aviso = setTimeout(() => {
+    aviso = null;
+    void ponerAlDia().catch((e: unknown) => { console.error("no se pudo poner al día la copia del catálogo", e); alAviso(30_000); });
+  }, demora);
 }
 
-function reconectar() {
+// Suelta un cliente que ya no sirve. Le queda un oyente de errores que no hace nada: un error que
+// llega tarde no tumba el proceso.
+function soltar(c: pg.Client) {
+  c.removeAllListeners();
+  c.on("error", () => undefined);
+  c.end().catch(() => undefined);
+}
+
+function reconectar(c: pg.Client) {
+  soltar(c);
+  if (oyente === c) oyente = null;
   if (!escuchando || reconexion) return;
-  oyente?.removeAllListeners(); oyente?.end().catch(() => undefined); oyente = null;
   reconexion = setTimeout(() => { reconexion = null; void escuchar(); }, espera);
   espera = Math.min(espera * 2, 60_000);
 }
 
 async function escuchar() {
   const c = new pg.Client({ connectionString: config.databaseUrl, keepAlive: true });
-  c.on("notification", alAviso);
-  c.on("error", reconectar);
-  c.on("end", reconectar);
+  c.on("notification", () => alAviso());
+  c.on("error", () => reconectar(c));
+  c.on("end", () => reconectar(c));
   try {
     await c.connect();
     await c.query("LISTEN catalogo");
     oyente = c; espera = 1000;
     // Lo que cambió mientras no se escuchaba.
     alAviso();
-  } catch { reconectar(); }
+  } catch { reconectar(c); }
 }
 
 export const iniciada = () => escuchando;
@@ -160,6 +183,8 @@ export type Busqueda = {
   marca?: string | null;
   // Solo los que tienen (true) o no tienen (false) stock, con el conjunto de los que tienen.
   stock?: { hay: boolean; conStock: ReadonlySet<string> } | null;
+  // Primero los que tienen un costo de este proveedor (Pedidos e Ingreso), en el mismo orden.
+  primeroDe?: string | null;
 };
 
 // La misma regla que tenía la consulta a la base: cada palabra es el comienzo de una palabra de la
@@ -179,10 +204,16 @@ export function buscar(b: Busqueda): FilaDeLaCopia[] {
     return palabras.every((p) => e.texto.includes(` ${p}`) || e.codigos.some((c) => c.startsWith(p)));
   });
   if (palabras.length) encontrados.sort((a, b) => a.fila.descripcion.length - b.fila.descripcion.length || comparar(a.fila.descripcion, b.fila.descripcion));
-  return encontrados.map((e) => e.fila);
+  const filas = encontrados.map((e) => e.fila);
+  if (!b.primeroDe) return filas;
+  const delProveedor = (f: FilaDeLaCopia) => f.proveedor_id === b.primeroDe || (f.proveedores ?? []).some((p) => p.proveedor_id === b.primeroDe);
+  return [...filas.filter(delProveedor), ...filas.filter((f) => !delProveedor(f))];
 }
 
 export const marcas = (): readonly string[] => marcasOrdenadas;
+
+// Un producto de la copia por su identificador (también uno dado de baja), o ninguno.
+export const fila = (id: string): FilaDeLaCopia | undefined => porId.get(id)?.fila;
 
 // ---------- La descarga a mano (historia 5) ----------
 
@@ -196,7 +227,9 @@ export function descarga(q: { marca: string | null; desde: string; limite: numbe
     .filter((e) => e.fila.id > q.desde && (desdeMarca === null ? e.fila.vigente : e.fila.cambio !== null && BigInt(e.fila.cambio) >= desdeMarca))
     .sort((a, b) => (a.fila.id < b.fila.id ? -1 : 1));
   const pagina = todos.slice(0, q.limite).map((e) => e.fila);
-  return { filas: pagina.filter((f) => f.vigente), quitados: pagina.filter((f) => !f.vigente).map((f) => f.id), hayMas: todos.length > q.limite, ultimo: pagina.at(-1)?.id ?? null, marca: marca ?? "0" };
+  // Los borrados de verdad desde la marca van con la primera página.
+  const borradosDesde = desdeMarca === null || q.desde ? [] : [...borrados].filter(([, m]) => BigInt(m) >= desdeMarca).map(([id]) => id);
+  return { filas: pagina.filter((f) => f.vigente), quitados: [...pagina.filter((f) => !f.vigente).map((f) => f.id), ...borradosDesde], hayMas: todos.length > q.limite, ultimo: pagina.at(-1)?.id ?? null, marca: marca ?? "0" };
 }
 
 // Para las pruebas: la copia con estas filas, sin base ni disco.

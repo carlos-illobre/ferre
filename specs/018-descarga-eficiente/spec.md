@@ -172,6 +172,20 @@ Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html`, apr
   desde la copia, de a páginas, hasta que se actualiza.
 - La lista de marcas para el filtro sale de la copia; el filtro de stock lee de la base solo qué
   productos tienen stock.
+- Pedidos e Ingreso: los productos del proveedor elegido van primero sobre todo lo que encuentra
+  la búsqueda, no solo sobre los primeros 50.
+- Sin conexión, con lo bajado, la búsqueda sigue la misma regla y el mismo orden que en el
+  servidor (E03); lo que se muestra mientras el servidor contesta, también.
+- Una búsqueda ya contestada se reutiliza hasta un minuto, salvo que se haya guardado un cambio
+  (una venta, un ajuste, un margen): entonces se vuelve a preguntar. Una contestada con lo bajado
+  se vuelve a preguntar al servidor a los 5 segundos, por si volvió la conexión. Los clientes se
+  piden como mucho una vez por minuto.
+- Quien cambia un producto (un margen, una lista, un ingreso, un conteo, unir duplicados) lo ve
+  cambiado en su respuesta siguiente, sin esperar a que la copia se entere sola.
+- Solo cuando el pedido no llega al servidor se dice «sin conexión»; si el servidor contesta un
+  error, se dice ese error.
+- Sin conexión, Inventario muestra el stock bajado sin su valor: el dinero invertido no se baja.
+- Si una versión nueva cambia la cuenta del precio, «Actualizar» baja todo de nuevo.
 
 ## Requirements *(mandatory)*
 

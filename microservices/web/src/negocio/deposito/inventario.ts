@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api, ErrorApi } from "../../api";
+import { api, esFaltaDeRed } from "../../api";
+import { loBajado } from "../../descarga";
 import { traerPorIds, type StockFila } from "../../catalogo";
 import type { AjusteDeStock, Movimiento, Stock } from "@servidor/stock";
 import { enviarOEncolar } from "../../cola";
@@ -17,17 +18,23 @@ export type { Movimiento };
 const CLAVE = ["stock"] as const;
 type Traido = Stock & { delDispositivo: boolean };
 
-// Sin conexión se muestra lo último que se vio en esta sesión; si el servidor contesta que no, o no
-// se vio nada, es un error (sin `estado` cuando fue la conexión). El stock no se guarda en el
-// dispositivo (specs/018).
+// Sin conexión se muestra lo último que se vio en esta sesión o, si no se vio, lo que se bajó a mano
+// para trabajar sin conexión (specs/018, historia 5): el stock de cada producto, sin su valor, que
+// es del dueño y no se baja. Si el servidor contesta que no, o no hay nada, es un error (sin
+// `estado` cuando fue la conexión).
 async function traerStock(): Promise<Traido> {
   try {
     return { ...(await api<Stock>("/stock")), delDispositivo: false };
   } catch (e) {
-    if (e instanceof ErrorApi) throw e;
+    if (!esFaltaDeRed(e)) throw e;
     const visto = consultas.getQueryData<Traido>(CLAVE);
     if (visto) return { ...visto, delDispositivo: true };
-    throw e;
+    const bajado = await loBajado();
+    if (!bajado) throw e;
+    const proveedor = new Map(bajado.productos.map((p) => [p.id, p.proveedor ?? null]));
+    const productos = [...bajado.stock].filter(([id]) => proveedor.has(id))
+      .map(([id, stock]) => ({ id, stock: String(stock), proveedor: proveedor.get(id) ?? null, costo_neto: null, valor: "0", ultimo_movimiento: null }));
+    return { productos, valor_total: 0, por_proveedor: {}, delDispositivo: true };
   }
 }
 

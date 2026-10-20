@@ -1,4 +1,4 @@
-import { crearCliente, ErrorDelServidor } from "./plataforma/servidor/cliente";
+import { crearCliente, ErrorDelServidor, esFaltaDeRed } from "./plataforma/servidor/cliente";
 import { reducirImagen } from "./plataforma/imagenes/reducir";
 import type { FotoSubida } from "@servidor/productos";
 
@@ -23,7 +23,7 @@ const cliente = crearCliente({
   alGuardar: (ruta) => window.dispatchEvent(new CustomEvent(EVENTO_CAMBIO, { detail: ruta })),
 });
 
-export { ErrorDelServidor as ErrorApi };
+export { ErrorDelServidor as ErrorApi, esFaltaDeRed };
 export const urlApi = cliente.url;
 export const api = cliente.pedir;
 export const descargar = cliente.descargar;

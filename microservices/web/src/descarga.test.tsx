@@ -5,7 +5,8 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 // La descarga a mano para trabajar sin conexión (specs/018, historia 5).
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-import { leerMeta, leerTodo, respetarElGuardado } from "./almacen";
+import { ErrorApi } from "./api";
+import { guardar, leerMeta, leerTodo, respetarElGuardado } from "./almacen";
 import { descargar, loBajado, olvidarLaDescarga, SIN_CONEXION_PARA_BAJAR } from "./descarga";
 import { cambiarPreferencia, recargarPreferencias } from "./preferencias";
 import { Configuracion } from "./pantallas/Configuracion";
@@ -15,13 +16,15 @@ const pedidos = () => apiFalsa.mock.calls.map((c) => String(c[0]));
 const COMPUTADORA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36";
 
 // El servidor de mentira: 3 productos de a 2 la primera vez; con marca, lo que cambió.
+const calculo = { version: "1" };
 function servidor(cambios: { productos: any[]; quitados: string[] } | null = null) {
   apiFalsa.mockImplementation(async (ruta: string) => {
     const q = new URL(ruta, "http://x").searchParams;
     if (ruta === "/productos/resumen") return { productos: 3, sin_margen: 0 };
     if (ruta.startsWith("/productos/descarga")) {
-      if (q.get("marca")) return { productos: cambios?.productos ?? [], quitados: cambios?.quitados ?? [], hay_mas: false, siguiente: null, marca: "200" };
-      return q.get("desde") ? { productos: [prod("c")], quitados: [], hay_mas: false, siguiente: "c", marca: "101" } : { productos: [prod("a"), prod("b")], quitados: [], hay_mas: true, siguiente: "b", marca: "100" };
+      const c = calculo.version;
+      if (q.get("marca")) return { productos: cambios?.productos ?? [], quitados: cambios?.quitados ?? [], hay_mas: false, siguiente: null, marca: "200", calculo: c };
+      return q.get("desde") ? { productos: [prod("c")], quitados: [], hay_mas: false, siguiente: "c", marca: "101", calculo: c } : { productos: [prod("a"), prod("b")], quitados: [], hay_mas: true, siguiente: "b", marca: "100", calculo: c };
     }
     if (ruta.startsWith("/stock/cambios")) return q.get("marca") ? { marca: "210", stock: { b: "9" } } : { marca: "110", stock: { a: "3", b: "1" } };
     if (ruta === "/clientes") return [{ id: "cl", nombre: "Constructora" }];
@@ -31,7 +34,7 @@ function servidor(cambios: { productos: any[]; quitados: string[] } | null = nul
 
 beforeEach(async () => {
   Object.defineProperty(navigator, "userAgent", { value: COMPUTADORA, configurable: true });
-  localStorage.clear(); recargarPreferencias(); olvidarLaDescarga(); apiFalsa.mockReset();
+  calculo.version = "1"; localStorage.clear(); recargarPreferencias(); olvidarLaDescarga(); apiFalsa.mockReset();
   cambiarPreferencia("sinConexion", false); await respetarElGuardado(); // empieza sin nada guardado
   cambiarPreferencia("sinConexion", true);
 });
@@ -61,6 +64,24 @@ describe("bajar los datos para trabajar sin conexión", () => {
     expect((await loBajado())?.stock.get("b")).toBe(9);
   });
 
+  it("018-E25: si el servidor cambió la cuenta del precio, «Actualizar» baja todo de nuevo", async () => {
+    servidor({ productos: [], quitados: ["a"] });
+    await descargar();
+    calculo.version = "2";
+    apiFalsa.mockClear();
+    await descargar();
+    expect(pedidos().filter((r) => r.startsWith("/productos/descarga"))).toEqual(["/productos/descarga?limite=500&marca=100", "/productos/descarga?limite=500", "/productos/descarga?limite=500&desde=b"]);
+    expect((await leerTodo<{ id: string }>("catalogo")).map((p) => p.id).sort()).toEqual(["a", "b", "c"]);
+    expect(await leerMeta("descarga")).toMatchObject({ productos: "100", calculo: "2", cuantos: 3 });
+  });
+
+  it("018-E28: un error del servidor se muestra tal cual, no como falta de conexión", async () => {
+    apiFalsa.mockRejectedValue(new ErrorApi(500, "La base no responde"));
+    await descargar();
+    render(<Configuracion alCambiarElGuardado={() => undefined} />);
+    await waitFor(() => expect(screen.getByTestId("cfg-descarga-error").textContent?.trim()).toBe("La base no responde"));
+  });
+
   it("018-E28: sin conexión lo dice y lo bajado antes sigue", async () => {
     servidor();
     await descargar();
@@ -70,6 +91,44 @@ describe("bajar los datos para trabajar sin conexión", () => {
     await act(async () => { fireEvent.click(screen.getByTestId("cfg-descargar")); });
     await waitFor(() => expect(screen.getByTestId("cfg-descarga-error").textContent?.trim()).toBe(SIN_CONEXION_PARA_BAJAR));
     expect(await leerTodo("catalogo")).toHaveLength(3);
+  });
+});
+
+describe("qué guarda el dispositivo (RF-84)", () => {
+  it("018-E13: sin la descarga a mano no guarda catálogo, stock ni clientes: lo que bajó sola una versión anterior se borra", async () => {
+    await guardar("catalogo", prod("viejo"));
+    await guardar("stock", { id: "viejo", stock: "4" });
+    await guardar("clientes", { id: "cl", nombre: "Constructora" });
+    await respetarElGuardado();
+    expect(await leerTodo("catalogo")).toEqual([]);
+    expect(await leerTodo("stock")).toEqual([]);
+    expect(await leerTodo("clientes")).toEqual([]);
+    expect(await loBajado()).toBeNull();
+  });
+
+  it("018-E13: lo bajado a mano no se borra al abrir la aplicación", async () => {
+    servidor();
+    await descargar();
+    await respetarElGuardado();
+    expect(await leerTodo("catalogo")).toHaveLength(3);
+  });
+
+  it("018-E29: al apagar «Trabajar sin conexión» se borra lo bajado y deja de usarse", async () => {
+    servidor();
+    await descargar();
+    expect(await loBajado()).not.toBeNull();
+    const preguntar = vi.spyOn(window, "confirm").mockReturnValue(true);
+    const alCambiar = vi.fn();
+    render(<Configuracion alCambiarElGuardado={alCambiar} />);
+    fireEvent.click(screen.getByTestId("cfg-sin-conexion"));
+    await waitFor(() => expect(alCambiar).toHaveBeenCalledTimes(1));
+    expect(preguntar.mock.calls[0]![0]).toContain("también los datos bajados");
+    expect(await loBajado()).toBeNull();
+    expect(screen.queryByTestId("cfg-descarga")).toBeNull();
+    cambiarPreferencia("sinConexion", true);
+    expect(await leerMeta("descarga")).toBeUndefined();
+    expect(await leerTodo("catalogo")).toEqual([]);
+    preguntar.mockRestore();
   });
 });
 

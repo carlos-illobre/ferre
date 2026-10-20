@@ -1410,7 +1410,10 @@ RF-122:
     - microservices/api/src/rutas/productos.test.ts
     - microservices/web/src/catalogo.test.tsx
     - microservices/web/src/pantallas/celular/Catalogo.test.tsx
-  defectos: []
+    - microservices/web/src/negocio/deposito/inventario.test.tsx
+  defectos:
+    - "Inventario y el stock del Depósito piden todos los productos con movimientos al abrirse, de a 200, para ordenarlos por nombre (revisión de 018, 1.6; #134)"
+    - "Buscar un código con guion (TA-81) en el buscador no lo encuentra: la búsqueda parte en palabras y la que sigue al guion no es el comienzo de ningún código; con el código exacto (escanear) sí. Ya pasaba antes de 018 (#135)"
 
 RF-123:
   estado: "A validar (018): sin conexión se busca con lo bajado a mano; sin eso, lo dice"

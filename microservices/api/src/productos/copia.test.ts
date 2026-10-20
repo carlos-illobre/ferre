@@ -1,6 +1,6 @@
 import type { EventEmitter } from "node:events";
 import { existsSync } from "node:fs";
-import { rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FilaDeLaCopia, LecturaDeLaCopia } from "./datos.js";
@@ -11,13 +11,14 @@ import type { FilaDeLaCopia, LecturaDeLaCopia } from "./datos.js";
 const leer = vi.hoisted(() => ({ entero: vi.fn<() => Promise<LecturaDeLaCopia>>(), cambios: vi.fn<(marca: string) => Promise<LecturaDeLaCopia | null>>() }));
 vi.mock("./datos.js", async (original) => ({ ...(await original<typeof import("./datos.js")>()), leerCatalogoEntero: leer.entero, leerCambiosDesde: leer.cambios }));
 
-const oyentes = vi.hoisted(() => [] as (EventEmitter & { query: (q: string) => Promise<void> })[]);
+const oyentes = vi.hoisted(() => [] as (EventEmitter & { query: (q: string) => Promise<void>; end: () => Promise<void> })[]);
+const conexion = vi.hoisted(() => ({ falla: false }));
 vi.mock("pg", async (original) => {
   const pg = await original<typeof import("pg")>();
   const { EventEmitter } = await import("node:events");
   class Client extends EventEmitter {
     constructor() { super(); oyentes.push(this as never); }
-    async connect() { /* conectado */ }
+    async connect() { if (conexion.falla) throw new Error("no conecta"); }
     async query(_q: string) { /* LISTEN */ }
     async end() { /* cerrado */ }
   }
@@ -28,7 +29,9 @@ const fila = (id: string, descripcion: string, extra: Partial<FilaDeLaCopia> = {
   ({ id, descripcion, marca: null, codigo_barras: null, codigos: [], vigente: true, ...extra }) as FilaDeLaCopia;
 const lectura = (marca: string, filas: FilaDeLaCopia[], quitados: string[] = []): LecturaDeLaCopia => ({ marca, filas, quitados });
 const descripciones = (copia: typeof import("./copia.js")) => copia.buscar({}).map((f) => f.descripcion);
-const ARCHIVO = path.join(process.env.CARPETA_LISTAS!, "copia", "catalogo.json");
+// Cada prueba guarda en su propia carpeta: una escritura tardía de la anterior no pisa la suya.
+const CARPETA_DE_LAS_PRUEBAS = process.env.CARPETA_LISTAS!;
+let ARCHIVO = "";
 
 async function copiaNueva() {
   vi.resetModules();
@@ -37,11 +40,14 @@ async function copiaNueva() {
 
 describe("la copia del catálogo", () => {
   beforeEach(async () => {
+    await mkdir(CARPETA_DE_LAS_PRUEBAS, { recursive: true });
+    process.env.CARPETA_LISTAS = await mkdtemp(path.join(CARPETA_DE_LAS_PRUEBAS, "copia-"));
+    ARCHIVO = path.join(process.env.CARPETA_LISTAS, "copia", "catalogo.json");
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-    leer.entero.mockReset(); leer.cambios.mockReset(); oyentes.length = 0;
+    leer.entero.mockReset(); leer.cambios.mockReset(); oyentes.length = 0; conexion.falla = false;
     await rm(ARCHIVO, { force: true });
   });
-  afterEach(() => { vi.useRealTimers(); });
+  afterEach(() => { vi.useRealTimers(); process.env.CARPETA_LISTAS = CARPETA_DE_LAS_PRUEBAS; });
 
   it("018-E18: la primera vez lee la base entera; al guardarla, el próximo arranque parte del disco y lee solo lo que cambió", async () => {
     leer.entero.mockResolvedValue(lectura("100", [fila("b", "Tuerca"), fila("a", "Arandela")]));
@@ -118,5 +124,62 @@ describe("la copia del catálogo", () => {
     expect(oyentes).toHaveLength(2);
     expect(leer.cambios).toHaveBeenCalledWith("100");
     expect(descripciones(copia)).toEqual(["Arandela", "Bulón"]);
+  });
+
+  it("una copia guardada de otra base no se usa: se lee la base entera", async () => {
+    leer.entero.mockResolvedValue(lectura("100", [fila("a", "Arandela")]));
+    leer.cambios.mockResolvedValue(lectura("100", []));
+    const copia = await copiaNueva();
+    await copia.iniciar();
+    await vi.advanceTimersByTimeAsync(2500);
+    for (let i = 0; i < 1000 && !existsSync(ARCHIVO); i++) await new Promise((r) => setImmediate(r));
+    const { readFile, writeFile } = await import("node:fs/promises");
+    const guardada = JSON.parse(await readFile(ARCHIVO, "utf8"));
+    await writeFile(ARCHIVO, JSON.stringify({ ...guardada, base: "otro-servidor:5432/postgres" }));
+    leer.entero.mockClear();
+    const otra = await copiaNueva();
+    await otra.iniciar();
+    expect(leer.entero).toHaveBeenCalledTimes(1);
+  });
+
+  it("un producto que la base borró de verdad se manda como quitado en la descarga siguiente", async () => {
+    leer.entero.mockResolvedValue(lectura("100", [fila("a", "Arandela", { cambio: "90" }), fila("b", "Tuerca", { cambio: "90" })]));
+    leer.cambios.mockResolvedValueOnce(lectura("130", [], ["b"]));
+    const copia = await copiaNueva();
+    await copia.iniciar();
+    await copia.ponerAlDia();
+    expect(copia.descarga({ marca: "120", desde: "", limite: 500 }).quitados).toEqual(["b"]);
+    expect(copia.descarga({ marca: "140", desde: "", limite: 500 }).quitados).toEqual([]);
+  });
+
+  it("018-E19: un error que llega tarde del cliente que ya se soltó no tumba el proceso; si no conecta, lo suelta y reintenta", async () => {
+    leer.entero.mockResolvedValue(lectura("100", [fila("a", "Arandela")]));
+    leer.cambios.mockResolvedValue(lectura("100", []));
+    const copia = await copiaNueva();
+    await copia.iniciar();
+    const primero = oyentes.at(-1)!;
+    conexion.falla = true;
+    primero.emit("error", new Error("se cortó"));
+    expect(() => primero.emit("error", new Error("otro error, tarde"))).not.toThrow();
+    await vi.advanceTimersByTimeAsync(1500); // reintenta y no conecta
+    const segundo = oyentes.at(-1)!;
+    expect(segundo).not.toBe(primero);
+    expect(() => segundo.emit("error", new Error("tarde"))).not.toThrow();
+    conexion.falla = false;
+    await vi.advanceTimersByTimeAsync(2500); // espera creciente: 2 s
+    expect(oyentes.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("018-E19: si leer lo que cambió falla, se vuelve a intentar a los 30 segundos", async () => {
+    leer.entero.mockResolvedValue(lectura("100", [fila("a", "Arandela")]));
+    leer.cambios.mockRejectedValueOnce(new Error("la base no responde")).mockResolvedValue(lectura("120", [fila("b", "Bulón")]));
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const copia = await copiaNueva();
+    await copia.iniciar();
+    await vi.advanceTimersByTimeAsync(300); // el aviso al conectar: falla
+    expect(descripciones(copia)).toEqual(["Arandela"]);
+    await vi.advanceTimersByTimeAsync(30_500);
+    expect(descripciones(copia)).toEqual(["Arandela", "Bulón"]);
+    error.mockRestore();
   });
 });

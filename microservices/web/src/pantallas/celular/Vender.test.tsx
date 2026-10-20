@@ -297,7 +297,7 @@ describe("Vender", () => {
     expect(location.hash).toBe("#/vender/hoy");
   });
 
-  it("sin conexión, dice que quedó guardada en el celular y que se envía sola", async () => {
+  it("018-E09: sin conexión, dice que quedó guardada en el celular y que se envía sola", async () => {
     enviarOEncolar.mockResolvedValueOnce({ encolado: true });
     const { agregar, cobrar } = armar();
     agregar("mecha vender");
@@ -384,6 +384,15 @@ describe("Vender", () => {
     expect(within(libre).getByTestId("descripcion-libre")).toHaveProperty("value", "bolsa de arena");
     fireEvent.change(within(libre).getByTestId("precio-manual"), { target: { value: "1500" } });
     expect(screen.getByTestId("total").textContent).toBe("$1.500"); // el ítem libre es precio a mano: tal cual (decisión 128)
+  });
+
+  it("018-E11: sin internet, un renglón a mano se agrega y se cobra", async () => {
+    enviarOEncolar.mockResolvedValueOnce({ encolado: true });
+    const { agregar, cobrar } = armar();
+    agregar("bolsa de arena");
+    fireEvent.change(within(screen.getByTestId("item")).getByTestId("precio-manual"), { target: { value: "1500" } });
+    cobrar();
+    expect(within(await screen.findByTestId("exito")).getByRole("heading", { name: "Guardada en este celular" })).toBeTruthy();
   });
 
   // RF-72: el margen elegido en la venta queda en el producto solo con «Fijar márgenes».

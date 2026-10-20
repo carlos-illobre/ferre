@@ -17,8 +17,8 @@ productos.get("/", (c) => {
   return c.json(reglas.catalogo({ limite, desde, buscar, codigo, ids }));
 });
 productos.get("/pagina", async (c) => {
-  const { limite, desde, buscar, codigo, ids, marca, disponibilidad } = c.req.query();
-  return c.json(await reglas.pagina({ limite, desde, buscar, codigo, ids, marca, disponibilidad }));
+  const { limite, desde, buscar, codigo, ids, marca, disponibilidad, primero } = c.req.query();
+  return c.json(await reglas.pagina({ limite, desde, buscar, codigo, ids, marca, disponibilidad, primero }));
 });
 productos.get("/descarga", (c) => { const { marca, desde, limite } = c.req.query(); return c.json(reglas.descarga({ marca, desde, limite })); });
 productos.get("/resumen", (c) => c.json(reglas.resumen()));

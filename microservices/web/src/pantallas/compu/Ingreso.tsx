@@ -192,7 +192,7 @@ export function Ingreso() {
           <label className="campo compras-fecha"><span>Fecha</span><input className="entrada" type="date" value={fechaCompra} max={hoyLocal()} onChange={(e) => setFechaCompra(e.target.value || hoyLocal())} data-testid="fecha" /></label>
         </div>
 
-        <BuscadorDeProducto consulta={consulta} alCambiar={(v) => { setConsulta(v); setErrorCodigo(null); }} resultados={resultados} alElegir={(p) => agregar(p)} alCrear={(d) => agregar(null, d)} cajaRef={caja}
+        <BuscadorDeProducto primero={proveedor?.id} consulta={consulta} alCambiar={(v) => { setConsulta(v); setErrorCodigo(null); }} resultados={resultados} alElegir={(p) => agregar(p)} alCrear={(d) => agregar(null, d)} cajaRef={caja}
           placeholder={esCelular ? "Producto que llegó" : "Escribí el producto que llegó"} alEscanear={esCelular && hayCamara() ? () => { setUltimoEscaneado(null); setEscaneando(true); } : undefined}
           aLaDerecha={(p) => <span className="importe chico">{p.costo_neto === null ? "sin costo" : pesos(p.costo_neto)}</span>} />
         <Aviso tipo="error" testId="codigo-desconocido">{errorCodigo}</Aviso>

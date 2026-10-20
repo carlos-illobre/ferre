@@ -48,10 +48,29 @@ describe("GET /stock/cambios", () => {
     expect(consulta.params).toEqual(["120"]);
   });
 
-  it("018-E24: sin marca (o con una rara), el de todos los que tienen movimientos", async () => {
+  it("018-E24: sin marca (o con una rara, o una que no entra en un xid8), el de todos los que tienen movimientos", async () => {
+    expect((await pedir(app, "GET", "/stock/cambios?marca=99999999999999999999", { rol: "mostrador" })).status).toBe(200);
+    expect(base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!.sql).not.toMatch(/transaccion/);
     await pedir(app, "GET", "/stock/cambios?marca=1;DROP", { rol: "mostrador" });
     expect(base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!.sql).not.toMatch(/transaccion/);
     expect((await pedir(app, "GET", "/stock/cambios", { rol: null })).status).toBe(401);
+  });
+});
+
+// El inventario toma el costo de la copia del catálogo; de la base, solo el stock (specs/018, revisión 1.6).
+describe("GET /stock", () => {
+  beforeEach(async () => {
+    base.actual = baseFalsa();
+    base.actual.programar(/FROM movimiento_stock GROUP BY producto_id/, { rows: [{ id: "p1", stock: "3", ultimo_movimiento: null }, { id: "unido", stock: "5", ultimo_movimiento: null }] });
+    const { cargarParaPrueba } = await import("../productos/copia.js");
+    cargarParaPrueba([{ id: "p1", descripcion: "P1", costo_neto: "1000", proveedor: "Tresge" }, { id: "unido", descripcion: "Unido", costo_neto: "10", vigente: false }]);
+  });
+
+  it("no lee productos ni costos de la base; los que ya no están a la venta no van", async () => {
+    const r = await (await pedir(app, "GET", "/stock", { rol: "dueño" })).json() as { productos: { id: string; valor: string; proveedor: string }[]; valor_total: number };
+    expect(r.productos).toEqual([expect.objectContaining({ id: "p1", valor: "3000.00", proveedor: "Tresge" })]);
+    expect(r.valor_total).toBe(3000);
+    expect(base.actual.sqlDe(/FROM producto|precio_proveedor/)).toHaveLength(0);
   });
 });
 

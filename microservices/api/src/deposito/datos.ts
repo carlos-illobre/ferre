@@ -48,22 +48,11 @@ export async function stockQueCambio(marcaAnterior: string | null): Promise<{ ma
 
 export type FilaDeStock = { id: string; stock: string; costo_neto: string | null; proveedor: string | null; valor: string; ultimo_movimiento: Date | null };
 
-// Cada producto activo con movimientos: su stock, su costo vigente (el del proveedor preferido,
-// o el más reciente) y el valor, stock × costo.
-export async function stockDeTodos(e: Ejecutor): Promise<FilaDeStock[]> {
-  const { rows } = await sql<FilaDeStock>`
-    WITH movimientos AS (
-       SELECT producto_id, SUM(cantidad) AS stock, MAX(fecha) AS ultimo_movimiento FROM movimiento_stock GROUP BY producto_id
-     ), costos AS (
-       SELECT DISTINCT ON (pp.producto_id) pp.producto_id, pp.costo_neto, pp.proveedor_id, pr.nombre AS proveedor
-         FROM precio_proveedor pp JOIN producto p ON p.id = pp.producto_id JOIN proveedor pr ON pr.id = pp.proveedor_id
-        WHERE p.proveedor_preferido_id IS NULL OR pp.proveedor_id = p.proveedor_preferido_id
-        ORDER BY pp.producto_id, pp.fecha_lista DESC, pp.creado_en DESC
-     )
-     SELECT p.id, COALESCE(m.stock, 0) AS stock, co.costo_neto, co.proveedor,
-            ROUND(COALESCE(m.stock, 0) * COALESCE(co.costo_neto, 0), 2) AS valor, m.ultimo_movimiento
-       FROM producto p LEFT JOIN movimientos m ON m.producto_id = p.id LEFT JOIN costos co ON co.producto_id = p.id
-      WHERE p.activo AND (m.producto_id IS NOT NULL)`.execute(e);
+// El stock de cada producto con movimientos y su último movimiento. El costo y el proveedor no se
+// leen de acá: los tiene la copia del catálogo del servidor (specs/018, revisión 1.6).
+export async function movimientosPorProducto(e: Ejecutor): Promise<{ id: string; stock: string; ultimo_movimiento: Date | null }[]> {
+  const { rows } = await sql<{ id: string; stock: string; ultimo_movimiento: Date | null }>`
+    SELECT producto_id AS id, SUM(cantidad)::text AS stock, MAX(fecha) AS ultimo_movimiento FROM movimiento_stock GROUP BY producto_id`.execute(e);
   return rows;
 }
 

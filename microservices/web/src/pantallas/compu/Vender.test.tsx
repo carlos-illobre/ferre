@@ -240,7 +240,7 @@ describe("Vender (v2)", () => {
     expect(screen.queryByTestId("item")).toBeNull();
   });
 
-  it("sin conexión la venta queda guardada en el dispositivo y lo dice", async () => {
+  it("018-E09: sin conexión la venta queda guardada en el dispositivo y lo dice", async () => {
     enviarOEncolar.mockResolvedValueOnce({ encolado: true });
     const { agregar } = armar();
     agregar("mecha vender");

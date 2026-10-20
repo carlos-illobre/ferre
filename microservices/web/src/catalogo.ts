@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { buscar, indexar, normalizar } from "./plataforma/busqueda/busqueda";
-import { api, ErrorApi, EVENTO_CAMBIO } from "./api";
+import { normalizar } from "./plataforma/busqueda/busqueda";
+import { api, ErrorApi, esFaltaDeRed, EVENTO_CAMBIO } from "./api";
 import { cambiosDeProductosPendientes, enviarOEncolar } from "./cola";
 import { loBajado, type Bajado } from "./descarga";
 import type { Producto } from "./producto";
@@ -53,18 +53,35 @@ async function sumar(pagina: PaginaDeProductos): Promise<Producto[]> {
   return llegados;
 }
 
-const sinConexion = (e: unknown) => !(e instanceof ErrorApi);
+const sinConexion = esFaltaDeRed;
 
 // ---------- Sin conexión, lo bajado a mano (historia 5) ----------
 
 // Lo bajado, como si lo hubiera contestado el servidor: la misma forma, para sumarlo igual.
 const comoPagina = (b: Bajado, productos: Producto[], hayMas = false, total = productos.length) =>
   ({ productos, stock: Object.fromEntries(productos.map((p) => [p.id, String(b.stock.get(p.id) ?? 0)])), hay_mas: hayMas, total }) as unknown as PaginaDeProductos;
-const conCodigos = (ps: Producto[]) => ps.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }));
+// La descarga trae, de cada producto, los códigos de todos sus proveedores (no solo el del que
+// fija el costo): sin conexión se encuentra por cualquiera de ellos, como en el servidor.
+type ConCodigosBajados = Producto & { codigos?: (string | null)[] };
+const codigosDe = (p: ConCodigosBajados) => [p.codigo_proveedor, p.codigo_barras, ...(p.codigos ?? [])];
+// La regla de búsqueda del servidor (specs/018, E03), para lo bajado sin conexión y para lo que se
+// muestra mientras el servidor contesta: así el orden no cambia al llegar la respuesta. Cada
+// palabra es el comienzo de una palabra de la descripción o la marca, o el comienzo de un código;
+// primero las descripciones más cortas.
+const palabrasDe = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+function comoElServidor(ps: Producto[], consulta: string): Producto[] {
+  const palabras = palabrasDe(consulta).slice(0, 8);
+  if (!palabras.length) return [];
+  return ps.filter((p) => {
+    const texto = ` ${palabrasDe(`${p.descripcion} ${p.marca ?? ""}`).join(" ")}`;
+    const codigos = [p.codigo_barras, ...((p as ConCodigosBajados).codigos ?? [p.codigo_proveedor])].filter((c): c is string => Boolean(c)).map((c) => c.toLowerCase());
+    return palabras.every((w) => texto.includes(` ${w}`) || codigos.some((c) => c.startsWith(w)));
+  }).sort((a, b) => a.descripcion.length - b.descripcion.length || comparar(a.descripcion, b.descripcion));
+}
 const claveDeMarca = (m: string) => m.trim().toLocaleLowerCase("es-AR");
 function buscarEnLoBajado(b: Bajado, c: { buscar?: string; codigo?: string; ids?: string[]; marca?: string | null; disponibilidad?: Disponibilidad }): Producto[] {
-  let r: Producto[] = c.buscar?.trim() ? buscar(indexar(conCodigos(b.productos)), c.buscar, Number.MAX_SAFE_INTEGER) : [...b.productos].sort((x, y) => comparar(x.descripcion, y.descripcion));
-  if (c.codigo) r = r.filter((p) => p.codigo_barras === c.codigo || p.codigo_proveedor === c.codigo);
+  let r: Producto[] = c.buscar?.trim() ? comoElServidor(b.productos, c.buscar) : [...b.productos].sort((x, y) => comparar(x.descripcion, y.descripcion));
+  if (c.codigo) r = r.filter((p) => codigosDe(p).includes(c.codigo!));
   if (c.ids) { const ids = new Set(c.ids); r = r.filter((p) => ids.has(p.id)); }
   if (c.marca) r = r.filter((p) => p.marca && claveDeMarca(p.marca) === claveDeMarca(c.marca!));
   if (c.disponibilidad && c.disponibilidad !== "todos") r = r.filter((p) => ((b.stock.get(p.id) ?? 0) > 0) === (c.disponibilidad === "con-stock"));
@@ -93,17 +110,26 @@ function pedirPagina(consulta: Record<string, string | number | undefined>): Pro
 // ---------- Buscar ----------
 
 // Cada búsqueda que se le hizo al servidor, con lo que trajo en su orden, y las que están en vuelo.
+// Se recuerdan por lo escrito y, en Pedidos e Ingreso, por el proveedor cuyos productos van
+// primero (el servidor los ordena así sobre todo lo encontrado, no solo sobre los primeros 50).
+const SEPARADOR = "\u0000";
+const llaveDe = (clave: string, primero?: string | null) => (primero ? `${clave}${SEPARADOR}${primero}` : clave);
+const partesDe = (llave: string): [string, string | undefined] => { const [clave, primero] = llave.split(SEPARADOR); return [clave!, primero]; };
+// Sin conexión, el mismo orden con lo bajado: primero los que trae ese proveedor.
+const delProveedor = (p: Producto, proveedorId: string) => p.proveedor_id === proveedorId || (p.proveedores ?? []).some((x) => x.proveedor_id === proveedorId);
+const primeroLosDe = (ps: Producto[], proveedorId?: string) => (proveedorId ? [...ps.filter((p) => delProveedor(p, proveedorId)), ...ps.filter((p) => !delProveedor(p, proveedorId))] : ps);
 const busquedas = new Map<string, { ids: string[]; cuando: number }>();
 const enVueloPorClave = new Map<string, Promise<void>>();
 let espera: ReturnType<typeof setTimeout> | null = null;
 let pedida: string | null = null;
 
 function buscarYa(clave: string): Promise<void> {
+  const [texto, primero] = partesDe(clave);
   const enVuelo = enVueloPorClave.get(clave);
   if (enVuelo) return enVuelo;
   poner({ buscando: true });
   let sinRed = false;
-  const pedido = oLoBajado(pedirPagina({ buscar: clave, limite: POR_PAGINA }), (b) => { sinRed = true; return comoPagina(b, buscarEnLoBajado(b, { buscar: clave }).slice(0, POR_PAGINA)); })
+  const pedido = oLoBajado(pedirPagina({ buscar: texto, primero, limite: POR_PAGINA }), (b) => { sinRed = true; return comoPagina(b, primeroLosDe(buscarEnLoBajado(b, { buscar: texto }), primero).slice(0, POR_PAGINA)); })
     .then(async (pagina) => {
       // Lo contestado con lo bajado se vuelve a preguntar al servidor enseguida, por si volvió la conexión.
       busquedas.set(clave, { ids: pagina.productos.map((p) => p.id), cuando: sinRed ? Date.now() - REFRESCO_MS + 5000 : Date.now() });
@@ -129,31 +155,34 @@ function pedirBusqueda(clave: string) {
 }
 
 // Si lo que se ve de esta búsqueda ya es lo que contestó el servidor (o lo bajado, sin conexión).
-export function busquedaAlDia(consulta: string): boolean {
-  const clave = normalizar(consulta);
-  return !clave || (busquedas.has(clave) && pedida !== clave && !enVueloPorClave.has(clave));
+export function busquedaAlDia(consulta: string, primero?: string | null): boolean {
+  const texto = normalizar(consulta);
+  const clave = llaveDe(texto, primero);
+  return !texto || (busquedas.has(clave) && pedida !== clave && !enVueloPorClave.has(clave));
 }
 // Lo encontrado para lo escrito, sin esperar a que se deje de escribir: para Enter, que no puede
 // tomar la lista de una búsqueda vieja ni la de memoria mientras el servidor contesta.
-export async function esperarBusqueda(consulta: string, maximo = POR_PAGINA): Promise<Producto[]> {
-  const clave = normalizar(consulta);
-  if (!clave) return [];
-  if (!busquedaAlDia(consulta)) {
+export async function esperarBusqueda(consulta: string, maximo = POR_PAGINA, primero?: string | null): Promise<Producto[]> {
+  const texto = normalizar(consulta);
+  if (!texto) return [];
+  const clave = llaveDe(texto, primero);
+  if (!busquedaAlDia(consulta, primero)) {
     if (pedida === clave) { if (espera) clearTimeout(espera); espera = null; pedida = null; }
     await buscarYa(clave);
   }
-  return resultadosDe(consulta, maximo);
+  return resultadosDe(consulta, maximo, primero);
 }
 
 // Lo que se ve de una búsqueda: lo que contestó el servidor, en su orden. Mientras contesta, lo
 // que ya está en memoria y coincide, para no mostrar la lista vacía.
-function resultadosDe(consulta: string, maximo: number): Producto[] {
-  const clave = normalizar(consulta);
-  if (!clave) return [];
+function resultadosDe(consulta: string, maximo: number, primero?: string | null): Producto[] {
+  const texto = normalizar(consulta);
+  if (!texto) return [];
+  const clave = llaveDe(texto, primero);
   const hecha = busquedas.get(clave);
   if (!hecha || Date.now() - hecha.cuando > REFRESCO_MS) pedirBusqueda(clave);
   if (hecha) return hecha.ids.map((id) => porId.get(id)).filter((p): p is Producto => Boolean(p)).slice(0, maximo);
-  return buscar(indexar(estado.catalogo.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }))), consulta, maximo);
+  return primeroLosDe(comoElServidor(estado.catalogo, consulta), primero ?? undefined).slice(0, maximo);
 }
 
 // Un producto que ya llegó en esta sesión, si llegó.
@@ -292,7 +321,8 @@ function ajustarStockLocal(id: string, delta: number) {
 
 export function useCatalogo() {
   const e = useSyncExternalStore(suscribir, () => estado);
-  const buscarProductos = useCallback((consulta: string, maximo = POR_PAGINA) => resultadosDe(consulta, maximo), [e]);
+  // `primero`: el proveedor cuyos productos van primero (Pedidos, Ingreso).
+  const buscarProductos = useCallback((consulta: string, maximo = POR_PAGINA, primero?: string | null) => resultadosDe(consulta, maximo, primero), [e]);
   return { catalogo: e.catalogo, buscandoEnElServidor: e.buscando, stock: e.stock, clientes: e.clientes, error: e.error, buscarProductos, actualizarProducto, ajustarStockLocal };
 }
 

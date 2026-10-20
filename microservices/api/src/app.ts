@@ -38,7 +38,7 @@ app.get("/health", (c) => c.json({ ok: true, version: process.env.VERSION ?? "de
 
 // Quien cambia el catálogo lo ve en su pedido siguiente (specs/018, RF-124): antes de contestar, la
 // copia del servidor lee lo que cambió. Los demás lo ven cuando llega el aviso de la base.
-const CAMBIA_EL_CATALOGO = /^\/(productos|equivalencias|listas|compras|proveedores|sectores|apartados)(\/|$)/;
+const CAMBIA_EL_CATALOGO = /^\/(productos|equivalencias|listas|compras|proveedores|sectores|conteos|apartados)(\/|$)/;
 app.use("/*", async (c, next) => {
   await next();
   if (c.req.method !== "GET" && c.res.status < 400 && CAMBIA_EL_CATALOGO.test(c.req.path) && copiaIniciada()) {
