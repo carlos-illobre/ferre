@@ -26,3 +26,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T015 [ajuste] Computadora: los últimos productos vendidos los da el servidor (también a quien no ve las ventas); el panel hasta la barra del cobro; F4 al lado de «No llevó»; ← no saca el cursor de un campo (decisión 133)
 - [x] T016 [ajuste] Computadora: las animaciones de la maqueta en Vender (buscar, agregar, quitar, vaciar, importes, cuenta del menú, sin precio al cobrar) (decisión 134)
 - [x] T017 [ajuste] Computadora: el aviso de «Quitaste…» centrado sobre la barra del cobro (decisión 133)
+- [x] T018 [ajuste] Computadora: el aviso de «No llevó» (y los demás de Vender) como el de «Quitaste…», centrado, con un tilde (decisión 133)

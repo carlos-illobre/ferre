@@ -1084,7 +1084,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      Y, como en la decisión 130, ← tampoco saca el cursor de una caja de texto: con el cursor en un
      campo, ← y → son del campo; al menú se llega desde la pestaña, con Alt + número o con
      Mayúsculas+Tab. El aviso de «Quitaste…» y «Vaciaste…» es el de la maqueta: verde oscuro, con el tacho y
-     «Deshacer», sin la ×, centrado sobre la barra del cobro; se va solo.
+     «Deshacer», sin la ×, centrado sobre la barra del cobro; se va solo. Los demás avisos de Vender
+     («Anotado como “No llevó”…») van igual, con un tilde en lugar del tacho.
 134. **Vender en la computadora con las animaciones de la maqueta** (2026-10-20). Carlos pidió las de
      la maqueta elegida, sobre todo al buscar y al agregar. Con los tiempos y curvas del lenguaje
      «Mostrador»: el desplegable de la búsqueda asoma; lo que se suma (un renglón nuevo, uno al que le

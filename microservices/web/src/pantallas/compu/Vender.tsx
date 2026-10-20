@@ -158,6 +158,7 @@ export function Vender() {
   const [pestanaPanel, setPestanaPanel] = useState<"donde" | "boleta">("donde");
   const [aviso, setAviso] = useState<{ texto: string; deshacer?: () => void } | null>(null);
   useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 6000); return () => clearTimeout(t); }, [aviso]);
+  useEffect(() => { if (!mensaje || esCelular) return; const t = setTimeout(() => setMensaje(null), 6000); return () => clearTimeout(t); }, [mensaje, esCelular, setMensaje]);
   const lista = useRef<HTMLUListElement>(null);
   useDeslizar(lista, items);
   const ruedaTotal = useRueda<HTMLSpanElement>(total);
@@ -330,12 +331,13 @@ export function Vender() {
         </div>
 
         <section className="vmc-cobro" aria-label="Cobro" data-testid="cobro">
-          {aviso && (
-            // Como la maqueta (decisión 133): verde oscuro, con el tacho si se quitó algo, y «Deshacer». Se va solo.
+          {(aviso || mensaje) && (
+            // Como la maqueta (decisión 133): verde oscuro y centrado sobre la barra; con el tacho y
+            // «Deshacer» si se quitó algo, o con el tilde para lo demás («No llevó»). Se va solo.
             <div className="vmc-aviso" role="status" data-testid="mensaje">
-              <Icono nombre={aviso.deshacer ? "basura" : "prohibido"} tam={20} />
-              <span>{aviso.texto}</span>
-              {aviso.deshacer && <button type="button" onClick={() => { aviso.deshacer!(); setAviso(null); }}>Deshacer</button>}
+              <Icono nombre={aviso?.deshacer ? "basura" : "tilde"} tam={20} />
+              <span>{aviso ? aviso.texto : mensaje}</span>
+              {aviso?.deshacer && <button type="button" onClick={() => { aviso.deshacer!(); setAviso(null); }}>Deshacer</button>}
             </div>
           )}
           {error && <div className="vender-cobro-aviso"><Aviso tipo="error" testId="error-cobro">{error}</Aviso></div>}
@@ -352,7 +354,6 @@ export function Vender() {
           <Boton variante="principal" tam="grande" disabled={ocupado || !items.length} onClick={() => void cobrar()} tecla="F2" data-testid="cobrar">{ocupado ? "Cobrando…" : <>Cobrar <span className="importe vmc-rueda" ref={ruedaTotal} data-testid="total">{pesosCortos(total)}</span></>}</Boton>
         </section>
 
-        <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
         {eligiendoCliente && <ElegirCliente clientes={clientes} elegido={clienteId} soloCuentaCorriente={medio === "cuenta_corriente"} alCerrar={() => setEligiendoCliente(false)} alElegir={(id) => { setClienteId(id); setEligiendoCliente(false); }} />}
         {cobro && <VentaRegistrada cobro={cobro} alVerHoy={() => { venta.cerrarCobro(); irA("hoy"); }} alCerrar={() => { venta.cerrarCobro(); setTimeout(() => caja.current?.focus(), 0); }} />}
       </Pagina>
