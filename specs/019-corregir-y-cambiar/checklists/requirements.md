@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — queda una: el permiso para un cambio de una venta de otro día
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Falta la respuesta de Carlos sobre el permiso del cambio y su aprobación de la especificación y de las maquetas antes de `/speckit-plan`.
+- Aprobada por Carlos el 2026-10-20, con las maquetas de la v2.

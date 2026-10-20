@@ -4,9 +4,9 @@
 
 **Created**: 2026-10-20
 
-**Status**: Borrador  <!-- pasa a «Aprobada» cuando Carlos aprueba la especificación -->
+**Status**: Aprobada (Carlos, 2026-10-20)
 
-**Maquetas**: Elegidas por Carlos el 2026-10-20, a confirmar con la especificación: en la
+**Maquetas**: Aprobadas (Carlos, 2026-10-20): en la
 computadora, la v2 de «Ventas de hoy» del director de arte («El día y la venta»: la venta elegida a
 la derecha con «Corregir», «Cambio» y «Anular»); en el celular, la hoja de la venta de la v2 («La
 venta en una hoja»), para corregir y para el cambio.
@@ -27,12 +27,13 @@ computadora.
 ### Session 2026-10-20
 
 - Q: ¿Hay un plazo para el cambio? → A: 15 días desde la venta.
-- Q: ¿Qué permiso hace falta? → A: El mismo que para anular: «Anular ventas del día» para las de hoy y «Anular ventas de cualquier día» para las de otro día.
+- Q: ¿Qué permiso hace falta? → A: El mismo que para anular: para corregir, «Anular ventas del día» para las de hoy y «Anular ventas de cualquier día» para las de otro día.
 - Q: Si el total sube, ¿se cobra la diferencia? → A: Sí, en ese momento y con el medio que se elija.
 - Q: Si baja, ¿cómo se devuelve? → A: En efectivo o, si la venta fue a cuenta corriente, bajando la deuda.
 - Q: Lo devuelto, ¿vuelve al stock? → A: Se pregunta si está fallado: si lo está, no vuelve y queda anotado; si no, vuelve.
 - Q: ¿Una venta anulada se corrige o se cambia? → A: No.
 - Q: Si el cliente no sabe cuándo compró, ¿cómo se encuentra la venta? → A: Se busca por producto entre las ventas de los últimos días.
+- Q: Un cambio sobre una venta de otro día, ¿pide «Anular ventas de cualquier día»? → A: No: quien anula las ventas del día puede registrar el cambio de cualquier venta de los últimos 15 días.
 - Q: ¿Cómo se ve? → A: Como la v2: en la computadora, la venta a la derecha con sus tres botones; en el celular, la hoja de la venta. Teclas: E corregir, C cambio, Alt+C registrar un cambio.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -113,12 +114,13 @@ coinciden con lo cobrado y lo devuelto.
 
 - **E22** Una venta anulada no ofrece «Corregir» ni «Cambio», y no aparece al buscar un cambio.
 - **E23** Una venta de hace más de 15 días no aparece al buscar un cambio; si se abre desde otro día, «Cambio» dice que pasó el plazo. «Corregir» sí se puede, con el permiso de cualquier día.
-- **E24** Sin el permiso que corresponde al día de la venta, «Corregir» y «Cambio» no aparecen y el servidor rechaza el pedido (403) aunque llegue igual.
+- **E24** Sin el permiso que corresponde, los botones no aparecen y el servidor rechaza el pedido (403) aunque llegue igual: corregir una venta de hoy pide «Anular ventas del día» y una de otro día, «Anular ventas de cualquier día»; registrar un cambio pide «Anular ventas del día» (o el de cualquier día) para cualquier venta de los últimos 15 días.
 - **E25** Una corrección que deja la venta sin renglones no se guarda: dice que para eso se anula.
 - **E26** No se puede devolver más de lo que se vendió de un renglón, sumando cambios anteriores sobre la misma venta.
 - **E27** Corregir y cambiar necesitan conexión: sin internet, dice que hace falta y la venta queda como estaba (como anular).
 - **E28** Dos personas corrigiendo la misma venta a la vez: la segunda en guardar ve que la venta cambió y vuelve a empezar con los valores nuevos; no se pisa la primera.
 - **E29** Un precio puesto a mano al corregir se respeta tal cual, como en la venta (RF-19).
+- **E31** Un pedido de corrección o de cambio que manda un total o una diferencia que no coincide con sus renglones: el servidor hace la cuenta de nuevo con los renglones, usa la suya y lo que guarda es lo que corresponde.
 - **E30** El producto que vuelve ya no está en el catálogo (se absorbió o se dio de baja): se acepta igual al precio pagado; si no está fallado vuelve al stock del producto que lo reemplazó, si hay uno.
 
 ## Requirements *(mandatory)*
@@ -128,7 +130,7 @@ coinciden con lo cobrado y lo devuelto.
 - **RF-126**: Quien puede anular una venta (RF-24: «Anular ventas del día» para las de hoy, «Anular ventas de cualquier día» para las demás) puede corregirla: cambiar cantidades, precios, renglones, el medio de pago y el cliente. Una venta anulada no se corrige.
 - **RF-127**: Antes de guardar una corrección se ve cómo queda el total y la diferencia. Al guardar: si la venta es a cuenta corriente, la deuda del cliente cambia en la diferencia; si no, una diferencia a favor del local se cobra en ese momento con el medio que se elija, y una a favor del cliente se devuelve en efectivo. El stock se mueve por la diferencia de cantidades.
 - **RF-128**: Nada se borra (principio V): la venta guarda sus valores anteriores, se ve «corregida» con lo anterior a la vista, y cada cambio queda en Actividad con quién, cuándo, el valor de antes y el de ahora.
-- **RF-129**: Un cambio de producto parte de una venta confirmada de hasta 15 días, que se encuentra buscando el producto entre las ventas de esos días. Lo que vuelve se toma al precio por unidad que se pagó y no puede superar lo vendido. Se pregunta si está fallado: lo fallado no vuelve al stock y queda anotado; lo demás vuelve. Lo que se lleva se descuenta del stock como en una venta.
+- **RF-129**: Un cambio de producto lo registra quien puede anular las ventas del día (o las de cualquier día), y parte de una venta confirmada de hasta 15 días, que se encuentra buscando el producto entre las ventas de esos días. Lo que vuelve se toma al precio por unidad que se pagó y no puede superar lo vendido. Se pregunta si está fallado: lo fallado no vuelve al stock y queda anotado; lo demás vuelve. Lo que se lleva se descuenta del stock como en una venta.
 - **RF-130**: La diferencia de un cambio se cobra (con el medio que se elija) si lo nuevo vale más, y se devuelve en efectivo (o baja la deuda, si la venta original fue a cuenta corriente) si vale menos. Cambia «no hay devoluciones de dinero» de RF-24.
 - **RF-131**: Los totales del día y por medio suman lo cobrado y restan lo devuelto por correcciones y cambios en el día en que pasaron; la venta corregida cuenta en su día con sus valores nuevos.
 - **RF-132**: En la computadora, «Ventas de hoy» como la v2: la venta elegida a la derecha con «Corregir» (E), «Cambio» (C) y «Anular»; «Registrar un cambio» (Alt+C) arriba. En el celular, la hoja de la venta de la v2 con los mismos tres verbos. Todo con el teclado en la computadora (decisión 121).
@@ -157,4 +159,3 @@ coinciden con lo cobrado y lo devuelto.
 - El comprobante que se manda por WhatsApp no es fiscal (003, historia 14): corregir no genera notas de crédito.
 - Lo «devuelto fallado» se ve donde hoy se ven las anomalías de stock, con su tipo propio.
 - Corregir y cambiar requieren conexión, como anular (RNF-10 dice qué funciona sin internet: registrar ventas).
-- [NEEDS CLARIFICATION: Un cambio sobre una venta de otro día (dentro de los 15 días) pide «Anular ventas de cualquier día», como dijo Carlos («mismo permiso»). Eso deja a quien solo anula las del día sin poder registrar cambios de ventas de ayer. ¿Es así, o el cambio dentro de los 15 días lo puede hacer quien anula las del día?]
