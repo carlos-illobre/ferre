@@ -38,6 +38,7 @@ descargar todo de la base, que descargue solo lo que necesita, siempre paginado�
 - Q: ¿Se descarga todo o solo lo necesario? → A: Solo lo necesario y siempre de a páginas (Carlos).
 - Q: ¿Hacen falta los registros de la base? → A: No (Carlos): el sistema no tiene que generar registros que nadie usa.
 - Q: ¿El chequeo de salud tiene que mirar la base? → A: No (Carlos): dice si el servidor anda, sin consultar la base.
+- Q: ¿El servidor consulta la base cada vez? → A: No (Carlos): lo que se lee seguido y cambia poco y de forma controlada (los productos, las listas de precios) se guarda en una copia en el servidor, que se actualiza junto con la base cuando cambia; lo que varía (las ventas) se consulta directo en la base.
 - Q: El celular que no guarda datos, ¿cómo busca de arranque? → A: [NEEDS CLARIFICATION: hoy arranca en «Bajar el catálogo al abrir», que baja todo en cada apertura. ¿Pasa a arrancar en «Buscar en el servidor», se saca la opción de bajar todo, o queda como está?]
 
 ## User Scenarios & Testing *(mandatory)*
@@ -119,6 +120,41 @@ base se abrieron.
 2. **E18** **Given** el servidor andando, **When** se mira su salud, **Then** dice que anda y qué versión es, sin consultar la base; el despliegue sigue volviendo a la versión anterior si la nueva no arranca (RNF-13).
 3. **E19** **Given** la base no responde, **When** alguien usa la aplicación, **Then** el pedido falla con el aviso de siempre y el mostrador sigue sin conexión (RNF-11); la salud del servidor no lo dice.
 
+### User Story 5 - El servidor tiene a mano lo que cambia poco (Priority: P1)
+
+Lo que se lee todo el tiempo y cambia solo por una acción puntual (aplicar una lista de
+precios, cambiar un margen) lo tiene el servidor en una copia propia. Cada vez que cambia, se
+escribe en la base y en la copia a la vez; para leerlo, el servidor no consulta la base. Lo
+que varía todo el día, como las ventas y el stock, se lee siempre de la base.
+
+**Why this priority**: Aunque los dispositivos pidan solo lo que cambió, el servidor arma cada
+respuesta leyendo la base; con la copia, leer productos no gasta la base.
+
+**Independent Test**: Con el servidor andando, pedir el catálogo y buscar productos muchas veces
+y ver que la base no recibió ninguna consulta de productos; aplicar una lista y ver los
+precios nuevos enseguida.
+
+**Acceptance Scenarios**:
+
+1. **E20** **Given** el servidor andando con su copia cargada, **When** se piden productos, se busca en el servidor o se abre la ficha de un producto, **Then** la respuesta sale de la copia y la base no recibe ninguna consulta de productos.
+2. **E21** **Given** se aplica una lista de precios, **When** termina, **Then** la base y la copia tienen los costos nuevos, y el próximo pedido de cualquier dispositivo los ve.
+3. **E22** **Given** se cambia el margen, el código, la foto, la unidad o el proveedor de un producto, o se unen o separan duplicados, **When** el servidor lo confirma, **Then** la copia ya lo tiene.
+4. **E23** **Given** un cambio que la base rechaza o que falla a la mitad, **When** termina con error, **Then** la copia queda como estaba: nunca tiene algo que la base no tiene.
+5. **E24** **Given** el servidor arranca (por ejemplo, después de subir una versión), **When** carga su copia, **Then** parte de la que guardó en su disco y le pide a la base solo lo que cambió desde entonces; la primera vez, o si la guardada no sirve, la carga entera de a páginas.
+6. **E25** **Given** una venta, un ingreso, un ajuste o un conteo, **When** se pide el stock o las ventas, **Then** se leen de la base, como hoy.
+
+**Qué va en la copia y qué no** (para que Carlos lo confirme):
+
+| Va en la copia: se lee seguido, cambia poco y por una acción puntual | Se lee de la base: varía todo el día |
+|---|---|
+| Productos, con sus costos, márgenes, códigos y fotos | Ventas, cobros y anulaciones |
+| Listas de precios y su historial | Stock y sus movimientos |
+| Proveedores | Ingresos de mercadería y pedidos a proveedores |
+| Clientes | Conteos y ajustes |
+| Sectores y estanterías | Productos apartados |
+| Roles, permisos y usuarios | Sesiones y vínculos de dispositivos |
+| | Auditoría y avisos para revisar |
+
 ### Edge Cases
 
 - Dos cambios del mismo producto entre dos actualizaciones: llega una vez, con el último.
@@ -143,6 +179,11 @@ base se abrieron.
 - **RF-123**: El stock y los clientes se actualizan igual: solo los que cambiaron.
 - **RF-124**: Buscar en el servidor (RF-85) trae de a 50 resultados y los siguientes al llegar al
   final de la lista.
+- **RF-126**: El servidor guarda en una copia propia lo que se lee seguido y cambia poco (la
+  tabla de la historia 5) y lo lee de ahí, sin consultar la base. Cada cambio se escribe en la
+  base y, recién cuando la base lo confirma, en la copia. Lo que varía (ventas, stock y lo demás
+  de la tabla) se lee de la base. Al arrancar, la copia parte de la guardada en el disco del
+  servidor y pide a la base solo lo que cambió.
 - **RF-125**: Ver si el servidor anda no consulta la base (Carlos, 2026-10-20). Nada de lo que corre
   solo, a ritmo fijo, consulta la base ni abre conexiones nuevas; las que se abren para atender
   pedidos se reutilizan.
@@ -166,6 +207,13 @@ base se abrieron.
 - **SC-004**: Vender, buscar y escanear siguen igual de rápidos, con y sin conexión.
 
 ## Assumptions
+
+- Cada ambiente tiene un solo proceso del servidor que atiende a la aplicación: la copia es una
+  sola y no hay otra que se desactualice. Si algún día hay dos, este requerimiento se revisa.
+- Un cambio hecho a mano en la base, por fuera del servidor, no llega a la copia hasta que el
+  servidor se reinicia. No se hace en la operación normal.
+- El ambiente de pruebas se reinicia con cada subida, muchas veces por día: por eso la copia se
+  guarda en el disco y al arrancar se pide solo lo que cambió, en vez de leer todo otra vez.
 
 - La computadora y el celular que guarda datos siguen teniendo el catálogo entero en el
   dispositivo: lo exige vender sin conexión (RNF-10, RNF-11). «Solo lo necesario» es, para
