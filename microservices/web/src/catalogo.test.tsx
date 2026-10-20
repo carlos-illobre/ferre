@@ -211,6 +211,10 @@ describe("sin conexión, con lo bajado a mano (historia 5)", () => {
     result.current.buscarProductos("otro");
     await act(async () => { await vi.advanceTimersByTimeAsync(350); });
     expect(result.current.buscarProductos("otro").map((p) => p.id)).toEqual(["a"]);
+    // Escrito entero, con su guion, también (decisión 139).
+    result.current.buscarProductos("OTRO-77");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.buscarProductos("OTRO-77").map((p) => p.id)).toEqual(["a"]);
   });
 
   it("018-E03: sin conexión, la misma regla y el mismo orden que el servidor: primero las descripciones más cortas", async () => {

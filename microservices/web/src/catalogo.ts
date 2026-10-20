@@ -67,15 +67,17 @@ const codigosDe = (p: ConCodigosBajados) => [p.codigo_proveedor, p.codigo_barras
 // La regla de búsqueda del servidor (specs/018, E03), para lo bajado sin conexión y para lo que se
 // muestra mientras el servidor contesta: así el orden no cambia al llegar la respuesta. Cada
 // palabra es el comienzo de una palabra de la descripción o la marca, o el comienzo de un código;
+// lo escrito entero, con sus signos, también vale como comienzo de un código (TA-81, decisión 139);
 // primero las descripciones más cortas.
 const palabrasDe = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
 function comoElServidor(ps: Producto[], consulta: string): Producto[] {
   const palabras = palabrasDe(consulta).slice(0, 8);
+  const entero = consulta.trim().toLowerCase();
   if (!palabras.length) return [];
   return ps.filter((p) => {
     const texto = ` ${palabrasDe(`${p.descripcion} ${p.marca ?? ""}`).join(" ")}`;
     const codigos = [p.codigo_barras, ...((p as ConCodigosBajados).codigos ?? [p.codigo_proveedor])].filter((c): c is string => Boolean(c)).map((c) => c.toLowerCase());
-    return palabras.every((w) => texto.includes(` ${w}`) || codigos.some((c) => c.startsWith(w)));
+    return palabras.every((w) => texto.includes(` ${w}`) || codigos.some((c) => c.startsWith(w))) || codigos.some((c) => c.startsWith(entero));
   }).sort((a, b) => a.descripcion.length - b.descripcion.length || comparar(a.descripcion, b.descripcion));
 }
 const claveDeMarca = (m: string) => m.trim().toLocaleLowerCase("es-AR");

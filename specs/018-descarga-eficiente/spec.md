@@ -40,6 +40,7 @@ ventas».
 - Q: ¿Qué pasa sin internet? → A: Se pierde la búsqueda; se conserva registrar ventas (decisión 129). Cambia el principio IV de la constitución y RNF-10.
 - Q: ¿Se sacan «Trabajar sin conexión» y «Cómo buscar productos» de Configuración? → A: No: Configuración queda como está; se agrega un botón que, solo al tocarlo, baja una vez todo lo necesario para trabajar sin conexión.
 - Q: ¿Dónde va el botón, qué baja y cuándo se usa? → A: En el celular y en la computadora, solo con «Trabajar sin conexión» habilitado; lo que necesita el empleado (quien vende y quien compra) para el día a día, no lo del administrador (Procesos, «Cómo va el negocio»); se usa solo sin conexión. «Cómo buscar productos» queda como está por ahora.
+- Q: ¿Y «Cómo buscar productos»? → A: Se saca: ya no cambiaba nada (Carlos, 2026-10-20, decisión 138).
 - Q: ¿Cómo se sabe qué es nuevo al volver a tocarlo? → A: Con la marca que da el servidor en cada descarga (no la fecha y hora del dispositivo): trae solo lo que cambió desde entonces.
 - Q: ¿«Trabajar sin conexión» en la computadora? → A: Sí, también (Carlos).
 - Q: ¿Hacen falta los registros de la base? → A: No: el sistema no genera registros que nadie usa.
@@ -64,7 +65,7 @@ hasta el final y ver que llegan los siguientes; medir que no llegó ningún otro
 
 1. **E01** **Given** una pantalla con productos recién abierta, **When** se mira, **Then** llegan los primeros 50 en orden alfabético, con su precio, su margen, su stock y sus proveedores; no llega ningún otro producto.
 2. **E02** **Given** los primeros 50 a la vista, **When** se llega al final de la lista, **Then** llegan los 50 siguientes, con «Cargando más…» mientras tanto; al final, ninguno más.
-3. **E03** **Given** una búsqueda por nombre, marca o código de proveedor con 300 resultados, **When** se escribe, **Then** se consulta una vez cuando se deja de escribir y llegan los primeros 50, en el mismo orden que hoy (primero las descripciones más cortas).
+3. **E03** **Given** una búsqueda por nombre, marca o código de proveedor con 300 resultados, **When** se escribe, **Then** se consulta una vez cuando se deja de escribir y llegan los primeros 50, en el mismo orden que hoy (primero las descripciones más cortas). Lo escrito entero, con sus signos (TA-81, 10/2), también vale como el comienzo de un código: así se encuentra un código con guion o barra escribiéndolo, y no solo escaneándolo (decisión 139).
 4. **E04** **Given** un código de barras escaneado o tipeado, **When** se lo busca, **Then** llega solo el producto de ese código, o «no existe» si no hay ninguno.
 5. **E05** **Given** los filtros del Catálogo (con stock, sin stock, marca), **When** se elige uno, **Then** el servidor filtra y devuelve la primera página; la lista de marcas para elegir también viene del servidor.
 6. **E06** **Given** una pantalla que necesita productos puntuales (los de un pedido, los de la venta del celular vinculado, los que tienen stock en Inventario), **When** se abre, **Then** pide esos productos por su identificador, de a páginas, y no el resto.

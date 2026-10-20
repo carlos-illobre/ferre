@@ -207,10 +207,6 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 **RF-65: gasto semanal en compras**
 17. ¿La «semana» del gasto son los últimos 7 días o la semana de calendario? ¿Hay que poder ver semanas anteriores?
 
-### Configuración (009)
-
-1. **RF-85, specs/018.** «Cómo buscar productos» quedó a la vista (decisión 136), pero desde specs/018 el catálogo se busca siempre en el servidor: la opción de arranque todavía dice «Bajar el catálogo al abrir: la búsqueda es instantánea…, abrir la aplicación tarda unos segundos más y gasta datos cada vez», cosa que ya no pasa, y elegir cualquiera de las dos no cambia nada. ¿Se saca la opción, se reescriben sus textos o queda como está?
-
 ### Base del sistema: requerimientos no funcionales (001)
 
 **Sin conexión y sincronización**

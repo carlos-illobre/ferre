@@ -157,9 +157,9 @@ test("con el trabajo sin conexión habilitado, la app abre sin red gracias al se
   await context.setOffline(false);
 });
 
-// Con el guardado deshabilitado se puede elegir no bajar el catálogo y buscar en el servidor (RF-85).
-test("en el celular, buscando en el servidor no se baja el catálogo y se busca, se lee un código y se vende igual", async ({ page }) => {
-  const EN_EL_SERVIDOR = JSON.stringify({ animaciones: true, sinConexion: false, buscar: "servidor" });
+// Con el guardado deshabilitado el catálogo no se baja: se busca en el servidor (specs/018).
+test("en el celular, sin guardar no se baja el catálogo y se busca, se lee un código y se vende igual", async ({ page }) => {
+  const EN_EL_SERVIDOR = JSON.stringify({ animaciones: true, sinConexion: false });
   await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, EN_EL_SERVIDOR]);
   const pedidos: string[] = [];
   page.on("request", (r) => { const u = new URL(r.url()); if (u.pathname.startsWith("/productos") && r.method() === "GET") pedidos.push(u.pathname + u.search); });
@@ -177,8 +177,8 @@ test("en el celular, buscando en el servidor no se baja el catálogo y se busca,
   expect(pedidos.filter((q) => !/[?&]limite=/.test(q))).toEqual([]);
   expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
 
-  // La elección está en Configuración, con la ventaja y la desventaja de cada forma (E15).
+  // Configuración ya no ofrece «Cómo buscar productos» (009-E15, decisión 138).
   await page.goto("/#/mas/configuracion");
-  await expect(page.getByTestId("cfg-buscar-servidor")).toHaveAttribute("aria-checked", "true");
-  await expect(page.getByTestId("cfg-buscar-memoria")).toContainText("Desventaja:");
+  await expect(page.getByTestId("cfg-sin-conexion")).toBeVisible();
+  await expect(page.getByText("Cómo buscar productos")).toHaveCount(0);
 });

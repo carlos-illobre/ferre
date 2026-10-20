@@ -5,21 +5,19 @@ import { crearPreferencias } from "./plataforma/preferencias/preferencias";
 // - `animaciones`: el movimiento al navegar.
 // - `sinConexion`: guardar los datos del negocio para trabajar sin conexión (RF-84); null hasta que
 //   la persona la toca: vale lo de arranque de cada aparato (habilitada en la computadora, specs/018).
-// - `buscar`: con el guardado deshabilitado, cómo se buscan los productos (RF-85).
 // - `versionCada` y `versionNunca`: cada cuántos minutos se busca una versión nueva con la
 //   aplicación a la vista, y si no se busca (la llave apagada, RF-96, decisión 92). Apagarla no
 //   borra el tiempo elegido.
 export const TIEMPOS_DE_VERSION = [5, 15, 60, 1440] as const;
 export type TiempoDeVersion = (typeof TIEMPOS_DE_VERSION)[number];
-export type Preferencias = { animaciones: boolean; sinConexion: boolean | null; buscar: "memoria" | "servidor"; versionCada: TiempoDeVersion; versionNunca: boolean };
+export type Preferencias = { animaciones: boolean; sinConexion: boolean | null; versionCada: TiempoDeVersion; versionNunca: boolean };
 
 const propias = crearPreferencias<Preferencias>({
   clave: "ferre.preferencias",
-  deArranque: { animaciones: true, sinConexion: null, buscar: "memoria", versionCada: 15, versionNunca: false },
+  deArranque: { animaciones: true, sinConexion: null, versionCada: 15, versionNunca: false },
   leer: (guardado, deArranque) => ({
     animaciones: typeof guardado?.animaciones === "boolean" ? guardado.animaciones : deArranque.animaciones,
     sinConexion: typeof guardado?.sinConexion === "boolean" ? guardado.sinConexion : deArranque.sinConexion,
-    buscar: guardado?.buscar === "servidor" ? "servidor" : deArranque.buscar,
     versionCada: TIEMPOS_DE_VERSION.find((t) => t === guardado?.versionCada) ?? deArranque.versionCada,
     versionNunca: typeof guardado?.versionNunca === "boolean" ? guardado.versionNunca : deArranque.versionNunca,
   }),

@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias, type TiempoDeVersion } from "../preferencias";
 import { borrarLoGuardado } from "../almacen";
 import { apartados, pendientes } from "../cola";
-import { esCelularAca, guardaEnElDispositivo } from "../guardado";
+import { guardaEnElDispositivo } from "../guardado";
 import { useDescarga } from "../descarga";
 import "./configuracion.css";
 
@@ -10,13 +10,6 @@ import "./configuracion.css";
 // Una sola pantalla para el celular y la computadora; cada preferencia es un renglón con su
 // llave y una línea que dice qué cambia. La primera: las animaciones. Debajo, lo propio que se
 // guarda en el servidor (RF-106, decisión 99): cada interfaz pasa sus celulares con huella y el vínculo.
-// Las dos formas de buscar productos cuando el celular no guarda el catálogo (RF-85), cada una
-// con lo que tiene de bueno y de malo.
-const FORMAS_DE_BUSCAR: { valor: "memoria" | "servidor"; nombre: string; ventaja: string; desventaja: string }[] = [
-  { valor: "memoria", nombre: "Bajar el catálogo al abrir", ventaja: "la búsqueda es instantánea y escanear responde en el acto.", desventaja: "abrir la aplicación tarda unos segundos más y gasta datos cada vez." },
-  { valor: "servidor", nombre: "Buscar en el servidor", ventaja: "no baja el catálogo: abre enseguida y casi no gasta datos.", desventaja: "cada búsqueda y cada código escaneado espera a la red." },
-];
-
 // Cada cuánto se busca una versión nueva con la aplicación a la vista (RF-96, decisión 92).
 const NOMBRE_DEL_TIEMPO: Record<TiempoDeVersion, string> = { 5: "5 min", 15: "15 min", 60: "1 hora", 1440: "24 horas" };
 
@@ -33,7 +26,7 @@ function useReducirMovimiento(): boolean {
 }
 
 export function Configuracion({ celular = false, alCambiarElGuardado = () => location.reload(), propio }: { celular?: boolean; alCambiarElGuardado?: () => void; propio?: ReactNode }) {
-  const { animaciones, buscar, versionCada, versionNunca } = usePreferencias();
+  const { animaciones, versionCada, versionNunca } = usePreferencias();
   // Trabajar sin conexión (RF-84): en el celular y en la computadora (specs/018). Cambiarlo vuelve a
   // abrir la aplicación, para que arranque guardando o sin guardar nada. Deshabilitarlo borra lo
   // guardado, también lo bajado a mano; si había cambios sin enviar se pierden, y antes se avisa.
@@ -53,7 +46,6 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
   }
   const reducir = useReducirMovimiento();
   // Las opciones de guardado son del aparato (un teléfono), no de la interfaz que se esté viendo.
-  const telefono = esCelularAca();
   const donde = celular ? "este celular" : "esta computadora";
   return (
     <main id="contenido" className={celular ? "contenido cfg" : "pagina cfg"} tabIndex={-1} data-testid="configuracion">
@@ -84,20 +76,6 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
           </span>
         </li>
         {sinConexion && <DatosSinConexion />}
-        {telefono && !sinConexion && (
-          <li className="cfg-fila cfg-opciones" role="radiogroup" aria-labelledby="cfg-buscar">
-            <span className="cfg-nombre" id="cfg-buscar">Cómo buscar productos</span>
-            <span className="cfg-detalle">Como este celular no guarda el catálogo, hay dos formas de buscar. Elegí la que te resulte mejor.</span>
-            {FORMAS_DE_BUSCAR.map((f) => (
-              <button key={f.valor} type="button" role="radio" aria-checked={buscar === f.valor} className={`cfg-opcion ${buscar === f.valor ? "elegida" : ""}`}
-                onClick={() => { if (buscar !== f.valor) { cambiarPreferencia("buscar", f.valor); alCambiarElGuardado(); } }} data-testid={`cfg-buscar-${f.valor}`}>
-                <strong>{f.nombre}</strong>
-                <span><b>Ventaja:</b> {f.ventaja}</span>
-                <span><b>Desventaja:</b> {f.desventaja}</span>
-              </button>
-            ))}
-          </li>
-        )}
         <li className="cfg-fila" data-testid="cfg-version">
           <span className="cfg-nombre" id="cfg-version">Buscar versión nueva</span>
           <button type="button" role="switch" aria-checked={!versionNunca} aria-labelledby="cfg-version" aria-describedby="cfg-version-detalle"

@@ -10,7 +10,5 @@ import { preferencias } from "./preferencias";
 // puede borrarle lo que tiene guardado.
 export const esCelularAca = (): boolean => typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod/.test(navigator.userAgent);
 export const guardaEnElDispositivo = (): boolean => preferencias().sinConexion ?? !esCelularAca();
-// Con el guardado deshabilitado, cómo se buscan los productos (RF-85).
-export const buscaEnElServidor = (): boolean => !guardaEnElDispositivo() && preferencias().buscar === "servidor";
 
 export const SIN_CONEXION_Y_SIN_GUARDADO = "Sin conexión: no se registró. Este celular no guarda nada; para trabajar sin conexión, habilitalo en Más → Configuración.";

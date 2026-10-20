@@ -16,7 +16,7 @@
 
 - Q: ¿De quién es la preferencia de las animaciones? → A: De cada persona en su dispositivo: la elige ahí y no cambia nada de los demás.
 - Q: ¿Cómo arranca? → A: Habilitada.
-- Q: Con el guardado deshabilitado, ¿cómo se busca en el catálogo? → A: Lo elige cada persona en Configuración entre bajarlo a la memoria al abrir o buscar en el servidor; cada opción explica su ventaja y su desventaja.
+- Q: Con el guardado deshabilitado, ¿cómo se busca en el catálogo? → A: Lo elige cada persona en Configuración entre bajarlo a la memoria al abrir o buscar en el servidor; cada opción explica su ventaja y su desventaja. (Ya no vale: desde specs/018 se busca siempre en el servidor y la opción se sacó, decisión 138.)
 - Q: ¿Qué pasa con las ventas sin enviar al deshabilitar el guardado? → A: Se pierden. Es un caso extremo y Carlos lo acepta.
 - Q: ¿Qué es «no guardar nada»? → A: Guardar lo mínimo para mantener la sesión y el vínculo: menos de 150 KB, sin contar los archivos de la aplicación. Nada de productos, ventas ni listas.
 - Todo lo que hay en Configuración es personal: de esa persona en ese dispositivo.
@@ -83,26 +83,20 @@ Los archivos de la aplicación (lo que se instala) no cuentan.
 - **E13** **Given** la aplicación abierta en la computadora, **When** se mira Configuración, **Then** la opción no aparece y la computadora sigue guardando como siempre, también con la ventana angosta.
 - **E14** **Given** un celular que venía usando la aplicación antes de este cambio, con datos guardados, **When** se actualiza, **Then** queda deshabilitada y lo guardado se borra, también lo que hubiera sin enviar.
 
-**Cómo se buscan los productos sin guardar el catálogo.** Con «Trabajar sin conexión»
-deshabilitada, la persona elige en Configuración una de dos formas, y cada una dice sus
-ventajas y desventajas:
+**Cómo se buscan los productos sin guardar el catálogo.** Ya no se elige: desde specs/018 el
+catálogo se busca siempre en el servidor, y «Cómo buscar productos» se sacó de Configuración
+(decisión 138, 2026-10-20). Los escenarios de esa opción quedan como estaban numerados:
 
-| Opción | Ventaja | Desventaja |
-|---|---|---|
-| **Bajar el catálogo al abrir** (de arranque) | La búsqueda es instantánea y escanear responde en el acto | Abrir la aplicación tarda unos segundos más y gasta datos cada vez |
-| **Buscar en el servidor** | No baja el catálogo: abre enseguida y casi no gasta datos | Cada búsqueda y cada código escaneado espera a la red |
-
-- **E15** **Given** «Trabajar sin conexión» deshabilitada, **When** se mira Configuración, **Then** aparece «Cómo buscar productos» con las dos opciones, cada una con su ventaja y su desventaja, y elegida «Bajar el catálogo al abrir».
-- **E16** **Given** «Trabajar sin conexión» habilitada, **When** se mira Configuración, **Then** «Cómo buscar productos» no aparece: el catálogo está guardado en el celular.
-- **E17** **Given** elegida «Buscar en el servidor», **When** se busca un producto o se escanea un código en Catálogo, Vender, Ingreso, Pedidos o Estanterías, **Then** aparece el mismo resultado que con el catálogo bajado, después de consultar al servidor.
-- **E18** **Given** elegida «Buscar en el servidor» y una búsqueda en curso, **When** la red tarda, **Then** la pantalla dice que está buscando; si no hay conexión, lo dice.
+- **E15** **Given** cualquier dispositivo, con «Trabajar sin conexión» habilitada o no, **When** se mira Configuración, **Then** «Cómo buscar productos» no aparece.
+- **E16** Ya no vale (decisión 138): lo cubre E15.
+- **E17** Ya no vale (decisión 138): el resultado de buscar lo dice specs/018 (E03).
+- **E18** Ya no vale (decisión 138): mientras el servidor contesta, specs/018.
 
 **Los textos de la pantalla, que son regla:**
 
 - Trabajar sin conexión, deshabilitada: «Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.» Habilitada: «Este celular guarda el catálogo, el stock y lo que falta enviar, para seguir trabajando si se corta internet. Ocupa varios megas.»
 - Al deshabilitarla pregunta: «Se va a borrar de este celular el catálogo y lo demás que estaba guardado. ¿Seguir?»; con cambios sin enviar dice cuántos y que se pierden.
 - Sin conexión y sin guardado, arriba dice «Sin conexión · no se puede registrar nada», y al intentar registrar: «Sin conexión: no se registró. Este celular no guarda nada; para trabajar sin conexión, habilitalo en Más → Configuración.»
-- Cómo buscar productos: «Como este celular no guarda el catálogo, hay dos formas de buscar. Elegí la que te resulte mejor.» y las dos opciones con su ventaja y su desventaja, como en la tabla de arriba.
 - Mientras consulta: «Buscando en el servidor…».
 
 ### User Story 3 - Elegir cada cuánto se busca una versión nueva (Priority: P3)
@@ -138,7 +132,7 @@ Maqueta: `maquetas/version-nueva.html`, aprobada por Carlos el 2026-10-16 junto 
 
 - **RF-83**: Más tiene la opción «Configuración», que abre una pantalla con las preferencias de la aplicación. La ve cualquier usuario con sesión. Cada preferencia dice en una línea qué cambia. La primera es «Animaciones»: habilitar o deshabilitar el movimiento al navegar (decisión 78). Se guarda en el dispositivo, vale en el momento y arranca habilitada.
 
-- **RF-85** (desde specs/018 el catálogo se busca siempre en el servidor y esta opción no cambia nada; queda a la vista hasta que Carlos decida; [NEEDS CLARIFICATION: ¿se saca, se reescriben sus textos o queda como está? Ver preguntas abiertas, Configuración 1]): Con el guardado deshabilitado (RF-84), la persona elige en Configuración cómo se buscan los productos: bajando el catálogo a la memoria cada vez que abre la aplicación (de arranque), o consultando al servidor en cada búsqueda y en cada código escaneado. Cada opción dice su ventaja y su desventaja. El resultado de buscar es el mismo en las dos. Qué es un celular lo decide el aparato (teléfono o tableta con Android o iOS), no el ancho de la ventana.
+- **RF-85**: Se sacó (decisión 138, 2026-10-20). Era la elección, con el guardado deshabilitado, entre bajar el catálogo a la memoria al abrir o buscar en el servidor; desde specs/018 el catálogo se busca siempre en el servidor (specs/018, RF-122) y la opción no cambiaba nada. Configuración no la muestra en ningún dispositivo.
 
 - **RF-84**: Guardar datos del negocio en el dispositivo para trabajar sin conexión es una preferencia de cada persona (RF-83), en el celular (arranca deshabilitada) y en la computadora (arranca habilitada; specs/018, decisión 136). Deshabilitada, el celular guarda solo lo mínimo para mantener la sesión y el vínculo (menos de 150 KB, sin contar los archivos de la aplicación), y sin conexión no registra ni guarda nada. Habilitada, guarda lo que falta enviar y deja bajar a mano los datos para buscar sin conexión (specs/018, historia 5); el catálogo ya no se guarda solo.
 
@@ -149,7 +143,7 @@ Maqueta: `maquetas/version-nueva.html`, aprobada por Carlos el 2026-10-16 junto 
 ### Key Entities
 
 - **Lo propio que está en el servidor**: los celulares con huella y el vínculo entre celular y computadora de la persona (RF-106). Se guardan en el servidor, son de esa persona y los cambia ella; no son una preferencia del dispositivo.
-- **Preferencia del dispositivo**: un valor que se guarda en el dispositivo (no en el servidor) y no se borra al salir de la sesión. Hoy: `animaciones` (sí o no), `sinConexion` y `buscar` (RF-84, RF-85) y cada cuánto se busca una versión nueva (RF-96).
+- **Preferencia del dispositivo**: un valor que se guarda en el dispositivo (no en el servidor) y no se borra al salir de la sesión. Hoy: `animaciones` (sí o no), `sinConexion` (RF-84) y cada cuánto se busca una versión nueva (RF-96).
 
 ## Success Criteria
 

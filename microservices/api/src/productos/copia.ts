@@ -189,9 +189,13 @@ export type Busqueda = {
 
 // La misma regla que tenía la consulta a la base: cada palabra es el comienzo de una palabra de la
 // descripción o la marca, o el comienzo de un código; un código exacto es el de barras o uno de
-// proveedor. Sin palabras, por descripción; con palabras, primero las descripciones más cortas.
+// proveedor; lo escrito entero también vale como comienzo de un código. Sin palabras, por
+// descripción; con palabras, primero las descripciones más cortas.
 export function buscar(b: Busqueda): FilaDeLaCopia[] {
   const palabras = datos.normalizarBusqueda(b.buscar ?? "").slice(0, 8);
+  // Lo escrito entero, con sus signos, también es el comienzo de un código: un código con guion o
+  // barra (TA-81) se encuentra escribiéndolo, no solo escaneándolo (decisión 139).
+  const entero = (b.buscar ?? "").trim().toLowerCase();
   const codigo = (b.codigo ?? "").trim();
   const ids = b.ids ? new Set(b.ids) : null;
   const marcaBuscada = b.marca ? claveDeMarca(b.marca) : null;
@@ -201,7 +205,8 @@ export function buscar(b: Busqueda): FilaDeLaCopia[] {
     if (codigo && f.codigo_barras !== codigo && !(f.codigos ?? []).includes(codigo)) return false;
     if (marcaBuscada !== null && (!f.marca || claveDeMarca(f.marca) !== marcaBuscada)) return false;
     if (b.stock && b.stock.conStock.has(f.id) !== b.stock.hay) return false;
-    return palabras.every((p) => e.texto.includes(` ${p}`) || e.codigos.some((c) => c.startsWith(p)));
+    return palabras.every((p) => e.texto.includes(` ${p}`) || e.codigos.some((c) => c.startsWith(p)))
+      || (entero !== "" && e.codigos.some((c) => c.startsWith(entero)));
   });
   if (palabras.length) encontrados.sort((a, b) => a.fila.descripcion.length - b.fila.descripcion.length || comparar(a.fila.descripcion, b.fila.descripcion));
   const filas = encontrados.map((e) => e.fila);

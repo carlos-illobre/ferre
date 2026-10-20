@@ -1122,3 +1122,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      pestaña y el cursor va a la caja de texto de la pantalla nueva, si tiene; ↓ o Esc devuelven la
      marca a la pantalla. Escribir, Tab o el mouse sacan la marca. La marca se ve con el borde verde.
      Completa la decisión 130 (que había dejado ← sin efecto dentro de una caja).
+138. **Se saca «Cómo buscar productos» de Configuración** (2026-10-20). Desde specs/018 el
+     catálogo se busca siempre en el servidor y la opción ya no cambiaba nada. Carlos: «sacala».
+     Reemplaza la parte de la decisión 136 que la dejaba a la vista (specs/009, RF-85).
+139. **Un código escrito entero en el buscador encuentra el producto, con sus signos** (2026-10-20).
+     Un código de proveedor con guion o barra (TA-81) se encontraba al escanearlo pero no al
+     escribirlo, porque la búsqueda parte lo escrito en palabras. Carlos: «sí», que se encuentre
+     también escribiéndolo, con y sin conexión (specs/018, E03).

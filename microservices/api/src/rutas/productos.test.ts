@@ -66,6 +66,12 @@ describe("GET /productos/pagina", () => {
     expect(base.actual.consultas.some((c) => /DROP/i.test(c.sql))).toBe(false);
   });
 
+  it("018-E03: un código escrito entero, con su guion, encuentra el producto (decisión 139)", async () => {
+    expect((await pagina("?buscar=TA-81")).productos.map((p) => p.id)).toEqual([ID(1)]);
+    expect((await pagina("?buscar=ta-8")).productos.map((p) => p.id)).toEqual([ID(1)]);
+    expect((await pagina("?buscar=TA-99")).productos).toEqual([]);
+  });
+
   it("018-E04: un código exacto, de barras o de proveedor; si no existe, nada", async () => {
     expect((await pagina("?codigo=7790000000035")).productos.map((p) => p.id)).toEqual([ID(3)]);
     expect((await pagina("?codigo=TA-81")).productos.map((p) => p.id)).toEqual([ID(1)]);

@@ -31,6 +31,15 @@ describe("Trabajar sin conexión en el celular", () => {
     expect(guardaEnElDispositivo()).toBe(false);
   });
 
+  it("009-E15: «Cómo buscar productos» no aparece, ni en el celular ni en la computadora (decisión 138)", () => {
+    const celular = render(<Configuracion celular alCambiarElGuardado={() => undefined} />);
+    expect(screen.getByTestId("configuracion").textContent).not.toContain("Cómo buscar productos");
+    celular.unmount();
+    aparato(COMPUTADORA);
+    render(<Configuracion alCambiarElGuardado={() => undefined} />);
+    expect(screen.getByTestId("configuracion").textContent).not.toContain("Cómo buscar productos");
+  });
+
   it("009-E08: deshabilitada, con conexión todo se manda y en el celular no queda ningún dato del negocio", async () => {
     apiFalsa.mockResolvedValue({});
     expect(await enviarOEncolar("venta", "POST", "/ventas", venta)).toEqual({ encolado: false });
