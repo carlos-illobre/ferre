@@ -207,3 +207,8 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-pago .vm-cliente b { font-size: 15px; font-weight: 800; }
 @media (prefers-reduced-motion: reduce) { .vm-mp, .vm-mp .medio-icono { transition: none; } .vm-mp.elegido span { animation: none; } }
 .vm-mp.elegido > .medio-icono.medio-icono.medio-icono { color: #fff; }
+
+/* El botón de cobrar, redondeado como la v4 (decisión 143): píldora y el círculo que se desliza. */
+.vm-deslizar { height: 60px; border-radius: 99px; }
+.vm-pulgar { width: 50px; height: 50px; border-radius: 99px; }
+.vm-deslizar-texto { padding: 0 22px 0 68px; }

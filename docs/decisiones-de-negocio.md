@@ -1161,3 +1161,9 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      aplicación (los de la v4 son genéricos) y con Cuenta corriente, que la v4 no tenía, en su color
      de siempre (decisión 108). El cliente queda al final de la fila, como un botón redondo con la
      persona (con sus iniciales si se eligió uno; en ámbar si falta en cuenta corriente).
+143. **Sin fondos verdosos: los neutros son los de «Mostrador»** (2026-10-20). Carlos: «seguí la nueva
+     paleta de colores, ya no hay fondos verdosos, los fondos son blancos y grises; el verde queda
+     para lo seleccionado». Los neutros de la paleta compartida (fondo, rellenos y bordes) pasan a
+     los grises cálidos de «Mostrador» (decisión 115), en las dos interfaces, y las hojas del celular
+     son blancas, con «×» para cerrar arriba a la derecha, como la v2. El botón de cobrar de Vender en
+     el celular, redondeado como la v4: una píldora con el círculo blanco que se desliza.

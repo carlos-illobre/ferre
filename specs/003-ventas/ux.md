@@ -109,8 +109,8 @@ el lenguaje «Mostrador». Desde el 2026-10-20 (decisión 140) se ve **igual a l
   de pastillas redondas (decisión 142): el elegido con su color, el ícono en un círculo lleno y
   el nombre; los demás, solo el ícono sobre su color suave; al final de la fila, el cliente, un
   botón redondo con la persona (sus iniciales si se eligió; en ámbar si falta en cuenta corriente),
-  que abre la lista de clientes; y el botón naranja de la v2, «Cobrar» a la izquierda y «$45.500» a la
-  derecha, con un cuadrado blanco con la flecha: se cobra arrastrándolo hasta el final; soltarlo antes lo devuelve, y tocarlo solo explica cómo se usa. Sin
+  que abre la lista de clientes; y el botón naranja, redondeado como la v4 (decisión 143), «Cobrar» a la
+  izquierda y «$45.500» a la derecha, con un círculo blanco con la flecha: se cobra arrastrándolo hasta el final; soltarlo antes lo devuelve, y tocarlo solo explica cómo se usa. Sin
   productos, está apagado.
 - **Escanear:** la cámara se abre arriba, en el lugar de la búsqueda, y empuja la venta hacia
   abajo: cada código leído suma el producto, que entra a la lista con un borde verde, y un aviso en

@@ -21,17 +21,18 @@
   --p-amarillo: #f7c445;
   --p-amarillo-suave: #fff7d6;
   --p-amarillo-borde: #f0c64a;
-  --p-fondo: #e6ece6;
-  --p-fondo-2: #eef3ee;
+  /* Los neutros, los grises cálidos de «Mostrador» (decisiones 115 y 143): sin fondos verdosos. */
+  --p-fondo: #F4F2EC;
+  --p-fondo-2: #F8F7F3;
   --p-superficie: #ffffff;
-  --p-borde: #c3cfc6;
-  --p-borde-suave: #dbe3dc;
-  --p-borde-fuerte: #7c9085;
-  --p-tinta: #18201e;
-  --p-texto-medio: #33403b;
-  --p-texto-2: #4a5451;
-  --p-relleno: #dfe5e0;
-  --p-relleno-fuerte: #d3ddd5;
+  --p-borde: #E6E2D8;
+  --p-borde-suave: #EEEBE4;
+  --p-borde-fuerte: #CEC8BA;
+  --p-tinta: #1A1D1B;
+  --p-texto-medio: #3A3E3B;
+  --p-texto-2: #545955;
+  --p-relleno: #ECE9E1;
+  --p-relleno-fuerte: #E3DFD5;
   --p-naranja-apretado: #ffd9cb;
   --p-amarillo-texto: #6b4a00;
   /* Los medios de pago (decisión 108, specs/017): el color y su fondo suave. */

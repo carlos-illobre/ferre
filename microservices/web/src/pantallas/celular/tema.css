@@ -76,7 +76,9 @@ button.foto-chica:empty::after { content: ""; width: 58%; height: 58%; backgroun
    marcado, así lo blanco resalta; todo lo que se toca lleva borde o color; y cada color
    dice una cosa: verde oscuro = dónde estoy y títulos, naranja = la acción principal,
    amarillo = atajos y avisos, blanco con borde = botones comunes y campos. */
-body, .hoja { background: var(--p-fondo); }
+body { background: var(--p-fondo); }
+/* Las hojas, blancas, como la v2 (decisión 143). */
+.hoja { background: #fff; }
 .titulo { color: var(--p-verde); }
 
 /* Tarjetas y listas: borde fino, para que se despeguen del fondo. */
@@ -331,3 +333,8 @@ body, .hoja { background: var(--p-fondo); }
 .venta-registrada .vendido .cantidad { font-size: 15px; color: var(--p-texto-2); white-space: nowrap; }
 .venta-registrada .vendido .total { font-size: 16px; font-weight: 800; white-space: nowrap; }
 .venta-registrada .nueva { position: fixed; left: 16px; right: 16px; bottom: 20px; height: 56px; max-width: 520px; margin: 0 auto; border: 0; border-radius: 16px; background: var(--p-verde); color: #fff; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+/* La «×» de las hojas, gris redondeada como la v2 (decisión 143). */
+.hoja .titulo-hoja { align-items: center; }
+.hoja .titulo-hoja > span { flex: 1; min-width: 0; }
+.hoja-cerrar { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: #ECE9E1; color: #1A1D1B; }

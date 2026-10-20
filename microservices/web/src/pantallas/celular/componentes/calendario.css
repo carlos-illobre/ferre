@@ -7,7 +7,7 @@
 .calendario-cab button:disabled { opacity: .35; }
 .calendario-grilla { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .calendario-sem { display: grid; place-items: center; height: 28px; font-size: 14px; font-weight: 700; color: #6B706B; }
-.calendario-grilla button { height: 44px; border-radius: 12px; border: 0; background: transparent; font-size: 16px; font-weight: 650; color: #1A1D1B; font-variant-numeric: tabular-nums; transition: background-color 120ms, transform 120ms cubic-bezier(.2, .8, .2, 1); }
+.calendario-grilla button { display: grid; place-items: center; padding: 0; line-height: 1; height: 44px; border-radius: 12px; border: 0; background: transparent; font-size: 16px; font-weight: 650; color: #1A1D1B; font-variant-numeric: tabular-nums; transition: background-color 120ms, transform 120ms cubic-bezier(.2, .8, .2, 1); }
 .calendario-grilla button:active:not(:disabled) { transform: scale(.94); }
 .calendario-grilla button.hoy { box-shadow: inset 0 0 0 1.5px #12382F; color: #12382F; font-weight: 800; }
 .calendario-grilla button.elegido { background: #12382F; color: #fff; font-weight: 800; box-shadow: none; }

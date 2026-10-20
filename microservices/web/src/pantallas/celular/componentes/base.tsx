@@ -101,7 +101,8 @@ export function Hoja({ titulo, extra, alCerrar, children, testId, clase }: { tit
     <div className="hoja-fondo" onClick={alCerrar} role="presentation">
       <div className={`hoja ${clase ?? ""}`} role="dialog" aria-label={typeof titulo === "string" ? titulo : undefined} onClick={(e) => e.stopPropagation()} data-testid={testId}>
         <div className="manija" aria-hidden="true" />
-        {titulo !== undefined && <div className="titulo-hoja"><span>{titulo}</span>{extra}</div>}
+        {/* Con título, la «×» para cerrar arriba a la derecha, como la v2 (decisión 143). */}
+        {titulo !== undefined && <div className="titulo-hoja"><span>{titulo}</span>{extra}<button type="button" className="hoja-cerrar" onClick={alCerrar} aria-label="Cerrar" data-testid="cerrar-hoja"><Icono nombre="cerrar" tam={20} grosor={2.4} /></button></div>}
         {children}
       </div>
     </div>

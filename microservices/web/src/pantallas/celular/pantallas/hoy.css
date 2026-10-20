@@ -104,3 +104,4 @@
 .hoy-dia.elegido > svg { color: #12382F; }
 .hoy-dia-calendario { margin-top: 4px; border-top: 1px solid #E6E2D8; border-radius: 0; }
 .hoy-fecha b small { display: inline; }
+.hoy-buscar-fila .hoy-listo { color: #545955; }
