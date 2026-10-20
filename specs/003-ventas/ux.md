@@ -152,6 +152,10 @@ Sigue el lenguaje «Mostrador»:
   «Lo último que se vendió»: los productos de las últimas cuatro ventas (los da el servidor; sin
   conexión, las ventas del dispositivo), en tarjetas con foto, nombre y precio, que se agregan con
   un clic (decisiones 131 y 133).
+- Animaciones de la maqueta (decisión 134): el desplegable asoma, lo que se suma entra con rebote y
+  un borde verde que se apaga, lo que se quita sube y se desvanece, los renglones se deslizan a su
+  lugar, los importes ruedan, la cuenta del menú salta, el renglón sin precio se sacude al cobrar y
+  los botones se hunden al apretarlos; nada se mueve con «menos movimiento» del sistema.
 - La venta registrada es una ventana como la del celular: el total, el medio, cuántos productos y la
   hora, «Ver en Ventas de hoy» y «Seguir vendiendo» (Enter).
 - No van: «Ganás en esta venta», escribir la cantidad en la búsqueda, el margen con 1 a 5, la ayuda

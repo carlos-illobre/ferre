@@ -248,3 +248,16 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
 .vmc-aviso button { flex: none; height: 38px; padding: 0 14px; border: 0; border-radius: 10px; background: rgb(255 255 255 / .16); color: #fff; font: inherit; font-weight: 750; cursor: pointer; }
 .vmc-aviso button:hover { background: rgb(255 255 255 / .26); }
 .vmc-aviso button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+/* Las animaciones de la maqueta (decisión 134): el desplegable asoma, el aviso y la venta vacía suben,
+   los números ruedan y los botones se hunden un poco al apretarlos. */
+.vmc-sug { animation: anim-asoma 120ms cubic-bezier(.2, .8, .2, 1) both; }
+.vmc-aviso { animation: anim-sube 200ms cubic-bezier(.2, .8, .2, 1) both; }
+.vmc-vacia, .vmc-ultimos { animation: anim-sube 200ms cubic-bezier(.2, .8, .2, 1) both; }
+.vmc-rueda { display: inline-block; }
+.vmc-pagina .boton, .vmc-medio, .vmc-cliente, .vmc-ultimo, .vmc-a-mano, .vmc-tacho, .vmc-item .contador button { transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 120ms; }
+.vmc-pagina .boton:active:not(:disabled), .vmc-medio:active, .vmc-cliente:active, .vmc-ultimo:active, .vmc-a-mano:active, .vmc-tacho:active { transform: scale(.97); }
+.vmc-item .contador button:active { transform: scale(.9); }
+@media (prefers-reduced-motion: reduce) {
+  .vmc-sug, .vmc-aviso, .vmc-vacia, .vmc-ultimos { animation: none; }
+  .vmc-pagina .boton:active, .vmc-medio:active, .vmc-cliente:active, .vmc-ultimo:active, .vmc-a-mano:active, .vmc-tacho:active, .vmc-item .contador button:active { transform: none; }
+}

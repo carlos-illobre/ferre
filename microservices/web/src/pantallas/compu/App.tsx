@@ -1,4 +1,6 @@
 import { createPortal } from "react-dom";
+import { saltar } from "../../plataforma/animacion/animacion";
+import "../../plataforma/animacion/animacion.css";
 import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo, useRef, useState } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
 import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
@@ -100,6 +102,13 @@ const MENU: Parte[] = [
 // Pantallas que no están en el menú pero tienen dirección.
 // «anular» era la pestaña de anular, que ahora está en «Ventas de hoy» (decisión 120): lleva ahí.
 const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "anular", nombre: "Ventas de hoy", icono: "ventas" }];
+// La cantidad de productos en la venta, en el menú: salta cuando suma, como la maqueta (decisión 134).
+function CuentaDeLaVenta({ n }: { n: number }) {
+  const ref = useRef<HTMLElement>(null);
+  const antes = useRef(n);
+  useEffect(() => { if (n > antes.current) saltar(ref.current); antes.current = n; }, [n]);
+  return <b ref={ref} className="cuenta-menu" aria-label={`${n} en la venta`} data-testid="cuenta-venta">{n}</b>;
+}
 const inicialesDe = (nombre: string) => nombre.trim().split(/\s+/).map((p) => p[0] ?? "").slice(0, 2).join("").toUpperCase();
 // El usuario abajo del menú, como la v2 (decisión 126): las iniciales, el nombre y el rol; al tocarlo,
 // un menú con el nombre y el rol arriba y «Cerrar sesión». Esc lo cierra.
@@ -338,7 +347,7 @@ function Pantallas() {
                 <Icono nombre={m.icono} tam={20} grosor={parte === m.clave ? 2.3 : 1.9} /><span className="txt">{m.nombre}</span>
                 {/* El número que, con Alt, abre la primera pantalla de esta parte. */}
                 {atajoDe(m.pestanas[0]!.ruta) && <span className="atajo" aria-hidden="true">Alt+{atajoDe(m.pestanas[0]!.ruta)}</span>}
-                {m.pestanas.some((p) => p.ruta === "vender") && enLaVenta > 0 && <b className="cuenta-menu" aria-label={`${enLaVenta} en la venta`} data-testid="cuenta-venta">{enLaVenta}</b>}
+                {m.pestanas.some((p) => p.ruta === "vender") && enLaVenta > 0 && <CuentaDeLaVenta n={enLaVenta} />}
               </button>
             );
           })}

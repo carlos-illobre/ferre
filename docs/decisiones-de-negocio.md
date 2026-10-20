@@ -1085,3 +1085,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      campo, ← y → son del campo; al menú se llega desde la pestaña, con Alt + número o con
      Mayúsculas+Tab. El aviso de «Quitaste…» y «Vaciaste…» es el de la maqueta: verde oscuro, con el tacho y
      «Deshacer», sin la ×; se va solo.
+134. **Vender en la computadora con las animaciones de la maqueta** (2026-10-20). Carlos pidió las de
+     la maqueta elegida, sobre todo al buscar y al agregar. Con los tiempos y curvas del lenguaje
+     «Mostrador»: el desplegable de la búsqueda asoma; lo que se suma (un renglón nuevo, uno al que le
+     subió la cantidad o lo que trae el celular) entra con un rebote y un borde verde que se apaga
+     solo; lo que se quita, y todo al vaciar, sube y se desvanece; los demás renglones se deslizan a
+     su lugar; el total, el subtotal y la cuenta de productos ruedan al cambiar; la cuenta del menú
+     salta al sumar; el renglón sin precio se sacude al intentar cobrar; el aviso y la venta vacía
+     suben al aparecer, y los botones se hunden un poco al apretarlos. Solo se mueve transform y
+     opacity, y nada se mueve para quien pidió menos movimiento en su sistema.

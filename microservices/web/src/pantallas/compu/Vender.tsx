@@ -6,6 +6,7 @@ import { MEDIOS, TEXTOS, type Medio } from "../textos";
 import { createPortal } from "react-dom";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { ventaActual } from "../../negocio/ventas/venta-en-curso";
+import { entra, sacudir, sale, useDeslizar, useRueda } from "../../plataforma/animacion/animacion";
 import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 import { marcarLoQueEntro, useLlegadosDelCelular } from "../../negocio/ventas/llegados-del-celular";
 import { NOMBRE_DE_MEDIO, cuentaDelRenglon, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
@@ -49,6 +50,14 @@ export function Vender() {
   const [ultimoEscaneo, setUltimoEscaneo] = useState<string | null>(null);
   const [puestoVinculado, setPuestoVinculado] = useState(false);
   const llegados = useLlegadosDelCelular();
+  // Lo que se suma entra con un rebote y el borde verde: un renglón nuevo o uno al que le subió la cantidad.
+  const [entrada, setEntrada] = useState({ clave: "", n: 0 });
+  const conEntrada = (agregarAlgo: () => unknown) => {
+    const antes = ventaActual().items;
+    agregarAlgo();
+    const sumado = ventaActual().items.find((d) => { const a = antes.find((x) => x.clave === d.clave); return !a || d.cantidad > a.cantidad; });
+    if (sumado) setEntrada((e) => ({ clave: sumado.clave, n: e.n + 1 }));
+  };
   const [eligiendoCliente, setEligiendoCliente] = useState(false);
   const caja = useRef<HTMLInputElement>(null);
 
@@ -108,9 +117,9 @@ export function Vender() {
       e.preventDefault();
       const p = resultados[elegido];
       const texto = consulta.trim();
-      if (p) elegirSugerencia(p);
-      else if (texto && /^[0-9A-Za-z-]{6,32}$/.test(texto)) agregarPorCodigo(texto);
-      else if (texto) agregar(null, texto); // ítem libre
+      if (p) conEntrada(() => elegirSugerencia(p));
+      else if (texto && /^[0-9A-Za-z-]{6,32}$/.test(texto)) conEntrada(() => agregarPorCodigo(texto));
+      else if (texto) conEntrada(() => agregar(null, texto)); // ítem libre
       else void cobrar(); // con la venta armada, el Enter final la cierra
     }
     else if (e.key === "Escape" && consulta) { e.preventDefault(); setConsulta(""); }
@@ -146,6 +155,9 @@ export function Vender() {
   const [aviso, setAviso] = useState<{ texto: string; deshacer?: () => void } | null>(null);
   useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 6000); return () => clearTimeout(t); }, [aviso]);
   const lista = useRef<HTMLUListElement>(null);
+  useDeslizar(lista, items);
+  const ruedaTotal = useRueda<HTMLSpanElement>(total);
+  const ruedaCuenta = useRueda<HTMLSpanElement>(items.length);
   // Lo último agregado queda elegido; si se va, el último que quede.
   const claves = items.map((i) => i.clave).join(",");
   const ultimaClave = items.at(-1)?.clave ?? null;
@@ -158,8 +170,10 @@ export function Vender() {
     obs.observe(el, { attributes: true, subtree: true, attributeFilter: ["data-flecha"] });
     return () => obs.disconnect();
   });
-  const vaciar = () => { if (!items.length) return; const copia = items; venta.vaciar(); setAviso({ texto: "Vaciaste la venta", deshacer: () => venta.devolver(copia) }); };
-  const quitarConDeshacer = (it: Item) => { const copia = items; quitar(it.clave); setAviso({ texto: `Quitaste ${nombreDeProducto(it.descripcion)}`, deshacer: () => venta.devolver(copia) }); };
+  // Las animaciones de la maqueta (decisión 134): lo que se va sube y se desvanece antes de irse.
+  const renglones = () => [...(lista.current?.querySelectorAll<HTMLElement>(":scope > [data-clave]") ?? [])];
+  const vaciar = () => { if (!items.length) return; const copia = items; sale(renglones(), () => { venta.vaciar(); setAviso({ texto: "Vaciaste la venta", deshacer: () => venta.devolver(copia) }); }); };
+  const quitarConDeshacer = (it: Item) => { const copia = items; sale(renglones().filter((r) => r.dataset.clave === it.clave), () => { quitar(it.clave); setAviso({ texto: `Quitaste ${nombreDeProducto(it.descripcion)}`, deshacer: () => venta.devolver(copia) }); }); };
   const [escaneandoCelular, setEscaneandoCelular] = useState(false);
   useEffect(() => {
     if (esCelular) return;
@@ -207,7 +221,7 @@ export function Vender() {
                         const precio = precioDeLista(p);
                         const stock = stockPorId.get(p.id);
                         return (
-                          <li key={p.id} id={`sug-${p.id}`} role="option" aria-selected={i === elegido} className="vmc-sug-r" onMouseDown={(e) => { e.preventDefault(); elegirSugerencia(p); }} onMouseEnter={() => setElegido(i)}>
+                          <li key={p.id} id={`sug-${p.id}`} role="option" aria-selected={i === elegido} className="vmc-sug-r" onMouseDown={(e) => { e.preventDefault(); conEntrada(() => elegirSugerencia(p)); }} onMouseEnter={() => setElegido(i)}>
                             <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
                             <span className="vmc-sug-txt"><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className="detalle">{detalleDe(p) || "\u00a0"}</span></span>
                             {/* Sin movimientos de stock, no hay: «sin stock», como la maqueta. */}
@@ -249,7 +263,7 @@ export function Vender() {
               </div>
             )}
             <div className="vmc-cab" data-testid="titulo-venta">
-              <h2>Esta venta</h2><span className="vmc-cuenta">{items.length} {items.length === 1 ? "producto" : "productos"}</span>
+              <h2>Esta venta</h2><span className="vmc-cuenta"><span className="vmc-rueda" ref={ruedaCuenta}>{items.length}</span> {items.length === 1 ? "producto" : "productos"}</span>
               {/* Cuántos precios faltan, al lado de la cuenta y no en la barra del cobro (decisión 126). */}
               {faltan > 0 && <span className="vmc-cuenta falta" data-testid="faltan-precios">Falta{faltan > 1 ? `n ${faltan} precios` : " 1 precio"}</span>}
               <span className="crece" />
@@ -276,7 +290,7 @@ export function Vender() {
                         const precio = precioSugerido(p);
                         return (
                           <li key={p.id}>
-                            <button type="button" className="vmc-ultimo" onClick={() => agregar(p)}>
+                            <button type="button" className="vmc-ultimo" onClick={() => conEntrada(() => agregar(p))}>
                               <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={20} grosor={1.6} />}</span>
                               <span className="vmc-ultimo-txt"><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span></span>
                             </button>
@@ -289,7 +303,7 @@ export function Vender() {
               </>
             ) : (
               <ul className="lista vmc-items" ref={lista} data-testid="venta">
-                {filas.map((f) => <RenglonDeVenta key={f.item.clave} {...f} alQuitar={() => quitarConDeshacer(f.item)} elegido={f.item.clave === elegida} alElegir={() => setElegida(f.item.clave)} llegado={llegados.has(f.item.clave)} />)}
+                {filas.map((f) => <RenglonDeVenta key={f.item.clave} {...f} alQuitar={() => quitarConDeshacer(f.item)} elegido={f.item.clave === elegida} alElegir={() => setElegida(f.item.clave)} llegado={llegados.has(f.item.clave)} entrada={entrada.clave === f.item.clave ? entrada.n : 0} />)}
               </ul>
             )}
           </div>
@@ -332,7 +346,7 @@ export function Vender() {
               {cliente ? <span className="vmc-iniciales" aria-hidden="true">{iniciales(cliente.nombre)}</span> : <Icono nombre="usuarios" tam={16} />}<span>{cliente ? cliente.nombre : medio === "cuenta_corriente" ? "Elegí el cliente" : "Cliente"}</span><kbd className="tecla">F9</kbd>
             </button>
           </div>
-          <Boton variante="principal" tam="grande" disabled={ocupado || !items.length} onClick={() => void cobrar()} tecla="F2" data-testid="cobrar">{ocupado ? "Cobrando…" : <>Cobrar <span className="importe" data-testid="total">{pesosCortos(total)}</span></>}</Boton>
+          <Boton variante="principal" tam="grande" disabled={ocupado || !items.length} onClick={() => void cobrar()} tecla="F2" data-testid="cobrar">{ocupado ? "Cobrando…" : <>Cobrar <span className="importe vmc-rueda" ref={ruedaTotal} data-testid="total">{pesosCortos(total)}</span></>}</Boton>
         </section>
 
         <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
@@ -482,13 +496,18 @@ function HojaPrecioAMano({ item, alPoner, alCerrar }: { item: Item; alPoner: (v:
 // Computadora (decisión 122): cada renglón, una tarjeta de la v2. Arriba la foto, el nombre con
 // marca, proveedor y stock, la cantidad con su unidad, el total del renglón y el tacho; abajo el
 // costo, el margen y el precio por unidad (o a mano). Elegirlo lo muestra en «De dónde sale».
-function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto, elegido, alElegir, llegado }: PropsDeRenglon & { elegido: boolean; alElegir: () => void; llegado: boolean }) {
+function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto, elegido, alElegir, llegado, entrada }: PropsDeRenglon & { elegido: boolean; alElegir: () => void; llegado: boolean; entrada: number }) {
   const { p, renglon } = useRenglon(it);
   const producto = it.producto;
   const sinPrecio = p.unitario === null;
   const raiz = useRef<HTMLLIElement>(null);
   const noAlcanza = stock !== undefined && it.cantidad > stock;
   const [aMano, setAMano] = useState(false);
+  // Entra con rebote cuando se suma (o lo trae el celular) y se sacude si falta su precio al cobrar.
+  useEffect(() => { if (entrada) entra(raiz.current); }, [entrada]);
+  useEffect(() => { if (llegado) entra(raiz.current); }, [llegado]);
+  useEffect(() => { if (marcar) sacudir(raiz.current); }, [marcar]);
+  const rueda = useRueda<HTMLSpanElement>(renglon?.valor ?? 0);
   return (
     <li ref={raiz} className={`vmc-item ${sinPrecio ? "sin-precio" : ""} ${sinPrecio && marcar ? "marcada" : ""} ${elegido ? "elegido" : ""}`} data-testid="item" data-clave={it.clave} onMouseDown={alElegir} onFocusCapture={alElegir}>
       {llegado && <span className="vmc-llego" role="status" data-testid="llego-del-celular"><Icono nombre="celular" tam={16} />Llegó del celular</span>}
@@ -501,7 +520,7 @@ function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
       </div>
       <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} etiqueta={`Cantidad de ${it.descripcion}`} />
       <div className="vmc-sub" data-testid="subtotal">
-        {renglon ? <span className="importe">{pesosCortos(renglon.valor)}</span> : <span className="falta-texto" data-testid="sin-precio">Sin precio</span>}
+        {renglon ? <span className="importe vmc-rueda" ref={rueda}>{pesosCortos(renglon.valor)}</span> : <span className="falta-texto" data-testid="sin-precio">Sin precio</span>}
         <small>{sinPrecio ? (producto && p.costo !== null ? "elegí el margen" : "poné el precio") : `${numero(it.cantidad)} × ${pesosCortos(p.unitario!)}`}</small>
       </div>
       {/* El tacho, a la derecha del precio (Carlos, 2026-10-20; decisión 132). */}

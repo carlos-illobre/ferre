@@ -1,0 +1,7 @@
+/* El borde verde de lo que se acaba de sumar, que se apaga solo (animacion.ts, «entra»). */
+[data-anim-nuevo] { position: relative; }
+[data-anim-nuevo]::after { content: ""; position: absolute; inset: -1px; border: 2px solid #0F8A5F; border-radius: inherit; pointer-events: none; animation: anim-apaga 1.2s cubic-bezier(.4, 0, 1, 1) forwards; }
+@keyframes anim-apaga { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes anim-asoma { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes anim-sube { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { [data-anim-nuevo]::after { animation: none; opacity: 0; } }
