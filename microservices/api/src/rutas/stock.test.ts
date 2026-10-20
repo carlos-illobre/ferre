@@ -31,3 +31,27 @@ describe("POST /stock/:producto/ajustes", () => {
     expect((await pedir(app, "POST", "/stock/p1/ajustes", { cuerpo: { cantidad_real: -1, motivo: "x" } })).status).toBe(400);
   });
 });
+
+// La descarga a mano (specs/018, historia 5): el stock que cambió desde la marca anterior.
+describe("GET /stock/cambios", () => {
+  beforeEach(() => {
+    base.actual = baseFalsa();
+    base.actual.programar(/pg_snapshot_xmin/, { rows: [{ marca: "150" }] });
+    base.actual.programar(/FROM movimiento_stock/, { rows: [{ producto_id: "p1", stock: "7" }] });
+  });
+
+  it("018-E25: con marca, solo el de los productos que se movieron desde entonces, y la marca nueva", async () => {
+    const r = await pedir(app, "GET", "/stock/cambios?marca=120", { rol: "mostrador" });
+    expect(await r.json()).toEqual({ marca: "150", stock: { p1: "7" } });
+    const consulta = base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!;
+    expect(consulta.sql).toMatch(/transaccion >= \$1::xid8/);
+    expect(consulta.params).toEqual(["120"]);
+  });
+
+  it("018-E24: sin marca (o con una rara), el de todos los que tienen movimientos", async () => {
+    await pedir(app, "GET", "/stock/cambios?marca=1;DROP", { rol: "mostrador" });
+    expect(base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!.sql).not.toMatch(/transaccion/);
+    expect((await pedir(app, "GET", "/stock/cambios", { rol: null })).status).toBe(401);
+  });
+});
+

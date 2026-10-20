@@ -15,7 +15,7 @@ import type { FilaDeLaCopia, LecturaDeLaCopia } from "./datos.js";
 // catálogo entero en cada arranque gastaría la base que se quiere cuidar.
 
 // Sube cuando cambia la forma de la fila: una copia guardada con otra forma no se usa.
-const FORMATO = 1;
+const FORMATO = 2;
 const ARCHIVO = () => path.join(config.carpetaListas, "copia", "catalogo.json");
 
 // Lo que la búsqueda compara de cada producto, armado una vez: el texto normalizado (con un
@@ -184,7 +184,22 @@ export function buscar(b: Busqueda): FilaDeLaCopia[] {
 
 export const marcas = (): readonly string[] => marcasOrdenadas;
 
+// ---------- La descarga a mano (historia 5) ----------
+
+// Lo que un dispositivo baja para trabajar sin conexión, de a páginas por identificador (así una
+// página no se corre si la copia cambia entre una y otra). Sin marca, todo lo vigente; con la
+// marca de la descarga anterior, solo lo que cambió desde entonces: lo vigente para guardar y lo
+// que se dio de baja o se unió a otro para borrar. La marca nueva es la de la copia.
+export function descarga(q: { marca: string | null; desde: string; limite: number }) {
+  const desdeMarca = q.marca === null ? null : BigInt(q.marca);
+  const todos = [...porId.values()]
+    .filter((e) => e.fila.id > q.desde && (desdeMarca === null ? e.fila.vigente : e.fila.cambio !== null && BigInt(e.fila.cambio) >= desdeMarca))
+    .sort((a, b) => (a.fila.id < b.fila.id ? -1 : 1));
+  const pagina = todos.slice(0, q.limite).map((e) => e.fila);
+  return { filas: pagina.filter((f) => f.vigente), quitados: pagina.filter((f) => !f.vigente).map((f) => f.id), hayMas: todos.length > q.limite, ultimo: pagina.at(-1)?.id ?? null, marca: marca ?? "0" };
+}
+
 // Para las pruebas: la copia con estas filas, sin base ni disco.
 export function cargarParaPrueba(filas: Partial<FilaDeLaCopia>[]) {
-  aplicar({ marca: "1", filas: filas.map((f) => ({ vigente: true, codigos: [], marca: null, codigo_barras: null, ...f }) as FilaDeLaCopia), quitados: [] }, true);
+  aplicar({ marca: "1", filas: filas.map((f) => ({ vigente: true, codigos: [], marca: null, codigo_barras: null, cambio: null, ...f }) as FilaDeLaCopia), quitados: [] }, true);
 }

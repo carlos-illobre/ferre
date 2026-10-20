@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { buscar, indexar, normalizar } from "./plataforma/busqueda/busqueda";
 import { api, ErrorApi } from "./api";
 import { cambiosDeProductosPendientes, enviarOEncolar } from "./cola";
+import { loBajado, type Bajado } from "./descarga";
 import type { Producto } from "./producto";
 import type { CambiosDeProducto, PaginaDeProductos } from "@servidor/productos";
 import type { FilaDeStock } from "@servidor/stock";
@@ -14,7 +15,8 @@ import type { Disponibilidad } from "./negocio/catalogo/stock-y-filtros";
 // de la lista) y recibe solo eso, de a 50, con su precio, su margen, sus proveedores y su stock.
 // Lo que fue llegando queda en memoria mientras la aplicación está abierta, compartido por todas
 // las pantallas: así una ficha o un renglón de la venta se ven sin volver a pedirlos. Sin
-// conexión no se busca (RF-123): se sigue vendiendo con lo que ya está en la venta.
+// conexión se busca en lo que se bajó a mano para trabajar sin conexión (historia 5); si no se
+// bajó nada, no se busca (RF-123) y se sigue vendiendo con lo que ya está en la venta.
 export type StockFila = FilaDeStock;
 export type { Cliente };
 type Cambios = Partial<Pick<Producto, "margen_elegido" | "codigo_barras" | "codigo_leido_en" | "foto_url"> & { unidad: Unidad; proveedor_preferido_id?: string }>;
@@ -52,6 +54,37 @@ async function sumar(pagina: PaginaDeProductos): Promise<Producto[]> {
 }
 
 const sinConexion = (e: unknown) => !(e instanceof ErrorApi);
+
+// ---------- Sin conexión, lo bajado a mano (historia 5) ----------
+
+// Lo bajado, como si lo hubiera contestado el servidor: la misma forma, para sumarlo igual.
+const comoPagina = (b: Bajado, productos: Producto[], hayMas = false, total = productos.length) =>
+  ({ productos, stock: Object.fromEntries(productos.map((p) => [p.id, String(b.stock.get(p.id) ?? 0)])), hay_mas: hayMas, total }) as unknown as PaginaDeProductos;
+const conCodigos = (ps: Producto[]) => ps.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }));
+const claveDeMarca = (m: string) => m.trim().toLocaleLowerCase("es-AR");
+function buscarEnLoBajado(b: Bajado, c: { buscar?: string; codigo?: string; ids?: string[]; marca?: string | null; disponibilidad?: Disponibilidad }): Producto[] {
+  let r: Producto[] = c.buscar?.trim() ? buscar(indexar(conCodigos(b.productos)), c.buscar, Number.MAX_SAFE_INTEGER) : [...b.productos].sort((x, y) => comparar(x.descripcion, y.descripcion));
+  if (c.codigo) r = r.filter((p) => p.codigo_barras === c.codigo || p.codigo_proveedor === c.codigo);
+  if (c.ids) { const ids = new Set(c.ids); r = r.filter((p) => ids.has(p.id)); }
+  if (c.marca) r = r.filter((p) => p.marca && claveDeMarca(p.marca) === claveDeMarca(c.marca!));
+  if (c.disponibilidad && c.disponibilidad !== "todos") r = r.filter((p) => ((b.stock.get(p.id) ?? 0) > 0) === (c.disponibilidad === "con-stock"));
+  return r;
+}
+// Las marcas de unos productos, sin repetir (como se escribió en la primera) y en orden.
+function marcasDe(ps: Producto[]): string[] {
+  const porClave = new Map<string, string>();
+  for (const p of ps) { const m = p.marca?.trim(); if (m && !porClave.has(claveDeMarca(m))) porClave.set(claveDeMarca(m), m); }
+  return [...porClave.values()].sort((x, y) => x.localeCompare(y, "es-AR", { sensitivity: "base" }));
+}
+// Si falla por falta de conexión y hay algo bajado, contesta lo bajado; si no, el mismo error.
+async function oLoBajado<T>(pedido: Promise<T>, conLoBajado: (b: Bajado) => T | Promise<T>): Promise<T> {
+  try { return await pedido; }
+  catch (e) {
+    const b = sinConexion(e) ? await loBajado() : null;
+    if (!b) throw e;
+    return conLoBajado(b);
+  }
+}
 function pedirPagina(consulta: Record<string, string | number | undefined>): Promise<PaginaDeProductos> {
   const q = new URLSearchParams(Object.entries(consulta).filter((e): e is [string, string | number] => e[1] !== undefined && e[1] !== "").map(([k, v]) => [k, String(v)]));
   return api<PaginaDeProductos>(`/productos/pagina${q.size ? `?${q}` : ""}`);
@@ -73,9 +106,11 @@ function pedirBusqueda(clave: string) {
   espera = setTimeout(() => {
     espera = null;
     enCurso += 1; poner({ buscando: true });
-    pedirPagina({ buscar: clave, limite: POR_PAGINA })
+    let sinRed = false;
+    oLoBajado(pedirPagina({ buscar: clave, limite: POR_PAGINA }), (b) => { sinRed = true; return comoPagina(b, buscarEnLoBajado(b, { buscar: clave }).slice(0, POR_PAGINA)); })
       .then(async (pagina) => {
-        busquedas.set(clave, { ids: pagina.productos.map((p) => p.id), cuando: Date.now() });
+        // Lo contestado con lo bajado se vuelve a preguntar al servidor enseguida, por si volvió la conexión.
+        busquedas.set(clave, { ids: pagina.productos.map((p) => p.id), cuando: sinRed ? Date.now() - REFRESCO_MS + 5000 : Date.now() });
         await sumar(pagina);
         poner({ error: null });
       })
@@ -101,7 +136,7 @@ export const productoEnMemoria = (id: string): Producto | undefined => porId.get
 // Un producto por su código de barras o de proveedor, preguntándole al servidor. Si la consulta
 // falla no se sabe si el producto existe: se dice eso, no «no existe».
 export async function traerPorCodigo(codigo: string): Promise<Producto | null> {
-  try { return (await sumar(await pedirPagina({ codigo, limite: 1 })))[0] ?? null; }
+  try { return (await sumar(await oLoBajado(pedirPagina({ codigo, limite: 1 }), (b) => comoPagina(b, buscarEnLoBajado(b, { codigo }).slice(0, 1)))))[0] ?? null; }
   catch (e) { throw sinConexion(e) ? new Error(SIN_CONEXION_PARA_BUSCAR) : e; }
 }
 
@@ -117,7 +152,10 @@ export async function quienTieneElCodigo(codigo: string, salvo: string): Promise
 // ya estén en memoria.
 export async function traerPorIds(ids: readonly string[], deNuevo = false): Promise<void> {
   const faltan = [...new Set(ids)].filter((id) => deNuevo || !porId.has(id));
-  for (let i = 0; i < faltan.length; i += 200) await pedirPagina({ ids: faltan.slice(i, i + 200).join(","), limite: 200 }).then(sumar).catch(() => undefined);
+  for (let i = 0; i < faltan.length; i += 200) {
+    const ids = faltan.slice(i, i + 200);
+    await oLoBajado(pedirPagina({ ids: ids.join(","), limite: 200 }), (b) => comoPagina(b, buscarEnLoBajado(b, { ids }))).then(sumar).catch(() => undefined);
+  }
 }
 
 // ---------- La lista de Catálogo y Productos, de a páginas ----------
@@ -134,7 +172,10 @@ export function useListaDeProductos(consulta: ConsultaDeLista) {
   const cargar = useCallback((desde: number) => {
     setLista((l) => ({ ...l, cargando: true, error: null }));
     const [buscarTexto, marca, disponibilidad] = JSON.parse(clave) as [string, string | null, Disponibilidad];
-    pedirPagina({ buscar: buscarTexto, marca: marca ?? undefined, disponibilidad: disponibilidad === "todos" ? undefined : disponibilidad, desde, limite: POR_PAGINA })
+    oLoBajado(pedirPagina({ buscar: buscarTexto, marca: marca ?? undefined, disponibilidad: disponibilidad === "todos" ? undefined : disponibilidad, desde, limite: POR_PAGINA }), (b) => {
+      const todos = buscarEnLoBajado(b, { buscar: buscarTexto, marca, disponibilidad });
+      return comoPagina(b, todos.slice(desde, desde + POR_PAGINA), desde + POR_PAGINA < todos.length, todos.length);
+    })
       .then(async (pagina) => {
         const llegados = await sumar(pagina);
         setLista((l) => (l.clave !== clave ? l : { clave, ids: [...(desde ? l.ids : []), ...llegados.map((p) => p.id)], hayMas: pagina.hay_mas, total: pagina.total, cargando: false, error: null }));
@@ -159,7 +200,8 @@ export function useMarcas(buscarTexto: string, pedir: boolean): string[] {
   useEffect(() => {
     if (!pedir) return;
     let vigente = true;
-    api<string[]>(`/productos/marcas${clave ? `?buscar=${encodeURIComponent(clave)}` : ""}`).then((m) => { if (vigente) setMarcas(m); }).catch(() => undefined);
+    oLoBajado(api<string[]>(`/productos/marcas${clave ? `?buscar=${encodeURIComponent(clave)}` : ""}`), (b) => marcasDe(buscarEnLoBajado(b, { buscar: clave })))
+      .then((m) => { if (vigente) setMarcas(m); }).catch(() => undefined);
     return () => { vigente = false; };
   }, [clave, pedir]);
   return marcas;
@@ -173,7 +215,7 @@ let clientesPedidos = 0;
 export function pedirClientes() {
   if (Date.now() - clientesPedidos < REFRESCO_MS) return;
   clientesPedidos = Date.now();
-  api<Cliente[]>("/clientes").then((clientes) => poner({ clientes })).catch(() => { clientesPedidos = 0; });
+  oLoBajado(api<Cliente[]>("/clientes"), (b) => b.clientes).then((clientes) => poner({ clientes })).catch(() => { clientesPedidos = 0; });
 }
 
 // ---------- Cambiar un producto ----------

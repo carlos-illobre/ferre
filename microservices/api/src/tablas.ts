@@ -21,7 +21,7 @@ export interface Base {
   };
   movimiento_stock: {
     id: string; producto_id: string; tipo: "venta" | "compra" | "ajuste"; cantidad: Numero; referencia_tipo: string | null;
-    referencia_id: string | null; fecha: Momento; nota: string | null; creado_en: Generated<Date>;
+    referencia_id: string | null; fecha: Momento; nota: string | null; creado_en: Generated<Date>; transaccion: Generated<string>;
   };
   anomalia: {
     id: string; tipo: "venta_sin_stock"; producto_id: string; usuario_id: string | null; venta_id: string | null; cantidad: Numero; detalle: string; creado_en: Generated<Date>;

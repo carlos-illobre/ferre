@@ -93,6 +93,17 @@ export function crearBaseLocal<A extends string>(opciones: OpcionesDeBaseLocal<A
     await terminada(tx);
   }
 
+  // Muchos de una vez, en una sola transacción: los que vienen se guardan (pisan al que tenga la
+  // misma clave) y los de `quitar` se borran.
+  async function guardarVarios<T>(almacen: A, valores: T[], quitar: IDBValidKey[] = []): Promise<void> {
+    const db = await abrir();
+    const tx = db.transaction(almacen, "readwrite");
+    const store = tx.objectStore(almacen);
+    for (const v of valores) store.put(v);
+    for (const k of quitar) store.delete(k);
+    await terminada(tx);
+  }
+
   async function borrar(almacen: A, clave: IDBValidKey): Promise<void> {
     const db = await abrir();
     const tx = db.transaction(almacen, "readwrite");
@@ -115,5 +126,5 @@ export function crearBaseLocal<A extends string>(opciones: OpcionesDeBaseLocal<A
     return esperar(db.transaction(almacen, "readonly").objectStore(almacen).count());
   }
 
-  return { abrir, borrarTodo, leer, leerTodo, guardar, reemplazarTodo, borrar, borrarAnterioresA, contar };
+  return { abrir, borrarTodo, leer, leerTodo, guardar, guardarVarios, reemplazarTodo, borrar, borrarAnterioresA, contar };
 }

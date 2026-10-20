@@ -1,7 +1,7 @@
 import { base } from "../base.js";
 import { anotarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
-import type { Movimiento, Stock, StockAjustado } from "../contratos/stock.js";
+import type { Movimiento, Stock, StockAjustado, StockQueCambio } from "../contratos/stock.js";
 import type { Enviable } from "../enviable.js";
 
 // Stock actual y valorización (issue #33). El valor es stock × costo vigente.
@@ -21,6 +21,9 @@ export async function stockConValor(veElDineroInvertido: boolean): Promise<Envia
   }
   return { productos: filas, valor_total: Math.round(total * 100) / 100, por_proveedor: porProveedor };
 }
+
+// GET /stock/cambios?marca= (specs/018, historia 5): el stock que cambió desde la descarga anterior.
+export const stockQueCambio = (marca: string | undefined): Promise<StockQueCambio> => datos.stockQueCambio(marca && /^\d{1,20}$/.test(marca) ? marca : null);
 
 export const movimientos = (productoId: string): Promise<Enviable<Movimiento>[]> => datos.movimientosDe(base, productoId);
 

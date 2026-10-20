@@ -113,13 +113,20 @@ describe("Trabajar sin conexión en el celular", () => {
     (window as any).innerWidth = 1024;
   });
 
-  it("009-E13: en la computadora la opción no aparece, y la computadora guarda siempre", async () => {
+  it("009-E13 018-E30: en la computadora la opción también aparece, y arranca habilitada: guarda como siempre", async () => {
     aparato(COMPUTADORA);
-    render(<Configuracion />);
-    expect(screen.queryByTestId("cfg-sin-conexion")).toBeNull();
+    render(<Configuracion alCambiarElGuardado={() => undefined} />);
+    expect(screen.getByTestId("cfg-sin-conexion").getAttribute("aria-checked")).toBe("true");
+    expect(screen.getByTestId("configuracion").textContent).toContain("Esta computadora guarda lo que falta enviar");
     expect(guardaEnElDispositivo()).toBe(true);
     await guardar("ventas", venta);
     expect(await leerTodo("ventas")).toHaveLength(1);
+  });
+
+  it("018-E30: en la computadora se puede deshabilitar, y entonces no guarda", () => {
+    aparato(COMPUTADORA);
+    cambiarPreferencia("sinConexion", false);
+    expect(guardaEnElDispositivo()).toBe(false);
   });
 
   it("009-E14: un celular que ya tenía datos guardados de antes queda deshabilitado y sin esos datos", async () => {
@@ -130,6 +137,6 @@ describe("Trabajar sin conexión en el celular", () => {
     expect(await hayBase()).toBe(true);
     await respetarElGuardado();
     expect(await hayBase()).toBe(false);
-    expect(preferencias().sinConexion).toBe(false);
+    expect(guardaEnElDispositivo()).toBe(false);
   });
 });

@@ -28,6 +28,12 @@ export type ProductoDelCatalogo = {
 // movimientos no vienen), si hay más y cuántos son en total.
 export type PaginaDeProductos = { productos: ProductoDelCatalogo[]; stock: Record<string, string>; hay_mas: boolean; total: number };
 
+// GET /productos/descarga?marca=&desde=&limite= (specs/018, historia 5): lo que se baja a mano para
+// trabajar sin conexión, de a 500. Sin marca, todo; con la marca de la descarga anterior, lo que
+// cambió desde entonces y los que hay que borrar. `siguiente` va como `desde` de la próxima página;
+// `marca` se guarda para la próxima descarga.
+export type DescargaDeProductos = { productos: ProductoDelCatalogo[]; quitados: string[]; hay_mas: boolean; siguiente: string | null; marca: string };
+
 // GET /productos/resumen: cuántos productos hay y cuántos tienen costo pero no margen elegido.
 export type ResumenDelCatalogo = { productos: number; sin_margen: number };
 

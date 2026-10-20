@@ -6,7 +6,7 @@ import { preciosDeUnProducto } from "../precios.js";
 import * as copia from "./copia.js";
 import * as datos from "./datos.js";
 import type { z } from "zod";
-import type { FotoSubida, PaginaDeProductos, ProductoDelCatalogo, ResumenDelCatalogo } from "../contratos/productos.js";
+import type { DescargaDeProductos, FotoSubida, PaginaDeProductos, ProductoDelCatalogo, ResumenDelCatalogo } from "../contratos/productos.js";
 import type { cambiosDeProducto } from "./esquemas.js";
 
 export { normalizarBusqueda, type ProductoCatalogo } from "./datos.js";
@@ -24,7 +24,7 @@ export function conPrecio<T extends { costo_neto: string | null; iva: string | n
 }
 
 // Lo que el dispositivo recibe de una fila de la copia: sin lo que la copia usa para buscar.
-const comoProducto = ({ vigente: _v, codigos: _c, ...p }: datos.FilaDeLaCopia): ProductoDelCatalogo => conPrecio(p);
+const comoProducto = ({ vigente: _v, codigos: _c, cambio: _m, ...p }: datos.FilaDeLaCopia): ProductoDelCatalogo => conPrecio(p);
 
 // Los valores que llegan en la consulta, recortados como siempre: hasta 300 identificadores con
 // forma de UUID; `desde` desde cero; `limite` hasta su tope.
@@ -53,6 +53,15 @@ export async function pagina(q: ConsultaDelCatalogo): Promise<PaginaDeProductos>
   const desde = entero(q.desde, 0, 10_000_000);
   const productos = filas.slice(desde, desde + limite);
   return { productos: productos.map(comoProducto), stock: await stockDeProductos(base, productos.map((p) => p.id)), hay_mas: desde + limite < filas.length, total: filas.length };
+}
+
+// GET /productos/descarga?marca=&desde=&limite= (specs/018, historia 5): para trabajar sin
+// conexión. Sale de la copia: no lee la base.
+export function descarga(q: { marca?: string; desde?: string; limite?: string }): DescargaDeProductos {
+  const marca = q.marca && /^\d{1,20}$/.test(q.marca) ? q.marca : null;
+  const desde = q.desde && UUID.test(q.desde) ? q.desde : "";
+  const d = copia.descarga({ marca, desde, limite: Math.max(1, entero(q.limite, 500, 1000)) });
+  return { productos: d.filas.map(comoProducto), quitados: d.quitados, hay_mas: d.hayMas, siguiente: d.ultimo, marca: d.marca };
 }
 
 // GET /productos/resumen: cuántos productos hay y cuántos tienen costo pero no margen.

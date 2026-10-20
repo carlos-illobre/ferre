@@ -100,6 +100,38 @@ describe("GET /productos/pagina", () => {
   });
 });
 
+describe("GET /productos/descarga (specs/018, historia 5)", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+  type Descarga = { productos: { id: string }[]; quitados: string[]; hay_mas: boolean; siguiente: string | null; marca: string };
+  const bajar = async (q: string) => (await pedir(app, "GET", `/productos/descarga${q}`, { rol: "mostrador" })).json() as Promise<Descarga>;
+
+  it("018-E24: la primera vez, todo lo vigente de a páginas por identificador, sin leer la base", async () => {
+    cargarParaPrueba(CATALOGO);
+    const primera = await bajar("?limite=100");
+    expect(primera.productos).toHaveLength(100);
+    expect(primera.hay_mas).toBe(true);
+    expect(primera.marca).toBe("1");
+    const segunda = await bajar(`?limite=100&desde=${primera.siguiente}`);
+    expect(segunda.productos).toHaveLength(24);
+    expect(segunda.hay_mas).toBe(false);
+    expect([...primera.productos, ...segunda.productos].some((p) => p.id === ID(5))).toBe(false); // el dado de baja no
+    expect(productosDeLaBase()).toHaveLength(0);
+  });
+
+  it("018-E25: con la marca anterior, solo lo que cambió desde entonces; lo dado de baja, para borrar", async () => {
+    cargarParaPrueba([
+      { id: ID(1), descripcion: "Viejo", cambio: null },
+      { id: ID(2), descripcion: "Cambió antes", cambio: "90" },
+      { id: ID(3), descripcion: "Cambió después", cambio: "120" },
+      { id: ID(4), descripcion: "Se unió a otro", cambio: "130", vigente: false },
+    ]);
+    const d = await bajar("?marca=100");
+    expect(d.productos.map((p) => p.id)).toEqual([ID(3)]);
+    expect(d.quitados).toEqual([ID(4)]);
+    expect((await bajar("?marca=no-es-una-marca")).productos).toHaveLength(3); // una marca rara vale como ninguna: todo
+  });
+});
+
 describe("GET /productos (la aplicación de la versión anterior)", () => {
   beforeEach(() => { base.actual = baseFalsa(); cargarParaPrueba(CATALOGO); });
 

@@ -8,6 +8,8 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const enCola = vi.hoisted(() => ({ cambios: new Map<string, Record<string, unknown>>() }));
 const enviar = vi.hoisted(() => vi.fn(async () => ({ encolado: false })));
 vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+const loBajado = vi.hoisted(() => ({ actual: null as null | { productos: any[]; stock: Map<string, number>; clientes: any[] } }));
+vi.mock("./descarga", () => ({ loBajado: async () => loBajado.actual }));
 vi.mock("./cola", () => ({ cambiosDeProductosPendientes: async () => enCola.cambios, enviarOEncolar: (...a: unknown[]) => (enviar as any)(...a) }));
 import { ErrorApi } from "./api";
 import { olvidarTodo, pedirClientes, SIN_CONEXION_PARA_BUSCAR, traerPorCodigo, traerPorIds, useCatalogo, useListaDeProductos } from "./catalogo";
@@ -18,7 +20,7 @@ const pedidos = () => apiFalsa.mock.calls.map((c) => String(c[0]));
 const parametros = (ruta: string) => Object.fromEntries(new URL(ruta, "http://x").searchParams);
 const sinRed = () => new TypeError("Failed to fetch");
 
-beforeEach(() => { olvidarTodo(); apiFalsa.mockReset(); enviar.mockClear(); enCola.cambios = new Map(); });
+beforeEach(() => { olvidarTodo(); apiFalsa.mockReset(); enviar.mockClear(); enCola.cambios = new Map(); loBajado.actual = null; });
 afterEach(() => { vi.useRealTimers(); });
 
 describe("buscar le pregunta al servidor", () => {
@@ -139,3 +141,44 @@ describe("los clientes", () => {
     expect(pedidos()).toEqual(["/clientes"]);
   });
 });
+
+describe("sin conexión, con lo bajado a mano (historia 5)", () => {
+  beforeEach(() => {
+    apiFalsa.mockRejectedValue(sinRed());
+    loBajado.actual = {
+      productos: [prod("m", "MECHA 8 MM", { codigo_barras: "779", marca: "Bosch" }), prod("t", "TORNILLO", { marca: "Fischer" }), prod("c", "CLAVO", { marca: "bosch" })],
+      stock: new Map([["m", 3]]),
+      clientes: [{ id: "cl", nombre: "Constructora" }],
+    };
+  });
+
+  it("018-E26: se busca, se escanea y se piden productos con lo bajado, con su stock", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("mecha");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.buscarProductos("mecha").map((p) => p.id)).toEqual(["m"]);
+    expect(result.current.error).toBeNull();
+    expect(result.current.stock.get("m")).toBe(3);
+    expect((await traerPorCodigo("779"))?.id).toBe("m");
+    await traerPorIds(["t"]);
+    expect(result.current.catalogo.map((p) => p.id).sort()).toEqual(["m", "t"]);
+  });
+
+  it("018-E26: la lista, con sus filtros, y los clientes también salen de lo bajado", async () => {
+    const { result } = renderHook(() => useListaDeProductos({ buscar: "", marca: "BOSCH", disponibilidad: "todos" }));
+    await waitFor(() => expect(result.current.productos.map((p) => p.id)).toEqual(["c", "m"]));
+    expect(result.current.error).toBeNull();
+    const conStock = renderHook(() => useListaDeProductos({ buscar: "", marca: null, disponibilidad: "con-stock" }));
+    await waitFor(() => expect(conStock.result.current.productos.map((p) => p.id)).toEqual(["m"]));
+    pedirClientes();
+    const { result: cat } = renderHook(() => useCatalogo());
+    await waitFor(() => expect(cat.current.clientes).toHaveLength(1));
+  });
+
+  it("018-E27: con conexión se busca en el servidor aunque haya algo bajado", async () => {
+    apiFalsa.mockResolvedValue(pagina([prod("s", "DEL SERVIDOR", { codigo_barras: "779" })]));
+    expect((await traerPorCodigo("779"))?.id).toBe("s");
+  });
+});
+

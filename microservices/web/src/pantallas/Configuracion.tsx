@@ -2,7 +2,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias, type TiempoDeVersion } from "../preferencias";
 import { borrarLoGuardado } from "../almacen";
 import { apartados, pendientes } from "../cola";
-import { esCelularAca } from "../guardado";
+import { esCelularAca, guardaEnElDispositivo } from "../guardado";
+import { useDescarga } from "../descarga";
 import "./configuracion.css";
 
 // Configuración (RF-83, decisión 79): las preferencias de la aplicación en este dispositivo.
@@ -32,17 +33,18 @@ function useReducirMovimiento(): boolean {
 }
 
 export function Configuracion({ celular = false, alCambiarElGuardado = () => location.reload(), propio }: { celular?: boolean; alCambiarElGuardado?: () => void; propio?: ReactNode }) {
-  const { animaciones, sinConexion, buscar, versionCada, versionNunca } = usePreferencias();
-  // Trabajar sin conexión (RF-84): solo en el celular. Cambiarlo vuelve a abrir la aplicación,
-  // para que arranque guardando todo o sin guardar nada. Deshabilitarlo borra lo guardado; si
-  // había cambios sin enviar se pierden, y antes se avisa.
+  const { animaciones, buscar, versionCada, versionNunca } = usePreferencias();
+  // Trabajar sin conexión (RF-84): en el celular y en la computadora (specs/018). Cambiarlo vuelve a
+  // abrir la aplicación, para que arranque guardando o sin guardar nada. Deshabilitarlo borra lo
+  // guardado, también lo bajado a mano; si había cambios sin enviar se pierden, y antes se avisa.
+  const sinConexion = guardaEnElDispositivo();
   async function cambiarSinConexion() {
     if (sinConexion) {
       // También cuenta lo que dejó sin mandar otra persona que usó este celular: se borraría igual.
       const sinEnviar = (await pendientes().catch(() => [])).length + (await apartados().catch(() => [])).length;
       const pregunta = sinEnviar > 0
-        ? `Hay ${sinEnviar} ${sinEnviar === 1 ? "cambio que todavía no se envió" : "cambios que todavía no se enviaron"} al servidor. Si dejás de guardar en este celular, se ${sinEnviar === 1 ? "pierde" : "pierden"}. ¿Seguir?`
-        : "Se va a borrar de este celular el catálogo y lo demás que estaba guardado. ¿Seguir?";
+        ? `Hay ${sinEnviar} ${sinEnviar === 1 ? "cambio que todavía no se envió" : "cambios que todavía no se enviaron"} al servidor. Si dejás de guardar en ${celular ? "este celular" : "esta computadora"}, se ${sinEnviar === 1 ? "pierde" : "pierden"}. ¿Seguir?`
+        : `Se va a borrar de ${celular ? "este celular" : "esta computadora"} lo que estaba guardado, también los datos bajados para trabajar sin conexión. ¿Seguir?`;
       if (!window.confirm(pregunta)) return;
       cambiarPreferencia("sinConexion", false);
       await borrarLoGuardado();
@@ -71,18 +73,17 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
           </span>
           {reducir && animaciones && <span className="cfg-detalle cfg-aviso" data-testid="cfg-reducir-movimiento">Este dispositivo tiene pedido «reducir movimiento»: no se anima igual, hasta que lo cambies en sus ajustes.</span>}
         </li>
-        {telefono && (
-          <li className="cfg-fila">
-            <span className="cfg-nombre" id="cfg-sin-conexion">Trabajar sin conexión</span>
-            <button type="button" role="switch" aria-checked={sinConexion} aria-labelledby="cfg-sin-conexion" aria-describedby="cfg-sin-conexion-detalle"
-              className={`cfg-llave ${sinConexion ? "si" : ""}`} onClick={() => void cambiarSinConexion()} data-testid="cfg-sin-conexion" />
-            <span className="cfg-detalle" id="cfg-sin-conexion-detalle">
-              {sinConexion
-                ? "Este celular guarda el catálogo, el stock y lo que falta enviar, para seguir trabajando si se corta internet. Ocupa varios megas."
-                : "Este celular no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva."}
-            </span>
-          </li>
-        )}
+        <li className="cfg-fila">
+          <span className="cfg-nombre" id="cfg-sin-conexion">Trabajar sin conexión</span>
+          <button type="button" role="switch" aria-checked={sinConexion} aria-labelledby="cfg-sin-conexion" aria-describedby="cfg-sin-conexion-detalle"
+            className={`cfg-llave ${sinConexion ? "si" : ""}`} onClick={() => void cambiarSinConexion()} data-testid="cfg-sin-conexion" />
+          <span className="cfg-detalle" id="cfg-sin-conexion-detalle">
+            {sinConexion
+              ? `${celular ? "Este celular" : "Esta computadora"} guarda lo que falta enviar, para seguir vendiendo si se corta internet. Para buscar sin internet, bajá los datos acá abajo.`
+              : `${celular ? "Este celular" : "Esta computadora"} no guarda datos del negocio. Si se corta internet, no se puede registrar nada hasta que vuelva.`}
+          </span>
+        </li>
+        {sinConexion && <DatosSinConexion />}
         {telefono && !sinConexion && (
           <li className="cfg-fila cfg-opciones" role="radiogroup" aria-labelledby="cfg-buscar">
             <span className="cfg-nombre" id="cfg-buscar">Cómo buscar productos</span>
@@ -121,3 +122,31 @@ export function Configuracion({ celular = false, alCambiarElGuardado = () => loc
     </main>
   );
 }
+
+// Los datos para trabajar sin conexión (specs/018, historia 5): se bajan solo al tocar el botón; la
+// primera vez, todo; después, «Actualizar» trae solo lo que cambió. Mientras baja se ve cuánto lleva.
+function DatosSinConexion() {
+  const { descarga, leida, avance, error, descargar } = useDescarga();
+  const numero = (n: number) => n.toLocaleString("es-AR");
+  const cuando = descarga ? new Date(descarga.cuando) : null;
+  return (
+    <li className="cfg-fila cfg-descarga" data-testid="cfg-descarga">
+      <span className="cfg-nombre" id="cfg-descarga">Datos para trabajar sin conexión</span>
+      <button type="button" className={`cfg-boton ${descarga || avance ? "secundario" : "principal"}`} disabled={!leida || avance !== null} onClick={descargar} aria-describedby="cfg-descarga-detalle" data-testid="cfg-descargar">
+        {avance ? "Descargando…" : descarga ? "Actualizar" : "Descargar"}
+      </button>
+      <span className="cfg-detalle" id="cfg-descarga-detalle" aria-live="polite">
+        {avance ? (
+          <>
+            <span className="cfg-barra" aria-hidden="true"><i style={{ width: `${avance.total ? Math.min(100, (avance.hechos / avance.total) * 100) : 0}%` }} /></span>
+            {avance.total ? `Bajando… ${numero(avance.hechos)} de ${numero(avance.total)} productos.` : `Bajando lo que cambió… ${numero(avance.hechos)} productos.`} Se puede seguir usando la aplicación.
+          </>
+        ) : descarga && cuando ? (
+          `Bajados el ${String(cuando.getDate()).padStart(2, "0")}/${String(cuando.getMonth() + 1).padStart(2, "0")} a las ${String(cuando.getHours()).padStart(2, "0")}:${String(cuando.getMinutes()).padStart(2, "0")}: ${numero(descarga.cuantos)} productos, su stock y los clientes. Sin internet se busca acá. «Actualizar» trae solo lo que cambió desde entonces.`
+        ) : "Todavía no se bajaron. Bajá los productos, el stock y los clientes para buscar y vender sin internet. Ocupa unos 10 MB; después, «Actualizar» trae solo lo que cambia."}
+        {error && <span className="cfg-aviso" role="alert" data-testid="cfg-descarga-error"> {error}</span>}
+      </span>
+    </li>
+  );
+}
+

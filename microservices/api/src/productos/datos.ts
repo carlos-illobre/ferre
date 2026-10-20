@@ -19,9 +19,10 @@ export function normalizarBusqueda(texto: string): string[] {
 }
 
 // La fila del catálogo como la tiene la copia del servidor (specs/018, RF-124): la de siempre,
-// más si sigue a la venta (activo y no unido a otro) y todos sus códigos de proveedor, también
-// los de listas viejas, que la búsqueda encuentra.
-export type FilaDeLaCopia = ProductoCatalogo & { vigente: boolean; codigos: string[] };
+// más si sigue a la venta (activo y no unido a otro), todos sus códigos de proveedor, también
+// los de listas viejas, que la búsqueda encuentra, y la transacción de su último cambio (null si
+// no cambió desde que se anotan), para la descarga a mano (historia 5).
+export type FilaDeLaCopia = ProductoCatalogo & { vigente: boolean; codigos: string[]; cambio: string | null };
 
 const CONSULTA_DEL_CATALOGO = `
   SELECT p.id, p.descripcion, p.marca, p.codigo_barras, p.codigo_leido_en, p.unidad, p.margen_elegido, p.modificado_en, p.sector_id, p.foto_url,
@@ -29,7 +30,8 @@ const CONSULTA_DEL_CATALOGO = `
          COALESCE(pp.descuentos->'explicacion', '[]'::jsonb) AS explicacion_costo,
          COALESCE(prov.lista, '[]'::json) AS proveedores,
          (p.activo AND p.reemplazado_por IS NULL) AS vigente,
-         ARRAY(SELECT DISTINCT c.codigo_proveedor FROM precio_proveedor c WHERE c.producto_id = p.id) AS codigos
+         ARRAY(SELECT DISTINCT c.codigo_proveedor FROM precio_proveedor c WHERE c.producto_id = p.id) AS codigos,
+         (SELECT cp.transaccion::text FROM cambio_de_producto cp WHERE cp.producto_id = p.id) AS cambio
     FROM producto p
     LEFT JOIN LATERAL (
       SELECT * FROM precio_proveedor x

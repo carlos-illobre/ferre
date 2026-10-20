@@ -29,3 +29,12 @@
 .cfg-tramos button.elegido { background: var(--p-superficie, #fff); color: var(--p-verde-texto, #0f6b52); box-shadow: 0 0 0 2px var(--p-ok, #0f8a5f); }
 .cfg-tramos button:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 2px; }
 .cfg-propio { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+/* Los datos para trabajar sin conexión (specs/018, historia 5): un botón en lugar de la llave. */
+.cfg-boton { grid-column: 2; grid-row: 1 / span 2; min-height: 44px; padding: 0 18px; border-radius: 12px; font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.cfg-boton.principal { border: 0; background: var(--p-ok, #0f8a5f); color: #fff; }
+.cfg-boton.secundario { border: 1.5px solid var(--p-borde-fuerte, #7c9085); background: var(--p-superficie, #fff); color: var(--p-tinta, #18201e); }
+.cfg-boton:disabled { opacity: 0.6; cursor: default; }
+.cfg-boton:focus-visible { outline: 3px solid var(--p-verde-texto, #0f6b52); outline-offset: 3px; }
+.cfg-barra { display: block; height: 8px; margin: 4px 0 8px; border-radius: 999px; background: var(--p-relleno, #dfe5e0); overflow: hidden; }
+.cfg-barra i { display: block; height: 100%; background: var(--p-ok, #0f8a5f); border-radius: 999px; transition: width 0.2s ease-out; }
+

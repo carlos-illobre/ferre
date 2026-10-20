@@ -12,6 +12,8 @@ stock.use("/*", exigirSesion);
 // El valor en pesos solo con «Ver el dinero invertido» (RF-99); sin él, las cantidades.
 stock.get("/", async (c) => c.json(await reglas.stockConValor(puede(c.get("sesion").usuario, "negocio.invertido"))));
 
+stock.get("/cambios", async (c) => c.json(await reglas.stockQueCambio(c.req.query("marca"))));
+
 stock.get("/:productoId/movimientos", async (c) => c.json(await reglas.movimientos(c.req.param("productoId"))));
 
 stock.post("/:productoId/ajustes", exigirPermiso("deposito.stock"), async (c) => {

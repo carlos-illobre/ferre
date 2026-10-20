@@ -16,3 +16,7 @@ export type Movimiento = { id: string; tipo: string; cantidad: string; referenci
 // POST /stock/:productoId/ajustes. La forma sale de la validación del servidor (decisión 89).
 export type AjusteDeStock = z.input<typeof ajusteDeStock>;
 export type StockAjustado = { stock: number; diferencia: number };
+
+// GET /stock/cambios?marca= (specs/018, historia 5): el stock de los productos que se movieron desde
+// la marca de la descarga anterior (sin marca, el de todos los que tienen movimientos), y la marca nueva.
+export type StockQueCambio = { marca: string; stock: Record<string, string> };

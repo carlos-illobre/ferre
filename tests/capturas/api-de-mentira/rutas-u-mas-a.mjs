@@ -4,7 +4,7 @@ import { ventas as deHoy, productos as base } from "./rutas-00-base.mjs";
 // ---- Productos: con estado (margen, proveedor preferido, foto), una foto de ejemplo y uno sin costo.
 const dibujo = (color) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="${color}"/><rect x="40" y="90" width="120" height="20" rx="10" fill="#fff" opacity=".85"/><circle cx="150" cy="100" r="24" fill="#fff" opacity=".6"/></svg>`)}`;
 const cambios = new Map();
-function productos() {
+export function productos() {
   const lista = base.map((p, i) => {
     const propios = p.proveedores ?? [{ proveedor_id: `pv-${i % 4}`, proveedor: p.proveedor, costo_neto: p.costo_neto, fecha_lista: p.fecha_lista, codigo_proveedor: p.codigo_proveedor }];
     const c = cambios.get(p.id) ?? {};

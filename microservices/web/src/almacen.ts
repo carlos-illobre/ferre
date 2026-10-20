@@ -26,6 +26,7 @@ export const leer = base.leer;
 export const leerTodo = base.leerTodo;
 export const guardar = base.guardar;
 export const reemplazarTodo = base.reemplazarTodo;
+export const guardarVarios = base.guardarVarios;
 export const borrar = base.borrar;
 export const contar = base.contar;
 export const borrarAnterioresA = (almacen: "ventas", indice: "fecha", limite: string): Promise<number> => base.borrarAnterioresA(almacen, indice, limite);
@@ -35,10 +36,11 @@ export const borrarLoGuardado = base.borrarTodo;
 
 // Al abrir la aplicación: un celular con el guardado deshabilitado no conserva datos del
 // negocio, tampoco los que hubiera guardado una versión anterior (RF-84).
-// El catálogo, el stock y los clientes ya no se guardan en ningún dispositivo (specs/018, E24): lo
-// que dejó una versión anterior se borra.
+// El catálogo, el stock y los clientes se guardan solo con la descarga a mano (specs/018, historia
+// 5): lo que bajó sola una versión anterior, sin esa descarga, se borra.
 export async function respetarElGuardado(): Promise<void> {
   if (!guardaEnElDispositivo()) { await borrarLoGuardado(); return; }
+  if (await leerMeta("descarga").catch(() => undefined)) return;
   await Promise.all([reemplazarTodo("catalogo", []), reemplazarTodo("stock", []), reemplazarTodo("clientes", []), borrar("meta", "catalogo_primeros"), borrar("meta", "catalogo_bajado")]).catch(() => undefined);
 }
 
