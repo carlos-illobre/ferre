@@ -71,8 +71,6 @@ export const TEXTOS = {
   },
   vender: {
     noLlevo: { largo: "Anotado como «No llevó»: qué pidió y a cuánto se le ofreció.", corto: "Anotado como «No llevó»." },
-    // El precio a mano se cobra tal cual: si no es múltiplo de $1.000 se avisa, sin impedir cobrar (RF-19, decisión 128).
-    noMultiplo: { largo: "No es múltiplo de $1.000: se cobra igual", corto: "No es múltiplo de $1.000" },
     sinPrecio: { largo: "Hay productos sin precio: elegí un margen o poné el precio a mano en el renglón marcado.", corto: "Hay productos sin precio: elegí un margen o poné el precio a mano." },
     elegiComoPaga: igual("Elegí cómo paga: efectivo, Mercado Pago, tarjeta o cuenta corriente."),
     faltaElCliente: igual("Cuenta corriente: elegí el cliente."),

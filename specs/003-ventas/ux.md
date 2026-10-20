@@ -126,9 +126,9 @@ Sigue el lenguaje «Mostrador»:
 - «Esta venta» con cuántos productos, y a la derecha «No llevó» (con su ícono, sin borde, y F4, que figura en la línea de teclas; Esc cierra el desplegable de la búsqueda, decisión 127) y
   «Vaciar» (con Deshacer); los dos, solo con productos en la venta (decisión 126).
 - Cada renglón, una tarjeta como la de la v2 (decisión 127): la foto, el nombre con marca,
-  proveedor y stock (o cuánto falta), el tacho a la izquierda de la cantidad (lo quita con
-  Deshacer), la cantidad en una pastilla con − y + y su unidad, y el total del renglón con
-  «3 × $7.000» debajo. Abajo, alineados con el nombre: el costo (con «Ver costos»), los márgenes en
+  proveedor y stock (o cuánto falta), la cantidad en una pastilla con − y + y su unidad (un
+  desplegable con el estilo de la pantalla), el total del renglón con «3 × $7.000» debajo y, a su
+  derecha, el tacho, que lo quita con Deshacer (decisión 132). Abajo, alineados con el nombre: el costo (con «Ver costos»), los márgenes en
   un selector segmentado (300, 200, 100, 50, 25 y un solo «%») y el precio por unidad con «a mano»
   al lado, sin borde y con el lápiz, que abre la ventana «Precio a mano» (el producto, la caja con
   «$», «Cancelar» y «Poner el precio», Enter); puesto, ese lugar dice «✎ A mano $X» y elegir un

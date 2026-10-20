@@ -383,7 +383,6 @@ describe("Vender", () => {
     expect(within(libre).getByTestId("descripcion-libre")).toHaveProperty("value", "bolsa de arena");
     fireEvent.change(within(libre).getByTestId("precio-manual"), { target: { value: "1500" } });
     expect(screen.getByTestId("total").textContent).toBe("$1.500"); // el ítem libre es precio a mano: tal cual (decisión 128)
-    expect(screen.getByTestId("no-multiplo").textContent).toBe("No es múltiplo de $1.000");
   });
 
   // RF-72: el margen elegido en la venta queda en el producto solo con «Fijar márgenes».

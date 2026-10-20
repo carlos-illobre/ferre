@@ -98,7 +98,7 @@ cobra $2.000.
 **Acceptance Scenarios**:
 
 1. **Given** una venta con 3 mechas ($9.000) y un tornillo a $1.000 el kilo, **When** el Vendedor pone 1,5 kg de tornillo, **Then** ese renglón vale $2.000 (1,5 × 1000 = 1500, para arriba) y el total es $11.000 (RF-19).
-2. **Given** un precio tipeado a mano que no es múltiplo de $1.000 ($1.500 o $2.500), **When** se suma a la venta, **Then** el renglón se cobra tal cual ($1.500 o $2.500), sin redondear, y muestra un aviso que dice que no es múltiplo de $1.000; el aviso no impide cobrar (RF-19).
+2. **Given** un precio tipeado a mano que no es múltiplo de $1.000 ($1.500 o $2.500), **When** se suma a la venta, **Then** el renglón se cobra tal cual ($1.500 o $2.500), sin redondear y sin aviso (RF-19, decisión 132).
 3. **Given** una venta que llega al servidor con un renglón de 0,5 × $3.000, uno a mano de $1.500 y uno de 0,3 × $10.000, **When** se registra, **Then** el total guardado es $6.500 ($2.000 + $1.500 + $3.000): el servidor redondea los renglones calculados y respeta el del precio a mano, igual que el dispositivo, y la cantidad y el precio por unidad se guardan tal cual (RF-19).
 4. **Given** un renglón cuyo importe ya es múltiplo de $1.000 (3 × $3.000; 0,3 m × $10.000), **When** se calcula, **Then** no sube: ni por redondear de más ni por un error de aritmética con decimales (RF-19).
 5. **Given** un renglón de 0,5 kg a $3.000, **When** se pide la explicación del subtotal, **Then** dice «× 0,5 kg = $1.500,00» y «Redondeado para arriba a $2.000,00 (múltiplo de $1.000,00) para no dar vuelto» (RF-19).

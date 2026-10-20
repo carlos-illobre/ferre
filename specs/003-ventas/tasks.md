@@ -22,3 +22,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T011 [ajuste] Computadora: el renglón de Vender exactamente como la v2 (tacho a la izquierda de la cantidad, «a mano» al lado del precio por unidad, el precio una sola vez) y «Falta N precios» arriba, al lado de la cuenta (decisión 127)
 - [x] T012 [arreglo] El precio puesto a mano (y el del ítem libre) se cobra tal cual, sin redondear, en el dispositivo y en el servidor, con el aviso «no es múltiplo de $1.000» que no impide cobrar (RF-19, decisiones 16 y 128)
 - [x] T013 [ajuste] Computadora: la venta vacía como la maqueta, con los cuatro últimos productos vendidos (decisión 131)
+- [x] T014 [regla] Sin aviso de «no es múltiplo de $1.000» en el precio a mano (celular y computadora); el tacho a la derecha del precio y el desplegable de la unidad con el estilo de la pantalla (decisión 132)

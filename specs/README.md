@@ -70,7 +70,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-16 | Ayudar a decidir el margen con datos (costeo por absorción: costos fijos, rotación) en vez de a ojo | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
 | RF-17 | Descuentos puntuales de un proveedor que se trasladan al precio de venta mientras duran | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
 | RF-18 | Buscar proveedores y ver su ficha: datos de contacto, listas cargadas, qué venden | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
-| RF-19 | Toda venta es múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto. Un precio puesto a mano se respeta tal cual y, si no es múltiplo de $1.000, la venta lo avisa | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
+| RF-19 | Toda venta es múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto. Un precio puesto a mano se respeta tal cual, sin aviso | [002-catalogo-y-precios](002-catalogo-y-precios/spec.md) |
 
 ### Ventas
 

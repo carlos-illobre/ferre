@@ -230,8 +230,8 @@ Prueba manual de punta a punta, pantalla por pantalla.
   hoy ata al diseño (decisión 19).
 - **Roles.** Por ahora todos los usuarios son Administrador y el Administrador puede todo
   (decisión 18).
-- **Precio a mano.** Se respeta tal cual; si no es múltiplo de $1.000 aparece un mensaje
-  de alerta que lo dice (RF-19, RF-20b).
+- **Precio a mano.** Se respeta tal cual, sin aviso aunque no sea múltiplo de $1.000 (RF-19,
+  RF-20b; decisión 132).
 
 ### 2026-10-11
 

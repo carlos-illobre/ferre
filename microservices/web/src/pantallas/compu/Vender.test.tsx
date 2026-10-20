@@ -79,9 +79,9 @@ describe("Vender (v2)", () => {
     fireEvent.click(within(item("TORNILLO")).getByTestId("habilitar-precio-manual"));
     fireEvent.change(screen.getByTestId("precio-manual"), { target: { value: "2500" } }); // en la ventana «Precio a mano»
     fireEvent.click(screen.getByTestId("poner-precio"));
-    // Se cobra tal cual y avisa que no es múltiplo de $1.000, sin impedir cobrar (003 historia 1, escenario 2; decisión 128).
+    // Se cobra tal cual, sin aviso (003 historia 1, escenario 2; decisiones 128 y 132).
     expect(screen.getByTestId("total").textContent).toBe("$2.500");
-    expect(within(item("TORNILLO")).getByTestId("no-multiplo").textContent).toBe("No es múltiplo de $1.000: se cobra igual");
+    expect(screen.queryByText(/múltiplo/)).toBeNull();
     expect(falso.actualizarProducto).not.toHaveBeenCalled();
   });
 
@@ -158,13 +158,13 @@ describe("Vender (v2)", () => {
     expect(screen.getByTestId("cliente").textContent).toContain("CUConstructora Uno");
   });
 
-  it("el tacho va a la izquierda de la cantidad; el precio por unidad sale una vez y «Precio a mano» abre su ventana", () => {
+  it("el tacho va a la derecha del precio; el precio por unidad sale una vez y «Precio a mano» abre su ventana", () => {
     const { agregar, item, falso } = armar();
     agregar("mecha vender");
     const renglon = item("MECHA");
     const tacho = within(renglon).getByTestId("quitar-renglon");
-    const cantidad = within(renglon).getByTestId("cantidad");
-    expect(tacho.compareDocumentPosition(cantidad) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const subtotal = within(renglon).getByTestId("subtotal");
+    expect(subtotal.compareDocumentPosition(tacho) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy(); // decisión 132
     // «Precio a mano» abre su ventana; puesto, el lugar del precio dice «A mano $5.000» y el de antes no se repite.
     fireEvent.click(within(renglon).getByTestId("habilitar-precio-manual"));
     fireEvent.change(screen.getByTestId("precio-manual"), { target: { value: "5000" } });

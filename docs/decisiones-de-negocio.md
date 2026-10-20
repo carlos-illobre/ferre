@@ -1070,3 +1070,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      foto, el nombre y el precio, que agregan el producto con un clic. Cambia lo de la decisión 126
      (que la había sacado). Salen de las ventas guardadas en este dispositivo y de las de hoy; con
      el catálogo en el servidor (018), los productos de esas tarjetas se tendrán que traer de ahí.
+132. **Sin aviso de «no es múltiplo de $1.000»; el tacho a la derecha del precio** (2026-10-20).
+     Carlos: el cartel que aclara que el precio a mano no es múltiplo de $1.000 no hace falta; se
+     saca en el celular y en la computadora (cambia RF-19 y la decisión 16: se cobra tal cual, sin
+     aviso). En el renglón de la computadora el tacho va a la derecha del precio (cambia lo de la
+     decisión 127), y el desplegable de la unidad tiene el estilo de la pantalla.

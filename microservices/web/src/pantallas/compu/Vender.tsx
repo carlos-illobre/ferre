@@ -8,7 +8,7 @@ import { contarAlEspejo, useEspejar } from "../../espejo";
 import { ventaActual } from "../../negocio/ventas/venta-en-curso";
 import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
 import { marcarLoQueEntro, useLlegadosDelCelular } from "../../negocio/ventas/llegados-del-celular";
-import { NOMBRE_DE_MEDIO, cuentaDelRenglon, noEsMultiploDeMil, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
+import { NOMBRE_DE_MEDIO, cuentaDelRenglon, precioDe, subtotalDe, useVenta, type Cobro, type Item, type MotivoDeCambio } from "../../negocio/ventas/venta";
 import { esMargenBoton } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { useCodigoParaVincular } from "../../negocio/vinculo";
@@ -473,7 +473,7 @@ function HojaPrecioAMano({ item, alPoner, alCerrar }: { item: Item; alPoner: (v:
             onChange={(e) => setValor(soloDigitos(e.target.value))} data-testid="precio-manual" />
         </label>
       </form>
-      <p className="detalle">Vale solo para esta venta: no cambia el margen guardado. Si no es múltiplo de $1.000 se avisa, pero se cobra igual.</p>
+      <p className="detalle">Vale solo para esta venta: no cambia el margen guardado. Se cobra tal cual, sin redondear.</p>
     </Hoja>
   );
 }
@@ -498,14 +498,13 @@ function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
           : <input className="entrada" value={it.descripcion} placeholder="¿Qué se lleva?" aria-label="Descripción del ítem libre" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
         <div className="detalle">{producto ? <>{detalleDe(producto)}<>{detalleDe(producto) ? " · " : ""}{(stock ?? 0) <= 0 ? <Pastilla tipo="alerta" sinPunto>sin stock</Pastilla> : noAlcanza ? <Pastilla tipo="alerta" sinPunto>{`hay ${numero(stock!)}: no alcanza`}</Pastilla> : <Pastilla tipo="ok" sinPunto>{numero(stock!)} {abreviarUnidad(it.unidad)}</Pastilla>}</></> : "Ítem libre: no está en ninguna lista"}</div>
       </div>
-      {/* El tacho a la izquierda de la cantidad, como en el celular (decisión 126). */}
-      <button type="button" className="vmc-tacho" title="Quitar de la venta" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} data-testid="quitar-renglon"><Icono nombre="basura" tam={20} /></button>
       <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} etiqueta={`Cantidad de ${it.descripcion}`} />
       <div className="vmc-sub" data-testid="subtotal">
         {renglon ? <span className="importe">{pesosCortos(renglon.valor)}</span> : <span className="falta-texto" data-testid="sin-precio">Sin precio</span>}
         <small>{sinPrecio ? (producto && p.costo !== null ? "elegí el margen" : "poné el precio") : `${numero(it.cantidad)} × ${pesosCortos(p.unitario!)}`}</small>
-        {noEsMultiploDeMil(it) && <small className="vmc-no-multiplo" data-testid="no-multiplo">{TEXTOS.vender.noMultiplo.largo}</small>}
       </div>
+      {/* El tacho, a la derecha del precio (Carlos, 2026-10-20; decisión 132). */}
+      <button type="button" className="vmc-tacho" title="Quitar de la venta" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} data-testid="quitar-renglon"><Icono nombre="basura" tam={20} /></button>
       <div className="vmc-fila2">
         {producto && p.costo !== null && <SiVeCostos><span>Costo <b className="vmc-valor">{pesos(p.costo)}</b></span><span className="vmc-sep" /></SiVeCostos>}
         {producto && p.costo !== null && <><span className={sinPrecio ? "falta-texto" : ""}>Margen</span><Margenes compacto sinSigno elegido={it.precioManual === null ? p.margen : null} alElegir={alElegirMargen} etiqueta={`Margen de ${it.descripcion}`} /><span>%</span><span className="vmc-sep" /></>}

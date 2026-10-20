@@ -41,8 +41,6 @@ export function precioDe(item: Item): { unitario: number | null; pasos: string[]
 
 // Un renglón con precio a mano (tipeado, o un ítem libre) se cobra tal cual (decisión 128).
 export const esAMano = (item: Item) => item.precioManual !== null || !item.producto;
-// Un precio a mano que no es múltiplo de $1.000 se avisa, pero se cobra igual (RF-19).
-export const noEsMultiploDeMil = (item: Item) => esAMano(item) && item.precioManual !== null && (item.precioManual * item.cantidad) % 1000 !== 0;
 
 // El subtotal de un renglón (precio × cantidad, redondeado como se cobra), con sus pasos; sin precio, ninguno.
 export function subtotalDe(item: Item) {

@@ -41,7 +41,7 @@ Decisiones de Carlos que tocan esta capacidad.
 
 ### Session 2026-10-10
 
-- Q: Un precio puesto a mano en una venta que no es múltiplo de $1.000, ¿se redondea? → A: No. Se respeta tal cual y la venta muestra un aviso que dice que no es múltiplo de $1.000. Lo calculado y lo que se vende suelto se sigue redondeando para arriba (decisión 16; RF-19).
+- Q: Un precio puesto a mano en una venta que no es múltiplo de $1.000, ¿se redondea? → A: No. Se respeta tal cual (el aviso de que no es múltiplo de $1.000 se sacó el 2026-10-20, decisión 132). Lo calculado y lo que se vende suelto se sigue redondeando para arriba (decisión 16; RF-19).
 - Q: ¿Qué rol carga listas, elige márgenes, une duplicados y ve costos? → A: En esta primera versión todos los usuarios son Administrador y el Administrador puede hacer todo. Qué podrá cada rol se define más adelante (decisión 18; RF-72).
 
 ## User Scenarios & Testing *(mandatory)*
@@ -106,7 +106,7 @@ comparar el precio y su explicación con la cuenta a mano.
 11. **Given** un costo de $1.649,14, margen 100 % e IVA 21 %, **When** pide la explicación del precio, **Then** ve «Costo $1.649,14», «+ 100 % de margen = $3.298,28», «+ IVA 21 % = $3.990,92» y «Redondeado para arriba a $4.000,00 (múltiplo de $1.000,00)»; un producto con IVA 10,5 % usa ese IVA.
 12. **Given** un precio que ya es múltiplo de $1.000, **When** se redondea, **Then** queda igual; $1.000,01 pasa a $2.000 y $15,10 a $1.000.
 13. **Given** un renglón de venta de 0,5 kg de un producto a $3.000 el kilo, **When** se calcula el renglón, **Then** es $2.000 y la explicación lo dice: «× 0,5 kg = $1.500,00», «Redondeado para arriba a $2.000,00 (múltiplo de $1.000,00) para no dar vuelto».
-14. **Given** un renglón de venta con un precio puesto a mano de $1.500 (RF-20b), **When** se calcula el renglón, **Then** se cobra $1.500, sin redondear, y el renglón muestra un aviso que dice que no es múltiplo de $1.000; el aviso no impide cobrar.
+14. **Given** un renglón de venta con un precio puesto a mano de $1.500 (RF-20b), **When** se calcula el renglón, **Then** se cobra $1.500, sin redondear y sin aviso (decisión 132).
 15. **Given** un cambio de margen en un catálogo de 100.000 productos, **When** el Administrador lo elige, **Then** el precio nuevo se ve en menos de 100 ms (RNF-07).
 
 ---
@@ -547,7 +547,7 @@ catálogo y ver si aparece entre los primeros resultados.
 - **RF-16**: El sistema DEBE ayudar a decidir el margen con datos en vez de a ojo, por costeo por absorción: reparte los gastos fijos del negocio entre los productos, calcula el costo total de cada uno, compara el precio vigente con el que sale de ese costo y sugiere el margen, con su explicación (RF-13). Es de una etapa posterior: necesita los gastos fijos (RF-64). [NEEDS CLARIFICATION: ¿con qué criterio se reparten los gastos fijos (alquiler, sueldo, servicios, impuestos) entre los productos: por unidad vendida, por valor vendido, por rotación o por familia de productos?]
 - **RF-17**: Los descuentos puntuales de un proveedor se DEBEN trasladar al precio de venta mientras duran: entran en el costo como un paso más y dejan de valer solos al terminar. [NEEDS CLARIFICATION: ¿cómo se entera el sistema de un descuento puntual: lo trae la lista del proveedor como oferta, lo carga alguien a mano, o las dos cosas? ¿Quién lo carga, hasta cuándo vale cuando el proveedor no dice la fecha de fin, y el precio de venta tiene que bajar siempre o solo si alguien lo aprueba?]
 - **RF-18**: Se DEBE poder buscar proveedores y ver su ficha: datos de contacto, listas cargadas y qué venden. [NEEDS CLARIFICATION: ¿qué datos de contacto de un proveedor hay que guardar (nombre del vendedor, teléfono, WhatsApp, correo, dirección, CUIT, usuario de su portal) y quién puede verlos y cambiarlos?]
-- **RF-19**: Toda venta DEBE ser múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta que calcula el sistema se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto; el redondeo figura en la explicación. La única excepción es el precio puesto a mano en una venta (RF-20b), incluido el del ítem libre: se respeta tal cual, su renglón no se redondea (vale precio × cantidad) y, si el importe del renglón no es múltiplo de $1.000, la venta muestra un aviso que lo dice. El aviso no impide cobrar y desaparece solo si el importe pasa a ser múltiplo de $1.000 (decisión 16 del 2026-10-10).
+- **RF-19**: Toda venta DEBE ser múltiplo de $1.000, porque no hay billetes chicos para dar vuelto. El precio de venta que calcula el sistema se redondea para arriba a $1.000 y cada renglón de la venta también, incluido lo que se vende suelto; el redondeo figura en la explicación. La única excepción es el precio puesto a mano en una venta (RF-20b), incluido el del ítem libre: se respeta tal cual y su renglón no se redondea (vale precio × cantidad), sin ningún aviso (decisión 16 del 2026-10-10; Carlos, 2026-10-20, decisión 132: el aviso de que no es múltiplo de $1.000 no hace falta).
 
 ### Key Entities *(include if feature involves data)*
 
@@ -572,7 +572,7 @@ El detalle está en [data-model.md](data-model.md) y el contrato del servidor en
 - **SC-004**: Cargar una lista (subir, revisar y aplicar) lleva menos de un minuto y no requiere manual.
 - **SC-005**: Volver a cargar una lista ya aplicada no agrega ningún costo ni ningún producto.
 - **SC-006**: El costo de diez productos elegidos a mano coincide con lo que se pagó en la factura.
-- **SC-007**: Todo precio de venta calculado y todo renglón de venta sin precio a mano es múltiplo de $1.000 y nunca queda por debajo del precio calculado; un renglón con precio a mano que no es múltiplo de $1.000 siempre muestra su aviso.
+- **SC-007**: Todo precio de venta calculado y todo renglón de venta sin precio a mano es múltiplo de $1.000 y nunca queda por debajo del precio calculado; un renglón con precio a mano se cobra tal cual, sin aviso (decisión 132).
 - **SC-008**: Elegir un margen y ver el precio lleva un solo toque o una sola acción de teclado, y el precio se ve en menos de 100 ms.
 - **SC-009**: El Vendedor o el Administrador explican cualquier precio que se ve sin abrir un Excel.
 - **SC-010**: Unir dos productos y volver a separarlos deja cada venta, costo y movimiento de stock en el producto donde estaba.
