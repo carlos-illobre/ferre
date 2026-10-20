@@ -41,12 +41,22 @@ test.beforeAll(() => {
 // así queda como si la persona la hubiera habilitado en Configuración.
 const HABILITADO = JSON.stringify({ animaciones: true, sinConexion: true, buscar: "memoria" });
 
+// Los datos para buscar sin conexión se bajan a mano, en Configuración (specs/018, historia 5).
+async function bajarLosDatos(page: import("@playwright/test").Page) {
+  await page.goto("/#/mas/configuracion");
+  await expect(page.getByTestId("cfg-descargar")).toBeEnabled();
+  await expect(page.getByTestId("cfg-descargar")).toHaveText("Descargar");
+  await page.getByTestId("cfg-descargar").click();
+  await expect(page.getByTestId("cfg-descargar")).toHaveText("Actualizar", { timeout: 60_000 });
+  await expect(page.getByTestId("cfg-descarga")).toContainText(/Bajados el \d\d\/\d\d a las \d\d:\d\d/);
+}
+
 test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y sin red no se puede vender", async ({ page, context }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
-  // Con conexión se trabaja igual: el catálogo está en memoria y se encuentra el producto (E08).
+  // Con conexión se trabaja igual: se busca en el servidor y se encuentra el producto (E08).
   await busqueda.fill("e2e destornillador offline");
   await busqueda.press("Enter");
   await expect(page.getByTestId("item").filter({ hasText: "DESTORNILLADOR OFFLINE" })).toBeVisible();
@@ -58,6 +68,10 @@ test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y 
   await context.setOffline(true);
   await page.evaluate(() => window.dispatchEvent(new Event("offline")));
   await expect(page.getByTestId("conexion-celular")).toContainText("no se puede registrar nada");
+  // Sin nada bajado, buscar dice que hace falta internet (018-E10).
+  await busqueda.fill("e2e algo que no está");
+  await expect(page.getByText("Sin conexión: para buscar productos hace falta internet.")).toBeVisible();
+  await busqueda.fill("");
   await deslizarParaCobrar(page);
   await expect(page.getByText(/habilitalo en Más → Configuración/)).toBeVisible();
   await expect(page.getByTestId("exito")).toHaveCount(0);
@@ -77,18 +91,21 @@ test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y 
 
 test("vender y cambiar un margen sin red; al volver la red llega todo una sola vez", async ({ page, context }) => {
   await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
+  // Nada se baja solo (018-E24): el catálogo se baja a mano, antes de cortar.
+  await page.goto("/#/vender");
+  await expect(page.getByTestId("busqueda")).toBeEnabled();
+  expect(await page.evaluate(() => new Promise<number>((r) => { const p = indexedDB.open("ferre"); p.onsuccess = () => { try { const c = p.result.transaction("catalogo").objectStore("catalogo").count(); c.onsuccess = () => r(c.result); } catch { r(0); } }; }))).toBe(0);
+  await bajarLosDatos(page);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
   await expect(page.getByTestId("conexion-celular")).not.toContainText("Sin conexión");
-  // Que el catálogo quede guardado en el dispositivo antes de cortar.
-  await expect.poll(async () => page.evaluate(() => new Promise<number>((r) => { const p = indexedDB.open("ferre"); p.onsuccess = () => { const c = p.result.transaction("catalogo").objectStore("catalogo").count(); c.onsuccess = () => r(c.result); }; })), { timeout: 10000 }).toBeGreaterThan(0);
 
   await context.setOffline(true);
   await page.evaluate(() => window.dispatchEvent(new Event("offline")));
   await expect(page.getByTestId("conexion-celular")).toContainText("Sin conexión");
 
-  // Venta sin red: queda guardada y el mostrador sigue.
+  // Venta sin red, buscando en lo bajado (018-E26): queda guardada y el mostrador sigue.
   await busqueda.fill("e2e destornillador offline");
   await expect(page.getByTestId("sugerencias")).toContainText("$2.000"); // 500 × 2 × 1,21 = 1210 → 2000
   await busqueda.press("Enter");
@@ -124,6 +141,7 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
 
 test("con el trabajo sin conexión habilitado, la app abre sin red gracias al service worker", async ({ page, context }) => {
   await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
+  await bajarLosDatos(page);
   await page.goto("/#/vender");
   await expect(page.getByTestId("busqueda")).toBeEnabled();
   // Esperar a que el service worker controle la página y haya precacheado la app.
@@ -144,7 +162,7 @@ test("en el celular, buscando en el servidor no se baja el catálogo y se busca,
   const EN_EL_SERVIDOR = JSON.stringify({ animaciones: true, sinConexion: false, buscar: "servidor" });
   await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, EN_EL_SERVIDOR]);
   const pedidos: string[] = [];
-  page.on("request", (r) => { const u = new URL(r.url()); if (u.pathname === "/productos" && r.method() === "GET") pedidos.push(u.search); });
+  page.on("request", (r) => { const u = new URL(r.url()); if (u.pathname.startsWith("/productos") && r.method() === "GET") pedidos.push(u.pathname + u.search); });
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
@@ -154,9 +172,9 @@ test("en el celular, buscando en el servidor no se baja el catálogo y se busca,
   await expect(page.getByText(/DESTORNILLADOR OFFLINE/i).first()).toBeVisible();
   await busqueda.press("Enter");
   await expect(page.getByTestId("item").filter({ hasText: "DESTORNILLADOR OFFLINE" })).toBeVisible();
-  await expect.poll(() => pedidos.some((q) => q.startsWith("?buscar="))).toBe(true);
-  // Nunca se pidió el catálogo entero: cada pedido lleva su límite o su filtro.
-  expect(pedidos.filter((q) => !/[?&](limite|buscar|codigo|ids)=/.test(q))).toEqual([]);
+  await expect.poll(() => pedidos.some((q) => q.startsWith("/productos/pagina?buscar="))).toBe(true);
+  // Nunca se pidió el catálogo entero (018-E01): cada pedido es de una página, con su límite.
+  expect(pedidos.filter((q) => !/[?&]limite=/.test(q))).toEqual([]);
   expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
 
   // La elección está en Configuración, con la ventaja y la desventaja de cada forma (E15).

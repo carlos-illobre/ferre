@@ -66,7 +66,7 @@ describe("bajar los datos para trabajar sin conexión", () => {
     await descargar();
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     render(<Configuracion alCambiarElGuardado={() => undefined} />);
-    await waitFor(() => expect(screen.getByTestId("cfg-descargar").textContent).toBe("Actualizar"));
+    await waitFor(() => expect(screen.getByTestId("cfg-descargar").textContent).toBe("Actualizar"), { timeout: 5000 });
     await act(async () => { fireEvent.click(screen.getByTestId("cfg-descargar")); });
     await waitFor(() => expect(screen.getByTestId("cfg-descarga-error").textContent?.trim()).toBe(SIN_CONEXION_PARA_BAJAR));
     expect(await leerTodo("catalogo")).toHaveLength(3);
@@ -77,10 +77,11 @@ describe("la fila de Configuración", () => {
   it("018-E23: con «Trabajar sin conexión» habilitado está la fila, con «Descargar»; al terminar, cuándo y cuántos, y «Actualizar»", async () => {
     servidor();
     render(<Configuracion alCambiarElGuardado={() => undefined} />);
-    await waitFor(() => expect(screen.getByTestId("cfg-descargar").textContent).toBe("Descargar"));
+    await waitFor(() => expect((screen.getByTestId("cfg-descargar") as HTMLButtonElement).disabled).toBe(false));
+    expect(screen.getByTestId("cfg-descargar").textContent).toBe("Descargar");
     expect(screen.getByTestId("cfg-descarga").textContent).toContain("Todavía no se bajaron");
     await act(async () => { fireEvent.click(screen.getByTestId("cfg-descargar")); });
-    await waitFor(() => expect(screen.getByTestId("cfg-descargar").textContent).toBe("Actualizar"));
+    await waitFor(() => expect(screen.getByTestId("cfg-descargar").textContent).toBe("Actualizar"), { timeout: 5000 });
     expect(screen.getByTestId("cfg-descarga").textContent).toMatch(/Bajados el \d\d\/\d\d a las \d\d:\d\d: 3 productos, su stock y los clientes/);
   });
 

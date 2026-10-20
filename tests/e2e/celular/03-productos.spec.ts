@@ -38,7 +38,7 @@ test.beforeAll(() => {
   psql(`INSERT INTO proveedor (id, nombre) VALUES ('00000000-0000-0000-0000-00000000e2e1', '${PROVEEDOR}')`);
   psql(`INSERT INTO producto (id, descripcion, marca, codigo_barras) VALUES ('00000000-0000-0000-0000-00000000e2e2', 'MECHA PARA MADERA DE 6 MM (E2E)', 'MARCA E2E', '7790000000099'), ('00000000-0000-0000-0000-00000000e2e3', 'TALADRO PERCUTOR 750 W (E2E)', 'MARCA E2E', NULL)`);
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000e2e2', '00000000-0000-0000-0000-00000000e2e1', 'ME6', 2000, '{"explicacion": ["Precio de lista 2000", "− 25 % (linea) = 1500", "Costo neto 1500"]}', 1500, 0.21, '2026-08-11'), (gen_random_uuid(), '00000000-0000-0000-0000-00000000e2e3', '00000000-0000-0000-0000-00000000e2e1', 'TP750', 120000, '[]', 120000, 0.21, '2026-08-11')`);
-  psql(`INSERT INTO producto (id, descripcion, marca, proveedor_preferido_id) SELECT gen_random_uuid(), 'TUERCA SCROLL ' || n || ' (E2E)', 'MARCA E2E', '00000000-0000-0000-0000-00000000e2e1' FROM generate_series(1, 40) n`);
+  psql(`INSERT INTO producto (id, descripcion, marca, proveedor_preferido_id) SELECT gen_random_uuid(), 'TUERCA SCROLL ' || n || ' (E2E)', 'MARCA E2E', '00000000-0000-0000-0000-00000000e2e1' FROM generate_series(1, 60) n`);
 });
 
 test("buscar un producto, elegir el margen y tipear otro margen a mano", async ({ page }) => {
@@ -115,7 +115,7 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
 
   // Las flechas y Shift+número funcionan aunque la búsqueda no tenga el foco.
   await page.getByTestId("busqueda").fill("e2e tuerca scroll");
-  await expect(page.getByTestId("producto")).toHaveCount(30);
+  await expect(page.getByTestId("producto")).toHaveCount(50); // de a 50 (specs/018)
   await page.locator("h1").first().click(); // el foco sale de la caja
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowDown");
@@ -125,7 +125,7 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
 
   // Carga progresiva: 30 primero, el resto al llegar al final.
   await page.getByTestId("cargar-mas").scrollIntoViewIfNeeded();
-  await expect(page.getByTestId("producto")).toHaveCount(40);
+  await expect(page.getByTestId("producto")).toHaveCount(60);
   await expect(page.getByTestId("cargar-mas")).toHaveCount(0);
 
   // Foto: en la ficha, sin foto muestra el ícono; al tocar se amplía con la descripción y Escape cierra.

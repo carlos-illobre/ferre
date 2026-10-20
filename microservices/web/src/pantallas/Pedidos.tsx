@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
-import { traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
+import { busquedaAlDia, esperarBusqueda, traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
 import { Escaner, hayCamara } from "../plataforma/camara/Escaner";
 import { usePuede } from "./permisos";
@@ -213,7 +213,7 @@ function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borra
       <div className="pd-buscar">
         <input ref={caja} type="search" value={consulta} onChange={(e) => { setConsulta(e.target.value); setError(null); }} placeholder={(celular && hayCamara() ? "Buscá lo que hay que pedir, o escanealo" : "Buscá lo que hay que pedir")}
           autoFocus={!celular} autoComplete="off" aria-label="Buscar un producto para agregar al pedido" data-testid="buscar-para-pedir"
-          onKeyDown={(e) => { if (e.key === "Enter" && resultados[0]) { e.preventDefault(); agregar(resultados[0]); } else if (e.key === "Escape") setConsulta(""); }} />
+          onKeyDown={(e) => { if (e.key === "Enter" && !busquedaAlDia(consulta)) { e.preventDefault(); void esperarBusqueda(consulta).then((r) => { if (r[0]) agregar(r[0]); }); } else if (e.key === "Enter" && resultados[0]) { e.preventDefault(); agregar(resultados[0]); } else if (e.key === "Escape") setConsulta(""); }} />
         {celular && hayCamara() && <button type="button" className="pd-boton" onClick={() => setEscaneando(true)} aria-label="Escanear" data-testid="escanear-para-pedir">Escanear</button>}
       </div>
       {escaneando && <Escaner alDetectar={alEscanear} alCerrar={() => setEscaneando(false)} />}

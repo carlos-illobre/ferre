@@ -80,5 +80,7 @@ export function moduloDeCatalogo(deLaPrueba: () => unknown) {
     productoEnMemoria: (id: string) => actual().productos.find((p) => p.id === id),
     quienTieneElCodigo: async (codigo: string, salvo: string) => actual().productos.find((p) => p.id !== salvo && p.codigo_barras === codigo),
     pedirClientes: () => undefined,
+    busquedaAlDia: () => true,
+    esperarBusqueda: async (c: string) => actual().useCatalogoFalso === undefined ? [] : buscar(indexar(actual().productos.map((p) => ({ ...p, codigos: [p.codigo_proveedor, p.codigo_barras] }))), c, 50),
   };
 }

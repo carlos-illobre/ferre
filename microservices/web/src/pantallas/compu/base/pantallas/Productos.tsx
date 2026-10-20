@@ -3,7 +3,7 @@ import { SiVeCostos, useVeCostos } from "../../../Costos";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
 import { usePuede } from "../../../permisos";
 import { MARGENES } from "../../../../negocio/precios/vista-previa";
-import { quienTieneElCodigo, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas } from "../../../../catalogo";
+import { esperarBusqueda, quienTieneElCodigo, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas } from "../../../../catalogo";
 import { useDebounce } from "../../../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { api, descargar, subirFoto, urlDeFoto } from "../../../../api";
@@ -106,9 +106,10 @@ export function Productos() {
     }
     else if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "BUTTON") {
       // Si la lista todavía no alcanzó a lo que se escribió (llega un instante después de tipear),
-      // Enter espera a que llegue: no abre la fila de la lista vieja.
-      const p = consulta === consultaEstable && !lista.cargando ? resultados[elegido] : undefined;
-      if (p) { e.preventDefault(); setAbiertoId(p.id); }
+      // Enter espera la respuesta y abre el primero: no abre la fila de la lista vieja.
+      e.preventDefault();
+      if (consulta === consultaEstable && !lista.cargando) { const p = resultados[elegido]; if (p) setAbiertoId(p.id); }
+      else if (consulta.trim()) void esperarBusqueda(consulta).then((r) => { if (r[0]) setAbiertoId(r[0].id); });
     }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
     // «+» agrega el elegido a la venta (015-E27); sin permiso de vender, no hace nada.

@@ -36,14 +36,31 @@ test.beforeAll(() => {
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '${ID_PROD}', '${ID_PROV}', 'DO2', 500, '[]', 500, 0.21, '2026-08-11')`);
 });
 
+// Los datos para buscar sin conexión se bajan a mano, en Configuración (specs/018, historia 5). En la
+// computadora «Trabajar sin conexión» arranca habilitada (018-E30).
+async function bajarLosDatos(page: import("@playwright/test").Page) {
+  await page.goto("/#/configuracion");
+  await expect(page.getByTestId("cfg-sin-conexion")).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByTestId("cfg-descargar")).toBeEnabled();
+  await page.getByTestId("cfg-descargar").click();
+  await expect(page.getByTestId("cfg-descargar")).toHaveText("Actualizar", { timeout: 60_000 });
+}
+
 test("vender y cambiar un margen sin red; al volver la red llega todo una sola vez", async ({ page, context }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await bajarLosDatos(page);
+  // «Actualizar» trae solo lo que cambió desde la descarga anterior, con la marca del servidor (018-E25).
+  const pedidos: string[] = [];
+  page.on("request", (r) => { const u = new URL(r.url()); if (u.pathname.startsWith("/productos/descarga")) pedidos.push(u.search); });
+  psql(`UPDATE producto SET margen_elegido = 100 WHERE id = '${ID_PROD}'`);
+  await page.getByTestId("cfg-descargar").click();
+  await expect(page.getByTestId("cfg-descargar")).toHaveText("Actualizar", { timeout: 60_000 });
+  await expect.poll(() => pedidos.length).toBeGreaterThan(0);
+  expect(pedidos.every((q) => /[?&]marca=\d+/.test(q))).toBe(true);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
   await expect(page.getByTestId("conexion")).not.toContainText("Sin conexión");
-  // Que el catálogo quede guardado en el dispositivo antes de cortar.
-  await expect.poll(async () => page.evaluate(() => new Promise<number>((r) => { const p = indexedDB.open("ferre"); p.onsuccess = () => { const c = p.result.transaction("catalogo").objectStore("catalogo").count(); c.onsuccess = () => r(c.result); }; })), { timeout: 10000 }).toBeGreaterThan(0);
 
   await context.setOffline(true);
   await page.evaluate(() => window.dispatchEvent(new Event("offline")));
@@ -83,6 +100,7 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
 
 test("la app abre sin red gracias al service worker", async ({ page, context }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await bajarLosDatos(page);
   await page.goto("/#/vender");
   await expect(page.getByTestId("busqueda")).toBeEnabled();
   // Esperar a que el service worker controle la página y haya precacheado la app.

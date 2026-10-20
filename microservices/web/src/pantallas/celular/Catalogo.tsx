@@ -6,7 +6,7 @@ import { SinPermiso } from "../SinPermiso";
 import { esMargenBoton, MARGENES } from "../../negocio/precios/vista-previa";
 import { AvisoError, Buscador, Hoja, Icono, Toast, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
-import { quienTieneElCodigo, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas } from "../../catalogo";
+import { esperarBusqueda, quienTieneElCodigo, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas } from "../../catalogo";
 import { useDebounce } from "../../plataforma/tiempo/debounce";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { pesos, pesosCortos } from "../../formato";
@@ -103,6 +103,8 @@ export function Productos() {
     if (abiertoId) return;
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
+    // Si la lista todavía no alcanzó a lo que se escribió, Enter espera la respuesta y abre el primero.
+    else if (e.key === "Enter" && (consulta !== consultaEstable || lista.cargando) && consulta.trim()) { e.preventDefault(); void esperarBusqueda(consulta).then((r) => { if (r[0]) setAbiertoId(r[0].id); }); }
     else if (e.key === "Enter" && resultados[elegido]) { e.preventDefault(); setAbiertoId(resultados[elegido]!.id); }
     else if (e.key === "Escape") { setConsulta(""); caja.current?.focus(); }
     else if (fijaMargen && e.shiftKey && /^Digit[1-5]$/.test(e.code)) {
@@ -110,7 +112,7 @@ export function Productos() {
       const p = resultados[elegido];
       if (p) actualizar(p.id, { margen_elegido: MARGENES[Number(e.code.slice(5)) - 1]! });
     }
-  }, [resultados, elegido, actualizar, abiertoId, fijaMargen]);
+  }, [resultados, elegido, actualizar, abiertoId, fijaMargen, consulta, consultaEstable, lista.cargando]);
   useTeclasGlobales(teclas, caja.current);
 
   const abierto = abiertoId ? catalogo.find((p) => p.id === abiertoId) ?? null : null;

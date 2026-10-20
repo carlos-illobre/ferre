@@ -39,6 +39,20 @@ describe("buscar le pregunta al servidor", () => {
     expect(pedidos()).toHaveLength(1); // la misma búsqueda, recién hecha, no se vuelve a pedir
   });
 
+  it("un cambio guardado (un ajuste de stock, una venta) hace que la próxima búsqueda vuelva a preguntar", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    apiFalsa.mockResolvedValueOnce(pagina([prod("c", "CANDADO")], { stock: { c: "17" } })).mockResolvedValueOnce(pagina([prod("c", "CANDADO")], { stock: { c: "15" } }));
+    const { result } = renderHook(() => useCatalogo());
+    result.current.buscarProductos("candado");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(result.current.stock.get("c")).toBe(17);
+    window.dispatchEvent(new CustomEvent("ferre:cambio-guardado", { detail: "/stock/c/ajustes" }));
+    result.current.buscarProductos("candado");
+    await act(async () => { await vi.advanceTimersByTimeAsync(350); });
+    expect(pedidos()).toHaveLength(2);
+    expect(result.current.stock.get("c")).toBe(15);
+  });
+
   it("018-E10: sin conexión, buscar dice que hace falta internet", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     apiFalsa.mockRejectedValue(sinRed());

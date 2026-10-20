@@ -4,6 +4,7 @@ import type { Producto } from "../../../celular/pantallas/Productos";
 import { Buscador, numero } from "../ui";
 import { abreviarUnidad } from "../../../../unidades";
 import "../estilos/deposito-comun.css";
+import { busquedaAlDia, esperarBusqueda } from "../../../../catalogo";
 
 // Lo que comparten Stock, Compras y Contar: el buscador de productos que se maneja con
 // flechas y Enter, y las pocas cuentas y palabras que las tres escriben igual.
@@ -50,8 +51,9 @@ export function BuscadorDeProducto({ consulta, alCambiar, resultados, alElegir, 
     else if (e.key === "ArrowUp" && total > 0) { e.preventDefault(); setMarcado((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter") {
       e.preventDefault();
-      const p = resultados[marcado];
-      if (p) alElegir(p); else if (ofreceCrear) alCrear?.(texto);
+      // Si el servidor todavía no contestó lo escrito, Enter espera esa respuesta (specs/018).
+      if (busquedaAlDia(texto)) { const p = resultados[marcado]; if (p) alElegir(p); else if (ofreceCrear) alCrear?.(texto); }
+      else void esperarBusqueda(texto).then((r) => { if (r[0]) alElegir(r[0]); else if (alCrear && !disabled) alCrear(texto); });
     } else if (e.key === "Escape" && consulta) { e.preventDefault(); alCambiar(""); }
   }
 

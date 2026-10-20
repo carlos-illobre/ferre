@@ -10,7 +10,7 @@ import { COMPROBANTES, MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { ErrorApi } from "../../api";
-import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
+import { busquedaAlDia, esperarBusqueda, productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
 import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
 import { abreviarUnidad, cantidadValida, enteras, unidadDe } from "../../unidades";
@@ -203,7 +203,7 @@ function Ingreso() {
   function teclas(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
-    else if (e.key === "Enter") { e.preventDefault(); if (resultados[elegido]) agregar(resultados[elegido]); else if (consulta.trim()) agregar(null, consulta.trim()); }
+    else if (e.key === "Enter") { e.preventDefault(); const texto = consulta.trim(); if (!busquedaAlDia(texto)) { void esperarBusqueda(texto).then((r) => (r[0] ? agregar(r[0]) : agregar(null, texto))); return; } if (resultados[elegido]) agregar(resultados[elegido]); else if (texto) agregar(null, texto); }
     else if (e.key === "Escape") setConsulta("");
   }
 
@@ -386,6 +386,7 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
+    else if (e.key === "Enter" && !busquedaAlDia(consulta)) { e.preventDefault(); void esperarBusqueda(consulta).then((r) => { if (r[0]) elegirProducto(r[0]); }); }
     else if (e.key === "Enter" && resultados[elegido]) { e.preventDefault(); elegirProducto(resultados[elegido]!); }
     else if (e.key === "Escape") setConsulta("");
   }

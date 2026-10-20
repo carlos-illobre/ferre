@@ -17,7 +17,7 @@ import { abreviarUnidad, cantidadValida, enteras, unidadDe, type Unidad } from "
 import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
 import { guardar, borrarAnterioresA } from "../../almacen";
 import { enviarOEncolar, enviarPendientes } from "../../cola";
-import { useCatalogo, type Cliente } from "../../catalogo";
+import { busquedaAlDia, esperarBusqueda, useCatalogo, type Cliente } from "../../catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { nombreDeProducto, pesos } from "../../formato";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
@@ -115,12 +115,16 @@ export function Vender() {
     else if (e.key === "ArrowUp" && resultados.length) { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter") {
       e.preventDefault();
-      const p = resultados[elegido];
       const texto = consulta.trim();
-      if (p) conEntrada(() => elegirSugerencia(p));
-      else if (texto && /^[0-9A-Za-z-]{6,32}$/.test(texto)) conEntrada(() => agregarPorCodigo(texto));
-      else if (texto) conEntrada(() => agregar(null, texto)); // ítem libre
-      else void cobrar(); // con la venta armada, el Enter final la cierra
+      const alEnter = (lista: Producto[], i: number) => {
+        const p = lista[i];
+        if (p) conEntrada(() => elegirSugerencia(p));
+        else if (texto && /^[0-9A-Za-z-]{6,32}$/.test(texto)) conEntrada(() => agregarPorCodigo(texto));
+        else if (texto) conEntrada(() => agregar(null, texto)); // ítem libre
+        else void cobrar(); // con la venta armada, el Enter final la cierra
+      };
+      // Si el servidor todavía no contestó lo escrito, Enter espera esa respuesta (specs/018).
+      if (busquedaAlDia(texto)) alEnter(resultados, elegido); else void esperarBusqueda(texto).then((r) => alEnter(r, 0));
     }
     else if (e.key === "Escape" && consulta) { e.preventDefault(); setConsulta(""); }
   }

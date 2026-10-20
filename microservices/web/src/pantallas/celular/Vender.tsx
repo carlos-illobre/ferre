@@ -12,7 +12,7 @@ import { AvisoError, Buscador, Contador, Hoja, Icono, Pasos, Toast, Lista } from
 import { abreviarUnidad, enteras, UNIDADES, type Unidad } from "../../unidades";
 import { subirFoto } from "../../api";
 import { alCambiarLaCola, enviarPendientes, pendientes as pendientesEnCola } from "../../cola";
-import { traerPorCodigo, useCatalogo } from "../../catalogo";
+import { busquedaAlDia, esperarBusqueda, traerPorCodigo, useCatalogo } from "../../catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { nombreDeProducto, pesos, pesosCortos } from "../../formato";
 import { describirDispositivo } from "./pantallas/Login";
@@ -160,10 +160,15 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
     else if (e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => Math.max(i - 1, 0)); }
     else if (e.key === "Enter") {
       e.preventDefault();
-      const p = resultados[elegido];
-      if (p) elegirSugerencia(p);
-      else if (consulta.trim() && /^[0-9A-Za-z\-]{6,32}$/.test(consulta.trim()) && !resultados.length) agregarPorCodigo(consulta.trim()); // lector USB
-      else if (consulta.trim()) agregar(null, consulta.trim()); // ítem libre (#17)
+      const texto = consulta.trim();
+      const alEnter = (lista: Producto[], i: number) => {
+        const p = lista[i];
+        if (p) elegirSugerencia(p);
+        else if (texto && /^[0-9A-Za-z\-]{6,32}$/.test(texto) && !lista.length) agregarPorCodigo(texto); // lector USB
+        else if (texto) agregar(null, texto); // ítem libre (#17)
+      };
+      // Si el servidor todavía no contestó lo escrito, Enter espera esa respuesta (specs/018).
+      if (busquedaAlDia(texto)) alEnter(resultados, elegido); else void esperarBusqueda(texto).then((r) => alEnter(r, 0));
     }
     else if (e.key === "Escape") { if (consulta) setConsulta(""); else noLlevo(); }
   }

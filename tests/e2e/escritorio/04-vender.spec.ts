@@ -137,22 +137,27 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect.poll(() => psql(`SELECT count(*) FROM consulta WHERE producto_id = '${ID_MECHA}'`)).toBe("1");
 });
 
-// Dos focos (decisión 82): la búsqueda espera deshabilitada a que baje el catálogo y, al habilitarse,
-// no le saca el foco al menú si la persona ya lo recorre con las flechas.
-test("sin mouse: el catálogo que termina de bajar no le saca el foco al menú", async ({ page }) => {
-  let soltarElCatalogo = () => {};
-  const catalogoSuelto = new Promise<void>((listo) => { soltarElCatalogo = listo; });
-  await page.route((url) => url.pathname.endsWith("/productos"), async (r) => { await catalogoSuelto; await r.continue(); }, { times: 1 });
+// Dos focos (decisión 82): mientras la búsqueda espera al servidor, el foco no se mueve solo: si la
+// persona ya recorre el menú con las flechas, ahí sigue (specs/018: el catálogo ya no se baja).
+test("sin mouse: lo que llega del servidor no le saca el foco al menú", async ({ page }) => {
+  let soltar = () => {};
+  const suelto = new Promise<void>((listo) => { soltar = listo; });
+  await page.route((url) => url.pathname.startsWith("/productos/pagina"), async (r) => { await suelto; await r.continue(); }, { times: 1 });
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
-  await expect(busqueda).toBeDisabled();
+  await expect(busqueda).toBeEnabled();
+  await busqueda.fill("e2e mecha");
+  // Fuera de la caja (dentro, las flechas mueven el cursor: decisión 130), las flechas van al menú.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-vender")).toBeFocused();
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
-  soltarElCatalogo();
-  await expect(busqueda).toBeEnabled();
+  const contesto = page.waitForResponse((r) => r.url().includes("/productos/pagina"));
+  soltar();
+  await contesto;
+  await page.waitForTimeout(300);
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
 });
 
