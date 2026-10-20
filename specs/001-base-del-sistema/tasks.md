@@ -50,3 +50,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T039 [arreglo] Las flechas nunca sacan el cursor de la caja de texto: ↑ desde la primera fila con el cursor en la búsqueda solo saca la marca (decisiones 82 y 130)
 - [x] T040 [regla] Monitor externo: una tarea programada en GitHub que una vez por día mira la salud de los dos ambientes, consulta sus bases y avisa si alguna pasa los 350 MB; el aviso es el correo de GitHub (RNF-12, historia 6) (T091)
 - [x] T041 [arreglo] Dos focos: con el cursor en una caja de texto, las flechas mueven la marca del teclado por el menú y las pestañas sin sacar el cursor (decisión 137)
+- [x] T042 [ajuste] Con el menú lateral plegado, el puntito de conexión queda centrado

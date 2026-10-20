@@ -172,7 +172,7 @@ Entrar va fuera del marco, a pantalla completa. Cada parte abre en su primera pe
   los renglones de la venta en curso; Más, una pastilla ámbar si hay anomalías.
 - Al pie del lateral: el espejo con el celular (`.vinculo`, verde si están juntos), la conexión
   («En línea · todo enviado» / ámbar «Sin conexión · 2 por enviar») y la persona.
-- Plegable a 72 px de íconos (`.app.plegado`, Ctrl B) para pantallas que piden ancho.
+- Plegable a 72 px de íconos (`.app.plegado`, Ctrl B) para pantallas que piden ancho. Plegado, todo lo del pie (el estado de la conexión, la persona) va centrado en la columna.
 - Contenido: cabecera (título 28 + acciones a la derecha, la principal en naranja) y debajo las
   pestañas subrayadas en pino. Área útil ≈ 1.070 × 600 px.
 - Teclado: ← va al lateral, ↑ ↓ lo recorren, → entra a las pestañas; Alt muestra las letras.

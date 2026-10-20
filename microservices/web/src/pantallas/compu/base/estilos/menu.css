@@ -75,6 +75,7 @@
   .app.plegado .lateral-marca { padding-left: 0; }
   .app.plegado .lateral .quien { flex-direction: column; padding: 0; }
   .app.plegado .lateral .quien-nombre, .app.plegado .lateral-pie .conexion { font-size: 0; padding: 6px; gap: 0; }
+  .app.plegado .lateral-pie .conexion { align-self: center; }
   .app.plegado .lateral .quien-nombre { display: none; }
   .app.plegado .lateral .espejo { padding: 10px; }
 
