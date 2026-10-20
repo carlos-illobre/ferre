@@ -101,9 +101,10 @@ body, .hoja { background: var(--p-fondo); }
 .cuadricula-5 .boton.activo { background: var(--p-verde); }
 
 /* Pestañas y opciones: la elegida va en verde oscuro, no en blanco. */
-.segmentos { background: var(--p-relleno-fuerte); }
-.segmentos button { color: var(--p-texto-medio); }
-.segmentos button.activo { background: var(--p-verde); color: #fff; box-shadow: none; }
+/* Las pestañas de adentro como en la v2 (decisión 140): la elegida en blanco sobre el gris cálido. */
+.segmentos { padding: 3px; border-radius: 12px; background: #ECE9E1; }
+.segmentos button { min-height: 44px; border-radius: 10px; color: #545955; font-size: 15px; font-weight: 700; }
+.segmentos button.activo { background: #fff; color: #12382F; font-weight: 800; box-shadow: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03); }
 
 /* Campos y búsqueda: blancos con borde, para que se note dónde se escribe. */
 .buscador .caja { border: 1.500px solid var(--p-borde-fuerte); box-shadow: none; }

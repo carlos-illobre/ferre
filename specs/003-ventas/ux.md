@@ -72,24 +72,26 @@ el total quedan al alcance del pulgar.
 
 **Vender en el celular** (decisión 119, Carlos, 2026-10-19; maqueta aprobada
 `maquetas/celular-vender-v2-con-v3.png`, la v2 del director de arte con tres cosas de la v3). Sigue
-el lenguaje «Mostrador»:
+el lenguaje «Mostrador». Desde el 2026-10-20 (decisión 140) se ve **igual a la v2**
+(`maquetas/celular-vender-v2-referencia.png`), salvo el cobro deslizando y el medio desplegable:
 
-- Arriba, «Vender», el estado de la conexión y, si el celular está en espejo con la computadora, la
+- Arriba, «Vender», debajo el estado de la conexión («● En línea · todo enviado») y, si el celular está en espejo con la computadora, la
   pastilla «En espejo»: tocarla abre una hoja con «Usar como lector de la computadora» (lo que se
   escanee entra en la venta de la computadora) y «Desvincular». Debajo, las pestañas «Vender» y
-  «Ventas de hoy» (decisión 120), y la búsqueda con el botón de la cámara a su derecha.
+  «Ventas de hoy» (decisión 120), sin ícono y con la elegida en blanco, y la búsqueda con el botón de la cámara a su derecha.
 - «Esta venta» con cuántos productos hay y, a la derecha, «No llevó» (anota lo que se preguntó) y «Vaciar»; los dos avisan abajo, y «Vaciar» ofrece Deshacer en lugar de preguntar antes.
 - Cada renglón, en una tarjeta: la foto, el nombre y debajo marca y stock; a la derecha, el precio
-  por unidad en una pastilla verde suave, con la unidad debajo («cada uno», «el metro», «el kg») y
-  un (?) chico: tocar la pastilla abre una hoja «Cómo se calculó» con el costo y su proveedor, el
+  por unidad en una pastilla verde suave, con la unidad debajo («cada uno», «el metro», «el kg»):
+  tocar la pastilla abre una hoja «Cómo se calculó» con el costo y su proveedor, el
   margen, el IVA, el redondeo, la cantidad y el total del renglón (con un precio a mano, el precio y
   el margen real). Tocar el resto del renglón abre su hoja: margen, precio a mano, cantidad y
-  «Quitar de la venta».
-- Abajo, en una fila: el tacho para quitar el renglón (ofrece Deshacer), la cantidad con − y + (con
-  1, «−» también lo quita), la unidad en una lista (un., kg, m, L) a su derecha, el margen (abre la
-  lista de márgenes) y el total del renglón; si el total no entra, baja a su propio renglón, a la
-  derecha, y nunca se sale de la tarjeta.
-- El fondo es el gris cálido de «Mostrador», como la v2. Los avisos («Vaciaste la venta», con
+  «Quitar de la venta», con la lista de la unidad (un., kg, m, L) al lado de la cantidad.
+- Abajo, en una fila: el tacho debajo de la foto para quitar el renglón (ofrece Deshacer), la
+  cantidad en blanco con − y + (con 1, «−» también lo quita) y la unidad adentro si no son
+  unidades («1,5 kg»), el margen (abre la lista de márgenes) y el total del renglón, sin salirse de
+  la tarjeta.
+- El fondo es el gris cálido de «Mostrador», como la v2. El menú de abajo lleva los íconos de la v2:
+  la etiqueta (Catálogo), el carrito (Vender), la caja (Depósito) y las tres rayas (Más). Los avisos («Vaciaste la venta», con
   Deshacer) salen abajo, sobre el cobro, y se van solos. Sin productos, el botón de cobrar se ve
   apagado como en la v2: el mismo naranja, más claro.
 - Un producto sin precio va en ámbar, con los márgenes para elegir ahí mismo (300, 200, 100, 50,
@@ -98,8 +100,8 @@ el lenguaje «Mostrador»:
 - Abajo, fijo: si falta algún precio, un aviso ámbar que dice cuál; el medio de pago en una
   pastilla con su ícono y su color, que al tocarla abre la lista de los cuatro; a su lado,
   «Cliente (opcional)», que abre la lista de clientes (con cuenta corriente pasa a ámbar y dice
-  «Elegí el cliente»); y el botón naranja «Deslizá para cobrar $45.500»: se cobra arrastrando el
-  círculo hasta el final; soltarlo antes lo devuelve, y tocarlo solo explica cómo se usa. Sin
+  «Elegí el cliente»); y el botón naranja de la v2, «Cobrar» a la izquierda y «$45.500» a la
+  derecha, con un cuadrado blanco con la flecha: se cobra arrastrándolo hasta el final; soltarlo antes lo devuelve, y tocarlo solo explica cómo se usa. Sin
   productos, está apagado.
 - **Escanear:** la cámara se abre arriba, en el lugar de la búsqueda, y empuja la venta hacia
   abajo: cada código leído suma el producto, que entra a la lista con un borde verde, y un aviso en
@@ -112,7 +114,8 @@ el lenguaje «Mostrador»:
 
 **Vender en la computadora** (decisiones 121 y 122, Carlos, 2026-10-19; maqueta aprobada
 `maquetas/compu-vender-elegida.png`: la v2 del director de arte con el panel de la v3 y la boleta de la v4).
-Sigue el lenguaje «Mostrador»:
+Sigue el lenguaje «Mostrador». Desde el 2026-10-20 (decisión 140) se ve **igual a la v2**
+(`maquetas/celular-vender-v2-referencia.png`), salvo el cobro deslizando y el medio desplegable:
 
 - Al entrar a Vender, se llegue como se llegue, el cursor queda en la búsqueda (decisión 127).
 - Arriba, la búsqueda y, a su derecha, «Escanear con el celular» si hay uno vinculado (el botón

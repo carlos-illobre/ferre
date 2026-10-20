@@ -89,6 +89,7 @@ export const TEXTOS = {
     clienteOpcional: igual("Cliente (opcional)"),
     elegiElCliente: igual("Elegí el cliente"),
     deslizaParaCobrar: igual("Deslizá para cobrar"),
+    cobrar: igual("Cobrar"),
     comoSeCobra: igual("Deslizá el botón hasta el final para cobrar"),
     redondeo: igual("Todo se redondea para arriba a múltiplos de $1.000, para no dar vuelto."),
     ventaRegistrada: igual("Venta registrada"),

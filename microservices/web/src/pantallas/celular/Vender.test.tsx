@@ -30,8 +30,8 @@ function armar(ventas: unknown = ventasVacias, sub: string | null = null) {
   const agregar = (texto: string) => { fireEvent.change(busqueda, { target: { value: texto } }); fireEvent.keyDown(busqueda, { key: "Enter" }); };
   // Los nombres se muestran como frase (decisión 127): se buscan sin importar mayúsculas.
   const item = (texto: string) => screen.getAllByTestId("item").find((i) => i.textContent?.toLowerCase().includes(texto.toLowerCase()))!;
-  // La unidad está en una lista al lado de la cantidad (decisión 119).
-  const unidad = (texto: string) => within(item(texto)).getByTestId("unidad");
+  // La unidad se elige en la hoja del renglón; en el renglón se ve adentro de la cantidad si no son unidades (decisión 140).
+  const unidad = (texto: string) => { fireEvent.click(within(item(texto)).getByTestId("abrir-renglon")); return within(screen.getByTestId("hoja-renglon")).getByTestId("unidad"); };
   // Con el teclado, Enter sobre el círculo cobra (el dedo lo arrastra hasta el final).
   const cobrar = () => fireEvent.keyDown(screen.getByTestId("cobrar-pulgar"), { key: "Enter" });
   const medio = (valor: string) => { fireEvent.click(screen.getByTestId("medio")); fireEvent.click(screen.getByTestId(`medio-${valor}`)); };
@@ -70,6 +70,8 @@ describe("Vender", () => {
     agregar("mecha vender");
     fireEvent.change(unidad("MECHA"), { target: { value: "kg" } });
     expect(falso.actualizarProducto).toHaveBeenCalledWith("mecha", { unidad: "kg" });
+    fireEvent.keyDown(screen.getByTestId("hoja-renglon"), { key: "Escape" });
+    expect(within(item("MECHA")).getByTestId("unidad-renglon").textContent).toBe("kg");
     const cantidad = within(item("MECHA")).getByTestId("cantidad") as HTMLInputElement;
     fireEvent.change(cantidad, { target: { value: "1.55" } });
     expect(cantidad.value).toBe("1,6");
@@ -97,7 +99,7 @@ describe("Vender", () => {
     const { agregar, item } = armar();
     agregar("mecha vender");
     fireEvent.change(within(item("MECHA")).getByTestId("cantidad"), { target: { value: "3" } });
-    expect(within(item("MECHA")).getByTestId("precio").textContent).toBe("$3.000cada uno?");
+    expect(within(item("MECHA")).getByTestId("precio").textContent).toBe("$3.000cada uno");
     fireEvent.click(within(item("MECHA")).getByTestId("precio"));
     const pasos = within(screen.getByTestId("hoja-explicacion")).getAllByRole("listitem").map((li) => li.textContent).join(" | ");
     expect(pasos).toContain("Costo $1.000,00");
@@ -178,7 +180,7 @@ describe("Vender", () => {
     expect(screen.getByTestId("cobrar").className).toContain("apagado");
     expect((screen.getByTestId("cobrar-pulgar") as HTMLButtonElement).disabled).toBe(true);
     agregar("mecha vender");
-    expect(screen.getByTestId("cobrar").textContent).toBe("Deslizá para cobrar $3.000");
+    expect(screen.getByTestId("cobrar").textContent).toBe("Cobrar$3.000");
     const pulgar = screen.getByTestId("cobrar-pulgar");
     fireEvent.click(pulgar, { detail: 1 });
     expect(screen.getByTestId("mensaje").textContent).toContain("Deslizá el botón hasta el final para cobrar");

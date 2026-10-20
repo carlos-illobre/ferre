@@ -69,23 +69,26 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-precio { display: flex; flex-direction: column; align-items: center; padding: 4px 10px; border-radius: 10px; background: var(--m-logro-suave); color: var(--m-tinta); }
 .vm-precio b { font-size: 17px; font-weight: 800; color: var(--m-logro-texto); }
 .vm-precio small { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); }
-.vm-que { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 99px; background: #fff; color: var(--m-logro-texto); box-shadow: inset 0 0 0 1.5px currentColor; font-size: 14px; font-weight: 800; line-height: 1; }
 .vm-precio.falta { background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); }
 .vm-precio.falta b { color: var(--m-urgente-texto); font-size: 15px; }
 .vm-precio-mano { display: inline-flex; align-items: center; gap: 4px; height: 44px; padding: 0 10px; border-radius: 12px; background: #fff; border: 1.5px solid var(--m-urgente); font-weight: 700; }
 .vm-precio-mano input { width: 84px; font-size: 17px; font-weight: 700; }
 .vm-margenes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 .vm-margenes button { height: 44px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); color: var(--m-urgente-texto); font-weight: 750; font-size: 15px; }
-.vm-abajo { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; row-gap: 6px; }
-.vm-tacho { width: 36px; height: 40px; display: grid; place-items: center; color: var(--m-texto-3); border-radius: 10px; flex: none; }
-.vm .vm-abajo .contador { height: 40px; background: var(--m-hundido); border: 0; }
-.vm .vm-abajo .contador button { width: 36px; height: 40px; color: var(--m-tinta); }
-.vm .vm-abajo .contador input { width: 28px; font-size: 16px; }
-.vm-unidad { position: relative; display: inline-flex; align-items: center; height: 40px; border-radius: 12px; background: var(--m-hundido); }
+.vm-abajo { display: flex; align-items: center; gap: 6px; }
+/* El tacho debajo de la foto; la cantidad en blanco con la unidad adentro, como la v2 (decisión 140). */
+.vm-tacho { width: 50px; height: 40px; display: grid; place-items: center; color: var(--m-texto-3); border-radius: 10px; flex: none; margin: 0 -6px 0 -4px; }
+.vm .vm-abajo .contador { height: 40px; background: #fff; border: 1px solid var(--m-borde-fuerte); border-radius: 12px; overflow: hidden; flex: none; }
+.vm .vm-abajo .contador button { width: 34px; height: 38px; color: var(--m-texto-2); border-radius: 0; }
+.vm .vm-abajo .contador input { width: 28px; font-size: 16px; font-weight: 800; color: var(--m-tinta); }
+.vm .vm-abajo .contador { display: inline-flex; }
+.vm .vm-abajo .contador > button:last-of-type { order: 3; }
+.vm-u { order: 2; margin: 0 2px 0 -6px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); }
+.vm-unidad { position: relative; display: inline-flex; align-items: center; height: 40px; border-radius: 12px; background: var(--m-hundido); margin-left: auto; }
 .vm-unidad select { appearance: none; -webkit-appearance: none; height: 40px; border: 0; background: none; font: inherit; font-weight: 750; font-size: 14px; color: var(--m-tinta); padding: 0 20px 0 8px; }
 .vm-unidad svg { position: absolute; right: 5px; pointer-events: none; }
-.vm-margen { display: inline-flex; align-items: center; gap: 2px; height: 40px; padding: 0 6px; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
-.vm-subtotal { margin-left: auto; font-weight: 800; font-size: 17px; white-space: nowrap; }
+.vm-margen { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
+.vm-subtotal { margin-left: auto; font-weight: 800; font-size: 19px; white-space: nowrap; }
 .vm-stock { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); font-size: 14px; font-weight: 700; }
 
 /* El cobro, fijo abajo: lo que falta, el medio y el cliente, y cobrar deslizando. */
@@ -93,22 +96,21 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-falta { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--m-urgente-texto); }
 .vm-pago { display: flex; align-items: center; gap: 8px; }
 .vm-medio { position: relative; }
-.vm-medio-elegido { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 10px; border-radius: 99px; border: 2px solid var(--medio); background: var(--medio-suave); font-weight: 800; font-size: 15px; color: var(--m-tinta); white-space: nowrap; }
+.vm-medio-elegido { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 10px; border-radius: 12px; border: 2px solid var(--medio); background: var(--medio-suave); font-weight: 800; font-size: 15px; color: var(--m-tinta); white-space: nowrap; }
 .vm-medios { position: absolute; left: 0; bottom: 52px; z-index: 30; min-width: 240px; padding: 6px; border-radius: 16px; background: #fff; border: 1px solid var(--m-borde); box-shadow: 0 16px 40px -8px rgba(26, 29, 27, .35); display: grid; transform-origin: 20% 100%; animation: vm-abre 0.18s cubic-bezier(.2, .9, .3, 1); }
 .vm-medios button { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 10px; border-radius: 10px; font-weight: 700; font-size: 15px; color: var(--m-tinta); text-align: left; }
 .vm-medios button[aria-selected="true"] { background: var(--medio-suave); }
 .vm-tilde-chica { margin-left: auto; color: var(--medio); }
 @keyframes vm-abre { from { opacity: 0; transform: scale(.94) translateY(6px); } }
-.vm-cliente { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--m-borde-fuerte); background: #fff; color: var(--m-texto-2); font-weight: 650; font-size: 15px; }
+.vm-cliente { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--m-borde-fuerte); background: #fff; color: var(--m-texto-2); font-weight: 650; font-size: 15px; }
 .vm-cliente span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .vm-cliente svg { flex: none; }
 .vm-cliente.elegido { color: var(--m-tinta); font-weight: 750; border-color: var(--m-tinta); }
 .vm-cliente.falta { border: 2px solid var(--m-urgente); color: var(--m-urgente-texto); background: var(--m-urgente-suave); }
-.vm-deslizar { position: relative; height: 60px; border-radius: 99px; background: var(--m-accion); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px; box-shadow: var(--m-sombra-accion); user-select: none; -webkit-user-select: none; }
+.vm-deslizar { position: relative; height: 56px; border-radius: 14px; background: var(--m-accion); color: #fff; display: flex; align-items: center; font-weight: 800; font-size: 18px; box-shadow: var(--m-sombra-accion); user-select: none; -webkit-user-select: none; }
 .vm-deslizar.apagado { opacity: .45; box-shadow: none; }
-.vm-pulgar { position: absolute; left: 5px; top: 5px; width: 50px; height: 50px; border-radius: 99px; background: #fff; color: var(--m-accion); display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0, 0, 0, .2); touch-action: none; transition: transform 0.32s cubic-bezier(.34, 1.4, .64, 1); z-index: 1; }
-.vm-deslizar-texto { padding: 0 44px 0 56px; white-space: nowrap; transition: opacity 0.2s; }
-.vm-flechita { position: absolute; right: 18px; opacity: .6; }
+.vm-pulgar { position: absolute; left: 5px; top: 5px; width: 46px; height: 46px; border-radius: 10px; background: #fff; color: var(--m-accion); display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0, 0, 0, .2); touch-action: none; transition: transform 0.32s cubic-bezier(.34, 1.4, .64, 1); z-index: 1; }
+.vm-deslizar-texto { flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 0 18px 0 64px; white-space: nowrap; transition: opacity 0.2s; }
 
 /* Las hojas de esta pantalla. */
 .vm-hoja-detalle { margin: -6px 2px 0; font-size: 15px; color: var(--m-texto-2); }
@@ -137,7 +139,9 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-listo-botones .boton { width: 100%; justify-content: center; }
 
 @media (max-width: 899px) {
-  .vm-cobro { bottom: calc(var(--alto-nav) + 6px + env(safe-area-inset-bottom)); }
+  .vm-cobro { bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom)); }
+  /* El cobro apoyado en el menú de abajo, sin franja en el medio, como la v2. */
+  .contenido.vm { padding-bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom)); }
 }
 @media (min-width: 900px) {
   .contenido.vender-ancho.vm > .vm-cobro { grid-column: 2; grid-row: 2; position: sticky; top: calc(var(--alto-barra) + 12px); bottom: auto; margin: 0; border-radius: 20px; border: 1px solid var(--m-borde); }
@@ -147,3 +151,8 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 /* Los avisos, abajo, sobre el cobro (como la v2). */
 .vm-tostada { position: absolute; left: 16px; right: 16px; bottom: calc(100% + 8px); pointer-events: none; }
 .vm-tostada .toast { pointer-events: auto; box-shadow: 0 12px 28px -8px rgba(0, 0, 0, .35); }
+
+/* El estado de la conexión, debajo del título, como la v2 (decisión 140); el de arriba no se repite. */
+.vm .estado-chico, .vm-hoy .estado-chico { margin-top: -6px; font-size: 14px; font-weight: 600; color: #545955; }
+.vm .estado-chico i, .vm-hoy .estado-chico i { width: 8px; height: 8px; }
+.app:has(.vm, .vm-hoy) .linea-de-arriba .estado-chico { display: none; }

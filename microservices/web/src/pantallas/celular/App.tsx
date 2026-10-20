@@ -76,9 +76,6 @@ export const DE_MAS: { parte: Exclude<Parte, "actividad"> | "negocio" | "tickets
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
   { parte: "configuracion", nombre: "Configuración", detalle: TEXTOS.configuracion.queHay.corto, icono: "ajustes" },
 ];
-const IconoMas = ({ grosor }: { grosor: number }) => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" /></svg>
-);
 
 // Buscando en el servidor (RF-85): mientras una consulta está en curso, se dice arriba.
 function BuscandoEnElServidor() {
@@ -271,7 +268,7 @@ function Pantallas() {
       <nav className="nav-inferior solo-celular" aria-label="Menú">
         {pestanas.map((p) => (
           <button key={p.ruta} type="button" data-testid={`menu-${p.ruta}`} className={pestana === p.ruta ? "activo" : ""} onClick={() => irA(p.ruta)} aria-current={pestana === p.ruta ? "page" : undefined}>
-            {p.ruta === "mas" ? <IconoMas grosor={pestana === "mas" ? 2.2 : 1.8} /> : <Icono nombre={p.ruta} tam={26} grosor={pestana === p.ruta ? 2.2 : 1.8} />}
+            <Icono nombre={`menu-${p.ruta}`} tam={26} grosor={pestana === p.ruta ? 2.2 : 1.8} />
             <span>{p.nombre}</span>
             {p.ruta === "vender" && enLaVenta > 0 && <b className="cuenta-menu" aria-label={`${enLaVenta} en la venta`} data-testid="cuenta-venta">{enLaVenta}</b>}
           </button>

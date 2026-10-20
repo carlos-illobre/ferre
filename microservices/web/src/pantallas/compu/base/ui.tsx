@@ -485,7 +485,7 @@ export function EstadoDeConexion({ testId = "conexion" }: { testId?: string }) {
     ? `Sin conexión${cantidad ? `: ${porEnviar}` : ""}`
     : cantidad > 0
       ? `${porEnviar}${viejo ? " hace más de una hora" : ""}`
-      : ultimoEnvio ? `Sincronizado ${haceCuanto(ultimoEnvio)}` : "Conectado";
+      : ultimoEnvio ? `Sincronizado ${haceCuanto(ultimoEnvio)}` : "En línea · todo enviado";
   return <span className={`conexion ${clase}`} role="status" data-testid={testId}><i aria-hidden="true" />{texto}</span>;
 }
 

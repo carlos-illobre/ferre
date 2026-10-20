@@ -36,7 +36,7 @@ export function EstadoDeConexion({ testId = "conexion" }: { testId?: string } = 
     ? (guardaEnElDispositivo() ? `Sin conexión${cantidad ? ` · ${cantidad} por enviar` : ""}` : "Sin conexión · no se puede registrar nada")
     : cantidad > 0
       ? `${cantidad} por enviar${viejo ? " desde hace más de una hora" : ""}`
-      : ultimoEnvio ? `Sincronizado ${haceCuanto(ultimoEnvio)}` : "Conectado";
+      : ultimoEnvio ? `Sincronizado ${haceCuanto(ultimoEnvio)}` : "En línea · todo enviado";
   return <span className={`estado-chico ${clase}`} data-testid={testId} title={texto}><i aria-hidden="true" />{texto}</span>;
 }
 

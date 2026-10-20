@@ -21,6 +21,11 @@ test.beforeAll(() => {
   psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  // La corrección de la corrida anterior (019): su plata, la marca en los renglones quitados y ella.
+  const suyas = `SELECT id FROM correccion_venta WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`;
+  psql(`DELETE FROM movimiento_dinero WHERE correccion_id IN (${suyas}) OR usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psql(`UPDATE item_venta SET quitado_por = NULL WHERE quitado_por IN (${suyas})`);
+  psql(`DELETE FROM correccion_venta WHERE id IN (${suyas})`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador vender E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
@@ -119,8 +124,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día, corregirla y a
   await page.keyboard.press("Control+Enter");
   await expect(page.getByTestId("mensaje")).toContainText("Corrección guardada");
   await expect(ultima).toContainText("corregida");
-  await expect.poll(() => psql(`SELECT count(*) FROM correccion_venta`)).toBe("1");
-  await expect.poll(() => psql(`SELECT count(*) FROM movimiento_dinero WHERE tipo = 'cobro_diferencia' AND medio_pago = 'efectivo'`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM correccion_venta WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM movimiento_dinero WHERE tipo = 'cobro_diferencia' AND medio_pago = 'efectivo' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("6.000");
   await panel.getByTestId("anular").click();
   await expect(page.getByTestId("confirmar-anular")).toContainText("−$");

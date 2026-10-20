@@ -82,13 +82,18 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await expect(page.getByTestId("total")).toContainText("$10.000");
   // Por kilo: admite un decimal (1,5 kg) y queda guardado en el producto. 1,5 kg × $1.000 =
   // $1.500: el renglón se redondea para arriba a $2.000 para no dar vuelto (RF-19).
-  await tornillo.getByTestId("unidad").selectOption("kg");
+  // La unidad se cambia en la hoja del renglón y se ve adentro de la cantidad (decisión 140).
+  await tornillo.getByTestId("abrir-renglon").click();
+  await page.getByTestId("hoja-renglon").getByTestId("unidad").selectOption("kg");
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("hoja-renglon")).toHaveCount(0);
+  await expect(tornillo.getByTestId("unidad-renglon")).toHaveText("kg");
   await tornillo.getByTestId("cantidad").fill("1.5");
   await expect(page.getByTestId("total")).toContainText("$11.000");
 
-  // Efectivo viene elegido (decisión 37); se cobra deslizando el botón, que dice el total (decisión 119).
+  // Efectivo viene elegido (decisión 37); se cobra deslizando el botón de la v2, que dice el total (decisiones 119 y 140).
   await expect(page.getByTestId("medio")).toHaveText("Efectivo");
-  await expect(page.getByTestId("cobrar")).toHaveText("Deslizá para cobrar $11.000");
+  await expect(page.getByTestId("cobrar")).toHaveText("Cobrar$11.000");
   await deslizarParaCobrar(page);
   // La venta registrada, con el importe grande; «Seguir vendiendo» vuelve a la búsqueda vacía.
   await expect(page.getByTestId("exito")).toContainText("Venta registrada");

@@ -27,3 +27,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T016 [ajuste] Computadora: las animaciones de la maqueta en Vender (buscar, agregar, quitar, vaciar, importes, cuenta del menú, sin precio al cobrar) (decisión 134)
 - [x] T017 [ajuste] Computadora: el aviso de «Quitaste…» centrado sobre la barra del cobro (decisión 133)
 - [x] T018 [ajuste] Computadora: el aviso de «No llevó» (y los demás de Vender) como el de «Quitaste…», centrado, con un tilde (decisión 133)
+- [x] T019 [interfaz] Celular: Vender igual a la v2 salvo cobrar deslizando y el medio desplegable; los íconos del menú de abajo de la v2; las pestañas de adentro con la elegida en blanco (decisión 140; maqueta `maquetas/celular-vender-v2-referencia.png`)

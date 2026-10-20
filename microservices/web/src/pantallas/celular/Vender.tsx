@@ -23,6 +23,7 @@ import { VentasDeHoy } from "./pantallas/VentasDeHoy";
 import { Pestanas } from "./Pestanas";
 import { SinPermiso } from "../SinPermiso";
 import type { Producto } from "./pantallas/Productos";
+import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import "./vender.css";
 
 // La venta en el celular (decisión 119, maqueta specs/003-ventas/maquetas/celular-vender-v2-con-v3.png):
@@ -53,7 +54,7 @@ export function ParteVender({ sub }: { sub: string | null }) {
   if (actual === "vender") return <Vender pestanas={pestanas} />;
   return (
     <main className="contenido vm-hoy">
-      <div className="encabezado"><h1 className="titulo">Vender</h1>{pestanas}</div>
+      <div className="encabezado"><h1 className="titulo">Vender</h1><EstadoDeConexion testId="conexion-vender" />{pestanas}</div>
       <VentasDeHoy anulaHoy={puedeEsto("ventas.anular", "ventas.anular_cualquiera")} anulaCualquierDia={puedeEsto("ventas.anular_cualquiera")} />
     </main>
   );
@@ -197,6 +198,8 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           <h1 className="titulo">Vender</h1>
           {emparejado && <button type="button" className="vm-espejo" onClick={() => setHoja("espejo")} data-testid="en-espejo"><Icono nombre="dispositivos" tam={18} />{TEXTOS.vender.enEspejo.corto}</button>}
         </div>
+        {/* El estado de la conexión, debajo del título, como en la v2 (decisión 140). */}
+        <EstadoDeConexion testId="conexion-vender" />
         {pestanas}
         {escaneando
           ? <Escaner className="vm-camara" seguido alDetectar={alDetectar} alCerrar={cerrarCamara} ultimo={ultimoEscaneo} />
@@ -259,7 +262,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </div>
         ) : items.map((it) => (
           <Renglon key={it.clave} item={it} stock={it.producto ? stockPorId.get(it.producto.id) : undefined} recien={escaneando && Boolean(recien) && it.producto?.id === recien}
-            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it)} alElegirMargen={(m) => elegirMargen(it, m)} alCambiarUnidad={(u) => cambiarUnidad(it, u)}
+            alCambiar={(c) => cambiarItem(it.clave, c)} alQuitar={() => quitar(it)} alElegirMargen={(m) => elegirMargen(it, m)}
             alAbrir={() => setRenglonAbierto(it.clave)}
             alSubirFoto={it.producto ? async (archivo) => { const foto_url = await subirFoto(it.producto!.id, archivo); actualizarProducto(it.producto!.id, { foto_url } as never).catch(() => undefined); cambiarItem(it.clave, { producto: { ...it.producto!, foto_url } }); } : undefined} />
         ))}
@@ -279,7 +282,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           </button>
         </div>
         <Deslizar apagado={!items.length || ocupado} ocupado={ocupado} alCobrar={cobrar} alTocar={() => setAviso({ texto: TEXTOS.vender.comoSeCobra.corto })}>
-          {ocupado ? "Cobrando…" : <>{TEXTOS.vender.deslizaParaCobrar.corto} <span data-testid="total">{pesosCortos(total)}</span></>}
+          {ocupado ? <span>Cobrando…</span> : <><span>{TEXTOS.vender.cobrar.corto}</span><span className="importe" data-testid="total">{pesosCortos(total)}</span></>}
         </Deslizar>
       </div>
 
@@ -296,7 +299,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
         </Hoja>
       )}
       {renglon && <HojaDelRenglon item={renglon} alCerrar={() => setRenglonAbierto(null)} alCambiar={(c) => cambiarItem(renglon.clave, c)} alElegirMargen={(m) => elegirMargen(renglon, m)}
-        alQuitar={() => { setRenglonAbierto(null); quitar(renglon); }} />}
+        alCambiarUnidad={(u) => cambiarUnidad(renglon, u)} alQuitar={() => { setRenglonAbierto(null); quitar(renglon); }} />}
       {cobro && <VentaRegistrada cobro={cobro} veHoy={veHoy} alCerrar={() => { venta.cerrarCobro(); setMensaje(null); }} alVerHoy={() => { venta.cerrarCobro(); setMensaje(null); irA("vender/hoy"); }} />}
     </main>
   );
@@ -334,8 +337,9 @@ function MedioDePago({ medio, alElegir }: { medio: Medio | null; alElegir: (m: M
   );
 }
 
-// Cobrar deslizando (decisión 119): se arrastra el círculo hasta el final; soltarlo antes lo
-// devuelve y un toque solo explica cómo se cobra. Con el teclado, Enter sobre el círculo cobra.
+// Cobrar deslizando (decisión 119): el botón de la v2, «Cobrar» y el total (decisión 140), con un
+// círculo que se arrastra hasta el final; soltarlo antes lo devuelve y un toque solo explica cómo
+// se cobra. Con el teclado, Enter sobre el círculo cobra.
 function Deslizar({ apagado, ocupado, alCobrar, alTocar, children }: { apagado: boolean; ocupado: boolean; alCobrar: () => Promise<void> | void; alTocar: () => void; children: ReactNode }) {
   const caja = useRef<HTMLDivElement>(null);
   const pulgar = useRef<HTMLButtonElement>(null);
@@ -373,10 +377,9 @@ function Deslizar({ apagado, ocupado, alCobrar, alTocar, children }: { apagado: 
         onPointerDown={bajar} onPointerMove={moverDedo} onPointerUp={soltar} onPointerCancel={soltar}
         onClick={(e) => { if (e.detail > 0 && xRef.current === 0) alTocar(); }}
         onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void cobrarYVolver(); } }}>
-        <Icono nombre={ocupado ? "tilde" : "flecha"} tam={24} grosor={2.4} />
+        <Icono nombre={ocupado ? "tilde" : "flecha"} tam={22} grosor={2.4} />
       </button>
       <span className="vm-deslizar-texto" style={{ opacity: 1 - x / max() }}>{children}</span>
-      <Icono nombre="derecha" tam={18} className="vm-flechita" />
     </div>
   );
 }
@@ -386,8 +389,8 @@ function Deslizar({ apagado, ocupado, alCobrar, alTocar, children }: { apagado: 
 // total del renglón. Sin precio, los márgenes para elegir ahí mismo.
 const POR_UNIDAD: Record<Unidad, string> = { unidad: "cada uno", kg: "el kg", m: "el metro", l: "el litro" };
 
-function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto, alAbrir }: {
-  item: Item; stock: number | undefined; recien: boolean; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alSubirFoto?: (archivo: File) => Promise<void>; alAbrir: () => void;
+function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen, alSubirFoto, alAbrir }: {
+  item: Item; stock: number | undefined; recien: boolean; alCambiar: (c: Partial<Item>) => void; alQuitar: () => void; alElegirMargen: (m: number) => void; alSubirFoto?: (archivo: File) => Promise<void>; alAbrir: () => void;
 }) {
   const p = precioDe(it);
   const producto = it.producto;
@@ -416,7 +419,7 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
         {!sinPrecio ? (
           veCostos || it.precioManual !== null
             ? <button type="button" className="vm-precio" onClick={() => setCalculo(true)} aria-label={`Cómo se calculó ${pesosCortos(p.unitario!)}`} data-testid="precio">
-                <b>{pesosCortos(p.unitario!)}</b><small>{it.precioManual !== null ? "a mano" : POR_UNIDAD[it.unidad]}<span className="vm-que" aria-hidden="true">?</span></small>
+                <b>{pesosCortos(p.unitario!)}</b><small>{it.precioManual !== null ? "a mano" : POR_UNIDAD[it.unidad]}</small>
               </button>
             : <span className="vm-precio"><b>{pesosCortos(p.unitario!)}</b><small>{POR_UNIDAD[it.unidad]}</small></span>
         ) : producto ? (
@@ -433,13 +436,10 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
       ) : (
         <div className="vm-abajo">
           <button type="button" className="vm-tacho" onClick={alQuitar} aria-label={`Quitar ${it.descripcion || "este renglón"} de la venta`} data-testid="quitar-renglon"><Icono nombre="tacho" tam={20} /></button>
-          <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} alQuitar={alQuitar} />
-          <label className="vm-unidad">
-            <select value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
-              {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
-            </select>
-            <Icono nombre="abajo" tam={14} grosor={2.6} />
-          </label>
+          {/* La unidad adentro de la cantidad, como en la v2, solo si no son unidades; se cambia en la hoja del renglón (decisión 140). */}
+          <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} alQuitar={alQuitar}>
+            {it.unidad !== "unidad" && <span className="vm-u" data-testid="unidad-renglon">{abreviarUnidad(it.unidad)}</span>}
+          </Contador>
           {producto && p.costo !== null && (
             <button type="button" className="vm-margen" onClick={alAbrir} aria-label={`Margen: ${it.precioManual !== null ? "a mano" : `${p.margen} %`}`} data-testid="margen">
               {it.precioManual !== null ? "a mano" : `${p.margen} %`}<Icono nombre="abajo" tam={14} grosor={2.6} />
@@ -465,9 +465,9 @@ function Renglon({ item: it, stock, recien, alCambiar, alQuitar, alElegirMargen,
   );
 }
 
-// La hoja de un renglón: el margen (cada uno con su precio), el precio a mano, la cantidad y
-// «Quitar de la venta».
-function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuitar }: { item: Item; alCerrar: () => void; alCambiar: (c: Partial<Item>) => void; alElegirMargen: (m: number) => void; alQuitar: () => void }) {
+// La hoja de un renglón: el margen (cada uno con su precio), el precio a mano, la cantidad con su
+// unidad y «Quitar de la venta».
+function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alCambiarUnidad, alQuitar }: { item: Item; alCerrar: () => void; alCambiar: (c: Partial<Item>) => void; alElegirMargen: (m: number) => void; alCambiarUnidad: (u: Unidad) => void; alQuitar: () => void }) {
   const p = precioDe(it);
   const renglon = subtotalDe(it);
   const precioAMano = (e: React.ChangeEvent<HTMLInputElement>) => alCambiar({ precioManual: e.target.value === "" ? null : Number(e.target.value.replace(/[^\d]/g, "")) });
@@ -488,6 +488,12 @@ function HojaDelRenglon({ item: it, alCerrar, alCambiar, alElegirMargen, alQuita
       </label>
       <div className="vm-fila-cantidad"><span>Cantidad</span>
         <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} testId="cantidad-hoja" />
+        <label className="vm-unidad">
+          <select value={it.unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad" data-testid="unidad">
+            {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
+          </select>
+          <Icono nombre="abajo" tam={14} grosor={2.6} />
+        </label>
         <b className="importe">{renglon ? pesosCortos(renglon.valor) : ""}</b>
       </div>
       <button type="button" className="boton vm-quitar vm-ancho" onClick={alQuitar} data-testid="quitar"><Icono nombre="tacho" tam={20} />Quitar de la venta</button>
