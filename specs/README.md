@@ -213,6 +213,9 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-130 | La diferencia de un cambio se cobra si lo nuevo vale más y se devuelve en efectivo (o baja la deuda) si vale menos; cambia RF-24 | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
 | RF-131 | Los totales del día suman lo cobrado y restan lo devuelto por correcciones y cambios | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
 | RF-132 | «Ventas de hoy» como la v2, con «Corregir», «Cambio» y «Anular» en la venta, en el celular y en la computadora | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
+| RF-133 | El servidor recuerda cada sesión el tiempo que fija quien administra (0 a 10 minutos) y en ese tiempo no la busca en la base; lo cambiado desde la aplicación vale en el pedido siguiente | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
+| RF-134 | El celular emparejado se entera de los pedidos de la computadora en el momento; la pregunta de respaldo va cada el tiempo que fija quien administra (5 segundos a 10 minutos) | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
+| RF-135 | Los ajustes que valen para todos los dispositivos se fijan en Más → Sistema, con el permiso «Administrar el sistema», y quedan en «Quién hizo qué» | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
 
 ## Requerimientos no funcionales
 

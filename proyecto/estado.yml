@@ -1488,3 +1488,18 @@ RNF-62:
   estado: "Pendiente (018-T009): lo mide Carlos en el panel de Supabase un mes después de subirlo"
   pruebas: []
   defectos: []
+
+RF-133:
+  estado: "Nuevo (020): especificación escrita, falta que la apruebe Carlos"
+  pruebas: []
+  defectos: []
+
+RF-134:
+  estado: "Nuevo (020): especificación escrita, falta que la apruebe Carlos"
+  pruebas: []
+  defectos: []
+
+RF-135:
+  estado: "Nuevo (020): especificación escrita, falta que la apruebe Carlos"
+  pruebas: []
+  defectos: []

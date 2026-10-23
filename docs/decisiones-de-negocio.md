@@ -1196,3 +1196,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      todavía no existe no va, hasta que Carlos lo pida: «para remarcar» (RF-15), el historial del
      costo (RF-14), la estantería del producto (no se guarda), «Lleva 2» en lo ya agregado,
      «Deshacer» en el aviso de agregado y filtrar tocando las pastillas de arriba.
+146. **Los tiempos que gastan la base los fija quien administra, para todos** (2026-10-23). Para
+     no pasar los 30 MB diarios de datos que salen de la base, el servidor recuerda la sesión un
+     rato y el celular emparejado pregunta menos seguido. Carlos: los dos tiempos se configuran
+     desde una pantalla de administración, iguales para todos los dispositivos; nadie los cambia
+     para el suyo. Van en una pestaña nueva, Más → Sistema, con los días del vínculo; con un
+     permiso nuevo, «Administrar el sistema»; la sesión de 0 a 10 minutos y el celular de 5
+     segundos a 10 minutos, los dos en 1 minuto de arranque (specs/020).
