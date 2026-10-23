@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-23
 
-**Status**: Borrador, para que la apruebe Carlos
+**Status**: Aprobada (Carlos, 2026-10-23)
 
 **Input**: Carlos, el 2026-10-23, para que la base no pase los 30 MB diarios de datos que salen
 (specs/018, RNF-62): «sí, agregalo, pero quiero que esos tiempos puedan ser configurables desde
@@ -34,6 +34,7 @@ dispositivo, sino que el administrador lo decide para todos».
 - Q: ¿Quién puede cambiarlos? → A: Quien tenga un permiso nuevo, «Administrar el sistema», que se asigna a un rol en Roles.
 - Q: ¿Entre qué valores se elige cuánto recuerda la sesión el servidor? → A: De 0 a 10 minutos; arranca en 1 minuto. Con 0 no la recuerda, como hoy.
 - Q: ¿Entre qué valores se elige cada cuánto pregunta el celular emparejado? → A: De 5 segundos a 10 minutos; arranca en 1 minuto.
+- Q: ¿Quién arranca con «Administrar el sistema»? → A: Los roles que tienen «Administrar usuarios» al actualizarse; y nunca puede quedar el sistema sin nadie con ese permiso (Carlos, al aprobar).
 
 ## User Scenarios & Testing *(mandatory)*
 
