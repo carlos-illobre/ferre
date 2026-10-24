@@ -4,6 +4,7 @@ import * as reglas from "../acceso/reglas.js";
 import { aprobacionDeCodigo, consultaDeCodigo, entradaConGoogle, pedidoDeCodigo } from "../acceso/esquemas.js";
 import type { ClienteDeGoogle, SesionActual } from "../contratos/sesiones.js";
 import { leerCuerpo } from "../validar.js";
+import { tiempos } from "../sistema/ajustes.js";
 
 // Sesiones: entrar con Google o con el celular, salir y las sesiones de todos. La ruta solo
 // traduce (ADR-018); las reglas están en `acceso/reglas.ts`.
@@ -45,7 +46,8 @@ sesiones.post("/vinculaciones/:id/estado", limitarIntentos(240, "codigo-estado")
 
 sesiones.get("/actual", exigirSesion, (c) => {
   const { id, usuario } = c.get("sesion");
-  return c.json({ id, usuario } satisfies SesionActual);
+  // Con lo que fija quien administra para todos (specs/020): cada dispositivo se entera acá.
+  return c.json({ id, usuario, ajustes: { celular_segundos: tiempos().celular_segundos } } satisfies SesionActual);
 });
 
 sesiones.delete("/actual", exigirSesion, async (c) => {

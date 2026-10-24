@@ -24,8 +24,10 @@ const PERMISOS = [
   ["procesos.dibujar", "Negocio", "Dibujar procesos", "Todo lo de «Ver procesos», más crear, cambiar, marcar vigentes, importar, exportar y borrar los procesos"],
   ["admin.usuarios", "Administración", "Administrar usuarios", "Autorizar personas, asignarles roles, desactivarlas"],
   ["admin.roles", "Administración", "Administrar roles", "Crear roles, cambiarles el nombre y los permisos, borrarlos"],
+  ["admin.sistema", "Administración", "Administrar el sistema", "Más → Sistema: los tiempos y los días del vínculo, para todos"],
 ].map(([clave, parte, nombre, detalle]) => ({ clave, parte, nombre, detalle }));
 const TODOS = PERMISOS.map((p) => p.clave);
+const sistema = { sesion_segundos: 60, celular_segundos: 60, vinculo_dias: 30 };
 
 let roles = [
   { id: "r-1", nombre: "Vendedor", permisos: ["ventas.registrar", "ventas.ver", "ventas.anular"] },
@@ -51,7 +53,10 @@ const conUsuarios = (r) => ({ ...r, usuarios: usuarios.filter((u) => u.roles.inc
 
 export default {
   "PUT /mentira/permisos": ({ body }) => { permisosDeLaSesion = body?.permisos?.length ? body.permisos : TODOS; return { permisos: permisosDeLaSesion }; },
-  "GET /sesiones/actual": () => ({ id: "s-1", usuario: sesion() }),
+  "GET /sesiones/actual": () => ({ id: "s-1", usuario: sesion(), ajustes: { celular_segundos: sistema.celular_segundos } }),
+  // Más → Sistema (specs/020).
+  "GET /sistema/ajustes": () => ({ ...sistema, tramos: { sesion_segundos: [0, 30, 60, 300, 600], celular_segundos: [5, 30, 60, 300, 600] } }),
+  "PUT /sistema/ajustes": ({ body }) => { Object.assign(sistema, body ?? {}); return { ...sistema, tramos: { sesion_segundos: [0, 30, 60, 300, 600], celular_segundos: [5, 30, 60, 300, 600] } }; },
   "POST /sesiones/google": ({ body }) => body?.credencial === "no"
     ? [403, { error: "juan.perez@ferre.test no está autorizado. Pedile a quien administra los usuarios que te dé de alta." }]
     : [201, { token: "token-de-mentira", usuario: sesion() }],

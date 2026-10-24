@@ -1,6 +1,6 @@
 import { sql } from "kysely";
 import type { Ejecutor } from "../base.js";
-import { PARA_ADMINISTRAR } from "../permisos.js";
+import { PARA_ADMINISTRAR, PARA_EL_SISTEMA } from "../permisos.js";
 import type { Usuario } from "../contratos/usuarios.js";
 import type { Enviable } from "../enviable.js";
 
@@ -16,6 +16,14 @@ export async function quienesAdministran(e: Ejecutor): Promise<string[]> {
       WHERE u.activo AND (SELECT count(DISTINCT rp.permiso) FROM usuario_rol ur JOIN rol_permiso rp ON rp.rol_id = ur.rol_id
                            WHERE ur.usuario_id = u.id AND rp.permiso = ANY(${PARA_ADMINISTRAR}::text[])) = ${PARA_ADMINISTRAR.length}`.execute(e);
   return rows.map((r) => r.id);
+}
+
+// Cuántos usuarios activos pueden fijar los ajustes del sistema (specs/020).
+export async function cuantosAdministranElSistema(e: Ejecutor): Promise<number> {
+  const { rows } = await sql<{ n: number }>`SELECT count(DISTINCT u.id)::int AS n FROM usuario u
+      JOIN usuario_rol ur ON ur.usuario_id = u.id JOIN rol_permiso rp ON rp.rol_id = ur.rol_id
+      WHERE u.activo AND rp.permiso = ${PARA_EL_SISTEMA}`.execute(e);
+  return rows[0]?.n ?? 0;
 }
 
 // ---------- Roles ----------

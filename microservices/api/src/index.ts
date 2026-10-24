@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { app } from "./app.js";
 import { config } from "./config.js";
 import { mantenerLaBaseDespierta, pool } from "./db.js";
+import { leerTiempos } from "./sistema/ajustes.js";
 import { aplicarMigraciones } from "./migraciones.js";
 import { iniciar as iniciarCopiaDelCatalogo } from "./productos/copia.js";
 
@@ -28,6 +29,8 @@ const aplicadas = await aplicarMigraciones(pool);
 if (aplicadas.length) console.log(`migraciones aplicadas: ${aplicadas.join(", ")}`);
 // La copia del catálogo (specs/018): del disco y lo que cambió, o la base entera la primera vez.
 await iniciarCopiaDelCatalogo();
+// Los tiempos que fija quien administra (specs/020): en memoria, para cada pedido.
+await leerTiempos();
 console.log("copia del catálogo lista");
 mantenerLaBaseDespierta();
 

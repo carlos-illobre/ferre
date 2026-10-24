@@ -2,7 +2,6 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { NOMBRES, TEXTOS } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
-import { DiasDelVinculoDelNegocio } from "../Vinculo";
 import { urlApi } from "../../api";
 import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, quitarCelularDeOtro, useCelularesDeOtros, useSesiones, useUsuarios, type CelularDeOtroFila, type SesionFila } from "../../negocio/usuarios";
 import { useGastosDeLaSemana } from "../../negocio/compras";
@@ -94,7 +93,6 @@ function Usuarios() {
             acceso={{ ...accesoDe(u.id, sesiones.datos, celulares.datos), alCerrarSesion: (s) => void cerrarLaSesion(s), alQuitarCelular: (c) => void quitarElCelular(c) }} />
         ))}
       </div>
-      <DiasDelVinculoDelNegocio />
       {alta && (
         <Hoja titulo="Autorizar a alguien" alCerrar={() => setAlta(false)} testId="hoja-autorizar">
           <form onSubmit={autorizar} className="formulario" data-testid="alta-usuario">

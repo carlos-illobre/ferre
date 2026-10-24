@@ -6,7 +6,7 @@
 
 **Status**: Aprobada (Carlos, 2026-10-23)
 
-**Maquetas**: Aprobada la variante A (tramos, se guarda al tocar), Carlos, 2026-10-24: `maquetas/celular-variante-a.png` y `maquetas/compu-variante-a.png`.
+**Maquetas**: Aprobadas (Carlos, 2026-10-24): la variante A (tramos, se guarda al tocar) con sus estados; `maquetas/celular-variante-a.png` y `maquetas/compu-variante-a.png`.
 
 **Input**: Carlos, el 2026-10-23, para que la base no pase los 30 MB diarios de datos que salen
 (specs/018, RNF-62): «sí, agregalo, pero quiero que esos tiempos puedan ser configurables desde

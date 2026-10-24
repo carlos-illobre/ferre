@@ -45,8 +45,8 @@ describe("las sesiones y los celulares de cada persona, en Usuarios", () => {
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/sesiones/s1", { method: "DELETE" }));
     fireEvent.click(within(lista).getByRole("button", { name: /Quitar el celular Samsung de Marta/ }));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/credenciales/c1", { method: "DELETE" }));
-    // Al final, cuántos días dura el vínculo.
-    expect(((await screen.findByTestId("dias-vinculo")) as HTMLInputElement).value).toBe("30");
+    // Los días del vínculo ya no van acá: están en Más → Sistema (specs/020).
+    expect(screen.queryByTestId("dias-vinculo")).toBeNull();
   });
 });
 

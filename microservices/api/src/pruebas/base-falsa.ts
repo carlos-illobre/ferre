@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
 import { vi } from "vitest";
-import type { Usuario } from "../acceso/sesiones.js";
+import { olvidarSesiones, type Usuario } from "../acceso/sesiones.js";
 import { PERMISOS } from "../permisos.js";
 
 // Base de datos simulada para probar las rutas sin Postgres: cada consulta se anota y se
@@ -32,15 +32,22 @@ export const usuarios: Record<string, Usuario & { rol: string }> = {
 const comando = (sql: string) => sql.trim().split(/\s/)[0]!.toUpperCase();
 
 export function baseFalsa() {
+  // Cada base de mentira empieza como un servidor recién arrancado: sin sesiones recordadas.
+  olvidarSesiones();
   const consultas: Consulta[] = [];
-  const programadas: { patron: RegExp; respuesta: Respuesta }[] = [];
+  // De arranque hay alguien que administra el sistema (specs/020); una prueba lo cambia programándolo.
+  const programadas: { patron: RegExp; respuesta: Respuesta }[] = [{ patron: /AS n FROM usuario u\s+JOIN usuario_rol/, respuesta: { rows: [{ n: 1 }] } }];
+  // Una fila de sesión fija para cualquier token (para probar el vencimiento y la renovación), o
+  // null para no encontrar ninguna; sin fijar, la del usuario de prueba de cada token.
+  let sesionFija: Record<string, unknown> | null | undefined;
   const query = vi.fn(async (sql: string, params: unknown[] = []) => {
     consultas.push({ sql, params });
+    if (sesionFija !== undefined && /FROM sesion s JOIN usuario u/.test(sql)) return { rows: sesionFija ? [sesionFija] : [], rowCount: sesionFija ? 1 : 0 };
     if (/FROM sesion s JOIN usuario u/.test(sql)) {
       const token = String(params[0]);
       const rol = Object.keys(usuarios).find((r) => token === hashDe(`token-${r}`));
       const u = rol ? usuarios[rol]! : null;
-      return { rows: u ? [{ id: `sesion-${u.rol}`, ultimo_uso_en: new Date(), usuario_id: u.id, email: u.email, nombre: u.nombre, roles: u.roles, permisos: u.permisos }] : [], rowCount: u ? 1 : 0 };
+      return { rows: u ? [{ id: `sesion-${u.rol}`, ultimo_uso_en: new Date(), expira_en: new Date(Date.now() + 86_400_000), usuario_id: u.id, email: u.email, nombre: u.nombre, roles: u.roles, permisos: u.permisos }] : [], rowCount: u ? 1 : 0 };
     }
     for (const p of programadas) {
       if (p.patron.test(sql)) {
@@ -55,6 +62,7 @@ export function baseFalsa() {
   return {
     pool, consultas,
     programar: (patron: RegExp, respuesta: Respuesta) => { programadas.unshift({ patron, respuesta }); },
+    fijarSesion: (fila: Record<string, unknown> | null) => { sesionFija = fila; },
     sqlDe: (patron: RegExp) => consultas.filter((c) => patron.test(c.sql)),
     limpiar: () => { consultas.length = 0; programadas.length = 0; },
   };

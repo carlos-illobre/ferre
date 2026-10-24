@@ -5,6 +5,7 @@ export const CONTROL_DE_SESION_MS = 30_000;
 export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
 import { api, borrarToken, guardarToken, leerToken } from "./api";
 import { vaciarVenta } from "./negocio/ventas/venta-en-curso";
+import { ponerAjustes } from "./ajustes-del-sistema";
 import type { SesionActual, UsuarioDeLaSesion } from "@servidor/sesiones";
 
 // `roles` son los nombres de sus roles y `permisos` lo que esos roles le dejan hacer (RF-72).
@@ -26,7 +27,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
     const token = leerToken();
     if (!token) return setSesion({ estado: "sin-sesion" });
     api<SesionActual>("/sesiones/actual")
-      .then((r) => { guardarUsuario(r.usuario); setSesion({ estado: "con-sesion", usuario: r.usuario, sinConexion: false, sesionId: r.id }); })
+      .then((r) => { guardarUsuario(r.usuario); ponerAjustes(r.ajustes); setSesion({ estado: "con-sesion", usuario: r.usuario, sinConexion: false, sesionId: r.id }); })
       .catch((e: { estado?: number }) => {
         if (e.estado === 401) return setSesion({ estado: "sin-sesion" });
         const guardado = leerUsuarioGuardado();
@@ -46,7 +47,8 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
   const conSesion = sesion.estado === "con-sesion";
   useEffect(() => {
     if (!conSesion) return;
-    const controlar = () => { if (document.visibilityState !== "hidden") api("/sesiones/actual").catch(() => undefined); };
+    // Con la respuesta llegan los ajustes que fija quien administra para todos (specs/020).
+    const controlar = () => { if (document.visibilityState !== "hidden") api<SesionActual>("/sesiones/actual").then((r) => ponerAjustes(r.ajustes)).catch(() => undefined); };
     const cada = setInterval(controlar, CONTROL_DE_SESION_MS);
     document.addEventListener("visibilitychange", controlar);
     window.addEventListener("online", controlar);
@@ -58,7 +60,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
     window.dispatchEvent(new Event(EVENTO_SESION_ABIERTA));
     guardarUsuario(usuario);
     setSesion({ estado: "con-sesion", usuario, sinConexion: false, sesionId: null });
-    api<SesionActual>("/sesiones/actual").then((r) => setSesion((s) => (s.estado === "con-sesion" ? { ...s, sesionId: r.id } : s))).catch(() => undefined);
+    api<SesionActual>("/sesiones/actual").then((r) => { ponerAjustes(r.ajustes); setSesion((s) => (s.estado === "con-sesion" ? { ...s, sesionId: r.id } : s)); }).catch(() => undefined);
   }, []);
 
   const salir = useCallback(async () => {

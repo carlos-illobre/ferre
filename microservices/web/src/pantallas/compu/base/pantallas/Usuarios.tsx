@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { DiasDelVinculoDelNegocio } from "../../../Vinculo";
 import { NOMBRES, TEXTOS } from "../../../textos";
 import { api, ErrorApi } from "../../../../api";
 import { fecha } from "../../../../formato";
@@ -172,7 +171,6 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
           <div className="usuarios-alta">{formulario}</div>
         </div>
       ))}
-      {lista.datos && <DiasDelVinculoDelNegocio />}
     </section>
   );
 }

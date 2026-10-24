@@ -221,8 +221,8 @@ la computadora».
 **El bloque «Vínculo entre celular y computadora»,** en Más → Configuración (decisiones 74 y 99):
 a quien está vinculado le dice con qué dispositivo y le ofrece «Desvincular». Quien no está
 vinculado no ve el bloque. **Cuántos días dura el vínculo** vale para todo el negocio: está solo
-al final de Más → Usuarios, en un recuadro «Vínculo entre celular y computadora: dura 30 días», para
-quien tiene «Administrar usuarios», que lo cambia ahí (decisión 100); Configuración no lo muestra.
+en Más → Sistema, para quien tiene «Administrar el sistema» (specs/020; antes, al final de Más →
+Usuarios, decisión 100); Configuración no lo muestra.
 Sin celular emparejado, la computadora muestra en el menú «Vincular el celular», siempre.
 
 **Reglas:**
@@ -248,7 +248,7 @@ Depósito, en este orden (la cuarta, Sesiones, se sacó el 2026-10-17: decisión
 
 | Pestaña | Qué tiene | Quién la ve |
 |---|---|---|
-| **Usuarios** | Los usuarios autorizados y autorizar a alguien (Historia 2); en la tarjeta de cada persona, sus sesiones abiertas (Historia 5) y sus celulares con huella (Historia 4); al final, cuántos días dura el vínculo (Historia 1c) | «Administrar usuarios» |
+| **Usuarios** | Los usuarios autorizados y autorizar a alguien (Historia 2); en la tarjeta de cada persona, sus sesiones abiertas (Historia 5) y sus celulares con huella (Historia 4). Los días del vínculo están en Más → Sistema (specs/020) | «Administrar usuarios» |
 | **Roles** | Los roles y armar uno (Historia 3b) | «Administrar roles» |
 | **Quién hizo qué** | El registro de acciones (Historia 6) | «Ver quién hizo qué» |
 

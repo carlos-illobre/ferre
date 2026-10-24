@@ -19,6 +19,8 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
   { ruta: "procesos", nombre: "Procesos", detalle: "Cómo se hace cada cosa en el negocio, dibujado paso a paso", icono: "procesos", pide: ["procesos.ver", "procesos.dibujar"] },
   { ruta: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
   { ruta: "configuracion", nombre: "Configuración", detalle: TEXTOS.configuracion.queHay.largo, icono: "ajustes" },
+  // Lo que vale para todos los dispositivos (specs/020).
+  { ruta: "sistema", nombre: "Sistema", detalle: TEXTOS.sistema.queHay.largo, icono: "computadora", pide: ["admin.sistema"] },
 ];
 
 // `destino`: adónde lleva la opción, si no es su propia ruta (Usuarios y Cómo va el negocio van a su primera pestaña).

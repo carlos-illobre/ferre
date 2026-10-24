@@ -26,7 +26,7 @@ En la columna «Exige», «sesión» quiere decir cualquier persona con sesión,
 | Método | Ruta | Exige | Para qué sirve |
 |---|---|---|---|
 | POST | `/sesiones/google` | Nada; 10 intentos por minuto | Entrar con Google. Cuerpo: `credencial` (el token del botón de Google) y `dispositivo` opcional. `201` con `token` y `usuario` (`id`, `email`, `nombre`, `rol`). `400` sin credencial; `401` si Google no verifica la cuenta; `403` «<correo> no está autorizado. Pedile a quien administra los usuarios que te dé de alta.» si el correo no está cargado o está desactivado. Registra `sesion.iniciada` con medio `google` |
-| GET | `/sesiones/actual` | Sesión | Quién soy: `id` de la sesión y `usuario` |
+| GET | `/sesiones/actual` | Sesión | Quién soy: `id` de la sesión y `usuario`, y `ajustes.celular_segundos`, cada cuánto pregunta el celular emparejado (specs/020). Con la sesión recordada por el servidor (specs/020, RF-133), no consulta la base mientras vale |
 | DELETE | `/sesiones/actual` | Sesión | Salir: revoca la sesión propia. `204`. Registra `sesion.cerrada` |
 | GET | `/sesiones` | `admin.usuarios` | Sesiones abiertas de todos los usuarios (sin revocar ni vencidas), la más usada recientemente primero: `id`, `dispositivo`, `creada_en`, `ultimo_uso_en`, `expira_en`, `email`, `nombre` |
 | DELETE | `/sesiones/:id` | `admin.usuarios` | Cerrar a distancia la sesión de cualquiera. `204` (también si el id no existe). Registra `sesion.revocada` |
@@ -104,7 +104,7 @@ sesión y atan una sesión de computadora con una de celular; no son una forma d
 | POST | `/puestos/:codigo/vincular` | Sesión | El celular leyó el QR de «Vincular el celular». Cuerpo opcional: `dispositivo_id` (el identificador que ese celular guarda para sí). Quedan vinculados los días configurados (`dias` en la respuesta) y se suelta el vínculo anterior de cualquiera de los dos. Guarda de qué usuario y de qué dos dispositivos es el vínculo. Registra `puesto.vinculado` |
 | GET | `/puestos/mio?dispositivo=…` | Sesión | Con quién está vinculada esta sesión: `comoComputadora` y `comoCelular` (cada uno `id`, `nombre`, `expira_en`, o `null`). `dispositivo` es el identificador de este dispositivo (8 a 64 letras, números, guiones): se anota en la sesión y, si este usuario tenía en ese dispositivo un vínculo vigente de una sesión anterior, el vínculo pasa a esta sesión. Cuenta aunque la sesión del otro lado esté cerrada |
 | GET | `/puestos/configuracion` | Sesión | `dias`: cuántos días dura un vínculo (30 de arranque) |
-| PUT | `/puestos/configuracion` | «Administrar usuarios» (si no, `403`) | Cuerpo: `dias`, entero de 1 a 365 (si no, `400`). Vale para los vínculos nuevos y los que se renueven. Registra `vinculo.dias_cambiados` |
+| PUT | `/puestos/configuracion` | «Administrar el sistema» (si no, `403`); para las aplicaciones de la versión anterior: se fija en `PUT /sistema/ajustes` | Cuerpo: `dias`, entero de 1 a 365 (si no, `400`). Vale para los vínculos nuevos y los que se renueven. Registra `vinculo.dias_cambiados` |
 | DELETE | `/puestos/:id` | Sesión de cualquiera de los dos | Desvincular. `204`. Registra `puesto.desvinculado`. Es la única forma de cortarlo desde la aplicación, junto con el cierre a distancia de la sesión de uno de los dos (`DELETE /sesiones/:id`); salir (`DELETE /sesiones/actual`) no lo corta |
 | POST | `/puestos/:id/codigos` | Sesión del celular vinculado a ese puesto (si no, `403`) | El celular manda un código escaneado |
 | POST | `/puestos/:id/codigos/:codigoId/recibido` | Sesión de la computadora dueña del puesto | La computadora confirma que lo recibió. `204` |
@@ -132,9 +132,16 @@ Lo que la computadora le pide a su celular emparejado:
 | Método | Ruta | Exige | Para qué sirve |
 |---|---|---|---|
 | POST | `/puestos/:id/lector` | Sesión de la computadora de ese emparejamiento (si no, `404`) | Pedirle al celular que haga de lector. Vale 2 minutos. `204` |
-| GET | `/puestos/avisos` | Sesión | Lo que las computadoras emparejadas con este celular esperan de él: `lector` (si pidieron el lector) y `fotos` (cada pedido de foto, con `codigo` y `para`). El celular lo consulta cada 3 segundos |
+| GET | `/puestos/avisos` | Sesión | Lo que las computadoras emparejadas con este celular esperan de él: `lector` (si pidieron el lector) y `fotos` (cada pedido de foto, con `codigo` y `para`). El celular lo consulta al empezar, al volver a la aplicación, al volver la conexión y cada `ajustes.celular_segundos` (specs/020) |
 | DELETE | `/puestos/avisos/lector` | Sesión | El celular abrió el lector o lo dejó para después: el pedido queda atendido. `204` |
 | GET | `/pedidos-de-foto/para-mi` | Sesión | Solo los pedidos de foto, con la misma forma que `fotos` |
+
+## Ajustes del sistema (`/sistema`, specs/020)
+
+| Método | Ruta | Rol | Para qué sirve |
+|---|---|---|---|
+| GET | `/sistema/ajustes` | «Administrar el sistema» (si no, `403`) | `sesion_segundos`, `celular_segundos`, `vinculo_dias` y `tramos` (los valores que se pueden elegir de cada tiempo: la sesión 0, 30, 60, 300 o 600; el celular 5, 30, 60, 300 o 600) |
+| PUT | `/sistema/ajustes` | «Administrar el sistema» (si no, `403`) | Cuerpo: uno o más de `sesion_segundos`, `celular_segundos` (uno de sus tramos) y `vinculo_dias` (entero de 1 a 365); otra cosa, `400` con los valores que puede tener. Vale para todos en el momento. Devuelve lo mismo que el `GET`. Registra `sistema.ajustes_cambiados` con lo de antes y lo nuevo |
 
 ## Qué exigen las rutas de las otras capacidades
 

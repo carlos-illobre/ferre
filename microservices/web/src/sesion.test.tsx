@@ -116,3 +116,21 @@ describe("la venta en curso al cerrarse la sesión", () => {
     expect(ventaActual().items).toHaveLength(0);
   });
 });
+
+// Lo que fija quien administra para todos llega con cada control de la sesión (specs/020).
+describe("los ajustes del sistema", () => {
+  it("020-E16: el tiempo del celular emparejado llega con la sesión, al abrir y en cada control", async () => {
+    const { celularCadaMs, olvidarAjustes } = await import("./ajustes-del-sistema");
+    olvidarAjustes();
+    let segundos = 30;
+    servidor = async (ruta) => (ruta === "/sesiones/actual" ? respuesta(200, { id: "s-1", usuario: CARLOS, ajustes: { celular_segundos: segundos } }) : respuesta(200, []));
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+    try {
+      render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
+      await waitFor(() => expect(celularCadaMs()).toBe(30_000));
+      segundos = 300;
+      await act(async () => { await vi.advanceTimersByTimeAsync(CONTROL_DE_SESION_MS); });
+      await waitFor(() => expect(celularCadaMs()).toBe(300_000));
+    } finally { vi.useRealTimers(); }
+  });
+});

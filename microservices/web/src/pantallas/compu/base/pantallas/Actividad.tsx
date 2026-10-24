@@ -42,6 +42,7 @@ const QUE: Record<string, { nombre: string; color?: Color }> = {
   "credencial.vinculada": { nombre: "Celular vinculado con huella" },
   "credencial.quitada": { nombre: "Celular con huella quitado" },
   "puesto.vinculado": { nombre: "Celular vinculado a la computadora" },
+  "sistema.ajustes_cambiados": { nombre: "Cambio en los ajustes del sistema", color: "alerta" },
   "cliente.creado": { nombre: "Cliente nuevo" },
   "proveedor.creado": { nombre: "Proveedor nuevo" },
   "proveedor.modificado": { nombre: "Cambio en un proveedor" },
@@ -70,6 +71,7 @@ const TIPOS: { valor: string; nombre: string }[] = [
   { valor: "credencial.", nombre: "Celulares con huella" },
   { valor: "cliente.", nombre: "Clientes" },
   { valor: "proveedor.", nombre: "Proveedores" },
+  { valor: "sistema.", nombre: "Ajustes del sistema" },
 ];
 
 const texto = (v: unknown) => (typeof v === "string" ? v : typeof v === "number" ? numero(v) : "");
@@ -101,6 +103,16 @@ function detalleDe(e: Evento, usuarios: UsuarioFila[]): string {
     }
     case "sesion.iniciada": return juntar(c.medio === "huella" ? "Con la huella" : "Con Google", texto(c.dispositivo));
     case "credencial.vinculada": return texto(c.dispositivo);
+    case "sistema.ajustes_cambiados": {
+      // Qué ajuste, de cuánto a cuánto (specs/020).
+      const antes = (c.antes ?? {}) as Contenido, despues = (c.despues ?? {}) as Contenido;
+      const tiempo = (s: unknown) => (s === 0 ? "no recordarla" : typeof s === "number" ? (s < 60 ? `${s} s` : `${s / 60} min`) : "");
+      return juntar(
+        "sesion_segundos" in despues && `Sesión recordada: de ${tiempo(antes.sesion_segundos)} a ${tiempo(despues.sesion_segundos)}`,
+        "celular_segundos" in despues && `Pregunta del celular: de ${tiempo(antes.celular_segundos)} a ${tiempo(despues.celular_segundos)}`,
+        "vinculo_dias" in despues && `Días del vínculo: de ${texto(antes.vinculo_dias)} a ${texto(despues.vinculo_dias)}`,
+      );
+    }
     case "sector.creado": case "cliente.creado": case "proveedor.creado": case "proceso.creado": case "proceso.importado": case "proceso.renombrado": case "proceso.vigente": return texto(c.nombre);
     default: return "";
   }

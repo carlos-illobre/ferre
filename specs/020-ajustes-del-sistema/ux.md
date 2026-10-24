@@ -25,7 +25,8 @@ Debajo, una nota: vale para todos los dispositivos, llega a los abiertos en meno
 cada cambio queda en «Quién hizo qué».
 
 **Cómo se cambia:** tocar un tramo lo guarda en ese momento, sin otro botón. Los días se guardan
-al tocar − o + y al dejar el número escrito.
+medio segundo largo (700 ms) después del último − o + (varios toques seguidos se guardan juntos), y
+al terminar de escribir el número (Enter o salir de la caja).
 
 **Lo que exige cada interfaz:**
 
@@ -39,7 +40,7 @@ al tocar − o + y al dejar el número escrito.
 
 - **Guardado:** la nota pasa a decir, en verde, qué quedó: «✓ Guardado para todos: la sesión se
   recuerda 5 minutos.»
-- **Días fuera de rango:** el número en rojo y «Puede ir de 1 a 365 días. No se guardó: sigue en
+- **Días fuera de rango:** el número con el color de error de la paleta (el naranja fuerte de «Mostrador», que no tiene un rojo) y «Puede ir de 1 a 365 días. No se guardó: sigue en
   N.»; no se guarda.
 - **Sin conexión:** arriba, «Sin conexión: para cambiar los ajustes del sistema hace falta
   internet. Se ve lo último que se guardó.»; los tramos y los días apagados.

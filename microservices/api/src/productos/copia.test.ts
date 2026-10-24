@@ -33,6 +33,13 @@ const descripciones = (copia: typeof import("./copia.js")) => copia.buscar({}).m
 const CARPETA_DE_LAS_PRUEBAS = process.env.CARPETA_LISTAS!;
 let ARCHIVO = "";
 
+// La copia se escribe en el disco aparte: se espera a que esté, hasta 5 segundos (con la máquina
+// cargada, unas vueltas del bucle de eventos no alcanzan).
+async function hastaQueEsteEnElDisco() {
+  const hasta = Date.now() + 5000;
+  while (!existsSync(ARCHIVO) && Date.now() < hasta) await new Promise((r) => setImmediate(r));
+}
+
 async function copiaNueva() {
   vi.resetModules();
   return import("./copia.js");
@@ -57,7 +64,7 @@ describe("la copia del catálogo", () => {
     expect(leer.entero).toHaveBeenCalledTimes(1);
     expect(descripciones(copia)).toEqual(["Arandela", "Tuerca"]);
     await vi.advanceTimersByTimeAsync(2500); // se guarda en el disco: se espera a que termine de escribir
-    for (let i = 0; i < 1000 && !existsSync(ARCHIVO); i++) await new Promise((r) => setImmediate(r));
+    await hastaQueEsteEnElDisco();
 
     leer.cambios.mockResolvedValue(lectura("140", [fila("c", "Clavo")]));
     const otra = await copiaNueva();
@@ -132,7 +139,7 @@ describe("la copia del catálogo", () => {
     const copia = await copiaNueva();
     await copia.iniciar();
     await vi.advanceTimersByTimeAsync(2500);
-    for (let i = 0; i < 1000 && !existsSync(ARCHIVO); i++) await new Promise((r) => setImmediate(r));
+    await hastaQueEsteEnElDisco();
     const { readFile, writeFile } = await import("node:fs/promises");
     const guardada = JSON.parse(await readFile(ARCHIVO, "utf8"));
     await writeFile(ARCHIVO, JSON.stringify({ ...guardada, base: "otro-servidor:5432/postgres" }));

@@ -4,6 +4,7 @@ import { anotarEvento } from "../eventos.js";
 import type { z } from "zod";
 import type { cambiosDeRol, cambiosDeUsuario, rolNuevo, usuarioNuevo } from "./esquemas.js";
 import * as datos from "./datos.js";
+import { olvidarSesiones } from "../acceso/sesiones.js";
 import type { Rol, Usuario } from "../contratos/usuarios.js";
 import type { Enviable } from "../enviable.js";
 
@@ -14,6 +15,7 @@ import type { Enviable } from "../enviable.js";
 export type Resultado = { ok: true; estado?: 201; cuerpo?: unknown } | { ok: false; estado: 400 | 404 | 409; error: string };
 const mal = (estado: 400 | 404 | 409, error: string): Resultado => ({ ok: false, estado, error });
 const SIN_QUIEN_ADMINISTRE = "No se guardó: el sistema se quedaría sin nadie que pueda administrar usuarios y roles";
+const SIN_QUIEN_ADMINISTRE_EL_SISTEMA = "No se guardó: el sistema se quedaría sin nadie que pueda administrar el sistema";
 const A_VOS_MISMO = "No podés quitarte a vos mismo los permisos de administrar: lo tiene que hacer otra persona";
 const repetido = (e: unknown) => (e as { code?: string }).code === "23505";
 
@@ -21,6 +23,7 @@ const repetido = (e: unknown) => (e as { code?: string }).code === "23505";
 async function siguenAdministrando(trx: Ejecutor, actorId: string, tocaAlActor: boolean): Promise<void> {
   const quienes = await datos.quienesAdministran(trx);
   if (quienes.length === 0) throw new Deshacer(mal(409, SIN_QUIEN_ADMINISTRE));
+  if ((await datos.cuantosAdministranElSistema(trx)) === 0) throw new Deshacer(mal(409, SIN_QUIEN_ADMINISTRE_EL_SISTEMA));
   if (tocaAlActor && !quienes.includes(actorId)) throw new Deshacer(mal(400, A_VOS_MISMO));
 }
 
@@ -48,7 +51,7 @@ export async function crearRol(r: RolEntrada, actorId: string): Promise<Resultad
   return { ok: true, estado: 201, cuerpo: { id, nombre, permisos } };
 }
 
-export async function cambiarRol(id: string, r: CambiosDeRol, actorId: string): Promise<Resultado> {
+async function cambiarRolSinOlvidar(id: string, r: CambiosDeRol, actorId: string): Promise<Resultado> {
   try {
     return await enTransaccion(async (trx) => {
       if (!(await datos.cambiarRol(trx, id, r.nombre?.trim() || null, r.descripcion?.trim() ?? null))) throw new Deshacer(mal(404, "No existe ese rol"));
@@ -67,7 +70,7 @@ export async function cambiarRol(id: string, r: CambiosDeRol, actorId: string): 
 
 // Un rol que alguien tiene no se borra: primero hay que sacárselo. Así tampoco puede quedar el
 // sistema sin quien administre por borrar un rol.
-export async function borrarRol(id: string, actorId: string): Promise<Resultado> {
+async function borrarRolSinOlvidar(id: string, actorId: string): Promise<Resultado> {
   const rol = await datos.rolConCuantos(base, id);
   if (!rol) return mal(404, "No existe ese rol");
   if (rol.usuarios > 0) return mal(409, `${rol.nombre} no se puede borrar: ${rol.usuarios === 1 ? "lo tiene 1 persona" : `lo tienen ${rol.usuarios} personas`}. Primero sacáselo`);
@@ -101,7 +104,7 @@ export async function autorizar(u: z.output<typeof usuarioNuevo>, actorId: strin
   return { ok: true, estado: 201, cuerpo: { id, email, nombre, activo: true } };
 }
 
-export async function cambiarUsuario(id: string, u: z.output<typeof cambiosDeUsuario>, actorId: string): Promise<Resultado> {
+async function cambiarUsuarioSinOlvidar(id: string, u: z.output<typeof cambiosDeUsuario>, actorId: string): Promise<Resultado> {
   if (actorId === id && u.activo === false) return mal(400, "No podés desactivarte a vos mismo: lo tiene que hacer otra persona");
   return enTransaccion(async (trx) => {
     if (!(await datos.cambiarUsuario(trx, id, u.activo ?? null, u.nombre?.trim() || null))) throw new Deshacer(mal(404, "No existe ese usuario"));
@@ -115,3 +118,14 @@ export async function cambiarUsuario(id: string, u: z.output<typeof cambiosDeUsu
     return { ok: true } as Resultado;
   });
 }
+
+// Un cambio de roles, de permisos o de una persona cambia lo que pueden hacer sesiones abiertas:
+// el servidor olvida las que recordaba y la próxima vez las busca en la base (specs/020, E03).
+async function yOlvidarSesiones(r: Promise<Resultado>): Promise<Resultado> {
+  const hecho = await r;
+  if (hecho.ok) olvidarSesiones();
+  return hecho;
+}
+export const cambiarRol = (...a: Parameters<typeof cambiarRolSinOlvidar>) => yOlvidarSesiones(cambiarRolSinOlvidar(...a));
+export const borrarRol = (...a: Parameters<typeof borrarRolSinOlvidar>) => yOlvidarSesiones(borrarRolSinOlvidar(...a));
+export const cambiarUsuario = (...a: Parameters<typeof cambiarUsuarioSinOlvidar>) => yOlvidarSesiones(cambiarUsuarioSinOlvidar(...a));

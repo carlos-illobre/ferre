@@ -32,7 +32,8 @@ export type EstadoDelCodigo =
   | { estado: "aprobada"; token: string; usuario: UsuarioDeLaSesion; puesto: { id: string; expira_en: string } | null };
 
 // GET /sesiones/actual
-export type SesionActual = { id: string; usuario: UsuarioDeLaSesion };
+// `ajustes`: lo que fija quien administra para todos los dispositivos (specs/020), en segundos.
+export type SesionActual = { id: string; usuario: UsuarioDeLaSesion; ajustes: { celular_segundos: number } };
 
 // GET /sesiones: las abiertas de todos, de la más usada a la menos, salvo la de quien pregunta
 // (esa se cierra con «Salir»: decisión 99). Cada una dice de quién es.

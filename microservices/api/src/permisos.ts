@@ -24,11 +24,15 @@ export const PERMISOS = [
   { clave: "procesos.ver", parte: "Negocio", nombre: "Ver procesos", detalle: "Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial" },
   { clave: "procesos.dibujar", parte: "Negocio", nombre: "Dibujar procesos", detalle: "Todo lo de «Ver procesos», más crear, cambiar, marcar vigentes, importar, exportar y borrar los procesos" },
   // «Administrar sesiones» se unió a este (decisión 100).
-  { clave: "admin.usuarios", parte: "Administración", nombre: "Administrar usuarios", detalle: "Autorizar personas, asignarles roles, desactivarlas, cerrarles las sesiones, quitarles los celulares con huella y fijar cuántos días dura el vínculo" },
+  { clave: "admin.usuarios", parte: "Administración", nombre: "Administrar usuarios", detalle: "Autorizar personas, asignarles roles, desactivarlas, cerrarles las sesiones y quitarles los celulares con huella" },
   { clave: "admin.roles", parte: "Administración", nombre: "Administrar roles", detalle: "Crear roles, cambiarles el nombre y los permisos, borrarlos" },
+  // Lo que vale para todos los dispositivos, en Más → Sistema (specs/020).
+  { clave: "admin.sistema", parte: "Administración", nombre: "Administrar el sistema", detalle: "Más → Sistema: cuánto recuerda la sesión el servidor, cada cuánto pregunta el celular emparejado y cuántos días dura el vínculo, para todos" },
 ] as const;
 export type Permiso = (typeof PERMISOS)[number]["clave"];
 export const CLAVES_DE_PERMISO: readonly string[] = PERMISOS.map((p) => p.clave);
 export const nombreDePermiso = (clave: string) => PERMISOS.find((p) => p.clave === clave)?.nombre ?? clave;
 // Sin estos dos nadie podría volver a dar permisos: siempre tiene que quedar alguien que los tenga.
 export const PARA_ADMINISTRAR: Permiso[] = ["admin.usuarios", "admin.roles"];
+// Y alguien que pueda fijar los ajustes del sistema (specs/020), no necesariamente la misma persona.
+export const PARA_EL_SISTEMA: Permiso = "admin.sistema";

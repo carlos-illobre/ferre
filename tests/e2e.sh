@@ -64,9 +64,22 @@ servir() {
   echo "El cliente web no arrancó en :$puerto (ver /tmp/ferre-preview-$puerto.log)"; exit 1
 }
 
+# Las pruebas cambian la base a mano (crean sesiones, sacan permisos): el servidor no tiene que
+# recordar la sesión (specs/020, RF-133), o vería lo de antes hasta un minuto. Se apaga una vez y se
+# reinicia la API para que lo lea; con la base que ya lo tiene, no hace nada.
+sin_recordar_la_sesion() {
+  # shellcheck disable=SC2068
+  local psql=(docker compose $@ exec -T db psql -U ferre -d ferre -tAc)
+  [ "$("${psql[@]}" "SELECT valor FROM configuracion WHERE clave = 'sesion.recordar_segundos'")" = "0" ] && return
+  "${psql[@]}" "UPDATE configuracion SET valor = '0' WHERE clave = 'sesion.recordar_segundos'" >/dev/null
+  # shellcheck disable=SC2068
+  docker compose $@ restart gestion-del-local >/dev/null && docker compose $@ up -d --wait >/dev/null
+}
+
 # El stack del compose y el cliente contra su API: lo que usa el CI y la computadora.
 preparar() {
   docker compose up -d --wait
+  sin_recordar_la_sesion
   # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.
   construir_web "${API_URL:-http://localhost}" dist
   servir dist 4173
@@ -81,6 +94,10 @@ preparar_los_dos() {
   construir_web "$CELULAR_API" dist-celular
   wait "$uno" || { cat /tmp/ferre-stack.log; exit 1; }
   wait "$dos" || { cat /tmp/ferre-stack-celular.log; exit 1; }
+  sin_recordar_la_sesion & local tres=$!
+  # shellcheck disable=SC2086
+  sin_recordar_la_sesion $CELULAR_COMPOSE
+  wait "$tres"
   servir dist 4173
   servir dist-celular "$CELULAR_PUERTO_WEB"
   export E2E_CELULAR_COMPOSE="$CELULAR_COMPOSE" E2E_CELULAR_API="$CELULAR_API" E2E_CELULAR_WEB="http://localhost:$CELULAR_PUERTO_WEB"

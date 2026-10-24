@@ -29,7 +29,7 @@ Quién puede entrar.
 
 Reglas que aplica la API: un usuario activo tiene al menos un rol; nadie se desactiva ni se
 quita a sí mismo los permisos de administrar; siempre queda al menos un usuario activo que
-puede administrar usuarios y roles; desactivar a un usuario revoca sus sesiones abiertas. El
+puede administrar usuarios y roles, ni sin alguien activo con «Administrar el sistema» (specs/020); desactivar a un usuario revoca sus sesiones abiertas. El
 primer usuario se crea con el comando `crear-usuario` del servicio, que le da todos los roles.
 
 ## rol, rol_permiso y usuario_rol
@@ -167,5 +167,11 @@ cierra a distancia la sesión de uno de los dos.
 
 ## configuracion
 
-Lo que el negocio configura desde la aplicación: `clave`, `valor`, `actualizado_en`. Hoy tiene
-una sola clave, `vinculo.dias` (30 de arranque; entero de 1 a 365).
+Lo que el negocio configura desde la aplicación para todos los dispositivos, en Más → Sistema
+(specs/020): `clave`, `valor`, `actualizado_en`. Las claves:
+
+| Clave | De arranque | Qué valores |
+|---|---|---|
+| `vinculo.dias` | 30 | Entero de 1 a 365 |
+| `sesion.recordar_segundos` | 60 | 0, 30, 60, 300 o 600: cuánto recuerda el servidor una sesión (0, no la recuerda) |
+| `celular.pregunta_segundos` | 60 | 5, 30, 60, 300 o 600: cada cuánto pregunta el celular emparejado por los pedidos de la computadora |

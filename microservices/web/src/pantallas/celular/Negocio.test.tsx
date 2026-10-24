@@ -102,9 +102,10 @@ describe("Negocio", () => {
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/credenciales/c1", { method: "DELETE" }));
   });
 
-  it("007-T037 al final de Usuarios, quien administra usuarios ve cuántos días dura el vínculo", async () => {
+  it("020-E12: los días del vínculo ya no están al final de Usuarios: se fijan en Más → Sistema", async () => {
     apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/puestos/configuracion" ? { dias: 30 } : []));
     render(<Negocio parte="usuarios" />);
-    expect(((await screen.findByTestId("dias-vinculo")) as HTMLInputElement).value).toBe("30");
+    await waitFor(() => expect(apiFalsa).toHaveBeenCalled());
+    expect(screen.queryByTestId("dias-vinculo")).toBeNull();
   });
 });

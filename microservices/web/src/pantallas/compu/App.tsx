@@ -43,6 +43,7 @@ import { Contar } from "./base/pantallas/Contar";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./base/pantallas/Resumen";
 import { MisCelulares, Usuarios } from "./base/pantallas/Usuarios";
 import { VinculoPropio } from "../Vinculo";
+import { Sistema } from "../Sistema";
 import { PESTANAS_DE_USUARIOS } from "../pestanas-de-usuarios";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
 import { Actividad } from "./base/pantallas/Actividad";
@@ -145,7 +146,7 @@ const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 const A_PARTE_COMUN: Record<string, string> = {
   productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy",
   pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
-  mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", "para-revisar": "mas/para-revisar", tickets: "mas/tickets", configuracion: "mas/configuracion", procesos: "mas/procesos",
+  mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", "para-revisar": "mas/para-revisar", tickets: "mas/tickets", configuracion: "mas/configuracion", sistema: "mas/sistema", procesos: "mas/procesos",
 };
 const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos", "vender/anular": "hoy" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
@@ -453,7 +454,7 @@ function Pantallas() {
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />
           : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? <Usuarios />
-          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion propio={<><MisCelulares /><VinculoPropio /></>} /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anomalias cabeza={pestanas ? null : undefined} /> : actual === "para-revisar" ? <ParaRevisar cabeza={pestanas ? null : <h1>Anomalías</h1>} /> : <Vender />}
+          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion propio={<><MisCelulares /><VinculoPropio /></>} /> : actual === "sistema" ? <Sistema /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anomalias cabeza={pestanas ? null : undefined} /> : actual === "para-revisar" ? <ParaRevisar cabeza={pestanas ? null : <h1>Anomalías</h1>} /> : <Vender />}
       </div>
     </div>
   );

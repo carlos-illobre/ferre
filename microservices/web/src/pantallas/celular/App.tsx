@@ -33,6 +33,7 @@ import { CabezaDeUsuarios } from "./Usuarios";
 import { PESTANAS_DE_USUARIOS, PIDE_USUARIOS } from "../pestanas-de-usuarios";
 import { MisCelulares } from "./MisCelulares";
 import { VinculoPropio } from "../Vinculo";
+import { Sistema } from "../Sistema";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../pestanas-de-negocio";
 import { ComoVaElNegocio, SUB_DE_SECCION } from "./ComoVaElNegocio";
 import { NOMBRES, TEXTOS } from "../textos";
@@ -65,7 +66,7 @@ const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: stri
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "mas", nombre: "Más" },
 ];
-export const DE_MAS: { parte: Exclude<Parte, "actividad"> | "negocio" | "tickets" | "anomalias" | "configuracion" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
+export const DE_MAS: { parte: Exclude<Parte, "actividad"> | "negocio" | "tickets" | "anomalias" | "configuracion" | "sistema" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
   // Cómo va el negocio abre en la primera de sus secciones que la persona puede ver (decisión 95).
   { parte: "negocio", nombre: NOMBRES.comoVaElNegocio, detalle: TEXTOS.negocio.queHayEnElNegocio.corto, icono: "resumen", pide: PIDE_EL_NEGOCIO },
   // Usuarios abre en la primera de sus pestañas que la persona puede ver (decisión 88).
@@ -75,6 +76,8 @@ export const DE_MAS: { parte: Exclude<Parte, "actividad"> | "negocio" | "tickets
   { parte: "procesos", nombre: "Procesos", detalle: "Cómo se hace cada cosa en el negocio, paso a paso", icono: "procesos", pide: ["procesos.ver", "procesos.dibujar"] },
   { parte: "tickets", nombre: "Mejoras y errores", detalle: "Avisar de un error o proponer una mejora, con fotos", icono: "editar" },
   { parte: "configuracion", nombre: "Configuración", detalle: TEXTOS.configuracion.queHay.corto, icono: "ajustes" },
+  // Lo que vale para todos los dispositivos (specs/020).
+  { parte: "sistema", nombre: "Sistema", detalle: TEXTOS.sistema.queHay.corto, icono: "computadora", pide: ["admin.sistema"] },
 ];
 
 // Buscando en el servidor (RF-85): mientras una consulta está en curso, se dice arriba.
@@ -221,13 +224,14 @@ function Pantallas() {
       {falta ? <SinPermiso falta={falta} />
         : pestana === "mas" && parte === "tickets" ? <Tickets />
         : pestana === "mas" && parte === "configuracion" ? <Configuracion celular propio={<><MisCelulares /><VinculoPropio /></>} />
+        : pestana === "mas" && parte === "sistema" ? <Sistema celular />
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />
         : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeUsuarios actual="roles" />} />
         : pestana === "mas" && deUsuarios ? <Negocio parte={deUsuarios.valor as Exclude<typeof deUsuarios.valor, "roles">} cabeza={<CabezaDeUsuarios actual={deUsuarios.valor} />} />
         : pestana === "mas" && deAnomalias?.valor === "para-revisar" ? <ParaRevisar cabeza={<CabezaDeAnomalias actual="para-revisar" />} />
         : pestana === "mas" && parte === "anomalias" ? <Anomalias cabeza={<CabezaDeAnomalias actual="anomalias" />} />
         : pestana === "mas" && deNegocio ? <ComoVaElNegocio seccion={deNegocio.valor} />
-        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "configuracion" && parte !== "procesos" && parte !== "negocio" ? <Negocio parte={parte} />
+        : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "configuracion" && parte !== "sistema" && parte !== "procesos" && parte !== "negocio" ? <Negocio parte={parte} />
         : pestana === "mas" ? (
         <main className="contenido" data-testid="mas">
           <div className="encabezado"><h1 className="titulo">Más</h1></div>

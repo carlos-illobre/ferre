@@ -14,10 +14,10 @@ const administran = (...ids: string[]) => base.actual.programar(/FROM usuario u\
 describe("roles", () => {
   beforeEach(() => { base.actual = baseFalsa(); administran("u-admin"); base.actual.programar(/UPDATE rol SET nombre/, { rowCount: 1 }); });
 
-  it("011-E40 la lista de permisos sale del servidor: veintiuno (Administrar sesiones se unió a Administrar usuarios: decisión 100), con «Ver procesos» y «Dibujar procesos» en Negocio, cada uno con su parte, nombre y explicación", async () => {
+  it("011-E40 la lista de permisos sale del servidor: veintidós (Administrar sesiones se unió a Administrar usuarios: decisión 100; Administrar el sistema, specs/020), con «Ver procesos» y «Dibujar procesos» en Negocio, cada uno con su parte, nombre y explicación", async () => {
     const r = await pedir(app, "GET", "/permisos", { rol: "admin" });
     const lista = (await r.json()) as { clave: string; parte: string; nombre: string; detalle: string }[];
-    expect(lista).toHaveLength(21);
+    expect(lista).toHaveLength(22);
     expect(lista.filter((p) => p.clave.startsWith("procesos.")).map((p) => [p.parte, p.nombre])).toEqual([["Negocio", "Ver procesos"], ["Negocio", "Dibujar procesos"]]);
     expect(lista.every((p) => p.clave && p.parte && p.nombre && p.detalle)).toBe(true);
     expect(new Set(lista.map((p) => p.parte))).toEqual(new Set(["Vender", "Catálogo", "Depósito", "Negocio", "Administración"]));
@@ -60,6 +60,16 @@ describe("roles", () => {
     expect(base.actual.sqlDe(/INSERT INTO rol_permiso/)[0]!.params).toEqual([ROL, ["ventas.ver"]]);
   });
 
+  it("020: un cambio no puede dejar al sistema sin nadie con «Administrar el sistema»; no hace falta que sea quien administra usuarios y roles", async () => {
+    base.actual.programar(/AS n FROM usuario u\s+JOIN usuario_rol/, { rows: [{ n: 0 }] });
+    const r = await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["admin.usuarios", "admin.roles"] } });
+    expect(r.status).toBe(409);
+    expect(((await r.json()) as { error: string }).error).toContain("sin nadie que pueda administrar el sistema");
+    // Quien administra usuarios y roles sin el permiso nuevo sigue pudiendo cambiar roles, si otro lo tiene.
+    base.actual.programar(/AS n FROM usuario u\s+JOIN usuario_rol/, { rows: [{ n: 1 }] });
+    expect((await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["admin.usuarios", "admin.roles"] } })).status).toBe(204);
+  });
+
   it("un cambio de permisos no puede dejar al sistema sin quien administre, ni a quien lo hace", async () => {
     administran();
     const r = await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["ventas.ver"] } });
@@ -94,6 +104,7 @@ describe("permisos por operación", () => {
     ["GET", "/auditoria", "Ver quién hizo qué"], ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver las ventas del negocio"],
     ["GET", "/usuarios", "Administrar usuarios"], ["GET", "/sesiones", "Administrar usuarios"], ["GET", "/roles", "Administrar roles"],
     ["PATCH", "/productos/p1", "Fijar márgenes"],
+    ["GET", "/sistema/ajustes", "Administrar el sistema"], ["PUT", "/sistema/ajustes", "Administrar el sistema"], ["PUT", "/puestos/configuracion", "Administrar el sistema"],
   ];
   it("sin el permiso, 403 diciendo cuál hace falta, y la sesión sigue", async () => {
     for (const [metodo, ruta, permiso] of PROHIBIDO_AL_QUE_SOLO_VENDE) {

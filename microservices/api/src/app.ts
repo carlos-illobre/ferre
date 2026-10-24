@@ -25,6 +25,7 @@ import { anomalias } from "./rutas/anomalias.js";
 import { permisos, roles } from "./rutas/roles.js";
 import { procesos } from "./rutas/procesos.js";
 import { apartados } from "./rutas/apartados.js";
+import { sistema } from "./rutas/sistema.js";
 
 export const app = new Hono();
 
@@ -71,6 +72,7 @@ app.route("/roles", roles);
 app.route("/permisos", permisos);
 app.route("/procesos", procesos);
 app.route("/apartados", apartados);
+app.route("/sistema", sistema);
 
 app.onError((error, c) => {
   console.error(error);

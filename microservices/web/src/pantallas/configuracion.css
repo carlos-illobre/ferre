@@ -31,3 +31,18 @@
 .cfg-barra { display: block; height: 8px; margin: 4px 0 8px; border-radius: 999px; background: var(--p-relleno, #dfe5e0); overflow: hidden; }
 .cfg-barra i { display: block; height: 100%; background: var(--p-ok, #0f8a5f); border-radius: 999px; transition: width 0.2s ease-out; }
 
+/* Más → Sistema (specs/020): los mismos renglones, con tramos o un número. */
+.cfg-sistema { grid-template-columns: 1fr; }
+.cfg-sistema .cfg-tramos { max-width: 560px; }
+.cfg-tramos.apagados button { opacity: .5; cursor: not-allowed; }
+.cfg-numero { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.cfg-numero input { width: 88px; min-height: 44px; padding: 0 12px; border: 1.5px solid var(--p-borde, #c3cfc6); border-radius: 12px; font: inherit; font-size: 1.0625rem; font-weight: 700; text-align: center; background: var(--p-superficie, #fff); color: var(--p-tinta, #18201e); }
+.cfg-numero .paso { width: 44px; min-height: 44px; border: 1.5px solid var(--p-borde, #c3cfc6); border-radius: 12px; background: var(--p-superficie, #fff); font: inherit; font-size: 1.25rem; font-weight: 700; color: var(--p-tinta, #18201e); cursor: pointer; }
+.cfg-numero .paso:disabled, .cfg-numero input:disabled { opacity: .5; cursor: not-allowed; }
+.cfg-numero .unidad { font-weight: 600; color: var(--p-texto-2, #3a4441); }
+.cfg-numero .rango { color: var(--p-texto-2, #4a5451); font-size: 0.9375rem; }
+.cfg-numero.cfg-mal input { border-color: var(--p-naranja-texto-fuerte); box-shadow: 0 0 0 1px var(--p-naranja-texto-fuerte); }
+.cfg-error { flex-basis: 100%; color: var(--p-naranja-texto-fuerte); font-weight: 600; }
+.cfg-hecho { color: var(--p-verde-texto, #0f6b52); font-weight: 600; }
+.cfg-sin-red { max-width: 640px; margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--p-amarillo-suave); color: var(--p-tinta, #18201e); font-weight: 600; }
+.cfg-rechazo { background: var(--p-naranja-suave); }

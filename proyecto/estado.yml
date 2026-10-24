@@ -1490,16 +1490,25 @@ RNF-62:
   defectos: []
 
 RF-133:
-  estado: "Nuevo (020): especificación aprobada; falta la maqueta"
-  pruebas: []
+  estado: "A validar (020): programado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/api/src/acceso/sesion-recordada.test.ts
+    - microservices/api/src/rutas/sistema.test.ts
   defectos: []
 
 RF-134:
-  estado: "Nuevo (020): especificación aprobada; falta la maqueta"
-  pruebas: []
+  estado: "A validar (020): programado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
+    - microservices/api/src/rutas/sistema.test.ts
   defectos: []
 
 RF-135:
-  estado: "Nuevo (020): especificación aprobada; falta la maqueta"
-  pruebas: []
-  defectos: []
+  estado: "A validar (020): programado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/pantallas/Sistema.test.tsx
+    - microservices/web/src/pantallas/compu/base/pantallas/Actividad.test.tsx
+    - microservices/api/src/rutas/sistema.test.ts
+    - microservices/api/src/rutas/roles.test.ts
+  defectos:
+    - "Guardar varios ajustes en un mismo pedido no es todo o nada: si fallan los días, los tiempos ya quedaron (la pantalla manda uno por vez; revisión de 020, D5)"
