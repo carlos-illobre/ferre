@@ -37,8 +37,7 @@ import { Sistema } from "../Sistema";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../pestanas-de-negocio";
 import { ComoVaElNegocio, SUB_DE_SECCION } from "./ComoVaElNegocio";
 import { NOMBRES, TEXTOS } from "../textos";
-import { Anomalias } from "../Anomalias";
-import { ParaRevisar } from "../ParaRevisar";
+import { AnotadasCelu, ParaRevisarCelu } from "./pantallas/Anomalias";
 import { CabezaDeAnomalias } from "./CabezaDeAnomalias";
 import { PESTANAS_DE_ANOMALIAS, PIDE_LAS_ANOMALIAS } from "../pestanas-de-anomalias";
 import { ParteVender } from "./Vender";
@@ -228,8 +227,8 @@ function Pantallas() {
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />
         : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeUsuarios actual="roles" />} />
         : pestana === "mas" && deUsuarios ? <Negocio parte={deUsuarios.valor as Exclude<typeof deUsuarios.valor, "roles">} cabeza={<CabezaDeUsuarios actual={deUsuarios.valor} />} />
-        : pestana === "mas" && deAnomalias?.valor === "para-revisar" ? <ParaRevisar cabeza={<CabezaDeAnomalias actual="para-revisar" />} />
-        : pestana === "mas" && parte === "anomalias" ? <Anomalias cabeza={<CabezaDeAnomalias actual="anomalias" />} />
+        : pestana === "mas" && deAnomalias?.valor === "para-revisar" ? <ParaRevisarCelu cabeza={<CabezaDeAnomalias actual="para-revisar" />} />
+        : pestana === "mas" && parte === "anomalias" ? <AnotadasCelu cabeza={<CabezaDeAnomalias actual="anomalias" />} />
         : pestana === "mas" && deNegocio ? <ComoVaElNegocio seccion={deNegocio.valor} />
         : pestana === "mas" && parte && parte !== "tickets" && parte !== "anomalias" && parte !== "configuracion" && parte !== "sistema" && parte !== "procesos" && parte !== "negocio" ? <Negocio parte={parte} />
         : pestana === "mas" ? (

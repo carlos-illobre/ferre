@@ -19,3 +19,9 @@ pruebas de las pantallas quedan en pausa en el CI y se arreglan todas juntas al 
 
 Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con «—» (E02). Una línea por cosa, con la pantalla.
 
+
+- Anomalías → Para revisar (computadora y celular): el stock de antes y de después de cada producto de una venta apartada («9 → 8 un.», «queda 8», «no hay») y el aviso de que al aceptarla se anota una anomalía por falta de stock.
+- Anomalías → Para revisar (computadora): la pastilla de cada persona dice «Sin acceso»; la v2 dice «Desactivada» o «Desactivado», que pide saber cómo se nombra cada persona.
+- Anomalías → Anotadas (computadora): «Contados después» (cuántos de los productos con anomalías se contaron después) y su barra.
+- Anomalías → Anotadas (computadora y celular): el botón «Contar» de cada producto, con su hoja para contarlo, y la marca «Contado hoy».
+- Anomalías → Anotadas (computadora y celular): el estante de cada producto («Est. A-03-12») y la hoja de cada producto con las veces que faltó.

@@ -1,0 +1,97 @@
+/* Las piezas de la v2 («Mostrador», docs/lenguaje-mostrador/) para las pantallas de Más: Anomalías,
+   Procesos, Mejoras y errores y Configuración, en el celular y en la computadora. Los valores son los
+   de las maquetas del director de arte; todo cuelga de `.mv2` para no pisar las piezas de cada
+   interfaz. Los neutros son los grises de «Mostrador», sin fondos verdosos (decisión 143). */
+.mv2 {
+  --v-fondo: #F4F2EC; --v-hundido: #ECE9E1; --v-hundido-2: #E3DFD5; --v-superficie: #FFFFFF;
+  --v-borde: #E6E2D8; --v-borde-fuerte: #CEC8BA; --v-tinta: #1A1D1B; --v-texto-2: #545955; --v-texto-3: #6B706B;
+  --v-pino: #12382F; --v-pino-2: #1D4B40; --v-pino-suave: #E3EEE8; --v-pino-texto: #17614E;
+  --v-accion: #E8541C; --v-accion-fuerte: #C8450F; --v-accion-suave: #FDEDE4; --v-accion-texto: #B23E0E;
+  --v-urgente: #F0A20F; --v-urgente-suave: #FFF3D8; --v-urgente-texto: #845400;
+  --v-error: #D7372A; --v-error-suave: #FCEAE7; --v-error-texto: #AE281D;
+  --v-logro: #1E9E62; --v-logro-suave: #E2F4EA; --v-logro-texto: #11764A;
+  --v-mp: #0A72C2; --v-mp-suave: #E3F0FA;
+  --v-sombra-1: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03);
+  --v-sombra-2: 0 6px 20px -8px rgba(26, 29, 27, .14), 0 1px 3px rgba(26, 29, 27, .06);
+  --v-sombra-accion: 0 8px 20px -8px rgba(232, 84, 28, .55);
+  --v-curva: cubic-bezier(.2, .8, .2, 1);
+  color: var(--v-tinta); font-feature-settings: "tnum" 1;
+}
+body:has(.mv2), .cuerpo:has(.mv2) { background: #F4F2EC; }
+.mv2 *, .mv2 *::before, .mv2 *::after { box-sizing: border-box; }
+.mv2 p, .mv2 h1, .mv2 h2, .mv2 h3, .mv2 h4 { margin: 0; }
+.mv2 :focus-visible { outline: 3px solid var(--v-pino-texto); outline-offset: 2px; }
+
+.mv-peso { font-size: max(14px, .62em); font-weight: 700; vertical-align: .32em; margin-right: .08em; }
+.mv-detalle { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--v-texto-2); }
+.mv-etiqueta { font-size: 14px; line-height: 18px; font-weight: 650; color: var(--v-texto-2); }
+.mv-seccion { font-size: 20px; line-height: 26px; font-weight: 750; letter-spacing: -.01em; }
+.mv-numero { font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -.02em; }
+
+.mv-tarjeta { background: var(--v-superficie); border: 1px solid var(--v-borde); border-radius: 16px; box-shadow: var(--v-sombra-1); }
+.mv-tarjeta-2 { background: var(--v-superficie); border: 1px solid var(--v-borde); border-radius: 16px; box-shadow: var(--v-sombra-2); }
+
+/* Tarjeta de resumen: ícono en un círculo, etiqueta y número. */
+.mv-resumen { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 16px; background: var(--v-superficie); border: 1px solid var(--v-borde); box-shadow: var(--v-sombra-1); min-width: 0; }
+.mv-resumen .ico { width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; background: var(--v-pino-suave); color: var(--v-pino-texto); flex: none; }
+.mv-resumen .et { font-size: 14px; line-height: 18px; color: var(--v-texto-2); font-weight: 600; }
+.mv-resumen .va { font-size: 22px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mv-resumen > div { min-width: 0; flex: 1; }
+.mv-resumen.urgente { background: var(--v-urgente-suave); border-color: transparent; }
+.mv-resumen.urgente .ico { background: #fff; color: var(--v-urgente-texto); }
+.mv-resumen.urgente .va { color: var(--v-urgente-texto); }
+.mv-barra { height: 6px; border-radius: 99px; background: var(--v-hundido-2); overflow: hidden; margin-top: 6px; }
+.mv-barra > b { display: block; height: 100%; border-radius: 99px; background: var(--v-logro); }
+
+/* Botones */
+.mv-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--v-borde-fuerte); background: var(--v-superficie); color: var(--v-tinta); font: inherit; font-weight: 700; font-size: 16px; box-shadow: var(--v-sombra-1); white-space: nowrap; cursor: pointer; transition: transform 120ms var(--v-curva), background 120ms; }
+.mv-btn:active:not(:disabled) { transform: scale(.97); }
+.mv-btn.chico { min-height: 36px; padding: 0 12px; font-size: 14px; border-radius: 10px; }
+.mv-btn.grande { min-height: 56px; padding: 0 24px; font-size: 18px; border-radius: 14px; }
+.mv-btn.accion { background: var(--v-accion); border-color: var(--v-accion); color: #fff; box-shadow: var(--v-sombra-accion); }
+.mv-btn.accion:active:not(:disabled) { background: var(--v-accion-fuerte); }
+.mv-btn.oscuro { background: var(--v-pino); border-color: var(--v-pino); color: #fff; box-shadow: var(--v-sombra-2); }
+.mv-btn.suave { background: var(--v-hundido); border-color: transparent; box-shadow: none; }
+.mv-btn.fantasma { background: transparent; border-color: transparent; box-shadow: none; color: var(--v-texto-2); }
+.mv-btn.peligro { background: var(--v-error-suave); border-color: transparent; box-shadow: none; color: var(--v-error-texto); }
+.mv-btn:disabled { opacity: .45; box-shadow: none; cursor: not-allowed; }
+.mv-kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--v-borde-fuerte); border-bottom-width: 2px; background: var(--v-superficie); color: var(--v-texto-2); font-size: 14px; line-height: 1; font-weight: 700; font-family: inherit; }
+.mv-btn.accion .mv-kbd, .mv-btn.oscuro .mv-kbd { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .35); color: #fff; }
+
+/* Pastillas */
+.mv-pastilla { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; font-size: 14px; font-weight: 650; background: var(--v-hundido); color: var(--v-texto-2); white-space: nowrap; }
+.mv-pastilla.logro { background: var(--v-logro-suave); color: var(--v-logro-texto); }
+.mv-pastilla.urgente { background: var(--v-urgente-suave); color: var(--v-urgente-texto); }
+.mv-pastilla.error { background: var(--v-error-suave); color: var(--v-error-texto); }
+.mv-pastilla.pino { background: var(--v-pino-suave); color: var(--v-pino-texto); }
+.mv-pastilla.accion { background: var(--v-accion-suave); color: var(--v-accion-texto); }
+.mv-pastilla.contorno { background: var(--v-superficie); border: 1px solid var(--v-borde); }
+.mv-pastilla .punto { width: 8px; height: 8px; border-radius: 99px; background: currentColor; }
+
+/* Avisos */
+.mv-aviso { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 20px; font-weight: 600; }
+.mv-aviso > svg { flex: none; margin-top: 2px; }
+.mv-aviso.urgente { background: var(--v-urgente-suave); color: var(--v-urgente-texto); }
+.mv-aviso.error { background: var(--v-error-suave); color: var(--v-error-texto); }
+.mv-aviso.logro { background: var(--v-logro-suave); color: var(--v-logro-texto); }
+.mv-aviso.pino { background: var(--v-pino-suave); color: var(--v-pino-texto); }
+
+/* Dato: etiqueta chica arriba y número abajo, teñido por su significado. */
+.mv-dato { display: grid; gap: 2px; padding: 6px 12px; border-radius: 12px; background: var(--v-hundido); min-width: 88px; }
+.mv-dato .et { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--v-texto-2); }
+.mv-dato .va { font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; }
+.mv-dato.error { background: var(--v-error-suave); } .mv-dato.error .va { color: var(--v-error-texto); }
+.mv-dato.urgente { background: var(--v-urgente-suave); } .mv-dato.urgente .va { color: var(--v-urgente-texto); }
+.mv-dato.logro { background: var(--v-logro-suave); } .mv-dato.logro .va { color: var(--v-logro-texto); }
+
+.mv-avatar { width: 32px; height: 32px; border-radius: 99px; background: var(--v-hundido-2); color: var(--v-texto-2); display: grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; }
+
+/* Foto de producto: recortada, sobre el azulejo hundido. */
+.mv-foto { width: 48px; height: 48px; border-radius: 12px; background: var(--v-hundido); display: grid; place-items: center; overflow: hidden; flex: none; color: var(--v-texto-3); }
+.mv-foto img { width: 86%; height: 86%; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(26, 29, 27, .18)); }
+
+/* Vacío: el tilde verde y qué pasa. */
+.mv-vacio { display: grid; justify-items: center; align-content: center; gap: 8px; text-align: center; padding: 32px 16px; color: var(--v-texto-2); font-size: 15px; }
+.mv-vacio .tilde { width: 64px; height: 64px; border-radius: 99px; background: var(--v-logro-suave); color: var(--v-logro-texto); display: grid; place-items: center; }
+.mv-vacio b { color: var(--v-tinta); font-size: 18px; font-weight: 800; }
+.mv-cargando { padding: 24px; color: var(--v-texto-2); font-size: 15px; }

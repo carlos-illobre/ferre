@@ -406,3 +406,25 @@ tablero, un resumen: cuánto toca contar y el acceso.
 **Estados:** vacío sin datos para clasificar (explica que el plan necesita ventas y stock
 cargados); al día («No toca contar nada» y cuándo es lo próximo); cargando; sin conexión (se
 ve el último plan bajado).
+
+## Más → Anomalías → «Anotadas», como la v2 (Carlos, 2026-10-24, decisión 148)
+
+Se ve como la v2 del director de arte (variante 1 de las maquetas de Anomalías, que en
+«Anotadas» trae el «Qué hay que contar» de la variante 2), con el lenguaje «Mostrador». Lo de
+«Para revisar» está en [specs/014-cambios-apartados/ux.md](../014-cambios-apartados/ux.md).
+
+- **Computadora.** Arriba, cuatro tarjetas: «Esta semana» (cuántas anomalías), «Faltaron» (lo que
+  faltó, sumado por unidad), «Contados después» y «La que más se repite» (el producto, en ámbar).
+  Debajo, a la izquierda, «Qué hay que contar»: un renglón por producto con anomalías esta semana,
+  con la foto, el nombre, cuántas veces, cuándo fue la última, y a la derecha «Faltó» o «Faltaron»
+  con la cantidad y su unidad, en rojo. A la derecha, el «Registro» con el candado y la pastilla
+  «No se edita ni se borra»: cada anomalía de la más nueva a la más vieja, agrupada por día, con la
+  hora, el producto y qué pasó (cuánto se vendió, cuánto había, cuánto faltó y quién estaba). Al pie
+  del registro, «Más nuevas» y «Más viejas» cuando hay más de una página.
+- **Celular.** Arriba, una línea: cuántas esta semana y lo que faltó. Después, un renglón por
+  producto (la foto, el nombre, cuántas veces y «−» lo que faltó, en rojo) y al final «Registro: no se
+  edita ni se borra ›», que abre en una hoja el registro entero, de la más nueva a la más vieja.
+- **Lo que la v2 muestra y todavía no se sabe** queda vacío o con «—» (E02 de 021): «Contados
+  después», el estante de cada producto, el botón «Contar» y la marca «Contado hoy» de cada
+  renglón. Los números de la semana se calculan solo si la primera página del registro alcanza para
+  cubrir los siete días; si no, también van con «—».

@@ -53,8 +53,7 @@ import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { Roles } from "../Roles";
 import { Tickets } from "../Tickets";
-import { Anomalias } from "../Anomalias";
-import { ParaRevisar } from "../ParaRevisar";
+import { Anotadas, ParaRevisar } from "./base/pantallas/Anomalias";
 import { PESTANAS_DE_ANOMALIAS } from "../pestanas-de-anomalias";
 import { useParaRevisar } from "../../negocio/apartados";
 import "./base/estilos/base.css";
@@ -454,7 +453,7 @@ function Pantallas() {
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />
           : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? <Usuarios />
-          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion propio={<><MisCelulares /><VinculoPropio /></>} /> : actual === "sistema" ? <Sistema /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anomalias cabeza={pestanas ? null : undefined} /> : actual === "para-revisar" ? <ParaRevisar cabeza={pestanas ? null : <h1>Anomalías</h1>} /> : <Vender />}
+          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion propio={<><MisCelulares /><VinculoPropio /></>} /> : actual === "sistema" ? <Sistema /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anotadas titulo={!pestanas} /> : actual === "para-revisar" ? <ParaRevisar titulo={!pestanas} /> : <Vender />}
       </div>
     </div>
   );
