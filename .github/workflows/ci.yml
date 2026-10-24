@@ -29,6 +29,8 @@ jobs:
       # Unitarias de la librería de precios, la API (rutas contra una base simulada), el
       # cliente web (pantallas sobre jsdom) y Procesos: la red de seguridad de cada push.
       - run: pnpm test
+        # Rediseño como la v2 (specs/021, decisión 148): las pruebas de las pantallas, en pausa hasta el final.
+        env: { PANTALLAS_EN_PAUSA: "1" }
 
   listas-de-proveedores:
     runs-on: ubuntu-latest

@@ -1208,3 +1208,19 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      recordarla, 30 segundos, 1, 5 o 10 minutos; el celular emparejado: 5 o 30 segundos, 1, 5 o
      10 minutos, los mismos tramos en el celular y la computadora. Los días del vínculo se
      escriben, con − y +, de 1 a 365 (specs/020).
+148. **Toda la aplicación como la v2** (2026-10-24). Carlos: «quiero que modifiques todas las
+     pantallas excepto la del login y las del tutorial, para que se vean iguales a v2, tienen que
+     tener exactamente el mismo diseño que v2». Las maquetas no se borran (después se agregan
+     detalles de la v3 y la v4). Respuestas a lo que chocaba (specs/021):
+     - Lo que ya eligió distinto de la v2 (el cobro deslizable, las pastillas de medio de pago de la
+       v4, el cobro redondeado, la cuenta corriente en rojo, la unidad con cada cantidad, el
+       calendario de «Otro día», el menú que se achica, el panel y la boleta de Vender en la
+       computadora) se mantiene.
+     - Lo que la v2 muestra y el sistema no hace se copia igual: el lugar queda vacío o con «—»
+       hasta que se programe.
+     - Las pantallas que la v2 no dibujó (Más, Ingreso, Pedidos, Sistema y Vincular): el director de
+       arte las diseña en sus tres versiones, como maquetas.
+     - Se hace con varias sesiones a la vez, que no escriben ni corren pruebas, para no gastar; las
+       pruebas las arma al final una sola sesión, todas juntas. Mientras tanto las pruebas de las
+       pantallas no corren en el CI (como en la decisión 25), para que cada subida se siga
+       desplegando en el ambiente de pruebas.
