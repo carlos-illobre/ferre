@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { VERSION_DE_PRECIOS } from "./precios.js";
 import { config } from "./config.js";
+import { baseResponde } from "./persistencia/conexion.js";
 import { iniciada as copiaIniciada, ponerAlDia } from "./productos/copia.js";
 import { sesiones } from "./rutas/sesiones.js";
 import { usuarios } from "./rutas/usuarios.js";
@@ -31,10 +32,13 @@ export const app = new Hono();
 // El cliente web vive en otro origen (ADR-010): solo ese origen puede llamar desde el navegador.
 app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders: ["Authorization", "Content-Type"] }));
 
-// Dice que el proceso anda y su versión, sin consultar la base (specs/018, RF-125): el compose lo
-// pregunta cada 10 segundos y cada consulta así llenaba los registros de la base. El arranque
-// ya espera a la base y aplica las migraciones antes de escuchar.
-app.get("/health", (c) => c.json({ ok: true, version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_DE_PRECIOS }));
+// Dice si el proceso anda, si la base responde y qué versión es (022-E05): el compose no da por
+// sano al servidor mientras la base no responda. La base está en la misma máquina: consultarla
+// cada 10 segundos no cuesta nada (ADR-026; antes no se hacía por el plan de Supabase, ADR-023).
+app.get("/health", async (c) => {
+  const db = await baseResponde();
+  return c.json({ ok: db, db: db ? "ok" : "sin-respuesta", version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_DE_PRECIOS }, db ? 200 : 503);
+});
 
 // Quien cambia el catálogo lo ve en su pedido siguiente (specs/018, RF-124): antes de contestar, la
 // copia del servidor lee lo que cambió. Los demás lo ven cuando llega el aviso de la base.

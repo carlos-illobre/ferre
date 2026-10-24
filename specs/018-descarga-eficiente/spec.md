@@ -128,10 +128,10 @@ ni abre conexiones nuevas.
 
 **Acceptance Scenarios**:
 
-1. **E20** **Given** el servidor andando y sin uso, **When** pasa una hora, **Then** no hizo ninguna consulta a la base ni abrió ninguna conexión nueva.
-2. **E21** **Given** el servidor andando, **When** se mira su salud, **Then** dice que anda y qué versión es, sin consultar la base; el despliegue sigue volviendo a la versión anterior si la nueva no arranca (RNF-13).
-3. **E22** **Given** la base no responde, **When** alguien usa la aplicación, **Then** el pedido falla con el aviso de siempre; la salud del servidor no lo dice.
-4. **E31** **Given** el servidor andando y nadie usando la aplicación, **When** pasan días, **Then** consulta la base una vez por día, para que Supabase no la pause a los 7 días sin uso; arrancar también cuenta como una consulta.
+1. **E20** Reemplazado por 022-E05 (2026-10-24): la salud consulta la base. Decía: el servidor andando y sin uso no hace ninguna consulta a la base en una hora.
+2. **E21** Reemplazado por 022-E05: la salud dice que anda, qué versión es y si la base responde; el despliegue sigue volviendo a la versión anterior si la nueva no arranca (RNF-13).
+3. **E22** Reemplazado por 022-E05: con la base sin responder, la salud lo dice. El pedido sigue fallando con el aviso de siempre.
+4. **E31** Retirado por 022 (2026-10-24): sin Supabase no hay pausa por falta de uso. Decía: una consulta por día para que Supabase no pause la base.
 
 ---
 
@@ -205,9 +205,12 @@ Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html`, apr
   responde desde ahí. La copia se pone al día sola cuando la base cambia, leyendo
   solo lo que cambió, y al arrancar parte de la que guardó en su disco. Las ventas, el stock y lo
   demás que varía se leen de la base.
-- **RF-125**: Ver si el servidor anda no consulta la base. Nada de lo que corre solo, a ritmo
-  fijo, consulta la base ni abre conexiones nuevas, salvo una consulta por día para que Supabase no
-  pause la base por falta de uso (Carlos, 2026-10-20).
+- **RF-125**: Ver si el servidor anda dice también si la base responde. Cambiado por
+  `022-base-de-datos-propia` (2026-10-24, decisión 151): la base dejó Supabase y está en la misma
+  máquina, así que consultarla no gasta ningún plan y no hace falta la consulta diaria contra la
+  pausa. Decía: ver si el servidor anda no consulta la base; nada de lo que corre solo, a ritmo
+  fijo, consulta la base ni abre conexiones nuevas, salvo una consulta por día para que Supabase
+  no pause la base por falta de uso (Carlos, 2026-10-20).
 
 ### Non-Functional Requirements
 

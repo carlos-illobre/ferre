@@ -1420,7 +1420,7 @@ RF-124:
   defectos: []
 
 RF-125:
-  estado: "Hecho (018-T002, 018-T012): la salud del servidor no consulta la base; una consulta por día evita que Supabase la pause"
+  estado: "Hecho (022-T007): la salud del servidor dice si la base responde (cambiado por 022); sin Supabase no hay consulta diaria"
   pruebas:
     - microservices/api/src/salud.test.ts
   defectos: []

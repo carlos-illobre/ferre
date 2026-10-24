@@ -5,21 +5,21 @@ const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof im
 vi.mock("./persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("./app.js");
 
-// La salud del servidor (specs/018, RF-125): el compose la pregunta cada 10 segundos.
+// La salud del servidor (022-E05): el compose la pregunta cada 10 segundos.
 describe("GET /health", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
-  it("018-E20 018-E21: dice que anda y su versión sin consultar la base", async () => {
-    for (let i = 0; i < 5; i++) {
-      const r = await app.request("/health");
-      expect(r.status).toBe(200);
-      expect(await r.json()).toMatchObject({ ok: true, version: expect.any(String), calculoDePrecios: expect.any(String) });
-    }
-    expect(base.actual.consultas).toHaveLength(0);
+  it("022-E05: dice que anda, que la base responde y su versión", async () => {
+    const r = await app.request("/health");
+    expect(r.status).toBe(200);
+    expect(await r.json()).toMatchObject({ ok: true, db: "ok", version: expect.any(String), calculoDePrecios: expect.any(String) });
+    expect(base.actual.sqlDe(/SELECT 1/)).toHaveLength(1);
   });
 
-  it("018-E22: con la base caída sigue diciendo que el proceso anda", async () => {
-    base.actual.pool.query = vi.fn(async () => { throw new Error("la base no responde"); }) as never;
-    expect((await app.request("/health")).status).toBe(200);
+  it("022-E05: con la base caída dice que la base no responde, y el servidor no figura sano", async () => {
+    base.actual.pool.connect = vi.fn(async () => { throw new Error("la base no responde"); }) as never;
+    const r = await app.request("/health");
+    expect(r.status).toBe(503);
+    expect(await r.json()).toMatchObject({ ok: false, db: "sin-respuesta" });
   });
 });
