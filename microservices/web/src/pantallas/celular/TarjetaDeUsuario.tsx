@@ -3,6 +3,8 @@ import { ElegirRoles, type RolAsignable } from "../RolesDeUsuario";
 import { type Acceso, type CelularDeOtroFila, type SesionFila } from "../../negocio/usuarios";
 import { fecha } from "../../formato";
 import { TEXTOS } from "../textos";
+import { IconoN, Iniciales, iconoDeRol as iconoV2 } from "../iconos-de-negocio";
+import "./usuarios.css";
 
 // Los íconos de cada rol (007-T032); un rol que armó el negocio lleva el escudo de los roles.
 const TRAZOS_DE_ROL: Record<string, string> = {
@@ -16,15 +18,14 @@ const TRAZO_DE_OTRO_ROL = "M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z";
 const trazo = (props: { d: string; tam?: number; grosor?: number }) => (
   <svg width={props.tam ?? 16} height={props.tam ?? 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={props.grosor ?? 2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={props.d} /></svg>
 );
-const COLORES = ["verde", "naranja", "amarillo", "azul"] as const;
-const iniciales = (nombre: string) => nombre.trim().split(/\s+/).map((p) => p[0] ?? "").slice(0, 2).join("").toUpperCase();
 const ICONOS = {
   correo: "M3 6h18v12H3zM3 7l9 6 9-6",
   calendario: "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 10h18M8 3v4M16 3v4",
   persona: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
   sesiones: "M3 5.5A1.5 1.5 0 0 1 4.5 4h10A1.5 1.5 0 0 1 16 5.5V14H3zM7 18h5M18 9h3v11h-5v-3",
 };
-export const iconoDeRol = (nombre: string, tam = 14) => trazo({ d: TRAZOS_DE_ROL[nombre] ?? TRAZO_DE_OTRO_ROL, tam });
+// Como la v2 (decisión 148): el ícono de Lucide de cada rol, el mismo que en la computadora.
+export const iconoDeRol = (nombre: string, tam = 16) => <IconoN nombre={iconoV2(nombre)} tam={tam} />;
 const Rol = ({ r }: { r: RolAsignable }) => <li className={r.nombre === "Administrador" ? "admin" : ""}>{iconoDeRol(r.nombre)}{r.nombre}</li>;
 
 export type Persona = { id: string; nombre: string; email: string; activo: boolean; creado_en?: string; roles?: RolAsignable[] };
@@ -34,12 +35,13 @@ type Pestana = "info" | "roles" | "sesiones";
 // iniciales, el nombre con su estado, el correo y los roles que entran en una línea. Al tocarla se
 // abre, siempre en «Información» (el correo, cuándo se unió y «Desactivar»), con las pestañas
 // «Roles» (todos, con «Cambiar roles») y «Sesiones» (sus sesiones y celulares con huella).
-export function TarjetaDeUsuario({ persona: u, orden, disponibles, alCambiarRoles, alActivar, acceso }: {
-  persona: Persona; orden: number; disponibles: RolAsignable[];
+export function TarjetaDeUsuario({ persona: u, disponibles, alCambiarRoles, alActivar, acceso, esVos }: {
+  persona: Persona; orden: number; disponibles: RolAsignable[]; esVos?: boolean;
   alCambiarRoles: (ids: string[]) => Promise<string | null>; alActivar: () => void;
   acceso?: Acceso & { alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void };
 }) {
-  const actuales = u.roles ?? [];
+  // El Administrador primero, como la v2.
+  const actuales = [...(u.roles ?? [])].sort((x, y) => Number(y.nombre === "Administrador") - Number(x.nombre === "Administrador"));
   const [abierta, setAbierta] = useState(false);
   const [pestana, setPestana] = useState<Pestana>("info");
   const [cambiando, setCambiando] = useState(false);
@@ -62,25 +64,25 @@ export function TarjetaDeUsuario({ persona: u, orden, disponibles, alCambiarRole
   const pestanas: [Pestana, string, string][] = [
     ["info", t.informacion.corto, ICONOS.persona],
     ["roles", t.roles.corto, TRAZO_DE_OTRO_ROL],
-    ["sesiones", `${t.sesiones.corto} (${cuantosAccesos})`, ICONOS.sesiones],
+    ["sesiones", `${t.acceso.corto} (${cuantosAccesos})`, ICONOS.sesiones],
   ];
   return (
     <article className={`ut ${u.activo ? "" : "apagada"} ${abierta ? "abierta" : ""}`} data-testid="usuario-fila">
       <button type="button" className="ut-arriba" aria-expanded={abierta} onClick={abrirOCerrar} data-testid="abrir-usuario">
-        <span className={`ut-avatar ${COLORES[orden % COLORES.length]}`} aria-hidden="true">{iniciales(u.nombre)}</span>
+        <Iniciales nombre={u.nombre} clave={u.email} apagado={!u.activo} />
         <span className="ut-quien">
-          <span className="ut-nombre"><strong>{u.nombre}</strong><span className={`ut-estado ${u.activo ? "si" : "no"}`}>{u.activo ? "Activo" : "Inactivo"}</span></span>
+          <span className="ut-nombre"><strong>{u.nombre}</strong>{esVos && <span className="ut-vos">Vos</span>}{!u.activo && <span className="ut-estado no">Inactivo</span>}</span>
           <span className="ut-correo">{u.email}</span>
           <RolesEnUnaLinea roles={actuales} nombre={u.nombre} />
         </span>
-        <span className="ut-flecha-abrir" aria-hidden="true">{trazo({ d: abierta ? "M6 15l6-6 6 6" : "M6 9l6 6 6-6", tam: 22 })}</span>
+        <span className="ut-flecha-abrir" aria-hidden="true"><IconoN nombre={abierta ? "chevron-up" : "chevron-down"} /></span>
       </button>
       {abierta && (
         <>
           <div className="ut-pestanas" role="tablist" aria-label={`Datos de ${u.nombre}`}>
-            {pestanas.map(([valor, nombre, icono]) => (
+            {pestanas.map(([valor, nombre]) => (
               <button key={valor} type="button" role="tab" aria-selected={pestana === valor} className={pestana === valor ? "si" : ""} onClick={() => setPestana(valor)} data-testid={`pestana-${valor}`}>
-                {trazo({ d: icono, tam: 18 })}{nombre}
+{nombre}
               </button>
             ))}
           </div>
@@ -171,25 +173,43 @@ function RolesEnUnaLinea({ roles, nombre }: { roles: RolAsignable[]; nombre: str
   );
 }
 
-// Sus sesiones y sus celulares con huella (decisión 100), con «Cerrar» o «Quitar».
-const ultimoUso = (iso: string | null) => (iso ? `usada ${new Date(iso).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}` : "todavía no se usó");
+// Sus sesiones y sus celulares con huella (decisión 100), como la v2: un renglón por aparato, con
+// su ícono, cuándo se usó y si entra con la huella. «Cerrar» cierra la sesión; si el aparato tiene
+// las dos cosas, «…» deja elegir entre cerrar la sesión y quitar la huella.
+const hace = (iso: string | null) => {
+  if (!iso) return "Todavía no se usó";
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
+  return min < 2 ? "Usándolo ahora" : min < 60 ? `Hace ${min} min` : min < 1440 ? `Hace ${Math.round(min / 60)} h` : `Usado el ${fecha(iso.slice(0, 10))}`;
+};
 function AccesoDeUsuario({ nombre, sesiones, celulares, alCerrarSesion, alQuitarCelular }: Acceso & { nombre: string; alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void }) {
+  const [menu, setMenu] = useState<string | null>(null);
+  const nombres = [...new Set([...sesiones.map((s) => s.dispositivo), ...celulares.map((c) => c.dispositivo ?? "Celular")])];
   return (
     <div className="ua-lista" data-testid="acceso-de-usuario">
-      {sesiones.length > 0 && <h4>Sesiones abiertas</h4>}
-      {sesiones.map((s) => (
-        <div key={s.id} className="ua-item" data-testid="sesion">
-          <span>{s.dispositivo}<small>{ultimoUso(s.ultimo_uso_en)}</small></span>
-          <button type="button" onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar</button>
-        </div>
-      ))}
-      {celulares.length > 0 && <h4>Celulares con huella</h4>}
-      {celulares.map((c) => (
-        <div key={c.id} className="ua-item" data-testid="celular-de-otro">
-          <span>{c.dispositivo ?? "celular"}<small>vinculado el {fecha(c.creada_en.slice(0, 10))} · {c.ultimo_uso_en ? `último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : "todavía no se usó"}</small></span>
-          <button type="button" onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar</button>
-        </div>
-      ))}
+      {nombres.map((n) => {
+        const s = sesiones.find((x) => x.dispositivo === n);
+        const c = celulares.find((x) => (x.dispositivo ?? "Celular") === n);
+        const esCelu = Boolean(c) || /celular|android|iphone|samsung|moto/i.test(n);
+        return (
+          <div key={n} className="ua-disp" data-testid={s ? "sesion" : "celular-de-otro"}>
+            <span className="ua-ico"><IconoN nombre={esCelu ? "smartphone" : "monitor"} /></span>
+            <span className="ua-texto"><b>{n}</b><small>{s ? hace(s.ultimo_uso_en) : c ? (c.ultimo_uso_en ? `Último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : `Vinculado el ${fecha(c.creada_en.slice(0, 10))}`) : ""}{c && <> · <IconoN nombre="fingerprint" tam={16} /> con huella</>}</small></span>
+            {s && c ? (
+              <button type="button" className="ua-boton icono" aria-expanded={menu === n} aria-label={`Qué hacer con ${n} de ${nombre}`} onClick={() => setMenu(menu === n ? null : n)}><IconoN nombre="ellipsis" tam={18} /></button>
+            ) : s ? (
+              <button type="button" className="ua-boton" onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar</button>
+            ) : c ? (
+              <button type="button" className="ua-boton" onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar</button>
+            ) : null}
+            {menu === n && s && c && (
+              <span className="ua-menu">
+                <button type="button" className="ua-boton" onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar la sesión</button>
+                <button type="button" className="ua-boton" onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar la huella</button>
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -198,9 +218,9 @@ function AccesoDeUsuario({ nombre, sesiones, celulares, alCerrarSesion, alQuitar
 export function AutorizarOtro({ alTocar }: { alTocar: () => void }) {
   return (
     <button type="button" className="ut-alta" onClick={alTocar} data-testid="autorizar">
-      <span className="ut-mas" aria-hidden="true">+</span>
-      <span><strong>{TEXTOS.usuarios.autorizarOtro.corto}</strong><small>{TEXTOS.usuarios.invitarAMas.corto}</small></span>
-      <span className="ut-alta-flecha" aria-hidden="true">{trazo({ d: "M9 6l6 6-6 6", tam: 20 })}</span>
+      <span className="ut-mas" aria-hidden="true"><IconoN nombre="user-plus" /></span>
+      <span><strong>{TEXTOS.usuarios.autorizarOtro.corto}</strong><small>{TEXTOS.usuarios.invitarAlguien.corto}</small></span>
+      <span className="ut-alta-flecha" aria-hidden="true"><IconoN nombre="chevron-right" /></span>
     </button>
   );
 }

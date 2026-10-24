@@ -168,6 +168,10 @@ export const TEXTOS = {
     sesiones: igual("Sesiones"),
     seUnio: igual("Se unió el"),
     sinSesiones: igual("No tiene sesiones abiertas ni celulares con huella."),
+    // La v2 (021, decisión 148).
+    acceso: igual("Acceso"),
+    invitarAlguien: { largo: "Con su correo de Google ya puede entrar. No hay contraseñas que crear.", corto: "Invitá a alguien de tu negocio" },
+    nombreOCorreo: { largo: "Buscá nombre o correo", corto: "Nombre o correo" },
   },
   configuracion: {
     // Más → Configuración: las preferencias del dispositivo y lo propio (decisión 99).

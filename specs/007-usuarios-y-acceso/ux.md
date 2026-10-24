@@ -321,6 +321,30 @@ al final.
   «Ordenar: correo».
 - Buscar, filtrar y ordenar no cambian nada guardado; al salir de la pantalla se pierden.
 
+### La pestaña Usuarios como la v2 (decisión 148, 2026-10-24)
+
+Tiene el diseño de la v2 del director de arte («Tabla y ficha» en la computadora, «Tarjetas» en el
+celular), con el lenguaje «Mostrador». Lo de arriba sigue valiendo en lo que hace; cambia cómo se ve:
+
+- **Computadora:** arriba, al lado de las pestañas, «Roles y permisos» (Alt R, con «Administrar
+  roles») y «Autorizar a alguien» (Alt N, naranja), que abre el alta en una hoja. Debajo, cuatro
+  números: activos de cuántos, sesiones abiertas, celulares con huella y «sin usar 30 días»
+  («—» hasta que se sepa). Después, el buscador «Buscá nombre o correo» (la tecla / lo enfoca), las
+  pastillas «Todos (N)» y «Activos (N)» y «Rol», que abre el panel de filtros (roles, estado y
+  orden). La lista es una persona por renglón, en tarjetas: las iniciales en un círculo de color,
+  el nombre (con «Vos») y el correo, sus roles como pastillas con ícono (el Administrador en
+  verde; los que no entran, «+N») y su acceso («2 · 1»: sesiones y huellas). Un desactivado va con
+  borde punteado y la pastilla «Inactivo». Con ↑ ↓ se recorre y la persona elegida se ve a la
+  derecha en su **ficha**: iniciales, nombre, correo y «Desde el dd/mm/aaaa»; sus roles con
+  «Cambiar» (R) y lo que permiten en palabras; sus sesiones abiertas con «Cerrar» y sus celulares
+  con huella con «Quitar»; abajo «Desactivar» o «Reactivar» y «Todo lo que hizo», que lleva a
+  «Quién hizo qué». La última acción de la persona y el punto verde de quien está conectado ahora
+  quedan vacíos hasta que se sepan.
+- **Celular:** el mismo diseño de tarjetas plegadas de arriba, con las piezas de la v2: el botón
+  naranja con el ícono de sumar persona, el buscador «Nombre o correo», «7 usuarios · 6 activos»
+  con «Ordenar» al lado, los roles con el ícono de la v2 y, al abrir una tarjeta, «Información»,
+  «Roles» y «Acceso (N)» con las sesiones y los celulares con huella en renglones de aparato.
+
 ## Historia 2: administrar usuarios
 
 **Quién:** quien tiene el permiso «Administrar usuarios».

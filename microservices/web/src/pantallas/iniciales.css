@@ -1,0 +1,10 @@
+/* Las iniciales de una persona (Usuarios y Quién hizo qué, la v2), iguales en las dos interfaces. */
+.iniciales { width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; flex: none; font-weight: 800; font-size: 14px; letter-spacing: .02em; position: relative; }
+.iniciales.s { width: 32px; height: 32px; }
+.iniciales.l { width: 56px; height: 56px; font-size: 18px; }
+.iniciales.t1 { background: var(--p-avatar-1); color: var(--p-avatar-1-texto); }
+.iniciales.t2 { background: var(--p-avatar-2); color: var(--p-avatar-2-texto); }
+.iniciales.t3 { background: var(--p-avatar-3); color: var(--p-avatar-3-texto); }
+.iniciales.t4 { background: var(--p-avatar-4); color: var(--p-avatar-4-texto); }
+.iniciales.t5 { background: var(--p-avatar-5); color: var(--p-avatar-5-texto); }
+.iniciales.apagado { background: var(--p-relleno); color: var(--p-texto-3); }

@@ -14,7 +14,9 @@ const trazo = (d: string, tam = 18) => (
 );
 const PERSONAS = "M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM22 19v-1a4 4 0 0 0-3-3.9M16 4.1a3 3 0 0 1 0 5.8";
 
-export function FiltroDeUsuarios<U extends Persona>({ filtro: f, roles }: { filtro: ReturnType<typeof useFiltroDeUsuarios<U>>; roles: RolAsignable[] }) {
+export function FiltroDeUsuarios<U extends Persona>({ filtro: f, roles, filas }: { filtro: ReturnType<typeof useFiltroDeUsuarios<U>>; roles: RolAsignable[]; filas?: U[] }) {
+  const total = filas?.length ?? 0;
+  const activos = filas?.filter((u) => u.activo).length ?? 0;
   const t = TEXTOS.usuarios;
   const [panel, setPanel] = useState<"filtros" | "ordenar" | null>(null);
   const alternar = (p: "filtros" | "ordenar") => setPanel(panel === p ? null : p);
@@ -29,7 +31,7 @@ export function FiltroDeUsuarios<U extends Persona>({ filtro: f, roles }: { filt
       <div className="fu-fila">
         <div className="fu-caja">
           <svg className="fu-lupa" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
-          <input {...f.combo} type="search" value={f.texto} placeholder={t.email.corto} aria-label={t.buscar.corto} autoComplete="off" autoCapitalize="none" spellCheck={false}
+          <input {...f.combo} type="search" value={f.texto} placeholder={t.nombreOCorreo.corto} aria-label={t.buscar.corto} autoComplete="off" autoCapitalize="none" spellCheck={false}
             onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
           {f.texto && <button type="button" className="fu-borrar" onClick={f.borrar} aria-label={t.borrarBusqueda.corto}>✕</button>}
         </div>
@@ -80,7 +82,7 @@ export function FiltroDeUsuarios<U extends Persona>({ filtro: f, roles }: { filt
         )}
       </div>
       <div className="fu-cuenta">
-        <p role="status" data-testid="cuantos-quedan">{f.resumen}</p>
+        <p role="status" data-testid="cuantos-quedan">{f.filtrado || f.texto ? f.resumen : `${total} ${total === 1 ? "usuario" : "usuarios"} · ${activos} ${activos === 1 ? "activo" : "activos"}`}</p>
         <div className="fu-ordenar">
           <button type="button" className="fu-boton bajo" aria-expanded={panel === "ordenar"} onClick={() => alternar("ordenar")} data-testid="ordenar">
             {trazo("M8 4v16M8 20l-3-3M8 20l3-3M16 20V4M16 4l-3 3M16 4l3 3", 16)}Ordenar: {f.orden === "correo" ? "correo" : "estado"}

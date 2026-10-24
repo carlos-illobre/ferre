@@ -45,6 +45,8 @@ export function Negocio({ parte, cabeza }: { parte: Parte; cabeza?: ReactNode })
 }
 
 function Usuarios() {
+  const { sesion } = useSesion();
+  const yo = sesion.estado === "con-sesion" ? sesion.usuario.id : null;
   const disponibles = useRolesAsignables();
   const usuarios = useUsuarios();
   const filas = usuarios.datos ?? [];
@@ -84,11 +86,11 @@ function Usuarios() {
   return (
     <>
       <AutorizarOtro alTocar={() => setAlta(true)} />
-      <FiltroDeUsuarios filtro={filtro} roles={disponibles} />
+      <FiltroDeUsuarios filtro={filtro} roles={disponibles} filas={filas} />
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(usuarios.error); }} />
       <div className="ut-lista" data-testid="usuarios">
         {filtro.visibles.map((u) => (
-          <TarjetaDeUsuario key={u.id} persona={u} orden={filas.indexOf(u)} disponibles={disponibles} alCambiarRoles={(ids) => cambiar(u.id, { roles: ids })}
+          <TarjetaDeUsuario key={u.id} persona={u} orden={filas.indexOf(u)} esVos={u.id === yo} disponibles={disponibles} alCambiarRoles={(ids) => cambiar(u.id, { roles: ids })}
             alActivar={async () => { const falla = await cambiar(u.id, { activo: !u.activo }); if (falla) setError(falla); }}
             acceso={{ ...accesoDe(u.id, sesiones.datos, celulares.datos), alCerrarSesion: (s) => void cerrarLaSesion(s), alQuitarCelular: (c) => void quitarElCelular(c) }} />
         ))}

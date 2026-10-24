@@ -5,14 +5,18 @@ import { fecha } from "../../../../formato";
 import { useSesion } from "../../../../sesion";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../../../credenciales";
 import { useEsCelular } from "../vista";
-import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Toast, Vacio, haceCuanto } from "../ui";
+import { Aviso, Boton, Hoja, Icono, Pagina, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";
 import { IconoCompu, comoCarga, esFallaDeRed, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
 import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, partesResaltadas, quitarCelularDeOtro, resumenDelAcceso, useCelularesDeOtros, useSesiones, useUsuarios, type Acceso, type CelularDeOtroFila, type EstadoDeUsuario, type OrdenDeUsuarios, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
 import { useFiltroDeUsuarios } from "../../../filtro-de-usuarios";
 import { usePuede } from "../../../permisos";
-import { ElegirRoles, RolesDeUsuario, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
+import { ElegirRoles, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
+import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
+import { IconoN, Iniciales, iconoDeRol } from "../../../iconos-de-negocio";
+import { irA } from "../rutas";
 import "../estilos/negocio.css";
+import "../estilos/usuarios.css";
 import type { HuellaVinculada } from "@servidor/credenciales";
 
 type Mensaje = { texto: string; testId?: string };
@@ -25,14 +29,15 @@ function enPalabras(e: unknown, queNoSePudo: string): string {
   return `${queNoSePudo}: ${texto}`;
 }
 
-// Más → Usuarios (decisiones 88 y 100): la pestaña Usuarios es quién puede entrar y con qué roles
-// y, en la fila de cada persona, sus sesiones y sus celulares con huella; al final, cuántos días
-// dura el vínculo. Los celulares propios y el vínculo de cada uno están en Configuración.
+// Más → Usuarios como la v2 («Tabla y ficha», decisión 148): arriba cuatro números, el buscador con
+// «Todos», «Activos» y «Rol»; una persona por renglón con sus roles y su acceso, y a la derecha la
+// ficha fija de la elegida, con sus roles, sus sesiones y celulares con huella y «Desactivar».
+// «Roles y permisos» y «Autorizar a alguien» van al lado de las pestañas.
 export function Usuarios() {
   const enLinea = useEnLinea();
   const [mensaje, setMensaje] = useState<Mensaje | null>(null);
   return (
-    <Pagina titulo={NOMBRES.usuarios} testId="usuarios-autorizados" className="usuarios" bajada={TEXTOS.usuarios.pestanaUsuarios.largo}>
+    <Pagina titulo={NOMBRES.usuarios} testId="usuarios-autorizados" className="usuarios uv" bajada={<span className="solo-lectores">{TEXTOS.usuarios.pestanaUsuarios.largo}</span>}>
       {!enLinea && <Aviso tipo="alerta" testId="usuarios-sin-conexion">Sin conexión: administrar usuarios necesita internet. Lo que ves puede no estar al día.</Aviso>}
       <Autorizados enLinea={enLinea} avisar={setMensaje} />
       <Toast texto={mensaje?.texto ?? null} alCerrar={() => setMensaje(null)} testId={mensaje?.testId ?? "mensaje"} />
@@ -54,12 +59,14 @@ export function MisCelulares() {
 
 function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
   const { sesion } = useSesion();
+  const puedeEsto = usePuede();
   const yo = sesion.estado === "con-sesion" ? sesion.usuario.id : null;
-  const esCelular = useEsCelular();
   const lista = comoCarga(useUsuarios(), "No se pudieron traer los usuarios");
   const [ocupada, setOcupada] = useState<string | null>(null);
   const [errorDeFila, setErrorDeFila] = useState<{ id: string; texto: string } | null>(null);
   const [alta, setAlta] = useState(false);
+  const [elegidaId, setElegidaId] = useState<string | null>(null);
+  const [cambiandoRoles, setCambiandoRoles] = useState(0);
   const filas = lista.datos ?? [];
   const activos = filas.filter((u) => u.activo).length;
 
@@ -80,10 +87,9 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
 
   const disponibles = useRolesAsignables();
   const filtro = useFiltroDeUsuarios(filas);
-  // Sus sesiones y sus celulares con huella (decisión 100), en la fila de cada persona.
+  // Sus sesiones y sus celulares con huella (decisión 100), en la ficha de cada persona.
   const sesiones = useSesiones();
   const celulares = useCelularesDeOtros();
-  const [desplegado, setDesplegado] = useState<string | null>(null);
   async function cerrarLaSesion(u: UsuarioFila, s: SesionFila) {
     setErrorDeFila(null);
     try { await cerrarSesion(s.id); avisar({ texto: `Se cerró la sesión de ${u.nombre} en ${s.dispositivo}.` }); }
@@ -95,143 +101,213 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
     catch (e) { setErrorDeFila({ id: u.id, texto: enPalabras(e, `No se pudo quitar el celular de ${u.nombre}`) }); celulares.recargar(); }
   }
   const accesoDeLaFila = (u: UsuarioFila) => accesoDe(u.id, sesiones.datos, celulares.datos);
-  const lineaDeAcceso = (u: UsuarioFila) => {
-    const resumen = resumenDelAcceso(accesoDeLaFila(u), !esCelular);
-    if (!resumen) return <span className="detalle" aria-label="Sin sesiones ni celulares">—</span>;
-    const abierto = desplegado === u.id;
-    return (
-      <button type="button" className={`usuarios-acceso ${abierto ? "abierto" : ""}`} aria-expanded={abierto} onClick={() => setDesplegado(abierto ? null : u.id)}
-        aria-label={`Sesiones y celulares de ${u.nombre}: ${resumen}`} data-testid="acceso-de-usuario">
-        <span>{resumen}</span><Icono nombre={abierto ? "arriba" : "derecha"} tam={14} />
-      </button>
-    );
+  const visibles = filtro.visibles;
+  const elegida = visibles.find((u) => u.id === elegidaId) ?? visibles[0] ?? null;
+  const lista$ = useRef<HTMLDivElement>(null);
+  const buscador = useRef<HTMLInputElement>(null);
+
+  // Alt R: Roles y permisos; Alt N: autorizar a alguien; /: buscar; R: cambiar los roles de la elegida.
+  const teclas = useRef<(e: KeyboardEvent) => void>(() => undefined);
+  teclas.current = (e: KeyboardEvent) => {
+    const escribiendo = e.target instanceof HTMLElement && (e.target.closest("input, textarea, select, [contenteditable='true']") !== null);
+    if (e.altKey && !e.ctrlKey && (e.key === "r" || e.key === "R") && puedeEsto("admin.roles")) { e.preventDefault(); irA("roles"); }
+    else if (e.altKey && !e.ctrlKey && (e.key === "n" || e.key === "N") && enLinea) { e.preventDefault(); setAlta(true); }
+    else if (!escribiendo && !e.altKey && !e.ctrlKey && !e.metaKey && e.key === "/") { e.preventDefault(); buscador.current?.focus(); }
+    else if (!escribiendo && !e.altKey && !e.ctrlKey && !e.metaKey && (e.key === "r" || e.key === "R") && elegida && !document.querySelector("dialog[open]")) { e.preventDefault(); setCambiandoRoles((n) => n + 1); }
   };
-  const listaDeAcceso = (u: UsuarioFila) => desplegado === u.id && (
-    <ListaDeAcceso nombre={u.nombre} {...accesoDeLaFila(u)} enLinea={enLinea} alCerrarSesion={(s) => void cerrarLaSesion(u, s)} alQuitarCelular={(c) => void quitarElCelular(u, c)} />
-  );
-  const rolDe = (u: UsuarioFila) => <RolesDeUsuario disponibles={disponibles} actuales={u.roles ?? []} nombre={u.nombre} bloqueado={ocupada === u.id || !enLinea} alGuardar={(ids) => cambiar(u, { roles: ids })} />;
-  const accionDe = (u: UsuarioFila) => u.id === yo ? <span className="detalle">A vos te desactiva otra persona</span> : (
-    <Boton tam={esCelular ? undefined : "chico"} variante={u.activo ? "peligro" : undefined} disabled={ocupada === u.id || !enLinea} onClick={() => cambiar(u, { activo: !u.activo })} aria-label={`${u.activo ? "Desactivar" : "Reactivar"} a ${u.nombre}`}>
-      {ocupada === u.id ? "Guardando…" : u.activo ? "Desactivar" : "Reactivar"}
-    </Boton>
-  );
-  const estadoDe = (u: UsuarioFila) => <Pastilla tipo={u.activo ? "ok" : undefined}>{u.activo ? "Activo" : "Desactivado"}</Pastilla>;
-  const errorDe = (u: UsuarioFila) => errorDeFila?.id === u.id ? <Aviso tipo="error">{errorDeFila.texto}</Aviso> : null;
+  useEffect(() => {
+    const f = (e: KeyboardEvent) => teclas.current(e);
+    window.addEventListener("keydown", f);
+    return () => window.removeEventListener("keydown", f);
+  }, []);
+  // ↑ ↓ recorren la lista y la ficha sigue a la elegida.
+  function moverse(e: React.KeyboardEvent) {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    const i = visibles.findIndex((u) => u.id === elegida?.id);
+    const otra = visibles[Math.min(visibles.length - 1, Math.max(0, i + (e.key === "ArrowDown" ? 1 : -1)))];
+    if (!otra) return;
+    e.preventDefault();
+    setElegidaId(otra.id);
+    lista$.current?.querySelector<HTMLButtonElement>(`[data-id="${otra.id}"]`)?.focus();
+  }
+
+  const conHuella = new Set((celulares.datos ?? []).map((c) => c.usuario_id)).size;
   const formulario = <AltaDeUsuario disponibles={disponibles} enLinea={enLinea} alAutorizar={(u) => { setAlta(false); avisar({ texto: `${u.nombre} ya puede entrar con su cuenta de Google.` }); }} />;
 
   return (
-    <section className="negocio-seccion" aria-labelledby="usuarios-autorizados">
-      <header className="negocio-seccion-cabeza">
-        <h2 id="usuarios-autorizados">Usuarios autorizados</h2>
-        {lista.datos && <span className="detalle">{activos} de {filas.length} pueden entrar</span>}
-      </header>
+    <>
+      <AlLadoDeLasPestanas>
+        {puedeEsto("admin.roles") && <button type="button" className="uv-boton" onClick={() => irA("roles")} aria-keyshortcuts="Alt+R" data-testid="ir-a-roles"><IconoN nombre="shield-check" tam={16} />Roles y permisos <span className="uv-kbd">Alt R</span></button>}
+        <button type="button" className="uv-boton accion" disabled={!enLinea} onClick={() => setAlta(true)} aria-keyshortcuts="Alt+N" data-testid="autorizar"><IconoN nombre="user-plus" tam={16} />{TEXTOS.usuarios.autorizarOtro.largo} <span className="uv-kbd">Alt N</span></button>
+      </AlLadoDeLasPestanas>
       <Aviso tipo="error" accion={<Boton tam="chico" onClick={lista.recargar}>Reintentar</Boton>}>{lista.error}</Aviso>
       {!lista.datos && !lista.error && <div className="tarjeta negocio-esqueleto" role="status" aria-label="Trayendo los usuarios">{[0, 1, 2].map((i) => <span key={i} className="esqueleto" />)}</div>}
-
-      {lista.datos && <FiltroDeUsuarios filtro={filtro} roles={disponibles} />}
-      {lista.datos && (esCelular ? (
-        <>
-          <ul className="lista" data-testid="usuarios">
-            {filtro.visibles.map((u) => (
-              <li key={u.id} className={`usuarios-tarjeta ${u.activo ? "" : "apagada"}`} data-testid="usuario-fila">
-                <div className="fila">
-                  <strong className="crece nombre">{u.nombre}{u.id === yo && <> <Pastilla tipo="azul" sinPunto>Vos</Pastilla></>}</strong>
-                  {estadoDe(u)}
-                </div>
-                <span className="detalle usuarios-correo">{u.email}</span>
-                <div className="fila usuarios-acciones">{rolDe(u)}{accionDe(u)}</div>
-                {lineaDeAcceso(u)}
-                {listaDeAcceso(u)}
-                {errorDe(u)}
-              </li>
-            ))}
-          </ul>
-          <Boton variante="principal" tam="grande" ancho icono="mas" disabled={!enLinea} onClick={() => setAlta(true)} data-testid="autorizar">Autorizar a alguien</Boton>
-          {alta && <Hoja titulo="Autorizar a alguien" alCerrar={() => setAlta(false)} testId="hoja-autorizar">{formulario}</Hoja>}
-        </>
-      ) : (
-        <div className="tabla-marco">
-          <table className="tabla" data-testid="usuarios">
-            <thead><tr><th scope="col">Nombre</th><th scope="col">Correo de Google</th><th scope="col">Roles</th><th scope="col">Estado</th><th scope="col">Acceso</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
-            <tbody>
-              {filtro.visibles.map((u) => (
-                <FilaConError key={u.id} error={errorDe(u)} columnas={6} debajo={listaDeAcceso(u)}>
-                  <tr className={u.activo ? "" : "atenuada"} data-testid="usuario-fila">
-                    <td className="nombre">{u.nombre}{u.id === yo && <> <Pastilla tipo="azul" sinPunto>Vos</Pastilla></>}</td>
-                    <td>{u.email}</td>
-                    <td>{rolDe(u)}</td>
-                    <td>{estadoDe(u)}</td>
-                    <td>{lineaDeAcceso(u)}</td>
-                    <td className="angosta usuarios-celda-accion">{accionDe(u)}</td>
-                  </tr>
-                </FilaConError>
-              ))}
-            </tbody>
-          </table>
-          <div className="usuarios-alta">{formulario}</div>
-        </div>
-      ))}
-    </section>
+      {lista.datos && (
+        <section className="uv-pantalla" aria-labelledby="usuarios-autorizados-titulo">
+          <h2 id="usuarios-autorizados-titulo" className="solo-lectores">Usuarios autorizados</h2>
+          <div className="uv-izq">
+            <div className="uv-kpis">
+              <div className="uv-kpi"><span className="uv-kpi-ico"><IconoN nombre="users" /></span><span className="uv-kpi-va">{activos}</span><span className="uv-kpi-et">activos de {filas.length}</span></div>
+              <div className="uv-kpi"><span className="uv-kpi-ico"><IconoN nombre="monitor" /></span><span className="uv-kpi-va">{sesiones.datos ? sesiones.datos.length : "—"}</span><span className="uv-kpi-et">{sesiones.datos?.length === 1 ? "sesión" : "sesiones"}</span></div>
+              <div className="uv-kpi"><span className="uv-kpi-ico"><IconoN nombre="fingerprint" /></span><span className="uv-kpi-va">{celulares.datos ? conHuella : "—"}</span><span className="uv-kpi-et">con huella</span></div>
+              <div className="uv-kpi" title="Todavía no se sabe quién no entra hace 30 días"><span className="uv-kpi-ico"><IconoN nombre="hourglass" /></span><span className="uv-kpi-va uv-gris">—</span><span className="uv-kpi-et">sin usar 30 días</span></div>
+            </div>
+            <FiltroDeUsuarios filtro={filtro} roles={disponibles} filas={filas} buscador={buscador} />
+            <div className="uv-tabla" data-testid="usuarios" ref={lista$} onKeyDown={moverse}>
+              <div className="uv-cab" aria-hidden="true"><span /><span>Persona</span><span>Roles</span><span>Acceso</span><span /></div>
+              {visibles.map((u) => {
+                const acceso = accesoDeLaFila(u);
+                const roles = [...(u.roles ?? [])].sort((x, y) => Number(y.nombre === "Administrador") - Number(x.nombre === "Administrador"));
+                // Los roles que entran en el renglón: dos si son cortos, si no uno, y «+N» con el resto.
+                const entran = roles.length > 1 && roles[0]!.nombre.length + roles[1]!.nombre.length <= 20 ? 2 : 1;
+                return (
+                  <button key={u.id} type="button" data-id={u.id} className={`uv-fila ${u.id === elegida?.id ? "elegida" : ""} ${u.activo ? "" : "inactiva"}`} aria-pressed={u.id === elegida?.id} onClick={() => setElegidaId(u.id)} data-testid="usuario-fila">
+                    <Iniciales nombre={u.nombre} clave={u.email} apagado={!u.activo} />
+                    <span className="uv-quien"><span className="uv-nom">{u.nombre}{u.id === yo && <span className="uv-yo">Vos</span>}</span><span className="uv-mail">{u.email}</span></span>
+                    <span className="uv-roles">
+                      {roles.slice(0, entran).map((r) => <span key={r.id} className={`uv-rol ${r.nombre === "Administrador" ? "admin" : ""}`}><IconoN nombre={iconoDeRol(r.nombre)} tam={16} />{r.nombre}</span>)}
+                      {roles.length > entran && <span className="uv-rol mas">+{roles.length - entran}</span>}
+                      {roles.length === 0 && <span className="uv-gris">Sin roles</span>}
+                    </span>
+                    <span className="uv-acc">
+                      {!u.activo ? <span className="uv-pastilla contorno">Inactivo</span>
+                        : acceso.sesiones.length + acceso.celulares.length === 0 ? <span className="uv-gris" aria-label="Sin sesiones ni celulares">—</span>
+                        : <span aria-label={resumenDelAcceso(acceso) ?? ""}><IconoN nombre="monitor" tam={16} />{acceso.sesiones.length} · <IconoN nombre="fingerprint" tam={16} />{acceso.celulares.length}</span>}
+                    </span>
+                    <IconoN nombre="chevron-right" className="uv-chev" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {elegida && (
+            <Ficha key={elegida.id} u={elegida} yo={yo} acceso={accesoDeLaFila(elegida)} disponibles={disponibles} enLinea={enLinea} ocupada={ocupada === elegida.id} error={errorDeFila?.id === elegida.id ? errorDeFila.texto : null}
+              cambiandoRoles={cambiandoRoles} alGuardarRoles={(ids) => cambiar(elegida, { roles: ids })} alActivar={() => void cambiar(elegida, { activo: !elegida.activo })}
+              alCerrarSesion={(s) => void cerrarLaSesion(elegida, s)} alQuitarCelular={(c) => void quitarElCelular(elegida, c)} />
+          )}
+        </section>
+      )}
+      {alta && <Hoja titulo={TEXTOS.usuarios.autorizarOtro.largo} alCerrar={() => setAlta(false)} testId="hoja-autorizar">{formulario}</Hoja>}
+    </>
   );
 }
 
-// Lo que se despliega de la línea de acceso: las sesiones de la persona, con «Cerrar», y sus
-// celulares con huella, con «Quitar» (decisión 100).
-function ListaDeAcceso({ nombre, sesiones, celulares, enLinea, alCerrarSesion, alQuitarCelular }: Acceso & { nombre: string; enLinea: boolean; alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void }) {
+// La ficha de la persona elegida, fija a la derecha: quién es y desde cuándo, sus roles con lo que
+// permiten en palabras («Cambiar», R), sus sesiones con «Cerrar», sus celulares con huella con
+// «Quitar» y, abajo, «Desactivar» o «Reactivar» y «Todo lo que hizo».
+function Ficha({ u, yo, acceso, disponibles, enLinea, ocupada, error, cambiandoRoles, alGuardarRoles, alActivar, alCerrarSesion, alQuitarCelular }: {
+  u: UsuarioFila; yo: string | null; acceso: Acceso; disponibles: RolAsignable[]; enLinea: boolean; ocupada: boolean; error: string | null; cambiandoRoles: number;
+  alGuardarRoles: (ids: string[]) => Promise<string | null>; alActivar: () => void; alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void;
+}) {
+  const roles = u.roles ?? [];
+  const [cambiando, setCambiando] = useState(false);
+  const [elegidos, setElegidos] = useState<string[]>([]);
+  const [errorRoles, setErrorRoles] = useState<string | null>(null);
+  const [guardando, setGuardando] = useState(false);
+  const abrir = () => { setElegidos(roles.map((r) => r.id)); setErrorRoles(null); setCambiando(true); };
+  const primera = useRef(cambiandoRoles);
+  useEffect(() => { if (cambiandoRoles !== primera.current && enLinea) abrir(); }, [cambiandoRoles]); // eslint-disable-line react-hooks/exhaustive-deps
+  async function guardar() {
+    if (elegidos.length === 0) { setErrorRoles(TEXTOS.usuarios.faltaUnRol.largo); return; }
+    setGuardando(true); setErrorRoles(null);
+    const falla = await alGuardarRoles(elegidos);
+    setGuardando(false);
+    if (falla) setErrorRoles(falla); else setCambiando(false);
+  }
+  const descripcion = roles.map((r) => disponibles.find((d) => d.id === r.id)?.descripcion).filter(Boolean).join(" ");
   return (
-    <div className="usuarios-acceso-lista" data-testid="lista-de-acceso">
-      {sesiones.length > 0 && <h3>Sesiones abiertas</h3>}
-      {sesiones.map((s) => (
-        <div key={s.id} className="usuarios-acceso-item" data-testid="sesion">
-          <span><span className="usuarios-dispositivo">{/celular/i.test(s.dispositivo) ? <Icono nombre="celular" tam={18} /> : <IconoCompu tam={18} />}{s.dispositivo}</span><small className="detalle" title={fechaCompleta(s.ultimo_uso_en)}>usada {haceCuanto(s.ultimo_uso_en)}</small></span>
-          <Boton tam="chico" variante="peligro" disabled={!enLinea} onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar</Boton>
-        </div>
-      ))}
-      {celulares.length > 0 && <h3>Celulares con huella</h3>}
-      {celulares.map((c) => (
-        <div key={c.id} className="usuarios-acceso-item" data-testid="celular-de-otro">
-          <span><span className="usuarios-dispositivo"><Icono nombre="celular" tam={18} />{c.dispositivo ?? "Celular"}</span><small className="detalle">vinculado el {fecha(c.creada_en.slice(0, 10))} · {c.ultimo_uso_en ? `último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : "todavía no se usó"}</small></span>
-          <Boton tam="chico" variante="peligro" disabled={!enLinea} onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar</Boton>
-        </div>
-      ))}
-    </div>
+    <aside className="uv-ficha" aria-label={`Ficha de ${u.nombre}`} data-testid="ficha-usuario">
+      <div className="uv-ficha-quien">
+        <Iniciales nombre={u.nombre} clave={u.email} tam="l" apagado={!u.activo} />
+        <div className="uv-ficha-textos"><div className="uv-ficha-nombre">{u.nombre}{u.id === yo && <span className="uv-yo">Vos</span>}</div><div className="uv-detalle uv-cortar">{u.email}</div><div className="uv-detalle">Desde el {fecha(u.creado_en.slice(0, 10))}{u.activo ? "" : " · desactivado"}</div></div>
+      </div>
+      <div className="uv-sep" />
+      <div data-testid="roles-de-usuario">
+        <h3>{TEXTOS.usuarios.roles.largo}{!cambiando && <button type="button" className="uv-boton suave" disabled={ocupada || !enLinea} onClick={abrir} aria-keyshortcuts="R" aria-label={`Cambiar los roles de ${u.nombre}`} data-testid="cambiar-roles"><IconoN nombre="pencil" tam={16} />Cambiar <span className="uv-kbd">R</span></button>}</h3>
+        {!cambiando && <div className="uv-roles uv-roles-ficha">{roles.length ? roles.map((r) => <span key={r.id} className={`uv-rol ${r.nombre === "Administrador" ? "admin" : ""}`}><IconoN nombre={iconoDeRol(r.nombre)} tam={16} />{r.nombre}</span>) : <span className="uv-gris">Sin roles</span>}</div>}
+        {!cambiando && descripcion && <p className="uv-puede">{descripcion}</p>}
+        {cambiando && (
+          <div className="ru-panel">
+            <ElegirRoles disponibles={disponibles} elegidos={elegidos} alCambiar={(ids) => { setElegidos(ids); setErrorRoles(null); }} nombre={u.nombre} />
+            {errorRoles && <p className="rl-error" role="alert">{errorRoles}</p>}
+            <div className="rl-acciones">
+              <button type="button" className="rl-boton" onClick={() => setCambiando(false)}>Cancelar</button>
+              <button type="button" className="rl-boton fuerte" disabled={guardando} onClick={() => void guardar()} data-testid="guardar-roles">{guardando ? "Guardando…" : "Guardar roles"}</button>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="uv-sep" />
+      <div data-testid="lista-de-acceso">
+        <h3>Sesiones abiertas ({acceso.sesiones.length})</h3>
+        {acceso.sesiones.length === 0 && <p className="uv-detalle">No tiene sesiones abiertas.</p>}
+        {acceso.sesiones.map((s) => (
+          <div key={s.id} className="uv-disp" data-testid="sesion">
+            <span className="uv-disp-ico">{/celular/i.test(s.dispositivo) ? <IconoN nombre="smartphone" /> : <IconoN nombre="monitor" />}</span>
+            <div className="uv-disp-texto"><div className="uv-disp-n">{s.dispositivo}</div><div className="uv-detalle" title={fechaCompleta(s.ultimo_uso_en)}>usada {haceCuanto(s.ultimo_uso_en)}</div></div>
+            <button type="button" className="uv-boton suave" disabled={!enLinea} onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${u.nombre} en ${s.dispositivo}`}>Cerrar</button>
+          </div>
+        ))}
+      </div>
+      <div>
+        <h3>Celular con huella ({acceso.celulares.length})</h3>
+        {acceso.celulares.length === 0 && <p className="uv-detalle">No vinculó ningún celular.</p>}
+        {acceso.celulares.map((c) => (
+          <div key={c.id} className="uv-disp" data-testid="celular-de-otro">
+            <span className="uv-disp-ico"><IconoN nombre="fingerprint" /></span>
+            <div className="uv-disp-texto"><div className="uv-disp-n">{c.dispositivo ?? "Celular"}</div><div className="uv-detalle">{c.ultimo_uso_en ? `Último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : `Vinculado el ${fecha(c.creada_en.slice(0, 10))}`}</div></div>
+            <button type="button" className="uv-boton suave" disabled={!enLinea} onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${u.nombre}`}>Quitar</button>
+          </div>
+        ))}
+      </div>
+      {error && <Aviso tipo="error">{error}</Aviso>}
+      <div className="uv-pie">
+        {u.id === yo ? <span className="uv-detalle uv-crece">A vos te desactiva otra persona</span> : (
+          <button type="button" className={`uv-boton ${u.activo ? "peligro" : "suave"} uv-crece`} disabled={ocupada || !enLinea} onClick={alActivar} aria-label={`${u.activo ? "Desactivar" : "Reactivar"} a ${u.nombre}`}>
+            <IconoN nombre={u.activo ? "user-x" : "user-check"} tam={16} />{ocupada ? "Guardando…" : u.activo ? "Desactivar" : "Reactivar"}
+          </button>
+        )}
+        <button type="button" className="uv-boton fantasma" onClick={() => irA("actividad")}>Todo lo que hizo</button>
+      </div>
+    </aside>
   );
 }
 
-// Arriba de la tabla (decisiones 98 y 102): el buscador con sus sugerencias, «Filtros» (varios
-// roles, y activos o inactivos), el orden y cuántos son.
-function FiltroDeUsuarios({ filtro: f, roles }: { filtro: ReturnType<typeof useFiltroDeUsuarios<UsuarioFila>>; roles: RolAsignable[] }) {
+// Arriba de la lista, como la v2: el buscador (con sus sugerencias y la tecla /), «Todos (N)» y
+// «Activos (N)», y «Rol», que abre el panel con los roles, el estado y el orden (decisiones 98 y 102).
+function FiltroDeUsuarios({ filtro: f, roles, filas, buscador }: { filtro: ReturnType<typeof useFiltroDeUsuarios<UsuarioFila>>; roles: RolAsignable[]; filas: UsuarioFila[]; buscador: React.RefObject<HTMLInputElement> }) {
   const t = TEXTOS.usuarios;
   const [panel, setPanel] = useState(false);
   const estados: [EstadoDeUsuario, string][] = [["todos", t.todos.largo], ["activos", t.activos.largo], ["inactivos", t.inactivos.largo]];
+  const activos = filas.filter((u) => u.activo).length;
   return (
-    <div className="usuarios-filtro" data-testid="filtro-usuarios">
-      <label className="campo usuarios-buscar">
-        <span>{t.buscar.largo}</span>
-        <span className="usuarios-buscar-caja">
-          <Icono nombre="buscar" tam={18} />
-          <input {...f.combo} className="entrada" type="search" value={f.texto} placeholder={t.email.largo} autoComplete="off" autoCapitalize="none" spellCheck={false}
-            onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
-          {f.texto && <button type="button" className="usuarios-borrar" onClick={f.borrar} aria-label={t.borrarBusqueda.largo}>✕</button>}
-          {f.sugerencias.length > 0 && (
-            <ul className="usuarios-sugerencias" id={f.listaId} role="listbox" aria-label={t.buscar.largo}>
-              {f.sugerencias.map((u, i) => {
-                const [antes, igual, despues] = partesResaltadas(u.email, f.texto);
-                return (
-                  <li key={u.id} id={f.opcionId(i)} role="option" aria-selected={i === f.activa} className={i === f.activa ? "activa" : ""}
-                    onMouseDown={(e) => e.preventDefault()} onClick={() => f.elegir(u)} data-testid="sugerencia-usuario">
-                    <span>{antes}<b>{igual}</b>{despues}</span><small>{u.nombre}</small>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </span>
+    <div className="uv-barra" data-testid="filtro-usuarios">
+      <label className="uv-campo">
+        <span className="solo-lectores">{t.buscar.largo}</span>
+        <IconoN nombre="search" />
+        <input ref={buscador} {...f.combo} type="search" value={f.texto} placeholder="Buscá nombre o correo" autoComplete="off" autoCapitalize="none" spellCheck={false}
+          onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
+        {f.texto ? <button type="button" className="usuarios-borrar" onClick={f.borrar} aria-label={t.borrarBusqueda.largo}>✕</button> : <span className="uv-kbd" aria-hidden="true">/</span>}
+        {f.sugerencias.length > 0 && (
+          <ul className="usuarios-sugerencias" id={f.listaId} role="listbox" aria-label={t.buscar.largo}>
+            {f.sugerencias.map((u, i) => {
+              const [antes, igual, despues] = partesResaltadas(u.email, f.texto);
+              return (
+                <li key={u.id} id={f.opcionId(i)} role="option" aria-selected={i === f.activa} className={i === f.activa ? "activa" : ""}
+                  onMouseDown={(e) => e.preventDefault()} onClick={() => f.elegir(u)} data-testid="sugerencia-usuario">
+                  <span>{antes}<b>{igual}</b>{despues}</span><small>{u.nombre}</small>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </label>
+      <button type="button" className={`uv-chip ${f.estado === "todos" ? "elegido" : ""}`} aria-pressed={f.estado === "todos"} onClick={() => f.elegirEstado("todos")}>{t.todos.largo} ({filas.length})</button>
+      <button type="button" className={`uv-chip ${f.estado === "activos" ? "elegido" : ""}`} aria-pressed={f.estado === "activos"} onClick={() => f.elegirEstado("activos")}>{t.activos.largo} ({activos})</button>
       <div className="usuarios-filtros">
-        <Boton tam="chico" icono="filtro" className={f.filtrado ? "con-filtros" : undefined} aria-expanded={panel} onClick={() => setPanel(!panel)} data-testid="abrir-filtros">
-          {t.filtros.largo}{f.filtrado && <span className="usuarios-aviso" aria-label="con filtros puestos" />}
-        </Boton>
+        <button type="button" className={`uv-boton ${f.roles.length || f.estado === "inactivos" ? "con-filtros" : ""}`} aria-expanded={panel} onClick={() => setPanel(!panel)} data-testid="abrir-filtros">
+          <IconoN nombre="list-filter" tam={16} />Rol{f.filtrado && <span className="usuarios-aviso" aria-label="con filtros puestos" />}
+        </button>
         {panel && (
           <div className="usuarios-panel" role="dialog" aria-label={t.filtros.largo} data-testid="panel-filtros" onKeyDown={(e) => { if (e.key === "Escape") { e.stopPropagation(); setPanel(false); } }}>
             <div className="usuarios-panel-cab"><h3>{t.roles.largo}</h3><small className="detalle">{t.unoOMas.largo}</small></div>
@@ -247,6 +323,12 @@ function FiltroDeUsuarios({ filtro: f, roles }: { filtro: ReturnType<typeof useF
                 </button>
               ))}
             </div>
+            <div className="usuarios-panel-cab"><h3>{t.ordenarPor.largo}</h3></div>
+            <div className="usuarios-opciones" role="group" aria-label={t.ordenarPor.largo}>
+              {([["correo", t.porCorreo.largo], ["estado", t.porEstado.largo]] as [OrdenDeUsuarios, string][]).map(([valor, nombre]) => (
+                <button key={valor} type="button" className={f.orden === valor ? "si" : ""} aria-pressed={f.orden === valor} onClick={() => f.elegirOrden(valor)} data-testid={`ordenar-${valor}`}>{nombre}</button>
+              ))}
+            </div>
             <div className="usuarios-panel-pie">
               <Boton tam="chico" onClick={f.quitarFiltros}>{t.quitarFiltros.largo}</Boton>
               <Boton tam="chico" variante="principal" onClick={() => setPanel(false)} data-testid="ver-usuarios">{t.aplicarFiltros.largo} · Ver {f.conLosFiltros} {f.conLosFiltros === 1 ? "usuario" : "usuarios"}</Boton>
@@ -254,20 +336,9 @@ function FiltroDeUsuarios({ filtro: f, roles }: { filtro: ReturnType<typeof useF
           </div>
         )}
       </div>
-      <label className="campo usuarios-orden">
-        <span>{t.ordenarPor.largo}</span>
-        <select className="entrada" value={f.orden} onChange={(e) => f.elegirOrden(e.target.value as OrdenDeUsuarios)} data-testid="ordenar">
-          <option value="correo">{t.porCorreo.largo}</option>
-          <option value="estado">{t.porEstado.largo}</option>
-        </select>
-      </label>
-      <span className="detalle usuarios-quedan" role="status" data-testid="cuantos-quedan">{f.resumen}</span>
+      <span className="solo-lectores" role="status" data-testid="cuantos-quedan">{f.resumen}</span>
     </div>
   );
-}
-
-function FilaConError({ children, error, columnas, debajo }: { children: React.ReactNode; error: React.ReactNode; columnas: number; debajo?: React.ReactNode }) {
-  return <>{children}{debajo && <tr className="hija"><td colSpan={columnas} className="usuarios-acceso-celda">{debajo}</td></tr>}{error && <tr className="hija"><td colSpan={columnas}>{error}</td></tr>}</>;
 }
 
 // Autorizar es agregar el correo de Google de la persona: no hay contraseña que crear.
