@@ -161,6 +161,30 @@ dispositivos que se mandan mensajes.
 1. **E20** **Given** el módulo, **When** se mira de qué depende, **Then** no usa nada de Ferrebress ni de otra biblioteca, salvo lo que trae el navegador y el servidor.
 2. **E21** **Given** el módulo, **When** se corren sus pruebas unitarias, **Then** recorren cada línea, cada rama y cada función.
 
+---
+
+### User Story 6 - Solo se hablan los dos del emparejamiento, y nada se pierde ni se repite (Priority: P1)
+
+Escenarios de error, de borde y de seguridad (paso 4).
+
+**Why this priority**: Lo que viaja es la venta en curso y las fotos de los comprobantes de una
+persona: no lo puede ver ni mandar nadie más, y no se puede perder un código.
+
+**Independent Test**: Con dos emparejamientos de personas distintas, intentar escuchar y mandar
+en la sala del otro; desvincular con los dos abiertos; recargar un lado con mensajes pendientes.
+
+**Acceptance Scenarios**:
+
+1. **E25** **Given** un dispositivo que no es uno de los dos lados de un emparejamiento (de otra persona, o sin sesión), **When** intenta escuchar o mandar en la sala de ese emparejamiento, **Then** el servidor lo rechaza y no recibe ni pasa nada.
+2. **E26** **Given** los dos conectados, **When** se desvincula desde cualquiera de los dos, vence el vínculo, se cierra a distancia la sesión de uno o se desactiva a la persona, **Then** la conexión se corta en el momento en los dos, el puntito desaparece y ninguno puede seguir mandando por el servidor.
+3. **E27** **Given** el servidor, **When** le llega algo para pasar que no tiene la forma de una tanda de mensajes, o es más grande que lo permitido, **Then** lo rechaza y no se lo pasa al otro.
+4. **E28** **Given** un dispositivo, **When** le llega un mensaje que no entiende, **Then** lo descarta sin romper la conexión.
+5. **E29** **Given** mensajes que uno mandó y el otro todavía no confirmó, **When** el otro recarga la aplicación, **Then** al volver a encontrarse le llegan los que faltaban, una sola vez y en orden, y no los que ya había recibido antes de recargar.
+6. **E30** **Given** una foto, **When** el celular la manda por cualquiera de los dos caminos, **Then** llega entera a la computadora.
+7. **E31** **Given** la conexión directa, **When** se arma, **Then** no se usa ningún servicio de terceros ni se abre ningún puerto en el servidor.
+8. **E32** **Given** el celular emparejado, **When** escanea un código con la computadora cerrada, **Then** dice que va a llegar cuando se abra la computadora, y llega al abrirla, una sola vez.
+9. **E33** **Given** quien tiene «Administrar el sistema», **When** abre Más → Sistema, **Then** ya no está «Cada cuánto pregunta el celular emparejado»: no hay nada que preguntar (RF-138).
+
 ### Edge Cases
 
 - **Uno de los dos cierra la aplicación o se apaga la pantalla del celular:** el otro pasa a «El
