@@ -44,3 +44,7 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Listas de precios (computadora): los adjuntos que llegaron sin proveedor («1 adjunto sin proveedor»); no se muestra la fila.
 - Listas de precios (computadora y celular): «Ver todas» las cargas; se ven las tres últimas.
 - Listas de precios (computadora): la foto de cada fila de la planilla; queda el lugar con un ícono.
+- Procesos (computadora): el mapa chico del dibujo, abajo a la izquierda.
+- Procesos (computadora): el aviso del error de forma flotando junto al paso, con su insignia ámbar (hoy el paso lleva la marca «!» de siempre).
+- Procesos (computadora y celular): el nombre de cada carril de costado con su ícono (en el celular, en una pastilla verde) y los pasos dibujados con los íconos de la v2; el dibujo sigue siendo el de bpmn-js.
+- Procesos (computadora y celular): la pastilla «hecho con bpmn.io»; queda el logo de bpmn.io como es, porque su licencia no deja cambiarlo.

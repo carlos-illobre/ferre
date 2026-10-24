@@ -36,6 +36,14 @@ const TRAZOS = {
   reloj: '<circle cx="12" cy="12" r="8"/><path d="M12 8 V12 L15 14"/>',
   ok: '<path d="M5 12 L10 17 L19 7"/>',
   cerrar: '<path d="M6 6 L18 18 M18 6 L6 18"/>',
+  // Los de la v2 (decisión 148 de Ferrebress): el aviso, el panel que se pliega y «Ver todo».
+  aviso: '<path d="M12 4 L21.5 20 H2.5 Z"/><path d="M12 10 V14 M12 17 h.01"/>',
+  panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3 V21 M16 15 L13 12 L16 9"/>',
+  "panel-derecho": '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3 V21 M8 9 L11 12 L8 15"/>',
+  pantalla: '<path d="M4 9 H20 V5 H4 Z M4 9 V19 H20 V9"/>',
+  "ver-todo": '<path d="M4 9 V4 H9 M15 4 H20 V9 M20 15 V20 H15 M9 20 H4 V15"/>',
+  "acercar": '<circle cx="11" cy="11" r="7"/><path d="M20 20 L16 16 M11 8 V14 M8 11 H14"/>',
+  "alejar": '<circle cx="11" cy="11" r="7"/><path d="M20 20 L16 16 M8 11 H14"/>',
 } as const;
 
 export type NombreDeIcono = keyof typeof TRAZOS;

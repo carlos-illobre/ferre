@@ -241,3 +241,128 @@
 .procesos .djs-element.selected .djs-outline { stroke-dasharray: 4 3; stroke-width: 2px; }
 .procesos-acciones-celu .procesos-boton.ancho.principal { background: var(--procesos-accion); color: #fff; box-shadow: none; }
 .procesos-acciones-celu .procesos-boton.ancho.principal:active { background: var(--procesos-accion-fuerte); }
+
+/* ===== La v2 en la computadora (decisión 148 de Ferrebress, maqueta «El tablero de dibujo») =====
+   Arriba el nombre con la miga y el estado; las figuras en una columna de baldosas; el dibujo
+   sobre el papel punteado con el acercar abajo a la derecha; el paso elegido en un panel blanco a
+   la derecha y la barra de los pasos abajo, de lado a lado. */
+.procesos-compu { gap: 0; }
+.procesos-compu .procesos-cabeza { gap: 8px; padding: 12px 16px 12px 20px; border-bottom: 1px solid var(--procesos-borde); background: var(--procesos-fondo); }
+.procesos-cabeza-icono { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--procesos-ok-suave); color: var(--procesos-ok); flex: none; }
+.procesos-cabeza-titulo { display: flex; flex-direction: column; min-width: 0; margin-right: 4px; }
+.procesos-migas { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 18px; color: var(--procesos-texto-2); font-weight: 600; white-space: nowrap; }
+.procesos-compu .procesos-guardado::before { display: none; }
+.procesos-compu .procesos-guardado { gap: 4px; }
+.procesos-compu .procesos-guardado.guardando::before, .procesos-compu .procesos-guardado.sin-conexion::before, .procesos-compu .procesos-guardado.error::before { display: inline-block; }
+.procesos-compu .procesos-selector { border: 0; background: none; padding: 0; min-height: 32px; font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; max-width: 420px; gap: 6px; }
+.procesos-compu .procesos-menu { top: 40px; }
+.procesos-compu .procesos-chip { height: 32px; padding: 0 12px; gap: 6px; font-weight: 650; }
+.procesos-compu .procesos-chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.procesos-compu .procesos-chip.borrador::before, .procesos-compu .procesos-chip.vigente-con-borrador::before { background: #C98A0B; }
+.procesos-compu .procesos-cabeza .procesos-boton { min-height: 40px; padding: 0 14px; border: 1px solid var(--procesos-borde-fuerte, #CEC8BA); border-radius: 12px; font-weight: 700; font-size: 15px; box-shadow: 0 1px 2px rgba(26, 29, 27, .05); }
+.procesos-compu .procesos-cabeza .procesos-boton.icono { width: 40px; padding: 0; }
+.procesos-compu .procesos-cabeza .procesos-boton.principal { border-color: var(--procesos-accion); box-shadow: 0 8px 20px -8px rgba(232, 84, 28, .55); }
+.procesos-compu .procesos-cabeza .procesos-boton.principal .procesos-tecla { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .35); color: #fff; }
+.procesos-compu .procesos-boton.fantasma { border-color: transparent; background: transparent; box-shadow: none; color: var(--procesos-texto-2); }
+.procesos-separador { width: 1px; height: 28px; background: var(--procesos-borde); margin: 0 4px; flex: none; }
+.procesos-compu .procesos-tecla { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--procesos-borde-fuerte, #CEC8BA); border-bottom-width: 2px; background: var(--procesos-superficie); color: var(--procesos-texto-2); font-size: 14px; line-height: 1; font-weight: 700; white-space: nowrap; }
+.procesos-compu > .procesos-aviso { margin: 8px 16px 0; }
+
+.procesos-compu .procesos-cuerpo { gap: 0; }
+.procesos-compu .procesos-figuras { width: 64px; padding: 12px 10px; gap: 6px; border: 0; border-right: 1px solid var(--procesos-borde); border-radius: 0; background: var(--procesos-fondo); overflow: visible; align-items: center; }
+.procesos-compu .procesos-figuras.abierto { width: 200px; align-items: stretch; }
+.procesos-compu .procesos-plegar { width: 40px; height: 40px; min-height: 0; padding: 0; border: 0; background: none; color: var(--procesos-texto-2); margin-bottom: 6px; }
+.procesos-compu .procesos-figuras.abierto .procesos-plegar { width: 100%; justify-content: flex-start; gap: 8px; padding: 0 8px; font-size: 14px; }
+.procesos-figura-caja { position: relative; display: block; }
+.procesos-figura-caja.grupo { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--procesos-borde); }
+.procesos-compu .procesos-figuras.plegado .procesos-figura { width: 40px; height: 36px; padding: 0; display: grid; place-items: center; border: 1px solid var(--procesos-borde); border-radius: 10px; background: var(--procesos-superficie); box-shadow: 0 1px 2px rgba(26, 29, 27, .05); color: var(--procesos-tinta); }
+.procesos-compu .procesos-figuras.plegado .procesos-figura:hover, .procesos-compu .procesos-figuras.plegado .procesos-figura:focus-visible { border-color: var(--procesos-titulo); }
+.procesos-compu .procesos-figura .procesos-icono { color: var(--procesos-tinta); }
+.procesos-globo { position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%); display: none; align-items: center; gap: 10px; padding: 6px 6px 6px 12px; border-radius: 8px; background: #1A1D1B; color: #fff; font-size: 14px; font-weight: 600; white-space: nowrap; z-index: 40; pointer-events: none; }
+.procesos-globo .procesos-tecla { background: rgba(255, 255, 255, .14) !important; border-color: rgba(255, 255, 255, .3) !important; color: #fff !important; }
+.procesos-figura-caja:hover .procesos-globo, .procesos-figura:focus-visible + .procesos-globo { display: inline-flex; }
+
+.procesos-compu .procesos-centro { gap: 0; padding: 0; }
+.procesos-compu .procesos-dibujo { border: 0; border-radius: 0; background: none; }
+.procesos-compu .djs-container { background-color: #EFECE4; background-image: radial-gradient(#D6D1C5 1px, transparent 1px); background-size: 16px 16px; }
+.procesos-compu .procesos-zoom { left: auto; right: 16px; bottom: 16px; gap: 2px; padding: 4px; background: var(--procesos-superficie); border: 1px solid var(--procesos-borde); border-radius: 14px; box-shadow: 0 6px 20px -8px rgba(26, 29, 27, .14), 0 1px 3px rgba(26, 29, 27, .06); }
+.procesos-zoom-boton { display: inline-flex; align-items: center; gap: 6px; min-width: 36px; height: 36px; justify-content: center; border: 0; border-radius: 10px; background: none; color: var(--procesos-tinta); font: inherit; font-size: 15px; font-weight: 650; cursor: pointer; }
+.procesos-zoom-boton.ancho { padding: 0 10px; }
+.procesos-zoom-boton:hover { background: var(--procesos-fondo); }
+.procesos-zoom-valor { min-width: 56px; text-align: center; font-weight: 800; font-size: 15px; }
+.procesos-zoom-raya { width: 1px; height: 24px; background: var(--procesos-borde); margin: 0 4px; }
+.procesos-compu .procesos-errores-generales { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 12px; padding: 8px 12px; background: var(--procesos-superficie); color: var(--procesos-aviso-texto); box-shadow: 0 6px 20px -8px rgba(26, 29, 27, .14); }
+
+.procesos-compu .procesos-del-paso { width: 300px; padding: 16px; border: 0; border-left: 1px solid var(--procesos-borde); border-radius: 0; background: var(--procesos-superficie); display: flex; flex-direction: column; }
+.procesos-compu .procesos-del-paso.plegado { width: 56px; padding: 12px 0; }
+.procesos-compu .procesos-del-paso-cabeza h2 { font-size: 16px; font-weight: 800; }
+.procesos-plegar-paso { width: 32px; height: 32px; display: grid; place-items: center; border: 0; background: none; color: var(--procesos-texto-2); border-radius: 8px; cursor: pointer; }
+.procesos-paso-tarjeta { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.procesos-paso-tarjeta > div { display: flex; flex-direction: column; min-width: 0; }
+.procesos-paso-tarjeta b { font-size: 16px; font-weight: 750; overflow-wrap: anywhere; }
+.procesos-paso-tarjeta span { font-size: 14px; color: var(--procesos-texto-2); }
+.procesos-paso-icono { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--procesos-accion-suave); color: var(--procesos-accion-texto); flex: none; }
+.procesos-compu .procesos-campo { margin-top: 14px; }
+.procesos-compu .procesos-campo > span:first-child { font-size: 14px; font-weight: 650; color: var(--procesos-texto-2); }
+.procesos-compu .procesos-campo input, .procesos-compu .procesos-campo select, .procesos-compu .procesos-campo textarea { border: 1px solid var(--procesos-borde-fuerte, #CEC8BA); border-radius: 12px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(26, 29, 27, .05); font-size: 15px; }
+.procesos-compu .procesos-campo input:focus, .procesos-compu .procesos-campo select:focus, .procesos-compu .procesos-campo textarea:focus { outline: none; border-color: var(--procesos-titulo); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); }
+.procesos-quitar { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: auto; padding: 0 16px; border: 0; border-radius: 12px; background: #FCEAE7; color: #AE281D; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+.procesos-formulario + .procesos-quitar { margin-top: 18px; }
+.procesos-compu .procesos-del-paso > .procesos-quitar:last-child { margin-top: auto; }
+
+.procesos-compu .procesos-pasos { border: 0; border-top: 1px solid var(--procesos-borde); border-radius: 0; background: var(--procesos-superficie); }
+.procesos-compu .procesos-pasos-cabeza { min-height: 48px; padding: 0 16px; gap: 12px; }
+.procesos-compu .procesos-pasos-cabeza b { font-size: 15px; font-weight: 800; }
+.procesos-compu .procesos-pasos-cabeza .procesos-chip { height: 28px; }
+.procesos-compu .procesos-pasos-cabeza .procesos-chip::before { display: none; }
+
+/* El dibujo, como la v2: los pasos blancos con el borde gris y las esquinas redondeadas, los
+   carriles blancos, las flechas grises y el elegido en naranja. */
+.procesos-compu .djs-element .djs-visual > rect:not([width="10"]) { rx: 10px; ry: 10px; }
+.procesos-compu .djs-shape[data-element-id^="Lane"] .djs-visual > rect, .procesos-compu .djs-shape[data-element-id^="Participant"] .djs-visual > rect, .procesos-compu .djs-shape[data-element-id^="Carril"] .djs-visual > rect { rx: 0; ry: 0; stroke: #E6E2D8 !important; stroke-width: 1px !important; }
+.procesos-compu .djs-connection .djs-visual > path { stroke: #8F938E !important; stroke-width: 1.5px !important; }
+.procesos-compu .djs-element.selected .djs-visual > rect, .procesos-compu .djs-element.selected .djs-visual > polygon, .procesos-compu .djs-element.selected .djs-visual > circle { stroke: var(--procesos-accion) !important; stroke-width: 2.5px !important; }
+.procesos-compu .djs-element.selected .djs-outline { stroke: rgba(232, 84, 28, .25) !important; stroke-width: 6px !important; stroke-dasharray: none !important; }
+/* El logo de bpmn.io queda a la vista, como pide su licencia: abajo, a la izquierda del acercar. */
+.procesos-compu .bjs-powered-by { top: auto !important; left: auto !important; right: 352px !important; bottom: 22px !important; }
+
+/* ===== La v2 en el celular (decisión 148 de Ferrebress, maqueta «Diagrama y hoja») ===== */
+.procesos-celu { gap: 12px; }
+.procesos-celu .procesos-celu-barra h1 { font-size: 24px; line-height: 30px; letter-spacing: -.02em; }
+.procesos-celu-barra-proceso h1 { font-size: 22px !important; line-height: 28px !important; }
+.procesos-celu-barra-proceso { align-items: flex-start; gap: 4px; }
+.procesos-celu-titulo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 2px; }
+.procesos-celu .procesos-desnudo { border: 0; background: none; box-shadow: none; color: var(--procesos-tinta); }
+.procesos-celu .procesos-celu-estado { gap: 12px; }
+.procesos-celu .procesos-chip { height: 30px; padding: 0 12px; gap: 6px; font-size: 15px; font-weight: 650; }
+.procesos-celu .procesos-chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.procesos-celu .procesos-chip.borrador::before, .procesos-celu .procesos-chip.vigente-con-borrador::before { background: var(--procesos-ok); }
+.procesos-celu .procesos-guardado { font-size: 15px; gap: 4px; }
+.procesos-celu .procesos-guardado.guardado::before { display: none; }
+.procesos-celu .procesos-segmentos { background: #ECE9E1; border-radius: 12px; padding: 3px; }
+.procesos-celu .procesos-segmentos button { min-height: 44px; border-radius: 10px; color: var(--procesos-texto-2); font-size: 16px; }
+.procesos-celu .procesos-segmentos button.elegido { color: var(--procesos-tinta); font-weight: 800; box-shadow: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03); }
+.procesos-celu .procesos-dibujo-celu { border: 0; border-top: 1px solid var(--procesos-borde); border-radius: 0; margin: 0 -16px; }
+.procesos-celu .djs-container { background-color: #EFECE4; background-image: radial-gradient(#D6D1C5 1px, transparent 1px); background-size: 16px 16px; }
+.procesos-celu .procesos-zoom-celu { gap: 0; padding: 0; top: 12px; right: 12px; background: var(--procesos-superficie); border: 1px solid var(--procesos-borde); border-radius: 16px; box-shadow: 0 6px 20px -8px rgba(26, 29, 27, .14), 0 1px 3px rgba(26, 29, 27, .06); overflow: hidden; }
+.procesos-celu .procesos-zoom-celu .procesos-boton { border: 0; border-radius: 0; width: 44px; min-height: 44px; background: none; }
+.procesos-celu .procesos-zoom-celu .procesos-boton + .procesos-boton { border-top: 1px solid var(--procesos-borde); }
+.procesos-celu .procesos-hoja-figuras { border-radius: 24px 24px 0 0; padding: 0 16px 12px; box-shadow: 0 -8px 24px -12px rgba(26, 29, 27, .2); }
+.procesos-celu .procesos-hoja-titulo b { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+.procesos-celu .procesos-figuras-celu { gap: 8px; margin: 8px 0 4px; }
+.procesos-celu .procesos-figura-celu { border: 1px solid transparent; border-radius: 12px; background: #ECE9E1; color: var(--procesos-texto-2); font-size: 15px; font-weight: 600; gap: 4px; }
+.procesos-celu .procesos-figura-celu .procesos-icono { color: var(--procesos-tinta); }
+.procesos-celu .procesos-figura-celu.elegida { background: var(--procesos-superficie); border-color: var(--procesos-titulo); }
+.procesos-arrastra { text-align: center; margin: 4px 0 0; font-size: 15px; }
+.procesos-celu .procesos-tarjeta { border: 1px solid var(--procesos-borde); border-radius: 16px; box-shadow: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03); }
+.procesos-celu .procesos-tarjeta-texto b { font-weight: 750; }
+.procesos-celu .procesos-boton.principal.ancho { min-height: 52px; border-radius: 14px; box-shadow: 0 8px 20px -8px rgba(232, 84, 28, .55); }
+.procesos-celu .procesos-paso-celu { border: 1px solid var(--procesos-borde); border-radius: 16px; box-shadow: 0 1px 2px rgba(26, 29, 27, .05); }
+.procesos-celu .procesos-paso-celu.elegido { border-color: var(--procesos-accion); box-shadow: 0 0 0 4px rgba(232, 84, 28, .15); }
+.procesos-celu .djs-connection .djs-visual > path { stroke: #8F938E !important; stroke-width: 1.5px !important; }
+.procesos-celu .djs-element.selected .djs-visual > rect, .procesos-celu .djs-element.selected .djs-visual > polygon, .procesos-celu .djs-element.selected .djs-visual > circle { stroke: var(--procesos-accion) !important; stroke-width: 2.5px !important; }
+.procesos-celu .djs-element.selected .djs-outline { stroke: rgba(232, 84, 28, .25) !important; stroke-width: 6px !important; stroke-dasharray: none !important; }
+.procesos-celu .djs-shape[data-element-id^="Lane"] .djs-visual > rect, .procesos-celu .djs-shape[data-element-id^="Participant"] .djs-visual > rect { stroke: #E6E2D8 !important; stroke-width: 1px !important; }
+
+/* Los desplegables de la v2: sin la flecha del navegador, con el chevron de los íconos. */
+.procesos-compu .procesos-campo select { appearance: none; -webkit-appearance: none; padding-right: 36px; background: var(--procesos-superficie) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23545955' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center; }

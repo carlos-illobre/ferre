@@ -57,6 +57,7 @@ export function PantallaDeProcesos({ interfaz }: { interfaz: "compu" | "celu" })
         puede={{ ver: puede("procesos.ver", "procesos.dibujar"), dibujar: puede("procesos.dibujar") }}
         pantallas={PANTALLAS_DE_FERREBRESS}
         guardarLocal={guardaEnElDispositivo() ? localStorage : null}
+        donde={["Más"]}
       />
     </Suspense>
     </main>

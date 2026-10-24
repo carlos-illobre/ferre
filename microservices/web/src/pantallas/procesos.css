@@ -19,6 +19,21 @@
   --procesos-aviso-borde: var(--p-amarillo-borde);
   --procesos-aviso-texto: var(--p-amarillo-texto);
 }
+/* La v2 (decisión 148): los colores de «Mostrador», los de la maqueta de Procesos. */
+.procesos-en-ferrebress .procesos {
+  --procesos-accion: #E8541C;
+  --procesos-accion-fuerte: #C8450F;
+  --procesos-accion-suave: #FDEDE4;
+  --procesos-accion-texto: #B23E0E;
+  --procesos-fondo: #F4F2EC;
+  --procesos-fondo-2: #F8F7F3;
+  --procesos-borde-fuerte: #CEC8BA;
+  --procesos-titulo: #12382F;
+  --procesos-ok: #17614E;
+  --procesos-ok-suave: #E3EEE8;
+  --procesos-aviso: #FFF3D8;
+  --procesos-aviso-texto: #845400;
+}
 /* En la computadora el editor ocupa toda la altura, debajo del encabezado. */
-.pagina.procesos-en-ferrebress { height: calc(100vh - 84px); min-height: 600px; overflow: hidden; padding-top: var(--e3, 12px); }
+.pagina.procesos-en-ferrebress { flex: 1 1 0; height: auto; min-height: 0; overflow: hidden; padding: 0; }
 .pagina.procesos-en-ferrebress > .procesos { flex: 1; min-height: 0; }

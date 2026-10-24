@@ -9,6 +9,44 @@ de la C, y celular de la B con el dibujo de la A en «Diagrama».
 - En Más, como «Procesos», con la explicación «Cómo se hace cada cosa en el negocio, dibujado
   paso a paso». Aparece solo con «Ver procesos» o «Dibujar procesos».
 
+## Cómo se ve: la v2 (Carlos, 2026-10-24, decisión 148)
+
+Procesos se ve como la v2 del director de arte (variante 1 de las maquetas de Procesos: «El
+tablero de dibujo» en la computadora y «Diagrama y hoja» en el celular), con el lenguaje
+«Mostrador». Hace lo mismo que antes; lo que sigue manda sobre la disposición de las historias.
+
+- **Computadora, arriba:** el ícono del proceso en una baldosa verde suave; encima del nombre, la
+  miga «Más › Procesos» y «✓ Guardado» (o «Guardando…», «Sin conexión: no se guardó»); el nombre
+  grande con su flecha, que abre la lista de procesos; el estado en una pastilla con su punto
+  (verde vigente, ámbar con borrador); a la derecha deshacer y rehacer, una raya, Importar,
+  Exportar, «Nuevo» y, con un borrador, «Marcar vigente» en naranja con su tecla, Alt+V. Sin
+  borrador, «Nuevo» es la acción en naranja.
+- **Las figuras,** a la izquierda, en una columna de baldosas blancas en cuatro grupos separados por
+  una raya (inicio, fin y espera; las tres tareas; las dos decisiones; el resto); al pasar el
+  mouse, el nombre en un globo oscuro (la tarea, con su tecla Insert). Arriba, el botón del panel
+  muestra los nombres.
+- **El dibujo,** sobre el papel punteado, de lado a lado; los carriles blancos, los pasos blancos
+  con el borde gris, las flechas grises y el elegido en naranja con un halo. Abajo a la derecha,
+  en una tarjeta blanca: alejar, el tamaño, acercar y «Ver todo». El logo de bpmn.io, a su
+  izquierda.
+- **El paso elegido,** a la derecha en blanco: «Paso elegido» con Alt+E y el botón para plegarlo; la
+  baldosa del tipo en naranja suave con el nombre y «Paso 5 de 10 · carril Vendedor»; los datos
+  en campos blancos redondeados; y al pie «Quitar el paso» en rojo suave, con Supr.
+- **Abajo, de lado a lado:** «Los pasos, en orden» con el resumen («10 pasos · 3 carriles · 2
+  decisiones»), la pastilla ámbar «1 paso con aviso» si alguno tiene un error de forma, Alt+P y la
+  flecha para abrir la tabla.
+- **Celular, dentro de un proceso:** ‹ para volver, el nombre, deshacer y «…»; debajo, el estado en
+  su pastilla y «✓ Guardado»; los segmentos «Diagrama» y «Pasos»; el dibujo de lado a lado sobre el
+  papel punteado con acercar, alejar y «Ver todo» apilados en una tarjeta blanca arriba a la
+  derecha; y la hoja blanca «Agregar un paso» con las doce figuras en baldosas grises con nombres
+  cortos (Subproc., Docum.) y «Arrastrá un paso al dibujo.» al pie.
+- **Lo que la v2 muestra y todavía no hay** (E02 de 021): el mapa chico del dibujo abajo a la
+  izquierda, el aviso del error de forma flotando junto al paso («Ninguna flecha llega a este
+  paso») con su insignia ámbar, el nombre de cada carril de costado con su ícono y en una pastilla
+  en el celular, y los íconos de persona y de sistema dentro de los pasos con el estilo de la v2: el
+  dibujo los muestra como los dibuja bpmn-js. El logo de bpmn.io se queda como es (su licencia no
+  deja cambiarlo), en vez de la pastilla «hecho con bpmn.io».
+
 ## Dibujar en la computadora (historia 1)
 
 - **A la vista, en este orden:** arriba, qué proceso está abierto (y desde ahí, los demás), su

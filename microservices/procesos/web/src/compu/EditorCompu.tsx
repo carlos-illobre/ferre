@@ -34,7 +34,7 @@ function usePanel(clave: string, local: GuardarLocal | null | undefined): [boole
 
 const TEXTO_DEL_GUARDADO = { guardado: "Guardado", guardando: "Guardando…", "sin-conexion": "Sin conexión: no se guardó", error: "No se guardó" } as const;
 
-export function EditorCompu({ procesos, puede, pantallas, guardarLocal }: { procesos: Procesos; puede: Puede; pantallas: string[]; guardarLocal?: GuardarLocal | null }) {
+export function EditorCompu({ procesos, puede, pantallas, guardarLocal, donde }: { procesos: Procesos; puede: Puede; pantallas: string[]; guardarLocal?: GuardarLocal | null; donde?: string[] }) {
   const d = useDibujo(procesos);
   const [figuras, alternarFiguras] = usePanel("figuras", guardarLocal);
   const [delPaso, alternarDelPaso] = usePanel("paso", guardarLocal);
@@ -114,52 +114,73 @@ export function EditorCompu({ procesos, puede, pantallas, guardarLocal }: { proc
 
   const filtrados = (lista ?? []).filter((p) => p.nombre.toLocaleLowerCase("es").includes(buscar.toLocaleLowerCase("es")));
   const errores = erroresDeForma(d.grafo).generales;
+  const conAviso = erroresDeForma(d.grafo).porPaso.size;
+  const orden = enOrden(d.grafo);
+  const decisiones = d.grafo.pasos.filter((p) => p.tipo === "decision" || p.tipo === "paralelo").length;
+  const resumen = [`${d.grafo.pasos.length} ${d.grafo.pasos.length === 1 ? "paso" : "pasos"}`, ...(d.grafo.carriles.length ? [`${d.grafo.carriles.length} ${d.grafo.carriles.length === 1 ? "carril" : "carriles"}`] : []), ...(decisiones ? [`${decisiones} ${decisiones === 1 ? "decisión" : "decisiones"}`] : [])].join(" · ");
+  const marcarVigente = dibuja && abierto?.borrador;
 
+  // Alt+V marca vigente el borrador (la v2).
+  function teclasDeLaCabeza(e: KeyboardEvent) {
+    if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "v" && marcarVigente) { e.preventDefault(); void procesos.marcarVigente(); return; }
+    teclas(e);
+  }
+
+  // La v2 (decisión 148 de Ferrebress): arriba el nombre con la miga y el estado, y las acciones; a
+  // la izquierda las figuras, en el centro el dibujo con el acercar abajo a la derecha, a la
+  // derecha el paso elegido y abajo la barra de los pasos, en orden.
   return (
-    <div className="procesos procesos-compu" data-testid="procesos" onKeyDown={teclas}>
+    <div className="procesos procesos-compu" data-testid="procesos" onKeyDown={teclasDeLaCabeza}>
       <header className="procesos-cabeza">
-        <div className="procesos-selector-caja" onClick={(e) => e.stopPropagation()}>
-          <button type="button" className="procesos-selector" aria-expanded={menu === "procesos"} onClick={() => setMenu(menu === "procesos" ? null : "procesos")} data-testid="procesos-selector">
-            <Icono nombre="diagrama" /> <span className="procesos-selector-nombre">{abierto?.nombre ?? "Procesos"}</span> <Icono nombre="abajo" tam={16} />
-          </button>
-          {menu === "procesos" && (
-            <div className="procesos-menu procesos-menu-procesos" role="menu" data-testid="procesos-menu">
-              <label className="procesos-buscar"><Icono nombre="buscar" /><input value={buscar} onChange={(e) => setBuscar(e.target.value)} placeholder="Buscar un proceso" aria-label="Buscar un proceso" autoFocus /></label>
-              <ul>
-                {filtrados.map((p) => (
-                  <li key={p.id}>
-                    <button type="button" role="menuitem" className={p.id === abierto?.id ? "elegido" : ""} onClick={() => { setMenu(null); void procesos.abrir(p.id); }} data-testid={`procesos-item-${p.id}`}>
-                      <b>{p.nombre}</b>
-                      <span>{TEXTO_DEL_ESTADO[p.vigente && p.borrador ? "vigente-con-borrador" : p.vigente ? "vigente" : "borrador"]} · {p.pasos} {p.pasos === 1 ? "paso" : "pasos"}</span>
-                    </button>
-                  </li>
-                ))}
-                {!filtrados.length && <li className="procesos-ayuda">Ningún proceso se llama así.</li>}
-              </ul>
-              {abierto && (
-                <div className="procesos-menu-acciones">
-                  <button type="button" onClick={() => { setMenu(null); setDialogo("historial"); }} data-testid="procesos-ver-historial"><Icono nombre="reloj" /> Historial</button>
-                  {dibuja && <button type="button" onClick={() => { setMenu(null); setDialogo("renombrar"); }} data-testid="procesos-renombrar"><Icono nombre="lapiz" /> Cambiar el nombre</button>}
-                  {dibuja && <button type="button" className="peligro" onClick={() => { setMenu(null); setDialogo("borrar"); }} data-testid="procesos-borrar"><Icono nombre="tacho" /> Borrar el proceso</button>}
-                </div>
-              )}
-            </div>
-          )}
+        <span className="procesos-cabeza-icono" aria-hidden="true"><Icono nombre="diagrama" tam={22} /></span>
+        <div className="procesos-cabeza-titulo">
+          <div className="procesos-migas">
+            <span>{[...(donde ?? []), "Procesos"].join(" › ")}</span>
+            {procesos.sinConexion && <span className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo se puede mirar</span>}
+            {dibuja && abierto && <span className={`procesos-guardado ${procesos.guardado}`} data-testid="procesos-guardado">{procesos.guardado === "guardado" && <Icono nombre="ok" tam={16} />}{TEXTO_DEL_GUARDADO[procesos.guardado]}</span>}
+          </div>
+          <div className="procesos-selector-caja" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="procesos-selector" aria-expanded={menu === "procesos"} onClick={() => setMenu(menu === "procesos" ? null : "procesos")} data-testid="procesos-selector">
+              <span className="procesos-selector-nombre">{abierto?.nombre ?? "Procesos"}</span> <Icono nombre="abajo" tam={18} />
+            </button>
+            {menu === "procesos" && (
+              <div className="procesos-menu procesos-menu-procesos" role="menu" data-testid="procesos-menu">
+                <label className="procesos-buscar"><Icono nombre="buscar" /><input value={buscar} onChange={(e) => setBuscar(e.target.value)} placeholder="Buscar un proceso" aria-label="Buscar un proceso" autoFocus /></label>
+                <ul>
+                  {filtrados.map((p) => (
+                    <li key={p.id}>
+                      <button type="button" role="menuitem" className={p.id === abierto?.id ? "elegido" : ""} onClick={() => { setMenu(null); void procesos.abrir(p.id); }} data-testid={`procesos-item-${p.id}`}>
+                        <b>{p.nombre}</b>
+                        <span>{TEXTO_DEL_ESTADO[p.vigente && p.borrador ? "vigente-con-borrador" : p.vigente ? "vigente" : "borrador"]} · {p.pasos} {p.pasos === 1 ? "paso" : "pasos"}</span>
+                      </button>
+                    </li>
+                  ))}
+                  {!filtrados.length && <li className="procesos-ayuda">Ningún proceso se llama así.</li>}
+                </ul>
+                {abierto && (
+                  <div className="procesos-menu-acciones">
+                    <button type="button" onClick={() => { setMenu(null); setDialogo("historial"); }} data-testid="procesos-ver-historial"><Icono nombre="reloj" /> Historial</button>
+                    {dibuja && <button type="button" onClick={() => { setMenu(null); setDialogo("renombrar"); }} data-testid="procesos-renombrar"><Icono nombre="lapiz" /> Cambiar el nombre</button>}
+                    {dibuja && <button type="button" className="peligro" onClick={() => { setMenu(null); setDialogo("borrar"); }} data-testid="procesos-borrar"><Icono nombre="tacho" /> Borrar el proceso</button>}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         {estado && <span className={`procesos-chip ${estado}`} data-testid="procesos-estado">{TEXTO_DEL_ESTADO[estado]}</span>}
         <span className="procesos-esp" />
-        {procesos.sinConexion && <span className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo se puede mirar</span>}
-        {dibuja && abierto && <span className={`procesos-guardado ${procesos.guardado}`} data-testid="procesos-guardado">{TEXTO_DEL_GUARDADO[procesos.guardado]}</span>}
         {dibuja && abierto && (
           <>
             <button type="button" className="procesos-boton icono" title="Deshacer (Ctrl+Z)" aria-label="Deshacer" onClick={() => d.lienzo.current?.deshacer()}><Icono nombre="deshacer" /></button>
             <button type="button" className="procesos-boton icono" title="Rehacer (Ctrl+Y)" aria-label="Rehacer" onClick={() => d.lienzo.current?.rehacer()}><Icono nombre="rehacer" /></button>
+            <span className="procesos-separador" aria-hidden="true" />
           </>
         )}
         {dibuja && <button type="button" className="procesos-boton" onClick={() => archivo.current?.click()} title="Traer un archivo BPMN de otro programa" data-testid="procesos-importar"><Icono nombre="subir" /> Importar</button>}
         {dibuja && abierto && (
           <div className="procesos-selector-caja" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="procesos-boton" aria-expanded={menu === "exportar"} onClick={() => setMenu(menu === "exportar" ? null : "exportar")} data-testid="procesos-exportar"><Icono nombre="bajar" /> Exportar <Icono nombre="abajo" tam={16} /></button>
+            <button type="button" className="procesos-boton" aria-expanded={menu === "exportar"} onClick={() => setMenu(menu === "exportar" ? null : "exportar")} data-testid="procesos-exportar"><Icono nombre="bajar" /> Exportar</button>
             {menu === "exportar" && (
               <div className="procesos-menu procesos-menu-exportar" role="menu" data-testid="procesos-menu-exportar">
                 <button type="button" role="menuitem" onClick={() => { setMenu(null); void d.exportar("png", abierto.nombre, TEXTO_DEL_ESTADO[estado!]); }} data-testid="procesos-exportar-png"><b>Imagen (PNG)</b><span>Para mandar o imprimir</span></button>
@@ -168,13 +189,9 @@ export function EditorCompu({ procesos, puede, pantallas, guardarLocal }: { proc
             )}
           </div>
         )}
-        {dibuja && abierto?.borrador && abierto.vigente && <button type="button" className="procesos-boton" onClick={() => void procesos.descartarBorrador()} data-testid="procesos-descartar">Descartar el borrador</button>}
-        {dibuja && abierto?.borrador ? (
-          <>
-            <button type="button" className="procesos-boton" onClick={() => setDialogo("nuevo")} data-testid="procesos-nuevo"><Icono nombre="mas" /> Proceso nuevo</button>
-            <button type="button" className="procesos-boton principal" onClick={() => void procesos.marcarVigente()} data-testid="procesos-marcar-vigente"><Icono nombre="ok" /> Marcar vigente</button>
-          </>
-        ) : dibuja && <button type="button" className="procesos-boton principal" onClick={() => setDialogo("nuevo")} data-testid="procesos-nuevo"><Icono nombre="mas" /> Proceso nuevo</button>}
+        {dibuja && abierto?.borrador && abierto.vigente && <button type="button" className="procesos-boton fantasma" onClick={() => void procesos.descartarBorrador()} data-testid="procesos-descartar">Descartar el borrador</button>}
+        {dibuja && <button type="button" className={`procesos-boton ${marcarVigente ? "" : "principal"}`} onClick={() => setDialogo("nuevo")} title="Proceso nuevo" data-testid="procesos-nuevo"><Icono nombre="mas" /> Nuevo</button>}
+        {marcarVigente && <button type="button" className="procesos-boton principal" onClick={() => void procesos.marcarVigente()} aria-keyshortcuts="Alt+V" data-testid="procesos-marcar-vigente"><Icono nombre="ok" /> Marcar vigente <span className="procesos-tecla">Alt V</span></button>}
       </header>
 
       {procesos.aviso && (
@@ -186,67 +203,78 @@ export function EditorCompu({ procesos, puede, pantallas, guardarLocal }: { proc
 
       <div className="procesos-cuerpo">
         {dibuja && abierto && (
-          <aside className={`procesos-panel procesos-figuras ${figuras ? "abierto" : "plegado"}`} data-testid="procesos-panel-figuras">
+          <aside className={`procesos-figuras ${figuras ? "abierto" : "plegado"}`} data-testid="procesos-panel-figuras">
             <button type="button" className="procesos-plegar" onClick={alternarFiguras} aria-expanded={figuras} title="Mostrar u ocultar los nombres (Alt+F)" data-testid="procesos-plegar-figuras">
-              <Icono nombre={figuras ? "izquierda" : "derecha"} />{figuras && <span>Arrastrá al dibujo</span>}
+              <Icono nombre={figuras ? "panel" : "panel-derecho"} />{figuras && <span>Arrastrá al dibujo</span>}
             </button>
-            {FIGURAS.map((f) => (
-              <button key={f.tipo} type="button" className="procesos-figura" title={f.nombre} aria-label={f.nombre} data-testid={`procesos-figura-${f.tipo}`}
-                onMouseDown={(e) => { e.preventDefault(); d.lienzo.current?.empezarArrastre(e.nativeEvent, f.tipo); }}
-                onClick={() => d.lienzo.current?.agregar(f.tipo, d.elegido)}>
-                <Icono nombre={f.tipo as NombreDeIcono} tam={figuras ? 22 : 24} />{figuras && <span>{f.nombre}</span>}
-              </button>
+            {FIGURAS_EN_GRUPOS.map((f, i) => (
+              <span key={f.tipo} className={`procesos-figura-caja ${GRUPO_NUEVO.has(i) ? "grupo" : ""}`}>
+                <button type="button" className="procesos-figura" aria-label={f.nombre} data-testid={`procesos-figura-${f.tipo}`}
+                  onMouseDown={(e) => { e.preventDefault(); d.lienzo.current?.empezarArrastre(e.nativeEvent, f.tipo); }}
+                  onClick={() => d.lienzo.current?.agregar(f.tipo, d.elegido)}>
+                  <Icono nombre={f.tipo as NombreDeIcono} tam={figuras ? 20 : 18} />{figuras && <span>{f.nombre}</span>}
+                </button>
+                {!figuras && <span className="procesos-globo" role="tooltip">{f.nombre}{f.tipo === "tarea" && <span className="procesos-tecla">Insert</span>}</span>}
+              </span>
             ))}
           </aside>
         )}
 
         <div className="procesos-centro">
-          <div className="procesos-panel procesos-dibujo" onKeyDownCapture={teclasDelDibujo}>
+          <div className="procesos-dibujo" onKeyDownCapture={teclasDelDibujo}>
             {xml ? (
               <Lienzo ref={d.lienzo} xml={xml} soloLectura={!dibuja} alCambiar={d.alCambiar} alCargar={d.alCargar} alElegir={alElegir} alZoom={setZoom} alError={procesos.avisar} />
             ) : <p className="procesos-ayuda procesos-cargando" role="status">{procesos.cargando ? "Abriendo el proceso…" : "Elegí un proceso de la lista."}</p>}
-            {errores.length > 0 && dibuja && <p className="procesos-errores-generales" data-testid="procesos-errores-generales">{errores.join(" · ")}</p>}
+            {errores.length > 0 && dibuja && <p className="procesos-errores-generales" data-testid="procesos-errores-generales"><Icono nombre="aviso" tam={16} />{errores.join(" · ")}</p>}
             {xml && (
               <div className="procesos-zoom">
-                <button type="button" className="procesos-boton icono" aria-label="Alejar" onClick={() => d.lienzo.current?.alejar()}><Icono nombre="menos" /></button>
-                <span className="procesos-boton chico" aria-label="Tamaño del dibujo">{Math.round(zoom * 100)} %</span>
-                <button type="button" className="procesos-boton icono" aria-label="Acercar" onClick={() => d.lienzo.current?.acercar()}><Icono nombre="mas" /></button>
-                <button type="button" className="procesos-boton icono" aria-label="Ver todo" title="Ver todo" onClick={() => d.lienzo.current?.verTodo()}><Icono nombre="ajustar" /></button>
+                <button type="button" className="procesos-zoom-boton" aria-label="Alejar" onClick={() => d.lienzo.current?.alejar()}><Icono nombre="alejar" tam={18} /></button>
+                <span className="procesos-zoom-valor" aria-label="Tamaño del dibujo">{Math.round(zoom * 100)} %</span>
+                <button type="button" className="procesos-zoom-boton" aria-label="Acercar" onClick={() => d.lienzo.current?.acercar()}><Icono nombre="acercar" tam={18} /></button>
+                <span className="procesos-zoom-raya" aria-hidden="true" />
+                <button type="button" className="procesos-zoom-boton ancho" onClick={() => d.lienzo.current?.verTodo()}><Icono nombre="ver-todo" tam={18} />Ver todo</button>
               </div>
             )}
           </div>
-          <section className={`procesos-panel procesos-pasos ${pasos ? "abierto" : "plegado"}`} data-testid="procesos-panel-pasos">
-            <button type="button" className="procesos-pasos-cabeza" onClick={alternarPasos} aria-expanded={pasos} data-testid="procesos-plegar-pasos">
-              <Icono nombre={pasos ? "abajo" : "derecha"} /><b>Los pasos, en orden</b>
-              <span className="procesos-ayuda">{dibuja ? "Lo que se cambia acá cambia el dibujo, y al revés." : "El recorrido del proceso, paso por paso."}</span>
-              <span className="procesos-esp" /><span className="procesos-ayuda">{d.grafo.pasos.length} {d.grafo.pasos.length === 1 ? "paso" : "pasos"}</span><span className="procesos-tecla">Alt+P</span>
-            </button>
-            {pasos && <TablaDePasos procesos={procesos} d={d} dibuja={dibuja} />}
-          </section>
         </div>
 
         {abierto && (
-          <aside className={`procesos-panel procesos-del-paso ${delPaso ? "abierto" : "plegado"}`} data-testid="procesos-panel-paso">
+          <aside className={`procesos-del-paso ${delPaso ? "abierto" : "plegado"}`} data-testid="procesos-panel-paso">
             {delPaso ? (
               <>
                 <div className="procesos-del-paso-cabeza">
-                  <button type="button" className="procesos-boton icono" onClick={alternarDelPaso} aria-expanded title="Plegar (Alt+E)" aria-label="Plegar el paso elegido" data-testid="procesos-plegar-paso"><Icono nombre="derecha" /></button>
                   <h2>Paso elegido</h2>
-                  {d.pasoElegido && dibuja && <button type="button" className="procesos-boton icono" title="Quitar el paso (Supr)" aria-label="Quitar el paso" onClick={() => d.lienzo.current?.quitar(d.pasoElegido!.id)} data-testid="procesos-quitar-paso"><Icono nombre="tacho" /></button>}
+                  <span className="procesos-tecla">Alt E</span>
+                  <button type="button" className="procesos-plegar-paso" onClick={alternarDelPaso} aria-expanded title="Plegar (Alt+E)" aria-label="Plegar el paso elegido" data-testid="procesos-plegar-paso"><Icono nombre="panel-derecho" /></button>
                 </div>
-                {d.pasoElegido
-                  ? <FormularioDelPaso paso={d.pasoElegido} grafo={d.grafo} pantallas={pantallas} soloLectura={!dibuja} alCambiar={(c) => d.lienzo.current?.cambiar(d.pasoElegido!.id, c)} />
-                  : <p className="procesos-ayuda">Tocá un paso del dibujo para ver sus datos.</p>}
+                {d.pasoElegido ? <>
+                  <div className="procesos-paso-tarjeta">
+                    <span className="procesos-paso-icono"><Icono nombre={d.pasoElegido.tipo} tam={22} /></span>
+                    <div><b>{d.pasoElegido.nombre || NOMBRE_DEL_TIPO[d.pasoElegido.tipo]}</b><span>{[`Paso ${orden.findIndex((p) => p.id === d.pasoElegido!.id) + 1} de ${orden.length}`, d.pasoElegido.carril ? `carril ${d.pasoElegido.carril}` : null].filter(Boolean).join(" · ")}</span></div>
+                  </div>
+                  <FormularioDelPaso paso={d.pasoElegido} grafo={d.grafo} pantallas={pantallas} soloLectura={!dibuja} alCambiar={(c) => d.lienzo.current?.cambiar(d.pasoElegido!.id, c)} />
+                  {dibuja && <button type="button" className="procesos-quitar" onClick={() => d.lienzo.current?.quitar(d.pasoElegido!.id)} aria-keyshortcuts="Delete" data-testid="procesos-quitar-paso"><Icono nombre="tacho" tam={18} /> Quitar el paso <span className="procesos-tecla">Supr</span></button>}
+                </> : <p className="procesos-ayuda">Tocá un paso del dibujo para ver sus datos.</p>}
               </>
             ) : (
               <button type="button" className="procesos-plegado-vertical" onClick={alternarDelPaso} aria-expanded={false} title="Mostrar el paso elegido (Alt+E)" data-testid="procesos-plegar-paso">
-                <Icono nombre="izquierda" />
+                <Icono nombre="panel" />
                 {d.pasoElegido && <><Icono nombre={d.pasoElegido.tipo} /><span className="procesos-vertical">{d.pasoElegido.nombre || NOMBRE_DEL_TIPO[d.pasoElegido.tipo]}</span></>}
               </button>
             )}
           </aside>
         )}
       </div>
+
+      <section className={`procesos-pasos ${pasos ? "abierto" : "plegado"}`} data-testid="procesos-panel-pasos">
+        <button type="button" className="procesos-pasos-cabeza" onClick={alternarPasos} aria-expanded={pasos} data-testid="procesos-plegar-pasos">
+          <Icono nombre="lista" /><b>Los pasos, en orden</b>
+          <span className="procesos-ayuda">{resumen}</span>
+          {conAviso > 0 && dibuja && <span className="procesos-chip borrador"><Icono nombre="aviso" tam={16} />{conAviso === 1 ? "1 paso con aviso" : `${conAviso} pasos con aviso`}</span>}
+          <span className="procesos-esp" /><span className="procesos-tecla">Alt P</span><Icono nombre={pasos ? "abajo" : "arriba"} />
+        </button>
+        {pasos && <TablaDePasos procesos={procesos} d={d} dibuja={dibuja} />}
+      </section>
 
       <EntradaDeArchivo archivo={archivo} alElegir={d.importar} />
       {dialogo === "nuevo" && <PedirNombre titulo="Proceso nuevo" boton="Crear" alCerrar={() => setDialogo(null)} alAceptar={async (n) => { if (await procesos.crear(n)) setDialogo(null); }} />}
@@ -256,6 +284,12 @@ export function EditorCompu({ procesos, puede, pantallas, guardarLocal }: { proc
     </div>
   );
 }
+
+// Las figuras van en cuatro grupos, separados por una raya: los eventos, las tareas, las
+// decisiones y el resto.
+const ORDEN_DE_LAS_FIGURAS = ["inicio", "fin", "espera", "tarea", "persona", "sistema", "decision", "paralelo", "subproceso", "carril", "documento", "nota"];
+const FIGURAS_EN_GRUPOS = ORDEN_DE_LAS_FIGURAS.map((t) => FIGURAS.find((f) => f.tipo === t)!);
+const GRUPO_NUEVO = new Set([3, 6, 8]);
 
 function TablaDePasos({ procesos, d, dibuja }: { procesos: Procesos; d: ReturnType<typeof useDibujo>; dibuja: boolean }) {
   const filas = filasDe(d.grafo);

@@ -18,6 +18,8 @@ export type PropsDeProcesos = {
   /** Las pantallas de la aplicación que se pueden nombrar en un paso («Vender → Cobrar»). */
   pantallas: string[];
   guardarLocal?: GuardarLocal | null;
+  /** Dónde está Procesos en la aplicación, para la miga de arriba («Más › Procesos»). */
+  donde?: string[];
 };
 
 export const esErrorDePedido = (e: unknown): e is ErrorDePedido => e instanceof Error && typeof (e as ErrorDePedido).estado === "number";

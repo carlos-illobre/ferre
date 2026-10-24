@@ -24,8 +24,8 @@ const FIGURAS_CELU: { tipo: TipoDePaso | "carril"; nombre: string; corto: string
   { tipo: "persona", nombre: "Tarea de una persona", corto: "Persona" }, { tipo: "sistema", nombre: "Tarea del sistema", corto: "Sistema" },
   { tipo: "decision", nombre: "Decisión", corto: "Decisión" }, { tipo: "paralelo", nombre: "En paralelo", corto: "Paralelo" },
   { tipo: "espera", nombre: "Espera", corto: "Espera" }, { tipo: "fin", nombre: "Fin", corto: "Fin" },
-  { tipo: "subproceso", nombre: "Subproceso", corto: "Subproceso" }, { tipo: "carril", nombre: "Carril", corto: "Carril" },
-  { tipo: "documento", nombre: "Documento", corto: "Documento" }, { tipo: "nota", nombre: "Nota", corto: "Nota" },
+  { tipo: "subproceso", nombre: "Subproceso", corto: "Subproc." }, { tipo: "carril", nombre: "Carril", corto: "Carril" },
+  { tipo: "documento", nombre: "Documento", corto: "Docum." }, { tipo: "nota", nombre: "Nota", corto: "Nota" },
 ];
 // Los que se pueden poner en el recorrido desde «Pasos».
 const PASOS_DEL_RECORRIDO = FIGURAS_CELU.filter((f): f is { tipo: TipoDePaso; nombre: string; corto: string } => ["tarea", "persona", "sistema", "decision", "paralelo", "espera", "fin", "subproceso"].includes(f.tipo));
@@ -115,16 +115,18 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
   return (
     <div className="procesos procesos-celu procesos-celu-proceso" data-testid="procesos">
       <AtrasVuelveALaLista alVolver={() => setVista("lista")} />
-      <div className="procesos-celu-barra">
-        <button type="button" className="procesos-boton icono" aria-label="Volver a la lista" onClick={() => setVista("lista")} data-testid="procesos-volver"><Icono nombre="izquierda" /></button>
-        <h1 title={abierto?.nombre}>{abierto?.nombre ?? "Abriendo…"}</h1>
-        {dibuja && <button type="button" className="procesos-boton icono" aria-label="Deshacer" onClick={() => d.lienzo.current?.deshacer()}><Icono nombre="deshacer" /></button>}
-        <button type="button" className="procesos-boton icono" aria-label="Más opciones" onClick={() => setHoja("menu")} data-testid="procesos-menu-celu"><Icono nombre="puntos" /></button>
-      </div>
-      <div className="procesos-celu-estado">
-        {estado && <span className={`procesos-chip ${estado}`} data-testid="procesos-estado">{TEXTO_DEL_ESTADO[estado]}</span>}
-        {dibuja && <span className={`procesos-guardado ${procesos.guardado}`} data-testid="procesos-guardado">{{ guardado: "Guardado", guardando: "Guardando…", "sin-conexion": "Sin conexión: no se guardó", error: "No se guardó" }[procesos.guardado]}</span>}
-        {procesos.sinConexion && <span className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo lectura</span>}
+      <div className="procesos-celu-barra procesos-celu-barra-proceso">
+        <button type="button" className="procesos-boton icono procesos-desnudo" aria-label="Volver a la lista" onClick={() => setVista("lista")} data-testid="procesos-volver"><Icono nombre="izquierda" tam={24} /></button>
+        <div className="procesos-celu-titulo">
+          <h1 title={abierto?.nombre}>{abierto?.nombre ?? "Abriendo…"}</h1>
+          <div className="procesos-celu-estado">
+            {estado && <span className={`procesos-chip ${estado}`} data-testid="procesos-estado">{TEXTO_DEL_ESTADO[estado]}</span>}
+            {dibuja && <span className={`procesos-guardado ${procesos.guardado}`} data-testid="procesos-guardado">{procesos.guardado === "guardado" && <Icono nombre="ok" tam={18} />}{{ guardado: "Guardado", guardando: "Guardando…", "sin-conexion": "Sin conexión: no se guardó", error: "No se guardó" }[procesos.guardado]}</span>}
+            {procesos.sinConexion && <span className="procesos-guardado sin-conexion" data-testid="procesos-sin-conexion">Sin conexión: solo lectura</span>}
+          </div>
+        </div>
+        {dibuja && <button type="button" className="procesos-boton icono procesos-desnudo" aria-label="Deshacer" onClick={() => d.lienzo.current?.deshacer()}><Icono nombre="deshacer" /></button>}
+        <button type="button" className="procesos-boton icono procesos-desnudo" aria-label="Más opciones" onClick={() => setHoja("menu")} data-testid="procesos-menu-celu"><Icono nombre="puntos" /></button>
       </div>
       {avisos}
       <div className="procesos-segmentos" role="tablist">
@@ -149,9 +151,9 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
         style={{ "--procesos-hoja-visible": `${dibuja && pestana === "diagrama" ? (figurasAbiertas ? altoHoja : ALTO_HOJA_PLEGADA) : 0}px` } as React.CSSProperties}>
         {xml && <Lienzo ref={d.lienzo} xml={xml} soloLectura={!dibuja} tactil alCambiar={d.alCambiar} alCargar={d.alCargar} alElegir={d.setElegido} alError={procesos.avisar} />}
         <div className="procesos-zoom procesos-zoom-celu">
-          <button type="button" className="procesos-boton icono" aria-label="Acercar" onClick={() => d.lienzo.current?.acercar()}><Icono nombre="mas" /></button>
-          <button type="button" className="procesos-boton icono" aria-label="Alejar" onClick={() => d.lienzo.current?.alejar()}><Icono nombre="menos" /></button>
-          <button type="button" className="procesos-boton icono" aria-label="Ver todo" onClick={() => d.lienzo.current?.verTodo()}><Icono nombre="ajustar" /></button>
+          <button type="button" className="procesos-boton icono" aria-label="Acercar" onClick={() => d.lienzo.current?.acercar()}><Icono nombre="acercar" tam={22} /></button>
+          <button type="button" className="procesos-boton icono" aria-label="Alejar" onClick={() => d.lienzo.current?.alejar()}><Icono nombre="alejar" tam={22} /></button>
+          <button type="button" className="procesos-boton icono" aria-label="Ver todo" onClick={() => d.lienzo.current?.verTodo()}><Icono nombre="ver-todo" tam={22} /></button>
         </div>
         {dibuja && pestana === "diagrama" && (
           <div ref={hojaFiguras} className={`procesos-hoja procesos-hoja-figuras ${figurasAbiertas ? "abierta" : "plegada"}`} data-testid="procesos-hoja-figuras">
@@ -159,7 +161,6 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
               <span className="procesos-tirador" />
               <span className="procesos-hoja-titulo-texto"><b>Agregar un paso</b><Icono nombre={figurasAbiertas ? "abajo" : "arriba"} /></span>
             </button>
-            <p className="procesos-ayuda procesos-un-renglon">Arrastrá un paso al dibujo.</p>
             <div className="procesos-figuras-celu">
               {FIGURAS_CELU.map((f) => (
                 <button key={f.tipo} type="button" className="procesos-figura-celu" aria-label={f.nombre} title={f.nombre} data-testid={`procesos-figura-${f.tipo}`}
@@ -170,6 +171,7 @@ export function ProcesosCelu({ procesos, puede, pantallas }: { procesos: Proceso
                 </button>
               ))}
             </div>
+            <p className="procesos-ayuda procesos-un-renglon procesos-arrastra">Arrastrá un paso al dibujo.</p>
           </div>
         )}
       </div>

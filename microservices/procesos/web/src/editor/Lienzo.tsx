@@ -58,6 +58,8 @@ type Props = {
   tactil?: boolean;
 };
 
+const LETRA = "'Manrope Variable', Manrope, system-ui, Arial, sans-serif";
+
 type Elemento = { id: string; type: string; businessObject: ObjetoBpmn & { $parent?: ObjetoBpmn }; x: number; y: number; width: number; height: number; parent?: Elemento; incoming?: Elemento[]; outgoing?: Elemento[]; source?: Elemento; target?: Elemento; labelTarget?: unknown };
 // bpmn-js no publica tipos para cada servicio: se usa por nombre, con lo poco que hace falta.
 type Servicio = Record<string, (...args: never[]) => unknown>;
@@ -104,8 +106,10 @@ export const Lienzo = forwardRef<ApiDelLienzo, Props>(function Lienzo({ xml, sol
       container: contenedor.current!,
       moddleExtensions: { procesos: EXTENSION },
       zoomScroll: { enabled: false },
-      // Letra más grande que la de fábrica: se lee de lejos, como el resto de la aplicación.
-      textRenderer: { defaultStyle: { fontFamily: "Arial, sans-serif", fontSize: 14, lineHeight: 1.2 }, externalStyle: { fontFamily: "Arial, sans-serif", fontSize: 13 } },
+      // Letra más grande que la de fábrica: se lee de lejos, como el resto de la aplicación. La
+      // letra y los colores son los de la v2 (la aplicación los puede cambiar con sus variables).
+      textRenderer: { defaultStyle: { fontFamily: LETRA, fontSize: 14, fontWeight: 650, lineHeight: 1.2 }, externalStyle: { fontFamily: LETRA, fontSize: 14, fontWeight: 500 } },
+      bpmnRenderer: { defaultFillColor: "#FFFFFF", defaultStrokeColor: "#6B706B", defaultLabelColor: "#1A1D1B" },
     };
     const v = soloLectura ? new NavigatedViewer(opciones) : new Modeler(opciones);
     visor.current = v;
