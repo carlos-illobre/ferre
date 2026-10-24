@@ -1,0 +1,32 @@
+/* Piezas propias de Pedidos a proveedores. Todo con las variables de _comun/comun.css. */
+
+/* El mensaje tal como lo recibe el proveedor: papel de chat, sin costos */
+.mensaje { position: relative; background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px 16px 4px 16px; padding: 12px 14px; box-shadow: var(--sombra-1); font-size: 15px; line-height: 22px; color: var(--tinta); }
+.mensaje .hola { font-weight: 600; margin-bottom: 6px; }
+.mensaje ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.mensaje li { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.mensaje li b { font-weight: 800; white-space: nowrap; }
+.mensaje li code { font: inherit; font-size: 14px; color: var(--texto-2); font-weight: 650; }
+.mensaje .firma { margin-top: 8px; color: var(--texto-2); font-size: 14px; }
+.mensaje .hora { position: absolute; right: 10px; bottom: 6px; font-size: 14px; color: var(--texto-3); }
+.fondo-chat { background: var(--hundido); border-radius: 16px; padding: 12px; }
+
+/* Avance de un pedido: lo que llegó sobre lo pedido */
+.avance { height: 8px; border-radius: 99px; background: var(--hundido-2); overflow: hidden; display: flex; }
+.avance b { display: block; height: 100%; background: var(--logro); }
+.avance b.parcial { background: repeating-linear-gradient(-45deg, var(--logro) 0 4px, #57C08F 4px 8px); }
+
+/* Grupo de una lista: título chico con su número */
+.grupo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 750; color: var(--texto-2); margin: 4px 4px 8px; }
+.grupo .n { color: var(--texto-3); font-weight: 700; }
+.grupo .linea { flex: 1; height: 1px; background: var(--borde); }
+
+/* Privado: lo que solo ve quien arma el pedido */
+.privado { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; color: var(--texto-3); }
+
+/* Lateral plegado (lenguaje: «plegable a 72 px para pantallas que piden ancho») */
+.app.plegado .nav-item .pastilla { position: absolute; top: 0; right: -6px; height: 22px; padding: 0 6px; margin: 0 !important; }
+.app.plegado .pie > .pastilla { display: none; }
+.app.plegado .vinculo { width: 48px; height: 48px; padding: 0; justify-content: center; }
+.app.plegado .usuario { padding: 6px 0; }
+.mensaje li code { white-space: nowrap; }

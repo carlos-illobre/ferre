@@ -1,0 +1,51 @@
+/* Más · piezas propias de la pantalla (sobre _comun/comun.css). Solo variables del lenguaje común. */
+
+/* ---- Opción de Más: el molde de las seis maquetas ---- */
+.ico-op { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--pino-suave); color: var(--pino-texto); flex: none; }
+.ico-op.urgente { background: var(--urgente-suave); color: var(--urgente-texto); }
+.ico-op.neutro { background: var(--hundido); color: var(--texto-2); }
+.ico-op.chico { width: 40px; height: 40px; border-radius: 12px; }
+
+.permiso { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--texto-3); }
+.permiso b { font-weight: 700; color: var(--texto-2); }
+
+/* Llave (la misma que Configuración) */
+.llave { position: relative; width: 52px; height: 32px; border-radius: 99px; background: var(--hundido-2); flex: none; border: 0; padding: 0; transition: background var(--t) var(--curva); }
+.llave::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 99px; background: #fff; box-shadow: 0 2px 4px rgba(26,29,27,.2); transition: transform var(--t) var(--rebote); }
+.llave.si { background: var(--pino); }
+.llave.si::after { transform: translateX(20px); }
+
+/* Tramos de Sistema: segmentos que ocupan el ancho */
+.tramos { display: flex; width: 100%; }
+.tramos > * { flex: 1; justify-content: center; min-height: 40px; }
+.tramos > * { cursor: pointer; }
+
+/* ---- Hoja (celular) y diálogo (computadora) ---- */
+.velo { position: fixed; inset: 0; background: rgba(26, 29, 27, .3); opacity: 0; transition: opacity var(--t-nav) var(--curva); z-index: 40; }
+.velo.ver { opacity: 1; }
+.celu .velo { position: absolute; }
+.hoja { position: absolute; left: 0; right: 0; bottom: 0; z-index: 41; background: var(--superficie); border-radius: var(--r-hoja) var(--r-hoja) 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 28px; transform: translateY(100%); transition: transform var(--t-nav) var(--curva); max-height: 92%; overflow: auto; }
+.hoja.ver { transform: none; }
+.hoja .asa { width: 40px; height: 5px; border-radius: 99px; background: var(--hundido-2); margin: 4px auto 12px; }
+.dialogo { position: fixed; left: 50%; top: 50%; z-index: 41; width: 600px; max-width: calc(100vw - 32px); background: var(--superficie); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); padding: 24px; transform: translate(-50%, -46%) scale(.98); opacity: 0; transition: transform var(--t) var(--curva), opacity var(--t) var(--curva); }
+.dialogo.ver { transform: translate(-50%, -50%); opacity: 1; }
+.cab-hoja { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.cab-hoja .t-seccion { flex: 1; }
+.ajuste { padding: 16px 0; border-top: 1px solid var(--borde); }
+.ajuste:first-of-type { border-top: 0; padding-top: 4px; }
+.ajuste .tt { font-weight: 750; font-size: 16px; line-height: 22px; }
+.ajuste .dd { font-size: 14px; line-height: 20px; color: var(--texto-2); margin: 2px 0 10px; }
+.ajuste .fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.tostada-mas { position: fixed; left: 50%; bottom: 32px; z-index: 60; transform: translate(-50%, 16px); opacity: 0; transition: transform var(--t) var(--rebote), opacity var(--t) var(--curva); }
+.celu .tostada-mas { position: absolute; bottom: 92px; }
+.tostada-mas.ver { transform: translate(-50%, 0); opacity: 1; }
+
+/* Foco del teclado (decisión 137: borde verde) */
+.marca-teclado { outline: 3px solid var(--pino); outline-offset: 2px; }
+
+/* Apretar */
+.tocable { transition: transform var(--t-micro) var(--curva); cursor: pointer; }
+.tocable:active { transform: scale(.98); }
+
+@media (prefers-reduced-motion: reduce) { .hoja, .dialogo, .velo, .tostada-mas { transition: none !important; } }

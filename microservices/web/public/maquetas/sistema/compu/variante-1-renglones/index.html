@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema · Renglones (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../sistema.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .cols { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+  .aj { padding: 18px 24px 20px; }
+  .aj + .aj { border-top: 1px solid var(--borde); }
+  .aj .cab { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 14px; align-items: start; }
+  .aj .tt { font-weight: 750; font-size: 16px; line-height: 22px; }
+  .aj .dd { font-size: 14px; line-height: 20px; color: var(--texto-2); margin-top: 2px; max-width: 520px; }
+  .aj .va { font-weight: 800; font-size: 16px; color: var(--pino); white-space: nowrap; margin-top: 2px; }
+  .aj .tramos, .aj .numero { margin: 12px 0 0 54px; }
+  .aj .tramos { max-width: 500px; }
+  .aj .rango { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .guardado { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+  .lado .tarjeta { padding: 16px 20px; }
+  .lado .tarjeta + .tarjeta { margin-top: 12px; }
+  .gasto .va { font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.02em; }
+  .gasto .va small { font-size: 16px; color: var(--texto-2); font-weight: 650; letter-spacing: 0; }
+  .gasto .medidor { margin: 32px 0 12px; }
+  .leyenda { display: grid; gap: 4px; font-size: 14px; color: var(--texto-2); }
+  .leyenda span { display: flex; align-items: center; gap: 8px; }
+  .leyenda i.c { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .leyenda em { margin-left: auto; font-style: normal; font-weight: 700; color: var(--tinta); }
+  .ult { padding: 0 !important; }
+  .ult .cab-ult { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; font-weight: 750; }
+  .ult a { color: var(--pino-texto); font-size: 14px; font-weight: 700; }
+  .teclas { display: flex; gap: 16px; align-items: center; margin-top: 12px; font-size: 14px; color: var(--texto-2); }
+  .teclas span { display: inline-flex; gap: 6px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="nav-sub"><a data-ir="anomalias">Anomalías</a><a data-ir="procesos">Procesos</a><a data-ir="mejoras-y-errores">Mejoras y errores</a><a data-ir="configuracion">Configuración</a><a class="activo" data-ir="sistema">Sistema</a></div>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Sistema</div><div class="sub">Lo que vale para todos los dispositivos. Lo fija quien administra; nadie lo cambia para el suyo.</div></div>
+      <div class="acciones"><span class="pastilla pino"><i class="i i-s" data-i="shield-check"></i>Administrar el sistema</span></div>
+    </header>
+    <section class="pantalla" style="padding-top:20px">
+      <div class="cols">
+        <div>
+          <div class="grupo">
+            <div class="aj">
+              <div class="cab">
+                <span class="ico-c"><i class="i" data-i="server"></i></span>
+                <div><div class="tt">Cuánto recuerda la sesión el servidor</div><div class="dd">Mientras la recuerda, no le pregunta a la base quién es cada persona ni qué puede hacer. Más tiempo, menos consultas. Desactivar a alguien desde la aplicación vale en el acto; un cambio hecho directo en la base tarda hasta este tiempo.</div></div>
+                <span class="kbd">Alt S</span>
+              </div>
+              <div class="tramos foco"><b>No</b><b>30 s</b><b class="elegido arranque">1 min</b><b>5 min</b><b>10 min</b></div>
+            </div>
+            <div class="aj">
+              <div class="cab">
+                <span class="ico-c"><i class="i" data-i="smartphone"></i></span>
+                <div><div class="tt">Cada cuánto pregunta el celular emparejado</div><div class="dd">Lo que la computadora le pide (una foto, que haga de lector) le llega al instante. Esta pregunta es el respaldo si se corta la conexión entre los dos: más seguido se entera antes y gasta más datos de la base.</div></div>
+                <span class="kbd">Alt C</span>
+              </div>
+              <div class="tramos"><b>5 s</b><b>30 s</b><b class="elegido arranque">1 min</b><b>5 min</b><b>10 min</b></div>
+            </div>
+            <div class="aj">
+              <div class="cab">
+                <span class="ico-c"><i class="i" data-i="link"></i></span>
+                <div><div class="tt">Cuántos días dura el vínculo</div><div class="dd">Cuánto queda unido un celular a una computadora sin volver a escanear. Lo usan los vínculos nuevos y los que se renuevan.</div></div>
+                <span class="kbd">Alt V</span>
+              </div>
+              <div class="numero"><button class="btn">−</button><span class="caja num">30</span><button class="btn">+</button><span style="font-weight:700">días</span><span class="rango">de 1 a 365</span></div>
+            </div>
+          </div>
+          <div class="guardado">
+            <div class="aviso logro" style="flex:1"><i class="i i-s" data-i="circle-check" style="margin-top:2px"></i><span>Guardado para todos: el celular emparejado pregunta cada 1 minuto. Llega a los dispositivos abiertos en menos de un minuto y queda en «Quién hizo qué».</span></div>
+          </div>
+          <div class="teclas"><span><span class="kbd">Tab</span> pasa de renglón</span><span><span class="kbd">←</span><span class="kbd">→</span> elige el tramo</span><span>Se guarda solo, sin otro botón</span><span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center"><span style="width:6px;height:6px;border-radius:9px;background:var(--texto-3);opacity:.5"></span>valor de arranque</span></div>
+        </div>
+
+        <div class="lado">
+          <div class="tarjeta gasto">
+            <div class="t-etiqueta">Datos que salen de la base, por día</div>
+            <div class="va num">12,2 MB <small>de 30 MB</small></div>
+            <div class="medidor"><b class="resto" style="width:24.5%"></b><b class="ses" style="width:4.75%"></b><b class="cel" style="width:1.25%"></b><span class="tope" data-t="tope 30" style="left:75%"></span></div>
+            <div class="leyenda">
+              <span><i class="c" style="background:var(--texto-3);opacity:.45"></i>Ventas, catálogo y stock<em>9,8 MB</em></span>
+              <span><i class="c" style="background:var(--pino)"></i>Buscar sesiones<em>1,9 MB</em></span>
+              <span><i class="c" style="background:var(--logro);opacity:.55"></i>Preguntas del celular<em>0,5 MB</em></span>
+            </div>
+            <div class="t-detalle" style="margin-top:10px">Estimado con el uso de esta semana. Antes de estos ajustes: 41 MB por día.</div>
+          </div>
+          <div class="tarjeta ult">
+            <div class="cab-ult">Últimos cambios <a data-ir="actividad">Quién hizo qué ›</a></div>
+            <div class="hecho"><span class="av">CI</span><div class="qq"><b>Carlos Illobre</b> · hoy 10:41<br>Celular emparejado <span class="de-a"><s>30 s</s>→ 1 min</span></div></div>
+            <div class="hecho"><span class="av">MB</span><div class="qq"><b>Marta Benítez</b> · ayer 18:40<br>Días del vínculo <span class="de-a"><s>15</s>→ 30</span></div></div>
+            <div class="hecho"><span class="av sis"><i class="i i-s" data-i="settings"></i></span><div class="qq"><b>Sistema</b> · 23/10<br>Valores de arranque</div></div>
+          </div>
+          <div class="tarjeta quien" style="display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center">
+            <span class="ico-c gris"><i class="i" data-i="users"></i></span>
+            <div><div style="font-weight:750">Lo cambian 2 personas</div><div class="t-detalle">Rol Administrador</div></div>
+            <a data-ir="usuarios" style="color:var(--pino-texto);font-weight:700;font-size:14px">Roles ›</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

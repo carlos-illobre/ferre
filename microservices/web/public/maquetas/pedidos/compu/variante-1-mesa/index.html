@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos · La mesa de pedidos (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<link rel="stylesheet" href="../../propio/pedidos.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .pantalla { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
+  .resumenes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .resumen { padding: 12px 14px; }
+  .resumen .et { white-space: nowrap; }
+  .resumen .va { font-size: 22px; line-height: 28px; }
+  .resumen .va small { font-size: 14px; font-weight: 650; color: var(--texto-2); margin-left: 6px; letter-spacing: 0; }
+  .resumen > div { flex: 1; min-width: 0; }
+  .cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: 296px minmax(0,1fr) 316px; gap: 16px; }
+
+  /* Lista de pedidos */
+  .lista { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  .pd { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .pd + .pd { margin-top: 6px; }
+  .pd b { font-size: 15px; font-weight: 750; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pd .d { grid-column: 1 / -1; font-size: 14px; color: var(--texto-2); line-height: 18px; display: flex; gap: 6px; align-items: center; }
+  .pd .imp { font-weight: 800; font-size: 15px; text-align: right; }
+  .pd .avance { grid-column: 1 / -1; margin-top: 4px; height: 6px; }
+  .pd.elegido { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.12), var(--sombra-2); }
+  .pd .pastilla { height: 24px; padding: 0 8px; }
+  .pd.sugerido { background: transparent; border-style: dashed; border-color: var(--borde-fuerte); box-shadow: none; }
+  .ambar { color: var(--urgente-texto); font-weight: 650; }
+  .grupo { margin-top: 12px; }
+  .grupo:first-child { margin-top: 0; }
+  .cerrados { margin-top: 8px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; color: var(--texto-2); font-size: 14px; font-weight: 650; }
+  .cerrados .i { margin-left: auto; }
+
+  /* Pedido en armado */
+  .pedido { display: flex; flex-direction: column; min-height: 0; padding: 14px 16px; gap: 10px; }
+  .p-cab { display: flex; align-items: center; gap: 12px; }
+  .p-cab .ini { width: 44px; height: 44px; border-radius: 12px; background: var(--pino-suave); color: var(--pino-texto); display: grid; place-items: center; font-weight: 800; }
+  .p-cab .t { font-size: 20px; font-weight: 800; line-height: 26px; letter-spacing: -.01em; display: flex; gap: 8px; align-items: center; }
+  .p-cab .btn { margin-left: auto; }
+  .agregar { height: 44px; }
+  .agregar .kbd { margin-left: auto; }
+  .tabla { display: grid; grid-template-columns: 40px minmax(0,1fr) 122px 88px; column-gap: 12px; align-items: center; }
+  .tabla .cab { font-size: 14px; font-weight: 650; color: var(--texto-3); padding-bottom: 4px; border-bottom: 1px solid var(--borde); }
+  .tabla .cab.der, .tabla .der { text-align: right; }
+  .tabla > .c { padding: 5px 0; border-bottom: 1px solid var(--borde); min-height: 52px; display: flex; align-items: center; }
+  .tabla > .c.der { justify-content: flex-end; }
+  .tabla .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .tabla .nom { display: block; min-width: 0; }
+  .tabla .nom b { display: block; font-size: 15px; font-weight: 700; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tabla .nom span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .tabla .cantidad { height: 36px; }
+  .tabla .cantidad button { width: 32px; }
+  .tabla .cantidad .n { min-width: 40px; font-size: 15px; }
+  .tabla .cantidad.foco { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.12); }
+  .tabla .cu { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .tabla .st { font-weight: 800; font-size: 15px; }
+  .p-pie { margin-top: auto; display: flex; align-items: center; gap: 16px; padding-top: 4px; }
+  .p-pie .tot { margin-left: auto; text-align: right; }
+  .p-pie .tot .t-etiqueta { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+  .p-pie .tot .va { font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -.02em; }
+
+  /* Así le llega */
+  .llega { display: flex; flex-direction: column; min-height: 0; gap: 12px; }
+  .llega .t-etiqueta { color: var(--tinta); font-size: 15px; font-weight: 750; display: flex; align-items: center; gap: 8px; }
+  .fondo-chat { flex: 1; min-height: 0; overflow: hidden; }
+  .mensaje { font-size: 14px; line-height: 20px; }
+  .mensaje li { gap: 6px; }
+  .numero { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .numero .i { color: var(--logro-texto); }
+  .llega .btn-accion { width: 100%; font-size: 17px; padding: 0 16px; }
+  .copiar { display: flex; gap: 8px; align-items: center; }
+  .copiar .btn { flex: 1; }
+  .nota { font-size: 14px; line-height: 18px; color: var(--texto-3); }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span><span class="pastilla urgente" style="margin-left:auto;height:24px">15</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-ir="anomalias"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54 de depósito</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">MR</span><div class="txt"><div style="font-weight:750;font-size:15px">Marcelo Ríos</div><div class="t-detalle">Comprador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <div class="acciones">
+        <button class="btn chico"><i class="i i-s" data-i="clipboard-list"></i>Qué pedir <span class="kbd">Alt Q</span></button>
+        <button class="btn chico"><i class="i i-s" data-i="plus"></i>Pedido nuevo <span class="kbd">Alt N</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a data-ir="stock">Stock</a><a data-ir="compras">Compras</a><a class="activa" data-no-ir>Pedidos <span class="pastilla urgente" style="height:24px">2</span></a><a data-ir="contar">Contar</a></nav>
+    <section class="pantalla">
+      <div class="resumenes">
+        <div class="resumen urgente"><span class="ico"><i class="i" data-i="clipboard-list"></i></span><div><div class="et">Para pedir</div><div class="va">15<small>en 3 proveedores</small></div></div></div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="pencil"></i></span><div><div class="et">Sin mandar</div><div class="va">1<small>borrador de hoy</small></div></div></div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="truck"></i></span><div><div class="et">En camino · 2 pedidos</div><div class="va"><span class="peso">$</span>256.600</div></div></div>
+        <div class="resumen"><span class="ico"><i class="i" data-i="package"></i></span><div><div class="et">Llegaron completos, octubre</div><div class="va">9<small>de 11</small></div><div class="barra"><b style="width:82%"></b></div></div></div>
+      </div>
+
+      <div class="cuerpo">
+        <div class="lista">
+          <div class="grupo">Sin mandar <span class="n">1</span><span class="linea"></span></div>
+          <div class="pd elegido"><b>Bulonera Centro</b><span class="pastilla">borrador</span><span class="d">6 renglones · hoy 10:31</span></div>
+
+          <div class="grupo">Por llegar <span class="n">2</span><span class="linea"></span></div>
+          <div class="pd"><b>Distribuidora Oeste</b><span class="pastilla pino">enviado</span><span class="d"><span class="ambar">Demorado 2 días</span> · 9 renglones</span></div>
+          <div class="pd"><b>Acindar Distribución</b><span class="pastilla urgente">recibido parcial</span><span class="d">Llegaron 4 de 6 · faltan 35 kg</span><span class="avance"><b style="width:67%"></b></span></div>
+
+          <div class="grupo">Para pedir <span class="n">2</span><span class="linea"></span></div>
+          <div class="pd sugerido"><b>Electro Lumen</b><span class="imp"><span class="peso">$</span>88.400</span><span class="d">5 productos bajo el mínimo</span></div>
+          <div class="pd sugerido"><b>Ferretera del Sur</b><span class="imp"><span class="peso">$</span>46.300</span><span class="d">4 productos · 1 para un cliente</span></div>
+
+          <div class="cerrados"><i class="i i-s" data-i="history"></i>Cerrados este mes · 4<i class="i i-s" data-i="chevron-right"></i></div>
+        </div>
+
+        <div class="pedido tarjeta-2">
+          <div class="p-cab">
+            <span class="ini">BC</span>
+            <div><div class="t">Bulonera Centro <span class="pastilla">borrador</span></div><div class="t-detalle">Desde Qué pedir · hoy 10:31 · se guarda solo</div></div>
+            <button class="btn btn-fantasma chico"><i class="i i-s" data-i="trash-2"></i>Borrar</button>
+          </div>
+          <div class="campo agregar"><i class="i" data-i="search"></i>Agregá: buscá o escaneá con el celular<span class="kbd">/</span></div>
+          <div class="tabla">
+            <span class="cab"></span><span class="cab">Producto</span><span class="cab">Cantidad</span><span class="cab der">Estimado</span>
+
+            <span class="c"><span class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></span></span>
+            <span class="c"><span class="nom"><b>Tornillo autoperforante T2 8 × 1" × 100</b><span>BC-T8100 · $3.800 c/u</span></span></span>
+            <span class="c"><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">10<span class="u">un.</span></span><button><i class="i i-s" data-i="plus"></i></button></span></span>
+            <span class="c der st"><span class="peso">$</span>38.000</span>
+
+            <span class="c"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span></span>
+            <span class="c"><span class="nom"><b>Tarugos nylon S8 con tope × 100</b><span>BC-TS8 · $4.150 c/u</span></span></span>
+            <span class="c"><span class="cantidad foco"><button><i class="i i-s" data-i="minus"></i></button><span class="n">15<span class="u">un.</span></span><button><i class="i i-s" data-i="plus"></i></button></span></span>
+            <span class="c der st"><span class="peso">$</span>62.250</span>
+
+            <span class="c"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span></span>
+            <span class="c"><span class="nom"><b>Mecha acero rápido HSS 8 mm</b><span>BC-HSS8 · $2.480 c/u</span></span></span>
+            <span class="c"><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">24<span class="u">un.</span></span><button><i class="i i-s" data-i="plus"></i></button></span></span>
+            <span class="c der st"><span class="peso">$</span>59.520</span>
+
+            <span class="c"><span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span></span>
+            <span class="c"><span class="nom"><b>Clavos punta París 2" por kilo</b><span>BC-CP2 · $2.900 c/u</span></span></span>
+            <span class="c"><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">10<span class="u">kg</span></span><button><i class="i i-s" data-i="plus"></i></button></span></span>
+            <span class="c der st"><span class="peso">$</span>29.000</span>
+
+            <span class="c"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span></span>
+            <span class="c"><span class="nom"><b>Puntas Phillips PH2 × 10</b><span>BC-PH2 · $3.950 c/u</span></span></span>
+            <span class="c"><span class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">6<span class="u">un.</span></span><button><i class="i i-s" data-i="plus"></i></button></span></span>
+            <span class="c der st"><span class="peso">$</span>23.700</span>
+          </div>
+          <div class="p-pie">
+            <span class="t-detalle">+ 1 renglón más abajo</span>
+            <div class="tot"><div class="t-etiqueta"><i class="i i-s" data-i="lock"></i>Estimado · solo lo ves vos</div><div class="va"><span class="peso">$</span>237.270</div></div>
+          </div>
+        </div>
+
+        <div class="llega">
+          <div class="t-etiqueta"><i class="i i-s" data-i="eye"></i>Así le llega a Bulonera Centro</div>
+          <div class="fondo-chat">
+            <div class="mensaje">
+              <div class="hola">Pedido de Ferrebress · lun 19/10</div>
+              <ul>
+                <li><b>10 un.</b><span>Tornillo T2 8 × 1" × 100 <code>BC-T8100</code></span></li>
+                <li><b>15 un.</b><span>Tarugos S8 con tope × 100 <code>BC-TS8</code></span></li>
+                <li><b>24 un.</b><span>Mecha HSS 8 mm <code>BC-HSS8</code></span></li>
+                <li><b>10 kg</b><span>Clavos punta París 2" <code>BC-CP2</code></span></li>
+                <li><b>6 un.</b><span>Puntas PH2 × 10 <code>BC-PH2</code></span></li>
+                <li><b>4 un.</b><span>Cinta métrica 5 m <code>BC-CM5</code></span></li>
+              </ul>
+              <div class="firma">Gracias. Marcelo, de Ferrebress</div>
+            </div>
+          </div>
+          <div class="numero"><i class="i i-s" data-i="circle-check"></i>WhatsApp de Bulonera: 11 4567-8901</div>
+          <button class="btn btn-accion grande"><i class="i" data-i="send"></i>Mandar por WhatsApp <span class="kbd">Alt W</span></button>
+          <div class="copiar"><button class="btn chico"><i class="i i-s" data-i="copy"></i>Copiar el texto <span class="kbd">Alt C</span></button></div>
+          <div class="nota">Copiarlo no lo da por enviado: después marcalo vos.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

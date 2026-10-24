@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema · Renglones (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../sistema.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { padding-bottom: 24px; }
+  .gasto { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: end; padding: 14px 16px; }
+  .gasto .va { font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -.02em; }
+  .gasto .va small { font-size: 14px; font-weight: 650; color: var(--texto-2); letter-spacing: 0; }
+  .gasto .medidor { grid-column: 1 / -1; margin-top: 8px; height: 8px; }
+  .aj { padding: 14px 16px 16px; }
+  .aj + .aj { border-top: 1px solid var(--borde); }
+  .aj .cab { display: block; }
+  .aj .tt { font-weight: 750; font-size: 16px; line-height: 22px; }
+  .aj .dd { font-size: 14px; line-height: 20px; color: var(--texto-2); margin-top: 2px; }
+  .aj .tramos, .aj .numero { margin-top: 12px; }
+  .nota { display: flex; gap: 8px; font-size: 14px; line-height: 20px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <a class="volver" data-ir="anomalias"><i class="i" data-i="chevron-left"></i>Más</a>
+  <div class="celu-cabecera"><span class="t-titulo">Sistema</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · vale para todos</div>
+  <div class="celu-pantalla">
+    <div class="grupo gasto">
+      <div><div class="t-etiqueta">Datos de la base, por día</div><div class="va num">12,2 MB <small>de 30 MB</small></div></div>
+      <span class="pastilla logro">Bien</span>
+      <div class="medidor"><b class="resto" style="width:32.7%"></b><b class="ses" style="width:6.3%"></b><b class="cel" style="width:1.7%"></b></div>
+    </div>
+    <div class="titulo-grupo">Valen para todos los dispositivos</div>
+    <div class="grupo">
+      <div class="aj">
+        <div class="cab"><div><div class="tt">Cuánto recuerda la sesión el servidor</div><div class="dd">Más tiempo, menos consultas a la base.</div></div></div>
+        <div class="tramos grande"><b>No</b><b>30 s</b><b class="elegido">1 min</b><b>5 min</b><b>10 min</b></div>
+      </div>
+      <div class="aj">
+        <div class="cab"><div><div class="tt">Cada cuánto pregunta el celular emparejado</div><div class="dd">Respaldo si se corta la conexión. Más seguido, más datos.</div></div></div>
+        <div class="tramos grande"><b>5 s</b><b>30 s</b><b class="elegido">1 min</b><b>5 min</b><b>10 min</b></div>
+      </div>
+      <div class="aj">
+        <div class="cab"><div><div class="tt">Cuántos días dura el vínculo</div><div class="dd">Celular y computadora unidos sin volver a escanear.</div></div></div>
+        <div class="numero"><button class="btn">−</button><span class="caja num">30</span><button class="btn">+</button><span style="font-weight:700">días</span><span class="t-detalle">de 1 a 365</span></div>
+      </div>
+    </div>
+    <div class="aviso logro nota"><i class="i i-s" data-i="circle-check" style="margin-top:2px"></i><span>Guardado para todos: el celular pregunta cada 1 minuto.</span></div>
+    <div class="titulo-grupo">Último cambio <a data-ir="actividad" style="margin-left:auto;color:var(--pino-texto)">Quién hizo qué ›</a></div>
+    <div class="grupo">
+      <div class="hecho"><span class="av">CI</span><div class="qq"><b>Carlos Illobre</b> · hoy 10:41<br>Celular emparejado <span class="de-a"><s>30 s</s>→ 1 min</span></div></div>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-ir="anomalias"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>if (location.search.includes('entera')) document.body.classList.add('entera');</script>
+</body>
+</html>

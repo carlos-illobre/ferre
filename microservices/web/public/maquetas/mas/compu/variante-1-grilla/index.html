@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Más · Grilla (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mas.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../mas.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .cabecera .sub { margin-top: 2px; }
+  .teclas { display: flex; gap: 16px; align-items: center; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .teclas .kbd { margin-right: 4px; }
+  .grilla { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 286px; gap: 16px; }
+  .op { display: flex; flex-direction: column; padding: 20px; text-decoration: none; color: inherit; border-radius: var(--r-tarjeta); }
+  .op:hover { box-shadow: var(--sombra-2); }
+  .op .cab { display: flex; align-items: center; gap: 14px; }
+  .op .nombre { font-size: 20px; line-height: 26px; font-weight: 750; letter-spacing: -.01em; flex: 1; }
+  .op .ch { color: var(--texto-3); }
+  .op .exp { font-size: 14px; line-height: 20px; color: var(--texto-2); margin: 10px 0 14px; min-height: 40px; }
+  .op .vis { flex: 1; }
+  .op .pie { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--borde); }
+  .datos { display: flex; gap: 8px; }
+  .datos .dato { flex: 1; min-width: 0; }
+  .mini-barras { display: flex; align-items: flex-end; gap: 6px; height: 36px; margin-top: 12px; }
+  .mini-barras b { flex: 1; border-radius: 4px 4px 2px 2px; background: var(--hundido-2); }
+  .mini-barras b.hoy { background: var(--urgente); }
+  .etapas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .caras { display: flex; margin-top: 10px; align-items: center; gap: 8px; }
+  .caras .avatar { width: 32px; height: 32px; font-size: 14px; border: 2px solid #fff; margin-left: -8px; }
+  .caras .avatar:first-child { margin-left: 0; }
+  .roles { padding: 20px; display: flex; flex-direction: column; background: var(--hundido); border: 1px dashed var(--borde-fuerte); box-shadow: none; }
+  .roles .chips { gap: 6px; margin: 10px 0 12px; }
+  .roles .chip { height: 32px; padding: 0 12px; font-size: 14px; }
+  .roles .ve { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .roles .ve span { display: grid; justify-items: center; gap: 4px; padding: 8px 0; border-radius: 10px; background: #fff; color: var(--pino-texto); font-size: 14px; font-weight: 650; transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+  .roles .ve span.no { opacity: .25; transform: scale(.94); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">5</span></a>
+    <div class="nav-sub"><a data-ir="anomalias">Anomalías</a><a data-ir="procesos">Procesos</a><a data-ir="mejoras-y-errores">Mejoras y errores</a><a data-ir="configuracion">Configuración</a><a href="#" data-sistema>Sistema</a></div>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Más</div><div class="sub">Lo que se usa menos. Ves solo lo que tus roles te dejan: Administrador y Gerente.</div></div>
+      <div class="acciones teclas"><span><span class="kbd">← → ↑ ↓</span>elegir</span><span><span class="kbd">Enter</span>abrir</span><span><span class="kbd">←</span>desde la primera, al menú</span></div>
+    </header>
+    <section class="pantalla" style="padding-top:20px">
+      <div class="grilla" id="grilla">
+        <a class="op tarjeta tocable marca-teclado" data-ir="anomalias" tabindex="0">
+          <div class="cab"><span class="ico-op urgente"><i class="i i-l" data-i="triangle-alert"></i></span><span class="nombre">Anomalías</span><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="exp">Lo que no coincide: lo vendido sin stock y lo que alguien dejó sin mandar.</div>
+          <div class="vis">
+            <div class="datos"><div class="dato urgente"><span class="et">Para revisar</span><span class="va">5</span></div><div class="dato"><span class="et">Esta semana</span><span class="va">38</span></div></div>
+            <div class="mini-barras" title="Anotadas por día"><b style="height:40%"></b><b style="height:65%"></b><b style="height:30%"></b><b style="height:80%"></b><b style="height:55%"></b><b style="height:45%"></b><b class="hoy" style="height:100%"></b></div>
+          </div>
+          <div class="pie"><span class="permiso"><i class="i i-s" data-i="lock"></i>Pide <b>«Ver las anomalías»</b></span></div>
+        </a>
+        <a class="op tarjeta tocable" data-ir="procesos" tabindex="0">
+          <div class="cab"><span class="ico-op"><i class="i i-l" data-i="workflow"></i></span><span class="nombre">Procesos</span><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="exp">Cómo se trabaja en el local, dibujado paso a paso: la venta, la compra, la recepción.</div>
+          <div class="vis">
+            <div class="datos"><div class="dato logro"><span class="et">Vigentes</span><span class="va">6</span></div><div class="dato"><span class="et">En borrador</span><span class="va">1</span></div></div>
+            <div class="etapas"><span class="pastilla contorno">Venta</span><span class="pastilla contorno">Compra</span><span class="pastilla urgente">Recepción · borrador</span></div>
+          </div>
+          <div class="pie"><span class="permiso"><i class="i i-s" data-i="lock"></i>Pide <b>«Ver procesos»</b></span></div>
+        </a>
+        <a class="op tarjeta tocable" data-ir="mejoras-y-errores" tabindex="0">
+          <div class="cab"><span class="ico-op"><i class="i i-l" data-i="bug"></i></span><span class="nombre">Mejoras y errores</span><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="exp">Avisá de algo que falla o proponé una idea, con fotos o capturas.</div>
+          <div class="vis">
+            <div class="datos"><div class="dato"><span class="et">Abiertas</span><span class="va">4</span></div><div class="dato"><span class="et">Resueltas</span><span class="va">27</span></div></div>
+            <div class="caras"><span class="avatar">MS</span><span class="avatar" style="background:var(--pino-suave);color:var(--pino-texto)">LF</span><span class="avatar">CI</span><span class="t-detalle">Último: Martín, hace 20 min</span></div>
+          </div>
+          <div class="pie"><span class="permiso"><i class="i i-s" data-i="users"></i>Para todos</span></div>
+        </a>
+        <a class="op tarjeta tocable" data-ir="configuracion" tabindex="0">
+          <div class="cab"><span class="ico-op neutro"><i class="i i-l" data-i="settings"></i></span><span class="nombre">Configuración</span><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="exp">Lo que decidís para vos en esta computadora: animaciones, versión nueva y tus celulares.</div>
+          <div class="vis">
+            <div class="datos"><div class="dato"><span class="et">Animaciones</span><span class="va" style="font-size:16px">Prendidas</span></div><div class="dato"><span class="et">Versión nueva</span><span class="va" style="font-size:16px">Cada 15 min</span></div></div>
+            <div class="etapas"><span class="pastilla logro"><span class="punto"></span>Vinculada con Moto G54</span></div>
+          </div>
+          <div class="pie"><span class="permiso"><i class="i i-s" data-i="user"></i>Solo para vos</span></div>
+        </a>
+        <a class="op tarjeta tocable" href="#" data-sistema tabindex="0">
+          <div class="cab"><span class="ico-op"><i class="i i-l" data-i="sliders-horizontal"></i></span><span class="nombre">Sistema</span><i class="i ch" data-i="chevron-right"></i></div>
+          <div class="exp">Los tiempos que valen para todos los dispositivos. Nadie los cambia para el suyo.</div>
+          <div class="vis">
+            <div class="datos"><div class="dato"><span class="et">Sesión</span><span class="va" style="font-size:16px" data-ver-sesion>1 min</span></div><div class="dato"><span class="et">Celular</span><span class="va" style="font-size:16px" data-ver-celular>1 min</span></div><div class="dato"><span class="et">Vínculo</span><span class="va" style="font-size:16px" data-ver-dias>30 días</span></div></div>
+          </div>
+          <div class="pie"><span class="permiso"><i class="i i-s" data-i="lock"></i>Pide <b>«Administrar el sistema»</b></span></div>
+        </a>
+        <div class="roles tarjeta">
+          <div class="t-renglon">Qué ve cada rol en Más</div>
+          <div class="t-detalle">Elegí un rol para ver qué opciones le aparecen. Lo demás no se le muestra.</div>
+          <div class="chips" id="roles"><button class="chip" data-rol="v">Vendedor</button><button class="chip" data-rol="c">Comprador</button><button class="chip" data-rol="r">Recepción</button><button class="chip" data-rol="a">Administrador</button><button class="chip elegido" data-rol="g">Gerente</button></div>
+          <div class="ve" id="ve"><span data-o="an"><i class="i" data-i="triangle-alert"></i>Anom.</span><span data-o="pr"><i class="i" data-i="workflow"></i>Proc.</span><span data-o="me"><i class="i" data-i="bug"></i>Mejoras</span><span data-o="co"><i class="i" data-i="settings"></i>Config.</span><span data-o="si" class="no"><i class="i" data-i="sliders-horizontal"></i>Sistema</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+// Qué ve cada rol (tabla de roles de arranque, specs/007).
+(function () {
+  var VE = { v: ["me", "co"], c: ["me", "co"], r: ["an", "me", "co"], a: ["an", "me", "co", "si"], g: ["an", "pr", "me", "co"] };
+  document.getElementById("roles").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-rol]"); if (!b) return;
+    this.querySelectorAll(".chip").forEach(function (c) { c.classList.toggle("elegido", c === b); });
+    var ve = VE[b.getAttribute("data-rol")];
+    document.querySelectorAll("#ve span").forEach(function (s) { s.classList.toggle("no", ve.indexOf(s.getAttribute("data-o")) < 0); });
+  });
+  // Flechas: la grilla se recorre como se ve (ux.md, «← → ↑ ↓ en Más»).
+  var ops = Array.prototype.slice.call(document.querySelectorAll("#grilla .op")), i = 0, COL = 3;
+  function marcar(n) { ops[i].classList.remove("marca-teclado"); i = n; ops[i].classList.add("marca-teclado"); ops[i].focus({ preventScroll: true }); }
+  document.addEventListener("keydown", function (e) {
+    if (document.querySelector(".dialogo")) return;
+    if (e.key === "ArrowRight" && i < ops.length - 1) marcar(i + 1);
+    else if (e.key === "ArrowLeft" && i > 0) marcar(i - 1);
+    else if (e.key === "ArrowDown" && i + COL < ops.length) marcar(i + COL);
+    else if (e.key === "ArrowUp" && i - COL >= 0) marcar(i - COL);
+    else if (e.key === "Enter") { e.preventDefault(); ops[i].click(); }
+    else return;
+    e.preventDefault();
+  });
+})();
+</script>
+</body>
+</html>

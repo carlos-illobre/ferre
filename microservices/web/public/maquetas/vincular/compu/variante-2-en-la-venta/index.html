@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vincular el celular · computadora · 2 Reinvención: el código en la venta</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_recursos/vincular.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_recursos/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .venta { display: grid; grid-template-columns: 1fr 340px; gap: 24px; height: 100%; }
+  .izq { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .buscar { display: flex; gap: 12px; }
+  .buscar .campo { flex: 1; }
+  .sec { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  /* El código vive en la venta: aparece donde va a servir */
+  .lector { display: grid; grid-template-columns: 148px 1fr; gap: 20px; align-items: center; padding: 16px 20px 16px 16px; border-radius: var(--r-tarjeta); background: var(--superficie); border: 1.5px dashed var(--pino-texto); position: relative; }
+  .lector .qr { --qr: 148px; padding: 10px; box-shadow: none; border: 1px solid var(--borde); border-radius: 14px; }
+  .lector .fila { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .lector .t-seccion { margin-bottom: 4px; }
+  .lector .mini { display: flex; gap: 16px; margin-top: 10px; }
+  .lector .mini span { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .panel-cobro { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .medios { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .medio-b { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); font-weight: 700; font-size: 15px; }
+  .medio-b .p { width: 10px; height: 10px; border-radius: 99px; background: var(--c); }
+  .medio-b.elegido { border: 2px solid var(--c); background: var(--cs); }
+  .medio-b .kbd { margin-left: auto; }
+  /* Mini código siempre en el lateral, sin abrir nada */
+  .vinculo.qr-lat { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; padding: 8px; background: var(--superficie); color: var(--tinta); border: 1px solid var(--borde); box-shadow: var(--sombra-1); }
+  .vinculo.qr-lat .qr { --qr: 64px; padding: 4px; border-radius: 8px; box-shadow: none; border: 1px solid var(--borde); }
+  .vinculo.qr-lat .qr .centro img { border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item activo" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">2</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-ir="anomalias"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo qr-lat"><div class="qr"><img class="codigo" src="../../_recursos/qr.svg" alt="Código para vincular el celular"></div><div class="txt" style="font-weight:750">Vincular el celular<small>Apuntalo acá</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Vender</div>
+      <div class="acciones"><span class="t-detalle">Sábado 24 de octubre · 10:42</span></div>
+    </header>
+    <nav class="pestanas"><a class="activa" data-ir="vender">Vender</a><a data-ir="ventas-de-hoy">Ventas de hoy <span class="pastilla" style="height:24px">23</span></a></nav>
+    <section class="pantalla">
+      <div class="venta">
+        <div class="izq">
+          <div class="buscar"><div class="campo foco"><i class="i" data-i="search"></i><span>Buscá por nombre o código</span><span class="cursor"></span><span class="kbd" style="margin-left:auto">Enter</span></div></div>
+
+          <div class="lector">
+            <div class="qr"><img class="codigo" src="../../_recursos/qr.svg" alt="Código para vincular el celular"><span class="centro"><img src="../../_recursos/isotipo-claro.png" alt=""></span></div>
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="pastilla pino"><i class="i i-s" data-i="scan-barcode"></i>Escanear con el celular</span><span style="margin-left:auto" class="reloj"><span class="anillo"></span><span>Cambia en <b>4:12</b></span></span></div>
+              <div class="t-seccion">Apuntá tu celular acá y escaneá</div>
+              <div class="t-detalle">Con «Vincular» del celular, o con su cámara. Desde ahí, cada código que leas entra en esta venta.</div>
+              <div class="fila">
+                <span class="pastilla contorno"><span class="latido"></span>Esperando el celular de Carlos</span>
+                <button class="btn btn-fantasma chico">Ahora no <span class="kbd">Esc</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sec"><span class="t-seccion">Esta venta</span><span class="pastilla">2 productos</span><span style="margin-left:auto" class="btn btn-fantasma chico"><i class="i i-s" data-i="trash-2"></i>Vaciar</span></div>
+          <div class="renglon fila-venta"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="titulo">Mecha acero rápido HSS 8 mm</div><div class="detalle">Ezeta · Bulonera Centro · Est. A-03-12</div></div><div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">3</span><button><i class="i i-s" data-i="plus"></i></button></div><div class="precio"><span class="peso">$</span>21.000<small>3 × $7.000</small></div></div>
+          <div class="renglon fila-venta"><span class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></span><div><div class="titulo">Martillo carpintero 27 mm mango fibra</div><div class="detalle">Bahco · Distribuidora Oeste · Est. B-01-04</div></div><div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1</span><button><i class="i i-s" data-i="plus"></i></button></div><div class="precio"><span class="peso">$</span>18.000<small>1 × $18.000</small></div></div>
+        </div>
+        <div class="tarjeta panel-cobro">
+          <div style="display:flex;justify-content:space-between"><span class="t-etiqueta">Total</span><span class="t-detalle">2 productos</span></div>
+          <div class="t-total"><span class="peso">$</span>39.000</div>
+          <div class="t-etiqueta">Cómo paga</div>
+          <div class="medios">
+            <div class="medio-b medio efectivo elegido"><span class="p"></span>Efectivo<span class="kbd">F5</span></div>
+            <div class="medio-b medio mp"><span class="p"></span>M. Pago<span class="kbd">F6</span></div>
+            <div class="medio-b medio tarjeta"><span class="p"></span>Tarjeta<span class="kbd">F7</span></div>
+            <div class="medio-b medio cuenta"><span class="p"></span>Cta. cte.<span class="kbd">F8</span></div>
+          </div>
+          <button class="btn btn-accion grande" style="margin-top:8px">Cobrar $39.000 <span class="kbd">F2</span></button>
+          <div style="display:flex;justify-content:space-between;padding:0 4px"><span class="btn btn-fantasma chico">No llevó <span class="kbd">Esc</span></span><span class="btn btn-fantasma chico">A pedido</span><span class="btn btn-fantasma chico">Presupuesto</span></div>
+          <div style="margin-top:auto"></div>
+          <div class="aviso pino"><i class="i" data-i="smartphone"></i><span>Con el celular vinculado, lo que escaneás aparece arriba de la lista con «Llegó del celular», y esta tarjeta del código se va.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

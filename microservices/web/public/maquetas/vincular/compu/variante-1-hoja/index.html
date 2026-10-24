@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vincular el celular · computadora · 1 Evolución: la hoja con el código</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_recursos/vincular.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_recursos/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .app { position: relative; }
+  .fondo-venta { display: grid; grid-template-columns: 1fr 340px; gap: 24px; height: 100%; }
+  .buscar { display: flex; gap: 12px; margin-bottom: 16px; }
+  .buscar .campo { flex: 1; }
+  .panel-cobro { padding: 20px; display: grid; align-content: start; gap: 16px; }
+  .hoja { left: 50%; top: 50%; width: 900px; margin-left: -334px; margin-top: -290px; display: grid; grid-template-columns: 340px 1fr; height: 580px; }
+  .hoja .izq { background: var(--hundido); display: grid; place-items: center; align-content: center; gap: 20px; padding: 32px; }
+  .hoja .der { padding: 32px 32px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .comparte { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pie-hoja { margin-top: auto; display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid var(--borde); }
+  .pie-hoja .t-detalle { flex: 1; }
+  .reloj { white-space: nowrap; }
+  .esperando { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 14px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); font-weight: 700; font-size: 14px; box-shadow: var(--sombra-1); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item activo" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-ir="anomalias"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="pie">
+      <div class="vinculo libre foco"><i class="i" data-i="smartphone"></i><div class="txt">Vincular el celular<small>Alt V</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Vender</div>
+      <div class="acciones"><span class="t-detalle">Sábado 24 de octubre · 10:42</span></div>
+    </header>
+    <nav class="pestanas"><a class="activa" data-ir="vender">Vender</a><a data-ir="ventas-de-hoy">Ventas de hoy <span class="pastilla" style="height:24px">23</span></a></nav>
+    <section class="pantalla">
+      <div class="fondo-venta">
+        <div>
+          <div class="buscar"><div class="campo"><i class="i" data-i="search"></i>Buscá por nombre o código, o escaneá</div><button class="btn btn-oscuro grande"><i class="i" data-i="scan-barcode"></i>Escanear con el celular</button></div>
+          <div class="renglon fila-venta"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="titulo">Mecha acero rápido HSS 8 mm</div><div class="detalle">Ezeta · Bulonera Centro · 3 un.</div></div><span></span><div class="precio"><span class="peso">$</span>21.000</div></div>
+          <div class="renglon fila-venta"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="titulo">Cinta métrica PowerLock 5 m</div><div class="detalle">Stanley · Distribuidora Oeste · 1 un.</div></div><span></span><div class="precio"><span class="peso">$</span>17.000</div></div>
+          <div class="renglon fila-venta"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="titulo">Tarugos nylon S8 con tope × 100</div><div class="detalle">Fischer · Ferretera del Sur · 1 un.</div></div><span></span><div class="precio"><span class="peso">$</span>8.000</div></div>
+        </div>
+        <div class="tarjeta panel-cobro"><div class="t-etiqueta">Total</div><div class="t-total"><span class="peso">$</span>46.000</div><button class="btn btn-accion grande">Cobrar $46.000 <span class="kbd">F2</span></button></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="velo"></div>
+  <div class="hoja" role="dialog" aria-label="Vincular el celular">
+    <div class="izq">
+      <div class="qr con-esquinas" style="--qr:244px"><img class="codigo" src="../../_recursos/qr.svg" alt="Código para vincular"><span class="centro"><img src="../../_recursos/isotipo-claro.png" alt=""></span></div>
+      <div class="reloj"><span class="anillo"></span><span>Se cambia solo en <b>4:12</b> · sirve una vez</span></div>
+      <div class="esperando"><span class="latido"></span>Esperando el celular…</div>
+    </div>
+    <div class="der">
+      <div style="display:flex;align-items:center;gap:8px"><span class="pastilla pino"><i class="i i-s" data-i="scan-barcode"></i>El celular, de lector</span><span style="margin-left:auto" class="btn btn-fantasma chico">Cerrar <span class="kbd">Esc</span></span></div>
+      <div class="t-titulo">Vinculá tu celular</div>
+      <div class="t-cuerpo" style="color:var(--texto-2);margin-top:-8px">Lo que escaneás con el celular entra en la venta de esta compu, y los dos ven lo mismo mientras trabajan juntos.</div>
+      <ol class="pasos">
+        <li><span class="n">1</span><div><b>En el celular, tocá «Vincular»</b><span class="d">Arriba a la derecha de cualquier pantalla, o en Más → Vincular con la computadora.</span></div></li>
+        <li><span class="n">2</span><div><b>Apuntá la cámara a este código</b><span class="d">Con tu mismo usuario, Carlos Illobre. La cámara del teléfono también sirve.</span></div></li>
+        <li><span class="n">3</span><div><b>Listo: quedan en espejo</b><span class="d">La venta que estás armando (5 productos, $46.000) aparece en el celular.</span></div></li>
+      </ol>
+      <div class="comparte">
+        <span class="pastilla logro"><i class="i i-s" data-i="check"></i>La venta, el ingreso y el pedido</span>
+        <span class="pastilla logro"><i class="i i-s" data-i="check"></i>La parte en la que estás</span>
+        <span class="pastilla contorno"><i class="i i-s" data-i="x"></i>La búsqueda y lo que abras encima</span>
+      </div>
+      <div class="pie-hoja">
+        <span class="t-detalle">Dura 30 días. Para soltarlos: Más → Configuración → Desvincular.</span>
+        <button class="btn chico"><i class="i i-s" data-i="refresh-cw"></i>Otro código <span class="kbd">Alt N</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

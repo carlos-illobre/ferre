@@ -1,0 +1,45 @@
+/* Ingreso de mercadería: lo que se abre al tocar (diálogos, hojas, el menú «Más», tostadas).
+   Lenguaje común; solo se mueve con transform y opacity. Prefijo ig- para no chocar con la página. */
+
+.ig-velo { position: fixed; inset: 0; background: rgba(26, 29, 27, .30); opacity: 0; transition: opacity var(--t-nav) var(--curva); z-index: 50; }
+.celu .ig-velo, .celu .ig-capa, .celu .ig-tostadas { position: absolute; }
+.ig-velo.ig-abierto { opacity: 1; }
+.ig-capa { position: fixed; z-index: 51; opacity: 0; transition: transform var(--t-nav) var(--curva), opacity var(--t) var(--curva); }
+.ig-capa.ig-abierto { opacity: 1; transform: none; }
+
+.ig-dialogo { left: 50%; top: 50%; width: 600px; max-height: calc(100vh - 48px); translate: -50% -50%; transform: scale(.97) translateY(8px); background: var(--superficie); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); display: flex; flex-direction: column; overflow: hidden; }
+.ig-dialogo.ancho { width: 820px; }
+.ig-hoja { left: 0; right: 0; bottom: 0; max-height: calc(100% - 56px); transform: translateY(100%); background: var(--fondo); border-radius: var(--r-hoja) var(--r-hoja) 0 0; box-shadow: var(--sombra-3); display: flex; flex-direction: column; overflow: hidden; opacity: 1; }
+.ig-hoja::before { content: ""; display: block; width: 40px; height: 5px; border-radius: 99px; background: var(--borde-fuerte); margin: 8px auto 2px; flex: none; }
+
+.ig-cab { display: flex; align-items: center; gap: 12px; padding: 20px 24px 12px; }
+.ig-hoja .ig-cab { padding: 8px 16px 10px; }
+.ig-cab .ig-tt { flex: 1; min-width: 0; }
+.ig-cab .ig-tt b { display: block; font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; }
+.ig-cab .ig-tt span { display: block; font-size: 14px; line-height: 20px; color: var(--texto-2); font-weight: 600; }
+.ig-cuerpo { padding: 4px 24px 20px; overflow: auto; min-height: 0; }
+.ig-hoja .ig-cuerpo { padding: 4px 16px 28px; }
+.ig-op { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 12px; border-radius: 12px; border: 0; background: transparent; font-weight: 700; font-size: 16px; text-align: left; width: 100%; cursor: pointer; }
+.ig-op:hover, .ig-op:focus-visible { background: var(--hundido); outline: none; }
+.ig-op .i { color: var(--texto-2); }
+.ig-op .pastilla { margin-left: auto; }
+
+.ig-factura { border-radius: 12px; background: var(--hundido); padding: 16px; }
+.ig-factura img { width: 100%; border-radius: 6px; box-shadow: var(--sombra-2); }
+.ig-qr { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: center; }
+.ig-qr img { width: 200px; height: 200px; padding: 10px; border: 1px solid var(--borde); border-radius: 16px; }
+.ig-qr ol { margin: 0; padding-left: 20px; font-size: 16px; line-height: 28px; }
+
+.ig-tostadas { position: fixed; left: 50%; bottom: 32px; translate: -50% 0; z-index: 60; display: grid; gap: 8px; justify-items: center; pointer-events: none; }
+.celu .ig-tostadas { bottom: 172px; }
+.ig-tostadas .tostada { transform: translateY(12px); opacity: 0; transition: transform var(--t) var(--rebote), opacity var(--t) var(--curva); pointer-events: auto; }
+.ig-tostadas .tostada.ig-abierto { transform: none; opacity: 1; }
+.ig-tostadas .tostada .btn { min-height: 32px; height: 32px; background: rgba(255,255,255,.14); border: 0; color: #fff; box-shadow: none; font-size: 14px; }
+
+/* Algo nuevo en una lista: entra desde 8 px abajo con rebote; el borde se pinta de verde 1 s */
+@keyframes ig-entra { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.ig-nuevo { animation: ig-entra var(--t-nav) var(--rebote); }
+.ig-nuevo::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; border: 2px solid var(--logro); opacity: 0; animation: ig-borde 1.2s var(--curva); pointer-events: none; }
+@keyframes ig-borde { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes ig-late { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+.ig-late { animation: ig-late var(--t) var(--rebote); }

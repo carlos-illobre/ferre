@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema · Presupuesto de datos (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../sistema.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  /* Arriba: el presupuesto de datos de la base, con la semana y el tope */
+  .presu { display: grid; grid-template-columns: 260px 1fr; gap: 32px; padding: 20px 24px; align-items: center; }
+  .presu .va { font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -.03em; }
+  .presu .va small { font-size: 16px; font-weight: 650; color: var(--texto-2); letter-spacing: 0; }
+  .semana { display: grid; grid-template-columns: repeat(7, 1fr) 1.4fr; gap: 10px; align-items: end; height: 100px; position: relative; }
+  .semana .col { display: grid; gap: 6px; justify-items: center; height: 100%; align-content: end; }
+  .semana .col b { width: 100%; border-radius: 6px 6px 3px 3px; background: var(--hundido-2); display: block; }
+  .semana .col.alto b { background: var(--error-suave); border-top: 3px solid var(--error); }
+  .semana .col.hoy b { background: var(--pino); }
+  .semana .col.prev b { background: repeating-linear-gradient(135deg, var(--pino-suave) 0 6px, #fff 6px 10px); border: 2px dashed var(--pino-texto); }
+  .semana .col span { font-size: 14px; color: var(--texto-2); font-weight: 650; }
+  .semana .col.hoy span, .semana .col.prev span { color: var(--pino); font-weight: 800; }
+  .semana .tope { position: absolute; left: 0; right: 0; height: 0; border-top: 2px dashed var(--error); }
+  .semana .tope em { position: absolute; right: 0; top: -24px; font-style: normal; font-size: 14px; font-weight: 700; color: var(--error-texto); background: #fff; padding: 0 4px; }
+  /* Tres modos: cada uno pone los dos tiempos juntos */
+  .modos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+  .modo { position: relative; padding: 16px 18px; border-radius: var(--r-tarjeta); border: 1px solid var(--borde-fuerte); background: #fff; box-shadow: var(--sombra-1); }
+  .modo.elegido { border: 2px solid var(--pino); padding: 15px 17px; background: linear-gradient(180deg, var(--pino-suave), #fff 55%); box-shadow: var(--sombra-2); }
+  .modo .cab { display: flex; align-items: center; gap: 10px; }
+  .modo .tt { font-weight: 800; font-size: 18px; }
+  .modo .kbd { margin-left: auto; }
+  .modo .mb { font-size: 24px; font-weight: 800; letter-spacing: -.02em; margin-top: 8px; }
+  .modo .mb small { font-size: 14px; color: var(--texto-2); font-weight: 650; letter-spacing: 0; }
+  .modo .barra { height: 6px; }
+  .modo ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+  .modo li { display: grid; grid-template-columns: 16px 1fr auto; gap: 8px; align-items: center; font-size: 14px; color: var(--texto-2); }
+  .modo li b { color: var(--tinta); font-weight: 750; }
+  /* Abajo: ajuste fino y vínculo */
+  .abajo { display: grid; grid-template-columns: 1fr 340px; gap: 12px; margin-top: 16px; }
+  .fino { padding: 14px 18px; display: grid; grid-template-columns: 260px 1fr; gap: 10px 16px; align-items: center; }
+  .fino .tt { font-weight: 750; font-size: 15px; }
+  .fino .tramos > b { height: 34px; }
+  .vinc { padding: 14px 18px; display: grid; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px">3</span></a>
+    <div class="nav-sub"><a data-ir="anomalias">Anomalías</a><a data-ir="procesos">Procesos</a><a data-ir="mejoras-y-errores">Mejoras y errores</a><a data-ir="configuracion">Configuración</a><a class="activo" data-ir="sistema">Sistema</a></div>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Sistema</div><div class="sub">Cuánto le pedís a la base, para todos los dispositivos. Elegí un modo; se guarda al tocarlo.</div></div>
+      <div class="acciones"><a class="btn chico" data-ir="actividad"><i class="i i-s" data-i="history"></i>Cambios: 3</a></div>
+    </header>
+    <section class="pantalla" style="padding-top:16px">
+      <div class="tarjeta presu">
+        <div>
+          <div class="t-etiqueta">La base manda, por día</div>
+          <div class="va num">12,2 MB</div>
+          <div class="t-detalle" style="margin-top:2px">de 30 MB que puede · con «Equilibrado»</div>
+          <span class="pastilla logro" style="margin-top:10px"><i class="i i-s" data-i="trending-up" style="transform:scaleY(-1)"></i>70 % menos que antes</span>
+        </div>
+        <div class="semana">
+          <span class="tope" style="bottom:calc(30px + 70px * 30 / 42)"><em>tope 30 MB</em></span>
+          <div class="col alto"><b style="height:68px"></b><span>Ju</span></div>
+          <div class="col alto"><b style="height:70px"></b><span>Vi</span></div>
+          <div class="col"><b style="height:40px"></b><span>Sá</span></div>
+          <div class="col alto"><b style="height:66px"></b><span>Lu</span></div>
+          <div class="col alto"><b style="height:69px"></b><span>Ma</span></div>
+          <div class="col"><b style="height:22px"></b><span>Mi</span></div>
+          <div class="col hoy"><b style="height:20px"></b><span>Hoy</span></div>
+          <div class="col prev"><b style="height:20px"></b><span>Así queda</span></div>
+        </div>
+      </div>
+
+      <div class="modos">
+        <div class="modo">
+          <div class="cab"><span class="ico-c gris"><i class="i" data-i="piggy-bank"></i></span><span class="tt">Ahorro</span><span class="kbd">1</span></div>
+          <div class="mb num">10,6 MB <small>por día</small></div>
+          <div class="barra"><b style="width:35%;background:var(--logro)"></b></div>
+          <ul>
+            <li><i class="i i-s" data-i="server"></i>Recuerda la sesión<b>10 min</b></li>
+            <li><i class="i i-s" data-i="smartphone"></i>El celular pregunta<b>cada 5 min</b></li>
+            <li><i class="i i-s" data-i="hourglass"></i>Si se corta el espejo<b>hasta 5 min</b></li>
+          </ul>
+        </div>
+        <div class="modo elegido">
+          <div class="cab"><span class="ico-c"><i class="i" data-i="scale"></i></span><span class="tt">Equilibrado</span><span class="pastilla pino" style="height:24px">De arranque</span><span class="kbd">2</span></div>
+          <div class="mb num">12,2 MB <small>por día</small></div>
+          <div class="barra"><b style="width:41%;background:var(--logro)"></b></div>
+          <ul>
+            <li><i class="i i-s" data-i="server"></i>Recuerda la sesión<b>1 min</b></li>
+            <li><i class="i i-s" data-i="smartphone"></i>El celular pregunta<b>cada 1 min</b></li>
+            <li><i class="i i-s" data-i="hourglass"></i>Si se corta el espejo<b>hasta 1 min</b></li>
+          </ul>
+        </div>
+        <div class="modo">
+          <div class="cab"><span class="ico-c urgente"><i class="i" data-i="zap"></i></span><span class="tt">Al instante</span><span class="kbd">3</span></div>
+          <div class="mb num" style="color:var(--urgente-texto)">28,1 MB <small>por día</small></div>
+          <div class="barra"><b style="width:94%;background:var(--urgente)"></b></div>
+          <ul>
+            <li><i class="i i-s" data-i="server"></i>Recuerda la sesión<b>No</b></li>
+            <li><i class="i i-s" data-i="smartphone"></i>El celular pregunta<b>cada 5 s</b></li>
+            <li><i class="i i-s" data-i="triangle-alert" style="color:var(--urgente-texto)"></i>Roza el tope de 30 MB<b></b></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="abajo">
+        <div class="tarjeta fino">
+          <div><div class="tt">Cuánto recuerda la sesión el servidor</div></div>
+          <div class="tramos"><b>No</b><b>30 s</b><b class="elegido">1 min</b><b>5 min</b><b>10 min</b></div>
+          <div><div class="tt">Cada cuánto pregunta el celular emparejado</div></div>
+          <div class="tramos"><b>5 s</b><b>30 s</b><b class="elegido">1 min</b><b>5 min</b><b>10 min</b></div>
+          <div class="t-detalle" style="grid-column:1/-1">A medida: si tocás un tramo distinto, el modo pasa a «A medida» y el gasto se recalcula.</div>
+        </div>
+        <div class="tarjeta vinc">
+          <div style="display:flex;align-items:center;gap:10px"><span class="ico-c"><i class="i" data-i="link"></i></span><div><div style="font-weight:750">Cuántos días dura el vínculo</div><div class="t-detalle">No cambia los datos de la base</div></div></div>
+          <div class="numero"><button class="btn">−</button><span class="caja num">30</span><button class="btn">+</button><span style="font-weight:700">días</span><span class="t-detalle">de 1 a 365</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;margin-top:16px;font-size:14px;color:var(--texto-2)">
+        <span class="aviso logro" style="padding:8px 12px;white-space:nowrap"><i class="i i-s" data-i="circle-check" style="margin-top:2px"></i>Guardado para todos: modo Equilibrado</span>
+        <span style="white-space:nowrap">Llega a todos en menos de un minuto</span>
+        <span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center;white-space:nowrap"><span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span> modo · <span class="kbd">Tab</span> ajuste fino</span>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
