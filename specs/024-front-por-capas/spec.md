@@ -53,6 +53,7 @@ las mediciones del front no empeoran.
 
 ## Requirements
 
+- **RNF-69**: el front está en capas (técnica, piezas visuales, negocio y las pantallas de cada interfaz), sin código repetido, en piezas chicas y con poca complejidad (E01 a E05).
 - Ninguna regla de negocio ni ninguna pantalla cambia.
 - Las reglas de dependencia y los límites los controla una verificación automática en cada subida.
 
