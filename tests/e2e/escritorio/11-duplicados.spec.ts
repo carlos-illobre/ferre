@@ -46,11 +46,17 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await page.getByTestId("buscar-duplicados").click();
   const sugerencia = page.getByTestId("sugerencia").filter({ hasText: "SILICONA DUPLICADA" });
   await expect(sugerencia).toBeVisible();
-  await expect(sugerencia).toContainText(/mismo código de barras/i);
   await expect(sugerencia).toContainText("Proveedor caro (e2e)");
   await expect(sugerencia).toContainText("Proveedor barato (e2e)");
+  // La sugerencia elegida se compara al lado de la cola, como la v2 (021).
+  await sugerencia.click();
+  const comparar = page.getByRole("region", { name: /mismo artículo/i });
+  await expect(comparar).toContainText(/mismo código de barras/i);
+  await expect(comparar).toContainText("SILICONA DUPLICADA");
 
-  await sugerencia.getByTestId("unir").click();
+  await comparar.getByTestId("unir").click();
+  await expect(page.getByTestId("deshacer")).toBeVisible(); // lo unido se puede deshacer en el momento
+  await page.getByTestId("unidos").click(); // «Unidos y separar», como la v2
   await expect(page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" })).toBeVisible();
   // El absorbido queda inactivo y su venta ahora apunta al conservado; el preferido es el barato.
   await expect.poll(() => psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe(`false ${ID_A}`);
@@ -77,6 +83,7 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
 
   // Separar: el absorbido vuelve a existir con sus precios y su venta.
   await page.goto("/#/duplicados");
+  await page.getByTestId("unidos").click();
   const union = page.getByTestId("union").filter({ hasText: "SILICONA DUPLICADA" });
   await expect(union).toBeVisible();
   await union.getByTestId("separar").click();

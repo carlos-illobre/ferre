@@ -18,7 +18,7 @@ const ROL_NUEVO = "Encargado E2E";
 const VENDEDOR = "00000000-0000-4000-8000-0000000000a1";
 const ADMINISTRADOR = "00000000-0000-4000-8000-0000000000a4";
 const RUTAS = CELULAR
-  ? { mas: "mas", usuarios: "mas/usuarios", roles: "mas/roles", numeros: "mas/negocio", gastos: "mas/gastos", deposito: "deposito", enMas: "mas-negocio" }
+  ? { mas: "mas", usuarios: "mas/usuarios", roles: "mas/roles", numeros: "mas/negocio", gastos: "mas/gastos", deposito: "deposito", enMas: "menu-negocio" }
   : { mas: "mas", usuarios: "usuarios", roles: "roles", numeros: "resumen", gastos: "gastos", deposito: "stock", enMas: "mas-resumen" };
 
 test.beforeAll(() => {
@@ -74,12 +74,12 @@ test("quien solo vende no ve los números ni la administración, y el servidor t
 
   // En Depósito solo queda mirar el inventario: ni ingresar mercadería ni contar ni corregir.
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.deposito);
-  await expect(page.getByText("Inventario").first()).toBeVisible();
+  await expect(page.getByTestId("tabla-stock")).toBeVisible();
   // 013-E09: sin «Ver el dinero invertido», ni el total ni el valor de cada producto.
   await expect(page.getByTestId("dinero-invertido-stock")).toHaveCount(0);
   await expect(page.getByTestId("valor-stock")).toHaveCount(0);
-  await expect(CELULAR ? page.getByRole("tab", { name: "Ingreso" }) : page.getByTestId("pestana-compras")).toHaveCount(0);
-  await expect(CELULAR ? page.getByRole("tab", { name: "Estanterías" }) : page.getByTestId("pestana-contar")).toHaveCount(0);
+  await expect(CELULAR ? page.getByRole("tab", { name: "Compras" }) : page.getByTestId("pestana-compras")).toHaveCount(0);
+  await expect(CELULAR ? page.getByRole("tab", { name: "Contar" }) : page.getByTestId("pestana-contar")).toHaveCount(0);
 
   const estados = await page.evaluate(async ([token, API]) => {
     const cabeceras = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
@@ -109,9 +109,9 @@ test("se arma un rol, se lo asigna y la persona gana ese acceso", async ({ page 
 
   await entrarComo(page, TOKEN_VENDEDOR, RUTAS.numeros);
   await expect(page.getByTestId("resumen-hoy")).toBeVisible();
-  // 013-E13: con una sola sección, el título y sin submenú.
-  await expect(page.getByRole("heading", { name: "Cómo va el negocio" })).toBeVisible();
-  await expect(CELULAR ? page.getByRole("tab") : page.getByTestId("pestana-gastos")).toHaveCount(0);
+  // 013-E13: con una sola sección, el título de la parte y sin segmentos de secciones (la v2, decisión 149).
+  await expect(page.getByRole("heading", { name: "Negocio", exact: true })).toBeVisible();
+  await expect(page.locator("[data-testid^='seccion-']")).toHaveCount(0);
   await expect(page.getByTestId("sin-permiso")).toHaveCount(0);
   await expect.poll(() => psql(`SELECT count(*) FROM evento WHERE tipo = 'rol.creado' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
 });
@@ -159,14 +159,16 @@ test("013: las secciones de Cómo va el negocio siguen los permisos de cada rol"
   const hash = createHash("sha256").update(TOKEN_GASTOS).digest("hex");
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
 
-  // 013-E12: desde Más se abre la primera sección que puede ver, Compras, con su submenú de dos.
+  // 013-E12: Negocio, en el menú, abre la primera sección que puede ver, Compras, con sus segmentos de dos (decisión 149).
   await entrarComo(page, TOKEN_GASTOS, RUTAS.mas);
   await page.getByTestId(RUTAS.enMas).click();
   await expect(page).toHaveURL(new RegExp(`#/${RUTAS.gastos}$`));
   await expect(page.getByTestId("gastos-semana")).toBeVisible();
   await expect(page.getByTestId("compras-recientes")).toHaveCount(0);
   if (CELULAR) {
-    await expect(page.getByRole("tab")).toHaveText(["Compras", "Inventario"]);
+    await expect(page.locator("[data-testid^='seccion-']:not([disabled])")).toHaveCount(2);
+    await expect(page.getByTestId("seccion-compras")).toHaveAttribute("aria-current", "page");
+    await expect(page.getByTestId("seccion-inventario")).toBeVisible();
   } else {
     await expect(page.getByTestId("pestana-resumen")).toHaveCount(0);
     // 013-E14: sin «Volver a Más» y sin atajo Alt; con las flechas se pasa de sección y Enter la abre.

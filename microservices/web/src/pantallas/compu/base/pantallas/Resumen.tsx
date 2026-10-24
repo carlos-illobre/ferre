@@ -238,6 +238,7 @@ export function ResumenInventario({ invertido }: { invertido: (vuelta: number) =
 // una con su permiso; Resultado apagada hasta que exista) y, a la derecha, qué período cuenta y
 // Hoy · Semana · Mes (Semana y Mes apagados hasta que se calculen). Al lado de las pestañas,
 // «Actualizado» y «Actualizar» (F5). Abajo, chico, quién entró y cómo está el servidor.
+let focoEnLasSecciones = false;
 function SeccionDelNegocio({ seccion, testId, bajada, cargando, datos, alActualizar, children }: { seccion: SeccionDeNegocio; testId: string; bajada: string; cargando?: boolean; datos?: unknown; alActualizar: () => void; children: ReactNode }) {
   const { sesion } = useSesion();
   const puedeEsto = usePuede();
@@ -263,9 +264,14 @@ function SeccionDelNegocio({ seccion, testId, bajada, cargando, datos, alActuali
     const i = visibles.findIndex((s) => s.valor === seccion);
     const otra = visibles[(i + (e.key === "ArrowRight" ? 1 : visibles.length - 1)) % visibles.length];
     e.preventDefault();
-    if (otra) irA(RUTA_DE_SECCION[otra.valor]);
+    if (otra) { focoEnLasSecciones = true; irA(RUTA_DE_SECCION[otra.valor]); }
   };
-  useEffect(() => { if (segmentos.current?.contains(document.activeElement)) segmentos.current.querySelector<HTMLButtonElement>("[aria-current='page']")?.focus(); }, [seccion]);
+  // Cada sección es otra pantalla: la nueva recibe el foco en su segmento, para seguir con las flechas.
+  useEffect(() => {
+    if (!focoEnLasSecciones) return;
+    focoEnLasSecciones = false;
+    segmentos.current?.querySelector<HTMLButtonElement>("[aria-current='page']")?.focus();
+  }, [seccion]);
   return (
     <Pagina titulo={NOMBRES.comoVaElNegocio} testId={testId} bajada={<span className="solo-lectores">{bajada}</span>} className="rv"
       acciones={<AlLadoDeLasPestanas><span className="rv-actualizado">{TEXTOS.tablero.actualizado.largo} {horaCorta(actualizado)}</span><button type="button" className="rv-boton" onClick={actualizar} disabled={!enLinea || cargando} aria-keyshortcuts="F5" data-testid="actualizar-negocio"><IconoN nombre="refresh-cw" tam={16} />Actualizar <span className="rv-kbd">F5</span></button></AlLadoDeLasPestanas>}>

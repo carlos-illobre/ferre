@@ -116,6 +116,7 @@ describe("Más → Sistema", () => {
   });
 
   it("020-E17: en Configuración no hay nada para cambiar estos tiempos en el propio dispositivo", () => {
+    apiFalsa.mockResolvedValue([]); // Configuración pide la lista de celulares con huella
     render(<Configuracion alCambiarElGuardado={() => undefined} />);
     const texto = screen.getByTestId("configuracion").textContent!;
     for (const nombre of ["Cuánto recuerda la sesión", "Cada cuánto pregunta el celular", "Cuántos días dura el vínculo"]) expect(texto).not.toContain(nombre);

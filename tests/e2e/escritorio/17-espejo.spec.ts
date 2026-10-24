@@ -117,8 +117,8 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   // La navegación va junta, en las dos direcciones.
   await celular.getByTestId("menu-deposito").click();
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
-  await compu.getByTestId("pestana-pedidos").click();
-  await expect(celular.getByRole("tab", { name: "Pedidos" })).toHaveAttribute("aria-selected", "true");
+  await compu.getByTestId("pestana-contar").click();
+  await expect(celular.getByRole("tab", { name: "Contar" })).toHaveAttribute("aria-selected", "true");
   // Ir a Depósito y enseguida a Más desde el celular: los dos quedan en Más, y el celular no vuelve solo a Depósito.
   // Con la red de la computadora lenta, como en el local: lo que ella contesta al primer toque llega
   // cuando el celular ya está en Más.
@@ -140,15 +140,18 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(compu.getByTestId("mas")).toBeVisible();
   await celular.getByTestId("menu-deposito").click();
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
-  await compu.getByTestId("pestana-pedidos").click();
-  await expect(celular.getByRole("tab", { name: "Pedidos" })).toHaveAttribute("aria-selected", "true");
+  await compu.getByTestId("pestana-contar").click();
+  await expect(celular.getByRole("tab", { name: "Contar" })).toHaveAttribute("aria-selected", "true");
   // La otra persona sigue donde estaba.
   await expect(otra.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await expect(otra.getByTestId("espejo")).toHaveCount(0);
 
   // El ingreso de mercadería también es uno solo: el proveedor que se elige en la computadora…
+  // Depósito → Compras y, desde ahí, «Registrar compra» (la v2, decisión 149).
   await compu.getByTestId("pestana-compras").click();
-  await expect(celular.getByRole("tab", { name: "Ingreso" })).toHaveAttribute("aria-selected", "true");
+  await expect(celular.getByRole("tab", { name: "Compras" })).toHaveAttribute("aria-selected", "true");
+  await compu.getByTestId("registrar-compra").click();
+  await expect(celular.getByTestId("proveedor")).toBeVisible();
   await compu.getByTestId("proveedor").selectOption({ label: "Proveedor espejo (e2e)" });
   await expect(celular.getByTestId("proveedor")).toContainText("Proveedor espejo (e2e)");
   // …el renglón que se agrega en el celular, y la cantidad que se corrige en la computadora.
@@ -161,8 +164,12 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(celular.getByTestId("renglon").filter({ hasText: "MECHA ESPEJO" }).getByTestId("cantidad")).toHaveValue("5");
 
   // Y el pedido a un proveedor: el que se abre en el celular se abre en la computadora, con sus renglones.
-  await celular.getByRole("tab", { name: "Pedidos" }).click();
-  await expect(compu.getByTestId("pestana-pedidos")).toHaveAttribute("aria-current", "page");
+  // Los pedidos se abren desde Compras, como la v2.
+  await celular.getByRole("tab", { name: "Compras" }).click();
+  await expect(compu.getByTestId("compras-recientes")).toBeVisible();
+  await celular.getByRole("button", { name: /^Pedidos/ }).click();
+  await expect(compu.getByTestId("pedido-nuevo")).toBeVisible();
+  await expect(compu.getByTestId("pestana-compras")).toHaveAttribute("aria-current", "page");
   await celular.getByTestId("pedido-nuevo").click();
   await celular.getByTestId("proveedor-opcion").filter({ hasText: "Proveedor espejo (e2e)" }).click();
   await expect(compu.getByTestId("armar-pedido")).toContainText("Pedido a Proveedor espejo (e2e)");
@@ -172,7 +179,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await celular.getByTestId("volver-a-pedidos").click();
   await expect(compu.getByTestId("armar-pedido")).toHaveCount(0);
   await compu.getByTestId("pestana-stock").click();
-  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+  await expect(celular.getByRole("tab", { name: "Stock" })).toHaveAttribute("aria-selected", "true");
 
   // Dónde se está parado lo decide la computadora (decisión 71): si se la abre de nuevo en otra
   // pantalla con el celular ya abierto, el celular va a ella y no al revés.
@@ -181,7 +188,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(celular.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await compu.getByTestId("menu-deposito").click();
-  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+  await expect(celular.getByRole("tab", { name: "Stock" })).toHaveAttribute("aria-selected", "true");
 
   // «Desconectar» hace que cada uno vaya por su lado: el celular se mueve y la computadora no. Al «Reconectar» manda la computadora.
   await celular.getByTestId("desconectar-arriba").click();
@@ -191,7 +198,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
   await celular.getByTestId("reconectar-arriba").click();
   // Al reconectar manda la computadora: si se hubiera ido a Catálogo, el celular quedaría ahí.
-  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+  await expect(celular.getByRole("tab", { name: "Stock" })).toHaveAttribute("aria-selected", "true");
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
 
@@ -220,14 +227,14 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await intrusa.context().close();
   compu = await enEsteDispositivo(TOKEN_COMPU_2);
   await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
-  await expect(celular.getByRole("tab", { name: "Inventario" })).toHaveAttribute("aria-selected", "true");
+  await expect(celular.getByRole("tab", { name: "Stock" })).toHaveAttribute("aria-selected", "true");
 
   // Desvincular es el corte definitivo y está solo en Más → Configuración (decisiones 74 y 99): los dos quedan sueltos y la computadora ofrece vincular.
   await expect(compu.getByTestId("desvincular-espejo")).toHaveCount(0);
   await compu.getByTestId("menu-mas").click();
   await expect(compu.getByTestId("desvincular-en-mas")).toHaveCount(0);
   await compu.getByTestId("mas-configuracion").click();
-  await expect(compu.getByTestId("vinculo-actual")).toContainText("vinculada con tu celular");
+  await expect(compu.getByTestId("vinculo-actual")).toContainText(/vinculada con tu celular/i);
   compu.once("dialog", (d) => void d.accept());
   await compu.getByTestId("desvincular-vinculo").click();
   await expect(compu.getByTestId("espejo")).toHaveCount(0);

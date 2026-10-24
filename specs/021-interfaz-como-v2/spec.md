@@ -48,6 +48,8 @@ como la v2 (decisiones 140, 141 y 145).
 
 - Una parte de la v2 que solo tiene sentido con un dato que no existe (por ejemplo, filtrar por «sin usar hace 30 días»): queda visible y apagada, con un «—», hasta que se programe.
 - Una v2 que contradice una decisión de Carlos posterior: manda la decisión (E03).
+- Una lista de la computadora con el elegido al lado, como la v2 (Stock, Usuarios, Duplicados, Para revisar): siempre hay uno elegido y las flechas lo mueven; ↑ desde el primero no saca el cursor de la búsqueda (decisiones 130 y 133). E04 se cumple con esa marca en lugar de la marca de la fila que se podía quitar.
+- Las secciones de Resumen son segmentos, como la v2: ← y → pasan a la otra sección y el teclado sigue en los segmentos.
 
 ## Requirements
 

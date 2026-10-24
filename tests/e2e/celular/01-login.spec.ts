@@ -42,12 +42,10 @@ test("sin sesión se pide entrar", async ({ page }) => {
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");
-  // Todo lo que se usa poco está en «Más» (decisión 28).
-  await page.getByRole("button", { name: "Más", exact: true }).click();
-  await page.getByRole("button", { name: /Cómo va el negocio/ }).click();
+  // Cómo va el negocio y Usuarios están en la parte Negocio del menú, como la v2 (decisión 149).
+  await page.getByTestId("menu-negocio").click();
   await expect(page.getByTestId("usuario-negocio")).toContainText("Dueño E2E");
-  await page.getByRole("button", { name: "Más", exact: true }).click();
-  await page.getByTestId("mas-usuarios").click();
+  await page.getByRole("tab", { name: "Usuarios" }).click();
   await expect(page.getByTestId("autorizar")).toContainText("Autorizar otro correo de Google");
   await expect(page.getByTestId("usuarios")).toContainText(EMAIL);
 });
@@ -86,7 +84,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await cdp.send("WebAuthn.clearCredentials", { authenticatorId });
   page.once("dialog", (d) => d.accept("Celular E2E"));
   await page.getByTestId("vincular-celular").click();
-  await expect(page.getByTestId("mensaje-celular")).toContainText('"Celular E2E" entra con la huella');
+  await expect(page.getByTestId("mensaje-celular")).toContainText("«Celular E2E» entra con la huella");
   await expect(page.getByTestId("celular")).toContainText("Celular E2E");
   await expect.poll(() => psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
 
@@ -165,7 +163,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   await expect(compu.getByTestId("codigo-desconocido")).toContainText("7790000000011", { timeout: 10000 });
   await celular.getByRole("button", { name: "Listo" }).click();
   // …y la foto de una factura se la pide sin código: al celular le aparece el aviso.
-  await compu.goto("/#/compras");
+  await compu.goto("/#/ingreso");
   await compu.getByTestId("foto-con-celular").click();
   await expect(compu.getByTestId("pedida-al-celular")).toBeVisible();
   await expect(celular.getByTestId("pedido-de-la-compu")).toContainText("La computadora pide una foto");

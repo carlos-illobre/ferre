@@ -180,6 +180,8 @@ function Fila({ ticket: x, alAbrir }: { ticket: Ticket | Pendiente; alAbrir: () 
   return (
     <button type="button" className={`tkv-tk ${enviado ? "" : "porenviar"}`} onClick={alAbrir} data-testid="ticket">
       <span className={`tkv-tipo ${x.tipo}`}><IconoDeLaV2 nombre={x.tipo === "error" ? "bicho" : "lamparita"} /></span>
+      {/* El tipo se ve en el ícono; quien no ve la pantalla lo oye. */}
+      <span className="solo-lectores">{x.tipo === "error" ? "Error" : "Mejora"}. </span>
       <span className="tx"><span className="texto">{x.descripcion}</span>
         <span className={`quien ${enviado ? "" : "urgente"}`}>{enviado ? [x.usuario, cuandoCorto(x.creado_en), x.dispositivo].filter(Boolean).join(" · ") : t.porEnviar.largo}</span></span>
       <span className="lado">

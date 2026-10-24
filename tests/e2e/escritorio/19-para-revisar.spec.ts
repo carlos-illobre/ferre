@@ -88,9 +88,14 @@ test("014-E01 014-E06 014-E14 una venta sin mandar de Ana, desactivada, sube apa
   const pestanas = CELULAR ? page.getByRole("tab") : page.locator(".pestanas button");
   await expect(pestanas).toHaveText(["Para revisar1", "Anotadas"]);
   const tarjeta = page.getByRole("region", { name: "Ana apartados E2E" }).getByTestId("apartado");
-  await expect(tarjeta).toContainText("Venta · $22.000 · Efectivo");
-  await expect(tarjeta).toContainText("2 un. Candado apartado (E2E)");
-  await tarjeta.getByTestId("aceptar-apartado").click();
+  // Como la v2 (021): en la bandeja, qué es, el medio y el importe; el detalle, en el celular en la
+  // misma tarjeta y en la computadora al lado.
+  await expect(tarjeta).toContainText(/Venta · .*Efectivo/);
+  await expect(tarjeta).toContainText("$22.000");
+  const detalle = CELULAR ? tarjeta : page.getByTestId("cambio-elegido");
+  await expect(detalle).toContainText("Candado apartado (E2E)");
+  await expect(detalle).toContainText("2 un.");
+  await detalle.getByTestId("aceptar-apartado").click();
   await expect(page.getByTestId("nada-para-revisar")).toBeVisible();
 
   // Quedó registrada a nombre de Ana, con la fecha en que la cobró, y se anotó quién la aceptó.

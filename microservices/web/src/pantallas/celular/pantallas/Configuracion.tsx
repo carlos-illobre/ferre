@@ -116,7 +116,7 @@ function DatosSinConexion() {
             <span className="mv-barra" aria-hidden="true"><b style={{ width: `${avance.total ? Math.min(100, (avance.hechos / avance.total) * 100) : 0}%` }} /></span>
             {avance.total ? `Bajando… ${numero(avance.hechos)} de ${numero(avance.total)} productos.` : `Bajando lo que cambió… ${numero(avance.hechos)} productos.`}
           </> : descarga && cuando
-            ? `Bajados el ${String(cuando.getDate()).padStart(2, "0")}/${String(cuando.getMonth() + 1).padStart(2, "0")}: ${numero(descarga.cuantos)} productos, su stock y los clientes. «Actualizar» trae solo lo que cambió.`
+            ? `Bajados el ${String(cuando.getDate()).padStart(2, "0")}/${String(cuando.getMonth() + 1).padStart(2, "0")} a las ${String(cuando.getHours()).padStart(2, "0")}:${String(cuando.getMinutes()).padStart(2, "0")}: ${numero(descarga.cuantos)} productos, su stock y los clientes. «Actualizar» trae solo lo que cambió.`
             : "Todavía no se bajaron. Bajá los productos, el stock y los clientes para buscar y vender sin internet. Ocupa unos 10 MB."}
           {error && <span className="cfgvc-error" role="alert" data-testid="cfg-descarga-error"> {error}</span>}
         </p>

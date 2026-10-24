@@ -72,9 +72,9 @@ test("con sesión el dueño entra y ve la administración", async ({ page }) => 
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
-  // Lo que se usa poco está en «Más» (decisión 28).
-  await page.getByTestId("menu-mas").click();
-  await page.getByTestId("mas-usuarios").click();
+  // Usuarios está en la parte Negocio del menú, como la v2 (decisión 149).
+  await page.getByTestId("menu-negocio").click();
+  await page.getByTestId("pestana-usuarios").click();
   await expect(page.getByTestId("usuarios")).toContainText(EMAIL);
 });
 
@@ -95,9 +95,9 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   await expect(page.getByTestId("ofrecer-huella")).toHaveCount(0);
   await expect(page.getByTestId("celular")).toHaveCount(0);
+  // El nombre se pregunta al vincular, como en el celular (021).
+  page.once("dialog", (d) => d.accept("Celular E2E"));
   await page.getByTestId("vincular-celular").click();
-  await page.getByTestId("nombre-celular").fill("Celular E2E");
-  await page.getByTestId("confirmar-vincular").click();
   await expect(page.getByTestId("mensaje-celular")).toContainText("«Celular E2E» entra con la huella");
   await expect(page.getByTestId("celular")).toContainText("Celular E2E");
   await expect.poll(() => psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
@@ -112,6 +112,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
 
   // Quitar el celular: ya no entra con la huella.
   await page.goto("/#/configuracion");
+  page.once("dialog", (d) => d.accept()); // pide confirmar, como en el celular
   await page.getByTestId("celular").getByRole("button", { name: /Quitar/ }).click();
   await expect(page.getByTestId("celular")).toHaveCount(0);
   await page.getByTestId("cuenta").click(); // «Cerrar sesión» está en el menú del usuario (decisión 126)
@@ -173,7 +174,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   await expect(compu.getByTestId("codigo-desconocido")).toContainText("7790000000011", { timeout: 10000 });
   await celular.getByRole("button", { name: "Listo" }).click();
   // …y la foto de una factura se la pide sin código: al celular le aparece el aviso.
-  await compu.goto("/#/compras");
+  await compu.goto("/#/ingreso");
   await compu.getByTestId("foto-con-celular").click();
   await expect(compu.getByTestId("pedida-al-celular")).toBeVisible();
   await expect(celular.getByTestId("pedido-de-la-compu")).toContainText("La computadora pide una foto");

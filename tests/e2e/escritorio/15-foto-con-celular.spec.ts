@@ -30,7 +30,7 @@ test.afterEach(cerrarLasOtrasVentanas);
 
 test("la computadora pide la foto de la factura con un código QR y el celular la manda", async ({ page, browser }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/compras");
+  await page.goto("/#/ingreso");
   await page.getByTestId("foto-con-celular").click();
   await expect(page.getByTestId("pedido-de-foto").getByRole("img", { name: "Código para sacar la foto con el celular" })).toBeVisible();
   // El enlace que lleva el código QR (lo deja la página para poder probar sin cámara).

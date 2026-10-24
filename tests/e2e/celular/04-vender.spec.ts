@@ -132,7 +132,11 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.getByRole("button", { name: /Anomalías/ }).click();
   // Anomalías abre en «Para revisar» (014): las anotadas están en la otra pestaña.
   await page.getByRole("tab", { name: "Anotadas" }).click();
-  await expect(page.getByTestId("anomalia").filter({ hasText: "TORNILLO VENDER" })).toContainText("Venta sin stock");
+  // Como la v2: arriba el resumen de la semana; el registro entero se abre aparte.
+  await expect(page.getByTestId("producto-con-anomalias").filter({ hasText: /TORNILLO VENDER/i })).toBeVisible();
+  await page.getByTestId("ver-registro").click();
+  await expect(page.getByTestId("anomalia").filter({ hasText: /TORNILLO VENDER/i }).first()).toContainText("Venta sin stock");
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Vender" }).click();
 
   // "No llevó": la consulta queda registrada.

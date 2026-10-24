@@ -39,7 +39,7 @@ test("avisar de un error con una captura, verlo en la lista, marcarlo resuelto y
   await page.getByTestId("tipo-error").click();
   await page.getByTestId("descripcion").fill(TEXTO);
   await page.getByTestId("archivo-foto").setInputFiles({ name: "captura.png", mimeType: "image/png", buffer: FOTO });
-  await expect(pantalla.getByLabel("Fotos del ticket").getByRole("listitem")).toHaveCount(1);
+  await expect(pantalla.getByRole("button", { name: /^Quitar la foto/ })).toHaveCount(1); // cada foto, con su botón para quitarla (la v2)
   await page.getByTestId("enviar").click();
   await expect(page.getByTestId("mensaje")).toContainText("Ticket enviado");
 
@@ -50,18 +50,22 @@ test("avisar de un error con una captura, verlo en la lista, marcarlo resuelto y
   await expect(ticket).toContainText("Error");
 
   // Marcar resuelto con una nota: pasa a los resueltos.
-  await ticket.getByTestId("resolver").click();
-  await ticket.getByTestId("nota").fill("Corregido en la versión de hoy");
-  await ticket.getByTestId("confirmar-resuelto").click();
+  // Como la v2 (021): el ticket se abre en su hoja y ahí se resuelve o se reabre.
+  await ticket.click();
+  const hoja = page.getByTestId("ticket-abierto");
+  await hoja.getByTestId("nota").fill("Corregido en la versión de hoy");
+  await hoja.getByTestId("confirmar-resuelto").click();
+  await expect(hoja).toHaveCount(0);
   await expect(page.getByTestId("ticket").filter({ hasText: TEXTO })).toHaveCount(0);
   await pantalla.getByRole("button", { name: /^Resueltos/ }).click();
   const resuelto = page.getByTestId("ticket").filter({ hasText: TEXTO });
-  await expect(resuelto).toContainText("Resuelto por Tickets E2E");
-  await expect(resuelto).toContainText("Corregido en la versión de hoy");
+  await resuelto.click();
+  await expect(hoja).toContainText("Tickets E2E lo resolvió");
+  await expect(hoja).toContainText("Corregido en la versión de hoy");
   await expect.poll(() => psql(`SELECT estado FROM ticket WHERE descripcion = '${TEXTO}'`)).toBe("resuelto");
 
   // Reabrir lo devuelve a los abiertos.
-  await resuelto.getByTestId("reabrir").click();
+  await hoja.getByTestId("reabrir").click();
   await expect(page.getByTestId("ticket").filter({ hasText: TEXTO })).toHaveCount(0);
   await expect.poll(() => psql(`SELECT estado || ' ' || COALESCE(nota, 'sin nota') FROM ticket WHERE descripcion = '${TEXTO}'`)).toBe("abierto sin nota");
 });

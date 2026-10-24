@@ -50,7 +50,7 @@ test("sugerir, unir y ver el proveedor más barato como preferido", async ({ pag
   await expect(sugerencia).toContainText("Proveedor caro (e2e)");
   await expect(sugerencia).toContainText("Proveedor barato (e2e)");
 
-  await sugerencia.getByTestId("unir").click();
+  await page.getByTestId("unir").click(); // en la barra de decidir, al pulgar (la v2)
   await expect(page.getByTestId("mensaje")).toContainText("Unidos");
   // El absorbido queda inactivo y su venta ahora apunta al conservado; el preferido es el barato.
   await expect.poll(() => psql(`SELECT activo::text || ' ' || COALESCE(reemplazado_por::text, '') FROM producto WHERE id = '${ID_B}'`)).toBe(`false ${ID_A}`);

@@ -36,28 +36,27 @@ test.beforeAll(() => {
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/stock");
-  // Inventario muestra las cantidades y, con «Ver el dinero invertido», el dinero (decisión 96).
-  await expect(page.getByRole("button", { name: /^Inventario/ })).toBeVisible();
+  // Depósito → Stock muestra las cantidades y, con «Ver el dinero invertido», el dinero (decisiones 96 y 149).
+  await expect(page.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
 
   await page.getByTestId("busqueda").fill("e2e candado stock");
   const fila = page.getByTestId("fila-stock").filter({ hasText: "CANDADO STOCK 40 MM" });
   await expect(fila.getByTestId("stock")).toContainText("17");
-  // 013-E10: quien prueba tiene el rol Gerente: ve el valor del producto (17 × $2.500) y el total.
-  await expect(fila.getByTestId("valor-stock")).toContainText("$42.500");
-  await expect(page.getByTestId("dinero-invertido-stock")).toBeVisible();
-
-  // La explicación del número: sus movimientos.
+  // La explicación del número: sus movimientos, en la cuenta del producto al lado (como la v2).
   await fila.getByTestId("stock").click();
   const detalle = page.getByTestId("detalle-stock");
+  // 013-E10: quien prueba tiene el rol Gerente: ve el valor del producto (17 × $2.500) y el total.
+  await expect(detalle.getByTestId("valor-stock")).toContainText("$42.500");
+  await expect(page.getByTestId("dinero-invertido-stock")).toBeVisible();
   const movimientos = detalle.getByTestId("movimientos");
   await expect(movimientos).toContainText("Compra");
   await expect(movimientos).toContainText("20");
   await expect(movimientos).toContainText("3");
-  await expect(detalle).not.toContainText("$");
+  await expect(movimientos).not.toContainText("$");
 
   // Corregir: "hay 15", con motivo. Queda un ajuste de −2 explicado.
-  await detalle.getByTestId("corregir").click();
   await detalle.getByTestId("cantidad-real").fill("15");
+  await detalle.getByRole("button", { name: "Otro…" }).click();
   await detalle.getByTestId("motivo").fill("conté la estantería");
   await detalle.getByTestId("guardar-ajuste").click();
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_PROD}'`)).toBe("15.000");

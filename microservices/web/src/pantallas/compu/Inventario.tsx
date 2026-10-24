@@ -110,8 +110,9 @@ export function Inventario() {
     if (e.key === "ArrowDown" && filas.length) { e.preventDefault(); setElegidoId(filas[Math.min(marcada + 1, filas.length - 1)]!.id); }
     else if (e.key === "ArrowUp" && filas.length) {
       e.preventDefault();
-      // Arriba del primer producto están las pestañas (decisión 82).
-      if (marcada === 0) document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']")?.focus();
+      // Arriba del primer producto están las pestañas (decisión 82), salvo con el cursor en la
+      // búsqueda: las flechas nunca lo sacan de la caja (decisiones 130 y 133).
+      if (marcada === 0) { if (!escribiendo) document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']")?.focus(); }
       else setElegidoId(filas[marcada - 1]!.id);
     }
     else if (e.key === "Enter" && destino === caja.current && elegido) { e.preventDefault(); if (esCelular) setAbiertoId(elegido.id); else panel.current?.querySelector<HTMLInputElement>("[data-testid='cantidad-real']")?.focus(); }
@@ -328,7 +329,7 @@ function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, enHoja, pan
         <div className={`sv-total ${cantidad < 0 ? "negativo" : ""}`} data-testid="stock-del-producto">{cantidad < 0 ? "−" : ""}{numero(Math.abs(cantidad))}<small>{rotulo}</small></div>
         <div className="sv-cuenta-saldo">
           {movimientos ? <>Es la suma de sus <b>{plural(movimientos.length, "movimiento", "movimientos")}</b></> : "Es la suma de sus movimientos"}<br />
-          Mínimo <b>—</b>{veInvertido && <> · vale <b>{fila?.costo_neto == null || valor <= 0 ? "—" : pesosEnteros(valor)}</b></>}
+          Mínimo <b>—</b>{veInvertido && <> · vale <b data-testid="valor-stock">{fila?.costo_neto == null || valor <= 0 ? "—" : pesosEnteros(valor)}</b></>}
           {porEnviar && <><br /><span className="sv-pastilla urgente">Se manda al volver internet</span></>}
         </div>
       </div>

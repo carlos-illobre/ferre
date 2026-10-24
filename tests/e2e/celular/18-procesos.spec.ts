@@ -146,9 +146,24 @@ test.describe("con el dedo", { tag: "@tiempo" }, () => {
     const cdp = await page.context().newCDPSession(page);
     const tocar = (type: "touchStart" | "touchMove" | "touchEnd", x?: number, y?: number) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: x === undefined ? [] : [{ x, y: y! }] });
     const desde = { x: figura.x + figura.width / 2, y: figura.y + figura.height / 2 };
-    const hasta = { x: lienzo.x + lienzo.width / 2, y: lienzo.y + 120 };
+    // Se suelta en un lugar libre de un carril, arriba de la hoja de figuras: encima de un paso no se agrega.
+    const hasta = await page.evaluate(([x0, y0, ancho, tope]) => {
+      for (let y = y0! + 60; y < tope!; y += 20) for (const f of [0.5, 0.25, 0.75]) {
+        const x = x0! + ancho! * f;
+        // Adentro de un carril (los pasos van en uno) y con lugar para el paso entero: sin otro paso
+        // ni un botón en ese lugar ni alrededor.
+        const libre = (px: number, py: number) => {
+          const e = document.elementFromPoint(px, py);
+          const forma = e?.closest("g.djs-element")?.getAttribute("data-element-id") ?? "";
+          return Boolean(e?.closest(".procesos-dibujo-celu")) && !e!.closest("button, .procesos-hoja") && /^Carril/.test(forma);
+        };
+        if ([[0, 0], [-60, 0], [60, 0], [0, -50], [0, 50]].every(([dx, dy]) => libre(x + dx!, y + dy!))) return { x, y };
+      }
+      return null;
+    }, [lienzo.x, lienzo.y, lienzo.width, figura.y - 40]);
+    expect(hasta).not.toBeNull();
     await tocar("touchStart", desde.x, desde.y);
-    for (let i = 1; i <= 12; i++) await tocar("touchMove", desde.x + ((hasta.x - desde.x) * i) / 12, desde.y + ((hasta.y - desde.y) * i) / 12);
+    for (let i = 1; i <= 12; i++) await tocar("touchMove", desde.x + ((hasta!.x - desde.x) * i) / 12, desde.y + ((hasta!.y - desde.y) * i) / 12);
     await tocar("touchEnd");
     await expect(formas).toHaveCount(11);
   });

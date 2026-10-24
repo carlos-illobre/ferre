@@ -80,7 +80,8 @@ test("contar un sector desde el celular y cerrarlo con ajustes", async ({ page }
   await expect.poll(() => psql(`SELECT nota FROM movimiento_stock WHERE producto_id = '${ID_A}' AND referencia_tipo = 'conteo'`)).toContain("había 10, hay 8");
   await expect.poll(() => psql(`SELECT count(*) FROM producto WHERE sector_id = (SELECT id FROM sector WHERE nombre = '${SECTOR}')`)).toBe("2");
 
-  // El sector muestra que se contó hoy.
+  // El sector muestra que se contó hoy, con la fecha como la v2.
+  const hoy = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", timeZone: "America/Argentina/Buenos_Aires" });
   await page.getByRole("button", { name: "Contar otro sector" }).click();
-  await expect(page.getByTestId("sectores").getByRole("button", { name: new RegExp(SECTOR) })).toContainText("contado hoy");
+  await expect(page.getByTestId("sectores").getByRole("button", { name: new RegExp(SECTOR) })).toContainText(`Contado el ${hoy}`);
 });

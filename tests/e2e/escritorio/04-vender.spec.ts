@@ -169,7 +169,8 @@ test("sin mouse: lo que llega del servidor no le saca el foco al menú", async (
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-vender")).toBeFocused();
-  await page.keyboard.press("ArrowUp");
+  // Vender es la primera parte del menú, como la v2 (decisión 149): Catálogo, la siguiente.
+  await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
   const contesto = page.waitForResponse((r) => r.url().includes("/productos/pagina"));
   soltar();
@@ -191,7 +192,8 @@ test("el menú se achica con su botón o con Ctrl+B, recuerda cómo quedó y sig
   await expect(page.getByTestId("menu-vender").locator(".txt")).toBeHidden();
   await page.reload();
   await expect(app).toHaveClass(/plegado/);
-  await page.keyboard.press("Alt+1");
+  // Alt+número sigue el orden del menú: Vender (1), Ventas del día (2), Productos (3).
+  await page.keyboard.press("Alt+3");
   await expect(page).toHaveURL(/#\/productos/);
   await page.keyboard.press("Control+b");
   await expect(app).not.toHaveClass(/plegado/);
@@ -225,8 +227,7 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   // Enter en el menú abre la parte y deja la marca en su primera pestaña.
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
-  await page.keyboard.press("ArrowDown");
-  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowDown"); // el menú de la v2: Vender, Catálogo, Depósito, Negocio, Más (decisión 149)
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
   // El stock se retiene hasta que la marca vuelve al menú: la búsqueda de Inventario aparece
   // tarde, como con internet lento, y no le saca el foco al menú (decisión 82).
@@ -239,12 +240,13 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   // En Más, Enter deja la marca en la primera opción, y se ve su borde.
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowDown");
   soltarElStock();
   await expect(page.getByTestId("pantalla-stock").getByTestId("busqueda")).toBeVisible();
   await expect(page.getByTestId("menu-mas")).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page.getByTestId("mas-resumen")).toBeFocused();
-  expect(await page.getByTestId("mas-resumen").evaluate((b) => getComputedStyle(b).outlineStyle)).toBe("solid");
+  await expect(page.getByTestId("mas-anomalias")).toBeFocused();
+  expect(await page.getByTestId("mas-anomalias").evaluate((b) => getComputedStyle(b).outlineStyle)).toBe("solid");
   // Y de vuelta a Catálogo, para seguir desde donde estaba.
   await page.keyboard.press("ArrowLeft");
   for (const _ of [1, 2, 3]) await page.keyboard.press("ArrowUp");
@@ -260,7 +262,7 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
   await hastaElMenu(page);
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
-  for (const destino of ["menu-vender", "menu-deposito", "menu-mas", "emparejar-celular", "cuenta", "plegar-menu", "menu-catalogo"]) {
+  for (const destino of ["menu-deposito", "menu-negocio", "menu-mas", "emparejar-celular", "cuenta", "plegar-menu", "menu-vender", "menu-catalogo"]) {
     await page.keyboard.press("ArrowDown");
     await expect(page.getByTestId(destino)).toBeFocused();
   }
@@ -290,51 +292,51 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   for (const _ of [1, 2, 3]) await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("menu-mas")).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page.getByTestId("mas-resumen")).toBeFocused();
+  await expect(page.getByTestId("mas-anomalias")).toBeFocused();
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByTestId("mas-usuarios")).toBeFocused();
-  await page.keyboard.press("ArrowDown");
-  await expect(page.getByTestId("mas-tickets")).toBeFocused();
-  await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("mas-procesos")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("mas-sistema")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("mas-configuracion")).toBeFocused();
   await page.keyboard.press("ArrowUp");
-  await expect(page.getByTestId("mas-resumen")).toBeFocused();
+  await expect(page.getByTestId("mas-anomalias")).toBeFocused();
   await expect(page.getByTestId("mas")).toBeVisible();
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-mas")).toBeFocused();
-  // Dos focos (decisión 82): en Inventario, ↓ desde la pestaña marca la primera fila entera y el
+  // Dos focos (decisión 82): en Stock, ↓ desde la pestaña marca la primera fila entera y el
   // cursor de escritura queda en la búsqueda; ↑ ↓ mueven la marca; ↑ desde la primera la saca de la lista.
+  await page.keyboard.press("ArrowUp");
   await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("pestana-stock")).toBeFocused();
   await page.keyboard.press("ArrowDown");
+  // Como la v2 (021): siempre hay un producto elegido, con su cuenta al lado; arranca en el primero.
   const filasDeStock = page.getByTestId("fila-stock");
-  await expect(filasDeStock.nth(0)).toHaveAttribute("data-flecha", "");
+  await expect(filasDeStock.nth(0)).toHaveAttribute("aria-selected", "true");
   await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
-  // La marca es una sola y es la fila entera. Si hay más filas, ↓ pasa a la siguiente y ↑ vuelve.
-  await expect(page.locator("[data-flecha]")).toHaveCount(1);
+  await expect(page.locator(".sv-filas [aria-selected='true']")).toHaveCount(1);
   if ((await filasDeStock.count()) > 1) {
     await page.keyboard.press("ArrowDown");
-    await expect(filasDeStock.nth(1)).toHaveAttribute("data-flecha", "");
-    await expect(page.locator("[data-flecha]")).toHaveCount(1);
+    await expect(filasDeStock.nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator(".sv-filas [aria-selected='true']")).toHaveCount(1);
     await page.keyboard.press("ArrowUp");
-    await expect(filasDeStock.nth(0)).toHaveAttribute("data-flecha", "");
+    await expect(filasDeStock.nth(0)).toHaveAttribute("aria-selected", "true");
   }
-  // ↑ desde la primera saca la marca de la lista; el cursor sigue en la búsqueda (son dos focos distintos).
+  // ↑ desde el primero no saca el cursor de la búsqueda (decisiones 130 y 133); el elegido sigue siendo el primero.
   await page.keyboard.press("ArrowUp");
-  await expect(page.locator("[data-flecha]")).toHaveCount(0);
   await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
+  await expect(filasDeStock.nth(0)).toHaveAttribute("aria-selected", "true");
   await hastaElMenu(page);
   await expect(page.getByTestId("menu-deposito")).toBeFocused();
   await page.keyboard.press("ArrowUp");
-  await expect(page.getByTestId("menu-vender")).toBeFocused();
-  await page.keyboard.press("ArrowUp");
   await expect(page.getByTestId("menu-catalogo")).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("menu-vender")).toBeFocused();
 
   // Al entrar a Vender, se llegue como se llegue, el cursor queda en la búsqueda (Carlos, 2026-10-20;
   // decisión 127): la venta entera, con el teclado.
-  await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("busqueda")).toBeFocused();
   await page.keyboard.type("e2e mecha vender");
@@ -350,7 +352,7 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   // recorren sin sacar el cursor de la búsqueda; Esc la devuelve a la pantalla.
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("menu-vender")).toHaveAttribute("data-marca", "");
-  await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("menu-catalogo")).toHaveAttribute("data-marca", "");
   await expect(page.getByTestId("busqueda")).toBeFocused();
   await page.keyboard.press("Escape");

@@ -27,10 +27,10 @@ test.beforeEach(() => {
 test("007-T037 en la tarjeta de la persona se cierra la sesión de otro dispositivo; la de este no figura", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
   await page.goto("/#/mas/usuarios");
-  // La tarjeta está plegada: se abre y se va a «Sesiones» (decisión 102).
+  // La tarjeta está plegada: se abre y se va a «Acceso», como la v2 (decisión 102).
   const tarjeta = page.getByTestId("usuario-fila").filter({ hasText: "Dueño cerrar E2E" });
   await tarjeta.getByTestId("abrir-usuario").click();
-  await expect(tarjeta.getByTestId("pestana-sesiones")).toHaveText("Sesiones (1)");
+  await expect(tarjeta.getByTestId("pestana-sesiones")).toHaveText("Acceso (1)");
   await tarjeta.getByTestId("pestana-sesiones").click();
   await expect(page.getByTestId("sesion").filter({ hasText: "otro celular" })).toBeVisible();
   // La de este dispositivo se cierra con «Salir»: no se repite en la lista (decisión 99).

@@ -118,6 +118,8 @@ function Fila({ ticket: x, alAbrir }: { ticket: Ticket | Pendiente; alAbrir: () 
   return (
     <button type="button" className={`tkvc-tk ${enviado ? "" : "porenviar"}`} onClick={alAbrir} data-testid="ticket">
       <span className={`tkv-tipo ${x.tipo}`}><IconoDeLaV2 nombre={x.tipo === "error" ? "bicho" : "lamparita"} /></span>
+      {/* El tipo se ve en el ícono; quien no ve la pantalla lo oye. */}
+      <span className="solo-lectores">{x.tipo === "error" ? "Error" : "Mejora"}. </span>
       <span className="tx"><span className="texto">{x.descripcion}</span>
         <span className={`quien ${enviado ? "" : "urgente"}`}>{enviado ? [x.usuario, cuandoCorto(x.creado_en)].join(" · ") : t.porEnviar.corto}</span></span>
       {!enviado ? <IconoDeLaV2 nombre="nube-subir" className="nube" /> : dias >= DIAS_DE_ESPERA ? <span className="mv-pastilla urgente">{dias} días</span> : x.fotos.length > 0 ? <span className="tkvc-mini chica"><Miniatura origen={x.fotos[0]!} /></span> : <span />}

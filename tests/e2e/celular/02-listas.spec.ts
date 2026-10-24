@@ -52,6 +52,7 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.getByRole("button", { name: "Agregar", exact: true }).click();
   await expect(page.getByTestId("estado-proveedores")).toContainText(PROVEEDOR);
   // El buscador deja solo los proveedores con lo escrito en el nombre (002-T003).
+  await page.getByRole("button", { name: "Buscar proveedor" }).click(); // la lupa, como la v2
   await page.getByTestId("buscar-proveedor").fill(PROVEEDOR.toUpperCase());
   await expect(page.getByTestId("estado-proveedores").getByRole("row")).toHaveCount(1);
   await page.getByTestId("buscar-proveedor").fill("");
@@ -61,9 +62,9 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   const resumen = page.getByTestId("resumen");
   await expect(resumen).toBeVisible();
   await expect(page.getByRole("heading", { name: PROVEEDOR_RE })).toBeVisible();
-  await expect(resumen.getByText("Productos leídos").locator("..")).toContainText("4");
-  await expect(resumen.getByText("Nuevos", { exact: true }).locator("..")).toContainText("4");
-  await expect(resumen.getByText("Filas salteadas").locator("..")).toContainText("1");
+  await expect(resumen.getByText("leídos").locator("..")).toContainText("4");
+  await expect(resumen.getByText("nuevos", { exact: true }).locator("..")).toContainText("4");
+  await expect(resumen.getByText("salteadas").locator("..")).toContainText("1");
 
   // La vista previa muestra el costo con descuento de línea y contado, y su explicación.
   const fila = page.getByRole("row", { name: /MP001/ });

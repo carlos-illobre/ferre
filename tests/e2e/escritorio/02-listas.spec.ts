@@ -42,8 +42,9 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.getByTestId("menu-catalogo").click();
   await page.getByRole("button", { name: /^Listas/ }).click();
   // El orden de la pantalla: primero cargar, después las últimas cargas (hasta tres) y al final los proveedores.
-  await expect.poll(() => page.locator("h2.seccion-titulo").allInnerTexts().then((t) => t.filter((x) => ["Cargar una lista", "Últimas cargas", "Proveedores"].includes(x)))).toEqual(["Cargar una lista", "Últimas cargas", "Proveedores"]);
-  expect(await page.locator('[aria-labelledby="listas-historial"] tbody tr').count()).toBeLessThanOrEqual(3);
+  await expect(page.getByTestId("zona-de-carga")).toBeVisible();
+  await expect.poll(() => page.locator("h2.lv-cab b").allInnerTexts().then((t) => t.filter((x) => ["Últimas cargas", "Proveedores"].includes(x)))).toEqual(["Últimas cargas", "Proveedores"]);
+  expect(await page.locator('[data-testid="historial"] li').count()).toBeLessThanOrEqual(3);
 
   // Alta del proveedor con su configuración de costo (descuento por contado 5 %).
   await page.getByTestId("agregar-proveedor").click();
@@ -58,9 +59,9 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   const resumen = page.getByTestId("resumen");
   await expect(resumen).toBeVisible();
   await expect(page.getByRole("heading", { name: PROVEEDOR_RE })).toBeVisible();
-  await expect(resumen.getByText("Productos leídos").locator("..")).toContainText("4");
+  await expect(resumen.getByText("Leídos").locator("..")).toContainText("4");
   await expect(resumen.getByText("Nuevos", { exact: true }).locator("..")).toContainText("4");
-  await expect(resumen.getByText("Filas salteadas").locator("..")).toContainText("1");
+  await expect(resumen.getByText("Salteadas").locator("..")).toContainText("1");
 
   // La vista previa muestra el costo con descuento de línea y contado, y su explicación.
   const fila = page.getByRole("row", { name: /MP001/ });
@@ -80,5 +81,5 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await expect(page.getByTestId("resultado")).toHaveCount(0);
 
   // El proveedor ya tiene su última lista aplicada.
-  await expect(page.getByTestId("estado-proveedores").getByRole("row", { name: PROVEEDOR_RE })).toContainText("hace");
+  await expect(page.getByTestId("estado-proveedores").getByRole("listitem", { name: PROVEEDOR_RE })).toContainText(/Al día|Vieja · \d+ días/); // la muestra trae una fecha de lista vieja
 });

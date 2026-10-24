@@ -43,7 +43,7 @@ test.beforeAll(() => {
 
 test("ingresar mercadería: stock, costo según factura, gasto de la semana y anulación", async ({ page }) => {
   await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
-  await page.goto("/#/compras");
+  await page.goto("/#/ingreso");
   await page.getByTestId("proveedor").selectOption({ label: PROVEEDOR });
   // El número de la factura no se tipea (RF-50): se sube su foto. En la computadora se puede
   // pedir al celular con un código QR o elegir un archivo.
@@ -90,13 +90,16 @@ test("ingresar mercadería: stock, costo según factura, gasto de la semana y an
   // Anular devuelve el stock; el costo según factura se mantiene.
   // En el ingreso no hay compras recientes: están en Cómo va el negocio (decisión 67).
   await expect(page.getByTestId("compras-recientes")).toHaveCount(0);
-  await page.goto("/#/gastos");
+  await page.goto("/#/compras"); // Depósito → Compras, como la v2 (decisión 149)
   const recientes = page.getByTestId("compras-recientes");
   const compra = recientes.getByTestId("compra-reciente").filter({ hasText: PROVEEDOR }).first();
   // La foto de la factura queda con la compra y se abre en grande para leer el número.
   await compra.getByTestId("ver-comprobante").click();
   await expect(page.getByRole("dialog", { name: "Foto del comprobante" })).toBeVisible();
   await page.getByRole("dialog", { name: "Foto del comprobante" }).getByRole("button", { name: "Cerrar" }).click();
+  // La compra se despliega con sus renglones y ahí se anula (021).
+  await compra.getByRole("button", { expanded: false }).click();
+  await expect(compra).toContainText("10 un.");
   await compra.getByTestId("anular").click();
   await page.getByTestId("motivo-anular").fill("error de carga");
   await page.getByTestId("anular-confirmar").click();
