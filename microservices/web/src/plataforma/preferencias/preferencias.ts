@@ -31,7 +31,7 @@ export function crearPreferencias<T extends object>(opciones: OpcionesDePreferen
     aplicar();
     oyentes.forEach((o) => o());
   }
-  function usar(): T {
+  function useLasPreferencias(): T {
     return useSyncExternalStore((o) => { oyentes.add(o); return () => { oyentes.delete(o); }; }, () => actuales);
   }
   // Para quien no es una pantalla: enterarse de cada cambio. Devuelve cómo dejar de escuchar.
@@ -39,5 +39,5 @@ export function crearPreferencias<T extends object>(opciones: OpcionesDePreferen
   // Volver a leer lo guardado, como al abrir la aplicación.
   function recargar(): void { actuales = leerLoGuardado(); aplicar(); oyentes.forEach((o) => o()); }
 
-  return { leer, cambiar, usar, escuchar, recargar };
+  return { leer, cambiar, usar: useLasPreferencias, escuchar, recargar };
 }

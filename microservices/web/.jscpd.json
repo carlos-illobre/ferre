@@ -1,0 +1,19 @@
+{
+  "path": [
+    "src"
+  ],
+  "pattern": "**/*.{ts,tsx,css}",
+  "ignore": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/pruebas/**"
+  ],
+  "minTokens": 50,
+  "minLines": 5,
+  "reporters": [
+    "consoleFull"
+  ],
+  "silent": true,
+  "gitignore": true,
+  "threshold": 1.8
+}
