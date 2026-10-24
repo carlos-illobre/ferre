@@ -181,6 +181,45 @@ aprobada `maquetas/celular-listas-renovada.png`):
 - **Un buscador «Buscar proveedor»**, pegado a la lista de proveedores, que deja los que tienen
   lo escrito en el nombre, sin importar mayúsculas ni tildes.
 
+**La pantalla Listas como la v2** (decisión 148, 2026-10-24; la variante 1 del director de
+arte, «La bandeja y la revisión» en la computadora y «Listas» en el celular). Manda sobre lo
+anterior en la disposición y las piezas; lo que la pantalla puede hacer es lo mismo.
+
+- **Computadora: bandeja a la izquierda y revisión a la derecha, en la misma pantalla.** Al lado
+  de las pestañas, «Agregar proveedor» y «Subir lista Alt S». La columna izquierda, de arriba
+  abajo: la zona punteada «Cargar una lista · Soltá el Excel acá, o Alt S»; «Para revisar» con
+  su cantidad y una fila por lista pendiente (ícono, proveedor, «dd/mm · subida hoy hh:mm» y su
+  tecla 1, 2…), la elegida con borde verde oscuro; «Últimas cargas» (las tres últimas ya
+  aplicadas o descartadas, con su pastilla); y la tarjeta «Proveedores» con la cantidad,
+  «Buscar /» y una fila por proveedor (punto verde o ámbar, nombre, pastilla «Vieja · 41 días»,
+  «Al día» o «Sin lista», y debajo sus descuentos, si los precios traen IVA y su lector), los de
+  lista vieja primero.
+- **La revisión, en una tarjeta a la derecha:** el ícono de la planilla, «Proveedor · lista del
+  dd/mm/aaaa» y debajo el archivo y cuándo se subió; seis números en una fila (Leídos, Cambian
+  con el promedio, sobre verde suave, Nuevos, Sin cambio, Ya no están, Salteadas en ámbar); los
+  avisos de la planilla en una franja ámbar; los filtros como pastillas con su número; la tabla
+  (foto, producto con marca y código, costo antes, costo nuevo subrayado de puntos, cambio en
+  una pastilla —ámbar si sube más de 15 %, verde si baja— y precio en estantería); la fila con
+  foco va en verde suave con una raya a la izquierda y debajo, en pasos, de dónde sale su costo.
+  Al pie: «Descartar Alt D», «Nada cambia hasta aplicar», las teclas ↑ ↓ Espacio y el botón
+  naranja «Aplicar · cambian N precios Ctrl Enter». Aplicando, el pie muestra el avance.
+- **Sin listas para revisar,** la derecha dice qué hacer: cargar una lista. Después de aplicar,
+  la derecha muestra el resultado, con «Ver los productos».
+- **Teclado:** Alt S elige el archivo, 1 a 9 abren la lista pendiente de ese número, ↑ ↓
+  recorren la tabla, Espacio pliega la explicación de la fila, Alt D descarta, Ctrl Enter
+  aplica, «/» busca un proveedor.
+- **Celular:** la lista pendiente como tarjeta blanca principal (ícono ámbar, «Para revisar»
+  en ámbar, el proveedor, «Lista del dd/mm/aaaa · subida hh:mm»), tres cifras (cambian con el
+  promedio sobre verde suave, nuevos, no están), la franja de proporción y «Revisar y aplicar →»
+  naranja a todo el ancho; si hay más, «Y N más: proveedor». Después «Cargar una lista» con
+  «Subir lista», «Últimas cargas» y «Proveedores» con su cantidad y la lupa, en grupos blancos
+  con filas separadas por una línea. La revisión sigue en una hoja.
+- **Lo que la v2 muestra y el sistema todavía no sabe** (E02 de la 021): cómo llegó la lista
+  (correo, portal), el precio de estantería antes y después (la columna queda con «—»), la
+  cantidad de subas de más de 15 %, filtrar por subas, nuevos o ya no están (las pastillas
+  quedan apagadas), «Ver el correo», «Usar 6 %», los adjuntos sin proveedor, «Ver todas» las
+  cargas y la foto de cada fila de la planilla.
+
 **Necesita ver al revisar:** proveedor y fecha de la lista; los avisos; el resumen en números
 (leídos, nuevos, cambian de precio con su variación promedio, sin cambio, ya no aparecen,
 filas salteadas); las filas salteadas con su motivo; la vista previa con los que cambian
@@ -310,6 +349,35 @@ maquetas aprobadas `maquetas/celular-duplicados-renovada*.png`):
 - **Al separar**, sin preguntar: un aviso «Separados: **«nombre»** vuelve a ser un producto
   aparte, con sus precios, ventas y stock», con el nombre del producto en negrita y amarillo, para que resalte, y «Deshacer» en blanco,
   que los vuelve a unir.
+
+
+**La pantalla Duplicados como la v2** (decisión 148, 2026-10-24; la variante 1 del director de
+arte, «La bandeja» en la computadora y «Renovada» en el celular). Manda sobre lo anterior en la
+disposición y las piezas; lo que la pantalla puede hacer es lo mismo.
+
+- **Computadora:** al lado de las pestañas, «Buscar en todo el catálogo Alt B», «Unir a mano
+  Alt U» y «Unidos y separar Alt S» (los dos últimos abren su panel). Arriba, cuatro números:
+  «Por revisar N sugerencias» en ámbar, con barras de cuántas llegaron cada uno de los últimos
+  siete días; «Mismo código»; «Descripción parecida»; y «Unidos hasta hoy N productos» en verde
+  suave. A la izquierda, filtros «Todas · Código · Texto» con su número y la cola de
+  sugerencias como una bandeja (foto, nombre, motivo con su ícono y los dos proveedores,
+  cuándo llegó); la elegida con borde verde oscuro. A la derecha, «¿Es el mismo artículo?» con
+  el motivo, J K y «1 de N»; los dos productos en una tabla lado a lado (Producto con «Conservar
+  este ← / →», Marca, Cód. barras, Proveedor, Costo con «El más barato» y la diferencia en %,
+  Lista con la fecha y hace cuántos días): la columna que se conserva va en verde suave; lo que
+  difiere del otro, resaltado en ámbar, y lo que coincide, con un tilde verde. Debajo, «así
+  queda»: un solo producto con los dos proveedores y de quién sale el costo. Al pie, «Es el
+  mismo E» (naranja), «Son distintos D», «Saltar J» y «ámbar = lo que cambia».
+- **Celular:** la nota con raya verde («El mismo artículo puede estar en varias listas. Al
+  unirlos queda uno solo, con todos sus proveedores y el precio del más barato.»); los tres
+  botones con su bajada («Todo el catálogo», «Dos, a mano», «Una unión»); «Por revisar N» con
+  «1 de N ›» para pasar a la siguiente; una sola sugerencia por vez, con los dos productos lado
+  a lado (foto, nombre, marca, proveedor y fecha con su ícono, costo y «barato»), un «=» entre
+  los dos, lo distinto en ámbar y abajo de cada uno «Se conserva» / «Conservar»; «Productos
+  unidos» con la cantidad en verde y «Ver todo», y las últimas en filas con «Separar». «Es el
+  mismo» (naranja) y «Son distintos» van en una barra fija abajo, sobre el menú, bajo el pulgar.
+- **Lo que la v2 muestra y el sistema todavía no sabe** (E02 de la 021): la foto de cada
+  producto de la sugerencia (queda el lugar con un ícono), el stock y las ventas en «así queda».
 
 ## Escanear con la cámara (historia 8 · RF-08)
 

@@ -67,6 +67,12 @@ const TRAZOS: Record<string, string> = {
   dispositivos: "M4 5h12v9H4zM8 18h4M10 14v4M17 9h4v11h-4z",
   // La estrella del proveedor más barato, en la ficha (decisión 145).
   estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
+  // Los de Listas y Duplicados como la v2 (decisión 148), los de Lucide de la maqueta.
+  unir: "M18 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 21V9a9 9 0 0 0 9 9",
+  dividir: "M16 3h5v5M8 3H3v5M12 22v-8.300a4 4 0 0 0-1.170-2.870L3 3M15 9l6-6",
+  camion: "M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.650a1 1 0 0 0-.220-.620l-3.480-4.350A1 1 0 0 0 17.520 8H14M17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",
+  correo: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM22 7l-8.970 5.700a1.940 1.940 0 0 1-2.060 0L2 7",
+  bandeja: "M3 13h5l2 3h4l2-3h5M3 13l2.600-7.200A1.500 1.500 0 0 1 7 5h10a1.500 1.500 0 0 1 1.400.800L21 13v5.500a1.500 1.500 0 0 1-1.500 1.500h-15A1.500 1.500 0 0 1 3 18.500Z",
 };
 export function Icono({ nombre, tam = 20, grosor = 2, className }: { nombre: keyof typeof TRAZOS | string; tam?: number; grosor?: number; className?: string }) {
   return (

@@ -1,0 +1,61 @@
+/* Listas de precios en el celular, como la v2 (decisión 148, «Listas»): la lista pendiente como
+   tarjeta principal, «Cargar una lista» y los grupos blancos de cargas y proveedores. */
+.cl-pend { display: flex; flex-direction: column; padding: 16px; border-radius: 20px; background: #fff; border: 1px solid var(--p-borde); box-shadow: 0 6px 20px -8px rgb(26 29 27 / .14), 0 1px 3px rgb(26 29 27 / .06); }
+.cl-pend-arr { display: flex; align-items: center; gap: 12px; }
+.cl-pend-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); display: grid; place-items: center; flex: none; }
+.cl-pend-texto { display: flex; flex-direction: column; min-width: 0; }
+.cl-pend-et { font-size: 14px; font-weight: 700; line-height: 18px; color: var(--p-amarillo-texto); }
+.cl-pend-nom { font-size: 18px; font-weight: 800; line-height: 24px; color: var(--p-tinta); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl-pend-d { font-size: 14px; line-height: 20px; color: var(--p-texto-2); }
+.cl-cifras { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+.cl-cifra { display: flex; flex-direction: column; padding: 8px 10px; border-radius: 12px; background: var(--p-relleno); min-width: 0; }
+.cl-cifra b { font-size: 20px; font-weight: 800; line-height: 26px; letter-spacing: -.01em; color: var(--p-tinta); white-space: nowrap; }
+.cl-cifra b small { margin-left: 2px; font-size: 14px; font-weight: 750; color: var(--p-verde-texto); }
+.cl-cifra span { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--p-texto-2); }
+.cl-cifra.verde { background: var(--p-verde-suave); }
+.cl-franja { display: flex; height: 6px; gap: 2px; margin-top: 12px; border-radius: 9px; overflow: hidden; }
+.cl-franja i { display: block; height: 100%; background: var(--p-relleno-fuerte); }
+.cl-revisar { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 56px; margin-top: 14px; padding: 0 16px 0 20px; border: 0; border-radius: 16px; background: var(--p-naranja); color: #fff; font: inherit; font-size: 18px; font-weight: 750; box-shadow: 0 8px 20px -8px rgb(216 63 14 / .55); }
+.cl-revisar:active { background: var(--p-naranja-fuerte); }
+.cl-mas-pend { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-top: -4px; padding: 0 4px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 650; color: var(--p-texto-2); text-align: left; }
+.cl-mas-pend b { color: var(--p-tinta); }
+.cl-mas-pend > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl-mas-pend svg:last-child { margin-left: auto; flex: none; }
+.cl-mas-pend svg { flex: none; }
+
+.cl-cargar { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 14px; border-radius: 16px; background: #fff; border: 1px solid var(--p-borde); box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.cl-cargar.arrastrando { outline: 2px dashed var(--p-verde-texto); }
+.cl-cargar-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--p-verde-suave); color: var(--p-verde-texto); display: grid; place-items: center; flex: none; }
+.cl-cargar-texto { display: flex; flex-direction: column; min-width: 0; }
+.cl-cargar-texto b { font-size: 16px; line-height: 20px; color: var(--p-tinta); }
+.cl-cargar-texto small { font-size: 14px; line-height: 19px; color: var(--p-texto-2); }
+.cl-subir { margin-left: auto; flex: none; height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--p-borde-fuerte); background: #fff; color: var(--p-tinta); font: inherit; font-size: 15px; font-weight: 650; box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.cl-subir:disabled { opacity: .55; }
+
+.cl-sec { display: flex; align-items: center; gap: 8px; margin: 10px 4px 0; font: inherit; }
+.cl-sec b { font-size: 18px; font-weight: 800; color: var(--p-tinta); }
+.cl-cuenta { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 8px; border-radius: 99px; background: var(--p-relleno); color: var(--p-texto-2); font-size: 14px; font-weight: 750; }
+.cl-lupa { display: grid; place-items: center; width: 44px; height: 44px; margin: -10px -8px -10px auto; border: 0; background: none; color: var(--p-verde-texto); }
+.cl-agregar { margin-left: 4px; min-height: 44px; font-size: 15px; }
+.cl-sec .cl-cuenta + .cl-agregar, .cl-sec b + .cl-agregar { margin-left: auto; }
+
+.cl-grupo { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05); overflow: hidden; }
+.cl-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--p-borde); }
+.cl-row:last-child { border-bottom: 0; }
+.cl-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--p-relleno); color: var(--p-texto-2); display: grid; place-items: center; grid-row: span 2; align-self: start; }
+.cl-n { font-weight: 800; font-size: 16px; line-height: 21px; color: var(--p-tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-d { grid-column: 2 / 4; font-size: 14px; line-height: 19px; color: var(--p-texto-2); }
+.cl-d b { color: var(--p-tinta); font-weight: 700; }
+.cl-pastilla { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 9px; border-radius: 99px; background: var(--p-relleno); color: var(--p-texto-2); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.cl-pastilla.verde { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.cl-pastilla.ambar { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); }
+
+/* La revisión, en la hoja: los seis números como las cifras de la tarjeta. */
+.cl-numeros { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 8px; }
+.cl-numeros > div { display: flex; flex-direction: column; padding: 8px 10px; border-radius: 12px; background: var(--p-relleno); min-width: 0; }
+.cl-numeros b { font-size: 20px; font-weight: 800; line-height: 26px; color: var(--p-tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-numeros b small { margin-left: 2px; font-size: 14px; font-weight: 750; color: var(--p-verde-texto); }
+.cl-numeros span { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--p-texto-2); }
+.cl-numeros .verde { background: var(--p-verde-suave); }
+.cl-numeros .ambar { background: var(--p-amarillo-suave); }
+.cl-numeros .ambar b { color: var(--p-amarillo-texto); }

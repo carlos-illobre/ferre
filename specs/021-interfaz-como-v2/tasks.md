@@ -37,3 +37,10 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Cómo va el negocio: lo más vendido del día con foto y posición (RF-61, «—»).
 - Cómo va el negocio: el cierre de caja con lo contado, lo esperado y la diferencia (RF-62, «—»).
 - Cómo va el negocio: la v2 compara con el mismo día de la semana pasada; quedó con ayer a la misma hora (decisión 111) hasta que Carlos decida.
+- Listas de precios (computadora y celular): cómo llegó la lista (por correo, de su portal); el ícono queda el de la planilla y dice «subida hoy 08:12».
+- Listas de precios (computadora): el precio de estantería antes y después de cada fila; la columna «Precio en estantería» queda con «—».
+- Listas de precios (computadora): cuántas subas de más de 15 % hay (la pastilla dice «—») y filtrar por subas, nuevos o ya no están (las pastillas quedan apagadas; «Cambian» y «Salteadas» sí andan).
+- Listas de precios (computadora): «Ver el correo» y «Usar 6 %» del aviso de contado; no se muestran.
+- Listas de precios (computadora): los adjuntos que llegaron sin proveedor («1 adjunto sin proveedor»); no se muestra la fila.
+- Listas de precios (computadora y celular): «Ver todas» las cargas; se ven las tres últimas.
+- Listas de precios (computadora): la foto de cada fila de la planilla; queda el lugar con un ícono.

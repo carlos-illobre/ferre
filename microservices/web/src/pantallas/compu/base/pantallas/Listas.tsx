@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useId, useRef, useState, type DragEvent, type FormEvent, type KeyboardEvent } from "react";
+import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
+import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
+import { TEXTOS } from "../../../textos";
 import { ErrorApi } from "../../../../api";
-import { aplicarLista, cargarLista, DIAS_LISTA_VIEJA, descartarLista, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useLectores, useListas, variacion, type Avance, type Cargada, type Fila, type ListaFila, type Proveedor, type Salteada } from "../../../../negocio/catalogo/listas";
+import { aplicarLista, buscarProveedores, cargarLista, descartarLista, descuentosDe, fraccionAplicada, pendientes, retomar, situacionDelProveedor, ultimaAplicada, useFilasDeLista, useLectores, useListas, variacion, type Avance, type Cargada, type Fila, type ListaFila, type Proveedor } from "../../../../negocio/catalogo/listas";
 import { altaDeProveedor, faltaEnProveedor } from "../../../../negocio/proveedores";
 import { fecha, pesos, porcentaje } from "../../../../formato";
 import { irA } from "../rutas";
-import { Aviso, Boton, Explicado, Hoja, Icono, Indicador, Pagina, Pastilla, Plegable, Progreso, Toast, Vacio, numero } from "../ui";
+import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Progreso, Toast, Vacio, numero } from "../ui";
 import { useEsCelular } from "../vista";
 import "../estilos/listas.css";
 
@@ -14,10 +17,16 @@ const SIN_CONEXION = "Sin conexión con el servidor. Cargar una lista necesita i
 
 const TANDA = 200;
 const mensajeDe = (e: unknown) => (e instanceof ErrorApi ? e.message : SIN_CONEXION);
-const diasDesde = (iso: string) => Math.max(0, Math.floor((Date.now() - new Date(`${iso.slice(0, 10)}T00:00:00`).getTime()) / 86400000));
-const haceDias = (d: number) => (d === 0 ? "hoy" : d === 1 ? "ayer" : `hace ${d} días`);
-const cuando = (iso: string) => new Date(iso).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
-const porciento = (fraccion: string) => `${numero(Number(fraccion) * 100)} %`;
+const diaYMes = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+const horaDe = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
+// «hoy 08:12», «ayer 18:40», «el 14/10»: cuándo se subió una lista.
+function subida(iso: string): string {
+  const d = new Date(iso);
+  const dias = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(iso).setHours(0, 0, 0, 0)) / 86400000);
+  return dias === 0 ? `hoy ${horaDe(iso)}` : dias === 1 ? `ayer ${horaDe(iso)}` : `el ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+// Una subida de más del 15 % se marca en ámbar, como en la v2.
+const SUBA_GRANDE = 15;
 
 function useEnLinea(): boolean {
   const [enLinea, setEnLinea] = useState(navigator.onLine);
@@ -31,203 +40,192 @@ function useEnLinea(): boolean {
   return enLinea;
 }
 
-// Cargar una lista de precios (RF-01): entregar el archivo → revisar el resumen y la vista
-// previa → aplicar o descartar. Nada se guarda hasta «Aplicar». Los proveedores van a la
-// vista y antes que el lugar donde se entrega el archivo: primero se mira cuál está viejo.
+// Cargar una lista de precios (RF-01), como la v2 (decisión 148, «La bandeja y la revisión»): a la
+// izquierda cargar, lo que espera revisión, las últimas cargas y los proveedores; a la derecha, la
+// revisión de la lista elegida, con su resumen, la tabla y «Aplicar». Nada se guarda hasta «Aplicar».
+// Teclado: Alt S elige el archivo, 1 a 9 abren la pendiente de ese número, ↑ ↓ recorren la tabla,
+// Espacio pliega la explicación, Alt D descarta, Ctrl Enter aplica y «/» busca un proveedor.
 export function Listas() {
   const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { proveedores, historial, error: fallo, recargar } = useListas();
   const error = fallo && mensajeDe(fallo);
+  // Lo que se acaba de subir; si no, la pendiente elegida (la primera, si no se eligió ninguna).
   const [cargada, setCargada] = useState<Cargada | null>(null);
+  const [elegidaId, setElegidaId] = useState<string | null>(null);
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [altaAbierta, setAltaAbierta] = useState(false);
+  const [buscado, setBuscado] = useState<string | null>(null);
+  const elegirArchivo = useRef<() => void>(() => undefined);
+  const cajaProveedor = useRef<HTMLInputElement>(null);
+  const t = TEXTOS.listas;
 
   // Al volver la conexión se recupera sola: el aviso desaparece cuando se corrige la causa.
   useEffect(() => { if (enLinea && error) void recargar(); }, [enLinea]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Entrar a revisar y volver con el resultado cambian toda la pantalla: se empieza desde arriba.
-  const idCargada = cargada?.id;
-  useEffect(() => { window.scrollTo(0, 0); document.getElementById("contenido")?.focus({ preventScroll: true }); }, [idCargada, resultado]);
-
-  if (cargada) {
-    return (
-      <Revision cargada={cargada} esCelular={esCelular}
-        alVolver={() => { setCargada(null); void recargar(); }}
-        alDescartar={() => { setCargada(null); setToast("Lista descartada. No se guardó ningún precio."); }}
-        alAplicar={(r) => { setCargada(null); setResultado(r); }} />
-    );
-  }
-
   const activos = (proveedores ?? []).filter((p) => p.activo);
   const sinAplicar = pendientes(historial);
-  const abrirPendiente = (l: ListaFila) => { setResultado(null); setCargada(retomar(l)); };
+  const ultimas = historial.filter((l) => l.estado !== "pendiente").slice(0, 3);
   const ultima = ultimaAplicada(historial);
+  const pendienteElegida = sinAplicar.find((l) => l.id === elegidaId) ?? sinAplicar[0] ?? null;
+  const enRevision = cargada ?? (pendienteElegida ? retomar(pendienteElegida) : null);
+  const deLaRevision = enRevision ? historial.find((l) => l.id === enRevision.id) : undefined;
+  const abrir = (l: ListaFila) => { setResultado(null); setCargada(null); setElegidaId(l.id); };
+  // Los de lista vieja primero: son los que hay que pedir.
+  const ordenados = [...activos].sort((a, b) => Number(situacionDelProveedor(ultima.get(b.id)).estado === "vieja") - Number(situacionDelProveedor(ultima.get(a.id)).estado === "vieja"));
+  const aLaVista = buscado === null ? ordenados : buscarProveedores(ordenados, buscado);
+
+  const teclas = useCallback((e: globalThis.KeyboardEvent) => {
+    if (document.querySelector("dialog[open]")) return;
+    if (e.altKey && e.code === "KeyS") { e.preventDefault(); elegirArchivo.current(); return; }
+    if (e.key === "/" && !e.ctrlKey && !e.altKey) { e.preventDefault(); setBuscado((b) => b ?? ""); requestAnimationFrame(() => cajaProveedor.current?.focus()); return; }
+    if (!e.ctrlKey && !e.altKey && !e.metaKey && /^Digit[1-9]$/.test(e.code)) {
+      const l = sinAplicar[Number(e.code.slice(5)) - 1];
+      if (l) { e.preventDefault(); abrir(l); }
+    }
+  }, [sinAplicar]); // eslint-disable-line react-hooks/exhaustive-deps
+  useTeclasGlobales(teclas);
 
   return (
-    <Pagina titulo="Listas de precios" bajada="Cargá la planilla de un proveedor para actualizar los costos. Antes de guardar vas a ver qué cambia.">
+    <Pagina titulo="Listas de precios" testId="listas" className={esCelular ? "" : "listas-v2"}
+      acciones={<AlLadoDeLasPestanas>
+        <div className="fila lv-arriba">
+          {activos.length > 0 && <Boton icono="edificio" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">{t.agregarProveedor.largo}</Boton>}
+          <Boton icono="subir" disabled={!enLinea} onClick={() => elegirArchivo.current()} aria-keyshortcuts="Alt+S" data-testid="subir-lista">{t.subirLista.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt S</kbd></Boton>
+        </div>
+      </AlLadoDeLasPestanas>}>
       <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={() => void recargar()}>Reintentar</Boton>}>{error}</Aviso>
       <Toast texto={toast} alCerrar={() => setToast(null)} />
 
-      {resultado && (
-        <section className="listas-resultado" role="status" data-testid="resultado">
-          <span className="listas-resultado-tilde" aria-hidden="true"><Icono nombre="tilde" tam={28} grosor={3} /></span>
-          <div className="listas-resultado-texto">
-            <h2>{resultado.titulo}</h2>
-            <p>{resultado.detalle}</p>
-          </div>
-          <div className="listas-resultado-botones">
-            <Boton icono="productos" onClick={() => irA("productos")}>Ver los productos</Boton>
-            <Boton variante="marino" onClick={() => setResultado(null)}>Entendido</Boton>
-          </div>
-        </section>
-      )}
+      <div className="lv">
+        <div className="lv-izq">
+          <ZonaDeCarga proveedores={activos} enLinea={enLinea} elegir={elegirArchivo} alCargar={(c) => { setResultado(null); setCargada(c); }} />
 
-      {sinAplicar.length > 0 && (
-        <section className="listas-seccion" aria-labelledby="listas-sinAplicar">
-          <h2 id="listas-sinAplicar" className="seccion-titulo">{sinAplicar.length === 1 ? "Una lista espera tu revisión" : `${sinAplicar.length} listas esperan tu revisión`}</h2>
-          <ul className="listas-sinAplicar">
-            {sinAplicar.map((l) => (
-              <li key={l.id} className="listas-pendiente" data-testid="lista-pendiente">
-                <span className="listas-pendiente-icono" aria-hidden="true"><Icono nombre="listas" tam={22} /></span>
-                <div className="listas-pendiente-texto">
-                  <strong>{l.proveedor} · lista del {fecha(l.fecha_lista)}</strong>
-                  <span className="detalle">
-                    {numero(l.resumen.leidas)} productos · {numero(l.resumen.modificados)} cambian de precio{l.resumen.modificados > 0 ? ` (${porcentaje(l.resumen.variacion_promedio)} en promedio)` : ""} · {numero(l.resumen.nuevos)} nuevos. Todavía no se guardó nada.
-                  </span>
-                </div>
-                <Boton variante="marino" onClick={() => abrirPendiente(l)} aria-label={`Revisar y aplicar la lista de ${l.proveedor} del ${fecha(l.fecha_lista)}`}>Revisar y aplicar</Boton>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {/* El orden lo pidió Carlos: primero cargar, después las últimas tres cargas y al final los proveedores. */}
-      <section className="listas-seccion" aria-labelledby="listas-cargar">
-        <h2 id="listas-cargar" className="seccion-titulo">Cargar una lista</h2>
-        <ZonaDeCarga proveedores={activos} enLinea={enLinea} alCargar={(c) => { setResultado(null); setCargada(c); }} />
-      </section>
-
-      <section className="listas-seccion" aria-labelledby="listas-historial">
-        <h2 id="listas-historial" className="seccion-titulo">Últimas cargas</h2>
-        {historial.length === 0 ? (
-          proveedores !== null && <p className="listas-nada">Todavía no se cargó ninguna lista. Cuando cargues la primera, acá queda anotado qué cambió.</p>
-        ) : esCelular ? (
-          <ul className="lista" data-testid="historial">
-            {historial.slice(0, 3).map((l) => (
-              <li key={l.id} className="renglon">
-                <span className="nombre">{l.proveedor} · lista del {fecha(l.fecha_lista)}</span>
-                <EstadoDeCarga estado={l.estado} />
-                <span className="detalle">{cuando(l.creado_en)} · {queCambio(l)}</span>
-                <span className="detalle listas-archivo">{l.archivo_nombre}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="tabla-marco">
-            <table className="tabla" data-testid="historial">
-              <thead><tr><th scope="col">Cuándo</th><th scope="col">Proveedor</th><th scope="col">Lista del</th><th scope="col">Archivo</th><th scope="col">Resultado</th><th scope="col">Estado</th></tr></thead>
-              <tbody>
-                {historial.slice(0, 3).map((l) => (
-                  <tr key={l.id}>
-                    <td className="angosta">{cuando(l.creado_en)}</td>
-                    <td className="nombre">{l.proveedor}</td>
-                    <td>{fecha(l.fecha_lista)}</td>
-                    <td className="detalle listas-archivo">{l.archivo_nombre}</td>
-                    <td>{queCambio(l)}</td>
-                    <td className="angosta"><EstadoDeCarga estado={l.estado} /></td>
-                  </tr>
+          {sinAplicar.length > 0 && (
+            <section aria-labelledby="lv-revisar">
+              <h2 id="lv-revisar" className="lv-cab"><b>{t.paraRevisar.largo}</b><span className="lv-cuenta ambar">{sinAplicar.length}</span></h2>
+              <ul className="lv-filas">
+                {sinAplicar.map((l, i) => (
+                  <li key={l.id}>
+                    <button type="button" className={`lv-fila ${!cargada && !resultado && l.id === pendienteElegida?.id ? "elegida" : ""}`} onClick={() => abrir(l)} data-testid="lista-pendiente"
+                      aria-label={`Revisar y aplicar la lista de ${l.proveedor} del ${fecha(l.fecha_lista)}`} aria-keyshortcuts={i < 9 ? String(i + 1) : undefined}>
+                      <span className="lv-ic"><Icono nombre="excel" /></span>
+                      <span className="lv-texto"><b>{l.proveedor}</b><span>{diaYMes(l.fecha_lista)} · subida {subida(l.creado_en)}</span></span>
+                      {i < 9 && <kbd className="tecla" aria-hidden="true">{i + 1}</kbd>}
+                    </button>
+                  </li>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+              </ul>
+            </section>
+          )}
 
-      <section className="listas-seccion" aria-labelledby="listas-proveedores">
-        <div className="listas-seccion-cabeza">
-          <h2 id="listas-proveedores" className="seccion-titulo">Proveedores</h2>
-          {activos.length > 0 && <Boton tam={esCelular ? undefined : "chico"} icono="mas" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">Agregar proveedor</Boton>}
-        </div>
-        {proveedores === null ? (
-          error ? null : <div className="esqueleto listas-esqueleto" aria-label="Cargando los proveedores" role="status" />
-        ) : activos.length === 0 ? (
-          <div className="tarjeta">
-            <Vacio icono="proveedor" titulo="Todavía no hay proveedores"
-              accion={<Boton variante="marino" icono="mas" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">Agregar el primer proveedor</Boton>}>
-              El primer paso es agregar al proveedor, con sus descuentos y si sus precios traen IVA. Después cargás su planilla acá abajo.
-            </Vacio>
-          </div>
-        ) : esCelular ? (
-          <ul className="lista" data-testid="estado-proveedores">
-            {activos.map((p) => {
-              const l = ultima.get(p.id);
-              return (
-                <li key={p.id} className="renglon" aria-label={p.nombre}>
-                  <span className="nombre">{p.nombre}</span>
-                  <EstadoDeLista lista={l} />
-                  <span className="detalle">{l ? `Última lista del ${fecha(l.fecha_lista)} (${haceDias(diasDesde(l.fecha_lista))}) · ${numero(l.resumen.leidas)} productos` : "Nunca se cargó una lista"}</span>
-                  <span className="detalle">{comoSeCalcula(p)}</span>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <div className="tabla-marco">
-            <table className="tabla" data-testid="estado-proveedores">
-              <thead><tr><th scope="col">Proveedor</th><th scope="col">Última lista aplicada</th><th scope="col" /><th scope="col" className="num">Productos</th><th scope="col">Cómo se calcula su costo</th><th scope="col">Lector</th></tr></thead>
-              <tbody>
-                {activos.map((p) => {
+          {/* El orden lo pidió Carlos: primero cargar, después las últimas tres cargas y al final los proveedores. */}
+          <section aria-labelledby="lv-ultimas">
+            <h2 id="lv-ultimas" className="lv-cab"><b>{t.ultimasCargas.largo}</b></h2>
+            {ultimas.length === 0 ? (
+              proveedores !== null && <p className="lv-nada">Todavía no se cargó ninguna lista. Cuando cargues la primera, acá queda anotado qué cambió.</p>
+            ) : (
+              <ul className="lv-filas" data-testid="historial">
+                {ultimas.map((l) => (
+                  <li key={l.id} className="lv-fila" title={l.archivo_nombre}>
+                    <span className="lv-ic"><Icono nombre={l.estado === "descartada" ? "archivo" : "excel"} /></span>
+                    <span className="lv-texto"><b>{l.proveedor}</b><span>{diaYMes(l.fecha_lista)} · {queCambio(l)}</span></span>
+                    <EstadoDeCarga estado={l.estado} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="lv-prov" aria-labelledby="lv-proveedores">
+            <h2 id="lv-proveedores" className="lv-cab">
+              <b>{t.proveedores.largo}</b>{activos.length > 0 && <span className="lv-cuenta">{activos.length}</span>}
+              {activos.length > 0 && <button type="button" className="lv-mas" onClick={() => { setBuscado((b) => (b === null ? "" : null)); requestAnimationFrame(() => cajaProveedor.current?.focus()); }} aria-keyshortcuts="/" aria-expanded={buscado !== null}>{t.buscar.largo} <kbd className="tecla" aria-hidden="true">/</kbd></button>}
+            </h2>
+            {buscado !== null && (
+              <label className="lv-buscar">
+                <Icono nombre="buscar" tam={18} />
+                <input ref={cajaProveedor} type="search" value={buscado} onChange={(e) => setBuscado(e.target.value)} onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setBuscado(null); } }}
+                  placeholder={t.buscarProveedor.largo} aria-label={t.buscarProveedor.largo} autoComplete="off" data-testid="buscar-proveedor" />
+              </label>
+            )}
+            {proveedores === null ? (
+              error ? null : <div className="esqueleto listas-esqueleto" aria-label="Cargando los proveedores" role="status" />
+            ) : activos.length === 0 ? (
+              <Vacio icono="proveedor" titulo="Todavía no hay proveedores"
+                accion={<Boton variante="marino" icono="mas" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">Agregar el primer proveedor</Boton>}>
+                El primer paso es agregar al proveedor, con sus descuentos y si sus precios traen IVA. Después cargás su planilla.
+              </Vacio>
+            ) : aLaVista.length === 0 ? <p className="lv-nada">Ningún proveedor con «{buscado}».</p> : (
+              <ul className="lv-proveedores" data-testid="estado-proveedores">
+                {aLaVista.map((p) => {
                   const l = ultima.get(p.id);
+                  const { estado, dias } = situacionDelProveedor(l);
                   return (
-                    <tr key={p.id}>
-                      <td className="nombre">{p.nombre}</td>
-                      <td>{l ? <>{fecha(l.fecha_lista)} <span className="detalle">· {haceDias(diasDesde(l.fecha_lista))}</span></> : <span className="detalle">Nunca se cargó una lista</span>}</td>
-                      <td className="angosta"><EstadoDeLista lista={l} /></td>
-                      <td className="num">{l ? numero(l.resumen.leidas) : "—"}</td>
-                      <td className="detalle">{comoSeCalcula(p)}</td>
-                      <td>{p.lector ? <code>{p.lector}</code> : <span className="detalle">Se elige al cargar</span>}</td>
-                    </tr>
+                    <li key={p.id} className="lv-proveedor" aria-label={p.nombre}>
+                      <span className={`lv-punto ${estado === "vieja" || estado === "sin lista" ? "vieja" : ""}`} aria-hidden="true" />
+                      <b>{p.nombre}</b>
+                      <span className={`lv-pastilla ${estado === "vieja" ? "ambar" : estado === "sin lista" ? "" : "verde"}`}>
+                        {estado === "vieja" ? `Vieja · ${dias} días` : estado === "sin lista" ? "Sin lista" : estado === "al día" ? "Al día" : "Vigente"}
+                      </span>
+                      <span className="lv-como">{comoSeCalcula(p)}</span>
+                    </li>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </ul>
+            )}
+          </section>
+        </div>
+
+        {resultado ? (
+          <section className="lv-der lv-resultado" role="status" data-testid="resultado">
+            <span className="lv-resultado-tilde" aria-hidden="true"><Icono nombre="tilde" tam={28} grosor={3} /></span>
+            <h2>{resultado.titulo}</h2>
+            <p>{resultado.detalle}</p>
+            <div className="fila">
+              <Boton icono="productos" onClick={() => irA("productos")}>Ver los productos</Boton>
+              <Boton variante="marino" onClick={() => setResultado(null)}>Entendido</Boton>
+            </div>
+          </section>
+        ) : enRevision ? (
+          <Revision key={enRevision.id} cargada={enRevision} origen={deLaRevision ? `${deLaRevision.archivo_nombre} · subida ${subida(deLaRevision.creado_en)}` : "Recién subida"}
+            alDescartar={() => { setCargada(null); setElegidaId(null); setToast("Lista descartada. No se guardó ningún precio."); void recargar(); }}
+            alAplicar={(r) => { setCargada(null); setElegidaId(null); setResultado(r); void recargar(); }} />
+        ) : (
+          <section className="lv-der lv-vacia">
+            <Vacio icono="listas" titulo={t.sinListasParaRevisar.largo}
+              accion={<Boton variante="principal" icono="subir" disabled={!enLinea} onClick={() => elegirArchivo.current()}>{t.subirLista.largo}</Boton>}>
+              {t.queHacer.largo}
+            </Vacio>
+          </section>
         )}
-      </section>
+      </div>
 
       {altaAbierta && <AltaDeProveedor enLinea={enLinea} alCerrar={() => setAltaAbierta(false)} alCambiar={async (nombre) => { await recargar(); setAltaAbierta(false); setToast(`Proveedor ${nombre} agregado.`); }} />}
     </Pagina>
   );
 }
 
+// Cómo se calcula el costo de un proveedor: si sus precios traen IVA, sus descuentos y su lector.
 function comoSeCalcula(p: Proveedor): string {
-  const partes = [p.precios_incluyen_iva ? "Precios con IVA" : "Precios sin IVA"];
-  if (Number(p.descuento_general)) partes.push(`${porciento(p.descuento_general)} de descuento`);
-  if (Number(p.descuento_contado)) partes.push(`${porciento(p.descuento_contado)} por contado`);
-  return partes.join(" · ");
+  return [p.precios_incluyen_iva ? "Con IVA" : "Sin IVA", ...descuentosDe(p), p.lector ? `lector ${p.lector}` : "lector a mano"].join(" · ");
 }
 
 function queCambio(l: ListaFila): string {
-  return l.estado === "aplicada" ? `${numero(l.resumen.nuevos)} nuevos, ${numero(l.resumen.modificados)} cambiados` : `${numero(l.resumen.leidas)} leídos`;
-}
-
-function EstadoDeLista({ lista }: { lista: ListaFila | undefined }) {
-  if (!lista) return <Pastilla tipo="alerta">Sin lista</Pastilla>;
-  return diasDesde(lista.fecha_lista) > DIAS_LISTA_VIEJA ? <Pastilla tipo="mal">Lista vieja</Pastilla> : <Pastilla tipo="ok">Al día</Pastilla>;
+  return l.estado === "aplicada" ? `${numero(l.resumen.modificados)} cambiados` : `${numero(l.resumen.leidas)} leídos`;
 }
 
 function EstadoDeCarga({ estado }: { estado: string }) {
-  if (estado === "aplicada") return <Pastilla tipo="ok">Aplicada</Pastilla>;
-  if (estado === "pendiente") return <Pastilla tipo="alerta">Sin revisar</Pastilla>;
-  if (estado === "aplicando") return <Pastilla tipo="azul">Aplicándose</Pastilla>;
-  if (estado === "descartada") return <Pastilla>Descartada</Pastilla>;
-  return <Pastilla>{estado}</Pastilla>;
+  if (estado === "aplicada") return <span className="lv-pastilla verde">Aplicada</span>;
+  if (estado === "pendiente") return <span className="lv-pastilla ambar">Sin revisar</span>;
+  if (estado === "aplicando") return <span className="lv-pastilla ambar">Aplicándose</span>;
+  if (estado === "descartada") return <span className="lv-pastilla">Descartada</span>;
+  return <span className="lv-pastilla">{estado}</span>;
 }
 
-function ZonaDeCarga({ proveedores, enLinea, alCargar }: { proveedores: Proveedor[]; enLinea: boolean; alCargar: (c: Cargada) => void }) {
+// Donde se entrega el archivo: la zona punteada de la v2. Se suelta encima o se elige (Alt S).
+function ZonaDeCarga({ proveedores, enLinea, elegir: abrirSelector, alCargar }: { proveedores: Proveedor[]; enLinea: boolean; elegir: React.MutableRefObject<() => void>; alCargar: (c: Cargada) => void }) {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [estado, setEstado] = useState<"esperando" | "leyendo" | "falta-proveedor" | "falta-fecha">("esperando");
   const [error, setError] = useState<{ archivo: string; motivo: string } | null>(null);
@@ -238,6 +236,8 @@ function ZonaDeCarga({ proveedores, enLinea, alCargar }: { proveedores: Proveedo
   const fechaElegida = useRef<HTMLInputElement>(null);
   const idAyuda = useId();
   const idFalta = useId();
+  const t = TEXTOS.listas;
+  useEffect(() => { abrirSelector.current = () => { if (estado === "esperando" && enLinea) entrada.current?.click(); }; }, [abrirSelector, estado, enLinea]);
 
   async function enviar(f: File, extra: Record<string, string> = {}) {
     setEstado("leyendo");
@@ -274,83 +274,73 @@ function ZonaDeCarga({ proveedores, enLinea, alCargar }: { proveedores: Proveedo
   }
 
   return (
-    <div className={`listas-zona ${arrastrando ? "arrastrando" : ""} ${estado === "esperando" ? "" : "ocupada"}`} data-testid="zona-de-carga"
-      onDragOver={(e) => { e.preventDefault(); if (estado === "esperando" && enLinea) setArrastrando(true); }} onDragLeave={() => setArrastrando(false)} onDrop={soltar}>
-      {estado === "esperando" && (
-        <>
-          <span className="listas-zona-icono" aria-hidden="true"><Icono nombre="subir" tam={26} /></span>
-          <div className="listas-zona-texto">
-            <strong><span className="solo-compu">{arrastrando ? "Soltala acá" : "Arrastrá acá la planilla del proveedor, o elegila"}</span><span className="solo-celu">Elegí la planilla del proveedor</span></strong>
-            <p id={idAyuda} className="detalle">Excel (.xlsx o .xls) de hasta 30 MB. Se reconoce sola de qué proveedor es. Nada se guarda hasta que la revises y toques «Aplicar».</p>
-          </div>
-          <Boton variante="principal" tam="grande" icono="archivo" disabled={!enLinea} aria-describedby={idAyuda} onClick={() => entrada.current?.click()} data-testid="elegir-archivo">Elegir archivo</Boton>
-        </>
-      )}
-      {estado === "leyendo" && <div className="listas-zona-ancho"><Progreso texto={`Leyendo ${archivo?.name ?? "la planilla"} y comparando con los costos de hoy…`} /></div>}
+    <div className="lv-zona-lugar">
+      <div className={`lv-zona ${arrastrando ? "arrastrando" : ""} ${estado === "esperando" ? "" : "ocupada"}`} data-testid="zona-de-carga"
+        onDragOver={(e) => { e.preventDefault(); if (estado === "esperando" && enLinea) setArrastrando(true); }} onDragLeave={() => setArrastrando(false)} onDrop={soltar}>
+        {estado === "leyendo" ? <Progreso texto={`Leyendo ${archivo?.name ?? "la planilla"}…`} /> : (
+          <button type="button" className="lv-zona-boton" disabled={!enLinea || estado !== "esperando"} aria-describedby={idAyuda} onClick={() => entrada.current?.click()} data-testid="elegir-archivo">
+            <span className="lv-zona-ic" aria-hidden="true"><Icono nombre="subir-archivo" /></span>
+            <span className="lv-texto">
+              <b>{arrastrando ? "Soltala acá" : t.cargarUnaLista.largo}</b>
+              <span id={idAyuda}>{t.soltaElExcel.largo} <kbd className="tecla" aria-hidden="true">Alt S</kbd></span>
+            </span>
+          </button>
+        )}
+      </div>
       {estado === "falta-proveedor" && archivo && (
-        <form className="listas-zona-pregunta" onSubmit={leerConProveedor} noValidate>
-          <span className="listas-zona-icono alerta" aria-hidden="true"><Icono nombre="alerta" tam={26} /></span>
-          <div className="listas-zona-texto">
-            <strong>No reconocí de qué proveedor es {archivo.name}</strong>
-            <p className="detalle">Elegilo y la leo de nuevo. No hace falta volver a elegir el archivo.</p>
-          </div>
-          <div className="listas-zona-campos">
-            <label className="campo">
-              <span>Proveedor de esta lista</span>
-              <select className="selector" value={proveedorId} autoFocus aria-invalid={falta && !proveedorId} aria-describedby={falta && !proveedorId ? idFalta : undefined}
-                onChange={(e) => { setProveedorId(e.target.value); setFalta(false); }} data-testid="elegir-proveedor">
-                <option value="" disabled>Elegí el proveedor</option>
-                {proveedores.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-              </select>
-            </label>
-            <Boton type="submit" variante="principal">Leer la lista</Boton>
-            <Boton onClick={cancelar}>Cancelar</Boton>
-          </div>
+        <form className="lv-pregunta" onSubmit={leerConProveedor} noValidate>
+          <strong><Icono nombre="alerta" tam={18} />No reconocí de qué proveedor es {archivo.name}</strong>
+          <p className="detalle">Elegilo y la leo de nuevo. No hace falta volver a elegir el archivo.</p>
+          <label className="campo">
+            <span>Proveedor de esta lista</span>
+            <select className="selector" value={proveedorId} autoFocus aria-invalid={falta && !proveedorId} aria-describedby={falta && !proveedorId ? idFalta : undefined}
+              onChange={(e) => { setProveedorId(e.target.value); setFalta(false); }} data-testid="elegir-proveedor">
+              <option value="" disabled>Elegí el proveedor</option>
+              {proveedores.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+            </select>
+          </label>
           {falta && !proveedorId && <p id={idFalta} className="listas-falta">Elegí de qué proveedor es la lista.</p>}
+          <div className="fila"><Boton type="submit" variante="principal">Leer la lista</Boton><Boton onClick={cancelar}>Cancelar</Boton></div>
         </form>
       )}
       {estado === "falta-fecha" && archivo && (
-        <form className="listas-zona-pregunta" onSubmit={leerConFecha} noValidate>
-          <span className="listas-zona-icono alerta" aria-hidden="true"><Icono nombre="reloj" tam={26} /></span>
-          <div className="listas-zona-texto">
-            <strong>La planilla {archivo.name} no dice su fecha</strong>
-            <p className="detalle">Indicá de qué fecha es la lista: con eso se sabe cuál es la más nueva de cada proveedor.</p>
-          </div>
-          <div className="listas-zona-campos">
-            <label className="campo">
-              <span>Fecha de la lista</span>
-              <input ref={fechaElegida} className="entrada" type="date" autoFocus defaultValue={new Date().toISOString().slice(0, 10)} aria-invalid={falta} aria-describedby={falta ? idFalta : undefined} onChange={() => setFalta(false)} data-testid="elegir-fecha" />
-            </label>
-            <Boton type="submit" variante="principal">Leer la lista</Boton>
-            <Boton onClick={cancelar}>Cancelar</Boton>
-          </div>
+        <form className="lv-pregunta" onSubmit={leerConFecha} noValidate>
+          <strong><Icono nombre="reloj" tam={18} />La planilla {archivo.name} no dice su fecha</strong>
+          <p className="detalle">Indicá de qué fecha es la lista: con eso se sabe cuál es la más nueva de cada proveedor.</p>
+          <label className="campo">
+            <span>Fecha de la lista</span>
+            <input ref={fechaElegida} className="entrada" type="date" autoFocus defaultValue={new Date().toISOString().slice(0, 10)} aria-invalid={falta} aria-describedby={falta ? idFalta : undefined} onChange={() => setFalta(false)} data-testid="elegir-fecha" />
+          </label>
           {falta && <p id={idFalta} className="listas-falta">Escribí la fecha de la lista.</p>}
+          <div className="fila"><Boton type="submit" variante="principal">Leer la lista</Boton><Boton onClick={cancelar}>Cancelar</Boton></div>
         </form>
       )}
       <input ref={entrada} type="file" accept=".xlsx,.xls" hidden data-testid="archivo" onChange={(e) => { elegir(e.target.files?.[0]); e.target.value = ""; }} />
-      {estado === "esperando" && !enLinea && <div className="listas-zona-ancho"><Aviso tipo="alerta">Sin conexión. Cargar una lista necesita internet; lo demás sigue funcionando.</Aviso></div>}
-      {estado === "esperando" && error && (
-        <div className="listas-zona-ancho">
-          <Aviso tipo="error" testId="error-de-carga"><strong>No se cargó {error.archivo}.</strong> {error.motivo}</Aviso>
-        </div>
-      )}
+      {estado === "esperando" && !enLinea && <Aviso tipo="alerta">Sin conexión. Cargar una lista necesita internet; lo demás sigue funcionando.</Aviso>}
+      {estado === "esperando" && error && <Aviso tipo="error" testId="error-de-carga"><strong>No se cargó {error.archivo}.</strong> {error.motivo}</Aviso>}
     </div>
   );
 }
 
-function Revision({ cargada, esCelular, alVolver, alDescartar, alAplicar }: { cargada: Cargada; esCelular: boolean; alVolver: () => void; alDescartar: () => void; alAplicar: (r: Resultado) => void }) {
+type Filtro = "cambian" | "salteadas";
+
+function Revision({ cargada, origen, alDescartar, alAplicar }: { cargada: Cargada; origen: string; alDescartar: () => void; alAplicar: (r: Resultado) => void }) {
   const { filas, total, error: falloDeFilas, trayendo, traerMas } = useFilasDeLista(cargada.id);
   const errorDeFilas = falloDeFilas && mensajeDe(falloDeFilas);
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [progreso, setProgreso] = useState<Avance | null>(null);
+  const [filtro, setFiltro] = useState<Filtro>("cambian");
   const vivo = useRef(true);
   const r = cargada.resumen;
+  const t = TEXTOS.listas;
+  const cambian = r.nuevos + r.modificados;
 
   useEffect(() => { vivo.current = true; return () => { vivo.current = false; }; }, []);
 
   // Aplicar corre en el servidor en segundo plano; acá se consulta el avance cada segundo.
   async function aplicar() {
+    if (ocupado) return;
     setOcupado(true); setError(null);
     try {
       const fin = await aplicarLista(cargada, setProgreso, () => vivo.current);
@@ -370,136 +360,170 @@ function Revision({ cargada, esCelular, alVolver, alDescartar, alAplicar }: { ca
     }
   }
   async function descartar() {
+    if (ocupado) return;
     setOcupado(true); setError(null);
     try { await descartarLista(cargada.id); alDescartar(); }
     catch (e) { setError(mensajeDe(e)); setOcupado(false); }
   }
 
+  const teclas = useCallback((e: globalThis.KeyboardEvent) => {
+    if (document.querySelector("dialog[open]")) return;
+    if (e.altKey && e.code === "KeyD") { e.preventDefault(); void descartar(); }
+    else if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); void aplicar(); }
+  }, [ocupado]); // eslint-disable-line react-hooks/exhaustive-deps
+  useTeclasGlobales(teclas);
+
   const buscandoDuplicados = progreso?.etapa === "duplicados";
   const totalAGuardar = progreso?.total ?? r.leidas;
   const fraccion = fraccionAplicada(progreso, r.leidas);
+  // Los filtros que el sistema todavía no sabe hacer quedan a la vista y apagados (021, E02).
+  const chips: { valor: Filtro | null; nombre: string; cuenta: string }[] = [
+    { valor: "cambian", nombre: "Cambian", cuenta: numero(r.modificados) },
+    { valor: null, nombre: `Subas de más de ${SUBA_GRANDE} %`, cuenta: "—" },
+    { valor: null, nombre: "Nuevos", cuenta: numero(r.nuevos) },
+    { valor: null, nombre: "Ya no están", cuenta: numero(r.dados_de_baja) },
+    { valor: "salteadas", nombre: "Salteadas", cuenta: numero(r.salteadas) },
+  ];
 
   return (
-    <Pagina titulo={`${cargada.proveedor} · lista del ${fecha(cargada.fecha_lista)}`} testId="revision"
-      bajada="Revisá qué cambia. Nada se guarda hasta que toques «Aplicar»; si algo no cierra, descartala."
-      acciones={<Boton icono="izquierda" disabled={ocupado} onClick={alVolver} data-testid="volver">Volver</Boton>}>
-      {cargada.avisos.map((a, i) => <Aviso key={i} tipo="alerta">{a}</Aviso>)}
-
-      <div className="indicadores listas-indicadores" data-testid="resumen">
-        <Indicador rotulo="Productos leídos" valor={numero(r.leidas)} icono="archivo" />
-        <div className={r.nuevos > 0 ? "listas-marca verde" : "listas-marca"}><Indicador rotulo="Nuevos" valor={numero(r.nuevos)} icono="mas" color="verde" /></div>
-        <div className={r.modificados > 0 ? "listas-marca ambar" : "listas-marca"}>
-          <Indicador rotulo="Cambian de precio" valor={numero(r.modificados)} icono="ganancia" color="ambar" detalle={r.modificados > 0 ? `${porcentaje(r.variacion_promedio)} en promedio` : undefined} />
+    <section className="lv-der lv-rev" aria-labelledby="lv-rev-titulo" data-testid="revision">
+      <header className="lv-rev-cab">
+        <span className="lv-doc" aria-hidden="true"><Icono nombre="excel" tam={24} /></span>
+        <div className="lv-texto">
+          <h2 id="lv-rev-titulo">{cargada.proveedor} · lista del {fecha(cargada.fecha_lista)}</h2>
+          <span>{origen}</span>
         </div>
-        <Indicador rotulo="Sin cambio" valor={numero(r.sin_cambio)} icono="tilde" />
-        <Indicador rotulo="Ya no aparecen" valor={numero(r.dados_de_baja)} icono="menos" color={r.dados_de_baja > 0 ? "rojo" : undefined} />
-        <Indicador rotulo="Filas salteadas" valor={numero(r.salteadas)} icono="alerta" color={r.salteadas > 0 ? "rojo" : undefined} />
+      </header>
+
+      <div className="lv-numeros" data-testid="resumen">
+        <div><span>Leídos</span><b>{numero(r.leidas)}</b></div>
+        <div className="cambian"><span>Cambian</span><b>{numero(r.modificados)}{r.modificados > 0 && <small>{porcentaje(r.variacion_promedio)}</small>}</b></div>
+        <div><span>Nuevos</span><b>{numero(r.nuevos)}</b></div>
+        <div><span>Sin cambio</span><b>{numero(r.sin_cambio)}</b></div>
+        <div><span>Ya no están</span><b>{numero(r.dados_de_baja)}</b></div>
+        <div className={r.salteadas > 0 ? "saltea" : ""}><span>Salteadas</span><b>{numero(r.salteadas)}</b></div>
       </div>
 
+      {cargada.avisos.map((a, i) => <div key={i} className="lv-aviso" role="status"><Icono nombre="alerta" tam={18} /><span>{a}</span></div>)}
+
+      <div className="lv-filtros" role="tablist" aria-label="Qué filas ver">
+        {chips.map((c) => (
+          <button key={c.nombre} type="button" role="tab" className="lv-chip" aria-selected={c.valor === filtro} disabled={c.valor === null}
+            title={c.valor === null ? "Todavía no se puede filtrar por esto" : undefined} onClick={() => c.valor && setFiltro(c.valor)}>
+            {c.nombre} <b>{c.cuenta}</b>
+          </button>
+        ))}
+      </div>
+
+      {filtro === "salteadas" ? (
+        <div className="lv-tabla" data-testid="salteadas">
+          {cargada.salteadas.length === 0 ? <p className="lv-nada">No se salteó ninguna fila.</p> : (
+            <ul className="lv-salteadas">
+              {cargada.salteadas.map((s) => (
+                <li key={s.fila}><span className="lv-salteada-fila">Fila {numero(s.fila)}</span><span><strong>{s.motivo}</strong>{s.contenido.some(Boolean) && <span className="detalle"> · {s.contenido.filter(Boolean).join(" | ")}</span>}</span></li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : (
+        <>
+          <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={traerMas}>Reintentar</Boton>}>{errorDeFilas && `No se pudo traer la vista previa. ${errorDeFilas}`}</Aviso>
+          {filas === null ? (errorDeFilas ? null : <div className="esqueleto lv-tabla" role="status" aria-label="Cargando la vista previa" />)
+            : <Previa filas={filas} mas={total > filas.length ? <Boton tam="chico" className="lv-mas-filas" disabled={trayendo} onClick={traerMas} data-testid="mas-filas">{trayendo ? "Trayendo más…" : `Mostrar ${numero(Math.min(TANDA, total - filas.length))} más de ${numero(total)}`}</Boton> : null} />}
+        </>
+      )}
+
+      <Aviso tipo="error">{error}</Aviso>
       {progreso ? (
-        <section className="tarjeta relleno listas-aplicando" aria-label="Aplicando la lista">
-          <ol className="listas-etapas">
-            <li className={buscandoDuplicados ? "hecha" : "en-curso"}><span aria-hidden="true">{buscandoDuplicados ? <Icono nombre="tilde" tam={14} grosor={3} /> : "1"}</span>Guardar los precios</li>
-            <li className={buscandoDuplicados ? "en-curso" : ""}><span aria-hidden="true">2</span>Buscar duplicados con otros proveedores</li>
-          </ol>
+        <div className="lv-aplicando" aria-label="Aplicando la lista">
           <Progreso fraccion={fraccion}
             texto={buscandoDuplicados ? "Precios guardados. Buscando duplicados con otros proveedores…" : `Guardando precios… ${numero(progreso.procesadas)} de ${numero(totalAGuardar)}`} />
-          <p className="detalle">Tarda un rato. Podés dejar esta pantalla abierta; cuando termina te avisa.</p>
-        </section>
+          <span className="detalle">Tarda un rato. Podés dejar esta pantalla abierta; cuando termina te avisa.</span>
+        </div>
       ) : (
-        <div className="listas-acciones">
-          <Boton variante="principal" tam="grande" onClick={aplicar} disabled={ocupado} data-testid="aplicar">Aplicar {numero(r.leidas)} precios</Boton>
-          <Boton tam="grande" onClick={descartar} disabled={ocupado} data-testid="descartar">Descartar</Boton>
-        </div>
+        <footer className="lv-pie">
+          <button type="button" className="lv-descartar" onClick={() => void descartar()} disabled={ocupado} aria-keyshortcuts="Alt+D" data-testid="descartar">{t.descartar.largo} <kbd className="tecla" aria-hidden="true">Alt D</kbd></button>
+          <span className="lv-nota"><Icono nombre="candado" tam={16} />{t.nadaCambiaHastaAplicar.largo}</span>
+          <span className="lv-nota tenue" aria-hidden="true"><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd><kbd className="tecla">Espacio</kbd></span>
+          <button type="button" className="lv-aplicar" onClick={() => void aplicar()} disabled={ocupado} aria-keyshortcuts="Control+Enter" data-testid="aplicar">
+            Aplicar · cambian {numero(cambian)} precios <kbd className="tecla" aria-hidden="true">Ctrl Enter</kbd>
+          </button>
+        </footer>
       )}
-      <Aviso tipo="error">{error}</Aviso>
-
-      {cargada.salteadas.length > 0 && (
-        <Plegable titulo="Filas salteadas" extra={`${numero(cargada.salteadas.length)} sin cargar`} relleno={false} testId="salteadas">
-          <ul className="listas-salteadas">
-            {cargada.salteadas.map((s) => (
-              <li key={s.fila}>
-                <span className="listas-salteada-fila">Fila {numero(s.fila)}</span>
-                <span><strong>{s.motivo}</strong>{s.contenido.some(Boolean) && <span className="detalle"> · {s.contenido.filter(Boolean).join(" | ")}</span>}</span>
-              </li>
-            ))}
-          </ul>
-        </Plegable>
-      )}
-
-      <section className="listas-seccion" aria-labelledby="listas-previa">
-        <div className="listas-seccion-cabeza">
-          <h2 id="listas-previa" className="seccion-titulo">Vista previa</h2>
-          {filas && <span className="detalle">Los que cambian de precio van primero{total > filas.length ? ` · ${numero(filas.length)} de ${numero(total)}` : ""}</span>}
-        </div>
-        <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={traerMas}>Reintentar</Boton>}>{errorDeFilas && `No se pudo traer la vista previa. ${errorDeFilas}`}</Aviso>
-        {filas === null ? (errorDeFilas ? null : <div className="esqueleto listas-esqueleto" role="status" aria-label="Cargando la vista previa" />)
-          : esCelular ? <PreviaEnTarjetas filas={filas} /> : <PreviaEnTabla filas={filas} />}
-        {filas && total > filas.length && <Boton className="listas-mas" disabled={trayendo} onClick={traerMas} data-testid="mas-filas">{trayendo ? "Trayendo más…" : `Mostrar ${numero(Math.min(TANDA, total - filas.length))} más`}</Boton>}
-      </section>
-    </Pagina>
+    </section>
   );
 }
 
-
 function Cambio({ fila }: { fila: Fila }) {
   const cambio = variacion(fila);
-  if (fila.costo_anterior === null) return <Pastilla tipo="ok" sinPunto>Nuevo</Pastilla>;
-  if (cambio === null || cambio === 0) return <span className="detalle">Sin cambio</span>;
+  if (fila.costo_anterior === null) return <span className="lv-var nuevo">Nuevo</span>;
+  if (cambio === null || cambio === 0) return <span className="lv-var">0 %</span>;
   const diferencia = Number(fila.costo_neto) - Number(fila.costo_anterior);
   return (
-    <span className={`listas-cambio ${cambio > 0 ? "sube" : "baja"}`}>
-      <Icono nombre={cambio > 0 ? "arriba" : "abajo"} tam={16} grosor={2.6} />
+    <span className={`lv-var ${cambio > SUBA_GRANDE ? "grande" : cambio < 0 ? "baja" : ""}`}>
       <Explicado valor={porcentaje(cambio)} etiqueta={`${cambio > 0 ? "Sube" : "Baja"} ${porcentaje(cambio)}`} titulo={`De dónde sale ${porcentaje(cambio)}`}
         pasos={[`Costo hasta ahora: ${pesos(fila.costo_anterior)}`, `Costo nuevo: ${pesos(fila.costo_neto)}`, `${diferencia > 0 ? "Sube" : "Baja"} ${pesos(Math.abs(diferencia))}, que sobre el costo de hasta ahora es ${porcentaje(cambio)}`]} />
     </span>
   );
 }
 
-function PreviaEnTabla({ filas }: { filas: Fila[] }) {
+// La tabla de la revisión. Se recorre con ↑ ↓; la fila con foco muestra debajo, en pasos, de
+// dónde sale su costo (Espacio la pliega).
+function Previa({ filas, mas }: { filas: Fila[]; mas: React.ReactNode }) {
   const [activa, setActiva] = useState(0);
-  // La vista previa se recorre con las flechas: una sola fila toma el foco al entrar con Tab.
+  const [explicada, setExplicada] = useState(true);
   function mover(e: KeyboardEvent<HTMLTableRowElement>, i: number) {
     if (e.target !== e.currentTarget) return;
+    if (e.key === " ") { e.preventDefault(); setExplicada((x) => !x); return; }
     const destino = e.key === "ArrowDown" ? i + 1 : e.key === "ArrowUp" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? filas.length - 1 : null;
     if (destino === null || destino < 0 || destino >= filas.length) return;
     e.preventDefault();
     setActiva(destino);
-    (e.currentTarget.parentElement?.children[destino] as HTMLElement | undefined)?.focus();
+    (e.currentTarget.closest("tbody")?.querySelector(`tr[data-fila="${destino}"]`) as HTMLElement | null)?.focus();
   }
   return (
-    <div className="tabla-marco">
-      <table className="tabla listas-previa" data-testid="vista-previa">
-        <thead><tr><th scope="col">Código</th><th scope="col">Descripción</th><th scope="col">Marca</th><th scope="col" className="num">Costo hasta ahora</th><th scope="col" className="num">Costo nuevo</th><th scope="col" className="num">Cambio</th></tr></thead>
+    <div className="lv-tabla">
+      <table className="lv-previa" data-testid="vista-previa" data-flechas-propias>
+        <colgroup><col className="c-foto" /><col /><col className="c-antes" /><col className="c-nuevo" /><col className="c-cambio" /><col className="c-estante" /></colgroup>
+        <thead><tr><th scope="col"><span className="solo-lectores">Foto</span></th><th scope="col">Producto</th><th scope="col" className="num">Costo antes</th><th scope="col" className="num">Costo nuevo</th><th scope="col" className="num">Cambio</th><th scope="col" className="num">{TEXTOS.listas.precioEnEstanteria.largo}</th></tr></thead>
         <tbody>
           {filas.map((f, i) => (
-            <tr key={f.codigo_proveedor} tabIndex={i === activa ? 0 : -1} onKeyDown={(e) => mover(e, i)} onFocus={() => setActiva(i)}>
-              <td className="angosta"><code>{f.codigo_proveedor}</code></td>
-              <td className="nombre">{f.descripcion}</td>
-              <td>{f.marca ?? <span className="detalle">—</span>}</td>
-              <td className="num">{f.costo_anterior === null ? <span className="detalle">—</span> : pesos(f.costo_anterior)}</td>
-              <td className="num"><Explicado valor={pesos(f.costo_neto)} pasos={f.explicacion} className="listas-costo" titulo={`De dónde sale el costo de ${f.descripcion}`} /></td>
-              <td className="num"><Cambio fila={f} /></td>
-            </tr>
+            <FilaDePrevia key={f.codigo_proveedor} fila={f} i={i} foco={i === activa} explicada={explicada && i === activa}
+              alTeclear={(e) => mover(e, i)} alEnfocar={() => setActiva(i)} />
           ))}
         </tbody>
       </table>
+      {mas}
     </div>
   );
 }
 
-function PreviaEnTarjetas({ filas }: { filas: Fila[] }) {
+function FilaDePrevia({ fila: f, i, foco, explicada, alTeclear, alEnfocar }: { fila: Fila; i: number; foco: boolean; explicada: boolean; alTeclear: (e: KeyboardEvent<HTMLTableRowElement>) => void; alEnfocar: () => void }) {
   return (
-    <ul className="lista" data-testid="vista-previa">
-      {filas.map((f) => (
-        <li key={f.codigo_proveedor} className="renglon listas-previa-renglon" aria-label={`${f.codigo_proveedor} ${f.descripcion}`}>
-          <span className="nombre">{f.descripcion}</span>
-          <Explicado valor={pesos(f.costo_neto)} pasos={f.explicacion} className="importe chico" titulo={`De dónde sale el costo de ${f.descripcion}`} />
-          <span className="detalle"><code>{f.codigo_proveedor}</code>{f.marca ? ` · ${f.marca}` : ""}{f.costo_anterior !== null ? ` · antes ${pesos(f.costo_anterior)}` : ""}</span>
-          <span className="listas-previa-cambio"><Cambio fila={f} /></span>
-        </li>
-      ))}
-    </ul>
+    <>
+      <tr data-fila={i} className={foco ? "foco" : ""} tabIndex={foco ? 0 : -1} onKeyDown={alTeclear} onFocus={alEnfocar} onClick={alEnfocar}>
+        <td className="lv-foto-celda"><span className="lv-foto" aria-hidden="true"><Icono nombre="productos" tam={16} /></span></td>
+        <td><span className="lv-n">{f.descripcion}</span><span className="lv-d">{[f.marca, f.codigo_proveedor].filter(Boolean).join(" · ")}</span></td>
+        <td className="num lv-antes">{f.costo_anterior === null ? "—" : pesos(f.costo_anterior)}</td>
+        <td className="num"><Explicado valor={pesos(f.costo_neto)} pasos={f.explicacion} className="lv-nuevo" titulo={`De dónde sale el costo de ${f.descripcion}`} /></td>
+        <td className="num"><Cambio fila={f} /></td>
+        <td className="num lv-estante" title="Todavía no se calcula acá">—</td>
+      </tr>
+      {explicada && f.explicacion.length > 0 && (
+        <tr className="lv-explica" aria-label={`De dónde sale el costo de ${f.descripcion}`}>
+          <td colSpan={6}>
+            <span className="lv-pasos">
+              {f.explicacion.map((p, k) => (
+                <span key={k} className="lv-paso-lugar">
+                  {k > 0 && <Icono nombre="derecha" tam={14} />}
+                  <span className={`lv-paso ${k === f.explicacion.length - 1 ? "fin" : ""}`}>{p}</span>
+                </span>
+              ))}
+            </span>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }
 

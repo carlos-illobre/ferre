@@ -6,17 +6,26 @@ import { altaDeProveedor, faltaEnProveedor } from "../../../negocio/proveedores"
 import { Explicacion } from "../componentes/Explicacion";
 import { AvisoError, Hoja, Icono, Toast, Lista } from "../componentes/base";
 import { fecha, pesos, porcentaje } from "../../../formato";
+import { TEXTOS } from "../../textos";
+import "./listas.css";
 
 const miles = (n: number | string) => Number(n).toLocaleString("es-AR");
 const mayuscula = (t: string) => t[0]!.toUpperCase() + t.slice(1);
-const diaYMes = (iso: string) => { const d = new Date(iso); return `${d.getDate()}/${d.getMonth() + 1}`; };
+const diaYMes = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+// «hoy 08:12», «ayer 18:40» o «el 14/10»: cuándo se subió una lista.
+function subida(iso: string): string {
+  const d = new Date(iso);
+  const hora = d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
+  const dias = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(iso).setHours(0, 0, 0, 0)) / 86400000);
+  return dias === 0 ? `hoy ${hora}` : dias === 1 ? `ayer ${hora}` : `el ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
 
 // El estado de una carga, como pastilla: aplicada (verde, con tilde), pendiente o aplicándose
 // (amarilla, con reloj) o descartada (gris).
 function EstadoDeCarga({ estado }: { estado: ListaFila["estado"] }) {
-  if (estado === "aplicada") return <span className="lp-estado ok"><Icono nombre="tilde" tam={14} grosor={3} />Aplicada</span>;
-  if (estado === "pendiente" || estado === "aplicando") return <span className="lp-estado pend"><Icono nombre="reloj" tam={14} />{estado === "aplicando" ? "Aplicándose…" : "Pendiente"}</span>;
-  return <span className="lp-estado gris">{mayuscula(estado)}</span>;
+  if (estado === "aplicada") return <span className="cl-pastilla verde"><Icono nombre="tilde" tam={14} grosor={3} />Aplicada</span>;
+  if (estado === "pendiente" || estado === "aplicando") return <span className="cl-pastilla ambar"><Icono nombre="reloj" tam={14} />{estado === "aplicando" ? "Aplicándose…" : "Pendiente"}</span>;
+  return <span className="cl-pastilla">{mayuscula(estado)}</span>;
 }
 
 // Cargar una lista de precios (issue #12): elegir el archivo → revisar el resumen y la
@@ -32,10 +41,15 @@ export function Listas() {
   const [resultado, setResultado] = useState<string | null>(null);
   const [altaAbierta, setAltaAbierta] = useState(false);
   const [buscado, setBuscado] = useState("");
+  const [buscando, setBuscando] = useState(false);
 
   const sinAplicar = pendientes(historial);
   const abrirPendiente = (l: ListaFila) => setCargada(retomar(l));
   const ultima = ultimaAplicada(historial);
+  const ultimas = historial.filter((l) => l.estado !== "pendiente").slice(0, 3);
+  const [primera, ...resto] = sinAplicar;
+  const activos = proveedores.filter((p) => p.activo);
+  const t = TEXTOS.listas;
 
   return (
     <>
@@ -43,74 +57,62 @@ export function Listas() {
       <Toast texto={resultado} alCerrar={() => setResultado(null)} testId="resultado" />
       <div className="dos-columnas">
       <div className="columna">
-      {sinAplicar.map((l) => (
-        <button key={l.id} type="button" className="tarjeta oscura lp-pendiente" onClick={() => abrirPendiente(l)} data-testid="lista-pendiente">
-          <span className="seccion">Lista pendiente de revisar</span>
-          <span className="lp-titulo">{l.proveedor}<small>Lista del {fecha(l.fecha_lista)}</small></span>
-          <span className="boton coral">Revisar y aplicar</span>
-          <span className="lp-numeros">
-            <span><b>{miles(l.resumen.leidas)}</b> productos</span>
-            <span><b>{miles(l.resumen.modificados)}</b> cambian{l.resumen.modificados > 0 ? ` (${porcentaje(l.resumen.variacion_promedio)})` : ""}</span>
-            <span><b>{miles(l.resumen.nuevos)}</b> nuevos</span>
-          </span>
+      {primera && <Pendiente l={primera} alAbrir={() => abrirPendiente(primera)} />}
+      {resto.length > 0 && (
+        <button type="button" className="cl-mas-pend" onClick={() => abrirPendiente(resto[0]!)} data-testid="lista-pendiente">
+          <Icono nombre="bandeja" tam={18} /><span>Y <b>{resto.length} más</b>: {resto.map((l) => l.proveedor).join(", ")}</span><Icono nombre="derecha" tam={18} />
         </button>
-      ))}
+      )}
       <ZonaDeCarga proveedores={proveedores} alCargar={setCargada} />
       {/* El orden lo pidió Carlos: primero cargar, después las últimas tres cargas y al final los proveedores. */}
-      {historial.length > 0 && (
+      {ultimas.length > 0 && (
         <>
-          <h2 className="seccion">Últimas cargas</h2>
-          <Lista data-testid="historial" className="lp-lista">
-            {historial.slice(0, 3).map((l) => (
-              <div key={l.id} className="lp-fila">
-                <span className="lp-icono excel"><Icono nombre="excel" tam={22} /></span>
-                <span className="lp-datos">
-                  <span className="lp-cabeza"><b>{l.proveedor}</b><EstadoDeCarga estado={l.estado} /></span>
-                  <span className="lp-que">Lista del {fecha(l.fecha_lista)} <em>· subida {diaYMes(l.creado_en)}</em></span>
-                  <span className="lp-meta"><span className="lp-archivo"><Icono nombre="archivo" tam={16} /><i>{l.archivo_nombre}</i></span></span>
-                  <span className="lp-meta">
-                    {l.estado === "aplicada"
-                      ? <><span><b className="mas">+{miles(l.resumen.nuevos)}</b> nuevos</span><span><b>{miles(l.resumen.modificados)}</b> cambiados</span></>
-                      : <span><b>{miles(l.resumen.leidas)}</b> leídos</span>}
-                  </span>
-                </span>
-              </div>
+          <h2 className="cl-sec"><b>{t.ultimasCargas.corto}</b></h2>
+          <ul className="cl-grupo" data-testid="historial">
+            {ultimas.map((l) => (
+              <li key={l.id} className="cl-row" aria-label={`${l.proveedor}, lista del ${fecha(l.fecha_lista)}, ${l.archivo_nombre}`}>
+                <span className="cl-ic"><Icono nombre={l.estado === "descartada" ? "archivo" : "excel"} tam={20} /></span>
+                <span className="cl-n">{l.proveedor}</span>
+                <EstadoDeCarga estado={l.estado} />
+                <span className="cl-d">Lista del {diaYMes(l.fecha_lista)} · {l.estado === "aplicada" ? <><b>{miles(l.resumen.modificados)}</b> cambiados{l.resumen.nuevos > 0 && <> · <b>{miles(l.resumen.nuevos)}</b> nuevos</>}</> : <><b>{miles(l.resumen.leidas)}</b> leídos</>}</span>
+              </li>
             ))}
-          </Lista>
+          </ul>
         </>
       )}
       </div>
       <div className="columna">
-      <h2 className="seccion"><span>Proveedores</span>{esDueno && <button type="button" className="enlace" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">+ Agregar</button>}</h2>
-      {proveedores.length === 0 ? <div className="aviso-suave">Todavía no hay proveedores cargados.</div> : (
+      <h2 className="cl-sec">
+        <b>{t.proveedores.corto}</b>{activos.length > 0 && <span className="cl-cuenta">{activos.length}</span>}
+        {activos.length > 0 && <button type="button" className="cl-lupa" onClick={() => setBuscando((b) => !b)} aria-label={t.buscarProveedor.corto} aria-expanded={buscando}><Icono nombre="buscar" tam={20} /></button>}
+        {esDueno && <button type="button" className="enlace cl-agregar" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">+ Agregar</button>}
+      </h2>
+      {activos.length === 0 ? <div className="aviso-suave">Todavía no hay proveedores cargados.</div> : (
         <>
-          <label className="lp-buscar">
-            <Icono nombre="buscar" tam={22} />
-            <input type="search" value={buscado} onChange={(e) => setBuscado(e.target.value)} placeholder="Buscar proveedor" aria-label="Buscar proveedor" autoComplete="off" data-testid="buscar-proveedor" />
-          </label>
-          <Lista data-testid="estado-proveedores" className="lp-lista">
-            {buscarProveedores(proveedores.filter((p) => p.activo), buscado).map((p) => {
+          {buscando && (
+            <label className="lp-buscar">
+              <Icono nombre="buscar" tam={22} />
+              <input type="search" value={buscado} onChange={(e) => setBuscado(e.target.value)} placeholder={t.buscarProveedor.corto} aria-label={t.buscarProveedor.corto} autoComplete="off" autoFocus data-testid="buscar-proveedor" />
+            </label>
+          )}
+          <ul className="cl-grupo" data-testid="estado-proveedores">
+            {buscarProveedores(activos, buscado).map((p) => {
               const l = ultima.get(p.id);
               const { estado, dias } = situacionDelProveedor(l);
               const descuentos = descuentosDe(p);
               return (
-                <div key={p.id} className="lp-fila" role="row" aria-label={p.nombre}>
-                  <span className="lp-icono"><Icono nombre="proveedor" tam={22} /></span>
-                  <span className="lp-datos">
-                    <span className="lp-cabeza"><b>{p.nombre}</b><span className={`lp-estado ${estado === "vieja" ? "vieja" : estado === "sin lista" ? "gris" : "ok"}`}>{mayuscula(estado)}</span></span>
-                    <span className="lp-que">{l ? <>Lista del {fecha(l.fecha_lista)} <em>· hace {dias} {dias === 1 ? "día" : "días"}</em></> : <em>Nunca se cargó una lista</em>}</span>
-                    {(l || p.lector || descuentos.length > 0) && (
-                      <span className="lp-meta">
-                        {l && <span><Icono nombre="caja" tam={16} /><b>{miles(l.resumen.leidas)}</b> productos</span>}
-                        {p.lector && <span><Icono nombre="lector" tam={16} />{p.lector}</span>}
-                        {descuentos.length > 0 && <span><Icono nombre="porcentaje" tam={16} />{descuentos.join(" · ")}</span>}
-                      </span>
-                    )}
-                  </span>
-                </div>
+                <li key={p.id} className="cl-row" role="row" aria-label={p.nombre}>
+                  <span className="cl-ic"><Icono nombre="proveedor" tam={20} /></span>
+                  <span className="cl-n">{p.nombre}</span>
+                  <span className={`cl-pastilla ${estado === "vieja" ? "ambar" : estado === "sin lista" ? "" : "verde"}`}>{mayuscula(estado)}</span>
+                  <span className="cl-d">{l ? <>Lista del {diaYMes(l.fecha_lista)} · hace <b>{dias} {dias === 1 ? "día" : "días"}</b></> : "Nunca se cargó una lista"}</span>
+                  {(l || p.lector || descuentos.length > 0) && (
+                    <span className="cl-d">{[l ? `${miles(l.resumen.leidas)} productos` : null, p.lector, descuentos.join(" · ") || null].filter(Boolean).join(" · ")}</span>
+                  )}
+                </li>
               );
             })}
-          </Lista>
+          </ul>
         </>
       )}
       </div>
@@ -118,6 +120,32 @@ export function Listas() {
       {cargada && <Revision cargada={cargada} alTerminar={(mensaje) => { setCargada(null); setResultado(mensaje ?? null); void recargar(); }} />}
       {altaAbierta && <AltaDeProveedor alCerrar={() => setAltaAbierta(false)} alCambiar={async () => { await recargar(); setAltaAbierta(false); }} />}
     </>
+  );
+}
+
+// La lista que espera revisión, como la tarjeta principal de la v2: tres cifras, la franja de
+// proporción y «Revisar y aplicar» a todo el ancho.
+function Pendiente({ l, alAbrir }: { l: ListaFila; alAbrir: () => void }) {
+  const r = l.resumen;
+  const parte = (n: number) => `${r.leidas ? Math.max(n > 0 ? 1 : 0, (n / r.leidas) * 100) : 0}%`;
+  return (
+    <div className="cl-pend" data-testid="lista-pendiente">
+      <div className="cl-pend-arr">
+        <span className="cl-pend-ic"><Icono nombre="excel" tam={24} /></span>
+        <span className="cl-pend-texto">
+          <span className="cl-pend-et">{TEXTOS.listas.paraRevisar.corto}</span>
+          <span className="cl-pend-nom">{l.proveedor}</span>
+          <span className="cl-pend-d">Lista del {fecha(l.fecha_lista)} · subida {subida(l.creado_en)}</span>
+        </span>
+      </div>
+      <div className="cl-cifras">
+        <div className="cl-cifra verde"><b>{miles(r.modificados)}{r.modificados > 0 && <small>{porcentaje(r.variacion_promedio)}</small>}</b><span>cambian</span></div>
+        <div className="cl-cifra"><b>{miles(r.nuevos)}</b><span>nuevos</span></div>
+        <div className="cl-cifra"><b>{miles(r.dados_de_baja)}</b><span>no están</span></div>
+      </div>
+      <div className="cl-franja" aria-hidden="true"><i style={{ width: parte(r.modificados), background: "var(--p-verde)" }} /><i style={{ width: parte(r.nuevos), background: "var(--p-naranja)" }} /><i style={{ flex: 1 }} /></div>
+      <button type="button" className="cl-revisar" onClick={alAbrir} aria-label={`Revisar y aplicar la lista de ${l.proveedor} del ${fecha(l.fecha_lista)}`}>{TEXTOS.listas.revisarYAplicar.corto}<Icono nombre="flecha" tam={22} /></button>
+    </div>
   );
 }
 
@@ -148,15 +176,13 @@ function ZonaDeCarga({ proveedores, alCargar }: { proveedores: Proveedor[]; alCa
 
   return (
     <>
-      <div className={`lp-cargar ${arrastrando ? "arrastrando" : ""}`} onDragOver={(e) => { e.preventDefault(); setArrastrando(true); }} onDragLeave={() => setArrastrando(false)} onDrop={soltar} data-testid="zona-de-carga">
-        <span className="lp-icono"><Icono nombre="subirArchivo" tam={22} /></span>
-        <span className="lp-datos">
-          <b>{estado === "leyendo" ? `Leyendo ${archivo?.name}…` : "Cargar una lista"}</b>
-          <small>Excel del proveedor (.xlsx)</small>
+      <div className={`cl-cargar ${arrastrando ? "arrastrando" : ""}`} onDragOver={(e) => { e.preventDefault(); setArrastrando(true); }} onDragLeave={() => setArrastrando(false)} onDrop={soltar} data-testid="zona-de-carga">
+        <span className="cl-cargar-ic"><Icono nombre="subirArchivo" tam={22} /></span>
+        <span className="cl-cargar-texto">
+          <b>{estado === "leyendo" ? `Leyendo ${archivo?.name}…` : TEXTOS.listas.cargarUnaLista.corto}</b>
+          <small>{TEXTOS.listas.soltaElExcel.corto}</small>
         </span>
-        <button type="button" className="boton tinta lp-subir" disabled={estado !== "esperando"} onClick={() => entrada.current?.click()} data-testid="subir-lista">
-          <Icono nombre="subir" tam={18} />Subir lista
-        </button>
+        <button type="button" className="cl-subir" disabled={estado !== "esperando"} onClick={() => entrada.current?.click()} data-testid="subir-lista">{TEXTOS.listas.subirLista.corto}</button>
       </div>
       {estado === "falta-proveedor" && archivo && (
         <div className="tarjeta">
@@ -229,13 +255,13 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
         <span className="titulo-hoja" role="heading" aria-level={2}>{cargada.proveedor} · {fecha(cargada.fecha_lista)}</span>
       </div>
       {cargada.avisos.map((a, i) => <div key={i} className="aviso-suave">{a}</div>)}
-      <div className="numeros-lista" data-testid="resumen">
-        <div><span className="importe">{r.leidas}</span><small>Productos leídos</small></div>
-        <div className={r.nuevos > 0 ? "tinta" : ""}><span className="importe">{r.nuevos}</span><small>Nuevos</small></div>
-        <div className={r.modificados > 0 ? "coral" : ""}><span className="importe">{r.modificados}</span><small>Cambian de precio{r.modificados > 0 ? ` (${porcentaje(r.variacion_promedio)})` : ""}</small></div>
-        <div><span className="importe">{r.sin_cambio}</span><small>Sin cambio</small></div>
-        <div><span className="importe">{r.dados_de_baja}</span><small>Ya no aparecen</small></div>
-        <div><span className="importe">{r.salteadas}</span><small>Filas salteadas</small></div>
+      <div className="cl-numeros" data-testid="resumen">
+        <div><b>{miles(r.leidas)}</b><span>leídos</span></div>
+        <div className="verde"><b>{miles(r.modificados)}{r.modificados > 0 && <small>{porcentaje(r.variacion_promedio)}</small>}</b><span>cambian</span></div>
+        <div><b>{miles(r.nuevos)}</b><span>nuevos</span></div>
+        <div><b>{miles(r.sin_cambio)}</b><span>sin cambio</span></div>
+        <div><b>{miles(r.dados_de_baja)}</b><span>no están</span></div>
+        <div className={r.salteadas > 0 ? "ambar" : ""}><b>{miles(r.salteadas)}</b><span>salteadas</span></div>
       </div>
       {cargada.salteadas.length > 0 && (
         <>
@@ -251,7 +277,7 @@ function Revision({ cargada, alTerminar }: { cargada: Cargada; alTerminar: (mens
       ) : (
         <div className="acciones auto-1fr">
           <button type="button" className="boton blanco" onClick={descartar} disabled={ocupado}>Descartar</button>
-          <button type="button" className="boton coral principal centrado" onClick={aplicar} disabled={ocupado} data-testid="aplicar">Aplicar {r.leidas} precios</button>
+          <button type="button" className="boton coral principal centrado" onClick={aplicar} disabled={ocupado} data-testid="aplicar">Aplicar · cambian {miles(r.nuevos + r.modificados)} precios</button>
         </div>
       )}
       <AvisoError texto={error} />
