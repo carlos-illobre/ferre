@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { detalleDelRegistro, diferenciaConLaLista, useIngreso } from "../../negocio/deposito/ingreso";
-import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStock, useMovimientos, useStock, type StockFila } from "../../negocio/deposito/inventario";
+import { cantidadContada } from "../../negocio/deposito/inventario";
 import { abrirConteo, crearSector as crearSectorNuevo, useConteo, useSectores, type Conteo } from "../../negocio/deposito/conteo";
 import { AvisoDePedido, Pedidos, usePedidoAIngresar } from "../Pedidos";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
-import { COMPROBANTES, MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
+import { COMPROBANTES } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { ErrorApi } from "../../api";
 import { busquedaAlDia, esperarBusqueda, productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
-import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
+import { pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
-import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe } from "../../unidades";
-import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast, Lista } from "./componentes/base";
+import { cantidadValida, conUnidad, enteras, unidadDe } from "../../unidades";
+import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Stock } from "./Stock";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
@@ -29,7 +29,6 @@ type Sub = (typeof SUB)[number]["valor"];
 // Lo que pide cada pestaña (RF-72). El inventario lo ve cualquiera con sesión.
 const PIDE: Partial<Record<Sub, Permiso[]>> = { pedidos: ["deposito.pedidos", "deposito.ingresos"], ingreso: ["deposito.ingresos"], contar: ["deposito.stock"] };
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
-const num = (n: number) => n.toLocaleString("es-AR");
 
 export function Deposito({ sub }: { sub: string | null }) {
   const puedeEsto = usePuede();
@@ -379,4 +378,3 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   );
 }
 
-const pesosEnteros = (n: number) => pesos(Math.round(n)).replace(/,00$/, "");

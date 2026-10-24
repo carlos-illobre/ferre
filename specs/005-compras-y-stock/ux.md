@@ -155,6 +155,28 @@ ver sus renglones y la foto del comprobante si la tiene; anularla.
 cargando; sin conexión (se muestra lo último que se bajó, diciendo de cuándo es, y anular
 avisa que necesita conexión); error al anular, en la compra misma.
 
+**Cómo se ve: la v2 (decisión 148, 2026-10-24).** Es la variante 1 de la maqueta del director
+de arte, «El escritorio de compras» en la computadora y «Resumen» en el celular. Sigue en Cómo va
+el negocio → Compras; los gastos y las compras recientes están en una sola pantalla.
+
+- Computadora: arriba, cuatro números: esta semana (lo gastado, cuántas compras y anuladas, y
+  una barra por día; tocar el número muestra lo comprado a cada proveedor), pedidos por llegar
+  (y cuántos llegaron a medias), se les debe y vencido (en rojo). Debajo, «Compras recientes»
+  con las pastillas «Esta semana», «Sin pagar» y «Anuladas», y cada compra como renglón con la
+  miniatura de su comprobante (o un ícono si no tiene), proveedor, fecha · comprobante ·
+  renglones, el total «sin IVA» (tachado y «no suma» si está anulada, con la pastilla
+  «Anulada»); se abre para ver los renglones y anularla. A la derecha: «Sacale una foto a la
+  factura» con «Elegir archivo» y «Cargar a mano» (llevan al ingreso), «Por llegar» con «Llegó»
+  en cada pedido (abre el ingreso con ese pedido) y «Vence primero». Arriba, al lado de las
+  pestañas, «Armar pedido» (Alt P) y «Registrar compra» (Alt N).
+- Celular: dos tarjetas (esta semana con sus barras, y se les debe en rojo), «Por llegar» con
+  «Pedidos (N)» y «Llegó», «Recientes» con «Ver todas», y fija al pulgar, encima del menú,
+  «Sacale foto a la factura», que lleva al ingreso.
+- Quedan vacíos hasta que se programen (E02): se les debe, vencido, «Sin pagar», «Vence
+  primero», si cada compra está pagada o cuándo vence, y el código QR de la tarjeta de la foto.
+  Las barras por día quedan vacías si las compras recientes no alcanzan para explicar el total
+  de la semana.
+
 ## Historia 3: stock y dinero invertido, y corregir (Administrador, Comprador; el Vendedor lo ve al vender)
 
 **Tiene que poder:** ver el valor del inventario; ver su desglose; buscar un producto; ver

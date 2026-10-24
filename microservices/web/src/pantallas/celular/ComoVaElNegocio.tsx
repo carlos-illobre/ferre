@@ -2,18 +2,17 @@ import { useEffect, useState } from "react";
 import { irA } from "../../rutas";
 import { urlApi } from "../../api";
 import { esAmbienteDePrueba } from "../../ambiente";
-import { fecha, pesos, pesosCortos } from "../../formato";
+import { fecha, pesosCortos } from "../../formato";
 import { useSesion } from "../../sesion";
 import { MEDIOS } from "../../negocio/ventas/venta";
 import { useConsultas, useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
-import { useGastosDeLaSemana } from "../../negocio/compras";
 import { usePuede } from "../permisos";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
 import { NOMBRES } from "../textos";
 import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
-import { Hoja, Lista, Pasos } from "./componentes/base";
+import { Hoja, Pasos } from "./componentes/base";
 import { IconoN, type IconoDeNegocio } from "../iconos-de-negocio";
 import { TEXTOS } from "../textos";
 import { agruparNoLlevados, compararConElAnterior, pasosDeLoVendido, type Comparado } from "../../negocio/ventas/tablero";
@@ -178,49 +177,10 @@ function NoLlevaron({ consultas, deHoy }: { consultas: Consulta[] | null; deHoy:
   );
 }
 
-// Compras: los gastos con «Ver los gastos» y las compras recientes con «Ver las compras».
+// Compras, como la v2 (decisión 148): los gastos con «Ver los gastos» y las compras recientes con
+// «Ver las compras», en una sola pantalla.
 function Compras() {
-  const puedeEsto = usePuede();
-  return (
-    <>
-      {puedeEsto("negocio.gastos") && <GastosDeLaSemana />}
-      {puedeEsto("deposito.compras") && <ComprasRecientes soloVer />}
-    </>
-  );
-}
-
-function GastosDeLaSemana() {
-  const gastos = useGastosDeLaSemana().datos;
-  return (
-    <>
-      <div className="numeros-del-negocio">
-        <Numero rotulo={NOMBRES.gastosDeLaSemana} valor={gastos ? pesosCortos(gastos.total) : null} testId="numero-gastos" ancho />
-      </div>
-      <h2 className="seccion" data-testid="gastos-semana"><span>{NOMBRES.gastosDeLaSemana}</span>{gastos && <span className="importe" style={{ fontSize: 16 }}>{pesosCortos(gastos.total)}</span>}</h2>
-      {!gastos && <div className="aviso-suave">Sin conexión: los gastos se ven cuando vuelva internet.</div>}
-      {gastos && gastos.por_proveedor.length === 0 && <div className="aviso-suave">En la semana no se registraron compras.</div>}
-      {gastos && gastos.por_proveedor.length > 0 && (
-        <Lista>
-          {gastos.por_proveedor.map((g) => (
-            <div key={g.proveedor} className="fila">
-              <span className="nombre">{g.proveedor}</span>
-              <strong className="derecha importe">{pesos(g.total)}</strong>
-              <span className="detalle">{g.compras} {Number(g.compras) === 1 ? "compra" : "compras"} desde el {fecha(gastos.desde)}</span>
-            </div>
-          ))}
-        </Lista>
-      )}
-    </>
-  );
-}
-
-function Numero({ rotulo, valor, rojo, ancho, testId }: { rotulo: string; valor: string | null; rojo?: boolean; ancho?: boolean; testId: string }) {
-  return (
-    <div className={`tarjeta numero-del-negocio ${ancho ? "ancho" : ""}`} data-testid={testId}>
-      <small>{rotulo}</small>
-      <strong className={`importe ${rojo ? "rojo" : ""}`}>{valor ?? "—"}</strong>
-    </div>
-  );
+  return <ComprasRecientes />;
 }
 
 // Quién entró, la conexión y el servidor: van al pie de cualquier sección.

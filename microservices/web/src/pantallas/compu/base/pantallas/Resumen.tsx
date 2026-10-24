@@ -5,7 +5,6 @@ import { usePuede } from "../../../permisos";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 import { urlApi } from "../../../../api";
 import { esAmbienteDePrueba } from "../../../../ambiente";
-import { fecha, pesos } from "../../../../formato";
 import { useSesion } from "../../../../sesion";
 import { MEDIOS, NOMBRE_DE_MEDIO as NOMBRE_MEDIO } from "../../../../negocio/ventas/venta";
 import type { VentasDelDia as DatosHoy } from "../../../../negocio/ventas/ventas-del-dia";
@@ -13,7 +12,6 @@ import { irA } from "../rutas";
 import { Aviso, Boton, EstadoDeConexion, Hoja, Pastilla, Pagina, pesosCortos } from "../ui";
 import { comoCarga, diaYHora, useEnLinea, type Carga } from "./negocio-comun";
 import { useConsultas, useVentasDelDia, type Consulta } from "../../../../negocio/ventas/ventas-del-dia";
-import { useGastosDeLaSemana, type Gastos } from "../../../../negocio/compras";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../../../pestanas-de-negocio";
 import { IconoN, type IconoDeNegocio } from "../../../iconos-de-negocio";
 import { agruparNoLlevados, compararConElAnterior, pasosDeLoVendido, type Comparado } from "../../../../negocio/ventas/tablero";
@@ -24,7 +22,6 @@ import "../estilos/resumen.css";
 
 
 const CONSULTAS_A_LA_VISTA = 3;
-const plural = (n: number, uno: string, muchos: string) => `${n.toLocaleString("es-AR")} ${n === 1 ? uno : muchos}`;
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
 const RUTA_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "resumen", compras: "gastos", inventario: "invertido" };
 const ICONO_DE_SECCION: Record<SeccionDeNegocio, IconoDeNegocio> = { ventas: "chart-column", compras: "truck", inventario: "boxes" };
@@ -220,29 +217,12 @@ export function ResumenCompras({ recientes }: { recientes: (vuelta: number) => R
   const [vuelta, setVuelta] = useState(0);
   return (
     <SeccionDelNegocio seccion="compras" testId="resumen-compras" bajada={TEXTOS.negocio.seccionCompras.largo} alActualizar={() => setVuelta((v) => v + 1)}>
-      {veGastos && <GastosConSuNumero key={`gastos-${vuelta}`} />}
-      {puedeEsto("deposito.compras") && <div className="rv-otra">{recientes(vuelta)}</div>}
+      {/* Como la v2 de Compras (decisión 148, 021-T004): los gastos y las compras recientes en una sola pantalla. */}
+      {(veGastos || puedeEsto("deposito.compras")) && <div className="rv-otra">{recientes(vuelta)}</div>}
     </SeccionDelNegocio>
   );
 }
 
-function GastosConSuNumero() {
-  const enLinea = useEnLinea();
-  const gastos = comoCarga(useGastosDeLaSemana(), "No se pudieron traer los gastos de la semana");
-  const hasta = gastos.datos ? new Date(new Date(`${gastos.datos.desde}T00:00:00`).getTime() + 6 * 86_400_000).toISOString().slice(0, 10) : null;
-  const periodo = gastos.datos ? `del ${fecha(gastos.datos.desde).slice(0, 5)} al ${fecha(hasta).slice(0, 5)}` : "";
-  return (
-    <>
-      <div className="rv-kpis rv-kpis-uno">
-        <Kpi principal icono="truck" rotulo="Gastos de la semana" testId="indicador-gastos"
-          pasos={gastos.datos ? pasosDeGastos(gastos.datos, periodo) : null} titulo="De dónde salen los gastos de la semana"
-          valor={<Numero carga={gastos}>{gastos.datos && <Pesos valor={Number(gastos.datos.total)} />}</Numero>}
-          comp={gastos.datos ? `En compras, ${periodo}` : textoDeEspera(gastos, enLinea)} />
-      </div>
-      <GastosDeLaSemana gastos={gastos} periodo={periodo} />
-    </>
-  );
-}
 
 // Inventario: el dinero invertido, en total y por proveedor.
 export function ResumenInventario({ invertido }: { invertido: (vuelta: number) => ReactNode }) {
@@ -320,11 +300,6 @@ function SeccionDelNegocio({ seccion, testId, bajada, cargando, datos, alActuali
   );
 }
 
-function pasosDeGastos(g: Gastos, periodo: string): string[] {
-  const pasos = g.por_proveedor.map((p) => `${p.proveedor}, ${plural(Number(p.compras), "compra", "compras")}: ${pesos(p.total)}`);
-  if (!pasos.length) pasos.push("En la semana no se registraron compras");
-  return [...pasos, `Gastos de la semana (${periodo}): ${pesos(g.total)}`];
-}
 
 const textoDeEspera = (c: Carga<unknown>, enLinea: boolean) => (c.error ? (enLinea ? "No se pudo cargar" : "Se ve cuando vuelva internet") : "Trayendo el dato…");
 
@@ -343,31 +318,6 @@ function Esqueleto({ renglones }: { renglones: number }) {
   return <div className="negocio-esqueleto" role="status" aria-label="Cargando">{Array.from({ length: renglones }, (_, i) => <span key={i} className="esqueleto" />)}</div>;
 }
 
-function GastosDeLaSemana({ gastos, periodo }: { gastos: Carga<Gastos>; periodo: string }) {
-  const filas = gastos.datos?.por_proveedor ?? [];
-  return (
-    <section className="rv-card" data-testid="gastos-semana" aria-labelledby="resumen-gastos">
-      <header className="rv-card-cab">
-        <h2 id="resumen-gastos">Lo comprado a cada proveedor</h2>
-        {gastos.datos && <span className="rv-der">{periodo}</span>}
-      </header>
-      <ErrorDeBloque carga={gastos} />
-      {!gastos.datos && !gastos.error && <Esqueleto renglones={3} />}
-      {gastos.datos && filas.length === 0 && <p className="rv-vacio-chico">En la semana no se registraron compras.</p>}
-      {filas.length > 0 && (
-        <ul className="rv-renglones">
-          {filas.map((g) => (
-            <li key={g.proveedor}>
-              <span className="rv-renglon-ico"><IconoN nombre="truck" tam={16} /></span>
-              <span className="rv-renglon-nombre">{g.proveedor}<small>{plural(Number(g.compras), "compra", "compras")}</small></span>
-              <span className="rv-renglon-importe"><Pesos valor={Number(g.total)} /></span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
 
 // Lo que preguntaron y no compraron, agrupado como la v2 («Disco de corte × 3»): demanda que hoy
 // se pierde. Se anota en Vender con «No llevó». «Ver las N» abre cada consulta, con cuándo, el

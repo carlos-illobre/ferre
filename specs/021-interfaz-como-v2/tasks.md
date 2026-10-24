@@ -59,3 +59,7 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Quién hizo qué (computadora): «Bajar en planilla» (apagado).
 - Quién hizo qué (computadora): «Ver la venta» desde la acción elegida, que abra esa venta.
 - Quién hizo qué (celular): «A revisar», cuántas acciones hay para revisar («—»).
+- Compras (computadora y celular): lo que se les debe a los proveedores, lo vencido y «Vence primero» («—»).
+- Compras (computadora y celular): si cada compra está pagada o cuándo vence («Pagada», «Vence 18/11», «por adelantado», «a 30 días») y el filtro «Sin pagar».
+- Compras (computadora): el código QR de «Sacale una foto a la factura» en la misma pantalla y que la compra «se arme sola» con la foto; hoy los botones llevan al ingreso.
+- Compras (computadora y celular): las barras por día de «Esta semana» salen de las compras recientes; si no alcanzan para explicar el total, quedan vacías (haría falta el gasto por día desde el servidor).
