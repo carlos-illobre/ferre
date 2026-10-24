@@ -1,0 +1,121 @@
+/* Cómo va el negocio como la v2 («Tablero por secciones», decisión 148): las secciones y el período
+   en segmentos, cuatro números con su comparación, lo vendido por hora, cómo pagaron y, abajo, lo
+   más vendido, lo que no llevaron y el cierre de caja. Las medidas son las de la maqueta; los
+   colores, los de paleta.css («Mostrador»). */
+.rv { gap: 12px; padding-top: 16px; }
+.rv .pagina-cabeza { display: contents; }
+.rv .pagina-cabeza .bajada { position: absolute; }
+.rv .pagina-cabeza h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Al lado de las pestañas: «Actualizado 19:12» y «Actualizar F5». */
+.rv-actualizado { font-size: 14px; font-weight: 600; color: var(--p-texto-2); white-space: nowrap; }
+.rv-boton { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font-weight: 700; font-size: 14px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); white-space: nowrap; cursor: pointer; }
+.rv-boton:disabled { opacity: .45; box-shadow: none; cursor: default; }
+.rv-kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--p-borde-fuerte); border-bottom-width: 2px; background: var(--p-superficie); color: var(--p-texto-2); font-size: 14px; line-height: 1; font-weight: 700; }
+
+/* Las secciones y el período. */
+.rv-barra { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.rv-segmentos { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--p-relleno); gap: 2px; }
+.rv-segmentos > button { min-height: 38px; padding: 0 14px; border: 0; border-radius: 9px; background: transparent; font-weight: 700; font-size: 15px; color: var(--p-texto-2); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer; }
+.rv-segmentos > button.elegido { background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); }
+.rv-segmentos > button:disabled { cursor: default; }
+.rv-segmentos > button:disabled:not(.elegido) { opacity: .55; }
+.rv-seg-kbd { font-size: 14px; color: var(--p-texto-3); font-weight: 700; margin-left: 2px; }
+.rv-periodo { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.rv-compara { font-size: 14px; color: var(--p-texto-2); font-weight: 600; text-align: right; line-height: 18px; }
+.rv-compara b { color: var(--p-tinta); font-weight: 750; }
+
+/* Los números de arriba. */
+.rv-kpis { display: grid; grid-template-columns: 1.25fr 1.25fr 1fr 1fr; gap: 12px; }
+.rv-kpis-uno { grid-template-columns: minmax(0, 340px); }
+.rv-kpi { position: relative; display: grid; gap: 2px; padding: 12px 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); min-width: 0; }
+.rv-kpi.principal { border-color: var(--p-verde-suave); }
+.rv-kpi-cab { display: flex; align-items: center; gap: 8px; }
+.rv-kpi-ico { width: 28px; height: 28px; border-radius: 99px; background: var(--p-verde-suave); color: var(--p-verde-texto); display: grid; place-items: center; flex: none; }
+.rv-etiqueta { font-size: 14px; line-height: 18px; font-weight: 650; color: var(--p-texto-2); }
+.rv-va { display: block; font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; color: var(--p-tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rv-explica { display: block; padding: 0; border: 0; background: none; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.rv-explica-i { position: absolute; top: 14px; right: 14px; color: var(--p-texto-3); display: inline-flex; }
+.rv-explica:hover .rv-explica-i, .rv-explica:focus-visible .rv-explica-i { color: var(--p-verde-texto); }
+.rv-pesos { white-space: nowrap; }
+.rv-va .rv-peso, .rv-caja-va .rv-peso { font-size: .62em; font-weight: 700; vertical-align: .32em; margin-right: .08em; }
+.rv-sin-dato { color: var(--p-texto-3); }
+.rv-comp { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.rv-comp-texto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.rv-delta { flex: none; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 99px; font-size: 14px; font-weight: 750; white-space: nowrap; background: var(--p-relleno); color: var(--p-texto-2); }
+.rv-delta.sube { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.rv-delta.baja { background: var(--rojo-suave); color: var(--rojo); }
+
+/* Las tarjetas de abajo. */
+.rv-fila-c { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; }
+.rv-fila-d { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 12px; }
+.rv-card { min-width: 0; padding: 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); display: flex; flex-direction: column; }
+.rv-card > .aviso { margin-bottom: 8px; }
+.rv-card-cab { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; min-height: 26px; }
+.rv-card-cab h2 { font-size: 18px; line-height: 24px; font-weight: 750; letter-spacing: -.01em; color: var(--p-tinta); white-space: nowrap; }
+.rv-der { margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 14px; color: var(--p-texto-2); font-weight: 600; white-space: nowrap; }
+.rv-enlace { padding: 0; border: 0; background: none; color: var(--p-verde-texto); font-weight: 750; font-size: 14px; cursor: pointer; }
+.rv-enlace:hover { text-decoration: underline; }
+.rv-ver-ventas { display: inline-flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: auto; padding-top: 8px; }
+.rv-pastilla { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 14px; font-weight: 650; background: var(--p-relleno); color: var(--p-texto-2); white-space: nowrap; }
+.rv-pastilla.urgente { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); }
+.rv-vacio-chico { font-size: 14px; line-height: 20px; color: var(--p-texto-2); font-weight: 500; }
+.rv-vacio-chico b { font-size: 22px; font-weight: 800; color: var(--p-texto-3); margin-right: 6px; vertical-align: -2px; }
+
+/* Vendido por hora. */
+.rv-leyendas { display: flex; align-items: center; gap: 12px; margin-left: 16px; font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.rv-ley { display: inline-flex; align-items: center; gap: 6px; }
+.rv-ley i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.rv-ley-hoy { background: var(--p-verde); }
+.rv-ley-antes { border: 1.5px dashed var(--p-borde-fuerte); }
+.rv-grafico { position: relative; height: 158px; display: grid; grid-template-columns: 56px 1fr; }
+.rv-eje { display: flex; flex-direction: column; justify-content: space-between; padding: 0 8px 26px 0; text-align: right; font-size: 14px; color: var(--p-texto-3); font-weight: 600; white-space: nowrap; }
+.rv-eje span { line-height: 0; }
+.rv-area { position: relative; }
+.rv-lineas { position: absolute; inset: 0 0 26px 0; display: flex; flex-direction: column; justify-content: space-between; }
+.rv-lineas span { border-top: 1px dashed var(--p-borde); }
+.rv-barras { position: absolute; inset: 0; display: grid; align-items: end; padding-bottom: 26px; }
+.rv-col { position: relative; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.rv-antes { position: absolute; bottom: 0; width: 28px; border-radius: 6px 6px 0 0; border: 1.5px dashed var(--p-borde-fuerte); border-bottom: 0; }
+.rv-hoy { position: relative; width: 20px; border-radius: 6px 6px 0 0; background: var(--p-verde); }
+.rv-col.ahora .rv-hoy { background: repeating-linear-gradient(135deg, var(--p-verde) 0 6px, var(--p-verde-2) 6px 12px); opacity: .55; }
+.rv-h { position: absolute; bottom: -26px; font-size: 14px; color: var(--p-texto-3); font-weight: 600; }
+.rv-globo { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); background: var(--p-tinta); color: #fff; font-size: 14px; font-weight: 750; padding: 3px 8px; border-radius: 8px; white-space: nowrap; }
+
+/* Cómo pagaron. */
+.rv-stack { display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 2px; margin: 2px 0 10px; }
+.rv-stack b { display: block; background: var(--medio); }
+.rv-stack .rv-stack-vacio { flex: 1; background: var(--p-relleno); }
+.rv-medios { display: grid; gap: 2px; }
+.rv-medios li { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 10px; height: 36px; white-space: nowrap; }
+.rv-medios .rv-medio-icono.medio-icono.con-fondo { width: 32px; height: 32px; }
+.rv-medio-nombre { font-weight: 700; font-size: 15px; color: var(--p-tinta); overflow: hidden; text-overflow: ellipsis; }
+.rv-medio-cuantas { font-size: 14px; color: var(--p-texto-3); font-weight: 600; }
+.rv-medio-importe { font-weight: 800; font-size: 16px; min-width: 88px; text-align: right; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+
+/* No llevaron, los gastos y el cierre de caja. */
+.rv-lista-simple { display: grid; gap: 8px; }
+.rv-lista-simple li { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 650; color: var(--p-tinta); white-space: nowrap; min-width: 0; }
+.rv-lista-simple li.ultima { color: var(--p-texto-2); }
+.rv-lista-simple svg { flex: none; }
+.rv-lista-nombre { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.rv-lista-simple .rv-pastilla { margin-left: auto; }
+.rv-renglones { display: grid; }
+.rv-renglones li { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--p-borde-suave); }
+.rv-renglones li:first-child { border-top: 0; }
+.rv-renglon-ico { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--p-relleno); color: var(--p-texto-2); }
+.rv-renglon-nombre { display: flex; flex-direction: column; min-width: 0; font-weight: 700; font-size: 15px; line-height: 20px; color: var(--p-tinta); }
+.rv-renglon-nombre small { font-weight: 500; font-size: 14px; color: var(--p-texto-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-renglon-importe { font-weight: 800; font-size: 15px; text-align: right; color: var(--p-tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rv-consultas { max-height: 320px; overflow-y: auto; }
+.rv-caja-va { font-size: 28px; font-weight: 800; letter-spacing: -.02em; color: var(--p-texto-3); line-height: 36px; }
+
+/* Compras e Inventario: lo que ya tenían, dentro de las mismas tarjetas. */
+.rv-otra > .tarjeta, .rv-otra .negocio-bloque, .rv-otra .tabla-marco { border-color: var(--p-borde); border-radius: 16px; }
+.rv-otra .negocio-bloque-cabeza h2 { font-size: 18px; line-height: 24px; font-weight: 750; }
+
+@media (max-width: 1180px) {
+  .rv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rv-fila-c, .rv-fila-d { grid-template-columns: minmax(0, 1fr); }
+  .rv-periodo { margin-left: 0; }
+}

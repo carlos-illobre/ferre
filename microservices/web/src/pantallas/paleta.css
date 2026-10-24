@@ -31,6 +31,8 @@
   --p-tinta: #1A1D1B;
   --p-texto-medio: #3A3E3B;
   --p-texto-2: #545955;
+  /* Lo menos importante (el «texto-3» de «Mostrador»); nunca menos de 14 px. */
+  --p-texto-3: #6B706B;
   --p-relleno: #ECE9E1;
   --p-relleno-fuerte: #E3DFD5;
   --p-naranja-apretado: #ffd9cb;

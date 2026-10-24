@@ -1,5 +1,5 @@
 import { IconoDeMedio } from "../../../IconoDeMedio";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { NOMBRES, TEXTOS } from "../../../textos";
 import { usePuede } from "../../../permisos";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
@@ -10,81 +10,205 @@ import { useSesion } from "../../../../sesion";
 import { MEDIOS, NOMBRE_DE_MEDIO as NOMBRE_MEDIO } from "../../../../negocio/ventas/venta";
 import type { VentasDelDia as DatosHoy } from "../../../../negocio/ventas/ventas-del-dia";
 import { irA } from "../rutas";
-import { useEsCelular } from "../vista";
-import { Aviso, Boton, EstadoDeConexion, Explicado, Icono, Indicador, Pagina, Pastilla, Vacio, pesosCortos } from "../ui";
+import { Aviso, Boton, EstadoDeConexion, Hoja, Pastilla, Pagina, pesosCortos } from "../ui";
 import { comoCarga, diaYHora, useEnLinea, type Carga } from "./negocio-comun";
 import { useConsultas, useVentasDelDia, type Consulta } from "../../../../negocio/ventas/ventas-del-dia";
 import { useGastosDeLaSemana, type Gastos } from "../../../../negocio/compras";
+import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../../../pestanas-de-negocio";
+import { IconoN, type IconoDeNegocio } from "../../../iconos-de-negocio";
+import { agruparNoLlevados, compararConElAnterior, pasosDeLoVendido, type Comparado } from "../../../../negocio/ventas/tablero";
+import { diaAnterior, nombreDelDia, porHora, resumenDelDia } from "../../../../negocio/ventas/resumen-del-dia";
+import { hoyLocal } from "../../../../negocio/ventas/ventas-del-dia";
 import "../estilos/negocio.css";
+import "../estilos/resumen.css";
 
 
-const CONSULTAS_A_LA_VISTA = 6;
+const CONSULTAS_A_LA_VISTA = 3;
 const plural = (n: number, uno: string, muchos: string) => `${n.toLocaleString("es-AR")} ${n === 1 ? uno : muchos}`;
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
+const RUTA_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "resumen", compras: "gastos", inventario: "invertido" };
+const ICONO_DE_SECCION: Record<SeccionDeNegocio, IconoDeNegocio> = { ventas: "chart-column", compras: "truck", inventario: "boxes" };
+const HORAS = ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
+const horaCorta = (d: Date) => d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
-// Cómo va el negocio, en tres secciones con su permiso cada una (decisión 95): Ventas (lo
-// vendido, por qué medio y lo que preguntaron y no llevaron), Compras (los gastos de la semana
-// y las compras recientes) e Inventario (el dinero invertido). Son pestañas de la opción de
-// Más; cada bloque carga por su cuenta y «Actualizar» vuelve a traer los de la sección.
+// Cómo va el negocio como la v2 (decisión 148): las secciones como segmentos con ícono, el
+// período a la derecha y, en Ventas, cuatro números con su comparación, lo vendido por hora,
+// cómo pagaron, lo más vendido, lo que no llevaron y el cierre de caja. Cada sección conserva su
+// permiso (decisión 95); lo que el sistema todavía no sabe queda en su lugar con «—» (021, E02).
 export function ResumenVentas() {
   const enLinea = useEnLinea();
   const puedeEsto = usePuede();
   const hoy = comoCarga(useVentasDelDia(), "No se pudieron traer las ventas de hoy");
+  const ayer = useVentasDelDia(diaAnterior(hoyLocal())).datos;
   const consultas = comoCarga(useConsultas(), "No se pudieron traer las consultas");
-  const hoyTexto = new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
-
-  const confirmadas = hoy.datos?.ventas.filter((v) => v.estado === "confirmada").length ?? 0;
-  const anuladas = hoy.datos ? hoy.datos.ventas.length - confirmadas : 0;
+  const ahora = new Date();
+  const r = hoy.datos ? resumenDelDia(hoy.datos.ventas) : null;
+  const comp = hoy.datos && ayer ? compararConElAnterior(hoy.datos.ventas, ayer.ventas, ahora.getHours() * 60 + ahora.getMinutes()) : null;
   const deHoy = consultas.datos?.filter((c) => esDeHoy(c.fecha)) ?? [];
+  const espera = textoDeEspera(hoy, enLinea);
 
   return (
-    <SeccionDelNegocio testId="resumen" bajada={`Hoy, ${hoyTexto}. ${TEXTOS.negocio.seccionVentas.largo}`} cargando={hoy.cargando || consultas.cargando} alActualizar={() => { hoy.recargar(); consultas.recargar(); }}>
-      <div className="indicadores">
-        <Indicador rotulo="Vendido hoy" icono="plata" color="ambar" testId="indicador-vendido"
-          valor={<Numero carga={hoy}>{hoy.datos && <Explicado valor={pesosCortos(hoy.datos.total)} etiqueta="Vendido hoy" titulo="De dónde sale lo vendido hoy" pasos={pasosDeVentas(hoy.datos, anuladas)} />}</Numero>}
-          detalle={hoy.datos ? (confirmadas === 0 ? "Todavía no se registraron ventas en el día" : "Suma de las ventas confirmadas") : textoDeEspera(hoy, enLinea)} />
-        <Indicador rotulo="Ventas de hoy" icono="ventas" testId="indicador-ventas"
-          valor={<Numero carga={hoy}>{confirmadas.toLocaleString("es-AR")}</Numero>}
-          detalle={hoy.datos ? (anuladas ? `${plural(anuladas, "anulada", "anuladas")}, que no ${anuladas === 1 ? "suma" : "suman"}` : "Ninguna anulada") : textoDeEspera(hoy, enLinea)} />
-        <Indicador rotulo="No llevaron hoy" icono="info" color={deHoy.length ? "rojo" : undefined} testId="indicador-consultas"
-          valor={<Numero carga={consultas}>{deHoy.length.toLocaleString("es-AR")}</Numero>}
-          detalle={consultas.datos ? (deHoy.length ? "Preguntaron el precio y no compraron" : "Nadie se fue sin comprar") : textoDeEspera(consultas, enLinea)} />
+    <SeccionDelNegocio seccion="ventas" testId="resumen" bajada={TEXTOS.negocio.seccionVentas.largo} cargando={hoy.cargando || consultas.cargando} datos={hoy.datos} alActualizar={() => { hoy.recargar(); consultas.recargar(); }}>
+      <div className="rv-kpis">
+        <Kpi principal icono="banknote" rotulo={TEXTOS.tablero.vendido.largo} testId="indicador-vendido"
+          pasos={hoy.datos ? pasosDeLoVendido(hoy.datos) : null} titulo="De dónde sale lo vendido hoy"
+          valor={<Numero carga={hoy}>{r && <Pesos valor={r.total} />}</Numero>}
+          comp={r ? <Comparacion c={comp?.vendido ?? null} pesos actual={r.total} /> : espera} />
+        <Kpi principal icono="trending-up" rotulo={TEXTOS.tablero.ganancia.largo} testId="indicador-ganancia"
+          valor={<span className="rv-sin-dato" title={TEXTOS.tablero.sinGanancia.largo}>—</span>}
+          comp={<><span className="rv-delta">—</span><span className="rv-comp-texto">{TEXTOS.tablero.sinGanancia.corto}</span></>} />
+        <Kpi icono="receipt" rotulo={TEXTOS.tablero.ventas.largo} testId="indicador-ventas"
+          valor={<Numero carga={hoy}>{r?.ventas.toLocaleString("es-AR")}</Numero>}
+          comp={r ? <Comparacion c={comp?.ventas ?? null} actual={r.ventas} /> : espera} />
+        <Kpi icono="shopping-bag" rotulo={TEXTOS.tablero.ticket.largo} testId="indicador-ticket"
+          valor={<Numero carga={hoy}>{r && (r.ticket === null ? <span className="rv-sin-dato">—</span> : <Pesos valor={r.ticket} />)}</Numero>}
+          comp={r ? (r.ticket === null ? <><span className="rv-delta">—</span>Sin ventas todavía</> : <Comparacion c={comp?.ticket ?? null} pesos actual={r.ticket} />) : espera} />
       </div>
 
-      <div className="resumen-columnas">
-        <section className="tarjeta negocio-bloque" data-testid="resumen-hoy" aria-labelledby="resumen-medios">
-          <header className="negocio-bloque-cabeza">
-            <h2 id="resumen-medios">Ventas de hoy por medio de pago</h2>
-            {hoy.datos && <span className="importe chico">{pesosCortos(hoy.datos.total)}</span>}
+      <div className="rv-fila-c">
+        <PorHora ventas={hoy.datos?.ventas ?? null} anteriores={ayer?.ventas ?? null} carga={hoy} />
+
+        <section className="rv-card" data-testid="resumen-hoy" aria-labelledby="resumen-medios">
+          <header className="rv-card-cab">
+            <h2 id="resumen-medios">{TEXTOS.tablero.comoPagaron.largo}</h2>
+            <span className="rv-der">ventas · importe</span>
           </header>
           <ErrorDeBloque carga={hoy} />
           {!hoy.datos && !hoy.error && <Esqueleto renglones={4} />}
-          {hoy.datos && (
-            <ul className="resumen-medios">
-              {MEDIOS.map((m) => {
-                const importe = hoy.datos!.totales[m] ?? 0;
-                const parte = hoy.datos!.total > 0 ? importe / hoy.datos!.total : 0;
-                return (
+          {hoy.datos && r && (
+            <>
+              <div className="rv-stack" aria-hidden="true">
+                {r.total > 0 ? MEDIOS.map((m) => r.medios[m].total > 0 && <b key={m} className={`medio-${m}`} style={{ flex: r.medios[m].total }} />) : <b className="rv-stack-vacio" />}
+              </div>
+              <ul className="rv-medios">
+                {MEDIOS.map((m) => (
                   <li key={m} data-testid={`medio-${m}`}>
-                    <IconoDeMedio medio={m} tam={18} conFondo className="resumen-medio-lugar" />
-                    <span className="resumen-medio-nombre">{NOMBRE_MEDIO[m]}</span>
-                    <span className="importe chico">{pesosCortos(importe)}</span>
-                    <span className="resumen-barra" aria-hidden="true"><i style={{ transform: `scaleX(${parte})` }} /></span>
-                    <span className="detalle resumen-parte">{hoy.datos!.total > 0 ? `${Math.round(parte * 100)} %` : "—"}</span>
+                    <IconoDeMedio medio={m} tam={18} conFondo className="rv-medio-icono" />
+                    <span className="rv-medio-nombre">{NOMBRE_MEDIO[m]} <span className="rv-medio-cuantas">· {r.medios[m].cuantas}</span></span>
+                    <span className="rv-medio-importe"><Pesos valor={r.medios[m].total} /></span>
                   </li>
-                );
-              })}
-            </ul>
+                ))}
+              </ul>
+            </>
           )}
-          <footer className="negocio-bloque-pie">
-            <span className="detalle">{hoy.datos ? `${plural(confirmadas, "venta", "ventas")} en el día` : ""}</span>
-            {puedeEsto("ventas.ver") && <Boton icono="ventas" onClick={() => irA("hoy")} data-testid="ver-ventas">Ver las ventas de hoy</Boton>}
-          </footer>
+          {puedeEsto("ventas.ver") && <button type="button" className="rv-enlace rv-ver-ventas" onClick={() => irA("hoy")} data-testid="ver-ventas">Ver las ventas de hoy <IconoN nombre="chevron-right" tam={16} /></button>}
         </section>
+      </div>
 
+      <div className="rv-fila-d">
+        <section className="rv-card" aria-labelledby="rv-top" data-testid="lo-mas-vendido">
+          <header className="rv-card-cab"><h2 id="rv-top">{TEXTOS.tablero.loMasVendido.largo}</h2><span className="rv-der">por dinero</span></header>
+          <p className="rv-vacio-chico"><b>—</b> {TEXTOS.tablero.sinLoMasVendido.largo}</p>
+        </section>
         <NoLlevaron consultas={consultas} deHoy={deHoy.length} />
+        <section className="rv-card" aria-labelledby="rv-caja" data-testid="cierre-de-caja">
+          <header className="rv-card-cab"><h2 id="rv-caja">{TEXTOS.tablero.caja.largo}</h2></header>
+          <div className="rv-caja-va">—</div>
+          <p className="rv-vacio-chico">{TEXTOS.tablero.sinCaja.largo}</p>
+        </section>
       </div>
     </SeccionDelNegocio>
+  );
+}
+
+// La comparación con ayer hasta la misma hora, como la v2: la pastilla con la flecha y el
+// porcentaje (verde si sube, roja si baja, gris si queda igual) y la diferencia con lo de ayer.
+function Comparacion({ c, actual, pesos, extra }: { c: Comparado | null; actual: number; pesos?: boolean; extra?: string }) {
+  const f = (n: number) => (pesos ? pesosCortos(n) : n.toLocaleString("es-AR"));
+  if (!c) return <><span className="rv-delta">—</span><span className="rv-comp-texto">{extra ?? "Trayendo lo de ayer…"}</span></>;
+  if (c.comparacion.sinVentas) return <><span className="rv-delta">—</span><span className="rv-comp-texto">{extra ?? TEXTOS.hoy.ayerSinVentas.largo}</span></>;
+  const p = c.comparacion.porcentaje;
+  const tipo = Math.abs(p) <= 1 ? "igual" : p > 0 ? "sube" : "baja";
+  const dif = actual - c.anterior;
+  const texto = `${dif >= 0 ? "+" : "−"}${f(Math.abs(dif))} · ayer: ${f(c.anterior)}`;
+  return (
+    <>
+      <span className={`rv-delta ${tipo}`}>{tipo !== "igual" && <IconoN nombre={p > 0 ? "arrow-up-right" : "arrow-down-right"} tam={16} />}{Math.abs(p)} %</span>
+      <span className="rv-comp-texto" title={extra ?? texto}>{extra ?? texto}</span>
+    </>
+  );
+}
+
+// Lo vendido por hora, como la v2: la barra de hoy en cada hora, la de ayer a la misma hora como
+// una raya punteada atrás, la hora de ahora rayada y la más alta con su importe en un globo.
+// Siempre de 8 a 19, y más si hubo ventas antes o después.
+function PorHora({ ventas, anteriores, carga }: { ventas: DatosHoy["ventas"] | null; anteriores: DatosHoy["ventas"] | null; carga: Carga<unknown> }) {
+  const ahora = new Date().getHours();
+  const hoyH = new Map((ventas ? porHora(ventas, ahora) : []).map((b) => [b.hora, b.total]));
+  const ayerH = new Map((anteriores ? porHora(anteriores) : []).map((b) => [b.hora, b.total]));
+  const todas = [...hoyH.keys(), ...ayerH.keys()].filter((h) => (hoyH.get(h) ?? 0) > 0 || (ayerH.get(h) ?? 0) > 0);
+  const desde = Math.min(8, ...todas), hasta = Math.max(19, ...todas);
+  const horas = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);
+  const max = Math.max(0, ...horas.map((h) => Math.max(hoyH.get(h) ?? 0, ayerH.get(h) ?? 0)));
+  const paso = escalon(max);
+  const tope = paso * 3;
+  const pico = horas.reduce<number | null>((m, h) => ((hoyH.get(h) ?? 0) > 0 && (m === null || (hoyH.get(h) ?? 0) > (hoyH.get(m) ?? 0)) ? h : m), null);
+  const alto = (v: number) => `${tope ? (v / tope) * 100 : 0}%`;
+  return (
+    <section className="rv-card" aria-labelledby="rv-por-hora" data-testid="vendido-por-hora">
+      <header className="rv-card-cab">
+        <h2 id="rv-por-hora">{TEXTOS.tablero.porHora.largo}</h2>
+        <span className="rv-leyendas"><span className="rv-ley"><i className="rv-ley-hoy" />{TEXTOS.hoy.hoy.largo}</span><span className="rv-ley"><i className="rv-ley-antes" />{TEXTOS.hoy.ayer.largo}</span></span>
+      </header>
+      <ErrorDeBloque carga={carga} />
+      <div className="rv-grafico">
+        <div className="rv-eje" aria-hidden="true">{[3, 2, 1, 0].map((i) => <span key={i}>{i === 0 ? "0" : miles(paso * i)}</span>)}</div>
+        <div className="rv-area">
+          <div className="rv-lineas" aria-hidden="true"><span /><span /><span /><span /></div>
+          <div className="rv-barras" style={{ gridTemplateColumns: `repeat(${horas.length}, 1fr)` }}>
+            {horas.map((h) => {
+              const v = hoyH.get(h) ?? 0, antes = ayerH.get(h) ?? 0;
+              return (
+                <div key={h} className={`rv-col ${h === ahora && ventas ? "ahora" : ""}`} data-testid="barra" role="img" aria-label={`${h} h: ${pesosCortos(v)}${antes ? `; ayer ${pesosCortos(antes)}` : ""}`}>
+                  {antes > 0 && <span className="rv-antes" style={{ height: alto(antes) }} />}
+                  {v > 0 && <span className="rv-hoy" style={{ height: alto(v) }}>{h === pico && <span className="rv-globo">{pesosCortos(v)}</span>}</span>}
+                  <span className="rv-h">{h}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// El escalón del eje: redondo y de modo que tres escalones cubran el máximo (60 mil para 63.000).
+function escalon(max: number): number {
+  if (max <= 0) return 10_000;
+  const crudo = max / 3;
+  const base = 10 ** Math.floor(Math.log10(crudo));
+  return [1, 2, 2.5, 5, 10].map((m) => m * base).find((v) => v * 3 >= max) ?? base * 10;
+}
+const miles = (n: number) => (n >= 1_000_000 ? `${(n / 1_000_000).toLocaleString("es-AR", { maximumFractionDigits: 1 })} M` : n >= 1000 ? `${(n / 1000).toLocaleString("es-AR", { maximumFractionDigits: 1 })} mil` : n.toLocaleString("es-AR"));
+
+// El «$» chico de la v2, delante del importe.
+function Pesos({ valor }: { valor: number }) {
+  const texto = pesosCortos(Math.abs(valor));
+  return <span className="rv-pesos" aria-label={`${valor < 0 ? "−" : ""}${texto}`}>{valor < 0 ? "−" : ""}<span className="rv-peso" aria-hidden="true">$</span><span aria-hidden="true">{texto.slice(1)}</span></span>;
+}
+
+// Un número de arriba: ícono y rótulo, el número grande y la comparación en una pastilla. Si el
+// número se explica, se toca (el número o la «i» de la esquina) y dice de dónde sale.
+function Kpi({ icono, rotulo, valor, comp, principal, pasos, titulo, testId }: { icono: IconoDeNegocio; rotulo: string; valor: ReactNode; comp: ReactNode; principal?: boolean; pasos?: string[] | null; titulo?: string; testId: string }) {
+  const [abierta, setAbierta] = useState(false);
+  return (
+    <div className={`rv-kpi ${principal ? "principal" : ""}`} data-testid={testId}>
+      <div className="rv-kpi-cab"><span className="rv-kpi-ico"><IconoN nombre={icono} tam={16} /></span><span className="rv-etiqueta">{rotulo}</span></div>
+      {pasos ? (
+        <>
+          <button type="button" className="rv-explica" aria-label={`${rotulo}. Ver de dónde sale`} aria-haspopup="dialog" onClick={() => setAbierta(true)} data-testid="explicacion">
+            <span className="rv-va">{valor}</span><span className="rv-explica-i"><IconoN nombre="info" tam={16} /></span>
+          </button>
+          {abierta && (
+            <Hoja titulo={titulo ?? `De dónde sale ${rotulo}`} alCerrar={() => setAbierta(false)} testId="hoja-explicacion" pie={<Boton variante="marino" onClick={() => setAbierta(false)}>Entendido</Boton>}>
+              <ol className="pasos">{pasos.map((p, i) => <li key={i}><span>{p}</span></li>)}</ol>
+            </Hoja>
+          )}
+        </>
+      ) : <div className="rv-va">{valor}</div>}
+      <div className="rv-comp">{comp}</div>
+    </div>
   );
 }
 
@@ -95,9 +219,9 @@ export function ResumenCompras({ recientes }: { recientes: (vuelta: number) => R
   const veGastos = puedeEsto("negocio.gastos");
   const [vuelta, setVuelta] = useState(0);
   return (
-    <SeccionDelNegocio testId="resumen-compras" bajada={TEXTOS.negocio.seccionCompras.largo} alActualizar={() => setVuelta((v) => v + 1)}>
+    <SeccionDelNegocio seccion="compras" testId="resumen-compras" bajada={TEXTOS.negocio.seccionCompras.largo} alActualizar={() => setVuelta((v) => v + 1)}>
       {veGastos && <GastosConSuNumero key={`gastos-${vuelta}`} />}
-      {puedeEsto("deposito.compras") && recientes(vuelta)}
+      {puedeEsto("deposito.compras") && <div className="rv-otra">{recientes(vuelta)}</div>}
     </SeccionDelNegocio>
   );
 }
@@ -109,10 +233,11 @@ function GastosConSuNumero() {
   const periodo = gastos.datos ? `del ${fecha(gastos.datos.desde).slice(0, 5)} al ${fecha(hasta).slice(0, 5)}` : "";
   return (
     <>
-      <div className="indicadores">
-        <Indicador rotulo="Gastos de la semana" icono="compras" testId="indicador-gastos"
-          valor={<Numero carga={gastos}>{gastos.datos && <Explicado valor={pesosCortos(gastos.datos.total)} etiqueta="Gastos de la semana" titulo="De dónde salen los gastos de la semana" pasos={pasosDeGastos(gastos.datos, periodo)} />}</Numero>}
-          detalle={gastos.datos ? `En compras, ${periodo}` : textoDeEspera(gastos, enLinea)} />
+      <div className="rv-kpis rv-kpis-uno">
+        <Kpi principal icono="truck" rotulo="Gastos de la semana" testId="indicador-gastos"
+          pasos={gastos.datos ? pasosDeGastos(gastos.datos, periodo) : null} titulo="De dónde salen los gastos de la semana"
+          valor={<Numero carga={gastos}>{gastos.datos && <Pesos valor={Number(gastos.datos.total)} />}</Numero>}
+          comp={gastos.datos ? `En compras, ${periodo}` : textoDeEspera(gastos, enLinea)} />
       </div>
       <GastosDeLaSemana gastos={gastos} periodo={periodo} />
     </>
@@ -123,22 +248,67 @@ function GastosConSuNumero() {
 export function ResumenInventario({ invertido }: { invertido: (vuelta: number) => ReactNode }) {
   const [vuelta, setVuelta] = useState(0);
   return (
-    <SeccionDelNegocio testId="resumen-inventario" bajada={TEXTOS.negocio.seccionInventario.largo} alActualizar={() => setVuelta((v) => v + 1)}>
-      {invertido(vuelta)}
+    <SeccionDelNegocio seccion="inventario" testId="resumen-inventario" bajada={TEXTOS.negocio.seccionInventario.largo} alActualizar={() => setVuelta((v) => v + 1)}>
+      <div className="rv-otra">{invertido(vuelta)}</div>
     </SeccionDelNegocio>
   );
 }
 
-// Lo común a las tres secciones: el título (que con las pestañas a la vista queda solo para
-// los lectores de pantalla), «Actualizar», el aviso sin conexión y, al pie, quién entró y
-// cómo está el servidor.
-function SeccionDelNegocio({ testId, bajada, cargando, alActualizar, children }: { testId: string; bajada: string; cargando?: boolean; alActualizar: () => void; children: ReactNode }) {
+// Lo común a las tres secciones, como la v2: arriba las secciones como segmentos con ícono (cada
+// una con su permiso; Resultado apagada hasta que exista) y, a la derecha, qué período cuenta y
+// Hoy · Semana · Mes (Semana y Mes apagados hasta que se calculen). Al lado de las pestañas,
+// «Actualizado» y «Actualizar» (F5). Abajo, chico, quién entró y cómo está el servidor.
+function SeccionDelNegocio({ seccion, testId, bajada, cargando, datos, alActualizar, children }: { seccion: SeccionDeNegocio; testId: string; bajada: string; cargando?: boolean; datos?: unknown; alActualizar: () => void; children: ReactNode }) {
   const { sesion } = useSesion();
+  const puedeEsto = usePuede();
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const enLinea = useEnLinea();
+  const [actualizado, setActualizado] = useState(() => new Date());
+  useEffect(() => { if (datos) setActualizado(new Date()); }, [datos]);
+  const actualizar = () => { if (enLinea && !cargando) { alActualizar(); setActualizado(new Date()); } };
+  const actualizarRef = useRef(actualizar);
+  actualizarRef.current = actualizar;
+  useEffect(() => {
+    const tecla = (e: KeyboardEvent) => { if (e.key === "F5" && !e.ctrlKey && !e.metaKey) { e.preventDefault(); actualizarRef.current(); } };
+    window.addEventListener("keydown", tecla);
+    return () => window.removeEventListener("keydown", tecla);
+  }, []);
+  const visibles = SECCIONES_DE_NEGOCIO.filter((s) => puedeEsto(...s.pide));
+  const ahora = new Date();
+  const dia = ahora.toLocaleDateString("es-AR", { weekday: "long" });
+  const diaYMes = ahora.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" });
+  const segmentos = useRef<HTMLDivElement>(null);
+  const moverse = (e: React.KeyboardEvent) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const i = visibles.findIndex((s) => s.valor === seccion);
+    const otra = visibles[(i + (e.key === "ArrowRight" ? 1 : visibles.length - 1)) % visibles.length];
+    e.preventDefault();
+    if (otra) irA(RUTA_DE_SECCION[otra.valor]);
+  };
+  useEffect(() => { if (segmentos.current?.contains(document.activeElement)) segmentos.current.querySelector<HTMLButtonElement>("[aria-current='page']")?.focus(); }, [seccion]);
   return (
-    <Pagina titulo={NOMBRES.comoVaElNegocio} testId={testId} bajada={bajada}
-      acciones={<AlLadoDeLasPestanas><Boton icono="repetir" onClick={alActualizar} disabled={!enLinea || cargando} data-testid="actualizar-negocio">Actualizar</Boton></AlLadoDeLasPestanas>}>
+    <Pagina titulo={NOMBRES.comoVaElNegocio} testId={testId} bajada={<span className="solo-lectores">{bajada}</span>} className="rv"
+      acciones={<AlLadoDeLasPestanas><span className="rv-actualizado">{TEXTOS.tablero.actualizado.largo} {horaCorta(actualizado)}</span><button type="button" className="rv-boton" onClick={actualizar} disabled={!enLinea || cargando} aria-keyshortcuts="F5" data-testid="actualizar-negocio"><IconoN nombre="refresh-cw" tam={16} />Actualizar <span className="rv-kbd">F5</span></button></AlLadoDeLasPestanas>}>
+      <div className="rv-barra">
+        {visibles.length > 1 && (
+          <div className="rv-segmentos rv-secciones" role="navigation" aria-label="Secciones" ref={segmentos} onKeyDown={moverse}>
+            {visibles.map((s) => (
+              <button key={s.valor} type="button" className={s.valor === seccion ? "elegido" : ""} aria-current={s.valor === seccion ? "page" : undefined} onClick={() => irA(RUTA_DE_SECCION[s.valor])} data-testid={`seccion-${s.valor}`}>
+                <IconoN nombre={ICONO_DE_SECCION[s.valor]} tam={16} />{s.nombre}
+              </button>
+            ))}
+            <button type="button" disabled title={TEXTOS.tablero.sinResultado.largo}><IconoN nombre="scale" tam={16} />{TEXTOS.tablero.resultado.largo}</button>
+          </div>
+        )}
+        {seccion === "ventas" && <div className="rv-periodo">
+          <div className="rv-compara"><b>{dia.charAt(0).toUpperCase() + dia.slice(1)} {diaYMes}, hasta las {horaCorta(actualizado)}</b><br />contra ayer, {nombreDelDia(diaAnterior(hoyLocal()))}, a la misma hora</div>
+          <div className="rv-segmentos" role="group" aria-label="Período">
+            <button type="button" className="elegido" aria-pressed="true">Hoy <span className="rv-seg-kbd">D</span></button>
+            <button type="button" disabled title={TEXTOS.tablero.sinPeriodo.largo}>Semana <span className="rv-seg-kbd">S</span></button>
+            <button type="button" disabled title={TEXTOS.tablero.sinPeriodo.largo}>Mes <span className="rv-seg-kbd">M</span></button>
+          </div>
+        </div>}
+      </div>
       {!enLinea && <Aviso tipo="alerta" testId="resumen-sin-conexion">Sin conexión: los números se ven cuando vuelva internet. Se actualizan solos.</Aviso>}
       {children}
       <footer className="resumen-pie">
@@ -148,13 +318,6 @@ function SeccionDelNegocio({ testId, bajada, cargando, alActualizar, children }:
       </footer>
     </Pagina>
   );
-}
-
-function pasosDeVentas(d: DatosHoy, anuladas: number): string[] {
-  const pasos = MEDIOS.filter((m) => (d.totales[m] ?? 0) > 0).map((m) => `${NOMBRE_MEDIO[m]}: ${pesos(d.totales[m])}`);
-  if (anuladas) pasos.push(`${plural(anuladas, "venta anulada", "ventas anuladas")}: no ${anuladas === 1 ? "suma" : "suman"}`);
-  if (!pasos.length) pasos.push("Todavía no se registraron ventas en el día");
-  return [...pasos, `Vendido hoy: ${pesos(d.total)}`];
 }
 
 function pasosDeGastos(g: Gastos, periodo: string): string[] {
@@ -181,94 +344,67 @@ function Esqueleto({ renglones }: { renglones: number }) {
 }
 
 function GastosDeLaSemana({ gastos, periodo }: { gastos: Carga<Gastos>; periodo: string }) {
-  const esCelular = useEsCelular();
   const filas = gastos.datos?.por_proveedor ?? [];
   return (
-    <section className="tarjeta negocio-bloque" data-testid="gastos-semana" aria-labelledby="resumen-gastos">
-      <header className="negocio-bloque-cabeza">
-        <h2 id="resumen-gastos">Gastos de la semana</h2>
-        {gastos.datos && <span className="importe chico">{pesosCortos(gastos.datos.total)}</span>}
-        {gastos.datos && <p className="detalle">Lo comprado a cada proveedor, {periodo}.</p>}
+    <section className="rv-card" data-testid="gastos-semana" aria-labelledby="resumen-gastos">
+      <header className="rv-card-cab">
+        <h2 id="resumen-gastos">Lo comprado a cada proveedor</h2>
+        {gastos.datos && <span className="rv-der">{periodo}</span>}
       </header>
       <ErrorDeBloque carga={gastos} />
       {!gastos.datos && !gastos.error && <Esqueleto renglones={3} />}
-      {gastos.datos && filas.length === 0 && <p className="negocio-bloque-vacio">En la semana no se registraron compras.</p>}
-      {filas.length > 0 && (esCelular ? (
-        <ul className="negocio-renglones">
+      {gastos.datos && filas.length === 0 && <p className="rv-vacio-chico">En la semana no se registraron compras.</p>}
+      {filas.length > 0 && (
+        <ul className="rv-renglones">
           {filas.map((g) => (
-            <li key={g.proveedor} className="renglon">
-              <span className="nombre">{g.proveedor}</span>
-              <span className="importe chico">{pesosCortos(g.total)}</span>
-              <span className="detalle">{plural(Number(g.compras), "compra", "compras")}</span>
+            <li key={g.proveedor}>
+              <span className="rv-renglon-ico"><IconoN nombre="truck" tam={16} /></span>
+              <span className="rv-renglon-nombre">{g.proveedor}<small>{plural(Number(g.compras), "compra", "compras")}</small></span>
+              <span className="rv-renglon-importe"><Pesos valor={Number(g.total)} /></span>
             </li>
           ))}
         </ul>
-      ) : (
-        <table className="tabla negocio-tabla">
-          <thead><tr><th scope="col">Proveedor</th><th scope="col" className="num">Compras</th><th scope="col" className="num">Total</th></tr></thead>
-          <tbody>
-            {filas.map((g) => (
-              <tr key={g.proveedor}>
-                <td className="nombre">{g.proveedor}</td>
-                <td className="num">{Number(g.compras).toLocaleString("es-AR")}</td>
-                <td className="num"><span className="importe chico">{pesosCortos(g.total)}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ))}
+      )}
     </section>
   );
 }
 
-// Lo que preguntaron y no compraron: demanda que hoy se pierde. Se anota en Vender con «No llevó».
+// Lo que preguntaron y no compraron, agrupado como la v2 («Disco de corte × 3»): demanda que hoy
+// se pierde. Se anota en Vender con «No llevó». «Ver las N» abre cada consulta, con cuándo, el
+// precio que se dijo y el motivo.
 function NoLlevaron({ consultas, deHoy }: { consultas: Carga<Consulta[]>; deHoy: number }) {
-  const esCelular = useEsCelular();
   const [todas, setTodas] = useState(false);
   const lista = consultas.datos ?? [];
-  const visibles = todas ? lista : lista.slice(0, CONSULTAS_A_LA_VISTA);
+  const grupos = agruparNoLlevados(lista);
   return (
-    <section className="tarjeta negocio-bloque" data-testid="consultas" aria-labelledby="resumen-consultas">
-      <header className="negocio-bloque-cabeza">
-        <h2 id="resumen-consultas">Preguntaron y no llevaron</h2>
-        {consultas.datos && lista.length > 0 && <Pastilla tipo={deHoy ? "alerta" : undefined} sinPunto>{deHoy ? `${deHoy} hoy` : "Ninguna hoy"}</Pastilla>}
-        <p className="detalle">Lo que se anota en Vender con «No llevó»: sirve para ver qué falta o qué está caro.</p>
+    <section className="rv-card" data-testid="consultas" aria-labelledby="resumen-consultas">
+      <header className="rv-card-cab">
+        <h2 id="resumen-consultas">{TEXTOS.tablero.noLlevaron.largo}</h2>
+        {consultas.datos && <span className={`rv-pastilla ${deHoy ? "urgente" : ""}`} title="Hoy">{deHoy ? `${deHoy} hoy` : "Ninguna hoy"}</span>}
+        {lista.length > CONSULTAS_A_LA_VISTA && <span className="rv-der"><button type="button" className="rv-enlace" aria-expanded={todas} onClick={() => setTodas((t) => !t)}>{todas ? "Ver menos" : `Ver las ${lista.length}`}</button></span>}
       </header>
       <ErrorDeBloque carga={consultas} />
       {!consultas.datos && !consultas.error && <Esqueleto renglones={3} />}
-      {consultas.datos && lista.length === 0 && (
-        <Vacio icono="info" titulo="Todavía no hay consultas anotadas">Cuando alguien pregunta un precio y no compra, tocá «No llevó» en Vender y queda anotado acá.</Vacio>
-      )}
-      {visibles.length > 0 && (esCelular ? (
-        <ul className="negocio-renglones">
-          {visibles.map((c) => (
-            <li key={c.id} className="renglon" data-testid="consulta">
-              <span className="nombre">{c.descripcion}</span>
-              <span className="importe chico">{c.precio_ofrecido ? pesosCortos(c.precio_ofrecido) : "—"}</span>
-              <span className="detalle">{diaYHora(c.fecha)}{c.motivo ? ` · ${c.motivo}` : ""}</span>
+      {consultas.datos && lista.length === 0 && <p className="rv-vacio-chico">Cuando alguien pregunta un precio y no compra, tocá «No llevó» en Vender y queda anotado acá.</p>}
+      {!todas && grupos.length > 0 && (
+        <ul className="rv-lista-simple">
+          {grupos.slice(0, CONSULTAS_A_LA_VISTA).map((g, i) => (
+            <li key={g.descripcion} className={i === CONSULTAS_A_LA_VISTA - 1 ? "ultima" : ""} data-testid="consulta">
+              <IconoN nombre="package" tam={16} /><span className="rv-lista-nombre">{g.descripcion}</span><span className="rv-pastilla">× {g.veces}</span>
             </li>
           ))}
         </ul>
-      ) : (
-        <table className="tabla negocio-tabla">
-          <thead><tr><th scope="col" className="angosta">Cuándo</th><th scope="col">Qué preguntaron</th><th scope="col" className="num">Precio que se dijo</th><th scope="col">Motivo</th></tr></thead>
-          <tbody>
-            {visibles.map((c) => (
-              <tr key={c.id} data-testid="consulta">
-                <td className="angosta">{diaYHora(c.fecha)}</td>
-                <td className="nombre">{c.descripcion}</td>
-                <td className="num">{c.precio_ofrecido ? <span className="importe chico">{pesosCortos(c.precio_ofrecido)}</span> : <span className="detalle">Sin precio</span>}</td>
-                <td className={c.motivo ? "" : "detalle"}>{c.motivo ?? "No se anotó"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ))}
-      {lista.length > CONSULTAS_A_LA_VISTA && (
-        <footer className="negocio-bloque-pie">
-          <span className="detalle">{todas ? `Las últimas ${lista.length}` : `${CONSULTAS_A_LA_VISTA} de ${lista.length}`}</span>
-          <Boton aria-expanded={todas} onClick={() => setTodas((t) => !t)}>{todas ? "Ver menos" : `Ver las ${lista.length}`}</Boton>
-        </footer>
+      )}
+      {todas && (
+        <ul className="rv-renglones rv-consultas">
+          {lista.map((c) => (
+            <li key={c.id} data-testid="consulta">
+              <span className="rv-renglon-ico"><IconoN nombre="package" tam={16} /></span>
+              <span className="rv-renglon-nombre">{c.descripcion}<small>{diaYHora(c.fecha)} · {c.motivo ?? "No se anotó el motivo"}</small></span>
+              <span className="rv-renglon-importe">{c.precio_ofrecido ? <Pesos valor={Number(c.precio_ofrecido)} /> : <span className="rv-sin-dato">Sin precio</span>}</span>
+            </li>
+          ))}
+        </ul>
       )}
     </section>
   );

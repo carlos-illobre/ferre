@@ -55,6 +55,40 @@ tres secciones, cada una con su permiso (decisión 95; el detalle, en
   «Hoy» y «Anular» de Vender (decisión 72). En la computadora, «Ver las ventas de hoy» lleva
   a la pestaña «Hoy».
 
+### Cómo se ve: la v2 (decisión 148, 2026-10-24)
+
+La pantalla tiene el diseño de la v2 del director de arte («Tablero por secciones» en la
+computadora, «Tablero» en el celular), con el lenguaje «Mostrador». Lo que la v2 muestra y el
+sistema todavía no sabe queda en su lugar, vacío o con «—», hasta que se programe (021, E02).
+
+- **Arriba:** las secciones como segmentos con ícono (Ventas, Compras, Inventario y
+  Resultado), cada una con su permiso; Resultado (RF-64) se ve apagada hasta que exista. En
+  Ventas, a la derecha, el período (Hoy, Semana y Mes, con las teclas D, S y M en la
+  computadora) y qué compara: «Sábado 24/10, hasta las 19:12 / contra ayer, viernes 23/10, a la
+  misma hora». Semana y Mes se ven apagados hasta que se calculen. En la computadora,
+  «Actualizado 19:12» y «Actualizar» con F5.
+- **La comparación** es con ayer hasta la misma hora, como en «Ventas del día» (decisión 111):
+  la v2 compara con el mismo día de la semana pasada, pero esa regla no está decidida. Va en una
+  pastilla verde si sube, roja si baja y gris si queda igual, con la diferencia y lo de ayer.
+- **Ventas, en la computadora:** cuatro números en una fila: Vendido (se toca y dice de dónde
+  sale), Ganancia («—» hasta que se calcule), Ventas y Ticket promedio (lo vendido dividido las
+  ventas confirmadas), cada uno con su comparación. Debajo, «Vendido por hora» (la barra de hoy
+  en cada hora, de 8 a 19 o más si hubo ventas antes o después; lo de ayer a esa hora como una
+  barra punteada atrás; la hora de ahora rayada y la más alta con su importe) y «Cómo pagaron»:
+  una barra con el color de cada medio (decisión 108) y cada medio con su cantidad de ventas y su
+  importe, y «Ver las ventas de hoy». Abajo, «Lo más vendido hoy» (RF-61, «—» hasta que exista),
+  «No llevaron» (lo preguntado, agrupado, con cuántas veces y una pastilla con las de hoy; «Ver
+  las N» muestra cada consulta con cuándo, el motivo y el precio que se dijo) y «Cierre de caja»
+  (RF-62, «—» hasta que exista).
+- **Ventas, en el celular:** los mismos datos con las palabras cortas: la tarjeta grande
+  «Vendido hoy» con su comparación y las horas en barras, una grilla de dos por dos con Ganancia,
+  Ventas, Ticket promedio y Caja, «Cómo pagaron» con la barra de colores y los cuatro medios,
+  «Lo más vendido hoy» y «No llevaron».
+- **Compras e Inventario** usan las mismas piezas: tarjetas blancas con su título, el número
+  de la sección arriba y su detalle en renglones.
+- **Al pie**, chico: quién entró, la conexión y cómo está el servidor (y la versión en el
+  ambiente de prueba).
+
 ## Historia 1: gasto de la semana (Comprador; RF-65)
 
 **Qué tiene que poder hacer el Comprador**

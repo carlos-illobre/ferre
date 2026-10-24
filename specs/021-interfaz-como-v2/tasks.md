@@ -32,3 +32,8 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Stock (computadora): «Exportar a Excel», «Etiquetas» (Alt E) y la etiqueta de un producto (la impresora del panel), apagados.
 - Stock (computadora y celular): la cuenta de «Qué pedir» («28», «a 4 proveedores»); el botón lleva a Pedidos.
 - Stock (celular): deslizar un renglón para «Etiqueta» y «Corregir»; corregir se hace tocando el producto.
+- Cómo va el negocio: la ganancia del día y su porcentaje («—»).
+- Cómo va el negocio: Semana y Mes en el período (apagados) y la sección Resultado (apagada).
+- Cómo va el negocio: lo más vendido del día con foto y posición (RF-61, «—»).
+- Cómo va el negocio: el cierre de caja con lo contado, lo esperado y la diferencia (RF-62, «—»).
+- Cómo va el negocio: la v2 compara con el mismo día de la semana pasada; quedó con ayer a la misma hora (decisión 111) hasta que Carlos decida.
