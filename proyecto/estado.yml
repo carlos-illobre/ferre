@@ -141,7 +141,7 @@ RF-10:
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/pantallas/celular/Catalogo.test.tsx
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/api/src/rutas/productos.test.ts
     - microservices/api/src/precios.test.ts
   defectos:
@@ -165,7 +165,7 @@ RF-12:
   estado: "Hecho"
   pruebas:
     - microservices/api/src/rutas/productos.test.ts
-    - microservices/web/src/unidades.test.ts
+    - microservices/web/src/negocio/catalogo/unidades.test.ts
     - microservices/web/src/pantallas/celular/Vender.test.tsx
   defectos: []
 
@@ -231,8 +231,8 @@ RF-20:
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - microservices/web/src/pantallas/celular/Vender.test.tsx
-    - microservices/web/src/unidades.test.ts
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/negocio/catalogo/unidades.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/api/src/precios.test.ts
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/.dependency-cruiser.cjs
@@ -607,7 +607,7 @@ RF-70:
     - microservices/api/src/rutas/entrar-con-google.test.ts
     - microservices/api/src/autenticacion.test.ts
     - microservices/web/src/pantallas/entrar-simulado.test.tsx
-    - microservices/web/src/sesion.test.tsx
+    - microservices/web/src/datos/sesion/sesion.test.tsx
     - docs/pruebas-manuales/entrar.md
   defectos:
     - "El límite de intentos de entrada (10 por minuto con Google, 20 con la huella) no tiene prueba"
@@ -694,7 +694,7 @@ RF-77:
 RF-83:
   estado: "Hecho (009-T001): pantalla Configuración en Más, en celular y computadora, con la opción de las animaciones"
   pruebas:
-    - microservices/web/src/preferencias.test.tsx
+    - microservices/web/src/datos/almacenamiento/preferencias.test.tsx
     - tests/e2e/celular/13-roles.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts
   defectos:
@@ -704,7 +704,7 @@ RF-83:
 RF-84:
   estado: "Hecho (009-T002, 018-T007): el guardado para trabajar sin conexión se elige en Configuración, en el celular (arranca deshabilitado) y en la computadora (arranca habilitado)"
   pruebas:
-    - microservices/web/src/guardado.test.tsx
+    - microservices/web/src/datos/almacenamiento/guardado.test.tsx
     - tests/e2e/celular/08-sin-conexion.spec.ts
   defectos:
     - "No está medido en un teléfono cuánto tarda en abrir ni cuántos datos gasta bajar el catálogo a la memoria con los 11.000 productos reales"
@@ -717,7 +717,7 @@ RF-84:
 RF-85:
   estado: "Hecho (009-T007), fuera de esta etapa: se sacó (decisión 138); Configuración ya no muestra «Cómo buscar productos»"
   pruebas:
-    - microservices/web/src/guardado.test.tsx
+    - microservices/web/src/datos/almacenamiento/guardado.test.tsx
   defectos: []
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
@@ -748,8 +748,8 @@ RF-74:
     - microservices/web/src/pantallas/acceso-de-usuarios.test.tsx
     - microservices/api/src/rutas/sesiones.test.ts
     - microservices/api/src/rutas/usuarios.test.ts
-    - microservices/web/src/sesion.test.tsx
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/sesion/sesion.test.tsx
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
   defectos:
     - "El vencimiento de la sesión a los 90 días y su renovación con el uso no tienen prueba"
 
@@ -785,7 +785,7 @@ RF-108:
   estado: "A validar (015): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
     - microservices/web/src/negocio/ventas/venta-en-curso.test.tsx
-    - microservices/web/src/sesion.test.tsx
+    - microservices/web/src/datos/sesion/sesion.test.tsx
     - microservices/web/src/pantallas/celular/Catalogo.para-vender.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx
     - tests/e2e/celular/17-espejo.spec.ts
@@ -929,7 +929,7 @@ RNF-03:
 RNF-04:
   estado: "Hecho en parte: se aparta de la regla en 2 puntos"
   pruebas:
-    - microservices/web/src/vista.test.ts
+    - microservices/web/src/app/vista.test.ts
     - tests/e2e/celular/00-arranque.spec.ts
   defectos:
     - "La letra mínima de 18 px del sistema visual no se cumple en el celular: la base es de 16 px y hay textos de 11 a 15 px"
@@ -939,7 +939,7 @@ RNF-04:
 RNF-05:
   estado: "A validar por Carlos en la notebook"
   pruebas:
-    - microservices/web/src/vista.test.ts
+    - microservices/web/src/app/vista.test.ts
     - tests/e2e/escritorio/00-arranque.spec.ts
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
     - tests/e2e/escritorio/04-vender.spec.ts
@@ -973,7 +973,7 @@ RNF-07:
 RNF-08:
   estado: "Nuevo, sin probar"
   pruebas:
-    - microservices/web/src/catalogo.test.tsx
+    - microservices/web/src/negocio/catalogo/catalogo.test.tsx
   defectos:
     - "La carga del catálogo (primeros al instante, el resto de fondo, una sola vez para toda la app) no está medida en un celular con el catálogo real de once mil productos"
     - "Sin prueba con más de 100.000 artículos: la búsqueda se mide con 50.000"
@@ -992,7 +992,7 @@ RNF-10:
   pruebas:
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/.dependency-cruiser.cjs
     - microservices/api/src/sql-con-parametros.test.ts
@@ -1005,7 +1005,7 @@ RNF-10:
 RNF-11:
   estado: "Hecho"
   pruebas:
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/web/src/negocio/ventas/venta.test.tsx
   defectos:
     - "Sin prueba: que una venta quede en espera y se reintente cuando el servidor responde con un error propio"
@@ -1041,7 +1041,7 @@ RNF-20:
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/api/src/rutas/ventas.test.ts
     - microservices/api/.dependency-cruiser.cjs
     - microservices/api/src/sql-con-parametros.test.ts
@@ -1164,7 +1164,7 @@ RNF-53:
 RNF-54:
   estado: "Hecho"
   pruebas:
-    - microservices/web/src/ambiente.test.ts
+    - microservices/web/src/plataforma/ambiente/ambiente.test.ts
   defectos:
     - "Sin prueba: que la barra titile y muestre la leyenda en pruebas, y que no la muestre en producción"
 
@@ -1201,8 +1201,8 @@ RNF-60:
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
     - microservices/web/src/plataforma/teclado/teclas.test.tsx
-    - microservices/web/src/guardado.test.tsx
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/guardado.test.tsx
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/web/src/negocio/ventas/venta.test.tsx
     - microservices/web/src/negocio/ventas/ventas-del-dia.test.tsx
     - microservices/web/src/negocio/deposito/ingreso.test.tsx
@@ -1354,7 +1354,7 @@ RF-102:
   pruebas:
     - microservices/api/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
     - tests/e2e/celular/19-para-revisar.spec.ts
 
@@ -1363,7 +1363,7 @@ RF-103:
   pruebas:
     - microservices/api/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
     - tests/e2e/celular/19-para-revisar.spec.ts
 
@@ -1372,7 +1372,7 @@ RF-104:
   pruebas:
     - microservices/api/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
     - tests/e2e/celular/19-para-revisar.spec.ts
 
@@ -1381,7 +1381,7 @@ RF-105:
   pruebas:
     - microservices/api/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
-    - microservices/web/src/cola.test.ts
+    - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
     - tests/e2e/celular/19-para-revisar.spec.ts
 
@@ -1397,7 +1397,7 @@ RF-122:
   estado: "A validar (018): cada pantalla pide al servidor lo que muestra, de a 50; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
     - microservices/api/src/rutas/productos.test.ts
-    - microservices/web/src/catalogo.test.tsx
+    - microservices/web/src/negocio/catalogo/catalogo.test.tsx
     - microservices/web/src/pantallas/celular/Catalogo.test.tsx
     - microservices/web/src/negocio/deposito/inventario.test.tsx
   defectos:
@@ -1406,9 +1406,9 @@ RF-122:
 RF-123:
   estado: "A validar (018): sin conexión se busca con lo bajado a mano; sin eso, lo dice"
   pruebas:
-    - microservices/web/src/catalogo.test.tsx
-    - microservices/web/src/descarga.test.tsx
-    - microservices/web/src/guardado.test.tsx
+    - microservices/web/src/negocio/catalogo/catalogo.test.tsx
+    - microservices/web/src/datos/almacenamiento/descarga.test.tsx
+    - microservices/web/src/datos/almacenamiento/guardado.test.tsx
   defectos: []
 
 RF-124:
