@@ -14,6 +14,11 @@ export const base = new Kysely<DB>({ dialect: new PostgresDialect({ pool: pool a
 // La base simulada de las pruebas de rutas no devuelve filas: entonces vale 0.
 export const numero = <C extends string>(filas: Record<C, unknown>[], clave: C): number => filas.reduce<number>((_, f) => Number(f[clave]), 0);
 
+// De qué instalación de PostgreSQL es la base (su `system_identifier`): cambia con cada base nueva
+// o restaurada de un volcado, y con ella cambian los números de transacción (022-E23).
+export const identificadorDeLaBase = () =>
+  sql<{ id: string }>`SELECT system_identifier::text AS id FROM pg_control_system()`.execute(base).then((r) => r.rows.map((f) => f.id).join());
+
 // Cierra las conexiones: al terminar un comando o las pruebas.
 export const cerrar = () => conexiones.pool.end();
 

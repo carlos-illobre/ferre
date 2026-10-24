@@ -1,7 +1,7 @@
 import { sql } from "kysely";
 import pg from "pg";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { base, baseResponde, escuchar, esperarLaBase } from "./conexion.js";
+import { base, baseResponde, escuchar, esperarLaBase, identificadorDeLaBase } from "./conexion.js";
 import * as conexiones from "./pool.js";
 
 // 022-E05: la salud sabe si la base responde; el arranque espera a la base.
@@ -12,6 +12,10 @@ describe("la conexión", () => {
     expect(await baseResponde()).toBe(true);
     vi.spyOn(conexiones.pool, "connect").mockRejectedValueOnce(new Error("sin base") as never);
     expect(await baseResponde()).toBe(false);
+  });
+
+  it("022-E23: dice de qué instalación de PostgreSQL es la base", async () => {
+    expect(await identificadorDeLaBase()).toMatch(/^\d+$/);
   });
 
   it("espera a la base con reintentos, y pasados los intentos es un error", async () => {

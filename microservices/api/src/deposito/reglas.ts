@@ -3,7 +3,7 @@ import { anotarEvento } from "../persistencia/eventos.js";
 import * as datos from "../persistencia/deposito.js";
 import type { FilaDeStock } from "../persistencia/deposito.js";
 import * as copia from "../productos/copia.js";
-import { marcaValida } from "../productos/reglas.js";
+import { marcaParaDispositivo, marcaValida } from "../productos/reglas.js";
 import type { Movimiento, Stock, StockAjustado, StockQueCambio } from "../contratos/stock.js";
 import type { Enviable } from "../enviable.js";
 
@@ -34,7 +34,10 @@ export async function stockConValor(veElDineroInvertido: boolean): Promise<Envia
 }
 
 // GET /stock/cambios?marca= (specs/018, historia 5): el stock que cambió desde la descarga anterior.
-export const stockQueCambio = (marca: string | undefined): Promise<StockQueCambio> => datos.stockQueCambio(marcaValida(marca));
+export async function stockQueCambio(marca: string | undefined): Promise<StockQueCambio> {
+  const cambio = await datos.stockQueCambio(marcaValida(marca));
+  return { ...cambio, marca: marcaParaDispositivo(cambio.marca) };
+}
 
 export const movimientos = (productoId: string): Promise<Enviable<Movimiento>[]> => datos.movimientosDe(base, productoId);
 

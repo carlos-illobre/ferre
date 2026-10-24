@@ -15,18 +15,20 @@ const prod = (id: string, extra: any = {}) => ({ id, descripcion: id.toUpperCase
 const pedidos = () => apiFalsa.mock.calls.map((c) => String(c[0]));
 const COMPUTADORA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36";
 
-// El servidor de mentira: 3 productos de a 2 la primera vez; con marca, lo que cambió.
+// El servidor de mentira: 3 productos de a 2 la primera vez; con marca, lo que cambió. Las marcas
+// dicen de qué base son (022-E23).
 const calculo = { version: "1" };
+const deLaBase = { id: "base" };
 function servidor(cambios: { productos: any[]; quitados: string[] } | null = null) {
   apiFalsa.mockImplementation(async (ruta: string) => {
     const q = new URL(ruta, "http://x").searchParams;
     if (ruta === "/productos/resumen") return { productos: 3, sin_margen: 0 };
     if (ruta.startsWith("/productos/descarga")) {
-      const c = calculo.version;
-      if (q.get("marca")) return { productos: cambios?.productos ?? [], quitados: cambios?.quitados ?? [], hay_mas: false, siguiente: null, marca: "200", calculo: c };
-      return q.get("desde") ? { productos: [prod("c")], quitados: [], hay_mas: false, siguiente: "c", marca: "101", calculo: c } : { productos: [prod("a"), prod("b")], quitados: [], hay_mas: true, siguiente: "b", marca: "100", calculo: c };
+      const [c, b] = [calculo.version, deLaBase.id];
+      if (q.get("marca")) return { productos: cambios?.productos ?? [], quitados: cambios?.quitados ?? [], hay_mas: false, siguiente: null, marca: `${b}.200`, calculo: c };
+      return q.get("desde") ? { productos: [prod("c")], quitados: [], hay_mas: false, siguiente: "c", marca: `${b}.101`, calculo: c } : { productos: [prod("a"), prod("b")], quitados: [], hay_mas: true, siguiente: "b", marca: `${b}.100`, calculo: c };
     }
-    if (ruta.startsWith("/stock/cambios")) return q.get("marca") ? { marca: "210", stock: { b: "9" } } : { marca: "110", stock: { a: "3", b: "1" } };
+    if (ruta.startsWith("/stock/cambios")) return q.get("marca") ? { marca: `${deLaBase.id}.210`, stock: { b: "9" } } : { marca: `${deLaBase.id}.110`, stock: { a: "3", b: "1" } };
     if (ruta === "/clientes") return [{ id: "cl", nombre: "Constructora" }];
     throw new Error(`inesperado: ${ruta}`);
   });
@@ -34,7 +36,7 @@ function servidor(cambios: { productos: any[]; quitados: string[] } | null = nul
 
 beforeEach(async () => {
   Object.defineProperty(navigator, "userAgent", { value: COMPUTADORA, configurable: true });
-  calculo.version = "1"; localStorage.clear(); recargarPreferencias(); olvidarLaDescarga(); apiFalsa.mockReset().mockResolvedValue([]);
+  calculo.version = "1"; deLaBase.id = "base"; localStorage.clear(); recargarPreferencias(); olvidarLaDescarga(); apiFalsa.mockReset().mockResolvedValue([]);
   cambiarPreferencia("sinConexion", false); await respetarElGuardado(); // empieza sin nada guardado
   cambiarPreferencia("sinConexion", true);
 });
@@ -45,7 +47,7 @@ describe("bajar los datos para trabajar sin conexión", () => {
     await descargar();
     expect(pedidos()).toEqual(["/productos/resumen", "/productos/descarga?limite=500", "/productos/descarga?limite=500&desde=b", "/stock/cambios", "/clientes"]);
     expect((await leerTodo<{ id: string }>("catalogo")).map((p) => p.id).sort()).toEqual(["a", "b", "c"]);
-    expect(await leerMeta("descarga")).toMatchObject({ productos: "100", stock: "110", cuantos: 3 });
+    expect(await leerMeta("descarga")).toMatchObject({ productos: "base.100", stock: "base.110", cuantos: 3 });
     const b = await loBajado();
     expect(b?.stock.get("a")).toBe(3);
     expect(b?.clientes).toHaveLength(1);
@@ -56,11 +58,11 @@ describe("bajar los datos para trabajar sin conexión", () => {
     await descargar();
     apiFalsa.mockClear();
     await descargar();
-    expect(pedidos()).toEqual(["/productos/descarga?limite=500&marca=100", "/stock/cambios?marca=110", "/clientes"]);
+    expect(pedidos()).toEqual(["/productos/descarga?limite=500&marca=base.100", "/stock/cambios?marca=base.110", "/clientes"]);
     const productos = await leerTodo<{ id: string; margen_elegido: number | null }>("catalogo");
     expect(productos.map((p) => p.id).sort()).toEqual(["b", "c", "d"]);
     expect(productos.find((p) => p.id === "b")?.margen_elegido).toBe(50);
-    expect(await leerMeta("descarga")).toMatchObject({ productos: "200", stock: "210", cuantos: 3 });
+    expect(await leerMeta("descarga")).toMatchObject({ productos: "base.200", stock: "base.210", cuantos: 3 });
     expect((await loBajado())?.stock.get("b")).toBe(9);
   });
 
@@ -70,9 +72,21 @@ describe("bajar los datos para trabajar sin conexión", () => {
     calculo.version = "2";
     apiFalsa.mockClear();
     await descargar();
-    expect(pedidos().filter((r) => r.startsWith("/productos/descarga"))).toEqual(["/productos/descarga?limite=500&marca=100", "/productos/descarga?limite=500", "/productos/descarga?limite=500&desde=b"]);
+    expect(pedidos().filter((r) => r.startsWith("/productos/descarga"))).toEqual(["/productos/descarga?limite=500&marca=base.100", "/productos/descarga?limite=500", "/productos/descarga?limite=500&desde=b"]);
     expect((await leerTodo<{ id: string }>("catalogo")).map((p) => p.id).sort()).toEqual(["a", "b", "c"]);
-    expect(await leerMeta("descarga")).toMatchObject({ productos: "100", calculo: "2", cuantos: 3 });
+    expect(await leerMeta("descarga")).toMatchObject({ productos: "base.100", calculo: "2", cuantos: 3 });
+  });
+
+  it("022-E23: si la base es otra, «Actualizar» no usa la marca vieja: baja todo de nuevo, también el stock", async () => {
+    servidor({ productos: [], quitados: [] });
+    await descargar();
+    await guardar("catalogo", prod("de-la-otra-base"));
+    deLaBase.id = "nueva";
+    apiFalsa.mockClear();
+    await descargar();
+    expect(pedidos()).toEqual(["/productos/descarga?limite=500&marca=base.100", "/productos/descarga?limite=500", "/productos/descarga?limite=500&desde=b", "/stock/cambios", "/clientes"]);
+    expect((await leerTodo<{ id: string }>("catalogo")).map((p) => p.id).sort()).toEqual(["a", "b", "c"]);
+    expect(await leerMeta("descarga")).toMatchObject({ productos: "nueva.100", stock: "nueva.110" });
   });
 
   it("018-E28: un error del servidor se muestra tal cual, no como falta de conexión", async () => {

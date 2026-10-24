@@ -116,7 +116,7 @@ describe("GET /productos/descarga (specs/018, historia 5)", () => {
     const primera = await bajar("?limite=100");
     expect(primera.productos).toHaveLength(100);
     expect(primera.hay_mas).toBe(true);
-    expect(primera.marca).toBe("1");
+    expect(primera.marca).toBe("prueba.1");
     const segunda = await bajar(`?limite=100&desde=${primera.siguiente}`);
     expect(segunda.productos).toHaveLength(24);
     expect(segunda.hay_mas).toBe(false);
@@ -131,11 +131,12 @@ describe("GET /productos/descarga (specs/018, historia 5)", () => {
       { id: ID(3), descripcion: "Cambió después", cambio: "120" },
       { id: ID(4), descripcion: "Se unió a otro", cambio: "130", vigente: false },
     ]);
-    const d = await bajar("?marca=100");
+    const d = await bajar("?marca=prueba.100");
     expect(d.productos.map((p) => p.id)).toEqual([ID(3)]);
     expect(d.quitados).toEqual([ID(4)]);
     expect((await bajar("?marca=no-es-una-marca")).productos).toHaveLength(3); // una marca rara vale como ninguna: todo
-    expect((await bajar("?marca=99999999999999999999")).productos).toHaveLength(3); // y una que no entra en un xid8, también
+    expect((await bajar("?marca=prueba.99999999999999999999")).productos).toHaveLength(3); // y una que no entra en un xid8, también
+    expect((await bajar("?marca=otra-base.100")).productos).toHaveLength(3); // 022-E23: y una de otra base, también
   });
 
   it("018-E26: cada producto con todos sus códigos de proveedor, y la versión del cálculo del precio", async () => {

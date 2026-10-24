@@ -3,6 +3,7 @@ import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
 vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
+const { cargarParaPrueba } = await import("../productos/copia.js");
 const { app } = await import("../app.js");
 
 // Corregir un stock a mano (RF-53): cuántas hay y por qué. El motivo es obligatorio para
@@ -36,20 +37,24 @@ describe("POST /stock/:producto/ajustes", () => {
 describe("GET /stock/cambios", () => {
   beforeEach(() => {
     base.actual = baseFalsa();
+    cargarParaPrueba([]);
     base.actual.programar(/pg_snapshot_xmin/, { rows: [{ marca: "150" }] });
     base.actual.programar(/FROM movimiento_stock/, { rows: [{ producto_id: "p1", stock: "7" }] });
   });
 
   it("018-E25: con marca, solo el de los productos que se movieron desde entonces, y la marca nueva", async () => {
-    const r = await pedir(app, "GET", "/stock/cambios?marca=120", { rol: "mostrador" });
-    expect(await r.json()).toEqual({ marca: "150", stock: { p1: "7" } });
+    const r = await pedir(app, "GET", "/stock/cambios?marca=prueba.120", { rol: "mostrador" });
+    expect(await r.json()).toEqual({ marca: "prueba.150", stock: { p1: "7" } });
     const consulta = base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!;
     expect(consulta.sql).toMatch(/transaccion >= \$1::xid8/);
     expect(consulta.params).toEqual(["120"]);
   });
 
   it("018-E24: sin marca (o con una rara, o una que no entra en un xid8), el de todos los que tienen movimientos", async () => {
-    expect((await pedir(app, "GET", "/stock/cambios?marca=99999999999999999999", { rol: "mostrador" })).status).toBe(200);
+    expect((await pedir(app, "GET", "/stock/cambios?marca=prueba.99999999999999999999", { rol: "mostrador" })).status).toBe(200);
+    expect(base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!.sql).not.toMatch(/transaccion/);
+    // 022-E23: la marca de otra base vale como ninguna.
+    await pedir(app, "GET", "/stock/cambios?marca=otra-base.120", { rol: "mostrador" });
     expect(base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!.sql).not.toMatch(/transaccion/);
     await pedir(app, "GET", "/stock/cambios?marca=1;DROP", { rol: "mostrador" });
     expect(base.actual.sqlDe(/FROM movimiento_stock/).at(-1)!.sql).not.toMatch(/transaccion/);
@@ -62,7 +67,6 @@ describe("GET /stock", () => {
   beforeEach(async () => {
     base.actual = baseFalsa();
     base.actual.programar(/FROM movimiento_stock GROUP BY producto_id/, { rows: [{ id: "p1", stock: "3", ultimo_movimiento: null }, { id: "unido", stock: "5", ultimo_movimiento: null }] });
-    const { cargarParaPrueba } = await import("../productos/copia.js");
     cargarParaPrueba([{ id: "p1", descripcion: "P1", costo_neto: "1000", proveedor: "Tresge" }, { id: "unido", descripcion: "Unido", costo_neto: "10", vigente: false }]);
   });
 

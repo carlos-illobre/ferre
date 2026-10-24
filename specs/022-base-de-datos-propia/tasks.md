@@ -7,7 +7,7 @@
 - [x] T005 Pruebas de la capa de datos del mostrador contra Postgres, con 100 % de cobertura que corta la subida; unitarias con base en utest.sh y en la CI (E15–E18) (depende de T004)
 - [x] T006 Capa de datos de Procesos en su carpeta y en su base, con el migrador de Kysely y sus pruebas al 100 % (E08, E15–E18) (depende de T005)
 - [x] T007 La salud dice si la base responde y el monitor deja de consultar Supabase (E05) (depende de T004)
-- [ ] T008 La marca de otra base no se usa (E23) (depende de T004)
+- [x] T008 La marca de otra base no se usa (E23) (depende de T004)
 - [ ] T009 Todo lo que cambia entre ambientes en el .env: AMBIENTE, sin valores por omisión, la base del dispositivo por ambiente (E19–E22) (depende de T003)
 - [ ] T010 Una prueba por cada escenario, anotada en `proyecto/estado.yml`; e2e en Docker (depende de T005, T006, T007, T008, T009)
 - [ ] T011 Documentación de operación (DEPLOYMENT, ORACLE, quickstart, data-model) (depende de T010)

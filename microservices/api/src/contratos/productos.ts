@@ -31,7 +31,8 @@ export type PaginaDeProductos = { productos: ProductoDelCatalogo[]; stock: Recor
 // GET /productos/descarga?marca=&desde=&limite= (specs/018, historia 5): lo que se baja a mano para
 // trabajar sin conexión, de a 500. Sin marca, todo; con la marca de la descarga anterior, lo que
 // cambió desde entonces y los que hay que borrar. `siguiente` va como `desde` de la próxima página;
-// `marca` se guarda para la próxima descarga.
+// `marca` se guarda para la próxima descarga: es «<base>.<transacción>», y la de otra base no vale
+// (022-E23).
 // Cada producto lleva todos sus códigos de proveedor (para escanear sin conexión) y la respuesta, la
 // versión del cálculo del precio: si cambió desde la descarga anterior, se vuelve a bajar todo.
 export type DescargaDeProductos = { productos: (ProductoDelCatalogo & { codigos: string[] })[]; quitados: string[]; hay_mas: boolean; siguiente: string | null; marca: string; calculo: string };

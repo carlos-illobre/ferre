@@ -17,6 +17,8 @@ import type { Cliente } from "@servidor/clientes";
 export type Descarga = { productos: string; stock: string; cuando: string; cuantos: number; calculo?: string };
 export const SIN_CONEXION_PARA_BAJAR = "Sin conexión: para bajar los datos hace falta internet.";
 const POR_PAGINA = 500;
+// La marca del servidor es «<base>.<transacción>»: de qué base es lo bajado (022-E23).
+const deQueBase = (marca: string) => marca.split(".")[0];
 
 type Estado = { descarga: Descarga | null; leida: boolean; avance: { hechos: number; total: number } | null; error: string | null };
 let estado: Estado = { descarga: null, leida: false, avance: null, error: null };
@@ -48,9 +50,10 @@ export function descargar(): Promise<void> {
       for (;;) {
         const q = new URLSearchParams({ limite: String(POR_PAGINA), ...(desdeLaMarca ? { marca: desdeLaMarca } : {}), ...(desde ? { desde } : {}) });
         const d = await api<DescargaDeProductos>(`/productos/descarga?${q}`);
-        // Cambió la cuenta del precio (o lo guardado no dice con cuál se hizo): no sirve, se baja
-        // todo desde el principio.
-        if (desdeLaMarca && d.calculo !== anterior?.calculo) {
+        // Cambió la cuenta del precio (o lo guardado no dice con cuál se hizo), o la base es otra (una
+        // nueva, restaurada u otro ambiente: la marca dice de cuál es, 022-E23): lo bajado no sirve, se
+        // baja todo desde el principio.
+        if (desdeLaMarca && (d.calculo !== anterior?.calculo || deQueBase(d.marca) !== deQueBase(desdeLaMarca))) {
           desdeLaMarca = null; hechos = 0; marca = "";
           await reemplazarTodo("catalogo", []);
           continue;
@@ -64,9 +67,10 @@ export function descargar(): Promise<void> {
         if (!d.hay_mas || !d.siguiente) break;
         desde = d.siguiente;
       }
-      const stock = await api<StockQueCambio>(`/stock/cambios${anterior ? `?marca=${anterior.stock}` : ""}`);
+      // El stock, desde su marca si los productos se bajaron desde la suya; si no, entero.
+      const stock = await api<StockQueCambio>(`/stock/cambios${desdeLaMarca ? `?marca=${anterior!.stock}` : ""}`);
       const filas = Object.entries(stock.stock).map(([id, s]) => ({ id, stock: s }));
-      if (anterior) await guardarVarios("stock", filas); else await reemplazarTodo("stock", filas);
+      if (desdeLaMarca) await guardarVarios("stock", filas); else await reemplazarTodo("stock", filas);
       await reemplazarTodo("clientes", await api<Cliente[]>("/clientes"));
       const cuantos = (await leerTodo<{ id: string }>("catalogo")).length;
       const nueva: Descarga = { productos: marca, stock: stock.marca, cuando: new Date().toISOString(), cuantos, calculo };

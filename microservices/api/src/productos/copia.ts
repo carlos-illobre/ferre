@@ -1,6 +1,6 @@
 import { config } from "../config.js";
 import * as archivos from "../persistencia/archivos.js";
-import { escuchar as escucharLaBase } from "../persistencia/conexion.js";
+import { escuchar as escucharLaBase, identificadorDeLaBase } from "../persistencia/conexion.js";
 import * as datos from "../persistencia/productos.js";
 import type { FilaDeLaCopia, LecturaDeLaCopia } from "../persistencia/productos.js";
 
@@ -132,10 +132,15 @@ function alAviso(demora = 200) {
 
 export const iniciada = () => escuchando;
 
+// De qué base es la copia (022-E23): las marcas que se dan a los dispositivos lo llevan.
+let idDeLaBase = "";
+export const deQueBase = () => idDeLaBase;
+
 // Al arrancar el servidor: la copia del disco, o la base entera si no hay; después, lo que cambió,
 // y a escuchar. Antes de esto el servidor no atiende.
 export async function iniciar(): Promise<void> {
   escuchando = true;
+  idDeLaBase = await identificadorDeLaBase();
   await leerDelDisco();
   await ponerAlDia();
   escucharLaBase("catalogo", () => alAviso());
@@ -206,5 +211,6 @@ export function descarga(q: { marca: string | null; desde: string; limite: numbe
 
 // Para las pruebas: la copia con estas filas, sin base ni disco.
 export function cargarParaPrueba(filas: Partial<FilaDeLaCopia>[]) {
+  idDeLaBase = "prueba";
   aplicar({ marca: "1", filas: filas.map((f) => ({ vigente: true, codigos: [], marca: null, codigo_barras: null, cambio: null, ...f }) as FilaDeLaCopia), quitados: [] }, true);
 }

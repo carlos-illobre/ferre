@@ -34,8 +34,14 @@ const entero = (texto: string | undefined, si: number, tope: number) => { const 
 
 export type ConsultaDelCatalogo = { limite?: string; desde?: string; buscar?: string; codigo?: string; ids?: string; marca?: string; disponibilidad?: string; primero?: string };
 
-// Una marca de descarga: hasta 20 dígitos y que entre en un xid8 (2^64 - 1); otra cosa no vale como marca.
-export const marcaValida = (m: string | undefined): string | null => (m && /^\d{1,20}$/.test(m) && BigInt(m) <= 18446744073709551615n ? m : null);
+// La marca de descarga que va a los dispositivos dice de qué base es: «<base>.<transacción>»
+// (022-E23). Vale solo si es de esta base y la transacción tiene hasta 20 dígitos y entra en un xid8
+// (2^64 - 1); otra cosa (otro ambiente, una base nueva o restaurada) vale como ninguna: se baja todo.
+export const marcaParaDispositivo = (transaccion: string) => `${copia.deQueBase()}.${transaccion}`;
+export function marcaValida(m: string | undefined): string | null {
+  const [base, transaccion = ""] = (m ?? "").split(".");
+  return base === copia.deQueBase() && /^\d{1,20}$/.test(transaccion) && BigInt(transaccion) <= 18446744073709551615n ? transaccion : null;
+}
 
 // GET /productos: lo de siempre, para la aplicación de la versión anterior mientras se actualiza
 // (specs/018): todo, o de a tandas, desde la copia.
@@ -67,7 +73,7 @@ export function descarga(q: { marca?: string; desde?: string; limite?: string })
   // Con todos sus códigos de proveedor, también los de listas viejas: sin conexión se escanean igual
   // que con conexión (revisión 1.3). Y la versión del cálculo del precio: si cambió, el dispositivo
   // vuelve a bajar todo (revisión 3.4).
-  return { productos: d.filas.map((f) => ({ ...comoProducto(f), codigos: f.codigos ?? [] })), quitados: d.quitados, hay_mas: d.hayMas, siguiente: d.ultimo, marca: d.marca, calculo: VERSION_DE_PRECIOS };
+  return { productos: d.filas.map((f) => ({ ...comoProducto(f), codigos: f.codigos ?? [] })), quitados: d.quitados, hay_mas: d.hayMas, siguiente: d.ultimo, marca: marcaParaDispositivo(d.marca), calculo: VERSION_DE_PRECIOS };
 }
 
 // GET /productos/resumen: cuántos productos hay y cuántos tienen costo pero no margen.

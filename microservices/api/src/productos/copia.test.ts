@@ -11,6 +11,9 @@ import type { FilaDeLaCopia, LecturaDeLaCopia } from "../persistencia/productos.
 const leer = vi.hoisted(() => ({ entero: vi.fn<() => Promise<LecturaDeLaCopia>>(), cambios: vi.fn<(marca: string) => Promise<LecturaDeLaCopia | null>>() }));
 vi.mock("../persistencia/productos.js", async (original) => ({ ...(await original<typeof import("../persistencia/productos.js")>()), leerCatalogoEntero: leer.entero, leerCambiosDesde: leer.cambios }));
 
+// De qué base es: sin base de verdad, una cualquiera.
+vi.mock("../persistencia/conexion.js", async (original) => ({ ...(await original<typeof import("../persistencia/conexion.js")>()), identificadorDeLaBase: async () => "prueba" }));
+
 const oyentes = vi.hoisted(() => [] as (EventEmitter & { query: (q: string) => Promise<void>; end: () => Promise<void> })[]);
 const conexion = vi.hoisted(() => ({ falla: false }));
 vi.mock("pg", async (original) => {
