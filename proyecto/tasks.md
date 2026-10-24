@@ -266,6 +266,20 @@ Las reglas no van acá: van en `specs/`.
   Lleva [definir] porque el criterio para repartir los gastos fijos se define con Carlos
   (specs/preguntas-abiertas.md, RF-16).
 
+## Almacenamiento de datos
+
+Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con su carpeta en
+`specs/` cuando se empieza; la última cumple todas las restricciones.
+
+- [ ] T139 [agente] [en curso] [alta] Etapa 1: PostgreSQL en un contenedor de la máquina de Oracle, una base por servicio (mostrador y Procesos), mudanza desde Supabase, capa de datos aparte con 100 % de cobertura y todo lo que cambia entre ambientes en el .env (specs/022-base-de-datos-propia)
+- [ ] T140 [agente] Etapa 2: copia cifrada por noche de la base y los archivos fuera de Oracle, guía de restauración probada, y Tickets en su propio servicio con su base (depende de T139)
+- [ ] T141 [agente] Etapa 3: el dispositivo guarda todos los cambios del mostrador, con tope por espacio y sin borrar lo no confirmado; pide al navegador no borrar los datos; sin almacenamiento local no trabaja sin conexión (depende de T139)
+- [ ] T142 [agente] Etapa 4: copia continua de la base (perder como mucho un minuto), avisos del monitor externo, prueba mensual de restauración, archivos en un almacenamiento de objetos y las listas de proveedores con su base (depende de T140)
+- [ ] T143 [agente] Etapa 5: usuarios de la base con lo mínimo, los históricos no se pueden modificar desde la base, unir duplicados sin reescribir filas, copia semanal inmutable en un segundo proveedor (depende de T142)
+- [ ] T144 [agente] Usuarios y acceso en su propio servicio con su base, cuando un tercer servicio necesite iniciar sesión (depende de T143)
+- [ ] T145 [agente] Etapa 6: réplica en caliente en una segunda máquina y archivos para análisis (Parquet con DuckDB) (depende de T143)
+- [ ] T146 [carlos] Crear las cuentas gratuitas de Cloudflare R2, Backblaze B2 y Healthchecks.io (antes de T140)
+
 ## Sin etapa
 
 - [x] T097 [agente] Un pedido de Carlos que cambia cómo se ve o se comporta algo se escribe en la documentación antes de programarlo (estimación 1h) (#97)

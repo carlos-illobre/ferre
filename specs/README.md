@@ -284,6 +284,11 @@ Los que son reglas generales están además en la constitución.
 | RNF-60 | El código se organiza en servicios, y en capas: tecnología reutilizable, negocio una sola vez y pantallas; el cálculo de precios vive en el servidor | [010-reordenamiento-del-codigo](010-reordenamiento-del-codigo/spec.md) |
 | RNF-61 | Procesos se puede llevar a otro proyecto: su regla, sus datos y sus pantallas están aparte y no usan nada propio de Ferrebress; usa la misma base de datos con tablas propias y guarda en BPMN 2.0 | [011-procesos](011-procesos/spec.md) |
 | RNF-62 | Los dos ambientes juntos usan menos de la mitad del plan gratuito de la base por mes: menos de 2,5 GB de datos que salen y menos de 0,5 GB de registros | [018-descarga-eficiente](018-descarga-eficiente/spec.md) |
+| RNF-63 | La base es PostgreSQL en un contenedor de la máquina, una instancia por ambiente y una base por servicio, cada una con su usuario; no se alcanza desde internet | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
+| RNF-64 | Los datos se mudan a la base nueva sin perder ni cambiar nada, comparando filas y total facturado; el mostrador sigue vendiendo mientras tanto | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
+| RNF-65 | Todo lo que guarda o lee datos está en una capa propia de cada servicio, sin código repetido, y un control automático impide usar la base o el disco desde otra capa | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
+| RNF-66 | Las pruebas de la capa de datos corren contra PostgreSQL y cubren el 100 % de sus líneas; una línea que no se puede cubrir no se escribe | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
+| RNF-67 | Todo lo que cambia entre ambientes está en el archivo de variables de entorno: el código que se prueba es el que corre en producción, sin valores por omisión | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
 
 ## De dónde vino cada cosa
 

@@ -1239,3 +1239,27 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      - En la computadora, arriba de las pestañas, el nombre de la parte en grande, con las acciones
        de la pantalla a su derecha; las teclas de las pestañas se ven al apretar Alt, como las del
        menú. Siguen las excepciones de la decisión 148 (el logotipo de la v1, el menú que se achica).
+
+150. **El almacenamiento de datos se rediseña por etapas** (2026-10-24). Carlos decidió:
+     - La base pasa a un contenedor de PostgreSQL en la máquina de Oracle, una instancia por
+       ambiente; Supabase deja de usarse.
+     - Una base por servicio dentro de esa instancia, cada una con su usuario. Servicios con
+       base: el mostrador, Procesos, Tickets (en su propio servicio), las listas de
+       proveedores y, más adelante, usuarios y acceso. Ventas, stock, catálogo y clientes
+       quedan juntos en el mostrador.
+     - Seis etapas, de la más simple a la completa: (1) la base en el contenedor, sin copias;
+       (2) copia por noche y Tickets aparte; (3) el dispositivo con tope por espacio; (4)
+       copia continua, avisos, prueba de restauración y archivos fuera del disco; (5)
+       seguridad y «nada se borra» en la base; (6) réplica y análisis. El trabajo sin
+       conexión queda como está en la etapa 1, para no hacerlo dos veces.
+     - Los históricos se conservan además para que otro proceso los analice (business
+       intelligence); el análisis lee copias en archivos, no la base de las ventas.
+     - El límite de lo que el dispositivo conserva pasa a ser por espacio, no por días: los
+       recursos a cuidar son el disco, el tráfico y la CPU.
+     - Todo lo que guarda o lee datos va en una capa propia de cada servicio, sin código
+       repetido, con pruebas que cubren el 100 % de sus líneas; una línea que no se puede
+       cubrir no se escribe.
+     - Todo lo que cambia entre ambientes va en el archivo de variables de entorno: el código
+       que se prueba y el que corre en producción son idénticos
+       (`specs/022-base-de-datos-propia/`).
+
