@@ -10,4 +10,5 @@ process.env.LISTAS_DE_PROVEEDORES_URL ??= "http://listas.prueba";
 process.env.PROCESOS_URL ??= "http://procesos.prueba";
 process.env.ORIGEN_WEB ??= "http://web.prueba";
 process.env.GOOGLE_CLIENT_ID ??= "cliente-google";
+process.env.VERSION ??= "prueba";
 process.env.CARPETA_LISTAS ??= mkdtempSync(path.join(tmpdir(), "ferre-listas-"));

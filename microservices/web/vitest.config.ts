@@ -8,7 +8,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["src/pruebas/preparar.ts"],
-    env: { VITE_API_URL: "http://api.prueba" },
+    // El ambiente de las pruebas: como cualquier otro, por variables (022-E19).
+    env: { VITE_API_URL: "http://api.prueba", VITE_AMBIENTE: "prueba", VITE_VERSION: "prueba" },
     include: ["src/**/*.test.{ts,tsx}"],
     exclude: ["node_modules/**"],
   },

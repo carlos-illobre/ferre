@@ -61,7 +61,7 @@ describe("entrar con Google (simulado)", () => {
     await elegirCuenta("credencial-de-google");
     expect(apiFalsa.mock.calls.find((c) => c[0] === "/sesiones/google")?.[1].body).toContain("credencial-de-google");
     await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro como Carlos"));
-    expect(localStorage.getItem("ferre.sesion")).toBe("token-nuevo");
+    expect(localStorage.getItem("ferre.sesion.prueba")).toBe("token-nuevo");
   });
 
   it("A5: en la computadora, un correo no autorizado no entra y la pantalla dice cuál y a quién pedirle el alta", async () => {
@@ -73,7 +73,7 @@ describe("entrar con Google (simulado)", () => {
     expect(error.textContent).toContain("extrano@gmail.com no está autorizado para entrar a Ferrebress");
     expect(error.textContent).toContain("Más → Usuarios");
     expect(screen.getByTestId("estado").textContent).toBe("sin-sesion");
-    expect(localStorage.getItem("ferre.sesion")).toBeNull();
+    expect(localStorage.getItem("ferre.sesion.prueba")).toBeNull();
   });
 
   it("007-T030: en la computadora, después de un correo no autorizado el botón de Google se vuelve a dibujar, sin el foco", async () => {

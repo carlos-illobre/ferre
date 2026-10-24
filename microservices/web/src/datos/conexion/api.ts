@@ -1,6 +1,7 @@
 import { crearCliente, ErrorDelServidor, esFaltaDeRed } from "../../plataforma/servidor/cliente";
 import { reducirImagen } from "../../plataforma/imagenes/reducir";
 import type { FotoSubida } from "@servidor/productos";
+import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // Única puerta a la API de Ferrebress. El cliente en sí es tecnología de la plataforma; acá
 // se dice dónde está la API, dónde vive la sesión (ADR-011) y qué pasa cuando se pierde o
@@ -16,7 +17,7 @@ export const EVENTO_SESION_CERRADA = "sesion-cerrada";
 
 const cliente = crearCliente({
   origen,
-  claveDelToken: "ferre.sesion",
+  claveDelToken: deEsteAmbiente("ferre.sesion"),
   // La sesión ya no vale: la aplicación vuelve a la entrada. El token perdido va en el aviso: con
   // él se sube lo que la persona dejó sin mandar, si la desactivaron (cola.ts, ADR-021).
   alPerderLaSesion: (token) => window.dispatchEvent(new CustomEvent(EVENTO_SESION_CERRADA, { detail: { token } })),

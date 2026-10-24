@@ -34,7 +34,7 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
-      - run: VITE_API_URL=http://localhost pnpm build
+      - run: VITE_API_URL=http://localhost VITE_BASE=/ VITE_AMBIENTE=desarrollo VITE_VERSION=ci pnpm build
       # Unitarias de la librería de precios, la API (rutas contra una base simulada y la capa de
       # datos contra PostgreSQL), el cliente web (pantallas sobre jsdom) y Procesos.
       - run: pnpm test
@@ -132,6 +132,7 @@ jobs:
         env:
           VITE_API_URL: ${{ vars.API_URL }}
           VITE_BASE: /${{ github.event.repository.name }}/
+          VITE_AMBIENTE: produccion
           VITE_VERSION: produccion ${{ github.sha }}
       - name: Construir pruebas (/pruebas/)
         working-directory: pruebas
@@ -141,6 +142,7 @@ jobs:
         env:
           VITE_API_URL: ${{ vars.API_URL_PRUEBAS }}
           VITE_BASE: /${{ github.event.repository.name }}/pruebas/
+          VITE_AMBIENTE: pruebas
           VITE_VERSION: pruebas ${{ github.sha }}
       - name: Armar el sitio
         run: |

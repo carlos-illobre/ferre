@@ -23,4 +23,6 @@ export const config = {
   googleClientId: obligatoria("GOOGLE_CLIENT_ID"),
   // Dónde se guardan los archivos originales de las listas cargadas (volumen del compose).
   carpetaListas: obligatoria("CARPETA_LISTAS"),
+  // Qué versión corre (la imagen); la salud la dice. No cambia el comportamiento.
+  version: obligatoria("VERSION"),
 };

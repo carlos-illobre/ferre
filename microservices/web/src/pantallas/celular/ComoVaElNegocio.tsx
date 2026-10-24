@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { irA } from "../../rutas";
 import { urlApi } from "../../datos/conexion";
-import { esAmbienteDePrueba } from "../../plataforma/ambiente";
+import { esAmbienteDePrueba, VERSION } from "../../plataforma/ambiente";
 import { fecha, pesosCortos } from "../../formato";
 import { useSesion } from "../../datos/sesion";
 import { MEDIOS } from "../../negocio/ventas/venta";
@@ -203,7 +203,7 @@ function QuienYDesdeDonde() {
           <button type="button" className="boton chico solo-celular" style={{ height: 34, fontSize: 13, borderRadius: 10 }} onClick={salir}>Salir</button>
         </div>
       )}
-      {esAmbienteDePrueba() && <div className="aviso-suave" data-testid="ambiente-negocio">Ambiente de prueba · {servidor ?? "…"} · versión {import.meta.env.VITE_VERSION ?? "local"}</div>}
+      {esAmbienteDePrueba() && <div className="aviso-suave" data-testid="ambiente-negocio">Ambiente de prueba · {servidor ?? "…"} · versión {VERSION}</div>}
       {!esAmbienteDePrueba() && servidor && <small style={{ padding: "0 4px" }} data-testid="estado">{servidor}</small>}
     </>
   );

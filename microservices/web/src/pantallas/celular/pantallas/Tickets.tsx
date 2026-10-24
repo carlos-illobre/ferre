@@ -10,6 +10,7 @@ import { Hoja } from "../componentes/base";
 import type { ResolucionDeTicket } from "@servidor/tickets";
 import "../../mas-v2.css";
 import "./tickets-v2.css";
+import { VERSION } from "../../../plataforma/ambiente";
 
 // Mejoras y errores (RF-80) en el celular, como la v2 del director de arte (variante 1, «El
 // buzón»; specs/008, decisión 148). Arriba la tarjeta para escribir: idea o error (la idea elegida
@@ -46,7 +47,7 @@ export function TicketsCelu() {
     if (texto.trim().length < 3) { setFalta("Contá qué pasó o qué te gustaría, aunque sea en una línea."); return; }
     setEnviando(true); setFalta(null);
     try {
-      await crearTicket({ tipo, descripcion: texto.trim(), dispositivo: describirDispositivo(), version: import.meta.env.VITE_VERSION ?? "local" }, fotos);
+      await crearTicket({ tipo, descripcion: texto.trim(), dispositivo: describirDispositivo(), version: VERSION }, fotos);
       setTexto(""); setFotos([]);
       setAviso(navigator.onLine ? "Ticket enviado. Gracias por avisar." : "Quedó guardado en este dispositivo: se envía solo cuando vuelva internet.");
     } catch { setFalta("No se pudo guardar el ticket en este dispositivo. Probá de nuevo."); }

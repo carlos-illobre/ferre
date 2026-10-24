@@ -40,7 +40,7 @@ describe("Configuración · animaciones", () => {
   it("009-E03: lo elegido queda en el dispositivo: sigue al volver a abrir la aplicación o al salir y volver a entrar", () => {
     cambiarPreferencia("animaciones", false);
     // Salir de la sesión no borra la preferencia: es otra clave del dispositivo.
-    localStorage.removeItem("ferre.sesion");
+    localStorage.removeItem("ferre.sesion.prueba");
     recargarPreferencias();
     expect(preferencias().animaciones).toBe(false);
     expect(document.documentElement.dataset.animaciones).toBe("no");

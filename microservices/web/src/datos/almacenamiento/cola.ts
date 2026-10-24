@@ -3,6 +3,7 @@ import { abrirBase, guardarMeta } from "./almacen";
 import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "./guardado";
 import { crearCola, type Cambio } from "../../plataforma/sin-conexion/cola";
 import { idDelUsuarioDeEsteDispositivo } from "../sesion";
+import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // La cola de cambios de Ferrebress hechos sin conexión (issue #18): ventas, «no llevó»,
 // márgenes y precios, ajustes de stock, renglones de conteo. La cola en sí es tecnología de la
@@ -47,7 +48,7 @@ export async function cambiosDeProductosPendientes(): Promise<Map<string, Record
 // desactivaron, sube al servidor con el token de esa sesión y queda apartado para que alguien lo
 // revise; si sigue activa (409) o el token ya no es de ninguna sesión (401), queda en el
 // dispositivo y sale cuando la persona vuelva a entrar. Sin conexión, se intenta de nuevo al volver.
-const PARA_APARTAR = "ferre.para-apartar";
+const PARA_APARTAR = deEsteAmbiente("ferre.para-apartar");
 const POR_PEDIDO = 200;
 type ParaApartar = { autor: string; token: string };
 function leerParaApartar(): ParaApartar | null {

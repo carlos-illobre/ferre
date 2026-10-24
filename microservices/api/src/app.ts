@@ -37,7 +37,7 @@ app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders:
 // cada 10 segundos no cuesta nada (ADR-026; antes no se hacía por el plan de Supabase, ADR-023).
 app.get("/health", async (c) => {
   const db = await baseResponde();
-  return c.json({ ok: db, db: db ? "ok" : "sin-respuesta", version: process.env.VERSION ?? "desconocida", calculoDePrecios: VERSION_DE_PRECIOS }, db ? 200 : 503);
+  return c.json({ ok: db, db: db ? "ok" : "sin-respuesta", version: config.version, calculoDePrecios: VERSION_DE_PRECIOS }, db ? 200 : 503);
 });
 
 // Quien cambia el catálogo lo ve en su pedido siguiente (specs/018, RF-124): antes de contestar, la

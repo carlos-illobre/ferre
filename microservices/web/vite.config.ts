@@ -4,12 +4,13 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // VITE_API_URL: origen de la API (https://api.dominio en producción, http://localhost en
 // desarrollo con el compose). VITE_BASE: ruta base cuando se publica bajo un subdirectorio
-// de GitHub Pages ("/ferre/"); "/" con dominio propio o en local.
-export default defineConfig(({ command }) => {
-  // Falta = error al construir, no un fallback silencioso. Los tests no construyen.
-  if (command === "build" && process.env.VITE_API_URL === undefined) {
-    throw new Error("Falta VITE_API_URL al construir el cliente web");
-  }
+// de GitHub Pages ("/ferre/"); "/" con dominio propio o en local. VITE_AMBIENTE: «produccion»,
+// «pruebas» o «desarrollo». VITE_VERSION: qué se construyó.
+export default defineConfig(({ command, isPreview }) => {
+  // Lo que cambia entre ambientes lo pone quien construye o levanta (022-E19): falta = error, no un
+  // valor por omisión. `vite preview` sirve lo ya construido; las pruebas tienen el suyo en vitest.config.ts.
+  const exigidas = command === "build" ? ["VITE_API_URL", "VITE_BASE", "VITE_AMBIENTE", "VITE_VERSION"] : isPreview ? [] : ["VITE_API_URL", "VITE_AMBIENTE", "VITE_VERSION"];
+  for (const variable of exigidas) if (process.env[variable] === undefined) throw new Error(`Falta ${variable} para el cliente web`);
   return {
     plugins: [
       react(),
@@ -57,7 +58,7 @@ export default defineConfig(({ command }) => {
         },
       }),
     ],
-    base: process.env.VITE_BASE ?? "/",
+    base: process.env.VITE_BASE,
     // La raíz es la aplicación (src/pantallas): es la única que hay (decisión 83).
     build: {
       outDir: "dist",

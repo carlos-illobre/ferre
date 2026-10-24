@@ -17,7 +17,7 @@ import { Configuracion } from "../../pruebas/configuracion";
 const TELEFONO = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36";
 const COMPUTADORA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36";
 const aparato = (ua: string) => Object.defineProperty(navigator, "userAgent", { value: ua, configurable: true });
-const hayBase = async () => (await indexedDB.databases()).some((b) => b.name === "ferre");
+const hayBase = async () => (await indexedDB.databases()).some((b) => b.name === "ferre.prueba");
 const venta = { id: "v1", fecha: "2026-10-13T12:00:00Z", total: 100, medio_pago: "efectivo", items: [], enviada: false };
 
 describe("Trabajar sin conexión en el celular", () => {

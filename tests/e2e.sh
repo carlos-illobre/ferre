@@ -36,13 +36,18 @@ PIDS=/tmp/ferre-preview.pid
 # La huella de lo que entra en el cliente web: si no cambió desde la última construcción, no se
 # vuelve a construir (tarda medio minuto).
 huella_web() {
-  { echo "$1"; git ls-files -s microservices/web microservices/procesos/web package.json pnpm-lock.yaml
+  { echo "$1"; grep -E '^(AMBIENTE|IMAGEN_TAG)=' .env; git ls-files -s microservices/web microservices/procesos/web package.json pnpm-lock.yaml
     git diff HEAD -- microservices/web microservices/procesos/web
     git ls-files --others --exclude-standard microservices/web microservices/procesos/web | xargs -r sha1sum
   } | sha1sum | cut -c1-40
 }
-# $1: la API a la que apunta; $2: la carpeta de salida, dentro de microservices/web.
+# $1: la API a la que apunta; $2: la carpeta de salida, dentro de microservices/web. El ambiente y
+# la versión salen del .env, como en cualquier ambiente (022-E19).
 construir_web() {
+  local VITE_BASE=/ VITE_AMBIENTE VITE_VERSION
+  VITE_AMBIENTE=$(grep '^AMBIENTE=' .env | cut -d= -f2-)
+  VITE_VERSION=$(grep '^IMAGEN_TAG=' .env | cut -d= -f2-)
+  export VITE_BASE VITE_AMBIENTE VITE_VERSION
   local huella archivo="microservices/web/$2/.huella-e2e"
   huella=$(huella_web "$1")
   if [ -f "$archivo" ] && [ "$(cat "$archivo")" = "$huella" ]; then echo "cliente web en $2: sin cambios"; return; fi

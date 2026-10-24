@@ -1,5 +1,6 @@
 import { api } from "./datos/conexion";
 import type { VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
+import { deEsteAmbiente } from "./plataforma/ambiente";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). La computadora es un "puesto";
 // el celular emparejado le manda cada código escaneado y recibe sus pedidos de foto, por el
@@ -9,8 +10,8 @@ import type { VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
 export type PuestoLocal = Pick<VinculoDeLaSesion, "id" | "expira_en">; // en la laptop
 export type PuestoRemoto = VinculoDeLaSesion;                          // en el celular
 
-const CLAVE_LOCAL = "ferre.puesto";
-const CLAVE_REMOTO = "ferre.puesto-remoto";
+const CLAVE_LOCAL = deEsteAmbiente("ferre.puesto");
+const CLAVE_REMOTO = deEsteAmbiente("ferre.puesto-remoto");
 
 function leer<T>(clave: string): T | null {
   try { const v = localStorage.getItem(clave); if (!v) return null; const p = JSON.parse(v) as T & { expira_en: string }; return new Date(p.expira_en).getTime() > Date.now() ? p : null; } catch { return null; }

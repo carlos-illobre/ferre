@@ -1,8 +1,9 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-pwa/client" />
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string | undefined;
-  readonly VITE_VERSION: string | undefined;
+  readonly VITE_API_URL: string;
+  readonly VITE_AMBIENTE: string;
+  readonly VITE_VERSION: string;
 }
 
 // Lo mínimo del script de Google Identity Services que usamos.

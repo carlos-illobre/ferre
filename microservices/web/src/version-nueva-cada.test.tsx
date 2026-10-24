@@ -54,7 +54,7 @@ describe("Configuración · buscar versión nueva", () => {
   it("009-E23: lo elegido queda en el dispositivo al volver a abrir o al salir y entrar", () => {
     cambiarPreferencia("versionCada", 5);
     cambiarPreferencia("versionNunca", true);
-    localStorage.removeItem("ferre.sesion");
+    localStorage.removeItem("ferre.sesion.prueba");
     recargarPreferencias();
     expect(preferencias().versionCada).toBe(5);
     expect(preferencias().versionNunca).toBe(true);

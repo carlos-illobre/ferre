@@ -20,8 +20,8 @@ function Estado() {
 }
 
 beforeEach(() => {
-  localStorage.setItem("ferre.sesion", "token-guardado");
-  localStorage.setItem("ferre.usuario", JSON.stringify(CARLOS));
+  localStorage.setItem("ferre.sesion.prueba", "token-guardado");
+  localStorage.setItem("ferre.usuario.prueba", JSON.stringify(CARLOS));
   vi.stubGlobal("fetch", vi.fn((url: string) => servidor(new URL(url).pathname)));
 });
 afterEach(() => { vi.unstubAllGlobals(); });
@@ -35,7 +35,7 @@ describe("el servidor da por terminada la sesión", () => {
     servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
     await act(async () => { await api("/productos").catch(() => undefined); });
     expect(screen.getByTestId("estado").textContent).toBe("sin-sesion");
-    expect(localStorage.getItem("ferre.sesion")).toBeNull();
+    expect(localStorage.getItem("ferre.sesion.prueba")).toBeNull();
   });
 
   it("D5: sin internet sigue adentro; al volver la conexión y rechazarla el servidor, vuelve a la entrada", async () => {
@@ -45,7 +45,7 @@ describe("el servidor da por terminada la sesión", () => {
     servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
     await act(async () => { await api("/ventas").catch(() => undefined); });
     expect(screen.getByTestId("estado").textContent).toBe("sin-sesion");
-    expect(localStorage.getItem("ferre.sesion")).toBeNull();
+    expect(localStorage.getItem("ferre.sesion.prueba")).toBeNull();
   });
 
   // Decisión 97 (historia 5, escenarios 4 y 4b): no hace falta que el dispositivo pida algo.
@@ -60,7 +60,7 @@ describe("el servidor da por terminada la sesión", () => {
       await act(async () => { await vi.advanceTimersByTimeAsync(CONTROL_DE_SESION_MS); });
       await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
       expect(CONTROL_DE_SESION_MS).toBeLessThanOrEqual(30_000);
-      expect(localStorage.getItem("ferre.sesion")).toBeNull();
+      expect(localStorage.getItem("ferre.sesion.prueba")).toBeNull();
     } finally { vi.useRealTimers(); }
   });
 

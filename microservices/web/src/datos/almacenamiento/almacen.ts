@@ -1,5 +1,6 @@
 import { guardaEnElDispositivo } from "./guardado";
 import { crearBaseLocal } from "../../plataforma/almacenamiento/base-local";
+import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // Lo que el mostrador necesita sin conexión (ADR-005): catálogo, stock, clientes, ventas de los
 // últimos 7 días y la cola de cambios pendientes. La base local en sí es tecnología de la
@@ -8,7 +9,7 @@ import { crearBaseLocal } from "../../plataforma/almacenamiento/base-local";
 export type Almacen = "catalogo" | "stock" | "clientes" | "ventas" | "cola" | "meta";
 
 const base = crearBaseLocal<Almacen>({
-  nombre: "ferre",
+  nombre: deEsteAmbiente("ferre"),
   version: 1,
   almacenes: [
     { nombre: "catalogo", clave: "id" },

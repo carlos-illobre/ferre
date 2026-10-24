@@ -4,7 +4,7 @@ import { NOMBRES, TEXTOS } from "../../../textos";
 import { usePuede } from "../../../permisos";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 import { urlApi } from "../../../../datos/conexion";
-import { esAmbienteDePrueba } from "../../../../plataforma/ambiente";
+import { esAmbienteDePrueba, VERSION } from "../../../../plataforma/ambiente";
 import { useSesion } from "../../../../datos/sesion";
 import { MEDIOS, NOMBRE_DE_MEDIO as NOMBRE_MEDIO } from "../../../../negocio/ventas/venta";
 import type { VentasDelDia as DatosHoy } from "../../../../negocio/ventas/ventas-del-dia";
@@ -378,7 +378,7 @@ function EstadoDelServidor() {
     return () => { vigente = false; };
   }, []);
   const prueba = esAmbienteDePrueba();
-  const version = import.meta.env.VITE_VERSION ?? "local";
+  const version = VERSION;
   const pastilla = <Pastilla tipo={estado.bien === null ? undefined : estado.bien ? "ok" : "mal"}><span data-testid="estado">{estado.texto}</span></Pastilla>;
   if (!prueba) return pastilla;
   return <span className="resumen-ambiente" data-testid="ambiente-negocio"><span className="detalle">Ambiente de prueba ·</span> {pastilla} <span className="detalle">· versión {version}</span></span>;

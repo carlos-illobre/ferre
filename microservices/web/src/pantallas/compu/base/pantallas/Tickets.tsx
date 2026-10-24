@@ -14,6 +14,7 @@ import { Hoja } from "../ui";
 import type { ResolucionDeTicket } from "@servidor/tickets";
 import "../../../mas-v2.css";
 import "../estilos/tickets-v2.css";
+import { VERSION } from "../../../../plataforma/ambiente";
 
 // Mejoras y errores (RF-80) en la computadora, como la v2 del director de arte (variante 1, «El
 // buzón»; specs/008, decisión 148). A la izquierda se escribe: idea o error (la idea elegida al
@@ -64,7 +65,7 @@ export function Tickets() {
     if (texto.trim().length < 3) { setFalta("Contá qué pasó o qué te gustaría, aunque sea en una línea."); return; }
     setEnviando(true); setFalta(null);
     try {
-      await crearTicket({ tipo, descripcion: texto.trim(), dispositivo: describirDispositivo(), version: import.meta.env.VITE_VERSION ?? "local" }, fotos);
+      await crearTicket({ tipo, descripcion: texto.trim(), dispositivo: describirDispositivo(), version: VERSION }, fotos);
       setTexto(""); setFotos([]);
       setAviso(navigator.onLine ? "Ticket enviado. Gracias por avisar." : "Quedó guardado en este dispositivo: se envía solo cuando vuelva internet.");
     } catch { setFalta("No se pudo guardar el ticket en este dispositivo. Probá de nuevo."); }
@@ -130,7 +131,7 @@ export function Tickets() {
             <div className="tkv-va-con">
               {usuario && <span className="mv-pastilla contorno"><span className="tkv-av">{iniciales(usuario).slice(0, 1)}</span>{usuario}</span>}
               <span className="mv-pastilla contorno"><IconoDeLaV2 nombre="pantalla" tam={16} />{describirDispositivo()}</span>
-              <span className="mv-pastilla contorno">{t.version.largo} {import.meta.env.VITE_VERSION ?? "local"}</span>
+              <span className="mv-pastilla contorno">{t.version.largo} {VERSION}</span>
             </div>
           </div>
           {falta && <p className="mv-aviso error" id="tkv-falta" role="alert">{falta}</p>}

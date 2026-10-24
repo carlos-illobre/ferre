@@ -22,7 +22,7 @@ const DISPOSICION: DisposicionParaFlechas = {
 };
 import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
-import { esAmbienteDePrueba } from "../../plataforma/ambiente";
+import { esAmbienteDePrueba, VERSION } from "../../plataforma/ambiente";
 import { ProveedorDeSesion, useSesion } from "../../datos/sesion";
 import { ConRutas, irA, useRuta } from "./base/rutas";
 import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } from "./base/ui";
@@ -447,7 +447,7 @@ function Pantallas() {
           <IndicadorDelVinculo />
           {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
           <EstadoDeConexion />
-          <CuentaDelUsuario nombre={sesion.usuario.nombre} rol={sesion.usuario.roles?.join(", ") ?? ""} detalle={`${sesion.usuario.email} · versión ${import.meta.env.VITE_VERSION ?? "local"}`} alSalir={salir} />
+          <CuentaDelUsuario nombre={sesion.usuario.nombre} rol={sesion.usuario.roles?.join(", ") ?? ""} detalle={`${sesion.usuario.email} · versión ${VERSION}`} alSalir={salir} />
         </div>
       </aside>
       <div className={`cuerpo ${pestanas ? "con-pestanas" : ""} ${titulo ? "con-titulo" : ""}`}>

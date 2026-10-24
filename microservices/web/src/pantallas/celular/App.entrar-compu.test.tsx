@@ -81,14 +81,14 @@ describe("el celular que llega por el código de la computadora", () => {
   });
 
   it("C2: con la sesión ya abierta, abrir el enlace no alcanza: pregunta y espera el toque", async () => {
-    localStorage.setItem("ferre.sesion", "token-guardado");
+    localStorage.setItem("ferre.sesion.prueba", "token-guardado");
     render(<App />);
     fireEvent.click(await screen.findByTestId("dejar-entrar"));
     await waitFor(() => expect(aprobaciones()).toHaveLength(1));
   });
 
   it("con la sesión ya abierta, sin tocar nada, la computadora no entra", async () => {
-    localStorage.setItem("ferre.sesion", "token-guardado");
+    localStorage.setItem("ferre.sesion.prueba", "token-guardado");
     render(<App />);
     expect(await screen.findByTestId("dejar-entrar")).toBeTruthy();
     await new Promise((r) => setTimeout(r, 300));

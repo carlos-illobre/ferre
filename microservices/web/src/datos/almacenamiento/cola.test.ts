@@ -61,7 +61,7 @@ describe("cola de cambios", () => {
 
   // Decisión 97 (007, historia 5, escenario 4d).
   it("lo que dejó sin mandar una persona no sale con la sesión de otra que entra después; sale si vuelve ella", async () => {
-    const quien = (u: string) => localStorage.setItem("ferre.usuario", JSON.stringify({ id: u, email: `${u}@ferre.test`, nombre: u }));
+    const quien = (u: string) => localStorage.setItem("ferre.usuario.prueba", JSON.stringify({ id: u, email: `${u}@ferre.test`, nombre: u }));
     quien("ana");
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     const { enviarOEncolar, pendientes, apartados, enviarPendientes } = await import("./cola");
@@ -81,12 +81,12 @@ describe("cola de cambios", () => {
     expect(await enviarPendientes()).toBe(0);
     expect(apiFalsa.mock.calls.map((c) => JSON.parse((c[1] as { body: string }).body).id)).toEqual(["de-ana"]);
     expect(await apartados()).toHaveLength(0);
-    localStorage.removeItem("ferre.usuario");
+    localStorage.removeItem("ferre.usuario.prueba");
   });
 
   // 014: lo que dejó sin mandar alguien a quien desactivaron sube apartado, con el token de su sesión cerrada.
   it("014-E01 014-E03 al cerrarse la sesión, lo de esa persona sube a /apartados y sale del dispositivo; si sigue activa (409), queda", async () => {
-    localStorage.setItem("ferre.usuario", JSON.stringify({ id: "ana", email: "ana@ferre.test", nombre: "Ana" }));
+    localStorage.setItem("ferre.usuario.prueba", JSON.stringify({ id: "ana", email: "ana@ferre.test", nombre: "Ana" }));
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     const { enviarOEncolar, pendientes, apartarLoDeQuienSalio } = await import("./cola");
     const { EVENTO_SESION_CERRADA } = await import("../conexion");
@@ -111,10 +111,10 @@ describe("cola de cambios", () => {
       const cuerpo = JSON.parse(String(init.body)) as { cambios: { tipo: string; ruta: string; cuerpo: { id: string } }[] };
       expect(cuerpo.cambios.map((c) => [c.tipo, c.ruta, c.cuerpo.id])).toEqual([["venta", "/ventas", "de-ana"]]);
       await vi.waitFor(async () => expect(await pendientes()).toHaveLength(0));
-      expect(localStorage.getItem("ferre.para-apartar")).toBeNull();
+      expect(localStorage.getItem("ferre.para-apartar.prueba")).toBeNull();
     } finally {
       vi.unstubAllGlobals();
-      localStorage.removeItem("ferre.usuario");
+      localStorage.removeItem("ferre.usuario.prueba");
     }
   });
 

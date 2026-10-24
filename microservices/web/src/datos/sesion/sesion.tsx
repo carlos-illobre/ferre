@@ -9,6 +9,7 @@ export const EVENTO_SESION_TERMINADA = "ferre:sesion-terminada";
 const terminar = () => window.dispatchEvent(new Event(EVENTO_SESION_TERMINADA));
 import { api, borrarToken, guardarToken, leerToken } from "../conexion";
 import type { SesionActual, UsuarioDeLaSesion } from "@servidor/sesiones";
+import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // `roles` son los nombres de sus roles y `permisos` lo que esos roles le dejan hacer (RF-72).
 // `rol` es el dato viejo de un solo rol: ya no viene del servidor; lo leen las versiones históricas.
@@ -78,7 +79,7 @@ export function useSesion() {
   return valor;
 }
 
-const CLAVE_USUARIO = "ferre.usuario";
+const CLAVE_USUARIO = deEsteAmbiente("ferre.usuario");
 function guardarUsuario(u: Usuario) {
   try { localStorage.setItem(CLAVE_USUARIO, JSON.stringify(u)); } catch { /* sin almacenamiento: se pide login al reconectar */ }
 }
