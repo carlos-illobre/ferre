@@ -216,6 +216,11 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-133 | El servidor recuerda cada sesión el tiempo que fija quien administra (no, 30 s, 1, 5 o 10 minutos) y en ese tiempo no la busca en la base; lo cambiado desde la aplicación vale en el pedido siguiente | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
 | RF-134 | El celular emparejado se entera de los pedidos de la computadora en el momento; la pregunta de respaldo va cada el tiempo que fija quien administra (5 o 30 s, 1, 5 o 10 minutos) | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
 | RF-135 | Los ajustes que valen para todos los dispositivos se fijan en Más → Sistema, con el permiso «Administrar el sistema», y quedan en «Quién hizo qué» | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
+| RF-136 | El celular y la computadora emparejados se hablan directo, sin pasar por el servidor, cuando los dispositivos y la red lo permiten | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
+| RF-137 | Si no se puede directo, los mensajes pasan solos por el servidor; por los dos caminos llegan una vez y en orden | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
+| RF-138 | Nada del vínculo pregunta al servidor ni a la base a ritmo fijo | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
+| RF-139 | Un indicador en los dos dispositivos dice el estado de la conexión, con un color por estado; al tocarlo, el detalle | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
+| RF-140 | Todo lo que viaja entre el celular y la computadora usa esta conexión: lector, espejo y pedido de foto | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
 
 ## Requerimientos no funcionales
 
@@ -289,6 +294,7 @@ Los que son reglas generales están además en la constitución.
 | RNF-65 | Todo lo que guarda o lee datos está en una capa propia de cada servicio, sin código repetido, y un control automático impide usar la base o el disco desde otra capa | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
 | RNF-66 | Las pruebas de la capa de datos corren contra PostgreSQL y cubren el 100 % de sus líneas; una línea que no se puede cubrir no se escribe | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
 | RNF-67 | Todo lo que cambia entre ambientes está en el archivo de variables de entorno: el código que se prueba es el que corre en producción, sin valores por omisión | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
+| RNF-68 | La conexión entre dispositivos se puede llevar a otro proyecto: módulo propio, sin dependencias, simple, sin código repetido, comentado y con pruebas que recorren cada línea | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
 
 ## De dónde vino cada cosa
 

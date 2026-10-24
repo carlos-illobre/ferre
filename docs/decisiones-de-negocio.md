@@ -1273,3 +1273,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      poco. Cada servicio del servidor, y la base, en su propia carpeta dentro de la de servicios
      (`specs/022-base-de-datos-propia/`).
 
+152. **El celular y la computadora se hablan directo, con el servidor de respaldo** (2026-10-24).
+     Carlos: la comunicación entre el celular y la computadora vinculada (cámara, lector, huella,
+     control remoto de la navegación en las dos direcciones) va por una conexión directa entre
+     los dos; si los dispositivos o el wifi no la permiten, pasa sola al servidor y no se sigue
+     reintentando. Reemplaza todo lo de hoy. Un puntito con un color por estado y un texto corto,
+     en los dos, que al tocarlo muestra el detalle; el diseño se ve después. Vive en un módulo
+     propio, sin dependencias, para llevarlo a otros proyectos, y solo ese módulo lleva reglas de
+     código propias: simple, sin código repetido, comentado y con pruebas unitarias que recorren
+     cada línea («si una línea no es cubierta por un test entonces no la escribas»); el resto del
+     proyecto se ve más adelante (specs/023, RNF-68).
