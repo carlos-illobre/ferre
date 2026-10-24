@@ -15,12 +15,16 @@
 # interfaz no les robe el procesador.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# Las pruebas consultan la base del mostrador con su usuario (comun/base.worker.mjs): la clave sale
+# del .env, como en cualquier ambiente. Solo esa: exportar todo el .env pisaría el del segundo stack.
+CLAVE_BASE_MOSTRADOR=$(grep '^CLAVE_BASE_MOSTRADOR=' .env | cut -d= -f2-)
+export CLAVE_BASE_MOSTRADOR
 
 # Corren contra la aplicación, que abre en la raíz.
 #
 # Para correrlos en una máquina donde los puertos 80 y 5432 están ocupados o Docker pide
 # sudo (por ejemplo el servidor): un .env con COMPOSE_PROJECT_NAME=ferre-e2e,
-# COMPOSE_PROFILES=local y PUERTO_API=18080, un `docker` en el PATH que llame a
+# COMPOSE_PROFILES= (vacío), PUERTO_API=18080, PUERTO_BASE=15432, un `docker` en el PATH que llame a
 # `sudo docker`, y API_URL=http://localhost:18080 tests/e2e.sh. Con API_URL, todo corre contra
 # ese único stack, una interfaz después de la otra. Al terminar,
 # `docker compose down -v` para no dejar el stack levantado.
@@ -69,7 +73,7 @@ servir() {
 # reinicia la API para que lo lea; con la base que ya lo tiene, no hace nada.
 sin_recordar_la_sesion() {
   # shellcheck disable=SC2068
-  local psql=(docker compose $@ exec -T db psql -U ferre -d ferre -tAc)
+  local psql=(docker compose $@ exec -T db psql -U mostrador -d mostrador -tAc)
   [ "$("${psql[@]}" "SELECT valor FROM configuracion WHERE clave = 'sesion.recordar_segundos'")" = "0" ] && return
   "${psql[@]}" "UPDATE configuracion SET valor = '0' WHERE clave = 'sesion.recordar_segundos'" >/dev/null
   # shellcheck disable=SC2068

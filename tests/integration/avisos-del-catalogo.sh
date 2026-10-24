@@ -6,7 +6,7 @@ set -uo pipefail
 [[ "${RAPIDO:-0}" == "1" ]] && exit 3
 cd "$(dirname "$0")/../.."
 
-salida=$(${PSQL:-docker compose exec -T db psql -U ferre -d ferre} -v ON_ERROR_STOP=1 -tA 2>&1 <<'SQL'
+salida=$(${PSQL:-docker compose exec -T db psql -U mostrador -d mostrador} -v ON_ERROR_STOP=1 -tA 2>&1 <<'SQL'
 BEGIN;
 INSERT INTO proveedor (id,nombre) VALUES ('00000000-0000-0000-0000-0000000000a1','Prov A'),('00000000-0000-0000-0000-0000000000a2','Prov B');
 INSERT INTO producto (id,descripcion) VALUES ('00000000-0000-0000-0000-000000000001','Tornillo'),('00000000-0000-0000-0000-000000000002','Tuerca'),('00000000-0000-0000-0000-000000000003','Clavo');

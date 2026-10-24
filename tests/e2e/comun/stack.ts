@@ -40,7 +40,7 @@ function conectar(compose: string[]): (sql: string) => string {
   try { puerto = execFileSync("docker", [...compose, "port", "db", "5432"], { cwd: RAIZ, encoding: "utf8" }).trim().split("\n")[0]!.split(":").pop() ?? ""; } catch { /* sin puerto publicado */ }
   if (!puerto) {
     // La base no está publicada (un .env sin el perfil local, por ejemplo): por el contenedor.
-    return (sql) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "ferre", "-d", "ferre", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
+    return (sql) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "mostrador", "-d", "mostrador", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
   }
   // El cliente de PostgreSQL es asíncrono y las pruebas consultan de forma sincrónica: la
   // consulta va a un hilo aparte y este espera su respuesta.

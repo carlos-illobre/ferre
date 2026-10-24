@@ -70,8 +70,8 @@ jobs:
       # alcanza porque ninguna entra en la imagen. IMAGEN_TAG del entorno pisa a la del .env.
       - run: cp .env.example .env
       - run: echo "IMAGEN_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-      - run: docker compose build gestion-del-local listas-de-proveedores procesos
-      - run: docker compose push gestion-del-local listas-de-proveedores procesos
+      - run: docker compose build db gestion-del-local listas-de-proveedores procesos
+      - run: docker compose push db gestion-del-local listas-de-proveedores procesos
 
   avisar:
     # GitHub no entra a la máquina (ADR-013): publica un aviso en ntfy y la máquina, que

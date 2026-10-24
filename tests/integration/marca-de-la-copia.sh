@@ -6,7 +6,7 @@
 set -uo pipefail
 [[ "${RAPIDO:-0}" == "1" ]] && exit 3
 cd "$(dirname "$0")/../.."
-PSQL=${PSQL:-docker compose exec -T db psql -U ferre -d ferre}
+PSQL=${PSQL:-docker compose exec -T db psql -U mostrador -d mostrador}
 P1=00000000-0000-0000-0000-0000000e1a01
 P2=00000000-0000-0000-0000-0000000e1a02
 sql() { $PSQL -v ON_ERROR_STOP=1 -tAc "$1"; }

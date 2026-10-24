@@ -7,7 +7,8 @@
 # publica solo en la interfaz local de la máquina (127.0.0.1:PUERTO_API); el reverse
 # proxy de la máquina, que no es parte de este repo, la alcanza ahí. Perfiles, desde el .env:
 #   gateway → Caddy local, solo para desarrollo (en Oracle lo pone la máquina)
-#   local   → PostgreSQL propio (solo desarrollo y CI; en la nube la base es Supabase)
+# La base corre en todos los ambientes (ADR-026): una instancia por proyecto de compose, con
+# una base y un usuario por servicio. Cada clave está una vez en el .env; acá se arma la cadena.
 
 services:
   reverse-proxy:
@@ -35,8 +36,11 @@ services:
       context: .
       dockerfile: microservices/api/Dockerfile
     restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      DATABASE_URL: ${DATABASE_URL:?falta DATABASE_URL en el .env}
+      DATABASE_URL: postgres://mostrador:${CLAVE_BASE_MOSTRADOR:?falta CLAVE_BASE_MOSTRADOR en el .env}@db:5432/mostrador
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
       ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
@@ -75,16 +79,19 @@ services:
       retries: 6
       start_period: 15s
 
-  # Procesos (ADR-019): un módulo aparte que se lleva a otros proyectos. Usa la misma base, en su
-  # propio esquema, y solo lo alcanza gestion-del-local por la red interna: no publica puertos.
+  # Procesos (ADR-019): un módulo aparte que se lleva a otros proyectos. Tiene su propia base en la
+  # misma instancia (ADR-026) y solo lo alcanza gestion-del-local por la red interna: no publica puertos.
   procesos:
     image: ${REGISTRO:?falta REGISTRO en el .env}/procesos:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
     build:
       context: .
       dockerfile: microservices/procesos/servidor/Dockerfile
     restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      DATABASE_URL: ${DATABASE_URL:?falta DATABASE_URL en el .env}
+      DATABASE_URL: postgres://procesos:${CLAVE_BASE_PROCESOS:?falta CLAVE_BASE_PROCESOS en el .env}@db:5432/procesos
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
       PORT: "8090"
     healthcheck:
@@ -94,22 +101,21 @@ services:
       retries: 9
       start_period: 30s
 
-  # Solo en desarrollo y CI. En producción la base es Supabase (ADR-002) y este servicio
-  # no se levanta: `docker compose --profile local up`.
+  # La base de datos (ADR-026). Publicada solo en la interfaz local: desde internet no se llega.
   db:
-    image: postgres:17-alpine
-    profiles: ["local"]
+    image: ${REGISTRO:?falta REGISTRO en el .env}/base-de-datos:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build: ./microservices/base-de-datos
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ferre
-      POSTGRES_PASSWORD: ferre
-      POSTGRES_DB: ferre
+      POSTGRES_PASSWORD: ${CLAVE_BASE_ADMIN:?falta CLAVE_BASE_ADMIN en el .env}
+      CLAVE_BASE_MOSTRADOR: ${CLAVE_BASE_MOSTRADOR:?falta CLAVE_BASE_MOSTRADOR en el .env}
+      CLAVE_BASE_PROCESOS: ${CLAVE_BASE_PROCESOS:?falta CLAVE_BASE_PROCESOS en el .env}
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${PUERTO_BASE:?falta PUERTO_BASE en el .env}:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ferre -d ferre"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 3s
       retries: 10
