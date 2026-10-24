@@ -28,5 +28,5 @@ la arquitectura (ADR-015 y ADR-018 siguen); cambia el aspecto y dónde está cad
 Nada cambia en lo que cada persona puede hacer: cada pantalla y cada pestaña siguen pidiendo los
 mismos permisos (RF-72), y el servidor los sigue controlando en cada pedido. Compras se ve con
 cualquiera de los permisos de compras, pedidos o ingresos; quien no ve las compras recientes entra
-directo al Ingreso. Usuarios se ve con «Administrar usuarios» o «Administrar roles»; con solo el
+directo al Ingreso si puede registrar ingresos, y si no, a los Pedidos (revisión, decisión 153). Usuarios se ve con «Administrar usuarios» o «Administrar roles»; con solo el
 segundo, muestra los roles. No se agregan datos nuevos a la vista ni se guardan en el dispositivo.

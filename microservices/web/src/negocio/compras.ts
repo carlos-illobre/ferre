@@ -64,3 +64,11 @@ export const esDeLaSemana = (c: CompraFila, gastos: Gastos | null): boolean => {
   const dia = new Date(`${c.fecha.slice(0, 10)}T00:00:00`).getTime();
   return dia >= desde && dia < desde + 7 * 86_400_000;
 };
+
+// Qué se abre en Depósito → Compras (decisiones 149 y 153): el escritorio de compras para quien
+// ve las compras o los gastos; si no, el ingreso para quien recibe mercadería, y los pedidos para
+// quien solo encarga.
+export type PantallaDeCompras = "escritorio" | "ingreso" | "pedidos";
+export function pantallaDeCompras(puede: (...permisos: ("negocio.gastos" | "deposito.compras" | "deposito.ingresos")[]) => boolean): PantallaDeCompras {
+  return puede("negocio.gastos", "deposito.compras") ? "escritorio" : puede("deposito.ingresos") ? "ingreso" : "pedidos";
+}

@@ -195,6 +195,14 @@ describe("Depósito · según los permisos", () => {
     expect(screen.queryByTestId("compras-recientes")).toBeNull();
   });
 
+  it("021-T012 quien solo encarga compras entra a Compras a los Pedidos, no al Ingreso (decisión 153)", async () => {
+    conPermisos("deposito.pedidos");
+    armar("compras");
+    expect(screen.getByRole("tab", { name: "Compras" }).getAttribute("aria-selected")).toBe("true");
+    expect(await screen.findByTestId("pedido-nuevo")).toBeTruthy();
+    expect(screen.queryByTestId("proveedor")).toBeNull();
+  });
+
   it("entrar por la dirección a Estanterías sin permiso dice qué permiso falta", () => {
     conPermisos("deposito.ingresos");
     armar("contar");

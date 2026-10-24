@@ -82,6 +82,19 @@ describe("tarjeta de una persona en el celular", () => {
     expect(screen.getByText("No tiene sesiones abiertas ni celulares con huella.")).toBeTruthy();
   });
 
+  it("021-T013 dos sesiones en aparatos con el mismo nombre van en dos renglones y cada una se cierra (decisión 153)", () => {
+    const alCerrarSesion = vi.fn();
+    const sesion = (id: string) => ({ id, usuario_id: "u1", dispositivo: "computadora · Chrome", ultimo_uso_en: null, email: LUCIA.email, nombre: LUCIA.nombre });
+    const acceso = { ...SIN_ACCESO, alCerrarSesion, sesiones: [sesion("s1"), sesion("s2")] };
+    render(<TarjetaDeUsuario persona={LUCIA} orden={0} disponibles={ROLES} alCambiarRoles={async () => null} alActivar={() => undefined} acceso={acceso as never} />);
+    abrir();
+    fireEvent.click(screen.getByTestId("pestana-sesiones"));
+    const cerrar = within(screen.getByTestId("acceso-de-usuario")).getAllByRole("button", { name: "Cerrar la sesión de Lucía Fernández en computadora · Chrome" });
+    expect(cerrar).toHaveLength(2);
+    fireEvent.click(cerrar[1]!);
+    expect(alCerrarSesion).toHaveBeenCalledWith(expect.objectContaining({ id: "s2" }));
+  });
+
   it("«Desactivar» avisa a la pantalla", () => {
     const alActivar = vi.fn();
     render(<TarjetaDeUsuario persona={{ ...LUCIA, activo: true }} orden={1} disponibles={ROLES} alCambiarRoles={async () => null} alActivar={alActivar} />);

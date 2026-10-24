@@ -13,7 +13,9 @@ pruebas de las pantallas quedan en pausa en el CI y se arreglan todas juntas al 
 - [x] T008 Anotar en `proyecto/tasks.md` lo que la v2 trae y el sistema no hace (los lugares vacíos de E02) (depende de T003 a T006)
 - [x] T009 Comparar cada pantalla con su v2 en capturas del celular y la computadora y mostrárselas a Carlos (depende de T007)
 - [x] T010 Las pruebas (y unificar los íconos de la v2 que quedaron en tres archivos, ver T007): arreglar las unitarias de las pantallas y las de punta a punta, sacar la pausa del CI y correr todo; borrar las pantallas viejas que quedaron solo porque las importaban sus pruebas (Anomalías, Para revisar, Mejoras y errores, Configuración compartidas) (depende de T009)
-- [ ] T011 Revisión independiente (paso 7) (depende de T010)
+- [x] T011 Revisión independiente (paso 7) (depende de T010)
+- [x] T012 [arreglo] Quien solo tiene «Encargar compras» entra desde Compras a los Pedidos, no al Ingreso que no puede usar, en el celular y la computadora (revisión, 3)
+- [x] T013 [arreglo] En el celular, la tarjeta de una persona muestra un renglón por sesión aunque dos aparatos se llamen igual, y cada una se puede cerrar (revisión, 4)
 
 ## Lo que la v2 trae y falta
 

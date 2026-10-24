@@ -173,7 +173,7 @@ function RolesEnUnaLinea({ roles, nombre }: { roles: RolAsignable[]; nombre: str
   );
 }
 
-// Sus sesiones y sus celulares con huella (decisión 100), como la v2: un renglón por aparato, con
+// Sus sesiones y sus celulares con huella (decisión 100), como la v2: un renglón por sesión, con
 // su ícono, cuándo se usó y si entra con la huella. «Cerrar» cierra la sesión; si el aparato tiene
 // las dos cosas, «…» deja elegir entre cerrar la sesión y quitar la huella.
 const hace = (iso: string | null) => {
@@ -183,25 +183,31 @@ const hace = (iso: string | null) => {
 };
 function AccesoDeUsuario({ nombre, sesiones, celulares, alCerrarSesion, alQuitarCelular }: Acceso & { nombre: string; alCerrarSesion: (s: SesionFila) => void; alQuitarCelular: (c: CelularDeOtroFila) => void }) {
   const [menu, setMenu] = useState<string | null>(null);
-  const nombres = [...new Set([...sesiones.map((s) => s.dispositivo), ...celulares.map((c) => c.dispositivo ?? "Celular")])];
+  // Cada sesión va en su renglón aunque dos aparatos se llamen igual (decisión 153); la huella se
+  // junta con la primera sesión de su mismo nombre, y la que no tiene sesión va sola.
+  const libres = [...celulares];
+  const renglones: { clave: string; n: string; s?: SesionFila; c?: CelularDeOtroFila }[] = sesiones.map((s) => {
+    const i = libres.findIndex((x) => (x.dispositivo ?? "Celular") === s.dispositivo);
+    const c = i < 0 ? undefined : libres.splice(i, 1)[0];
+    return { clave: s.id, n: s.dispositivo, s, c };
+  });
+  for (const c of libres) renglones.push({ clave: c.id, n: c.dispositivo ?? "Celular", c });
   return (
     <div className="ua-lista" data-testid="acceso-de-usuario">
-      {nombres.map((n) => {
-        const s = sesiones.find((x) => x.dispositivo === n);
-        const c = celulares.find((x) => (x.dispositivo ?? "Celular") === n);
+      {renglones.map(({ clave, n, s, c }) => {
         const esCelu = Boolean(c) || /celular|android|iphone|samsung|moto/i.test(n);
         return (
-          <div key={n} className="ua-disp" data-testid={s ? "sesion" : "celular-de-otro"}>
+          <div key={clave} className="ua-disp" data-testid={s ? "sesion" : "celular-de-otro"}>
             <span className="ua-ico"><IconoN nombre={esCelu ? "smartphone" : "monitor"} /></span>
             <span className="ua-texto"><b>{n}</b><small>{s ? hace(s.ultimo_uso_en) : c ? (c.ultimo_uso_en ? `Último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : `Vinculado el ${fecha(c.creada_en.slice(0, 10))}`) : ""}{c && <> · <IconoN nombre="fingerprint" tam={16} /> con huella</>}</small></span>
             {s && c ? (
-              <button type="button" className="ua-boton icono" aria-expanded={menu === n} aria-label={`Qué hacer con ${n} de ${nombre}`} onClick={() => setMenu(menu === n ? null : n)}><IconoN nombre="ellipsis" tam={18} /></button>
+              <button type="button" className="ua-boton icono" aria-expanded={menu === clave} aria-label={`Qué hacer con ${n} de ${nombre}`} onClick={() => setMenu(menu === clave ? null : clave)}><IconoN nombre="ellipsis" tam={18} /></button>
             ) : s ? (
               <button type="button" className="ua-boton" onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar</button>
             ) : c ? (
               <button type="button" className="ua-boton" onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar</button>
             ) : null}
-            {menu === n && s && c && (
+            {menu === clave && s && c && (
               <span className="ua-menu">
                 <button type="button" className="ua-boton" onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar la sesión</button>
                 <button type="button" className="ua-boton" onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${nombre}`}>Quitar la huella</button>

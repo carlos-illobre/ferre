@@ -55,6 +55,7 @@ import { Tickets } from "./base/pantallas/Tickets";
 import { Anotadas, ParaRevisar } from "./base/pantallas/Anomalias";
 import { PESTANAS_DE_ANOMALIAS } from "../pestanas-de-anomalias";
 import { useParaRevisar } from "../../negocio/apartados";
+import { pantallaDeCompras } from "../../negocio/compras";
 import "./base/estilos/base.css";
 import "./base/estilos/entrar.css";
 import "./tema.css";
@@ -472,8 +473,9 @@ function Pantallas() {
           : actual === "roles" ? <Roles />
           : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`ingreso?pedido=${id}`)} /></main>
           : actual === "hoy" ? <Hoy /> : actual === "productos" ? <Productos /> : actual === "ingreso" ? <Ingreso />
-          // Compras, como la v2: el escritorio de las compras; quien solo recibe mercadería va directo al ingreso.
-          : actual === "compras" ? (puede(usuario, "negocio.gastos", "deposito.compras") ? <main id="contenido" className="pagina pagina-compras" tabIndex={-1}><ComprasRecientes /></main> : <Ingreso />)
+          // Compras, como la v2: el escritorio de las compras, o el ingreso o los pedidos (decisión 153).
+          : actual === "compras" ? { escritorio: <main id="contenido" className="pagina pagina-compras" tabIndex={-1}><ComprasRecientes /></main>, ingreso: <Ingreso />,
+            pedidos: <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`ingreso?pedido=${id}`)} /></main> }[pantallaDeCompras((...p) => puede(usuario, ...p))]
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />

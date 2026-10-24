@@ -3,6 +3,7 @@ import { contarAlEspejo, useEspejar } from "../../espejo";
 import { detalleDelRegistro, diferenciaConLaLista, useIngreso } from "../../negocio/deposito/ingreso";
 import { cantidadContada } from "../../negocio/deposito/inventario";
 import { abrirConteo, crearSector as crearSectorNuevo, ordenarSectores, useConteo, useSectores, type Conteo } from "../../negocio/deposito/conteo";
+import { pantallaDeCompras } from "../../negocio/compras";
 import { AvisoDePedido, Pedidos, usePedidoAIngresar } from "../Pedidos";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
@@ -50,7 +51,8 @@ export function Deposito({ sub }: { sub: string | null }) {
         <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor }))} actual={pestana} alElegir={(v) => irA(`deposito/${v}`)} />
       </div>
       {actual === "pedidos" ? <Pedidos celular alIngresar={(id) => irA(`deposito/ingreso?pedido=${id}`)} /> : actual === "stock" ? <Stock /> : actual === "ingreso" ? <Ingreso />
-        : actual === "compras" ? (puedeEsto("negocio.gastos", "deposito.compras") ? <ComprasRecientes /> : <Ingreso />) : <Contar />}
+        // El escritorio de compras, o el ingreso o los pedidos (decisión 153).
+        : actual === "compras" ? { escritorio: <ComprasRecientes />, ingreso: <Ingreso />, pedidos: <Pedidos celular alIngresar={(id) => irA(`deposito/ingreso?pedido=${id}`)} /> }[pantallaDeCompras(puedeEsto)] : <Contar />}
     </main>
   );
 }

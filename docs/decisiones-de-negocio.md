@@ -1288,3 +1288,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      para cualquier celular; sigue elegir un archivo); avisar con la aplicación cerrada y la huella
      remota quedan para una segunda etapa.
      El indicador: la variante A, en su propio botón donde está «Vincular» (2026-10-24).
+
+153. **Lo que frena el cierre de la interfaz v2** (2026-10-24, revisión de specs/021). Carlos: las
+     teclas (Alt + letra y las de cada pantalla) se rehacen todas más adelante porque funcionan
+     mal y sin consistencia, así que por ahora no se tocan (T139); los mínimos de tamaño del
+     celular se redefinen (T140). Se arreglan ya: quien solo encarga compras llega a los Pedidos
+     desde Compras, y la tarjeta de una persona en el celular muestra cada sesión, aunque dos
+     aparatos se llamen igual.
