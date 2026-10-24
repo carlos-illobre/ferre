@@ -63,7 +63,7 @@ RF-06:
   pruebas:
     - tests/e2e/escritorio/11-duplicados.spec.ts
     - tests/e2e/celular/11-duplicados.spec.ts
-    - microservices/api/src/duplicados/datos.test.ts
+    - microservices/api/src/persistencia/duplicados.test.ts
     - microservices/web/src/pantallas/celular/Catalogo.test.tsx
   defectos:
     - "Solo se sugieren duplicados con la misma descripción (sin acentos, símbolos ni espacios, de 8 caracteres o más); no por descripción similar"
@@ -1025,7 +1025,7 @@ RNF-13:
   pruebas:
     - tests/integration/health.sh
     - tests/integration/migraciones.sh
-    - microservices/api/src/migraciones.test.ts
+    - microservices/api/src/persistencia/migrar.test.ts
     - microservices/listas/tests/test_health.py
     - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
   defectos:
@@ -1258,7 +1258,7 @@ RF-93:
   estado: "Hecho (011-T002, 011-T006): borrador, vigente e historial con copiar al borrador"
   pruebas:
     - microservices/procesos/servidor/src/reglas.test.ts
-    - microservices/procesos/servidor/src/datos.test.ts
+    - microservices/procesos/servidor/src/persistencia/procesos.test.ts
     - microservices/procesos/web/src/compu/EditorCompu.test.tsx
   defectos: []
 
@@ -1390,7 +1390,7 @@ RNF-61:
   pruebas:
     - microservices/procesos/servidor/.dependency-cruiser.cjs
     - microservices/procesos/web/.dependency-cruiser.cjs
-    - microservices/procesos/servidor/src/datos.test.ts
+    - microservices/procesos/servidor/src/persistencia/procesos.test.ts
   defectos: []
 
 RF-122:
@@ -1423,7 +1423,6 @@ RF-125:
   estado: "Hecho (018-T002, 018-T012): la salud del servidor no consulta la base; una consulta por día evita que Supabase la pause"
   pruebas:
     - microservices/api/src/salud.test.ts
-    - microservices/api/src/despierta.test.ts
   defectos: []
 
 RF-126:

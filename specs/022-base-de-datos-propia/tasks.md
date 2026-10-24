@@ -5,7 +5,7 @@
 - [x] T003 La base en su carpeta: imagen propia, script de arranque con una base y un usuario por servicio, compose sin perfil, variables nuevas en el .env y en las plantillas de los ambientes, sin Supabase (E01–E04, E06, E07, E10) (depende de T002)
 - [x] T004 Capa de datos del mostrador: carpeta propia, una conexión, una transacción, el migrador de Kysely, archivos, eventos y cada tema; todo por Kysely; los tipos generados desde la base con las listas cerradas como ENUM; control de capas (E11–E14, E09) (depende de T003)
 - [x] T005 Pruebas de la capa de datos del mostrador contra Postgres, con 100 % de cobertura que corta la subida; unitarias con base en utest.sh y en la CI (E15–E18) (depende de T004)
-- [ ] T006 Capa de datos de Procesos en su carpeta y en su base, con el migrador de Kysely y sus pruebas al 100 % (E08, E15–E18) (depende de T005)
+- [x] T006 Capa de datos de Procesos en su carpeta y en su base, con el migrador de Kysely y sus pruebas al 100 % (E08, E15–E18) (depende de T005)
 - [ ] T007 La salud dice si la base responde y el monitor deja de consultar Supabase (E05) (depende de T004)
 - [ ] T008 La marca de otra base no se usa (E23) (depende de T004)
 - [ ] T009 Todo lo que cambia entre ambientes en el .env: AMBIENTE, sin valores por omisión, la base del dispositivo por ambiente (E19–E22) (depende de T003)

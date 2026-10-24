@@ -19,7 +19,8 @@ RUN addgroup -g 10001 app && adduser -u 10001 -G app -D app
 WORKDIR /app
 COPY --from=build --chown=app:app /out ./
 COPY --from=build --chown=app:app /app/microservices/procesos/servidor/dist ./dist
-COPY --from=build --chown=app:app /app/microservices/procesos/servidor/migraciones ./migraciones
+# Las migraciones van al lado del migrador compilado, donde las busca (src/persistencia/migrar.ts).
+COPY --from=build --chown=app:app /app/microservices/procesos/servidor/src/persistencia/migraciones ./dist/persistencia/migraciones
 USER app
 EXPOSE 8090
 CMD ["node", "dist/index.js"]
