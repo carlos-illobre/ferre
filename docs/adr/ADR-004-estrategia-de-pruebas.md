@@ -84,3 +84,10 @@ Los clips y las capturas del manual de uso (`specs/012-manual-de-uso/`) se arman
 propios en `tests/capturas/tutorial/`, contra la API de mentira, al ritmo de una persona y
 grabando video. Las pruebas de punta a punta no graban video (`video: "off"`) ni comparten esos
 recorridos: no se hacen más lentas por el manual (pedido de Carlos).
+
+## Enmienda (2026-10-24): la capa de datos, al 100 %
+
+La capa de datos de cada servicio (`src/persistencia/`) se prueba contra PostgreSQL de verdad, con
+un umbral del 100 % de líneas, ramas, funciones y sentencias que corta la subida; una línea de esa
+capa que no se puede cubrir no se escribe (decisiones 150 y 151, ADR-025). El resto del código
+sigue sin meta de cobertura.

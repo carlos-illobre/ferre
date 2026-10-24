@@ -90,3 +90,11 @@ El mostrador sigue funcionando durante cualquier caída del servidor o de la bas
 ## Referencias
 
 ADR-001, ADR-003. Issues #18, #19.
+
+## Enmienda del 2026-10-24: la base sale de Supabase (ADR-026)
+
+La base pasa a un contenedor de PostgreSQL en la máquina de Oracle, una instancia por ambiente y
+una base por servicio (ADR-026). La máquina vuelve a guardar datos. Las cuatro capas de respaldo
+de esta decisión se rearman por etapas (decisión 150): la copia por noche en la etapa 2, la copia
+continua, el monitor y la prueba de restauración en la etapa 4, la copia semanal en otro
+proveedor en la etapa 5. El tope de 350 MB y la pausa por inactividad se van con Supabase.

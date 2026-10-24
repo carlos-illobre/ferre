@@ -65,7 +65,9 @@ mostrador figura «a validar» hasta que Carlos o el Vendedor lo confirman. Ese 
 escribe en la especificación: vive en `proyecto/estado.yml`, con las pruebas que lo
 respaldan, y es lo único que hay que reiniciar si el código se rehace. Las unitarias
 corren en cada push; las de punta a punta cubren los caminos principales, una vez en el
-celular y otra en la computadora. Sin meta de cobertura ni mutation testing (ADR-004).
+celular y otra en la computadora. Sin meta de cobertura ni mutation testing, salvo la capa de
+datos de cada servicio: 100 % de sus líneas, y una línea que no se puede cubrir no se escribe
+(ADR-004).
 
 ### VII. Seguro por defecto
 
@@ -103,8 +105,9 @@ decisiones de negocio de Carlos se anotan con su fecha en la especificación que
 
 - **Stack:** el de ADR-001 y ADR-010. Cada problema con la tecnología que mejor lo resuelve;
   ante la duda, TypeScript.
-- **Datos:** `gestion-del-local` es el único dueño de la base (ADR-003). El esquema cambia
-  con una migración nueva; nunca se edita una aplicada.
+- **Datos:** cada servicio es el único dueño de su base, dentro de la instancia de PostgreSQL
+  de su ambiente (ADR-003, ADR-026); todo lo que guarda o lee datos está en su capa de datos
+  (ADR-025). El esquema cambia con una migración nueva; nunca se edita una aplicada.
 - **Ambientes:** `master` es pruebas y cada push lo despliega; `produccion` se promueve solo
   cuando Carlos lo pide (ADR-012).
 - **Equipo del local:** una notebook vieja con internet intermitente y un celular Android.

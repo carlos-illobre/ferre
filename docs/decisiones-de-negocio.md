@@ -1263,3 +1263,13 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
        que se prueba y el que corre en producción son idénticos
        (`specs/022-base-de-datos-propia/`).
 
+151. **Etapa 1 del almacenamiento: lo más fácil, y solo la capa de datos** (2026-10-24). Como no
+     hay nada real en producción, las bases nuevas arrancan vacías en los dos ambientes y no se
+     muda nada; Supabase no aporta valor y se quita, y con ella el tope de consumo de su plan
+     gratuito (RNF-62). Las migraciones de cada servicio las aplica la biblioteca de consultas,
+     con pocas líneas propias en cada uno, sin una biblioteca interna compartida. «Si una línea
+     no puede ser cubierta, no se escribe» vale solo para la capa de datos. El reordenamiento
+     toca solo la capa de datos; las reglas, las rutas y la web se reordenan más adelante, de a
+     poco. Cada servicio del servidor, y la base, en su propia carpeta dentro de la de servicios
+     (`specs/022-base-de-datos-propia/`).
+

@@ -29,3 +29,5 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [022](ADR-022-la-venta-en-curso-vive-fuera-de-la-pantalla-vender.md) | La venta en curso vive en el negocio compartido, fuera de la pantalla Vender: el Catálogo le agrega, el menú la cuenta y el espejo se engancha una vez | Aceptado | 2026-10-17 |
 | [023](ADR-023-el-catalogo-vive-en-el-servidor.md) | El catálogo vive en el servidor, en una copia que la base mantiene al día con avisos; los dispositivos piden de a páginas y no lo guardan | Aceptado | 2026-10-20 |
 | [024](ADR-024-la-venta-corregida-guarda-su-historia.md) | La venta corregida guarda una foto de antes y después; un cambio es un registro propio; la plata de las diferencias va en movimientos de dinero del día | Aceptado | 2026-10-20 |
+| [025](ADR-025-sin-orm-todo-por-kysely.md) | Sin ORM: la capa de datos usa solo Kysely, migraciones SQL con su migrador y tipos generados desde la base | Aceptado | 2026-10-24 |
+| [026](ADR-026-una-base-por-servicio-en-la-maquina.md) | La base corre en la máquina, una instancia por ambiente y una base por servicio; sale de Supabase | Aceptado | 2026-10-24 |

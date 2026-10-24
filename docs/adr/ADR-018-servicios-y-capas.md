@@ -95,3 +95,10 @@ anomalias, actividad):
   `microservices/web/src/plataforma/busqueda/`.
 - [ADR-014](ADR-014-dos-interfaces-celular-y-escritorio.md) sigue valiendo en que hay dos
   juegos de pantallas; deja de valer que cada uno tenga sus propios datos y reglas.
+
+## Enmienda (2026-10-24): la capa de datos en su carpeta
+
+En cada servicio con base, todo lo que guarda o lee datos (la base y el disco) está en
+`src/persistencia/`, que es lo único que importa `kysely`, `pg` o `node:fs`; los `datos.ts` de cada
+tema pasan ahí, uno por tema. `pnpm capas` lo controla. La base es una pieza más en
+`microservices/base-de-datos/` (ADR-025, ADR-026).

@@ -72,3 +72,9 @@ cada aplicación.
 - La CI construye y publica una imagen más (`procesos`) y el compose suma el servicio. No hay
   variables nuevas en el `.env`: usa la misma base y el mismo token entre servicios.
 - Cómo llevarlo a otro proyecto está en `microservices/procesos/README.md`.
+
+## Enmienda (2026-10-24): Procesos tiene su propia base
+
+Procesos deja de usar la base de Ferrebress: tiene su base `procesos` en la misma instancia, con
+su usuario (ADR-026). Sus tablas siguen en el esquema `procesos` dentro de ella, y sus migraciones
+las aplica el migrador de Kysely (ADR-025). Para llevarlo a otro proyecto se copia su base entera.

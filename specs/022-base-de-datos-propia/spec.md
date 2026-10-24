@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-24
 
-**Status**: Borrador: falta que Carlos conteste las preguntas marcadas y la apruebe
+**Status**: Aprobada (Carlos, 2026-10-24, con sus respuestas a las cuatro preguntas)
 
 **Maquetas**: No lleva pantallas
 
@@ -29,14 +29,18 @@ el 18/11 puede restringir la base (ADR-023).
 
 ### Session 2026-10-24
 
-[NEEDS CLARIFICATION: RNF-62 (de `018-descarga-eficiente`) pide que los dos ambientes usen menos de la mitad del plan gratuito de Supabase en datos que salen de la base y en registros. Sin Supabase ese tope ya no existe. ¿Se retira, o se reemplaza por un tope del tráfico que sale del servidor hacia los dispositivos, que es el recurso que hay que cuidar?]
-
 - Q: ¿Dónde vive la base? → A: En la máquina de Oracle, en un contenedor de PostgreSQL, uno por ambiente. Supabase deja de usarse (decisión 150).
 - Q: ¿Una base para todo o una por servicio? → A: Una instancia y, adentro, una base por servicio, cada una con su usuario, que no puede entrar a las de los otros. En esta etapa, dos: la del mostrador y la de Procesos (decisión 150).
 - Q: ¿Se quita el trabajo sin conexión en esta etapa? → A: No: queda como está (decisión 150).
 - Q: ¿Copias de seguridad en esta etapa? → A: No: llegan en la etapa 2 (decisión 150).
 - Q: ¿Cuánta cobertura de pruebas? → A: El 100 % de las líneas de la capa de datos; una línea que no se puede cubrir no se escribe (decisión 150). Cambia la regla general, que no tenía meta de cobertura.
 - Q: ¿Qué puede ser distinto entre ambientes? → A: Solo lo que dice el archivo de variables de entorno; el código es el mismo (decisión 150).
+- Q: Sin copias en esta etapa, ¿se muda producción ya? → A: Todavía no hay nada real en producción: se hace lo más fácil. Las bases nuevas arrancan vacías en los dos ambientes y no se muda nada desde Supabase, que no aporta valor y se quita (decisión 151).
+- Q: El código que aplica las migraciones está copiado en cada servicio: ¿biblioteca compartida, una de afuera o la copia? → A: La que ya trae la biblioteca de consultas, con unas pocas líneas propias en cada servicio (decisión 151).
+- Q: «Si una línea no puede ser cubierta, no se escribe», ¿vale para todo el código? → A: Solo para la capa de datos (decisión 151).
+- Q: ¿Qué pasa con el tope de consumo del plan gratuito de la base (RNF-62)? → A: Si Supabase no aporta valor, no se usa; sin Supabase ese tope no existe y RNF-62 se retira (decisión 151).
+- Q: ¿Hasta dónde llega el reordenamiento del código? → A: Solo la capa de datos. Las reglas y las rutas cambian únicamente lo necesario para llamarla (de dónde importan); el resto se reordena más adelante, de a poco (decisión 151).
+- Q: ¿Dónde va cada pieza del servidor? → A: Cada servicio del servidor tiene su propia carpeta dentro de la de servicios; la base de datos, que pasa a ser una pieza más, también (decisión 151).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -63,25 +67,26 @@ afuera.
 
 ---
 
-### User Story 2 - Mudar los datos sin perder nada (Priority: P1)
+### User Story 2 - Las bases nuevas arrancan vacías (Priority: P1)
 
-Los datos que hoy están en Supabase pasan a la base nueva sin perder ni cambiar nada, y el
-mostrador sigue vendiendo mientras tanto.
+Como no hay nada real en producción, no se muda nada: cada ambiente arranca con sus bases
+vacías y con el esquema al día, y la primera persona se da de alta con el comando de siempre.
+Lo que el servidor y los dispositivos tenían guardado de la base anterior no se mezcla con la
+nueva.
 
-**Why this priority**: sin esto la base nueva arranca vacía.
+**Why this priority**: es el camino más corto a dejar Supabase, que pasó el tope del plan
+gratuito.
 
-**Independent Test**: mudar una copia de la base actual a una base nueva vacía y comparar
-tabla por tabla la cantidad de filas, y el total facturado.
+**Independent Test**: levantar un ambiente con la base vacía, dar de alta a la primera persona,
+entrar y cargar una lista.
 
 **Acceptance Scenarios**:
 
-1. **E07** **Given** la base de Supabase con datos, **When** se muda a la base nueva, **Then** cada tabla tiene la misma cantidad de filas, y la cantidad de ventas y el total facturado coinciden; si algo no coincide, la mudanza se informa como fallida y la aplicación sigue usando la base anterior.
-2. **E08** **Given** las tablas de Procesos, que hoy están en un esquema propio de la base compartida, **When** se mudan, **Then** quedan en la base de Procesos y la del mostrador no las tiene.
-3. **E09** **Given** el mostrador vendiendo durante la mudanza, **When** el servidor deja de responder un rato, **Then** las ventas quedan en el dispositivo y se mandan solas cuando el servidor vuelve, una sola vez cada una.
-4. **E10** **Given** la mudanza terminada, **When** se revisa la configuración de los ambientes, **Then** ninguno apunta a Supabase.
-5. **E23** **Given** la copia del catálogo que el servidor guarda en su disco y los datos que un dispositivo bajó a mano para trabajar sin conexión, los dos con la marca de la base anterior, **When** el servidor arranca con la base nueva, **Then** el servidor arma su copia de nuevo desde la base nueva, y el dispositivo, la próxima vez que baje, baja todo y no solo lo que cambió: una marca de la base anterior no sirve en la nueva.
-
-[NEEDS CLARIFICATION: en esta etapa no hay copias de seguridad: si se rompe el disco de la máquina o Oracle la reclama, se pierde todo lo que haya en la base. ¿Producción se muda en esta etapa, o en esta etapa se muda solo pruebas y producción sigue en Supabase hasta que estén las copias de la etapa 2? Y, si producción se muda ahora, ¿Supabase se conserva sin uso, como copia de lo que había el día de la mudanza, hasta la etapa 2?]
+1. **E07** **Given** un ambiente con la base nueva vacía, **When** arranca, **Then** el esquema del mostrador y el de Procesos quedan al día y la aplicación responde, sin productos ni ventas.
+2. **E08** **Given** la base de Procesos nueva, **When** se mira dónde están sus tablas, **Then** están en su base, y la del mostrador no tiene ninguna tabla de Procesos.
+3. **E09** **Given** la base vacía, **When** se da de alta a la primera persona con el comando del servidor, **Then** recibe todos los roles y puede entrar.
+4. **E10** **Given** los dos ambientes con la base nueva, **When** se revisa su configuración, **Then** ninguno apunta a Supabase ni tiene ninguna variable que la nombre.
+5. **E23** **Given** la copia del catálogo que el servidor guarda en su disco y los datos que un dispositivo bajó a mano para trabajar sin conexión, los dos con la marca de la base anterior, **When** el servidor arranca con la base nueva, **Then** el servidor arma su copia de nuevo desde la base nueva, y el dispositivo, la próxima vez que baja, baja todo y no solo lo que cambió: una marca de otra base no sirve.
 
 ---
 
@@ -103,9 +108,8 @@ capa de datos usa la base o el disco.
 1. **E11** **Given** el código de un servicio con base, **When** se lo mira, **Then** todo el acceso a datos está en una sola carpeta de ese servicio, separada de las rutas y de las reglas.
 2. **E12** **Given** una regla del negocio o una ruta que importa la biblioteca de la base o lee o escribe un archivo directamente, **When** se sube el cambio, **Then** el control de capas lo rechaza y dice qué archivo y qué importó.
 3. **E13** **Given** la capa de datos, **When** se busca código repetido, **Then** hay una sola forma de abrir una transacción, una sola de consultar, una sola de aplicar las migraciones y una sola de guardar y leer un archivo; la forma de las tablas que usa el código no se escribe a mano aparte de las migraciones, sale de ellas.
-4. **E14** **Given** las pruebas de las rutas y de las reglas, **When** corren, **Then** no reconocen consultas por su texto: reemplazan la capa de datos por una de prueba con la misma interfaz.
+4. **E14** **Given** las reglas y las rutas, **When** se compara el código antes y después de esta etapa, **Then** solo cambió de dónde importan la capa de datos; su lógica y sus pruebas siguen iguales.
 
-[NEEDS CLARIFICATION: el mostrador y Procesos aplican sus migraciones con el mismo código, copiado en los dos, y cuando se separen Tickets y las listas habrá cuatro copias. Las tres salidas: (a) una biblioteca interna compartida por los servicios, sin repetición, pero va contra la decisión 84 («no hay librerías compartidas entre servicios») y Procesos y Tickets dejan de poder llevarse solos a otro proyecto; (b) usar en todos los servicios una biblioteca de afuera que ya hace las migraciones, y cada uno queda con unas pocas líneas propias; (c) aceptar la copia, que es chica. ¿Cuál?]
 
 ---
 
@@ -126,7 +130,6 @@ funciones cubiertas; agregar una línea sin prueba y ver que la subida se frena.
 3. **E17** **Given** las pruebas de la capa de datos, **When** corren, **Then** usan una base PostgreSQL de la misma versión que producción, vacía al empezar, con las migraciones aplicadas por el mismo código que en producción; ninguna prueba de esta capa simula la base.
 4. **E18** **Given** una consulta que falla en la base (por ejemplo, un dato que rompe una restricción), **When** corre su prueba, **Then** se comprueba que el error llega a quien llamó y que la transacción no dejó nada a medias.
 
-[NEEDS CLARIFICATION: «si una línea no puede ser cubierta por una prueba, no se escribe» ¿vale solo para la capa de datos o para todo el código? Si vale para todo, el 100 % de cobertura pasa a ser regla de todo el sistema y hay que llevar el resto del código a ese nivel, que es bastante más trabajo que esta etapa.]
 
 ---
 
@@ -162,8 +165,8 @@ de variables, y ver que solo cambia lo que ese archivo dice.
 ### Non-Functional Requirements
 
 - **RNF-63**: La base de datos es PostgreSQL y corre en un contenedor de la máquina del servidor, una instancia por ambiente, con sus datos en un volumen. Adentro hay una base por servicio, cada una con su usuario, que no puede abrir las de los otros. La base no se alcanza desde internet. Reemplaza lo que la decisión técnica de la base (ADR-002) decía de Supabase y de que la máquina no guarda datos; las copias de seguridad llegan en la etapa 2.
-- **RNF-64**: Los datos se mudan de la base anterior a la nueva sin perder ni cambiar nada: se comparan las filas de cada tabla y el total facturado, y si no coinciden la mudanza no se da por hecha. El mostrador sigue vendiendo durante la mudanza.
-- **RNF-65**: En cada servicio, todo lo que guarda o lee datos (base y archivos) está en una capa propia, separada de las rutas y de las reglas del negocio, y un control automático en cada subida impide que otra capa use la base o el disco. Dentro de esa capa no hay código repetido: una sola forma de consultar, de abrir una transacción, de migrar y de guardar un archivo, y la forma de las tablas sale de las migraciones, no se escribe dos veces.
+- **RNF-64**: Las bases nuevas arrancan vacías y con el esquema al día; no se muda nada de la base anterior, que no tenía datos reales, y deja de usarse. Lo que el servidor o un dispositivo guardaron con una marca de otra base no se usa en la nueva. Retira RNF-62, el tope de consumo del plan gratuito de la base anterior.
+- **RNF-65**: En cada servicio, todo lo que guarda o lee datos (base y archivos) está en una capa propia, separada de las rutas y de las reglas del negocio; cada servicio del servidor, y la base, tienen su carpeta propia dentro de la de servicios; y un control automático en cada subida impide que otra capa use la base o el disco. Dentro de esa capa no hay código repetido: una sola forma de consultar, de abrir una transacción, de migrar y de guardar un archivo, y la forma de las tablas sale de las migraciones, no se escribe dos veces.
 - **RNF-66**: Las pruebas de la capa de datos corren contra PostgreSQL de la misma versión que producción y cubren el 100 % de sus líneas, ramas y funciones; una subida que baja de ese número no pasa. Una línea de esa capa que no se puede cubrir con una prueba no se escribe. Cambia, para esta capa, la regla de las pruebas (RNF-55), que no tenía meta de cobertura.
 - **RNF-67**: Todo lo que cambia entre ambientes está en el archivo de variables de entorno y en ningún otro lado: el código que se prueba es el mismo que corre en producción. Ninguna pieza tiene valores por omisión para esas variables ni deduce el ambiente de otra cosa (la versión, la dirección). Lo que cada ambiente guarda en el dispositivo va aparte, nombrado según el ambiente.
 
@@ -178,17 +181,20 @@ de variables, y ver que solo cambia lo que ese archivo dice.
 ### Measurable Outcomes
 
 - **SC-001**: Ningún ambiente usa una base de afuera; los dos corren con su base en la máquina.
-- **SC-002**: La mudanza termina con las mismas filas en cada tabla y el mismo total facturado.
+- **SC-002**: Un ambiente nuevo arranca con las bases vacías y deja entrar a la primera persona dada de alta con el comando.
 - **SC-003**: La capa de datos de cada servicio tiene el 100 % de cobertura, y el control de capas no encuentra ningún acceso a la base o al disco fuera de ella.
 - **SC-004**: Entre el código que corre en pruebas y el que corre en producción no hay ninguna diferencia; solo cambia el archivo de variables de entorno.
 
 ## Assumptions
 
 - La máquina de Oracle tiene lugar y memoria para dos instancias de PostgreSQL (una por ambiente); la base del negocio es chica.
-- El trabajo sin conexión del mostrador no cambia en esta etapa: es lo que cubre los cortes de la mudanza.
+- El trabajo sin conexión del mostrador no cambia en esta etapa.
+- Lo que haya en las bases de Supabase (datos de prueba) se pierde: Carlos lo acepta.
 - Tickets, las listas y los usuarios siguen en la base del mostrador; se separan en etapas siguientes.
 
 ## Out of Scope (por ahora)
+
+- Reordenar las reglas, las rutas, sus pruebas y la web: solo se tocan para llamar a la capa de datos o para leer las variables de entorno.
 
 - Copias de seguridad, restauración y avisos (etapas 2 y 4).
 - Separar Tickets, las listas de proveedores y los usuarios en servicios con base propia (etapas 2, 4 y posterior a la 5).

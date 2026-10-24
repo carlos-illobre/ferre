@@ -211,7 +211,7 @@ Maquetas: `maquetas/celular-descarga.html` y `maquetas/compu-descarga.html`, apr
 
 ### Non-Functional Requirements
 
-- **RNF-62**: Con el uso de hoy, los dos ambientes juntos usan menos de la mitad de lo que permite
+- **RNF-62**: Retirado por `022-base-de-datos-propia` (decisión 151): la base deja Supabase y su plan gratuito. Decía: con el uso de hoy, los dos ambientes juntos usan menos de la mitad de lo que permite
   el plan gratuito de la base por mes: menos de 2,5 GB de datos que salen de la base y menos de
   0,5 GB de registros. Lo mide Carlos en el panel de uso de Supabase un mes después de subirlo.
 

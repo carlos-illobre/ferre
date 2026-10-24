@@ -1485,7 +1485,7 @@ RF-132:
   defectos: []
 
 RNF-62:
-  estado: "Pendiente (018-T009): lo mide Carlos en el panel de Supabase un mes después de subirlo"
+  estado: "Pendiente, fuera de esta etapa: retirado por RNF-64 (022), la base deja Supabase"
   pruebas: []
   defectos: []
 
@@ -1514,26 +1514,26 @@ RF-135:
     - "Guardar varios ajustes en un mismo pedido no es todo o nada: si fallan los días, los tiempos ya quedaron (la pantalla manda uno por vez; revisión de 020, D5)"
 
 RNF-63:
-  estado: "Nuevo (022): especificación en borrador"
+  estado: "Nuevo (022): especificación aprobada"
   pruebas: []
   defectos: []
 
 RNF-64:
-  estado: "Nuevo (022): especificación en borrador"
+  estado: "Nuevo (022): especificación aprobada"
   pruebas: []
   defectos: []
 
 RNF-65:
-  estado: "Nuevo (022): especificación en borrador"
+  estado: "Nuevo (022): especificación aprobada"
   pruebas: []
   defectos: []
 
 RNF-66:
-  estado: "Nuevo (022): especificación en borrador"
+  estado: "Nuevo (022): especificación aprobada"
   pruebas: []
   defectos: []
 
 RNF-67:
-  estado: "Nuevo (022): especificación en borrador"
+  estado: "Nuevo (022): especificación aprobada"
   pruebas: []
   defectos: []

@@ -67,3 +67,10 @@ internet se pierde la búsqueda y se conserva registrar ventas.
   reconectar lee lo que cambió.
 - La base de pruebas ya no recibe consultas solas: si nadie la usa 7 días, Supabase la pausa.
   Lo cubre el monitor diario (RNF-12, T091).
+
+## Enmienda (2026-10-24): la salud vuelve a consultar la base
+
+Sin Supabase (ADR-026) no hay plan que cuidar: la salud del servidor vuelve a decir si la base
+responde, y el monitor ya no consulta la base desde afuera (no se alcanza desde internet). La
+marca de «lo que cambió» lleva el identificador de la base, para que una marca de otra base no
+se use.
