@@ -3,21 +3,34 @@ import { buscarDuplicados, buscarUniones, resolverSugerencia, separar as separar
 import { useCatalogo } from "../../../catalogo";
 import { fecha, pesos } from "../../../formato";
 import { AvisoError, Buscador, Hoja, Icono, Toast, Lista } from "../componentes/base";
+import { TEXTOS } from "../../textos";
+import "./duplicados.css";
 import { FotoProducto } from "../componentes/Foto";
 
 // Un mismo artículo en varios proveedores (issue #29): quien administra ve las sugerencias
-// lado a lado y decide "es el mismo" o "son distintos". También une dos a mano y separa.
-// Cada candidato de una sugerencia: la marca, el proveedor, el costo y la fecha de la lista,
-// cada dato con su ícono (002-T005).
-function Candidato({ p }: { p: Resumen }) {
+// lado a lado y decide "es el mismo" o "son distintos". También une dos a mano y separa. Como
+// la v2 (decisión 148, «Renovada»): una sugerencia por vez, tocar un producto lo elige para
+// conservar, y «Es el mismo» / «Son distintos» van en la barra fija de abajo, bajo el pulgar.
+const plano = (t: string | null) => (t ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+const diaYMes = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+
+// Un lado de la sugerencia: la foto, el nombre, la marca, el proveedor y la fecha de la lista con
+// su ícono, el costo y si se conserva. Lo que difiere del que se conserva va en ámbar.
+function Lado({ p, otro, conserva, barato, alElegir }: { p: Resumen; otro: Resumen; conserva: boolean; barato: boolean; alElegir: () => void }) {
+  const t = TEXTOS.duplicados;
+  // Lo distinto se marca del lado que no se conserva, como en la computadora.
+  const marca = (valor: string | null, del: string | null) => (!conserva && plano(valor) !== plano(del) ? <span className="cd-difiere">{valor ?? "—"}</span> : valor);
   return (
-    <>
-      <strong>{p.descripcion}</strong>
-      {p.marca && <span className="dp-dato"><Icono nombre="marca" tam={16} />{p.marca}</span>}
-      <span className="dp-dato"><Icono nombre="proveedor" tam={16} />{p.proveedor ?? "Sin proveedor"}</span>
-      <span className="dp-dato dp-costo">{p.costo_neto ? pesos(p.costo_neto) : "Sin costo"}</span>
-      {p.fecha_lista && <span className="dp-dato"><Icono nombre="calendario" tam={16} />{fecha(p.fecha_lista)}</span>}
-    </>
+    <button type="button" role="radio" aria-checked={conserva} className={`cd-lado ${conserva ? "si" : ""}`} onClick={alElegir}
+      aria-label={`${conserva ? "Se conserva" : "Conservar"} «${p.descripcion}»`}>
+      <span className="cd-foto" aria-hidden="true"><Icono nombre="imagen" tam={22} /></span>
+      <span className="cd-n">{marca(p.descripcion, otro.descripcion)}</span>
+      <span className="cd-dato"><Icono nombre="marca" tam={16} />{marca(p.marca, otro.marca) ?? "Sin marca"}</span>
+      <span className="cd-dato"><Icono nombre="camion" tam={16} /><span className="cd-elipsis">{p.proveedor ?? "Sin proveedor"}</span></span>
+      <span className="cd-dato"><Icono nombre="calendario" tam={16} />{p.fecha_lista ? marca(fecha(p.fecha_lista), otro.fecha_lista ? fecha(otro.fecha_lista) : null) : "—"}</span>
+      <span className="cd-costo">{p.costo_neto ? pesos(p.costo_neto) : "Sin costo"}{barato && <span className="cd-barato"><Icono nombre="tilde" tam={14} grosor={3} />{t.elMasBarato.corto}</span>}</span>
+      <span className={`cd-cons ${conserva ? "si" : ""}`}><span className="cd-radio" aria-hidden="true" />{conserva ? t.seConserva.corto : t.conservarEste.corto}</span>
+    </button>
   );
 }
 
@@ -31,58 +44,76 @@ export function Duplicados() {
   const [aMano, setAMano] = useState(false);
   // «Separar» y «Ver todo» abren la lista de todos los productos unidos, con su buscador.
   const [todas, setTodas] = useState(false);
+  const [elegidaId, setElegidaId] = useState<string | null>(null);
+  const [conservar, setConservar] = useState<Record<string, "a" | "b">>({});
+  const [ocupado, setOcupado] = useState(false);
+  const t = TEXTOS.duplicados;
+
+  const posicion = Math.max(0, sugerencias.findIndex((s) => s.id === elegidaId));
+  const s = sugerencias[posicion] ?? null;
 
   async function buscar() {
     try { const nuevas = await buscarDuplicados(); setMensaje(nuevas ? `${nuevas} sugerencia(s) nueva(s).` : "Sin sugerencias nuevas."); }
     catch (e) { setError((e as Error).message); }
   }
-  async function resolver(s: Sugerencia, accion: "unir" | "rechazar", conservar: "a" | "b" = "a") {
+  async function resolver(accion: "unir" | "rechazar") {
+    if (!s || ocupado) return;
+    const lado = conservar[s.id] ?? "a";
+    const siguiente = sugerencias[posicion + 1] ?? sugerencias[posicion - 1] ?? null;
+    setOcupado(true);
     try {
-      await resolverSugerencia(s, accion, conservar);
-      setMensaje(accion === "unir" ? `Unidos: "${(conservar === "a" ? s.a : s.b).descripcion}" ahora tiene ${s.a.proveedor} y ${s.b.proveedor}.` : "Marcados como distintos.");
-    } catch (e) { setError((e as Error).message); }
+      await resolverSugerencia(s, accion, lado);
+      setElegidaId(siguiente?.id ?? null);
+      setMensaje(accion === "unir" ? `Unidos: "${s[lado].descripcion}" ahora tiene ${s.a.proveedor} y ${s.b.proveedor}.` : "Marcados como distintos.");
+    } catch (e) { setError((e as Error).message); } finally { setOcupado(false); }
   }
+  const costos = s ? [Number(s.a.costo_neto), Number(s.b.costo_neto)] : [];
+  const masBarato = s && s.a.costo_neto && s.b.costo_neto && costos[0] !== costos[1] ? (costos[0]! < costos[1]! ? "a" : "b") : null;
 
   return (
     <>
-      <div className="dp-nota">
-        <span className="dp-circulo"><Icono nombre="enlace" tam={18} /></span>
-        <span><b>Unificá productos duplicados</b><small>El mismo artículo puede estar en varias listas. Al unirlos queda uno solo, con todos sus proveedores y el precio del más barato.</small></span>
+      <div className="cd-nota">
+        <Icono nombre="unir" tam={18} />
+        <span>{t.nota.corto} <b>{t.notaFuerte.corto}</b>{t.notaFin.corto}</span>
       </div>
-      <div className="dp-acciones">
-        <span><button type="button" className="dp-accion fuerte" onClick={buscar} data-testid="buscar-duplicados"><span className="dp-circulo"><Icono nombre="buscar" tam={15} /></span>Buscar</button><small>Duplicados en todo el catálogo</small></span>
-        <span><button type="button" className="dp-accion" onClick={() => setAMano(true)} data-testid="unir-a-mano"><span className="dp-circulo naranja"><Icono nombre="enlace" tam={15} /></span>Unir</button><small>Dos productos, elegidos a mano</small></span>
-        <span><button type="button" className="dp-accion" onClick={() => setTodas(true)} data-testid="separar-uno"><span className="dp-circulo"><Icono nombre="separar" tam={15} /></span>Separar</button><small>Deshacer una unión</small></span>
+      <div className="cd-tres">
+        <div><button type="button" className="cd-boton oscuro" onClick={buscar} data-testid="buscar-duplicados"><Icono nombre="buscar" tam={18} />{t.buscarEnTodo.corto}</button><span>Todo el catálogo</span></div>
+        <div><button type="button" className="cd-boton" onClick={() => setAMano(true)} data-testid="unir-a-mano"><Icono nombre="unir" tam={18} />{t.unirAMano.corto}</button><span>Dos, a mano</span></div>
+        <div><button type="button" className="cd-boton" onClick={() => setTodas(true)} data-testid="separar-uno"><Icono nombre="dividir" tam={18} />{t.unidosYSeparar.corto}</button><span>Una unión</span></div>
       </div>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(fallo); }} />
-      {sugerencias.length === 0 && (
+
+      <h2 className="cd-sec">
+        <b>{t.porRevisar.corto}</b><span className="cd-cuenta ambar">{sugerencias.length}</span>
+        {sugerencias.length > 1 && <button type="button" className="cd-siguiente" onClick={() => setElegidaId(sugerencias[(posicion + 1) % sugerencias.length]!.id)} aria-label={`La siguiente: ${posicion + 1} de ${sugerencias.length}`}>{posicion + 1} de {sugerencias.length} ›</button>}
+      </h2>
+      {!s ? (
         <div className="dp-vacio">
           <span className="dp-circulo"><Icono nombre="reloj" tam={20} /></span>
           <span><b>No hay sugerencias pendientes</b><small>Tocá «Buscar» para revisar el catálogo.</small></span>
         </div>
-      )}
-      {sugerencias.length > 0 && <div className="tarjetas">
-      {sugerencias.map((s) => (
-        <div key={s.id} className="dp-sugerencia" data-testid="sugerencia">
-          <span className="dp-motivo"><Icono nombre={s.motivo === "codigo_barras" ? "codigoDeBarras" : "lector"} tam={16} />{s.motivo === "codigo_barras" ? "Mismo código de barras" : "Misma descripción"}</span>
-          <div className="dp-candidatos">
-            {(["a", "b"] as const).map((lado) => (
-              <button key={lado} type="button" className="dp-candidato" onClick={() => resolver(s, "unir", lado)} aria-label={`Es el mismo: conservar «${s[lado].descripcion}»`}>
-                <Candidato p={s[lado]} />
-                <em>Conservar este</em>
-              </button>
-            ))}
-          </div>
-          <div className="dp-botones">
-            <button type="button" className="boton tinta" onClick={() => resolver(s, "unir", "a")} data-testid="unir">Es el mismo</button>
-            <button type="button" className="boton" onClick={() => resolver(s, "rechazar")}>Son distintos</button>
+      ) : (
+        <div className="cd-sug" data-testid="sugerencia">
+          <span className={`cd-motivo ${s.motivo === "codigo_barras" ? "codigo" : ""}`}><Icono nombre={s.motivo === "codigo_barras" ? "codigoDeBarras" : "lector"} tam={16} />{s.motivo === "codigo_barras" ? t.mismoCodigo.corto : t.descripcionParecida.corto}</span>
+          <div className="cd-par" role="radiogroup" aria-label="Qué producto se conserva si son el mismo">
+            <Lado p={s.a} otro={s.b} conserva={(conservar[s.id] ?? "a") === "a"} barato={masBarato === "a"} alElegir={() => setConservar((c) => ({ ...c, [s.id]: "a" }))} />
+            <Lado p={s.b} otro={s.a} conserva={conservar[s.id] === "b"} barato={masBarato === "b"} alElegir={() => setConservar((c) => ({ ...c, [s.id]: "b" }))} />
+            <span className="cd-igual" aria-hidden="true">=</span>
           </div>
         </div>
-      ))}
-      </div>}
+      )}
       {aMano && <UnionManual alCerrar={() => setAMano(false)} alUnir={async (m) => { setMensaje(m); setAMano(false); }} />}
       <Unidos uniones={uniones ?? []} todas={todas} alVerTodas={setTodas} />
+      {s && (
+        <>
+          <div className="cd-hueco" aria-hidden="true" />
+          <div className="cd-barra">
+            <button type="button" className="cd-mismo" disabled={ocupado} onClick={() => void resolver("unir")} data-testid="unir"><Icono nombre="unir" tam={22} />{t.esElMismo.corto}</button>
+            <button type="button" className="cd-distintos" disabled={ocupado} onClick={() => void resolver("rechazar")} data-testid="rechazar"><Icono nombre="cerrar" tam={22} />{t.sonDistintos.corto}</button>
+          </div>
+        </>
+      )}
     </>
   );
 }
@@ -138,23 +169,20 @@ function Unidos({ uniones, todas, alVerTodas }: { uniones: Union[]; todas: boole
     catch (e) { setMensaje((e as Error).message); }
   }
   const lista = (cuales: Union[]) => (
-    <Lista className="dp-lista">
-      {cuales.map((u) => <UnionHecha key={u.absorbido_id} u={u} alSeparar={() => void separar(u)} />)}
-    </Lista>
+    <ul className="cd-unidas">
+      {cuales.map((u) => <li key={u.absorbido_id}><UnionHecha u={u} alSeparar={() => void separar(u)} /></li>)}
+    </ul>
   );
   return (
     <>
-      <h2 className="seccion dp-titulo" data-testid="unidos"><span>Productos unidos {uniones.length > 0 && <span className="dp-cuenta">{uniones.length}</span>}</span></h2>
-      <p className="dp-bajada">Cada uno junta varios productos. Se pueden separar si hace falta.</p>
+      <h2 className="cd-sec" data-testid="unidos">
+        <b>{TEXTOS.duplicados.productosUnidos.corto}</b>{uniones.length > 0 && <span className="cd-cuenta verde">{uniones.length}</span>}
+        {uniones.length > 0 && <button type="button" className="cd-ver" onClick={() => alVerTodas(true)} data-testid="ver-todas-las-uniones">{TEXTOS.duplicados.verTodo.corto}</button>}
+      </h2>
       <Toast texto={mensaje} alCerrar={() => { setMensaje(null); setSeparada(null); }} testId="mensaje-separar" accion={separada ? { texto: "Deshacer", alTocar: () => void deshacer(separada) } : undefined} />
       {uniones.length === 0 ? <div className="aviso-suave">Todavía no se unió ningún producto.</div> : (
-        <div className="dp-unidos">
+        <div>
           {lista(uniones.slice(0, A_LA_VISTA))}
-          {uniones.length > A_LA_VISTA && (
-            <button type="button" className="dp-ver-todo" onClick={() => alVerTodas(true)} data-testid="ver-todas-las-uniones">
-              <Icono nombre="lista" tam={20} />Ver todo ({uniones.length})<Icono nombre="derecha" tam={20} />
-            </button>
-          )}
         </div>
       )}
       {todas && (
@@ -167,19 +195,16 @@ function Unidos({ uniones, todas, alVerTodas }: { uniones: Union[]; todas: boole
   );
 }
 
-// Una unión: la foto, el nombre con «Separar» a su derecha y, debajo, la marca, a cuál unió,
-// los proveedores y cuándo.
+// Una unión, como la v2: la foto, el nombre con «Separar» a su derecha y, debajo, la marca, los
+// proveedores y cuándo, y a cuál unió.
 function UnionHecha({ u, alSeparar }: { u: Union; alSeparar: () => void }) {
   return (
-    <div className="dp-union" data-testid="union">
-      <span className="dp-foto">{u.foto_url ? <FotoProducto id={u.conservado_id} url={u.foto_url} descripcion={u.conservado} /> : <Icono nombre="imagen" tam={22} />}</span>
-      <span className="dp-datos">
-        <span className="dp-cabeza"><b>{u.conservado}</b><button type="button" className="dp-separar" onClick={alSeparar} aria-label={`Separar «${u.absorbido}» de «${u.conservado}»`}><Icono nombre="separar" tam={15} />Separar</button></span>
-        {u.marca && <small><Icono nombre="marca" tam={15} /><i>{u.marca}</i></small>}
-        <small><Icono nombre="enlace" tam={15} /><i>Unió «{u.absorbido}»</i></small>
-        {u.proveedores && <small><Icono nombre="proveedor" tam={15} /><i>{u.proveedores}</i></small>}
-        <small><Icono nombre="calendario" tam={15} /><i>Unido el {fecha(u.unido_en.slice(0, 10))}</i></small>
-      </span>
+    <div className="cd-unida" data-testid="union">
+      <span className="cd-foto chica">{u.foto_url ? <FotoProducto id={u.conservado_id} url={u.foto_url} descripcion={u.conservado} /> : <Icono nombre="imagen" tam={20} />}</span>
+      <b className="cd-unida-n">{u.conservado}</b>
+      <button type="button" className="cd-separar" onClick={alSeparar} aria-label={`Separar «${u.absorbido}» de «${u.conservado}»`}><Icono nombre="dividir" tam={16} />{TEXTOS.duplicados.separar.corto}</button>
+      <span className="cd-unida-d">{[u.marca, u.proveedores, diaYMes(u.unido_en.slice(0, 10))].filter(Boolean).join(" · ")}</span>
+      <span className="cd-unida-d">Unió «{u.absorbido}»</span>
     </div>
   );
 }

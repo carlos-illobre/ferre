@@ -92,7 +92,7 @@ export function Listas() {
       acciones={<AlLadoDeLasPestanas>
         <div className="fila lv-arriba">
           {activos.length > 0 && <Boton icono="edificio" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">{t.agregarProveedor.largo}</Boton>}
-          <Boton icono="subir" disabled={!enLinea} onClick={() => elegirArchivo.current()} aria-keyshortcuts="Alt+S" data-testid="subir-lista">{t.subirLista.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt S</kbd></Boton>
+          <Boton icono="subir" disabled={!enLinea} onClick={() => elegirArchivo.current()} data-atajo="s" data-testid="subir-lista">{t.subirLista.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt S</kbd></Boton>
         </div>
       </AlLadoDeLasPestanas>}>
       <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={() => void recargar()}>Reintentar</Boton>}>{error}</Aviso>
@@ -366,11 +366,13 @@ function Revision({ cargada, origen, alDescartar, alAplicar }: { cargada: Cargad
     catch (e) { setError(mensajeDe(e)); setOcupado(false); }
   }
 
-  const teclas = useCallback((e: globalThis.KeyboardEvent) => {
+  const alTeclear = useRef<(e: globalThis.KeyboardEvent) => void>(() => undefined);
+  alTeclear.current = (e) => {
     if (document.querySelector("dialog[open]")) return;
     if (e.altKey && e.code === "KeyD") { e.preventDefault(); void descartar(); }
     else if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); void aplicar(); }
-  }, [ocupado]); // eslint-disable-line react-hooks/exhaustive-deps
+  };
+  const teclas = useCallback((e: globalThis.KeyboardEvent) => alTeclear.current(e), []);
   useTeclasGlobales(teclas);
 
   const buscandoDuplicados = progreso?.etapa === "duplicados";

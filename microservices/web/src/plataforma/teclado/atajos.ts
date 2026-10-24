@@ -9,9 +9,13 @@ const sinAcentos = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toL
 
 // A cada nombre, en orden, su letra: la primera del nombre que esté libre; si no le queda
 // ninguna, la primera libre del abecedario; si no quedan letras, ninguna.
-export function repartirLetras(nombres: string[]): (string | null)[] {
-  const tomadas = new Set(RESERVADAS);
-  return nombres.map((nombre) => {
+// `pedidas`: la letra que un botón pide para sí (`data-atajo`, la que muestra su pantalla, como
+// «Alt S»); se le da esa y nadie más la toma.
+export function repartirLetras(nombres: string[], pedidas: (string | null)[] = []): (string | null)[] {
+  const tomadas = new Set([...RESERVADAS, ...pedidas.filter((l): l is string => Boolean(l))]);
+  return nombres.map((nombre, i) => {
+    const pedida = pedidas[i];
+    if (pedida) return pedida;
     const propias = [...sinAcentos(nombre)].filter((c) => ABECEDARIO.includes(c));
     const letra = propias.find((c) => !tomadas.has(c)) ?? [...ABECEDARIO].find((c) => !tomadas.has(c)) ?? null;
     if (letra) tomadas.add(letra);
@@ -49,7 +53,7 @@ export function useAtajos(activos: boolean, opciones?: { alFinal?: string }): vo
     const mostrar = () => {
       ocultar();
       const botones = botonesALaVista();
-      const letras = repartirLetras(botones.map(nombreDe));
+      const letras = repartirLetras(botones.map(nombreDe), botones.map((b) => b.dataset.atajo?.toLowerCase() ?? null));
       capa = document.createElement("div");
       capa.className = "atajos-capa";
       capa.setAttribute("aria-hidden", "true");

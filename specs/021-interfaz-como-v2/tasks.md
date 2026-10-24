@@ -52,3 +52,5 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Usuarios (computadora y celular): el punto verde de quien está conectado ahora y «No entró aún» para quien nunca entró.
 - Usuarios (computadora): en la ficha, «Último: …», lo último que hizo la persona.
 - Usuarios (computadora): «Todo lo que hizo» abre Quién hizo qué sin filtrar por la persona.
+- Duplicados (computadora y celular): la foto de cada producto de la sugerencia; queda el lugar con un ícono.
+- Duplicados (computadora): el stock y las ventas en «así queda» («16 un. y las 35 ventas»); dice solo los proveedores y de quién sale el costo.

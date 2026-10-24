@@ -57,3 +57,104 @@
   .duplicados-manual { grid-template-columns: minmax(0, 1fr); }
   .duplicados-manual-pie .boton { width: 100%; }
 }
+
+/* Duplicados como la v2 (decisión 148, «La bandeja»): arriba los números, a la izquierda la cola
+   como una bandeja y a la derecha el par en una tabla. Colores de la paleta compartida. */
+.dv-arriba { align-items: center; gap: 8px; }
+.dv-arriba { gap: 6px; flex-wrap: nowrap; }
+.dv-arriba .boton { min-height: 38px; padding: 0 10px; gap: 6px; border-radius: 12px; font-size: 15px; }
+@media (max-width: 1439px) { .dv-arriba .tecla { display: none; } }
+.duplicados-v2 { padding-bottom: 12px; }
+
+.dv-numeros { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 12px; }
+.dv-numero { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05); min-width: 0; }
+.dv-numero.ambar { background: var(--p-amarillo-suave); border-color: transparent; }
+.dv-numero.verde { background: var(--p-verde-suave); border-color: transparent; }
+.dv-numero-ic { width: 36px; height: 36px; border-radius: 99px; background: var(--p-superficie); color: var(--p-verde-texto); display: grid; place-items: center; flex: none; box-shadow: 0 1px 2px rgb(26 29 27 / .06); }
+.dv-numero.ambar .dv-numero-ic { color: var(--p-amarillo-texto); }
+.dv-numero-texto { display: flex; flex-direction: column; min-width: 0; }
+.dv-numero-texto > span { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--p-texto-2); white-space: nowrap; }
+.dv-numero-texto b { font-size: 22px; line-height: 26px; font-weight: 800; color: var(--p-tinta); white-space: nowrap; }
+.dv-numero-texto b small { font-size: 15px; font-weight: 700; }
+.dv-numero.ambar b small { color: var(--p-amarillo-texto); }
+.dv-barras { display: flex; gap: 3px; align-items: flex-end; height: 26px; margin-left: auto; }
+.dv-barras i { width: 8px; border-radius: 3px; background: var(--p-amarillo); opacity: .85; }
+.dv-barras i.vacia { background: var(--p-relleno-fuerte); opacity: 1; }
+
+.dv { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; margin-top: 16px; height: calc(100dvh - 232px); min-height: 480px; }
+.dv-bandeja { display: flex; flex-direction: column; min-height: 0; }
+.dv-chips { display: flex; gap: 8px; margin-bottom: 10px; }
+.dv-chip { height: 36px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font: inherit; font-size: 14px; font-weight: 650; white-space: nowrap; cursor: pointer; }
+.dv-chip[aria-selected="true"] { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+.dv-chip:focus-visible { outline: 3px solid var(--p-verde); outline-offset: 2px; }
+.dv-cola { list-style: none; margin: 0; padding: 2px 4px 4px 2px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; min-height: 0; }
+.dv-sug { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: "f n p" "f d p"; gap: 4px 12px; align-items: center; width: 100%; padding: 10px 12px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 14px; box-shadow: 0 1px 2px rgb(26 29 27 / .05); font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.dv-sug:hover { border-color: var(--p-borde-fuerte); }
+.dv-sug:focus-visible { outline: 3px solid var(--p-verde); outline-offset: 2px; }
+.dv-sug.foco { border-color: var(--p-verde); box-shadow: 0 0 0 3px rgb(23 49 43 / .10), 0 6px 20px -8px rgb(26 29 27 / .14); }
+.dv-sug.foco::before { content: ""; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--p-verde); }
+.dv-sug .dv-foto { grid-area: f; }
+.dv-n { grid-area: n; font-weight: 750; font-size: 15px; line-height: 20px; color: var(--p-tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv-d { grid-area: d; display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 18px; color: var(--p-texto-2); white-space: nowrap; overflow: hidden; }
+.dv-d svg { flex: none; }
+.dv-cuando { grid-area: p; align-self: start; font-size: 14px; font-weight: 650; color: var(--p-texto-2); }
+.dv-foto { width: 40px; height: 40px; border-radius: 8px; background: var(--p-relleno); color: var(--p-texto-2); display: grid; place-items: center; flex: none; }
+.dv-foto.grande { width: 48px; height: 48px; }
+
+.dv-comparar { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 16px 20px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 20px; box-shadow: 0 6px 20px -8px rgb(26 29 27 / .14), 0 1px 3px rgb(26 29 27 / .06); overflow-y: auto; }
+.dv-vacia { display: grid; place-items: center; }
+.dv-comp-cab { display: flex; align-items: center; gap: 12px; }
+.dv-comp-cab h2 { margin: 0; font-size: 18px; font-weight: 800; color: var(--p-tinta); }
+.dv-motivo { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 99px; background: var(--p-relleno); color: var(--p-texto-2); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.dv-motivo.codigo { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.dv-nav { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; color: var(--p-texto-2); white-space: nowrap; }
+.dv-tecla-boton { border: 0; background: none; padding: 0; cursor: pointer; }
+.dv-tabla { margin-top: 12px; display: grid; grid-template-columns: 116px minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--p-borde); border-radius: 14px; overflow: hidden; flex: none; }
+.dv-tabla > div { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 6px 14px; border-top: 1px solid var(--p-borde); font-size: 15px; line-height: 22px; color: var(--p-tinta); }
+.dv-tabla > .dv-h { border-top: 0; padding: 12px 14px; flex-direction: column; align-items: flex-start; }
+.dv-r { color: var(--p-texto-2) !important; font-size: 14px !important; font-weight: 650; background: var(--p-fondo-2); }
+.dv-cel + .dv-cel { border-left: 1px solid var(--p-borde); }
+.dv-cel.elegida { background: var(--p-verde-suave); }
+.dv-prod { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; }
+.dv-prod-n { font-weight: 750; font-size: 15px; line-height: 20px; overflow-wrap: anywhere; }
+.dv-cons { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 6px 0 12px; border-radius: 99px; border: 1.5px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-texto-2); font: inherit; font-size: 14px; font-weight: 750; white-space: nowrap; cursor: pointer; }
+.dv-cons .tecla { height: 22px; min-width: 22px; }
+.dv-radio { width: 16px; height: 16px; border-radius: 99px; border: 2px solid var(--p-borde-fuerte); flex: none; }
+.dv-cons.si { border-color: var(--p-verde); background: var(--p-verde); color: #fff; }
+.dv-cons.si .dv-radio { border-color: #fff; background: radial-gradient(circle, #fff 0 3px, transparent 4px); }
+.dv-cons.si .tecla { background: rgb(255 255 255 / .16); border-color: rgb(255 255 255 / .45); color: #fff; }
+.dv-cons:focus-visible { outline: 3px solid var(--p-naranja); outline-offset: 2px; }
+.dv-difiere { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); border-radius: 6px; padding: 0 4px; margin: 0 -4px; }
+.dv-ok { display: inline-flex; color: var(--p-ok); }
+.dv-costo { font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; }
+.dv-barato { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 99px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-size: 14px; font-weight: 750; white-space: nowrap; }
+.dv-cel.elegida .dv-barato { background: var(--p-superficie); }
+.dv-mas { font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.dv-queda { display: flex; align-items: center; gap: 12px; margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--p-relleno); font-size: 14px; line-height: 21px; color: var(--p-texto-2); font-weight: 600; }
+.dv-queda b { color: var(--p-tinta); }
+.dv-queda > svg { flex: none; color: var(--p-verde-texto); }
+.dv-pie { margin-top: auto; padding-top: 12px; display: flex; align-items: center; gap: 8px; }
+.dv-mismo, .dv-distintos, .dv-saltar { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 750; cursor: pointer; white-space: nowrap; }
+.dv-mismo { border: 0; background: var(--p-naranja); color: #fff; box-shadow: 0 8px 20px -8px rgb(216 63 14 / .55); }
+.dv-mismo:hover:not(:disabled) { background: var(--p-naranja-fuerte); }
+.dv-mismo .tecla { background: rgb(255 255 255 / .16); border-color: rgb(255 255 255 / .45); color: #fff; }
+.dv-distintos { border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.dv-distintos:hover:not(:disabled) { background: var(--p-fondo-2); }
+.dv-saltar { border: 0; background: none; color: var(--p-texto-medio); font-weight: 650; }
+.dv-mismo:disabled, .dv-distintos:disabled { opacity: .55; cursor: default; }
+.dv-mismo:focus-visible, .dv-distintos:focus-visible, .dv-saltar:focus-visible { outline: 3px solid var(--p-verde); outline-offset: 2px; }
+.dv-ayuda { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--p-texto-2); white-space: nowrap; }
+.dv-ayuda .dv-difiere { margin: 0; padding: 0 6px; }
+
+/* Lo último que se hizo, con «Deshacer», abajo al centro. */
+.dv-hecho { position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%); z-index: 30; width: min(720px, calc(100vw - 48px)); animation: subir var(--normal) ease-out; }
+.dv-hecho .aviso { align-items: center; box-shadow: 0 24px 48px -16px rgb(18 56 47 / .28), 0 4px 12px rgb(18 56 47 / .08); }
+.dv-hecho .aviso > svg { margin-top: 0; }
+.dv-hecho .aviso > .duplicados-hecho-botones { display: flex; gap: var(--e2); flex: none; }
+
+@media (max-width: 1199px) {
+  .dv-numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dv { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .dv-cola { max-height: 320px; }
+  .dv-pie { flex-wrap: wrap; }
+}
