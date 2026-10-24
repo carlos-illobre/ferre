@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-24
 
-**Status**: Borrador  <!-- pasa a «Aprobada» cuando Carlos aprueba la especificación -->
+**Status**: Aprobada (Carlos, 2026-10-24)
 
 **Maquetas**: Pendientes. Solo lleva el indicador del estado de la conexión, en el celular y la computadora; Carlos lo ve después (2026-10-24: «enfocate más que nada en la conexión, la parte gráfica después la vemos»).
 
