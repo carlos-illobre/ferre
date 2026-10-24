@@ -31,8 +31,8 @@ export function ComprasRecientes() {
   const registra = puede("deposito.ingresos");
   const encarga = puede("deposito.pedidos");
   const enLinea = useEnLinea();
-  const gastos = useGastosDeLaSemana();
-  const compras = useComprasRecientes();
+  const gastos = useGastosDeLaSemana(veGastos);
+  const compras = useComprasRecientes(veCompras);
   const { porLlegar } = usePedidosPorLlegar(encarga || registra);
   const [mensaje, setMensaje] = useState<string | null>(null);
 

@@ -9,7 +9,7 @@ import { abrirBase, guardar, leerTodo, respetarElGuardado } from "./almacen";
 import { enviarOEncolar, pendientes } from "./cola";
 import { guardaEnElDispositivo } from "./guardado";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./pantallas/Configuracion";
+import { Configuracion } from "./pruebas/configuracion";
 
 // Trabajar sin conexión en el celular (RF-84, specs/009-configuracion): el celular guarda datos
 // del negocio solo si la persona lo habilita; la computadora, siempre.
@@ -21,7 +21,7 @@ const hayBase = async () => (await indexedDB.databases()).some((b) => b.name ===
 const venta = { id: "v1", fecha: "2026-10-13T12:00:00Z", total: 100, medio_pago: "efectivo", items: [], enviada: false };
 
 describe("Trabajar sin conexión en el celular", () => {
-  beforeEach(async () => { aparato(TELEFONO); localStorage.clear(); recargarPreferencias(); apiFalsa.mockReset(); await respetarElGuardado(); });
+  beforeEach(async () => { aparato(TELEFONO); localStorage.clear(); recargarPreferencias(); apiFalsa.mockReset().mockResolvedValue([]); await respetarElGuardado(); });
   afterEach(() => { aparato(COMPUTADORA); });
 
   it("009-E07: en un celular sin nada elegido, figura deshabilitada", () => {

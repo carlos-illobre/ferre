@@ -144,7 +144,7 @@ function Detalle({ cambio: c, numero, de, conRed, enCurso, error, alDecidir }: {
         <div className="anv-efecto">
           {noSePuede ? <>
             <h3>{t.porQueNo.largo}</h3>
-            <div className="mv-aviso error"><IconoDeLaV2 nombre="unir" tam={16} /><div>{c.error}</div></div>
+            <div className="mv-aviso error" data-testid="error-de-apartado"><IconoDeLaV2 nombre="unir" tam={16} /><div>{c.error}</div></div>
             <div className="ef"><IconoDeLaV2 nombre="historia" tam={16} /><div>{t.siLoDescartas.largo}</div></div>
           </> : <>
             <h3>{v.tipo === "venta" ? t.siLaAceptas.largo : t.siLoAceptas.largo}</h3>

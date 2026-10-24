@@ -2,7 +2,8 @@ import { conPermisos } from "./pruebas/sesion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./pantallas/Configuracion";
+import { Configuracion } from "./pruebas/configuracion";
+import { TEXTOS } from "./pantallas/textos";
 import { animarNavegacion, ConRutas, irA } from "./rutas";
 
 // Configuración (RF-83, specs/009-configuracion): las animaciones se habilitan o deshabilitan
@@ -14,7 +15,7 @@ describe("Configuración · animaciones", () => {
     render(<Configuracion celular />);
     expect(screen.getByTestId("cfg-animaciones").getAttribute("aria-checked")).toBe("true");
     expect(document.documentElement.dataset.animaciones).toBeUndefined();
-    expect(screen.getByTestId("configuracion").textContent).toContain("como en una aplicación de iPhone");
+    expect(screen.getByTestId("configuracion").textContent).toContain(TEXTOS.configuracionV2.animacionesSi.corto);
   });
 
   it("009-E02: al deshabilitarlas vale en el momento: la página queda marcada y la navegación no arma ninguna transición", async () => {

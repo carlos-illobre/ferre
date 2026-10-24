@@ -33,7 +33,7 @@ describe("tarjeta de una persona en el celular", () => {
   it("al abrirla está en «Información»: el correo, cuándo se unió y «Reactivar», sin «Cambiar roles»", () => {
     render(<TarjetaDeUsuario persona={LUCIA} orden={0} disponibles={ROLES} alCambiarRoles={async () => null} alActivar={() => undefined} acceso={SIN_ACCESO} />);
     abrir();
-    expect(screen.getAllByRole("tab").map((p) => [p.textContent, p.getAttribute("aria-selected")])).toEqual([["Información", "true"], ["Roles", "false"], ["Sesiones (0)", "false"]]);
+    expect(screen.getAllByRole("tab").map((p) => [p.textContent, p.getAttribute("aria-selected")])).toEqual([["Información", "true"], ["Roles", "false"], ["Acceso (0)", "false"]]);
     expect(screen.getByTestId("se-unio").textContent).toBe("Se unió el 02/09/2026");
     expect(screen.getByTestId("reactivar").textContent).toBe("Reactivar");
     expect(screen.queryByTestId("cambiar-roles")).toBeNull();
@@ -62,14 +62,14 @@ describe("tarjeta de una persona en el celular", () => {
     expect(screen.getByTestId("pestana-info").getAttribute("aria-selected")).toBe("true");
   });
 
-  it("en «Sesiones» están sus sesiones y celulares con «Cerrar» y «Quitar»; sin ninguno, lo dice", () => {
+  it("en «Acceso» están sus sesiones y celulares con «Cerrar» y «Quitar»; sin ninguno, lo dice", () => {
     const alCerrarSesion = vi.fn();
     const acceso = { ...SIN_ACCESO, alCerrarSesion, sesiones: [{ id: "s1", usuario_id: "u1", dispositivo: "computadora · Firefox", ultimo_uso_en: null, email: LUCIA.email, nombre: LUCIA.nombre }],
       celulares: [{ id: "c1", usuario_id: "u1", dispositivo: "Samsung", creada_en: "2026-09-01T10:00:00Z", ultimo_uso_en: null }] };
     const { unmount } = render(<TarjetaDeUsuario persona={LUCIA} orden={0} disponibles={ROLES} alCambiarRoles={async () => null} alActivar={() => undefined} acceso={acceso as never} />);
     abrir();
     fireEvent.click(screen.getByTestId("pestana-sesiones"));
-    expect(screen.getByTestId("pestana-sesiones").textContent).toBe("Sesiones (2)");
+    expect(screen.getByTestId("pestana-sesiones").textContent).toBe("Acceso (2)");
     const lista = screen.getByTestId("acceso-de-usuario");
     expect(lista.textContent).toContain("computadora · Firefox");
     expect(lista.textContent).toContain("Samsung");
@@ -107,16 +107,16 @@ describe("buscar, filtrar y ordenar en el celular", () => {
   ];
   function Lista() {
     const f = useFiltroDeUsuarios(GENTE);
-    return <><FiltroDeUsuarios filtro={f} roles={ROLES} /><ul>{f.visibles.map((u) => <li key={u.id} data-testid="visible">{u.nombre}</li>)}</ul></>;
+    return <><FiltroDeUsuarios filtro={f} roles={ROLES} filas={GENTE} /><ul>{f.visibles.map((u) => <li key={u.id} data-testid="visible">{u.nombre}</li>)}</ul></>;
   }
   const visibles = () => screen.queryAllByTestId("visible").map((l) => l.textContent);
   const opcion = (nombre: string) => within(screen.getByRole("group", { name: "Roles" })).getByRole("button", { name: nombre });
 
   it("siempre dice cuántos son, y la lista va por correo", () => {
     render(<Lista />);
-    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("3 usuarios");
+    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("3 usuarios · 2 activos");
     expect(visibles()).toEqual(["Carlos", "Lucía Fernández", "Marta"]);
-    expect((screen.getByTestId("buscar-usuario") as HTMLInputElement).placeholder).toBe("Email");
+    expect((screen.getByTestId("buscar-usuario") as HTMLInputElement).placeholder).toBe("Nombre o correo");
   });
 
   it("al escribir sugiere con el correo resaltado y el nombre; elegir una deja solo a esa persona", () => {
@@ -138,7 +138,7 @@ describe("buscar, filtrar y ordenar en el celular", () => {
     expect(visibles()).toEqual(["Marta"]);
     fireEvent.click(screen.getByRole("button", { name: "Borrar la búsqueda" }));
     expect(visibles()).toEqual(["Carlos", "Lucía Fernández", "Marta"]);
-    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("3 usuarios");
+    expect(screen.getByTestId("cuantos-quedan").textContent).toBe("3 usuarios · 2 activos");
   });
 
   it("«Filtros»: varios roles a la vez (queda quien tiene cualquiera) y el estado; se marca y dice cuántos", () => {

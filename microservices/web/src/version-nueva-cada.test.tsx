@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { buscaVersionSola, cadaCuantoBuscarVersion, cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./pantallas/Configuracion";
+import { Configuracion } from "./pruebas/configuracion";
 
 // Cada cuánto se busca una versión nueva con la aplicación a la vista (RF-96, decisión 92).
 // Que el timer se pare con la app oculta y tome el tiempo nuevo lo prueba mientras-se-ve.test.ts.

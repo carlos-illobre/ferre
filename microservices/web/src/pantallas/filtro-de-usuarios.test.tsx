@@ -11,9 +11,9 @@ import { Usuarios } from "./compu/base/pantallas/Usuarios";
 
 const VENDEDOR = { id: "r1", nombre: "Vendedor" }, RECEPCION = { id: "r2", nombre: "Recepción" };
 const GENTE = [
-  { id: "u1", email: "marta.bress@ferre.test", nombre: "Marta", activo: true, roles: [VENDEDOR] },
-  { id: "u2", email: "lucia.fernandez@ferre.test", nombre: "Lucía Fernández", activo: false, roles: [RECEPCION] },
-  { id: "u3", email: "luis@ferre.test", nombre: "Luis", activo: true, roles: [VENDEDOR, RECEPCION] },
+  { id: "u1", email: "marta.bress@ferre.test", nombre: "Marta", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [VENDEDOR] },
+  { id: "u2", email: "lucia.fernandez@ferre.test", nombre: "Lucía Fernández", activo: false, creado_en: "2026-08-01T12:00:00Z", roles: [RECEPCION] },
+  { id: "u3", email: "luis@ferre.test", nombre: "Luis", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [VENDEDOR, RECEPCION] },
 ];
 
 // 007-T033 y 007-T044: en la computadora, arriba de la tabla, buscar, filtrar por roles y estado, y ordenar (decisiones 98 y 102).
@@ -22,7 +22,7 @@ describe("buscar y filtrar usuarios en la computadora", () => {
     conTodosLosPermisos();
     apiFalsa.mockReset().mockImplementation(async (ruta: string) => (ruta === "/usuarios" ? GENTE : ruta === "/roles" ? [VENDEDOR, RECEPCION] : []));
   });
-  const filas = () => screen.getAllByTestId("usuario-fila").map((f) => f.querySelector(".nombre")!.textContent);
+  const filas = () => screen.getAllByTestId("usuario-fila").map((f) => f.querySelector(".uv-nom")!.firstChild!.textContent);
   const buscador = () => screen.getByTestId("buscar-usuario") as HTMLInputElement;
 
   it("al escribir sugiere; con las flechas y Enter se elige una y quedan solo esa persona", async () => {
@@ -64,7 +64,7 @@ describe("buscar y filtrar usuarios en la computadora", () => {
     fireEvent.click(screen.getByRole("button", { name: "Quitar filtros" }));
     fireEvent.click(roles.getByRole("button", { name: "Vendedor" }));
     fireEvent.click(roles.getByRole("button", { name: "Recepción" }));
-    expect(filas()).toEqual(["Lucía Fernández", "Luis", "Marta Vos"]);
+    expect(filas()).toEqual(["Lucía Fernández", "Luis", "Marta"]);
     fireEvent.change(buscador(), { target: { value: "marta" } });
     fireEvent.click(screen.getByRole("button", { name: "Quitar filtros" }));
     fireEvent.change(buscador(), { target: { value: "zz" } });
@@ -75,8 +75,9 @@ describe("buscar y filtrar usuarios en la computadora", () => {
   it("se ordena por correo o por estado, primero los activos", async () => {
     render(<Usuarios />);
     await screen.findAllByTestId("usuario-fila");
-    expect(filas()).toEqual(["Lucía Fernández", "Luis", "Marta Vos"]);
-    fireEvent.change(screen.getByTestId("ordenar"), { target: { value: "estado" } });
-    expect(filas()).toEqual(["Luis", "Marta Vos", "Lucía Fernández"]);
+    expect(filas()).toEqual(["Lucía Fernández", "Luis", "Marta"]);
+    fireEvent.click(screen.getByTestId("abrir-filtros"));
+    fireEvent.click(screen.getByTestId("ordenar-estado"));
+    expect(filas()).toEqual(["Luis", "Marta", "Lucía Fernández"]);
   });
 });

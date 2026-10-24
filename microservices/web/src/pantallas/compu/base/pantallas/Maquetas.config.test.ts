@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 const RAIZ = resolve(__dirname, "../../../../../../..");
 const PUBLICO = resolve(RAIZ, "microservices/web/public");
 const leer = (ruta: string) => readFileSync(resolve(RAIZ, ruta), "utf8");
-const PANTALLAS = ["entrar", "vender", "ventas-de-hoy", "productos", "listas", "duplicados", "stock", "compras", "contar", "resumen", "usuarios", "actividad", "anomalias", "procesos", "mejoras-y-errores", "configuracion"];
+const PANTALLAS = ["entrar", "vender", "ventas-de-hoy", "productos", "listas", "duplicados", "stock", "compras", "contar", "resumen", "usuarios", "actividad", "anomalias", "procesos", "mejoras-y-errores", "configuracion", "mas", "ingreso", "pedidos", "sistema", "vincular"];
 
 describe("las maquetas navegables", () => {
   it("la aplicación instalada no las guarda ni las muestra en su lugar", () => {

@@ -8,9 +8,9 @@ vi.mock("../api", async (original) => ({ ...(await original<typeof import("../ap
 // jsdom no sabe guardar un archivo en su IndexedDB simulada: el almacén del dispositivo se
 // reemplaza por uno en memoria, que alcanza para probar que nada se pierde ni se duplica.
 const guardado = vi.hoisted(() => new Map<string, unknown>());
-vi.mock("../almacen", () => ({ guardarMeta: async (clave: string, valor: unknown) => { guardado.set(clave, valor); }, leerMeta: async (clave: string) => guardado.get(clave) ?? null }));
+vi.mock("../almacen", async (original) => ({ ...(await original<typeof import("../almacen")>()), guardarMeta: async (clave: string, valor: unknown) => { guardado.set(clave, valor); }, leerMeta: async (clave: string) => guardado.get(clave) ?? null }));
 
-import { Tickets } from "./Tickets";
+import { Tickets } from "./compu/base/pantallas/Tickets";
 
 const abierto = { id: "t-1", tipo: "error", descripcion: "La pantalla quedó en blanco", dispositivo: "celular · Chrome", version: "abc", creado_en: "2026-10-11T12:00:00Z", estado: "abierto", resuelto_en: null, nota: null, usuario: "Marta", resuelto_por: null, fotos: [] };
 const resuelto = { ...abierto, id: "t-2", descripcion: "No imprimía", estado: "resuelto", resuelto_en: "2026-10-11T13:00:00Z", resuelto_por: "Carlos", nota: "Corregido" };
@@ -77,12 +77,14 @@ describe("Mejoras y errores", () => {
     render(<Tickets />);
     fireEvent.change(screen.getByTestId("descripcion"), { target: { value: "Se cortó internet" } });
     fireEvent.click(screen.getByTestId("enviar"));
-    await screen.findByText("Por enviar", { selector: "h2" });
+    // Como la v2 (021): queda en la lista, marcado «por enviar».
+    const porEnviar = () => screen.queryAllByTestId("ticket").filter((x) => /por enviar/i.test(x.textContent ?? "")).length;
+    await waitFor(() => expect(porEnviar()).toBe(1));
     expect(enviados).toHaveLength(0);
     hayRed = true;
     fireEvent(window, new Event("online"));
     await waitFor(() => expect(enviados).toHaveLength(1));
-    await waitFor(() => expect(screen.queryByText("Por enviar", { selector: "h2" })).toBeNull());
+    await waitFor(() => expect(porEnviar()).toBe(0));
     fireEvent(window, new Event("online"));
     await new Promise((r) => setTimeout(r, 30));
     expect(enviados).toHaveLength(1);
@@ -93,15 +95,17 @@ describe("Mejoras y errores", () => {
     const lista = await screen.findByTestId("lista-de-tickets");
     expect(lista.textContent).toContain("La pantalla quedó en blanco");
     expect(lista.textContent).not.toContain("No imprimía");
-    fireEvent.click(within(lista).getByTestId("resolver"));
+    // Como la v2: se abre el ticket y ahí se marca resuelto, con su nota.
+    fireEvent.click(within(lista).getAllByTestId("ticket")[0]!);
     fireEvent.change(screen.getByTestId("nota"), { target: { value: "Listo" } });
     fireEvent.click(screen.getByTestId("confirmar-resuelto"));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/tickets/t-1/resolver", expect.objectContaining({ method: "POST", body: JSON.stringify({ nota: "Listo" }) })));
     fireEvent.click(screen.getByRole("button", { name: /Resueltos/ }));
     const resueltos = await screen.findByTestId("lista-de-tickets");
-    expect(resueltos.textContent).toContain("Resuelto por Carlos");
-    expect(resueltos.textContent).toContain("Corregido");
-    fireEvent.click(within(resueltos).getByTestId("reabrir"));
+    fireEvent.click(within(resueltos).getAllByTestId("ticket")[0]!);
+    expect(document.body.textContent).toContain("Carlos lo resolvió");
+    expect(document.body.textContent).toContain("Corregido");
+    fireEvent.click(screen.getByTestId("reabrir"));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/tickets/t-2/reabrir", expect.objectContaining({ method: "POST" })));
   });
 });

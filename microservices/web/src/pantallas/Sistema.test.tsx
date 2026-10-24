@@ -7,7 +7,7 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { ErrorApi } from "../api";
 import { Sistema } from "./Sistema";
-import { Configuracion } from "./Configuracion";
+import { Configuracion } from "../pruebas/configuracion";
 import { olvidarAjustesVistos } from "../negocio/sistema/ajustes";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";

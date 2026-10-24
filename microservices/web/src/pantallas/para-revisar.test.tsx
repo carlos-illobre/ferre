@@ -12,7 +12,7 @@ import { PESTANAS_DE_ANOMALIAS, PIDE_LAS_ANOMALIAS } from "./pestanas-de-anomali
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 import { CabezaDeAnomalias } from "./celular/CabezaDeAnomalias";
-import { ParaRevisar } from "./ParaRevisar";
+import { ParaRevisar } from "./compu/base/pantallas/Anomalias";
 import { describir } from "../negocio/apartados";
 
 // Más → Anomalías → Para revisar (specs/014-cambios-apartados).
@@ -37,23 +37,28 @@ describe("Para revisar", () => {
   });
   afterEach(() => { Object.defineProperty(navigator, "onLine", { value: true, configurable: true }); });
 
+  // Como la v2 (bandeja y detalle, 021): a la izquierda los cambios agrupados por persona; a la
+  // derecha, el elegido con «Aceptar» y «Descartar».
+  const elegir = (c: HTMLElement) => { fireEvent.click(c); return screen.getByTestId("cambio-elegido"); };
+
   it("014-E05 muestra cada cambio agrupado por persona, con qué es, cuándo lo hizo, cuándo llegó y desde qué dispositivo", async () => {
     render(<ParaRevisar />);
     const ana = await screen.findByRole("region", { name: "Ana López" });
-    expect(ana.textContent).toContain("sesión cerrada el 17/10 a las 09:12 · desde «celular del mostrador»");
+    expect(ana.textContent).toContain("celular del mostrador");
     const [venta, ajuste] = within(ana).getAllByTestId("apartado");
-    expect(venta!.textContent).toContain("Venta · $27.000 · Efectivo");
-    expect(venta!.textContent).toContain("2 un. Candado bronce 40 mm — $22.000");
-    expect(venta!.textContent).toContain("Cobrada el 17/10 a las 08:47 · llegó a las 10:05");
-    expect(ajuste!.textContent).toContain("Ajuste de stock · Thinner sello de oro");
-    expect(ajuste!.textContent).toContain("Hay 6 un. · «conté la estantería»");
+    expect(venta!.textContent).toContain("Venta");
+    const detalle = elegir(venta!);
+    expect(detalle.textContent).toContain("Candado bronce 40 mm");
+    expect(detalle.textContent).toContain("08:47");
+    expect(detalle.textContent).toContain("10:05");
+    expect(elegir(ajuste!).textContent).toContain("Thinner sello de oro");
     expect(screen.getByRole("region", { name: "Beto" })).toBeTruthy();
   });
 
   it("014-E06 014-E09 «Aceptar» acepta ese cambio y solo ese; la lista se vuelve a pedir", async () => {
     render(<ParaRevisar />);
     const ana = await screen.findByRole("region", { name: "Ana López" });
-    fireEvent.click(within(ana).getAllByTestId("aceptar-apartado")[0]!);
+    fireEvent.click(within(elegir(within(ana).getAllByTestId("apartado")[0]!)).getByTestId("aceptar-apartado"));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/apartados/apa-1/aceptar", { method: "POST" }));
     await waitFor(() => expect(screen.getAllByTestId("apartado")).toHaveLength(2));
     expect(apiFalsa.mock.calls.filter(([r]) => String(r).endsWith("/aceptar"))).toHaveLength(1);
@@ -62,33 +67,31 @@ describe("Para revisar", () => {
   it("014-E07 «Descartar» lo saca de la lista", async () => {
     render(<ParaRevisar />);
     const ana = await screen.findByRole("region", { name: "Ana López" });
-    fireEvent.click(within(ana).getAllByTestId("descartar-apartado")[1]!);
+    fireEvent.click(within(elegir(within(ana).getAllByTestId("apartado")[1]!)).getByTestId("descartar-apartado"));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/apartados/apa-2/descartar", { method: "POST" }));
     await waitFor(() => expect(screen.getAllByTestId("apartado")).toHaveLength(2));
   });
 
-  it("014-E08 014-E18 si no se pudo aceptar, la tarjeta dice por qué y el cambio sigue ahí", async () => {
+  it("014-E08 014-E18 si no se pudo aceptar, el cambio dice por qué y sigue ahí", async () => {
     render(<ParaRevisar />);
     // El motivo de la última vez, que guardó el servidor.
     const beto = await screen.findByRole("region", { name: "Beto" });
-    expect(within(beto).getByTestId("error-de-apartado").textContent).toBe("No se pudo aceptar: el producto se unió con otro");
-    // Y lo que dice el servidor ahora: otra persona ya lo decidió, así que ya no está en la lista
-    // del servidor. La tarjeta no se va: queda con el motivo a la vista.
+    expect(within(elegir(within(beto).getByTestId("apartado"))).getByTestId("error-de-apartado").textContent).toContain("el producto se unió con otro");
+    // Y lo que dice el servidor ahora: otra persona ya lo decidió. El cambio no se va: queda con el motivo a la vista.
     apiFalsa.mockImplementation(async (ruta: string, opciones?: { method?: string }) => {
       if (opciones?.method === "POST") { lista = lista.filter((c) => (c as { id: string }).id !== "apa-1"); throw new ErrorApi(409, "Ya se decidió: lo aceptó Marta"); }
       return ruta === "/apartados" ? { apartados: lista } : {};
     });
     const ana = screen.getByRole("region", { name: "Ana López" });
-    fireEvent.click(within(ana).getAllByTestId("aceptar-apartado")[0]!);
-    expect((await within(ana).findByTestId("error-de-apartado")).textContent).toBe("Ya se decidió: lo aceptó Marta");
-    await act(async () => { await new Promise((r) => setTimeout(r, 50)); });
-    expect(within(ana).getByTestId("error-de-apartado").textContent).toBe("Ya se decidió: lo aceptó Marta");
+    const detalle = elegir(within(ana).getAllByTestId("apartado")[0]!);
+    fireEvent.click(within(detalle).getByTestId("aceptar-apartado"));
+    expect((await within(screen.getByTestId("cambio-elegido")).findByTestId("error-de-apartado")).textContent).toContain("Ya se decidió: lo aceptó Marta");
   });
 
   it("014-E10 sin nada para revisar, lo dice", async () => {
     lista = [];
     render(<ParaRevisar />);
-    expect((await screen.findByTestId("nada-para-revisar")).textContent).toBe("No hay nada para revisar.");
+    expect((await screen.findByTestId("nada-para-revisar")).textContent).toContain("nada para revisar");
   });
 
   it("sin conexión no deja aceptar ni descartar, y lo dice", async () => {

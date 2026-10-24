@@ -9,7 +9,7 @@ import { ErrorApi } from "./api";
 import { guardar, leerMeta, leerTodo, respetarElGuardado } from "./almacen";
 import { descargar, loBajado, olvidarLaDescarga, SIN_CONEXION_PARA_BAJAR } from "./descarga";
 import { cambiarPreferencia, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./pantallas/Configuracion";
+import { Configuracion } from "./pruebas/configuracion";
 
 const prod = (id: string, extra: any = {}) => ({ id, descripcion: id.toUpperCase(), marca: null, codigo_barras: null, unidad: "unidad", margen_elegido: null, proveedor: "P", codigo_proveedor: null, costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-11", lista_importada_id: "l", explicacion_costo: [], ...extra });
 const pedidos = () => apiFalsa.mock.calls.map((c) => String(c[0]));
@@ -34,7 +34,7 @@ function servidor(cambios: { productos: any[]; quitados: string[] } | null = nul
 
 beforeEach(async () => {
   Object.defineProperty(navigator, "userAgent", { value: COMPUTADORA, configurable: true });
-  calculo.version = "1"; localStorage.clear(); recargarPreferencias(); olvidarLaDescarga(); apiFalsa.mockReset();
+  calculo.version = "1"; localStorage.clear(); recargarPreferencias(); olvidarLaDescarga(); apiFalsa.mockReset().mockResolvedValue([]);
   cambiarPreferencia("sinConexion", false); await respetarElGuardado(); // empieza sin nada guardado
   cambiarPreferencia("sinConexion", true);
 });

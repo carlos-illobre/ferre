@@ -10,12 +10,12 @@ vi.mock("../espejo", async (original) => ({ ...(await original<typeof import("..
 
 import { conTodosLosPermisos } from "../pruebas/sesion";
 import { Usuarios } from "./compu/base/pantallas/Usuarios";
-import { Configuracion } from "./Configuracion";
+import { Configuracion } from "../pruebas/configuracion";
 import { MisCelulares } from "./celular/MisCelulares";
 import { VinculoPropio } from "./Vinculo";
 
-const MARTA = { id: "m1", email: "marta@ferre.test", nombre: "Marta", activo: true, roles: [{ id: "r1", nombre: "Vendedor" }] };
-const NICO = { id: "n1", email: "nico@ferre.test", nombre: "Nicolás", activo: true, roles: [{ id: "r1", nombre: "Vendedor" }] };
+const MARTA = { id: "m1", email: "marta@ferre.test", nombre: "Marta", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [{ id: "r1", nombre: "Vendedor" }] };
+const NICO = { id: "n1", email: "nico@ferre.test", nombre: "Nicolás", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [{ id: "r1", nombre: "Vendedor" }] };
 
 // 007-T037 y 009-T006: sin pestaña Sesiones (decisiones 99 y 100).
 describe("las sesiones y los celulares de cada persona, en Usuarios", () => {
@@ -30,15 +30,15 @@ describe("las sesiones y los celulares de cada persona, en Usuarios", () => {
     });
   });
 
-  it("en la computadora, la columna «Acceso» dice cuánto tiene cada uno y despliega debajo de la fila sus sesiones y celulares", async () => {
+  it("en la computadora, la columna «Acceso» dice cuánto tiene cada uno y la ficha de la elegida, sus sesiones y celulares, que se cierran y se quitan", async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<Usuarios />);
-    const linea = await screen.findByRole("button", { name: /Sesiones y celulares de Marta/ });
-    expect(linea.textContent).toBe("1 sesión · 1 huella");
-    const nico = screen.getAllByTestId("usuario-fila").find((f) => f.textContent?.includes("Nicolás"))!;
-    expect(within(nico).queryByTestId("acceso-de-usuario")).toBeNull();
-    fireEvent.click(linea);
-    const lista = screen.getByTestId("lista-de-acceso");
+    // Como la v2: la fila dice cuánto tiene («1 sesión, 1 celular»); la ficha de la persona elegida, el detalle.
+    const filas = await screen.findAllByTestId("usuario-fila");
+    const marta = filas.find((f) => f.textContent?.includes("Marta"))!;
+    expect(within(marta).getByLabelText(/sesi/i).textContent).toBe("1 · 1");
+    fireEvent.click(marta);
+    const lista = screen.getByTestId("ficha-usuario");
     expect(lista.textContent).toContain("computadora · Firefox");
     expect(lista.textContent).toContain("Samsung de Marta");
     fireEvent.click(within(lista).getByRole("button", { name: "Cerrar la sesión de Marta en computadora · Firefox" }));
@@ -60,7 +60,7 @@ describe("lo propio, en Configuración", () => {
     unmount();
     espejo.emparejado = true;
     render(<Configuracion celular propio={<><MisCelulares /><VinculoPropio /></>} />);
-    expect(screen.getByTestId("vinculo-actual").textContent).toContain("Este celular está vinculado con tu computadora.");
+    expect(screen.getByTestId("vinculo-actual").textContent).toContain("Vinculado con tu computadora");
     expect(screen.getByTestId("desvincular-vinculo")).toBeTruthy();
     expect(screen.queryByTestId("dias-vinculo")).toBeNull();
   });

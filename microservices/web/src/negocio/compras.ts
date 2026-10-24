@@ -12,8 +12,9 @@ export type Gastos = GastosDeLaSemana;
 
 const COMPRAS = ["compras"] as const;
 
-export const useComprasRecientes = () => useDelServidor<CompraFila[]>(COMPRAS, "/compras");
-export const useGastosDeLaSemana = () => useDelServidor<Gastos>([...COMPRAS, "semana"], "/compras/semana");
+// Cada una se pide solo con su permiso: sin él, el servidor la rechaza (013-E02, E03).
+export const useComprasRecientes = (activo = true) => useDelServidor<CompraFila[]>(COMPRAS, "/compras", { activo });
+export const useGastosDeLaSemana = (activo = true) => useDelServidor<Gastos>([...COMPRAS, "semana"], "/compras/semana", { activo });
 
 export const nombreDelComprobante = (c: CompraFila): string =>
   c.comprobante_tipo === "sin_comprobante" ? "sin comprobante" : `${c.comprobante_tipo}${c.comprobante_numero ? ` ${c.comprobante_numero}` : c.foto ? " con foto" : " sin foto"}`;
@@ -39,7 +40,7 @@ export const faltanDe = (p: Pedido) => p.items.filter((i) => Number(i.recibido) 
 // compras recientes sin anular; si esas compras no alcanzan para explicar el total de la semana
 // (hay más de las que trae la lista), no se dibuja nada: mejor vacío que un número que no cierra.
 export function gastoPorDia(gastos: Gastos | null, compras: CompraFila[] | null): { letra: string; total: number }[] | null {
-  if (!gastos || !compras) return null;
+  if (!gastos?.desde || !compras) return null;
   const desde = new Date(`${gastos.desde}T00:00:00`);
   const dias = Array.from({ length: 7 }, (_, i) => { const d = new Date(desde.getTime() + i * 86_400_000); return { clave: d.toISOString().slice(0, 10), letra: "DLMMJVS"[d.getDay()]!, total: 0 }; });
   for (const c of compras) {

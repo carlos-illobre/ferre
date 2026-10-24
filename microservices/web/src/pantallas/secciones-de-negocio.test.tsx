@@ -45,24 +45,20 @@ describe("Más → Cómo va el negocio", () => {
     ]);
   });
 
-  it("013-E05 la opción de Más pide alguno de los permisos de la pantalla, en las dos interfaces", () => {
-    expect(DE_MAS_COMPU.find((d) => d.ruta === "resumen")!.pide).toEqual(PIDE_EL_NEGOCIO);
+  it("013-E05 021-E01 Cómo va el negocio está en la parte Negocio, no en Más, y pide alguno de los permisos de la pantalla (decisión 149)", () => {
+    expect(DE_MAS_COMPU.find((d) => d.ruta === "resumen")).toBeUndefined();
     expect(DE_MAS_CELULAR.find((d) => d.parte === "negocio")!.pide).toEqual(PIDE_EL_NEGOCIO);
     expect(PIDE_EL_NEGOCIO).toEqual(["negocio.ventas", "negocio.gastos", "deposito.compras", "negocio.invertido"]);
-  });
-
-  it("013-E12 en la computadora, la opción de Más lleva a la sección que se le indique", () => {
-    render(<Mas atajoDe={() => null} opciones={DE_MAS_COMPU.filter((d) => d.ruta === "resumen").map((d) => ({ ...d, destino: "gastos" }))} />);
-    fireEvent.click(screen.getByTestId("mas-resumen"));
-    expect(location.hash).toBe("#/gastos");
+    render(<Mas atajoDe={() => null} opciones={DE_MAS_COMPU} />);
+    expect(screen.queryByTestId("mas-resumen")).toBeNull();
   });
 
   describe("en la computadora", () => {
     it("013-E01 Ventas: lo vendido, la cantidad de ventas y lo que no llevaron, sin los gastos", async () => {
       conDatos(<ResumenVentas />);
       await waitFor(() => expect(screen.getByTestId("indicador-vendido").textContent).toContain("$293.000"));
-      expect(screen.getByTestId("indicador-ventas").textContent).toContain("1 anulada");
-      expect(screen.getByTestId("indicador-consultas").textContent).toContain("1");
+      expect(screen.getByTestId("indicador-ventas").textContent).toMatch(/^Ventas1/);
+      expect(screen.getByTestId("consultas").textContent).toContain("1 hoy");
       expect(await screen.findByText("Disco de corte 115 mm")).toBeTruthy();
       expect(screen.queryByTestId("indicador-gastos")).toBeNull();
       expect(apiFalsa.mock.calls.map(([r]) => r)).not.toContain("/compras/semana");
@@ -82,7 +78,7 @@ describe("Más → Cómo va el negocio", () => {
       conPermisos("negocio.gastos");
       conDatos(<ResumenCompras recientes={(v) => <ComprasRecientes key={v} />} />);
       await waitFor(() => expect(screen.getByTestId("indicador-gastos").textContent).toContain("$126.900"));
-      expect(screen.getByTestId("gastos-semana").textContent).toContain("Tresge");
+      expect(screen.getByTestId("gastos-semana").textContent).toContain("1 compra");
       expect(screen.queryByTestId("compras-recientes")).toBeNull();
     });
 
@@ -111,31 +107,34 @@ describe("Más → Cómo va el negocio", () => {
   });
 
   describe("en el celular", () => {
-    it("013-E11 con todo, las tres pestañas en orden; tocar una lleva a su dirección", async () => {
+    it("013-E11 021-E01 con todo, las tres secciones en orden, como segmentos (Resultado, apagado); tocar una lleva a su dirección", async () => {
       conDatos(<ComoVaElNegocio seccion="ventas" />);
-      expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Ventas", "Compras", "Inventario"]);
-      fireEvent.click(screen.getByRole("tab", { name: "Inventario" }));
+      expect(["ventas", "compras", "inventario"].map((s) => screen.getByTestId(`seccion-${s}`).textContent)).toEqual(["Ventas", "Compras", "Inventario"]);
+      fireEvent.click(screen.getByTestId("seccion-inventario"));
       expect(location.hash).toBe("#/mas/invertido");
     });
 
     it("013-E12 sin «Ver las ventas del negocio», el submenú tiene solo Compras e Inventario", () => {
       conPermisos("negocio.gastos", "negocio.invertido");
       conDatos(<ComoVaElNegocio seccion="compras" />);
-      expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Compras", "Inventario"]);
+      expect(screen.queryByTestId("seccion-ventas")).toBeNull();
+      expect(screen.getByTestId("seccion-compras")).toBeTruthy();
+      expect(screen.getByTestId("seccion-inventario")).toBeTruthy();
     });
 
     it("013-E13 con una sola sección, el título y sin submenú", () => {
       conPermisos("negocio.ventas");
       conDatos(<ComoVaElNegocio seccion="ventas" />);
-      expect(screen.getByRole("heading", { name: "Cómo va el negocio" })).toBeTruthy();
+      expect(screen.getByRole("heading", { name: "Negocio" })).toBeTruthy();
       expect(screen.queryAllByRole("tab")).toHaveLength(0);
+      expect(screen.queryByTestId("seccion-ventas")).toBeNull();
     });
 
     it("013-E01 Ventas: lo vendido, por medio de pago y lo que no llevaron, sin los gastos", async () => {
       conPermisos("negocio.ventas");
       conDatos(<ComoVaElNegocio seccion="ventas" />);
       await waitFor(() => expect(screen.getByTestId("numero-vendido").textContent).toContain("$293.000"));
-      expect(screen.getByTestId("resumen-hoy").textContent).toContain("Mercado Pago");
+      expect(screen.getByTestId("resumen-hoy").textContent).toContain("M. Pago");
       expect(await screen.findByText("Disco de corte 115 mm")).toBeTruthy();
       expect(screen.queryByTestId("gastos-semana")).toBeNull();
     });

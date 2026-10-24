@@ -19,7 +19,7 @@ describe("Negocio", () => {
     globalThis.fetch = vi.fn(async () => ({ json: async () => ({ ok: true, db: "ok" }) })) as never;
     apiFalsa.mockImplementation(async (ruta: string) => {
       if (ruta.startsWith("/auditoria")) return eventos(Number(new URL(`http://x${ruta}`).searchParams.get("pagina")));
-      if (ruta === "/usuarios") return [{ id: "d1", email: "d@b", nombre: "Dueño", activo: true, roles: [{ id: "r3", nombre: "Administrador" }] }, { id: "m1", email: "m@b", nombre: "Marta", activo: true, roles: [{ id: "r1", nombre: "Vendedor" }] }];
+      if (ruta === "/usuarios") return [{ id: "d1", email: "d@b", nombre: "Dueño", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [{ id: "r3", nombre: "Administrador" }] }, { id: "m1", email: "m@b", nombre: "Marta", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [{ id: "r1", nombre: "Vendedor" }] }];
       if (ruta === "/roles") return [{ id: "r1", nombre: "Vendedor" }, { id: "r2", nombre: "Recepción" }, { id: "r3", nombre: "Administrador" }];
       if (ruta === "/sesiones") return [{ id: "s1", usuario_id: "m1", dispositivo: "computadora · Firefox", ultimo_uso_en: "2026-09-14T12:00:00Z", email: "m@b", nombre: "Marta" }, { id: "s2", usuario_id: "m1", dispositivo: "celular · Chrome", ultimo_uso_en: "2026-09-14T11:00:00Z", email: "m@b", nombre: "Marta" }];
       if (ruta === "/credenciales/de-otros") return [{ id: "c1", usuario_id: "m1", dispositivo: "Samsung de Marta", creada_en: "2026-09-01T10:00:00Z", ultimo_uso_en: null }];
@@ -29,22 +29,22 @@ describe("Negocio", () => {
     });
   });
 
-  it("'Quién hizo qué' va de a 10 por página, acorta el detalle y pagina hacia adelante y atrás", async () => {
+  it("'Quién hizo qué' va de a 10 por página, como la v2: cuántas son, una tarjeta por acción y el paginador «Nuevas · 1 de 3 · Anteriores»", async () => {
     render(<Negocio parte="actividad" />);
     const paginado = await screen.findByTestId("paginado");
-    expect(paginado.textContent).toContain("Página 1 de 3 · 24 acciones");
-    expect(screen.getAllByText("venta.registrada", { exact: false })).toHaveLength(10);
-    const detalles = Array.from(document.querySelectorAll("code")).map((c) => c.textContent ?? "");
-    expect(detalles.every((d) => d.length === 121 && d.endsWith("…"))).toBe(true);
-    expect(screen.getByRole("button", { name: "← Anteriores" })).toHaveProperty("disabled", true);
-    fireEvent.click(screen.getByRole("button", { name: "Siguientes →" }));
-    await waitFor(() => expect(screen.getByTestId("paginado").textContent).toContain("Página 2 de 3"));
-    expect(apiFalsa).toHaveBeenCalledWith("/auditoria?pagina=2");
-    fireEvent.click(screen.getByRole("button", { name: "Siguientes →" }));
-    await waitFor(() => expect(screen.getByTestId("paginado").textContent).toContain("Página 3 de 3"));
-    expect(screen.getByRole("button", { name: "Siguientes →" })).toHaveProperty("disabled", true);
-    fireEvent.click(screen.getByRole("button", { name: "← Anteriores" }));
-    await waitFor(() => expect(screen.getByTestId("paginado").textContent).toContain("Página 2 de 3"));
+    expect(paginado.textContent).toContain("1 de 3");
+    expect(paginado.textContent).toContain("1 a 10");
+    expect(screen.getByTestId("cuenta").textContent).toContain("24 acciones");
+    expect(screen.getAllByTestId("evento")).toHaveLength(10);
+    expect(screen.getByTestId("anteriores")).toHaveProperty("disabled", true);
+    fireEvent.click(screen.getByTestId("siguientes"));
+    await waitFor(() => expect(screen.getByTestId("paginado").textContent).toContain("2 de 3"));
+    expect(apiFalsa.mock.calls.some(([r]) => /^\/auditoria\?pagina=2&/.test(String(r)))).toBe(true);
+    fireEvent.click(screen.getByTestId("siguientes"));
+    await waitFor(() => expect(screen.getByTestId("paginado").textContent).toContain("3 de 3"));
+    expect(screen.getByTestId("siguientes")).toHaveProperty("disabled", true);
+    fireEvent.click(screen.getByTestId("anteriores"));
+    await waitFor(() => expect(screen.getByTestId("paginado").textContent).toContain("2 de 3"));
   });
 
   it("cada persona muestra sus roles y se le pueden tildar varios; autorizar a alguien pide al menos uno", async () => {
@@ -84,17 +84,17 @@ describe("Negocio", () => {
     expect(apiFalsa).not.toHaveBeenCalledWith("/credenciales/de-otros");
   });
 
-  it("007-T037 007-T044 en la pestaña «Sesiones» de cada persona están sus sesiones y celulares, y se cierran y se quitan", async () => {
+  it("007-T037 007-T044 en la pestaña «Acceso» de cada persona están sus sesiones y celulares, y se cierran y se quitan", async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<Negocio parte="usuarios" />);
     const marta = (await screen.findAllByTestId("usuario-fila")).find((f) => f.textContent?.includes("Marta"))!;
     fireEvent.click(within(marta).getByTestId("abrir-usuario"));
-    await waitFor(() => expect(within(marta).getByTestId("pestana-sesiones").textContent).toBe("Sesiones (3)"));
+    await waitFor(() => expect(within(marta).getByTestId("pestana-sesiones").textContent).toBe("Acceso (3)"));
     fireEvent.click(within(marta).getByTestId("pestana-sesiones"));
     // Quien no tiene nada lo dice.
     const dueno = screen.getAllByTestId("usuario-fila").find((f) => f.textContent?.includes("Dueño"))!;
     fireEvent.click(within(dueno).getByTestId("abrir-usuario"));
-    expect(within(dueno).getByTestId("pestana-sesiones").textContent).toBe("Sesiones (0)");
+    expect(within(dueno).getByTestId("pestana-sesiones").textContent).toBe("Acceso (0)");
     expect(within(marta).getAllByTestId("sesion").map((s) => s.textContent)).toEqual([expect.stringContaining("computadora · Firefox"), expect.stringContaining("celular · Chrome")]);
     fireEvent.click(within(marta).getByRole("button", { name: "Cerrar la sesión de Marta en celular · Chrome" }));
     await waitFor(() => expect(apiFalsa).toHaveBeenCalledWith("/sesiones/s2", { method: "DELETE" }));

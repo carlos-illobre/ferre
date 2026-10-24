@@ -18,7 +18,7 @@ import "./configuracion-v2.css";
 // (decisión 138).
 const t = TEXTOS.configuracionV2;
 
-export function ConfiguracionCelu() {
+export function ConfiguracionCelu({ alCambiarElGuardado }: { alCambiarElGuardado?: () => void } = {}) {
   const { animaciones, versionCada, versionNunca } = usePreferencias();
   const reducir = useReducirMovimiento();
   const sinConexion = guardaEnElDispositivo();
@@ -38,7 +38,7 @@ export function ConfiguracionCelu() {
           detalle={animaciones ? t.animacionesSi.corto : t.animacionesNo.corto}>
           {reducir && animaciones && <p className="mv-aviso urgente" data-testid="cfg-reducir-movimiento">{t.reducirMovimiento.corto}</p>}
         </Renglon>
-        <Renglon icono={sinConexion ? "disco" : "sin-senal"} titulo={t.sinConexion.corto} id="cfg-sin-conexion" encendida={sinConexion} alCambiar={() => void cambiarSinConexion("este celular")} testId="cfg-sin-conexion"
+        <Renglon icono={sinConexion ? "disco" : "sin-senal"} titulo={t.sinConexion.corto} id="cfg-sin-conexion" encendida={sinConexion} alCambiar={() => void cambiarSinConexion("este celular", alCambiarElGuardado)} testId="cfg-sin-conexion"
           detalle={sinConexion ? t.sinConexionSi.corto : t.sinConexionNo.corto} />
       </div>
       {sinConexion && <DatosSinConexion />}

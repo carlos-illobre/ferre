@@ -103,7 +103,7 @@ describe("el celular", () => {
     fireEvent.click(screen.getByTestId("procesos-pestana-diagrama"));
     const hoja = screen.getByTestId("procesos-hoja-figuras");
     // Las doce, con nombres cortos; el nombre completo, para los lectores de pantalla.
-    expect(within(hoja).getAllByRole("button").filter((b) => b.className.includes("procesos-figura-celu")).map((b) => b.textContent)).toEqual(["Inicio", "Tarea", "Persona", "Sistema", "Decisión", "Paralelo", "Espera", "Fin", "Subproceso", "Carril", "Documento", "Nota"]);
+    expect(within(hoja).getAllByRole("button").filter((b) => b.className.includes("procesos-figura-celu")).map((b) => b.textContent)).toEqual(["Inicio", "Tarea", "Persona", "Sistema", "Decisión", "Paralelo", "Espera", "Fin", "Subproc.", "Carril", "Docum.", "Nota"]);
     expect(within(hoja).getByRole("button", { name: "Tarea de una persona" })).toBeTruthy();
     fireEvent.touchStart(within(hoja).getByText("Decisión"));
     expect(lienzoFalso.llamadas.find(([n]) => n === "empezarArrastre")?.[2]).toBe("decision");

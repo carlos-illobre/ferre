@@ -55,15 +55,18 @@ describe("dibujar en la computadora", () => {
     expect(screen.getByTestId("procesos-panel-paso").className).toContain("abierto");
   });
 
-  it("011-E03 la izquierda tiene las doce figuras con su nombre, y plegada, solo los íconos con el nombre al pasar el mouse", async () => {
+  it("011-E03 021-E01 la izquierda tiene las doce figuras en los grupos de la v2 (empieza y termina, lo que se hace, el camino, lo demás) con su nombre, y plegada, solo los íconos con el nombre al pasar el mouse", async () => {
     await s.cargar("Venta");
     abrir();
     const panel = await screen.findByTestId("procesos-panel-figuras");
     const figuras = within(panel).getAllByRole("button").filter((b) => b.className.includes("procesos-figura"));
-    expect(figuras.map((b) => b.getAttribute("title"))).toEqual(["Inicio", "Tarea", "Tarea de una persona", "Tarea del sistema", "Decisión", "En paralelo", "Espera", "Fin", "Subproceso", "Carril", "Documento", "Nota"]);
-    expect(within(panel).queryByText("Decisión")).toBeNull();
+    expect(figuras.map((b) => b.getAttribute("aria-label"))).toEqual(["Inicio", "Fin", "Espera", "Tarea", "Tarea de una persona", "Tarea del sistema", "Decisión", "En paralelo", "Subproceso", "Carril", "Documento", "Nota"]);
+    // Plegada, como la v2: solo los íconos, y el nombre en un globo al pasar el mouse.
+    expect(screen.getByTestId("procesos-figura-decision").textContent).toBe("");
+    expect(within(panel).getAllByRole("tooltip")).toHaveLength(12);
     fireEvent.click(screen.getByTestId("procesos-plegar-figuras"));
-    expect(within(panel).getByText("Decisión")).toBeTruthy();
+    expect(screen.getByTestId("procesos-figura-decision").textContent).toBe("Decisión");
+    expect(within(panel).queryAllByRole("tooltip")).toHaveLength(0);
   });
 
   it("011-E06 el panel del paso muestra sus datos y cada cambio va al dibujo", async () => {

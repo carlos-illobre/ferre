@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { conPermisos } from "../../pruebas/sesion";
+import { conPermisos, conTodosLosPermisos } from "../../pruebas/sesion";
+import { consultas } from "../../consultas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
@@ -86,6 +87,8 @@ describe("Depósito · Ingreso", () => {
   });
 
   it("compras recientes (en Cómo va el negocio): cada compra se abre y muestra sus renglones", async () => {
+    conTodosLosPermisos();
+    consultas.clear(); // lo que trajeron las pruebas anteriores
     apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/compras" ? compras : []));
     render(<ComprasRecientes />);
     const compra = await screen.findByTestId("compra-reciente");
@@ -93,7 +96,7 @@ describe("Depósito · Ingreso", () => {
     fireEvent.click(within(compra).getAllByRole("button")[0]!);
     expect(compra.textContent).toContain("10 un.");
     expect(compra.textContent).toContain("CINTA AISLADORA");
-    expect(compra.textContent).toContain("$12.000,00");
+    expect(compra.textContent).toContain("$12.000");
     expect(compra.textContent).toContain("PINCEL NUEVO");
   });
 });
@@ -104,7 +107,10 @@ describe("Depósito · Stock", () => {
   it("013-E10 con «Ver el dinero invertido», el total y el valor de cada producto (decisión 96)", async () => {
     armar("stock");
     const fila = await screen.findByTestId("fila-stock");
-    expect(within(fila).getByTestId("valor-stock").textContent).toBe("$17.000");
+    // Como la v2: el valor está en la hoja del producto, con su stock y sus movimientos.
+    fireEvent.click(within(fila).getByTestId("stock"));
+    const hoja = await screen.findByTestId("detalle-stock");
+    expect(within(hoja).getByTestId("valor-stock").textContent).toBe("$17.000");
     expect(screen.getByTestId("dinero-invertido-stock")).toBeTruthy();
   });
 
@@ -117,17 +123,18 @@ describe("Depósito · Stock", () => {
     expect(within(fila).getByTestId("foto-chica")).toBeTruthy(); // la foto del producto también se saca desde acá
     expect(within(fila).getByTestId("stock").textContent).toContain("17 un.");
     fireEvent.click(within(fila).getByTestId("stock"));
-    await screen.findByTestId("movimientos");
-    expect(fila.textContent).toContain("Stock 17 un. = suma de estos movimientos");
-    expect(screen.getByTestId("movimientos").textContent).toContain("+20");
-    fireEvent.click(within(fila).getByTestId("corregir"));
-    fireEvent.change(within(fila).getByTestId("cantidad-real"), { target: { value: "15" } });
+    const hoja = await screen.findByTestId("detalle-stock");
+    await within(hoja).findByTestId("movimientos");
+    expect(hoja.textContent).toContain("Es la suma de sus");
+    expect(within(hoja).getByTestId("movimientos").textContent).toContain("+20");
+    expect(within(hoja).queryByTestId("valor-stock")).toBeNull();
+    fireEvent.change(within(hoja).getByTestId("cantidad-real"), { target: { value: "15" } });
     // El motivo es obligatorio, igual que en la computadora: sin motivo no se guarda.
-    fireEvent.click(within(fila).getByTestId("guardar-ajuste"));
-    expect(within(fila).getByRole("alert").textContent).toContain("Falta el motivo");
+    fireEvent.click(within(hoja).getByTestId("guardar-ajuste"));
+    expect(within(hoja).getByRole("alert").textContent).toContain("Falta el motivo");
     expect(enviarOEncolar).not.toHaveBeenCalled();
-    fireEvent.click(within(fila).getByRole("button", { name: "Rotura" })); // un motivo frecuente, de un toque
-    fireEvent.click(within(fila).getByTestId("guardar-ajuste"));
+    fireEvent.click(within(hoja).getByRole("button", { name: "Rotura" })); // un motivo frecuente, de un toque
+    fireEvent.click(within(hoja).getByTestId("guardar-ajuste"));
     await waitFor(() => expect(enviarOEncolar).toHaveBeenCalledWith("stock.ajuste", "POST", "/stock/cinta/ajustes", { cantidad_real: 15, motivo: "Rotura" }));
   });
 });
@@ -137,7 +144,7 @@ describe("Depósito · Contar", () => {
   it("lista los sectores con su estado y ofrece crear uno", async () => {
     armar("contar");
     const sector = await screen.findByRole("button", { name: /Estantería bulones/ });
-    expect(sector.textContent).toContain("nunca contado");
+    expect(sector.textContent).toContain("Nunca contado");
     fireEvent.click(screen.getByTestId("sector-nuevo"));
     expect(screen.getByPlaceholderText(/Sector nuevo/)).toBeTruthy();
   });
@@ -167,18 +174,25 @@ describe("Depósito · según los permisos", () => {
     expect(screen.queryByTestId("corregir")).toBeNull();
   });
 
-  it("desde el menú, Depósito abre siempre en la primera pestaña: Inventario (decisiones 56 y 68)", async () => {
+  it("021-E01 desde el menú, Depósito abre siempre en la primera pestaña: Stock · Compras · Contar, como la v2 (decisiones 56 y 149)", async () => {
     armar(null);
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Inventario", "Ingreso", "Estanterías", "Pedidos"]);
-    expect(screen.getByRole("tab", { name: "Inventario" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Stock", "Compras", "Contar"]);
+    expect(screen.getByRole("tab", { name: "Stock" }).getAttribute("aria-selected")).toBe("true");
   });
 
-  it("cada pestaña lleva a su propia dirección: Ingreso no cae en la primera", () => {
+  it("cada pestaña lleva a su propia dirección; el Ingreso y los Pedidos se ven con «Compras» marcada", () => {
     armar("stock");
-    for (const [nombre, direccion] of [["Ingreso", "#/deposito/ingreso"], ["Pedidos", "#/deposito/pedidos"], ["Estanterías", "#/deposito/contar"], ["Inventario", "#/deposito/stock"]] as const) {
+    for (const [nombre, direccion] of [["Compras", "#/deposito/compras"], ["Contar", "#/deposito/contar"], ["Stock", "#/deposito/stock"]] as const) {
       fireEvent.click(screen.getByRole("tab", { name: nombre }));
       expect(location.hash).toBe(direccion);
     }
+  });
+
+  it("quien solo recibe mercadería entra a Compras directo al Ingreso", () => {
+    conPermisos("deposito.ingresos");
+    armar("compras");
+    expect(screen.getByRole("tab", { name: "Compras" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.queryByTestId("compras-recientes")).toBeNull();
   });
 
   it("entrar por la dirección a Estanterías sin permiso dice qué permiso falta", () => {

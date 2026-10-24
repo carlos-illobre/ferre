@@ -18,7 +18,7 @@ import "../estilos/configuracion-v2.css";
 // derecha, «Tu cuenta»: los celulares con huella y el vínculo con el celular (Alt O, Alt U).
 const t = TEXTOS.configuracionV2;
 
-export function Configuracion() {
+export function Configuracion({ alCambiarElGuardado }: { alCambiarElGuardado?: () => void } = {}) {
   const { animaciones, versionCada, versionNunca } = usePreferencias();
   const reducir = useReducirMovimiento();
   const sinConexion = guardaEnElDispositivo();
@@ -53,7 +53,7 @@ export function Configuracion() {
                 </div>
               )}
             </Renglon>
-            <Renglon icono={sinConexion ? "disco" : "sin-senal"} titulo={t.sinConexion.largo} id="cfg-sin-conexion" encendida={sinConexion} alCambiar={() => void cambiarSinConexion("esta computadora")} testId="cfg-sin-conexion"
+            <Renglon icono={sinConexion ? "disco" : "sin-senal"} titulo={t.sinConexion.largo} id="cfg-sin-conexion" encendida={sinConexion} alCambiar={() => void cambiarSinConexion("esta computadora", alCambiarElGuardado)} testId="cfg-sin-conexion"
               detalle={sinConexion ? t.sinConexionSi.largo : t.sinConexionNo.largo} />
           </div>
           {sinConexion && <DatosSinConexion />}

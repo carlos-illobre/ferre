@@ -1,6 +1,10 @@
 # Especificación: la aplicación como la v2
 
-**Carpeta**: `021-interfaz-como-v2` · **Creada**: 2026-10-24 · **Estado**: aprobada por Carlos (2026-10-24, decisión 148)
+**Carpeta**: `021-interfaz-como-v2` · **Creada**: 2026-10-24
+
+**Status**: Aprobada (Carlos, 2026-10-24, decisión 148)
+
+**Maquetas**: Aprobadas (la v2 de cada pantalla, elegida por Carlos el 2026-10-24; decisión 148)
 
 **Pedido de Carlos**: «quiero que modifiques todas las pantallas excepto la del login y las del
 tutorial, para que se vean iguales a v2, tienen que tener exactamente el mismo diseño que v2».
