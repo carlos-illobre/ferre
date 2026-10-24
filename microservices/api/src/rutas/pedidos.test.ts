@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 const PEDIDO = "7a1e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c01";

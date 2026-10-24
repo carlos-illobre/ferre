@@ -4,7 +4,7 @@ import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 // Corregir una venta (specs/019, historia 1). La base es de mentira: se programa la venta y sus
 // renglones, y se mira qué escribe el servidor.
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 const ID = "22222222-2222-4222-8222-222222222222";

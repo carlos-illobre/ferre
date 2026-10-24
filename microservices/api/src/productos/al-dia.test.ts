@@ -5,7 +5,7 @@ import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 // la copia del servidor lee lo que cambió; sin esperar el aviso de la base.
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
 const copia = vi.hoisted(() => ({ ponerAlDia: vi.fn(async () => undefined) }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 vi.mock("./copia.js", async (original) => ({ ...(await original<typeof import("./copia.js")>()), iniciada: () => true, ponerAlDia: copia.ponerAlDia }));
 const { app } = await import("../app.js");
 

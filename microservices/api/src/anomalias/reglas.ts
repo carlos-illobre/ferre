@@ -1,5 +1,5 @@
-import { base } from "../base.js";
-import * as datos from "./datos.js";
+import { base } from "../persistencia/conexion.js";
+import * as datos from "../persistencia/anomalias.js";
 import type { PaginaDeAnomalias } from "../contratos/anomalias.js";
 import type { Enviable } from "../enviable.js";
 

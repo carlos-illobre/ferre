@@ -5,7 +5,6 @@ import type { TicketCreado } from "../contratos/tickets.js";
 import { resolucionDeTicket } from "../tickets/esquemas.js";
 import { leerCuerpo } from "../validar.js";
 
-export { carpetaTickets } from "../tickets/reglas.js";
 
 // Tickets: la ruta solo traduce (ADR-018); las reglas y los datos están en `tickets/`.
 export const tickets = new Hono();

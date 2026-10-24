@@ -1,7 +1,7 @@
-import { base } from "../base.js";
-import { anotarEvento } from "../eventos.js";
-import * as datos from "./datos.js";
-import type { FilaDeStock } from "./datos.js";
+import { base } from "../persistencia/conexion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
+import * as datos from "../persistencia/deposito.js";
+import type { FilaDeStock } from "../persistencia/deposito.js";
 import * as copia from "../productos/copia.js";
 import { marcaValida } from "../productos/reglas.js";
 import type { Movimiento, Stock, StockAjustado, StockQueCambio } from "../contratos/stock.js";

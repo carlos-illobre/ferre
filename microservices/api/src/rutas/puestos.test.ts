@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 // El emparejamiento celular–computadora (decisión 58).
@@ -24,7 +24,7 @@ describe("emparejamiento", () => {
 
   it("al volver a entrar en un dispositivo vinculado, el vínculo dormido pasa a la sesión nueva del mismo usuario", async () => {
     await pedir(app, "GET", "/puestos/mio?dispositivo=celular-de-ana-0001", { rol: "mostrador" });
-    expect(base.actual.sqlDe(/UPDATE sesion SET dispositivo_id = \$2/)[0]!.params).toEqual(["sesion-mostrador", "celular-de-ana-0001"]);
+    expect(base.actual.sqlDe(/UPDATE sesion SET dispositivo_id = /)[0]!.params).toEqual(["celular-de-ana-0001", "sesion-mostrador", "celular-de-ana-0001"]);
     const comoCompu = base.actual.sqlDe(/UPDATE puesto SET sesion_id = \$1 WHERE usuario_id = \$2 AND compu_dispositivo = \$3/)[0]!;
     const comoCelular = base.actual.sqlDe(/UPDATE puesto SET celular_sesion_id = \$1 WHERE usuario_id = \$2 AND celular_dispositivo = \$3/)[0]!;
     // Solo los vínculos de ese usuario y de ese dispositivo: a otra persona que entre ahí no se le aplican.
@@ -42,7 +42,7 @@ describe("emparejamiento", () => {
     expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\)/)).toHaveLength(0);
     expect((await pedir(app, "DELETE", "/sesiones/sesion-mostrador", { rol: "soloVende" })).status).toBe(403);
     expect((await pedir(app, "DELETE", "/sesiones/sesion-mostrador", { rol: "admin" })).status).toBe(204);
-    expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL AND expira_en > now\(\) AND \(sesion_id = \$1 OR celular_sesion_id = \$1\)/)[0]!.params).toEqual(["sesion-mostrador"]);
+    expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL AND expira_en > now\(\) AND \(sesion_id = \$1 OR celular_sesion_id = \$2\)/)[0]!.params).toEqual(["sesion-mostrador", "sesion-mostrador"]);
   });
 
   it("los días que dura el vínculo se configuran: los ve cualquiera y los cambia quien administra sesiones", async () => {
@@ -51,9 +51,9 @@ describe("emparejamiento", () => {
     expect((await pedir(app, "PUT", "/puestos/configuracion", { rol: "admin", cuerpo: { dias: 0 } })).status).toBe(400);
     expect((await pedir(app, "PUT", "/puestos/configuracion", { rol: "admin", cuerpo: { dias: 400 } })).status).toBe(400);
     expect(await (await pedir(app, "PUT", "/puestos/configuracion", { rol: "admin", cuerpo: { dias: 10 } })).json()).toEqual({ dias: 10 });
-    expect(base.actual.sqlDe(/INSERT INTO configuracion/)[0]!.params).toEqual(["10"]);
+    expect(base.actual.sqlDe(/INSERT INTO configuracion/)[0]!.params).toEqual(["vinculo.dias", "10"]);
     // Vincular usa los días configurados.
-    base.actual.programar(/SELECT valor FROM configuracion/, { rows: [{ valor: "10" }] });
+    base.actual.programar(/SELECT clave, valor FROM configuracion/, { rows: [{ clave: "vinculo.dias", valor: "10" }] });
     base.actual.programar(/UPDATE puesto SET vinculado_en = now\(\)/, { rows: [{ id: "p2", nombre: null, sesion_id: "sesion-admin", expira_en: "2026-10-23T00:00:00Z" }] });
     const r = await pedir(app, "POST", "/puestos/codigo-del-qr/vincular", { rol: "admin", cuerpo: { dispositivo_id: "celular-de-ana-0001" } });
     expect(await r.json()).toMatchObject({ id: "p2", dias: 10 });
@@ -64,15 +64,15 @@ describe("emparejamiento", () => {
     base.actual.programar(/UPDATE puesto SET vinculado_en = now\(\)/, { rows: [{ id: "p2", nombre: "computadora del mostrador", sesion_id: "sesion-admin", expira_en: "2026-11-11T00:00:00Z" }] });
     const r = await pedir(app, "POST", "/puestos/codigo-del-qr/vincular", { rol: "mostrador" });
     expect(await r.json()).toMatchObject({ id: "p2", dias: 30, expira_en: "2026-11-11T00:00:00Z" });
-    expect(base.actual.sqlDe(/UPDATE puesto SET vinculado_en = now\(\)/)[0]!.params[2]).toBe("30");
+    expect(base.actual.sqlDe(/UPDATE puesto SET vinculado_en = now\(\)/)[0]!.params[1]).toBe("30");
     expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL/)[0]!.params).toEqual(["sesion-admin", "sesion-mostrador", "p2"]);
   });
 
   it("cualquiera de los dos lo suelta", async () => {
     base.actual.programar(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/, { rowCount: 1 });
     expect((await pedir(app, "DELETE", "/puestos/p1", { rol: "mostrador" })).status).toBe(204);
-    expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/)[0]!.params).toEqual(["p1", "sesion-mostrador"]);
-    expect(JSON.stringify(base.actual.sqlDe(/INSERT INTO evento/).at(-1)!.params)).toContain("puesto.desvinculado");
+    expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/)[0]!.params).toEqual(["p1", "sesion-mostrador", "sesion-mostrador"]);
+    expect(JSON.stringify(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params)).toContain("puesto.desvinculado");
   });
 
   // Decisión 60: el espejo.
@@ -126,7 +126,7 @@ describe("emparejamiento", () => {
     expect(await celular.terminado()).toBe(true);
     // Cerrar a distancia la sesión de uno de los dos.
     celular = await abrir();
-    base.actual.programar(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL AND expira_en > now\(\) AND \(sesion_id = \$1 OR celular_sesion_id = \$1\) RETURNING id/, { rows: [{ id: "p1" }] });
+    base.actual.programar(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL AND expira_en > now\(\) AND \(sesion_id = \$1 OR celular_sesion_id = \$\d\) RETURNING id/, { rows: [{ id: "p1" }] });
     await pedir(app, "DELETE", "/sesiones/sesion-admin", { rol: "admin" });
     expect(await celular.hasta('"c"')).toContain('data: {"c":true}');
     // Desactivar a la persona.

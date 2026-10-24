@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { base, Deshacer, enTransaccion } from "../base.js";
-import { anotarEvento } from "../eventos.js";
-import * as datos from "./datos.js";
+import { base } from "../persistencia/conexion.js";
+import { Deshacer, enTransaccion } from "../persistencia/transaccion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
+import * as datos from "../persistencia/compras.js";
 import type { z } from "zod";
 import type { CompraRegistrada, CompraReciente, CompraRepetida, FotoDeComprobante, GastosDeLaSemana, RenglonDeCompra } from "../contratos/compras.js";
 import { ARCHIVO_DE_FOTO, type compraNueva } from "./esquemas.js";
 import type { Enviable } from "../enviable.js";
 
-export { carpetaComprobantes } from "./datos.js";
 
 // Ingreso de mercadería (issue #30): reemplaza el papel semanal de gastos y es la mitad del
 // stock (lo que entra). Cada renglón suma stock; si el costo de la factura difiere del de la

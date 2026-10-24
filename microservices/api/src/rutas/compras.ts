@@ -4,7 +4,6 @@ import * as reglas from "../compras/reglas.js";
 import { anulacionDeCompra, compraNueva } from "../compras/esquemas.js";
 import { leerCuerpo } from "../validar.js";
 
-export { carpetaComprobantes } from "../compras/reglas.js";
 
 // Ingreso de mercadería (issue #30). La ruta solo traduce (ADR-018); las reglas y los datos
 // están en `compras/`.

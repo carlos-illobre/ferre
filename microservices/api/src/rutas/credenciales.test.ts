@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 // La criptografía la hace la librería (probada por sus autores); acá se prueba el
 // circuito: desafío de un solo uso, alta, listado, baja, login y sesión.
 const verificar = vi.hoisted(() => ({ registro: vi.fn(), login: vi.fn() }));
@@ -35,7 +35,7 @@ describe("passkeys", () => {
     expect(verificar.registro.mock.calls[0]![0]).toMatchObject({ expectedOrigin: "http://web.prueba", expectedRPID: "web.prueba", requireUserVerification: true });
     const insert = base.actual.sqlDe(/INSERT INTO credencial/)[0]!;
     expect(insert.params).toEqual(["cred-1", "u-mostrador", clave, 0, ["internal"], "Celular de Carlos"]);
-    expect(base.actual.sqlDe(/INSERT INTO evento/).at(-1)!.params[1]).toBe("credencial.vinculada");
+    expect(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params[1]).toBe("credencial.vinculada");
     // el mismo desafío no sirve dos veces, ni sin sesión
     expect((await pedir(app, "POST", "/credenciales/registro", { rol: "mostrador", cuerpo: { desafioId, respuesta: { id: "cred-1" } } })).status).toBe(400);
     expect((await pedir(app, "POST", "/credenciales/registro/opciones", { rol: null, cuerpo: {} })).status).toBe(401);
@@ -61,9 +61,9 @@ describe("passkeys", () => {
     expect(cuerpo.token.length).toBeGreaterThan(20);
     expect(cuerpo.usuario).toMatchObject({ id: "u-mostrador", roles: ["Vendedor"], permisos: ["ventas.registrar"] });
     expect(verificar.login.mock.calls[0]![0]).toMatchObject({ credential: { id: "cred-1", counter: 3 }, requireUserVerification: true });
-    expect(base.actual.sqlDe(/UPDATE credencial SET contador/)[0]!.params).toEqual(["cred-1", 4]);
+    expect(base.actual.sqlDe(/UPDATE credencial SET contador/)[0]!.params).toEqual([4, "cred-1"]);
     expect(base.actual.sqlDe(/INSERT INTO sesion/)).toHaveLength(1);
-    expect(base.actual.sqlDe(/INSERT INTO evento/).at(-1)!.params[1]).toBe("sesion.iniciada");
+    expect(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params[1]).toBe("sesion.iniciada");
     // desconocido
     const { desafioId: d2 } = (await (await pedir(app, "POST", "/credenciales/login/opciones", { rol: null, cuerpo: {} })).json()) as { desafioId: string };
     const r2 = await pedir(app, "POST", "/credenciales/login", { rol: null, cuerpo: { desafioId: d2, respuesta: { id: "otra" } } });
@@ -86,10 +86,10 @@ describe("passkeys", () => {
   it("listar y quitar: cada uno los suyos; el admin puede quitar cualquiera", async () => {
     base.actual.programar(/SELECT id, dispositivo, creada_en, ultimo_uso_en FROM credencial/, { rows: [{ id: "cred-1", dispositivo: "Celular", creada_en: "2026-09-14", ultimo_uso_en: null }] });
     expect(await (await pedir(app, "GET", "/credenciales", { rol: "mostrador" })).json()).toEqual([{ id: "cred-1", dispositivo: "Celular", creada_en: "2026-09-14", ultimo_uso_en: null }]);
-    base.actual.programar(/UPDATE credencial SET revocada_en/, (p) => ({ rowCount: p[2] === true || p[1] === "u-mostrador" ? 1 : 0 }));
+    base.actual.programar(/UPDATE credencial SET revocada_en/, (p) => ({ rowCount: p[1] === true || p[2] === "u-mostrador" ? 1 : 0 }));
     expect((await pedir(app, "DELETE", "/credenciales/cred-1", { rol: "mostrador" })).status).toBe(204);
     expect((await pedir(app, "DELETE", "/credenciales/cred-1", { rol: "admin" })).status).toBe(204);
-    expect(base.actual.sqlDe(/UPDATE credencial SET revocada_en/)[1]!.params).toEqual(["cred-1", "u-admin", true]);
+    expect(base.actual.sqlDe(/UPDATE credencial SET revocada_en/)[1]!.params).toEqual(["cred-1", true, "u-admin"]);
   });
 
   it("007-T037 los celulares de las demás personas los ve solo quien administra usuarios, sin los suyos", async () => {

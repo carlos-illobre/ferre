@@ -4,9 +4,10 @@ import {
   type AuthenticationResponseJSON, type RegistrationResponseJSON,
 } from "@simplewebauthn/server";
 import { config } from "../config.js";
-import { pool } from "../db.js";
-import { registrarEvento } from "../eventos.js";
-import * as datos from "./datos.js";
+import { base } from "../persistencia/conexion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
+import * as datos from "../persistencia/acceso.js";
+import { guardar } from "../persistencia/sistema.js";
 import { crearSesion, generarToken, revocarSesion, usuarioConPermisos, type SesionActiva } from "./sesiones.js";
 import { adoptarVinculos, anotarDispositivo, cortarVinculosDe, diasDeVinculo, emparejar, sellarVinculo, soltarAnteriores, vinculosDelUsuario } from "./vinculo.js";
 import { central, cerrarAlVencer, cerrarSalas } from "./salas.js";
@@ -27,10 +28,10 @@ export const dispositivoDe = (userAgent: string | undefined, dado?: string): str
 // Si el correo que verificó Google está autorizado y activo, se abre una sesión.
 export async function entrarConGoogle(email: string, dispositivo: string): Promise<Resultado<SesionNueva>> {
   const id = await datos.usuarioActivoPorCorreo(email);
-  const usuario = id ? await usuarioConPermisos(pool, id) : null;
+  const usuario = id ? await usuarioConPermisos(base, id) : null;
   if (!usuario) return mal(403, `${email} no está autorizado. Pedile a quien administra los usuarios que te dé de alta.`);
-  const sesion = await crearSesion(pool, usuario.id, dispositivo);
-  await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo, medio: "google" } });
+  const sesion = await crearSesion(base, usuario.id, dispositivo);
+  await anotarEvento(base, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo, medio: "google" } });
   return bien({ token: sesion.token, usuario }, 201);
 }
 
@@ -50,7 +51,7 @@ export async function pedirCodigoDeEntrada(dispositivo: string): Promise<CodigoD
 }
 
 export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: string, dispositivoId: unknown): Promise<Resultado<CodigoAprobado>> {
-  await anotarDispositivo(pool, sesion.id, dispositivoId);
+  await anotarDispositivo(base, sesion.id, dispositivoId);
   const aprobada = await datos.aprobarVinculacion(codigo, sesion.usuario.id, sesion.id);
   return aprobada ? bien({ dispositivo: aprobada.dispositivo }) : mal(410, SIN_CODIGO);
 }
@@ -60,31 +61,31 @@ export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: strin
 export async function estadoDelCodigo(id: string, clave: string, dispositivoId: unknown): Promise<Resultado<EstadoDelCodigo>> {
   const aprobada = await datos.retirarVinculacion(id, clave);
   if (!aprobada) return bien({ estado: (await datos.vinculacionVigente(id, clave)) ? "pendiente" : "vencida" });
-  const usuario = await usuarioConPermisos(pool, aprobada.aprobada_por);
+  const usuario = await usuarioConPermisos(base, aprobada.aprobada_por);
   if (!usuario) return bien({ estado: "vencida" });
-  const sesion = await crearSesion(pool, usuario.id, aprobada.dispositivo);
+  const sesion = await crearSesion(base, usuario.id, aprobada.dispositivo);
   await datos.anotarSesionDeVinculacion(id, sesion.id);
-  await anotarDispositivo(pool, sesion.id, dispositivoId);
-  await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo: aprobada.dispositivo, medio: "celular" } });
-  const emparejado = aprobada.celular_sesion_id ? await emparejar(pool, sesion.id, aprobada.celular_sesion_id, aprobada.dispositivo).catch(() => null) : null;
+  await anotarDispositivo(base, sesion.id, dispositivoId);
+  await anotarEvento(base, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo: aprobada.dispositivo, medio: "celular" } });
+  const emparejado = aprobada.celular_sesion_id ? await emparejar(base, sesion.id, aprobada.celular_sesion_id, aprobada.dispositivo).catch(() => null) : null;
   const puesto = emparejado && { id: emparejado.id, expira_en: emparejado.expira_en };
   if (emparejado) cerrarSalas(emparejado.soltados);
-  if (puesto) await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: puesto.id, medio: "entrada" } });
+  if (puesto) await anotarEvento(base, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: puesto.id, medio: "entrada" } });
   return bien({ estado: "aprobada", token: sesion.token, usuario, puesto });
 }
 
 // ---------- Sesiones ----------
 export async function salir(sesion: SesionActiva) {
-  await revocarSesion(pool, sesion.id);
-  await registrarEvento(pool, { tipo: "sesion.cerrada", usuarioId: sesion.usuario.id, contenido: { sesionId: sesion.id } });
+  await revocarSesion(base, sesion.id);
+  await anotarEvento(base, { tipo: "sesion.cerrada", usuarioId: sesion.usuario.id, contenido: { sesionId: sesion.id } });
 }
 // La de quien pregunta no va: se cierra con «Salir» (decisión 99).
 export const sesionesAbiertas = (salvo: string): Promise<Enviable<SesionAbierta>[]> => datos.sesionesAbiertas(salvo);
 // Cerrar a distancia la sesión de un dispositivo corta también su vínculo (decisión 73).
 export async function cerrarSesion(sesionId: string, actorId: string) {
-  await revocarSesion(pool, sesionId);
-  cerrarSalas(await cortarVinculosDe(pool, sesionId));
-  await registrarEvento(pool, { tipo: "sesion.revocada", usuarioId: actorId, contenido: { sesionId } });
+  await revocarSesion(base, sesionId);
+  cerrarSalas(await cortarVinculosDe(base, sesionId));
+  await anotarEvento(base, { tipo: "sesion.revocada", usuarioId: actorId, contenido: { sesionId } });
 }
 
 // ---------- Huellas (passkeys, ADR-011 enmienda) ----------
@@ -133,7 +134,7 @@ export async function vincularHuella(usuarioId: string, desafioId: string | unde
   const { credential, credentialDeviceType } = verificacion.registrationInfo;
   const dispositivo = (dispositivoDado?.trim() || userAgent || "celular").slice(0, 120);
   await datos.guardarCredencial({ id: credential.id, usuarioId, clavePublica: Buffer.from(credential.publicKey), contador: credential.counter, transportes: credential.transports ?? [], dispositivo });
-  await registrarEvento(pool, { tipo: "credencial.vinculada", usuarioId, contenido: { id: credential.id, dispositivo, tipo: credentialDeviceType } });
+  await anotarEvento(base, { tipo: "credencial.vinculada", usuarioId, contenido: { id: credential.id, dispositivo, tipo: credentialDeviceType } });
   return bien({ id: credential.id, dispositivo }, 201);
 }
 
@@ -143,7 +144,7 @@ export const celularesDeOtros = (usuarioId: string): Promise<Enviable<CelularDeO
 // Quitar un celular: el propio, o cualquiera si administra usuarios (decisión 100).
 export async function quitarCelular(id: string, actorId: string, administra: boolean) {
   if (!(await datos.quitarCredencial(id, actorId, administra))) return mal(404, "No existe ese celular vinculado");
-  await registrarEvento(pool, { tipo: "credencial.quitada", usuarioId: actorId, contenido: { id } });
+  await anotarEvento(base, { tipo: "credencial.quitada", usuarioId: actorId, contenido: { id } });
   return bien();
 }
 
@@ -170,9 +171,9 @@ export async function entrarConHuella(desafioId: string | undefined, respuesta: 
   if (!verificacion.verified) return mal(401, "La huella no se pudo verificar");
   await datos.usarCredencial(cred.id, verificacion.authenticationInfo.newCounter);
   const dispositivo = (dispositivoDado?.trim() || cred.dispositivo || "celular").slice(0, 120);
-  const sesion = await crearSesion(pool, cred.usuario_id, dispositivo);
-  await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: cred.usuario_id, contenido: { sesionId: sesion.id, dispositivo, medio: "huella", credencial: cred.id } });
-  return bien({ token: sesion.token, usuario: await usuarioConPermisos(pool, cred.usuario_id) }, 201);
+  const sesion = await crearSesion(base, cred.usuario_id, dispositivo);
+  await anotarEvento(base, { tipo: "sesion.iniciada", usuarioId: cred.usuario_id, contenido: { sesionId: sesion.id, dispositivo, medio: "huella", credencial: cred.id } });
+  return bien({ token: sesion.token, usuario: await usuarioConPermisos(base, cred.usuario_id) }, 201);
 }
 
 // ---------- Vínculo celular–computadora (decisiones 58 y 73) ----------
@@ -191,31 +192,31 @@ export async function codigoParaVincular(sesionId: string, nombre: string | unde
 export async function vincular(sesion: SesionActiva, codigo: string, dispositivoId: unknown): Promise<Resultado<Vinculado>> {
   const duenio = await datos.duenioDelCodigo(codigo);
   if (duenio && duenio !== sesion.usuario.id) return mal(403, "Esa computadora tiene la sesión de otra persona. El celular se empareja solo con una computadora donde entraste vos.");
-  await anotarDispositivo(pool, sesion.id, dispositivoId);
-  const dias = await diasDeVinculo(pool);
+  await anotarDispositivo(base, sesion.id, dispositivoId);
+  const dias = await diasDeVinculo();
   const puesto = await datos.vincularPorCodigo(codigo, sesion.id, dias);
   if (!puesto) return mal(404, "El código venció o ya se usó. Generá otro en la computadora.");
-  cerrarSalas(await soltarAnteriores(pool, puesto.sesion_id, sesion.id, puesto.id));
-  await sellarVinculo(pool, puesto.id);
-  await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: sesion.usuario.id, contenido: { puestoId: puesto.id, medio: "codigo" } });
+  cerrarSalas(await soltarAnteriores(base, puesto.sesion_id, sesion.id, puesto.id));
+  await sellarVinculo(base, puesto.id);
+  await anotarEvento(base, { tipo: "puesto.vinculado", usuarioId: sesion.usuario.id, contenido: { puestoId: puesto.id, medio: "codigo" } });
   return bien({ id: puesto.id, nombre: puesto.nombre, expira_en: puesto.expira_en, dias });
 }
 
 // Con quién está vinculada esta sesión, como computadora y como celular. Si el dispositivo
 // tenía un vínculo dormido de este usuario, se reactiva acá.
 export async function vinculosDe(sesion: SesionActiva, dispositivo: string | undefined): Promise<VinculosDeLaSesion> {
-  await anotarDispositivo(pool, sesion.id, dispositivo);
-  await adoptarVinculos(pool, sesion.id, sesion.usuario.id, dispositivo);
+  await anotarDispositivo(base, sesion.id, dispositivo);
+  await adoptarVinculos(base, sesion.id, sesion.usuario.id, dispositivo);
   const filas = await datos.vinculosDeLaSesion(sesion.id);
   const de = (compu: boolean) => { const p = filas.find((r) => (r.sesion_id === sesion.id) === compu); return p ? { id: p.id, nombre: p.nombre, expira_en: p.expira_en } : null; };
   return { comoComputadora: de(true), comoCelular: de(false) };
 }
 
-export const diasDelVinculo = () => diasDeVinculo(pool);
+export const diasDelVinculo = () => diasDeVinculo();
 // Los días ya llegan validados (entre 1 y 365: `esquemas.ts`).
 export async function cambiarDiasDelVinculo(dias: number, actorId: string): Promise<Resultado<DiasDelVinculo>> {
-  await datos.guardarDiasDeVinculo(dias);
-  await registrarEvento(pool, { tipo: "vinculo.dias_cambiados", usuarioId: actorId, contenido: { dias } });
+  await guardar("vinculo.dias", dias);
+  await anotarEvento(base, { tipo: "vinculo.dias_cambiados", usuarioId: actorId, contenido: { dias } });
   return bien({ dias });
 }
 
@@ -230,12 +231,12 @@ export async function estadoDelPuesto(puestoId: string, sesionId: string): Promi
 export async function soltar(puestoId: string, sesion: SesionActiva): Promise<boolean> {
   if (!(await datos.soltarPuesto(puestoId, sesion.id))) return false;
   central.cerrar(puestoId);
-  await registrarEvento(pool, { tipo: "puesto.desvinculado", usuarioId: sesion.usuario.id, contenido: { puestoId } });
+  await anotarEvento(base, { tipo: "puesto.desvinculado", usuarioId: sesion.usuario.id, contenido: { puestoId } });
   return true;
 }
 
 // Al desactivar a una persona se cierran las salas de sus vínculos (ADR-027).
-export const cerrarSalasDelUsuario = async (usuarioId: string) => cerrarSalas(await vinculosDelUsuario(pool, usuarioId));
+export const cerrarSalasDelUsuario = async (usuarioId: string) => cerrarSalas(await vinculosDelUsuario(base, usuarioId));
 
 // La conexión entre los dos dispositivos de un vínculo: escuchar la sala y mandar por ella.
 // Escuchar la sala cierra la sala sola cuando vence el vínculo (023-E26).

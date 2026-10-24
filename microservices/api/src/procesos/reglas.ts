@@ -1,6 +1,6 @@
 import { config } from "../config.js";
-import { base } from "../base.js";
-import { anotarEvento } from "../eventos.js";
+import { base } from "../persistencia/conexion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
 import type { Usuario } from "../acceso/sesiones.js";
 
 // Procesos es un servicio aparte que se lleva a otros proyectos (ADR-019): no sabe de sesiones.

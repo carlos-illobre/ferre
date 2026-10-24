@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 const venta = { id: "11111111-1111-4111-8111-111111111111", medio_pago: "efectivo", items: [{ producto_id: "p1", descripcion: "MECHA", cantidad: 3, precio_unitario: 3000, margen_aplicado: 100, costo_neto: 1000, explicacion: { pasos: ["+ 100 % de margen"] } }] };

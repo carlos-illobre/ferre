@@ -3,13 +3,13 @@ import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { FilaDeLaCopia, LecturaDeLaCopia } from "./datos.js";
+import type { FilaDeLaCopia, LecturaDeLaCopia } from "../persistencia/productos.js";
 
 // La copia del catálogo en el servidor (specs/018, RF-124): qué lee de la base y cuándo. La base
 // se simula con las dos lecturas de `datos.ts`; la conexión que escucha los avisos, con un cliente
 // de `pg` de mentira.
 const leer = vi.hoisted(() => ({ entero: vi.fn<() => Promise<LecturaDeLaCopia>>(), cambios: vi.fn<(marca: string) => Promise<LecturaDeLaCopia | null>>() }));
-vi.mock("./datos.js", async (original) => ({ ...(await original<typeof import("./datos.js")>()), leerCatalogoEntero: leer.entero, leerCambiosDesde: leer.cambios }));
+vi.mock("../persistencia/productos.js", async (original) => ({ ...(await original<typeof import("../persistencia/productos.js")>()), leerCatalogoEntero: leer.entero, leerCambiosDesde: leer.cambios }));
 
 const oyentes = vi.hoisted(() => [] as (EventEmitter & { query: (q: string) => Promise<void>; end: () => Promise<void> })[]);
 const conexion = vi.hoisted(() => ({ falla: false }));

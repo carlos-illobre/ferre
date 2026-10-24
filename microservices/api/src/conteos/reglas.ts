@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { base, Deshacer, enTransaccion } from "../base.js";
-import { anotarEvento } from "../eventos.js";
-import * as datos from "./datos.js";
+import { base } from "../persistencia/conexion.js";
+import { Deshacer, enTransaccion } from "../persistencia/transaccion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
+import * as datos from "../persistencia/conteos.js";
 import type { Conteo, ConteoAbierto, ConteoCerrado, Sector } from "../contratos/conteos.js";
 import type { Enviable } from "../enviable.js";
 

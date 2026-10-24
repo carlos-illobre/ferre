@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { base } from "../base.js";
-import { anotarEvento } from "../eventos.js";
+import { base } from "../persistencia/conexion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
 import { subtotalDeRenglon } from "../precios.js";
 import type { VentaDelDia, VentasDelDia } from "../contratos/ventas.js";
-import * as datos from "./datos.js";
+import * as datos from "../persistencia/ventas.js";
 import type { z } from "zod";
 import type { CambioRegistrado, Consulta, VentaParaCambio, VentaRegistrada } from "../contratos/ventas.js";
 import type { cambioDeVenta, consultaNueva, correccionDeVenta, ventaNueva } from "./esquemas.js";
-import type { Ejecutor } from "../base.js";
+import type { Ejecutor } from "../persistencia/transaccion.js";
 import type { Enviable } from "../enviable.js";
 
 // La venta (issue #15), en sus reglas (ADR-018, etapa 5): reemplaza el renglón del cuaderno.

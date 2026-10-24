@@ -1,14 +1,18 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 const { ponerParaPrueba } = await import("../sistema/ajustes.js");
 
 // La sesión recordada (specs/020, RF-133): mientras vale, la sesión no se vuelve a buscar en la base.
 const busquedas = () => base.actual.sqlDe(/FROM sesion s JOIN usuario u/).length;
 const varios = async (n: number, rol: "soloVende" | "admin" = "soloVende") => { for (let i = 0; i < n; i++) expect((await pedir(app, "GET", "/sesiones/actual", { rol })).status).toBe(200); };
+// Una base de mentira que contesta con la consulta que se le pase.
+const comoBase = (query: (...a: unknown[]) => Promise<unknown>) =>
+  new Kysely<never>({ dialect: new PostgresDialect({ pool: { connect: async () => ({ query, release: () => undefined }), end: async () => undefined } as never }) });
 const ROL = "0b0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c11";
 
 describe("la sesión recordada", () => {
@@ -69,12 +73,13 @@ describe("la sesión recordada", () => {
     let soltar: () => void = () => undefined;
     const fila = { id: "s1", ultimo_uso_en: new Date(), expira_en: new Date(Date.now() + 86_400_000), usuario_id: "u1", email: "a@b", nombre: "A", roles: [], permisos: ["admin.usuarios"] };
     const lenta = { query: vi.fn(() => new Promise((r) => { soltar = () => r({ rows: [fila] }); })) };
-    const enCurso = buscarSesion(lenta as never, "token-lento");
+    const enCurso = buscarSesion(comoBase(lenta.query) as never, "token-lento");
     olvidarSesiones(); // mientras tanto se le quitó un permiso desde la aplicación
+    await vi.waitFor(() => expect(lenta.query).toHaveBeenCalled());
     soltar();
     expect((await enCurso)?.usuario.permisos).toEqual(["admin.usuarios"]);
     const rapida = { query: vi.fn(async () => ({ rows: [{ ...fila, permisos: [] }] })) };
-    expect((await buscarSesion(rapida as never, "token-lento"))?.usuario.permisos).toEqual([]);
+    expect((await buscarSesion(comoBase(rapida.query) as never, "token-lento"))?.usuario.permisos).toEqual([]);
     expect(rapida.query).toHaveBeenCalledTimes(1);
   });
 

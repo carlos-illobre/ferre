@@ -4,7 +4,7 @@ import path from "node:path";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 // El catálogo sale de la copia del servidor (specs/018, RF-122, RF-124): ninguna búsqueda lee
@@ -229,7 +229,7 @@ describe("PATCH /productos/:id", () => {
       expect(r.status, `margen ${m}`).toBe(400);
     }
     const update = base.actual.sqlDe(/UPDATE producto SET margen_elegido/)[0]!;
-    expect(update.params).toEqual(["p1", 100]);
+    expect(update.params).toEqual([100, "p1"]);
   });
 
   it("la unidad es unidad, kg, m o l", async () => {
@@ -249,9 +249,9 @@ describe("PATCH /productos/:id", () => {
     expect((await pedir(app, "PATCH", "/productos/nadie", { cuerpo: { margen_elegido: 50 } })).status).toBe(404);
     base.actual.programar(/UPDATE producto SET/, { rowCount: 1 });
     await pedir(app, "PATCH", "/productos/p1", { rol: "mostrador", cuerpo: { margen_elegido: 50 } });
-    const evento = base.actual.sqlDe(/INSERT INTO evento/).at(-1)!;
+    const evento = base.actual.sqlDe(/insert into "evento"/).at(-1)!;
     expect(evento.params[1]).toBe("producto.precio_elegido");
-    expect(evento.params[4]).toBe("u-mostrador");
+    expect(evento.params[5]).toBe("u-mostrador");
   });
 });
 

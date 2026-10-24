@@ -1,15 +1,15 @@
-import { base } from "../base.js";
-import { pool } from "../db.js";
-import { productosConStock, stockDeProductos } from "../deposito/datos.js";
-import { registrarEvento } from "../eventos.js";
+import { base } from "../persistencia/conexion.js";
+import { productosConStock, stockDeProductos } from "../persistencia/deposito.js";
+import { anotarEvento } from "../persistencia/eventos.js";
 import { preciosDeUnProducto, VERSION_DE_PRECIOS } from "../precios.js";
 import * as copia from "./copia.js";
-import * as datos from "./datos.js";
+import * as datos from "../persistencia/productos.js";
 import type { z } from "zod";
 import type { DescargaDeProductos, FotoSubida, PaginaDeProductos, ProductoDelCatalogo, ResumenDelCatalogo } from "../contratos/productos.js";
 import type { cambiosDeProducto } from "./esquemas.js";
 
-export { normalizarBusqueda, type ProductoCatalogo } from "./datos.js";
+export { type ProductoCatalogo } from "../persistencia/productos.js";
+export { normalizarBusqueda } from "./copia.js";
 
 // El catálogo para el mostrador (issues #13 y #14), en sus reglas (ADR-018): cada producto con
 // su costo vigente, el margen elegido y el precio ya calculado acá, con su explicación y el de
@@ -100,7 +100,7 @@ export async function cambiar(id: string, cambios: CambiosValidados, fijaMargene
   if ("margen_elegido" in cambios && !fijaMargenes) return { error: "No tenés permiso para esto. Hace falta: Fijar márgenes", permiso: "catalogo.margenes", estado: 403 };
   const conLectura = "codigo_barras" in cambios ? { ...cambios, codigo_leido_en: horaDeLectura(cambios.codigo_barras ?? null, cambios.codigo_leido_en) } : cambios;
   if (!(await datos.cambiar(id, conLectura))) return { error: "No existe ese producto", estado: 404 };
-  await registrarEvento(pool, { tipo: "producto.precio_elegido", usuarioId, contenido: { id, ...conLectura } });
+  await anotarEvento(base, { tipo: "producto.precio_elegido", usuarioId, contenido: { id, ...conLectura } });
   return null;
 }
 
@@ -113,7 +113,7 @@ export async function subirFoto(id: string, archivo: unknown, usuarioId: string)
   if (archivo.size > 10 * 1024 * 1024) return { error: "La foto pesa más de 10 MB", estado: 413 };
   const url = await datos.guardarFoto(Buffer.from(await archivo.arrayBuffer()), extension);
   if (!(await datos.cambiar(id, { foto_url: url }))) return { error: "No existe ese producto", estado: 404 };
-  await registrarEvento(pool, { tipo: "producto.foto", usuarioId, contenido: { id, foto_url: url } });
+  await anotarEvento(base, { tipo: "producto.foto", usuarioId, contenido: { id, foto_url: url } });
   return { foto_url: url };
 }
 

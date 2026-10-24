@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 // Google de mentira (RF-70): la credencial «google:<correo>» la confirma Google con ese correo;
 // «sin-verificar:<correo>» trae un correo que Google no verificó; cualquier otra no la reconoce.
 // Lo que se prueba es qué hace Ferrebress con lo que Google confirma, no la pantalla de Google.
@@ -43,7 +43,7 @@ describe("entrar con Google", () => {
     // Mayúsculas y minúsculas no distinguen un correo de otro.
     expect(base.actual.sqlDe(/FROM usuario WHERE email/)[0]!.params).toEqual(["carlos@ferre.test"]);
     expect(base.actual.sqlDe(/INSERT INTO sesion/)).toHaveLength(1);
-    expect(JSON.parse(String(base.actual.sqlDe(/INSERT INTO evento/)[0]!.params.at(-1)))).toMatchObject({ medio: "google" });
+    expect(JSON.parse(String(base.actual.sqlDe(/insert into "evento"/)[0]!.params.at(-1)))).toMatchObject({ medio: "google" });
   });
 
   it("A5: un correo que nadie autorizó no entra, y el error dice cuál es", async () => {

@@ -1,6 +1,6 @@
-import { randomUUID } from "node:crypto";
-import type pg from "pg";
-import { generarToken, hashear } from "./sesiones.js";
+import * as datos from "../persistencia/acceso.js";
+import { leer } from "../persistencia/sistema.js";
+import type { Ejecutor } from "../persistencia/transaccion.js";
 
 // El emparejamiento entre un celular y una computadora (decisión 58). Es un `puesto`: la
 // sesión de la computadora y la del celular, unidas por un tiempo. Con eso el celular le
@@ -15,72 +15,40 @@ import { generarToken, hashear } from "./sesiones.js";
 // apuntar a su sesión nueva. Dura los días configurados y se corta solo al desvincular.
 export const DIAS_EMPAREJADO = 30; // los de arranque; el negocio los cambia desde Más
 
-type Db = Pick<pg.Pool, "query">;
-
-const VIGENTE = "vinculado_en IS NOT NULL AND expira_en > now()";
-
-export async function diasDeVinculo(db: Db): Promise<number> {
-  const { rows } = await db.query<{ valor: string }>("SELECT valor FROM configuracion WHERE clave = 'vinculo.dias'").catch(() => ({ rows: [] as { valor: string }[] }));
-  const dias = Number(rows[0]?.valor);
+export async function diasDeVinculo(): Promise<number> {
+  const dias = Number((await leer(["vinculo.dias"]).catch(() => new Map<string, string>())).get("vinculo.dias"));
   return Number.isInteger(dias) && dias >= 1 && dias <= 365 ? dias : DIAS_EMPAREJADO;
 }
 
 // El identificador que cada navegador guarda para sí. Se anota en su sesión.
 export const dispositivoValido = (id: unknown): id is string => typeof id === "string" && /^[\w-]{8,64}$/.test(id);
-export async function anotarDispositivo(db: Db, sesionId: string, dispositivoId: unknown) {
+export async function anotarDispositivo(db: Ejecutor, sesionId: string, dispositivoId: unknown) {
   if (!dispositivoValido(dispositivoId)) return;
-  await db.query("UPDATE sesion SET dispositivo_id = $2 WHERE id = $1 AND dispositivo_id IS DISTINCT FROM $2", [sesionId, dispositivoId]);
+  await datos.anotarDispositivo(db, sesionId, dispositivoId);
 }
 
 // El usuario volvió a entrar en un dispositivo que tenía vinculado: su vínculo dormido pasa a esta sesión.
-export async function adoptarVinculos(db: Db, sesionId: string, usuarioId: string, dispositivoId: unknown) {
+export async function adoptarVinculos(db: Ejecutor, sesionId: string, usuarioId: string, dispositivoId: unknown) {
   if (!dispositivoValido(dispositivoId)) return;
-  await db.query(`UPDATE puesto SET sesion_id = $1 WHERE usuario_id = $2 AND compu_dispositivo = $3 AND ${VIGENTE} AND sesion_id <> $1`, [sesionId, usuarioId, dispositivoId]);
-  await db.query(`UPDATE puesto SET celular_sesion_id = $1 WHERE usuario_id = $2 AND celular_dispositivo = $3 AND ${VIGENTE} AND celular_sesion_id <> $1`, [sesionId, usuarioId, dispositivoId]);
+  await datos.adoptarVinculos(db, sesionId, usuarioId, dispositivoId);
 }
 
-// Deja anotado de quién es el vínculo y de qué dispositivos, tomándolo de las dos sesiones.
-export async function sellarVinculo(db: Db, puestoId: string) {
-  await db.query(
-    `UPDATE puesto p SET usuario_id = a.usuario_id, compu_dispositivo = a.dispositivo_id, celular_dispositivo = b.dispositivo_id
-       FROM sesion a, sesion b WHERE p.id = $1 AND a.id = p.sesion_id AND b.id = p.celular_sesion_id`, [puestoId]);
-}
-
+export const sellarVinculo = datos.sellarVinculo;
 // Los vínculos vigentes de un usuario: al desactivarlo se cierran sus salas.
-export async function vinculosDelUsuario(db: Db, usuarioId: string): Promise<string[]> {
-  const { rows } = await db.query<{ id: string }>(`SELECT id FROM puesto WHERE usuario_id = $1 AND ${VIGENTE}`, [usuarioId]);
-  return rows.map((r) => r.id);
-}
-
+export const vinculosDelUsuario = datos.vinculosDelUsuario;
 // Un administrador cerró a distancia la sesión de un dispositivo: sus vínculos se cortan.
 // Devuelve cuáles, para cerrar sus salas (ADR-027).
-export async function cortarVinculosDe(db: Db, sesionId: string): Promise<string[]> {
-  const { rows } = await db.query<{ id: string }>(`UPDATE puesto SET expira_en = now() WHERE ${VIGENTE} AND (sesion_id = $1 OR celular_sesion_id = $1) RETURNING id`, [sesionId]);
-  return rows.map((r) => r.id);
-}
-
+export const cortarVinculosDe = datos.cortarVinculosDe;
 // Deja sin efecto los emparejamientos anteriores de esa computadora o de ese celular. Devuelve
 // cuáles, para cerrar sus salas (ADR-027).
-export async function soltarAnteriores(db: Db, compuSesionId: string, celularSesionId: string, salvo: string | null = null): Promise<string[]> {
-  const { rows } = await db.query<{ id: string }>(
-    "UPDATE puesto SET expira_en = now() WHERE vinculado_en IS NOT NULL AND expira_en > now() AND (sesion_id = $1 OR celular_sesion_id = $2) AND id IS DISTINCT FROM $3 RETURNING id",
-    [compuSesionId, celularSesionId, salvo],
-  );
-  return rows.map((r) => r.id);
-}
+export const soltarAnteriores = (db: Ejecutor, compuSesionId: string, celularSesionId: string, salvo: string | null = null) => datos.soltarAnteriores(db, compuSesionId, celularSesionId, salvo);
 
 // Vincular de nuevo (o entrar a la computadora con el celular) reemplaza al vínculo anterior:
 // así se renueva el plazo.
-export async function emparejar(db: Db, compuSesionId: string, celularSesionId: string, nombre: string | null): Promise<{ id: string; expira_en: string; soltados: string[] }> {
+export async function emparejar(db: Ejecutor, compuSesionId: string, celularSesionId: string, nombre: string | null): Promise<{ id: string; expira_en: string; soltados: string[] }> {
   const soltados = await soltarAnteriores(db, compuSesionId, celularSesionId);
-  const dias = await diasDeVinculo(db);
-  const id = randomUUID();
-  const { rows } = await db.query<{ expira_en: string }>(
-    `INSERT INTO puesto (id, sesion_id, codigo_hash, nombre, vinculado_en, celular_sesion_id, expira_en)
-     VALUES ($1, $2, $3, $4, now(), $5, now() + ($6 || ' days')::interval) RETURNING expira_en`,
-    // El código no se usa (nadie tiene que leerlo): va uno al azar porque la columna es única.
-    [id, compuSesionId, hashear(generarToken()), nombre, celularSesionId, String(dias)],
-  );
-  await sellarVinculo(db, id);
-  return { id, expira_en: rows[0]?.expira_en ?? new Date(Date.now() + dias * 86400000).toISOString(), soltados };
+  const dias = await diasDeVinculo();
+  const puesto = await datos.puestoVinculado(db, { compuSesionId, celularSesionId, nombre, dias });
+  await sellarVinculo(db, puesto.id);
+  return { id: puesto.id, expira_en: puesto.expira_en ?? new Date(Date.now() + dias * 86400000).toISOString(), soltados };
 }

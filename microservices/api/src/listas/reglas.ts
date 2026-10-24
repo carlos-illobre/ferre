@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { config } from "../config.js";
-import { pool } from "../db.js";
-import { registrarEvento } from "../eventos.js";
-import { sugerirEquivalencias } from "../duplicados/datos.js";
-import * as datos from "./datos.js";
+import * as archivos from "../persistencia/archivos.js";
+import { base } from "../persistencia/conexion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
+import { sugerirEquivalencias } from "../persistencia/duplicados.js";
+import * as datos from "../persistencia/listas.js";
 import type { EstadoDeLista, FilasDeLista, ListaAplicandose, ListaCargada, ListaEnHistorial, OrigenDeLista } from "../contratos/listas.js";
 import type { Enviable } from "../enviable.js";
 import { detectarProveedor, ErrorDeLectura, leerPlanilla, type FilaLeida, type Lectura } from "./lector.js";
@@ -15,6 +15,13 @@ import { detectarProveedor, ErrorDeLectura, leerPlanilla, type FilaLeida, type L
 // productos y precios. El archivo original se guarda para reprocesar.
 export type Rechazo = { error: string; estado: 400 | 404 | 409 | 413 | 422 | 502 };
 const LOTE = 500;
+
+// Las filas no se guardan hasta aplicar: se vuelve a leer el archivo original.
+async function releer(lista: datos.ListaGuardada): Promise<Lectura> {
+  const contenido = await archivos.leer(lista.archivo_ruta);
+  if (!contenido) throw new Error("El archivo de esa lista ya no está en el disco");
+  return leerPlanilla(new File([contenido], lista.archivo_nombre), { lector: lista.lector, precios_incluyen_iva: lista.precios_incluyen_iva, descuento_general: lista.descuento_general, descuento_contado: lista.descuento_contado });
+}
 
 export const historial = (): Promise<Enviable<ListaEnHistorial>[]> => datos.historial();
 
@@ -56,12 +63,10 @@ export async function cargar(archivo: unknown, proveedorDado: unknown, fechaDada
   const fechaLista = (typeof fechaDada === "string" && fechaDada) || lectura.fecha_lista;
   if (!fechaLista) return { error: "La planilla no dice su fecha: indicá la fecha de la lista", estado: 422 };
   const id = randomUUID();
-  const ruta = path.join(config.carpetaListas, `${id}${path.extname(archivo.name) || ".xlsx"}`);
-  await mkdir(config.carpetaListas, { recursive: true });
-  await writeFile(ruta, Buffer.from(await archivo.arrayBuffer()));
+  const ruta = await archivos.guardar("", `${id}${path.extname(archivo.name) || ".xlsx"}`, Buffer.from(await archivo.arrayBuffer()));
   const resumen = await compararConVigente(proveedorId, lectura.filas);
   await datos.guardarPendiente({ id, proveedorId, archivoNombre: archivo.name, ruta, fechaLista, resumen: JSON.stringify({ ...lectura.resumen, ...resumen, salteadas_detalle: lectura.salteadas.slice(0, 50) }), avisos: JSON.stringify(lectura.avisos), usuarioId });
-  await registrarEvento(pool, { tipo: "lista.cargada", usuarioId, contenido: { id, proveedor: proveedor.nombre, archivo: archivo.name, fechaLista, ...lectura.resumen, ...resumen } });
+  await anotarEvento(base, { tipo: "lista.cargada", usuarioId, contenido: { id, proveedor: proveedor.nombre, archivo: archivo.name, fechaLista, ...lectura.resumen, ...resumen } });
   return { id, proveedor: proveedor.nombre, fecha_lista: fechaLista, resumen: { ...lectura.resumen, ...resumen }, avisos: lectura.avisos, salteadas: lectura.salteadas.slice(0, 50) };
 }
 
@@ -77,7 +82,7 @@ export async function lectores(): Promise<string[] | null> {
 export async function filas(id: string, desde: number): Promise<FilasDeLista | null> {
   const lista = await datos.buscarLista(id);
   if (!lista) return null;
-  const lectura = await datos.releer(lista);
+  const lectura = await releer(lista);
   const vigentes = new Map((await datos.costosVigentes(lista.proveedor_id)).map((r) => [r.codigo_proveedor, r.costo_neto]));
   const todas = lectura.filas.map((f) => ({ ...f, costo_anterior: vigentes.get(f.codigo_proveedor) ?? null }));
   const orden = (f: (typeof todas)[number]) => (f.costo_anterior === null ? 1 : Number(f.costo_anterior) !== Number(f.costo_neto) ? 0 : 2);
@@ -99,7 +104,7 @@ export async function aplicar(id: string, usuarioId: string): Promise<Rechazo | 
 }
 
 async function aplicarEnSegundoPlano(lista: datos.ListaGuardada, usuarioId: string): Promise<void> {
-  const lectura = await datos.releer(lista);
+  const lectura = await releer(lista);
   const total = lectura.filas.length;
   // El progreso dice qué etapa va: «precios» (n de total) y después «duplicados».
   const progreso = (procesadas: number, etapa: "precios" | "duplicados" = "precios") => datos.anotarProgreso(lista.id, { procesadas, total, etapa });
@@ -134,10 +139,10 @@ async function aplicarEnSegundoPlano(lista: datos.ListaGuardada, usuarioId: stri
   // Los productos nuevos pueden ser el mismo artículo que ya vende otro proveedor (#29).
   if (nuevosIds.length) {
     await progreso(total, "duplicados");
-    resultado.posibles_duplicados = await sugerirEquivalencias(pool, nuevosIds);
+    resultado.posibles_duplicados = await sugerirEquivalencias(base, nuevosIds);
   }
   await datos.marcarAplicada(lista.id, usuarioId, resultado);
-  await registrarEvento(pool, { tipo: "lista.aplicada", usuarioId, contenido: { id: lista.id, proveedorId: lista.proveedor_id, fechaLista: lista.fecha_lista, ...resultado } });
+  await anotarEvento(base, { tipo: "lista.aplicada", usuarioId, contenido: { id: lista.id, proveedorId: lista.proveedor_id, fechaLista: lista.fecha_lista, ...resultado } });
 }
 
 // El Excel original, tal como lo mandó el proveedor.
@@ -145,7 +150,7 @@ export async function archivo(id: string): Promise<{ error: string } | { nombre:
   const lista = await datos.archivoDe(id);
   if (!lista) return { error: "No existe esa lista" };
   if (!lista.archivo_ruta) return { error: "Esa lista se cargó sin guardar el archivo" };
-  const contenido = await readFile(lista.archivo_ruta).catch(() => null);
+  const contenido = await archivos.leer(lista.archivo_ruta);
   if (!contenido) return { error: "El archivo de esa lista ya no está en el disco" };
   return { nombre: lista.archivo_nombre.replace(/[^\w. -]+/g, "_"), original: lista.archivo_nombre, contenido };
 }
@@ -158,6 +163,6 @@ export const estado = (id: string): Promise<Enviable<EstadoDeLista> | null> => d
 
 export async function descartar(id: string, usuarioId: string): Promise<boolean> {
   if (!(await datos.descartar(id))) return false;
-  await registrarEvento(pool, { tipo: "lista.descartada", usuarioId, contenido: { id } });
+  await anotarEvento(base, { tipo: "lista.descartada", usuarioId, contenido: { id } });
   return true;
 }

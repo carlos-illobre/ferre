@@ -1,9 +1,8 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import path from "node:path";
-import pg from "pg";
 import { config } from "../config.js";
-import * as datos from "./datos.js";
-import type { FilaDeLaCopia, LecturaDeLaCopia } from "./datos.js";
+import * as archivos from "../persistencia/archivos.js";
+import { escuchar as escucharLaBase } from "../persistencia/conexion.js";
+import * as datos from "../persistencia/productos.js";
+import type { FilaDeLaCopia, LecturaDeLaCopia } from "../persistencia/productos.js";
 
 // La copia del catálogo en el servidor (specs/018, RF-124; ADR-023). Los productos con sus costos
 // y proveedores cambian poco y por acciones puntuales (aplicar una lista, cambiar un margen, unir
@@ -19,7 +18,13 @@ const FORMATO = 3;
 // De qué base es la copia guardada: el servidor, el puerto y el nombre de la base (sin usuario ni
 // clave). Una copia de otra base (un volumen copiado entre ambientes) no se usa.
 const BASE = () => { try { const u = new URL(config.databaseUrl); return `${u.hostname}:${u.port}${u.pathname}`; } catch { return "?"; } };
-const ARCHIVO = () => path.join(config.carpetaListas, "copia", "catalogo.json");
+const ARCHIVO = () => archivos.ruta("copia", "catalogo.json");
+
+// Lo que la búsqueda compara de un producto: minúsculas, sin acentos y con todo lo que no es
+// letra ni número convertido en espacio.
+export function normalizarBusqueda(texto: string): string[] {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
 
 // Lo que la búsqueda compara de cada producto, armado una vez: el texto normalizado (con un
 // espacio adelante, para buscar comienzos de palabra) y los códigos en minúsculas.
@@ -41,7 +46,7 @@ function entrada(fila: FilaDeLaCopia): Entrada {
   // Las fechas que llegan de `pg` como Date se guardan como texto: igual que en la respuesta y en el disco.
   const f = JSON.parse(JSON.stringify(fila)) as FilaDeLaCopia;
   const codigos = [f.codigo_barras, ...(f.codigos ?? [])].filter((c): c is string => Boolean(c)).map((c) => c.toLowerCase());
-  return { fila: f, texto: ` ${datos.normalizarBusqueda(`${f.descripcion} ${f.marca ?? ""}`).join(" ")}`, codigos };
+  return { fila: f, texto: ` ${normalizarBusqueda(`${f.descripcion} ${f.marca ?? ""}`).join(" ")}`, codigos };
 }
 
 // Las marcas de unos productos, sin repetir (como se escribió en el primero) y en orden.
@@ -94,15 +99,11 @@ function guardarPronto() {
 }
 async function guardar() {
   if (marca === null) return;
-  const archivo = ARCHIVO();
-  await mkdir(path.dirname(archivo), { recursive: true });
-  // Se escribe al lado y se renombra: un corte a mitad no deja un archivo roto.
-  await writeFile(`${archivo}.nuevo`, JSON.stringify({ formato: FORMATO, base: BASE(), marca, filas: [...porId.values()].map((e) => e.fila), borrados: [...borrados] }));
-  await rename(`${archivo}.nuevo`, archivo);
+  await archivos.guardar("copia", "catalogo.json", JSON.stringify({ formato: FORMATO, base: BASE(), marca, filas: [...porId.values()].map((e) => e.fila), borrados: [...borrados] }));
 }
 async function leerDelDisco(): Promise<boolean> {
   try {
-    const guardada = JSON.parse(await readFile(ARCHIVO(), "utf8")) as { formato?: unknown; base?: unknown; marca?: unknown; filas?: unknown; borrados?: unknown };
+    const guardada = JSON.parse(String(await archivos.leer(ARCHIVO()))) as { formato?: unknown; base?: unknown; marca?: unknown; filas?: unknown; borrados?: unknown };
     if (guardada.formato !== FORMATO || guardada.base !== BASE() || typeof guardada.marca !== "string" || !/^\d+$/.test(guardada.marca) || !Array.isArray(guardada.filas)) return false;
     // Cada fila tiene que tener, al menos, su identificador y su descripción.
     if (!guardada.filas.every((f) => f && typeof f.id === "string" && typeof f.descripcion === "string")) return false;
@@ -114,12 +115,8 @@ async function leerDelDisco(): Promise<boolean> {
 
 // ---------- Los avisos de la base ----------
 
-// Una conexión propia, larga y quieta, solo para escuchar. Si se corta, se reconecta con espera
-// creciente y lee lo que cambió mientras tanto.
+// Si se escuchan los avisos de la base: la conexión que escucha está en la capa de datos.
 let escuchando = false;
-let oyente: pg.Client | null = null;
-let espera = 1000;
-let reconexion: ReturnType<typeof setTimeout> | null = null;
 let aviso: ReturnType<typeof setTimeout> | null = null;
 
 // Una lista aplicada avisa una vez por transacción; varios avisos juntos, una sola lectura. Si la
@@ -133,36 +130,6 @@ function alAviso(demora = 200) {
   }, demora);
 }
 
-// Suelta un cliente que ya no sirve. Le queda un oyente de errores que no hace nada: un error que
-// llega tarde no tumba el proceso.
-function soltar(c: pg.Client) {
-  c.removeAllListeners();
-  c.on("error", () => undefined);
-  c.end().catch(() => undefined);
-}
-
-function reconectar(c: pg.Client) {
-  soltar(c);
-  if (oyente === c) oyente = null;
-  if (!escuchando || reconexion) return;
-  reconexion = setTimeout(() => { reconexion = null; void escuchar(); }, espera);
-  espera = Math.min(espera * 2, 60_000);
-}
-
-async function escuchar() {
-  const c = new pg.Client({ connectionString: config.databaseUrl, keepAlive: true });
-  c.on("notification", () => alAviso());
-  c.on("error", () => reconectar(c));
-  c.on("end", () => reconectar(c));
-  try {
-    await c.connect();
-    await c.query("LISTEN catalogo");
-    oyente = c; espera = 1000;
-    // Lo que cambió mientras no se escuchaba.
-    alAviso();
-  } catch { reconectar(c); }
-}
-
 export const iniciada = () => escuchando;
 
 // Al arrancar el servidor: la copia del disco, o la base entera si no hay; después, lo que cambió,
@@ -171,7 +138,7 @@ export async function iniciar(): Promise<void> {
   escuchando = true;
   await leerDelDisco();
   await ponerAlDia();
-  await escuchar();
+  escucharLaBase("catalogo", () => alAviso());
 }
 
 // ---------- Buscar ----------
@@ -192,7 +159,7 @@ export type Busqueda = {
 // proveedor; lo escrito entero también vale como comienzo de un código. Sin palabras, por
 // descripción; con palabras, primero las descripciones más cortas.
 export function buscar(b: Busqueda): FilaDeLaCopia[] {
-  const palabras = datos.normalizarBusqueda(b.buscar ?? "").slice(0, 8);
+  const palabras = normalizarBusqueda(b.buscar ?? "").slice(0, 8);
   // Lo escrito entero, con sus signos, también es el comienzo de un código: un código con guion o
   // barra (TA-81) se encuentra escribiéndolo, no solo escaneándolo (decisión 139).
   const entero = (b.buscar ?? "").trim().toLowerCase();

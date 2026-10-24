@@ -9,11 +9,6 @@ import { describe, expect, it } from "vitest";
 // números de los parámetros: cualquier otra cosa hace fallar la prueba.
 const SE_PUEDE_PEGAR = new Set([
   "ROLES_Y_PERMISOS", "VIGENTE", "NORMALIZAR", "soloNuevos", "CONSULTA_DEL_CATALOGO", // fragmentos fijos de SQL
-  "tabla", // de listas fijas (TABLAS_MOVIBLES, y «producto» o «precio_proveedor» en las listas)
-  'columnas.join(", ")', // columnas fijas de las listas
-  'sets.join(", ")', // columnas de producto que pasan por COLUMNAS_QUE_SE_CAMBIAN
-  "valores", // solo números de parámetro ($1, $2…)
-  "j * 4 + 1", "j * 4 + 2", "j * 4 + 3", "j * 4 + 4", "valores.length", "i * columnas.length + j + 1",
 ]);
 
 function archivos(dir: string): string[] {

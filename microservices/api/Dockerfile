@@ -23,7 +23,8 @@ RUN addgroup -g 10001 app && adduser -u 10001 -G app -D app
 WORKDIR /app
 COPY --from=build --chown=app:app /out ./
 COPY --from=build --chown=app:app /app/microservices/api/dist ./dist
-COPY --from=build --chown=app:app /app/microservices/api/migrations ./migrations
+# Las migraciones van al lado del migrador compilado, donde las busca (src/persistencia/migrar.ts).
+COPY --from=build --chown=app:app /app/microservices/api/src/persistencia/migraciones ./dist/persistencia/migraciones
 RUN mkdir -p /app/datos/listas && chown app:app /app/datos/listas
 USER app
 EXPOSE 8080

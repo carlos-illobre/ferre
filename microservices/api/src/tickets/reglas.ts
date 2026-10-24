@@ -1,10 +1,9 @@
-import { base } from "../base.js";
-import { anotarEvento } from "../eventos.js";
-import * as datos from "./datos.js";
+import { base } from "../persistencia/conexion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
+import * as datos from "../persistencia/tickets.js";
 import type { Ticket } from "../contratos/tickets.js";
 import type { Enviable } from "../enviable.js";
 
-export { carpetaTickets } from "./datos.js";
 
 // Tickets (RF-80): errores y mejoras que reporta quien usa el sistema, con texto y fotos.
 // Todos los usuarios ven todos.

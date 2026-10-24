@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa } from "./pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("./pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("./db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("./persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("./app.js");
 
 // La salud del servidor (specs/018, RF-125): el compose la pregunta cada 10 segundos.

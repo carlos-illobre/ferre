@@ -18,6 +18,15 @@ env:
 jobs:
   typescript:
     runs-on: ubuntu-latest
+    # La capa de datos se prueba contra PostgreSQL de la misma versión que la base (ADR-025).
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env: { POSTGRES_PASSWORD: prueba }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U postgres" --health-interval 2s --health-retries 30
+    env:
+      BASE_DE_PRUEBAS: postgres://postgres:prueba@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -26,9 +35,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: VITE_API_URL=http://localhost pnpm build
-      # Unitarias de la librería de precios, la API (rutas contra una base simulada), el
-      # cliente web (pantallas sobre jsdom) y Procesos: la red de seguridad de cada push.
+      # Unitarias de la librería de precios, la API (rutas contra una base simulada y la capa de
+      # datos contra PostgreSQL), el cliente web (pantallas sobre jsdom) y Procesos.
       - run: pnpm test
+      # La capa de datos de cada servicio, con el 100 % de cobertura: si baja, no se sube.
+      - run: pnpm -r --if-present test:persistencia
 
   listas-de-proveedores:
     runs-on: ubuntu-latest

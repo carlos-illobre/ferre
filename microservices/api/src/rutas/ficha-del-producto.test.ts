@@ -5,7 +5,7 @@ import { horaDeLectura } from "../productos/reglas.js";
 // Lo que la ficha del producto renovada pide al servidor (specs/016): la última lectura del
 // código de barras y el archivo de origen del costo.
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 describe("la última lectura del código (RF-112)", () => {
@@ -15,9 +15,9 @@ describe("la última lectura del código (RF-112)", () => {
     const r = await pedir(app, "PATCH", "/productos/p1", { rol: "soloVende", cuerpo: { codigo_barras: "7791234000004", codigo_leido_en: "2026-10-13T13:24:00.000Z" } });
     expect(r.status).toBe(204);
     const update = base.actual.sqlDe(/UPDATE producto SET/).at(-1)!;
-    expect(update.sql).toMatch(/codigo_barras = \$2, codigo_leido_en = \$3/);
-    expect(update.params).toEqual(["p1", "7791234000004", "2026-10-13T13:24:00.000Z"]);
-    expect(base.actual.sqlDe(/INSERT INTO evento/).at(-1)!.params.join(" ")).toContain("2026-10-13T13:24:00.000Z");
+    expect(update.sql).toMatch(/codigo_barras = \$1, codigo_leido_en = \$2/);
+    expect(update.params).toEqual(["7791234000004", "2026-10-13T13:24:00.000Z", "p1"]);
+    expect(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params.join(" ")).toContain("2026-10-13T13:24:00.000Z");
   });
 
   it("016-E09: sin hora, o con una en el futuro o anterior al sistema, vale la del servidor", () => {
@@ -31,7 +31,7 @@ describe("la última lectura del código (RF-112)", () => {
 
   it("016-E11: borrar el código borra la última lectura; la hora sola, sin código, no se acepta", async () => {
     await pedir(app, "PATCH", "/productos/p1", { cuerpo: { codigo_barras: null } });
-    expect(base.actual.sqlDe(/UPDATE producto SET/).at(-1)!.params).toEqual(["p1", null, null]);
+    expect(base.actual.sqlDe(/UPDATE producto SET/).at(-1)!.params).toEqual([null, null, "p1"]);
     expect((await pedir(app, "PATCH", "/productos/p1", { cuerpo: { codigo_leido_en: "2026-10-13T13:24:00Z" } })).status).toBe(400);
     expect((await pedir(app, "PATCH", "/productos/p1", { cuerpo: { codigo_barras: "779123", codigo_leido_en: "ayer" } })).status).toBe(400);
   });
@@ -42,7 +42,7 @@ describe("la última lectura del código (RF-112)", () => {
   });
 
   it("016-E10: el catálogo trae la última lectura de cada producto", async () => {
-    const { leerCatalogoEntero } = await import("../productos/datos.js");
+    const { leerCatalogoEntero } = await import("../persistencia/productos.js");
     base.actual.programar(/pg_snapshot_xmin/, { rows: [{ marca: "10", tope: "12" }] });
     await leerCatalogoEntero();
     expect(base.actual.sqlDe(/FROM producto p/).at(-1)!.sql).toMatch(/p\.codigo_leido_en/);

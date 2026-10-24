@@ -1,7 +1,7 @@
 import type { Context, MiddlewareHandler } from "hono";
 import { OAuth2Client } from "google-auth-library";
 import { config } from "./config.js";
-import { pool } from "./db.js";
+import { base } from "./persistencia/conexion.js";
 import { buscarSesion, type SesionActiva, type Usuario } from "./acceso/sesiones.js";
 import { nombreDePermiso, type Permiso } from "./permisos.js";
 
@@ -24,7 +24,7 @@ export const exigirSesion: MiddlewareHandler = async (c, next) => {
   const interna = (c.env as { sesionInterna?: SesionActiva } | undefined)?.sesionInterna;
   if (interna) { c.set("sesion", interna); await next(); return; }
   const token = tokenDe(c);
-  const sesion = token ? await buscarSesion(pool, token) : null;
+  const sesion = token ? await buscarSesion(base, token) : null;
   if (!sesion) return c.json({ error: "Hay que iniciar sesión" }, 401);
   c.set("sesion", sesion);
   await next();

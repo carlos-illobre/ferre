@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { base, Deshacer, enTransaccion, type Ejecutor } from "../base.js";
-import { anotarEvento } from "../eventos.js";
+import { base } from "../persistencia/conexion.js";
+import { Deshacer, enTransaccion, type Ejecutor } from "../persistencia/transaccion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
 import type { z } from "zod";
 import type { cambiosDeRol, cambiosDeUsuario, rolNuevo, usuarioNuevo } from "./esquemas.js";
-import * as datos from "./datos.js";
+import * as datos from "../persistencia/administracion.js";
 import { olvidarSesiones } from "../acceso/sesiones.js";
 import { cerrarSalasDelUsuario } from "../acceso/reglas.js";
 import type { Rol, Usuario } from "../contratos/usuarios.js";

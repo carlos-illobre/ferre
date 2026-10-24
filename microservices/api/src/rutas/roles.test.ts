@@ -3,7 +3,7 @@ import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 import { PERMISOS } from "../permisos.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 const { cargarParaPrueba } = await import("../productos/copia.js");
 

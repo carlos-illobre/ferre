@@ -1,11 +1,11 @@
-import { base, enTransaccion } from "../base.js";
-import { pool } from "../db.js";
-import { anotarEvento } from "../eventos.js";
+import { base } from "../persistencia/conexion.js";
+import { enTransaccion } from "../persistencia/transaccion.js";
+import { anotarEvento } from "../persistencia/eventos.js";
 import { hashear, usuarioConPermisos, type SesionActiva } from "../acceso/sesiones.js";
 import type { Usuario } from "../acceso/sesiones.js";
 import type { CambioParaApartar, CambiosApartados, CambiosParaRevisar } from "../contratos/apartados.js";
 import type { Enviable } from "../enviable.js";
-import * as datos from "./datos.js";
+import * as datos from "../persistencia/apartados.js";
 
 // Lo apartado (specs/014-cambios-apartados, ADR-021): lo que una persona hizo sin conexión y no
 // llegó al servidor antes de que la desactivaran. Sube con el token de su sesión cerrada, se
@@ -33,7 +33,7 @@ export async function aceptar(id: string, quien: Usuario): Promise<Resultado<{ a
     if (!cambio) return mal(404, "Ese cambio apartado no existe");
     if (cambio.decision) return mal(409, yaDecidido(cambio.decision, cambio.decidido_por));
     // Puede que ya la hayan reactivado: lo apartado se acepta igual (014, casos de borde).
-    const autor = (await usuarioConPermisos(pool, cambio.usuario_id)) ?? (await usuarioConPermisos(pool, cambio.usuario_id, true));
+    const autor = (await usuarioConPermisos(base, cambio.usuario_id)) ?? (await usuarioConPermisos(base, cambio.usuario_id, true));
     if (!autor) return mal(404, "La persona que hizo ese cambio ya no existe");
     const error = (await productoQueYaNoEsta(cambio)) ?? (await repetir(cambio, { id: cambio.sesion_id, usuario: autor }));
     if (error) {

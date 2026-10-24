@@ -3,7 +3,7 @@ import { baseFalsa, pedir, usuarios } from "../pruebas/base-falsa.js";
 import { hashear } from "../acceso/sesiones.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
 // Entrar a la computadora con el celular (RF-76, decisión 57): volvió el 2026-10-12, sin paso
@@ -32,7 +32,7 @@ describe("entrar a la computadora con el celular", () => {
     // Solo se aprueba el que no fue aprobado y no venció.
     const sql = base.actual.sqlDe(/UPDATE vinculacion SET aprobada_en/)[0]!;
     expect(sql.sql).toMatch(/aprobada_en IS NULL AND expira_en > now\(\)/);
-    expect(sql.params).toEqual(["u-solo-vende", hashear("viejo"), "sesion-soloVende"]); // y desde qué sesión de celular
+    expect(sql.params).toEqual(["u-solo-vende", "sesion-soloVende", hashear("viejo")]); // y desde qué sesión de celular
     base.actual.programar(/UPDATE vinculacion SET aprobada_en/, { rows: [{ id: "v1", dispositivo: "computadora · Chrome" }] });
     expect((await pedir(app, "POST", "/sesiones/vinculaciones/aprobar", { rol: "soloVende", cuerpo: { codigo: "bueno" } })).status).toBe(200);
   });
@@ -56,7 +56,7 @@ describe("entrar a la computadora con el celular", () => {
     expect(retiro.sql).toMatch(/clave_hash = \$2 AND aprobada_en IS NOT NULL AND retirada_en IS NULL/);
     expect(retiro.params).toEqual(["v1", hashear("la-clave")]);
     expect(base.actual.sqlDe(/INSERT INTO sesion/).at(-1)!.params[1]).toBe("u-cajero");
-    const evento = base.actual.sqlDe(/INSERT INTO evento/).at(-1)!.params;
+    const evento = base.actual.sqlDe(/insert into "evento"/).at(-1)!.params;
     expect(JSON.stringify(evento)).toContain("sesion.iniciada");
     expect(JSON.stringify(evento)).toContain("celular");
   });

@@ -1,4 +1,4 @@
-import * as datos from "./datos.js";
+import * as datos from "../persistencia/sistema.js";
 import { TRAMOS_DE_SESION } from "./esquemas.js";
 
 // El tiempo que fija quien administra, para todos (specs/020, RF-133; el del celular emparejado

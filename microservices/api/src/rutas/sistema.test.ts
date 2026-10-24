@@ -2,14 +2,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { baseFalsa, pedir } from "../pruebas/base-falsa.js";
 
 const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("../pruebas/base-falsa.js")["baseFalsa"]> }));
-vi.mock("../db.js", () => ({ get pool() { return base.actual.pool; } }));
+vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 const { leerTiempos, ponerParaPrueba, segundosDeSesion } = await import("../sistema/ajustes.js");
 
 // Más → Sistema (specs/020): lo que vale para todos, que fija quien administra el sistema.
 type Ajustes = { sesion_segundos: number; vinculo_dias: number; tramos: { sesion_segundos: number[] } };
 const guardados = () => base.actual.sqlDe(/INSERT INTO configuracion/).map((c) => c.params);
-const eventos = () => base.actual.sqlDe(/INSERT INTO evento/);
+const eventos = () => base.actual.sqlDe(/insert into "evento"/);
 
 describe("los ajustes del sistema", () => {
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe("los ajustes del sistema", () => {
 
   it("020-E14: los días del vínculo se guardan en el mismo lugar que antes", async () => {
     await pedir(app, "PUT", "/sistema/ajustes", { rol: "admin", cuerpo: { vinculo_dias: 45 } });
-    expect(guardados()).toEqual([["45"]]);
+    expect(guardados()).toEqual([["vinculo.dias", "45"]]);
   });
 
   it("023-E33: el tiempo del celular emparejado ya no existe: no se ve ni se guarda", async () => {
