@@ -8,7 +8,7 @@ pruebas de las pantallas quedan en pausa en el CI y se arreglan todas juntas al 
 - [x] T003 [interfaz] Catálogo: Listas de precios y Duplicados como la v2, en el celular y la computadora
 - [ ] T004 [interfaz] Depósito: Stock, Compras y Contar como la v2, en el celular y la computadora
 - [x] T005 [interfaz] Negocio: Cómo va el negocio, Usuarios y Quién hizo qué como la v2, en el celular y la computadora
-- [ ] T006 [interfaz] Más: Anomalías, Procesos, Mejoras y errores y Configuración como la v2, en el celular y la computadora
+- [x] T006 [interfaz] Más: Anomalías, Procesos, Mejoras y errores y Configuración como la v2, en el celular y la computadora
 - [ ] T007 [interfaz] El marco (menú lateral, pestañas, menú de abajo) revisado contra la v2; en Negocio, las pestañas Resumen · Usuarios · Quién hizo qué (las secciones de Resumen pasan a ser segmentos de la pantalla y Roles, un botón dentro de Usuarios, como la v2) (depende de T003 a T006). Unificar los íconos de la v2 en un solo juego: `IconoDeLaV2.tsx`, `IconoDeDeposito.tsx`, `iconos-de-negocio.tsx` y los trazos agregados a las piezas de cada interfaz (correo, subir-archivo, edificio, unir, separar, codigo-de-barras, texto, capas, flecha; unir, dividir, camion, correo, bandeja). Si cambia la altura del menú de abajo del celular, ajustar la barra fija de Duplicados
 - [ ] T008 Anotar en `proyecto/tasks.md` lo que la v2 trae y el sistema no hace (los lugares vacíos de E02) (depende de T003 a T006)
 - [ ] T009 Comparar cada pantalla con su v2 en capturas del celular y la computadora y mostrárselas a Carlos (depende de T007)
@@ -63,3 +63,6 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Compras (computadora y celular): si cada compra está pagada o cuándo vence («Pagada», «Vence 18/11», «por adelantado», «a 30 días») y el filtro «Sin pagar».
 - Compras (computadora): el código QR de «Sacale una foto a la factura» en la misma pantalla y que la compra «se arme sola» con la foto; hoy los botones llevan al ingreso.
 - Compras (computadora y celular): las barras por día de «Esta semana» salen de las compras recientes; si no alcanzan para explicar el total, quedan vacías (haría falta el gasto por día desde el servidor).
+- Configuración (celular): cuánto ocupa lo guardado en el celular y su barra («38 KB de 150 KB»); queda con «—».
+- Configuración (computadora y celular): la marca «Este» en el celular desde el que se mira y el nombre del dispositivo vinculado («Vinculada con Moto G54»); dice «tu celular» o «tu computadora».
+- Configuración (computadora): cuánto ocupa lo guardado para trabajar sin conexión («23,4 MB»).

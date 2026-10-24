@@ -6,7 +6,7 @@ import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
 import { TEXTOS_DEL_VINCULO } from "../EspejoEstado";
 import { useCatalogo } from "../../catalogo";
-import { Configuracion } from "../Configuracion";
+import { ConfiguracionCelu } from "./pantallas/Configuracion";
 import { PantallaDeProcesos } from "../Procesos";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { alAvisoDelEspejo, pausarEspejo, useEspejar, useEspejo } from "../../espejo";
@@ -31,8 +31,6 @@ import { Negocio, type Parte } from "./Negocio";
 import { TicketsCelu } from "./pantallas/Tickets";
 import { CabezaDeUsuarios } from "./Usuarios";
 import { PESTANAS_DE_USUARIOS, PIDE_USUARIOS } from "../pestanas-de-usuarios";
-import { MisCelulares } from "./MisCelulares";
-import { VinculoPropio } from "../Vinculo";
 import { Sistema } from "../Sistema";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../pestanas-de-negocio";
 import { ComoVaElNegocio, SUB_DE_SECCION } from "./ComoVaElNegocio";
@@ -222,7 +220,7 @@ function Pantallas() {
       )}
       {falta ? <SinPermiso falta={falta} />
         : pestana === "mas" && parte === "tickets" ? <TicketsCelu />
-        : pestana === "mas" && parte === "configuracion" ? <Configuracion celular propio={<><MisCelulares /><VinculoPropio /></>} />
+        : pestana === "mas" && parte === "configuracion" ? <ConfiguracionCelu />
         : pestana === "mas" && parte === "sistema" ? <Sistema celular />
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />
         : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeUsuarios actual="roles" />} />

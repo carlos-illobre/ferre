@@ -36,13 +36,12 @@ import { Duplicados } from "./base/pantallas/Duplicados";
 import { Inventario } from "./Inventario";
 import { DineroInvertido } from "../DineroInvertido";
 import { Ingreso } from "./Ingreso";
-import { Configuracion } from "../Configuracion";
+import { Configuracion } from "./base/pantallas/Configuracion";
 import { PantallaDeProcesos } from "../Procesos";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { Contar } from "./base/pantallas/Contar";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./base/pantallas/Resumen";
-import { MisCelulares, Usuarios } from "./base/pantallas/Usuarios";
-import { VinculoPropio } from "../Vinculo";
+import { Usuarios } from "./base/pantallas/Usuarios";
 import { Sistema } from "../Sistema";
 import { PESTANAS_DE_USUARIOS } from "../pestanas-de-usuarios";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
@@ -453,7 +452,7 @@ function Pantallas() {
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />
           : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? <Usuarios />
-          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion propio={<><MisCelulares /><VinculoPropio /></>} /> : actual === "sistema" ? <Sistema /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anotadas titulo={!pestanas} /> : actual === "para-revisar" ? <ParaRevisar titulo={!pestanas} /> : <Vender />}
+          : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion /> : actual === "sistema" ? <Sistema /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anotadas titulo={!pestanas} /> : actual === "para-revisar" ? <ParaRevisar titulo={!pestanas} /> : <Vender />}
       </div>
     </div>
   );

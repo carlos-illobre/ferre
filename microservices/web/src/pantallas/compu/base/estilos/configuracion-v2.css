@@ -1,0 +1,48 @@
+/* Configuración en la computadora, como la v2 («Dos columnas»; decisión 148). Las piezas (.mv-*)
+   están en mas-v2.css; acá, la disposición: esta computadora a la izquierda y tu cuenta a la derecha. */
+.cfgv { gap: 16px !important; padding: 20px 32px 32px !important; }
+.cfgv-cabeza h1 { font-size: 28px; line-height: 34px; font-weight: 800; letter-spacing: -.02em; }
+.cfgv-cabeza .mv-detalle { font-size: 15px; }
+.cfgv-cols { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.cfgv-cols > section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.cfgv-sub { font-size: 16px; font-weight: 750; padding: 0 2px; }
+.cfgv-tarjeta { overflow: hidden; }
+.cfgv-renglon { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 4px 14px; padding: 20px 24px; }
+.cfgv-renglon + .cfgv-renglon { border-top: 1px solid var(--v-borde); }
+.cfgv-baldosa { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--v-pino-suave); color: var(--v-pino-texto); flex: none; }
+.cfgv-baldosa.blanca { background: #fff; color: var(--v-texto-2); border: 1px solid var(--v-borde); }
+.cfgv-texto { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cfgv-texto b { font-size: 16px; font-weight: 750; }
+.cfgv-llave-caja { display: flex; align-items: flex-start; gap: 14px; }
+.cfgv-extra { grid-column: 2 / -1; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.cfgv-llave { position: relative; flex: none; width: 52px; height: 32px; padding: 0; border: 0; border-radius: 999px; background: var(--v-borde-fuerte); cursor: pointer; transition: background-color .2s ease-out; }
+.cfgv-llave::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / .3); transition: transform .2s cubic-bezier(.32, .72, 0, 1); }
+.cfgv-llave.si { background: var(--v-pino); }
+.cfgv-llave.si::after { transform: translateX(20px); }
+.cfgv-llave::before { content: ""; position: absolute; inset: -6px -4px; }
+.cfgv-muestra { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; }
+.cfgv-mueve { position: relative; height: 64px; border-radius: 10px; background: var(--v-hundido); overflow: hidden; }
+.cfgv-mueve i { position: absolute; left: 22px; top: 12px; width: 76px; height: 30px; border-radius: 6px; background: #fff; box-shadow: var(--v-sombra-1); animation: cfgv-sube 2.4s var(--v-curva) infinite; }
+.cfgv-mueve b { position: absolute; right: 8px; bottom: 8px; width: 40px; height: 10px; border-radius: 5px; background: var(--v-pino); animation: cfgv-entra 2.4s var(--v-curva) infinite; }
+.cfgv-mueve.quieto i, .cfgv-mueve.quieto b { animation: none; }
+@keyframes cfgv-sube { 0%, 15% { transform: translateY(10px); opacity: 0; } 35%, 100% { transform: none; opacity: 1; } }
+@keyframes cfgv-entra { 0%, 40% { transform: translateY(20px); } 60%, 100% { transform: none; } }
+.cfgv-tramos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; max-width: 420px; padding: 3px; border-radius: 12px; background: var(--v-hundido); }
+.cfgv-tramos button { min-height: 40px; border: 0; border-radius: 9px; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--v-texto-2); cursor: pointer; }
+.cfgv-tramos button.elegido { background: #fff; color: var(--v-tinta); box-shadow: var(--v-sombra-1); }
+.cfgv-guarda { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 18px 20px; border-radius: 16px; background: var(--v-hundido); }
+.cfgv-guarda .mv-barra { display: block; margin: 4px 0 8px; }
+.cfgv-error { color: var(--v-error-texto); font-weight: 600; }
+.cfgv-celulares { overflow: hidden; }
+.cfgv-celular { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--v-borde); }
+.cfgv-celulares > .mv-aviso { margin: 12px 16px 0; }
+.cfgv-sin { padding: 14px 16px; border-bottom: 1px solid var(--v-borde); }
+.cfgv-vincular { margin: 12px 16px 0; }
+.cfgv-nota { display: flex; gap: 8px; align-items: flex-start; padding: 12px 16px 14px; font-size: 14px; color: var(--v-texto-2); }
+.cfgv-nota svg { flex: none; margin-top: 2px; }
+.cfgv-vinculo { padding: 20px; display: flex; flex-direction: column; gap: 4px; }
+.cfgv-linea { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.cfgv-linea > i { flex: 1; border-top: 2px dashed var(--v-logro); }
+.cfgv-aparato { width: 44px; height: 44px; border-radius: 12px; background: var(--v-hundido); color: var(--v-texto-2); display: grid; place-items: center; }
+.cfgv-vinculo-titulo { font-size: 16px; font-weight: 750; }
+.cfgv-botones { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
